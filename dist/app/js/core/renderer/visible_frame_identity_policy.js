@@ -1,3 +1,5 @@
+import { getThematicWgiSignature } from "../thematic_wgi_view_model.js";
+import { getPopulationSignature } from "../population_spatial_view_model.js";
 // Owns visible frame identity policy decisions; inputs remain live.
 export function createVisibleFrameIdentityPolicy(runtimeState, {
   areZoomTransformsEquivalent,
@@ -35,6 +37,8 @@ export function createVisibleFrameIdentityPolicy(runtimeState, {
       runtimeState.showStrategicResourceMarkers ? "strategic-resources:on" : "strategic-resources:off",
       `strategic-rev:${Number(runtimeState.scenarioStrategicValuesRevision || 0)}`,
       `strategic-metric:${String(runtimeState.strategicChoroplethMetric || "")}`,
+      `thematic:${getThematicWgiSignature(runtimeState)}`,
+      `population:${getPopulationSignature(runtimeState)}`,
       `strategic-style:${JSON.stringify(runtimeState.styleConfig?.strategicValues || {})}`,
       runtimeState.showTransport ? "transport:on" : "transport:off",
       runtimeState.showRoad ? "road:on" : "road:off",

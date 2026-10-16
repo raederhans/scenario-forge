@@ -423,7 +423,8 @@ export function createUrbanCityPolicyOwner({
           for (let dy = -1; dy <= 1; dy += 1) {
             for (const other of markerGrid.get(gridKey(cellX + dx, cellY + dy)) || []) {
               const boundsDistance = (entry.markerSizePx + other.markerSizePx) / 2 + 8;
-              const minimumDistance = Math.max(localSeparationPx, boundsDistance);
+              const minimumDistance = boundsDistance
+                + (Math.max(localSeparationPx, boundsDistance) - boundsDistance) * detailProgress;
               if (Math.hypot(screenX - other.screenPoint[0], screenY - other.screenPoint[1]) < minimumDistance) return false;
             }
           }

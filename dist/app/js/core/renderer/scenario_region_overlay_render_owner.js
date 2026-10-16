@@ -27,6 +27,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   shouldSkipFeature,
   pathBoundsInScreen,
   getResolvedFeatureColor,
+  getPopulationUnestimatedOverlayColor = () => null,
   LAND_FILL_COLOR,
   getPoliticalFeaturePathEntry,
   getScenarioWaterVisualRevisionToken,
@@ -146,9 +147,10 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
           context.restore();
         }
       };
-      const waterPath = visibleParts.length === parts.length
-        ? getScenarioWaterFeaturePath(feature, parts)
-        : null;
+      // A retained whole-feature path is already projected. Offscreen parts
+      // are clipped by the canvas, so a subset view can reuse that exact path.
+      const waterPath = getCachedWaterFeaturePath(feature, parts)
+        || (visibleParts.length === parts.length ? getScenarioWaterFeaturePath(feature, parts) : null);
       let didFill = false;
       if (waterPath) {
         fillWaterPath(waterPath);
@@ -208,6 +210,8 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     }
     const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+    const populationColor = getSafeCanvasColor(getPopulationUnestimatedOverlayColor(), null);
+    const unestimatedFeatures = populationColor ? new Set([...buckets.land, ...buckets.shoal]) : null;
     overlayFeatures.forEach((feature, index) => {
       const id = getSharedFeatureId(feature) || `atlantropa-overlay-${index}`;
       if (!id) return;
@@ -215,7 +219,8 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return;
       if (!pathBoundsInScreen(feature)) return;
       const fillColor =
-        getSafeCanvasColor(runtimeState.colors?.[id], null)
+        (unestimatedFeatures?.has(feature) ? populationColor : null)
+        || getSafeCanvasColor(runtimeState.colors?.[id], null)
         || getSafeCanvasColor(getResolvedFeatureColor(feature, id), null)
         || LAND_FILL_COLOR;
       const cachedPath = getPoliticalFeaturePathEntry(feature, {
@@ -328,7 +333,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       if (path) {
         if (estimatedBytes <= waterPathCacheBudget) for (const part of parts) scenarioWaterPathCache.delete(part);
         const cacheKey = Symbol("scenario-water-path");
-        scenarioWaterPathCache.set(cacheKey, { path, parts, estimatedBytes });
+        scenarioWaterPathCache.set(cacheKey, { path, parts: [...parts], estimatedBytes });
         const retained = scenarioWaterPathCache.get(cacheKey);
         if (retained?.path === path) {
           retained.projectionGeneration = getProjectionGeometryGeneration(rendererSurfaceHost.getProjection());
@@ -446,8 +451,8 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       visiblePathBytes += allPartsVisible
         ? 256 + parts.reduce((sum, part) => sum + getGeometryRetentionWeights(part).path - 256 + 8, 0)
         : visibleParts.reduce((sum, part) => sum + getGeometryRetentionWeights(part).path, 0);
-      if (allPartsVisible ? getCachedWaterFeaturePath(feature, parts)
-        : visibleParts.every((part) => scenarioWaterPathCache.has(part))) continue;
+      if (getCachedWaterFeaturePath(feature, parts)
+        || (!allPartsVisible && visibleParts.every((part) => scenarioWaterPathCache.has(part)))) continue;
       plans.push({ feature, parts, visibleParts, allPartsVisible });
     }
     const identity = getVisibleWaterWarmupIdentity(selection);

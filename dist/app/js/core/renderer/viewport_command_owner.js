@@ -152,13 +152,27 @@ export function createViewportCommandOwner({
     applyZoomCommand(selection, zoomBehavior, zoomBehavior.scaleTo, [nextScale], nextScale);
   }
 
-  function enforceZoomConstraints() {
+  function enforceZoomConstraints({ suppressRender = false } = {}) {
     const zoomBehavior = getZoomBehavior();
     const selection = selectInteractionRect();
     if (!zoomBehavior || !selection) return;
     selection.interrupt?.();
     pendingScale = null;
     pendingCommand = null;
+    if (suppressRender) {
+      const d3 = getD3();
+      const node = getInteractionRectNode();
+      const constrained = zoomBehavior.constrain()(
+        d3.zoomTransform(node),
+        zoomBehavior.extent().call(node, node.__data__, 0, [node]),
+        zoomBehavior.translateExtent(),
+      );
+      // Keep D3 and renderer state aligned before D3 emits zoom events. The
+      // lifecycle's same-transform guard then avoids an early map draw.
+      effects.setZoomTransform?.(constrained);
+      selection.call(zoomBehavior.transform, constrained);
+      return;
+    }
     selection.call(zoomBehavior.translateBy, 0, 0);
   }
 

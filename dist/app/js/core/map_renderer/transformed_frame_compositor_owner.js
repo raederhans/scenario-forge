@@ -27,6 +27,8 @@ export function createTransformedFrameCompositorOwner({
   effects = {},
 } = {}) {
   const interactionCompositePassNames = requirePassNames(constants.interactionCompositePassNames);
+  const getActiveInteractionCompositePassNames = getters.getActiveInteractionCompositePassNames
+    || (() => interactionCompositePassNames);
   const renderPhaseIdle = requireString(constants.renderPhaseIdle, "constants.renderPhaseIdle");
   const renderPhaseInteracting = requireString(
     constants.renderPhaseInteracting,
@@ -71,10 +73,6 @@ export function createTransformedFrameCompositorOwner({
     "getters.getZoomGestureEndedAt",
   );
   const getDpr = requireFunction(getters.getDpr, "getters.getDpr");
-  const isHgoRuntimePreviewReady = requireFunction(
-    getters.isHgoRuntimePreviewReady,
-    "getters.isHgoRuntimePreviewReady",
-  );
 
   const nowMs = requireFunction(helpers.nowMs, "helpers.nowMs");
   const canDrawTransformedPass = requireFunction(
@@ -116,7 +114,6 @@ export function createTransformedFrameCompositorOwner({
     effects.blitCompositeBufferToMain,
     "effects.blitCompositeBufferToMain",
   );
-  const resetMainCanvas = requireFunction(effects.resetMainCanvas, "effects.resetMainCanvas");
   const setInteractionCompositeRejectedReason = requireFunction(
     effects.setInteractionCompositeRejectedReason,
     "effects.setInteractionCompositeRejectedReason",
@@ -171,7 +168,7 @@ export function createTransformedFrameCompositorOwner({
         })
         : composeRenderPassesToTarget(
           bufferContext,
-          interactionCompositePassNames,
+          getActiveInteractionCompositePassNames(),
           currentTransform,
           { requireAllPasses: true },
         ).ok;
@@ -187,7 +184,9 @@ export function createTransformedFrameCompositorOwner({
         drawBordersPass(k, { interactive: !!interactiveBorders });
         bufferContext.setTransform(1, 0, 0, 1, 0, 0);
       }
-      ok = drawTransformedPass("labels", currentTransform);
+      ok = effects.drawInteractionLabels
+        ? effects.drawInteractionLabels(currentTransform)
+        : drawTransformedPass("labels", currentTransform);
     });
     if (!ok) return false;
     blitCompositeBufferToMain(bufferCanvas);
@@ -200,8 +199,10 @@ export function createTransformedFrameCompositorOwner({
     if (effects.ensureTransformedPassCoverage?.(timings) === false) return false;
     const cache = getRenderPassCacheSnapshot();
     const activeTransformedPassNames = getActiveTransformedFramePassNames();
+    const activeInteractionPassNames = getActiveInteractionCompositePassNames();
     const transformedPasses = activeTransformedPassNames.filter((passName) => (
-      !interactionCompositePassNames.includes(passName) && passName !== "labels"
+      !activeInteractionPassNames.includes(passName) && passName !== "labels"
+        && !(effects.drawInteractionLabels && passName === "textureLabels")
     ));
     const initialRenderPhase = getRenderPhase();
     const allowDirtyFastFrame = initialRenderPhase === renderPhaseSettling
@@ -213,28 +214,6 @@ export function createTransformedFrameCompositorOwner({
       allowDirty: allowDirtyFastFrame,
     }))) {
       return false;
-    }
-    if (isHgoRuntimePreviewReady()) {
-      resetMainCanvas();
-      const drewHgoPreviewFrame = activeTransformedPassNames.every((passName) => (
-        drawTransformedPass(passName, currentTransform)
-      ));
-      if (!drewHgoPreviewFrame) {
-        recordRenderPerfMetric("transformedFrameBufferComposeFailure", 0, {
-          phase: String(getRenderPhase() || ""),
-          activeScenarioId: String(getActiveScenarioId() || ""),
-          allowDirtyFastFrame,
-          usedDirtyInteractionPasses: false,
-          reason: "hgo-runtime-preview",
-        });
-        return false;
-      }
-      if (dirtyFastFramePassNames.length) {
-        timings.usedDirtyFastFramePasses = dirtyFastFramePassNames.join(",");
-      }
-      recordPassTiming(timings, "hgoPreviewTransformedFrame", compositeStart);
-      incrementPerfCounter("transformedFrames");
-      return true;
     }
     const compositeReuseDecision = getInteractionCompositeReuseDecision(currentTransform, cache, {
       allowSelectionTopologyContinuity: getRenderPhase() === renderPhaseInteracting,
@@ -251,7 +230,7 @@ export function createTransformedFrameCompositorOwner({
     const canBuildCompositeNow = true;
     const canDrawDirtyInteractionPasses = allowDirtyFastFrame
       && !canReuseComposite
-      && interactionCompositePassNames.every((passName) => canDrawTransformedPass(passName, cache, {
+      && activeInteractionPassNames.every((passName) => canDrawTransformedPass(passName, cache, {
         allowDirty: true,
       }));
     const compositeReady = canReuseComposite

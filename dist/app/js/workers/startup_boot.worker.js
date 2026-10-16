@@ -3,6 +3,8 @@
 importScripts(
   new URL("../core/feature_identity_shared.js", self.location.href).href,
   new URL("../core/json_resource_decoder_shared.js", self.location.href).href,
+  new URL("../core/scenario_chunk_format_shared.js", self.location.href).href,
+  new URL("../core/startup_topology_codec_shared.js", self.location.href).href,
   new URL("../core/geometry_transfer_codec_shared.js", self.location.href).href,
   new URL("../../vendor/topojson-client.min.js", self.location.href).href
 );
@@ -200,11 +202,6 @@ async function fetchJsonResource(url, label, { signal = null } = {}) {
   };
 }
 
-async function decompressGzipBytes(bytes, options = {}) {
-  const buffer = await JSON_RESOURCE_DECODER.decompressGzip(bytes, options);
-  return JSON_RESOURCE_DECODER.decodeUtf8Bytes(buffer);
-}
-
 function buildGzipCandidateUrl(url) {
   const normalized = String(url || "").trim();
   if (!normalized || normalized.endsWith(".gz") || !normalized.endsWith(".json")) {
@@ -366,19 +363,34 @@ function normalizeRuntimePoliticalMetaPayload(meta) {
   };
 }
 
-function postWorkerMessage(type, payload) {
-  if (type === MESSAGE_TYPES.RUNTIME_CHUNK_READY) {
-    const field = payload.chunkPayload ? "chunkPayload" : "decodedCollections";
+function postWorkerMessage(type, payload, { signal = null } = {}) {
+  throwIfAborted(signal);
+  const startupReady = type === MESSAGE_TYPES.BASE_STARTUP_READY
+    || type === MESSAGE_TYPES.STARTUP_BUNDLE_READY
+    || type === MESSAGE_TYPES.SCENARIO_RUNTIME_BOOTSTRAP_READY;
+  const allowCloneFallback = type === MESSAGE_TYPES.BASE_STARTUP_READY
+    || type === MESSAGE_TYPES.STARTUP_BUNDLE_READY;
+  if (startupReady || type === MESSAGE_TYPES.RUNTIME_CHUNK_READY) {
+    const field = startupReady ? "message" : (payload.chunkPayload ? "chunkPayload" : "decodedCollections");
     const startedAt = nowMs();
-    const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(payload[field]);
-    if (transport.transferables.length) {
-      self.postMessage({ type, ...payload, [field]: null,
-        geometryTransport: { field, payload: transport.payload },
-        metrics: { ...payload.metrics, geometryPackingMs: nowMs() - startedAt },
-      }, transport.transferables);
-      return;
+    try {
+      const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(startupReady ? payload : payload[field], {
+        includeTopologyArcs: startupReady,
+      });
+      throwIfAborted(signal);
+      if (transport.transferables.length) {
+        self.postMessage({ type, ...(startupReady ? { taskId: payload.taskId } : { ...payload, [field]: null }),
+          geometryTransport: { field, payload: transport.payload },
+          metrics: { ...payload.metrics, geometryPackingMs: nowMs() - startedAt },
+        }, transport.transferables);
+        return;
+      }
+    } catch (error) {
+      if (!allowCloneFallback || isAbortError(error) || signal?.aborted) throw error;
+      // Packing and transfer only touch new buffers, so the original reply stays usable.
     }
   }
+  throwIfAborted(signal);
   self.postMessage({
     type,
     ...payload,
@@ -467,8 +479,14 @@ async function handleLoadStartupBundle(message) {
       `[startup_worker] Startup bundle scenario mismatch. Expected "${expectedScenarioId}" but received "${scenarioId}".`
     );
   }
-  const topologyPrimary = payload.base?.topology_primary || null;
-  const runtimeTopology = payload.scenario?.runtime_topology_bootstrap || null;
+  const startupTopologyCodec = globalThis.__scenarioForgeStartupTopologyCodecShared;
+  if (typeof startupTopologyCodec?.decodeStartupTopology !== "function") {
+    throw new Error("[startup_worker] Startup topology codec failed to initialize.");
+  }
+  const topologyPrimary = await startupTopologyCodec.decodeStartupTopology(payload.base?.topology_primary || null);
+  const runtimeTopology = await startupTopologyCodec.decodeStartupTopology(payload.scenario?.runtime_topology_bootstrap || null);
+  if (payload.base) payload.base.topology_primary = topologyPrimary;
+  if (payload.scenario) payload.scenario.runtime_topology_bootstrap = runtimeTopology;
   const runtimePoliticalMetaPayload = normalizeRuntimePoliticalMetaPayload(payload?.scenario?.runtime_political_meta || null);
   const bootstrapStrategy = String(payload?.scenario?.bootstrap_strategy || "").trim();
   if (!topologyPrimary?.objects?.political) {
@@ -621,14 +639,18 @@ async function handleDecodeRuntimeChunk(message, { signal = null } = {}) {
   if (chunkType && chunkType !== "runtime-topology") {
     const chunkResult = await fetchJsonResource(chunkUrl, chunkType || "scenarioChunk", { signal });
     throwIfAborted(signal);
+    const chunkPayload = chunkType === "scenario-chunk" && chunkResult.payload?.type === "Topology"
+      ? globalThis.__scenarioForgeScenarioChunkFormatShared.decodeScenarioChunkPayload(chunkResult.payload, self.topojson)
+      : chunkResult.payload;
+    throwIfAborted(signal);
     postWorkerMessage(MESSAGE_TYPES.RUNTIME_CHUNK_READY, {
       taskId,
-      chunkPayload: chunkResult.payload || null,
+      chunkPayload: chunkPayload || null,
       metrics: {
         totalMs: nowMs() - startedAt,
         chunkPayload: chunkResult.metrics || null,
       },
-    });
+    }, { signal });
     return;
   }
   const runtimeTopologyResult = await fetchJsonResource(runtimeTopologyUrl, "runtimePoliticalTopology", { signal });
@@ -664,7 +686,7 @@ async function handleDecodeRuntimeChunk(message, { signal = null } = {}) {
         buildMs: metaCompletedAt - metaStartedAt,
       },
     },
-  });
+  }, { signal });
 }
 
 async function dispatchMessage(message) {

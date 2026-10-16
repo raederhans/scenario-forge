@@ -32,7 +32,7 @@ const startupWorkerTaskClient = createWorkerTaskClient({
     const startedAt = performance.now();
     const { field, payload } = message.geometryTransport;
     const value = globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(payload);
-    return { ...message, [field]: value, geometryTransport: undefined,
+    return { ...message, ...(field === "message" ? value : { [field]: value }), geometryTransport: undefined,
       metrics: { ...message.metrics, geometryUnpackingMs: performance.now() - startedAt } };
   },
   createMessageError: (message) => {

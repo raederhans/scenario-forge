@@ -102,7 +102,7 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
   }
 
   function preparePolitical({ force = false } = {}) {
-    if (!enabled() || pendingEditBlocksWorker()) return null;
+    if (!enabled() || h.isPoliticalEnabled?.() === false || pendingEditBlocksWorker()) return null;
     if (!force && !h.needsPoliticalRender()) return null;
     const snapshot = getPoliticalSnapshot();
     if (!snapshot) return null;
@@ -133,7 +133,7 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
         return;
       }
       const latest = pending.get("political") === task;
-      const canUseWorker = enabled() && !pendingEditBlocksWorker();
+      const canUseWorker = enabled() && h.isPoliticalEnabled?.() !== false && !pendingEditBlocksWorker();
       const superseded = !latest || state.zoomTransform.x !== task.transform.x
         || state.zoomTransform.y !== task.transform.y || state.zoomTransform.k !== task.transform.k
         || state.activeScenarioId !== task.scenarioId || state.sceneGeneration !== task.sceneGeneration
@@ -200,7 +200,7 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
   }
 
   function drawPolitical() {
-    if (!enabled() || pendingEditBlocksWorker() || !politicalFrame) return null;
+    if (!enabled() || h.isPoliticalEnabled?.() === false || pendingEditBlocksWorker() || !politicalFrame) return null;
     const snapshot = getPoliticalSnapshot();
     if (!snapshot || politicalFrame.identity !== snapshot.description.identity) return null;
     const context = surface.getContext();

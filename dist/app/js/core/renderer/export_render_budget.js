@@ -35,5 +35,8 @@ export function estimateExportRenderBytes({ width, height, pixelRatio, passNames
   const physicalScratchBytes = physicalIntensity ? physicalPixels * 8 + (physicalPixels <= 2_000_000 ? physicalPixels * 8 : 0) : 0;
   const bathymetryScratchBytes = bathymetryCoverage ? bathymetryPixels * 8 : 0;
   const riverContourScratchBytes = riverInternalContours ? riverContourPixels * 4 : 0;
-  return (passPixels + scenarioPixels + 3 * targetPixels) * 4 + physicalScratchBytes + bathymetryScratchBytes + riverContourScratchBytes;
+  // Include the bounded population presentation surface and image data during export.
+  const populationScratchBytes = passNames.includes("populationHeatmap")
+    ? Math.min(2_000_000, Math.floor(targetPixels * (1 + 2 * RENDER_PASS_OVERSCAN_RATIO_PER_SIDE) ** 2)) * 12 : 0;
+  return (passPixels + scenarioPixels + 3 * targetPixels) * 4 + physicalScratchBytes + bathymetryScratchBytes + riverContourScratchBytes + populationScratchBytes;
 }

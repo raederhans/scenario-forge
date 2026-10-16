@@ -47,7 +47,7 @@ export function getBakePassNamesForLayer(layerId, exportUi, {
   if (layerId === "color") {
     return [
       ...(visibility.background === false ? [] : ["background"]),
-      ...(visibility.political === false ? [] : ["physicalBase", "political"]),
+      ...(visibility.political === false ? [] : ["physicalBase", "political", "populationHeatmap"]),
       ...(visibility.context === false ? [] : ["contextBase", "contextScenario"]),
       ...(visibility.effects === false ? [] : ["effects", "dayNight"]),
     ];

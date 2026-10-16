@@ -1,4 +1,6 @@
 import { normalizeStrategicValuesStyle } from "../strategic_values_view_model.js";
+import { normalizeThematicWgiStyle } from "../thematic_wgi_view_model.js";
+import { normalizePopulationStyle } from "../population_spatial_view_model.js";
 import { normalizeRenderingStyleConfig } from "../renderer/display_quality_policy.js";
 // UI state defaults.
 // 这里收口 overlay dirty 标记、可见性开关、workbench UI 和样式配置，
@@ -215,6 +217,8 @@ export function createDefaultStyleConfig() {
       ...createDefaultCityLayerStyleConfig(),
     },
     strategicValues: normalizeStrategicValuesStyle(),
+    thematic: normalizeThematicWgiStyle(),
+    population: normalizePopulationStyle(),
     urban: createDefaultUrbanStyleConfig(),
     physical: {
       ...createDefaultPhysicalStyleConfig(),
@@ -488,6 +492,8 @@ export function restoreImportedStyleConfigState(
   target.styleConfig = {
     ...currentStyleConfig,
     rendering: normalizeRenderingStyleConfig(imported.rendering),
+    thematic: normalizeThematicWgiStyle(imported.thematic),
+    population: normalizePopulationStyle(imported.population),
     internalBorders: {
       ...defaults.internalBorders,
       ...((imported.internalBorders && typeof imported.internalBorders === "object")

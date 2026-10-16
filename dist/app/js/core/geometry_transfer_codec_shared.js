@@ -2,20 +2,23 @@
 // Only newly allocated buffers are transferred; source GeoJSON remains usable.
 var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGeometryTransferCodecShared || (() => {
   const depths = { Point: 1, MultiPoint: 2, LineString: 2, MultiLineString: 3, Polygon: 3, MultiPolygon: 4 };
-  function mapGeometry(value, transform) {
+  function mapGeometry(value, transform, includeTopologyArcs = false) {
     if (!value || typeof value !== "object") return value;
     if (Object.hasOwn(depths, value.type) && Array.isArray(value.coordinates)) return transform(value, depths[value.type]);
-    if (Array.isArray(value)) return value.map((item) => mapGeometry(item, transform));
-    // Properties and topology arcs are opaque. Walk container objects, including
-    // decodedCollections, FeatureCollections and raster update envelopes.
+    if (Array.isArray(value)) return value.map((item) => mapGeometry(item, transform, includeTopologyArcs));
+    // Properties are opaque. Topology arcs are opt-in for startup responses;
+    // ordinary chunk/raster messages keep the original v1 contract.
     if (Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null) return value;
     const result = { ...value };
     for (const key of Object.keys(value)) {
-      if (key !== "properties" && key !== "arcs" && key !== "coordinates") result[key] = mapGeometry(value[key], transform);
+      if (key !== "properties" && key !== "arcs" && key !== "coordinates") result[key] = mapGeometry(value[key], transform, includeTopologyArcs);
+    }
+    if (includeTopologyArcs && value.type === "Topology" && Array.isArray(value.arcs)) {
+      result.arcs = transform({ type: "MultiLineString", coordinates: value.arcs }, 3).coordinates;
     }
     return result;
   }
-  function pack(value, { minCoordinateCount = 16_384 } = {}) {
+  function pack(value, { minCoordinateCount = 16_384, includeTopologyArcs = false } = {}) {
     let coordinateCount = 0, lengthCount = 0, valid = true;
     function count(array, depth) {
       if (!Array.isArray(array)) { valid = false; return; }
@@ -26,7 +29,7 @@ var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGe
         else valid = false;
       }
     }
-    mapGeometry(value, (geometry, depth) => { count(geometry.coordinates, depth); return geometry; });
+    mapGeometry(value, (geometry, depth) => { count(geometry.coordinates, depth); return geometry; }, includeTopologyArcs);
     // Small updates stay on the ordinary path. The cutoff is deliberately
     // conservative: measured TNO samples at 18k scalars amortize conversion;
     // sub-1k samples do not. This is a transport choice, never an LOD change.
@@ -44,21 +47,21 @@ var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGe
       const offset = [coordinateOffset, lengthOffset];
       write(geometry.coordinates, depth);
       return { ...geometry, coordinates: offset };
-    });
+    }, includeTopologyArcs);
     return {
-      payload: { encoding: "geo-f64-v1", value: packed, coordinates, lengths },
+      payload: { encoding: includeTopologyArcs ? "geo-f64-v2" : "geo-f64-v1", value: packed, coordinates, lengths },
       transferables: [coordinates.buffer, lengths.buffer],
     };
   }
   function unpack(payload) {
-    if (payload?.encoding !== "geo-f64-v1") throw new Error("Unsupported geometry transport encoding.");
+    if (payload?.encoding !== "geo-f64-v1" && payload?.encoding !== "geo-f64-v2") throw new Error("Unsupported geometry transport encoding.");
     const { coordinates, lengths } = payload;
     function read(depth, cursor) {
       const array = new Array(lengths[cursor[1]++]);
       for (let i = 0; i < array.length; i += 1) array[i] = depth === 1 ? coordinates[cursor[0]++] : read(depth - 1, cursor);
       return array;
     }
-    return mapGeometry(payload.value, (geometry, depth) => ({ ...geometry, coordinates: read(depth, [...geometry.coordinates]) }));
+    return mapGeometry(payload.value, (geometry, depth) => ({ ...geometry, coordinates: read(depth, [...geometry.coordinates]) }), payload.encoding === "geo-f64-v2");
   }
   return Object.freeze({ pack, unpack });
 })();

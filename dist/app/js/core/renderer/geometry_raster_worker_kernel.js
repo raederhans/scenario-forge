@@ -57,6 +57,17 @@ export function createGeometryRasterWorkerKernel({
     const startedAt = now();
     abortIfNeeded(isCancelled);
     if (packet.kind !== "hit" && packet.kind !== "political" && packet.kind !== "navigation") throw new Error("Unsupported raster kind.");
+    let geometryRetentionBudget = geometryCacheBudget;
+    let pathRetentionBudget = pathCacheBudget;
+    if (packet.kind === "navigation" && packet.navigationRetentionBudgetBytes !== undefined) {
+      const budget = packet.navigationRetentionBudgetBytes;
+      if (!Number.isSafeInteger(budget) || budget < 0) throw new Error("Invalid navigation retention budget.");
+      geometryRetentionBudget = Math.min(geometryCacheBudget, Math.floor(budget * 2 / 3));
+      pathRetentionBudget = Math.min(pathCacheBudget, budget - geometryRetentionBudget);
+    }
+    geometries.budget = geometryRetentionBudget;
+    paths.budget = pathRetentionBudget;
+    paths.trim();
     const { width, height, dpr = 1, offsetX = 0, offsetY = 0 } = packet;
     const { x = 0, y = 0, k = 1, scaleY = k } = packet.transform || {};
     if (![width, height].every((value) => Number.isInteger(value) && value > 0)
@@ -286,7 +297,16 @@ export function createGeometryRasterWorkerKernel({
     // exceed the target. Retire inactive geometry and acknowledge it so the
     // client can re-upload it on a later view without disabling the worker.
     const trimStartedAt = navigationTimings ? now() : 0;
-    const evictedGeometryIds = geometries.trim(frameGeometryIds);
+    // The immutable navigation bitmap no longer needs its input geometry.
+    // Release its temporary frame pins before acknowledging retained state;
+    // otherwise a whole-world upload could stay above budget between jobs.
+    if (packet.kind === "navigation") {
+      // Keep geometry behind resident projected paths warm first. Plain painter
+      // order would retain late water while retiring the early cached land paths.
+      for (const id of paths.keys()) geometries.get(id);
+    }
+    const evictedGeometryIds = packet.kind === "navigation"
+      ? geometries.trim() : geometries.trim(frameGeometryIds);
     for (const id of evictedGeometryIds) paths.delete(id);
     if (navigationTimings) navigationTimings.trimMs = now() - trimStartedAt;
     return { bitmap, kind: packet.kind, width: region?.width ?? width, height: region?.height ?? height,

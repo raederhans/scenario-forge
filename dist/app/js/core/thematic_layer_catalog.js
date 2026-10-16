@@ -1,8 +1,18 @@
 import defaultThematicLayerIndex from "../../data/thematic_layers/index.json" with { type: "json" };
+import defaultWgiManifest from "../../data/thematic_layers/political/wgi_state_capacity_v1/manifest.json" with { type: "json" };
+import defaultHdiManifest from "../../data/thematic_layers/social/human_development_v1/manifest.json" with { type: "json" };
+import defaultPopulationManifest from "../../data/thematic_layers/population/wdi_population_v1/manifest.json" with { type: "json" };
 import {
   resolveThematicLayerCatalogAssetKey,
   resolveThematicLayerManifestAssetKey,
 } from "./runtime_asset_registry.js";
+import {
+  THEMATIC_WGI_LAYER_ID,
+  isThematicWgiScenarioSupported,
+} from "./thematic_wgi_data.js";
+import { THEMATIC_HDI_LAYER_ID } from "./thematic_hdi_data.js";
+import { THEMATIC_POPULATION_LAYER_ID } from "./thematic_population_data.js";
+import { getThematicIndicator } from "./thematic_indicator_catalog.js";
 
 export const THEMATIC_LAYER_RENDER_DISABLED_REASON = "Runtime rendering disabled";
 export const THEMATIC_REAL_SOURCE_NOT_INGESTED_REASON = "Real source not ingested";
@@ -11,6 +21,55 @@ export const THEMATIC_CATALOG_PENDING_SUMMARY = "Preview metadata pending";
 export const THEMATIC_CATALOG_READY_SUMMARY = "Preview metadata available";
 export const THEMATIC_SOURCE_POLICY_FIXTURE_ONLY = "fixture_only";
 export const THEMATIC_SOURCE_POLICY_REAL_SOURCE_CACHE_ONLY = "real_source_cache_only";
+export const THEMATIC_WGI_MAIN_MAP_SUPPORT_LABEL = "WGI governance · Scenario reference";
+export const THEMATIC_HDI_MAIN_MAP_SUPPORT_LABEL = "UNDP human development · Scenario reference";
+export const THEMATIC_POPULATION_MAIN_MAP_SUPPORT_LABEL = "WDI population · Scenario reference";
+export const THEMATIC_MAIN_MAP_SUPPORT_LABEL = "Country indicators · Scenario reference";
+
+const MAIN_MAP_PROVIDERS = new Map([
+  [THEMATIC_WGI_LAYER_ID, {
+    sourceId: "world_bank_wgi_2025_revision", version: "7", year: 2024,
+    release: "WGI 2025 Revision: Governance Estimates and Absolute Scores (1996-2024)",
+    supportLabel: THEMATIC_WGI_MAIN_MAP_SUPPORT_LABEL,
+  }],
+  [THEMATIC_HDI_LAYER_ID, {
+    sourceId: "undp_hdr_2025", version: "2025", year: 2023,
+    release: "Human Development Report 2025",
+    supportLabel: THEMATIC_HDI_MAIN_MAP_SUPPORT_LABEL,
+  }],
+  [THEMATIC_POPULATION_LAYER_ID, {
+    sourceId: "world_bank_wdi_population", version: "2026-07-13", year: 2023,
+    release: "World Development Indicators",
+    supportLabel: THEMATIC_POPULATION_MAIN_MAP_SUPPORT_LABEL,
+  }],
+]);
+
+function supportsMainMapRender(layerId, sourcePolicy, fixtureOnly, manifest) {
+  const consumer = manifest?.runtime_consumer;
+  const provider = MAIN_MAP_PROVIDERS.get(layerId);
+  if (!provider) return false;
+  const source = Array.isArray(manifest?.provenance)
+    ? manifest.provenance.find((entry) => entry?.source_id === provider.sourceId) : null;
+  return Boolean(manifest?.layer_id === layerId
+    && manifest.schema_version === 1 && manifest.status !== "fixture" && !fixtureOnly
+    && source?.version === provider.version && source.selected_year === provider.year && manifest.period?.year === provider.year
+    && source.release === provider.release
+    && sourcePolicy === THEMATIC_SOURCE_POLICY_REAL_SOURCE_CACHE_ONLY
+    && manifest.source_policy === THEMATIC_SOURCE_POLICY_REAL_SOURCE_CACHE_ONLY
+    && Array.isArray(manifest.metric_ids)
+    && consumer?.status === "main_map_ready" && consumer.supports_main_map_render === true
+    && Array.isArray(consumer.supported_metrics) && consumer.supported_metrics.length > 0
+    && new Set(consumer.supported_metrics).size === consumer.supported_metrics.length
+    && consumer.supported_metrics.every((metricId) => {
+      const metric = getThematicIndicator(metricId);
+      return metric?.layerId === layerId && metric.dataVersion === consumer.data_version
+        && manifest.metric_ids.includes(metricId);
+    })
+    && Array.isArray(consumer.supported_scenarios) && consumer.supported_scenarios.length > 0
+    && new Set(consumer.supported_scenarios).size === consumer.supported_scenarios.length
+    && consumer.supported_scenarios.includes("modern_world")
+    && consumer.supported_scenarios.every(isThematicWgiScenarioSupported));
+}
 
 function freezeArray(values = []) {
   return Object.freeze([...(Array.isArray(values) ? values : [])]);
@@ -80,12 +139,13 @@ function createSummaryText({
   sourcePolicyLabel,
   payloadKind,
   hiddenByDefault,
+  renderSupportLabel = THEMATIC_LAYER_RENDER_DISABLED_REASON,
 }) {
   return [
     statusLabel,
     sourcePolicyLabel,
     payloadKind,
-    THEMATIC_LAYER_RENDER_DISABLED_REASON,
+    renderSupportLabel,
     hiddenByDefault ? "Hidden by default" : "Visible by default",
   ]
     .map((part) => normalizeText(part))
@@ -118,18 +178,24 @@ function normalizeLayerSummary(layer = {}, {
   const hiddenByDefault = layer.default_visible !== true;
   const statusLabel = normalizeText(statusLegend[status], status);
   const sourcePolicyLabel = normalizeText(sourcePolicyLegend[sourcePolicy], sourcePolicy);
+  const fixtureOnly = sourcePolicy === THEMATIC_SOURCE_POLICY_FIXTURE_ONLY || status === "fixture";
+  const supportsRendering = supportsMainMapRender(layerId, sourcePolicy, fixtureOnly, manifest);
+  const renderSupportLabel = supportsRendering
+    ? MAIN_MAP_PROVIDERS.get(layerId).supportLabel
+    : THEMATIC_LAYER_RENDER_DISABLED_REASON;
   const summary = createSummaryText({
     statusLabel,
     sourcePolicyLabel,
     payloadKind,
     hiddenByDefault,
+    renderSupportLabel,
   });
-  const fixtureOnly = sourcePolicy === THEMATIC_SOURCE_POLICY_FIXTURE_ONLY || status === "fixture";
   return Object.freeze({
     id: layerId,
     layerId,
     theme: normalizeText(layer.theme || manifest?.theme, "thematic"),
-    title: normalizeText(layer.title || manifest?.title, layerId || "Thematic layer"),
+    title: supportsRendering ? renderSupportLabel
+      : normalizeText(layer.title || manifest?.title, layerId || "Thematic layer"),
     description: normalizeText(layer.description || manifest?.description),
     geometryKind: normalizeText(layer.geometry_kind || manifest?.geometry_kind, "unknown"),
     manifestPath: normalizeText(layer.manifest_path),
@@ -154,8 +220,11 @@ function normalizeLayerSummary(layer = {}, {
     limitations: freezeArray(manifest?.limitations),
     fixtureOnly,
     supportsRuntimePreview: true,
-    supportsMainMapRender: false,
-    disabledReason: THEMATIC_LAYER_RENDER_DISABLED_REASON,
+    supportsMainMapRender: supportsRendering,
+    runtimeMetricIds: freezeArray(supportsRendering ? manifest.runtime_consumer.supported_metrics : []),
+    supportedScenarioIds: freezeArray(supportsRendering ? manifest.runtime_consumer.supported_scenarios : []),
+    renderSupportLabel,
+    disabledReason: supportsRendering ? "" : THEMATIC_LAYER_RENDER_DISABLED_REASON,
     realSourceStatus: createRealSourceStatus(sourcePolicy),
     summary,
   });
@@ -197,6 +266,7 @@ export function normalizeThematicLayerCatalogPayload(payload = defaultThematicLa
     }))
     .filter((layer) => !!layer.layerId);
   const loadedManifestCount = layers.filter((layer) => layer.manifestLoaded).length;
+  const supportsMainMapRender = layers.some((layer) => layer.supportsMainMapRender);
   return Object.freeze({
     schemaVersion: normalizeNumber(catalog.schema_version, 1),
     generatedAt: normalizeText(catalog.generated_at),
@@ -208,13 +278,20 @@ export function normalizeThematicLayerCatalogPayload(payload = defaultThematicLa
     sourcePolicyLegend,
     statusLegend,
     layers: Object.freeze(layers),
-    summary: `${THEMATIC_CATALOG_READY_SUMMARY} | ${layers.length} layers | ${THEMATIC_LAYER_RENDER_DISABLED_REASON}`,
+    supportsMainMapRender,
+    summary: `${THEMATIC_CATALOG_READY_SUMMARY} | ${layers.length} layers | ${supportsMainMapRender ? THEMATIC_MAIN_MAP_SUPPORT_LABEL : THEMATIC_LAYER_RENDER_DISABLED_REASON}`,
   });
 }
 
 export function listDefaultThematicLayerSummaries() {
   // Synchronous panel contracts need a generated snapshot; runtime loading below still uses registry asset keys.
-  return normalizeThematicLayerCatalogPayload(defaultThematicLayerIndex).layers;
+  return normalizeThematicLayerCatalogPayload(defaultThematicLayerIndex, {
+    manifestByLayerId: {
+      [THEMATIC_WGI_LAYER_ID]: defaultWgiManifest,
+      [THEMATIC_HDI_LAYER_ID]: defaultHdiManifest,
+      [THEMATIC_POPULATION_LAYER_ID]: defaultPopulationManifest,
+    },
+  }).layers;
 }
 
 export async function loadThematicLayerCatalogPreview({

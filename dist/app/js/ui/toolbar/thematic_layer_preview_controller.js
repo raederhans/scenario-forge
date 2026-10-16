@@ -79,7 +79,7 @@ function createLayerCard(layer, translate) {
 
   const header = document.createElement("div");
   header.className = "thematic-layer-card-header";
-  const title = createTextNodeElement("h3", "thematic-layer-card-title", layer.title);
+  const title = createTextNodeElement("h3", "thematic-layer-card-title", translateUi(translate, layer.title));
   const subtitle = createTextNodeElement("p", "thematic-layer-card-summary", layer.summary);
   header.append(title, subtitle);
 
@@ -91,7 +91,9 @@ function createLayerCard(layer, translate) {
   if (layer.hiddenByDefault) {
     badgeRow.append(createBadge(translateUi(translate, "Hidden by default")));
   }
-  badgeRow.append(createBadge(translateUi(translate, layer.disabledReason), "is-muted"));
+  if (layer.disabledReason) {
+    badgeRow.append(createBadge(translateUi(translate, layer.disabledReason), "is-muted"));
+  }
 
   const metadata = document.createElement("dl");
   metadata.className = "thematic-layer-meta-grid";

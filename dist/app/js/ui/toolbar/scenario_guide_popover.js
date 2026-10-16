@@ -36,15 +36,14 @@ function createScenarioGuidePopoverController({
   };
 
   const syncScenarioGuideQuickSteps = () => {
-    const usesHgo = String(state.activeScenarioId || "").trim() === "hgo_1936";
     const identityStep = scenarioGuidePopover?.querySelector?.("#scenarioGuideStepActive");
     if (identityStep) {
-      identityStep.hidden = !usesHgo;
-      identityStep.classList.toggle("hidden", !usesHgo);
+      identityStep.hidden = true;
+      identityStep.classList.add("hidden");
     }
     const headings = [
-      ["scenarioGuideStepOwner", usesHgo ? "4. Set the active owner" : "3. Set the active owner"],
-      ["scenarioGuideStepApplyActions", usesHgo ? "5. Edit, style, then save" : "4. Edit, style, then save"],
+      ["scenarioGuideStepOwner", "3. Set the active owner"],
+      ["scenarioGuideStepApplyActions", "4. Edit, style, then save"],
     ];
     headings.forEach(([id, key]) => {
       const heading = scenarioGuidePopover?.querySelector?.(`#${id} strong`);

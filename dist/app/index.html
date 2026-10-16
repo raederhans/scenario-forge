@@ -17,7 +17,9 @@
       }
     </script>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/map-label-fonts.css" />
     <link rel="stylesheet" href="css/editor-workspace.css" />
+    <link rel="stylesheet" href="css/editor-tool-guidance.css" />
     <link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />
     <link rel="modulepreload" href="js/main.js" />
   </head>
@@ -58,6 +60,7 @@
             <div class="sidebar-details-body">
               <div id="scenarioStatus" class="body-text visually-hidden">No scenario active</div>
               <div id="scenarioAuditHint" class="body-text visually-hidden hidden">Coverage report unavailable</div>
+              <a id="hgoEditorLink" class="btn-secondary" href="../hgo/" data-i18n="Open HGO editor">Open HGO editor</a>
               <label id="lblScenarioSelect" class="visually-hidden" for="scenarioSelect">Scenario</label>
               <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input scenario-select-native" aria-hidden="true" tabindex="-1">
                 <option id="optScenarioNone" value="">None</option>
@@ -395,6 +398,23 @@
                     <option value="performance" data-i18n="Performance priority">Performance priority</option>
                   </select>
                 </div>
+                <details class="appearance-mini-section mt-3">
+                  <summary data-i18n="Rendering experiment">Rendering experiment</summary>
+                  <label class="toggle-label mt-3">
+                    <input id="politicalRasterTrial" type="checkbox" class="checkbox-input" aria-describedby="politicalRasterTrialStatus" />
+                    <span data-i18n="Raster acceleration (experimental)">Raster acceleration (experimental)</span>
+                  </label>
+                  <label class="toggle-label mt-3" for="politicalRenderMode" data-i18n="Political display mode">Political display mode</label>
+                  <select id="politicalRenderMode" aria-describedby="politicalRenderBackend" class="select-input">
+                    <option value="auto" data-i18n="Automatic (native during evaluation)">Automatic (native during evaluation)</option>
+                    <option value="raster" data-i18n="Persistent raster candidate">Persistent raster candidate</option>
+                    <option value="vector" data-i18n="Native vector compatibility">Native vector compatibility</option>
+                    <option value="hybrid" data-i18n="Legacy hybrid comparison">Legacy hybrid comparison</option>
+                  </select>
+                  <p id="politicalRenderBackend" class="hint-text" role="status"></p>
+                  <p id="politicalRasterTrialStatus" class="hint-text" role="status"></p>
+                  <p class="hint-text" data-i18n="Persistent raster stays raster after navigation; legacy hybrid restores native detail.">Persistent raster stays raster after navigation; legacy hybrid restores native detail.</p>
+                </details>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section">
                     <summary id="lblInternalBorders" class="section-header">Internal Borders</summary>
@@ -940,16 +960,16 @@
                         </div>
                         <div class="city-points-panel-stack">
                           <section class="appearance-control-card city-hierarchy-card" aria-labelledby="cityHierarchyTitle">
-                            <h4 id="cityHierarchyTitle" class="appearance-control-card-title" data-i18n="City hierarchy">City hierarchy</h4>
-                            <div class="city-symbol-legend" aria-label="City hierarchy" data-i18n-aria-label="City hierarchy">
-                              <span><i class="city-key-capital" aria-hidden="true">☆</i><span data-i18n="Capital">Capital</span></span>
-                              <span><i class="city-key metropolis" aria-hidden="true"></i><span data-i18n="Metropolis">Metropolis</span></span>
-                              <span><i class="city-key large" aria-hidden="true"></i><span data-i18n="Large city">Large city</span></span>
-                              <span><i class="city-key medium" aria-hidden="true"></i><span data-i18n="Medium city">Medium city</span></span>
-                              <span><i class="city-key small" aria-hidden="true"></i><span data-i18n="Small city">Small city</span></span>
-                              <span><i class="city-key town" aria-hidden="true"></i><span data-i18n="Town">Town</span></span>
-                            </div>
+                            <h4 id="cityHierarchyTitle" class="appearance-control-card-title" data-i18n="Display & style">Display &amp; style</h4>
                             <div class="appearance-control-card-stack">
+                              <label class="range-label" for="cityPointsTheme" data-i18n="Style">Style</label>
+                              <select id="cityPointsTheme" class="select-input">
+                                <option id="optCityPointsThemeClassicGraphite" value="classic_graphite" selected>Graphite Signal</option>
+                                <option id="optCityPointsThemeAtlasInk" value="atlas_ink">Cyan Beacon</option>
+                                <option id="optCityPointsThemeParchmentSepia" value="parchment_sepia">Vermilion Ledger</option>
+                                <option id="optCityPointsThemeSlateBlue" value="slate_blue">Royal Violet</option>
+                                <option id="optCityPointsThemeIvoryOutline" value="ivory_outline">Ivory Night</option>
+                              </select>
                               <label class="range-label" for="cityPointsDensityPreset" data-i18n="Map detail">Map detail</label>
                               <select id="cityPointsDensityPreset" class="select-input">
                                 <option value="compact" data-i18n="Compact">Compact</option><option value="balanced" selected data-i18n="Standard">Standard</option><option value="detailed" data-i18n="Detailed">Detailed</option>
@@ -959,21 +979,23 @@
                                 <option value="metropolis" data-i18n="Metropolis">Metropolis</option><option value="large" data-i18n="Large city">Large city</option><option value="medium" data-i18n="Medium city">Medium city</option><option value="small" data-i18n="Small city">Small city</option><option value="town" selected data-i18n="Town">Town</option>
                               </select>
                             </div>
-                            <p id="cityPointsHierarchyHint" class="city-points-advanced-hint"></p>
+                            <details class="city-hierarchy-help">
+                              <summary data-i18n="City hierarchy">City hierarchy</summary>
+                              <div class="city-symbol-legend" aria-label="City hierarchy" data-i18n-aria-label="City hierarchy">
+                                <span><i class="city-key-capital" aria-hidden="true">☆</i><span data-i18n="Capital">Capital</span></span>
+                                <span><i class="city-key metropolis" aria-hidden="true"></i><span data-i18n="Metropolis">Metropolis</span></span>
+                                <span><i class="city-key large" aria-hidden="true"></i><span data-i18n="Large city">Large city</span></span>
+                                <span><i class="city-key medium" aria-hidden="true"></i><span data-i18n="Medium city">Medium city</span></span>
+                                <span><i class="city-key small" aria-hidden="true"></i><span data-i18n="Small city">Small city</span></span>
+                                <span><i class="city-key town" aria-hidden="true"></i><span data-i18n="Town">Town</span></span>
+                              </div>
+                              <p id="cityPointsHierarchyHint" class="city-points-advanced-hint"></p>
+                            </details>
                           </section>
 
                           <section class="appearance-control-card city-points-style-card" aria-labelledby="lblCityPointsStyleGroup">
-                            <h4 id="lblCityPointsStyleGroup" class="appearance-control-card-title" data-i18n="Style">Style</h4>
+                            <h4 id="lblCityPointsStyleGroup" class="appearance-control-card-title" data-i18n="Markers">Markers</h4>
                             <div class="appearance-control-card-stack">
-                              <div>
-                                <select id="cityPointsTheme" class="select-input" aria-labelledby="lblCityPointsStyleGroup">
-                                  <option id="optCityPointsThemeClassicGraphite" value="classic_graphite" selected>Graphite Signal</option>
-                                  <option id="optCityPointsThemeAtlasInk" value="atlas_ink">Cyan Beacon</option>
-                                  <option id="optCityPointsThemeParchmentSepia" value="parchment_sepia">Vermilion Ledger</option>
-                                  <option id="optCityPointsThemeSlateBlue" value="slate_blue">Royal Violet</option>
-                                  <option id="optCityPointsThemeIvoryOutline" value="ivory_outline">Ivory Night</option>
-                                </select>
-                              </div>
                               <div>
                                 <div class="range-row">
                                   <label id="lblCityPointsMarkerScale" class="range-label" for="cityPointsMarkerScale">Marker Scale</label>
@@ -2067,9 +2089,9 @@
                       </div>
                       <p id="appearancePresetSummary" class="panel-hint" data-i18n="0 presets">0 presets</p>
                       <p id="appearancePresetList" class="appearance-preset-list" data-preset-count="0" data-i18n="No appearance presets saved">No appearance presets saved</p>
-                      <div class="sidebar-equal-actions">
-                        <button id="appearancePresetApplyBtn" type="button" class="btn-secondary" disabled data-i18n="Apply">Apply</button>
-                        <button id="appearancePresetDeleteBtn" type="button" class="btn-secondary" disabled data-i18n="Delete">Delete</button>
+                      <div class="preset-library-actions">
+                        <button id="appearancePresetApplyBtn" type="button" class="btn-primary" disabled data-i18n="Apply">Apply</button>
+                        <button id="appearancePresetDeleteBtn" type="button" class="btn-secondary preset-delete-action" disabled data-i18n="Delete">Delete</button>
                       </div>
                       <div class="sidebar-equal-actions">
                         <button id="appearancePresetImportBtn" type="button" class="btn-secondary" data-i18n="Import">Import</button>
@@ -2165,6 +2187,47 @@
                 hidden
               >
                 <h2 id="lblThematicLayersPanel" class="section-header" data-i18n="Thematic Layers">Thematic Layers</h2>
+                <section id="populationSpatialPanel" class="appearance-control-card" aria-labelledby="populationSpatialTitle">
+                  <h3 id="populationSpatialTitle" data-i18n="Population distribution">Population distribution</h3>
+                  <label class="toggle-label"><input id="togglePopulation" type="checkbox" class="checkbox-input"/><span data-i18n="Show population distribution">Show population distribution</span></label>
+                  <label for="populationMode" class="range-label" data-i18n="Population display">Population display</label>
+                  <select id="populationMode" class="select-input">
+                    <option value="density" data-i18n="Parcel density">Parcel density</option>
+                    <option value="heatmap" data-i18n="Continuous heatmap">Continuous heatmap</option>
+                  </select>
+                  <label for="populationOpacity" class="range-label"><span data-i18n="Opacity">Opacity</span><output id="populationOpacityValue" for="populationOpacity">80%</output></label>
+                  <input id="populationOpacity" type="range" min="0" max="100" value="80"/>
+                  <p id="populationStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
+                  <button id="populationRetry" type="button" class="btn-secondary" hidden data-i18n="Retry">Retry</button>
+                  <p id="populationReferenceNote" class="city-points-advanced-hint" hidden></p>
+                  <details><summary data-i18n="Density legend and source">Density legend and source</summary>
+                    <p class="hint" data-i18n="persons/km²">persons/km²</p>
+                    <div id="populationLegend" class="thematic-wgi-legend" hidden></div>
+                    <p id="populationSourceNote" class="city-points-advanced-hint"></p>
+                  </details>
+                  <details><summary data-i18n="Population statistics">Population statistics</summary>
+                    <label for="populationSummaryScope" class="range-label" data-i18n="Summary scope">Summary scope</label>
+                    <select id="populationSummaryScope" class="select-input"></select>
+                    <p id="populationSummary" class="city-points-advanced-hint" role="status"></p>
+                    <button id="populationSummarizeSelection" type="button" class="btn-secondary" data-i18n="Summarize selected parcels">Summarize selected parcels</button>
+                    <button id="populationExportStats" type="button" class="btn-secondary" data-i18n="Export parcel statistics (CSV)">Export parcel statistics (CSV)</button>
+                  </details>
+                </section>
+                <section id="thematicWgiPanel" class="appearance-control-card" aria-labelledby="thematicWgiTitle">
+                  <h3 id="thematicWgiTitle" data-i18n="Country indicators">Country indicators</h3>
+                  <label for="thematicWgiMetric" class="range-label" data-i18n="Indicator">Indicator</label>
+                  <select id="thematicWgiMetric" class="select-input" aria-describedby="thematicWgiStatus">
+                    <option value="wgi_government_effectiveness_score_0_100" data-i18n="Government effectiveness">Government effectiveness</option>
+                    <option value="wgi_rule_of_law_score_0_100" data-i18n="Rule of law">Rule of law</option>
+                  </select>
+                  <label class="toggle-label"><input id="toggleThematicWgi" type="checkbox" class="checkbox-input"/><span data-i18n="Show thematic shading">Show thematic shading</span></label>
+                  <p id="thematicWgiStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
+                  <p id="thematicWgiReferenceNote" class="city-points-advanced-hint" hidden></p>
+                  <button id="thematicWgiRetry" type="button" class="btn-secondary" hidden data-i18n="Retry">Retry</button>
+                  <div id="thematicWgiLegend" class="thematic-wgi-legend" hidden></div>
+                  <p id="thematicWgiCoverage" class="city-points-advanced-hint"></p>
+                  <p class="city-points-advanced-hint" data-i18n="Hover a region to inspect its country indicator. This is not a local measurement.">Hover a region to inspect its country indicator. This is not a local measurement.</p>
+                </section>
                 <section id="strategicValuesPanel" class="appearance-control-card strategic-values-panel" aria-labelledby="strategicValuesTitle">
                   <div class="strategic-values-heading"><h3 id="strategicValuesTitle" data-i18n="Scenario strategic data">Scenario strategic data</h3><button id="strategicValuesLoad" type="button" class="btn-secondary" data-i18n="Load data">Load data</button></div>
                   <p id="strategicValuesStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
@@ -2666,7 +2729,7 @@
             </div>
           </details>
 
-          <h2 id="waterInspectorHeading" class="visually-hidden">Water Regions</h2>
+          <h2 id="waterInspectorHeading" class="visually-hidden" data-i18n="Water Regions">Water Regions</h2>
           <details id="waterInspectorSection" class="card inspector-section sidebar-section-shell" aria-labelledby="waterInspectorHeading lblWaterInspector">
             <summary id="lblWaterInspector" class="sidebar-section-head">
               <span class="sidebar-section-title">Water Regions</span>
@@ -2726,8 +2789,8 @@
                   <div class="water-filter-field">
                     <label id="lblWaterSort" class="sidebar-field-label" for="waterInspectorSortSelect">Sort</label>
                     <select id="waterInspectorSortSelect" class="select-input">
-                      <option value="name">Name</option>
-                      <option value="type">Type</option>
+                      <option value="name" data-i18n="Name">Name</option>
+                      <option value="type" data-i18n="Type">Type</option>
                       <option value="group" data-i18n="Group">Group</option>
                       <option value="override" data-i18n="Has Override">Has Override</option>
                     </select>
@@ -2759,6 +2822,7 @@
                   <p id="waterInspectorEmptyHint" class="sidebar-tool-hint">
                     Click a sea, lake, or strait on the map, or choose one from the list.
                   </p>
+                  <button id="waterInspectorLakeSettingsBtn" class="btn-secondary" type="button" aria-controls="editorWaterFilters" data-i18n="Lake interaction settings" hidden>Lake interaction settings</button>
                 </div>
                 <div id="waterInspectorSelected" class="hidden">
                   <p id="waterInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
@@ -2889,7 +2953,7 @@
               <div id="legendEditorStack" class="inspector-panel-body inspector-stack"></div>
             </details>
 
-            <h2 id="frontlineProjectHeading" class="visually-hidden">Frontlines & Annotations</h2>
+            <h2 id="frontlineProjectHeading" class="visually-hidden" data-i18n="Frontlines & Annotations">Frontlines &amp; Annotations</h2>
             <details id="frontlineProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="frontlineProjectHeading lblFrontlineProject">
               <summary id="lblFrontlineProject" class="sidebar-section-head">
                 <span class="sidebar-section-title is-secondary" data-i18n="Frontlines & Annotations">Frontlines & Annotations</span>
@@ -2929,7 +2993,7 @@
               </div>
             </details>
 
-            <h2 id="exportProjectHeading" class="visually-hidden">Export</h2>
+            <h2 id="exportProjectHeading" class="visually-hidden" data-i18n="Export">Export</h2>
             <details id="exportProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="exportProjectHeading lblExportProject" open>
               <summary id="lblExportProject" class="sidebar-section-head">
                 <span class="sidebar-section-title is-secondary" data-i18n="Export">Export</span>
@@ -2957,7 +3021,7 @@
               </div>
             </details>
 
-            <h2 id="inspectorUtilitiesHeading" class="visually-hidden">Utilities</h2>
+            <h2 id="inspectorUtilitiesHeading" class="visually-hidden" data-i18n="Utilities">Utilities</h2>
             <details id="inspectorUtilitiesSection" class="card inspector-section sidebar-support-block" aria-labelledby="inspectorUtilitiesHeading lblInspectorUtilities">
               <summary id="lblInspectorUtilities" class="sidebar-support-head" data-i18n="Utilities">
                 <span class="sidebar-support-title">Utilities</span>
@@ -3010,7 +3074,7 @@
               </div>
             </details>
 
-            <h2 id="diagnosticsHeading" class="visually-hidden">Diagnostics</h2>
+            <h2 id="diagnosticsHeading" class="visually-hidden" data-i18n="Diagnostics">Diagnostics</h2>
             <details id="diagnosticsSection" class="card inspector-section dev-only sidebar-appendix-shell" aria-labelledby="diagnosticsHeading lblDiagnostics">
               <summary id="lblDiagnostics" class="sidebar-appendix-head">
                 <span class="sidebar-appendix-title">Diagnostics</span>
@@ -3460,7 +3524,8 @@
             </li>
             <li id="scenarioGuideStepSelect" class="scenario-guide-step">
               <strong data-i18n="2. Select the target country in Inspector">2. Select the target country in Inspector</strong>
-              <span class="scenario-guide-step-line" data-i18n="Open the right-side Inspector and confirm that the selected country is the one you actually want to edit.">Open the right-side Inspector and confirm that the selected country is the one you actually want to edit.</span>
+              <span class="scenario-guide-step-line" data-i18n="Choose Objects → Countries on the left, select a country, then review its properties on the right.">Choose Objects → Countries on the left, select a country, then review its properties on the right.</span>
+              <button id="scenarioGuideSelectCountryBtn" class="btn-secondary scenario-guide-step-action" type="button" data-i18n="Go to country list">Go to country list</button>
             </li>
             <li id="scenarioGuideStepActive" class="scenario-guide-step">
               <strong data-i18n="3. Confirm HGO identity when needed">3. Confirm HGO identity when needed</strong>
@@ -3492,19 +3557,19 @@
 
         <section id="scenarioGuideSectionHgo" class="scenario-guide-manual-section hidden" data-guide-panel="hgo" role="tabpanel" aria-labelledby="scenarioGuideTabHgo scenarioGuideHgoTitle" hidden>
           <h4 id="scenarioGuideHgoTitle" class="scenario-guide-manual-title" data-i18n="HGO and identity">HGO and identity</h4>
-          <p class="scenario-guide-manual-lead" data-i18n="Use this section when the scenario uses HGO source data, HGO flags, or HGO country-name variants.">Use this section when the scenario uses HGO source data, HGO flags, or HGO country-name variants.</p>
+          <p class="scenario-guide-manual-lead" data-i18n="Edit HGO maps in the separate editor, or review HGO names and flags in the Inspector.">Edit HGO maps in the separate editor, or review HGO names and flags in the Inspector.</p>
           <div class="scenario-guide-tool-accordion">
             <details class="scenario-guide-tool-panel" open>
               <summary class="scenario-guide-tool-summary">
-                <span class="scenario-guide-tool-title" data-i18n="HGO runtime preview">HGO runtime preview</span>
-                <span class="scenario-guide-tool-summary-copy" data-i18n="Check the donor geography before editing.">Check the donor geography before editing.</span>
+                <span class="scenario-guide-tool-title" data-i18n="HGO editor">HGO editor</span>
+                <span class="scenario-guide-tool-summary-copy" data-i18n="A dedicated workspace for HGO maps.">A dedicated workspace for HGO maps.</span>
               </summary>
               <div class="scenario-guide-tool-body">
-                <p data-i18n="HGO preview helps you inspect the HGO source layer beside the active scenario map. It is best used before ownership, label, or color decisions.">HGO preview helps you inspect the HGO source layer beside the active scenario map. It is best used before ownership, label, or color decisions.</p>
+                <p data-i18n="Select a land or sea state to change its color or label. Undo changes, save your HGO project, or export a PNG.">Select a land or sea state to change its color or label. Undo changes, save your HGO project, or export a PNG.</p>
+                <p><a href="../hgo/" data-i18n="Open HGO editor">Open HGO editor</a></p>
                 <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="You need to compare the active map against HGO geography or confirm that the selected feature belongs to the expected source region.">You need to compare the active map against HGO geography or confirm that the selected feature belongs to the expected source region.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Apply the HGO-backed scenario, open the preview, select the target country, then read the Inspector before changing anything.">Apply the HGO-backed scenario, open the preview, select the target country, then read the Inspector before changing anything.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="The selected country, owner tag, and visible boundary should describe the same place before you edit.">The selected country, owner tag, and visible boundary should describe the same place before you edit.</span></li>
+                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Open the editor, select a state on the map or through search, then edit its color or label.">Open the editor, select a state on the map or through search, then edit its color or label.</span></li>
+                  <li><strong data-i18n="Save">Save</strong><span data-i18n="HGO projects open in the HGO editor. Save the current workspace before switching editors.">HGO projects open in the HGO editor. Save the current workspace before switching editors.</span></li>
                 </ul>
               </div>
             </details>

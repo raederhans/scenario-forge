@@ -44,6 +44,7 @@ function normalizeReadyReason(reason, fallback = "post-ready") {
 export function createStartupReadyHandoffOwner({
   runtimeState,
   postReadyScheduler,
+  startupSampleProjectId = "",
   effects = {},
   helpers = {},
 } = {}) {
@@ -83,6 +84,22 @@ export function createStartupReadyHandoffOwner({
   let hydrationScenarioId;
   let hydrationRequestId;
   let hydrationScenarioApplyEpoch;
+  let startupSampleSettled = false;
+  const requestedStartupSampleId = String(startupSampleProjectId || "").trim().toLowerCase();
+
+  function hasPendingStartupSample() {
+    if (!requestedStartupSampleId || startupSampleSettled) return false;
+    const sampleState = targetRuntime.sampleProjectDeeplink;
+    if (targetRuntime.uiHydrationStatus === "failed"
+      || (sampleState?.sampleId === requestedStartupSampleId
+        && ["success", "error"].includes(String(sampleState.status || "")))) {
+      // This priority belongs to the initial URL request. Later Guide sample
+      // selections must not close the gate again after that request settles.
+      startupSampleSettled = true;
+      return false;
+    }
+    return true;
+  }
 
   function scopedTaskOptions(options = {}, { scenarioScoped = true } = {}) {
     const epoch = lifecycleEpoch;
@@ -111,6 +128,7 @@ export function createStartupReadyHandoffOwner({
     postReadyScheduler.clearTask?.("post-ready-contour-warmup");
     postReadyContextWarmupScheduled = false;
     postReadyHydrationScheduled = false;
+    startupSampleSettled = false;
     return {
       reason: normalizeReadyReason(reason, "reset"),
       postReadyContextWarmupScheduled,
@@ -136,6 +154,7 @@ export function createStartupReadyHandoffOwner({
         return null;
       })
     ), scopedTaskOptions({
+      canStart: () => !hasPendingStartupSample(),
       timeout: 2200,
       delayMs: 1200,
       retryDelayMs: 600,
@@ -147,6 +166,7 @@ export function createStartupReadyHandoffOwner({
         return null;
       })
     ), scopedTaskOptions({
+      canStart: () => !hasPendingStartupSample(),
       timeout: 4800,
       delayMs: shouldFastTrackScenarioHydration() ? 300 : 4200,
       retryDelayMs: shouldFastTrackScenarioHydration() ? 450 : 900,
@@ -289,12 +309,22 @@ export function createStartupReadyHandoffOwner({
         consoleWarn(`[boot] Deferred full interaction infrastructure build failed. reason=${reason}`, error);
       });
     }, scopedTaskOptions({
-      canStart: () => !targetRuntime.detailDeferred || !!targetRuntime.detailPromotionCompleted,
+      canStart: () => !hasPendingStartupSample()
+        && (!targetRuntime.detailDeferred || !!targetRuntime.detailPromotionCompleted),
       timeout: 1200,
       delayMs: 180,
       retryDelayMs: 320,
       idleQuietMs: POST_READY_IDLE_QUIET_MS,
     }));
+  }
+
+  function markStartupSampleSettled() {
+    if (!postReadyHydrationScheduled) return false;
+    // Observe settlement here before another sample can replace its state,
+    // even when no scheduler canStart check has run yet.
+    // Scene tasks retain their original stale cancellation semantics. The
+    // project import recovery owns work for the committed scenario.
+    return !hasPendingStartupSample();
   }
 
   function schedulePostReadyVisualWarmup() {
@@ -371,6 +401,7 @@ export function createStartupReadyHandoffOwner({
       }
       if (loaded) task.commit(() => requestMainRender("post-ready-context-warmup"));
     }, scopedTaskOptions({
+      canStart: () => !hasPendingStartupSample(),
       timeout: 1600,
       delayMs: 900,
       retryDelayMs: 420,
@@ -391,6 +422,7 @@ export function createStartupReadyHandoffOwner({
         }));
         task.commit(() => requestMainRender("post-ready-contours"));
       }, scopedTaskOptions({
+        canStart: () => !hasPendingStartupSample(),
         timeout: 1800,
         delayMs: 1400,
         retryDelayMs: 420,
@@ -407,6 +439,7 @@ export function createStartupReadyHandoffOwner({
     markUiHydrationReady,
     scheduleReadyPostBootWork,
     startDeferredFullInteractionInfrastructureBuild,
+    markStartupSampleSettled,
     schedulePostReadyHydration,
     schedulePostReadyPoliticalReconcile,
     schedulePostReadyDeferredContextWarmup,

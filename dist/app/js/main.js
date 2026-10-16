@@ -6,7 +6,9 @@ import {
   setStartupInitialScenarioChunkVisualPromotion,
   setStartupInteractionMode,
   setUiHydrationState,
+  replaceSampleProjectDeeplinkState,
 } from "./core/state/actions/boot_actions.js";
+import { getSampleProjectIdFromUrl } from "./core/sample_project_url.js";
 import { createStartupBootOverlayController } from "./bootstrap/startup_boot_overlay.js";
 import { createStartupDataPipelineOwner } from "./bootstrap/startup_data_pipeline.js";
 import { createDeferredDetailPromotionOwner } from "./bootstrap/deferred_detail_promotion.js";
@@ -50,6 +52,7 @@ import { updateUIText } from "./ui/i18n.js";
 import { bindBeforeUnload } from "./core/dirty_state.js";
 
 const state = runtimeState;
+const startupSampleProjectId = getSampleProjectIdFromUrl();
 configureStartupSupportKeyUsageAudit();
 
 registerMainRuntimeDiagnostics({
@@ -154,6 +157,7 @@ function getStartupScenarioBootOwner() {
 }
 
 async function tryScheduleStartupSampleProjectDeeplink() {
+  if (!startupSampleProjectId) return false;
   return runOptionalStartupTask({
     loadModule: startupSampleProjectDeeplinkModuleLoader.loadModuleOnce,
     run: (sampleProjectDeeplinkModule) => sampleProjectDeeplinkModule.tryScheduleStartupSampleProjectDeeplink({
@@ -170,9 +174,22 @@ async function tryScheduleStartupSampleProjectDeeplink() {
           refreshColorState: (options) => callRuntimeHook(state, "refreshColorStateFn", options),
         },
         showToast: (message, options) => callRuntimeHook(state, "showToastFn", message, options),
+        onSettled: () => getStartupReadyHandoffOwner().markStartupSampleSettled(),
       },
     }),
-    onError: (error) => console.warn("[boot] Startup sample project deeplink scheduling failed:", error),
+    onError: (error) => {
+      const sampleState = replaceSampleProjectDeeplinkState(state, {
+        ...state.sampleProjectDeeplink,
+        sampleId: startupSampleProjectId,
+        status: "error",
+        errorCode: "sample-project-startup-failed",
+        errorMessage: String(error?.message || error),
+        updatedAt: Date.now(),
+      });
+      getStartupReadyHandoffOwner().markStartupSampleSettled();
+      callRuntimeHook(state, "refreshSampleProjectBannerFn", sampleState);
+      console.warn("[boot] Startup sample project deeplink scheduling failed:", error);
+    },
   });
 }
 
@@ -183,6 +200,7 @@ function getStartupReadyHandoffOwner() {
   startupReadyHandoffOwner = createStartupReadyHandoffOwner({
     runtimeState: state,
     postReadyScheduler,
+    startupSampleProjectId,
     effects: {
       commitUiHydrationState: (patch) => setUiHydrationState(runtimeState, patch),
       getStartupUiBootstrapPromise: deferredUiBootstrapper.getPromise,

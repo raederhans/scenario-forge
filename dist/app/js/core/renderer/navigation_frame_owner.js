@@ -3,6 +3,22 @@ import { pageResourceBudget } from "../runtime_resource_budget.js";
 const MAX_DIMENSION = 1024;
 const MAX_RETAINED_BYTES = 8 * 1024 * 1024;
 const SLICE_MS = 6;
+const DEFAULT_QUALITY_LIMITS = Object.freeze({
+  worldMaxDevicePixelMagnification: 2,
+  detailMinCssScaleRatio: 0.8,
+  detailMaxCssScaleRatio: 1.25,
+  detailMaxDevicePixelMagnification: 1.5,
+});
+
+function isValidTransform(transform) {
+  return Number.isFinite(transform?.x) && Number.isFinite(transform?.y)
+    && Number.isFinite(transform?.k) && transform.k > 0;
+}
+
+function isValidCanvasSize(canvas) {
+  return Number.isSafeInteger(canvas?.width) && canvas.width > 0
+    && Number.isSafeInteger(canvas?.height) && canvas.height > 0;
+}
 
 export function createNavigationFrameOwner({
   getIdentity,
@@ -13,7 +29,13 @@ export function createNavigationFrameOwner({
   now = () => performance.now(),
   resourceBudget = pageResourceBudget,
   recordMetric = () => {},
+  qualityLimits = {},
 } = {}) {
+  const quality = { ...DEFAULT_QUALITY_LIMITS, ...qualityLimits };
+  if (Object.values(quality).some((value) => !Number.isFinite(value) || value <= 0)
+    || quality.detailMinCssScaleRatio > quality.detailMaxCssScaleRatio) {
+    throw new TypeError("Navigation raster quality limits must be positive finite bounds.");
+  }
   const frameOwner = Symbol("navigation-frame");
   const jobOwner = Symbol("navigation-frame-job");
   let frame = null;
@@ -55,8 +77,7 @@ export function createNavigationFrameOwner({
     if (job && !validIdentity(job.identity)) cancelJob("identity");
     if (!frame) return false;
     const identity = getIdentity();
-    const pressure = resourceBudget.snapshot().pressure;
-    if (identity !== frame.identity || pressure) {
+    if (identity !== frame.identity) {
       let changedFields = [];
       try {
         const before = JSON.parse(frame.identity), after = JSON.parse(identity);
@@ -64,7 +85,7 @@ export function createNavigationFrameOwner({
           changedFields = before.flatMap((value, index) => JSON.stringify(value) === JSON.stringify(after[index]) ? [] : [index]);
         }
       } catch { /* Scalar identities are supported by standalone callers. */ }
-      recordMetric("navigationFrameInvalid", 0, { reason: identity !== frame.identity ? "identity" : "pressure", changedFields });
+      recordMetric("navigationFrameInvalid", 0, { reason: "identity", changedFields });
       releaseFrame();
       return false;
     }
@@ -74,8 +95,8 @@ export function createNavigationFrameOwner({
   function runSlice(active) {
     active.timer = null;
     if (job !== active) return;
-    if (!validIdentity(active.identity) || resourceBudget.snapshot().pressure) {
-      cancelJob("identity-or-pressure");
+    if (!validIdentity(active.identity)) {
+      cancelJob("identity");
       return;
     }
     if (shouldPause()) {
@@ -171,7 +192,10 @@ export function createNavigationFrameOwner({
     const width = Math.max(1, Math.round(worldWidth * scale));
     const height = Math.max(1, Math.round(worldHeight * scale));
     const bytes = width * height * 4;
-    if (bytes > MAX_RETAINED_BYTES || !resourceBudget.admitSpeculative(bytes).admitted) return false;
+    // Navigation is a bounded required fallback. Other owners' retained
+    // canvases must not evict it or permanently prevent its preparation.
+    const retainedBytes = (frame?.bytes || 0) + (job?.bytes || 0);
+    if (retainedBytes + bytes > MAX_RETAINED_BYTES) return false;
 
     const canvas = createCanvas();
     canvas.width = width;
@@ -216,8 +240,8 @@ export function createNavigationFrameOwner({
       result = await renderRaster({ width: active.canvas.width, height: active.canvas.height,
         bounds: active.bounds, signal: active.controller.signal });
       if (job !== active) return;
-      if (!validIdentity(active.identity) || resourceBudget.snapshot().pressure) {
-        cancelJob("identity-or-pressure");
+      if (!validIdentity(active.identity)) {
+        cancelJob("identity");
         return;
       }
       if (!result?.bitmap) throw new Error("Navigation worker unavailable");
@@ -227,8 +251,8 @@ export function createNavigationFrameOwner({
       publish(active);
     } catch {
       if (job !== active) return;
-      if (!validIdentity(active.identity) || resourceBudget.snapshot().pressure) {
-        cancelJob("identity-or-pressure");
+      if (!validIdentity(active.identity)) {
+        cancelJob("identity");
         return;
       }
       // Unsupported/failed workers retain the existing cooperative renderer.
@@ -245,10 +269,12 @@ export function createNavigationFrameOwner({
 
   function captureWholeScene(source, transform, dpr, bounds) {
     if (shouldPause()) return false;
-    if (!source?.width || !source.height || !Number.isFinite(transform?.k) || transform.k <= 0
-      || !Number.isFinite(dpr) || dpr <= 0 || !Array.isArray(bounds)) return false;
+    if (!isValidCanvasSize(source) || !isValidTransform(transform)
+      || !Number.isFinite(dpr) || dpr <= 0 || !Array.isArray(bounds)
+      || !Array.isArray(bounds[0]) || !Array.isArray(bounds[1])) return false;
     const [[minX, minY], [maxX, maxY]] = bounds;
-    if (![minX, minY, maxX, maxY, transform.x, transform.y].every(Number.isFinite)) return false;
+    if (![minX, minY, maxX, maxY].every(Number.isFinite)
+      || maxX <= minX || maxY <= minY) return false;
     // Only a complete exact frame whose visible canvas contains the entire
     // projected world proves global coverage. Regional snapshots cannot seed it.
     if ((minX * transform.k + transform.x) * dpr < 0
@@ -269,13 +295,51 @@ export function createNavigationFrameOwner({
   function draw(context, transform, dpr, {
     detailSource = null, detailTransform = null, detailDpr = dpr,
   } = {}) {
-    if (!context?.canvas || !isReady()
-      || !Number.isFinite(transform?.x) || !Number.isFinite(transform?.y)
-      || !(Number.isFinite(transform?.k) && transform.k > 0)
-      || !(Number.isFinite(dpr) && dpr > 0)) return false;
+    if (!isValidCanvasSize(context?.canvas) || !isReady()
+      || !isValidTransform(transform) || !(Number.isFinite(dpr) && dpr > 0)) return false;
     const { canvas, bounds, backgroundColor } = frame;
+    if (!isValidCanvasSize(canvas)) return false;
     const worldWidth = bounds[1][0] - bounds[0][0];
     const worldHeight = bounds[1][1] - bounds[0][1];
+    const worldScaleX = dpr * transform.k * worldWidth / canvas.width;
+    const worldScaleY = dpr * transform.k * worldHeight / canvas.height;
+    const worldOffsetX = dpr * (transform.x + transform.k * bounds[0][0]);
+    const worldOffsetY = dpr * (transform.y + transform.k * bounds[0][1]);
+    if (![worldScaleX, worldScaleY, worldOffsetX, worldOffsetY].every(Number.isFinite)
+      || worldScaleX <= 0 || worldScaleY <= 0) return false;
+    const worldMagnification = Math.max(worldScaleX, worldScaleY);
+    const worldQualityOK = worldMagnification <= quality.worldMaxDevicePixelMagnification;
+
+    let detail = null;
+    if (detailSource !== context.canvas && isValidCanvasSize(detailSource) && isValidTransform(detailTransform)
+      && Number.isFinite(detailDpr) && detailDpr > 0) {
+      const ratio = transform.k / detailTransform.k;
+      const magnification = ratio * dpr / detailDpr;
+      const x = (transform.x - detailTransform.x * ratio) * dpr;
+      const y = (transform.y - detailTransform.y * ratio) * dpr;
+      const width = detailSource.width * magnification;
+      const height = detailSource.height * magnification;
+      if ([ratio, magnification, x, y, width, height].every(Number.isFinite)
+        && magnification > 0 && ratio >= quality.detailMinCssScaleRatio
+        && ratio <= quality.detailMaxCssScaleRatio
+        && magnification <= quality.detailMaxDevicePixelMagnification) {
+        detail = {
+          ratio, magnification, x, y,
+          coversViewport: x <= 0 && y <= 0
+            && x + width >= context.canvas.width && y + height >= context.canvas.height,
+        };
+      }
+    }
+    // Decide before any destination mutation. A sharp regional crop can stand
+    // alone only when it covers every target pixel; world blur cannot fill gaps.
+    if (!worldQualityOK && !detail?.coversViewport) {
+      recordMetric("navigationFrameReject", 0, {
+        reason: "raster-quality", worldMagnification,
+        detailQualityOK: Boolean(detail), detailCoversViewport: Boolean(detail?.coversViewport),
+      });
+      return false;
+    }
+    const detailOnly = !worldQualityOK;
     context.save();
     try {
       context.setTransform(1, 0, 0, 1, 0, 0);
@@ -284,23 +348,22 @@ export function createNavigationFrameOwner({
       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
       context.fillStyle = backgroundColor;
       context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-      context.setTransform(dpr * transform.k * worldWidth / canvas.width, 0,
-        0, dpr * transform.k * worldHeight / canvas.height,
-        dpr * (transform.x + transform.k * bounds[0][0]),
-        dpr * (transform.y + transform.k * bounds[0][1]));
-      context.drawImage(canvas, 0, 0);
-      if (detailSource && detailTransform && detailDpr > 0 && detailTransform.k > 0) {
-        const ratio = transform.k / detailTransform.k;
-        context.setTransform(ratio * dpr / detailDpr, 0, 0, ratio * dpr / detailDpr,
-          (transform.x - detailTransform.x * ratio) * dpr,
-          (transform.y - detailTransform.y * ratio) * dpr);
+      if (worldQualityOK) {
+        context.setTransform(worldScaleX, 0, 0, worldScaleY, worldOffsetX, worldOffsetY);
+        context.drawImage(canvas, 0, 0);
+      }
+      if (detail) {
+        context.setTransform(detail.magnification, 0, 0, detail.magnification, detail.x, detail.y);
         context.drawImage(detailSource, 0, 0);
       }
     } finally {
       context.restore();
     }
     recordMetric("navigationFrameReuse", 0, {
-      targetK: transform.k, detail: Boolean(detailSource && detailTransform),
+      targetK: transform.k, detail: Boolean(detail), detailOnly,
+      worldMagnification, worldQualityOK,
+      detailCssScaleRatio: detail?.ratio ?? null,
+      detailDevicePixelMagnification: detail?.magnification ?? null,
     });
     return true;
   }

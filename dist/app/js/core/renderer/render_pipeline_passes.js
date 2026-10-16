@@ -21,6 +21,7 @@ export function createRenderPipelinePassesOwner({
     getPassCoverage = () => null,
     getRenderPassCacheState = () => ({ signatures: {}, dirty: {}, reasons: {}, canvases: {}, counters: {} }),
     getRenderPassSignature = () => "",
+    getActiveRenderPassNames = () => null,
     incrementPerfCounter = () => {},
     rebuildResolvedColors = () => {},
     recordRenderPerfMetric = () => {},
@@ -44,18 +45,6 @@ export function createRenderPipelinePassesOwner({
     });
   }
 
-  function getHgoPreviewVisibilityTokenFromSignature(signature) {
-    return String(signature || "")
-      .split("::")
-      .find((part) => part === "hgo:on" || part === "hgo:off") || "";
-  }
-
-  function didHgoPreviewVisibilityTokenChange(previousSignature, nextSignature) {
-    const previousToken = getHgoPreviewVisibilityTokenFromSignature(previousSignature);
-    const nextToken = getHgoPreviewVisibilityTokenFromSignature(nextSignature);
-    return !!previousToken && !!nextToken && previousToken !== nextToken;
-  }
-
   function shouldDeferExactAfterSettlePassForCriticalPaint(passName, cache = getRenderPassCacheState()) {
     if (!exactAfterSettleDeferredPassNames.has(passName)) return false;
     const controller = getExactAfterSettleControllerState();
@@ -69,13 +58,9 @@ export function createRenderPipelinePassesOwner({
   function prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache = getRenderPassCacheState()) {
     const nextSignature = getRenderPassSignature(passName, transform);
     const previousSignature = String(cache.signatures[passName] || "");
-    const hgoPreviewVisibilityChanged = passName === "contextScenario"
-      && didHgoPreviewVisibilityTokenChange(previousSignature, nextSignature);
     if (previousSignature !== nextSignature) {
       cache.dirty[passName] = true;
-      if (hgoPreviewVisibilityChanged) {
-        cache.reasons[passName] = "hgo-runtime-preview";
-      } else if (!cache.reasons[passName] || cache.reasons[passName] === "init") {
+      if (!cache.reasons[passName] || cache.reasons[passName] === "init") {
         cache.reasons[passName] = "signature";
       }
       if (passName === "contextScenario") {
@@ -83,7 +68,6 @@ export function createRenderPipelinePassesOwner({
           activeScenarioId: String(state.activeScenarioId || ""),
           previousSignature,
           nextSignature,
-          hgoPreviewVisibilityChanged,
         });
       }
     }
@@ -165,7 +149,11 @@ export function createRenderPipelinePassesOwner({
   function ensureIdleRenderPasses(timings, passNames = null) {
     const transform = state.zoomTransform || globalThis.d3.zoomIdentity;
     const cache = getRenderPassCacheState();
-    const requestedPassNames = Array.isArray(passNames) ? new Set(passNames.filter(Boolean)) : null;
+    const activePassNames = getActiveRenderPassNames();
+    const selectedPassNames = Array.isArray(passNames) ? passNames : activePassNames;
+    const requestedPassNames = Array.isArray(selectedPassNames)
+      ? new Set(selectedPassNames.filter((name) => name
+        && (!Array.isArray(activePassNames) || activePassNames.includes(name)))) : null;
     if (state.legacyColorStateDirty) {
       rebuildResolvedColors();
     }

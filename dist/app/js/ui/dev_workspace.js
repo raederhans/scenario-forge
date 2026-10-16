@@ -34,7 +34,6 @@ import {
   normalizeScenarioTagInput,
   normalizeScenarioNameInput,
   normalizeScenarioColorInput,
-  sanitizeScenarioColorList,
 } from "./dev_workspace/dev_workspace_normalizers.js";
 const state = runtimeState;
 
@@ -58,14 +57,6 @@ function formatUi(key, replacements = {}) {
 
 function localizeSelectionSummary(count) {
   return formatUi("{count} features selected.", { count });
-}
-
-function readStoredExpanded() {
-  try {
-    return localStorage.getItem(DEV_WORKSPACE_STORAGE_KEY) === "1";
-  } catch (_error) {
-    return false;
-  }
 }
 
 function writeStoredExpanded(nextValue) {
@@ -411,40 +402,6 @@ function renderScenarioTagInspectorDetails(container, row = null) {
     [ui("Name"), row.displayName || row.nameEn || row.tag],
     [ui("Feature Count"), String(Number(row.featureCountLive || 0) || 0)],
   ]);
-}
-
-function renderCapitalEditorSearchResults(container, matches = [], query = "") {
-  if (!container) return;
-  container.replaceChildren();
-  if (!matches.length) {
-    if (normalizeScenarioNameInput(query)) {
-      const empty = document.createElement("div");
-      empty.className = "dev-workspace-empty";
-      empty.textContent = ui("No matching countries.");
-      container.appendChild(empty);
-    }
-    return;
-  }
-  matches.forEach((entry) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "btn-secondary";
-    button.dataset.devCapitalSearchTag = entry.tag;
-    button.style.display = "flex";
-    button.style.width = "100%";
-    button.style.justifyContent = "space-between";
-    button.style.alignItems = "center";
-    button.style.marginBottom = "0.35rem";
-
-    const label = document.createElement("span");
-    label.textContent = `${entry.tag} | ${entry.displayName || entry.nameEn || entry.nameZh || entry.tag}`;
-
-    const meta = document.createElement("span");
-    meta.textContent = entry.releasable ? ui("Releasable") : ui("Scenario Country");
-
-    button.append(label, meta);
-    container.appendChild(button);
-  });
 }
 
 function selectScenarioCapitalEditorTag(tag, { clearSearch = false } = {}) {

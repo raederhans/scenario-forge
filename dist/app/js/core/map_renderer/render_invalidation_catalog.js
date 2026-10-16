@@ -12,7 +12,7 @@ export const PASS_RESOURCE_MAP = Object.freeze({
   background: Object.freeze(["backgroundBuffer"]),
   physicalBase: Object.freeze(["physicalBaseBuffer"]),
   political: Object.freeze(["politicalBaseBuffer", "hitIndex"]),
-  hgoPreview: Object.freeze(["hgoPreviewBuffer"]),
+  populationHeatmap: Object.freeze(["populationHeatmapBuffer"]),
   contextBase: Object.freeze(["contextBaseBuffer"]),
   contextScenario: Object.freeze(["contextScenarioBuffer"]),
   effects: Object.freeze(["effectsBuffer"]),
@@ -43,10 +43,6 @@ export const FIRST_FRAME_BASE_TARGET_RESOURCES = Object.freeze([
   "interactionOverlay",
 ]);
 
-export const FIRST_FRAME_HGO_TARGET_RESOURCES = Object.freeze([
-  "hgoPreviewBuffer",
-]);
-
 export const UNSUPPORTED_RENDER_PASS_INPUT_KEYS = Object.freeze([
   "targetPasses",
   "legacyTargetPasses",
@@ -71,23 +67,17 @@ export function hasAnyTargetResource(targetResources = [], resourceNames = []) {
   ));
 }
 
-export function getFirstFrameTargetResources({
-  hgoPreviewDirty = false,
-} = {}) {
+export function getFirstFrameTargetResources() {
   return normalizeStringList([
     ...FIRST_FRAME_BASE_TARGET_RESOURCES,
-    ...(hgoPreviewDirty ? FIRST_FRAME_HGO_TARGET_RESOURCES : []),
   ]);
 }
 
-export function resolveFirstFrameTargetResources(targetResources = [], {
-  hgoPreviewDirty = false,
-} = {}) {
-  const allowlist = new Set(getFirstFrameTargetResources({ hgoPreviewDirty }));
+export function resolveFirstFrameTargetResources(targetResources = []) {
+  const allowlist = new Set(getFirstFrameTargetResources());
   const filteredTargetResources = normalizeStringList(targetResources).filter((resourceName) => allowlist.has(resourceName));
   return normalizeStringList([
     ...FIRST_FRAME_BASE_TARGET_RESOURCES,
     ...filteredTargetResources,
-    ...(hgoPreviewDirty ? FIRST_FRAME_HGO_TARGET_RESOURCES : []),
   ]);
 }

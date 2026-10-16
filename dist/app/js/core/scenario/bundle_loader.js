@@ -26,6 +26,7 @@ import {
   loadOptionalScenarioResource as sharedLoadOptionalScenarioResource,
   normalizeScenarioId as sharedNormalizeScenarioId,
 } from "./shared.js";
+import "../scenario_chunk_format_shared.js";
 
 const SCENARIO_RUNTIME_SHELL_REQUIRED_OBJECTS = Object.freeze([
   "land_mask",
@@ -372,7 +373,7 @@ async function loadScenarioChunkFile(
       signal?.throwIfAborted();
       if (workerResult.chunkPayload) {
         return {
-          payload: workerResult.chunkPayload,
+          payload: globalThis.__scenarioForgeScenarioChunkFormatShared.decodeScenarioChunkPayload(workerResult.chunkPayload),
           metrics: workerResult.metrics?.chunkPayload || workerResult.metrics || null,
           reason: "worker",
         };
@@ -387,8 +388,9 @@ async function loadScenarioChunkFile(
     label: `scenario:${resourceLabel}`,
     signal,
   });
+  signal?.throwIfAborted();
   return {
-    payload: result.payload,
+    payload: globalThis.__scenarioForgeScenarioChunkFormatShared.decodeScenarioChunkPayload(result.payload),
     metrics: result.metrics || null,
     reason: "main-thread",
     scenarioId,

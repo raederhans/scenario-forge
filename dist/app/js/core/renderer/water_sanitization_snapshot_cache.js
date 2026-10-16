@@ -47,6 +47,18 @@ export function buildWaterRegionFeatureFromParts(feature, parts) {
   };
 }
 
+export function rebindSanitizedWaterRegionFeature(feature, sanitized) {
+  if (!sanitized) return null;
+  if (feature.geometry === sanitized.geometry) return feature;
+  // Geometry may be reused, but the caller owns the current metadata. Keep
+  // the existing wrapper only while its shallow fields still match.
+  const featureKeys = Object.keys(feature).filter((key) => key !== "geometry");
+  const sanitizedKeys = Object.keys(sanitized).filter((key) => key !== "geometry");
+  if (featureKeys.length === sanitizedKeys.length && featureKeys.every((key) =>
+    Object.hasOwn(sanitized, key) && feature[key] === sanitized[key])) return sanitized;
+  return { ...feature, geometry: sanitized.geometry };
+}
+
 function sameWaterGeometry(left, right) {
   if (!left || !right || left.type !== right.type) return false;
   if (left === right) return true;
@@ -77,20 +89,21 @@ export function createWaterSanitizationSnapshotCache() {
       if (!reused) return null;
       const other = snapshots.find((snapshot) => snapshot !== reused);
       snapshots = [reused, ...(other ? [other] : [])];
-      return reused.result.slice();
+      return reused.bindings.map(({ feature, sanitized }) =>
+        rebindSanitizedWaterRegionFeature(feature, sanitized)).filter(Boolean);
     },
     findDecodedFeature(featureId, feature) {
       if (!featureId) return null;
       return snapshots.map((snapshot) => snapshot.byId.get(featureId))
         .find((entry) => entry && entry.feature !== feature
-          && sameWaterGeometry(entry.feature.geometry, feature?.geometry)) || null;
+          && sameWaterGeometry(entry.geometry, feature?.geometry)) || null;
     },
-    remember(source, scenarioId, result, byId) {
+    remember(source, scenarioId, bindings, byId) {
       const next = {
         scenarioId,
         source: source.slice(),
         geometries: source.map((feature) => feature?.geometry),
-        result: result.slice(),
+        bindings: bindings.slice(),
         byId,
       };
       const largest = snapshots.slice().sort((a, b) => b.source.length - a.source.length)[0];

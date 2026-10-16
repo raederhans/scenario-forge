@@ -110,6 +110,10 @@ export function createStartupScenarioBootOwner({
         throw startupApplyError;
       }
       startupRecoveryReason = String(startupApplyError?.message || "startup-bundle-apply-failed");
+      const causeMessage = String(startupApplyError?.cause?.message || "").trim();
+      if (causeMessage && causeMessage !== startupRecoveryReason) {
+        startupRecoveryReason += ` Cause: ${causeMessage}`;
+      }
       console.warn(
         `[boot] Startup bundle apply failed for "${defaultScenarioBundle.manifest?.scenario_id || ""}", falling back to legacy bootstrap bundle.`,
         startupApplyError

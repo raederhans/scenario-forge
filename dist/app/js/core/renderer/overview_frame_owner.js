@@ -50,10 +50,11 @@ export function createOverviewFrameOwner({
   function draw(context, current, dpr) {
     if (!context || !isCurrent() || frame.dpr !== dpr) return false;
     const { canvas, transform: reference } = frame;
+    const ratio = current.k / reference.k;
+    if (!(ratio >= 0.8 && ratio <= 1.25)) return false;
     const coverage = transformCoverage({ minX: 0, minY: 0,
       maxX: canvas.width / dpr, maxY: canvas.height / dpr }, reference, current);
     if (!coversViewport(coverage, context.canvas.width / dpr, context.canvas.height / dpr)) return false;
-    const ratio = current.k / reference.k;
     // Identity and actual coverage are checked before touching visible pixels.
     context.save();
     try {

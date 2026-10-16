@@ -1,4 +1,6 @@
 import { createStrategicValuesOwner } from "./strategic_values_owner.js";
+import { createThematicWgiOwner } from "./thematic_wgi_owner.js";
+import { createPopulationSpatialOwner } from "./population_spatial_owner.js";
 import { normalizeDisplayQuality } from "../../core/renderer/display_quality_policy.js";
 import {
   URBAN_ADAPTIVE_TINT_DEFAULT_COLOR,
@@ -235,6 +237,14 @@ export function createAppearanceControlsController({
     }
   };
   thematicLayerPreviewController = createThematicLayerPreviewController({ t });
+  const thematicWgiOwner = createThematicWgiOwner({
+    runtimeState, t, markDirty,
+    refreshColorState: (options) => runtimeState.refreshColorStateFn?.(options),
+  });
+  const populationSpatialOwner = createPopulationSpatialOwner({
+    runtimeState, t, markDirty,
+    refreshColorState: (options) => runtimeState.refreshColorStateFn?.(options),
+  });
   void thematicLayerPreviewController.load().then(() => renderLayerStatusSummaries());
   const appearanceTabButtons = Array.from(document.querySelectorAll("[data-appearance-tab]"));
   const appearanceTabPanels = Array.from(document.querySelectorAll("[data-appearance-panel]"));
@@ -432,6 +442,18 @@ export function createAppearanceControlsController({
     });
   };
 
+  const getTabArrowDirection = (button, key) => {
+    const isVertical = button.closest?.('[role="tablist"]')?.getAttribute("aria-orientation") === "vertical";
+    if (isVertical) {
+      if (key === "ArrowDown") return 1;
+      if (key === "ArrowUp") return -1;
+      return null;
+    }
+    if (key === "ArrowRight") return 1;
+    if (key === "ArrowLeft") return -1;
+    return null;
+  };
+
   const setAppearanceTab = (tabId = "borders") => {
     const normalizedTabId = String(tabId || "borders").trim().toLowerCase();
     appearanceTabButtons.forEach((button) => {
@@ -462,8 +484,8 @@ export function createAppearanceControlsController({
         : (currentIndex + direction + buttons.length) % buttons.length;
     const nextButton = buttons[nextIndex];
     if (!nextButton) return;
-    setAppearanceTab(nextButton.dataset.appearanceTab || "borders");
     nextButton.focus?.();
+    nextButton.click?.();
   };
 
   const setMapContentTab = (tabId = "ocean") => {
@@ -495,8 +517,8 @@ export function createAppearanceControlsController({
         : (currentIndex + direction + buttons.length) % buttons.length;
     const nextButton = buttons[nextIndex];
     if (!nextButton) return;
-    setMapContentTab(nextButton.dataset.mapContentTab || "ocean");
     nextButton.focus?.();
+    nextButton.click?.();
   };
 
   const syncUrbanConfig = () => {
@@ -584,6 +606,8 @@ export function createAppearanceControlsController({
     // 这样 transport/city/physical 的派生状态不会被后面的简单 DOM 赋值覆盖回旧值。
     cityPointsOwner.renderCityPointsUi();
     strategicValuesOwner.render();
+    thematicWgiOwner.render();
+    populationSpatialOwner.render();
     renderBorderUi();
     if (toggleUrban) toggleUrban.checked = !!runtimeState.showUrban;
     physicalOwner.renderPhysicalUi();
@@ -654,12 +678,10 @@ export function createAppearanceControlsController({
         setAppearanceTab(button.dataset.appearanceTab || "borders");
       });
       button.addEventListener("keydown", (event) => {
-        if (event.key === "ArrowRight") {
+        const arrowDirection = getTabArrowDirection(button, event.key);
+        if (arrowDirection !== null) {
           event.preventDefault();
-          moveAppearanceTabFocus(button, 1);
-        } else if (event.key === "ArrowLeft") {
-          event.preventDefault();
-          moveAppearanceTabFocus(button, -1);
+          moveAppearanceTabFocus(button, arrowDirection);
         } else if (event.key === "Home") {
           event.preventDefault();
           moveAppearanceTabFocus(button, "first");
@@ -677,12 +699,10 @@ export function createAppearanceControlsController({
         setMapContentTab(button.dataset.mapContentTab || "ocean");
       });
       button.addEventListener("keydown", (event) => {
-        if (event.key === "ArrowRight") {
+        const arrowDirection = getTabArrowDirection(button, event.key);
+        if (arrowDirection !== null) {
           event.preventDefault();
-          moveMapContentTabFocus(button, 1);
-        } else if (event.key === "ArrowLeft") {
-          event.preventDefault();
-          moveMapContentTabFocus(button, -1);
+          moveMapContentTabFocus(button, arrowDirection);
         } else if (event.key === "Home") {
           event.preventDefault();
           moveMapContentTabFocus(button, "first");

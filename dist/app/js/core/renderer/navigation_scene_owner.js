@@ -1,19 +1,89 @@
 import { createGeometryRasterWorkerClient } from "../geometry_raster_worker_client.js";
+import { getThematicWgiSignature } from "../thematic_wgi_view_model.js";
 import { packGeometryCooperatively } from "../cooperative_geometry_transport.js";
 import { createNavigationFrameOwner } from "./navigation_frame_owner.js";
 import { getObjectIdentityToken } from "./object_identity.js";
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import { isScenarioPoliticalBaseChunk } from "../scenario_chunk_manager.js";
+import { pageResourceBudget } from "../runtime_resource_budget.js";
 
 // Navigation owns a small, whole-scene raster. Viewport chunk promotion is not
 // a paint edit, and must not discard the only frame that covers a fast pan.
 export function createNavigationSceneOwner(state, { surface, helpers: h, createFrameOwner = createNavigationFrameOwner,
   createWorkerClient = createGeometryRasterWorkerClient,
+  createCanvas = () => document.createElement("canvas"),
+  resourceBudget = pageResourceBudget,
   yieldTask = () => globalThis.scheduler?.yield ? globalThis.scheduler.yield() : new Promise((resolve) => setTimeout(resolve, 0)),
 }) {
   let paintRevision = null;
   let paintSignature = "";
+  let disposed = false;
+  let workerLease = null;
+  let waterRasterFeatures = new WeakMap();
+  const sphereFeature = { type: "Feature", geometry: { type: "Sphere" } };
+  const workerStoreKey = () => JSON.stringify([state.activeScenarioId, state.sceneGeneration]);
+
+  function releaseWorker(lease = workerLease, reason = "clear") {
+    if (!lease || lease.released) return;
+    lease.released = true;
+    if (workerLease === lease) workerLease = null;
+    lease.unsubscribe?.();
+    try {
+      h.recordMetric("navigationWorkerRelease", 0, {
+        reason: lease.releaseReason || reason, retainedBytes: lease.retainedBytes,
+        sharedResources: resourceBudget.snapshot(),
+      });
+    } catch { /* Diagnostics must not prevent releasing retained resources. */ }
+    lease.client.dispose();
+  }
+
+  function reconcileWorker() {
+    if (workerLease && (workerLease.sceneKey !== workerStoreKey()
+      || (!workerLease.busy && resourceBudget.snapshot().pressure))) {
+      releaseWorker(workerLease, workerLease.sceneKey !== workerStoreKey() ? "scene" : "pressure");
+    }
+  }
+
+  function acquireWorker() {
+    reconcileWorker();
+    if (!workerLease) {
+      let lease;
+      const client = createWorkerClient({ packGeometry: packGeometryCooperatively, resourceBudget,
+        onMetric: (name, duration, details) => {
+          if (name === "geometryWorkerRoundTrip" && lease) {
+            lease.retainedBytes = Number(details.cacheBudget?.geometry?.estimatedBytes || 0)
+              + Number(details.cacheBudget?.paths?.estimatedBytes || 0) + lease.surfaceBytes;
+          }
+          h.recordMetric(`navigation${name[0].toUpperCase()}${name.slice(1)}`, duration, details);
+        } });
+      lease = { client, sceneKey: workerStoreKey(), busy: false, released: false,
+        retainedBytes: 0, surfaceBytes: 0 };
+      workerLease = lease;
+      lease.unsubscribe = resourceBudget.subscribe(() => {
+        if (!lease.busy && resourceBudget.snapshot().pressure) releaseWorker(lease, "pressure");
+      });
+    }
+    return workerLease;
+  }
+
+  function waterRasterFeature(feature) {
+    const geometries = h.collectSafeWaterRegionGeometryParts(feature)
+      .map((part) => part.type === "Feature" ? part.geometry : part);
+    const cached = waterRasterFeatures.get(feature);
+    if (cached && geometries.length === cached.geometry.geometries.length
+      && geometries.every((geometry, index) => geometry === cached.geometry.geometries[index])) return cached;
+    const result = { type: "Feature", geometry: { type: "GeometryCollection", geometries } };
+    waterRasterFeatures.set(feature, result);
+    return result;
+  }
   let detailedFrame = null;
+  const detailOwner = Symbol("navigation-base-detail");
+  const maxDetailBytes = 32 * 1024 * 1024;
+  function clearDetail() {
+    if (detailedFrame) { detailedFrame.source.width = 0; detailedFrame.source.height = 0; }
+    detailedFrame = null;
+    resourceBudget.release(detailOwner);
+  }
   let requestedIdentity = "";
   let sourceRequest = null;
   let sourcePayloads = null;
@@ -39,6 +109,8 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
   }
 
   function prewarm() {
+    if (disposed) return;
+    reconcileWorker();
     discardStaleSources();
     const bundle = state.scenarioBundleCacheById?.[state.activeScenarioId];
     if (!bundle) return;
@@ -118,6 +190,7 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
       getObjectIdentityToken(state.scenarioBaselineOwnersByFeatureId),
       state.sovereigntyRevision, state.scenarioShellOverlayRevision, state.mapSemanticMode,
       paintSignature, state.strategicChoroplethMetric,
+      getThematicWgiSignature(state),
       getObjectIdentityToken(state.scenarioStrategicValuesData),
       getWholeLayerIdentity("water", state.scenarioWaterRegionsData),
       getObjectIdentityToken(state.waterRegionsData),
@@ -144,6 +217,8 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
   }
 
   function prepare() {
+    if (disposed) return;
+    reconcileWorker();
     discardStaleSources();
     if (state.bootBlocking || (state.scenarioApplyInFlight
       && prewarmedSourceIdentity !== getSourceIdentity())) return;
@@ -234,10 +309,13 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
       if (typeof projection[key] === "function") projectionOptions[key] = projection[key]();
     }
     const renderRaster = async ({ width, height, bounds: rasterBounds, signal }) => {
-      const worker = createWorkerClient({ packGeometry: packGeometryCooperatively,
-        onMetric: (name, duration, details) => h.recordMetric(`navigation${name[0].toUpperCase()}${name.slice(1)}`, duration, details) });
-      if (!worker.available()) { worker.dispose(); return null; }
-      const onAbort = () => worker.dispose();
+      if (disposed || signal.aborted || getIdentity() !== identity) return null;
+      const lease = acquireWorker();
+      const worker = lease.client;
+      if (!worker.available()) { releaseWorker(lease, "unavailable"); return null; }
+      lease.busy = true;
+      let result = null;
+      const onAbort = () => releaseWorker(lease, "cancel");
       signal.addEventListener("abort", onAbort, { once: true });
       const startedAt = performance.now();
       const entries = [];
@@ -253,11 +331,10 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
             const item = items[index];
             let entry;
             if (layerIndex === 0) {
-              entry = { feature: { type: "Feature", geometry: { type: "Sphere" } }, fillColor: h.getOceanBaseFillColor(), alpha: 1 };
+              entry = { feature: sphereFeature, fillColor: h.getOceanBaseFillColor(), alpha: 1 };
             } else if (layerIndex === 3) {
               const alpha = h.getWaterRegionDefaultStyle(item).opacity;
-              if (alpha > 0) entry = { feature: { type: "Feature", geometry: { type: "GeometryCollection",
-                geometries: h.collectSafeWaterRegionGeometryParts(item).map((part) => part.type === "Feature" ? part.geometry : part) } },
+              if (alpha > 0) entry = { feature: waterRasterFeature(item),
                 fillColor: h.getWaterRegionColor(h.getFeatureId(item), item), alpha };
             } else entry = landEntry(item);
             if (entry) entries.push({ ...entry, id: `${layerIndex}:${index}` });
@@ -272,13 +349,29 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
         if (signal.aborted || getIdentity() !== identity) return null;
         const [[minX, minY], [maxX, maxY]] = rasterBounds;
         const k = width / (maxX - minX), scaleY = height / (maxY - minY);
-        return await worker.request({ kind: "navigation", identity, sceneKey: identity,
+        const sharedBudget = resourceBudget.snapshot();
+        lease.surfaceBytes = width * height * 4;
+        // Current job's destination bitmap is already reported by frame owner.
+        // Replace only this lease's old worker reports; other owners' retained
+        // geometry is never counted as reclaimable navigation capacity. Keep
+        // half that capacity free for editing and frame replacement transients.
+        const navigationRetentionBudgetBytes = Math.max(0, Math.floor((sharedBudget.softLimitBytes
+          - sharedBudget.estimatedBytes + lease.retainedBytes - lease.surfaceBytes) / 2));
+        result = await worker.request({ kind: "navigation", identity, sceneKey: lease.sceneKey,
           projectionKey: String(getProjectionGeometryGeneration(projection)), projectionOptions,
-          entries, width, height, dpr: 1,
+          entries, width, height, dpr: 1, navigationRetentionBudgetBytes,
           transform: { x: -minX * k, y: -minY * scaleY, k, scaleY } }, { signal });
+        return result;
       } finally {
         signal.removeEventListener("abort", onAbort);
-        worker.dispose();
+        lease.busy = false;
+        if (!result?.bitmap || signal.aborted || disposed || lease.sceneKey !== workerStoreKey()
+          || !worker.available() || resourceBudget.snapshot().pressure) {
+          const reason = disposed ? "dispose" : signal.aborted ? "cancel"
+            : lease.sceneKey !== workerStoreKey() ? "scene" : !result?.bitmap ? "failure"
+              : !worker.available() ? "unavailable" : "pressure";
+          releaseWorker(lease, reason);
+        }
       }
     };
     if (frame.prepare({ bounds, layers, renderRaster, backgroundColor: "transparent" }) !== false) {
@@ -287,27 +380,58 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
     }
   }
 
-  function captureDetail(source, transform, dpr, { completeExact = false } = {}) {
-    detailedFrame = { source, transform: { x: transform.x, y: transform.y, k: transform.k }, dpr, identity: getIdentity() };
-    if (completeExact && !frame.isReady() && globalThis.d3?.geoPath && surface.getProjection()) {
-      const bounds = globalThis.d3.geoPath(surface.getProjection()).bounds({ type: "Sphere" });
-      if (frame.captureWholeScene?.(source, transform, dpr, bounds)) return;
+  function captureDetail(source, transform, dpr, { completeExact = false, drawBase = null } = {}) {
+    if (disposed) return false;
+    // Source supplies dimensions only. Copying the visible screenshot would
+    // bake text into both the detail and the whole-world navigation raster.
+    if (!completeExact || typeof drawBase !== "function" || !(transform?.k > 0) || !(dpr > 0)) return false;
+    const bytes = Number(source?.width) * Number(source?.height) * 4;
+    if (!Number.isSafeInteger(bytes) || bytes <= 0 || bytes > maxDetailBytes) return false;
+    // Release the replaceable detail before allocating its successor; retained
+    // detail never exceeds the local cap and the visible complete frame stays intact.
+    clearDetail();
+    const canvas = createCanvas();
+    canvas.width = source.width; canvas.height = source.height;
+    const context = canvas.getContext("2d");
+    if (!context) { canvas.width = 0; canvas.height = 0; return false; }
+    resourceBudget.update(detailOwner, { bitmaps: bytes });
+    try {
+      if (drawBase(context) !== true) { canvas.width = 0; canvas.height = 0; resourceBudget.release(detailOwner); return false; }
+    } catch (error) {
+      canvas.width = 0; canvas.height = 0; resourceBudget.release(detailOwner);
+      throw error;
     }
+    detailedFrame = { source: canvas, transform: { x: transform.x, y: transform.y, k: transform.k }, dpr,
+      identity: getIdentity(), detailIdentity: h.getDetailIdentity?.(transform) };
+    // A global raster must not inherit viewport-only context layers; the
+    // cooperative world renderer remains its one consistent source.
     prepare();
+    return true;
   }
 
   function draw(transform) {
+    if (disposed) return false;
+    reconcileWorker();
+    if (detailedFrame && (detailedFrame.identity !== getIdentity()
+      || h.getDetailIdentity && detailedFrame.detailIdentity !== h.getDetailIdentity(detailedFrame.transform))) clearDetail();
     const detail = detailedFrame?.identity === getIdentity() ? detailedFrame : null;
-    return frame.draw(surface.getContext(), transform, state.dpr || 1, {
+    if (h.canDrawLabels && !h.canDrawLabels(transform)) return false;
+    const drawn = frame.draw(surface.getContext(), transform, state.dpr || 1, {
       detailSource: detail?.source,
       detailTransform: detail?.transform,
       detailDpr: detail?.dpr,
     });
+    if (!drawn) return false;
+    return h.drawLabels ? h.drawLabels(transform) : true;
   }
 
+  function clear() {
+    const lease = workerLease;
+    if (lease) lease.releaseReason = disposed ? "dispose" : "clear";
+    frame.clear(); releaseWorker(lease, disposed ? "dispose" : "clear"); requestedIdentity = ""; clearDetail();
+    waterRasterFeatures = new WeakMap();
+    sourceRequest = null; sourcePayloads = null; failedSourceIdentity = ""; prewarmedSourceIdentity = "";
+  }
   return Object.freeze({ prepare, prewarm, draw, captureDetail, isReady: frame.isReady,
-    clear() {
-      frame.clear(); requestedIdentity = ""; detailedFrame = null;
-      sourceRequest = null; sourcePayloads = null; failedSourceIdentity = ""; prewarmedSourceIdentity = "";
-    } });
+    clear, dispose() { disposed = true; clear(); } });
 }
