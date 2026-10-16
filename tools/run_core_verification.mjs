@@ -49,6 +49,11 @@ const DEFAULT_JSON_OUT = path.join(REPO_ROOT, ".runtime", "reports", "generated"
 const DEFAULT_MD_OUT = path.join(REPO_ROOT, ".runtime", "reports", "generated", "verify-core.md");
 const NIGHTLY_SCENARIO_HEAVY_ROUTE_PREFIX = "python-heavy:geo_stack:";
 const NIGHTLY_SCENARIO_HEAVY_ROUTE_COUNT = 19;
+const PAGES_ARTIFACT_INVENTORY_LEAVES = new Set([
+  "node-test:tests/renderer_draw_canvas_orchestration_inventory_boundary.test.mjs",
+  "node-test:tests/render_pass_cache_host_owner_inventory.test.mjs",
+  "node-test:tests/render_pass_commit_accounting_owner_inventory.test.mjs",
+]);
 
 export const NIGHTLY_LINUX_CORE_EXCLUDED_COMMAND_REFS = Object.freeze([
   "verify:p4:state-writer-policy",
@@ -363,6 +368,13 @@ export function buildNightlyLinuxCoreShardPlan({
   const selectedCommandRefs = new Set(
     selected.commands.map(({ entry }) => entry.commandRef),
   );
+  // Resolve suites through the same catalog used for balancing. Do not bind
+  // artifact preparation to a shard number: the two-shard plan moves consumers.
+  const pagesArtifactConsumers = prepared ? [...new Set(selected.commands.flatMap(({ entry }) => (
+    buildVerificationSelectionPlan(prepared.catalog, [entry.commandRef], {
+      preparedCatalog: prepared, platform, repoRoot,
+    }).normalizedLeaves.filter((leaf) => PAGES_ARTIFACT_INVENTORY_LEAVES.has(leaf))
+  )))].sort() : [];
   const groups = basePlan.groups.map((group) => ({
     ...group,
     commands: group.commands.filter((entry) => selectedCommandRefs.has(entry.commandRef)),
@@ -387,6 +399,7 @@ export function buildNightlyLinuxCoreShardPlan({
     nightlyShard: {
       schemaVersion: 1,
       kind: "nightly-linux-core-shard",
+      pagesArtifactConsumers,
       shardIndex,
       shardCount,
       leafCount: selected.leafCount,

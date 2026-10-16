@@ -75,6 +75,20 @@ Command supersession 在生成任何折叠结果前检查 selected command graph
 
 `pages` 分组会写入或检查 Pages mirror、dist manifest 和 `.runtime` 报告。执行包含该分组的保留计划或 main-thread 计划时，由 integration owner 协调 dist lane；普通默认计划不因此要求占用 dist lane。
 
+### 源码、生成一致性与发布产物
+
+Renderer inventory 同时检查源码边界和打包后的 owner 完整镜像。源码已更新时，不应把历史 tracked `dist` 当作当前提交的产物，也不应只同步报错的几个 JS 文件。对当前 checkout 先限时构建完整 artifact，再将原检查指向该目录：
+
+```sh
+export SCENARIO_FORGE_PAGES_ARTIFACT_ROOT=.runtime/verification-pages/dist
+timeout 300 python tools/build_pages_dist.py --output-root "$SCENARIO_FORGE_PAGES_ARTIFACT_ROOT"
+npm run test:node:renderer-draw-canvas-orchestration-inventory
+```
+
+Nightly Linux core 的只读计划在 `nightlyShard.pagesArtifactConsumers` 中列出当前分片的 artifact inventory leaves（包括 suite 内的 leaves）。工作流只为有消费者的分片构建该 checkout 的完整 artifact，构建上限 5 分钟；随后通过 `SCENARIO_FORGE_PAGES_ARTIFACT_ROOT` 传给原 runner。构建失败或 inventory 不一致仍使 job 失败，原命令顺序、失败即停和最终汇总保持不变。2/3 分片布局使用同一消费者解析，不依赖固定 shard 编号。直接运行 inventory 或本地 core 时也应显式准备同一 checkout 的 artifact；未设置环境变量的历史 tracked-dist 诊断行为仍保留。
+
+三个验证责任独立：源码测试证明当前代码边界；`test:py:landing-map-asset-contracts` 从数据生成 SVG/JSON 并逐字节比较 committed landing 输入；artifact 的 startup-shell、inventory 和 release gate 检查实际打包内容。`build_pages_dist.py` 只复制 committed landing 输入，不会修复陈旧 SVG，artifact inventory 通过也不能替代生成一致性或发布验收。历史 `verify:pages-dist-and-drift` 仍检查 tracked mirror 漂移，不能把它的失败解释成源码 artifact 构建失败；发布继续使用自己的 artifact admission、smoke 和同 SHA receipt。
+
 ## Main-thread 通道
 
 `verify:core:main-thread` 在完整保留计划上追加这些显式 E2E 命令：

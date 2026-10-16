@@ -539,6 +539,35 @@ test("Nightly Linux core preserves the complete command set across two and three
   assert.deepEqual(commandSets[0], commandSets[1]);
 });
 
+test("Nightly artifact preparation follows inventory leaves through both shard layouts", () => {
+  const expected = [
+    "node-test:tests/render_pass_cache_host_owner_inventory.test.mjs",
+    "node-test:tests/render_pass_commit_accounting_owner_inventory.test.mjs",
+    "node-test:tests/renderer_draw_canvas_orchestration_inventory_boundary.test.mjs",
+  ].sort();
+  // Catch newly added artifact-aware core tests that need preparation too.
+  const artifactTests = fs.readdirSync("tests").filter((name) => name.endsWith("inventory.test.mjs")
+    || name.endsWith("inventory_boundary.test.mjs"))
+    .filter((name) => fs.readFileSync(path.join("tests", name), "utf8").includes("SCENARIO_FORGE_PAGES_ARTIFACT_ROOT"))
+    .map((name) => `node-test:tests/${name}`).sort();
+  assert.deepEqual(artifactTests, expected);
+  for (const shardCount of [2, 3]) {
+    const plans = Array.from({ length: shardCount }, (_, index) => buildNightlyLinuxCoreShardPlan({
+      shardCount, shardIndex: index + 1,
+    }));
+    assert.deepEqual(plans.flatMap((plan) => plan.nightlyShard.pagesArtifactConsumers).sort(), expected);
+    for (const plan of plans) {
+      const refs = commandRefs(plan);
+      assert.equal(plan.nightlyShard.pagesArtifactConsumers.includes(expected[0]),
+        refs.includes("test:node:render-pass-cache-host-owner-suite"));
+      assert.equal(plan.nightlyShard.pagesArtifactConsumers.includes(expected[1]),
+        refs.includes("test:node:render-pass-commit-accounting-owner-suite"));
+      assert.equal(plan.nightlyShard.pagesArtifactConsumers.includes(expected[2]),
+        refs.includes("test:node:renderer-draw-canvas-orchestration-inventory"));
+    }
+  }
+});
+
 test("Nightly Linux core sharding is deterministic and rejects invalid leaf authority", () => {
   const commands = [
     { commandRef: "alpha" },
