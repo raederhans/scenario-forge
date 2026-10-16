@@ -2186,6 +2186,7 @@ jobs:
         core_by_name = {str(step["name"]): step for step in core_steps}
         preparation = core_by_name["Plan Linux core artifact inputs"]
         self.assertIn("--list", parse_step_run(preparation))
+        self.assertIn("--nightly-linux-core --shard-index ${{ matrix.shard }} --shard-count 2 ", parse_step_run(preparation))
         self.assertIn("p.nightlyShard.pagesArtifactConsumers.length > 0", parse_step_run(preparation))
         artifact_build = core_by_name["Build same-checkout Pages artifact for inventory contracts"]
         self.assertIn("        if: steps.artifact-inputs.outputs.required == 'true'", artifact_build["lines"])

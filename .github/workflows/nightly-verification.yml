@@ -250,7 +250,7 @@ jobs:
       - name: Plan Linux core artifact inputs
         id: artifact-inputs
         run: |
-          node tools/run_core_verification.mjs --nightly-linux-core --shard-index ${{ matrix.shard }} --shard-count 3 --list --json-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.json --md-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.md --profile-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}-profile.json
+          node tools/run_core_verification.mjs --nightly-linux-core --shard-index ${{ matrix.shard }} --shard-count 2 --list --json-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.json --md-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.md --profile-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}-profile.json
           node -e 'const p = require("./.runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.json"); console.log("required=" + (p.nightlyShard.pagesArtifactConsumers.length > 0))' >> "$GITHUB_OUTPUT"
       - name: Build same-checkout Pages artifact for inventory contracts
         if: steps.artifact-inputs.outputs.required == 'true'
