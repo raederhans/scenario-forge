@@ -419,9 +419,6 @@ let brushSession = null;
 let suppressNextClickAfterBrush = false;
 let lastDetailToastToken = "";
 let lastDetailToastAt = 0;
-let lastInspectorOverlaySignature = "";
-let lastDevSelectionOverlaySignature = "";
-
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
 const MAP_PAN_PADDING_PX = 50;
@@ -575,8 +572,6 @@ const INTERNAL_BORDER_AUTO_DARK = "#ffffff";
 const INTERNAL_BORDER_AUTO_LIGHT = "#111827";
 const CONTOUR_HOST_FILL_FALLBACK_RADIUS = 24;
 const DETAIL_ADM_BORDER_COLOR = "#888888";
-const DETAIL_ADM_BORDER_MIN_ALPHA = 0.24;
-const DETAIL_ADM_BORDER_MAX_ALPHA = 0.34;
 const DETAIL_ADM_BORDER_MIN_WIDTH = 0.30;
 const DETAIL_ADM_BORDER_TARGET_MIN_ALPHA = 0.12;
 const DETAIL_ADM_BORDER_TARGET_MAX_ALPHA = 0.18;
@@ -643,10 +638,6 @@ const STRATEGIC_RESOURCE_MARKER_COLORS = Object.freeze({
 const STRATEGIC_RESOURCE_MARKER_STROKE = "#f8fafc";
 const STRATEGIC_COUNTER_ATTACHMENT_KIND = "operational-line";
 
-const DEFAULT_OPERATION_GRAPHIC_OPACITY = 0.96;
-const DEFAULT_OPERATION_GRAPHIC_WIDTH = 4.4;
-
-const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
 const TEXTURE_LABEL_SERIF_STACK = "\"Libre Baskerville\", \"Palatino Linotype\", Georgia, serif";
 const CITY_MARKER_THEME_GRAPHITE = "classic_graphite";
 const CITY_REVEAL_PROFILE_HYBRID = "hybrid_country_budget";
@@ -738,7 +729,6 @@ let physicalLandClipPathCache = {
 const SCENARIO_COASTLINE_MAX_AREA_DELTA_RATIO = 0.02;
 const SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO = 0.25;
 const SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT = 500;
-const scenarioOwnerOnlyCanonicalFallbackWarnings = new Set();
 const missingPhysicalContextWarnings = new Set();
 let scenarioRegionOverlayRenderOwner = null;
 const renderDiag = {
@@ -752,7 +742,6 @@ const renderDiag = {
   transformedPasses: {},
   waterHit: null,
 };
-const rewoundFeatureLogKeys = new Set();
 const urbanGeoCentroidCache = new WeakMap();
 let cityAnchorCache = new WeakMap();
 const urbanFeatureIndexCache = {
@@ -10908,20 +10897,8 @@ function getBathymetryBandVisibilityConfig(feature, k) {
   return getBathymetryStylePolicy().getBathymetryBandVisibilityConfig(feature, k);
 }
 
-function drawBathymetryBands(collection, oceanStyle) {
-  return getOceanRenderOwner().drawBathymetryBands(collection, oceanStyle);
-}
-
-function buildVisibleBathymetryContourDepthSet(collection, oceanStyle) {
-  return getOceanRenderOwner().buildVisibleBathymetryContourDepthSet(collection, oceanStyle);
-}
-
 function getBathymetryContourVisibilityConfig(feature, k) {
   return getBathymetryStylePolicy().getBathymetryContourVisibilityConfig(feature, k);
-}
-
-function drawBathymetryContours(collection, oceanStyle) {
-  return getOceanRenderOwner().drawBathymetryContours(collection, oceanStyle);
 }
 
 function getBathymetryCollectionBySource(collection, source) {
@@ -10970,14 +10947,6 @@ function getFeatureProjectedDensity(feature) {
   return maxDensity;
 }
 
-function buildCoastalAccentStrokeBuckets(entries) {
-  return getOceanRenderOwner().buildCoastalAccentStrokeBuckets(entries);
-}
-
-function drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa = false } = {}) {
-  return getOceanRenderOwner().drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa });
-}
-
 function getScenarioCoastalAccentOverlayVisualConfig(feature, k, options2) {
   return getBathymetryStylePolicy().getScenarioCoastalAccentOverlayVisualConfig(feature, k, options2);
 }
@@ -11000,10 +10969,6 @@ function clipOutAtlantropaAccentRegions() {
   } catch (_) {
     return false;
   }
-}
-
-function drawScenarioCoastalAccentOverlays(k, { interactive = false } = {}) {
-  return getOceanRenderOwner().drawScenarioCoastalAccentOverlays(k, { interactive });
 }
 
 function drawScenarioCoastalAccentLayer(k, { interactive = false } = {}) {
@@ -15254,15 +15219,6 @@ function applyWaterRegionFill(targetId, selectedColor, { kind = "fill-water-regi
   refreshSidebarAfterPaint({ waterRegionIds: [resolvedId] });
   noteRenderAction(kind, actionStart);
   return true;
-}
-
-function executeSingleSubdivisionFill(action) {
-  if (!action) return false;
-  const targetIds = action.eventPayload?.targetIds || [action.featureId];
-  return applyVisualSubdivisionFill(targetIds, action.selectedColor, {
-    kind: "fill-feature-color",
-    dirtyReason: "fill-feature-color",
-  });
 }
 
 function executeDoubleClickBatchFill(feature, featureId, event = null) {

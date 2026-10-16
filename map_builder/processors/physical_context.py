@@ -213,27 +213,6 @@ def _load_discrete_landcover_array() -> tuple[np.ndarray, rasterio.Affine]:
     return array.astype(np.int16, copy=False), transform
 
 
-def _load_forest_type_array() -> tuple[np.ndarray, rasterio.Affine]:
-    cell_size = float(cfg.PHYSICAL_SEMANTIC_CELL_SIZE_DEGREES)
-    width = int(round(360.0 / cell_size))
-    height = int(round(180.0 / cell_size))
-    source = _resolve_raster_source(
-        url=cfg.CGLS_LC100_2019_FOREST_TYPE_URL,
-        filename=cfg.CGLS_LC100_2019_FOREST_TYPE_FILENAME,
-        min_size_bytes=50_000_000,
-    )
-
-    with rasterio.open(source) as dataset:
-        array = dataset.read(
-            1,
-            out_shape=(height, width),
-            resampling=Resampling.mode,
-        )
-        transform = from_bounds(*dataset.bounds, width=width, height=height)
-
-    return array.astype(np.int16, copy=False), transform
-
-
 def _build_semantic_code_grid(discrete_landcover: np.ndarray, transform) -> np.ndarray:
     height, width = discrete_landcover.shape
     semantic_codes = np.zeros((height, width), dtype=np.uint8)
@@ -253,23 +232,6 @@ def _build_semantic_code_grid(discrete_landcover: np.ndarray, transform) -> np.n
     semantic_codes[grassland_mask] = 2
     semantic_codes[desert_mask] = 3
     semantic_codes[tundra_mask] = 4
-    semantic_codes[rainforest_mask] = 5
-    return semantic_codes
-
-
-def _build_forest_semantic_code_grid(forest_type: np.ndarray, transform) -> np.ndarray:
-    height, width = forest_type.shape
-    semantic_codes = np.zeros((height, width), dtype=np.uint8)
-
-    forest_mask = np.isin(forest_type, list(cfg.CGLS_FOREST_TYPE_CODES))
-    rainforest_mask = np.isin(forest_type, list(cfg.CGLS_RAINFOREST_FOREST_TYPE_CODES))
-
-    row_indices = np.arange(height)
-    lat_centers = transform.f + (row_indices + 0.5) * transform.e
-    rainforest_band = np.abs(lat_centers) <= float(cfg.PHYSICAL_RAINFOREST_MAX_ABS_LAT)
-    rainforest_mask &= rainforest_band[:, None]
-
-    semantic_codes[forest_mask] = 1
     semantic_codes[rainforest_mask] = 5
     return semantic_codes
 

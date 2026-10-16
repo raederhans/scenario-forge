@@ -83,7 +83,6 @@ import {
   getSearchParams,
   normalizeScenarioBundleLevel,
   scenarioBundleSatisfiesLevel,
-  normalizeScenarioCoreMap as sharedNormalizeScenarioCoreMap,
   loadScenarioJsonWithTimeout as sharedLoadScenarioJsonWithTimeout,
   loadScenarioJsonResourceWithTimeout as sharedLoadScenarioJsonResourceWithTimeout,
   loadOptionalScenarioResource as sharedLoadOptionalScenarioResource,
@@ -105,15 +104,9 @@ import {
   createScenarioStartupHydrationController,
 } from "./scenario/startup_hydration.js";
 import {
-  getScenarioRegistryEntries as getBundleLoaderScenarioRegistryEntries,
-  getScenarioDisplayName as getBundleLoaderScenarioDisplayName,
-  getScenarioNameMap as getBundleLoaderScenarioNameMap,
-  getScenarioFixedOwnerColors as getBundleLoaderScenarioFixedOwnerColors,
   mergeReleasableCatalogs,
   getScenarioMetaById as getBundleLoaderScenarioMetaById,
-  getDefaultScenarioId as getBundleLoaderDefaultScenarioId,
   getScenarioManifestVersion,
-  getScenarioManifestSummary as getBundleLoaderScenarioManifestSummary,
   getScenarioBaselineHashFromBundle,
   getScenarioDefaultCountryCode,
   normalizeScenarioRuntimeTopologyPayload as normalizeBundleLoaderScenarioRuntimeTopologyPayload,
@@ -152,8 +145,6 @@ function showToast(message, options = {}) {
   callRuntimeHook(null, "showToastFn", message, options);
 }
 
-const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
-const SCENARIO_FATAL_RECOVERY_CODE = "SCENARIO_FATAL_RECOVERY";
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
 const SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE = 60;
 const SCENARIO_OWNER_FEATURE_COVERAGE_MIN_RATIO = 0.85;
@@ -259,10 +250,6 @@ registerRenderTransactionOptionalLayerConfigs(runtimeState, SCENARIO_OPTIONAL_LA
 
 const normalizeStartupBundleRuntimePoliticalMeta = normalizeBundleLoaderScenarioRuntimePoliticalMeta;
 
-function normalizeScenarioCoreMap(rawMap) {
-  return sharedNormalizeScenarioCoreMap(rawMap, { normalizeFeatureText: normalizeCityText });
-}
-
 function loadScenarioJsonWithTimeout(d3Client, url, options = {}) {
   return sharedLoadScenarioJsonWithTimeout(loadMeasuredJsonResource, d3Client, url, options);
 }
@@ -312,42 +299,14 @@ function recordScenarioPerfMetric(name, durationMs, details = {}) {
   return sharedRecordScenarioPerfMetric(state, name, durationMs, details);
 }
 
-function getScenarioRegistryEntries() {
-  return getBundleLoaderScenarioRegistryEntries(state);
-}
-
-function getScenarioDisplayName(source, fallbackId = "") {
-  return getBundleLoaderScenarioDisplayName(source, fallbackId, t);
-}
-
-function getScenarioNameMap(countryMap = {}) {
-  return getBundleLoaderScenarioNameMap(countryMap);
-}
-
-function getScenarioFixedOwnerColors(countryMap = {}) {
-  return getBundleLoaderScenarioFixedOwnerColors(countryMap);
-}
-
 function getScenarioMetaById(scenarioId) {
   return getBundleLoaderScenarioMetaById(state, normalizeScenarioId, scenarioId);
-}
-
-function getDefaultScenarioId() {
-  return getBundleLoaderDefaultScenarioId(state, normalizeScenarioId);
-}
-
-function getScenarioManifestSummary(manifest = runtimeState.activeScenarioManifest) {
-  return getBundleLoaderScenarioManifestSummary(manifest);
 }
 
 
 
 function normalizeScenarioRuntimeTopologyPayload(payload) {
   return normalizeBundleLoaderScenarioRuntimeTopologyPayload(payload);
-}
-
-function normalizeScenarioRuntimePoliticalMeta(meta) {
-  return normalizeStartupBundleRuntimePoliticalMeta(meta);
 }
 
 function scheduleScenarioDeferredBundleMetadataLoad(

@@ -11,9 +11,7 @@ import tempfile
 import geopandas as gpd
 import pandas as pd
 import requests
-from shapely.geometry import LineString
 from shapely.ops import unary_union
-from shapely.ops import split as split_geometry
 
 from map_builder import config as cfg
 from map_builder.geo.utils import pick_column
@@ -608,33 +606,6 @@ def _clip_features_to_country_shell(
     return clipped
 
 
-def _rebalance_groups(groups: list[list[int]], target: int) -> list[list[int]]:
-    normalized = [list(dict.fromkeys(group)) for group in groups if group]
-    if target <= 0:
-        return []
-    if not normalized:
-        return []
-
-    while len(normalized) > target:
-        normalized.sort(key=lambda grp: (len(grp), grp[0]))
-        merged = normalized.pop(0)
-        normalized[0].extend(merged)
-        normalized[0] = list(dict.fromkeys(normalized[0]))
-
-    while len(normalized) < target:
-        split_idx = max(range(len(normalized)), key=lambda idx: len(normalized[idx]))
-        members = normalized[split_idx]
-        if len(members) <= 1:
-            break
-        half = max(1, len(members) // 2)
-        left = members[:half]
-        right = members[half:]
-        normalized[split_idx] = left
-        normalized.append(right)
-
-    return [group for group in normalized if group]
-
-
 def _partition_indices(gdf: gpd.GeoDataFrame, quota: int) -> list[list[int]]:
     if gdf.empty:
         return []
@@ -702,97 +673,6 @@ def _select_us_locked_indices(
     rest_df = state_df.reset_index(drop=True)
     component_floor = _component_floor(rest_df)
     return locked_indices, rest_df, max(1, component_floor), component_floor
-
-
-def _split_geometry_once(geom):
-    if geom is None or geom.is_empty:
-        return None
-    minx, miny, maxx, maxy = geom.bounds
-    width = maxx - minx
-    height = maxy - miny
-    if width <= 0 or height <= 0:
-        return None
-
-    if width >= height:
-        midx = (minx + maxx) / 2.0
-        cutter = LineString([(midx, miny - height), (midx, maxy + height)])
-    else:
-        midy = (miny + maxy) / 2.0
-        cutter = LineString([(minx - width, midy), (maxx + width, midy)])
-
-    try:
-        parts = split_geometry(geom, cutter)
-    except Exception:
-        return None
-    candidates = [part for part in parts.geoms if part is not None and not part.is_empty]
-    if len(candidates) < 2:
-        return None
-    candidates = sorted(candidates, key=lambda g: g.area, reverse=True)
-    first = candidates[0]
-    second = unary_union(candidates[1:]) if len(candidates) > 2 else candidates[1]
-    if second is None or second.is_empty:
-        return None
-    return first, second
-
-
-def _top_up_us_feature_count(us_out: gpd.GeoDataFrame, target_count: int) -> gpd.GeoDataFrame:
-    if us_out.empty or len(us_out) >= target_count:
-        return us_out
-
-    work = _ensure_epsg4326(us_out.copy().reset_index(drop=True))
-    known_ids = set(work["id"].astype(str))
-    blocked: set[str] = set()
-    guard = 0
-    max_guard = max(2000, (target_count - len(work)) * 50)
-
-    while len(work) < target_count and guard < max_guard:
-        guard += 1
-        coarse = work[work["detail_tier"] == "coarse"].copy()
-        if coarse.empty:
-            break
-
-        coarse = coarse[~coarse["id"].astype(str).isin(blocked)]
-        if coarse.empty:
-            break
-
-        coarse_metric = coarse.to_crs("EPSG:6933")
-        coarse["__area"] = coarse_metric.geometry.area
-        pick_idx = int(coarse.sort_values("__area", ascending=False).index[0])
-        base = work.loc[pick_idx].copy()
-        split_parts = _split_geometry_once(base.geometry)
-        if not split_parts:
-            blocked.add(str(base["id"]))
-            continue
-
-        left_geom, right_geom = split_parts
-        base_id = str(base["id"])
-        left_id = f"{base_id}__A"
-        right_id = f"{base_id}__B"
-        suffix = 1
-        while left_id in known_ids:
-            left_id = f"{base_id}__A{suffix}"
-            suffix += 1
-        suffix = 1
-        while right_id in known_ids or right_id == left_id:
-            right_id = f"{base_id}__B{suffix}"
-            suffix += 1
-
-        left_row = base.copy()
-        left_row["id"] = left_id
-        left_row["geometry"] = left_geom
-
-        right_row = base.copy()
-        right_row["id"] = right_id
-        right_row["geometry"] = right_geom
-
-        work = work.drop(index=[pick_idx]).reset_index(drop=True)
-        work = gpd.GeoDataFrame(
-            pd.concat([work, gpd.GeoDataFrame([left_row, right_row], crs=work.crs)], ignore_index=True),
-            crs=work.crs,
-        )
-        known_ids.update({left_id, right_id})
-
-    return work
 
 
 def _hamilton_quotas(

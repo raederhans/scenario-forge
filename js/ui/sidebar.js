@@ -158,17 +158,6 @@ async function loadRuntimeJsonAsset(assetKey) {
   return response.json();
 }
 
-function extractCountryCodeFromId(value) {
-  const text = String(value || "").trim().toUpperCase();
-  if (!text) return "";
-  const prefix = text.split(/[-_]/)[0];
-  if (/^[A-Z]{2,3}$/.test(prefix)) {
-    return normalizeCountryCode(prefix);
-  }
-  const alphaPrefix = prefix.match(/^[A-Z]{2,3}/);
-  return normalizeCountryCode(alphaPrefix ? alphaPrefix[0] : "");
-}
-
 function getCountryCodeFromProps(props = {}, fallbackId = "") {
   return normalizeCountryCode(
     getSharedFeatureCountryCode(
