@@ -6,8 +6,6 @@ const MAX_CANDIDATES_PER_POLYGON = 32;
 const MAX_FIT_CANDIDATES = 20;
 const DEFAULT_MAX_GRID_SIZE = 32;
 const MAX_GLYPH_ANGLE = 30 * Math.PI / 180;
-const TAU = Math.PI * 2;
-
 function finiteNumber(value, fallback = 0) {
   return Number.isFinite(Number(value)) ? Number(value) : fallback;
 }
@@ -89,18 +87,6 @@ function preparePolygon(ringsInput, polygonIndex) {
   return { polygonIndex, rings, minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY, vertexCount, area: Math.max(0, polygonArea),
     centerX: polygonArea > 1e-12 ? centerWeightX / polygonArea : (minX + maxX) / 2,
     centerY: polygonArea > 1e-12 ? centerWeightY / polygonArea : (minY + maxY) / 2 };
-}
-
-function pointInRings(x, y, rings) {
-  let inside = false;
-  for (const ring of rings) {
-    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-      const a = ring[j];
-      const b = ring[i];
-      if ((a.y > y) !== (b.y > y) && x < ((b.x - a.x) * (y - a.y)) / (b.y - a.y) + a.x) inside = !inside;
-    }
-  }
-  return inside;
 }
 
 function isAxisAlignedRectangle(component) {

@@ -439,13 +439,13 @@ export function createLegendControlOwner({
       return;
     }
 
-    const { colors, specialZoneLegendLayers, labelMap, activeScenarioId, hasScenarioVisualEdits } =
+    const { colors, specialZoneLegendLayers, labelMap, activeScenarioId, hasScenarioVisualEdits, thematicLegend } =
       getLegendModel(uniqueColors, labels);
-    const hasMeaningfulLabels = colors.some((color) => {
+    const hasMeaningfulLabels = !!thematicLegend || colors.some((color) => {
       const key = String(color || "").toLowerCase();
       return String(labelMap?.[key] || "").trim().length > 0;
     });
-    const colorRows = colors.map((color, index) => ({
+    const colorRows = thematicLegend?.entries || colors.map((color, index) => ({
       color,
       label: labelMap?.[String(color || "").toLowerCase()] || `Category ${index + 1}`,
     }));
@@ -455,10 +455,10 @@ export function createLegendControlOwner({
       stroke: layer.style?.stroke || "#6d28d9",
       pattern: layer.style?.pattern || "solid",
     }));
-    const legendKey = JSON.stringify([getLanguage(), colorRows, specialZoneRows]);
+    const legendKey = JSON.stringify([getLanguage(), colorRows, specialZoneRows, thematicLegend]);
     const shouldRebuild = legendKey !== lastLegendKey;
 
-    if (!colors.length && !specialZoneLegendLayers.length) {
+    if (!colorRows.length && !specialZoneLegendLayers.length) {
       controlElement.hidden = true;
       stopLegendDrag();
       stopLegendResize();
@@ -473,17 +473,31 @@ export function createLegendControlOwner({
     }
 
     controlElement.hidden = false;
-    const headerKey = JSON.stringify([getLanguage(), colors.length + specialZoneLegendLayers.length, controlState.collapsed]);
+    const headerKey = JSON.stringify([getLanguage(), colorRows.length + specialZoneLegendLayers.length, controlState.collapsed]);
     if (headerKey !== lastHeaderKey) {
       controlElement.classList.toggle("is-collapsed", controlState.collapsed);
-      setLegendControlHeader(colors.length + specialZoneLegendLayers.length, controlState.collapsed);
+      setLegendControlHeader(colorRows.length + specialZoneLegendLayers.length, controlState.collapsed);
       lastHeaderKey = headerKey;
     }
 
     if (shouldRebuild) {
       legendControlBodyElement.replaceChildren();
+      if (thematicLegend) {
+        const title = document.createElement("div");
+        title.className = "map-legend-section-title";
+        title.textContent = thematicLegend.title;
+        legendControlBodyElement.appendChild(title);
+      }
 
       colorRows.forEach((row) => appendLegendRow(legendControlBodyElement, row));
+      if (thematicLegend) {
+        for (const text of [thematicLegend.note, thematicLegend.referenceNote, thematicLegend.source].filter(Boolean)) {
+          const note = document.createElement("p");
+          note.className = "city-points-advanced-hint";
+          note.textContent = text;
+          legendControlBodyElement.appendChild(note);
+        }
+      }
 
       if (specialZoneLegendLayers.length) {
         const section = document.createElement("div");

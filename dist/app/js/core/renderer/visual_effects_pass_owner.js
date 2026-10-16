@@ -15,7 +15,6 @@ export function createVisualEffectsPassOwner({
   const getViewportSize = requireFunction(getters.getViewportSize, "getters.getViewportSize");
   const getTextureStyleConfig = requireFunction(getters.getTextureStyleConfig, "getters.getTextureStyleConfig");
   const isBootInteractionReady = requireFunction(getters.isBootInteractionReady, "getters.isBootInteractionReady");
-  const isHgoRuntimePreviewReady = requireFunction(getters.isHgoRuntimePreviewReady, "getters.isHgoRuntimePreviewReady");
   const clamp = requireFunction(helpers.clamp, "helpers.clamp");
   const getDashPattern = requireFunction(helpers.getDashPattern, "helpers.getDashPattern");
   const getSafeBlendMode = requireFunction(helpers.getSafeBlendMode, "helpers.getSafeBlendMode");
@@ -579,13 +578,6 @@ export function createVisualEffectsPassOwner({
   }
 
   function drawTextureLabelEffectsPass(k) {
-    if (isHgoRuntimePreviewReady()) {
-      recordRenderPerfMetric("drawTextureLabelEffectsPass", 0, {
-        skipped: true,
-        reason: "hgo-runtime-preview",
-      });
-      return;
-    }
     const texture = getTextureStyleConfig();
     const mode = String(texture.mode || "none").trim().toLowerCase();
     if (!isBootInteractionReady()) return;

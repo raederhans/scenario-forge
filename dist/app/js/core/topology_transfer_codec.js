@@ -37,8 +37,9 @@ export function unpackTopologyFromTransfer(topology, topologyArcs) {
     const arc = new Array(arcLengths[arcIndex]);
     for (let index = 0; index < arc.length; index++) {
       const length = pointLengths[pointIndex++];
-      arc[index] = Array.from(values.subarray(valueIndex, valueIndex + length));
-      valueIndex += length;
+      const point = new Array(length);
+      for (let axis = 0; axis < length; axis++) point[axis] = values[valueIndex++];
+      arc[index] = point;
     }
     arcs[arcIndex] = arc;
   }

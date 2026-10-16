@@ -19,6 +19,11 @@ export function setScenarioAuditUiState(partial = {}) {
 export function syncScenarioUi() {
   emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SCENARIO_UI);
   emitStateBusEvent(STATE_BUS_EVENTS.RENDER_SCENARIO_AUDIT_PANEL);
+  // Apply-time appearance refreshes cannot load thematic data until the
+  // scenario request releases its lock; its final UI sync resumes that work.
+  if ((runtimeState.styleConfig?.thematic?.enabled || runtimeState.styleConfig?.population?.enabled) && !runtimeState.scenarioApplyInFlight) {
+    emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SPECIAL_ZONE_EDITOR_UI);
+  }
 }
 
 export function syncCountryUi({ renderNow = false } = {}) {

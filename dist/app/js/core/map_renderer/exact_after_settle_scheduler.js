@@ -243,16 +243,18 @@ function createExactAfterSettleScheduler({
           abortInterruptedExactAfterSettleRefresh(`${passName}-identity-mismatch`, generation);
           return;
         }
-        const preparation = prepareRenderPassAsync(passName);
-        if (preparation) {
-          Promise.resolve(preparation).then(() => {
-            if (isExactAfterSettleGenerationCurrent(generation, "applying")) enqueueNextPass(index, activePlan);
-          }).catch(() => abortInterruptedExactAfterSettleRefresh(`${passName}-prepare-failed`, generation));
-          return;
-        }
+        // Invalidate before async preparation so it and the eventual draw use
+        // the same political snapshot epoch. Keep that plan across retries.
         const nextPlan = passName === "political"
           ? invalidateExactAfterSettlePoliticalPass(generation, activePlan)
           : activePlan;
+        const preparation = prepareRenderPassAsync(passName);
+        if (preparation) {
+          Promise.resolve(preparation).then(() => {
+            if (isExactAfterSettleGenerationCurrent(generation, "applying")) enqueueNextPass(index, nextPlan);
+          }).catch(() => abortInterruptedExactAfterSettleRefresh(`${passName}-prepare-failed`, generation));
+          return;
+        }
         getRenderPipelinePassesOwner().prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache);
         recordRenderPerfMetric("settleExactRefreshPass", Math.max(0, nowMs() - passStart), {
           activeScenarioId: String(runtimeState.activeScenarioId || ""),

@@ -1,0 +1,18 @@
+.editor-tool-tooltip {
+  position: fixed;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100vw - 16px);
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #23364a;
+  color: #fff;
+  box-shadow: 0 4px 16px #10203026;
+  font: 12px/1.5 var(--font-body, sans-serif);
+  pointer-events: none;
+}
+.editor-tool-tooltip[hidden], .editor-brush-pan-hint[hidden] { display: none; }
+.editor-tool-tooltip kbd { border: 1px solid #ffffff55; border-radius: 3px; padding: 0 5px; font: inherit; }
+.editor-brush-pan-hint { flex: 0 0 100%; box-sizing: border-box; margin: 0; padding: 0 4px 2px; color: var(--text-secondary); font-size: 12px; line-height: 1.5; text-align: center; }

@@ -49,11 +49,6 @@ function equalBounds(left, right) {
     && left.maxX === right.maxX && left.maxY === right.maxY;
 }
 
-function equalColor(left, right) {
-  return !!left && !!right && left[0] === right[0] && left[1] === right[1]
-    && left[2] === right[2] && left[3] === right[3];
-}
-
 function movedIdsByLongestIncreasingSubsequence(previousEntries, nextEntries) {
   const oldPositionById = new Map(previousEntries.map((entry, index) => [entry.id, index]));
   const commonEntries = nextEntries.filter((entry) => oldPositionById.has(entry.id));

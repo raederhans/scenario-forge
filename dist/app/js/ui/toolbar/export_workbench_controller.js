@@ -16,7 +16,7 @@ import {
 
 const EXPORT_MAIN_LAYER_VIEW_MODELS = Object.freeze([
   Object.freeze({ id: "background", name: "Background", summary: "Base frame", passNames: ["background"] }),
-  Object.freeze({ id: "political", name: "Political", summary: "Terrain + ownership", passNames: ["physicalBase", "political"] }),
+  Object.freeze({ id: "political", name: "Political", summary: "Terrain + ownership", passNames: ["physicalBase", "political", "populationHeatmap"] }),
   Object.freeze({ id: "context", name: "Context", summary: "Scenario overlays", passNames: ["contextBase", "contextScenario"] }),
   Object.freeze({ id: "effects", name: "Effects", summary: "Borders + overlays", passNames: ["effects", "lineEffects", "contextMarkers", "dayNight", "borders", "textureLabels"] }),
   Object.freeze({ id: "labels", name: "Labels", summary: "Render-pass labels", passNames: ["labels"] }),

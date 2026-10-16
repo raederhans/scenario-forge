@@ -1,3 +1,6 @@
+import { getThematicWgiFeatureInspection, getThematicReferenceNote } from "./thematic_wgi_view_model.js";
+import { getPopulationTooltipLines } from "./population_spatial_presentation.js";
+import { getThematicIndicator, formatThematicIndicatorValue } from "./thematic_indicator_catalog.js";
 import { getStrategicFeatureInspection, STRATEGIC_METRIC_NAMES } from "./strategic_values_view_model.js";
 // Translation helpers (Phase 13)
 import { state as runtimeState } from "./state.js";
@@ -420,7 +423,25 @@ function renderTooltipText(model) {
 
 function getTooltipText(feature) {
   const base = renderTooltipText(buildTooltipModel(feature));
+  const population = feature ? getPopulationTooltipLines(runtimeState, feature) : [];
+  if (population.length) return [base, ...population].join("\n");
   if (!feature || feature.properties?.water_type || feature.properties?.special_type) return base;
+  const thematic = getThematicWgiFeatureInspection(runtimeState, feature);
+  if (thematic) {
+    const zh = runtimeState.currentLanguage === "zh";
+    const metric = getThematicIndicator(runtimeState.thematicWgiRuntime.data.metricId);
+    const value = thematic.status === "value" ? formatThematicIndicatorValue(metric, thematic.value, runtimeState.currentLanguage)
+      : thematic.status === "missing" ? (zh ? "来源缺失" : "Source missing") : (zh ? "未匹配／未覆盖" : "Unmatched / not covered");
+    const interval = thematic.uncertainty?.score_confidence_interval_90;
+    const uncertainty = thematic.status === "value" && Number.isFinite(interval?.lower) && Number.isFinite(interval?.upper)
+      ? `\n${zh ? "90% 置信区间" : "90% confidence interval"}: ${interval.lower.toFixed(1)}–${interval.upper.toFixed(1)}` : "";
+    const referenceCountry = thematic.referenceMapping && thematic.referenceCountryCode
+      ? `\n${t("Reference country", "ui")}: ${thematic.name ? `${thematic.name} (${thematic.referenceCountryCode})` : thematic.referenceCountryCode}` : "";
+    const referenceNote = thematic.referenceMapping
+      ? `\n${getThematicReferenceNote(runtimeState)}` : "";
+    const scopeLabel = zh ? "国家／经济体指标" : metric.family === "wgi" ? "Country/economy score" : "Country/economy indicator";
+    return `${base}\n${zh ? metric.labelZh : metric.labelEn} · ${metric.year}: ${value}${uncertainty}${referenceCountry}${referenceNote}\n${scopeLabel} · ${metric.source}`;
+  }
   const strategic = getStrategicFeatureInspection(runtimeState, getSharedFeatureId(feature));
   if (!strategic) return base;
   const zh = runtimeState.currentLanguage === "zh";

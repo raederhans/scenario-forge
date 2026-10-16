@@ -154,7 +154,6 @@ function createScenarioChunkPromotionRefreshPlan({
   changedLayerKeys = [],
   hasPoliticalChange = false,
   firstFrameOnly = false,
-  hgoPreviewDirty = false,
 } = {}) {
   const normalizedChangedLayerKeys = normalizeLayerKeyList(changedLayerKeys);
   const promotionTargetResources = getScenarioChunkPromotionTargetResources({
@@ -162,7 +161,7 @@ function createScenarioChunkPromotionRefreshPlan({
     hasPoliticalChange,
   });
   const targetResources = firstFrameOnly
-    ? resolveFirstFrameTargetResources(promotionTargetResources, { hgoPreviewDirty })
+    ? resolveFirstFrameTargetResources(promotionTargetResources)
     : promotionTargetResources;
   return createScenarioRefreshPlan({
     source: "scenario-chunk-promotion",

@@ -202,11 +202,6 @@ async function fetchJsonResource(url, label, { signal = null } = {}) {
   };
 }
 
-async function decompressGzipBytes(bytes, options = {}) {
-  const buffer = await JSON_RESOURCE_DECODER.decompressGzip(bytes, options);
-  return JSON_RESOURCE_DECODER.decodeUtf8Bytes(buffer);
-}
-
 function buildGzipCandidateUrl(url) {
   const normalized = String(url || "").trim();
   if (!normalized || normalized.endsWith(".gz") || !normalized.endsWith(".json")) {

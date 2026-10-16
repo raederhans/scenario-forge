@@ -1,0 +1,16 @@
+/* Complete upstream character coverage; licenses and provenance: vendor/fonts/README.md. */
+@font-face {
+  font-family: "Map Garamond";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../vendor/fonts/ebgaramond/EBGaramond-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Map Noto Serif SC";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../vendor/fonts/notoserifsc/NotoSerifSC-400.woff2") format("woff2");
+}

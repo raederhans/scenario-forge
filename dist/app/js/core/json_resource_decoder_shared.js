@@ -184,7 +184,7 @@ var SCENARIO_FORGE_JSON_RESOURCE_DECODER_SHARED = globalThis.__scenarioForgeJson
     throw new Error("[json_resource_decoder] TextDecoder is not available.");
   }
 
-  async function decompressGzip(compressedBytes, { signal = null, label = "resource" } = {}) {
+  async function decompressGzip(compressedBytes, { signal = null, label = "resource", maxOutputBytes = null } = {}) {
     throwIfAborted(signal);
 
     const inputView = compressedBytes instanceof Uint8Array
@@ -197,6 +197,11 @@ var SCENARIO_FORGE_JSON_RESOURCE_DECODER_SHARED = globalThis.__scenarioForgeJson
 
     if (!inputView || inputView.byteLength < 18) {
       throw createDecompressError(label, new Error("Buffer too short or invalid for gzip decompression."));
+    }
+    const bounded = maxOutputBytes !== null;
+    if (bounded && (!Number.isSafeInteger(maxOutputBytes) || maxOutputBytes < 0
+      || readUint32LE(inputView, inputView.length - 4) > maxOutputBytes)) {
+      throw createDecompressError(label, new Error("Gzip output exceeds the declared limit."));
     }
 
     // 1. Native DecompressionStream path
@@ -213,7 +218,30 @@ var SCENARIO_FORGE_JSON_RESOURCE_DECODER_SHARED = globalThis.__scenarioForgeJson
       }
 
       let decompressedBuffer;
-      if (!signal) {
+      if (bounded) {
+        const reader = stream.getReader();
+        const output = new Uint8Array(maxOutputBytes);
+        let offset = 0;
+        try {
+          for (;;) {
+            throwIfAborted(signal);
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (value.byteLength > maxOutputBytes - offset) {
+              throw new Error("Gzip output exceeds the declared limit.");
+            }
+            output.set(value, offset);
+            offset += value.byteLength;
+          }
+          decompressedBuffer = output.buffer.slice(0, offset);
+        } catch (error) {
+          await reader.cancel(error).catch(() => {});
+          throwIfAborted(signal);
+          throw createDecompressError(label, error);
+        } finally {
+          reader.releaseLock();
+        }
+      } else if (!signal) {
         try {
           decompressedBuffer = await new Response(stream).arrayBuffer();
         } catch (error) {
@@ -260,7 +288,7 @@ var SCENARIO_FORGE_JSON_RESOURCE_DECODER_SHARED = globalThis.__scenarioForgeJson
 
     let decompressedBytes;
     try {
-      decompressedBytes = gunzipSync(inputView);
+      decompressedBytes = gunzipSync(inputView, bounded ? { out: new Uint8Array(maxOutputBytes + 1) } : undefined);
     } catch (error) {
       throwIfAborted(signal);
       if (isAbortError(error)) throw error;
@@ -270,6 +298,9 @@ var SCENARIO_FORGE_JSON_RESOURCE_DECODER_SHARED = globalThis.__scenarioForgeJson
 
     if (!decompressedBytes || !(decompressedBytes instanceof Uint8Array)) {
       throw createDecompressError(label, new Error("Invalid output from fallback gunzip."));
+    }
+    if (bounded && decompressedBytes.byteLength > maxOutputBytes) {
+      throw createDecompressError(label, new Error("Gzip output exceeds the declared limit."));
     }
 
     // Validate ISIZE and CRC32 because fflate gunzipSync does not verify checksum trailer

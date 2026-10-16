@@ -1,3 +1,9 @@
+import { getMapLabelHierarchy } from "./renderer/map_label_hierarchy.js";
+import { getThematicWgiLegend, getThematicWgiSignature, isThematicWgiActive } from "./thematic_wgi_view_model.js";
+import { getPopulationLegend, getPopulationSignature, isPopulationRequested, isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "./population_spatial_view_model.js";
+import { getPopulationHeatmapSnapshot, ensurePopulationHeatmapData } from "./population_spatial_runtime.js";
+import { samplePopulationDensityLonLat } from "./population_spatial_data.js";
+import { createPopulationHeatmapRenderOwner, getPopulationViewportDetailTileIds } from "./renderer/population_heatmap_render_owner.js";
 import { clearAllRiverPaintOverridesState } from "./state/actions/river_paint_actions.js";
 import { getEditedRiverParentIds } from "./river_paint/partition_model.js";
 import { getRiverPaintRuntime } from "./river_paint/runtime.js";
@@ -39,8 +45,13 @@ import { createPoliticalDerivedStateCache } from "./renderer/political_derived_s
 import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from "./political_geometry_store.js";
 import { createCountryFillPaletteOwner } from "./renderer/country_fill_palette_owner.js";
 import { createGeometryRasterRuntimeOwner } from "./renderer/geometry_raster_runtime_owner.js";
+import { readPoliticalRenderPolicy, writePoliticalRenderMode, writePoliticalIdRasterPreference, getPoliticalIdRasterEligibility, publishPoliticalIdRasterStatus } from "./renderer/political_id_raster_trial.js";
+import { collectPoliticalRasterDisplayFeatures } from "./renderer/political_id_raster_source.js";
+import { createPoliticalIdRasterRuntimeOwner } from "./renderer/political_id_raster_runtime_owner.js";
 import { createOverviewFrameOwner } from "./renderer/overview_frame_owner.js";
 import { createNavigationSceneOwner } from "./renderer/navigation_scene_owner.js";
+import { createLabelDrawSnapshotOwner } from "./renderer/label_draw_snapshot.js";
+import { pageResourceBudget } from "./runtime_resource_budget.js";
 import { createBorderMeshWorkerRuntime } from "./renderer/border_mesh_worker_runtime.js";
 import { createBorderMeshWorkerClient } from "./border_mesh_worker_client.js";
 import { getProjectionGeometryGeneration } from "./renderer/projection_geometry_identity.js";
@@ -75,6 +86,8 @@ import {
   normalizeOperationGraphicOpacity,
   getOperationGraphicEditorMidpoints,
   getOperationGraphicLabelAnchor,
+  createProjectedOperationGraphicPath,
+  projectOperationGraphicSegments,
   DEFAULT_OPERATION_GRAPHIC_KIND,
   DEFAULT_OPERATIONAL_LINE_KIND,
   OPERATION_GRAPHIC_STYLE_PRESETS,
@@ -300,7 +313,6 @@ import {
   collectSpatialItemsForProjectedRects,
   collectVisibleSpatialItemsWithStats,
 } from "./renderer/spatial_query_index.js";
-import { createHgoRuntimePreviewRenderOwner } from "./map_renderer/hgo_runtime_preview_render_owner.js";
 import { createSetMapDataTransactionOwner } from "./map_renderer/set_map_data_transaction_owner.js";
 import { createRenderRequestBoundaryOwner } from "./map_renderer/render_request_boundary_owner.js";
 import { createRenderPhaseLifecycleOwner } from "./map_renderer/render_phase_lifecycle_owner.js";
@@ -328,6 +340,7 @@ import {
   projectCoordinateToWorkerPixel,
 } from "./map_renderer/political_raster_worker_packet.js";
 import {
+  filterEnabledRenderPassNames,
   INTERACTION_COMPOSITE_PASS_NAMES,
   RENDER_PASS_NAMES,
   RENDER_PASS_OVERSCAN_RATIO_PER_SIDE,
@@ -348,6 +361,7 @@ import { createDayNightRuntimeOwner } from "./renderer/day_night_runtime_owner.j
 import { createContextPassOrchestratorOwner } from "./renderer/context_pass_orchestrator_owner.js";
 import { createPoliticalPassOrchestratorOwner } from "./renderer/political_pass_orchestrator_owner.js";
 import { createPoliticalBackgroundRenderOwner } from "./renderer/political_background_render_owner.js";
+import { getProjectedPathResourceAccounting } from "./renderer/projected_path_resource_accounting.js";
 import { createPoliticalPartialRepaintOwner } from "./renderer/political_partial_repaint_owner.js";
 import { createRenderPerfMetricsRuntimeOwner } from "./renderer/render_perf_metrics_runtime_owner.js";
 import { createRenderCacheOwner } from "./renderer/render_cache_owner.js";
@@ -405,9 +419,6 @@ let brushSession = null;
 let suppressNextClickAfterBrush = false;
 let lastDetailToastToken = "";
 let lastDetailToastAt = 0;
-let lastInspectorOverlaySignature = "";
-let lastDevSelectionOverlaySignature = "";
-
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
 const MAP_PAN_PADDING_PX = 50;
@@ -561,8 +572,6 @@ const INTERNAL_BORDER_AUTO_DARK = "#ffffff";
 const INTERNAL_BORDER_AUTO_LIGHT = "#111827";
 const CONTOUR_HOST_FILL_FALLBACK_RADIUS = 24;
 const DETAIL_ADM_BORDER_COLOR = "#888888";
-const DETAIL_ADM_BORDER_MIN_ALPHA = 0.24;
-const DETAIL_ADM_BORDER_MAX_ALPHA = 0.34;
 const DETAIL_ADM_BORDER_MIN_WIDTH = 0.30;
 const DETAIL_ADM_BORDER_TARGET_MIN_ALPHA = 0.12;
 const DETAIL_ADM_BORDER_TARGET_MAX_ALPHA = 0.18;
@@ -629,10 +638,6 @@ const STRATEGIC_RESOURCE_MARKER_COLORS = Object.freeze({
 const STRATEGIC_RESOURCE_MARKER_STROKE = "#f8fafc";
 const STRATEGIC_COUNTER_ATTACHMENT_KIND = "operational-line";
 
-const DEFAULT_OPERATION_GRAPHIC_OPACITY = 0.96;
-const DEFAULT_OPERATION_GRAPHIC_WIDTH = 4.4;
-
-const PAPER_TEXTURE_BASE_TILE_SIZE = 512;
 const TEXTURE_LABEL_SERIF_STACK = "\"Libre Baskerville\", \"Palatino Linotype\", Georgia, serif";
 const CITY_MARKER_THEME_GRAPHITE = "classic_graphite";
 const CITY_REVEAL_PROFILE_HYBRID = "hybrid_country_budget";
@@ -701,11 +706,17 @@ let staticMeshCache = {
 };
 let countryFillPaletteOwner = null;
 let geometryRasterRuntimeOwner = null;
+let politicalIdRasterRuntimeOwner = null;
 let politicalEntriesInvalidationEpoch = 0;
 let overviewFrameOwner = null;
 let navigationSceneOwner = null;
+const labelDrawSnapshotOwner = createLabelDrawSnapshotOwner();
+let navigationExactRefreshNeeded = false;
 let borderMeshWorkerRuntime = null;
 const geometryWorkerEnabled = new URLSearchParams(globalThis.location?.search || "").get("geometry_worker") !== "0";
+// Explicit opt-in until whole-application cold/warm and visual gates support a
+// default change. Scenario loading, editing and export have no separate format.
+let politicalIdRasterActivationKey = "";
 let contourHostFillColorCache = new WeakMap();
 let staticMeshSourceCountries = {
   primary: new Set(),
@@ -718,7 +729,6 @@ let physicalLandClipPathCache = {
 const SCENARIO_COASTLINE_MAX_AREA_DELTA_RATIO = 0.02;
 const SCENARIO_COASTLINE_MAX_INTERIOR_RING_RATIO = 0.25;
 const SCENARIO_COASTLINE_MAX_INTERIOR_RING_COUNT = 500;
-const scenarioOwnerOnlyCanonicalFallbackWarnings = new Set();
 const missingPhysicalContextWarnings = new Set();
 let scenarioRegionOverlayRenderOwner = null;
 const renderDiag = {
@@ -732,7 +742,6 @@ const renderDiag = {
   transformedPasses: {},
   waterHit: null,
 };
-const rewoundFeatureLogKeys = new Set();
 const urbanGeoCentroidCache = new WeakMap();
 let cityAnchorCache = new WeakMap();
 const urbanFeatureIndexCache = {
@@ -881,9 +890,6 @@ function getRenderPassSignaturePolicy() {
       getViewportRenderSignature,
       getPhysicalLandMaskInfo,
       getScenarioRuntimeTopologySignatureToken,
-      getHgoRuntimePreviewVisibilitySignature,
-      getHgoRuntimePreviewProjectionOptions,
-      isHgoRuntimePreviewReady,
       rendererSurfaceHost,
       getContextBaseZoomBucketId,
       shouldRefreshContextBaseForColorChanges,
@@ -933,7 +939,6 @@ let renderPhaseLifecycleOwner = null;
 let hitCanvasSchedulingOwner = null;
 let visibleFrameDiagnosticsOwner = null;
 let intensityFieldMaskOwner = null;
-let hgoRuntimePreviewRenderOwner = null;
 let legendControlOwner = null;
 let selectionOverlayOwner = null;
 let transientOverlayRenderOwner = null;
@@ -1007,6 +1012,7 @@ function getLegendControlOwner() {
     getLegendModel: (uniqueColors, labels) => ({
       colors: Array.isArray(uniqueColors) ? uniqueColors : readLegendColors(state),
       specialZoneLegendLayers: LegendManager.getSpecialZoneLayers(runtimeState),
+      thematicLegend: getPopulationLegend(runtimeState) || getThematicWgiLegend(runtimeState),
       labelMap: labels || LegendManager.getLabels(state),
       activeScenarioId: runtimeState.activeScenarioId,
       hasScenarioVisualEdits: !!runtimeState.activeScenarioId && (
@@ -1491,7 +1497,6 @@ function getMapHoverInteractionOwner() {
     constants: { hoverSnapPx: HIT_SNAP_RADIUS_HOVER_PX, renderPhaseIdle: RENDER_PHASE_IDLE },
     getters: {
       nowMs,
-      inspectHgoRuntimePreviewFromEvent,
       getHitFromEvent,
       getHoveredFacilityEntryFromEvent,
       isFacilityDetailsSurfaceActive,
@@ -1948,6 +1953,7 @@ function getOceanRenderOwner() {
     helpers: {
       applyBathymetryCoverageExclusionMask,
       applyOceanClipMask,
+      getPhysicalLandMaskInfo,
       clamp,
       clipOutAtlantropaAccentRegions,
       doesOceanStyleRequireBathymetry,
@@ -2045,6 +2051,79 @@ function getPhysicalLayerRenderOwner() {
     },
   });
   return physicalLayerRenderOwner;
+}
+
+let populationHeatmapRenderOwner = null;
+
+function applyPopulationLandClipMask() {
+  if (runtimeState.activeScenarioId === "tno_1962" && !runtimeState.scenarioAtlantropaData?.features?.length) return false;
+  if (!applyPhysicalLandClipMask()) return false;
+  if (runtimeState.activeScenarioId === "tno_1962") {
+    // The real-world source cannot estimate Atlantropa land or shoals. Exclude
+    // these outlines even when a coarse source pixel straddles the real coast.
+    const excluded = (runtimeState.scenarioAtlantropaData?.features || []).filter((feature) =>
+      ["land", "shoal"].includes(getAtlantropaRenderLayer(feature)));
+    if (excluded.length) {
+      const context = rendererSurfaceHost.getContext();
+      context.beginPath();
+      context.rect(-1e7, -1e7, 2e7, 2e7);
+      rendererSurfaceHost.getPathCanvas()({ type: "FeatureCollection", features: excluded });
+      context.clip("evenodd");
+    }
+  }
+  return true;
+}
+
+function getPopulationHeatmapRenderOwner() {
+  if (!populationHeatmapRenderOwner) populationHeatmapRenderOwner = createPopulationHeatmapRenderOwner({
+    state: runtimeState,
+    getters: {
+      getContext: () => rendererSurfaceHost.getContext(),
+      getProjection: () => rendererSurfaceHost.getProjection(),
+      getProjectionKey: getProjectionRenderSignature,
+      getSnapshot: () => getPopulationHeatmapSnapshot(runtimeState),
+      sampleDensity: samplePopulationDensityLonLat,
+      isRequested: () => isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap",
+      getMaskInfo: () => runtimeState.activeScenarioId === "tno_1962" && !runtimeState.scenarioAtlantropaData?.features?.length
+        ? { collection: null, maskSource: "atlantropa-unavailable" } : getPhysicalLandMaskInfo(),
+      isExportRendering: () => exportRenderInProgress,
+    },
+    helpers: { applyLandMask: applyPopulationLandClipMask, recordMetric: recordRenderPerfMetric, nowMs },
+  });
+  return populationHeatmapRenderOwner;
+}
+
+export function getPopulationHeatmapRenderReadiness() {
+  return getPopulationHeatmapRenderOwner().getReadiness();
+}
+
+export function assertPopulationHeatmapReadyForExport() {
+  return getPopulationHeatmapRenderOwner().assertReadyForExport();
+}
+
+function preparePopulationViewportData() {
+  const detailTileIds = getPopulationViewportDetailTileIds(runtimeState, { projection: rendererSurfaceHost.getProjection() });
+  return ensurePopulationHeatmapData(runtimeState, { detailTileIds, onChange: () => {
+    invalidateRenderPasses(["populationHeatmap"], "population-tiles-ready");
+    requestRendererRender("population-tiles-ready");
+    callRuntimeHook(runtimeState, "updateSpecialZoneEditorUIFn");
+  } });
+}
+
+export async function ensurePopulationHeatmapReadyForExport() {
+  if (isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap") {
+    await preparePopulationViewportData();
+    const snapshot = getPopulationHeatmapSnapshot(runtimeState);
+    if (snapshot.refinementStatus === "failed") throw new Error(`Population heatmap detail loading failed: ${snapshot.error || "unknown error"}.`);
+  }
+  return assertPopulationHeatmapReadyForExport();
+}
+
+function drawPopulationHeatmapPass(k) {
+  if (!exportRenderInProgress && isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap") {
+    void preparePopulationViewportData();
+  }
+  return getPopulationHeatmapRenderOwner().draw(k);
 }
 
 function getScenarioReliefOverlayRenderOwner() {
@@ -2317,6 +2396,7 @@ let riverInternalContourOwner = null;
 let riverContourRenderOwner = null;
 function hasVisibleRiverPartitions() {
   return debugMode === "PROD" && !runtimeState.strategicChoroplethMetric
+    && !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState)
     && !!getRiverPaintRuntime(runtimeState).getActivePack();
 }
 function getRiverPaintRenderOwner() {
@@ -2326,7 +2406,7 @@ function getRiverPaintRenderOwner() {
     getPath: () => rendererSurfaceHost.getPathCanvas(),
     getProjectionKey: getOverlayProjectionSignature,
     isVisible: pathBoundsInScreen,
-    isEnabled: () => debugMode === "PROD" && !runtimeState.strategicChoroplethMetric,
+    isEnabled: () => debugMode === "PROD" && !runtimeState.strategicChoroplethMetric && !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState),
     fallbackColor: LAND_FILL_COLOR,
   });
   return riverPaintRenderOwner;
@@ -2421,9 +2501,11 @@ function getPaintContourRuntimeOwner() {
 }
 
 async function ensurePaintContoursReady() {
-  getRiverPaintRuntime(runtimeState).assertReadyForExport();
-  if (!isHgoRuntimePreviewReady()) await Promise.all([
-    getPaintContourRuntimeOwner().ensureReady(), getRiverInternalContourOwner().ensureReady(),
+  const riverPartitionsRequired = !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState);
+  if (riverPartitionsRequired) getRiverPaintRuntime(runtimeState).assertReadyForExport();
+  await Promise.all([
+    getPaintContourRuntimeOwner().ensureReady(),
+    ...(riverPartitionsRequired ? [getRiverInternalContourOwner().ensureReady()] : []),
   ]);
 }
 
@@ -2482,6 +2564,7 @@ function getBorderDrawOwner() {
       buildDetailAdmMeshSignature,
       clamp,
       drawScenarioCoastalAccentLayer,
+      drawCoastalTransition,
       getCoastlineCollectionForZoom,
       getInternalBorderStrokeColor,
       getSafeCanvasColor,
@@ -2593,6 +2676,7 @@ function getRenderCacheOwner() {
     },
     getters: {
       getContext: () => rendererSurfaceHost.getContext?.() || null,
+      getActiveInteractionCompositePassNames,
     },
     helpers: {
       cloneZoomTransform,
@@ -2668,6 +2752,7 @@ function getTransformedFrameCompositorOwner() {
       getCurrentTransform: () => runtimeState.zoomTransform || globalThis.d3.zoomIdentity,
       getRenderPassCacheSnapshot: getRenderPassCacheState,
       getActiveTransformedFramePassNames,
+      getActiveInteractionCompositePassNames,
       getRenderPhase: () => runtimeState.renderPhase,
       getDeferExactAfterSettle: () => runtimeState.deferExactAfterSettle,
       getActiveScenarioId: () => runtimeState.activeScenarioId,
@@ -2675,7 +2760,6 @@ function getTransformedFrameCompositorOwner() {
       getZoomGestureScaleDelta: () => runtimeState.zoomGestureScaleDelta,
       getZoomGestureEndedAt: () => runtimeState.zoomGestureEndedAt,
       getDpr: () => runtimeState.dpr,
-      isHgoRuntimePreviewReady,
     },
     helpers: {
       nowMs,
@@ -2692,17 +2776,17 @@ function getTransformedFrameCompositorOwner() {
       drawInteractionComposite,
       composeRenderPassesToTarget,
       drawTransformedPass,
+      drawInteractionLabels: (transform) => replayNavigationLabels(transform),
       drawInteractionBorderSnapshot,
       drawBordersPass,
       blitCompositeBufferToMain,
-      resetMainCanvas,
       setInteractionCompositeRejectedReason: (reason) => {
         getRenderPassCacheState().interactionComposite.rejectedReason = reason;
       },
       invalidateInteractionComposite,
       buildInteractionComposite,
       ensureTransformedPassCoverage: (timings) => getRenderPipelinePassesOwner().ensureTransformedPassCoverage(
-        timings, isHgoRuntimePreviewReady() ? ["hgoPreview"] : INTERACTION_COMPOSITE_PASS_NAMES,
+        timings, getActiveInteractionCompositePassNames(),
       ),
       canDrawInteractionComposite,
       setPendingExactPoliticalFastFrame: (value) => {
@@ -2852,14 +2936,12 @@ function getViewportReadModelOwner() {
           ? identity.translate(x, y) : identity || null;
       },
       getPanContentBoundsSnapshots: () => {
-        if (isHgoRuntimePreviewReady()) return [snapshotBounds(getProjectedHgoRuntimePreviewBounds())];
         const features = runtimeState.landData?.features;
         if (!rendererSurfaceHost.getPathSvg() || !Array.isArray(features) || !features.length) return [];
         const [width, height] = getLogicalCanvasDimensions();
         return snapshotFeatureBounds(features.filter((feature) => !shouldSkipFeature(feature, width, height, { forceProd: true })));
       },
       getProjectedRenderableContentBoundsSnapshots: () => {
-        if (isHgoRuntimePreviewReady()) return [snapshotBounds(getProjectedHgoRuntimePreviewBounds())];
         const features = runtimeState.landData?.features;
         if (!Array.isArray(features) || !features.length || Number(runtimeState.width || 0) <= 0 || Number(runtimeState.height || 0) <= 0) return [];
         const [width, height] = getLogicalCanvasDimensions();
@@ -3161,7 +3243,6 @@ function getClickSelectionTransactionOwner() {
       getSpecialRegionColor,
       getWaterRegionColor,
       handleSpecialZoneMembershipClick,
-      inspectHgoRuntimePreviewFromEvent,
       isDoubleClickBatchEligible,
       isFacilityDetailsSurfaceActive,
       isMacroOceanWaterRegion,
@@ -3240,26 +3321,6 @@ function getIntensityFieldMaskOwner() {
   return intensityFieldMaskOwner;
 }
 
-function getHgoRuntimePreviewRenderOwner() {
-  if (hgoRuntimePreviewRenderOwner) {
-    return hgoRuntimePreviewRenderOwner;
-  }
-  hgoRuntimePreviewRenderOwner = createHgoRuntimePreviewRenderOwner({
-    runtimeState,
-    renderPassNames: RENDER_PASS_NAMES,
-    transformedFramePassNames: TRANSFORMED_FRAME_PASS_NAMES,
-    getProjection: () => rendererSurfaceHost.getProjection(),
-    getMapSvg: () => rendererSurfaceHost.getMapSvg(),
-    getTargetCanvas: () => rendererSurfaceHost.getContext()?.canvas || null,
-    callRuntimeHook,
-    createHitResult,
-    resetCanvasContext,
-    recordRenderPerfMetric,
-    nowMs,
-  });
-  return hgoRuntimePreviewRenderOwner;
-}
-
 function getVisualEffectsPassOwner() {
   if (visualEffectsPassOwner) {
     return visualEffectsPassOwner;
@@ -3273,7 +3334,6 @@ function getVisualEffectsPassOwner() {
       getViewportSize: () => ({ width: runtimeState.width, height: runtimeState.height }),
       getTextureStyleConfig,
       isBootInteractionReady,
-      isHgoRuntimePreviewReady,
     },
     helpers: {
       clamp,
@@ -3340,7 +3400,6 @@ function getContextPassOrchestratorOwner() {
   }
   contextPassOrchestratorOwner = createContextPassOrchestratorOwner({
     getters: {
-      isHgoRuntimePreviewReady,
       getDeferContextBasePass: () => runtimeState.deferContextBasePass,
     },
     resolvers: {
@@ -3374,14 +3433,118 @@ function getContextPassOrchestratorOwner() {
   return contextPassOrchestratorOwner;
 }
 
+function getPoliticalIdRasterEligibilityReason() {
+  return getPoliticalIdRasterEligibility({ requested: readPoliticalRenderPolicy().requested, exporting: exportRenderInProgress,
+    debugMode, ready: isBootInteractionReady(), firstVisible: runtimeState.firstVisibleFramePainted,
+    readonly: runtimeState.startupReadonly, unlocking: runtimeState.startupReadonlyUnlockInFlight,
+    riverPartitions: hasVisibleRiverPartitions(), scenarioId: runtimeState.activeScenarioId });
+}
+
+function isPoliticalIdRasterSelected() { return getPoliticalIdRasterEligibilityReason() === "eligible"; }
+function isPoliticalIdRasterPrimary() { return readPoliticalRenderPolicy().persistent; }
+
+export function setPoliticalRenderMode(mode) {
+  writePoliticalRenderMode(mode);
+  resetPoliticalRasterPolicy();
+}
+
+export function setPoliticalIdRasterTrialEnabled(enabled) {
+  writePoliticalIdRasterPreference(!!enabled);
+  resetPoliticalRasterPolicy();
+}
+
+function resetPoliticalRasterPolicy() {
+  politicalIdRasterRuntimeOwner?.dispose();
+  politicalIdRasterRuntimeOwner = null;
+  politicalIdRasterActivationKey = "";
+  invalidateRenderPasses(["political"], "political-id-raster-preference");
+  requestRendererRender("political-id-raster-preference", { visual: true });
+  publishPoliticalIdRasterStatus(getPoliticalIdRasterDiagnostics());
+}
+
+function getPoliticalIdRasterRuntimeOwner() {
+  politicalIdRasterRuntimeOwner ||= createPoliticalIdRasterRuntimeOwner({
+    state: runtimeState,
+    surface: rendererSurfaceHost,
+    resourceBudget: pageResourceBudget,
+    refineAfterMs: 180,
+    displayMode: isPoliticalIdRasterPrimary() ? "raster" : "hybrid",
+    helpers: {
+      isEnabled: isPoliticalIdRasterSelected,
+      isBrushActive: () => !!brushSession,
+      getFeatureId,
+      getBounds: (feature, id) => getProjectedFeatureBounds(feature, { featureId: id }),
+      getLayout: () => getRenderPassLayout("political"),
+      hasStroke: feature => !isAtlantropaSeaFeature(feature),
+      getAssetSceneKey: () => `${runtimeState.activeScenarioId}${isPoliticalIdRasterPrimary() ? ":complete-display-v1" : ""}`,
+      getAssetManifestUrl: () => {
+        // Existing prebuilt assets cover only the fine pass, not its support background.
+        if (isPoliticalIdRasterPrimary()) return "";
+        const override = new URLSearchParams(globalThis.location?.search || "").get("political_id_assets");
+        return override === "0" ? "" : override || runtimeState.activeScenarioManifest?.political_id_raster_manifest_url || "";
+      },
+      getChangedColorIds: () => {
+        const cache = getRenderPassCacheState();
+        return cache.reasons?.political === "refresh-colors" && cache.partialPoliticalDirtyIds?.size
+          ? Array.from(cache.partialPoliticalDirtyIds) : null;
+      },
+      resolveColor: (feature, id) => {
+        const color = globalThis.d3.color(getPoliticalPartialRepaintOwner().getPoliticalFeatureFillColor(feature, id, 0));
+        if (!color || color.opacity !== 1) throw new Error("Political ID raster requires opaque feature fills.");
+        return color.formatHex();
+      },
+      getFeatures: () => {
+        const layout = getRenderPassLayout("political");
+        const features = isPoliticalIdRasterPrimary() ? collectPoliticalRasterDisplayFeatures({
+          fullCollection: runtimeState.landDataFull, interactiveCollection: runtimeState.landData, getId: getFeatureId,
+        }) : runtimeState.landData?.features || [];
+        return orderPoliticalShellUnderlayFirst(features.map((feature, drawOrder) => ({
+          feature, drawOrder, id: getFeatureId(feature),
+        })).filter(({ feature, id }) => id && feature.geometry && !shouldExcludePoliticalVisualFeature(feature, id)
+          && !shouldSkipFeature(feature, layout.paddedWidth, layout.paddedHeight))).map(entry => entry.feature);
+      },
+      getSourceIdentity: () => {
+        const layout = getRenderPassLayout("political");
+        const foreground = new Set(Object.keys(runtimeState.visualOverrides || {})
+          .filter(id => !!getSafeCanvasColor(runtimeState.visualOverrides[id], null)));
+        if (hasPendingPoliticalColorEdit()) {
+          for (const id of getRenderPassCacheState().pendingPoliticalColorEditIds || []) foreground.add(id);
+        }
+        return {
+          sceneKey: [runtimeState.activeScenarioId, runtimeState.sceneGeneration].join(":"),
+          projectionKey: String(getProjectionGeometryGeneration(rendererSurfaceHost.getProjection())),
+          coverageKey: [runtimeState.mapSemanticMode,
+            runtimeState.scenarioShellOverlayRevision, isPoliticalIdRasterPrimary() ? "complete-display-v1" : "fine"].join(":"),
+          version: [getObjectIdentityToken(runtimeState.landData?.features),
+            isPoliticalIdRasterPrimary() ? getObjectIdentityToken(runtimeState.landDataFull?.features) : "fine", runtimeState.topologyRevision,
+            runtimeState.scenarioDataGeneration, runtimeState.sovereigntyRevision,
+            layout.paddedWidth, layout.paddedHeight,
+            [...foreground].sort().join(",")].join(":"),
+          colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor()].join(":"),
+          colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor()].join(":"),
+        };
+      },
+    },
+    effects: {
+      recordMetric: recordRenderPerfMetric,
+      requestRender: reason => {
+        invalidateRenderPasses(["political"], reason);
+        requestRendererRender(reason, { visual: true });
+      },
+    },
+  });
+  return politicalIdRasterRuntimeOwner;
+}
+
 function getGeometryRasterRuntimeOwner() {
   geometryRasterRuntimeOwner ||= createGeometryRasterRuntimeOwner({
     state: runtimeState,
     surface: rendererSurfaceHost,
     helpers: {
       pointRadius: PATH_POINT_RADIUS,
-      isEnabled: () => geometryWorkerEnabled && isBootInteractionReady() && debugMode === "PROD" && !isHgoRuntimePreviewReady()
+      isEnabled: () => geometryWorkerEnabled && isBootInteractionReady() && debugMode === "PROD"
         && !isPoliticalRasterWorkerBitmapEnabled() && !hasVisibleRiverPartitions(),
+      isPoliticalEnabled: () => !isPoliticalIdRasterSelected(),
       getPoliticalLayout: () => getRenderPassLayout("political"),
       getPoliticalSignature: () => getRenderPassSignature("political", runtimeState.zoomTransform),
       // All supported political edits invalidate their pass. Collection identities
@@ -3459,13 +3622,14 @@ function getPoliticalPassOrchestratorOwner() {
   }
   politicalPassOrchestratorOwner = createPoliticalPassOrchestratorOwner({
     getters: {
-      isHgoRuntimePreviewReady,
       isRenderDiagnosticsEnabled: () => renderDiag.enabled,
       hasPoliticalLandFeatures: () => !!runtimeState.landData?.features?.length,
       isPoliticalRasterWorkerBitmapEnabled,
       hasPendingPoliticalColorEdit,
       isExportRendering: () => exportRenderInProgress,
       hasInlinePoliticalPartitions: hasVisibleRiverPartitions,
+      isPoliticalIdRasterSelected,
+      isPoliticalIdRasterPrimary,
     },
     resolvers: {
       resolvePoliticalPassIdentity,
@@ -3487,6 +3651,9 @@ function getPoliticalPassOrchestratorOwner() {
       buildPoliticalRasterWorkerPacket: buildPoliticalPassWorkerPacket,
       requestPoliticalRasterWorkerPass: requestPoliticalPassWorker,
       drawPoliticalFineFeatureLoop,
+      drawPoliticalIdRasterFine: () => getPoliticalIdRasterRuntimeOwner().draw(),
+      cancelNativeBackgroundPreparation: () => politicalBackgroundRenderOwner?.cancelScenarioPoliticalBackgroundDeferredFullCache(
+        "political-id-raster-primary", { force: true }),
       drawPoliticalPartitions: k => getRiverPaintRenderOwner().draw(k),
       clearPendingPoliticalColorEdit,
     },
@@ -3546,7 +3713,10 @@ function getPoliticalBackgroundRenderOwner() {
     effects: {
       recordRenderPerfMetric,
       cancelDeferredWork,
-      scheduleDeferredWork,
+      scheduleDeferredWork: (callback, options) => scheduleDeferredWork(
+        (...args) => getRenderCacheOwner().withValidatedCache(() => callback(...args)),
+        options,
+      ),
       invalidateRenderPasses,
       recordProgressivePoliticalFullCacheReadyDiagnostics,
       requestRendererRender,
@@ -3560,6 +3730,8 @@ function getPoliticalBackgroundRenderOwner() {
       applyOceanClipMask,
       drawOceanStyle,
       warn: (...args) => globalThis.console?.warn?.(...args),
+      resourceBudget: pageResourceBudget,
+      politicalPathResourceAccounting: getProjectedPathResourceAccounting(pageResourceBudget),
     },
     platform: {
       d3: globalThis.d3,
@@ -3590,6 +3762,8 @@ function getPoliticalPartialRepaintOwner() {
     getters: {
       drawWorkerPoliticalFine: () => hasVisibleRiverPartitions() ? null : getGeometryRasterRuntimeOwner().drawPolitical(),
       hasInlinePoliticalPartitions: hasVisibleRiverPartitions,
+      isPoliticalIdRasterSelected,
+      hasNativePoliticalIdRasterFrame: () => politicalIdRasterRuntimeOwner?.hasNativeFrame() === true,
       getRuntimeState: () => runtimeState,
       getDebugMode: () => debugMode,
       getDefaultTransform: () => runtimeState.zoomTransform || globalThis.d3?.zoomIdentity,
@@ -3645,6 +3819,10 @@ function getPoliticalPartialRepaintOwner() {
       setPassReferenceTransform,
       recordPassTiming,
       drawPartitionForParent: (feature, k) => getRiverPaintRenderOwner().draw(k, getFeatureId(feature)),
+      onPartialRepaint: () => {
+        getPoliticalPassOrchestratorOwner().noteNativePartialRepaint();
+        if (isPoliticalIdRasterSelected()) politicalIdRasterRuntimeOwner?.noteNativePartialRepaint();
+      },
       commitPoliticalPassDiagnostics: (politicalPassDiagnostics) => {
         renderDiag.politicalPass = politicalPassDiagnostics;
         publishRenderDiagnostics();
@@ -3682,7 +3860,7 @@ function getRenderPipelinePassesOwner() {
       drawBackgroundPass,
       drawPhysicalBasePass,
       drawPoliticalPass,
-      drawHgoPreviewPass,
+      drawPopulationHeatmapPass,
       drawContextBasePass,
       drawContextScenarioPass,
       drawEffectsPass,
@@ -3716,6 +3894,7 @@ function getRenderPipelinePassesOwner() {
       rebuildResolvedColors,
       getRenderPassCacheState,
       getRenderPassSignature,
+      getActiveRenderPassNames,
       incrementPerfCounter,
       recordRenderPerfMetric,
       renderPassToCache,
@@ -3749,6 +3928,11 @@ function getDrawCanvasOrchestrationOwner() {
       nowMs,
     },
     effects: {
+      beforeFrame: reconcileRenderFrameResources,
+      afterFrame: () => {
+        getRenderCacheOwner().syncSurfaceResourceAccounting();
+        syncVisibleSurfaceResourceAccounting();
+      },
       ensureLayerDataFromTopology: () => {
         ensureLayerDataFromTopology();
         // Cached viewport frames also need to select the current contour pack.
@@ -3758,7 +3942,10 @@ function getDrawCanvasOrchestrationOwner() {
           ensurePhysicalAtlasDetailForView();
         }
       },
-      prepareAsyncFrame: () => getGeometryRasterRuntimeOwner().prepareFrame(),
+      prepareAsyncFrame: () => navigationExactRefreshNeeded
+        ? !!getGeometryRasterRuntimeOwner().preparePolitical({ force: true })
+        : getGeometryRasterRuntimeOwner().prepareFrame(),
+      requiresExactFrame: () => navigationExactRefreshNeeded,
       withValidatedCache: (callback) => getRenderCacheOwner().withValidatedCache(callback),
       incrementPerfCounter,
       clearPoliticalPatchOverlayIfStale,
@@ -3767,7 +3954,12 @@ function getDrawCanvasOrchestrationOwner() {
       drawTransformedFrameFromCaches,
       drawLastGoodFrameFallback,
       drawOverviewFrameFallback,
-      drawNavigationFrame: (transform) => !exportRenderInProgress && !!navigationSceneOwner?.draw(transform),
+      drawNavigationFrame: (transform) => {
+        const drawn = !exportRenderInProgress && !!navigationSceneOwner?.draw(transform);
+        navigationExactRefreshNeeded = !drawn && !!runtimeState.firstVisibleFramePainted
+          && !exportRenderInProgress;
+        return drawn;
+      },
       noteMissingVisibleFrameSkippedDuringInteraction,
       drawBaseVisibleFrameFallback,
       resetContextBreakdownForExactFrame,
@@ -4456,7 +4648,9 @@ function getRenderPassLayout(passName) {
 function resizeRenderPassCanvases(passNames = RENDER_PASS_NAMES) {
   overviewFrameOwner?.clear();
   exactCompositeReuseOwner?.invalidate();
-  return getRenderCacheOwner().resizeRenderPassCanvases(passNames);
+  const active = getActiveRenderPassNames();
+  const selected = passNames.filter((name) => active.includes(name));
+  if (selected.length) return getRenderCacheOwner().resizeRenderPassCanvases(selected);
 }
 
 function ensureRenderPassCanvas(passName) {
@@ -4541,8 +4735,11 @@ function captureLastGoodFrame(reason = "frame", transform = runtimeState.zoomTra
   if (reason === "exact-frame") {
     if (!navigationSceneOwner?.isReady()) getOverviewFrameOwner().capture(targetCanvas, transform, runtimeState.dpr);
   }
-  if (!exportRenderInProgress) getNavigationSceneOwner().captureDetail(targetCanvas, transform, runtimeState.dpr, {
+  if (!exportRenderInProgress && reason === "exact-frame") getNavigationSceneOwner().captureDetail(targetCanvas, transform, runtimeState.dpr, {
     completeExact: reason === "exact-frame" && !!committedFrameIdentity.metadata?.fullPoliticalReady,
+    drawBase: (target) => composeRenderPassesToTarget(target,
+      getActiveRenderPassNames().filter((name) => name !== "labels" && name !== "textureLabels"),
+      transform, { requireAllPasses: true }).ok,
   });
   return true;
 }
@@ -4579,6 +4776,12 @@ function getNavigationSceneOwner() {
       getCachedWaterPath: (feature, parts) => getScenarioRegionOverlayRenderOwner().getCachedWaterFeaturePath(feature, parts),
       getCachedLandPath: (feature, featureId) => getPoliticalFeaturePathEntry(feature, { featureId, allowBuild: false })?.path,
       getOceanBaseFillColor, landFill: LAND_FILL_COLOR,
+      canDrawLabels: (transform) => canReplayNavigationLabels(transform),
+      drawLabels: (transform) => replayNavigationLabels(transform),
+      getDetailIdentity: (reference) => JSON.stringify([
+        getCommittedFrameKeySignature(getCommittedFrameIdentity(reference).commitKey),
+        getActiveRenderPassNames().map((name) => [name, getRenderPassSignature(name, reference)]),
+      ]),
     },
   });
   return navigationSceneOwner;
@@ -4715,6 +4918,11 @@ function drawLastGoodFrameFallback(currentTransform = runtimeState.zoomTransform
     });
     return false;
   };
+  const cssRatio = currentTransform.k / referenceTransform.k;
+  const pixelRatio = cssRatio * runtimeState.dpr / Number(frame.dpr || 1);
+  if (!(cssRatio >= 0.8 && cssRatio <= 1.25 && pixelRatio > 0 && pixelRatio <= 1.5)) {
+    return reject("raster-quality");
+  }
   if (String(frame.scenarioId || "") !== identity.scenarioId) {
     return reject("scenario-mismatch");
   }
@@ -4943,8 +5151,6 @@ function isScenarioWaterTopologyExclusiveMode() {
 function getScenarioSurfaceVersionParts(waterFeatureCount = null, atlantropaCounts = null) {
   const maskInfo = getPhysicalLandMaskInfo();
   const runtimeTopologyRef = runtimeState.scenarioRuntimeTopologyData || runtimeState.runtimePoliticalTopology || null;
-  const effectiveWaterFeatureCount = Number(waterFeatureCount
-    ?? getEffectiveWaterRegionFeatures().length);
   const signal = [
     String(runtimeState.activeScenarioId || ""),
     `runtime-tag:${String(runtimeState.scenarioRuntimeTopologyVersionTag || "").trim() || `${getObjectIdentityToken(runtimeTopologyRef, "scenario-runtime-topology")}:${getScenarioRuntimeTopologySignatureToken()}`}`,
@@ -4952,7 +5158,7 @@ function getScenarioSurfaceVersionParts(waterFeatureCount = null, atlantropaCoun
     `mask-tag:${String(runtimeState.scenarioContextLandMaskVersionTag || runtimeState.scenarioLandMaskVersionTag || "").trim() || `${maskInfo.maskSource}:${getObjectIdentityToken(maskInfo.collection, "scenario-mask")}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`}`,
     `water-ref:${getObjectIdentityToken(runtimeState.scenarioWaterRegionsData, "scenario-water")}`,
     `lakes-ref:${getObjectIdentityToken(runtimeState.contextLayerExternalDataByName?.lakes, "global-lakes")}`,
-    `water-tag:${String(runtimeState.scenarioWaterOverlayVersionTag || "").trim() || `features:${effectiveWaterFeatureCount}`}`,
+    `water-tag:${String(runtimeState.scenarioWaterOverlayVersionTag || "").trim() || `features:${Number(waterFeatureCount ?? getEffectiveWaterRegionFeatures().length)}`}`,
     `water-mode:${getScenarioWaterRegionsMode()}`,
   ];
   // Allocate identity tokens in the same order as the standalone surface signal.
@@ -4982,6 +5188,7 @@ function getScenarioWaterVisualRevisionToken({ effectiveWaterFeatureCount = null
     `water-effective:${resolvedWaterFeatureCount}`,
     `water-scenario:${getFeatureCollectionFeatureCount(runtimeState.scenarioWaterRegionsData)}`,
     `water-atlantropa:${atlantropaRevisionToken}`,
+    `population:${getPopulationSignature(runtimeState)}`,
     `water-overrides:${stableJson(runtimeState.waterRegionOverrides || {})}`,
     runtimeState.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
     runtimeState.showOpenOceanRegions ? "open-ocean:on" : "open-ocean:off",
@@ -5538,7 +5745,7 @@ function drawScenarioReliefOverlaysPass(k) {
 }
 
 function getFeatureCountryCodeNormalized(feature) {
-  return canonicalCountryCode(getSharedFeatureCountryCode(feature));
+  return getSharedFeatureCountryCode(feature);
 }
 
 function getFeatureBorderMeshCountryCodeNormalized(feature) {
@@ -5946,7 +6153,6 @@ function getPassCounterNames(passName) {
   if (passName === "background") return ["backgroundPassRenders"];
   if (passName === "physicalBase") return ["contextPassRenders", "physicalBasePassRenders"];
   if (passName === "political") return ["politicalPassRenders"];
-  if (passName === "hgoPreview") return ["hgoPreviewPassRenders"];
   if (passName === "effects") return ["effectsPassRenders"];
   if (passName === "contextBase") return ["contextPassRenders", "contextBasePassRenders"];
   if (passName === "contextScenario") return ["contextPassRenders", "contextScenarioPassRenders"];
@@ -6459,7 +6665,7 @@ function evaluateSkipFeature(feature, canvasWidth, canvasHeight, { forceProd = f
       skip: false,
       reason: null,
       featureId,
-      countryCode: getFeatureCountryCodeNormalized(feature),
+      countryCode,
       bounds,
     };
   }
@@ -6926,8 +7132,14 @@ function rebuildResolvedColors() {
     }
   });
 
-  replaceResolvedColorsState(state, nextColors);
-  bumpColorRevision(state);
+  // A startup reconciliation may resolve the exact same complete palette.
+  // Preserve its identity so pending coverage and the current political pass
+  // are not invalidated merely because a new table was allocated.
+  const colorIds = Object.keys(nextColors);
+  const colorsChanged = !previousColors || Object.keys(previousColors).length !== colorIds.length
+    || colorIds.some((id) => previousColors[id] !== nextColors[id]);
+  replaceResolvedColorsState(state, colorsChanged ? nextColors : previousColors);
+  if (colorsChanged) bumpColorRevision(state);
   if (colorSourceFeatures === runtimeState.landDataFull?.features) {
     politicalDerivedStateCache.refreshColors({
       identity: getPoliticalDerivedStateIdentity(), collection: runtimeState.landDataFull,
@@ -6938,7 +7150,8 @@ function rebuildResolvedColors() {
   getCountryFillPaletteOwner().invalidate();
   notifyPaintContourColorsChanged();
   retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColorRevision);
-  invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
+  if (colorsChanged) invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
+  else invalidateRenderPasses(["physicalBase", "contextBase"], "rebuild-colors");
   recordColorRebuildDiagnostics(runtimeState, {
     phase: "color-rebuild-complete", previousColorRevision, sourceFeatureCount: colorSourceFeatures.length, resolvedColorCount: Object.keys(nextColors).length, sourceName: getResolvedColorSourceName(),
   });
@@ -6946,8 +7159,9 @@ function rebuildResolvedColors() {
     featureCount: Object.keys(nextColors).length,
     sourceFeatureCount: colorSourceFeatures.length,
     source: getResolvedColorSourceName(),
+    colorsChanged,
   });
-  return nextColors;
+  return runtimeState.colors;
 }
 
 function getResolvedColorSourceFeatures() {
@@ -7363,6 +7577,8 @@ function retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColo
 
 function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, inputStartedAt = 0, inputLabel = "", coalescePatchPreview = false } = {}) {
 
+  const previousColors = runtimeState.colors;
+  const previousColorRevision = Number(runtimeState.colorRevision || 0);
   ensureSovereigntyState();
   const cache = getRenderPassCacheState();
   const pendingRenderIds = new Set();
@@ -7375,19 +7591,35 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, input
   }
 
   const ids = normalizePoliticalColorEditIds(featureIds);
+  let canRefreshDerivedColors = true;
   ids.forEach((id) => {
     const feature = findResolvedColorFeatureById(id);
     if (!feature) {
+      canRefreshDerivedColors = false;
       setResolvedColorForFeature(state, id, null);
       return;
     }
     const resolved = getResolvedFeatureColor(feature, id);
+    if (!resolved) canRefreshDerivedColors = false;
     setResolvedColorForFeature(state, id, resolved);
     cache.partialPoliticalDirtyIds.add(id);
     pendingRenderIds.add(id);
   });
 
+  canRefreshDerivedColors = canRefreshDerivedColors && runtimeState.colors === previousColors
+    && Number(runtimeState.colorRevision || 0) === previousColorRevision;
   bumpColorRevision(state);
+  if (canRefreshDerivedColors) {
+    // Keep a valid paint transaction on the same published geometry baseline.
+    politicalDerivedStateCache.refreshColors({
+      identity: getPoliticalDerivedStateIdentity(),
+      collection: runtimeState.landDataFull,
+      previousColors,
+      previousColorRevision,
+      colors: runtimeState.colors,
+      colorRevision: runtimeState.colorRevision,
+    });
+  }
   getCountryFillPaletteOwner().notifyColorsChanged(ids);
   notifyPaintContourColorsChanged(getRiverPaintRuntime(runtimeState).expandDirtyIds(ids));
   if (!markPendingPoliticalColorEdit(Array.from(pendingRenderIds), {
@@ -8364,31 +8596,34 @@ function invalidateBorderCache() {
   });
 }
 
-function isHgoRuntimePreviewReady() {
-  return getHgoRuntimePreviewRenderOwner().isReady();
-}
-
-function getHgoRuntimePreviewVisibilitySignature() {
-  return getHgoRuntimePreviewRenderOwner().getVisibilitySignature();
-}
-
 function getActiveRenderPassNames() {
-  return getHgoRuntimePreviewRenderOwner().getActiveRenderPassNames();
+  return filterCurrentEnabledRenderPasses(RENDER_PASS_NAMES);
 }
 
 function getActiveTransformedFramePassNames() {
-  return getHgoRuntimePreviewRenderOwner().getActiveTransformedFramePassNames();
+  return filterCurrentEnabledRenderPasses(TRANSFORMED_FRAME_PASS_NAMES);
 }
 
-function getHgoRuntimePreviewProjectionOptions(overrides = {}) {
-  return getHgoRuntimePreviewRenderOwner().getProjectionOptions(overrides);
+function filterCurrentEnabledRenderPasses(passNames) {
+  return filterEnabledRenderPassNames(passNames, {
+    showPhysical: !!runtimeState.showPhysical,
+    physicalMode: normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical).mode,
+    showUrban: !!runtimeState.showUrban,
+    showRivers: !!runtimeState.showRivers,
+    showTransport: !!runtimeState.showTransport,
+    showStrategicResourceMarkers: !!runtimeState.showStrategicResourceMarkers,
+    showCityPoints: !!runtimeState.showCityPoints,
+    textureMode: normalizeTextureMode(runtimeState.styleConfig?.texture?.mode),
+    dayNightEnabled: !!getDayNightStyleConfig().enabled,
+    populationHeatmapEnabled: isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap",
+  });
 }
 
-registerRuntimeHook(runtimeState, "getHgoRuntimePreviewProjectionOptionsFn", getHgoRuntimePreviewProjectionOptions);
-
-function inspectHgoRuntimePreviewFromEvent(event, { eventType = "unknown" } = {}) {
-  return getHgoRuntimePreviewRenderOwner().inspectFromEvent(event, { eventType });
+function getActiveInteractionCompositePassNames() {
+  const active = getActiveRenderPassNames();
+  return INTERACTION_COMPOSITE_PASS_NAMES.filter((name) => active.includes(name));
 }
+
 
 function keyToHitColor(key) {
   const value = Math.max(0, Math.min(0xffffff, Number(key) || 0));
@@ -9047,7 +9282,22 @@ function getLandHitFromPointer(
 
   const strictCandidates = candidateCollector
     ? candidateCollector.land(0) : collectGridCandidates(pointer.px, pointer.py, 0);
-  if (eventType === "hover" && !enableSnap) {
+  // A display ID can accelerate a unique interior only. Geographic containment
+  // and the existing rank/filter policy still decide the hit; overlaps, brush,
+  // seams and stale/missing raster coverage continue through the normal path.
+  if (hitMode !== "canvas" && !runtimeState.brushModeEnabled && isPoliticalIdRasterSelected()
+    && ["click", "dblclick", "hover"].includes(eventType) && strictCandidates.length === 1) {
+    const raster = politicalIdRasterRuntimeOwner?.queryPoint({ x: pointer.px, y: pointer.py });
+    if (raster?.kind === "interior" && raster.primaryId === strictCandidates[0]?.item?.id) {
+      const verified = rankCandidates(strictCandidates, pointer.lonLat, { eventType, targetType: "land" })
+        .find(candidate => candidate.containsGeo);
+      if (verified) {
+        recordRenderPerfMetric("politicalIdRasterPick", 0, { id: raster.primaryId, verified: true });
+        return toHitResult(verified, { viaSnap: false, strict: true, zoomK: pointer.zoomK, targetType: "land" });
+      }
+    }
+  }
+  if ((eventType === "hover" || eventType === "brush") && !enableSnap) {
     const strictHoverHit = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "land" });
     return strictHoverHit
       ? toHitResult(strictHoverHit, {
@@ -9058,16 +9308,16 @@ function getLandHitFromPointer(
       })
       : createHitResult();
   }
-  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat, { eventType, targetType: "land" });
-  if (strictRanked.length > 0) {
-    const strictContainsGeo = strictRanked.find((candidate) => candidate.containsGeo);
+  // The first containing item in canonical priority order is the same winner
+  // as ranking every containment result; lower-priority geometry need not run.
+  if (strictCandidates.length > 0) {
+    const strictContainsGeo = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "land" });
     if (strictContainsGeo) {
       if (hitMode === "auto" && eventType !== "compat") {
-        const strictIds = new Set(strictRanked.map((candidate) => candidate.item.id));
-        const strictMatchCount = strictRanked.filter((candidate) => candidate.containsGeo).length;
+        const strictIds = new Set(strictCandidates.map((candidate) => candidate.item.id));
         const hitFromCanvas = getValidatedCanvasHit(event, strictIds, {
           forceBuild:
-            strictMatchCount > 1
+            strictCandidates.length > 1
             && (eventType === "click" || eventType === "dblclick" || eventType === "compat"),
         });
         if (hitFromCanvas.id === strictContainsGeo.item.id) {
@@ -9273,6 +9523,9 @@ function flushPendingIndexUiRefresh() {
   if (pending.renderCountryList && typeof runtimeState.renderCountryListFn === "function") {
     runtimeState.renderCountryListFn();
     refreshedScopes.push("country");
+  }
+  if (pending.renderCountryList && (runtimeState.styleConfig?.thematic?.enabled === true || runtimeState.styleConfig?.population?.enabled === true)) {
+    callRuntimeHook(runtimeState, "updateSpecialZoneEditorUIFn");
   }
   if (pending.renderWaterRegionList && typeof runtimeState.renderWaterRegionListFn === "function") {
     runtimeState.renderWaterRegionListFn();
@@ -9829,7 +10082,7 @@ function getPoliticalDerivedStateIdentity() {
     runtimeState.mapSemanticMode, runtimeState.sovereigntyRevision,
     runtimeState.scenarioShellOverlayRevision, runtimeState.showScenarioAtlantropa,
     runtimeState.runtimePoliticalMetaSeed, runtimeState.scenarioStrategicValuesRevision,
-    runtimeState.strategicChoroplethMetric, JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(),
+    runtimeState.strategicChoroplethMetric, getThematicWgiSignature(runtimeState), getPopulationSignature(runtimeState), JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(),
     runtimeState.landIndex,
     runtimeState.width, runtimeState.height];
 }
@@ -10644,20 +10897,8 @@ function getBathymetryBandVisibilityConfig(feature, k) {
   return getBathymetryStylePolicy().getBathymetryBandVisibilityConfig(feature, k);
 }
 
-function drawBathymetryBands(collection, oceanStyle) {
-  return getOceanRenderOwner().drawBathymetryBands(collection, oceanStyle);
-}
-
-function buildVisibleBathymetryContourDepthSet(collection, oceanStyle) {
-  return getOceanRenderOwner().buildVisibleBathymetryContourDepthSet(collection, oceanStyle);
-}
-
 function getBathymetryContourVisibilityConfig(feature, k) {
   return getBathymetryStylePolicy().getBathymetryContourVisibilityConfig(feature, k);
-}
-
-function drawBathymetryContours(collection, oceanStyle) {
-  return getOceanRenderOwner().drawBathymetryContours(collection, oceanStyle);
 }
 
 function getBathymetryCollectionBySource(collection, source) {
@@ -10706,14 +10947,6 @@ function getFeatureProjectedDensity(feature) {
   return maxDensity;
 }
 
-function buildCoastalAccentStrokeBuckets(entries) {
-  return getOceanRenderOwner().buildCoastalAccentStrokeBuckets(entries);
-}
-
-function drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa = false } = {}) {
-  return getOceanRenderOwner().drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa });
-}
-
 function getScenarioCoastalAccentOverlayVisualConfig(feature, k, options2) {
   return getBathymetryStylePolicy().getScenarioCoastalAccentOverlayVisualConfig(feature, k, options2);
 }
@@ -10738,12 +10971,12 @@ function clipOutAtlantropaAccentRegions() {
   }
 }
 
-function drawScenarioCoastalAccentOverlays(k, { interactive = false } = {}) {
-  return getOceanRenderOwner().drawScenarioCoastalAccentOverlays(k, { interactive });
-}
-
 function drawScenarioCoastalAccentLayer(k, { interactive = false } = {}) {
   return getOceanRenderOwner().drawScenarioCoastalAccentLayer(k, { interactive });
+}
+
+function drawCoastalTransition(k, options) {
+  return getOceanRenderOwner().drawCoastalTransition(k, options);
 }
 
 function resolveOceanMask() {
@@ -12527,6 +12760,8 @@ function getScenarioRegionOverlayRenderOwner() {
       shouldSkipFeature,
       pathBoundsInScreen,
       getResolvedFeatureColor,
+      getPopulationUnestimatedOverlayColor: () => runtimeState.activeScenarioId === "tno_1962" && isPopulationActive(runtimeState)
+        ? POPULATION_UNESTIMATED_COLOR : null,
       LAND_FILL_COLOR,
       getPoliticalFeaturePathEntry,
       getScenarioWaterVisualRevisionToken,
@@ -12559,10 +12794,6 @@ function drawScenarioRegionOverlaysPass(k) {
   return getScenarioRegionOverlayRenderOwner().drawScenarioRegionOverlaysPass(k);
 }
 
-function drawHgoPreviewPass() {
-  return getHgoRuntimePreviewRenderOwner().drawPreviewPass();
-}
-
 function drawEffectsPass(k, options = undefined) {
   return getVisualEffectsPassOwner().drawEffectsPass(k, options);
 }
@@ -12572,7 +12803,7 @@ function drawLineEffectsPass(k, options = undefined) {
 }
 
 function drawTextureLabelEffectsPass(k) {
-  return getVisualEffectsPassOwner().drawTextureLabelEffectsPass(k);
+  return recordLabelPass("textureLabels", () => getVisualEffectsPassOwner().drawTextureLabelEffectsPass(k));
 }
 
 function drawContextBasePass(k, options = undefined) {
@@ -12595,14 +12826,6 @@ function drawDayNightPass(k, options = undefined) {
 }
 
 function drawBordersPass(k, { interactive = false } = {}) {
-  if (isHgoRuntimePreviewReady()) {
-    recordRenderPerfMetric("drawBordersPass", 0, {
-      interactive: !!interactive,
-      skipped: true,
-      reason: "hgo-runtime-preview",
-    });
-    return;
-  }
   if (!runtimeState.landData?.features?.length) return;
   drawHierarchicalBorders(k, { interactive });
 }
@@ -12682,6 +12905,12 @@ function getCountryLabelRenderOwner() {
       getTransform: () => runtimeState.zoomTransform,
       getLanguage: () => runtimeState.currentLanguage || "en",
       getCountryLabelSource: () => getCountryLabelSourceOwner().getSource(),
+      getCountryLabelColors: (code) => {
+        const luminance = getCanvasColorRelativeLuminance(getAdmin0BackgroundFillColor(code));
+        return Number.isFinite(luminance) && luminance < 0.18
+          ? { fill: "#f4f1e7", stroke: "rgba(16, 24, 32, 0.5)" }
+          : { fill: "#172b35", stroke: "rgba(255, 252, 241, 0.4)" };
+      },
     },
     helpers: {
       onInvalidate: () => {
@@ -12703,26 +12932,60 @@ function getCountryLabelRenderOwner() {
 }
 
 function drawLabelsPass(k, { interactive = false } = {}) {
-  if (isHgoRuntimePreviewReady()) {
-    recordRenderPerfMetric("drawLabelsPass", 0, {
-      interactive: !!interactive,
-      skipped: true,
-      reason: "hgo-runtime-preview",
-    });
-    return;
-  }
+  return recordLabelPass("labels", () => drawLabelsPassContent(k, { interactive }));
+}
+
+function recordLabelPass(passName, draw) {
+  if (exportRenderInProgress) return draw();
+  const context = rendererSurfaceHost.getContext();
+  const transform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity;
+  return labelDrawSnapshotOwner.capture(passName, context, {
+    transform, dpr: runtimeState.dpr, layout: getRenderPassLayout(passName),
+    signature: getRenderPassSignature(passName, transform),
+  }, (recordingContext) => withRenderTarget(recordingContext, draw));
+}
+
+function getNavigationLabelPassNames() {
+  return getActiveRenderPassNames().filter((name) => name === "labels" || name === "textureLabels");
+}
+
+function canReplayNavigationLabels(transform) {
+  const cache = getRenderPassCacheState();
+  const names = getNavigationLabelPassNames();
+  return names.every((name) => !cache.dirty[name]) && labelDrawSnapshotOwner.canReplay(names,
+    rendererSurfaceHost.getContext(), transform, runtimeState.dpr, getRenderPassSignature);
+}
+
+function replayNavigationLabels(transform) {
+  return labelDrawSnapshotOwner.replay(getNavigationLabelPassNames(), rendererSurfaceHost.getContext(),
+    transform, runtimeState.dpr, getRenderPassSignature);
+}
+
+function drawLabelsPassContent(k, { interactive = false } = {}) {
   drawBlankFeatureLabelsPass(k, { interactive });
   const occupiedBoxes = [];
   if (shouldShowMarineRegionNames(runtimeState.styleConfig, interactive)) {
     drawOrdinaryMarineLabels(k, occupiedBoxes);
   }
-  getCityPointsRenderOwner().drawLabelsPass(k, { interactive, occupiedBoxes });
+  // Keep capitals beside their symbols. Overview country titles take priority
+  // over ordinary city names; regional views favor the whole city layer.
+  const countryLabelsFirst = !interactive && !runtimeState.deferContextBasePass
+    && getMapLabelHierarchy(k, runtimeState).preferCountries;
+  let overviewLayout = null;
+  if (countryLabelsFirst) {
+    overviewLayout = getCityPointsRenderOwner().reserveOverviewLabelBoxes(k, occupiedBoxes);
+  } else {
+    getCityPointsRenderOwner().drawLabelsPass(k, { interactive, occupiedBoxes });
+  }
   if (!interactive && !runtimeState.deferContextBasePass) {
     if (runtimeState.styleConfig?.countryLabels?.enabled !== false) {
       getCountryLabelSourceOwner().prepare();
       const startedAt = nowMs();
       getCountryLabelRenderOwner().drawCountryLabels(k, { occupiedBoxes });
       recordRenderPerfMetric("countryLabels", nowMs() - startedAt, getCountryLabelRenderOwner().getDiagnostics());
+    }
+    if (countryLabelsFirst) {
+      getCityPointsRenderOwner().drawLabelsPass(k, { occupiedBoxes, overviewLayout });
     }
     getTransportOverviewRenderOwner().drawPendingLabels(k, { occupiedBoxes });
     getPhysicalLayerRenderOwner().drawPhysicalRegionLabels(k, { occupiedBoxes });
@@ -12979,14 +13242,15 @@ function canDrawTransformedPass(passName, cache = getRenderPassCacheState(), { a
 }
 
 function canBuildInteractionComposite(cache = getRenderPassCacheState()) {
-  return INTERACTION_COMPOSITE_PASS_NAMES.every((passName) => canDrawTransformedPass(passName, cache));
+  return getActiveInteractionCompositePassNames().every((passName) => canDrawTransformedPass(passName, cache));
 }
 
 function buildInteractionComposite(currentTransform, timings) {
   if (!rendererSurfaceHost.getContext()?.canvas || !canBuildInteractionComposite(getRenderPassCacheState())) return false;
   const cache = getRenderPassCacheState();
   const identity = getVisibleFrameIdentity(currentTransform);
-  const coverage = getCachedPassCompositorOwner().getCompositeCoverage(INTERACTION_COMPOSITE_PASS_NAMES, currentTransform);
+  const passNames = getActiveInteractionCompositePassNames();
+  const coverage = getCachedPassCompositorOwner().getCompositeCoverage(passNames, currentTransform);
   if (!coversViewport(coverage, identity.pixelWidth / identity.dpr, identity.pixelHeight / identity.dpr)) return false;
   const compositeCanvas = ensureInteractionCompositeCanvas();
   const compositeContext = compositeCanvas.getContext("2d");
@@ -12996,7 +13260,7 @@ function buildInteractionComposite(currentTransform, timings) {
   const startedAt = nowMs();
   compositeContext.setTransform(1, 0, 0, 1, 0, 0);
   compositeContext.clearRect(0, 0, compositeCanvas.width, compositeCanvas.height);
-  const result = composeRenderPassesToTarget(compositeContext, INTERACTION_COMPOSITE_PASS_NAMES, currentTransform, {
+  const result = composeRenderPassesToTarget(compositeContext, passNames, currentTransform, {
     requireAllPasses: true, targetOffsetX: layout.offsetX, targetOffsetY: layout.offsetY,
   });
   if (!result.ok) return false;
@@ -13026,7 +13290,7 @@ function buildInteractionComposite(currentTransform, timings) {
   recordRenderPerfMetric("interactionCompositeBuild", nowMs() - startedAt, {
     phase: String(runtimeState.renderPhase || ""),
     activeScenarioId: String(runtimeState.activeScenarioId || ""),
-    passCount: INTERACTION_COMPOSITE_PASS_NAMES.length,
+    passCount: passNames.length,
   });
   return true;
 }
@@ -13120,7 +13384,7 @@ let exportRenderInProgress = false;
 async function ensureCountryLabelsReadyForExport(passNames) {
   if (!passNames.includes("labels")) return;
   await waitForCountryLabelsForExport({
-    isDisabled: () => isHgoRuntimePreviewReady() || runtimeState.styleConfig?.countryLabels?.enabled === false,
+    isDisabled: () => runtimeState.styleConfig?.countryLabels?.enabled === false,
     prepareSource: () => getCountryLabelSourceOwner().prepare(),
     getSource: () => getCountryLabelSourceOwner().getSource(),
     getDiagnostics: () => getCountryLabelRenderOwner().getDiagnostics(),
@@ -13132,11 +13396,16 @@ async function ensureCountryLabelsReadyForExport(passNames) {
 }
 
 function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
-  if (passNames.includes("political") || passNames.includes("borders")) getRiverPaintRuntime(runtimeState).assertReadyForExport();
+  passNames = filterCurrentEnabledRenderPasses(passNames);
+  if (passNames.includes("populationHeatmap")) assertPopulationHeatmapReadyForExport();
+  const riverPartitionsRequired = !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState);
+  if (riverPartitionsRequired && (passNames.includes("political") || passNames.includes("borders"))) {
+    getRiverPaintRuntime(runtimeState).assertReadyForExport();
+  }
   const width = Number(runtimeState.colorCanvas?.width || 0);
   const height = Number(runtimeState.colorCanvas?.height || 0);
   if (!width || !height) return null;
-  if (passNames.includes("labels") && !isHgoRuntimePreviewReady()
+  if (passNames.includes("labels")
     && runtimeState.styleConfig?.countryLabels?.enabled !== false) {
     const sourceStatus = getCountryLabelSourceOwner().getSource().status;
     const labelStatus = countryLabelRenderOwner?.getDiagnostics();
@@ -13145,12 +13414,12 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
       throw new Error("Country names are still preparing or failed to prepare; wait for labels before exporting, or disable country names.");
     }
   }
-  if (passNames.includes("borders") && !isHgoRuntimePreviewReady()) {
+  if (passNames.includes("borders")) {
     const contourStatus = getPaintContourRuntimeOwner().diagnostics().status;
     if (contourStatus === "building" || contourStatus === "error") {
       throw new Error(`Paint contours are ${contourStatus}; prepare contours before exporting borders.`);
     }
-    if (hasVisibleRiverPartitions() && getRiverInternalContourOwner().diagnostics().status !== "ready") {
+    if (riverPartitionsRequired && hasVisibleRiverPartitions() && getRiverInternalContourOwner().diagnostics().status !== "ready") {
       throw new Error("River internal contours are not ready; prepare contours before exporting borders.");
     }
     const politicalStatus = getPoliticalBorderRuntimeOwner().diagnostics().status;
@@ -13211,6 +13480,8 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   // An export has its own pixel density and pass canvases. Keep the visible frame's
   // cache object intact, including its reference transforms and water-layer cache.
   const visibleCache = runtimeState.renderPassCache;
+  const releaseVisibleScope = getRenderCacheOwner().retainSurfaceCacheForScope(visibleCache);
+  const previousExportState = exportRenderInProgress;
   const visibleDpr = runtimeState.dpr;
   const transform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity;
   const requestedPasses = new Set(passNames);
@@ -13229,9 +13500,13 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
     const result = composeRenderPassesToTarget(exportContext, passNames, transform, { requireAllPasses: true });
     if (!result.ok) throw new Error(`Export composition failed: ${result.reason}.`);
   } finally {
+    const exportCache = runtimeState.renderPassCache;
     commitRenderPassCacheState(runtimeState, visibleCache);
     runtimeState.dpr = visibleDpr;
-    exportRenderInProgress = false;
+    getRenderCacheOwner().releaseSurfaceCache(exportCache);
+    releaseVisibleScope();
+    getRenderCacheOwner().syncSurfaceResourceAccounting();
+    exportRenderInProgress = previousExportState;
     riverContourRenderOwner?.dispose();
   }
   return exportCanvas;
@@ -13277,6 +13552,41 @@ function promoteDeferredColorRenderToIdle() {
     reason: String(getRenderPassCacheState().reasons?.political || ""),
   });
   return true;
+}
+
+let previousActiveRenderPassSignature = "";
+let previousRenderSceneKey = "";
+const visibleSurfaceResourceOwner = Symbol("renderer-visible-surfaces");
+function syncVisibleSurfaceResourceAccounting() {
+  const surfaces = new Set([
+    rendererSurfaceHost.getMapCanvas(), rendererSurfaceHost.getHitCanvas(),
+    rendererSurfaceHost.getPoliticalPatchCanvas(), rendererSurfaceHost.getInteractionOverlayCanvas(),
+    ...Object.values(rendererSurfaceHost.getCanvasLayers() || {}).map((layer) => layer?.canvas),
+  ].filter(Boolean));
+  const bytes = [...surfaces].reduce((sum, canvas) => sum + canvas.width * canvas.height * 4, 0);
+  pageResourceBudget.update(visibleSurfaceResourceOwner, { bitmaps: bytes });
+}
+function reconcileRenderFrameResources() {
+  navigationExactRefreshNeeded = false;
+  const sceneKey = JSON.stringify([runtimeState.activeScenarioId, runtimeState.sceneGeneration,
+    getProjectionGeometryGeneration(rendererSurfaceHost.getProjection())]);
+  if (sceneKey !== previousRenderSceneKey) {
+    previousRenderSceneKey = sceneKey;
+    politicalBackgroundRenderOwner?.releaseScenarioPoliticalBackgroundCache("root-scene-change");
+    labelDrawSnapshotOwner.clear();
+    navigationSceneOwner?.clear();
+  }
+  const activePassNames = getActiveRenderPassNames();
+  const activeSignature = activePassNames.join("|");
+  if (activeSignature !== previousActiveRenderPassSignature) {
+    previousActiveRenderPassSignature = activeSignature;
+    exactCompositeReuseOwner?.invalidate();
+    invalidateInteractionComposite("active-passes");
+    clearLastGoodFrame("active-passes");
+    navigationSceneOwner?.clear();
+    labelDrawSnapshotOwner.clear();
+  }
+  if (getRenderCacheOwner().releaseInactivePassSurfaces(activePassNames)) exactCompositeReuseOwner?.invalidate();
 }
 
 function drawCanvas() {
@@ -13660,16 +13970,12 @@ function getProjectedPoint(coord) {
 }
 
 function projectStrategicPoints(points = []) {
-  return points.map((point) => getProjectedPoint(point)).filter(Boolean);
+  const segments = projectOperationGraphicSegments(points, rendererSurfaceHost.getProjection(), globalThis.d3);
+  return segments.reduce((best, segment) => segment.length > best.length ? segment : best, []);
 }
 
 function createOperationGraphicPath(points = [], { closed = false, curved = true } = {}) {
-  const projected = projectStrategicPoints(points);
-  if (projected.length < (closed ? 3 : 2) || !globalThis.d3?.line) return "";
-  const curve = closed
-    ? (curved ? globalThis.d3.curveCatmullRomClosed.alpha(0.5) : globalThis.d3.curveLinearClosed)
-    : (curved ? globalThis.d3.curveCatmullRom.alpha(0.5) : globalThis.d3.curveLinear);
-  return globalThis.d3.line().curve(curve)(projected) || "";
+  return createProjectedOperationGraphicPath(points, rendererSurfaceHost.getProjection(), globalThis.d3, { closed, curved });
 }
 
 function getOperationGraphicById(id) {
@@ -13902,7 +14208,16 @@ function render() {
     if (setCanvasSize({ reason: "display-quality-change" })) markAllOverlaysDirty();
   }
   ensureResolvedColorsReadyForStableVisibleFrame("render");
+  const rasterActivation = isPoliticalIdRasterSelected() ? `${runtimeState.activeScenarioId}:${runtimeState.sceneGeneration}:${readPoliticalRenderPolicy().effectiveMode}` : "";
+  if (rasterActivation !== politicalIdRasterActivationKey) {
+    politicalIdRasterActivationKey = rasterActivation;
+    // Preserve the current native frame while the initial assets load. The
+    // producer invalidates this pass when complete coverage becomes available.
+    if (rasterActivation) getPoliticalIdRasterRuntimeOwner().prepare();
+    else invalidateRenderPasses(["political"], "political-id-raster-activation");
+  }
   drawCanvas();
+  publishPoliticalIdRasterStatus(getPoliticalIdRasterDiagnostics());
   if (runtimeState.renderPhase === RENDER_PHASE_IDLE) {
     scheduleHitCanvasBuildIfNeeded();
   }
@@ -14459,17 +14774,7 @@ function normalizeDevInteractionHit(hit = null) {
     viaSnap: !!hit.viaSnap,
     strict: !!hit.strict,
   };
-  if (targetType === "hgo") {
-    const hgoRuntime = normalizeHgoRuntimeHitPayload(hit.hgoRuntime);
-    if (hgoRuntime) {
-      normalized.hgoRuntime = hgoRuntime;
-    }
-  }
   return normalized;
-}
-
-function normalizeHgoRuntimeHitPayload(payload = null) {
-  return getHgoRuntimePreviewRenderOwner().normalizeHitPayload(payload);
 }
 
 function getDevInteractionHitSignature(hit = null) {
@@ -14916,15 +15221,6 @@ function applyWaterRegionFill(targetId, selectedColor, { kind = "fill-water-regi
   return true;
 }
 
-function executeSingleSubdivisionFill(action) {
-  if (!action) return false;
-  const targetIds = action.eventPayload?.targetIds || [action.featureId];
-  return applyVisualSubdivisionFill(targetIds, action.selectedColor, {
-    kind: "fill-feature-color",
-    dirtyReason: "fill-feature-color",
-  });
-}
-
 function executeDoubleClickBatchFill(feature, featureId, event = null) {
   if (!feature || !featureId) return false;
   const leadingClick = lastQuickFillLeafClick;
@@ -14961,7 +15257,10 @@ function executeDoubleClickBatchFill(feature, featureId, event = null) {
 function composeBrushInteractionSessionOwner() {
   const owner = createBrushInteractionSessionOwner(runtimeState, {
     getBrushSession: () => brushSession,
-    setBrushSession: (session) => { brushSession = session; },
+    setBrushSession: (session) => {
+      brushSession = session;
+      if (!session) politicalIdRasterRuntimeOwner?.finishNativePartialRepaint();
+    },
     suppressNextClick: () => { suppressNextClickAfterBrush = true; },
     getContext: () => rendererSurfaceHost.getContext(),
     nowMs,
@@ -15149,10 +15448,6 @@ function updateMap(transform) {
   return getRendererViewportUpdateOwner().updateMap(transform);
 }
 
-function getProjectedHgoRuntimePreviewBounds() {
-  return getHgoRuntimePreviewRenderOwner().getProjectedBounds();
-}
-
 function getProjectedRenderableContentBounds() {
   return getViewportReadModelOwner().getProjectedRenderableContentBounds();
 }
@@ -15177,8 +15472,8 @@ function getZoomPercent() {
   return getViewportReadModelOwner().getZoomPercent();
 }
 
-function enforceZoomConstraints() {
-  return getViewportCommandOwner().enforceZoomConstraints();
+function enforceZoomConstraints(options) {
+  return getViewportCommandOwner().enforceZoomConstraints(options);
 }
 
 function fitProjection({ skipSpatialIndex = false } = {}) {
@@ -15387,6 +15682,8 @@ function resetRendererTransactionState({
   hitCanvasDirty = false,
 } = {}) {
   contextLayerRenderScheduler.reset();
+  politicalIdRasterRuntimeOwner?.dispose();
+  politicalIdRasterRuntimeOwner = null;
   paintContourRuntimeOwner?.dispose();
   riverInternalContourOwner?.dispose();
   riverInternalContourOwner = null;
@@ -15567,10 +15864,28 @@ export { RENDER_PASS_NAMES } from "./map_renderer/render_pass_catalog.js";
 // Read existing owners only: observing completion must never schedule work.
 export function getRendererAsyncWorkStatus() {
   return {
-    geometryPendingCount: geometryRasterRuntimeOwner?.getPendingWorkCount() || 0,
+    geometryPendingCount: (geometryRasterRuntimeOwner?.getPendingWorkCount() || 0)
+      + (politicalIdRasterRuntimeOwner?.getPendingWorkCount() || 0),
     borderScheduled: (staticBorderMeshLifecycle?.hasPendingWork() || paintContourRuntimeOwner?.hasPendingWork()) || false,
     exactPending: !!runtimeState.deferExactAfterSettle || !!runtimeState.exactAfterSettleHandle,
   };
+}
+
+export function getPoliticalIdRasterDiagnostics() {
+  const reason = getPoliticalIdRasterEligibilityReason();
+  const current = politicalIdRasterRuntimeOwner?.getDiagnostics();
+  const policy = readPoliticalRenderPolicy();
+  const passes = politicalPassOrchestratorOwner?.getDiagnostics() || {};
+  return { ...current, ...policy, passes,
+    actualBackend: passes.lastBackend || "none", sourceCoverage: policy.persistent ? "complete-display-v1" : "fine",
+    runtimeVersion: "raster-r0-r2-v1", selected: reason === "eligible",
+    pending: current?.pending || 0,
+    displayState: reason === "off" ? "off" : reason !== "eligible" ? "fallback" : current?.displayState || "preparing",
+    reason: reason === "eligible" ? current?.reason || "awaiting-render" : reason };
+}
+
+export async function capturePoliticalIdRasterAssets() {
+  return politicalIdRasterRuntimeOwner?.exportAssets() || [];
 }
 
 export {

@@ -1024,6 +1024,8 @@ export function createProjectSupportDiagnosticsController({
     modeText.textContent = t("生成模式", "ui");
     const modeSelect = document.createElement("select");
     modeSelect.className = "legend-generator-select";
+    modeSelect.setAttribute("aria-label", t("生成模式", "ui"));
+    modeSelect.setAttribute("data-i18n-aria-label", "生成模式");
     [
       ["weighted-random", t("加权随机", "ui")],
       ["direct-area", t("按实控面积", "ui")],
@@ -1044,6 +1046,8 @@ export function createProjectSupportDiagnosticsController({
     continentText.textContent = t("大洲", "ui");
     const continentSelect = document.createElement("select");
     continentSelect.className = "legend-generator-select";
+    continentSelect.setAttribute("aria-label", t("大洲", "ui"));
+    continentSelect.setAttribute("data-i18n-aria-label", "大洲");
     legendManager.getContinentOptions().forEach((entry) => {
       const option = document.createElement("option");
       option.value = entry.id;

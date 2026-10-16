@@ -1,3 +1,5 @@
+import { recordContextLayerPublication } from "../context_layer_revision.js";
+
 // Publish display aliases without mutating the immutable per-pack cache entries.
 export function commitPhysicalContourDisplayState(target, { major, minor } = {}) {
   const changed = [];
@@ -11,7 +13,13 @@ export function commitPhysicalContourDisplayState(target, { major, minor } = {})
     target.physicalContourMinorData = minor;
     changed.push("physical_contours_minor");
   }
-  if (changed.length) target.contextLayerRevision = (Number(target.contextLayerRevision) || 0) + 1;
+  if (changed.length) {
+    const previousRevision = Number(target.contextLayerRevision) || 0;
+    target.contextLayerRevision = previousRevision + 1;
+    recordContextLayerPublication(target, previousRevision,
+      changed.map(layer => layer === "physical_contours_major"
+        ? target.physicalContourMajorData : target.physicalContourMinorData));
+  }
   return changed;
 }
 

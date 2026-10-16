@@ -6,13 +6,6 @@ function normalizeGeoCountryCode(rawValue) {
   return /^[A-Z]{2,3}$/.test(normalized) ? normalized : "";
 }
 
-function extractCountryCodeFromFeatureId(rawValue) {
-  const text = String(rawValue || "").trim().toUpperCase();
-  if (!text) return "";
-  const match = text.match(/^([A-Z]{2,3})(?:[_-]|$)/);
-  return normalizeGeoCountryCode(match?.[1] || "");
-}
-
 function resolveFeatureGeoCountryCode(feature) {
   return normalizeGeoCountryCode(getSharedFeatureCountryCode(feature));
 }

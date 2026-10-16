@@ -1,3 +1,6 @@
+import { getThematicWgiSignature } from "../thematic_wgi_view_model.js";
+import { getPopulationSignature } from "../population_spatial_view_model.js";
+import { getPopulationHeatmapSnapshot } from "../population_spatial_runtime.js";
 import {
   normalizeIntensityFieldsState, normalizePhysicalStyleConfig,
   normalizeTextureStyleConfig, normalizeUrbanStyleConfig,
@@ -62,9 +65,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   getViewportRenderSignature,
   getPhysicalLandMaskInfo,
   getScenarioRuntimeTopologySignatureToken,
-  getHgoRuntimePreviewVisibilitySignature,
-  getHgoRuntimePreviewProjectionOptions,
-  isHgoRuntimePreviewReady,
   rendererSurfaceHost,
   getContextBaseZoomBucketId,
   shouldRefreshContextBaseForColorChanges,
@@ -107,13 +107,32 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   }
 
   function getTransportPresentationSignatureParts() {
+    const dataParts = [];
+    if (runtimeState.showTransport) {
+      const overlayState = runtimeState.transportCountryOverlayState;
+      for (const [family, visible, field, layer] of [
+        ["road", runtimeState.showRoad, "roadsData", "roads"],
+        ["rail", runtimeState.showRail, "railwaysData", "railways"],
+        ["airport", runtimeState.showAirports, "airportsData", "airports"],
+        ["port", runtimeState.showPorts, "portsData", "ports"],
+      ]) {
+        if (!visible) continue;
+        const familyOverlay = overlayState?.overlaysByFamily?.[family];
+        const overlay = familyOverlay?.status === "ready" ? familyOverlay
+          : overlayState?.status === "ready" && overlayState.family === family ? overlayState : null;
+        dataParts.push(getObjectIdentityToken(runtimeState[field]),
+          getObjectIdentityToken(overlay?.collectionsByLayer?.[layer]));
+        if (family === "rail") dataParts.push(getObjectIdentityToken(runtimeState.railStationsMajorData),
+          getObjectIdentityToken(overlay?.collectionsByLayer?.rail_stations_major));
+      }
+    }
     return [
       runtimeState.showTransport ? "transport:on" : "transport:off",
       runtimeState.showRoad ? "road:on" : "road:off",
       runtimeState.showAirports ? "airports:on" : "airports:off",
       runtimeState.showPorts ? "ports:on" : "ports:off",
       runtimeState.showRail ? "rail:on" : "rail:off",
-      `context:${Number(runtimeState.contextLayerRevision || 0)}`,
+      ...dataParts,
       `scene:${Number(runtimeState.sceneGeneration || 0)}`,
       `scenario-data:${Number(runtimeState.scenarioDataGeneration || 0)}`,
       `language:${String(runtimeState.currentLanguage || "en")}`,
@@ -129,6 +148,8 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       getDebugMode(),
       runtimeState.topologyBundleMode || "single",
       runtimeState.strategicChoroplethMetric || "",
+      getThematicWgiSignature(runtimeState),
+      getPopulationSignature(runtimeState),
       runtimeState.scenarioStrategicValuesRevision || 0,
       stableJson(runtimeState.styleConfig?.strategicValues || {}),
     ].join("::");
@@ -151,6 +172,17 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   function getRenderPassSignature(passName, transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
     const transformSignature = getRenderPassTransformSignature(passName, transform);
     const intensityFields = normalizeIntensityFieldsState(runtimeState.intensityFields);
+    if (passName === "populationHeatmap") {
+      const snapshot = getPopulationHeatmapSnapshot(runtimeState);
+      const maskInfo = getPhysicalLandMaskInfo();
+      return [transformSignature, getViewportRenderSignature(), runtimeState.dpr,
+        getPassTopologyRevision(passName), getPopulationSignature(runtimeState),
+        snapshot.status, snapshot.version, snapshot.revision,
+        getObjectIdentityToken(rendererSurfaceHost.getProjection()),
+        getScenarioRuntimeTopologySignatureToken(),
+        `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}`,
+        getScenarioOverlaySignatureToken()].join("::");
+    }
     if (passName === "background") {
       const { showRegionNames: _showRegionNames, ...oceanPaintStyle } = runtimeState.styleConfig?.ocean || {};
       return [
@@ -187,24 +219,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     if (passName === "political") {
       return [
         runtimeState.colorRevision || 0,
-        getHgoRuntimePreviewVisibilitySignature(),
         getPoliticalPassStaticSignature(transform),
-      ].join("::");
-    }
-    if (passName === "hgoPreview") {
-      const preview = runtimeState.hgoRuntimePreview || {};
-      const summary = preview.summary || {};
-      const hgoProjectionOptions = getHgoRuntimePreviewProjectionOptions();
-      return [
-        isHgoRuntimePreviewReady() ? "hgo:on" : "hgo:off",
-        String(preview.status || ""),
-        Number(runtimeState.dpr || 1).toFixed(2),
-        Number(runtimeState.width || 0),
-        Number(runtimeState.height || 0),
-        rendererSurfaceHost.getProjection() ? transformSignature : "projection:none",
-        hgoProjectionOptions.projectionName,
-        hgoProjectionOptions.sourceProjection,
-        `seed:${Number(summary.provinceCount || summary.province_count || 0)}:${Number(summary.stateCount || summary.state_count || 0)}:${Number(summary.countryCount || summary.country_count || 0)}`,
       ].join("::");
     }
     if (passName === "effects") {
@@ -227,7 +242,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       const baseSignatureParts = [
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
-        getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.deferContextBasePass ? "context-base:deferred" : "context-base:ready",
         `bucket:${zoomBucket}`,
         runtimeState.showPhysical ? "physical:on" : "physical:off",
@@ -272,7 +286,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         transformSignature,
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
-        getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.deferContextBasePass ? "context-markers:deferred" : "context-markers:ready",
         runtimeState.showCityPoints ? "cities:on" : "cities:off",
         runtimeState.showStrategicResourceMarkers ? "strategic-resources:on" : "strategic-resources:off",
@@ -290,7 +303,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         stableJson(runtimeState.styleConfig?.physical?.atlasClassVisibility || {}),
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
-        getHgoRuntimePreviewVisibilitySignature(),
         `marine-data:${String(runtimeState.waterRegionsDataToken || "")}:${String(runtimeState.scenarioWaterOverlayVersionTag || "")}`,
         runtimeState.styleConfig?.ocean?.showRegionNames === true ? "marine-labels:on" : "marine-labels:off",
         runtimeState.styleConfig?.countryLabels?.enabled !== false ? "country-labels:on" : "country-labels:off",
@@ -310,8 +322,8 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         transformSignature,
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
-        getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.scenarioReliefOverlayRevision || 0,
+        getPopulationSignature(runtimeState),
         `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
         `scenario-overlays:${getScenarioOverlaySignatureToken()}`,
         runtimeState.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
@@ -326,7 +338,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     if (passName === "textureLabels") {
       return [
         transformSignature,
-        getHgoRuntimePreviewVisibilitySignature(),
         getPassTopologyRevision(passName),
         stableJson(normalizeTextureStyleConfig(runtimeState.styleConfig?.texture || {})),
       ].join("::");
@@ -342,7 +353,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         runtimeState.showWaterRegions ? "water:on" : "water:off",
         runtimeState.showScenarioAtlantropa !== false ? "atlantropa:on" : "atlantropa:off",
         getScenarioOverlaySignatureToken(),
-        getHgoRuntimePreviewVisibilitySignature(),
         getPassTopologyRevision(passName),
         getBorderAppearanceRevision(),
         getPaintContourRevision(),

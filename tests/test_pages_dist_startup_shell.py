@@ -326,6 +326,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "dist/app/js",
             "dist/app/css",
             "dist/app/vendor",
+            "dist/hgo",
             "dist/pages-dist-manifest.json",
         )
         tracked_paths = [line.strip() for line in result.stdout.splitlines() if line.strip()]
@@ -336,11 +337,12 @@ class PagesDistStartupShellTest(unittest.TestCase):
         ]
         self.assertEqual([], uncovered)
 
-        package_text = (REPO_ROOT / "package.json").read_text(encoding="utf-8")
+        package_scripts = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))["scripts"]
         workflow_text = VERIFY_SHARED_WORKFLOW.read_text(encoding="utf-8")
         for spec in pathspecs:
             with self.subTest(spec=spec):
-                self.assertIn(spec, package_text)
+                for script_name in ("verify:pages-dist-and-drift", "verify:dist-drift"):
+                    self.assertIn(spec, package_scripts[script_name], script_name)
                 self.assertIn(spec, workflow_text)
 
     def test_landing_generated_cartography_assets_exist(self) -> None:

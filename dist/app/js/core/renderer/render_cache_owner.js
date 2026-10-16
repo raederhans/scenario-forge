@@ -5,8 +5,10 @@
  * primitives. map_renderer.js keeps diagnostics, adjacent render side effects,
  * render pass orchestration, and visible-frame transactions.
  */
+import { createRenderCacheSurfaceResources } from "./render_cache_surface_resources.js";
 import { createRenderCacheValidationScope } from "./render_cache_validation_scope.js";
 import { surfaceCoversViewport } from "./cached_surface_coverage.js";
+import { pageResourceBudget } from "../runtime_resource_budget.js";
 const LAST_GOOD_FRAME_VISUAL_INVALIDATION_PASS_NAMES = new Set([
   "political", "contextBase",
   "contextScenario",
@@ -27,6 +29,7 @@ export function createRenderCacheOwner({
   constants = {},
   getters = {},
   helpers = {},
+  resourceBudget = pageResourceBudget,
 } = {}) {
   const {
     interactionCompositePassNames = [],
@@ -36,6 +39,7 @@ export function createRenderCacheOwner({
   } = constants;
   const {
     getContext = () => null,
+    getActiveInteractionCompositePassNames = () => interactionCompositePassNames,
   } = getters;
   const {
     cloneZoomTransform = (transform) => transform,
@@ -71,7 +75,7 @@ export function createRenderCacheOwner({
   }
 
   function hasInteractionCompositePass(passNames) {
-    return passNames.some((passName) => interactionCompositePassNames.includes(passName));
+    return passNames.some((passName) => getActiveInteractionCompositePassNames().includes(passName));
   }
 
   function createMutationSummary({
@@ -116,10 +120,19 @@ export function createRenderCacheOwner({
     };
   }
 
-  const { getRenderPassCacheState, withValidatedCache } = composeRenderCacheValidationScope(
+  const { getRenderPassCacheState: getValidatedCacheState, withValidatedCache } = composeRenderCacheValidationScope(
     state,
     ensureRenderPassCacheState, cloneZoomTransform, renderPassNames,
   );
+  const {
+    getRenderPassCacheState, syncSurfaceResourceAccounting, retainSurfaceCacheForScope,
+    releaseSurfaceCache, releaseInactivePassSurfaces, clearContextScenarioLayerSurfaces,
+    getContextScenarioLayerCacheEntry, clearContextScenarioLayerIdentity,
+  } = createRenderCacheSurfaceResources({
+    initialCache: state.renderPassCache || null, getValidatedCacheState,
+    renderPassNames, resourceBudget,
+    invalidateInteractionComposite, invalidateLastGoodFrame,
+  });
 
   function invalidateLastGoodFrame(reason = "visual-invalidation") {
     const cache = getRenderPassCacheState();
@@ -296,23 +309,6 @@ export function createRenderCacheOwner({
     return layout;
   }
 
-  function getContextScenarioLayerCacheEntry(layerName) {
-    const cache = getRenderPassCacheState();
-    const resolvedLayerName = String(layerName || "default").trim() || "default";
-    const existing = cache.contextScenarioLayerCache?.[resolvedLayerName];
-    if (existing && typeof existing === "object") {
-      return existing;
-    }
-    const next = {
-      canvas: null,
-      signature: "",
-      referenceTransform: null,
-      renderedCount: 0,
-    };
-    cache.contextScenarioLayerCache[resolvedLayerName] = next;
-    return next;
-  }
-
   function ensureContextScenarioLayerCanvas(layerName) {
     const layerEntry = getContextScenarioLayerCacheEntry(layerName);
     if (!layerEntry.canvas) {
@@ -327,6 +323,7 @@ export function createRenderCacheOwner({
       layerEntry.canvas.height = layout.pixelHeight;
       clearContextScenarioLayerIdentity(layerEntry);
     }
+    syncSurfaceResourceAccounting();
     return layerEntry.canvas;
   }
 
@@ -377,12 +374,6 @@ export function createRenderCacheOwner({
     });
   }
 
-  function clearContextScenarioLayerIdentity(entry) {
-    entry.signature = "";
-    entry.referenceTransform = null;
-    entry.renderedCount = 0;
-  }
-
   function renderContextScenarioLayer(layerName, currentTransform, { draw, getSignature }) {
     const entry = getContextScenarioLayerCacheEntry(layerName);
     const canvas = ensureContextScenarioLayerCanvas(layerName);
@@ -414,6 +405,7 @@ export function createRenderCacheOwner({
       if (canvas.width !== layout.pixelWidth) canvas.width = layout.pixelWidth;
       if (canvas.height !== layout.pixelHeight) canvas.height = layout.pixelHeight;
     });
+    syncSurfaceResourceAccounting();
   }
 
   function ensureRenderPassCanvas(passName) {
@@ -447,6 +439,7 @@ export function createRenderCacheOwner({
     const canvas = cache.lastGoodFrame.canvas;
     if (canvas.width !== width) canvas.width = width;
     if (canvas.height !== height) canvas.height = height;
+    syncSurfaceResourceAccounting();
     return cache.lastGoodFrame.canvas;
   }
 
@@ -458,12 +451,13 @@ export function createRenderCacheOwner({
       canvas.height = 1;
       cache.interactionComposite.canvas = canvas;
     }
-    const layout = getRenderPassLayout(interactionCompositePassNames[0]);
+    const layout = getRenderPassLayout(getActiveInteractionCompositePassNames()[0]);
     const { pixelWidth: width, pixelHeight: height } = layout;
     const canvas = cache.interactionComposite.canvas;
     if (canvas.width !== width) canvas.width = width;
     if (canvas.height !== height) canvas.height = height;
     cache.interactionComposite.layout = { ...layout };
+    syncSurfaceResourceAccounting();
     return cache.interactionComposite.canvas;
   }
 
@@ -482,6 +476,7 @@ export function createRenderCacheOwner({
     const canvas = cache.compositeBuffer.canvas;
     if (canvas.width !== width) canvas.width = width;
     if (canvas.height !== height) canvas.height = height;
+    syncSurfaceResourceAccounting();
     return cache.compositeBuffer.canvas;
   }
 
@@ -535,7 +530,8 @@ export function createRenderCacheOwner({
       const sharedReferenceTransformCleared = !!cache.referenceTransform;
       cache.referenceTransform = null;
       cache.referenceTransforms = {};
-      cache.contextScenarioLayerCache = {};
+      clearContextScenarioLayerSurfaces(cache);
+      syncSurfaceResourceAccounting();
       clearPassFullReferenceTransforms();
       const interactionComposite = getInteractionCompositeEffect(
         invalidateInteractionComposite(normalizedReason),
@@ -614,7 +610,7 @@ export function createRenderCacheOwner({
   }
 
   function getInteractionCompositeSignature(cache = getRenderPassCacheState()) {
-    return interactionCompositePassNames.map((passName) => [
+    return getActiveInteractionCompositePassNames().map((passName) => [
       passName,
       String(cache.signatures?.[passName] || ""),
       getTransformSignature(getPassReferenceTransform(passName)),
@@ -644,7 +640,8 @@ export function createRenderCacheOwner({
       mismatchReasons.push("canvas-size-mismatch");
     }
     if (Number(composite.colorRevision || 0) !== identity.colorRevision) mismatchReasons.push("color-revision-mismatch");
-    if (!surfaceCoversViewport(composite, currentTransform, identity)) mismatchReasons.push("coverage-mismatch");
+    if (composite.canvas.width === 0 || composite.canvas.height === 0
+      || !surfaceCoversViewport(composite, currentTransform, identity)) mismatchReasons.push("coverage-mismatch");
     return mismatchReasons;
   }
 
@@ -695,6 +692,10 @@ export function createRenderCacheOwner({
 
   return Object.freeze({
     withValidatedCache,
+    syncSurfaceResourceAccounting,
+    retainSurfaceCacheForScope,
+    releaseSurfaceCache,
+    releaseInactivePassSurfaces,
     scenarioLayerCache: Object.freeze({
       getSnapshot: getContextScenarioLayerSnapshot,
       render: renderContextScenarioLayer,

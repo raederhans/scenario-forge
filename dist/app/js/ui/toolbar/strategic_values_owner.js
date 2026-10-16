@@ -1,3 +1,5 @@
+import { setThematicWgiStyleState } from "../../core/state/actions/thematic_wgi_actions.js";
+import { setPopulationStyleState } from "../../core/state/actions/population_spatial_actions.js";
 import { patchAppearanceStyleGroupState } from "../../core/state/actions/appearance_actions.js";
 import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
 import { isStrategicChoroplethMetric } from "../../core/renderer/strategic_choropleth.js";
@@ -214,6 +216,12 @@ export function createStrategicValuesOwner({
     bind("strategicChoroplethMetric", "change", (event) => {
       const metric = String(event.target.value || "");
       setAppearanceVisibilityState(runtimeState, "strategicChoroplethMetric", isStrategicChoroplethMetric(metric) ? metric : "");
+      if (runtimeState.strategicChoroplethMetric && runtimeState.styleConfig?.thematic?.enabled) {
+        setThematicWgiStyleState(runtimeState, { ...runtimeState.styleConfig.thematic, enabled: false });
+      }
+      if (runtimeState.strategicChoroplethMetric && runtimeState.styleConfig?.population?.enabled) {
+        setPopulationStyleState(runtimeState, { ...runtimeState.styleConfig.population, enabled: false });
+      }
       if (runtimeState.strategicChoroplethMetric) void load("toolbar-strategic-choropleth");
       persist(); renderDirty("strategic-choropleth-metric"); render();
     });

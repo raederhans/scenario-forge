@@ -1,3 +1,6 @@
+import { getMapLabelHierarchy } from "./map_label_hierarchy.js";
+import { doScreenLabelBoxesOverlap } from "./screen_label_placement.js";
+
 const DEFAULT_ZOOM_IDENTITY = Object.freeze({ x: 0, y: 0, k: 1 });
 const CITY_MARKER_SPRITE_CACHE_LIMIT = 256;
 export function resolveSettlementRank(entry) {
@@ -381,7 +384,7 @@ export function createCityPointsRenderOwner({
     };
   }
 
-  function drawCityMarkersFromEntries(markerEntries, { config, scale, opacity, interactive = false, occupiedBoxes, layoutOnly = false } = {}) {
+  function drawCityMarkersFromEntries(markerEntries, { config, scale, opacity, interactive = false, occupiedBoxes, layoutOnly = false, avoidCollisions = false } = {}) {
     syncRenderTargets();
     if (!context || !Array.isArray(markerEntries) || !markerEntries.length) return [];
     const drawnEntries = [];
@@ -408,6 +411,11 @@ export function createCityPointsRenderOwner({
         };
       const sprite = getCityMarkerSprite(spriteEntry, config, pixelDensity);
       if (!sprite?.canvas) return;
+      const markerBox = entry.screenPoint ? {
+        x: entry.screenPoint[0] - sprite.anchorX, y: entry.screenPoint[1] - sprite.anchorY,
+        w: sprite.width, h: sprite.height,
+      } : null;
+      if (avoidCollisions && markerBox && occupiedBoxes?.some((box) => doScreenLabelBoxesOverlap(markerBox, box))) return;
       const drawWidth = sprite.width / scale;
       const drawHeight = sprite.height / scale;
       const drawX = entry.anchor[0] - (sprite.anchorX / scale);
@@ -461,7 +469,40 @@ export function createCityPointsRenderOwner({
     });
   }
 
-  function drawLabelsPass(k, { interactive = false, occupiedBoxes = [] } = {}) {
+  function reserveCityMarkerBoxes(k, occupiedBoxes) {
+    if (runtimeState.deferContextBasePass) return;
+    const renderState = getCityLayerRenderState(k);
+    if (renderState.skipped) return;
+    drawCityMarkersFromEntries(renderState.markerEntries, {
+      config: renderState.config,
+      scale: renderState.scale,
+      opacity: renderState.opacity,
+      occupiedBoxes,
+      layoutOnly: true,
+    });
+  }
+
+  function reserveOverviewLabelBoxes(k, occupiedBoxes) {
+    if (runtimeState.deferContextBasePass) return null;
+    const renderState = getCityLayerRenderState(k);
+    if (renderState.skipped) return null;
+    const capitalMarkers = renderState.markerEntries.filter((entry) => getCityVisualCapitalState(entry, renderState.config));
+    drawCityMarkersFromEntries(capitalMarkers, {
+      config: renderState.config, scale: renderState.scale, opacity: renderState.opacity,
+      occupiedBoxes, layoutOnly: true,
+    });
+    const capitalEntries = renderState.labelEntries.filter((entry) => getCityVisualCapitalState(entry, renderState.config));
+    const start = occupiedBoxes.length;
+    const hierarchy = getMapLabelHierarchy(renderState.scale, runtimeState);
+    drawCityLabelsFromEntries(capitalEntries, {
+      config: renderState.config, scale: renderState.scale, occupiedBoxes,
+      labelBudget: renderState.labelBudget, layoutOnly: true,
+      labelOpacity: hierarchy.cityOpacity, capitalLabelOpacity: hierarchy.capitalOpacity,
+    });
+    return { renderState, capitalMarkers, capitalEntries, capitalBoxes: occupiedBoxes.slice(start) };
+  }
+
+  function drawLabelsPass(k, { interactive = false, occupiedBoxes = [], markersReserved = false, overviewLayout = null } = {}) {
     const startedAt = nowMs();
     if (interactive) {
       recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
@@ -481,7 +522,7 @@ export function createCityPointsRenderOwner({
       });
       return;
     }
-    const renderState = getCityLayerRenderState(k, {
+    const renderState = overviewLayout?.renderState || getCityLayerRenderState(k, {
       interactive: false,
       cacheHoverEntries: true,
     });
@@ -496,27 +537,54 @@ export function createCityPointsRenderOwner({
       });
       return;
     }
-    // All policy markers are drawn consistently, populating occupiedBoxes to avoid label overlap
-    const drawnEntries = drawCityMarkersFromEntries(renderState.markerEntries, {
+    // Overview passes reserve capitals before country names. Draw those
+    // symbols here without claiming their bounds twice.
+    const markerOptions = {
       config: renderState.config,
       scale: renderState.scale,
       opacity: renderState.opacity,
       interactive: false,
-      occupiedBoxes,
-    });
+    };
+    // At overview scale, ordinary city symbols yield to country titles. The
+    // capital symbols and names were reserved first and always keep their slot.
+    const drawnEntries = overviewLayout ? [
+      ...drawCityMarkersFromEntries(overviewLayout.capitalMarkers, markerOptions),
+      ...drawCityMarkersFromEntries(renderState.markerEntries.filter((entry) => !getCityVisualCapitalState(entry, renderState.config)),
+        { ...markerOptions, occupiedBoxes, avoidCollisions: true }),
+    ] : drawCityMarkersFromEntries(renderState.markerEntries, { ...markerOptions, occupiedBoxes: markersReserved ? undefined : occupiedBoxes });
     cacheVisibleCityHoverEntries(drawnEntries);
-    const labelCount = drawCityLabelsFromEntries(renderState.labelEntries, {
+    const hierarchy = getMapLabelHierarchy(renderState.scale, runtimeState);
+    const labelOptions = {
       config: renderState.config,
       scale: renderState.scale,
       occupiedBoxes,
       labelBudget: renderState.labelBudget,
-    });
+      labelOpacity: hierarchy.cityOpacity,
+      capitalLabelOpacity: hierarchy.capitalOpacity,
+    };
+    let labelCount = 0;
+    if (overviewLayout) {
+      // Country placements have already respected these reserved names. Release
+      // their boxes so the capitals can reclaim the same near-marker positions.
+      const reserved = new Set(overviewLayout.capitalBoxes);
+      for (let index = occupiedBoxes.length - 1; index >= 0; index -= 1) {
+        if (reserved.has(occupiedBoxes[index])) occupiedBoxes.splice(index, 1);
+      }
+      labelCount = drawCityLabelsFromEntries(overviewLayout.capitalEntries, { ...labelOptions, reusePlacement: true });
+      const drawnIds = new Set(drawnEntries.map((entry) => entry.id));
+      const ordinaryEntries = renderState.labelEntries.filter((entry) => !getCityVisualCapitalState(entry, renderState.config) && drawnIds.has(entry.id));
+      labelCount += drawCityLabelsFromEntries(ordinaryEntries, { ...labelOptions,
+        labelBudget: Number.isFinite(renderState.labelBudget) ? Math.max(0, renderState.labelBudget - labelCount) : undefined });
+    } else {
+      labelCount = drawCityLabelsFromEntries(renderState.labelEntries, labelOptions);
+    }
     recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
       interactive: false,
       skipped: false,
       featureCount: renderState.featureCount,
       visibleFeatureCount: drawnEntries.length,
       labelCount,
+      hierarchy,
     });
   }
 
@@ -579,6 +647,8 @@ export function createCityPointsRenderOwner({
     drawCityMarkersFromEntries,
     drawCityPointsLayer,
     drawLabelsPass,
+    reserveCityMarkerBoxes,
+    reserveOverviewLabelBoxes,
     getCityLayerRenderState,
     getCityMarkerSprite,
     getCityMarkerVisualSpec,

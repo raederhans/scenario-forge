@@ -4,6 +4,9 @@ import {
 import { replaceStartupBootCacheState } from "./actions/boot_actions.js";
 import { commitPhysicalContourDisplayState } from "./actions/content_load_actions.js";
 import { setDefaultRuntimePoliticalTopologyState } from "./actions/scenario_chunk_promotion_actions.js";
+import { createDefaultThematicWgiRuntimeState } from "./actions/thematic_wgi_actions.js";
+import { createDefaultPopulationRuntimeState } from "./actions/population_spatial_actions.js";
+import { recordContextLayerPublication, recordStartupContextCollection } from "./context_layer_revision.js";
 
 // Content/data state defaults.
 // 这里收口 localization、topology、context layer 和底图数据默认 shape，
@@ -64,6 +67,8 @@ export function createDefaultContentState() {
     specialZonesExternalData: null,
     contextLayerExternalDataByName: {},
     contextLayerRevision: 0,
+    thematicWgiRuntime: createDefaultThematicWgiRuntimeState(),
+    populationRuntime: createDefaultPopulationRuntimeState(),
     contextLayerLoadStateByName: createDefaultContextLayerLoadStateByName(),
     contextLayerLoadErrorByName: {},
     contextLayerLoadPromiseByName: {},
@@ -356,7 +361,9 @@ export function commitContextLayerCollection(
     target[targetField] = collection;
   }
   if (bumpRevision) {
-    target.contextLayerRevision = (Number(target.contextLayerRevision) || 0) + 1;
+    const previousRevision = Number(target.contextLayerRevision) || 0;
+    target.contextLayerRevision = previousRevision + 1;
+    recordContextLayerPublication(target, previousRevision, [collection]);
   }
   return collection;
 }
@@ -607,6 +614,15 @@ export function decodeStartupPrimaryCollectionsIntoState(
       || topojsonClient.feature(target.topologyPrimary, objects.physical);
   } else if (Array.isArray(target.contextLayerExternalDataByName?.physical?.features)) {
     target.physicalData = target.contextLayerExternalDataByName.physical;
+  }
+  // Register the provided decode bundle with its source, never infer provenance
+  // from mutable display fields which may already contain external overrides.
+  for (const [layerName, field] of Object.entries({
+    ocean: "oceanData", land: "landBgData", water_regions: "waterRegionsData",
+    rivers: "riversData", urban: "urbanData", physical: "physicalData", special_zones: "specialZonesData",
+  })) {
+    recordStartupContextCollection(target, target.topologyPrimary, objects[layerName],
+      startupDecodedCollections?.[field], topojsonClient?.feature);
   }
   return target.landData;
 }

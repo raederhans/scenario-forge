@@ -170,7 +170,8 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         self.assertIn('../core/scenario_resources.js', TOOLBAR_JS.read_text(encoding="utf-8"))
         self.assertIn('../core/scenario_resources.js', SCENARIO_CONTROLS_JS.read_text(encoding="utf-8"))
         self.assertIn('./scenario_resources.js', INTERACTION_FUNNEL_JS.read_text(encoding="utf-8"))
-        self.assertIn('../core/scenario_shell_overlay.js', SIDEBAR_JS.read_text(encoding="utf-8"))
+        self.assertNotIn('../core/scenario_shell_overlay.js', SIDEBAR_JS.read_text(encoding="utf-8"))
+        self.assertNotIn('refreshScenarioShellOverlays', SIDEBAR_JS.read_text(encoding="utf-8"))
         self.assertNotIn('../core/scenario_manager.js', SIDEBAR_JS.read_text(encoding="utf-8"))
         self.assertIn('../core/scenario_recovery.js', SCENARIO_CONTROLS_JS.read_text(encoding="utf-8"))
 
@@ -260,7 +261,10 @@ class ScenarioResourcesBoundaryContractTest(unittest.TestCase):
         post_apply_content = SCENARIO_POST_APPLY_EFFECTS.read_text(encoding="utf-8")
         pure_helpers_content = SCENARIO_PURE_HELPERS.read_text(encoding="utf-8")
 
-        self.assertIn('registerRuntimeHook(state, "updateScenarioUIFn", renderScenarioControls);', controls_content)
+        self.assertIn('releaseHook = registerOwnedRuntimeHook(state, "updateScenarioUIFn", renderScenarioControls);', controls_content)
+        self.assertIn('disposeActiveScenarioControls?.();', controls_content)
+        self.assertIn('releaseHook();', controls_content)
+        self.assertIn('return dispose;', controls_content)
         self.assertNotIn("runtimeState.updateScenarioUIFn = renderScenarioControls;", controls_content)
 
         self.assertIn('setScenarioPerfMetricState(runtimeState, "chunkedFirstFramePrewarm"', post_apply_content)

@@ -1,5 +1,7 @@
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import { GeometryBudgetMap, getGeometryRetentionWeights, PROJECTED_PATH_CACHE_BUDGET } from "./geometry_cache_budget.js";
+import { pageResourceBudget } from "../runtime_resource_budget.js";
+import { getProjectedPathResourceAccounting } from "./projected_path_resource_accounting.js";
 
 // Owns projected political paths and cancellable idle warmup; cache state remains shared.
 const POLITICAL_PATH_WARMUP_OVERSCAN_PX = 96;
@@ -28,7 +30,43 @@ export function createPoliticalPathCacheOwner(runtimeState, {
   nowMs,
   RENDER_PHASE_IDLE,
   pathCacheBudget = PROJECTED_PATH_CACHE_BUDGET,
+  resourceBudget = pageResourceBudget,
 }) {
+  const pathResourceAccounting = getProjectedPathResourceAccounting(resourceBudget);
+  const pathCacheResourceOwner = Symbol("political-path-cache");
+
+  class AccountedPoliticalPathMap extends GeometryBudgetMap {
+    constructor() {
+      super({ budget: pathCacheBudget, weigh: (entry) => entry?.estimatedBytes || 256 });
+    }
+
+    set(key, value) {
+      pathResourceAccounting.batch(() => {
+        super.set(key, value);
+        if (super.has(key)) {
+          pathResourceAccounting.retain(pathCacheResourceOwner, value?.path, value?.estimatedBytes || 256);
+        }
+      });
+      return this;
+    }
+
+    delete(key) {
+      const value = Map.prototype.get.call(this, key);
+      const deleted = super.delete(key);
+      if (deleted) pathResourceAccounting.release(pathCacheResourceOwner, value?.path);
+      return deleted;
+    }
+
+    clear() {
+      pathResourceAccounting.batch(() => {
+        for (const value of this.values()) {
+          pathResourceAccounting.release(pathCacheResourceOwner, value?.path);
+        }
+        super.clear();
+      });
+    }
+  }
+
   let warmupTransform = null;
   let warmupViewportSignature = "";
   function getPoliticalPathCacheSignature() {
@@ -93,7 +131,7 @@ export function createPoliticalPathCacheOwner(runtimeState, {
     const cache = getRenderPassCacheState();
     const signature = getPoliticalPathCacheSignature(transform);
     const valid =
-      cache.politicalPathCache instanceof Map
+      cache.politicalPathCache instanceof AccountedPoliticalPathMap
       && cache.politicalPathCacheSignature === signature;
     if (valid) {
       return {
@@ -114,8 +152,9 @@ export function createPoliticalPathCacheOwner(runtimeState, {
       const previousTransform = cache.politicalPathCacheTransform
         ? cloneZoomTransform(cache.politicalPathCacheTransform)
         : null;
-      if (!(cache.politicalPathCache instanceof GeometryBudgetMap)) {
-        cache.politicalPathCache = new GeometryBudgetMap({ budget: pathCacheBudget, weigh: (entry) => entry.estimatedBytes || 256 });
+      if (!(cache.politicalPathCache instanceof AccountedPoliticalPathMap)) {
+        if (cache.politicalPathCache instanceof Map) cache.politicalPathCache.clear();
+        cache.politicalPathCache = new AccountedPoliticalPathMap();
       } else {
         cache.politicalPathCache.clear();
       }

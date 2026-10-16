@@ -2,7 +2,7 @@ export const RENDER_PASS_NAMES = [
   "background",
   "physicalBase",
   "political",
-  "hgoPreview",
+  "populationHeatmap",
   "contextBase",
   "contextScenario",
   "effects",
@@ -18,7 +18,7 @@ export const TRANSFORM_REUSED_RENDER_PASS_NAMES = new Set([
   "background",
   "physicalBase",
   "political",
-  "hgoPreview",
+  "populationHeatmap",
   "contextBase",
   "contextScenario",
   "effects",
@@ -35,6 +35,7 @@ export const INTERACTION_COMPOSITE_PASS_NAMES = [
   "background",
   "physicalBase",
   "political",
+  "populationHeatmap",
   "contextBase",
   "contextScenario",
   "effects",
@@ -47,7 +48,7 @@ export const TRANSFORMED_FRAME_PASS_NAMES = [
   "background",
   "physicalBase",
   "political",
-  "hgoPreview",
+  "populationHeatmap",
   "contextBase",
   "contextScenario",
   "effects",
@@ -59,3 +60,5 @@ export const TRANSFORMED_FRAME_PASS_NAMES = [
 ];
 
 export const RENDER_PASS_OVERSCAN_RATIO_PER_SIDE = 0.15;
+
+export { filterEnabledRenderPassNames } from "./render_pass_visibility_policy.js";

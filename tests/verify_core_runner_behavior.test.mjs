@@ -46,6 +46,7 @@ import {
   constrainAdaptiveEntrypointSelection,
   discoverChangedFiles,
   executeAdaptivePlan,
+  executeAdaptivePlanConcurrent,
   readSelectionArtifact,
   parseArgs as parseAdaptiveArgs,
   writeAdaptiveOutputs,
@@ -1893,6 +1894,7 @@ test("adaptive history discovery requires its exact base and rejects last-commit
     entrypoint: "",
     includeMainThread: false,
     deferMainThread: false,
+    concurrency: 1,
     selectionJson: "",
     verificationCatalogFixture: "",
     verificationCatalogFixtureSha256: "",
@@ -3758,6 +3760,148 @@ test("adaptive execution records an interrupted terminal result and stops", () =
   assert.equal(results[0].exitCode, 1);
   assert.equal(results[0].processStarted, true);
   assert.equal(checkpoints.at(-1)[0].status, "interrupted");
+});
+
+function concurrentAdaptiveFixture() {
+  return {
+    routeGaps: [],
+    executionCommands: ["first", "second", "dependent", "independent"].map((groupId) => ({
+      groupId,
+      commandRef: `node ${groupId}.mjs`,
+      process: { bin: "node", args: [`${groupId}.mjs`] },
+      executionOwner: "child-safe",
+      resourceLocks: [],
+      dependencyEdges: groupId === "dependent"
+        ? [{ from: "first", to: "dependent" }, { from: "second", to: "dependent" }]
+        : [],
+      leafIds: [`node-script:${groupId}.mjs`],
+      files: [`${groupId}.mjs`],
+    })),
+  };
+}
+
+test("adaptive concurrency keeps every command and dependency with at most two active children", async () => {
+  const plan = concurrentAdaptiveFixture();
+  const original = structuredClone(plan);
+  const releases = new Map();
+  const calls = [];
+  const checkpoints = [];
+  let active = 0;
+  let peak = 0;
+  const execution = executeAdaptivePlanConcurrent(plan, {
+    runner(bin, args, options) {
+      calls.push([bin, ...args]);
+      assert.equal(options.shell, false);
+      peak = Math.max(peak, ++active);
+      return new Promise((resolve) => releases.set(args[0], () => {
+        active -= 1;
+        resolve({ status: 0 });
+      }));
+    },
+    onCheckpoint: (entries) => checkpoints.push(structuredClone(entries)),
+  });
+  assert.deepEqual(calls, [["node", "first.mjs"], ["node", "second.mjs"]]);
+  releases.get("second.mjs")();
+  await new Promise(setImmediate);
+  assert.deepEqual(calls.at(-1), ["node", "independent.mjs"]);
+  assert.equal(releases.has("dependent.mjs"), false);
+  releases.get("first.mjs")();
+  await new Promise(setImmediate);
+  assert.deepEqual(calls.at(-1), ["node", "dependent.mjs"]);
+  releases.get("dependent.mjs")();
+  releases.get("independent.mjs")();
+  const results = await execution;
+  assert.equal(peak, 2);
+  assert.equal(active, 0);
+  assert.equal(checkpoints.length, 8);
+  assert.deepEqual(plan, original);
+  const serialCalls = [];
+  const serial = executeAdaptivePlan(plan, { runner: (bin, args) => {
+    serialCalls.push([bin, ...args]);
+    return { status: 0 };
+  } });
+  assert.deepEqual(calls.sort(), serialCalls.sort());
+  assert.deepEqual(results.flatMap((entry) => entry.leafIds).sort(), serial.flatMap((entry) => entry.leafIds).sort());
+  assert.ok(results.every((entry) => entry.status === "passed" && entry.processStarted));
+  assert.ok(checkpoints.at(-1).every((entry) => entry.status === "passed"));
+});
+
+test("adaptive concurrency stops pending work on failure, interruption or spawn error and drains active work", async () => {
+  for (const failure of [{ status: 7 }, { status: null, signal: "SIGTERM" }, new Error("spawn failed")]) {
+    const calls = [];
+    const releases = new Map();
+    const execution = executeAdaptivePlanConcurrent(concurrentAdaptiveFixture(), {
+      runner(bin, args) {
+        calls.push(args[0]);
+        return new Promise((resolve, reject) => releases.set(args[0], (result) => (
+          result instanceof Error ? reject(result) : resolve(result)
+        )));
+      },
+    });
+    releases.get("first.mjs")(failure);
+    await new Promise(setImmediate);
+    assert.deepEqual(calls, ["first.mjs", "second.mjs"]);
+    let drained = false;
+    execution.then(() => { drained = true; });
+    await new Promise(setImmediate);
+    assert.equal(drained, false);
+    releases.get("second.mjs")({ status: 0 });
+    const results = await execution;
+    assert.equal(results.length, 2);
+    assert.notEqual(results[0].status, "passed");
+    assert.equal(results[0].processStarted, !(failure instanceof Error));
+    assert.equal(results[0].signal, failure.signal || null);
+    assert.equal(results[1].status, "passed");
+  }
+});
+
+test("adaptive concurrency rejects unsafe ownership and invalid dependency graphs before any spawn", async () => {
+  for (const mutate of [
+    (plan) => { plan.executionCommands[3].executionOwner = "main-thread"; },
+    (plan) => { plan.executionCommands[3].executionOwner = "ci-only"; },
+    (plan) => { plan.executionCommands[3].resourceLocks = ["pages-dist"]; },
+    (plan) => { delete plan.executionCommands[3].resourceLocks; },
+    (plan) => { delete plan.executionCommands[3].dependencyEdges; },
+    (plan) => { plan.executionCommands[3].groupId = "first"; },
+    (plan) => { plan.executionCommands[3].dependencyEdges = [{ from: "missing", to: "independent" }]; },
+    (plan) => { plan.executionCommands[3].dependencyEdges = [{ from: "dependent", to: "first" }]; },
+  ]) {
+    const plan = concurrentAdaptiveFixture();
+    mutate(plan);
+    let calls = 0;
+    await assert.rejects(executeAdaptivePlanConcurrent(plan, { runner: () => { calls += 1; } }), /adaptive-concurrent-/);
+    assert.equal(calls, 0);
+  }
+  const blocked = concurrentAdaptiveFixture();
+  blocked.routeGaps.push({ code: "unresolved" });
+  assert.deepEqual(await executeAdaptivePlanConcurrent(blocked, { runner() { assert.fail("blocked plan spawned"); } }), []);
+  assert.equal(parseAdaptiveArgs([]).concurrency, 1);
+  assert.equal(parseAdaptiveArgs(["--concurrency", "2"]).concurrency, 2);
+  for (const value of ["0", "3", "1.5", "NaN", ""]) {
+    assert.ok(parseAdaptiveArgs(["--concurrency", value]).inputErrors.includes("adaptive-concurrency-must-be-1-or-2"));
+  }
+});
+
+test("adaptive concurrent child runner executes real commands and preserves a dependent read", async () => {
+  const root = fs.mkdtempSync(path.join(process.cwd(), ".runtime/tmp/adaptive-concurrent-"));
+  try {
+    const plan = concurrentAdaptiveFixture();
+    const outputs = ["first", "second"].map((name) => path.join(root, name));
+    plan.executionCommands = plan.executionCommands.slice(0, 3).map((entry, index) => ({
+      ...entry,
+      process: { bin: process.execPath, args: ["-e", index < 2
+        ? `require('node:fs').writeFileSync(${JSON.stringify(outputs[index])}, 'complete')`
+        : `for (const file of ${JSON.stringify(outputs)}) require('node:assert/strict').equal(require('node:fs').readFileSync(file, 'utf8'), 'complete')`] },
+    }));
+    // Shared leaves can put the consumer first in declaration order. Edges,
+    // rather than array positions, retain the required execution order.
+    plan.executionCommands.reverse();
+    const results = await executeAdaptivePlanConcurrent(plan);
+    assert.equal(results.length, 3);
+    assert.ok(results.every((entry) => entry.status === "passed" && entry.processStarted));
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test("adaptive pre-spawn ENOENT and interrupted evidence keep processStarted false", () => {

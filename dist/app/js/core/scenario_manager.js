@@ -57,7 +57,6 @@ import {
   getScenarioTopologyFeatureCollection,
   loadScenarioBundle,
   trimScenarioBundleCaches,
-  loadScenarioRegistry,
   resetScenarioChunkRuntimeState,
   releaseScenarioAuditPayload,
   scheduleScenarioDeferredBundleMetadataLoad,
@@ -101,9 +100,7 @@ import {
   getScenarioNameMap as getBundleLoaderScenarioNameMap,
   getScenarioFixedOwnerColors as getBundleLoaderScenarioFixedOwnerColors,
   mergeReleasableCatalogs,
-  getScenarioMetaById as getBundleLoaderScenarioMetaById,
   getDefaultScenarioId as getBundleLoaderDefaultScenarioId,
-  getScenarioManifestSummary as getBundleLoaderScenarioManifestSummary,
   getScenarioBaselineHashFromBundle,
   getScenarioDefaultCountryCode as getBundleLoaderDefaultCountryCode,
 } from "./scenario/bundle_loader.js";
@@ -116,8 +113,6 @@ function showToast(message, options = {}) {
 }
 
 const SCENARIO_DETAIL_SOURCE_FALLBACK_ORDER = ["na_v2", "na_v1", "legacy_bak", "highres"];
-const SCENARIO_CHUNK_REFRESH_DELAY_MS_INTERACTING = 180;
-const SCENARIO_CHUNK_REFRESH_DELAY_MS_IDLE = 60;
 let activeScenarioApplyPromise = null;
 let activeScenarioApplyTargetId = "";
 let activeScenarioApplyRequestId = 0;
@@ -338,16 +333,8 @@ function getScenarioFixedOwnerColors(
 }
 
 
-function getScenarioMetaById(scenarioId) {
-  return getBundleLoaderScenarioMetaById(state, normalizeScenarioId, scenarioId);
-}
-
 function getDefaultScenarioId() {
   return getBundleLoaderDefaultScenarioId(state, normalizeScenarioId);
-}
-
-function getScenarioManifestSummary(manifest = runtimeState.activeScenarioManifest) {
-  return getBundleLoaderScenarioManifestSummary(manifest);
 }
 
 function getActiveScenarioMergedChunkLayerPayload(layerKey, scenarioId = runtimeState.activeScenarioId) {
@@ -387,12 +374,6 @@ function normalizeScenarioFeatureCollection(payload) {
     type: "FeatureCollection",
     features: payload.features,
   };
-}
-
-function getCachedScenarioBundle(scenarioId = runtimeState.activeScenarioId) {
-  const normalizedScenarioId = normalizeScenarioId(scenarioId);
-  if (!normalizedScenarioId) return null;
-  return runtimeState.scenarioBundleCacheById?.[normalizedScenarioId] || null;
 }
 
 function setScenarioViewMode(
@@ -1468,32 +1449,6 @@ export async function completeScenarioProjectImport(prepared, isCurrent) {
   if (!promotion?.ok) {
     throw new Error(`Scenario project import political promotion failed: ${promotion?.status || "not-ready"}.`);
   }
-}
-
-async function applyDefaultScenarioOnStartup(
-  {
-    renderNow = true,
-    d3Client = globalThis.d3,
-  } = {}
-) {
-  if (runtimeState.activeScenarioId) {
-    return null;
-  }
-  const registry = await loadScenarioRegistry({ d3Client });
-  const defaultScenarioId = normalizeScenarioId(registry?.default_scenario_id);
-  if (!defaultScenarioId) {
-    return null;
-  }
-  const meta = getScenarioMetaById(defaultScenarioId);
-  if (!meta?.manifest_url) {
-    console.warn(`[scenario] Default scenario "${defaultScenarioId}" is not registered.`);
-    return null;
-  }
-  return applyScenarioById(defaultScenarioId, {
-    renderNow,
-    markDirtyReason: "",
-    showToastOnComplete: false,
-  });
 }
 
 function resetToScenarioBaseline(options = {}) {
