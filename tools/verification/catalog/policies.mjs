@@ -133,7 +133,7 @@ export const CATALOG_POLICIES = {
     "nightlyRoles": [
       { "id": "browser", "shards": ["browser"] },
       { "id": "final", "shards": ["final"] },
-      { "id": "linux-core", "shards": ["1", "2", "3"] },
+      { "id": "linux-core", "shards": ["1", "2"] },
       { "id": "metadata", "shards": ["metadata"] },
       { "id": "p4-checker-boundaries", "shards": ["p4-checker-boundaries"] },
       { "id": "p4-closeout", "shards": ["p4-closeout"] },

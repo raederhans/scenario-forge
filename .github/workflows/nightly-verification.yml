@@ -212,13 +212,13 @@ jobs:
           retention-days: 14
 
   linux-core:
-    name: Nightly Linux Core ${{ matrix.shard }}/3
+    name: Nightly Linux Core ${{ matrix.shard }}/2
     runs-on: ubuntu-latest
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2]
     env:
       WHEELHOUSE_DIR: .runtime/python/wheels
       SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/nightly-linux-core/dist
@@ -250,14 +250,14 @@ jobs:
       - name: Plan Linux core artifact inputs
         id: artifact-inputs
         run: |
-          node tools/run_core_verification.mjs --nightly-linux-core --shard-index ${{ matrix.shard }} --shard-count 3 --list --json-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.json --md-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.md --profile-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}-profile.json
+          node tools/run_core_verification.mjs --nightly-linux-core --shard-index ${{ matrix.shard }} --shard-count 2 --list --json-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.json --md-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.md --profile-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}-profile.json
           node -e 'const p = require("./.runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.json"); console.log("required=" + (p.nightlyShard.pagesArtifactConsumers.length > 0))' >> "$GITHUB_OUTPUT"
       - name: Build same-checkout Pages artifact for inventory contracts
         if: steps.artifact-inputs.outputs.required == 'true'
         timeout-minutes: 5
         run: python tools/build_pages_dist.py --output-root "$SCENARIO_FORGE_PAGES_ARTIFACT_ROOT"
       - name: Run balanced Linux core shard
-        run: node tools/run_core_verification.mjs --nightly-linux-core --shard-index ${{ matrix.shard }} --shard-count 3 --json-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.json --md-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.md --profile-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}-profile.json
+        run: node tools/run_core_verification.mjs --nightly-linux-core --shard-index ${{ matrix.shard }} --shard-count 2 --json-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.json --md-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}.md --profile-out .runtime/reports/generated/nightly/linux-core-${{ matrix.shard }}-profile.json
       - name: Upload Linux core shard evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
