@@ -2171,11 +2171,30 @@ jobs:
 
         for job_id in ("linux-core", "scenario-heavy"):
             env = parse_job_env(jobs[job_id])
-            self.assertEqual(set(env), {"WHEELHOUSE_DIR"})
+            expected_env = {"WHEELHOUSE_DIR"}
+            if job_id == "linux-core":
+                expected_env.add("SCENARIO_FORGE_PAGES_ARTIFACT_ROOT")
+                self.assertEqual(env["SCENARIO_FORGE_PAGES_ARTIFACT_ROOT"], ".runtime/nightly-linux-core/dist")
+            self.assertEqual(set(env), expected_env)
             names = [str(step["name"]) for step in parse_job_steps(jobs[job_id])]
             self.assertNotIn("Download P4 closeout", names)
             self.assertNotIn("Download exact P4 producer evidence", names)
             self.assertNotIn("Validate exact P4 producer evidence", names)
+
+        core_steps = parse_job_steps(jobs["linux-core"])
+        core_by_name = {str(step["name"]): step for step in core_steps}
+        preparation = core_by_name["Plan Linux core artifact inputs"]
+        self.assertIn("--list", parse_step_run(preparation))
+        self.assertIn("p.nightlyShard.pagesArtifactConsumers.length > 0", parse_step_run(preparation))
+        artifact_build = core_by_name["Build same-checkout Pages artifact for inventory contracts"]
+        self.assertIn("        if: steps.artifact-inputs.outputs.required == 'true'", artifact_build["lines"])
+        self.assertIn("        timeout-minutes: 5", artifact_build["lines"])
+        self.assertEqual(parse_step_run(artifact_build),
+                         'python tools/build_pages_dist.py --output-root "$SCENARIO_FORGE_PAGES_ARTIFACT_ROOT"')
+        core_names = [str(step["name"]) for step in core_steps]
+        self.assertLess(core_names.index(str(preparation["name"])), core_names.index(str(artifact_build["name"])))
+        self.assertLess(core_names.index(str(artifact_build["name"])), core_names.index("Run balanced Linux core shard"))
+        self.assertNotIn("continue-on-error", jobs["linux-core"])
 
         pages_steps = parse_job_steps(jobs["pages"])
         pages_by_name = {str(step["name"]): step for step in pages_steps}
