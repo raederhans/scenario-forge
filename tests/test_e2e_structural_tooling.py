@@ -2054,13 +2054,18 @@ jobs:
         self.assertIn("unknown verification profile", workflow)
         self.assertIn("exit 2", workflow[validation_index:setup_python_index])
 
-    def test_verify_shared_keeps_two_checkout_commits_for_non_pr_fast_history(self) -> None:
+    def test_verify_shared_preserves_fast_policy_history_and_other_profile_parents(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "verify-shared.yml").read_text(encoding="utf-8")
         verify_job = parse_workflow_job_blocks(workflow)["verify"]
         checkout = next(step for step in parse_job_steps(verify_job) if step.get("name") == "Checkout")
         checkout_body = "\n".join(str(line) for line in checkout["lines"])
 
-        self.assertIn("fetch-depth: 2", checkout_body)
+        self.assertIn("fetch-depth: ${{ inputs.profile == 'pr-fast' && '0' || '2' }}", checkout_body)
+        selector = next(step for step in parse_job_steps(verify_job) if step.get("name") == "Read affected files")
+        selector_run = parse_step_run(selector)
+        self.assertIn('if ! git cat-file -e "${BASE_SHA}^{commit}"; then', selector_run)
+        self.assertIn('git fetch --no-tags origin "$BASE_SHA"', selector_run)
+        self.assertNotIn("--depth", selector_run)
         self.assertIn("git diff --name-only --no-renames HEAD^ HEAD", verify_job)
 
     def test_deploy_minimal_installs_locked_node_dependencies_before_pages_build(self) -> None:

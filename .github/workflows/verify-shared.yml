@@ -46,8 +46,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          # pr-fast falls back to HEAD^ outside pull_request events.
-          fetch-depth: 2
+          # Fast policy checks prove ancestry against the frozen P4 baseline.
+          # Other profiles only need HEAD^ for the non-PR affected-file fallback.
+          fetch-depth: ${{ inputs.profile == 'pr-fast' && '0' || '2' }}
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /*
@@ -121,7 +122,10 @@ jobs:
           set -euo pipefail
           mkdir -p .runtime/tmp
           if [ -n "$BASE_SHA" ]; then
-            git fetch --no-tags --depth=1 origin "$BASE_SHA"
+            # Do not re-shallow a complete policy history at the event base.
+            if ! git cat-file -e "${BASE_SHA}^{commit}"; then
+              git fetch --no-tags origin "$BASE_SHA"
+            fi
             git diff --name-only --no-renames "$BASE_SHA" HEAD > .runtime/tmp/pr-check-files.txt
           else
             git diff --name-only --no-renames HEAD^ HEAD > .runtime/tmp/pr-check-files.txt
