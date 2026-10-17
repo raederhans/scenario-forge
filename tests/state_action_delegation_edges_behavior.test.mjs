@@ -16,6 +16,8 @@ import {
   STATE_IMPORTED_PURE_NORMALIZER_CONTRACT,
   STATE_TARGET_PURE_READER_CONTRACT,
   STATE_IMPORTED_BORROWED_PROJECTION_CONTRACT,
+  findStateImportedPureReaderContractEntry,
+  findStateMutationDelegatingOwnerFactoryContractEntry,
   inspectStateImportedBorrowedProjectionSource,
   inspectStateActionNonTargetNormalizerSites,
   inspectStateImportedPureNormalizerSource,
@@ -217,6 +219,33 @@ function refreshPureReaderOwnerPins(entry, source) {
     })),
   };
 }
+
+test("indexed contract lookups preserve first-match eligibility and path normalization", () => {
+  const paths = (value) => [value, `./${value}`, value.replaceAll("/", "\\")];
+  for (const entry of STATE_TARGET_PURE_READER_CONTRACT) {
+    const expected = STATE_TARGET_PURE_READER_CONTRACT.find((candidate) =>
+      candidate.modulePath === entry.modulePath
+      && candidate.functionName === entry.functionName
+      && candidate.targetParameterPath === "$"
+      && candidate.importedArgumentCount > candidate.targetParameterIndex) || null;
+    for (const modulePath of paths(entry.modulePath)) {
+      assert.equal(findStateImportedPureReaderContractEntry(modulePath, entry.functionName), expected);
+      assert.equal(findStateImportedPureReaderContractEntry(modulePath, `${entry.functionName}Missing`), null);
+    }
+    assert.equal(findStateImportedPureReaderContractEntry("js/unregistered.js", entry.functionName), null);
+    assert.equal(findStateImportedPureReaderContractEntry(entry.modulePath, {}), null);
+  }
+  for (const entry of STATE_MUTATION_DELEGATING_OWNER_CONTRACT) {
+    const expected = STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find((candidate) =>
+      candidate.factoryModulePath === entry.factoryModulePath
+      && candidate.factoryExportName === entry.factoryExportName);
+    for (const modulePath of paths(entry.factoryModulePath)) {
+      assert.equal(findStateMutationDelegatingOwnerFactoryContractEntry(modulePath, entry.factoryExportName), expected);
+      assert.equal(findStateMutationDelegatingOwnerFactoryContractEntry(modulePath, `${entry.factoryExportName}Missing`), null);
+    }
+    assert.equal(findStateMutationDelegatingOwnerFactoryContractEntry("js/unregistered.js", entry.factoryExportName), null);
+  }
+});
 
 test("active chunk ID reader proves its three scalar map callbacks without accepting callback writes", async () => {
   const modulePath = "js/core/scenario/chunk_promotion_queries.js";
