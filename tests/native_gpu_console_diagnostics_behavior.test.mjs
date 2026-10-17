@@ -31,15 +31,19 @@ test("classified diagnostics remain intact in an attached JSON artifact", async 
   const attachments = [];
   const directory = path.resolve(".runtime/tmp", `native-gpu-diagnostic-${process.pid}-${Date.now()}`);
   const artifactPath = path.join(directory, "native-gpu-readback-diagnostics.json");
+  let archivePath;
   try {
-    await attachNativeGpuDiagnostics({ outputPath: () => artifactPath, attach: async (...args) => attachments.push(args) }, diagnostics);
+    archivePath = await attachNativeGpuDiagnostics({ outputPath: () => artifactPath, attach: async (...args) => attachments.push(args) }, diagnostics);
     assert.equal(attachments[0][0], "native-gpu-readback-diagnostics");
     assert.equal(attachments[0][1].path, artifactPath);
     assert.deepEqual(JSON.parse(await fs.readFile(artifactPath, "utf8")), diagnostics);
     assert.equal(attachments[0][1].contentType, "application/json");
+    await fs.unlink(artifactPath);
+    assert.deepEqual(JSON.parse(await fs.readFile(archivePath, "utf8")), diagnostics, "later Playwright output cleanup must not remove earlier raw diagnostics");
   } finally {
     await fs.unlink(artifactPath).catch(() => {});
     await fs.rmdir(directory).catch(() => {});
+    if (archivePath) await fs.unlink(archivePath);
   }
   await attachNativeGpuDiagnostics({ attach: () => assert.fail("empty diagnostics should not attach") }, []);
 });

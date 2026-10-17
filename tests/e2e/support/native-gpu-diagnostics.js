@@ -6,6 +6,7 @@
 const READBACK_NOTICE = /^\[\.WebGL-0x[0-9a-f]+\]GL Driver Message \(OpenGL, Performance, GL_CLOSE_PATH_NV, High\): GPU stall due to ReadPixels(?: \(this message will no longer repeat\))?$/i;
 const fs = require("node:fs/promises");
 const path = require("node:path");
+const { randomUUID } = require("node:crypto");
 
 function readConsoleIssue(message) {
   return { type: message.type(), text: message.text(), location: message.location(), argumentCount: message.args().length };
@@ -25,9 +26,15 @@ async function attachNativeGpuDiagnostics(testInfo, diagnostics) {
   const artifactPath = testInfo.outputPath("native-gpu-readback-diagnostics.json");
   await fs.mkdir(path.dirname(artifactPath), { recursive: true });
   await fs.writeFile(artifactPath, JSON.stringify(diagnostics, null, 2), "utf8");
+  // Each Playwright command clears outputDir. A PR runs several commands before
+  // upload, so also archive outside it to preserve diagnostics from earlier runs.
+  const archivePath = path.resolve(__dirname, "../../../.runtime/reports/generated/native-gpu-readback-diagnostics", `${randomUUID()}.json`);
+  await fs.mkdir(path.dirname(archivePath), { recursive: true });
+  await fs.copyFile(artifactPath, archivePath);
   await testInfo.attach("native-gpu-readback-diagnostics", {
     path: artifactPath, contentType: "application/json",
   });
+  return archivePath;
 }
 
 module.exports = { readConsoleIssue, isNativeGpuReadbackDiagnostic, attachNativeGpuDiagnostics };

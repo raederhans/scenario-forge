@@ -2,6 +2,8 @@
 
 当前阶段：统一 [PR #244](https://github.com/raederhans/scenario-forge/pull/244) 已建立。第二轮 head `fec2e664179a8426f529fae9707310dcd6f79281` 的 Raster 原五阶段、Perf、Quick Fill、Scenario、Transport 均成功。pr-verify 的两个剩余失败已独立审查：footprint 契约仍要求旧 PR 触发器；1939/TNO smoke 被 Chromium 原生 ReadPixels 性能诊断截断。前者现在约束仅 manual/schedule、禁止 PR/push，原报告和无部署断言保留。
 
+最终取证审核另确认：本 PR 串行执行多个 Playwright 命令，后续命令会清空共享 outputDir。因此每份诊断另外存入独立 `.runtime/reports/generated/native-gpu-readback-diagnostics/`，smoke/demo 均上传它。定向单元回归删除模拟用例输出后仍必须读到完整归档，避免成功日志之外的原始 JSON 证据丢失；这项只修正取证持久化，不改变已通过的浏览器行为。
+
 后者通过固定 Chromium 145.0.7632.6 / ANGLE `4c0ae3917d4feab6ae1c99d7b750a69cdf3cc96c` 源码和本地实际 GPU 合成实验确认：该固定文本由 Vulkan 同步读回路径发出，不代表 GL 错误或已经测量的性能回归；同步读回仍有成本，独立性能门禁不变。仅当 warning、零 JS 参数、同源同 document 路径且 line/column 均为 0、文本完全匹配时单独记录。应用 console.warn 同文仍有参数并失败，其他 warning/error、context lost、网络和像素断言均保留；全局 console allowlist 未变，生产栅格未关闭。原始完整诊断写入 Playwright 输出并上传 JSON。证据和实验局限见 ignored `final-integration/gpu-investigation.zh-CN.md`。
 
 本轮最小重验：footprint 单项 1/1、诊断分类及实际文件保存 2/2、工作流取证契约 1/1；真实 Chromium 1939、TNO、sample-guide golden PNG 三项 3/3（workers=1/retries=0，总 2 分钟），1939/TNO 后续网络断言均执行且为 0，golden PNG 后续样例切换/脏状态弹窗断言也执行。诊断落盘调整后额外单跑 1939 1/1 确认实际文件；没有重复未变的五视口布局或全套 GPU 检查。提交后仍需等最终 head 的不部署 CI 终态，不合并、不部署。

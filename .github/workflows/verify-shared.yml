@@ -275,6 +275,7 @@ jobs:
             .runtime/tests/playwright/**/test-failed-*.png
             .runtime/tests/playwright/**/trace.zip
             .runtime/tests/playwright/**/native-gpu-readback-diagnostics*.json
+            .runtime/reports/generated/native-gpu-readback-diagnostics/*.json
 
       - name: Run Golden Demo E2E
         if: inputs.profile == 'demo'
@@ -305,6 +306,7 @@ jobs:
             .runtime/tests/playwright/**/test-failed-*.png
             .runtime/tests/playwright/**/trace.zip
             .runtime/tests/playwright/**/native-gpu-readback-diagnostics*.json
+            .runtime/reports/generated/native-gpu-readback-diagnostics/*.json
 
       - name: Upload deploy dist artifact
         if: inputs.profile == 'deploy-minimal'
