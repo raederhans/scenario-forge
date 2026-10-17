@@ -9,6 +9,12 @@ const politicalIdRasterRoute = {
 export const RENDERER_CACHE_PIPELINE_RECORDS = [
   {
     ...politicalIdRasterRoute,
+    id: "local:renderer:native-gpu-console-diagnostics", selectorOrder: 5005,
+    commandRef: "node --test tests/native_gpu_console_diagnostics_behavior.test.mjs",
+    sourceRefs: ["tests/e2e/support/native-gpu-diagnostics.js", "tests/native_gpu_console_diagnostics_behavior.test.mjs"],
+  },
+  {
+    ...politicalIdRasterRoute,
     id: "e2e:raster-startup-recovery", selectorOrder: 5004,
     commandRef: "node node_modules/@playwright/test/cli.js test tests/e2e/raster_startup_recovery.spec.js --workers=1 --retries=0",
     sourceRefs: ["tools/political_id_raster_app_session.mjs", "tools/verify_political_id_raster_integration.mjs",

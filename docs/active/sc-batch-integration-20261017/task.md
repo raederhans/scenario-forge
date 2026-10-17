@@ -5,7 +5,8 @@
 - [x] 独立审核并无冲突应用回滚与模块恢复增量。
 - [x] 组合后的必要定向检查 35/35；PR 规划 planned、0 unmatched、0 route gaps；52 文件来源字节一致。
 - [x] 收到并审核 sample-guide 文字层高度修复补丁；真实按钮/抽屉流程和来源成功 trace 验证通过。
-- [ ] 最终提交、单一 PR、最终 head 的不部署 CI 到终态。
+- [x] 汇总提交和单一 PR #244，修复托管 CI 明确复现的本批整合遗漏。
+- [ ] 最终 head 的不部署 CI 到终态。
 
 本文件记录提交前验收基线。当前功能分支为 `codex/sc-batch-review-20261017`；统一 PR 与最终 head 的不部署 CI 结果以 GitHub PR/Actions 回执及本地 `.runtime/reports/generated/final-integration/` 交付报告为准。不得合并或部署。
 
