@@ -5604,6 +5604,8 @@ export const STATE_CAPABILITY_RETIREMENT_SOURCE_PROOFS = Object.freeze([
   Object.freeze({ modulePath: "js/core/state/dev_state.js", sourceFingerprint: "287c112761893f20b0ca5f11c82aa28eb5912b5216b0058e701503cfb8079a6d" }),
   Object.freeze({ modulePath: "js/core/map_editing_policy.js", sourceFingerprint: "2f55bb91a28da72f7ed2fa843f55d7e32309d4b10511f360d429d59dd464af36" }),
 ]);
+const RETIRED_RENDERER_CURRENT_SOURCE_FINGERPRINT = "349a9377a8b3ffe5902c240ab2ba6ae75f71c2bfa04d21695ec74aba93198a09";
+
 const retiredCapabilityModules = [
   {
     modulePath: "js/ui/dev_workspace/scenario_tag_creator_controller.js",
@@ -5653,7 +5655,7 @@ const retiredCapabilityModules = [
   {
     modulePath: "js/core/map_renderer.js", bindingIdentity: RETIRED_CORE_STATE_BINDING_IDENTITY,
     previousSourceFingerprint: "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    currentSourceFingerprint: "c0a85baba59e7258c3c31001a0622e0d715c4ccc774c9b07788bfe643219ef38",
+    currentSourceFingerprint: RETIRED_RENDERER_CURRENT_SOURCE_FINGERPRINT,
     memberships: [
       ["color", "P4.4", "assign", "countryBaseColors", 3, "622061d65a1cac3cc053ad5d57320b6625611fce0a169d9be6569ac9ade357c0"],
       ["color", "P4.4", "assign", "featureOverrides", 4, "2b49424706a23f675add6c116fff341ca7c167193a80b2bf06a89f298af07b87"],
@@ -5839,7 +5841,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "7e055462841e1458080efbdc2f78f9b8d4663f09144a147ce3ec2d23ec938ef4",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "0ad27d710f78d6d1af7a0e145b20d835a89d4d8c363996031b9197acb783b04d",
-    "currentSourceFingerprint": "726af223b3c721a3989a79a9841e7b1095c9868380a87a030919b65c4fd7b757",
+    "currentSourceFingerprint": "b15aca85a5f9b86650000735453b0b8e3d8f1c81c89b5dbc453e68e26deb4a33",
     "allowReadReferences": true,
     "retirementKind": "terminal-action-capability",
     "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|countryBaseColors",
@@ -5860,7 +5862,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "e7c60c422368b2a17945bb601d2da99ea4584b9af6dd8aac27752faff285def7",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "0ad27d710f78d6d1af7a0e145b20d835a89d4d8c363996031b9197acb783b04d",
-    "currentSourceFingerprint": "726af223b3c721a3989a79a9841e7b1095c9868380a87a030919b65c4fd7b757",
+    "currentSourceFingerprint": "b15aca85a5f9b86650000735453b0b8e3d8f1c81c89b5dbc453e68e26deb4a33",
     "allowReadReferences": true,
     "retirementKind": "terminal-action-capability",
     "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|featureOverrides",
@@ -6010,7 +6012,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "b17371bb30556b5e5736f3b52d0ccbf284e5e7d1975fd64ea11c0b70de5ee470",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "c0a85baba59e7258c3c31001a0622e0d715c4ccc774c9b07788bfe643219ef38",
+    "currentSourceFingerprint": RETIRED_RENDERER_CURRENT_SOURCE_FINGERPRINT,
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|delete|sovereignBaseColors",
@@ -6027,7 +6029,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "1f35c44f87b5bd5e23d3c733a3c560aa224244cf5c50aacff6ffa47943c660af",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "c0a85baba59e7258c3c31001a0622e0d715c4ccc774c9b07788bfe643219ef38",
+    "currentSourceFingerprint": RETIRED_RENDERER_CURRENT_SOURCE_FINGERPRINT,
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|delete|visualOverrides",
@@ -6044,7 +6046,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "9f3cd6152efd6c2659c2854a85b921c468824cbb5d621ab61832980b95de5cf1",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "c0a85baba59e7258c3c31001a0622e0d715c4ccc774c9b07788bfe643219ef38",
+    "currentSourceFingerprint": RETIRED_RENDERER_CURRENT_SOURCE_FINGERPRINT,
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|runtime-hooks|P4.5|assign|resolveSpecialZoneParentGroupTargetIdsFn",
@@ -6061,7 +6063,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "922f400af35f30ecdb8098901b0deacfeeac53a40393cf88b0bc04638291db99",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "c0a85baba59e7258c3c31001a0622e0d715c4ccc774c9b07788bfe643219ef38",
+    "currentSourceFingerprint": RETIRED_RENDERER_CURRENT_SOURCE_FINGERPRINT,
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|runtime-hooks|P4.5|assign|syncDayNightClockTimerFn",
@@ -6221,6 +6223,31 @@ export const STATE_CAPABILITY_RETIREMENT_CONTRACT = Object.freeze(
 export function findStateCapabilityRetirementContractEntry(identity) {
   return STATE_CAPABILITY_RETIREMENT_CONTRACT.find((entry) =>
     entry.retiredMembershipIdentity === identity) || null;
+}
+
+// Historical evidence survives unrelated edits to the current source proof.
+// The live contract identity and source fingerprint are validated separately.
+export function matchesStateCapabilityRetirementHistory(record, contract) {
+  if (!record || !contract || record.proofPrecision !== "explicit-capability-retirement") return false;
+  const historicalFields = {
+    retiredMembershipIdentity: contract.retiredMembershipIdentity,
+    retiredCallerPath: contract.modulePath,
+    retiredCallerBindingIdentity: contract.bindingIdentity,
+    retiredMutationSiteFingerprint: contract.retiredMutationSiteFingerprint,
+    retiredMutationSiteCount: contract.retiredMutationSiteCount,
+    previousSourceRevision: contract.previousSourceRevision,
+    previousSourceFingerprint: contract.previousSourceFingerprint,
+    domain: contract.domain,
+    migrationPhase: contract.migrationPhase,
+    operation: contract.operation,
+    key: contract.key,
+  };
+  return Object.entries(historicalFields).every(([key, value]) => record[key] === value)
+    && (!contract.previousActionProofFingerprint || (
+      record.previousActionProof
+      && createHash("sha256").update(JSON.stringify(record.previousActionProof)).digest("hex")
+        === contract.previousActionProofFingerprint
+    ));
 }
 
 const IMPORTED_PURE_NORMALIZER_ENTRY_BY_EXPORT = new Map(

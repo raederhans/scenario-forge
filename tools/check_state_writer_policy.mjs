@@ -8,6 +8,8 @@ import { isDeepStrictEqual } from "node:util";
 import {
   findStateActionCrossFileMigrationContractEntry,
   findStateCapabilityRetirementContractEntry,
+  findStateActionSuccessorProofContractEntry,
+  matchesStateCapabilityRetirementHistory,
 } from "./state_action_delegation_contract.mjs";
 
 import {
@@ -249,6 +251,18 @@ export function validateCallerToActionLedgerHistoryTransition({
       continue;
     }
     const endedAuthority = findStateCapabilityRetirementContractEntry(previousEntry.retiredMembershipIdentity);
+    if (matchesStateCapabilityRetirementHistory(previousEntry, endedAuthority)
+      && matchesStateCapabilityRetirementHistory(currentEntry, endedAuthority)
+      && currentEntry.capabilityRetirementContractIdentity === endedAuthority.contractIdentity
+      && currentEntry.currentSourceFingerprint === endedAuthority.currentSourceFingerprint) {
+      const previousHistory = structuredClone(previousEntry);
+      const currentHistory = structuredClone(currentEntry);
+      for (const field of ["capabilityRetirementContractIdentity", "currentSourceFingerprint"]) {
+        delete previousHistory[field];
+        delete currentHistory[field];
+      }
+      if (isDeepStrictEqual(previousHistory, currentHistory)) continue;
+    }
     if (currentEntry.proofPrecision === "explicit-capability-retirement"
       && currentEntry.capabilityRetirementContractIdentity === endedAuthority?.contractIdentity
       && endedAuthority?.previousActionProofFingerprint === createHash("sha256").update(JSON.stringify(previousEntry)).digest("hex")
@@ -314,12 +328,23 @@ export function validateCallerToActionLedgerHistoryTransition({
       previousPhase !== currentPhase;
     const observationRefresh =
       samePhaseObservationRefresh || crossPhaseObservationRefresh;
-    const expectedHistory = observationRefresh
-      ? structuredClone(previousEntry)
-      : previousEntry;
-    const actualHistory = observationRefresh
-      ? structuredClone(currentEntry)
-      : currentEntry;
+    const expectedHistory = structuredClone(previousEntry);
+    const actualHistory = structuredClone(currentEntry);
+    const previousProofs = expectedHistory.functionProofs || [expectedHistory];
+    const currentProofs = actualHistory.functionProofs || [actualHistory];
+    for (const [index, currentProof] of currentProofs.entries()) {
+      const contract = findStateActionSuccessorProofContractEntry(
+        currentProof.actionModulePath, currentProof.actionExportName,
+        [currentEntry.domain, currentEntry.migrationPhase, currentEntry.operation, currentEntry.key].join("|"),
+      );
+      if (contract && currentProof.successorProofContractIdentity === contract.contractIdentity
+        && previousProofs[index]) {
+        // Descriptors, terminal membership and historical anchors still compare
+        // below; only the current contract's derived stamp may be refreshed.
+        delete previousProofs[index].successorProofContractIdentity;
+        delete currentProof.successorProofContractIdentity;
+      }
+    }
     if (observationRefresh) {
       // The builder refreshes live source coordinates within the recording
       // phase and may refresh the action edge across phases. Snapshot

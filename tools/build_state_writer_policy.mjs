@@ -44,6 +44,7 @@ import {
   STATE_CAPABILITY_RETIREMENT_CONTRACT,
   STATE_CAPABILITY_RETIREMENT_SOURCE_PROOFS,
   findStateCapabilityRetirementContractEntry,
+  matchesStateCapabilityRetirementHistory,
   inspectStateTargetPureReaderFunctionSource,
   STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT,
   STATE_ACTION_DELEGATION_CONTRACT,
@@ -2425,10 +2426,7 @@ export function inspectStateCapabilityRetirementEvidence({
     const historicalWriterMatches = previousBinding
       && priorSites.length === entry.retiredMutationSiteCount
       && priorFingerprint === entry.retiredMutationSiteFingerprint;
-    const previousLedgerMatches = previousRetirement?.proofPrecision === "explicit-capability-retirement"
-      && previousRetirement.capabilityRetirementContractIdentity === entry.contractIdentity
-      && previousRetirement.retiredMutationSiteCount === entry.retiredMutationSiteCount
-      && previousRetirement.retiredMutationSiteFingerprint === entry.retiredMutationSiteFingerprint;
+    const previousLedgerMatches = matchesStateCapabilityRetirementHistory(previousRetirement, entry);
     if (!retired || (!historicalWriterMatches && !previousLedgerMatches && !inheritedActionProofMatches)) {
       violations.push({ code: "state-capability-retirement-proof-invalid", reason: "historical-membership-drift", identity: entry.retiredMembershipIdentity });
     }
