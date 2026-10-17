@@ -36,6 +36,7 @@ import {
 import {
   buildDefaultStateOwnershipReport,
   validateTestDiagnosticBudget,
+  validateStateWriterPolicySchema,
   validateStateWriterPolicySnapshot,
 } from "./state_writer_policy.mjs";
 import {
@@ -1363,6 +1364,22 @@ export async function buildStateWriterPolicyReport({
   const sourceBaseSha = String(
     loadedPolicy?.baseline?.sourceBaseSha || "",
   ).trim();
+  // A malformed authority ledger cannot pass. Reject it before starting the
+  // repository inventory or historical worker; valid policies retain both.
+  const schemaViolations = validateStateWriterPolicySchema(loadedPolicy);
+  if (schemaViolations.length) {
+    return {
+      schemaVersion: 1,
+      stage: "policy-schema",
+      phase: normalizedPhase,
+      sourceBaseSha,
+      policyPath: path.relative(PROJECT_ROOT, STATE_WRITER_POLICY_PATH).replaceAll("\\", "/"),
+      policyBaseline: loadedPolicy.baseline,
+      verdict: "fail",
+      violations: schemaViolations,
+      metrics: null,
+    };
+  }
   const identity = buildStateWriterVerificationIdentity({
     sourceBaseSha,
     requireClean,
@@ -1692,8 +1709,11 @@ async function main() {
   if (args.json) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   } else {
+    const summary = report.stage === "policy-schema"
+      ? `${report.violations.length} schema violations before source scans`
+      : `${report.metrics.legacyDirectFiles.production} production + ${report.metrics.legacyDirectFiles.test} test legacy-direct files`;
     console.log(
-      `P4 state writer policy ${report.verdict}: ${report.metrics.legacyDirectFiles.production} production + ${report.metrics.legacyDirectFiles.test} test legacy-direct files; report ${path.relative(PROJECT_ROOT, outputPath).replaceAll("\\", "/")}.`,
+      `P4 state writer policy ${report.verdict}: ${summary}; report ${path.relative(PROJECT_ROOT, outputPath).replaceAll("\\", "/")}.`,
     );
     if (report.violations.length) {
       for (const violation of report.violations) {
