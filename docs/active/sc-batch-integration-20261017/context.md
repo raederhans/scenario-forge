@@ -27,3 +27,11 @@
 来源 golden 失败 trace 的两条 console warning，location 为 app document line 0，无 JS 堆栈，文本为 Chromium 原生 GL Driver Message / GPU stall due to ReadPixels；PNG 签名/下载断言在 console 断言之前均通过。当前源码显式 `readPixelsForValidation` 只被 prototype oracle 调用，不能据此归咎生产回滚/测试改动，也不能证明全部为无害环境噪声；WebGL 到 Canvas2D 的合成可涉及驱动内部读回。PR 如实保留未通过项，未改 console 门禁，后续以 hosted CI 终态验证。原始提取证据 `sample-guide-source-gpu-evidence.json`。
 
 最终推送前 ls-remote 再次确认 main 仍为 `5fbbfdcff`，拟用远端分支不存在。本副本已创建 `codex/sc-batch-review-20261017`。下一步按已读取的 write-lore-commits 准备明确范围的提交，单一 PR，跟踪不部署 CI；不合并、不部署。
+
+首轮提交 `54ac5ce09041f24cc5119f96da21cc4b45a18af2` 已推送并创建 [PR #244](https://github.com/raederhans/scenario-forge/pull/244)。HGO、五个场景合同和 Transport 成功。首轮 CI 确认四个本批组合遗漏：smoke 在测试前被 59/60 spec 数量/漏登记拦住；fast 的北美新测试缺 heavy grouping；Quick Fill 的 checked-in import graph 陈旧；TNO raster release native-reference 在新默认启用策略下 `requested=true`。日志为 ignored final-integration 目录的 `pr-smoke-first.log`、`pr-fast-first.log`、`quick-fill-first.log`、`raster-release-first.log`。不归咎 GPU 告警；不重跑原失败 head。
+
+修复：把新增 spec 精确登记为 browser regression，manifest count 改为实际60并同步 all/regression 清单，固定四个 smoke spec不变；北美测试登记 geo_stack；重建原 import graph；native oracle 会话显式 `political_id_raster=0`，原 requested=false、无下载、像素和恢复断言不变。新增真实 Chromium fixture 回归检查实际导航参数，避免把自动栅格帧作为原生参考。53 个来源文件中的 verifier 和 recovery spec 因此有明确本地修正，其余仍与来源相符。
+
+新增本地 browser fixture owner 仍为 /root，工作目录同上；命令 `node node_modules/@playwright/test/cli.js test tests/e2e/raster_startup_recovery.spec.js --workers=1 --retries=0 --grep "native reference startup" --output .runtime/tests/playwright/native-reference-startup`；使用原显式浏览器缓存与 dummy base URL，fixture 自选 localhost 端口，日志 `.runtime/reports/generated/final-integration/native-reference-startup.log`。退出码为终态，没有其他本地测试/服务器共享端口。后续跟踪 PR 的新 head，不合并、不部署。
+
+CI 定向修复本地验收：新增真实 browser fixture 1/1 通过（2.1秒），生成清单路由回归1/1通过，总本地行为检查37；E2E 精确60项/固定4项smoke列举、103项heavy分类、409项发现命令覆盖、75项spec导入图、timeout guardrails、syntax/diff-check通过。最终规划还发现生成all/regression清单缺路由，已把test-lists目录交给原精确层级完整性检查，保留fail-closed契约。未重复完整像素场景。最终64路径规划planned、0 unmatched、0 route gaps；首轮失败日志均保留在ignored目录。

@@ -22,6 +22,7 @@ ownership_retirement.spec.js
 physical_layer_regression.spec.js
 physical_layer_runtime_contract.spec.js
 project_save_load_roundtrip.spec.js
+raster_startup_recovery.spec.js
 review_regressions.spec.js
 river_contour_visibility.spec.js
 river_layer_regression.spec.js

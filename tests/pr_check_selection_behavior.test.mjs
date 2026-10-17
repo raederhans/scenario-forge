@@ -36,6 +36,12 @@ test("UI and export changes select the full sample-guide layout regression", () 
   }
 });
 
+test("generated E2E lists retain their exact layer integrity check", () => {
+  const plan = selectPrChecks(["tests/e2e/test-lists/all.txt", "tests/e2e/test-lists/regression.txt"]);
+  assert.deepEqual(plan.unmatchedChangedFiles, []);
+  assert.ok(plan.commands.some(command => command.args.includes("tools/e2e_layering.mjs") && command.args.includes("check")));
+});
+
 test("boundary-named behavior is not filtered, while exact historical audits are explicit", () => {
   const plan = selectPrChecks(["tests/map_data_boundary_behavior.test.mjs", "tests/state_target_private_cache_contract_behavior.test.mjs"]);
   assert.ok(plan.nodeTests.includes("tests/map_data_boundary_behavior.test.mjs"));

@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "graphMode": "artifact-only",
   "summary": {
-    "specCount": 74,
-    "nodeCount": 90,
-    "reverseIndexKeyCount": 143,
+    "specCount": 75,
+    "nodeCount": 91,
+    "reverseIndexKeyCount": 145,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -1218,6 +1218,20 @@
         "js/core/scenario_manager.js",
         "js/core/state.js",
         "js/ui/sidebar.js"
+      ]
+    },
+    "tests/e2e/raster_startup_recovery.spec.js": {
+      "directDependencies": [
+        "tools/political_id_raster_app_session.mjs",
+        "tools/verify_political_id_raster_integration.mjs"
+      ],
+      "transitiveDependencies": [
+        "tools/political_id_raster_app_session.mjs",
+        "tools/verify_political_id_raster_integration.mjs"
+      ],
+      "repoImpact": [
+        "tools/political_id_raster_app_session.mjs",
+        "tools/verify_political_id_raster_integration.mjs"
       ]
     },
     "tests/e2e/release/pages_public_release_gate.spec.js": {
@@ -2941,6 +2955,9 @@
     "tests/e2e/project_save_load_roundtrip.spec.js": [
       "tests/e2e/project_save_load_roundtrip.spec.js"
     ],
+    "tests/e2e/raster_startup_recovery.spec.js": [
+      "tests/e2e/raster_startup_recovery.spec.js"
+    ],
     "tests/e2e/release/pages_public_release_gate.spec.js": [
       "tests/e2e/release/pages_public_release_gate.spec.js"
     ],
@@ -3511,7 +3528,11 @@
     "tests/fixtures/river_paint/overlap_visibility.json": [
       "tests/e2e/river_overlap_visibility.spec.js"
     ],
+    "tools/political_id_raster_app_session.mjs": [
+      "tests/e2e/raster_startup_recovery.spec.js"
+    ],
     "tools/verify_political_id_raster_integration.mjs": [
+      "tests/e2e/raster_startup_recovery.spec.js",
       "tests/e2e/release/pages_public_release_gate.spec.js"
     ],
     "vendor/d3.v7.min.js": [

@@ -171,6 +171,14 @@
       "ownerHint": "project-persistence"
     },
     {
+      "specPath": "tests/e2e/raster_startup_recovery.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "renderer-runtime",
+      "ownerHint": "renderer-runtime",
+      "commandRef": "node node_modules/@playwright/test/cli.js test tests/e2e/raster_startup_recovery.spec.js --workers=1 --retries=0"
+    },
+    {
       "specPath": "tests/e2e/review_regressions.spec.js",
       "primaryLayer": "regression",
       "executionMode": "browser",

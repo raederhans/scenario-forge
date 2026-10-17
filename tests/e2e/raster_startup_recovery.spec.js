@@ -13,7 +13,9 @@ test.afterEach(async () => { for (const close of cleanup.reverse()) await close(
 // Exercise the real browser module map without loading map data or the GPU.
 async function fixture(t, moduleResponse, dependencyResponse = null) {
   let requests = 0;
+  const documents = [];
   const server = createServer((request, response) => {
+    if (request.url.startsWith("/app/?")) documents.push(request.url);
     if (request.url === "/app/js/core/map_renderer.js") {
       requests++;
       const { status = 200, type = "text/javascript", body = "export const renderer = true;" } = moduleResponse(requests);
@@ -40,10 +42,20 @@ async function fixture(t, moduleResponse, dependencyResponse = null) {
   return {
     url: `http://127.0.0.1:${server.address().port}/app/`, output,
     requests: () => requests,
+    documents: () => [...documents],
     diagnostics: async () => Promise.all((await readdir(output)).filter(name => name.endsWith(".json"))
       .map(async name => JSON.parse(await readFile(path.join(output, name), "utf8")))),
   };
 }
+
+test("native reference startup explicitly opts out of default raster rendering", async ({}, t) => {
+  const f = await fixture(t, () => ({}));
+  const { createRasterIntegrationCheck } = await import("../../tools/verify_political_id_raster_integration.mjs");
+  const check = await createRasterIntegrationCheck({ baseUrl: f.url, scenarioId: "fixture", output: f.output });
+  cleanup.push(() => check.close());
+  assert.equal(f.documents().length, 1);
+  assert.equal(new URL(f.documents()[0], f.url).searchParams.get("political_id_raster"), "0");
+});
 
 test("public raster startup recovers one evidenced module 503 in a fresh context and keeps its trace", async ({}, t) => {
   const f = await fixture(t, count => count === 1 ? { status: 503, body: "temporary service failure" } : {});
