@@ -176,7 +176,7 @@
       "executionMode": "browser",
       "domain": "renderer-runtime",
       "ownerHint": "renderer-runtime",
-      "commandRef": "node node_modules/@playwright/test/cli.js test tests/e2e/raster_startup_recovery.spec.js --workers=1 --retries=0"
+      "commandRef": "node tools/e2e_layering.mjs run-spec tests/e2e/raster_startup_recovery.spec.js"
     },
     {
       "specPath": "tests/e2e/review_regressions.spec.js",

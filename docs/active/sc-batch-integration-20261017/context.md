@@ -2,6 +2,8 @@
 
 当前阶段：统一 [PR #244](https://github.com/raederhans/scenario-forge/pull/244) 已建立。第二轮 head `fec2e664179a8426f529fae9707310dcd6f79281` 的 Raster 原五阶段、Perf、Quick Fill、Scenario、Transport 均成功。pr-verify 的两个剩余失败已独立审查：footprint 契约仍要求旧 PR 触发器；1939/TNO smoke 被 Chromium 原生 ReadPixels 性能诊断截断。前者现在约束仅 manual/schedule、禁止 PR/push，原报告和无部署断言保留。
 
+`052c2a79` 托管 smoke 四项 4/4 通过（2.2分钟），随后串行受影响 browser 命令复用 8810，Python server 启动失败；服务器明确不复用 socket，且既有 golden 步骤也因 TIME_WAIT 使用不同端口。runner 现给每条 browser 命令独立递增端口，同时设置服务端与应用 origin 端口，并开启 webserver 启动日志；回归通过 1/1，未增加重试/超时。fast 首次继续走到旧结构契约：新 raster spec 与 catalog 同步使用 canonical run-spec，保留 spec 唯一性严格契约；旧显式 selector/adaptive artifact 行为全部保留，只把工作流绑定断言改为当前分流 runner 的先选择后执行与 fail-closed 契约。两项目标结构测试 2/2 通过。该 head Raster/QuickFill/Scenario/Transport 已成功，Perf 当时仍运行，后续以最后 head 为准。
+
 最终取证审核另确认：本 PR 串行执行多个 Playwright 命令，后续命令会清空共享 outputDir。因此每份诊断另外存入独立 `.runtime/reports/generated/native-gpu-readback-diagnostics/`，smoke/demo 均上传它。定向单元回归删除模拟用例输出后仍必须读到完整归档，避免成功日志之外的原始 JSON 证据丢失；这项只修正取证持久化，不改变已通过的浏览器行为。
 
 后者通过固定 Chromium 145.0.7632.6 / ANGLE `4c0ae3917d4feab6ae1c99d7b750a69cdf3cc96c` 源码和本地实际 GPU 合成实验确认：该固定文本由 Vulkan 同步读回路径发出，不代表 GL 错误或已经测量的性能回归；同步读回仍有成本，独立性能门禁不变。仅当 warning、零 JS 参数、同源同 document 路径且 line/column 均为 0、文本完全匹配时单独记录。应用 console.warn 同文仍有参数并失败，其他 warning/error、context lost、网络和像素断言均保留；全局 console allowlist 未变，生产栅格未关闭。原始完整诊断写入 Playwright 输出并上传 JSON。证据和实验局限见 ignored `final-integration/gpu-investigation.zh-CN.md`。

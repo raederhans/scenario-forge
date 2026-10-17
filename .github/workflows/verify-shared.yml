@@ -246,6 +246,8 @@ jobs:
 
       - name: Run affected browser behaviors
         if: inputs.profile == 'pr-smoke'
+        env:
+          DEBUG: pw:webserver
         shell: bash
         run: |
           args=()

@@ -64,3 +64,17 @@ test("invalid input and real command failures propagate", () => {
   assert.throws(() => runPrChecks(["--unknown"]), /Unknown argument/);
   assert.equal(runPrChecks(["--changed-file", "tests/pr_check_selection_behavior.test.mjs", "--lane", "unit"], { runner: () => ({ status: 7 }) }), 7);
 });
+
+test("sequential browser commands use distinct matching server and app ports after smoke", () => {
+  const ports = [];
+  assert.equal(runPrChecks([
+    "--changed-file", "tests/e2e/hoi4_1939_ui_smoke.spec.js",
+    "--changed-file", "tests/e2e/tno_1962_ui_smoke.spec.js", "--lane", "browser",
+  ], { runner: (_bin, _args, options) => {
+    assert.equal(options.env.MAPCREATOR_DEV_PORT, options.env.PLAYWRIGHT_TEST_SERVER_PORT);
+    ports.push(Number(options.env.MAPCREATOR_DEV_PORT));
+    return { status: 0 };
+  } }), 0);
+  const base = Number(process.env.PLAYWRIGHT_TEST_SERVER_PORT || process.env.MAPCREATOR_DEV_PORT || 8810);
+  assert.deepEqual(ports, [base + 1, base + 2]);
+});

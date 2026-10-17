@@ -190,9 +190,14 @@ export function runPrChecks(argv = process.argv.slice(2), { cwd = process.cwd(),
   if (list) return 0;
   const tmp = path.join(cwd, ".runtime", "tmp");
   fs.mkdirSync(tmp, { recursive: true });
+  // A preceding smoke command used the base port. dev_server intentionally does
+  // not reuse sockets, so use a separate port for each sequential browser run.
+  let nextBrowserPort = Number(process.env.PLAYWRIGHT_TEST_SERVER_PORT || process.env.MAPCREATOR_DEV_PORT || 8810) + 1;
   for (const command of selection.commands.filter(command => lane === "all" || command.lane === lane)) {
+    const browserEnv = command.lane === "browser"
+      ? { MAPCREATOR_DEV_PORT: String(nextBrowserPort), PLAYWRIGHT_TEST_SERVER_PORT: String(nextBrowserPort++) } : {};
     const result = runner(command.bin, command.args, { cwd, stdio: "inherit", shell: false,
-      env: { ...process.env, TMPDIR: tmp, TEMP: tmp, TMP: tmp, PYTHONDONTWRITEBYTECODE: "1" } });
+      env: { ...process.env, ...browserEnv, TMPDIR: tmp, TEMP: tmp, TMP: tmp, PYTHONDONTWRITEBYTECODE: "1" } });
     if (result.error || result.status !== 0) return result.status || 1;
   }
   return 0;

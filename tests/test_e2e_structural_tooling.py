@@ -1752,18 +1752,22 @@ const page = {
             self.assertIn("verify:architecture-boundaries", package_commands)
             self.assertIn("verify:perf-gate-contract", package_commands)
 
-    def test_verify_shared_builds_selector_artifact_before_selected_execution(self) -> None:
+    def test_explicit_selector_artifact_and_pr_lane_selection_precede_execution(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "verify-shared.yml").read_text(encoding="utf-8")
-        selector_explain_index = workflow.index("node tools/select_verification_targets.mjs --changed-files-list")
-        adaptive_runner_index = workflow.index("node tools/run_adaptive_tests.mjs")
-        self.assertLess(selector_explain_index, adaptive_runner_index)
-        self.assertIn("id: selector", workflow)
-        self.assertIn("if: always() && inputs.profile == 'pr-fast' && steps.selector.outcome != 'skipped'", workflow)
+        changed_files_index = workflow.index("- name: Read affected files")
+        selected_runner_index = workflow.index("node tools/ci/run_pr_checks.mjs --changed-files-list")
+        self.assertLess(changed_files_index, selected_runner_index)
+        self.assertIn("if: inputs.profile == 'pr-fast'", workflow)
+        self.assertIn("--lane unit", workflow)
+        self.assertIn("--lane browser", workflow)
+        runner = (REPO_ROOT / "tools" / "ci" / "run_pr_checks.mjs").read_text(encoding="utf-8")
+        self.assertLess(runner.index("console.log(JSON.stringify(selection"), runner.index("const result = runner("))
+        self.assertIn("Unmapped changed files:", runner)
         self.assertNotIn("npm run verify:test-import-graph", workflow)
         self.assertNotIn("npm run verify:architecture-boundaries", workflow)
         self.assertNotIn("npm run verify:test-timeout-inventory", workflow)
-        self.assertIn(".runtime/reports/generated/test-import-graph.json", workflow)
-        self.assertIn(".runtime/tmp/verification-selector-changed-files.txt", workflow)
+        self.assertIn("test -s .runtime/tmp/pr-check-files.txt", workflow)
+        self.assertIn(".runtime/tmp/pr-check-files.txt", workflow)
 
         changed_files_path = self.tmp_root / "verification-selector-changed-files.txt"
         selector_json_path = self.tmp_root / "verification-selector-explain.json"

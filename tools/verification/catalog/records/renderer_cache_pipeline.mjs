@@ -16,7 +16,7 @@ export const RENDERER_CACHE_PIPELINE_RECORDS = [
   {
     ...politicalIdRasterRoute,
     id: "e2e:raster-startup-recovery", selectorOrder: 5004,
-    commandRef: "node node_modules/@playwright/test/cli.js test tests/e2e/raster_startup_recovery.spec.js --workers=1 --retries=0",
+    commandRef: "node tools/e2e_layering.mjs run-spec tests/e2e/raster_startup_recovery.spec.js",
     sourceRefs: ["tools/political_id_raster_app_session.mjs", "tools/verify_political_id_raster_integration.mjs",
       "tests/e2e/raster_startup_recovery.spec.js"],
     cost: "heavy", tiers: ["regression"], profiles: ["full"],
