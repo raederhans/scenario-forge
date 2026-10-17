@@ -115,6 +115,47 @@ test("native bounded gzip cancels an oversized stream and never retries through 
   assert.equal(fallbackCalls, 0);
 });
 
+test("native bounded gzip reuses exact output and trims spare capacity", async () => {
+  const allocations = [];
+  class TrackedUint8Array extends Uint8Array {
+    constructor(...args) {
+      super(...args);
+      if (typeof args[0] === "number") allocations.push(this.buffer);
+    }
+  }
+  const context = vm.createContext({
+    Uint8Array: TrackedUint8Array, ArrayBuffer, Blob, Response, DecompressionStream, Error,
+  });
+  vm.runInContext(sharedSource, context);
+  const decoder = context.__scenarioForgeJsonResourceDecoderShared;
+  const bytes = Buffer.from("海域 🌊");
+  const compressed = gzipSync(bytes);
+  for (const spare of [0, 5]) {
+    allocations.length = 0;
+    const result = await decoder.decompressGzip(compressed, { maxOutputBytes: bytes.length + spare });
+    assert.deepEqual(Buffer.from(result), bytes);
+    assert.equal(allocations.length, 1);
+    assert.equal(result === allocations[0], spare === 0);
+  }
+});
+
+test("fallback gzip isolates every injected output, including exact buffers and subviews", async () => {
+  const decoder = createBoundedDecoder(undefined);
+  const bytes = Buffer.from("validated output");
+  const compressed = gzipSync(bytes);
+  for (const [offset, spare] of [[0, 0], [0, 5], [3, 5]]) {
+    const backing = new Uint8Array(offset + bytes.length + spare).fill(255);
+    backing.set(bytes, offset);
+    const decoded = backing.subarray(offset, offset + bytes.length);
+    decoder.setFallbackGunzip(() => decoded);
+    const result = await decoder.decompressGzip(compressed);
+    assert.deepEqual(Buffer.from(result), bytes);
+    assert.notEqual(result, backing.buffer);
+    decoded.fill(0);
+    assert.deepEqual(Buffer.from(result), bytes);
+  }
+});
+
 function createMockResponse({
   ok = true,
   status = 200,

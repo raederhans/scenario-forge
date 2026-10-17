@@ -10,6 +10,8 @@ import { hasScenarioRuntimeShellContract } from "../core/scenario_resources.js";
 import {
   getScenarioStartupBundleFilename,
   normalizeScenarioLocaleLanguage,
+  SCENARIO_STARTUP_GEO_ALIASES_FILENAME,
+  SCENARIO_STARTUP_LOCALES_FILENAME,
 } from "../core/scenario/locale_asset_contract.js";
 import { normalizeCountryCodeAlias } from "../core/country_code_aliases.js";
 import {
@@ -315,6 +317,12 @@ export function getStartupScenarioSupportUrl(scenarioId, filename) {
   const normalizedScenarioId = String(scenarioId || "").trim();
   const normalizedFilename = String(filename || "").trim();
   if (!normalizedScenarioId || !normalizedFilename) {
+    return "";
+  }
+  // Built-in lightweight_base scenarios do not publish scoped startup locales.
+  // An empty override selects the existing shared localization registry assets.
+  if (["blank_base", "modern_world"].includes(normalizedScenarioId)
+    && [SCENARIO_STARTUP_LOCALES_FILENAME, SCENARIO_STARTUP_GEO_ALIASES_FILENAME].includes(normalizedFilename)) {
     return "";
   }
   return `data/scenarios/${normalizedScenarioId}/${normalizedFilename}`;

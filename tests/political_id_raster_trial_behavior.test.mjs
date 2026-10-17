@@ -9,11 +9,11 @@ test("URL overrides the saved experiment without requiring storage access", () =
   assert.equal(readPoliticalIdRasterPreference({ search: "", storage: broken }), false);
   assert.equal(readPoliticalIdRasterPreference({ search: "", storage: { getItem: () => "1" } }), true);
 });
-test("the trial is eligible only after safe startup and only for the three supported scenarios", () => {
+test("raster is eligible only after safe startup and for supported political scenarios", () => {
   const base = { requested: true, exporting: false, debugMode: "PROD", ready: true, firstVisible: true,
     readonly: false, unlocking: false, riverPartitions: false, scenarioId: "hoi4_1939" };
-  for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962"]) assert.equal(getPoliticalIdRasterEligibility({ ...base, scenarioId }), "eligible");
-  for (const [patch, reason] of [[{ requested: false }, "off"], [{ scenarioId: "modern_world" }, "unsupported-scenario"],
+  for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962", "modern_world"]) assert.equal(getPoliticalIdRasterEligibility({ ...base, scenarioId }), "eligible");
+  for (const [patch, reason] of [[{ requested: false }, "off"], [{ scenarioId: "blank_base" }, "unsupported-scenario"],
     [{ ready: false }, "startup"], [{ firstVisible: false }, "startup"], [{ readonly: true }, "startup"],
     [{ unlocking: true }, "startup"], [{ exporting: true }, "export"], [{ riverPartitions: true }, "river-partitions"], [{ debugMode: "DEBUG" }, "debug-mode"]]) {
     assert.equal(getPoliticalIdRasterEligibility({ ...base, ...patch }), reason);
@@ -48,7 +48,7 @@ test("trial control persists changes and exposes translatable live status", asyn
 });
 
 const policyStore = values => ({ getItem: key => values[key] ?? null });
-test("resident policy is explicit and defaults remain native with preserved legacy hybrid semantics", () => {
+test("policy preserves explicit vector, raster and legacy hybrid preferences", () => {
   const read = (search = "", values = {}) => readPoliticalRenderPolicy({ search, storage: policyStore(values) });
   assert.equal(read().effectiveMode, "vector");
   assert.equal(read().mode, "auto");
@@ -65,6 +65,26 @@ test("resident policy is explicit and defaults remain native with preserved lega
   const broken = { getItem() { throw Error("blocked"); } };
   assert.equal(readPoliticalRenderPolicy({ search: "?political_render_mode=raster", storage: broken }).persistent, true);
   assert.equal(readPoliticalRenderPolicy({ search: "", storage: broken }).requested, false);
+});
+
+test("automatic policy selects persistent raster only for supported, capable devices", () => {
+  const defaults = { search: "", storage: policyStore({}), capable: true, deviceMemory: 4 };
+  for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962", "modern_world"]) {
+    const policy = readPoliticalRenderPolicy({ ...defaults, scenarioId });
+    assert.equal(policy.mode, "auto");
+    assert.equal(policy.effectiveMode, "raster");
+    assert.equal(policy.persistent, true);
+    assert.equal(policy.preferenceSource, "default");
+  }
+  for (const patch of [{ scenarioId: "blank_base" }, { scenarioId: "do" },
+    { scenarioId: "hoi4_1939", capable: false }, { scenarioId: "hoi4_1939", deviceMemory: 2 }]) {
+    assert.equal(readPoliticalRenderPolicy({ ...defaults, ...patch }).effectiveMode, "vector");
+  }
+  assert.equal(readPoliticalRenderPolicy({ ...defaults, scenarioId: "modern_world", deviceMemory: undefined }).persistent, true);
+  assert.equal(readPoliticalRenderPolicy({ ...defaults, scenarioId: "hoi4_1939",
+    storage: policyStore({ "scenario-forge-political-render-mode": "vector" }) }).requested, false);
+  assert.equal(readPoliticalRenderPolicy({ ...defaults, scenarioId: "hoi4_1939",
+    storage: { getItem() { throw new Error("storage blocked"); } } }).persistent, true);
 });
 
 test("explicit mode writes and legacy toggles cannot leave a conflicting URL preference", t => {

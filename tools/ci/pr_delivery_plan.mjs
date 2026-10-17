@@ -5,11 +5,7 @@ import { fileURLToPath } from "node:url";
 import { planPullRequest } from "./pr_plan.mjs";
 import { packageChangeRequiresPerformance } from "./perf_policy.mjs";
 import { discoverWorkspaceChangedFiles } from "../verification/workspace_changes.mjs";
-import { prepareRepositoryVerificationCatalogBinding } from "../verification/script_portfolio.mjs";
-import { buildPrCostObservation } from "../verification/verification_profile.mjs";
-import { buildRecommendation } from "../select_verification_targets.mjs";
-import { buildRouteIndex } from "../test_route_registry.mjs";
-import { buildExecutionPlan } from "../run_adaptive_tests.mjs";
+import { selectPrChecks } from "./run_pr_checks.mjs";
 
 const sortedUnique = (values) => [...new Set(values)].sort();
 const errorWithCode = (code, detail) => Object.assign(new Error(`${code}: ${detail}`), { code });
@@ -44,28 +40,18 @@ export function describeCommand(bin, args) {
   };
 }
 
-export function selectRepositoryLocalPlan({ changedFiles, cwd = process.cwd() }) {
-  const packageScripts = JSON.parse(fs.readFileSync(path.join(cwd, "package.json"), "utf8")).scripts || {};
-  const routes = buildRouteIndex();
-  const binding = prepareRepositoryVerificationCatalogBinding({ packageScripts, selectorRoutes: routes, repoRoot: cwd });
-  const selectorStartedAt = performance.now();
-  const boundSelection = binding.bindSelectionReport(buildRecommendation(changedFiles, routes, {
-    routeAuthority: binding.preparedCatalog.authority,
-  }));
-  const report = {
-    ...boundSelection,
-    prCost: buildPrCostObservation({
-      selectorReport: boundSelection,
-      observationStage: "selector",
-      timingInputs: { selectorMs: { value: performance.now() - selectorStartedAt, source: "local-monotonic-clock" } },
-    }),
-    adaptiveMode: "dry-run",
-    mainThreadDisposition: "deferred",
+export function selectRepositoryLocalPlan({ changedFiles, cwd = process.cwd(), base = "origin/main" }) {
+  const selection = selectPrChecks(changedFiles, { cwd, base });
+  return {
+    report: { unmatchedChangedFiles: selection.unmatchedChangedFiles,
+      diagnosticNextSteps: selection.deferred.map(command => `Manual maintenance: ${command}`) },
+    executionPlan: {
+      routeGaps: selection.unmatchedChangedFiles.map(file => ({ code: "unmapped-changed-file", detail: file })),
+      executionCommands: selection.commands.map(process => ({ process })),
+      commandsToRun: selection.commands.map(command => [command.bin, ...command.args].join(" ")),
+      blockedMainThreadCommands: [], deferredCiOnlyCommands: [], deferredMainThreadGroups: [], deferredCiOnlyGroups: [],
+    },
   };
-  const executionPlan = buildExecutionPlan(report, {
-    packageScripts, preparedCatalog: binding.preparedCatalog, includeMainThread: false,
-  });
-  return { report, executionPlan };
 }
 
 export function buildPrDeliveryPlan({
@@ -119,7 +105,7 @@ export function buildPrDeliveryPlan({
     () => fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
   let selection;
   try {
-    selection = selectLocal({ changedFiles: predictedChangedFiles, cwd: repoRoot });
+    selection = selectLocal({ changedFiles: predictedChangedFiles, cwd: repoRoot, base: baseSha });
     if (!selection?.report || !selection?.executionPlan
       || !Array.isArray(selection.report.unmatchedChangedFiles) || !Array.isArray(selection.executionPlan.routeGaps)) {
       throw errorWithCode("pr-delivery-selector-result-invalid", "expected report and executionPlan");

@@ -2,6 +2,7 @@ import {loadDataset} from './data/dataset.js';
 import {createHgoSession} from './session.js';
 import {text,keyboardAction,validateProjectFile,parseHexColor} from './ui/text.js';
 import {createCountryPanel} from './ui/countries.js';
+import {createInspectorTabs} from './ui/inspector.js';
 import {consumeHandoff} from './integration/handoff.js';
 
 const $=id=>document.getElementById(id);
@@ -9,6 +10,7 @@ const palette=['#d17b55','#d6b978','#87977a','#728b98','#9b859e','#e2daca','#3d4
 let language='zh',session=null,countryPanel=null,loadingController=null,loadGeneration=0,viewModel=null,exporting=false,handoffPending=false,toastTimer=0,destroyed=false,leaveAuthorized=false;
 const objectUrls=new Set();
 const t=key=>text[language][key]||key;
+const inspectorTabs=createInspectorTabs({root:$('inspector-tabs'),panels:{paint:$('panel-paint'),countries:$('panel-countries'),display:$('panel-display')},onChange:name=>countryPanel?.setActive(name==='countries')});
 function notify(message,error=false){const el=$('toast');el.textContent=message;el.classList.toggle('error',error);el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.hidden=true;},error?9000:4000);}
 function attempt(action){try{return action();}catch(error){notify(error.message,true);}}
 function download(blob,name){const url=URL.createObjectURL(blob);objectUrls.add(url);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>{URL.revokeObjectURL(url);objectUrls.delete(url);},1500);}
@@ -20,6 +22,7 @@ function setLanguage(next){
   $('state-search').placeholder=t('searchPlaceholder');$('paint-color').setAttribute('aria-label',t('colorHeading'));$('zoom-in').setAttribute('aria-label',t('zoomIn'));$('zoom-out').setAttribute('aria-label',t('zoomOut'));$('map-canvas').setAttribute('aria-label',t('mapAria'));$('back-link').setAttribute('aria-label',t('back'));
   for(const [id,key,shortcut]of [['tool-select','select','V'],['tool-paint','paint','B'],['tool-pick','pickTitle','I'],['tool-pan','pan','H'],['undo-button','undo','Ctrl/⌘+Z'],['redo-button','redo','Ctrl/⌘+Shift+Z']])$(id).title=`${t(key)} (${shortcut})`;
   $('tool-pick').setAttribute('aria-label',t('pick'));
+  $('inspector-tabs').setAttribute('aria-label',t('editorWorkspace'));
   if(viewModel)render(viewModel);else{$('load-title').textContent=t(loadingController?'loading':'loadCancelled');$('load-detail').textContent=t(loadingController?'loadDetail':'cancelledDetail');}
   search();
 }
@@ -63,7 +66,7 @@ async function start(){
     if(destroyed||controller.signal.aborted||generation!==loadGeneration)return;
     const url=new URL(location.href),token=url.searchParams.get('handoff');handoffPending=Boolean(token);
     session=createHgoSession({canvas:$('map-canvas'),overlayCanvas:$('overlay-canvas'),dataset,onChange:render,onError:error=>notify(error.message,true)});
-    countryPanel=createCountryPanel({root:$('country-panel'),session,getLanguage:()=>language,onError:error=>notify(error.message,true)});
+    countryPanel=createCountryPanel({root:$('country-panel'),session,active:inspectorTabs.current==='countries',getLanguage:()=>language,onError:error=>notify(error.message,true)});
     loadingController=null;$('load-panel').hidden=!handoffPending;$('cancel-load').hidden=true;$('retry-load').hidden=true;render(session.getViewModel());
     if(dataset.placesWarning)notify(`${t('cityWarning')} ${dataset.placesWarning}`,true);
     if(token){
@@ -107,7 +110,7 @@ $('save-button').addEventListener('click',save);$('open-button').addEventListene
 $('project-file').addEventListener('change',event=>void openFile(event.target.files[0]));$('export-button').addEventListener('click',()=>void exportPng());
 $('back-link').addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||event.button!==0)return;if(!canReplace())event.preventDefault();else leaveAuthorized=true;});
 window.addEventListener('beforeunload',event=>{if(!leaveAuthorized&&session?.getViewModel().dirty){event.preventDefault();event.returnValue='';}});
-window.addEventListener('pagehide',event=>{if(event.persisted)return;destroyed=true;++loadGeneration;loadingController?.abort();countryPanel?.dispose();countryPanel=null;session?.dispose();session=null;clearTimeout(toastTimer);for(const url of objectUrls)URL.revokeObjectURL(url);objectUrls.clear();});
+window.addEventListener('pagehide',event=>{if(event.persisted)return;destroyed=true;++loadGeneration;loadingController?.abort();countryPanel?.dispose();countryPanel=null;inspectorTabs.dispose();session?.dispose();session=null;clearTimeout(toastTimer);for(const url of objectUrls)URL.revokeObjectURL(url);objectUrls.clear();});
 window.addEventListener('pageshow',()=>{leaveAuthorized=false;session?.resize();});
 document.addEventListener('keydown',event=>{
   if(!viewModel||event.repeat)return;

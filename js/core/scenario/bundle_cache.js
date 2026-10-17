@@ -9,10 +9,38 @@ export {
   SCENARIO_CHUNK_PAYLOAD_CACHE_BYTE_LIMIT,
   recordScenarioChunkPayloadSourceBytes,
 } from "./bundle_cache_policy.js";
-export function trimScenarioBundleCache(state, recency, targetId) {
+const topologyObjectsByDecodedCollection = {
+  politicalData: ["political"],
+  scenarioLandMaskData: ["land_mask", "land"],
+  scenarioContextLandMaskData: ["context_land_mask"],
+  scenarioWaterRegionsData: ["scenario_water"],
+  scenarioSpecialRegionsData: ["scenario_special_land"],
+  scenarioAtlantropaData: ["scenario_atlantropa"],
+};
+
+export function trimScenarioBundleCache(state, recency, targetId, { releaseDerived = true } = {}) {
   const retainedIds = trimScenarioBundleCacheState(state, Array.from(recency.keys()), targetId);
   recency.clear();
   for (const id of retainedIds) recency.set(id, true);
+  if (!releaseDerived || state.scenarioApplyInFlight) return;
+  for (const [id, bundle] of Object.entries(state.scenarioBundleCacheById || {})) {
+    if (!bundle || id === targetId || id === String(state.activeScenarioId || "").trim()) continue;
+    if ((bundle.deferredMetadataLoadPromise && !bundle.deferredMetadataLoadSettled)
+      || Object.values(bundle.optionalLayerPromises || {}).some(Boolean)
+      || Object.values(bundle.chunkPayloadPromisesById || {}).some(Boolean)) continue;
+    const topology = bundle.runtimeTopologyPayload;
+    const objects = topology?.objects;
+    if (topology?.type !== "Topology" || !Array.isArray(topology.arcs) || !objects) continue;
+    if (bundle.runtimeDecodedCollections) {
+      // A decoded-only layer has no replacement source: keep it. Only discard
+      // worker derivations that can be rebuilt from this bundle's own Topology.
+      const retained = Object.entries(bundle.runtimeDecodedCollections).filter(([key, collection]) =>
+        collection && !topologyObjectsByDecodedCollection[key]?.some(name => objects[name]));
+      bundle.runtimeDecodedCollections = retained.length ? Object.fromEntries(retained) : null;
+    }
+    bundle.runtimeDecodedTopologyCache?.clear();
+    delete bundle.runtimeDecodedTopologyCache;
+  }
 }
 
 export function trimScenarioChunkPayloadCache(bundle, protectedIds = []) {

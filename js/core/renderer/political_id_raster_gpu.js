@@ -57,7 +57,7 @@ export function createPoliticalIdRasterGpu({
     alpha: true, antialias: false, premultipliedAlpha: true,
     depth: false, stencil: false, preserveDrawingBuffer: false,
   });
-  if (!gl) throw new Error("Political ID raster prototype requires WebGL2.");
+  if (!gl) throw new Error("Political ID raster requires WebGL2.");
   const limit = gl.getParameter(gl.MAX_TEXTURE_SIZE);
   const resources = new Set();
   const resident = new Map();
@@ -256,6 +256,7 @@ export function createPoliticalIdRasterGpu({
       return topLeft;
     }
     return {
+      getLimits: () => ({ maxTextureSize: limit }),
       canvas, setPalette, setTiles, draw, readPixelsForValidation, dispose,
       isAvailable: () => !disposed && !lost && !gl.isContextLost(),
       getStats: () => ({

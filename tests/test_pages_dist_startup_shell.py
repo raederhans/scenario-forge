@@ -338,12 +338,16 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertEqual([], uncovered)
 
         package_scripts = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))["scripts"]
-        workflow_text = VERIFY_SHARED_WORKFLOW.read_text(encoding="utf-8")
+        from tests.test_e2e_structural_tooling import parse_workflow_job_blocks, parse_job_scalar
+
+        workflow_text = (REPO_ROOT / ".github/workflows/nightly-verification.yml").read_text(encoding="utf-8")
+        pages_job = parse_workflow_job_blocks(workflow_text)["pages"]
+        self.assertEqual(parse_job_scalar(pages_job, "if"), "github.event_name == 'workflow_dispatch' && inputs.maintenance")
+        self.assertIn("run: npm run verify:pages-dist-and-drift", pages_job)
         for spec in pathspecs:
             with self.subTest(spec=spec):
                 for script_name in ("verify:pages-dist-and-drift", "verify:dist-drift"):
                     self.assertIn(spec, package_scripts[script_name], script_name)
-                self.assertIn(spec, workflow_text)
 
     def test_landing_generated_cartography_assets_exist(self) -> None:
         source_svg_assets = (
@@ -3692,7 +3696,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         upload_block = "\n".join(workflow_lines[upload_block_start : upload_block_start + 4])
 
         self.assertIn(
-            "path: ${{ inputs.pages-artifact-only && '.runtime/pages-release/dist' || 'dist' }}",
+            "path: .runtime/pages-release/dist",
             upload_block,
         )
         self.assertIn("include-hidden-files: true", upload_block)

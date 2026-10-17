@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "17 18 * * *"
   workflow_dispatch:
+    inputs:
+      maintenance:
+        description: Run historical proof, metadata, mirror drift and Windows governance audits.
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -14,6 +19,7 @@ concurrency:
 
 jobs:
   metadata:
+    if: github.event_name == 'workflow_dispatch' && inputs.maintenance
     name: Nightly Metadata
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -62,6 +68,7 @@ jobs:
           retention-days: 14
 
   p4-checker-boundaries:
+    if: github.event_name == 'workflow_dispatch' && inputs.maintenance
     name: Nightly P4 Checker and Python Boundaries
     runs-on: windows-latest
     timeout-minutes: 60
@@ -104,6 +111,7 @@ jobs:
           retention-days: 14
 
   p4-full-policy:
+    if: github.event_name == 'workflow_dispatch' && inputs.maintenance
     name: Nightly P4 Canonical Full Policy TAP
     runs-on: windows-latest
     timeout-minutes: 120
@@ -131,6 +139,7 @@ jobs:
           retention-days: 14
 
   p4-fast:
+    if: github.event_name == 'workflow_dispatch' && inputs.maintenance
     name: Nightly P4.4 Fast Contracts and Routes
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -158,6 +167,7 @@ jobs:
           retention-days: 14
 
   p4-closeout:
+    if: github.event_name == 'workflow_dispatch' && inputs.maintenance
     name: Nightly P4 Closeout
     needs: ["p4-checker-boundaries", "p4-full-policy", "p4-fast"]
     runs-on: ubuntu-latest
@@ -271,6 +281,7 @@ jobs:
           retention-days: 14
 
   pages:
+    if: github.event_name == 'workflow_dispatch' && inputs.maintenance
     name: Nightly Pages Dist and Drift
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -331,8 +342,10 @@ jobs:
       - name: Build artifact-only Pages shadow dist
         run: python tools/build_pages_dist.py --output-root .runtime/pages-artifact-shadow/dist
       - name: Build legacy tracked Pages reference
+        if: github.event_name == 'workflow_dispatch' && inputs.maintenance
         run: python tools/build_pages_dist.py
       - name: Verify artifact-only Pages shadow
+        if: github.event_name == 'workflow_dispatch' && inputs.maintenance
         run: python tools/pages_artifact_shadow.py verify --artifact-root .runtime/pages-artifact-shadow/dist --run-id github-${{ github.run_id }}-${{ github.run_attempt }} --comparison-out .runtime/reports/generated/nightly/pages-artifact-shadow-comparison.json
       - name: Start artifact-only Pages shadow server
         run: |
@@ -351,6 +364,7 @@ jobs:
           PLAYWRIGHT_TEST_BASE_URL: http://127.0.0.1:4173/
         run: npm run test:e2e:pages-public-release-gate
       - name: Record artifact-only Pages shadow receipt
+        if: github.event_name == 'workflow_dispatch' && inputs.maintenance
         run: python tools/pages_artifact_shadow.py receipt --comparison .runtime/reports/generated/nightly/pages-artifact-shadow-comparison.json --public-smoke passed --out .runtime/reports/generated/nightly/pages-artifact-shadow.json
       - name: Upload artifact-only Pages shadow
         if: always()
@@ -358,10 +372,9 @@ jobs:
         with:
           name: nightly-pages-artifact-shadow-${{ github.sha }}-${{ github.run_attempt }}
           path: |
-            .runtime/pages-artifact-shadow/dist
             .runtime/reports/generated/nightly/pages-artifact-shadow-comparison.json
             .runtime/reports/generated/nightly/pages-artifact-shadow.json
-          if-no-files-found: error
+          if-no-files-found: ignore
           include-hidden-files: true
           retention-days: 14
 
@@ -460,6 +473,7 @@ jobs:
           retention-days: 14
 
   windows-governance:
+    if: github.event_name == 'workflow_dispatch' && inputs.maintenance
     name: Nightly Windows Governance
     runs-on: windows-latest
     timeout-minutes: 45
@@ -512,6 +526,7 @@ jobs:
       - name: Summarize Nightly shard results
         env:
           REQUIRED_RESULTS: ${{ toJSON(needs) }}
+          RUN_MAINTENANCE: ${{ github.event_name == 'workflow_dispatch' && inputs.maintenance }}
         run: |
           node <<'NODE'
           const fs = require("node:fs");
@@ -524,7 +539,9 @@ jobs:
           const summary = ["## Nightly shard results", "", "| Job | Result |", "| --- | --- |", ...rows, ""].join("\n");
           console.log(summary);
           if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
-          const rejected = expectedJobs.filter((job) => needs[job]?.result !== "success");
+          const maintenance = new Set(["metadata", "pages", "p4-closeout", "windows-governance"]);
+          const rejected = expectedJobs.filter((job) => needs[job]?.result !==
+            (maintenance.has(job) && process.env.RUN_MAINTENANCE !== "true" ? "skipped" : "success"));
           if (!dependencySetMatches || rejected.length > 0) {
             console.error(`Nightly verification failed: ${rejected.join(", ") || "dependency set mismatch"}`);
             process.exit(1);

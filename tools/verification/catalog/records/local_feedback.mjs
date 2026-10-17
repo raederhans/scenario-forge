@@ -218,6 +218,7 @@ export function createLocalFeedbackRecords(baseRecords) {
   // Each local leaf covers this owner only; broader roots and data retain their
   // existing PR/nightly/release requirements.
   const localOwnerCoverage = [
+    ["cooperative-geometry-transport", "renderer-runtime", "js/core/cooperative_geometry_transport.js", "tests/cooperative_geometry_transport_behavior.test.mjs", ["js/core/geometry_raster_worker_client.js", "js/core/geometry_transfer_codec_shared.js"]],
     ["json-resource-decoder", "startup", "js/core/json_resource_decoder_shared.js", "tests/json_resource_decoder_behavior.test.mjs", ["js/core/data_loader.js", "js/workers/startup_boot.worker.js"]],
     ["regional-precision-chunk-budget", "scenario-runtime", "tools/scenario_chunk_assets.py", "tests/regional_precision_chunk_budget.test.mjs", ["js/core/scenario_chunk_manager.js"]],
     ["scenario-spatial-chunk-selection", "scenario-runtime", "tools/political_detail_partition.py", "tests/scenario_spatial_chunk_selection_behavior.test.mjs", ["js/core/scenario_chunk_manager.js", "js/core/scenario/bundle_cache_policy.js", "js/core/scenario/chunk_runtime.js"]],
@@ -542,7 +543,16 @@ export function createLocalFeedbackRecords(baseRecords) {
     selectorOrder: editorCheckoutRecord.selectorOrder + 15,
   };
 
-  return [baselineStartupProjectionRecord, marineSyncRecord, startupTopologyCodecRecord, physicalDetailRecord, bathymetryBuilderRecord, ...actionRecords, ...borderRecords, countryInspectorRecord,
+  const northAmericaRecord = {
+    ...editorCheckoutRecord,
+    id: "local:python:north-america-processing",
+    commandRef: "python -m pytest tests/test_north_america_processing.py -q",
+    sourceRefs: ["map_builder/processors/north_america.py", "tests/test_north_america_processing.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 16,
+  };
+
+  return [northAmericaRecord, baselineStartupProjectionRecord, marineSyncRecord, startupTopologyCodecRecord, physicalDetailRecord, bathymetryBuilderRecord, ...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...precisionPytestRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
     historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
     startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord,

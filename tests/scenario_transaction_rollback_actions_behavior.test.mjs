@@ -5,22 +5,27 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import {
+  captureScenarioActivationState,
   restoreScenarioActivationAfterColorDirtyState,
   restoreScenarioActivationBeforeAuditState,
   restoreScenarioActivationBeforeColorDirtyState,
   SCENARIO_ACTIVATION_STATE_KEYS,
 } from "../js/core/state/actions/scenario_activation_actions.js";
 import {
+  captureScenarioPaletteState,
   restoreScenarioPaletteState,
   SCENARIO_PALETTE_STATE_KEYS,
 } from "../js/core/state/actions/scenario_palette_actions.js";
 import {
+  captureActiveScenarioPerformanceHintsState,
+  captureScenarioPresentationState,
   restoreScenarioTransactionPresentationBeforeAuditState,
   restoreScenarioTransactionPresentationState,
   setActiveScenarioPerformanceHintsState,
   SCENARIO_PRESENTATION_STATE_KEYS,
 } from "../js/core/state/actions/scenario_presentation_actions.js";
 import {
+  captureScenarioHealthState,
   restoreScenarioDataHealthState,
   restoreScenarioHydrationHealthGateState,
 } from "../js/core/state/actions/scenario_health_actions.js";
@@ -30,12 +35,14 @@ import {
 } from "../js/core/state/actions/scenario_readiness_actions.js";
 import {
   captureScenarioTransactionRollbackOptionalState,
+  captureScenarioTransactionRollbackSupplementalState,
   SCENARIO_TRANSACTION_ROLLBACK_SUPPLEMENTAL_HANDOFF_PHASE_BY_KEY,
   SCENARIO_TRANSACTION_ROLLBACK_OPTIONAL_STATE_KEYS,
   SCENARIO_TRANSACTION_ROLLBACK_SUPPLEMENTAL_STATE_KEYS,
   validateScenarioTransactionRollbackSupplementalStatePatch,
 } from "../js/core/state/actions/scenario_transaction_rollback_actions.js";
 import {
+  patchScenarioChunkLoadState,
   replaceScenarioChunkRuntimeState,
   setScenarioChunkRuntimeHooksState,
 } from "../js/core/state/actions/scenario_chunk_runtime_actions.js";
@@ -44,6 +51,20 @@ import {
   setScenarioPoliticalChunkPayloadState,
 } from "../js/core/state/actions/scenario_chunk_promotion_actions.js";
 import { cloneScenarioStateValue } from "../js/core/scenario/shared.js";
+import { createScenarioRollbackClone } from "../js/core/scenario/rollback_clone.js";
+import { trimScenarioBundleCache } from "../js/core/scenario/bundle_cache.js";
+import {
+  createDefaultActiveScenarioChunksState,
+  createDefaultScenarioHydrationHealthGate,
+  createDefaultRuntimeChunkLoadState,
+} from "../js/core/state/scenario_runtime_state.js";
+import {
+  bumpScenarioDataGenerationState,
+  bumpSceneGenerationState,
+  ensureSceneSnapshotState,
+} from "../js/core/state/renderer_runtime_state.js";
+import { normalizeMapSemanticMode } from "../js/core/state_defaults.js";
+import { makeFixture } from "./helpers/river_paint_fixture.mjs";
 
 const REPO_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -129,6 +150,49 @@ function createValues(keys) {
       Object.freeze({ key, index }),
     ]),
   );
+}
+
+function createProductionRollbackHarness(runtimeState) {
+  // Execute the production capture/patch/restore composition with real domain
+  // actions; only UI/palette effects and resource callbacks are supplied here.
+  const dependencies = {
+    runtimeState, countryNames: {}, defaultCountryPalette: {}, normalizeMapSemanticMode,
+    captureScenarioActivationState, captureScenarioPaletteState,
+    captureActiveScenarioPerformanceHintsState, captureScenarioPresentationState,
+    captureScenarioHealthState, captureScenarioTransactionRollbackOptionalState,
+    captureScenarioTransactionRollbackSupplementalState,
+    SCENARIO_TRANSACTION_ROLLBACK_OPTIONAL_STATE_KEYS,
+    SCENARIO_TRANSACTION_ROLLBACK_SUPPLEMENTAL_STATE_KEYS,
+    SCENARIO_ACTIVATION_STATE_KEYS, SCENARIO_READINESS_STATE_KEYS,
+    SCENARIO_PRESENTATION_STATE_KEYS, SCENARIO_PALETTE_STATE_KEYS,
+    restoreScenarioActivationBeforeAuditState, restoreScenarioActivationBeforeColorDirtyState,
+    restoreScenarioActivationAfterColorDirtyState, restoreScenarioReadinessState,
+    restoreScenarioHydrationHealthGateState, restoreScenarioDataHealthState,
+    restoreScenarioTransactionPresentationBeforeAuditState,
+    restoreScenarioTransactionPresentationState, restoreScenarioPaletteState,
+    setActiveScenarioPerformanceHintsState, setDefaultRuntimePoliticalTopologyState,
+    setScenarioPoliticalChunkPayloadState, replaceScenarioChunkRuntimeState,
+    setScenarioChunkRuntimeHooksState, validateScenarioTransactionRollbackSupplementalStatePatch,
+    createDefaultActiveScenarioChunksState, createDefaultScenarioHydrationHealthGate,
+    createDefaultRuntimeChunkLoadState, bumpScenarioDataGenerationState,
+    bumpSceneGenerationState, ensureSceneSnapshotState, cloneScenarioStateValue,
+    createScenarioRollbackClone,
+    ensureScenarioAuditUiState: () => {},
+    setScenarioAuditUiState: (value) => { runtimeState.scenarioAuditUi = value; },
+    syncResolvedDefaultCountryPalette: () => {},
+    readRegisteredRuntimeHookSource: (target, name) => target[name] || null,
+    callRuntimeHook: (target, name, ...args) => target[name]?.(...args),
+    scheduleScenarioChunkRefresh: () => {},
+    awaitInitialScenarioChunkVisualPromotion: () => {},
+  };
+  const source = ROLLBACK_SOURCE.slice(ROLLBACK_SOURCE.indexOf("const ROLLBACK_REQUIRED_KEYS"))
+    .replace(/^export /gm, "");
+  return new Function(...Object.keys(dependencies), `${source}; return {
+    capture: captureScenarioApplyRollbackSnapshot,
+    restore: restoreScenarioApplyRollbackSnapshot,
+    schedule: scheduleScenarioChunkRefresh,
+    promote: awaitInitialScenarioChunkVisualPromotion,
+  };`)(...Object.values(dependencies));
 }
 
 function createDomainSnapshot(keys, values, {
@@ -291,7 +355,8 @@ test("scenario rollback authority key sets are pairwise disjoint and cover the e
   }
 
   const authorityKeys = authorityEntries.flatMap(([, keys]) => keys);
-  assert.equal(authorityKeys.length, 110);
+  // Retired featureOverrides/countryBaseColors (-2), canonical riverPaint (+1).
+  assert.equal(authorityKeys.length, 109);
   assert.deepEqual(
     sorted(extractRollbackPatchValueKeys(ROLLBACK_SOURCE)),
     sorted(authorityKeys),
@@ -308,7 +373,7 @@ test("scenario rollback authority key sets are pairwise disjoint and cover the e
     ROLLBACK_SOURCE,
     "ROLLBACK_REQUIRED_KEYS",
   );
-  assert.equal(requiredSnapshotKeys.length, 110);
+  assert.equal(requiredSnapshotKeys.length, 109);
   assert.deepEqual(
     sorted(
       requiredSnapshotKeys.map(
@@ -317,6 +382,109 @@ test("scenario rollback authority key sets are pairwise disjoint and cover the e
     ),
     sorted(authorityKeys),
   );
+});
+
+test("production rollback restores river edits while cache trimming and stale chunk work stay fenced", async () => {
+  const { state: target, cells } = await makeFixture();
+  target.riverPaint.overrides[cells[0].id] = "#123456";
+  target.styleConfig = { ocean: { fill: "#abcdef" } };
+  target.ui = {};
+  target.runtimeChunkLoadState = {
+    generation: 5, shellStatus: "ready", promotionScheduled: true,
+    promotionCommitInFlight: true, promotionCommitStatus: "running",
+  };
+  const topology = { type: "Topology", arcs: [[[0, 0], [1, 1]]], objects: { political: {} } };
+  target.scenarioRuntimeTopologyData = topology;
+  const bundle = {
+    runtimeTopologyPayload: topology,
+    runtimeDecodedCollections: { politicalData: { features: [{ id: "P" }] } },
+    runtimeDecodedTopologyCache: new Map([["political", {}]]),
+  };
+  target.scenarioBundleCacheById = { modern_world: bundle, hoi4_1939: {} };
+  target.scenarioApplyInFlight = true;
+  const rollback = createProductionRollbackHarness(target);
+  target.scheduleScenarioChunkRefreshFn = rollback.schedule;
+  target.awaitInitialScenarioChunkVisualPromotionFn = rollback.promote;
+  const snapshot = rollback.capture();
+  const expectedPaint = structuredClone(target.riverPaint);
+  assert.deepEqual(snapshot.riverPaint, expectedPaint);
+  assert.notEqual(snapshot.riverPaint.overrides, target.riverPaint.overrides);
+  assert.notEqual(snapshot.riverPaint.pack, target.riverPaint.pack);
+
+  target.activeScenarioId = "hoi4_1939";
+  target.riverPaint.overrides[cells[0].id] = "#654321";
+  target.riverPaint.editMode = false;
+  target.runtimeChunkLoadState = { generation: 7, shellStatus: "loading" };
+  target.scheduleScenarioChunkRefreshFn = () => {};
+  const cancellations = [];
+  target.cancelScenarioChunkPromotionCommitFn = (reason) => cancellations.push(reason);
+  const recency = new Map();
+  trimScenarioBundleCache(target, recency, "hoi4_1939");
+  assert.ok(bundle.runtimeDecodedCollections, "an apply must retain outgoing derivations for rollback");
+  const staleChunkWrite = Promise.resolve().then(() => patchScenarioChunkLoadState(
+    target, { shellStatus: "stale" }, { expectedLoadStateGeneration: 7 },
+  ));
+
+  rollback.restore(snapshot);
+  assert.deepEqual(target.riverPaint, expectedPaint);
+  assert.notEqual(target.riverPaint, snapshot.riverPaint);
+  assert.notEqual(target.riverPaint.pack, snapshot.riverPaint.pack);
+  assert.equal(target.activeScenarioId, "modern_world");
+  assert.deepEqual(cancellations, ["rolled-back"]);
+  assert.equal(await staleChunkWrite, false);
+  assert.equal(target.runtimeChunkLoadState.shellStatus, "ready");
+  assert.equal(target.runtimeChunkLoadState.generation, 8);
+  assert.equal(target.runtimeChunkLoadState.promotionTimerId, null);
+  assert.equal(target.runtimeChunkLoadState.promotionCommitInFlight, false);
+  assert.equal(target.runtimeChunkLoadState.promotionCommitStatus, "rolled-back");
+  assert.equal(target.scheduleScenarioChunkRefreshFn, rollback.schedule);
+  assert.equal(target.awaitInitialScenarioChunkVisualPromotionFn, rollback.promote);
+  assert.equal(target.sceneGeneration, 2);
+  assert.equal(target.scenarioDataGeneration, 1);
+
+  target.scenarioApplyInFlight = false;
+  trimScenarioBundleCache(target, recency, "hoi4_1939");
+  assert.ok(bundle.runtimeDecodedCollections, "the restored active bundle must remain protected");
+  target.activeScenarioId = "hoi4_1939";
+  trimScenarioBundleCache(target, recency, "hoi4_1939");
+  assert.equal(bundle.runtimeDecodedCollections, null);
+  assert.equal(bundle.runtimeDecodedTopologyCache, undefined);
+  rollback.restore(snapshot);
+  assert.deepEqual(target.riverPaint, expectedPaint);
+  assert.deepEqual(target.scenarioRuntimeTopologyData, topology);
+  assert.notEqual(target.scenarioRuntimeTopologyData, topology);
+  assert.equal(target.runtimeChunkLoadState.generation, 9);
+});
+
+test("production rollback validates river state before effects and remains safe to retry", async () => {
+  const { state: target, cells } = await makeFixture();
+  target.riverPaint.overrides[cells[0].id] = "#123456";
+  const rollback = createProductionRollbackHarness(target);
+  const snapshot = rollback.capture();
+  const expectedPaint = structuredClone(snapshot.riverPaint);
+  const cancellations = [];
+  target.cancelScenarioChunkPromotionCommitFn = (reason) => cancellations.push(reason);
+  target.activeScenarioId = "failed-target";
+  target.riverPaint = { schemaVersion: 1, editMode: false, pack: null, overrides: {} };
+  const failedPaint = target.riverPaint;
+  const incomplete = { ...snapshot };
+  delete incomplete.riverPaint;
+  assert.throws(() => rollback.restore(incomplete), /missing required keys: riverPaint/);
+  assert.throws(() => rollback.restore(snapshot, { shouldFailRestore: true }), /Injected rollback restore failure/);
+  assert.equal(target.riverPaint, failedPaint);
+  assert.equal(target.activeScenarioId, "failed-target");
+  assert.deepEqual(cancellations, []);
+
+  rollback.restore(snapshot);
+  assert.deepEqual(target.riverPaint, expectedPaint);
+  target.riverPaint.overrides[cells[0].id] = "#abcdef";
+  const nextSnapshot = rollback.capture();
+  assert.deepEqual(snapshot.riverPaint, expectedPaint, "restoring and editing must not mutate the reusable snapshot");
+  assert.equal(nextSnapshot.riverPaint.overrides[cells[0].id], "#abcdef");
+  assert.notEqual(nextSnapshot.riverPaint, snapshot.riverPaint);
+  rollback.restore(snapshot);
+  assert.deepEqual(target.riverPaint, expectedPaint);
+  assert.deepEqual(cancellations, ["rolled-back", "rolled-back"]);
 });
 
 test("scenario rollback patch discovery is portable across line endings", () => {

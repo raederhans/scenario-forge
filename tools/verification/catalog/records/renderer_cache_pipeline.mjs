@@ -9,6 +9,16 @@ const politicalIdRasterRoute = {
 export const RENDERER_CACHE_PIPELINE_RECORDS = [
   {
     ...politicalIdRasterRoute,
+    id: "e2e:raster-startup-recovery", selectorOrder: 5004,
+    commandRef: "node node_modules/@playwright/test/cli.js test tests/e2e/raster_startup_recovery.spec.js --workers=1 --retries=0",
+    sourceRefs: ["tools/political_id_raster_app_session.mjs", "tools/verify_political_id_raster_integration.mjs",
+      "tests/e2e/raster_startup_recovery.spec.js"],
+    cost: "heavy", tiers: ["regression"], profiles: ["full"],
+    resourceLocks: ["browser-dev-server", "playwright-browser", ".runtime-output"],
+    executionOwners: ["main-thread"], entrypointPolicyIndex: 0,
+  },
+  {
+    ...politicalIdRasterRoute,
     id: "local:renderer:political-id-raster-trial", selectorOrder: 5003,
     commandRef: "node --test tests/political_id_raster_trial_behavior.test.mjs",
     sourceRefs: [

@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-17 SC 本批统一 PR
+
+整合负责人使用独立副本 `C:/Users/raede/Documents/Codex/2026-10-17/task-9/scenario-forge-final`、分支 `codex/sc-batch-review-20261017`，基于远端 main `5fbbfdcff` 整合已审核 46 文件补丁、riverPaint 回滚、模块启动诊断与 sample-guide 测试修复。授权只包含功能分支推送、单一 PR 和不部署 CI，不合并、不部署、不改保护设置。用户主目录和来源副本保留。提交前验收基线见 [本批记录](sc-batch-integration-20261017/task.md)，最终 PR 和 CI 状态以 GitHub 回执为准。
+
 ## 2026-10-11 资产缓存与 TNO 大视口精修
 
 最新状态：PR #223 合并为 `84fa243937ef30dd182bbf52942f3b4bc8eb618f`，但 Pages 产物回归15/16通过，缓存复访检查阻止了发布。线上仍是 `64b1ef685`。同一独占工作树继续使用 `codex/raster-cache-revisit-20261011`，修复缓存命中等待网络清单和详细数据刷新丢弃有效路径的问题；最终本地16项检查已通过，root 的8008服务与浏览器已关闭；root 独占后续 PR、必需检查、合并和 Pages 门禁。其他对话改动保留，超时、内存、画质和默认关闭规则不变。

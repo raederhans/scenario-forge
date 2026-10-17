@@ -224,9 +224,11 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
   referenceUrl.searchParams.set("geometry_worker", "0");
   referenceUrl.searchParams.set("political_raster_worker_bitmap", "0");
   const startupStarted = performance.now();
-  const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, viewport, enabled: null, published, holdRasterAssets: recoverAssets });
+  const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, viewport, enabled: null, published, holdRasterAssets: recoverAssets,
+    startupOutput: path.join(output, "startup") });
   const { page } = session;
-  const report = { scenarioId, dpr, viewport, requirePrebuiltAssets, expectNativeBudgetFallback, baseUrl, views: [], completedStages: [], timings: { startupMs: performance.now() - startupStarted } };
+  const report = { scenarioId, dpr, viewport, requirePrebuiltAssets, expectNativeBudgetFallback, baseUrl,
+    startupAttempts: session.startupAttempts, views: [], completedStages: [], timings: { startupMs: performance.now() - startupStarted } };
   async function runPhase(name, action) {
     const started = performance.now();
     const watchdog = setTimeout(() => { void session.browser.close(); }, 120000);

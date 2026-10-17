@@ -233,7 +233,9 @@ var SCENARIO_FORGE_JSON_RESOURCE_DECODER_SHARED = globalThis.__scenarioForgeJson
             output.set(value, offset);
             offset += value.byteLength;
           }
-          decompressedBuffer = output.buffer.slice(0, offset);
+          // Startup topology streams declare their exact size. Keep the owned
+          // buffer when full; trim spare capacity without exposing zero padding.
+          decompressedBuffer = offset === output.byteLength ? output.buffer : output.buffer.slice(0, offset);
         } catch (error) {
           await reader.cancel(error).catch(() => {});
           throwIfAborted(signal);

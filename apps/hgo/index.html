@@ -44,49 +44,64 @@
       </div>
     </section>
     <aside class="inspector" aria-label="Map editor">
+      <section class="paint-dock" aria-labelledby="paint-dock-heading">
+        <div class="section-heading"><h2 id="paint-dock-heading" data-i18n="colorHeading">绘制颜色</h2></div>
+        <div class="color-control"><input id="paint-color" type="color" value="#d17b55" disabled aria-label="绘制颜色" aria-describedby="pick-hint"><label for="paint-hex" class="sr-only" data-i18n="hexColor">十六进制颜色</label><input id="paint-hex" value="#d17b55" maxlength="7" spellcheck="false" disabled aria-describedby="pick-hint"><span class="color-mark">●</span></div>
+        <div class="scope-control"><label for="paint-scope" class="field-label" data-i18n="paintScope">填充范围</label><select id="paint-scope" disabled><option value="state" data-i18n="scopeState">州（可连续拖绘）</option><option value="country" data-i18n="scopeCountry">所属国家（当前归属）</option></select></div>
+      </section>
+      <div class="inspector-tabs" id="inspector-tabs" role="tablist" aria-label="Editor workspace">
+        <button type="button" id="tab-paint" role="tab" aria-selected="true" aria-controls="panel-paint" data-panel="paint" data-i18n="tabPaint">绘制</button>
+        <button type="button" id="tab-countries" role="tab" aria-selected="false" aria-controls="panel-countries" data-panel="countries" tabindex="-1" data-i18n="tabCountries">国家</button>
+        <button type="button" id="tab-display" role="tab" aria-selected="false" aria-controls="panel-display" data-panel="display" tabindex="-1" data-i18n="tabDisplay">显示</button>
+      </div>
+      <div class="inspector-page" id="panel-paint" role="tabpanel" aria-labelledby="tab-paint" tabindex="0">
       <section class="search-section">
         <label class="section-label" for="state-search" data-i18n="findPlace">寻找一片地方</label>
         <div class="search-field"><span aria-hidden="true">⌕</span><input id="state-search" type="search" autocomplete="off" disabled placeholder="州名、实体或 ID" aria-controls="search-results"></div>
         <div id="search-results" class="search-results" aria-live="polite"></div>
       </section>
-      <details class="country-section" id="country-management"><summary data-i18n="countryManagement">国家与核心领土</summary><div id="country-panel"></div></details>
       <section class="color-section">
-        <div class="section-heading"><h2 data-i18n="colorHeading">绘制颜色</h2><span class="small-index">01</span></div>
-        <div class="color-control"><input id="paint-color" type="color" value="#d17b55" disabled aria-label="绘制颜色" aria-describedby="pick-hint"><label for="paint-hex" class="sr-only" data-i18n="hexColor">十六进制颜色</label><input id="paint-hex" value="#d17b55" maxlength="7" spellcheck="false" disabled aria-describedby="pick-hint"><span class="color-mark">●</span></div>
         <div id="color-swatches" class="swatches" aria-label="Color palette"></div>
-        <p id="pick-hint" class="field-hint" data-i18n="pickHint">复制地块颜色：用内置“地图取色”（I）点击地图。颜色弹窗内是系统屏幕吸管。</p>
-        <label for="paint-scope" class="field-label" data-i18n="paintScope">填充范围</label>
-        <select id="paint-scope" disabled><option value="state" data-i18n="scopeState">州（可连续拖绘）</option><option value="country" data-i18n="scopeCountry">所属国家（当前归属）</option></select>
-        <p class="field-hint" data-i18n="scopeHint">绘制模式双击填所属国家；水域只填该州。国家范围不含未释放国家的核心声明。</p>
         <button id="paint-selection" class="button-dark full-width" disabled data-i18n="applyColor">为所选州上色</button>
+        <details class="inline-help"><summary data-i18n="paintHelp">填充与取色说明</summary><p id="pick-hint" class="field-hint" data-i18n="pickHint">复制地块颜色：用内置“地图取色”（I）点击地图。颜色弹窗内是系统屏幕吸管。</p><p class="field-hint" data-i18n="scopeHint">绘制不改变归属。</p></details>
       </section>
       <section class="selection-section">
         <div class="section-heading"><h2 data-i18n="selectionHeading">当前选择</h2><button id="clear-selection" class="text-button" disabled data-i18n="clear">清除</button></div>
-        <div id="selection-empty" class="selection-empty"><span class="empty-symbol" aria-hidden="true">⊹</span><p data-i18n="selectionEmpty">点击地图，选择一个州。</p><small data-i18n="multiHint">Shift + 点击可多选 · 海域同样可编辑</small></div>
+        <div id="selection-empty" class="selection-empty"><p data-i18n="selectionEmpty">点击地图，选择一个州。</p></div>
         <div id="selection-detail" hidden>
           <div class="selected-title"><span id="selected-swatch"></span><h3 id="selected-name"></h3></div>
-          <dl class="selection-facts"><div><dt data-i18n="stateId">州 ID</dt><dd id="selected-id"></dd></div><div><dt data-i18n="referenceEntity">当前国家</dt><dd id="selected-entity"></dd></div><div><dt data-i18n="originalEntity">原始归属</dt><dd id="selected-original-entity"></dd></div><div><dt data-i18n="selectedCount">已选州数</dt><dd id="selected-count"></dd></div></dl>
           <button id="pick-selection" class="full-width" disabled data-i18n="pickStored">取该州存储色</button>
+          <details class="selection-properties"><summary data-i18n="stateProperties">州详情与标签</summary>
+          <dl class="selection-facts"><div><dt data-i18n="stateId">州 ID</dt><dd id="selected-id"></dd></div><div><dt data-i18n="referenceEntity">当前国家</dt><dd id="selected-entity"></dd></div><div><dt data-i18n="originalEntity">原始归属</dt><dd id="selected-original-entity"></dd></div><div><dt data-i18n="selectedCount">已选州数</dt><dd id="selected-count"></dd></div></dl>
           <label for="label-input" class="field-label" data-i18n="mapLabel">地图标签</label><div class="label-control"><input id="label-input" maxlength="200" disabled><button id="label-button" disabled data-i18n="apply">应用</button></div>
           <p class="field-hint" data-i18n="labelHint">留空恢复原名。参考实体保持只读。</p>
+          </details>
         </div>
       </section>
+      <details class="keyboard-help"><summary data-i18n="shortcuts">快捷键与操作</summary><p data-i18n="multiHint">Shift + 点击可多选 · 海域同样可编辑</p><p data-i18n="shortcutText"></p></details>
+      </div>
+      <div class="inspector-page country-page" id="panel-countries" role="tabpanel" aria-labelledby="tab-countries" tabindex="0" hidden><div id="country-panel"></div></div>
+      <div class="inspector-page" id="panel-display" role="tabpanel" aria-labelledby="tab-display" tabindex="0" hidden>
       <section class="layer-section">
-        <div class="section-heading"><h2 data-i18n="mapLayers">地图显示</h2><span class="small-index">02</span></div>
+        <div class="section-heading"><h2 data-i18n="mapLayers">地图显示</h2></div>
         <label class="layer-toggle"><span data-i18n="borders">州边界</span><input id="layer-borders" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
         <label class="layer-toggle"><span data-i18n="labels">地名标签</span><input id="layer-labels" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
         <label class="layer-toggle"><span data-i18n="cities">原生城市</span><input id="layer-cities" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
+        <details class="display-options"><summary data-i18n="borderStyle">边界样式</summary>
         <label class="field-label" for="border-width" data-i18n="borderWidth">边界宽度（屏幕像素）</label>
         <div class="display-range"><input id="border-width" type="range" min="0" max="2" step="0.1" value="0.7" disabled><output id="border-width-value" for="border-width">0.7 px</output></div>
         <label class="field-label" for="border-opacity" data-i18n="borderOpacity">边界不透明度</label>
         <div class="display-range"><input id="border-opacity" type="range" min="0" max="1" step="0.05" value="0.45" disabled><output id="border-opacity-value" for="border-opacity">45%</output></div>
         <label class="display-color" for="border-color"><span data-i18n="borderColor">边界颜色</span><input id="border-color" type="color" value="#1f2933" disabled></label>
         <p class="field-hint" data-i18n="borderHint">州界较淡，原始国家边界较深。微小州选中后显示定位圈；放大不会增加源图细节。</p>
-        <label class="field-label" for="label-density" data-i18n="labelDensity">标签密度</label>
+        </details>
+        <details class="display-options"><summary data-i18n="labelOptions">标签密度</summary>
+        <label class="sr-only" for="label-density" data-i18n="labelDensity">标签密度</label>
         <select id="label-density" disabled><option value="low" data-i18n="densityLow">低</option><option value="medium" selected data-i18n="densityMedium">中</option><option value="high" data-i18n="densityHigh">高</option></select>
+        </details>
       </section>
-      <details class="keyboard-help"><summary data-i18n="shortcuts">快捷键与操作</summary><p data-i18n="shortcutText">V 选择 · B 绘制 · I 地图取色（点击地块读取存储色） · H 平移 · 0 全图。绘制模式拖动连续填色，双击填所属国家；空格或中键拖动平移，滚轮缩放。Ctrl/⌘ + Z 整笔撤销，Shift + Z 重做；Escape 取消笔划，Ctrl/⌘ + S 保存。</p></details>
       <footer class="inspector-footer"><span class="edition-tag">NATIVE / PIXEL SPACE</span><span data-i18n="footerNote">独立项目 · 自由编辑</span><p class="field-hint" data-i18n="projectFormatHint">JSON 保存归属与颜色，请在独立 HGO 打开；PNG 为视觉输出。</p></footer>
+      </div>
     </aside>
   </main>
   <footer class="statusbar"><span class="status-led" id="status-led"></span><span id="status-text" role="status" aria-live="polite">正在加载…</span><span id="dataset-stats"></span></footer>

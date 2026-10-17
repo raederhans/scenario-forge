@@ -1,11 +1,11 @@
 """Asset regression for the Algerian shared-edge break observed at 28-29N."""
-import json
 from pathlib import Path
 import unittest
 
 import shapely
 from shapely.geometry import LineString, MultiLineString
 from map_builder.coverage_validation import coverage_is_valid_exact
+from map_builder.json_source import read_json_source
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class TnoBorderContinuityTests(unittest.TestCase):
     def test_current_manifest_keeps_algerian_source_seam_in_all_display_lods(self):
-        read = lambda path: json.loads((ROOT / path).read_text(encoding='utf-8'))
+        read = lambda path: read_json_source(ROOT / path)
         manifest = read('data/scenarios/tno_1962/manifest.json')
         topology = _absolute_topology(read(manifest['runtime_topology_url']))
         dz = {str(g['properties']['id']): _decode_geometry(topology, g)
@@ -35,8 +35,15 @@ class TnoBorderContinuityTests(unittest.TestCase):
         self.assertLess(shared.difference(local.buffer(1e-8)).length, 1e-6)
         chunks = read(manifest['detail_chunk_manifest_url'])['chunks']
         coarse = next(c for c in chunks if c['layer'] == 'political' and c['lod'] == 'coarse')
-        coarse_dz = {f['properties']['id']: shapely.geometry.shape(f['geometry'])
-                     for f in read(coarse['url'])['features'] if f['properties']['id'] in dz}
+        coarse_payload = read(coarse['url'])
+        if coarse_payload['type'] == 'Topology':
+            coarse_topology = _absolute_topology(coarse_payload)
+            coarse_dz = {g['properties']['id']: _decode_geometry(coarse_topology, g)
+                         for g in coarse_topology['objects']['political']['geometries']
+                         if g['properties']['id'] in dz}
+        else:
+            coarse_dz = {f['properties']['id']: shapely.geometry.shape(f['geometry'])
+                         for f in coarse_payload['features'] if f['properties']['id'] in dz}
         self.assertEqual(set(coarse_dz), set(dz))
         self.assertTrue(coverage_is_valid_exact(coarse_dz.values()))
         for lat in (28, 29):

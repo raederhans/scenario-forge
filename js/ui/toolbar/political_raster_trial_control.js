@@ -11,7 +11,7 @@ export function bindPoliticalRasterTrialControl({ getDiagnostics, setEnabled, se
     toggle.checked = !!info.requested;
     if (mode) mode.value = info.mode || (info.requested ? "hybrid" : "auto");
     if (backend) backend.textContent = `${t("Actual political renderer", "ui")}: ${info.actualBackend || "none"} · ${info.reason || "off"}`;
-    const labels = { off: "Raster trial is off", startup: "Preparing the map", "unsupported-scenario": "Available in 1936, 1939 and TNO",
+    const labels = { off: "Raster trial is off", startup: "Preparing the map", "unsupported-scenario": "Using compatible display",
       preparing: "Preparing accelerated display", accelerated: "Accelerated display", precise: "Precise display restored", fallback: "Using compatible display" };
     const key = info.reason === "unsupported-scenario" || info.reason === "startup" ? info.reason : info.displayState;
     status.dataset.i18n = labels[key] || labels.fallback;

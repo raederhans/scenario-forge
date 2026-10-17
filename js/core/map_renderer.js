@@ -714,8 +714,7 @@ const labelDrawSnapshotOwner = createLabelDrawSnapshotOwner();
 let navigationExactRefreshNeeded = false;
 let borderMeshWorkerRuntime = null;
 const geometryWorkerEnabled = new URLSearchParams(globalThis.location?.search || "").get("geometry_worker") !== "0";
-// Explicit opt-in until whole-application cold/warm and visual gates support a
-// default change. Scenario loading, editing and export have no separate format.
+// Automatic admission shares the existing scenario, editing and export formats.
 let politicalIdRasterActivationKey = "";
 let contourHostFillColorCache = new WeakMap();
 let staticMeshSourceCountries = {
@@ -3433,15 +3432,19 @@ function getContextPassOrchestratorOwner() {
   return contextPassOrchestratorOwner;
 }
 
+function getPoliticalRenderPolicy() {
+  return readPoliticalRenderPolicy({ scenarioId: runtimeState.activeScenarioId });
+}
+
 function getPoliticalIdRasterEligibilityReason() {
-  return getPoliticalIdRasterEligibility({ requested: readPoliticalRenderPolicy().requested, exporting: exportRenderInProgress,
+  return getPoliticalIdRasterEligibility({ requested: getPoliticalRenderPolicy().requested, exporting: exportRenderInProgress,
     debugMode, ready: isBootInteractionReady(), firstVisible: runtimeState.firstVisibleFramePainted,
     readonly: runtimeState.startupReadonly, unlocking: runtimeState.startupReadonlyUnlockInFlight,
     riverPartitions: hasVisibleRiverPartitions(), scenarioId: runtimeState.activeScenarioId });
 }
 
 function isPoliticalIdRasterSelected() { return getPoliticalIdRasterEligibilityReason() === "eligible"; }
-function isPoliticalIdRasterPrimary() { return readPoliticalRenderPolicy().persistent; }
+function isPoliticalIdRasterPrimary() { return getPoliticalRenderPolicy().persistent; }
 
 export function setPoliticalRenderMode(mode) {
   writePoliticalRenderMode(mode);
@@ -14208,8 +14211,11 @@ function render() {
     if (setCanvasSize({ reason: "display-quality-change" })) markAllOverlaysDirty();
   }
   ensureResolvedColorsReadyForStableVisibleFrame("render");
-  const rasterActivation = isPoliticalIdRasterSelected() ? `${runtimeState.activeScenarioId}:${runtimeState.sceneGeneration}:${readPoliticalRenderPolicy().effectiveMode}` : "";
+  const rasterActivation = isPoliticalIdRasterSelected() ? `${runtimeState.activeScenarioId}:${runtimeState.sceneGeneration}:${getPoliticalRenderPolicy().effectiveMode}` : "";
   if (rasterActivation !== politicalIdRasterActivationKey) {
+    // A suspended or replaced scene must not retain its Worker, GPU or tile cache.
+    politicalIdRasterRuntimeOwner?.dispose();
+    politicalIdRasterRuntimeOwner = null;
     politicalIdRasterActivationKey = rasterActivation;
     // Preserve the current native frame while the initial assets load. The
     // producer invalidates this pass when complete coverage becomes available.
@@ -15872,13 +15878,14 @@ export function getRendererAsyncWorkStatus() {
 }
 
 export function getPoliticalIdRasterDiagnostics() {
-  const reason = getPoliticalIdRasterEligibilityReason();
+  const policy = getPoliticalRenderPolicy();
+  const reason = policy.mode === "auto" && !policy.requested
+    ? policy.automaticRasterReason : getPoliticalIdRasterEligibilityReason();
   const current = politicalIdRasterRuntimeOwner?.getDiagnostics();
-  const policy = readPoliticalRenderPolicy();
   const passes = politicalPassOrchestratorOwner?.getDiagnostics() || {};
   return { ...current, ...policy, passes,
     actualBackend: passes.lastBackend || "none", sourceCoverage: policy.persistent ? "complete-display-v1" : "fine",
-    runtimeVersion: "raster-r0-r2-v1", selected: reason === "eligible",
+    runtimeVersion: "raster-auto-v1", selected: reason === "eligible",
     pending: current?.pending || 0,
     displayState: reason === "off" ? "off" : reason !== "eligible" ? "fallback" : current?.displayState || "preparing",
     reason: reason === "eligible" ? current?.reason || "awaiting-render" : reason };

@@ -1820,19 +1820,17 @@ const page = {
         self.assertEqual(adaptive_payload["executionPlan"]["routeGaps"], [])
         self.assertGreater(len(adaptive_payload["executionPlan"]["executionGroups"]), 0)
 
-    def test_verify_shared_pr_fast_runner_executes_the_adaptive_child_safe_plan(self) -> None:
+    def test_verify_shared_pr_fast_runner_executes_core_and_affected_unit_plan(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "verify-shared.yml").read_text(encoding="utf-8")
         self.assertNotIn("- name: Run Python fast contracts", workflow)
-        self.assertIn("node tools/run_adaptive_tests.mjs", workflow)
-        self.assertIn("--changed-files-list .runtime/tmp/verification-selector-changed-files.txt", workflow)
-        self.assertIn("--selection-json .runtime/reports/generated/verification-selector-explain.json", workflow)
-        self.assertIn("--execute", workflow)
-        self.assertIn("--defer-main-thread", workflow)
-        self.assertIn("--concurrency 2", workflow)
-        self.assertIn("--profile-out .runtime/reports/generated/verification-selector-execution.profile.json", workflow)
-        self.assertIn("verification-selector-execution.json", workflow)
-        self.assertIn(".runtime/reports/generated/verification-selector-execution.*", workflow)
-        self.assertIn('test -s "$changed_files"', workflow)
+        steps = {step["name"]: step for step in parse_job_steps(parse_workflow_job_blocks(workflow)["verify"])}
+        unit = steps["Run core and affected behaviors"]
+        self.assertIn("if: inputs.profile == 'pr-fast'", "\n".join(unit["lines"]))
+        self.assertIn("node tools/ci/run_pr_checks.mjs --changed-files-list .runtime/tmp/pr-check-files.txt", parse_step_run(unit))
+        self.assertIn("--lane unit", parse_step_run(unit))
+        self.assertIn("--base", parse_step_run(unit))
+        self.assertIn("test -s .runtime/tmp/pr-check-files.txt", parse_step_run(steps["Read affected files"]))
+        self.assertNotIn("continue-on-error", "\n".join(unit["lines"]))
         self.assertNotIn("npm run verify:script-portfolio", workflow)
         self.assertNotIn("name.startsWith('test:node:')", workflow)
         self.assertNotIn("spawnSync('npm', ['run', name]", workflow)
@@ -1874,10 +1872,16 @@ const page = {
         self.assertGreaterEqual(shared_workflow.count(demo_node_condition), 2)
         self.assertGreaterEqual(shared_workflow.count(demo_browser_condition), 2)
         demo_step = shared_workflow.split("- name: Run Golden Demo E2E\n", 1)[1].split("\n      - name:", 1)[0]
-        self.assertIn("if: inputs.profile == 'demo' || inputs.run-golden-demo", demo_step)
+        self.assertIn("if: inputs.profile == 'demo'", demo_step)
         self.assertIn("run: npm run verify:demo", demo_step)
         self.assertRegex(demo_step, r"(?m)^          MAPCREATOR_DEV_PORT: '8811'$")
         self.assertIn("run-golden-demo requires the pr-smoke profile", shared_workflow)
+        affected_step = shared_workflow.split("- name: Run affected browser behaviors\n", 1)[1].split("\n      - name:", 1)[0]
+        self.assertIn("if: inputs.profile == 'pr-smoke'", affected_step)
+        self.assertIn('if [ "${{ inputs.run-golden-demo }}" = "true" ]', affected_step)
+        self.assertIn("args+=(--changed-file tests/e2e/sample_guide_deeplink.spec.js)", affected_step)
+        self.assertIn('--lane browser "${args[@]}"', affected_step)
+        self.assertNotIn("--grep", affected_step)
         demo_spec = (REPO_ROOT / "tests/e2e/sample_guide_deeplink.spec.js").read_text(encoding="utf-8")
         self.assertEqual(demo_spec.count("@golden-demo"), 1)
         self.assertIn("name: demo-timing-and-failure-context", shared_workflow)
@@ -2027,7 +2031,12 @@ jobs:
         self.assertNotIn("build_pages_dist.py", source_body)
         self.assertIn("python tools/build_pages_dist.py", body)
         self.assertIn('python tools/build_pages_dist.py --output-root "$artifact_root"', body)
-        self.assertIn("tests.test_pages_dist_startup_shell", body)
+        selection = run_command("node", "tools/ci/run_pr_checks.mjs", "--base", "HEAD", "--changed-file", "tools/build_pages_dist.py", "--list")
+        self.assert_command_ok(selection)
+        planned = json.loads(selection.stdout)
+        self.assertEqual(planned["unmatchedChangedFiles"], [])
+        for module in ("test_pages_dist_startup_shell", "test_pages_artifact_admission"):
+            self.assertTrue(any(command["lane"] == "unit" and any(module in arg for arg in command["args"]) for command in planned["commands"]), module)
         self.assertIn("SCENARIO_FORGE_PAGES_ARTIFACT_ROOT", body)
         self.assertNotIn("git diff --exit-code --", body)
         self.assertIn("artifact_root=.runtime/pages-pr/dist", body)
@@ -2048,14 +2057,14 @@ jobs:
         checkout_body = "\n".join(str(line) for line in checkout["lines"])
 
         self.assertIn("fetch-depth: 2", checkout_body)
-        self.assertIn("git diff --name-only HEAD^ HEAD", verify_job)
+        self.assertIn("git diff --name-only --no-renames HEAD^ HEAD", verify_job)
 
     def test_deploy_minimal_installs_locked_node_dependencies_before_pages_build(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "verify-shared.yml").read_text(encoding="utf-8")
         setup_node_index = workflow.index("- name: Setup Node")
         dependency_guard_index = workflow.index("- name: Check deploy-minimal dependency guardrails")
         install_node_index = workflow.index("- name: Install Node dependencies")
-        build_pages_index = workflow.index("- name: Build Pages dist")
+        build_pages_index = workflow.index("- name: Build Pages artifact from source")
         setup_node_step = workflow[setup_node_index:install_node_index]
         install_node_step = workflow[install_node_index:build_pages_index]
         dependency_guard_step = workflow[dependency_guard_index:install_node_index]
@@ -2112,6 +2121,13 @@ jobs:
         self.assertEqual(set(jobs), expected_jobs)
         self.assertIn("schedule:", workflow)
         self.assertIn("workflow_dispatch:", workflow)
+        maintenance_condition = "github.event_name == 'workflow_dispatch' && inputs.maintenance"
+        maintenance_jobs = {"metadata", "p4-checker-boundaries", "p4-full-policy", "p4-fast", "p4-closeout", "pages", "windows-governance"}
+        self.assertEqual(parse_workflow_dispatch_inputs(workflow)["maintenance"]["default"], "false")
+        for job in maintenance_jobs:
+            self.assertEqual(parse_job_scalar(jobs[job], "if"), maintenance_condition, job)
+        for job in {"linux-core", "pages-artifact-shadow", "browser", "scenario-heavy"}:
+            self.assertIsNone(parse_job_scalar(jobs[job], "if"), job)
         self.assertIn("concurrency:", workflow)
         self.assertNotRegex(workflow, r"npm run verify:nightly(?:\s|$)")
         self.assertNotIn("npm run verify:p4:p4-3", workflow)
@@ -2275,12 +2291,16 @@ jobs:
         )
         pages_shadow_upload = "\n".join(str(line) for line in pages_shadow_by_name["Upload artifact-only Pages shadow"]["lines"])
         self.assertIn("name: nightly-pages-artifact-shadow-${{ github.sha }}-${{ github.run_attempt }}", pages_shadow_upload)
-        self.assertIn(".runtime/pages-artifact-shadow/dist", pages_shadow_upload)
+        self.assertNotIn(".runtime/pages-artifact-shadow/dist", pages_shadow_upload)
         self.assertIn("pages-artifact-shadow-comparison.json", pages_shadow_upload)
         self.assertIn("pages-artifact-shadow.json", pages_shadow_upload)
-        self.assertIn("if-no-files-found: error", pages_shadow_upload)
+        self.assertIn("if-no-files-found: ignore", pages_shadow_upload)
         self.assertIn("include-hidden-files: true", pages_shadow_upload)
         self.assertNotIn("dist/**", pages_shadow_upload)
+        for name in ("Build legacy tracked Pages reference", "Verify artifact-only Pages shadow", "Record artifact-only Pages shadow receipt"):
+            self.assertIn(f"if: {maintenance_condition}", "\n".join(pages_shadow_by_name[name]["lines"]), name)
+        for name in ("Build artifact-only Pages shadow dist", "Start artifact-only Pages shadow server", "Smoke artifact-only Pages shadow"):
+            self.assertNotIn("if:", "\n".join(pages_shadow_by_name[name]["lines"]), name)
 
         browser_steps = parse_job_steps(jobs["browser"])
         browser_by_name = {str(step["name"]): step for step in browser_steps}
@@ -2344,7 +2364,7 @@ jobs:
             "node",
             "-e",
             aggregator,
-            env={"REQUIRED_RESULTS": json.dumps(required_results)},
+            env={"REQUIRED_RESULTS": json.dumps(required_results), "RUN_MAINTENANCE": "true"},
         )
         self.assert_command_ok(completed)
         required_results["p4-closeout"]["result"] = "failure"
@@ -2352,9 +2372,21 @@ jobs:
             "node",
             "-e",
             aggregator,
-            env={"REQUIRED_RESULTS": json.dumps(required_results)},
+            env={"REQUIRED_RESULTS": json.dumps(required_results), "RUN_MAINTENANCE": "true"},
         )
         self.assertNotEqual(rejected.returncode, 0)
+
+        for maintenance in (False, True):
+            results = {job: {"result": "skipped" if job in maintenance_jobs and not maintenance else "success"}
+                       for job in parse_job_scalar(jobs["final"], "needs")}
+            env = {"REQUIRED_RESULTS": json.dumps(results), "RUN_MAINTENANCE": str(maintenance).lower()}
+            self.assert_command_ok(run_command("node", "-e", aggregator, env=env))
+            for job, entry in results.items():
+                for result in ("failure", "cancelled", "success" if entry["result"] == "skipped" else "skipped"):
+                    with self.subTest(maintenance=maintenance, job=job, result=result):
+                        mutated = {**results, job: {"result": result}}
+                        rejected = run_command("node", "-e", aggregator, env={**env, "REQUIRED_RESULTS": json.dumps(mutated)})
+                        self.assertNotEqual(rejected.returncode, 0)
 
         route_result = run_command(
             "node",
