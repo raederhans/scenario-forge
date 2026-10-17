@@ -9,8 +9,6 @@ on:
         type: string
   schedule:
     - cron: "17 3 * * 1"
-  pull_request:
-    types: [opened, reopened, synchronize]
 
 permissions:
   contents: read

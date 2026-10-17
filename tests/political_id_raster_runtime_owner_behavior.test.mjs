@@ -44,7 +44,7 @@ function makeClient() {
   };
 }
 
-function makeGpuFactory({ fail = false } = {}) {
+function makeGpuFactory({ fail = false, maxTextureSize = 16384 } = {}) {
   const instances = [];
   const createGpu = ({ onContextLost }) => {
     if (fail) throw new Error("mock GPU creation failed");
@@ -57,6 +57,7 @@ function makeGpuFactory({ fail = false } = {}) {
       draws: [],
       disposeCount: 0,
       isAvailable() { return this.available && !this.disposed; },
+      getLimits: () => ({ maxTextureSize }),
       setPalette(bytes, revision) { this.palettes.push({ bytes: bytes.slice(), revision }); },
       setTiles(tiles) { this.tileSets.push([...tiles]); },
       draw(plan) { this.draws.push(plan); },
@@ -371,9 +372,62 @@ test("GPU creation failure returns fallback and stops requesting raster work", (
   assert.equal(f.owner.draw(), null);
   assert.equal(f.requests.length, 0);
   assert.match(f.owner.getDiagnostics().failed, /GPU unavailable/);
+  assert.equal(f.client.disposed, true, "permanent fallback releases the Worker and its projected geometry");
   assert.equal(f.owner.getDiagnostics().fallbacks, 1);
   assert.equal(f.owner.draw(), null);
   assert.equal(f.requests.length, 0);
+});
+
+test("a low GPU texture limit rejects the view before tile work and recovers on resize", async t => {
+  const harness = makeGpuFactory({ maxTextureSize: 512 });
+  const f = fixture({ width: 600, height: 100, createGpu: harness.createGpu });
+  t.after(() => f.owner.dispose());
+  assert.equal(f.owner.prepare(), false);
+  for (let i = 0; i < 3; i++) assert.equal(f.owner.draw(), null);
+  assert.equal(f.owner.getDiagnostics().reason, "gpu-texture-limit");
+  assert.equal(f.requests.length, 0);
+  assert.equal(harness.instances.length, 1, "rejected view does not repeatedly create WebGL contexts");
+  assert.equal(harness.instances[0].disposed, true);
+  f.layout.pixelWidth = 100;
+  assert.equal(f.owner.prepare(), true);
+  await resolveAll(f);
+  assert.ok(f.owner.draw());
+});
+
+test("Worker failure releases resident resources and leaves one inert vector fallback", async t => {
+  const f = fixture();
+  t.after(() => f.owner.dispose());
+  f.owner.draw();
+  f.requests[0].reject(new Error("tile build failed"));
+  await tick();
+  assert.equal(f.client.disposed, true);
+  assert.equal(f.gpus[0].disposed, true);
+  assert.equal(f.cache.getStats().cpuBytes, 0);
+  assert.equal(f.owner.getPendingWorkCount(), 0);
+  assert.match(f.owner.getDiagnostics().failed, /tile build failed/);
+  assert.equal(f.owner.hasNativeFrame(), true, "permanent fallback admits existing native partial recolors");
+  assert.equal(f.owner.draw(), null);
+  assert.equal(f.requests.length, 1);
+});
+
+test("rejecting a larger GPU view cannot restart production from an aborted tile callback", async t => {
+  const harness = makeGpuFactory({ maxTextureSize: 512 });
+  const f = fixture({ width: 100, height: 100, createGpu: harness.createGpu });
+  t.after(() => f.owner.dispose());
+  assert.equal(f.owner.prepare(), true);
+  assert.equal(f.requests.length, 1);
+  f.layout.pixelWidth = 600;
+  assert.equal(f.owner.draw(), null);
+  assert.equal(f.owner.getDiagnostics().reason, "gpu-texture-limit");
+  assert.equal(f.requests[0].signal.aborted, true);
+  f.requests[0].reject(new DOMException("Aborted", "AbortError"));
+  await tick();
+  assert.equal(f.requests.length, 1, "the cancelled callback must not pump the rejected viewport");
+  assert.equal(f.owner.getPendingWorkCount(), 0);
+  f.layout.pixelWidth = 100;
+  assert.equal(f.owner.prepare(), true);
+  await resolveAll(f);
+  assert.ok(f.owner.draw(), "a later admitted view still rebuilds its interrupted tile");
 });
 
 test("context loss recreates GPU resources from cached CPU tiles without rebuilding them", async (t) => {

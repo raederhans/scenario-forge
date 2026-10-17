@@ -16,9 +16,10 @@ on:
         type: boolean
         default: false
       pages-artifact-only:
+        description: Deprecated compatibility input; both values build and verify a source artifact.
         required: false
         type: boolean
-        default: false
+        default: true
       run-pages-check:
         required: false
         type: boolean
@@ -45,8 +46,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          # pr-fast falls back to HEAD^ outside pull_request events.
-          fetch-depth: 2
+          # Fast policy checks prove ancestry against the frozen P4 baseline.
+          # Other profiles only need HEAD^ for the non-PR affected-file fallback.
+          fetch-depth: ${{ inputs.profile == 'pr-fast' && '0' || '2' }}
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            ${{ inputs.profile != 'full' && '!/dist/' || '' }}
 
       - name: Validate verification profile
         shell: bash
@@ -106,22 +112,25 @@ jobs:
         if: inputs.profile == 'deploy-minimal' || (inputs.profile == 'pr-fast' && inputs.run-pages-check)
         run: node --test tests/sample_project_contracts.test.mjs
 
-      - name: Explain verification selector
+      - name: Read affected files
         id: selector
-        if: inputs.profile == 'pr-fast'
+        if: inputs.profile == 'pr-fast' || inputs.profile == 'pr-smoke'
         shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          mkdir -p .runtime/tmp .runtime/reports/generated
-          changed_files=.runtime/tmp/verification-selector-changed-files.txt
-          : > "$changed_files"
-          if [ -n "${{ github.event.pull_request.base.sha }}" ]; then
-            git fetch --no-tags --depth=1 origin "${{ github.event.pull_request.base.sha }}"
-            git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" > "$changed_files"
+          set -euo pipefail
+          mkdir -p .runtime/tmp
+          if [ -n "$BASE_SHA" ]; then
+            # Do not re-shallow a complete policy history at the event base.
+            if ! git cat-file -e "${BASE_SHA}^{commit}"; then
+              git fetch --no-tags origin "$BASE_SHA"
+            fi
+            git diff --name-only --no-renames "$BASE_SHA" HEAD > .runtime/tmp/pr-check-files.txt
           else
-            git diff --name-only HEAD^ HEAD > "$changed_files"
+            git diff --name-only --no-renames HEAD^ HEAD > .runtime/tmp/pr-check-files.txt
           fi
-          test -s "$changed_files" || { echo "::error::verification selector received an empty changed-file set"; exit 1; }
-          node tools/select_verification_targets.mjs --changed-files-list "$changed_files" --json-out .runtime/reports/generated/verification-selector-explain.json --md-out .runtime/reports/generated/verification-selector-explain.md
+          test -s .runtime/tmp/pr-check-files.txt
 
       - name: Check Pages source references without building artifacts
         if: inputs.profile == 'pr-fast' && inputs.run-pages-source-check
@@ -133,7 +142,6 @@ jobs:
         run: |
           artifact_root=.runtime/pages-pr/dist
           python tools/build_pages_dist.py --output-root "$artifact_root"
-          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT="$artifact_root" python -m unittest tests.test_pages_dist_startup_shell -q
           echo "SCENARIO_FORGE_PAGES_ARTIFACT_ROOT=$artifact_root" >> "$GITHUB_ENV"
 
       - name: Cache Playwright browsers
@@ -146,7 +154,7 @@ jobs:
             playwright-browsers-${{ runner.os }}-
 
       - name: Install Playwright Chromium
-        if: (inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke' || inputs.profile == 'demo' || (inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only)
+        if: (inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke' || inputs.profile == 'demo' || inputs.profile == 'deploy-minimal'
         run: |
           mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
           max_retries=2
@@ -162,32 +170,17 @@ jobs:
             attempt=$((attempt + 1))
           done
 
-      - name: Build Pages dist
-        if: inputs.profile == 'deploy-minimal' && !inputs.pages-artifact-only
-        run: python tools/build_pages_dist.py
-
       - name: Build Pages artifact from source
-        if: inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only
+        if: inputs.profile == 'deploy-minimal'
         run: python tools/build_pages_dist.py --output-root .runtime/pages-release/dist
-
-      - name: Fail if tracked dist drifted from source
-        if: inputs.profile == 'deploy-minimal' && !inputs.pages-artifact-only
-        run: |
-          git diff --exit-code -- dist/.nojekyll dist/app.js dist/index.html dist/styles.css dist/assets dist/app/index.html dist/app/js dist/app/css dist/app/vendor dist/hgo dist/pages-dist-manifest.json \
-            || { echo "::error::dist/app is out of sync with source. Run 'python tools/build_pages_dist.py' and commit the result."; exit 1; }
-
-      - name: Verify Pages dist startup shell
-        if: inputs.profile == 'deploy-minimal' && !inputs.pages-artifact-only
-        run: python -m unittest tests.test_pages_dist_startup_shell -q
 
       - name: Verify and exercise the Pages artifact
         id: pages_checks
-        if: inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only
+        if: inputs.profile == 'deploy-minimal'
         env:
           SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/pages-release/dist
           PLAYWRIGHT_TEST_BASE_URL: http://127.0.0.1:4173/
         run: |
-          python -m unittest tests.test_pages_dist_startup_shell -q
           python -m http.server 4173 --bind 127.0.0.1 --directory .runtime/pages-release/dist > .runtime/pages-release/server.log 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
@@ -215,7 +208,7 @@ jobs:
             .runtime/tests/playwright/
 
       - name: Upload Pages artifact admission
-        if: inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only
+        if: inputs.profile == 'deploy-minimal'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: deploy-admission
@@ -226,66 +219,9 @@ jobs:
         if: inputs.profile == 'full'
         run: python -m unittest discover -s tests -p "test_*.py"
 
-      - name: Prepare exact state retirement history
-        if: always() && inputs.profile == 'pr-fast' && steps.selector.outcome == 'success'
-        run: |
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          import { execFileSync, spawnSync } from 'node:child_process';
-          const selection = JSON.parse(fs.readFileSync('.runtime/reports/generated/verification-selector-explain.json', 'utf8'));
-          const command = 'node --test tests/state_target_private_cache_contract_behavior.test.mjs';
-          if (!selection.recommendedCommands.some(entry => entry.commandRef === command)) {
-            console.log('Historical retirement proof is not selected.');
-            process.exit(0);
-          }
-          const { STATE_CAPABILITY_RETIREMENT_CONTRACT } = await import('./tools/state_action_delegation_contract.mjs');
-          const requirements = new Map();
-          for (const { previousSourceRevision: revision, modulePath } of STATE_CAPABILITY_RETIREMENT_CONTRACT) {
-            if (!/^[0-9a-f]{40}$/.test(revision)) throw new Error('Retirement history requires an exact commit.');
-            const paths = requirements.get(revision) || new Set(['tools/state_writer_policy.json']);
-            paths.add(modulePath);
-            requirements.set(revision, paths);
-          }
-          for (const [revision, paths] of requirements) {
-            if (spawnSync('git', ['cat-file', '-e', `${revision}^{commit}`], { stdio: 'ignore' }).status !== 0) {
-              execFileSync('git', ['fetch', '--no-tags', '--filter=blob:none', '--depth=1', 'origin', revision], { stdio: 'inherit' });
-            }
-            // Materialize only the pinned proof inputs; unrelated historical assets stay unfetched.
-            for (const sourcePath of paths) {
-              execFileSync('git', ['cat-file', '-s', `${revision}:${sourcePath}`], { stdio: 'ignore' });
-            }
-          }
-          console.log(`Prepared retirement proof inputs from ${requirements.size} exact commits.`);
-          NODE
-
-      - name: Run affected child-safe contracts
-        if: always() && inputs.profile == 'pr-fast' && steps.selector.outcome != 'skipped'
-        run: |
-          node tools/run_adaptive_tests.mjs \
-            --changed-files-list .runtime/tmp/verification-selector-changed-files.txt \
-            --selection-json .runtime/reports/generated/verification-selector-explain.json \
-            --execute \
-            --defer-main-thread \
-            --concurrency 2 \
-            --profile-out .runtime/reports/generated/verification-selector-execution.profile.json \
-            --json-out .runtime/reports/generated/verification-selector-execution.json \
-            --md-out .runtime/reports/generated/verification-selector-execution.md
-
-      - name: Upload verification selector evidence
-        if: always() && inputs.profile == 'pr-fast'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: verification-selector-evidence
-          if-no-files-found: ignore
-          include-hidden-files: true
-          path: |
-            .runtime/reports/generated/verification-selector-explain.*
-            .runtime/reports/generated/verification-selector-execution.*
-            .runtime/reports/generated/test-import-graph.json
-            .runtime/reports/generated/test-timeout-inventory.*
-            .runtime/reports/generated/test-import-graph-summary.*
-            .runtime/tmp/verification-selector-changed-files.txt
-            tests/e2e/test-import-graph.json
+      - name: Run core and affected behaviors
+        if: inputs.profile == 'pr-fast'
+        run: node tools/ci/run_pr_checks.mjs --changed-files-list .runtime/tmp/pr-check-files.txt --base "${{ github.event.pull_request.base.sha || 'HEAD^' }}" --lane unit
 
       - name: Run renderer split node behavior tests
         if: inputs.profile == 'full'
@@ -299,20 +235,6 @@ jobs:
         if: inputs.profile == 'full'
         run: npm run test:node:physical-layer-contracts
 
-      - name: Verify test infra guardrails
-        if: inputs.profile == 'pr-fast'
-        run: |
-          npm run verify:test-console-allowlist
-          npm run verify:test-timeout-guardrails
-
-      - name: Run PR routing contracts
-        if: inputs.profile == 'pr-fast'
-        run: |
-          # The affected selector owns structural checks, including the full
-          # Python structural suite. Keep only inexpensive routing policy checks
-          # unconditional; full/nightly verification retains the complete inventory.
-          node --test tests/pr_ci_plan_behavior.test.mjs tests/adaptive_routing_policy_behavior.test.mjs
-
       - name: Run strict TNO scenario contract gate
         # PR scenario contracts are owned by Scenario Contract Matrix.
         if: inputs.profile == 'full'
@@ -325,6 +247,18 @@ jobs:
       - name: Run focused UI E2E
         if: inputs.profile == 'pr-smoke' && inputs.smoke-mode == 'ui'
         run: node node_modules/@playwright/test/cli.js test tests/e2e/main_shell_i18n.spec.js tests/e2e/editor_detail_polish.spec.js --workers=1 --retries=0
+
+      - name: Run affected browser behaviors
+        if: inputs.profile == 'pr-smoke'
+        env:
+          DEBUG: pw:webserver
+        shell: bash
+        run: |
+          args=()
+          if [ "${{ inputs.run-golden-demo }}" = "true" ]; then
+            args+=(--changed-file tests/e2e/sample_guide_deeplink.spec.js)
+          fi
+          node tools/ci/run_pr_checks.mjs --changed-files-list .runtime/tmp/pr-check-files.txt --base "${{ github.event.pull_request.base.sha || 'HEAD^' }}" --lane browser "${args[@]}"
 
       - name: Write smoke timing summary
         if: always() && ((inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke')
@@ -346,9 +280,11 @@ jobs:
             .runtime/tests/playwright/**/error-context.md
             .runtime/tests/playwright/**/test-failed-*.png
             .runtime/tests/playwright/**/trace.zip
+            .runtime/tests/playwright/**/native-gpu-readback-diagnostics*.json
+            .runtime/reports/generated/native-gpu-readback-diagnostics/*.json
 
       - name: Run Golden Demo E2E
-        if: inputs.profile == 'demo' || inputs.run-golden-demo
+        if: inputs.profile == 'demo'
         env:
           # The preceding smoke server can leave its non-reusable socket in TIME_WAIT.
           MAPCREATOR_DEV_PORT: '8811'
@@ -375,12 +311,14 @@ jobs:
             .runtime/tests/playwright/**/error-context.md
             .runtime/tests/playwright/**/test-failed-*.png
             .runtime/tests/playwright/**/trace.zip
+            .runtime/tests/playwright/**/native-gpu-readback-diagnostics*.json
+            .runtime/reports/generated/native-gpu-readback-diagnostics/*.json
 
       - name: Upload deploy dist artifact
         if: inputs.profile == 'deploy-minimal'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: deploy-dist
-          path: ${{ inputs.pages-artifact-only && '.runtime/pages-release/dist' || 'dist' }}
+          path: .runtime/pages-release/dist
           # Keep .nojekyll in the handoff artifact; upload-artifact omits hidden files by default.
           include-hidden-files: true

@@ -6,3 +6,85 @@
 .country-section{padding:18px 0;border-bottom:1px solid var(--line)}.country-section>summary{font-size:12px;font-weight:650;cursor:pointer}.country-section[open]>summary{margin-bottom:14px}#country-panel{font-size:11px}#country-panel input:not([type=checkbox]):not([type=color]),#country-panel select{width:100%;padding:8px;border:1px solid #cdcec5;background:#fbfaf5;border-radius:4px;font:inherit}#country-panel input[type=color]{width:44px;height:30px;padding:0;border:0;background:none}#country-panel label{display:block;margin:10px 0 5px}#country-panel button{font-size:11px;line-height:1.5;height:auto;padding:7px 8px}#country-list,#country-core-list,#country-state-list{max-height:180px;overflow:auto;display:grid;gap:4px;margin:8px 0}#country-list button,#country-core-list button{width:100%;text-align:left}#country-list button[aria-pressed=true]{border-color:#8b643a;background:#e7ddc9}#country-selected{border-top:1px solid var(--line);padding-top:10px}#country-keep-overrides,#country-unify-overrides,#country-confirm-transfer,#country-refresh-preview{width:100%;margin:4px 0}#country-unify-overrides,#country-confirm-transfer{background:var(--ink);color:var(--paper)}#country-preview{padding:10px;border:1px solid #b4b5a9;border-radius:5px;margin-top:12px;background:#eae7dc}#country-preview-summary{white-space:pre-line;line-height:1.7}#country-stale{color:#9c3f24;font-weight:600}.country-hint,.country-notice{color:var(--muted);line-height:1.65}.country-swatch{display:inline-block;width:12px;height:12px;border:1px solid #0002;margin-right:5px;vertical-align:middle}.inspector-footer .field-hint{max-width:210px}.country-section[open] #country-panel{overflow-wrap:anywhere}@media(max-width:640px){.inspector>.country-section{grid-column:1/-1}.selection-section{grid-row:auto}.country-section[open] #country-panel{max-height:65dvh;overflow:auto}}
 
 .country-counts{display:block;margin-top:3px;font-size:10px;color:var(--muted)}#country-preview-summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 8px;white-space:normal;font-size:10px}#country-preview-summary dt{color:var(--muted)}#country-preview-summary dd{margin:0;font-variant-numeric:tabular-nums}.country-warning{color:#8c3c2b;line-height:1.6}#country-panel section{padding:10px}.inspector-footer{flex-wrap:wrap}
+
+/* One work area at a time; paint settings and history stay within reach. */
+.workspace{grid-template-columns:minmax(0,1fr) 320px}
+.inspector{padding:0;overflow:hidden;min-height:0}
+.inspector .paint-dock{flex:none;padding:12px 18px 10px}
+.paint-dock .section-heading{margin-bottom:8px}
+.paint-dock .color-control{min-height:40px;padding:5px 10px}
+.scope-control{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;margin-top:8px}
+.scope-control .field-label{margin:0;font-size:12px}
+.scope-control #paint-scope{margin:0;min-height:36px;padding:7px;font-size:12px}
+.inspector-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:6px 12px;border-bottom:1px solid var(--line);flex:none}
+.inspector-tabs button{min-height:38px;border-color:transparent;font-size:13px;font-weight:600}
+.inspector-tabs button[aria-selected=true]{background:var(--ink);color:var(--paper)}
+.inspector-page{flex:1;min-height:0;overflow:auto;padding:0 18px;scrollbar-width:thin;overscroll-behavior:contain;scroll-padding:12px}
+.inspector-page:focus-visible,select:focus-visible,[tabindex="-1"]:focus-visible{outline:2px solid #b97641;outline-offset:-2px}
+.inspector-page>section{padding:14px 0}
+.inspector-page .section-heading{margin-bottom:8px}
+.inspector-page .section-label{margin-bottom:8px}
+.inspector-page .search-results{max-height:none;overflow:visible}
+.swatches{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:0 0 10px}
+.swatches button{height:32px;min-height:32px}
+.inline-help,.selection-properties,.display-options{font-size:12px;color:var(--muted)}
+.inline-help summary,.selection-properties summary,.display-options summary,.keyboard-help summary{min-height:36px;padding:8px 0;cursor:pointer}
+.field-hint{font-size:12px;line-height:1.55;margin:8px 0}
+.selection-empty{padding:0}
+.selection-empty p{margin:0;font-size:12px;color:var(--muted)}
+.selected-title h3{font-size:18px}
+#pick-selection{margin-top:10px;font-size:12px}
+.selection-facts{margin:8px 0 14px;gap:8px;font-size:12px;color:var(--ink)}
+.selection-facts dd{overflow-wrap:anywhere;text-align:right}
+.text-button{min-height:36px;padding:0 8px;font-size:12px}
+.keyboard-help{padding:8px 0;font-size:12px}
+.keyboard-help p{line-height:1.6}
+.layer-toggle{min-height:40px}
+.display-options{border-top:1px solid var(--line);margin-top:10px;color:var(--ink)}
+.display-options .field-label{margin-top:8px;font-size:12px}
+.inspector-footer{padding:16px 0;font-size:11px}
+.inspector-footer .field-hint{max-width:none}
+
+/* Country navigation replaces stacked lists and nested scrolling cards. */
+.country-page{padding:0;overflow:hidden}
+#country-panel{height:100%;min-height:0;font-size:12px}
+#country-panel .country-step{height:100%;min-height:0;display:flex;flex-direction:column;padding:0;border:0;margin:0;background:transparent}
+.country-step-head{flex:none;padding:12px 18px 10px;border-bottom:1px solid var(--line)}
+.country-step-head h2,.country-step-head h3{font-size:14px;margin:0 0 8px;line-height:1.45;overflow-wrap:anywhere}
+.country-step-body{flex:1;min-height:0;overflow:auto;padding:8px 18px 14px;scrollbar-width:thin;overscroll-behavior:contain;scroll-padding:12px}
+#country-panel #country-selected{padding:0;margin:8px 0 0;border:0;font-size:17px}
+#country-panel .country-back{width:100%;text-align:left;padding:4px 0;border:0;font-size:12px;min-height:36px;color:var(--muted)}
+#country-panel input:not([type=checkbox]):not([type=color]),#country-panel select{min-height:38px;font-size:12px}
+#country-panel input[type=color]{width:48px;height:36px}
+#country-panel button{font-size:12px;min-height:38px}
+#country-panel .country-checkbox{display:flex;align-items:center;gap:8px;min-height:36px;margin:6px 0}
+.country-checkbox input{flex:none;width:18px;height:18px;margin:0}
+#country-panel #country-list,#country-panel #country-core-list{max-height:none;overflow:visible;display:grid;gap:6px;margin:0}
+#country-panel #country-state-list{max-height:none;overflow:visible;display:block;margin:6px 0}
+#country-panel .country-counts{font-size:11px}
+#country-panel .country-core-heading{font-size:13px;margin:18px 0 0;padding-top:14px;border-top:1px solid var(--line)}
+#country-core-search{margin:6px 0 10px}
+#country-preview-summary,#country-preview-overview{display:grid;grid-template-columns:minmax(0,1fr) auto;font-size:12px;line-height:1.4;gap:7px 10px;margin:4px 0 12px}
+#country-preview-summary dt,#country-preview-overview dt{overflow-wrap:anywhere}
+#country-preview-overview dd{margin:0;font-variant-numeric:tabular-nums}
+.country-preview-identity{display:grid;grid-template-columns:60px minmax(0,1fr);gap:12px}
+.country-step-actions{flex:none;padding:8px 18px;background:var(--paper);border-top:1px solid var(--line)}
+#country-panel .country-step-actions button{margin:3px 0}
+#country-panel label{font-size:12px}
+@media(min-width:1600px){.workspace{grid-template-columns:minmax(0,1fr) 350px}}
+@media(max-width:1000px){.workspace{grid-template-columns:minmax(0,1fr) 300px}}
+@media(max-width:640px){
+  .workspace{display:flex}
+  .inspector{display:flex;flex-direction:column;height:80dvh;min-height:560px;padding:0;gap:0}
+  .map-stage{height:50dvh}
+  .inspector-page .selection-section{grid-row:auto;grid-column:auto}
+  .label-control{flex-wrap:nowrap}.label-control button{width:auto}
+}
+@media(pointer:coarse){
+  button,.tool-rail button,.inspector-tabs button,#country-panel button,.layer-toggle{min-height:44px}
+  .swatches{grid-template-columns:repeat(auto-fit,minmax(44px,1fr))}.swatches button{height:44px}
+  .inline-help summary,.selection-properties summary,.display-options summary,.keyboard-help summary{min-height:44px;padding:12px 0}
+  .scope-control #paint-scope,#country-panel input:not([type=checkbox]):not([type=color]),#country-panel select{min-height:44px}
+  .label-control input,.label-control button,#country-panel .country-checkbox{min-height:44px}
+  .color-control input[type=color],#country-panel input[type=color],.display-color input{width:44px;height:44px;flex-shrink:0}
+}

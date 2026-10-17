@@ -2,7 +2,7 @@
 // 这个模块负责 loadScenarioBundle 主交易、startup bootstrap cache probe/write、bundle assemble 与 cache-hit 恢复。
 // scenario_resources.js 继续保留 facade、startup hydration、optional layer 与对外 export 面。
 
-import { trimScenarioBundleCacheState } from "../state/actions/scenario_activation_actions.js";
+import { trimScenarioBundleCache } from "./bundle_cache.js";
 import { setStartupScenarioBootstrapCacheStatus } from "../state/actions/boot_actions.js";
 
 function createScenarioBundleRuntimeController({
@@ -39,6 +39,7 @@ function createScenarioBundleRuntimeController({
 } = {}) {
   const bundleLoadPromisesByKey = new Map();
   const bundleCacheRecency = new Map();
+  let pendingBundleLoads = 0;
   const normalizeBundleLoadKeyPart = (value, fallback = "") => String(value ?? fallback).trim() || fallback;
   const normalizeSourceShaMetadata = (source = null) => {
     const payload = source && typeof source === "object" ? source : {};
@@ -55,9 +56,9 @@ function createScenarioBundleRuntimeController({
   };
 
   function retainBundleInCache(targetId) {
-    const retainedIds = trimScenarioBundleCacheState(state, Array.from(bundleCacheRecency.keys()), targetId);
-    bundleCacheRecency.clear();
-    for (const id of retainedIds) bundleCacheRecency.set(id, true);
+    trimScenarioBundleCache(state, bundleCacheRecency, targetId, {
+      releaseDerived: pendingBundleLoads === 0,
+    });
   }
 
   function buildBundleLoadKey({
@@ -308,6 +309,7 @@ function createScenarioBundleRuntimeController({
     if (!forceReload && bundleLoadPromisesByKey.has(bundleLoadKey)) {
       return bundleLoadPromisesByKey.get(bundleLoadKey);
     }
+    pendingBundleLoads += 1;
     const loadPromise = (async () => {
       await loadScenarioRegistry({ d3Client });
       const meta = getScenarioMetaById(targetId);
@@ -460,6 +462,7 @@ function createScenarioBundleRuntimeController({
     try {
       return await loadPromise;
     } finally {
+      pendingBundleLoads -= 1;
       if (!forceReload) {
         bundleLoadPromisesByKey.delete(bundleLoadKey);
       }

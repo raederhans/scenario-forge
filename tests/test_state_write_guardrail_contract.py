@@ -317,45 +317,17 @@ class StateWriteGuardrailContractTest(unittest.TestCase):
             self.fail(details or "state write allowlist check failed")
         self.assertIn("State write allowlist passed", result.stdout)
 
-    def test_legacy_scanner_fixture_exclusions_are_exact_and_policy_tested(self):
+    def test_legacy_scanner_classifies_fixtures_and_singleton_writes_semantically(self):
         checker_source = CHECK_SCRIPT.read_text(encoding="utf-8")
-        expected_fixtures = {
-            "tests/state_writer_policy_behavior.test.mjs",
-            "tests/state_writer_policy_manifest_behavior.test.mjs",
-            "tests/state_writer_scanner_soundness_behavior.test.mjs",
-            "tests/state_writer_policy_soundness_behavior.test.mjs",
-            "tests/day_night_runtime_owner_behavior.test.mjs",
-            "tests/political_background_render_owner_behavior.test.mjs",
-        }
-        fixture_match = re.search(
-            r"const\s+LEGACY_SCANNER_FIXTURE_PATHS\s*=\s*new\s+Set\(\s*\[(?P<body>.*?)\]\s*\);",
-            checker_source,
-            flags=re.DOTALL,
+        self.assertNotIn("LEGACY_SCANNER_FIXTURE_PATHS", checker_source)
+        result = subprocess.run(
+            ["node", "--test", "tests/state_write_allowlist_behavior.test.mjs"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
         )
-        self.assertIsNotNone(fixture_match)
-        actual_fixtures = set(
-            re.findall(r'"([^"]+)"', fixture_match.group("body"))
-        )
-        self.assertEqual(actual_fixtures, expected_fixtures)
-
-        scripts = json.loads(PACKAGE_JSON.read_text(encoding="utf-8")).get("scripts", {})
-        self.assertEqual(
-            scripts.get("test:node:p4:state-writer-policy"),
-            "node tools/run_p4_state_writer_policy_tests.mjs",
-        )
-        runner_source = (
-            REPO_ROOT / "tools" / "run_p4_state_writer_policy_tests.mjs"
-        ).read_text(encoding="utf-8")
-        runner_match = re.search(
-            r"export\s+const\s+P4_STATE_WRITER_POLICY_TEST_FILES\s*=\s*Object\.freeze\(\s*\[(?P<body>.*?)\]\s*\);",
-            runner_source,
-            flags=re.DOTALL,
-        )
-        self.assertIsNotNone(runner_match)
-        runner_test_files = set(
-            re.findall(r'"([^"]+)"', runner_match.group("body"))
-        )
-        self.assertTrue(expected_fixtures.issubset(runner_test_files))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_transport_workbench_state_owner_is_explicit_state_writer(self):
         allowlist = json.loads(ALLOWLIST_FILE.read_text(encoding="utf-8"))

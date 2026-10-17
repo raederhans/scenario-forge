@@ -8,6 +8,8 @@ import { isDeepStrictEqual } from "node:util";
 import {
   findStateActionCrossFileMigrationContractEntry,
   findStateCapabilityRetirementContractEntry,
+  findStateActionSuccessorProofContractEntry,
+  matchesStateCapabilityRetirementHistory,
 } from "./state_action_delegation_contract.mjs";
 
 import {
@@ -36,6 +38,7 @@ import {
 import {
   buildDefaultStateOwnershipReport,
   validateTestDiagnosticBudget,
+  validateStateWriterPolicySchema,
   validateStateWriterPolicySnapshot,
 } from "./state_writer_policy.mjs";
 import {
@@ -248,6 +251,18 @@ export function validateCallerToActionLedgerHistoryTransition({
       continue;
     }
     const endedAuthority = findStateCapabilityRetirementContractEntry(previousEntry.retiredMembershipIdentity);
+    if (matchesStateCapabilityRetirementHistory(previousEntry, endedAuthority)
+      && matchesStateCapabilityRetirementHistory(currentEntry, endedAuthority)
+      && currentEntry.capabilityRetirementContractIdentity === endedAuthority.contractIdentity
+      && currentEntry.currentSourceFingerprint === endedAuthority.currentSourceFingerprint) {
+      const previousHistory = structuredClone(previousEntry);
+      const currentHistory = structuredClone(currentEntry);
+      for (const field of ["capabilityRetirementContractIdentity", "currentSourceFingerprint"]) {
+        delete previousHistory[field];
+        delete currentHistory[field];
+      }
+      if (isDeepStrictEqual(previousHistory, currentHistory)) continue;
+    }
     if (currentEntry.proofPrecision === "explicit-capability-retirement"
       && currentEntry.capabilityRetirementContractIdentity === endedAuthority?.contractIdentity
       && endedAuthority?.previousActionProofFingerprint === createHash("sha256").update(JSON.stringify(previousEntry)).digest("hex")
@@ -313,12 +328,23 @@ export function validateCallerToActionLedgerHistoryTransition({
       previousPhase !== currentPhase;
     const observationRefresh =
       samePhaseObservationRefresh || crossPhaseObservationRefresh;
-    const expectedHistory = observationRefresh
-      ? structuredClone(previousEntry)
-      : previousEntry;
-    const actualHistory = observationRefresh
-      ? structuredClone(currentEntry)
-      : currentEntry;
+    const expectedHistory = structuredClone(previousEntry);
+    const actualHistory = structuredClone(currentEntry);
+    const previousProofs = expectedHistory.functionProofs || [expectedHistory];
+    const currentProofs = actualHistory.functionProofs || [actualHistory];
+    for (const [index, currentProof] of currentProofs.entries()) {
+      const contract = findStateActionSuccessorProofContractEntry(
+        currentProof.actionModulePath, currentProof.actionExportName,
+        [currentEntry.domain, currentEntry.migrationPhase, currentEntry.operation, currentEntry.key].join("|"),
+      );
+      if (contract && currentProof.successorProofContractIdentity === contract.contractIdentity
+        && previousProofs[index]) {
+        // Descriptors, terminal membership and historical anchors still compare
+        // below; only the current contract's derived stamp may be refreshed.
+        delete previousProofs[index].successorProofContractIdentity;
+        delete currentProof.successorProofContractIdentity;
+      }
+    }
     if (observationRefresh) {
       // The builder refreshes live source coordinates within the recording
       // phase and may refresh the action edge across phases. Snapshot
@@ -1363,6 +1389,22 @@ export async function buildStateWriterPolicyReport({
   const sourceBaseSha = String(
     loadedPolicy?.baseline?.sourceBaseSha || "",
   ).trim();
+  // A malformed authority ledger cannot pass. Reject it before starting the
+  // repository inventory or historical worker; valid policies retain both.
+  const schemaViolations = validateStateWriterPolicySchema(loadedPolicy);
+  if (schemaViolations.length) {
+    return {
+      schemaVersion: 1,
+      stage: "policy-schema",
+      phase: normalizedPhase,
+      sourceBaseSha,
+      policyPath: path.relative(PROJECT_ROOT, STATE_WRITER_POLICY_PATH).replaceAll("\\", "/"),
+      policyBaseline: loadedPolicy.baseline,
+      verdict: "fail",
+      violations: schemaViolations,
+      metrics: null,
+    };
+  }
   const identity = buildStateWriterVerificationIdentity({
     sourceBaseSha,
     requireClean,
@@ -1692,8 +1734,11 @@ async function main() {
   if (args.json) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   } else {
+    const summary = report.stage === "policy-schema"
+      ? `${report.violations.length} schema violations before source scans`
+      : `${report.metrics.legacyDirectFiles.production} production + ${report.metrics.legacyDirectFiles.test} test legacy-direct files`;
     console.log(
-      `P4 state writer policy ${report.verdict}: ${report.metrics.legacyDirectFiles.production} production + ${report.metrics.legacyDirectFiles.test} test legacy-direct files; report ${path.relative(PROJECT_ROOT, outputPath).replaceAll("\\", "/")}.`,
+      `P4 state writer policy ${report.verdict}: ${summary}; report ${path.relative(PROJECT_ROOT, outputPath).replaceAll("\\", "/")}.`,
     );
     if (report.violations.length) {
       for (const violation of report.violations) {

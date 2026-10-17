@@ -2,19 +2,27 @@
 // Only newly allocated buffers are transferred; source GeoJSON remains usable.
 var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGeometryTransferCodecShared || (() => {
   const depths = { Point: 1, MultiPoint: 2, LineString: 2, MultiLineString: 3, Polygon: 3, MultiPolygon: 4 };
-  function mapGeometry(value, transform, includeTopologyArcs = false) {
+  function mapGeometry(value, transform, includeTopologyArcs = false, copy = true) {
     if (!value || typeof value !== "object") return value;
     if (Object.hasOwn(depths, value.type) && Array.isArray(value.coordinates)) return transform(value, depths[value.type]);
-    if (Array.isArray(value)) return value.map((item) => mapGeometry(item, transform, includeTopologyArcs));
+    if (Array.isArray(value)) {
+      if (copy) return value.map((item) => mapGeometry(item, transform, includeTopologyArcs));
+      for (const item of value) mapGeometry(item, transform, includeTopologyArcs, false);
+      return value;
+    }
     // Properties are opaque. Topology arcs are opt-in for startup responses;
     // ordinary chunk/raster messages keep the original v1 contract.
     if (Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null) return value;
-    const result = { ...value };
+    const result = copy ? { ...value } : value;
     for (const key of Object.keys(value)) {
-      if (key !== "properties" && key !== "arcs" && key !== "coordinates") result[key] = mapGeometry(value[key], transform, includeTopologyArcs);
+      if (key !== "properties" && key !== "arcs" && key !== "coordinates") {
+        const mapped = mapGeometry(value[key], transform, includeTopologyArcs, copy);
+        if (copy) result[key] = mapped;
+      }
     }
     if (includeTopologyArcs && value.type === "Topology" && Array.isArray(value.arcs)) {
-      result.arcs = transform({ type: "MultiLineString", coordinates: value.arcs }, 3).coordinates;
+      const mapped = transform({ type: "MultiLineString", coordinates: value.arcs }, 3).coordinates;
+      if (copy) result.arcs = mapped;
     }
     return result;
   }
@@ -29,7 +37,9 @@ var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGe
         else valid = false;
       }
     }
-    mapGeometry(value, (geometry, depth) => { count(geometry.coordinates, depth); return geometry; }, includeTopologyArcs);
+    // The sizing pass only visits source data. Cloning here discards an entire
+    // message-shaped tree, even for small messages that bypass packing below.
+    mapGeometry(value, (geometry, depth) => { count(geometry.coordinates, depth); return geometry; }, includeTopologyArcs, false);
     // Small updates stay on the ordinary path. The cutoff is deliberately
     // conservative: measured TNO samples at 18k scalars amortize conversion;
     // sub-1k samples do not. This is a transport choice, never an LOD change.

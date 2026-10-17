@@ -26,7 +26,7 @@ async function appHarness({handoff=false,ready=true}={}){
     getViewModel(){return this.model;},loadDocument(payload){this.loaded=payload;},serializeDocument(){this.serialized++;return project;},markSaved(){this.saved++;}};
   class TestURL extends URL {static createObjectURL(){return 'blob:test';}static revokeObjectURL(){}}
   const context={document,window:{confirm:()=>true,addEventListener(){},removeEventListener(){},},location:{href:`https://example.test/hgo${handoff?'?handoff=123e4567-e89b-12d3-a456-426614174000':''}`},history:{state:null,replaceState(){}},URL:TestURL,Blob,AbortController,Element:class{},
-    setTimeout:()=>1,clearTimeout(){},loadDataset:async()=>({placesWarning:null}),createHgoSession:()=>session,createCountryPanel:()=>({render(){},dispose(){}}),
+    setTimeout:()=>1,clearTimeout(){},loadDataset:async()=>({placesWarning:null}),createHgoSession:()=>session,createCountryPanel:()=>({render(){},dispose(){},setActive(){}}),createInspectorTabs:()=>({current:'paint',dispose(){}}),
     consumeHandoff:(token,accept)=>new Promise((resolve,reject)=>{acceptHandoff=accept;finishHandoff={resolve,reject};}),text,keyboardAction,validateProjectFile,parseHexColor,console};
   vm.runInNewContext(source,context,{filename:'apps/hgo/src/main.js'});
   return {elements,listeners,session,start:context.appStart,accept:payload=>acceptHandoff(payload),finish:()=>finishHandoff.resolve(true)};

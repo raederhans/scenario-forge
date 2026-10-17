@@ -130,6 +130,7 @@ export const TEST_ROUTING_RECORDS = [
     "sourceRefs": [
       "tools/e2e_layering.mjs",
       "tests/e2e/test-layer-manifest.json",
+      "tests/e2e/test-lists",
       ".github/workflows/pr-verify.yml",
       ".github/workflows/verify-shared.yml"
     ],

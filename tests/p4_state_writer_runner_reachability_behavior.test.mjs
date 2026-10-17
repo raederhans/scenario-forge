@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
+import { buildStateWriterPolicyReport } from "../tools/check_state_writer_policy.mjs";
+import { validateStateWriterPolicySchema } from "../tools/state_writer_policy.mjs";
 
 import {
   assertP4StateWriterPolicyManifestRunMode,
@@ -318,4 +320,47 @@ test("node route discovery keeps wrapper-based named gates reachable", () => {
       .includes("tools/run_p4_state_writer_policy_tests.mjs"),
     route.sourceRef,
   );
+});
+
+
+const schemaPolicyFixture = () => ({
+  schemaVersion: 1,
+  baseline: { phase: "P4.0", baseSha: "fixture", sourceBaseSha: "a".repeat(40) },
+  writers: [],
+});
+
+test("invalid policy schema fails before Git history, repository scans or proof workers", async () => {
+  const policy = { ...schemaPolicyFixture(), schemaVersion: 99 };
+  const expected = validateStateWriterPolicySchema(policy);
+  assert.ok(expected.length);
+  let scans = 0;
+  class UnexpectedScanCache extends Map {
+    get() { scans += 1; throw new Error("unexpected repository scan"); }
+  }
+  const report = await buildStateWriterPolicyReport({
+    policy,
+    previousPolicyRevision: "missing-revision-must-not-be-read",
+    repositoryScanCache: new UnexpectedScanCache(),
+  });
+  assert.equal(report.verdict, "fail");
+  assert.equal(report.stage, "policy-schema");
+  assert.equal(report.metrics, null, "unmeasured source metrics must not look like zero findings");
+  assert.deepEqual(report.violations, expected);
+  assert.equal(scans, 0);
+});
+
+test("valid policy schema still requires the source inventory and propagates its failure", async () => {
+  const policy = schemaPolicyFixture();
+  assert.deepEqual(validateStateWriterPolicySchema(policy), []);
+  const failure = new Error("source inventory required");
+  let scans = 0;
+  class RequiredScanCache extends Map {
+    get() { scans += 1; throw failure; }
+  }
+  await assert.rejects(buildStateWriterPolicyReport({
+    policy,
+    previousPolicy: null,
+    repositoryScanCache: new RequiredScanCache(),
+  }), error => error === failure);
+  assert.equal(scans, 1);
 });

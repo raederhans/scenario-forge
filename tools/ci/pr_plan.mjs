@@ -34,7 +34,7 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
   // These planners only choose checks; they are not inputs to the Pages artifact.
   // Unknown CI tools and the workflow that actually builds it remain conservative.
   const routingOnlyInputs = new Set([
-    "tools/ci/pr_plan.mjs", "tools/ci/perf_policy.mjs", "tools/ci/pr_delivery_plan.mjs",
+    "tools/ci/pr_plan.mjs", "tools/ci/perf_policy.mjs", "tools/ci/pr_delivery_plan.mjs", "tools/ci/run_pr_checks.mjs",
     ".github/workflows/pr-verify.yml",
   ]);
   const artifactPolicyRelevant = controlPlane && files.some(file => (
@@ -49,8 +49,9 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     || files.some((file) => /^requirements[^/]*\.txt$/u.test(file));
   // A script may be invoked directly by a browser workflow, even when no other
   // package script references it. The performance exemption is not that proof.
-  const browserRelevant = runtimeRelevant || controlPlane || dependencyChange || matches(["package.json"])
-    || matches(["tests/e2e/**", "playwright.config.cjs", "tools/e2e_layering.mjs"]);
+  const browserRelevant = runtimeRelevant || controlPlane || dependencyChange || matches(["data/scenarios/**", "map_builder/**"]) || matches(["package.json"])
+    || matches(["tests/e2e/**", "playwright.config.cjs", "tools/e2e_layering.mjs",
+      "tools/political_id_raster_app_session.mjs", "tools/verify_political_id_raster_integration.mjs"]);
   // Source-only changes validate their live reference graph. Changes to packaging,
   // public assets or dependencies still exercise the complete built artifact.
   // These renderer contracts compare built mirrors byte-for-byte. Supply a fresh
@@ -74,6 +75,7 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     "js/bootstrap/startup_sample_project_deeplink.js",
     "js/core/sample_project_import_workflow.js",
     "js/core/sample_project_registry.js",
+    "js/ui/**", "css/**", "js/core/export*", "js/core/state/actions/export*", "index.html",
     "landing/**",
     "tests/e2e/sample_guide_deeplink.spec.js",
     "tools/ci/**", ".github/workflows/pr-verify.yml",

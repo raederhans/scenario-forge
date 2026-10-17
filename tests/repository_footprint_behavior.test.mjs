@@ -495,7 +495,7 @@ test("standalone workflow keeps footprint policy report-only and publishes runti
   assert.match(workflow, /^name: Repository Footprint Report$/m);
   assert.match(workflow, /^  workflow_dispatch:$/m);
   assert.match(workflow, /^  schedule:$/m);
-  assert.match(workflow, /^  pull_request:$/m);
+  assert.doesNotMatch(workflow, /^  (?:pull_request|push):$/m);
   assert.match(workflow, /^  report-only:$/m);
   assert.match(workflow, /node tools\/repository_footprint\.mjs/);
   assert.match(workflow, /args=\(--as-of "\$\(date -u \+%F\)"\)/);

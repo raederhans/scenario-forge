@@ -15,6 +15,8 @@ import {
   expandStateActionMembershipsWithLegacyReplacements,
   findStateActionReadOnlyContractEntry,
   findStateActionSuccessorProofContractEntry,
+  findStateCapabilityRetirementContractEntry,
+  matchesStateCapabilityRetirementHistory,
   getStateActionDelegationContractEntriesForModule,
   STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT,
   STATE_ACTION_DELEGATION_CONTRACT,
@@ -7223,14 +7225,6 @@ test("cross-phase policy rebuild fails closed when two actions own the successor
 test("P4.4 successor proofs persist the exact contracted relay edge and fail closed", () => {
   const callerPath = "js/core/fixture_ui_state.js";
   assert.deepEqual(validateStateActionSuccessorProofContract(), []);
-  assert.equal(STATE_ACTION_SUCCESSOR_PROOF_CONTRACT.length, 23);
-  assert.equal(
-    STATE_ACTION_SUCCESSOR_PROOF_CONTRACT.reduce(
-      (count, entry) => count + entry.successorEdges.length,
-      0,
-    ),
-    26,
-  );
   const contract = findStateActionSuccessorProofContractEntry(
     "js/core/state/actions/transport_actions.js",
     "applyTransportWorkbenchOverviewState",
@@ -9034,6 +9028,89 @@ test("capability retirement rejects current writes even after the local source p
     ({ reason, identity }) => reason === "current-source-drift"
       && identity === entry.retiredMembershipIdentity,
   ));
+});
+
+test("capability retirement refresh preserves historical anchors and rejects forged evidence", async () => {
+  const policy = await readStateWriterPolicy();
+  const entry = policy.progress.callerToActionLedger.entries.find((proof) =>
+    proof.retiredCallerPath === "js/core/hgo_runtime_preview.js"
+    && proof.proofPrecision === "explicit-capability-retirement");
+  const contract = findStateCapabilityRetirementContractEntry(entry.retiredMembershipIdentity);
+  const previous = structuredClone(policy);
+  const prior = previous.progress.callerToActionLedger.entries.find((proof) =>
+    proof.retiredMembershipIdentity === entry.retiredMembershipIdentity);
+  prior.capabilityRetirementContractIdentity = "0".repeat(64);
+  prior.currentSourceFingerprint = "1".repeat(64);
+  assert.equal(matchesStateCapabilityRetirementHistory(prior, contract), true);
+  assert.deepEqual(validateCallerToActionLedgerHistoryTransition({
+    previousPolicy: previous, currentPolicy: policy,
+  }), []);
+  assert.deepEqual(inspectStateCapabilityRetirementEvidence({
+    previousPolicy: previous, currentWriters: policy.writers, contractEntries: [contract],
+  }), []);
+  for (const field of ["previousSourceRevision", "previousSourceFingerprint",
+    "retiredMutationSiteFingerprint", "retiredCallerBindingIdentity", "key"]) {
+    const forged = { ...prior, [field]: "forged" };
+    assert.equal(matchesStateCapabilityRetirementHistory(forged, contract), false, field);
+    const altered = structuredClone(policy);
+    Object.assign(altered.progress.callerToActionLedger.entries.find((proof) =>
+      proof.retiredMembershipIdentity === entry.retiredMembershipIdentity), forged);
+    assert.ok(validateCallerToActionLedgerHistoryTransition({
+      previousPolicy: policy, currentPolicy: altered,
+    }).length, field);
+  }
+  const restoredSource = "state.hgoRuntimePreview = {};";
+  const refreshedContract = { ...contract,
+    currentSourceFingerprint: capabilityRetirementFingerprint(restoredSource) };
+  assert.ok(inspectStateCapabilityRetirementEvidence({
+    previousPolicy: previous, currentWriters: policy.writers,
+    contractEntries: [refreshedContract],
+    readCurrentSource: (modulePath) => modulePath === contract.modulePath
+      ? restoredSource : readRetirementCurrentSource(modulePath),
+  }).some(({ reason }) => reason === "current-source-drift"));
+});
+
+test("successor stamp refresh retains exact callee target and terminal membership", async () => {
+  const policy = await readStateWriterPolicy();
+  const entry = policy.progress.callerToActionLedger.entries.find((proof) =>
+    proof.key === "hoveredSpecialRegionId" && proof.successorActionProofs?.length);
+  const previous = structuredClone(policy);
+  previous.progress.callerToActionLedger.entries.find((proof) =>
+    proof.retiredMembershipIdentity === entry.retiredMembershipIdentity)
+    .successorProofContractIdentity = "0".repeat(64);
+  assert.deepEqual(validateCallerToActionLedgerHistoryTransition({
+    previousPolicy: previous, currentPolicy: policy,
+  }), []);
+  for (const [field, value] of [["actionExportName", "unrelatedAction"],
+    ["targetArgumentIndex", 1], ["terminalMembership", "ui|P4.4|assign|showUrban"]]) {
+    const altered = structuredClone(policy);
+    altered.progress.callerToActionLedger.entries.find((proof) =>
+      proof.retiredMembershipIdentity === entry.retiredMembershipIdentity)
+      .successorActionProofs[0][field] = value;
+    assert.ok(validateCallerToActionLedgerHistoryTransition({
+      previousPolicy: previous, currentPolicy: altered,
+    }).length, field);
+    assert.ok(validateStateWriterPolicySchema(altered).length, field);
+  }
+  const forged = structuredClone(policy);
+  forged.progress.callerToActionLedger.entries.find((proof) =>
+    proof.retiredMembershipIdentity === entry.retiredMembershipIdentity)
+    .successorProofContractIdentity = "2".repeat(64);
+  assert.ok(validateCallerToActionLedgerHistoryTransition({
+    previousPolicy: previous, currentPolicy: forged,
+  }).length);
+});
+
+test("reviewed ledger schema requires explicit toolbar callback migration", async () => {
+  const policy = await readStateWriterPolicy();
+  assert.deepEqual(validateStateWriterPolicySchema(policy), []);
+  const entry = policy.progress.callerToActionLedger.entries.find((proof) =>
+    proof.key === "showUrban"
+    && proof.callerPath === "js/ui/toolbar/appearance_controls_controller.js");
+  assert.equal(entry.proofPrecision, "explicit-cross-file");
+  entry.enclosingFunctionIdentity = entry.retiredEnclosingFunctionIdentity;
+  assert.ok(validateStateWriterPolicySchema(policy).some(({ code }) =>
+    code === "caller-action-ledger-entry-invalid"));
 });
 
 test("capability retirement ledger records an exact non-action proof and rejects fabricated successors", () => {

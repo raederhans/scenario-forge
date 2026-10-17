@@ -176,7 +176,7 @@ test("hosted workflows consume the planned lanes and keep release artifact check
   assert.match(pr, /run-pages-source-check: \$\{\{ needs\.pr-plan\.outputs\.pages_mode == 'source' \}\}/);
   assert.match(shared, /python tools\/check_pages_source_graph\.py/);
   assert.match(shared, /tests\/e2e\/main_shell_i18n\.spec\.js tests\/e2e\/editor_detail_polish\.spec\.js --workers=1 --retries=0/);
-  assert.match(shared, /inputs\.profile == 'deploy-minimal' && inputs\.pages-artifact-only/);
+  assert.match(shared, /inputs\.profile == 'deploy-minimal'/);
   assert.match(shared, /python tools\/build_pages_dist\.py --output-root .runtime\/pages-release\/dist/);
   assert.match(shared, /npm run test:e2e:pages-public-release-gate/);
 });

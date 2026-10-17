@@ -127,6 +127,7 @@ export function createPoliticalIdRasterRuntimeOwner({
   const resourceOwner = Symbol("political-id-raster");
   let snapshot = null, sourceVersion = null, paletteVersion = null, colorScope = null, namespace = null;
   let gpu = null, active = null, plan = null, disposed = false, failed = "";
+  let gpuTextureLimit = null;
   let gpuTiles = [];
   let epoch = 0, planKey = "", attempted = new Set();
   const stats = { builds: 0, cacheHits: 0, staleResults: 0, commits: 0, fallbacks: 0,
@@ -176,6 +177,9 @@ export function createPoliticalIdRasterRuntimeOwner({
   }
 
   function account() {
+    // Persistence cancellation settles asynchronously after dispose() releases
+    // this owner. A late callback must not recreate its budget registration.
+    if (disposed) return;
     const retained = cache.getStats();
     const graphics = gpu?.getStats();
     const assets = assetStore?.stats();
@@ -261,6 +265,10 @@ export function createPoliticalIdRasterRuntimeOwner({
     // Direct IDs alone must leave room for exact edge coverage. Do not build a
     // complete view that cannot coexist in the unchanged CPU cache budget.
     if (plan && plan.width * plan.height * 4 >= cache.maxBytes) plan = null;
+    if (!plan) {
+      cancel(); releaseGpu(); committedPlan = null;
+      cancelRefinement(); cancelAssetRecovery(); account();
+    }
     const key = plan?.tiles.map(tile => tile.key).join("|") || "";
     if (key !== planKey) { attempted = new Set(); planKey = key; }
     // An obsolete view can finish only its current tile. There is no old-view
@@ -460,10 +468,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       account();
     }).catch(error => {
       if (disposed || controller.signal.aborted) return;
-      failed = String(error?.message || error);
-      cache.clear();
-      releaseGpu();
-      account();
+      failProducer(error);
     }).finally(() => {
       if (active === task) active = null;
       if (disposed) return;
@@ -491,14 +496,45 @@ export function createPoliticalIdRasterRuntimeOwner({
       // CPU coverage remains valid and no geometry is rebuilt for context loss.
       e.requestRender("political-id-raster-context-lost");
     } });
+    gpuTextureLimit = gpu.getLimits?.().maxTextureSize ?? null;
     return gpu.isAvailable();
+  }
+
+  function admitGpuView() {
+    const exceedsLimit = () => gpuTextureLimit !== null
+      && (plan.width > gpuTextureLimit || plan.height > gpuTextureLimit);
+    if (!exceedsLimit() && !ensureGpu()) {
+      displayState = "fallback"; reason = "gpu-unavailable"; return false;
+    }
+    if (!exceedsLimit()) return true;
+    // A 4K/DPR view can exceed an integrated GPU's texture size before it
+    // exceeds our byte budget. Do not build all its tiles only to reject output.
+    cancel(); releaseGpu(); committedPlan = null;
+    // Aborted tile promises still settle and call pump(). Withdraw this view
+    // before they do, and cancel idle recovery/refinement for rejected output.
+    plan = null;
+    cancelRefinement(); cancelAssetRecovery();
+    displayState = "fallback"; reason = "gpu-texture-limit";
+    account();
+    return false;
   }
 
   function failProducer(error) {
     failed = String(error?.message || error);
+    cancelRefinement();
+    cancelAssetRecovery();
     cancel();
+    worker.dispose();
+    manifestController.abort();
+    assetStore?.dispose();
+    identityBuilder.dispose();
     releaseGpu();
     cache.clear();
+    source.dispose();
+    snapshot = null; committedPlan = null;
+    codeToId.clear();
+    tileDependencies = new WeakMap(); tileIdentities = new WeakMap();
+    pathCacheEstimatedBytes = 0;
     account();
     stats.fallbacks++;
     displayState = "fallback"; reason = "producer-error";
@@ -511,7 +547,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       syncSource();
       if (!updatePlan()) { stats.fallbacks++; displayState = "fallback"; reason = "view-budget"; return false; }
       updateViewIdentity();
-      if (!ensureGpu()) { displayState = "fallback"; reason = "gpu-unavailable"; return false; }
+      if (!admitGpuView()) return false;
       // Start the same bounded producer without repainting a still-current
       // native frame. The ready callback requests the first accelerated draw.
       pump();
@@ -542,7 +578,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         return null;
       }
       // Probe availability before spending CPU time building unavailable output.
-      if (!ensureGpu()) { displayState = "fallback"; reason = "gpu-unavailable"; return null; }
+      if (!admitGpuView()) return null;
       const tiles = plan.tiles.map(tile => cache.get(tile.key));
       if (tiles.some(tile => !tile)) {
         // Actual edge coverage can exceed the CPU budget even when the pixel
@@ -640,7 +676,9 @@ export function createPoliticalIdRasterRuntimeOwner({
 
   return Object.freeze({ prepare, draw, queryPoint, noteNativePartialRepaint,
     finishNativePartialRepaint() { if (nativePartialPending) noteNativePartialRepaint(); },
-    hasNativeFrame: () => !disposed && !persistent && (displayState === "precise" || nativePartialPending),
+    // A permanently stopped producer leaves the ordinary native pass in charge,
+    // including its cheap partial recolors instead of forcing full vector draws.
+    hasNativeFrame: () => !disposed && (!!failed || (!persistent && (displayState === "precise" || nativePartialPending))),
     async exportAssets() {
       if (disposed || !snapshot) return [];
       return cache.entries().flatMap(([, tile]) => {

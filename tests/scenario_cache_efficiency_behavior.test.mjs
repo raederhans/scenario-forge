@@ -12,6 +12,96 @@ import { trimScenarioBundleCache, SCENARIO_BUNDLE_CACHE_LIMIT, SCENARIO_CHUNK_PA
 import { createScenarioChunkPayloadLoader } from "../js/core/scenario/chunk_payload_loader.js";
 import { commitScenarioChunkPayloadEntriesState } from "../js/core/state/actions/scenario_chunk_runtime_actions.js";
 import { ensureScenarioChunkRuntimeState, commitScenarioChunkSelectionState } from "../js/core/state/actions/scenario_chunk_runtime_actions.js";
+import { createScenarioStartupHydrationController } from "../js/core/scenario/startup_hydration.js";
+import { createRequire } from "node:module";
+
+const topojson = createRequire(import.meta.url)("../vendor/topojson-client.min.js");
+
+function createDerivedBundle() {
+  const topology = { type: "Topology", arcs: [[[0, 0], [2, 0], [2, 2], [0, 0]]],
+    objects: { political: { type: "GeometryCollection", geometries: [
+      { type: "Polygon", arcs: [[0]], properties: { id: "A" } },
+    ] } } };
+  return { bundleLevel: "full", runtimeTopologyPayload: topology,
+    runtimeDecodedCollections: { politicalData: topojson.feature(topology, topology.objects.political) } };
+}
+
+test("inactive bundle releases worker and hydration derivations, then rebuilds from retained topology", (t) => {
+  const previousTopojson = globalThis.topojson;
+  let decodes = 0;
+  globalThis.topojson = { feature(...args) { decodes++; return topojson.feature(...args); } };
+  t.after(() => { globalThis.topojson = previousTopojson; });
+  const bundle = createDerivedBundle();
+  const expected = structuredClone(bundle.runtimeDecodedCollections.politicalData);
+  const topology = bundle.runtimeTopologyPayload;
+  const decodedOnlyWater = { type: "FeatureCollection", features: [{ id: "water" }] };
+  bundle.runtimeDecodedCollections.scenarioWaterRegionsData = decodedOnlyWater;
+  const state = { activeScenarioId: "a", scenarioBundleCacheById: { a: bundle, b: createDerivedBundle() } };
+  const hydration = createScenarioStartupHydrationController({ state,
+    normalizeScenarioFeatureCollection: value => value,
+    getScenarioDecodedCollection: (value, key) => value.runtimeDecodedCollections?.[key] || null,
+  });
+  hydration.getScenarioTopologyFeatureCollection(topology, "political", bundle);
+  assert.equal(decodes, 0);
+  assert.equal(bundle.runtimeDecodedTopologyCache.size, 1);
+  assert.equal(Object.hasOwn({ ...bundle }, "runtimeDecodedTopologyCache"), false);
+  state.activeScenarioId = "b";
+  trimScenarioBundleCache(state, new Map(), "b");
+  assert.equal(state.scenarioBundleCacheById.a, bundle);
+  assert.equal(bundle.runtimeTopologyPayload, topology);
+  assert.equal(bundle.runtimeDecodedTopologyCache, undefined);
+  assert.equal(bundle.runtimeDecodedCollections.politicalData, undefined);
+  assert.equal(bundle.runtimeDecodedCollections.scenarioWaterRegionsData, decodedOnlyWater);
+  state.activeScenarioId = "a";
+  assert.deepEqual(hydration.getScenarioTopologyFeatureCollection(topology, "political", bundle), expected);
+  hydration.getScenarioTopologyFeatureCollection(topology, "political", bundle);
+  assert.equal(decodes, 1, "returning to the bundle decodes once, then reuses the rebuilt collection");
+});
+
+test("derived release protects active, requested, applying and in-flight bundles", () => {
+  const cases = [
+    ({ state }) => { state.activeScenarioId = "a"; },
+    context => { context.targetId = "a"; },
+    ({ state }) => { state.scenarioApplyInFlight = true; },
+    ({ bundle }) => { bundle.deferredMetadataLoadPromise = Promise.resolve(); },
+    ({ bundle }) => { bundle.optionalLayerPromises = { water: Promise.resolve() }; },
+    ({ bundle }) => { bundle.chunkPayloadPromisesById = { chunk: Promise.resolve() }; },
+    context => { context.options = { releaseDerived: false }; },
+    ({ bundle }) => { bundle.runtimeTopologyPayload = null; },
+  ];
+  for (const protect of cases) {
+    const bundle = createDerivedBundle();
+    const original = bundle.runtimeDecodedCollections;
+    const context = { bundle, targetId: "b", options: {},
+      state: { activeScenarioId: "b", scenarioBundleCacheById: { a: bundle, b: {} } } };
+    protect(context);
+    trimScenarioBundleCache(context.state, new Map(), context.targetId, context.options);
+    assert.equal(bundle.runtimeDecodedCollections, original);
+  }
+});
+
+test("concurrent forced bundle loads protect derivations until both failure paths settle", async () => {
+  const bundle = createDerivedBundle();
+  const original = bundle.runtimeDecodedCollections;
+  const state = { activeScenarioId: "b", scenarioBundleCacheById: { a: bundle, b: {} } };
+  const pending = [];
+  const controller = createScenarioBundleRuntimeController({ state,
+    normalizeScenarioId: String, normalizeScenarioBundleLevel: String, normalizeScenarioLanguage: String,
+    loadScenarioRegistry: () => new Promise((_resolve, reject) => pending.push(reject)),
+  });
+  const first = controller.loadScenarioBundle("a", { forceReload: true }).catch(error => error);
+  const second = controller.loadScenarioBundle("a", { forceReload: true }).catch(error => error);
+  controller.trimScenarioBundleCaches();
+  assert.equal(bundle.runtimeDecodedCollections, original);
+  pending[0](new Error("first registry failure"));
+  assert.match((await first).message, /first registry/);
+  controller.trimScenarioBundleCaches();
+  assert.equal(bundle.runtimeDecodedCollections, original);
+  pending[1](new Error("second registry failure"));
+  assert.match((await second).message, /second registry/);
+  controller.trimScenarioBundleCaches();
+  assert.equal(bundle.runtimeDecodedCollections, null);
+});
 
 for (const mode of ["refresh", "prewarm"]) {
   test(`${mode} actual load-to-commit path retains all 40 required chunks and drops outgoing selection pins`, async () => {

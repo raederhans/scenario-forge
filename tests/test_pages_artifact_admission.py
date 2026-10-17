@@ -164,23 +164,25 @@ class ArtifactReleaseWorkflowTests(unittest.TestCase):
         inputs = parse_workflow_dispatch_inputs(deploy)
         self.assertEqual(inputs["artifact_only"]["default"], "true")
         self.assertEqual(inputs["artifact_only"]["type"], "boolean")
+        self.assertIn("Deprecated compatibility input", deploy)
+        self.assertNotIn("!inputs.artifact_only", deploy)
         steps = parse_job_steps(parse_workflow_job_blocks(deploy)["build"])
         names = [step["name"] for step in steps]
         verify = steps[names.index("Verify artifact source and downloaded bytes")]
         self.assertIn("--verify-receipt", parse_step_run(verify))
         self.assertIn('--expected-source-sha "$EXPECTED_SOURCE_SHA"', parse_step_run(verify))
         self.assertLess(names.index(verify["name"]), names.index("Upload artifact"))
-        self.assertIn("github.event_name != 'workflow_dispatch' || inputs.artifact_only", "\n".join(verify["lines"]))
-        legacy = steps[names.index("Validate dist artifact payload")]
-        self.assertIn("github.event_name == 'workflow_dispatch' && !inputs.artifact_only", "\n".join(legacy["lines"]))
+        self.assertNotIn("if:", "\n".join(verify["lines"]))
+        self.assertNotIn("Validate dist artifact payload", names)
         shared = (REPO_ROOT / ".github/workflows/verify-shared.yml").read_text(encoding="utf-8")
+        self.assertRegex(shared, r"(?m)^      pages-artifact-only:\n(?:        [^\n]+\n)*?        type: boolean\n        default: true$")
         steps = parse_job_steps(parse_workflow_job_blocks(shared)["verify"])
         by_name = {step["name"]: step for step in steps}
         exercise = parse_step_run(by_name["Verify and exercise the Pages artifact"])
         self.assertLess(exercise.index("project_save_load_roundtrip"), exercise.index("pages_artifact_admission.py"))
         self.assertIn("--public-smoke passed", exercise)
         self.assertIn("--output-root .runtime/pages-release/dist", parse_step_run(by_name["Build Pages artifact from source"]))
-        self.assertIn("!inputs.pages-artifact-only", "\n".join(by_name["Fail if tracked dist drifted from source"]["lines"]))
+        self.assertNotIn("Fail if tracked dist drifted from source", by_name)
 
 
 def runtime_temp_directory() -> tempfile.TemporaryDirectory[str]:

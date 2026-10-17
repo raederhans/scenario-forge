@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { initLongAnimationFrameObserver, waitForStartupRenderSettle } from "../js/bootstrap/startup_bootstrap_support.js";
+import { getStartupScenarioSupportUrl, initLongAnimationFrameObserver, waitForStartupRenderSettle } from "../js/bootstrap/startup_bootstrap_support.js";
 import { state as runtimeState } from "../js/core/state.js";
 import {
   setLongAnimationFrameObserver,
@@ -17,6 +17,19 @@ function restoreGlobalProperty(name, hadProperty, value) {
   }
   delete globalThis[name];
 }
+
+test("built-in lightweight scenarios use shared startup localization instead of unpublished files", () => {
+  for (const filename of ["locales.startup.json", "geo_aliases.startup.json"]) {
+    for (const id of ["modern_world", "blank_base"]) {
+      assert.equal(getStartupScenarioSupportUrl(` ${id} `, filename), "");
+    }
+    for (const id of ["hoi4_1936", "hoi4_1939", "tno_1962", "custom_scenario"]) {
+      assert.equal(getStartupScenarioSupportUrl(id, filename), `data/scenarios/${id}/${filename}`);
+    }
+  }
+  assert.equal(getStartupScenarioSupportUrl("modern_world", "city_overrides.json"),
+    "data/scenarios/modern_world/city_overrides.json");
+});
 
 test("startup waits for layout interaction to settle without accepting a frame itself", async () => {
   const state = { renderPhase: "interacting", firstVisibleFramePainted: false };

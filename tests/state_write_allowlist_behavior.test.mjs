@@ -65,6 +65,21 @@ test("production legacy scan remains unchanged", () => {
   assert.equal(hasDirectStateWrites("function f(runtimeState) { runtimeState.foo = 1; }", "js/core/example.js"), true);
 });
 
+test("former fixture exclusions cannot hide a real singleton mutation", () => {
+  for (const file of [
+    "state_writer_policy_behavior.test.mjs",
+    "state_writer_policy_manifest_behavior.test.mjs",
+    "state_writer_scanner_soundness_behavior.test.mjs",
+    "state_writer_policy_soundness_behavior.test.mjs",
+    "day_night_runtime_owner_behavior.test.mjs",
+    "political_background_render_owner_behavior.test.mjs",
+  ]) {
+    const relativePath = `tests/${file}`;
+    const source = fs.readFileSync(new URL(`../${relativePath}`, import.meta.url), "utf8");
+    assert.equal(hasDirectStateWrites(source + '\nimport { state as injectedSingleton } from "../js/core/state.js";\ninjectedSingleton.unapproved = true;', relativePath), true, file);
+  }
+});
+
 test("reported real test fixtures pass semantic classification without file exceptions", () => {
   for (const file of [
     "border_mesh_owner_behavior.test.mjs",

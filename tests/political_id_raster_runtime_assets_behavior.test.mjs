@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { createPoliticalIdRasterRuntimeOwner } from "../js/core/renderer/political_id_raster_runtime_owner.js";
 import { createPoliticalIdRasterCache, planPoliticalIdRasterView } from "../js/core/renderer/political_id_raster_cache.js";
 import { createPoliticalIdRasterAssetStore, decodePoliticalIdRasterAsset, encodePoliticalIdRasterAsset } from "../js/core/renderer/political_id_raster_assets.js";
+import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 
 const EDGE_FLAG = 0x80000000;
 const tick = () => new Promise((resolve) => setImmediate(resolve));
@@ -466,6 +467,7 @@ function fixture({
   assetRetryAfterMs = 5000,
   load = async () => null,
   assetStore: injectedAssetStore = null,
+  resourceBudget = null,
 } = {}) {
   const state = { zoomTransform: { ...transform }, dpr: 1 };
   const identity = { sceneKey: "scene-a", projectionKey: "projection-a", coverageKey: "coverage-a", version: 1, colorVersion: 0 };
@@ -499,6 +501,7 @@ function fixture({
   };
   const cache = createPoliticalIdRasterCache();
   const owner = createPoliticalIdRasterRuntimeOwner({
+    resourceBudget,
     state,
     surface: { getProjection: () => makeProjection(projectionMode), getContext: () => context },
     helpers,
@@ -854,6 +857,28 @@ test("dispose aborts a pending asset load and disposes injected dependencies", a
   assert.equal(f.owner.getPendingWorkCount(), 0);
   await drain();
   assert.equal(f.requests.length, 0);
+});
+
+test("disposing during asset persistence cannot republish a released resource owner", async t => {
+  const budget = createRuntimeResourceBudget();
+  const f = fixture({ resourceBudget: budget });
+  t.after(() => f.owner.dispose());
+  let saveSignal;
+  f.assetStore.save = (_identity, _tile, { signal }) => {
+    saveSignal = signal;
+    return new Promise(() => {});
+  };
+  f.owner.draw();
+  await waitFor(() => f.requests.length === 1, "asset miss should reach the worker");
+  f.requests[0].resolve({ ...makeTile(f.requests[0].packet), stats: { pathCacheEstimatedBytes: 1024 } });
+  await waitFor(() => saveSignal, "completed tile should enter persistence");
+  f.owner.dispose();
+  assert.equal(saveSignal.aborted, true);
+  assert.equal(budget.snapshot().ownerCount, 0);
+  await drain();
+  assert.equal(budget.snapshot().ownerCount, 0, "late persistence cleanup must not restore disposed accounting");
+  assert.equal(budget.snapshot().estimatedBytes, 0);
+  assert.equal(f.owner.getPendingWorkCount(), 0);
 });
 
 test("a never-settling asset save times out, releases the pump, and still commits later tiles", async (t) => {

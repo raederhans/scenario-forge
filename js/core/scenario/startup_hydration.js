@@ -66,7 +66,6 @@ function createScenarioStartupHydrationController({
   ownerFeatureCoverageMinRatio = 0.85,
   ownerFeatureCoverageMinFeatures = 1000,
 } = {}) {
-  const decodedTopologyCollectionsByBundle = new WeakMap();
   const decodedCollectionKeysByObject = {
     political: "politicalData",
     land_mask: "scenarioLandMaskData",
@@ -88,7 +87,7 @@ function createScenarioStartupHydrationController({
       source.runtime_bootstrap_topology_sha256 || "",
       source.detail_chunk_manifest_sha256 || "",
     ]) : "";
-    const cache = matchingBundle ? decodedTopologyCollectionsByBundle.get(matchingBundle) : null;
+    const cache = matchingBundle?.runtimeDecodedTopologyCache || null;
     const previous = cache?.get(objectName);
     // Loader treats decoded TopoJSON as immutable for a given source SHA. Identity/length
     // checks cover bundle reconstruction and object replacement without rescanning large arcs.
@@ -136,7 +135,12 @@ function createScenarioStartupHydrationController({
         workerCollection,
         collection,
       });
-      if (!cache) decodedTopologyCollectionsByBundle.set(matchingBundle, nextCache);
+      // Keep the existing per-bundle derivations reachable by the cache lifecycle
+      // so inactive bundles can release them together with the worker collections.
+      // This private cache must not follow spreads into a newly assembled bundle.
+      if (!cache) Object.defineProperty(matchingBundle, "runtimeDecodedTopologyCache", {
+        value: nextCache, configurable: true,
+      });
     }
     return collection;
   }

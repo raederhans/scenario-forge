@@ -1,4 +1,33 @@
 import { chromium } from "playwright";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
+
+const STARTUP_MAX_ATTEMPTS = 2;
+const STARTUP_RETRY_DELAY_MS = 1000;
+const DIAGNOSTIC_HEADERS = ["content-type", "content-length", "etag", "last-modified", "cache-control",
+  "date", "age", "server", "via", "x-cache", "x-served-by", "x-github-request-id", "x-fastly-request-id", "retry-after"];
+
+// An import TypeError alone does not establish propagation or a transient HTTP
+// failure. Never retry missing files, invalid modules, data/asset errors or later
+// raster assertions. A new context resets the failed browser module map without
+// query-string imports that could create a second state/renderer singleton.
+export function isTransientRasterModuleFailure(error, { published, phase, url, network = [] }) {
+  if (!published || phase !== "module-import") return false;
+  const match = String(error?.message || error).match(/Failed to fetch dynamically imported module:\s*(https?:\/\/[^\s"'`]+)/i);
+  if (!match) return false;
+  const base = new URL(url), moduleRoot = new URL("js/", base);
+  const isAppModule = value => {
+    try {
+      const candidate = new URL(value);
+      return candidate.origin === base.origin && candidate.pathname.startsWith(moduleRoot.pathname) && candidate.pathname.endsWith(".js");
+    } catch { return false; }
+  };
+  if (!isAppModule(match[1])) return false;
+  const failedModules = network.filter(entry => entry.resourceType === "script" && isAppModule(entry.url)
+    && (entry.status === "failed" || entry.status >= 400 || /text\/html/i.test(entry.headers?.["content-type"] || "")));
+  return failedModules.length > 0 && failedModules.every(entry => [502, 503, 504].includes(entry.status === "failed" ? entry.httpStatus : entry.status)
+    && (!entry.headers?.["retry-after"] || Number(entry.headers["retry-after"]) <= STARTUP_RETRY_DELAY_MS / 1000));
+}
 
 // Fault injection follows completed owner operations, not the arrival order
 // of browser requests. Late callbacks from an aborted request must not spend
@@ -18,7 +47,7 @@ export function shouldHoldRasterAssetRequest() {
   return true;
 }
 
-export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280, height: 900 }, build = false, scenarioId = "", enabled = true, savedPreference = null, language = null, published = false, holdRasterAssets = false } = {}) {
+export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280, height: 900 }, build = false, scenarioId = "", enabled = true, savedPreference = null, language = null, published = false, holdRasterAssets = false, startupOutput = null } = {}) {
   const url = new URL(baseUrl);
   const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
   const publishedTarget = url.origin === "https://raederhans.github.io" && url.pathname === "/scenario-forge/app/";
@@ -27,10 +56,43 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
   else url.searchParams.set("political_id_raster", enabled ? "1" : "0");
   if (scenarioId) url.searchParams.set("default_scenario", scenarioId);
   if (build) url.searchParams.set("political_id_assets", "0");
+  const failures = [];
+  for (let attempt = 1; attempt <= STARTUP_MAX_ATTEMPTS; attempt++) {
+    try {
+      const session = await openRasterAppAttempt(url, { dpr, viewport, scenarioId, savedPreference, language, published, holdRasterAssets, startupOutput, attempt });
+      return { ...session, startupAttempts: failures };
+    } catch (error) {
+      const diagnostic = error.rasterStartupFailure;
+      if (diagnostic) failures.push(diagnostic);
+      error.rasterStartupDiagnostics = failures;
+      if (!diagnostic?.willRetry) throw error;
+      await new Promise(resolve => setTimeout(resolve, STARTUP_RETRY_DELAY_MS));
+    }
+  }
+}
+
+async function openRasterAppAttempt(url, { dpr, viewport, scenarioId, savedPreference, language, published, holdRasterAssets, startupOutput, attempt }) {
   const browser = await chromium.launch({ headless: true });
+  const startedAt = new Date().toISOString();
+  const errors = [], network = [], warnings = [], startupNetwork = [];
+  const responseStatuses = new WeakMap();
+  let context, page, phase = "context", tracing = "";
   try {
-    const context = await browser.newContext({ viewport, deviceScaleFactor: dpr, reducedMotion: "reduce" });
-    const page = await context.newPage();
+    context = await browser.newContext({ viewport, deviceScaleFactor: dpr, reducedMotion: "reduce" });
+    if (startupOutput) {
+      await mkdir(startupOutput, { recursive: true });
+      try {
+        // Playwright Test can already own tracing on this explicitly created
+        // context. Use a chunk and leave the runner's recorder active.
+        await context.tracing.startChunk({ title: `Raster startup attempt ${attempt}` });
+        tracing = "chunk";
+      } catch (traceError) {
+        if (!String(traceError).includes("Must start tracing before starting a new chunk")) throw traceError;
+        await context.tracing.start({ screenshots: false, snapshots: true, sources: false });
+        tracing = "owned";
+      }
+    }
+    page = await context.newPage();
     await page.addInitScript(({ savedPreference, language, holdRasterAssets }) => {
       if (savedPreference !== null) localStorage.setItem("scenario-forge-political-id-raster", savedPreference ? "1" : "0");
       if (language) localStorage.setItem("map_lang", language);
@@ -51,11 +113,23 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
         if (held.delete(request)) void page.evaluate(() => { window.__rasterAssetFaults.aborted++; }).catch(() => {});
       });
     }
-    const errors = [], network = [], warnings = [];
     context.on("response", response => {
+      responseStatuses.set(response.request(), response.status());
       if (response.status() >= 400) errors.push(`HTTP ${response.status()}: ${response.url()}`);
+      const resourceType = response.request().resourceType();
+      if (resourceType === "script" || resourceType === "document" || response.status() >= 400) {
+        const headers = response.headers();
+        startupNetwork.push({ url: response.url(), status: response.status(), resourceType,
+          headers: Object.fromEntries(DIAGNOSTIC_HEADERS.filter(name => headers[name] !== undefined).map(name => [name, headers[name]])) });
+      }
       if (response.url().includes("/political_id_raster/")) network.push({ url: response.url(), status: response.status(),
         contentEncoding: response.headers()["content-encoding"] || "", contentLength: response.headers()["content-length"] || "" });
+    });
+    context.on("requestfailed", request => {
+      // Chromium also emits ERR_ABORTED after an HTTP module error. Keep both
+      // events and correlate that failure to its actual response, not its URL.
+      startupNetwork.push({ url: request.url(), status: "failed", httpStatus: responseStatuses.get(request),
+        resourceType: request.resourceType(), errorText: request.failure()?.errorText || "" });
     });
     page.on("console", message => { if (message.type() === "warning") warnings.push(message.text()); });
     await page.addInitScript(() => {
@@ -67,16 +141,49 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
     });
     page.on("pageerror", error => errors.push(String(error)));
     page.on("console", message => { if (message.type() === "error") errors.push(message.text()); });
+    phase = "navigation";
     await page.goto(url.href, { waitUntil: "domcontentloaded", timeout: 60000 });
+    phase = "module-import";
     await page.evaluate(async () => {
       const renderer = await import(new URL("js/core/map_renderer.js", document.baseURI));
       const { state } = await import(new URL("js/core/state.js", document.baseURI));
       const scenarios = await import(new URL("js/core/scenario_manager.js", document.baseURI));
       window.__rasterTask = { renderer, state, scenarios };
     });
+    phase = "startup-ready";
     await waitRasterStartup(page);
+    if (tracing === "owned") await context.tracing.stop();
     return { browser, context, page, errors, network, warnings };
-  } catch (error) { await browser.close(); throw error; }
+  } catch (error) {
+    const diagnostic = { attempt, phase, url: url.href, scenarioId, expectedSourceSha: process.env.GITHUB_SHA || null,
+      startedAt, failedAt: new Date().toISOString(),
+      error: String(error.stack || error), errors: [...errors], warnings: [...warnings], network: [...startupNetwork] };
+    diagnostic.willRetry = attempt < STARTUP_MAX_ATTEMPTS && isTransientRasterModuleFailure(error, { ...diagnostic, published });
+    if (startupOutput) {
+      const prefix = path.join(startupOutput, `startup-attempt-${attempt}`);
+      if (tracing) {
+        try {
+          if (tracing === "owned") await context.tracing.stop({ path: `${prefix}.zip` });
+          else {
+            await context.tracing.stopChunk({ path: `${prefix}.zip` });
+            await context.tracing.startChunk();
+          }
+          diagnostic.tracePath = `${prefix}.zip`;
+        }
+        catch (traceError) { diagnostic.traceError = String(traceError); }
+      }
+      try {
+        diagnostic.diagnosticPath = `${prefix}.json`;
+        await writeFile(diagnostic.diagnosticPath, JSON.stringify(diagnostic, null, 2) + "\n");
+      } catch (writeError) { diagnostic.writeError = String(writeError); diagnostic.willRetry = false; }
+    }
+    error.rasterStartupFailure = diagnostic;
+    console.warn(JSON.stringify({ rasterStartupFailure: { attempt, phase, url: url.href, error: String(error), willRetry: diagnostic.willRetry,
+      diagnosticPath: diagnostic.diagnosticPath, networkFailures: startupNetwork.filter(entry => entry.status === "failed" || entry.status >= 400) } }));
+    await context?.close().catch(() => {});
+    await browser.close().catch(() => {});
+    throw error;
+  }
 }
 
 // Initial navigation and cache reload share the same startup boundary.

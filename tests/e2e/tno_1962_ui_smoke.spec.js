@@ -10,6 +10,7 @@ const {
 } = require("./support/playwright-app");
 const { mergeSmokeFailureSelectors } = require("./support/playwright-selectors");
 const { getConsoleIgnorePatterns } = require("./support/expectations/console-allowlist");
+const { readConsoleIssue, isNativeGpuReadbackDiagnostic, attachNativeGpuDiagnostics } = require("./support/native-gpu-diagnostics");
 
 test.setTimeout(120000);
 const SCENARIO_ID = 'tno_1962';
@@ -51,7 +52,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
   page.on('console', (msg) => {
     const type = msg.type();
     if (type === 'error' || type === 'warning') {
-      consoleIssues.push({ type, text: msg.text() });
+      consoleIssues.push(readConsoleIssue(msg));
     }
   });
 
@@ -179,8 +180,10 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
     fs.mkdirSync(path.dirname(shotPath), { recursive: true });
     await page.screenshot({ path: shotPath, fullPage: true });
 
+    const nativeGpuDiagnostics = consoleIssues.filter(issue => isNativeGpuReadbackDiagnostic(issue, page.url()));
+    await attachNativeGpuDiagnostics(testInfo, nativeGpuDiagnostics);
     const actionableConsoleIssues = consoleIssues.filter(
-      (issue) => !expectedConsolePatterns.some((pattern) => pattern.test(issue.text)),
+      (issue) => !nativeGpuDiagnostics.includes(issue) && !expectedConsolePatterns.some((pattern) => pattern.test(issue.text)),
     );
     expect(actionableConsoleIssues, `Console issues: ${JSON.stringify(consoleIssues, null, 2)}`).toEqual([]);
     expect(networkFailures, `Network failures: ${JSON.stringify(networkFailures, null, 2)}`).toEqual([]);

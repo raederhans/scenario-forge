@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "graphMode": "artifact-only",
   "summary": {
-    "specCount": 74,
-    "nodeCount": 90,
-    "reverseIndexKeyCount": 143,
+    "specCount": 75,
+    "nodeCount": 92,
+    "reverseIndexKeyCount": 146,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -864,6 +864,7 @@
     "tests/e2e/hoi4_1939_ui_smoke.spec.js": {
       "directDependencies": [
         "tests/e2e/support/expectations/console-allowlist.js",
+        "tests/e2e/support/native-gpu-diagnostics.js",
         "tests/e2e/support/playwright-app.js",
         "tests/e2e/support/playwright-selectors.js"
       ],
@@ -874,6 +875,7 @@
         "js/core/state.js",
         "js/ui/sidebar.js",
         "tests/e2e/support/expectations/console-allowlist.js",
+        "tests/e2e/support/native-gpu-diagnostics.js",
         "tests/e2e/support/playwright-app-paths.js",
         "tests/e2e/support/playwright-app.js",
         "tests/e2e/support/playwright-frontline-panel.js",
@@ -1220,6 +1222,20 @@
         "js/ui/sidebar.js"
       ]
     },
+    "tests/e2e/raster_startup_recovery.spec.js": {
+      "directDependencies": [
+        "tools/political_id_raster_app_session.mjs",
+        "tools/verify_political_id_raster_integration.mjs"
+      ],
+      "transitiveDependencies": [
+        "tools/political_id_raster_app_session.mjs",
+        "tools/verify_political_id_raster_integration.mjs"
+      ],
+      "repoImpact": [
+        "tools/political_id_raster_app_session.mjs",
+        "tools/verify_political_id_raster_integration.mjs"
+      ]
+    },
     "tests/e2e/release/pages_public_release_gate.spec.js": {
       "directDependencies": [
         "js/core/interaction_funnel.js",
@@ -1418,6 +1434,7 @@
       "directDependencies": [
         "js/core/dirty_state.js",
         "js/core/state.js",
+        "tests/e2e/support/native-gpu-diagnostics.js",
         "tests/e2e/support/playwright-app.js"
       ],
       "transitiveDependencies": [
@@ -1427,6 +1444,7 @@
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
         "js/ui/sidebar.js",
+        "tests/e2e/support/native-gpu-diagnostics.js",
         "tests/e2e/support/playwright-app-paths.js",
         "tests/e2e/support/playwright-app.js",
         "tests/e2e/support/playwright-frontline-panel.js",
@@ -1883,6 +1901,7 @@
       "directDependencies": [
         "js/core/state.js",
         "tests/e2e/support/expectations/console-allowlist.js",
+        "tests/e2e/support/native-gpu-diagnostics.js",
         "tests/e2e/support/playwright-app.js",
         "tests/e2e/support/playwright-selectors.js"
       ],
@@ -1893,6 +1912,7 @@
         "js/core/state.js",
         "js/ui/sidebar.js",
         "tests/e2e/support/expectations/console-allowlist.js",
+        "tests/e2e/support/native-gpu-diagnostics.js",
         "tests/e2e/support/playwright-app-paths.js",
         "tests/e2e/support/playwright-app.js",
         "tests/e2e/support/playwright-frontline-panel.js",
@@ -2941,6 +2961,9 @@
     "tests/e2e/project_save_load_roundtrip.spec.js": [
       "tests/e2e/project_save_load_roundtrip.spec.js"
     ],
+    "tests/e2e/raster_startup_recovery.spec.js": [
+      "tests/e2e/raster_startup_recovery.spec.js"
+    ],
     "tests/e2e/release/pages_public_release_gate.spec.js": [
       "tests/e2e/release/pages_public_release_gate.spec.js"
     ],
@@ -3024,6 +3047,11 @@
     ],
     "tests/e2e/support/input-evidence.js": [
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js"
+    ],
+    "tests/e2e/support/native-gpu-diagnostics.js": [
+      "tests/e2e/hoi4_1939_ui_smoke.spec.js",
+      "tests/e2e/sample_guide_deeplink.spec.js",
+      "tests/e2e/tno_1962_ui_smoke.spec.js"
     ],
     "tests/e2e/support/playwright-app-paths.js": [
       "tests/e2e/city_label_i18n_redraw.spec.js",
@@ -3511,7 +3539,11 @@
     "tests/fixtures/river_paint/overlap_visibility.json": [
       "tests/e2e/river_overlap_visibility.spec.js"
     ],
+    "tools/political_id_raster_app_session.mjs": [
+      "tests/e2e/raster_startup_recovery.spec.js"
+    ],
     "tools/verify_political_id_raster_integration.mjs": [
+      "tests/e2e/raster_startup_recovery.spec.js",
       "tests/e2e/release/pages_public_release_gate.spec.js"
     ],
     "vendor/d3.v7.min.js": [

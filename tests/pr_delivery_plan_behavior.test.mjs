@@ -304,8 +304,7 @@ test("real repository selector/catalog/execution planner smoke is pure and selec
   assert.deepEqual(local.report.unmatchedChangedFiles, []);
   assert.deepEqual(local.executionPlan.routeGaps, []);
   assert.ok(local.executionPlan.commandsToRun.some((command) => command.includes("appearance_actions_behavior")));
-  assert.ok(local.executionPlan.selectedLeaves.length > 0);
-  assert.ok(local.executionPlan.catalogDigest);
+  assert.ok(local.executionPlan.executionCommands.length > 0);
   const docs = selectRepositoryLocalPlan({ cwd: REPO_ROOT, changedFiles: ["docs/delivery-preview.md"] });
   assert.deepEqual(docs.report.unmatchedChangedFiles, []);
   assert.deepEqual(docs.executionPlan.routeGaps, []);

@@ -30,6 +30,7 @@
       "tests/test_modern_world_rebuild.py",
       "tests/test_mixed_lod_coverage.py",
       "tests/test_nordic_water_seed.py",
+      "tests/test_north_america_processing.py",
       "tests/test_pages_dist_startup_shell_heavy.py",
       "tests/test_patch_checked_in_urban_artifacts.py",
       "tests/test_physical_context_contours.py",

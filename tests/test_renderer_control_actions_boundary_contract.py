@@ -41,6 +41,7 @@ INTERACTION_KEYS = {
 
 CLICK_INTERACTION_KEYS = {
     "hoveredId",
+    "hoveredRiverCellId",
     "hoverOverlayDirty",
     "waterRegionOverrides",
 }

@@ -6,12 +6,14 @@ Object.assign(labels.en,{showEmpty:'Show countries with no states',coreNotice:'E
 Object.assign(labels.zh,{showEmpty:'显示没有所属州的国家',coreNotice:'按核心关系编辑地图归属，不代表游戏可释放条件。',parentBefore:'母国原有州数',other:'其他国家的目标核心州（不转交）',createPreview:'创建国家预览',create:'创建国家并转交州',conflict:'建议颜色与邻近国家较接近，可手动选择其他颜色。'});
 labels.en.completed='Transfer completed. Undo restores the whole step.';
 labels.zh.completed='已完成，整步可撤销。';
+Object.assign(labels.en,{listHeading:'Countries & core territories',backCountries:'Back to countries',backDetails:'Back to country details',coreHeading:'Transfer core territories',coreHelp:'About core relationships',fullPreview:'Full counts & state locator'});
+Object.assign(labels.zh,{listHeading:'国家与核心领土',backCountries:'返回国家列表',backDetails:'返回国家详情',coreHeading:'转交核心领土',coreHelp:'核心关系说明',fullPreview:'完整统计与州定位'});
 
-export function createCountryPanel({root,session,t,onError=()=>{},getLanguage=()=>root.ownerDocument.documentElement?.lang||'en'}) {
-  const doc=root.ownerDocument, listeners=[], translated=[], details=root.closest?.('details');
+export function createCountryPanel({root,session,active=true,onError=()=>{},getLanguage=()=>root.ownerDocument.documentElement?.lang||'en'}) {
+  const doc=root.ownerDocument, listeners=[], translated=[];
   let disposed=false, vm={ready:false}, generation, selected=null, preview=null, previewRevision;
   let lastRevision, lastReady, lastLanguage, needsRows=true;
-  let baseDirty=false,completed=false;
+  let baseDirty=false,completed=false,step='list',listScroll=0,detailScroll=0;
   const text=key=>labels[String(getLanguage()).startsWith('zh')?'zh':'en'][key]||key;
   const make=(tag,id,className)=>{const node=doc.createElement(tag);if(id)node.id=id;if(className)node.className=className;return node;};
   const caption=(node,key)=>{translated.push([node,key]);return node;};
@@ -27,9 +29,10 @@ export function createCountryPanel({root,session,t,onError=()=>{},getLanguage=()
   const coreSearch=make('input','country-core-search','country-search');coreSearch.type='search';
   const coreNotice=caption(make('p','country-core-notice','country-hint'),'coreNotice');
   const coreList=make('div','country-core-list','country-core-list'),coreEmpty=caption(make('p',null,'country-hint'),'noCores');
-  const section=make('section','country-preview','country-preview'),heading=caption(make('h3'),'preview');
+  const section=make('section','country-preview','country-step country-preview'),heading=caption(make('h3'),'preview');heading.tabIndex=-1;
   const summary=make('dl','country-preview-summary','country-preview-summary');
-  const stateLabel=caption(make('label'),'locate'),stateList=make('select','country-state-list','country-state-list');stateList.size=6;stateLabel.htmlFor=stateList.id;
+  const overview=make('dl','country-preview-overview','country-preview-summary');
+  const stateLabel=caption(make('label'),'locate'),stateList=make('select','country-state-list','country-state-list');stateLabel.htmlFor=stateList.id;
   const focus=caption(make('button','country-focus-state'),'locate');
   const colorLabel=caption(make('label'),'color'),targetColor=make('input','country-target-color');targetColor.type='color';targetColor.value='#808080';colorLabel.htmlFor=targetColor.id;
   const nameLabel=caption(make('label'),'name'),targetName=make('input','country-target-name');targetName.type='text';targetName.maxLength=200;nameLabel.htmlFor=targetName.id;
@@ -38,9 +41,32 @@ export function createCountryPanel({root,session,t,onError=()=>{},getLanguage=()
   const conflict=caption(make('p','country-color-conflict','country-warning'),'conflict');
   const completedHint=caption(make('p','country-completed','country-hint'),'completed');completedHint.setAttribute('role','status');
   const refresh=caption(make('button','country-refresh-preview'),'refresh'),confirm=caption(make('button','country-confirm-transfer'),'confirm');
-  section.append(heading,summary,stateLabel,stateList,focus,colorLabel,targetColor,nameLabel,targetName,overrideLabel,existing,conflict,stale,completedHint,refresh,confirm);
-  for(const button of [keep,unify,refresh,confirm,focus])button.type='button';
-  root.replaceChildren(search,emptyToggleLabel,list,empty,selectedTitle,baseLabel,baseColor,keep,unify,zero,coreNotice,coreSearch,coreList,coreEmpty,section);
+  const listStep=make('section','country-browse','country-step'),listHead=make('div',null,'country-step-head'),listBody=make('div',null,'country-step-body');
+  const listHeading=caption(make('h2'),'listHeading');
+  listHead.append(listHeading,search,emptyToggleLabel);listBody.append(list,empty);listStep.append(listHead,listBody);
+  const detailStep=make('section','country-detail','country-step'),detailHead=make('div',null,'country-step-head'),detailBody=make('div',null,'country-step-body');
+  const backCountries=caption(make('button','country-back-list','country-back'),'backCountries'),backDetails=caption(make('button','country-back-detail','country-back'),'backDetails');
+  selectedTitle.tabIndex=-1;detailHead.append(backCountries,selectedTitle);
+  const coreHeading=caption(make('h4',null,'country-core-heading'),'coreHeading'),coreHelp=make('details',null,'inline-help'),coreHelpSummary=caption(make('summary'),'coreHelp');coreHelp.append(coreHelpSummary,coreNotice);
+  detailBody.append(baseLabel,baseColor,keep,unify,zero,coreHeading,coreHelp,coreSearch,coreList,coreEmpty);detailStep.append(detailHead,detailBody);
+  const previewHead=make('div',null,'country-step-head'),previewBody=make('div',null,'country-step-body'),previewActions=make('div',null,'country-step-actions');
+  const fullPreview=make('details',null,'inline-help'),fullPreviewHeading=caption(make('summary'),'fullPreview');fullPreview.append(fullPreviewHeading,summary,stateLabel,stateList,focus);
+  const identity=make('div',null,'country-preview-identity'),colorField=make('div'),nameField=make('div');colorField.append(colorLabel,targetColor);nameField.append(nameLabel,targetName);identity.append(colorField,nameField);
+  previewHead.append(backDetails,heading);previewBody.append(overview,identity,overrideLabel,existing,conflict,stale,completedHint,fullPreview);previewActions.append(refresh,confirm);section.append(previewHead,previewBody,previewActions);
+  for(const button of [keep,unify,refresh,confirm,focus,backCountries,backDetails])button.type='button';
+  root.replaceChildren(listStep,detailStep,section);
+  function showStep(next,focusNode){
+    step=next;listStep.hidden=step!=='list';detailStep.hidden=step!=='detail';section.hidden=step!=='preview'||!preview;
+    focusNode?.focus?.({preventScroll:true});
+  }
+  listen(backCountries,'click',()=>{
+    showStep('list');listBody.scrollTop=listScroll;
+    ([...list.children].find(row=>row.dataset.country===selected?.tag)||search).focus?.({preventScroll:true});
+  });
+  listen(backDetails,'click',()=>{
+    showStep('detail');detailBody.scrollTop=detailScroll;
+    ([...coreList.children].find(row=>row.dataset.target===preview?.target)||selectedTitle).focus?.({preventScroll:true});
+  });
 
   function localize(){
     for(const [node,key]of translated)node.textContent=text(key);
@@ -75,8 +101,9 @@ export function createCountryPanel({root,session,t,onError=()=>{},getLanguage=()
     coreEmpty.textContent=candidates.length>100?(String(getLanguage()).startsWith('zh')?`显示前 100 / ${candidates.length} 个候选，请搜索缩小范围。`:`Showing 100 of ${candidates.length} candidates. Search to narrow the list.`):text('noCores');
   }
   function showSummary(){
-    summary.replaceChildren();
+    summary.replaceChildren();overview.replaceChildren();
     if(!preview)return;
+    for(const [key,value]of [['parent',`${preview.parent} · ${preview.parentBefore} → ${preview.parentRemaining}`],['target',`${preview.target} · ${preview.targetBefore} → ${preview.targetAfter}`],['states',preview.stateIds.length],['affected',preview.overrideCount]]){const term=make('dt'),detail=make('dd');term.textContent=text(key);detail.textContent=String(value);overview.append(term,detail);}
     const fields=[['parent',preview.parent],['parentBefore',preview.parentBefore],['states',preview.stateIds.length],['remaining',preview.parentRemaining],['target',preview.target],['before',preview.targetBefore],['after',preview.targetAfter],['affected',preview.overrideCount],['tiny',preview.tinyCount],['other',preview.otherCoreCount]];
     for(const [key,value]of fields){const term=make('dt'),detail=make('dd');term.textContent=text(key);detail.textContent=String(value);summary.append(term,detail);}
   }
@@ -93,7 +120,7 @@ export function createCountryPanel({root,session,t,onError=()=>{},getLanguage=()
     }
     coreSearch.disabled=!vm.ready||!selected||!selected.stateCount;
     for(const node of [...list.children,...coreList.children])node.disabled=!vm.ready;
-    section.hidden=!preview;
+    showStep(step);
     const changed=!!preview&&previewRevision!==vm.countryRevision;
     stale.hidden=completed||!changed;
     completedHint.hidden=!completed;
@@ -110,19 +137,23 @@ export function createCountryPanel({root,session,t,onError=()=>{},getLanguage=()
   }
   function chooseCountry(tag){
     const country=session.listCountries('',{includeEmpty:true}).find(entry=>entry.tag===tag);if(!country)return;
+    listScroll=listBody.scrollTop||0;detailScroll=0;
     selected=country;preview=null;previewRevision=undefined;completed=false;baseColor.value=country.color;baseDirty=false;coreSearch.value='';
     session.selectCountry(tag);countryRows();coreRows();updateControls();
+    detailBody.scrollTop=0;showStep('detail',selectedTitle);
   }
   function chooseTarget(target,retainDraft=false){
     if(!selected)return;
     const next=session.previewTransfer(selected.tag,target);
     preview=next;previewRevision=next.revision;completed=false;
+    if(!retainDraft)detailScroll=detailBody.scrollTop||0;
     if(!retainDraft||next.targetBefore>0){targetColor.value=next.suggestedColor;targetName.value=next.targetName||next.target;}
     if(!retainDraft)override.checked=true;
     stateList.replaceChildren();
     const names=new Map((next.states||[]).map(state=>[String(state.id),state.name]));
     for(const id of next.stateIds){const option=make('option');option.value=String(id);option.textContent=names.get(String(id))?`${names.get(String(id))} · ${id}`:String(id);stateList.append(option);}
     showSummary();updateControls();
+    if(!retainDraft){fullPreview.open=false;previewBody.scrollTop=0;showStep('preview',heading);}
   }
   function taggedTarget(event,attribute,container){
     for(let node=event.target;node&&node!==container;node=node.parentNode)if(node.dataset?.[attribute])return node.dataset[attribute];
@@ -148,21 +179,20 @@ export function createCountryPanel({root,session,t,onError=()=>{},getLanguage=()
   function render(next,force=false){
     if(disposed)return;
     const changedProject=generation!==undefined&&next.projectGeneration!==generation;
-    if(changedProject){selected=null;preview=null;previewRevision=undefined;completed=false;baseDirty=false;search.value='';coreSearch.value='';}
+    if(changedProject){selected=null;preview=null;previewRevision=undefined;completed=false;baseDirty=false;search.value='';coreSearch.value='';step='list';listScroll=detailScroll=0;listBody.scrollTop=0;}
     const language=String(getLanguage());
     const changed=force||changedProject||lastRevision!==next.countryRevision||lastReady!==next.ready||lastLanguage!==language;
     generation=next.projectGeneration;vm=next;
     if(!changed)return;
     needsRows=true;lastRevision=vm.countryRevision;lastReady=vm.ready;lastLanguage=language;
     localize();
-    if(vm.ready&&(!details||details.open)){
+    if(vm.ready&&active){
       if(selected)selected=session.listCountries('',{includeEmpty:true}).find(entry=>entry.tag===selected.tag)||null;
       if(selected&&!baseDirty)baseColor.value=selected.color;
       countryRows();coreRows();needsRows=false;
     }
     showSummary();updateControls();
   }
-  if(details)listen(details,'toggle',()=>{if(details.open&&needsRows)render(vm,true);});
   render(vm);
-  return {render,dispose(){if(disposed)return;disposed=true;for(const off of listeners)off();root.replaceChildren();}};
+  return {render,setActive(value){active=!!value;if(active&&needsRows)render(vm,true);},dispose(){if(disposed)return;disposed=true;for(const off of listeners)off();root.replaceChildren();}};
 }
