@@ -283,6 +283,21 @@ test("hover lifecycle actions preserve grouped IDs prepared payloads and frame h
   assert.equal(target.sentinel, "preserved");
 });
 
+test("river hover follows its parent land and clears on click or hover exit", async () => {
+  const { setHoveredFeatureIdsState, clearClickHoveredIdState } = await loadActions();
+  const target = { sentinel: "preserved" };
+  setHoveredFeatureIdsState(target, { landId: "land-1", riverCellId: "river-1" });
+  assert.equal(target.hoveredRiverCellId, "river-1");
+  clearClickHoveredIdState(target);
+  assert.deepEqual([target.hoveredId, target.hoveredRiverCellId], [null, null]);
+  setHoveredFeatureIdsState(target, { riverCellId: "orphan-river" });
+  assert.equal(target.hoveredRiverCellId, null);
+  setHoveredFeatureIdsState(target, { landId: "land-2", riverCellId: "river-2" });
+  setHoveredFeatureIdsState(target);
+  assert.deepEqual([target.hoveredId, target.hoveredRiverCellId], [null, null]);
+  assert.equal(target.sentinel, "preserved");
+});
+
 test("click selected color delegates to the canonical appearance selection action", async () => {
   const source = await readFile(new URL(MODULE_PATH, import.meta.url), "utf8");
   assert.match(source, /import \{ setSelectedColorState \} from "\.\/appearance_selection_actions\.js";/);

@@ -36788,6 +36788,668 @@
       ]
     },
     {
+      "path": "js/core/state/actions/population_spatial_actions.js",
+      "surface": "production",
+      "domain": "content",
+      "authority": "domain-action",
+      "migrationPhase": "P4.2",
+      "bindings": [
+        {
+          "id": "parameter:resetPopulationRuntimeState:0:09fc96082d34:24:53",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "resetPopulationRuntimeState",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 24,
+            "column": 53
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "content",
+              "migrationPhase": "P4.2",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "populationRuntime"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "populationRuntime"
+                }
+              ],
+              "aliasSites": [
+                {
+                  "alias": "target",
+                  "aliasChain": [
+                    "target"
+                  ],
+                  "operation": "assign",
+                  "key": "populationRuntime",
+                  "line": 17,
+                  "column": 3,
+                  "sourceFingerprint": "c4bef0111567abce85b14c47b6f3b52a9ce517603eefc37768af12bea3e4d5ff"
+                }
+              ],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 21,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "populationRuntime",
+                  "sourceFingerprint": "c4bef0111567abce85b14c47b6f3b52a9ce517603eefc37768af12bea3e4d5ff"
+                },
+                {
+                  "line": 25,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "populationRuntime",
+                  "sourceFingerprint": "a18d63aa7fa552102c91cf1a0f6202236b3c2c4a033573d1ba5d5aaecc6af670"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:setPopulationRuntimeState:0:09fc96082d34:10:88",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "setPopulationRuntimeState",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 10,
+            "column": 88
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "content",
+              "migrationPhase": "P4.2",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "populationRuntime"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "populationRuntime"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 21,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "populationRuntime",
+                  "sourceFingerprint": "c4bef0111567abce85b14c47b6f3b52a9ce517603eefc37768af12bea3e4d5ff"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:setPopulationStyleState:0:09fc96082d34:28:54",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "setPopulationStyleState",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 28,
+            "column": 54
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "content",
+              "migrationPhase": "P4.2",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "populationRuntime"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "populationRuntime"
+                }
+              ],
+              "aliasSites": [
+                {
+                  "alias": "target",
+                  "aliasChain": [
+                    "target",
+                    "target"
+                  ],
+                  "operation": "assign",
+                  "key": "populationRuntime",
+                  "line": 17,
+                  "column": 3,
+                  "sourceFingerprint": "c4bef0111567abce85b14c47b6f3b52a9ce517603eefc37768af12bea3e4d5ff"
+                }
+              ],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 21,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "populationRuntime",
+                  "sourceFingerprint": "c4bef0111567abce85b14c47b6f3b52a9ce517603eefc37768af12bea3e4d5ff"
+                },
+                {
+                  "line": 25,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "populationRuntime",
+                  "sourceFingerprint": "a18d63aa7fa552102c91cf1a0f6202236b3c2c4a033573d1ba5d5aaecc6af670"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "js/core/state/actions/river_paint_actions.js",
+      "surface": "production",
+      "domain": "cross-domain",
+      "authority": "domain-action",
+      "migrationPhase": "multi-phase",
+      "bindings": [
+        {
+          "id": "parameter:applyRiverCellPaintState:0:09fc96082d34:23:90",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "applyRiverCellPaintState",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 23,
+            "column": 90
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 30,
+                  "column": 40,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "0330dedc64f07d10de2e193253e2b38c78a2df600e70f4a72dd8d0e10e06a9a8"
+                },
+                {
+                  "line": 37,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "f6a214f7a5fcda0c2cee9660b7fc29f5649e3c68aad48e20e950137c98913a68"
+                }
+              ]
+            },
+            {
+              "domain": "renderer",
+              "migrationPhase": "P4.3",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 30,
+                  "column": 18,
+                  "reason": "unsupported-call-mutation",
+                  "operation": "unsupported",
+                  "key": "landIndex",
+                  "sourceFingerprint": "b104a76076e9e4181126317ff727e94ea3fdef74e172de1e965c2839cf929d14"
+                }
+              ]
+            },
+            {
+              "domain": "color",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "riverPaint"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "riverPaint"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        },
+        {
+          "id": "parameter:clearAllRiverPaintOverridesState:0:09fc96082d34:62:58",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "clearAllRiverPaintOverridesState",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 62,
+            "column": 58
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "color",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "riverPaint"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "riverPaint"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 65,
+                  "column": 28,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "riverPaint",
+                  "sourceFingerprint": "56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:restoreRiverPaintOverridesState:0:09fc96082d34:41:64",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "restoreRiverPaintOverridesState",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 41,
+            "column": 64
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "color",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "riverPaint"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "riverPaint"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 53,
+                  "column": 26,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "riverPaint",
+                  "sourceFingerprint": "13dfa3d8c6ef3bb80a0a3e769e92f5b564c445e112aa5d40053758e133399e14"
+                },
+                {
+                  "line": 58,
+                  "column": 28,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "riverPaint",
+                  "sourceFingerprint": "56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:setRiverPaintEditModeState:0:09fc96082d34:17:61",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "setRiverPaintEditModeState",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 17,
+            "column": 61
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 19,
+                  "column": 29,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "60908e8f302e90990d5118826e9ddd43ad4d313a5bfd2b3ac8021e72c57c8cbb"
+                }
+              ]
+            },
+            {
+              "domain": "color",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "riverPaint"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "riverPaint"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 20,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "riverPaint",
+                  "sourceFingerprint": "56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:setRiverPaintState:0:09fc96082d34:10:51",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "setRiverPaintState",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 10,
+            "column": 51
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "color",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "riverPaint"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "riverPaint"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "js/core/state/actions/thematic_wgi_actions.js",
+      "surface": "production",
+      "domain": "content",
+      "authority": "domain-action",
+      "migrationPhase": "P4.2",
+      "bindings": [
+        {
+          "id": "parameter:resetThematicWgiRuntimeState:0:09fc96082d34:22:54",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "resetThematicWgiRuntimeState",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 22,
+            "column": 54
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "content",
+              "migrationPhase": "P4.2",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "thematicWgiRuntime"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "thematicWgiRuntime"
+                }
+              ],
+              "aliasSites": [
+                {
+                  "alias": "target",
+                  "aliasChain": [
+                    "target"
+                  ],
+                  "operation": "assign",
+                  "key": "thematicWgiRuntime",
+                  "line": 13,
+                  "column": 3,
+                  "sourceFingerprint": "05dd6f3b92632125743bd12021e894abb79ec563aebbb2f2fd21862f03ce2c9c"
+                }
+              ],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 19,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "thematicWgiRuntime",
+                  "sourceFingerprint": "05dd6f3b92632125743bd12021e894abb79ec563aebbb2f2fd21862f03ce2c9c"
+                },
+                {
+                  "line": 23,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "thematicWgiRuntime",
+                  "sourceFingerprint": "1b66c83b79b2a6b230ae228f4364c1837d615f2b56442ef8ddc5256db3e96990"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:setThematicWgiRuntimeState:0:09fc96082d34:8:89",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "setThematicWgiRuntimeState",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 8,
+            "column": 89
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "content",
+              "migrationPhase": "P4.2",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "thematicWgiRuntime"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "thematicWgiRuntime"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 19,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "thematicWgiRuntime",
+                  "sourceFingerprint": "05dd6f3b92632125743bd12021e894abb79ec563aebbb2f2fd21862f03ce2c9c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:setThematicWgiStyleState:0:09fc96082d34:26:55",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "setThematicWgiStyleState",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 26,
+            "column": 55
+          },
+          "authority": "domain-action",
+          "grants": [
+            {
+              "domain": "content",
+              "migrationPhase": "P4.2",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "thematicWgiRuntime"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "thematicWgiRuntime"
+                }
+              ],
+              "aliasSites": [
+                {
+                  "alias": "target",
+                  "aliasChain": [
+                    "target",
+                    "target"
+                  ],
+                  "operation": "assign",
+                  "key": "thematicWgiRuntime",
+                  "line": 13,
+                  "column": 3,
+                  "sourceFingerprint": "05dd6f3b92632125743bd12021e894abb79ec563aebbb2f2fd21862f03ce2c9c"
+                }
+              ],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 19,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "thematicWgiRuntime",
+                  "sourceFingerprint": "05dd6f3b92632125743bd12021e894abb79ec563aebbb2f2fd21862f03ce2c9c"
+                },
+                {
+                  "line": 23,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "thematicWgiRuntime",
+                  "sourceFingerprint": "1b66c83b79b2a6b230ae228f4364c1837d615f2b56442ef8ddc5256db3e96990"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "path": "js/core/state_catalog.js",
       "surface": "production",
       "domain": "scenario",
