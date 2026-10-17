@@ -7591,22 +7591,14 @@ export function validateStateMutationDelegatingOwnerContract(
   return violations;
 }
 
-const MUTATION_OWNER_FACTORY_ENTRIES_BY_MODULE = new Map();
-for (const entry of STATE_MUTATION_DELEGATING_OWNER_CONTRACT) {
-  let entries = MUTATION_OWNER_FACTORY_ENTRIES_BY_MODULE.get(entry.factoryModulePath);
-  if (!entries) {
-    entries = new Map();
-    MUTATION_OWNER_FACTORY_ENTRIES_BY_MODULE.set(entry.factoryModulePath, entries);
-  }
-  if (!entries.has(entry.factoryExportName)) entries.set(entry.factoryExportName, entry);
-}
-
 export function findStateMutationDelegatingOwnerFactoryContractEntry(
   modulePath,
   exportName,
 ) {
-  return MUTATION_OWNER_FACTORY_ENTRIES_BY_MODULE.get(normalizeModulePath(modulePath))
-    ?.get(String(exportName || "")) || null;
+  return STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find((entry) => (
+    entry.factoryModulePath === normalizeModulePath(modulePath)
+    && entry.factoryExportName === String(exportName || "")
+  )) || null;
 }
 
 function walkSyntaxTree(node, visit) {
@@ -13087,21 +13079,13 @@ function stateTargetPureReaderContractEntryId(entry = {}) {
   ].join("#");
 }
 
-const IMPORTED_PURE_READER_ENTRIES_BY_MODULE = new Map();
-for (const entry of STATE_TARGET_PURE_READER_CONTRACT) {
-  if (entry.targetParameterPath !== "$"
-    || !(entry.importedArgumentCount > entry.targetParameterIndex)) continue;
-  let entries = IMPORTED_PURE_READER_ENTRIES_BY_MODULE.get(entry.modulePath);
-  if (!entries) {
-    entries = new Map();
-    IMPORTED_PURE_READER_ENTRIES_BY_MODULE.set(entry.modulePath, entries);
-  }
-  if (!entries.has(entry.functionName)) entries.set(entry.functionName, entry);
-}
-
 export function findStateImportedPureReaderContractEntry(modulePath, exportName) {
-  return IMPORTED_PURE_READER_ENTRIES_BY_MODULE.get(normalizeModulePath(modulePath))
-    ?.get(exportName) || null;
+  return STATE_TARGET_PURE_READER_CONTRACT.find((entry) => (
+    entry.modulePath === normalizeModulePath(modulePath)
+    && entry.functionName === exportName
+    && entry.targetParameterPath === "$"
+    && entry.importedArgumentCount > entry.targetParameterIndex
+  )) || null;
 }
 
 export function findStateTargetPureReaderContractEntry(

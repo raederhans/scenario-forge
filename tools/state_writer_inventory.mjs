@@ -2203,14 +2203,6 @@ function analyzeBindingMutations(
   const diagnostics = [];
   const actionDelegations = [];
   const borrowedProjectionCallsWithReportedBorrowedArgument = new WeakSet();
-  const projectLocalImportPathCache = new Map();
-  const normalizedFilePath = String(filePath || "")
-    .replaceAll("\\", "/").replace(/^\.\//, "");
-  const mutationDelegatingOwnerContracts = recognizeCurrentContracts
-    ? STATE_MUTATION_DELEGATING_OWNER_CONTRACT.filter(
-      ({ compositionModulePath }) => compositionModulePath === normalizedFilePath,
-    )
-    : [];
   const bindingMutationAnalysisContext =
     getBindingMutationAnalysisContextForScan();
   const exportedFunctionNodes =
@@ -2353,22 +2345,22 @@ function analyzeBindingMutations(
   }
 
   function mergeTrackedStates(states) {
-    // Joining only reads these immutable inputs; clone only the exact result.
-    const statuses = states.map(trackedStateStatus);
+    const normalized = states.map((state) => cloneTrackedState(state));
+    const statuses = normalized.map(trackedStateStatus);
     if (statuses.every((status) => status === "none")) {
       return noneTrackedState();
     }
     if (
       statuses.every((status) => status === "exact")
-      && states.every(
+      && normalized.every(
         (state) =>
-          trackedStateIdentity(state) === trackedStateIdentity(states[0]),
+          trackedStateIdentity(state) === trackedStateIdentity(normalized[0]),
       )
     ) {
-      return cloneTrackedState(states[0]);
+      return cloneTrackedState(normalized[0]);
     }
-    if (states.every((state) => trackedStateStatus(state) === "none" || Array.isArray(state.borrowedPaths))) {
-      const paths = states.flatMap(state => state?.borrowedPaths || []);
+    if (normalized.every((state) => trackedStateStatus(state) === "none" || Array.isArray(state.borrowedPaths))) {
+      const paths = normalized.flatMap(state => state.borrowedPaths || []);
       return maybeTrackedState([...new Map(paths.map(path => [JSON.stringify(path), path])).values()]);
     }
     return maybeTrackedState();
@@ -3549,13 +3541,8 @@ function analyzeBindingMutations(
   }
 
   function resolveProjectLocalImportPath(importSource) {
-    const rawSource = String(importSource || "");
-    if (projectLocalImportPathCache.has(rawSource)) {
-      return projectLocalImportPathCache.get(rawSource);
-    }
-    const source = rawSource.replaceAll("\\", "/");
+    const source = String(importSource || "").replaceAll("\\", "/");
     if (!source.startsWith("./") && !source.startsWith("../")) {
-      projectLocalImportPathCache.set(rawSource, "");
       return "";
     }
     const importer = String(filePath || "").replaceAll("\\", "/");
@@ -3568,12 +3555,9 @@ function analyzeBindingMutations(
       || resolved.startsWith("../")
       || path.posix.isAbsolute(resolved)
     ) {
-      projectLocalImportPathCache.set(rawSource, "");
       return "";
     }
-    const result = resolved.replace(/^\.\//, "");
-    projectLocalImportPathCache.set(rawSource, result);
-    return result;
+    return resolved.replace(/^\.\//, "");
   }
 
   function importedTargetDelegation(callNode) {
@@ -4112,7 +4096,8 @@ function analyzeBindingMutations(
     const ownerFunction = currentExecutionFunction();
     if (
       !contract
-      || normalizedFilePath !== contract.compositionModulePath
+      || String(filePath || "").replaceAll("\\", "/").replace(/^\.\//, "")
+        !== contract.compositionModulePath
       || ownerFunction?.id?.name !== contract.compositionExportName
     ) return false;
     const ownerSource = String(source || "")
@@ -4123,7 +4108,13 @@ function analyzeBindingMutations(
   }
 
   function mutationDelegatingOwnerContractsForCurrentModule() {
-    return mutationDelegatingOwnerContracts;
+    if (!recognizeCurrentContracts) return [];
+    const normalizedFilePath = String(filePath || "")
+      .replaceAll("\\", "/")
+      .replace(/^\.\//, "");
+    return STATE_MUTATION_DELEGATING_OWNER_CONTRACT.filter(
+      ({ compositionModulePath }) => compositionModulePath === normalizedFilePath,
+    );
   }
 
   function hasExactMutationDelegatingOwnerCompositionFunction(
@@ -4132,7 +4123,8 @@ function analyzeBindingMutations(
   ) {
     if (
       !contract
-      || normalizedFilePath !== contract.compositionModulePath
+      || String(filePath || "").replaceAll("\\", "/").replace(/^\.\//, "")
+        !== contract.compositionModulePath
       || functionNode?.id?.name !== contract.compositionExportName
     ) return false;
     return createHash("sha256")
@@ -5947,7 +5939,7 @@ function analyzeBindingMutations(
   function replaceAliasRecords(target, replacement) {
     target.clear();
     for (const [record, state] of replacement) {
-      target.set(record, state);
+      target.set(record, cloneTrackedState(state));
     }
     return target;
   }
