@@ -150,14 +150,14 @@ test("cached frame preparation selects LOD during settle while deferring active 
   assert.equal(callback?.type, "ArrowFunctionExpression");
   const runtime = { renderPhase: "settling" };
   const events = [];
-  const prepare = new Function("runtimeState", "ensureLayerDataFromTopology", "ensureContourLodForView", "RENDER_PHASE_INTERACTING",
+  const prepare = new Function("runtimeState", "ensureLayerDataFromTopology", "ensureContourLodForView", "ensurePhysicalAtlasDetailForView", "RENDER_PHASE_INTERACTING",
     `return (${rendererSource.slice(callback.start, callback.end)});`
-  )(runtime, () => events.push("topology"), () => events.push("lod"), "interacting");
-  prepare(); assert.deepEqual(events.splice(0), ["topology", "lod"]);
+  )(runtime, () => events.push("topology"), () => events.push("lod"), () => events.push("atlas"), "interacting");
+  prepare(); assert.deepEqual(events.splice(0), ["topology", "lod", "atlas"]);
   runtime.renderPhase = "interacting";
   prepare(); assert.deepEqual(events.splice(0), ["topology"]);
   runtime.renderPhase = "idle";
-  prepare(); assert.deepEqual(events.splice(0), ["topology", "lod"]);
+  prepare(); assert.deepEqual(events.splice(0), ["topology", "lod", "atlas"]);
   runtime.scenarioApplyInFlight = true;
   prepare(); assert.deepEqual(events, ["topology"]);
 });

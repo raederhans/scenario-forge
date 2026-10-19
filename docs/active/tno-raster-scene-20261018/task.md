@@ -317,3 +317,12 @@ v5 正常就绪为 2290.5/3555.6/2743.2 ms，但 held 100% 在释放后触发 30
 PR #245 首次 CI 的缓存回归仍假定 TNO 默认关闭栅格，原生参考阶段在 requested=false 断言失败。对照启动改为明确选择矢量，保留全部像素、缓存、恢复断言及原超时。最终 CI 回执见 https://github.com/raederhans/scenario-forge/pull/245 。
 
 第二轮 TNO 五阶段缓存回归与浏览器 smoke 通过。PR 组合检查发现旧 exact-composite 抽取夹具遗漏新增的场景/导出状态和 commit 返回契约；补齐原生模式夹具后 9/9 通过，保留全部复用、失效与导出断言。
+
+
+### 合并门禁补齐
+
+完整检查进一步发现旧渲染抽取夹具和源码证明没有随异步准备迁移：补齐预览、水层、地形LOD和表面签名夹具，精确更新分片调度断言及新增测试路由预期。扩大 Node 探查运行 6663 项（6602 pass、55 fail、6 skip），保留该非全绿结果；它包含旧数据/dist及状态证明问题，不作为全仓通过声明。CI 同组合后续 108 条命令直接运行全部通过。
+
+独立审查确认没有新增共享状态写权限。coverage 证明绑定实际三个私有 generator；当前源码/依赖指纹与 static 调度函数身份精确迁移，历史退役 pins 保留。水层分离任务与可销毁资源，并在资源创建点捕获私有 cleanup；static Promise resolver明确以函数值调用。两项proof及borrowed-effect、water owner/client共212项通过，另7项攻击负测通过；不扩大通用白名单。经selection返回的feature别名写入仍依靠精确源码pin拒绝，不声称结构扫描单独覆盖。
+
+本次资源调整后，现有 Pages 产物同步两项产品模块，DPR2 `merge-proof-artifact-smoke` 和 `merge-proof-artifact-retained` 实际编辑/保存恢复及暂停准备编辑闭环均通过。此前source-server检查因缺少生成favicon/sample索引失败保留；没有放宽网络错误断言。此次浏览器验证是功能回归，不能代替三会话稳定性能证据，首次GPU尖峰与严格地形像素FAIL仍未解决。

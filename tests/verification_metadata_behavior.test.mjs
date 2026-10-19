@@ -2630,7 +2630,7 @@ test("M4 overlay lifecycle edits select one shared behavior command within the e
   );
   assert.deepEqual(selection.unmatchedChangedFiles, []);
   assert.deepEqual(selection.localEntrypointRouteGaps, []);
-  const sharedCommands = selection.recommendedCommands.filter(({ commandRef }) => commandRef.includes("scenario_region_overlay_render_owner_behavior"));
+  const sharedCommands = selection.recommendedCommands.filter(({ commandRef }) => commandRef.includes("scenario_region_overlay_render_owner_behavior") && commandRef.includes("scenario_relief_overlay_render_owner_behavior"));
   assert.equal(sharedCommands.length, 1);
   for (const file of ["scenario_relief_overlay_render_owner_behavior", "render_cache_owner_invalidation_behavior"]) {
     assert.ok(sharedCommands[0].commandRef.includes(file));

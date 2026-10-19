@@ -70,7 +70,8 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
   let visibleBorderCountryCodesCache = { signature: "", codes: new Set() };
 
   function finishPrivatePreparation(preparation = privatePreparation) {
-    preparation?.resolve();
+    const resolve = preparation?.resolve;
+    resolve?.();
     if (privatePreparation === preparation) privatePreparation = null;
   }
 

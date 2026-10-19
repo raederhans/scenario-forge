@@ -49,6 +49,9 @@ function createLakeShoreHarness({ featurePath = { id: "lake-path" }, bounds } = 
     setLineDash() {},
   };
   const scope = vm.createContext({
+    getOceanSurfacePattern: () => null,
+    getCachedWaterFeaturePath: () => null,
+    isMacroOceanWaterRegion: () => false,
     nowMs: () => 1,
     collectContextMetric: (...args) => metrics.push(args),
     waterPathBuildCount: 0,
@@ -454,6 +457,9 @@ function createHarness({
       }
     : null;
   const context = vm.createContext({
+    getOceanSurfacePattern: () => null,
+    getCachedWaterFeaturePath: () => null,
+    isMacroOceanWaterRegion: () => false,
     isLakeRegion,
     shouldDrawLakeOutline,
     normalizeLakeStyleConfig,

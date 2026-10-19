@@ -364,8 +364,8 @@ test("entrypoint delegates default transform resolution once to the signature po
     let reads = 0;
     Object.defineProperty(state, "zoomTransform", { get() { reads++; return undefined; } });
     const node = ast.body.find(n => n.type === "FunctionDeclaration" && n.id.name === name);
-    const invoke = new Function("runtimeState", "getRenderPassSignaturePolicy", `${source.slice(node.start, node.end)}; return ${name};`)(state, () => policy);
-    const expected = policy[name](...args);
+    const invoke = new Function("runtimeState", "getRenderPassSignaturePolicy", "getRenderPassLayout", "getTnoScenePaintOverscanPx", `${source.slice(node.start, node.end)}; return ${name};`)(state, () => policy, () => ({ pixelWidth: 800, pixelHeight: 600, offsetX: 0, offsetY: 0, dpr: 1 }), () => 0);
+    const expected = policy[name](...args) + (name === "getRenderPassSignature" ? "|surface:800:600:0:0:1|paint-margin:0" : "");
     const directReads = reads;
     reads = 0;
     assert.equal(invoke(...args), expected);

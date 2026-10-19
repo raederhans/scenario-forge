@@ -78,6 +78,9 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   const waterHighlightDisplay = createWaterHighlightDisplay();
   let waterHighlightGeometryCache = new WeakMap();
   let waterRasterPreparation = null;
+  // Destructible resources never share the record that borrows scene selections.
+  let waterRasterResources = null;
+  let releaseWaterRasterResources = null;
   let publishedWaterRasterIdentity = "";
   let unavailableWaterRaster = null;
   const waterRasterResourceOwner = Symbol("scenario-water-raster-preparation");
@@ -109,20 +112,12 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   }
 
   function cancelWaterRasterPreparation() {
-    waterRasterPreparation?.controller?.abort();
-    waterRasterPreparation?.bitmap?.close();
+    releaseWaterRasterResources?.();
+    releaseWaterRasterResources = null;
     resourceBudget?.release(waterRasterResourceOwner);
     if (waterRasterPreparation?.handle != null) cancelWaterWork(waterRasterPreparation.handle);
-    if (waterRasterPreparation?.canvas) {
-      resourceBudget?.release(waterRasterResourceOwner);
-      waterRasterPreparation.canvas.width = 1;
-      waterRasterPreparation.canvas.height = 1;
-      if (waterRasterPreparation.scratch) {
-        waterRasterPreparation.scratch.width = 1;
-        waterRasterPreparation.scratch.height = 1;
-      }
-    }
     waterRasterPreparation = null;
+    waterRasterResources = null;
   }
 
   // The outer scene keeps its published pixels until this complete candidate is
@@ -153,8 +148,14 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     cancelVisibleWaterWarmup();
     const selection = getScenarioWaterSelection();
     const controller = new AbortController();
+    const resources = { controller, bitmap: null };
+    releaseWaterRasterResources = () => {
+      controller.abort();
+      resources.bitmap?.close();
+    };
+    waterRasterResources = resources;
     const task = { worker: true, revision, identity: `water-worker:${++nextWaterRasterGeometryIdentity}`,
-      controller, ready: false, bitmap: null, startedAt: nowMs(), renderedCount: 0 };
+      ready: false, startedAt: nowMs(), renderedCount: 0 };
     waterRasterPreparation = task;
     try {
       const patternSource = getWaterPatternSource();
@@ -194,7 +195,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
           requestRender("scenario-water-raster-stale");
           return;
         }
-        task.bitmap = result.bitmap; task.ready = true; task.renderedCount = result.renderedCount;
+        resources.bitmap = result.bitmap; task.ready = true; task.renderedCount = result.renderedCount;
         resourceBudget?.update(waterRasterResourceOwner, { bitmaps: bitmapBytes });
         resourceBudget?.update(waterWorkerResourceOwner, { workerGeometry: result.stats.geometryBytes,
           projectedPaths: result.stats.pathBytes, bitmaps: result.stats.patternBytes });
@@ -208,7 +209,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   }
 
   function failWorkerWaterTask(task, error) {
-    if (waterRasterPreparation !== task || task.controller.signal.aborted) return;
+    if (waterRasterPreparation !== task || waterRasterResources?.controller.signal.aborted) return;
     // A failed candidate is never ready: the caller must keep the complete old scene.
     task.error = error;
     failedWorkerRevision = task.revision;
@@ -278,7 +279,13 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     }
     const transform = cloneZoomTransform(runtimeState.zoomTransform);
     const k = prepareTargetContext(context, transform, layout);
-    const task = { identity, selection, canvas, scratch: null, context, k, index: 0, partIndex: 0, parts: null, tileX: 0, renderedCount: 0,
+    const resources = { canvas, scratch: null };
+    releaseWaterRasterResources = () => {
+      canvas.width = canvas.height = 1;
+      if (resources.scratch) resources.scratch.width = resources.scratch.height = 1;
+    };
+    waterRasterResources = resources;
+    const task = { identity, selection, context, k, index: 0, partIndex: 0, parts: null, tileX: 0, renderedCount: 0,
       handle: null, ready: false, startedAt: nowMs(), maxSliceMs: 0, maxWorkMs: 0, slowestFeatureId: "", slowestPartIndex: 0 };
     waterRasterPreparation = task;
     const run = () => {
@@ -308,13 +315,13 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
             task.renderedCount += drawScenarioWaterFillLayer(k, { waterFeatures: [feature], collectMetrics: false });
             task.partIndex = task.parts.length;
           } else {
-            if (!task.scratch) {
-              task.scratch = globalThis.document.createElement("canvas");
-              task.scratch.width = scratchWidth;
-              task.scratch.height = layout.pixelHeight;
+            if (!resources.scratch) {
+              resources.scratch = globalThis.document.createElement("canvas");
+              resources.scratch.width = scratchWidth;
+              resources.scratch.height = layout.pixelHeight;
               resourceBudget?.update(waterRasterResourceOwner, { bitmaps: bitmapBytes + scratchWidth * layout.pixelHeight * 4 });
             }
-            const scratch = task.scratch;
+            const scratch = resources.scratch;
             const scratchContext = scratch.getContext("2d");
             if (!scratchContext) throw new Error("water scratch context unavailable");
             if (!task.partIndex) prepareTargetContext(scratchContext, transform, {
@@ -1005,12 +1012,13 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
 
       if (waterRasterPreparation?.ready && waterRasterPreparation.identity === rasterIdentity) {
         const prepared = waterRasterPreparation;
+        const preparedResources = waterRasterResources;
         renderedWaterCount = scenarioLayerCache.render("water", currentTransform, {
           draw: () => {
             const context = rendererSurfaceHost.getContext();
             context.save();
             context.setTransform(1, 0, 0, 1, 0, 0);
-            context.drawImage(prepared.bitmap || prepared.canvas, 0, 0);
+            context.drawImage(preparedResources.bitmap || preparedResources.canvas, 0, 0);
             context.restore();
             return prepared.renderedCount;
           },
@@ -1027,7 +1035,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
           const context = rendererSurfaceHost.getContext();
           context.save();
           context.setTransform(1, 0, 0, 1, 0, 0);
-          context.drawImage(prepared.bitmap || prepared.canvas, 0, 0);
+          context.drawImage(preparedResources.bitmap || preparedResources.canvas, 0, 0);
           context.restore();
           renderedWaterCount = prepared.renderedCount;
           waterCacheMode = "prepared-direct";

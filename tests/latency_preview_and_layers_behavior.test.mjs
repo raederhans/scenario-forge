@@ -77,6 +77,7 @@ function previewFixture({ riverVisible = false } = {}) {
   const budget = createPoliticalPatchPreviewBudget({ now: () => clock });
   const scope = {
     riverVisible,
+    tnoRasterSceneOwner: null,
     hasVisibleRiverPartitions: () => scope.riverVisible,
     politicalPatchPreviewBudget: budget,
     rendererSurfaceHost: { getPoliticalPatchContext: () => ({ canvas: {}, save() {}, restore() {} }), getProjection: () => ({}), getPathCanvas: () => ({}) },
