@@ -2,7 +2,7 @@
 
 ## 2026-10-19 TNO GPU 栅格场景整合
 
-当前任务独占 `C:/Users/raede/.codex/worktrees/tno-raster-scene/mapcreator`，分支 `codex/tno-raster-scene-20261018`，基于 `5fbbfdcff93ae36e24261b0e7f1ae58239fa4cc4`（准确基点以 Git merge-base 为准）。用户已授权提交、推送和受保护合并；root 独占 Git 与验证。主目录及其他工作树的 WIP 不纳入。保留本树及 ignored 性能证据用于后续首次 GPU 帧尖峰、地形严格像素一致性和 130% 离群长任务修复；这些仍未完成。任务实现和现场验收见 [任务记录](tno-raster-scene-20261018/task.md)，远端 PR 为合并与 CI 的最终回执。
+当前任务独占 `C:/Users/raede/.codex/worktrees/tno-raster-scene/mapcreator`，分支 `codex/tno-raster-scene-20261018`，基于 `5fbbfdcff93ae36e24261b0e7f1ae58239fa4cc4`（准确基点以 Git merge-base 为准）。用户已授权提交、推送和受保护合并；root 独占 Git 与验证。主目录及其他工作树的 WIP 不纳入。保留本树及 ignored 性能证据用于后续首次 GPU 帧尖峰、地形严格像素一致性和 130% 离群长任务修复；这些仍未完成。任务实现和现场验收见 [任务记录](tno-raster-scene-20261018/task.md)，实现提交 `5581600f` 已推送；[PR #245](https://github.com/raederhans/scenario-forge/pull/245) 为合并与 CI 的最终回执。
 
 
 ## 2026-10-11 资产缓存与 TNO 大视口精修
