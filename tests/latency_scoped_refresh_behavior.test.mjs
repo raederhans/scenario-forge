@@ -16,7 +16,7 @@ function fixture() {
     "resetFirstVisibleFramePainted", "invalidateRenderPasses", "clearRenderPassReferenceTransforms", "markAllOverlaysDirty", "rebuildStaticMeshes",
     "invalidateBorderCache", "updateDynamicBorderStatusUI", "updateSpecialZonesPaths", "renderSpecialZoneEditorOverlay", "updateZoomTranslateExtent",
     "resetScenarioWaterCacheAdaptiveState", "scheduleSecondarySpatialIndexBuild", "render", "requestScopedRender", "rebuildAuxiliaryRegionIndexes",
-    "queueIndexUiRefresh", "markRendererTopologyChanged", "recordScopedTopologyChange", "clearDeferredInternalBorderMeshCaches", "scheduleDeferredHeavyBorderMeshes", "syncScenarioSecondaryRegionIndexes"];
+    "queueIndexUiRefresh", "markRendererTopologyChanged", "notifyPaintContourSourcePublished", "recordScopedTopologyChange", "clearDeferredInternalBorderMeshCaches", "scheduleDeferredHeavyBorderMeshes", "syncScenarioSecondaryRegionIndexes"];
   const deps = Object.fromEntries(effectNames.map((name) => [name, (...args) => { calls.push([name, ...args]); if (name === "rebuildPrimaryPoliticalDerivedState") return { incremental: !!args[0].incremental, changedFeatureCount: 1 }; }]));
   deps.getEffectiveAtlantropaFeatures = () => ({ water: [] });
   deps.ensureLayerDataFromTopology = () => calls.push(["ensureLayerDataFromTopology"]);
@@ -46,6 +46,10 @@ test("changed political payload uses validated incremental path without resettin
   assert.equal(result.mode, "geometry"); assert.equal(result.incremental, true);
   assert.equal(f.calls.find(([name]) => name === "rebuildPrimaryPoliticalDerivedState")[1].incremental, true);
   assert.ok(f.names().includes("markRendererTopologyChanged"));
+  const publication = f.names().indexOf("notifyPaintContourSourcePublished");
+  assert.equal(publication, f.names().indexOf("markRendererTopologyChanged") + 1,
+    "acknowledge immutable publication before any downstream contour reader");
+  assert.deepEqual(f.calls[publication][1], { previousTopologyRevision: 3 });
   assert.ok(!f.names().includes("resetRendererTransactionState"));
   assert.ok(!f.names().includes("resetScenarioWaterCacheAdaptiveState"));
 });
@@ -55,6 +59,7 @@ test("pure style revision invalidates style-dependent passes, not indices or bor
   assert.equal(result.mode, "style"); assert.ok(result.targetPasses.includes("political"));
   assert.ok(!f.names().includes("rebuildPrimaryPoliticalDerivedState"));
   assert.ok(!f.names().includes("invalidateBorderCache"));
+  assert.ok(!f.names().includes("notifyPaintContourSourcePublished"));
 });
 test("actual water replacement rebuilds secondary authority while preserving primary", () => {
   const f = fixture(), previous = f.capture(); f.state.scenarioWaterRegionsData = { features: [] };

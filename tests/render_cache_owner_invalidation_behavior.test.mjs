@@ -682,3 +682,54 @@ test("zero-sized composite backings cannot claim explicit viewport coverage", ()
   assert.equal(owner.canDrawInteractionComposite(transform), false);
   assert.equal(cache.interactionComposite.reason, "coverage-mismatch");
 });
+
+test("explicit paint padding covers pans through 96 CSS pixels and requires refill beyond", async () => {
+  const { getSurfaceCoverage, transformCoverage, coversViewport } = await import("../js/core/renderer/cached_surface_coverage.js");
+  let direct = false;
+  const state = { width: 800, height: 600, dpr: 2, renderPassCache: createRenderPassCache() };
+  const owner = createRenderCacheOwner({ state,
+    getters: { getPassPaintOverscanPx: () => direct ? 96 : 0 },
+    helpers: { ensureRenderPassCacheState: () => state.renderPassCache } });
+  assert.equal(owner.getRenderPassLayout("labels").offsetX, 0);
+  direct = true;
+  const layout = owner.getRenderPassLayout("labels");
+  assert.deepEqual([layout.offsetX, layout.offsetY, layout.pixelWidth, layout.pixelHeight], [96, 96, 1984, 1584]);
+  const coverage = getSurfaceCoverage({ width: layout.pixelWidth, height: layout.pixelHeight }, layout);
+  const reference = { x: 0, y: 0, k: 1 };
+  for (const x of [-96, -48, 0, 48, 96]) assert.equal(coversViewport(transformCoverage(coverage, reference, { x, y: 0, k: 1 }), 800, 600), true);
+  assert.equal(coversViewport(transformCoverage(coverage, reference, { x: 97, y: 0, k: 1 }), 800, 600), false);
+  assert.equal(coversViewport(transformCoverage(coverage, { x: 97, y: 0, k: 1 }, { x: 97, y: 0, k: 1 }), 800, 600), true);
+  direct = false;
+  assert.equal(owner.getRenderPassLayout("labels").offsetX, 0);
+  assert.deepEqual([state.width, state.height], [800, 600]);
+});
+
+
+test("direct scene layouts keep small camera margins and invalidate old pixels on backend changes", () => {
+  const state = { width: 800, height: 600, dpr: 2, renderPassCache: createRenderPassCache() };
+  let direct = true;
+  const owner = createRenderCacheOwner({ state,
+    constants: { renderPassNames: RENDER_PASS_NAMES, transformedFramePassNames: new Set(["physicalBase", "political"]), renderPassOverscanRatioPerSide: 0.15 },
+    getters: { getPassOverscanRatio: () => direct ? 0.05 : 0.15, getPassPaintOverscanPx: name => direct && name === "labels" ? 96 : 0 },
+    helpers: { ensureRenderPassCacheState: value => value.renderPassCache } });
+  for (const name of ["physicalBase", "political"]) {
+    const l = owner.getRenderPassLayout(name);
+    assert.deepEqual([l.offsetX, l.offsetY, l.pixelWidth, l.pixelHeight], [40, 30, 1760, 1320]);
+    state.renderPassCache.canvases[name] = { width: l.pixelWidth, height: l.pixelHeight };
+  }
+  assert.equal(owner.getRenderPassLayout("labels").offsetX, 96, "actual country/city paint coverage is preserved");
+  direct = false;
+  const l = owner.getRenderPassLayout("political");
+  assert.deepEqual([l.offsetX, l.offsetY, l.pixelWidth, l.pixelHeight], [120, 90, 2080, 1560]);
+  assert.equal(state.renderPassCache.dirty.political, true);
+  assert.equal(state.renderPassCache.reasons.political, "surface-layout-change");
+  assert.equal(state.renderPassCache.canvases.political.width, 1760, "layout observation does not clear accepted pixels");
+  state.renderPassCache.dirty.political = false;
+  owner.getRenderPassLayout("political");
+  assert.equal(state.renderPassCache.dirty.political, false, "unchanged layout does not repeatedly invalidate");
+  direct = true;
+  owner.getRenderPassLayout("political");
+  assert.equal(state.renderPassCache.dirty.political, true, "switching back also repaints the old origin");
+  direct = false;
+  assert.equal(owner.getRenderPassLayout("labels").offsetX, 0);
+});

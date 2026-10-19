@@ -41,6 +41,7 @@ export function createProjectedGeometryBoundsOwner({
     getProjection = () => null,
     getPathCanvas = () => null,
     getPathSvg = () => null,
+    getBoundsPath = () => getPathCanvas() || getPathSvg(),
     getLandFeatures = () => [],
     getRiverFeatures = () => [],
     getActiveScenarioId = () => "",
@@ -105,8 +106,8 @@ export function createProjectedGeometryBoundsOwner({
     return computeCoordinateBounds(getProjection(), geoObject);
   }
 
-  function computeProjectedGeoBounds(geoObject) {
-    const pathRef = getPathCanvas() || getPathSvg();
+  function computeProjectedGeoBounds(geoObject, { allowCoordinateFallback = true } = {}) {
+    const pathRef = getBoundsPath();
     if (!pathRef || !geoObject) return null;
     ensureGeometryBoundsIdentity();
     const geometry = geoObject.type === "Feature" ? geoObject.geometry : geoObject;
@@ -116,12 +117,12 @@ export function createProjectedGeometryBoundsOwner({
     try {
       bounds = pathRef.bounds(geoObject);
     } catch (_error) {
-      return computeProjectedCoordinateBounds(geoObject);
+      return allowCoordinateFallback ? computeProjectedCoordinateBounds(geoObject) : null;
     }
-    if (!bounds || bounds.length !== 2) return computeProjectedCoordinateBounds(geoObject);
+    if (!bounds || bounds.length !== 2) return allowCoordinateFallback ? computeProjectedCoordinateBounds(geoObject) : null;
     const projectedBounds = buildProjectedBounds(bounds[0]?.[0], bounds[0]?.[1], bounds[1]?.[0], bounds[1]?.[1]);
     if (projectedBounds && geometry && typeof geometry === "object") projectedPartBounds.set(geometry, { pathRef, bounds: projectedBounds });
-    return projectedBounds || computeProjectedCoordinateBounds(geoObject);
+    return projectedBounds || (allowCoordinateFallback ? computeProjectedCoordinateBounds(geoObject) : null);
   }
 
   function computeProjectedFeatureBounds(feature) {

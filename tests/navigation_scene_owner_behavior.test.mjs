@@ -88,6 +88,7 @@ function fixture(overrides = {}, services = {}) {
   };
   let currentProjection = projection;
   let getIdentity;
+  let recordFrameMetric;
   const frame = {
     prepare(options) { calls.prepare.push(options); return true; },
     draw(...args) { calls.draw.push(args); return true; },
@@ -114,15 +115,18 @@ function fixture(overrides = {}, services = {}) {
     getOceanBaseFillColor: () => "#canonical-ocean",
     landFill: "#fallback-land",
   };
-  const owner = createNavigationSceneOwner(state, {
+  const createOwner = () => createNavigationSceneOwner(state, {
     surface, helpers, ...services,
-    createFrameOwner({ getIdentity: captured }) {
+    createFrameOwner({ getIdentity: captured, recordMetric }) {
       getIdentity = captured;
+      recordFrameMetric = recordMetric;
       return frame;
     },
   });
+  const owner = createOwner();
   return {
-    state, owner, calls, frame, helpers, getIdentity: () => getIdentity(),
+    state, owner, calls, frame, helpers, createOwner, getIdentity: () => getIdentity(),
+    recordFrameMetric: (...args) => recordFrameMetric(...args),
     setProjection: (next) => { currentProjection = next; },
     globalLand, viewportDetail, sharedLake, scenarioLake,
   };
@@ -439,6 +443,95 @@ test("failed or cleared navigation source requests do not publish or retry on ev
   resolveLoad({ water: [{ features: [feature("late-water")] }] });
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(f.calls.prepare.length, 0);
+}));
+
+test("dispose fences an already queued identity retry while a new owner can prepare and start its worker", () => withGeoPath(async () => {
+  let workers = 0, requests = 0, releases = 0;
+  const f = fixture({}, {
+    yieldTask: async () => {},
+    createWorkerClient: () => {
+      workers++;
+      return { available: () => true, dispose: () => releases++, request: async () => {
+        requests++;
+        return { bitmap: {} };
+      } };
+    },
+  });
+  f.owner.prepare();
+  const oldRaster = f.calls.prepare[0];
+  // This is the real frame-owner callback: it resets requestedIdentity and
+  // queues prepare(), which must observe disposal at the microtask boundary.
+  f.recordFrameMetric("navigationFrameCancel", 1, { reason: "identity" });
+  f.owner.dispose();
+  await new Promise(setImmediate);
+  assert.equal(f.calls.prepare.length, 1, "the queued retry cannot prepare another raster");
+  assert.equal(f.calls.clear, 1);
+  assert.equal(await oldRaster.renderRaster({ width: 20, height: 10, bounds: oldRaster.bounds,
+    signal: new AbortController().signal }), null, "even a retained old raster callback cannot acquire a worker");
+  assert.equal(workers, 0);
+  assert.equal(requests, 0);
+
+  const replacement = f.createOwner();
+  replacement.prepare();
+  assert.equal(f.calls.prepare.length, 2);
+  const raster = f.calls.prepare[1];
+  assert.ok((await raster.renderRaster({ width: 20, height: 10, bounds: raster.bounds,
+    signal: new AbortController().signal })).bitmap);
+  assert.equal(workers, 1);
+  assert.equal(requests, 1);
+  replacement.dispose();
+  assert.equal(releases, 1);
+}));
+
+test("dispose rejects late global source completion without blocking a new owner's source load or worker", () => withGeoPath(async () => {
+  const bundle = { chunkRegistry: { byLayer: { water: [
+    { id: "water-base", globalCoverage: true, lod: "coarse" },
+  ] } }, chunkPayloadCacheById: {} };
+  let workers = 0, requests = 0;
+  const f = fixture({ scenarioBundleCacheById: { "scenario-a": bundle } }, {
+    yieldTask: async () => {},
+    createWorkerClient: () => {
+      workers++;
+      return { available: () => true, dispose() {}, request: async () => {
+        requests++;
+        return { bitmap: {} };
+      } };
+    },
+  });
+  const completions = [];
+  f.helpers.ensureNavigationSources = () => new Promise(resolve => completions.push(resolve));
+  f.helpers.getEffectiveWaterRegionFeatures = (_atlantropa, water) => water;
+  f.owner.prepare();
+  await Promise.resolve();
+  assert.equal(completions.length, 1);
+  f.owner.dispose();
+
+  const replacement = f.createOwner();
+  replacement.prepare();
+  await Promise.resolve();
+  assert.equal(completions.length, 2);
+  completions[0]({ water: [{ features: [feature("disposed-water")] }] });
+  await new Promise(setImmediate);
+  assert.equal(f.calls.prepare.length, 0);
+  assert.equal(f.calls.clear, 1, "late completion cannot clear the replacement owner");
+  assert.equal(workers, 0);
+  assert.equal(requests, 0);
+  assert.equal(f.calls.metrics.some(([name]) => name === "navigationSourceLoad"), false);
+  replacement.prepare();
+  await Promise.resolve();
+  assert.equal(completions.length, 2, "old finalization cannot clear the replacement request");
+
+  const currentWater = feature("replacement-water");
+  completions[1]({ water: [{ features: [currentWater] }] });
+  await new Promise(setImmediate);
+  assert.equal(f.calls.prepare.length, 1);
+  const raster = f.calls.prepare[0];
+  assert.deepEqual(raster.layers[3].items, [currentWater]);
+  assert.ok((await raster.renderRaster({ width: 20, height: 10, bounds: raster.bounds,
+    signal: new AbortController().signal })).bitmap);
+  assert.equal(workers, 1);
+  assert.equal(requests, 1);
+  replacement.dispose();
 }));
 
 

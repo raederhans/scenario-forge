@@ -1,6 +1,8 @@
 import "../../vendor/d3.v7.min.js";
 import { buildPoliticalIdRasterTile } from "../core/renderer/political_id_raster_tile.js";
 import { createPoliticalIdRasterAssetStore } from "../core/renderer/political_id_raster_assets.js";
+import { createPoliticalIdResidentGeometry } from "../core/renderer/political_id_resident_geometry.js";
+import { drawPackedRasterGeometry, isPackedRasterGeometry } from "../core/renderer/packed_geometry.js";
 
 const d3 = globalThis.d3;
 
@@ -13,8 +15,10 @@ function stableKey(value) {
 }
 
 // Path2D does not expose retained storage. This input-coordinate estimate is a
-// budget hint, not a heap measurement; the entry cap also bounds retention.
+// budget hint, not a heap measurement. Both packed and GeoJSON estimates have
+// a 256-byte floor, which also bounds entry count under the byte budget.
 function estimatePathBytes(feature) {
+  if (isPackedRasterGeometry(feature)) return feature.weights.path;
   let points = 0;
   function visit(value) {
     if (!Array.isArray(value)) return;
@@ -57,8 +61,9 @@ export function createPoliticalIdRasterWorkerRuntime({
   postMessage,
   buildTile = buildPoliticalIdRasterTile,
   projectionApi = d3,
-  pathCacheMaxEntries = 1024,
   pathCacheMaxEstimatedBytes = 16 * 1024 * 1024,
+  pathCacheMaxEntries = Math.floor(pathCacheMaxEstimatedBytes / 256),
+  geometryCacheMaxBytes = 48 * 1024 * 1024,
   createAssetStore = createPoliticalIdRasterAssetStore,
 } = {}) {
   if (!Number.isSafeInteger(pathCacheMaxEntries) || pathCacheMaxEntries < 0
@@ -66,12 +71,15 @@ export function createPoliticalIdRasterWorkerRuntime({
     throw new RangeError("Political path cache budgets must be nonnegative integers.");
   }
   const tasks = new Map();
-  let queue = Promise.resolve();
+  let geometryQueue = Promise.resolve();
   let disposed = false;
   let cacheNamespace = null;
   let pathCache = new Map();
   let pathCacheEstimatedBytes = 0;
   let assetStore = null, assetManifestRevision = -1;
+  // Binary source residency and projected Path2D retention have different working
+  // sets. Keep both bounded independently: 48 MiB + 16 MiB by default.
+  const geometry = createPoliticalIdResidentGeometry(geometryCacheMaxBytes);
 
   function dispose() {
     disposed = true;
@@ -80,6 +88,7 @@ export function createPoliticalIdRasterWorkerRuntime({
     pathCache.clear();
     pathCacheEstimatedBytes = 0;
     cacheNamespace = null;
+    geometry.clear();
   }
 
   async function run(task) {
@@ -87,9 +96,23 @@ export function createPoliticalIdRasterWorkerRuntime({
     const isCancelled = () => task.cancelled;
     try {
       if (task.cancelled) return;
+      if (task.type === "SYNC_POLITICAL_ID_GEOMETRY") {
+        const value = geometry.sync(task);
+        // Only paths whose source survived the transaction remain valid.
+        const versions = new Map(value.resident);
+        for (const [key, cached] of pathCache) {
+          const [scene, id, version] = JSON.parse(key);
+          if (scene !== task.geometryNamespace || versions.get(id) !== version) {
+            pathCache.delete(key); pathCacheEstimatedBytes -= cached.estimatedBytes;
+          }
+        }
+        postMessage({ type: "RESULT", taskId, value: { ...value, pathBytes: pathCacheEstimatedBytes,
+          geometryBudgetBytes: geometryCacheMaxBytes, pathBudgetBytes: pathCacheMaxEstimatedBytes } });
+        return;
+      }
       if (task.type === "LOAD_POLITICAL_ID_ASSET" || task.type === "SAVE_POLITICAL_ID_ASSET") {
-        // IDB events, gzip streaming and validation must not wait behind native
-        // map rendering on the UI thread. Reuse the existing serial worker.
+        // Asset I/O may await disk/network independently of geometry residency.
+        // SYNC and BUILD alone share the geometry transaction queue.
         assetStore ||= createAssetStore({ onStats: assets => {
           if (!disposed) postMessage({ type: "ASSET_STATS", assets });
         } });
@@ -132,10 +155,11 @@ export function createPoliticalIdRasterWorkerRuntime({
         const path = buildPath();
         pathBuilds++;
         const estimatedBytes = estimatePathBytes(entry.feature);
-        if (key && !task.cancelled && pathCacheMaxEntries > 0 && estimatedBytes <= pathCacheMaxEstimatedBytes) {
+        const pathBudget = pathCacheMaxEstimatedBytes;
+        if (key && !task.cancelled && pathCacheMaxEntries > 0 && estimatedBytes <= pathBudget) {
           localCache.set(key, { path, estimatedBytes });
           localEstimatedBytes += estimatedBytes;
-          while (localCache.size > pathCacheMaxEntries || localEstimatedBytes > pathCacheMaxEstimatedBytes) {
+          while (localCache.size > pathCacheMaxEntries || localEstimatedBytes > pathBudget) {
             const oldestKey = localCache.keys().next().value;
             localEstimatedBytes -= localCache.get(oldestKey).estimatedBytes;
             localCache.delete(oldestKey);
@@ -145,6 +169,7 @@ export function createPoliticalIdRasterWorkerRuntime({
       }
       const entries = (packet.entries || []).map((entry) => ({
         ...entry,
+        feature: packet.residentGeometry ? geometry.get(namespace, entry.id, entry.geometryVersion) : entry.feature,
         bounds: entry.bounds && {
           minX: Number(entry.bounds.minX) * density,
           minY: Number(entry.bounds.minY) * density,
@@ -162,6 +187,11 @@ export function createPoliticalIdRasterWorkerRuntime({
         strokeWidth: Number(packet.strokeWidth ?? 0.75),
         gutter: Number(packet.gutter ?? 0),
         getCachedPath,
+        createProjectedPath: packet.residentGeometry ? (entry) => {
+          const path = new Path2D();
+          drawPackedRasterGeometry(entry.feature, projection, path, 4.5);
+          return path;
+        } : null,
         d3: projectionApi,
         isCancelled,
       });
@@ -169,6 +199,7 @@ export function createPoliticalIdRasterWorkerRuntime({
         Object.assign(tile.stats ||= {}, {
           pathBuilds, pathCacheHits, pathCacheEntries: localCache.size,
           pathCacheEstimatedBytes: localEstimatedBytes,
+          residentGeometryBytes: geometry.getBytes(), pathBytes: localEstimatedBytes,
         });
         postMessage({ taskId, type: "RESULT", tile }, [tile.codes.buffer, tile.edgeIds.buffer, tile.edgeWeights.buffer]);
         pathCache = localCache;
@@ -194,7 +225,7 @@ export function createPoliticalIdRasterWorkerRuntime({
       if (task) { task.cancelled = true; task.controller.abort(); }
       return;
     }
-    if (!["BUILD_POLITICAL_ID_TILE", "LOAD_POLITICAL_ID_ASSET", "SAVE_POLITICAL_ID_ASSET"].includes(data.type)) {
+    if (!["BUILD_POLITICAL_ID_TILE", "SYNC_POLITICAL_ID_GEOMETRY", "LOAD_POLITICAL_ID_ASSET", "SAVE_POLITICAL_ID_ASSET"].includes(data.type)) {
       postMessage({ taskId, type: "ERROR", message: "Unsupported political ID raster task." });
       return;
     }
@@ -202,11 +233,15 @@ export function createPoliticalIdRasterWorkerRuntime({
     if (previous) { previous.cancelled = true; previous.controller.abort(); }
     const task = { ...data, taskId, packet: data.packet || {}, cancelled: false, controller: new AbortController() };
     tasks.set(taskId, task);
-    queue = queue.then(() => run(task), () => run(task));
+    if (task.type === "LOAD_POLITICAL_ID_ASSET" || task.type === "SAVE_POLITICAL_ID_ASSET") {
+      void run(task);
+    } else geometryQueue = geometryQueue.then(() => run(task), () => run(task));
   }
 
   return {
     handleMessage, dispose, getPendingTaskCount: () => tasks.size,
+    getGeometryStats: () => ({ residentGeometryBytes: geometry.getBytes(), pathBytes: pathCacheEstimatedBytes,
+      geometryBudgetBytes: geometryCacheMaxBytes, pathBudgetBytes: pathCacheMaxEstimatedBytes }),
     getPathCacheStats: () => ({
       geometryNamespace: cacheNamespace, pathCacheEntries: pathCache.size,
       pathCacheEstimatedBytes,

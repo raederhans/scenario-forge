@@ -358,15 +358,23 @@ export function createPoliticalCollectionOwner({
   }
 
   function mergeOverrideFeatures(baseFeatures, overrideCollection) {
+    return consumePreparation(mergeOverrideFeaturesSteps(baseFeatures, overrideCollection));
+  }
+
+  function* mergeOverrideFeaturesSteps(baseFeatures, overrideCollection) {
     const order = [];
     const featureById = new Map();
 
-    baseFeatures.forEach((feature) => {
+    for (let index = 0, length = baseFeatures.length; index < length; index++) {
+      if (!(index in baseFeatures)) { yield; continue; }
+      const feature = baseFeatures[index];
       const featureId = getFeatureId(feature);
-      if (!featureId || featureById.has(featureId)) return;
-      order.push(featureId);
-      featureById.set(featureId, feature);
-    });
+      if (featureId && !featureById.has(featureId)) {
+        order.push(featureId);
+        featureById.set(featureId, feature);
+      }
+      yield;
+    }
 
     let applied = 0;
     let replaced = 0;
@@ -374,22 +382,25 @@ export function createPoliticalCollectionOwner({
     const overrides = Array.isArray(overrideCollection?.features)
       ? overrideCollection.features
       : [];
-    overrides.forEach((feature) => {
-      if (!feature?.geometry) return;
+    for (let index = 0, length = overrides.length; index < length; index++) {
+      if (!(index in overrides)) { yield; continue; }
+      const feature = overrides[index];
+      if (!feature?.geometry) { yield; continue; }
       const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: "ru_override" });
       const featureId = getFeatureId(normalizedFeature);
-      if (!featureId) return;
+      if (!featureId) { yield; continue; }
 
       const replaceIds = parseReplaceFeatureIds(
         normalizedFeature?.properties?.replace_ids ??
         normalizedFeature?.properties?.replaceIds ??
         ""
       );
-      replaceIds.forEach((replaceId) => {
+      for (const replaceId of replaceIds) {
         if (featureById.delete(replaceId)) {
           replaced += 1;
         }
-      });
+        yield;
+      }
 
       const existing = featureById.has(featureId);
       featureById.set(featureId, {
@@ -403,7 +414,8 @@ export function createPoliticalCollectionOwner({
         order.push(featureId);
       }
       applied += 1;
-    });
+      yield;
+    }
 
     if (applied > 0) {
       console.info(
@@ -411,9 +423,12 @@ export function createPoliticalCollectionOwner({
       );
     }
 
-    return order
-      .filter((id) => featureById.has(id))
-      .map((id) => featureById.get(id));
+    const result = [];
+    for (const id of order) {
+      if (featureById.has(id)) result.push(featureById.get(id));
+      yield;
+    }
+    return result;
   }
 
   function composePoliticalFeatures(primaryTopology, detailTopology, overrideCollection = null) {
@@ -454,31 +469,96 @@ export function createPoliticalCollectionOwner({
     return result;
   }
 
+  function consumePreparation(iterator) {
+    let next = iterator.next();
+    while (!next.done) next = iterator.next();
+    return next.value;
+  }
+
+  async function consumePreparationChunked(iterator, {
+    isCurrent = () => true,
+    yieldControl = () => new Promise((resolve) => setTimeout(resolve, 0)),
+    nowMs = () => globalThis.performance?.now?.() ?? Date.now(),
+  } = {}) {
+    let yieldCount = 0;
+    let maxSliceMs = 0;
+    let sliceStartedAt = nowMs();
+    let steps = 0;
+    // Input can replace authority while yielded. Guard every slice and the
+    // final result without paying the whole-scene identity check per feature.
+    let current = isCurrent();
+    while (current) {
+      const next = iterator.next();
+      const sliceMs = Math.max(0, nowMs() - sliceStartedAt);
+      maxSliceMs = Math.max(maxSliceMs, sliceMs);
+      if (next.done) {
+        if (!isCurrent()) break;
+        return { status: "prepared", value: next.value, yieldCount, maxSliceMs };
+      }
+      if (++steps >= 400 || sliceMs >= 6) {
+        if (!isCurrent()) break;
+        yieldCount += 1;
+        await yieldControl();
+        current = isCurrent();
+        sliceStartedAt = nowMs();
+        steps = 0;
+      }
+    }
+    iterator.return();
+    return { status: "cancelled", value: null, yieldCount, maxSliceMs };
+  }
+
   function composePoliticalFeatureCollections(primaryCollection, detailCollection = null, overrideCollection = null) {
+    return consumePreparation(composePoliticalFeatureCollectionsSteps(primaryCollection, detailCollection, overrideCollection));
+  }
+
+  async function composePoliticalFeatureCollectionsChunked(primaryCollection, detailCollection = null, overrideCollection = null, options = {}) {
+    const { value, ...result } = await consumePreparationChunked(
+      composePoliticalFeatureCollectionsSteps(primaryCollection, detailCollection, overrideCollection), options
+    );
+    return { ...result, collection: value };
+  }
+
+  function* composePoliticalFeatureCollectionsSteps(primaryCollection, detailCollection, overrideCollection) {
     const geometrySnapshot = getPoliticalGeometrySnapshot(detailCollection);
     if (geometrySnapshot && detailCollection.globalCoverage === true && !overrideCollection) {
       const featuresById = new Map();
+      const features = [];
+      const preparation = { complete: false, snapshotRevision: geometrySnapshot.revision };
       const changedIds = new Set(geometrySnapshot.changedIds);
       let complete = true;
       // Source membership is indexed by the chunk store. Metadata remains
       // editable: retain shallow snapshot checks and propagate wrapper changes.
       for (const [id, feature] of geometrySnapshot.featuresById) {
-        if (!getFeatureId(feature)) continue;
+        if (!getFeatureId(feature)) {
+          yield;
+          continue;
+        }
         const cached = indexedDetailWrappers.get(feature);
         let wrapped = cached && matchesSnapshot(feature, cached.featureSnapshot)
           && matchesSnapshot(feature.properties, cached.propertiesSnapshot) ? cached.wrapped : null;
+        // Composition can finish before its caller cancels publication. Keep
+        // metadata candidates on same-revision retries for the committed cache.
+        if (wrapped && (cached.preparation?.complete === false
+          || cached.preparation?.snapshotRevision === geometrySnapshot.revision)) {
+          changedIds.add(id);
+          indexedDetailWrappers.set(feature, { ...cached, preparation });
+        }
         if (!wrapped) {
           const normalized = normalizeFeatureGeometry(feature, { sourceLabel: "detail" });
           wrapped = { ...normalized, properties: { ...(normalized?.properties || {}), __source: "detail" } };
           changedIds.add(id);
           if (normalizedGeometryByGeometry.has(feature?.geometry)) indexedDetailWrappers.set(feature, {
-            featureSnapshot: { ...feature }, propertiesSnapshot: { ...(feature.properties || {}) }, wrapped,
+            featureSnapshot: { ...feature }, propertiesSnapshot: { ...(feature.properties || {}) }, wrapped, preparation,
           });
           else complete = false;
         }
         featuresById.set(id, wrapped);
+        features.push(wrapped);
+        yield;
       }
-      const result = { type: "FeatureCollection", features: [...featuresById.values()] };
+      const result = { type: "FeatureCollection", features };
+      preparation.complete = true;
       return complete ? registerPoliticalGeometrySnapshot(result, { ...geometrySnapshot, featuresById, changedIds: [...changedIds] }) : result;
     }
     // A complete scenario collection owns every region, including its shell
@@ -486,41 +566,47 @@ export function createPoliticalCollectionOwner({
     const normalizedPrimaryCollection = detailCollection?.globalCoverage !== true && Array.isArray(primaryCollection?.features)
       ? primaryCollection
       : { type: "FeatureCollection", features: [] };
-    const normalizedDetailCollection = Array.isArray(detailCollection?.features)
-      ? {
-        type: "FeatureCollection",
-        features: detailCollection.features.map((feature) => {
+    let normalizedDetailCollection = null;
+    if (Array.isArray(detailCollection?.features)) {
+      const sourceFeatures = detailCollection.features;
+      const normalizedFeatures = new Array(sourceFeatures.length);
+      for (let index = 0, length = sourceFeatures.length; index < length; index++) {
+        if (index in sourceFeatures) {
+          const feature = sourceFeatures[index];
           // Geometry and metadata can be replaced independently on a feature.
           // Compare shallow snapshots so scalar metadata edits stay visible.
           const cached = normalizedDetailWrapperByFeature.get(feature);
           if (cached && matchesSnapshot(feature, cached.featureSnapshot)
             && matchesSnapshot(feature.properties, cached.propertiesSnapshot)) {
-            return cached.wrapped;
+            normalizedFeatures[index] = cached.wrapped;
+          } else {
+            const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: "detail" });
+            const wrapped = {
+              ...normalizedFeature,
+              properties: {
+                ...(normalizedFeature?.properties || {}),
+                __source: "detail",
+              },
+            };
+            // A failed normalization must be retried on the next composition.
+            if (normalizedGeometryByGeometry.has(feature?.geometry)) {
+              normalizedDetailWrapperByFeature.set(feature, {
+                featureSnapshot: { ...feature },
+                propertiesSnapshot: { ...(feature.properties || {}) },
+                wrapped,
+              });
+            }
+            normalizedFeatures[index] = wrapped;
           }
-          const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: "detail" });
-          const wrapped = {
-            ...normalizedFeature,
-            properties: {
-              ...(normalizedFeature?.properties || {}),
-              __source: "detail",
-            },
-          };
-          // A failed normalization must be retried on the next composition.
-          if (normalizedGeometryByGeometry.has(feature?.geometry)) {
-            normalizedDetailWrapperByFeature.set(feature, {
-              featureSnapshot: { ...feature },
-              propertiesSnapshot: { ...(feature.properties || {}) },
-              wrapped,
-            });
-          }
-          return wrapped;
-        }),
+        }
+        yield;
       }
-      : null;
+      normalizedDetailCollection = { type: "FeatureCollection", features: normalizedFeatures };
+    }
     if (!normalizedDetailCollection) {
       const baseFeatures = normalizedPrimaryCollection.features;
       const features = overrideCollection
-        ? mergeOverrideFeatures(baseFeatures, overrideCollection)
+        ? yield* mergeOverrideFeaturesSteps(baseFeatures, overrideCollection)
         : baseFeatures;
       return {
         type: "FeatureCollection",
@@ -529,18 +615,23 @@ export function createPoliticalCollectionOwner({
     }
     const detailCountries = new Set();
     const detailFeatureIdsByCountry = new Map();
-    normalizedDetailCollection.features.forEach((feature) => {
-      const code = getFeatureCountryCodeNormalized(feature);
-      if (code) detailCountries.add(code);
-      const featureId = getFeatureId(feature);
-      if (!code || !featureId) return;
-      let ids = detailFeatureIdsByCountry.get(code);
-      if (!ids) {
-        ids = new Set();
-        detailFeatureIdsByCountry.set(code, ids);
+    for (let index = 0, length = normalizedDetailCollection.features.length; index < length; index++) {
+      if (index in normalizedDetailCollection.features) {
+        const feature = normalizedDetailCollection.features[index];
+        const code = getFeatureCountryCodeNormalized(feature);
+        if (code) detailCountries.add(code);
+        const featureId = getFeatureId(feature);
+        if (code && featureId) {
+          let ids = detailFeatureIdsByCountry.get(code);
+          if (!ids) {
+            ids = new Set();
+            detailFeatureIdsByCountry.set(code, ids);
+          }
+          ids.add(featureId);
+        }
       }
-      ids.add(featureId);
-    });
+      yield;
+    }
 
     const seen = new Set();
     const features = [];
@@ -553,8 +644,13 @@ export function createPoliticalCollectionOwner({
       features.push(feature);
     };
 
-    normalizedDetailCollection.features.forEach(pushIfUnique);
-    normalizedPrimaryCollection.features.forEach((feature) => {
+    for (let index = 0, length = normalizedDetailCollection.features.length; index < length; index++) {
+      if (index in normalizedDetailCollection.features) pushIfUnique(normalizedDetailCollection.features[index]);
+      yield;
+    }
+    for (let index = 0, length = normalizedPrimaryCollection.features.length; index < length; index++) {
+      if (!(index in normalizedPrimaryCollection.features)) { yield; continue; }
+      const feature = normalizedPrimaryCollection.features[index];
       const code = getFeatureCountryCodeNormalized(feature);
       if (code && detailCountries.has(code)) {
         const featureId = getFeatureId(feature);
@@ -571,13 +667,12 @@ export function createPoliticalCollectionOwner({
           };
           pushIfUnique(promotedFeature);
         }
-        return;
-      }
-      pushIfUnique(feature);
-    });
+      } else pushIfUnique(feature);
+      yield;
+    }
 
     const mergedFeatures = overrideCollection
-      ? mergeOverrideFeatures(features, overrideCollection)
+      ? yield* mergeOverrideFeaturesSteps(features, overrideCollection)
       : features;
 
     return {
@@ -586,14 +681,14 @@ export function createPoliticalCollectionOwner({
     };
   }
 
-  function collectCountryCoverageStats(features = []) {
+  function createCountryCoverageAccumulator(totalFeatures) {
     const detailCountries = new Set();
     const primaryCountries = new Set();
     let detailFeatureCount = 0;
     let primaryFeatureCount = 0;
     const countryCoverage = new Map();
 
-    features.forEach((feature) => {
+    function add(feature) {
       const countryCode = getFeatureCountryCodeNormalized(feature);
       if (!countryCode) return;
       const source = String(feature?.properties?.__source || "primary");
@@ -623,112 +718,120 @@ export function createPoliticalCollectionOwner({
           countryEntry.promotedPrimaryFeatures += 1;
         }
       }
-    });
+    }
 
-    const detailCountryList = [];
-    const primaryCountryList = [];
-    const priorityCountryGaps = [];
-    Array.from(countryCoverage.values())
-      .sort((a, b) => a.countryCode.localeCompare(b.countryCode))
-      .forEach((entry) => {
-        entry.detailOnly = entry.detailFeatures > 0 && entry.primaryFeatures === 0;
-        if (entry.detailFeatures > 0) {
-          detailCountryList.push(entry);
-        }
-        if (entry.primaryFeatures > 0) {
-          primaryCountryList.push(entry);
-        }
-        if (entry.priorityCountry && entry.primaryFeatures > 0) {
-          priorityCountryGaps.push({
-            countryCode: entry.countryCode,
-            primaryFeatures: entry.primaryFeatures,
-            promotedPrimaryFeatures: entry.promotedPrimaryFeatures,
-            detailFeatures: entry.detailFeatures,
-          });
-        }
-      });
+    function finish() {
+      const detailCountryList = [];
+      const primaryCountryList = [];
+      const priorityCountryGaps = [];
+      Array.from(countryCoverage.values())
+        .sort((a, b) => a.countryCode.localeCompare(b.countryCode))
+        .forEach((entry) => {
+          entry.detailOnly = entry.detailFeatures > 0 && entry.primaryFeatures === 0;
+          if (entry.detailFeatures > 0) {
+            detailCountryList.push(entry);
+          }
+          if (entry.primaryFeatures > 0) {
+            primaryCountryList.push(entry);
+          }
+          if (entry.priorityCountry && entry.primaryFeatures > 0) {
+            priorityCountryGaps.push({
+              countryCode: entry.countryCode,
+              primaryFeatures: entry.primaryFeatures,
+              promotedPrimaryFeatures: entry.promotedPrimaryFeatures,
+              detailFeatures: entry.detailFeatures,
+            });
+          }
+        });
 
-    const totalCountries = new Set([...detailCountries, ...primaryCountries]).size;
-    return {
-      totalCountries,
-      detailCountries: detailCountries.size,
-      primaryCountries: primaryCountries.size,
-      totalFeatures: features.length,
-      detailFeatures: detailFeatureCount,
-      primaryFeatures: primaryFeatureCount,
-      detailCountryList,
-      primaryCountryList,
-      priorityCountryGaps,
-    };
+      const totalCountries = new Set([...detailCountries, ...primaryCountries]).size;
+      return {
+        totalCountries,
+        detailCountries: detailCountries.size,
+        primaryCountries: primaryCountries.size,
+        totalFeatures,
+        detailFeatures: detailFeatureCount,
+        primaryFeatures: primaryFeatureCount,
+        detailCountryList,
+        primaryCountryList,
+        priorityCountryGaps,
+      };
+    }
+    return { add, finish };
+  }
+
+  function collectCountryCoverageStats(features = []) {
+    const coverage = createCountryCoverageAccumulator(features.length);
+    for (const feature of features) coverage.add(feature);
+    return coverage.finish();
   }
 
   function buildInteractiveLandData(fullCollection) {
-    if (!Array.isArray(fullCollection?.features) || !fullCollection.features.length) {
-      return fullCollection;
-    }
+    return consumePreparation(preparePoliticalCollectionViewSteps(fullCollection, false)).interactiveCollection;
+  }
 
-    const explicitFeatures = fullCollection.features.filter((feature) =>
-      isPoliticalInteractionRenderableFeature(feature, getFeatureId(feature))
+  async function preparePoliticalCollectionViewChunked(fullCollection, options = {}) {
+    const { value, ...result } = await consumePreparationChunked(
+      preparePoliticalCollectionViewSteps(fullCollection, true), options
     );
-    const explicitCollection = explicitFeatures.length === fullCollection.features.length
-      ? fullCollection
-      : {
-        type: "FeatureCollection",
-        features: explicitFeatures,
-      };
-    if (!Array.isArray(explicitCollection?.features) || !explicitCollection.features.length) {
-      return explicitCollection;
-    }
+    return { ...result, interactiveCollection: value?.interactiveCollection ?? null, coverage: value?.coverage ?? null };
+  }
 
+  function* preparePoliticalCollectionViewSteps(fullCollection, includeCoverage) {
+    const sourceFeatures = Array.isArray(fullCollection?.features) ? fullCollection.features : [];
+    const coverage = includeCoverage ? createCountryCoverageAccumulator(sourceFeatures.length) : null;
+    const finish = (interactiveCollection) => ({ interactiveCollection, coverage: coverage?.finish() });
+    if (!sourceFeatures.length) return finish(fullCollection);
+
+    const explicitFeatures = [];
     const filterStateByCountry = new Map();
-    explicitCollection.features.forEach((feature) => {
-      const countryCode = getFeatureCountryCodeNormalized(feature);
-      const blockedTiers = interactiveAggregateTierFilters[countryCode];
-      if (!countryCode || !blockedTiers?.size) return;
-
-      const tier = getDetailTier(feature).toLowerCase();
-      let entry = filterStateByCountry.get(countryCode);
-      if (!entry) {
-        entry = {
-          blockedTiers,
-          hasLeaf: false,
-          hasBlocked: false,
-        };
-        filterStateByCountry.set(countryCode, entry);
+    for (const feature of sourceFeatures) {
+      coverage?.add(feature);
+      if (isPoliticalInteractionRenderableFeature(feature, getFeatureId(feature))) {
+        explicitFeatures.push(feature);
+        const countryCode = getFeatureCountryCodeNormalized(feature);
+        const blockedTiers = interactiveAggregateTierFilters[countryCode];
+        if (countryCode && blockedTiers?.size) {
+          const tier = getDetailTier(feature).toLowerCase();
+          let entry = filterStateByCountry.get(countryCode);
+          if (!entry) {
+            entry = { blockedTiers, hasLeaf: false, hasBlocked: false };
+            filterStateByCountry.set(countryCode, entry);
+          }
+          if (blockedTiers.has(tier)) entry.hasBlocked = true;
+          else if (String(feature?.properties?.__source || "primary") === "detail") entry.hasLeaf = true;
+        }
       }
-
-      if (blockedTiers.has(tier)) {
-        entry.hasBlocked = true;
-        return;
-      }
-
-      if (String(feature?.properties?.__source || "primary") === "detail") {
-        entry.hasLeaf = true;
-      }
-    });
-
-    const activeFilters = new Map(
-      Array.from(filterStateByCountry.entries()).filter(([, entry]) => entry.hasLeaf && entry.hasBlocked)
-    );
-    if (!activeFilters.size) {
-      return applyFragmentCamouflageToCollection(explicitCollection);
+      yield;
     }
+    const explicitCollection = explicitFeatures.length === sourceFeatures.length
+      ? fullCollection
+      : { type: "FeatureCollection", features: explicitFeatures };
+    if (!explicitFeatures.length) return finish(explicitCollection);
 
-    const filteredFeatures = explicitCollection.features.filter((feature) => {
-      const countryCode = getFeatureCountryCodeNormalized(feature);
-      const entry = activeFilters.get(countryCode);
-      if (!entry) return true;
-      return !entry.blockedTiers.has(getDetailTier(feature).toLowerCase());
-    });
-
-    if (filteredFeatures.length === explicitCollection.features.length) {
-      return applyFragmentCamouflageToCollection(explicitCollection);
+    const activeFilters = new Map();
+    for (const [code, entry] of filterStateByCountry) {
+      if (entry.hasLeaf && entry.hasBlocked) activeFilters.set(code, entry);
+      yield;
     }
-
-    return applyFragmentCamouflageToCollection({
-      type: "FeatureCollection",
-      features: filteredFeatures,
-    });
+    if (!activeFilters.size && !fragmentCamouflageRuleEntries.length) return finish(explicitCollection);
+    const features = [];
+    let changed = false;
+    let filtered = false;
+    for (const feature of explicitFeatures) {
+      const entry = activeFilters.size ? activeFilters.get(getFeatureCountryCodeNormalized(feature)) : null;
+      if (entry?.blockedTiers.has(getDetailTier(feature).toLowerCase())) {
+        changed = true;
+        filtered = true;
+      } else {
+        const camouflaged = fragmentCamouflageRuleEntries.length ? applyFragmentCamouflageToFeature(feature) : feature;
+        if (camouflaged !== feature) changed = true;
+        features.push(camouflaged);
+      }
+      yield;
+    }
+    return finish(filtered ? { type: "FeatureCollection", features }
+      : changed ? { ...explicitCollection, features } : explicitCollection);
   }
 
   return {
@@ -737,6 +840,8 @@ export function createPoliticalCollectionOwner({
     buildInteractiveLandData,
     collectCountryCoverageStats,
     composePoliticalFeatureCollections,
+    composePoliticalFeatureCollectionsChunked,
+    preparePoliticalCollectionViewChunked,
     composePoliticalFeatures,
     getPoliticalFeatureCollection,
     mergeOverrideFeatures,

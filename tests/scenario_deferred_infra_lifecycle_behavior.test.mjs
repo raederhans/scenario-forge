@@ -84,6 +84,28 @@ test("obsolete deferred callback cannot release or execute a replacement handle"
   assert.equal(replacement.cancelled, true, "old callback must not drop the replacement handle");
 });
 
+test("visual and deferred infrastructure reuse current prepared coverage without rescanning political features", async () => {
+  let scans = 0, current = true;
+  const coverage = { completePoliticalFeatureCount: 1, primaryVisibleFeatureSubsetActive: false,
+    landDataCoverageMissing: false, colorCoverageMissing: false };
+  const { state, runtime, scheduled } = createFixture({
+    buildInteractiveLandData: (collection) => { scans++; return collection; },
+    rebuildPrimaryPoliticalDerivedState: () => ({ getPreparedCoverage: () => current ? coverage : null }),
+  });
+  const full = { features: [{ id: "leaf" }] };
+  Object.assign(state, { scenarioPoliticalChunkData: full, scenarioPoliticalVisibleChunkData: null,
+    landDataFull: full, landData: full, colors: { leaf: "blue" } });
+  runtime.refreshMapDataForScenarioChunkPromotion({ suppressRender: true, hasPoliticalPayloadChange: true });
+  assert.equal(scans, 0);
+  assert.equal(await scheduled.at(-1).callback(), true);
+  assert.equal(scans, 0);
+  current = false;
+  runtime.refreshMapDataForScenarioChunkPromotion({ suppressRender: true, hasPoliticalPayloadChange: true });
+  assert.equal(scans, 1, "expired coverage must be checked again");
+  assert.equal(await scheduled.at(-1).callback(), true);
+  assert.equal(scans, 2, "no-mutation deferred refresh scans once, never twice");
+});
+
 test("deferred infra failure terminates its pending state and keeps the error observable", async () => {
   const failure = new Error("spatial build failed");
   const { state, calls, runtime } = createFixture({
@@ -199,4 +221,63 @@ test("an awaited spatial result for a replaced load state cannot update the new 
   await Promise.resolve();
   release();
   assert.equal(await nextRun, true);
+});
+
+function completePoliticalFixture() {
+  const fixture = createFixture({ buildInteractiveLandData: collection => collection });
+  const full = { features: [{ id: "leaf" }] };
+  Object.assign(fixture.state, { scenarioPoliticalChunkData: full, scenarioPoliticalVisibleChunkData: null,
+    landDataFull: full, landData: full, colors: { leaf: "blue" } });
+  return fixture;
+}
+
+test("complete no-restore infra requests committed border preservation without skipping border refresh effects", async () => {
+  const { state, calls, runtime } = completePoliticalFixture();
+  state.runtimeChunkLoadState.pendingInfraPromotion = { reason: "zoom-end" };
+  assert.equal(await runtime.runDeferredScenarioChunkPromotionInfraRefresh({
+    hasPoliticalGeometryChange: true, completePoliticalDerivedStateReady: true, refreshOpeningOwnerBorders: false,
+  }), true);
+  assert.deepEqual(calls.filter(([name]) => name === "invalidateBorderCache"),
+    [["invalidateBorderCache", { preservePreparedSurface: true }]]);
+  assert.ok(!calls.some(([name]) => name === "rebuildPoliticalLandCollections" || name === "refreshScenarioOpeningOwnerBorders"));
+  for (const effect of ["ensureSovereigntyState", "updateDynamicBorderStatusUI", "updateSpecialZonesPaths",
+    "renderSpecialZoneEditorOverlay", "render"]) {
+    assert.ok(calls.some(([name]) => name === effect), `${effect} still runs`);
+  }
+  assert.equal(state.runtimeChunkLoadState.pendingInfraPromotion, null);
+  assert.equal(state.activeInteractionRecoveryTaskKey, "");
+});
+
+test("infra requiring opening-owner borders retains the original unconditional invalidation contract", async () => {
+  const { calls, runtime } = completePoliticalFixture();
+  assert.equal(await runtime.runDeferredScenarioChunkPromotionInfraRefresh({
+    hasPoliticalGeometryChange: true, completePoliticalDerivedStateReady: true,
+  }), true);
+  assert.deepEqual(calls.filter(([name]) => name === "invalidateBorderCache"), [["invalidateBorderCache"]]);
+  const openingIndex = calls.findIndex(([name]) => name === "refreshScenarioOpeningOwnerBorders");
+  const invalidateIndex = calls.findIndex(([name]) => name === "invalidateBorderCache");
+  assert.ok(openingIndex >= 0 && openingIndex < invalidateIndex);
+});
+
+test("actual full political restoration cannot request preservation even when derived readiness was supplied", async () => {
+  const { calls, runtime } = completePoliticalFixture();
+  assert.equal(await runtime.runDeferredScenarioChunkPromotionInfraRefresh({
+    hasPoliticalGeometryChange: true, completePoliticalDerivedStateReady: true,
+    primaryVisibleDerivedStateReady: true, refreshOpeningOwnerBorders: false,
+  }), true);
+  assert.ok(calls.some(([name]) => name === "rebuildPoliticalLandCollections"));
+  assert.ok(calls.some(([name]) => name === "rebuildRuntimeDerivedState"));
+  assert.deepEqual(calls.filter(([name]) => name === "invalidateBorderCache"), [["invalidateBorderCache"]]);
+  const metric = calls.find(([method, name]) => method === "recordRenderPerfMetric" && name === "chunkPromotionDeferredInfraMs");
+  assert.equal(metric[3].restoredFullPoliticalChunkData, true);
+});
+
+test("infra without complete political derived inputs retains the original invalidation call", async () => {
+  const { calls, runtime } = createFixture();
+  assert.equal(await runtime.runDeferredScenarioChunkPromotionInfraRefresh({
+    hasPoliticalGeometryChange: true, completePoliticalDerivedStateReady: false, refreshOpeningOwnerBorders: false,
+  }), true);
+  assert.deepEqual(calls.filter(([name]) => name === "invalidateBorderCache"), [["invalidateBorderCache"]]);
+  assert.ok(calls.some(([name]) => name === "buildIndex"));
+  assert.ok(calls.some(([name]) => name === "buildSpatialIndexChunked"));
 });

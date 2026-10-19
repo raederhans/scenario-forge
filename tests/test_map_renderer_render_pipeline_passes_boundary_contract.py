@@ -210,10 +210,14 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         self.assertIsNone(re.search(r"(?m)^\s*function\s+getIdleRenderPassDefinitions\s*\(", renderer_content))
         self.assertIsNone(re.search(r"(?m)^\s*function\s+prepareIdleRenderPassDefinition\s*\(", renderer_content))
         self.assertIsNone(re.search(r"(?m)^\s*function\s+ensureIdleRenderPasses\s*\(", renderer_content))
-        # Exact-resolution export reuses the owner's pass catalog in its isolated cache.
-        # Interactive idle scheduling remains in the extracted scheduler.
+        # Export and initial direct-scene coverage reuse the owner's catalog.
+        # Subsequent retained navigation never rebuilds mutable pass canvases.
         pass_catalog_call = "getRenderPipelinePassesOwner().getIdleRenderPassDefinitions()"
-        self.assertEqual(renderer_content.count(pass_catalog_call), 1)
+        self.assertEqual(renderer_content.count(pass_catalog_call), 2)
+        scene_content = renderer_content.split("function getTnoRasterSceneOwner()", 1)[1].split(
+            "function getPoliticalIdRasterRuntimeOwner()", 1
+        )[0]
+        self.assertEqual(scene_content.count(pass_catalog_call), 1)
         export_content = renderer_content.split("function renderExportPassesToCanvas(", 1)[1].split(
             "\nfunction composeTransformedFrameToBuffer(", 1
         )[0]
@@ -298,7 +302,7 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         self.assertIn("function ensureIdleRenderPasses(timings, passNames = null) {", owner_content)
         self.assertIn(
             "canYieldRenderPassWork: () => runtimeState.firstVisibleFramePainted\n"
-            "        && isBootInteractionReady() && !hasPendingPoliticalColorEdit()",
+            "        && isBootInteractionReady() && (!hasPendingPoliticalColorEdit() || tnoRasterSceneOwner?.isActive())",
             renderer_content,
         )
         self.assertIn("const activePassNames = getActiveRenderPassNames();", owner_content)

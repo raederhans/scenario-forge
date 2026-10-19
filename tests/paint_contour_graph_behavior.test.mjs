@@ -1,7 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import { buildPaintContourGraph, createPaintContourGraphBuilder } from '../js/core/renderer/paint_contour_graph.js';
 import { createPaintContourMesh } from '../js/core/renderer/paint_contour_mesh.js';
+
+// Exercise the two internal numerical primitives without widening the public API.
+let scalarInternals;
+function readScalarInternals() {
+  return scalarInternals ||= readFile(new URL('../js/core/renderer/paint_contour_graph.js', import.meta.url), 'utf8')
+    .then(source => import(`data:text/javascript;base64,${Buffer.from(`${source}\nexport { createCompactEdges, sourceEdgeQuery, sourceCollinear };`).toString('base64')}`));
+}
 
 const polygon = (id, rings) => ({ id, geometry: { type: 'Polygon', coordinates: rings } });
 const rect = (id, x0, y0, x1, y1) => polygon(id, [[[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]]]);
@@ -173,4 +182,140 @@ test('partially exact seams retain the unmatched interval for coarse/fine reconc
   assert.equal(g.diagnostics.nodedSharedSegments,1);
   assert.equal(g.diagnostics.quantizedSharedSegments,1);
   assert.deepEqual(segments(g),['A:B|[1,0]|[1,1]','A:B|[1,1]|[1,2]']);
+});
+
+function compactFixture() {
+  const features = [];
+  for (let row = 0; row < 12; row++) for (let column = 0; column < 16; column++) {
+    const x = -160 + column, y = -70 + row, ring = [], drift = column % 3 === 0 ? 1e-10 : 0;
+    for (let step = 0; step < 8; step++) ring.push([x + step / 8 + drift, y]);
+    for (let step = 0; step < 8; step++) ring.push([x + 1 + drift, y + step / 8]);
+    for (let step = 0; step < 8; step++) ring.push([x + 1 - step / 8 + drift, y + 1]);
+    for (let step = 0; step < 8; step++) ring.push([x + drift, y + 1 - step / 8]);
+    ring.push(ring[0]); if ((row + column) % 2) ring.reverse();
+    features.push({ ...polygon(`r${row}c${column}`, [ring]), coordinatePrecision: column % 3 ? 7 : 4 });
+  }
+  return features;
+}
+
+function graphBytes(graph) {
+  const hash = createHash('sha256');
+  hash.update(JSON.stringify([graph.featureIds, graph.diagnostics]));
+  for (const value of [graph.coordinates, graph.offsets, graph.owners]) hash.update(Buffer.from(value.buffer, value.byteOffset, value.byteLength));
+  return hash.digest('hex');
+}
+
+test('compact edge indexing preserves legacy packed bytes through rehash, patches, ambiguity and restore', () => {
+  const features = compactFixture(), before = JSON.stringify(features), builder = createPaintContourGraphBuilder();
+  builder.patch(features);
+  const hashes = [graphBytes(builder.finish())];
+  builder.patch([{ ...features[17], id: 'overlap-a' }, { ...features[17], id: 'overlap-b' }]);
+  assert.ok(builder.getStorageStats().overflowEdges > 0, 'three-way owners use the exceptional overflow path');
+  hashes.push(graphBytes(builder.finish()));
+  builder.patch([rect(features[0].id, -160, -70, -159, -68)], ['overlap-a', 'overlap-b', features[16].id]);
+  hashes.push(graphBytes(builder.finish()));
+  builder.patch([features[0], features[16]]);
+  hashes.push(graphBytes(builder.finish()));
+  // Frozen against the previous object/Map implementation, including feature
+  // IDs, diagnostics, exact Float64 coordinates, chain order and owner order.
+  assert.deepEqual(hashes, [
+    '449a25c14fb14c54122662cb29e34f4c861a98e4540002cc486eacade45f0325',
+    'f9b875485572987f89beceaba1699c233747b0653f917b3a6dfcd86318f0cfce',
+    'd1dab1d16163bb2ed491782525bacaed746b98e754074153504719de89bcc3f8',
+    'a3dc34332dc4cb416c4dda093ee57b3135016e6accc50cf004f6afe00c631157',
+  ]);
+  assert.equal(JSON.stringify(features), before);
+  assert.equal(builder.getStorageStats().overflowEdges, 0);
+});
+
+test('large regular grid matches an independent adjacency oracle with compact persistent storage', () => {
+  const width = 80, height = 40, features = [], expected = [];
+  const add = (left, right, ends) => expected.push(`${[left,right].sort().join(':')}|${ends.map(JSON.stringify).sort().join('|')}`);
+  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+    const id = `${x}:${y}`, feature = rect(id, x - 100, y - 50, x - 99, y - 49);
+    if ((x + y) % 2) feature.geometry.coordinates[0].reverse();
+    features.push(feature);
+    if (x + 1 < width) add(id, `${x+1}:${y}`, [[x-99,y-50],[x-99,y-49]]);
+    if (y + 1 < height) add(id, `${x}:${y+1}`, [[x-100,y-49],[x-99,y-49]]);
+  }
+  const builder = createPaintContourGraphBuilder(); builder.patch(features);
+  assert.deepEqual(segments(builder.finish()), expected.sort());
+  const storage = builder.getStorageStats();
+  assert.equal(storage.segmentCount, width * (height + 1) + height * (width + 1));
+  assert.equal(storage.featureEdgeIndexBytes, features.length * 4 * Uint32Array.BYTES_PER_ELEMENT);
+  assert.ok(storage.compactEdgeBytes <= (storage.segmentCount + 4096) * 96);
+  assert.equal(storage.overflowEdges, 0);
+});
+
+test('deletion tombstones and slot reuse remain bounded across repeated full replacements', () => {
+  const builder = createPaintContourGraphBuilder();
+  const original = Array.from({ length: 1500 }, (_, index) => rect(String(index), -150 + index % 60 * 2,
+    -60 + Math.floor(index / 60) * 2, -149 + index % 60 * 2, -59 + Math.floor(index / 60) * 2));
+  builder.patch(original);
+  const initial = builder.getStorageStats();
+  for (let generation = 0; generation < 12; generation++) {
+    const shifted = original.map(feature => ({ ...feature, geometry: { type: 'Polygon',
+      coordinates: feature.geometry.coordinates.map(ring => ring.map(([x,y]) => [x + generation / 100, y])) } }));
+    builder.patch([], original.map(feature => feature.id));
+    builder.patch(shifted);
+    const storage = builder.getStorageStats();
+    assert.equal(storage.segmentCount, initial.segmentCount);
+    assert.equal(storage.edgeCapacity, initial.edgeCapacity);
+    assert.equal(storage.featureEdgeIndexBytes, initial.featureEdgeIndexBytes);
+    assert.ok(storage.compactEdgeBytes <= initial.compactEdgeBytes * 2);
+  }
+  assert.equal(builder.finish().diagnostics.arcCount, 0);
+  builder.patch(original); assert.equal(builder.finish().diagnostics.arcCount, 0);
+});
+
+test('scalar interval queries retain mixed compact/split edge order and inclusive boundaries', async () => {
+  const { createCompactEdges, sourceEdgeQuery } = await readScalarInternals();
+  const store = createCompactEdges();
+  const add = (a, b) => store.getOrAdd(a, b, a, b);
+  add([10, 0], [30, 4]); add([10, 2], [20, 6]); add([-5, -4], [0, 0]);
+  add([-1800000000, 0], [1800000000, 0]); // Excluded world-spanning chord.
+  store.beginRead();
+  const originals = [...store.values()];
+  const split = { a: [10, -2], b: [25, 2], start: [1, -0.2], end: [2.5, 0.2] };
+  const excluded = { ...split, key: 99 };
+  const query = sourceEdgeQuery(store, [split, excluded]);
+  // Equal lower x values keep original insertion order before the split edge.
+  assert.deepEqual(query(10, -2, 10, 2), [originals[0], originals[1], split]);
+  assert.deepEqual(query(0, 0, 0, 0), [originals[2]]);
+  assert.deepEqual(query(30, 4, 30, 4), [originals[0]]);
+  assert.deepEqual(query(31, -90, 40, 90), []);
+  store.endRead();
+});
+
+test('scalar source collinearity preserves the original floating error operation order', async () => {
+  const { createCompactEdges, sourceCollinear } = await readScalarInternals();
+  const error = value => Math.max(Number.MIN_VALUE, Math.abs(value) * Number.EPSILON);
+  // Frozen pre-scalar formula: an oracle for the numerical acceptance boundary.
+  function original(edge, point) {
+    const [a, b] = [edge.start, edge.end];
+    const difference = (x, y) => [x - y, error(x) + error(y) + error(x - y)];
+    const [dx, dxError] = difference(b[0], a[0]), [dy, dyError] = difference(b[1], a[1]);
+    const [px, pxError] = difference(point[0], a[0]), [py, pyError] = difference(point[1], a[1]);
+    const left = dx * py, right = dy * px, determinant = left - right;
+    const bound = Math.abs(dx) * pyError + Math.abs(py) * dxError + dxError * pyError
+      + Math.abs(dy) * pxError + Math.abs(px) * dyError + dyError * pxError
+      + error(left) + error(right) + error(determinant);
+    return Number.isFinite(bound) && Math.abs(determinant) <= bound;
+  }
+  let accepted = 0, rejected = 0;
+  for (const [start, end] of [[[0, 0], [1, 1]], [[179, 89], [179.1, 89.1]],
+    [[-1e-20, -1e-20], [1e-20, 1e-20]], [[-0, 0], [0, 1]]]) {
+    const ordinary = { start, end }, store = createCompactEdges();
+    store.getOrAdd([0, 0], [1, 1], start, end);
+    const compact = [...store.values()][0];
+    for (const step of [0, 0.25, 0.5, 1]) for (const drift of [0, Number.MIN_VALUE, Number.EPSILON, 1e-12]) {
+      const point = [start[0] + (end[0] - start[0]) * step, start[1] + (end[1] - start[1]) * step + drift];
+      const expected = original(ordinary, point), other = { start: point, end: point };
+      expected ? accepted++ : rejected++;
+      for (const edge of [ordinary, compact]) for (const second of [false, true]) {
+        assert.equal(sourceCollinear(edge, other, second), expected);
+      }
+    }
+  }
+  assert.ok(accepted > 0 && rejected > 0);
 });

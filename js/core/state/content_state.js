@@ -243,6 +243,24 @@ export function commitBaseCitySupportData(
   return target.worldCitiesData;
 }
 
+// Every dictionary in this candidate was built privately. Publication must not
+// enumerate or clone the full base/alias maps again on the main thread.
+export function commitPreparedBaseCitySupportData(target, candidate) {
+  if (!target || typeof target !== "object" || !candidate) return null;
+  target.worldCitiesData = candidate.worldCities || null;
+  target.baseCityAliasesData = candidate.cityAliases || null;
+  target.baseGeoLocales = candidate.baseGeoLocales;
+  target.baseGeoAliasToStableKey = candidate.baseGeoAliasToStableKey;
+  target.locales = candidate.locales;
+  target.geoAliasToStableKey = candidate.geoAliasToStableKey;
+  target.cityLayerRevision = (Number(target.cityLayerRevision) || 0) + 1;
+  target.baseCityLocalizationReady = true;
+  target.baseCityDataState = "loaded";
+  target.baseCityDataError = "";
+  target.baseCityDataPromise = null;
+  return target.worldCitiesData;
+}
+
 export function failBaseCitySupportLoad(target, error) {
   if (!target || typeof target !== "object") {
     return "";
@@ -268,6 +286,74 @@ export function setBaseLocalizationDataPromise(target, promise = null) {
   }
   target.baseLocalizationDataPromise = promise || null;
   return target.baseLocalizationDataPromise;
+}
+
+// A private candidate owns its dictionaries until publication. Avoid large
+// spreads at the commit boundary: full geo dictionaries can contain 100k keys.
+export function* copyLocalizationEntries(target, source) {
+  if (!source || typeof source !== "object") return;
+  let copied = 0;
+  for (const key in source) {
+    if (!Object.hasOwn(source, key)) continue;
+    if (key === "__proto__") {
+      Object.defineProperty(target, key, { value: source[key], enumerable: true, writable: true, configurable: true });
+    } else {
+      target[key] = source[key];
+    }
+    if (++copied % 128 === 0) yield;
+  }
+}
+
+export async function prepareLocalizationCandidate(iterator, {
+  isCurrent = () => true,
+  yieldControl = () => globalThis.scheduler?.yield
+    ? globalThis.scheduler.yield()
+    : new Promise((resolve) => setTimeout(resolve, 0)),
+  nowMs = () => globalThis.performance?.now?.() ?? Date.now(),
+  sliceBudgetMs = 6,
+} = {}) {
+  // Start in a fresh task as well, so a settled fetch does not extend its task.
+  await yieldControl();
+  if (!isCurrent()) return null;
+  let startedAt = nowMs();
+  for (;;) {
+    const step = iterator.next();
+    if (step.done) return isCurrent() ? step.value : null;
+    if (nowMs() - startedAt >= sliceBudgetMs) {
+      await yieldControl();
+      if (!isCurrent()) return null;
+      startedAt = nowMs();
+    }
+  }
+}
+
+export function prepareFullLocalizationData({ uiLocales, geoLocales, aliasToStableKey, cityPatch } = {}, options) {
+  function* prepare() {
+    const candidate = { uiLocales: {}, baseGeoLocales: {}, baseGeoAliasToStableKey: {} };
+    yield* copyLocalizationEntries(candidate.uiLocales, uiLocales);
+    yield* copyLocalizationEntries(candidate.baseGeoLocales, geoLocales);
+    yield* copyLocalizationEntries(candidate.baseGeoLocales, cityPatch?.geo);
+    yield* copyLocalizationEntries(candidate.baseGeoAliasToStableKey, aliasToStableKey);
+    yield* copyLocalizationEntries(candidate.baseGeoAliasToStableKey, cityPatch?.aliasToStableKey);
+    return candidate;
+  }
+  return prepareLocalizationCandidate(prepare(), options);
+}
+
+export function commitPreparedFullLocalizationData(target, candidate) {
+  if (!target || typeof target !== "object" || !candidate) return null;
+  target.baseGeoLocales = candidate.baseGeoLocales;
+  target.baseGeoAliasToStableKey = candidate.baseGeoAliasToStableKey;
+  target.locales = candidate.locales;
+  target.geoAliasToStableKey = candidate.geoAliasToStableKey;
+  target.baseLocalizationLevel = "full";
+  target.baseLocalizationDataState = "loaded";
+  target.baseLocalizationDataError = "";
+  target.baseLocalizationDataPromise = null;
+  if (candidate.scenarioActive) {
+    target.cityLayerRevision = Math.max(0, Number(target.cityLayerRevision || 0)) + 1;
+  }
+  return target.locales;
 }
 
 export function commitFullLocalizationData(

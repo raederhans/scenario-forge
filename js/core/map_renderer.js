@@ -1,4 +1,9 @@
+import { isUsableLineMesh } from "./renderer/packed_line_mesh.js";
+import { createBorderCanvasPreparationOwner } from "./renderer/border_canvas_preparation_owner.js";
+import { createPhysicalViewportCacheOwner } from "./renderer/physical_viewport_cache_owner.js";
+import { planPhysicalViewportSurface } from "./renderer/physical_raster_surface.js";
 import { getMapLabelHierarchy } from "./renderer/map_label_hierarchy.js";
+import { analyzeScenarioPoliticalDerivedStateCoverageChunked } from "./renderer/scenario_chunk_promotion_helpers.js";
 import { getThematicWgiLegend, getThematicWgiSignature, isThematicWgiActive } from "./thematic_wgi_view_model.js";
 import { getPopulationLegend, getPopulationSignature, isPopulationRequested, isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "./population_spatial_view_model.js";
 import { getPopulationHeatmapSnapshot, ensurePopulationHeatmapData } from "./population_spatial_runtime.js";
@@ -43,11 +48,13 @@ import { createStaticBorderMeshLifecycle, getSourceCountriesSignature, getCoastl
 import { createPoliticalPathCacheOwner } from "./renderer/political_path_cache_owner.js";
 import { createPoliticalDerivedStateCache } from "./renderer/political_derived_state_cache.js";
 import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from "./political_geometry_store.js";
+import { getContextCollectionRevision, getContextGeometryRevision } from "./state/context_layer_revision.js";
 import { createCountryFillPaletteOwner } from "./renderer/country_fill_palette_owner.js";
 import { createGeometryRasterRuntimeOwner } from "./renderer/geometry_raster_runtime_owner.js";
 import { readPoliticalRenderPolicy, writePoliticalRenderMode, writePoliticalIdRasterPreference, getPoliticalIdRasterEligibility, publishPoliticalIdRasterStatus } from "./renderer/political_id_raster_trial.js";
-import { collectPoliticalRasterDisplayFeatures } from "./renderer/political_id_raster_source.js";
+import { collectPoliticalRasterDisplayFeatures, collectPoliticalRasterDisplayFeaturesAsync } from "./renderer/political_id_raster_source.js";
 import { createPoliticalIdRasterRuntimeOwner } from "./renderer/political_id_raster_runtime_owner.js";
+import { createTnoRasterSceneOwner } from "./renderer/tno_raster_scene_owner.js";
 import { createOverviewFrameOwner } from "./renderer/overview_frame_owner.js";
 import { createNavigationSceneOwner } from "./renderer/navigation_scene_owner.js";
 import { createLabelDrawSnapshotOwner } from "./renderer/label_draw_snapshot.js";
@@ -707,15 +714,19 @@ let staticMeshCache = {
 let countryFillPaletteOwner = null;
 let geometryRasterRuntimeOwner = null;
 let politicalIdRasterRuntimeOwner = null;
+let tnoRasterSceneOwner = null;
+let tnoRasterSceneFailure = "";
+let politicalPassUsesDirectScene = false;
 let politicalEntriesInvalidationEpoch = 0;
+let waterPreparationInvalidationEpoch = 0;
 let overviewFrameOwner = null;
 let navigationSceneOwner = null;
 const labelDrawSnapshotOwner = createLabelDrawSnapshotOwner();
 let navigationExactRefreshNeeded = false;
 let borderMeshWorkerRuntime = null;
 const geometryWorkerEnabled = new URLSearchParams(globalThis.location?.search || "").get("geometry_worker") !== "0";
-// Explicit opt-in until whole-application cold/warm and visual gates support a
-// default change. Scenario loading, editing and export have no separate format.
+// TNO defaults to the resident raster scene. Explicit vector and hybrid modes
+// retain their existing producers; canonical editing and export share one format.
 let politicalIdRasterActivationKey = "";
 let contourHostFillColorCache = new WeakMap();
 let staticMeshSourceCountries = {
@@ -781,6 +792,9 @@ let strategicOverlayRenderOwner = null;
 let borderMeshOwner = null;
 let specialZoneLayersRenderOwner = null;
 let borderDrawOwner = null;
+let borderPathPreparationJob = null;
+let borderPathPreparationFailedRevision = null;
+let borderPathPreparationStats = null;
 let interactionBorderSnapshotOwner = null;
 let spatialIndexRuntimeOwner = null;
 let renderPipelinePassesOwner = null;
@@ -1439,6 +1453,7 @@ function getRendererTransactionResetOwner() {
         getHitCanvasSchedulingOwner().cancelScheduledHitCanvasBuild(options)
       ),
       cancelSecondarySpatialBuild: () => {
+        secondarySpatialPreparationVersion++;
         cancelDeferredWork(secondarySpatialBuildHandle);
         secondarySpatialBuildHandle = null;
         pendingSecondarySpatialBuildReasons.clear();
@@ -1695,6 +1710,7 @@ function getUrbanCityPolicyOwner() {
       getDefaultCityMinZoomForTier,
       getUrbanFeatureStableId,
       isCityAnchorInViewport,
+      getCityPaintOverscanPx: () => Math.max(48, getTnoScenePaintOverscanPx("labels")),
       isCityLabelEligibleForPhase,
       isCityScenarioTagExcludedFromReveal,
     },
@@ -1711,6 +1727,7 @@ function getCityLabelOwner() {
     getters: {
       getContext: () => rendererSurfaceHost.getContext(),
       getViewportSize: () => ({ width: runtimeState.width, height: runtimeState.height }),
+      getPaintBounds: getTnoSceneLabelPaintBounds,
     },
     helpers: {
       clamp,
@@ -1743,6 +1760,10 @@ function getCityPointsRenderOwner() {
     },
     helpers: {
       buildCityRevealPlan: (...args) => buildCityRevealPlan(...args),
+      prepareCityRevealPlan: (...args) => getUrbanCityPolicyOwner().prepareCityRevealPlan(...args),
+      isPrivatePreparationEnabled: () => !exportRenderInProgress && isTnoRasterSceneSelected()
+        && tnoRasterSceneOwner?.isActive(),
+      getCityPaintOverscanPx: () => Math.max(48, getTnoScenePaintOverscanPx("labels")),
       clamp,
       collectContextMetric,
       drawCityLabelsFromEntries: (...args) => getCityLabelOwner().drawCityLabelsFromEntries(...args),
@@ -1881,6 +1902,11 @@ function getRiverLayerRenderOwner() {
       getDashPattern,
       getFeatureCollectionFeatureCount,
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+      getCachedStrokePath: (feature) => (
+        feature?.geometry?.type === "LineString" || feature?.geometry?.type === "MultiLineString"
+          ? getProjectedGeographicPath(feature)
+          : null
+      ),
       getSafeCanvasColor,
       nowMs,
       pathBoundsInScreen,
@@ -2514,6 +2540,12 @@ function getPaintContourDiagnostics() {
     internal: getRiverInternalContourOwner().diagnostics(), visibility: getRiverContourRenderOwner().diagnostics() };
 }
 
+function getBoundaryPathViewport() {
+  // Deleting fully offscreen segments changes native GPU stroke coverage.
+  // Preserve complete Path2D geometry; batch only independent native paints.
+  return null;
+}
+
 function getBorderDrawOwner() {
   if (borderDrawOwner) {
     return borderDrawOwner;
@@ -2558,6 +2590,7 @@ function getBorderDrawOwner() {
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
       getProjection: () => rendererSurfaceHost.getProjection(),
       getVisibleInternalBorderMeshSignature: () => visibleInternalBorderMeshSignature,
+      getBoundaryPathViewport,
     },
     helpers: {
       buildCountryParentBorderMeshes,
@@ -2582,6 +2615,176 @@ function getBorderDrawOwner() {
     },
   });
   return borderDrawOwner;
+}
+
+let physicalViewportCacheOwner = null;
+let borderCanvasPreparationOwner = null;
+let borderSourcePreparationPromise = null;
+const canvasCandidateMaxBytes = 80 * 1024 * 1024;
+const borderCanvasResourceOwner = Symbol("border-canvas-candidate");
+const physicalCanvasResourceOwner = Symbol("physical-canvas-candidate");
+function getPhysicalCandidateBytes() {
+  return physicalViewportCacheOwner?.getPendingBytes() || 0;
+}
+function readBorderCanvasSnapshot() {
+  if (exportRenderInProgress || !isTnoRasterSceneSelected() || runtimeState.isInteracting) return null;
+  const reference = cloneZoomTransform(runtimeState.zoomTransform);
+  const preparation = getBorderDrawOwner().getHierarchicalBordersPreparationState(reference.k);
+  if (!preparation.ready) return null;
+  const layout = getRenderPassLayout("borders");
+  const key = JSON.stringify([runtimeState.activeScenarioId, runtimeState.sceneGeneration,
+    runtimeState.currentScenarioApplyRequestId, runtimeState.renderTransactionDiagnostics?.scenarioApplyEpoch,
+    getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()), preparation.revision,
+    getRenderPassSignature("borders", reference), reference, layout]);
+  return { key, layout, reference };
+}
+function getBorderCanvasPreparationOwner() {
+  if (!borderCanvasPreparationOwner) borderCanvasPreparationOwner = createBorderCanvasPreparationOwner({
+    readSnapshot: readBorderCanvasSnapshot, readCache: getRenderPassCacheState,
+    draw: (context, snapshot) => withRenderTarget(context, () => {
+      drawBordersPass(prepareTargetContext(context, snapshot.reference, snapshot.layout));
+    }),
+    getPaintWork: command => getBorderDrawOwner().getPathWork(command.args?.[0]) ?? 8192,
+    canAllocate: bytes => bytes + getPhysicalCandidateBytes() <= canvasCandidateMaxBytes,
+    onResource: (bytes, allocation) => bytes ? pageResourceBudget.update(borderCanvasResourceOwner, allocation)
+      : pageResourceBudget.release(borderCanvasResourceOwner),
+    onReady: () => requestRendererRender("border-canvas-prepared", { flush: false }),
+    onStats: stats => recordRenderPerfMetric("borderCanvasPreparation", stats.totalMs, stats),
+    onError: error => console.warn("[render] Border canvas preparation failed; using native pass.", error),
+  });
+  return borderCanvasPreparationOwner;
+}
+function prepareBorderCanvasPass() {
+  if (!exportRenderInProgress && isTnoRasterSceneSelected() && !runtimeState.isInteracting) {
+    if (borderSourcePreparationPromise) return borderSourcePreparationPromise;
+    const contours = getPaintContourRuntimeOwner();
+    contours.getRevision();
+    const meshes = getStaticBorderMeshLifecycle().getPrivatePreparationPromise();
+    if (meshes || contours.hasPendingWork()) {
+      // Keep the published border surface while source owners finish. In
+      // particular, do not rasterize a mesh already known to be superseded.
+      const draining = borderCanvasPreparationOwner?.cancelPreparation();
+      const pending = [meshes, draining];
+      if (contours.hasPendingWork()) pending.push(contours.ensureReady());
+      const promise = Promise.allSettled(pending).finally(() => {
+        if (borderSourcePreparationPromise !== promise) return;
+        borderSourcePreparationPromise = null;
+        requestRendererRender("border-source-prepared", { flush: false });
+      });
+      borderSourcePreparationPromise = promise;
+      return promise;
+    }
+  }
+  const pending = prepareScenarioBorderPaths();
+  if (pending) return pending;
+  if (exportRenderInProgress || runtimeState.isInteracting) return null;
+  if (!isTnoRasterSceneSelected()) { borderCanvasPreparationOwner?.clear(); return null; }
+  return getBorderCanvasPreparationOwner().prepare();
+}
+function physicalCanvasIdentity() {
+  const projection = rendererSurfaceHost.getProjection();
+  const mask = getPhysicalLandMaskInfo(), atlas = getResolvedPhysicalAtlasCollection();
+  return JSON.stringify([runtimeState.activeScenarioId, runtimeState.sceneGeneration,
+    runtimeState.currentScenarioApplyRequestId, runtimeState.showPhysical, runtimeState.dpr,
+    getObjectIdentityToken(projection), getProjectionGeometryGeneration(projection),
+    ["scale", "translate", "center", "rotate", "angle", "reflectX", "reflectY", "precision", "clipAngle", "clipExtent", "parallels"]
+      .map(name => typeof projection?.[name] === "function" ? projection[name]() : null),
+    ["preclip", "postclip"].map(name => typeof projection?.[name] === "function" ? getObjectIdentityToken(projection[name]()) : ""),
+    mask.maskSource, mask.maskQualityToken, getObjectIdentityToken(mask.collection),
+    getObjectIdentityToken(mask.collection?.features), getContextCollectionRevision(runtimeState, mask.collection),
+    getContextGeometryRevision(runtimeState), getPoliticalGeometrySnapshot(mask.collection)?.revision || 0,
+    mask.collection?.features?.length || 0,
+    runtimeState.scenarioContextLandMaskVersionTag, runtimeState.scenarioLandMaskVersionTag,
+    getObjectIdentityToken(atlas), getObjectIdentityToken(atlas?.features), getContextCollectionRevision(runtimeState, atlas),
+    runtimeState.styleConfig?.physical, !!runtimeState.intensityFields?.channels?.physicalAtlas?.enabled,
+    Number(runtimeState.intensityFields?.channels?.physicalAtlas?.revision || 0)]);
+}
+function physicalCanvasKey() {
+  return JSON.stringify([physicalCanvasIdentity(), cloneZoomTransform(runtimeState.zoomTransform),
+    runtimeState.width, runtimeState.height, getRenderPassLayout("physicalBase")]);
+}
+function readPhysicalViewportSnapshot() {
+  if (exportRenderInProgress || !isTnoRasterSceneSelected() || !runtimeState.showPhysical
+    || runtimeState.intensityFields?.channels?.physicalAtlas?.enabled) return null;
+  const atlasCollection = getResolvedPhysicalAtlasCollection();
+  if (!atlasCollection?.features?.length) return null;
+  const plan = planPhysicalViewportSurface(getRenderPassLayout("physicalBase"),
+    cloneZoomTransform(runtimeState.zoomTransform), { maxBytes: canvasCandidateMaxBytes });
+  return plan ? { key: physicalCanvasKey(), sourceKey: physicalCanvasIdentity(), ...plan, atlasCollection } : null;
+}
+function getPhysicalViewportCacheOwner() {
+  if (!physicalViewportCacheOwner) physicalViewportCacheOwner = createPhysicalViewportCacheOwner({
+    readSnapshot: readPhysicalViewportSnapshot, readCache: getRenderPassCacheState,
+    draw: (context, snapshot) => withRenderTarget(context, () => {
+      const k = prepareTargetContext(context, snapshot.reference, snapshot.layout);
+      getPhysicalLayerRenderOwner().drawPhysicalBasePass(k, { atlasCollection: snapshot.atlasCollection });
+    }),
+    canAllocate: bytes => bytes + (borderCanvasPreparationOwner?.getPendingBytes() || 0) <= canvasCandidateMaxBytes,
+    onResource: bytes => bytes ? pageResourceBudget.update(physicalCanvasResourceOwner, { bitmaps: bytes, gpuTextures: 0 })
+      : pageResourceBudget.release(physicalCanvasResourceOwner),
+    onReady: () => requestRendererRender("physical-viewport-prepared", { flush: false }),
+    onStats: stats => recordRenderPerfMetric("physicalCanvasPreparation", stats.totalMs, stats),
+    onError: error => console.warn("[render] Physical viewport preparation failed; using native pass.", error),
+  });
+  return physicalViewportCacheOwner;
+}
+function preparePhysicalCanvasPass() {
+  if (exportRenderInProgress) return null;
+  return getPhysicalViewportCacheOwner().prepare();
+}
+
+function prepareScenarioBorderPaths() {
+  if (exportRenderInProgress || !isTnoRasterSceneSelected() || !runtimeState.landData?.features?.length) {
+    borderPathPreparationJob?.controller.abort();
+    borderPathPreparationJob = null;
+    borderDrawOwner?.clearHierarchicalBordersPreparation();
+    borderPathPreparationFailedRevision = null;
+    borderPathPreparationStats = null;
+    return null;
+  }
+  const owner = getBorderDrawOwner(), k = Number(runtimeState.zoomTransform?.k || 1);
+  const preparation = owner.getHierarchicalBordersPreparationState(k);
+  if (!preparation.supported || preparation.ready || preparation.revision === borderPathPreparationFailedRevision) return null;
+  if (borderPathPreparationJob?.revision === preparation.revision) return borderPathPreparationJob.promise;
+  borderPathPreparationJob?.controller.abort();
+  owner.cancelHierarchicalBordersPreparation();
+  const scenarioId = runtimeState.activeScenarioId;
+  const requestId = runtimeState.currentScenarioApplyRequestId;
+  const applyEpoch = runtimeState.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0;
+  const projectionGeneration = getProjectionGeometryGeneration(rendererSurfaceHost.getProjection());
+  const job = { revision: preparation.revision, controller: new AbortController(), promise: null };
+  borderPathPreparationJob = job;
+  const isCurrent = () => borderPathPreparationJob === job
+    && !job.controller.signal.aborted && !exportRenderInProgress && isTnoRasterSceneSelected()
+    && runtimeState.activeScenarioId === scenarioId && runtimeState.currentScenarioApplyRequestId === requestId
+    && (runtimeState.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0) === applyEpoch
+    && Number(runtimeState.zoomTransform?.k || 1) === k
+    && getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()) === projectionGeneration;
+  const startedAt = nowMs();
+  job.promise = owner.prepareHierarchicalBorders(k, { signal: job.controller.signal, isCurrent })
+    .then((ready) => {
+      if (ready && isCurrent()) {
+        const result = owner.getHierarchicalBordersPreparationState(k);
+        borderPathPreparationStats = { estimatedPathBytes: result.estimatedPathBytes,
+          maxPreparedBytes: result.maxPreparedBytes, projectedInputPoints: result.projectedInputPoints,
+          submittedPathPoints: result.submittedPathPoints };
+        borderPathPreparationFailedRevision = null;
+      }
+      return ready;
+    })
+    .catch((error) => {
+      if (isCurrent() && error?.name !== "AbortError") {
+        borderPathPreparationFailedRevision = job.revision;
+        console.warn("[render] Border path preparation failed; using synchronous drawing.", error);
+      }
+      return false;
+    }).finally(() => {
+      if (borderPathPreparationJob !== job) return;
+      borderPathPreparationJob = null;
+      recordRenderPerfMetric("borderPathPreparation", nowMs() - startedAt, { revision: job.revision, ...borderPathPreparationStats });
+      requestRendererRender("border-path-prepared", { flush: false });
+    });
+  return job.promise;
 }
 
 function getInteractionBorderSnapshotOwner() {
@@ -2655,6 +2858,13 @@ function getSpatialIndexRuntimeOwner() {
         getObjectIdentityToken(rendererSurfaceHost.getPathCanvas()),
         runtimeState.contextLayerRevision,
       ].join(":"),
+      getSecondarySpatialSourceIdentity: () => [
+        runtimeState.waterRegionsData?.features, runtimeState.scenarioWaterRegionsData?.features,
+        runtimeState.scenarioAtlantropaData?.features, runtimeState.scenarioSpecialRegionsData?.features,
+        runtimeState.contextLayerExternalDataByName?.lakes?.features, runtimeState.activeScenarioManifest,
+        runtimeState.topologyRevision, runtimeState.dataGeneration, runtimeState.contextLayerRevision,
+        runtimeState.showScenarioAtlantropa,
+      ],
       computeProjectedGeoBounds,
       shouldExcludeWaterHitGeometry,
     },
@@ -2677,6 +2887,14 @@ function getRenderCacheOwner() {
     getters: {
       getContext: () => rendererSurfaceHost.getContext?.() || null,
       getActiveInteractionCompositePassNames,
+      getPassPaintOverscanPx: getTnoScenePaintOverscanPx,
+      // Direct scenes retain a complete overview for navigation beyond coverage.
+      // Legacy per-pass padding duplicates that storage and prevents private GPU frames fitting the shared cap.
+      // Keep a small camera margin: zero padding forces every pan event to
+      // rerasterize and upload all transformed passes. Five percent preserves
+      // ordinary drag reuse while leaving room for a private GPU candidate.
+      getPassOverscanRatio: () => !exportRenderInProgress && isTnoRasterSceneSelected()
+        ? 0.05 : RENDER_PASS_OVERSCAN_RATIO_PER_SIDE,
     },
     helpers: {
       cloneZoomTransform,
@@ -2871,6 +3089,10 @@ function getProjectedGeometryBoundsOwner() {
       getProjection: () => rendererSurfaceHost.getProjection(),
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
       getPathSvg: () => rendererSurfaceHost.getPathSvg(),
+      // bounds() streams through the projection independently of the drawing
+      // context. withRenderTarget creates a temporary Canvas path each pass;
+      // use the stable path for this same projection so those scopes share bounds.
+      getBoundsPath: () => rendererSurfaceHost.getPathSvg() || rendererSurfaceHost.getPathCanvas(),
       getLandFeatures: () => runtimeState.landData?.features || [],
       getRiverFeatures: () => runtimeState.riversData?.features || [],
       getActiveScenarioId: () => runtimeState.activeScenarioId || "",
@@ -2882,7 +3104,7 @@ function getProjectedGeometryBoundsOwner() {
       recordRenderPerfMetric,
       recordProjectedBoundsDiagnosticsState,
       resetHostWaterPathCaches: () => {
-        scenarioRegionOverlayRenderOwner?.resetWaterPathCaches();
+        scenarioRegionOverlayRenderOwner?.resetWaterPathCaches({ preserveResidentWorker: true });
       },
       warn: (...args) => console.warn(...args),
     },
@@ -2967,7 +3189,8 @@ function getViewportCommandOwner() {
       getZoomBehavior: () => rendererSurfaceHost.getZoomBehavior(),
       getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
       getD3: () => globalThis.d3,
-      canAnimateCamera: () => !!runtimeState.firstVisibleFramePainted && !!navigationSceneOwner?.isReady(),
+      canAnimateCamera: () => !!runtimeState.firstVisibleFramePainted
+        && (!!tnoRasterSceneOwner?.isActive() || !!navigationSceneOwner?.isReady()),
       calculatePanExtent,
       getCenteredFitZoomTransform,
     },
@@ -3434,14 +3657,14 @@ function getContextPassOrchestratorOwner() {
 }
 
 function getPoliticalIdRasterEligibilityReason() {
-  return getPoliticalIdRasterEligibility({ requested: readPoliticalRenderPolicy().requested, exporting: exportRenderInProgress,
+  return getPoliticalIdRasterEligibility({ requested: readPoliticalRenderPolicy({ scenarioId: runtimeState.activeScenarioId }).requested, exporting: exportRenderInProgress,
     debugMode, ready: isBootInteractionReady(), firstVisible: runtimeState.firstVisibleFramePainted,
     readonly: runtimeState.startupReadonly, unlocking: runtimeState.startupReadonlyUnlockInFlight,
     riverPartitions: hasVisibleRiverPartitions(), scenarioId: runtimeState.activeScenarioId });
 }
 
 function isPoliticalIdRasterSelected() { return getPoliticalIdRasterEligibilityReason() === "eligible"; }
-function isPoliticalIdRasterPrimary() { return readPoliticalRenderPolicy().persistent; }
+function isPoliticalIdRasterPrimary() { return readPoliticalRenderPolicy({ scenarioId: runtimeState.activeScenarioId }).persistent; }
 
 export function setPoliticalRenderMode(mode) {
   writePoliticalRenderMode(mode);
@@ -3454,12 +3677,97 @@ export function setPoliticalIdRasterTrialEnabled(enabled) {
 }
 
 function resetPoliticalRasterPolicy() {
+  cityPointsRenderOwner?.cancelPreparation();
+  borderCanvasPreparationOwner?.clear();
+  physicalViewportCacheOwner?.clear();
   politicalIdRasterRuntimeOwner?.dispose();
   politicalIdRasterRuntimeOwner = null;
+  tnoRasterSceneOwner?.dispose();
+  tnoRasterSceneOwner = null;
+  tnoRasterSceneFailure = "";
+  politicalPassUsesDirectScene = false;
   politicalIdRasterActivationKey = "";
   invalidateRenderPasses(["political"], "political-id-raster-preference");
   requestRendererRender("political-id-raster-preference", { visual: true });
   publishPoliticalIdRasterStatus(getPoliticalIdRasterDiagnostics());
+}
+
+function isTnoRasterSceneSelected() {
+  return runtimeState.activeScenarioId === "tno_1962" && isPoliticalIdRasterPrimary()
+    && isPoliticalIdRasterSelected() && !tnoRasterSceneFailure;
+}
+
+// These producers paint the entire requested rectangle, not only its backing canvas.
+function getTnoScenePaintOverscanPx(passName) {
+  if (exportRenderInProgress || !isTnoRasterSceneSelected()) return 0;
+  if (!["borders", "labels", "textureLabels"].includes(passName)) return 0;
+  // Optional producers still have viewport-specific placement contracts.
+  if (passName === "labels" && ((runtimeState.showTransport
+    && ["showAirports", "showPorts", "showRoad", "showRail"].some(name => runtimeState[name]))
+    || (runtimeState.showPhysical && runtimeState.styleConfig?.physical?.showRegionLabels))) return 0;
+  return VIEWPORT_CULL_OVERSCAN_PX;
+}
+
+function getTnoSceneLabelPaintBounds() {
+  const margin = getTnoScenePaintOverscanPx("labels");
+  return margin ? { minX: -margin, minY: -margin,
+    maxX: runtimeState.width + margin, maxY: runtimeState.height + margin } : null;
+}
+
+function getPoliticalDirectFrameKey() {
+  return [runtimeState.activeScenarioId, runtimeState.sceneGeneration, runtimeState.topologyRevision,
+    runtimeState.scenarioDataGeneration, runtimeState.sovereigntyRevision, runtimeState.colorRevision,
+    getObjectIdentityToken(runtimeState.colors), getObjectIdentityToken(runtimeState.landData?.features),
+    getObjectIdentityToken(runtimeState.landDataFull?.features), runtimeState.scenarioShellOverlayRevision,
+    runtimeState.mapSemanticMode, runtimeState.dpr,
+    getProjectionGeometryGeneration(rendererSurfaceHost.getProjection())].join(":");
+}
+
+function getTnoRasterSceneOwner() {
+  tnoRasterSceneOwner ||= createTnoRasterSceneOwner({
+    surface: rendererSurfaceHost,
+    resourceBudget: pageResourceBudget,
+    helpers: {
+      getActivePassNames: getActiveRenderPassNames,
+      getPassCanvas: name => getRenderPassCacheState().canvases?.[name],
+      getPassReferenceTransform,
+      getPassLayout: getRenderPassLayout,
+      getDpr: () => runtimeState.dpr,
+      getCurrentTransform: () => runtimeState.zoomTransform,
+      getPreparationIdentity: () => politicalIdRasterRuntimeOwner?.getStagedFrameIdentity()
+        ?? politicalIdRasterRuntimeOwner?.getDirectFrame(),
+      getSceneIdentity: getPoliticalDirectFrameKey,
+      requestRender: reason => requestRendererRender(reason),
+      yieldControl: yieldToMain,
+      getDirectFrame: () => politicalIdRasterRuntimeOwner?.getDirectFrame(),
+      getOverviewFrame: () => politicalIdRasterRuntimeOwner?.getOverviewFrame(),
+      capturePublishedColorBaseline: options => politicalIdRasterRuntimeOwner?.capturePublishedColorBaseline(options),
+      ensurePassCoverage: transform => {
+        const canvas = rendererSurfaceHost.getMapCanvas();
+        const width = canvas.width / runtimeState.dpr, height = canvas.height / runtimeState.dpr;
+        const missing = getActiveRenderPassNames().filter(name => name !== "political"
+          && !coversViewport(getCachedPassCompositorOwner().getPassCoverage(name, transform), width, height));
+        if (!missing.length) return true;
+        const definitions = new Map(getRenderPipelinePassesOwner().getIdleRenderPassDefinitions());
+        for (const name of missing) {
+          const draw = definitions.get(name);
+          if (!draw) return false;
+          renderPassToCache(name, draw, transform, {});
+        }
+        recordRenderPerfMetric("gpuSceneLayerCoverageRefresh", 0, { passes: missing.join(",") });
+        return missing.every(name => coversViewport(
+          getCachedPassCompositorOwner().getPassCoverage(name, transform), width, height));
+      },
+    },
+    onContextLost: () => {
+      tnoRasterSceneFailure = "webgl-context-lost";
+      politicalIdRasterRuntimeOwner?.dispose();
+      politicalIdRasterRuntimeOwner = null;
+      invalidateRenderPasses(["political"], "scene-context-lost");
+      requestRendererRender("scene-context-lost", { visual: true });
+    },
+  });
+  return tnoRasterSceneOwner;
 }
 
 function getPoliticalIdRasterRuntimeOwner() {
@@ -3469,9 +3777,15 @@ function getPoliticalIdRasterRuntimeOwner() {
     resourceBudget: pageResourceBudget,
     refineAfterMs: 180,
     displayMode: isPoliticalIdRasterPrimary() ? "raster" : "hybrid",
+    directPresentation: isTnoRasterSceneSelected(),
+    ...(isTnoRasterSceneSelected() ? { createGpu: options => getTnoRasterSceneOwner().ensureGpu(options) } : {}),
     helpers: {
       isEnabled: isPoliticalIdRasterSelected,
       isBrushActive: () => !!brushSession,
+      isDirectFrameCompatible: (frame, identity) => identity.sceneKey === [runtimeState.activeScenarioId, runtimeState.sceneGeneration].join(":")
+        && identity.projectionKey === String(getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()))
+        && identity.coverageKey.split(":")[0] === String(runtimeState.mapSemanticMode)
+        && JSON.stringify(frame.layout) === JSON.stringify(getRenderPassLayout("political")),
       getFeatureId,
       getBounds: (feature, id) => getProjectedFeatureBounds(feature, { featureId: id }),
       getLayout: () => getRenderPassLayout("political"),
@@ -3493,6 +3807,25 @@ function getPoliticalIdRasterRuntimeOwner() {
         if (!color || color.opacity !== 1) throw new Error("Political ID raster requires opaque feature fills.");
         return color.formatHex();
       },
+      prepareFeatures: async ({ signal, yieldControl, timeBudgetMs, workBatch }) => {
+        const layout = getRenderPassLayout("political");
+        const features = await collectPoliticalRasterDisplayFeaturesAsync({
+          fullCollection: runtimeState.landDataFull, interactiveCollection: runtimeState.landData, getId: getFeatureId,
+        }, { signal, yieldControl, timeBudgetMs, workBatch });
+        const entries = [];
+        let sliceStarted = performance.now();
+        for (let drawOrder = 0; drawOrder < features.length; drawOrder++) {
+          signal.throwIfAborted();
+          const feature = features[drawOrder], id = getFeatureId(feature);
+          if (id && feature.geometry && !shouldExcludePoliticalVisualFeature(feature, id)
+            && !shouldSkipFeature(feature, layout.paddedWidth, layout.paddedHeight)) entries.push({ feature, id, drawOrder });
+          if ((drawOrder + 1) % workBatch === 0 || performance.now() - sliceStarted >= timeBudgetMs) {
+            await yieldControl(); sliceStarted = performance.now();
+          }
+        }
+        await yieldControl();
+        return orderPoliticalShellUnderlayFirst(entries).map(entry => entry.feature);
+      },
       getFeatures: () => {
         const layout = getRenderPassLayout("political");
         const features = isPoliticalIdRasterPrimary() ? collectPoliticalRasterDisplayFeatures({
@@ -3510,16 +3843,18 @@ function getPoliticalIdRasterRuntimeOwner() {
         if (hasPendingPoliticalColorEdit()) {
           for (const id of getRenderPassCacheState().pendingPoliticalColorEditIds || []) foreground.add(id);
         }
+        const geometryContentVersion = [getObjectIdentityToken(runtimeState.landData?.features),
+          isPoliticalIdRasterPrimary() ? getObjectIdentityToken(runtimeState.landDataFull?.features) : "fine",
+          runtimeState.topologyRevision, runtimeState.scenarioDataGeneration, runtimeState.sovereigntyRevision,
+          layout.paddedWidth, layout.paddedHeight].join(":");
         return {
+          directFrameKey: getPoliticalDirectFrameKey(),
           sceneKey: [runtimeState.activeScenarioId, runtimeState.sceneGeneration].join(":"),
           projectionKey: String(getProjectionGeometryGeneration(rendererSurfaceHost.getProjection())),
           coverageKey: [runtimeState.mapSemanticMode,
             runtimeState.scenarioShellOverlayRevision, isPoliticalIdRasterPrimary() ? "complete-display-v1" : "fine"].join(":"),
-          version: [getObjectIdentityToken(runtimeState.landData?.features),
-            isPoliticalIdRasterPrimary() ? getObjectIdentityToken(runtimeState.landDataFull?.features) : "fine", runtimeState.topologyRevision,
-            runtimeState.scenarioDataGeneration, runtimeState.sovereigntyRevision,
-            layout.paddedWidth, layout.paddedHeight,
-            [...foreground].sort().join(",")].join(":"),
+          geometryContentVersion,
+          version: `${geometryContentVersion}:${[...foreground].sort().join(",")}`,
           colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor()].join(":"),
           colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor()].join(":"),
         };
@@ -3527,6 +3862,7 @@ function getPoliticalIdRasterRuntimeOwner() {
     },
     effects: {
       recordMetric: recordRenderPerfMetric,
+      commitPublishedColorEdit: clearPendingPoliticalColorEdit,
       requestRender: reason => {
         invalidateRenderPasses(["political"], reason);
         requestRendererRender(reason, { visual: true });
@@ -3879,14 +4215,22 @@ function getRenderPipelinePassesOwner() {
       getPassReferenceTransform,
       getPassCoverage: (passName, transform) => getCachedPassCompositorOwner().getPassCoverage(passName, transform),
       prepareRenderPassAsync: (passName) => {
-        if (passName === "political") return getGeometryRasterRuntimeOwner().preparePolitical({ force: true });
+        if (passName === "political") {
+          if (!exportRenderInProgress && isTnoRasterSceneSelected()) return getPoliticalIdRasterRuntimeOwner().prepareSource();
+          return getGeometryRasterRuntimeOwner().preparePolitical({ force: true });
+        }
+        if (passName === "physicalBase") return preparePhysicalCanvasPass();
+        if (passName === "labels") return prepareLabelsPass();
+        if (passName === "contextMarkers") return prepareCityPointsPass();
+        if (passName === "borders") return prepareBorderCanvasPass();
         if (passName === "contextScenario" && !exportRenderInProgress) {
+          if (isTnoRasterSceneSelected()) return !getScenarioRegionOverlayRenderOwner().prepareScenarioWaterLayer();
           return !getScenarioRegionOverlayRenderOwner().prepareVisibleWaterPaths();
         }
         return null;
       },
       canYieldRenderPassWork: () => runtimeState.firstVisibleFramePainted
-        && isBootInteractionReady() && !hasPendingPoliticalColorEdit(),
+        && isBootInteractionReady() && (!hasPendingPoliticalColorEdit() || tnoRasterSceneOwner?.isActive()),
       nowMs,
       // The active render boundary still coalesces requests until its finally
       // block. Queue after that boundary closes so the next slice is not lost.
@@ -3946,6 +4290,7 @@ function getDrawCanvasOrchestrationOwner() {
         ? !!getGeometryRasterRuntimeOwner().preparePolitical({ force: true })
         : getGeometryRasterRuntimeOwner().prepareFrame(),
       requiresExactFrame: () => navigationExactRefreshNeeded,
+      isScenePublicationPending: () => !!tnoRasterSceneOwner?.getDiagnostics().publicationPending,
       withValidatedCache: (callback) => getRenderCacheOwner().withValidatedCache(callback),
       incrementPerfCounter,
       clearPoliticalPatchOverlayIfStale,
@@ -3955,7 +4300,9 @@ function getDrawCanvasOrchestrationOwner() {
       drawLastGoodFrameFallback,
       drawOverviewFrameFallback,
       drawNavigationFrame: (transform) => {
-        const drawn = !exportRenderInProgress && !!navigationSceneOwner?.draw(transform);
+        const drawn = !exportRenderInProgress && (isTnoRasterSceneSelected()
+          ? !!tnoRasterSceneOwner?.present(transform, { refresh: false })
+          : !!navigationSceneOwner?.draw(transform));
         navigationExactRefreshNeeded = !drawn && !!runtimeState.firstVisibleFramePainted
           && !exportRenderInProgress;
         return drawn;
@@ -4016,6 +4363,7 @@ let deferredIndexUiRefreshState = null;
 let pendingSidebarRefreshHandle = null;
 let pendingSidebarRefreshState = null;
 let secondarySpatialBuildHandle = null;
+let secondarySpatialPreparationVersion = 0;
 let pendingSecondarySpatialBuildReasons = new Set();
 let pendingScenarioChunkFlushAfterExactHandle = null;
 let staticBorderMeshLifecycle = null;
@@ -4497,6 +4845,7 @@ function getMutationPassNames(mutation = {}) {
 function applyRenderPassInvalidationEffects(mutation = {}) {
   const targetPassNames = getMutationPassNames(mutation);
   if (targetPassNames.includes("political")) politicalEntriesInvalidationEpoch++;
+  if (targetPassNames.includes("contextScenario") || targetPassNames.includes("background")) waterPreparationInvalidationEpoch++;
   const reason = mutation.reason || "unspecified";
   const hostFollowUps = mutation.effects?.hostFollowUps || {};
   if (hostFollowUps.needsRenderPassDiagnostics || targetPassNames.length) {
@@ -4605,6 +4954,9 @@ function isBootInteractionReady() {
 
 function clearRenderPassReferenceTransforms(passNames = null) {
   const mutation = getRenderCacheOwner().clearRenderPassReferenceTransforms(passNames);
+  const clearedPassNames = mutation.effects?.referenceTransforms?.passNames || [];
+  if (mutation.effects?.referenceTransforms?.clearedAll || clearedPassNames.includes("contextScenario")
+    || clearedPassNames.includes("background")) waterPreparationInvalidationEpoch++;
   const hostFollowUps = mutation.effects?.hostFollowUps || {};
   if (hostFollowUps.needsPoliticalPathCacheInvalidation || mutation.politicalPathCacheInvalidated) {
     politicalEntriesInvalidationEpoch++;
@@ -4687,6 +5039,9 @@ function canDrawInteractionComposite(currentTransform, cache = getRenderPassCach
 }
 
 function captureLastGoodFrame(reason = "frame", transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
+  // The visible GPU scene already retains the independent layers. Capturing the
+  // legacy 2D surface here would copy obsolete pixels and duplicate the scene.
+  if (!exportRenderInProgress && tnoRasterSceneOwner?.isActive()) return true;
   if (!rendererSurfaceHost.getContext()?.canvas) return false;
   const targetCanvas = ensureLastGoodFrameCanvas();
   const targetContext = targetCanvas.getContext("2d");
@@ -4789,6 +5144,7 @@ function getNavigationSceneOwner() {
 
 function prepareScenarioNavigation() {
   ensureCurrentSceneSnapshot("scenario-navigation-prefetch");
+  if (runtimeState.activeScenarioId === "tno_1962" && isPoliticalIdRasterPrimary()) return;
   getNavigationSceneOwner().prewarm();
 }
 
@@ -5087,7 +5443,10 @@ function invalidateInteractionBorderSnapshot(reason = "unspecified") {
 }
 
 function captureInteractionBorderSnapshot(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
-  // 入口负责编排 snapshot 生命周期与时机，像素细节由 owner 实现。
+  // The retained GPU scene already contains the visible borders and is the
+  // navigation frame. Recording a second native snapshot would rasterize the
+  // old coastlines again before every gesture, blocking the same compositor.
+  if (!exportRenderInProgress && isTnoRasterSceneSelected() && tnoRasterSceneOwner?.isActive()) return false;
   return getInteractionBorderSnapshotOwner().captureInteractionBorderSnapshot(transform);
 }
 
@@ -5244,7 +5603,10 @@ function getRenderPassTransformSignature(passName, transform) {
 }
 
 function getRenderPassSignature(passName, transform) {
-  return getRenderPassSignaturePolicy().getRenderPassSignature(passName, transform);
+  const signature = getRenderPassSignaturePolicy().getRenderPassSignature(passName, transform);
+  const layout = getRenderPassLayout(passName);
+  const margin = getTnoScenePaintOverscanPx(passName);
+  return `${signature}|surface:${layout.pixelWidth}:${layout.pixelHeight}:${layout.offsetX}:${layout.offsetY}:${layout.dpr}|paint-margin:${margin}`;
 }
 
 function resolveHitMode() {
@@ -5508,14 +5870,14 @@ function getScenarioExcludedWaterRegionGroups() {
   );
 }
 
-function isWaterRegionExcludedByScenario(feature) {
+function isWaterRegionExcludedByScenario(feature, exclusions = null) {
   if (!feature || isScenarioWaterRegion(feature)) return false;
-  const excludedIds = getScenarioExcludedWaterRegionIds();
+  const excludedIds = exclusions?.ids || getScenarioExcludedWaterRegionIds();
   const featureId = String(feature?.properties?.id || "").trim();
   if (featureId && excludedIds.has(featureId)) {
     return true;
   }
-  const excludedGroups = getScenarioExcludedWaterRegionGroups();
+  const excludedGroups = exclusions?.groups || getScenarioExcludedWaterRegionGroups();
   const regionGroup = String(feature?.properties?.region_group || "").trim().toLowerCase();
   return !!(regionGroup && excludedGroups.has(regionGroup));
 }
@@ -5558,8 +5920,8 @@ function getEffectiveAtlantropaFeatures(sourceFeatures = runtimeState.scenarioAt
   return buckets;
 }
 
-function buildAtlantropaLandLikeFeatureCollection() {
-  const buckets = getEffectiveAtlantropaFeatures();
+function buildAtlantropaLandLikeFeatureCollection(sourceFeatures = runtimeState.scenarioAtlantropaData?.features) {
+  const buckets = getEffectiveAtlantropaFeatures(sourceFeatures);
   const features = [
     ...buckets.land,
     ...buckets.shoal,
@@ -5569,12 +5931,12 @@ function buildAtlantropaLandLikeFeatureCollection() {
 }
 
 let previousPoliticalExtraIds = [];
-function appendUniqueFeatureCollections(primaryCollection, extraCollection) {
+function appendUniqueFeatureCollections(primaryCollection, extraCollection, { publish = true } = {}) {
   const primaryFeatures = Array.isArray(primaryCollection?.features) ? primaryCollection.features : [];
   const extraFeatures = Array.isArray(extraCollection?.features) ? extraCollection.features : [];
   const snapshot = getPoliticalGeometrySnapshot(primaryCollection);
-  if (!extraFeatures.length && !snapshot) {
-    previousPoliticalExtraIds = [];
+  if (!extraFeatures.length && (!snapshot || !previousPoliticalExtraIds.length)) {
+    if (publish) previousPoliticalExtraIds = [];
     return primaryCollection;
   }
   const featureMap = snapshot ? new Map(snapshot.featuresById) : null;
@@ -5595,11 +5957,12 @@ function appendUniqueFeatureCollections(primaryCollection, extraCollection) {
     changedIds: [...new Set([...snapshot.changedIds, ...extraIds, ...previousPoliticalExtraIds])],
     removedIds: [...new Set([...snapshot.removedIds, ...previousPoliticalExtraIds.filter((id) => !featureMap.has(id))])],
   });
-  previousPoliticalExtraIds = extraIds;
+  if (publish) previousPoliticalExtraIds = extraIds;
   return result;
 }
 
 function getEffectiveWaterRegionFeatures(atlantropaFeatures = getEffectiveAtlantropaFeatures(), scenarioWaterFeatures = runtimeState.scenarioWaterRegionsData?.features) {
+  const exclusions = { ids: getScenarioExcludedWaterRegionIds(), groups: getScenarioExcludedWaterRegionGroups() };
   const scenarioFeatures = [
     ...(Array.isArray(scenarioWaterFeatures)
       ? scenarioWaterFeatures
@@ -5612,7 +5975,7 @@ function getEffectiveWaterRegionFeatures(atlantropaFeatures = getEffectiveAtlant
     globalLakeFeatures: runtimeState.contextLayerExternalDataByName?.lakes?.features || [],
     activeScenarioId: runtimeState.activeScenarioId || "",
     exclusive: isScenarioWaterTopologyExclusiveMode(),
-    isExcluded: isWaterRegionExcludedByScenario,
+    isExcluded: (feature) => isWaterRegionExcludedByScenario(feature, exclusions),
   }));
 }
 
@@ -6214,6 +6577,7 @@ function cancelDeferredWork(handle) {
 }
 
 function clearStagedMapDataTasks() {
+  secondarySpatialPreparationVersion++;
   cancelDeferredWork(runtimeState.stagedContextBaseHandle);
   cancelDeferredWork(runtimeState.stagedHitCanvasHandle);
   cancelDeferredWork(secondarySpatialBuildHandle);
@@ -6253,8 +6617,20 @@ function getExactAfterSettleScheduler() {
     scheduleDeferredContextBaseEnhancements,
     getRenderPassCacheState,
     getRenderPipelinePassesOwner,
-    prepareRenderPassAsync: (passName) => passName === "political"
-      ? getGeometryRasterRuntimeOwner().preparePolitical({ force: true }) : null,
+    prepareRenderPassAsync: (passName) => {
+      if (passName === "political") {
+          if (!exportRenderInProgress && isTnoRasterSceneSelected()) return getPoliticalIdRasterRuntimeOwner().prepareSource();
+          return getGeometryRasterRuntimeOwner().preparePolitical({ force: true });
+        }
+      if (passName === "physicalBase") return preparePhysicalCanvasPass();
+      if (passName === "labels") return prepareLabelsPass();
+      if (passName === "contextMarkers") return prepareCityPointsPass();
+        if (passName === "borders") return prepareBorderCanvasPass();
+      if (passName === "contextScenario" && !exportRenderInProgress && isTnoRasterSceneSelected()) {
+        return !getScenarioRegionOverlayRenderOwner().prepareScenarioWaterLayer();
+      }
+      return null;
+    },
     getPhysicalExactRefreshPasses,
     invalidateRenderPasses,
     requestRendererRender,
@@ -6475,8 +6851,8 @@ function computeProjectedCoordinateBounds(geoObject) {
   return getProjectedGeometryBoundsOwner().computeProjectedCoordinateBounds(geoObject);
 }
 
-function computeProjectedGeoBounds(geoObject) {
-  return getProjectedGeometryBoundsOwner().computeProjectedGeoBounds(geoObject);
+function computeProjectedGeoBounds(geoObject, options) {
+  return getProjectedGeometryBoundsOwner().computeProjectedGeoBounds(geoObject, options);
 }
 
 function normalizeGeoObjectForSphericalDiagnostics(geoObject) {
@@ -6893,6 +7269,13 @@ function isInteractionRecoveryBlocked() {
     || isExactAfterSettleControllerActive()
     || !!runtimeState.activeInteractionRecoveryTaskKey
   );
+}
+
+function canStartPrivateBorderMeshPreparation() {
+  return !exportRenderInProgress
+    && runtimeState.renderPhase === RENDER_PHASE_IDLE
+    && !runtimeState.isInteracting
+    && !runtimeState.activeInteractionRecoveryTaskKey;
 }
 
 function isInteractionRecoverySettled({ quietMs = 600 } = {}) {
@@ -7454,8 +7837,16 @@ function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-co
   // Reject large transactions before resolving IDs or traversing coordinates.
   if (politicalPatchPreviewBudget.exceedsFeatureLimit(ids.length)) return deferPreview("feature-budget");
   if (!rendererSurfaceHost.getPoliticalPatchContext()?.canvas || !rendererSurfaceHost.getProjection() || !rendererSurfaceHost.getPathCanvas()) return deferPreview("preview-surface-unavailable");
-  const features = ids.map((id) => ({ id, feature: findResolvedColorFeatureById(id) })).filter((entry) => entry.feature?.geometry);
-  if (!features.length) return deferPreview("no-preview-features");
+  const resolvedFeatures = ids.map((id) => ({ id, feature: findResolvedColorFeatureById(id) })).filter((entry) => entry.feature?.geometry);
+  if (!resolvedFeatures.length) return deferPreview("no-preview-features");
+  const retainedScene = tnoRasterSceneOwner?.getDiagnostics();
+  const features = retainedScene?.active ? resolvedFeatures.filter(({ id }) =>
+    !politicalIdRasterRuntimeOwner?.matchesPublishedColor(id, { overview: retainedScene.usingOverview })) : resolvedFeatures;
+  if (!features.length) {
+    politicalPatchPreviewBudget.reset();
+    clearPoliticalPatchOverlay("published-colors-restored");
+    return true;
+  }
   const decision = politicalPatchPreviewBudget.inspect(features, ({ id, feature }) => !!getPoliticalFeaturePathEntry(feature, {
     featureId: id, allowBuild: false,
   }));
@@ -7975,7 +8366,7 @@ function scheduleDynamicBorderRecompute(reason = "", delayMs = 150) {
 }
 
 function isUsableMesh(mesh) {
-  return !!(mesh && Array.isArray(mesh.coordinates) && mesh.coordinates.length > 0);
+  return isUsableLineMesh(mesh);
 }
 
 function getAdmin1Group(entity) {
@@ -8209,9 +8600,12 @@ function getStaticBorderMeshLifecycle() {
       setDetailAdmMeshBuildState: (next) => { detailAdmMeshBuildState = next; },
       buildDeferredBorderMeshesAsync: (options) => getBorderMeshWorkerRuntime().buildDeferredBorderMeshesAsync(options),
       commitDeferredBorderMeshes: (result) => getBorderMeshWorkerRuntime().commitDeferredBorderMeshes(result),
+      isRetainedSceneActive: () => isTnoRasterSceneSelected() && !!tnoRasterSceneOwner?.isActive(),
+      canStartPrivateBorderMeshPreparation,
       getContextBaseZoomBucketId,
       getProjectedViewportBounds,
       VIEWPORT_CULL_OVERSCAN_PX,
+      getPaintOverscanPx: () => Math.max(48, getTnoScenePaintOverscanPx("borders")),
       canonicalCountryCode,
       cancelDeferredWork,
       scheduleDeferredWork,
@@ -8258,8 +8652,12 @@ function syncStaticMeshSnapshot() {
   staticMeshCache.snapshot = captureStaticMeshSnapshot();
 }
 
-function clearDeferredInternalBorderMeshCaches({ syncSnapshot = true } = {}) {
-  setStaticMeshSourceCountries(getSourceCountrySets());
+function clearDeferredInternalBorderMeshCaches({ syncSnapshot = true, preparedSourceCountries = null } = {}) {
+  const features = runtimeState.landDataFull?.features?.length
+    ? runtimeState.landDataFull.features : runtimeState.landData?.features;
+  const prepared = preparedSourceCountries?.status === "prepared"
+    && preparedSourceCountries.sourceFeatures === features;
+  setStaticMeshSourceCountries(prepared ? preparedSourceCountries.sourceCountries : getSourceCountrySets());
   runtimeState.cachedProvinceBorders = [];
   runtimeState.cachedProvinceBordersByCountry = new Map();
   runtimeState.cachedLocalBorders = [];
@@ -8587,12 +8985,20 @@ function rebuildStaticMeshes({
   scheduleDeferredHeavyBorderMeshes();
 }
 
-function invalidateBorderCache() {
+function invalidateBorderCache({ preservePreparedSurface = false } = {}) {
   const startedAt = nowMs();
+  // Completed political infrastructure can arrive after the exact canvas was
+  // already committed. Keep it only when rebuilding dynamic borders leaves
+  // that same clean canvas and every versioned drawing input unchanged.
+  const prepared = preservePreparedSurface && !exportRenderInProgress
+    && isTnoRasterSceneSelected() && tnoRasterSceneOwner?.isActive()
+    ? borderCanvasPreparationOwner?.getCurrentCommittedSnapshot() : null;
   rebuildDynamicBorders();
-  invalidateRenderPasses("borders", "border-cache");
+  const preserved = !!prepared && borderCanvasPreparationOwner?.getCurrentCommittedSnapshot() === prepared;
+  if (!preserved) invalidateRenderPasses("borders", "border-cache");
   recordRenderPerfMetric("invalidateBorderCache", nowMs() - startedAt, {
     dynamicBorderCount: Array.isArray(runtimeState.dynamicBorderFeatures) ? runtimeState.dynamicBorderFeatures.length : 0,
+    preservedPreparedSurface: preserved,
   });
 }
 
@@ -9505,11 +9911,7 @@ function cancelPendingIndexUiRefresh() {
     pendingIndexUiRefreshState = null;
     return;
   }
-  if (typeof globalThis.cancelAnimationFrame === "function") {
-    globalThis.cancelAnimationFrame(pendingIndexUiRefreshHandle);
-  } else {
-    globalThis.clearTimeout(pendingIndexUiRefreshHandle);
-  }
+  globalThis.clearTimeout(pendingIndexUiRefreshHandle);
   pendingIndexUiRefreshHandle = null;
   pendingIndexUiRefreshState = null;
 }
@@ -9535,6 +9937,7 @@ function flushPendingIndexUiRefresh() {
     runtimeState.renderSpecialRegionListFn();
     refreshedScopes.push("special");
   }
+  if (pending.renderDevWorkspace) notifyDevWorkspace();
   if (refreshedScopes.length) {
     recordUiRefreshMetric("uiIndexFullRefresh", {
       scope: refreshedScopes.length === 1 ? refreshedScopes[0] : "mixed",
@@ -9549,21 +9952,24 @@ function scheduleIndexUiRefresh({
   renderCountryList = false,
   renderWaterRegionList = false,
   renderSpecialRegionList = false,
+  renderDevWorkspace = false,
 } = {}) {
   pendingIndexUiRefreshState = {
     renderCountryList: !!(pendingIndexUiRefreshState?.renderCountryList || renderCountryList),
     renderWaterRegionList: !!(pendingIndexUiRefreshState?.renderWaterRegionList || renderWaterRegionList),
     renderSpecialRegionList: !!(pendingIndexUiRefreshState?.renderSpecialRegionList || renderSpecialRegionList),
+    renderDevWorkspace: !!(pendingIndexUiRefreshState?.renderDevWorkspace || renderDevWorkspace),
   };
   if (pendingIndexUiRefreshHandle !== null && pendingIndexUiRefreshHandle !== undefined) {
     return;
   }
   const callback = () => {
+    if (pendingIndexUiRefreshHandle !== handle) return;
     flushPendingIndexUiRefresh();
   };
-  pendingIndexUiRefreshHandle = typeof globalThis.requestAnimationFrame === "function"
-    ? globalThis.requestAnimationFrame(callback)
-    : globalThis.setTimeout(callback, 0);
+  // Keep list/workspace work out of the map's animation-frame task.
+  const handle = globalThis.setTimeout(callback, 0);
+  pendingIndexUiRefreshHandle = handle;
 }
 
 function flushDeferredIndexUiRefresh() {
@@ -9578,21 +9984,25 @@ function scheduleIndexUiRefreshAfterCoarseFrame({
   renderCountryList = false,
   renderWaterRegionList = false,
   renderSpecialRegionList = false,
+  renderDevWorkspace = false,
 } = {}) {
   deferredIndexUiRefreshState = {
     renderCountryList: !!(deferredIndexUiRefreshState?.renderCountryList || renderCountryList),
     renderWaterRegionList: !!(deferredIndexUiRefreshState?.renderWaterRegionList || renderWaterRegionList),
     renderSpecialRegionList: !!(deferredIndexUiRefreshState?.renderSpecialRegionList || renderSpecialRegionList),
+    renderDevWorkspace: !!(deferredIndexUiRefreshState?.renderDevWorkspace || renderDevWorkspace),
   };
   if (deferredIndexUiRefreshHandle !== null && deferredIndexUiRefreshHandle !== undefined) {
     return;
   }
   const callback = () => {
+    if (deferredIndexUiRefreshHandle !== handle) return;
     flushDeferredIndexUiRefresh();
   };
-  deferredIndexUiRefreshHandle = typeof globalThis.requestAnimationFrame === "function"
+  const handle = typeof globalThis.requestAnimationFrame === "function"
     ? globalThis.requestAnimationFrame(callback)
     : globalThis.setTimeout(callback, 0);
+  deferredIndexUiRefreshHandle = handle;
 }
 
 function queueIndexUiRefresh(
@@ -9888,8 +10298,8 @@ function rebuildAuxiliaryRegionIndexes() {
 
 function finalizeIndexBuildEffects() {
   runtimeState.devSelectionOverlayDirty = true;
-  notifyDevWorkspace();
   runtimeState.hitCanvasDirty = true;
+  queueIndexUiRefresh({ renderDevWorkspace: true }, "deferred");
 }
 
 function adoptRuntimePoliticalMeta(payload) {
@@ -9989,6 +10399,11 @@ function scheduleSecondarySpatialIndexBuild({
       scheduleSecondarySpatialIndexBuild({ timeout, reason: normalizedReason });
       return;
     }
+    if (isTnoRasterSceneSelected()) {
+      pendingSecondarySpatialBuildReasons.clear();
+      prepareScenarioSecondaryRegionIndexes({ reason: normalizedReason });
+      return;
+    }
     const taskKey = "secondary-spatial-index";
     if (!beginInteractionRecoveryTask(taskKey)) {
       scheduleSecondarySpatialIndexBuild({ timeout, reason: normalizedReason });
@@ -10029,6 +10444,44 @@ function scheduleSecondarySpatialIndexBuild({
   }, { timeout });
 }
 
+function prepareScenarioSecondaryRegionIndexes({ reason, hasWaterChange = true, hasSpecialChange = true }) {
+  const version = ++secondarySpatialPreparationVersion;
+  const owner = getSpatialIndexRuntimeOwner();
+  const isCurrent = () => version === secondarySpatialPreparationVersion && isTnoRasterSceneSelected();
+  owner.resetSecondarySpatialIndexState({ preserveCurrent: true, reason });
+  // Both geometry bounds and grid construction run on a private candidate.
+  // Keep the published lookup usable, and do not hold the interaction recovery
+  // lock while yielding: edits and camera gestures must remain available.
+  void (async () => {
+    await yieldToMain();
+    if (!isCurrent()) return;
+    const startedAt = nowMs();
+    const result = await owner.buildSecondarySpatialIndexesChunked({ isCurrent });
+    if (!isCurrent()) return;
+    if (result.status !== "published") {
+      // A context pack can invalidate the source identity without scheduling
+      // secondary work. Coalesce a fresh candidate unless another build won.
+      if (result.status === "cancelled" && runtimeState.secondarySpatialBuildPending) {
+        scheduleSecondarySpatialIndexBuild({ reason: `${reason}-superseded-source` });
+      }
+      return;
+    }
+    rebuildAuxiliaryRegionIndexes();
+    // A newer candidate can supersede a request for the other layer. Both
+    // indexes publish together, so refresh both lists from that same snapshot.
+    queueIndexUiRefresh({ renderWaterRegionList: true, renderSpecialRegionList: true });
+    runtimeState.hitCanvasDirty = true;
+    scheduleHitCanvasBuildIfNeeded({ reason: `${reason}-hit-canvas` });
+    recordRenderPerfMetric("scenarioSecondaryRegionIndexesPreparation", nowMs() - startedAt, {
+      ...result, reason, hasWaterChange, hasSpecialChange,
+    });
+  })().catch((error) => {
+    if (!isCurrent()) return;
+    recordRenderPerfMetric("scenarioSecondaryRegionIndexesPreparationFailed", 0, { reason, error: String(error) });
+    console.error("Secondary spatial preparation failed", error);
+  });
+}
+
 function syncScenarioSecondaryRegionIndexes({
   changedLayerKeys = [],
   reason = "scenario-chunk-promotion",
@@ -10045,6 +10498,15 @@ function syncScenarioSecondaryRegionIndexes({
   }
   if (isInteractionRecoveryBlocked()) {
     return false;
+  }
+  if (isTnoRasterSceneSelected()) {
+    cancelDeferredWork(secondarySpatialBuildHandle);
+    secondarySpatialBuildHandle = null;
+    pendingSecondarySpatialBuildReasons.clear();
+    prepareScenarioSecondaryRegionIndexes({ reason, hasWaterChange, hasSpecialChange });
+    // This owner now owns completion; callers must not schedule a duplicate
+    // synchronous infrastructure refresh while the old index is still live.
+    return true;
   }
   const startedAt = nowMs();
   rebuildAuxiliaryRegionIndexes();
@@ -10555,12 +11017,12 @@ function getWaterRegionDefaultFillColorById(id) {
 function getPathBounds(shape) {
   if (!rendererSurfaceHost.getPathCanvas() || !shape) return null;
   try {
-    const bounds = rendererSurfaceHost.getPathCanvas().bounds(shape);
-    if (!bounds || bounds.length !== 2) return null;
-    const minX = bounds[0][0];
-    const minY = bounds[0][1];
-    const maxX = bounds[1][0];
-    const maxY = bounds[1][1];
+    // Culling has usually projected this same immutable geometry already.
+    // Reuse only exact native path bounds, preserving this helper's rejection
+    // of failed projections rather than accepting coordinate-only estimates.
+    const bounds = computeProjectedGeoBounds(shape, { allowCoordinateFallback: false });
+    if (!bounds) return null;
+    const { minX, minY, maxX, maxY } = bounds;
     if (![minX, minY, maxX, maxY].every(Number.isFinite)) return null;
     if (maxX <= minX || maxY <= minY) return null;
     return { minX, minY, maxX, maxY };
@@ -11445,10 +11907,25 @@ function getPhysicalLandMaskInfo() {
 }
 
 function getPhysicalLandClipCacheKey(maskInfo) {
-  return [
-    getProjectionRenderSignature(),
-    `scenario-surface:${getScenarioSurfaceVersionSignal()}`,
-  ].join("::");
+  const projection = rendererSurfaceHost.getProjection();
+  const collection = maskInfo.collection;
+  const maskVersion = maskInfo.maskSource === "scenarioContextLandMask"
+    ? runtimeState.scenarioContextLandMaskVersionTag
+    : maskInfo.maskSource === "scenarioLandMask" ? runtimeState.scenarioLandMaskVersionTag : "";
+  // Published collections are immutable between their collection/geometry
+  // revisions. Do not scan all features merely to look up a projected path.
+  // Known water-only publications leave these mask revisions unchanged.
+  return JSON.stringify([
+    getObjectIdentityToken(projection), getProjectionGeometryGeneration(projection),
+    ["scale", "translate", "center", "rotate", "angle", "reflectX", "reflectY", "precision", "clipAngle", "clipExtent", "parallels"]
+      .map(name => [name, typeof projection?.[name] === "function" ? projection[name]() : null]),
+    ["preclip", "postclip"].map(name => typeof projection?.[name] === "function"
+      ? getObjectIdentityToken(projection[name]()) : ""),
+    PATH_POINT_RADIUS, maskInfo.maskSource, maskInfo.maskQualityToken,
+    getObjectIdentityToken(collection), getObjectIdentityToken(collection?.features), collection?.features?.length || 0,
+    getContextGeometryRevision(runtimeState), getContextCollectionRevision(runtimeState, collection),
+    String(maskVersion || ""), getPoliticalGeometrySnapshot(collection)?.revision || 0,
+  ]);
 }
 
 function getPhysicalLandClipPath(maskInfo, landMask) {
@@ -12736,6 +13213,53 @@ function getScenarioRegionOverlayRenderOwner() {
     scenarioRegionOverlayRenderOwner = createScenarioRegionOverlayRenderOwner(runtimeState, {
       rendererSurfaceHost,
       scenarioLayerCache: getRenderCacheOwner().scenarioLayerCache,
+      getScenarioWaterRasterLayout: () => !exportRenderInProgress && isTnoRasterSceneSelected()
+        ? getRenderPassLayout("contextScenario") : null,
+      // Existing visual invalidation owns in-place style/paint changes. These
+      // scalar revisions and source identities keep every continuation O(1).
+      getWaterPreparationRevision: () => [
+        waterPreparationInvalidationEpoch, runtimeState.activeScenarioId,
+        runtimeState.scenarioDataGeneration, runtimeState.topologyRevision, runtimeState.contextLayerRevision,
+        runtimeState.scenarioShellOverlayRevision, runtimeState.scenarioReliefOverlayRevision,
+        getObjectIdentityToken(runtimeState.scenarioWaterRegionsData),
+        getObjectIdentityToken(runtimeState.contextLayerExternalDataByName?.lakes),
+        getObjectIdentityToken(runtimeState.scenarioRuntimeTopologyData),
+        getObjectIdentityToken(runtimeState.activeScenarioManifest),
+        getObjectIdentityToken(runtimeState.waterRegionOverrides),
+        getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
+        runtimeState.showWaterRegions, runtimeState.showOpenOceanRegions,
+        runtimeState.allowOpenOceanPaint, runtimeState.allowOpenOceanSelect,
+        runtimeState.showScenarioReliefOverlays, runtimeState.mapSemanticMode,
+        runtimeState.dpr, runtimeState.width, runtimeState.height,
+        runtimeState.zoomTransform?.x, runtimeState.zoomTransform?.y, runtimeState.zoomTransform?.k,
+      ].join("|"),
+      getWaterWorkerProjectionOptions: () => {
+        const projection = rendererSurfaceHost.getProjection();
+        const options = { factory: "geoEqualEarth", pointRadius: PATH_POINT_RADIUS };
+        for (const key of ["scale", "translate", "center", "rotate", "angle", "reflectX", "reflectY", "precision", "clipAngle", "clipExtent"]) {
+          if (typeof projection?.[key] === "function") options[key] = projection[key]();
+        }
+        return options;
+      },
+      getWaterPatternSource: () => {
+        if (!doesOceanStyleRequireBathymetry() && !runtimeState.intensityFields?.channels?.oceanDepth?.enabled) return null;
+        const canvas = getRenderPassCacheState().canvases?.background;
+        const referenceTransform = getPassReferenceTransform("background");
+        if (!canvas || !referenceTransform) return null;
+        return { canvas, referenceTransform: { ...referenceTransform }, layout: { ...getRenderPassLayout("background") },
+          revision: `${waterPreparationInvalidationEpoch}:${getObjectIdentityToken(canvas)}:${referenceTransform.x}:${referenceTransform.y}:${referenceTransform.k}` };
+      },
+      onWaterPreparationUnavailable: (reason) => {
+        if (tnoRasterSceneFailure) return;
+        tnoRasterSceneFailure = `water-preparation:${reason}`;
+        // The direct political pass has no RGBA backing. Invalidate both passes
+        // so composeCachedPasses rebuilds the complete native scene before display.
+        invalidateRenderPasses(["political", "contextScenario"], "water-preparation-unavailable");
+        queueMicrotask(() => requestRendererRender("water-preparation-unavailable", { visual: true }));
+      },
+      prepareTargetContext,
+      withRenderTarget,
+      resourceBudget: pageResourceBudget,
       cloneZoomTransform,
       nowMs,
       collectContextMetric,
@@ -12902,6 +13426,7 @@ function getCountryLabelRenderOwner() {
       getProjection: () => rendererSurfaceHost.getProjection(),
       getProjectionIdentity: () => getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
       getViewportSize: () => ({ width: runtimeState.width, height: runtimeState.height }),
+      getPaintBounds: getTnoSceneLabelPaintBounds,
       getTransform: () => runtimeState.zoomTransform,
       getLanguage: () => runtimeState.currentLanguage || "en",
       getCountryLabelSource: () => getCountryLabelSourceOwner().getSource(),
@@ -12913,6 +13438,8 @@ function getCountryLabelRenderOwner() {
       },
     },
     helpers: {
+      isPrivatePreparationEnabled: () => !exportRenderInProgress && isTnoRasterSceneSelected()
+        && tnoRasterSceneOwner?.isActive() && !runtimeState.isInteracting,
       onInvalidate: () => {
         invalidateRenderPasses("labels", "country-label-layout");
         requestRendererRender("country-label-layout", { flush: false });
@@ -12931,12 +13458,59 @@ function getCountryLabelRenderOwner() {
   return countryLabelRenderOwner;
 }
 
+let cityPointsPreparationPromise = null;
+function prepareCityPointsPass() {
+  if (exportRenderInProgress || !isTnoRasterSceneSelected() || !tnoRasterSceneOwner?.isActive()
+    || runtimeState.isInteracting) {
+    cityPointsRenderOwner?.cancelPreparation();
+    return null;
+  }
+  const preparation = getCityPointsRenderOwner().prepareCurrentView(runtimeState.zoomTransform?.k || 1,
+    { isCurrent: () => !runtimeState.isInteracting });
+  if (preparation && preparation !== cityPointsPreparationPromise) {
+    cityPointsPreparationPromise = preparation;
+    preparation.then((ready) => {
+      if (ready) requestRendererRender("city-plan-prepared", { flush: false });
+    }, () => {}).finally(() => {
+      if (cityPointsPreparationPromise === preparation) cityPointsPreparationPromise = null;
+    });
+  }
+  return preparation;
+}
+
+function prepareLabelsPass() {
+  // Both plans are private and independent. Neither may be built by a draw
+  // callback, including the overview reservation that precedes country labels.
+  const preparations = [prepareCityPointsPass(), prepareCountryLabelsPass()].filter(Boolean);
+  return preparations.length ? Promise.all(preparations) : null;
+}
+
+function prepareCountryLabelsPass() {
+  if (exportRenderInProgress || !isTnoRasterSceneSelected() || !tnoRasterSceneOwner?.isActive()
+    || runtimeState.isInteracting || runtimeState.styleConfig?.countryLabels?.enabled === false) {
+    countryLabelRenderOwner?.cancelPreparation();
+    return null;
+  }
+  const source = getCountryLabelSourceOwner();
+  const status = source.getSource().status;
+  if (status === "pending") return source.prepare();
+  if (status !== "ready") return null;
+  return getCountryLabelRenderOwner().prepareCurrentView(runtimeState.zoomTransform?.k || 1);
+}
+
 function drawLabelsPass(k, { interactive = false } = {}) {
   return recordLabelPass("labels", () => drawLabelsPassContent(k, { interactive }));
 }
 
 function recordLabelPass(passName, draw) {
   if (exportRenderInProgress) return draw();
+  if (isTnoRasterSceneSelected() && tnoRasterSceneOwner?.isActive()) {
+    // The complete GPU scene already retains the label texture for navigation.
+    // Recording every Canvas text/style call here duplicates that representation
+    // and synchronously queries the drawing context for thousands of labels.
+    labelDrawSnapshotOwner.clear();
+    return draw();
+  }
   const context = rendererSurfaceHost.getContext();
   const transform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity;
   return labelDrawSnapshotOwner.capture(passName, context, {
@@ -13124,6 +13698,7 @@ function drawOrdinaryMarineLabels(k, occupiedBoxes) {
     const anchor = resolveMarineInteriorAnchor({
       part: selectedPart, generation, centroid, bounds: selectedPartBounds, transform,
       width: runtimeState.width, height: runtimeState.height,
+      paintBounds: getTnoSceneLabelPaintBounds(),
       gridSize: id === selectedId ? 5 : 3,
       contains: (point) => {
         if (point === centroid && marineLabelCentroidInteriorCache.has(selectedPart)) {
@@ -13143,6 +13718,7 @@ function drawOrdinaryMarineLabels(k, occupiedBoxes) {
   let selectedDrawn = false;
   const drawnCount = drawMarineLabels(entries, {
     context, scale: k, width: runtimeState.width, height: runtimeState.height,
+    paintBounds: getTnoSceneLabelPaintBounds(),
     language: runtimeState.currentLanguage, selectedId, occupiedBoxes,
     onPlaced: (entry) => { if (entry.id === selectedId) selectedDrawn = true; },
   });
@@ -13156,6 +13732,33 @@ function drawOrdinaryMarineLabels(k, occupiedBoxes) {
 function renderPassToCache(passName, drawFn, transform, timings) {
   exactCompositeReuseOwner?.invalidate();
   let passStart = 0;
+  const borderCandidate = passName === "borders" && !exportRenderInProgress && isTnoRasterSceneSelected()
+    ? borderCanvasPreparationOwner?.takeReady() : null;
+  if (borderCandidate) {
+    const cache = getRenderPassCacheState(), previous = cache.canvases.borders;
+    cache.canvases.borders = borderCandidate.canvas;
+    getRenderCacheOwner().syncSurfaceResourceAccounting();
+    if (previous && previous !== borderCandidate.canvas) { previous.width = 1; previous.height = 1; }
+    getRenderPassCommitAccountingOwner().commitRenderPass({ passName, transform, timings, passStart: nowMs() });
+    borderCanvasPreparationOwner.noteCommitted(borderCandidate);
+    tnoRasterSceneOwner?.notePassCommit(passName);
+    return;
+  }
+  const physicalCandidate = passName === "physicalBase" && !exportRenderInProgress && isTnoRasterSceneSelected()
+    ? physicalViewportCacheOwner?.takeReady() : null;
+  if (physicalCandidate) {
+    const cache = getRenderPassCacheState(), previous = cache.canvases[passName];
+    cache.canvases[passName] = physicalCandidate.canvas;
+    getRenderCacheOwner().syncSurfaceResourceAccounting();
+    getRenderPassCommitAccountingOwner().commitRenderPass({ passName, transform, timings, passStart: nowMs() });
+    const retained = physicalViewportCacheOwner.noteCommitted(physicalCandidate, previous);
+    if (previous && previous !== physicalCandidate.canvas && !retained) { previous.width = 1; previous.height = 1; }
+    tnoRasterSceneOwner?.notePassCommit(passName);
+    return;
+  }
+  if (passName === "physicalBase" && !exportRenderInProgress) {
+    physicalViewportCacheOwner?.noteNativeDraw(getRenderPassCacheState().canvases.physicalBase);
+  }
   const hostResult = getRenderPassCacheHostOwner().prepareRenderPassHost({
     passName,
     transform,
@@ -13165,7 +13768,7 @@ function renderPassToCache(passName, drawFn, transform, timings) {
     },
   });
   if (hostResult?.skipped) return;
-  getRenderPassCommitAccountingOwner().commitRenderPass({
+  const commit = getRenderPassCommitAccountingOwner().commitRenderPass({
     passName,
     transform,
     drawResult: hostResult.drawResult,
@@ -13173,6 +13776,10 @@ function renderPassToCache(passName, drawFn, transform, timings) {
     passStart,
     hostSummary: hostResult,
   });
+  if (commit.committed) {
+    if (passName === "political") politicalPassUsesDirectScene = !!politicalIdRasterRuntimeOwner?.getDirectFrame();
+    tnoRasterSceneOwner?.notePassCommit(passName);
+  }
 }
 
 function resetCanvasContext(targetContext, width, height) {
@@ -13213,6 +13820,48 @@ function blitCompositeBufferToMain(bufferCanvas) {
 
 function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity) {
   if (!rendererSurfaceHost.getContext()?.canvas) return false;
+  if (!exportRenderInProgress && isTnoRasterSceneSelected()) {
+    const scene = getTnoRasterSceneOwner();
+    if (scene.preparePublication?.(currentTransform) === false) {
+      scene.present(currentTransform, { refresh: false });
+      return false;
+    }
+    const staged = politicalIdRasterRuntimeOwner?.getDiagnostics().stagedPending;
+    if (staged && !politicalIdRasterRuntimeOwner.publishDirectFrame()) {
+      scene.cancelPublicationPreparation?.();
+      invalidateRenderPasses(["political"], "scene-candidate-rejected");
+      if (politicalIdRasterRuntimeOwner.getDiagnostics().stagedRejectionReason === "stale-candidate") {
+        queueMicrotask(() => requestRendererRender("scene-candidate-rejected"));
+      }
+      tnoRasterSceneOwner?.present(currentTransform, { refresh: false });
+      return false;
+    }
+    if (getTnoRasterSceneOwner().present(currentTransform)) {
+      politicalPassUsesDirectScene = true;
+      // Startup can begin a legacy whole-world raster before the first GPU
+      // scene is eligible. Once the GPU owns navigation, retire that producer
+      // and its queued identity retries; fallback can create a fresh owner.
+      if (navigationSceneOwner) {
+        navigationSceneOwner.dispose();
+        navigationSceneOwner = null;
+        overviewFrameOwner?.clear();
+      }
+      incrementPerfCounter("composites");
+      return true;
+    }
+    // A direct political pass has no RGBA copy. If the shared scene fails after
+    // preparation, rebuild that pass through the existing producer before using
+    // the 2D compositor; never present a blank political layer as a fallback.
+    if (politicalPassUsesDirectScene) {
+      tnoRasterSceneFailure = tnoRasterSceneOwner.getDiagnostics().fallbackReason || "scene-unavailable";
+    }
+  }
+  if (!exportRenderInProgress) tnoRasterSceneOwner?.clear();
+  if (politicalPassUsesDirectScene) {
+    politicalIdRasterRuntimeOwner?.dispose();
+    politicalIdRasterRuntimeOwner = null;
+    renderPassToCache("political", drawPoliticalPass, currentTransform, {});
+  }
   const bufferCanvas = ensureCompositeBufferCanvas();
   const result = getExactCompositeReuseOwner().composeExact(bufferCanvas, passNames, currentTransform);
   if (!result.ok) {
@@ -13433,7 +14082,8 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   }
   // A matching screen DPR may still hold transformed interaction passes. Final
   // exports at that density need an exact redraw as well.
-  const redrawAtTargetResolution = pixelRatio !== null && targetDpr >= Number(runtimeState.dpr || 1);
+  const redrawAtTargetResolution = (politicalPassUsesDirectScene && passNames.includes("political"))
+    || (pixelRatio !== null && targetDpr >= Number(runtimeState.dpr || 1));
   const logicalWidth = Number(runtimeState.width || 0);
   const logicalHeight = Number(runtimeState.height || 0);
   if (redrawAtTargetResolution) {
@@ -13571,12 +14221,21 @@ function reconcileRenderFrameResources() {
   const sceneKey = JSON.stringify([runtimeState.activeScenarioId, runtimeState.sceneGeneration,
     getProjectionGeometryGeneration(rendererSurfaceHost.getProjection())]);
   if (sceneKey !== previousRenderSceneKey) {
+    cityPointsRenderOwner?.cancelPreparation();
+    borderCanvasPreparationOwner?.clear();
     previousRenderSceneKey = sceneKey;
+    physicalViewportCacheOwner?.clear();
+    tnoRasterSceneOwner?.clear();
+    tnoRasterSceneFailure = "";
     politicalBackgroundRenderOwner?.releaseScenarioPoliticalBackgroundCache("root-scene-change");
     labelDrawSnapshotOwner.clear();
     navigationSceneOwner?.clear();
   }
   const activePassNames = getActiveRenderPassNames();
+  if (!isTnoRasterSceneSelected() || !activePassNames.includes("borders")) borderCanvasPreparationOwner?.clear();
+  if (!isTnoRasterSceneSelected() || !activePassNames.includes("physicalBase")) {
+    physicalViewportCacheOwner?.clear();
+  }
   const activeSignature = activePassNames.join("|");
   if (activeSignature !== previousActiveRenderPassSignature) {
     previousActiveRenderPassSignature = activeSignature;
@@ -14208,7 +14867,7 @@ function render() {
     if (setCanvasSize({ reason: "display-quality-change" })) markAllOverlaysDirty();
   }
   ensureResolvedColorsReadyForStableVisibleFrame("render");
-  const rasterActivation = isPoliticalIdRasterSelected() ? `${runtimeState.activeScenarioId}:${runtimeState.sceneGeneration}:${readPoliticalRenderPolicy().effectiveMode}` : "";
+  const rasterActivation = isPoliticalIdRasterSelected() ? `${runtimeState.activeScenarioId}:${runtimeState.sceneGeneration}:${readPoliticalRenderPolicy({ scenarioId: runtimeState.activeScenarioId }).effectiveMode}` : "";
   if (rasterActivation !== politicalIdRasterActivationKey) {
     politicalIdRasterActivationKey = rasterActivation;
     // Preserve the current native frame while the initial assets load. The
@@ -15681,9 +16340,14 @@ function resetRendererTransactionState({
   cancelHoverOverlayRender = false,
   hitCanvasDirty = false,
 } = {}) {
+  cityPointsRenderOwner?.cancelPreparation();
   contextLayerRenderScheduler.reset();
   politicalIdRasterRuntimeOwner?.dispose();
   politicalIdRasterRuntimeOwner = null;
+  tnoRasterSceneOwner?.dispose();
+  tnoRasterSceneOwner = null;
+  tnoRasterSceneFailure = "";
+  politicalPassUsesDirectScene = false;
   paintContourRuntimeOwner?.dispose();
   riverInternalContourOwner?.dispose();
   riverInternalContourOwner = null;
@@ -15706,7 +16370,9 @@ function rebuildPrimaryPoliticalDerivedState({
   buildSpatial = true,
   includeSecondarySpatial = false,
   incremental = false,
+  preparedPoliticalState = null,
 } = {}) {
+  if (preparedPoliticalState) return preparedPoliticalState.adopt();
   const previousCollection = runtimeState.landDataFull;
   rebuildPrimaryPoliticalCollections();
   const coverageInputSnapshot = {
@@ -15730,6 +16396,131 @@ function rebuildPrimaryPoliticalDerivedState({
   });
   return { coverageInputSnapshot, incremental: !!incrementalDelta, changedFeatureCount: incrementalDelta?.changedIds.length || 0,
     removedFeatureCount: incrementalDelta?.removedIds.length || 0 };
+}
+
+// Prepare the complete next political authority before chunk payload publication.
+// Every yield leaves the displayed document, picking maps and colors untouched.
+export async function prepareScenarioPoliticalChunkPromotion({ politicalPayload, primaryPoliticalPayload = null, atlantropaPayload = undefined, isCurrent = () => true } = {}) {
+  if (!isTnoRasterSceneSelected() || !tnoRasterSceneOwner?.isActive()
+    || politicalPayload?.globalCoverage !== true || !runtimeState.landIndex?.size) return null;
+  const startedAt = nowMs();
+  const previousCollection = runtimeState.landDataFull;
+  const colors = runtimeState.colors, colorRevision = runtimeState.colorRevision;
+  const identity = getPoliticalDerivedStateIdentity();
+  const atlantropa = runtimeState.scenarioAtlantropaData;
+  const expectedAtlantropaFeatures = atlantropaPayload === undefined ? atlantropa?.features : atlantropaPayload?.features;
+  const riverData = runtimeState.riversData;
+  const current = () => isCurrent() && isTnoRasterSceneSelected()
+    && runtimeState.landDataFull === previousCollection
+    && runtimeState.colors === colors && runtimeState.colorRevision === colorRevision
+    && (runtimeState.scenarioAtlantropaData === atlantropa
+      || runtimeState.scenarioAtlantropaData?.features === expectedAtlantropaFeatures)
+    && runtimeState.riversData === riverData
+    && getPoliticalDerivedStateIdentity().every((value, index) => value === identity[index]);
+  const options = { isCurrent: current, yieldControl: yieldToMain, nowMs };
+  const collectionOwner = getPoliticalCollectionOwner();
+  // The first private slice must not share the publisher's host task. Later
+  // stages also cross a host boundary, so their individually bounded work
+  // cannot accumulate into one long task through promise continuations.
+  await yieldToMain();
+  if (!current()) return { status: "cancelled" };
+  const composed = await collectionOwner.composePoliticalFeatureCollectionsChunked(null, politicalPayload, null, options);
+  if (composed.status !== "prepared" || !current()) return { status: "cancelled" };
+  await yieldToMain();
+  if (!current()) return { status: "cancelled" };
+  const extras = buildAtlantropaLandLikeFeatureCollection(expectedAtlantropaFeatures || []);
+  const fullCollection = getRiverPaintRuntime(runtimeState).pinCollection(
+    appendUniqueFeatureCollections(composed.collection, extras, { publish: false }));
+  const [view, sourceCountriesPreparation] = await Promise.all([
+    collectionOwner.preparePoliticalCollectionViewChunked(fullCollection, options),
+    getBorderMeshOwner().prepareSourceCountrySets({ fullCollection, ...options }),
+  ]);
+  if (view.status !== "prepared" || sourceCountriesPreparation.status !== "prepared" || !current()) return { status: "cancelled" };
+  await yieldToMain();
+  if (!current()) return { status: "cancelled" };
+  const incrementalDelta = politicalDerivedStateCache.describe({ identity, previousCollection,
+    collection: fullCollection, colors, colorRevision });
+  const spatialOwner = getSpatialIndexRuntimeOwner();
+  const spatial = await spatialOwner.preparePrimarySpatialCandidateChunked({
+    features: view.interactiveCollection?.features || [], riverFeatures: riverData?.features || [],
+    incrementalDelta, projectedBoundsCache: ensureProjectedBoundsCache(), ...options,
+  });
+  if (spatial.status !== "prepared" || !current()) return { status: "cancelled" };
+  // Resolve against the current canonical edit state, then guard its revision at
+  // adoption. Edits during preparation cancel this candidate rather than vanish.
+  const nextColors = incrementalDelta ? { ...colors } : {};
+  for (const id of incrementalDelta?.removedIds || []) delete nextColors[id];
+  const colorFeatures = incrementalDelta
+    ? incrementalDelta.changedIds.map(id => [id, incrementalDelta.features.get(id)])
+    : (fullCollection.features || []).map((feature, index) => [getFeatureId(feature) || `feature-${index}`, feature]);
+  let sliceStarted = nowMs(), colorMaxSliceMs = 0;
+  for (let index = 0; index < colorFeatures.length; index++) {
+    const [id, feature] = colorFeatures[index];
+    const color = getResolvedFeatureColor(feature, id);
+    if (color) nextColors[id] = color;
+    else delete nextColors[id];
+    if (index % 400 === 399 || nowMs() - sliceStarted >= 6) {
+      colorMaxSliceMs = Math.max(colorMaxSliceMs, nowMs() - sliceStarted);
+      await yieldToMain();
+      if (!current()) return { status: "cancelled" };
+      sliceStarted = nowMs();
+    }
+  }
+  colorMaxSliceMs = Math.max(colorMaxSliceMs, nowMs() - sliceStarted);
+  const colorIds = Object.keys(nextColors);
+  const colorsChanged = Object.keys(colors || {}).length !== colorIds.length
+    || colorIds.some(id => nextColors[id] !== colors[id]);
+  const coverageInputSnapshot = { fullCollection, expectedInteractiveCollection: view.interactiveCollection };
+  const expectedPrimary = primaryPoliticalPayload?.features?.length < politicalPayload.features.length
+    ? primaryPoliticalPayload : null;
+  const coveragePreparation = await analyzeScenarioPoliticalDerivedStateCoverageChunked({
+    scenarioPoliticalChunkData: politicalPayload, scenarioPoliticalVisibleChunkData: expectedPrimary,
+    landDataFull: fullCollection, landData: view.interactiveCollection, colors: nextColors,
+  }, { ...options, coverageInputSnapshot, shouldExcludePoliticalVisualFeature });
+  if (coveragePreparation.status !== "prepared" || !current()) return { status: "cancelled" };
+  let consumed = false;
+  const canAdopt = () => !consumed && current() && spatialOwner.isPrimarySpatialCandidateCurrent(spatial.candidate);
+  recordRenderPerfMetric("politicalPromotionPreparation", nowMs() - startedAt, {
+    featureCount: fullCollection.features.length, incremental: !!incrementalDelta,
+    changedFeatureCount: incrementalDelta?.changedIds.length || 0,
+    maxSliceMs: Math.max(composed.maxSliceMs, view.maxSliceMs, spatial.maxSliceMs, colorMaxSliceMs, coveragePreparation.maxSliceMs, sourceCountriesPreparation.maxSliceMs),
+    yieldCount: composed.yieldCount + view.yieldCount + spatial.yieldCount + coveragePreparation.yieldCount + sourceCountriesPreparation.yieldCount,
+    computedBounds: spatial.computedBounds, reusedItems: spatial.reusedItems,
+  });
+  return { status: "prepared", isCurrent: canAdopt, adopt() {
+    if (!canAdopt()) throw new Error("Political promotion candidate expired before adoption.");
+    if (spatialOwner.adoptPrimarySpatialCandidate(spatial.candidate).status !== "published") {
+      throw new Error("Political promotion candidate could not be adopted.");
+    }
+    consumed = true;
+    runtimeState.landDataFull = fullCollection;
+    runtimeState.landData = view.interactiveCollection;
+    previousPoliticalExtraIds = (extras?.features || []).map(getFeatureId);
+    setDebugCountryCoverageState(runtimeState, view.coverage);
+    if (!incrementalDelta) buildRuntimePoliticalMeta();
+    replaceResolvedColorsState(state, colorsChanged ? nextColors : colors);
+    if (colorsChanged) bumpColorRevision(state);
+    retargetPendingPoliticalColorEditRevisionAfterColorRebuild(Number(colorRevision || 0));
+    getCountryFillPaletteOwner().invalidate();
+    notifyPaintContourColorsChanged();
+    queueIndexUiRefresh({ renderCountryList: true, renderWaterRegionList: true, renderSpecialRegionList: true }, "deferred");
+    finalizeIndexBuildEffects();
+    politicalDerivedStateCache.commit({ identity: getPoliticalDerivedStateIdentity(), collection: fullCollection,
+      colors: runtimeState.colors, colorRevision: runtimeState.colorRevision });
+    const publishedIdentity = getPoliticalDerivedStateIdentity();
+    const publishedColors = runtimeState.colors, publishedColorRevision = runtimeState.colorRevision;
+    // This evidence belongs to these exact published authorities. An edit or
+    // replacement invalidates it; deferred infrastructure then checks afresh.
+    const getPreparedCoverage = () => runtimeState.landDataFull === fullCollection
+      && runtimeState.landData === view.interactiveCollection
+      && runtimeState.colors === publishedColors && runtimeState.colorRevision === publishedColorRevision
+      && runtimeState.scenarioPoliticalChunkData?.features === politicalPayload.features
+      && runtimeState.scenarioPoliticalVisibleChunkData?.features === expectedPrimary?.features
+      && getPoliticalDerivedStateIdentity().every((value, index) => value === publishedIdentity[index])
+      ? coveragePreparation.coverage : null;
+    return { coverageInputSnapshot, getPreparedCoverage, preparedSourceCountries: sourceCountriesPreparation,
+      incremental: !!incrementalDelta, prepared: true };
+  } };
 }
 
 function setMapData({
@@ -15791,6 +16582,7 @@ scenarioRefreshRuntime = createScenarioRefreshRuntime({
   yieldToMain,
   nowMs,
   markRendererTopologyChanged,
+  notifyPaintContourSourcePublished: (publication) => paintContourRuntimeOwner?.notifySourcePublished(publication),
   clearDeferredInternalBorderMeshCaches,
   scheduleDeferredHeavyBorderMeshes,
   resetScenarioWaterCacheAdaptiveState,
@@ -15871,14 +16663,34 @@ export function getRendererAsyncWorkStatus() {
   };
 }
 
+export function getCountryLabelReadiness() {
+  const expected = runtimeState.styleConfig?.countryLabels?.enabled !== false;
+  if (!expected) return { expected, ready: true, sourceStatus: "disabled" };
+  const source = countryLabelSourceOwner?.peekSource();
+  if (source?.status === "disabled") return { expected, ready: true, sourceStatus: "disabled" };
+  if (!source || source.status !== "ready" || !countryLabelRenderOwner) {
+    return { expected, ready: false, sourceStatus: source?.status || "uninitialized" };
+  }
+  const readiness = countryLabelRenderOwner.getReadinessForCurrentView(source);
+  return { expected, ...readiness, sourceStatus: source.status,
+    ready: readiness.ready && !runtimeState.renderPassCache?.dirty?.labels };
+}
+
 export function getPoliticalIdRasterDiagnostics() {
   const reason = getPoliticalIdRasterEligibilityReason();
   const current = politicalIdRasterRuntimeOwner?.getDiagnostics();
-  const policy = readPoliticalRenderPolicy();
+  const policy = readPoliticalRenderPolicy({ scenarioId: runtimeState.activeScenarioId });
   const passes = politicalPassOrchestratorOwner?.getDiagnostics() || {};
-  return { ...current, ...policy, passes,
+  return { ...current, ...policy, passes, asyncWork: getRendererAsyncWorkStatus(),
+    scene: { active: false, frames: 0, textureUploads: 0, bytes: 0,
+      ...tnoRasterSceneOwner?.getDiagnostics(), failure: tnoRasterSceneFailure,
+      borderCanvas: borderCanvasPreparationOwner?.getStats(),
+      physicalCanvas: { ...physicalViewportCacheOwner?.getStats(), fullWorld: false, pending: !!physicalViewportCacheOwner?.getPendingPromise() } },
+    waterPreparation: scenarioRegionOverlayRenderOwner?.getPreparationDiagnostics(),
+    borderPreparation: { pending: !!borderPathPreparationJob || !!borderCanvasPreparationOwner?.getPendingPromise(), revision: borderPathPreparationJob?.revision ?? null,
+      failedRevision: borderPathPreparationFailedRevision, ...borderPathPreparationStats },
     actualBackend: passes.lastBackend || "none", sourceCoverage: policy.persistent ? "complete-display-v1" : "fine",
-    runtimeVersion: "raster-r0-r2-v1", selected: reason === "eligible",
+    runtimeVersion: "tno-resident-gpu-scene-v1", selected: reason === "eligible",
     pending: current?.pending || 0,
     displayState: reason === "off" ? "off" : reason !== "eligible" ? "fallback" : current?.displayState || "preparing",
     reason: reason === "eligible" ? current?.reason || "awaiting-render" : reason };

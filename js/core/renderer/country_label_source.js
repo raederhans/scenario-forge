@@ -62,10 +62,14 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
     return { scenarioId, bundle, chunked, bases, topology, identity };
   }
 
-  function publishNames() {
-    const next = JSON.stringify([state.currentLanguage, getObjectIdentityToken(state.scenarioCountriesByTag),
+  function currentNameKey() {
+    return JSON.stringify([state.currentLanguage, getObjectIdentityToken(state.scenarioCountriesByTag),
       getObjectIdentityToken(state.countryNames), getObjectIdentityToken(state.locales?.geo),
       getObjectIdentityToken(state.geoAliasToStableKey)]);
+  }
+
+  function publishNames() {
+    const next = currentNameKey();
     if (next === nameKey) return;
     nameKey = next;
     countries = geometryRecords.map(({ countryCode, geometry }) => {
@@ -182,6 +186,15 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
 
   return Object.freeze({
     getSource() { sync(); return { status, sourceToken, revision, features, countries, error }; },
+    // Acceptance observers may inspect completion without selecting a source,
+    // loading chunks, or starting/replacing a geometry worker.
+    peekSource() {
+      const c = context();
+      const disabled = c.scenarioId === 'blank_base' || state.mapSemanticMode === 'blank';
+      const current = sourceToken === c.identity && (status !== 'ready' || nameKey === currentNameKey());
+      return { status: disposed ? 'disposed' : disabled ? 'disabled' : current ? status : 'pending',
+        sourceToken, revision, features, countries, error: current ? error : '' };
+    },
     prepare,
     dispose() {
       disposed = true; buildRequest?.controller.abort(); buildRequest?.client.terminate();

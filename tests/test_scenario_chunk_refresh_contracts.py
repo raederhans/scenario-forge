@@ -852,7 +852,29 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             self.scenario_chunk_runtime_source.count(
                 "canRollbackPromotionContinuation()"
             ),
-            4,
+            5,
+        )
+        # The optional-only candidate survives the second frame yield without
+        # being consumed. Its expiry must restore only this owner's snapshot and
+        # return before optional refresh can adopt or synchronously rebuild it.
+        optional_refresh_slice = self._slice_between(
+            self.scenario_chunk_runtime_source,
+            "      if (deferredOptionalVisibleRefresh) {",
+            "\n      if (!isPendingScenarioChunkPromotionCurrent({",
+        )
+        self.assertRegex(
+            optional_refresh_slice,
+            re.compile(
+                r'if \(preparedPoliticalState && !preparedPoliticalState\.isCurrent\(\)\) \{\s*'
+                r'if \(canRollbackPromotionContinuation\(\)\) \{\s*'
+                r'restoreMergedLayerRuntimeSnapshot\(mergedLayerSnapshot\);\s*'
+                r'restoreScenarioDataGenerationSnapshot\(\);\s*\}\s*'
+                r'setPromotionCommitStatus\("promotion-deferred", '
+                r'\{ inFlight: false, finishedAt: Date\.now\(\) \}\);\s*'
+                r'return false;\s*\}\s*'
+                r'refreshScenarioRenderVisibleOptionalChunkPayloadChange\(deferredOptionalVisibleRefresh\);',
+                re.S,
+            ),
         )
         query_source = (ROOT / "js/core/scenario/chunk_promotion_queries.js").read_text(encoding="utf-8")
         self.assertIn("currentLoadState !== loadState", query_source)
@@ -910,7 +932,9 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         helper_start = self.map_renderer_source.index("function clearDeferredInternalBorderMeshCaches(")
         helper_end = self.map_renderer_source.index("function buildDetailAdmMeshSignature", helper_start)
         helper_source = self.map_renderer_source[helper_start:helper_end]
-        self.assertIn("setStaticMeshSourceCountries(getSourceCountrySets());", helper_source)
+        self.assertIn('preparedSourceCountries?.status === "prepared"', helper_source)
+        self.assertIn("preparedSourceCountries.sourceFeatures === features", helper_source)
+        self.assertIn("setStaticMeshSourceCountries(prepared ? preparedSourceCountries.sourceCountries : getSourceCountrySets());", helper_source)
         self.assertIn("runtimeState.cachedProvinceBorders = [];", helper_source)
         self.assertIn("runtimeState.cachedProvinceBordersByCountry = new Map();", helper_source)
         self.assertIn("runtimeState.cachedLocalBorders = [];", helper_source)
@@ -931,8 +955,11 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             promotion_source,
             re.compile(
                 r'if \(hasPoliticalChange\) \{[\s\S]*?'
-                r'rebuildPrimaryPoliticalDerivedState\(\{\s*scheduleUiMode: "deferred",\s*buildSpatial: true,\s*includeSecondarySpatial: false,\s*incremental: true,\s*\}\)\?\.coverageInputSnapshot;\s*\}'
-                r'[\s\S]*?if \(hasPoliticalChange\) \{\s*clearDeferredInternalBorderMeshCaches\(\);\s*scheduleDeferredHeavyBorderMeshes\(\);\s*\}',
+                r'const rebuilt = rebuildPrimaryPoliticalDerivedState\(\{\s*scheduleUiMode: "deferred",\s*buildSpatial: true,\s*includeSecondarySpatial: false,\s*incremental: true,\s*preparedPoliticalState,\s*\}\);'
+                r'\s*coverageInputSnapshot = rebuilt\?\.coverageInputSnapshot;'
+                r'\s*preparedSourceCountries = rebuilt\?\.preparedSourceCountries \|\| null;'
+                r'\s*getPreparedPoliticalCoverage = rebuilt\?\.getPreparedCoverage \|\| \(\(\) => null\);\s*\}'
+                r'[\s\S]*?if \(hasPoliticalChange\) \{\s*if \(preparedSourceCountries\) clearDeferredInternalBorderMeshCaches\(\{ preparedSourceCountries \}\);\s*else clearDeferredInternalBorderMeshCaches\(\);\s*scheduleDeferredHeavyBorderMeshes\(\);\s*\}',
                 re.S,
             ),
         )

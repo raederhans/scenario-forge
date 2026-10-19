@@ -40,10 +40,13 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
   getContextBaseZoomBucketId,
   getProjectedViewportBounds,
   VIEWPORT_CULL_OVERSCAN_PX,
+  getPaintOverscanPx = () => VIEWPORT_CULL_OVERSCAN_PX * 0.5,
   canonicalCountryCode,
   cancelDeferredWork,
   scheduleDeferredWork,
   isInteractionRecoverySettled,
+  isRetainedSceneActive = () => false,
+  canStartPrivateBorderMeshPreparation = () => false,
   beginInteractionRecoveryTask,
   endInteractionRecoveryTask,
   nowMs,
@@ -63,7 +66,18 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
 }) {
   let deferredHeavyBorderMeshHandle = null;
   let workerAbort = null;
+  let privatePreparation = null;
   let visibleBorderCountryCodesCache = { signature: "", codes: new Set() };
+
+  function finishPrivatePreparation(preparation = privatePreparation) {
+    preparation?.resolve();
+    if (privatePreparation === preparation) privatePreparation = null;
+  }
+
+  function getPrivatePreparationPromise() {
+    if (!isRetainedSceneActive()) finishPrivatePreparation();
+    return privatePreparation?.promise || null;
+  }
 
   function buildDetailAdmMeshSignature(visibleCountryCodes = new Set(), k = runtimeState.zoomTransform?.k || 1) {
     const detailCountries = Array.from(getStaticMeshSourceCountries().detail || new Set())
@@ -80,7 +94,7 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
   }
 
   function getVisibleCountryCodesForBorderMeshes() {
-    const viewportBounds = getProjectedViewportBounds({ overscanPx: VIEWPORT_CULL_OVERSCAN_PX * 0.5 });
+    const viewportBounds = getProjectedViewportBounds({ overscanPx: getPaintOverscanPx() });
     if (!viewportBounds) {
       return new Set();
     }
@@ -119,7 +133,7 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
   let deferredHeavyBorderRunId = 0;
 
   function readWorkIdentity() {
-    const bounds = getProjectedViewportBounds({ overscanPx: VIEWPORT_CULL_OVERSCAN_PX * 0.5 });
+    const bounds = getProjectedViewportBounds({ overscanPx: getPaintOverscanPx() });
     return [
       runtimeState.activeScenarioId, runtimeState.scenarioApplyEpoch,
       runtimeState.sceneGeneration, runtimeState.scenarioDataGeneration,
@@ -136,6 +150,7 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
 
   function cancelDeferredHeavyBorderMeshes() {
     deferredHeavyBorderRunId += 1;
+    finishPrivatePreparation();
     workerAbort?.abort();
     workerAbort = null;
     cancelDeferredWork(deferredHeavyBorderMeshHandle);
@@ -146,13 +161,26 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
     cancelDeferredHeavyBorderMeshes();
     const runId = deferredHeavyBorderRunId;
     const taskKey = "deferred-heavy-border-meshes";
+    const preparation = isRetainedSceneActive() && buildDeferredBorderMeshesAsync && commitDeferredBorderMeshes
+      ? { promise: null, resolve: null } : null;
+    if (preparation) {
+      preparation.promise = new Promise(resolve => { preparation.resolve = resolve; });
+      privatePreparation = preparation;
+    }
     // Borrowed topology/spatial identities stay separate from mutable progress.
     // Compare references without cloning or modifying the captured collections.
     let executionIdentity = null;
     let work = null;
+    // Only private Worker preparation can run without the native mesh path's
+    // quiet period. Admission and current-identity checks still guard commit.
+    const useRetainedWorkerPath = () => isRetainedSceneActive()
+      && !!buildDeferredBorderMeshesAsync && !!commitDeferredBorderMeshes
+      && work?.workerStatus !== "fallback";
     const enqueue = () => {
       if (runId !== deferredHeavyBorderRunId) return;
-      deferredHeavyBorderMeshHandle = scheduleDeferredWork(runSlice, { timeout: 360 });
+      try {
+        deferredHeavyBorderMeshHandle = scheduleDeferredWork(runSlice, { timeout: useRetainedWorkerPath() ? 16 : 360 });
+      } catch (error) { finishPrivatePreparation(preparation); throw error; }
     };
     const isCurrent = () => {
       if (runId !== deferredHeavyBorderRunId) return false;
@@ -169,10 +197,19 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
       return true;
     };
     function runSlice() {
+      try { runAdmittedSlice(); }
+      catch (error) { finishPrivatePreparation(preparation); throw error; }
+    }
+    function runAdmittedSlice() {
       if (runId !== deferredHeavyBorderRunId) return;
+      if (!isRetainedSceneActive()) finishPrivatePreparation(preparation);
       deferredHeavyBorderMeshHandle = null;
       if (restartIfStale()) return;
-      if (!isInteractionRecoverySettled({ quietMs: 900 })) { enqueue(); return; }
+      // Private launch and current ready commit can finish during exact paint
+      // preparation. Native fallback still waits for the complete recovery gate.
+      const privateStep = useRetainedWorkerPath() && (!work?.workerStatus || work.workerStatus === "ready");
+      if (!isInteractionRecoverySettled({ quietMs: useRetainedWorkerPath() ? 0 : 900 })
+        && !(privateStep && canStartPrivateBorderMeshPreparation())) { enqueue(); return; }
       if (!beginInteractionRecoveryTask(taskKey)) { enqueue(); return; }
       const startedAt = nowMs();
       let needsContinuation = false;
@@ -210,11 +247,14 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
           }).then((result) => {
             work.workerResult = result;
             work.workerStatus = result == null ? "fallback" : "ready";
+            if (result == null) finishPrivatePreparation(preparation);
           }, (error) => {
             work.workerStatus = "fallback";
+            finishPrivatePreparation(preparation);
             if (isCurrent()) recordInteractionRecoveryTaskMetric("border-worker-fallback", 0, { message: String(error?.message || error) });
           }).finally(() => {
             if (workerAbort === abort) workerAbort = null;
+            if (!isRetainedSceneActive()) finishPrivatePreparation(preparation);
             if (runId !== deferredHeavyBorderRunId) return;
             if (!restartIfStale()) enqueue();
           });
@@ -222,6 +262,7 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
         }
         if (work.workerStatus === "pending") return;
         if (work.workerStatus === "ready") {
+          if (restartIfStale()) return;
           work.changed = !!commitDeferredBorderMeshes(work.workerResult);
           work.snapshotChanged = work.changed;
           work.index = work.countries.length;
@@ -291,8 +332,12 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
             });
           }
         } finally {
-          endInteractionRecoveryTask(taskKey);
-          if (needsContinuation && isCurrent()) enqueue();
+          try {
+            endInteractionRecoveryTask(taskKey);
+            if (needsContinuation && isCurrent()) enqueue();
+          } finally {
+            if (completed) finishPrivatePreparation(preparation);
+          }
         }
       }
     }
@@ -326,6 +371,7 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
 
   return Object.freeze({
     hasPendingWork: () => !!deferredHeavyBorderMeshHandle || !!workerAbort,
+    getPrivatePreparationPromise,
     buildDetailAdmMeshSignature,
     getVisibleCountryCodesForBorderMeshes,
     cancelDeferredHeavyBorderMeshes,

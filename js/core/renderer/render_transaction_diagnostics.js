@@ -7,6 +7,7 @@ const GLOBAL_RENDER_TRANSACTION_DIAGNOSTICS_NAME = "__scenarioForgeRenderTransac
 const DEFAULT_SNAPSHOT_LIMIT = 1;
 const ENABLED_SNAPSHOT_LIMIT = 200;
 const WARNING_LIMIT = 200;
+const resolvedColorCounts = new WeakMap();
 
 const TRUE_PARAM_VALUES = new Set(["1", "true", "yes", "on"]);
 
@@ -129,6 +130,27 @@ function getObjectSize(value) {
   if (Array.isArray(value)) return value.length;
   if (typeof value === "object") return Object.keys(value).length;
   return 0;
+}
+
+function getResolvedColorCount(runtimeState) {
+  const colors = runtimeState?.colors;
+  const revision = runtimeState?.colorRevision;
+  const cacheableState = runtimeState && typeof runtimeState === "object";
+  // Renderer color writers either replace this table or advance colorRevision
+  // after an in-place batch. A normalized/default snapshot revision is not
+  // evidence of that contract. Native collection sizes are already constant-time.
+  if (!cacheableState || !Object.hasOwn(runtimeState, "colorRevision")
+    || !Number.isSafeInteger(revision) || revision < 0
+    || !colors || typeof colors !== "object" || colors instanceof Map
+    || colors instanceof Set || Array.isArray(colors)) {
+    if (cacheableState) resolvedColorCounts.delete(runtimeState);
+    return getObjectSize(colors);
+  }
+  const cached = resolvedColorCounts.get(runtimeState);
+  if (cached?.colors === colors && cached.revision === revision) return cached.count;
+  const count = getObjectSize(colors);
+  resolvedColorCounts.set(runtimeState, { colors, revision, count });
+  return count;
 }
 
 function getFeatureCount(value) {
@@ -290,7 +312,7 @@ function buildFeatureCounts(runtimeState) {
     spatialItems: getFeatureCount(runtimeState?.spatialItems),
     waterSpatialItems: getFeatureCount(runtimeState?.waterSpatialItems),
     specialSpatialItems: getFeatureCount(runtimeState?.specialSpatialItems),
-    resolvedColors: getObjectSize(runtimeState?.colors),
+    resolvedColors: getResolvedColorCount(runtimeState),
   };
 }
 

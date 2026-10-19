@@ -89,7 +89,7 @@ export function appendLandSpatialItemsRange({
   }
 }
 
-export function buildWaterSpatialItems({
+export function* iterateWaterSpatialItems({
   features = [],
   getFeatureId = () => "",
   collectFeatureHitGeometries = () => [],
@@ -99,28 +99,35 @@ export function buildWaterSpatialItems({
   nextEntries = null,
 } = {}) {
   const items = [];
-  features.forEach((feature) => {
+  for (const feature of features) {
+    yield;
     const id = getFeatureId(feature);
-    if (!id) return;
+    if (!id) continue;
     const source = String(feature?.properties?.__source || "primary");
     const candidates = Array.isArray(previousEntries) ? previousEntries : [previousEntries];
     const previous = candidates.map((entries) => entries?.get(id))
       .find((entry) => entry && entry.geometry === feature.geometry && entry.source === source);
     if (previous) {
-      const firstOrder = items.length;
-      const reused = previous.feature === feature && previous.items[0]?.drawOrder === firstOrder
-        ? previous.items
-        : previous.items.map((item, index) => ({ ...item, feature, drawOrder: firstOrder + index }));
-      items.push(...reused);
-      nextEntries?.set(id, { feature, geometry: feature.geometry, source, items: reused });
-      return;
+      const featureItems = [];
+      for (const item of previous.items) {
+        const drawOrder = items.length;
+        const reused = item.feature === feature && item.drawOrder === drawOrder
+          ? item : { ...item, feature, drawOrder };
+        featureItems.push(reused);
+        items.push(reused);
+        yield;
+      }
+      nextEntries?.set(id, { feature, geometry: feature.geometry, source, items: featureItems });
+      continue;
     }
     const featureItems = [];
     const hitGeometries = collectFeatureHitGeometries(feature);
     let featureBounds;
     let featureBoundsComputed = false;
-    hitGeometries.forEach((hitGeometry, partIndex) => {
-      if (shouldExcludeWaterHitGeometry(hitGeometry, feature, id)) return;
+    for (let partIndex = 0; partIndex < hitGeometries.length; partIndex += 1) {
+      yield;
+      const hitGeometry = hitGeometries[partIndex];
+      if (shouldExcludeWaterHitGeometry(hitGeometry, feature, id)) continue;
       let bounds = computeProjectedGeoBounds(hitGeometry);
       if (!bounds) {
         // Several parts can require the same whole-feature fallback. Keep this
@@ -131,10 +138,10 @@ export function buildWaterSpatialItems({
         }
         bounds = featureBounds;
       }
-      if (!bounds) return;
-      featureItems.push({
+      if (!bounds) continue;
+      const item = {
         id: `${id}::part:${partIndex}`,
-        drawOrder: items.length + featureItems.length,
+        drawOrder: items.length,
         featureId: id,
         feature,
         hitGeometry,
@@ -145,29 +152,31 @@ export function buildWaterSpatialItems({
         maxX: bounds.maxX,
         maxY: bounds.maxY,
         bboxArea: bounds.area,
-      });
-    });
-    items.push(...featureItems);
+      };
+      featureItems.push(item);
+      items.push(item);
+    }
     nextEntries?.set(id, { feature, geometry: feature.geometry, source, items: featureItems });
-  });
+  }
   return items;
 }
 
-export function buildSpecialSpatialItems({
+export function* iterateSpecialSpatialItems({
   features = [],
   allowComputeMissingBounds = true,
   getFeatureId = () => "",
   getProjectedFeatureBounds = () => null,
 } = {}) {
   const items = [];
-  features.forEach((feature) => {
+  for (const feature of features) {
+    yield;
     const id = getFeatureId(feature);
-    if (!id) return;
+    if (!id) continue;
     const resolvedBounds = getProjectedFeatureBounds(feature, {
       featureId: id,
       allowCompute: allowComputeMissingBounds,
     });
-    if (!resolvedBounds) return;
+    if (!resolvedBounds) continue;
     items.push({
       id,
       feature,
@@ -179,11 +188,11 @@ export function buildSpecialSpatialItems({
       maxY: resolvedBounds.maxY,
       bboxArea: resolvedBounds.area,
     });
-  });
+  }
   return items;
 }
 
-export function buildSpatialGridSnapshot({
+export function* iterateSpatialGridSnapshot({
   items = [],
   canvasWidth = 1,
   canvasHeight = 1,
@@ -213,8 +222,9 @@ export function buildSpatialGridSnapshot({
     grid.get(key).push(item);
   };
 
-  items.forEach((item) => {
-    if (!item?.id) return;
+  for (const item of items) {
+    yield;
+    if (!item?.id) continue;
     itemsById.set(item.id, item);
     const c0 = clampNumber(Math.floor(item.minX / cellSize), 0, cols - 1);
     const c1 = clampNumber(Math.floor(item.maxX / cellSize), 0, cols - 1);
@@ -224,15 +234,16 @@ export function buildSpatialGridSnapshot({
 
     if (covered > hitMaxCellsPerItem) {
       globals.push(item);
-      return;
+      continue;
     }
 
     for (let row = r0; row <= r1; row += 1) {
       for (let col = c0; col <= c1; col += 1) {
         pushToCell(col, row, item);
+        yield;
       }
     }
-  });
+  }
 
   return {
     grid,
@@ -305,4 +316,23 @@ export function reconcileSpatialGridSnapshot(previous, options) {
     ]) },
     itemsById: nextById,
   };
+}
+
+// Synchronous callers consume the same steps without scheduling overhead.
+function consumeSpatialSteps(iterator) {
+  let step = iterator.next();
+  while (!step.done) step = iterator.next();
+  return step.value;
+}
+
+export function buildWaterSpatialItems(options) {
+  return consumeSpatialSteps(iterateWaterSpatialItems(options));
+}
+
+export function buildSpecialSpatialItems(options) {
+  return consumeSpatialSteps(iterateSpecialSpatialItems(options));
+}
+
+export function buildSpatialGridSnapshot({ ...options } = {}) {
+  return consumeSpatialSteps(iterateSpatialGridSnapshot(options));
 }

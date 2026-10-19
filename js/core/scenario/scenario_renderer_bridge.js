@@ -19,6 +19,7 @@ export {
   invalidateOceanBackgroundVisualState,
   invalidateOceanWaterInteractionVisualState,
   prepareScenarioNavigation,
+  prepareScenarioPoliticalChunkPromotion,
   recomputeDynamicBordersNow,
   refreshColorState,
   refreshResolvedColorsForFeatures,

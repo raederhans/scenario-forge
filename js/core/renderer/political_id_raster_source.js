@@ -49,12 +49,18 @@ function equalBounds(left, right) {
     && left.maxX === right.maxX && left.maxY === right.maxY;
 }
 
-function movedIdsByLongestIncreasingSubsequence(previousEntries, nextEntries) {
-  const oldPositionById = new Map(previousEntries.map((entry, index) => [entry.id, index]));
-  const commonEntries = nextEntries.filter((entry) => oldPositionById.has(entry.id));
+function* movedIdsByLongestIncreasingSubsequence(previousEntries, nextEntries) {
+  const oldPositionById = new Map(), commonEntries = [];
+  for (let index = 0; index < previousEntries.length; index++) {
+    oldPositionById.set(previousEntries[index].id, index); yield "lis-index";
+  }
+  for (const entry of nextEntries) {
+    if (oldPositionById.has(entry.id)) commonEntries.push(entry);
+    yield "lis-common";
+  }
   const tails = [];
   const tailEntryIndices = [];
-  const predecessor = new Array(commonEntries.length).fill(-1);
+  const predecessor = [];
   for (let index = 0; index < commonEntries.length; index += 1) {
     const oldPosition = oldPositionById.get(commonEntries[index].id);
     let low = 0, high = tails.length;
@@ -63,15 +69,49 @@ function movedIdsByLongestIncreasingSubsequence(previousEntries, nextEntries) {
       if (tails[middle] < oldPosition) low = middle + 1;
       else high = middle;
     }
-    if (low > 0) predecessor[index] = tailEntryIndices[low - 1];
+    predecessor[index] = low > 0 ? tailEntryIndices[low - 1] : -1;
     tails[low] = oldPosition;
     tailEntryIndices[low] = index;
+    yield "lis-scan";
   }
   const keptIds = new Set();
   for (let index = tailEntryIndices[tails.length - 1] ?? -1; index >= 0; index = predecessor[index]) {
     keptIds.add(commonEntries[index].id);
+    yield "lis-kept";
   }
-  return new Set(commonEntries.filter((entry) => !keptIds.has(entry.id)).map((entry) => entry.id));
+  const moved = new Set();
+  for (const entry of commonEntries) {
+    if (!keptIds.has(entry.id)) moved.add(entry.id);
+    yield "lis-moved";
+  }
+  return moved;
+}
+
+const abortPreparation = () => new DOMException("Stale political raster source preparation", "AbortError");
+function drainSteps(iterator) {
+  let step;
+  do { step = iterator.next(); } while (!step.done);
+  return step.value;
+}
+async function runSteps(iterator, { signal, yieldControl = () => new Promise(resolve => setTimeout(resolve, 0)),
+  nowMs = () => globalThis.performance?.now() ?? Date.now(), timeBudgetMs = 4, workBatch = 256,
+} = {}, isCurrent = () => true) {
+  const batch = Math.max(1, Math.floor(Number(workBatch) || 1));
+  const budget = Math.max(0, Number(timeBudgetMs) || 0);
+  const check = () => { if (signal?.aborted || !isCurrent()) throw abortPreparation(); };
+  let startedAt = nowMs(), work = 0;
+  try {
+    while (true) {
+      check();
+      const step = iterator.next();
+      check();
+      if (step.done) return step.value;
+      if (++work >= batch || nowMs() - startedAt >= budget) {
+        await yieldControl({ phase: step.value });
+        check(); work = 0; startedAt = nowMs();
+      }
+    }
+  } finally { iterator.return(); }
 }
 
 function stableSerialize(value) {
@@ -113,7 +153,7 @@ function copyBounds(bounds) {
   return bounds ? Object.freeze({ ...bounds }) : null;
 }
 
-function makePublicSnapshot(snapshot) {
+function makePublicSnapshot(snapshot, palette = snapshot?.palette.slice()) {
   if (!snapshot) return null;
   return Object.freeze({
     sceneKey: snapshot.sceneKey,
@@ -123,7 +163,7 @@ function makePublicSnapshot(snapshot) {
     paletteRevision: snapshot.paletteRevision,
     mappingRevision: snapshot.mappingRevision,
     entries: snapshot.entries,
-    palette: snapshot.palette.slice(),
+    palette,
     changedIds: snapshot.changedIds,
     removedIds: snapshot.removedIds,
     dirtyBounds: snapshot.dirtyBounds,
@@ -166,36 +206,23 @@ export function createPoliticalIdRasterSource({
     if (disposed) throw new Error("[political_id_raster_source] source is disposed.");
   }
 
-  function geometryVersionOf(geometry) {
-    if ((typeof geometry === "object" && geometry !== null) || typeof geometry === "function") {
-      let version = objectGeometryVersions.get(geometry);
-      if (version === undefined) {
-        version = nextGeometryVersion++;
-        objectGeometryVersions.set(geometry, version);
-      }
-      return version;
-    }
-    if (geometry == null) return 0;
-    let version = primitiveGeometryVersions.get(geometry);
-    if (version === undefined) {
-      version = nextGeometryVersion++;
-      primitiveGeometryVersions.set(geometry, version);
-    }
-    return version;
-  }
+  let publicationEpoch = 0;
+  let preparedCandidates = new WeakMap();
+  const knownCandidates = new WeakSet();
 
-  function publish({ collection, sceneKey, projectionKey, coverageKey = "", colorRevision = 0 } = {}) {
+  function* prepareSteps({ collection, sceneKey, projectionKey, coverageKey = "", colorRevision = 0 } = {}, boundsForFeature = getBounds) {
     assertOpen();
+    if (typeof boundsForFeature !== "function") throw new TypeError("[political_id_raster_source] getBounds must be a function.");
+    const baselineEpoch = publicationEpoch;
+    const baseline = currentSnapshot;
+    const oldById = currentEntryById;
     const features = readFeatures(collection);
     const normalizedSceneKey = normalizeKey(sceneKey);
     const normalizedProjectionKey = normalizeKey(projectionKey);
     const normalizedCoverageKey = normalizeKey(coverageKey);
     const revisionKey = stableSerialize(colorRevision);
-    const candidates = [];
-    const ids = new Set();
-
-    // Validate the complete incoming collection before changing any private state.
-    for (let drawOrder = 0; drawOrder < features.length; drawOrder += 1) {
+    const candidates = [], ids = new Set();
+    for (let drawOrder = 0; drawOrder < features.length; drawOrder++) {
       const feature = features[drawOrder];
       if (!feature || typeof feature !== "object") {
         throw new TypeError(`[political_id_raster_source] Invalid feature at draw order ${drawOrder}.`);
@@ -205,102 +232,154 @@ export function createPoliticalIdRasterSource({
       if (ids.has(id)) throw new TypeError(`[political_id_raster_source] Duplicate feature ID "${id}".`);
       ids.add(id);
       const geometry = feature.geometry;
-      const bounds = normalizeBounds(getBounds(feature, id), id);
+      const bounds = normalizeBounds(boundsForFeature(feature, id), id);
       const color = normalizeColor(resolveColor(feature, id), id);
       candidates.push({ id, feature, geometry, bounds, color, drawOrder });
+      yield "validation";
     }
 
-    const oldEntries = currentSnapshot?.entries || [];
-    const oldById = currentEntryById;
-    const sceneChanged = !hasPublished || normalizedSceneKey !== currentSnapshot.sceneKey;
-    const projectionChanged = !hasPublished || normalizedProjectionKey !== currentSnapshot.projectionKey;
-    const coverageChanged = !hasPublished || normalizedCoverageKey !== currentSnapshot.coverageKey;
-    const nextIdsByCode = sceneChanged ? new Map() : new Map(idsByCode);
+    const oldEntries = baseline?.entries || [];
+    const sceneChanged = !hasPublished || normalizedSceneKey !== baseline.sceneKey;
+    const projectionChanged = !hasPublished || normalizedProjectionKey !== baseline.projectionKey;
+    const coverageChanged = !hasPublished || normalizedCoverageKey !== baseline.coverageKey;
+    const nextIdsByCode = new Map();
+    if (!sceneChanged) for (const [id, code] of idsByCode) {
+      nextIdsByCode.set(id, code); yield "mapping-copy";
+    }
     let candidateNextCode = sceneChanged ? 1 : nextCode;
     let mappingChanged = sceneChanged;
     for (const candidate of candidates) {
-      if (nextIdsByCode.has(candidate.id)) continue;
-      if (!Number.isSafeInteger(candidateNextCode) || candidateNextCode > 0x3fffffff) {
-        throw new RangeError("[political_id_raster_source] Feature code space exhausted.");
+      if (!nextIdsByCode.has(candidate.id)) {
+        if (!Number.isSafeInteger(candidateNextCode) || candidateNextCode > 0x3fffffff) {
+          throw new RangeError("[political_id_raster_source] Feature code space exhausted.");
+        }
+        nextIdsByCode.set(candidate.id, candidateNextCode++);
+        mappingChanged = true;
       }
-      nextIdsByCode.set(candidate.id, candidateNextCode++);
-      mappingChanged = true;
+      yield "mapping";
     }
 
-    const nextEntries = candidates.map((candidate) => Object.freeze({
-      id: candidate.id,
-      code: nextIdsByCode.get(candidate.id),
-      feature: candidate.feature,
-      bounds: candidate.bounds,
-      drawOrder: candidate.drawOrder,
-      geometryVersion: geometryVersionOf(candidate.geometry),
-    }));
-    const nextById = new Map(nextEntries.map((entry) => [entry.id, entry]));
+    // Version allocation is private until commit. Failed/cancelled preparations
+    // cannot consume IDs or leave an unbounded chain of weak-cache overlays.
+    const newObjectVersions = new WeakMap(), newPrimitiveVersions = new Map(), versionAssignments = [];
+    let candidateNextGeometryVersion = nextGeometryVersion;
+    const geometryVersionOf = geometry => {
+      const object = (typeof geometry === "object" && geometry !== null) || typeof geometry === "function";
+      if (!object && geometry == null) return 0;
+      const existing = object ? objectGeometryVersions : primitiveGeometryVersions;
+      const pending = object ? newObjectVersions : newPrimitiveVersions;
+      let version = existing.get(geometry) ?? pending.get(geometry);
+      if (version === undefined) {
+        version = candidateNextGeometryVersion++;
+        pending.set(geometry, version); versionAssignments.push([geometry, version, object]);
+      }
+      return version;
+    };
+    const nextEntries = [], nextById = new Map();
+    for (const candidate of candidates) {
+      const entry = Object.freeze({ id: candidate.id, code: nextIdsByCode.get(candidate.id),
+        feature: candidate.feature, bounds: candidate.bounds, drawOrder: candidate.drawOrder,
+        geometryVersion: geometryVersionOf(candidate.geometry) });
+      nextEntries.push(entry); nextById.set(entry.id, entry); yield "entries";
+    }
     const globallyChanged = sceneChanged || projectionChanged || coverageChanged;
-    const movedIds = globallyChanged ? new Set() : movedIdsByLongestIncreasingSubsequence(oldEntries, nextEntries);
-    const changedIds = [];
-    const dirtyBounds = [];
+    const movedIds = globallyChanged ? new Set() : yield* movedIdsByLongestIncreasingSubsequence(oldEntries, nextEntries);
+    const changedIds = [], dirtyBounds = [];
     for (const entry of nextEntries) {
       const previous = oldById.get(entry.id) || null;
-      const changed = globallyChanged || !previous
-        || previous.geometryVersion !== entry.geometryVersion
-        || movedIds.has(entry.id)
-        || !equalBounds(previous.bounds, entry.bounds);
-      if (!changed) continue;
-      changedIds.push(entry.id);
-      dirtyBounds.push({ id: entry.id, oldBounds: previous?.bounds || null, newBounds: entry.bounds,
-        previousCoverageUnknown: !!previous && previous.bounds === null });
+      const changed = globallyChanged || !previous || previous.geometryVersion !== entry.geometryVersion
+        || movedIds.has(entry.id) || !equalBounds(previous.bounds, entry.bounds);
+      if (changed) {
+        changedIds.push(entry.id);
+        dirtyBounds.push({ id: entry.id, oldBounds: previous?.bounds || null, newBounds: entry.bounds,
+          previousCoverageUnknown: !!previous && previous.bounds === null });
+      }
+      yield "dirty-bounds";
     }
     const removedIds = [];
     for (const previous of oldEntries) {
-      if (nextById.has(previous.id)) continue;
-      removedIds.push(previous.id);
-      dirtyBounds.push({ id: previous.id, oldBounds: previous.bounds, newBounds: null,
-        previousCoverageUnknown: previous.bounds === null });
+      if (!nextById.has(previous.id)) {
+        removedIds.push(previous.id);
+        dirtyBounds.push({ id: previous.id, oldBounds: previous.bounds, newBounds: null,
+          previousCoverageUnknown: previous.bounds === null });
+      }
+      yield "removed";
     }
     const geometryChanged = !hasPublished || globallyChanged || changedIds.length > 0 || removedIds.length > 0;
-
-    const paletteLength = candidateNextCode * 4;
-    const nextPalette = new Uint8Array(paletteLength);
-    for (let index = 0; index < candidates.length; index += 1) {
-      const candidate = candidates[index];
-      const offset = nextIdsByCode.get(candidate.id) * 4;
-      nextPalette.set(candidate.color, offset);
+    const nextPalette = new Uint8Array(candidateNextCode * 4);
+    for (const candidate of candidates) {
+      nextPalette.set(candidate.color, nextIdsByCode.get(candidate.id) * 4); yield "palette";
     }
-    const paletteBytesChanged = !currentSnapshot
-      || currentSnapshot.palette.length !== nextPalette.length
-      || currentSnapshot.palette.some((value, index) => value !== nextPalette[index]);
+    let paletteBytesChanged = !baseline || baseline.palette.length !== nextPalette.length;
+    if (!paletteBytesChanged) for (let offset = 0; offset < nextPalette.length; offset++) {
+      if (baseline.palette[offset] !== nextPalette[offset]) { paletteBytesChanged = true; break; }
+      yield "palette-compare";
+    }
     const colorRevisionChanged = !hasColorRevision || revisionKey !== colorRevisionKey;
-
-    if (geometryChanged) geometryRevision += 1;
-    if (paletteBytesChanged || colorRevisionChanged) paletteRevision += 1;
-    if (mappingChanged) mappingRevision += 1;
-
-    currentSnapshot = {
-      sceneKey: normalizedSceneKey,
-      projectionKey: normalizedProjectionKey,
-      coverageKey: normalizedCoverageKey,
-      geometryRevision,
-      paletteRevision,
-      mappingRevision,
-      entries: Object.freeze(nextEntries),
-      palette: nextPalette,
-      changedIds: Object.freeze(changedIds),
-      removedIds: Object.freeze(removedIds),
-      dirtyBounds: Object.freeze(dirtyBounds.map((item) => Object.freeze({
-        id: item.id,
-        oldBounds: copyBounds(item.oldBounds),
-        newBounds: copyBounds(item.newBounds),
-        previousCoverageUnknown: item.previousCoverageUnknown,
-      }))),
+    const frozenDirtyBounds = [];
+    for (const item of dirtyBounds) {
+      frozenDirtyBounds.push(Object.freeze({ id: item.id, oldBounds: copyBounds(item.oldBounds),
+        newBounds: copyBounds(item.newBounds), previousCoverageUnknown: item.previousCoverageUnknown }));
+      yield "dirty-freeze";
+    }
+    const snapshot = {
+      sceneKey: normalizedSceneKey, projectionKey: normalizedProjectionKey, coverageKey: normalizedCoverageKey,
+      geometryRevision: geometryRevision + (geometryChanged ? 1 : 0),
+      paletteRevision: paletteRevision + (paletteBytesChanged || colorRevisionChanged ? 1 : 0),
+      mappingRevision: mappingRevision + (mappingChanged ? 1 : 0),
+      entries: Object.freeze(nextEntries), palette: nextPalette,
+      changedIds: Object.freeze(changedIds), removedIds: Object.freeze(removedIds),
+      dirtyBounds: Object.freeze(frozenDirtyBounds),
     };
-    currentEntryById = nextById;
-    idsByCode = nextIdsByCode;
-    nextCode = candidateNextCode;
-    colorRevisionKey = revisionKey;
-    hasColorRevision = true;
-    hasPublished = true;
-    return getSnapshot();
+    const publicPalette = new Uint8Array(nextPalette.length);
+    for (let offset = 0; offset < nextPalette.length; offset += 4096) {
+      publicPalette.set(nextPalette.subarray(offset, offset + 4096), offset); yield "public-palette";
+    }
+    return { baselineEpoch, snapshot, publicSnapshot: makePublicSnapshot(snapshot, publicPalette),
+      nextById, nextIdsByCode, candidateNextCode, candidateNextGeometryVersion, versionAssignments, revisionKey };
+  }
+
+  function rememberCandidate(prepared, signal) {
+    if (disposed || signal?.aborted || prepared.baselineEpoch !== publicationEpoch) throw abortPreparation();
+    const candidate = Object.freeze({});
+    knownCandidates.add(candidate); preparedCandidates.set(candidate, { ...prepared, signal });
+    return candidate;
+  }
+
+  async function prepare(input, options = {}) {
+    assertOpen();
+    const expectedEpoch = publicationEpoch;
+    const prepared = await runSteps(prepareSteps(input, options.getBounds ?? getBounds), options,
+      () => !disposed && publicationEpoch === expectedEpoch);
+    return rememberCandidate(prepared, options.signal);
+  }
+
+  function commitPrepared(candidate) {
+    if (!candidate || !knownCandidates.has(candidate)) throw new TypeError("[political_id_raster_source] Unknown prepared candidate.");
+    const prepared = preparedCandidates.get(candidate);
+    if (!prepared || disposed || prepared.signal?.aborted || prepared.baselineEpoch !== publicationEpoch) {
+      preparedCandidates.delete(candidate); throw abortPreparation();
+    }
+    // Only weak-cache registrations remain here. No feature validation, bounds,
+    // colors, sorting, palette copy or dirty-bound construction occurs at commit.
+    const assignments = prepared.versionAssignments;
+    for (let index = 0; index < assignments.length; index++) {
+      const assignment = assignments[index];
+      (assignment[2] ? objectGeometryVersions : primitiveGeometryVersions).set(assignment[0], assignment[1]);
+    }
+    nextGeometryVersion = prepared.candidateNextGeometryVersion;
+    currentSnapshot = prepared.snapshot;
+    currentEntryById = prepared.nextById; idsByCode = prepared.nextIdsByCode;
+    nextCode = prepared.candidateNextCode; colorRevisionKey = prepared.revisionKey;
+    geometryRevision = currentSnapshot.geometryRevision; paletteRevision = currentSnapshot.paletteRevision;
+    mappingRevision = currentSnapshot.mappingRevision; hasColorRevision = hasPublished = true;
+    publicationEpoch++; preparedCandidates = new WeakMap();
+    return prepared.publicSnapshot;
+  }
+
+  function publish(input) {
+    assertOpen();
+    return commitPrepared(rememberCandidate(drainSteps(prepareSteps(input))));
   }
 
   function updateColors(featureIds = null, options = {}) {
@@ -350,6 +429,7 @@ export function createPoliticalIdRasterSource({
       paletteRevision,
       palette: nextPalette,
     };
+    publicationEpoch++; preparedCandidates = new WeakMap();
     return getSnapshot();
   }
 
@@ -391,6 +471,7 @@ export function createPoliticalIdRasterSource({
   function dispose() {
     if (disposed) return;
     disposed = true;
+    publicationEpoch++; preparedCandidates = new WeakMap();
     currentSnapshot = null;
     currentEntryById = new Map();
     idsByCode = new Map();
@@ -399,7 +480,7 @@ export function createPoliticalIdRasterSource({
     primitiveGeometryVersions.clear();
   }
 
-  return Object.freeze({ publish, updateColors, getSnapshot, captureFrame, isFrameCurrent, dispose });
+  return Object.freeze({ publish, prepare, commitPrepared, updateColors, getSnapshot, captureFrame, isFrameCurrent, dispose });
 }
 
 // Full/fine views can wrap equal geometry, or deliberately prune tiny visual
@@ -447,7 +528,7 @@ function completeDisplayFeature(fine, full, id) {
  * picking still consumes the original interactive collection, never these wrappers.
  * The caller applies the existing visual exclusion and painter-order policies.
  */
-export function collectPoliticalRasterDisplayFeatures({ fullCollection, interactiveCollection, getId = getFeatureId }) {
+function* collectPoliticalRasterDisplayFeaturesSteps({ fullCollection, interactiveCollection, getId = getFeatureId }) {
   const fine = readFeatures(interactiveCollection);
   const full = fullCollection ? readFeatures(fullCollection) : fine;
   const fineById = new Map(), seen = new Set(), completeById = new Map();
@@ -460,6 +541,7 @@ export function collectPoliticalRasterDisplayFeatures({ fullCollection, interact
     const id = identify(feature);
     if (fineById.has(id)) throw new TypeError(`Duplicate interactive feature ID "${id}".`);
     fineById.set(id, feature);
+    yield "display-interactive";
   }
   const support = [];
   for (const feature of full) {
@@ -469,6 +551,18 @@ export function collectPoliticalRasterDisplayFeatures({ fullCollection, interact
     const interactive = fineById.get(id);
     if (interactive) completeById.set(id, completeDisplayFeature(interactive, feature, id));
     else support.push(feature);
+    yield "display-full";
   }
-  return [...support, ...fine.map(feature => completeById.get(identify(feature)) || feature)];
+  for (const feature of fine) {
+    support.push(completeById.get(identify(feature)) || feature); yield "display-result";
+  }
+  return support;
+}
+
+export function collectPoliticalRasterDisplayFeatures(input) {
+  return drainSteps(collectPoliticalRasterDisplayFeaturesSteps(input));
+}
+
+export function collectPoliticalRasterDisplayFeaturesAsync(input, options = {}) {
+  return runSteps(collectPoliticalRasterDisplayFeaturesSteps(input), options);
 }

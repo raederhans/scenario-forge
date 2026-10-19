@@ -56,6 +56,7 @@ function createOwner({
   pathBoundsInScreen = () => true,
   showRivers = true,
   pathCanvas = null,
+  getCachedStrokePath,
 } = {}) {
   const metrics = [];
   const pathCalls = [];
@@ -80,6 +81,7 @@ function createOwner({
     helpers: {
       clamp,
       collectContextMetric: (name, durationMs, details) => metrics.push({ name, durationMs, details }),
+      getCachedStrokePath,
       getContext: () => context,
       getContextBaseZoomBucketId: (k) => (k < 1.4 ? "low" : k < 2.5 ? "mid" : "high"),
       getDashPattern: () => [4, 2],
@@ -384,4 +386,55 @@ test("river geometry fallback without context API preserves widths alpha and das
   assert.equal(fallback.pathCalls.length, 2);
   assert.equal(projection.calls.length, 1);
   assert.deepEqual(reused.metrics, fallback.metrics);
+});
+
+test("river draws reuse cached paths across draws without switching the shared d3 context", (t) => {
+  installPath2D(t);
+  const context = createCanvasContext();
+  const a = createFeature("River", 2), b = createFeature("River", 3), canal = createFeature("Canal", 3);
+  const features = [a, b, canal];
+  const paths = new Map(features.map(feature => [feature, new Path2D()]));
+  const lookups = [];
+  const projection = createSwitchablePath(context, { throws: true });
+  const harness = createOwner({ context, features, pathCanvas: projection.path,
+    getCachedStrokePath: feature => { lookups.push(feature); return paths.get(feature); },
+  });
+  harness.owner.drawRiversLayer(5);
+  harness.owner.drawRiversLayer(5);
+  const strokes = context.calls.filter(call => call.type === "stroke");
+  const expected = [a, b, a, b, canal].map(feature => paths.get(feature));
+  assert.deepEqual(strokes.map(call => call.path), [...expected, ...expected]);
+  assert.deepEqual(lookups, [...features, ...features]);
+  assert.equal(projection.calls.length, 0);
+  assert.equal(projection.path.context(), context);
+  assert.equal(context.calls.filter(call => call.type === "beginPath").length, 0);
+  assert.deepEqual(strokes.map(call => call.strokeStyle),
+    ["#ddeeff", "#ddeeff", "#336699", "#336699", "#336699", "#ddeeff", "#ddeeff", "#336699", "#336699", "#336699"]);
+  assert.equal(context.lineCap, "round");
+  assert.equal(context.lineJoin, "round");
+});
+
+test("river cores without outlines use cached paths and preserve native fallback order and style", (t) => {
+  installPath2D(t);
+  const a = createFeature("River", 2), b = createFeature("River", 3);
+  const context = createCanvasContext(), cached = new Path2D(), lookups = [];
+  const projection = createSwitchablePath(context);
+  const harness = createOwner({ context, features: [a, b], pathCanvas: projection.path,
+    getCachedStrokePath: feature => { lookups.push(feature); return feature === a ? cached : null; },
+  });
+  const native = createOwner({ features: [a, b] });
+  harness.state.styleConfig.rivers.outlineWidth = native.state.styleConfig.rivers.outlineWidth = 0;
+  harness.owner.drawRiversLayer(2, { interactive: true });
+  native.owner.drawRiversLayer(2, { interactive: true });
+  const strokes = context.calls.filter(call => call.type === "stroke");
+  assert.deepEqual(lookups, [a, b]);
+  assert.deepEqual(strokes.map(call => call.path), [cached, undefined]);
+  assert.deepEqual(projection.calls, [{ feature: b, target: context }]);
+  assert.equal(projection.path.context(), context);
+  assert.equal(context.calls.filter(call => call.type === "beginPath").length, 1);
+  const styles = h => h.context.calls.filter(call => call.type === "stroke").map(({ path, ...style }) => style);
+  assert.deepEqual(styles(harness), styles(native));
+  assert.deepEqual(harness.metrics, native.metrics);
+  assert.equal(context.lineCap, "round");
+  assert.equal(context.lineJoin, "round");
 });

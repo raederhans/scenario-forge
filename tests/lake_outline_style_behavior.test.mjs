@@ -39,4 +39,6 @@ test("only curated visible lakes receive outlines independent of river style", (
   assert.equal(shouldDrawLakeOutline(feature("lake_baikal", "sea"), bounds, 2, config), false);
   assert.equal(shouldDrawLakeOutline(feature("lake_baikal"), bounds, 1, config), false);
   assert.equal(shouldDrawLakeOutline(feature("lake_baikal"), bounds, 2, { outlineEnabled: false }), false);
+  assert.equal(shouldDrawLakeOutline(feature("lake_baikal"), bounds, 10,
+    normalizeLakeStyleConfig({ outlineWidth: 0 })), false, "zero width must not reuse a previous Canvas stroke width");
 });

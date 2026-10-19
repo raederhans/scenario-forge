@@ -18,6 +18,23 @@ function glyphs(text, metric) {
   return Array.from(text, (character) => ({ text: character, ...metric }));
 }
 
+test("worker timing keeps candidate reuse while prepared geometry remains request-local", () => {
+  const handle = createCountryLabelLayoutWorkerHandler();
+  const polygons = multiPolygon(rectangle(0, 0, 100, 50));
+  const options = { glyphs: glyphs("TEST", { advance: 1, left: 0, right: 1, ascent: 0.8, descent: 0.1 }),
+    minFontSize: 1, maxFontSize: 10, maxAlternatives: 3, allowArcs: true };
+  for (const requestId of [1, 2]) {
+    const result = handle({ requestId, generation: 1, countryCode: "A", polygons: requestId === 1 ? polygons : undefined, options });
+    assert.deepEqual(result.fit, fitCountryLabel(buildCountryLabelCandidates(polygons, { allowArcs: true }), { ...options, polygons }));
+    assert.equal(result.candidateBuilt, requestId === 1);
+    assert.ok(result.preparedGeometryBuilds > 0, "each request releases its temporary prepared index after the exact fit");
+    assert.equal(result.preparedGeometryHits, 0);
+    assert.equal(result.preparedGeometryBytes, 0);
+    for (const field of ["workerMs", "fitMs", "candidateBuildMs", "preparedGeometryBuildMs"])
+      assert.ok(Number.isFinite(result[field]) && result[field] >= 0, field);
+  }
+});
+
 test("three components retain both gentle arc directions inside the default candidate budget", () => {
   for (const polygons of [
     multiPolygon(rectangle(0, 0, 260, 100), rectangle(300, 0, 220, 90), rectangle(560, 0, 180, 80)),

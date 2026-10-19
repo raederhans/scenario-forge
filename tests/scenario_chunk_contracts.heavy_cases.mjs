@@ -1067,7 +1067,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function isWaterRegionRenderable\(feature\) \{[\s\S]*?if \(isOpenOceanWaterRegion\(feature\)\) \{[\s\S]*?return isOpenOceanRenderable\(\);[\s\S]*?return feature\?\.properties\?\.interactive !== false;[\s\S]*?\}/.test(rendererSource)
         && /function isWaterRegionEnabled\(feature\) \{[\s\S]*?if \(isOpenOceanWaterRegion\(feature\)\) \{[\s\S]*?return isOpenOceanOverlayActive\(\);[\s\S]*?return feature\?\.properties\?\.interactive !== false;[\s\S]*?\}/.test(rendererSource)
         && /function getWaterHitFromPointer\([\s\S]*?\) \{[\s\S]*?if \(!runtimeState\.showWaterRegions && !isOpenOceanOverlayActive\(\) && !isLakeInteractionEnabled\(runtimeState\)\) return createHitResult\(\);/.test(rendererSource)
-        && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\], maskOnly = false \} = \{\}\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) return;/.test(scenarioRegionOverlayOwnerSource)
+        && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\], maskOnly = false, partsOverride = null, opaque = false, collectMetrics = true \} = \{\}\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) return;/.test(scenarioRegionOverlayOwnerSource)
         && /function collectWaterGridCandidates\(px, py, radiusProj = 0\) \{[\s\S]*?shouldIncludeItem: \(item\) => isWaterRegionEnabled\(item\.feature\),/.test(rendererSource)
         && /function rebuildAuxiliaryRegionIndexes\(\) \{[\s\S]*?if \(!isWaterRegionEnabled\(selectedFeature\)\) \{[\s\S]*?runtimeState\.selectedWaterRegionId = "";/.test(rendererSource)
         && /function drawScenarioWaterHighlightLayer\(k\) \{[\s\S]*?if \(!isWaterRegionEnabled\(feature\)\) return;/.test(scenarioRegionOverlayOwnerSource),
@@ -1077,19 +1077,19 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function sanitizeWaterRegionFeatures\(features = \[\]\) \{[\s\S]*?recordRenderPerfMetric\("waterSphericalSanitization"/.test(projectedGeometryBoundsOwnerSource)
         && /function sanitizeWaterRegionFeatures\(features = \[\]\) \{[\s\S]*?return getProjectedGeometryBoundsOwner\(\)\.sanitizeWaterRegionFeatures\(features\);/.test(rendererSource),
       waterDrawAndHighlightUseSafeParts:
-        /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\], maskOnly = false \} = \{\}\) \{[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\)/.test(scenarioRegionOverlayOwnerSource)
+        /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\], maskOnly = false, partsOverride = null, opaque = false, collectMetrics = true \} = \{\}\) \{[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\)/.test(scenarioRegionOverlayOwnerSource)
         && /function drawScenarioWaterHighlightLayer\(k\) \{[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\)/.test(scenarioRegionOverlayOwnerSource),
       waterFillUsesProjectionPathCacheBeforeCanvasFallback:
         /const scenarioWaterPathCache = new GeometryBudgetMap\(/.test(scenarioRegionOverlayOwnerSource)
         && /function getScenarioWaterFeaturePath\(feature, parts\) \{[\s\S]*?getCachedWaterFeaturePath\(feature, parts\)[\s\S]*?combinedPath\.addPath\(partPath\)[\s\S]*?scenarioWaterPathCache\.set\(cacheKey, \{ path, parts: \[\.\.\.parts\], estimatedBytes \}\);/.test(scenarioRegionOverlayOwnerSource)
         && /sameWaterPathParts\(cached\.parts, parts\)[\s\S]*?cached\.projectionGeneration === getProjectionGeometryGeneration/.test(scenarioRegionOverlayOwnerSource)
-        && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\], maskOnly = false \} = \{\}\) \{[\s\S]*?const waterPath = getCachedWaterFeaturePath\(feature, parts\)\s*\|\| \(visibleParts\.length === parts\.length \? getScenarioWaterFeaturePath\(feature, parts\) : null\);[\s\S]*?fillWaterPath\(waterPath\);[\s\S]*?getScenarioWaterPartPath\(part\)[\s\S]*?fillWaterPath\(partPath\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\);/.test(scenarioRegionOverlayOwnerSource),
+        && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\], maskOnly = false, partsOverride = null, opaque = false, collectMetrics = true \} = \{\}\) \{[\s\S]*?const waterPath = partsOverride \? null : getCachedWaterFeaturePath\(feature, parts\)\s*\|\| \(visibleParts\.length === parts\.length \? getScenarioWaterFeaturePath\(feature, parts\) : null\);[\s\S]*?fillWaterPath\(waterPath\);[\s\S]*?getScenarioWaterPartPath\(part\)[\s\S]*?fillWaterPath\(partPath\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\);/.test(scenarioRegionOverlayOwnerSource),
       waterCoverageUsesSafeParts:
         /function getScreenBounds\(part, transform\) \{[\s\S]*?const bounds = computeProjectedGeoBounds\(part\);/.test(scenarioWaterCachePolicyOwnerSource)
         && /function getScenarioWaterVisibleCoverageRatioLegacy\(waterFeatures = \[\]\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) continue;[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?getScreenBounds\(part, transform\)/.test(scenarioWaterCachePolicyOwnerSource)
         && /function getScenarioWaterVisibleCoverageRatioGrid\(waterFeatures = \[\]\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) continue;[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?getScreenBounds\(part, transform\)/.test(scenarioWaterCachePolicyOwnerSource),
       waterSpatialIndexSkipsUnsafeParts:
-        /function buildWaterSpatialItems\(\{[\s\S]*?shouldExcludeWaterHitGeometry = \(\) => false,[\s\S]*?if \(shouldExcludeWaterHitGeometry\(hitGeometry, feature, id\)\) return;/.test(spatialBuilderSource)
+        /function\* iterateWaterSpatialItems\(\{[\s\S]*?shouldExcludeWaterHitGeometry = \(\) => false,[\s\S]*?if \(shouldExcludeWaterHitGeometry\(hitGeometry, feature, id\)\) continue;/.test(spatialBuilderSource)
         && /shouldExcludeWaterHitGeometry = \(\) => false/.test(spatialOwnerSource)
         && /shouldExcludeWaterHitGeometry,/.test(spatialOwnerSource)
         && /collectFeatureHitGeometries: collectSafeWaterRegionGeometryParts/.test(rendererSource),
@@ -1103,8 +1103,10 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /maskInfo\.maskQualityToken \|\| "unchecked"/.test(rendererSource)
         && /function getScenarioSurfaceVersionParts\(waterFeatureCount = null, atlantropaCounts = null\) \{[\s\S]*?const atlantropaRevisionToken = String\(getScenarioAtlantropaRevisionToken\(atlantropaCounts\)\);[\s\S]*?return \{ signal: signal\.join\("\|"\), atlantropaRevisionToken \};/.test(rendererSource)
         && /function getScenarioWaterVisualRevisionToken\(\{ effectiveWaterFeatureCount = null, atlantropaFeatures = null \} = \{\}\) \{[\s\S]*?const \{ signal, atlantropaRevisionToken \} = getScenarioSurfaceVersionParts\(\s*resolvedWaterFeatureCount, atlantropaCounts\s*\);\s*return \[\s*signal,/.test(rendererSource)
-        && /function getPhysicalLandClipCacheKey\(maskInfo\) \{[\s\S]*?scenario-surface:\$\{getScenarioSurfaceVersionSignal\(\)\}/.test(rendererSource)
         && /function getCoastlineDecisionSignature\(decision = null\) \{[\s\S]*?String\(decision\.scenarioSurfaceVersionSignal \|\| ""\)/.test(staticBorderMeshLifecycleSource),
+      physicalLandClipTracksOnlyMaskGeometryAndProjection:
+        /function getPhysicalLandClipCacheKey\(maskInfo\) \{[\s\S]*?getProjectionGeometryGeneration\(projection\)[\s\S]*?getObjectIdentityToken\(collection\)[\s\S]*?getContextGeometryRevision\(runtimeState\), getContextCollectionRevision\(runtimeState, collection\)/.test(rendererSource)
+        && !rendererSource.slice(rendererSource.indexOf("function getPhysicalLandClipCacheKey(maskInfo) {"), rendererSource.indexOf("function getPhysicalLandClipPath(maskInfo, landMask) {")).includes("getScenarioSurfaceVersionSignal"),
       chunkPromotionSkipsDeferredInfraWhenSecondaryIndexesAlreadySynced:
         /const synchronizedSecondaryRegionIndexes = syncScenarioSecondaryRegionIndexes\(\{[\s\S]*?const shouldSkipDeferredInfraRefresh = synchronizedSecondaryRegionIndexes && !hasPoliticalChange;[\s\S]*?if \(shouldSkipDeferredInfraRefresh\) \{[\s\S]*?scheduleHitCanvasBuildIfNeeded\(\{[\s\S]*?\}\);[\s\S]*?\} else \{[\s\S]*?scheduleDeferredScenarioChunkPromotionInfraRefresh\(\{/.test(scenarioRefreshRuntimeSource),
       startupHydrationWaterOnlyChangeSyncsSecondaryIndexes:

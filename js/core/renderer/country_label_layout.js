@@ -877,7 +877,7 @@ function layoutWithTracking(candidate, lines, component, fontSize, options) {
   return null;
 }
 
-export function fitCountryLabel(candidates, options = {}) {
+export function fitCountryLabel(candidates, options = {}, preparationTiming = null) {
   if (!Array.isArray(candidates) || candidates.length === 0 || !Array.isArray(options.glyphs) || options.glyphs.length === 0) return null;
   const minHoleArea = Math.max(0, finiteNumber(options.minHoleArea));
   const originalPolygons = normalizeMultiPolygon(options.polygons);
@@ -909,8 +909,13 @@ export function fitCountryLabel(candidates, options = {}) {
     const index = Math.floor(finiteNumber(candidate?.polygonIndex, -1));
     if (index < 0 || index >= rawPolygons.length) continue;
     if (!prepared.has(index)) {
+      const startedAt = preparationTiming ? globalThis.performance.now() : 0;
       const component = preparePolygon(rawPolygons[index], index);
       if (component) prepared.set(index, buildSegmentIndex(component));
+      if (preparationTiming) {
+        preparationTiming.builds++;
+        preparationTiming.buildMs += globalThis.performance.now() - startedAt;
+      }
     }
   }
 

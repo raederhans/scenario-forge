@@ -21,6 +21,7 @@ import {
   resolveDeferredExactContextTargetPasses,
   resolveExactAfterSettleTargetPasses,
 } from "./exact_after_settle_refresh_plans.js";
+import { preflightPrivateRenderPasses, prepareExactRenderPassesInSlices } from "../renderer/render_pipeline_passes.js";
 
 function createExactAfterSettleScheduler({
   runtimeState,
@@ -214,8 +215,9 @@ function createExactAfterSettleScheduler({
       return abortInterruptedExactAfterSettleRefresh("pass-start-identity-mismatch", generation);
     }
     const transform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
+    const allDefinitions = getRenderPipelinePassesOwner().getIdleRenderPassDefinitions();
     const definitions = filterExactAfterSettleIdleRenderPassDefinitions(
-      getRenderPipelinePassesOwner().getIdleRenderPassDefinitions(),
+      allDefinitions,
       plan.exactTargetPasses,
     );
     const timings = {};
@@ -225,56 +227,57 @@ function createExactAfterSettleScheduler({
       rebuildResolvedColors();
     }
 
-    const enqueueNextPass = (index, activePlan) => {
-      if (index >= definitions.length) {
-        completeScheduledExactAfterSettleRefreshPlan(generation, activePlan, passStartedAt);
-        return;
+    // All private producers must see the same invalidated political epoch.
+    // Warm deferred producers too, without making them a prerequisite for the
+    // exact passes' paint or changing the order in which pass canvases publish.
+    const preparationPlan = definitions.some(([passName]) => passName === "political")
+      ? invalidateExactAfterSettlePoliticalPass(generation, plan)
+      : plan;
+    const preparationTargets = new Set([
+      ...(preparationPlan.exactTargetPasses || []),
+      ...(preparationPlan.deferredExactTargetPasses || []),
+    ]);
+    const activePassNames = getActiveRenderPassNames();
+    const canPreparePass = (passName) => {
+      if (!isExactAfterSettleGenerationCurrent(generation, "applying")) return false;
+      if (runtimeState.renderPhase !== renderPhaseIdle) {
+        return abortInterruptedExactAfterSettleRefresh(`${passName}-phase-interrupted`, generation);
       }
-      const [passName, drawFn] = definitions[index];
-      enqueueFrameTask(() => {
-        const passStart = nowMs();
-        const activeController = getExactAfterSettleControllerState();
-        if (!isExactAfterSettleGenerationCurrent(generation, "applying")) return;
-        if (runtimeState.renderPhase !== renderPhaseIdle) {
-          abortInterruptedExactAfterSettleRefresh(`${passName}-phase-interrupted`, generation);
-          return;
-        }
-        if (!isExactAfterSettleIdentityCurrent(activeController)) {
-          abortInterruptedExactAfterSettleRefresh(`${passName}-identity-mismatch`, generation);
-          return;
-        }
-        // Invalidate before async preparation so it and the eventual draw use
-        // the same political snapshot epoch. Keep that plan across retries.
-        const nextPlan = passName === "political"
-          ? invalidateExactAfterSettlePoliticalPass(generation, activePlan)
-          : activePlan;
-        const preparation = prepareRenderPassAsync(passName);
-        if (preparation) {
-          Promise.resolve(preparation).then(() => {
-            if (isExactAfterSettleGenerationCurrent(generation, "applying")) enqueueNextPass(index, nextPlan);
-          }).catch(() => abortInterruptedExactAfterSettleRefresh(`${passName}-prepare-failed`, generation));
-          return;
-        }
+      if (!isExactAfterSettleIdentityCurrent(getExactAfterSettleControllerState())) {
+        return abortInterruptedExactAfterSettleRefresh(`${passName}-identity-mismatch`, generation);
+      }
+      return true;
+    };
+    const onPrepareError = (passName) => {
+      if (isExactAfterSettleGenerationCurrent(generation, "applying")) {
+        abortInterruptedExactAfterSettleRefresh(`${passName}-prepare-failed`, generation);
+      }
+    };
+    if (preflightPrivateRenderPasses(allDefinitions, {
+      prepareRenderPassAsync,
+      shouldPrepare: passName => preparationTargets.has(passName)
+        && (!Array.isArray(activePassNames) || activePassNames.includes(passName)),
+      beforePrepare: canPreparePass,
+      onPrepareError,
+    }) === null) return false;
+
+    prepareExactRenderPassesInSlices({
+      definitions, generation, enqueueFrameTask, prepareRenderPassAsync, canPreparePass, nowMs,
+      isGenerationCurrent: () => isExactAfterSettleGenerationCurrent(generation, "applying"),
+      onPrepareError,
+      onComplete: () => completeScheduledExactAfterSettleRefreshPlan(generation, preparationPlan, passStartedAt),
+      onPassReady: (passName, drawFn, index, passStart) => {
         getRenderPipelinePassesOwner().prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache);
         recordRenderPerfMetric("settleExactRefreshPass", Math.max(0, nowMs() - passStart), {
           activeScenarioId: String(runtimeState.activeScenarioId || ""),
           generation,
           passName,
           index,
-          targetPasses: Array.isArray(nextPlan.exactTargetPasses) ? nextPlan.exactTargetPasses : [],
+          targetPasses: Array.isArray(preparationPlan.exactTargetPasses) ? preparationPlan.exactTargetPasses : [],
           passCount: definitions.length,
         });
-        enqueueNextPass(index + 1, nextPlan);
-      }, {
-        priority: "high",
-        label: `exact-after-settle-pass-${passName}`,
-        generation,
-        dedupe: true,
-        deferOnContinuousInput: false,
-      });
-    };
-
-    enqueueNextPass(0, plan);
+      },
+    });
     return true;
   }
 

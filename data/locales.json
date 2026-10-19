@@ -295319,8 +295319,8 @@
   },
   "ui": {
     "Political display mode": {"en": "Political display mode", "zh": "政治层显示模式"},
-    "Automatic (native during evaluation)": {"en": "Automatic (native during evaluation)", "zh": "自动（评估期使用原生）"},
-    "Persistent raster candidate": {"en": "Persistent raster candidate", "zh": "常驻栅格候选"},
+    "Automatic (raster for TNO)": {"en": "Automatic (raster for TNO)", "zh": "自动（TNO 优先栅格）"},
+    "Raster display": {"en": "Raster display", "zh": "栅格显示"},
     "Native vector compatibility": {"en": "Native vector compatibility", "zh": "原生矢量兼容"},
     "Legacy hybrid comparison": {"en": "Legacy hybrid comparison", "zh": "旧混合模式对照"},
     "Actual political renderer": {"en": "Actual political renderer", "zh": "实际政治层渲染器"},

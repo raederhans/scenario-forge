@@ -19,6 +19,7 @@ function createScenarioRefreshRuntime(deps = {}) {
     beginInteractionRecoveryTask, endInteractionRecoveryTask, isInteractionRecoverySettled,
     scheduleDeferredWork, cancelDeferredWork, yieldToMain, nowMs,
     markRendererTopologyChanged, clearDeferredInternalBorderMeshCaches,
+    notifyPaintContourSourcePublished = () => {},
     scheduleDeferredHeavyBorderMeshes, resetScenarioWaterCacheAdaptiveState,
     syncScenarioSecondaryRegionIndexes, invalidateRenderPasses,
     markAllOverlaysDirty, updateZoomTranslateExtent, isUsableMesh,
@@ -34,6 +35,7 @@ function createScenarioRefreshRuntime(deps = {}) {
 
   const { captureRefreshState, refreshDeferredDetail } = createScenarioDeferredRefreshOwner({
     runtimeState, nowMs, rebuildPrimaryPoliticalDerivedState, markRendererTopologyChanged,
+    notifyPaintContourSourcePublished,
     clearDeferredInternalBorderMeshCaches, scheduleDeferredHeavyBorderMeshes,
     invalidateInteractionComposite, rebuildStaticMeshes, invalidateBorderCache,
     updateDynamicBorderStatusUI, syncScenarioSecondaryRegionIndexes,
@@ -49,6 +51,7 @@ function createScenarioRefreshRuntime(deps = {}) {
   let deferredInfraEpoch = 0;
   let activeInfraExecution = null;
   let activeInfraLoadStateIsCurrent = () => false;
+  let getPreparedPoliticalCoverage = () => null;
   const scenarioVisualInvalidationExecutor = createScenarioVisualInvalidationExecutor({
     clearLastGoodFrame, clearRenderPassReferenceTransforms, invalidateInteractionComposite,
     invalidateBorderCache, resetScenarioWaterCacheAdaptiveState, invalidateRenderPasses,
@@ -82,6 +85,7 @@ function createScenarioRefreshRuntime(deps = {}) {
     cancelDeferredScenarioChunkPromotionInfraRefresh();
     activeInfraExecution = null;
     scenarioChunkPromotionVersion = 0;
+    getPreparedPoliticalCoverage = () => null;
   }
 
   function scheduleDeferredScenarioChunkPromotionInfraRefresh({
@@ -183,7 +187,8 @@ function createScenarioRefreshRuntime(deps = {}) {
     let infrastructureMutationStarted = false;
     try {
       let politicalCoverageBeforeRestore = hasPoliticalGeometryChange
-        ? analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, shouldExcludePoliticalVisualFeature })
+        ? (getPreparedPoliticalCoverage()
+          || analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, shouldExcludePoliticalVisualFeature }))
         : null;
       let resolvedCompletePoliticalDerivedStateReady = !!completePoliticalDerivedStateReady
         || (!!primaryDerivedStateReady && !politicalCoverageBeforeRestore?.primaryVisibleFeatureSubsetActive);
@@ -260,7 +265,9 @@ function createScenarioRefreshRuntime(deps = {}) {
         }
         fullPoliticalRestoreMs = nowMs() - fullRestoreStartedAt;
         restoredFullPoliticalChunkData = shouldRestoreFullPoliticalDerivedState;
-        politicalCoverageBeforeRestore = analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, shouldExcludePoliticalVisualFeature });
+        if (hasPrimaryVisiblePoliticalSubset || shouldRestoreFullPoliticalDerivedState) {
+          politicalCoverageBeforeRestore = analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, shouldExcludePoliticalVisualFeature });
+        }
         if (
           restoredFullPoliticalChunkData
           && !politicalCoverageBeforeRestore.landDataCoverageMissing
@@ -304,7 +311,15 @@ function createScenarioRefreshRuntime(deps = {}) {
             reason: `${reason}-opening`,
           });
         }
-        invalidateBorderCache();
+        // The visual stage may already have committed the complete border
+        // surface. Let the renderer preserve it only after checking the full
+        // committed input key around the dynamic-border refresh.
+        if (resolvedCompletePoliticalDerivedStateReady && !restoredFullPoliticalChunkData
+          && refreshOpeningOwnerBorders === false) {
+          invalidateBorderCache({ preservePreparedSurface: true });
+        } else {
+          invalidateBorderCache();
+        }
         updateDynamicBorderStatusUI();
         updateSpecialZonesPaths();
         renderSpecialZoneEditorOverlay();
@@ -408,6 +423,7 @@ function createScenarioRefreshRuntime(deps = {}) {
     politicalFeatureIds = [],
     hasPoliticalPayloadChange = false,
     refreshPlan = null,
+    preparedPoliticalState = null,
   } = {}) {
     const startedAt = nowMs();
     const runtimeChunkLoadState = runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object"
@@ -424,18 +440,25 @@ function createScenarioRefreshRuntime(deps = {}) {
       politicalFeatureIds,
       hasPoliticalPayloadChange,
     });
-    let coverageInputSnapshot = null;
+    let coverageInputSnapshot = null, preparedSourceCountries = null;
     if (hasPoliticalChange) {
-      coverageInputSnapshot = rebuildPrimaryPoliticalDerivedState({
+      const rebuilt = rebuildPrimaryPoliticalDerivedState({
         scheduleUiMode: "deferred",
         buildSpatial: true,
         includeSecondarySpatial: false,
         incremental: true,
-      })?.coverageInputSnapshot;
+        preparedPoliticalState,
+      });
+      coverageInputSnapshot = rebuilt?.coverageInputSnapshot;
+      preparedSourceCountries = rebuilt?.preparedSourceCountries || null;
+      getPreparedPoliticalCoverage = rebuilt?.getPreparedCoverage || (() => null);
     }
     scenarioChunkPromotionVersion = Number(scenarioChunkPromotionVersion || 0) + 1;
     const previousTopologyRevision = Number(runtimeState.topologyRevision || 0);
     markRendererTopologyChanged({ hitCanvasDirty: true });
+    // The derived collection above is an immutable publication. Its color
+    // notification can observe it before this transaction advances topology.
+    notifyPaintContourSourcePublished({ previousTopologyRevision });
     if (runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object") {
       queueScenarioChunkPromotionState(runtimeState, {
         visualPromotion: null,
@@ -444,7 +467,8 @@ function createScenarioRefreshRuntime(deps = {}) {
       });
     }
     if (hasPoliticalChange) {
-      clearDeferredInternalBorderMeshCaches();
+      if (preparedSourceCountries) clearDeferredInternalBorderMeshCaches({ preparedSourceCountries });
+      else clearDeferredInternalBorderMeshCaches();
       scheduleDeferredHeavyBorderMeshes();
     }
     if ((Array.isArray(effectiveChangedLayerKeys) ? effectiveChangedLayerKeys : []).some((layerKey) => String(layerKey || "").trim().toLowerCase() === "water")) {
@@ -477,7 +501,8 @@ function createScenarioRefreshRuntime(deps = {}) {
     const promotedPrimaryFeatureCount = Array.isArray(runtimeState.scenarioPoliticalVisibleChunkData?.features)
       ? runtimeState.scenarioPoliticalVisibleChunkData.features.length
       : promotedTotalFeatureCount;
-    const currentPoliticalCoverage = analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, coverageInputSnapshot, shouldExcludePoliticalVisualFeature });
+    const currentPoliticalCoverage = getPreparedPoliticalCoverage()
+      || analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, coverageInputSnapshot, shouldExcludePoliticalVisualFeature });
     const primaryVisibleDerivedStateReady = hasPoliticalChange
       && !!currentPoliticalCoverage.primaryVisibleFeatureSubsetActive;
     const completePoliticalDerivedStateReady = hasPoliticalChange

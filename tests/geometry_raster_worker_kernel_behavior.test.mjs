@@ -32,6 +32,37 @@ test("transferred raster geometry has identical D3 drawing commands and supports
   await transported.kernel.render(packet({ geometryUpdates: [{ id: "region", feature: null }], entries: [] }));
   await assert.rejects(transported.kernel.render(packet({ geometryUpdates: [] })), /Missing raster geometry/);
 });
+
+test("hit and political consume cooperative mixed batches with unchanged D3 commands and removal semantics", async () => {
+  for (const kind of ["hit", "political"]) {
+    const baseline = harness(), transported = harness();
+    const input = packet({ kind });
+    const encoded = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(input.geometryUpdates, { minCoordinateCount: 0 });
+    await baseline.kernel.render(input);
+    await transported.kernel.render({ ...input, geometryUpdates: null, geometryTransport: {
+      encoding: "geo-f64-batches-v1", batches: [structuredClone(encoded.payload, { transfer: encoded.transferables }),
+        [{ id: "absent", feature: null }]],
+    } });
+    assert.deepEqual(transported.draws, baseline.draws);
+    await transported.kernel.render(packet({ kind, entries: [], geometryUpdates: null,
+      geometryTransport: { encoding: "geo-f64-batches-v1", batches: [[{ id: "region", feature: null }]] } }));
+    await assert.rejects(transported.kernel.render(packet({ kind, geometryUpdates: [] })), /Missing raster geometry/);
+  }
+});
+
+test("hit and political cancellation between unpack batches stops before bitmap allocation", async () => {
+  for (const kind of ["hit", "political"]) {
+    let cancelled = false, clock = 0;
+    const { kernel, bitmaps } = harness({ sliceBudgetMs: 1, now: () => clock += 2,
+      yieldTask: async () => { cancelled = true; } });
+    const input = packet({ kind });
+    const encoded = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(input.geometryUpdates, { minCoordinateCount: 0 });
+    await assert.rejects(kernel.render({ ...input, geometryUpdates: null, geometryTransport: {
+      encoding: "geo-f64-batches-v1", batches: [encoded.payload, []],
+    } }, { isCancelled: () => cancelled }), { name: "AbortError" });
+    assert.equal(bitmaps.length, 0);
+  }
+});
 class RecordedPath {
   commands = [];
   moveTo(...args) { this.commands.push(["moveTo", ...args]); }
@@ -40,18 +71,18 @@ class RecordedPath {
   arc(...args) { this.commands.push(["arc", ...args]); }
 }
 function harness(overrides = {}) {
-  const draws = [], transforms = [], bitmaps = [];
+  const draws = [], transforms = [], bitmaps = [], contextOptions = [];
   const kernel = createGeometryRasterWorkerKernel({
     d3, createPath: () => new RecordedPath(), yieldTask: async () => {},
     createCanvas: () => ({
-      getContext: () => ({
+      getContext: (_kind, options) => { contextOptions.push(options); return {
         setTransform: (...args) => transforms.push(["setTransform", ...args]),
         translate: (...args) => transforms.push(["translate", ...args]),
         scale: (...args) => transforms.push(["scale", ...args]),
         clearRect() {},
         fill(...args) { draws.push({ kind: "fill", args, color: this.fillStyle }); },
         stroke(...args) { draws.push({ kind: "stroke", args, color: this.strokeStyle, width: this.lineWidth }); },
-      }),
+      }; },
       transferToImageBitmap: () => {
         const bitmap = { closed: false, close() { this.closed = true; } };
         bitmaps.push(bitmap);
@@ -59,7 +90,7 @@ function harness(overrides = {}) {
       },
     }), ...overrides,
   });
-  return { kernel, draws, transforms, bitmaps };
+  return { kernel, draws, transforms, bitmaps, contextOptions };
 }
 const feature = { type: "Feature", geometry: { type: "GeometryCollection", geometries: [
   { type: "Polygon", coordinates: [[[170, 65], [-170, 65], [-175, 85], [170, 65]]] },
@@ -89,12 +120,13 @@ test("real D3 stream preserves clipping, resampling, holes, multipolygons and po
   assert.equal(result.pathBuildCount, 1);
 });
 test("camera, DPR, color and hit reuse geometry; replacement, projection and scene invalidate", async () => {
-  const { kernel, draws } = harness();
+  const { kernel, draws, contextOptions } = harness();
   await kernel.render(packet());
   const hit = await kernel.render(packet({ kind: "hit", geometryUpdates: [], dpr: 1, transform: { x: 40, y: 0, k: 1 } }));
   assert.equal(hit.pathBuildCount, 0);
   assert.equal(draws.at(-1).kind, "fill");
   assert.equal(draws.length, 3, "hit never strokes even if style contains a stroke");
+  assert.deepEqual(contextOptions, [undefined, { willReadFrequently: true }], "visible political and hidden hit masks own separate contexts; hit uses CPU readback");
   assert.equal((await kernel.render(packet())).pathBuildCount, 1, "explicit same-ID update replaces geometry");
   assert.equal((await kernel.render(packet({ projectionKey: 2, geometryUpdates: [] }))).pathBuildCount, 1);
   await assert.rejects(kernel.render(packet({ sceneKey: "hoi4", geometryUpdates: [] })), /Missing raster geometry/);

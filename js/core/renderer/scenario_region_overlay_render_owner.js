@@ -7,6 +7,7 @@ import { createWaterHighlightDisplay } from "./water_highlight_display.js";
 import { GeometryBudgetMap, getGeometryRetentionWeights, PROJECTED_PATH_CACHE_BUDGET } from "./geometry_cache_budget.js";
 import { getFeatureId as getSharedFeatureId } from "../feature_identity.js";
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
+import { createWaterRasterWorkerClient } from "../water_raster_worker_client.js";
 
 export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   rendererSurfaceHost,
@@ -50,6 +51,15 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   scheduleWaterWork = (callback) => globalThis.setTimeout(callback, 0),
   cancelWaterWork = (handle) => globalThis.clearTimeout(handle),
   requestRender = () => {},
+  onWaterPreparationUnavailable = () => {},
+  getScenarioWaterRasterLayout = null,
+  withRenderTarget = null,
+  prepareTargetContext = null,
+  resourceBudget = null,
+  getWaterPreparationRevision = null,
+  getWaterWorkerProjectionOptions = null,
+  getWaterPatternSource = () => null,
+  createWaterWorkerClient = createWaterRasterWorkerClient,
 }) {
   const scenarioWaterPathCache = new GeometryBudgetMap({ budget: waterPathCacheBudget, weigh: (entry) => entry.estimatedBytes });
   // Weak geometry aliases let fresh feature wrappers reuse a bounded feature
@@ -67,6 +77,302 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   let waterPathCacheEpoch = 0;
   const waterHighlightDisplay = createWaterHighlightDisplay();
   let waterHighlightGeometryCache = new WeakMap();
+  let waterRasterPreparation = null;
+  let publishedWaterRasterIdentity = "";
+  let unavailableWaterRaster = null;
+  const waterRasterResourceOwner = Symbol("scenario-water-raster-preparation");
+  const waterRasterGeometryIdentities = new WeakMap();
+  let nextWaterRasterGeometryIdentity = 0;
+  let waterWorkerClient = null;
+  let waterWorkerSceneKey = null;
+  let publishedWaterWorkerRevision;
+  let failedWorkerRevision;
+  const waterWorkerResourceOwner = Symbol("scenario-water-resident-worker");
+  const waterWorkerFeatureVersions = new WeakMap();
+
+  function waterGeometryVersion(parts) {
+    const cached = waterWorkerFeatureVersions.get(parts[0]);
+    if (cached && sameWaterPathParts(cached.parts, parts)) return cached.version;
+    const version = ++nextWaterRasterGeometryIdentity;
+    waterWorkerFeatureVersions.set(parts[0], { parts: [...parts], version });
+    return version;
+  }
+
+  function getWaterRasterIdentity(selection, layout) {
+    const geometries = selection.waterFeatures.map(feature => {
+      const geometry = feature.geometry || feature.parts || feature;
+      if (!waterRasterGeometryIdentities.has(geometry)) waterRasterGeometryIdentities.set(geometry, ++nextWaterRasterGeometryIdentity);
+      return [getSharedFeatureId(feature), waterRasterGeometryIdentities.get(geometry)];
+    });
+    return JSON.stringify([getVisibleWaterWarmupIdentity(selection), getWaterPreparationRevision?.(), geometries,
+      layout.pixelWidth, layout.pixelHeight, layout.offsetX, layout.offsetY]);
+  }
+
+  function cancelWaterRasterPreparation() {
+    waterRasterPreparation?.controller?.abort();
+    waterRasterPreparation?.bitmap?.close();
+    resourceBudget?.release(waterRasterResourceOwner);
+    if (waterRasterPreparation?.handle != null) cancelWaterWork(waterRasterPreparation.handle);
+    if (waterRasterPreparation?.canvas) {
+      resourceBudget?.release(waterRasterResourceOwner);
+      waterRasterPreparation.canvas.width = 1;
+      waterRasterPreparation.canvas.height = 1;
+      if (waterRasterPreparation.scratch) {
+        waterRasterPreparation.scratch.width = 1;
+        waterRasterPreparation.scratch.height = 1;
+      }
+    }
+    waterRasterPreparation = null;
+  }
+
+  // The outer scene keeps its published pixels until this complete candidate is
+  // ready. Never expose an incrementally painted layer as valid scene coverage.
+  function prepareScenarioWaterLayer() {
+    const workerLayout = getScenarioWaterRasterLayout?.();
+    if (workerLayout && getWaterPreparationRevision && getWaterWorkerProjectionOptions) {
+      waterWorkerClient ||= createWaterWorkerClient();
+      if (waterWorkerClient.available() && failedWorkerRevision !== getWaterPreparationRevision()) {
+        return prepareWorkerWaterLayer(workerLayout);
+      }
+    }
+    return prepareCanvasWaterLayer();
+  }
+
+  function prepareWorkerWaterLayer(layout) {
+    if (!canPrepareVisibleWaterPaths()) {
+      cancelWaterRasterPreparation();
+      // Match the canvas/path producer: startup and interaction use the
+      // ordinary draw path until background preparation becomes applicable.
+      return true;
+    }
+    const revision = getWaterPreparationRevision();
+    if (waterRasterPreparation?.worker && waterRasterPreparation.revision === revision) return waterRasterPreparation.ready;
+    const snapshot = scenarioLayerCache.getSnapshot("water");
+    if (publishedWaterWorkerRevision === revision && snapshot.hasCanvas && snapshot.hasReferenceTransform) return true;
+    cancelWaterRasterPreparation();
+    cancelVisibleWaterWarmup();
+    const selection = getScenarioWaterSelection();
+    const controller = new AbortController();
+    const task = { worker: true, revision, identity: `water-worker:${++nextWaterRasterGeometryIdentity}`,
+      controller, ready: false, bitmap: null, startedAt: nowMs(), renderedCount: 0 };
+    waterRasterPreparation = task;
+    try {
+      const patternSource = getWaterPatternSource();
+      const lakeStyle = normalizeLakeStyleConfig(runtimeState.styleConfig?.lakes);
+      const features = [];
+      for (const [index, feature] of selection.waterFeatures.entries()) {
+        if (!isWaterRegionRenderable(feature)) continue;
+        const opacity = getWaterRegionDefaultStyle(feature).opacity;
+        if (!(opacity > 0)) continue;
+        const parts = collectSafeWaterRegionGeometryParts(feature);
+        if (!parts.length) continue;
+        const id = getSharedFeatureId(feature) || `water-${index}`;
+        const hasColorOverride = (!isMacroOceanWaterRegion(feature) || runtimeState.allowOpenOceanPaint)
+          && !!getSafeCanvasColor(runtimeState.waterRegionOverrides?.[id], null);
+        features.push({ id, geometryVersion: waterGeometryVersion(parts), parts,
+          opacity, fillColor: getWaterRegionColor(id, feature),
+          useOceanPattern: !!patternSource && !isLakeRegion(feature) && !hasColorOverride,
+          lake: isLakeRegion(feature) ? { ...lakeStyle, featureIdentity: { id: feature.id, properties: {
+            id: feature.properties?.id, water_type: feature.properties?.water_type,
+          } }, outlineColor: getSafeCanvasColor(lakeStyle.outlineColor, "#54738f") } : null });
+      }
+      const bitmapBytes = layout.pixelWidth * layout.pixelHeight * 4;
+      resourceBudget?.update(waterRasterResourceOwner, { workerSurfaces: Math.min(32 * 1024 * 1024, bitmapBytes * 2) });
+      waterWorkerSceneKey = `${runtimeState.activeScenarioId}:${runtimeState.sceneGeneration}`;
+      task.promise = waterWorkerClient.request({ identity: task.identity, revision,
+        sceneKey: waterWorkerSceneKey,
+        projectionOptions: getWaterWorkerProjectionOptions(), layout,
+        transform: cloneZoomTransform(runtimeState.zoomTransform), features, patternSource,
+      }, { signal: controller.signal }).then(result => {
+        if (waterRasterPreparation !== task || controller.signal.aborted) {
+          result.bitmap.close();
+          return;
+        }
+        if (getWaterPreparationRevision() !== revision) {
+          result.bitmap.close();
+          cancelWaterRasterPreparation();
+          requestRender("scenario-water-raster-stale");
+          return;
+        }
+        task.bitmap = result.bitmap; task.ready = true; task.renderedCount = result.renderedCount;
+        resourceBudget?.update(waterRasterResourceOwner, { bitmaps: bitmapBytes });
+        resourceBudget?.update(waterWorkerResourceOwner, { workerGeometry: result.stats.geometryBytes,
+          projectedPaths: result.stats.pathBytes, bitmaps: result.stats.patternBytes });
+        collectContextMetric("scenarioWaterRasterPreparation", nowMs() - task.startedAt, {
+          ...result.stats, featureCount: features.length, renderedCount: result.renderedCount, worker: true,
+        });
+        requestRender("scenario-water-raster-ready");
+      }).catch(error => failWorkerWaterTask(task, error));
+    } catch (error) { failWorkerWaterTask(task, error); }
+    return false;
+  }
+
+  function failWorkerWaterTask(task, error) {
+    if (waterRasterPreparation !== task || task.controller.signal.aborted) return;
+    // A failed candidate is never ready: the caller must keep the complete old scene.
+    task.error = error;
+    failedWorkerRevision = task.revision;
+    resourceBudget?.release(waterRasterResourceOwner);
+    collectContextMetric("scenarioWaterRasterPreparation", nowMs() - task.startedAt, {
+      worker: true, failed: true, reason: error.name, message: error.message,
+    });
+    requestRender("scenario-water-raster-failed");
+  }
+
+  function markWaterPreparationUnavailable(identity, reason) {
+    if (unavailableWaterRaster?.identity === identity) return false;
+    cancelWaterRasterPreparation();
+    unavailableWaterRaster = { identity, reason };
+    // A skipped candidate has no complete pixels. The scene owner must switch
+    // to its complete native path; it must never publish this as ready.
+    onWaterPreparationUnavailable(reason);
+    requestRender("scenario-water-raster-unavailable");
+    return false;
+  }
+
+  function prepareCanvasWaterLayer() {
+    if (!getScenarioWaterRasterLayout || !withRenderTarget || !prepareTargetContext) {
+      if (failedWorkerRevision !== undefined && failedWorkerRevision === getWaterPreparationRevision?.()) {
+        return markWaterPreparationUnavailable(`revision:${failedWorkerRevision}`, "canvas-preparation-unavailable");
+      }
+      return prepareVisibleWaterPaths();
+    }
+    const layout = getScenarioWaterRasterLayout();
+    if (!layout) {
+      cancelWaterRasterPreparation();
+      return prepareVisibleWaterPaths();
+    }
+    if (!canPrepareVisibleWaterPaths()) {
+      cancelWaterRasterPreparation();
+      return true;
+    }
+    const selection = getScenarioWaterSelection();
+    const identity = getWaterRasterIdentity(selection, layout);
+    if (waterRasterPreparation?.identity === identity) return waterRasterPreparation.ready;
+    cancelWaterRasterPreparation();
+    const snapshot = scenarioLayerCache.getSnapshot("water");
+    if (unavailableWaterRaster?.identity === identity) return false;
+    unavailableWaterRaster = null;
+    if ((publishedWaterRasterIdentity === identity && snapshot.hasCanvas && snapshot.hasReferenceTransform)
+      || !selection.waterFeatures.length) return true;
+    cancelVisibleWaterWarmup();
+    const canvas = globalThis.document?.createElement("canvas");
+    if (!canvas) return markWaterPreparationUnavailable(identity, "canvas-unavailable");
+    const bitmapBytes = layout.pixelWidth * layout.pixelHeight * 4;
+    const scratchWidth = Math.min(layout.pixelWidth,
+      Math.floor((32 * 1024 * 1024 - bitmapBytes) / (layout.pixelHeight * 4)));
+    if (!Number.isFinite(bitmapBytes) || scratchWidth < 1) {
+      collectContextMetric("scenarioWaterRasterPreparation", 0, {
+        skipped: true, reason: "surface-budget", bitmapBytes, budgetBytes: 32 * 1024 * 1024,
+      });
+      return markWaterPreparationUnavailable(identity, "surface-budget");
+    }
+    resourceBudget?.update(waterRasterResourceOwner, { bitmaps: bitmapBytes });
+    canvas.width = layout.pixelWidth;
+    canvas.height = layout.pixelHeight;
+    const context = canvas.getContext("2d");
+    if (!context) {
+      resourceBudget?.release(waterRasterResourceOwner);
+      canvas.width = canvas.height = 1;
+      return markWaterPreparationUnavailable(identity, "context-unavailable");
+    }
+    const transform = cloneZoomTransform(runtimeState.zoomTransform);
+    const k = prepareTargetContext(context, transform, layout);
+    const task = { identity, selection, canvas, scratch: null, context, k, index: 0, partIndex: 0, parts: null, tileX: 0, renderedCount: 0,
+      handle: null, ready: false, startedAt: nowMs(), maxSliceMs: 0, maxWorkMs: 0, slowestFeatureId: "", slowestPartIndex: 0 };
+    waterRasterPreparation = task;
+    const run = () => {
+      task.handle = null;
+      if (waterRasterPreparation !== task) return;
+      if (!canPrepareVisibleWaterPaths() || getWaterRasterIdentity(getScenarioWaterSelection(), getScenarioWaterRasterLayout() || {}) !== identity) {
+        cancelWaterRasterPreparation();
+        return;
+      }
+      const startedAt = nowMs();
+      try {
+      withRenderTarget(context, () => {
+      do {
+        const feature = selection.waterFeatures[task.index];
+        const workStartedAt = nowMs();
+        const partIndex = task.partIndex;
+        if (!task.parts) {
+          task.parts = isWaterRegionRenderable(feature)
+            ? collectSafeWaterRegionGeometryParts(feature) : [];
+          task.didDraw = false;
+        }
+        if (task.parts.length && getWaterRegionDefaultStyle(feature).opacity > 0) {
+          // Lake outlines retain their original fill/stroke alpha ordering.
+          // Marine polygon parts retain their holes; paint an opaque union and
+          // apply feature opacity once so overlapping parts do not darken.
+          if (isLakeRegion(feature)) {
+            task.renderedCount += drawScenarioWaterFillLayer(k, { waterFeatures: [feature], collectMetrics: false });
+            task.partIndex = task.parts.length;
+          } else {
+            if (!task.scratch) {
+              task.scratch = globalThis.document.createElement("canvas");
+              task.scratch.width = scratchWidth;
+              task.scratch.height = layout.pixelHeight;
+              resourceBudget?.update(waterRasterResourceOwner, { bitmaps: bitmapBytes + scratchWidth * layout.pixelHeight * 4 });
+            }
+            const scratch = task.scratch;
+            const scratchContext = scratch.getContext("2d");
+            if (!scratchContext) throw new Error("water scratch context unavailable");
+            if (!task.partIndex) prepareTargetContext(scratchContext, transform, {
+              ...layout, offsetX: layout.offsetX - task.tileX / layout.dpr,
+            });
+            withRenderTarget(scratchContext, () => {
+              task.didDraw = !!drawScenarioWaterFillLayer(k, {
+                waterFeatures: [feature], partsOverride: [task.parts[task.partIndex]], opaque: true, collectMetrics: false,
+              }) || task.didDraw;
+            });
+            task.partIndex += 1;
+            if (task.partIndex === task.parts.length) {
+              context.save();
+              context.setTransform(1, 0, 0, 1, 0, 0);
+              context.globalAlpha = getWaterRegionDefaultStyle(feature).opacity;
+              context.drawImage(scratch, task.tileX, 0);
+              context.restore();
+              task.tileX += scratchWidth;
+              if (task.tileX < layout.pixelWidth) task.partIndex = 0;
+              else if (task.didDraw) task.renderedCount += 1;
+            }
+          }
+        } else task.partIndex = task.parts.length;
+        if (task.partIndex === task.parts.length) {
+          task.parts = null;
+          task.partIndex = 0;
+          task.tileX = 0;
+          task.index += 1;
+        }
+        const workMs = nowMs() - workStartedAt;
+        if (workMs > task.maxWorkMs) {
+          task.maxWorkMs = workMs;
+          task.slowestFeatureId = getSharedFeatureId(feature);
+          task.slowestPartIndex = partIndex;
+        }
+      } while (task.index < selection.waterFeatures.length && nowMs() - startedAt < 6);
+      });
+      } catch (_error) {
+        cancelWaterRasterPreparation();
+        collectContextMetric("scenarioWaterRasterPreparation", nowMs() - startedAt, { skipped: true, reason: "prepare-failed" });
+        markWaterPreparationUnavailable(identity, "prepare-failed");
+        return;
+      }
+      task.maxSliceMs = Math.max(task.maxSliceMs, nowMs() - startedAt);
+      if (task.index < selection.waterFeatures.length) task.handle = scheduleWaterWork(run);
+      else {
+        task.ready = true;
+        collectContextMetric("scenarioWaterRasterPreparation", nowMs() - task.startedAt, {
+          featureCount: selection.waterFeatures.length, renderedCount: task.renderedCount,
+          maxSliceMs: task.maxSliceMs, maxWorkMs: task.maxWorkMs,
+          slowestFeatureId: task.slowestFeatureId, slowestPartIndex: task.slowestPartIndex,
+        });
+        requestRender("scenario-water-raster-ready");
+      }
+    };
+    task.handle = scheduleWaterWork(run);
+    return false;
+  }
 
   function getScenarioWaterPartBounds(part) {
     const cached = scenarioWaterPartBoundsCache.get(part);
@@ -91,13 +397,13 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     return { showWater, atlantropaFeatures, effectiveWaterFeatures, waterFeatures };
   }
 
-  function drawScenarioWaterFillLayer(k, { waterFeatures = [], maskOnly = false } = {}) {
+  function drawScenarioWaterFillLayer(k, { waterFeatures = [], maskOnly = false, partsOverride = null, opaque = false, collectMetrics = true } = {}) {
     const startedAt = nowMs();
     const buildCountBefore = waterPathBuildCount;
     const buildMsBefore = waterPathBuildMs;
     let renderedWaterCount = 0;
     if (!waterFeatures.length) {
-      if (!maskOnly) collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
+      if (!maskOnly && collectMetrics) collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
         featureCount: 0,
         renderedCount: 0,
         buildCount: 0,
@@ -110,7 +416,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     const oceanSurfacePattern = maskOnly ? null : getOceanSurfacePattern();
     waterFeatures.forEach((feature, index) => {
       if (!isWaterRegionRenderable(feature)) return;
-      const parts = collectSafeWaterRegionGeometryParts(feature);
+      const parts = partsOverride || collectSafeWaterRegionGeometryParts(feature);
       if (!parts.length) return;
       const visibleParts = [];
       parts.forEach((part) => {
@@ -118,7 +424,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
         visibleParts.push(part);
       });
       if (!visibleParts.length) return;
-      const fillOpacity = maskOnly ? 1 : getWaterRegionDefaultStyle(feature).opacity;
+      const fillOpacity = maskOnly || opaque ? 1 : getWaterRegionDefaultStyle(feature).opacity;
       if (!(fillOpacity > 0)) return;
       const id = getSharedFeatureId(feature) || `water-${index}`;
       rendererSurfaceHost.getContext().save();
@@ -149,7 +455,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       };
       // A retained whole-feature path is already projected. Offscreen parts
       // are clipped by the canvas, so a subset view can reuse that exact path.
-      const waterPath = getCachedWaterFeaturePath(feature, parts)
+      const waterPath = partsOverride ? null : getCachedWaterFeaturePath(feature, parts)
         || (visibleParts.length === parts.length ? getScenarioWaterFeaturePath(feature, parts) : null);
       let didFill = false;
       if (waterPath) {
@@ -179,7 +485,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       rendererSurfaceHost.getContext().restore();
       if (didFill) renderedWaterCount += 1;
     });
-    if (!maskOnly) collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
+    if (!maskOnly && collectMetrics) collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
       featureCount: waterFeatures.length,
       renderedCount: renderedWaterCount,
       buildCount: waterPathBuildCount - buildCountBefore,
@@ -673,6 +979,14 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
           evaluatedSignals ??= getScenarioWaterCacheComplexitySignals(waterFeatures);
           return evaluatedSignals.visibleCoverageRatio;
         },
+        get partCount() {
+          evaluatedSignals ??= getScenarioWaterCacheComplexitySignals(waterFeatures);
+          return evaluatedSignals.partCount;
+        },
+        get vertexCount() {
+          evaluatedSignals ??= getScenarioWaterCacheComplexitySignals(waterFeatures);
+          return evaluatedSignals.vertexCount;
+        },
       });
       if (evaluatedSignals) {
         waterVisibleCoverageRatio = evaluatedSignals.visibleCoverageRatio;
@@ -680,8 +994,54 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
         waterCoverageAlgo = evaluatedSignals.waterCoverageAlgo || "grid";
       }
       const strategy = useAdaptiveDirect ? "adaptive-direct" : forcedWaterCache.mode;
+      const rasterLayout = getScenarioWaterRasterLayout?.();
+      const workerRevision = getWaterPreparationRevision?.();
+      const rasterIdentity = rasterLayout && waterRasterPreparation?.worker
+        ? (waterRasterPreparation.revision === workerRevision ? waterRasterPreparation.identity : "")
+        : rasterLayout && !waterRasterPreparation && publishedWaterWorkerRevision !== undefined
+          ? (publishedWaterWorkerRevision === workerRevision ? publishedWaterRasterIdentity : "")
+          : rasterLayout && (waterRasterPreparation?.ready || publishedWaterRasterIdentity)
+            ? getWaterRasterIdentity({ effectiveWaterFeatures, atlantropaFeatures, waterFeatures }, rasterLayout) : "";
 
-      if (strategy === "direct" || strategy === "adaptive-direct") {
+      if (waterRasterPreparation?.ready && waterRasterPreparation.identity === rasterIdentity) {
+        const prepared = waterRasterPreparation;
+        renderedWaterCount = scenarioLayerCache.render("water", currentTransform, {
+          draw: () => {
+            const context = rendererSurfaceHost.getContext();
+            context.save();
+            context.setTransform(1, 0, 0, 1, 0, 0);
+            context.drawImage(prepared.bitmap || prepared.canvas, 0, 0);
+            context.restore();
+            return prepared.renderedCount;
+          },
+          getSignature: () => waterVisualRevision,
+        });
+        if (scenarioLayerCache.draw("water", currentTransform, { allowTransform: false })) {
+          publishedWaterRasterIdentity = rasterIdentity;
+          publishedWaterWorkerRevision = prepared.worker ? prepared.revision : undefined;
+          waterCacheMode = "prepared";
+          cancelWaterRasterPreparation();
+        } else {
+          // A missing cache context must not turn a complete candidate into a
+          // blank pass. The candidate has exactly the target layout/transform.
+          const context = rendererSurfaceHost.getContext();
+          context.save();
+          context.setTransform(1, 0, 0, 1, 0, 0);
+          context.drawImage(prepared.bitmap || prepared.canvas, 0, 0);
+          context.restore();
+          renderedWaterCount = prepared.renderedCount;
+          waterCacheMode = "prepared-direct";
+        }
+      } else if (publishedWaterRasterIdentity === rasterIdentity && rasterIdentity && canReuseWaterLayer
+        && scenarioLayerCache.draw("water", currentTransform, { allowTransform: false })) {
+        renderedWaterCount = Number(waterLayerEntry.renderedCount || 0);
+        waterCacheMode = "reuse";
+      } else if (rasterLayout && (waterRasterPreparation || unavailableWaterRaster)) {
+        // Only complete candidates can enter this pass. Preparation failure is
+        // handed to the scene owner rather than drawing partial/synchronous water.
+        waterCacheMode = unavailableWaterRaster ? "unavailable"
+          : waterRasterPreparation.worker ? (waterRasterPreparation.error ? "worker-failed" : "worker-pending") : "canvas-pending";
+      } else if (strategy === "direct" || strategy === "adaptive-direct") {
         waterCacheMode = strategy;
         collectContextMetric("contextScenarioLayerCacheMiss", 0, {
           layer: "water",
@@ -800,8 +1160,19 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     });
   }
 
-  function resetWaterPathCaches() {
+  function resetWaterPathCaches({ preserveResidentWorker = false } = {}) {
     cancelVisibleWaterWarmup();
+    cancelWaterRasterPreparation();
+    if (!preserveResidentWorker || waterWorkerSceneKey !== `${runtimeState.activeScenarioId}:${runtimeState.sceneGeneration}`) {
+      waterWorkerClient?.dispose();
+      waterWorkerClient = null;
+      waterWorkerSceneKey = null;
+      resourceBudget?.release(waterWorkerResourceOwner);
+    }
+    publishedWaterRasterIdentity = "";
+    publishedWaterWorkerRevision = undefined;
+    failedWorkerRevision = undefined;
+    unavailableWaterRaster = null;
     scenarioWaterPathCache.clear();
     scenarioWaterPartBoundsCache = new WeakMap();
     waterHighlightDisplay.clear();
@@ -840,6 +1211,14 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     getScenarioWaterPartBounds,
     getCachedWaterFeaturePath,
     prepareVisibleWaterPaths,
+    prepareScenarioWaterLayer,
+    getPreparationDiagnostics: () => ({
+      pending: !!waterRasterPreparation && !waterRasterPreparation.ready,
+      ready: !!waterRasterPreparation?.ready,
+      worker: !!waterRasterPreparation?.worker,
+      currentRevision: getWaterPreparationRevision?.(), revision: waterRasterPreparation?.revision,
+      client: waterWorkerClient?.getDiagnostics?.(),
+    }),
     drawScenarioRegionOverlaysPass,
     resetWaterPathCaches,
     getPreviousWaterRenderedCount,

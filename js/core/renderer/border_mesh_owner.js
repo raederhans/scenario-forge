@@ -7,6 +7,7 @@ import {
   buildGlobalCountryBorderMesh as buildGlobalCountryBorderMeshFromSources,
   buildSourceBorderMeshes as buildSourceBorderMeshesFromSources,
   getSourceCountrySets as getSourceCountrySetsFromSelection,
+  getSourceCountrySetsSteps,
   resolveScenarioOpeningOwnerBorderSelection,
 } from "./border_mesh_source_selection.js";
 import {
@@ -331,6 +332,49 @@ export function createBorderMeshOwner({
     });
   }
 
+  async function prepareSourceCountrySets({
+    fullCollection = state.landDataFull,
+    landCollection = state.landData,
+    isCurrent = () => true,
+    yieldControl = () => new Promise(resolve => setTimeout(resolve, 0)),
+    nowMs: preparationNowMs = () => globalThis.performance?.now?.() ?? Date.now(),
+  } = {}) {
+    const sourceFeatures = Array.isArray(fullCollection?.features) && fullCollection.features.length
+      ? fullCollection.features : (Array.isArray(landCollection?.features) ? landCollection.features : []);
+    const iterator = getSourceCountrySetsSteps({
+      state: { landData: { features: sourceFeatures } },
+      getFeatureCountryCodeNormalized: getFeatureBorderMeshCountryCodeNormalized,
+      getFeatureId,
+      shouldExcludePoliticalInteractionFeature,
+    });
+    let yieldCount = 0, maxSliceMs = 0, work = 0, sliceStartedAt = preparationNowMs();
+    let current = isCurrent();
+    try {
+      while (current) {
+        const next = iterator.next();
+        if (next.done) {
+          maxSliceMs = Math.max(maxSliceMs, preparationNowMs() - sliceStartedAt);
+          if (!isCurrent()) break;
+          return { status: "prepared", sourceCountries: next.value, sourceFeatures, maxSliceMs, yieldCount };
+        }
+        if (++work % 512 === 0) {
+          const sliceMs = preparationNowMs() - sliceStartedAt;
+          if (sliceMs >= 4) {
+            maxSliceMs = Math.max(maxSliceMs, sliceMs);
+            yieldCount++;
+            await yieldControl();
+            current = isCurrent();
+            if (!current) break;
+            sliceStartedAt = preparationNowMs();
+          }
+        }
+      }
+      return { status: "cancelled", sourceCountries: null, sourceFeatures, maxSliceMs, yieldCount };
+    } finally {
+      iterator.return();
+    }
+  }
+
   function buildCountryParentBorderMeshes(countryCode) {
     return buildCountryParentBorderMeshesFromSources({
       countryCode,
@@ -501,6 +545,7 @@ export function createBorderMeshOwner({
     getFrontlineMesh,
     buildDetailAdmBorderMesh,
     getSourceCountrySets,
+    prepareSourceCountrySets,
     buildCountryParentBorderMeshes,
     buildSourceBorderMeshes,
     buildGlobalCountryBorderMesh,

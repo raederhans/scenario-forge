@@ -5,6 +5,58 @@ import { RENDER_PASS_NAMES } from "../js/core/map_renderer/render_pass_catalog.j
 import { IDLE_RENDER_PASS_DEFINITIONS } from "../js/core/renderer/render_pipeline_catalog.js";
 import { createRenderPipelinePassesOwner } from "../js/core/renderer/render_pipeline_passes.js";
 
+test("independent private producers start together while old pass canvases remain intact", () => {
+  const names = ["physicalBase", "political", "contextScenario", "borders", "contextMarkers", "labels"];
+  const canvases = Object.fromEntries(names.map(name => [name, { name }]));
+  const cache = { canvases, signatures: {}, dirty: Object.fromEntries(names.map(name => [name, true])) };
+  const prepared = [], painted = [];
+  const owner = createRenderPipelinePassesOwner({
+    state: { zoomTransform: { x: 0, y: 0, k: 1 } },
+    helpers: { getRenderPassCacheState: () => cache, getRenderPassSignature: () => "next",
+      prepareRenderPassAsync: name => { prepared.push(name); return name === "political"; },
+      renderPassToCache: name => painted.push(name) },
+  });
+  assert.equal(owner.ensureIdleRenderPasses({}, names), false);
+  assert.deepEqual(prepared, names);
+  assert.deepEqual(painted, []);
+  for (const name of names) assert.equal(cache.canvases[name], canvases[name]);
+});
+
+test("marker-only preparation preserves its old canvas at both preflight and the final paint gate", () => {
+  const oldCanvas = { id: "previous-markers" }, painted = [], prepared = [];
+  const cache = { canvases: { contextMarkers: oldCanvas }, counters: {},
+    dirty: { contextMarkers: true }, reasons: {}, signatures: { contextMarkers: "previous" } };
+  let pending = true;
+  const owner = createRenderPipelinePassesOwner({
+    state: { zoomTransform: { x: 0, y: 0, k: 2.5 } },
+    helpers: {
+      getRenderPassCacheState: () => cache,
+      getRenderPassSignature: () => "next",
+      prepareRenderPassAsync: (name) => { prepared.push(name); return pending; },
+      renderPassToCache(name) {
+        painted.push(name);
+        cache.canvases[name] = { id: "prepared-markers" };
+        cache.signatures[name] = "next";
+        cache.dirty[name] = false;
+      },
+    },
+  });
+  assert.equal(owner.ensureIdleRenderPasses({}, ["contextMarkers"]), false);
+  assert.deepEqual(prepared, ["contextMarkers"], "marker-only updates cannot depend on a labels preflight");
+  assert.equal(owner.prepareIdleRenderPassDefinition("contextMarkers", () => {}, { k: 2.5 }, {}), false);
+  assert.deepEqual(prepared, ["contextMarkers", "contextMarkers"]);
+  assert.deepEqual(painted, []);
+  assert.equal(cache.canvases.contextMarkers, oldCanvas);
+  assert.equal(cache.signatures.contextMarkers, "previous");
+  assert.equal(cache.dirty.contextMarkers, true);
+  pending = false;
+  assert.equal(owner.ensureIdleRenderPasses({}, ["contextMarkers"]), true);
+  assert.deepEqual(painted, ["contextMarkers"]);
+  assert.equal(cache.dirty.contextMarkers, false);
+  assert.equal(cache.signatures.contextMarkers, "next");
+  assert.notEqual(cache.canvases.contextMarkers, oldCanvas);
+});
+
 const EXPECTED_IDLE_RENDER_PASS_NAMES = [
   "background",
   "physicalBase",

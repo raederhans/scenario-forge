@@ -270,12 +270,61 @@ test("strokeCode zero omits transparent TNO stroke without recording code zero",
   assert.deepEqual([...contributions(tile, 4 * 12 + 3).keys()], [1]);
 });
 
-test("long raster loops yield, cancellation aborts, and mask canvas is released", async () => {
-  const harness = maskHarness(() => 128);
+test("cheap raster checkpoints keep coverage without scheduling worker turns", async () => {
+  let clock = 0, yields = 0;
+  const harness = maskHarness(() => { clock += 0.1; return 255; });
+  const tile = await buildPoliticalIdRasterTile({
+    entries: Array.from({ length: 64 }, (_, index) => ({ code: index + 1, feature,
+      bounds: { minX: 0, minY: 0, maxX: 1, maxY: 1 } })),
+    projection: d3.geoIdentity(), width: 1, height: 1, d3, ...harness,
+    now: () => clock, yieldTask: async () => { yields++; },
+  });
+  assert.equal(yields, 0, "four entry checkpoints below 8ms need no event-loop turns");
+  assert.equal(tile.stats.yieldCount, 0);
+  assert.equal(tile.stats.yieldWallMs, 0);
+  assert.deepEqual([...tile.codes], [64], "the last opaque painter still owns the pixel");
+  assert.equal(tile.stats.maskReadPixels, 64);
+});
+
+test("raster yields after 8ms of work and resets its budget after the yielded turn", async () => {
+  let clock = 0, reads = 0, yields = 0;
+  const costs = [0.5, 0.125, 0.375, 0.125];
+  const harness = maskHarness(() => { clock += costs[Math.floor(reads++ / 16)]; return 255; });
+  const tile = await buildPoliticalIdRasterTile({
+    entries: Array.from({ length: 64 }, () => ({ code: 1, feature,
+      bounds: { minX: 0, minY: 0, maxX: 1, maxY: 1 } })),
+    projection: d3.geoIdentity(), width: 1, height: 1, d3, ...harness,
+    now: () => clock,
+    yieldTask: async () => { yields++; clock += 100; },
+  });
+  assert.equal(yields, 2, "100ms spent yielding must not consume the next work slice");
+  assert.equal(tile.stats.yieldCount, 2);
+  assert.equal(tile.stats.yieldWallMs, 200);
+  assert.equal(tile.stats.buildMs, 218);
+  assert.deepEqual([...tile.codes], [1]);
+});
+
+test("pixel checkpoints cancel below the yield budget and release the mask canvas", async () => {
   let cancelled = false, yields = 0;
+  const harness = maskHarness(() => { cancelled = true; return 128; });
   await assert.rejects(buildPoliticalIdRasterTile({
     entries: [{ code: 1, feature, bounds: { minX: 0, minY: 0, maxX: 256, maxY: 300 } }],
     projection: d3.geoIdentity(), width: 256, height: 300, d3, ...harness,
+    now: () => 0, isCancelled: () => cancelled,
+    yieldTask: async () => { yields++; },
+  }), { name: "AbortError" });
+  assert.equal(yields, 0, "cancellation is checked even when a yield is unnecessary");
+  assert.equal(harness.canvas.width, 0);
+  assert.equal(harness.canvas.height, 0);
+});
+
+test("long raster loops yield, cancellation aborts, and mask canvas is released", async () => {
+  const harness = maskHarness(() => 128);
+  let cancelled = false, yields = 0, ticks = 0;
+  await assert.rejects(buildPoliticalIdRasterTile({
+    entries: [{ code: 1, feature, bounds: { minX: 0, minY: 0, maxX: 256, maxY: 300 } }],
+    projection: d3.geoIdentity(), width: 256, height: 300, d3, ...harness,
+    now: () => ticks++ * 8,
     isCancelled: () => cancelled,
     yieldTask: async () => { yields++; cancelled = true; },
   }), { name: "AbortError" });

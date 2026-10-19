@@ -15,6 +15,140 @@ const coordinate = (point) => {
 };
 const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a; };
 
+// The persistent graph contains millions of edges. Keep their exact snapped
+// keys, original Float64 endpoints and usual two signed owners in columns,
+// rather than an object, string and several Arrays/Sets for every segment.
+const EDGE_SHIFT = 12, EDGE_CHUNK = 1 << EDGE_SHIFT, EDGE_MASK = EDGE_CHUNK - 1;
+const TOMBSTONE = 0xffffffff;
+class ContourEdgeView {
+  constructor(store, index) { this.store = store; this.index = index; }
+  get key() { return this.index + 1; }
+  get a() { return this.store.point(this.index, false, false); }
+  get b() { return this.store.point(this.index, true, false); }
+  get start() { return this.store.point(this.index, false, true); }
+  get end() { return this.store.point(this.index, true, true); }
+  get members() { return this.store.members(this.index); }
+}
+// Scalar queries must not materialize a point Array on each sort comparison.
+// Temporary split edges retain their ordinary point arrays and exact values.
+function edgeCoordinate(edge, second, axis, original = false) {
+  return edge instanceof ContourEdgeView ? edge.store.scalar(edge.index, second, axis, original)
+    : edge[original ? (second ? 'end' : 'start') : (second ? 'b' : 'a')][axis];
+}
+function copyEdge(edge, overrides) {
+  return edge instanceof ContourEdgeView
+    ? { key: edge.key, a: edge.a, b: edge.b, start: edge.start, end: edge.end, members: edge.members, ...overrides }
+    : { ...edge, ...overrides };
+}
+
+function createCompactEdges() {
+  const chunks = [], overflow = new Map();
+  let table = new Uint32Array(2048), used = 0, size = 0, allocated = 0;
+  let head = 0, tail = 0, free = 0, views = null;
+  const chunk = index => chunks[index >>> EDGE_SHIFT];
+  const offset = index => index & EDGE_MASK;
+  function hash(ax, ay, bx, by) {
+    let value = Math.imul(ax ^ 0x9e3779b9, 0x85ebca6b);
+    value = Math.imul(value ^ ay, 0xc2b2ae35);
+    value = Math.imul(value ^ bx, 0x85ebca6b);
+    value = Math.imul(value ^ by, 0xc2b2ae35);
+    return (value ^ value >>> 16) >>> 0;
+  }
+  function locate(ax, ay, bx, by) {
+    let slot = hash(ax, ay, bx, by) & (table.length - 1), empty = -1;
+    for (;;) {
+      const token = table[slot];
+      if (!token) return { slot: empty < 0 ? slot : empty, index: -1 };
+      if (token === TOMBSTONE) { if (empty < 0) empty = slot; }
+      else {
+        const index = token - 1, values = chunk(index).snapped, at = offset(index) * 4;
+        if (values[at] === ax && values[at + 1] === ay && values[at + 2] === bx && values[at + 3] === by) return { slot, index };
+      }
+      slot = (slot + 1) & (table.length - 1);
+    }
+  }
+  function rehash(length) {
+    table = new Uint32Array(length); used = size;
+    for (let token = head; token; token = chunk(token - 1).links[offset(token - 1) * 2 + 1]) {
+      const index = token - 1, values = chunk(index).snapped, at = offset(index) * 4;
+      table[locate(values[at], values[at + 1], values[at + 2], values[at + 3]).slot] = token;
+    }
+  }
+  function getOrAdd(a, b, start, end) {
+    let found = locate(a[0], a[1], b[0], b[1]);
+    if (found.index >= 0) return found.index;
+    if ((used + 1) * 10 >= table.length * 7) {
+      rehash((size + 1) * 10 >= table.length * 5 ? table.length * 2 : table.length);
+      found = locate(a[0], a[1], b[0], b[1]);
+    }
+    let index;
+    if (free) { index = free - 1; free = chunk(index).links[offset(index) * 2]; }
+    else {
+      if (allocated >= TOMBSTONE - 1) throw new RangeError('Contour edge index capacity exceeded.');
+      index = allocated++;
+      if (!(index & EDGE_MASK)) chunks.push({ snapped: new Int32Array(EDGE_CHUNK * 4),
+        original: new Float64Array(EDGE_CHUNK * 4), owners: new Int32Array(EDGE_CHUNK * 2), links: new Uint32Array(EDGE_CHUNK * 2) });
+    }
+    const storage = chunk(index), at = offset(index) * 4, link = offset(index) * 2;
+    storage.snapped.set([a[0], a[1], b[0], b[1]], at);
+    storage.original.set([start[0], start[1], end[0], end[1]], at);
+    storage.links[link] = tail; storage.links[link + 1] = 0;
+    if (tail) chunk(tail - 1).links[offset(tail - 1) * 2 + 1] = index + 1;
+    else head = index + 1;
+    tail = index + 1;
+    if (!table[found.slot]) used++;
+    table[found.slot] = index + 1; size++;
+    return index;
+  }
+  function members(index) {
+    const values = chunk(index).owners, at = offset(index) * 2;
+    return overflow.get(index) || (values[at + 1] ? [values[at], values[at + 1]] : [values[at]]);
+  }
+  function addMember(index, member) {
+    const values = chunk(index).owners, at = offset(index) * 2, extra = overflow.get(index);
+    if (extra) { if (extra.includes(member)) return false; extra.push(member); return true; }
+    if (values[at] === member || values[at + 1] === member) return false;
+    if (!values[at]) values[at] = member;
+    else if (!values[at + 1]) values[at + 1] = member;
+    else overflow.set(index, [values[at], values[at + 1], member]);
+    return true;
+  }
+  function removeMember(index, owner) {
+    const storage = chunk(index), at = offset(index) * 2, values = storage.owners;
+    if (!values[at]) return;
+    const next = members(index).filter(member => Math.abs(member) !== owner);
+    values[at] = next[0] || 0; values[at + 1] = next[1] || 0;
+    if (next.length > 2) overflow.set(index, next); else overflow.delete(index);
+    if (next.length) return;
+    const key = offset(index) * 4, coordinates = storage.snapped;
+    table[locate(coordinates[key], coordinates[key + 1], coordinates[key + 2], coordinates[key + 3]).slot] = TOMBSTONE;
+    const before = storage.links[at], after = storage.links[at + 1];
+    if (before) chunk(before - 1).links[offset(before - 1) * 2 + 1] = after; else head = after;
+    if (after) chunk(after - 1).links[offset(after - 1) * 2] = before; else tail = before;
+    storage.links[at] = free; free = index + 1; size--;
+  }
+  return {
+    get size() { return size; }, getOrAdd, addMember, removeMember, members,
+    point(index, second, original) {
+      const values = chunk(index)[original ? 'original' : 'snapped'], at = offset(index) * 4 + (second ? 2 : 0);
+      return [values[at], values[at + 1]];
+    },
+    scalar(index, second, axis, original) {
+      return chunk(index)[original ? 'original' : 'snapped'][offset(index) * 4 + (second ? 2 : 0) + axis];
+    },
+    beginRead() { views = []; }, endRead() { views = null; },
+    *values() {
+      for (let token = head; token; token = chunk(token - 1).links[offset(token - 1) * 2 + 1]) {
+        const index = token - 1;
+        yield views ? views[index] ||= new ContourEdgeView(this, index) : new ContourEdgeView(this, index);
+      }
+    },
+    stats() { return { compactEdgeBytes: table.byteLength + chunks.reduce((sum, item) => sum + item.snapped.byteLength
+      + item.original.byteLength + item.owners.byteLength + item.links.byteLength, 0),
+      edgeCapacity: chunks.length * EDGE_CHUNK, overflowEdges: overflow.size }; },
+  };
+}
+
 function ringSide(ring, hole) {
   let area = 0;
   for (let i = 0; i < ring.length - 1; i += 1) {
@@ -82,8 +216,8 @@ function nodeEdges(unmatched, diagnostics, accept = () => true, metric = 'nodedS
       if (!pair) {
         // Keep unmatched subintervals. Dropping an entire partly matched edge
         // would hide a later coarse/fine seam along its remaining portion.
-        for (const edge of list) remaining.push({ ...edge, a: current.point, b: next.point,
-          start: current.original, end: next.original });
+        for (const edge of list) remaining.push(copyEdge(edge, { a: current.point, b: next.point,
+          start: current.original, end: next.original }));
         continue;
       }
       shared.push({ a: current.point, b: next.point, start: current.original, end: next.original, pair });
@@ -99,12 +233,15 @@ function nodeEdges(unmatched, diagnostics, accept = () => true, metric = 'nodedS
 // of input uncertainty through subtraction, multiplication and the determinant;
 // this is a numerical error bound, not a geographic snapping distance.
 const representationError = value => Math.max(Number.MIN_VALUE, Math.abs(value) * Number.EPSILON);
-function sourceCollinear(edge, point) {
-  const [a, b] = [edge.start, edge.end];
+function sourceCollinear(edge, other, second) {
+  const ax = edgeCoordinate(edge, false, 0, true), ay = edgeCoordinate(edge, false, 1, true);
+  const bx = edgeCoordinate(edge, true, 0, true), by = edgeCoordinate(edge, true, 1, true);
+  const x = edgeCoordinate(other, second, 0, true), y = edgeCoordinate(other, second, 1, true);
   const error = representationError;
-  const difference = (x, y) => [x - y, error(x) + error(y) + error(x - y)];
-  const [dx, dxError] = difference(b[0], a[0]), [dy, dyError] = difference(b[1], a[1]);
-  const [px, pxError] = difference(point[0], a[0]), [py, pyError] = difference(point[1], a[1]);
+  const dx = bx - ax, dxError = error(bx) + error(ax) + error(bx - ax);
+  const dy = by - ay, dyError = error(by) + error(ay) + error(by - ay);
+  const px = x - ax, pxError = error(x) + error(ax) + error(x - ax);
+  const py = y - ay, pyError = error(y) + error(ay) + error(y - ay);
   const left = dx * py, right = dy * px, determinant = left - right;
   const bound = Math.abs(dx) * pyError + Math.abs(py) * dxError + dxError * pyError
     + Math.abs(dy) * pxError + Math.abs(px) * dyError + dyError * pxError
@@ -116,19 +253,20 @@ function sourceEdgeQuery(edges, occupied) {
   // Static x-interval tree: bbox queries retain ALL original owners, including
   // edges consumed/rejected by earlier matching. No global proximity search.
   const ordered = [...edges.values(), ...occupied.filter(edge => !edge.key)]
-    .filter(edge => Math.abs(edge.b[0] - edge.a[0]) <= 180 * SCALE)
-    .sort((a, b) => a.a[0] - b.a[0]);
+    .filter(edge => Math.abs(edgeCoordinate(edge, true, 0) - edgeCoordinate(edge, false, 0)) <= 180 * SCALE)
+    .sort((a, b) => edgeCoordinate(a, false, 0) - edgeCoordinate(b, false, 0));
   let size = 1; while (size < ordered.length) size *= 2;
   const maxima = new Float64Array(size * 2).fill(-Infinity);
-  ordered.forEach((edge, index) => { maxima[size + index] = edge.b[0]; });
+  ordered.forEach((edge, index) => { maxima[size + index] = edgeCoordinate(edge, true, 0); });
   for (let index = size - 1; index > 0; index -= 1) maxima[index] = Math.max(maxima[index * 2], maxima[index * 2 + 1]);
   return (x0, y0, x1, y1) => {
     const result = [];
     function visit(node, lo, hi) {
-      if (lo >= ordered.length || ordered[lo].a[0] > x1 || maxima[node] < x0) return;
+      if (lo >= ordered.length || edgeCoordinate(ordered[lo], false, 0) > x1 || maxima[node] < x0) return;
       if (hi - lo === 1) {
         const edge = ordered[lo];
-        if (Math.min(edge.a[1], edge.b[1]) <= y1 && Math.max(edge.a[1], edge.b[1]) >= y0) result.push(edge);
+        const ay = edgeCoordinate(edge, false, 1), by = edgeCoordinate(edge, true, 1);
+        if (Math.min(ay, by) <= y1 && Math.max(ay, by) >= y0) result.push(edge);
         return;
       }
       const mid = (lo + hi) >>> 1;
@@ -145,8 +283,8 @@ function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occu
   const maxComparisonsPerGroup = 4096;
   const buckets = new Map(), parents = unmatched.map((_, index) => index);
   const find = index => { while (parents[index] !== index) { parents[index] = parents[parents[index]]; index = parents[index]; } return index; };
-  const compatible = (a, b) => sourceCollinear(a, b.start) && sourceCollinear(a, b.end)
-    && sourceCollinear(b, a.start) && sourceCollinear(b, a.end);
+  const compatible = (a, b) => sourceCollinear(a, b, false) && sourceCollinear(a, b, true)
+    && sourceCollinear(b, a, false) && sourceCollinear(b, a, true);
   for (let index = 0; index < unmatched.length; index += 1) {
     const edge = unmatched[index];
     if (precisions.get(Math.abs(edge.members[0]) - 1) !== 7 || Math.abs(edge.b[0] - edge.a[0]) > 180 * SCALE) continue;
@@ -221,8 +359,8 @@ function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occu
         shared.push({ a: current.point, b: next.point, start: current.original, end: next.original, pair });
         diagnostics.sourceNodedSharedSegments += 1;
       } else {
-        for (const edge of list) remaining.push({ ...edge, a: current.point, b: next.point,
-          start: current.original, end: next.original });
+        for (const edge of list) remaining.push(copyEdge(edge, { a: current.point, b: next.point,
+          start: current.original, end: next.original }));
       }
     }
   }
@@ -299,7 +437,7 @@ function packChains(segments, featureIds, diagnostics) {
     if (!group) groups.set(key, group = { pair: edge.pair, edges: [] });
     group.edges.push(edge);
   }
-  const paths = [], pairs = [];
+  const paths = [];
   let pointCount = 0;
   for (const { pair, edges } of groups.values()) {
     const nodes = new Map(), used = new Set();
@@ -311,13 +449,12 @@ function packChains(segments, featureIds, diagnostics) {
       }
     });
     function walk(start, firstIndex) {
-      const points = [];
+      const steps = [];
       let vertex = start, index = firstIndex;
       while (!used.has(index)) {
         used.add(index);
         const edge = edges[index], forward = keyOf(edge.a) === vertex;
-        if (!points.length) points.push(forward ? edge.start : edge.end);
-        points.push(forward ? edge.end : edge.start);
+        steps.push((index + 1) * (forward ? 1 : -1));
         vertex = keyOf(forward ? edge.b : edge.a);
         const adjacent = nodes.get(vertex);
         if (adjacent.length !== 2) break;
@@ -325,7 +462,7 @@ function packChains(segments, featureIds, diagnostics) {
         if (next === undefined) break;
         index = next;
       }
-      if (points.length > 1) { paths.push(points); pairs.push(pair); pointCount += points.length; }
+      if (steps.length) { paths.push({ edges, steps: Int32Array.from(steps), pair }); pointCount += steps.length + 1; }
     }
     for (const [vertex, adjacent] of nodes) {
       if (adjacent.length === 2) continue;
@@ -337,10 +474,17 @@ function packChains(segments, featureIds, diagnostics) {
   const offsets = new Uint32Array(paths.length + 1);
   const owners = new Uint32Array(paths.length * 2);
   let position = 0;
-  paths.forEach((points, index) => {
+  const writePoint = point => {
+    coordinates[position * 2] = point[0]; coordinates[position * 2 + 1] = point[1]; position++;
+  };
+  paths.forEach(({ edges, steps, pair }, index) => {
     offsets[index] = position;
-    owners[index * 2] = pairs[index][0]; owners[index * 2 + 1] = pairs[index][1];
-    for (const p of points) { coordinates[position * 2] = p[0]; coordinates[position * 2 + 1] = p[1]; position += 1; }
+    owners[index * 2] = pair[0]; owners[index * 2 + 1] = pair[1];
+    for (let step = 0; step < steps.length; step++) {
+      const token = steps[step], edge = edges[Math.abs(token) - 1], forward = token > 0;
+      if (!step) writePoint(forward ? edge.start : edge.end);
+      writePoint(forward ? edge.end : edge.start);
+    }
   });
   offsets[paths.length] = position;
   return { featureIds: [...featureIds], coordinates, offsets, owners,
@@ -348,15 +492,12 @@ function packChains(segments, featureIds, diagnostics) {
 }
 
 export function createPaintContourGraphBuilder() {
-  const edges = new Map(), idToIndex = new Map(), featureIds = [], featureEdges = new Map();
+  const edges = createCompactEdges(), idToIndex = new Map(), featureIds = [], featureEdges = new Map();
   const invalidRingsById = new Map(), precisions = new Map();
   function remove(featureId) {
     const id = idToIndex.get(String(featureId));
     if (id === undefined) return;
-    for (const edge of featureEdges.get(id) || []) {
-      edge.members = edge.members.filter(member => Math.abs(member) !== id + 1);
-      if (!edge.members.length) edges.delete(edge.key);
-    }
+    for (const edge of featureEdges.get(id) || []) edges.removeMember(edge, id + 1);
     featureEdges.delete(id); invalidRingsById.delete(id); precisions.delete(id);
   }
   function add({ id: rawId, geometry, coordinatePrecision = 7 }) {
@@ -366,7 +507,7 @@ export function createPaintContourGraphBuilder() {
     let id = idToIndex.get(featureId);
     if (id === undefined) { id = featureIds.length; featureIds.push(featureId); idToIndex.set(featureId, id); }
     precisions.set(id, coordinatePrecision === 4 ? 4 : 7);
-    const touched = new Set();
+    const touched = [];
     let invalidRings = 0;
     function polygon(rings) {
       if (!Array.isArray(rings)) return;
@@ -388,15 +529,9 @@ export function createPaintContourGraphBuilder() {
           if (!order) continue;
           const forward = order < 0;
           const a = snapped[forward ? i : i + 1], b = snapped[forward ? i + 1 : i];
-          const key = `${keyOf(a)};${keyOf(b)}`;
-          let edge = edges.get(key);
-          if (!edge) {
-            edge = { key, a, b, start: ring[forward ? i : i + 1].slice(0, 2), end: ring[forward ? i + 1 : i].slice(0, 2), members: [] };
-            edges.set(key, edge);
-          }
+          const edge = edges.getOrAdd(a, b, ring[forward ? i : i + 1], ring[forward ? i + 1 : i]);
           const member = (id + 1) * side * (forward ? 1 : -1);
-          if (!edge.members.includes(member)) edge.members.push(member);
-          touched.add(edge);
+          if (edges.addMember(edge, member)) touched.push(edge);
         }
       });
     }
@@ -406,7 +541,7 @@ export function createPaintContourGraphBuilder() {
       else if (value?.type === 'GeometryCollection') (value.geometries || []).forEach(visit);
     }
     visit(geometry);
-    featureEdges.set(id, touched);
+    featureEdges.set(id, Uint32Array.from(touched));
     invalidRingsById.set(id, invalidRings);
   }
   return Object.freeze({
@@ -416,8 +551,16 @@ export function createPaintContourGraphBuilder() {
         ambiguousSegments: 0, exactSharedSegments: 0, nodedSharedSegments: 0, sourceNodedSharedSegments: 0,
         sourceLineComparisons: 0, sourceLineMaxBucket: 0, sourceLineSkippedBuckets: 0, sourceLineSkippedGroups: 0,
         quantizedSharedSegments: 0, ambiguousQuantizedSegments: 0, oneSidedSegments: 0 };
-      return packChains(sharedSegments(edges, diagnostics, precisions), featureIds, diagnostics);
+      edges.beginRead();
+      let segments;
+      try { segments = sharedSegments(edges, diagnostics, precisions); }
+      finally { edges.endRead(); }
+      // Packing must not keep views for the unshared world coastline alive.
+      // Only accepted shared segments survive into the output phase.
+      return packChains(segments, featureIds, diagnostics);
     },
+    getStorageStats() { return { ...edges.stats(), segmentCount: edges.size,
+      featureEdgeIndexBytes: [...featureEdges.values()].reduce((sum, indices) => sum + indices.byteLength, 0) }; },
   });
 }
 

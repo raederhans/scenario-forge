@@ -6,6 +6,7 @@ import { createCityLabelOwner } from "../js/core/renderer/city_label_owner.js";
 import { normalizeCityLayerStyleConfig } from "../js/core/state_defaults.js";
 import { getMapLabelHierarchy } from "../js/core/renderer/map_label_hierarchy.js";
 import { claimScreenLabelPlacement } from "../js/core/renderer/screen_label_placement.js";
+import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
 
 const markerTokens = {
   baseShadow: "rgba(0, 0, 0, 0.2)",
@@ -223,6 +224,254 @@ test("city points owner records hidden skip metrics and clears hover entries", (
   assert.equal(harness.owner.getHoveredCityTooltipEntry({ type: "mousemove" }, { targetType: "land", id: "LAND1" }), null);
 });
 
+test("reveal plan reuses normalized values and isolates selected marker-label aliases", () => {
+  let builds = 0;
+  const entry = { id: "selected", acceptedLabelPlacement: "", anchor: [1, 2], screenPoint: [3, 4] };
+  const unselected = { get unused() { throw new Error("unselected candidates must not be cloned"); } };
+  const harness = createCityPointsHarness({ markerEntries: [entry],
+    buildCityRevealPlan: () => {
+      builds++;
+      return { markerEntries: [entry], labelEntries: [entry], candidateEntries: [entry, unselected], labelBudget: 5 };
+    },
+  });
+  const first = harness.owner.getCityLayerRenderState(2, { interactive: true });
+  assert.deepEqual(first.labelEntries, []);
+  first.markerEntries[0].acceptedLabelPlacement = "left";
+  first.markerEntries[0].labelContrastMode = "light";
+  harness.state.styleConfig.cityPoints = { ...harness.state.styleConfig.cityPoints, markerScale: "1" };
+  const second = harness.owner.getCityLayerRenderState(2);
+  assert.equal(builds, 1, "a new config object with identical normalized values reuses the complete plan");
+  assert.equal(second.markerEntries[0], second.labelEntries[0]);
+  assert.notEqual(second.markerEntries[0], first.markerEntries[0]);
+  assert.notEqual(second.markerEntries[0], entry);
+  assert.equal(second.labelEntries[0].acceptedLabelPlacement, "");
+  assert.equal(second.labelEntries[0].labelContrastMode, undefined);
+  assert.equal(second.labelBudget, 5);
+  assert.equal(entry.acceptedLabelPlacement, "");
+  assert.equal(entry.labelContrastMode, undefined);
+});
+
+test("reveal plan invalidates for data, geometry, exact viewport and deferred label dependencies", () => {
+  let collection = { features: [{}] };
+  let projection = () => [0, 0];
+  let paintOverscan = 48;
+  let builds = 0;
+  const entry = { id: "city" };
+  const state = { showCityPoints: true, width: 800, height: 500,
+    zoomTransform: { x: 0, y: 0, k: 2 }, styleConfig: { cityPoints: { showLabels: true } } };
+  const owner = createCityPointsRenderOwner({ state,
+    getters: { getProjection: () => projection },
+    helpers: {
+      getEffectiveCityCollection: () => collection,
+      getCityPaintOverscanPx: () => paintOverscan,
+      normalizeCityLayerStyleConfig,
+      buildCityRevealPlan: () => {
+        builds++;
+        return { markerEntries: [entry], labelEntries: state.deferExactAfterSettle ? [] : [entry] };
+      },
+    },
+  });
+  const render = () => owner.getCityLayerRenderState(2);
+  render(); render();
+  assert.equal(builds, 1);
+  const mutations = [
+    () => { collection = { features: [{}] }; },
+    ...["cityLayerRevision", "sceneGeneration", "scenarioDataGeneration", "scenarioStrategicValuesRevision", "sovereigntyRevision"]
+      .map((field) => () => { state[field] = 1; }),
+    () => { state.activeScenarioId = "tno"; },
+    () => { state.scenarioCountriesByTag = {}; },
+    () => { state.activeScenarioManifest = {}; },
+    () => { state.urbanData = { features: [] }; },
+    () => { projection = () => [1, 1]; },
+    () => { markProjectionGeometryChanged(projection); },
+    () => { state.zoomTransform.x += 1e-8; },
+    () => { state.zoomTransform.y += 1e-8; },
+    () => { state.zoomTransform.k += 1e-8; },
+    () => { state.width++; },
+    () => { state.height++; },
+    () => { paintOverscan++; },
+    () => { state.deferExactAfterSettle = true; },
+  ];
+  for (const mutate of mutations) {
+    const before = builds;
+    mutate(); render(); render();
+    assert.equal(builds, before + 1, String(mutate));
+  }
+  assert.deepEqual(render().labelEntries, []);
+  state.deferExactAfterSettle = false;
+  assert.equal(render().labelEntries.length, 1, "settling rebuilds the full label plan");
+  const before = builds;
+  state.zoomTransform.x = 10; render();
+  state.zoomTransform.x = 20; render();
+  state.zoomTransform.x = 10; render();
+  assert.equal(builds, before + 3, "only the most recent plan is cached");
+});
+
+function createPrivateRevealHarness() {
+  const entry = { id: "prepared-city", cityId: "prepared-city", anchor: [1, 2], screenPoint: [3, 4] };
+  const h = { collection: { features: [{}] }, projection: () => [0, 0], enabled: true,
+    builds: 0, preparations: 0, contextReads: 0, paintOverscan: 48,
+    state: { showCityPoints: true, width: 800, height: 500,
+      zoomTransform: { x: 0, y: 0, k: 2 }, styleConfig: { cityPoints: { showLabels: true } } } };
+  h.owner = createCityPointsRenderOwner({ state: h.state,
+    getters: {
+      getProjection: () => h.projection,
+      getContext: () => { h.contextReads++; return null; },
+      getMapSvg: () => ({}),
+    },
+    helpers: {
+      getEffectiveCityCollection: () => h.collection,
+      getCityPaintOverscanPx: () => h.paintOverscan,
+      normalizeCityLayerStyleConfig,
+      getPointer: () => [3, 4],
+      getCityTooltipText: (value) => value.id,
+      isPrivatePreparationEnabled: () => h.enabled,
+      buildCityRevealPlan: () => { h.builds++; return { markerEntries: [entry], labelEntries: [entry] }; },
+      prepareCityRevealPlan: async (_collection, _scale, _transform, _config, options) => {
+        h.preparations++;
+        await options.yieldControl?.();
+        return options.isCurrent() ? { markerEntries: [entry], labelEntries: [entry], labelBudget: 4 } : null;
+      },
+    },
+  });
+  return h;
+}
+
+test("private city preparation consumes only ready plans, preserves hover and reuses complete labels across defer", async () => {
+  const h = createPrivateRevealHarness();
+  let release;
+  const held = new Promise((resolve) => { release = resolve; });
+  const previous = { id: "previous-city", screenPoint: [3, 4], markerSizePx: 3 };
+  h.owner.cacheVisibleCityHoverEntries([previous]);
+  const before = h.owner.getHoveredCityEntryFromEvent({ type: "mousemove" });
+  h.state.deferExactAfterSettle = true;
+  const pending = h.owner.prepareCurrentView(2, { yieldControl: () => held });
+  assert.equal(h.owner.prepareCurrentView(2), pending, "one view shares a single private job");
+  assert.equal(h.contextReads, 1, "preparation never reads or installs a drawing context");
+  release();
+  assert.equal(await pending, true);
+  assert.equal(h.owner.getHoveredCityEntryFromEvent({ type: "mousemove" }), before);
+  const deferred = h.owner.getCityLayerRenderState(2);
+  assert.equal(deferred.markerEntries.length, 1);
+  assert.equal(deferred.labelEntries.length, 0);
+  h.state.deferExactAfterSettle = false;
+  const settled = h.owner.getCityLayerRenderState(2);
+  assert.equal(settled.labelEntries.length, 1);
+  assert.equal(settled.markerEntries[0], settled.labelEntries[0]);
+  settled.markerEntries[0].acceptedLabelPlacement = "left";
+  assert.equal(h.owner.getCityLayerRenderState(2).markerEntries[0].acceptedLabelPlacement, undefined);
+  assert.equal(h.owner.prepareCurrentView(2), null);
+  assert.equal(h.preparations, 1);
+  assert.equal(h.builds, 0, "draw never synchronously rebuilds a private plan");
+  h.state.zoomTransform.x += 1;
+  assert.equal(h.owner.getCityLayerRenderState(2).reason, "preparing");
+  assert.equal(h.preparations, 1, "a draw cache miss does not start autonomous preparation");
+  h.enabled = false;
+  assert.equal(h.owner.getCityLayerRenderState(2).skipped, false);
+  assert.equal(h.builds, 1, "ordinary vector/export callers retain the synchronous fallback");
+});
+
+test("private city preparation cancels each scene, data, projection, viewport and configuration identity change", async () => {
+  const mutations = [
+    (h) => { h.collection = { features: [{}] }; },
+    (h) => { h.collection.features = [{}]; },
+    ...["cityLayerRevision", "sceneGeneration", "scenarioDataGeneration", "scenarioStrategicValuesRevision", "sovereigntyRevision"]
+      .map((name) => (h) => { h.state[name] = 1; }),
+    ...["worldCitiesData", "scenarioCityOverridesData", "scenarioStrategicValuesData", "sovereigntyByFeatureId",
+      "scenarioCountriesByTag", "activeScenarioManifest", "urbanData"]
+      .map((name) => (h) => { h.state[name] = {}; }),
+    (h) => { h.state.activeScenarioId = "new-scene"; },
+    (h) => { h.projection = () => [1, 1]; },
+    (h) => { markProjectionGeometryChanged(h.projection); },
+    ...["x", "y", "k"].map((name) => (h) => { h.state.zoomTransform[name] += 1e-8; }),
+    ...["width", "height"].map((name) => (h) => { h.state[name]++; }),
+    (h) => { h.paintOverscan++; },
+    (h) => { h.state.styleConfig.cityPoints.markerScale = 1.5; },
+    (h) => { h.state.showCityPoints = false; },
+    (h) => { h.enabled = false; },
+    (h) => { h.owner.cancelPreparation(); },
+  ];
+  for (const mutate of mutations) {
+    const h = createPrivateRevealHarness();
+    let release;
+    const held = new Promise((resolve) => { release = resolve; });
+    const pending = h.owner.prepareCurrentView(2, { yieldControl: () => held });
+    mutate(h);
+    release();
+    assert.equal(await pending, false, String(mutate));
+    assert.equal(h.contextReads, 0);
+    assert.equal(h.builds, 0);
+    assert.equal(h.preparations, 1);
+  }
+});
+
+test("private city preparation keeps defer flips current but honors abort and caller cancellation", async () => {
+  for (const mode of ["defer", "abort", "caller"]) {
+    const h = createPrivateRevealHarness();
+    let release, current = true;
+    const held = new Promise((resolve) => { release = resolve; });
+    const controller = new AbortController();
+    const pending = h.owner.prepareCurrentView(2, { signal: controller.signal, isCurrent: () => current,
+      yieldControl: () => held });
+    if (mode === "defer") h.state.deferExactAfterSettle = true;
+    if (mode === "abort") controller.abort();
+    if (mode === "caller") current = false;
+    release();
+    assert.equal(await pending, mode === "defer");
+    if (mode === "defer") {
+      assert.equal(h.owner.getCityLayerRenderState(2).labelEntries.length, 0);
+      h.state.deferExactAfterSettle = false;
+      assert.equal(h.owner.getCityLayerRenderState(2).labelEntries.length, 1);
+      assert.equal(h.preparations, 1);
+    }
+  }
+});
+
+test("cold city draws never build or reserve a plan and an older job cannot replace the current ready view", async () => {
+  const h = createPrivateRevealHarness();
+  assert.equal(h.owner.getCityLayerRenderState(2).reason, "preparing");
+  const boxes = [];
+  assert.equal(h.owner.reserveOverviewLabelBoxes(2, boxes), null);
+  assert.deepEqual(boxes, []);
+  assert.equal(h.builds, 0);
+  let release;
+  const held = new Promise((resolve) => { release = resolve; });
+  const previous = h.owner.prepareCurrentView(2, { yieldControl: () => held });
+  h.state.zoomTransform.x = 4;
+  const current = h.owner.prepareCurrentView(2, { yieldControl: async () => {} });
+  assert.equal(await current, true);
+  release();
+  assert.equal(await previous, false);
+  assert.equal(h.owner.getCityLayerRenderState(2).skipped, false);
+  assert.equal(h.owner.prepareCurrentView(2), null);
+  assert.equal(h.preparations, 2);
+  assert.equal(h.builds, 0);
+});
+
+test("reveal plan invalidates for every changed normalized city configuration value", () => {
+  let builds = 0;
+  const entry = { id: "city" };
+  const harness = createCityPointsHarness({ markerEntries: [entry], buildCityRevealPlan: () => {
+    builds++;
+    return { markerEntries: [entry], labelEntries: [entry] };
+  } });
+  harness.owner.getCityLayerRenderState(2);
+  const changes = {
+    theme: "atlas_ink", markerDensity: 1.5, densityPreset: "compact", minSettlementRank: "large",
+    labelDensity: "dense", color: "#123456", capitalColor: "#654321", opacity: 0.5, markerScale: 1.5,
+    showLabels: false, labelSize: 20, labelMinZoom: 4, showCapitalOverlay: false, capitalScale: 2,
+  };
+  for (const [field, value] of Object.entries(changes)) {
+    const before = builds;
+    const previous = normalizeCityLayerStyleConfig(harness.state.styleConfig.cityPoints)[field];
+    harness.state.styleConfig.cityPoints[field] = value;
+    const normalized = normalizeCityLayerStyleConfig(harness.state.styleConfig.cityPoints)[field];
+    harness.owner.getCityLayerRenderState(2);
+    assert.notEqual(previous, normalized, `${field} fixture must change its normalized value`);
+    assert.equal(builds, before + 1, field);
+  }
+});
+
 test("city labels pass draws markers before delegating labels", () => {
   const restoreCanvas = installCanvasFactory();
   try {
@@ -375,7 +624,8 @@ test("overview capitals keep their near-marker position through country placemen
   const overviewLayout = harness.owner.reserveOverviewLabelBoxes(2, occupiedBoxes);
   assert.equal(draws.length, 0, "reservation measures but does not draw text");
   assert.equal(overviewLayout.capitalBoxes.length, 1);
-  assert.equal(entries[0].acceptedLabelPlacement, "right");
+  assert.equal(overviewLayout.capitalEntries[0].acceptedLabelPlacement, "right");
+  assert.equal(entries[0].acceptedLabelPlacement, undefined, "the reveal plan template is not changed by layout");
   assert.equal(entries[1].acceptedLabelPlacement, undefined, "ordinary names do not reserve overview space");
   const clearCountryBox = { x: 170, y: 140, w: 100, h: 20 };
   assert.equal(claimScreenLabelPlacement([
@@ -383,7 +633,7 @@ test("overview capitals keep their near-marker position through country placemen
     { id: "country-center", box: clearCountryBox },
   ], occupiedBoxes).id, "country-center");
   harness.owner.drawLabelsPass(2, { occupiedBoxes, overviewLayout });
-  assert.equal(entries[0].acceptedLabelPlacement, "right", "country placement cannot push the capital across its star");
+  assert.equal(overviewLayout.capitalEntries[0].acceptedLabelPlacement, "right", "country placement cannot push the capital across its star");
   assert.equal(draws.length, 1, "the shared label budget includes capitals");
   assert.equal(draws[0][1], 45, "10px screen offset at 2x remains beside the star");
   assert.equal(occupiedBoxes.length, 4, "two markers, one country and one capital; no duplicate reservations");
@@ -465,10 +715,14 @@ test("markers depend on policy with consistent interactive and settled density w
     ...entry, markerSizePx: 6, anchor: [20 + index * 50, 25], screenPoint: [80 + index * 200, 100],
   }));
   let pointer = entries[1].screenPoint;
+  let builds = 0;
   const harness = createCityPointsHarness({
     markerEntries: entries,
     pointer: () => pointer,
-    buildCityRevealPlan: () => ({ markerEntries: entries, labelEntries: entries.slice(0, 4), labelBudget: 4 }),
+    buildCityRevealPlan: () => {
+      builds++;
+      return { markerEntries: entries, labelEntries: entries.slice(0, 4), labelBudget: 4 };
+    },
     drawLabels: (candidates, options, context) => {
       context.measureText = () => ({ width: 8 });
       context.strokeText = () => {};
@@ -493,12 +747,18 @@ test("markers depend on policy with consistent interactive and settled density w
   assert.equal(harness.renderMetrics.at(-1).detail.labelCount, 1, "labels collision only culls labels");
   assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 5);
   assert.deepEqual(harness.labelCalls.at(-1).entries.map((entry) => entry.id), ["named", "blocked", "capital", "major"]);
-  assert.deepEqual(entries.filter((entry) => entry.acceptedLabelPlacement).map((entry) => entry.id), ["named"]);
+  assert.deepEqual(harness.labelCalls.at(-1).entries.filter((entry) => entry.acceptedLabelPlacement).map((entry) => entry.id), ["named"]);
+  assert.ok(entries.every((entry) => !entry.acceptedLabelPlacement), "layout leaves the reveal template clean");
   pointer = entries[1].screenPoint;
   assert.equal(harness.owner.getHoveredCityEntryFromEvent({ type: "mousemove" })?.id, "blocked");
   pointer = entries[2].screenPoint;
   assert.equal(harness.owner.getHoveredCityEntryFromEvent({ type: "mousemove" })?.id, "capital");
   assert.equal(occupiedBoxes.length, 7, "existing blocker + 5 markers + 1 placed label");
+
+  harness.owner.drawLabelsPass(4, { occupiedBoxes: [] });
+  assert.equal(builds, 1, "the same reveal plan is reused for a second layout");
+  assert.equal(harness.renderMetrics.at(-1).detail.labelCount, 4, "collision layout runs again when occupied boxes change");
+  assert.equal(harness.labelCalls.length, 2);
 
   for (const mode of ["labels-off", "distant", "deferred", "interactive"]) {
     harness.state.styleConfig.cityPoints.showLabels = mode !== "labels-off";

@@ -293,6 +293,102 @@ test("physical base pass draws semantic and relief without an extra gradient sta
   assert.equal(harness.metrics.at(-1).details.reliefRenderedCount, 1);
 });
 
+test("physical base retains two independent land clips with identical fill order, alpha and blends when atlas intensity is disabled", () => {
+  const features = [createAtlasFeature("forest", "semantic_overlay", "semantic"),
+    createAtlasFeature("mountain", "relief_base", "relief")];
+  const h = createOwner({ atlasFeatures: features });
+  h.owner.drawPhysicalBasePass(2);
+  assert.equal(h.helperCalls.filter(call => call === "clip").length, 2);
+  assert.deepEqual(h.pathCalls.map(feature => feature.id), ["semantic", "relief"]);
+  assert.deepEqual(h.context.calls.filter(call => call.type === "fill").map(call =>
+    [call.fillStyle, call.alpha, call.composite]),
+  [["#446644", 1, "multiply"], ["#887766", 0.8 * 0.5 * 0.8, "soft-light"]]);
+  assert.equal(h.context.calls[0].type, "save");
+  assert.equal(h.context.calls.at(-1).type, "restore");
+  assert.equal(h.context.calls.filter(call => call.type === "save").length, 2);
+  assert.equal(h.context.calls.filter(call => call.type === "restore").length, 2);
+
+  h.helperCalls.length = 0;
+  h.context.calls.length = 0;
+  h.state.intensityFields.channels.physicalContour = { enabled: true };
+  h.owner.drawPhysicalBasePass(2);
+  assert.equal(h.helperCalls.filter(call => call === "clip").length, 2,
+    "a separate contour intensity channel does not redirect atlas painting");
+});
+
+test("any enabled atlas intensity retains the two independent clips, including a neutral field", () => {
+  const h = createOwner({ atlasFeatures: [createAtlasFeature("forest", "semantic_overlay"),
+    createAtlasFeature("mountain", "relief_base")] });
+  h.state.intensityFields.channels.physicalAtlas = { enabled: true, points: [], grid: { composite: [1, 1] } };
+  h.owner.drawPhysicalBasePass(2);
+  assert.equal(h.helperCalls.filter(call => call === "clip").length, 2);
+  assert.equal(h.context.calls.filter(call => call.type === "save").length, 2);
+  assert.equal(h.context.calls.filter(call => call.type === "restore").length, 2);
+});
+
+test("full-world base uses the captured complete atlas LOD without live viewport checks or LOD reads", () => {
+  const semantic = createAtlasFeature("forest", "semantic_overlay", "captured-semantic");
+  const relief = createAtlasFeature("mountain", "relief_base", "captured-relief");
+  const atlasCollection = { features: [relief, semantic] };
+  const h = createOwner({ helperOverrides: {
+    getResolvedPhysicalAtlasCollection() { throw new Error("unexpected live LOD lookup"); },
+    pathBoundsInScreen() { throw new Error("unexpected live viewport culling"); },
+  } });
+  h.state.zoomTransform = { x: 1e6, y: -1e6, k: 100 };
+  h.owner.drawPhysicalBasePass(1, { fullWorld: true, atlasCollection });
+  assert.deepEqual(h.pathCalls, [semantic, relief], "layer order remains semantic then relief regardless of collection order");
+  assert.equal(h.helperCalls.filter(call => call === "clip").length, 2);
+  assert.equal(h.context.calls.filter(call => call.type === "save").length, 2);
+  assert.equal(h.context.calls.filter(call => call.type === "restore").length, 2);
+  h.pathCalls.length = 0;
+  h.state.styleConfig.physical.atlasClassVisibility.forest = false;
+  h.owner.drawPhysicalBasePass(1, { fullWorld: true, atlasCollection });
+  assert.deepEqual(h.pathCalls, [relief], "canonical drawing still applies class visibility");
+});
+
+test("ordinary atlas drawing retains viewport culling while full-world drawing preserves all matching features", () => {
+  const semantic = createAtlasFeature("forest", "semantic_overlay", "outside-semantic");
+  const relief = createAtlasFeature("mountain", "relief_base", "inside-relief");
+  let checks = 0;
+  const h = createOwner({ atlasFeatures: [semantic, relief], helperOverrides: {
+    pathBoundsInScreen(feature) { checks++; return feature === relief; },
+  } });
+  h.owner.drawPhysicalBasePass(2);
+  assert.deepEqual(h.pathCalls, [relief]); assert.equal(checks, 2);
+  h.pathCalls.length = 0; checks = 0;
+  h.owner.drawPhysicalBasePass(2, { fullWorld: true });
+  assert.deepEqual(h.pathCalls, [semantic, relief]); assert.equal(checks, 0);
+});
+
+test("full-world base resolves one LOD for both layers and an explicit absent collection never falls back to live data", () => {
+  const first = [createAtlasFeature("forest", "semantic_overlay", "coarse-semantic"),
+    createAtlasFeature("mountain", "relief_base", "coarse-relief")];
+  const other = [createAtlasFeature("forest", "semantic_overlay", "detail-semantic"),
+    createAtlasFeature("mountain", "relief_base", "detail-relief")];
+  let reads = 0;
+  const h = createOwner({ helperOverrides: {
+    getResolvedPhysicalAtlasCollection: () => ({ features: ++reads === 1 ? first : other }),
+  } });
+  h.owner.drawPhysicalBasePass(1, { fullWorld: true });
+  assert.equal(reads, 1); assert.deepEqual(h.pathCalls, first);
+  h.pathCalls.length = 0;
+  h.owner.drawPhysicalBasePass(1, { fullWorld: true, atlasCollection: null });
+  assert.equal(reads, 1); assert.deepEqual(h.pathCalls, []);
+  assert.equal(h.metrics.at(-1).details.reason, "no-data");
+});
+
+test("full-world atlas rendering keeps the original two-clip command order, styles and interactive opacity", () => {
+  const atlasCollection = { features: [createAtlasFeature("forest", "semantic_overlay"),
+    createAtlasFeature("mountain", "relief_base")] };
+  const normal = createOwner({ atlasFeatures: atlasCollection.features });
+  const canonical = createOwner({ helperOverrides: { pathBoundsInScreen() { throw new Error("live culling"); } } });
+  normal.owner.drawPhysicalBasePass(2, { interactive: true });
+  canonical.owner.drawPhysicalBasePass(2, { interactive: true, fullWorld: true, atlasCollection });
+  assert.deepEqual(canonical.pathCalls, normal.pathCalls);
+  assert.deepEqual(canonical.context.calls, normal.context.calls);
+  assert.deepEqual(canonical.helperCalls, normal.helperCalls);
+});
+
 test("landform and land cover sliders independently suppress their own fills", () => {
   const h = createOwner({ atlasFeatures: [createAtlasFeature("forest", "semantic_overlay"), createAtlasFeature("mountain", "relief_base")] });
   h.state.styleConfig.physical.landformIntensity = 0;

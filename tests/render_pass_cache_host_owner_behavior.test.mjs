@@ -53,6 +53,13 @@ function createRenderPassToCacheHarness({
   };
   let nowIndex = 0;
   const dependencyMap = {
+    physicalViewportCacheOwner: null,
+    borderCanvasPreparationOwner: null,
+    exportRenderInProgress: false,
+    isTnoRasterSceneSelected: () => false,
+    politicalIdRasterRuntimeOwner: null,
+    politicalPassUsesDirectScene: false,
+    tnoRasterSceneOwner: null,
     exactCompositeReuseOwner: null,
     getRenderPassCacheState: () => cacheState,
     getRenderPassCacheHostOwner: () => ({
@@ -65,6 +72,7 @@ function createRenderPassToCacheHarness({
     getRenderPassCommitAccountingOwner: () => ({
       commitRenderPass(options) {
         calls.push(["commitRenderPass", options]);
+        return { committed: options.drawResult?.committed !== false };
       },
     }),
     recordRenderPerfMetric: (name, duration, metadata) => {

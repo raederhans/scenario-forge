@@ -6,26 +6,75 @@ function getFeatureCollectionFeatures(payload) {
   return Array.isArray(payload?.features) ? payload.features : [];
 }
 
-function collectFeatureIdSet(features = []) {
-  return new Set(
-    (Array.isArray(features) ? features : [])
-      .map((feature) => String(getFeatureId(feature) || feature?.id || feature?.properties?.id || "").trim())
-      .filter(Boolean)
-  );
+function* collectFeatureIdSetSteps(features = []) {
+  const ids = new Set();
+  for (let index = 0, length = features.length; index < length; index += 1) {
+    if (!(index in features)) {
+      yield;
+      continue;
+    }
+    const feature = features[index];
+    const id = String(getFeatureId(feature) || feature?.id || feature?.properties?.id || "").trim();
+    if (id) ids.add(id);
+    yield;
+  }
+  return ids;
 }
 
-function getMissingFeatureIdSample(completeFeatureIds, candidateFeatureIds) {
+function* getMissingFeatureIdSampleSteps(completeFeatureIds, candidateFeatureIds) {
   const missing = [];
-  completeFeatureIds.forEach((featureId) => {
-    if (missing.length >= POLITICAL_DERIVED_STATE_MISSING_SAMPLE_LIMIT) return;
-    if (!candidateFeatureIds.has(featureId)) {
-      missing.push(featureId);
-    }
-  });
+  for (const featureId of completeFeatureIds) {
+    if (!candidateFeatureIds.has(featureId)) missing.push(featureId);
+    yield;
+    if (missing.length >= POLITICAL_DERIVED_STATE_MISSING_SAMPLE_LIMIT) break;
+  }
   return missing;
 }
 
-export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, {
+export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, options = {}) {
+  const iterator = analyzeScenarioPoliticalDerivedStateCoverageSteps(runtimeState, options);
+  let next = iterator.next();
+  while (!next.done) next = iterator.next();
+  return next.value;
+}
+
+export async function analyzeScenarioPoliticalDerivedStateCoverageChunked(runtimeState, {
+  isCurrent = () => true,
+  yieldControl = () => new Promise((resolve) => setTimeout(resolve, 0)),
+  nowMs = () => globalThis.performance?.now?.() ?? Date.now(),
+  ...options
+} = {}) {
+  const iterator = analyzeScenarioPoliticalDerivedStateCoverageSteps(runtimeState, options);
+  let yieldCount = 0;
+  let maxSliceMs = 0;
+  let steps = 0;
+  let sliceStartedAt = nowMs();
+  // Authority can change across yielded tasks, not between these private
+  // synchronous steps. Check at slice/publication boundaries instead of
+  // re-parsing renderer policy and revisions for every feature.
+  let current = isCurrent();
+  while (current) {
+    const next = iterator.next();
+    const sliceMs = Math.max(0, nowMs() - sliceStartedAt);
+    maxSliceMs = Math.max(maxSliceMs, sliceMs);
+    if (next.done) {
+      if (!isCurrent()) break;
+      return { status: "prepared", coverage: next.value, yieldCount, maxSliceMs };
+    }
+    if (++steps >= 400 || sliceMs >= 6) {
+      if (!isCurrent()) break;
+      yieldCount += 1;
+      await yieldControl();
+      current = isCurrent();
+      sliceStartedAt = nowMs();
+      steps = 0;
+    }
+  }
+  iterator.return();
+  return { status: "cancelled", coverage: null, yieldCount, maxSliceMs };
+}
+
+function* analyzeScenarioPoliticalDerivedStateCoverageSteps(runtimeState, {
   buildInteractiveLandData = null,
   coverageInputSnapshot = null,
   shouldExcludePoliticalVisualFeature = () => false,
@@ -41,34 +90,51 @@ export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, {
     ? coverageInputSnapshot.expectedInteractiveCollection
     : (typeof buildInteractiveLandData === "function" ? buildInteractiveLandData(fullLandCollection) : null);
   const expectedInteractiveFeatures = getFeatureCollectionFeatures(expectedInteractiveCollection);
-  const colorIds = new Set(Object.keys(runtimeState?.colors || {}).map((featureId) => String(featureId || "").trim()).filter(Boolean));
-  const completeFeatureIds = collectFeatureIdSet(completeFeatures);
-  const requiredColorFeatureIds = collectFeatureIdSet(completeFeatures.filter((feature) => (
-    !shouldExcludePoliticalVisualFeature(feature, getFeatureId(feature))
-  )));
-  const primaryVisibleFeatureIds = collectFeatureIdSet(primaryVisibleFeatures);
-  const landDataFeatureIds = collectFeatureIdSet(landDataFeatures);
-  const fullLandDataFeatureIds = collectFeatureIdSet(fullLandDataFeatures);
-  const expectedInteractiveFeatureIds = collectFeatureIdSet(expectedInteractiveFeatures);
+  const colorIds = new Set();
+  const colors = runtimeState?.colors || {};
+  for (const key in colors) {
+    if (Object.hasOwn(colors, key)) {
+      const id = String(key || "").trim();
+      if (id) colorIds.add(id);
+    }
+    yield;
+  }
+  const completeFeatureIds = yield* collectFeatureIdSetSteps(completeFeatures);
+  const requiredColorFeatures = [];
+  for (let index = 0, length = completeFeatures.length; index < length; index += 1) {
+    if (index in completeFeatures) {
+      const feature = completeFeatures[index];
+      if (!shouldExcludePoliticalVisualFeature(feature, getFeatureId(feature))) requiredColorFeatures.push(feature);
+    }
+    yield;
+  }
+  const requiredColorFeatureIds = yield* collectFeatureIdSetSteps(requiredColorFeatures);
+  const primaryVisibleFeatureIds = yield* collectFeatureIdSetSteps(primaryVisibleFeatures);
+  const landDataFeatureIds = yield* collectFeatureIdSetSteps(landDataFeatures);
+  const fullLandDataFeatureIds = yield* collectFeatureIdSetSteps(fullLandDataFeatures);
+  const expectedInteractiveFeatureIds = yield* collectFeatureIdSetSteps(expectedInteractiveFeatures);
   const completePoliticalFeatureCount = completeFeatures.length;
   const primaryVisibleFeatureCount = primaryVisibleFeatures.length;
   const landDataFeatureCount = landDataFeatures.length;
   const colorsCount = colorIds.size;
-  const primaryVisibleFeatureSubsetActive = primaryVisibleFeatureCount > 0
-    && completePoliticalFeatureCount > primaryVisibleFeatureCount
-    && (
-      primaryVisibleFeatureIds.size <= 0
-      || Array.from(primaryVisibleFeatureIds).every((featureId) => completeFeatureIds.has(featureId))
-    );
+  let primaryVisibleFeatureSubsetActive = primaryVisibleFeatureCount > 0
+    && completePoliticalFeatureCount > primaryVisibleFeatureCount;
+  if (primaryVisibleFeatureSubsetActive) {
+    for (const featureId of primaryVisibleFeatureIds) {
+      if (!completeFeatureIds.has(featureId)) primaryVisibleFeatureSubsetActive = false;
+      yield;
+      if (!primaryVisibleFeatureSubsetActive) break;
+    }
+  }
   const missingFullLandFeatureIdsSample = completeFeatureIds.size > 0
-    ? getMissingFeatureIdSample(completeFeatureIds, fullLandDataFeatureIds)
+    ? yield* getMissingFeatureIdSampleSteps(completeFeatureIds, fullLandDataFeatureIds)
     : [];
-  const missingInteractiveFeatureIdsSample = getMissingFeatureIdSample(expectedInteractiveFeatureIds, landDataFeatureIds);
+  const missingInteractiveFeatureIdsSample = yield* getMissingFeatureIdSampleSteps(expectedInteractiveFeatureIds, landDataFeatureIds);
   const missingLandFeatureIdsSample = [...new Set([
     ...missingFullLandFeatureIdsSample, ...missingInteractiveFeatureIdsSample,
   ])].slice(0, POLITICAL_DERIVED_STATE_MISSING_SAMPLE_LIMIT);
   const missingColorFeatureIdsSample = requiredColorFeatureIds.size > 0
-    ? getMissingFeatureIdSample(requiredColorFeatureIds, colorIds)
+    ? yield* getMissingFeatureIdSampleSteps(requiredColorFeatureIds, colorIds)
     : [];
   const fullLandDataCoverageMissing = missingFullLandFeatureIdsSample.length > 0;
   const interactiveLandDataCoverageMissing = missingInteractiveFeatureIdsSample.length > 0;

@@ -150,11 +150,12 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
       const preferredIndex = candidates.findIndex((candidate) => candidate.id === preferredPlacements.get(entry));
       if (preferredIndex > 0) candidates.unshift(candidates.splice(preferredIndex, 1)[0]);
       const viewportSize = getViewportSize();
+      const bounds = getters.getPaintBounds?.() || { minX: -24, minY: -24, maxX: viewportSize.width + 24, maxY: viewportSize.height + 24 };
       const acceptedPlacement = claimScreenLabelPlacement(candidates, occupiedBoxes, (box) => (
-        !(box.x > viewportSize.width + 24
-        || box.y > viewportSize.height + 24
-        || (box.x + box.w) < -24
-        || (box.y + box.h) < -24)
+        !(box.x > bounds.maxX
+        || box.y > bounds.maxY
+        || (box.x + box.w) < bounds.minX
+        || (box.y + box.h) < bounds.minY)
       ));
       if (!acceptedPlacement) {
         continue;

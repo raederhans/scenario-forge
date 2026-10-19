@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createPoliticalIdRasterWorkerClient } from "../js/core/political_id_raster_worker_client.js";
+import { createPoliticalIdRasterWorkerClient, POLITICAL_ID_ASSET_SAVE_MAX_BYTES } from "../js/core/political_id_raster_worker_client.js";
 import { createPoliticalIdRasterWorkerRuntime, recreatePoliticalIdRasterProjection } from "../js/workers/political_id_raster.worker.js";
 
 function makeWorkerHarness() {
@@ -153,6 +153,62 @@ test("asset save accounts for the caller-preserving tile copy and releases it on
   assert.equal(client.assetStore.stats().pendingBytes, 0);
 });
 
+test("asset save proxy drops excess or oversized writes before creating worker copies", async () => {
+  const harness = makeWorkerHarness();
+  const client = createPoliticalIdRasterWorkerClient({ createWorker: harness.createWorker, isSupported: () => true });
+  const tile = { codes: new Uint32Array([1]), edgeIds: new Uint32Array(), edgeWeights: new Float32Array() };
+  const controller = new AbortController();
+  const saving = client.assetStore.save("one", tile, { signal: controller.signal });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(await client.assetStore.save("two", tile), false);
+  assert.equal(harness.workers[0].messages.length, 1);
+  assert.equal(client.assetStore.stats().pendingBytes, 4);
+  controller.abort(); await assert.rejects(saving, { name: "AbortError" });
+  const oversized = { ...tile, codes: new Uint32Array(POLITICAL_ID_ASSET_SAVE_MAX_BYTES / 4 + 1) };
+  assert.equal(await client.assetStore.save("huge", oversized), false);
+  assert.equal(harness.workers[0].messages.filter(message => message.type === "SAVE_POLITICAL_ID_ASSET").length, 1);
+  assert.equal(client.assetStore.stats().pendingBytes, 0);
+  client.dispose();
+});
+
+test("slow asset I/O cannot block geometry while SYNC and BUILD remain serial", async () => {
+  const sent = [], builds = [];
+  let finishSave, finishBuild, saveSignal;
+  const tile = { codes: new Uint32Array(), edgeIds: new Uint32Array(), edgeWeights: new Float32Array() };
+  const runtime = createPoliticalIdRasterWorkerRuntime({
+    postMessage: message => sent.push(message), projectionApi: projectionHarness().api,
+    createAssetStore: () => ({ save: (_identity, _tile, { signal }) => {
+      saveSignal = signal; return new Promise(resolve => { finishSave = resolve; });
+    }, load: async () => null, stats: () => ({}), dispose() {} }),
+    buildTile: async ({ originX }) => {
+      builds.push(originX);
+      if (builds.length === 1) await new Promise(resolve => { finishBuild = resolve; });
+      return tile;
+    },
+  });
+  runtime.handleMessage({ type: "SAVE_POLITICAL_ID_ASSET", taskId: "held-save", identity: "tile", tile });
+  const packet = { density: 1, width: 1, height: 1, originX: 1,
+    projectionOptions: { factory: "geoEqualEarth" }, entries: [] };
+  runtime.handleMessage({ type: "BUILD_POLITICAL_ID_TILE", taskId: "first-build", packet });
+  runtime.handleMessage({ type: "SYNC_POLITICAL_ID_GEOMETRY", taskId: "sync", geometryNamespace: "scene",
+    updates: { encoding: "geo-f64-v1", value: [], coordinates: new Float64Array(), lengths: new Uint32Array() } });
+  runtime.handleMessage({ type: "BUILD_POLITICAL_ID_TILE", taskId: "second-build", packet: { ...packet, originX: 2 } });
+  runtime.handleMessage({ type: "LOAD_POLITICAL_ID_ASSET", taskId: "read", identity: "other" });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(builds, [1], "the build starts before the held save completes");
+  assert.deepEqual(sent.map(message => message.taskId), ["read"], "reads also bypass the pending save and build");
+  finishBuild();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(builds, [1, 2]);
+  assert.deepEqual(sent.map(message => message.taskId), ["read", "first-build", "sync", "second-build"]);
+  runtime.handleMessage({ type: "CANCEL_TASK", taskId: "held-save" });
+  assert.equal(saveSignal.aborted, true);
+  finishSave(true); await new Promise(resolve => setImmediate(resolve));
+  assert.equal(sent.length, 4, "late cancelled persistence cannot publish");
+  assert.equal(runtime.getPendingTaskCount(), 0);
+  runtime.dispose();
+});
+
 test("worker asset reads validate one manifest revision, transfer coverage and abort without late publication", async () => {
   const sent = [], calls = [];
   let readSignal, release;
@@ -289,6 +345,48 @@ test("worker paths reuse stable geometry across tiles and style-only changes", a
   assert.equal(second.stats.pathCacheEntries, 1);
   assert.equal(second.stats.pathCacheEstimatedBytes, 320);
   assert.equal(harness.inputs[1].gutter, 2);
+});
+
+test("default path budget retains a repeated 2048-geometry tile working set", async () => {
+  const harness = pathCacheHarness();
+  const entries = Array.from({ length: 2048 }, (_, index) => ({ ...harness.packet.entries[0], id: `feature-${index}` }));
+  const first = await harness.request({ entries });
+  assert.equal(first.stats.pathBuilds, 2048);
+  assert.equal(first.stats.pathCacheHits, 0);
+  assert.equal(first.stats.pathCacheEntries, 2048);
+  assert.equal(first.stats.pathCacheEstimatedBytes, 2048 * 320);
+  const second = await harness.request({ entries, originX: 10 });
+  assert.equal(second.stats.pathBuilds, 0, "same-order traversal must not thrash at the former 1024-entry limit");
+  assert.equal(second.stats.pathCacheHits, 2048);
+  assert.equal(second.stats.pathCacheEntries, 2048);
+  assert.equal(second.stats.pathCacheEstimatedBytes, first.stats.pathCacheEstimatedBytes);
+  assert.equal(harness.runtime.getGeometryStats().pathBudgetBytes, 16 * 1024 * 1024);
+  for (let index = 0; index < entries.length; index++) assert.equal(harness.paths[index], harness.paths[index + entries.length]);
+  harness.runtime.dispose();
+});
+
+test("derived path entry allowance obeys smaller byte budgets and explicit entry caps", async () => {
+  for (const [options, retained] of [
+    [{ pathCacheMaxEstimatedBytes: 0 }, 0],
+    [{ pathCacheMaxEstimatedBytes: 255 }, 0],
+    [{ pathCacheMaxEstimatedBytes: 319 }, 0],
+    [{ pathCacheMaxEstimatedBytes: 640 }, 2],
+    [{ pathCacheMaxEstimatedBytes: 1000 }, 3],
+    [{ pathCacheMaxEstimatedBytes: 10_000, pathCacheMaxEntries: 2 }, 2],
+    [{ pathCacheMaxEstimatedBytes: 10_000, pathCacheMaxEntries: 0 }, 0],
+    [{ pathCacheMaxEstimatedBytes: 640, pathCacheMaxEntries: 10 }, 2],
+  ]) {
+    const harness = pathCacheHarness(options);
+    const entries = Array.from({ length: 5 }, (_, index) => ({ ...harness.packet.entries[0], id: `feature-${index}` }));
+    const first = await harness.request({ entries });
+    assert.equal(first.stats.pathCacheEntries, retained, JSON.stringify(options));
+    assert.equal(first.stats.pathCacheEstimatedBytes, retained * 320);
+    assert.ok(first.stats.pathCacheEstimatedBytes <= options.pathCacheMaxEstimatedBytes);
+    const second = await harness.request({ entries: retained ? entries.slice(-retained) : entries });
+    assert.equal(second.stats.pathCacheHits, retained);
+    assert.equal(second.stats.pathBuilds, retained ? 0 : entries.length);
+    harness.runtime.dispose();
+  }
 });
 
 test("worker path identity invalidates on geometry version, projection precision, density and namespace", async () => {

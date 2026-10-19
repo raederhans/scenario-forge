@@ -2,14 +2,61 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import test from "node:test";
-import { createCountryLabelRenderOwner, projectCountryLabelPolygons, waitForCountryLabelsForExport } from "../js/core/renderer/country_label_render_owner.js";
+import { createCountryLabelRenderOwner, groupProjectedRings, isCountryLabelDefinitelyInvisible, projectCountryLabelPolygons, waitForCountryLabelsForExport } from "../js/core/renderer/country_label_render_owner.js";
 import { createCountryLabelLayoutWorkerHandler } from "../js/core/renderer/country_label_layout_worker.js";
+import { fitCountryLabel } from "../js/core/renderer/country_label_layout.js";
 import { getMapLabelHierarchy } from "../js/core/renderer/map_label_hierarchy.js";
 
 const vendor = await readFile(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8");
 const sandbox = {};
 vm.runInNewContext(vendor, sandbox);
 const d3 = sandbox.d3;
+
+// Deliberately retain the original full-edge ray cast as the independent oracle.
+function groupProjectedRingsNaively(rings) {
+  const nodes = rings.map((ring) => {
+    let sum = 0, minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (let index = 0; index < ring.length; index++) {
+      const point = ring[index], next = ring[(index + 1) % ring.length];
+      sum += point[0] * next[1] - next[0] * point[1];
+      minX = Math.min(minX, point[0]); minY = Math.min(minY, point[1]);
+      maxX = Math.max(maxX, point[0]); maxY = Math.max(maxY, point[1]);
+    }
+    return { ring, area: Math.abs(sum) / 2, minX, minY, maxX, maxY, parent: null, depth: 0 };
+  }).filter((node) => node.area > 1e-8).sort((a, b) => b.area - a.area);
+  for (let index = 0; index < nodes.length; index++) {
+    const node = nodes[index];
+    const [x, y] = node.ring[0];
+    for (let prior = index - 1; prior >= 0; prior--) {
+      const candidate = nodes[prior];
+      if (x < candidate.minX || x > candidate.maxX || y < candidate.minY || y > candidate.maxY) continue;
+      let inside = false;
+      for (let i = 0, j = candidate.ring.length - 1; i < candidate.ring.length; j = i++) {
+        const [xi, yi] = candidate.ring[i], [xj, yj] = candidate.ring[j];
+        if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+      }
+      if (inside) { node.parent = candidate; node.depth = candidate.depth + 1; break; }
+    }
+  }
+  const byExterior = new Map(nodes.filter((node) => node.depth % 2 === 0).map((node) => [node, [node.ring]]));
+  for (const node of nodes) if (node.depth % 2 === 1) byExterior.get(node.parent)?.push(node.ring);
+  return [...byExterior.values()];
+}
+
+function densifyRing(ring, subdivisions) {
+  const result = [];
+  for (let i = 0; i < ring.length - 1; i++) {
+    const [x, y] = ring[i], [nextX, nextY] = ring[i + 1];
+    for (let step = 0; step < subdivisions; step++) {
+      const t = step / subdivisions;
+      result.push([x + (nextX - x) * t, y + (nextY - y) * t]);
+    }
+  }
+  result.push([...ring[0]]);
+  return result;
+}
+
+const squareRing = (x, y, size) => [[x, y], [x + size, y], [x + size, y + size], [x, y + size], [x, y]];
 
 function createContext() {
   const events = [];
@@ -31,7 +78,7 @@ function createContext() {
 }
 
 function createHarness({ names = ["AB"], fontSizes = [12], alternatives = [], realLayout = false,
-  viewportWidth = 800, helperOptions = {} } = {}) {
+  viewportWidth = 800, helperOptions = {}, getPaintBounds = () => null } = {}) {
   const context = createContext();
   const state = { styleConfig: {}, zoomTransform: { x: 0, y: 0, k: 1 }, language: "en" };
   const projection = { stream: (sink) => sink };
@@ -44,7 +91,9 @@ function createHarness({ names = ["AB"], fontSizes = [12], alternatives = [], re
   const fitCalls = [];
   const timers = new Map();
   let timerId = 0;
-  const helpers = { geoStream: d3.geoStream,
+  // Existing scheduling fixtures model one legacy serial worker. Pool tests
+  // below explicitly use the production four slots and two requests per slot.
+  const helpers = { geoStream: d3.geoStream, maxLayoutWorkers: 1, maxPendingPerWorker: 8,
     setTimeout(callback) { timers.set(++timerId, callback); return timerId; },
     clearTimeout(id) { timers.delete(id); }, ...helperOptions };
   if (!realLayout) {
@@ -66,11 +115,487 @@ function createHarness({ names = ["AB"], fontSizes = [12], alternatives = [], re
   const owner = createCountryLabelRenderOwner({ state, helpers, getters: {
     getContext: () => context, getProjection: () => projection,
     getProjectionIdentity: () => projectionIdentity, getCountryLabelSource: () => source,
-    getViewportSize: () => ({ width: viewportWidth, height: 700 }),
+    getViewportSize: () => ({ width: viewportWidth, height: 700 }), getPaintBounds,
     getTransform: () => state.zoomTransform, getLanguage: () => state.language,
   } });
-  return { owner, state, source, context, fitCalls, timers, setProjectionIdentity(value) { projectionIdentity = value; } };
+  return { owner, state, source, context, fitCalls, timers,
+    setProjectionIdentity(value) { projectionIdentity = value; }, setViewportWidth(value) { viewportWidth = value; } };
 }
+
+test("current-view readiness includes scheduled fits but does not wait for offscreen worker requests", () => {
+  const callbacks = [], messages = [];
+  const { owner, state, source, fitCalls } = createHarness({ helperOptions: {
+    onInvalidate() {}, scheduleWork: callback => callbacks.push(callback),
+    createWorker: () => ({ postMessage: message => messages.push(message), terminate() {} }),
+  } });
+  assert.equal(owner.getReadinessForCurrentView(source).ready, false);
+  assert.equal(callbacks.length, 0, "observation never schedules projection or fitting");
+  owner.drawCountryLabels(1);
+  const scheduled = owner.getReadinessForCurrentView(source);
+  assert.equal(scheduled.ready, false);
+  assert.equal(scheduled.pendingFits, 1);
+  assert.equal(scheduled.scheduled, true);
+  assert.equal(scheduled.pendingWorkerFits, 0);
+  callbacks.shift()();
+  assert.equal(messages.length, 1);
+  state.zoomTransform.x = -1000;
+  const offscreen = owner.getReadinessForCurrentView(source);
+  assert.equal(offscreen.pendingFits, 0);
+  assert.equal(offscreen.pendingWorkerFits, 1);
+  assert.equal(offscreen.ready, true, "an old view's worker does not block a complete current view");
+  state.zoomTransform.x = 0;
+  assert.equal(owner.getReadinessForCurrentView(source).ready, false);
+  state.styleConfig.countryLabels = { enabled: false };
+  assert.equal(owner.getReadinessForCurrentView(source).ready, true);
+  assert.equal(messages.length, 1);
+  assert.equal(fitCalls.length, 0);
+});
+
+test("visibility upper bound preserves threshold, unknown geometry and any potentially visible component", () => {
+  const transform = { x: 0, y: 0, k: 1 }, viewport = { minX: 0, minY: 0, maxX: 800, maxY: 700 };
+  const bounds = { x: 20, y: 20, w: 100, h: 100 };
+  const entry = area => ({ polygons: [[]], components: [{ area, bounds }] });
+  const thresholdArea = (28 + 32 * (0.05 / 0.9)) ** 2;
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(100), transform, viewport), true);
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(thresholdArea * (1 - 1e-10)), transform, viewport), true);
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(thresholdArea), transform, viewport), false,
+    "the alpha=0.05 mathematical boundary still needs its exact fit");
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(thresholdArea * (1 + 1e-10)), transform, viewport), false);
+  const two = entry(100); two.components.push({ area: 10000, bounds });
+  assert.equal(isCountryLabelDefinitelyInvisible(two, transform, viewport), false);
+  for (const unknown of [entry(NaN), entry(Infinity), { ...entry(100), polygons: null },
+    { polygons: [[]], components: [] }, { polygons: [[]], components: [{ area: 100, bounds: { ...bounds, w: Infinity } }] }]) {
+    assert.equal(isCountryLabelDefinitelyInvisible(unknown, transform, viewport), false);
+  }
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(100), { ...transform, k: NaN }, viewport), false);
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(100), transform, { ...viewport, maxX: NaN }), false);
+});
+
+test("tiny countries skip worker fits and regain exact preparation when zoom makes them potentially visible", async () => {
+  const callbacks = [], messages = [];
+  let worker;
+  const h = createHarness({ realLayout: true, helperOptions: { nowMs: () => 0,
+    scheduleWork: callback => callbacks.push(callback), onInvalidate() {},
+    createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+  } });
+  h.source.countries[0].feature.geometry.coordinates = [squareRing(50, 50, 10)];
+  const first = h.owner.prepareCurrentView(1);
+  callbacks.shift()(); await first;
+  assert.equal(messages.length, 0, "projected visible area proves that even a maximally readable font is invisible");
+  assert.equal(h.owner.isReadyForCurrentView(), true);
+  assert.equal(h.owner.drawCountryLabels(1), 0);
+  assert.equal(h.owner.getDiagnostics().skippedByVisibilityUpperBound, 1);
+  assert.equal(h.owner.getDiagnostics().cachedFits, 0, "view-specific exclusion never stores a permanent null fit");
+  h.state.zoomTransform.k = 4;
+  const enlarged = h.owner.prepareCurrentView(4);
+  callbacks.shift()();
+  assert.equal(messages.length, 1);
+  worker.onmessage({ data: createCountryLabelLayoutWorkerHandler()(messages[0]) });
+  await enlarged;
+  assert.equal(h.owner.isReadyForCurrentView(), true);
+  h.owner.drawCountryLabels(4);
+  assert.equal(h.owner.getDiagnostics().skippedByVisibilityUpperBound, 0);
+  assert.equal(h.owner.getDiagnostics().geometryBuilds, 1);
+});
+
+test("a partially visible country starts fitting after panning reveals enough of the same geometry", async () => {
+  const callbacks = [], messages = [];
+  let worker;
+  const h = createHarness({ helperOptions: { nowMs: () => 0,
+    scheduleWork: callback => callbacks.push(callback), onInvalidate() {},
+    createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+  } });
+  h.source.countries[0].feature.geometry.coordinates = [squareRing(795, 50, 100)];
+  const partial = h.owner.prepareCurrentView(1);
+  callbacks.shift()(); await partial;
+  assert.equal(messages.length, 0);
+  assert.equal(h.owner.isReadyForCurrentView(), true);
+  h.state.zoomTransform.x = -100;
+  assert.equal(h.owner.isReadyForCurrentView(), false, "same-band panning must reevaluate visibility before readiness");
+  const exposed = h.owner.prepareCurrentView(1);
+  callbacks.shift()();
+  assert.equal(messages.length, 1);
+  worker.onmessage({ data: { requestId: messages[0].requestId, fit: null } });
+  await exposed;
+  assert.equal(h.owner.isReadyForCurrentView(), true);
+  assert.equal(h.owner.getDiagnostics().geometryBuilds, 1);
+});
+
+test("private preparation replenishes its bounded worker queue without drawing or per-fit invalidation", async () => {
+  const callbacks = [], messages = [];
+  let worker, invalidations = 0;
+  const { owner, context } = createHarness({ names: Array.from({ length: 12 }, (_, index) => `C${index}`),
+    viewportWidth: 2400, helperOptions: { nowMs: () => 0,
+      scheduleWork: callback => callbacks.push(callback), onInvalidate: () => invalidations++,
+      createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+    } });
+  const preparing = owner.prepareCurrentView(1);
+  assert.ok(preparing instanceof Promise);
+  assert.equal(owner.prepareCurrentView(1), preparing);
+  assert.equal(messages.length, 0, "preflight only schedules a private slice");
+  callbacks.shift()();
+  assert.equal(messages.length, 8);
+  assert.equal(owner.getDiagnostics().pendingWorkerFits, 8);
+  for (const message of messages.slice(0, 4)) worker.onmessage({ data: { requestId: message.requestId, fit: null } });
+  assert.equal(invalidations, 0);
+  assert.equal(callbacks.length, 1, "worker replies refill the queue without another labels draw");
+  callbacks.shift()();
+  assert.equal(messages.length, 12);
+  assert.equal(owner.getDiagnostics().pendingWorkerFits, 8);
+  for (const message of messages.slice(4)) worker.onmessage({ data: { requestId: message.requestId, fit: null } });
+  await preparing;
+  assert.equal(invalidations, 1);
+  assert.equal(owner.isReadyForCurrentView(), true, "null fits are completed exact layout outcomes");
+  assert.equal(owner.prepareCurrentView(1), null);
+  assert.equal(callbacks.length, 0);
+  assert.equal(context.events.some(([event]) => event === "fill" || event === "stroke"), false);
+});
+
+test("four lazy country workers preserve exact results, stable geometry ownership and shared queue limits", async () => {
+  const callbacks = [], workers = [], countrySlots = new Map();
+  const oracle = createCountryLabelLayoutWorkerHandler();
+  let uploads = 0, invalidations = 0;
+  const h = createHarness({ names: Array.from({ length: 12 }, (_, index) => `C${index}`), viewportWidth: 2400,
+    realLayout: true, helperOptions: { maxLayoutWorkers: 4, maxPendingPerWorker: 2, nowMs: () => 0,
+      scheduleWork: callback => callbacks.push(callback), onInvalidate: () => invalidations++,
+      createWorker({ index }) {
+        const slot = { index, queue: [], terminated: false, handle: createCountryLabelLayoutWorkerHandler(),
+          terminate() { this.terminated = true; }, postMessage(message) {
+            assert.equal(index, Number(message.countryCode.slice(1)) % 4);
+            if (countrySlots.has(message.countryCode)) assert.equal(countrySlots.get(message.countryCode), slot);
+            else countrySlots.set(message.countryCode, slot);
+            if (message.polygons) uploads++;
+            slot.queue.push(message);
+            assert.ok(slot.queue.length <= 2);
+          } };
+        workers.push(slot); return slot;
+      },
+    } });
+  const drain = async pending => {
+    let turns = 0;
+    while (callbacks.length || workers.some(worker => worker.queue.length)) {
+      assert.ok(turns++ < 100);
+      while (callbacks.length) callbacks.shift()();
+      assert.ok(workers.reduce((count, worker) => count + worker.queue.length, 0) <= 8);
+      // Different countries may finish in any order; each slot remains FIFO.
+      for (const worker of [...workers].reverse()) {
+        const message = worker.queue.shift();
+        if (!message) continue;
+        const result = worker.handle(message);
+        assert.deepEqual(result.fit, oracle(message).fit);
+        worker.onmessage({ data: result });
+      }
+    }
+    await pending;
+  };
+  const first = h.owner.prepareCurrentView(1);
+  assert.equal(workers.length, 0, "slots are created only when their first fit dispatches");
+  callbacks.shift()();
+  assert.equal(workers.length, 4);
+  assert.equal(workers.reduce((count, worker) => count + worker.queue.length, 0), 8);
+  await drain(first);
+  assert.equal(uploads, 12, "the full country set is partitioned, never broadcast to four workers");
+  assert.equal(invalidations, 1);
+  assert.equal(h.owner.isReadyForCurrentView(), true);
+  h.state.zoomTransform.k = 1.3;
+  await drain(h.owner.prepareCurrentView(1.3));
+  assert.equal(uploads, 12, "later bands reuse each country's only worker geometry copy");
+  assert.equal(invalidations, 2);
+  const diagnostics = h.owner.getDiagnostics();
+  assert.equal(diagnostics.workerCount, 4);
+  assert.equal(diagnostics.workersCreated, 4);
+  assert.equal(diagnostics.maxWorkerQueue, 2);
+  assert.equal(diagnostics.maxPendingWorkerFits, 8);
+  assert.equal(diagnostics.preparedGeometryBytes, 0);
+});
+
+test("a failed pool generation tears down every slot and rejects late replies before recovery", async () => {
+  for (const failure of ["error", "messageerror", "timeout"]) {
+    const callbacks = [], workers = [];
+    let invalidations = 0;
+    const h = createHarness({ names: Array.from({ length: 8 }, (_, index) => `C${index}`), viewportWidth: 2000,
+      helperOptions: { maxLayoutWorkers: 4, maxPendingPerWorker: 2, nowMs: () => 0,
+        scheduleWork: callback => callbacks.push(callback), onInvalidate: () => invalidations++,
+        createWorker({ index }) {
+          const worker = { index, messages: [], terminated: false,
+            postMessage(message) { this.messages.push(message); }, terminate() { this.terminated = true; } };
+          workers.push(worker); return worker;
+        },
+      } });
+    const pending = h.owner.prepareCurrentView(1);
+    callbacks.shift()();
+    assert.equal(workers.length, 4);
+    if (failure === "timeout") [...h.timers.values()][0]();
+    else if (failure === "messageerror") workers[2].onmessageerror();
+    else workers[2].onerror(new Error("pool fixture failure"));
+    await pending;
+    assert.equal(invalidations, 1);
+    assert.ok(workers.every(worker => worker.terminated));
+    assert.equal(h.timers.size, 0);
+    assert.equal(h.owner.getDiagnostics().workerCount, 0);
+    assert.equal(h.owner.getDiagnostics().pendingWorkerFits, 0);
+    assert.equal(h.owner.isReadyForCurrentView(), false);
+    assert.equal(h.owner.prepareCurrentView(1), null);
+    h.source.revision++;
+    const recovered = h.owner.prepareCurrentView(1);
+    for (const worker of workers.slice(0, 4)) {
+      worker.onmessage({ data: { requestId: worker.messages[0].requestId, fit: null } });
+      worker.onerror(new Error("stale pool failure"));
+    }
+    assert.equal(invalidations, 1);
+    while (callbacks.length) callbacks.shift()();
+    assert.equal(workers.length, 8);
+    for (const worker of workers.slice(4)) for (const message of worker.messages)
+      worker.onmessage({ data: { requestId: message.requestId, fit: null } });
+    await recovered;
+    assert.equal(h.owner.getDiagnostics().workerCount, 4);
+    assert.equal(h.owner.getDiagnostics().workerErrors, 0);
+    assert.equal(h.owner.isReadyForCurrentView(), true);
+    assert.equal(invalidations, 2);
+  }
+});
+
+test("private worker preparation preserves exact synchronous fit and glyph drawing", async () => {
+  const native = createHarness({ names: ["TEST"], realLayout: true });
+  assert.equal(native.owner.drawCountryLabels(1), 1);
+  const callbacks = [], messages = [];
+  let worker, invalidations = 0;
+  const prepared = createHarness({ names: ["TEST"], realLayout: true, helperOptions: {
+    nowMs: () => 0, scheduleWork: callback => callbacks.push(callback), onInvalidate: () => invalidations++,
+    createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+  } });
+  const pending = prepared.owner.prepareCurrentView(1);
+  callbacks.shift()();
+  const result = createCountryLabelLayoutWorkerHandler()(messages[0]);
+  worker.onmessage({ data: result });
+  await pending;
+  assert.equal(invalidations, 1);
+  assert.equal(prepared.owner.drawCountryLabels(1), 1);
+  assert.deepEqual(prepared.owner.getDiagnostics().lastLabels, native.owner.getDiagnostics().lastLabels);
+  const glyphEvents = context => context.events.filter(([event]) => event === "fill" || event === "stroke");
+  assert.deepEqual(glyphEvents(prepared.context), glyphEvents(native.context));
+  assert.equal(prepared.owner.prepareCurrentView(1), null);
+});
+
+test("private preparation supersedes a view before dispatch and draws join its existing work", async () => {
+  const callbacks = [], messages = [];
+  let worker, invalidations = 0;
+  const { owner, state } = createHarness({ helperOptions: { nowMs: () => 0,
+    scheduleWork: callback => callbacks.push(callback), onInvalidate: () => invalidations++,
+    createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+  } });
+  const old = owner.prepareCurrentView(1);
+  state.zoomTransform.k = 1.3;
+  const current = owner.prepareCurrentView(1.3);
+  await old;
+  owner.drawCountryLabels(1.3);
+  assert.equal(callbacks.length, 2, "draw cannot add a second producer beside the private pump");
+  callbacks.shift()();
+  assert.equal(messages.length, 0, "cancelled host slices never dispatch old-band fits");
+  callbacks.shift()();
+  assert.equal(messages.length, 1);
+  assert.equal(invalidations, 0);
+  worker.onmessage({ data: { requestId: messages[0].requestId, fit: null } });
+  await current;
+  assert.equal(invalidations, 1);
+  assert.equal(owner.isReadyForCurrentView(), true);
+});
+
+test("private preparation cancels disabled, interactive and externally disabled candidates without publishing", async () => {
+  for (const stop of [h => { h.state.styleConfig.countryLabels = { enabled: false }; },
+    h => { h.state.isInteracting = true; }, h => { h.enabled = false; }]) {
+    const callbacks = [], messages = [];
+    let invalidations = 0;
+    const h = { enabled: true };
+    Object.assign(h, createHarness({ helperOptions: {
+      scheduleWork: callback => callbacks.push(callback), onInvalidate: () => invalidations++,
+      isPrivatePreparationEnabled: () => h.enabled,
+      createWorker: () => ({ postMessage: message => messages.push(message), terminate() {} }),
+    } }));
+    const pending = h.owner.prepareCurrentView(1);
+    stop(h);
+    assert.equal(h.owner.prepareCurrentView(1), null);
+    await pending;
+    callbacks.shift()();
+    assert.equal(messages.length, 0);
+    assert.equal(invalidations, 0);
+  }
+});
+
+test("private source and font replacement settle old work and reject stale worker fits", async () => {
+  for (const replace of [h => { h.source.sourceToken = {}; h.source.revision++; },
+    h => h.setProjectionIdentity(2), h => h.owner.clearTextCache()]) {
+    const callbacks = [], messages = [], workers = [];
+    let invalidations = 0;
+    const h = createHarness({ helperOptions: { nowMs: () => 0,
+      scheduleWork: callback => callbacks.push(callback), onInvalidate: () => invalidations++,
+      createWorker() { const worker = { postMessage: message => messages.push({ worker, message }), terminate() {} };
+        workers.push(worker); return worker; },
+    } });
+    const old = h.owner.prepareCurrentView(1);
+    callbacks.shift()();
+    const first = messages[0];
+    replace(h);
+    const current = h.owner.prepareCurrentView(1);
+    await old;
+    first.worker.onmessage({ data: { requestId: first.message.requestId, fit: null } });
+    assert.equal(invalidations, 0, "obsolete preparation never announces a publication");
+    while (callbacks.length) callbacks.shift()();
+    const last = messages.at(-1);
+    assert.notEqual(last.message.requestId, first.message.requestId);
+    last.worker.onmessage({ data: { requestId: last.message.requestId, fit: null } });
+    await current;
+    assert.equal(invalidations, 1);
+    assert.equal(h.owner.isReadyForCurrentView(), true);
+    assert.equal(h.owner.getDiagnostics().cachedFits, 1);
+  }
+});
+
+test("explicit cancellation releases the private view and late replies cannot publish it", async () => {
+  const callbacks = [], messages = [];
+  let worker, invalidations = 0;
+  const { owner } = createHarness({ helperOptions: { nowMs: () => 0,
+    scheduleWork: callback => callbacks.push(callback), onInvalidate: () => invalidations++,
+    createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+  } });
+  const pending = owner.prepareCurrentView(1);
+  callbacks.shift()();
+  owner.cancelPreparation();
+  await pending;
+  assert.equal(owner.getDiagnostics().privatePreparationPending, false);
+  const resumed = owner.prepareCurrentView(1);
+  assert.ok(resumed instanceof Promise, "a new epoch prepares its own exact result");
+  assert.equal(callbacks.length, 0, "the bounded queue waits for the obsolete in-flight request to release its slot");
+  worker.onmessage({ data: { requestId: messages[0].requestId, fit: null } });
+  assert.equal(invalidations, 0);
+  assert.equal(owner.getDiagnostics().cachedFits, 0, "an obsolete job cannot populate the current fit cache");
+  assert.equal(owner.getDiagnostics().pendingWorkerFits, 0);
+  callbacks.shift()();
+  worker.onmessage({ data: { requestId: messages[1].requestId, fit: null } });
+  await resumed;
+  assert.equal(invalidations, 1);
+  assert.equal(owner.isReadyForCurrentView(), true);
+});
+
+test("final exact country fit is independent of completed warm fits and cancelled reply dispatch order", async () => {
+  const candidates = [85, 105].map(y => ({ polygonIndex: 0, kind: "horizontal", angle: 0,
+    points: [{ x: 40, y }, { x: 150, y }], length: 110, clearance: 55 }));
+  const run = async (order) => {
+    const callbacks = [], messages = [];
+    let worker;
+    const h = createHarness({ names: ["BRAZIL"], realLayout: true, helperOptions: {
+      nowMs: () => 0, scheduleWork: callback => callbacks.push(callback), onInvalidate() {},
+      createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+    } });
+    const warming = h.owner.prepareCurrentView(1);
+    callbacks.shift()();
+    const first = messages[0];
+    const warmFit = fitCountryLabel(candidates, { ...first.options, polygons: first.polygons,
+      minFontSize: 12, maxFontSize: 12, maxAlternatives: 0, preferredCandidateIndex: 1 });
+    assert.equal(warmFit.candidateIndex, 1, "a real equal-score alternate provides the warm history");
+    const deliverWarm = () => worker.onmessage({ data: { requestId: first.requestId, fit: warmFit } });
+    if (order === "completed-warm") deliverWarm();
+    else h.owner.cancelPreparation();
+    await warming;
+    if (order === "cancelled-before-dispatch") deliverWarm();
+    h.state.zoomTransform.k = 1.3;
+    const current = h.owner.prepareCurrentView(1.3);
+    while (callbacks.length) callbacks.shift()();
+    const target = messages[1];
+    if (order === "cancelled-after-dispatch") deliverWarm();
+    assert.equal(target.options.preferredCandidateIndex, undefined,
+      "final input cannot inherit whichever band happened to finish before dispatch");
+    const fit = fitCountryLabel(candidates, { ...target.options, polygons: first.polygons,
+      minFontSize: 12, maxFontSize: 12, maxAlternatives: 0 });
+    assert.equal(fit.candidateIndex, 0);
+    worker.onmessage({ data: { requestId: target.requestId, fit } });
+    await current;
+    assert.equal(h.owner.isReadyForCurrentView(), true);
+    h.owner.drawCountryLabels(1.3);
+    return { fit, labels: h.owner.getDiagnostics().lastLabels,
+      glyphs: h.context.events.filter(([event]) => ["translate", "rotate", "fill", "stroke"].includes(event)) };
+  };
+  const cold = await run("cancelled-after-dispatch");
+  assert.deepEqual(await run("cancelled-before-dispatch"), cold);
+  assert.deepEqual(await run("completed-warm"), cold,
+    "warming the cache may change latency but never the final candidate or glyph positions");
+});
+
+test("viewport-dependent country fits use bounded distinct cache entries", () => {
+  const h = createHarness();
+  h.owner.drawCountryLabels(1);
+  assert.equal(h.fitCalls.length, 1);
+  h.setViewportWidth(801);
+  assert.equal(h.owner.isReadyForCurrentView(), false, "arc-area inputs changed within the same zoom band");
+  h.owner.drawCountryLabels(1);
+  assert.equal(h.fitCalls.length, 2);
+  assert.notEqual(h.fitCalls[0].minArcComponentArea, h.fitCalls[1].minArcComponentArea);
+  for (let width = 802; width < 810; width++) {
+    h.setViewportWidth(width);
+    h.owner.drawCountryLabels(1);
+    assert.ok(h.owner.getDiagnostics().cachedFits <= 4);
+  }
+  assert.equal(h.owner.getDiagnostics().cachedFits, 4);
+});
+
+test("a host preparation exception settles once, stays failed without retry and recovers on a new source", async () => {
+  const callbacks = [], messages = [];
+  let worker, invalidations = 0;
+  const h = createHarness({ helperOptions: { nowMs: () => 0,
+    scheduleWork: callback => callbacks.push(callback), onInvalidate: () => invalidations++,
+    createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+  } });
+  const measure = h.context.measureText;
+  h.context.measureText = () => { throw new Error("fixture glyph metric failure"); };
+  const pending = h.owner.prepareCurrentView(1);
+  callbacks.shift()();
+  await pending;
+  assert.equal(invalidations, 1);
+  assert.equal(h.owner.getDiagnostics().privatePreparationPending, false);
+  assert.equal(h.owner.getDiagnostics().workerErrors, 1);
+  assert.match(h.owner.getDiagnostics().lastWorkerError, /glyph metric failure/);
+  assert.equal(h.owner.isReadyForCurrentView(), false);
+  assert.equal(h.owner.prepareCurrentView(1), null);
+  assert.doesNotThrow(() => h.owner.drawCountryLabels(1));
+  assert.equal(callbacks.length, 0, "terminal generation failure must not create another host attempt");
+  assert.equal(messages.length, 0);
+  h.context.measureText = measure;
+  h.source.revision++;
+  const recovered = h.owner.prepareCurrentView(1);
+  callbacks.shift()();
+  worker.onmessage({ data: { requestId: messages[0].requestId, fit: null } });
+  await recovered;
+  assert.equal(h.owner.getDiagnostics().workerErrors, 0);
+  assert.equal(h.owner.isReadyForCurrentView(), true);
+  assert.equal(invalidations, 2);
+});
+
+test("owner aggregates small worker timing and prepared-index accounting without retaining per-request arrays", async () => {
+  const callbacks = [], messages = [];
+  let worker;
+  const { owner, state } = createHarness({ helperOptions: { nowMs: () => 0,
+    scheduleWork: callback => callbacks.push(callback), onInvalidate() {},
+    createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+  } });
+  for (const [k, workerMs, fitMs, candidateBuildMs, preparedGeometryBuildMs, preparedGeometryBytes] of [
+    [1, 10, 8, 2, 3, 100], [1.3, 7, 6, 1, 2, 120],
+  ]) {
+    state.zoomTransform.k = k;
+    const pending = owner.prepareCurrentView(k);
+    callbacks.shift()();
+    worker.onmessage({ data: { requestId: messages.at(-1).requestId, fit: null,
+      workerMs, fitMs, candidateBuildMs, preparedGeometryBuildMs, preparedGeometryBytes,
+      preparedGeometryBuilds: k === 1 ? 1 : 0, preparedGeometryHits: k === 1 ? 0 : 1 } });
+    await pending;
+  }
+  const d = owner.getDiagnostics();
+  assert.equal(d.workerTotalMs, 17); assert.equal(d.workerMaxMs, 10);
+  assert.equal(d.workerFitMs, 14); assert.equal(d.workerMaxFitMs, 8);
+  assert.equal(d.workerCandidateBuildMs, 3); assert.equal(d.workerMaxCandidateBuildMs, 2);
+  assert.equal(d.workerPreparedBuildMs, 5); assert.equal(d.workerMaxPreparedBuildMs, 3);
+  assert.equal(d.preparedGeometryBuilds, 1); assert.equal(d.preparedGeometryHits, 1);
+  assert.equal(d.preparedGeometryBytes, 120);
+});
 
 test("projection streams split antimeridian exteriors and retain polygon holes", () => {
   const projection = d3.geoEquirectangular().scale(100).translate([400, 200]);
@@ -119,6 +644,56 @@ test("ring grouping preserves nested islands, concave gaps and boundary containm
   assert.deepEqual(polygons.find(([ring]) => ring[0][0] === 10), [concave]);
   assert.deepEqual(polygons.find(([ring]) => ring[0][0] === 20), [inConcaveGap]);
   assert.deepEqual(polygons.find(([ring]) => ring[0][0] === 0), [onExcludedBoundary]);
+});
+
+test("indexed large concave and nested rings exactly match the full-edge oracle at boundaries", () => {
+  const exterior = densifyRing(squareRing(-100, -100, 500), 128);
+  const concave = densifyRing([
+    [-20, -10], [280, -10], [280, 50], [80, 50], [80, 290], [-20, 290], [-20, 290], [-20, -10],
+  ], 128);
+  const island = densifyRing(squareRing(-10, 0, 50), 96);
+  const islandHole = squareRing(0, 10, 20);
+  const innerIsland = squareRing(5, 15, 5);
+  const probes = [];
+  for (let y = -100; y <= 400; y += 25) {
+    for (let x = -100; x <= 400; x += 25) probes.push(squareRing(x, y, 0.125));
+  }
+  // Include both endpoints and midpoints of horizontal/vertical notch edges,
+  // plus repeated closure points, rather than only non-boundary sample points.
+  for (const [x, y] of [[-20, -10], [280, -10], [280, 50], [80, 50], [80, 170], [-20, 290],
+    [130, -10], [180, 50], [400, 400], [-100, -100], [0, 400], [0, -100]]) {
+    probes.push(squareRing(x, y, 0.0625));
+  }
+  const rings = [...probes, innerIsland, islandHole, concave, island, exterior];
+  for (const oriented of [rings, rings.map((ring) => [...ring].reverse())]) {
+    assert.deepEqual(groupProjectedRings(oriented), groupProjectedRingsNaively(oriented));
+    const unclosed = oriented.map((ring) => ring.slice(0, -1));
+    assert.deepEqual(groupProjectedRings(unclosed), groupProjectedRingsNaively(unclosed), "implicit closing edges are also indexed");
+  }
+});
+
+test("large-ring y index reduces actual edge coordinate reads and stays local to one grouping", () => {
+  let outerReads = 0;
+  const rawOuter = densifyRing(squareRing(0, 0, 1000), 1024);
+  const outer = new Proxy(rawOuter, {
+    get(target, key, receiver) {
+      if (typeof key === "string" && /^(0|[1-9]\d*)$/.test(key)) outerReads++;
+      return Reflect.get(target, key, receiver);
+    },
+  });
+  const holes = Array.from({ length: 400 }, (_, index) => squareRing(20 + (index % 20) * 45, 20 + Math.floor(index / 20) * 45, 2));
+  const rings = [...holes, outer];
+  const expected = groupProjectedRingsNaively(rings);
+  const naiveReads = outerReads;
+  outerReads = 0;
+  const actual = groupProjectedRings(rings);
+  const indexedReads = outerReads;
+  assert.deepEqual(actual, expected);
+  assert.ok(indexedReads < naiveReads / 8, `indexed reads ${indexedReads} must be below one eighth of naive reads ${naiveReads}`);
+  outerReads = 0;
+  groupProjectedRings(rings);
+  assert.equal(outerReads, indexedReads, "a new grouping rebuilds its own lazy index");
+  assert.deepEqual(Reflect.ownKeys(rawOuter), Reflect.ownKeys(densifyRing(squareRing(0, 0, 1000), 1024)), "rings do not retain index properties");
 });
 
 test("pan and zoom reuse map geometry and text fits while repainting transformed glyphs", () => {
@@ -762,4 +1337,36 @@ test("export preserves label failure and timeout guards and disabled bypass", as
     wait: async () => { tick++; }, now: () => tick, timeoutMs: 2 }), /still preparing/);
   await waitForCountryLabelsForExport({ ...options, isDisabled: () => true,
     prepareSource: () => { throw new Error("must not prepare disabled labels"); } });
+});
+
+test("country glyphs in paint padding are actually drawn and keep geometry fits reusable", () => {
+  let bounds = null;
+  const { owner, state, context, fitCalls } = createHarness({ getPaintBounds: () => bounds });
+  state.zoomTransform.x = -130;
+  assert.equal(owner.drawCountryLabels(1), 0);
+  const fits = fitCalls.length;
+  bounds = { minX: -96, minY: -96, maxX: 896, maxY: 796 };
+  assert.equal(owner.drawCountryLabels(1), 1);
+  assert.ok(context.events.some(event => event[0] === "fill"));
+  assert.equal(fitCalls.length, fits);
+  bounds = null;
+  assert.equal(owner.drawCountryLabels(1), 0);
+});
+
+test("deferred fit completes for a country wholly inside the paint margin", () => {
+  const callbacks = [];
+  const { owner, state, source, context, fitCalls } = createHarness({
+    getPaintBounds: () => ({ minX: -96, minY: -96, maxX: 896, maxY: 796 }),
+    helperOptions: { nowMs: () => 0, scheduleWork: callback => callbacks.push(callback), onInvalidate() {} },
+  });
+  source.countries[0].feature.geometry.coordinates = [[[20, 20], [100, 20], [100, 170], [20, 170], [20, 20]]];
+  state.zoomTransform.x = -110;
+  assert.equal(owner.drawCountryLabels(1), 0);
+  assert.equal(callbacks.length, 1);
+  callbacks.shift()();
+  assert.equal(fitCalls.length, 1, "deferred preparation must include the offscreen paint rectangle");
+  assert.equal(owner.drawCountryLabels(1), 1);
+  assert.equal(owner.getDiagnostics().pendingFits, 0);
+  assert.equal(callbacks.length, 0, "no repeated invalidation/preparation loop");
+  assert.ok(context.events.some(event => event[0] === "fill"));
 });

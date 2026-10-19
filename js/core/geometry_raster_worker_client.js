@@ -1,10 +1,20 @@
 import { createWorkerTaskClient } from "./worker_task_client.js";
 import { pageResourceBudget } from "./runtime_resource_budget.js";
-import "./geometry_transfer_codec_shared.js";
+import { packGeometryCooperatively } from "./cooperative_geometry_transport.js";
 
 const WORKER_URL = new URL("../workers/geometry_raster.worker.js", import.meta.url);
 const closeResult = (result) => result?.bitmap?.close?.();
 const measuredBytes = (value) => Number.isSafeInteger(value) && value >= 0 ? value : null;
+
+function geometryForTransfer(geometry) {
+  const wire = { type: geometry.type };
+  if (geometry.type === "GeometryCollection") {
+    wire.geometries = Array.isArray(geometry.geometries)
+      ? geometry.geometries.map(part => part ? geometryForTransfer(part) : part) : geometry.geometries;
+  } else if (Object.hasOwn(geometry, "coordinates")) wire.coordinates = geometry.coordinates;
+  if (geometry.coordinatePrecision !== undefined) wire.coordinatePrecision = geometry.coordinatePrecision;
+  return wire;
+}
 
 // One active request plus the latest request for each surface. Geometry is
 // acknowledged separately from frame currentness, so a stale frame cannot
@@ -15,7 +25,8 @@ export function createGeometryRasterWorkerClient({
     && typeof Path2D === "function",
   onMetric = () => {},
   resourceBudget = pageResourceBudget,
-  packGeometry = (updates) => globalThis.__scenarioForgeGeometryTransferCodecShared.pack(updates),
+  packGeometry = (updates, options) => packGeometryCooperatively(updates, { ...options,
+    pack: batch => globalThis.__scenarioForgeGeometryTransferCodecShared.pack(batch, { minCoordinateCount: 0 }) }),
 } = {}) {
   let disabled = false;
   let active = null;
@@ -75,13 +86,15 @@ export function createGeometryRasterWorkerClient({
       const retainedIds = new Set([...nextIdsByKind.values()].flatMap((ids) => [...ids]));
 
       // Build geometry updates for entries that changed or are new.
-      const entries = task.input.entries.map(({ feature, ...entry }) => {
-        if (!feature?.geometry) throw new TypeError(`Missing raster geometry: ${entry.id}`);
-        if (savedRefs.get(entry.id) !== feature.geometry) {
-          updates.push({ id: entry.id, feature });
+      const entries = task.input.entries.map(({ feature, id, fillColor, alpha, strokeColor, lineWidth }) => {
+        if (!feature?.geometry) throw new TypeError(`Missing raster geometry: ${id}`);
+        if (savedRefs.get(id) !== feature.geometry) {
+          const wireFeature = { type: "Feature", geometry: geometryForTransfer(feature.geometry) };
+          if (feature.coordinatePrecision !== undefined) wireFeature.coordinatePrecision = feature.coordinatePrecision;
+          updates.push({ id, feature: wireFeature });
         }
-        nextRefs.set(entry.id, feature.geometry);
-        return entry;
+        nextRefs.set(id, feature.geometry);
+        return { id, fillColor, alpha, strokeColor, lineWidth };
       });
 
       // Political overscan and hit candidates differ. Retain their active union

@@ -45,7 +45,7 @@ const exportSource = source.slice(start, end);
 
 function harness({ failPass = false, failComposition = false, screenDpr = 1, budgetExceeded = false,
   contourStatus = "ready", politicalStatus = "ready",
-  riverVisible = false, riverStatus = "ready", riverScratch = false } = {}) {
+  riverVisible = false, riverStatus = "ready", riverScratch = false, directScene = false } = {}) {
   const visibleCache = { canvases: { background: { width: 100, height: 50 } } };
   const runtimeState = {
     width: 100,
@@ -56,15 +56,17 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
     zoomTransform: { k: 1, x: 0, y: 0 },
   };
   const calls = [];
+  const renderStates = [];
   const scratchDisposals = [];
   const resourceBudget = createRuntimeResourceBudget();
   const renderCacheOwner = createRenderCacheOwner({ state: runtimeState, resourceBudget,
-    constants: { renderPassNames: ["background", "borders"] },
+    constants: { renderPassNames: ["background", "political", "borders"] },
     helpers: { ensureRenderPassCacheState: (state) => state.renderPassCache } });
   renderCacheOwner.syncSurfaceResourceAccounting();
   let allocatedCanvases = 0;
   const context = vm.createContext({
     runtimeState,
+    politicalPassUsesDirectScene: directScene,
     getRenderCacheOwner: () => renderCacheOwner,
     assertPopulationHeatmapReadyForExport: () => ({ ready: true, status: "disabled" }),
     filterCurrentEnabledRenderPasses: (names) => filterEnabledRenderPassNames(names),
@@ -104,12 +106,19 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
       ensureIdleRenderPasses: () => calls.push("screen-pass"),
       getIdleRenderPassDefinitions: () => [
         ["background", () => calls.push("draw-source")],
+        ["political", () => {
+          assert.equal(vm.runInContext("exportRenderInProgress", context), true,
+            "political export must select the native producer");
+          calls.push("draw-native-political");
+        }],
         ["borders", () => calls.push("draw-contours")],
       ],
     }),
     getRenderPassCacheHostOwner: () => ({
       prepareRenderPassHost: ({ passName, drawFn }) => {
         calls.push(`render-${passName}-${runtimeState.dpr}`);
+        renderStates.push({ passName, cache: runtimeState.renderPassCache,
+          exporting: vm.runInContext("exportRenderInProgress", context) });
         if (failPass) throw new Error("pass failed");
         runtimeState.renderPassCache.canvases[passName] = {
           width: Math.round(runtimeState.width * runtimeState.dpr),
@@ -126,7 +135,7 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
       calls.push(`compose-${target.canvas?.width || 0}`);
       if (failComposition) return { ok: false, reason: "missing-pass" };
       if (options?.requireAllPasses) {
-        assert.equal(runtimeState.renderPassCache.canvases[names[0]].width, 200);
+        assert.equal(runtimeState.renderPassCache.canvases[names[0]].width, target.canvas.width);
       }
       return { ok: true };
     },
@@ -134,8 +143,30 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
     createDefaultRenderPassCacheState: () => ({ canvases: {}, referenceTransforms: {} }),
   });
   vm.runInContext(exportSource, context);
-  return { run: context.renderExportPassesToCanvas, context, runtimeState, visibleCache, calls, scratchDisposals, resourceBudget,
+  return { run: context.renderExportPassesToCanvas, context, runtimeState, visibleCache, calls, renderStates, scratchDisposals, resourceBudget,
     allocatedCanvases: () => allocatedCanvases };
+}
+
+for (const pixelRatio of [null, 1]) {
+  test(`direct scene ${pixelRatio === null ? "default" : "lower DPR"} export redraws native politics in an isolated cache`, () => {
+    const h = harness({ directScene: true, screenDpr: 2 });
+    const expectedDpr = pixelRatio ?? 2;
+    const before = structuredClone(h.visibleCache);
+    const output = h.run(["background", "political"], { pixelRatio });
+    assert.equal(output.width, 100 * expectedDpr);
+    assert.equal(output.height, 50 * expectedDpr);
+    assert.deepEqual(h.calls, [`render-background-${expectedDpr}`, "draw-source",
+      `render-political-${expectedDpr}`, "draw-native-political", `compose-${100 * expectedDpr}`]);
+    assert.equal(h.renderStates.length, 2);
+    assert.ok(h.renderStates.every(item => item.exporting && item.cache !== h.visibleCache));
+    assert.equal(h.renderStates[0].cache, h.renderStates[1].cache);
+    assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
+    assert.deepEqual(h.visibleCache, before);
+    assert.equal(h.runtimeState.dpr, 2);
+    assert.equal(h.context.politicalPassUsesDirectScene, true);
+    assert.equal(vm.runInContext("exportRenderInProgress", h.context), false);
+    assert.equal(h.resourceBudget.snapshot().categories.bitmaps, 100 * 50 * 4);
+  });
 }
 
 for (const riverStatus of ["idle", "partial", "error"]) {

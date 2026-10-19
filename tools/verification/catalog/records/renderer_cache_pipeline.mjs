@@ -9,6 +9,111 @@ const politicalIdRasterRoute = {
 export const RENDERER_CACHE_PIPELINE_RECORDS = [
   {
     ...politicalIdRasterRoute,
+    id: "local:renderer:physical-world-surface", selectorOrder: 5025,
+    commandRef: "node --test tests/physical_raster_surface_behavior.test.mjs tests/physical_canvas_residency_behavior.test.mjs tests/physical_layer_render_owner_behavior.test.mjs",
+    sourceRefs: ["js/core/renderer/physical_raster_surface.js", "tests/physical_raster_surface_behavior.test.mjs", "tests/physical_canvas_residency_behavior.test.mjs"],
+  },
+  {
+    ...politicalIdRasterRoute,
+    id: "local:renderer:canvas-draw-batches", selectorOrder: 5024,
+    commandRef: "node --test tests/canvas_draw_batch_behavior.test.mjs tests/canvas_gpu_submission_client_behavior.test.mjs tests/canvas_gpu_submission_worker_behavior.test.mjs",
+    sourceRefs: ["js/core/renderer/canvas_draw_batch.js", "js/core/canvas_gpu_submission_client.js", "js/core/renderer/canvas_gpu_submission_kernel.js", "js/workers/canvas_gpu_submission.worker.js", "tests/canvas_draw_batch_behavior.test.mjs", "tests/canvas_gpu_submission_client_behavior.test.mjs", "tests/canvas_gpu_submission_worker_behavior.test.mjs"],
+  },
+  {
+    ...politicalIdRasterRoute,
+    id: "local:renderer:index-ui-refresh", selectorOrder: 5023,
+    commandRef: "node --test tests/index_ui_refresh_scheduler_behavior.test.mjs",
+    sourceRefs: ["js/core/map_renderer.js", "tests/index_ui_refresh_scheduler_behavior.test.mjs"],
+  },
+  {
+    ...politicalIdRasterRoute,
+    id: "local:renderer:water-resident-producer", selectorOrder: 5022,
+    commandRef: "node --test tests/water_geometry_transport_behavior.test.mjs tests/water_raster_worker_client_behavior.test.mjs tests/water_raster_worker_kernel_behavior.test.mjs tests/scenario_region_overlay_render_owner_behavior.test.mjs",
+    sourceRefs: [
+      "js/core/map_renderer.js",
+      "js/core/water_raster_worker_client.js",
+      "js/workers/water_raster.worker.js",
+      "js/core/renderer/water_geometry_transport.js",
+      "js/core/renderer/water_raster_worker_kernel.js",
+      "js/core/renderer/scenario_region_overlay_render_owner.js",
+      "tests/water_geometry_transport_behavior.test.mjs",
+      "tests/water_raster_worker_client_behavior.test.mjs",
+      "tests/water_raster_worker_kernel_behavior.test.mjs",
+      "tests/scenario_region_overlay_render_owner_behavior.test.mjs",
+      "tools/verify_water_raster_pixels.mjs",
+    ],
+  },
+  {
+    ...politicalIdRasterRoute,
+    id: "local:renderer:tno-scene-paint-bounds", selectorOrder: 5008,
+    commandRef: "node --test tests/country_label_render_owner_behavior.test.mjs tests/city_label_owner_behavior.test.mjs tests/static_border_mesh_lifecycle_behavior.test.mjs tests/render_cache_owner_invalidation_behavior.test.mjs tests/urban_city_policy_strategic_values_behavior.test.mjs tests/marine_label_owner_behavior.test.mjs",
+    sourceRefs: [
+      "js/core/map_renderer.js",
+      "js/core/renderer/country_label_render_owner.js",
+      "js/core/renderer/city_label_owner.js",
+      "js/core/renderer/static_border_mesh_lifecycle.js",
+      "js/core/renderer/render_cache_owner.js",
+      "js/core/renderer/urban_city_policy.js",
+      "js/core/renderer/marine_label_owner.js",
+      "tests/country_label_render_owner_behavior.test.mjs",
+      "tests/city_label_owner_behavior.test.mjs",
+      "tests/static_border_mesh_lifecycle_behavior.test.mjs",
+      "tests/render_cache_owner_invalidation_behavior.test.mjs",
+      "tests/urban_city_policy_strategic_values_behavior.test.mjs",
+      "tests/marine_label_owner_behavior.test.mjs"
+],
+  },
+  {
+    ...politicalIdRasterRoute,
+    id: "local:renderer:gpu-scene-compositor", selectorOrder: 5004,
+    commandRef: "node --test tests/gpu_scene_compositor_behavior.test.mjs tests/political_id_raster_gpu_residency_behavior.test.mjs tests/political_id_raster_overview_behavior.test.mjs",
+    sourceRefs: [
+      "js/core/renderer/gpu_scene_compositor.js",
+      "js/core/renderer/political_id_raster_gpu.js",
+      "js/core/renderer/political_id_raster_overview.js",
+      "tests/gpu_scene_compositor_behavior.test.mjs",
+      "tests/political_id_raster_gpu_residency_behavior.test.mjs",
+      "tests/political_id_raster_overview_behavior.test.mjs",
+      "tools/verify_tno_gpu_pixels.mjs",
+    ],
+    // This child-safe route verifies the shared GL lifecycle and upload contracts.
+    // The localhost pixel harness remains a separately run real-GPU validation.
+  },
+  {
+    ...politicalIdRasterRoute,
+    id: "local:renderer:political-id-resident-geometry", selectorOrder: 5005,
+    commandRef: "node --test tests/political_id_resident_geometry_behavior.test.mjs",
+    sourceRefs: [
+      "js/core/renderer/political_id_resident_geometry.js",
+      "js/core/political_id_raster_worker_client.js",
+      "js/workers/political_id_raster.worker.js",
+      "tests/political_id_resident_geometry_behavior.test.mjs",
+    ],
+  },
+  {
+    ...politicalIdRasterRoute,
+    id: "local:renderer:tno-raster-scene-owner", selectorOrder: 5006,
+    commandRef: "node --test tests/tno_raster_scene_owner_behavior.test.mjs",
+    sourceRefs: [
+      "js/core/map_renderer.js",
+      "js/core/renderer/tno_raster_scene_owner.js",
+      "js/core/renderer/gpu_scene_compositor.js",
+      "tests/tno_raster_scene_owner_behavior.test.mjs",
+    ],
+  },
+  {
+    ...politicalIdRasterRoute,
+    id: "local:renderer:tno-raster-scene-profile", selectorOrder: 5007,
+    commandRef: "node --test tests/tno_raster_scene_profile_contract.test.mjs tests/tno_native_breadcrumbs.test.mjs",
+    sourceRefs: [
+      "tools/profile_tno_raster_scene.mjs",
+      "tests/tno_raster_scene_profile_contract.test.mjs",
+      "tools/tno_native_breadcrumbs.mjs",
+      "tests/tno_native_breadcrumbs.test.mjs",
+    ],
+  },
+  {
+    ...politicalIdRasterRoute,
     id: "local:renderer:political-id-raster-trial", selectorOrder: 5003,
     commandRef: "node --test tests/political_id_raster_trial_behavior.test.mjs",
     sourceRefs: [

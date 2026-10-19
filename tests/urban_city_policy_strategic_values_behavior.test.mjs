@@ -388,7 +388,7 @@ test("priority reserve fades to zero before the P4 boundary", () => {
   assert.deepEqual(values, [30, 19, 8, 1, 0]);
 });
 
-function createRevealFixture(features) {
+function createRevealFixture(features, overrides = {}, state = { urbanData: null }) {
   const profile = { groupKey: "country", countryTier: "A", countryTierRank: 5 };
   const helpers = {
     ...cityPolicy,
@@ -402,10 +402,99 @@ function createRevealFixture(features) {
     getCityScreenPoint: (anchor) => anchor,
     getCityViewportCenterDistanceNorm: () => 0,
     isCityAnchorInViewport: () => true,
+    ...overrides,
   };
-  const owner = createUrbanCityPolicyOwner({ state: { urbanData: null }, caches: { urbanFeatureIndexCache: {} }, helpers });
-  return (scale) => owner.buildCityRevealPlan({ features }, scale, {}, { showLabels: true, labelMinZoom: 1.45 });
+  const owner = createUrbanCityPolicyOwner({ state, caches: { urbanFeatureIndexCache: {} }, helpers });
+  const collection = { features }, config = { showLabels: true, labelMinZoom: 1.45 };
+  const build = (scale) => owner.buildCityRevealPlan(collection, scale, {}, config);
+  build.prepare = (scale, options) => owner.prepareCityRevealPlan(collection, scale, {}, config, options);
+  return build;
 }
+
+test("cooperative reveal preserves native stable ordering, selected aliases and all synchronous plan fields", async () => {
+  const features = Array.from({ length: 257 }, (_, index) => ({
+    ...createCityFeature(`async-${index % 17}`, "host", {
+      __city_base_tier: ["major", "regional", "minor"][index % 3],
+      __city_population: (index % 13) * 100000,
+      __city_is_capital: index % 31 === 0,
+    }),
+    geometry: { type: "Point", coordinates: [(index % 30) * 50, Math.floor(index / 30) * 50] },
+  }));
+  const build = createRevealFixture(features);
+  let yields = 0;
+  for (const scale of [1, 1.45, 2.45, 5, 12]) {
+    const prepared = await build.prepare(scale, { workBatch: 17, nowMs: () => 0,
+      yieldControl: async () => { yields++; } });
+    assert.deepEqual(prepared, build(scale));
+    const inputOrder = new Map(features.map((feature, index) => [feature, index]));
+    const nativeOrder = [...prepared.candidateEntries]
+      .sort((left, right) => inputOrder.get(left.feature) - inputOrder.get(right.feature))
+      .sort((left, right) => compareCityRevealEntries(left, right, prepared.phase.id));
+    assert.deepEqual(prepared.candidateEntries, nativeOrder, "equal comparisons retain source feature order");
+    assert.ok(prepared.labelEntries.every((entry) => prepared.markerEntries.includes(entry)));
+  }
+  assert.ok(yields > 100, "mapping, sorting and selection all use bounded preparation slices");
+});
+
+test("cooperative reveal cancels before cold helpers and inside candidate sorting", async () => {
+  const features = Array.from({ length: 128 }, (_, index) => ({
+    ...createCityFeature(`sort-${128 - index}`, "host", { __city_base_tier: "major" }),
+    geometry: { type: "Point", coordinates: [index * 50, 0] },
+  }));
+  let anchors = 0, comparisons = 0;
+  const build = createRevealFixture(features, {
+    getCityAnchor(feature) { anchors++; return feature.geometry.coordinates; },
+    compareCityRevealEntries(left, right, phase) { comparisons++; return compareCityRevealEntries(left, right, phase); },
+  });
+  let current = true;
+  assert.equal(await build.prepare(5, { isCurrent: () => current,
+    yieldControl: async () => { current = false; } }), null);
+  assert.equal(anchors, 0, "a stale first task must not enter a projection helper");
+  current = true;
+  assert.equal(await build.prepare(5, { workBatch: 8, nowMs: () => 0, isCurrent: () => current,
+    yieldControl: async () => { if (comparisons > 20) current = false; } }), null);
+  assert.equal(anchors, 128);
+  assert.ok(comparisons > 20 && comparisons < 100, "sorting cancels inside a merge pass");
+});
+
+test("cooperative reveal prepares full labels while the public synchronous plan respects defer", async () => {
+  const state = { urbanData: null, deferExactAfterSettle: true };
+  const feature = { ...createCityFeature("deferred", "host", { __city_base_tier: "major" }),
+    geometry: { type: "Point", coordinates: [0, 0] } };
+  const build = createRevealFixture([feature], {}, state);
+  assert.equal(build(5).labelEntries.length, 0);
+  const prepared = await build.prepare(5, { yieldControl: async () => {} });
+  assert.equal(prepared.labelEntries.length, 1);
+  state.deferExactAfterSettle = false;
+  assert.deepEqual(prepared, build(5));
+});
+
+test("cooperative reveal honors elapsed time before its work-count limit", async () => {
+  const features = Array.from({ length: 160 }, (_, index) => ({
+    ...createCityFeature(`timed-${index}`, "host", { __city_base_tier: "major" }),
+    geometry: { type: "Point", coordinates: [index * 50, 0] },
+  }));
+  let clock = 0, yields = 0, anchors = 0, priorAnchors = 0;
+  const build = createRevealFixture(features, { getCityAnchor(feature) { anchors++; return feature.geometry.coordinates; } });
+  assert.ok(await build.prepare(5, { workBatch: 10000, sliceBudgetMs: 2, nowMs: () => (clock += 3),
+    yieldControl: async () => {
+      assert.ok(anchors - priorAnchors <= 32, "elapsed-time checkpoints bound the candidate scan");
+      priorAnchors = anchors;
+      yields++;
+    } }));
+  assert.ok(yields > 10);
+});
+
+test("default cooperative reveal yield lets a host task run before collection projection", async () => {
+  let hostTaskRan = false;
+  const feature = createCityFeature("host-yield", "host", { __city_base_tier: "major" });
+  const build = createRevealFixture([feature], { getCityAnchor(value) {
+    assert.equal(hostTaskRan, true);
+    return value.geometry.coordinates;
+  } });
+  setTimeout(() => { hostTaskRan = true; }, 0);
+  assert.ok(await build.prepare(5));
+});
 
 test("reveal plan exposes local minor cities, rejects overlapping markers and retains label alternates", () => {
   const features = Array.from({ length: 120 }, (_, index) => ({
@@ -440,4 +529,16 @@ test("dense local city clusters keep breathing room instead of filling every gap
   for (let index = 1; index < plan.markerEntries.length; index += 1) {
     assert.ok(plan.markerEntries[index].screenPoint[0] - plan.markerEntries[index - 1].screenPoint[0] >= 48);
   }
+});
+
+test("city reveal selects candidates inside explicit paint padding", () => {
+  let margin = 48;
+  const feature = { ...createCityFeature("padding", "host", { __city_base_tier: "major" }), geometry: { type: "Point", coordinates: [-70, 50] } };
+  const planAt = createRevealFixture([feature], { getCityPaintOverscanPx: () => margin,
+    isCityAnchorInViewport: ([x], { padding }) => x >= -padding });
+  assert.equal(planAt(5).labelEntries.length, 0);
+  margin = 96;
+  assert.equal(planAt(5).labelEntries.length, 1);
+  margin = 48;
+  assert.equal(planAt(5).labelEntries.length, 0);
 });

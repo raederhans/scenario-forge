@@ -87,8 +87,9 @@ export function createOceanRenderOwner({
       context.lineWidth = lineWidth + (2.2 / zoom);
       context.lineJoin = "round";
       context.lineCap = "round";
-      buildPath();
-      context.stroke();
+      const path = buildPath();
+      if (path && typeof path === "object") context.stroke(path);
+      else context.stroke();
     } finally {
       context.restore();
     }

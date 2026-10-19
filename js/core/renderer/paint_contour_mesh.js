@@ -1,5 +1,8 @@
 // The compact geometry graph is immutable. Paint and display ownership only
 // choose which of its shared arcs are visible.
+import { createPackedLineMesh, getPackedLineMesh } from "./packed_line_mesh.js";
+export const getPackedPaintContourMesh = getPackedLineMesh;
+
 export function createPaintContourMesh(graph, resolveColor, {
   resolveBoundaryKey = () => null,
   separatePoliticalBorders = () => false,
@@ -9,7 +12,7 @@ export function createPaintContourMesh(graph, resolveColor, {
   if (!(coordinates instanceof Float64Array) || !(offsets instanceof Uint32Array)
     || !(owners instanceof Uint32Array) || owners.length !== (offsets.length - 1) * 2
     || coordinates.length !== offsets.at(-1) * 2) throw new TypeError('Invalid paint contour graph');
-  const incidents = new Map(), colors = new Array(featureIds.length), boundaryKeys = new Array(featureIds.length), active = new Map();
+  const incidents = new Map(), colors = new Array(featureIds.length), boundaryKeys = new Array(featureIds.length), active = new Set();
   let revision = 0, mesh = null, bordersSeparated = false;
   for (let i = 0; i < owners.length; i += 1) {
     const id = featureIds[owners[i]];
@@ -45,9 +48,7 @@ export function createPaintContourMesh(graph, resolveColor, {
       if (enabled === active.has(arc)) continue;
       changed = true;
       if (!enabled) { active.delete(arc); continue; }
-      const line = [];
-      for (let i = offsets[arc]; i < offsets[arc + 1]; i += 1) line.push([coordinates[i * 2], coordinates[i * 2 + 1]]);
-      active.set(arc, line);
+      active.add(arc);
     }
     if (changed) { revision += 1; mesh = null; }
     return changed;
@@ -58,7 +59,12 @@ export function createPaintContourMesh(graph, resolveColor, {
     getRevision: () => revision,
     getActiveArcCount: () => active.size,
     getMesh() {
-      if (!mesh) mesh = { type: 'MultiLineString', coordinates: [...active.values()] };
+      if (!mesh) {
+        const arcs = Uint32Array.from(active);
+        // The renderer streams these immutable ranges directly. The ordinary
+        // GeoJSON view remains lazy for external/native consumers and exports.
+        mesh = createPackedLineMesh({ coordinates, offsets, arcs });
+      }
       return mesh;
     },
   });

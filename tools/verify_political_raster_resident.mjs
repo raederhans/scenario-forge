@@ -10,16 +10,33 @@ export function residentFrameReady(s = window.__rasterTask.state, d = window.__r
   const c = s.runtimeChunkLoadState || {};
   const background = s.renderPerfMetrics?.drawPoliticalBackgroundFillsPass;
   const nativeReady = !!background && (!background.progressive || background.deferredFullCacheReady);
+  const physicalExpected = s.showPhysical && s.styleConfig?.physical?.mode !== "contours_only";
+  const physicalReady = !physicalExpected || ((!s.renderPassCache?.dirty?.physicalBase && !d.scene?.physicalCanvas?.pending)
+    && (s.physicalSemanticsData?.features?.length > 0 || s.contextLayerLoadStateByName?.physical_semantics === "error"));
+  // A retained primary or overview is valid input feedback, but cannot finish a
+  // direct raster sample before the complete candidate has actually published.
+  const directReady = !d.directPresentation || (!s.secondarySpatialBuildPending && !d.asyncWork?.borderScheduled && !s.renderPassCache?.dirty?.borders
+    && !d.waterPreparation?.pending && !d.borderPreparation?.pending && !d.stagedPending && d.publishedFrame?.state === "published"
+    && d.scene?.active === true && d.scene.presentationState === "published" && !d.scene.usingOverview
+    && !d.scene.publicationPending && physicalReady);
   const backendReady = d.effectiveMode === "raster" ? d.actualBackend === "raster" && d.displayState === "accelerated"
-    && d.sourceCoverage === "complete-display-v1" && d.view
+    && directReady && d.sourceCoverage === "complete-display-v1" && d.view
     && ["x", "y", "k"].every(key => Math.abs(d.view[key] - s.zoomTransform[key]) < 1e-7)
     : nativeReady && (d.effectiveMode !== "hybrid" || d.displayState === "precise");
-  return !s.scenarioApplyInFlight && !s.startupReadonly && !s.isInteracting && s.renderPhase === "idle"
+  const baseReady = !s.scenarioApplyInFlight && !s.startupReadonly && !s.isInteracting && s.renderPhase === "idle"
     && !s.deferExactAfterSettle && !s.exactAfterSettleHandle && !s.activePostReadyTaskKey
     && !s.renderPassCache?.dirty?.political && !c.pendingReason && !c.refreshScheduled && !c.promotionScheduled
     && !c.pendingPromotion && !c.pendingInfraPromotion && !c.promotionCommitInFlight
-    && !d.failed && !d.pending && !d.refinementPending
+    && !d.failed && !d.pending && !d.refinementPending && !d.deferredForegroundOrder
     && backendReady;
+  if (!baseReady) return false;
+  if (s.styleConfig?.countryLabels?.enabled === false) return true;
+  if (s.renderPassCache?.dirty?.labels) return false;
+  // Resolve the small current-view status only after the other producers are
+  // ready. This observer must not create owners or schedule source/layout work.
+  const labels = d.countryLabels ?? (typeof window !== "undefined"
+    ? window.__rasterTask?.renderer?.getCountryLabelReadiness?.() : null);
+  return labels?.ready === true;
 }
 
 async function settle(page) {

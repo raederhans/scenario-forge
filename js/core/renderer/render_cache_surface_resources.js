@@ -1,3 +1,25 @@
+export function calculateRenderPassSurfaceLayout({ width, height, dpr: requestedDpr, overscanRatio, paintOverscanPx }) {
+  const dpr = Math.max(requestedDpr || 1, 1);
+  const logicalWidth = Math.max(1, Number(width || 1));
+  const logicalHeight = Math.max(1, Number(height || 1));
+  const paintOverscan = Math.max(0, Number(paintOverscanPx) || 0);
+  const offsetX = Math.max(paintOverscan, Math.ceil(logicalWidth * overscanRatio));
+  const offsetY = Math.max(paintOverscan, Math.ceil(logicalHeight * overscanRatio));
+  const paddedWidth = logicalWidth + offsetX * 2;
+  const paddedHeight = logicalHeight + offsetY * 2;
+  return {
+    offsetX,
+    offsetY,
+    logicalWidth,
+    logicalHeight,
+    paddedWidth,
+    paddedHeight,
+    pixelWidth: Math.max(1, Math.floor(paddedWidth * dpr)),
+    pixelHeight: Math.max(1, Math.floor(paddedHeight * dpr)),
+    dpr,
+  };
+}
+
 // Owns internal surface retention and accounting across visible and export roots.
 export function createRenderCacheSurfaceResources({
   initialCache, getValidatedCacheState, renderPassNames, resourceBudget,

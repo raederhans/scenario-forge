@@ -5,6 +5,7 @@ import { createPoliticalFeaturePolicy } from "../js/core/renderer/political_feat
 
 import {
   analyzeScenarioPoliticalDerivedStateCoverage,
+  analyzeScenarioPoliticalDerivedStateCoverageChunked,
   assertPromotionDeltaPureValue,
   buildScenarioChunkPromotionVisualMetricDetails,
   createScenarioChunkPromotionDelta,
@@ -13,6 +14,106 @@ import {
   recordScenarioPoliticalDerivedStateCoverage,
   resolveScenarioChunkPromotionChangeSet,
 } from "../js/core/renderer/scenario_chunk_promotion_helpers.js";
+
+function makeChunkedCoverageFixture(count = 850) {
+  const features = Array.from({ length: count }, (_, id) => Object.freeze({ id: `F_${id}` }));
+  const full = Object.freeze({ features: Object.freeze(features) });
+  const interactive = Object.freeze({ features: Object.freeze(features.slice(0, -1)) });
+  const colors = Object.create({ INHERITED: "#123" });
+  for (const feature of features) colors[feature.id] = "#123";
+  Object.defineProperty(colors, "HIDDEN", { enumerable: false, value: "#123" });
+  const state = Object.freeze({ scenarioPoliticalChunkData: full,
+    scenarioPoliticalVisibleChunkData: Object.freeze({ features: Object.freeze(features.slice(0, -1)) }),
+    landDataFull: full, landData: interactive, colors: Object.freeze(colors) });
+  const options = { coverageInputSnapshot: { fullCollection: full, expectedInteractiveCollection: interactive },
+    buildInteractiveLandData: () => { throw new Error("matching snapshot must avoid rebuilding"); },
+    shouldExcludePoliticalVisualFeature: (feature) => feature.id === `F_${count - 1}` };
+  return { state, options };
+}
+
+test("chunked coverage scans frozen full inputs with 400-step yields and matches synchronous semantics", async () => {
+  const { state, options } = makeChunkedCoverageFixture();
+  const before = JSON.stringify(state);
+  let excludedChecks = 0;
+  let yields = 0;
+  const progress = [];
+  const prepared = await analyzeScenarioPoliticalDerivedStateCoverageChunked(state, {
+    ...options, nowMs: () => 0,
+    shouldExcludePoliticalVisualFeature: (feature) => { excludedChecks += 1; return options.shouldExcludePoliticalVisualFeature(feature); },
+    yieldControl: async () => { yields += 1; progress.push(excludedChecks); },
+  });
+  assert.equal(prepared.status, "prepared");
+  assert.equal(prepared.yieldCount, yields);
+  assert.ok(yields > 15, "color, all feature-ID scans, subset and missing-ID membership loops yield independently");
+  assert.ok(progress.some((count) => count > 0 && count < 850), "visual exclusion work is also split");
+  assert.equal(prepared.maxSliceMs, 0);
+  assert.deepEqual(prepared.coverage, analyzeScenarioPoliticalDerivedStateCoverage(state, options));
+  assert.equal(prepared.coverage.colorsCount, 850, "inherited and nonenumerable colors remain excluded");
+  assert.equal(prepared.coverage.requiredColorFeatureCount, 849);
+  assert.equal(prepared.coverage.primaryVisibleFeatureSubsetActive, true);
+  assert.equal(prepared.coverage.landDataCoverageMissing, false);
+  assert.equal(JSON.stringify(state), before);
+});
+
+test("chunked coverage cancellation before work and during scans returns no candidate and leaves state untouched", async () => {
+  const { state, options } = makeChunkedCoverageFixture();
+  const before = JSON.stringify(state);
+  let callbackCalls = 0;
+  const excluded = () => { callbackCalls += 1; return false; };
+  const early = await analyzeScenarioPoliticalDerivedStateCoverageChunked(state, {
+    ...options, shouldExcludePoliticalVisualFeature: excluded, isCurrent: () => false,
+  });
+  assert.equal(early.status, "cancelled");
+  assert.equal(early.coverage, null);
+  assert.equal(early.yieldCount, 0);
+  assert.equal(callbackCalls, 0);
+  let current = true;
+  let yields = 0;
+  const middle = await analyzeScenarioPoliticalDerivedStateCoverageChunked(state, {
+    ...options, nowMs: () => 0, isCurrent: () => current,
+    yieldControl: async () => { if (++yields === 6) current = false; },
+  });
+  assert.equal(middle.status, "cancelled");
+  assert.equal(middle.coverage, null);
+  assert.equal(middle.yieldCount, 6);
+  assert.equal(JSON.stringify(state), before);
+});
+
+test("chunked coverage applies 6ms budget and preserves missing sample order, canonical IDs and failed subsets", async () => {
+  const full = { features: Array.from({ length: 30 }, (_, id) => ({ id: id + 100, properties: { id: `F_${id}` } })) };
+  const state = { scenarioPoliticalChunkData: full, landDataFull: { features: full.features.slice(10) },
+    scenarioPoliticalVisibleChunkData: { features: [{ id: "UNRELATED" }] },
+    landData: { features: full.features.slice(1) }, colors: { F_0: "#123", UNRELATED: "#123" } };
+  const options = { buildInteractiveLandData: () => full };
+  let time = 0;
+  const prepared = await analyzeScenarioPoliticalDerivedStateCoverageChunked(state, {
+    ...options, nowMs: () => time++, yieldControl: async () => {},
+  });
+  assert.equal(prepared.status, "prepared");
+  assert.ok(prepared.yieldCount > 0);
+  assert.equal(prepared.maxSliceMs, 6);
+  assert.deepEqual(prepared.coverage, analyzeScenarioPoliticalDerivedStateCoverage(state, options));
+  assert.deepEqual(prepared.coverage.missingFullLandFeatureIdsSample, Array.from({ length: 8 }, (_, id) => `F_${id}`));
+  assert.deepEqual(prepared.coverage.missingInteractiveFeatureIdsSample, ["F_0"]);
+  assert.deepEqual(prepared.coverage.missingColorFeatureIdsSample, Array.from({ length: 8 }, (_, id) => `F_${id + 1}`));
+  assert.equal(prepared.coverage.primaryVisibleFeatureSubsetActive, false);
+});
+
+test("shared coverage scanner preserves sparse-array callbacks and empty-ID subset semantics", async () => {
+  const features = new Array(3);
+  features[1] = { id: "A" };
+  const full = { features };
+  const state = { scenarioPoliticalChunkData: full, landDataFull: full, landData: full,
+    scenarioPoliticalVisibleChunkData: { features: [{}] }, colors: { A: "#123" } };
+  let checks = 0;
+  const options = { shouldExcludePoliticalVisualFeature: (feature) => { assert.ok(feature); checks += 1; return false; } };
+  const prepared = await analyzeScenarioPoliticalDerivedStateCoverageChunked(state, options);
+  assert.equal(checks, 1);
+  assert.equal(prepared.coverage.completePoliticalFeatureCount, 3);
+  assert.equal(prepared.coverage.primaryVisibleFeatureSubsetActive, true);
+  assert.equal(prepared.coverage.interactiveCoverageChecked, false);
+  assert.deepEqual(prepared.coverage, analyzeScenarioPoliticalDerivedStateCoverage(state, options));
+});
 
 test("full and interactive coverage follow existing shell and aggregate filtering without hiding missing data", () => {
   const leaf = { id: "GB_LEAF", properties: { country: "GB", detail_tier: "adm2", __source: "detail" } };
