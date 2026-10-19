@@ -8,6 +8,7 @@ import {
 } from "./spatial_index_runtime_builders.js";
 import {
   applyPrimarySpatialSnapshot,
+  applyPrimarySpatialCandidate,
   applySecondarySpatialSnapshot,
   clearPrimaryIndexMaps,
   markSecondarySpatialBuildPending,
@@ -16,6 +17,8 @@ import {
 import {
   createSpatialIndexPerfPayload,
 } from "./spatial_index_runtime_derivation.js";
+import { prepareSecondarySpatialSnapshotChunked } from "./secondary_spatial_chunked_builder.js";
+import { createPrimarySpatialCandidateBuilder } from "./primary_spatial_candidate_builder.js";
 
 export function createSpatialIndexRuntimeOwner({
   state,
@@ -59,15 +62,25 @@ export function createSpatialIndexRuntimeOwner({
     computeProjectedGeoBounds = () => null,
     shouldExcludeWaterHitGeometry = () => false,
     getSecondarySpatialCacheIdentity = () => null,
+    getSecondarySpatialSourceIdentity,
   } = helpers;
 
   // Retain the latest and largest accepted water sets. A zoom can visit more
   // than one detail subset before returning to the larger overview set.
   let waterSnapshots = [];
+  let secondaryBuildGeneration = 0;
+  const primaryCandidateBuilder = createPrimarySpatialCandidateBuilder({ state, getPathSvg,
+    gridConstants: { hitGridTargetCols, hitGridMinCellPx, hitGridMaxCellPx, hitMaxCellsPerItem },
+    helpers: { getLogicalCanvasDimensions, getFeatureId, computeProjectedFeatureBounds,
+      shouldExcludePoliticalInteractionFeature, shouldExcludePoliticalVisualFeature, shouldSkipFeature,
+      getFeatureCountryCodeNormalized, getFeatureBorderMeshCountryCodeNormalized, nowMs, yieldToMain },
+    publish: (candidate) => applyPrimarySpatialCandidate(state, candidate),
+  });
 
   // buildIndex 负责主索引映射层（landIndex/countryToFeatureIds/idToKey/keyToId），
   // 为渲染与交互提供 feature-id 级别的稳定检索键；空间网格由 buildSpatialIndex 系列负责。
   function buildIndex({ scheduleUiMode = "immediate" } = {}) {
+    primaryCandidateBuilder.invalidate();
     clearPrimaryIndexMaps(state);
     rebuildAuxiliaryRegionIndexes();
 
@@ -98,6 +111,8 @@ export function createSpatialIndexRuntimeOwner({
     preserveCurrent = false,
     reason = "secondary-spatial-reset",
   } = {}) {
+    primaryCandidateBuilder.invalidate();
+    secondaryBuildGeneration += 1;
     if (!preserveCurrent) {
       waterSnapshots = [];
     }
@@ -110,6 +125,7 @@ export function createSpatialIndexRuntimeOwner({
   function rebuildRuntimePrimaryIndex({
     projectedBoundsCache = null,
   } = {}) {
+    primaryCandidateBuilder.invalidate();
     clearPrimaryIndexMaps(state);
     rebuildAuxiliaryRegionIndexes();
 
@@ -143,6 +159,7 @@ export function createSpatialIndexRuntimeOwner({
   }
 
   function reconcileRuntimePrimaryIndex({ projectedBoundsCache = null, incrementalDelta = null } = {}) {
+    primaryCandidateBuilder.invalidate();
     if (![state.landIndex, state.countryToFeatureIds, state.idToKey, state.keyToId].every((map) => map instanceof Map)) {
       rebuildRuntimePrimaryIndex({ projectedBoundsCache });
       return;
@@ -212,6 +229,7 @@ export function createSpatialIndexRuntimeOwner({
   function buildSecondarySpatialIndexes({
     allowComputeMissingBounds = true,
   } = {}) {
+    secondaryBuildGeneration += 1;
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
     // The caller's identity must change with projection, scenario, water
     // sanitization and any in-place water edits. No identity means no reuse.
@@ -295,6 +313,42 @@ export function createSpatialIndexRuntimeOwner({
       : [nextWaterSnapshot, ...(priorLargest ? [priorLargest] : [])];
   }
 
+  async function buildSecondarySpatialIndexesChunked({
+    allowComputeMissingBounds = true,
+    isCurrent = () => true,
+    yieldControl = yieldToMain,
+  } = {}) {
+    const generation = ++secondaryBuildGeneration;
+    const stateGeneration = state.secondarySpatialGeneration;
+    const cacheIdentity = getSecondarySpatialCacheIdentity();
+    const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+    const current = () => generation === secondaryBuildGeneration
+      && state.secondarySpatialGeneration === stateGeneration && isCurrent();
+    const prepared = await prepareSecondarySpatialSnapshotChunked({
+      waterFeatures: [...getEffectiveWaterRegionFeatures()],
+      specialFeatures: [...getEffectiveSpecialRegionFeatures()],
+      reusableSnapshots: cacheIdentity == null ? []
+        : waterSnapshots.filter((snapshot) => snapshot.identity === cacheIdentity),
+      cacheIdentity, allowComputeMissingBounds, isCurrent: current, yieldControl,
+      gridOptions: { canvasWidth, canvasHeight, hitGridTargetCols,
+        hitGridMinCellPx, hitGridMaxCellPx, hitMaxCellsPerItem },
+      helpers: { getFeatureId, getSecondarySpatialCacheIdentity, getLogicalCanvasDimensions,
+        getEffectiveWaterRegionFeatures, getEffectiveSpecialRegionFeatures, getSecondarySpatialSourceIdentity, nowMs,
+        collectFeatureHitGeometries, computeProjectedGeoBounds,
+        shouldExcludeWaterHitGeometry, getProjectedFeatureBounds },
+    });
+    const { snapshot, validate, ...metrics } = prepared;
+    if (!snapshot || !validate()) return { ...metrics, status: "cancelled" };
+    applySecondarySpatialSnapshot(state, { ...snapshot, reason: "secondary-spatial-chunked-build" });
+    const priorLargest = waterSnapshots
+      .filter((entry) => entry.identity === cacheIdentity && entry !== snapshot.exactSnapshot)
+      .sort((a, b) => b.items.length - a.items.length)[0];
+    waterSnapshots = cacheIdentity == null ? []
+      : [snapshot.waterSnapshot, ...(priorLargest ? [priorLargest] : [])];
+    return { ...metrics, status: "published",
+      waterItems: snapshot.water.items.length, specialItems: snapshot.special.items.length };
+  }
+
   // buildSpatialIndex 负责主空间索引（state.spatialItems + state.spatialGrid + spatialGridMeta），
   // 并在 includeSecondary=true 时追加 water/special 次级索引，确保命中测试共享统一网格语义。
   function buildSpatialIndex({
@@ -302,6 +356,8 @@ export function createSpatialIndexRuntimeOwner({
     allowComputeMissingBounds = true,
     reuseExisting = false,
   } = {}) {
+    primaryCandidateBuilder.invalidate();
+    secondaryBuildGeneration += 1;
     const startedAt = nowMs();
     const previous = reuseExisting ? { grid: state.spatialGrid, gridMeta: state.spatialGridMeta, itemsById: state.spatialItemsById } : null;
     if (!reuseExisting) resetPrimarySpatialState(state);
@@ -404,6 +460,7 @@ export function createSpatialIndexRuntimeOwner({
     isCurrent = () => true,
     yieldControl = yieldToMain,
   } = {}) {
+    primaryCandidateBuilder.invalidate();
     if (!isCurrent()) return false;
     setInteractionInfrastructureState("building-index", {
       ready: keepReady ? true : false,
@@ -462,6 +519,8 @@ export function createSpatialIndexRuntimeOwner({
     isCurrent = () => true,
     yieldControl = yieldToMain,
   } = {}) {
+    primaryCandidateBuilder.invalidate();
+    secondaryBuildGeneration += 1;
     if (!isCurrent()) return false;
     setInteractionInfrastructureState("building-spatial", {
       ready: keepReady ? true : false,
@@ -556,11 +615,15 @@ export function createSpatialIndexRuntimeOwner({
   }
 
   return {
+    preparePrimarySpatialCandidateChunked: primaryCandidateBuilder.preparePrimarySpatialCandidateChunked,
+    isPrimarySpatialCandidateCurrent: primaryCandidateBuilder.isPrimarySpatialCandidateCurrent,
+    adoptPrimarySpatialCandidate: primaryCandidateBuilder.adoptPrimarySpatialCandidate,
     buildIndex,
     rebuildRuntimePrimaryIndex,
     reconcileRuntimePrimaryIndex,
     resetSecondarySpatialIndexState,
     buildSecondarySpatialIndexes,
+    buildSecondarySpatialIndexesChunked,
     buildSpatialIndex,
     buildIndexChunked,
     buildSpatialIndexChunked,

@@ -26,6 +26,7 @@ import {
   invalidateOceanWaterInteractionVisualState,
   refreshColorState,
   refreshMapDataForScenarioChunkPromotion,
+  prepareScenarioPoliticalChunkPromotion,
   refreshScenarioOpeningOwnerBorders,
 } from "./scenario/scenario_renderer_bridge.js";
 import {
@@ -570,6 +571,7 @@ const {
   isScenarioOptionalLayerRequestedForVisibility: (...args) => isScenarioOptionalLayerRequestedForVisibility(...args),
   syncScenarioLocalizationState,
   refreshMapDataForScenarioChunkPromotion,
+  prepareScenarioPoliticalChunkPromotion,
   flushRenderBoundary,
   requestRender,
   recordScenarioPerfMetric,

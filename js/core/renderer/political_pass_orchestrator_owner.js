@@ -110,7 +110,8 @@ export function createPoliticalPassOrchestratorOwner({
       recordRenderPerfMetric(metric, Number(value || 0), { renderedCount: Number(metrics.renderedCount || 0),
         visibleItemCount: viewport.visibleItemCount, source: "political-id-raster" });
     }
-    clearPendingPoliticalColorEdit({ renderedCount: Number(metrics.renderedCount || 0),
+    // Only published pixels may consume pending IDs used in the candidate identity.
+    if (!metrics.staged && !metrics.retained) clearPendingPoliticalColorEdit({ renderedCount: Number(metrics.renderedCount || 0),
       renderedIds: metrics.renderedIds, paintSource: "political-id-raster" });
     counters[primary ? "rasterPrimaryPasses" : "hybridRasterPasses"]++;
     lastBackend = primary ? "raster" : "hybrid-raster";

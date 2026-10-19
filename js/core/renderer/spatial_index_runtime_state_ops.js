@@ -2,6 +2,7 @@ import {
   createDefaultSecondarySpatialIndexState,
   createDefaultSpatialIndexState,
 } from "../state/spatial_index_state.js";
+import { commitProjectedBoundsCacheState } from "../state/actions/renderer_cache_actions.js";
 
 function ensureMapHolder(currentValue) {
   return currentValue instanceof Map ? currentValue : new Map();
@@ -69,6 +70,20 @@ export function applyPrimarySpatialSnapshot(state, {
   state.spatialGrid = grid;
   state.spatialGridMeta = gridMeta;
   state.spatialItemsById = itemsById;
+}
+
+export function applyPrimarySpatialCandidate(state, candidate) {
+  commitProjectedBoundsCacheState(state, {
+    projectedBoundsById: candidate.projectedBoundsById,
+    sphericalFeatureDiagnosticsById: state.sphericalFeatureDiagnosticsById || new Map(),
+  });
+  state.landIndex = candidate.landIndex;
+  state.countryToFeatureIds = candidate.countryToFeatureIds;
+  state.idToKey = candidate.idToKey;
+  state.keyToId = candidate.keyToId;
+  applyPrimarySpatialSnapshot(state, { items: candidate.spatialItems, grid: candidate.spatialGrid,
+    gridMeta: candidate.spatialGridMeta, itemsById: candidate.spatialItemsById });
+  state.hitCanvasDirty = true;
 }
 
 export function applySecondarySpatialSnapshot(state, {

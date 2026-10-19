@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { createExactAfterSettleScheduler } from "../js/core/map_renderer/exact_after_settle_scheduler.js";
 
-function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync = () => null, includeContextPasses = false, getRenderPassSignature } = {}) {
+function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync = () => null, includeContextPasses = false, includeWaterPass = false, getRenderPassSignature } = {}) {
   const events = [];
   const metrics = [];
   const frameTasks = [];
@@ -68,6 +68,7 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
   const definitions = [
     ...(cameraSignatureMismatch ? [["background", () => {}]] : []),
     ...(includeContextPasses ? [["physicalBase", () => {}], ["contextBase", () => {}]] : []),
+    ...(includeWaterPass ? [["contextScenario", () => {}]] : []),
     ["political", () => {}],
     ["borders", () => {}],
     ["labels", () => {}],
@@ -315,15 +316,110 @@ test("async pass preparation preserves the visible frame and waits before pass d
     assert.equal(h.events.includes("prepare:political"), false);
     assert.equal(h.events.includes("request-render:exact-after-settle:true"), false);
     assert.equal(h.frameTasks.length, 0);
-    assert.deepEqual(preparationEpochs, [1], "preparation must observe the invalidated snapshot epoch");
+    assert.deepEqual(preparationEpochs, [1, 1], "preflight and pass preparation must observe the invalidated snapshot epoch");
     resolvePreparation(); await Promise.resolve();
     h.runNextFrame("exact-after-settle-pass-political");
     assert.equal(h.events.includes("prepare:political"), true);
-    assert.deepEqual(preparationEpochs, [1, 1], "retry must preserve the prepared snapshot epoch");
+    assert.deepEqual(preparationEpochs, [1, 1, 1], "retry must preserve the prepared snapshot epoch");
     h.runNextFrame("exact-after-settle-pass-borders");
     assert.equal(h.runtimeState.exactAfterSettleController.phase, "awaiting-paint");
     assert.equal(h.events.filter((event) => event === "invalidate:political:exact-after-settle-political").length, 1);
   } finally { h.restore(); }
+});
+
+test("exact preflight starts all private producers at one epoch without awaiting deferred work", async () => {
+  const starts = [];
+  let resolvePolitical;
+  let ready = false;
+  const political = new Promise(resolve => { resolvePolitical = () => { ready = true; resolve(); }; });
+  const deferred = new Promise(() => {});
+  const h = createHarness({ includeContextPasses: true, includeWaterPass: true,
+    prepareRenderPassAsync: pass => {
+      starts.push([pass, h.events.filter(event => event === "invalidate:political:exact-after-settle-political").length]);
+      if (pass === "political") return ready ? null : political;
+      if (pass === "labels" || pass === "contextScenario") return deferred;
+      return null;
+    } });
+  try {
+    h.cache.dirty.physicalBase = true;
+    h.cache.dirty.contextScenario = true;
+    h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+    h.runTimer(); h.runNextFrame(); h.runNextFrame();
+    assert.deepEqual(starts, ["physicalBase", "contextScenario", "political", "borders", "labels"].map(pass => [pass, 1]));
+    assert.equal(h.events.some(event => event.startsWith("prepare:")), false, "preflight cannot paint a pass");
+    h.runNextFrame("exact-after-settle-pass-physicalBase");
+    h.runNextFrame("exact-after-settle-pass-political");
+    assert.equal(h.events.includes("prepare:borders"), false);
+    resolvePolitical(); await Promise.resolve();
+    h.runNextFrame("exact-after-settle-pass-political");
+    h.runNextFrame("exact-after-settle-pass-borders");
+    assert.equal(h.runtimeState.exactAfterSettleController.phase, "awaiting-paint", "deferred promises cannot delay exact paint");
+    assert.deepEqual(h.events.filter(event => event.startsWith("prepare:")), ["prepare:physicalBase", "prepare:political", "prepare:borders"]);
+    assert.equal(h.events.filter(event => event === "invalidate:political:exact-after-settle-political").length, 1);
+  } finally { h.restore(); }
+});
+
+test("repeated preparation yields preserve one political epoch and fence late failures", async () => {
+  for (const outcome of ["complete", "replacement"]) {
+    let firstReady, secondReady, secondFailed;
+    let stage = 0;
+    const first = new Promise(resolve => { firstReady = () => { stage = 1; resolve(); }; });
+    const second = new Promise((resolve, reject) => {
+      secondReady = () => { stage = 2; resolve(); };
+      secondFailed = reject;
+    });
+    const h = createHarness({ prepareRenderPassAsync: pass => pass === "political"
+      ? [first, second, null][stage] : null });
+    try {
+      h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+      h.runTimer(); h.runNextFrame(); h.runNextFrame();
+      h.runNextFrame("exact-after-settle-pass-political");
+      firstReady(); await Promise.resolve();
+      h.runNextFrame("exact-after-settle-pass-political");
+      assert.equal(h.events.includes("prepare:political"), false);
+      assert.equal(h.runtimeState.exactAfterSettleController.phase, "applying");
+      assert.equal(h.events.filter(event => event === "invalidate:political:exact-after-settle-political").length, 1);
+      if (outcome === "complete") {
+        secondReady(); await Promise.resolve();
+        h.runNextFrame("exact-after-settle-pass-political");
+        h.runNextFrame("exact-after-settle-pass-borders");
+        assert.equal(h.runtimeState.exactAfterSettleController.phase, "awaiting-paint");
+        assert.equal(h.events.filter(event => event === "prepare:political").length, 1);
+        assert.equal(h.events.filter(event => event === "invalidate:political:exact-after-settle-political").length, 1);
+      } else {
+        h.scheduler.cancelExactAfterSettleRefresh();
+        h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+        const generation = h.runtimeState.exactAfterSettleController.generation;
+        const aborts = h.events.filter(event => event === "metric:settleExactRefreshAbortBeforePaint").length;
+        secondFailed(new Error("superseded second yield"));
+        await Promise.resolve(); await Promise.resolve();
+        assert.equal(h.runtimeState.exactAfterSettleController.generation, generation);
+        assert.equal(h.runtimeState.exactAfterSettleController.phase, "scheduled");
+        assert.equal(h.events.filter(event => event === "metric:settleExactRefreshAbortBeforePaint").length, aborts);
+      }
+    } finally { h.restore(); }
+  }
+});
+
+test("rejected speculative deferred preparation cannot abort a replacement generation", async () => {
+  for (const failedPass of ["labels", "political"]) {
+  let rejectDeferred;
+  const deferred = new Promise((_, reject) => { rejectDeferred = reject; });
+  const h = createHarness({ prepareRenderPassAsync: pass => pass === failedPass ? deferred : null });
+  try {
+    h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+    h.runTimer(); h.runNextFrame(); h.runNextFrame();
+    h.runNextFrame("exact-after-settle-pass-political");
+    h.scheduler.cancelExactAfterSettleRefresh();
+    h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+    const generation = h.runtimeState.exactAfterSettleController.generation;
+    const aborts = h.events.filter(event => event === "metric:settleExactRefreshAbortBeforePaint").length;
+    rejectDeferred(new Error("old source")); await Promise.resolve(); await Promise.resolve();
+    assert.equal(h.runtimeState.exactAfterSettleController.generation, generation);
+    assert.equal(h.runtimeState.exactAfterSettleController.phase, "scheduled");
+    assert.equal(h.events.filter(event => event === "metric:settleExactRefreshAbortBeforePaint").length, aborts);
+  } finally { h.restore(); }
+  }
 });
 
 test("late preparation cannot draw an old generation or an interrupted gesture", async () => {

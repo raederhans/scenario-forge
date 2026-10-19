@@ -2,6 +2,69 @@ import { IDLE_RENDER_PASS_DEFINITIONS } from "./render_pipeline_catalog.js";
 import { EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES } from "./exact_after_settle_pass_catalog.js";
 import { coversViewport } from "./cached_surface_coverage.js";
 
+// Start private candidates without publishing pass canvases. A null result
+// means the caller's guard or synchronous failure interrupted the traversal.
+export function preflightPrivateRenderPasses(definitions, {
+  prepareRenderPassAsync,
+  shouldPrepare = () => true,
+  beforePrepare = () => true,
+  onPrepareError,
+}) {
+  let preparationPending = false;
+  for (const [passName] of definitions) {
+    if (!["political", "physicalBase", "contextScenario", "contextMarkers", "borders", "labels"].includes(passName)
+      || !shouldPrepare(passName)) continue;
+    if (!beforePrepare(passName)) return null;
+    try {
+      const preparation = prepareRenderPassAsync(passName);
+      if (preparation) {
+        preparationPending = true;
+        if (onPrepareError) Promise.resolve(preparation).catch(error => onPrepareError(passName, error));
+      }
+    } catch (error) {
+      if (!onPrepareError) throw error;
+      onPrepareError(passName, error);
+      return null;
+    }
+  }
+  return preparationPending;
+}
+
+// Preparation may yield more than once. Resume the same pass only while its
+// scheduler generation is current, then publish passes in catalog order.
+export function prepareExactRenderPassesInSlices({
+  definitions, generation, enqueueFrameTask, prepareRenderPassAsync,
+  canPreparePass, isGenerationCurrent, onPrepareError, onPassReady, onComplete, nowMs,
+}) {
+  const enqueueNextPass = (index) => {
+    if (index >= definitions.length) {
+      onComplete();
+      return;
+    }
+    const [passName, drawFn] = definitions[index];
+    enqueueFrameTask(() => {
+      const passStartedAt = nowMs();
+      if (!canPreparePass(passName)) return;
+      const preparation = prepareRenderPassAsync(passName);
+      if (preparation) {
+        Promise.resolve(preparation).then(() => {
+          if (isGenerationCurrent()) enqueueNextPass(index);
+        }).catch(() => onPrepareError(passName));
+        return;
+      }
+      onPassReady(passName, drawFn, index, passStartedAt);
+      enqueueNextPass(index + 1);
+    }, {
+      priority: "high",
+      label: `exact-after-settle-pass-${passName}`,
+      generation,
+      dedupe: true,
+      deferOnContinuousInput: false,
+    });
+  };
+  enqueueNextPass(0);
+}
+
 export function createRenderPipelinePassesOwner({
   state = {},
   constants = {},
@@ -142,7 +205,8 @@ export function createRenderPipelinePassesOwner({
     ) {
       return;
     }
-    if (passName === "contextScenario" && prepareRenderPassAsync(passName)) return false;
+    if ((passName === "physicalBase" || passName === "contextScenario" || passName === "contextMarkers" || passName === "borders" || passName === "labels")
+      && prepareRenderPassAsync(passName)) return false;
     renderPassToCache(passName, drawFn, transform, timings);
   }
 
@@ -160,12 +224,17 @@ export function createRenderPipelinePassesOwner({
     // Color resolution and transformed-frame fallbacks can change the exact
     // identity after the frame-level worker check. Gate the actual paint here,
     // before clearing any pass canvas, including while still settling.
-    if ((!requestedPassNames || requestedPassNames.has("political"))
-      && (cache.dirty.political
-        || cache.signatures.political !== getRenderPassSignature("political", transform))
-      && prepareRenderPassAsync("political")) return false;
     const definitions = getIdleRenderPassDefinitions()
       .filter(([passName]) => !requestedPassNames || requestedPassNames.has(passName));
+    // These producers own private candidates and independent cancellation
+    // fences. Start all of them before waiting for any one of them; no pass
+    // canvas is cleared or published by this preflight.
+    const preparationPending = preflightPrivateRenderPasses(definitions, {
+      prepareRenderPassAsync,
+      shouldPrepare: passName => cache.dirty[passName]
+        || cache.signatures[passName] !== getRenderPassSignature(passName, transform),
+    });
+    if (preparationPending) return false;
     const startedAt = nowMs();
     for (let index = 0; index < definitions.length; index += 1) {
       const [passName, drawFn] = definitions[index];

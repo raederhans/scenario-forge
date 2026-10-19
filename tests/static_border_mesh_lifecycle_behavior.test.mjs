@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   createStaticBorderMeshLifecycle,
   getCoastlineDecisionSignature,
@@ -85,11 +86,165 @@ test("worker wait releases recovery ownership and commits only after quiet admis
   h.setSettled(true); h.drain(); assert.equal(commits, 1);
   assert.equal(h.owner.hasPendingWork(), false);
   assert.equal(h.events.some(([name]) => name === "country"), false);
+  assert.ok(h.events.filter(([name]) => name === "schedule").every(([, timeout]) => timeout === 360));
+  assert.ok(h.events.filter(([name]) => name === "settled").every(([, quietMs]) => quietMs === 900));
+});
+
+test("retained Worker start and complete commit need no additional quiet period", async () => {
+  let resolve; let commits = 0;
+  const quietRequests = [];
+  const h = harness({ isRetainedSceneActive: () => true,
+    isInteractionRecoverySettled: ({ quietMs }) => { quietRequests.push(quietMs); return quietMs === 0; },
+    buildDeferredBorderMeshesAsync: () => new Promise(done => { resolve = done; }),
+    commitDeferredBorderMeshes: () => { commits++; return true; } });
+  h.owner.scheduleDeferredHeavyBorderMeshes(); h.run(); await Promise.resolve();
+  assert.equal(commits, 0, "uncompleted private preparation cannot publish");
+  assert.equal(h.pending.size, 0);
+  assert.equal(h.events.filter(([name]) => name === "end").length, 1, "Worker wait releases admission");
+  resolve({}); for (let index = 0; index < 8; index++) await Promise.resolve();
+  h.drain();
+  assert.equal(commits, 1);
+  assert.deepEqual(quietRequests, [0, 0]);
+  assert.deepEqual(h.events.filter(([name]) => name === "schedule").map(([, timeout]) => timeout), [16, 16]);
+  assert.equal(h.events.filter(([name]) => name === "snapshot").length, 1);
+  assert.equal(h.events.filter(([name]) => name === "render").length, 1);
+  assert.equal(h.events.some(([name]) => name === "country" || name === "detail"), false);
+});
+
+test("retained private launch and admitted ready commit can finish during exact paint wait", async () => {
+  let resolve; let starts = 0; let commits = 0; let canStart = true;
+  const h = harness({ isRetainedSceneActive: () => true,
+    canStartPrivateBorderMeshPreparation: () => canStart,
+    buildDeferredBorderMeshesAsync: () => { starts++; return new Promise(done => { resolve = done; }); },
+    commitDeferredBorderMeshes: () => { commits++; return true; } });
+  h.setSettled(false); h.owner.scheduleDeferredHeavyBorderMeshes(); h.run(); await Promise.resolve();
+  assert.equal(starts, 1, "private launch does not depend on exact paint completion");
+  assert.equal(h.events.filter(([name]) => name === "end").length, 1);
+  canStart = false;
+  resolve({}); for (let index = 0; index < 8; index++) await Promise.resolve();
+  h.run(); assert.equal(commits, 0, "ready Worker result still observes private admission blockers");
+  assert.equal(h.events.some(([name]) => name === "snapshot" || name === "render"), false);
+  canStart = true; h.drain();
+  assert.equal(commits, 1);
+  assert.ok(h.events.filter(([name]) => name === "settled").every(([, quietMs]) => quietMs === 0));
+});
+
+test("early private launch stays retained-only and cannot run native fallback before settlement", async () => {
+  for (const retained of [false, true]) {
+    let starts = 0;
+    const h = harness({ isRetainedSceneActive: () => retained,
+      canStartPrivateBorderMeshPreparation: () => true,
+      buildDeferredBorderMeshesAsync: async () => { starts++; return null; },
+      commitDeferredBorderMeshes: () => assert.fail("no result to commit") });
+    h.setSettled(false); h.owner.scheduleDeferredHeavyBorderMeshes(); h.run();
+    for (let index = 0; index < 8; index++) await Promise.resolve();
+    assert.equal(starts, retained ? 1 : 0);
+    if (retained) h.run();
+    assert.equal(h.events.some(([name]) => name === "country" || name === "snapshot"), false);
+    h.setSettled(true); h.drain();
+    for (let index = 0; index < 8; index++) await Promise.resolve();
+    h.drain();
+    assert.ok(h.events.some(([name]) => name === "country"));
+  }
+});
+
+test("early private Worker result cannot publish after cancellation or source replacement", async () => {
+  for (const change of ["cancel", "source"]) {
+    let resolve; let signal; let commits = 0;
+    const h = harness({ isRetainedSceneActive: () => true,
+      canStartPrivateBorderMeshPreparation: () => true,
+      buildDeferredBorderMeshesAsync: request => { signal = request.signal; return new Promise(done => { resolve = done; }); },
+      commitDeferredBorderMeshes: () => { commits++; return true; } });
+    h.setSettled(false); h.owner.scheduleDeferredHeavyBorderMeshes(); h.run(); await Promise.resolve();
+    if (change === "cancel") h.owner.cancelDeferredHeavyBorderMeshes();
+    else h.state.topologyDetail = {};
+    resolve({}); for (let index = 0; index < 8; index++) await Promise.resolve();
+    h.setSettled(true);
+    if (change === "cancel") {
+      assert.equal(signal.aborted, true);
+      assert.equal(h.pending.size, 0);
+    } else {
+      assert.equal(h.pending.size, 1, "changed input queues fresh private preparation");
+      h.run(); await Promise.resolve();
+      h.owner.cancelDeferredHeavyBorderMeshes();
+      resolve({}); for (let index = 0; index < 8; index++) await Promise.resolve();
+    }
+    assert.equal(commits, 0);
+    assert.equal(h.events.some(([name]) => name === "snapshot" || name === "render"), false);
+  }
+});
+
+test("host private launch gate preserves input, render-phase and recovery ownership blockers", () => {
+  const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
+  const body = source.match(/function canStartPrivateBorderMeshPreparation\(\) \{([\s\S]*?)\n\}/)?.[1];
+  assert.ok(body);
+  const allowed = new Function("runtimeState", "RENDER_PHASE_IDLE", "exportRenderInProgress = false", body);
+  const state = { renderPhase: "idle", isInteracting: false, activeInteractionRecoveryTaskKey: "", deferExactAfterSettle: true,
+    exactAfterSettleController: { phase: "awaiting-paint" } };
+  assert.equal(allowed(state, "idle"), true);
+  assert.equal(allowed(state, "idle", true), false, "export retains the native recovery gate");
+  for (const change of [{ renderPhase: "interacting" }, { isInteracting: true }, { activeInteractionRecoveryTaskKey: "another-task" }]) {
+    assert.equal(allowed({ ...state, ...change }, "idle"), false);
+  }
+});
+
+test("retained Worker start and completion still wait for interaction and task admission gates", async () => {
+  let resolve; let starts = 0; let commits = 0;
+  const h = harness({ isRetainedSceneActive: () => true,
+    buildDeferredBorderMeshesAsync: () => { starts++; return new Promise(done => { resolve = done; }); },
+    commitDeferredBorderMeshes: () => { commits++; return true; } });
+  h.setSettled(false); h.owner.scheduleDeferredHeavyBorderMeshes(); h.run(); await Promise.resolve();
+  assert.equal(starts, 0); assert.equal(h.events.some(([name]) => name === "begin"), false);
+  h.setSettled(true); h.setAdmitted(false); h.run(); await Promise.resolve();
+  assert.equal(starts, 0);
+  h.setAdmitted(true); h.run(); await Promise.resolve(); assert.equal(starts, 1);
+  resolve({}); for (let index = 0; index < 8; index++) await Promise.resolve();
+  h.setSettled(false); h.run(); assert.equal(commits, 0);
+  h.setSettled(true); h.setAdmitted(false); h.run(); assert.equal(commits, 0);
+  assert.equal(h.events.some(([name]) => name === "snapshot" || name === "render"), false);
+  h.setAdmitted(true); h.drain(); assert.equal(commits, 1);
+  assert.ok(h.events.filter(([name]) => name === "schedule").every(([, timeout]) => timeout === 16));
+  assert.ok(h.events.filter(([name]) => name === "settled").every(([, quietMs]) => quietMs === 0));
+});
+
+for (const failure of ["rejection", "null-result"]) {
+  test(`retained Worker ${failure} restores native quiet and scheduling policy`, async () => {
+    const h = harness({ isRetainedSceneActive: () => true,
+      buildDeferredBorderMeshesAsync: async () => { if (failure === "rejection") throw new Error("unavailable"); return null; },
+      commitDeferredBorderMeshes: () => assert.fail("failed Worker cannot commit") });
+    h.owner.scheduleDeferredHeavyBorderMeshes();
+    const preparation = h.owner.getPrivatePreparationPromise();
+    assert.ok(preparation);
+    h.run();
+    for (let index = 0; index < 8; index++) await Promise.resolve();
+    await preparation;
+    assert.equal(h.owner.getPrivatePreparationPromise(), null, "native fallback cannot hold the private paint fence");
+    assert.equal(h.events.filter(([name]) => name === "schedule").at(-1)[1], 360);
+    h.setSettled(false); h.run();
+    assert.deepEqual(h.events.filter(([name]) => name === "settled").at(-1), ["settled", 900]);
+    assert.equal(h.events.some(([name]) => name === "country" || name === "snapshot"), false);
+    h.setSettled(true); h.drain();
+    assert.ok(h.events.some(([name]) => name === "country"));
+    assert.deepEqual(h.events.filter(([name]) => name === "schedule").map(([, timeout]) => timeout), [16, 360, 360, 360]);
+  });
+}
+
+test("retained scene without both Worker ports keeps the native quiet policy", () => {
+  for (const ports of [{}, { buildDeferredBorderMeshesAsync: () => assert.fail("missing commit port") },
+    { commitDeferredBorderMeshes: () => assert.fail("missing build port") }]) {
+    const h = harness({ isRetainedSceneActive: () => true, ...ports });
+    h.owner.scheduleDeferredHeavyBorderMeshes();
+    assert.equal(h.owner.getPrivatePreparationPromise(), null);
+    h.drain();
+    assert.ok(h.events.filter(([name]) => name === "schedule").every(([, timeout]) => timeout === 360));
+    assert.ok(h.events.filter(([name]) => name === "settled").every(([, quietMs]) => quietMs === 900));
+  }
 });
 
 test("cancelled worker result cannot commit or clear a newer job", async () => {
   let resolve; let signal; let commits = 0;
-  const h = harness({ buildDeferredBorderMeshesAsync: (request) => { signal = request.signal; return new Promise((done) => { resolve = done; }); },
+  const h = harness({ isRetainedSceneActive: () => true,
+    buildDeferredBorderMeshesAsync: (request) => { signal = request.signal; return new Promise((done) => { resolve = done; }); },
     commitDeferredBorderMeshes: () => { commits++; return true; } });
   h.owner.scheduleDeferredHeavyBorderMeshes(); h.run(); await Promise.resolve();
   h.owner.scheduleDeferredHeavyBorderMeshes(); assert.equal(signal.aborted, true);
@@ -107,7 +262,8 @@ test("worker errors use the existing synchronous mesh path", async () => {
 
 test("scene changes discard worker replies and restart current selection", async () => {
   let resolve; let commits = 0;
-  const h = harness({ buildDeferredBorderMeshesAsync: () => new Promise((done) => { resolve = done; }),
+  const h = harness({ isRetainedSceneActive: () => true,
+    buildDeferredBorderMeshesAsync: () => new Promise((done) => { resolve = done; }),
     commitDeferredBorderMeshes: () => { commits++; return true; } });
   h.owner.scheduleDeferredHeavyBorderMeshes(); h.run(); await Promise.resolve();
   h.state.sceneGeneration = 2; resolve({});
@@ -251,6 +407,7 @@ for (const identityKey of ["topologyPrimary", "topology", "topologyDetail", "run
     const requests = [];
     const commits = [];
     const h = harness({
+      isRetainedSceneActive: () => true,
       buildDeferredBorderMeshesAsync: (request) => new Promise((resolve) => requests.push({ request, resolve })),
       commitDeferredBorderMeshes: (result) => { commits.push(result); return true; },
     });
@@ -311,3 +468,119 @@ for (const change of ["scene", "topology", "owner", "viewport", "sceneGeneration
     assert.equal(h.events.filter(([name]) => name === "render").length, 1);
   });
 }
+
+test("border candidate queries include the actual paint margin and invalidate their bounds identity", () => {
+  let margin = 0;
+  const fixture = harness({ getPaintOverscanPx: () => margin,
+    getProjectedViewportBounds: ({ overscanPx }) => ({ minX: -overscanPx, minY: -overscanPx, maxX: 10 + overscanPx, maxY: 10 + overscanPx }) });
+  fixture.state.spatialItems.push({ countryCode: "bb", minX: -70, minY: 1, maxX: -60, maxY: 2 });
+  assert.deepEqual([...fixture.owner.getVisibleCountryCodesForBorderMeshes()], ["AA"]);
+  margin = 96;
+  assert.deepEqual([...fixture.owner.getVisibleCountryCodesForBorderMeshes()], ["AA", "BB"]);
+  margin = 0;
+  assert.deepEqual([...fixture.owner.getVisibleCountryCodesForBorderMeshes()], ["AA"]);
+});
+
+test("private preparation waits across queued, Worker and ready states through recovery release", async () => {
+  let resolve, canStart = false;
+  const h = harness({ isRetainedSceneActive: () => true,
+    canStartPrivateBorderMeshPreparation: () => canStart,
+    buildDeferredBorderMeshesAsync: () => new Promise(done => { resolve = done; }),
+    commitDeferredBorderMeshes: () => true });
+  assert.equal(h.owner.getPrivatePreparationPromise(), null);
+  h.setSettled(false); h.owner.scheduleDeferredHeavyBorderMeshes();
+  const preparation = h.owner.getPrivatePreparationPromise();
+  let complete = false;
+  preparation.then(() => { complete = true; assert.equal(h.events.at(-1)[0], "end"); });
+  h.run(); await Promise.resolve();
+  assert.equal(complete, false);
+  assert.equal(h.owner.getPrivatePreparationPromise(), preparation);
+  canStart = true; h.run(); await Promise.resolve();
+  assert.equal(h.owner.getPrivatePreparationPromise(), preparation);
+  resolve({}); for (let index = 0; index < 8; index++) await Promise.resolve();
+  assert.equal(complete, false, "a ready but unpublished source still holds the private fence");
+  h.run(); await preparation;
+  assert.equal(complete, true);
+  assert.equal(h.owner.getPrivatePreparationPromise(), null);
+  assert.equal(h.events.filter(([name]) => name === "begin").length, 2);
+  assert.equal(h.events.filter(([name]) => name === "end").length, 2);
+});
+
+test("cancel and restart resolve the old private waiter without resolving a newer queued run", async () => {
+  const requests = [];
+  const h = harness({ isRetainedSceneActive: () => true,
+    buildDeferredBorderMeshesAsync: () => new Promise(resolve => requests.push(resolve)),
+    commitDeferredBorderMeshes: () => assert.fail("cancelled result cannot commit") });
+  h.owner.scheduleDeferredHeavyBorderMeshes();
+  const first = h.owner.getPrivatePreparationPromise();
+  h.run(); await Promise.resolve();
+  h.owner.scheduleDeferredHeavyBorderMeshes(); await first;
+  const second = h.owner.getPrivatePreparationPromise();
+  assert.notEqual(first, second);
+  let done = false; second.then(() => { done = true; });
+  requests[0]({}); for (let index = 0; index < 8; index++) await Promise.resolve();
+  assert.equal(done, false);
+  assert.equal(h.owner.getPrivatePreparationPromise(), second);
+  h.owner.cancelDeferredHeavyBorderMeshes(); await second;
+  assert.equal(h.owner.getPrivatePreparationPromise(), null);
+});
+
+test("stale ready work resolves its old waiter, starts a fresh fence and cannot commit across identity changes", async () => {
+  let resolve, commits = 0, changeAtAdmission = false;
+  const h = harness({ isRetainedSceneActive: () => true,
+    canStartPrivateBorderMeshPreparation: () => true,
+    beginInteractionRecoveryTask: () => {
+      if (changeAtAdmission) { h.state.topologyDetail = {}; changeAtAdmission = false; }
+      return true;
+    },
+    buildDeferredBorderMeshesAsync: () => new Promise(done => { resolve = done; }),
+    commitDeferredBorderMeshes: () => { commits++; return true; } });
+  h.setSettled(false); h.owner.scheduleDeferredHeavyBorderMeshes();
+  const first = h.owner.getPrivatePreparationPromise();
+  h.run(); await Promise.resolve();
+  resolve({}); for (let index = 0; index < 8; index++) await Promise.resolve();
+  changeAtAdmission = true; h.run(); await first;
+  assert.equal(commits, 0, "commit rechecks full identity after obtaining recovery admission");
+  assert.ok(h.owner.getPrivatePreparationPromise());
+  assert.notEqual(h.owner.getPrivatePreparationPromise(), first);
+  h.run(); await Promise.resolve();
+  resolve({}); for (let index = 0; index < 8; index++) await Promise.resolve();
+  const second = h.owner.getPrivatePreparationPromise();
+  h.drain(); await second;
+  assert.equal(commits, 1);
+  assert.equal(h.owner.getPrivatePreparationPromise(), null);
+});
+
+test("retained exit releases the private fence while ready publication retains the native settled gate", async () => {
+  let retained = true, resolve, commits = 0;
+  const h = harness({ isRetainedSceneActive: () => retained,
+    canStartPrivateBorderMeshPreparation: () => true,
+    buildDeferredBorderMeshesAsync: () => new Promise(done => { resolve = done; }),
+    commitDeferredBorderMeshes: () => { commits++; return true; } });
+  h.setSettled(false); h.owner.scheduleDeferredHeavyBorderMeshes();
+  const preparation = h.owner.getPrivatePreparationPromise();
+  h.run(); await Promise.resolve();
+  retained = false;
+  assert.equal(h.owner.getPrivatePreparationPromise(), null); await preparation;
+  resolve({}); for (let index = 0; index < 8; index++) await Promise.resolve();
+  h.run(); assert.equal(commits, 0);
+  h.setSettled(true); h.drain(); assert.equal(commits, 1);
+});
+
+test("synchronous commit and queue failures release private waiters without swallowing errors", async () => {
+  const h = harness({ isRetainedSceneActive: () => true,
+    buildDeferredBorderMeshesAsync: async () => ({}),
+    commitDeferredBorderMeshes: () => { throw new Error("commit failure"); } });
+  h.owner.scheduleDeferredHeavyBorderMeshes();
+  const preparation = h.owner.getPrivatePreparationPromise();
+  h.run(); for (let index = 0; index < 8; index++) await Promise.resolve();
+  assert.throws(() => h.run(), /commit failure/);
+  await preparation;
+  assert.equal(h.owner.getPrivatePreparationPromise(), null);
+  assert.equal(h.events.at(-1)[0], "end");
+  const queue = harness({ isRetainedSceneActive: () => true,
+    buildDeferredBorderMeshesAsync: async () => ({}), commitDeferredBorderMeshes: () => true,
+    scheduleDeferredWork: () => { throw new Error("queue failure"); } });
+  assert.throws(() => queue.owner.scheduleDeferredHeavyBorderMeshes(), /queue failure/);
+  assert.equal(queue.owner.getPrivatePreparationPromise(), null);
+});

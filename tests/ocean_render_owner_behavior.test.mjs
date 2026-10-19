@@ -362,6 +362,19 @@ test("coastal transition keeps a narrow screen-space extension across zooms", ()
   }
 });
 
+test("coastal transition strokes a prepared path after applying both clips", () => {
+  const events = [], prepared = { preparedPath: true };
+  const harness = createOwner({ helperOverrides: {
+    applyOceanClipMask: () => events.push("ocean-clip"),
+    clipOutAtlantropaAccentRegions: () => events.push("atlantropa-clip"),
+  } });
+  assert.equal(harness.owner.drawCoastalTransition(2, {
+    lineWidth: 0.9, buildPath: () => { events.push("prepared-path"); return prepared; },
+  }), true);
+  assert.deepEqual(events, ["ocean-clip", "atlantropa-clip", "prepared-path"]);
+  assert.equal(harness.context.calls.find(call => call.type === "stroke").path, prepared);
+});
+
 test("coastal transition rejects disabled or unusable requests before clipping or geometry", () => {
   for (const state of [
     { styleConfig: { coastlines: { opacity: 0 } } },

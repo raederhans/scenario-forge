@@ -221,10 +221,11 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
   const referenceUrl = new URL(baseUrl);
   // The opt-in producer already excludes these alternative bitmap producers.
   // Disable them for the paired OFF frame so the oracle is native Canvas.
+  // TNO auto mode is raster-first; the reference must explicitly opt out.
   referenceUrl.searchParams.set("geometry_worker", "0");
   referenceUrl.searchParams.set("political_raster_worker_bitmap", "0");
   const startupStarted = performance.now();
-  const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, viewport, enabled: null, published, holdRasterAssets: recoverAssets });
+  const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, viewport, enabled: false, published, holdRasterAssets: recoverAssets });
   const { page } = session;
   const report = { scenarioId, dpr, viewport, requirePrebuiltAssets, expectNativeBudgetFallback, baseUrl, views: [], completedStages: [], timings: { startupMs: performance.now() - startupStarted } };
   async function runPhase(name, action) {
@@ -266,7 +267,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
   }
   async function prepareNativeReferences() {
     assert.equal(await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().requested), false);
-    assert.equal(session.network.length, 0, "default-off must not download raster assets");
+    assert.equal(session.network.length, 0, "explicit native reference must not download raster assets");
     await toggle(page, false);
     await settled(page);
     if (expectNativeBudgetFallback) {

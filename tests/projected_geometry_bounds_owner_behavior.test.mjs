@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import fs from "node:fs";
+import vm from "node:vm";
 
 import { createProjectedGeometryBoundsOwner } from "../js/core/renderer/projected_geometry_bounds_owner.js";
 import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
@@ -293,6 +295,99 @@ test("computeProjectedGeoBounds falls back to coordinate projection when path bo
     height: 1,
     area: 1,
   });
+});
+
+test("native-only bounds reuse native results without adopting coordinate fallbacks", () => {
+  const feature = createFeature("A", createPolygon([1, 2]));
+  let nativeBounds = [[1, 2], [11, 22]];
+  const { owner, calls } = createHarness({ pathBounds: () => nativeBounds });
+  const first = owner.computeProjectedGeoBounds(feature);
+  assert.equal(owner.computeProjectedGeoBounds({ ...feature }, { allowCoordinateFallback: false }), first);
+  assert.equal(calls.pathBounds, 1);
+
+  for (const invalid of [null, [[NaN, 0], [1, 1]]]) {
+    owner.clearProjectedBoundsCache();
+    nativeBounds = invalid;
+    assert.ok(owner.computeProjectedGeoBounds(feature), "default keeps the coordinate fallback");
+    assert.equal(owner.computeProjectedGeoBounds(feature, { allowCoordinateFallback: false }), null);
+    nativeBounds = [[3, 4], [13, 24]];
+    assert.equal(owner.computeProjectedGeoBounds(feature, { allowCoordinateFallback: false }).minX, 3);
+  }
+
+  let repaired = false;
+  const throwing = createHarness({ pathBounds: () => {
+    if (!repaired) throw new Error("native path unavailable");
+    return [[5, 6], [15, 26]];
+  } });
+  assert.equal(throwing.owner.computeProjectedGeoBounds(feature, { allowCoordinateFallback: false }), null);
+  assert.ok(throwing.owner.computeProjectedGeoBounds(feature));
+  repaired = true;
+  assert.equal(throwing.owner.computeProjectedGeoBounds(feature, { allowCoordinateFallback: false }).minX, 5);
+  assert.equal(throwing.calls.pathBounds, 3, "fallbacks and failures never populate the native cache");
+});
+
+test("native-only bounds invalidate on projection, scenario, path and geometry identity changes", () => {
+  let projection = p => p, scenarioId = "tno_1962", count = 0;
+  const newPath = () => ({ bounds: () => { count++; return [[count, 2], [count + 10, 22]]; } });
+  let path = newPath();
+  const owner = createProjectedGeometryBoundsOwner({ getters: {
+    getProjection: () => projection,
+    getPathCanvas: () => path,
+    getActiveScenarioId: () => scenarioId,
+  } });
+  let feature = createFeature("A", createPolygon([1, 2]));
+  const read = () => owner.computeProjectedGeoBounds(feature, { allowCoordinateFallback: false });
+  const first = read();
+  feature = { ...feature };
+  assert.equal(read(), first);
+  markProjectionGeometryChanged(projection);
+  assert.equal(read().minX, 2);
+  projection = p => p;
+  assert.equal(read().minX, 3);
+  scenarioId = "other";
+  assert.equal(read().minX, 4);
+  path = newPath();
+  assert.equal(read().minX, 5);
+  feature = { ...feature, geometry: structuredClone(feature.geometry) };
+  assert.equal(read().minX, 6);
+  assert.equal(read().minX, 6);
+  assert.equal(count, 6);
+});
+
+test("stable projection bounds survive drawing-target changes with exact bundled d3 native values", () => {
+  const sandbox = {};
+  vm.runInNewContext(fs.readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), sandbox);
+  const { d3 } = sandbox;
+  const projection = d3.geoEqualEarth().precision(0.1).scale(128).translate([380, 250]);
+  const stablePath = d3.geoPath(projection).pointRadius(2);
+  const context = { moveTo() {}, lineTo() {}, closePath() {}, arc() {} };
+  let canvasPath = d3.geoPath(projection, context).pointRadius(2), calls = 0;
+  const nativeBounds = stablePath.bounds;
+  stablePath.bounds = shape => { calls++; return nativeBounds(shape); };
+  const owner = createProjectedGeometryBoundsOwner({ getters: {
+    getProjection: () => projection, getPathCanvas: () => canvasPath,
+    getBoundsPath: () => stablePath,
+  } });
+  const shapes = [createFeature("A", createPolygon([10, 25])),
+    { type: "Point", coordinates: [-110, 56] },
+    { type: "LineString", coordinates: [[-179, 40], [179, 42]] },
+    { type: "Sphere" }];
+  for (const shape of shapes) {
+    const expected = canvasPath.bounds(shape);
+    const first = owner.computeProjectedGeoBounds(shape, { allowCoordinateFallback: false });
+    assert.deepEqual([first.minX, first.minY, first.maxX, first.maxY],
+      [expected[0][0], expected[0][1], expected[1][0], expected[1][1]]);
+    const before = calls;
+    canvasPath = d3.geoPath(projection, context).pointRadius(2);
+    assert.equal(owner.computeProjectedGeoBounds(shape, { allowCoordinateFallback: false }), first);
+    assert.equal(calls, before, "temporary rendering paths do not evict the stable native result");
+  }
+  projection.scale(256);
+  markProjectionGeometryChanged(projection);
+  const expected = canvasPath.bounds(shapes[0]);
+  const changed = owner.computeProjectedGeoBounds(shapes[0], { allowCoordinateFallback: false });
+  assert.equal(changed.minX, expected[0][0]);
+  assert.equal(calls, shapes.length + 1);
 });
 
 test("rebuildProjectedBoundsCache rebuilds land and river feature entries", () => {

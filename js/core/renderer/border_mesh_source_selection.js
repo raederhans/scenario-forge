@@ -111,7 +111,16 @@ export function resolveScenarioOpeningOwnerBorderSelection({
   };
 }
 
-export function getSourceCountrySets({
+export function getSourceCountrySets(options = {}) {
+  const iterator = getSourceCountrySetsSteps(options);
+  let next = iterator.next();
+  while (!next.done) next = iterator.next();
+  return next.value;
+}
+
+// Both readers preserve feature iteration order and the nonempty full-source
+// preference. Private preparation can yield without publishing partial Sets.
+export function* getSourceCountrySetsSteps({
   state,
   getFeatureCountryCodeNormalized = () => "",
   getFeatureId = () => "",
@@ -124,17 +133,18 @@ export function getSourceCountrySets({
   const features = Array.isArray(state.landDataFull?.features) && state.landDataFull.features.length
     ? state.landDataFull.features
     : (Array.isArray(state.landData?.features) ? state.landData.features : []);
-  features.forEach((feature) => {
+  for (let index = 0, length = features.length; index < length; index++) {
+    if (!(index in features)) { yield; continue; }
+    const feature = features[index];
     const source = String(feature?.properties?.__source || "primary");
     const countryCode = getFeatureCountryCodeNormalized(feature);
     const featureId = getFeatureId(feature);
-    if (!countryCode || shouldExcludePoliticalInteractionFeature(feature, featureId)) return;
-    if (source === "detail") {
-      sets.detail.add(countryCode);
-      return;
+    if (countryCode && !shouldExcludePoliticalInteractionFeature(feature, featureId)) {
+      if (source === "detail") sets.detail.add(countryCode);
+      else sets.primary.add(countryCode);
     }
-    sets.primary.add(countryCode);
-  });
+    yield;
+  }
   return sets;
 }
 

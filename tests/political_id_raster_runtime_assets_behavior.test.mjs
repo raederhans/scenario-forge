@@ -7,6 +7,22 @@ import { createPoliticalIdRasterAssetStore, decodePoliticalIdRasterAsset, encode
 const EDGE_FLAG = 0x80000000;
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
+function idleScheduler(t) {
+  const request = globalThis.requestIdleCallback, cancel = globalThis.cancelIdleCallback;
+  const callbacks = new Map();
+  let sequence = 0;
+  globalThis.requestIdleCallback = callback => { callbacks.set(++sequence, callback); return sequence; };
+  globalThis.cancelIdleCallback = id => callbacks.delete(id);
+  t.after(() => {
+    if (request === undefined) delete globalThis.requestIdleCallback; else globalThis.requestIdleCallback = request;
+    if (cancel === undefined) delete globalThis.cancelIdleCallback; else globalThis.cancelIdleCallback = cancel;
+  });
+  return { get size() { return callbacks.size; }, run() {
+    const pending = [...callbacks.values()]; callbacks.clear();
+    for (const callback of pending) callback({ timeRemaining: () => 50, didTimeout: false });
+  } };
+}
+
 test("startup boundary waits for every writable-ready condition and preserves wait failure", async t => {
   const { waitRasterStartup } = await import("../tools/political_id_raster_app_session.mjs");
   const priorWindow = globalThis.window;
@@ -464,6 +480,7 @@ function fixture({
   height = 100,
   assetTimeoutMs = 1500,
   assetRetryAfterMs = 5000,
+  directPresentation = false,
   load = async () => null,
   assetStore: injectedAssetStore = null,
 } = {}) {
@@ -514,6 +531,7 @@ function fixture({
     canonicalCoordinates,
     assetTimeoutMs,
     assetRetryAfterMs,
+    directPresentation,
   });
   return {
     owner,
@@ -557,6 +575,8 @@ test("asset I/O maps only tile contributors while preserving edge IDs and global
   assert.deepEqual([...f.assetStore.loads[0].idToCode], [["stable-a", 1], ["edge-only", 2]],
     "each Worker read must avoid cloning unrelated scene IDs");
   await settleOneWorker(f, { edge: true });
+  assert.ok(f.owner.draw());
+  await waitFor(() => f.assetStore.saves.length === 1, "published coverage persists in a later task");
   const saved = f.assetStore.saves[0];
   assert.deepEqual([...saved.options.codeToId], [[1, "stable-a"], [2, "edge-only"]]);
   const remapped = decodePoliticalIdRasterAsset(saved.buffer, {
@@ -644,11 +664,12 @@ test("an asset miss builds with the worker, saves stable IDs, and exported bytes
 
   const request = await settleOneWorker(f, { marker: "worker-built", edge: true });
   assert.equal(f.owner.getPendingWorkCount(), 0);
-  assert.equal(f.assetStore.saves.length, 1);
-  assert.equal(f.assetStore.loads[0].identity, f.assetStore.saves[0].identity);
+  assert.equal(f.assetStore.saves.length, 0);
   assert.equal(f.owner.getDiagnostics().builds, 1);
   assert.equal(f.owner.getDiagnostics().failed, "");
   assert.ok(f.owner.draw());
+  await waitFor(() => f.assetStore.saves.length === 1, "published coverage persists in a later task");
+  assert.equal(f.assetStore.loads[0].identity, f.assetStore.saves[0].identity);
 
   const exports = await f.owner.exportAssets();
   assert.equal(exports.length, 1);
@@ -695,6 +716,7 @@ for (const mismatch of ["size", "origin"]) {
     assert.equal(f.owner.getDiagnostics().assetHits, 0);
     assert.equal(f.owner.getDiagnostics().builds, 1);
     assert.ok(f.owner.draw());
+    await waitFor(() => !!repaired, "repair persists only after publication");
     const tile = decodePoliticalIdRasterAsset(repaired.payload, {
       identity: repaired.identity, idToCode: new Map([["stable-a", 1]]),
     });
@@ -856,12 +878,13 @@ test("dispose aborts a pending asset load and disposes injected dependencies", a
   assert.equal(f.requests.length, 0);
 });
 
-test("a never-settling asset save times out, releases the pump, and still commits later tiles", async (t) => {
+test("slow persistence cannot block the next tile or full publication, and save retention stays bounded", async (t) => {
+  const idle = idleScheduler(t);
   const f = fixture({
     transform: { x: 0, y: 200, k: 1 },
     width: 600,
     height: 100,
-    assetTimeoutMs: 10,
+    assetTimeoutMs: 1000,
     features: [feature("stable-a", { minX: -700, minY: -300, maxX: 1200, maxY: 100 })],
   });
   const hangingSaves = [];
@@ -884,27 +907,151 @@ test("a never-settling asset save times out, releases the pump, and still commit
 
   for (let index = 0; index < expected.tiles.length; index += 1) {
     const request = f.requests[index];
-    assert.ok(request, `worker request ${index + 1} should follow the previous save timeout`);
+    assert.ok(request, `worker request ${index + 1} must proceed while persistence is pending`);
     request.resolve(makeTile(request.packet, { marker: `timeout-tile-${index}` }));
-    await waitFor(() => hangingSaves.length === index + 1 && hangingSaves[index].signal.aborted,
-      `asset save ${index + 1} should time out and abort its operation signal`);
-    assert.equal(hangingSaves[index].settled, false);
+    await drain();
+    assert.equal(hangingSaves.length, 0, "preparation must never compete with persistence for IndexedDB");
+    assert.equal(idle.size, 0, "tile completion cannot schedule persistence before publication");
     if (index + 1 < expected.tiles.length) {
       await waitFor(() => f.requests.length === index + 2,
-        `the pump should request tile ${index + 2} after the prior save timeout`);
+        `the pump should request tile ${index + 2} before the prior save finishes`);
     }
   }
 
-  await waitFor(() => f.owner.getPendingWorkCount() === 0, "the final tile task should complete after its save timeout");
+  await waitFor(() => f.owner.getPendingWorkCount() === 0, "display work completes independently of saves");
   assert.equal(f.requests.length, expected.tiles.length);
   assert.equal(f.cache.getStats().tileCount, expected.tiles.length);
-  assert.equal(f.owner.getDiagnostics().assetTimeout, true);
+  assert.equal(f.owner.getDiagnostics().assetTimeout, false);
   assert.equal(f.owner.getDiagnostics().failed, "");
-  assert.equal(f.owner.getDiagnostics().assetFailureOperation, "save");
+  assert.equal(f.owner.getDiagnostics().backgroundSave.pending, false);
+  assert.equal(f.owner.getDiagnostics().backgroundSave.candidatePending, true);
+  assert.equal(f.owner.getDiagnostics().assetSavesDropped, 2);
   assert.equal(f.owner.getDiagnostics().assetRecovery.state, "ready", "optional saves cannot disable asset reads");
-  assert.ok(f.owner.draw(), "the complete CPU tile set remains drawable after save timeouts");
+  assert.ok(f.owner.draw(), "the complete CPU tile set remains drawable during persistence");
+  assert.equal(hangingSaves.length, 0, "publication does not synchronously clone the tile");
+  assert.equal(idle.size, 1);
+  idle.run();
+  await drain();
+  assert.equal(hangingSaves.length, 1);
+  assert.equal(hangingSaves[0].tile.marker, "timeout-tile-2", "only the final lightweight candidate persists");
+  assert.equal(f.owner.getDiagnostics().backgroundSave.candidatePending, false);
   assert.equal(f.gpus[0].draws.length, 1);
   assert.equal(f.metrics.at(-1)[0], "politicalIdRasterCommit");
+  f.owner.dispose();
+  assert.equal(hangingSaves[0].signal.aborted, true);
+  assert.equal(f.owner.getDiagnostics().backgroundSave.pending, false);
+});
+
+test("direct coverage waits for scene publication and a later idle callback before cloning assets", async t => {
+  const idle = idleScheduler(t), f = fixture({ directPresentation: true });
+  t.after(() => f.owner.dispose());
+  assert.equal(f.owner.prepare(), true);
+  await settleOneWorker(f);
+  assert.equal(f.assetStore.saves.length, 0);
+  assert.equal(idle.size, 0);
+  assert.equal((await f.owner.exportAssets()).length, 1, "explicit export remains available before persistence");
+  assert.equal(f.owner.draw().staged, true);
+  assert.equal(idle.size, 0, "staging is not scene publication");
+  assert.equal(f.owner.publishDirectFrame(), true);
+  assert.equal(f.assetStore.saves.length, 0, "publish never synchronously clones payloads");
+  assert.equal(idle.size, 1);
+  idle.run(); await drain();
+  assert.equal(f.assetStore.saves.length, 1);
+  assert.equal(f.owner.getDiagnostics().backgroundSave.candidatePending, false);
+});
+
+test("new viewport production cancels both queued and in-flight idle saves before its next read", async t => {
+  const idle = idleScheduler(t);
+  for (const startWrite of [false, true]) {
+    const f = fixture();
+    t.after(() => f.owner.dispose());
+    let saveSignal, writes = 0;
+    f.assetStore.save = (_identity, _tile, { signal }) => {
+      saveSignal = signal; writes++;
+      return new Promise(() => {});
+    };
+    f.owner.prepare(); await settleOneWorker(f);
+    assert.ok(f.owner.draw());
+    if (startWrite) { idle.run(); await drain(); assert.equal(saveSignal.aborted, false); }
+    f.state.zoomTransform.x += 1024;
+    f.owner.prepare();
+    assert.equal(idle.size, 0);
+    if (startWrite) assert.equal(saveSignal.aborted, true);
+    idle.run(); await drain();
+    assert.equal(writes, Number(startWrite));
+    assert.equal(f.requests.length, 2, "the new producer does not await a broken save backend");
+    assert.equal(f.owner.getDiagnostics().backgroundSave.pending, false);
+    assert.equal(f.owner.getDiagnostics().failed, "");
+    f.owner.dispose();
+  }
+});
+
+test("candidate eviction, source invalidation and disposal release optional persistence without payload ownership", async t => {
+  const idle = idleScheduler(t);
+  for (const action of ["evict", "source", "dispose"]) {
+    const f = fixture();
+    t.after(() => f.owner.dispose());
+    f.owner.prepare(); await settleOneWorker(f);
+    assert.ok(f.owner.draw());
+    assert.equal(f.owner.getDiagnostics().backgroundSave.candidatePending, true);
+    if (action === "evict") f.cache.clear();
+    else if (action === "source") { f.identity.sceneKey = "other-scene"; f.owner.prepare(); }
+    else f.owner.dispose();
+    idle.run(); await drain();
+    assert.equal(f.assetStore.saves.length, 0);
+    assert.equal(f.owner.getDiagnostics().backgroundSave.candidatePending, false);
+    assert.equal(f.owner.getDiagnostics().backgroundSave.idleScheduled, false);
+    assert.equal(f.owner.getDiagnostics().assetSavesDropped, 1);
+    f.owner.dispose();
+  }
+});
+
+test("background save timeouts and errors are diagnostic and preserve admitted coverage", async t => {
+  for (const timeout of [true, false]) {
+    const f = fixture({ assetTimeoutMs: 10 });
+    t.after(() => f.owner.dispose());
+    let signal;
+    f.assetStore.save = (_identity, _tile, options) => {
+      signal = options.signal;
+      return timeout ? new Promise(() => {}) : Promise.reject(new Error("disk unavailable"));
+    };
+    f.owner.draw();
+    await settleOneWorker(f);
+    assert.ok(f.owner.draw());
+    await waitFor(() => !!f.owner.getDiagnostics().backgroundSave.lastFailure, "optional write must release its own deadline");
+    const d = f.owner.getDiagnostics();
+    assert.equal(d.backgroundSave.lastFailure.kind, timeout ? "timeout" : "error");
+    assert.equal(d.assetSaveTimeouts, Number(timeout));
+    assert.equal(d.assetSaveErrors, Number(!timeout));
+    assert.equal(signal.aborted, timeout);
+    assert.equal(d.assetError, "");
+    assert.equal(d.failed, "");
+    assert.equal(d.assetRecovery.state, "ready");
+    assert.equal(f.cache.getStats().tileCount, 1);
+    assert.ok(f.owner.draw());
+    f.owner.dispose();
+  }
+});
+
+test("namespace cancellation aborts background persistence without recording a failure", async t => {
+  const f = fixture();
+  t.after(() => f.owner.dispose());
+  const pending = deferred();
+  let saveSignal;
+  f.assetStore.save = (_identity, _tile, { signal }) => { saveSignal = signal; return pending.promise; };
+  f.owner.draw();
+  await settleOneWorker(f);
+  assert.ok(f.owner.draw());
+  await waitFor(() => !!saveSignal, "published coverage starts its idle save");
+  assert.equal(saveSignal.aborted, false);
+  f.identity.sceneKey = "next-scene";
+  f.owner.draw();
+  assert.equal(saveSignal.aborted, true);
+  pending.reject(new Error("late old scene write"));
+  await drain();
+  assert.equal(f.owner.getDiagnostics().backgroundSave.lastFailure, null);
+  assert.equal(f.owner.getDiagnostics().assetError, "");
+  assert.equal(f.owner.getDiagnostics().failed, "");
 });
 
 test("worker preparation failures remain handled when identity work is cancelled", async () => {

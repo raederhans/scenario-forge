@@ -74,6 +74,7 @@ export function createRiverLayerRenderOwner({
   const {
     clamp,
     collectContextMetric,
+    getCachedStrokePath = () => null,
     getContext = () => null,
     getDashPattern,
     getFeatureCollectionFeatureCount,
@@ -208,9 +209,11 @@ export function createRiverLayerRenderOwner({
       visibleEntries.push({ feature, profile });
     });
 
-    // Reuse projected geometry only inside this synchronous draw. The shared
-    // d3 path must be restored before stroking or drawing another layer.
+    // Prefer the shared projection cache. A local fallback only lives for this
+    // draw and must restore the d3 context before stroking another layer.
     function createStrokePath(feature) {
+      const cached = getCachedStrokePath(feature);
+      if (cached) return cached;
       if (typeof globalThis.Path2D !== "function" || typeof pathCanvas.context !== "function") return null;
       const previousContext = pathCanvas.context();
       if (!previousContext) return null;
@@ -268,6 +271,9 @@ export function createRiverLayerRenderOwner({
       context.setLineDash(resolvedDashPattern);
       visibleEntries.forEach((entry) => {
         const { profile } = entry;
+        // Without an outline, keep the original native-path fallback rather
+        // than creating a new Path2D solely for the core stroke.
+        if (entry.path === undefined) entry.path = getCachedStrokePath(entry.feature);
         const resolvedCoreWidth = widthBase
           * zoomStyle.coreWidthFactor
           * profile.widthFactor;

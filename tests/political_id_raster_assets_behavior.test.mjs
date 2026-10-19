@@ -49,6 +49,113 @@ function memoryBackend() {
 const createStore = (options = {}) => createPoliticalIdRasterAssetStore({ indexedDB: null, fetchImpl: null, ...options });
 const response = (buffer) => ({ ok: true, headers: { get: () => null }, arrayBuffer: async () => buffer });
 
+// Model IDB's request callbacks and atomic transaction commit, while retaining
+// an observable operation log to catch accidental per-hit metadata scans.
+function indexedDbHarness() {
+  const stores = new Map(), log = [];
+  let created = false, serial = Promise.resolve();
+  const database = {
+    createObjectStore(name) { stores.set(name, new Map()); }, close() {},
+    transaction(names, mode) {
+      const record = { names: [].concat(names), mode, requests: [] };
+      log.push(record);
+      const local = new Map([...stores].map(([name, values]) => [name, new Map(values)]));
+      const actions = [];
+      let aborted = false;
+      const transaction = {
+        abort() { aborted = true; },
+        objectStore(name) {
+          function request(method, key, work) {
+            if (mode === 'readonly' && ['put', 'delete'].includes(method)) throw new Error('Readonly mutation');
+            record.requests.push([name, method, key]);
+            const pending = {};
+            actions.push(() => { pending.result = structuredClone(work()); pending.onsuccess?.(); });
+            return pending;
+          }
+          return {
+            get: key => request('get', key, () => local.get(name).get(key)),
+            getAll: () => request('getAll', null, () => [...local.get(name).values()]),
+            put: value => request('put', value.identity, () => local.get(name).set(value.identity, value)),
+            delete: key => request('delete', key, () => local.get(name).delete(key)),
+          };
+        },
+      };
+      serial = serial.then(async () => {
+        // Read the committed state when this transaction actually starts.
+        for (const [name, values] of stores) local.set(name, new Map(values));
+        await new Promise(resolve => setImmediate(resolve));
+        try {
+          while (actions.length && !aborted) actions.shift()();
+          if (aborted) transaction.onabort?.();
+          else {
+            if (mode === 'readwrite') for (const name of record.names) stores.set(name, local.get(name));
+            transaction.oncomplete?.();
+          }
+        } catch (error) { transaction.error = error; transaction.onerror?.(); }
+      });
+      return transaction;
+    },
+  };
+  return { log, stores, indexedDB: { open() {
+    const request = { result: database };
+    setImmediate(() => {
+      if (!created) { created = true; request.onupgradeneeded?.(); }
+      request.onsuccess?.();
+    });
+    return request;
+  } } };
+}
+
+test('IndexedDB hits use readonly single-key reads and defer bounded LRU touches to atomic writes', async t => {
+  const harness = indexedDbHarness(), size = encode('a').byteLength;
+  const store = createStore({ indexedDB: harness.indexedDB, maxBytes: size * 2 });
+  t.after(() => store.dispose());
+  await store.save('a', tile(), { codeToId });
+  await store.save('b', tile(), { codeToId });
+  const before = harness.log.length;
+  assert.ok(await store.load('a', { idToCode }));
+  assert.equal(await store.load('absent', { idToCode }), null);
+  assert.deepEqual(harness.log.slice(before), [
+    { names: ['tiles'], mode: 'readonly', requests: [['tiles', 'get', 'a']] },
+    { names: ['tiles'], mode: 'readonly', requests: [['tiles', 'get', 'absent']] },
+  ]);
+  await store.save('c', tile(), { codeToId });
+  assert.deepEqual([...harness.stores.get('tiles').keys()].sort(), ['a', 'c']);
+  assert.ok([...harness.stores.get('metadata').values()].reduce((sum, value) => sum + value.byteLength, 0) <= size * 2);
+  assert.equal(store.stats().indexedDBHits, 1);
+});
+
+test('opening an old IndexedDB with a smaller budget prunes before any readonly admission', async t => {
+  const harness = indexedDbHarness(), size = encode('a').byteLength;
+  const old = createStore({ indexedDB: harness.indexedDB, maxBytes: size * 3 });
+  await old.save('a', tile(), { codeToId });
+  await old.save('b', tile(), { codeToId });
+  await old.save('c', tile(), { codeToId });
+  old.dispose();
+  const before = harness.log.length;
+  const smaller = createStore({ indexedDB: harness.indexedDB, maxBytes: size });
+  t.after(() => smaller.dispose());
+  assert.equal(await smaller.load('a', { idToCode }), null);
+  assert.deepEqual(harness.log.slice(before).map(record => record.mode), ['readwrite', 'readonly']);
+  assert.deepEqual([...harness.stores.get('tiles').keys()], ['c']);
+  assert.ok(await smaller.load('c', { idToCode }));
+  assert.equal(harness.log.at(-1).requests.length, 1);
+});
+
+test('persistent reads do not wait for an unrelated slow write queue', async t => {
+  let release;
+  const store = createStore({ backend: {
+    writeBounded: () => new Promise(resolve => { release = resolve; }),
+    read: async identity => encode(identity),
+  } });
+  t.after(() => store.dispose());
+  const writing = store.save('a', tile(), { codeToId });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.ok(await store.load('b', { idToCode }));
+  assert.equal(store.stats().pendingWrites, 1);
+  release(true); await writing;
+});
+
 test('binary coverage roundtrip remaps stable IDs without changing span offsets, counts, weights or background', () => {
   const buffer = encode();
   const result = decode(buffer);

@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { buildCityLocalizationPatch, normalizeCityText, mergeCityLocalizationData, normalizeCityFeatureCollection, normalizeScenarioCityOverridesPayload } from "../js/core/data_loader.js";
 import { state as runtimeState } from "../js/core/state.js";
-import { commitBaseCitySupportData, setCurrentLanguage } from "../js/core/state/content_state.js";
+import { commitBaseCitySupportData, setCurrentLanguage, copyLocalizationEntries, prepareLocalizationCandidate } from "../js/core/state/content_state.js";
 import { captureScenarioActivationState, restoreScenarioActivationState } from "../js/core/state/actions/scenario_activation_actions.js";
 import { applyScenarioChunkCityExternalEffectState, captureScenarioPresentationState, restoreScenarioPresentationState } from "../js/core/state/actions/scenario_presentation_actions.js";
 import { syncScenarioLocalizationState } from "../js/core/scenario_localization_state.js";
@@ -25,7 +25,7 @@ function cityNamePatchFixture(localState) {
     .replace(/^import[\s\S]*?;\r?\n/gm, "").replace(/^export /gm, "");
   return vm.runInNewContext(`${source}\nbuildScenarioCityNameSyncPatch`, {
     runtimeState: localState, buildCityLocalizationPatch, normalizeCityText,
-    applyScenarioChunkCityExternalEffectState, console, globalThis: {},
+    applyScenarioChunkCityExternalEffectState, copyLocalizationEntries, prepareLocalizationCandidate, console, globalThis: {},
   });
 }
 
@@ -83,7 +83,7 @@ test("scenario name synchronization never maps distant capitals into Russian cit
     .replace(/^import[\s\S]*?;\r?\n/gm, "").replace(/^export /gm, "");
   const syncLocal = vm.runInNewContext(`${source}\nsyncScenarioLocalizationState`, {
     runtimeState: localState, buildCityLocalizationPatch, normalizeCityText,
-    applyScenarioChunkCityExternalEffectState, console,
+    applyScenarioChunkCityExternalEffectState, copyLocalizationEntries, prepareLocalizationCandidate, console,
     globalThis: { d3: { geoContains: () => true, geoCentroid: () => [44.50184, 48.71939] } },
   });
   for (const cityId of ["CITY::ne::1159149593", "CITY::ne::1159150731"]) {

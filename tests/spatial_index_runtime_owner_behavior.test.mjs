@@ -428,3 +428,163 @@ test("secondary water reuse tracks geometry, flags, removals and projection iden
   assert.equal(state.waterSpatialItems[0].minX, 240);
   assert.deepEqual([collected, projected], [8, 8], "an old identity must not revive a stale snapshot");
 });
+
+
+function createSecondaryChunkHarness({ parts = 1200, constants = {}, fastSource = false } = {}) {
+  let water = [{ id: "water", geometry: { parts: Array.from({ length: parts }, (_, index) =>
+    ({ bounds: bounds(index % 500) })) }, properties: { __source: "scenario" } }];
+  let specials = [{ id: "zone", bounds: bounds(40) }];
+  let identity = "scenario:projection:water:1";
+  let dimensions = [800, 600];
+  let projectionReads = 0;
+  let sourceReads = 0;
+  let clock = 0;
+  const state = createDefaultSpatialIndexState();
+  const owner = createSpatialIndexRuntimeOwner({ state, constants, helpers: {
+    getFeatureId: (feature) => feature.id,
+    getEffectiveWaterRegionFeatures: () => { sourceReads++; return water; },
+    getEffectiveSpecialRegionFeatures: () => specials,
+    getSecondarySpatialSourceIdentity: fastSource ? () => [water, specials] : undefined,
+    getSecondarySpatialCacheIdentity: () => identity,
+    getLogicalCanvasDimensions: () => dimensions,
+    collectFeatureHitGeometries: (feature) => feature.geometry.parts,
+    computeProjectedGeoBounds: (geometry) => { projectionReads += 1; clock += 0.1; return geometry.bounds; },
+    getProjectedFeatureBounds: (feature) => feature.bounds,
+    nowMs: () => clock,
+  } });
+  const snapshot = () => Object.fromEntries(Object.entries(state).filter(([key]) =>
+    key.startsWith("waterSpatial") || key.startsWith("specialSpatial")));
+  return { owner, state, snapshot, get water() { return water; },
+    setWater: (next) => { water = next; }, setSpecials: (next) => { specials = next; },
+    setIdentity: (next) => { identity = next; }, setDimensions: (next) => { dimensions = next; },
+    get projectionReads() { return projectionReads; }, get sourceReads() { return sourceReads; } };
+}
+
+test("secondary preparation uses source tokens between slices and full source checks at publication", async () => {
+  const h = createSecondaryChunkHarness({ fastSource: true });
+  const result = await h.owner.buildSecondarySpatialIndexesChunked();
+  assert.equal(result.status, "published");
+  assert.ok(result.yieldCount > 10);
+  assert.equal(h.sourceReads, 4, "initial capture, initial validation, completed candidate and publication only");
+});
+
+test("secondary source tokens still reject in-place feature mutations at publication", async () => {
+  const h = createSecondaryChunkHarness({ fastSource: true });
+  h.owner.buildSecondarySpatialIndexes();
+  const previous = h.snapshot();
+  let yields = 0;
+  const result = await h.owner.buildSecondarySpatialIndexesChunked({ yieldControl: async () => {
+    if (++yields === 2) h.water[0].properties.__source = "changed-in-place";
+  } });
+  assert.equal(result.status, "cancelled");
+  for (const [key, value] of Object.entries(previous)) assert.equal(h.state[key], value, key);
+});
+
+test("secondary chunking retains interactive layers and atomically publishes full sync parity", async () => {
+  const h = createSecondaryChunkHarness();
+  h.owner.buildSecondarySpatialIndexes();
+  const previous = h.snapshot();
+  const previousContents = Object.fromEntries(Object.entries(previous).map(([key, value]) =>
+    [key, value instanceof Map ? new Map([...value].map(([id, bucket]) =>
+      [id, Array.isArray(bucket) ? bucket.slice() : bucket]))
+      : Array.isArray(value) ? value.slice() : value ? { ...value, globals: value.globals?.slice() } : value]));
+  const nextWater = [{ ...h.water[0], geometry: { parts: h.water[0].geometry.parts.slice().reverse() } }];
+  h.setWater(nextWater);
+  h.setSpecials([{ id: "new-zone", bounds: bounds(100) }]);
+  let yields = 0;
+  const result = await h.owner.buildSecondarySpatialIndexesChunked({ yieldControl: async () => {
+    yields += 1;
+    for (const [key, value] of Object.entries(previous)) assert.equal(h.state[key], value, key);
+    assert.deepEqual(h.snapshot(), previousContents, "published maps and buckets stay immutable");
+    const hits = collectSpatialItemsForProjectedRects({ grid: h.state.waterSpatialGrid,
+      gridMeta: h.state.waterSpatialGridMeta, items: h.state.waterSpatialItems,
+      projectedRects: [{ minX: 0, minY: 0, maxX: 600, maxY: 600 }] });
+    assert.ok(hits.items.length, "old water remains queryable during preparation");
+  } });
+  assert.equal(result.status, "published");
+  assert.equal(result.waterItems, 1200);
+  assert.equal(result.specialItems, 1);
+  assert.equal(result.yieldCount, yields);
+  assert.ok(yields > 10, "a single multipart feature is split across multiple slices");
+  assert.ok(result.maxSliceMs < 6.2, "bounds work follows elapsed-time budget");
+  assert.notEqual(h.state.waterSpatialGrid, previous.waterSpatialGrid);
+  assert.notEqual(h.state.specialSpatialGrid, previous.specialSpatialGrid);
+  const published = h.snapshot();
+  h.owner.buildSecondarySpatialIndexes();
+  assert.deepEqual(h.snapshot(), published, "sync and async snapshots match");
+  const reads = h.projectionReads;
+  const grid = h.state.waterSpatialGrid;
+  const reused = await h.owner.buildSecondarySpatialIndexesChunked();
+  assert.equal(reused.status, "published");
+  assert.equal(h.projectionReads, reads, "accepted geometry entries reuse bounds");
+  assert.equal(h.state.waterSpatialGrid, grid, "exact accepted grid is reused");
+});
+
+for (const mutation of ["identity", "layout", "feature", "geometry", "source", "special", "reset", "preserve-reset", "sync", "caller"]) {
+  test(`secondary chunking cancels after ${mutation} invalidation without overwriting current state`, async () => {
+    const h = createSecondaryChunkHarness();
+    h.owner.buildSecondarySpatialIndexes();
+    h.setWater([{ ...h.water[0], geometry: { parts: h.water[0].geometry.parts.slice() } }]);
+    let expected = h.snapshot();
+    let current = true;
+    let yields = 0;
+    const result = await h.owner.buildSecondarySpatialIndexesChunked({ isCurrent: () => current,
+      yieldControl: async () => {
+        if (++yields !== 2) return;
+        if (mutation === "identity") h.setIdentity("projection:2");
+        if (mutation === "layout") h.setDimensions([900, 600]);
+        if (mutation === "feature") h.water[0] = { ...h.water[0] };
+        if (mutation === "geometry") h.water[0].geometry = { parts: [] };
+        if (mutation === "source") h.water[0].properties.__source = "new-source";
+        if (mutation === "special") h.setSpecials([]);
+        if (mutation === "reset") h.owner.resetSecondarySpatialIndexState();
+        if (mutation === "preserve-reset") h.owner.resetSecondarySpatialIndexState({ preserveCurrent: true });
+        if (mutation === "sync") h.owner.buildSecondarySpatialIndexes();
+        if (mutation === "caller") current = false;
+        expected = h.snapshot();
+      } });
+    assert.equal(result.status, "cancelled");
+    assert.equal(yields, 2);
+    for (const [key, value] of Object.entries(expected)) assert.equal(h.state[key], value, key);
+  });
+}
+
+test("a newer secondary async build supersedes a suspended build", async () => {
+  const h = createSecondaryChunkHarness();
+  let release;
+  const suspended = h.owner.buildSecondarySpatialIndexesChunked({
+    yieldControl: () => new Promise((resolve) => { release = resolve; }),
+  });
+  const latest = await h.owner.buildSecondarySpatialIndexesChunked();
+  assert.equal(latest.status, "published");
+  const snapshot = h.snapshot();
+  release();
+  assert.equal((await suspended).status, "cancelled");
+  assert.deepEqual(h.snapshot(), snapshot);
+});
+
+test("secondary grid population yields within a single large cell footprint", async () => {
+  const h = createSecondaryChunkHarness({ parts: 1, constants: {
+    hitGridTargetCols: 100, hitGridMinCellPx: 1, hitGridMaxCellPx: 10, hitMaxCellsPerItem: 10000,
+  } });
+  h.water[0].geometry.parts[0].bounds = { minX: 0, minY: 0, maxX: 800, maxY: 600, area: 480000 };
+  const result = await h.owner.buildSecondarySpatialIndexesChunked();
+  assert.equal(result.status, "published");
+  assert.ok(result.yieldCount >= 15, "one grid item spanning thousands of cells is sliced");
+  assert.equal(h.state.waterSpatialGrid.size, 7500);
+});
+
+
+test("empty secondary chunked snapshots clear pending state and stale published layers", async () => {
+  const h = createSecondaryChunkHarness({ parts: 1 });
+  h.owner.buildSecondarySpatialIndexes();
+  h.owner.resetSecondarySpatialIndexState({ preserveCurrent: true });
+  h.setWater([]);
+  h.setSpecials([]);
+  const result = await h.owner.buildSecondarySpatialIndexesChunked();
+  assert.equal(result.status, "published");
+  assert.equal(h.state.secondarySpatialBuildPending, false);
+  assert.equal(h.state.waterSpatialItems.length, 0);
+  assert.equal(h.state.specialSpatialItems.length, 0);
+  assert.equal(h.state.waterSpatialGrid.size, 0);
+});

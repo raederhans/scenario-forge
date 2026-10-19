@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createPoliticalIdRasterSource, collectPoliticalRasterDisplayFeatures } from "../js/core/renderer/political_id_raster_source.js";
+import { createPoliticalIdRasterSource, collectPoliticalRasterDisplayFeatures, collectPoliticalRasterDisplayFeaturesAsync } from "../js/core/renderer/political_id_raster_source.js";
 
 function feature(id, color, bounds, geometry = {}) {
   return { id, color, geometry, bounds };
@@ -22,6 +22,199 @@ function harness() {
   });
   return { source, reads, publish };
 }
+
+const preparationInput = (features, options = {}) => ({ collection: { features }, sceneKey: "scene-a",
+  projectionKey: "projection-a", coverageKey: "coverage-a", colorRevision: 0, ...options });
+const cooperative = { nowMs: () => 0, workBatch: 2, yieldControl: () => Promise.resolve() };
+
+test("private asynchronous preparation matches synchronous publish across mapping, LIS, palette and scene transitions", async () => {
+  const h = harness(), oracle = harness();
+  const a = feature("a", "#112233", { minX: 0, minY: 0, maxX: 1, maxY: 1 });
+  const b = feature("b", "#445566", null), c = feature("c", "#778899", a.bounds), d = feature("d", "#aabbcc", a.bounds);
+  const cases = [[[a, b, c], {}], [[c, a, b], {}], [[a, c], {}], [[a, d, b, c], {}],
+    [[a, b], { sceneKey: "scene-b" }], [[a, b], { sceneKey: "scene-b", projectionKey: "projection-b", colorRevision: 2 }]];
+  for (const [features, options] of cases) {
+    const before = h.source.getSnapshot();
+    const expected = oracle.publish(features, options);
+    const candidate = await h.source.prepare(preparationInput(features, options), { ...cooperative,
+      yieldControl: () => { assert.deepEqual(h.source.getSnapshot(), before); return Promise.resolve(); } });
+    assert.deepEqual(Object.keys(candidate), []);
+    assert.equal(Object.isFrozen(candidate), true);
+    assert.deepEqual(h.source.getSnapshot(), before);
+    const snapshot = h.source.commitPrepared(candidate);
+    assert.deepEqual(snapshot, expected);
+    snapshot.palette[4] = 0;
+    assert.deepEqual(h.source.getSnapshot().palette, expected.palette, "commit returns an isolated precomputed public palette");
+  }
+});
+
+test("cancelling every preparation phase preserves all published state and consumes neither codes nor geometry versions", async () => {
+  const phases = ["validation", "mapping-copy", "mapping", "entries", "lis-index", "lis-common", "lis-scan", "lis-kept",
+    "lis-moved", "dirty-bounds", "removed", "palette", "palette-compare", "dirty-freeze", "public-palette"];
+  for (const phase of phases) {
+    const h = harness(), oracle = harness(), controller = new AbortController();
+    const a = feature("a", "#112233", null), b = feature("b", "#445566", null), c = feature("c", "#778899", null);
+    h.publish([a, b, c]); oracle.publish([a, b, c]);
+    const before = h.source.getSnapshot();
+    const next = [c, b, { ...a, geometry: {} }];
+    if (phase !== "palette-compare") next.push(feature("cancelled", "#aabbcc", null));
+    let cancelled = false;
+    await assert.rejects(h.source.prepare(preparationInput(next), { ...cooperative, workBatch: 1, signal: controller.signal,
+      yieldControl: ({ phase: current }) => {
+        assert.deepEqual(h.source.getSnapshot(), before);
+        if (current === phase) { cancelled = true; controller.abort(); }
+        return Promise.resolve();
+      } }), { name: "AbortError" }, phase);
+    assert.equal(cancelled, true, phase);
+    assert.deepEqual(h.source.getSnapshot(), before, phase);
+    const accepted = [a, b, c, feature("accepted", "#010203", null)];
+    assert.deepEqual(h.publish(accepted), oracle.publish(accepted), phase);
+    const candidate = await h.source.prepare(preparationInput(accepted), cooperative);
+    assert.deepEqual(h.source.commitPrepared(candidate), oracle.publish(accepted), "a fresh preparation can succeed after cancellation");
+  }
+});
+
+test("invalid asynchronous inputs do not mutate or invalidate a valid prepared candidate", async () => {
+  const h = harness(); const a = feature("a", "#112233", null);
+  h.publish([a]); const before = h.source.getSnapshot();
+  const accepted = [a, feature("accepted", "#445566", null)];
+  const candidate = await h.source.prepare(preparationInput(accepted), cooperative);
+  for (const invalid of [[a, { ...a }], [a, feature("", "#112233", null)],
+    [a, feature("bad", "transparent", null)], [a, feature("bad", "#112233", { minX: 1, minY: 0, maxX: 0, maxY: 1 })], [null]]) {
+    await assert.rejects(h.source.prepare(preparationInput(invalid), cooperative), TypeError);
+    assert.deepEqual(h.source.getSnapshot(), before);
+  }
+  const snapshot = h.source.commitPrepared(candidate);
+  assert.deepEqual(snapshot.entries.map(({ id, code, geometryVersion }) => [id, code, geometryVersion]), [["a", 1, 1], ["accepted", 2, 2]]);
+});
+
+test("color updates during preparation or before commit fence stale palettes including no-op updates", async () => {
+  for (const during of [true, false]) {
+    const h = harness(); const a = feature("a", "#112233", null); h.publish([a]);
+    let latest, updated = false;
+    const options = { ...cooperative, workBatch: 1, yieldControl: () => {
+      if (during && !updated) { updated = true; a.color = "#aabbcc"; latest = h.source.updateColors(["a"], { colorRevision: 1 }); }
+      return Promise.resolve();
+    } };
+    if (during) await assert.rejects(h.source.prepare(preparationInput([a]), options), { name: "AbortError" });
+    else {
+      const candidate = await h.source.prepare(preparationInput([a]), options);
+      a.color = "#aabbcc"; latest = h.source.updateColors(["a"], { colorRevision: 1 });
+      assert.throws(() => h.source.commitPrepared(candidate), { name: "AbortError" });
+    }
+    assert.deepEqual(h.source.getSnapshot(), latest);
+    const noopCandidate = await h.source.prepare(preparationInput([a], { colorRevision: 1 }), cooperative);
+    h.source.updateColors([]);
+    assert.throws(() => h.source.commitPrepared(noopCandidate), { name: "AbortError" });
+    const fresh = await h.source.prepare(preparationInput([a], { colorRevision: 1 }), cooperative);
+    assert.deepEqual([...h.source.commitPrepared(fresh).palette.slice(4, 8)], [170, 187, 204, 255]);
+  }
+});
+
+test("new publications, competing candidates, signal cancellation and dispose reject obsolete commits", async () => {
+  const h = harness(); const a = feature("a", "#112233", null); h.publish([a]);
+  const old = await h.source.prepare(preparationInput([a]), cooperative);
+  const latest = h.publish([feature("scene-b", "#445566", null)], { sceneKey: "scene-b" });
+  assert.throws(() => h.source.commitPrepared(old), { name: "AbortError" });
+  assert.deepEqual(h.source.getSnapshot(), latest);
+  const input = preparationInput([a], { sceneKey: "scene-b" });
+  const first = await h.source.prepare(input, cooperative), second = await h.source.prepare(input, cooperative);
+  h.source.commitPrepared(first);
+  assert.throws(() => h.source.commitPrepared(second), { name: "AbortError" });
+  assert.throws(() => h.source.commitPrepared(first), { name: "AbortError" });
+  assert.throws(() => harness().source.commitPrepared(second), /Unknown prepared/);
+  const controller = new AbortController();
+  const cancelled = await h.source.prepare(input, { ...cooperative, signal: controller.signal }); controller.abort();
+  assert.throws(() => h.source.commitPrepared(cancelled), { name: "AbortError" });
+  const disposedCandidate = await h.source.prepare(input, cooperative);
+  h.source.dispose();
+  assert.throws(() => h.source.commitPrepared(disposedCandidate), { name: "AbortError" });
+  assert.equal(h.source.getSnapshot(), null);
+  await assert.rejects(h.source.prepare(input, cooperative), /disposed/);
+});
+
+test("source mutation and disposal during a yielded preparation abort without publishing its partial result", async () => {
+  for (const dispose of [false, true]) {
+    const h = harness(); const a = feature("a", "#112233", null); h.publish([a]);
+    let changed = false, expected;
+    await assert.rejects(h.source.prepare(preparationInput([a]), { ...cooperative, workBatch: 1, yieldControl: () => {
+      if (!changed) {
+        changed = true;
+        if (dispose) { h.source.dispose(); expected = null; }
+        else expected = h.publish([feature("replacement", "#445566", null)]);
+      }
+      return Promise.resolve();
+    } }), { name: "AbortError" });
+    assert.deepEqual(h.source.getSnapshot(), expected);
+  }
+});
+
+test("large source preparation yields through all bulk work, honors private bounds and leaves commit with no callbacks", async t => {
+  let defaultBounds = 0, boundsReads = 0, colorReads = 0, idReads = 0;
+  const source = createPoliticalIdRasterSource({ getId: f => { idReads++; return f.id; },
+    getBounds: f => { defaultBounds++; return f.bounds; }, resolveColor: f => { colorReads++; return f.color; } });
+  const items = Array.from({ length: 5000 }, (_, index) => feature(`id-${index}`, "#112233", null));
+  source.publish(preparationInput(items));
+  const before = source.getSnapshot(), phases = new Set(); let yields = 0;
+  const candidate = await source.prepare(preparationInput([...items].reverse()), { ...cooperative, workBatch: 64,
+    getBounds: () => { boundsReads++; return { minX: 1, minY: 2, maxX: 3, maxY: 4 }; },
+    yieldControl: ({ phase }) => {
+      yields++; phases.add(phase); assert.equal(source.getSnapshot().entries, before.entries); return Promise.resolve();
+    } });
+  assert.ok(yields > 100);
+  // This fixture's public palette is only 20 KiB. Its per-copy cancellation
+  // checkpoint is covered above; it need not exhaust another host-task batch.
+  for (const phase of ["validation", "mapping-copy", "mapping", "entries", "lis-index", "lis-common", "lis-scan",
+    "lis-moved", "dirty-bounds", "removed", "palette", "palette-compare", "dirty-freeze"]) assert.ok(phases.has(phase), phase);
+  const readsBeforeCommit = [defaultBounds, boundsReads, colorReads, idReads];
+  const startedAt = performance.now(); const snapshot = source.commitPrepared(candidate); const commitMs = performance.now() - startedAt;
+  assert.deepEqual([defaultBounds, boundsReads, colorReads, idReads], readsBeforeCommit);
+  assert.equal(defaultBounds, items.length); assert.equal(boundsReads, items.length);
+  assert.deepEqual(snapshot.entries[0].bounds, { minX: 1, minY: 2, maxX: 3, maxY: 4 });
+  let clock = 0, timeYields = 0;
+  await source.prepare(preparationInput(items), { workBatch: 1e9, timeBudgetMs: 4, nowMs: () => clock++,
+    yieldControl: () => { timeYields++; return Promise.resolve(); } });
+  assert.ok(timeYields > 0, "the time budget yields independently of the batch limit");
+  const newItems = Array.from({ length: 5000 }, (_, index) => feature(`new-${index}`, "#445566", null));
+  const newCandidate = await source.prepare(preparationInput(newItems), cooperative);
+  const newStartedAt = performance.now(); source.commitPrepared(newCandidate); const newGeometryCommitMs = performance.now() - newStartedAt;
+  t.diagnostic(`5000-feature commit existing geometry ${commitMs.toFixed(3)}ms; 5000 new WeakMap registrations ${newGeometryCommitMs.toFixed(3)}ms (diagnostic, no timing assertion)`);
+});
+
+test("asynchronous complete-display collection preserves order, references and authenticated pruning", async () => {
+  const polygon = x => [[[x, 0], [x, 1], [x + 1, 1], [x, 0]]];
+  const full = { id: "pruned", geometry: { type: "MultiPolygon", coordinates: [polygon(0), polygon(10)] } };
+  const fine = { ...full, properties: { __visualFragmentCamouflage: true, __visualFragmentPrunedCount: 1 },
+    geometry: { type: "MultiPolygon", coordinates: [structuredClone(full.geometry.coordinates[0])] } };
+  const support = feature("support", "#112233", null), extra = feature("extra", "#445566", null);
+  const input = { fullCollection: [support, full], interactiveCollection: [extra, fine], getId: f => f.id };
+  const expected = collectPoliticalRasterDisplayFeatures(input), phases = new Set();
+  const actual = await collectPoliticalRasterDisplayFeaturesAsync(input, { ...cooperative, workBatch: 1,
+    yieldControl: ({ phase }) => { phases.add(phase); return Promise.resolve(); } });
+  assert.deepEqual(actual, expected); actual.forEach((value, index) => assert.equal(value, expected[index]));
+  assert.deepEqual([...phases], ["display-interactive", "display-full", "display-result"]);
+  assert.equal(actual[2].geometry, full.geometry);
+  assert.equal(fine.geometry.coordinates.length, 1);
+});
+
+test("asynchronous display collection cancels every bulk phase, rejects invalid identity and remains reusable", async () => {
+  const a = feature("a", "#112233", null), support = feature("support", "#445566", null);
+  const input = { fullCollection: [support, a], interactiveCollection: [a], getId: f => f.id };
+  for (const phase of ["display-interactive", "display-full", "display-result"]) {
+    const controller = new AbortController();
+    await assert.rejects(collectPoliticalRasterDisplayFeaturesAsync(input, { ...cooperative, workBatch: 1, signal: controller.signal,
+      yieldControl: ({ phase: current }) => { if (current === phase) controller.abort(); return Promise.resolve(); } }), { name: "AbortError" });
+  }
+  for (const invalid of [{ ...input, fullCollection: [a, a] }, { ...input, interactiveCollection: [a, a] },
+    { ...input, interactiveCollection: [{ geometry: {} }] },
+    { ...input, fullCollection: [{ ...a, geometry: { type: "Point", coordinates: [1, 1] } }] }]) {
+    await assert.rejects(collectPoliticalRasterDisplayFeaturesAsync(invalid, cooperative), TypeError);
+  }
+  const many = Array.from({ length: 3000 }, (_, index) => feature(`display-${index}`, "#112233", null)); let yields = 0;
+  const result = await collectPoliticalRasterDisplayFeaturesAsync({ interactiveCollection: many, getId: f => f.id },
+    { ...cooperative, workBatch: 64, yieldControl: () => { yields++; return Promise.resolve(); } });
+  assert.ok(yields > 100); assert.deepEqual(result, many); result.forEach((value, index) => assert.equal(value, many[index]));
+});
 
 test("new, removed, and reintroduced IDs use monotonic per-scene codes", () => {
   const h = harness();

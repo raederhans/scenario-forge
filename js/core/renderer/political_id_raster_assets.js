@@ -187,10 +187,13 @@ function abortable(promise, signal) {
   });
 }
 
-// Every persistent touch/write prunes in one readwrite transaction. This also
-// enforces a smaller budget when reopening a database created by another store.
+// Prune once before the first read and atomically with every write. Hits use a
+// single-key readonly transaction; bounded in-memory touches approximate LRU
+// until the next write, without making every hit wait for metadata mutation.
 function createIndexedDbBackend(indexedDB, dbName) {
-  let opening, database, closed = false;
+  let opening, database, initialized, closed = false, clock = Date.now(), touchBytes = 0;
+  const touches = new Map();
+  const lifetime = new AbortController();
   function open() {
     if (closed) return Promise.reject(new Error('Asset database closed.'));
     if (!opening) opening = new Promise((resolve, reject) => {
@@ -210,7 +213,7 @@ function createIndexedDbBackend(indexedDB, dbName) {
     });
     return opening;
   }
-  async function operation(identity, entry, maxBytes, signal, remove = false) {
+  async function operation(identity, entry, maxBytes, signal) {
     const db = await open();
     checkAbort(signal);
     return new Promise((resolve, reject) => {
@@ -229,33 +232,31 @@ function createIndexedDbBackend(indexedDB, dbName) {
             if (!valid) { store.delete(record?.identity); metadataStore.delete(record?.identity); }
             return valid;
           });
-          const previous = records.find((record) => record.identity === identity);
           const keep = records.filter((record) => record.identity !== identity);
-          if (remove) { store.delete(identity); metadataStore.delete(identity); }
-          else if (entry || previous) {
-            const touched = records.reduce((latest, record) => Math.max(latest, record.touched), Date.now()) + 1;
-            const current = { identity, byteLength: (entry ?? previous).byteLength, touched };
-            keep.push(current);
-            if (entry) { result = entry.payload; store.put({ identity, payload: entry.payload }); }
-            else {
-              const payloadRequest = store.get(identity);
-              payloadRequest.onsuccess = () => {
-                const payload = payloadRequest.result?.payload;
-                if (payload instanceof ArrayBuffer && payload.byteLength === previous.byteLength && retained) result = payload;
-                else { store.delete(identity); metadataStore.delete(identity); }
-              };
+          clock = records.reduce((latest, record) => Math.max(latest, record.touched), clock);
+          for (const record of keep) {
+            if (touches.has(record.identity)) {
+              record.touched = ++clock;
+              metadataStore.put(record);
             }
+          }
+          touches.clear();
+          touchBytes = 0;
+          if (entry) {
+            const current = { identity, byteLength: entry.byteLength, touched: ++clock };
+            keep.push(current);
+            result = entry.payload;
+            store.put({ identity, payload: entry.payload });
             metadataStore.put(current);
           }
           keep.sort((a, b) => a.touched - b.touched || a.identity.localeCompare(b.identity));
           let bytes = keep.reduce((total, record) => total + record.byteLength, 0);
-          let retained = true;
           while (bytes > maxBytes && keep.length) {
             const oldest = keep.shift();
             bytes -= oldest.byteLength;
             store.delete(oldest.identity);
             metadataStore.delete(oldest.identity);
-            if (oldest.identity === identity) { result = null; retained = false; }
+            if (oldest.identity === identity) result = null;
           }
         } catch (error) { transaction.abort(); reject(error); }
       };
@@ -264,10 +265,59 @@ function createIndexedDbBackend(indexedDB, dbName) {
       transaction.onabort = transaction.onerror = () => { release(); reject(signal?.aborted ? abortError() : transaction.error ?? new Error('Asset database transaction failed.')); };
     });
   }
-  return { read: (identity, maxBytes, signal) => operation(identity, null, maxBytes, signal),
-    writeBounded: (entry, maxBytes, signal) => operation(entry.identity, entry, maxBytes, signal),
-    remove: (identity, maxBytes, signal) => operation(identity, null, maxBytes, signal, true),
-    close() { closed = true; database?.close(); } };
+  function initialize(maxBytes) {
+    // Initialization belongs to this store's lifetime, not the first tile's
+    // deadline. A cancelled first read must not poison all subsequent reads.
+    if (!initialized) initialized = operation(null, null, maxBytes, lifetime.signal).catch(error => {
+      initialized = null;
+      throw error;
+    });
+    return initialized;
+  }
+  return {
+    async read(identity, maxBytes, signal) {
+      await abortable(initialize(maxBytes), signal);
+      checkAbort(signal);
+      const db = await open();
+      checkAbort(signal);
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction('tiles', 'readonly');
+        const abort = () => { try { transaction.abort(); } catch {} };
+        signal?.addEventListener('abort', abort, { once: true });
+        const request = transaction.objectStore('tiles').get(identity);
+        let payload = null;
+        request.onsuccess = () => {
+          const value = request.result?.payload;
+          if (value instanceof ArrayBuffer && value.byteLength >= HEADER_BYTES && value.byteLength <= maxBytes) payload = value;
+        };
+        const release = () => signal?.removeEventListener('abort', abort);
+        transaction.oncomplete = () => {
+          release();
+          if (payload) {
+            if (touches.has(identity)) touchBytes -= identity.length * 2;
+            touches.delete(identity);
+            touches.set(identity, true);
+            touchBytes += identity.length * 2;
+            while (touches.size > 1024 || touchBytes > 64 * 1024) {
+              const oldest = touches.keys().next().value;
+              touches.delete(oldest);
+              touchBytes -= oldest.length * 2;
+            }
+          }
+          resolve(payload);
+        };
+        transaction.onabort = transaction.onerror = () => {
+          release();
+          reject(signal?.aborted ? abortError() : transaction.error ?? new Error('Asset database read failed.'));
+        };
+      });
+    },
+    async writeBounded(entry, maxBytes, signal) {
+      await abortable(initialize(maxBytes), signal);
+      return operation(entry.identity, entry, maxBytes, signal);
+    },
+    close() { closed = true; lifetime.abort(); touches.clear(); touchBytes = 0; database?.close(); },
+  };
 }
 
 function manifestUrl(value, baseUrl) {
@@ -448,7 +498,7 @@ export function createPoliticalIdRasterAssetStore({
           const timer = entry || cacheMode === 'only'
             ? setTimeout(() => cacheController.abort(), PERSISTENT_READ_BUDGET_MS) : null;
           try {
-            const payload = await abortable(queue(() => { checkAbort(cacheSignal); return persistent.read(identity, maxBytes, cacheSignal); }), cacheSignal);
+            const payload = await abortable(persistent.read(identity, maxBytes, cacheSignal), cacheSignal);
             checkAbort(operation.signal);
             if (payload) {
               const tile = decode(payload);

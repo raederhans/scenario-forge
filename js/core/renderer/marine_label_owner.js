@@ -34,7 +34,7 @@ export function getMarineLabelName(feature, language = "en") {
 
 export function drawMarineLabels(entries, {
   context, scale, width, height, language = "en", selectedId = "", occupiedBoxes = [],
-  onPlaced = null,
+  onPlaced = null, paintBounds = null,
 } = {}) {
   if (!context || !Array.isArray(entries) || !entries.length || !(scale > 0)) return 0;
   const maxLabels = scale < 2.2 ? 20 : scale < 4.5 ? 35 : 55;
@@ -62,8 +62,8 @@ export function drawMarineLabels(entries, {
     if (![x, y].every(Number.isFinite)) continue;
     const box = { x: x - textWidth / 2 - 5, y: y - fontPx / 2 - 3, w: textWidth + 10, h: fontPx + 6 };
     const placement = claimScreenLabelPlacement([{ box }], occupiedBoxes, (candidate) => (
-      candidate.x >= 2 && candidate.y >= 2
-      && candidate.x + candidate.w <= width - 2 && candidate.y + candidate.h <= height - 2
+      candidate.x >= (paintBounds?.minX ?? 0) + 2 && candidate.y >= (paintBounds?.minY ?? 0) + 2
+      && candidate.x + candidate.w <= (paintBounds?.maxX ?? width) - 2 && candidate.y + candidate.h <= (paintBounds?.maxY ?? height) - 2
     ));
     if (!placement) continue;
     if (typeof onPlaced === "function") onPlaced(entry);
@@ -85,19 +85,19 @@ export function chooseMarineFocusBounds(boundsList = []) {
     .sort((a, b) => (b.maxX - b.minX) * (b.maxY - b.minY) - (a.maxX - a.minX) * (a.maxY - a.minY))[0] || null;
 }
 
-function getVisibleMarineBounds(bounds, transform, width, height) {
+function getVisibleMarineBounds(bounds, transform, width, height, paintBounds) {
   if (!bounds || !transform || !(transform.k > 0)) return null;
-  const minX = Math.max(bounds.minX, (2 - transform.x) / transform.k);
-  const maxX = Math.min(bounds.maxX, (width - 2 - transform.x) / transform.k);
-  const minY = Math.max(bounds.minY, (2 - transform.y) / transform.k);
-  const maxY = Math.min(bounds.maxY, (height - 2 - transform.y) / transform.k);
+  const minX = Math.max(bounds.minX, ((paintBounds?.minX ?? 0) + 2 - transform.x) / transform.k);
+  const maxX = Math.min(bounds.maxX, ((paintBounds?.maxX ?? width) - 2 - transform.x) / transform.k);
+  const minY = Math.max(bounds.minY, ((paintBounds?.minY ?? 0) + 2 - transform.y) / transform.k);
+  const maxY = Math.min(bounds.maxY, ((paintBounds?.maxY ?? height) - 2 - transform.y) / transform.k);
   if (!(maxX > minX) || !(maxY > minY)) return null;
   return { minX, maxX, minY, maxY };
 }
 
-export function findMarineInteriorAnchor({ centroid = null, bounds, transform, width, height, contains, gridSize = 3 } = {}) {
+export function findMarineInteriorAnchor({ centroid = null, bounds, transform, width, height, contains, gridSize = 3, paintBounds = null } = {}) {
   if (typeof contains !== "function") return null;
-  const visibleBounds = getVisibleMarineBounds(bounds, transform, width, height);
+  const visibleBounds = getVisibleMarineBounds(bounds, transform, width, height, paintBounds);
   if (!visibleBounds) return null;
   const { minX, maxX, minY, maxY } = visibleBounds;
   const inside = (point) => Array.isArray(point) && point.every(Number.isFinite)
@@ -127,15 +127,15 @@ export function createMarineInteriorAnchorResolver() {
       projectionGeneration = generation;
       byPart = new WeakMap();
     }
-    const { bounds, centroid, transform, width, height, gridSize = 3 } = options;
+    const { bounds, centroid, transform, width, height, gridSize = 3, paintBounds = null } = options;
     if (!part || !bounds || !transform) return null;
     const key = [transform.x, transform.y, transform.k, width, height, gridSize,
-      bounds.minX, bounds.minY, bounds.maxX, bounds.maxY, centroid?.[0], centroid?.[1]];
+      bounds.minX, bounds.minY, bounds.maxX, bounds.maxY, centroid?.[0], centroid?.[1], paintBounds?.minX, paintBounds?.minY, paintBounds?.maxX, paintBounds?.maxY];
     const previous = byPart.get(part);
     if (previous && key.every((value, index) => Object.is(value, previous.key[index]))) return previous.anchor;
     const sameGeometry = previous && key.slice(5).every((value, index) => Object.is(value, previous.key[index + 5]));
     if (sameGeometry && previous.anchor && typeof options.contains === "function") {
-      const visibleBounds = getVisibleMarineBounds(bounds, transform, width, height);
+      const visibleBounds = getVisibleMarineBounds(bounds, transform, width, height, paintBounds);
       const [x, y] = previous.anchor;
       if (visibleBounds && x >= visibleBounds.minX && x <= visibleBounds.maxX
         && y >= visibleBounds.minY && y <= visibleBounds.maxY) {

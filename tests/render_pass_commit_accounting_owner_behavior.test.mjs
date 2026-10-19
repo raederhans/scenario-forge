@@ -111,6 +111,13 @@ function createOwnerHarness({
 function createRenderPassToCacheHarness({ hostResult, nowValue = 900 } = {}) {
   const calls = [];
   const dependencyMap = {
+    physicalViewportCacheOwner: null,
+    borderCanvasPreparationOwner: null,
+    exportRenderInProgress: false,
+    isTnoRasterSceneSelected: () => false,
+    politicalIdRasterRuntimeOwner: null,
+    politicalPassUsesDirectScene: false,
+    tnoRasterSceneOwner: null,
     exactCompositeReuseOwner: {
       invalidate() {
         calls.push(["invalidateExactComposite"]);
@@ -128,6 +135,7 @@ function createRenderPassToCacheHarness({ hostResult, nowValue = 900 } = {}) {
     getRenderPassCommitAccountingOwner: () => ({
       commitRenderPass(options) {
         calls.push(["commitRenderPass", options]);
+        return { committed: options.drawResult?.committed !== false };
       },
     }),
     nowMs: () => {

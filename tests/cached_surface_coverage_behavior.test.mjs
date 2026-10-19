@@ -170,6 +170,24 @@ test("settling rejects uncovered dirty layers instead of publishing empty edges"
   assert.equal(owner.ensureTransformedPassCoverage({}, ["political"]), false);
 });
 
+test("exact borders keep the old surface until projected paths are completely prepared", () => {
+  let pending = true;
+  const surface = { published: true }, painted = [];
+  const cache = { dirty: { borders: true }, signatures: { borders: "old" }, reasons: {}, counters: {}, canvases: { borders: surface } };
+  const owner = createRenderPipelinePassesOwner({ state: { zoomTransform: origin }, helpers: {
+    getRenderPassCacheState: () => cache, getRenderPassSignature: () => "new",
+    prepareRenderPassAsync: name => name === "borders" && pending ? Promise.resolve() : null,
+    renderPassToCache: name => { painted.push(name); cache.dirty[name] = false; cache.signatures[name] = "new"; },
+  } });
+  assert.equal(owner.ensureIdleRenderPasses({}, ["borders"]), false);
+  assert.equal(cache.canvases.borders, surface);
+  assert.equal(cache.signatures.borders, "old");
+  assert.deepEqual(painted, []);
+  pending = false;
+  assert.equal(owner.ensureIdleRenderPasses({}, ["borders"]), true);
+  assert.deepEqual(painted, ["borders"]);
+});
+
 test("exact and coverage preparation yield between expensive passes and converge without repainting completed work", () => {
   for (const mode of ["exact", "coverage"]) {
     let time = 0;

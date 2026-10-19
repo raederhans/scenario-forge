@@ -9,16 +9,35 @@ import { createScenarioWaterCachePolicyOwner } from "../js/core/renderer/scenari
 import { isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "../js/core/population_spatial_view_model.js";
 import { POPULATION_LAYER_ID, POPULATION_DATA_VERSION, POPULATION_YEAR } from "../js/core/population_spatial_data.js";
 
-function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudget, actualWaterPolicy = false, oceanSurfacePattern = null } = {}) {
+function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudget, actualWaterPolicy = false, oceanSurfacePattern = null, rasterPreparation = false, clockStep = 0, resourceBudget = null, pixelMasks = null, waterWorker = null } = {}) {
   const events = [];
   const metrics = [];
   const coverageCalls = [];
   const waterJobs = [];
+  const unavailableReasons = [];
+  const canvases = [];
   const waterWork = { effectiveCollections: 0, atlantropaBuckets: 0, signatures: 0 };
-  const context = (name) => Object.fromEntries(
+  const context = (name) => {
+    const target = Object.fromEntries(
     ["save", "restore", "setTransform", "drawImage", "translate", "scale", "fill", "stroke", "beginPath", "closePath", "clip", "moveTo", "lineTo", "setLineDash"]
       .map((method) => [method, (...args) => events.push([name, method, ...args])]),
-  );
+    );
+    if (pixelMasks) {
+      target.pixels = [0, 0, 0, 0];
+      target.globalAlpha = 1;
+      const stack = [];
+      target.save = () => stack.push(target.globalAlpha);
+      target.restore = () => { target.globalAlpha = stack.pop(); };
+      target.clearRect = () => { target.pixels.fill(0); };
+      const composite = source => source.forEach((alpha, index) => {
+        const sourceAlpha = alpha * target.globalAlpha;
+        target.pixels[index] = sourceAlpha + target.pixels[index] * (1 - sourceAlpha);
+      });
+      target.fill = path => { composite(pixelMasks[path.path] || [0, 0, 0, 0]); events.push([name, "fill", path]); };
+      target.drawImage = canvas => { composite(canvas.getContext("2d").pixels); events.push([name, "drawImage", canvas]); };
+    }
+    return target;
+  };
   let target = context("main");
   const main = target;
   const layer = context("layer");
@@ -34,9 +53,16 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
   let adaptiveDirect = false;
   let boundsAvailable = true;
   let visible = true;
+  let clock = 0;
+  let canvasIndex = 0;
   const oldDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
   const oldPath = Object.getOwnPropertyDescriptor(globalThis, "Path2D");
-  Object.defineProperty(globalThis, "document", { configurable: true, value: { createElement: () => ({ width: 1, height: 1, getContext: () => noLayerContext ? null : layer }) } });
+  Object.defineProperty(globalThis, "document", { configurable: true, value: { createElement: () => {
+    const target = rasterPreparation ? context(`canvas-${canvasIndex++}`) : layer;
+    const canvas = { width: 1, height: 1, getContext: () => noLayerContext ? null : target };
+    canvases.push(canvas);
+    return canvas;
+  } } });
   Object.defineProperty(globalThis, "Path2D", { configurable: true, value: class {
     constructor(path) { this.path = path; this.parts = []; }
     addPath(path) { this.parts.push(path); }
@@ -76,6 +102,13 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     },
   });
   const owner = createScenarioRegionOverlayRenderOwner(state, {
+    getWaterPreparationRevision: waterWorker ? () => revision : null,
+    getWaterWorkerProjectionOptions: waterWorker ? () => ({ factory: "geoEqualEarth" }) : null,
+    createWaterWorkerClient: waterWorker ? () => waterWorker : undefined,
+    resourceBudget,
+    getScenarioWaterRasterLayout: rasterPreparation ? () => cacheOwner.getRenderPassLayout("contextScenario") : null,
+    withRenderTarget,
+    prepareTargetContext: (context, transform) => { context.clearRect?.(); return transform.k; },
     waterPathCacheBudget,
     rendererSurfaceHost: {
       getContext: () => target,
@@ -85,7 +118,7 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     },
     scenarioLayerCache: cacheOwner.scenarioLayerCache,
     cloneZoomTransform: (value) => ({ ...value }),
-    nowMs: () => 1,
+    nowMs: () => { clock += clockStep; return clock; },
     collectContextMetric: (name, _duration, payload) => metrics.push({ name, ...payload }),
     isWaterRegionRenderable: () => true,
     getWaterRegionDefaultStyle: () => ({ opacity: 0.6 }),
@@ -97,6 +130,7 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     scheduleWaterWork: (callback) => { const job = { callback, canceled: false }; waterJobs.push(job); return job; },
     cancelWaterWork: (job) => { job.canceled = true; },
     requestRender: (reason) => events.push(["requestRender", reason]),
+    onWaterPreparationUnavailable: reason => unavailableReasons.push(reason),
     getScenarioWaterVisualRevisionToken: () => { waterWork.signatures += 1; return revision; },
     isWaterRegionEnabled: () => true,
     isMacroOceanWaterRegion: (feature) => !!feature.macro,
@@ -133,7 +167,8 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
       ? waterPolicy.shouldUseDirectScenarioWaterDraw(signals)
       : adaptiveDirect,
   });
-  return { owner, reliefOwner, cacheOwner, state, water, waterWork, waterJobs,
+  return { owner, reliefOwner, cacheOwner, state, water, waterWork, waterJobs, canvases, unavailableReasons,
+    runOneWaterJob: () => { const job = waterJobs.shift(); if (job && !job.canceled) job.callback(); },
     runWaterJobs: () => { while (waterJobs.length) { const job = waterJobs.shift(); if (!job.canceled) job.callback(); } },
     get layout() { return cacheOwner.getRenderPassLayout("contextScenario"); }, events, metrics, coverageCalls, main, draw: () => owner.drawScenarioRegionOverlaysPass(state.zoomTransform.k),
     setNoLayerContext: (value) => { noLayerContext = value; },
@@ -146,6 +181,285 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     replaceCache: () => { cache = { contextScenarioLayerCache: {}, layouts: {} }; }, getCache: () => cache,
   };
 }
+
+test("worker preparation snapshots selection once and publishes only complete candidate", async t => {
+  let resolve;
+  const worker = { available: () => true, dispose() {}, request: () => new Promise(done => { resolve = done; }) };
+  const h = harness(t, { rasterPreparation: true, waterWorker: worker });
+  h.state.firstVisibleFramePainted = true;
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  const reads = h.waterWork.effectiveCollections;
+  for (let i = 0; i < 10; i++) assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.equal(h.waterWork.effectiveCollections, reads);
+  assert.equal(h.events.filter(event => event[0] === "pathSvg").length, 0);
+  let closed = 0;
+  resolve({ bitmap: { close() { closed++; } }, renderedCount: 1,
+    stats: { geometryBytes: 1, pathBytes: 1, patternBytes: 0 } });
+  await Promise.resolve();
+  assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+  h.draw();
+  assert.equal(closed, 1);
+  assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+  h.owner.resetWaterPathCaches();
+});
+
+test("worker failure prepares a complete sliced canvas and retries worker only for a new revision", async t => {
+  let requests = 0;
+  const worker = { available: () => true, dispose() {}, request: async () => { requests++; throw new Error("worker failed"); } };
+  const h = harness(t, { rasterPreparation: true, clockStep: 2, waterWorker: worker });
+  h.state.firstVisibleFramePainted = true;
+  h.water.parts = Array.from({ length: 5 }, (_, id) => ({ id }));
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  await Promise.resolve(); await Promise.resolve();
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  h.draw();
+  assert.equal(h.events.filter(event => event[0] === "pathSvg").length, 0);
+  assert.equal(h.metrics.some(metric => metric.failed && metric.worker), true);
+  h.runOneWaterJob();
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.ok(h.events.filter(event => event[0] === "pathSvg").length < 5);
+  h.runWaterJobs();
+  assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+  assert.equal(requests, 1);
+  h.draw();
+  assert.equal(h.metrics.at(-1).waterCacheMode, "prepared");
+  assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+  assert.equal(requests, 1);
+  assert.deepEqual(h.unavailableReasons, []);
+  h.setRevision("water-2");
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.equal(requests, 2);
+  h.owner.resetWaterPathCaches();
+});
+
+test("worker preparation bypasses temporary startup and interaction constraints and resumes at idle", t => {
+  let requests = 0;
+  const worker = { available: () => true, dispose() {}, request: () => { requests++; return new Promise(() => {}); } };
+  const h = harness(t, { rasterPreparation: true, waterWorker: worker });
+  assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+  h.state.firstVisibleFramePainted = true;
+  for (const flags of [{ renderPhase: "interacting" }, { bootBlocking: true }, { scenarioApplyInFlight: true },
+    { startupReadonly: true }, { startupReadonlyUnlockInFlight: true }]) {
+    Object.assign(h.state, flags);
+    assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+    for (const key of Object.keys(flags)) h.state[key] = key === "renderPhase" ? "idle" : false;
+  }
+  assert.equal(requests, 0);
+  assert.deepEqual(h.unavailableReasons, []);
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.equal(requests, 1);
+  h.owner.resetWaterPathCaches();
+});
+
+test("canvas recovery replaces a previously published worker layer after a revision fails", async t => {
+  const worker = { available: () => true, dispose() {}, request: async input => {
+    if (input.revision !== "water-1") throw new Error("worker failed");
+    return { bitmap: { close() {} }, renderedCount: 1,
+      stats: { geometryBytes: 1, pathBytes: 1, patternBytes: 0 } };
+  } };
+  const h = harness(t, { rasterPreparation: true, waterWorker: worker });
+  h.state.firstVisibleFramePainted = true;
+  h.owner.prepareScenarioWaterLayer();
+  await Promise.resolve();
+  h.draw();
+  h.setRevision("water-2");
+  h.owner.prepareScenarioWaterLayer();
+  await Promise.resolve(); await Promise.resolve();
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  h.runWaterJobs();
+  assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+  h.draw();
+  assert.equal(h.metrics.at(-1).waterCacheMode, "prepared");
+  assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+  assert.deepEqual(h.unavailableReasons, []);
+  h.owner.resetWaterPathCaches();
+});
+
+test("worker failure with an oversized canvas notifies native fallback once and never becomes ready", async t => {
+  let requests = 0;
+  const worker = { available: () => true, dispose() {}, request: async () => { requests++; throw new RangeError("surface budget"); } };
+  const h = harness(t, { rasterPreparation: true, waterWorker: worker });
+  h.state.firstVisibleFramePainted = true;
+  h.state.width = h.state.height = 4000;
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  await Promise.resolve(); await Promise.resolve();
+  for (let i = 0; i < 3; i++) assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.equal(requests, 1);
+  assert.deepEqual(h.unavailableReasons, ["surface-budget"]);
+  assert.equal(h.waterJobs.length, 0);
+  h.draw();
+  assert.equal(h.metrics.at(-1).waterCacheMode, "unavailable");
+  assert.equal(h.events.some(event => event[1] === "fill"), false);
+  h.owner.resetWaterPathCaches();
+});
+
+test("missing canvas context notifies native fallback once without marking preparation ready", t => {
+  const h = harness(t, { rasterPreparation: true, noLayerContext: true });
+  h.state.firstVisibleFramePainted = true;
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.deepEqual(h.unavailableReasons, ["context-unavailable"]);
+  assert.equal(h.waterJobs.length, 0);
+  h.owner.resetWaterPathCaches();
+});
+
+test("failed canvas slice notifies native fallback and releases partial surfaces", t => {
+  const resources = new Map();
+  const h = harness(t, { rasterPreparation: true,
+    resourceBudget: { update: (key, value) => resources.set(key, value), release: key => resources.delete(key) } });
+  h.state.firstVisibleFramePainted = true;
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  h.setNoLayerContext(true);
+  h.runWaterJobs();
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.deepEqual(h.unavailableReasons, ["prepare-failed"]);
+  assert.equal(resources.size, 0);
+  assert.equal(h.canvases.every(canvas => canvas.width === 1 && canvas.height === 1), true);
+  h.owner.resetWaterPathCaches();
+});
+
+test("worker revision change aborts old candidate and closes its late bitmap", async t => {
+  const jobs = [];
+  const worker = { available: () => true, dispose() {}, request: (_input, { signal }) => new Promise(resolve => jobs.push({ resolve, signal })) };
+  const h = harness(t, { rasterPreparation: true, waterWorker: worker });
+  h.state.firstVisibleFramePainted = true;
+  h.owner.prepareScenarioWaterLayer();
+  h.setRevision("water-2");
+  h.owner.prepareScenarioWaterLayer();
+  assert.equal(jobs[0].signal.aborted, true);
+  let closed = 0;
+  jobs[0].resolve({ bitmap: { close() { closed++; } } });
+  await Promise.resolve();
+  assert.equal(closed, 1);
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  h.owner.resetWaterPathCaches();
+});
+
+test("stale worker completion wakes preparation even when no newer render has started", async t => {
+  const jobs = [];
+  const worker = { available: () => true, dispose() {}, request: () => new Promise(resolve => jobs.push(resolve)) };
+  const h = harness(t, { rasterPreparation: true, waterWorker: worker });
+  h.state.firstVisibleFramePainted = true;
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  h.setRevision("water-2");
+  let closed = 0;
+  jobs[0]({ bitmap: { close() { closed++; } } });
+  await Promise.resolve();
+  assert.equal(closed, 1);
+  assert.ok(h.events.some(event => event[0] === "requestRender" && event[1] === "scenario-water-raster-stale"));
+  assert.equal(h.owner.getPreparationDiagnostics().pending, false);
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.equal(jobs.length, 2);
+  h.owner.resetWaterPathCaches();
+});
+
+test("candidate water raster yields between parts and publishes only the complete layer", t => {
+  const resources = new Map();
+  const h = harness(t, { rasterPreparation: true, clockStep: 2,
+    resourceBudget: { update: (key, value) => resources.set(key, value), release: key => resources.delete(key) } });
+  h.state.firstVisibleFramePainted = true;
+  h.water.parts = Array.from({ length: 5 }, (_, i) => ({ id: `part-${i}` }));
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.equal(resources.size, 1);
+  h.runOneWaterJob();
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.equal(h.events.some(event => event[0] === "main" && event[1] === "drawImage"), false);
+  assert.ok(h.events.filter(event => event[0] === "pathSvg").length < 5);
+  h.runWaterJobs();
+  assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+  assert.equal(h.events.filter(event => event[0] === "pathSvg").length, 5);
+  h.events.length = 0;
+  h.draw();
+  assert.equal(h.metrics.at(-1).waterCacheMode, "prepared");
+  assert.equal(h.events.some(event => event[0] === "pathSvg" || event[1] === "fill"), false);
+  assert.equal(resources.size, 0);
+  assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+  assert.equal(h.waterJobs.length, 0);
+});
+
+test("water raster candidate rejects transform changes and releases reset surfaces", t => {
+  const resources = new Map();
+  const h = harness(t, { rasterPreparation: true, clockStep: 2,
+    resourceBudget: { update: (key, value) => resources.set(key, value), release: key => resources.delete(key) } });
+  h.state.firstVisibleFramePainted = true;
+  h.water.parts = [{ id: "a" }, { id: "b" }];
+  h.owner.prepareScenarioWaterLayer();
+  h.state.zoomTransform.k = 2;
+  h.runWaterJobs();
+  assert.equal(resources.size, 0);
+  assert.equal(h.events.some(event => event[0] === "pathSvg"), false);
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  h.owner.resetWaterPathCaches();
+  assert.equal(resources.size, 0);
+  h.runWaterJobs();
+  assert.equal(h.events.some(event => event[0] === "pathSvg"), false);
+});
+
+test("part masks preserve holes and apply marine feature opacity once across overlaps", t => {
+  // Samples: A-only, A/B overlap, A-hole covered by B, uncovered hole.
+  // Each Path2D represents a complete polygon including its interior rings.
+  const h = harness(t, { rasterPreparation: true, pixelMasks: {
+    "projection-1:a": [1, 1, 0, 0],
+    "projection-1:b": [0, 1, 1, 0],
+  } });
+  h.state.firstVisibleFramePainted = true;
+  h.water.parts = [{ id: "a" }, { id: "b" }];
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  h.runWaterJobs();
+  h.draw();
+  assert.deepEqual(h.main.pixels, [0.6, 0.6, 0.6, 0]);
+  assert.equal(h.events.filter(event => event[0] === "pathSvg").length, 2);
+});
+
+test("water raster surface budget rejects oversized candidates without scheduling or increasing budget", t => {
+  const h = harness(t, { rasterPreparation: true });
+  h.state.firstVisibleFramePainted = true;
+  h.state.width = 4000;
+  h.state.height = 4000;
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  assert.equal(h.waterJobs.length, 0);
+  assert.equal(h.metrics.at(-1).reason, "surface-budget");
+  assert.deepEqual(h.unavailableReasons, ["surface-budget"]);
+  h.draw();
+  assert.equal(h.events.some(event => event[1] === "fill"), false);
+});
+
+test("lake-only candidate does not allocate or clear a marine scratch surface", t => {
+  const h = harness(t, { rasterPreparation: true });
+  h.state.firstVisibleFramePainted = true;
+  h.water.properties = { water_type: "lake" };
+  h.owner.prepareScenarioWaterLayer();
+  h.runWaterJobs();
+  assert.equal(h.canvases.length, 1);
+  assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+  assert.equal(h.metrics.filter(metric => metric.name === "drawScenarioWaterFillLayer").length, 0);
+  assert.equal(h.metrics.filter(metric => metric.name === "scenarioWaterRasterPreparation").length, 1);
+});
+
+test("large DPR2 marine raster uses exact-size candidate and budget-bounded scratch strips", t => {
+  const usage = [];
+  const h = harness(t, { rasterPreparation: true,
+    resourceBudget: { update: (_key, value) => usage.push(value.bitmaps), release: () => {} } });
+  h.state.firstVisibleFramePainted = true;
+  h.state.width = 1000;
+  h.state.height = 1000;
+  h.state.dpr = 2;
+  assert.equal(h.owner.prepareScenarioWaterLayer(), false);
+  h.runWaterJobs();
+  assert.equal(h.owner.prepareScenarioWaterLayer(), true);
+  const [candidate, scratch] = h.canvases;
+  assert.equal(candidate.width, h.layout.pixelWidth);
+  assert.equal(candidate.height, h.layout.pixelHeight);
+  assert.ok(scratch.width < candidate.width);
+  assert.equal(scratch.height, candidate.height);
+  assert.ok(Math.max(...usage) <= 32 * 1024 * 1024);
+  assert.deepEqual(h.events.filter(event => event[0] === "canvas-0" && event[1] === "drawImage")
+    .map(event => event[3]), Array.from({ length: Math.ceil(candidate.width / scratch.width) }, (_, index) => index * scratch.width));
+  h.events.length = 0;
+  h.draw();
+  assert.equal(h.metrics.at(-1).waterCacheMode, "prepared");
+  assert.equal(h.events.some(event => event[1] === "fill"), false);
+});
 
 test("selected marine highlight uses simplified display geometry while fill keeps original safe parts", (t) => {
   const sandbox = {};
@@ -596,7 +910,7 @@ for (const mode of ["density", "heatmap"]) {
 test("renderer wires projection and adaptive resets to the same overlay owner", () => {
   const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
   assert.match(source, /createScenarioRegionOverlayRenderOwner\(runtimeState,\s*\{\s*rendererSurfaceHost,/);
-  assert.match(source, /resetHostWaterPathCaches: \(\) => \{\s*scenarioRegionOverlayRenderOwner\?\.resetWaterPathCaches\(\);/);
+  assert.match(source, /resetHostWaterPathCaches: \(\) => \{\s*scenarioRegionOverlayRenderOwner\?\.resetWaterPathCaches\(\{ preserveResidentWorker: true \}\);/);
   assert.match(source, /getPreviousRenderedCount: \(\) => getScenarioRegionOverlayRenderOwner\(\)\.getPreviousWaterRenderedCount\(\),/);
   assert.match(source, /computeProjectedGeoBounds: \(part\) => getScenarioRegionOverlayRenderOwner\(\)\.getScenarioWaterPartBounds\(part\),/);
   assert.match(source, /function resetScenarioWaterCacheAdaptiveState\([^)]*\) \{\s*scenarioRegionOverlayRenderOwner\?\.resetPreviousWaterRenderedCount\(\);/);
@@ -742,4 +1056,19 @@ test("disabled open-ocean paint does not let a stored override hide bathymetry",
   h.state.allowOpenOceanPaint = true;
   h.draw();
   assert.equal(h.main.fillStyle, "#123456");
+});
+
+test("precision cache reset retains the resident worker only within the same scene", async t => {
+  let disposals = 0;
+  const worker = { available: () => true, dispose() { disposals++; }, request: async () => ({
+    bitmap: { close() {} }, renderedCount: 1, stats: { geometryBytes: 1, pathBytes: 1, patternBytes: 0 },
+  }) };
+  const h = harness(t, { rasterPreparation: true, waterWorker: worker });
+  h.state.firstVisibleFramePainted = true;
+  h.owner.prepareScenarioWaterLayer(); await Promise.resolve(); h.draw();
+  h.owner.resetWaterPathCaches({ preserveResidentWorker: true });
+  assert.equal(disposals, 0);
+  h.state.sceneGeneration = 2;
+  h.owner.resetWaterPathCaches({ preserveResidentWorker: true });
+  assert.equal(disposals, 1);
 });

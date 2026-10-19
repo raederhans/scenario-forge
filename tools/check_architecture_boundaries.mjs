@@ -5241,11 +5241,11 @@ function collectFailures() {
         "let projectedGeometryBoundsOwner = null;",
         "createProjectedGeometryBoundsOwner({",
         "getD3: () => globalThis.d3,",
-        "return getProjectedGeometryBoundsOwner().computeProjectedGeoBounds(geoObject);",
+        "return getProjectedGeometryBoundsOwner().computeProjectedGeoBounds(geoObject, options);",
         "return getProjectedGeometryBoundsOwner().getProjectedFeatureBounds(feature, { featureId, allowCompute });",
         "return getProjectedGeometryBoundsOwner().sanitizeWaterRegionFeatures(features);",
         "collectFeatureHitGeometries: collectSafeWaterRegionGeometryParts,",
-        "scenarioRegionOverlayRenderOwner?.resetWaterPathCaches();",
+        "scenarioRegionOverlayRenderOwner?.resetWaterPathCaches({ preserveResidentWorker: true });",
       ],
       rendererForbiddenTokens: [
         "const sphericalGeometryDiagnosticsByObject = new WeakMap();",
@@ -5708,13 +5708,13 @@ function collectFailures() {
     ownerTokens: [
       "const scenarioWaterPathCache = new GeometryBudgetMap(",
       "scenarioWaterPathCache.clear();",
-      "function resetWaterPathCaches()",
+      "function resetWaterPathCaches({ preserveResidentWorker = false } = {})",
       "function drawScenarioRegionOverlaysPass(k)",
     ],
     rendererRequiredTokens: [
       "createScenarioRegionOverlayRenderOwner(runtimeState, {",
       "return getScenarioRegionOverlayRenderOwner().drawScenarioRegionOverlaysPass(k);",
-      "scenarioRegionOverlayRenderOwner?.resetWaterPathCaches();",
+      "scenarioRegionOverlayRenderOwner?.resetWaterPathCaches({ preserveResidentWorker: true });",
     ],
     rendererForbiddenTokens: [
       "let scenarioWaterPartPathCache = new WeakMap();",

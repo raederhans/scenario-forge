@@ -30,6 +30,33 @@ function fixture(extra = {}, helpers = {}) {
   return { owner, state, bundle, payload };
 }
 
+test('readiness peeks never prepare or replace a source and detect stale scene and names', async () => {
+  let yields = 0, changes = 0;
+  const { owner, state } = fixture({}, { isWorkerSupported: () => false,
+    yieldTask: () => { yields++; return Promise.resolve(); }, onChange: () => changes++ });
+  assert.equal(owner.peekSource().status, 'pending');
+  assert.equal(owner.peekSource().revision, 0);
+  assert.equal(yields, 0, 'observing an uninitialized owner cannot begin its source build');
+  await owner.prepare();
+  const accepted = owner.peekSource(), completedYields = yields, completedChanges = changes;
+  assert.equal(accepted.status, 'ready');
+  assert.equal(owner.peekSource().countries, accepted.countries, 'peeking does not copy country geometry or names');
+  state.currentLanguage = 'zh';
+  assert.equal(owner.peekSource().status, 'pending', 'old-language fit inputs are not current');
+  assert.equal(owner.peekSource().revision, accepted.revision, 'peeking consumes no source revision');
+  assert.equal(owner.getSource().status, 'ready', 'the existing producer can publish its names normally');
+  assert.equal(owner.peekSource().status, 'ready');
+  state.sceneGeneration++;
+  assert.equal(owner.peekSource().status, 'pending');
+  assert.equal(yields, completedYields);
+  assert.equal(changes, completedChanges);
+  state.activeScenarioId = 'blank_base';
+  assert.equal(owner.peekSource().status, 'disabled');
+  assert.equal(yields, completedYields);
+  owner.dispose();
+  assert.equal(owner.peekSource().status, 'disposed');
+});
+
 for (const transpose of [false, true]) {
   test(`exact ${transpose ? 'horizontal' : 'vertical'} coarse borders dissolve detail subsegments without changing source geometry`, async () => {
     const rectangle = (x, y, width, height) => {

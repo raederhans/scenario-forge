@@ -3,7 +3,7 @@ import test from "node:test";
 import { createCityLabelOwner } from "../js/core/renderer/city_label_owner.js";
 import { claimScreenLabelPlacement } from "../js/core/renderer/screen_label_placement.js";
 
-function fixture() {
+function fixture(getPaintBounds = () => null) {
   const calls = [];
   const fonts = [];
   const measures = [];
@@ -15,7 +15,7 @@ function fixture() {
     set font(value) { fonts.push(value); },
   };
   const owner = createCityLabelOwner({
-    getters: { getContext: () => context, getViewportSize: () => viewport },
+    getters: { getContext: () => context, getViewportSize: () => viewport, getPaintBounds },
     helpers: {
       clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
       getCityVisualCapitalState: (entry, config) => entry.isCapital && config?.showCapitalOverlay !== false,
@@ -216,4 +216,16 @@ test("capital label opacity follows the capital overlay switch and preserves vis
     config: { showCapitalOverlay: false }, scale: 1, labelOpacity: 0.7, capitalLabelOpacity: 0.5,
   }), 1);
   assert.deepEqual(alphas, [0.7]);
+});
+
+test("paint bounds draw real city text in padding without changing the viewport", () => {
+  let bounds = null;
+  const { owner, calls } = fixture(() => bounds);
+  const entry = { anchor: [-70, 50], screenPoint: [-70, 50] };
+  assert.equal(owner.drawCityLabelsFromEntries([entry], { config: {}, scale: 1 }), 0);
+  bounds = { minX: -96, minY: -96, maxX: 196, maxY: 196 };
+  assert.equal(owner.drawCityLabelsFromEntries([entry], { config: {}, scale: 1 }), 1);
+  assert.ok(calls[0][1] < 0);
+  bounds = null;
+  assert.equal(owner.drawCityLabelsFromEntries([entry], { config: {}, scale: 1 }), 0);
 });

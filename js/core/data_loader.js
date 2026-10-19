@@ -323,13 +323,23 @@ function normalizeCityFeature(feature, index, { sourceLabel = "world_cities" } =
   };
 }
 
-function normalizeCityFeatureCollection(payload, { sourceLabel = "world_cities" } = {}) {
+function finishCityPreparation(iterator) {
+  let step;
+  do { step = iterator.next(); } while (!step.done);
+  return step.value;
+}
+
+function* normalizeCityFeatureCollectionSteps(payload, { sourceLabel = "world_cities" } = {}) {
   if (!Array.isArray(payload?.features)) {
     return null;
   }
   const ids = new Set();
   const stableKeys = new Set();
-  const features = payload.features.map((feature, index) => {
+  const features = new Array(payload.features.length);
+  for (let index = 0; index < payload.features.length; index++) {
+    if ((index + 1) % 128 === 0) yield;
+    if (!(index in payload.features)) continue;
+    const feature = payload.features[index];
     const normalized = normalizeCityFeature(feature, index, { sourceLabel });
     for (const [field, seen] of [["id", ids], ["stable_key", stableKeys]]) {
       const value = normalized.properties[field];
@@ -338,13 +348,17 @@ function normalizeCityFeatureCollection(payload, { sourceLabel = "world_cities" 
       }
       seen.add(value);
     }
-    return normalized;
-  });
+    features[index] = normalized;
+  }
   return {
     ...payload,
     type: "FeatureCollection",
     features,
   };
+}
+
+function normalizeCityFeatureCollection(payload, options) {
+  return finishCityPreparation(normalizeCityFeatureCollectionSteps(payload, options));
 }
 
 function normalizeScenarioCityOverrideEntry(rawEntry, rawCityId = "") {
@@ -510,38 +524,48 @@ function normalizeScenarioGeoLocalePatchPayload(payload) {
   };
 }
 
-function applyAliasObjectToPatch(rawAliasMap, aliasToStableKey) {
+function* applyAliasObjectToPatch(rawAliasMap, aliasToStableKey) {
   if (!rawAliasMap || typeof rawAliasMap !== "object") return;
-  Object.entries(rawAliasMap).forEach(([rawAlias, rawStableKey]) => {
+  let processed = 0;
+  for (const rawAlias in rawAliasMap) {
+    if (!Object.hasOwn(rawAliasMap, rawAlias)) continue;
+    const rawStableKey = rawAliasMap[rawAlias];
     const alias = normalizeCityText(rawAlias);
     const stableKey = normalizeCityText(rawStableKey);
-    if (!alias || !stableKey) return;
-    aliasToStableKey[alias] = stableKey;
-  });
+    if (alias && stableKey) aliasToStableKey[alias] = stableKey;
+    if (++processed % 128 === 0) yield;
+  }
 }
 
-function applyGeoLocaleObjectToPatch(rawGeoMap, geo) {
+function* applyGeoLocaleObjectToPatch(rawGeoMap, geo) {
   if (!rawGeoMap || typeof rawGeoMap !== "object") return;
-  Object.entries(rawGeoMap).forEach(([rawStableKey, rawEntry]) => {
+  let processed = 0;
+  for (const rawStableKey in rawGeoMap) {
+    if (!Object.hasOwn(rawGeoMap, rawStableKey)) continue;
+    if (++processed % 128 === 0) yield;
+    const rawEntry = rawGeoMap[rawStableKey];
     const stableKey = normalizeCityText(rawStableKey);
     const localeEntry = getCityLocaleEntry(rawEntry, stableKey);
-    if (!stableKey || !localeEntry) return;
+    if (!stableKey || !localeEntry) continue;
     // 多路 locale 来源会在这里汇流，所以保留“后写覆盖前写”的浅合并语义，
     // 让更具体的 patch/alias 扩展可以覆盖基础条目，而不必复制整份对象。
     geo[stableKey] = {
       ...(geo[stableKey] || {}),
       ...localeEntry,
     };
-  });
+  }
 }
 
-function applyCityAliasEntriesToPatch(entries, geo, aliasToStableKey) {
-  asArray(entries).forEach((entry, index) => {
-    if (!entry || typeof entry !== "object") return;
+function* applyCityAliasEntriesToPatch(entries, geo, aliasToStableKey) {
+  entries = asArray(entries);
+  for (let index = 0; index < entries.length; index++) {
+    if ((index + 1) % 128 === 0) yield;
+    const entry = entries[index];
+    if (!entry || typeof entry !== "object") continue;
     const stableKey = normalizeCityText(
       entry.stable_key || entry.locale_key || entry.localeKey || entry.id || entry.city_id || `city_alias_${index + 1}`
     );
-    if (!stableKey) return;
+    if (!stableKey) continue;
     // Alias-only and metadata-only entries must not publish IDs as translations.
     const localeEntry = getCityLocaleEntry(entry);
     if (localeEntry) {
@@ -566,17 +590,19 @@ function applyCityAliasEntriesToPatch(entries, geo, aliasToStableKey) {
     aliases.forEach((alias) => {
       aliasToStableKey[alias] = stableKey;
     });
-  });
+  }
 }
 
-function buildCityLocalizationPatch({ cityCollection = null, cityAliases = null } = {}) {
+export function* buildCityLocalizationPatchSteps({ cityCollection = null, cityAliases = null } = {}) {
   const geo = {};
   const aliasToStableKey = {};
 
-  asArray(cityCollection?.features).forEach((feature) => {
+  let processed = 0;
+  for (const feature of asArray(cityCollection?.features)) {
+    if (++processed % 128 === 0) yield;
     const props = feature?.properties || {};
     const stableKey = normalizeCityText(getSharedFeatureStableKey(feature));
-    if (!stableKey) return;
+    if (!stableKey) continue;
     const localeEntry = getCityLocaleEntry(props.__city_locale || props, stableKey);
     if (localeEntry) {
       geo[stableKey] = {
@@ -589,19 +615,23 @@ function buildCityLocalizationPatch({ cityCollection = null, cityAliases = null 
       if (!normalizedAlias) return;
       aliasToStableKey[normalizedAlias] = stableKey;
     });
-  });
+  }
 
-  applyAliasObjectToPatch(cityAliases?.alias_to_stable_key, aliasToStableKey);
-  applyGeoLocaleObjectToPatch(cityAliases?.geo, geo);
-  applyGeoLocaleObjectToPatch(cityAliases?.locales?.geo, geo);
-  applyCityAliasEntriesToPatch(cityAliases?.entries, geo, aliasToStableKey);
-  applyCityAliasEntriesToPatch(cityAliases?.cities, geo, aliasToStableKey);
-  applyCityAliasEntriesToPatch(cityAliases?.aliases, geo, aliasToStableKey);
+  yield* applyAliasObjectToPatch(cityAliases?.alias_to_stable_key, aliasToStableKey);
+  yield* applyGeoLocaleObjectToPatch(cityAliases?.geo, geo);
+  yield* applyGeoLocaleObjectToPatch(cityAliases?.locales?.geo, geo);
+  yield* applyCityAliasEntriesToPatch(cityAliases?.entries, geo, aliasToStableKey);
+  yield* applyCityAliasEntriesToPatch(cityAliases?.cities, geo, aliasToStableKey);
+  yield* applyCityAliasEntriesToPatch(cityAliases?.aliases, geo, aliasToStableKey);
 
   return {
     geo,
     aliasToStableKey,
   };
+}
+
+function buildCityLocalizationPatch(options) {
+  return finishCityPreparation(buildCityLocalizationPatchSteps(options));
 }
 
 function mergeCityLocalizationData({
@@ -636,13 +666,14 @@ async function loadOptionalJsonCandidate(d3Client, candidateUrls, { label = "res
   for (const url of urls.filter(Boolean)) {
     try {
       const payload = await d3Client.json(url);
-      const normalized = normalizer(payload, url);
+      const normalized = await normalizer(payload, url);
       if (normalized !== null && normalized !== undefined) {
         return normalized;
       }
       console.warn(`[data_loader] Optional ${label} payload invalid at ${url}.`);
       sawFailure = true;
     } catch (error) {
+      if (error?.name === "AbortError") throw error;
       sawFailure = true;
       console.warn(`[data_loader] Optional ${label} missing or invalid at ${url}.`, error);
     }
@@ -1907,6 +1938,8 @@ export async function loadCitySupportData({
   geoAliases = { alias_to_stable_key: {} },
   includeLocalization = true,
   cityCollection = null,
+  deferLocalization = false,
+  prepareCandidate = finishCityPreparation,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadCitySupportData().");
@@ -1915,7 +1948,7 @@ export async function loadCitySupportData({
   const [worldCities, cityAliases] = await Promise.all([
     cityCollection || loadOptionalJsonCandidate(d3Client, worldCitiesUrls, {
       label: "world_cities",
-      normalizer: (payload) => normalizeCityFeatureCollection(payload, { sourceLabel: "world_cities" }),
+      normalizer: (payload) => prepareCandidate(normalizeCityFeatureCollectionSteps(payload, { sourceLabel: "world_cities" })),
     }),
     includeLocalization ? loadOptionalJsonCandidate(d3Client, cityAliasesUrls, {
       label: "city_aliases",
@@ -1924,6 +1957,9 @@ export async function loadCitySupportData({
   ]);
 
   if (!includeLocalization) return { worldCities, localizationReady: false };
+  // The pipeline rebases localization against its current snapshot after fetch,
+  // rather than publishing a merge against dictionaries captured before IO.
+  if (deferLocalization) return { worldCities, cityAliases, localizationReady: true, localizationDeferred: true };
   const merged = mergeCityLocalizationData({
     locales,
     geoAliases,

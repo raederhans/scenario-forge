@@ -2313,6 +2313,14 @@ test(`local projection preserves exact test routes with renderer scope ${include
   }), "edit", { preparedCatalog: binding.preparedCatalog });
   const expectedCommands = [
     ...(includeRenderer ? [
+      "node --test tests/country_label_render_owner_behavior.test.mjs tests/city_label_owner_behavior.test.mjs tests/static_border_mesh_lifecycle_behavior.test.mjs tests/render_cache_owner_invalidation_behavior.test.mjs tests/urban_city_policy_strategic_values_behavior.test.mjs tests/marine_label_owner_behavior.test.mjs",
+      "node --test tests/index_ui_refresh_scheduler_behavior.test.mjs",
+      "node --test tests/scenario_political_preparation_behavior.test.mjs",
+      "node --test tests/scenario_secondary_preparation_behavior.test.mjs",
+      "node --test tests/tno_raster_scene_owner_behavior.test.mjs",
+      "node --test tests/water_geometry_transport_behavior.test.mjs tests/water_raster_worker_client_behavior.test.mjs tests/water_raster_worker_kernel_behavior.test.mjs tests/scenario_region_overlay_render_owner_behavior.test.mjs",
+    ] : []),
+    ...(includeRenderer ? [
       "node --test tests/atlantropa_water_color_behavior.test.mjs",
       "node --test tests/bathymetry_runtime_state_behavior.test.mjs",
       "node --test tests/cached_surface_coverage_behavior.test.mjs",
@@ -2341,7 +2349,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
     ...(includeRenderer ? ["test:node:ownership-retirement", "test:node:startup-lifecycle"] : []),
   ];
 
-  assert.deepEqual(projected.recommendedCommands.map((entry) => entry.commandRef), expectedCommands);
+  assert.deepEqual(projected.recommendedCommands.map((entry) => entry.commandRef), expectedCommands.sort());
   assert.deepEqual(projected.localEntrypointRouteGaps, []);
   assert.equal(projected.localLeafEquivalence.status, "equivalent");
   // The broader renderer scope must retain its added obligations and report
@@ -2354,6 +2362,21 @@ test(`local projection preserves exact test routes with renderer scope ${include
     "adaptive-edit-cost-budget-exceeded",
   ] : []);
   assert.deepEqual(plan.selectedLeaves.map((entry) => entry.leafId).sort(), [
+    ...(includeRenderer ? [
+      "node-test:tests/city_label_owner_behavior.test.mjs",
+      "node-test:tests/country_label_render_owner_behavior.test.mjs",
+      "node-test:tests/index_ui_refresh_scheduler_behavior.test.mjs",
+      "node-test:tests/render_cache_owner_invalidation_behavior.test.mjs",
+      "node-test:tests/scenario_political_preparation_behavior.test.mjs",
+      "node-test:tests/scenario_region_overlay_render_owner_behavior.test.mjs",
+      "node-test:tests/scenario_secondary_preparation_behavior.test.mjs",
+      "node-test:tests/static_border_mesh_lifecycle_behavior.test.mjs",
+      "node-test:tests/tno_raster_scene_owner_behavior.test.mjs",
+      "node-test:tests/urban_city_policy_strategic_values_behavior.test.mjs",
+      "node-test:tests/water_geometry_transport_behavior.test.mjs",
+      "node-test:tests/water_raster_worker_client_behavior.test.mjs",
+      "node-test:tests/water_raster_worker_kernel_behavior.test.mjs",
+    ] : []),
     ...(includeRenderer ? ["node-test:tests/atlantropa_water_color_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/bathymetry_runtime_state_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/border_draw_owner_behavior.test.mjs", "node-test:tests/border_mesh_owner_behavior.test.mjs", "node-test:tests/brush_interaction_session_owner_behavior.test.mjs"] : []),
@@ -2404,7 +2427,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
       "node-test:tests/visual_brush_transaction_behavior.test.mjs",
     ] : []),
     "python-unittest:tests.test_map_renderer_render_snapshot_boundary_contract",
-  ]);
+  ].sort());
   assert.equal(plan.executionCommands.length, includeRenderer ? 0 : 2);
   assert.equal(adaptivePlanningExitCode(projected, plan), includeRenderer ? 2 : 0);
   for (const testFile of changedFiles.filter((file) => file.startsWith("tests/"))) {

@@ -39,9 +39,12 @@ function ringMetrics(ring) {
   return { area: Math.abs(sum) / 2, minX, minY, maxX, maxY };
 }
 
-function ringContains(ring, [x, y]) {
+const MIN_INDEXED_RING_LENGTH = 256;
+const RING_EDGE_BLOCK_SIZE = 32;
+
+function ringContainsEdgeRange(ring, x, y, start, end) {
   let inside = false;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+  for (let i = start, j = start === 0 ? ring.length - 1 : start - 1; i < end; j = i++) {
     const [xi, yi] = ring[i];
     const [xj, yj] = ring[j];
     if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
@@ -49,7 +52,42 @@ function ringContains(ring, [x, y]) {
   return inside;
 }
 
-function groupProjectedRings(rings) {
+function buildRingYIndex(ring, start = 0, end = ring.length) {
+  if (end - start <= RING_EDGE_BLOCK_SIZE) {
+    // Every edge i also uses vertex i-1, including the closing edge at i=0.
+    let minY = ring[start === 0 ? ring.length - 1 : start - 1][1];
+    let maxY = minY;
+    for (let index = start; index < end; index++) {
+      const y = ring[index][1];
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y);
+    }
+    return { start, end, minY, maxY };
+  }
+  const middle = start + Math.floor((end - start) / 2);
+  const left = buildRingYIndex(ring, start, middle);
+  const right = buildRingYIndex(ring, middle, end);
+  return { left, right, minY: Math.min(left.minY, right.minY), maxY: Math.max(left.maxY, right.maxY) };
+}
+
+function indexedRingContains(ring, index, x, y) {
+  // The original crossing predicate includes the lower endpoint and excludes
+  // the upper one. Horizontal blocks therefore have no crossings at any y.
+  if (y < index.minY || y >= index.maxY) return false;
+  if (!index.left) return ringContainsEdgeRange(ring, x, y, index.start, index.end);
+  return indexedRingContains(ring, index.left, x, y) !== indexedRingContains(ring, index.right, x, y);
+}
+
+function ringContains(node, [x, y]) {
+  const ring = node.ring;
+  if (ring.length < MIN_INDEXED_RING_LENGTH) return ringContainsEdgeRange(ring, x, y, 0, ring.length);
+  // Many holes query the same large exterior. Keep this lazy index on the
+  // grouping node only, so no geometry or projection cache retains it.
+  node.ringYIndex ||= buildRingYIndex(ring);
+  return indexedRingContains(ring, node.ringYIndex, x, y);
+}
+
+export function groupProjectedRings(rings) {
   // A clipped spherical polygon can emit several disjoint exterior rings in
   // one polygonStart/polygonEnd pair. Rebuild planar nesting before fitting.
   const nodes = rings.map((ring) => ({ ring, ...ringMetrics(ring), parent: null, depth: 0 }))
@@ -62,7 +100,7 @@ function groupProjectedRings(rings) {
       // Most projected island rings are disjoint. Reject impossible containers
       // before walking their edges; inclusive bounds retain exact boundary rules.
       if (x < candidate.minX || x > candidate.maxX || y < candidate.minY || y > candidate.maxY) continue;
-      if (ringContains(candidate.ring, node.ring[0])) {
+      if (ringContains(candidate, node.ring[0])) {
         node.parent = candidate;
         node.depth = node.parent.depth + 1;
         break;
@@ -160,8 +198,8 @@ function polygonBounds(polygons) {
 function visibleComponentArea(component, transform, viewport) {
   if (!component) return 0;
   const box = screenBox(component.bounds, transform, 0);
-  const width = Math.max(0, Math.min(viewport.width, box.x + box.w) - Math.max(0, box.x));
-  const height = Math.max(0, Math.min(viewport.height, box.y + box.h) - Math.max(0, box.y));
+  const width = Math.max(0, Math.min(viewport.maxX ?? viewport.width, box.x + box.w) - Math.max(viewport.minX ?? 0, box.x));
+  const height = Math.max(0, Math.min(viewport.maxY ?? viewport.height, box.y + box.h) - Math.max(viewport.minY ?? 0, box.y));
   const fraction = box.w > 0 && box.h > 0 ? width * height / (box.w * box.h) : 0;
   return component.area * transform.k ** 2 * fraction;
 }
@@ -174,12 +212,33 @@ function visibleTerritoryArea(entry, transform, viewport) {
   }, 0);
 }
 
+export function isCountryLabelDefinitelyInvisible(entry, transform, paintBounds) {
+  if (!entry.polygons || !Array.isArray(entry.components) || !entry.components.length
+    || ![transform?.x, transform?.y, transform?.k].every(Number.isFinite) || !(transform.k > 0)
+    || ![paintBounds?.minX ?? 0, paintBounds?.minY ?? 0,
+      paintBounds?.maxX ?? paintBounds?.width, paintBounds?.maxY ?? paintBounds?.height].every(Number.isFinite)) return false;
+  return entry.components.every(component => {
+    if (!component?.bounds || ![component.bounds.x, component.bounds.y, component.bounds.w, component.bounds.h].every(Number.isFinite)
+      || component.bounds.w < 0 || component.bounds.h < 0 || !Number.isFinite(component.area) || component.area < 0) return false;
+    const visibleArea = visibleComponentArea(component, transform, paintBounds);
+    if (!Number.isFinite(visibleArea) || visibleArea < 0) return false;
+    // Readability saturates at fontSizePx=10; country opacity is at most one.
+    // Thus no fitted glyph size or placement can reach the drawing threshold.
+    const maximumAlpha = getVisibilityAlpha(10, visibleArea);
+    // Keep the exact mathematical cutoff too: floating rounding just below
+    // 0.05 must not discard a country at the boundary.
+    return visibleArea < (28 + 32 * (0.05 / 0.9)) ** 2
+      && Number.isFinite(maximumAlpha) && maximumAlpha < 0.05;
+  });
+}
+
 export function createCountryLabelRenderOwner({ state = {}, getters = {}, helpers = {} } = {}) {
   const {
     getContext = () => null,
     getProjection = () => null,
     getProjectionIdentity = () => getProjectionGeometryGeneration(getProjection()),
     getViewportSize = () => ({ width: 0, height: 0 }),
+    getPaintBounds = () => null,
     getTransform = () => state.zoomTransform || { x: 0, y: 0, k: 1 },
     getLanguage = () => state.currentLanguage || state.language || "en",
     getCountryLabelSource = () => null,
@@ -191,7 +250,10 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
   const glyphMetrics = new Map();
   let geometryCache = null;
   let scheduledContinuation = null;
-  let layoutWorker = null;
+  let privatePreparation = null;
+  let layoutWorkers = [];
+  const maxLayoutWorkers = Math.max(1, Math.min(4, Math.floor(helpers.maxLayoutWorkers || 4)));
+  const maxPendingPerWorker = Math.max(1, Math.min(MAX_PENDING_WORKER_FITS, Math.floor(helpers.maxPendingPerWorker || 2)));
   let workerFailed = false;
   let requestId = 0;
   let cacheGeneration = 0;
@@ -204,11 +266,19 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     if (typeof globalThis.requestIdleCallback === "function") globalThis.requestIdleCallback(callback, { timeout: 200 });
     else globalThis.setTimeout(callback, 0);
   });
+  const schedulePreparation = helpers.schedulePreparation || helpers.scheduleWork
+    || ((callback) => globalThis.setTimeout(callback, 0));
   const diagnostics = {
     geometryBuilds: 0, candidateBuilds: 0, fitBuilds: 0, metricBuilds: 0,
     projectedCountries: 0, candidateCount: 0, drawn: 0, glyphsDrawn: 0, pendingFits: 0, lastLabels: [],
     workerFits: 0, workerErrors: 0, lastWorkerError: "",
+    workerTotalMs: 0, workerMaxMs: 0, workerFitMs: 0, workerMaxFitMs: 0,
+    workerCandidateBuildMs: 0, workerMaxCandidateBuildMs: 0, workerPreparedBuildMs: 0, workerMaxPreparedBuildMs: 0,
+    preparedGeometryHits: 0, preparedGeometryBuilds: 0, preparedGeometryBytes: 0,
+    workerCount: 0, workersCreated: 0, workerPoolLimit: maxLayoutWorkers,
+    maxWorkerQueue: 0, maxPendingWorkerFits: 0,
     rejectedByVisibility: 0, rejectedByCollision: 0, rejectedByViewport: 0, noFit: 0, rejectedLabels: [],
+    skippedByVisibilityUpperBound: 0,
   };
 
   function storeFit(entry, key, fit) {
@@ -239,12 +309,22 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     return false;
   }
 
+  function terminateLayoutWorkers() {
+    const previous = layoutWorkers;
+    layoutWorkers = [];
+    diagnostics.workerCount = 0;
+    for (const slot of previous) slot?.worker.terminate();
+  }
+
+  function canQueueEntry(entry) {
+    return (layoutWorkers[entry.workerSlot]?.pending || 0) < maxPendingPerWorker;
+  }
+
   function failWorker(error) {
     diagnostics.workerErrors += 1;
     diagnostics.lastWorkerError = String(error?.message || error || "country label layout worker failed");
     workerFailed = true;
-    layoutWorker?.terminate();
-    layoutWorker = null;
+    terminateLayoutWorkers();
     for (const pending of workerRequests.values()) {
       clearRequestTimeout(pending.timeout);
       pending.entry.workerPending.delete(pending.key);
@@ -253,23 +333,43 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     workerRequests.clear();
   }
 
-  function getLayoutWorker() {
-    if (layoutWorker || workerFailed) return layoutWorker;
+  function getLayoutWorker(entry) {
+    const index = entry.workerSlot;
+    if (workerFailed) return null;
+    if (layoutWorkers[index]) return layoutWorkers[index];
     const createWorker = helpers.createWorker || (typeof globalThis.Worker === "function"
       ? () => new Worker(new URL("./country_label_layout_worker.js", import.meta.url), { type: "module" }) : null);
     if (!createWorker) return null;
     try {
-      layoutWorker = createWorker();
-      const ownedWorker = layoutWorker;
-      layoutWorker.onmessage = ({ data }) => {
-        if (layoutWorker !== ownedWorker) return;
+      const worker = createWorker({ index });
+      const slot = { worker, pending: 0 };
+      layoutWorkers[index] = slot;
+      diagnostics.workerCount++;
+      diagnostics.workersCreated++;
+      worker.onmessage = ({ data }) => {
+        if (layoutWorkers[index] !== slot) return;
         const request = workerRequests.get(data.requestId);
-        if (!request) return;
+        if (!request || request.slot !== slot) return;
         clearRequestTimeout(request.timeout);
         workerRequests.delete(data.requestId);
+        slot.pending--;
         request.entry.workerPending.delete(request.key);
-        if (request.geometry !== geometryCache || request.textGeneration !== textGeneration) {
-          helpers.onInvalidate?.();
+        for (const [field, total, maximum] of [["workerMs", "workerTotalMs", "workerMaxMs"],
+          ["fitMs", "workerFitMs", "workerMaxFitMs"],
+          ["candidateBuildMs", "workerCandidateBuildMs", "workerMaxCandidateBuildMs"],
+          ["preparedGeometryBuildMs", "workerPreparedBuildMs", "workerMaxPreparedBuildMs"]]) {
+          if (Number.isFinite(data[field]) && data[field] >= 0) {
+            diagnostics[total] += data[field];
+            diagnostics[maximum] = Math.max(diagnostics[maximum], data[field]);
+          }
+        }
+        diagnostics.preparedGeometryHits += Number(data.preparedGeometryHits) || 0;
+        diagnostics.preparedGeometryBuilds += Number(data.preparedGeometryBuilds) || 0;
+        if (Number.isFinite(data.preparedGeometryBytes)) diagnostics.preparedGeometryBytes = data.preparedGeometryBytes;
+        if (request.geometry !== geometryCache || request.textGeneration !== textGeneration
+          || !isFitCacheCurrent(request.view)
+          || (request.preparation && !isPrivateViewCurrent(request.preparation))) {
+          notifyPreparationProgress(request);
           return;
         }
         if (data.error) {
@@ -277,7 +377,6 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
           failWorker(data.error);
         } else {
           storeFit(request.entry, request.key, data.fit);
-          if (data.fit) request.entry.previousFit = data.fit;
           diagnostics.fitBuilds += 1;
           diagnostics.workerFits += 1;
           if (data.candidateBuilt) {
@@ -285,25 +384,29 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
             diagnostics.candidateCount += data.candidateCount;
           }
         }
-        helpers.onInvalidate?.();
+        notifyPreparationProgress(request);
       };
-      layoutWorker.onerror = (error) => {
-        if (layoutWorker !== ownedWorker) return;
+      worker.onerror = (error) => {
+        if (layoutWorkers[index] !== slot) return;
         failWorker(error);
-        helpers.onInvalidate?.();
+        notifyPreparationProgress();
       };
-      layoutWorker.onmessageerror = () => {
-        if (layoutWorker !== ownedWorker) return;
+      worker.onmessageerror = () => {
+        if (layoutWorkers[index] !== slot) return;
         failWorker(new Error("Country label worker response could not be decoded."));
-        helpers.onInvalidate?.();
+        notifyPreparationProgress();
       };
     } catch (error) {
       failWorker(error);
     }
-    return layoutWorker;
+    return layoutWorkers[index] || null;
   }
 
-  function prepareFit(entry, context, text, key, isChinese, font, zoomBand) {
+  function prepareFit(entry, context, text, key, isChinese, font, zoomBand, view) {
+    if (workerFailed) {
+      storeFit(entry, key, null);
+      return;
+    }
     const viewport = getViewportSize();
     const options = {
       glyphs: getGlyphMetrics(context, text, font), glyphPadding: 0.06,
@@ -311,7 +414,8 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       maxTracking: isChinese ? 0.14 : 0.08,
       minHoleArea: MIN_LABEL_HOLE_SCREEN_AREA / zoomBand.upperScale ** 2,
       readableFontSize: 10 / (zoomBand.upperScale / 2 ** 0.25),
-      preferredCandidateIndex: entry.previousFit?.candidateIndex,
+      // Exact fits use the layout algorithm's stable ranking. A completed old
+      // band must not make the same final input choose a different candidate.
       maxAlternatives: 3,
       maxTiltDegrees: 30, allowArcs: true,
       preferGentleArcs: true,
@@ -319,22 +423,26 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       maxArcTiltDegrees: isChinese ? 10 : 15, maxArcBendDegrees: isChinese ? 14 : 22,
       allowMultiline: true, allowPositionShift: true,
     };
-    const worker = typeof helpers.onInvalidate === "function" ? getLayoutWorker() : null;
+    const slot = typeof helpers.onInvalidate === "function" ? getLayoutWorker(entry) : null;
     if (workerFailed) {
       storeFit(entry, key, null);
       return;
     }
-    if (worker) {
+    if (slot) {
       const id = ++requestId;
       entry.workerPending.add(key);
       const timeout = setRequestTimeout(() => {
         if (!workerRequests.has(id)) return;
         failWorker(new Error("Country label layout worker timed out."));
-        helpers.onInvalidate?.();
+        notifyPreparationProgress();
       }, 20_000);
-      workerRequests.set(id, { geometry: geometryCache, entry, key, textGeneration, timeout });
+      workerRequests.set(id, { geometry: geometryCache, entry, key, textGeneration, timeout, slot, view,
+        preparation: privatePreparation });
+      slot.pending++;
+      diagnostics.maxWorkerQueue = Math.max(diagnostics.maxWorkerQueue, slot.pending);
+      diagnostics.maxPendingWorkerFits = Math.max(diagnostics.maxPendingWorkerFits, workerRequests.size);
       try {
-        worker.postMessage({ requestId: id, generation: cacheGeneration, countryCode: entry.countryCode,
+        slot.worker.postMessage({ requestId: id, generation: cacheGeneration, countryCode: entry.countryCode,
           polygons: entry.workerHasGeometry ? undefined : entry.polygons, options });
         entry.workerHasGeometry = true;
       } catch (error) { failWorker(error); }
@@ -354,7 +462,6 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     const fit = candidates.length ? fitLabel(candidates, { ...options, polygons: entry.polygons }) : null;
     diagnostics.fitBuilds += 1;
     storeFit(entry, key, fit);
-    if (fit) entry.previousFit = fit;
   }
 
   function getGlyphMetrics(context, text, font) {
@@ -386,16 +493,16 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     if (geometryCache && geometryCache.sourceToken === source.sourceToken
       && geometryCache.revision === source.revision && geometryCache.projection === projection
       && geometryCache.identity === identity) return geometryCache;
-    const entries = (source.countries || []).map((record) => {
+    cancelPrivatePreparation();
+    const entries = (source.countries || []).map((record, index) => {
       const shape = record.geometry || record.feature?.geometry;
       const inputPolygons = shape?.type === "MultiPolygon" ? shape.coordinates
         : shape?.type === "Polygon" ? [shape.coordinates] : [];
       return { countryCode: record.countryCode, inputPolygons, projectedPolygons: [], polygonCursor: 0,
-        polygons: null, bounds: null, components: [], candidates: null, fits: new Map(), previousFit: null,
-        workerPending: new Set(), workerHasGeometry: false };
+        polygons: null, bounds: null, components: [], candidates: null, fits: new Map(),
+        workerPending: new Set(), workerHasGeometry: false, workerSlot: index % maxLayoutWorkers };
     });
-    layoutWorker?.terminate();
-    layoutWorker = null;
+    terminateLayoutWorkers();
     for (const pending of workerRequests.values()) clearRequestTimeout(pending.timeout);
     workerRequests.clear();
     scheduledContinuation = null;
@@ -404,6 +511,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     workerFailed = false;
     diagnostics.workerErrors = 0;
     diagnostics.lastWorkerError = "";
+    diagnostics.preparedGeometryBytes = 0;
     cacheGeneration += 1;
     diagnostics.geometryBuilds += 1;
     diagnostics.projectedCountries = 0;
@@ -417,7 +525,153 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     return geometryCache;
   }
 
+  function getFitKey(text, language, font, zoomBand, viewport) {
+    // Arc eligibility depends on viewport area. Keep band last so a compatible
+    // cached band can still provide temporary navigation feedback.
+    return `${textGeneration}\n${language}\n${font}\n${text}\n${viewport.width}:${viewport.height}\n${zoomBand.index}`;
+  }
+
+  function getViewFitRequest(entry, view, onInvisible = null) {
+    const text = displayText(view.records.get(entry.countryCode)?.name, view.language);
+    if (!text) return null;
+    const key = getFitKey(text, view.language, view.font, view.zoomBand, view.viewport);
+    if (entry.polygons) {
+      if (!entry.bounds) return null;
+      const box = screenBox(entry.bounds, view.transform, 0);
+      const bounds = view.paintBounds;
+      if (box.x + box.w < bounds.minX + 2 || box.y + box.h < bounds.minY + 2
+        || box.x > bounds.maxX - 2 || box.y > bounds.maxY - 2) return null;
+      if (isCountryLabelDefinitelyInvisible(entry, view.transform, bounds)) {
+        onInvisible?.(entry, text);
+        return null;
+      }
+    }
+    return { entry, text, key };
+  }
+
+  function collectPendingFits(view) {
+    return view.geometry.entries.map(entry => getViewFitRequest(entry, view))
+      .filter(request => request && (!request.entry.polygons || !request.entry.fits.has(request.key)));
+  }
+
+  function preparePendingFits(pending, view) {
+    const target = getContext();
+    if (!target) return;
+    const start = nowMs();
+    let prepared = 0, remaining = 12;
+    for (const { entry, text, key } of pending) {
+      if (workerRequests.size >= MAX_PENDING_WORKER_FITS) break;
+      if (entry.workerPending.has(key) || entry.fits.has(key) || entry.workerPending.size >= MAX_CACHED_FITS || !canQueueEntry(entry)) continue;
+      if (prepared && (remaining <= 0 || prepared >= 8)) break;
+      if (!entry.polygons) projectEntry(entry, view.projection, Math.max(0, remaining));
+      // Projection can establish that a country does not need a fit at all.
+      if (entry.polygons && getViewFitRequest(entry, view) && nowMs() - start < 12) {
+        target.save();
+        try { prepareFit(entry, target, text, key, view.isChinese, view.font, view.zoomBand, view); }
+        finally { target.restore(); }
+      }
+      prepared += 1;
+      remaining = 12 - (nowMs() - start);
+    }
+  }
+
+  function cancelPrivatePreparation(error = null) {
+    const job = privatePreparation;
+    if (!job) return;
+    privatePreparation = null;
+    job.scheduled = false;
+    job.view = null;
+    if (error) job.reject(error);
+    else job.resolve();
+  }
+
+  function isFitCacheCurrent(view) {
+    if (!view || view.textGeneration !== textGeneration || geometryCache !== view.geometry
+      || getProjection() !== view.projection || getProjectionIdentity() !== view.geometry.identity
+      || String(getLanguage() || "en") !== view.language) return false;
+    const source = getCountryLabelSource();
+    if (source?.status !== "ready" || source.sourceToken !== view.geometry.sourceToken
+      || source.revision !== view.geometry.revision || source.countries !== view.countries) return false;
+    const viewport = getViewportSize();
+    return viewport.width === view.viewport.width && viewport.height === view.viewport.height;
+  }
+
+  function isFitViewCurrent(view) {
+    if (!isFitCacheCurrent(view)) return false;
+    const transform = getTransform() || {}, viewport = getViewportSize();
+    const bounds = getPaintBounds() || { minX: 0, minY: 0, maxX: viewport.width, maxY: viewport.height };
+    return ["x", "y", "k"].every(key => (Number(transform[key]) || (key === "k" ? 1 : 0)) === view.transform[key])
+      && ["minX", "minY", "maxX", "maxY"].every(key => bounds[key] === view.paintBounds[key]);
+  }
+
+  function isPrivateViewCurrent(job) {
+    return privatePreparation === job && helpers.isPrivatePreparationEnabled?.() !== false
+      && !state.isInteracting && state.styleConfig?.countryLabels?.enabled !== false
+      && isFitViewCurrent(job.view);
+  }
+
+  function advancePrivatePreparation() {
+    const job = privatePreparation;
+    if (!job) return;
+    if (!isPrivateViewCurrent(job)) { cancelPrivatePreparation(); return; }
+    const pending = collectPendingFits(job.view);
+    if (!pending.length || workerFailed) {
+      cancelPrivatePreparation();
+      helpers.onInvalidate?.();
+      return;
+    }
+    const next = pending.some(({ entry, key }) => !entry.workerPending.has(key)
+      && entry.workerPending.size < MAX_CACHED_FITS && canQueueEntry(entry));
+    if (!next || job.scheduled || workerRequests.size >= MAX_PENDING_WORKER_FITS) return;
+    job.scheduled = true;
+    schedulePreparation(() => {
+      if (privatePreparation !== job) return;
+      job.scheduled = false;
+      if (!isPrivateViewCurrent(job) || !getContext()) { cancelPrivatePreparation(); return; }
+      try {
+        preparePendingFits(collectPendingFits(job.view), job.view);
+        advancePrivatePreparation();
+      } catch (error) {
+        // The frame preflight may only inspect the returned promise. Record a
+        // terminal generation failure and wake it without an unhandled reject.
+        failWorker(error);
+        cancelPrivatePreparation();
+        helpers.onInvalidate?.();
+      }
+    });
+  }
+
+  function notifyPreparationProgress(request = null) {
+    if (privatePreparation) advancePrivatePreparation();
+    else if (!request?.preparation) helpers.onInvalidate?.();
+  }
+
+  function prepareCurrentView(k) {
+    if (privatePreparation && privatePreparation.view.transform.k === k
+      && isPrivateViewCurrent(privatePreparation)) return privatePreparation.promise;
+    cancelPrivatePreparation();
+    if (helpers.isPrivatePreparationEnabled?.() === false || state.isInteracting
+      || state.styleConfig?.countryLabels?.enabled === false || !(k > 0)
+      || !getContext() || !getProjection()) return null;
+    const source = getCountryLabelSource(), projection = getProjection(), viewport = getViewportSize();
+    if (source?.status !== "ready" || !(viewport.width > 0 && viewport.height > 0)) return null;
+    const raw = getTransform() || {}, language = String(getLanguage() || "en"), isChinese = language.startsWith("zh");
+    const view = { geometry: getGeometry(source, projection), projection, countries: source.countries, viewport: { ...viewport },
+      transform: { x: Number(raw.x) || 0, y: Number(raw.y) || 0, k }, language, isChinese,
+      font: isChinese ? CHINESE_FONT : ENGLISH_FONT, zoomBand: getZoomBand(k), textGeneration,
+      paintBounds: { ...(getPaintBounds() || { minX: 0, minY: 0, maxX: viewport.width, maxY: viewport.height }) },
+      records: new Map((source.countries || []).map(record => [record.countryCode, record])) };
+    if (!collectPendingFits(view).length || workerFailed) return null;
+    scheduledContinuation = null;
+    const job = { view, scheduled: false, resolve: null, reject: null, promise: null };
+    job.promise = new Promise((resolve, reject) => { job.resolve = resolve; job.reject = reject; });
+    privatePreparation = job;
+    advancePrivatePreparation();
+    return job.promise;
+  }
+
   function drawCountryLabels(k, { interactive = false, occupiedBoxes = [] } = {}) {
+    if (privatePreparation && (interactive || !isPrivateViewCurrent(privatePreparation))) cancelPrivatePreparation();
     diagnostics.drawn = 0;
     diagnostics.glyphsDrawn = 0;
     diagnostics.pendingFits = 0;
@@ -427,11 +681,13 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     diagnostics.rejectedByViewport = 0;
     diagnostics.noFit = 0;
     diagnostics.rejectedLabels = [];
+    diagnostics.skippedByVisibilityUpperBound = 0;
     if (interactive || state.styleConfig?.countryLabels?.enabled === false || !(k > 0)) return 0;
     const context = getContext();
     const projection = getProjection();
     const source = getCountryLabelSource();
     const viewport = getViewportSize();
+    const paintBounds = getPaintBounds() || { minX: 0, minY: 0, maxX: viewport.width, maxY: viewport.height };
     if (!context || !projection || source?.status !== "ready" || !(viewport.width > 0 && viewport.height > 0)) return 0;
     const rawTransform = getTransform() || {};
     const transform = { x: Number(rawTransform.x) || 0, y: Number(rawTransform.y) || 0, k };
@@ -442,6 +698,8 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     const hierarchy = getMapLabelHierarchy(k, state);
     const geometry = getGeometry(source, projection);
     const records = new Map((source.countries || []).map((record) => [record.countryCode, record]));
+    const fitView = { records, language, font, zoomBand, transform, paintBounds, projection, isChinese,
+      geometry, textGeneration, countries: source.countries, viewport: { ...viewport } };
     const deferred = typeof helpers.onInvalidate === "function";
     const pending = [];
     const reject = (entry, text, fontSizePx, reason, visibleArea) => {
@@ -456,18 +714,18 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       context.textAlign = "left";
       context.textBaseline = "alphabetic";
       context.lineJoin = "round";
+      const onInvisible = (entry, text) => {
+        diagnostics.skippedByVisibilityUpperBound++;
+        reject(entry, text, null, "Visibility", visibleTerritoryArea(entry, transform, paintBounds));
+      };
       const fitted = geometry.entries.map((entry) => {
-        const text = displayText(records.get(entry.countryCode)?.name, language);
-        if (!text) return null;
-        const key = `${textGeneration}\n${language}\n${font}\n${text}\n${zoomBand.index}`;
+        const request = getViewFitRequest(entry, fitView, onInvisible);
+        if (!request) return null;
+        const { text, key } = request;
         if (!entry.polygons) {
-          pending.push({ entry, text, key });
+          pending.push(request);
           return null;
         }
-        if (!entry.bounds) return null;
-        const countryBox = screenBox(entry.bounds, transform, 0);
-        if (countryBox.x + countryBox.w < 2 || countryBox.y + countryBox.h < 2
-          || countryBox.x > viewport.width - 2 || countryBox.y > viewport.height - 2) return null;
         let fit = entry.fits.get(key);
         if (!entry.fits.has(key) && deferred) {
           pending.push({ entry, text, key });
@@ -480,16 +738,16 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
             && (cachedFit.minHoleArea || 0) <= MIN_LABEL_HOLE_SCREEN_AREA / zoomBand.upperScale ** 2)?.[1];
           if (!fit) return null;
         } else if (!entry.fits.has(key)) {
-          prepareFit(entry, context, text, key, isChinese, font, zoomBand);
+          prepareFit(entry, context, text, key, isChinese, font, zoomBand, fitView);
           fit = entry.fits.get(key);
         }
-        const visibleArea = visibleTerritoryArea(entry, transform, viewport);
+        const visibleArea = visibleTerritoryArea(entry, transform, paintBounds);
         if (!fit) reject(entry, text, null, "noFit", visibleArea);
         if (!fit) return null;
         const groups = (fit.componentFits?.length ? fit.componentFits : [fit]).slice(0, 3).map((group) => {
           const component = entry.components.find((part) => part.polygonIndex === group.polygonIndex)
             || entry.components[0];
-          return { fit: group, component, visibleArea: visibleComponentArea(component, transform, viewport) };
+          return { fit: group, component, visibleArea: visibleComponentArea(component, transform, paintBounds) };
         }).sort((a, b) => b.visibleArea - a.visibleArea || (b.component?.area || 0) - (a.component?.area || 0));
         return { entry, fit, groups, text, visibleArea: groups[0]?.visibleArea || 0 };
       }).filter(Boolean).sort((a, b) => b.visibleArea - a.visibleArea
@@ -518,8 +776,8 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
           const boxes = fit.glyphs.filter((glyph) => glyph.text.trim())
             .map((glyph) => screenBox(glyph.box, transform, 1.5));
           if (!inkBoxes.length || inkBoxes.some((box) => ![box.x, box.y, box.w, box.h].every(Number.isFinite)
-            || box.x < 0 || box.y < 0 || box.x + box.w > viewport.width
-            || box.y + box.h > viewport.height)) {
+            || box.x < paintBounds.minX || box.y < paintBounds.minY || box.x + box.w > paintBounds.maxX
+            || box.y + box.h > paintBounds.maxY)) {
             reason = "Viewport";
             continue;
           }
@@ -563,8 +821,10 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       context.restore();
     }
     diagnostics.pendingFits = pending.length;
-    const nextPreparation = pending.find(({ entry, key }) => !entry.workerPending.has(key) && entry.workerPending.size < MAX_CACHED_FITS);
-    if (nextPreparation && !scheduledContinuation && workerRequests.size < MAX_PENDING_WORKER_FITS) {
+    const nextPreparation = pending.find(({ entry, key }) => !entry.workerPending.has(key)
+      && entry.workerPending.size < MAX_CACHED_FITS && canQueueEntry(entry));
+    if (privatePreparation) advancePrivatePreparation();
+    else if (!workerFailed && nextPreparation && !scheduledContinuation && workerRequests.size < MAX_PENDING_WORKER_FITS) {
       const continuation = {};
       scheduledContinuation = continuation;
       scheduleWork(() => {
@@ -575,40 +835,16 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
           || state.styleConfig?.countryLabels?.enabled === false) return;
         const latestSource = getCountryLabelSource();
         if (latestSource?.sourceToken !== geometry.sourceToken || latestSource.revision !== geometry.revision) return;
-        const target = getContext();
-        if (!target) return;
-        const start = nowMs();
-        let prepared = 0;
-        let remaining = 12;
-        // Share one budget and repaint across several countries. One repaint
-        // per country used to double the frames needed for worker completion.
-        for (const { entry, text, key } of pending) {
-          // The worker executes serially. Bound its queue so waiting requests
-          // cannot expire behind unrelated countries or older zoom bands.
-          if (workerRequests.size >= MAX_PENDING_WORKER_FITS) break;
-          if (entry.workerPending.has(key) || entry.fits.has(key) || entry.workerPending.size >= MAX_CACHED_FITS) continue;
-          if (prepared && (remaining <= 0 || prepared >= 8)) break;
-          if (!entry.polygons) projectEntry(entry, projection, Math.max(0, remaining));
-          const box = entry.bounds ? screenBox(entry.bounds, transform, 0) : null;
-          const inViewport = box && !(box.x + box.w < 2 || box.y + box.h < 2
-            || box.x > viewport.width - 2 || box.y > viewport.height - 2);
-          if (entry.polygons && inViewport && nowMs() - start < 12) {
-            target.save();
-            try { prepareFit(entry, target, text, key, isChinese, font, zoomBand); }
-            finally { target.restore(); }
-          }
-          prepared += 1;
-          remaining = 12 - (nowMs() - start);
-        }
+        preparePendingFits(pending, fitView);
         helpers.onInvalidate?.();
       });
     }
     return diagnostics.drawn;
   }
 
-  function getPendingFitsForCurrentView() {
+  function getPendingFitsForCurrentView(source) {
     if (state.styleConfig?.countryLabels?.enabled === false) return 0;
-    const source = getCountryLabelSource();
+    source ??= getCountryLabelSource();
     if (source?.status === "disabled") return 0;
     if (source?.status !== "ready") return 1;
     if (!geometryCache || geometryCache.sourceToken !== source.sourceToken
@@ -619,6 +855,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     const records = new Map((source.countries || []).map((record) => [record.countryCode, record]));
     const transform = getTransform() || { k: 1, x: 0, y: 0 };
     const viewport = getViewportSize();
+    const paintBounds = getPaintBounds() || { minX: 0, minY: 0, maxX: viewport.width, maxY: viewport.height };
     const zoomBand = getZoomBand(Number(transform.k) || 1);
     return geometryCache.entries.reduce((count, entry) => {
       const text = displayText(records.get(entry.countryCode)?.name, language);
@@ -626,22 +863,33 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       if (!entry.polygons) return count + 1;
       if (!entry.bounds) return count;
       const box = screenBox(entry.bounds, transform, 0);
-      if (box.x + box.w < 2 || box.y + box.h < 2 || box.x > viewport.width - 2 || box.y > viewport.height - 2) return count;
-      return count + Number(!entry.fits.has(`${textGeneration}\n${language}\n${font}\n${text}\n${zoomBand.index}`));
+      if (box.x + box.w < paintBounds.minX + 2 || box.y + box.h < paintBounds.minY + 2 || box.x > paintBounds.maxX - 2 || box.y > paintBounds.maxY - 2) return count;
+      if (isCountryLabelDefinitelyInvisible(entry, transform, paintBounds)) return count;
+      return count + Number(!entry.fits.has(getFitKey(text, language, font, zoomBand, viewport)));
     }, 0);
   }
 
   return {
     drawCountryLabels,
+    prepareCurrentView,
+    cancelPreparation: () => cancelPrivatePreparation(),
     clearTextCache() {
+      cancelPrivatePreparation();
       textGeneration += 1;
       glyphMetrics.clear();
       for (const entry of geometryCache?.entries || []) entry.fits.clear();
     },
     isReadyForCurrentView: () => getPendingFitsForCurrentView() === 0 && diagnostics.workerErrors === 0,
+    getReadinessForCurrentView(source) {
+      const pendingFits = getPendingFitsForCurrentView(source);
+      return { ready: pendingFits === 0 && diagnostics.workerErrors === 0, pendingFits,
+        pendingWorkerFits: workerRequests.size, scheduled: scheduledContinuation !== null || !!privatePreparation?.scheduled,
+        workerErrors: diagnostics.workerErrors };
+    },
     getDiagnostics: () => ({ ...diagnostics, pendingFits: getPendingFitsForCurrentView(),
       cachedFits: (geometryCache?.entries || []).reduce((count, entry) => count + entry.fits.size, 0),
       pendingWorkerFits: workerRequests.size,
+      privatePreparationPending: privatePreparation !== null,
       rejectedLabels: diagnostics.rejectedLabels.map((label) => ({ ...label })),
       lastLabels: diagnostics.lastLabels.map((label) => ({ ...label, bounds: { ...label.bounds } })) }),
   };

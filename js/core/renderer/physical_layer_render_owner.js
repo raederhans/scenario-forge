@@ -65,6 +65,7 @@ export function createPhysicalLayerRenderOwner({
       baseOpacity = 1,
       blendMode = "source-over",
       clipAlreadyApplied = false,
+      fullWorld = false,
     } = {}
   ) {
     const context = getContext();
@@ -82,7 +83,7 @@ export function createPhysicalLayerRenderOwner({
       const atlasClass = getPhysicalAtlasClass(feature);
       if (!atlasClass || cfg.atlasClassVisibility?.[atlasClass] === false) return;
       if (getPhysicalAtlasLayer(feature) !== layerName) return;
-      if (!pathBoundsInScreen(feature)) return;
+      if (!fullWorld && !pathBoundsInScreen(feature)) return;
       const fillColor = getSafeCanvasColor(PHYSICAL_ATLAS_PALETTE[atlasClass], null);
       if (!fillColor) return;
       context.globalAlpha = clamp(
@@ -105,7 +106,8 @@ export function createPhysicalLayerRenderOwner({
     return renderedCount;
   }
 
-  function drawPhysicalReliefOverlayLayer(k, { interactive = false, clipAlreadyApplied = false } = {}) {
+  function drawPhysicalReliefOverlayLayer(k, { interactive = false, clipAlreadyApplied = false,
+    fullWorld = false, atlasCollection: suppliedAtlasCollection } = {}) {
     const startedAt = nowMs();
     const cfg = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
     const presetProfile = getPhysicalPresetRenderProfile(cfg);
@@ -124,7 +126,7 @@ export function createPhysicalLayerRenderOwner({
       return 0;
     }
 
-    const atlasCollection = getResolvedPhysicalAtlasCollection();
+    const atlasCollection = suppliedAtlasCollection === undefined ? getResolvedPhysicalAtlasCollection() : suppliedAtlasCollection;
     if (!Array.isArray(atlasCollection?.features) || atlasCollection.features.length === 0) {
       collectContextMetric("drawPhysicalReliefOverlayLayer", nowMs() - startedAt, {
         featureCount: 0,
@@ -158,6 +160,7 @@ export function createPhysicalLayerRenderOwner({
       baseOpacity: overlayOpacity,
       blendMode: getPhysicalReliefOverlayBlendMode(cfg, presetProfile),
       clipAlreadyApplied,
+      fullWorld,
     });
     collectContextMetric("drawPhysicalReliefOverlayLayer", nowMs() - startedAt, {
       featureCount: atlasCollection.features.length,
@@ -172,7 +175,8 @@ export function createPhysicalLayerRenderOwner({
     return renderedCount;
   }
 
-  function drawPhysicalBasePass(k, { interactive = false } = {}) {
+  function drawPhysicalBasePass(k, { interactive = false, fullWorld = false,
+    atlasCollection: suppliedAtlasCollection } = {}) {
     const startedAt = nowMs();
     const cfg = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
     const maskInfo = getPhysicalLandMaskInfo();
@@ -190,7 +194,7 @@ export function createPhysicalLayerRenderOwner({
       return;
     }
 
-    const atlasCollection = getResolvedPhysicalAtlasCollection();
+    const atlasCollection = suppliedAtlasCollection === undefined ? getResolvedPhysicalAtlasCollection() : suppliedAtlasCollection;
     if (!Array.isArray(atlasCollection?.features) || atlasCollection.features.length === 0) {
       collectContextMetric("drawPhysicalBasePass", nowMs() - startedAt, {
         featureCount: 0,
@@ -205,8 +209,11 @@ export function createPhysicalLayerRenderOwner({
       return;
     }
 
-    const semanticRenderedCount = drawPhysicalAtlasLayer(k, { interactive });
-    const reliefRenderedCount = drawPhysicalReliefOverlayLayer(k, { interactive });
+    // Canonical preparation owns one resolved LOD for both layers. Ordinary
+    // drawing retains the existing live resolver and viewport culling behavior.
+    const collection = fullWorld ? atlasCollection : suppliedAtlasCollection;
+    const semanticRenderedCount = drawPhysicalAtlasLayer(k, { interactive, fullWorld, atlasCollection: collection });
+    const reliefRenderedCount = drawPhysicalReliefOverlayLayer(k, { interactive, fullWorld, atlasCollection: collection });
     const renderedCount = semanticRenderedCount + reliefRenderedCount;
     collectContextMetric("drawPhysicalBasePass", nowMs() - startedAt, {
       featureCount: atlasCollection.features.length,
@@ -222,7 +229,8 @@ export function createPhysicalLayerRenderOwner({
     });
   }
 
-  function drawPhysicalAtlasLayer(k, { interactive = false, clipAlreadyApplied = false } = {}) {
+  function drawPhysicalAtlasLayer(k, { interactive = false, clipAlreadyApplied = false,
+    fullWorld = false, atlasCollection: suppliedAtlasCollection } = {}) {
     const startedAt = nowMs();
     const cfg = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
     const presetProfile = getPhysicalPresetRenderProfile(cfg);
@@ -240,7 +248,7 @@ export function createPhysicalLayerRenderOwner({
       return 0;
     }
 
-    const atlasCollection = getResolvedPhysicalAtlasCollection();
+    const atlasCollection = suppliedAtlasCollection === undefined ? getResolvedPhysicalAtlasCollection() : suppliedAtlasCollection;
     if (!Array.isArray(atlasCollection?.features) || atlasCollection.features.length === 0) {
       if (shouldReportDeferredContextLayerGap("physical_semantics")) {
         warnMissingPhysicalContextOnce(
@@ -267,6 +275,7 @@ export function createPhysicalLayerRenderOwner({
       ),
       blendMode: getSafeBlendMode(cfg.blendMode, presetProfile.semanticBlendMode),
       clipAlreadyApplied,
+      fullWorld,
     });
     collectContextMetric("drawPhysicalAtlasLayer", nowMs() - startedAt, {
       featureCount: atlasCollection.features.length,

@@ -1,5 +1,6 @@
 import { getMapLabelHierarchy } from "./map_label_hierarchy.js";
 import { doScreenLabelBoxesOverlap } from "./screen_label_placement.js";
+import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 
 const DEFAULT_ZOOM_IDENTITY = Object.freeze({ x: 0, y: 0, k: 1 });
 const CITY_MARKER_SPRITE_CACHE_LIMIT = 256;
@@ -37,11 +38,14 @@ export function createCityPointsRenderOwner({
   } = constants;
   const {
     buildCityRevealPlan = () => ({ markerEntries: [], labelEntries: [] }),
+    prepareCityRevealPlan = null,
+    isPrivatePreparationEnabled = () => false,
     clamp = (value, min, max) => Math.min(max, Math.max(min, value)),
     collectContextMetric = () => {},
     drawCityLabelsFromEntries = () => 0,
     getCityMarkerRenderStyle = () => ({}),
     getCityMarkerSizePx = () => 0,
+    getCityPaintOverscanPx = () => 48,
     getCityTooltipText = () => "",
     getCityVisualCapitalState = (entry) => !!entry?.isCapital,
     getEffectiveCityCollection = () => null,
@@ -64,6 +68,9 @@ export function createCityPointsRenderOwner({
   } = getters;
 
   const cityMarkerSpriteCache = new Map();
+  let lastRevealPlan = null;
+  let preparedRevealPlan = null;
+  let privatePreparation = null;
   let visibleCityHoverEntries = [];
   let context = null;
   let projection = null;
@@ -324,6 +331,98 @@ export function createCityPointsRenderOwner({
       : [];
   }
 
+  function getCityRevealViewKey(cityCollection, scale, transform, config, currentProjection = getProjection()) {
+    return [
+      cityCollection, cityCollection?.features, cityCollection?.features?.length, runtimeState.cityLayerRevision,
+      runtimeState.showCityPoints, runtimeState.worldCitiesData, runtimeState.scenarioCityOverridesData,
+      runtimeState.activeScenarioId, runtimeState.sceneGeneration, runtimeState.scenarioDataGeneration,
+      runtimeState.scenarioStrategicValuesData, runtimeState.scenarioStrategicValuesRevision, runtimeState.sovereigntyRevision,
+      runtimeState.sovereigntyByFeatureId,
+      runtimeState.scenarioCountriesByTag, runtimeState.activeScenarioManifest,
+      runtimeState.urbanData, currentProjection, getProjectionGeometryGeneration(currentProjection),
+      scale, transform?.x, transform?.y, transform?.k,
+      runtimeState.width, runtimeState.height, getCityPaintOverscanPx(),
+      // Normalization returns fresh objects. Compare their values, including
+      // future normalized fields, rather than their allocation identity.
+      JSON.stringify(Object.keys(config).sort().map((name) => [name, config[name]])),
+    ];
+  }
+
+  const sameViewKey = (left, right) => !!left && !!right && left.length === right.length
+    && left.every((value, index) => Object.is(value, right[index]));
+
+  function getCityRevealConfig() {
+    const config = normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {});
+    return config.revealProfile === cityRevealProfileHybrid ? config : { ...config, revealProfile: cityRevealProfileHybrid };
+  }
+
+  function cancelPreparation() {
+    privatePreparation = null;
+  }
+
+  function prepareCurrentView(k, options = {}) {
+    if (!isPrivatePreparationEnabled() || typeof prepareCityRevealPlan !== "function") {
+      cancelPreparation();
+      return null;
+    }
+    const cityCollection = getEffectiveCityCollection();
+    const currentProjection = getProjection();
+    if (!runtimeState.showCityPoints || !cityCollection?.features?.length || !currentProjection) {
+      cancelPreparation();
+      return null;
+    }
+    const rawTransform = runtimeState.zoomTransform || getZoomIdentity();
+    const transform = { x: rawTransform?.x, y: rawTransform?.y, k: rawTransform?.k };
+    const scale = Math.max(0.0001, Number(transform.k || k || 1));
+    const config = getCityRevealConfig();
+    const key = getCityRevealViewKey(cityCollection, scale, transform, config, currentProjection);
+    if (sameViewKey(preparedRevealPlan?.key, key)) return null;
+    if (sameViewKey(privatePreparation?.key, key)) return privatePreparation.promise;
+    const job = { key, promise: null };
+    privatePreparation = job;
+    const current = () => {
+      if (privatePreparation !== job || options.signal?.aborted || options.isCurrent?.() === false
+        || !isPrivatePreparationEnabled() || getProjection() !== currentProjection) return false;
+      const liveTransform = runtimeState.zoomTransform || getZoomIdentity();
+      const liveScale = Math.max(0.0001, Number(liveTransform?.k || k || 1));
+      return sameViewKey(key, getCityRevealViewKey(getEffectiveCityCollection(), liveScale, liveTransform, getCityRevealConfig()));
+    };
+    // The policy's first step yields before entering any collection/projection
+    // helper. No context, hover list or label reservation is touched here.
+    job.promise = prepareCityRevealPlan(cityCollection, scale, transform, config, { ...options, isCurrent: current })
+      .then((plan) => {
+        if (!plan || !current()) return false;
+        preparedRevealPlan = { key, plan };
+        return true;
+      }).finally(() => {
+        if (privatePreparation === job) privatePreparation = null;
+      });
+    return job.promise;
+  }
+
+  function getReusableCityRevealPlan(cityCollection, scale, transform, config) {
+    const baseKey = getCityRevealViewKey(cityCollection, scale, transform, config, projection);
+    const usePrepared = isPrivatePreparationEnabled() && typeof prepareCityRevealPlan === "function";
+    const key = [...baseKey, !!runtimeState.deferExactAfterSettle];
+    if (usePrepared && !sameViewKey(preparedRevealPlan?.key, baseKey)) return null;
+    if (!usePrepared && !sameViewKey(lastRevealPlan?.key, key)) {
+      lastRevealPlan = { key, plan: buildCityRevealPlan(cityCollection, scale, transform, config) };
+    }
+    const template = usePrepared ? preparedRevealPlan.plan : lastRevealPlan.plan;
+    // Label placement writes fields onto entries. Copy only the selected
+    // entries, preserving aliases between markers and labels within this call.
+    const selected = new Map();
+    const cloneEntry = (entry) => {
+      if (!selected.has(entry)) selected.set(entry, { ...entry });
+      return selected.get(entry);
+    };
+    return {
+      markerEntries: Array.isArray(template?.markerEntries) ? template.markerEntries.map(cloneEntry) : [],
+      labelEntries: !runtimeState.deferExactAfterSettle && Array.isArray(template?.labelEntries) ? template.labelEntries.map(cloneEntry) : [],
+      labelBudget: template?.labelBudget,
+    };
+  }
+
   function getCityLayerRenderState(k, { interactive = false, cacheHoverEntries = false } = {}) {
     syncRenderTargets();
     const cityCollection = getEffectiveCityCollection();
@@ -345,12 +444,8 @@ export function createCityPointsRenderOwner({
     const transform = runtimeState.zoomTransform || getZoomIdentity();
     const scale = Math.max(0.0001, Number(transform?.k || k || 1));
     const opacity = config.opacity;
-    const plan = config.revealProfile === cityRevealProfileHybrid
-      ? buildCityRevealPlan(cityCollection, scale, transform, config)
-      : buildCityRevealPlan(cityCollection, scale, transform, {
-        ...config,
-        revealProfile: cityRevealProfileHybrid,
-      });
+    const plan = getReusableCityRevealPlan(cityCollection, scale, transform,
+      config.revealProfile === cityRevealProfileHybrid ? config : { ...config, revealProfile: cityRevealProfileHybrid });
     const markerEntries = Array.isArray(plan?.markerEntries) ? plan.markerEntries : [];
 
     if (!markerEntries.length) {
@@ -360,7 +455,7 @@ export function createCityPointsRenderOwner({
       return {
         featureCount,
         skipped: true,
-        reason: "culled",
+        reason: plan ? "culled" : "preparing",
         markerEntries,
         labelEntries: [],
         config,
@@ -643,6 +738,8 @@ export function createCityPointsRenderOwner({
   }
 
   return {
+    prepareCurrentView,
+    cancelPreparation,
     cacheVisibleCityHoverEntries,
     drawCityMarkersFromEntries,
     drawCityPointsLayer,

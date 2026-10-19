@@ -3,6 +3,10 @@ import test from "node:test";
 import { createGeometryRasterWorkerClient } from "../js/core/geometry_raster_worker_client.js";
 
 const tick = () => new Promise(setImmediate);
+const updatesOf = packet => packet.geometryTransport?.encoding === "geo-f64-batches-v1"
+  ? packet.geometryTransport.batches.flatMap(batch => batch?.encoding === "geo-f64-v1"
+    ? globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(batch) : batch)
+  : packet.geometryUpdates || globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(packet.geometryTransport);
 
 test("worker eviction acknowledgement causes the next use to re-upload even after a stale frame", async () => {
   const { client, sent, reply } = fixture();
@@ -11,8 +15,8 @@ test("worker eviction acknowledgement causes the next use to re-upload even afte
   await tick();
   reply(0, { result: { bitmap: { close() {} }, evictedGeometryIds: ["a"] } });
   await first; await tick();
-  assert.equal(sent[1].packet.geometryUpdates.length, 1);
-  assert.equal(sent[1].packet.geometryUpdates[0].id, "a");
+  assert.equal(updatesOf(sent[1].packet).length, 1);
+  assert.equal(updatesOf(sent[1].packet)[0].id, "a");
   reply(1); await second; client.dispose();
 });
 
@@ -28,17 +32,85 @@ test("large geometry dispatch transfers fresh buffers while source and acknowled
   const first = client.request(input("large-one", "political", { entries }));
   await tick();
   assert.equal(sent[0].packet.geometryUpdates, null);
-  assert.deepEqual(globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(sent[0].packet.geometryTransport), [{ id: "large", feature: large }]);
+  assert.deepEqual(updatesOf(sent[0].packet), [{ id: "large", feature: large }]);
   worker.onmessage({ data: { taskId: sent[0].taskId, result: { bitmap: { close() {} } } } });
   await first;
   const second = client.request(input("large-two", "hit", { entries }));
   await tick();
-  assert.deepEqual(sent[1].packet.geometryUpdates, []);
-  assert.equal(sent[1].packet.geometryTransport, null);
+  assert.deepEqual(updatesOf(sent[1].packet), []);
   assert.equal(large.geometry.coordinates.length, 10_000);
   worker.onmessage({ data: { taskId: sent[1].taskId, result: { bitmap: { close() {} } } } });
   await second;
   client.dispose();
+});
+
+test("default batches transfer minimal nested geometry shells without reading feature or entry metadata", async () => {
+  const sent = [], transfers = [];
+  const worker = { terminate() {}, postMessage(message, transfer) {
+    sent.push(structuredClone(message, { transfer }));
+    transfers.push(transfer);
+  } };
+  const client = createGeometryRasterWorkerClient({ createWorker: () => worker, isSupported: () => true });
+  const geometry = { type: "GeometryCollection", coordinatePrecision: 4, geometries: [
+    { type: "Point", coordinates: [1 + 1e-10, -0, 3.123456789012345] },
+    { type: "GeometryCollection", geometries: [] },
+  ] };
+  const denyMetadata = target => Object.defineProperty(target, "properties", { enumerable: true,
+    get() { throw new Error("unrelated metadata must not enter raster transport"); } });
+  denyMetadata(geometry);
+  denyMetadata(geometry.geometries[0]);
+  const rich = denyMetadata({ type: "Feature", id: "irrelevant-feature-id", coordinatePrecision: 7, geometry });
+  const entries = Array.from({ length: 35 }, (_, index) => denyMetadata({ id: String(index), feature: rich,
+    fillColor: "#123456", alpha: 0.4, strokeColor: "#abcdef", lineWidth: 0.5 }));
+  try {
+    const first = client.request(input("minimal-first", "hit", { entries }));
+    await tick();
+    const packet = sent[0].packet;
+    assert.equal(packet.geometryTransport.encoding, "geo-f64-batches-v1");
+    assert.equal(packet.geometryTransport.batches.length, 2);
+    assert.equal(packet.geometryUpdates, null);
+    assert.equal(transfers[0].length, 4);
+    assert.ok(transfers[0].every(buffer => buffer.byteLength === 0));
+    const updates = updatesOf(packet);
+    assert.deepEqual(updates.map(update => update.id), entries.map(entry => entry.id));
+    assert.deepEqual(Object.keys(updates[0].feature), ["type", "geometry", "coordinatePrecision"]);
+    assert.deepEqual(Object.keys(updates[0].feature.geometry), ["type", "geometries", "coordinatePrecision"]);
+    assert.deepEqual(Object.keys(updates[0].feature.geometry.geometries[0]), ["type", "coordinates"]);
+    assert.deepEqual(updates[0].feature.geometry.geometries[0].coordinates, geometry.geometries[0].coordinates);
+    assert.deepEqual(packet.entries[0], { id: "0", fillColor: "#123456", alpha: 0.4, strokeColor: "#abcdef", lineWidth: 0.5 });
+    worker.onmessage({ data: { taskId: sent[0].taskId, result: { bitmap: { close() {} } } } });
+    await first;
+    const nextEntries = entries.map(({ id, fillColor, alpha, strokeColor, lineWidth }) => ({
+      id, fillColor, alpha, strokeColor, lineWidth,
+      feature: { type: "Feature", geometry, properties: { changed: true } },
+    }));
+    const second = client.request(input("minimal-second", "political", { entries: nextEntries }));
+    await tick();
+    assert.deepEqual(updatesOf(sent[1].packet), [], "new feature wrappers and metadata retain the original geometry ACK");
+    assert.equal(geometry.geometries[0].coordinates[0], 1 + 1e-10);
+    worker.onmessage({ data: { taskId: sent[1].taskId, result: { bitmap: { close() {} } } } });
+    await second;
+  } finally { client.dispose(); }
+});
+
+test("default cooperative packing cancellation resets upload acknowledgement without disabling fallback", async () => {
+  const { client, sent, reply, creations } = fixture();
+  const controller = new AbortController();
+  let cancelled = false;
+  const coordinates = new Proxy([1 + 1e-10, 2], { get(target, key) {
+    if (key === "0" && !cancelled) { cancelled = true; controller.abort(); }
+    return Reflect.get(target, key);
+  } });
+  const entries = [{ id: "cancel", feature: { type: "Feature", geometry: { type: "Point", coordinates } } }];
+  assert.equal(await client.request(input("cancelled-pack", "hit", { entries }), { signal: controller.signal }), null);
+  assert.equal(creations(), 0);
+  assert.equal(sent.length, 0);
+  assert.equal(client.available(), true);
+  const retry = client.request(input("retry-pack", "hit", { entries }));
+  await tick();
+  assert.equal(sent[0].packet.resetGeometry, true);
+  assert.equal(updatesOf(sent[0].packet)[0].feature.geometry.coordinates[0], 1 + 1e-10);
+  reply(0); await retry; client.dispose();
 });
 const feature = { geometry: { type: "Point", coordinates: [1, 2] } };
 const input = (identity, kind = "political", extra = {}) => ({
@@ -86,20 +158,20 @@ test("geometry is acknowledged after success, replaced by geometry reference and
   const second = client.request(input("two", "hit"));
   await tick();
   assert.equal(sent[0].packet.resetGeometry, true);
-  assert.equal(sent[0].packet.geometryUpdates.length, 1);
+  assert.equal(updatesOf(sent[0].packet).length, 1);
   reply(0); await first; await tick();
-  assert.equal(sent[1].packet.geometryUpdates.length, 0);
+  assert.equal(updatesOf(sent[1].packet).length, 0);
   assert.equal(sent[1].packet.resetGeometry, false);
   reply(1); await second;
   const replacement = { geometry: { type: "Point", coordinates: [3, 4] } };
   const third = client.request(input("three", "hit", { entries: [{ id: "a", feature: replacement }] }));
   await tick();
-  assert.equal(sent[2].packet.geometryUpdates[0].feature, replacement);
+  assert.deepEqual(updatesOf(sent[2].packet)[0].feature.geometry, replacement.geometry);
   reply(2); await third;
   const fourth = client.request(input("four", "hit", { sceneKey: "hoi4" }));
   await tick();
   assert.equal(sent[3].packet.resetGeometry, true);
-  assert.equal(sent[3].packet.geometryUpdates.length, 1);
+  assert.equal(updatesOf(sent[3].packet).length, 1);
   reply(3); await fourth;
   client.dispose();
 });
@@ -181,7 +253,7 @@ test("departed entry IDs receive null geometry updates to release worker kernel 
   });
   await tick();
   assert.equal(sent[0].packet.resetGeometry, true);
-  assert.equal(sent[0].packet.geometryUpdates.length, 2, "both entries uploaded on first request");
+  assert.equal(updatesOf(sent[0].packet).length, 2, "both entries uploaded on first request");
   reply(0); await first; await tick();
 
   // Second request: only entry [a] — b is removed
@@ -192,7 +264,7 @@ test("departed entry IDs receive null geometry updates to release worker kernel 
   await tick();
   assert.equal(sent[1].packet.resetGeometry, false, "same scene: no full reset");
   // geometry for 'a' unchanged → no upload; 'b' removed → null update
-  const updates1 = sent[1].packet.geometryUpdates;
+  const updates1 = updatesOf(sent[1].packet);
   assert.equal(updates1.length, 1, "exactly one removal update");
   assert.equal(updates1[0].id, "b");
   assert.equal(updates1[0].feature, null, "null signals kernel to release b");
@@ -221,7 +293,7 @@ test("same-scene topology revision does not reset geometry store; only changed g
   });
   await tick();
   assert.equal(sent[1].packet.resetGeometry, false, "same sceneKey: incremental, no reset");
-  assert.equal(sent[1].packet.geometryUpdates.length, 0, "unchanged geometry: no re-upload");
+  assert.equal(updatesOf(sent[1].packet).length, 0, "unchanged geometry: no re-upload");
   reply(1); await second; await tick();
 
   // Now geometry for 'a' changed (e.g. new chunk promoted same ID)
@@ -231,9 +303,9 @@ test("same-scene topology revision does not reset geometry store; only changed g
   });
   await tick();
   assert.equal(sent[2].packet.resetGeometry, false, "still same scene");
-  assert.equal(sent[2].packet.geometryUpdates.length, 1, "changed geometry uploads only that ID");
-  assert.equal(sent[2].packet.geometryUpdates[0].id, "a");
-  assert.equal(sent[2].packet.geometryUpdates[0].feature, featureAv2);
+  assert.equal(updatesOf(sent[2].packet).length, 1, "changed geometry uploads only that ID");
+  assert.equal(updatesOf(sent[2].packet)[0].id, "a");
+  assert.deepEqual(updatesOf(sent[2].packet)[0].feature.geometry, featureAv2.geometry);
   reply(2); await third;
   client.dispose();
 });
@@ -257,7 +329,7 @@ test("geometry refs are bounded to current active IDs after each successful roun
     entries: [{ id: "0", feature: features[0], fillColor: "#aaa" }],
   });
   await tick();
-  const updates = sent[1].packet.geometryUpdates;
+  const updates = updatesOf(sent[1].packet);
   // IDs 1-4 departed → 4 null removals
   const removals = updates.filter((u) => u.feature === null);
   assert.equal(removals.length, 4, "4 null removals for 4 departed IDs");
@@ -270,7 +342,7 @@ test("geometry refs are bounded to current active IDs after each successful roun
     entries: [{ id: "0", feature: features[0], fillColor: "#aaa" }],
   });
   await tick();
-  assert.equal(sent[2].packet.geometryUpdates.length, 0, "no spurious re-removal of already-gone IDs");
+  assert.equal(updatesOf(sent[2].packet).length, 0, "no spurious re-removal of already-gone IDs");
   reply(2); await third;
   client.dispose();
 });
@@ -285,8 +357,8 @@ test("alternating hit and political requests retain their active union then rele
     const [kind, selected] = requests[index];
     const promise = client.request({ identity: String(index), sceneKey: "same", kind, entries: selected });
     await tick();
-    if (index === 1 || index === 2) assert.deepEqual(sent[index].packet.geometryUpdates, []);
-    if (index === 3) assert.deepEqual(sent[index].packet.geometryUpdates, [{ id: "b", feature: null }]);
+    if (index === 1 || index === 2) assert.deepEqual(updatesOf(sent[index].packet), []);
+    if (index === 3) assert.deepEqual(updatesOf(sent[index].packet), [{ id: "b", feature: null }]);
     reply(index); await promise; await tick();
   }
   client.dispose();

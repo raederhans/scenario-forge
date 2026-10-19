@@ -219,6 +219,8 @@ test("complexity signals include rounded coverage previous count and coverage so
     featureCount: 1,
     visibleCoverageRatio: 0.3333,
     previousRenderedCount: 7,
+    partCount: 1,
+    vertexCount: 0,
     waterCoverageAlgo: "legacy",
     waterCoverageAlgoSource: "state",
   });
@@ -232,4 +234,6 @@ test("direct scenario water draw decision follows all low complexity thresholds"
   assert.equal(owner.shouldUseDirectScenarioWaterDraw({ ...below, featureCount: 25 }), false);
   assert.equal(owner.shouldUseDirectScenarioWaterDraw({ ...below, visibleCoverageRatio: 0.2001 }), false);
   assert.equal(owner.shouldUseDirectScenarioWaterDraw({ ...below, previousRenderedCount: 29 }), false);
+  assert.equal(owner.shouldUseDirectScenarioWaterDraw({ ...below, partCount: 65 }), false);
+  assert.equal(owner.shouldUseDirectScenarioWaterDraw({ ...below, vertexCount: 12001 }), false);
 });

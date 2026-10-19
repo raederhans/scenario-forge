@@ -4,6 +4,7 @@ import { captureScenarioRefreshState, resolveScenarioRefreshScope } from "./scen
 // orchestration. All mutations use existing injected owners and actions.
 export function createScenarioDeferredRefreshOwner({
     runtimeState, nowMs, rebuildPrimaryPoliticalDerivedState, markRendererTopologyChanged,
+    notifyPaintContourSourcePublished = () => {},
     clearDeferredInternalBorderMeshCaches, scheduleDeferredHeavyBorderMeshes,
     invalidateInteractionComposite, rebuildStaticMeshes, invalidateBorderCache,
     updateDynamicBorderStatusUI, syncScenarioSecondaryRegionIndexes,
@@ -42,6 +43,7 @@ export function createScenarioDeferredRefreshOwner({
       });
       previousRevision = Number(runtimeState.topologyRevision || 0);
       markRendererTopologyChanged({ hitCanvasDirty: true });
+      notifyPaintContourSourcePublished({ previousTopologyRevision: previousRevision });
       ["physicalBase", "political", "contextBase", "contextMarkers", "borders", "labels"].forEach((pass) => targetPasses.add(pass));
       clearDeferredInternalBorderMeshCaches();
       scheduleDeferredHeavyBorderMeshes();

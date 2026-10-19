@@ -10,6 +10,33 @@
 import { isScenarioStrategicValuesUsable } from "../scenario/strategic_values.js";
 import { getCityDetailProgress, getCitySettlementRank, getCitySettlementRankWeight } from "./city_reveal_policy.js";
 
+// Yield after every merge write, including tail copies: a large sorted run
+// must remain interruptible even when the comparator always prefers one side.
+function* stableSortCityEntries(entries, compare) {
+  let source = entries;
+  let target = new Array(entries.length);
+  for (let width = 1; width < entries.length; width *= 2) {
+    for (let start = 0; start < entries.length; start += width * 2) {
+      const middle = Math.min(start + width, entries.length);
+      const end = Math.min(start + width * 2, entries.length);
+      let left = start, right = middle;
+      for (let index = start; index < end; index += 1) {
+        // Native stable sort treats NaN comparisons as equality as well.
+        const takeLeft = left < middle && (right >= end || !(compare(source[left], source[right]) > 0));
+        target[index] = takeLeft ? source[left++] : source[right++];
+        yield;
+      }
+    }
+    [source, target] = [target, source];
+  }
+  return source;
+}
+
+async function yieldCityPlanningTask() {
+  if (typeof globalThis.scheduler?.yield === "function") await globalThis.scheduler.yield();
+  else await new Promise((resolve) => setTimeout(resolve, 0));
+}
+
 export function getUrbanCityRenderPassSignatureParts(state, passName) {
   const cities = `cities:${Number(state?.cityLayerRevision || 0)}`;
   const strategic = `strategic:${Number(state?.scenarioStrategicValuesRevision || 0)}`;
@@ -66,6 +93,7 @@ export function createUrbanCityPolicyOwner({
     getDefaultCityMinZoomForTier,
     getUrbanFeatureStableId,
     isCityAnchorInViewport,
+    getCityPaintOverscanPx = () => 48,
     isCityLabelEligibleForPhase,
     isCityScenarioTagExcludedFromReveal,
   } = helpers;
@@ -295,7 +323,7 @@ export function createUrbanCityPolicyOwner({
     });
   }
 
-  function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
+  function* iterateCityRevealPlan(cityCollection, scale, transform, config, includeDeferredLabels = false) {
     const phase = getCityRevealPhase(scale);
     const countryProfiles = getCityCountryProfileIndex(cityCollection);
     const urbanIndex = getUrbanFeatureIndex();
@@ -317,10 +345,10 @@ export function createUrbanCityPolicyOwner({
     const labelEntries = [];
     const minimumRankWeight = Math.max(0, getCitySettlementRankWeight(config.minSettlementRank || "town"));
 
-    const candidateEntries = cityCollection.features
-      .map((feature) => {
+    const paintOverscanPx = getCityPaintOverscanPx();
+    const createCandidateEntry = (feature) => {
         const anchor = getCityAnchor(feature);
-        if (!anchor || !isCityAnchorInViewport(anchor, { padding: 48, transform })) {
+        if (!anchor || !isCityAnchorInViewport(anchor, { padding: paintOverscanPx, transform })) {
           return null;
         }
         const profile = countryProfiles.get(getCityCountryGroupKey(feature)) || {
@@ -394,20 +422,30 @@ export function createUrbanCityPolicyOwner({
           return null;
         }
         return entry;
-      })
-      .filter(Boolean)
-      .sort((left, right) => compareCityRevealEntries(left, right, phase.id));
+      };
+    const unsortedCandidates = [];
+    const features = cityCollection.features;
+    for (let index = 0, length = features.length; index < length; index += 1) {
+      if (index in features) {
+        const entry = createCandidateEntry(features[index]);
+        if (entry) unsortedCandidates.push(entry);
+      }
+      yield;
+    }
+    const candidateEntries = yield* stableSortCityEntries(unsortedCandidates,
+      (left, right) => compareCityRevealEntries(left, right, phase.id));
 
     const priorityCapitalEntriesByCountry = new Map();
-    candidateEntries.forEach((entry) => {
+    for (const entry of candidateEntries) {
+      yield;
       if (!entry.isCapital || !entry.isPriorityCountry) {
-        return;
+        continue;
       }
       const existing = priorityCapitalEntriesByCountry.get(entry.countryKey);
       if (!existing || compareCityRevealEntries(entry, existing, phase.id) < 0) {
         priorityCapitalEntriesByCountry.set(entry.countryKey, entry);
       }
-    });
+    }
     const acceptedCityIds = new Set();
     const detailProgress = getCityDetailProgress(scale);
     const markerGrid = new Map();
@@ -438,25 +476,26 @@ export function createUrbanCityPolicyOwner({
       acceptedCityIds.add(entry.cityId);
       return true;
     };
-    Array.from(priorityCapitalEntriesByCountry.values())
-      .sort((left, right) => {
+    const priorityCapitalEntries = yield* stableSortCityEntries(Array.from(priorityCapitalEntriesByCountry.values()),
+      (left, right) => {
         const leftRank = getCityPriorityCountryReserveRank(left);
         const rightRank = getCityPriorityCountryReserveRank(right);
         if (leftRank !== rightRank) return rightRank - leftRank;
         if (left.population !== right.population) return right.population - left.population;
         return String(left.cityId || "").localeCompare(String(right.cityId || ""));
-      })
-      .some((entry) => {
-        if (markerEntries.length >= markerBudget || markerEntries.length >= priorityReserveBudget) {
-          return true;
-        }
-        const currentCount = countsByCountry.get(entry.countryKey) || 0;
-        if (currentCount >= 1) return false;
-        acceptMarker(entry);
-        return false;
       });
+    for (const entry of priorityCapitalEntries) {
+      yield;
+      if (markerEntries.length >= markerBudget || markerEntries.length >= priorityReserveBudget) {
+        break;
+      }
+      const currentCount = countsByCountry.get(entry.countryKey) || 0;
+      if (currentCount >= 1) continue;
+      acceptMarker(entry);
+    }
 
     for (const entry of candidateEntries) {
+      yield;
       if (markerEntries.length >= markerBudget) break;
       if (acceptedCityIds.has(entry.cityId)) continue;
       const currentCount = countsByCountry.get(entry.countryKey) || 0;
@@ -465,16 +504,21 @@ export function createUrbanCityPolicyOwner({
       acceptMarker(entry);
     }
 
-    if (config.showLabels && !state?.deferExactAfterSettle && labelBudget > 0 && scale >= Number(config.labelMinZoom || 0)) {
-      markerEntries
-        .filter((entry) => isCityLabelEligibleForPhase(entry, phase.id))
-        .sort((left, right) => compareCityRevealEntries(left, right, phase.id))
-        .forEach((entry) => {
-          if (scale < getCityLabelMinZoom(entry, config)) {
-            return false;
-          }
-          labelEntries.push(entry);
-        });
+    if (config.showLabels && (includeDeferredLabels || !state?.deferExactAfterSettle) && labelBudget > 0 && scale >= Number(config.labelMinZoom || 0)) {
+      const eligibleLabels = [];
+      for (const entry of markerEntries) {
+        if (isCityLabelEligibleForPhase(entry, phase.id)) eligibleLabels.push(entry);
+        yield;
+      }
+      const sortedLabels = yield* stableSortCityEntries(eligibleLabels,
+        (left, right) => compareCityRevealEntries(left, right, phase.id));
+      for (const entry of sortedLabels) {
+        yield;
+        if (scale < getCityLabelMinZoom(entry, config)) {
+          continue;
+        }
+        labelEntries.push(entry);
+      }
     }
 
     return {
@@ -486,6 +530,39 @@ export function createUrbanCityPolicyOwner({
       labelEntries,
       candidateEntries,
     };
+  }
+
+  function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {
+    const iterator = iterateCityRevealPlan(cityCollection, scale, transform, config);
+    let step;
+    do { step = iterator.next(); } while (!step.done);
+    return step.value;
+  }
+
+  async function prepareCityRevealPlan(cityCollection, scale, transform, config = {}, {
+    signal, isCurrent = () => true, yieldControl = yieldCityPlanningTask,
+    nowMs = () => globalThis.performance?.now?.() ?? Date.now(), sliceBudgetMs = 4, workBatch = 512,
+  } = {}) {
+    const current = () => !signal?.aborted && isCurrent();
+    if (!current()) return null;
+    // Do not start a cold collection scan in the caller's render task.
+    await yieldControl();
+    if (!current()) return null;
+    const iterator = iterateCityRevealPlan(cityCollection, scale, transform, config, true);
+    const batchLimit = Math.max(1, Number(workBatch) || 512);
+    const timeLimit = Math.max(0.1, Number(sliceBudgetMs) || 4);
+    let started = nowMs(), work = 0;
+    while (true) {
+      const step = iterator.next();
+      if (step.done) return current() ? step.value : null;
+      work += 1;
+      if (work >= batchLimit || (work % 32 === 0 && nowMs() - started >= timeLimit)) {
+        await yieldControl();
+        if (!current()) return null;
+        work = 0;
+        started = nowMs();
+      }
+    }
   }
 
   function getEffectiveCityCollection() {
@@ -648,6 +725,7 @@ export function createUrbanCityPolicyOwner({
 
   return {
     buildCityRevealPlan,
+    prepareCityRevealPlan,
     doesScenarioCountryHideCityPoints,
     getCityScenarioTag,
     getCityUrbanRuntimeInfo,

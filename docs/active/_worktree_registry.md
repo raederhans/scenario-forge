@@ -1,5 +1,10 @@
 # Worktree Registry
 
+## 2026-10-19 TNO GPU 栅格场景整合
+
+当前任务独占 `C:/Users/raede/.codex/worktrees/tno-raster-scene/mapcreator`，分支 `codex/tno-raster-scene-20261018`，基于 `5fbbfdcff93ae36e24261b0e7f1ae58239fa4cc4`（准确基点以 Git merge-base 为准）。用户已授权提交、推送和受保护合并；root 独占 Git 与验证。主目录及其他工作树的 WIP 不纳入。保留本树及 ignored 性能证据用于后续首次 GPU 帧尖峰、地形严格像素一致性和 130% 离群长任务修复；这些仍未完成。任务实现和现场验收见 [任务记录](tno-raster-scene-20261018/task.md)，实现提交 `5581600f` 已推送；[PR #245](https://github.com/raederhans/scenario-forge/pull/245) 为合并与 CI 的最终回执。
+
+
 ## 2026-10-11 资产缓存与 TNO 大视口精修
 
 最新状态：PR #223 合并为 `84fa243937ef30dd182bbf52942f3b4bc8eb618f`，但 Pages 产物回归15/16通过，缓存复访检查阻止了发布。线上仍是 `64b1ef685`。同一独占工作树继续使用 `codex/raster-cache-revisit-20261011`，修复缓存命中等待网络清单和详细数据刷新丢弃有效路径的问题；最终本地16项检查已通过，root 的8008服务与浏览器已关闭；root 独占后续 PR、必需检查、合并和 Pages 门禁。其他对话改动保留，超时、内存、画质和默认关闭规则不变。

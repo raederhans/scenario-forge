@@ -67,8 +67,8 @@ class MainStartupDataPipelineBoundaryContractTest(unittest.TestCase):
 
         self.assertIn('startBootMetric?.("localization:full:load");', owner_content)
         self.assertIn('finishBootMetric?.("scenario:full:hydrate", {', owner_content)
-        self.assertIn("const cityPatch = buildCityLocalizationPatch({", owner_content)
-        self.assertIn("syncScenarioLocalizationState({", owner_content)
+        self.assertIn("buildCityLocalizationPatchSteps({", owner_content)
+        self.assertIn("prepareScenarioLocalizationState(", owner_content)
         self.assertIn("invalidateContextLayerVisualStateBatch?.(loadedLayerNames, `context-layer:${reason}`, {", owner_content)
         self.assertIn("checkpointBootMetric?.(`layer:${layerName}:first-render-after-load`);", owner_content)
         self.assertIn("manifest.runtime_topology_url", owner_content)

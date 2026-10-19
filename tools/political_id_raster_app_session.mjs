@@ -18,7 +18,7 @@ export function shouldHoldRasterAssetRequest() {
   return true;
 }
 
-export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280, height: 900 }, build = false, scenarioId = "", enabled = true, savedPreference = null, language = null, published = false, holdRasterAssets = false } = {}) {
+export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280, height: 900 }, build = false, scenarioId = "", enabled = true, savedPreference = null, language = null, published = false, holdRasterAssets = false, launchOptions = {}, initScripts = [] } = {}) {
   const url = new URL(baseUrl);
   const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
   const publishedTarget = url.origin === "https://raederhans.github.io" && url.pathname === "/scenario-forge/app/";
@@ -27,7 +27,7 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
   else url.searchParams.set("political_id_raster", enabled ? "1" : "0");
   if (scenarioId) url.searchParams.set("default_scenario", scenarioId);
   if (build) url.searchParams.set("political_id_assets", "0");
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: true, ...launchOptions });
   try {
     const context = await browser.newContext({ viewport, deviceScaleFactor: dpr, reducedMotion: "reduce" });
     const page = await context.newPage();
@@ -67,6 +67,7 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
     });
     page.on("pageerror", error => errors.push(String(error)));
     page.on("console", message => { if (message.type() === "error") errors.push(message.text()); });
+    for (const script of initScripts) await page.addInitScript(script);
     await page.goto(url.href, { waitUntil: "domcontentloaded", timeout: 60000 });
     await page.evaluate(async () => {
       const renderer = await import(new URL("js/core/map_renderer.js", document.baseURI));

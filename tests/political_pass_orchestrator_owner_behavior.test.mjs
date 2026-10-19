@@ -716,3 +716,17 @@ test("native export does not replace the last visible resident backend diagnosti
   assert.equal(h.owner.getDiagnostics().lastBackend, "raster");
   assert.equal(h.owner.getDiagnostics().nativeFinePasses, 1);
 });
+
+
+for (const presentation of ["staged", "retained"]) {
+  test(`${presentation} direct raster does not consume pending edit identity before publication`, () => {
+    const h = createHarness({ idRasterSelected: true, pendingEdit: true,
+      idRasterMetrics: { [presentation]: true, fillMs: 1, strokeMs: 0, renderedCount: 1, renderedIds: new Set(["a"]) },
+      overrides: { getters: { isPoliticalIdRasterPrimary: () => true } } });
+    assert.equal(h.owner.drawPoliticalPass(3).reason, "political-id-raster-primary");
+    const names = h.events.map(eventName);
+    assert.equal(names.includes("clear-pending"), false);
+    assert.equal(names.includes("background"), false);
+    assert.equal(names.includes("fine-loop"), false);
+  });
+}

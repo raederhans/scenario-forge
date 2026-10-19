@@ -111,21 +111,24 @@ export function createGeometryRasterWorkerKernel({
     const unpackingStartedAt = now();
     let updates;
     if (packet.geometryTransport?.encoding === "geo-f64-batches-v1") {
-      if (packet.kind !== "navigation" || !Array.isArray(packet.geometryTransport.batches)) {
-        throw new Error("Invalid navigation geometry transport.");
+      if (!Array.isArray(packet.geometryTransport.batches)) {
+        throw new Error("Invalid geometry transport batches.");
       }
       updates = [];
       let unpackSliceStartedAt = now();
       for (const batch of packet.geometryTransport.batches) {
         abortIfNeeded(isCancelled);
         const decoded = batch?.encoding === "geo-f64-v1"
-          ? globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(batch) : batch;
-        if (!Array.isArray(decoded)) throw new Error("Invalid navigation geometry batch.");
+          ? packet.kind === "navigation"
+            ? globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(batch)
+            : decodePackedRasterUpdates(batch)
+          : batch;
+        if (!Array.isArray(decoded)) throw new Error("Invalid geometry transport batch.");
         updates.push(...decoded);
         if (now() - unpackSliceStartedAt >= sliceBudgetMs) {
           const yieldStartedAt = now();
           await yieldTask();
-          navigationTimings.yieldWallMs += now() - yieldStartedAt;
+          if (navigationTimings) navigationTimings.yieldWallMs += now() - yieldStartedAt;
           unpackSliceStartedAt = now();
         }
       }
@@ -158,7 +161,9 @@ export function createGeometryRasterWorkerKernel({
     let surface = surfaces.get(packet.kind);
     if (!surface) {
       const canvas = createCanvas(surfaceWidth, surfaceHeight);
-      const context = canvas.getContext("2d", packet.kind === "navigation" ? { willReadFrequently: true } : undefined);
+      // Hit masks are copied into a CPU readback surface and never displayed.
+      // Keep their raster work off the GPU queue used by the visible scene.
+      const context = canvas.getContext("2d", packet.kind !== "political" ? { willReadFrequently: true } : undefined);
       if (!context) throw new Error("Worker 2D context unavailable.");
       surface = { canvas, context };
       surfaces.set(packet.kind, surface);

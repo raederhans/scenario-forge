@@ -2,6 +2,8 @@ import { resolveContourLodRequest } from "../js/core/renderer/physical_contour_l
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
+import { prepareScenarioLocalizationState } from "../js/core/scenario_localization_state.js";
+import { buildCityLocalizationPatchSteps } from "../js/core/data_loader.js";
 import * as contentActions from "../js/core/state/content_state.js";
 import * as contentLoadActions from "../js/core/state/actions/content_load_actions.js";
 
@@ -23,11 +25,16 @@ function harness(overrides = {}, helperOverrides = {}) {
     ...contentLoadActions,
     normalizeRequestedContextLayerNames: (names) => names,
     syncScenarioLocalizationState: () => events.push("sync-localization"),
+    prepareScenarioLocalizationState: async (...args) => {
+      const candidate = await prepareScenarioLocalizationState(...args);
+      if (candidate) events.push("sync-localization");
+      return candidate;
+    },
     syncCountryUi: () => events.push("country-ui"),
     ensureActiveScenarioOptionalLayersForVisibility: async () => {},
     emitStateBusEvent: () => events.push("ui-event"),
     STATE_BUS_EVENTS: {},
-    buildCityLocalizationPatch: () => ({}),
+    buildCityLocalizationPatchSteps,
     console: { info() {}, warn() {} },
     ...overrides,
   };
@@ -213,7 +220,7 @@ test("night-light geometry skips localization; a concurrent labels caller upgrad
   assert.equal(await labels, cities);
   assert.deepEqual(requests.map((request) => request.includeLocalization), [false, true]);
   assert.equal(requests[1].cityCollection, cities);
-  assert.equal(state.cityLayerRevision, 1);
+  assert.equal(state.cityLayerRevision, 2);
   assert.equal(state.baseCityLocalizationReady, true);
   assert.equal(events.filter((event) => event === "sync-localization").length, 1);
   await owner.ensureBaseCityDataReady({ renderNow: false });
@@ -394,4 +401,220 @@ test("cached contour reactivation forwards renderNow false without scheduling an
   assert.deepEqual(events, []);
   await owner.ensureContextLayerDataReady("physical-contours-set", { renderNow: false });
   assert.equal(invalidations.length, 1, "same alias has no second invalidation");
+});
+
+
+test("full localization stays private across preparation and publishes base and scenario dictionaries together", async () => {
+  const first = deferred();
+  const second = deferred();
+  let yields = 0;
+  const payload = { locales: { ui: { ready: "Ready" }, geo: { BASE: { en: "Base", zh: "基础" } } },
+    geoAliases: { alias_to_stable_key: { base: "BASE" } } };
+  const { owner, state } = harness({ loadLocalizationData: async () => payload }, {
+    yieldToMain: async () => { yields++; await (yields === 1 ? first.promise : second.promise); },
+  });
+  const oldLocales = state.locales;
+  state.locales.geo.OLD = { en: "Startup fallback" };
+  state.baseGeoLocales = { OLD: state.locales.geo.OLD };
+  const oldBase = state.baseGeoLocales;
+  state.scenarioGeoLocalePatchData = { geo: { BASE: { en: "Scenario", zh: "场景" } } };
+  const pending = owner.ensureFullLocalizationDataReady({ renderNow: false });
+  await new Promise(setImmediate);
+  assert.equal(yields, 1);
+  assert.equal(state.locales, oldLocales);
+  assert.equal(state.baseGeoLocales, oldBase);
+  first.resolve();
+  await new Promise(setImmediate);
+  assert.equal(yields, 2);
+  assert.equal(state.locales, oldLocales, "base preparation cannot expose half of the final dictionaries");
+  assert.equal(state.baseGeoLocales, oldBase);
+  second.resolve();
+  await pending;
+  assert.deepEqual(state.baseGeoLocales, payload.locales.geo);
+  assert.deepEqual(state.locales.geo, { BASE: { en: "Scenario", zh: "场景" } });
+  assert.deepEqual(state.geoAliasToStableKey, { base: "BASE" });
+  assert.equal(state.baseLocalizationDataState, "loaded");
+});
+
+for (const change of ["scenario ABA", "import epoch", "edit revision"]) {
+  test(`full localization discards a prepared candidate after ${change} and preserves the current edit`, async () => {
+    let yields = 0;
+    const { owner, state } = harness({
+      loadLocalizationData: async () => ({ locales: { ui: {}, geo: { BASE: { en: "Base" } } } }),
+    }, { yieldToMain: async () => {
+      if (++yields !== 2) return;
+      if (change === "scenario ABA") {
+        state.activeScenarioId = "B";
+        state.currentScenarioApplyRequestId++;
+        state.activeScenarioId = "A";
+        state.currentScenarioApplyRequestId++;
+      } else if (change === "import epoch") {
+        state.renderTransactionDiagnostics = { scenarioApplyEpoch: 1 };
+      } else {
+        state.cityLayerRevision = 1;
+      }
+      state.scenarioGeoLocalePatchData.geo.BASE = { en: "Current edit", zh: "当前编辑" };
+    } });
+    state.scenarioGeoLocalePatchData = { geo: { BASE: { en: "Old scenario" } } };
+    await owner.ensureFullLocalizationDataReady({ renderNow: false });
+    assert.ok(yields >= 4, "the stale candidate must be rebuilt in new tasks");
+    assert.deepEqual(state.locales.geo.BASE, { en: "Current edit", zh: "当前编辑" });
+    assert.deepEqual(state.baseGeoLocales.BASE, { en: "Base" });
+  });
+}
+
+test("cancelling full localization during preparation keeps startup dictionaries and publishes no UI events", async () => {
+  const controller = new AbortController();
+  const { owner, state, events } = harness({
+    loadLocalizationData: async () => ({ locales: { ui: { ready: "New" }, geo: { BASE: { en: "Base" } } } }),
+  }, { yieldToMain: async () => { controller.abort(); } });
+  const locales = state.locales;
+  state.locales.geo.OLD = { zh: "旧字典仍可用" };
+  state.baseGeoLocales = { OLD: state.locales.geo.OLD };
+  const base = state.baseGeoLocales;
+  assert.equal(await owner.ensureFullLocalizationDataReady({ signal: controller.signal }), null);
+  assert.equal(state.locales, locales);
+  assert.equal(state.baseGeoLocales, base);
+  assert.equal(state.locales.geo.OLD.zh, "旧字典仍可用");
+  assert.equal(state.baseLocalizationDataPromise, null);
+  assert.deepEqual(events, []);
+});
+
+
+test("full localization without a scenario preserves existing UI fallback and independent base dictionaries", async () => {
+  const { owner, state } = harness({ loadLocalizationData: async () => ({
+    locales: { geo: { BASE: { en: "Base", zh: "基础" } } },
+    geoAliases: { alias_to_stable_key: { fallback: "BASE" } },
+  }) }, { yieldToMain: async () => {} });
+  state.activeScenarioId = "";
+  state.locales.ui = { fallback: "Existing UI fallback" };
+  state.currentLanguage = "zh";
+  await owner.ensureFullLocalizationDataReady({ renderNow: false });
+  assert.deepEqual(state.locales.ui, { fallback: "Existing UI fallback" });
+  assert.deepEqual(state.locales.geo, state.baseGeoLocales);
+  assert.notEqual(state.locales.geo, state.baseGeoLocales);
+  assert.deepEqual(state.geoAliasToStableKey, state.baseGeoAliasToStableKey);
+  assert.notEqual(state.geoAliasToStableKey, state.baseGeoAliasToStableKey);
+  assert.equal(state.currentLanguage, "zh");
+  assert.equal(state.cityLayerRevision, undefined);
+});
+
+test("city support publishes geometry, base and scenario dictionaries together after private preparation", async () => {
+  const held = deferred();
+  let yields = 0;
+  const cities = { features: [] };
+  const { owner, state } = harness({ loadCitySupportData: async (options) => {
+    assert.equal(options.deferLocalization, true);
+    return { worldCities: cities, cityAliases: { geo: { CITY: { en: "Base city", zh: "基础城市" } },
+      alias_to_stable_key: { City: "CITY" } }, localizationReady: true, localizationDeferred: true };
+  } }, { yieldToMain: async () => { if (++yields === 1) await held.promise; } });
+  state.baseGeoLocales = { OLD: { en: "Old" } };
+  state.baseGeoAliasToStableKey = { old: "OLD" };
+  state.scenarioGeoLocalePatchData = { geo: { CITY: { en: "Scenario city", zh: "场景城市" } } };
+  const original = { locales: state.locales, base: state.baseGeoLocales, aliases: state.baseGeoAliasToStableKey };
+  const pending = owner.ensureBaseCityDataReady({ renderNow: false });
+  await new Promise(setImmediate);
+  assert.equal(state.worldCitiesData, undefined);
+  assert.equal(state.locales, original.locales);
+  assert.equal(state.baseGeoLocales, original.base);
+  assert.equal(state.baseGeoAliasToStableKey, original.aliases);
+  assert.equal(state.baseCityLocalizationReady, undefined);
+  held.resolve();
+  await pending;
+  assert.equal(state.worldCitiesData, cities);
+  assert.deepEqual(state.baseGeoLocales.CITY, { en: "Base city", zh: "基础城市" });
+  assert.deepEqual(state.locales.geo.CITY, { en: "Scenario city", zh: "场景城市" });
+  assert.deepEqual(state.geoAliasToStableKey, { old: "OLD", City: "CITY" });
+  assert.equal(state.baseCityLocalizationReady, true);
+  assert.ok(yields >= 3);
+});
+
+for (const change of ["scenario ABA", "import epoch", "city edit", "full localization"]) {
+  test(`city preparation rebases after ${change} without losing the current dictionaries`, async () => {
+    let yields = 0;
+    const { owner, state } = harness({ loadCitySupportData: async () => ({ worldCities: { features: [] },
+      cityAliases: { geo: { CITY: { en: "Base city" } } }, localizationReady: true, localizationDeferred: true,
+      locales: { geo: { STALE: { en: "Old base captured before IO" } } },
+      geoAliases: { alias_to_stable_key: { stale: "STALE" } },
+    }) }, {
+      yieldToMain: async () => {
+        if (++yields !== 2) return;
+        if (change === "scenario ABA") {
+          state.activeScenarioId = "B"; state.currentScenarioApplyRequestId++;
+          state.activeScenarioId = "A"; state.currentScenarioApplyRequestId++;
+        } else if (change === "import epoch") state.renderTransactionDiagnostics = { scenarioApplyEpoch: 1 };
+        else if (change === "city edit") state.cityLayerRevision = 1;
+        else {
+          state.baseGeoLocales = { FULL: { en: "Full dictionary" } };
+          state.baseGeoAliasToStableKey = { full: "FULL" };
+          state.locales = { ui: { full: "UI" }, geo: state.baseGeoLocales };
+        }
+        state.scenarioGeoLocalePatchData.geo.CITY = { en: "Current scenario edit" };
+      },
+    });
+    state.scenarioGeoLocalePatchData = { geo: { CITY: { en: "Stale scenario" } } };
+    await owner.ensureBaseCityDataReady({ renderNow: false });
+    assert.ok(yields >= 5, "a changed snapshot must restart private preparation");
+    assert.deepEqual(state.locales.geo.CITY, { en: "Current scenario edit" });
+    assert.deepEqual(state.baseGeoLocales.CITY, { en: "Base city", zh: "Base city" });
+    if (change === "full localization") {
+      assert.deepEqual(state.baseGeoLocales.FULL, { en: "Full dictionary" });
+      assert.equal(state.geoAliasToStableKey.full, "FULL");
+      assert.equal(state.locales.ui.full, "UI");
+      assert.equal(state.baseGeoLocales.STALE, undefined);
+      assert.equal(state.geoAliasToStableKey.stale, undefined);
+    }
+  });
+}
+
+test("cancelled city dictionary preparation publishes nothing and a later request retries", async () => {
+  let loads = 0, clock = 0, yields = 0;
+  const controller = new AbortController();
+  const aliases = Object.fromEntries(Array.from({ length: 2048 }, (_, index) => [`alias-${index}`, `CITY-${index}`]));
+  const { owner, state, events } = harness({
+    loadCitySupportData: async () => { loads++; return { worldCities: { features: [] }, cityAliases: { alias_to_stable_key: aliases }, localizationReady: true }; },
+    prepareLocalizationCandidate: (iterator, options) => contentActions.prepareLocalizationCandidate(iterator, {
+      ...options, nowMs: () => ++clock, sliceBudgetMs: 1,
+    }),
+  }, { yieldToMain: async () => { if (++yields === 2) controller.abort(); } });
+  const originalLocales = state.locales;
+  assert.equal(await owner.ensureBaseCityDataReady({ signal: controller.signal }), null);
+  assert.equal(state.locales, originalLocales);
+  assert.equal(state.worldCitiesData, undefined);
+  assert.equal(state.baseGeoLocales, undefined);
+  assert.equal(state.baseCityDataPromise, null);
+  assert.deepEqual(events, []);
+  await owner.ensureBaseCityDataReady({ renderNow: false });
+  assert.equal(loads, 2);
+  assert.equal(state.geoAliasToStableKey["alias-2047"], "CITY-2047");
+  assert.equal(state.baseCityDataState, "loaded");
+});
+
+test("failed city patch preparation keeps the previous publication and can retry", async () => {
+  let fail = true;
+  const aliases = { get broken() { if (fail) throw new Error("city patch invalid"); return "CITY"; } };
+  const { owner, state } = harness({ loadCitySupportData: async () => ({ worldCities: { features: [] },
+    cityAliases: { alias_to_stable_key: aliases }, localizationReady: true }) }, { yieldToMain: async () => {} });
+  const original = state.locales;
+  await assert.rejects(owner.ensureBaseCityDataReady(), /city patch invalid/);
+  assert.equal(state.worldCitiesData, undefined);
+  assert.equal(state.locales, original);
+  assert.equal(state.baseCityDataState, "error");
+  assert.equal(state.baseCityDataPromise, null);
+  fail = false;
+  await owner.ensureBaseCityDataReady({ renderNow: false });
+  assert.equal(state.geoAliasToStableKey.broken, "CITY");
+  assert.equal(state.baseCityDataState, "loaded");
+});
+
+test("replacing the city load promise discards its private candidate and preserves the new owner", async () => {
+  const replacement = Promise.resolve("replacement");
+  const { owner, state, events } = harness({ loadCitySupportData: async () => ({ worldCities: { features: [] }, localizationReady: true }) }, {
+    yieldToMain: async () => { state.baseCityDataPromise = replacement; },
+  });
+  assert.equal(await owner.ensureBaseCityDataReady(), null);
+  assert.equal(state.baseCityDataPromise, replacement);
+  assert.equal(state.baseCityDataState, "loading");
+  assert.equal(state.worldCitiesData, undefined);
+  assert.deepEqual(events, []);
 });

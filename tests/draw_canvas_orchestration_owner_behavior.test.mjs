@@ -54,6 +54,7 @@ function createHarness({
   effectiveZoomTransform = null,
   navigation = null,
   requiresExactFrame = false,
+  scenePublicationPending = false,
 } = {}) {
   const calls = [];
   let currentPhase = phase;
@@ -72,6 +73,7 @@ function createHarness({
     },
   });
   const effects = {
+    isScenePublicationPending: () => scenePublicationPending,
     requiresExactFrame: () => requiresExactFrame,
     ...(prepareAsyncFrame ? { prepareAsyncFrame: () => {
       calls.push(["prepareAsyncFrame"]);
@@ -615,6 +617,16 @@ test("exact failure aborts exact-after-settle and skips finalize", () => {
     "compose-cached-passes-failed",
   ]);
   assert.equal(calls.some((call) => call[0] === "finalizePendingExactAfterSettleRefreshAfterPaint"), false);
+});
+
+test("private scene publication waits without aborting or finalizing exact refresh", () => {
+  const { calls, owner } = createHarness({ exact: false, scenePublicationPending: true });
+  const summary = owner.drawCanvasFrame(SUMMARY_OPTIONS);
+  assert.equal(summary.status, "waiting-worker");
+  assert.equal(summary.frameMode, "previous-pixels");
+  for (const name of ["abortPendingExactAfterSettleRefreshAfterPaint", "finalizePendingExactAfterSettleRefreshAfterPaint", "captureLastGoodFrame"]) {
+    assert.equal(names(calls).includes(name), false, name);
+  }
 });
 
 test("dirty fast frame skips capture and records exact metadata", () => {

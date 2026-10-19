@@ -1,3 +1,5 @@
+import { getGeometryRetentionWeights } from "./geometry_cache_budget.js";
+
 const DEFAULT_SCENARIO_WATER_CACHE_MODE_PARAM = "water_cache_mode";
 const DEFAULT_SCENARIO_WATER_CACHE_MODE_ALT_PARAM = "scenario_water_cache_mode";
 const DEFAULT_SCENARIO_WATER_CACHE_MODES = new Set(["adaptive", "reuse", "redraw", "direct"]);
@@ -11,9 +13,7 @@ const DEFAULT_SCENARIO_WATER_LOW_COMPLEXITY_FEATURE_MAX = 24;
 const DEFAULT_SCENARIO_WATER_LOW_COMPLEXITY_COVERAGE_MAX = 0.2;
 const DEFAULT_SCENARIO_WATER_LOW_COMPLEXITY_PREV_RENDERED_MAX = 28;
 
-function toAllowedSet(value, defaultSet) {
-  return value instanceof Set ? value : defaultSet;
-}
+function toAllowedSet(value, defaultSet) { return value instanceof Set ? value : defaultSet; }
 
 function defaultCloneZoomTransform(transform = null) {
   return {
@@ -23,9 +23,7 @@ function defaultCloneZoomTransform(transform = null) {
   };
 }
 
-function clampUnit(value) {
-  return Math.max(0, Math.min(1, Number(value) || 0));
-}
+function clampUnit(value) { return Math.max(0, Math.min(1, Number(value) || 0)); }
 
 export function createScenarioWaterCachePolicyOwner({
   state = {},
@@ -218,20 +216,30 @@ export function createScenarioWaterCachePolicyOwner({
   function getScenarioWaterCacheComplexitySignals(waterFeatures = []) {
     const coverageAlgoDecision = getForcedScenarioWaterCoverageAlgo();
     const visibleCoverageRatio = getScenarioWaterVisibleCoverageRatio(waterFeatures, { algo: coverageAlgoDecision.algo });
+    let partCount = 0, vertexCount = 0;
+    for (const feature of Array.isArray(waterFeatures) ? waterFeatures : []) {
+      if (!isWaterRegionRenderable(feature)) continue;
+      for (const part of collectSafeWaterRegionGeometryParts(feature)) {
+        partCount += 1;
+        vertexCount += getGeometryRetentionWeights(part).points;
+      }
+    }
     return {
       featureCount: Array.isArray(waterFeatures) ? waterFeatures.length : 0,
       visibleCoverageRatio: Number(visibleCoverageRatio.toFixed(4)),
       previousRenderedCount: Math.max(0, Number(getPreviousRenderedCount() || 0)),
+      partCount, vertexCount,
       waterCoverageAlgo: coverageAlgoDecision.algo,
       waterCoverageAlgoSource: coverageAlgoDecision.source,
     };
   }
 
   function shouldUseDirectScenarioWaterDraw(signals) {
-    return (
-      Number(signals?.featureCount || 0) <= scenarioWaterLowComplexityFeatureMax
+    return (Number(signals?.featureCount || 0) <= scenarioWaterLowComplexityFeatureMax
       && Number(signals?.previousRenderedCount || 0) <= scenarioWaterLowComplexityPrevRenderedMax
       && Number(signals?.visibleCoverageRatio || 0) <= scenarioWaterLowComplexityCoverageMax
+      && Number(signals?.partCount || 0) <= 64
+      && Number(signals?.vertexCount || 0) <= 12000
     );
   }
 

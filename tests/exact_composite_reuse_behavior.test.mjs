@@ -43,6 +43,8 @@ function harness() {
     getLayout: () => layout, getDpr: () => state.dpr, diagnosticsEnabled: () => diagnostics,
     resetContext: context => context.clearRect(), compose: compositor.composeRenderPassesToTarget });
   const globals = { runtimeState: state, exactCompositeReuseOwner: owner,
+    exportRenderInProgress: false, isTnoRasterSceneSelected: () => false,
+    tnoRasterSceneOwner: null, politicalPassUsesDirectScene: false,
     rendererSurfaceHost: { getContext: () => main.getContext() }, ensureCompositeBufferCanvas: () => buffer,
     getExactCompositeReuseOwner: () => owner, getExactAfterSettleControllerState: () => ({}), recordRenderPerfMetric() {},
     blitCompositeBufferToMain(image) { blits++; main.pixels = [...image.pixels]; },
@@ -80,7 +82,8 @@ test("real full/partial/worker writers invalidate before touching pass pixels", 
   assert.deepEqual(h.main.pixels, [1, 4]);
   const full = realFunction("renderPassToCache", { exactCompositeReuseOwner: h.owner, nowMs: () => 0,
     getRenderPassCacheHostOwner: () => ({ prepareRenderPassHost({ drawFn }) { drawFn(); return { drawResult: {} }; } }),
-    getRenderPassCommitAccountingOwner: () => ({ commitRenderPass() {} }) });
+    tnoRasterSceneOwner: null,
+    getRenderPassCommitAccountingOwner: () => ({ commitRenderPass() { return { committed: true }; } }) });
   full("base", () => { h.cache.canvases.base.pixels[0] = 9; }, {}, {});
   h.render(names);
   assert.deepEqual(h.main.pixels, [9, 4]);
@@ -122,7 +125,7 @@ test("actual export remains a separate pass composition after exact buffer reuse
   let prepared = 0;
   const exportGlobals = {
     isThematicWgiActive, isPopulationActive,
-    exportRenderInProgress: false,
+    exportRenderInProgress: false, politicalPassUsesDirectScene: false,
     filterCurrentEnabledRenderPasses: filterEnabledRenderPassNames,
     runtimeState: h.state, getRenderPipelinePassesOwner: () => ({ ensureIdleRenderPasses() {
       assert.equal(exportGlobals.exportRenderInProgress, true);
@@ -142,7 +145,7 @@ test("actual export remains a separate pass composition after exact buffer reuse
 test("export restores its prior rendering mode when pass preparation throws", () => {
   for (const previous of [false, true]) {
     const h = harness();
-    const globals = { runtimeState: h.state, exportRenderInProgress: previous,
+    const globals = { runtimeState: h.state, exportRenderInProgress: previous, politicalPassUsesDirectScene: false,
       isThematicWgiActive, isPopulationActive,
       filterCurrentEnabledRenderPasses: filterEnabledRenderPassNames,
       getRenderPipelinePassesOwner: () => ({ ensureIdleRenderPasses() {

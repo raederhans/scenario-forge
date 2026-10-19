@@ -3,6 +3,7 @@
 const EDGE_FLAG = 0x80000000;
 const MAX_CODE = 0x7fffffff;
 const SLICE_PIXELS = 65536;
+const SLICE_BUDGET_MS = 8;
 const now = () => globalThis.performance?.now?.() ?? Date.now();
 const defaultYieldTask = () => globalThis.scheduler?.yield
   ? globalThis.scheduler.yield()
@@ -57,7 +58,7 @@ function createAccumulator(width, height) {
     contributions.set(code, (contributions.get(code) ?? 0) + alpha);
   }
 
-  function* finish({ originX = 0, originY = 0, maskReadPixels = 0, startedAt, isCancelled }) {
+  function* finish({ originX = 0, originY = 0, maskReadPixels = 0, startedAt, isCancelled, clock = now }) {
     let edgeLength = 0;
     let contributionCount = 0;
     let maxContributors = 0;
@@ -94,7 +95,7 @@ function createAccumulator(width, height) {
         maxContributors,
         retainedBytes: codes.byteLength + edgeIds.byteLength + edgeWeights.byteLength,
         maskReadPixels,
-        buildMs: now() - startedAt,
+        buildMs: clock() - startedAt,
       },
     };
   }
@@ -160,8 +161,9 @@ export async function buildPoliticalIdRasterTile({
   getCachedPath = null,
   isCancelled = () => false,
   yieldTask = defaultYieldTask,
+  now: readNow = now,
 }) {
-  const startedAt = now();
+  const startedAt = readNow();
   validateDimensions(width, height, originX, originY);
   if (![0, 1, 2, 4].includes(gutter)) throw new RangeError("Political raster gutter must be 0, 1, 2, or 4.");
   const maskWidth = width + gutter * 2, maskHeight = height + gutter * 2;
@@ -177,6 +179,7 @@ export async function buildPoliticalIdRasterTile({
   let pixelWork = 0;
   let entryWork = 0;
   let pathBuilds = 0, pathCacheHits = 0;
+  let sliceStartedAt = startedAt, yieldCount = 0, yieldWallMs = 0;
   function buildPath(entry) {
     pathBuilds++;
     if (createProjectedPath) return createProjectedPath(entry);
@@ -188,7 +191,15 @@ export async function buildPoliticalIdRasterTile({
   }
   async function pause() {
     checkCancelled(isCancelled);
+    const yieldStartedAt = readNow();
+    // Keep cancellation checkpoints frequent without scheduling a worker task
+    // for every cheap group of features or pixels. Asset I/O and cancellation
+    // still get an event-loop turn once this slice has spent its time budget.
+    if (yieldStartedAt - sliceStartedAt < SLICE_BUDGET_MS) return;
     await yieldTask();
+    sliceStartedAt = readNow();
+    yieldCount++;
+    yieldWallMs += sliceStartedAt - yieldStartedAt;
     checkCancelled(isCancelled);
   }
   try {
@@ -240,13 +251,14 @@ export async function buildPoliticalIdRasterTile({
       }
       if (++entryWork % 16 === 0) await pause();
     }
-    const steps = accumulator.finish({ originX, originY, maskReadPixels, startedAt, isCancelled });
+    const steps = accumulator.finish({ originX, originY, maskReadPixels, startedAt, isCancelled, clock: readNow });
     let step = steps.next();
     while (!step.done) {
       await pause();
       step = steps.next();
     }
-    Object.assign(step.value.stats, { strokeWidth, originX, originY, gutter, maskWidth, maskHeight, pathBuilds, pathCacheHits });
+    Object.assign(step.value.stats, { strokeWidth, originX, originY, gutter, maskWidth, maskHeight, pathBuilds, pathCacheHits,
+      yieldCount, yieldWallMs });
     return step.value;
   } finally {
     pathGenerator?.context(null);

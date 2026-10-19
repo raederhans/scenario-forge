@@ -5,7 +5,7 @@
  * primitives. map_renderer.js keeps diagnostics, adjacent render side effects,
  * render pass orchestration, and visible-frame transactions.
  */
-import { createRenderCacheSurfaceResources } from "./render_cache_surface_resources.js";
+import { calculateRenderPassSurfaceLayout, createRenderCacheSurfaceResources } from "./render_cache_surface_resources.js";
 import { createRenderCacheValidationScope } from "./render_cache_validation_scope.js";
 import { surfaceCoversViewport } from "./cached_surface_coverage.js";
 import { pageResourceBudget } from "../runtime_resource_budget.js";
@@ -39,6 +39,8 @@ export function createRenderCacheOwner({
   } = constants;
   const {
     getContext = () => null,
+    getPassPaintOverscanPx = () => 0,
+    getPassOverscanRatio = () => renderPassOverscanRatioPerSide,
     getActiveInteractionCompositePassNames = () => interactionCompositePassNames,
   } = getters;
   const {
@@ -275,37 +277,30 @@ export function createRenderCacheOwner({
   }
 
   function getRenderPassOverscanRatio(passName) {
-    return transformedFramePassNames.has(passName)
-      ? renderPassOverscanRatioPerSide
-      : 0;
+    return transformedFramePassNames.has(passName) ? Math.max(0, Number(getPassOverscanRatio(passName)) || 0) : 0;
   }
 
   function buildRenderPassLayout(passName) {
-    const dpr = Math.max(state.dpr || 1, 1);
-    const logicalWidth = Math.max(1, Number(state.width || 1));
-    const logicalHeight = Math.max(1, Number(state.height || 1));
-    const overscanRatio = getRenderPassOverscanRatio(passName);
-    const offsetX = overscanRatio > 0 ? Math.ceil(logicalWidth * overscanRatio) : 0;
-    const offsetY = overscanRatio > 0 ? Math.ceil(logicalHeight * overscanRatio) : 0;
-    const paddedWidth = logicalWidth + offsetX * 2;
-    const paddedHeight = logicalHeight + offsetY * 2;
-    return {
-      offsetX,
-      offsetY,
-      logicalWidth,
-      logicalHeight,
-      paddedWidth,
-      paddedHeight,
-      pixelWidth: Math.max(1, Math.floor(paddedWidth * dpr)),
-      pixelHeight: Math.max(1, Math.floor(paddedHeight * dpr)),
-      dpr,
-    };
+    return calculateRenderPassSurfaceLayout({
+      width: state.width,
+      height: state.height,
+      dpr: state.dpr,
+      overscanRatio: getRenderPassOverscanRatio(passName),
+      paintOverscanPx: getPassPaintOverscanPx(passName),
+    });
   }
 
   function getRenderPassLayout(passName) {
     const cache = getRenderPassCacheState();
     const layout = buildRenderPassLayout(passName);
+    const previous = cache.layouts[passName];
     cache.layouts[passName] = layout;
+    // A backend can change padding without changing the viewport or camera.
+    // Existing pixels still use the old origin until the pass is repainted.
+    if (previous && cache.canvases?.[passName]
+      && ["offsetX", "offsetY", "pixelWidth", "pixelHeight", "dpr"].some(key => previous[key] !== layout[key])) {
+      invalidateRenderPasses([passName], "surface-layout-change");
+    }
     return layout;
   }
 

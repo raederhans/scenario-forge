@@ -233,6 +233,7 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
         return waitingWorkerResult(includeSummary);
       }
       drewExactFrame = !!composeCachedPasses(activeRenderPassNames);
+      if (!drewExactFrame && effects.isScenePublicationPending?.()) return waitingWorkerResult(includeSummary);
       drewFrame = drewExactFrame;
       frameMode = drewExactFrame ? "exact" : frameMode;
       if (!drewExactFrame) {

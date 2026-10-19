@@ -274,6 +274,7 @@ function createScenarioChunkRuntimeController({
   isScenarioOptionalLayerRequestedForVisibility = () => false,
   syncScenarioLocalizationState,
   refreshMapDataForScenarioChunkPromotion,
+  prepareScenarioPoliticalChunkPromotion = async () => null,
   flushRenderBoundary,
   requestRender = flushRenderBoundary,
   recordScenarioPerfMetric,
@@ -1130,6 +1131,7 @@ function createScenarioChunkRuntimeController({
     primaryPoliticalPayload = null,
     forceRefresh = false,
     firstFrameOnly = false,
+    preparedPoliticalState = null,
     scenarioApplyEpoch = 0,
     scenarioApplyRequestId = 0,
   } = {}) {
@@ -1245,6 +1247,7 @@ function createScenarioChunkRuntimeController({
       politicalFeatureIds: resolvedPoliticalFeatureIds,
       hasPoliticalPayloadChange: true,
       firstFrameOnly,
+      preparedPoliticalState,
     });
     const finishedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
     recordScenarioRenderMetric("politicalChunkPromotionBreakdown", finishedAt - startedAt, {
@@ -1282,6 +1285,7 @@ function createScenarioChunkRuntimeController({
     reason = "refresh",
     changedLayerKeys = [],
     renderVisibleChangedLayerKeys = [],
+    preparedPoliticalState = null,
   } = {}) {
     const normalizedRenderVisibleChangedLayerKeys = Array.from(new Set(
       (Array.isArray(renderVisibleChangedLayerKeys) ? renderVisibleChangedLayerKeys : [])
@@ -1304,6 +1308,7 @@ function createScenarioChunkRuntimeController({
       changedLayerKeys: normalizedChangedLayerKeys,
       politicalFeatureIds: [],
       hasPoliticalPayloadChange: false,
+      preparedPoliticalState,
     });
     return true;
   }
@@ -1498,6 +1503,40 @@ function createScenarioChunkRuntimeController({
         politicalFeatureCount: Array.isArray(pendingPromotion.politicalFeatureIds) ? pendingPromotion.politicalFeatureIds.length : 0,
       },
     });
+    // Prepare privately before taking the render lock or replacing live payloads.
+    // Input and edits continue against the published authority throughout yields.
+    const preparationGesture = runtimeState.zoomGestureStartTransform;
+    const isPreparationCurrent = () => !runtimeState.isInteracting
+      && runtimeState.zoomGestureStartTransform === preparationGesture
+      && isPendingScenarioChunkPromotionCurrent({
+        pendingPromotion, loadState, currentLoadState: runtimeState.runtimeChunkLoadState,
+        scenarioId, activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
+        runId, promotionCommitRunId,
+        currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
+        latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
+        latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
+      });
+    // Strategic values also change the color resolver's inputs. That uncommon
+    // mixed transaction keeps its existing all-at-once rebuild contract.
+    const canPreparePolitical = !Object.hasOwn(mergedLayerPayloads, "strategicvalues")
+      || mergedLayerPayloads.strategicvalues === runtimeState.scenarioStrategicValuesData;
+    // Match optional-layer publication's identity check, including explicit clears.
+    // A selection/signature change alone does not replace Atlantropa geometry.
+    const hasAtlantropaPayloadChange = Object.hasOwn(mergedLayerPayloads, "scenario_atlantropa")
+      && (mergedLayerPayloads.scenario_atlantropa || null) !== (runtimeState.scenarioAtlantropaData || null);
+    const preparedPoliticalState = !allowStartupInitialVisual && canPreparePolitical
+      && (!areScenarioFeatureCollectionsEquivalent(runtimeState.scenarioPoliticalChunkData, mergedLayerPayloads.political)
+        || pendingPromotion.primaryVisibleFeatureSubsetChanged
+        || hasAtlantropaPayloadChange)
+      ? await prepareScenarioPoliticalChunkPromotion({
+        politicalPayload: normalizeScenarioFeatureCollection(mergedLayerPayloads.political), isCurrent: isPreparationCurrent,
+        primaryPoliticalPayload: normalizeScenarioFeatureCollection(pendingPromotion.primaryMergedLayerPayloads?.political),
+        atlantropaPayload: mergedLayerPayloads.scenario_atlantropa,
+      }) : null;
+    if (preparedPoliticalState && (preparedPoliticalState.status !== "prepared" || !preparedPoliticalState.isCurrent())) {
+      setPromotionCommitStatus("promotion-deferred", { inFlight: false, finishedAt: Date.now() });
+      return false;
+    }
     const previousRenderLock = !!runtimeState.scenarioChunkPromotionRenderLocked;
     const mergedLayerSnapshot = captureMergedLayerRuntimeSnapshot(mergedLayerPayloads);
     const promotionRootSnapshot =
@@ -1623,6 +1662,7 @@ function createScenarioChunkRuntimeController({
         runtimeState.zoomGestureStartTransform !== promotionGestureStartTransform
         || runtimeState.isInteracting
         || runtimeState.renderPhase === "interacting"
+        || (preparedPoliticalState && !preparedPoliticalState.isCurrent())
       ) {
         if (canRollbackPromotionContinuation()) {
           restoreMergedLayerRuntimeSnapshot(mergedLayerSnapshot);
@@ -1676,6 +1716,7 @@ function createScenarioChunkRuntimeController({
         primaryPoliticalPayload: primaryMergedLayerPayloads.political || null,
         forceRefresh: !!pendingPromotion.primaryVisibleFeatureSubsetChanged || shouldForceStartupInitialVisualRefresh,
         firstFrameOnly: !!allowStartupInitialVisual,
+        preparedPoliticalState,
         scenarioApplyEpoch: promotionScenarioApplyEpoch,
         scenarioApplyRequestId: promotionScenarioApplyRequestId,
       });
@@ -1685,6 +1726,7 @@ function createScenarioChunkRuntimeController({
           reason: pendingPromotion.reason,
           changedLayerKeys: effectiveChangedLayerKeys,
           renderVisibleChangedLayerKeys: mergedLayerResult.renderVisibleChangedLayerKeys,
+          preparedPoliticalState,
         };
       }
       // Keep the render lock across this frame break so a half-applied visual payload
@@ -1738,6 +1780,16 @@ function createScenarioChunkRuntimeController({
         return false;
       }
       if (deferredOptionalVisibleRefresh) {
+        // Unlike a political payload replacement, the optional-only branch has
+        // not consumed its candidate before this second frame continuation.
+        if (preparedPoliticalState && !preparedPoliticalState.isCurrent()) {
+          if (canRollbackPromotionContinuation()) {
+            restoreMergedLayerRuntimeSnapshot(mergedLayerSnapshot);
+            restoreScenarioDataGenerationSnapshot();
+          }
+          setPromotionCommitStatus("promotion-deferred", { inFlight: false, finishedAt: Date.now() });
+          return false;
+        }
         refreshScenarioRenderVisibleOptionalChunkPayloadChange(deferredOptionalVisibleRefresh);
       }
       if (!isPendingScenarioChunkPromotionCurrent({

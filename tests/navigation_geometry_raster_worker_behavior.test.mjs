@@ -44,8 +44,8 @@ test("navigation decodes mixed batches, builds SVG Path2D, and fills in entry or
   assert.ok(paths.every((svg) => typeof svg === "string" && svg.length > 0));
   assert.ok(transforms.some((args) => args.length === 2 && args[0] === 2 && args[1] === 3));
   await assert.rejects(kernel.render({ sceneKey: "nav", projectionKey: 1, kind: "political",
-    width: 20, height: 10, geometryTransport: { encoding: "geo-f64-batches-v1", batches: [] } }),
-  /Invalid navigation geometry transport/);
+    width: 20, height: 10, geometryTransport: { encoding: "geo-f64-batches-v1", batches: null } }),
+  /Invalid geometry transport batches/);
 });
 
 test("completed navigation bitmaps unpin geometry before the final budget and eviction acknowledgement", async () => {

@@ -67,6 +67,39 @@ test("resident policy is explicit and defaults remain native with preserved lega
   assert.equal(readPoliticalRenderPolicy({ search: "", storage: broken }).requested, false);
 });
 
+test("TNO auto selects resident raster while other scenario auto policies remain vector", () => {
+  const read = (scenarioId, search = "", values = {}) => readPoliticalRenderPolicy({ scenarioId, search, storage: policyStore(values) });
+  const tno = read("tno_1962");
+  assert.equal(tno.mode, "auto"); assert.equal(tno.preferenceSource, "default");
+  assert.equal(tno.effectiveMode, "raster"); assert.equal(tno.requested, true);
+  assert.equal(tno.persistent, true); assert.equal(tno.automaticRasterEnabled, true);
+  for (const scenarioId of ["", "hoi4_1936", "hoi4_1939", "modern_world", "unknown_scenario"]) {
+    const policy = read(scenarioId);
+    assert.equal(policy.mode, "auto", scenarioId); assert.equal(policy.effectiveMode, "vector", scenarioId);
+    assert.equal(policy.requested, false, scenarioId); assert.equal(policy.persistent, false, scenarioId);
+    assert.equal(policy.automaticRasterEnabled, false, scenarioId);
+  }
+  assert.equal(read("tno_1962", "?political_render_mode=auto").effectiveMode, "raster");
+  assert.equal(read("tno_1962", "", { "scenario-forge-political-render-mode": "auto" }).effectiveMode, "raster");
+  assert.equal(read("hoi4_1939", "?political_render_mode=auto").effectiveMode, "vector");
+});
+
+test("explicit vector and legacy off override TNO automatic raster admission", () => {
+  const read = (search, values = {}) => readPoliticalRenderPolicy({ scenarioId: "tno_1962", search, storage: policyStore(values) });
+  for (const policy of [
+    read("?political_render_mode=vector"),
+    read("?political_render_mode=vector&political_id_raster=1", { "scenario-forge-political-render-mode": "raster" }),
+    read("", { "scenario-forge-political-render-mode": "vector" }),
+    read("?political_id_raster=0", { "scenario-forge-political-render-mode": "raster" }),
+    read("", { "scenario-forge-political-id-raster": "0" }),
+  ]) {
+    assert.equal(policy.mode, "vector"); assert.equal(policy.effectiveMode, "vector");
+    assert.equal(policy.requested, false); assert.equal(policy.persistent, false);
+  }
+  const blockedStorage = { getItem() { throw Error("blocked"); } };
+  assert.equal(readPoliticalRenderPolicy({ scenarioId: "tno_1962", search: "?political_render_mode=vector", storage: blockedStorage }).effectiveMode, "vector");
+});
+
 test("explicit mode writes and legacy toggles cannot leave a conflicting URL preference", t => {
   const originals = Object.fromEntries(["localStorage", "location", "history"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
   const values = new Map(); let href = "https://example.test/app/?political_id_raster=0&sample=keep";
@@ -89,7 +122,7 @@ test("explicit mode writes and legacy toggles cannot leave a conflicting URL pre
 
 test("resident readiness requires complete raster output and does not accept a native-refined substitute", async () => {
   const { residentFrameReady } = await import("../tools/verify_political_raster_resident.mjs");
-  const s = { renderPhase: "idle", zoomTransform: { x:0,y:0,k:1 } };
+  const s = { renderPhase: "idle", zoomTransform: { x:0,y:0,k:1 }, styleConfig: { countryLabels: { enabled: false } } };
   const d = { effectiveMode:"raster", actualBackend:"raster", displayState:"accelerated", sourceCoverage:"complete-display-v1", view:{x:0,y:0,k:1} };
   assert.equal(residentFrameReady(s,d),true);
   for (const patch of [{actualBackend:"vector"},{displayState:"precise"},{sourceCoverage:"fine"},{pending:1},{refinementPending:true},{view:{x:1,y:0,k:1}}]) {
@@ -97,10 +130,27 @@ test("resident readiness requires complete raster output and does not accept a n
   }
 });
 
+test("direct resident readiness rejects staged candidates, retained publications and overview feedback", async () => {
+  const { residentFrameReady } = await import("../tools/verify_political_raster_resident.mjs");
+  const s = { renderPhase: "idle", zoomTransform: { x: 0, y: 0, k: 1 }, styleConfig: { countryLabels: { enabled: false } } };
+  const d = { effectiveMode: "raster", actualBackend: "raster", displayState: "accelerated",
+    sourceCoverage: "complete-display-v1", view: { ...s.zoomTransform }, directPresentation: true,
+    stagedPending: false, publishedFrame: { state: "published" },
+    scene: { active: true, presentationState: "published", usingOverview: false } };
+  assert.equal(residentFrameReady(s, d), true);
+  for (const patch of [{ stagedPending: true }, { publishedFrame: { state: "retained" } }, { publishedFrame: null },
+    { scene: { ...d.scene, usingOverview: true } }, { scene: { ...d.scene, presentationState: "retained" } },
+    { scene: { ...d.scene, active: false } }, { scene: null }]) {
+    assert.equal(residentFrameReady(s, { ...d, ...patch }), false, JSON.stringify(patch));
+  }
+  assert.equal(residentFrameReady(s, { ...d, directPresentation: false, stagedPending: true,
+    publishedFrame: null, scene: null }), true, "non-direct producers keep their existing completion gates");
+});
+
 
 test("paired native and hybrid baselines wait for their real completed political producer", async () => {
   const { residentFrameReady } = await import("../tools/verify_political_raster_resident.mjs");
-  const s = { renderPhase:"idle", zoomTransform:{x:0,y:0,k:1},
+  const s = { renderPhase:"idle", zoomTransform:{x:0,y:0,k:1}, styleConfig: { countryLabels: { enabled: false } },
     renderPerfMetrics:{drawPoliticalBackgroundFillsPass:{progressive:true,deferredFullCacheReady:false}} };
   assert.equal(residentFrameReady(s,{effectiveMode:"vector"}),false);
   s.renderPerfMetrics.drawPoliticalBackgroundFillsPass.deferredFullCacheReady=true;

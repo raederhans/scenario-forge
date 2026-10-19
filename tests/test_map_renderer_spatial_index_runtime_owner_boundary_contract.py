@@ -44,8 +44,15 @@ class MapRendererSpatialIndexRuntimeOwnerBoundaryContractTest(unittest.TestCase)
         self.assertIsNone(re.search(r"(?m)^\s*function\s+buildSecondarySpatialIndexes\s*\(", renderer_content))
         combined_runtime_content = f"{renderer_content}\n{refresh_runtime_content}"
         self.assertEqual(combined_runtime_content.count("getSpatialIndexRuntimeOwner().resetSecondarySpatialIndexState({"), 3)
-        self.assertEqual(combined_runtime_content.count("preserveCurrent: true"), 3)
+        self.assertEqual(combined_runtime_content.count("preserveCurrent: true"), 4)
         self.assertEqual(combined_runtime_content.count("getSpatialIndexRuntimeOwner().buildSecondarySpatialIndexes({"), 3)
+        preparation = renderer_content.split("function prepareScenarioSecondaryRegionIndexes(", 1)[1].split(
+            "function syncScenarioSecondaryRegionIndexes(", 1
+        )[0]
+        self.assertIn("owner.resetSecondarySpatialIndexState({ preserveCurrent: true, reason });", preparation)
+        self.assertIn("await owner.buildSecondarySpatialIndexesChunked({ isCurrent })", preparation)
+        self.assertNotIn("beginInteractionRecoveryTask(", preparation)
+        self.assertLess(preparation.index('result.status !== "published"'), preparation.index("rebuildAuxiliaryRegionIndexes();"))
         self.assertIn("function rebuildRuntimeDerivedState({", renderer_content)
         self.assertIn("async function buildBasicInteractionInfrastructureAfterStartup({", renderer_content)
         self.assertIn("async function buildFullInteractionInfrastructureAfterStartup({", renderer_content)

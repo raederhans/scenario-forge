@@ -61,7 +61,7 @@ class MapRendererBorderMeshOwnerBoundaryContractTest(unittest.TestCase):
     def test_static_mesh_rebuild_keeps_viewport_internal_border_meshes_deferred(self):
         renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
         start = renderer_content.index("function rebuildStaticMeshes({")
-        end = renderer_content.index("function invalidateBorderCache()", start)
+        end = renderer_content.index("function invalidateBorderCache(", start)
         rebuild_source = renderer_content[start:end]
 
         self.assertIn("scheduleDeferredHeavyBorderMeshes();", rebuild_source)

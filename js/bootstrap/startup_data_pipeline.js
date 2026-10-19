@@ -1,5 +1,5 @@
 import {
-  buildCityLocalizationPatch,
+  buildCityLocalizationPatchSteps,
   loadCitySupportData,
   loadContextLayerPack,
   loadLocalizationData,
@@ -18,7 +18,7 @@ import {
   loadScenarioRegistry,
   validateScenarioRuntimeShellContract,
 } from "../core/scenario_resources.js";
-import { syncScenarioLocalizationState } from "../core/scenario_localization_state.js";
+import { prepareScenarioLocalizationState } from "../core/scenario_localization_state.js";
 import { syncCountryUi } from "../core/scenario_ui_sync.js";
 import {
   SCENARIO_STARTUP_BUNDLE_MANIFEST_LANGUAGE_FIELDS,
@@ -44,8 +44,12 @@ import {
   beginBaseCitySupportLoad,
   beginFullLocalizationLoad,
   commitBaseCitySupportData,
+  commitPreparedBaseCitySupportData,
   commitContextLayerCollection,
-  commitFullLocalizationData,
+  commitPreparedFullLocalizationData,
+  copyLocalizationEntries,
+  prepareFullLocalizationData,
+  prepareLocalizationCandidate,
   decodeStartupPrimaryCollectionsIntoState,
   failBaseCitySupportLoad,
   failFullLocalizationLoad,
@@ -151,10 +155,20 @@ export function createStartupDataPipelineOwner({
       return cities;
     }
     beginBaseCitySupportLoad(state);
+    const ownsLoad = () => state.baseCityDataPromise === promise;
+    const loadIsCurrent = () => canCommit() && ownsLoad();
     const promise = loadCitySupportData({
       d3Client: globalThis.d3,
       includeLocalization,
       cityCollection: state.worldCitiesData || null,
+      deferLocalization: true,
+      prepareCandidate: async (iterator) => {
+        const candidate = await prepareLocalizationCandidate(iterator, {
+          isCurrent: loadIsCurrent, yieldControl: helpers.yieldToMain,
+        });
+        assertReceiverCurrent({ isCurrent: loadIsCurrent });
+        return candidate;
+      },
       locales: {
         ui: state.locales?.ui || {},
         geo: state.baseGeoLocales && typeof state.baseGeoLocales === "object"
@@ -167,17 +181,63 @@ export function createStartupDataPipelineOwner({
           : (state.geoAliasToStableKey || {}),
       },
     })
-      .then((result) => {
-        if (!canCommit()) return null;
-        commitBaseCitySupportData(state, result, {
-          scenarioActive: !!state.activeScenarioId,
-        });
-        if (state.activeScenarioId && result.localizationReady !== false) {
-          syncScenarioLocalizationState({
-            cityOverridesPayload: state.scenarioCityOverridesData,
-            geoLocalePatchPayload: state.scenarioGeoLocalePatchData,
+      .then(async (result) => {
+        if (!loadIsCurrent()) return null;
+        let published = false;
+        if (result.localizationReady === false) {
+          commitBaseCitySupportData(state, result);
+          published = true;
+        } else while (loadIsCurrent()) {
+          const snapshot = {
+            activeScenarioId: state.activeScenarioId,
+            currentScenarioApplyRequestId: state.currentScenarioApplyRequestId,
+            locales: state.locales,
+            baseGeoLocales: state.baseGeoLocales,
+            baseGeoAliasToStableKey: state.baseGeoAliasToStableKey,
+            geoAliasToStableKey: state.geoAliasToStableKey,
+            worldCitiesData: state.worldCitiesData,
+            baseCityAliasesData: state.baseCityAliasesData,
+            scenarioCityOverridesData: state.scenarioCityOverridesData,
+            scenarioGeoLocalePatchData: state.scenarioGeoLocalePatchData,
+            ruCityOverrides: state.ruCityOverrides,
+            cityLayerRevision: state.cityLayerRevision,
+          };
+          const epoch = state.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0;
+          const isCurrent = () => loadIsCurrent()
+            && (state.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0) === epoch
+            && Object.keys(snapshot).every((key) => state[key] === snapshot[key]);
+          const prepareOptions = { isCurrent, yieldControl: helpers.yieldToMain };
+          const patch = await prepareLocalizationCandidate(buildCityLocalizationPatchSteps({
+            cityCollection: result.worldCities, cityAliases: result.cityAliases,
+          }), prepareOptions);
+          if (!patch) continue;
+          const base = await prepareFullLocalizationData({
+            uiLocales: snapshot.locales?.ui,
+            geoLocales: (!result.localizationDeferred && result.locales?.geo) || snapshot.baseGeoLocales || snapshot.locales?.geo,
+            aliasToStableKey: (!result.localizationDeferred && result.geoAliases?.alias_to_stable_key)
+              || snapshot.baseGeoAliasToStableKey || snapshot.geoAliasToStableKey,
+            cityPatch: patch,
+          }, prepareOptions);
+          if (!base) continue;
+          const final = snapshot.activeScenarioId
+            ? await prepareScenarioLocalizationState({ ...snapshot, worldCitiesData: result.worldCities }, {
+                baseGeoLocales: base.baseGeoLocales, baseAliasMap: base.baseGeoAliasToStableKey,
+              }, prepareOptions)
+            : await prepareLocalizationCandidate((function* () {
+                const geo = {}, aliasToStableKey = {};
+                yield* copyLocalizationEntries(geo, base.baseGeoLocales);
+                yield* copyLocalizationEntries(aliasToStableKey, base.baseGeoAliasToStableKey);
+                return { geo, aliasToStableKey };
+              })(), prepareOptions);
+          if (!final || !isCurrent()) continue;
+          commitPreparedBaseCitySupportData(state, {
+            ...base, worldCities: result.worldCities, cityAliases: result.cityAliases,
+            locales: { ...snapshot.locales, geo: final.geo }, geoAliasToStableKey: final.aliasToStableKey,
           });
+          published = true;
+          break;
         }
+        if (!published || !canCommit()) return null;
         emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI);
         if (shouldRender()) {
           requestMainRender?.(`base-city-loaded:${reason}`, { flush: true });
@@ -186,7 +246,7 @@ export function createStartupDataPipelineOwner({
         return state.worldCitiesData;
       })
       .catch((error) => {
-        if (!canCommit()) return null;
+        if (!loadIsCurrent()) return null;
         failBaseCitySupportLoad(state, error);
         console.warn(`[boot] Failed to load base city support data. reason=${reason}`, error);
         throw error;
@@ -216,40 +276,64 @@ export function createStartupDataPipelineOwner({
       d3Client: globalThis.d3,
       localeLevel: "full",
     })
-      .then((result) => {
+      .then(async (result) => {
+        while (canCommit()) {
+          // The resource is page scoped, but every private scenario candidate is
+          // tied to the exact apply request and presentation used to prepare it.
+          const snapshot = {
+            activeScenarioId: state.activeScenarioId,
+            currentScenarioApplyRequestId: state.currentScenarioApplyRequestId,
+            locales: state.locales,
+            baseGeoLocales: state.baseGeoLocales,
+            baseGeoAliasToStableKey: state.baseGeoAliasToStableKey,
+            worldCitiesData: state.worldCitiesData,
+            baseCityAliasesData: state.baseCityAliasesData,
+            scenarioCityOverridesData: state.scenarioCityOverridesData,
+            scenarioGeoLocalePatchData: state.scenarioGeoLocalePatchData,
+            ruCityOverrides: state.ruCityOverrides,
+            cityLayerRevision: state.cityLayerRevision,
+          };
+          const epoch = state.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0;
+          const isCurrent = () => canCommit()
+            && (state.renderTransactionDiagnostics?.scenarioApplyEpoch ?? 0) === epoch
+            && Object.keys(snapshot).every((key) => state[key] === snapshot[key]);
+          const prepareOptions = { isCurrent, yieldControl: helpers.yieldToMain };
+          const cityPatch = await prepareLocalizationCandidate(buildCityLocalizationPatchSteps({
+            cityCollection: snapshot.worldCitiesData || null, cityAliases: snapshot.baseCityAliasesData || null,
+          }), prepareOptions);
+          if (!cityPatch) continue;
+          const base = await prepareFullLocalizationData({
+            uiLocales: result.locales?.ui && typeof result.locales.ui === "object"
+              ? result.locales.ui : snapshot.locales?.ui,
+            geoLocales: result.locales?.geo,
+            aliasToStableKey: result.geoAliases?.alias_to_stable_key,
+            cityPatch,
+          }, prepareOptions);
+          if (!base) continue;
+          const scenarioActive = !!snapshot.activeScenarioId;
+          const final = scenarioActive
+            ? await prepareScenarioLocalizationState(snapshot, {
+                baseGeoLocales: base.baseGeoLocales, baseAliasMap: base.baseGeoAliasToStableKey,
+              }, prepareOptions)
+            : await prepareLocalizationCandidate((function* () {
+                const geo = {};
+                const aliasToStableKey = {};
+                yield* copyLocalizationEntries(geo, base.baseGeoLocales);
+                yield* copyLocalizationEntries(aliasToStableKey, base.baseGeoAliasToStableKey);
+                return { geo, aliasToStableKey };
+              })(), prepareOptions);
+          if (!final || !isCurrent()) continue;
+          // No yields or dictionary copies between this final identity check and
+          // publication. Existing readers see either the old or complete state.
+          commitPreparedFullLocalizationData(state, {
+            ...base,
+            locales: { ...snapshot.locales, ui: base.uiLocales, geo: final.geo },
+            geoAliasToStableKey: final.aliasToStableKey,
+            scenarioActive,
+          });
+          break;
+        }
         if (!canCommit()) return null;
-        const fullBaseGeoLocales =
-          result.locales?.geo && typeof result.locales.geo === "object"
-            ? { ...result.locales.geo }
-            : {};
-        const fullUiLocales =
-          result.locales?.ui && typeof result.locales.ui === "object"
-            ? { ...result.locales.ui }
-            : (state.locales?.ui || {});
-        const fullBaseAliasMap =
-          result.geoAliases?.alias_to_stable_key && typeof result.geoAliases.alias_to_stable_key === "object"
-            ? { ...result.geoAliases.alias_to_stable_key }
-            : {};
-        if (state.worldCitiesData || state.baseCityAliasesData) {
-          const cityPatch = buildCityLocalizationPatch({
-            cityCollection: state.worldCitiesData || null,
-            cityAliases: state.baseCityAliasesData || null,
-          });
-          Object.assign(fullBaseGeoLocales, cityPatch.geo || {});
-          Object.assign(fullBaseAliasMap, cityPatch.aliasToStableKey || {});
-        }
-        commitFullLocalizationData(state, {
-          uiLocales: fullUiLocales,
-          geoLocales: fullBaseGeoLocales,
-          aliasToStableKey: fullBaseAliasMap,
-          scenarioActive: !!state.activeScenarioId,
-        });
-        if (state.activeScenarioId) {
-          syncScenarioLocalizationState({
-            cityOverridesPayload: state.scenarioCityOverridesData,
-            geoLocalePatchPayload: state.scenarioGeoLocalePatchData,
-          });
-        }
         finishBootMetric?.("localization:full:load", {
           reason,
           resourceMetrics: result.resourceMetrics || {},

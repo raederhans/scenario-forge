@@ -1,7 +1,29 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
 
 import { createZoomInteractionLifecycleOwner } from "../js/core/renderer/zoom_interaction_lifecycle_owner.js";
+
+test("retained TNO navigation skips redundant border capture and preserves native fallbacks", () => {
+  const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
+  const start = source.indexOf("function captureInteractionBorderSnapshot(");
+  const end = source.indexOf("\nfunction drawInteractionBorderSnapshot(", start);
+  assert.ok(start >= 0 && end > start);
+  const makeCapture = new Function("runtimeState", "exportRenderInProgress", "isTnoRasterSceneSelected",
+    "tnoRasterSceneOwner", "getInteractionBorderSnapshotOwner",
+    source.slice(start, end) + "\nreturn captureInteractionBorderSnapshot;");
+  for (const selected of [false, true]) for (const exporting of [false, true]) {
+    for (const active of [false, true, null]) {
+      const transform = { x: 12, y: 34, k: 2.5 }, captures = [];
+      const capture = makeCapture({ zoomTransform: transform }, exporting, () => selected,
+        active === null ? null : { isActive: () => active },
+        () => ({ captureInteractionBorderSnapshot: value => { captures.push(value); return true; } }));
+      const skipped = selected && !exporting && active === true;
+      assert.equal(capture(), !skipped);
+      assert.deepEqual(captures, skipped ? [] : [transform]);
+    }
+  }
+});
 
 function createTransform(label, { x = 0, y = 0, k = 1 } = {}) {
   return { label, x, y, k };

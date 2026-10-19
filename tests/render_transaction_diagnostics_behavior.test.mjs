@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import { bumpColorRevision, setResolvedColorForFeature } from "../js/core/state/color_state.js";
 
 import {
   classifyRenderTransactionPhaseKind,
@@ -84,6 +85,93 @@ test("render transaction snapshots keep one entry in ordinary mode", () => {
     assert.equal(runtimeState.renderTransactionDiagnostics.latestSnapshot.phase, "third");
     assert.equal(globalThis[globalName], undefined);
   });
+});
+
+function countedColors(entries = { A: "#112233" }) {
+  let enumerations = 0;
+  const colors = new Proxy(entries, { ownKeys(target) { enumerations++; return Reflect.ownKeys(target); } });
+  return { colors, enumerations: () => enumerations };
+}
+
+const emptyColorsWarning = snapshot => snapshot.warnings.some(
+  warning => warning.code === RENDER_TRANSACTION_WARNING_CODES.resolvedColorsEmptyWithLand);
+const colorsState = (colors, colorRevision = 0) => ({ activeScenarioId: "tno_1962",
+  colors, colorRevision, landData: { features: [{ id: "A" }] }, renderPassCache: {} });
+
+test("stable explicit color revisions enumerate once per state and retain accurate counts", () => {
+  const counted = countedColors();
+  const state = colorsState(counted.colors, 0);
+  assert.equal(recordRenderTransactionSnapshot(state).featureCounts.resolvedColors, 1);
+  assert.equal(recordRenderTransactionSnapshot(state, { extra: { colorRevision: 99 } }).featureCounts.resolvedColors, 1);
+  assert.equal(counted.enumerations(), 1, "snapshot revision overrides are not table mutation evidence");
+  assert.equal(emptyColorsWarning(recordRenderTransactionSnapshot(state)), false);
+  const otherState = colorsState(counted.colors, 0);
+  assert.equal(recordRenderTransactionSnapshot(otherState).featureCounts.resolvedColors, 1);
+  assert.equal(counted.enumerations(), 2, "state instances own independent cache entries");
+});
+
+test("same-reference color batches recount on revision bumps and preserve empty-color warnings", () => {
+  const counted = countedColors();
+  const state = colorsState(counted.colors, 3);
+  assert.equal(recordRenderTransactionSnapshot(state).featureCounts.resolvedColors, 1);
+  setResolvedColorForFeature(state, "A", null);
+  bumpColorRevision(state);
+  const emptied = recordRenderTransactionSnapshot(state);
+  assert.equal(emptied.featureCounts.resolvedColors, 0);
+  assert.equal(emptyColorsWarning(emptied), true);
+  setResolvedColorForFeature(state, "B", "#445566");
+  bumpColorRevision(state);
+  const refilled = recordRenderTransactionSnapshot(state);
+  assert.equal(refilled.featureCounts.resolvedColors, 1);
+  assert.equal(emptyColorsWarning(refilled), false);
+  assert.equal(state.colors, counted.colors);
+  assert.equal(counted.enumerations(), 3);
+});
+
+test("colors reference replacement recounts even when the explicit revision is unchanged", () => {
+  const before = countedColors(), after = countedColors({});
+  const state = colorsState(before.colors, 5);
+  assert.equal(recordRenderTransactionSnapshot(state).featureCounts.resolvedColors, 1);
+  state.colors = after.colors;
+  const snapshot = recordRenderTransactionSnapshot(state);
+  assert.equal(snapshot.featureCounts.resolvedColors, 0);
+  assert.equal(emptyColorsWarning(snapshot), true);
+  assert.equal(before.enumerations(), 1);
+  assert.equal(after.enumerations(), 1);
+});
+
+test("missing or invalid explicit revisions retain fresh counting and warning accuracy", () => {
+  for (const revision of [undefined, null, "1", NaN, Infinity, -1, 0.5, Number.MAX_SAFE_INTEGER + 1]) {
+    const counted = countedColors();
+    const state = colorsState(counted.colors);
+    if (revision === undefined) delete state.colorRevision;
+    else state.colorRevision = revision;
+    assert.equal(recordRenderTransactionSnapshot(state).featureCounts.resolvedColors, 1);
+    delete counted.colors.A;
+    const snapshot = recordRenderTransactionSnapshot(state);
+    assert.equal(snapshot.featureCounts.resolvedColors, 0);
+    assert.equal(emptyColorsWarning(snapshot), true);
+    assert.equal(counted.enumerations(), 2);
+  }
+  const counted = countedColors();
+  const state = colorsState(counted.colors, 1);
+  recordRenderTransactionSnapshot(state);
+  delete state.colorRevision;
+  delete counted.colors.A;
+  recordRenderTransactionSnapshot(state);
+  state.colorRevision = 1;
+  assert.equal(recordRenderTransactionSnapshot(state).featureCounts.resolvedColors, 0);
+  assert.equal(counted.enumerations(), 3, "an invalid revision discards the old cache before a value is restored");
+});
+
+test("native collection sizes stay live without revision-based caching", () => {
+  for (const colors of [new Map([["A", "#112233"]]), new Set(["A"]), ["A"]]) {
+    const state = colorsState(colors, 1);
+    assert.equal(recordRenderTransactionSnapshot(state).featureCounts.resolvedColors, 1);
+    if (colors instanceof Map || colors instanceof Set) colors.clear();
+    else colors.length = 0;
+    assert.equal(recordRenderTransactionSnapshot(state).featureCounts.resolvedColors, 0);
+  }
 });
 
 test("render transaction global exposure is removed when diagnostics are disabled", () => {

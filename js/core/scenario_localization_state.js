@@ -4,6 +4,7 @@ import {
   normalizeCityText,
 } from "./data_loader.js";
 import { applyScenarioChunkCityExternalEffectState } from "./state/actions/scenario_presentation_actions.js";
+import { copyLocalizationEntries, prepareLocalizationCandidate } from "./state/content_state.js";
 const state = runtimeState;
 
 function getScenarioOverrideLocaleEntry(overrideEntry) {
@@ -23,7 +24,7 @@ function getScenarioOverrideLocaleEntry(overrideEntry) {
   return Object.keys(localeEntry).length ? localeEntry : null;
 }
 
-function buildScenarioOverrideSourceCityIndex(overrideEntries) {
+function* buildScenarioOverrideSourceCityIndex(overrideEntries, target) {
   const matches = new Map();
   for (const entry of overrideEntries) {
     const cityId = normalizeCityText(entry?.city_id);
@@ -32,8 +33,9 @@ function buildScenarioOverrideSourceCityIndex(overrideEntries) {
     if (stableKey) matches.set(stableKey, null);
   }
   let remaining = matches.size;
-  const features = Array.isArray(runtimeState.worldCitiesData?.features) ? runtimeState.worldCitiesData.features : [];
+  const features = Array.isArray(target.worldCitiesData?.features) ? target.worldCitiesData.features : [];
   for (let index = 0; index < features.length && remaining > 0; index += 1) {
+    yield;
     const feature = features[index];
     const props = feature?.properties || {};
     const cityId = normalizeCityText(props.__city_id || props.id || feature?.id);
@@ -80,14 +82,14 @@ function getAngularDistanceDegrees(left, right) {
   return Math.hypot(dx, dy);
 }
 
-function resolveScenarioGeoFeatureIdForCityFeature(cityFeature) {
+function* resolveScenarioGeoFeatureIdForCityFeature(cityFeature, target, centroidCache) {
   const props = cityFeature?.properties || {};
   // This supplemental polygon layer contains Russian cities only. A global
   // capital must never acquire a Russian host through a spatial fallback.
   const countryCode = normalizeCityText(props.__city_country_code || props.country_code).toUpperCase();
   if (countryCode !== "RU") return "";
   const point = getFeaturePointCoordinates(cityFeature);
-  const overrideFeatures = Array.isArray(runtimeState.ruCityOverrides?.features) ? runtimeState.ruCityOverrides.features : [];
+  const overrideFeatures = Array.isArray(target.ruCityOverrides?.features) ? target.ruCityOverrides.features : [];
   if (!point || !overrideFeatures.length) return "";
 
   const geoContains = globalThis.d3?.geoContains;
@@ -96,11 +98,16 @@ function resolveScenarioGeoFeatureIdForCityFeature(cityFeature) {
   let nearestDistance = Number.POSITIVE_INFINITY;
 
   for (const feature of overrideFeatures) {
+    yield;
     const featureId = normalizeCityText(feature?.properties?.id || feature?.id);
     if (!featureId || !feature?.geometry) continue;
     try {
       if (typeof geoCentroid !== "function") continue;
-      const centroid = geoCentroid(feature);
+      let centroid = centroidCache.get(feature);
+      if (!centroidCache.has(feature)) {
+        centroid = geoCentroid(feature);
+        centroidCache.set(feature, centroid);
+      }
       const distance = getAngularDistanceDegrees(point, centroid);
       // Reversed spherical rings can contain almost the entire world. Require
       // the same local proximity used by the fallback before trusting contains.
@@ -119,24 +126,26 @@ function resolveScenarioGeoFeatureIdForCityFeature(cityFeature) {
   return nearestDistance <= 1.5 ? nearestId : "";
 }
 
-function buildScenarioCityNameSyncPatch({ baseGeoLocales = {}, scenarioGeoPatch = {} } = {}) {
+function* prepareScenarioCityNameSyncPatch({ baseGeoLocales = {}, scenarioGeoPatch = {} } = {}, target = runtimeState) {
   const geo = {};
   const conflicts = [];
   let preservedExplicitPatchCount = 0;
-  const overrideEntries = Object.values(runtimeState.scenarioCityOverridesData?.cities || {});
+  const overrideEntries = Object.values(target.scenarioCityOverridesData?.cities || {});
   let sourceCityIndex;
+  const centroidCache = new Map();
 
-  overrideEntries.forEach((overrideEntry) => {
+  for (const overrideEntry of overrideEntries) {
+    yield;
     const localeEntry = getScenarioOverrideLocaleEntry(overrideEntry);
-    if (!localeEntry?.en && !localeEntry?.zh) return;
-    sourceCityIndex ||= buildScenarioOverrideSourceCityIndex(overrideEntries);
+    if (!localeEntry?.en && !localeEntry?.zh) continue;
+    sourceCityIndex ||= yield* buildScenarioOverrideSourceCityIndex(overrideEntries, target);
     const sourceFeature = getScenarioOverrideSourceCityFeature(overrideEntry, sourceCityIndex);
-    if (!sourceFeature) return;
+    if (!sourceFeature) continue;
 
     const sourceProps = sourceFeature?.properties || {};
     const targetIds = new Set([
       normalizeCityText(sourceProps.__city_host_feature_id || sourceProps.host_feature_id),
-      resolveScenarioGeoFeatureIdForCityFeature(sourceFeature),
+      yield* resolveScenarioGeoFeatureIdForCityFeature(sourceFeature, target, centroidCache),
     ].filter(Boolean));
 
     targetIds.forEach((targetId) => {
@@ -170,44 +179,57 @@ function buildScenarioCityNameSyncPatch({ baseGeoLocales = {}, scenarioGeoPatch 
         next: nextEntry,
       });
     });
-  });
+  }
 
   return { geo, conflicts, preservedExplicitPatchCount };
 }
 
-function applyScenarioGeoLocalization() {
-  const baseGeoLocales = runtimeState.baseGeoLocales && typeof runtimeState.baseGeoLocales === "object"
-    ? runtimeState.baseGeoLocales
-    : {};
-  const baseAliasMap = runtimeState.baseGeoAliasToStableKey && typeof runtimeState.baseGeoAliasToStableKey === "object"
-    ? runtimeState.baseGeoAliasToStableKey
-    : {};
-  const scenarioGeoPatch = runtimeState.scenarioGeoLocalePatchData?.geo
-    && typeof runtimeState.scenarioGeoLocalePatchData.geo === "object"
-    ? runtimeState.scenarioGeoLocalePatchData.geo
-    : {};
-  const overrideEntries = Object.values(runtimeState.scenarioCityOverridesData?.cities || {});
+function finishLocalizationIterator(iterator) {
+  let step;
+  do { step = iterator.next(); } while (!step.done);
+  return step.value;
+}
+
+function buildScenarioCityNameSyncPatch(options) {
+  return finishLocalizationIterator(prepareScenarioCityNameSyncPatch(options));
+}
+
+function* buildScenarioGeoLocalization(target, { baseGeoLocales = target.baseGeoLocales, baseAliasMap = target.baseGeoAliasToStableKey } = {}) {
+  baseGeoLocales = baseGeoLocales && typeof baseGeoLocales === "object" ? baseGeoLocales : {};
+  baseAliasMap = baseAliasMap && typeof baseAliasMap === "object" ? baseAliasMap : {};
+  const scenarioGeoPatch = target.scenarioGeoLocalePatchData?.geo
+    && typeof target.scenarioGeoLocalePatchData.geo === "object"
+    ? target.scenarioGeoLocalePatchData.geo : {};
+  const overrideEntries = Object.values(target.scenarioCityOverridesData?.cities || {});
   const patch = buildCityLocalizationPatch({
-    cityCollection: runtimeState.scenarioCityOverridesData?.featureCollection || null,
+    cityCollection: target.scenarioCityOverridesData?.featureCollection || null,
     cityAliases: { cities: overrideEntries },
   });
-  const synchronizedNamePatch = buildScenarioCityNameSyncPatch({
-    baseGeoLocales,
-    scenarioGeoPatch,
-  });
+  const synchronizedNamePatch = yield* prepareScenarioCityNameSyncPatch({ baseGeoLocales, scenarioGeoPatch }, target);
+  const geo = {};
+  const aliasToStableKey = {};
+  for (const source of [baseGeoLocales, patch.geo, synchronizedNamePatch.geo, scenarioGeoPatch]) {
+    yield* copyLocalizationEntries(geo, source);
+  }
+  yield* copyLocalizationEntries(aliasToStableKey, baseAliasMap);
+  yield* copyLocalizationEntries(aliasToStableKey, patch.aliasToStableKey);
+  return { geo, aliasToStableKey, synchronizedNamePatch };
+}
+
+// The caller retains the live localization while this private snapshot is built.
+// It must validate its scenario identity immediately before publishing.
+export function prepareScenarioLocalizationState(target, base, options) {
+  return prepareLocalizationCandidate(buildScenarioGeoLocalization(target, base), options);
+}
+
+function applyScenarioGeoLocalization() {
+  const candidate = finishLocalizationIterator(buildScenarioGeoLocalization(runtimeState));
   if (!runtimeState.locales || typeof runtimeState.locales !== "object") {
     runtimeState.locales = { ui: {}, geo: {} };
   }
-  runtimeState.locales.geo = {
-    ...baseGeoLocales,
-    ...patch.geo,
-    ...synchronizedNamePatch.geo,
-    ...scenarioGeoPatch,
-  };
-  runtimeState.geoAliasToStableKey = {
-    ...baseAliasMap,
-    ...patch.aliasToStableKey,
-  };
+  runtimeState.locales.geo = candidate.geo;
+  runtimeState.geoAliasToStableKey = candidate.aliasToStableKey;
+  const { synchronizedNamePatch } = candidate;
   if (synchronizedNamePatch.conflicts.length > 0) {
     const preservedSuffix = synchronizedNamePatch.preservedExplicitPatchCount > 0
       ? ` Preserved ${synchronizedNamePatch.preservedExplicitPatchCount} explicit scenario patch override${synchronizedNamePatch.preservedExplicitPatchCount === 1 ? "" : "s"}.`

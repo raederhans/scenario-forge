@@ -17,6 +17,9 @@ const MIN_SCREEN_SPAN_PX = 8;
 
 export function shouldDrawLakeOutline(feature, bounds, k, config) {
   if (config?.outlineEnabled === false || !isLakeRegion(feature)) return false;
+  // Canvas ignores lineWidth=0 and would retain the preceding stroke width.
+  // A zero-width style must therefore suppress the stroke on both backends.
+  if (Number.isFinite(Number(config?.outlineWidth)) && Number(config.outlineWidth) <= 0) return false;
   const id = String(feature?.properties?.id || feature?.id || "").trim();
   if (!OUTLINED_LAKE_IDS.has(id)) return false;
   const scale = Number(k);

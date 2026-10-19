@@ -234,3 +234,19 @@ test("label anchor avoids a polygon hole and stays in the visible water", () => 
     contains: ([x, y]) => x < 30 && y < 30,
   }), null, "offscreen water does not receive a label");
 });
+
+test("marine anchor cache includes paint bounds and labels paint beyond the viewport", () => {
+  const resolve = createMarineInteriorAnchorResolver();
+  const options = { part: {}, generation: 1, centroid: [-60, 50], bounds: { minX: -80, minY: 20, maxX: -40, maxY: 80 },
+    transform: { x: 0, y: 0, k: 1 }, width: 100, height: 100, contains: () => true };
+  assert.equal(resolve(options), null);
+  const paintBounds = { minX: -96, minY: -96, maxX: 196, maxY: 196 };
+  assert.deepEqual(resolve({ ...options, paintBounds }), [-60, 50]);
+  assert.equal(resolve(options), null);
+  let painted = 0;
+  const context = { save() {}, restore() {}, measureText: () => ({ width: 20 }), strokeText() {}, fillText() { painted++; } };
+  const entries = [{ id: "marine_test", feature: { properties: { id: "marine_test", water_type: "sea", region_group: "marine_macro" } }, label: "Sea", anchor: [-60, 50], screenPoint: [-60, 50] }];
+  assert.equal(drawMarineLabels(entries, { context, scale: 1, width: 100, height: 100 }), 0);
+  assert.equal(drawMarineLabels(entries, { context, scale: 1, width: 100, height: 100, paintBounds }), 1);
+  assert.equal(painted, 1);
+});

@@ -46,7 +46,7 @@ test.after(() => {
   globalThis.d3 = previousD3;
 });
 
-test("fragment camouflage prunes configured small multipolygon components without mutating source", () => {
+test("fragment camouflage prunes configured small multipolygon components without mutating source", async () => {
   globalThis.d3 = {
     geoArea: (feature) => Math.abs(Number(feature?.geometry?.coordinates?.[0]?.[0]?.[0]) || 0),
   };
@@ -81,6 +81,9 @@ test("fragment camouflage prunes configured small multipolygon components withou
   assert.equal(interactiveFeature.properties.__visualFragmentCamouflage, true);
   assert.equal(interactiveFeature.properties.__visualFragmentPrunedCount, 2);
   assert.equal(fullCollection.features[0].geometry.coordinates.length, 3);
+  const prepared = await owner.preparePoliticalCollectionViewChunked(fullCollection);
+  assert.equal(prepared.status, "prepared");
+  assert.deepEqual(prepared.interactiveCollection, interactiveCollection);
 });
 
 test("fragment camouflage leaves unmatched countries unchanged", () => {

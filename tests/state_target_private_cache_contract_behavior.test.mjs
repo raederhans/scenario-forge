@@ -198,3 +198,48 @@ test("urban visibility migration follows the actual surviving callback and rejec
   const wrongEdges = edges.map(e => e.sourceFingerprint === contract.replacementActionSourceFingerprint ? { ...e, enclosingFunctionIdentity: e.enclosingFunctionIdentity.replace('"ordinal":6', '"ordinal":5') } : e);
   assert.throws(() => buildCallerToActionLedger({ ...args, actionDelegations: wrongEdges }), /proof generation failed/);
 });
+
+// TNO generator and private resource boundary regressions.
+{
+  const coverage = STATE_TARGET_PURE_READER_CONTRACT.find(entry => entry.functionName === "analyzeScenarioPoliticalDerivedStateCoverage");
+  const coverageSource = read(coverage.modulePath);
+
+  // The public wrapper can remain byte-identical while a private generator changes.
+  // Its dependency proof must still reject writes or publication of borrowed objects.
+  for (const [label, marker, replacement] of [
+    ["feature write", "const feature = features[index];", "const feature = features[index]; feature.changed = true;"],
+    ["state write", "const colorIds = new Set();", "runtimeState.colors.changed = true; const colorIds = new Set();"],
+    ["borrowed feature publication", "    completePoliticalFeatureCount,", "    borrowed: requiredColorFeatures, completePoliticalFeatureCount,"],
+    ["borrowed iterator yield", "      if (id) colorIds.add(id);", "      if (id) colorIds.add(id); yield runtimeState;"],
+  ]) {
+    test(`TNO coverage proof rejects private generator ${label}`, () => {
+      assert.ok(coverageSource.includes(marker));
+      const result = inspectStateTargetPureReaderFunctionSource(coverageSource.replace(marker, replacement), coverage);
+      assert.ok(result.violations.some(item => item.code === "state-target-pure-reader-dependency-source-drift"));
+      assert.ok(!result.violations.some(item => item.code === "state-target-pure-reader-source-drift"));
+    });
+  }
+
+  const overlayPath = "js/core/renderer/scenario_region_overlay_render_owner.js";
+  const overlaySource = read(overlayPath);
+  for (const [label, marker, replacement] of [
+    ["borrowed canvas cleanup", 'const canvas = globalThis.document?.createElement("canvas");', "const canvas = runtimeState.canvas;"],
+    ["borrowed overrides write", "const feature = selection.waterFeatures[task.index];", "const feature = selection.waterFeatures[task.index]; runtimeState.waterRegionOverrides.changed = true;"],
+  ]) {
+    test(`TNO overlay rejects ${label} beyond the source pin`, async () => {
+      assert.ok(overlaySource.includes(marker));
+      await assert.rejects(discoverStateWriterBindingsForSource(overlayPath, overlaySource.replace(marker, replacement), "production", {
+        scanAllParameters: true, includeInventories: true,
+      }), error => error.violations?.some(item => item.code === "state-target-pure-reader-mutation"));
+    });
+  }
+
+
+  test("TNO overlay source proof rejects writes through returned selection aliases", async () => {
+    const marker = "const feature = selection.waterFeatures[task.index];";
+    await assert.rejects(discoverStateWriterBindingsForSource(overlayPath, overlaySource.replace(marker, marker + " feature.geometry.coordinates.length = 0;"), "production", {
+      scanAllParameters: true, includeInventories: true,
+    }), error => error.violations?.some(item => item.code === "state-target-pure-reader-source-drift"));
+  });
+
+}
