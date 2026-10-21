@@ -43,13 +43,24 @@
         <div class="load-actions"><button id="cancel-load" data-i18n="cancel">取消</button><button id="retry-load" hidden data-i18n="retry">重新加载</button></div>
       </div>
     </section>
-    <aside class="inspector" aria-label="Map editor">
+    <aside id="inspector" class="inspector" aria-label="Map editor">
+      <div class="inspector-header">
       <section class="search-section">
         <label class="section-label" for="state-search" data-i18n="findPlace">寻找一片地方</label>
         <div class="search-field"><span aria-hidden="true">⌕</span><input id="state-search" type="search" autocomplete="off" disabled placeholder="州名、实体或 ID" aria-controls="search-results"></div>
         <div id="search-results" class="search-results" aria-live="polite"></div>
       </section>
-      <details class="country-section" id="country-management"><summary data-i18n="countryManagement">国家与核心领土</summary><div id="country-panel"></div></details>
+      <div class="inspector-tabs" role="tablist" aria-label="地图工作区" data-i18n-aria="inspectorNavigation">
+        <button type="button" id="inspector-tab-edit" role="tab" aria-controls="inspector-panel-edit" aria-selected="true" tabindex="0" data-i18n="tabEdit">编辑</button>
+        <button type="button" id="inspector-tab-layers" role="tab" aria-controls="inspector-panel-layers" aria-selected="false" tabindex="-1" data-i18n="tabLayers">图层</button>
+        <button type="button" id="inspector-tab-countries" role="tab" aria-controls="inspector-panel-countries" aria-selected="false" tabindex="-1" data-i18n="tabCountries">国家</button>
+      </div>
+      <div id="selection-summary" class="selection-summary" role="status" aria-live="polite">
+        <span id="selection-summary-swatch" class="selection-summary-swatch" aria-hidden="true" hidden></span>
+        <div><strong id="selection-summary-title">点击地图，选择一个州。</strong><small id="selection-summary-meta">Shift + 点击可多选 · 海域同样可编辑</small></div>
+      </div>
+      </div>
+      <div id="inspector-panel-edit" class="inspector-panel" role="tabpanel" aria-labelledby="inspector-tab-edit" tabindex="0">
       <section class="color-section">
         <div class="section-heading"><h2 data-i18n="colorHeading">绘制颜色</h2><span class="small-index">01</span></div>
         <div class="color-control"><input id="paint-color" type="color" value="#d17b55" disabled aria-label="绘制颜色" aria-describedby="pick-hint"><label for="paint-hex" class="sr-only" data-i18n="hexColor">十六进制颜色</label><input id="paint-hex" value="#d17b55" maxlength="7" spellcheck="false" disabled aria-describedby="pick-hint"><span class="color-mark">●</span></div>
@@ -71,11 +82,16 @@
           <p class="field-hint" data-i18n="labelHint">留空恢复原名。参考实体保持只读。</p>
         </div>
       </section>
+      <details class="keyboard-help"><summary data-i18n="shortcuts">快捷键与操作</summary><p data-i18n="shortcutText">V 选择 · B 绘制 · I 地图取色 · H 平移 · 0 全图。Ctrl/⌘ + Z 撤销，Shift + Z 重做；Ctrl/⌘ + S 保存。</p></details>
+      <footer class="inspector-footer"><span class="edition-tag">NATIVE / PIXEL SPACE</span><span data-i18n="footerNote">独立项目 · 自由编辑</span><p class="field-hint" data-i18n="projectFormatHint">JSON 保存归属与颜色，请在独立 HGO 打开；PNG 为视觉输出。</p></footer>
+      </div>
+      <div id="inspector-panel-layers" class="inspector-panel" role="tabpanel" aria-labelledby="inspector-tab-layers" tabindex="0" hidden>
       <section class="layer-section">
         <div class="section-heading"><h2 data-i18n="mapLayers">地图显示</h2><span class="small-index">02</span></div>
         <label class="layer-toggle"><span data-i18n="borders">州边界</span><input id="layer-borders" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
         <label class="layer-toggle"><span data-i18n="labels">地名标签</span><input id="layer-labels" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
         <label class="layer-toggle"><span data-i18n="cities">原生城市</span><input id="layer-cities" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
+        <details class="layer-parameters"><summary data-i18n="borderParameters">边界与标签参数</summary>
         <label class="field-label" for="border-width" data-i18n="borderWidth">边界宽度（屏幕像素）</label>
         <div class="display-range"><input id="border-width" type="range" min="0" max="2" step="0.1" value="0.7" disabled><output id="border-width-value" for="border-width">0.7 px</output></div>
         <label class="field-label" for="border-opacity" data-i18n="borderOpacity">边界不透明度</label>
@@ -84,9 +100,13 @@
         <p class="field-hint" data-i18n="borderHint">州界较淡，原始国家边界较深。微小州选中后显示定位圈；放大不会增加源图细节。</p>
         <label class="field-label" for="label-density" data-i18n="labelDensity">标签密度</label>
         <select id="label-density" disabled><option value="low" data-i18n="densityLow">低</option><option value="medium" selected data-i18n="densityMedium">中</option><option value="high" data-i18n="densityHigh">高</option></select>
+        </details>
       </section>
-      <details class="keyboard-help"><summary data-i18n="shortcuts">快捷键与操作</summary><p data-i18n="shortcutText">V 选择 · B 绘制 · I 地图取色（点击地块读取存储色） · H 平移 · 0 全图。绘制模式拖动连续填色，双击填所属国家；空格或中键拖动平移，滚轮缩放。Ctrl/⌘ + Z 整笔撤销，Shift + Z 重做；Escape 取消笔划，Ctrl/⌘ + S 保存。</p></details>
-      <footer class="inspector-footer"><span class="edition-tag">NATIVE / PIXEL SPACE</span><span data-i18n="footerNote">独立项目 · 自由编辑</span><p class="field-hint" data-i18n="projectFormatHint">JSON 保存归属与颜色，请在独立 HGO 打开；PNG 为视觉输出。</p></footer>
+      <div id="visualization-panel"></div>
+      </div>
+      <div id="inspector-panel-countries" class="inspector-panel" role="tabpanel" aria-labelledby="inspector-tab-countries" tabindex="0" hidden>
+      <details class="country-section" id="country-management"><summary data-i18n="countryManagement">国家与核心领土</summary><div id="country-panel"></div></details>
+      </div>
     </aside>
   </main>
   <footer class="statusbar"><span class="status-led" id="status-led"></span><span id="status-text" role="status" aria-live="polite">正在加载…</span><span id="dataset-stats"></span></footer>

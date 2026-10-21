@@ -11,11 +11,15 @@ import json
 from pathlib import Path
 import re
 import shutil
+import sys
 import tempfile
+import time
 from urllib.parse import unquote, urlsplit
 
 
 MAX_ASSET = 160 * 1024 * 1024
+MAX_OVERLAY_ASSET = 24 * 1024 * 1024
+MAX_OVERLAY_CATALOG = 512 * 1024
 RECEIPT = '.hgo-build.json'
 DEFAULT_MAIN_URL = '../../../index.html'
 
@@ -92,6 +96,116 @@ def dataset_files(folder):
     return files
 
 
+def overlay_files(folder):
+    """Validate and return an optional runtime overlay catalog closure."""
+    folder = Path(folder).resolve()
+    overlay_candidate = folder / 'assets/overlays'
+    require(not overlay_candidate.is_symlink(), 'Overlay root may not be a symbolic link')
+    catalog_path = overlay_candidate / 'catalog.json'
+    require(not catalog_path.is_symlink(), 'Overlay catalog may not be a symbolic link')
+    if not catalog_path.exists():
+        return {}
+    catalog_bytes = catalog_path.read_bytes()
+    require(0 < len(catalog_bytes) <= MAX_OVERLAY_CATALOG, 'Overlay catalog exceeds the 512 KiB limit')
+    try:
+        catalog = json.loads(catalog_bytes.decode('utf-8'))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError('Invalid overlay catalog JSON') from error
+    require(isinstance(catalog, dict) and catalog.get('format') == 'hgo-visualization-catalog'
+            and type(catalog.get('schemaVersion')) is int and catalog.get('schemaVersion') == 1,
+            'Unsupported overlay catalog')
+
+    base_manifest_path = folder / 'assets/default/manifest.json'
+    base = json.loads(base_manifest_path.read_bytes())
+    base_identity = dict(id=base.get('id'), revision=base.get('revision'))
+    require(catalog.get('baseDataset') == base_identity, 'Overlay catalog base dataset mismatch')
+    expected_assets = {'localization', 'metrics', 'terrain', 'terrainBalanced',
+                       'terrainPalette', 'terrainLabels', 'rivers', 'riversBalanced', 'nightLights',
+                       'illumination'}
+    assets = catalog.get('assets')
+    require(isinstance(assets, dict) and set(assets) == expected_assets,
+            'Overlay catalog asset set is invalid')
+    overlays = (folder / 'assets/overlays').resolve()
+    files = {catalog_path: catalog_bytes}
+    seen_paths = set()
+
+    def resolve_overlay(relative):
+        require(isinstance(relative, str) and relative and not relative.startswith(('/', '\\'))
+                and '\\' not in relative and ':' not in relative,
+                'Overlay catalog path must be relative')
+        parsed = Path(relative)
+        require(not parsed.is_absolute() and parsed.as_posix() == relative
+                and all(part not in ('', '.', '..') for part in parsed.parts),
+                'Overlay catalog path escapes overlays')
+        current = overlays
+        for part in parsed.parts:
+            current = current / part
+            require(not current.is_symlink(), 'Symbolic-link overlay asset refused')
+        resolved = current.resolve()
+        require(resolved.is_relative_to(overlays) and resolved.is_file(),
+                f'Overlay catalog asset is missing or escapes overlays: {relative}')
+        return resolved
+
+    def verified_file(descriptor, category):
+        require(isinstance(descriptor, dict), f'Invalid {category} descriptor')
+        relative = descriptor.get('path')
+        path = resolve_overlay(relative)
+        require(relative not in seen_paths, f'Duplicate overlay closure path: {relative}')
+        seen_paths.add(relative)
+        expected_length = descriptor.get('byteLength')
+        expected_hash = descriptor.get('sha256')
+        require(type(expected_length) is int and 0 < expected_length <= MAX_OVERLAY_ASSET
+                and path.stat().st_size == expected_length,
+                f'{category}: transport length mismatch')
+        require(isinstance(expected_hash, str) and re.fullmatch(r'[a-f0-9]{64}', expected_hash),
+                f'{category}: invalid SHA-256')
+        payload = path.read_bytes()
+        require(digest(payload) == expected_hash, f'{category}: SHA-256 mismatch')
+        files[path] = payload
+        return payload
+
+    for name, asset in assets.items():
+        require(isinstance(asset, dict), f'{name}: invalid overlay asset descriptor')
+        if name == 'illumination':
+            require(asset.get('vectorEncoding') == 'premultiplied-unit-rgb-edge-fade-v2',
+                    'Unsupported illumination vector encoding')
+        payload = verified_file(asset, name)
+        encoding = asset.get('encoding')
+        if encoding == 'json':
+            require('dtype' not in asset and 'decodedByteLength' not in asset,
+                    f'{name}: JSON asset has binary metadata')
+            try:
+                json.loads(payload.decode('utf-8'))
+            except (UnicodeDecodeError, json.JSONDecodeError) as error:
+                raise ValueError(f'{name}: invalid JSON asset') from error
+        elif encoding == 'gzip':
+            width, height, channels = asset.get('width'), asset.get('height'), asset.get('channels')
+            require(asset.get('dtype') == 'u8' and type(width) is int and type(height) is int
+                    and width > 0 and height > 0 and type(channels) is int and channels in (1, 4),
+                    f'{name}: unsupported gzip asset shape')
+            decoded_length = width * height * channels
+            require(decoded_length <= MAX_OVERLAY_ASSET and asset.get('decodedByteLength') == decoded_length,
+                    f'{name}: declared decoded size mismatch')
+            try:
+                with gzip.GzipFile(fileobj=io.BytesIO(payload)) as stream:
+                    decoded = stream.read(decoded_length + 1)
+                    require(len(decoded) == decoded_length and not stream.read(1),
+                            f'{name}: gzip decoded size mismatch')
+            except OSError as error:
+                raise ValueError(f'{name}: invalid gzip stream') from error
+        else:
+            raise ValueError(f'{name}: unsupported overlay encoding')
+
+    provenance = catalog.get('provenance')
+    require(isinstance(provenance, list) and len(provenance) <= 2048,
+            'Invalid overlay provenance list')
+    for item in provenance:
+        require(isinstance(item, dict) and set(item) == {'path', 'byteLength', 'sha256'},
+                'Invalid overlay provenance descriptor')
+        verified_file(item, 'Overlay provenance')
+    return files
+
+
 def build_app(source_dir, output_dir, main_url=DEFAULT_MAIN_URL):
     source = Path(source_dir).resolve()
     requested_output = Path(output_dir)
@@ -121,6 +235,11 @@ def build_app(source_dir, output_dir, main_url=DEFAULT_MAIN_URL):
     for path, payload in dataset_files((source / 'assets/default').resolve()).items():
         require(path.is_relative_to(source), 'Dataset escapes app source')
         planned[path.relative_to(source)] = payload
+    for path, payload in overlay_files(source).items():
+        require(path.is_relative_to(source), 'Overlay closure escapes app source')
+        relative = path.relative_to(source)
+        require(relative not in planned, 'Overlay closure collides with another packaged file')
+        planned[relative] = payload
     if output.exists():
         require(output.is_dir(), 'Output is not a directory')
         existing = [path for path in output.rglob('*') if path.is_file() or path.is_symlink()]
@@ -144,7 +263,17 @@ def build_app(source_dir, output_dir, main_url=DEFAULT_MAIN_URL):
         (stage / RECEIPT).write_bytes(encoded(receipt))
         if output.exists():
             shutil.rmtree(output)
-        stage.replace(output)
+        for attempt in range(4):
+            require(not output.exists() and not output.is_symlink(),
+                    'Output appeared during publication; refusing to replace it')
+            try:
+                # On Windows rename also refuses a destination created after the check.
+                stage.rename(output)
+                break
+            except PermissionError as error:
+                if sys.platform != 'win32' or getattr(error, 'winerror', None) not in {5, 32} or attempt == 3:
+                    raise
+                time.sleep(0.05 * (attempt + 1))
     finally:
         if stage.exists():
             shutil.rmtree(stage)

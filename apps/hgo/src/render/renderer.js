@@ -1,8 +1,11 @@
 import {createLabelLayout} from './labels.js';
+import {createVisualizationGpu,visualizationShader} from './visualization.js';
+import {metricDisplayKind} from '../data/metrics.js';
+import {createMetricSymbolLayout} from './metric_symbols.js';
 const vertex = `#version 300 es
-in vec2 position;
+layout(location=0) in vec2 position;
 void main(){gl_Position=vec4(position,0.,1.);}`;
-const fragment = `#version 300 es
+const fragment = (visualized=false)=>`#version 300 es
 precision highp float;
 precision highp int;
 precision highp usampler2D;
@@ -19,8 +22,12 @@ uniform float borderWidth;
 uniform float borderOpacity;
 uniform vec3 borderColor;
 uniform float pixelRatio;
+uniform bool thematic;
+uniform bool metricNeutral;
+uniform int waterOwner;
 out vec4 result;
 ivec2 table(uint code){return ivec2(int(code)%256,int(code)/256);}
+${visualized?visualizationShader:''}
 uvec2 identityAt(ivec2 p){if(any(lessThan(p,ivec2(0)))||any(greaterThanEqual(p,ivec2(size))))return uvec2(0);return texelFetch(states,table(texelFetch(ids,p,0).r),0).rg;}
 bool selectedAt(ivec2 p){if(any(lessThan(p,ivec2(0)))||any(greaterThanEqual(p,ivec2(size))))return false;return texelFetch(selected,table(texelFetch(ids,p,0).r),0).r>.5;}
 void main(){
@@ -32,6 +39,10 @@ void main(){
  if(code==uint(0)){result=vec4(.12,.15,.18,1.);return;}
  result=texelFetch(colors,table(code),0);
  uvec2 current=identityAt(p);
+ // WTR ownership is immutable. Preserve water while quieting the land base;
+ // the document palette and native picking IDs remain authoritative.
+ if((thematic||metricNeutral)&&current.r!=uint(0)&&int(current.g)!=waterOwner)result.rgb=metricNeutral?vec3(.84,.83,.79):mix(vec3(.84,.83,.79),result.rgb,.1);
+ ${visualized?'result.rgb=visualize(result.rgb,source,code);':''}
  bool isSelected=texelFetch(selected,table(code),0).r>.5;
  vec2 f=fract(source);
  float coverage=0.,selectionCoverage=0.;
@@ -44,7 +55,8 @@ void main(){
   if(neighbour.r!=current.r){
    // Country emphasis follows document owner, never painted colour/cores.
    float width=min(2.,borderWidth*(neighbour.g!=current.g?1.25:1.));
-   if(width>0.)coverage=max(coverage,clamp((width*.5+.5/pixelRatio-distance)*pixelRatio,0.,1.));
+   float emphasis=(thematic||metricNeutral)&&neighbour.g==current.g?.3:1.;
+   if(width>0.)coverage=max(coverage,emphasis*clamp((width*.5+.5/pixelRatio-distance)*pixelRatio,0.,1.));
    if(!isSelected&&selectedAt(p+direction))selectionCoverage=max(selectionCoverage,clamp((1.25+.5/pixelRatio-distance)*pixelRatio,0.,1.));
   }
  }
@@ -90,19 +102,20 @@ export function createRenderer(canvas, dataset) {
   const {width,height} = dataset.manifest.coordinateSpace;
   if (Math.max(width,height,256) > gl.getParameter(gl.MAX_TEXTURE_SIZE)) throw new Error('Native map exceeds this GPU texture limit');
   const shaders = [], textures = [];
-  let program, buffer, vao, markerProgram, markerBuffer, markerVao, disposed=false;
+  let program, visualProgram, visualUniforms, buffer, vao, markerProgram, markerBuffer, markerVao, visualization, disposed=false;
   function shader(type, source) { const s = gl.createShader(type); shaders.push(s); gl.shaderSource(s,source); gl.compileShader(s); if (!gl.getShaderParameter(s,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
   function texture(unit, internal, w,h,format,type,data) { const t = gl.createTexture(); textures.push(t); gl.activeTexture(gl.TEXTURE0+unit); gl.bindTexture(gl.TEXTURE_2D,t); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE); gl.pixelStorei(gl.UNPACK_ALIGNMENT,1); gl.texImage2D(gl.TEXTURE_2D,0,internal,w,h,0,format,type,data); return t; }
   function dispose({contextLost=false}={}) {
     if(disposed)return;
     disposed=true;
+    visualization?.dispose({contextLost});
     // A lost context already invalidated these handles. Never pass them to a
     // restored context, where deletion would poison its new GL error state.
-    if(!contextLost){for(const t of textures)gl.deleteTexture(t);for(const s of shaders)gl.deleteShader(s);for(const b of [buffer,markerBuffer])if(b)gl.deleteBuffer(b);for(const v of [vao,markerVao])if(v)gl.deleteVertexArray(v);for(const p of [program,markerProgram])if(p)gl.deleteProgram(p);}
+    if(!contextLost){for(const t of textures)gl.deleteTexture(t);for(const s of shaders)gl.deleteShader(s);for(const b of [buffer,markerBuffer])if(b)gl.deleteBuffer(b);for(const v of [vao,markerVao])if(v)gl.deleteVertexArray(v);for(const p of [program,visualProgram,markerProgram])if(p)gl.deleteProgram(p);}
     textures.length=0;shaders.length=0;program=null;buffer=null;vao=null;markerProgram=null;markerBuffer=null;markerVao=null;
   }
   try {
-    program=gl.createProgram(); gl.attachShader(program,shader(gl.VERTEX_SHADER,vertex)); gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fragment)); gl.linkProgram(program); if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(program)); gl.useProgram(program);
+    program=gl.createProgram(); gl.attachShader(program,shader(gl.VERTEX_SHADER,vertex)); gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fragment())); gl.linkProgram(program); if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(program)); gl.useProgram(program);
     vao=gl.createVertexArray();gl.bindVertexArray(vao);buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW); const pos=gl.getAttribLocation(program,'position');gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
     const rows=Math.ceil(dataset.core.provinceIds.length/256), stateCodes=new Uint16Array(256*rows*2);
     const stateIndex=new Map(dataset.core.states.map((s,i)=>[String(s.id),i+1]));
@@ -120,10 +133,29 @@ export function createRenderer(canvas, dataset) {
     texture(2,gl.RGBA8,256,rows,gl.RGBA,gl.UNSIGNED_BYTE,null);
     texture(3,gl.R8,256,rows,gl.RED,gl.UNSIGNED_BYTE,null);
     for(const [i,name] of ['ids','states','colors','selected'].entries())gl.uniform1i(gl.getUniformLocation(program,name),i);
+    gl.uniform1i(gl.getUniformLocation(program,'waterOwner'),ownerIndex.get('WTR')||0);
     const palette=new Uint8Array(rows*256*4), selection=new Uint8Array(rows*256);
     let selectedStates=[];
     let ownerDocument=null,ownerRevision;
-    const uniforms=Object.fromEntries(['size','viewport','center','scale','borders','borderWidth','borderOpacity','borderColor','pixelRatio'].map(k=>[k,gl.getUniformLocation(program,k)]));
+    const uniformNames=['size','viewport','center','scale','borders','borderWidth','borderOpacity','borderColor','pixelRatio','thematic','metricNeutral'];
+    const baseUniforms=Object.fromEntries(uniformNames.map(k=>[k,gl.getUniformLocation(program,k)]));
+    const hasVisualizations=layers=>layers.terrain||layers.rivers||layers.nightLights||layers.dayNight||
+      ['fill','levels'].includes(metricDisplayKind(layers.metric))||layers.textureOpacity>0;
+    function ensureVisualizations(){
+      if(visualization)return;
+      // Compile the decorated path on first use. Disabled overlays keep the
+      // original shader and avoid all optional texture samples/uniform calls.
+      visualProgram=gl.createProgram();
+      gl.attachShader(visualProgram,shader(gl.VERTEX_SHADER,vertex));
+      gl.attachShader(visualProgram,shader(gl.FRAGMENT_SHADER,fragment(true)));
+      gl.linkProgram(visualProgram);
+      if(!gl.getProgramParameter(visualProgram,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(visualProgram));
+      gl.useProgram(visualProgram);
+      for(const [i,name]of ['ids','states','colors','selected'].entries())gl.uniform1i(gl.getUniformLocation(visualProgram,name),i);
+      gl.uniform1i(gl.getUniformLocation(visualProgram,'waterOwner'),ownerIndex.get('WTR')||0);
+      visualUniforms=Object.fromEntries(uniformNames.map(k=>[k,gl.getUniformLocation(visualProgram,k)]));
+      visualization=createVisualizationGpu(gl,visualProgram,dataset);
+    }
     markerProgram=gl.createProgram();gl.attachShader(markerProgram,shader(gl.VERTEX_SHADER,markerVertex));gl.attachShader(markerProgram,shader(gl.FRAGMENT_SHADER,markerFragment));gl.linkProgram(markerProgram);if(!gl.getProgramParameter(markerProgram,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(markerProgram));
     markerVao=gl.createVertexArray();gl.bindVertexArray(markerVao);markerBuffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,markerBuffer);const anchor=gl.getAttribLocation(markerProgram,'anchor');gl.enableVertexAttribArray(anchor);gl.vertexAttribPointer(anchor,2,gl.FLOAT,false,0,0);
     gl.useProgram(markerProgram);gl.uniform1i(gl.getUniformLocation(markerProgram,'ids'),0);gl.uniform1i(gl.getUniformLocation(markerProgram,'selected'),3);
@@ -133,6 +165,7 @@ export function createRenderer(canvas, dataset) {
     if(gl.getError()!==gl.NO_ERROR)throw new Error('GPU rejected native integer map textures');
     return {
       gl,
+      setVisualizations(resources,layers){if(hasVisualizations(layers))ensureVisualizations();visualization?.sync(resources,layers);},
       update(document, selected) {
         const hasOwner=typeof document.owner==='function',revision=document.ownerRevision;
         const refreshOwners=ownerDocument!==document||ownerRevision!==revision||(hasOwner&&!Number.isFinite(revision));
@@ -149,10 +182,16 @@ export function createRenderer(canvas, dataset) {
         ownerDocument=document;ownerRevision=revision;
         selectedStates=[...selected].map(id=>stateById.get(String(id))).filter(s=>Array.isArray(s?.anchor)&&s.anchor.length===2&&s.anchor.every(Number.isFinite)&&Number.isFinite(s.pixelCount)&&s.pixelCount>0);for(let i=1;i<dataset.core.provinceIds.length;i++){if(dataset.core.provinceStateIds[i]===null)continue;const id=String(dataset.core.provinceStateIds[i]),c=document.color(id);palette[i*4]=parseInt(c.slice(1,3),16);palette[i*4+1]=parseInt(c.slice(3,5),16);palette[i*4+2]=parseInt(c.slice(5,7),16);palette[i*4+3]=255;selection[i]=selected.has(id)?255:0;} gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,textures[2]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RGBA,gl.UNSIGNED_BYTE,palette);gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,textures[3]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RED,gl.UNSIGNED_BYTE,selection);
       },
-      draw(view,layers,pixelRatio=1) {
-        gl.disable(gl.BLEND);gl.useProgram(program);gl.bindVertexArray(vao);gl.viewport(0,0,canvas.width,canvas.height);
+      draw(view,layers,pixelRatio=1,solar) {
+        const visualized=hasVisualizations(layers);
+        if(visualized)ensureVisualizations();
+        const uniforms=visualized?visualUniforms:baseUniforms;
+        gl.disable(gl.BLEND);gl.useProgram(visualized?visualProgram:program);gl.bindVertexArray(vao);gl.viewport(0,0,canvas.width,canvas.height);
+        if(visualized)visualization.draw(layers,solar);
         gl.uniform2f(uniforms.size,width,height);gl.uniform2f(uniforms.viewport,canvas.width,canvas.height);gl.uniform2f(uniforms.center,view.x,view.y);gl.uniform1f(uniforms.scale,view.scale*pixelRatio);gl.uniform1f(uniforms.pixelRatio,pixelRatio);gl.uniform1i(uniforms.borders,layers.borders?1:0);
         gl.uniform1f(uniforms.borderWidth,bounded(layers.borderWidth,.7,2));gl.uniform1f(uniforms.borderOpacity,bounded(layers.borderOpacity,.45,1));
+        gl.uniform1i(uniforms.thematic,layers.baseMapStyle==='thematic'?1:0);
+        gl.uniform1i(uniforms.metricNeutral,['symbols','levels'].includes(metricDisplayKind(layers.metric))?1:0);
         const color=/^#[0-9a-f]{6}$/i.test(layers.borderColor||'')?layers.borderColor:'#1f2933';gl.uniform3f(uniforms.borderColor,...[1,3,5].map(i=>parseInt(color.slice(i,i+2),16)/255));gl.drawArrays(gl.TRIANGLES,0,6);
         // At most 64 tiny visible states receive a locator ring. Only selected
         // metadata is visited; no raster scan or per-fragment anchor loop.
@@ -167,8 +206,29 @@ export function createRenderer(canvas, dataset) {
 // Retain at most the layout for a live overlay canvas. Export canvases and their
 // spatial index become collectible when the one-shot export finishes.
 const overlayLayouts = new WeakMap();
-export function drawOverlay(canvas,dataset,document,view,layers,pixelRatio=1,options={}) {
+export function releaseLandformLabels(canvas) {overlayLayouts.get(canvas)?.layout.releaseLandforms();}
+export function releaseMetricSymbols(canvas) {const owner=overlayLayouts.get(canvas);owner?.symbols?.release();if(owner)owner.metricSummary=null;}
+export function metricSymbolSummary(canvas) {return overlayLayouts.get(canvas)?.metricSummary||null;}
+export function releaseOverlayLayout(canvas) {overlayLayouts.delete(canvas);}
+function overlayOwner(canvas,dataset){
   let owner=overlayLayouts.get(canvas);
-  if(!owner||owner.dataset!==dataset){owner={dataset,layout:createLabelLayout(dataset)};overlayLayouts.set(canvas,owner);}
-  return owner.layout.draw(canvas,document,view,layers,pixelRatio,options);
+  if(!owner||owner.dataset!==dataset){owner={dataset,layout:createLabelLayout(dataset),symbols:null,metricSummary:null};overlayLayouts.set(canvas,owner);}
+  return owner;
+}
+export function prepareMetricSymbols(canvas,dataset,view,layers,pixelRatio=1,metrics=null){
+  const owner=overlayOwner(canvas,dataset);
+  let symbols=null;
+  if(metricDisplayKind(layers.metric)==='symbols'&&metrics){
+    owner.symbols??=createMetricSymbolLayout(dataset);
+    symbols=owner.symbols.layout(metrics,layers.metric,view,canvas.width/pixelRatio,canvas.height/pixelRatio);
+    owner.metricSummary={metricId:layers.metric,visibleCount:symbols.visibleCount,displacedCount:symbols.displacedCount,crowdedCount:symbols.crowdedCount,maxValue:symbols.maxValue,scale:view.scale};
+  }else{owner.symbols?.release();owner.metricSummary=null;}
+  return symbols;
+}
+export function drawOverlay(canvas,dataset,document,view,layers,pixelRatio=1,options={}) {
+  const owner=overlayOwner(canvas,dataset);
+  const symbols=Object.hasOwn(options,'metricSymbols')?options.metricSymbols:prepareMetricSymbols(canvas,dataset,view,layers,pixelRatio,options.metrics);
+  const labels=owner.layout.draw(canvas,document,view,layers,pixelRatio,{...options,reservedBoxes:symbols?.boxes||[]});
+  if(symbols)owner.symbols.draw(canvas,symbols,pixelRatio,{opacity:layers.metricOpacity,selectedIds:options.selectedIds||[]});
+  return labels;
 }

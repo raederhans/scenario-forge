@@ -22,7 +22,21 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          sparse-checkout: apps/hgo
+          # Localization reproducibility checks need these original sources.
+          # Keep the native runtime isolated without skipping its data checks.
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /apps/hgo/
+            /data/hgo_catalogs/hgo_place_names.json
+            /data/locales.json
+            /data/geo_aliases.json
+            /data/world_cities.geojson
+            /data/palettes/hoi4_vanilla.palette.json
+            /data/hierarchy.json
+            /data/city_aliases.json
+            /data/marine_regions.refined.source.geojson
+            /data/marine_regions.additional.source.geojson
+            /data/ne_10m_admin_1_states_provinces.zip
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'

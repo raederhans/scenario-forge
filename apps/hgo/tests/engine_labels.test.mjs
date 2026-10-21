@@ -44,6 +44,15 @@ test('explicit state names outrank real capitals without fabricating a capital f
   assert.equal(entries.length,1);
 });
 
+test('resource exclusion boxes prevent state, city and country labels from covering quantities',()=>{
+  const dataset=fixture(3),owner=createLabelLayout(dataset),view={x:120,y:50,scale:1};
+  const doc={labels:{0:'First',1:'Middle',2:'Last'}},reserved=[[140,140,160,160]];
+  const entries=owner.layout(doc,view,layers,300,300,undefined,null,reserved);
+  assert.ok(entries.length>0);
+  assert.ok(entries.every(entry=>entry.boxes.every(box=>!overlap(box,reserved[0]))));
+  assert.equal(entries.some(entry=>entry.text==='Middle'),false);
+});
+
 test('mixed city, country and state layouts have no overlapping accepted boxes', () => {
   const dataset=fixture(40);
   dataset.core.entities=Array.from({length:20},(_,id)=>({tag:`E${id}`,name:`Nation ${id}`,anchor:[id*70+50,130]}));
