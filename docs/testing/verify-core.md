@@ -14,7 +14,7 @@
 - Scenario 与 Transport 在 PR 中验证合并候选，不再由每次 `main` push 重复触发全量检查；两个工作流都保留 `workflow_dispatch` 全量入口。`main` 的 Pages 构建、产物准入和部署后检查继续执行。
 - Adaptive selector 仍对 verification/workflow 等控制平面保持 fail-closed。普通未注册文档与非 runtime reference assets 作为 advisory；新增 renderer、UI、map-builder、scenario-data 和 CI planner 文件可先由目录 ownership 映射到已有 domain routes。自动 ownership 如果无法解析出任何真实 route，仍保持 unmatched 并阻断，不会静默放行。
 - PR 性能验证分为 `skip`、`sample`、`strict` 三档。无性能相关改动为 `skip`；普通 runtime/data PR 默认 `sample`，只对 HOI4 1939 candidate 生成独立 measurement-only evidence，不做 regression verdict，也不再生成同-runner base；`ci:perf-strict`、`ci:full`、定时和手动性能运行使用 `strict`，继续测 TNO 1962 与 HOI4 1939，并保留 same-runner base/candidate 对照与 enforced regressions。
-- 已登记的局部 UI 组合使用独立 `perf-observation` 采样，失败仍可见，但 `perf-gate` 只校验该豁免的有效性，不等待观察任务。其余需要性能测量的改动仍等待 required measurement。两条通道复用 `perf-measure.yml`，严格模式及采样协议不变。分类缺失/矛盾或 required measurement 失败都不能放行。
+- 所有 `sample` 采样都走独立 `perf-observation`：结果和失败仍可见，但不阻塞合并；`perf-gate` 只校验分类有效。只有 `strict`（`ci:perf-strict`、`ci:full`、定时和手动）才等待 required measurement。两条通道复用 `perf-measure.yml`，严格模式及采样协议不变。分类缺失/矛盾或 required measurement 失败都不能放行。
 - `ci:perf-expected` 表示本次改动预期改变性能特征。普通 PR 仍保留 sampled evidence，但不因性能 delta 阻断。若同时显式添加 `ci:perf-strict`，strict 优先。
 - 当前标准性能 role contract 仍固定为每个被测剧本 3 次预热、5 次 measured runs。因此 `sample` 的主要降本来自只运行一个代表剧本和移除同-runner base measurement，而不是降低样本协议。Nightly/manual strict 保持完整可比较性。
 - PR 更新继续自动取消同一 PR 的过时验证。现有 required check 名称保持稳定，P1-P3 本身不要求放松 branch protection。

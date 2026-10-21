@@ -137,7 +137,7 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
         : smokeMode === "full" ? "Runtime, browser support, dependencies or CI policy require the shared smoke suite." : "No browser behavior selected.",
       pages: pagesMode === "full" ? "Delivery inputs, assets, dependencies or CI policy require a full Pages artifact."
         : pagesMode === "source" ? "Validate the current source reference graph without rebuilding unchanged data." : "No Pages inputs selected.",
-      performance: performance.diagnostic_only ? "Bounded UI change: candidate sampling is diagnostic and does not delay the merge gate."
+      performance: performance.diagnostic_only ? "Sampled measurement is diagnostic only and does not delay the merge gate; only strict runs block."
         : performance.required_for_merge ? "Performance measurement must complete before the required gate succeeds." : "No performance measurement selected.",
     },
   };
