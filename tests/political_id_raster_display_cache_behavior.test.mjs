@@ -24,6 +24,19 @@ test("cold display shades once; unchanged palette and grid reuse RGBA without GP
   assert.equal(f.cache.getStats().retainedSurfaceBytes, 1600);
 });
 
+test("warm frames reuse the palette snapshot while edit, undo and reset take fresh snapshots", () => {
+  const f = fixture(); f.cache.draw(f.input);
+  for (let i = 0; i < 5; i++) { f.input.plan.outputX = i; f.cache.draw(f.input); }
+  assert.equal(f.cache.getStats().paletteSnapshotCopies, 1);
+  assert.equal(f.draws.length, 1);
+  f.change(2); f.cache.draw(f.input);
+  f.change(2, 255); f.cache.draw(f.input); // Undo of the same in-place byte edit.
+  assert.equal(f.cache.getStats().paletteSnapshotCopies, 3);
+  assert.equal(f.cache.getStats().partialUpdates, 2);
+  f.cache.reset(); f.cache.draw(f.input);
+  assert.equal(f.cache.getStats().paletteSnapshotCopies, 4);
+});
+
 test("a palette edit shades and clears only its contributor region", () => {
   const f = fixture(); f.cache.draw(f.input); f.change(2); f.cache.draw(f.input);
   assert.deepEqual(f.draws.at(-1), { width: 10, height: 10, originX: 10, originY: 0 });

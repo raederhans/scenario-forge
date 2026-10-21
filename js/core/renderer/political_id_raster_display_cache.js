@@ -14,7 +14,8 @@ export function createPoliticalIdRasterDisplayCache({
     return token;
   }
   const stats = { fullUpdates: 0, partialUpdates: 0, reusedFrames: 0, shadedPixels: 0,
-    lastUpdatedPixels: 0, lastFullPixels: 0, lastGpuMs: 0, lastCaptureMs: 0 };
+    lastUpdatedPixels: 0, lastFullPixels: 0, lastGpuMs: 0, lastCaptureMs: 0,
+    paletteSnapshotCopies: 0 };
 
   function reset() {
     previous = null;
@@ -99,8 +100,14 @@ export function createPoliticalIdRasterDisplayCache({
     } else stats.reusedFrames++;
     // Commit only after the region was successfully copied. The byte snapshot
     // detects changes even when a caller updates the palette buffer in place.
+    // The palette revision already gates byte comparison and GPU uploads.
+    // An unchanged revision can keep its owned byte snapshot through pans or
+    // grid changes; a new revision still snapshots in-place edits after success.
+    const paletteSnapshot = previous && previous.revision === revision && previous.palette.length === palette.length
+      ? previous.palette : palette.slice();
+    if (paletteSnapshot !== previous?.palette) stats.paletteSnapshotCopies++;
     previous = { plan: { width: plan.width, height: plan.height, originX: plan.originX,
-      originY: plan.originY, density: plan.density }, tokens, revision, palette: palette.slice() };
+      originY: plan.originY, density: plan.density }, tokens, revision, palette: paletteSnapshot };
     return canvas;
   }
 

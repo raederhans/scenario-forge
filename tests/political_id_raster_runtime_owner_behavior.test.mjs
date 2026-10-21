@@ -330,6 +330,38 @@ for (const setup of ["createGpu", "prepareFrame"]) test(`GPU ${setup} failure du
   assert.equal(f.owner.draw(), null);
 });
 
+test("rendered coverage survives recolors and same-grid pans, but not geometry or grid changes", async (t) => {
+  const f = fixture({ displayMode: "raster" });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f);
+  const first = f.owner.draw();
+  assert.deepEqual([...first.renderedIds], ["a"]);
+  first.renderedIds.clear(); // Consumers cannot corrupt the retained ID list.
+  f.features[0].color = "#abcdef"; f.identity.colorVersion++;
+  assert.deepEqual([...f.owner.draw().renderedIds], ["a"]);
+  f.state.zoomTransform.x += 1;
+  assert.deepEqual([...f.owner.draw().renderedIds], ["a"]);
+  assert.equal(f.owner.getDiagnostics().renderedCoverageScans, 1);
+  assert.equal(f.owner.getDiagnostics().renderedCoverageCacheHits, 2);
+
+  const b = feature("b", f.features[0].bounds);
+  f.setFeatures([b]); f.identity.version++;
+  f.owner.draw(); await resolveAll(f);
+  assert.deepEqual([...f.owner.draw().renderedIds], ["b"]);
+  assert.equal(f.owner.getDiagnostics().renderedCoverageScans, 2);
+
+  f.state.zoomTransform.x += 512;
+  f.owner.draw(); await resolveAll(f);
+  assert.deepEqual([...f.owner.draw().renderedIds], []);
+  assert.equal(f.owner.getDiagnostics().renderedCoverageScans, 3);
+
+  // Scene replacement can reuse the same geometry revision counter and grid.
+  f.identity.sceneKey = "scene-b"; f.setFeatures([feature("c", { minX: -660, minY: -160, maxX: -640, maxY: -140 })]);
+  f.owner.draw(); await resolveAll(f);
+  assert.deepEqual([...f.owner.draw().renderedIds], ["c"]);
+  assert.equal(f.owner.getDiagnostics().renderedCoverageScans, 4);
+});
+
 test("the complete viewport is committed only after every required tile is cached", async (t) => {
   const f = fixture({ width: 600, height: 100, transform: { x: 0, y: 200, k: 1 },
     features: [feature("a", { minX: 100, minY: -160, maxX: 120, maxY: -140 })] });
