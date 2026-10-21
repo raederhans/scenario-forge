@@ -72,7 +72,7 @@ function runRequiredGate(overrides = {}) {
   const script = source.split("node <<'NODE'\n")[1].split("\n          NODE")[0];
   const needs = {
     "pr-plan": { result: "success", outputs: { run_fast: "true", run_smoke: "true", run_hgo: "true" } },
-    "pr-verify-fast": { result: "success" }, "pr-verify-smoke": { result: "success" },
+    "pr-verify-fast": { result: "success" }, "pr-tests": { result: "success" }, "pr-verify-smoke": { result: "success" },
     "pr-verify-hgo": { result: "success" },
     ...overrides,
   };
@@ -87,11 +87,12 @@ test("required gate accepts explicit docs exemption but rejects missing or faile
   assert.equal(runRequiredGate(), 0);
   assert.equal(runRequiredGate({
     "pr-plan": { result: "success", outputs: { run_fast: "false", run_smoke: "false", run_hgo: "false" } },
-    "pr-verify-fast": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
+    "pr-verify-fast": { result: "skipped" }, "pr-tests": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
     "pr-verify-hgo": { result: "skipped" },
   }), 0);
   for (const result of ["skipped", "failure", "cancelled", undefined]) {
     assert.equal(runRequiredGate({ "pr-verify-fast": { result } }), 1, result);
+    assert.equal(runRequiredGate({ "pr-tests": { result } }), 1, result);
     assert.equal(runRequiredGate({ "pr-verify-smoke": { result } }), 1, result);
     assert.equal(runRequiredGate({ "pr-verify-hgo": { result } }), 1, result);
   }
@@ -104,7 +105,7 @@ test("required gate accepts explicit docs exemption but rejects missing or faile
   }
   assert.equal(runRequiredGate({
     "pr-plan": { result: "failure", outputs: { run_fast: "false", run_smoke: "false", run_hgo: "false" } },
-    "pr-verify-fast": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
+    "pr-verify-fast": { result: "skipped" }, "pr-tests": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
     "pr-verify-hgo": { result: "skipped" },
   }), 1);
 });
@@ -146,7 +147,7 @@ test("required data lanes fail closed on failed plans and malformed exemptions",
 test("required gate accepts native-only success and requires explicit HGO plans and results", () => {
   assert.equal(runRequiredGate({
     "pr-plan": { result: "success", outputs: { run_fast: "false", run_smoke: "false", run_hgo: "true" } },
-    "pr-verify-fast": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
+    "pr-verify-fast": { result: "skipped" }, "pr-tests": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
   }), 0);
   for (const run_hgo of [undefined, "invalid", "", true, false]) {
     assert.equal(runRequiredGate({
