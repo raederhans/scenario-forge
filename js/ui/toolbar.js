@@ -1298,7 +1298,7 @@ function initToolbar({ render } = {}) {
 
   const addRecentColor = (color) => {
     const normalized = normalizeHexColor(color);
-    if (!normalized) return;
+    if (!normalized || normalizeHexColor(runtimeState.recentColors?.[0]) === normalized) return;
     runtimeState.recentColors = (Array.isArray(runtimeState.recentColors) ? runtimeState.recentColors : [])
       .filter((value) => normalizeHexColor(value) !== normalized);
     runtimeState.recentColors.unshift(normalized);
@@ -1724,10 +1724,20 @@ function initToolbar({ render } = {}) {
   } = appearanceControlsController;
   registerRuntimeHook(state, "clearReferenceImageFn", clearReferenceImage);
   registerRuntimeHook(state, "updateTransportAppearanceUIFn", renderTransportAppearanceUi);
+  // Recent colors feed only the recent strip and the library's recent group.
+  // Paint input coalesces the full library rebuild into the next frame.
+  let recentPaletteLibraryFrame = 0;
   registerRuntimeHook(state, "updateRecentUI", () => {
     renderRecentColors();
-    renderPalette(runtimeState.currentPaletteTheme);
-    renderPaletteLibrary();
+    if (recentPaletteLibraryFrame) return;
+    if (typeof globalThis.requestAnimationFrame !== "function") {
+      renderPaletteLibrary();
+      return;
+    }
+    recentPaletteLibraryFrame = globalThis.requestAnimationFrame(() => {
+      recentPaletteLibraryFrame = 0;
+      renderPaletteLibrary();
+    });
   });
   registerRuntimeHook(state, "updateParentBorderCountryListFn", renderParentBorderCountryList);
 
