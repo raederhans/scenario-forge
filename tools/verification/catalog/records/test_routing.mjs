@@ -3,6 +3,42 @@ import { VERIFICATION_CATALOG_SOURCE_FILES } from "../source_files.mjs";
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const TEST_ROUTING_RECORDS = [
   {
+    "id": "infra:run-all-tests",
+    "commandRef": "node --test tests/run_all_tests_quarantine_behavior.test.mjs",
+    "sourceRefs": [
+      "tools/run_all_tests.mjs",
+      "tests/quarantine.json",
+      "tests/run_all_tests_quarantine_behavior.test.mjs",
+      ".github/workflows/all-tests-nightly.yml",
+      "requirements-dev.txt"
+    ],
+    "ownerHints": [
+      "test-infra"
+    ],
+    "domains": [
+      "test-routing"
+    ],
+    "tiers": [
+      "contract"
+    ],
+    "cost": "fast",
+    "resourceLocks": [],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 1,
+    "verificationOrder": null,
+    "selectorOrder": 1707,
+    "verification": null,
+    "selector": {}
+  },
+  {
     "id": "infra:adaptive-recursion-policy",
     "commandRef": "node tools/run_adaptive_tests.mjs --entrypoint impact --execute --defer-main-thread",
     "sourceRefs": [
