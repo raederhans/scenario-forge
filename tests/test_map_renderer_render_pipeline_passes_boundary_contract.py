@@ -174,7 +174,7 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         for token in (
             "maskInfo: getPhysicalLandMaskInfo(),",
             "urbanFeatureCount: getFeatureCollectionFeatureCount(runtimeState.urbanData),",
-            "cityFeatureCount: getFeatureCollectionFeatureCount(getEffectiveCityCollection()),",
+            "cityFeatureCount: getFeatureCollectionFeatureCount(cityCollection),",
             "strategicResourceFeatureCount: getStrategicValuesResourceFeatureCount(",
             "airportFeatureCount: getFeatureCollectionFeatureCount(runtimeState.airportsData),",
             "portFeatureCount: getFeatureCollectionFeatureCount(runtimeState.portsData),",

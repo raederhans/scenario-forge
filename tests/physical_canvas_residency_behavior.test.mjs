@@ -119,6 +119,7 @@ function harness() {
     + 'let tnoRasterSceneFailure = "", politicalPassUsesDirectScene = false, politicalIdRasterActivationKey = "";\n'
     + implementation + '\nreturn { prepare: preparePhysicalCanvasPass, render: renderPassToCache,\n'
     + 'snapshot: readPhysicalViewportSnapshot, key: physicalCanvasKey, identity: physicalCanvasIdentity,\n'
+    + 'invalidationPasses: getPhysicalInputInvalidationPasses,\n'
     + 'owner: getPhysicalViewportCacheOwner, pendingBytes: getPhysicalCandidateBytes,\n'
     + 'resetPolicy: resetPoliticalRasterPolicy, reconcile: reconcileRenderFrameResources,\n'
     + 'setExport(value) { exportRenderInProgress = value; },\n'
@@ -137,6 +138,20 @@ test("draw never creates or prepares an owner and preparation forwards its one c
   assert.equal(h.api.prepare(), result); assert.equal(h.api.prepare(), result);
   assert.equal(h.records.owners.length, 1); assert.equal(h.records.preparations.length, 2);
   assert.equal(h.records.preparations[0].atlasCollection, h.state.physicalSemanticsData);
+});
+
+test("physical input reconciliation preserves an exact committed pass only in the selected display backend", () => {
+  const h = harness(), passes = ["background", "physicalBase", "political", "contextScenario"];
+  assert.equal(h.api.invalidationPasses(passes), passes);
+  h.api.owner();
+  h.mockOwner.getCurrentCommittedSnapshot = () => null;
+  assert.equal(h.api.invalidationPasses(passes), passes);
+  h.mockOwner.getCurrentCommittedSnapshot = () => ({ key: h.api.key() });
+  assert.deepEqual(h.api.invalidationPasses(passes), ["background", "political", "contextScenario"]);
+  h.api.setExport(true);
+  assert.equal(h.api.invalidationPasses(passes), passes);
+  h.api.setExport(false); h.environment.selected = false;
+  assert.equal(h.api.invalidationPasses(passes), passes);
 });
 
 test("snapshot isolates exact camera/layout keys from source identity and copies the camera", () => {

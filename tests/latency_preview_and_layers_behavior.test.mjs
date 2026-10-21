@@ -234,6 +234,7 @@ test("production layer invalidation preserves the water source token and schedul
   const body = source.slice(source.indexOf("function invalidateContextLayerVisualStateBatch("), source.indexOf("\nfunction createHitCanvasElement("));
   const scheduled = [], invalidated = [];
   const scope = { PHYSICAL_ATLAS_DETAIL_LAYER: "physical_semantics_detail", layerResolverCache: { waterRegionsDataToken: "stable-water" },
+    getPhysicalInputInvalidationPasses: passes => passes,
     invalidateRenderPasses: (passes) => invalidated.push([...passes]), clearRenderPassReferenceTransforms() {},
     contextLayerRenderScheduler: { request: (...args) => scheduled.push(args) } };
   vm.createContext(scope); vm.runInContext(body, scope);

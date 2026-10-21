@@ -245,8 +245,49 @@ export function commitBaseCitySupportData(
 
 // Every dictionary in this candidate was built privately. Publication must not
 // enumerate or clone the full base/alias maps again on the main thread.
+// Localization hydration also bumps city revisions. Keep reference-only proof
+// so an optional city preparation can distinguish that publication from an edit.
+const localizationPublications = new WeakMap();
+
+function getCurrentLocalizationPublication(target) {
+  const publication = localizationPublications.get(target);
+  return publication && Object.keys(publication.snapshot).every((key) => target[key] === publication.snapshot[key])
+    && target.locales?.geo === publication.geo
+    ? publication : null;
+}
+
+function beginLocalizationPublication(target) {
+  return getCurrentLocalizationPublication(target)?.fromCityRevision
+    ?? (Number(target.cityLayerRevision) || 0);
+}
+
+function recordLocalizationPublication(target, fromCityRevision) {
+  localizationPublications.set(target, {
+    fromCityRevision,
+    snapshot: {
+      activeScenarioId: target.activeScenarioId,
+      scenarioCityOverridesData: target.scenarioCityOverridesData,
+      cityLayerRevision: target.cityLayerRevision,
+      baseGeoLocales: target.baseGeoLocales,
+      baseGeoAliasToStableKey: target.baseGeoAliasToStableKey,
+      worldCitiesData: target.worldCitiesData,
+      locales: target.locales,
+      geoAliasToStableKey: target.geoAliasToStableKey,
+    },
+    geo: target.locales?.geo,
+  });
+}
+
+export function isCityRevisionFromLocalizationPublication(target, previousRevision) {
+  const publication = getCurrentLocalizationPublication(target);
+  const revision = Number(previousRevision) || 0;
+  return !!publication && revision >= publication.fromCityRevision
+    && revision < (Number(target.cityLayerRevision) || 0);
+}
+
 export function commitPreparedBaseCitySupportData(target, candidate) {
   if (!target || typeof target !== "object" || !candidate) return null;
+  const fromCityRevision = beginLocalizationPublication(target);
   target.worldCitiesData = candidate.worldCities || null;
   target.baseCityAliasesData = candidate.cityAliases || null;
   target.baseGeoLocales = candidate.baseGeoLocales;
@@ -258,6 +299,7 @@ export function commitPreparedBaseCitySupportData(target, candidate) {
   target.baseCityDataState = "loaded";
   target.baseCityDataError = "";
   target.baseCityDataPromise = null;
+  recordLocalizationPublication(target, fromCityRevision);
   return target.worldCitiesData;
 }
 
@@ -342,6 +384,7 @@ export function prepareFullLocalizationData({ uiLocales, geoLocales, aliasToStab
 
 export function commitPreparedFullLocalizationData(target, candidate) {
   if (!target || typeof target !== "object" || !candidate) return null;
+  const fromCityRevision = beginLocalizationPublication(target);
   target.baseGeoLocales = candidate.baseGeoLocales;
   target.baseGeoAliasToStableKey = candidate.baseGeoAliasToStableKey;
   target.locales = candidate.locales;
@@ -353,6 +396,7 @@ export function commitPreparedFullLocalizationData(target, candidate) {
   if (candidate.scenarioActive) {
     target.cityLayerRevision = Math.max(0, Number(target.cityLayerRevision || 0)) + 1;
   }
+  recordLocalizationPublication(target, fromCityRevision);
   return target.locales;
 }
 

@@ -252,17 +252,73 @@ function sourceCollinear(edge, other, second) {
 function sourceEdgeQuery(edges, occupied) {
   // Static x-interval tree: bbox queries retain ALL original owners, including
   // edges consumed/rejected by earlier matching. No global proximity search.
-  const ordered = [...edges.values(), ...occupied.filter(edge => !edge.key)]
-    .filter(edge => Math.abs(edgeCoordinate(edge, true, 0) - edgeCoordinate(edge, false, 0)) <= 180 * SCALE)
-    .sort((a, b) => edgeCoordinate(a, false, 0) - edgeCoordinate(b, false, 0));
-  let size = 1; while (size < ordered.length) size *= 2;
-  const maxima = new Float64Array(size * 2).fill(-Infinity);
+  let ordered = [...edges.values(), ...occupied.filter(edge => !edge.key)]
+    .filter(edge => Math.abs(edgeCoordinate(edge, true, 0) - edgeCoordinate(edge, false, 0)) <= 180 * SCALE);
+  let sortedX0 = null, maxima, size = 1;
+  const int32Min = -0x80000000, int32Max = 0x7fffffff;
+  const fitsInt32 = value => Number.isInteger(value) && value >= int32Min && value <= int32Max;
+  let canRadixSort = true;
+  if (canRadixSort) {
+    // Keep keys and ordinal scratch local to this build. The signed-domain
+    // check and key capture share one pass over each eligible edge.
+    const keys = new Int32Array(ordered.length);
+    for (let index = 0; index < ordered.length; index += 1) {
+      const edge = ordered[index];
+      const x0 = edgeCoordinate(edge, false, 0), x1 = edgeCoordinate(edge, true, 0);
+      if (!fitsInt32(x0) || !fitsInt32(x1)) {
+        canRadixSort = false;
+        break;
+      }
+      keys[index] = x0;
+    }
+    if (canRadixSort) {
+      // Two stable 16-bit LSD passes sort unsigned ordinals by signed x0.
+      // Flipping the sign bit maps signed Int32 order to unsigned key order.
+      const frequencies = new Uint32Array(1 << 16);
+      let ordinals = new Uint32Array(ordered.length), scratch = new Uint32Array(ordered.length);
+      for (let index = 0; index < ordinals.length; index += 1) ordinals[index] = index;
+      for (let shift = 0; shift < 32; shift += 16) {
+        frequencies.fill(0);
+        for (const ordinal of ordinals) {
+          const key = (keys[ordinal] ^ 0x80000000) >>> 0;
+          frequencies[(key >>> shift) & 0xffff] += 1;
+        }
+        let offset = 0;
+        for (let bucket = 0; bucket < frequencies.length; bucket += 1) {
+          const count = frequencies[bucket]; frequencies[bucket] = offset; offset += count;
+        }
+        for (const ordinal of ordinals) {
+          const key = (keys[ordinal] ^ 0x80000000) >>> 0;
+          scratch[frequencies[(key >>> shift) & 0xffff]++] = ordinal;
+        }
+        const previous = ordinals; ordinals = scratch; scratch = previous;
+      }
+
+      const sorted = new Array(ordered.length);
+      sortedX0 = new Int32Array(ordered.length);
+      for (let index = 0; index < ordinals.length; index += 1) {
+        const ordinal = ordinals[index];
+        sorted[index] = ordered[ordinal];
+        sortedX0[index] = keys[ordinal];
+      }
+      ordered = sorted;
+    }
+  }
+  if (!canRadixSort) {
+    // Coordinates beyond the exact signed-Int32 domain retain the original
+    // floating comparison sort and Float64 interval maxima path.
+    ordered.sort((a, b) => edgeCoordinate(a, false, 0) - edgeCoordinate(b, false, 0));
+  }
+  while (size < ordered.length) size *= 2;
+  maxima = canRadixSort
+    ? new Int32Array(size * 2).fill(int32Min)
+    : new Float64Array(size * 2).fill(-Infinity);
   ordered.forEach((edge, index) => { maxima[size + index] = edgeCoordinate(edge, true, 0); });
   for (let index = size - 1; index > 0; index -= 1) maxima[index] = Math.max(maxima[index * 2], maxima[index * 2 + 1]);
   return (x0, y0, x1, y1) => {
     const result = [];
     function visit(node, lo, hi) {
-      if (lo >= ordered.length || edgeCoordinate(ordered[lo], false, 0) > x1 || maxima[node] < x0) return;
+      if (lo >= ordered.length || (sortedX0 ? sortedX0[lo] : edgeCoordinate(ordered[lo], false, 0)) > x1 || maxima[node] < x0) return;
       if (hi - lo === 1) {
         const edge = ordered[lo];
         const ay = edgeCoordinate(edge, false, 1), by = edgeCoordinate(edge, true, 1);

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { createCityPointsRenderOwner } from "../js/core/renderer/city_points_render_owner.js";
+import { createUrbanCityPolicyOwner } from "../js/core/renderer/urban_city_policy.js";
 import { createCityLabelOwner } from "../js/core/renderer/city_label_owner.js";
 import { normalizeCityLayerStyleConfig } from "../js/core/state_defaults.js";
 import { getMapLabelHierarchy } from "../js/core/renderer/map_label_hierarchy.js";
@@ -320,7 +321,13 @@ function createPrivateRevealHarness() {
       getMapSvg: () => ({}),
     },
     helpers: {
-      getEffectiveCityCollection: () => h.collection,
+      getEffectiveCityCollection: () => { h.syncReads = (h.syncReads || 0) + 1; return h.collection; },
+      getCachedEffectiveCityCollection: () => h.publishedCollection || h.collection,
+      getEffectiveCityCollectionSource: () => ({ collection: h.collection, features: h.collection.features }),
+      isEffectiveCityCollectionSourceCurrent: (source) => !!source
+        && source.collection === h.collection && source.features === h.collection.features,
+      prepareEffectiveCityCollection: async (source) => ({ source, collection: source.collection }),
+      installEffectiveCityCollection: ({ collection }) => { h.publishedCollection = collection; return true; },
       getCityPaintOverscanPx: () => h.paintOverscan,
       normalizeCityLayerStyleConfig,
       getPointer: () => [3, 4],
@@ -401,7 +408,8 @@ test("private city preparation cancels each scene, data, projection, viewport an
     assert.equal(await pending, false, String(mutate));
     assert.equal(h.contextReads, 0);
     assert.equal(h.builds, 0);
-    assert.equal(h.preparations, 1);
+    assert.ok(h.preparations <= 1);
+    assert.equal(h.syncReads || 0, 0, "stale checks never rebuild the collection");
   }
 });
 
@@ -444,7 +452,7 @@ test("cold city draws never build or reserve a plan and an older job cannot repl
   assert.equal(await previous, false);
   assert.equal(h.owner.getCityLayerRenderState(2).skipped, false);
   assert.equal(h.owner.prepareCurrentView(2), null);
-  assert.equal(h.preparations, 2);
+  assert.equal(h.preparations, 1, "superseded source preparation never starts a reveal");
   assert.equal(h.builds, 0);
 });
 
@@ -1124,4 +1132,51 @@ test("sprite bounds and caches remain valid and compact across scale and rank ch
       assert.equal(cached, sprite, "unchanged visual must hit sprite cache");
     }
   }
+});
+
+
+test("private city source and reveal publish together and stale/cancelled reads never invoke synchronous merge", async () => {
+  const state = { showCityPoints: true, worldCitiesData: { features: [{ id: "first", properties: {} }] },
+    zoomTransform: { x: 0, y: 0, k: 2 }, styleConfig: { cityPoints: {} } };
+  let scans = 0, syncReads = 0, enabled = true, releaseReveal;
+  const policy = createUrbanCityPolicyOwner({ state, caches: { cityLayerCache: {} }, helpers: {
+    getCityFeatureKey: (feature) => { scans++; return feature.id; },
+    getCityFeatureAliases: (_feature, key) => [key], getCityCanonicalId: (feature) => feature.id,
+  } });
+  const projection = () => [0, 0];
+  const owner = createCityPointsRenderOwner({ state, getters: { getProjection: () => projection }, helpers: {
+    ...policy, normalizeCityLayerStyleConfig, isPrivatePreparationEnabled: () => enabled,
+    getEffectiveCityCollection: () => { syncReads++; return policy.getEffectiveCityCollection(); },
+    prepareCityRevealPlan: async (collection, _scale, _transform, _config, options) => {
+      assert.equal(collection.features[0].id, "first");
+      assert.equal(policy.getCachedEffectiveCityCollection(), null, "source stays private throughout reveal");
+      await new Promise((resolve) => { releaseReveal = resolve; });
+      return options.isCurrent() ? { markerEntries: [{ id: "first" }], labelEntries: [] } : null;
+    },
+  } });
+  assert.equal(owner.getCityLayerRenderState(2).reason, "preparing");
+  const pending = owner.prepareCurrentView(2, { yieldControl: async () => {} });
+  assert.equal(scans, 0, "preflight never enters the cold merge");
+  while (!releaseReveal) await Promise.resolve();
+  assert.equal(scans, 1);
+  assert.equal(policy.getCachedEffectiveCityCollection(), null);
+  releaseReveal();
+  assert.equal(await pending, true);
+  const published = policy.getCachedEffectiveCityCollection();
+  assert.equal(published.features[0].id, "first");
+  assert.equal(owner.getCityLayerRenderState(2).skipped, false);
+  state.worldCitiesData = { features: [{ id: "next", properties: {} }] };
+  assert.equal(owner.getCityLayerRenderState(2).reason, "preparing");
+  let releaseSource;
+  const cancelled = owner.prepareCurrentView(2, { yieldControl: () => new Promise((resolve) => { releaseSource = resolve; }) });
+  state.showCityPoints = false;
+  assert.equal(owner.prepareCurrentView(2), null);
+  releaseSource();
+  assert.equal(await cancelled, false);
+  assert.equal(policy.getCachedEffectiveCityCollection(), published);
+  assert.equal(scans, 1, "cancelled source never scans; stale reads keep the previous collection intact");
+  assert.equal(syncReads, 0);
+  enabled = false;
+  owner.getCityLayerRenderState(2);
+  assert.equal(syncReads, 1, "mode exit retains the native synchronous path");
 });

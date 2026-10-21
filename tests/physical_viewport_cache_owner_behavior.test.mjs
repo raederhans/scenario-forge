@@ -81,6 +81,35 @@ test("exact viewport hits reuse the original complete canvas with no redraw or r
   assert.equal(h.owner.getStats().entries, 2);
 });
 
+test("input reconciliation retains only the exact clean committed physical surface", async () => {
+  const h = fixture();
+  assert.equal(h.owner.getCurrentCommittedSnapshot(), null);
+  await h.owner.prepare();
+  assert.equal(h.owner.getCurrentCommittedSnapshot(), null);
+  const { job } = h.commit();
+  assert.equal(h.owner.getCurrentCommittedSnapshot(), job.snapshot);
+  h.cache.dirty.physicalBase = true;
+  assert.equal(h.owner.getCurrentCommittedSnapshot(), null, "external dirty state must win");
+  h.cache.dirty.physicalBase = false;
+  for (const change of [
+    { sourceKey: "changed-inputs" }, { key: "other-camera" },
+    { layout: { pixelWidth: 21, pixelHeight: 10 } },
+  ]) {
+    h.snapshot = { ...job.snapshot, ...change };
+    assert.equal(h.owner.getCurrentCommittedSnapshot(), null);
+  }
+  h.snapshot = job.snapshot;
+  h.cache.canvases.physicalBase = {};
+  assert.equal(h.owner.getCurrentCommittedSnapshot(), null);
+  h.cache.canvases.physicalBase = job.canvas;
+  job.canvas.width++;
+  assert.equal(h.owner.getCurrentCommittedSnapshot(), null);
+  job.canvas.width--;
+  assert.equal(h.owner.getCurrentCommittedSnapshot(), job.snapshot);
+  h.owner.noteNativeDraw(job.canvas);
+  assert.equal(h.owner.getCurrentCommittedSnapshot(), null);
+});
+
 test("LRU bounds active and inactive rasters and never shrinks a retained or active canvas", async () => {
   const h = fixture();
   await h.owner.prepare(); const a = h.commit().job;

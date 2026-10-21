@@ -160,7 +160,14 @@ export function createPhysicalViewportCacheOwner({
     owned.delete(canvas);
     if (committed?.canvas === canvas) committed = null;
   }
+  function getCurrentCommittedSnapshot() {
+    const cache = readCache();
+    if (!committed || cache?.dirty?.physicalBase || cache?.canvases?.physicalBase !== committed.canvas
+      || !same(readSnapshot(), committed)) return null;
+    return committed.snapshot;
+  }
   return Object.freeze({ prepare, takeReady, noteCommitted, noteNativeDraw, clear,
+    getCurrentCommittedSnapshot,
     getPendingPromise: () => candidate?.ready ? null : candidate?.promise || null,
     getPendingBytes: () => pendingBytes,
     getStats: () => ({ ...stats, cacheHits, cacheMisses,
