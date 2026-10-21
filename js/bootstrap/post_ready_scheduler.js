@@ -382,7 +382,7 @@ export function createPostReadyScheduler({
       canStart,
       maxWaitMs,
       maxRunMs,
-    });
+    }, taskDiagnostics.get(normalizedTaskKey)?.idleDeadlineAt ?? null);
   }
 
   function scheduleTask(
@@ -399,7 +399,8 @@ export function createPostReadyScheduler({
       canStart = () => true,
       maxWaitMs = 0,
       maxRunMs = 0,
-    } = {}
+    } = {},
+    idleDeadlineAt = null,
   ) {
     const normalizedTaskKey = normalizeTaskKey(taskKey);
     if (!normalizedTaskKey) return;
@@ -420,6 +421,7 @@ export function createPostReadyScheduler({
       idleQuietMs,
       minIdleTimeRemainingMs,
       allowChunkBacklog: shouldAllowChunkBacklog,
+      idleDeadlineAt,
     });
     const scheduledEpoch = taskEpoch;
     const scheduledHandle = { type: "timeout", id: null };
@@ -452,6 +454,12 @@ export function createPostReadyScheduler({
         return;
       }
       if (timers.requestIdleCallback) {
+        // A short idle callback consumes its native timeout. Preserve the
+        // original deadline across our retries, rather than renewing it on
+        // every frame and starving work on high-refresh-rate displays.
+        const diagnostic = taskDiagnostics.get(normalizedTaskKey);
+        diagnostic.idleDeadlineAt ??= nowMs() + Math.max(0, Number(timeout) || 0);
+        const idleDeadline = diagnostic.idleDeadlineAt;
         const idleId = timers.requestIdleCallback((deadline) => {
           if (!ownsScheduledHandle()) return;
           if (!isCurrent() || !canStart() || (Number(maxWaitMs) > 0 && nowMs() - taskDiagnostics.get(normalizedTaskKey).firstScheduledAt >= Number(maxWaitMs))) {
@@ -462,7 +470,7 @@ export function createPostReadyScheduler({
           const remainingMs = typeof deadline?.timeRemaining === "function"
             ? Number(deadline.timeRemaining())
             : Number.POSITIVE_INFINITY;
-          if (!deadline?.didTimeout && remainingMs < minIdleTimeRemainingMs) {
+          if (!deadline?.didTimeout && nowMs() < idleDeadline && remainingMs < minIdleTimeRemainingMs) {
             markTaskRetry(normalizedTaskKey, "idle-time-remaining");
             rescheduleTask(normalizedTaskKey, callback, { timeout, retryDelayMs, idleQuietMs, minIdleTimeRemainingMs, allowChunkBacklog: shouldAllowChunkBacklog, isCurrent, canStart, maxWaitMs, maxRunMs });
             return;
@@ -476,7 +484,7 @@ export function createPostReadyScheduler({
             return;
           }
           runTaskCallback(normalizedTaskKey, callback, { isCurrent, maxRunMs, idleQuietMs, allowChunkBacklog: shouldAllowChunkBacklog });
-        }, { timeout });
+        }, { timeout: Math.max(0, idleDeadline - nowMs()) });
         registerHandle("idle", idleId);
         return;
       }

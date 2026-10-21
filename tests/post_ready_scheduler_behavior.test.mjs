@@ -583,3 +583,66 @@ test("requestIdleCallback path retries when the idle budget is too low", () => {
   assert.equal(targetState.postReadyTaskDiagnostics.maxRetryCount, 1);
   assert.deepEqual(targetState.postReadyTaskDiagnostics.pendingTaskKeys, ["post-ready-idle"]);
 });
+
+test("repeated short idle callbacks retain the original task timeout instead of starving", () => {
+  let now = 0;
+  const targetState = createTargetState();
+  const globalScope = createTimerScope({ idle: true });
+  const scheduler = createPostReadyScheduler({ targetState, globalScope, clock: () => now });
+  let runCount = 0;
+  scheduler.scheduleTask("context-warmup", () => { runCount++; }, { timeout: 1600, retryDelayMs: 420 });
+  for (const time of [0, 420, 840, 1260, 1680]) {
+    now = time;
+    globalScope.__test.runNextTimeout();
+    globalScope.__test.runNextIdle({ didTimeout: false, timeRemaining: () => 1 });
+    assert.equal(runCount, time >= 1600 ? 1 : 0);
+  }
+  assert.deepEqual(globalScope.__test.idleCalls.map(({ options }) => options.timeout), [1600, 1180, 760, 340, 0]);
+  assert.equal(POST_READY_IDLE_QUIET_MS, 850);
+  assert.equal(POST_READY_IDLE_TIME_REMAINING_MS, 8);
+});
+
+test("an expired idle timeout still waits for interaction settlement and a current scope", () => {
+  let now = 0;
+  let current = true;
+  const targetState = createTargetState();
+  const globalScope = createTimerScope({ idle: true });
+  const scheduler = createPostReadyScheduler({ targetState, globalScope, clock: () => now });
+  let runCount = 0;
+  scheduler.scheduleTask("idle", () => { runCount++; }, { timeout: 100, isCurrent: () => current });
+  globalScope.__test.runNextTimeout();
+  globalScope.__test.runNextIdle({ didTimeout: false, timeRemaining: () => 1 });
+  now = 200;
+  targetState.isInteracting = true;
+  globalScope.__test.runNextTimeout();
+  assert.equal(runCount, 0);
+  assert.equal(globalScope.__test.idleCalls.length, 1);
+  targetState.isInteracting = false;
+  now = 300;
+  globalScope.__test.runNextTimeout();
+  current = false;
+  globalScope.__test.runNextIdle({ didTimeout: true, timeRemaining: () => 0 });
+  assert.equal(runCount, 0);
+  assert.equal(scheduler.getDiagnostics().taskOutcomes.idle.reason, "stale");
+});
+
+for (const replacement of ["new task", "clear", "reset"]) {
+  test(`a ${replacement} does not inherit an older task's idle timeout`, () => {
+    let now = 0;
+    const targetState = createTargetState();
+    const globalScope = createTimerScope({ idle: true });
+    const scheduler = createPostReadyScheduler({ targetState, globalScope, clock: () => now });
+    scheduler.scheduleTask("same-key", () => assert.fail("old task"), { timeout: 100 });
+    globalScope.__test.runNextTimeout();
+    globalScope.__test.runNextIdle({ didTimeout: false, timeRemaining: () => 1 });
+    now = 200;
+    if (replacement === "clear") scheduler.clearTask("same-key");
+    if (replacement === "reset") scheduler.reset();
+    let runCount = 0;
+    scheduler.scheduleTask("same-key", () => { runCount++; }, { timeout: 100 });
+    globalScope.__test.runNextTimeout();
+    assert.equal(globalScope.__test.idleCalls.at(-1).options.timeout, 100);
+    globalScope.__test.runNextIdle({ didTimeout: false, timeRemaining: () => 1 });
+    assert.equal(runCount, 0);
+  });
+}

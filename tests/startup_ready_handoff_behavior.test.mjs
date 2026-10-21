@@ -913,3 +913,32 @@ test("scenario replacement during optional warmup prevents later loads and rende
   await assert.rejects(scheduler.tasks[0].callback(), /stale/);
   assert.deepEqual(events, ["rivers"]);
 });
+
+for (const replacement of ["scenario", "request", "epoch"]) {
+  test(`deferred context warmup re-arms after a ${replacement} replacement before physical semantics load`, async () => {
+    const events = [];
+    const targetRuntime = createTargetRuntime({
+      activeScenarioId: "A", currentScenarioApplyRequestId: 1,
+      renderTransactionDiagnostics: { scenarioApplyEpoch: 1 },
+      showRivers: true, showPhysical: true,
+    });
+    const { owner, scheduler } = createOwnerHarness({ targetRuntime, helpers: createHelpers({ overrides: {
+      ensureContextLayerDataReady: async ([layer]) => {
+        events.push(layer);
+        if (events.length !== 1) return;
+        if (replacement === "scenario") targetRuntime.activeScenarioId = "B";
+        if (replacement === "request") targetRuntime.currentScenarioApplyRequestId = 2;
+        if (replacement === "epoch") targetRuntime.renderTransactionDiagnostics.scenarioApplyEpoch = 2;
+      },
+    } }) });
+    owner.schedulePostReadyDeferredContextWarmup();
+    await assert.rejects(scheduler.tasks[0].callback(), /stale/);
+    assert.deepEqual(events, ["rivers"]);
+    owner.schedulePostReadyDeferredContextWarmup();
+    assert.equal(scheduler.tasks.length, 2, "a stale warmup must not suppress the current scene's demand");
+    await scheduler.tasks[1].callback();
+    assert.deepEqual(events, ["rivers", "rivers", "physical-set"]);
+    owner.schedulePostReadyDeferredContextWarmup();
+    assert.equal(scheduler.tasks.length, 2, "the unchanged current scene remains deduplicated");
+  });
+}

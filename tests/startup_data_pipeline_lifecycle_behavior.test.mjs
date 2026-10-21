@@ -6,6 +6,9 @@ import { prepareScenarioLocalizationState } from "../js/core/scenario_localizati
 import { buildCityLocalizationPatchSteps } from "../js/core/data_loader.js";
 import * as contentActions from "../js/core/state/content_state.js";
 import * as contentLoadActions from "../js/core/state/actions/content_load_actions.js";
+import { createStartupReadyHandoffOwner } from "../js/bootstrap/startup_ready_handoff.js";
+import { createPostReadyScheduler } from "../js/bootstrap/post_ready_scheduler.js";
+import { shouldRequestPhysicalAtlasDetail, PHYSICAL_ATLAS_DETAIL_LAYER, getPhysicalPresentationLayerRequests } from "../js/core/renderer/physical_atlas_lod_policy.js";
 
 // Run the real owner with controlled resource IO; no DOM or network is needed.
 const source = readFileSync(new URL("../js/bootstrap/startup_data_pipeline.js", import.meta.url), "utf8")
@@ -21,6 +24,7 @@ function harness(overrides = {}, helperOverrides = {}) {
   const events = [];
   const dependencies = {
     resolveContourLodRequest,
+    shouldRequestPhysicalAtlasDetail, PHYSICAL_ATLAS_DETAIL_LAYER, getPhysicalPresentationLayerRequests,
     ...contentActions,
     ...contentLoadActions,
     normalizeRequestedContextLayerNames: (names) => names,
@@ -617,4 +621,49 @@ test("replacing the city load promise discards its private candidate and preserv
   assert.equal(state.baseCityDataState, "loading");
   assert.equal(state.worldCitiesData, undefined);
   assert.deepEqual(events, []);
+});
+
+test("re-armed real post-ready warmup loads physical semantics after a stale river receiver", { timeout: 3000 }, async (t) => {
+  const riverLoad = deferred(), riverStarted = deferred(), currentReceiver = deferred(), rendered = deferred();
+  const loads = [];
+  const { owner: pipeline, state } = harness({ loadContextLayerPack: (layer) => {
+    loads.push(layer);
+    if (layer === "rivers") { riverStarted.resolve(); return riverLoad.promise; }
+    return Promise.resolve({ type: "FeatureCollection", features: [{ id: layer }] });
+  } });
+  Object.assign(state, { showRivers: true, showPhysical: true, showCityPoints: false,
+    bootBlocking: false, baseCityDataState: "loaded" });
+  const scheduler = createPostReadyScheduler({ targetState: state });
+  t.after(() => scheduler.reset("test-cleanup"));
+  let receivers = 0;
+  const noop = () => {};
+  const handoff = createStartupReadyHandoffOwner({
+    runtimeState: state,
+    postReadyScheduler: { scheduleTask: (key, callback, options) => scheduler.scheduleTask(key, callback, {
+      ...options, delayMs: 0, idleQuietMs: 0,
+    }) },
+    effects: { commitUiHydrationState: noop, getStartupUiBootstrapPromise: noop },
+    helpers: {
+      buildInteractionInfrastructureAfterStartup: noop, checkpointBootMetric: noop, completeBootSequenceLogging: noop,
+      ensureActiveScenarioBundleHydrated: noop, ensureBaseCityDataReady: noop, ensureFullLocalizationDataReady: noop,
+      reconcileDetailPromotionPoliticalPass: noop, scheduleDeferredDetailPromotion: noop, shouldFastTrackScenarioHydration: noop,
+      requestMainRender: rendered.resolve,
+      ensureContextLayerDataReady: (layers, options) => {
+        if (layers.includes("rivers") && ++receivers === 2) currentReceiver.resolve();
+        return pipeline.ensureContextLayerDataReady(layers, options);
+      },
+    },
+  });
+  handoff.schedulePostReadyDeferredContextWarmup();
+  await riverStarted.promise;
+  state.currentScenarioApplyRequestId++;
+  handoff.schedulePostReadyDeferredContextWarmup();
+  await currentReceiver.promise;
+  riverLoad.resolve({ type: "FeatureCollection", features: [{ id: "river" }] });
+  await rendered.promise;
+  assert.deepEqual(loads, ["rivers", "physical", "physical_semantics"]);
+  assert.equal(state.contextLayerLoadStateByName.physical_semantics, "loaded");
+  assert.equal(state.physicalSemanticsData.features[0].id, "physical_semantics");
+  assert.equal(state.contextLayerExternalDataByName.physical_semantics, state.physicalSemanticsData);
+  assert.equal(state.currentScenarioApplyRequestId, 2);
 });

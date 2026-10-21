@@ -79,6 +79,7 @@ export function createStartupReadyHandoffOwner({
   const consoleWarn = getConsoleWarn(helpers);
 
   let postReadyContextWarmupScheduled = false;
+  let postReadyContextWarmupIsCurrent = null;
   let postReadyHydrationScheduled = false;
   let lifecycleEpoch = 0;
   let hydrationScenarioId;
@@ -127,6 +128,7 @@ export function createStartupReadyHandoffOwner({
     postReadyScheduler.clearTask?.("post-ready-context-warmup");
     postReadyScheduler.clearTask?.("post-ready-contour-warmup");
     postReadyContextWarmupScheduled = false;
+    postReadyContextWarmupIsCurrent = null;
     postReadyHydrationScheduled = false;
     startupSampleSettled = false;
     return {
@@ -347,7 +349,8 @@ export function createStartupReadyHandoffOwner({
   }
 
   function schedulePostReadyDeferredContextWarmup() {
-    if (targetRuntime.bootBlocking || postReadyContextWarmupScheduled) {
+    if (targetRuntime.bootBlocking
+      || (postReadyContextWarmupScheduled && postReadyContextWarmupIsCurrent?.())) {
       return;
     }
     const readContextDemand = () => {
@@ -374,6 +377,14 @@ export function createStartupReadyHandoffOwner({
       return;
     }
     postReadyContextWarmupScheduled = true;
+    const contextTaskOptions = scopedTaskOptions({
+      canStart: () => !hasPendingStartupSample(),
+      timeout: 1600,
+      delayMs: 900,
+      retryDelayMs: 420,
+      idleQuietMs: POST_READY_IDLE_QUIET_MS,
+    });
+    postReadyContextWarmupIsCurrent = contextTaskOptions.isCurrent;
     postReadyScheduler.scheduleTask("post-ready-context-warmup", async (task) => {
       task.throwIfStale();
       if (targetRuntime.bootBlocking) {
@@ -400,13 +411,7 @@ export function createStartupReadyHandoffOwner({
         loaded = true;
       }
       if (loaded) task.commit(() => requestMainRender("post-ready-context-warmup"));
-    }, scopedTaskOptions({
-      canStart: () => !hasPendingStartupSample(),
-      timeout: 1600,
-      delayMs: 900,
-      retryDelayMs: 420,
-      idleQuietMs: POST_READY_IDLE_QUIET_MS,
-    }));
+    }, contextTaskOptions);
     if (requestedContourLayerNames.length) {
       postReadyScheduler.scheduleTask("post-ready-contour-warmup", async (task) => {
         task.throwIfStale();

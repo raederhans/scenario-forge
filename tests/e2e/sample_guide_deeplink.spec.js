@@ -1,4 +1,5 @@
 const { test, expect } = require("@playwright/test");
+const { readConsoleIssue, isNativeGpuReadbackDiagnostic, attachNativeGpuDiagnostics } = require("./support/native-gpu-diagnostics");
 const {
   gotoApp,
   waitForShellReady,
@@ -70,21 +71,26 @@ async function expectNoHorizontalOverflow(page, selectors) {
 function installExportActionIssueTracker(page) {
   const pageErrors = [];
   const actionableConsoleIssues = [];
+  const nativeGpuDiagnostics = [];
   page.on("pageerror", (error) => {
     pageErrors.push(String(error?.stack || error?.message || error));
   });
   page.on("console", (message) => {
     const type = message.type();
     if (type === "error" || type === "warning") {
-      actionableConsoleIssues.push({ type, text: message.text() });
+      const issue = readConsoleIssue(message);
+      if (isNativeGpuReadbackDiagnostic(issue, page.url())) nativeGpuDiagnostics.push(issue);
+      else actionableConsoleIssues.push(issue);
     }
   });
   return {
     pageErrors,
     actionableConsoleIssues,
+    nativeGpuDiagnostics,
     reset() {
       pageErrors.length = 0;
       actionableConsoleIssues.length = 0;
+      nativeGpuDiagnostics.length = 0;
     },
   };
 }
@@ -92,6 +98,7 @@ function installExportActionIssueTracker(page) {
 function installGoldenRuntimeIssueTracker(page) {
   const unexpectedIssues = [];
   const expectedIssues = [];
+  const nativeGpuDiagnostics = [];
   page.on("pageerror", (error) => {
     unexpectedIssues.push({ kind: "pageerror", text: String(error?.stack || error?.message || error) });
   });
@@ -99,6 +106,11 @@ function installGoldenRuntimeIssueTracker(page) {
     const type = message.type();
     if (type !== "error" && type !== "warning") return;
     const text = message.text();
+    const issue = readConsoleIssue(message);
+    if (isNativeGpuReadbackDiagnostic(issue, page.url())) {
+      nativeGpuDiagnostics.push(issue);
+      return;
+    }
     if (/^\[map_renderer\] Removed 2 D3-unsafe water geometry part\(s\): marine_arctic_ocean, marine_southern_ocean$/.test(text)) {
       expectedIssues.push({ kind: `console:${type}`, text });
       return;
@@ -116,7 +128,7 @@ function installGoldenRuntimeIssueTracker(page) {
       url: request.url(),
     });
   });
-  return { expectedIssues, unexpectedIssues };
+  return { expectedIssues, unexpectedIssues, nativeGpuDiagnostics };
 }
 
 async function readDownloadBuffer(download) {
@@ -130,6 +142,13 @@ async function readDownloadBuffer(download) {
 }
 
 async function expectExportWorkbenchLayoutReachable(page) {
+  // The text stack is inside the advanced section, which starts collapsed.
+  // Open it through the user control before measuring its layout.
+  const advancedButton = page.locator("#exportWorkbenchAdvancedBtn");
+  if (await advancedButton.getAttribute("aria-expanded") !== "true") {
+    await advancedButton.click();
+  }
+  await expect(advancedButton).toHaveAttribute("aria-expanded", "true");
   const selectors = {
     panel: "#exportWorkbenchPanel",
     footer: ".export-workbench-footer",
@@ -502,6 +521,8 @@ test("@golden-demo sample guide card opens export from the TNO sample deeplink",
   } catch (error) {
     await writeSampleGuideFailureArtifact(page, testInfo);
     throw error;
+  } finally {
+    await attachNativeGpuDiagnostics(testInfo, runtimeIssues.nativeGpuDiagnostics);
   }
 });
 

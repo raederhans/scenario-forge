@@ -4,7 +4,7 @@ import {
   normalizeCityText,
 } from "./data_loader.js";
 import { applyScenarioChunkCityExternalEffectState } from "./state/actions/scenario_presentation_actions.js";
-import { copyLocalizationEntries, prepareLocalizationCandidate } from "./state/content_state.js";
+import { copyLocalizationEntries, prepareLocalizationCandidate, isCityRevisionFromLocalizationPublication } from "./state/content_state.js";
 const state = runtimeState;
 
 function getScenarioOverrideLocaleEntry(overrideEntry) {
@@ -222,8 +222,7 @@ export function prepareScenarioLocalizationState(target, base, options) {
   return prepareLocalizationCandidate(buildScenarioGeoLocalization(target, base), options);
 }
 
-function applyScenarioGeoLocalization() {
-  const candidate = finishLocalizationIterator(buildScenarioGeoLocalization(runtimeState));
+function applyScenarioGeoLocalization(candidate) {
   if (!runtimeState.locales || typeof runtimeState.locales !== "object") {
     runtimeState.locales = { ui: {}, geo: {} };
   }
@@ -240,12 +239,118 @@ function applyScenarioGeoLocalization() {
   }
 }
 
+function getLocalizationInputIdentity(target) {
+  return [
+    target.activeScenarioId,
+    target.baseGeoLocales, target.baseGeoAliasToStableKey,
+    target.worldCitiesData, target.ruCityOverrides,
+    target.scenarioCityOverridesData, target.scenarioCityOverridesData?.cities,
+    target.scenarioCityOverridesData?.featureCollection,
+    target.scenarioGeoLocalePatchData, target.scenarioGeoLocalePatchData?.geo,
+    globalThis.d3?.geoContains, globalThis.d3?.geoCentroid,
+  ];
+}
+
+let confirmedLocalization = null;
+
+function getConfirmedLocalization(inputs) {
+  const confirmed = confirmedLocalization;
+  return confirmed
+    && inputs.every((input, index) => input === confirmed.inputs[index])
+    && runtimeState.locales === confirmed.locales
+    && runtimeState.locales?.geo === confirmed.candidate.geo
+    && runtimeState.geoAliasToStableKey === confirmed.candidate.aliasToStableKey
+    && runtimeState.cityLayerRevision === confirmed.cityLayerRevision
+    ? confirmed.candidate : null;
+}
+
+function commitScenarioLocalization(cityOverridesPayload, geoLocalePatchPayload, candidate) {
+  applyScenarioChunkCityExternalEffectState(runtimeState, cityOverridesPayload);
+  runtimeState.scenarioGeoLocalePatchData = geoLocalePatchPayload || null;
+  applyScenarioGeoLocalization(candidate);
+  confirmedLocalization = {
+    inputs: getLocalizationInputIdentity(runtimeState), candidate,
+    locales: runtimeState.locales, cityLayerRevision: runtimeState.cityLayerRevision,
+  };
+}
+
+function createLocalizationTarget(cityOverridesPayload, geoLocalePatchPayload) {
+  return {
+    activeScenarioId: runtimeState.activeScenarioId,
+    baseGeoLocales: runtimeState.baseGeoLocales,
+    baseGeoAliasToStableKey: runtimeState.baseGeoAliasToStableKey,
+    worldCitiesData: runtimeState.worldCitiesData,
+    ruCityOverrides: runtimeState.ruCityOverrides,
+    scenarioCityOverridesData: (cityOverridesPayload === undefined
+      ? runtimeState.scenarioCityOverridesData : cityOverridesPayload) || null,
+    scenarioGeoLocalePatchData: geoLocalePatchPayload || null,
+  };
+}
+
 export function syncScenarioLocalizationState({
   cityOverridesPayload,
   geoLocalePatchPayload = runtimeState.scenarioGeoLocalePatchData,
 } = {}) {
-  applyScenarioChunkCityExternalEffectState(runtimeState, cityOverridesPayload);
-  runtimeState.scenarioGeoLocalePatchData = geoLocalePatchPayload || null;
-  applyScenarioGeoLocalization();
+  const target = createLocalizationTarget(cityOverridesPayload, geoLocalePatchPayload);
+  const candidate = getConfirmedLocalization(getLocalizationInputIdentity(target))
+    || finishLocalizationIterator(buildScenarioGeoLocalization(target));
+  commitScenarioLocalization(cityOverridesPayload, geoLocalePatchPayload, candidate);
+}
+
+// Only async resource owners use this entry point. Preparation never publishes
+// partial city effects or dictionaries, and synchronous consumers stay synchronous.
+export async function syncScenarioLocalizationStateAsync({
+  cityOverridesPayload,
+  geoLocalePatchPayload = runtimeState.scenarioGeoLocalePatchData,
+} = {}, options = {}) {
+  const originalCityPayload = runtimeState.scenarioCityOverridesData;
+  let expectedCityRevision = runtimeState.cityLayerRevision;
+  const originalScenarioId = runtimeState.activeScenarioId;
+  const incomingCities = cityOverridesPayload?.cities;
+  const incomingFeatures = cityOverridesPayload?.featureCollection;
+  const ownerIsCurrent = () => {
+    if (!(options.isCurrent?.() ?? true)
+      || runtimeState.activeScenarioId !== originalScenarioId
+      || runtimeState.scenarioCityOverridesData !== originalCityPayload
+      || cityOverridesPayload?.cities !== incomingCities
+      || cityOverridesPayload?.featureCollection !== incomingFeatures) return false;
+    if (runtimeState.cityLayerRevision !== expectedCityRevision) {
+      if (!isCityRevisionFromLocalizationPublication(runtimeState, expectedCityRevision)) return false;
+      expectedCityRevision = runtimeState.cityLayerRevision;
+    }
+    return true;
+  };
+  // Parallel base/full-localization hydration can replace the merge inputs.
+  // Rebuild against those inputs, but never overwrite a newer city edit.
+  while (ownerIsCurrent()) {
+    const target = createLocalizationTarget(cityOverridesPayload, geoLocalePatchPayload);
+    const inputs = getLocalizationInputIdentity(target);
+    const before = {
+      ...createLocalizationTarget(),
+      scenarioCityOverridesData: runtimeState.scenarioCityOverridesData,
+      scenarioGeoLocalePatchData: runtimeState.scenarioGeoLocalePatchData,
+      locales: runtimeState.locales,
+      geoAliasToStableKey: runtimeState.geoAliasToStableKey,
+      cityLayerRevision: runtimeState.cityLayerRevision,
+    };
+    const previousGeo = runtimeState.locales?.geo;
+    const isCurrent = () => ownerIsCurrent()
+      && Object.keys(before).every((key) => runtimeState[key] === before[key])
+      && runtimeState.locales?.geo === previousGeo
+      && getLocalizationInputIdentity(target).every((input, index) => input === inputs[index]);
+    const candidate = getConfirmedLocalization(inputs)
+      || await prepareScenarioLocalizationState(target, undefined, { ...options, isCurrent });
+    if (!candidate || !isCurrent()) {
+      // The optional city load follows the latest locale patch while retaining
+      // an explicitly supplied patch if the caller owns that replacement.
+      if (geoLocalePatchPayload === before.scenarioGeoLocalePatchData) {
+        geoLocalePatchPayload = runtimeState.scenarioGeoLocalePatchData;
+      }
+      continue;
+    }
+    commitScenarioLocalization(cityOverridesPayload, geoLocalePatchPayload, candidate);
+    return true;
+  }
+  return false;
 }
 

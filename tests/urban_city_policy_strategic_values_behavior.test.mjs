@@ -47,7 +47,7 @@ function createStrategicValuesPayload(victoryPointsByFeature, diagnostics = { er
   };
 }
 
-function createOwner(state) {
+function createOwner(state, helperOverrides = {}) {
   const helpers = {
     getCityCanonicalId: (feature) => String(feature?.properties?.city_id || feature?.id || "").trim(),
     getCityFeatureAliases: (feature, key) => new Set([
@@ -74,7 +74,7 @@ function createOwner(state) {
       cityLayerCache: {},
       urbanFeatureIndexCache: {},
     },
-    helpers,
+    helpers: { ...helpers, ...helperOverrides },
   });
 }
 
@@ -541,4 +541,83 @@ test("city reveal selects candidates inside explicit paint padding", () => {
   assert.equal(planAt(5).labelEntries.length, 1);
   margin = 48;
   assert.equal(planAt(5).labelEntries.length, 0);
+});
+
+
+test("private effective city merge matches synchronous aliases, overrides, capitals and strategic values without publishing early", async () => {
+  const state = {
+    activeScenarioId: "test", cityLayerRevision: 2, scenarioStrategicValuesRevision: 3, sovereigntyRevision: 4,
+    worldCitiesData: { features: Array.from({ length: 160 }, (_, index) =>
+      createCityFeature(`city-${index}`, "host", { __city_population: index, __city_is_capital: index === 0 })) },
+    sovereigntyByFeatureId: { host: "AAA" }, scenarioCountriesByTag: { AAA: { feature_count: 1 } },
+    scenarioCityOverridesData: { features: [createCityFeature("replacement", "host", { __city_replace_ids: ["city-2"] })],
+      cities: { rename: { city_id: "city-3", display_name: { en: "Renamed" }, aliases: ["alias"] },
+        hidden: { city_id: "city-4", hidden: true } } },
+    scenarioStrategicValuesData: createStrategicValuesPayload({ host: [{ city_id: "city-3", value: 12 }] }),
+  };
+  const owner = createOwner(state);
+  let yields = 0;
+  const prepared = await owner.prepareEffectiveCityCollection(owner.getEffectiveCityCollectionSource(), {
+    workBatch: 17, nowMs: () => 0, yieldControl: async () => {
+      yields++;
+      assert.equal(owner.getCachedEffectiveCityCollection(), null);
+    },
+  });
+  assert.ok(yields > 20, "base merge, alias writes, capital sorting and finalization are sliced");
+  assert.deepEqual(prepared.collection, createOwner(state).getEffectiveCityCollection());
+  assert.equal(owner.getCachedEffectiveCityCollection(), null);
+  assert.equal(owner.installEffectiveCityCollection(prepared), true);
+  assert.equal(owner.getEffectiveCityCollection(), prepared.collection, "cache hits remain synchronous and preserve identity");
+  assert.equal((await owner.prepareEffectiveCityCollection(prepared.source)).collection, prepared.collection);
+});
+
+test("private effective city merge abort and every source change preserve the previous published collection", async () => {
+  const mutations = [
+    ...["worldCitiesData", "scenarioCityOverridesData", "scenarioStrategicValuesData", "scenarioCountriesByTag", "sovereigntyByFeatureId"]
+      .map((name) => (state) => { state[name] = {}; }),
+    ...["cityLayerRevision", "scenarioStrategicValuesRevision", "sovereigntyRevision"]
+      .map((name) => (state) => { state[name]++; }),
+    (state) => { state.activeScenarioId = "changed"; },
+  ];
+  for (const mutate of mutations) {
+    const state = { worldCitiesData: { features: [createCityFeature("old", "host")] },
+      cityLayerRevision: 0, scenarioStrategicValuesRevision: 0, sovereigntyRevision: 0 };
+    let scans = 0;
+    const owner = createOwner(state, { getCityFeatureKey: (feature) => { scans++; return feature.id; } });
+    const published = owner.getEffectiveCityCollection();
+    scans = 0;
+    state.cityLayerRevision++;
+    const source = owner.getEffectiveCityCollectionSource();
+    const result = await owner.prepareEffectiveCityCollection(source, { yieldControl: async () => { mutate(state); } });
+    assert.equal(result, null);
+    assert.equal(owner.isEffectiveCityCollectionSourceCurrent(source), false);
+    assert.equal(owner.getCachedEffectiveCityCollection(), published);
+    assert.equal(scans, 0, "currentness and stale reads do not enter the merge");
+    assert.equal(owner.installEffectiveCityCollection({ source, collection: null }), false);
+    assert.equal(owner.getCachedEffectiveCityCollection(), published);
+  }
+  const state = { worldCitiesData: { features: Array.from({ length: 100 }, (_, i) => createCityFeature(`abort-${i}`, "host")) } };
+  const owner = createOwner(state);
+  const controller = new AbortController();
+  let yields = 0;
+  assert.equal(await owner.prepareEffectiveCityCollection(owner.getEffectiveCityCollectionSource(), {
+    signal: controller.signal, workBatch: 8, yieldControl: async () => { if (++yields === 3) controller.abort(); },
+  }), null);
+  assert.equal(owner.getCachedEffectiveCityCollection(), null);
+});
+
+test("first effective city collection preparation crosses a host task before reading a base feature", async () => {
+  let hostTaskRan = false, scans = 0;
+  const state = { worldCitiesData: { features: [createCityFeature("first", "host")] } };
+  const owner = createOwner(state, { getCityFeatureKey: (feature) => {
+    assert.equal(hostTaskRan, true);
+    scans++;
+    return feature.id;
+  } });
+  setTimeout(() => { hostTaskRan = true; }, 0);
+  const pending = owner.prepareEffectiveCityCollection();
+  assert.equal(scans, 0);
+  assert.ok(await pending);
+  assert.ok(scans > 0);
+  assert.equal(owner.getCachedEffectiveCityCollection(), null);
 });

@@ -16,11 +16,11 @@ function createCanvasContext() {
     beginPath() {
       calls.push({ type: "beginPath" });
     },
-    clip() {
-      calls.push({ type: "clip" });
+    clip(path) {
+      calls.push({ type: "clip", ...(path ? { path } : {}) });
     },
-    fill() {
-      calls.push({ type: "fill", alpha: this.globalAlpha, fillStyle: this.fillStyle });
+    fill(path) {
+      calls.push({ type: "fill", alpha: this.globalAlpha, fillStyle: this.fillStyle, ...(path ? { path } : {}) });
     },
     lineTo(x, y) {
       calls.push({ type: "lineTo", x, y });
@@ -37,12 +37,13 @@ function createCanvasContext() {
     setLineDash(value) {
       calls.push({ type: "setLineDash", value });
     },
-    stroke() {
+    stroke(path) {
       calls.push({
         type: "stroke",
         alpha: this.globalAlpha,
         lineWidth: this.lineWidth,
         strokeStyle: this.strokeStyle,
+        ...(path ? { path } : {}),
       });
     },
   };
@@ -67,6 +68,7 @@ function createOwner({
   renderPhase = "idle",
   showScenarioReliefOverlays = true,
   coastalAccentEnabled = false,
+  getProjectedGeographicPath,
 } = {}) {
   const metrics = [];
   const pathCalls = [];
@@ -83,6 +85,7 @@ function createOwner({
     getters: {
       getContext: () => context,
       getPathCanvas: () => (feature) => pathCalls.push(feature.id),
+      getProjectedGeographicPath,
     },
     helpers: {
       collectContextMetric: (name, durationMs, details) => metrics.push({ name, durationMs, details }),
@@ -156,4 +159,45 @@ test("scenario relief owner skips interacting and settling phases", () => {
   assert.equal(renderedCount, 0);
   assert.equal(harness.metrics.at(-1).details.reason, "interacting");
   assert.equal(harness.context.calls.length, 0);
+});
+
+for (const [id, kind, geometryType, filled] of [
+  ["salt-a", "salt_flat_texture", "Polygon", true],
+  ["atlantropa_salt", "salt_flat_texture", "MultiPolygon", true],
+  ["swamp-a", "swamp_margin", "MultiPolygon", true],
+  ["shore-a", "new_shoreline", "LineString", false],
+  ["dam-a", "dam_approach", "LineString", false],
+]) {
+  test(`scenario relief reuses one projected path for ${id} without changing styles or pattern order`, () => {
+    const feature = createFeature(id, kind, geometryType);
+    const path = { feature: id };
+    const requested = [];
+    const cached = createOwner({ features: [feature], getProjectedGeographicPath: (value) => {
+      requested.push(value);
+      return path;
+    } });
+    const native = createOwner({ features: [feature] });
+    assert.equal(cached.owner.drawScenarioReliefOverlaysLayer(2), 1);
+    assert.equal(native.owner.drawScenarioReliefOverlaysLayer(2), 1);
+    assert.deepEqual(requested, [feature]);
+    assert.deepEqual(cached.pathCalls, []);
+    assert.deepEqual(native.pathCalls, filled ? [id, id] : [id]);
+    const pathOperations = cached.context.calls.filter((call) => call.path);
+    assert.deepEqual(pathOperations.map(({ type }) => type), filled ? ["fill", "clip", "stroke"] : ["stroke"]);
+    assert.ok(pathOperations.every((call) => call.path === path));
+    assert.deepEqual(cached.context.calls.map(({ path: _path, ...call }) => call), native.context.calls);
+    assert.deepEqual(cached.metrics, native.metrics);
+  });
+}
+
+test("scenario relief uses its native path when the projected path getter has no result", () => {
+  const feature = createFeature("salt-a", "salt_flat_texture");
+  const native = createOwner({ features: [feature] });
+  let requests = 0;
+  const missing = createOwner({ features: [feature], getProjectedGeographicPath: () => { requests++; return null; } });
+  native.owner.drawScenarioReliefOverlaysLayer(2);
+  missing.owner.drawScenarioReliefOverlaysLayer(2);
+  assert.equal(requests, 1);
+  assert.deepEqual(missing.pathCalls, native.pathCalls);
+  assert.deepEqual(missing.context.calls, native.context.calls);
 });
