@@ -68,7 +68,10 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     "tools/check_pages_source_graph.py", "tools/build_landing_*", "tools/runtime_json_packing.py",
     "tests/test_pages*", "tests/test_landing*",
   ]);
-  const pagesMode = pagesFull ? "full" : runtimeRelevant ? "source" : "none";
+  // HGO is published inside the Pages artifact, so its source references are
+  // part of the same graph (#246 merged an unresolved one while fast was skipped).
+  const pagesSourceRelevant = runtimeRelevant || files.some(isNativeFile);
+  const pagesMode = pagesFull ? "full" : pagesSourceRelevant ? "source" : "none";
   const smokeMode = full || browserRelevant ? (!full && boundedUi ? "ui" : "full") : "none";
   const publicSampleRelevant = matches([
     "js/bootstrap/startup_sample_project_deeplink.js",
@@ -111,7 +114,9 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     changedFiles: files,
     labels: [...labelSet].sort(),
     riskTier: full || controlPlane || dependencyChange ? "integration" : docsOnly ? "docs" : boundedUi ? "ui" : "affected",
-    runFast: full || (!docsOnly && !nativeOnly),
+    // Fast contracts are a few minutes; skipping them by path let main break for
+    // every later PR. Only ordinary documentation stays exempt.
+    runFast: full || !docsOnly,
     runHgo: full || controlPlane || hgoRelevant,
     runSmoke: smokeMode !== "none",
     smokeMode,
@@ -126,7 +131,7 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     perfDiagnostic: performance.diagnostic_only,
     expectedPerformanceChange: labelSet.has("ci:perf-expected"),
     reasons: {
-      fast: nativeOnly && !full ? "Independent HGO changes use the native app verification job."
+      fast: nativeOnly && !full ? "HGO changes run the native app job plus fast contracts and the Pages source graph."
         : docsOnly && !full ? "Ordinary documentation only; no test environment is needed." : "Run affected contracts and reject unresolved verification coverage.",
       smoke: smokeMode === "ui" ? "All behavioral changes belong to the bounded UI scope; run focused shell and editor checks."
         : smokeMode === "full" ? "Runtime, browser support, dependencies or CI policy require the shared smoke suite." : "No browser behavior selected.",

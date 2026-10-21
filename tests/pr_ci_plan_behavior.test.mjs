@@ -99,7 +99,7 @@ test("planner CLI shares manifest exemption and missing or invalid files stay co
   assert.equal(invoke(["--github-output", "outputs.txt"]).runHgo, true);
   const outputs = fs.readFileSync(path.join(cwd, "outputs.txt"), "utf8");
   assert.match(outputs, /^run_hgo=true$/m);
-  assert.match(outputs, /^run_fast=false$/m);
+  assert.match(outputs, /^run_fast=true$/m);
   fs.writeFileSync(path.join(cwd, "changes.txt"), "package.json\n");
   fs.writeFileSync(path.join(cwd, "head.json"), "{invalid");
   assert.notEqual(invoke(manifestArgs).perfMode, "skip");
@@ -119,7 +119,7 @@ test("docs-only changes keep heavyweight PR lanes off", () => {
   assert.equal(plan.perfMode, "skip");
 });
 
-test("native-only changes select HGO without main project verification", () => {
+test("native-only changes select HGO plus fast contracts and the Pages source graph", () => {
   for (const changedFiles of [
     ["apps/hgo/src/main.js"],
     ["apps/hgo/assets/default/manifest.json", "apps/hgo/package.json", "docs/active/hgo/plan.md"],
@@ -127,7 +127,9 @@ test("native-only changes select HGO without main project verification", () => {
   ]) {
     const plan = planPullRequest({ changedFiles });
     assert.equal(plan.runHgo, true);
-    for (const key of ["runFast", "runSmoke", "runDemo", "runPages", "runPagesSource", "runTransport", "perfRequired"]) assert.equal(plan[key], false, key);
+    assert.equal(plan.runFast, true);
+    assert.equal(plan.runPagesSource, true);
+    for (const key of ["runSmoke", "runDemo", "runPages", "runTransport", "perfRequired"]) assert.equal(plan[key], false, key);
     assert.equal(plan.perfMode, "skip");
     assert.deepEqual(plan.scenarioIds, []);
   }
