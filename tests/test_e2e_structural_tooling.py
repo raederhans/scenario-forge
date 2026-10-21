@@ -78,7 +78,7 @@ def parse_workflow_job_blocks(workflow: str) -> dict[str, str]:
 
 def parse_required_pr_workflow_jobs(workflow: str) -> dict[str, str]:
     jobs = parse_workflow_job_blocks(workflow)
-    expected_jobs = {"pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo", "pr-verify-required"}
+    expected_jobs = {"pr-plan", "pr-verify-fast", "pr-tests", "pr-verify-smoke", "pr-verify-hgo", "pr-verify-required"}
     if set(jobs) != expected_jobs:
         raise AssertionError(f"workflow job set mismatch: expected {sorted(expected_jobs)}, found {sorted(jobs)}")
     return jobs
@@ -1858,7 +1858,7 @@ const page = {
         self.assertEqual(parse_job_scalar(required_job, "if"), "always()")
         self.assertEqual(
             parse_job_scalar(required_job, "needs"),
-            ["pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo"],
+            ["pr-plan", "pr-verify-fast", "pr-tests", "pr-verify-smoke", "pr-verify-hgo"],
         )
         self.assertEqual(parse_job_scalar(required_job, "runs-on"), "ubuntu-latest")
         self.assertIsNone(parse_job_scalar(required_job, "uses"))
@@ -1955,6 +1955,8 @@ jobs:
                     job: {"result": result, "outputs": {}}
                     for job, result in zip(job_names, result_matrix, strict=True)
                 }
+                # pr-tests shares the fast lane's acceptance; mirror it to keep the matrix 4^4.
+                needs["pr-tests"] = {"result": needs["pr-verify-fast"]["result"], "outputs": {}}
                 needs["pr-plan"]["outputs"]["run_smoke"] = "true"
                 needs["pr-plan"]["outputs"]["run_fast"] = "true"
                 needs["pr-plan"]["outputs"]["run_hgo"] = "true"
@@ -1979,7 +1981,7 @@ jobs:
         script = extract_required_aggregator_script(required_job)
         valid_needs = {
             job: {"result": "success", "outputs": {}}
-            for job in ("pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo")
+            for job in ("pr-plan", "pr-verify-fast", "pr-tests", "pr-verify-smoke", "pr-verify-hgo")
         }
         valid_needs["pr-plan"]["outputs"] = {"run_smoke": "true", "run_fast": "true", "run_hgo": "true"}
         cases = {
