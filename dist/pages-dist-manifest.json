@@ -50132,7 +50132,7 @@
     },
     {
       "path": "app/js/core/map_renderer/render_pass_cache_host_owner.js",
-      "size_bytes": 3673,
+      "size_bytes": 4322,
       "source_kind": "dist"
     },
     {
@@ -79136,5 +79136,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 1031384608
+  "total_bytes": 1031385257
 }

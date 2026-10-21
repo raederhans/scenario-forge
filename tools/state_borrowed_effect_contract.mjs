@@ -227,7 +227,7 @@ const callbackInjectionDefinitions =[
     "callbackReturnsBorrowed": true,
     "sourceFingerprints": {
       "js/core/map_renderer/scenario_refresh_runtime.js": "9828e1b10520d1b8db1501fb7c2a590bb3f7f7e685cedc4cca23809cd71ed27e",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644",
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
       "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78",
       "js/core/river_paint/pilot_manifest.js": "e63d24879c44b189d94914f108fdfe5f5f22d52709701b4f753dbe9611711cd9",
@@ -257,7 +257,7 @@ const callbackInjectionDefinitions =[
     "callbackReturnsBorrowed": false,
     "sourceFingerprints": {
       "js/core/map_renderer/scenario_refresh_runtime.js": "9828e1b10520d1b8db1501fb7c2a590bb3f7f7e685cedc4cca23809cd71ed27e",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644",
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
       "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78",
       "js/core/river_paint/pilot_manifest.js": "e63d24879c44b189d94914f108fdfe5f5f22d52709701b4f753dbe9611711cd9",
@@ -319,7 +319,7 @@ const callbackInjectionDefinitions =[
       "js/core/renderer/projected_coordinate_bounds.js": "ab6d6f787880c11b84f4d685d163b35502073259220c7460d691ac23aa6d8ec8",
       "js/core/renderer/water_sanitization_snapshot_cache.js": "f3688bebc55ff296b5c9a121fe0ccc74da662198981c8bf55429b239fc23ea38",
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644",
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "js/core/renderer/projected_geometry_bounds_owner.js": "b287dfda55b4e629d77e08cf1ed187e58f2aee8e4f60b1bf17f6ae41f569a747",
       "js/core/state/renderer_runtime_state.js": "70b3d7ddd1d469b033aea1b516ba8de98928e0d19c4c7c3fdbfe8f3ffb197968",
       "js/core/state/actions/renderer_cache_actions.js": "4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739",
@@ -365,7 +365,7 @@ const callbackInjectionDefinitions =[
       "js/core/renderer/projected_coordinate_bounds.js": "ab6d6f787880c11b84f4d685d163b35502073259220c7460d691ac23aa6d8ec8",
       "js/core/renderer/water_sanitization_snapshot_cache.js": "f3688bebc55ff296b5c9a121fe0ccc74da662198981c8bf55429b239fc23ea38",
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644",
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "js/core/renderer/projected_geometry_bounds_owner.js": "b287dfda55b4e629d77e08cf1ed187e58f2aee8e4f60b1bf17f6ae41f569a747",
       "js/core/state/renderer_runtime_state.js": "70b3d7ddd1d469b033aea1b516ba8de98928e0d19c4c7c3fdbfe8f3ffb197968",
       "js/core/state/actions/renderer_cache_actions.js": "4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739",
@@ -403,7 +403,7 @@ const callbackInjectionDefinitions =[
     "requiredOwnerCompositionNames": [],
     "sourceFingerprints": {
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644",
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "vendor/d3.v7.min.js": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
     }
   },
@@ -431,7 +431,7 @@ const callbackInjectionDefinitions =[
     ],
     "sourceFingerprints": {
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644",
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "js/core/renderer/projected_geographic_path_cache.js": "8f613fe731f82c6d59d75773fbd524018a6c2ebfc4259c5056cba34ead49f4d8",
       "js/core/renderer/renderer_surface_host.js": "58361f391628007208099fba71707254a680e46310274e91bf8f22a876df3e83",
       "js/core/renderer/renderer_projection_path_owner.js": "489a62baf4bed0936dcd716b8ed2b9f87cc3fbec34ba0284d2adc1907dfae2bb",
@@ -440,7 +440,7 @@ const callbackInjectionDefinitions =[
       "js/core/runtime_resource_budget.js": "22a5724883241795444078d668ff8a8466b00be9cc7eeb223dee9b2227b24f9b",
       "js/core/renderer/geometry_cache_budget.js": "1daec3c19a136bfd8542f479a121119a34939121b1e367c4e6e4f3ddedfda3af",
       "js/core/renderer/projected_path_resource_accounting.js": "1c22a8eb96d7a1789abd905df8c4ee2abc090ee825215aeb3ab6085333088918",
-      "js/core/renderer/render_cache_surface_resources.js": "8f2070c1b59bde6a6a677bbd26c6e35711712d906ac1b17898925ec71ce9a496"
+      "js/core/renderer/render_cache_surface_resources.js": "d72ae63bdd8dc770cfbb42790dc2ed867386322fb89ebb6b656d834065fc72ef"
     }
   },
   {
@@ -465,7 +465,7 @@ const callbackInjectionDefinitions =[
     "requiredOwnerCompositionNames": [],
     "sourceFingerprints": {
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644",
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "js/core/state.js": "d5db7104a473a577bff27bdee57125982dc7b66f6bc14e76d0f87e3bb336aaef",
       "js/core/intensity_field.js": "f9bfad34368d667483e85ef831944ce1851ca47c96cdc73221c165c260f1293f",
       "js/core/state/intensity_field_state.js": "31631a55a3a26f9a3e1eda661c2bbf1477df2c5d53e8ef77c743fde813b7478d"
@@ -526,7 +526,7 @@ const callbackInjectionDefinitions =[
     ],
     "sourceFingerprints": {
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644",
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "js/core/renderer/renderer_surface_host.js": "58361f391628007208099fba71707254a680e46310274e91bf8f22a876df3e83",
       "js/core/renderer/renderer_projection_path_owner.js": "489a62baf4bed0936dcd716b8ed2b9f87cc3fbec34ba0284d2adc1907dfae2bb",
       "js/core/renderer/projection_geometry_identity.js": "25aca815b841ab7238697cb512f2221bb1042bd50170a9804cee3e511669cf8e",
@@ -572,7 +572,7 @@ const callbackInjectionDefinitions =[
     ],
     "sourceFingerprints": {
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644",
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "js/core/renderer/renderer_surface_host.js": "58361f391628007208099fba71707254a680e46310274e91bf8f22a876df3e83",
       "js/core/renderer/renderer_projection_path_owner.js": "489a62baf4bed0936dcd716b8ed2b9f87cc3fbec34ba0284d2adc1907dfae2bb",
       "js/core/renderer/projection_geometry_identity.js": "25aca815b841ab7238697cb512f2221bb1042bd50170a9804cee3e511669cf8e",
@@ -674,7 +674,7 @@ const callbackInjectionDefinitions =[
     "callbackReturnsBorrowed": false,
     "sourceFingerprints": {
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644"
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4"
     }
   },
   {
@@ -697,7 +697,7 @@ const callbackInjectionDefinitions =[
     "callbackReturnsBorrowed": false,
     "sourceFingerprints": {
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644"
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4"
     }
   },
   {
@@ -729,7 +729,7 @@ const callbackInjectionDefinitions =[
       "js/core/renderer/projected_coordinate_bounds.js": "ab6d6f787880c11b84f4d685d163b35502073259220c7460d691ac23aa6d8ec8",
       "js/core/renderer/water_sanitization_snapshot_cache.js": "f3688bebc55ff296b5c9a121fe0ccc74da662198981c8bf55429b239fc23ea38",
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
-      "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644",
+      "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "js/core/renderer/projected_geometry_bounds_owner.js": "b287dfda55b4e629d77e08cf1ed187e58f2aee8e4f60b1bf17f6ae41f569a747",
       "js/core/state/renderer_runtime_state.js": "70b3d7ddd1d469b033aea1b516ba8de98928e0d19c4c7c3fdbfe8f3ffb197968",
       "js/core/state/actions/renderer_cache_actions.js": "4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739",
@@ -1116,8 +1116,8 @@ const borrowedOwnerEffectDefinition = {
   ],
   "sourceFingerprints": {
     "js/core/renderer/political_path_cache_owner.js": "c510d593118f2e39f3591229b4374fa40f2be5a93c765f7c175b68b899f8b14f",
-    "js/core/map_renderer.js": "29abd54c99ea3adbf0d57f6d52535cc7226b877b67b516b072b5f7c4484f3644",
-    "js/core/renderer/render_cache_owner.js": "ed292f9f9267e2063308c3dcc0a17233afd48b356630a2671ce72392947be718",
+    "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
+    "js/core/renderer/render_cache_owner.js": "7d163a0c851594163b4eda6b70eed770a79d46b86e6b19b5bfd33d7ad2577382",
     "js/core/renderer/render_cache_validation_scope.js": "d6f09790a3fa9be6fcd6172521c9658aeff01db9ce7e964b439b84bf7cd7febf",
     "js/core/state/renderer_runtime_state.js": "70b3d7ddd1d469b033aea1b516ba8de98928e0d19c4c7c3fdbfe8f3ffb197968",
     "js/core/renderer/render_pass_cache_state_normalizer.js": "03f4cad1217469c4a5d980ebb0e54793f2bd0f86fa4e557f0b68f11d8af9d70c",
@@ -1134,7 +1134,7 @@ const borrowedOwnerEffectDefinition = {
     "js/core/runtime_resource_budget.js": "22a5724883241795444078d668ff8a8466b00be9cc7eeb223dee9b2227b24f9b",
     "js/core/renderer/geometry_cache_budget.js": "1daec3c19a136bfd8542f479a121119a34939121b1e367c4e6e4f3ddedfda3af",
     "js/core/renderer/projected_path_resource_accounting.js": "1c22a8eb96d7a1789abd905df8c4ee2abc090ee825215aeb3ab6085333088918",
-    "js/core/renderer/render_cache_surface_resources.js": "8f2070c1b59bde6a6a677bbd26c6e35711712d906ac1b17898925ec71ce9a496"
+    "js/core/renderer/render_cache_surface_resources.js": "d72ae63bdd8dc770cfbb42790dc2ed867386322fb89ebb6b656d834065fc72ef"
   }
 };
 export const STATE_BORROWED_OWNER_EFFECT_CONTRACT = Object.freeze([Object.freeze({

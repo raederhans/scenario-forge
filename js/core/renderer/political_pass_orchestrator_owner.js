@@ -125,8 +125,8 @@ export function createPoliticalPassOrchestratorOwner({
   function resolveRecoveryQuality(backgroundSummary) {
     return String(backgroundSummary?.recoveryQuality || resolvePoliticalRecoveryQualityEffect());
   }
-  function drawBasePoliticalPass(k) {
-    counters.passes++;
+  function drawBasePoliticalPass(k, withNativeTarget = null, nativeReentry = false) {
+    if (!nativeReentry) counters.passes++;
     const identity = resolvePoliticalPassIdentity(k);
     recordPoliticalRasterWorkerSnapshot();
     const viewport = resolvePoliticalPassViewport(identity);
@@ -160,32 +160,24 @@ export function createPoliticalPassOrchestratorOwner({
     }
     const primaryRaster = idRasterSelected && getters.isPoliticalIdRasterPrimary?.() === true;
     if (primaryRaster && hasPoliticalLandFeatures()) {
-      const metrics = drawPoliticalIdRasterFine({ k, identity, viewport });
+      const metrics = nativeReentry ? null : drawPoliticalIdRasterFine({ k, identity, viewport });
       if (validRasterMetrics(metrics)) return commitRaster(metrics, identity, viewport, true);
-      counters.nativeFallbackPasses++;
+      if (!nativeReentry) counters.nativeFallbackPasses++;
     }
+    if (withNativeTarget) return withNativeTarget(() => drawBasePoliticalPass(k, null, true));
     counters.nativeBackgroundPasses++;
     // Export draws into a separate target; it must not relabel the visible editor frame.
     if (!exportRendering) { lastBackend = "vector"; lastReason = primaryRaster ? "raster-unavailable" : inlinePoliticalPartitions ? "river-partitions" : "native-policy"; }
     const backgroundStartedAt = nowMs();
     const backgroundSummary = drawPoliticalBackgroundFills({ identity, viewport });
-    recordRenderPerfMetric(
-      "drawPoliticalBackgroundFillsPass",
-      nowMs() - backgroundStartedAt,
-      {
-        groupCount: Number(backgroundSummary?.groupCount || 0),
-        entryCount: Number(backgroundSummary?.entryCount || 0),
-        reusedPathCount: Number(backgroundSummary?.reusedPathCount || 0),
-        builtPathCount: Number(backgroundSummary?.builtPathCount || 0),
-        pathlessEntryCount: Number(backgroundSummary?.pathlessEntryCount || 0),
-        cacheHit: !!backgroundSummary?.cacheHit,
-        recoveryQuality: resolveRecoveryQuality(backgroundSummary),
-        progressive: !!backgroundSummary?.progressive,
-        deferredFullCacheReady: !!backgroundSummary?.deferredFullCacheReady,
-        deferredFullCacheScheduled: !!backgroundSummary?.deferredFullCacheScheduled,
-        coarseUnderlay: String(backgroundSummary?.coarseUnderlay || ""),
-      },
-    );
+    const backgroundStats = backgroundSummary || {};
+    recordRenderPerfMetric("drawPoliticalBackgroundFillsPass", nowMs() - backgroundStartedAt, {
+      ...Object.fromEntries(["groupCount", "entryCount", "reusedPathCount", "builtPathCount", "pathlessEntryCount"]
+        .map(key => [key, Number(backgroundStats[key] || 0)])),
+      ...Object.fromEntries(["cacheHit", "progressive", "deferredFullCacheReady", "deferredFullCacheScheduled"]
+        .map(key => [key, !!backgroundStats[key]])),
+      recoveryQuality: resolveRecoveryQuality(backgroundSummary), coarseUnderlay: String(backgroundStats.coarseUnderlay || ""),
+    });
     if (!hasPoliticalLandFeatures()) {
       return createPoliticalPassDrawResult(identity.sceneIdentity, {
         politicalDataStage: "not-ready",
@@ -266,13 +258,21 @@ export function createPoliticalPassOrchestratorOwner({
     });
   }
 
-  function drawPoliticalPass(k) {
-    const result = drawBasePoliticalPass(k);
+  function drawPartitions(k, result) {
     if (result && !hasInlinePoliticalPartitions()) effects.drawPoliticalPartitions?.(k);
     return result;
   }
+  function drawPoliticalPass(k) {
+    return drawPartitions(k, drawBasePoliticalPass(k));
+  }
+  // Direct producers allocate no pass target; native fallback enters it and re-resolves identity/viewport.
+  function drawPoliticalPassWithNativeTarget(k, withNativeTarget) {
+    let entered = false;
+    const result = drawBasePoliticalPass(k, draw => withNativeTarget(() => { entered = true; return drawPartitions(k, draw()); }));
+    return entered ? result : drawPartitions(k, result);
+  }
 
-  return Object.freeze({ drawPoliticalPass,
+  return Object.freeze({ drawPoliticalPass, drawPoliticalPassWithNativeTarget,
     noteNativePartialRepaint() { counters.nativePartialRepaints++; lastBackend = "vector-partial"; lastReason = "partial-feedback"; },
     getDiagnostics: () => ({ ...counters, lastBackend, lastReason }),
   });

@@ -71,11 +71,23 @@ export function createRenderPassCacheHostOwner({ effects = {}, getters = {} } = 
     transform,
     drawFn,
     onHostReady = null,
+    drawWithoutCanvas = null,
   } = {}) {
     if (typeof drawFn !== "function") {
       throw new TypeError("drawFn must be a function.");
     }
 
+    // Direct producers can finish without a pixel target. Native fallback invokes
+    // this continuation once, retaining the same target restoration semantics.
+    if (typeof drawWithoutCanvas === "function") {
+      let nativeSummary = null;
+      const drawResult = drawWithoutCanvas((nativeDraw) => {
+        nativeSummary = prepareRenderPassHost({ passName, transform, drawFn: nativeDraw, onHostReady });
+        return nativeSummary.drawResult;
+      });
+      return nativeSummary || createSummary({ passName, k: Number(transform?.k || 1),
+        drawInvoked: true, drawResult, trace: createTrace() });
+    }
     const trace = createTrace();
     const normalizedPassName = String(passName || "");
     const passCanvas = runEffect(trace, "ensureRenderPassCanvas", normalizedPassName);
