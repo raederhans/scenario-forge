@@ -77,10 +77,10 @@ class MapRendererUrbanCityPolicyBoundaryContractTest(unittest.TestCase):
         self.assertIn("function getUrbanFeatureIndex() {", policy_content)
         self.assertIn("function getCityUrbanRuntimeInfo(feature, urbanIndex = getUrbanFeatureIndex()) {", policy_content)
         self.assertIn("function buildCityRevealPlan(cityCollection, scale, transform, config = {}) {", policy_content)
-        self.assertIn("function getCityScenarioTag(feature) {", policy_content)
+        self.assertIn("function getCityScenarioTag(feature, sovereignty = state?.sovereigntyByFeatureId) {", policy_content)
         self.assertIn("function doesScenarioCountryHideCityPoints(tag) {", policy_content)
         self.assertIn("function applyScenarioCityOverride(feature, overrideEntry) {", policy_content)
-        self.assertIn("function applyStrategicVictoryPointRank(feature) {", policy_content)
+        self.assertIn("function applyStrategicVictoryPointRank(feature, source = state?.scenarioStrategicValuesData) {", policy_content)
         self.assertIn("function getEffectiveCityCollection() {", policy_content)
 
         self.assertIn("export function createCityPointsRenderOwner({", city_points_owner_content)

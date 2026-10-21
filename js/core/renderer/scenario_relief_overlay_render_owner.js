@@ -25,6 +25,7 @@ export function createScenarioReliefOverlayRenderOwner({
   const {
     getContext = () => null,
     getPathCanvas = () => null,
+    getProjectedGeographicPath = () => null,
   } = getters;
   const {
     cloneZoomTransform,
@@ -196,15 +197,21 @@ export function createScenarioReliefOverlayRenderOwner({
       }
       const bounds = getPathBounds(feature);
       if (!bounds) return;
+      const projectedPath = getProjectedGeographicPath(feature);
       const geometryType = String(feature?.geometry?.type || "").trim();
       if ((geometryType === "Polygon" || geometryType === "MultiPolygon") && style.fill) {
         context.beginPath();
-        pathCanvas(feature);
+        if (!projectedPath) pathCanvas(feature);
         context.save();
         context.globalAlpha = style.fillAlpha ?? 1;
         context.fillStyle = style.fill;
-        context.fill();
-        context.clip();
+        if (projectedPath) {
+          context.fill(projectedPath);
+          context.clip(projectedPath);
+        } else {
+          context.fill();
+          context.clip();
+        }
         if (kind === "salt_flat_texture") {
           drawPolygonLinePattern(bounds, {
             color: style.stroke,
@@ -239,7 +246,7 @@ export function createScenarioReliefOverlayRenderOwner({
         context.restore();
       }
       context.beginPath();
-      pathCanvas(feature);
+      if (!projectedPath) pathCanvas(feature);
       context.save();
       if (kind === "dam_approach") {
         context.setLineDash([3 / Math.max(0.0001, k), 2 / Math.max(0.0001, k)]);
@@ -248,7 +255,8 @@ export function createScenarioReliefOverlayRenderOwner({
       context.lineWidth = (style.lineWidth || 1) / Math.max(0.0001, k);
       context.lineJoin = "round";
       context.lineCap = "round";
-      context.stroke();
+      if (projectedPath) context.stroke(projectedPath);
+      else context.stroke();
       context.restore();
       renderedCount += 1;
     });

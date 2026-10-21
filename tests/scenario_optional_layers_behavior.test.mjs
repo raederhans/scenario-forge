@@ -5,6 +5,7 @@ import { state } from "../js/core/state.js";
 import {
   ensureActiveScenarioOptionalLayerLoaded,
   ensureActiveScenarioOptionalLayersForVisibility,
+  loadScenarioOptionalLayerPayload,
 } from "../js/core/scenario_resources.js";
 import { createScenarioBundleAssembler } from "../js/core/scenario/bundle_loader.js";
 import { createLayerFromPreset } from "../js/core/special_zone_layers.js";
@@ -686,4 +687,114 @@ test("outgoing strategic payload validation stays bound to its bundle baseline",
   assert.deepEqual(payload.diagnostics.errors, []);
   assert.equal(bundle.strategicValuesPayload, payload);
   assert.equal(state.scenarioStrategicValuesData, null);
+});
+
+function installOptionalCityScenario(t) {
+  const bundle = installOptionalWaterScenario(t);
+  preserveScenarioState(t, ["locales", "baseGeoLocales", "baseGeoAliasToStableKey", "geoAliasToStableKey",
+    "worldCitiesData", "ruCityOverrides", "scenarioCityOverridesData", "scenarioGeoLocalePatchData", "cityLayerRevision"]);
+  bundle.manifest.city_overrides_url = "cities.json";
+  state.baseGeoLocales = Object.fromEntries(Array.from({ length: 1024 }, (_, i) => [`base-${i}`, { en: `Base ${i}` }]));
+  state.baseGeoAliasToStableKey = { base: "base-0" };
+  state.locales = { ui: { test: "UI" }, geo: { old: { en: "Old" } } };
+  state.geoAliasToStableKey = { old: "old" };
+  state.worldCitiesData = null;
+  state.ruCityOverrides = null;
+  state.scenarioCityOverridesData = null;
+  state.scenarioGeoLocalePatchData = { geo: { PATCH: { en: "Patch" } } };
+  state.cityLayerRevision = 0;
+  return bundle;
+}
+
+function holdCityPreparation(t) {
+  const previousScheduler = globalThis.scheduler;
+  let entered;
+  const started = new Promise((resolve) => { entered = resolve; });
+  let released = false;
+  const waiting = [];
+  globalThis.scheduler = { yield: () => new Promise((resolve) => {
+    entered();
+    if (released) setImmediate(resolve);
+    else waiting.push(resolve);
+  }) };
+  t.after(() => { globalThis.scheduler = previousScheduler; });
+  return { started, release() {
+    released = true;
+    for (const resolve of waiting.splice(0)) setImmediate(resolve);
+  } };
+}
+
+function optionalCityPayload(name = "City") {
+  return { cities: { city: { city_id: "city", display_name: { en: name } } } };
+}
+
+test("optional cities await a real host yield and complete publication for loaded, promise-cache and settled-cache callers", async (t) => {
+  const bundle = installOptionalCityScenario(t);
+  const host = holdCityPreparation(t);
+  const json = t.mock.fn(async () => optionalCityPayload());
+  const options = { d3Client: { json }, applyToActiveScenario: true, scenarioApplyRequestId: 1 };
+  let resolved = false;
+  const first = loadScenarioOptionalLayerPayload(bundle, "cities", options).then((result) => { resolved = true; return result; });
+  await host.started;
+  const follower = loadScenarioOptionalLayerPayload(bundle, "cities", options);
+  assert.equal(resolved, false);
+  assert.equal(state.scenarioCityOverridesData, null);
+  assert.equal(state.locales.geo.old.en, "Old");
+  assert.equal(state.cityLayerRevision, 0);
+  host.release();
+  const [payload, followerPayload] = await Promise.all([first, follower]);
+  assert.equal(payload, followerPayload);
+  assert.equal(state.scenarioCityOverridesData, payload);
+  assert.equal(state.locales.geo["id::city"].en, "City");
+  assert.equal(state.locales.geo["base-1023"].en, "Base 1023");
+  assert.equal(state.locales.geo.PATCH.en, "Patch");
+  assert.equal(state.geoAliasToStableKey.base, "base-0");
+  const completeGeo = state.locales.geo;
+  assert.equal(await loadScenarioOptionalLayerPayload(bundle, "cities", options), payload);
+  assert.equal(state.locales.geo, completeGeo, "settled cache reuses the complete confirmed dictionaries");
+  assert.equal(json.mock.callCount(), 1);
+});
+
+for (const changedIdentity of ["scenario", "request", "epoch", "bundle", "payload", "request-current"]) {
+  test(`optional cities reject a ${changedIdentity} change during private preparation`, async (t) => {
+    const bundle = installOptionalCityScenario(t);
+    const host = holdCityPreparation(t);
+    state.renderTransactionDiagnostics = { scenarioApplyEpochByScenarioId: { optional_owner_test: 1 } };
+    let requestCurrent = true;
+    const pending = loadScenarioOptionalLayerPayload(bundle, "cities", {
+      d3Client: { json: async () => optionalCityPayload() }, applyToActiveScenario: true,
+      scenarioApplyRequestId: 1, scenarioApplyEpoch: 1,
+      isScenarioApplyRequestCurrent: () => requestCurrent,
+    });
+    await host.started;
+    if (changedIdentity === "scenario") state.activeScenarioId = "different-scenario";
+    if (changedIdentity === "request") state.currentScenarioApplyRequestId = 2;
+    if (changedIdentity === "epoch") state.renderTransactionDiagnostics.scenarioApplyEpochByScenarioId.optional_owner_test = 2;
+    if (changedIdentity === "bundle") state.scenarioBundleCacheById.optional_owner_test = { manifest: { ...bundle.manifest } };
+    if (changedIdentity === "payload") bundle.cityOverridesPayload = optionalCityPayload("Replacement");
+    if (changedIdentity === "request-current") requestCurrent = false;
+    host.release();
+    await pending;
+    assert.equal(state.scenarioCityOverridesData, null);
+    assert.equal(state.cityLayerRevision, 0);
+    assert.deepEqual(state.locales.geo, { old: { en: "Old" } });
+  });
+}
+
+test("forced optional city reload cancels the old preparation token and publishes the new city", async (t) => {
+  const bundle = installOptionalCityScenario(t);
+  const host = holdCityPreparation(t);
+  const options = { applyToActiveScenario: true, scenarioApplyRequestId: 1 };
+  const old = loadScenarioOptionalLayerPayload(bundle, "cities", { ...options, d3Client: { json: async () => optionalCityPayload("Old city") } });
+  await host.started;
+  const next = loadScenarioOptionalLayerPayload(bundle, "cities", {
+    ...options, forceReload: true, d3Client: { json: async () => optionalCityPayload("New city") },
+  });
+  host.release();
+  const [oldPayload, newPayload] = await Promise.all([old, next]);
+  assert.notEqual(oldPayload, newPayload);
+  assert.equal(state.scenarioCityOverridesData, newPayload);
+  assert.equal(state.locales.geo["id::city"].en, "New city");
+  assert.equal(state.cityLayerRevision, 1);
+  assert.equal(bundle.cityOverridesPayload, newPayload);
 });

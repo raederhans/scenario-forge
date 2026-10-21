@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createBorderCanvasPreparationOwner } from "../js/core/renderer/border_canvas_preparation_owner.js";
+import { runCanvasDrawBatches } from "../js/core/renderer/canvas_draw_batch.js";
 
 function deferred() {
   let resolve;
@@ -440,3 +441,155 @@ test("export, vector mode and interaction bypass new and existing source waits",
     }
   }
 });
+
+function rendererBorderCaptureFixture() {
+  const snapshotStart = rendererSource.indexOf("function readBorderCanvasSnapshot() {");
+  const snapshotEnd = rendererSource.indexOf("function getBorderCanvasPreparationOwner()", snapshotStart);
+  const preparationStart = rendererSource.indexOf("function prepareBorderCanvasPass() {");
+  const preparationEnd = rendererSource.indexOf("function physicalCanvasIdentity()", preparationStart);
+  assert.ok(snapshotStart >= 0 && snapshotEnd > snapshotStart && preparationEnd > preparationStart);
+  const source = rendererSource.slice(snapshotStart, snapshotEnd) + rendererSource.slice(preparationStart, preparationEnd);
+  const h = {
+    state: { activeScenarioId: "tno_1962", sceneGeneration: 1, currentScenarioApplyRequestId: 1,
+      renderTransactionDiagnostics: { scenarioApplyEpoch: 1 }, zoomTransform: { x: 0, y: 0, k: 1 }, isInteracting: false },
+    cache: { dirty: { borders: true }, canvases: {} }, canvases: [], resources: [], wakes: [], errors: [],
+    source: deferred(), sourceRevision: 1, meshPending: false, contourPending: false, contourInvalidated: false,
+    startSourceDuringCapture: null, contourWaits: 0, runs: 0, captures: 0,
+    nativeStrokes: 0, snapshots: 0, consumes: 0, disposals: 0, targetInstalled: false,
+  };
+  const contours = {
+    getRevision() {
+      // Source invalidation is discovered by the real snapshot's synchronous
+      // revision read, rather than by hasPendingWork alone.
+      if (h.contourInvalidated) { h.contourInvalidated = false; h.contourPending = true; }
+      return h.sourceRevision;
+    },
+    hasPendingWork: () => h.contourPending,
+    ensureReady() { h.contourWaits++; return h.source.promise; },
+  };
+  const dependencies = {
+    runtimeState: h.state, isTnoRasterSceneSelected: () => true,
+    getPaintContourRuntimeOwner: () => contours,
+    getStaticBorderMeshLifecycle: () => ({ getPrivatePreparationPromise: () => h.meshPending ? h.source.promise : null }),
+    cloneZoomTransform: value => ({ ...value }),
+    getBorderDrawOwner: () => ({ getHierarchicalBordersPreparationState: () => ({ ready: true, revision: h.sourceRevision }) }),
+    getRenderPassLayout: () => ({ pixelWidth: 20, pixelHeight: 10 }),
+    getProjectionGeometryGeneration: () => 1, rendererSurfaceHost: { getProjection: () => null },
+    getRenderPassSignature: () => `borders:${h.sourceRevision}`,
+    prepareScenarioBorderPaths: () => null,
+    getBorderCanvasPreparationOwner: () => h.owner,
+    requestRendererRender: (...args) => h.wakes.push(args),
+  };
+  h.api = new Function(...Object.keys(dependencies),
+    "let exportRenderInProgress = false, borderSourcePreparationPromise = null, borderCanvasPreparationOwner = null;\n"
+    + source + "\nreturn { readSnapshot: readBorderCanvasSnapshot, prepare: prepareBorderCanvasPass,"
+    + " pending: () => borderSourcePreparationPromise, installOwner(owner) { borderCanvasPreparationOwner = owner; } };"
+  )(...Object.values(dependencies));
+  h.owner = createBorderCanvasPreparationOwner({
+    readSnapshot: h.api.readSnapshot, readCache: () => h.cache,
+    createCanvas() {
+      const canvas = { width: 0, height: 0, getContext: () => context };
+      const context = { reset() {}, beginPath() {}, stroke() { h.nativeStrokes++; } };
+      h.canvases.push(canvas);
+      return canvas;
+    },
+    createGpuConsumer: () => ({
+      async consume(bitmap) {
+        h.consumes++; bitmap.close();
+        return Object.fromEntries([
+          "workerContextInitMs", "workerTextureSetupMs", "workerContextCreationCount", "workerContextReuseCount",
+          "workerUploadMs", "workerFenceMs", "workerFlushMs", "workerFenceWaitMs",
+          "workerErrorCheckMs", "workerCleanupMs", "workerTotalMs",
+        ].map(name => [name, 0]));
+      },
+      async dispose() { h.disposals++; },
+    }),
+    runCanvasDrawBatches: input => {
+      h.runs++;
+      return runCanvasDrawBatches({ ...input, now: () => 0,
+        yieldTask: async () => { assert.equal(h.targetInstalled, false); },
+        createBitmap: async canvas => {
+          h.snapshots++;
+          return { width: canvas.width, height: canvas.height, close() {} };
+        },
+      });
+    },
+    draw(context) {
+      h.targetInstalled = true;
+      try {
+        h.captures++; context.beginPath(); context.stroke({});
+        if (h.startSourceDuringCapture === "mesh") h.meshPending = true;
+        if (h.startSourceDuringCapture === "contour") h.contourInvalidated = true;
+        h.startSourceDuringCapture = null;
+      } finally { h.targetInstalled = false; }
+    },
+    getPaintWork: () => 1,
+    onResource: bytes => h.resources.push(bytes),
+    onError: error => h.errors.push(error),
+  });
+  h.api.installOwner(h.owner);
+  h.commitReady = () => {
+    const job = h.owner.takeReady();
+    assert.ok(job, "the complete candidate must be ready for atomic adoption");
+    h.cache.canvases.borders = job.canvas; h.cache.dirty.borders = false;
+    h.owner.noteCommitted(job);
+    return job;
+  };
+  return h;
+}
+
+for (const sourceKind of ["mesh", "contour", "none"]) {
+  test(`real border snapshot and runner handle ${sourceKind} work discovered during command capture`, async () => {
+    const h = rendererBorderCaptureFixture();
+    await h.api.prepare();
+    const published = h.commitReady();
+    h.nativeStrokes = h.snapshots = h.consumes = h.runs = h.captures = 0;
+    h.state.zoomTransform = { x: 0, y: 0, k: 2.5 };
+    h.cache.dirty.borders = true;
+    h.startSourceDuringCapture = sourceKind;
+    await h.api.prepare();
+    assert.equal(h.captures, 1);
+    assert.equal(h.cache.canvases.borders, published.canvas);
+    assert.deepEqual([published.canvas.width, published.canvas.height], [20, 10]);
+    if (sourceKind !== "none") {
+      assert.equal(h.nativeStrokes, 0, "capture invalidation must stop before the first native paint");
+      assert.equal(h.snapshots, 0); assert.equal(h.consumes, 0);
+      assert.equal(h.owner.takeReady(), null);
+      assert.equal(h.owner.getPendingBytes(), 0);
+      assert.deepEqual([h.canvases[1].width, h.canvases[1].height], [1, 1]);
+      const barrier = h.api.prepare();
+      assert.equal(h.api.pending(), barrier);
+      assert.equal(h.api.prepare(), barrier);
+      let released = false;
+      barrier.then(() => { released = true; });
+      await tick();
+      assert.equal(released, false, "the barrier must wait for the actual source promise");
+      assert.equal(h.canvases.length, 2, "waiting must not allocate another candidate");
+      assert.equal(h.disposals, 0, "source waiting must not clear the reusable GPU session");
+      h.meshPending = h.contourPending = false;
+      h.sourceRevision++;
+      h.source.resolve();
+      await barrier;
+      assert.equal(h.api.pending(), null);
+      assert.equal(h.contourWaits, sourceKind === "contour" ? 1 : 0);
+      assert.deepEqual(h.wakes, [["border-source-prepared", { flush: false }]]);
+      const current = h.api.prepare();
+      assert.equal(h.api.prepare(), current);
+      await current;
+      assert.equal(h.runs, 2, "source completion rebuilds the cancelled candidate once");
+    } else {
+      assert.equal(h.api.pending(), null);
+      assert.equal(h.runs, 1);
+      assert.equal(h.contourWaits, 0);
+      assert.deepEqual(h.wakes, []);
+    }
+    assert.equal(h.nativeStrokes, 1); assert.equal(h.snapshots, 1); assert.equal(h.consumes, 1);
+    assert.equal(h.disposals, 0); assert.deepEqual(h.errors, []);
+    const accepted = h.commitReady();
+    assert.notEqual(accepted.canvas, published.canvas);
+    assert.equal(h.api.prepare(), null, "a clean current canvas must not restart preparation");
+    assert.equal(h.runs, sourceKind === "none" ? 1 : 2);
+    assert.deepEqual([published.canvas.width, published.canvas.height], [20, 10]);
+    await h.owner.clear();
+  });
+}

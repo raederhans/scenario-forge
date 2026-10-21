@@ -1761,6 +1761,11 @@ function getCityPointsRenderOwner() {
     helpers: {
       buildCityRevealPlan: (...args) => buildCityRevealPlan(...args),
       prepareCityRevealPlan: (...args) => getUrbanCityPolicyOwner().prepareCityRevealPlan(...args),
+      getEffectiveCityCollectionSource: (...args) => getUrbanCityPolicyOwner().getEffectiveCityCollectionSource(...args),
+      isEffectiveCityCollectionSourceCurrent: (...args) => getUrbanCityPolicyOwner().isEffectiveCityCollectionSourceCurrent(...args),
+      getCachedEffectiveCityCollection: (...args) => getUrbanCityPolicyOwner().getCachedEffectiveCityCollection(...args),
+      prepareEffectiveCityCollection: (...args) => getUrbanCityPolicyOwner().prepareEffectiveCityCollection(...args),
+      installEffectiveCityCollection: (...args) => getUrbanCityPolicyOwner().installEffectiveCityCollection(...args),
       isPrivatePreparationEnabled: () => !exportRenderInProgress && isTnoRasterSceneSelected()
         && tnoRasterSceneOwner?.isActive(),
       getCityPaintOverscanPx: () => Math.max(48, getTnoScenePaintOverscanPx("labels")),
@@ -2178,6 +2183,7 @@ function getScenarioReliefOverlayRenderOwner() {
     getters: {
       getContext: () => rendererSurfaceHost.getContext(),
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+      getProjectedGeographicPath,
     },
     helpers: {
       cloneZoomTransform,
@@ -2628,6 +2634,11 @@ function getPhysicalCandidateBytes() {
 }
 function readBorderCanvasSnapshot() {
   if (exportRenderInProgress || !isTnoRasterSceneSelected() || runtimeState.isInteracting) return null;
+  const contours = getPaintContourRuntimeOwner();
+  contours.getRevision();
+  // Capturing border commands can start a missing detail mesh. Recheck source
+  // readiness before replay so the candidate never paints those older inputs.
+  if (getStaticBorderMeshLifecycle().getPrivatePreparationPromise() || contours.hasPendingWork()) return null;
   const reference = cloneZoomTransform(runtimeState.zoomTransform);
   const preparation = getBorderDrawOwner().getHierarchicalBordersPreparationState(reference.k);
   if (!preparation.ready) return null;
@@ -2731,6 +2742,14 @@ function getPhysicalViewportCacheOwner() {
 function preparePhysicalCanvasPass() {
   if (exportRenderInProgress) return null;
   return getPhysicalViewportCacheOwner().prepare();
+}
+function getPhysicalInputInvalidationPasses(passNames) {
+  // Input reconciliation can replace unrelated topology/overlay bindings.
+  // Reuse only a clean, owned native raster whose complete physical inputs,
+  // camera and backing still match. Explicit dirty invalidation stays authoritative.
+  return !exportRenderInProgress && isTnoRasterSceneSelected()
+    && physicalViewportCacheOwner?.getCurrentCommittedSnapshot()
+    ? passNames.filter(name => name !== "physicalBase") : passNames;
 }
 
 function prepareScenarioBorderPaths() {
@@ -3605,8 +3624,10 @@ function resolveContextBaseDeferredSnapshot() {
 }
 
 function resolveContextMarkersDeferredSnapshot() {
+  const cityCollection = !exportRenderInProgress && isTnoRasterSceneSelected() && tnoRasterSceneOwner?.isActive()
+    ? getUrbanCityPolicyOwner().getCachedEffectiveCityCollection() : getEffectiveCityCollection();
   return {
-    cityFeatureCount: getFeatureCollectionFeatureCount(getEffectiveCityCollection()),
+    cityFeatureCount: getFeatureCollectionFeatureCount(cityCollection),
     strategicResourceFeatureCount: getStrategicValuesResourceFeatureCount(
       runtimeState.scenarioStrategicValuesData,
     ),
@@ -4983,8 +5004,9 @@ function invalidateOceanBackgroundVisualState(reason = "ocean-background") {
 function invalidateOceanWaterInteractionVisualState(reason = "ocean-water-interaction") {
   resetScenarioWaterCacheAdaptiveState(reason);
   cancelExactAfterSettleRefresh({ clearDefer: true });
-  invalidateRenderPasses(["background", "physicalBase", "contextScenario"], reason);
-  clearRenderPassReferenceTransforms(["background", "physicalBase", "contextScenario"]);
+  const passes = getPhysicalInputInvalidationPasses(["background", "physicalBase", "contextScenario"]);
+  invalidateRenderPasses(passes, reason);
+  clearRenderPassReferenceTransforms(passes);
 }
 
 function invalidateOceanCoastalAccentVisualState(reason = "ocean-coastal-accent") {
@@ -7533,8 +7555,8 @@ function rebuildResolvedColors() {
   getCountryFillPaletteOwner().invalidate();
   notifyPaintContourColorsChanged();
   retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColorRevision);
-  if (colorsChanged) invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
-  else invalidateRenderPasses(["physicalBase", "contextBase"], "rebuild-colors");
+  invalidateRenderPasses(getPhysicalInputInvalidationPasses(colorsChanged
+    ? ["physicalBase", "political", "contextBase"] : ["physicalBase", "contextBase"]), "rebuild-colors");
   recordColorRebuildDiagnostics(runtimeState, {
     phase: "color-rebuild-complete", previousColorRevision, sourceFeatureCount: colorSourceFeatures.length, resolvedColorCount: Object.keys(nextColors).length, sourceName: getResolvedColorSourceName(),
   });
@@ -8216,7 +8238,7 @@ function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-la
       targetPasses.add("contextScenario");
     }
   });
-  const resolvedPasses = Array.from(targetPasses);
+  const resolvedPasses = getPhysicalInputInvalidationPasses(Array.from(targetPasses));
   invalidateRenderPasses(resolvedPasses, reason);
   clearRenderPassReferenceTransforms(resolvedPasses);
   if (renderNow) {

@@ -138,7 +138,7 @@ test("renderer full color rebuild refreshes its matching derived baseline", () =
     getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: () => false }),
     getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),
     retargetPendingPoliticalColorEditRevisionAfterColorRebuild() {},
-    invalidateRenderPasses() {}, recordColorRebuildDiagnostics() {}, recordRenderPerfMetric() {},
+    invalidateRenderPasses() {}, getPhysicalInputInvalidationPasses: passes => passes, recordColorRebuildDiagnostics() {}, recordRenderPerfMetric() {},
   }, ["notifyPaintContourColorsChanged"]);
   const rebuilt = rebuild();
   assert.equal(state.colors, rebuilt);
@@ -170,7 +170,7 @@ test("renderer empty or fallback color sources cannot certify a derived baseline
       getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: () => false }),
       getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),
       retargetPendingPoliticalColorEditRevisionAfterColorRebuild() {},
-      invalidateRenderPasses() {}, recordColorRebuildDiagnostics() {}, recordRenderPerfMetric() {},
+      invalidateRenderPasses() {}, getPhysicalInputInvalidationPasses: passes => passes, recordColorRebuildDiagnostics() {}, recordRenderPerfMetric() {},
     }, ["notifyPaintContourColorsChanged"]);
     rebuild();
     assert.equal(refreshes, 0, fallback ? "fallback land source" : "empty source");
@@ -196,7 +196,7 @@ test("identical color rebuilds retain the palette identity while real additions,
     getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: () => false }),
     getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),
     retargetPendingPoliticalColorEditRevisionAfterColorRebuild() {},
-    invalidateRenderPasses: passes => invalidations.push([...passes]),
+    invalidateRenderPasses: passes => invalidations.push([...passes]), getPhysicalInputInvalidationPasses: passes => passes,
     recordColorRebuildDiagnostics() {}, recordRenderPerfMetric() {},
   }, ["notifyPaintContourColorsChanged"]);
   assert.equal(rebuild(), originalColors, "normalization must not replace an identical resolved palette");

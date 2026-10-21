@@ -147,13 +147,15 @@ export function createPoliticalIdRasterRuntimeOwner({
   let snapshot = null, sourceVersion = null, paletteVersion = null, colorScope = null, namespace = null;
   let gpu = null, active = null, plan = null, disposed = false, failed = "";
   let gpuTiles = [];
+  let renderedCoverage = null;
   let epoch = 0, planKey = "", attempted = new Set();
   const stats = { builds: 0, cacheHits: 0, staleResults: 0, commits: 0, fallbacks: 0,
     geometryInvalidations: 0, contextLosses: 0, coldBuildMs: 0, lastCommitMs: 0,
     assetHits: 0, pathBuilds: 0, pathCacheHits: 0, pickInteriors: 0, pickFallbacks: 0,
     identityMs: 0, assetLookupMs: 0, assetTimeouts: 0, assetErrors: 0,
     assetProbes: 0, assetRecoveries: 0, assetBypasses: 0,
-    assetSavesDropped: 0, assetSaveTimeouts: 0, assetSaveErrors: 0 };
+    assetSavesDropped: 0, assetSaveTimeouts: 0, assetSaveErrors: 0,
+    renderedCoverageScans: 0, renderedCoverageCacheHits: 0 };
 
   function recordAssetFailure(error, operation, probe = false) {
     assetFailureKind = error.name === "TimeoutError" ? "timeout" : "error";
@@ -223,6 +225,19 @@ export function createPoliticalIdRasterRuntimeOwner({
     cancelGpuPreparation();
     stagedFrame = null; active?.controller.abort(); active = null;
     cancelAssetSave(); dropSaveCandidate(); assetPublishedViewKey = "";
+  }
+  function getRenderedIds() {
+    // Color edits and camera movement within the same tile rectangle do not
+    // change this conservative coverage. Keep one ID list, never source objects
+    // or tile buffers, and return a fresh Set for the pending-edit consumer.
+    const key = JSON.stringify([epoch, namespace, snapshot.geometryRevision, snapshot.mappingRevision,
+      plan.density, plan.originX, plan.originY, plan.width, plan.height]);
+    if (renderedCoverage?.key !== key || renderedCoverage.entries !== snapshot.entries) {
+      const ids = snapshot.entries.filter(entry => intersectsTile(entry.bounds, plan)).map(entry => entry.id);
+      renderedCoverage = { key, entries: snapshot.entries, ids };
+      stats.renderedCoverageScans++;
+    } else stats.renderedCoverageCacheHits++;
+    return new Set(renderedCoverage.ids);
   }
   function usable() { return !disposed && !failed && h.isEnabled() && worker.available(); }
   function cancelGpuPreparation() {
@@ -957,9 +972,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         } finally { context.restore(); }
       }
       const compositeDoneAt = performance.now();
-      const renderedIds = new Set(snapshot.entries.filter(entry => intersectsTile(entry.bounds, {
-        density: plan.density, originX: plan.originX, originY: plan.originY, width: plan.width, height: plan.height,
-      })).map(entry => entry.id));
+      const renderedIds = getRenderedIds();
       if (!directPresentation) stats.commits++;
       displayState = "accelerated"; reason = "coverage-ready";
       if (firstRasterReadyMs === null) firstRasterReadyMs = performance.now() - viewStartedAt;
@@ -1335,6 +1348,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       tileDependencies = new WeakMap();
       tileIdentities = new WeakMap();
       committedPlan = null;
+      renderedCoverage = null;
       snapshot = null;
       plan = null;
       resourceBudget?.release(resourceOwner);

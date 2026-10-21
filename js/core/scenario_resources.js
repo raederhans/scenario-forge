@@ -64,7 +64,7 @@ import {
   requestRender,
 } from "./render_boundary.js";
 import { buildScenarioReleasableIndex } from "./releasable_manager.js";
-import { syncScenarioLocalizationState } from "./scenario_localization_state.js";
+import { syncScenarioLocalizationState, syncScenarioLocalizationStateAsync } from "./scenario_localization_state.js";
 import {
   setScenarioAuditUiState,
   syncCountryUi,
@@ -762,15 +762,38 @@ export async function loadScenarioOptionalLayerPayload(
       else delete bundle.optionalLayerSettledByKey[layerKey];
     }
   };
-  const applyLoadedPayload = (payload, reason) => {
-    if (applyToActiveScenario && ownsSettlement()) {
-      applyScenarioOptionalLayerState(bundle, layerKey, payload, {
+  const applyLoadedPayload = async (payload, reason) => {
+    if (!applyToActiveScenario || !ownsSettlement()) return;
+    if (config.stateField !== "scenarioCityOverridesData") {
+      return applyScenarioOptionalLayerState(bundle, layerKey, payload, {
         scenarioApplyEpoch,
         scenarioApplyRequestId,
         isScenarioApplyRequestCurrent,
         reason,
       });
     }
+    const scenarioId = getScenarioBundleId(bundle);
+    const context = {
+      scenarioId,
+      scenarioApplyEpoch: Math.max(0, Number(scenarioApplyEpoch || bundle?.chunkLifecycle?.scenarioApplyEpoch || 0)),
+      scenarioApplyRequestId: Math.max(0, Number(scenarioApplyRequestId || bundle?.chunkLifecycle?.scenarioApplyRequestId || 0)),
+      isScenarioApplyRequestCurrent,
+      reason,
+      extra: { layerKey },
+    };
+    if (state.scenarioBundleCacheById?.[scenarioId] !== bundle
+      || !shouldContinueScenarioApplyContext(context, "optional-layer-state-apply")) return false;
+    const epoch = getCurrentScenarioApplyEpoch(scenarioId);
+    const requestId = getCurrentScenarioApplyRequestId();
+    const isCurrent = () => ownsSettlement()
+      && state.scenarioBundleCacheById?.[scenarioId] === bundle
+      && (bundle[config.bundleField] ?? null) === payload
+      && getCurrentScenarioApplyEpoch(scenarioId) === epoch
+      && getCurrentScenarioApplyRequestId() === requestId
+      && isScenarioApplyContextCurrent(context);
+    const applied = await syncScenarioLocalizationStateAsync({ cityOverridesPayload: payload }, { isCurrent });
+    if (applied) syncScenarioUi();
+    return applied;
   };
   // optional layer 允许从 3 个来源收敛到同一份 bundle/runtime state：
   // 1) 现成 promise，避免并发重复请求
@@ -786,7 +809,7 @@ export async function loadScenarioOptionalLayerPayload(
     : {};
   if (!forceReload && bundle.optionalLayerPromises[layerKey]) {
     const payload = await bundle.optionalLayerPromises[layerKey];
-    applyLoadedPayload(payload, "scenario-optional-layer-promise-cache");
+    await applyLoadedPayload(payload, "scenario-optional-layer-promise-cache");
     return payload;
   }
   if (forceReload) {
@@ -794,7 +817,7 @@ export async function loadScenarioOptionalLayerPayload(
   }
   if (!forceReload && bundle.optionalLayerSettledByKey[layerKey] === true) {
     const payload = bundle[config.bundleField] ?? null;
-    applyLoadedPayload(payload, "scenario-optional-layer-settled-cache");
+    await applyLoadedPayload(payload, "scenario-optional-layer-settled-cache");
     return payload;
   }
   requestToken = {};
@@ -864,7 +887,7 @@ export async function loadScenarioOptionalLayerPayload(
       loaded: !!payload,
       cacheHit: false,
     });
-    applyLoadedPayload(payload, "scenario-optional-layer-loaded");
+    await applyLoadedPayload(payload, "scenario-optional-layer-loaded");
     return payload;
   } finally {
     if (bundle.optionalLayerPromises[layerKey] === promise) {

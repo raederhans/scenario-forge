@@ -3129,7 +3129,7 @@ freezeStateTargetPureReaderEntry({
   "dependencyFingerprints": {
     "js/core/renderer/object_identity.js": "8b3b177452d5e824e7f8e99ed3f8dbbbf281c7004ad4e30890215c64a86f6bcf",
     "js/core/renderer/physical_atlas_lod_policy.js": "0f156bd94fd3bbd25212dfa121385a0114e7719840c6f83f87209b9a95fa5bed",
-    "js/core/renderer/urban_city_policy.js": "eca062d178be37d9ead564e805f907ea6e59b8334f15fa4ca6ec4a990f949e72",
+    "js/core/renderer/urban_city_policy.js": "12919c25de8e3681c5c9fccba8f744dfd5830abee59f26a88584eb300d85a43c",
     "js/core/thematic_wgi_view_model.js": "b90990ae93e185e0acb2aaa66fcb0386d6517292e0a5c6a52a488521efe3fe3a",
     "js/core/thematic_wgi_data.js": "f578bbdedb1d33621218f5a0a5ab3aa94581283a30e0ac4ac89b8bad73a2a2b1",
     "js/core/thematic_indicator_catalog.js": "fb5b549f69592af019b1ddae00f04183ba4c6df1a7add8d6b61f20798976d3ef",
@@ -5713,7 +5713,7 @@ const retiredCapabilityModules = [
   {
     modulePath: "js/core/map_renderer.js", bindingIdentity: RETIRED_CORE_STATE_BINDING_IDENTITY,
     previousSourceFingerprint: "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    currentSourceFingerprint: "64c05e9fdb496db3ed4347df091cd6a8cb9cb8535af78e482ef05fff4f736f6c",
+    currentSourceFingerprint: "b105caa21664bf508424d5fd24d27b29056362b76ba056158aedd671c7414cd0",
     memberships: [
       ["color", "P4.4", "assign", "countryBaseColors", 3, "622061d65a1cac3cc053ad5d57320b6625611fce0a169d9be6569ac9ade357c0"],
       ["color", "P4.4", "assign", "featureOverrides", 4, "2b49424706a23f675add6c116fff341ca7c167193a80b2bf06a89f298af07b87"],
@@ -6070,7 +6070,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "b17371bb30556b5e5736f3b52d0ccbf284e5e7d1975fd64ea11c0b70de5ee470",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "64c05e9fdb496db3ed4347df091cd6a8cb9cb8535af78e482ef05fff4f736f6c",
+    "currentSourceFingerprint": "b105caa21664bf508424d5fd24d27b29056362b76ba056158aedd671c7414cd0",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|delete|sovereignBaseColors",
@@ -6087,7 +6087,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "1f35c44f87b5bd5e23d3c733a3c560aa224244cf5c50aacff6ffa47943c660af",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "64c05e9fdb496db3ed4347df091cd6a8cb9cb8535af78e482ef05fff4f736f6c",
+    "currentSourceFingerprint": "b105caa21664bf508424d5fd24d27b29056362b76ba056158aedd671c7414cd0",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|delete|visualOverrides",
@@ -6104,7 +6104,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "9f3cd6152efd6c2659c2854a85b921c468824cbb5d621ab61832980b95de5cf1",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "64c05e9fdb496db3ed4347df091cd6a8cb9cb8535af78e482ef05fff4f736f6c",
+    "currentSourceFingerprint": "b105caa21664bf508424d5fd24d27b29056362b76ba056158aedd671c7414cd0",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|runtime-hooks|P4.5|assign|resolveSpecialZoneParentGroupTargetIdsFn",
@@ -6121,7 +6121,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "922f400af35f30ecdb8098901b0deacfeeac53a40393cf88b0bc04638291db99",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "64c05e9fdb496db3ed4347df091cd6a8cb9cb8535af78e482ef05fff4f736f6c",
+    "currentSourceFingerprint": "b105caa21664bf508424d5fd24d27b29056362b76ba056158aedd671c7414cd0",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|runtime-hooks|P4.5|assign|syncDayNightClockTimerFn",
@@ -7539,7 +7539,7 @@ freezeMutationDelegatingOwnerEntry({
     factoryModulePath: "js/bootstrap/startup_ready_handoff.js",
     factoryExportName: "createStartupReadyHandoffOwner",
     factorySourceFingerprint:
-      "ed5191eef11ff927c24bc93ebf084ad080d987e04089797266b4da31fd0e952b",
+      "463c3ff67ccc7d1faa124af53f83d2f473ef82154904544c8591740c0ff5056a",
     ownerBindingName: "startupReadyHandoffOwner",
     methods: [
       "beginUiHydration",
@@ -11430,6 +11430,51 @@ function createScenarioRuntimeActivationRetirementEntry([domain, migrationPhase,
 export const STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT =
   Object.freeze([
     ...P44_STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT,
+    // The localization commit helper retains both retired synchronous write receipts.
+    freezeCrossFileMigrationEntry({
+  "retiredCallerPath": "js/core/scenario_localization_state.js",
+  "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "domain": "scenario",
+  "migrationPhase": "P4.2",
+  "operation": "assign",
+  "key": "scenarioCityOverridesData",
+  "retiredMutationSites": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"syncScenarioLocalizationState\",\"ordinal\":0}]}",
+      "sourceFingerprint": "ba0c319ef86a99cc209a7d3da27aef82a638630ba8037b0d72c27019ceefd5a3",
+      "occurrenceIndex": 0
+    }
+  ],
+  "replacementCallerPath": "js/core/scenario_localization_state.js",
+  "replacementCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"commitScenarioLocalization\",\"ordinal\":0}]}",
+  "actionModulePath": "js/core/state/actions/scenario_presentation_actions.js",
+  "actionExportName": "applyScenarioChunkCityExternalEffectState",
+  "targetArgumentIndex": 0,
+  "replacementActionSourceFingerprint": "2d3eb2747db4965da75d0470091351b5b07cf75f6b2a78e6e720f7451c89a573"
+}),
+    freezeCrossFileMigrationEntry({
+  "retiredCallerPath": "js/core/scenario_localization_state.js",
+  "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "domain": "ui",
+  "migrationPhase": "P4.4",
+  "operation": "assign",
+  "key": "cityLayerRevision",
+  "retiredMutationSites": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"syncScenarioLocalizationState\",\"ordinal\":0}]}",
+      "sourceFingerprint": "d000f931d0bddac0c326f19299f576b15422a7aa46d68ea52584f07a1f116f6e",
+      "occurrenceIndex": 0
+    }
+  ],
+  "replacementCallerPath": "js/core/scenario_localization_state.js",
+  "replacementCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"commitScenarioLocalization\",\"ordinal\":0}]}",
+  "actionModulePath": "js/core/state/actions/scenario_presentation_actions.js",
+  "actionExportName": "applyScenarioChunkCityExternalEffectState",
+  "targetArgumentIndex": 0,
+  "replacementActionSourceFingerprint": "2d3eb2747db4965da75d0470091351b5b07cf75f6b2a78e6e720f7451c89a573"
+}),
     // Earlier UI callbacks shift this surviving, unchanged urban visibility action call.
     freezeCrossFileMigrationEntry({
   "retiredCallerPath": "js/ui/toolbar/appearance_controls_controller.js",
