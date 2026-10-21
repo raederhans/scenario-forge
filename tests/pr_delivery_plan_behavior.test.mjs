@@ -170,16 +170,16 @@ test("package prediction compares committed base/head separately from workspace 
   f.write("package.json", JSON.stringify({ ...isolated, dependencies: { example: "1" } }));
   const dirty = f.plan();
   assert.equal(dirty.ci.committed.perfMode, "skip");
-  assert.equal(dirty.ci.predicted.perfRequired, true);
-  assert.equal(f.plan({ changedFiles: ["package.json"] }).ci.predicted.perfRequired, true);
+  assert.notEqual(dirty.ci.predicted.perfMode, "skip");
+  assert.notEqual(f.plan({ changedFiles: ["package.json"] }).ci.predicted.perfMode, "skip");
   assert.equal(f.plan({ changedFiles: ["docs/preview.md"] }).ci.predicted.perfMode, "skip");
   f.write("package.json", "{invalid");
-  assert.equal(f.plan().ci.predicted.perfRequired, true);
+  assert.notEqual(f.plan().ci.predicted.perfMode, "skip");
   fs.unlinkSync(path.join(f.cwd, "package.json"));
-  assert.equal(f.plan().ci.predicted.perfRequired, true);
+  assert.notEqual(f.plan().ci.predicted.perfMode, "skip");
   const readFailure = f.plan({}, { runner: (bin, args, options) => args[0] === "show"
     ? { status: 1, stdout: "", stderr: "manifest unavailable" } : spawnSync(bin, args, options) });
-  assert.equal(readFailure.ci.committed.perfRequired, true);
+  assert.notEqual(readFailure.ci.committed.perfMode, "skip");
 });
 
 test("package policy uses specified base content rather than the diff merge base", (t) => {
@@ -199,8 +199,8 @@ test("package policy uses specified base content rather than the diff merge base
   const plan = f.plan();
   assert.equal(plan.git.mergeBaseSha, manifestBase);
   assert.notEqual(plan.git.baseSha, manifestBase);
-  assert.equal(plan.ci.committed.perfRequired, true);
-  assert.equal(plan.ci.predicted.perfRequired, true);
+  assert.notEqual(plan.ci.committed.perfMode, "skip");
+  assert.notEqual(plan.ci.predicted.perfMode, "skip");
   assert.equal(f.plan({ base: manifestBase }).ci.committed.perfMode, "skip");
 });
 

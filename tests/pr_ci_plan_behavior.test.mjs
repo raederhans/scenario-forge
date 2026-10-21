@@ -40,7 +40,7 @@ test("shared package policy exempts only isolated test and verification scripts"
 });
 
 test("PR planner accepts shared package exemption but defaults conservatively", () => {
-  assert.equal(planPullRequest({ changedFiles: ["package.json"] }).perfRequired, true);
+  assert.notEqual(planPullRequest({ changedFiles: ["package.json"] }).perfMode, "skip");
   const exempt = planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: false });
   assert.equal(exempt.perfMode, "skip");
   assert.equal(exempt.perfRequired, false);
@@ -64,7 +64,7 @@ test("PR planner accepts shared package exemption but defaults conservatively", 
   assert.equal(full.runSmoke, true);
   assert.equal(planPullRequest({ changedFiles: ["package.json"] }).pagesMode, "full");
   assert.equal(planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: false, labels: ["ci:perf-strict"] }).perfMode, "strict");
-  assert.equal(planPullRequest({ changedFiles: ["package.json", "package-lock.json"], packageRequiresPerf: false }).perfRequired, true);
+  assert.notEqual(planPullRequest({ changedFiles: ["package.json", "package-lock.json"], packageRequiresPerf: false }).perfMode, "skip");
 });
 
 test("planner CLI shares manifest exemption and missing or invalid files stay conservative", (t) => {
@@ -89,12 +89,12 @@ test("planner CLI shares manifest exemption and missing or invalid files stay co
   assert.equal(invoke(manifestArgs).perfMode, "skip");
   assert.equal(invoke(manifestArgs).pagesMode, "none");
   assert.equal(invoke(manifestArgs).runSmoke, true);
-  assert.equal(invoke().perfRequired, true);
+  assert.notEqual(invoke().perfMode, "skip");
   assert.equal(invoke().pagesMode, "full");
-  assert.equal(invoke(["--base-package-file", "missing.json", "--head-package-file", "head.json"]).perfRequired, true);
-  assert.equal(invoke(["--base-package-file", "base.json"]).perfRequired, true);
+  assert.notEqual(invoke(["--base-package-file", "missing.json", "--head-package-file", "head.json"]).perfMode, "skip");
+  assert.notEqual(invoke(["--base-package-file", "base.json"]).perfMode, "skip");
   fs.writeFileSync(path.join(cwd, "head.json"), "");
-  assert.equal(invoke(manifestArgs).perfRequired, true);
+  assert.notEqual(invoke(manifestArgs).perfMode, "skip");
   fs.writeFileSync(path.join(cwd, "changes.txt"), "apps/hgo/src/main.js\n");
   assert.equal(invoke(["--github-output", "outputs.txt"]).runHgo, true);
   const outputs = fs.readFileSync(path.join(cwd, "outputs.txt"), "utf8");
@@ -102,9 +102,9 @@ test("planner CLI shares manifest exemption and missing or invalid files stay co
   assert.match(outputs, /^run_fast=false$/m);
   fs.writeFileSync(path.join(cwd, "changes.txt"), "package.json\n");
   fs.writeFileSync(path.join(cwd, "head.json"), "{invalid");
-  assert.equal(invoke(manifestArgs).perfRequired, true);
+  assert.notEqual(invoke(manifestArgs).perfMode, "skip");
   fs.writeFileSync(path.join(cwd, "head.json"), JSON.stringify({ scripts: { "test:isolated": "node changed.mjs" }, dependencies: { example: "1" } }));
-  assert.equal(invoke(manifestArgs).perfRequired, true);
+  assert.notEqual(invoke(manifestArgs).perfMode, "skip");
 });
 
 test("docs-only changes keep heavyweight PR lanes off", () => {
@@ -195,12 +195,12 @@ test("renderer mirror contracts receive a freshly built Pages artifact", () => {
   }
 });
 
-test("runtime changes select smoke, source references and required sampled performance", () => {
+test("runtime changes select smoke, source references and non-blocking sampled performance", () => {
   const plan = planPullRequest({ changedFiles: ["js/core/renderer/navigation_frame_owner.js"] });
   assert.equal(plan.runSmoke, true);
   assert.equal(plan.runPages, false);
   assert.equal(plan.pagesMode, "source");
-  assert.equal(plan.perfRequired, true);
+  assert.equal(plan.perfRequired, false);
   assert.equal(plan.perfMode, "sample");
 });
 

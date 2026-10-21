@@ -22,13 +22,13 @@ test("mixed changes and full intent cannot inherit a UI exemption", () => {
   for (const file of ["js/core/map_renderer.js", "js/core/state/index.js", "js/ui/unregistered.js", "data/CATALOG.json", "package-lock.json", "unknown-input.bin"]) {
     const plan = planPullRequest({ changedFiles: ["css/editor-workspace.css", file] });
     assert.equal(plan.smokeMode, "full", file);
-    assert.equal(plan.perfRequired, true, file);
-    assert.equal(plan.perfDiagnostic, false, file);
+    assert.notEqual(plan.perfMode, "skip", file);
+    assert.equal(plan.perfDiagnostic, true, file);
   }
   const full = planPullRequest({ changedFiles: ["css/editor-workspace.css"], labels: ["ci:full"] });
   assert.equal(full.smokeMode, "full");
   assert.equal(full.pagesMode, "full");
-  assert.equal(full.perfRequired, true);
+  assert.notEqual(full.perfMode, "skip");
   assert.equal(full.perfMode, "strict");
 });
 

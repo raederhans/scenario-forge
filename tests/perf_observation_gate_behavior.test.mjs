@@ -44,8 +44,9 @@ test("bounded UI observation requires runtime and permits only known companions"
     for (const extra of ["js/core/map_renderer.js", "js/ui/unknown.js", "data/scenarios/tno_1962/x.json", "data/unknown.json", "tools/test.mjs", "AGENTS.md", "docs/testing/guide.md", "tests/unknown.test.mjs"]) {
       const mixed = classifyPerformance({ changedFiles: [file, ...companions, extra] });
       assert.equal(isBoundedUiChange([file, extra]), false, extra);
-      assert.equal(mixed.required_for_merge, true, extra);
-      assert.equal(mixed.diagnostic_only, false, extra);
+      assert.equal(mixed.should_run_perf, true, extra);
+      assert.equal(mixed.required_for_merge, false, extra);
+      assert.equal(mixed.diagnostic_only, true, extra);
     }
   }
 });
