@@ -117,6 +117,7 @@ const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "sovereigntyByFeatureId",
   "sovereigntyInitialized",
   "visualOverrides",
+  "riverPaint",
   "sovereignBaseColors",
   "activeSovereignCode",
   "selectedWaterRegionId",
@@ -397,6 +398,7 @@ function buildScenarioTransactionRollbackStatePatch(snapshot) {
         cloneScenarioStateValue(snapshot.sovereigntyByFeatureId),
       sovereigntyInitialized: !!snapshot.sovereigntyInitialized,
       visualOverrides: cloneScenarioStateValue(snapshot.visualOverrides),
+      riverPaint: cloneScenarioStateValue(snapshot.riverPaint),
       sovereignBaseColors:
         cloneScenarioStateValue(snapshot.sovereignBaseColors),
       topologyDetail: cloneScenarioStateValue(snapshot.topologyDetail),
