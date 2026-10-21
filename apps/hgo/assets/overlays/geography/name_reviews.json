@@ -1,0 +1,1057 @@
+{
+  "schemaVersion": 1,
+  "scope": "HGO-only corrections bound to exact physical label IDs and original bilingual source values. Empty proposedZh keeps the English source name. Original Natural Earth NAME takes precedence over demonstrably mismatched NAME_EN.",
+  "entries": [
+    {
+      "id": "ne-physical-1730072149",
+      "originalEn": "North-Estonian Coastal Plain",
+      "originalZh": "波罗的海平原",
+      "proposedEn": "Baltic Plains",
+      "proposedZh": "波罗的海平原",
+      "reason": "原始NAME是Baltic Plains，中文与之对应；NAME_EN错误缩到North-Estonian Coastal Plain。不要把靠谱中文反改为这个局部沿海平原。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730072149",
+        "coordinates": [
+          25.87906389696016,
+          57.481237972288994
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730072149",
+            "NAME": "Baltic Plains",
+            "NAME_EN": "North-Estonian Coastal Plain",
+            "NAME_ZH": "波罗的海平原",
+            "FEATURECLA": "Plain",
+            "WIKIDATAID": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103977",
+      "originalEn": "Enugu Nigeria",
+      "originalZh": "尼日爾河三角洲",
+      "proposedEn": "Niger Delta",
+      "proposedZh": "尼日尔河三角洲",
+      "reason": "NAME=Niger Delta、FEATURECLA=Delta，中文正确指尼日尔河三角洲；NAME_EN却串到城市Enugu Nigeria。保留地貌而非把三角洲译成埃努古城市。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103977",
+        "coordinates": [
+          6.35068588703783,
+          5.227148437500091
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103977",
+            "NAME": "Niger Delta",
+            "NAME_EN": "Enugu Nigeria",
+            "NAME_ZH": "尼日爾河三角洲",
+            "FEATURECLA": "Delta",
+            "WIKIDATAID": "Q29412"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103105",
+      "originalEn": "Cruach nam Miseag",
+      "originalZh": "格兰皮安山脉",
+      "proposedEn": "Grampian Mountains",
+      "proposedZh": "格兰皮安山脉",
+      "reason": "NAME=Grampian Mts.，中文指整个格兰皮安山脉；NAME_EN串到局部山峰Cruach nam Miseag。仅展开原始Mts.缩写。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103105",
+        "coordinates": [
+          -4.3175311628780335,
+          56.52927277225973
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103105",
+            "NAME": "Grampian Mts.",
+            "NAME_EN": "Cruach nam Miseag",
+            "NAME_ZH": "格兰皮安山脉",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q5189745"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730072941",
+      "originalEn": "Grande Sertão Veredas National Park",
+      "originalZh": "坎波斯塞尔腾高地",
+      "proposedEn": "Campos Sertão",
+      "proposedZh": "坎波斯塞尔腾高原",
+      "reason": "NAME=Campos Sertão、FEATURECLA=Plateau；NAME_EN串到Grande Sertão Veredas National Park国家公园。保留原中文专名词素，类别按原始Plateau，不把地貌替换为公园。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730072941",
+        "coordinates": [
+          -45.69458798363527,
+          -15.150567315630909
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730072941",
+            "NAME": "Campos Sertão",
+            "NAME_EN": "Grande Sertão Veredas National Park",
+            "NAME_ZH": "坎波斯塞尔腾高地",
+            "FEATURECLA": "Plateau",
+            "WIKIDATAID": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730071811",
+      "originalEn": "Serra da Capivara",
+      "originalZh": "皮奥伊山脉",
+      "proposedEn": "Serra do Piauí",
+      "proposedZh": "皮奥伊山脉",
+      "reason": "NAME=S. do Piaui，原中文对应该区域山脉；NAME_EN误缩到Serra da Capivara。保留原始Piaui词素并仅展开山脉缩写。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730071811",
+        "coordinates": [
+          -43.33815971145718,
+          -8.994561456255923
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730071811",
+            "NAME": "S. do Piaui",
+            "NAME_EN": "Serra da Capivara",
+            "NAME_ZH": "皮奥伊山脉",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103161",
+      "originalEn": "Serra do Espinho",
+      "originalZh": "埃斯皮尼亚索山脉",
+      "proposedEn": "Serra do Espinhaço",
+      "proposedZh": "埃斯皮尼亚索山脉",
+      "reason": "NAME明确为Serra do Espinhaço，中文也对应Espinhaço；NAME_EN=Serra do Espinho是另一拼写/词形，不应覆盖原始专名。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103161",
+        "coordinates": [
+          -48.610560121301205,
+          -16.402886651568416
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103161",
+            "NAME": "Serra do Espinhaço",
+            "NAME_EN": "Serra do Espinho",
+            "NAME_ZH": "埃斯皮尼亚索山脉",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q22024985"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730071945",
+      "originalEn": "Tagant Region",
+      "originalZh": "塔甘特省",
+      "proposedEn": "Tagant Plateau",
+      "proposedZh": "塔甘特高原",
+      "reason": "NAME=Tagant、FEATURECLA=Plateau，原始对象为高原；NAME_EN=Tagant Region与中文塔甘特省使用行政区域名。取已有塔甘特词素，纠正地貌/行政类别混用。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730071945",
+        "coordinates": [
+          -11.786185989019767,
+          17.710699774212827
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730071945",
+            "NAME": "Tagant",
+            "NAME_EN": "Tagant Region",
+            "NAME_ZH": "塔甘特省",
+            "FEATURECLA": "Plateau",
+            "WIKIDATAID": "Q843903"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730071991",
+      "originalEn": "Kolyma Mountains",
+      "originalZh": "鄂霍次克科利马高地",
+      "proposedEn": "Okhotsk-Kolyma Upland",
+      "proposedZh": "鄂霍次克科利马高地",
+      "reason": "原始NAME=Okhotsk-Kolyma Upland，原中文对应；NAME_EN=Kolyma Mountains删掉Okhotsk并把高地缩到山脉。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730071991",
+        "coordinates": [
+          149.88305171642298,
+          61.359015203900356
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730071991",
+            "NAME": "Okhotsk-Kolyma Upland",
+            "NAME_EN": "Kolyma Mountains",
+            "NAME_ZH": "鄂霍次克科利马高地",
+            "FEATURECLA": "Plateau",
+            "WIKIDATAID": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103251",
+      "originalEn": "Karoo",
+      "originalZh": "卡魯",
+      "proposedEn": "Northern Karoo",
+      "proposedZh": "北卡鲁",
+      "reason": "NAME=Northern Karroo，NAME_EN=Karoo及中文卡鲁均漏掉Northern。保留已有卡鲁词素并恢复明确的北部限定；Karroo/Karoo仅保留通行英文拼写差异。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103251",
+        "coordinates": [
+          21.63056629684819,
+          -30.1348202453184
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103251",
+            "NAME": "Northern Karroo",
+            "NAME_EN": "Karoo",
+            "NAME_ZH": "卡魯",
+            "FEATURECLA": "Plateau",
+            "WIKIDATAID": "Q916997"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103705",
+      "originalEn": "Laurentian Upland",
+      "originalZh": "苏必利尔高地",
+      "proposedEn": "Superior Upland",
+      "proposedZh": "苏必利尔高地",
+      "reason": "NAME=Superior Upland，原中文准确对应；NAME_EN改为更宽泛的Laurentian Upland。这里保留原制图主标签及其中文，不重新推断两者边界关系。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103705",
+        "coordinates": [
+          -89.51989241144989,
+          46.56076691288469
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103705",
+            "NAME": "Superior Upland",
+            "NAME_EN": "Laurentian Upland",
+            "NAME_ZH": "苏必利尔高地",
+            "FEATURECLA": "Plateau",
+            "WIKIDATAID": "Q15241934"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730072981",
+      "originalEn": "Stanovoy Range",
+      "originalZh": "斯坦诺沃伊高地",
+      "proposedEn": "Stanovoy Upland",
+      "proposedZh": "斯坦诺沃伊高地",
+      "reason": "NAME=STANOVOY UPLAND，中文是高地；NAME_EN=Stanovoy Range串成同词根山脉。保留原始高地对象，另一个Stanovoy Range条目不受影响。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730072981",
+        "coordinates": [
+          111.81458450217664,
+          56.870703436322245
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730072981",
+            "NAME": "STANOVOY UPLAND",
+            "NAME_EN": "Stanovoy Range",
+            "NAME_ZH": "斯坦诺沃伊高地",
+            "FEATURECLA": "Plateau",
+            "WIKIDATAID": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159104047",
+      "originalEn": "Guiana Highlands",
+      "originalZh": "圭亚那地盾",
+      "proposedEn": "Guiana Shield",
+      "proposedZh": "圭亚那地盾",
+      "reason": "NAME=GUIANA SHIELD，中文地盾对应NAME；不能因NAME_EN=Guiana Highlands而把这一地质对象改为高地。另一个Guiana Highlands ID分别处理。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159104047",
+        "coordinates": [
+          -58.308408822278196,
+          2.6850039734315914
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159104047",
+            "NAME": "GUIANA SHIELD",
+            "NAME_EN": "Guiana Highlands",
+            "NAME_ZH": "圭亚那地盾",
+            "FEATURECLA": "Plateau",
+            "WIKIDATAID": "Q208807"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103939",
+      "originalEn": "Appennino Ligure",
+      "originalZh": "利古雷亞平寧山脈",
+      "proposedEn": "Apennines",
+      "proposedZh": "亚平宁山脉",
+      "reason": "NAME=APPENNINI指原始亚平宁山脉主标签；NAME_EN及中文误缩成利古里亚段Appennino Ligure。恢复主山脉并只删除不在原始主名中的利古雷限定。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103939",
+        "coordinates": [
+          13.159174861493165,
+          42.5759036316347
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103939",
+            "NAME": "APPENNINI",
+            "NAME_EN": "Appennino Ligure",
+            "NAME_ZH": "利古雷亞平寧山脈",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q377264"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103887",
+      "originalEn": "Ahag",
+      "originalZh": "阿哈革山脉",
+      "proposedEn": "Ahaggar Mountains",
+      "proposedZh": "阿哈革山脉",
+      "reason": "NAME=AHAGGAR MTS.，原中文保留既有专名；NAME_EN=Ahag是损坏/截短的名字。依据原始NAME展开Mts.，不新拟中文音译。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103887",
+        "coordinates": [
+          5.368553017056133,
+          24.323096014447202
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103887",
+            "NAME": "AHAGGAR MTS.",
+            "NAME_EN": "Ahag",
+            "NAME_ZH": "阿哈革山脉",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q23836082"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103537",
+      "originalEn": "Columbia Kootenay Mountain",
+      "originalZh": "哥伦比亚山脉",
+      "proposedEn": "Columbia Mountains",
+      "proposedZh": "哥伦比亚山脉",
+      "reason": "NAME=COLUMBIA MTS.，中文对应整条山脉；NAME_EN=Columbia Kootenay Mountain变成含局部限定的单数Mountain。恢复原始范围标签。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103537",
+        "coordinates": [
+          -118.64377047271631,
+          51.70435211796283
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103537",
+            "NAME": "COLUMBIA MTS.",
+            "NAME_EN": "Columbia Kootenay Mountain",
+            "NAME_ZH": "哥伦比亚山脉",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q22529966"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103011",
+      "originalEn": "Mount Nyangani",
+      "originalZh": "伊尼揚加尼山",
+      "proposedEn": "Inyanga Mountains",
+      "proposedZh": "",
+      "reason": "NAME=Inyanga Mts.是山脉；NAME_EN=Mount Nyangani及原中文伊尼扬加尼山指单一山峰。可靠原始英文可保留，未在本次有限审查核实山脉的对应中文，不把峰名套到山脉。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103011",
+        "coordinates": [
+          32.919495988461115,
+          -18.737908624224666
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103011",
+            "NAME": "Inyanga Mts.",
+            "NAME_EN": "Mount Nyangani",
+            "NAME_ZH": "伊尼揚加尼山",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q152294"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103971",
+      "originalEn": "Cordillera Blanca",
+      "originalZh": "布蘭卡山脈",
+      "proposedEn": "Cordillera Central",
+      "proposedZh": "",
+      "reason": "原始同NE_ID记录的NAME均为CORD. CENTRAL，但NAME_EN及中文串到Cordillera Blanca/布兰卡山脉。恢复可核验的原始Central，不在本次强译其地区专名或混同白山脉。原始档同ID多记录需保留审计。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103971",
+        "coordinates": [
+          -79.03476775423442,
+          -3.23986174922468
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103971",
+            "NAME": "CORD. CENTRAL",
+            "NAME_EN": "Cordillera Blanca",
+            "NAME_ZH": "布蘭卡山脈",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q804330"
+          },
+          {
+            "NE_ID": "1159103971",
+            "NAME": "CORD. CENTRAL",
+            "NAME_EN": "Cordillera Blanca",
+            "NAME_ZH": "布蘭卡山脈",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q804330"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103649",
+      "originalEn": "Ordos Desert",
+      "originalZh": "鄂爾多斯沙漠",
+      "proposedEn": "Mu Us Desert",
+      "proposedZh": "",
+      "reason": "NAME=Mu Us Desert，而NAME_EN与中文变成更大范围的Ordos Desert/鄂尔多斯沙漠。优先恢复原始特定沙漠标签；本轮不凭范围包含关系将两名当完全等价，也不新拟中文专名。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103649",
+        "coordinates": [
+          108.0321534033132,
+          39.04447052616598
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103649",
+            "NAME": "Mu Us Desert",
+            "NAME_EN": "Ordos Desert",
+            "NAME_ZH": "鄂爾多斯沙漠",
+            "FEATURECLA": "Desert",
+            "WIKIDATAID": "Q1670841"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103531",
+      "originalEn": "Serra da Mantiquiera",
+      "originalZh": "曼蒂凯拉山脉",
+      "proposedEn": "Serra da Mantiqueira",
+      "proposedZh": "曼蒂凯拉山脉",
+      "reason": "原始NAME=Serra da Mantiqueira，NAME_EN把字母顺序写成Mantiquiera；中文可沿用。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103531",
+        "coordinates": [
+          -45.39683996884076,
+          -22.923049771096707
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103531",
+            "NAME": "Serra da Mantiqueira",
+            "NAME_EN": "Serra da Mantiquiera",
+            "NAME_ZH": "曼蒂凯拉山脉",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q22071997"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159104055",
+      "originalEn": "Nullabor Plain",
+      "originalZh": "纳拉伯平原",
+      "proposedEn": "Nullarbor Plain",
+      "proposedZh": "纳拉伯平原",
+      "reason": "原始NAME=NULLARBOR PLAIN，NAME_EN=Nullabor Plain漏掉r；中文无需因英文拼错另造译名。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159104055",
+        "coordinates": [
+          128.30930638302257,
+          -31.223321221880923
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159104055",
+            "NAME": "NULLARBOR PLAIN",
+            "NAME_EN": "Nullabor Plain",
+            "NAME_ZH": "纳拉伯平原",
+            "FEATURECLA": "Plain",
+            "WIKIDATAID": "Q381050"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103883",
+      "originalEn": "Crystal Mountain",
+      "originalZh": "水晶山脉",
+      "proposedEn": "Crystal Mountains",
+      "proposedZh": "水晶山脉",
+      "reason": "NAME=CRYSTAL MOUNTAINS、FEATURECLA=Range/mtn，中文为山脉；NAME_EN错误用单数Crystal Mountain。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103883",
+        "coordinates": [
+          13.448073261200218,
+          -3.8154232726621515
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103883",
+            "NAME": "CRYSTAL MOUNTAINS",
+            "NAME_EN": "Crystal Mountain",
+            "NAME_ZH": "水晶山脉",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q5191296"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730072703",
+      "originalEn": "Western Ghats",
+      "originalZh": "南高止山脉",
+      "proposedEn": "Southern Ghats",
+      "proposedZh": "南高止山脉",
+      "reason": "NAME=Southern Ghats，中文南高止山脉对应NAME；NAME_EN却为Western Ghats。不要反改中文为西高止，另一个真正Western Ghats条目已有单独ID。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730072703",
+        "coordinates": [
+          77.13049395986371,
+          9.54852936405657
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730072703",
+            "NAME": "Southern Ghats",
+            "NAME_EN": "Western Ghats",
+            "NAME_ZH": "南高止山脉",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730072595",
+      "originalEn": "Guiana Highlands",
+      "originalZh": "圭亚那地盾",
+      "proposedZh": "圭亚那高地",
+      "reason": "此ID的主NAME与NAME_EN均为Guiana Highlands，中文却为地盾。与另一个主NAME=Guiana Shield的ID明确区分；已有圭亚那词素不变，仅使地貌名与主对象对应。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730072595",
+        "coordinates": [
+          -63.08324663893151,
+          5.453467108197259
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730072595",
+            "NAME": "GUIANA HIGHLANDS",
+            "NAME_EN": "Guiana Highlands",
+            "NAME_ZH": "圭亚那地盾",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q208807"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730073373",
+      "originalEn": "Eastern Sayan Mountains",
+      "originalZh": "萨彦岭",
+      "proposedZh": "东萨彦岭",
+      "reason": "主NAME与英文均明确Eastern Sayan Mountains；原中文萨彦岭漏掉Eastern。另一Western Sayan已有西萨彦岭，可复用有据萨彦岭词素。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730073373",
+        "coordinates": [
+          97.14714387945907,
+          53.50830719608784
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730073373",
+            "NAME": "EASTERN SAYAN MTS.",
+            "NAME_EN": "Eastern Sayan Mountains",
+            "NAME_ZH": "萨彦岭",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159104635",
+      "originalEn": "North Island Volcanic Plateau",
+      "originalZh": "北爱尔兰火山高地",
+      "proposedZh": "北岛火山高原",
+      "reason": "NAME=N.I. Volcanic Plateau、英文North Island Volcanic Plateau，原生源位置在新西兰。Island不是Ireland，原中文北爱尔兰为明确错地；Plateau为高原。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159104635",
+        "coordinates": [
+          175.63637566862766,
+          -39.371125374626644
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159104635",
+            "NAME": "N.I. Volcanic Plateau",
+            "NAME_EN": "North Island Volcanic Plateau",
+            "NAME_ZH": "北爱尔兰火山高地",
+            "FEATURECLA": "Plateau",
+            "WIKIDATAID": "Q190309"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159104335",
+      "originalEn": "Gobi Desert",
+      "originalZh": "大漠",
+      "proposedZh": "戈壁沙漠",
+      "reason": "主名为Gobi Desert，原中文大漠只是泛称，丢失Gobi专名。使用通行中文地理名戈壁，不按字母创作新音译。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159104335",
+        "coordinates": [
+          106.05586645769634,
+          42.759863592572216
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159104335",
+            "NAME": "GOBI DESERT",
+            "NAME_EN": "Gobi Desert",
+            "NAME_ZH": "大漠",
+            "FEATURECLA": "Desert",
+            "WIKIDATAID": "Q42070"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159104211",
+      "originalEn": "Atlantic coastal plain",
+      "originalZh": "海濱平原",
+      "proposedZh": "大西洋沿岸平原",
+      "reason": "NAME_EN明确Atlantic coastal plain，原中文海滨平原只是泛地貌类别，漏掉Atlantic。恢复大西洋限定，不更动原始标签范围。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159104211",
+        "coordinates": [
+          -83.87761153445257,
+          31.69281647343159
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159104211",
+            "NAME": "COASTAL PLAIN",
+            "NAME_EN": "Atlantic coastal plain",
+            "NAME_ZH": "海濱平原",
+            "FEATURECLA": "Plain",
+            "WIKIDATAID": "Q756832"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159104223",
+      "originalEn": "Indo-Gangetic Plain",
+      "originalZh": "中央平原",
+      "proposedEn": "Ganges Plain",
+      "proposedZh": "恒河平原",
+      "reason": "NAME=GANGES PLAIN；NAME_EN扩大为Indo-Gangetic Plain，而原中文中央平原丢掉恒河专名。恢复原始主标签。恒河词素可由同表Ganges Delta/恒河三角洲直接核对。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159104223",
+        "coordinates": [
+          84.34065098594375,
+          26.021734930462827
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159104223",
+            "NAME": "GANGES PLAIN",
+            "NAME_EN": "Indo-Gangetic Plain",
+            "NAME_ZH": "中央平原",
+            "FEATURECLA": "Plain",
+            "WIKIDATAID": "Q192305"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730072617",
+      "originalEn": "New Guinea Highlands",
+      "originalZh": "巴布亞新幾內亞高地",
+      "proposedZh": "新几内亚高地",
+      "reason": "主NAME及英文均指New Guinea Highlands，原中文增加巴布亚，缩成巴布亚新几内亚国家范围。保留已有新几内亚词素，不将全岛地貌限制为现代国家。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730072617",
+        "coordinates": [
+          144.82551745900628,
+          -6.406121514849644
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730072617",
+            "NAME": "NEW GUINEA HIGHLANDS",
+            "NAME_EN": "New Guinea Highlands",
+            "NAME_ZH": "巴布亞新幾內亞高地",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q2961771"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730071943",
+      "originalEn": "Great Karoo",
+      "originalZh": "格雷特卡鲁高地",
+      "proposedZh": "大卡鲁",
+      "reason": "Great Karoo的Great是明确的大小限定，不应音译为格雷特。取同表已有卡鲁词素，译大卡鲁；不额外宣称行政范围。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730071943",
+        "coordinates": [
+          22.20837549078614,
+          -32.564557624894874
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730071943",
+            "NAME": "Great Karroo",
+            "NAME_EN": "Great Karoo",
+            "NAME_ZH": "格雷特卡鲁高地",
+            "FEATURECLA": "Plateau",
+            "WIKIDATAID": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730070773",
+      "originalEn": "White Sands",
+      "originalZh": "怀特沙漠",
+      "proposedZh": "白沙沙漠",
+      "reason": "White Sands中White是白色形容词，不是姓氏怀特；原主名与Desert类别支持白沙沙漠，避免将颜色专名误作人名音译。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730070773",
+        "coordinates": [
+          -106.30651158933328,
+          32.96073029179098
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730070773",
+            "NAME": "White Sands",
+            "NAME_EN": "White Sands",
+            "NAME_ZH": "怀特沙漠",
+            "FEATURECLA": "Desert",
+            "WIKIDATAID": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1730071967",
+      "originalEn": "Jabal Abyad Plateau",
+      "originalZh": "阿比让高原",
+      "proposedZh": "",
+      "reason": "原始NAME=Jabal al Abyad Plateau，NAME_EN=Jabal Abyad Plateau，中文阿比让则对应另一城市Abidjan，不能作为Abyad专名。未在本次核实可靠中文地貌名，保留原英文。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1730071967",
+        "coordinates": [
+          25.9587475130199,
+          18.45840470486887
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1730071967",
+            "NAME": "Jabal al Abyad Plateau",
+            "NAME_EN": "Jabal Abyad Plateau",
+            "NAME_ZH": "阿比让高原",
+            "FEATURECLA": "Plateau",
+            "WIKIDATAID": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103591",
+      "originalEn": "Borohoro Mountains",
+      "originalZh": "",
+      "proposedZh": "",
+      "reason": "Borohoro Mountains原中文为空；本次不为填满覆盖率新增无中文依据的音译，继续英文fallback。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103591",
+        "coordinates": [
+          83.67678069270667,
+          44.00021836353166
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103591",
+            "NAME": "Borohoro Mts.",
+            "NAME_EN": "Borohoro Mountains",
+            "NAME_ZH": "",
+            "FEATURECLA": "Range/mtn",
+            "WIKIDATAID": "Q9177711"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ne-physical-1159103225",
+      "originalEn": "Atherton Tableland",
+      "originalZh": "",
+      "proposedZh": "",
+      "reason": "Atherton Tableland原中文为空；本次不为填满覆盖率新增无中文依据的专名音译，继续英文fallback。",
+      "source": {
+        "path": "data/physical_region_labels.geojson",
+        "key": "ne-physical-1159103225",
+        "coordinates": [
+          145.22663017539557,
+          -17.508154296874977
+        ],
+        "archive": {
+          "path": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_geography_regions_polys.zip",
+          "member": "ne_10m_geography_regions_polys.dbf",
+          "sha256": "cb7b9db200284ed1551f20eacc7f3333e9b5f311c19f7cb2670694529f688682"
+        },
+        "records": [
+          {
+            "NE_ID": "1159103225",
+            "NAME": "Atherton Tableland",
+            "NAME_EN": "Atherton Tableland",
+            "NAME_ZH": "",
+            "FEATURECLA": "Plateau",
+            "WIKIDATAID": "Q755509"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,3593 @@
+{
+  "schemaVersion": 1,
+  "policy": "Author translations are explicitly translation, not external verification. Repository bilingual records retain their exact source identity. No placeholder becomes a real place name.",
+  "baseline": {
+    "stats": {
+      "entities": {
+        "displayFallbacks": 0,
+        "total": 570,
+        "translated": 554,
+        "untranslated": 16
+      },
+      "places": {
+        "displayFallbacks": 0,
+        "total": 884,
+        "translated": 551,
+        "untranslated": 333
+      },
+      "states": {
+        "displayFallbacks": 271,
+        "total": 11894,
+        "translated": 2947,
+        "untranslated": 8947
+      }
+    },
+    "indexSha256": "b95d87de940f0f31fbd4c664d4e1ce2391e1587ebba2293f5793fe6716baab88"
+  },
+  "countryReference": {
+    "path": "data/ne_50m_admin_0_countries.zip",
+    "member": "ne_50m_admin_0_countries.dbf",
+    "sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
+    "fields": [
+      "ISO_A2",
+      "NAME",
+      "NAME_EN",
+      "NAME_LONG",
+      "ADMIN",
+      "GEOUNIT",
+      "SUBUNIT",
+      "NAME_ZH"
+    ],
+    "entries": [
+      {
+        "code": "ZW",
+        "zh": "津巴布韦",
+        "names": [
+          "Zimbabwe"
+        ]
+      },
+      {
+        "code": "ZM",
+        "zh": "赞比亚",
+        "names": [
+          "Zambia"
+        ]
+      },
+      {
+        "code": "YE",
+        "zh": "也门",
+        "names": [
+          "Yemen"
+        ]
+      },
+      {
+        "code": "VN",
+        "zh": "越南",
+        "names": [
+          "Vietnam"
+        ]
+      },
+      {
+        "code": "VE",
+        "zh": "委内瑞拉",
+        "names": [
+          "Venezuela"
+        ]
+      },
+      {
+        "code": "VA",
+        "zh": "梵蒂冈",
+        "names": [
+          "Vatican",
+          "Vatican City"
+        ]
+      },
+      {
+        "code": "VU",
+        "zh": "瓦努阿图",
+        "names": [
+          "Vanuatu"
+        ]
+      },
+      {
+        "code": "UZ",
+        "zh": "乌兹别克斯坦",
+        "names": [
+          "Uzbekistan"
+        ]
+      },
+      {
+        "code": "UY",
+        "zh": "乌拉圭",
+        "names": [
+          "Uruguay"
+        ]
+      },
+      {
+        "code": "FM",
+        "zh": "密克罗尼西亚联邦",
+        "names": [
+          "Micronesia",
+          "Federated States of Micronesia"
+        ]
+      },
+      {
+        "code": "MH",
+        "zh": "马绍尔群岛",
+        "names": [
+          "Marshall Is.",
+          "Marshall Islands"
+        ]
+      },
+      {
+        "code": "MP",
+        "zh": "北马里亚纳群岛",
+        "names": [
+          "N. Mariana Is.",
+          "Northern Mariana Islands"
+        ]
+      },
+      {
+        "code": "VI",
+        "zh": "美属维尔京群岛",
+        "names": [
+          "U.S. Virgin Is.",
+          "United States Virgin Islands"
+        ]
+      },
+      {
+        "code": "GU",
+        "zh": "关岛",
+        "names": [
+          "Guam"
+        ]
+      },
+      {
+        "code": "AS",
+        "zh": "美属萨摩亚",
+        "names": [
+          "American Samoa"
+        ]
+      },
+      {
+        "code": "PR",
+        "zh": "波多黎各",
+        "names": [
+          "Puerto Rico"
+        ]
+      },
+      {
+        "code": "US",
+        "zh": "美国",
+        "names": [
+          "United States of America",
+          "United States"
+        ]
+      },
+      {
+        "code": "GS",
+        "zh": "南乔治亚和南桑威奇群岛",
+        "names": [
+          "S. Geo. and the Is.",
+          "South Georgia and the Islands",
+          "South Georgia and the South Sandwich Islands"
+        ]
+      },
+      {
+        "code": "IO",
+        "zh": "英属印度洋领地",
+        "names": [
+          "Br. Indian Ocean Ter.",
+          "British Indian Ocean Territory"
+        ]
+      },
+      {
+        "code": "SH",
+        "zh": "圣赫勒拿",
+        "names": [
+          "Saint Helena"
+        ]
+      },
+      {
+        "code": "PN",
+        "zh": "皮特凯恩群岛",
+        "names": [
+          "Pitcairn Is.",
+          "Pitcairn Islands"
+        ]
+      },
+      {
+        "code": "AI",
+        "zh": "安圭拉",
+        "names": [
+          "Anguilla"
+        ]
+      },
+      {
+        "code": "FK",
+        "zh": "福克兰群岛",
+        "names": [
+          "Falkland Is.",
+          "Falkland Islands / Malvinas",
+          "Falkland Islands"
+        ]
+      },
+      {
+        "code": "KY",
+        "zh": "开曼群岛",
+        "names": [
+          "Cayman Is.",
+          "Cayman Islands"
+        ]
+      },
+      {
+        "code": "BM",
+        "zh": "百慕大",
+        "names": [
+          "Bermuda"
+        ]
+      },
+      {
+        "code": "VG",
+        "zh": "英属维尔京群岛",
+        "names": [
+          "British Virgin Is.",
+          "British Virgin Islands"
+        ]
+      },
+      {
+        "code": "TC",
+        "zh": "特克斯和凯科斯群岛",
+        "names": [
+          "Turks and Caicos Is.",
+          "Turks and Caicos Islands"
+        ]
+      },
+      {
+        "code": "MS",
+        "zh": "蒙特塞拉特",
+        "names": [
+          "Montserrat"
+        ]
+      },
+      {
+        "code": "JE",
+        "zh": "泽西",
+        "names": [
+          "Jersey"
+        ]
+      },
+      {
+        "code": "GG",
+        "zh": "根西",
+        "names": [
+          "Guernsey"
+        ]
+      },
+      {
+        "code": "IM",
+        "zh": "马恩岛",
+        "names": [
+          "Isle of Man"
+        ]
+      },
+      {
+        "code": "GB",
+        "zh": "英国",
+        "names": [
+          "United Kingdom"
+        ]
+      },
+      {
+        "code": "AE",
+        "zh": "阿拉伯联合酋长国",
+        "names": [
+          "United Arab Emirates"
+        ]
+      },
+      {
+        "code": "UA",
+        "zh": "乌克兰",
+        "names": [
+          "Ukraine"
+        ]
+      },
+      {
+        "code": "UG",
+        "zh": "乌干达",
+        "names": [
+          "Uganda"
+        ]
+      },
+      {
+        "code": "TM",
+        "zh": "土库曼斯坦",
+        "names": [
+          "Turkmenistan"
+        ]
+      },
+      {
+        "code": "TR",
+        "zh": "土耳其",
+        "names": [
+          "Turkey"
+        ]
+      },
+      {
+        "code": "TN",
+        "zh": "突尼斯",
+        "names": [
+          "Tunisia"
+        ]
+      },
+      {
+        "code": "TT",
+        "zh": "特立尼达和多巴哥",
+        "names": [
+          "Trinidad and Tobago"
+        ]
+      },
+      {
+        "code": "TO",
+        "zh": "汤加",
+        "names": [
+          "Tonga"
+        ]
+      },
+      {
+        "code": "TG",
+        "zh": "多哥",
+        "names": [
+          "Togo"
+        ]
+      },
+      {
+        "code": "TL",
+        "zh": "东帝汶",
+        "names": [
+          "Timor-Leste",
+          "East Timor"
+        ]
+      },
+      {
+        "code": "TH",
+        "zh": "泰国",
+        "names": [
+          "Thailand"
+        ]
+      },
+      {
+        "code": "TZ",
+        "zh": "坦桑尼亚",
+        "names": [
+          "Tanzania",
+          "United Republic of Tanzania"
+        ]
+      },
+      {
+        "code": "TJ",
+        "zh": "塔吉克斯坦",
+        "names": [
+          "Tajikistan"
+        ]
+      },
+      {
+        "code": "SY",
+        "zh": "叙利亚",
+        "names": [
+          "Syria"
+        ]
+      },
+      {
+        "code": "CH",
+        "zh": "瑞士",
+        "names": [
+          "Switzerland"
+        ]
+      },
+      {
+        "code": "SE",
+        "zh": "瑞典",
+        "names": [
+          "Sweden"
+        ]
+      },
+      {
+        "code": "SZ",
+        "zh": "斯威士兰",
+        "names": [
+          "eSwatini",
+          "Kingdom of eSwatini",
+          "Eswatini"
+        ]
+      },
+      {
+        "code": "SR",
+        "zh": "苏里南",
+        "names": [
+          "Suriname"
+        ]
+      },
+      {
+        "code": "SS",
+        "zh": "南苏丹",
+        "names": [
+          "S. Sudan",
+          "South Sudan"
+        ]
+      },
+      {
+        "code": "SD",
+        "zh": "苏丹",
+        "names": [
+          "Sudan"
+        ]
+      },
+      {
+        "code": "LK",
+        "zh": "斯里兰卡",
+        "names": [
+          "Sri Lanka"
+        ]
+      },
+      {
+        "code": "ES",
+        "zh": "西班牙",
+        "names": [
+          "Spain"
+        ]
+      },
+      {
+        "code": "KR",
+        "zh": "大韩民国",
+        "names": [
+          "South Korea",
+          "Republic of Korea"
+        ]
+      },
+      {
+        "code": "ZA",
+        "zh": "南非",
+        "names": [
+          "South Africa"
+        ]
+      },
+      {
+        "code": "SO",
+        "zh": "索马里",
+        "names": [
+          "Somalia"
+        ]
+      },
+      {
+        "code": "SB",
+        "zh": "所罗门群岛",
+        "names": [
+          "Solomon Is.",
+          "Solomon Islands"
+        ]
+      },
+      {
+        "code": "SK",
+        "zh": "斯洛伐克",
+        "names": [
+          "Slovakia"
+        ]
+      },
+      {
+        "code": "SI",
+        "zh": "斯洛文尼亚",
+        "names": [
+          "Slovenia"
+        ]
+      },
+      {
+        "code": "SG",
+        "zh": "新加坡",
+        "names": [
+          "Singapore"
+        ]
+      },
+      {
+        "code": "SL",
+        "zh": "塞拉利昂",
+        "names": [
+          "Sierra Leone"
+        ]
+      },
+      {
+        "code": "SC",
+        "zh": "塞舌尔",
+        "names": [
+          "Seychelles"
+        ]
+      },
+      {
+        "code": "RS",
+        "zh": "塞尔维亚",
+        "names": [
+          "Serbia",
+          "Republic of Serbia"
+        ]
+      },
+      {
+        "code": "SN",
+        "zh": "塞内加尔",
+        "names": [
+          "Senegal"
+        ]
+      },
+      {
+        "code": "SA",
+        "zh": "沙特阿拉伯",
+        "names": [
+          "Saudi Arabia"
+        ]
+      },
+      {
+        "code": "ST",
+        "zh": "圣多美和普林西比",
+        "names": [
+          "São Tomé and Principe",
+          "São Tomé and Príncipe"
+        ]
+      },
+      {
+        "code": "SM",
+        "zh": "圣马力诺",
+        "names": [
+          "San Marino"
+        ]
+      },
+      {
+        "code": "WS",
+        "zh": "萨摩亚",
+        "names": [
+          "Samoa"
+        ]
+      },
+      {
+        "code": "VC",
+        "zh": "圣文森特和格林纳丁斯",
+        "names": [
+          "St. Vin. and Gren.",
+          "Saint Vincent and the Grenadines"
+        ]
+      },
+      {
+        "code": "LC",
+        "zh": "圣卢西亚",
+        "names": [
+          "Saint Lucia"
+        ]
+      },
+      {
+        "code": "KN",
+        "zh": "圣基茨和尼维斯",
+        "names": [
+          "St. Kitts and Nevis",
+          "Saint Kitts and Nevis"
+        ]
+      },
+      {
+        "code": "RW",
+        "zh": "卢旺达",
+        "names": [
+          "Rwanda"
+        ]
+      },
+      {
+        "code": "RU",
+        "zh": "俄罗斯",
+        "names": [
+          "Russia",
+          "Russian Federation"
+        ]
+      },
+      {
+        "code": "RO",
+        "zh": "罗马尼亚",
+        "names": [
+          "Romania"
+        ]
+      },
+      {
+        "code": "QA",
+        "zh": "卡塔尔",
+        "names": [
+          "Qatar"
+        ]
+      },
+      {
+        "code": "PT",
+        "zh": "葡萄牙",
+        "names": [
+          "Portugal"
+        ]
+      },
+      {
+        "code": "PL",
+        "zh": "波兰",
+        "names": [
+          "Poland"
+        ]
+      },
+      {
+        "code": "PH",
+        "zh": "菲律宾",
+        "names": [
+          "Philippines"
+        ]
+      },
+      {
+        "code": "PE",
+        "zh": "秘鲁",
+        "names": [
+          "Peru"
+        ]
+      },
+      {
+        "code": "PY",
+        "zh": "巴拉圭",
+        "names": [
+          "Paraguay"
+        ]
+      },
+      {
+        "code": "PG",
+        "zh": "巴布亚新几内亚",
+        "names": [
+          "Papua New Guinea"
+        ]
+      },
+      {
+        "code": "PA",
+        "zh": "巴拿马",
+        "names": [
+          "Panama"
+        ]
+      },
+      {
+        "code": "PW",
+        "zh": "帕劳",
+        "names": [
+          "Palau"
+        ]
+      },
+      {
+        "code": "PK",
+        "zh": "巴基斯坦",
+        "names": [
+          "Pakistan"
+        ]
+      },
+      {
+        "code": "OM",
+        "zh": "阿曼",
+        "names": [
+          "Oman"
+        ]
+      },
+      {
+        "code": "KP",
+        "zh": "朝鲜民主主义人民共和国",
+        "names": [
+          "North Korea",
+          "Dem. Rep. Korea"
+        ]
+      },
+      {
+        "code": "NG",
+        "zh": "尼日利亚",
+        "names": [
+          "Nigeria"
+        ]
+      },
+      {
+        "code": "NE",
+        "zh": "尼日尔",
+        "names": [
+          "Niger"
+        ]
+      },
+      {
+        "code": "NI",
+        "zh": "尼加拉瓜",
+        "names": [
+          "Nicaragua"
+        ]
+      },
+      {
+        "code": "NZ",
+        "zh": "新西兰",
+        "names": [
+          "New Zealand"
+        ]
+      },
+      {
+        "code": "NU",
+        "zh": "纽埃",
+        "names": [
+          "Niue"
+        ]
+      },
+      {
+        "code": "CK",
+        "zh": "库克群岛",
+        "names": [
+          "Cook Is.",
+          "Cook Islands"
+        ]
+      },
+      {
+        "code": "NL",
+        "zh": "荷兰",
+        "names": [
+          "Netherlands"
+        ]
+      },
+      {
+        "code": "AW",
+        "zh": "阿鲁巴",
+        "names": [
+          "Aruba"
+        ]
+      },
+      {
+        "code": "CW",
+        "zh": "库拉索",
+        "names": [
+          "Curaçao"
+        ]
+      },
+      {
+        "code": "NP",
+        "zh": "尼泊尔",
+        "names": [
+          "Nepal"
+        ]
+      },
+      {
+        "code": "NR",
+        "zh": "瑙鲁",
+        "names": [
+          "Nauru"
+        ]
+      },
+      {
+        "code": "NA",
+        "zh": "纳米比亚",
+        "names": [
+          "Namibia"
+        ]
+      },
+      {
+        "code": "MZ",
+        "zh": "莫桑比克",
+        "names": [
+          "Mozambique"
+        ]
+      },
+      {
+        "code": "MA",
+        "zh": "摩洛哥",
+        "names": [
+          "Morocco"
+        ]
+      },
+      {
+        "code": "EH",
+        "zh": "西撒哈拉",
+        "names": [
+          "W. Sahara",
+          "Western Sahara"
+        ]
+      },
+      {
+        "code": "ME",
+        "zh": "黑山",
+        "names": [
+          "Montenegro"
+        ]
+      },
+      {
+        "code": "MN",
+        "zh": "蒙古国",
+        "names": [
+          "Mongolia"
+        ]
+      },
+      {
+        "code": "MD",
+        "zh": "摩尔多瓦",
+        "names": [
+          "Moldova"
+        ]
+      },
+      {
+        "code": "MC",
+        "zh": "摩纳哥",
+        "names": [
+          "Monaco"
+        ]
+      },
+      {
+        "code": "MX",
+        "zh": "墨西哥",
+        "names": [
+          "Mexico"
+        ]
+      },
+      {
+        "code": "MU",
+        "zh": "毛里求斯",
+        "names": [
+          "Mauritius"
+        ]
+      },
+      {
+        "code": "MR",
+        "zh": "毛里塔尼亚",
+        "names": [
+          "Mauritania"
+        ]
+      },
+      {
+        "code": "MT",
+        "zh": "马耳他",
+        "names": [
+          "Malta"
+        ]
+      },
+      {
+        "code": "ML",
+        "zh": "马里",
+        "names": [
+          "Mali"
+        ]
+      },
+      {
+        "code": "MV",
+        "zh": "马尔代夫",
+        "names": [
+          "Maldives"
+        ]
+      },
+      {
+        "code": "MY",
+        "zh": "马来西亚",
+        "names": [
+          "Malaysia"
+        ]
+      },
+      {
+        "code": "MW",
+        "zh": "马拉维",
+        "names": [
+          "Malawi"
+        ]
+      },
+      {
+        "code": "MG",
+        "zh": "马达加斯加",
+        "names": [
+          "Madagascar"
+        ]
+      },
+      {
+        "code": "MK",
+        "zh": "北马其顿",
+        "names": [
+          "North Macedonia"
+        ]
+      },
+      {
+        "code": "LU",
+        "zh": "卢森堡",
+        "names": [
+          "Luxembourg"
+        ]
+      },
+      {
+        "code": "LT",
+        "zh": "立陶宛",
+        "names": [
+          "Lithuania"
+        ]
+      },
+      {
+        "code": "LI",
+        "zh": "列支敦士登",
+        "names": [
+          "Liechtenstein"
+        ]
+      },
+      {
+        "code": "LY",
+        "zh": "利比亚",
+        "names": [
+          "Libya"
+        ]
+      },
+      {
+        "code": "LR",
+        "zh": "利比里亚",
+        "names": [
+          "Liberia"
+        ]
+      },
+      {
+        "code": "LS",
+        "zh": "莱索托",
+        "names": [
+          "Lesotho"
+        ]
+      },
+      {
+        "code": "LB",
+        "zh": "黎巴嫩",
+        "names": [
+          "Lebanon"
+        ]
+      },
+      {
+        "code": "LV",
+        "zh": "拉脱维亚",
+        "names": [
+          "Latvia"
+        ]
+      },
+      {
+        "code": "LA",
+        "zh": "老挝",
+        "names": [
+          "Laos",
+          "Lao PDR"
+        ]
+      },
+      {
+        "code": "KG",
+        "zh": "吉尔吉斯斯坦",
+        "names": [
+          "Kyrgyzstan"
+        ]
+      },
+      {
+        "code": "KW",
+        "zh": "科威特",
+        "names": [
+          "Kuwait"
+        ]
+      },
+      {
+        "code": "KI",
+        "zh": "基里巴斯",
+        "names": [
+          "Kiribati"
+        ]
+      },
+      {
+        "code": "KE",
+        "zh": "肯尼亚",
+        "names": [
+          "Kenya"
+        ]
+      },
+      {
+        "code": "KZ",
+        "zh": "哈萨克斯坦",
+        "names": [
+          "Kazakhstan"
+        ]
+      },
+      {
+        "code": "JO",
+        "zh": "约旦",
+        "names": [
+          "Jordan"
+        ]
+      },
+      {
+        "code": "JP",
+        "zh": "日本",
+        "names": [
+          "Japan"
+        ]
+      },
+      {
+        "code": "JM",
+        "zh": "牙买加",
+        "names": [
+          "Jamaica"
+        ]
+      },
+      {
+        "code": "IT",
+        "zh": "意大利",
+        "names": [
+          "Italy"
+        ]
+      },
+      {
+        "code": "IL",
+        "zh": "以色列",
+        "names": [
+          "Israel"
+        ]
+      },
+      {
+        "code": "PS",
+        "zh": "巴勒斯坦",
+        "names": [
+          "Palestine"
+        ]
+      },
+      {
+        "code": "IE",
+        "zh": "爱尔兰",
+        "names": [
+          "Ireland"
+        ]
+      },
+      {
+        "code": "IQ",
+        "zh": "伊拉克",
+        "names": [
+          "Iraq"
+        ]
+      },
+      {
+        "code": "IR",
+        "zh": "伊朗",
+        "names": [
+          "Iran"
+        ]
+      },
+      {
+        "code": "ID",
+        "zh": "印度尼西亚",
+        "names": [
+          "Indonesia"
+        ]
+      },
+      {
+        "code": "IN",
+        "zh": "印度",
+        "names": [
+          "India"
+        ]
+      },
+      {
+        "code": "IS",
+        "zh": "冰岛",
+        "names": [
+          "Iceland"
+        ]
+      },
+      {
+        "code": "HU",
+        "zh": "匈牙利",
+        "names": [
+          "Hungary"
+        ]
+      },
+      {
+        "code": "HN",
+        "zh": "洪都拉斯",
+        "names": [
+          "Honduras"
+        ]
+      },
+      {
+        "code": "HT",
+        "zh": "海地",
+        "names": [
+          "Haiti"
+        ]
+      },
+      {
+        "code": "GY",
+        "zh": "圭亚那",
+        "names": [
+          "Guyana"
+        ]
+      },
+      {
+        "code": "GW",
+        "zh": "几内亚比绍",
+        "names": [
+          "Guinea-Bissau"
+        ]
+      },
+      {
+        "code": "GN",
+        "zh": "几内亚",
+        "names": [
+          "Guinea"
+        ]
+      },
+      {
+        "code": "GT",
+        "zh": "危地马拉",
+        "names": [
+          "Guatemala"
+        ]
+      },
+      {
+        "code": "GD",
+        "zh": "格林纳达",
+        "names": [
+          "Grenada"
+        ]
+      },
+      {
+        "code": "GR",
+        "zh": "希腊",
+        "names": [
+          "Greece"
+        ]
+      },
+      {
+        "code": "GH",
+        "zh": "加纳",
+        "names": [
+          "Ghana"
+        ]
+      },
+      {
+        "code": "DE",
+        "zh": "德国",
+        "names": [
+          "Germany"
+        ]
+      },
+      {
+        "code": "GE",
+        "zh": "格鲁吉亚",
+        "names": [
+          "Georgia"
+        ]
+      },
+      {
+        "code": "GM",
+        "zh": "冈比亚",
+        "names": [
+          "Gambia",
+          "The Gambia"
+        ]
+      },
+      {
+        "code": "GA",
+        "zh": "加蓬",
+        "names": [
+          "Gabon"
+        ]
+      },
+      {
+        "code": "PM",
+        "zh": "圣皮埃尔和密克隆",
+        "names": [
+          "St. Pierre and Miquelon",
+          "Saint Pierre and Miquelon"
+        ]
+      },
+      {
+        "code": "WF",
+        "zh": "瓦利斯和富图纳",
+        "names": [
+          "Wallis and Futuna Is.",
+          "Wallis and Futuna Islands",
+          "Wallis and Futuna"
+        ]
+      },
+      {
+        "code": "MF",
+        "zh": "法属圣马丁",
+        "names": [
+          "St-Martin",
+          "Saint-Martin",
+          "Saint Martin"
+        ]
+      },
+      {
+        "code": "BL",
+        "zh": "圣巴泰勒米",
+        "names": [
+          "St-Barthélemy",
+          "Saint-Barthélemy",
+          "Saint Barthélemy",
+          "Saint Barthelemy"
+        ]
+      },
+      {
+        "code": "PF",
+        "zh": "法属波利尼西亚",
+        "names": [
+          "Fr. Polynesia",
+          "French Polynesia"
+        ]
+      },
+      {
+        "code": "NC",
+        "zh": "新喀里多尼亚",
+        "names": [
+          "New Caledonia"
+        ]
+      },
+      {
+        "code": "TF",
+        "zh": "法属南部和南极领地",
+        "names": [
+          "Fr. S. Antarctic Lands",
+          "French Southern and Antarctic Lands"
+        ]
+      },
+      {
+        "code": "AX",
+        "zh": "奥兰",
+        "names": [
+          "Åland",
+          "Åland Islands",
+          "Aland"
+        ]
+      },
+      {
+        "code": "FI",
+        "zh": "芬兰",
+        "names": [
+          "Finland"
+        ]
+      },
+      {
+        "code": "FJ",
+        "zh": "斐济",
+        "names": [
+          "Fiji"
+        ]
+      },
+      {
+        "code": "ET",
+        "zh": "埃塞俄比亚",
+        "names": [
+          "Ethiopia"
+        ]
+      },
+      {
+        "code": "EE",
+        "zh": "爱沙尼亚",
+        "names": [
+          "Estonia"
+        ]
+      },
+      {
+        "code": "ER",
+        "zh": "厄立特里亚",
+        "names": [
+          "Eritrea"
+        ]
+      },
+      {
+        "code": "GQ",
+        "zh": "赤道几内亚",
+        "names": [
+          "Eq. Guinea",
+          "Equatorial Guinea"
+        ]
+      },
+      {
+        "code": "SV",
+        "zh": "萨尔瓦多",
+        "names": [
+          "El Salvador"
+        ]
+      },
+      {
+        "code": "EG",
+        "zh": "埃及",
+        "names": [
+          "Egypt"
+        ]
+      },
+      {
+        "code": "EC",
+        "zh": "厄瓜多尔",
+        "names": [
+          "Ecuador"
+        ]
+      },
+      {
+        "code": "DO",
+        "zh": "多米尼加",
+        "names": [
+          "Dominican Rep.",
+          "Dominican Republic"
+        ]
+      },
+      {
+        "code": "DM",
+        "zh": "多米尼克",
+        "names": [
+          "Dominica"
+        ]
+      },
+      {
+        "code": "DJ",
+        "zh": "吉布提",
+        "names": [
+          "Djibouti"
+        ]
+      },
+      {
+        "code": "GL",
+        "zh": "格陵兰",
+        "names": [
+          "Greenland"
+        ]
+      },
+      {
+        "code": "FO",
+        "zh": "法罗群岛",
+        "names": [
+          "Faeroe Is.",
+          "Faeroe Islands",
+          "Faroe Islands"
+        ]
+      },
+      {
+        "code": "DK",
+        "zh": "丹麦",
+        "names": [
+          "Denmark"
+        ]
+      },
+      {
+        "code": "CZ",
+        "zh": "捷克",
+        "names": [
+          "Czechia",
+          "Czech Republic"
+        ]
+      },
+      {
+        "code": "CY",
+        "zh": "塞浦路斯",
+        "names": [
+          "Cyprus"
+        ]
+      },
+      {
+        "code": "CU",
+        "zh": "古巴",
+        "names": [
+          "Cuba"
+        ]
+      },
+      {
+        "code": "HR",
+        "zh": "克罗地亚",
+        "names": [
+          "Croatia"
+        ]
+      },
+      {
+        "code": "CI",
+        "zh": "科特迪瓦",
+        "names": [
+          "Côte d'Ivoire",
+          "Ivory Coast"
+        ]
+      },
+      {
+        "code": "CR",
+        "zh": "哥斯达黎加",
+        "names": [
+          "Costa Rica"
+        ]
+      },
+      {
+        "code": "CD",
+        "zh": "刚果民主共和国",
+        "names": [
+          "Dem. Rep. Congo",
+          "Democratic Republic of the Congo"
+        ]
+      },
+      {
+        "code": "CG",
+        "zh": "刚果共和国",
+        "names": [
+          "Congo",
+          "Republic of the Congo"
+        ]
+      },
+      {
+        "code": "KM",
+        "zh": "科摩罗",
+        "names": [
+          "Comoros"
+        ]
+      },
+      {
+        "code": "CO",
+        "zh": "哥伦比亚",
+        "names": [
+          "Colombia"
+        ]
+      },
+      {
+        "code": "CN",
+        "zh": "中华人民共和国",
+        "names": [
+          "China",
+          "People's Republic of China"
+        ]
+      },
+      {
+        "code": "MO",
+        "zh": "澳门",
+        "names": [
+          "Macao",
+          "Macau",
+          "Macao S.A.R"
+        ]
+      },
+      {
+        "code": "HK",
+        "zh": "香港",
+        "names": [
+          "Hong Kong",
+          "Hong Kong S.A.R."
+        ]
+      },
+      {
+        "code": "CL",
+        "zh": "智利",
+        "names": [
+          "Chile"
+        ]
+      },
+      {
+        "code": "TD",
+        "zh": "乍得",
+        "names": [
+          "Chad"
+        ]
+      },
+      {
+        "code": "CF",
+        "zh": "中非共和国",
+        "names": [
+          "Central African Rep.",
+          "Central African Republic"
+        ]
+      },
+      {
+        "code": "CV",
+        "zh": "佛得角",
+        "names": [
+          "Cabo Verde",
+          "Republic of Cabo Verde",
+          "Cape Verde"
+        ]
+      },
+      {
+        "code": "CA",
+        "zh": "加拿大",
+        "names": [
+          "Canada"
+        ]
+      },
+      {
+        "code": "CM",
+        "zh": "喀麦隆",
+        "names": [
+          "Cameroon"
+        ]
+      },
+      {
+        "code": "KH",
+        "zh": "柬埔寨",
+        "names": [
+          "Cambodia"
+        ]
+      },
+      {
+        "code": "MM",
+        "zh": "缅甸",
+        "names": [
+          "Myanmar"
+        ]
+      },
+      {
+        "code": "BI",
+        "zh": "布隆迪",
+        "names": [
+          "Burundi"
+        ]
+      },
+      {
+        "code": "BF",
+        "zh": "布基纳法索",
+        "names": [
+          "Burkina Faso"
+        ]
+      },
+      {
+        "code": "BG",
+        "zh": "保加利亚",
+        "names": [
+          "Bulgaria"
+        ]
+      },
+      {
+        "code": "BN",
+        "zh": "文莱",
+        "names": [
+          "Brunei",
+          "Brunei Darussalam"
+        ]
+      },
+      {
+        "code": "BR",
+        "zh": "巴西",
+        "names": [
+          "Brazil"
+        ]
+      },
+      {
+        "code": "BW",
+        "zh": "博茨瓦纳",
+        "names": [
+          "Botswana"
+        ]
+      },
+      {
+        "code": "BA",
+        "zh": "波斯尼亚和黑塞哥维那",
+        "names": [
+          "Bosnia and Herz.",
+          "Bosnia and Herzegovina"
+        ]
+      },
+      {
+        "code": "BO",
+        "zh": "玻利维亚",
+        "names": [
+          "Bolivia"
+        ]
+      },
+      {
+        "code": "BT",
+        "zh": "不丹",
+        "names": [
+          "Bhutan"
+        ]
+      },
+      {
+        "code": "BJ",
+        "zh": "贝宁",
+        "names": [
+          "Benin"
+        ]
+      },
+      {
+        "code": "BZ",
+        "zh": "伯利兹",
+        "names": [
+          "Belize"
+        ]
+      },
+      {
+        "code": "BE",
+        "zh": "比利时",
+        "names": [
+          "Belgium"
+        ]
+      },
+      {
+        "code": "BY",
+        "zh": "白俄罗斯",
+        "names": [
+          "Belarus"
+        ]
+      },
+      {
+        "code": "BB",
+        "zh": "巴巴多斯",
+        "names": [
+          "Barbados"
+        ]
+      },
+      {
+        "code": "BD",
+        "zh": "孟加拉国",
+        "names": [
+          "Bangladesh"
+        ]
+      },
+      {
+        "code": "BH",
+        "zh": "巴林",
+        "names": [
+          "Bahrain"
+        ]
+      },
+      {
+        "code": "BS",
+        "zh": "巴哈马",
+        "names": [
+          "Bahamas",
+          "The Bahamas"
+        ]
+      },
+      {
+        "code": "AZ",
+        "zh": "阿塞拜疆",
+        "names": [
+          "Azerbaijan"
+        ]
+      },
+      {
+        "code": "AT",
+        "zh": "奥地利",
+        "names": [
+          "Austria"
+        ]
+      },
+      {
+        "code": "AU",
+        "zh": "澳大利亚",
+        "names": [
+          "Australia"
+        ]
+      },
+      {
+        "code": "HM",
+        "zh": "赫德岛和麦克唐纳群岛",
+        "names": [
+          "Heard I. and McDonald Is.",
+          "Heard I. and McDonald Islands",
+          "Heard Island and McDonald Islands"
+        ]
+      },
+      {
+        "code": "NF",
+        "zh": "诺福克岛",
+        "names": [
+          "Norfolk Island"
+        ]
+      },
+      {
+        "code": "AM",
+        "zh": "亚美尼亚",
+        "names": [
+          "Armenia"
+        ]
+      },
+      {
+        "code": "AR",
+        "zh": "阿根廷",
+        "names": [
+          "Argentina"
+        ]
+      },
+      {
+        "code": "AG",
+        "zh": "安提瓜和巴布达",
+        "names": [
+          "Antigua and Barb.",
+          "Antigua and Barbuda"
+        ]
+      },
+      {
+        "code": "AO",
+        "zh": "安哥拉",
+        "names": [
+          "Angola"
+        ]
+      },
+      {
+        "code": "AD",
+        "zh": "安道尔",
+        "names": [
+          "Andorra"
+        ]
+      },
+      {
+        "code": "DZ",
+        "zh": "阿尔及利亚",
+        "names": [
+          "Algeria"
+        ]
+      },
+      {
+        "code": "AL",
+        "zh": "阿尔巴尼亚",
+        "names": [
+          "Albania"
+        ]
+      },
+      {
+        "code": "AF",
+        "zh": "阿富汗",
+        "names": [
+          "Afghanistan"
+        ]
+      },
+      {
+        "code": "AQ",
+        "zh": "南极洲",
+        "names": [
+          "Antarctica"
+        ]
+      },
+      {
+        "code": "SX",
+        "zh": "荷属圣马丁",
+        "names": [
+          "Sint Maarten"
+        ]
+      },
+      {
+        "code": "TV",
+        "zh": "图瓦卢",
+        "names": [
+          "Tuvalu"
+        ]
+      }
+    ]
+  },
+  "entities": {
+    "BAH": {
+      "original": "Bahamas",
+      "zh": "巴哈马",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names.",
+      "reference": "data/ne_50m_admin_0_countries.zip#NAME_ZH; scoped country identity"
+    },
+    "BAS": {
+      "original": "British Antilles",
+      "zh": "英属安的列斯群岛",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names."
+    },
+    "COG": {
+      "original": "Congo",
+      "zh": "刚果",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names."
+    },
+    "CRC": {
+      "original": "Curacao",
+      "zh": "库拉索",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names.",
+      "reference": "data/ne_50m_admin_0_countries.zip#NAME_ZH; scoped country identity"
+    },
+    "FIJ": {
+      "original": "Fiji",
+      "zh": "斐济",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names.",
+      "reference": "data/ne_50m_admin_0_countries.zip#NAME_ZH; scoped country identity"
+    },
+    "GDL": {
+      "original": "Guadeloupe",
+      "zh": "瓜德罗普",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names.",
+      "reference": "data/ne_50m_admin_0_countries.zip#NAME_ZH; scoped country identity"
+    },
+    "GUM": {
+      "original": "Guam",
+      "zh": "关岛",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names.",
+      "reference": "data/ne_50m_admin_0_countries.zip#NAME_ZH; scoped country identity"
+    },
+    "HOL": {
+      "original": "Holland",
+      "zh": "荷兰",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names.",
+      "reference": "data/ne_50m_admin_0_countries.zip#NAME_ZH; scoped country identity"
+    },
+    "LUX": {
+      "original": "Luxemburg",
+      "zh": "卢森堡",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names.",
+      "reference": "data/ne_50m_admin_0_countries.zip#NAME_ZH; scoped country identity"
+    },
+    "MAN": {
+      "original": "Manchukou",
+      "zh": "满洲国",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names.",
+      "reference": "data/locales.json#geo/Manchukuo; short-name normalization without adding Empire"
+    },
+    "MEN": {
+      "original": "Mengkukuo",
+      "zh": "蒙疆联合自治政府",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names.",
+      "reference": "data/scenarios/tno_1962/countries.json#countries/MEN/display_name_zh"
+    },
+    "PER": {
+      "original": "Persia",
+      "zh": "波斯",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names."
+    },
+    "SAM": {
+      "original": "Samoa",
+      "zh": "萨摩亚",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names.",
+      "reference": "data/ne_50m_admin_0_countries.zip#NAME_ZH; scoped country identity"
+    },
+    "SOL": {
+      "original": "Solomon",
+      "zh": "所罗门群岛",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names.",
+      "reference": "data/ne_50m_admin_0_countries.zip#NAME_ZH; scoped country identity"
+    },
+    "TAH": {
+      "original": "Tahiti",
+      "zh": "塔希提",
+      "status": "translation",
+      "basis": "Native entity identity; conventional Chinese geographic or historical name. Modern country names do not replace historical English names."
+    },
+    "GXC": {
+      "original": "Guangxi",
+      "zh": "广西",
+      "status": "translation",
+      "basis": "Native Guangxi entity name, normalized to the conventional Chinese geographic short name; not a modern city-alias match.",
+      "reference": "data/hierarchy.json#labels/CN_Guangxi; native GXC entity"
+    }
+  },
+  "geographicTerms": {
+    "Aral Sea": {
+      "zh": "咸海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Caspian Sea": {
+      "zh": "里海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Black Sea": {
+      "zh": "黑海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Pacific Ocean": {
+      "zh": "太平洋",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Pacific": {
+      "zh": "太平洋",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Atlantic Ocean": {
+      "zh": "大西洋",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Atlantic": {
+      "zh": "大西洋",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Indian Ocean": {
+      "zh": "印度洋",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Arctic Ocean": {
+      "zh": "北冰洋",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Antarctic Ocean": {
+      "zh": "南冰洋",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Mediterranean Sea": {
+      "zh": "地中海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Mediterranean": {
+      "zh": "地中海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "North Sea": {
+      "zh": "北海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Baltic Sea": {
+      "zh": "波罗的海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Red Sea": {
+      "zh": "红海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Aegean Sea": {
+      "zh": "爱琴海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Adriatic Sea": {
+      "zh": "亚得里亚海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Adriatic": {
+      "zh": "亚得里亚海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Tyrrhenian Sea": {
+      "zh": "第勒尼安海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Tyrrhenian": {
+      "zh": "第勒尼安海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Ligurian Sea": {
+      "zh": "利古里亚海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Ligurian": {
+      "zh": "利古里亚海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Ionian Sea": {
+      "zh": "爱奥尼亚海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Ionian": {
+      "zh": "爱奥尼亚海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Marmara Sea": {
+      "zh": "马尔马拉海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Marmaran": {
+      "zh": "马尔马拉海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Alboran": {
+      "zh": "阿尔沃兰海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Persian Gulf": {
+      "zh": "波斯湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Gulf of Aden": {
+      "zh": "亚丁湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Gulf of Oman": {
+      "zh": "阿曼湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Gulf of Alaska": {
+      "zh": "阿拉斯加湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Gulf of Mexico": {
+      "zh": "墨西哥湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Gulf of California": {
+      "zh": "加利福尼亚湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Bay of Bengal": {
+      "zh": "孟加拉湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Bay of Biscay": {
+      "zh": "比斯开湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Bay of Campeche": {
+      "zh": "坎佩切湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "English Channel": {
+      "zh": "英吉利海峡",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Bering Sea": {
+      "zh": "白令海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Caribbean Sea": {
+      "zh": "加勒比海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "South China Sea": {
+      "zh": "南海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "East China Sea": {
+      "zh": "东海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Yellow Sea": {
+      "zh": "黄海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Sea of Japan": {
+      "zh": "日本海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Sea of Okhotsk": {
+      "zh": "鄂霍次克海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Philippine Sea": {
+      "zh": "菲律宾海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Coral Sea": {
+      "zh": "珊瑚海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Tasman Sea": {
+      "zh": "塔斯曼海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Gulf of Guinea": {
+      "zh": "几内亚湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Gulf of Bothnia": {
+      "zh": "波的尼亚湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Gulf of Finland": {
+      "zh": "芬兰湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Gulf of Riga": {
+      "zh": "里加湾",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Malacca Strait": {
+      "zh": "马六甲海峡",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Strait of Malacca": {
+      "zh": "马六甲海峡",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Strait of Magellan": {
+      "zh": "麦哲伦海峡",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Bass Strait": {
+      "zh": "巴斯海峡",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Torres Strait": {
+      "zh": "托雷斯海峡",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Haro Strait": {
+      "zh": "哈罗海峡",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Dead Sea": {
+      "zh": "死海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Michigan": {
+      "zh": "密歇根湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Superior": {
+      "zh": "苏必利尔湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Huron": {
+      "zh": "休伦湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Erie": {
+      "zh": "伊利湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Ontario": {
+      "zh": "安大略湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Chad": {
+      "zh": "乍得湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Victoria": {
+      "zh": "维多利亚湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Albert": {
+      "zh": "艾伯特湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Edward": {
+      "zh": "爱德华湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Kivu": {
+      "zh": "基伍湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Tanganyika": {
+      "zh": "坦噶尼喀湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Malawi": {
+      "zh": "马拉维湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Mweru": {
+      "zh": "姆韦鲁湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Volta": {
+      "zh": "沃尔特湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Titicaca": {
+      "zh": "的的喀喀湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Poopo": {
+      "zh": "波波湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Baikal": {
+      "zh": "贝加尔湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Balkhash": {
+      "zh": "巴尔喀什湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Khanka": {
+      "zh": "兴凯湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Tsinghai Lake": {
+      "zh": "青海湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Dongting Lake": {
+      "zh": "洞庭湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Poyang Lake": {
+      "zh": "鄱阳湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Taihu Lake": {
+      "zh": "太湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Hungtse": {
+      "zh": "洪泽湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Geneva": {
+      "zh": "日内瓦湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Constance": {
+      "zh": "博登湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Balaton": {
+      "zh": "巴拉顿湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Sevan": {
+      "zh": "塞凡湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Urmia": {
+      "zh": "乌尔米耶湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Taupo": {
+      "zh": "陶波湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Rukwa": {
+      "zh": "鲁夸湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Great Bear Lake": {
+      "zh": "大熊湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Great Slave Lake": {
+      "zh": "大奴湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Great Salt Lake": {
+      "zh": "大盐湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Winnipeg": {
+      "zh": "温尼伯湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Manitoba": {
+      "zh": "马尼托巴湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake of the Woods": {
+      "zh": "伍兹湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Lake Champlain": {
+      "zh": "尚普兰湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Tonle Sap": {
+      "zh": "洞里萨湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Issyk Kul": {
+      "zh": "伊塞克湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Van Golu": {
+      "zh": "凡湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Tuz Golu": {
+      "zh": "图兹湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Kurisches Haff": {
+      "zh": "库尔斯潟湖",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Asov": {
+      "zh": "亚速海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Azov Sea": {
+      "zh": "亚速海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Azov": {
+      "zh": "亚速海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Caspian": {
+      "zh": "里海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Sahul Shelf": {
+      "zh": "萨胡尔陆架",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Newfoundland": {
+      "zh": "纽芬兰",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Zealandia": {
+      "zh": "西兰大陆",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Antilles": {
+      "zh": "安的列斯群岛",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Bahamas": {
+      "zh": "巴哈马",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Ceylon": {
+      "zh": "锡兰",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Persia": {
+      "zh": "波斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Korea": {
+      "zh": "朝鲜半岛",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Guam": {
+      "zh": "关岛",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Fiji": {
+      "zh": "斐济",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Samoa": {
+      "zh": "萨摩亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Tahiti": {
+      "zh": "塔希提",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Wadden Sea": {
+      "zh": "瓦登海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Dutch Wadden Sea": {
+      "zh": "荷兰瓦登海",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "North Channel": {
+      "zh": "北海峡",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Sicilian": {
+      "zh": "西西里",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Algerian": {
+      "zh": "阿尔及利亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Norwegian": {
+      "zh": "挪威",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Scottish": {
+      "zh": "苏格兰",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Irish": {
+      "zh": "爱尔兰",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Northern-Irish": {
+      "zh": "北爱尔兰",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Persian": {
+      "zh": "波斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Soviet": {
+      "zh": "苏联",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Azerbaijani": {
+      "zh": "阿塞拜疆",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Turkmen": {
+      "zh": "土库曼",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Uzbek": {
+      "zh": "乌兹别克",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "British": {
+      "zh": "英国",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "French": {
+      "zh": "法国",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "German": {
+      "zh": "德国",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Dutch": {
+      "zh": "荷兰",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Danish": {
+      "zh": "丹麦",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Swedish": {
+      "zh": "瑞典",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Finnish": {
+      "zh": "芬兰",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Canadian": {
+      "zh": "加拿大",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "American": {
+      "zh": "美国",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Texan": {
+      "zh": "得克萨斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Mexican": {
+      "zh": "墨西哥",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Peruvian": {
+      "zh": "秘鲁",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Chilean": {
+      "zh": "智利",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Costa Rican": {
+      "zh": "哥斯达黎加",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Brazilian": {
+      "zh": "巴西",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Argentinian": {
+      "zh": "阿根廷",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "South African": {
+      "zh": "南非",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Somali": {
+      "zh": "索马里",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Kenyan": {
+      "zh": "肯尼亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Mozambican": {
+      "zh": "莫桑比克",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Zanzibari": {
+      "zh": "桑给巴尔",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Comoran": {
+      "zh": "科摩罗",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Seychellian": {
+      "zh": "塞舌尔",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Mauritiuan": {
+      "zh": "毛里求斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Maldivean": {
+      "zh": "马尔代夫",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Omani": {
+      "zh": "阿曼",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Yemeni": {
+      "zh": "也门",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Gujarati": {
+      "zh": "古吉拉特",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Bombay": {
+      "zh": "孟买",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Ceylonian": {
+      "zh": "锡兰",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Madrasian": {
+      "zh": "马德拉斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Bengali": {
+      "zh": "孟加拉",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Burmese": {
+      "zh": "缅甸",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Sumatran": {
+      "zh": "苏门答腊",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Indonesian": {
+      "zh": "印度尼西亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Vietnamese": {
+      "zh": "越南",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Chinese": {
+      "zh": "中国",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Japanese": {
+      "zh": "日本",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Korean": {
+      "zh": "朝鲜半岛",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Australian": {
+      "zh": "澳大利亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Bulgarian": {
+      "zh": "保加利亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Crimean": {
+      "zh": "克里米亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Dobrogean": {
+      "zh": "多布罗加",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label or geographic adjective; not a claim of modern geometry."
+    },
+    "Tetuan": {
+      "zh": "得土安",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Tétouan": {
+      "zh": "得土安",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Ibiza": {
+      "zh": "伊维萨",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Roussilon": {
+      "zh": "鲁西永",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Roussillon": {
+      "zh": "鲁西永",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Occitania": {
+      "zh": "奥克西塔尼亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Savoy": {
+      "zh": "萨伏依",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Asinara": {
+      "zh": "阿西纳拉",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Olbia": {
+      "zh": "奥尔比亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Calabria": {
+      "zh": "卡拉布里亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Puglia": {
+      "zh": "普利亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Marche": {
+      "zh": "马尔凯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Corfu": {
+      "zh": "科孚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Euboea": {
+      "zh": "优卑亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Naxos": {
+      "zh": "纳克索斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Milos": {
+      "zh": "米洛斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Lesvos": {
+      "zh": "莱斯沃斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Lesbos": {
+      "zh": "莱斯沃斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Chios": {
+      "zh": "希俄斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Izmir": {
+      "zh": "伊兹密尔",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Bodrum": {
+      "zh": "博德鲁姆",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Latakia": {
+      "zh": "拉塔基亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Tripoli": {
+      "zh": "的黎波里",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Benghasi": {
+      "zh": "班加西",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Gelibolu": {
+      "zh": "加里波利",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Qattara": {
+      "zh": "盖塔拉",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Suez": {
+      "zh": "苏伊士",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Spanish": {
+      "zh": "西班牙",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Corsican": {
+      "zh": "科西嘉",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Genoan": {
+      "zh": "热那亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Provencal": {
+      "zh": "普罗旺斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Occitan": {
+      "zh": "奥克西塔尼亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Ibizan": {
+      "zh": "伊维萨",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Grenadan": {
+      "zh": "格拉纳达",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Murcian": {
+      "zh": "穆尔西亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Mallorcan": {
+      "zh": "马略卡",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Menorcan": {
+      "zh": "梅诺卡",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Calabrian": {
+      "zh": "卡拉布里亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Neopolitan": {
+      "zh": "那不勒斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Sardinian": {
+      "zh": "撒丁",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Tunisian": {
+      "zh": "突尼斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Tripoltanian": {
+      "zh": "的黎波里塔尼亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Maltese": {
+      "zh": "马耳他",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Italian": {
+      "zh": "意大利",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Benghasian": {
+      "zh": "班加西",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Cypriot": {
+      "zh": "塞浦路斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Rhodean": {
+      "zh": "罗得",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Peloponnesean": {
+      "zh": "伯罗奔尼撒",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Lebanese": {
+      "zh": "黎巴嫩",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Palestinian": {
+      "zh": "巴勒斯坦",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Egyptian": {
+      "zh": "埃及",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Libyan": {
+      "zh": "利比亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Moroccan": {
+      "zh": "摩洛哥",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Portuguese": {
+      "zh": "葡萄牙",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Hawaiian": {
+      "zh": "夏威夷",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Baja Californian": {
+      "zh": "下加利福尼亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Californian": {
+      "zh": "加利福尼亚",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "New Zealand": {
+      "zh": "新西兰",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Torres": {
+      "zh": "托雷斯",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Madagascan": {
+      "zh": "马达加斯加",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "Malawi Island": {
+      "zh": "马拉维岛",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    },
+    "South Africa": {
+      "zh": "南非",
+      "status": "translation",
+      "basis": "Conventional Chinese rendering of an explicit native geographic label/adjective; not a claim about modern geometry or an externally verified feature match."
+    }
+  },
+  "scopedNames": [
+    {
+      "entityTag": "GER",
+      "en": "Königsberg",
+      "zh": "柯尼斯堡",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Breslau",
+      "zh": "布雷斯劳",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Stettin",
+      "zh": "施泰丁",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Ostpreußen",
+      "zh": "东普鲁士",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Ostpreussen",
+      "zh": "东普鲁士",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Württemberg",
+      "zh": "符腾堡",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Oberbayern",
+      "zh": "上巴伐利亚",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Niederbayern",
+      "zh": "下巴伐利亚",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Franken",
+      "zh": "弗兰肯",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Pommern",
+      "zh": "波美拉尼亚",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Hinterpommern",
+      "zh": "后波美拉尼亚",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Niederschlesien",
+      "zh": "下西里西亚",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Oberschlesien",
+      "zh": "上西里西亚",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Ostschlesien",
+      "zh": "东西里西亚",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "DAN",
+      "en": "Danzig",
+      "zh": "但泽",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "POL",
+      "en": "Wilno",
+      "zh": "维尔诺",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "POL",
+      "en": "Lwów",
+      "zh": "利沃夫",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "UKR",
+      "en": "Stalino",
+      "zh": "斯大林诺",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "KOR",
+      "en": "Keijō",
+      "zh": "京城",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "KOR",
+      "en": "Heijō",
+      "zh": "平壤",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "TWN",
+      "en": "Taihoku",
+      "zh": "台北",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "CHI",
+      "en": "Peking",
+      "zh": "北京",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "HPC",
+      "en": "Peking",
+      "zh": "北京",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "CCG",
+      "en": "Chungking",
+      "zh": "重庆",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "CTU",
+      "en": "Chengtu",
+      "zh": "成都",
+      "status": "translation",
+      "basis": "Native historical-language toponym retained; does not substitute a modern successor name."
+    },
+    {
+      "entityTag": "RUS",
+      "en": "Leningrad",
+      "zh": "列宁格勒",
+      "status": "translation",
+      "basis": "Historical native toponym translation; city identity does not authorize replacing it with a modern renamed city."
+    },
+    {
+      "entityTag": "RUS",
+      "en": "Stalingrad",
+      "zh": "斯大林格勒",
+      "status": "translation",
+      "basis": "Historical native toponym translation; city identity does not authorize replacing it with a modern renamed city."
+    },
+    {
+      "entityTag": "TUR",
+      "en": "Constantinople",
+      "zh": "君士坦丁堡",
+      "status": "translation",
+      "basis": "Historical native toponym translation; city identity does not authorize replacing it with a modern renamed city."
+    },
+    {
+      "entityTag": "RAJ",
+      "en": "Madras",
+      "zh": "马德拉斯",
+      "status": "translation",
+      "basis": "Historical native toponym translation; city identity does not authorize replacing it with a modern renamed city."
+    },
+    {
+      "entityTag": "RAJ",
+      "en": "Calcutta",
+      "zh": "加尔各答",
+      "status": "translation",
+      "basis": "Historical native toponym translation; city identity does not authorize replacing it with a modern renamed city."
+    },
+    {
+      "entityTag": "RUS",
+      "en": "Gorky",
+      "zh": "高尔基",
+      "status": "translation",
+      "basis": "Historical native toponym translation; city identity does not authorize replacing it with a modern renamed city."
+    },
+    {
+      "entityTag": "RUS",
+      "en": "Sverdlovsk",
+      "zh": "斯维尔德洛夫斯克",
+      "status": "translation",
+      "basis": "Historical native toponym translation; city identity does not authorize replacing it with a modern renamed city."
+    },
+    {
+      "entityTag": "KAZ",
+      "en": "Guryev",
+      "zh": "古里耶夫",
+      "status": "translation",
+      "basis": "Historical native toponym translation; city identity does not authorize replacing it with a modern renamed city."
+    },
+    {
+      "entityTag": "RAJ",
+      "en": "Trivandrum",
+      "zh": "特里凡得琅",
+      "status": "translation",
+      "basis": "Historical native toponym translation; city identity does not authorize replacing it with a modern renamed city."
+    },
+    {
+      "entityTag": "RAJ",
+      "en": "Trivanduram",
+      "zh": "特里凡得琅",
+      "status": "translation",
+      "basis": "Historical native toponym translation; city identity does not authorize replacing it with a modern renamed city."
+    },
+    {
+      "entityTag": "TVC",
+      "en": "Trivanduram",
+      "zh": "特里凡得琅",
+      "status": "translation",
+      "basis": "Historical native toponym translation; city identity does not authorize replacing it with a modern renamed city."
+    },
+    {
+      "entityTag": "SHG",
+      "en": "Weihaiwei",
+      "zh": "威海卫",
+      "status": "translation",
+      "basis": "Historical/native-language place-name translation; preserve the source toponym rather than a modern successor name."
+    },
+    {
+      "entityTag": "INC",
+      "en": "Saigon",
+      "zh": "西贡",
+      "status": "translation",
+      "basis": "Historical/native-language place-name translation; preserve the source toponym rather than a modern successor name."
+    },
+    {
+      "entityTag": "FIN",
+      "en": "Viipuri",
+      "zh": "维堡",
+      "status": "translation",
+      "basis": "Historical/native-language place-name translation; preserve the source toponym rather than a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Liegnitz",
+      "zh": "利格尼茨",
+      "status": "translation",
+      "basis": "Historical/native-language place-name translation; preserve the source toponym rather than a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Glogau",
+      "zh": "格洛高",
+      "status": "translation",
+      "basis": "Historical/native-language place-name translation; preserve the source toponym rather than a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Allenstein",
+      "zh": "阿伦施泰因",
+      "status": "translation",
+      "basis": "Historical/native-language place-name translation; preserve the source toponym rather than a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Oppeln",
+      "zh": "奥佩尔恩",
+      "status": "translation",
+      "basis": "Historical/native-language place-name translation; preserve the source toponym rather than a modern successor name."
+    },
+    {
+      "entityTag": "GER",
+      "en": "Köslin",
+      "zh": "克斯林",
+      "status": "translation",
+      "basis": "Historical/native-language place-name translation; preserve the source toponym rather than a modern successor name."
+    },
+    {
+      "entityTag": "PIL",
+      "en": "Bailingmiao",
+      "zh": "百灵庙",
+      "status": "translation",
+      "basis": "Historical/native-language place-name translation; preserve the source toponym rather than a modern successor name."
+    },
+    {
+      "entityTag": "MAN",
+      "en": "Shinkingu",
+      "zh": "新京",
+      "status": "translation",
+      "basis": "Historical/native-language place-name translation; preserve the source toponym rather than a modern successor name."
+    },
+    {
+      "entityTag": "INS",
+      "en": "Batavia",
+      "zh": "巴达维亚",
+      "status": "translation",
+      "basis": "Reviewed historical/native toponym; modern city identity does not change its historical Chinese name.",
+      "nativeStateIds": [
+        335
+      ],
+      "nativePlaceIds": [
+        "vp-7381"
+      ]
+    },
+    {
+      "entityTag": "ROM",
+      "en": "Cluj",
+      "zh": "克卢日",
+      "status": "translation",
+      "basis": "Reviewed historical/native toponym; modern city identity does not change its historical Chinese name.",
+      "nativeStateIds": [
+        1217
+      ],
+      "nativePlaceIds": [
+        "vp-6711"
+      ]
+    },
+    {
+      "entityTag": "RUS",
+      "en": "Gorki",
+      "zh": "高尔基",
+      "status": "translation",
+      "basis": "Reviewed historical/native toponym; modern city identity does not change its historical Chinese name.",
+      "nativeStateIds": [
+        252
+      ],
+      "nativePlaceIds": [
+        "vp-11375"
+      ]
+    },
+    {
+      "entityTag": "MAN",
+      "en": "Hōten",
+      "zh": "奉天",
+      "status": "translation",
+      "basis": "Reviewed historical/native toponym; modern city identity does not change its historical Chinese name.",
+      "nativeStateIds": [],
+      "nativePlaceIds": [
+        "vp-11771"
+      ]
+    },
+    {
+      "entityTag": "RUS",
+      "en": "Kalinin",
+      "zh": "加里宁",
+      "status": "translation",
+      "basis": "Reviewed historical/native toponym; modern city identity does not change its historical Chinese name.",
+      "nativeStateIds": [
+        247
+      ],
+      "nativePlaceIds": [
+        "vp-6245"
+      ]
+    },
+    {
+      "entityTag": "RUS",
+      "en": "Kuibyshev",
+      "zh": "古比雪夫",
+      "status": "translation",
+      "basis": "Reviewed historical/native toponym; modern city identity does not change its historical Chinese name.",
+      "nativeStateIds": [
+        251
+      ],
+      "nativePlaceIds": [
+        "vp-11225"
+      ]
+    },
+    {
+      "entityTag": "COG",
+      "en": "Leopoldville",
+      "zh": "利奥波德维尔",
+      "status": "translation",
+      "basis": "Reviewed historical/native toponym; modern city identity does not change its historical Chinese name.",
+      "nativeStateIds": [
+        1499
+      ],
+      "nativePlaceIds": []
+    },
+    {
+      "entityTag": "MZB",
+      "en": "Lourenço Marques",
+      "zh": "洛伦索·马尔克斯",
+      "status": "translation",
+      "basis": "Reviewed historical/native toponym; modern city identity does not change its historical Chinese name.",
+      "nativeStateIds": [],
+      "nativePlaceIds": [
+        "vp-8245"
+      ]
+    },
+    {
+      "entityTag": "TAJ",
+      "en": "Stalinabad",
+      "zh": "斯大林纳巴德",
+      "status": "translation",
+      "basis": "Reviewed historical/native toponym; modern city identity does not change its historical Chinese name.",
+      "nativeStateIds": [
+        742
+      ],
+      "nativePlaceIds": [
+        "vp-12250"
+      ]
+    },
+    {
+      "entityTag": "COG",
+      "en": "Stanleyville",
+      "zh": "斯坦利维尔",
+      "status": "translation",
+      "basis": "Reviewed historical/native toponym; modern city identity does not change its historical Chinese name.",
+      "nativeStateIds": [
+        718
+      ],
+      "nativePlaceIds": []
+    }
+  ],
+  "placeAliases": {
+    "vp-692": {
+      "original": "München",
+      "entityTag": "GER",
+      "stateId": 52,
+      "cityId": "CITY::ne::1159151357",
+      "countryCode": "DE",
+      "status": "normalization",
+      "basis": "Reviewed native-language spelling mapped to the same known city; Chinese comes from the bound repository city ID, not a same-name global join."
+    },
+    "vp-516": {
+      "original": "Brussel",
+      "entityTag": "BEL",
+      "stateId": 6,
+      "cityId": "CITY::ne::1159151465",
+      "countryCode": "BE",
+      "status": "normalization",
+      "basis": "Reviewed native-language spelling mapped to the same known city; Chinese comes from the bound repository city ID, not a same-name global join."
+    },
+    "vp-13724": {
+      "original": "Athina",
+      "entityTag": "GRE",
+      "stateId": 1225,
+      "cityId": "CITY::ne::1159151545",
+      "countryCode": "GR",
+      "status": "normalization",
+      "basis": "Reviewed native-language spelling mapped to the same known city; Chinese comes from the bound repository city ID, not a same-name global join."
+    },
+    "vp-10070": {
+      "original": "Errbat",
+      "entityTag": "MOR",
+      "stateId": 461,
+      "cityId": "CITY::ne::1159150673",
+      "countryCode": "MA",
+      "status": "normalization",
+      "basis": "Reviewed native-language spelling mapped to the same known city; Chinese comes from the bound repository city ID, not a same-name global join."
+    },
+    "vp-1117": {
+      "original": "Nīgata",
+      "entityTag": "JAP",
+      "stateId": 534,
+      "cityId": "CITY::ne::1159147183",
+      "countryCode": "JP",
+      "status": "normalization",
+      "basis": "Reviewed native-language spelling mapped to the same known city; Chinese comes from the bound repository city ID, not a same-name global join."
+    },
+    "vp-6583": {
+      "original": "Lëtzebeurg",
+      "entityTag": "LUX",
+      "stateId": 8,
+      "cityId": "CITY::ne::1159146437",
+      "countryCode": "LU",
+      "status": "normalization",
+      "basis": "Reviewed native-language spelling mapped to the same known city; Chinese comes from the bound repository city ID, not a same-name global join."
+    },
+    "vp-1497": {
+      "original": "Gauwati",
+      "entityTag": "RAJ",
+      "stateId": 11810,
+      "cityId": "CITY::ne::1159150029",
+      "countryCode": "IN",
+      "status": "normalization",
+      "basis": "Reviewed native-language spelling mapped to the same known city; Chinese comes from the bound repository city ID, not a same-name global join."
+    },
+    "vp-12421": {
+      "original": "Asahigawa",
+      "entityTag": "JAP",
+      "stateId": 536,
+      "cityId": "CITY::ne::1159147163",
+      "countryCode": "JP",
+      "status": "normalization",
+      "basis": "Reviewed native-language spelling mapped to the same known city; Chinese comes from the bound repository city ID, not a same-name global join."
+    },
+    "vp-13270": {
+      "original": "Prishtinë",
+      "entityTag": "YUG",
+      "stateId": 812,
+      "cityId": "CITY::gn::786714",
+      "countryCode": "XK",
+      "status": "normalization",
+      "basis": "Reviewed native-language spelling mapped to the same known city; Chinese comes from the bound repository city ID, not a same-name global join."
+    },
+    "vp-13633": {
+      "original": "Gwadar",
+      "entityTag": "OMN",
+      "stateId": 1914,
+      "cityId": "CITY::ne::1159136401",
+      "countryCode": "PK",
+      "status": "normalization",
+      "basis": "Reviewed native-language spelling mapped to the same known city; Chinese comes from the bound repository city ID, not a same-name global join."
+    },
+    "vp-3022": {
+      "original": "Trøndheim",
+      "entityTag": "NOR",
+      "stateId": 1272,
+      "cityId": "CITY::ne::1159150641",
+      "countryCode": "NO",
+      "status": "normalization",
+      "basis": "Reviewed native-language spelling mapped to the same known city; Chinese comes from the bound repository city ID, not a same-name global join."
+    }
+  },
+  "equivalentCityAliases": [
+    {
+      "en": "Warszawa",
+      "cityId": "CITY::ne::1159151299",
+      "status": "normalization",
+      "basis": "Polish and English names for Warsaw; not a historical rename."
+    },
+    {
+      "en": "Moskva",
+      "cityId": "CITY::ne::1159151585",
+      "status": "normalization",
+      "basis": "Russian and English names for Moscow; not a historical rename."
+    }
+  ]
+}

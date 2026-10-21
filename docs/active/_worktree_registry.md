@@ -1,5 +1,12 @@
 # Worktree Registry
 
+## 2026-10-21 HGO visual layers and resource symbols
+
+- Branch: `codex/hgo-visual-layers`; base `origin/main@2f057a05dc5f55fab2bb8166c7702f0a145c771d`.
+- Managed checkout: `C:/Users/raede/.codex/worktrees/hgo-visual-layers/mapcreator`. Root owns integration, localhost:8010, browser checks, builds, commits, push and protected merge.
+- Scope: independent HGO raster overlays, inspector tabs, native resource/infrastructure visualization, bounded full-map symbol decluttering and evidence-backed bilingual names. Primary-checkout and other-worktree WIP are preserved.
+- Retain this checkout after delivery for frozen comparisons and ignored source-review evidence. See [delivery status](hgo-visual-layers/task.md); the branch PR is authoritative for final checks and merge receipt.
+
 ## 2026-10-19 TNO GPU 栅格场景整合
 
 当前任务独占 `C:/Users/raede/.codex/worktrees/tno-raster-scene/mapcreator`，分支 `codex/tno-raster-scene-20261018`，基于 `5fbbfdcff93ae36e24261b0e7f1ae58239fa4cc4`（准确基点以 Git merge-base 为准）。用户已授权提交、推送和受保护合并；root 独占 Git 与验证。主目录及其他工作树的 WIP 不纳入。保留本树及 ignored 性能证据用于后续首次 GPU 帧尖峰、地形严格像素一致性和 130% 离群长任务修复；这些仍未完成。任务实现和现场验收见 [任务记录](tno-raster-scene-20261018/task.md)，实现提交 `5581600f` 已推送；[PR #245](https://github.com/raederhans/scenario-forge/pull/245) 为合并与 CI 的最终回执。

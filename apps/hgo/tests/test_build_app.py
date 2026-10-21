@@ -1,10 +1,12 @@
 import gzip
 import hashlib
 import json
+import shutil
 from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import call, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 from build_app import build_app, encoded
@@ -112,6 +114,88 @@ class BuildAppTests(unittest.TestCase):
         self.put('assets/default/provenance.json', encoded(dict(files={})))
         with self.assertRaisesRegex(ValueError, 'Provenance fingerprint'):
             build_app(self.source, self.base / 'other')
+
+    def test_windows_publication_retries_only_the_rename(self):
+        for code in (5, 32):
+            with self.subTest(winerror=code):
+                error = PermissionError('Directory publication denied')
+                error.winerror = code
+                calls = []
+
+                def fail_then_rename(stage, output):
+                    calls.append(stage)
+                    if len(calls) < 3:
+                        raise error
+                    # Model the successful publication without a real rename:
+                    # Windows scanners can inject extra, unrelated sharing errors.
+                    # The ordinary package tests exercise the real rename path.
+                    shutil.copytree(stage, output)
+                    return output
+
+                output = self.base / f'packed-{code}'
+                with patch('build_app.sys.platform', 'win32'), \
+                        patch.object(Path, 'rename', autospec=True, side_effect=fail_then_rename), \
+                        patch('build_app.time.sleep') as sleep:
+                    build_app(self.source, output)
+                self.assertEqual(len(calls), 3)
+                self.assertEqual(len(set(calls)), 1)
+                self.assertEqual(sleep.call_args_list, [call(0.05), call(0.1)])
+                self.assertTrue((output / 'index.html').is_file())
+
+    def test_publication_errors_are_not_swallowed(self):
+        cases = [('win32', PermissionError('No Windows error code'), 1),
+                 ('win32', OSError('Unrelated filesystem failure'), 1)]
+        for platform, code, attempts in [('win32', 5, 4), ('win32', 32, 4),
+                                         ('win32', 87, 1), ('linux', 5, 1)]:
+            error = PermissionError('Directory publication denied')
+            error.winerror = code
+            cases.append((platform, error, attempts))
+        for platform, error, attempts in cases:
+            with self.subTest(platform=platform, error=error, attempts=attempts):
+                with patch('build_app.sys.platform', platform), \
+                        patch.object(Path, 'rename', side_effect=error) as rename, \
+                        patch('build_app.time.sleep') as sleep:
+                    with self.assertRaises(type(error)) as caught:
+                        build_app(self.source, self.output)
+                self.assertIs(caught.exception, error)
+                self.assertEqual(rename.call_count, attempts)
+                self.assertEqual(sleep.call_args_list,
+                                 [call(0.05 * attempt) for attempt in range(1, attempts)])
+                self.assertFalse(self.output.exists())
+                self.assertEqual(list(self.base.glob('.hgo-build-*')), [])
+
+    def test_output_created_during_publication_retry_is_preserved(self):
+        error = PermissionError('Directory publication denied')
+        error.winerror = 5
+
+        def create_unknown_output(delay):
+            self.output.mkdir()
+            (self.output / 'user.txt').write_text('preserve')
+
+        with patch('build_app.sys.platform', 'win32'), \
+                patch.object(Path, 'rename', side_effect=error) as rename, \
+                patch('build_app.time.sleep', side_effect=create_unknown_output):
+            with self.assertRaisesRegex(ValueError, 'Output appeared during publication'):
+                build_app(self.source, self.output)
+        self.assertEqual(rename.call_count, 1)
+        self.assertEqual((self.output / 'user.txt').read_text(), 'preserve')
+        self.assertEqual(list(self.base.glob('.hgo-build-*')), [])
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Windows rename must refuse a concurrent destination')
+    def test_windows_rename_refuses_output_created_after_conflict_check(self):
+        rename = Path.rename
+
+        def create_then_rename(stage, output):
+            output.write_text('preserve')
+            return rename(stage, output)
+
+        with patch.object(Path, 'rename', autospec=True, side_effect=create_then_rename), \
+                patch('build_app.time.sleep') as sleep:
+            with self.assertRaises(FileExistsError):
+                build_app(self.source, self.output)
+        sleep.assert_not_called()
+        self.assertEqual(self.output.read_text(), 'preserve')
+        self.assertEqual(list(self.base.glob('.hgo-build-*')), [])
 
 
 if __name__ == '__main__':

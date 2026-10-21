@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import {readFile,readdir,realpath,stat} from 'node:fs/promises';
+import {lstat,readFile,readdir,realpath,stat} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 
@@ -45,6 +46,36 @@ export async function checkBoundary(directory=path.resolve(here,'..')) {
   if(manifest.format!=='hgo-native-dataset'||manifest.schemaVersion!==1)throw new Error('Unsupported dataset manifest');
   for(const asset of Object.values(manifest.assets||{}))assets.add(await resolveLocal(`./${asset.url}`,manifestPath));
   assets.add(await resolveLocal(`./${manifest.source.provenanceUrl}`,manifestPath));
+  const overlayRoot=path.join(root,'assets/overlays'),catalogPath=path.join(overlayRoot,'catalog.json');
+  let catalogBytes;
+  try{if((await lstat(catalogPath)).isSymbolicLink())throw new Error('Overlay catalog symbolic link refused');catalogBytes=await readFile(catalogPath);}catch(error){if(error.code!=='ENOENT')throw error;}
+  if(catalogBytes){
+    if((await lstat(overlayRoot)).isSymbolicLink())throw new Error('Overlay root symbolic link refused');
+    if(catalogBytes.byteLength>512*1024)throw new Error('Overlay catalog exceeds the 512 KiB limit');
+    let catalog;try{catalog=JSON.parse(catalogBytes.toString('utf8'));}catch{throw new Error('Invalid overlay catalog JSON');}
+    if(catalog.format!=='hgo-visualization-catalog'||catalog.schemaVersion!==1)throw new Error('Unsupported overlay catalog');
+    if(catalog.baseDataset?.id!==manifest.id||catalog.baseDataset?.revision!==manifest.revision)throw new Error('Overlay catalog base dataset mismatch');
+    const overlayRootReal=await realpath(overlayRoot),closure=new Set();
+    async function overlayDescriptor(item,label){
+      if(!item||typeof item.path!=='string'||!item.path||item.path.startsWith('/')||item.path.includes('\\')||item.path.includes(':')||item.path.split('/').some(part=>!part||part==='.'||part==='..'))throw new Error(`Invalid ${label} path`);
+      const resolved=await realpath(path.resolve(overlayRootReal,...item.path.split('/')));
+      const relative=path.relative(overlayRootReal,resolved);
+      if(relative===''||relative==='..'||relative.startsWith(`..${path.sep}`)||path.isAbsolute(relative))throw new Error(`${label} escapes overlay closure`);
+      let cursor=overlayRootReal;for(const part of item.path.split('/')){cursor=path.join(cursor,part);if((await lstat(cursor)).isSymbolicLink())throw new Error(`${label} symbolic link refused`);}
+      const info=await stat(resolved);if(!info.isFile())throw new Error(`${label} is not a file`);
+      if(!Number.isSafeInteger(item.byteLength)||item.byteLength<=0||item.byteLength!==info.size)throw new Error(`${label} byteLength mismatch`);
+      if(typeof item.sha256!=='string'||!/^[a-f0-9]{64}$/.test(item.sha256))throw new Error(`${label} has invalid SHA-256`);
+      const bytes=await readFile(resolved);
+      if(createHash('sha256').update(bytes).digest('hex')!==item.sha256)throw new Error(`${label} SHA-256 mismatch`);
+      const key=relative.split(path.sep).join('/');if(closure.has(key))throw new Error(`Duplicate overlay closure path: ${key}`);closure.add(key);
+      assets.add(resolved);
+    }
+    if(!catalog.assets||typeof catalog.assets!=='object'||Array.isArray(catalog.assets))throw new Error('Invalid overlay assets');
+    for(const [name,item] of Object.entries(catalog.assets))await overlayDescriptor(item,`Overlay asset ${name}`);
+    if(!Array.isArray(catalog.provenance)||catalog.provenance.length>2048)throw new Error('Invalid overlay provenance list');
+    for(const item of catalog.provenance)await overlayDescriptor(item,'Overlay provenance');
+    assets.add(catalogPath);
+  }
   if(!visited.has(path.join(root,'src/main.js')))throw new Error('Missing independent module entry');
   return {modules:visited.size,assets:assets.size,root};
 }
