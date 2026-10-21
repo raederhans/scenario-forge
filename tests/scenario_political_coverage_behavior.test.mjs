@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import test from "node:test";
+import "../js/core/scenario_chunk_format_shared.js";
 import { getFeatureId } from "../js/core/feature_identity.js";
 import { normalizeScenarioFeatureCollection, getScenarioFeatureCollectionIdentityList,
   areScenarioFeatureCollectionsEquivalent } from "../js/core/scenario/pure_helpers.js";
@@ -47,7 +49,10 @@ for (const scenarioId of ["tno_1962", "hoi4_1936", "hoi4_1939"]) {
 }
 
 test("real TNO detail replaces coarse by canonical identity despite different topology IDs", () => {
-  const read = (name) => JSON.parse(readFileSync(new URL(`../data/scenarios/tno_1962/chunks/political.${name}.json`, import.meta.url), "utf8"));
+  // Published political chunks are TopoJSON; decode them exactly as the runtime does.
+  const topojson = createRequire(import.meta.url)("../vendor/topojson-client.min.js");
+  const { decodeScenarioChunkPayload } = globalThis.__scenarioForgeScenarioChunkFormatShared;
+  const read = (name) => decodeScenarioChunkPayload(JSON.parse(readFileSync(new URL(`../data/scenarios/tno_1962/chunks/political.${name}.json`, import.meta.url), "utf8")), topojson);
   const coarse = read("coarse.r0c0");
   const detail = read("detail.country.ger");
   const merged = mergeScenarioChunkPayloads("political", [detail, coarse]);
