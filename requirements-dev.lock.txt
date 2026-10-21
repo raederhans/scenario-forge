@@ -29,7 +29,7 @@ Pygments==2.20.0
 pyogrio==0.12.1
 pyparsing==3.3.2
 pyproj==3.7.2
-pytest==9.0.3
+pytest==9.1.1
 pytest-xdist==3.8.0
 python-dateutil==2.9.0.post0
 rasterio==1.5.0

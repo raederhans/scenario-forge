@@ -14,7 +14,7 @@ test("every quarantined test exists and states why it is skipped", () => {
 });
 
 test("slow lists name existing files once and never overlap the quarantine", () => {
-  for (const [list, suite] of [["nodeSlow", "node"], ["pythonSlow", "python"]]) {
+  for (const [list, suite] of [["nodeSlow", "node"], ["nodeWindowsOnly", "node"], ["pythonSlow", "python"]]) {
     const files = quarantine[list].files;
     assert.ok(quarantine[list]._reason, `${list} needs a reason`);
     assert.equal(new Set(files).size, files.length, `${list} has duplicates`);

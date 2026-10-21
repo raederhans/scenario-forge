@@ -68,5 +68,11 @@
       "tests/verify_core_runner_behavior.test.mjs",
       "tests/state_action_delegation_edges_behavior.test.mjs"
     ]
+  },
+  "nodeWindowsOnly": {
+    "_reason": "Exercises the Windows-only Williams crossover harness (WMI telemetry, power lifecycle, Windows Job runner); runs only on win32.",
+    "files": [
+      "tests/williams_crossover_governance_behavior.test.mjs"
+    ]
   }
 }
