@@ -12,6 +12,32 @@ function readScalarInternals() {
     .then(source => import(`data:text/javascript;base64,${Buffer.from(`${source}\nexport { createCompactEdges, sourceEdgeQuery, sourceCollinear };`).toString('base64')}`));
 }
 
+function legacySourceEdgeQuery(edges, occupied) {
+  const ordered = [...edges.values(), ...occupied.filter(edge => !edge.key)]
+    .filter(edge => Math.abs(edge.b[0] - edge.a[0]) <= 180 * 1e7);
+  const ordinal = new Map(ordered.map((edge, index) => [edge, index]));
+  ordered.sort((a, b) => a.a[0] - b.a[0] || ordinal.get(a) - ordinal.get(b));
+  let size = 1; while (size < ordered.length) size *= 2;
+  const maxima = new Float64Array(size * 2).fill(-Infinity);
+  ordered.forEach((edge, index) => { maxima[size + index] = edge.b[0]; });
+  for (let index = size - 1; index > 0; index -= 1) maxima[index] = Math.max(maxima[index * 2], maxima[index * 2 + 1]);
+  return (x0, y0, x1, y1) => {
+    const result = [];
+    function visit(node, lo, hi) {
+      if (lo >= ordered.length || ordered[lo].a[0] > x1 || maxima[node] < x0) return;
+      if (hi - lo === 1) {
+        const edge = ordered[lo];
+        if (Math.min(edge.a[1], edge.b[1]) <= y1 && Math.max(edge.a[1], edge.b[1]) >= y0) result.push(edge);
+        return;
+      }
+      const mid = (lo + hi) >>> 1;
+      visit(node * 2, lo, mid); visit(node * 2 + 1, mid, hi);
+    }
+    visit(1, 0, size);
+    return result;
+  };
+}
+
 const polygon = (id, rings) => ({ id, geometry: { type: 'Polygon', coordinates: rings } });
 const rect = (id, x0, y0, x1, y1) => polygon(id, [[[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]]]);
 function segments(graph) {
@@ -205,6 +231,19 @@ function graphBytes(graph) {
   return hash.digest('hex');
 }
 
+test('signed world strips with split boundaries retain exact packed graph bytes', () => {
+  const split = (id, x0, x1) => polygon(id, [[[x0, -1], [x1, -1], [x1, 1], [x0, 1], [x0, 0], [x0, -1]]]);
+  const features = [rect('W-A', -4, -1, -3, 1), split('W-B', -3, -2),
+    rect('E-A', 3, -1, 4, 1), split('E-B', 4, 5)].map(feature => ({ ...feature, coordinatePrecision: 7 }));
+  const graph = buildPaintContourGraph(features);
+  assert.deepEqual(graph.featureIds, ['W-A', 'W-B', 'E-A', 'E-B']);
+  assert.deepEqual(segments(graph), [
+    'E-A:E-B|[4,-1]|[4,0]', 'E-A:E-B|[4,0]|[4,1]',
+    'W-A:W-B|[-3,-1]|[-3,0]', 'W-A:W-B|[-3,0]|[-3,1]',
+  ]);
+  assert.equal(graphBytes(graph), '510b387ec1fbe974376381dcf056c429a05966d080c5d0724f7671d03fe33173');
+});
+
 test('compact edge indexing preserves legacy packed bytes through rehash, patches, ambiguity and restore', () => {
   const features = compactFixture(), before = JSON.stringify(features), builder = createPaintContourGraphBuilder();
   builder.patch(features);
@@ -285,6 +324,55 @@ test('scalar interval queries retain mixed compact/split edge order and inclusiv
   assert.deepEqual(query(30, 4, 30, 4), [originals[0]]);
   assert.deepEqual(query(31, -90, 40, 90), []);
   store.endRead();
+});
+
+test('signed-Int32 radix interval queries preserve duplicate-x0 ordinal order and inclusive bounds', async () => {
+  const { sourceEdgeQuery } = await readScalarInternals();
+  const edge = (id, x0, y0, x1, y1) => ({ id, a: [x0, y0], b: [x1, y1] });
+  const int32Min = -0x80000000, int32Max = 0x7fffffff;
+  const source = [
+    edge('tie-upper-first', -1e9, 5, -1e9 + 30, 10),
+    edge('signed-max', int32Max - 5, -2, int32Max, 2),
+    edge('signed-min', int32Min, -2, int32Min + 5, 2),
+    edge('tie-lower-second', -1e9, -5, -1e9 + 10, 0),
+    edge('long-cross-buckets', -1700000000, -10, 100, 10),
+    edge('zero-degenerate', 0, 0, 0, 0),
+  ];
+  const occupied = [edge('occupied-tie', -1e9, -1, -1e9 + 20, 1), { ...edge('excluded-keyed', 0, -1, 0, 1), key: 7 }];
+  const store = { values: () => source };
+  const expected = legacySourceEdgeQuery(store, occupied), actual = sourceEdgeQuery(store, occupied);
+  const ranges = [
+    [int32Min, -2, int32Min + 5, 2], [-1e9, -10, -1e9 + 30, 10],
+    [0, -10, 100, 10], [int32Max - 5, -2, int32Max, 2],
+    [int32Min, -10, int32Max, 10], [int32Min - 1, -10, int32Max + 1, 10],
+    [0, 0, 0, 0],
+  ];
+  for (const range of ranges) {
+    assert.deepEqual(actual(...range).map(value => value.id), expected(...range).map(value => value.id), `query ${range.join(',')}`);
+  }
+  const tied = actual(-1e9, -10, -1e9 + 30, 10).map(value => value.id);
+  assert.ok(tied.indexOf('tie-upper-first') < tied.indexOf('tie-lower-second'));
+  assert.ok(tied.indexOf('tie-lower-second') < tied.indexOf('occupied-tie'));
+  assert.deepEqual(sourceEdgeQuery({ values: () => [] }, [])(0, 0, 0, 0), []);
+});
+
+test('source query keeps legacy fallback for non-Int32 starts, ends and fractional coordinates', async () => {
+  const { sourceEdgeQuery } = await readScalarInternals();
+  const edge = (id, x0, y0, x1, y1) => ({ id, a: [x0, y0], b: [x1, y1] });
+  const source = [
+    edge('positive-overflow-start', 2147483648, 0, 2147483649, 1),
+    edge('negative-overflow-start', -2147483649, 0, -2147483648, 1),
+    edge('overflow-end-only', 2000000000, -2, 2147483648, 2),
+    edge('fractional-start', 0.5, -1, 1.5, 1),
+    edge('in-range', -10, -1, -5, 1),
+  ];
+  const occupied = [edge('occupied-overflow', 2147483648, -1, 2147483650, 1)];
+  const store = { values: () => source };
+  const expected = legacySourceEdgeQuery(store, occupied), actual = sourceEdgeQuery(store, occupied);
+  for (const range of [[-3e9, -2, 3e9, 2], [-2147483649, 0, -2147483648, 1],
+    [2000000000, -2, 2147483648, 2], [0.5, -1, 1.5, 1]]) {
+    assert.deepEqual(actual(...range).map(value => value.id), expected(...range).map(value => value.id), `query ${range.join(',')}`);
+  }
 });
 
 test('scalar source collinearity preserves the original floating error operation order', async () => {

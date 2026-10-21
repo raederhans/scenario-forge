@@ -49,6 +49,11 @@ export function createCityPointsRenderOwner({
     getCityTooltipText = () => "",
     getCityVisualCapitalState = (entry) => !!entry?.isCapital,
     getEffectiveCityCollection = () => null,
+    getEffectiveCityCollectionSource = () => null,
+    isEffectiveCityCollectionSourceCurrent = () => false,
+    getCachedEffectiveCityCollection = () => null,
+    prepareEffectiveCityCollection = null,
+    installEffectiveCityCollection = () => false,
     getHoverEntryHitPriority = () => 0,
     getPointer = () => null,
     getZoomIdentity = () => DEFAULT_ZOOM_IDENTITY,
@@ -361,13 +366,14 @@ export function createCityPointsRenderOwner({
   }
 
   function prepareCurrentView(k, options = {}) {
-    if (!isPrivatePreparationEnabled() || typeof prepareCityRevealPlan !== "function") {
+    if (!isPrivatePreparationEnabled() || typeof prepareCityRevealPlan !== "function"
+      || typeof prepareEffectiveCityCollection !== "function") {
       cancelPreparation();
       return null;
     }
-    const cityCollection = getEffectiveCityCollection();
+    const source = getEffectiveCityCollectionSource();
     const currentProjection = getProjection();
-    if (!runtimeState.showCityPoints || !cityCollection?.features?.length || !currentProjection) {
+    if (!runtimeState.showCityPoints || !currentProjection) {
       cancelPreparation();
       return null;
     }
@@ -375,28 +381,41 @@ export function createCityPointsRenderOwner({
     const transform = { x: rawTransform?.x, y: rawTransform?.y, k: rawTransform?.k };
     const scale = Math.max(0.0001, Number(transform.k || k || 1));
     const config = getCityRevealConfig();
-    const key = getCityRevealViewKey(cityCollection, scale, transform, config, currentProjection);
-    if (sameViewKey(preparedRevealPlan?.key, key)) return null;
-    if (sameViewKey(privatePreparation?.key, key)) return privatePreparation.promise;
-    const job = { key, promise: null };
+    const key = getCityRevealViewKey(null, scale, transform, config, currentProjection);
+    if (isEffectiveCityCollectionSourceCurrent(preparedRevealPlan?.source)
+      && sameViewKey(preparedRevealPlan?.viewKey, key)
+      && sameViewKey(preparedRevealPlan.key,
+        getCityRevealViewKey(getCachedEffectiveCityCollection(), scale, transform, config, currentProjection))) return null;
+    if (isEffectiveCityCollectionSourceCurrent(privatePreparation?.source)
+      && sameViewKey(privatePreparation?.key, key)) return privatePreparation.promise;
+    const job = { key, source, promise: null };
     privatePreparation = job;
     const current = () => {
       if (privatePreparation !== job || options.signal?.aborted || options.isCurrent?.() === false
-        || !isPrivatePreparationEnabled() || getProjection() !== currentProjection) return false;
+        || !isPrivatePreparationEnabled() || getProjection() !== currentProjection
+        || !isEffectiveCityCollectionSourceCurrent(source)) return false;
       const liveTransform = runtimeState.zoomTransform || getZoomIdentity();
       const liveScale = Math.max(0.0001, Number(liveTransform?.k || k || 1));
-      return sameViewKey(key, getCityRevealViewKey(getEffectiveCityCollection(), liveScale, liveTransform, getCityRevealConfig()));
+      return sameViewKey(key, getCityRevealViewKey(null, liveScale, liveTransform, getCityRevealConfig()));
     };
     // The policy's first step yields before entering any collection/projection
     // helper. No context, hover list or label reservation is touched here.
-    job.promise = prepareCityRevealPlan(cityCollection, scale, transform, config, { ...options, isCurrent: current })
-      .then((plan) => {
-        if (!plan || !current()) return false;
-        preparedRevealPlan = { key, plan };
-        return true;
-      }).finally(() => {
-        if (privatePreparation === job) privatePreparation = null;
-      });
+    job.promise = (async () => {
+      const prepared = await prepareEffectiveCityCollection(source, { ...options, isCurrent: current });
+      if (!prepared || !current()) return false;
+      const cityCollection = prepared.collection;
+      const plan = cityCollection?.features?.length
+        ? await prepareCityRevealPlan(cityCollection, scale, transform, config, { ...options, isCurrent: current })
+        : { markerEntries: [], labelEntries: [] };
+      if (!plan || !current()) return false;
+      // Source and plan become visible together, after both private stages.
+      const readyKey = getCityRevealViewKey(cityCollection, scale, transform, config, currentProjection);
+      if (!installEffectiveCityCollection(prepared)) return false;
+      preparedRevealPlan = { key: readyKey, viewKey: key, source, plan };
+      return true;
+    })().finally(() => {
+      if (privatePreparation === job) privatePreparation = null;
+    });
     return job.promise;
   }
 
@@ -425,7 +444,8 @@ export function createCityPointsRenderOwner({
 
   function getCityLayerRenderState(k, { interactive = false, cacheHoverEntries = false } = {}) {
     syncRenderTargets();
-    const cityCollection = getEffectiveCityCollection();
+    const privateMode = isPrivatePreparationEnabled();
+    const cityCollection = privateMode ? getCachedEffectiveCityCollection() : getEffectiveCityCollection();
     const featureCount = getFeatureCollectionFeatureCount(cityCollection);
     if (!runtimeState.showCityPoints || !cityCollection?.features?.length || !projection) {
       if (cacheHoverEntries) {
@@ -436,7 +456,8 @@ export function createCityPointsRenderOwner({
         markerEntries: [],
         labelEntries: [],
         skipped: true,
-        reason: !runtimeState.showCityPoints ? "hidden" : !projection ? "no-projection" : "no-data",
+        reason: !runtimeState.showCityPoints ? "hidden" : !projection ? "no-projection"
+          : privateMode && !isEffectiveCityCollectionSourceCurrent(preparedRevealPlan?.source) ? "preparing" : "no-data",
       };
     }
 

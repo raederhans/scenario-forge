@@ -161,8 +161,8 @@ export function createUrbanCityPolicyOwner({
     return String(aliasToKey.get(value) || "").trim();
   }
 
-  function getScenarioCountryCodesForTag(tag) {
-    const record = state?.scenarioCountriesByTag?.[tag];
+  function getScenarioCountryCodesForTag(tag, countries = state?.scenarioCountriesByTag) {
+    const record = countries?.[tag];
     if (!record || typeof record !== "object") return new Set();
     return new Set(
       [record.lookup_iso2, record.base_iso2]
@@ -171,12 +171,12 @@ export function createUrbanCityPolicyOwner({
     );
   }
 
-  function getCityScenarioTag(feature) {
+  function getCityScenarioTag(feature, sovereignty = state?.sovereigntyByFeatureId) {
     const props = feature?.properties || {};
     const hostFeatureId = String(props.__city_host_feature_id || props.host_feature_id || "").trim();
     if (!hostFeatureId) return "";
     return String(
-      state?.sovereigntyByFeatureId?.[hostFeatureId]
+      sovereignty?.[hostFeatureId]
       || ""
     ).trim().toUpperCase();
   }
@@ -185,10 +185,6 @@ export function createUrbanCityPolicyOwner({
     const normalizedTag = String(tag || "").trim().toUpperCase();
     if (!normalizedTag) return false;
     return !!state?.scenarioCountriesByTag?.[normalizedTag]?.hide_city_points;
-  }
-
-  function shouldHideCityPointForScenarioCountry(feature) {
-    return doesScenarioCountryHideCityPoints(getCityScenarioTag(feature));
   }
 
   function getCapitalCandidateSortTuple(feature, preferredCountryCodes = new Set()) {
@@ -272,9 +268,9 @@ export function createUrbanCityPolicyOwner({
     return String(value || "").trim().toLowerCase();
   }
 
-  function getStrategicVictoryPointForCity(feature) {
-    const strategicValues = isScenarioStrategicValuesUsable(state?.scenarioStrategicValuesData)
-      ? state.scenarioStrategicValuesData
+  function getStrategicVictoryPointForCity(feature, source = state?.scenarioStrategicValuesData) {
+    const strategicValues = isScenarioStrategicValuesUsable(source)
+      ? source
       : null;
     const byFeature = strategicValues?.victoryPointsByFeature
       && typeof strategicValues.victoryPointsByFeature === "object"
@@ -309,8 +305,8 @@ export function createUrbanCityPolicyOwner({
     return exactMatch || null;
   }
 
-  function applyStrategicVictoryPointRank(feature) {
-    const entry = getStrategicVictoryPointForCity(feature);
+  function applyStrategicVictoryPointRank(feature, source = state?.scenarioStrategicValuesData) {
+    const entry = getStrategicVictoryPointForCity(feature, source);
     const value = Math.max(0, Number(entry?.value || 0));
     if (!entry || value <= 0) {
       return feature;
@@ -565,38 +561,53 @@ export function createUrbanCityPolicyOwner({
     }
   }
 
-  function getEffectiveCityCollection() {
-    const baseRef = state?.worldCitiesData || null;
-    const scenarioRef = state?.scenarioCityOverridesData || null;
-    const strategicValuesRef = state?.scenarioStrategicValuesData || null;
-    const scenarioCountriesRef = state?.scenarioCountriesByTag || null;
-    const scenarioId = String(state?.activeScenarioId || "");
-    const cityLayerRevision = Number(state?.cityLayerRevision || 0);
-    const strategicValuesRevision = Number(state?.scenarioStrategicValuesRevision || 0);
-    const sovereigntyRevision = Number(state?.sovereigntyRevision || 0);
-    if (
-      cityLayerCache?.baseRef === baseRef
-      && cityLayerCache?.scenarioRef === scenarioRef
-      && cityLayerCache?.strategicValuesRef === strategicValuesRef
-      && cityLayerCache?.scenarioCountriesRef === scenarioCountriesRef
-      && cityLayerCache?.scenarioId === scenarioId
-      && cityLayerCache?.cityLayerRevision === cityLayerRevision
-      && cityLayerCache?.strategicValuesRevision === strategicValuesRevision
-      && cityLayerCache?.sovereigntyRevision === sovereigntyRevision
-    ) {
-      return cityLayerCache.merged;
-    }
+  function getEffectiveCityCollectionSource() {
+    return {
+      baseRef: state?.worldCitiesData || null,
+      scenarioRef: state?.scenarioCityOverridesData || null,
+      strategicValuesRef: state?.scenarioStrategicValuesData || null,
+      scenarioCountriesRef: state?.scenarioCountriesByTag || null,
+      sovereigntyRef: state?.sovereigntyByFeatureId || null,
+      scenarioId: String(state?.activeScenarioId || ""),
+      cityLayerRevision: Number(state?.cityLayerRevision || 0),
+      strategicValuesRevision: Number(state?.scenarioStrategicValuesRevision || 0),
+      sovereigntyRevision: Number(state?.sovereigntyRevision || 0),
+    };
+  }
 
+  function sameEffectiveCitySource(left, right) {
+    return !!left && !!right && Object.keys(right).every((key) => Object.is(left[key], right[key]));
+  }
+
+  function isEffectiveCityCollectionSourceCurrent(source) {
+    return sameEffectiveCitySource(source, getEffectiveCityCollectionSource());
+  }
+
+  function getCachedEffectiveCityCollection() {
+    return cityLayerCache?.merged || null;
+  }
+
+  function installEffectiveCityCollection(prepared) {
+    if (!prepared || !isEffectiveCityCollectionSourceCurrent(prepared.source)) return false;
+    if (cityLayerCache && typeof cityLayerCache === "object") {
+      Object.assign(cityLayerCache, prepared.source, { merged: prepared.collection });
+    }
+    return true;
+  }
+
+  function* iterateEffectiveCityCollection(source) {
+    const { baseRef, scenarioRef, strategicValuesRef, scenarioCountriesRef, sovereigntyRef, scenarioId } = source;
     const featuresByKey = new Map();
     const aliasToKey = new Map();
-    const rememberFeatureAliases = (feature, key) => {
-      getCityFeatureAliases(feature, key).forEach((alias) => {
+    const rememberFeatureAliases = function* (feature, key) {
+      for (const alias of getCityFeatureAliases(feature, key)) {
         aliasToKey.set(alias, key);
-      });
+        yield;
+      }
     };
-    const setFeature = (feature, key) => {
+    const setFeature = function* (feature, key) {
       featuresByKey.set(key, feature);
-      rememberFeatureAliases(feature, key);
+      yield* rememberFeatureAliases(feature, key);
     };
     const deleteByAlias = (rawAlias) => {
       const alias = String(rawAlias || "").trim();
@@ -605,84 +616,98 @@ export function createUrbanCityPolicyOwner({
       featuresByKey.delete(resolvedKey);
     };
 
-    (Array.isArray(baseRef?.features) ? baseRef.features : []).forEach((feature, index) => {
-      const key = getCityFeatureKey(feature, `world_city_${index + 1}`);
-      if (!key || feature?.properties?.__city_hidden) return;
-      setFeature(feature, key);
-    });
+    let index = 0;
+    for (const feature of (Array.isArray(baseRef?.features) ? baseRef.features : [])) {
+      yield;
+      index += 1;
+      const key = getCityFeatureKey(feature, `world_city_${index}`);
+      if (!key || feature?.properties?.__city_hidden) continue;
+      yield* setFeature(feature, key);
+    }
 
     const legacyScenarioCollection = scenarioRef?.featureCollection || (
       Array.isArray(scenarioRef?.features) ? scenarioRef : null
     );
-    (Array.isArray(legacyScenarioCollection?.features) ? legacyScenarioCollection.features : []).forEach((feature, index) => {
+    index = 0;
+    for (const feature of (Array.isArray(legacyScenarioCollection?.features) ? legacyScenarioCollection.features : [])) {
+      yield;
+      index += 1;
       const props = feature?.properties || {};
-      const key = getCityFeatureKey(feature, `scenario_city_${index + 1}`);
+      const key = getCityFeatureKey(feature, `scenario_city_${index}`);
       const replaceIds = Array.isArray(props.__city_replace_ids) ? props.__city_replace_ids : [];
-      replaceIds.forEach((value) => deleteByAlias(value));
-      if (!key) return;
+      for (const value of replaceIds) { deleteByAlias(value); yield; }
+      if (!key) continue;
       deleteByAlias(key);
-      if (props.__city_hidden) return;
-      setFeature(feature, key);
-    });
+      if (props.__city_hidden) continue;
+      yield* setFeature(feature, key);
+    }
 
-    Object.values(scenarioRef?.cities || {}).forEach((overrideEntry) => {
+    for (const entryKey in (scenarioRef?.cities || {})) {
+      if (!Object.hasOwn(scenarioRef.cities, entryKey)) continue;
+      yield;
+      const overrideEntry = scenarioRef.cities[entryKey];
       const replaceIds = Array.isArray(overrideEntry?.replace_ids) ? overrideEntry.replace_ids : [];
-      replaceIds.forEach((value) => deleteByAlias(value));
+      for (const value of replaceIds) { deleteByAlias(value); yield; }
       const key = resolveCityFeatureKey(
         overrideEntry?.city_id || overrideEntry?.stable_key || "",
         featuresByKey,
         aliasToKey
       );
-      if (!key || !featuresByKey.has(key)) return;
+      if (!key || !featuresByKey.has(key)) continue;
       const nextFeature = applyScenarioCityOverride(featuresByKey.get(key), overrideEntry);
       if (nextFeature?.properties?.__city_hidden) {
         featuresByKey.delete(key);
-        return;
+        continue;
       }
-      setFeature(nextFeature, key);
-    });
+      yield* setFeature(nextFeature, key);
+    }
 
     const activeCapitalCityIds = new Set();
-    if (scenarioId && state?.scenarioCountriesByTag && typeof state.scenarioCountriesByTag === "object") {
+    if (scenarioId && scenarioCountriesRef && typeof scenarioCountriesRef === "object") {
       const candidatesByTag = new Map();
-      Array.from(featuresByKey.entries()).forEach(([key, feature]) => {
-        const tag = getCityScenarioTag(feature);
-        if (!tag) return;
+      for (const [key, feature] of featuresByKey) {
+        yield;
+        const tag = getCityScenarioTag(feature, sovereigntyRef);
+        if (!tag) continue;
         const current = candidatesByTag.get(tag) || [];
         current.push({ key, feature });
         candidatesByTag.set(tag, current);
-      });
+      }
 
-      Object.keys(state.scenarioCountriesByTag).forEach((rawTag) => {
+      for (const rawTag in scenarioCountriesRef) {
+        if (!Object.hasOwn(scenarioCountriesRef, rawTag)) continue;
+        yield;
         const tag = String(rawTag || "").trim().toUpperCase();
-        if (!tag) return;
-        const country = state.scenarioCountriesByTag[rawTag];
-        const capitalHint = state.scenarioCityOverridesData?.capital_city_hints?.[tag];
+        if (!tag) continue;
+        const country = scenarioCountriesRef[rawTag];
+        const capitalHint = scenarioRef?.capital_city_hints?.[tag];
         if ((scenarioId !== "blank_base" && country?.feature_count === 0)
-          || capitalHint?.resolution_method === "no_capital") return;
-        const explicitKey = resolveCityFeatureKey(state.scenarioCityOverridesData?.capitals_by_tag?.[tag], featuresByKey, aliasToKey);
+          || capitalHint?.resolution_method === "no_capital") continue;
+        const explicitKey = resolveCityFeatureKey(scenarioRef?.capitals_by_tag?.[tag], featuresByKey, aliasToKey);
         const hintedKey = explicitKey
           ? ""
-          : resolveCityFeatureKey(state.scenarioCityOverridesData?.capital_city_hints?.[tag]?.city_id, featuresByKey, aliasToKey);
+          : resolveCityFeatureKey(scenarioRef?.capital_city_hints?.[tag]?.city_id, featuresByKey, aliasToKey);
         let resolvedKey = explicitKey || hintedKey;
         if (!resolvedKey) {
-          const candidateEntries = (candidatesByTag.get(tag) || []).slice();
+          const candidateEntries = candidatesByTag.get(tag) || [];
           if (candidateEntries.length) {
-            const preferredCountryCodes = getScenarioCountryCodesForTag(tag);
-            candidateEntries.sort((left, right) => compareCapitalCandidateEntries(left, right, preferredCountryCodes));
-            resolvedKey = candidateEntries[0]?.key || "";
+            const preferredCountryCodes = getScenarioCountryCodesForTag(tag, scenarioCountriesRef);
+            const sortedCandidates = yield* stableSortCityEntries(candidateEntries,
+              (left, right) => compareCapitalCandidateEntries(left, right, preferredCountryCodes));
+            resolvedKey = sortedCandidates[0]?.key || "";
           }
         }
-        if (!resolvedKey || !featuresByKey.has(resolvedKey)) return;
+        if (!resolvedKey || !featuresByKey.has(resolvedKey)) continue;
         const resolvedCityId = getCityCanonicalId(featuresByKey.get(resolvedKey)) || resolvedKey;
         if (resolvedCityId) {
           activeCapitalCityIds.add(resolvedCityId);
         }
-      });
+      }
     }
 
     const finalFeatures = [];
-    Array.from(featuresByKey.entries()).forEach(([key, feature]) => {
+    for (const [key, feature] of featuresByKey) {
+      yield;
       const cityId = getCityCanonicalId(feature) || key;
       const nextIsCapital = scenarioId ? activeCapitalCityIds.has(cityId) : !!feature?.properties?.__city_is_capital;
       // Country-capital priority must follow the scenario, including newly
@@ -695,11 +720,11 @@ export function createUrbanCityPolicyOwner({
           __city_is_capital: nextIsCapital,
           __city_is_country_capital: nextIsCountryCapital,
         });
-      const strategicFeature = applyStrategicVictoryPointRank(nextFeature);
-      if (!strategicFeature?.properties?.__city_hidden && !shouldHideCityPointForScenarioCountry(strategicFeature)) {
+      const strategicFeature = applyStrategicVictoryPointRank(nextFeature, strategicValuesRef);
+      if (!strategicFeature?.properties?.__city_hidden && !scenarioCountriesRef?.[getCityScenarioTag(strategicFeature, sovereigntyRef)]?.hide_city_points) {
         finalFeatures.push(strategicFeature);
       }
-    });
+    }
 
     const merged = finalFeatures.length
       ? {
@@ -708,19 +733,44 @@ export function createUrbanCityPolicyOwner({
       }
       : null;
 
-    if (cityLayerCache && typeof cityLayerCache === "object") {
-      cityLayerCache.baseRef = baseRef;
-      cityLayerCache.scenarioRef = scenarioRef;
-      cityLayerCache.strategicValuesRef = strategicValuesRef;
-      cityLayerCache.scenarioCountriesRef = scenarioCountriesRef;
-      cityLayerCache.scenarioId = scenarioId;
-      cityLayerCache.cityLayerRevision = cityLayerRevision;
-      cityLayerCache.strategicValuesRevision = strategicValuesRevision;
-      cityLayerCache.sovereigntyRevision = sovereigntyRevision;
-      cityLayerCache.merged = merged;
-    }
-
     return merged;
+  }
+
+  function getEffectiveCityCollection() {
+    const source = getEffectiveCityCollectionSource();
+    if (sameEffectiveCitySource(cityLayerCache, source)) return cityLayerCache.merged;
+    const iterator = iterateEffectiveCityCollection(source);
+    let step;
+    do { step = iterator.next(); } while (!step.done);
+    installEffectiveCityCollection({ source, collection: step.value });
+    return step.value;
+  }
+
+  async function prepareEffectiveCityCollection(source = getEffectiveCityCollectionSource(), {
+    signal, isCurrent = () => true, yieldControl = yieldCityPlanningTask,
+    nowMs = () => globalThis.performance?.now?.() ?? Date.now(), sliceBudgetMs = 4, workBatch = 512,
+  } = {}) {
+    const current = () => !signal?.aborted && isCurrent() && isEffectiveCityCollectionSourceCurrent(source);
+    if (!current()) return null;
+    if (sameEffectiveCitySource(cityLayerCache, source)) return { source, collection: cityLayerCache.merged };
+    // Even the first merge scan starts in a subsequent host task.
+    await yieldControl();
+    if (!current()) return null;
+    const iterator = iterateEffectiveCityCollection(source);
+    const batchLimit = Math.max(1, Number(workBatch) || 512);
+    const timeLimit = Math.max(0.1, Number(sliceBudgetMs) || 4);
+    let started = nowMs(), work = 0;
+    while (true) {
+      const step = iterator.next();
+      if (step.done) return current() ? { source, collection: step.value } : null;
+      work += 1;
+      if (work >= batchLimit || (work % 32 === 0 && nowMs() - started >= timeLimit)) {
+        await yieldControl();
+        if (!current()) return null;
+        work = 0;
+        started = nowMs();
+      }
+    }
   }
 
   return {
@@ -730,6 +780,11 @@ export function createUrbanCityPolicyOwner({
     getCityScenarioTag,
     getCityUrbanRuntimeInfo,
     getEffectiveCityCollection,
+    getEffectiveCityCollectionSource,
+    isEffectiveCityCollectionSourceCurrent,
+    getCachedEffectiveCityCollection,
+    prepareEffectiveCityCollection,
+    installEffectiveCityCollection,
     getUrbanFeatureIndex,
   };
 }

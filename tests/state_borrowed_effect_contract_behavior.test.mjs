@@ -413,14 +413,16 @@ test("localization callback proof preserves global publication effects and rejec
   assert.ok(entry.effects.some(effect => effect.includes("payload reference")));
   assert.ok(entry.effects.some(effect => effect.includes("cityLayerRevision")));
   assert.ok(entry.sourceFingerprints["js/core/data_loader.js"]);
+  assert.ok(entry.sourceFingerprints["js/core/state/content_state.js"]);
   assert.ok(entry.sourceFingerprints["vendor/d3.v7.min.js"]);
   assert.throws(() => entry.effects.push("pure"), TypeError);
   const read = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8");
   const cases = [
     [entry.assemblyModulePath, './scenario_localization_state.js', './fake_localization.js'],
-    [entry.implementationModulePath, 'applyScenarioGeoLocalization();', 'applyScenarioGeoLocalization(); return cityOverridesPayload;'],
+    [entry.implementationModulePath, 'applyScenarioGeoLocalization(candidate);', 'applyScenarioGeoLocalization(candidate); return cityOverridesPayload;'],
     [entry.implementationModulePath, 'const geometry = feature?.geometry;', 'feature.bad = true; const geometry = feature?.geometry;'],
     ['js/core/data_loader.js', 'const geo = {};', 'cityCollection.features.length = 0; const geo = {};'],
+    ['js/core/state/content_state.js', 'const localizationPublications = new WeakMap();', 'const localizationPublications = new Map();'],
     ['js/core/state/actions/scenario_presentation_actions.js', 'export function applyScenarioChunkCityExternalEffectState(target, payload) {', 'export function applyScenarioChunkCityExternalEffectState(target, payload) { payload.bad = true;'],
   ];
   for (const [changedPath, original, replacement] of cases) {

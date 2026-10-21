@@ -226,7 +226,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["scenario-chunk-payload-loader", "scenario-runtime", "js/core/scenario/chunk_payload_loader.js", "tests/scenario_chunk_payload_loader_behavior.test.mjs"],
     ["scenario-chunk-layer-payloads", "scenario-runtime", "js/core/scenario/chunk_layer_payloads.js", "tests/scenario_chunk_layer_payloads_behavior.test.mjs"],
     ["scenario-chunk-promotion-queries", "scenario-runtime", "js/core/scenario/chunk_promotion_queries.js", "tests/scenario_chunk_promotion_queries_behavior.test.mjs", ["js/core/scenario/chunk_runtime.js"]],
-    ["scenario-optional-layer-runtime", "scenario-runtime", "js/core/scenario/optional_layer_runtime.js", "tests/scenario_optional_layers_behavior.test.mjs", ["js/core/scenario_resources.js"]],
+    ["scenario-optional-layer-runtime", "scenario-runtime", "js/core/scenario/optional_layer_runtime.js", "tests/scenario_optional_layers_behavior.test.mjs", ["js/core/scenario_resources.js", "js/core/scenario_localization_state.js", "js/core/state/content_state.js"]],
     ["state-write-allowlist", "state-ownership", "tools/check_state_write_allowlist.mjs", "tests/state_write_allowlist_behavior.test.mjs"],
     ["viewport-read-model", "renderer-runtime", "js/core/renderer/viewport_read_model_owner.js", "tests/viewport_read_model_owner_behavior.test.mjs"],
     ["selection-overlay", "renderer-runtime", "js/core/renderer/selection_overlay_owner.js", "tests/selection_overlay_owner_behavior.test.mjs"],
