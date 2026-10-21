@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools import build_pages_dist as pages
+from apps.hgo.tools.build_app import overlay_files as hgo_overlay_files
 from tools.app_entry_resolver import resolve_editor_entry_path, resolve_landing_entry_path
 
 
@@ -67,6 +68,10 @@ def build_source_inventory(root: Path) -> dict[str, Path]:
             add(manifest_path.parent / entry["url"], f"hgo/assets/default/{entry['url']}")
         provenance = manifest["source"]["provenanceUrl"]
         add(manifest_path.parent / provenance, f"hgo/assets/default/{provenance}")
+    # Mirror the HGO builder: only the validated overlay catalog closure is published.
+    hgo_root = hgo.resolve()
+    for path in hgo_overlay_files(hgo):
+        add(path, f"hgo/{path.relative_to(hgo_root).as_posix()}")
     for name in pages.DATA_RUNTIME_FILES:
         add(root / "data" / name, f"app/data/{name}")
     for name in pages.DATA_RUNTIME_DIRS:
