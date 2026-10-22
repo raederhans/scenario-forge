@@ -633,8 +633,8 @@
       "description": "Manual runtime asset registry shared by JS resolvers and build manifest generation.",
       "owner": "data/runtime_asset_registry.json",
       "role": "runtime_asset_registry",
-      "sha256": "9f08ac94d23a58425fe917cb04273551f64385781930a8d349b4b5800f857cf7",
-      "size_bytes": 395385
+      "sha256": "8dcc18d001a3fb1992e75565c62b34237906b3876fc49b2fc67b45a1fc1ad09c",
+      "size_bytes": 387237
     },
     "thematic_layers/index.json": {
       "role": "thematic_layer_catalog",
@@ -966,7 +966,7 @@
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_manifest.schema.json",
       "size_bytes": 187828,
-      "sha256": "bcecf70fd07cd42df1dc077d4e90ea01d41c3ce14cfd652c9c5d6db9dc114c3d",
+      "sha256": "84f7a4fafbafde37a8409323c25aaf2cc7884a41eccd1d03f36342bc183ae6fa",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/overview.json": {
@@ -985,8 +985,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 5760896,
-      "sha256": "d3ee400f095577f81105059609e22426311b2d40e40c933c0ae516080034ff9e",
+      "size_bytes": 5743605,
+      "sha256": "f45839549732338d8b0b78e84ac662985d4a89236fc7d0415c8b2583fad97b96",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/hoi4_1936.json": {
@@ -995,8 +995,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 6161370,
-      "sha256": "a3b2f4f18ec26177acb55e7fa8922ecaf1e69ec4bc4a56b36a21ff07ece8f356",
+      "size_bytes": 6144080,
+      "sha256": "31eba5ae3571a4267970d6f57c8969a6e3459c1811b8f725985b3a2734b2af38",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/hoi4_1939.json": {
@@ -1005,8 +1005,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 6161370,
-      "sha256": "9dc75adfb3bc8eb28ff3352cc5202f8b7aec1e9e10c6394a4eda392994188b2b",
+      "size_bytes": 6144080,
+      "sha256": "3d50998e100006bcd0eb7d2dbb516b9e6f3ac8532152112e437c0e344b553de0",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/tno_1962.json": {
@@ -1015,8 +1015,8 @@
       "artifact_class": "publish",
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
-      "size_bytes": 3321526,
-      "sha256": "01b46e4269226e0d4c34a1b30239c0f40c1a58eccbaaaa27cd3eb0612ebda805",
+      "size_bytes": 3304425,
+      "sha256": "9c7afe21f019e14f95a389605af2027f0d713695af1163cd4295cfca0e35191f",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/tiles/r384_c1152.json": {
@@ -7947,6 +7947,24 @@
       "releasable_catalog": {
         "url": "data/releasables/hoi4_vanilla.internal.phase1.catalog.json",
         "role": "releasable_catalog"
+      },
+      "political_id_raster:hoi4_1936": {
+        "url": "data/scenarios/hoi4_1936/political_id_raster/manifest.json",
+        "role": "political_id_raster_manifest",
+        "schema_ref": "schema://political-id-raster/manifest/v1",
+        "description": "Optional compressed ID tiles for the experimental political renderer; limited world-view LOD coverage."
+      },
+      "political_id_raster:hoi4_1939": {
+        "url": "data/scenarios/hoi4_1939/political_id_raster/manifest.json",
+        "role": "political_id_raster_manifest",
+        "schema_ref": "schema://political-id-raster/manifest/v1",
+        "description": "Optional compressed ID tiles for the experimental political renderer; limited world-view LOD coverage."
+      },
+      "political_id_raster:tno_1962": {
+        "url": "data/scenarios/tno_1962/political_id_raster/manifest.json",
+        "role": "political_id_raster_manifest",
+        "schema_ref": "schema://political-id-raster/manifest/v1",
+        "description": "Optional compressed ID tiles for the experimental political renderer; limited world-view LOD coverage."
       },
       "scenario_registry": {
         "url": "data/scenarios/index.json",

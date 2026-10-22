@@ -1,0 +1,1784 @@
+{
+  "schema_version": 1,
+  "plan_id": "europe_de_fr.v1",
+  "candidate_source": "data/political_feature_merges/europe_de_fr.candidates.json",
+  "constraints": [
+    "owners",
+    "cores",
+    "strategic_value_buckets",
+    "hierarchy_groups",
+    "quick_fill_groups",
+    "river_paint_parcels_unchanged",
+    "contiguous"
+  ],
+  "ownership_scenarios": [
+    "hoi4_1936",
+    "hoi4_1939",
+    "modern_world",
+    "tno_1962"
+  ],
+  "strategic_scenarios": [
+    "hoi4_1936",
+    "hoi4_1939"
+  ],
+  "counts": {
+    "candidates": 83,
+    "groups": 54,
+    "merged_members": 132,
+    "features_removed": 78,
+    "split_or_reduced_candidates": 46
+  },
+  "groups": [
+    {
+      "id": "DE_MRG_d0e3890ae1d5",
+      "member_ids": [
+        "DE112",
+        "DE142"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg",
+      "names": {
+        "en": "Böblingen + Tübingen, Landkreis",
+        "zh": "伯布林根、蒂宾根区"
+      },
+      "member_names": {
+        "DE112": {
+          "en": "Böblingen",
+          "zh": "伯布林根"
+        },
+        "DE142": {
+          "en": "Tübingen, Landkreis",
+          "zh": "蒂宾根区"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_c9a9f2cd9548",
+      "member_ids": [
+        "DE113",
+        "DE114"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg",
+      "names": {
+        "en": "Esslingen + Göppingen",
+        "zh": "埃斯林根、格平根"
+      },
+      "member_names": {
+        "DE113": {
+          "en": "Esslingen",
+          "zh": "埃斯林根"
+        },
+        "DE114": {
+          "en": "Göppingen",
+          "zh": "格平根"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_a27167ef8f23",
+      "member_ids": [
+        "DE115",
+        "DE116",
+        "DE118"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg",
+      "names": {
+        "en": "Ludwigsburg + Rems-Murr-Kreis + Heilbronn, Landkreis",
+        "zh": "路德维希堡、雷姆斯-穆尔圆、海尔布隆区"
+      },
+      "member_names": {
+        "DE115": {
+          "en": "Ludwigsburg",
+          "zh": "路德维希堡"
+        },
+        "DE116": {
+          "en": "Rems-Murr-Kreis",
+          "zh": "雷姆斯-穆尔圆"
+        },
+        "DE118": {
+          "en": "Heilbronn, Landkreis",
+          "zh": "海尔布隆区"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_e87b9124c03f",
+      "member_ids": [
+        "DE119",
+        "DE11A",
+        "DE11D"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg",
+      "names": {
+        "en": "Hohenlohekreis + Schwäbisch Hall + Ostalbkreis",
+        "zh": "霍恩洛厄区、施韦比施哈尔、奥斯塔布克赖斯"
+      },
+      "member_names": {
+        "DE119": {
+          "en": "Hohenlohekreis",
+          "zh": "霍恩洛厄区"
+        },
+        "DE11A": {
+          "en": "Schwäbisch Hall",
+          "zh": "施韦比施哈尔"
+        },
+        "DE11D": {
+          "en": "Ostalbkreis",
+          "zh": "奥斯塔布克赖斯"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_68ba87808df8",
+      "member_ids": [
+        "DE12A",
+        "DE12C"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg",
+      "names": {
+        "en": "Calw + Freudenstadt",
+        "zh": "卡尔夫、弗罗伊登施塔特"
+      },
+      "member_names": {
+        "DE12A": {
+          "en": "Calw",
+          "zh": "卡尔夫"
+        },
+        "DE12C": {
+          "en": "Freudenstadt",
+          "zh": "弗罗伊登施塔特"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_bd0cf439de30",
+      "member_ids": [
+        "DE217",
+        "DE21B"
+      ],
+      "parent_id": "DE_Bayern",
+      "names": {
+        "en": "Dachau + Freising",
+        "zh": "达豪、弗赖辛"
+      },
+      "member_names": {
+        "DE217": {
+          "en": "Dachau",
+          "zh": "达豪"
+        },
+        "DE21B": {
+          "en": "Freising",
+          "zh": "弗赖辛"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_ec3ed49e067c",
+      "member_ids": [
+        "DE218",
+        "DE21C",
+        "DE21H"
+      ],
+      "parent_id": "DE_Bayern",
+      "names": {
+        "en": "Ebersberg + Fürstenfeldbruck + München, Landkreis",
+        "zh": "埃伯斯贝格、菲尔斯滕费尔德布鲁克、慕尼黑, 区"
+      },
+      "member_names": {
+        "DE218": {
+          "en": "Ebersberg",
+          "zh": "埃伯斯贝格"
+        },
+        "DE21C": {
+          "en": "Fürstenfeldbruck",
+          "zh": "菲尔斯滕费尔德布鲁克"
+        },
+        "DE21H": {
+          "en": "München, Landkreis",
+          "zh": "慕尼黑, 区"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_3fb6d34d5cec",
+      "member_ids": [
+        "DE21A",
+        "DE21G"
+      ],
+      "parent_id": "DE_Bayern",
+      "names": {
+        "en": "Erding + Mühldorf a. Inn",
+        "zh": "埃尔丁、米尔多夫 A.客栈"
+      },
+      "member_names": {
+        "DE21A": {
+          "en": "Erding",
+          "zh": "埃尔丁"
+        },
+        "DE21G": {
+          "en": "Mühldorf a. Inn",
+          "zh": "米尔多夫 A.客栈"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_bf419442ff08",
+      "member_ids": [
+        "DE21E",
+        "DE21L",
+        "DE21N"
+      ],
+      "parent_id": "DE_Bayern",
+      "names": {
+        "en": "Landsberg am Lech + Starnberg + Weilheim-Schongau",
+        "zh": "莱希河畔兰茨贝格、施塔恩贝格、魏尔海姆-雄高"
+      },
+      "member_names": {
+        "DE21E": {
+          "en": "Landsberg am Lech",
+          "zh": "莱希河畔兰茨贝格"
+        },
+        "DE21L": {
+          "en": "Starnberg",
+          "zh": "施塔恩贝格"
+        },
+        "DE21N": {
+          "en": "Weilheim-Schongau",
+          "zh": "魏尔海姆-雄高"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_d4ab7c811a60",
+      "member_ids": [
+        "DE221",
+        "DE227",
+        "DE22C"
+      ],
+      "parent_id": "DE_Bayern",
+      "names": {
+        "en": "Landshut, Kreisfreie Stadt + Landshut, Landkreis + Dingolfing-Landau",
+        "zh": "兰茨胡特，独立城市、兰茨胡特区、丁戈尔芬-兰道"
+      },
+      "member_names": {
+        "DE221": {
+          "en": "Landshut, Kreisfreie Stadt",
+          "zh": "兰茨胡特，独立城市"
+        },
+        "DE227": {
+          "en": "Landshut, Landkreis",
+          "zh": "兰茨胡特区"
+        },
+        "DE22C": {
+          "en": "Dingolfing-Landau",
+          "zh": "丁戈尔芬-兰道"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_73019c3017aa",
+      "member_ids": [
+        "DE231",
+        "DE234"
+      ],
+      "parent_id": "DE_Bayern",
+      "names": {
+        "en": "Amberg, Kreisfreie Stadt + Amberg-Sulzbach",
+        "zh": "安贝格, 克莱斯自由城、安贝格-苏尔茨巴赫"
+      },
+      "member_names": {
+        "DE231": {
+          "en": "Amberg, Kreisfreie Stadt",
+          "zh": "安贝格, 克莱斯自由城"
+        },
+        "DE234": {
+          "en": "Amberg-Sulzbach",
+          "zh": "安贝格-苏尔茨巴赫"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_08a36bff89a0",
+      "member_ids": [
+        "DE25B",
+        "DE25C"
+      ],
+      "parent_id": "DE_Bayern",
+      "names": {
+        "en": "Roth + Weißenburg-Gunzenhausen",
+        "zh": "罗斯、魏森堡-贡岑豪森"
+      },
+      "member_names": {
+        "DE25B": {
+          "en": "Roth",
+          "zh": "罗斯"
+        },
+        "DE25C": {
+          "en": "Weißenburg-Gunzenhausen",
+          "zh": "魏森堡-贡岑豪森"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_348581c848f8",
+      "member_ids": [
+        "DE241",
+        "DE245",
+        "DE24C"
+      ],
+      "parent_id": "DE_Bayern",
+      "names": {
+        "en": "Bamberg, Kreisfreie Stadt + Bamberg, Landkreis + Lichtenfels",
+        "zh": "班贝格, 克莱斯自由城、班贝格县、利希滕费尔斯"
+      },
+      "member_names": {
+        "DE241": {
+          "en": "Bamberg, Kreisfreie Stadt",
+          "zh": "班贝格, 克莱斯自由城"
+        },
+        "DE245": {
+          "en": "Bamberg, Landkreis",
+          "zh": "班贝格县"
+        },
+        "DE24C": {
+          "en": "Lichtenfels",
+          "zh": "利希滕费尔斯"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_22b5c35ff0db",
+      "member_ids": [
+        "DE242",
+        "DE246",
+        "DE24B"
+      ],
+      "parent_id": "DE_Bayern",
+      "names": {
+        "en": "Bayreuth, Kreisfreie Stadt + Bayreuth, Landkreis + Kulmbach",
+        "zh": "拜罗伊特, 克莱斯自由城、拜罗伊特, 兰德克莱斯、库姆巴赫"
+      },
+      "member_names": {
+        "DE242": {
+          "en": "Bayreuth, Kreisfreie Stadt",
+          "zh": "拜罗伊特, 克莱斯自由城"
+        },
+        "DE246": {
+          "en": "Bayreuth, Landkreis",
+          "zh": "拜罗伊特, 兰德克莱斯"
+        },
+        "DE24B": {
+          "en": "Kulmbach",
+          "zh": "库姆巴赫"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_88b2cc10d998",
+      "member_ids": [
+        "DE248",
+        "DE257",
+        "DE258"
+      ],
+      "parent_id": "DE_Bayern",
+      "names": {
+        "en": "Forchheim + Erlangen-Höchstadt + Fürth, Landkreis",
+        "zh": "福希海姆、埃尔兰根-赫希施塔特、菲尔特, 兰德克赖斯"
+      },
+      "member_names": {
+        "DE248": {
+          "en": "Forchheim",
+          "zh": "福希海姆"
+        },
+        "DE257": {
+          "en": "Erlangen-Höchstadt",
+          "zh": "埃尔兰根-赫希施塔特"
+        },
+        "DE258": {
+          "en": "Fürth, Landkreis",
+          "zh": "菲尔特, 兰德克赖斯"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_d7270b2f4f53",
+      "member_ids": [
+        "DE262",
+        "DE268",
+        "DE26B"
+      ],
+      "parent_id": "DE_Bayern",
+      "names": {
+        "en": "Schweinfurt, Kreisfreie Stadt + Kitzingen + Schweinfurt, Landkreis",
+        "zh": "施韦因富特，独立城市、基青根、施韦因富特区"
+      },
+      "member_names": {
+        "DE262": {
+          "en": "Schweinfurt, Kreisfreie Stadt",
+          "zh": "施韦因富特，独立城市"
+        },
+        "DE268": {
+          "en": "Kitzingen",
+          "zh": "基青根"
+        },
+        "DE26B": {
+          "en": "Schweinfurt, Landkreis",
+          "zh": "施韦因富特区"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_54666399e0ac",
+      "member_ids": [
+        "DE401",
+        "DE408",
+        "DE40E"
+      ],
+      "parent_id": "DE_Brandenburg",
+      "names": {
+        "en": "Brandenburg an der Havel, Kreisfreie Stadt + Havelland + Potsdam-Mittelmark",
+        "zh": "哈弗尔河畔勃兰登堡, 克莱斯自由城、哈弗兰、波茨坦-米特尔马克"
+      },
+      "member_names": {
+        "DE401": {
+          "en": "Brandenburg an der Havel, Kreisfreie Stadt",
+          "zh": "哈弗尔河畔勃兰登堡, 克莱斯自由城"
+        },
+        "DE408": {
+          "en": "Havelland",
+          "zh": "哈弗兰"
+        },
+        "DE40E": {
+          "en": "Potsdam-Mittelmark",
+          "zh": "波茨坦-米特尔马克"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_a235cf36d16c",
+      "member_ids": [
+        "DE406",
+        "DE40H"
+      ],
+      "parent_id": "DE_Brandenburg",
+      "names": {
+        "en": "Dahme-Spreewald + Teltow-Fläming",
+        "zh": "达默-施普雷瓦尔德、特尔托-弗莱明"
+      },
+      "member_names": {
+        "DE406": {
+          "en": "Dahme-Spreewald",
+          "zh": "达默-施普雷瓦尔德"
+        },
+        "DE40H": {
+          "en": "Teltow-Fläming",
+          "zh": "特尔托-弗莱明"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_171e39a343f9",
+      "member_ids": [
+        "DE40A",
+        "DE40D"
+      ],
+      "parent_id": "DE_Brandenburg",
+      "names": {
+        "en": "Oberhavel + Ostprignitz-Ruppin",
+        "zh": "奥伯哈维尔、奥斯特普里尼茨-鲁平"
+      },
+      "member_names": {
+        "DE40A": {
+          "en": "Oberhavel",
+          "zh": "奥伯哈维尔"
+        },
+        "DE40D": {
+          "en": "Ostprignitz-Ruppin",
+          "zh": "奥斯特普里尼茨-鲁平"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_77741e43de3f",
+      "member_ids": [
+        "DE716",
+        "DE71C"
+      ],
+      "parent_id": "DE_Hessen",
+      "names": {
+        "en": "Darmstadt-Dieburg + Offenbach, Landkreis",
+        "zh": "达姆施塔特-迪堡、奥芬巴赫区"
+      },
+      "member_names": {
+        "DE716": {
+          "en": "Darmstadt-Dieburg",
+          "zh": "达姆施塔特-迪堡"
+        },
+        "DE71C": {
+          "en": "Offenbach, Landkreis",
+          "zh": "奥芬巴赫区"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_e2f350a636b5",
+      "member_ids": [
+        "DE718",
+        "DE71A"
+      ],
+      "parent_id": "DE_Hessen",
+      "names": {
+        "en": "Hochtaunuskreis + Main-Taunus-Kreis",
+        "zh": "上陶努斯克雷斯、美因-陶努斯-县"
+      },
+      "member_names": {
+        "DE718": {
+          "en": "Hochtaunuskreis",
+          "zh": "上陶努斯克雷斯"
+        },
+        "DE71A": {
+          "en": "Main-Taunus-Kreis",
+          "zh": "美因-陶努斯-县"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_e2617eca3f85",
+      "member_ids": [
+        "DE719",
+        "DE71E",
+        "DE721"
+      ],
+      "parent_id": "DE_Hessen",
+      "names": {
+        "en": "Main-Kinzig-Kreis + Wetteraukreis + Gießen, Landkreis",
+        "zh": "美茵-金齐希区、韦特劳克雷斯、吉森区"
+      },
+      "member_names": {
+        "DE719": {
+          "en": "Main-Kinzig-Kreis",
+          "zh": "美茵-金齐希区"
+        },
+        "DE71E": {
+          "en": "Wetteraukreis",
+          "zh": "韦特劳克雷斯"
+        },
+        "DE721": {
+          "en": "Gießen, Landkreis",
+          "zh": "吉森区"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_3b750624bff4",
+      "member_ids": [
+        "DE722",
+        "DE723"
+      ],
+      "parent_id": "DE_Hessen",
+      "names": {
+        "en": "Lahn-Dill-Kreis + Limburg-Weilburg",
+        "zh": "兰迪尔区、林堡-魏尔堡"
+      },
+      "member_names": {
+        "DE722": {
+          "en": "Lahn-Dill-Kreis",
+          "zh": "兰迪尔区"
+        },
+        "DE723": {
+          "en": "Limburg-Weilburg",
+          "zh": "林堡-魏尔堡"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_d561808c92a5",
+      "member_ids": [
+        "DE725",
+        "DE732"
+      ],
+      "parent_id": "DE_Hessen",
+      "names": {
+        "en": "Vogelsbergkreis + Fulda",
+        "zh": "福格尔斯贝格地区、富尔达"
+      },
+      "member_names": {
+        "DE725": {
+          "en": "Vogelsbergkreis",
+          "zh": "福格尔斯贝格地区"
+        },
+        "DE732": {
+          "en": "Fulda",
+          "zh": "富尔达"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_33b1389d946f",
+      "member_ids": [
+        "DE733",
+        "DE735"
+      ],
+      "parent_id": "DE_Hessen",
+      "names": {
+        "en": "Hersfeld-Rotenburg + Schwalm-Eder-Kreis",
+        "zh": "赫斯菲尔德-罗滕堡、施瓦尔姆-埃德圆"
+      },
+      "member_names": {
+        "DE733": {
+          "en": "Hersfeld-Rotenburg",
+          "zh": "赫斯菲尔德-罗滕堡"
+        },
+        "DE735": {
+          "en": "Schwalm-Eder-Kreis",
+          "zh": "施瓦尔姆-埃德圆"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_ce73c32b1090",
+      "member_ids": [
+        "DE80J",
+        "DE80L"
+      ],
+      "parent_id": "DE_Mecklenburg_Vorpommern",
+      "names": {
+        "en": "Mecklenburgische Seenplatte + Vorpommern-Rügen",
+        "zh": "梅克伦堡湖区、西波美拉尼亚-吕根岛"
+      },
+      "member_names": {
+        "DE80J": {
+          "en": "Mecklenburgische Seenplatte",
+          "zh": "梅克伦堡湖区"
+        },
+        "DE80L": {
+          "en": "Vorpommern-Rügen",
+          "zh": "西波美拉尼亚-吕根岛"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_9e1fff10ce51",
+      "member_ids": [
+        "DE914",
+        "DE91A"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Gifhorn + Peine",
+        "zh": "吉夫霍恩、惩罚"
+      },
+      "member_names": {
+        "DE914": {
+          "en": "Gifhorn",
+          "zh": "吉夫霍恩"
+        },
+        "DE91A": {
+          "en": "Peine",
+          "zh": "惩罚"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_46ade2104d23",
+      "member_ids": [
+        "DE917",
+        "DE91B"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Helmstedt + Wolfenbüttel",
+        "zh": "赫尔姆施泰特、沃尔芬比特尔"
+      },
+      "member_names": {
+        "DE917": {
+          "en": "Helmstedt",
+          "zh": "赫尔姆施泰特"
+        },
+        "DE91B": {
+          "en": "Wolfenbüttel",
+          "zh": "沃尔芬比特尔"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_4ab0c6062d32",
+      "member_ids": [
+        "DE918",
+        "DE926"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Northeim + Holzminden",
+        "zh": "诺特海姆、霍尔兹明登"
+      },
+      "member_names": {
+        "DE918": {
+          "en": "Northeim",
+          "zh": "诺特海姆"
+        },
+        "DE926": {
+          "en": "Holzminden",
+          "zh": "霍尔兹明登"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_830e5845fb60",
+      "member_ids": [
+        "DE922",
+        "DE927"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Diepholz + Nienburg (Weser)",
+        "zh": "迪普霍尔茨、宁堡（威悉河）"
+      },
+      "member_names": {
+        "DE922": {
+          "en": "Diepholz",
+          "zh": "迪普霍尔茨"
+        },
+        "DE927": {
+          "en": "Nienburg (Weser)",
+          "zh": "宁堡（威悉河）"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_4fdd27cf49f7",
+      "member_ids": [
+        "DE923",
+        "DE928"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Hameln-Pyrmont + Schaumburg",
+        "zh": "哈默尔恩-皮尔蒙特、绍姆堡"
+      },
+      "member_names": {
+        "DE923": {
+          "en": "Hameln-Pyrmont",
+          "zh": "哈默尔恩-皮尔蒙特"
+        },
+        "DE928": {
+          "en": "Schaumburg",
+          "zh": "绍姆堡"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_5dd80c1fcf77",
+      "member_ids": [
+        "DE931",
+        "DE938"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Celle + Heidekreis",
+        "zh": "策勒、希斯圆环"
+      },
+      "member_names": {
+        "DE931": {
+          "en": "Celle",
+          "zh": "策勒"
+        },
+        "DE938": {
+          "en": "Heidekreis",
+          "zh": "希斯圆环"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_698a45847033",
+      "member_ids": [
+        "DE937",
+        "DE93B"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Rotenburg (Wümme) + Verden",
+        "zh": "罗滕堡 (乌姆)、世界"
+      },
+      "member_names": {
+        "DE937": {
+          "en": "Rotenburg (Wümme)",
+          "zh": "罗滕堡 (乌姆)"
+        },
+        "DE93B": {
+          "en": "Verden",
+          "zh": "世界"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_67a8450f3c9f",
+      "member_ids": [
+        "DE946",
+        "DE94G"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Ammerland + Wesermarsch",
+        "zh": "阿默兰、威悉马什"
+      },
+      "member_names": {
+        "DE946": {
+          "en": "Ammerland",
+          "zh": "阿默兰"
+        },
+        "DE94G": {
+          "en": "Wesermarsch",
+          "zh": "威悉马什"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_3a19ae12c637",
+      "member_ids": [
+        "DE947",
+        "DE94A",
+        "DE94H"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Aurich + Friesland (DE) + Wittmund",
+        "zh": "奥里希、弗里斯兰（德国）、维特蒙德"
+      },
+      "member_names": {
+        "DE947": {
+          "en": "Aurich",
+          "zh": "奥里希"
+        },
+        "DE94A": {
+          "en": "Friesland (DE)",
+          "zh": "弗里斯兰（德国）"
+        },
+        "DE94H": {
+          "en": "Wittmund",
+          "zh": "维特蒙德"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_c922c0ebada5",
+      "member_ids": [
+        "DE948",
+        "DE94E",
+        "DE94F"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Cloppenburg + Osnabrück, Landkreis + Vechta",
+        "zh": "克洛彭堡、奥斯纳布吕克区、维希塔"
+      },
+      "member_names": {
+        "DE948": {
+          "en": "Cloppenburg",
+          "zh": "克洛彭堡"
+        },
+        "DE94E": {
+          "en": "Osnabrück, Landkreis",
+          "zh": "奥斯纳布吕克区"
+        },
+        "DE94F": {
+          "en": "Vechta",
+          "zh": "维希塔"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_70752f860917",
+      "member_ids": [
+        "DEA35",
+        "DEA5C"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen",
+      "names": {
+        "en": "Coesfeld + Unna",
+        "zh": "科斯费尔德、离开"
+      },
+      "member_names": {
+        "DEA35": {
+          "en": "Coesfeld",
+          "zh": "科斯费尔德"
+        },
+        "DEA5C": {
+          "en": "Unna",
+          "zh": "离开"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_9410ac111320",
+      "member_ids": [
+        "DEA38",
+        "DEA42"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen",
+      "names": {
+        "en": "Warendorf + Gütersloh",
+        "zh": "瓦伦多夫、居特斯洛"
+      },
+      "member_names": {
+        "DEA38": {
+          "en": "Warendorf",
+          "zh": "瓦伦多夫"
+        },
+        "DEA42": {
+          "en": "Gütersloh",
+          "zh": "居特斯洛"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_5adb00f4a83d",
+      "member_ids": [
+        "DEA43",
+        "DEA46"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen",
+      "names": {
+        "en": "Herford + Minden-Lübbecke",
+        "zh": "赫尔福德、明登-吕贝克"
+      },
+      "member_names": {
+        "DEA43": {
+          "en": "Herford",
+          "zh": "赫尔福德"
+        },
+        "DEA46": {
+          "en": "Minden-Lübbecke",
+          "zh": "明登-吕贝克"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_6f627c55e7bd",
+      "member_ids": [
+        "DEA57",
+        "DEA59",
+        "DEA5B"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen",
+      "names": {
+        "en": "Hochsauerlandkreis + Olpe + Soest",
+        "zh": "霍赫绍尔兰区、奥尔佩、索斯特"
+      },
+      "member_names": {
+        "DEA57": {
+          "en": "Hochsauerlandkreis",
+          "zh": "霍赫绍尔兰区"
+        },
+        "DEA59": {
+          "en": "Olpe",
+          "zh": "奥尔佩"
+        },
+        "DEA5B": {
+          "en": "Soest",
+          "zh": "索斯特"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_c6f2d9d3d036",
+      "member_ids": [
+        "DEB15",
+        "DEB22",
+        "DEB24"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz",
+      "names": {
+        "en": "Birkenfeld + Bernkastel-Wittlich + Vulkaneifel",
+        "zh": "比肯费尔德、贝恩卡斯特尔-维特利希、埃菲尔火山"
+      },
+      "member_names": {
+        "DEB15": {
+          "en": "Birkenfeld",
+          "zh": "比肯费尔德"
+        },
+        "DEB22": {
+          "en": "Bernkastel-Wittlich",
+          "zh": "贝恩卡斯特尔-维特利希"
+        },
+        "DEB24": {
+          "en": "Vulkaneifel",
+          "zh": "埃菲尔火山"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_bceaa37f49ef",
+      "member_ids": [
+        "DEB32",
+        "DEB3F",
+        "DEB3G"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz",
+      "names": {
+        "en": "Kaiserslautern, Kreisfreie Stadt + Kaiserslautern, Landkreis + Kusel",
+        "zh": "凯撒斯劳滕，独立城市、凯撒斯劳滕区、库塞尔"
+      },
+      "member_names": {
+        "DEB32": {
+          "en": "Kaiserslautern, Kreisfreie Stadt",
+          "zh": "凯撒斯劳滕，独立城市"
+        },
+        "DEB3F": {
+          "en": "Kaiserslautern, Landkreis",
+          "zh": "凯撒斯劳滕区"
+        },
+        "DEB3G": {
+          "en": "Kusel",
+          "zh": "库塞尔"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_ea826ec181b8",
+      "member_ids": [
+        "DEB3B",
+        "DEB3J"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz",
+      "names": {
+        "en": "Alzey-Worms + Mainz-Bingen",
+        "zh": "阿尔蔡-沃尔姆斯、美因茨-宾根"
+      },
+      "member_names": {
+        "DEB3B": {
+          "en": "Alzey-Worms",
+          "zh": "阿尔蔡-沃尔姆斯"
+        },
+        "DEB3J": {
+          "en": "Mainz-Bingen",
+          "zh": "美因茨-宾根"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_d67a0e4a728d",
+      "member_ids": [
+        "DEF05",
+        "DEF0B"
+      ],
+      "parent_id": "DE_Schleswig_Holstein",
+      "names": {
+        "en": "Dithmarschen + Rendsburg-Eckernförde",
+        "zh": "迪特马尔申、伦茨堡-埃肯弗德"
+      },
+      "member_names": {
+        "DEF05": {
+          "en": "Dithmarschen",
+          "zh": "迪特马尔申"
+        },
+        "DEF0B": {
+          "en": "Rendsburg-Eckernförde",
+          "zh": "伦茨堡-埃肯弗德"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_98e486211a34",
+      "member_ids": [
+        "DEG04",
+        "DEG0B",
+        "DEG0E"
+      ],
+      "parent_id": "DE_Th_ringen",
+      "names": {
+        "en": "Suhl, Kreisfreie Stadt + Schmalkalden-Meiningen + Hildburghausen",
+        "zh": "苏尔，独立城市、施马尔卡尔登-迈宁根、希尔德布格豪森"
+      },
+      "member_names": {
+        "DEG04": {
+          "en": "Suhl, Kreisfreie Stadt",
+          "zh": "苏尔，独立城市"
+        },
+        "DEG0B": {
+          "en": "Schmalkalden-Meiningen",
+          "zh": "施马尔卡尔登-迈宁根"
+        },
+        "DEG0E": {
+          "en": "Hildburghausen",
+          "zh": "希尔德布格豪森"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_c90ee890d36c",
+      "member_ids": [
+        "DEG05",
+        "DEG0G",
+        "DEG0J"
+      ],
+      "parent_id": "DE_Th_ringen",
+      "names": {
+        "en": "Weimar, Kreisfreie Stadt + Weimarer Land + Saale-Holzland-Kreis",
+        "zh": "魏玛，独立城市、魏玛国家、萨勒-霍尔茨兰区"
+      },
+      "member_names": {
+        "DEG05": {
+          "en": "Weimar, Kreisfreie Stadt",
+          "zh": "魏玛，独立城市"
+        },
+        "DEG0G": {
+          "en": "Weimarer Land",
+          "zh": "魏玛国家"
+        },
+        "DEG0J": {
+          "en": "Saale-Holzland-Kreis",
+          "zh": "萨勒-霍尔茨兰区"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_b86ffe1dd2ea",
+      "member_ids": [
+        "DEG07",
+        "DEG0A",
+        "DEG0D"
+      ],
+      "parent_id": "DE_Th_ringen",
+      "names": {
+        "en": "Nordhausen + Kyffhäuserkreis + Sömmerda",
+        "zh": "诺德豪森、凯夫豪瑟区、索默达"
+      },
+      "member_names": {
+        "DEG07": {
+          "en": "Nordhausen",
+          "zh": "诺德豪森"
+        },
+        "DEG0A": {
+          "en": "Kyffhäuserkreis",
+          "zh": "凯夫豪瑟区"
+        },
+        "DEG0D": {
+          "en": "Sömmerda",
+          "zh": "索默达"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_cc565c282846",
+      "member_ids": [
+        "DEG09",
+        "DEG0N",
+        "DEG0P"
+      ],
+      "parent_id": "DE_Th_ringen",
+      "names": {
+        "en": "Unstrut-Hainich-Kreis + Eisenach, Kreisfreie Stadt + Wartburgkreis",
+        "zh": "温斯特鲁特-海尼希区、艾森纳赫, 克莱斯自由城、瓦尔特堡区"
+      },
+      "member_names": {
+        "DEG09": {
+          "en": "Unstrut-Hainich-Kreis",
+          "zh": "温斯特鲁特-海尼希区"
+        },
+        "DEG0N": {
+          "en": "Eisenach, Kreisfreie Stadt",
+          "zh": "艾森纳赫, 克莱斯自由城"
+        },
+        "DEG0P": {
+          "en": "Wartburgkreis",
+          "zh": "瓦尔特堡区"
+        }
+      }
+    },
+    {
+      "id": "DE_MRG_ac1a1840dec2",
+      "member_ids": [
+        "DEG0F",
+        "DEG0I",
+        "DEG0K"
+      ],
+      "parent_id": "DE_Th_ringen",
+      "names": {
+        "en": "Ilm-Kreis + Saalfeld-Rudolstadt + Saale-Orla-Kreis",
+        "zh": "伊尔姆区、萨尔费尔德-鲁多尔施塔特、萨勒-奥尔拉区"
+      },
+      "member_names": {
+        "DEG0F": {
+          "en": "Ilm-Kreis",
+          "zh": "伊尔姆区"
+        },
+        "DEG0I": {
+          "en": "Saalfeld-Rudolstadt",
+          "zh": "萨尔费尔德-鲁多尔施塔特"
+        },
+        "DEG0K": {
+          "en": "Saale-Orla-Kreis",
+          "zh": "萨勒-奥尔拉区"
+        }
+      }
+    },
+    {
+      "id": "FR_MRG_ef55d0091c1e",
+      "member_ids": [
+        "FR_ARR_50003",
+        "FR_ARR_50004"
+      ],
+      "parent_id": "FR_Normandie",
+      "names": {
+        "en": "Coutances + Saint-Lô",
+        "zh": "库坦塞斯、圣洛"
+      },
+      "member_names": {
+        "FR_ARR_50003": {
+          "en": "Coutances",
+          "zh": "库坦塞斯"
+        },
+        "FR_ARR_50004": {
+          "en": "Saint-Lô",
+          "zh": "圣洛"
+        }
+      }
+    },
+    {
+      "id": "FR_MRG_6d703ee3f8dc",
+      "member_ids": [
+        "FR_ARR_22002",
+        "FR_ARR_22004"
+      ],
+      "parent_id": "FR_Bretagne",
+      "names": {
+        "en": "Guingamp + Saint-Brieuc",
+        "zh": "甘冈、圣布里厄"
+      },
+      "member_names": {
+        "FR_ARR_22002": {
+          "en": "Guingamp",
+          "zh": "甘冈"
+        },
+        "FR_ARR_22004": {
+          "en": "Saint-Brieuc",
+          "zh": "圣布里厄"
+        }
+      }
+    },
+    {
+      "id": "FR_MRG_5b1fca32ff2c",
+      "member_ids": [
+        "FR_ARR_29002",
+        "FR_ARR_29003",
+        "FR_ARR_29004"
+      ],
+      "parent_id": "FR_Bretagne",
+      "names": {
+        "en": "Châteaulin + Morlaix + Quimper",
+        "zh": "沙托兰、莫尔莱、坎佩尔"
+      },
+      "member_names": {
+        "FR_ARR_29002": {
+          "en": "Châteaulin",
+          "zh": "沙托兰"
+        },
+        "FR_ARR_29003": {
+          "en": "Morlaix",
+          "zh": "莫尔莱"
+        },
+        "FR_ARR_29004": {
+          "en": "Quimper",
+          "zh": "坎佩尔"
+        }
+      }
+    },
+    {
+      "id": "FR_MRG_a3ac3f104566",
+      "member_ids": [
+        "FR_ARR_61001",
+        "FR_ARR_61002",
+        "FR_ARR_61003"
+      ],
+      "parent_id": "FR_Normandie",
+      "names": {
+        "en": "Alençon + Argentan + Mortagne-au-Perche",
+        "zh": "阿朗松、阿根廷、莫尔塔涅奥佩尔什"
+      },
+      "member_names": {
+        "FR_ARR_61001": {
+          "en": "Alençon",
+          "zh": "阿朗松"
+        },
+        "FR_ARR_61002": {
+          "en": "Argentan",
+          "zh": "阿根廷"
+        },
+        "FR_ARR_61003": {
+          "en": "Mortagne-au-Perche",
+          "zh": "莫尔塔涅奥佩尔什"
+        }
+      }
+    },
+    {
+      "id": "FR_MRG_7c681aa2032e",
+      "member_ids": [
+        "FR_ARR_62003",
+        "FR_ARR_62005",
+        "FR_ARR_62006"
+      ],
+      "parent_id": "FR_Hauts_de_France",
+      "names": {
+        "en": "Boulogne-sur-Mer + Saint-Omer + Calais",
+        "zh": "博嫩、圣奥马尔斯、卡勒斯"
+      },
+      "member_names": {
+        "FR_ARR_62003": {
+          "en": "Boulogne-sur-Mer",
+          "zh": "博嫩"
+        },
+        "FR_ARR_62005": {
+          "en": "Saint-Omer",
+          "zh": "圣奥马尔斯"
+        },
+        "FR_ARR_62006": {
+          "en": "Calais",
+          "zh": "卡勒斯"
+        }
+      }
+    }
+  ],
+  "split_or_reduced_candidates": [
+    {
+      "candidate": [
+        "DE113",
+        "DE114",
+        "DE145"
+      ],
+      "applied": [
+        [
+          "DE113",
+          "DE114"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DE11B",
+        "DE127",
+        "DE128"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE123",
+        "DE12B"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE135",
+        "DE137",
+        "DE143"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE146",
+        "DE148",
+        "DE149"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE21I",
+        "DE21J",
+        "DE275"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE226",
+        "DE22B",
+        "DE238"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE231",
+        "DE234",
+        "DE259"
+      ],
+      "applied": [
+        [
+          "DE231",
+          "DE234"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DE236",
+        "DE25B",
+        "DE25C"
+      ],
+      "applied": [
+        [
+          "DE25B",
+          "DE25C"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DE715",
+        "DE71B"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE716",
+        "DE717",
+        "DE71C"
+      ],
+      "applied": [
+        [
+          "DE716",
+          "DE71C"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DE71D",
+        "DE722",
+        "DE723"
+      ],
+      "applied": [
+        [
+          "DE722",
+          "DE723"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DE724",
+        "DE736"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE733",
+        "DE734",
+        "DE735"
+      ],
+      "applied": [
+        [
+          "DE733",
+          "DE735"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DE80J",
+        "DE80K",
+        "DE80L"
+      ],
+      "applied": [
+        [
+          "DE80J",
+          "DE80L"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DE916",
+        "DE917",
+        "DE91B"
+      ],
+      "applied": [
+        [
+          "DE917",
+          "DE91B"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DE922",
+        "DE927",
+        "DE94D"
+      ],
+      "applied": [
+        [
+          "DE922",
+          "DE927"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DE931",
+        "DE933",
+        "DE938"
+      ],
+      "applied": [
+        [
+          "DE931",
+          "DE938"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DE932",
+        "DE936"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE934",
+        "DE935",
+        "DE93A"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE937",
+        "DE939",
+        "DE93B"
+      ],
+      "applied": [
+        [
+          "DE937",
+          "DE93B"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DE941",
+        "DE946",
+        "DE94G"
+      ],
+      "applied": [
+        [
+          "DE946",
+          "DE94G"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DEA26",
+        "DEA27"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DEA2A",
+        "DEA58"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DEA35",
+        "DEA37",
+        "DEA5C"
+      ],
+      "applied": [
+        [
+          "DEA35",
+          "DEA5C"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DEA44",
+        "DEA45"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DEB12",
+        "DEB17",
+        "DEB1C"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DEB13",
+        "DEB18",
+        "DEB1B"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DEB14",
+        "DEB1A",
+        "DEB1D"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DEB31",
+        "DEB3C",
+        "DEB3I"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DEB3B",
+        "DEB3D",
+        "DEB3J"
+      ],
+      "applied": [
+        [
+          "DEB3B",
+          "DEB3J"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DEE06",
+        "DEE0C"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DEF05",
+        "DEF0B",
+        "DEF0E"
+      ],
+      "applied": [
+        [
+          "DEF05",
+          "DEF0B"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "DEF08",
+        "DEF0A"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DEG0L",
+        "DEG0M"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "FR_ARR_14001",
+        "FR_ARR_50003",
+        "FR_ARR_50004"
+      ],
+      "applied": [
+        [
+          "FR_ARR_50003",
+          "FR_ARR_50004"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "FR_ARR_14003",
+        "FR_ARR_27002",
+        "FR_ARR_27003"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "FR_ARR_14004",
+        "FR_ARR_50001"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "FR_ARR_22002",
+        "FR_ARR_22004",
+        "FR_ARR_56002"
+      ],
+      "applied": [
+        [
+          "FR_ARR_22002",
+          "FR_ARR_22004"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "FR_ARR_59003",
+        "FR_ARR_62007"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "FR_ARR_62001",
+        "FR_ARR_62002",
+        "FR_ARR_62004"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "FR_ARR_77001",
+        "FR_ARR_77003",
+        "FR_ARR_77004"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "FR_ARR_78001",
+        "FR_ARR_78002",
+        "FR_ARR_78003"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "FR_ARR_91001",
+        "FR_ARR_91002",
+        "FR_ARR_91003"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "FR_ARR_93002",
+        "FR_ARR_93003",
+        "FR_ARR_95002"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "FR_ARR_94001",
+        "FR_ARR_94002",
+        "FR_ARR_94003"
+      ],
+      "applied": []
+    }
+  ]
+}

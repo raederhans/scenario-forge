@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
-    "chunk_count": 213,
-    "feature_count": 12711,
+    "chunk_count": 211,
+    "feature_count": 12633,
     "water_count": 285
   },
   "controller_changes": [
@@ -21938,6 +21938,60 @@
     },
     "polar_materialization": {
       "classified_feature_ids": [
+        "DE_MRG_08a36bff89a0",
+        "DE_MRG_171e39a343f9",
+        "DE_MRG_22b5c35ff0db",
+        "DE_MRG_33b1389d946f",
+        "DE_MRG_348581c848f8",
+        "DE_MRG_3a19ae12c637",
+        "DE_MRG_3b750624bff4",
+        "DE_MRG_3fb6d34d5cec",
+        "DE_MRG_46ade2104d23",
+        "DE_MRG_4ab0c6062d32",
+        "DE_MRG_4fdd27cf49f7",
+        "DE_MRG_54666399e0ac",
+        "DE_MRG_5adb00f4a83d",
+        "DE_MRG_5dd80c1fcf77",
+        "DE_MRG_67a8450f3c9f",
+        "DE_MRG_68ba87808df8",
+        "DE_MRG_698a45847033",
+        "DE_MRG_6f627c55e7bd",
+        "DE_MRG_70752f860917",
+        "DE_MRG_73019c3017aa",
+        "DE_MRG_77741e43de3f",
+        "DE_MRG_830e5845fb60",
+        "DE_MRG_88b2cc10d998",
+        "DE_MRG_9410ac111320",
+        "DE_MRG_98e486211a34",
+        "DE_MRG_9e1fff10ce51",
+        "DE_MRG_a235cf36d16c",
+        "DE_MRG_a27167ef8f23",
+        "DE_MRG_ac1a1840dec2",
+        "DE_MRG_b86ffe1dd2ea",
+        "DE_MRG_bceaa37f49ef",
+        "DE_MRG_bd0cf439de30",
+        "DE_MRG_bf419442ff08",
+        "DE_MRG_c6f2d9d3d036",
+        "DE_MRG_c90ee890d36c",
+        "DE_MRG_c922c0ebada5",
+        "DE_MRG_c9a9f2cd9548",
+        "DE_MRG_cc565c282846",
+        "DE_MRG_ce73c32b1090",
+        "DE_MRG_d0e3890ae1d5",
+        "DE_MRG_d4ab7c811a60",
+        "DE_MRG_d561808c92a5",
+        "DE_MRG_d67a0e4a728d",
+        "DE_MRG_d7270b2f4f53",
+        "DE_MRG_e2617eca3f85",
+        "DE_MRG_e2f350a636b5",
+        "DE_MRG_e87b9124c03f",
+        "DE_MRG_ea826ec181b8",
+        "DE_MRG_ec3ed49e067c",
+        "FR_MRG_5b1fca32ff2c",
+        "FR_MRG_6d703ee3f8dc",
+        "FR_MRG_7c681aa2032e",
+        "FR_MRG_a3ac3f104566",
+        "FR_MRG_ef55d0091c1e",
         "GF_PRIMARY",
         "NO_PRIMARY_GAP_15",
         "NO_PRIMARY_GAP_16",
@@ -111337,10 +111391,10 @@
     "BRG": {
       "base_iso2": "BE",
       "continent_label": "Europe",
-      "controller_feature_count": 90,
+      "controller_feature_count": 88,
       "display_name": "Ordensstaat Burgund",
       "entry_kind": "scenario_country",
-      "feature_count": 90,
+      "feature_count": 88,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -111355,7 +111409,7 @@
       "provenance_iso2": "BE",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 90
+        "manual_reviewed": 91
       },
       "rule_sources": [
         "tno_1962_brg_baseline"
@@ -112156,10 +112210,10 @@
     "FRA": {
       "base_iso2": "FR",
       "continent_label": "Europe",
-      "controller_feature_count": 257,
+      "controller_feature_count": 251,
       "display_name": "France",
       "entry_kind": "",
-      "feature_count": 257,
+      "feature_count": 251,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -112172,7 +112226,7 @@
       "provenance_iso2": "FR",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 257
+        "approx_existing_geometry": 261
       },
       "rule_sources": [
         "french_colonies"
@@ -112360,10 +112414,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 840,
+      "controller_feature_count": 770,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 840,
+      "feature_count": 770,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -112376,7 +112430,7 @@
       "provenance_iso2": "DE",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 840
+        "manual_reviewed": 889
       },
       "rule_sources": [
         "germany_frontier_1936",
@@ -117036,16 +117090,16 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "c136b3da0ba64a61746a4e787dd540bd7a9012fc0977615f676a789118f227c5",
+  "snapshot_fingerprint": "cacba18444b81c7be2c27c53988a56b787f1b9c60df11d4478ee7b22bd158c42",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "748e40b2b34ad8d9548a1e53b081f73be646038495954130f40bc413e8ae1078",
-    "detail_chunk_manifest_sha256": "2c9749da6b926f98a870910da12621765df46a443d341fdb8cb39974acf6f208",
+    "build_snapshot_sha256": "bd0d2020aaaa6d4c801fb98ad1e8ba4126aef175057054271cc2ced7fad31e3e",
+    "detail_chunk_manifest_sha256": "debac9c7812483309e4147000ec73c2ae5408c415a51fdb8e308179573382a9f",
     "runtime_bootstrap_topology_sha256": "778d8bf0739545699e84b5a5b99decbec670752d1f36ef142ac8399e4e923119",
-    "runtime_topology_sha256": "2de31f99fdf3ccf6d037d2af394d714bc202ced9e3d76ec483105f48ec13ec20"
+    "runtime_topology_sha256": "a92516ee612491da9225c16a6f740d9ecd3129dd30a25991176493e68384b6c4"
   },
   "summary": {
-    "approximate_count": 861,
+    "approximate_count": 865,
     "belarus_hybrid_feature_count": 0,
     "blocker_count": 0,
     "changed_feature_count": 2032,
@@ -117058,25 +117112,25 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 12711,
+    "feature_count": 12633,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 9381,
+    "manual_reviewed_feature_count": 9431,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
     "owner_count": 172,
     "quality_counts": {
-      "approx_existing_geometry": 921,
+      "approx_existing_geometry": 925,
       "direct_country_copy": 2578,
-      "manual_reviewed": 9381
+      "manual_reviewed": 9431
     },
     "scenario_atlantropa_feature_count": 726,
     "scenario_rule_blocker_count": 0,
     "scenario_runtime_topology_object_count": 7,
     "source_counts": {
       "controller_rule": 0,
-      "direct_active_owner": 4354,
+      "direct_active_owner": 4407,
       "fallback_mapped_tag": 3,
-      "manual_rule": 6240,
+      "manual_rule": 6241,
       "scenario_generated": 445,
       "tno_reichskommissariat_baseline": 1838
     },
