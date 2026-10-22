@@ -360,7 +360,7 @@
 - 在 `unittest` 入口里新增 pytest 风格模块函数时，要同步加 wrapper method；否则 `python -m unittest ...` 会绿灯但跳过新用例。
 
 ### Scenario chunk 合同失败先区分代码与签入数据
-- `npm run test:node:scenario-chunk-contracts` 可能因 `hoi4_1939` coarse chunk per-feature bounds 数量漂移失败；若本轮未改 scenario 数据，先把它作为签入数据合同问题单独处理，避免把 renderer/helper refactor 和数据重建混在一个 diff。
+- `node --test tests/scenario_chunk_contracts.test.mjs` 可能因 `hoi4_1939` coarse chunk per-feature bounds 数量漂移失败；若本轮未改 scenario 数据，先把它作为签入数据合同问题单独处理，避免把 renderer/helper refactor 和数据重建混在一个 diff。
 
 ### Pack path helper 参数顺序要用合同锁住
 - 同名 `getPackPath` helper 在 point/industrial preview 中签名可能不同；抽 runtime helper 或修 full-pack 探测时，加静态合同或行为测试锁调用顺序，避免把 `mode` 和 `variantId` 互换后悄悄回退到 preview pack。
