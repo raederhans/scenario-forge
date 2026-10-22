@@ -34,6 +34,6 @@ npm run test:e2e:smoke   # 浏览器冒烟
 | `pr-verify-hgo` | 独立 HGO 编辑器的检查、测试和数据校验。 |
 | `PR Verify Required` | 汇总以上 job，任一失败即失败；这是唯一的 required check。 |
 
-另外，Scenario Contract Matrix 和 Transport Contract Required 只在相关数据或构建脚本变化时触发（见各自 workflow 的 `paths`），也可以从 Actions 手动运行。性能门禁由 `perf-pr-gate.yml` 和 [性能策略](../tools/ci/perf_policy.mjs) 决定。
+另外，Scenario Contract Matrix（5 个场景的严格数据合约）和 Transport Contract Required 也在每个 PR 上运行，可以从 Actions 手动重跑；它们不是 required check。性能门禁由 `perf-pr-gate.yml` 和 [性能策略](../tools/ci/perf_policy.mjs) 决定。
 
 保存工作到功能分支无需先追平 `main`。准备合并时再 fetch 目标分支并确认最终提交的 required check；合并后的 Pages 发布独立验收。

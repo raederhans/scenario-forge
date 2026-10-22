@@ -3,19 +3,8 @@ name: Scenario Contract Matrix
 on:
   workflow_dispatch:
   pull_request:
-    paths:
-      - 'data/scenarios/**'
-      - 'data/CATALOG.json'
-      - 'data/manifest.json'
-      - 'data/source_ledger.json'
-      - 'map_builder/**'
-      - 'tools/check_scenario_contracts.py'
-      - 'tools/scenario_chunk_assets.py'
-      - 'tools/regional_scenario_assets.py'
-      - 'tools/stage_us_county_scenario.py'
-      - 'tools/stage_us_county_adapted_bundle.py'
-      - 'requirements-dev.lock.txt'
-      - '.github/workflows/scenario-contract-matrix.yml'
+  # Runs on every PR: check_scenario_contracts.py imports much of tools/ and map_builder/,
+  # so a hand-kept path list would silently skip real regressions.
 
 permissions:
   contents: read

@@ -3,16 +3,7 @@ name: Transport Contract Required
 on:
   workflow_dispatch:
   pull_request:
-    paths:
-      - 'data/transport_layers/**'
-      - 'requirements-transport.lock.txt'
-      - 'tools/build_data_catalog.py'
-      - 'tools/check_transport_workbench_manifests.py'
-      - 'tools/build_transport_workbench_*'
-      - 'tools/build_global_transport_*'
-      - 'tests/test_transport_*'
-      - 'tests/test_global_transport_builder_contracts.py'
-      - '.github/workflows/transport-contract-required.yml'
+  # Runs on every PR for the same reason as the scenario matrix: no hand-kept path list.
 
 permissions:
   contents: read

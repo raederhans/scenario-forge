@@ -34,6 +34,6 @@ Every PR runs the same jobs; there is no path-based routing:
 | `pr-verify-hgo` | Checks, tests and data validation for the standalone HGO editor. |
 | `PR Verify Required` | Fails when any job above fails; the only required check. |
 
-Scenario Contract Matrix and Transport Contract Required trigger only when their data or builders change (see each workflow's `paths`) and can be started manually from Actions. Performance gating lives in `perf-pr-gate.yml` and the [performance policy](../tools/ci/perf_policy.mjs).
+Scenario Contract Matrix (strict data contracts for all five scenarios) and Transport Contract Required also run on every PR and can be rerun from Actions; they are not required checks. Performance gating lives in `perf-pr-gate.yml` and the [performance policy](../tools/ci/perf_policy.mjs).
 
 Saving work to a feature branch does not require updating from `main` first. Fetch the target when preparing to merge and check the final commit's required check; Pages release admission stays separate after merge.
