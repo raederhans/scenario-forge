@@ -54,7 +54,9 @@ class TnoChinaPlaceNamesTest(unittest.TestCase):
             with self.subTest(name=raw_name):
                 self.assertEqual(self.manual[target], expected)
                 self.assertEqual(self.locales[target]["zh"], expected)
-                others = [entry for entry in aliases if entry["primary_name"] == raw_name and entry["stable_key"] != target]
+                # A same-name county merged into a political feature keeps its raw name as an alias.
+                others = [entry for entry in aliases if raw_name in (entry["primary_name"], *entry.get("aliases", []))
+                          and entry["stable_key"] != target]
                 self.assertTrue(others)
                 for other in others:
                     # Some source polygons have no stable locale yet and still use the raw-name fallback.

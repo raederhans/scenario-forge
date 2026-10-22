@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/modern_world/audit.json",
-  "baseline_hash": "a4e1d9525a9fd1fa1c2a9e101288f96fe7bc011af0513bc3758960a07e54764e",
+  "baseline_hash": "790f5f3c2c0085fdcd74b35e2389069a5dfe567cc7ab3b7ad74e9ea703f29391",
   "bookmark_date": "2026.1.1.12",
   "bookmark_description": "Modern-world baseline with matched The Fire Rises country colors.",
   "bookmark_name": "Modern World",
@@ -38,12 +38,12 @@
   "runtime_topology_url": "data/scenarios/modern_world/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "a796ad53a181abe5efa43046ac7946d1806267d784672b5133cd9e8c2a115a0b",
+  "snapshot_fingerprint": "d4ac71e00ee8c5fe7c9fd37bda7f41af29034f42414547a6d53be07d042f1b1f",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
-    "runtime_topology_sha256": "1e0fadd8e832607ecde8b83cd79561c2d8668339f19f26e4b11a8d0d4c0bfdd7",
+    "runtime_topology_sha256": "335cdcb4fef7538d009abcb3b9731fc65edb8082ee7ea3b717846b7e46014936",
     "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a"
   },
   "special_zone_layers_url": "data/scenarios/modern_world/special_zone_layers.json",
@@ -61,18 +61,18 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 22870,
+    "feature_count": 22676,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 202,
     "quality_counts": {
-      "direct_country_copy": 22870
+      "direct_country_copy": 22676
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "canonical_baseline": 22870
+      "canonical_baseline": 22676
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,

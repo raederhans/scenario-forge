@@ -2040,7 +2040,7 @@
       "continent_label": "Asia",
       "display_name": "China",
       "entry_kind": "",
-      "feature_count": 2395,
+      "feature_count": 2328,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -7208,7 +7208,7 @@
       "continent_label": "Europe",
       "display_name": "Ukraine",
       "entry_kind": "",
-      "feature_count": 1072,
+      "feature_count": 1031,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -7276,7 +7276,7 @@
       "continent_label": "North America",
       "display_name": "United States of America",
       "entry_kind": "",
-      "feature_count": 914,
+      "feature_count": 828,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [

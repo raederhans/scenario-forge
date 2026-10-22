@@ -59,7 +59,12 @@ class QuickFillBuildContractTest(unittest.TestCase):
     def test_china_unresolved_provinces_are_not_published_as_complete(self):
         level = self.hierarchy["quick_fill"]["countries"]["CN"]["levels"]["prefecture"]
         self.assertEqual(level["status"], "partial")
-        self.assertEqual(len(level["unmapped_feature_ids"]), 353)
+        # 353 unresolved leaves before merges; merged unresolved leaves collapse to one ID.
+        china_merges = [members for merged, members in self.merged_members.items() if merged.startswith("CN_")]
+        unresolved = {row["feature_id"] for row in self.crosswalk["unresolved"]}
+        self.assertEqual(len(level["unmapped_feature_ids"]), 353 - sum(len(members) - 1 for merged, members in
+                                                                        self.merged_members.items() if merged in unresolved))
+        self.assertTrue(china_merges)
         self.assertEqual(len(level["blocked_parent_groups"]), 26)
         self.assertEqual(len(level["groups"]), 12)
         leaves = []

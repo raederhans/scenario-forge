@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import subprocess
 import sys
@@ -59,8 +60,12 @@ GLOBAL_PROJECTED = (
     "releasables/hoi4_vanilla.internal.phase1.catalog.json", "releasables/hoi4_vanilla.internal.phase1.source.json",
     "releasables/tno_1962.internal.phase1.catalog.json", "releasables/tno_1962.internal.phase1.source.json",
 )
+CHINA_CROSSWALK = "quick_fill/china_prefecture_crosswalk.v1.json"
 POPULATION_FEATURES = "thematic_layers/population/ghsl_population_2020_v1/features"
 LANGUAGE_SEPARATORS = {"en": " + ", "zh": "、"}
+# ID lists that annotate each feature independently (audit samples, reviewed
+# name collisions) rather than define a set, so a lone merged member is valid.
+PER_FEATURE_ANNOTATIONS = ("$.audit.", "$.reviewed_collision_feature_ids")
 
 
 class Merges:
@@ -105,7 +110,7 @@ class Merges:
         if isinstance(value, str):
             return self.map_id(value)
         if isinstance(value, list):
-            if value and all(isinstance(item, str) for item in value):
+            if value and all(isinstance(item, str) for item in value) and not at.startswith(PER_FEATURE_ANNOTATIONS):
                 present = {item[4:] if item.startswith("id::") else item for item in value}
                 for group in self.groups:
                     found = present.intersection(group["member_ids"])
@@ -334,11 +339,130 @@ def apply_scenario(scenario_id: str, merges: Merges) -> dict:
 
 
 def apply_locales(merges: Merges) -> None:
-    rewrite(DATA / "locales.json", merges.project)
+    def transform(payload: dict) -> dict:
+        payload = merges.project(payload)
+        # Members with no ID-keyed name used the raw-name fallback; the merged name has none.
+        for group in merges.groups:
+            payload["geo"].setdefault("id::" + group["id"], dict(group["names"]))
+        return payload
+
+    rewrite(DATA / "locales.json", transform)
 
 
 def apply_hierarchy(merges: Merges) -> None:
     rewrite(DATA / "hierarchy.json", merges.project)
+
+
+def apply_china_crosswalk(merges: Merges) -> None:
+    """Project the prefecture crosswalk and re-pin it to the merged leaves.
+
+    Plans only merge China leaves that share one crosswalk prefecture (or are
+    all unresolved), so membership is unchanged; the input signatures follow
+    tools/build_china_prefecture_crosswalk.py over the merged topology.
+    """
+    hierarchy = load_json(DATA / "hierarchy.json")
+    parents = {key: sorted(members) for key, members in sorted(hierarchy["groups"].items()) if key.startswith("CN_")}
+    topology = load_json(DATA / "europe_topology.runtime_political_v1.json")
+    rows = sorted((str(row["id"]), str(row.get("name", ""))) for row in
+                  (geometry.get("properties") or {} for geometry in topology["objects"]["political"]["geometries"])
+                  if str(row.get("cntr_code", "")).upper() == "CN")
+
+    def transform(crosswalk: dict) -> dict:
+        crosswalk = copy.deepcopy(crosswalk)
+        for record in crosswalk["groups"].values():
+            record["feature_ids"] = sorted(dict.fromkeys(merges.map_id(member) for member in record["feature_ids"]))
+        unresolved: dict[str, dict] = {}
+        for row in crosswalk["unresolved"]:
+            group_id = merges.remap.get(row["feature_id"])
+            if not group_id:
+                unresolved[row["feature_id"]] = row
+                continue
+            merged = unresolved.setdefault(group_id, {**row, "feature_id": group_id,
+                                                      "name": merges.by_id[group_id]["names"]["en"], "candidates": []})
+            merged["candidates"] = sorted(set(merged["candidates"]) | set(row["candidates"]))
+        crosswalk["unresolved"] = sorted(unresolved.values(), key=lambda row: row["feature_id"])
+        for province, summary in crosswalk["provinces"].items():
+            summary["total"] = len(parents.get(province, []))
+            summary["matched"] = sum(len(record["feature_ids"]) for record in crosswalk["groups"].values()
+                                     if record["province_id"] == province)
+            summary["unresolved"] = sum(row["province_id"] == province for row in crosswalk["unresolved"])
+        crosswalk["input_parent_signature"] = hashlib.sha256(
+            json.dumps(parents, ensure_ascii=True, separators=(",", ":")).encode()).hexdigest()
+        crosswalk["input_feature_signature"] = hashlib.sha256(
+            json.dumps(rows, ensure_ascii=True, separators=(",", ":")).encode()).hexdigest()
+        return crosswalk
+
+    rewrite(DATA / CHINA_CROSSWALK, transform)
+
+
+def apply_quick_fill() -> None:
+    """Rebuild hierarchy quick-fill metadata from the projected crosswalk and every applied plan."""
+    from map_builder.quick_fill_hierarchy import build_quick_fill_metadata, load_crosswalk, load_feature_merge_members
+
+    topology = load_json(DATA / "europe_topology.runtime_political_v1.json")
+    properties = [row.get("properties", {}) for row in topology["objects"]["political"]["geometries"]]
+
+    def transform(hierarchy: dict) -> dict:
+        return {**hierarchy, "quick_fill": build_quick_fill_metadata(
+            hierarchy, properties, load_crosswalk(DATA), load_feature_merge_members(DATA))}
+
+    rewrite(DATA / "hierarchy.json", transform)
+
+
+def manifest_in_sync() -> list[str]:
+    """Manifest outputs whose committed (HEAD) file matches the committed evidence."""
+    def head_blobs(paths: list[str]) -> list[bytes | None]:
+        request = "".join(f"HEAD:{path}\n" for path in paths).encode()
+        output = subprocess.run(["git", "cat-file", "--batch"], input=request, capture_output=True, check=True, cwd=ROOT).stdout
+        blobs, offset = [], 0
+        for _ in paths:
+            header_end = output.index(b"\n", offset)
+            header = output[offset:header_end].split()
+            if header[-1] == b"missing":
+                blobs.append(None)
+                offset = header_end + 1
+                continue
+            size = int(header[2])
+            blobs.append(output[header_end + 1:header_end + 1 + size])
+            offset = header_end + 1 + size + 1
+        return blobs
+
+    manifest_blob, = head_blobs(["data/manifest.json"])
+    outputs = {name: entry for name, entry in json.loads(manifest_blob)["outputs"].items()
+               if isinstance(entry, dict) and entry.get("sha256")}
+    names = list(outputs)
+    return [name for name, blob in zip(names, head_blobs([f"data/{name}" for name in names]))
+            if blob is not None and hashlib.sha256(blob).hexdigest() == outputs[name]["sha256"]]
+
+
+def refresh_manifest(in_sync: list[str]) -> list[str]:
+    """Re-record evidence for outputs this tool changed, using the manifest writer's own fields.
+
+    Only outputs that were in sync at HEAD are touched; unrelated stale
+    entries stay for their owners to refresh.
+    """
+    import init_map_data
+
+    path = DATA / "manifest.json"
+    original = path.read_bytes()
+    manifest = json.loads(original)
+    # Other registrars (e.g. population) may already have re-recorded their outputs.
+    changed = [name for name in in_sync
+               if hashlib.sha256((DATA / name).read_bytes()).hexdigest() != manifest["outputs"][name]["sha256"]]
+    if not changed:
+        return []
+    try:
+        init_map_data.write_data_manifest(DATA)
+        regenerated = load_json(path)["outputs"]
+    finally:
+        path.write_bytes(original)
+    for name in changed:
+        entry = manifest["outputs"][name]
+        for key, value in regenerated[name].items():
+            if key in ("sha256", "size_bytes") or (key in entry and isinstance(value, int) and not isinstance(value, bool)):
+                entry[key] = value
+    write_like(path, manifest, original)
+    return changed
 
 
 def apply_geo_aliases(merges: Merges) -> None:
@@ -365,6 +489,9 @@ def merge_geo_aliases(payload: dict, merges: Merges) -> dict:
     for group_id, entry in merged_entries.items():
         aliases.setdefault(entry["primary_name"], f"id::{group_id}")
     payload["alias_to_stable_key"] = aliases
+    # A sample of aliases shared by several features; a merged member keeps its row under the merged key.
+    for row in payload.get("ambiguous_aliases_sample") or []:
+        row["stable_keys"] = list(dict.fromkeys(merges.map_id(key) for key in row["stable_keys"]))
     payload["entry_count"], payload["alias_count"] = len(entries), len(aliases)
     return payload
 
@@ -431,15 +558,26 @@ def main() -> None:
     parser.add_argument("--scenario", action="append", choices=SCENARIOS, help="Limit scenario processing (default: all).")
     parser.add_argument("--skip-global", action="store_true")
     parser.add_argument("--population-only", action="store_true", help="Only re-bind population features (after scenarios).")
+    parser.add_argument("--quick-fill-only", action="store_true", help="Only rebuild hierarchy quick-fill metadata.")
+    parser.add_argument("--manifest-only", action="store_true", help="Only refresh data/manifest.json evidence.")
     args = parser.parse_args()
     merges = Merges(load_json(ROOT / args.plan))
+    if args.quick_fill_only:
+        apply_quick_fill()
+        return
+    if args.manifest_only:
+        print(json.dumps({"manifest": refresh_manifest(manifest_in_sync())}))
+        return
     if args.population_only:
         print(json.dumps({"population": apply_population(merges)}))
         return
     report = {}
+    in_sync = manifest_in_sync()
     if not args.skip_global:
         report["base_topologies"] = apply_base_topologies(merges)
         apply_hierarchy(merges)
+        apply_china_crosswalk(merges)
+        apply_quick_fill()
         apply_locales(merges)
         apply_geo_aliases(merges)
         report["global"] = project_files([DATA / name for name in GLOBAL_PROJECTED if (DATA / name).exists()], merges)
@@ -448,6 +586,7 @@ def main() -> None:
         print(json.dumps({scenario_id: {k: v for k, v in report[scenario_id].items() if k != "fixes"}}, ensure_ascii=False), flush=True)
     if not args.skip_global:
         report["population"] = apply_population(merges)
+        report["manifest"] = refresh_manifest(in_sync)
     print(json.dumps({key: value for key, value in report.items() if key not in SCENARIOS}, ensure_ascii=False))
 
 
