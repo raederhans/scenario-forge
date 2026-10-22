@@ -327,7 +327,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       assert.ok(report.states.some(value => value.displayState === "precise"));
     }
     report.preference = await page.evaluate(async () => {
-      const { readPoliticalIdRasterPreference } = await import(new URL("js/core/renderer/political_id_raster_trial.js", document.baseURI));
+      const { readPoliticalIdRasterPreference } = (await globalThis.__scenarioForgeTestApi.internals()).rasterTrial;
       return { saved: readPoliticalIdRasterPreference({ search: "" }), forcedOff: readPoliticalIdRasterPreference({ search: "?political_id_raster=0" }) };
     });
     assert.deepEqual(report.preference, { saved: true, forcedOff: false });
@@ -360,9 +360,11 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     const url = new URL(page.url()); url.searchParams.set('political_id_raster', '1');
     await page.goto(url.href, { waitUntil: 'domcontentloaded' });
     mark('navigationCompleteMs');
+    // The bundled editor installs the test API when main.js runs; use its live modules.
+    await page.waitForFunction(() => !!globalThis.__scenarioForgeTestApi);
     await page.evaluate(async () => {
-      window.__rasterTask = { renderer: await import(new URL('js/core/map_renderer.js', document.baseURI)),
-        ...(await import(new URL('js/core/state.js', document.baseURI))) };
+      const { renderer, state } = await globalThis.__scenarioForgeTestApi.internals();
+      window.__rasterTask = { renderer, state };
     });
     mark('importsCompleteMs');
     timing.bootAtImport = await page.evaluate(() => {

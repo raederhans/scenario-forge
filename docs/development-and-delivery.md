@@ -13,6 +13,8 @@ npm run test:e2e:smoke   # browser smoke
 npm run test:e2e:golden  # golden user flows (about 10 minutes)
 ```
 
+`dist/` is not tracked. CI builds the Pages artifact from source with `tools/build_pages_dist.py`, which bundles the editor's JavaScript into `app/js/bundle/` with `tools/build_editor_bundle.mjs` (esbuild). Run `npm run verify:pages-dist` for a local build.
+
 `tests/quarantine.json` is the only skip list on PRs. Every entry needs a reason and leaves as soon as the test is fixed or deleted. Nightly runs everything with `--all`, including the quarantine and the slow lists.
 
 | Stage | Action |

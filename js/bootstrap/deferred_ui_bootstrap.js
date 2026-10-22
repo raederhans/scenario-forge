@@ -1,12 +1,15 @@
 import { initTranslations } from "../ui/i18n.js";
 
-const DEFERRED_UI_MODULE_PATHS = Object.freeze([
-  "../ui/toolbar.js",
-  "../ui/sidebar.js",
-  "../ui/scenario_controls.js",
-  "../ui/styled_selects.js",
-  "../ui/shortcuts.js",
-]);
+// Literal import() calls so a bundler can follow them; a variable specifier would
+// load a second, unbundled copy of every module these import (including state.js).
+const DEFERRED_UI_MODULE_LOADERS = Object.freeze({
+  "../ui/toolbar.js": () => import("../ui/toolbar.js"),
+  "../ui/sidebar.js": () => import("../ui/sidebar.js"),
+  "../ui/scenario_controls.js": () => import("../ui/scenario_controls.js"),
+  "../ui/styled_selects.js": () => import("../ui/styled_selects.js"),
+  "../ui/shortcuts.js": () => import("../ui/shortcuts.js"),
+});
+const DEFERRED_UI_MODULE_PATHS = Object.freeze(Object.keys(DEFERRED_UI_MODULE_LOADERS));
 
 const UI_INTERACTION_ROOT_IDS = Object.freeze([
   "editorProjectBar",
@@ -50,7 +53,7 @@ export function attachDeferredUiBootstrapRejectionObserver(promise) {
 export function createDeferredUiBootstrapper({
   globalScope = globalThis,
   documentRef = globalThis.document,
-  importModule = (path) => import(path),
+  importModule = (path) => DEFERRED_UI_MODULE_LOADERS[path](),
   initTranslationsFn = initTranslations,
 } = {}) {
   let deferredUiBootstrapPromise = null;

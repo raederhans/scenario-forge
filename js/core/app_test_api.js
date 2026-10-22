@@ -89,6 +89,20 @@ function isDirty() {
   return !!state.isDirty;
 }
 
+// NOT part of the stable contract above. Release and raster diagnostics still inspect
+// internals; on a bundled build, importing ./js/core/*.js by URL would load a second,
+// unused copy of each module, so they get the live instances from here instead.
+async function internals() {
+  const [renderer, rasterTrial, interactionFunnel, scenarioDispatcher, scenarioManager] = await Promise.all([
+    import("./map_renderer.js"),
+    import("./renderer/political_id_raster_trial.js"),
+    import("./interaction_funnel.js"),
+    import("./scenario_dispatcher.js"),
+    import("./scenario_manager.js"),
+  ]);
+  return { state, renderer, rasterTrial, interactionFunnel, scenarioDispatcher, scenarioManager };
+}
+
 export function installAppTestApi(target = globalThis) {
   target.__scenarioForgeTestApi = Object.freeze({
     version: API_VERSION,
@@ -97,6 +111,7 @@ export function installAppTestApi(target = globalThis) {
     editedFeatureColors,
     history,
     isDirty,
+    internals,
   });
 }
 
