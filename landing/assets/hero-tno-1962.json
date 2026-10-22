@@ -43,7 +43,7 @@
     "base_land_features_inspected": 23146,
     "base_land_features_candidates": 6043,
     "base_land_features_clipped": 6041,
-    "base_land_paths_available": 7436,
+    "base_land_paths_available": 7367,
     "base_land_path_limit": 360,
     "base_land_paths": 30,
     "base_land_paths_dropped": 0,
@@ -58,7 +58,7 @@
     "base_coastline_paths_dropped": 0,
     "atlantropa_features": 642,
     "atlantropa_water_paths": 336,
-    "atlantropa_land_paths": 268,
+    "atlantropa_land_paths": 266,
     "atlantropa_shoal_paths": 61
   },
   "counts": {
@@ -68,7 +68,7 @@
     "base_land_features_inspected": 23146,
     "base_land_features_candidates": 6043,
     "base_land_features_clipped": 6041,
-    "base_land_paths_available": 7436,
+    "base_land_paths_available": 7367,
     "base_land_path_limit": 360,
     "base_land_paths": 30,
     "base_land_paths_dropped": 0,
@@ -83,7 +83,7 @@
     "base_coastline_paths_dropped": 0,
     "atlantropa_features": 642,
     "atlantropa_water_paths": 336,
-    "atlantropa_land_paths": 268,
+    "atlantropa_land_paths": 266,
     "atlantropa_shoal_paths": 61
   },
   "territory_tags": [

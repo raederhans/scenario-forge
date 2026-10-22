@@ -360,11 +360,11 @@
     "locales.json": {
       "artifact_class": "publish",
       "description": "Published locale bundle for UI and geo labels.",
-      "geo_entry_count": 73569,
+      "geo_entry_count": 73570,
       "owner": "init_map_data.hierarchy_locales",
       "role": "locales",
-      "sha256": "a7dcff15519e47c9e0902da4f681499efea30216a10eaa798987f66068f9540b",
-      "size_bytes": 8493350,
+      "sha256": "1fa418d43e94308401bbe82b2ebca888e126f0509e556cbaa62d94c65c0c27fc",
+      "size_bytes": 8493463,
       "type": "locales",
       "ui_entry_count": 2090
     },

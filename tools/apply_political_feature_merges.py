@@ -339,7 +339,14 @@ def apply_scenario(scenario_id: str, merges: Merges) -> dict:
 
 
 def apply_locales(merges: Merges) -> None:
-    rewrite(DATA / "locales.json", merges.project)
+    def transform(payload: dict) -> dict:
+        payload = merges.project(payload)
+        # Members with no ID-keyed name used the raw-name fallback; the merged name has none.
+        for group in merges.groups:
+            payload["geo"].setdefault("id::" + group["id"], dict(group["names"]))
+        return payload
+
+    rewrite(DATA / "locales.json", transform)
 
 
 def apply_hierarchy(merges: Merges) -> None:

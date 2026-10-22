@@ -293734,7 +293734,7 @@
     },
     "id::CN_MRG_6c8b997d87f4": {
       "en": "Jiaxian + Lushanxian + Baofengxian",
-      "zh": "郏县、Lushanxian、宝丰县"
+      "zh": "郏县、庐山县、宝丰县"
     },
     "id::CN_MRG_41987d66c89b": {
       "en": "Anyangxian + Tangyinxian",
@@ -293762,11 +293762,11 @@
     },
     "id::CN_MRG_8c69fc20650e": {
       "en": "Xushuixian + Wangduxian + Qingyuanxian",
-      "zh": "徐水县、望都县、Qingyuanxian"
+      "zh": "徐水县、望都县、清源县"
     },
     "id::CN_MRG_5c6db60e61b3": {
       "en": "Shanggaoxian + Wanzaixian + Shanggaoxian",
-      "zh": "上高县、万载县、Shanggaoxian"
+      "zh": "上高县、万载县、上高县"
     },
     "id::CN_MRG_afbaca334723": {
       "en": "Wuqiangxian + Wuyixian + Shenzhou",
@@ -293782,7 +293782,7 @@
     },
     "id::CN_MRG_34e4e9cc4fbe": {
       "en": "Boyexian + Lixian + Anguo",
-      "zh": "博野县、Lixian、安国"
+      "zh": "博野县、澧县、安国"
     },
     "id::CN_MRG_dcba081e6d4b": {
       "en": "Nanyang + Sheqixian",
@@ -293826,7 +293826,7 @@
     },
     "id::CN_MRG_d7d38b1d4e6c": {
       "en": "Xiuningxian + Yixian",
-      "zh": "休宁县、Yixian"
+      "zh": "休宁县、黟县"
     },
     "id::CN_MRG_03c2697ed1c7": {
       "en": "Xinxiang + Weihui",
@@ -293850,11 +293850,11 @@
     },
     "id::CN_MRG_855b56adb95d": {
       "en": "Suichuanxian + Taihexian + Wananxian",
-      "zh": "遂川县、Taihexian、万安县"
+      "zh": "遂川县、太和县、万安县"
     },
     "id::CN_MRG_3f1f7652e799": {
       "en": "Feixixian + Chaohu",
-      "zh": "费西县、Chaohu"
+      "zh": "费西县、巢湖"
     },
     "id::CN_MRG_6d6cb2d8c363": {
       "en": "Shangyouxian + Nankang",
@@ -293866,11 +293866,11 @@
     },
     "id::CN_MRG_caa06bd6794d": {
       "en": "Yongfengxian + Jishuixian + Jian",
-      "zh": "永丰县、积水县、Jian"
+      "zh": "永丰县、积水县、坚"
     },
     "id::CN_MRG_f2a3fc747532": {
       "en": "Taihuxian + Qianshanxian",
-      "zh": "太湖县、Qianshanxian"
+      "zh": "太湖县、千山县"
     },
     "id::CN_MRG_c5c7b0e9cbd8": {
       "en": "Shuixian + Qixian",
@@ -293890,11 +293890,11 @@
     },
     "id::CN_MRG_a8d7799e7061": {
       "en": "Wuyuanxian + Hengfengxian + Dexing",
-      "zh": "Wuyuanxian、横峰县、德兴"
+      "zh": "五源县、横峰县、德兴"
     },
     "id::CN_MRG_1130259eb8b0": {
       "en": "Guangzhongxian + Weixian",
-      "zh": "广中县、Weixian"
+      "zh": "广中县、潍县"
     },
     "id::CN_MRG_c71520fb477c": {
       "en": "Mixian + Dongfeng",
@@ -294218,7 +294218,7 @@
     },
     "id::UA_MRG_ce31c0ac496b": {
       "en": "Teplyk + Trostianets",
-      "zh": "特普雷克、Trostianets"
+      "zh": "特普雷克、特罗斯蒂亚内茨"
     },
     "id::UA_MRG_de7e916ec1cb": {
       "en": "Khmilnyk + Lityn",
@@ -294279,6 +294279,10 @@
     "id::UA_MRG_2d1c37bdd071": {
       "en": "Oleksandriia + Znamianka",
       "zh": "亚历克桑德里亚、兹纳米安卡"
+    },
+    "id::CN_MRG_e76984eed8fb": {
+      "en": "Yichuanxian + Yiyangxian",
+      "zh": "宜川县、弋阳县"
     }
   },
   "ui": {

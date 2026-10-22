@@ -52522,7 +52522,7 @@
     },
     {
       "path": "assets/europe-1936-showcase.svg",
-      "size_bytes": 254470,
+      "size_bytes": 141445,
       "source_kind": "dist"
     },
     {
@@ -52547,7 +52547,7 @@
     },
     {
       "path": "assets/hero-blank.svg",
-      "size_bytes": 1211654,
+      "size_bytes": 1200670,
       "source_kind": "dist"
     },
     {
@@ -52567,7 +52567,7 @@
     },
     {
       "path": "assets/hero-hoi4-1936.svg",
-      "size_bytes": 281902,
+      "size_bytes": 263254,
       "source_kind": "dist"
     },
     {
@@ -52582,7 +52582,7 @@
     },
     {
       "path": "assets/hero-hoi4-1939.svg",
-      "size_bytes": 349779,
+      "size_bytes": 299604,
       "source_kind": "dist"
     },
     {
@@ -52597,7 +52597,7 @@
     },
     {
       "path": "assets/hero-tno-1962.svg",
-      "size_bytes": 1423805,
+      "size_bytes": 972342,
       "source_kind": "dist"
     },
     {
@@ -52762,7 +52762,7 @@
     },
     {
       "path": "assets/work-alt-history-med.svg",
-      "size_bytes": 300400,
+      "size_bytes": 300404,
       "source_kind": "dist"
     },
     {
@@ -52792,7 +52792,7 @@
     },
     {
       "path": "assets/work-scenario-switch-europe.svg",
-      "size_bytes": 190290,
+      "size_bytes": 190447,
       "source_kind": "dist"
     },
     {
@@ -79103,7 +79103,7 @@
     {
       "file_count": 59,
       "path": "assets",
-      "size_bytes": 27293669
+      "size_bytes": 26649535
     },
     {
       "file_count": 21,
@@ -79136,5 +79136,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 1031485183
+  "total_bytes": 1030841049
 }

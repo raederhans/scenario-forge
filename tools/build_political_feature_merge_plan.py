@@ -112,21 +112,28 @@ def connected_components(members: list[str], adjacency: dict[str, set[str]]) -> 
 LANGUAGE_SEPARATORS = {"en": " + ", "zh": "、"}
 
 
-def load_name_sources() -> list[dict]:
-    """Global locales first, then scenario locale patches (which name ambiguous raw names per ID)."""
-    sources = [{key[4:]: entry for key, entry in (read_json(DATA / "locales.json").get("geo") or {}).items()
-                if key.startswith("id::")}]
+def load_name_sources() -> tuple[list[dict], dict]:
+    """ID-keyed names (global locales, then scenario locale patches), plus raw-name locales.
+
+    Scenario patches name leaves whose raw names are ambiguous; leaves with no
+    ID-keyed name fall back to the raw-name locale, as the runtime does.
+    """
+    geo = read_json(DATA / "locales.json").get("geo") or {}
+    sources = [{key[4:]: entry for key, entry in geo.items() if key.startswith("id::")}]
     for path in sorted(DATA.glob("scenarios/*/geo_locale_patch.json")):
         sources.append(read_json(path).get("geo") or {})
-    return sources
+    return sources, geo
 
 
-def member_name(feature_id: str, name_sources: list[dict], source_names: dict[str, str]) -> dict:
+def member_name(feature_id: str, name_sources: tuple[list[dict], dict], source_names: dict[str, str]) -> dict:
+    by_id, raw_names = name_sources
+    source_name = source_names.get(feature_id) or ""
     names = {}
     for language in LANGUAGE_SEPARATORS:
-        names[language] = next((source[feature_id][language] for source in name_sources
+        names[language] = next((source[feature_id][language] for source in by_id
                                 if isinstance(source.get(feature_id), dict) and source[feature_id].get(language)), None)
-    fallback = source_names.get(feature_id) or feature_id
+        names[language] = names[language] or (raw_names.get(source_name) or {}).get(language)
+    fallback = source_name or feature_id
     return {language: name or names.get("en") or fallback for language, name in names.items()}
 
 

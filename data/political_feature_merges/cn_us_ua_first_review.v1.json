@@ -111,7 +111,7 @@
       "parent_id": "CN_Henan",
       "names": {
         "en": "Jiaxian + Lushanxian + Baofengxian",
-        "zh": "郏县、Lushanxian、宝丰县"
+        "zh": "郏县、庐山县、宝丰县"
       },
       "member_names": {
         "CN_CITY_17275852B12367976812965": {
@@ -120,7 +120,7 @@
         },
         "CN_CITY_17275852B60013836791147": {
           "en": "Lushanxian",
-          "zh": "Lushanxian"
+          "zh": "庐山县"
         },
         "CN_CITY_17275852B60708257219667": {
           "en": "Baofengxian",
@@ -275,7 +275,7 @@
       "parent_id": "CN_Hebei",
       "names": {
         "en": "Xushuixian + Wangduxian + Qingyuanxian",
-        "zh": "徐水县、望都县、Qingyuanxian"
+        "zh": "徐水县、望都县、清源县"
       },
       "member_names": {
         "CN_CITY_17275852B17915990545621": {
@@ -288,7 +288,7 @@
         },
         "CN_CITY_17275852B70455093500286": {
           "en": "Qingyuanxian",
-          "zh": "Qingyuanxian"
+          "zh": "清源县"
         }
       }
     },
@@ -302,7 +302,7 @@
       "parent_id": "CN_Jiangxi",
       "names": {
         "en": "Shanggaoxian + Wanzaixian + Shanggaoxian",
-        "zh": "上高县、万载县、Shanggaoxian"
+        "zh": "上高县、万载县、上高县"
       },
       "member_names": {
         "CN_CITY_17275852B18090329850308": {
@@ -315,7 +315,7 @@
         },
         "CN_CITY_17275852B67626464932783": {
           "en": "Shanggaoxian",
-          "zh": "Shanggaoxian"
+          "zh": "上高县"
         }
       }
     },
@@ -410,7 +410,7 @@
       "parent_id": "CN_Hebei",
       "names": {
         "en": "Boyexian + Lixian + Anguo",
-        "zh": "博野县、Lixian、安国"
+        "zh": "博野县、澧县、安国"
       },
       "member_names": {
         "CN_CITY_17275852B21011904878760": {
@@ -419,7 +419,7 @@
         },
         "CN_CITY_17275852B29896348675191": {
           "en": "Lixian",
-          "zh": "Lixian"
+          "zh": "澧县"
         },
         "CN_CITY_17275852B7444451912335": {
           "en": "Anguo",
@@ -502,16 +502,16 @@
       "parent_id": "CN_Henan",
       "names": {
         "en": "Yichuanxian + Yiyangxian",
-        "zh": "Yichuanxian、Yiyangxian"
+        "zh": "宜川县、弋阳县"
       },
       "member_names": {
         "CN_CITY_17275852B44956350685295": {
           "en": "Yichuanxian",
-          "zh": "Yichuanxian"
+          "zh": "宜川县"
         },
         "CN_CITY_17275852B81329065873888": {
           "en": "Yiyangxian",
-          "zh": "Yiyangxian"
+          "zh": "弋阳县"
         }
       }
     },
@@ -678,7 +678,7 @@
       "parent_id": "CN_Anhui",
       "names": {
         "en": "Xiuningxian + Yixian",
-        "zh": "休宁县、Yixian"
+        "zh": "休宁县、黟县"
       },
       "member_names": {
         "CN_CITY_17275852B31757639036873": {
@@ -687,7 +687,7 @@
         },
         "CN_CITY_17275852B98150019256975": {
           "en": "Yixian",
-          "zh": "Yixian"
+          "zh": "黟县"
         }
       }
     },
@@ -816,7 +816,7 @@
       "parent_id": "CN_Jiangxi",
       "names": {
         "en": "Suichuanxian + Taihexian + Wananxian",
-        "zh": "遂川县、Taihexian、万安县"
+        "zh": "遂川县、太和县、万安县"
       },
       "member_names": {
         "CN_CITY_17275852B37858104001226": {
@@ -825,7 +825,7 @@
         },
         "CN_CITY_17275852B73903296597057": {
           "en": "Taihexian",
-          "zh": "Taihexian"
+          "zh": "太和县"
         },
         "CN_CITY_17275852B74776996629025": {
           "en": "Wananxian",
@@ -842,7 +842,7 @@
       "parent_id": "CN_Anhui",
       "names": {
         "en": "Feixixian + Chaohu",
-        "zh": "费西县、Chaohu"
+        "zh": "费西县、巢湖"
       },
       "member_names": {
         "CN_CITY_17275852B47297530357355": {
@@ -851,7 +851,7 @@
         },
         "CN_CITY_17275852B77342375778801": {
           "en": "Chaohu",
-          "zh": "Chaohu"
+          "zh": "巢湖"
         }
       }
     },
@@ -909,7 +909,7 @@
       "parent_id": "CN_Jiangxi",
       "names": {
         "en": "Yongfengxian + Jishuixian + Jian",
-        "zh": "永丰县、积水县、Jian"
+        "zh": "永丰县、积水县、坚"
       },
       "member_names": {
         "CN_CITY_17275852B43446340592902": {
@@ -922,7 +922,7 @@
         },
         "CN_CITY_17275852B99539158189120": {
           "en": "Jian",
-          "zh": "Jian"
+          "zh": "坚"
         }
       }
     },
@@ -935,7 +935,7 @@
       "parent_id": "CN_Anhui",
       "names": {
         "en": "Taihuxian + Qianshanxian",
-        "zh": "太湖县、Qianshanxian"
+        "zh": "太湖县、千山县"
       },
       "member_names": {
         "CN_CITY_17275852B55448399697332": {
@@ -944,7 +944,7 @@
         },
         "CN_CITY_17275852B8482565791704": {
           "en": "Qianshanxian",
-          "zh": "Qianshanxian"
+          "zh": "千山县"
         }
       }
     },
@@ -1051,12 +1051,12 @@
       "parent_id": "CN_Jiangxi",
       "names": {
         "en": "Wuyuanxian + Hengfengxian + Dexing",
-        "zh": "Wuyuanxian、横峰县、德兴"
+        "zh": "五源县、横峰县、德兴"
       },
       "member_names": {
         "CN_CITY_17275852B5353146374567": {
           "en": "Wuyuanxian",
-          "zh": "Wuyuanxian"
+          "zh": "五源县"
         },
         "CN_CITY_17275852B67769801833376": {
           "en": "Hengfengxian",
@@ -1077,7 +1077,7 @@
       "parent_id": "CN_Hebei",
       "names": {
         "en": "Guangzhongxian + Weixian",
-        "zh": "广中县、Weixian"
+        "zh": "广中县、潍县"
       },
       "member_names": {
         "CN_CITY_17275852B53933530490343": {
@@ -1086,7 +1086,7 @@
         },
         "CN_CITY_17275852B64817974651819": {
           "en": "Weixian",
-          "zh": "Weixian"
+          "zh": "潍县"
         }
       }
     },
@@ -3024,7 +3024,7 @@
       "parent_id": "UA_Vinnytsia",
       "names": {
         "en": "Teplyk + Trostianets",
-        "zh": "特普雷克、Trostianets"
+        "zh": "特普雷克、特罗斯蒂亚内茨"
       },
       "member_names": {
         "UA_RAY_74538382B75813986727772": {
@@ -3033,7 +3033,7 @@
         },
         "UA_RAY_74538382B76388790181712": {
           "en": "Trostianets",
-          "zh": "Trostianets"
+          "zh": "特罗斯蒂亚内茨"
         }
       }
     },
