@@ -5,9 +5,10 @@
 // Only entries in tests/quarantine.json are skipped (quarantine plus the slow lists).
 // --all ignores the quarantine; nightly uses it so known breakage stays visible.
 //
-// A few tests compare sources with the built Pages artifact. dist/ is not tracked, so
-// unless SCENARIO_FORGE_PAGES_ARTIFACT_ROOT or a local dist/ build exists, this builds one
-// into .runtime/pages-test/dist and reuses it while HEAD and the working tree are unchanged.
+// A few tests compare sources with the built Pages artifact. Unless
+// SCENARIO_FORGE_PAGES_ARTIFACT_ROOT names one explicitly, this builds it into
+// .runtime/pages-test/dist and reuses it only while HEAD and every modified, staged or
+// untracked file are byte-identical. A local dist/ is never trusted: it may be stale.
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -26,18 +27,28 @@ function run(command, args) {
 }
 
 function sourceStamp() {
-  const git = (...args) => spawnSync("git", args, { encoding: "utf8", maxBuffer: 1 << 26 }).stdout || "";
-  return createHash("sha256").update(git("rev-parse", "HEAD")).update(git("status", "--porcelain"))
-    .update(git("diff")).digest("hex");
+  const git = (args, input) => spawnSync("git", args, { encoding: "utf8", input, maxBuffer: 1 << 26 }).stdout || "";
+  const changed = new Set([
+    ...git(["diff", "HEAD", "--name-only", "-z"]).split("\0"),
+    ...git(["ls-files", "--others", "--exclude-standard", "-z"]).split("\0"),
+  ].filter(Boolean));
+  const paths = [...changed].sort();
+  const present = paths.filter(path => existsSync(path));
+  // Content hashes, not diff text: a binary file edited twice keeps the same diff text.
+  const hashes = present.length ? git(["hash-object", "--stdin-paths"], `${present.join("\n")}\n`).trim().split("\n") : [];
+  const hashByPath = new Map(present.map((path, index) => [path, hashes[index]]));
+  const hash = createHash("sha256").update(git(["rev-parse", "HEAD"]));
+  for (const path of paths) hash.update(`${path}\0${hashByPath.get(path) || "deleted"}\n`);
+  return hash.digest("hex");
 }
 
 function ensurePagesArtifact() {
-  if (process.env.SCENARIO_FORGE_PAGES_ARTIFACT_ROOT || existsSync("dist/index.html")) return;
+  if (process.env.SCENARIO_FORGE_PAGES_ARTIFACT_ROOT) return;
   const stamp = sourceStamp();
   const built = existsSync(`${TEST_ARTIFACT_ROOT}/index.html`) && existsSync(ARTIFACT_STAMP)
     && readFileSync(ARTIFACT_STAMP, "utf8") === stamp;
   if (!built) {
-    console.log(`> building the Pages artifact into ${TEST_ARTIFACT_ROOT} (no dist/ found)`);
+    console.log(`> building the Pages artifact into ${TEST_ARTIFACT_ROOT} (sources changed since the last build)`);
     rmSync(".runtime/pages-test", { recursive: true, force: true });
     const result = spawnSync(process.execPath, ["tools/run_python.mjs", "tools/build_pages_dist.py", "--output-root", TEST_ARTIFACT_ROOT], { stdio: "inherit" });
     if (result.status !== 0) process.exit(result.status ?? 1);
