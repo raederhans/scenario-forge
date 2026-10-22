@@ -996,4 +996,14 @@ test("real D3 rejects an inverted compact ring as world bounds and accepts the s
   assert.equal(inverted.invalid, true);
   assert.equal(inverted.hasExcessiveSphereArea, true);
   assert.equal(inverted.isWorldBounds, true);
+
+  // Repeated inverted rings accumulate past a hemisphere before D3 normalizes
+  // the area, so the area alone looks valid; only geoBounds rejects it.
+  const wide = [[0, 0], [150, 0], [150, 80], [0, 80], [0, 0]];
+  const stacked = owner.getSphericalGeometryDiagnostics({ type: "Polygon", coordinates: [wide, wide, wide] });
+  assert.equal(stacked.hasExcessiveSphereArea, false);
+  assert.equal(stacked.isWorldBounds, true);
+  assert.equal(stacked.invalid, true);
+  const stackedParts = owner.getSphericalGeometryDiagnostics({ type: "MultiPolygon", coordinates: [[clockwise], [wide, wide, wide]] });
+  assert.equal(stackedParts.invalid, true);
 });

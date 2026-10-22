@@ -50,44 +50,62 @@ export function computeProjectedCoordinateBounds(projection, geoObject) {
   return buildProjectedBounds(minX, minY, maxX, maxY);
 }
 
-function collectGeometries(geoObject, out) {
-  if (!geoObject || typeof geoObject !== "object") return false;
-  if (geoObject.type === "FeatureCollection") {
-    return Array.isArray(geoObject.features) && geoObject.features.every((feature) => collectGeometries(feature, out));
-  }
-  if (geoObject.type === "Feature") return collectGeometries(geoObject.geometry, out);
-  if (geoObject.type === "GeometryCollection") {
-    return Array.isArray(geoObject.geometries) && geoObject.geometries.every((geometry) => collectGeometries(geometry, out));
-  }
-  if (!Array.isArray(geoObject.coordinates)) return false;
-  out.push(geoObject.coordinates);
-  return true;
+function isValidPosition(position) {
+  const lon = position?.[0];
+  const lat = position?.[1];
+  return typeof lon === "number" && lon >= -180 && lon <= 180 && lat > -90 && lat < 90;
 }
 
-// True when every vertex is a valid non-polar lon/lat and all of them fit in a
-// longitude span under 180 degrees. D3 reports world bounds only for a polygon
-// whose ring area accumulates negative (an inverted complement); inside such a
-// span that polygon's geoArea is 4π minus less than 2π, so the area check
-// already rejects it and geoBounds cannot change the verdict.
-export function isCompactLonLatGeometry(geoObject) {
-  const stack = [];
-  if (!collectGeometries(geoObject, stack)) return false;
+function ringLongitudeSpan(ring) {
+  if (!Array.isArray(ring)) return Infinity;
   let minLon = Infinity;
   let maxLon = -Infinity;
-  while (stack.length) {
-    const value = stack.pop();
-    if (typeof value[0] === "number") {
-      const lon = value[0];
-      const lat = value[1];
-      if (!(lon >= -180 && lon <= 180 && lat > -90 && lat < 90)) return false;
-      if (lon < minLon) minLon = lon;
-      if (lon > maxLon) maxLon = lon;
-      continue;
-    }
-    for (const item of value) {
-      if (!Array.isArray(item)) return false;
-      stack.push(item);
-    }
+  for (const position of ring) {
+    if (!isValidPosition(position)) return Infinity;
+    if (position[0] < minLon) minLon = position[0];
+    if (position[0] > maxLon) maxLon = position[0];
   }
-  return maxLon - minLon < 180;
+  return maxLon - minLon;
+}
+
+function isAreaBoundedPolygon(rings) {
+  if (!Array.isArray(rings)) return false;
+  let span = 0;
+  for (const ring of rings) span += ringLongitudeSpan(ring);
+  return span < 180;
+}
+
+function hasValidPositions(value) {
+  if (!Array.isArray(value)) return false;
+  return typeof value[0] === "number" ? isValidPosition(value) : value.every(hasValidPositions);
+}
+
+// True when geoBounds cannot change D3's spherical verdict. D3 reports world
+// bounds only for a polygon whose summed ring areas are negative (an inverted
+// complement), and normalizes that polygon's geoArea to 4π plus the sum. A ring
+// of valid non-polar vertices spanning Δλ < 180° encloses at most 2·Δλ, so when
+// a polygon's ring spans add up to under 180° the sum stays above -2π and the
+// inverted polygon's area exceeds 2π, which the area check already rejects.
+// Rings that avoid the poles also keep every other polygon's bounds off ±90°.
+export function isCompactLonLatGeometry(geoObject) {
+  if (!geoObject || typeof geoObject !== "object") return false;
+  switch (geoObject.type) {
+    case "FeatureCollection":
+      return Array.isArray(geoObject.features) && geoObject.features.every(isCompactLonLatGeometry);
+    case "Feature":
+      return isCompactLonLatGeometry(geoObject.geometry);
+    case "GeometryCollection":
+      return Array.isArray(geoObject.geometries) && geoObject.geometries.every(isCompactLonLatGeometry);
+    case "Polygon":
+      return isAreaBoundedPolygon(geoObject.coordinates);
+    case "MultiPolygon":
+      return Array.isArray(geoObject.coordinates) && geoObject.coordinates.every(isAreaBoundedPolygon);
+    case "Point":
+    case "MultiPoint":
+    case "LineString":
+    case "MultiLineString":
+      return hasValidPositions(geoObject.coordinates);
+    default:
+      return false;
+  }
 }

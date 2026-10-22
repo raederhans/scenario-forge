@@ -1072,7 +1072,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function rebuildAuxiliaryRegionIndexes\(\) \{[\s\S]*?if \(!isWaterRegionEnabled\(selectedFeature\)\) \{[\s\S]*?runtimeState\.selectedWaterRegionId = "";/.test(rendererSource)
         && /function drawScenarioWaterHighlightLayer\(k\) \{[\s\S]*?if \(!isWaterRegionEnabled\(feature\)\) return;/.test(scenarioRegionOverlayOwnerSource),
       waterSphericalDiagnosticsBacksSanitization:
-        /function getSphericalGeometryDiagnostics\(geoObject\) \{[\s\S]*?const d3 = getD3\(\);[\s\S]*?d3\.geoArea[\s\S]*?d3\.geoBounds[\s\S]*?isWorldBounds\(bounds\)[\s\S]*?sphericalGeometryMaxArea/.test(projectedGeometryBoundsOwnerSource)
+        /function getSphericalGeometryDiagnostics\(geoObject\) \{[\s\S]*?const d3 = getD3\(\);[\s\S]*?d3\.geoArea[\s\S]*?sphericalGeometryMaxArea[\s\S]*?d3\.geoBounds[\s\S]*?isWorldBounds\(bounds\)/.test(projectedGeometryBoundsOwnerSource)
         && /function collectSafeWaterRegionGeometryPartsInfo\(feature\) \{[\s\S]*?isSphericalGeometryUnsafe\(part\)[\s\S]*?removedCount \+= 1;/.test(projectedGeometryBoundsOwnerSource)
         && /function sanitizeWaterRegionFeatures\(features = \[\]\) \{[\s\S]*?recordRenderPerfMetric\("waterSphericalSanitization"/.test(projectedGeometryBoundsOwnerSource)
         && /function sanitizeWaterRegionFeatures\(features = \[\]\) \{[\s\S]*?return getProjectedGeometryBoundsOwner\(\)\.sanitizeWaterRegionFeatures\(features\);/.test(rendererSource),
