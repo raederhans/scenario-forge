@@ -11,7 +11,7 @@
     "city_overrides.json": "7d5c2892b1cfb679b66237f6f9cfc640329c39c1365b50fc68fd7ce0befa8611",
     "cores.by_feature.json": "69c2715ddb82f00534523972c8d1a0752ed850096fce86d0d384e9f8fa8e0ae5",
     "countries.json": "96c49e4aea7959d510093850c2e2fe9d315d21e18e7142dd84f2daea4e08b9e3",
-    "geo_locale_patch.json": "37afac5aa5a9998056c0b0fbd7c49e1503ca0b9e2530d0750a84d07997d017b3",
+    "geo_locale_patch.json": "938ff885ecdb6bf373f146b98b30cef754ffb8b75044cfc47a5260609fb62041",
     "owners.by_feature.json": "293e47f6002466f529de80d690511eea191cf121a84b3c44993920e7dc21cbdf",
     "relief_overlays.geojson": "bea4068e87d1919162261a9264dc1c982ccc5d09a5fd08cb9cafd5ceb860af73",
     "runtime_topology.topo.json": "49dac339534689a6e024f73e36ad6da6f1c2915d3acbc9a4630d16cb2727123b",
@@ -27,7 +27,7 @@
     "derived/geometry_drop_audit.json": "92eb9483f35ac36bb0e65e610d6d880b4dc0065736340acc6037f7326496e0f8",
     "detail_chunks.manifest.json": "fb63e97448b8b616b9ba62271b13abbca6174ad22106511e1f0438dbd8370a0a",
     "geo_aliases.startup.json": "4087b200237be216c8a79ee39d5dc367a452e588ea4ea3647c40ea975a1b440c",
-    "locales.startup.json": "ec65b367d1198f801cb9bbc76fee0e42c5644bc43c04be8ec0d81866f151d66a",
+    "locales.startup.json": "e5d52017fb4f8638aef82de846d9d3af141b9152b0b1e6cec1f64e0f7658914e",
     "mesh_pack.json": "25b590edd2ac78336b3c02d1373a4ce70113268ae50c767855ce5937c6211390",
     "runtime_meta.json": "97b14de61075c1c1ccca7e60233b916673800f460b8da7a21b9e36d80315fda7",
     "runtime_topology.bootstrap.topo.json": "778d8bf0739545699e84b5a5b99decbec670752d1f36ef142ac8399e4e923119",
@@ -41,6 +41,6 @@
   "profile": "tno_full",
   "report_paths": {},
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "3daf3201af9ad75a4253e98a4a03fbeb32f0a31a985a99d6bdec9b9a58ffa363",
+  "snapshot_fingerprint": "f2b03cd632e543d12f55148ad83156b590201a378fd3018f898c64320abd9335",
   "water_count": 285
 }
