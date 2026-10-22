@@ -162,12 +162,12 @@ test("PR workflow calls native verification once and requires exactly the planne
   assert.match(native, /^  workflow_dispatch:/m);
   assert.match(workflow, /run_hgo: \$\{\{ steps\.plan\.outputs\.run_hgo \}\}/);
   assert.match(workflow, /pr-verify-hgo:\s+needs: \["pr-plan"\]\s+if: needs\.pr-plan\.outputs\.run_hgo == 'true'\s+uses: \.\/\.github\/workflows\/hgo-native\.yml/);
-  assert.match(workflow, /needs: \["pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo"\]/);
+  assert.match(workflow, /needs: \["pr-plan", "pr-verify-fast", "pr-tests", "pr-verify-smoke", "pr-verify-hgo"\]/);
   const script = workflow.match(/node <<'NODE'\r?\n([\s\S]*?)\r?\n\s+NODE/)[1];
   const accepted = (planned, result, omit = false) => {
     const needs = {
       "pr-plan": { result: "success", outputs: { run_fast: "false", run_smoke: "false", run_hgo: planned } },
-      "pr-verify-fast": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
+      "pr-verify-fast": { result: "skipped" }, "pr-tests": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
       ...(!omit ? { "pr-verify-hgo": { result } } : {}),
     };
     let exitCode = 0;
