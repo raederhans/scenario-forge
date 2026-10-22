@@ -206,6 +206,66 @@ export function createRenderCacheSurfaceResources({
     return changed;
   }
 
+  const canvasIds = new WeakMap();
+  let nextCanvasId = 1;
+  let reclaimedBytes = 0;
+  let reclaimedCount = 0;
+  const auxiliaryNames = ["lastGoodFrame", "interactionComposite", "compositeBuffer", "borderSnapshot"];
+
+  // Caller has successfully presented the replacement GPU scene and invalidated
+  // the exact composite replay key. A valid fallback frame remains protected.
+  function releaseObsoleteSceneSurfaces({ directPolitical = false } = {}) {
+    const cache = getRenderPassCacheState();
+    if (retainedSurfaceCaches.size) return 0;
+    const candidates = new Set();
+    for (const name of auxiliaryNames) {
+      const entry = cache[name];
+      if (!entry?.canvas || (name !== "compositeBuffer" && entry.valid !== false)) continue;
+      candidates.add(entry.canvas);
+      entry.canvas = null;
+    }
+    if (directPolitical && cache.canvases?.political) {
+      candidates.add(cache.canvases.political);
+      delete cache.canvases.political;
+    }
+    const protectedSurfaces = getProtectedSurfaceCanvases(cache);
+    collectSurfaceCanvases(cache, protectedSurfaces);
+    let bytes = 0;
+    for (const canvas of candidates) {
+      if (protectedSurfaces.has(canvas)) continue;
+      bytes += Math.max(0, canvas.width) * Math.max(0, canvas.height) * 4;
+      if (canvas.width && canvas.height) reclaimedCount++;
+    }
+    releaseCanvasBackings(candidates, protectedSurfaces);
+    reclaimedBytes += bytes;
+    updateSurfaceResourceAccounting();
+    return bytes;
+  }
+
+  function getSurfaceDiagnostics() {
+    const cache = getRenderPassCacheState();
+    const rows = new Map();
+    function add(canvas, role, valid, retained) {
+      if (!canvas) return;
+      if (!canvasIds.has(canvas)) canvasIds.set(canvas, nextCanvasId++);
+      let row = rows.get(canvas);
+      if (!row) {
+        row = { id: canvasIds.get(canvas), width: canvas.width, height: canvas.height,
+          estimatedBytes: canvas.width * canvas.height * 4, references: [] };
+        rows.set(canvas, row);
+      }
+      row.references.push({ role, valid, retained });
+    }
+    for (const root of new Set([cache, ...retainedSurfaceCaches.keys()])) {
+      const retained = retainedSurfaceCaches.has(root);
+      for (const [name, canvas] of Object.entries(root?.canvases || {})) add(canvas, `pass:${name}`, !root.dirty?.[name], retained);
+      for (const [name, entry] of Object.entries(root?.contextScenarioLayerCache || {})) add(entry?.canvas, `scenario:${name}`, !!entry?.signature, retained);
+      for (const name of auxiliaryNames) add(root?.[name]?.canvas, name, root?.[name]?.valid ?? null, retained);
+    }
+    return { estimateKind: "rgba-backing-dimensions-not-heap", reclaimedBytes, reclaimedCount,
+      retainedScopes: [...retainedSurfaceCaches.values()].reduce((a, b) => a + b, 0), surfaces: [...rows.values()] };
+  }
+
   function getContextScenarioLayerCacheEntry(layerName) {
     const cache = getRenderPassCacheState();
     const resolvedLayerName = String(layerName || "default").trim() || "default";
@@ -232,6 +292,7 @@ export function createRenderCacheSurfaceResources({
   return Object.freeze({
     getRenderPassCacheState, syncSurfaceResourceAccounting, retainSurfaceCacheForScope,
     releaseSurfaceCache, releaseInactivePassSurfaces, clearContextScenarioLayerSurfaces,
+    releaseObsoleteSceneSurfaces, getSurfaceDiagnostics,
     getContextScenarioLayerCacheEntry, clearContextScenarioLayerIdentity,
   });
 }

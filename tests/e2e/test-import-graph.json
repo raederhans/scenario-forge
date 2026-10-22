@@ -3,8 +3,8 @@
   "graphMode": "artifact-only",
   "summary": {
     "specCount": 74,
-    "nodeCount": 90,
-    "reverseIndexKeyCount": 143,
+    "nodeCount": 91,
+    "reverseIndexKeyCount": 144,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -1418,6 +1418,7 @@
       "directDependencies": [
         "js/core/dirty_state.js",
         "js/core/state.js",
+        "tests/e2e/support/native-gpu-diagnostics.js",
         "tests/e2e/support/playwright-app.js"
       ],
       "transitiveDependencies": [
@@ -1427,6 +1428,7 @@
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
         "js/ui/sidebar.js",
+        "tests/e2e/support/native-gpu-diagnostics.js",
         "tests/e2e/support/playwright-app-paths.js",
         "tests/e2e/support/playwright-app.js",
         "tests/e2e/support/playwright-frontline-panel.js",
@@ -3024,6 +3026,9 @@
     ],
     "tests/e2e/support/input-evidence.js": [
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js"
+    ],
+    "tests/e2e/support/native-gpu-diagnostics.js": [
+      "tests/e2e/sample_guide_deeplink.spec.js"
     ],
     "tests/e2e/support/playwright-app-paths.js": [
       "tests/e2e/city_label_i18n_redraw.spec.js",

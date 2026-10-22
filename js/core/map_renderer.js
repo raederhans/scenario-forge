@@ -13781,7 +13781,12 @@ function renderPassToCache(passName, drawFn, transform, timings) {
   if (passName === "physicalBase" && !exportRenderInProgress) {
     physicalViewportCacheOwner?.noteNativeDraw(getRenderPassCacheState().canvases.physicalBase);
   }
+  const directPolitical = passName === "political" && !exportRenderInProgress
+    && isTnoRasterSceneSelected() && !hasVisibleRiverPartitions() && !!runtimeState.landData?.features?.length;
+  if (directPolitical) passStart = nowMs();
   const hostResult = getRenderPassCacheHostOwner().prepareRenderPassHost({
+    drawWithoutCanvas: directPolitical ? (withNativeTarget) => getPoliticalPassOrchestratorOwner()
+      .drawPoliticalPassWithNativeTarget(Number(transform?.k || 1), withNativeTarget) : null,
     passName,
     transform,
     drawFn,
@@ -13799,7 +13804,7 @@ function renderPassToCache(passName, drawFn, transform, timings) {
     hostSummary: hostResult,
   });
   if (commit.committed) {
-    if (passName === "political") politicalPassUsesDirectScene = !!politicalIdRasterRuntimeOwner?.getDirectFrame();
+    if (passName === "political") politicalPassUsesDirectScene = !hostResult.hasPassCanvas;
     tnoRasterSceneOwner?.notePassCommit(passName);
   }
 }
@@ -13860,6 +13865,8 @@ function composeCachedPasses(passNames, currentTransform = runtimeState.zoomTran
     }
     if (getTnoRasterSceneOwner().present(currentTransform)) {
       politicalPassUsesDirectScene = true;
+      exactCompositeReuseOwner?.invalidate();
+      getRenderCacheOwner().releaseObsoleteSceneSurfaces({ directPolitical: true });
       // Startup can begin a legacy whole-world raster before the first GPU
       // scene is eligible. Once the GPU owns navigation, retire that producer
       // and its queued identity retries; fallback can create a fresh owner.
@@ -16704,6 +16711,7 @@ export function getPoliticalIdRasterDiagnostics() {
   const policy = readPoliticalRenderPolicy({ scenarioId: runtimeState.activeScenarioId });
   const passes = politicalPassOrchestratorOwner?.getDiagnostics() || {};
   return { ...current, ...policy, passes, asyncWork: getRendererAsyncWorkStatus(),
+    canvasResources: getRenderCacheOwner().getSurfaceDiagnostics(),
     scene: { active: false, frames: 0, textureUploads: 0, bytes: 0,
       ...tnoRasterSceneOwner?.getDiagnostics(), failure: tnoRasterSceneFailure,
       borderCanvas: borderCanvasPreparationOwner?.getStats(),
