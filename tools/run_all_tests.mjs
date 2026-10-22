@@ -39,7 +39,7 @@ function ensurePagesArtifact() {
   if (!built) {
     console.log(`> building the Pages artifact into ${TEST_ARTIFACT_ROOT} (no dist/ found)`);
     rmSync(".runtime/pages-test", { recursive: true, force: true });
-    const result = spawnSync("python", ["tools/build_pages_dist.py", "--output-root", TEST_ARTIFACT_ROOT], { stdio: "inherit" });
+    const result = spawnSync(process.execPath, ["tools/run_python.mjs", "tools/build_pages_dist.py", "--output-root", TEST_ARTIFACT_ROOT], { stdio: "inherit" });
     if (result.status !== 0) process.exit(result.status ?? 1);
     writeFileSync(ARTIFACT_STAMP, stamp);
   }
