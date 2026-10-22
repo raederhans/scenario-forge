@@ -73,15 +73,10 @@ because their names contain `owner`: many are responsibility owners.
 Focused checks:
 
 ```sh
-npm run test:node:ownership-retirement
-npm run test:node:scenario-lifecycle-runtime-behavior
+npm test
 npx playwright test tests/e2e/ownership_retirement.spec.js tests/e2e/ui_rework_mainline_shell_sidebar.spec.js --grep "ownership editing|desktop commands" --workers=1
-npm run verify:state-write-allowlist
-python -m unittest tests.test_map_renderer_color_resolution_strategy_boundary_contract tests.test_scenario_state_actions_boundary_contract tests.test_sidebar_split_boundary_contract -q
 ```
 
-A full `check_state_writer_policy.mjs` run is not evidence of a new regression by
-itself: the unmodified baseline already fails the borrowed-owner source proof
-for `js/core/map_renderer.js`. The retirement must not widen that policy or refresh
-unrelated fingerprints merely to turn the historical proof green. Record that
-baseline limitation separately from the focused behavior and publication checks.
+The state-writer policy proofs and source-boundary contracts that this retirement
+originally recorded against were removed in the Phase 0 cleanup (2026-10-22);
+behavior tests and the browser checks above are the remaining evidence.

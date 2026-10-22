@@ -4,6 +4,8 @@ import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 const output = ".runtime/browser/quick-fill";
+// CI serves on another port so the smoke server's TIME_WAIT socket on 8810 cannot collide.
+const port = process.env.MAPCREATOR_DEV_PORT || "8810";
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -11,7 +13,7 @@ const errors = [];
 page.on("pageerror", (error) => errors.push(String(error)));
 let evidence = {};
 try {
-  await page.goto("http://127.0.0.1:8810/app/?startup_interaction=full&startup_worker=0&startup_cache=0", { waitUntil: "domcontentloaded" });
+  await page.goto(`http://127.0.0.1:${port}/app/?startup_interaction=full&startup_worker=0&startup_cache=0`, { waitUntil: "domcontentloaded" });
   await page.evaluate(async () => { globalThis.__qfState = (await import("./js/core/state.js")).state; });
   await page.waitForFunction(() => globalThis.__qfState?.bootBlocking === false && !globalThis.__qfState.scenarioApplyInFlight, undefined, { timeout: 90000 });
   evidence.boot = await page.evaluate(() => ({ scenario: globalThis.__qfState.activeScenarioId, leaves: globalThis.__qfState.landIndex?.size, readonly: globalThis.__qfState.startupReadonly }));

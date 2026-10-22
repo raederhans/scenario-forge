@@ -51,7 +51,7 @@
 
 启动脚本会显示本地编辑器地址。环境准备、运行资源、后端预览及开发命令见[本地开发文档](docs/local-development.md)。
 
-提交或创建 PR 前，运行 `npm run pr:plan`，按[开发与交付](docs/development-and-delivery.zh-CN.md)选择本次所需的验证。
+提交或创建 PR 前，运行 `npm test`，并参考[开发与交付](docs/development-and-delivery.zh-CN.md)。
 
 ## 可用范围与数据来源
 

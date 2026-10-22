@@ -19,11 +19,10 @@ function run(command, args) {
 }
 
 if (suite === "node") {
-  const skipped = new Set(process.platform === "win32" ? [] : quarantine.nodeWindowsOnly.files);
-  if (!all) for (const file of [...Object.keys(quarantine.node), ...quarantine.nodeSlow.files]) skipped.add(file);
+  const skipped = new Set(all ? [] : [...Object.keys(quarantine.node), ...quarantine.nodeSlow.files]);
   const files = readdirSync("tests").filter(name => name.endsWith(".test.mjs"))
     .map(name => `tests/${name}`).filter(file => !skipped.has(file)).sort();
-  for (const file of skipped) console.log(`skipped: ${file} — ${quarantine.node[file] || (quarantine.nodeSlow.files.includes(file) ? quarantine.nodeSlow._reason : quarantine.nodeWindowsOnly._reason)}`);
+  for (const file of skipped) console.log(`skipped: ${file} — ${quarantine.node[file] || quarantine.nodeSlow._reason}`);
   run(process.execPath, ["--test", ...(shard ? [`--test-shard=${shard.slice(8)}`] : []), ...files]);
 } else if (suite === "python") {
   const ignored = all ? [] : [...Object.keys(quarantine.python), ...quarantine.pythonSlow.files];

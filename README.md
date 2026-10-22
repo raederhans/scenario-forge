@@ -51,7 +51,7 @@ On Windows, with Python 3 installed and the required runtime assets present, run
 
 The launcher prints the local editor URL. See [local development](docs/local-development.md) for setup, runtime assets, backend previews, and development commands.
 
-Before committing or opening a PR, use `npm run pr:plan` and follow [development and delivery](docs/development-and-delivery.md) for scoped verification.
+Before committing or opening a PR, run `npm test` and follow [development and delivery](docs/development-and-delivery.md).
 
 ## Availability and sources
 

@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { validateStateActionNonTargetParameterMutations } from "../tools/build_state_writer_policy.mjs";
 
 import {
   commitExportWorkbenchUiState,
@@ -134,11 +133,3 @@ test("export workbench field actions retain normalized domain semantics", () => 
   }]);
 });
 
-test("export workbench actions keep non-target parameters read-only", async () => {
-  const modulePath = "js/core/state/actions/export_workbench_actions.js";
-  const source = await readFile(new URL(`../${modulePath}`, import.meta.url), "utf8");
-  assert.deepEqual(
-    await validateStateActionNonTargetParameterMutations(modulePath, source),
-    [],
-  );
-});

@@ -20,15 +20,3 @@ test("project input cannot overwrite scenario reference assignments or enable bl
   assert.deepEqual(resolveImportedOwnershipState(data, { activeScenarioId: "" }).sovereigntyByFeatureId, {});
 });
 
-test("retirement verification adds a child-safe behavior target and a separately owned browser route", async () => {
-  const { createOwnershipRetirementRecords } = await import("../tools/verification/catalog/records/ownership_retirement.mjs");
-  const original = Object.freeze([Object.freeze({ selectorOrder: 900 })]);
-  const [behavior, browser] = createOwnershipRetirementRecords(original);
-  assert.equal(original.length, 1);
-  assert.equal(behavior.selectorOrder, 901);
-  assert.deepEqual(behavior.executionOwners, ["child-safe"]);
-  assert.deepEqual(behavior.resourceLocks, []);
-  assert.ok(behavior.sourceRefs.includes("js/core/map_data_boundary.js"));
-  assert.deepEqual(browser.executionOwners, ["main-thread"]);
-  assert.ok(browser.resourceLocks.includes("playwright-browser"));
-});

@@ -351,7 +351,7 @@ test("real modern-world geometry uses geographic origin and reports coverage wit
     if (key) countries.add(key);
     if (observation.status !== "value") assert.equal(observation.value, null);
   }
-  assert.equal(counts.value + counts.missing + counts.unmatched, 22948);
+  assert.equal(counts.value + counts.missing + counts.unmatched, topology.objects.political.geometries.length);
   assert.ok(counts.value > 22000);
   assert.equal(counts.missing, 0);
   assert.ok(counts.unmatched > 0);

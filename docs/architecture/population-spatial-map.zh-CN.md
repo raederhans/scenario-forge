@@ -43,8 +43,8 @@ npm run build:population-spatial
 相关检查：
 
 ```powershell
-npm run test:node:population-spatial
-npm run test:py:population-spatial
+node --test tests/population_spatial_data_behavior.test.mjs tests/population_spatial_runtime_behavior.test.mjs tests/population_spatial_view_model_behavior.test.mjs tests/population_spatial_integration_behavior.test.mjs tests/population_heatmap_render_behavior.test.mjs
+python -m unittest tests.test_population_spatial -q
 python tools/data_health.py
 python -m unittest tests.test_data_catalog_contract
 ```
