@@ -229,7 +229,7 @@ export function createProjectedGeometryBoundsOwner({
       const area = Number(d3.geoArea(normalizedGeoObject));
       const hasExcessiveSphereArea = Number.isFinite(area) && area > sphericalGeometryMaxArea;
       // Bounds only label rejected geometry; skip them when they cannot matter.
-      const bounds = hasExcessiveSphereArea || !isCompactLonLatGeometry(normalizedGeoObject)
+      const bounds = hasExcessiveSphereArea || !isCompactLonLatGeometry(normalizedGeoObject, sphericalGeometryMaxArea)
         ? d3.geoBounds(normalizedGeoObject) : null;
       const diagnostics = {
         area,

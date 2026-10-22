@@ -42,6 +42,7 @@ function createHarness({
   projection = ([lon, lat]) => [lon * 10 + 1, lat * -5 + 2],
   d3 = null,
   features = {},
+  constants = {},
 } = {}) {
   const harnessStore = {
     activeScenarioId: "tno_1962",
@@ -70,6 +71,7 @@ function createHarness({
   };
   const owner = createProjectedGeometryBoundsOwner({
     state: harnessStore,
+    constants,
     getters: {
       getProjection: () => projection,
       getPathCanvas: () => (pathCanvasEnabled ? path : null),
@@ -1016,4 +1018,21 @@ test("real D3 rejects an inverted compact ring as world bounds and accepts the s
   assert.equal(repeated.hasExcessiveSphereArea, false);
   assert.equal(repeated.isWorldBounds, true);
   assert.equal(repeated.invalid, true);
+
+  // An edge whose ends are 180° apart takes the minor arc over a pole.
+  const polarLine = owner.getSphericalGeometryDiagnostics({ type: "LineString", coordinates: [[180, 80], [0, 0], [-180, -45]] });
+  assert.equal(polarLine.isWorldBounds, true);
+  assert.equal(polarLine.invalid, true);
+});
+
+test("real D3 keeps the world-bounds check when the configured area limit exceeds a hemisphere", () => {
+  const sandbox = {};
+  vm.runInNewContext(fs.readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), sandbox);
+  const { d3 } = sandbox;
+  const { owner } = createHarness({ d3, constants: { sphericalGeometryMaxArea: Math.PI * 4 } });
+  const reversedSquare = { type: "Polygon", coordinates: [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]] };
+  const diagnostics = owner.getSphericalGeometryDiagnostics(reversedSquare);
+  assert.equal(diagnostics.hasExcessiveSphereArea, false);
+  assert.equal(diagnostics.isWorldBounds, true);
+  assert.equal(diagnostics.invalid, true);
 });
