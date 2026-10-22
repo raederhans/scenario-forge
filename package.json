@@ -10,6 +10,7 @@
     "test": "node tools/run_all_tests.mjs node && node tools/run_all_tests.mjs python",
     "test:node": "node tools/run_all_tests.mjs node",
     "test:python": "node tools/run_all_tests.mjs python",
+    "test:e2e:golden": "node node_modules/@playwright/test/cli.js test tests/e2e/golden --workers=1",
     "test:e2e:map-clarity": "node tools/e2e_layering.mjs run-spec tests/e2e/map_clarity.spec.js",
     "python": "node tools/run_python.mjs",
     "start:backend-preview": "npm run python -- tools/dev_server.py /backend/",

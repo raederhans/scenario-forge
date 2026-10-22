@@ -10,6 +10,7 @@ npm run test:node        # 只跑 Node（tests/*.test.mjs）
 npm run test:python      # 只跑 Python（pytest -n auto）
 node --test tests/<file>.test.mjs   # 单个文件
 npm run test:e2e:smoke   # 浏览器冒烟
+npm run test:e2e:golden  # 黄金用户流程（约 10 分钟）
 ```
 
 `tests/quarantine.json` 是 PR 上唯一的跳过清单，每一项都必须写明原因，修好或删掉后立即移除。nightly 用 `--all` 运行全部测试，包括隔离项和慢测试。
@@ -30,6 +31,7 @@ npm run test:e2e:smoke   # 浏览器冒烟
 | --- | --- |
 | `pr-tests` | 全部 Node 单元测试（2 个分片）和 Python 单元测试。 |
 | `pr-verify-fast` | 公开样例项目校验、Quick Fill 层级数据与审计、数据目录健康检查、Pages 源码引用检查、Pages 产物构建与启动壳检查。 |
+| `pr-golden` | 黄金用户流程（2 个分片）：启动、5 个场景切换与填色、撤销重做、保存后重新打开、PNG 导出、性能预算。只通过 DOM 和 `js/core/app_test_api.js` 访问应用。 |
 | `pr-verify-smoke` | 浏览器冒烟、Golden Demo 和 Quick Fill 真实工具栏冒烟（`tools/check_quick_fill_browser.mjs`）。 |
 | `pr-verify-hgo` | 独立 HGO 编辑器的检查、测试和数据校验。 |
 | `PR Verify Required` | 汇总以上 job，任一失败即失败；这是唯一的 required check。 |

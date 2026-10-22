@@ -26,6 +26,7 @@
 - 隔离的行为变更默认运行一个最相关的目标测试或检查。
 - 单元测试入口只有一个：`npm test`（或 `npm run test:node` / `npm run test:python`），单个文件用 `node --test tests/<file>.test.mjs`。
 - UI 运行时行为在必要时运行一个聚焦的浏览器或 Playwright 检查。
+- 黄金流程（`tests/e2e/golden/`，`npm run test:e2e:golden`）是重构的行为安全网：只通过 DOM 和 `window.__scenarioForgeTestApi`（`js/core/app_test_api.js`）读写应用。重写状态或渲染时，改这个适配模块让黄金流程继续通过，不要改黄金流程去迁就内部实现；性能预算在 `tests/e2e/golden/golden-budgets.js`。
 - 共享契约、跨模块、数据、性能、构建、dist 或发布路径发生变化时，再扩大到相应的项目标准检查，例如 `npm run verify:pages-dist`。
 - bug 已复现、断言稳定且具有实际复发风险时，新增或更新回归测试。
 - 测试只验证可观察行为：调用真实模块、检查输出、状态或渲染结果。不要新增读取源码文本做字符串、正则、token、行数或哈希断言的测试，也不要为"文件结构/调用关系"写守卫测试；它们会在每次重构时失败，却拦不住行为回归。
