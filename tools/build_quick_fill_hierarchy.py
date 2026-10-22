@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path: sys.path.insert(0, str(ROOT))
-from map_builder.quick_fill_hierarchy import build_quick_fill_metadata, load_crosswalk
+from map_builder.quick_fill_hierarchy import build_quick_fill_metadata, load_crosswalk, load_feature_merge_members
 
 
 def main() -> None:
@@ -20,7 +20,7 @@ def main() -> None:
     hierarchy = json.loads(path.read_text(encoding="utf-8"))
     topology = json.loads((data / "europe_topology.runtime_political_v1.json").read_text(encoding="utf-8"))
     properties = [row.get("properties", {}) for row in topology["objects"]["political"]["geometries"]]
-    metadata = build_quick_fill_metadata(hierarchy, properties, load_crosswalk(data))
+    metadata = build_quick_fill_metadata(hierarchy, properties, load_crosswalk(data), load_feature_merge_members(data))
     if args.check:
         if hierarchy.get("quick_fill") != metadata: raise SystemExit("Quick-fill metadata is stale. Run tools/build_quick_fill_hierarchy.py")
     else:

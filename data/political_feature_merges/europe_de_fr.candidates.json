@@ -1,0 +1,864 @@
+{
+  "schema_version": 1,
+  "candidate_set": "europe_de_fr_granularity_20261021",
+  "description": "Adjacent DE NUTS3 / FR arrondissement candidates from the 2026-10-21 granularity research (Germany; Normandie, Bretagne, Hauts-de-France, Ile-de-France). Candidates only; tools/build_political_feature_merge_plan.py derives the applied plan from every scenario's assignments.",
+  "protected_feature_ids": [
+    "DE111",
+    "DE117",
+    "DE122",
+    "DE124",
+    "DE125",
+    "DE126",
+    "DE129",
+    "DE131",
+    "DE132",
+    "DE133",
+    "DE134",
+    "DE136",
+    "DE138",
+    "DE139",
+    "DE13A",
+    "DE141",
+    "DE144",
+    "DE147",
+    "DE211",
+    "DE212",
+    "DE214",
+    "DE215",
+    "DE216",
+    "DE21D",
+    "DE21F",
+    "DE21K",
+    "DE21M",
+    "DE222",
+    "DE225",
+    "DE228",
+    "DE229",
+    "DE22A",
+    "DE232",
+    "DE235",
+    "DE237",
+    "DE239",
+    "DE23A",
+    "DE247",
+    "DE249",
+    "DE24A",
+    "DE24D",
+    "DE252",
+    "DE253",
+    "DE254",
+    "DE256",
+    "DE25A",
+    "DE263",
+    "DE264",
+    "DE265",
+    "DE266",
+    "DE267",
+    "DE269",
+    "DE26A",
+    "DE26C",
+    "DE271",
+    "DE274",
+    "DE277",
+    "DE278",
+    "DE279",
+    "DE27A",
+    "DE27B",
+    "DE27C",
+    "DE27D",
+    "DE27E",
+    "DE300",
+    "DE402",
+    "DE403",
+    "DE404",
+    "DE405",
+    "DE407",
+    "DE409",
+    "DE40B",
+    "DE40C",
+    "DE40F",
+    "DE40G",
+    "DE40I",
+    "DE501",
+    "DE502",
+    "DE600",
+    "DE711",
+    "DE712",
+    "DE713",
+    "DE714",
+    "DE731",
+    "DE803",
+    "DE80M",
+    "DE80N",
+    "DE80O",
+    "DE911",
+    "DE912",
+    "DE913",
+    "DE91C",
+    "DE925",
+    "DE929",
+    "DE943",
+    "DE944",
+    "DE949",
+    "DE94B",
+    "DE94C",
+    "DEA11",
+    "DEA12",
+    "DEA13",
+    "DEA14",
+    "DEA15",
+    "DEA16",
+    "DEA17",
+    "DEA18",
+    "DEA19",
+    "DEA1A",
+    "DEA1B",
+    "DEA1D",
+    "DEA1E",
+    "DEA1F",
+    "DEA22",
+    "DEA23",
+    "DEA24",
+    "DEA28",
+    "DEA29",
+    "DEA2B",
+    "DEA2D",
+    "DEA31",
+    "DEA32",
+    "DEA33",
+    "DEA34",
+    "DEA36",
+    "DEA41",
+    "DEA47",
+    "DEA51",
+    "DEA52",
+    "DEA53",
+    "DEA54",
+    "DEA55",
+    "DEA56",
+    "DEA5A",
+    "DEB11",
+    "DEB21",
+    "DEB23",
+    "DEB25",
+    "DEB34",
+    "DEB35",
+    "DEB3E",
+    "DEB3H",
+    "DEB3K",
+    "DEC01",
+    "DEC02",
+    "DEC04",
+    "DEC05",
+    "DED21",
+    "DED2C",
+    "DED2D",
+    "DED2E",
+    "DED2F",
+    "DED41",
+    "DED42",
+    "DED43",
+    "DED44",
+    "DED45",
+    "DED51",
+    "DED52",
+    "DED53",
+    "DEE02",
+    "DEE03",
+    "DEE04",
+    "DEE05",
+    "DEE07",
+    "DEE08",
+    "DEE09",
+    "DEE0A",
+    "DEE0B",
+    "DEE0D",
+    "DEE0E",
+    "DEF02",
+    "DEF03",
+    "DEF06",
+    "DEF07",
+    "DEF09",
+    "DEF0C",
+    "DEF0D",
+    "DEF0F",
+    "DEG01",
+    "DEG02",
+    "DEG03",
+    "FR_ARR_02001",
+    "FR_ARR_02002",
+    "FR_ARR_02004",
+    "FR_ARR_02005",
+    "FR_ARR_14002",
+    "FR_ARR_29001",
+    "FR_ARR_35001",
+    "FR_ARR_35002",
+    "FR_ARR_35003",
+    "FR_ARR_35004",
+    "FR_ARR_56003",
+    "FR_ARR_59001",
+    "FR_ARR_59002",
+    "FR_ARR_59004",
+    "FR_ARR_59005",
+    "FR_ARR_59006",
+    "FR_ARR_60001",
+    "FR_ARR_60002",
+    "FR_ARR_60003",
+    "FR_ARR_75001",
+    "FR_ARR_76001",
+    "FR_ARR_76002",
+    "FR_ARR_76003",
+    "FR_ARR_77002",
+    "FR_ARR_77005",
+    "FR_ARR_78004",
+    "FR_ARR_80001",
+    "FR_ARR_80002",
+    "FR_ARR_80003",
+    "FR_ARR_80004",
+    "FR_ARR_92003",
+    "FR_ARR_93001",
+    "FR_ARR_95001",
+    "FR_ARR_95003"
+  ],
+  "candidates": [
+    {
+      "member_ids": [
+        "DE112",
+        "DE142"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE113",
+        "DE114",
+        "DE145"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE115",
+        "DE116",
+        "DE118"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE119",
+        "DE11A",
+        "DE11D"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE11B",
+        "DE127",
+        "DE128"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE123",
+        "DE12B"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE12A",
+        "DE12C"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE135",
+        "DE137",
+        "DE143"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE146",
+        "DE148",
+        "DE149"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE217",
+        "DE21B"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE218",
+        "DE21C",
+        "DE21H"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE21A",
+        "DE21G"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE21E",
+        "DE21L",
+        "DE21N"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE21I",
+        "DE21J",
+        "DE275"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE221",
+        "DE227",
+        "DE22C"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE226",
+        "DE22B",
+        "DE238"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE231",
+        "DE234",
+        "DE259"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE236",
+        "DE25B",
+        "DE25C"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE241",
+        "DE245",
+        "DE24C"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE242",
+        "DE246",
+        "DE24B"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE248",
+        "DE257",
+        "DE258"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE262",
+        "DE268",
+        "DE26B"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE401",
+        "DE408",
+        "DE40E"
+      ],
+      "parent_id": "DE_Brandenburg"
+    },
+    {
+      "member_ids": [
+        "DE406",
+        "DE40H"
+      ],
+      "parent_id": "DE_Brandenburg"
+    },
+    {
+      "member_ids": [
+        "DE40A",
+        "DE40D"
+      ],
+      "parent_id": "DE_Brandenburg"
+    },
+    {
+      "member_ids": [
+        "DE715",
+        "DE71B"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE716",
+        "DE717",
+        "DE71C"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE718",
+        "DE71A"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE719",
+        "DE71E",
+        "DE721"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE71D",
+        "DE722",
+        "DE723"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE724",
+        "DE736"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE725",
+        "DE732"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE733",
+        "DE734",
+        "DE735"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE80J",
+        "DE80K",
+        "DE80L"
+      ],
+      "parent_id": "DE_Mecklenburg_Vorpommern"
+    },
+    {
+      "member_ids": [
+        "DE914",
+        "DE91A"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE916",
+        "DE917",
+        "DE91B"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE918",
+        "DE926"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE922",
+        "DE927",
+        "DE94D"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE923",
+        "DE928"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE931",
+        "DE933",
+        "DE938"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE932",
+        "DE936"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE934",
+        "DE935",
+        "DE93A"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE937",
+        "DE939",
+        "DE93B"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE941",
+        "DE946",
+        "DE94G"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE947",
+        "DE94A",
+        "DE94H"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE948",
+        "DE94E",
+        "DE94F"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DEA26",
+        "DEA27"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen"
+    },
+    {
+      "member_ids": [
+        "DEA2A",
+        "DEA58"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen"
+    },
+    {
+      "member_ids": [
+        "DEA35",
+        "DEA37",
+        "DEA5C"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen"
+    },
+    {
+      "member_ids": [
+        "DEA38",
+        "DEA42"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen"
+    },
+    {
+      "member_ids": [
+        "DEA43",
+        "DEA46"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen"
+    },
+    {
+      "member_ids": [
+        "DEA44",
+        "DEA45"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen"
+    },
+    {
+      "member_ids": [
+        "DEA57",
+        "DEA59",
+        "DEA5B"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen"
+    },
+    {
+      "member_ids": [
+        "DEB12",
+        "DEB17",
+        "DEB1C"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz"
+    },
+    {
+      "member_ids": [
+        "DEB13",
+        "DEB18",
+        "DEB1B"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz"
+    },
+    {
+      "member_ids": [
+        "DEB14",
+        "DEB1A",
+        "DEB1D"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz"
+    },
+    {
+      "member_ids": [
+        "DEB15",
+        "DEB22",
+        "DEB24"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz"
+    },
+    {
+      "member_ids": [
+        "DEB31",
+        "DEB3C",
+        "DEB3I"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz"
+    },
+    {
+      "member_ids": [
+        "DEB32",
+        "DEB3F",
+        "DEB3G"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz"
+    },
+    {
+      "member_ids": [
+        "DEB3B",
+        "DEB3D",
+        "DEB3J"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz"
+    },
+    {
+      "member_ids": [
+        "DEE06",
+        "DEE0C"
+      ],
+      "parent_id": "DE_Sachsen_Anhalt"
+    },
+    {
+      "member_ids": [
+        "DEF05",
+        "DEF0B",
+        "DEF0E"
+      ],
+      "parent_id": "DE_Schleswig_Holstein"
+    },
+    {
+      "member_ids": [
+        "DEF08",
+        "DEF0A"
+      ],
+      "parent_id": "DE_Schleswig_Holstein"
+    },
+    {
+      "member_ids": [
+        "DEG04",
+        "DEG0B",
+        "DEG0E"
+      ],
+      "parent_id": "DE_Th_ringen"
+    },
+    {
+      "member_ids": [
+        "DEG05",
+        "DEG0G",
+        "DEG0J"
+      ],
+      "parent_id": "DE_Th_ringen"
+    },
+    {
+      "member_ids": [
+        "DEG07",
+        "DEG0A",
+        "DEG0D"
+      ],
+      "parent_id": "DE_Th_ringen"
+    },
+    {
+      "member_ids": [
+        "DEG09",
+        "DEG0N",
+        "DEG0P"
+      ],
+      "parent_id": "DE_Th_ringen"
+    },
+    {
+      "member_ids": [
+        "DEG0F",
+        "DEG0I",
+        "DEG0K"
+      ],
+      "parent_id": "DE_Th_ringen"
+    },
+    {
+      "member_ids": [
+        "DEG0L",
+        "DEG0M"
+      ],
+      "parent_id": "DE_Th_ringen"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_14001",
+        "FR_ARR_50003",
+        "FR_ARR_50004"
+      ],
+      "parent_id": "FR_Normandie"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_14003",
+        "FR_ARR_27002",
+        "FR_ARR_27003"
+      ],
+      "parent_id": "FR_Normandie"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_14004",
+        "FR_ARR_50001"
+      ],
+      "parent_id": "FR_Normandie"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_22002",
+        "FR_ARR_22004",
+        "FR_ARR_56002"
+      ],
+      "parent_id": "FR_Bretagne"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_29002",
+        "FR_ARR_29003",
+        "FR_ARR_29004"
+      ],
+      "parent_id": "FR_Bretagne"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_59003",
+        "FR_ARR_62007"
+      ],
+      "parent_id": "FR_Hauts_de_France"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_61001",
+        "FR_ARR_61002",
+        "FR_ARR_61003"
+      ],
+      "parent_id": "FR_Normandie"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_62001",
+        "FR_ARR_62002",
+        "FR_ARR_62004"
+      ],
+      "parent_id": "FR_Hauts_de_France"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_62003",
+        "FR_ARR_62005",
+        "FR_ARR_62006"
+      ],
+      "parent_id": "FR_Hauts_de_France"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_77001",
+        "FR_ARR_77003",
+        "FR_ARR_77004"
+      ],
+      "parent_id": "FR_Ile_de_France"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_78001",
+        "FR_ARR_78002",
+        "FR_ARR_78003"
+      ],
+      "parent_id": "FR_Ile_de_France"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_91001",
+        "FR_ARR_91002",
+        "FR_ARR_91003"
+      ],
+      "parent_id": "FR_Ile_de_France"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_93002",
+        "FR_ARR_93003",
+        "FR_ARR_95002"
+      ],
+      "parent_id": "FR_Ile_de_France"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_94001",
+        "FR_ARR_94002",
+        "FR_ARR_94003"
+      ],
+      "parent_id": "FR_Ile_de_France"
+    }
+  ]
+}

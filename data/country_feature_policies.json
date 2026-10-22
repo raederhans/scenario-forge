@@ -1,34 +1,99 @@
 {
-  "schema_version": 2,
-  "subdivision_protected_countries": [
-    "CN",
-    "FR",
-    "IN",
-    "PL",
-    "RU"
-  ],
   "country_gate": {
+    "country_gap_target_km2": 1.0,
+    "support_tiers": {
+      "order_of_magnitude_improvement_countries": [
+        "RU",
+        "UA"
+      ],
+      "strict_gap_target_countries": [
+        "DE",
+        "GB",
+        "CZ"
+      ]
+    },
     "target_country_codes": [
       "RU",
       "UA",
       "DE",
       "GB",
       "CZ"
-    ],
-    "country_gap_target_km2": 1.0,
-    "support_tiers": {
+    ]
+  },
+  "display": {
+    "countryNames": {
+      "AL": "Albania",
+      "AM": "Armenia",
+      "AT": "Austria",
+      "AZ": "Azerbaijan",
+      "BA": "Bosnia and Herzegovina",
+      "BD": "Bangladesh",
+      "BE": "Belgium",
+      "BG": "Bulgaria",
+      "BT": "Bhutan",
+      "BY": "Belarus",
+      "CH": "Switzerland",
+      "CN": "China",
+      "CY": "Cyprus",
+      "CZ": "Czechia",
+      "DE": "Germany",
+      "DK": "Denmark",
+      "EE": "Estonia",
+      "ES": "Spain",
+      "FI": "Finland",
+      "FR": "France",
+      "GB": "United Kingdom",
+      "GE": "Georgia",
+      "GR": "Greece",
+      "HR": "Croatia",
+      "HU": "Hungary",
+      "IE": "Ireland",
+      "IN": "India",
+      "IS": "Iceland",
+      "IT": "Italy",
+      "JP": "Japan",
+      "KP": "North Korea",
+      "KR": "South Korea",
+      "LI": "Liechtenstein",
+      "LK": "Sri Lanka",
+      "LT": "Lithuania",
+      "LU": "Luxembourg",
+      "LV": "Latvia",
+      "MD": "Moldova",
+      "ME": "Montenegro",
+      "MK": "North Macedonia",
+      "MM": "Myanmar",
+      "MN": "Mongolia",
+      "MT": "Malta",
+      "NL": "Netherlands",
+      "NO": "Norway",
+      "NP": "Nepal",
+      "PK": "Pakistan",
+      "PL": "Poland",
+      "PT": "Portugal",
+      "RO": "Romania",
+      "RS": "Serbia",
+      "RU": "Russia",
+      "SE": "Sweden",
+      "SI": "Slovenia",
+      "SK": "Slovakia",
+      "TR": "Turkey",
+      "TW": "Taiwan",
+      "UA": "Ukraine",
+      "UK": "United Kingdom",
+      "XK": "Kosovo"
+    },
+    "detailOverlaySupportTiers": {
+      "order_of_magnitude_improvement_countries": [
+        "RU",
+        "UA"
+      ],
       "strict_gap_target_countries": [
         "DE",
         "GB",
         "CZ"
-      ],
-      "order_of_magnitude_improvement_countries": [
-        "RU",
-        "UA"
       ]
-    }
-  },
-  "display": {
+    },
     "fragmentCamouflage": {
       "rules": [
         {
@@ -41,7 +106,7 @@
             "BY_INT_MOGILEV",
             "BY_INT_VITEBSK"
           ],
-          "minComponentAreaSteradians": 0.00000125,
+          "minComponentAreaSteradians": 1.25e-06,
           "preserveLargestComponent": true
         },
         {
@@ -51,12 +116,74 @@
             "RU_RAY_50074027B51726500082089",
             "RU_RAY_50074027B64424707524567"
           ],
-          "minComponentAreaSteradians": 0.00000025,
+          "minComponentAreaSteradians": 2.5e-07,
           "preserveLargestComponent": true
         }
       ]
     },
     "palette": {
+      "countryPalette": {
+        "AL": "#b9770e",
+        "AM": "#2a9d8f",
+        "AT": "#417505",
+        "AZ": "#f4a261",
+        "BA": "#1a5276",
+        "BD": "#1d4ed8",
+        "BE": "#bd10e0",
+        "BG": "#f39c12",
+        "BT": "#7c3aed",
+        "BY": "#9b5de5",
+        "CH": "#d0021b",
+        "CN": "#c1121f",
+        "CY": "#d68910",
+        "CZ": "#3498db",
+        "DE": "#5d7cba",
+        "DK": "#95a5a6",
+        "EE": "#2980b9",
+        "ES": "#e74c3c",
+        "FI": "#d35400",
+        "FR": "#4a90e2",
+        "GB": "#5d6d7e",
+        "GE": "#a23e48",
+        "GR": "#148f77",
+        "HR": "#16a085",
+        "HU": "#e67e22",
+        "IE": "#1e8449",
+        "IN": "#d62828",
+        "IS": "#5499c7",
+        "IT": "#50e3c2",
+        "JP": "#38b000",
+        "KP": "#7f1d1d",
+        "KR": "#2563eb",
+        "LI": "#45b39d",
+        "LK": "#0f766e",
+        "LT": "#c0392b",
+        "LU": "#8b572a",
+        "LV": "#8e44ad",
+        "MD": "#f28482",
+        "ME": "#117a65",
+        "MK": "#7d3c98",
+        "MM": "#f59e0b",
+        "MN": "#577590",
+        "MT": "#a93226",
+        "NL": "#7ed321",
+        "NO": "#34495e",
+        "NP": "#f97316",
+        "PK": "#2d6a4f",
+        "PL": "#f5a623",
+        "PT": "#9b59b6",
+        "RO": "#2ecc71",
+        "RS": "#6c3483",
+        "RU": "#4a4e69",
+        "SE": "#7f8c8d",
+        "SI": "#27ae60",
+        "SK": "#1abc9c",
+        "TR": "#b03a2e",
+        "TW": "#f59e0b",
+        "UA": "#6b8fd6",
+        "UK": "#5d6d7e",
+        "XK": "#2e4053"
+      },
       "themes": {
         "HOI4 Vanilla": [
           "#871818",
@@ -75,24 +202,6 @@
           "#9e2a2b",
           "#b23a48",
           "#6d597a"
-        ],
-        "TNO (The New Order)": [
-          "#420420",
-          "#5e0d0d",
-          "#2a2a2a",
-          "#0f0f0f",
-          "#00f7ff",
-          "#00d9ff",
-          "#00ff9d",
-          "#ccff00",
-          "#ff0055",
-          "#ffcc00",
-          "#8a2be2",
-          "#2e8b57",
-          "#adb5bd",
-          "#6c757d",
-          "#495057",
-          "#343a40"
         ],
         "Kaiserreich": [
           "#7b1113",
@@ -129,137 +238,30 @@
           "#000000",
           "#ffffff",
           "#ff5400"
+        ],
+        "TNO (The New Order)": [
+          "#420420",
+          "#5e0d0d",
+          "#2a2a2a",
+          "#0f0f0f",
+          "#00f7ff",
+          "#00d9ff",
+          "#00ff9d",
+          "#ccff00",
+          "#ff0055",
+          "#ffcc00",
+          "#8a2be2",
+          "#2e8b57",
+          "#adb5bd",
+          "#6c757d",
+          "#495057",
+          "#343a40"
         ]
-      },
-      "countryPalette": {
-        "DE": "#5d7cba",
-        "FR": "#4a90e2",
-        "IT": "#50e3c2",
-        "PL": "#f5a623",
-        "NL": "#7ed321",
-        "BE": "#bd10e0",
-        "LU": "#8b572a",
-        "AT": "#417505",
-        "CH": "#d0021b",
-        "UA": "#6b8fd6",
-        "BY": "#9b5de5",
-        "MD": "#f28482",
-        "RU": "#4a4e69",
-        "GE": "#a23e48",
-        "AM": "#2a9d8f",
-        "AZ": "#f4a261",
-        "MN": "#577590",
-        "CN": "#c1121f",
-        "IN": "#d62828",
-        "PK": "#2d6a4f",
-        "BD": "#1d4ed8",
-        "NP": "#f97316",
-        "BT": "#7c3aed",
-        "MM": "#f59e0b",
-        "LK": "#0f766e",
-        "JP": "#38b000",
-        "KR": "#2563eb",
-        "KP": "#7f1d1d",
-        "TW": "#f59e0b",
-        "ES": "#e74c3c",
-        "PT": "#9b59b6",
-        "CZ": "#3498db",
-        "SK": "#1abc9c",
-        "HU": "#e67e22",
-        "RO": "#2ecc71",
-        "BG": "#f39c12",
-        "HR": "#16a085",
-        "SI": "#27ae60",
-        "EE": "#2980b9",
-        "LV": "#8e44ad",
-        "LT": "#c0392b",
-        "FI": "#d35400",
-        "SE": "#7f8c8d",
-        "NO": "#34495e",
-        "DK": "#95a5a6",
-        "IE": "#1e8449",
-        "UK": "#5d6d7e",
-        "GB": "#5d6d7e",
-        "GR": "#148f77",
-        "CY": "#d68910",
-        "MT": "#a93226",
-        "TR": "#b03a2e",
-        "RS": "#6c3483",
-        "BA": "#1a5276",
-        "ME": "#117a65",
-        "AL": "#b9770e",
-        "MK": "#7d3c98",
-        "XK": "#2e4053",
-        "IS": "#5499c7",
-        "LI": "#45b39d"
       }
-    },
-    "countryNames": {
-      "DE": "Germany",
-      "FR": "France",
-      "IT": "Italy",
-      "PL": "Poland",
-      "NL": "Netherlands",
-      "BE": "Belgium",
-      "LU": "Luxembourg",
-      "AT": "Austria",
-      "CH": "Switzerland",
-      "UA": "Ukraine",
-      "BY": "Belarus",
-      "MD": "Moldova",
-      "RU": "Russia",
-      "GE": "Georgia",
-      "AM": "Armenia",
-      "AZ": "Azerbaijan",
-      "MN": "Mongolia",
-      "CN": "China",
-      "IN": "India",
-      "PK": "Pakistan",
-      "BD": "Bangladesh",
-      "NP": "Nepal",
-      "BT": "Bhutan",
-      "MM": "Myanmar",
-      "LK": "Sri Lanka",
-      "JP": "Japan",
-      "KR": "South Korea",
-      "KP": "North Korea",
-      "TW": "Taiwan",
-      "ES": "Spain",
-      "PT": "Portugal",
-      "CZ": "Czechia",
-      "SK": "Slovakia",
-      "HU": "Hungary",
-      "RO": "Romania",
-      "BG": "Bulgaria",
-      "HR": "Croatia",
-      "SI": "Slovenia",
-      "EE": "Estonia",
-      "LV": "Latvia",
-      "LT": "Lithuania",
-      "FI": "Finland",
-      "SE": "Sweden",
-      "NO": "Norway",
-      "DK": "Denmark",
-      "IE": "Ireland",
-      "UK": "United Kingdom",
-      "GB": "United Kingdom",
-      "GR": "Greece",
-      "CY": "Cyprus",
-      "MT": "Malta",
-      "TR": "Turkey",
-      "RS": "Serbia",
-      "BA": "Bosnia and Herzegovina",
-      "ME": "Montenegro",
-      "AL": "Albania",
-      "MK": "North Macedonia",
-      "XK": "Kosovo",
-      "IS": "Iceland",
-      "LI": "Liechtenstein"
     },
     "presets": {
       "DE": [
         {
-          "name": "Bavaria",
           "ids": [
             "DE211",
             "DE212",
@@ -267,57 +269,44 @@
             "DE214",
             "DE215",
             "DE216",
-            "DE217",
-            "DE218",
+            "DE_MRG_bd0cf439de30",
+            "DE_MRG_ec3ed49e067c",
             "DE219",
-            "DE21A",
-            "DE21B",
-            "DE21C",
+            "DE_MRG_3fb6d34d5cec",
             "DE21D",
-            "DE21E",
+            "DE_MRG_bf419442ff08",
             "DE21F",
-            "DE21G",
-            "DE21H",
             "DE21I",
             "DE21J",
             "DE21K",
-            "DE21L",
             "DE21M",
-            "DE21N",
-            "DE221",
+            "DE_MRG_d4ab7c811a60",
             "DE222",
             "DE223",
             "DE224",
             "DE225",
             "DE226",
-            "DE227",
             "DE228",
             "DE229",
             "DE22A",
             "DE22B",
-            "DE22C",
-            "DE231",
+            "DE_MRG_73019c3017aa",
             "DE232",
             "DE233",
-            "DE234",
             "DE235",
             "DE236",
             "DE237",
             "DE238",
             "DE239",
             "DE23A",
-            "DE241",
-            "DE242",
+            "DE_MRG_348581c848f8",
+            "DE_MRG_22b5c35ff0db",
             "DE243",
             "DE244",
-            "DE245",
-            "DE246",
             "DE247",
-            "DE248",
+            "DE_MRG_88b2cc10d998",
             "DE249",
             "DE24A",
-            "DE24B",
-            "DE24C",
             "DE24D",
             "DE251",
             "DE252",
@@ -325,23 +314,18 @@
             "DE254",
             "DE255",
             "DE256",
-            "DE257",
-            "DE258",
             "DE259",
             "DE25A",
-            "DE25B",
-            "DE25C",
+            "DE_MRG_08a36bff89a0",
             "DE261",
-            "DE262",
+            "DE_MRG_d7270b2f4f53",
             "DE263",
             "DE264",
             "DE265",
             "DE266",
             "DE267",
-            "DE268",
             "DE269",
             "DE26A",
-            "DE26B",
             "DE26C",
             "DE271",
             "DE272",
@@ -357,10 +341,10 @@
             "DE27C",
             "DE27D",
             "DE27E"
-          ]
+          ],
+          "name": "Bavaria"
         },
         {
-          "name": "Saxony",
           "ids": [
             "DED21",
             "DED2C",
@@ -375,35 +359,30 @@
             "DED51",
             "DED52",
             "DED53"
-          ]
+          ],
+          "name": "Saxony"
         },
         {
-          "name": "Prussia (Eastern Core)",
           "ids": [
             "DE300",
-            "DE401",
+            "DE_MRG_54666399e0ac",
             "DE402",
             "DE403",
             "DE404",
             "DE405",
-            "DE406",
+            "DE_MRG_a235cf36d16c",
             "DE407",
-            "DE408",
             "DE409",
-            "DE40A",
+            "DE_MRG_171e39a343f9",
             "DE40B",
             "DE40C",
-            "DE40D",
-            "DE40E",
             "DE40F",
             "DE40G",
-            "DE40H",
             "DE40I",
             "DE803",
             "DE804",
-            "DE80J",
+            "DE_MRG_ce73c32b1090",
             "DE80K",
-            "DE80L",
             "DE80M",
             "DE80N",
             "DE80O",
@@ -421,30 +400,29 @@
             "DEE0C",
             "DEE0D",
             "DEE0E"
-          ]
+          ],
+          "name": "Prussia (Eastern Core)"
         },
         {
-          "name": "Schleswig-Holstein",
           "ids": [
             "DEF01",
             "DEF02",
             "DEF03",
             "DEF04",
-            "DEF05",
+            "DE_MRG_d67a0e4a728d",
             "DEF06",
             "DEF07",
             "DEF08",
             "DEF09",
             "DEF0A",
-            "DEF0B",
             "DEF0C",
             "DEF0D",
             "DEF0E",
             "DEF0F"
-          ]
+          ],
+          "name": "Schleswig-Holstein"
         },
         {
-          "name": "Alsace-Lorraine + Luxembourg",
           "ids": [
             "FR_ARR_57003",
             "FR_ARR_57005",
@@ -463,17 +441,17 @@
             "LU_ADM1_LUX-906",
             "LU_ADM1_LUX-907",
             "LU_ADM1_LUX-908"
-          ]
+          ],
+          "name": "Alsace-Lorraine + Luxembourg"
         },
         {
-          "name": "North Schleswig + Bornholm",
           "ids": [
             "DK_HIST_NORTH_SCHLESWIG",
             "DK014"
-          ]
+          ],
+          "name": "North Schleswig + Bornholm"
         },
         {
-          "name": "Slovenia",
           "ids": [
             "SI031",
             "SI032",
@@ -487,12 +465,12 @@
             "SI042",
             "SI043",
             "SI044"
-          ]
+          ],
+          "name": "Slovenia"
         }
       ],
       "FR": [
         {
-          "name": "Alsace-Lorraine (1871)",
           "ids": [
             "FR_ARR_57003",
             "FR_ARR_57005",
@@ -508,19 +486,16 @@
             "FR_ARR_68002",
             "FR_ARR_68004",
             "FR_ARR_68006"
-          ]
+          ],
+          "name": "Alsace-Lorraine (1871)"
         },
         {
-          "name": "Brittany",
           "ids": [
             "FR_ARR_22001",
-            "FR_ARR_22002",
+            "FR_MRG_6d703ee3f8dc",
             "FR_ARR_22003",
-            "FR_ARR_22004",
             "FR_ARR_29001",
-            "FR_ARR_29002",
-            "FR_ARR_29003",
-            "FR_ARR_29004",
+            "FR_MRG_5b1fca32ff2c",
             "FR_ARR_35001",
             "FR_ARR_35002",
             "FR_ARR_35003",
@@ -528,10 +503,10 @@
             "FR_ARR_56001",
             "FR_ARR_56002",
             "FR_ARR_56003"
-          ]
+          ],
+          "name": "Brittany"
         },
         {
-          "name": "Savoy & Nice (pre-1860)",
           "ids": [
             "FR_ARR_06001",
             "FR_ARR_06002",
@@ -542,12 +517,12 @@
             "FR_ARR_74002",
             "FR_ARR_74003",
             "FR_ARR_74004"
-          ]
+          ],
+          "name": "Savoy & Nice (pre-1860)"
         }
       ],
       "IT": [
         {
-          "name": "Kingdom of Two Sicilies",
           "ids": [
             "ITF11",
             "ITF12",
@@ -582,20 +557,20 @@
             "ITG17",
             "ITG18",
             "ITG19"
-          ]
+          ],
+          "name": "Kingdom of Two Sicilies"
         },
         {
-          "name": "Papal States (Lazio)",
           "ids": [
             "ITI41",
             "ITI42",
             "ITI43",
             "ITI44",
             "ITI45"
-          ]
+          ],
+          "name": "Papal States (Lazio)"
         },
         {
-          "name": "Sardinia-Piedmont",
           "ids": [
             "ITC11",
             "ITC12",
@@ -615,10 +590,10 @@
             "ITG2F",
             "ITG2G",
             "ITG2H"
-          ]
+          ],
+          "name": "Sardinia-Piedmont"
         },
         {
-          "name": "Lombardy-Venetia",
           "ids": [
             "ITC41",
             "ITC42",
@@ -643,10 +618,10 @@
             "ITH42",
             "ITH43",
             "ITH44"
-          ]
+          ],
+          "name": "Lombardy-Venetia"
         },
         {
-          "name": "Grand Duchy of Tuscany",
           "ids": [
             "ITI11",
             "ITI12",
@@ -658,16 +633,16 @@
             "ITI18",
             "ITI19",
             "ITI1A"
-          ]
+          ],
+          "name": "Grand Duchy of Tuscany"
         },
         {
-          "name": "French Occupation Strip (1940, Approx.)",
           "ids": [
             "FR_ARR_06002"
-          ]
+          ],
+          "name": "French Occupation Strip (1940, Approx.)"
         },
         {
-          "name": "Nice + Savoy",
           "ids": [
             "FR_ARR_06002",
             "FR_ARR_73001",
@@ -677,20 +652,20 @@
             "FR_ARR_74002",
             "FR_ARR_74003",
             "FR_ARR_74004"
-          ]
+          ],
+          "name": "Nice + Savoy"
         },
         {
-          "name": "Corsica",
           "ids": [
             "FR_ARR_2A001",
             "FR_ARR_2A004",
             "FR_ARR_2B002",
             "FR_ARR_2B003",
             "FR_ARR_2B005"
-          ]
+          ],
+          "name": "Corsica"
         },
         {
-          "name": "Southeast France Expansion",
           "ids": [
             "MC_ADMIN0_PASSTHROUGH",
             "FR_ARR_06001",
@@ -700,10 +675,10 @@
             "FR_ARR_04004",
             "FR_ARR_05001",
             "FR_ARR_05002"
-          ]
+          ],
+          "name": "Southeast France Expansion"
         },
         {
-          "name": "Albania",
           "ids": [
             "AL011",
             "AL012",
@@ -717,23 +692,23 @@
             "AL033",
             "AL034",
             "AL035"
-          ]
+          ],
+          "name": "Albania"
         },
         {
-          "name": "Malta",
           "ids": [
             "MT001",
             "MT002"
-          ]
+          ],
+          "name": "Malta"
         },
         {
-          "name": "Cyprus",
           "ids": [
             "CY000"
-          ]
+          ],
+          "name": "Cyprus"
         },
         {
-          "name": "Dalmatia + Kotor Bay",
           "ids": [
             "HR033",
             "HR034",
@@ -742,20 +717,75 @@
             "ME_ADM1_MNE-1506",
             "ME_ADM1_MNE-1507",
             "ME_ADM1_MNE-1518"
-          ]
+          ],
+          "name": "Dalmatia + Kotor Bay"
         },
         {
-          "name": "Italian Greek Islands",
           "ids": [
             "GR_ADM1_GRC-2883",
             "GR_ADM1_GRC-2990",
             "GR_ADM1_GRC-3013"
-          ]
+          ],
+          "name": "Italian Greek Islands"
+        }
+      ],
+      "RU": [
+        {
+          "ids": [
+            "RUS-2364",
+            "RUS-2365"
+          ],
+          "name": "Moscow Region"
+        },
+        {
+          "ids": [
+            "RUS-2336",
+            "RUS-2337"
+          ],
+          "name": "St. Petersburg Region"
+        },
+        {
+          "ids": [
+            "RUS-2333",
+            "RUS-2334",
+            "RUS-2335",
+            "RUS-2336",
+            "RUS-2337",
+            "RUS-2342",
+            "RUS-2343",
+            "RUS-2353",
+            "RUS-2354",
+            "RUS-2355",
+            "RUS-2356",
+            "RUS-2358",
+            "RUS-2359",
+            "RUS-2360"
+          ],
+          "name": "TNO WRRF (Approximate)"
+        },
+        {
+          "ids": [
+            "RUS-2383"
+          ],
+          "name": "TNO Komi (Approximate)"
+        },
+        {
+          "ids": [
+            "RUS-2279",
+            "RUS-2280",
+            "RUS-2303",
+            "RUS-2304",
+            "RUS-2305",
+            "RUS-2306",
+            "RUS-2371",
+            "RUS-2416",
+            "RUS-2417"
+          ],
+          "name": "Caucasus"
         }
       ],
       "UK": [
         {
-          "name": "Scotland",
           "ids": [
             "UKM50",
             "UKM61",
@@ -780,10 +810,10 @@
             "UKM93",
             "UKM94",
             "UKM95"
-          ]
+          ],
+          "name": "Scotland"
         },
         {
-          "name": "Wales",
           "ids": [
             "UKL11",
             "UKL12",
@@ -797,10 +827,10 @@
             "UKL22",
             "UKL23",
             "UKL24"
-          ]
+          ],
+          "name": "Wales"
         },
         {
-          "name": "Northern Ireland",
           "ids": [
             "UKN06",
             "UKN07",
@@ -813,75 +843,18 @@
             "UKN0E",
             "UKN0F",
             "UKN0G"
-          ]
+          ],
+          "name": "Northern Ireland"
         }
-      ],
-      "RU": [
-        {
-          "name": "Moscow Region",
-          "ids": [
-            "RUS-2364",
-            "RUS-2365"
-          ]
-        },
-        {
-          "name": "St. Petersburg Region",
-          "ids": [
-            "RUS-2336",
-            "RUS-2337"
-          ]
-        },
-        {
-          "name": "TNO WRRF (Approximate)",
-          "ids": [
-            "RUS-2333",
-            "RUS-2334",
-            "RUS-2335",
-            "RUS-2336",
-            "RUS-2337",
-            "RUS-2342",
-            "RUS-2343",
-            "RUS-2353",
-            "RUS-2354",
-            "RUS-2355",
-            "RUS-2356",
-            "RUS-2358",
-            "RUS-2359",
-            "RUS-2360"
-          ]
-        },
-        {
-          "name": "TNO Komi (Approximate)",
-          "ids": [
-            "RUS-2383"
-          ]
-        },
-        {
-          "name": "Caucasus",
-          "ids": [
-            "RUS-2279",
-            "RUS-2280",
-            "RUS-2303",
-            "RUS-2304",
-            "RUS-2305",
-            "RUS-2306",
-            "RUS-2371",
-            "RUS-2416",
-            "RUS-2417"
-          ]
-        }
-      ]
-    },
-    "detailOverlaySupportTiers": {
-      "strict_gap_target_countries": [
-        "DE",
-        "GB",
-        "CZ"
-      ],
-      "order_of_magnitude_improvement_countries": [
-        "RU",
-        "UA"
       ]
     }
-  }
+  },
+  "schema_version": 2,
+  "subdivision_protected_countries": [
+    "CN",
+    "FR",
+    "IN",
+    "PL",
+    "RU"
+  ]
 }

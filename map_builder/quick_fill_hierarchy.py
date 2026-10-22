@@ -73,7 +73,20 @@ def validate_china_crosswalk_partition(groups: dict, crosswalk: dict, known_ids:
             raise ValueError(f"China province release requires a complete partition: {province}")
 
 
-def build_quick_fill_metadata(hierarchy: dict, properties: list[dict], crosswalk: dict | None = None) -> dict:
+def resolve_fr_department(feature_id: str, merged_members: dict[str, list[str]] | None = None) -> str | None:
+    """Department of an arrondissement, or of a merged feature whose members share one."""
+    department = derive_fr_department(feature_id)
+    if department is None and merged_members and feature_id in merged_members:
+        member_departments = {derive_fr_department(member) for member in merged_members[feature_id]}
+        if len(member_departments) == 1 and None not in member_departments:
+            department = member_departments.pop()
+    return department
+
+
+def build_quick_fill_metadata(
+    hierarchy: dict, properties: list[dict], crosswalk: dict | None = None,
+    merged_members: dict[str, list[str]] | None = None,
+) -> dict:
     groups = hierarchy.get("groups", {})
     countries = {}
     by_country: dict[str, list[dict]] = defaultdict(list)
@@ -89,7 +102,7 @@ def build_quick_fill_metadata(hierarchy: dict, properties: list[dict], crosswalk
     for region, members in groups.items():
         if not region.startswith("FR_"): continue
         for feature_id in members:
-            department = derive_fr_department(feature_id)
+            department = resolve_fr_department(feature_id, merged_members)
             if department is None:
                 raise ValueError(f"Unsupported France arrondissement ID: {feature_id}")
             region_by_department[department].add(region)
@@ -145,6 +158,15 @@ def build_quick_fill_metadata(hierarchy: dict, properties: list[dict], crosswalk
         if len(rows) == 1 and country not in countries and not any(key.startswith(country + "_") for key in groups):
             countries[country] = {"parent_available": False, "levels": {}}
     return {"version": 1, "semantics": "geographic_editing_groups_not_historical_administration", "countries": countries}
+
+
+def load_feature_merge_members(data_dir: Path) -> dict[str, list[str]]:
+    """Merged political feature ID -> member IDs from applied merge plans."""
+    members: dict[str, list[str]] = {}
+    for path in sorted((data_dir / "political_feature_merges").glob("*.v[0-9]*.json")):
+        for group in json.loads(path.read_text(encoding="utf-8")).get("groups", []):
+            members[str(group["id"])] = [str(member) for member in group["member_ids"]]
+    return members
 
 
 def load_crosswalk(data_dir: Path) -> dict | None:

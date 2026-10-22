@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1939/audit.json",
-  "baseline_hash": "141c1ffa0ec5df664f8b121a1fd0659503ea3acd47a83c8301d47b0518101e50",
+  "baseline_hash": "1a263e8aa174d851ae415b854325124c6050a7834c2b98da3549bf2e71140820",
   "bookmark_date": "1939.8.14.12",
   "bookmark_description": "BLITZKRIEG_DESC",
   "bookmark_name": "BLITZKRIEG_NAME",
@@ -80,6 +80,7 @@
     "special_regions_default": false,
     "water_regions_default": false
   },
+  "political_id_raster_manifest_url": "data/scenarios/hoi4_1939/political_id_raster/manifest.json",
   "render_budget_hints": {
     "detail_zoom_threshold": 1.7,
     "max_optional_chunks": 3,
@@ -90,12 +91,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "453dad3bc10161b6926db3e73d8f5bd1c3f7d8ff77311abf129f6abfb016e04e",
+  "snapshot_fingerprint": "8cb63ebcaaada1665c911452954935fa4beecc4871f1056e07ef847093b76226",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "605fa74fbe2f1cc084e63666b6687ad7288140bd7c8e1aad144243d1a436ceff",
+    "detail_chunk_manifest_sha256": "4d5dde668915246a3cedaf91b83d379d3696f5159b1b8d8ffec895976e510e75",
     "runtime_bootstrap_topology_sha256": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
-    "runtime_topology_sha256": "43e307baa1b7ffa4b00774fdf12c7d96eb0cd0dd219c1c6990384da0c6cddbff"
+    "runtime_topology_sha256": "c4b4bf360f292a3166bbd0994114f1d724d80d759808713e2b7476af2445a698"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1939/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -119,7 +120,7 @@
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 23418,
+    "feature_count": 23340,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 17217,
     "manual_reviewed_region_count": 13,
@@ -146,6 +147,5 @@
     "synthetic_owner_feature_count": 23,
     "topology_blocker_count": 0
   },
-  "version": 2,
-  "political_id_raster_manifest_url": "data/scenarios/hoi4_1939/political_id_raster/manifest.json"
+  "version": 2
 }

@@ -150,6 +150,384 @@
       ],
       "owner": "XIK"
     },
+    "DE_MRG_08a36bff89a0": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_171e39a343f9": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_22b5c35ff0db": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_33b1389d946f": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_348581c848f8": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_3a19ae12c637": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_3b750624bff4": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_3fb6d34d5cec": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_46ade2104d23": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_4ab0c6062d32": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_4fdd27cf49f7": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_54666399e0ac": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_5adb00f4a83d": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_5dd80c1fcf77": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_67a8450f3c9f": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_68ba87808df8": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_698a45847033": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_6f627c55e7bd": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_70752f860917": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_73019c3017aa": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_77741e43de3f": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_830e5845fb60": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_88b2cc10d998": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_9410ac111320": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_98e486211a34": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_9e1fff10ce51": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_a235cf36d16c": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_a27167ef8f23": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_ac1a1840dec2": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_b86ffe1dd2ea": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_bceaa37f49ef": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_bd0cf439de30": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_bf419442ff08": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_c6f2d9d3d036": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_c90ee890d36c": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_c922c0ebada5": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_c9a9f2cd9548": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_cc565c282846": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_ce73c32b1090": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_d0e3890ae1d5": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_d4ab7c811a60": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_d561808c92a5": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_d67a0e4a728d": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_d7270b2f4f53": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_e2617eca3f85": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_e2f350a636b5": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_e87b9124c03f": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_ea826ec181b8": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_ec3ed49e067c": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "FR_MRG_5b1fca32ff2c": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_6d703ee3f8dc": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_7c681aa2032e": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "FR_MRG_a3ac3f104566": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_ef55d0091c1e": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
     "GF_PRIMARY": {
       "controller": "GY",
       "cores": [

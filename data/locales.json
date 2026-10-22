@@ -206164,41 +206164,9 @@
       "en": "Stuttgart, Stadtkreis",
       "zh": "斯图加特市区"
     },
-    "id::DE112": {
-      "en": "Böblingen",
-      "zh": "伯布林根"
-    },
-    "id::DE113": {
-      "en": "Esslingen",
-      "zh": "埃斯林根"
-    },
-    "id::DE114": {
-      "en": "Göppingen",
-      "zh": "格平根"
-    },
-    "id::DE115": {
-      "en": "Ludwigsburg",
-      "zh": "路德维希堡"
-    },
-    "id::DE116": {
-      "en": "Rems-Murr-Kreis",
-      "zh": "雷姆斯-穆尔圆"
-    },
     "id::DE117": {
       "en": "Heilbronn, Stadtkreis",
       "zh": "海尔布隆市区"
-    },
-    "id::DE118": {
-      "en": "Heilbronn, Landkreis",
-      "zh": "海尔布隆区"
-    },
-    "id::DE119": {
-      "en": "Hohenlohekreis",
-      "zh": "霍恩洛厄区"
-    },
-    "id::DE11A": {
-      "en": "Schwäbisch Hall",
-      "zh": "施韦比施哈尔"
     },
     "id::DE11B": {
       "en": "Main-Tauber-Kreis",
@@ -206207,10 +206175,6 @@
     "id::DE11C": {
       "en": "Heidenheim",
       "zh": "海登海姆"
-    },
-    "id::DE11D": {
-      "en": "Ostalbkreis",
-      "zh": "奥斯塔布克赖斯"
     },
     "id::DE121": {
       "en": "Baden-Baden, Stadtkreis",
@@ -206248,17 +206212,9 @@
       "en": "Pforzheim, Stadtkreis",
       "zh": "普福尔茨海姆市区"
     },
-    "id::DE12A": {
-      "en": "Calw",
-      "zh": "卡尔夫"
-    },
     "id::DE12B": {
       "en": "Enzkreis",
       "zh": "恩兹克莱斯"
-    },
-    "id::DE12C": {
-      "en": "Freudenstadt",
-      "zh": "弗罗伊登施塔特"
     },
     "id::DE131": {
       "en": "Freiburg im Breisgau, Stadtkreis",
@@ -206303,10 +206259,6 @@
     "id::DE141": {
       "en": "Reutlingen",
       "zh": "罗伊特林根"
-    },
-    "id::DE142": {
-      "en": "Tübingen, Landkreis",
-      "zh": "蒂宾根区"
     },
     "id::DE143": {
       "en": "Zollernalbkreis",
@@ -206360,49 +206312,17 @@
       "en": "Bad Tölz-Wolfratshausen",
       "zh": "巴特特尔茨-沃尔夫拉茨豪森"
     },
-    "id::DE217": {
-      "en": "Dachau",
-      "zh": "达豪"
-    },
-    "id::DE218": {
-      "en": "Ebersberg",
-      "zh": "埃伯斯贝格"
-    },
     "id::DE219": {
       "en": "Eichstätt",
       "zh": "艾希施塔特"
-    },
-    "id::DE21A": {
-      "en": "Erding",
-      "zh": "埃尔丁"
-    },
-    "id::DE21B": {
-      "en": "Freising",
-      "zh": "弗赖辛"
-    },
-    "id::DE21C": {
-      "en": "Fürstenfeldbruck",
-      "zh": "菲尔斯滕费尔德布鲁克"
     },
     "id::DE21D": {
       "en": "Garmisch-Partenkirchen",
       "zh": "加米施-帕滕基兴"
     },
-    "id::DE21E": {
-      "en": "Landsberg am Lech",
-      "zh": "莱希河畔兰茨贝格"
-    },
     "id::DE21F": {
       "en": "Miesbach",
       "zh": "米斯巴赫"
-    },
-    "id::DE21G": {
-      "en": "Mühldorf a. Inn",
-      "zh": "米尔多夫 A.客栈"
-    },
-    "id::DE21H": {
-      "en": "München, Landkreis",
-      "zh": "慕尼黑, 区"
     },
     "id::DE21I": {
       "en": "Neuburg-Schrobenhausen",
@@ -206416,21 +206336,9 @@
       "en": "Rosenheim, Landkreis",
       "zh": "罗森海姆区"
     },
-    "id::DE21L": {
-      "en": "Starnberg",
-      "zh": "施塔恩贝格"
-    },
     "id::DE21M": {
       "en": "Traunstein",
       "zh": "特劳恩斯坦"
-    },
-    "id::DE21N": {
-      "en": "Weilheim-Schongau",
-      "zh": "魏尔海姆-雄高"
-    },
-    "id::DE221": {
-      "en": "Landshut, Kreisfreie Stadt",
-      "zh": "兰茨胡特，独立城市"
     },
     "id::DE222": {
       "en": "Passau, Kreisfreie Stadt",
@@ -206452,10 +206360,6 @@
       "en": "Kelheim",
       "zh": "凯尔海姆"
     },
-    "id::DE227": {
-      "en": "Landshut, Landkreis",
-      "zh": "兰茨胡特区"
-    },
     "id::DE228": {
       "en": "Passau, Landkreis",
       "zh": "帕绍区"
@@ -206472,14 +206376,6 @@
       "en": "Straubing-Bogen",
       "zh": "施特劳宾-伯根"
     },
-    "id::DE22C": {
-      "en": "Dingolfing-Landau",
-      "zh": "丁戈尔芬-兰道"
-    },
-    "id::DE231": {
-      "en": "Amberg, Kreisfreie Stadt",
-      "zh": "安贝格, 克莱斯自由城"
-    },
     "id::DE232": {
       "en": "Regensburg, Kreisfreie Stadt",
       "zh": "雷根斯堡，独立城市"
@@ -206487,10 +206383,6 @@
     "id::DE233": {
       "en": "Weiden i. d. Opf, Kreisfreie Stadt",
       "zh": "上普法尔茨魏登（独立城市）"
-    },
-    "id::DE234": {
-      "en": "Amberg-Sulzbach",
-      "zh": "安贝格-苏尔茨巴赫"
     },
     "id::DE235": {
       "en": "Cham",
@@ -206516,14 +206408,6 @@
       "en": "Tirschenreuth",
       "zh": "蒂申罗伊特"
     },
-    "id::DE241": {
-      "en": "Bamberg, Kreisfreie Stadt",
-      "zh": "班贝格, 克莱斯自由城"
-    },
-    "id::DE242": {
-      "en": "Bayreuth, Kreisfreie Stadt",
-      "zh": "拜罗伊特, 克莱斯自由城"
-    },
     "id::DE243": {
       "en": "Coburg, Kreisfreie Stadt",
       "zh": "科堡, 克莱斯自由城"
@@ -206532,21 +206416,9 @@
       "en": "Hof, Kreisfreie Stadt",
       "zh": "霍夫，无区市"
     },
-    "id::DE245": {
-      "en": "Bamberg, Landkreis",
-      "zh": "班贝格县"
-    },
-    "id::DE246": {
-      "en": "Bayreuth, Landkreis",
-      "zh": "拜罗伊特, 兰德克莱斯"
-    },
     "id::DE247": {
       "en": "Coburg, Landkreis",
       "zh": "科堡, 兰德克莱斯"
-    },
-    "id::DE248": {
-      "en": "Forchheim",
-      "zh": "福希海姆"
     },
     "id::DE249": {
       "en": "Hof, Landkreis",
@@ -206555,14 +206427,6 @@
     "id::DE24A": {
       "en": "Kronach",
       "zh": "克罗纳赫"
-    },
-    "id::DE24B": {
-      "en": "Kulmbach",
-      "zh": "库姆巴赫"
-    },
-    "id::DE24C": {
-      "en": "Lichtenfels",
-      "zh": "利希滕费尔斯"
     },
     "id::DE24D": {
       "en": "Wunsiedel i. Fichtelgebirge",
@@ -206592,14 +206456,6 @@
       "en": "Ansbach, Landkreis",
       "zh": "安斯巴赫, 兰德克赖斯"
     },
-    "id::DE257": {
-      "en": "Erlangen-Höchstadt",
-      "zh": "埃尔兰根-赫希施塔特"
-    },
-    "id::DE258": {
-      "en": "Fürth, Landkreis",
-      "zh": "菲尔特, 兰德克赖斯"
-    },
     "id::DE259": {
       "en": "Nürnberger Land",
       "zh": "纽伦堡国家"
@@ -206608,21 +206464,9 @@
       "en": "Neustadt a. d. Aisch-Bad Windsheim",
       "zh": "诺伊施塔特 A. d.艾施-巴特温茨海姆"
     },
-    "id::DE25B": {
-      "en": "Roth",
-      "zh": "罗斯"
-    },
-    "id::DE25C": {
-      "en": "Weißenburg-Gunzenhausen",
-      "zh": "魏森堡-贡岑豪森"
-    },
     "id::DE261": {
       "en": "Aschaffenburg, Kreisfreie Stadt",
       "zh": "阿沙芬堡, 自由城"
-    },
-    "id::DE262": {
-      "en": "Schweinfurt, Kreisfreie Stadt",
-      "zh": "施韦因富特，独立城市"
     },
     "id::DE263": {
       "en": "Würzburg, Kreisfreie Stadt",
@@ -206644,10 +206488,6 @@
       "en": "Haßberge",
       "zh": "哈斯贝格"
     },
-    "id::DE268": {
-      "en": "Kitzingen",
-      "zh": "基青根"
-    },
     "id::DE269": {
       "en": "Miltenberg",
       "zh": "米尔滕贝格"
@@ -206655,10 +206495,6 @@
     "id::DE26A": {
       "en": "Main-Spessart",
       "zh": "主要施佩萨尔特"
-    },
-    "id::DE26B": {
-      "en": "Schweinfurt, Landkreis",
-      "zh": "施韦因富特区"
     },
     "id::DE26C": {
       "en": "Würzburg, Landkreis",
@@ -206724,10 +206560,6 @@
       "en": "Berlin",
       "zh": "柏林"
     },
-    "id::DE401": {
-      "en": "Brandenburg an der Havel, Kreisfreie Stadt",
-      "zh": "哈弗尔河畔勃兰登堡, 克莱斯自由城"
-    },
     "id::DE402": {
       "en": "Cottbus, Kreisfreie Stadt",
       "zh": "科特布斯, 克莱斯自由城"
@@ -206744,25 +206576,13 @@
       "en": "Barnim",
       "zh": "巴尼姆"
     },
-    "id::DE406": {
-      "en": "Dahme-Spreewald",
-      "zh": "达默-施普雷瓦尔德"
-    },
     "id::DE407": {
       "en": "Elbe-Elster",
       "zh": "易北河-埃尔斯特"
     },
-    "id::DE408": {
-      "en": "Havelland",
-      "zh": "哈弗兰"
-    },
     "id::DE409": {
       "en": "Märkisch-Oderland",
       "zh": "马尔克施-奥德兰"
-    },
-    "id::DE40A": {
-      "en": "Oberhavel",
-      "zh": "奥伯哈维尔"
     },
     "id::DE40B": {
       "en": "Oberspreewald-Lausitz",
@@ -206772,14 +206592,6 @@
       "en": "Oder-Spree",
       "zh": "奥德狂欢"
     },
-    "id::DE40D": {
-      "en": "Ostprignitz-Ruppin",
-      "zh": "奥斯特普里尼茨-鲁平"
-    },
-    "id::DE40E": {
-      "en": "Potsdam-Mittelmark",
-      "zh": "波茨坦-米特尔马克"
-    },
     "id::DE40F": {
       "en": "Prignitz",
       "zh": "普里尼茨"
@@ -206787,10 +206599,6 @@
     "id::DE40G": {
       "en": "Spree-Neiße",
       "zh": "施普雷-尼斯河"
-    },
-    "id::DE40H": {
-      "en": "Teltow-Fläming",
-      "zh": "特尔托-弗莱明"
     },
     "id::DE40I": {
       "en": "Uckermark",
@@ -206828,81 +206636,29 @@
       "en": "Bergstraße",
       "zh": "伯格大街"
     },
-    "id::DE716": {
-      "en": "Darmstadt-Dieburg",
-      "zh": "达姆施塔特-迪堡"
-    },
     "id::DE717": {
       "en": "Groß-Gerau",
       "zh": "大盖劳"
-    },
-    "id::DE718": {
-      "en": "Hochtaunuskreis",
-      "zh": "上陶努斯克雷斯"
-    },
-    "id::DE719": {
-      "en": "Main-Kinzig-Kreis",
-      "zh": "美茵-金齐希区"
-    },
-    "id::DE71A": {
-      "en": "Main-Taunus-Kreis",
-      "zh": "美因-陶努斯-县"
     },
     "id::DE71B": {
       "en": "Odenwaldkreis",
       "zh": "奥登瓦尔德区"
     },
-    "id::DE71C": {
-      "en": "Offenbach, Landkreis",
-      "zh": "奥芬巴赫区"
-    },
     "id::DE71D": {
       "en": "Rheingau-Taunus-Kreis",
       "zh": "莱茵高-陶努斯地区"
-    },
-    "id::DE71E": {
-      "en": "Wetteraukreis",
-      "zh": "韦特劳克雷斯"
-    },
-    "id::DE721": {
-      "en": "Gießen, Landkreis",
-      "zh": "吉森区"
-    },
-    "id::DE722": {
-      "en": "Lahn-Dill-Kreis",
-      "zh": "兰迪尔区"
-    },
-    "id::DE723": {
-      "en": "Limburg-Weilburg",
-      "zh": "林堡-魏尔堡"
     },
     "id::DE724": {
       "en": "Marburg-Biedenkopf",
       "zh": "马尔堡-比登科普夫"
     },
-    "id::DE725": {
-      "en": "Vogelsbergkreis",
-      "zh": "福格尔斯贝格地区"
-    },
     "id::DE731": {
       "en": "Kassel, Kreisfreie Stadt",
       "zh": "卡塞尔，无区市"
     },
-    "id::DE732": {
-      "en": "Fulda",
-      "zh": "富尔达"
-    },
-    "id::DE733": {
-      "en": "Hersfeld-Rotenburg",
-      "zh": "赫斯菲尔德-罗滕堡"
-    },
     "id::DE734": {
       "en": "Kassel, Landkreis",
       "zh": "卡塞尔区"
-    },
-    "id::DE735": {
-      "en": "Schwalm-Eder-Kreis",
-      "zh": "施瓦尔姆-埃德圆"
     },
     "id::DE736": {
       "en": "Waldeck-Frankenberg",
@@ -206920,17 +206676,9 @@
       "en": "Schwerin, Kreisfreie Stadt",
       "zh": "什未林，独立城市"
     },
-    "id::DE80J": {
-      "en": "Mecklenburgische Seenplatte",
-      "zh": "梅克伦堡湖区"
-    },
     "id::DE80K": {
       "en": "Landkreis Rostock",
       "zh": "罗斯托克区"
-    },
-    "id::DE80L": {
-      "en": "Vorpommern-Rügen",
-      "zh": "西波美拉尼亚-吕根岛"
     },
     "id::DE80M": {
       "en": "Nordwestmecklenburg",
@@ -206956,65 +206704,21 @@
       "en": "Wolfsburg, Kreisfreie Stadt",
       "zh": "沃尔夫斯堡，独立城市"
     },
-    "id::DE914": {
-      "en": "Gifhorn",
-      "zh": "吉夫霍恩"
-    },
     "id::DE916": {
       "en": "Goslar",
       "zh": "戈斯拉尔"
-    },
-    "id::DE917": {
-      "en": "Helmstedt",
-      "zh": "赫尔姆施泰特"
-    },
-    "id::DE918": {
-      "en": "Northeim",
-      "zh": "诺特海姆"
-    },
-    "id::DE91A": {
-      "en": "Peine",
-      "zh": "惩罚"
-    },
-    "id::DE91B": {
-      "en": "Wolfenbüttel",
-      "zh": "沃尔芬比特尔"
     },
     "id::DE91C": {
       "en": "Göttingen",
       "zh": "哥廷根"
     },
-    "id::DE922": {
-      "en": "Diepholz",
-      "zh": "迪普霍尔茨"
-    },
-    "id::DE923": {
-      "en": "Hameln-Pyrmont",
-      "zh": "哈默尔恩-皮尔蒙特"
-    },
     "id::DE925": {
       "en": "Hildesheim",
       "zh": "希尔德斯海姆"
     },
-    "id::DE926": {
-      "en": "Holzminden",
-      "zh": "霍尔兹明登"
-    },
-    "id::DE927": {
-      "en": "Nienburg (Weser)",
-      "zh": "宁堡（威悉河）"
-    },
-    "id::DE928": {
-      "en": "Schaumburg",
-      "zh": "绍姆堡"
-    },
     "id::DE929": {
       "en": "Region Hannover",
       "zh": "汉诺威地区"
-    },
-    "id::DE931": {
-      "en": "Celle",
-      "zh": "策勒"
     },
     "id::DE932": {
       "en": "Cuxhaven",
@@ -207036,14 +206740,6 @@
       "en": "Osterholz",
       "zh": "奥斯特霍尔茨"
     },
-    "id::DE937": {
-      "en": "Rotenburg (Wümme)",
-      "zh": "罗滕堡 (乌姆)"
-    },
-    "id::DE938": {
-      "en": "Heidekreis",
-      "zh": "希斯圆环"
-    },
     "id::DE939": {
       "en": "Stade",
       "zh": "施塔德"
@@ -207051,10 +206747,6 @@
     "id::DE93A": {
       "en": "Uelzen",
       "zh": "于尔岑"
-    },
-    "id::DE93B": {
-      "en": "Verden",
-      "zh": "世界"
     },
     "id::DE941": {
       "en": "Delmenhorst, Kreisfreie Stadt",
@@ -207076,25 +206768,9 @@
       "en": "Wilhelmshaven, Kreisfreie Stadt",
       "zh": "威廉港，无区市"
     },
-    "id::DE946": {
-      "en": "Ammerland",
-      "zh": "阿默兰"
-    },
-    "id::DE947": {
-      "en": "Aurich",
-      "zh": "奥里希"
-    },
-    "id::DE948": {
-      "en": "Cloppenburg",
-      "zh": "克洛彭堡"
-    },
     "id::DE949": {
       "en": "Emsland",
       "zh": "埃姆斯兰"
-    },
-    "id::DE94A": {
-      "en": "Friesland (DE)",
-      "zh": "弗里斯兰（德国）"
     },
     "id::DE94B": {
       "en": "Grafschaft Bentheim",
@@ -207107,22 +206783,6 @@
     "id::DE94D": {
       "en": "Oldenburg, Landkreis",
       "zh": "奥尔登堡区"
-    },
-    "id::DE94E": {
-      "en": "Osnabrück, Landkreis",
-      "zh": "奥斯纳布吕克区"
-    },
-    "id::DE94F": {
-      "en": "Vechta",
-      "zh": "维希塔"
-    },
-    "id::DE94G": {
-      "en": "Wesermarsch",
-      "zh": "威悉马什"
-    },
-    "id::DE94H": {
-      "en": "Wittmund",
-      "zh": "维特蒙德"
     },
     "id::DEA11": {
       "en": "Düsseldorf, Kreisfreie Stadt",
@@ -207244,10 +206904,6 @@
       "en": "Borken",
       "zh": "博尔肯"
     },
-    "id::DEA35": {
-      "en": "Coesfeld",
-      "zh": "科斯费尔德"
-    },
     "id::DEA36": {
       "en": "Recklinghausen",
       "zh": "雷克林豪森"
@@ -207256,21 +206912,9 @@
       "en": "Steinfurt",
       "zh": "斯坦富特"
     },
-    "id::DEA38": {
-      "en": "Warendorf",
-      "zh": "瓦伦多夫"
-    },
     "id::DEA41": {
       "en": "Bielefeld, Kreisfreie Stadt",
       "zh": "比勒费尔德, 克莱斯自由城"
-    },
-    "id::DEA42": {
-      "en": "Gütersloh",
-      "zh": "居特斯洛"
-    },
-    "id::DEA43": {
-      "en": "Herford",
-      "zh": "赫尔福德"
     },
     "id::DEA44": {
       "en": "Höxter",
@@ -207279,10 +206923,6 @@
     "id::DEA45": {
       "en": "Lippe",
       "zh": "嘴唇"
-    },
-    "id::DEA46": {
-      "en": "Minden-Lübbecke",
-      "zh": "明登-吕贝克"
     },
     "id::DEA47": {
       "en": "Paderborn",
@@ -207312,29 +206952,13 @@
       "en": "Ennepe-Ruhr-Kreis",
       "zh": "埃内普-鲁尔-县"
     },
-    "id::DEA57": {
-      "en": "Hochsauerlandkreis",
-      "zh": "霍赫绍尔兰区"
-    },
     "id::DEA58": {
       "en": "Märkischer Kreis",
       "zh": "马克雪县"
     },
-    "id::DEA59": {
-      "en": "Olpe",
-      "zh": "奥尔佩"
-    },
     "id::DEA5A": {
       "en": "Siegen-Wittgenstein",
       "zh": "齐根-维特根斯坦"
-    },
-    "id::DEA5B": {
-      "en": "Soest",
-      "zh": "索斯特"
-    },
-    "id::DEA5C": {
-      "en": "Unna",
-      "zh": "离开"
     },
     "id::DEB11": {
       "en": "Koblenz, Kreisfreie Stadt",
@@ -207351,10 +206975,6 @@
     "id::DEB14": {
       "en": "Bad Kreuznach",
       "zh": "巴特克罗伊茨纳赫"
-    },
-    "id::DEB15": {
-      "en": "Birkenfeld",
-      "zh": "比肯费尔德"
     },
     "id::DEB17": {
       "en": "Mayen-Koblenz",
@@ -207384,17 +207004,9 @@
       "en": "Trier, Kreisfreie Stadt",
       "zh": "特里尔，独立城市"
     },
-    "id::DEB22": {
-      "en": "Bernkastel-Wittlich",
-      "zh": "贝恩卡斯特尔-维特利希"
-    },
     "id::DEB23": {
       "en": "Eifelkreis Bitburg-Prüm",
       "zh": "比特堡-普吕姆艾菲尔克瑞斯"
-    },
-    "id::DEB24": {
-      "en": "Vulkaneifel",
-      "zh": "埃菲尔火山"
     },
     "id::DEB25": {
       "en": "Trier-Saarburg",
@@ -207403,10 +207015,6 @@
     "id::DEB31": {
       "en": "Frankenthal (Pfalz), Kreisfreie Stadt",
       "zh": "弗兰肯塔尔 (普法尔茨), 克莱斯自由城"
-    },
-    "id::DEB32": {
-      "en": "Kaiserslautern, Kreisfreie Stadt",
-      "zh": "凯撒斯劳滕，独立城市"
     },
     "id::DEB33": {
       "en": "Landau in der Pfalz, Kreisfreie Stadt",
@@ -207440,10 +207048,6 @@
       "en": "Zweibrücken, Kreisfreie Stadt",
       "zh": "茨魏布吕肯，独立城市"
     },
-    "id::DEB3B": {
-      "en": "Alzey-Worms",
-      "zh": "阿尔蔡-沃尔姆斯"
-    },
     "id::DEB3C": {
       "en": "Bad Dürkheim",
       "zh": "巴特迪克海姆"
@@ -207456,14 +207060,6 @@
       "en": "Germersheim",
       "zh": "格默斯海姆"
     },
-    "id::DEB3F": {
-      "en": "Kaiserslautern, Landkreis",
-      "zh": "凯撒斯劳滕区"
-    },
-    "id::DEB3G": {
-      "en": "Kusel",
-      "zh": "库塞尔"
-    },
     "id::DEB3H": {
       "en": "Südliche Weinstraße",
       "zh": "南部葡萄酒之路"
@@ -207471,10 +207067,6 @@
     "id::DEB3I": {
       "en": "Rhein-Pfalz-Kreis",
       "zh": "莱茵-普法尔茨州"
-    },
-    "id::DEB3J": {
-      "en": "Mainz-Bingen",
-      "zh": "美因茨-宾根"
     },
     "id::DEB3K": {
       "en": "Südwestpfalz",
@@ -207628,10 +207220,6 @@
       "en": "Neumünster, Kreisfreie Stadt",
       "zh": "新明斯特，独立城市"
     },
-    "id::DEF05": {
-      "en": "Dithmarschen",
-      "zh": "迪特马尔申"
-    },
     "id::DEF06": {
       "en": "Herzogtum Lauenburg",
       "zh": "劳恩堡公国"
@@ -207651,10 +207239,6 @@
     "id::DEF0A": {
       "en": "Plön",
       "zh": "计划"
-    },
-    "id::DEF0B": {
-      "en": "Rendsburg-Eckernförde",
-      "zh": "伦茨堡-埃肯弗德"
     },
     "id::DEF0C": {
       "en": "Schleswig-Flensburg",
@@ -207684,69 +207268,17 @@
       "en": "Jena, Kreisfreie Stadt",
       "zh": "耶拿，独立城市"
     },
-    "id::DEG04": {
-      "en": "Suhl, Kreisfreie Stadt",
-      "zh": "苏尔，独立城市"
-    },
-    "id::DEG05": {
-      "en": "Weimar, Kreisfreie Stadt",
-      "zh": "魏玛，独立城市"
-    },
     "id::DEG06": {
       "en": "Eichsfeld",
       "zh": "艾希斯菲尔德"
-    },
-    "id::DEG07": {
-      "en": "Nordhausen",
-      "zh": "诺德豪森"
-    },
-    "id::DEG09": {
-      "en": "Unstrut-Hainich-Kreis",
-      "zh": "温斯特鲁特-海尼希区"
-    },
-    "id::DEG0A": {
-      "en": "Kyffhäuserkreis",
-      "zh": "凯夫豪瑟区"
-    },
-    "id::DEG0B": {
-      "en": "Schmalkalden-Meiningen",
-      "zh": "施马尔卡尔登-迈宁根"
     },
     "id::DEG0C": {
       "en": "Gotha",
       "zh": "哥达"
     },
-    "id::DEG0D": {
-      "en": "Sömmerda",
-      "zh": "索默达"
-    },
-    "id::DEG0E": {
-      "en": "Hildburghausen",
-      "zh": "希尔德布格豪森"
-    },
-    "id::DEG0F": {
-      "en": "Ilm-Kreis",
-      "zh": "伊尔姆区"
-    },
-    "id::DEG0G": {
-      "en": "Weimarer Land",
-      "zh": "魏玛国家"
-    },
     "id::DEG0H": {
       "en": "Sonneberg",
       "zh": "索内贝格"
-    },
-    "id::DEG0I": {
-      "en": "Saalfeld-Rudolstadt",
-      "zh": "萨尔费尔德-鲁多尔施塔特"
-    },
-    "id::DEG0J": {
-      "en": "Saale-Holzland-Kreis",
-      "zh": "萨勒-霍尔茨兰区"
-    },
-    "id::DEG0K": {
-      "en": "Saale-Orla-Kreis",
-      "zh": "萨勒-奥尔拉区"
     },
     "id::DEG0L": {
       "en": "Greiz",
@@ -207755,14 +207287,6 @@
     "id::DEG0M": {
       "en": "Altenburger Land",
       "zh": "阿尔滕堡兰德"
-    },
-    "id::DEG0N": {
-      "en": "Eisenach, Kreisfreie Stadt",
-      "zh": "艾森纳赫, 克莱斯自由城"
-    },
-    "id::DEG0P": {
-      "en": "Wartburgkreis",
-      "zh": "瓦尔特堡区"
     },
     "id::DE_SHELL_FB_001": {
       "en": "Germany Shell Fallback 1",
@@ -210272,17 +209796,9 @@
       "en": "Dinan",
       "zh": "迪南"
     },
-    "id::FR_ARR_22002": {
-      "en": "Guingamp",
-      "zh": "甘冈"
-    },
     "id::FR_ARR_22003": {
       "en": "Lannion",
       "zh": "拉尼翁"
-    },
-    "id::FR_ARR_22004": {
-      "en": "Saint-Brieuc",
-      "zh": "圣布里厄"
     },
     "id::FR_ARR_23001": {
       "en": "Aubusson",
@@ -210363,18 +209879,6 @@
     "id::FR_ARR_29001": {
       "en": "Brest",
       "zh": "布雷斯特"
-    },
-    "id::FR_ARR_29002": {
-      "en": "Châteaulin",
-      "zh": "沙托兰"
-    },
-    "id::FR_ARR_29003": {
-      "en": "Morlaix",
-      "zh": "莫尔莱"
-    },
-    "id::FR_ARR_29004": {
-      "en": "Quimper",
-      "zh": "坎佩尔"
     },
     "id::FR_ARR_2A001": {
       "en": "Ajaccio",
@@ -210664,14 +210168,6 @@
       "en": "Cherbourg",
       "zh": "瑟堡"
     },
-    "id::FR_ARR_50003": {
-      "en": "Coutances",
-      "zh": "库坦塞斯"
-    },
-    "id::FR_ARR_50004": {
-      "en": "Saint-Lô",
-      "zh": "圣洛"
-    },
     "id::FR_ARR_51001": {
       "en": "Châlons-en-Champagne",
       "zh": "香槟沙隆"
@@ -210828,18 +210324,6 @@
       "en": "Senlis",
       "zh": "桑利斯"
     },
-    "id::FR_ARR_61001": {
-      "en": "Alençon",
-      "zh": "阿朗松"
-    },
-    "id::FR_ARR_61002": {
-      "en": "Argentan",
-      "zh": "阿根廷"
-    },
-    "id::FR_ARR_61003": {
-      "en": "Mortagne-au-Perche",
-      "zh": "莫尔塔涅奥佩尔什"
-    },
     "id::FR_ARR_62001": {
       "en": "Arras",
       "zh": "阿特雷赫特"
@@ -210848,21 +210332,9 @@
       "en": "Béthune",
       "zh": "贝蒂恩"
     },
-    "id::FR_ARR_62003": {
-      "en": "Boulogne-sur-Mer",
-      "zh": "博嫩"
-    },
     "id::FR_ARR_62004": {
       "en": "Montreuil",
       "zh": "蒙特勒伊"
-    },
-    "id::FR_ARR_62005": {
-      "en": "Saint-Omer",
-      "zh": "圣奥马尔斯"
-    },
-    "id::FR_ARR_62006": {
-      "en": "Calais",
-      "zh": "卡勒斯"
     },
     "id::FR_ARR_62007": {
       "en": "Lens",
@@ -295315,27 +294787,297 @@
     "Teluk Wandamen": {
       "en": "Teluk Wandamen",
       "zh": "旺达门湾"
+    },
+    "id::DE_MRG_d0e3890ae1d5": {
+      "en": "Böblingen + Tübingen, Landkreis",
+      "zh": "伯布林根、蒂宾根区"
+    },
+    "id::DE_MRG_c9a9f2cd9548": {
+      "en": "Esslingen + Göppingen",
+      "zh": "埃斯林根、格平根"
+    },
+    "id::DE_MRG_a27167ef8f23": {
+      "en": "Ludwigsburg + Rems-Murr-Kreis + Heilbronn, Landkreis",
+      "zh": "路德维希堡、雷姆斯-穆尔圆、海尔布隆区"
+    },
+    "id::DE_MRG_e87b9124c03f": {
+      "en": "Hohenlohekreis + Schwäbisch Hall + Ostalbkreis",
+      "zh": "霍恩洛厄区、施韦比施哈尔、奥斯塔布克赖斯"
+    },
+    "id::DE_MRG_68ba87808df8": {
+      "en": "Calw + Freudenstadt",
+      "zh": "卡尔夫、弗罗伊登施塔特"
+    },
+    "id::DE_MRG_bd0cf439de30": {
+      "en": "Dachau + Freising",
+      "zh": "达豪、弗赖辛"
+    },
+    "id::DE_MRG_ec3ed49e067c": {
+      "en": "Ebersberg + Fürstenfeldbruck + München, Landkreis",
+      "zh": "埃伯斯贝格、菲尔斯滕费尔德布鲁克、慕尼黑, 区"
+    },
+    "id::DE_MRG_3fb6d34d5cec": {
+      "en": "Erding + Mühldorf a. Inn",
+      "zh": "埃尔丁、米尔多夫 A.客栈"
+    },
+    "id::DE_MRG_bf419442ff08": {
+      "en": "Landsberg am Lech + Starnberg + Weilheim-Schongau",
+      "zh": "莱希河畔兰茨贝格、施塔恩贝格、魏尔海姆-雄高"
+    },
+    "id::DE_MRG_d4ab7c811a60": {
+      "en": "Landshut, Kreisfreie Stadt + Landshut, Landkreis + Dingolfing-Landau",
+      "zh": "兰茨胡特，独立城市、兰茨胡特区、丁戈尔芬-兰道"
+    },
+    "id::DE_MRG_73019c3017aa": {
+      "en": "Amberg, Kreisfreie Stadt + Amberg-Sulzbach",
+      "zh": "安贝格, 克莱斯自由城、安贝格-苏尔茨巴赫"
+    },
+    "id::DE_MRG_08a36bff89a0": {
+      "en": "Roth + Weißenburg-Gunzenhausen",
+      "zh": "罗斯、魏森堡-贡岑豪森"
+    },
+    "id::DE_MRG_348581c848f8": {
+      "en": "Bamberg, Kreisfreie Stadt + Bamberg, Landkreis + Lichtenfels",
+      "zh": "班贝格, 克莱斯自由城、班贝格县、利希滕费尔斯"
+    },
+    "id::DE_MRG_22b5c35ff0db": {
+      "en": "Bayreuth, Kreisfreie Stadt + Bayreuth, Landkreis + Kulmbach",
+      "zh": "拜罗伊特, 克莱斯自由城、拜罗伊特, 兰德克莱斯、库姆巴赫"
+    },
+    "id::DE_MRG_88b2cc10d998": {
+      "en": "Forchheim + Erlangen-Höchstadt + Fürth, Landkreis",
+      "zh": "福希海姆、埃尔兰根-赫希施塔特、菲尔特, 兰德克赖斯"
+    },
+    "id::DE_MRG_d7270b2f4f53": {
+      "en": "Schweinfurt, Kreisfreie Stadt + Kitzingen + Schweinfurt, Landkreis",
+      "zh": "施韦因富特，独立城市、基青根、施韦因富特区"
+    },
+    "id::DE_MRG_54666399e0ac": {
+      "en": "Brandenburg an der Havel, Kreisfreie Stadt + Havelland + Potsdam-Mittelmark",
+      "zh": "哈弗尔河畔勃兰登堡, 克莱斯自由城、哈弗兰、波茨坦-米特尔马克"
+    },
+    "id::DE_MRG_a235cf36d16c": {
+      "en": "Dahme-Spreewald + Teltow-Fläming",
+      "zh": "达默-施普雷瓦尔德、特尔托-弗莱明"
+    },
+    "id::DE_MRG_171e39a343f9": {
+      "en": "Oberhavel + Ostprignitz-Ruppin",
+      "zh": "奥伯哈维尔、奥斯特普里尼茨-鲁平"
+    },
+    "id::DE_MRG_77741e43de3f": {
+      "en": "Darmstadt-Dieburg + Offenbach, Landkreis",
+      "zh": "达姆施塔特-迪堡、奥芬巴赫区"
+    },
+    "id::DE_MRG_e2f350a636b5": {
+      "en": "Hochtaunuskreis + Main-Taunus-Kreis",
+      "zh": "上陶努斯克雷斯、美因-陶努斯-县"
+    },
+    "id::DE_MRG_e2617eca3f85": {
+      "en": "Main-Kinzig-Kreis + Wetteraukreis + Gießen, Landkreis",
+      "zh": "美茵-金齐希区、韦特劳克雷斯、吉森区"
+    },
+    "id::DE_MRG_3b750624bff4": {
+      "en": "Lahn-Dill-Kreis + Limburg-Weilburg",
+      "zh": "兰迪尔区、林堡-魏尔堡"
+    },
+    "id::DE_MRG_d561808c92a5": {
+      "en": "Vogelsbergkreis + Fulda",
+      "zh": "福格尔斯贝格地区、富尔达"
+    },
+    "id::DE_MRG_33b1389d946f": {
+      "en": "Hersfeld-Rotenburg + Schwalm-Eder-Kreis",
+      "zh": "赫斯菲尔德-罗滕堡、施瓦尔姆-埃德圆"
+    },
+    "id::DE_MRG_ce73c32b1090": {
+      "en": "Mecklenburgische Seenplatte + Vorpommern-Rügen",
+      "zh": "梅克伦堡湖区、西波美拉尼亚-吕根岛"
+    },
+    "id::DE_MRG_9e1fff10ce51": {
+      "en": "Gifhorn + Peine",
+      "zh": "吉夫霍恩、惩罚"
+    },
+    "id::DE_MRG_46ade2104d23": {
+      "en": "Helmstedt + Wolfenbüttel",
+      "zh": "赫尔姆施泰特、沃尔芬比特尔"
+    },
+    "id::DE_MRG_4ab0c6062d32": {
+      "en": "Northeim + Holzminden",
+      "zh": "诺特海姆、霍尔兹明登"
+    },
+    "id::DE_MRG_830e5845fb60": {
+      "en": "Diepholz + Nienburg (Weser)",
+      "zh": "迪普霍尔茨、宁堡（威悉河）"
+    },
+    "id::DE_MRG_4fdd27cf49f7": {
+      "en": "Hameln-Pyrmont + Schaumburg",
+      "zh": "哈默尔恩-皮尔蒙特、绍姆堡"
+    },
+    "id::DE_MRG_5dd80c1fcf77": {
+      "en": "Celle + Heidekreis",
+      "zh": "策勒、希斯圆环"
+    },
+    "id::DE_MRG_698a45847033": {
+      "en": "Rotenburg (Wümme) + Verden",
+      "zh": "罗滕堡 (乌姆)、世界"
+    },
+    "id::DE_MRG_67a8450f3c9f": {
+      "en": "Ammerland + Wesermarsch",
+      "zh": "阿默兰、威悉马什"
+    },
+    "id::DE_MRG_3a19ae12c637": {
+      "en": "Aurich + Friesland (DE) + Wittmund",
+      "zh": "奥里希、弗里斯兰（德国）、维特蒙德"
+    },
+    "id::DE_MRG_c922c0ebada5": {
+      "en": "Cloppenburg + Osnabrück, Landkreis + Vechta",
+      "zh": "克洛彭堡、奥斯纳布吕克区、维希塔"
+    },
+    "id::DE_MRG_70752f860917": {
+      "en": "Coesfeld + Unna",
+      "zh": "科斯费尔德、离开"
+    },
+    "id::DE_MRG_9410ac111320": {
+      "en": "Warendorf + Gütersloh",
+      "zh": "瓦伦多夫、居特斯洛"
+    },
+    "id::DE_MRG_5adb00f4a83d": {
+      "en": "Herford + Minden-Lübbecke",
+      "zh": "赫尔福德、明登-吕贝克"
+    },
+    "id::DE_MRG_6f627c55e7bd": {
+      "en": "Hochsauerlandkreis + Olpe + Soest",
+      "zh": "霍赫绍尔兰区、奥尔佩、索斯特"
+    },
+    "id::DE_MRG_c6f2d9d3d036": {
+      "en": "Birkenfeld + Bernkastel-Wittlich + Vulkaneifel",
+      "zh": "比肯费尔德、贝恩卡斯特尔-维特利希、埃菲尔火山"
+    },
+    "id::DE_MRG_bceaa37f49ef": {
+      "en": "Kaiserslautern, Kreisfreie Stadt + Kaiserslautern, Landkreis + Kusel",
+      "zh": "凯撒斯劳滕，独立城市、凯撒斯劳滕区、库塞尔"
+    },
+    "id::DE_MRG_ea826ec181b8": {
+      "en": "Alzey-Worms + Mainz-Bingen",
+      "zh": "阿尔蔡-沃尔姆斯、美因茨-宾根"
+    },
+    "id::DE_MRG_d67a0e4a728d": {
+      "en": "Dithmarschen + Rendsburg-Eckernförde",
+      "zh": "迪特马尔申、伦茨堡-埃肯弗德"
+    },
+    "id::DE_MRG_98e486211a34": {
+      "en": "Suhl, Kreisfreie Stadt + Schmalkalden-Meiningen + Hildburghausen",
+      "zh": "苏尔，独立城市、施马尔卡尔登-迈宁根、希尔德布格豪森"
+    },
+    "id::DE_MRG_c90ee890d36c": {
+      "en": "Weimar, Kreisfreie Stadt + Weimarer Land + Saale-Holzland-Kreis",
+      "zh": "魏玛，独立城市、魏玛国家、萨勒-霍尔茨兰区"
+    },
+    "id::DE_MRG_b86ffe1dd2ea": {
+      "en": "Nordhausen + Kyffhäuserkreis + Sömmerda",
+      "zh": "诺德豪森、凯夫豪瑟区、索默达"
+    },
+    "id::DE_MRG_cc565c282846": {
+      "en": "Unstrut-Hainich-Kreis + Eisenach, Kreisfreie Stadt + Wartburgkreis",
+      "zh": "温斯特鲁特-海尼希区、艾森纳赫, 克莱斯自由城、瓦尔特堡区"
+    },
+    "id::DE_MRG_ac1a1840dec2": {
+      "en": "Ilm-Kreis + Saalfeld-Rudolstadt + Saale-Orla-Kreis",
+      "zh": "伊尔姆区、萨尔费尔德-鲁多尔施塔特、萨勒-奥尔拉区"
+    },
+    "id::FR_MRG_ef55d0091c1e": {
+      "en": "Coutances + Saint-Lô",
+      "zh": "库坦塞斯、圣洛"
+    },
+    "id::FR_MRG_6d703ee3f8dc": {
+      "en": "Guingamp + Saint-Brieuc",
+      "zh": "甘冈、圣布里厄"
+    },
+    "id::FR_MRG_5b1fca32ff2c": {
+      "en": "Châteaulin + Morlaix + Quimper",
+      "zh": "沙托兰、莫尔莱、坎佩尔"
+    },
+    "id::FR_MRG_a3ac3f104566": {
+      "en": "Alençon + Argentan + Mortagne-au-Perche",
+      "zh": "阿朗松、阿根廷、莫尔塔涅奥佩尔什"
+    },
+    "id::FR_MRG_7c681aa2032e": {
+      "en": "Boulogne-sur-Mer + Saint-Omer + Calais",
+      "zh": "博嫩、圣奥马尔斯、卡勒斯"
     }
   },
   "ui": {
-    "Political display mode": {"en": "Political display mode", "zh": "政治层显示模式"},
-    "Automatic (raster for TNO)": {"en": "Automatic (raster for TNO)", "zh": "自动（TNO 优先栅格）"},
-    "Raster display": {"en": "Raster display", "zh": "栅格显示"},
-    "Native vector compatibility": {"en": "Native vector compatibility", "zh": "原生矢量兼容"},
-    "Legacy hybrid comparison": {"en": "Legacy hybrid comparison", "zh": "旧混合模式对照"},
-    "Actual political renderer": {"en": "Actual political renderer", "zh": "实际政治层渲染器"},
-    "Persistent raster stays raster after navigation; legacy hybrid restores native detail.": {"en": "Persistent raster stays raster after navigation; legacy hybrid restores native detail.", "zh": "常驻栅格在导航结束后保持栅格显示；旧混合模式恢复原生细节。"},
-    "Rendering experiment": {"en": "Rendering experiment", "zh": "渲染试验"},
-    "Raster acceleration (experimental)": {"en": "Raster acceleration (experimental)", "zh": "栅格加速（试用）"},
-    "For 1936, 1939 and TNO. Detail is restored after navigation.": {"en": "For 1936, 1939 and TNO. Detail is restored after navigation.", "zh": "适用于 1936、1939 和 TNO，停止导航后恢复精细显示。"},
-    "Raster trial is off": {"en": "Raster trial is off", "zh": "栅格试用已关闭"},
-    "Preparing the map": {"en": "Preparing the map", "zh": "正在准备地图"},
-    "Available in 1936, 1939 and TNO": {"en": "Available in 1936, 1939 and TNO", "zh": "适用于 1936、1939 和 TNO"},
-    "Preparing accelerated display": {"en": "Preparing accelerated display", "zh": "正在准备加速显示"},
-    "Accelerated display": {"en": "Accelerated display", "zh": "正在使用栅格显示"},
-    "Precise display restored": {"en": "Precise display restored", "zh": "已恢复精确显示"},
-    "Using compatible display": {"en": "Using compatible display", "zh": "正在使用兼容显示"},
-    "Population coverage": { "en": "Population coverage", "zh": "人口数据覆盖率" },
+    "Political display mode": {
+      "en": "Political display mode",
+      "zh": "政治层显示模式"
+    },
+    "Automatic (raster for TNO)": {
+      "en": "Automatic (raster for TNO)",
+      "zh": "自动（TNO 优先栅格）"
+    },
+    "Raster display": {
+      "en": "Raster display",
+      "zh": "栅格显示"
+    },
+    "Native vector compatibility": {
+      "en": "Native vector compatibility",
+      "zh": "原生矢量兼容"
+    },
+    "Legacy hybrid comparison": {
+      "en": "Legacy hybrid comparison",
+      "zh": "旧混合模式对照"
+    },
+    "Actual political renderer": {
+      "en": "Actual political renderer",
+      "zh": "实际政治层渲染器"
+    },
+    "Persistent raster stays raster after navigation; legacy hybrid restores native detail.": {
+      "en": "Persistent raster stays raster after navigation; legacy hybrid restores native detail.",
+      "zh": "常驻栅格在导航结束后保持栅格显示；旧混合模式恢复原生细节。"
+    },
+    "Rendering experiment": {
+      "en": "Rendering experiment",
+      "zh": "渲染试验"
+    },
+    "Raster acceleration (experimental)": {
+      "en": "Raster acceleration (experimental)",
+      "zh": "栅格加速（试用）"
+    },
+    "For 1936, 1939 and TNO. Detail is restored after navigation.": {
+      "en": "For 1936, 1939 and TNO. Detail is restored after navigation.",
+      "zh": "适用于 1936、1939 和 TNO，停止导航后恢复精细显示。"
+    },
+    "Raster trial is off": {
+      "en": "Raster trial is off",
+      "zh": "栅格试用已关闭"
+    },
+    "Preparing the map": {
+      "en": "Preparing the map",
+      "zh": "正在准备地图"
+    },
+    "Available in 1936, 1939 and TNO": {
+      "en": "Available in 1936, 1939 and TNO",
+      "zh": "适用于 1936、1939 和 TNO"
+    },
+    "Preparing accelerated display": {
+      "en": "Preparing accelerated display",
+      "zh": "正在准备加速显示"
+    },
+    "Accelerated display": {
+      "en": "Accelerated display",
+      "zh": "正在使用栅格显示"
+    },
+    "Precise display restored": {
+      "en": "Precise display restored",
+      "zh": "已恢复精确显示"
+    },
+    "Using compatible display": {
+      "en": "Using compatible display",
+      "zh": "正在使用兼容显示"
+    },
+    "Population coverage": {
+      "en": "Population coverage",
+      "zh": "人口数据覆盖率"
+    },
     "Population distribution": {
       "en": "Population distribution",
       "zh": "人口空间分布"
@@ -295448,48 +295190,174 @@
       "en": "Showing overview; refining this view…",
       "zh": "已显示全局概览，正在细化当前视野…"
     },
-    "Landform strength": {"en": "Landform strength", "zh": "地形强度"},
-    "Land cover strength": {"en": "Land cover strength", "zh": "地表覆被强度"},
-    "Physical region names": {"en": "Physical region names", "zh": "地貌区域名称"},
-    "Alps DEM shading": {"en": "Alps DEM shading", "zh": "阿尔卑斯 DEM 阴影"},
-    "Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.": {"en": "Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.", "zh": "400% 缩放启用阿尔卑斯覆被细节；参考年份为 2019，其他地区沿用概览。"},
-    "Names from 200% zoom; DEM shading from 400%. Current geography reference.": {"en": "Names from 200% zoom; DEM shading from 400%. Current geography reference.", "zh": "名称从 200% 缩放显示，DEM 阴影从 400% 显示，均为现实地理参考。"},
-    "Local adjustments": {"en": "Local adjustments", "zh": "局部调整"},
-    "Advanced contour settings": {"en": "Advanced contour settings", "zh": "等高线高级设置"},
-    "Major Minimum Elevation (m)": {"en": "Major Minimum Elevation (m)", "zh": "主等高线最低海拔（米）"},
-    "Minor Minimum Elevation (m)": {"en": "Minor Minimum Elevation (m)", "zh": "次等高线最低海拔（米）"},
-    "Landforms": {"en": "Landforms", "zh": "地形"},
-    "Land cover": {"en": "Land cover", "zh": "地表覆被"},
-    "Other forests": {"en": "Other forests", "zh": "其他森林"},
-    "No coverage in current data": {"en": "No coverage in current data", "zh": "当前数据未覆盖"},
-    "Coverage loading": {"en": "Coverage loading", "zh": "覆盖数据加载中"},
-    "Land cover reference: 2019.": {"en": "Land cover reference: 2019.", "zh": "地表覆被参考年份：2019。"},
-    "Bathymetry tuning": {"en":"Bathymetry tuning","zh":"测深效果调节"},
-    "Bathymetry opacity": {"en":"Bathymetry opacity","zh":"测深效果不透明度"},
-    "Bathymetry contour strength": {"en":"Bathymetry contour strength","zh":"测深等深线强度"},
-    "Depth contrast": {"en":"Depth contrast","zh":"深度对比度"},
-    "Global oceans · raster-derived bathymetry": {"en":"Global oceans · raster-derived bathymetry","zh":"全球海洋 · 栅格推导测深"},
-    "Scenario depth is schematic": {"en":"Scenario depth is schematic","zh":"剧本深度为示意"},
-    "Depth legend and sources": {"en":"Depth legend and sources","zh":"深度图例与来源"},
-    "Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.": {"en":"Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.","zh":"区域测深效果由地形数据推导。无数据区域保留海洋底色。"},
-    "Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.": {"en":"Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.","zh":"覆盖大西洋、太平洋、印度洋、南大洋、北冰洋及相连边缘海；局部细节受源数据分辨率限制。"},
-    "Regional depth bins": {"en":"Regional depth bins","zh":"区域深度分级"},
-    "0–200 m shelf": {"en":"0–200 m shelf","zh":"0–200 米 陆架"},
-    "200–1000 m slope": {"en":"200–1000 m slope","zh":"200–1000 米 陆坡"},
-    "1000–4000 m deep": {"en":"1000–4000 m deep","zh":"1000–4000 米 深海"},
-    "4000+ m abyss": {"en":"4000+ m abyss","zh":"4000 米以上 深渊"},
-    "Scenario depth shows relative nearshore and deeper water, not measured meters.": {"en":"Scenario depth shows relative nearshore and deeper water, not measured meters.","zh":"剧本深度仅表示近岸与深水的相对关系，不代表实测米数。"},
-    "Data source and loaded feature counts.": {"en":"Data source and loaded feature counts.","zh":"数据来源与已加载要素数量。"},
-    "Select a bathymetry style to adjust these controls.": {"en":"Select a bathymetry style to adjust these controls.","zh":"选择测深样式后可调整这些控件。"},
-    "Bathymetry loading": {"en":"Bathymetry loading","zh":"测深数据加载中"},
-    "Bathymetry data failed to load": {"en":"Bathymetry data failed to load","zh":"测深数据加载失败"},
-    "Some bathymetry sources failed to load": {"en":"Some bathymetry sources failed to load","zh":"部分测深数据源加载失败"},
-    "No bathymetry coverage in this view": {"en":"No bathymetry coverage in this view","zh":"当前视图无测深覆盖"},
-    "Bathymetry opacity is zero": {"en":"Bathymetry opacity is zero","zh":"测深效果不透明度为零"},
-    "raster-derived visible": {"en":"raster-derived visible","zh":"个栅格推导要素可见"},
-    "schematic visible": {"en":"schematic visible","zh":"个示意要素可见"},
-    "Large Lake Outlines": { "en": "Large Lake Outlines", "zh": "大湖湖岸线" },
-    "Show Sea Names": { "en": "Show Sea Names", "zh": "显示海域名称" },
+    "Landform strength": {
+      "en": "Landform strength",
+      "zh": "地形强度"
+    },
+    "Land cover strength": {
+      "en": "Land cover strength",
+      "zh": "地表覆被强度"
+    },
+    "Physical region names": {
+      "en": "Physical region names",
+      "zh": "地貌区域名称"
+    },
+    "Alps DEM shading": {
+      "en": "Alps DEM shading",
+      "zh": "阿尔卑斯 DEM 阴影"
+    },
+    "Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.": {
+      "en": "Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.",
+      "zh": "400% 缩放启用阿尔卑斯覆被细节；参考年份为 2019，其他地区沿用概览。"
+    },
+    "Names from 200% zoom; DEM shading from 400%. Current geography reference.": {
+      "en": "Names from 200% zoom; DEM shading from 400%. Current geography reference.",
+      "zh": "名称从 200% 缩放显示，DEM 阴影从 400% 显示，均为现实地理参考。"
+    },
+    "Local adjustments": {
+      "en": "Local adjustments",
+      "zh": "局部调整"
+    },
+    "Advanced contour settings": {
+      "en": "Advanced contour settings",
+      "zh": "等高线高级设置"
+    },
+    "Major Minimum Elevation (m)": {
+      "en": "Major Minimum Elevation (m)",
+      "zh": "主等高线最低海拔（米）"
+    },
+    "Minor Minimum Elevation (m)": {
+      "en": "Minor Minimum Elevation (m)",
+      "zh": "次等高线最低海拔（米）"
+    },
+    "Landforms": {
+      "en": "Landforms",
+      "zh": "地形"
+    },
+    "Land cover": {
+      "en": "Land cover",
+      "zh": "地表覆被"
+    },
+    "Other forests": {
+      "en": "Other forests",
+      "zh": "其他森林"
+    },
+    "No coverage in current data": {
+      "en": "No coverage in current data",
+      "zh": "当前数据未覆盖"
+    },
+    "Coverage loading": {
+      "en": "Coverage loading",
+      "zh": "覆盖数据加载中"
+    },
+    "Land cover reference: 2019.": {
+      "en": "Land cover reference: 2019.",
+      "zh": "地表覆被参考年份：2019。"
+    },
+    "Bathymetry tuning": {
+      "en": "Bathymetry tuning",
+      "zh": "测深效果调节"
+    },
+    "Bathymetry opacity": {
+      "en": "Bathymetry opacity",
+      "zh": "测深效果不透明度"
+    },
+    "Bathymetry contour strength": {
+      "en": "Bathymetry contour strength",
+      "zh": "测深等深线强度"
+    },
+    "Depth contrast": {
+      "en": "Depth contrast",
+      "zh": "深度对比度"
+    },
+    "Global oceans · raster-derived bathymetry": {
+      "en": "Global oceans · raster-derived bathymetry",
+      "zh": "全球海洋 · 栅格推导测深"
+    },
+    "Scenario depth is schematic": {
+      "en": "Scenario depth is schematic",
+      "zh": "剧本深度为示意"
+    },
+    "Depth legend and sources": {
+      "en": "Depth legend and sources",
+      "zh": "深度图例与来源"
+    },
+    "Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.": {
+      "en": "Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.",
+      "zh": "区域测深效果由地形数据推导。无数据区域保留海洋底色。"
+    },
+    "Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.": {
+      "en": "Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.",
+      "zh": "覆盖大西洋、太平洋、印度洋、南大洋、北冰洋及相连边缘海；局部细节受源数据分辨率限制。"
+    },
+    "Regional depth bins": {
+      "en": "Regional depth bins",
+      "zh": "区域深度分级"
+    },
+    "0–200 m shelf": {
+      "en": "0–200 m shelf",
+      "zh": "0–200 米 陆架"
+    },
+    "200–1000 m slope": {
+      "en": "200–1000 m slope",
+      "zh": "200–1000 米 陆坡"
+    },
+    "1000–4000 m deep": {
+      "en": "1000–4000 m deep",
+      "zh": "1000–4000 米 深海"
+    },
+    "4000+ m abyss": {
+      "en": "4000+ m abyss",
+      "zh": "4000 米以上 深渊"
+    },
+    "Scenario depth shows relative nearshore and deeper water, not measured meters.": {
+      "en": "Scenario depth shows relative nearshore and deeper water, not measured meters.",
+      "zh": "剧本深度仅表示近岸与深水的相对关系，不代表实测米数。"
+    },
+    "Data source and loaded feature counts.": {
+      "en": "Data source and loaded feature counts.",
+      "zh": "数据来源与已加载要素数量。"
+    },
+    "Select a bathymetry style to adjust these controls.": {
+      "en": "Select a bathymetry style to adjust these controls.",
+      "zh": "选择测深样式后可调整这些控件。"
+    },
+    "Bathymetry loading": {
+      "en": "Bathymetry loading",
+      "zh": "测深数据加载中"
+    },
+    "Bathymetry data failed to load": {
+      "en": "Bathymetry data failed to load",
+      "zh": "测深数据加载失败"
+    },
+    "Some bathymetry sources failed to load": {
+      "en": "Some bathymetry sources failed to load",
+      "zh": "部分测深数据源加载失败"
+    },
+    "No bathymetry coverage in this view": {
+      "en": "No bathymetry coverage in this view",
+      "zh": "当前视图无测深覆盖"
+    },
+    "Bathymetry opacity is zero": {
+      "en": "Bathymetry opacity is zero",
+      "zh": "测深效果不透明度为零"
+    },
+    "raster-derived visible": {
+      "en": "raster-derived visible",
+      "zh": "个栅格推导要素可见"
+    },
+    "schematic visible": {
+      "en": "schematic visible",
+      "zh": "个示意要素可见"
+    },
+    "Large Lake Outlines": {
+      "en": "Large Lake Outlines",
+      "zh": "大湖湖岸线"
+    },
+    "Show Sea Names": {
+      "en": "Show Sea Names",
+      "zh": "显示海域名称"
+    },
     "Capital": {
       "zh": "首都",
       "en": "Capital"
