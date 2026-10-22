@@ -1,0 +1,46 @@
+{
+  "_readme": "Tests skipped by tools/run_all_tests.mjs on PRs. Every entry needs a reason; remove it once fixed or deleted. Nightly runs everything with --all, so quarantined tests stay visible there.",
+  "node": {
+    "tests/startup_resource_graph_contract.test.mjs": "Defaults to the stale tracked dist/ manifest when no fresh Pages artifact is supplied."
+  },
+  "python": {
+    "tests/test_global_transport_builder_contracts.py": "Four methods grep transport runtime JS text; rotted.",
+    "tests/test_data_manifest_contract.py": "data/manifest.json hashes for locales.json and runtime_asset_registry.json are stale.",
+    "tests/test_source_ledger_contract.py": "natural_earth_10m_urban_areas_zip ledger entry lacks required checker fields.",
+    "tests/test_political_topology_gap_contract.py": "Reads published political chunks as GeoJSON; they are TopoJSON now.",
+    "tests/test_tno_eastern_precision_sources.py": "Expects the plain runtime topology; it is gzip-only now.",
+    "tests/test_tno_inspector_groups.py": "Expects the retired TNO SOV tag (see tools/retire_tno_sov.py)."
+  },
+  "pythonSlow": {
+    "_reason": "Each takes more than about 10 s on a fast workstation (roughly 2x on a 4-core CI runner); nightly runs them.",
+    "files": [
+      "tests/test_landing_map_asset_contracts.py",
+      "tests/test_pages_dist_startup_shell.py",
+      "tests/test_tno_bundle_builder.py",
+      "tests/test_marine_refinement.py",
+      "tests/test_tno_water_geometries.py",
+      "tests/test_tno_east_europe_gaps.py",
+      "tests/test_us_county_adapted_bundle.py",
+      "tests/test_dev_server.py",
+      "tests/test_data_catalog_contract.py",
+      "tests/test_scenario_contracts.py",
+      "tests/test_perf_gate_contract.py",
+      "tests/test_polar_geography_contract.py",
+      "tests/test_france_precision.py",
+      "tests/test_patch_checked_in_urban_artifacts.py",
+      "tests/test_transport_manifest_contracts.py",
+      "tests/test_scenario_chunk_assets.py",
+      "tests/test_build_global_bathymetry_asset.py",
+      "tests/test_blank_base_rebuild.py",
+      "tests/test_physical_water_mask.py"
+    ]
+  },
+  "nodeSlow": {
+    "_reason": "Single tests take 15-55 s on a fast workstation (roughly 2x on CI); nightly runs them.",
+    "files": [
+      "tests/water_geometry_runtime.test.mjs",
+      "tests/marine_refinement_runtime.test.mjs",
+      "tests/bathymetry_geometry_behavior.test.mjs"
+    ]
+  }
+}

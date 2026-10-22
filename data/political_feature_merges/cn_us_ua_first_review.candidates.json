@@ -1,0 +1,1824 @@
+{
+  "schema_version": 1,
+  "candidate_set": "cn_us_ua_first_review",
+  "description": "First-review dense-country candidates from the 2026-10-21 TNO granularity research (Hebei, Henan, Anhui, Jiangxi; Texas; Poltava, Vinnytsia, Kirovohrad, Zhytomyr). Groups have at most three members sharing a positive-length boundary; protected IDs are national/owner/historical-front borders, major-city hosts and detected river boundaries.",
+  "protected_feature_ids": [
+    "CN_CITY_17275852B10180385527417",
+    "CN_CITY_17275852B10417338286601",
+    "CN_CITY_17275852B1061618089075",
+    "CN_CITY_17275852B10682420809377",
+    "CN_CITY_17275852B12908503886054",
+    "CN_CITY_17275852B14553820792876",
+    "CN_CITY_17275852B14866353147502",
+    "CN_CITY_17275852B15523465043405",
+    "CN_CITY_17275852B15586652060579",
+    "CN_CITY_17275852B15977137196263",
+    "CN_CITY_17275852B16095129082560",
+    "CN_CITY_17275852B16258690311459",
+    "CN_CITY_17275852B16549058596986",
+    "CN_CITY_17275852B17867161339331",
+    "CN_CITY_17275852B18196453405091",
+    "CN_CITY_17275852B18412643750307",
+    "CN_CITY_17275852B18626458296265",
+    "CN_CITY_17275852B18650308284914",
+    "CN_CITY_17275852B19397285057030",
+    "CN_CITY_17275852B19931241701115",
+    "CN_CITY_17275852B19936192796712",
+    "CN_CITY_17275852B20323770219280",
+    "CN_CITY_17275852B21512782047125",
+    "CN_CITY_17275852B21539803830882",
+    "CN_CITY_17275852B21810019705519",
+    "CN_CITY_17275852B22707504793071",
+    "CN_CITY_17275852B22736277138860",
+    "CN_CITY_17275852B24581804832570",
+    "CN_CITY_17275852B24717929885720",
+    "CN_CITY_17275852B24738212461481",
+    "CN_CITY_17275852B25527504348841",
+    "CN_CITY_17275852B25584448604265",
+    "CN_CITY_17275852B25717626841565",
+    "CN_CITY_17275852B27387408000676",
+    "CN_CITY_17275852B27899236857957",
+    "CN_CITY_17275852B28404307874661",
+    "CN_CITY_17275852B28435212496203",
+    "CN_CITY_17275852B29180806171493",
+    "CN_CITY_17275852B29450147562060",
+    "CN_CITY_17275852B30120943168727",
+    "CN_CITY_17275852B31510326051494",
+    "CN_CITY_17275852B31900972836749",
+    "CN_CITY_17275852B32222846476141",
+    "CN_CITY_17275852B32324091961089",
+    "CN_CITY_17275852B32842590404417",
+    "CN_CITY_17275852B3297440504647",
+    "CN_CITY_17275852B32989531796686",
+    "CN_CITY_17275852B33664952861914",
+    "CN_CITY_17275852B34461807983634",
+    "CN_CITY_17275852B35191117841364",
+    "CN_CITY_17275852B35367898303515",
+    "CN_CITY_17275852B36068725262944",
+    "CN_CITY_17275852B36714320356801",
+    "CN_CITY_17275852B36737936197596",
+    "CN_CITY_17275852B37318058786515",
+    "CN_CITY_17275852B37350063092030",
+    "CN_CITY_17275852B37762337287015",
+    "CN_CITY_17275852B37803356904979",
+    "CN_CITY_17275852B37842112492131",
+    "CN_CITY_17275852B39263965325493",
+    "CN_CITY_17275852B39600332445203",
+    "CN_CITY_17275852B41032470199188",
+    "CN_CITY_17275852B41153803332766",
+    "CN_CITY_17275852B41187046911697",
+    "CN_CITY_17275852B41473005819241",
+    "CN_CITY_17275852B42311251295370",
+    "CN_CITY_17275852B42868481826233",
+    "CN_CITY_17275852B42949182938993",
+    "CN_CITY_17275852B43165756519885",
+    "CN_CITY_17275852B43191682084250",
+    "CN_CITY_17275852B4344290320214",
+    "CN_CITY_17275852B43722651535129",
+    "CN_CITY_17275852B45020271947314",
+    "CN_CITY_17275852B45530821909299",
+    "CN_CITY_17275852B45820941167845",
+    "CN_CITY_17275852B45953294841051",
+    "CN_CITY_17275852B45958961660036",
+    "CN_CITY_17275852B46346395801730",
+    "CN_CITY_17275852B46393920630539",
+    "CN_CITY_17275852B46736465172107",
+    "CN_CITY_17275852B50524833382886",
+    "CN_CITY_17275852B5131093529483",
+    "CN_CITY_17275852B56067085830492",
+    "CN_CITY_17275852B56282348268720",
+    "CN_CITY_17275852B56564088961928",
+    "CN_CITY_17275852B57128594064202",
+    "CN_CITY_17275852B58235819833008",
+    "CN_CITY_17275852B59002516276853",
+    "CN_CITY_17275852B60076511840527",
+    "CN_CITY_17275852B60218719915669",
+    "CN_CITY_17275852B60414806889849",
+    "CN_CITY_17275852B60620518951028",
+    "CN_CITY_17275852B61177414411617",
+    "CN_CITY_17275852B61726350757100",
+    "CN_CITY_17275852B62040954239455",
+    "CN_CITY_17275852B62859148681973",
+    "CN_CITY_17275852B64442957752259",
+    "CN_CITY_17275852B64978204094712",
+    "CN_CITY_17275852B65261927384665",
+    "CN_CITY_17275852B65587507291468",
+    "CN_CITY_17275852B65889258356554",
+    "CN_CITY_17275852B66003162693266",
+    "CN_CITY_17275852B66983384026241",
+    "CN_CITY_17275852B67315226354305",
+    "CN_CITY_17275852B68447300329810",
+    "CN_CITY_17275852B68627257397845",
+    "CN_CITY_17275852B69259623848725",
+    "CN_CITY_17275852B69453353693019",
+    "CN_CITY_17275852B69801287390069",
+    "CN_CITY_17275852B69993211466305",
+    "CN_CITY_17275852B70843634097749",
+    "CN_CITY_17275852B70958466386582",
+    "CN_CITY_17275852B71122715185286",
+    "CN_CITY_17275852B714584663018",
+    "CN_CITY_17275852B72633077913274",
+    "CN_CITY_17275852B72971629177091",
+    "CN_CITY_17275852B74586174185496",
+    "CN_CITY_17275852B74817202637370",
+    "CN_CITY_17275852B75567917484769",
+    "CN_CITY_17275852B75890737929332",
+    "CN_CITY_17275852B76479334373543",
+    "CN_CITY_17275852B77473010275224",
+    "CN_CITY_17275852B77980777243348",
+    "CN_CITY_17275852B78567156775151",
+    "CN_CITY_17275852B78609951456513",
+    "CN_CITY_17275852B78610390708344",
+    "CN_CITY_17275852B78810548183227",
+    "CN_CITY_17275852B79805983057899",
+    "CN_CITY_17275852B81133861819543",
+    "CN_CITY_17275852B81372791356325",
+    "CN_CITY_17275852B81916485203474",
+    "CN_CITY_17275852B82067370611519",
+    "CN_CITY_17275852B82114276452469",
+    "CN_CITY_17275852B82150177084912",
+    "CN_CITY_17275852B83634722552305",
+    "CN_CITY_17275852B84472681161194",
+    "CN_CITY_17275852B84727014688033",
+    "CN_CITY_17275852B85263946797397",
+    "CN_CITY_17275852B8527290020627",
+    "CN_CITY_17275852B86114589403662",
+    "CN_CITY_17275852B8665149309175",
+    "CN_CITY_17275852B86936617351443",
+    "CN_CITY_17275852B87550790271681",
+    "CN_CITY_17275852B89036303488164",
+    "CN_CITY_17275852B89400607939331",
+    "CN_CITY_17275852B90289163541326",
+    "CN_CITY_17275852B9046707294983",
+    "CN_CITY_17275852B91173560245297",
+    "CN_CITY_17275852B91286509256855",
+    "CN_CITY_17275852B91301275454086",
+    "CN_CITY_17275852B92392502748538",
+    "CN_CITY_17275852B92861934763247",
+    "CN_CITY_17275852B93565976694521",
+    "CN_CITY_17275852B93933840848962",
+    "CN_CITY_17275852B94560918292835",
+    "CN_CITY_17275852B95102809901298",
+    "CN_CITY_17275852B95241901152258",
+    "CN_CITY_17275852B95987945429206",
+    "CN_CITY_17275852B96094758616716",
+    "CN_CITY_17275852B96614928239344",
+    "CN_CITY_17275852B97070335713694",
+    "CN_CITY_17275852B97099342637573",
+    "CN_CITY_17275852B97575309486257",
+    "CN_CITY_17275852B97589720817814",
+    "CN_CITY_17275852B97923044022234",
+    "CN_CITY_17275852B98000133869092",
+    "CN_CITY_17275852B99838630509501",
+    "UA_RAY_74538382B19464931464269",
+    "UA_RAY_74538382B24000649598641",
+    "UA_RAY_74538382B33094259068281",
+    "UA_RAY_74538382B34820599431847",
+    "UA_RAY_74538382B37973254287789",
+    "UA_RAY_74538382B39784518508744",
+    "UA_RAY_74538382B52142389762962",
+    "UA_RAY_74538382B56756126132930",
+    "UA_RAY_74538382B57692221763967",
+    "UA_RAY_74538382B68255145682197",
+    "UA_RAY_74538382B68825553908118",
+    "UA_RAY_74538382B7363516927626",
+    "UA_RAY_74538382B89155529549277",
+    "UA_RAY_74538382B89307192182420",
+    "UA_RAY_74538382B99860915109561",
+    "US_CNTY_48027",
+    "US_CNTY_48029",
+    "US_CNTY_48041",
+    "US_CNTY_48043",
+    "US_CNTY_48061",
+    "US_CNTY_48085",
+    "US_CNTY_48113",
+    "US_CNTY_48121",
+    "US_CNTY_48135",
+    "US_CNTY_48141",
+    "US_CNTY_48201",
+    "US_CNTY_48215",
+    "US_CNTY_48229",
+    "US_CNTY_48245",
+    "US_CNTY_48271",
+    "US_CNTY_48303",
+    "US_CNTY_48309",
+    "US_CNTY_48323",
+    "US_CNTY_48329",
+    "US_CNTY_48355",
+    "US_CNTY_48375",
+    "US_CNTY_48377",
+    "US_CNTY_48423",
+    "US_CNTY_48427",
+    "US_CNTY_48439",
+    "US_CNTY_48441",
+    "US_CNTY_48443",
+    "US_CNTY_48453",
+    "US_CNTY_48465",
+    "US_CNTY_48479",
+    "US_CNTY_48485",
+    "US_CNTY_48505"
+  ],
+  "candidates": [
+    {
+      "member_ids": [
+        "CN_CITY_17275852B10280834953954",
+        "CN_CITY_17275852B45286123916499"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_dba34ea83805"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B10417226533704",
+        "CN_CITY_17275852B46601481369620",
+        "CN_CITY_17275852B90910208115389"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_048b03b43fe0"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B10675763964956",
+        "CN_CITY_17275852B58489467965072"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_df8ebe1824bb"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B11062842353292",
+        "CN_CITY_17275852B2228474136637",
+        "CN_CITY_17275852B30839777764393"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_0349cec82974"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B11677783822616",
+        "CN_CITY_17275852B25591140968152",
+        "CN_CITY_17275852B97874259231937"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_9bf93ec6ab55"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B11831222400516",
+        "CN_CITY_17275852B66267690510959",
+        "CN_CITY_17275852B83104882902138"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_1343c63acfbe"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B12009758175917",
+        "CN_CITY_17275852B21727756292013",
+        "CN_CITY_17275852B90293274121417"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_80f4a0f35d44"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B12367976812965",
+        "CN_CITY_17275852B60013836791147",
+        "CN_CITY_17275852B60708257219667"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_af2d5d72053a"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B13720894899448",
+        "CN_CITY_17275852B42150871691362",
+        "CN_CITY_17275852B88630649694026"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_a11f979a75e8"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B14080596373630",
+        "CN_CITY_17275852B80933238140606"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_24b3eb9e4c4f"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B14914107047494",
+        "CN_CITY_17275852B41090829126149",
+        "CN_CITY_17275852B61014639645675"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_571a7b049bf1"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B15402619404646",
+        "CN_CITY_17275852B30063446428877"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_90664f8c81a2"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B15928071016890",
+        "CN_CITY_17275852B38392968045125",
+        "CN_CITY_17275852B61603419379796"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_73e18945eeb4"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B15976604032949",
+        "CN_CITY_17275852B66013638365038"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_97393e6e88ff"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B16614537297563",
+        "CN_CITY_17275852B95269391851003"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_e69597eb50e3"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B16970659563174",
+        "CN_CITY_17275852B3853093148241",
+        "CN_CITY_17275852B41676873149267"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_a3b0753ead52"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B17244930809328",
+        "CN_CITY_17275852B78831071059765",
+        "CN_CITY_17275852B79000631743628"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_35263ab6f436"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B17278626690982",
+        "CN_CITY_17275852B54720396840939",
+        "CN_CITY_17275852B55507691146729"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_11fbea53bddf"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B17915990545621",
+        "CN_CITY_17275852B69472300438393",
+        "CN_CITY_17275852B70455093500286"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_a639a7b2c2d7"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B18090329850308",
+        "CN_CITY_17275852B23091947477547",
+        "CN_CITY_17275852B67626464932783"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_c850a62bf61e"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B18322727061238",
+        "CN_CITY_17275852B63554143431725"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_c6acac8c6240"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B18639822721943",
+        "CN_CITY_17275852B50191422864704",
+        "CN_CITY_17275852B60036374298215"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_858f55cd2f9d"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B18660143588191",
+        "CN_CITY_17275852B54478662483461"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_8c779b468111"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B19731807948045",
+        "CN_CITY_17275852B45429218697197",
+        "CN_CITY_17275852B90274183162284"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_0237ef9b049e"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B2055839745215",
+        "CN_CITY_17275852B24684038509558",
+        "CN_CITY_17275852B93154995028726"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_3cf8f5e63730"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B20688362661640",
+        "CN_CITY_17275852B48027257295245",
+        "CN_CITY_17275852B86260962826974"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_21176aef4f2f"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B21011904878760",
+        "CN_CITY_17275852B29896348675191",
+        "CN_CITY_17275852B7444451912335"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_363cda8d2b6c"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B22610568030006",
+        "CN_CITY_17275852B35414726377112",
+        "CN_CITY_17275852B47307455232994"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_7e43d36e79e9"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B23039937395207",
+        "CN_CITY_17275852B76570182530435"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_bbfa98255799"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B23042571236095",
+        "CN_CITY_17275852B39849449809026",
+        "CN_CITY_17275852B50805542405305"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_a9ea437ce9be"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B23676912924817",
+        "CN_CITY_17275852B8841096687907"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_3d00c83cbf33"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B24021264016342",
+        "CN_CITY_17275852B44956350685295",
+        "CN_CITY_17275852B81329065873888"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_32d2db116bd8"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B24106672686887",
+        "CN_CITY_17275852B81617624799306"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_e15bbd9f64f6"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B24333220567136",
+        "CN_CITY_17275852B39422876200918",
+        "CN_CITY_17275852B96228664587587"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_18e862856d5e"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B24882340673968",
+        "CN_CITY_17275852B31393010637863",
+        "CN_CITY_17275852B8103009054716"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_ad85768a2546"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B25101176936396",
+        "CN_CITY_17275852B81051002573718"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_fc8d7384081b"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B25230716975612",
+        "CN_CITY_17275852B52729797795226"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_230f6026ab78"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B25648013684247",
+        "CN_CITY_17275852B58903134773136"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_9e2a88fbed50"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B25767544969831",
+        "CN_CITY_17275852B31367125179867",
+        "CN_CITY_17275852B36499134265956"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_3abc5c30e7d5"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B26763632681669",
+        "CN_CITY_17275852B56182979447767"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_2076d6a9120b"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B27436635474795",
+        "CN_CITY_17275852B31377284290570"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_55b572cc149a"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B29212741984798",
+        "CN_CITY_17275852B64087191598728",
+        "CN_CITY_17275852B87718878820627"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_33af89a1c9b8"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B29905847665822",
+        "CN_CITY_17275852B73453477463881"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_2d200643a2c8"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B30373565857678",
+        "CN_CITY_17275852B37600232739643"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_d4cc4dd29ccf"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B30631409334147",
+        "CN_CITY_17275852B95874414124304"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_27a9330c6d40"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B31491185089163",
+        "CN_CITY_17275852B431696373370",
+        "CN_CITY_17275852B55754577664448"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_6df751ff387e"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B31573882035564",
+        "CN_CITY_17275852B57882995260260",
+        "CN_CITY_17275852B72769683371533"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_04a711f6894a"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B31757639036873",
+        "CN_CITY_17275852B93231482572641",
+        "CN_CITY_17275852B98150019256975"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_7ae61f1c2d3e"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B32258301015981",
+        "CN_CITY_17275852B41151461072680",
+        "CN_CITY_17275852B98747059027351"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_c3f0e2639dc5"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B34450056986470",
+        "CN_CITY_17275852B66433667475820"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_8c3d11f6ade5"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B35674473625997",
+        "CN_CITY_17275852B9304528417696"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_41c9168d67b6"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B35904418947378",
+        "CN_CITY_17275852B51290893529729",
+        "CN_CITY_17275852B76152157086843"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_a42b76912bb3"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B36087518478347",
+        "CN_CITY_17275852B37388992508665"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_adc7ab4d735d"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B36890628103019",
+        "CN_CITY_17275852B51175072856676",
+        "CN_CITY_17275852B87149259927291"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_de6279d90aa5"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B37578058694758",
+        "CN_CITY_17275852B800916503217"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_6a1ce91e1d78"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B37858104001226",
+        "CN_CITY_17275852B73903296597057",
+        "CN_CITY_17275852B74776996629025"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_f9d27d6e612f"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B37962942142742",
+        "CN_CITY_17275852B56023235126255",
+        "CN_CITY_17275852B61616021978467"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_a5a5d4c9e22d"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B3826775936083",
+        "CN_CITY_17275852B85976102347819"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_9c702703c428"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B40039310856406",
+        "CN_CITY_17275852B47297530357355",
+        "CN_CITY_17275852B77342375778801"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_5d890f69ef4c"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B41394272458329",
+        "CN_CITY_17275852B71083235506927"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_33689bd6471b"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B41756501926338",
+        "CN_CITY_17275852B42898496791559",
+        "CN_CITY_17275852B71871830431018"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_16e619ff1faa"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B42323417187142",
+        "CN_CITY_17275852B61165424028511"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_5c5f9e9c2d98"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B43166713994651",
+        "CN_CITY_17275852B56434829262827"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_c9e6c27ca9d7"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B43446340592902",
+        "CN_CITY_17275852B70748117167042",
+        "CN_CITY_17275852B99539158189120"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_cddd342e1272"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B45581719395514",
+        "CN_CITY_17275852B55448399697332",
+        "CN_CITY_17275852B8482565791704"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_66cba0a32b9e"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B46380594187155",
+        "CN_CITY_17275852B68084346150299",
+        "CN_CITY_17275852B7483411794752"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_d271b87cb00e"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B47245604901224",
+        "CN_CITY_17275852B50412174337680"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_e6c772cb61a8"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B47611284562797",
+        "CN_CITY_17275852B59963011340599"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_17e7b714f643"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B48217934131504",
+        "CN_CITY_17275852B51390796967225",
+        "CN_CITY_17275852B89533026423026"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_04f55bd71433"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B48796108703718",
+        "CN_CITY_17275852B71216121267542"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_79ae11340949"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B51269093511150",
+        "CN_CITY_17275852B76534884260482",
+        "CN_CITY_17275852B91186135419268"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_a9e968ef907c"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B5353146374567",
+        "CN_CITY_17275852B67769801833376",
+        "CN_CITY_17275852B90238227594233"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_6347deea5152"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B53933530490343",
+        "CN_CITY_17275852B64817974651819",
+        "CN_CITY_17275852B74264051584102"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_85f973a4f389"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B55464189255182",
+        "CN_CITY_17275852B55840349463324",
+        "CN_CITY_17275852B98988434995928"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_bf2b3822a5eb"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B55776769429507",
+        "CN_CITY_17275852B59735937562693",
+        "CN_CITY_17275852B7735540978639"
+      ],
+      "parent_id": "CN_Anhui",
+      "research_id": "RESEARCH_CN_e36049e1fce5"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B5674127157826",
+        "CN_CITY_17275852B63987790069029",
+        "CN_CITY_17275852B88170553797239"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_a21880e6f0a0"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B57492284435715",
+        "CN_CITY_17275852B96657206671737"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_674ec0655d84"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B58371513472148",
+        "CN_CITY_17275852B95887002471957"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_7ce952d06557"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B59579726815916",
+        "CN_CITY_17275852B67574078001488"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_259ee2ed187c"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B59616994343756",
+        "CN_CITY_17275852B63877453406832",
+        "CN_CITY_17275852B88707811573248"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_8daf38b07436"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B6082279520202",
+        "CN_CITY_17275852B62617200555443",
+        "CN_CITY_17275852B83134707412237"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_2aa4f5fa4673"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B61532431382022",
+        "CN_CITY_17275852B66961239610954"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_63e5f368b181"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B61638108171693",
+        "CN_CITY_17275852B63272164318035",
+        "CN_CITY_17275852B71435621524955"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_70b36696415a"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B65550927062733",
+        "CN_CITY_17275852B96665943782542"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_7b46e3cafae9"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B69224732604429",
+        "CN_CITY_17275852B69310239774277"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_c1391fcbfc74"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B69618555412569",
+        "CN_CITY_17275852B81783797021346",
+        "CN_CITY_17275852B86987062890699"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_d25d40dbe860"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B70255924310381",
+        "CN_CITY_17275852B86070890642714",
+        "CN_CITY_17275852B92700741958693"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_650100f2482c"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B7651699454151",
+        "CN_CITY_17275852B97427850556586"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "research_id": "RESEARCH_CN_b72978bf7354"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B7797076027602",
+        "CN_CITY_17275852B79917267034965",
+        "CN_CITY_17275852B90337071234971"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_7e0d423060ed"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B82772378373798",
+        "CN_CITY_17275852B94743712738136"
+      ],
+      "parent_id": "CN_Henan",
+      "research_id": "RESEARCH_CN_93b8f5220e25"
+    },
+    {
+      "member_ids": [
+        "CN_CITY_17275852B88151757349593",
+        "CN_CITY_17275852B9681816955607"
+      ],
+      "parent_id": "CN_Hebei",
+      "research_id": "RESEARCH_CN_2e24cbad9dcc"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48001",
+        "US_CNTY_48225"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_66e82e3a00c7"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48003",
+        "US_CNTY_48227",
+        "US_CNTY_48317"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_2a3869dfb9dc"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48009",
+        "US_CNTY_48023",
+        "US_CNTY_48503"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_c0231b29b5ae"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48011",
+        "US_CNTY_48065",
+        "US_CNTY_48233"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_a8c6f0da1121"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48013",
+        "US_CNTY_48297"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_5a654a4b0c78"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48015",
+        "US_CNTY_48477"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_973e2da3d9af"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48017",
+        "US_CNTY_48189",
+        "US_CNTY_48279"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_d571b874f430"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48019",
+        "US_CNTY_48385"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_41036e335340"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48021",
+        "US_CNTY_48149"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_8b5aae6fe9b6"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48031",
+        "US_CNTY_48171"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_2e6a701e04d4"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48033",
+        "US_CNTY_48115",
+        "US_CNTY_48165"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_f7239f1a4314"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48039",
+        "US_CNTY_48157",
+        "US_CNTY_48473"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_896fb56b9835"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48045",
+        "US_CNTY_48191",
+        "US_CNTY_48437"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_5d1a5da0f77f"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48047",
+        "US_CNTY_48247"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_6e53c1524434"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48049",
+        "US_CNTY_48083",
+        "US_CNTY_48333"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_805e3c8c308e"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48051",
+        "US_CNTY_48287",
+        "US_CNTY_48491"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_5f53966a0d3c"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48053",
+        "US_CNTY_48099",
+        "US_CNTY_48281"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_9c6b44bbba54"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48057",
+        "US_CNTY_48239"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_f37f751180fc"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48059",
+        "US_CNTY_48133"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_a82ddbd1fac4"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48063",
+        "US_CNTY_48183",
+        "US_CNTY_48459"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_92241d9ff873"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48067",
+        "US_CNTY_48343"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_481abd51f460"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48069",
+        "US_CNTY_48369"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_7f9c46ecebe2"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48073",
+        "US_CNTY_48401"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_5956ad4b10ab"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48077",
+        "US_CNTY_48237",
+        "US_CNTY_48497"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_51125ab65770"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48079",
+        "US_CNTY_48219",
+        "US_CNTY_48445"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_3c801f899d85"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48081",
+        "US_CNTY_48399",
+        "US_CNTY_48431"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_8143a23f4589"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48087",
+        "US_CNTY_48211",
+        "US_CNTY_48483"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_630edbfe8d5f"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48089",
+        "US_CNTY_48285",
+        "US_CNTY_48481"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_4546931c1e53"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48091",
+        "US_CNTY_48209"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_d8cffbf1c44b"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48093",
+        "US_CNTY_48143"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_699ba29f09ef"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48095",
+        "US_CNTY_48235",
+        "US_CNTY_48451"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_698d8a8eeb7f"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48097",
+        "US_CNTY_48181",
+        "US_CNTY_48337"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_d3978cc2eb90"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48101",
+        "US_CNTY_48153",
+        "US_CNTY_48345"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_ec0f21687c62"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48103",
+        "US_CNTY_48383",
+        "US_CNTY_48461"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_aa7f5649ccee"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48105",
+        "US_CNTY_48413",
+        "US_CNTY_48435"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_99b3b9e97e14"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48107",
+        "US_CNTY_48125",
+        "US_CNTY_48263"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_eabe6872ebd0"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48109",
+        "US_CNTY_48389"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_7bd2b0e377e8"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48111",
+        "US_CNTY_48195",
+        "US_CNTY_48421"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_71ef5847f1a4"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48117",
+        "US_CNTY_48205",
+        "US_CNTY_48359"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_992b69edff4d"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48123",
+        "US_CNTY_48469"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_f175f0a83c3f"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48129",
+        "US_CNTY_48179",
+        "US_CNTY_48393"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_bef7ab65bfdd"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48131",
+        "US_CNTY_48249",
+        "US_CNTY_48273"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_57796ad19a2b"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48137",
+        "US_CNTY_48259",
+        "US_CNTY_48265"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_5c52211e7f4b"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48139",
+        "US_CNTY_48251"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_850290730274"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48155",
+        "US_CNTY_48487"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_d5804947275f"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48159",
+        "US_CNTY_48223",
+        "US_CNTY_48449"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_db13f9ae48e8"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48169",
+        "US_CNTY_48305"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_036746fbb2d8"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48203",
+        "US_CNTY_48315"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_3ed4202e40dc"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48207",
+        "US_CNTY_48447"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_5030c9b40331"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48217",
+        "US_CNTY_48293",
+        "US_CNTY_48349"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_a71bf043f736"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48221",
+        "US_CNTY_48425"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_4a15ead6330c"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48241",
+        "US_CNTY_48351",
+        "US_CNTY_48403"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_619edac1650c"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48253",
+        "US_CNTY_48417",
+        "US_CNTY_48429"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_ba6e91caa790"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48255",
+        "US_CNTY_48493"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_b9aadcd6d19a"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48257",
+        "US_CNTY_48397",
+        "US_CNTY_48467"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_4a2ba3f05c11"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48267",
+        "US_CNTY_48327"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_e9b361f5bf95"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48269",
+        "US_CNTY_48275",
+        "US_CNTY_48433"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_cfbda57925e4"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48283",
+        "US_CNTY_48311"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_b3f9c6b393e6"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48289",
+        "US_CNTY_48313"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_cfa37f1af0a2"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48295",
+        "US_CNTY_48357"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_29dcce88c092"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48299",
+        "US_CNTY_48319"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_a92dcfd49fdf"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48325",
+        "US_CNTY_48463",
+        "US_CNTY_48507"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_ddd9a61a2b78"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48335",
+        "US_CNTY_48353",
+        "US_CNTY_48415"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_18418f023b53"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48373",
+        "US_CNTY_48455"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_a1e340ecda8e"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48405",
+        "US_CNTY_48419"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_70c13cd0945e"
+    },
+    {
+      "member_ids": [
+        "US_CNTY_48475",
+        "US_CNTY_48495"
+      ],
+      "parent_id": "US_Texas",
+      "research_id": "RESEARCH_US_c8eb0884d54e"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B12709317910219",
+        "UA_RAY_74538382B94896655218904",
+        "UA_RAY_74538382B96857740504911"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "research_id": "RESEARCH_UA_b9e23ec889e4"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B1295446134246",
+        "UA_RAY_74538382B57466537231315"
+      ],
+      "parent_id": "UA_Poltava",
+      "research_id": "RESEARCH_UA_9e563489c1e6"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B13053028483551",
+        "UA_RAY_74538382B75855496887574",
+        "UA_RAY_74538382B99424317893885"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "research_id": "RESEARCH_UA_96bce867f549"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B13174941050792",
+        "UA_RAY_74538382B49727252906057",
+        "UA_RAY_74538382B70813216743380"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "research_id": "RESEARCH_UA_51460fd7b186"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B15303326410198",
+        "UA_RAY_74538382B15383579018603",
+        "UA_RAY_74538382B92678915216320"
+      ],
+      "parent_id": "UA_Poltava",
+      "research_id": "RESEARCH_UA_7114dd1c0d60"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B1986372473405",
+        "UA_RAY_74538382B82525342266993"
+      ],
+      "parent_id": "UA_Poltava",
+      "research_id": "RESEARCH_UA_d6d284d2e1e0"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B24202642451616",
+        "UA_RAY_74538382B80669310769437",
+        "UA_RAY_74538382B88010222583687"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "research_id": "RESEARCH_UA_824dc0f08b48"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B24211497806867",
+        "UA_RAY_74538382B60535297050868",
+        "UA_RAY_74538382B83988407306770"
+      ],
+      "parent_id": "UA_Poltava",
+      "research_id": "RESEARCH_UA_a17c2b2ba357"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B28667917897493",
+        "UA_RAY_74538382B30239669246101",
+        "UA_RAY_74538382B32721525373151"
+      ],
+      "parent_id": "UA_Poltava",
+      "research_id": "RESEARCH_UA_479f2c686db0"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B29600786349581",
+        "UA_RAY_74538382B40041339344288"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "research_id": "RESEARCH_UA_3ac301247627"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B29634078398489",
+        "UA_RAY_74538382B44263254033139",
+        "UA_RAY_74538382B94405396686419"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "research_id": "RESEARCH_UA_d18b8793734f"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B30544134807890",
+        "UA_RAY_74538382B34796929779218",
+        "UA_RAY_74538382B97123961313815"
+      ],
+      "parent_id": "UA_Poltava",
+      "research_id": "RESEARCH_UA_f80ec4f0e1b8"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B32198153584627",
+        "UA_RAY_74538382B69268260028088"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "research_id": "RESEARCH_UA_5ceab75fcdb8"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B32839428556025",
+        "UA_RAY_74538382B75813986727772",
+        "UA_RAY_74538382B76388790181712"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "research_id": "RESEARCH_UA_e8d9a45220b2"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B34104046396179",
+        "UA_RAY_74538382B83246565510085"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "research_id": "RESEARCH_UA_c2a5f658e4e2"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B38609283059110",
+        "UA_RAY_74538382B95360083052097"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "research_id": "RESEARCH_UA_7a2dfa9ed9a3"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B40286307768032",
+        "UA_RAY_74538382B68550856765578"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "research_id": "RESEARCH_UA_606755e1b91c"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B40940873671576",
+        "UA_RAY_74538382B69405527085585",
+        "UA_RAY_74538382B96819013794956"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "research_id": "RESEARCH_UA_748d89a7bee0"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B44340415968020",
+        "UA_RAY_74538382B4782887938967",
+        "UA_RAY_74538382B88978880858250"
+      ],
+      "parent_id": "UA_Poltava",
+      "research_id": "RESEARCH_UA_fe02e8706875"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B45059422214147",
+        "UA_RAY_74538382B58798821419341"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "research_id": "RESEARCH_UA_2e76ef112426"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B48236413060906",
+        "UA_RAY_74538382B65548017442564"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "research_id": "RESEARCH_UA_adb7e93e87bc"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B5063322332018",
+        "UA_RAY_74538382B60330166440880",
+        "UA_RAY_74538382B63160428645400"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "research_id": "RESEARCH_UA_75930578e6df"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B5065610238765",
+        "UA_RAY_74538382B51817175452920"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "research_id": "RESEARCH_UA_c52960725280"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B57034061820630",
+        "UA_RAY_74538382B73277137080743"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "research_id": "RESEARCH_UA_5d7a93dd13c9"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B58237861988874",
+        "UA_RAY_74538382B64394372263090",
+        "UA_RAY_74538382B80884786840021"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "research_id": "RESEARCH_UA_f39f105e490f"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B60018374136133",
+        "UA_RAY_74538382B64662360696322"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "research_id": "RESEARCH_UA_b00bf7caf5b1"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B62956114849097",
+        "UA_RAY_74538382B72798454015327",
+        "UA_RAY_74538382B86431925858942"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "research_id": "RESEARCH_UA_31db6a353adf"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B63112784365900",
+        "UA_RAY_74538382B87722024081340",
+        "UA_RAY_74538382B88912930718320"
+      ],
+      "parent_id": "UA_Poltava",
+      "research_id": "RESEARCH_UA_dcf38a035bef"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B67308569242211",
+        "UA_RAY_74538382B8481477190191",
+        "UA_RAY_74538382B97447105405204"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "research_id": "RESEARCH_UA_7004e8a21a15"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B69842770208303",
+        "UA_RAY_74538382B79975421345437",
+        "UA_RAY_74538382B83616373915642"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "research_id": "RESEARCH_UA_2d91d8dfb9c3"
+    }
+  ]
+}
