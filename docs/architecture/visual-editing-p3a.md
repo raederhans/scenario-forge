@@ -69,17 +69,16 @@ pixels, and invalidate on erase, undo, palette changes and geometry promotion.
 
 ## Validation
 
-Focused unit/behavior command: `npm run test:node:ownership-retirement`.
-This includes reference selection, normal click and drag transactions, fill
+Focused unit/behavior coverage lives in the whole `npm test` suite and
+includes reference selection, normal click and drag transactions, fill
 hierarchies, history, palette/legend and reference-border consumers.
 Browser coverage adds real Modern World hit dispatch, multi-feature country
 fill/erase, undo/redo and same-version export/import to the existing retirement
 UI check. Actual results are recorded in the PR, not inferred from test presence.
 
-The pristine merged source still fails the historical borrowed-owner proof in
-`check_state_writer_policy.mjs` at `political_path_cache_owner.js`. The working
-source's direct-write allowlist remains unchanged. No allowance, timeout, route
-rule or unrelated proof fingerprint is widened to hide a failure.
+The state-writer policy proofs referenced when this phase landed were removed in
+the Phase 0 cleanup (2026-10-22). No allowance or timeout is widened to hide a
+failure.
 
 ## Continuation review corrections
 

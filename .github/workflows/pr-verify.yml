@@ -3,7 +3,6 @@ name: pr-verify
 on:
   workflow_dispatch:
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 concurrency:
   group: pr-verify-${{ github.event.pull_request.number || github.ref }}
@@ -11,101 +10,17 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
 
+# Every job runs on every PR. There is no path-based planner: the whole unit
+# suite takes a few minutes, and a skipped lane is a lane nobody trusts.
 jobs:
-  pr-plan:
-    name: PR Plan
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      run_fast: ${{ steps.plan.outputs.run_fast }}
-      run_hgo: ${{ steps.plan.outputs.run_hgo }}
-      run_smoke: ${{ steps.plan.outputs.run_smoke }}
-      smoke_mode: ${{ steps.plan.outputs.smoke_mode }}
-      run_demo: ${{ steps.plan.outputs.run_demo }}
-      run_pages: ${{ steps.plan.outputs.run_pages }}
-      pages_mode: ${{ steps.plan.outputs.pages_mode }}
-      scenario_ids: ${{ steps.plan.outputs.scenario_ids }}
-      run_transport: ${{ steps.plan.outputs.run_transport }}
-      perf_mode: ${{ steps.plan.outputs.perf_mode }}
-      expected_performance_change: ${{ steps.plan.outputs.expected_performance_change }}
-    steps:
-      - name: Checkout PR planner only
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          sparse-checkout: |
-            tools/ci/pr_plan.mjs
-            tools/ci/perf_policy.mjs
-          sparse-checkout-cone-mode: false
-          fetch-depth: 0
-          filter: blob:none
-
-      - name: Read changed files
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-          mkdir -p .runtime/tmp .runtime/reports/generated
-          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            # Manual reruns exercise all lanes without requiring a PR payload.
-            printf '%s\n' '.github/workflows/pr-verify.yml' > .runtime/tmp/pr-changed-files.txt
-            exit 0
-          fi
-          git -c core.quotePath=false diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA" -- > .runtime/tmp/pr-changed-files.txt
-          test -s .runtime/tmp/pr-changed-files.txt || { echo "::error::PR planner received an empty changed-file set"; exit 1; }
-
-      - name: Plan PR verification
-        id: plan
-        env:
-          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then PR_LABELS=ci:full; fi
-          # Use the specified event base/head, matching the perf gate classifier.
-          # Empty/unreadable manifests retain conservative measurement planning.
-          : > .runtime/tmp/pr-base-package.json
-          : > .runtime/tmp/pr-head-package.json
-          if grep -Fxq 'package.json' .runtime/tmp/pr-changed-files.txt; then
-            if ! git show "${BASE_SHA}:package.json" > .runtime/tmp/pr-base-package.json 2>/dev/null; then
-              : > .runtime/tmp/pr-base-package.json
-            fi
-            if ! git show "${HEAD_SHA}:package.json" > .runtime/tmp/pr-head-package.json 2>/dev/null; then
-              : > .runtime/tmp/pr-head-package.json
-            fi
-          fi
-          node tools/ci/pr_plan.mjs \
-            --changed-files .runtime/tmp/pr-changed-files.txt \
-            --labels "$PR_LABELS" \
-            --base-package-file .runtime/tmp/pr-base-package.json \
-            --head-package-file .runtime/tmp/pr-head-package.json \
-            --json-out .runtime/reports/generated/pr-plan.json \
-            --github-output "$GITHUB_OUTPUT"
-          cat .runtime/reports/generated/pr-plan.json >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload PR plan
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: pr-plan
-          path: .runtime/reports/generated/pr-plan.json
-
   pr-verify-fast:
-    needs: ["pr-plan"]
-    if: needs.pr-plan.outputs.run_fast == 'true'
     uses: ./.github/workflows/verify-shared.yml
     with:
       profile: pr-fast
-      run-e2e-smoke: false
-      run-pages-check: ${{ needs.pr-plan.outputs.run_pages == 'true' }}
-      run-pages-source-check: ${{ needs.pr-plan.outputs.pages_mode == 'source' }}
 
   pr-tests:
     name: pr-tests (${{ matrix.suite }})
-    needs: ["pr-plan"]
-    if: needs.pr-plan.outputs.run_fast == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -115,10 +30,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          # Full history without blobs: proof tests read pinned older commits on demand.
-          fetch-depth: 0
-          filter: blob:none
       - name: Setup Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
@@ -138,56 +49,30 @@ jobs:
         run: node tools/run_all_tests.mjs ${{ matrix.suite }}
 
   pr-verify-smoke:
-    needs: ["pr-plan"]
-    if: needs.pr-plan.outputs.run_smoke == 'true'
     uses: ./.github/workflows/verify-shared.yml
     with:
       profile: pr-smoke
-      run-e2e-smoke: true
-      smoke-mode: ${{ needs.pr-plan.outputs.smoke_mode }}
-      run-golden-demo: ${{ needs.pr-plan.outputs.run_demo == 'true' }}
 
   pr-verify-hgo:
-    needs: ["pr-plan"]
-    if: needs.pr-plan.outputs.run_hgo == 'true'
     uses: ./.github/workflows/hgo-native.yml
 
   pr-verify-required:
     name: PR Verify Required
     if: always()
-    needs: ["pr-plan", "pr-verify-fast", "pr-tests", "pr-verify-smoke", "pr-verify-hgo"]
+    needs: ["pr-verify-fast", "pr-tests", "pr-verify-smoke", "pr-verify-hgo"]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Require planned PR verification results
+      - name: Require every PR verification job to pass
         env:
-          REQUIRED_RESULTS: ${{ toJSON(needs) }}
+          RESULTS: ${{ toJSON(needs) }}
         run: |
           node <<'NODE'
-          const needs = JSON.parse(process.env.REQUIRED_RESULTS);
-          const expectedJobs = ["pr-plan", "pr-verify-fast", "pr-tests", "pr-verify-smoke", "pr-verify-hgo"];
-          const actualJobs = Object.keys(needs).sort();
-          const dependencySetMatches = JSON.stringify(actualJobs) === JSON.stringify([...expectedJobs].sort());
-          const planPassed = needs["pr-plan"]?.result === "success";
-          const fastResult = needs["pr-verify-fast"]?.result;
-          const plannedFast = needs["pr-plan"]?.outputs?.run_fast;
-          const testsResult = needs["pr-tests"]?.result;
-          const fastAccepted = plannedFast === "true"
-            ? fastResult === "success" && testsResult === "success"
-            : plannedFast === "false" && fastResult === "skipped" && testsResult === "skipped";
-          const smokeResult = needs["pr-verify-smoke"]?.result;
-          const plannedSmoke = needs["pr-plan"]?.outputs?.run_smoke;
-          const smokeAccepted = plannedSmoke === "true"
-            ? smokeResult === "success"
-            : plannedSmoke === "false" && smokeResult === "skipped";
-          const hgoResult = needs["pr-verify-hgo"]?.result;
-          const plannedHgo = needs["pr-plan"]?.outputs?.run_hgo;
-          const hgoAccepted = plannedHgo === "true"
-            ? hgoResult === "success"
-            : plannedHgo === "false" && hgoResult === "skipped";
-          for (const job of expectedJobs) console.log(`${job}: ${needs[job]?.result ?? "missing"}`);
-          if (!dependencySetMatches || !planPassed || !fastAccepted || !smokeAccepted || !hgoAccepted) {
-            console.error("Required PR verification failed.");
-            process.exit(1);
+          const needs = JSON.parse(process.env.RESULTS);
+          let ok = true;
+          for (const [job, { result }] of Object.entries(needs)) {
+            console.log(`${job}: ${result}`);
+            if (result !== "success") ok = false;
           }
+          if (!ok) process.exit(1);
           NODE

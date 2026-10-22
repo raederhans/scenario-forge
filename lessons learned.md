@@ -106,8 +106,6 @@
 
 ### review lane 的职责是暴露真实缺口
 - 红灯保留为显式风险。
-- static contract 从 E2E 拆出后，要接入具名入口和现有路由体系。
-- selector explain、列表入口、变更入口、grep 规则、workflow paths 共用同一份真相源。
 - source replacement 经公开源复核确认缺少可用几何时，要写入 source-review metadata 并退出 actionable 队列，避免同一个不可替换候选被重复重开。
 
 ### 测试锁真实合同
@@ -143,7 +141,6 @@
 - `dist/pages-dist-manifest.json`、`data/manifest.json`、根 `dist/assets/*.json` 这类字节合同文件，修改后要同时复核自引用尺寸/hash；生成脚本和 `dist/app` 文本产物都要在 `.gitattributes` 固定 LF。
 - Pages manifest 扫描文件时按 repo-relative POSIX path 排序；直接排序 `Path` 对象会让 Windows 和 Linux 对 mixed-case 发布路径产出不同记录顺序。
 - Renderer owner extraction 只要改到浏览器会加载的 `js/core/**` 模块，就要在 review 收尾跑 `verify:pages-dist` 或等价 drift gate，确保 `dist/app` import 图和源码一致。
-- `js/core/map_renderer.js` 或 `js/core/map_renderer/**` 新增浏览器加载模块时，selector 也要把源码路径路由到 `verify:pages-dist`；只路由已生成的 `dist/app/**` 会让缺失镜像文件在提交前漏掉。
 - 覆盖类合同可以用 bbox 作为候选预筛，最终通过条件必须绑定真实 geometry 命中，并用跨 bbox 但不相交的反例测试锁住。
 - Marine Regions source snapshot 接近 GitHub 100MiB 限制时，要把简化规则写进 source spec/provenance，比如 `snapshot_simplify_tolerance`；只压最终 water feature 会留下不可推送的大 snapshot。
 - 只改 water layer 时，优先在现有 `runtime_topology.topo.json` 上替换 `scenario_water`；从 political/land/context 反提再重建会丢失独立的 `scenario_atlantropa` 对象。
@@ -368,9 +365,6 @@
 ### Pack path helper 参数顺序要用合同锁住
 - 同名 `getPackPath` helper 在 point/industrial preview 中签名可能不同；抽 runtime helper 或修 full-pack 探测时，加静态合同或行为测试锁调用顺序，避免把 `mode` 和 `variantId` 互换后悄悄回退到 preview pack。
 
-### 测试路由目录规则要避开同目录异域文件
-- Adaptive selector 处理 `ops/browser-mcp/` 这类混合目录时，static smoke support files 用显式文件集合和具体 route id；perf benchmark 继续走 perf 文件集合，避免静态合同改动误选 live gate。
-
 ### profile validator 要接入真实入口
 - 配置文件 validator 如果只跑在静态测试里，live 脚本仍可能用默认值吞掉拼写漂移；新增 profile 合同时要把 validator 放到解析入口前，并用 unknown-field 负例锁住隐藏 fallback。
 - profile 字段只要会进入 shell 文件名、URL 或退出状态，就要校验语义边界；非空字符串检查不足以保护 localhost-only、路径安全和端口范围。
@@ -517,7 +511,7 @@
 - 从 popover 内触发全局确认弹窗时，E2E 要覆盖弹窗可见和可点击；`z-index` 低于 Guide popover 会让确认弹窗实际出现在后方，dirty confirm 路径会被误判成逻辑卡住。
 
 ### 新增 E2E spec 要同步分层入口
-- 新增 `tests/e2e/*.spec.js` 时同步更新 `test-layer-manifest.json`、test list、timeout allowlist 和 selector mapping；仅有 `package.json` 脚本会让分层 gate 与变更选择器漏跑关键浏览器覆盖。
+- 新增 `tests/e2e/*.spec.js` 时同步更新 `test-layer-manifest.json`；仅有 `package.json` 脚本会让分层 smoke 入口漏跑关键浏览器覆盖。
 
 ### Sample 派生状态要绑定同一个 sample id
 - 导入失败路径保留 previous sample 时，推荐导出、Guide 和 Export Workbench 派生状态要同时校验 sample id，确保 attempted sample 元数据停留在失败上下文，previous committed sample 继续显示自己的推荐。
@@ -528,45 +522,14 @@
 ### Pages 部署 smoke 先区分传播窗口
 - GitHub Pages 刚部署后 release smoke 如果停在 shell ready，先用公开 URL、关键资源 HTTP 探测和同 run rerun 验证传播窗口；资源稳定后仍失败，再按产品启动回归处理。
 
-### Selector 路由要覆盖 checked-in dist 镜像
-- 新增 source owner 或公开样例入口后，同步检查 `dist/app/**` 和 `dist/pages-dist-manifest.json` 的 selector 路由；只改镜像文件时也要进入 `verify:pages-dist`，并带上 `dist` 与 `.runtime-output` 主线程锁。
-- 仓库级配置文件也要有 selector 路由；`.gitignore`、workflow、验证入口这类改动如果 unmatched，`--execute` 会正确红灯，但例行审计会漏掉应跑的 contract。
-
-### 新增 selector domain 要同步 supervisor registry
-- `tools/test_route_registry.mjs` 新增 domain 时，同步更新 `tools/ai_test_supervisor/domain_registry.json` 和 supervisor schema test；否则 selector 本身能路由，SF-ATS contract gate 会因未登记 domain 失败。
-
 ### 本地 Pages release gate 先生成 dist
 - 跑 `/dist/` release gate 前先执行 `verify:pages-dist`，再用 `tools/dev_server.py /dist/` 服务页面；裸 `http.server` 可能缺少项目路由语义，把未生成或未映射的 `dist/app/data/**` 误报成启动回归。
 
-### Owner 迁移后同步源码扫描合同
-- Renderer owner extraction 完成后，同步检查 Python source-scan contract 是否仍锚定旧 `js/main.js` 或 `js/core/map_renderer.js` 文本形态；合同应指向当前 owner 文件或升级为行为测试，否则 `verify:core` 会在运行时代码无变更时被旧扫描规则阻塞。
-
-### Full verify:core 要在 clean HEAD 收口
-- `verify:core` 里部分 inventory 会要求 checked-in dist 无 staged/unstaged diff，而 `verify:dist-drift` 会要求 builder 输出与 index 一致；生成 dist 同步后先提交，再在 clean HEAD 上跑 full gate，避免两个合同在脏 worktree 中互相卡住。
-
-### 阶段 inventory 的 dist guard 要收窄路径
-- 某个 renderer 阶段只想证明自己的镜像没变时，guard 应检查该阶段 owner 和主 renderer mirror 路径；全局锁 `dist/app/**` 会挡住后续阶段由 `verify:dist-drift` 要求的合法新增镜像。
-
-### Python source-scan 合同要有真实入口
-- 把 Python boundary contract 放进 verification metadata 的 `sourceRefs` 只能帮助 selector 识别文件；还要同步 package script、route registry 和 verify-core plan 断言，确保该 contract 真实执行。
-
-### Windows 子进程树隔离要先验证当前用户权限
-- WMI 进程事件订阅可能在普通用户令牌下直接返回权限错误；Windows 性能实验应在测量前编译并探测 Job Object helper，通过 suspended root、assign-before-resume、kill-on-close 和 fail-closed 清理证据实现可审计的整棵进程树隔离。
-
-### Windows 电源方案复制要验证返回 GUID 的真实状态
-- `powercfg /duplicatescheme` 可能返回新 GUID，同时紧接着的 `/list` 仍看不到该方案；未来独立实验协议应以返回 GUID 为身份起点，再分别验证查询、激活和最终清理，并在任何测量前完成一次无副作用 preflight。
-
 ### 审计修复要锁住完整入口与可恢复所有权
 - transformed-pass diagnostics 必须覆盖单 pass 绘制和多 pass compose 两条入口；浏览器断言同时绑定本次操作前后签名与目标 zoom，才能排除陈旧诊断假阳性。
-- 源码结构测试提取函数体时应先配平参数括号，再从参数结束后的 `{` 配平函数体；默认参数 `{}` 会让“首个花括号就是函数体”的扫描器截断合同。
-- Windows 电源方案只有在 duplicate 返回 GUID 等于预分配 `temporaryGuid` 后才能写 `createdGuid`；清理前还要校验 journal 的 GUID 一致性与 absence + duplicate 所有权证据，让错误输出和篡改 journal 都保持零删除。
 
 ### 核心基线证据要可重建并绑定身份
-- 默认 `verify:core` 入口使用的单元测试应通过 tracked fixture 或测试内临时 fixture 重建输入；被 `.gitignore` 排除的历史 `.runtime` 报告只服务显式离线复核，并通过路径与哈希参数注入，确保 clean worktree 能重复执行核心验证。
 - 性能 gate 的 oracle 同步记录 schema、scenario manifest、feature count、sample role、精确 Chromium 与采样次数；工作负载或采样语义变化先进入独立归因调查，明确批准后再建立新日期 oracle，并保留旧 oracle 作为历史证据。
-
-### 清单合同要区分入口、委托与可证明范围
-- 清单字段分别记录 entry host 和 delegated owner；合同直接读取的生产源全部进入验证路由。人工审查的依赖快照验证路径存在与静态可达性，并避免复制整份清单作为自证 oracle。
 
 ### E2E 等待条件要区分视觉完成和基础设施 backlog
 - 颜色覆盖、render idle、交互稳定这类浏览器断言应等待 visual promotion、refresh、commit 和像素/状态合同；deferred infra promotion 这类后台 backlog 保留在失败快照中做诊断，避免把已完成的用户可见路径误判成超时。

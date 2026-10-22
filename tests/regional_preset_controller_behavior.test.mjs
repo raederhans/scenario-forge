@@ -4,11 +4,6 @@ import fs from "node:fs";
 
 import { createRegionalPresetController } from "../js/ui/sidebar/regional_preset_controller.js";
 import { createScenarioTerritoryController } from "../js/ui/sidebar/scenario_territory_controller.js";
-import { discoverStateWriterBindingsForSource } from "../tools/build_state_writer_policy.mjs";
-import {
-  STATE_TARGET_PURE_READER_CONTRACT,
-  inspectStateTargetPureReaderFunctionSource,
-} from "../tools/state_action_delegation_contract.mjs";
 
 class FakeElement {
   constructor(tagName) {
@@ -595,83 +590,3 @@ test("territory controller visual apply consumes the generated regional referenc
   assert.deepEqual(calls.shells, []);
 });
 
-test("controller remains a registered pure reader and fails closed on source drift or state writes", async () => {
-  const modulePath = "js/ui/sidebar/regional_preset_controller.js";
-  const source = fs.readFileSync(modulePath, "utf8");
-  const contractEntry = STATE_TARGET_PURE_READER_CONTRACT.find((entry) => (
-    entry.modulePath === modulePath
-    && entry.functionName === "createRegionalPresetController"
-  ));
-  assert.ok(contractEntry);
-  assert.deepEqual(contractEntry.acceptedEscapes, []);
-  assert.deepEqual(contractEntry.conservativeFindings, []);
-
-  const strictDiscovery = await discoverStateWriterBindingsForSource(
-    modulePath,
-    source,
-    "production",
-    { scanAllParameters: true, includeInventories: true },
-  );
-  assert.deepEqual(
-    strictDiscovery.bindingInventories.flatMap(({ findings }) => findings),
-    [],
-  );
-  assert.deepEqual(
-    inspectStateTargetPureReaderFunctionSource(source, contractEntry).violations,
-    [],
-  );
-
-  const returnStart = source.lastIndexOf("  return {");
-  const returnEnd = source.indexOf("  };", returnStart);
-  assert.notEqual(returnStart, -1);
-  assert.notEqual(returnEnd, -1);
-  const returnStatement = source.slice(returnStart, returnEnd + "  };".length);
-  const mutated = source.replace(
-    returnStatement,
-    `  runtimeState.selectedColor = "bad";\n${returnStatement}`,
-  );
-  assert.notEqual(mutated, source);
-  assert.ok(
-    inspectStateTargetPureReaderFunctionSource(mutated, contractEntry).violations.some(
-      ({ code }) => code === "state-target-pure-reader-source-drift",
-    ),
-  );
-  await assert.rejects(
-    () => discoverStateWriterBindingsForSource(
-      modulePath,
-      mutated,
-      "production",
-      { scanAllParameters: true, includeInventories: true },
-    ),
-    (error) => error?.code === "state-target-pure-reader-contract-violation",
-  );
-
-  const rawDiscovery = await discoverStateWriterBindingsForSource(
-    modulePath,
-    mutated,
-    "production",
-    {
-      scanAllParameters: true,
-      includeInventories: true,
-      enforceCurrentContracts: false,
-    },
-  );
-  assert.ok(
-    rawDiscovery.bindingInventories.flatMap(({ findings }) => findings).length > 0,
-  );
-
-  const escaped = source.replace(returnStatement, "  return runtimeState;");
-  assert.notEqual(escaped, source);
-  await assert.rejects(
-    () => discoverStateWriterBindingsForSource(
-      modulePath,
-      escaped,
-      "production",
-      { scanAllParameters: true, includeInventories: true },
-    ),
-    (error) => error?.code === "state-target-pure-reader-contract-violation"
-      && error.violations.some(
-        ({ code }) => code === "state-target-pure-reader-conservative-finding-unregistered",
-      ),
-  );
-});

@@ -1,7 +1,0 @@
-{
-  "status": "passed",
-  "passed": true,
-  "summary": "Read-only audit completed with evidence-backed findings for data source drift, topology stitching, precision risk, deprecated/duplicated data, fallback burden, and maintenance risk.",
-  "output_artifact_path": "docs/active/land-data-architecture-audit/report.md",
-  "architect_review": { "verdict": "approved_with_blocking_findings", "status": "BLOCK" }
-}

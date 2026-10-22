@@ -5,16 +5,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import * as strategicOverlayActions from "../js/core/state/actions/strategic_overlay_actions.js";
-import {
-  buildStateWriterBindingGrants,
-  discoverStateWriterBindingsForSource,
-  validateStateActionNonTargetParameterMutations,
-} from "../tools/build_state_writer_policy.mjs";
-import { buildCanonicalStateKeyAuthorityIndex } from "../tools/state_writer_policy.mjs";
-import {
-  STATE_ACTION_DELEGATION_CONTRACT,
-  validateStateActionPolicyBindings,
-} from "../tools/state_action_delegation_contract.mjs";
 
 const {
   commitStrategicOverlayCollectionsState,
@@ -25,52 +15,6 @@ const {
 
 const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(TEST_DIR, "..");
-
-test("strategic overlay actions detach non-target inputs before helper boundaries", async () => {
-  const relativePath = "js/core/state/actions/strategic_overlay_actions.js";
-  const source = fs.readFileSync(path.join(REPO_ROOT, relativePath), "utf8");
-  assert.deepEqual(
-    await validateStateActionNonTargetParameterMutations(relativePath, source),
-    [],
-  );
-});
-
-test("strategic overlay target bindings contain no unadmitted diagnostics", async () => {
-  const modulePath = "js/core/state/actions/strategic_overlay_actions.js";
-  const source = fs.readFileSync(path.join(REPO_ROOT, modulePath), "utf8");
-  const { bindingInventories } = await discoverStateWriterBindingsForSource(
-    modulePath,
-    source,
-    "production",
-    { includeInventories: true },
-  );
-  const authorityIndex = buildCanonicalStateKeyAuthorityIndex();
-  const writer = {
-    path: modulePath,
-    authority: "domain-action",
-    bindings: bindingInventories.map(({ binding, findings }) => ({
-      ...binding,
-      authority: "domain-action",
-      grants: buildStateWriterBindingGrants(
-        findings,
-        modulePath,
-        authorityIndex,
-        "production",
-      ),
-    })),
-  };
-  const contractEntries = STATE_ACTION_DELEGATION_CONTRACT.filter(
-    ({ modulePath: entryPath }) => entryPath === modulePath,
-  );
-
-  assert.deepEqual(
-    validateStateActionPolicyBindings([writer], {
-      contractEntries,
-      modulePaths: [modulePath],
-    }),
-    [],
-  );
-});
 
 function getFunctionSource(source, functionName) {
   const startToken = `function ${functionName}`;

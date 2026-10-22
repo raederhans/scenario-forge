@@ -24,20 +24,19 @@
 
 - 文档、注释和不参与执行或解析的文本变更无需运行项目测试。
 - 隔离的行为变更默认运行一个最相关的目标测试或检查。
-- 已有局部路由的 action/owner 修改，可用 `npm run verify:edit -- --changed-file <path>` 获得真实行为测试反馈；显式路径只代表本次选择的文件，不代表整个工作区已验收。
-- `verify:core` 默认只含无资源锁的 child-safe 检查；完整非浏览器组合使用 `--include-reserved`，浏览器/主线程组合使用既有 `verify:core:main-thread`。不要把完整策略历史证明作为每次未提交修改的前置条件。
+- 单元测试入口只有一个：`npm test`（或 `npm run test:node` / `npm run test:python`），单个文件用 `node --test tests/<file>.test.mjs`。
 - UI 运行时行为在必要时运行一个聚焦的浏览器或 Playwright 检查。
-- 共享契约、跨模块、数据、性能、构建、dist 或发布路径发生变化时，再扩大到相应的项目标准检查。
-- `test:adaptive`、supervisor、`verify:core`、`verify:pr`、nightly、release 和全量浏览器检查只用于验证框架自身改动、相关高风险路径、CI / 发布任务，或用户明确要求的场景。
+- 共享契约、跨模块、数据、性能、构建、dist 或发布路径发生变化时，再扩大到相应的项目标准检查，例如 `npm run verify:pages-dist`。
 - bug 已复现、断言稳定且具有实际复发风险时，新增或更新回归测试。
+- 测试只验证可观察行为：调用真实模块、检查输出、状态或渲染结果。不要新增读取源码文本做字符串、正则、token、行数或哈希断言的测试，也不要为"文件结构/调用关系"写守卫测试；它们会在每次重构时失败，却拦不住行为回归。
+- 跳过测试只能写进 `tests/quarantine.json` 并注明原因。
 - 检查已充分证明当前声明后停止；不重复未受新改动影响的检查，不为普通改动生成完整证据包。
 - 不扩大 console、timeout 或 route allowlist 来掩盖真实失败。
 
 ## 提交与 PR
 
-- 交付前运行 `npm run pr:plan`：只读查看本分支相对 `origin/main` 的已提交差异、未提交改动、建议的本地检查和预计 CI。它不 fetch、不执行测试，也不表示检查通过。
-- 按计划运行本次所需的目标检查；覆盖缺口先补齐。`verify:edit` 用于局部反馈，`verify:commit` 用于提交前组合检查；不要把 `verify:pr`、nightly 或 release 作为每次推送功能分支的固定前置条件。
-- 推送功能分支、PR 合并、部署分别汇报。PR 等待最终提交的 required checks；计划中的 deferred/diagnostic 不是已通过。遵守既有推送、合并和生产发布授权。
+- 提交前运行 `npm test`；每个 PR 在 CI 上运行同一组检查，不按改动路径分流。
+- 推送功能分支、PR 合并、部署分别汇报。PR 等待最终提交的 `PR Verify Required`。遵守既有推送、合并和生产发布授权。
 - 具体用法见 [开发与交付](docs/development-and-delivery.zh-CN.md)。
 
 ## 汇报

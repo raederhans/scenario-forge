@@ -3,62 +3,29 @@ name: Scenario Contract Matrix
 on:
   workflow_dispatch:
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
-  # PR checks cover the merge candidate; manual runs retain a full audit entry.
-  # Do not repeat all scenarios automatically after every main merge.
+    paths:
+      - 'data/scenarios/**'
+      - 'data/CATALOG.json'
+      - 'data/manifest.json'
+      - 'data/source_ledger.json'
+      - 'map_builder/**'
+      - 'tools/check_scenario_contracts.py'
+      - 'tools/scenario_chunk_assets.py'
+      - 'tools/regional_scenario_assets.py'
+      - 'tools/stage_us_county_scenario.py'
+      - 'tools/stage_us_county_adapted_bundle.py'
+      - 'requirements-dev.lock.txt'
+      - '.github/workflows/scenario-contract-matrix.yml'
 
 permissions:
   contents: read
-  pull-requests: read
 
 concurrency:
   group: scenario-contract-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  plan:
-    name: Scenario Contract Plan
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      scenario_ids: ${{ steps.plan.outputs.scenario_ids }}
-    steps:
-      - name: Checkout planner only
-        if: github.event_name == 'pull_request'
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          sparse-checkout: |
-            tools/ci/pr_plan.mjs
-            tools/ci/perf_policy.mjs
-          sparse-checkout-cone-mode: false
-          fetch-depth: 0
-          filter: blob:none
-
-      - name: Resolve scenario matrix
-        id: plan
-        shell: bash
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
-          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
-        run: |
-          set -euo pipefail
-          if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
-            echo 'scenario_ids=["blank_base","hoi4_1936","hoi4_1939","modern_world","tno_1962"]' >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          mkdir -p .runtime/tmp .runtime/reports/generated
-          git -c core.quotePath=false diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA" -- > .runtime/tmp/pr-changed-files.txt
-          test -s .runtime/tmp/pr-changed-files.txt || { echo "::error::Scenario planner received an empty changed-file set"; exit 1; }
-          node tools/ci/pr_plan.mjs \
-            --changed-files .runtime/tmp/pr-changed-files.txt \
-            --labels "$PR_LABELS" \
-            --json-out .runtime/reports/generated/scenario-pr-plan.json \
-            --github-output "$GITHUB_OUTPUT"
-
   strict-scenario-contract-review:
-    if: always()
-    needs: [plan]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -71,54 +38,25 @@ jobs:
           - hoi4_1936
           - hoi4_1939
     steps:
-      - name: Resolve this scenario lane
-        id: selected
-        shell: bash
-        env:
-          PLAN_RESULT: ${{ needs.plan.result }}
-          SCENARIO_IDS: ${{ needs.plan.outputs.scenario_ids }}
-          SCENARIO_ID: ${{ matrix.scenario_id }}
-        run: |
-          node <<'NODE' >> "$GITHUB_OUTPUT"
-          const selected = JSON.parse(process.env.SCENARIO_IDS);
-          const known = ["blank_base", "modern_world", "tno_1962", "hoi4_1936", "hoi4_1939"];
-          if (process.env.PLAN_RESULT !== "success" || !Array.isArray(selected)
-            || selected.some(id => !known.includes(id)) || new Set(selected).size !== selected.length
-            || !known.includes(process.env.SCENARIO_ID)) throw new Error("Invalid scenario plan.");
-          console.log(`should_run=${selected.includes(process.env.SCENARIO_ID)}`);
-          NODE
-
       - name: Checkout
-        if: steps.selected.outputs.should_run == 'true'
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          fetch-depth: 1
 
       - name: Setup Python
-        if: steps.selected.outputs.should_run == 'true'
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
           cache: "pip"
 
       - name: Install Python test dependencies
-        if: steps.selected.outputs.should_run == 'true'
         run: python -m pip install -r requirements-dev.lock.txt
 
-      - name: Prepare report directory
-        if: steps.selected.outputs.should_run == 'true'
-        run: mkdir -p .runtime/reports/generated
-
       - name: Run strict scenario contract review (${{ matrix.scenario_id }})
-        if: steps.selected.outputs.should_run == 'true'
-        run: python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/${{ matrix.scenario_id }} --report-path .runtime/reports/generated/${{ matrix.scenario_id }}.strict_contract_report.json
-
-      - name: Fast success for scenario-unrelated changes
-        if: steps.selected.outputs.should_run != 'true'
-        run: echo "Scenario contract skipped before repository checkout."
+        run: |
+          mkdir -p .runtime/reports/generated
+          python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/${{ matrix.scenario_id }} --report-path .runtime/reports/generated/${{ matrix.scenario_id }}.strict_contract_report.json
 
       - name: Upload strict contract report (${{ matrix.scenario_id }})
-        if: always() && steps.selected.outputs.should_run == 'true'
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ${{ matrix.scenario_id }}-strict-contract-report
