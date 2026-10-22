@@ -270,7 +270,7 @@ test("factory validates every dependency and freezes the exact public API", () =
 
   const { owner } = createHarness();
   assert.equal(Object.isFrozen(owner), true);
-  assert.deepEqual(Object.keys(owner), ["drawPoliticalPass", "noteNativePartialRepaint", "getDiagnostics"]);
+  assert.deepEqual(Object.keys(owner), ["drawPoliticalPass", "drawPoliticalPassWithNativeTarget", "noteNativePartialRepaint", "getDiagnostics"]);
 });
 
 test("worker bitmap success short-circuits before background and preserves snapshot order", () => {
@@ -730,3 +730,61 @@ for (const presentation of ["staged", "retained"]) {
     assert.equal(names.includes("fine-loop"), false);
   });
 }
+
+
+test("deferred native target is entered only for fallback and preserves staged edits", () => {
+  for (const presentation of ["staged", "retained", "fallback"]) {
+    let nativeCalls = 0;
+    const h = createHarness({ idRasterSelected: true, pendingEdit: true,
+      idRasterMetrics: presentation === "fallback" ? null : { [presentation]: true,
+        fillMs: 1, strokeMs: 0, renderedCount: 1, renderedIds: new Set(["a"]) },
+      overrides: { getters: { isPoliticalIdRasterPrimary: () => true } } });
+    const result = h.owner.drawPoliticalPassWithNativeTarget(3, draw => { nativeCalls++; return draw(); });
+    assert.equal(nativeCalls, presentation === "fallback" ? 1 : 0);
+    assert.equal(result.reason, presentation === "fallback" ? "fine-feature-loop" : "political-id-raster-primary");
+    assert.equal(h.events.map(eventName).filter(name => name === "id-raster-fine").length, 1);
+    assert.equal(h.events.map(eventName).includes("clear-pending"), presentation === "fallback");
+  }
+});
+
+
+test("native fallback resolves its viewport after the full target is installed", () => {
+  let native = false;
+  const h = createHarness({ idRasterSelected: true, idRasterMetrics: null,
+    overrides: { getters: { isPoliticalIdRasterPrimary: () => true }, resolvers: {
+      resolvePoliticalPassIdentity: () => ({ ...IDENTITY_CAPSULE, canvasWidth: native ? 200 : 100 }),
+      resolvePoliticalPassViewport: identity => ({ ...VIEWPORT_CAPSULE, visibleItemCount: identity.canvasWidth }),
+    }, effects: { drawPoliticalBackgroundFills: ({ identity, viewport }) => {
+      assert.equal(native, true);
+      assert.equal(identity.canvasWidth, 200);
+      assert.equal(viewport.visibleItemCount, 200);
+      return DEFAULT_BACKGROUND;
+    }, drawPoliticalPartitions: () => { assert.equal(native, true, "partitions must use the pass target before restore"); } } } });
+  h.owner.drawPoliticalPassWithNativeTarget(3, draw => { native = true; try { return draw(); } finally { native = false; } });
+  assert.equal(native, false);
+});
+
+
+test("deferred political fallback paints base and partitions on the actual host target", async () => {
+  const { createRenderPassCacheHostOwner } = await import("../js/core/map_renderer/render_pass_cache_host_owner.js");
+  const visible = { canvas: { width: 100, height: 100 } };
+  const pass = { canvas: { width: 200, height: 200 } };
+  let target = visible;
+  const painted = [];
+  const h = createHarness({ idRasterSelected: true, idRasterMetrics: null,
+    overrides: { getters: { isPoliticalIdRasterPrimary: () => true }, effects: {
+      drawPoliticalBackgroundFills: () => { painted.push(["base", target]); return DEFAULT_BACKGROUND; },
+      drawPoliticalPartitions: () => { painted.push(["partitions", target]); },
+    } } });
+  const host = createRenderPassCacheHostOwner({ effects: {
+    ensureRenderPassCanvas: () => ({ getContext: () => pass }),
+    prepareTargetContext: context => { assert.equal(context, pass); return 3; },
+    withRenderTarget: (context, draw) => { const previous = target; target = context;
+      try { return draw(); } finally { target = previous; } },
+  }, getters: { getRenderPassLayout: () => ({}) } });
+  const summary = host.prepareRenderPassHost({ passName: "political", transform: { k: 3 }, drawFn: () => assert.fail(),
+    drawWithoutCanvas: runNative => h.owner.drawPoliticalPassWithNativeTarget(3, runNative) });
+  assert.equal(summary.drawResult.reason, "fine-feature-loop");
+  assert.deepEqual(painted, [["base", pass], ["partitions", pass]]);
+  assert.equal(target, visible);
+});

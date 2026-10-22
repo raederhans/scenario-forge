@@ -50132,7 +50132,7 @@
     },
     {
       "path": "app/js/core/map_renderer/render_pass_cache_host_owner.js",
-      "size_bytes": 3673,
+      "size_bytes": 4322,
       "source_kind": "dist"
     },
     {
@@ -51877,7 +51877,7 @@
     },
     {
       "path": "app/js/ui/dev_workspace.js",
-      "size_bytes": 40240,
+      "size_bytes": 40379,
       "source_kind": "dist"
     },
     {
@@ -51952,7 +51952,7 @@
     },
     {
       "path": "app/js/ui/sidebar.js",
-      "size_bytes": 176159,
+      "size_bytes": 176201,
       "source_kind": "dist"
     },
     {
@@ -52027,7 +52027,7 @@
     },
     {
       "path": "app/js/ui/toolbar.js",
-      "size_bytes": 131983,
+      "size_bytes": 132465,
       "source_kind": "dist"
     },
     {
@@ -52047,7 +52047,7 @@
     },
     {
       "path": "app/js/ui/toolbar/appearance_controls_controller.js",
-      "size_bytes": 41077,
+      "size_bytes": 41163,
       "source_kind": "dist"
     },
     {
@@ -52522,7 +52522,7 @@
     },
     {
       "path": "assets/europe-1936-showcase.svg",
-      "size_bytes": 141456,
+      "size_bytes": 254459,
       "source_kind": "dist"
     },
     {
@@ -52547,7 +52547,7 @@
     },
     {
       "path": "assets/hero-blank.svg",
-      "size_bytes": 1224814,
+      "size_bytes": 1215077,
       "source_kind": "dist"
     },
     {
@@ -52567,7 +52567,7 @@
     },
     {
       "path": "assets/hero-hoi4-1936.svg",
-      "size_bytes": 281853,
+      "size_bytes": 281866,
       "source_kind": "dist"
     },
     {
@@ -52582,7 +52582,7 @@
     },
     {
       "path": "assets/hero-hoi4-1939.svg",
-      "size_bytes": 349756,
+      "size_bytes": 349743,
       "source_kind": "dist"
     },
     {
@@ -79103,7 +79103,7 @@
     {
       "file_count": 59,
       "path": "assets",
-      "size_bytes": 27193743
+      "size_bytes": 27297009
     },
     {
       "file_count": 21,
@@ -79136,5 +79136,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 1031383859
+  "total_bytes": 1031488523
 }

@@ -601,7 +601,7 @@
     "origin_kind": "derived",
     "upstream_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GLOBE_R2023A/GHS_POP_E2020_GLOBE_R2023A_54009_1000/V1-0/GHS_POP_E2020_GLOBE_R2023A_54009_1000_V1_0.zip",
     "immutable_ref": "GHS_POP_E2020_GLOBE_R2023A_54009_1000_V1_0",
-    "current_local_sha256": "866342e6fd33d883d4f4b5703969aa5ac0f6ea3b87d7aaddcc5e0282c1c5f137",
+    "current_local_sha256": "9e5d6c2df6b72e66a560179d71aa64bd85a3d41272ccb64d41e758409dc111fa",
     "license": "CC-BY-4.0",
     "citation": "https://doi.org/10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE",
     "consumers": [

@@ -1,33 +1,29 @@
 {
-  "version": 1,
   "catalog_id": "tno_1962.internal.phase1",
-  "generated_at": "2026-03-20T22:00:38.494707+00:00",
-  "scenario_ids": [
-    "tno_1962",
-    "hoi4_1936",
-    "hoi4_1939"
-  ],
   "entries": [
     {
-      "tag": "ALG",
-      "display_name": "French Algeria",
-      "color_hex": "#1746e6",
+      "allow_manual_overlay": true,
+      "boundary_variants": [],
       "capital_state_id": 459,
+      "color_hex": "#1746e6",
+      "companion_actions": [],
+      "core_state_ids": [
+        459,
+        460,
+        513,
+        514
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "French Algeria",
+      "entry_kind": "releasable",
+      "notes": "France releasable for the retained TNO 1962 French Algeria footprint.",
       "parent_owner_tag": "FRA",
       "parent_owner_tags": [
         "FRA"
       ],
-      "release_lookup_iso2": "DZ",
-      "entry_kind": "releasable",
-      "scenario_ids": [
-        "tno_1962"
-      ],
-      "scenario_only": true,
-      "allow_manual_overlay": true,
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "DZA-2195",
           "DZA-2196",
@@ -46,118 +42,31 @@
           "ATLWLD_west_med_31",
           "ATLWLD_west_med_70"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        459,
-        460,
-        513,
-        514
-      ],
+      "release_lookup_iso2": "DZ",
       "resolved_feature_count_hint": 16,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "France releasable for the retained TNO 1962 French Algeria footprint."
-    },
-    {
-      "tag": "BRG",
-      "display_name": "Ordensstaat Burgund",
-      "color_hex": "#1a1a1a",
-      "capital_state_id": null,
-      "parent_owner_tag": "GER",
-      "parent_owner_tags": [],
-      "release_lookup_iso2": "BE",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962"
       ],
       "scenario_only": true,
+      "tag": "ALG",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
-      "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
-        "feature_ids": [
-          "BE100",
-          "BE211",
-          "BE212",
-          "BE213",
-          "BE223",
-          "BE224",
-          "BE225",
-          "BE231",
-          "BE232",
-          "BE233",
-          "BE234",
-          "BE235",
-          "BE236",
-          "BE241",
-          "BE242",
-          "BE251",
-          "BE252",
-          "BE253",
-          "BE254",
-          "BE255",
-          "BE256",
-          "BE257",
-          "BE258",
-          "BE310",
-          "BE323",
-          "BE328",
-          "BE329",
-          "BE32A",
-          "BE32B",
-          "BE32C",
-          "BE32D",
-          "BE331",
-          "BE332",
-          "BE334",
-          "BE335",
-          "BE336",
-          "BE341",
-          "BE342",
-          "BE343",
-          "BE344",
-          "BE345",
-          "BE351",
-          "BE352",
-          "BE353",
-          "FR_ARR_59001",
-          "FR_ARR_59002",
-          "FR_ARR_59003",
-          "FR_ARR_59004",
-          "FR_ARR_59005",
-          "FR_ARR_59006",
-          "FR_ARR_62001",
-          "FR_ARR_62002",
-          "FR_ARR_62003",
-          "FR_ARR_62004",
-          "FR_ARR_62005",
-          "FR_ARR_62006",
-          "FR_ARR_62007",
-          "FR_ARR_80001",
-          "FR_ARR_80002",
-          "FR_ARR_80003",
-          "FR_ARR_80004"
-        ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
-      },
-      "default_boundary_variant_id": "current_tno_initial",
       "boundary_variants": [
         {
+          "basis": "tno_current_runtime",
+          "description": "Current TNO-style Burgundy footprint based on Belgium, Nord-Pas-de-Calais, and Somme.",
           "id": "current_tno_initial",
           "label": "Current TNO Initial",
-          "description": "Current TNO-style Burgundy footprint based on Belgium, Nord-Pas-de-Calais, and Somme.",
-          "basis": "tno_current_runtime",
           "preset_source": {
-            "type": "feature_ids",
-            "name": "",
-            "group_ids": [],
+            "exclude_feature_ids": [],
+            "exclude_group_ids": [],
             "feature_ids": [
               "BE100",
               "BE211",
@@ -211,30 +120,28 @@
               "FR_ARR_59006",
               "FR_ARR_62001",
               "FR_ARR_62002",
-              "FR_ARR_62003",
+              "FR_MRG_7c681aa2032e",
               "FR_ARR_62004",
-              "FR_ARR_62005",
-              "FR_ARR_62006",
               "FR_ARR_62007",
               "FR_ARR_80001",
               "FR_ARR_80002",
               "FR_ARR_80003",
               "FR_ARR_80004"
             ],
-            "exclude_group_ids": [],
-            "exclude_feature_ids": []
+            "group_ids": [],
+            "name": "",
+            "type": "feature_ids"
           },
           "resolved_feature_count_hint": 61
         },
         {
+          "basis": "tno_fbw_plus_project_runtime",
+          "description": "Expanded Burgundy after victory over France, combining the northern TNO footprint with the eastern Burgundian block.",
           "id": "fbw_expanded",
           "label": "Franco-Burgundian War",
-          "description": "Expanded Burgundy after victory over France, combining the northern TNO footprint with the eastern Burgundian block.",
-          "basis": "tno_fbw_plus_project_runtime",
           "preset_source": {
-            "type": "feature_ids",
-            "name": "",
-            "group_ids": [],
+            "exclude_feature_ids": [],
+            "exclude_group_ids": [],
             "feature_ids": [
               "BE100",
               "BE211",
@@ -288,10 +195,8 @@
               "FR_ARR_59006",
               "FR_ARR_62001",
               "FR_ARR_62002",
-              "FR_ARR_62003",
+              "FR_MRG_7c681aa2032e",
               "FR_ARR_62004",
-              "FR_ARR_62005",
-              "FR_ARR_62006",
               "FR_ARR_62007",
               "FR_ARR_80001",
               "FR_ARR_80002",
@@ -336,20 +241,20 @@
               "FR_ARR_89002",
               "FR_ARR_89003"
             ],
-            "exclude_group_ids": [],
-            "exclude_feature_ids": []
+            "group_ids": [],
+            "name": "",
+            "type": "feature_ids"
           },
           "resolved_feature_count_hint": 99
         },
         {
+          "basis": "hgo_augmented_runtime",
+          "description": "Maximum early-project Burgundy, extending the expanded wartime footprint deeper into eastern and northeastern France.",
           "id": "early_maximum",
           "label": "Early Maximum",
-          "description": "Maximum early-project Burgundy, extending the expanded wartime footprint deeper into eastern and northeastern France.",
-          "basis": "hgo_augmented_runtime",
           "preset_source": {
-            "type": "feature_ids",
-            "name": "",
-            "group_ids": [],
+            "exclude_feature_ids": [],
+            "exclude_group_ids": [],
             "feature_ids": [
               "BE100",
               "BE211",
@@ -403,10 +308,8 @@
               "FR_ARR_59006",
               "FR_ARR_62001",
               "FR_ARR_62002",
-              "FR_ARR_62003",
+              "FR_MRG_7c681aa2032e",
               "FR_ARR_62004",
-              "FR_ARR_62005",
-              "FR_ARR_62006",
               "FR_ARR_62007",
               "FR_ARR_80001",
               "FR_ARR_80002",
@@ -479,75 +382,188 @@
               "FR_ARR_88002",
               "FR_ARR_88003"
             ],
-            "exclude_group_ids": [],
-            "exclude_feature_ids": []
+            "group_ids": [],
+            "name": "",
+            "type": "feature_ids"
           },
           "resolved_feature_count_hint": 127
         }
       ],
+      "capital_state_id": null,
+      "color_hex": "#1a1a1a",
       "companion_actions": [],
       "core_state_ids": [],
-      "resolved_feature_count_hint": 61,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Burgundian releasable with current TNO, Franco-Burgundian War, and early maximum boundary variants."
-    },
-    {
-      "tag": "BRI",
-      "display_name": "BRI",
-      "color_hex": "#69886a",
-      "capital_state_id": 14,
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "release_lookup_iso2": "FR",
+      "default_boundary_variant_id": "current_tno_initial",
+      "display_name": "Ordensstaat Burgund",
       "entry_kind": "releasable",
+      "notes": "Burgundian releasable with current TNO, Franco-Burgundian War, and early maximum boundary variants.",
+      "parent_owner_tag": "GER",
+      "parent_owner_tags": [],
+      "preset_source": {
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
+        "feature_ids": [
+          "BE100",
+          "BE211",
+          "BE212",
+          "BE213",
+          "BE223",
+          "BE224",
+          "BE225",
+          "BE231",
+          "BE232",
+          "BE233",
+          "BE234",
+          "BE235",
+          "BE236",
+          "BE241",
+          "BE242",
+          "BE251",
+          "BE252",
+          "BE253",
+          "BE254",
+          "BE255",
+          "BE256",
+          "BE257",
+          "BE258",
+          "BE310",
+          "BE323",
+          "BE328",
+          "BE329",
+          "BE32A",
+          "BE32B",
+          "BE32C",
+          "BE32D",
+          "BE331",
+          "BE332",
+          "BE334",
+          "BE335",
+          "BE336",
+          "BE341",
+          "BE342",
+          "BE343",
+          "BE344",
+          "BE345",
+          "BE351",
+          "BE352",
+          "BE353",
+          "FR_ARR_59001",
+          "FR_ARR_59002",
+          "FR_ARR_59003",
+          "FR_ARR_59004",
+          "FR_ARR_59005",
+          "FR_ARR_59006",
+          "FR_ARR_62001",
+          "FR_ARR_62002",
+          "FR_MRG_7c681aa2032e",
+          "FR_ARR_62004",
+          "FR_ARR_62007",
+          "FR_ARR_80001",
+          "FR_ARR_80002",
+          "FR_ARR_80003",
+          "FR_ARR_80004"
+        ],
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
+      },
+      "release_lookup_iso2": "BE",
+      "resolved_feature_count_hint": 61,
       "scenario_ids": [
         "tno_1962"
       ],
       "scenario_only": true,
+      "tag": "BRG",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": false,
-      "preset_source": {
-        "type": "legacy_preset_name",
-        "name": "Brittany",
-        "group_ids": [],
-        "feature_ids": [],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
-      },
-      "default_boundary_variant_id": "",
       "boundary_variants": [],
+      "capital_state_id": 14,
+      "color_hex": "#69886a",
       "companion_actions": [],
       "core_state_ids": [
         14
       ],
+      "default_boundary_variant_id": "",
+      "display_name": "BRI",
+      "entry_kind": "releasable",
+      "notes": "French internal releasable. Runtime geometry reuses the existing Brittany preset.",
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "preset_source": {
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
+        "feature_ids": [],
+        "group_ids": [],
+        "name": "Brittany",
+        "type": "legacy_preset_name"
+      },
+      "release_lookup_iso2": "FR",
       "resolved_feature_count_hint": null,
-      "validation_status": "ok",
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "scenario_only": true,
+      "tag": "BRI",
       "validation_errors": [],
-      "notes": "French internal releasable. Runtime geometry reuses the existing Brittany preset."
+      "validation_status": "ok"
     },
     {
-      "tag": "CRO",
-      "display_name": "Independent State of Croatia",
-      "color_hex": "#5a8f55",
+      "allow_manual_overlay": true,
+      "boundary_variants": [],
       "capital_state_id": 109,
+      "color_hex": "#5a8f55",
+      "companion_actions": [
+        {
+          "action_type": "ownership_transfer",
+          "auto_apply_on_core_territory": true,
+          "basis": "historical_reference",
+          "description": "Transfers the Italian Dalmatian coastal claim bundle when Croatia core territory is applied.",
+          "hidden_in_ui": false,
+          "id": "dalmatia_kotor_to_ita",
+          "label": "Transfer Dalmatia + Kotor Bay To Italy",
+          "preset_source": {
+            "exclude_feature_ids": [],
+            "exclude_group_ids": [],
+            "feature_ids": [
+              "HR033",
+              "HR034",
+              "HR035",
+              "HR037",
+              "ME_ADM1_MNE-1506",
+              "ME_ADM1_MNE-1507",
+              "ME_ADM1_MNE-1518"
+            ],
+            "group_ids": [],
+            "name": "",
+            "type": "feature_ids"
+          },
+          "resolved_feature_count_hint": 7,
+          "target_owner_tag": "ITA"
+        }
+      ],
+      "core_state_ids": [
+        103,
+        109,
+        163,
+        852
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Independent State of Croatia",
+      "entry_kind": "releasable",
+      "notes": "Italy releasable for a Croatia-centered South Slav settlement. Auto-transfers Dalmatia and the Kotor Bay strip to direct Italian control.",
       "parent_owner_tag": "ITA",
       "parent_owner_tags": [
         "ITA",
         "YUG"
       ],
-      "release_lookup_iso2": "HR",
-      "entry_kind": "releasable",
-      "scenario_ids": [
-        "tno_1962"
-      ],
-      "scenario_only": true,
-      "allow_manual_overlay": true,
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "HR021",
           "HR022",
@@ -586,71 +602,45 @@
           "BA_ADM1_54001226B66267900922909",
           "BA_ADM1_54001226B82378099338701"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [
-        {
-          "id": "dalmatia_kotor_to_ita",
-          "label": "Transfer Dalmatia + Kotor Bay To Italy",
-          "description": "Transfers the Italian Dalmatian coastal claim bundle when Croatia core territory is applied.",
-          "basis": "historical_reference",
-          "action_type": "ownership_transfer",
-          "target_owner_tag": "ITA",
-          "auto_apply_on_core_territory": true,
-          "hidden_in_ui": false,
-          "preset_source": {
-            "type": "feature_ids",
-            "name": "",
-            "group_ids": [],
-            "feature_ids": [
-              "HR033",
-              "HR034",
-              "HR035",
-              "HR037",
-              "ME_ADM1_MNE-1506",
-              "ME_ADM1_MNE-1507",
-              "ME_ADM1_MNE-1518"
-            ],
-            "exclude_group_ids": [],
-            "exclude_feature_ids": []
-          },
-          "resolved_feature_count_hint": 7
-        }
-      ],
-      "core_state_ids": [
-        103,
-        109,
-        163,
-        852
-      ],
+      "release_lookup_iso2": "HR",
       "resolved_feature_count_hint": 36,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Italy releasable for a Croatia-centered South Slav settlement. Auto-transfers Dalmatia and the Kotor Bay strip to direct Italian control."
-    },
-    {
-      "tag": "SER",
-      "display_name": "Serbian Administration",
-      "color_hex": "#3f6f3d",
-      "capital_state_id": 107,
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "YUG"
-      ],
-      "release_lookup_iso2": "RS",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962"
       ],
       "scenario_only": true,
+      "tag": "CRO",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 107,
+      "color_hex": "#3f6f3d",
+      "companion_actions": [],
+      "core_state_ids": [
+        45,
+        107,
+        108,
+        764,
+        802,
+        803
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Serbian Administration",
+      "entry_kind": "releasable",
+      "notes": "Italy releasable for the Serbian-led inland South Slav settlement spanning Serbia, Montenegro, Macedonia, and Kosovo.",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "YUG"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "MK001",
           "MK002",
@@ -737,46 +727,72 @@
           "XK_ADM1_KOS-5914",
           "XK_ADM1_KOS-5915"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        45,
-        107,
-        108,
-        764,
-        802,
-        803
-      ],
+      "release_lookup_iso2": "RS",
       "resolved_feature_count_hint": 84,
-      "validation_status": "ok",
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "scenario_only": true,
+      "tag": "SER",
       "validation_errors": [],
-      "notes": "Italy releasable for the Serbian-led inland South Slav settlement spanning Serbia, Montenegro, Macedonia, and Kosovo."
+      "validation_status": "ok"
     },
     {
-      "tag": "GRE",
-      "display_name": "Greek Protectorate",
-      "color_hex": "#6a965f",
+      "allow_manual_overlay": true,
+      "boundary_variants": [],
       "capital_state_id": 47,
+      "color_hex": "#6a965f",
+      "companion_actions": [
+        {
+          "action_type": "ownership_transfer",
+          "auto_apply_on_core_territory": true,
+          "basis": "historical_reference",
+          "description": "Transfers the Ionian Islands, Crete, and the South Aegean to direct Italian control when the Greek protectorate is applied.",
+          "hidden_in_ui": false,
+          "id": "greek_islands_to_ita",
+          "label": "Transfer Italian Greek Islands To Italy",
+          "preset_source": {
+            "exclude_feature_ids": [],
+            "exclude_group_ids": [],
+            "feature_ids": [
+              "GR_ADM1_GRC-2883",
+              "GR_ADM1_GRC-2990",
+              "GR_ADM1_GRC-3013"
+            ],
+            "group_ids": [],
+            "name": "",
+            "type": "feature_ids"
+          },
+          "resolved_feature_count_hint": 3,
+          "target_owner_tag": "ITA"
+        }
+      ],
+      "core_state_ids": [
+        47,
+        164,
+        182,
+        184,
+        185,
+        186,
+        187,
+        731
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Greek Protectorate",
+      "entry_kind": "releasable",
+      "notes": "Italy releasable for a mainland Greek protectorate that excludes the directly controlled Italian island arc.",
       "parent_owner_tag": "ITA",
       "parent_owner_tags": [
         "GRE",
         "ITA"
       ],
-      "release_lookup_iso2": "GR",
-      "entry_kind": "releasable",
-      "scenario_ids": [
-        "tno_1962"
-      ],
-      "scenario_only": true,
-      "allow_manual_overlay": true,
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "EL301",
           "EL302",
@@ -842,71 +858,71 @@
           "GR_ADM1_GRC-2992",
           "GR_ADM1_GRC-3001"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [
-        {
-          "id": "greek_islands_to_ita",
-          "label": "Transfer Italian Greek Islands To Italy",
-          "description": "Transfers the Ionian Islands, Crete, and the South Aegean to direct Italian control when the Greek protectorate is applied.",
-          "basis": "historical_reference",
-          "action_type": "ownership_transfer",
-          "target_owner_tag": "ITA",
-          "auto_apply_on_core_territory": true,
-          "hidden_in_ui": false,
-          "preset_source": {
-            "type": "feature_ids",
-            "name": "",
-            "group_ids": [],
-            "feature_ids": [
-              "GR_ADM1_GRC-2883",
-              "GR_ADM1_GRC-2990",
-              "GR_ADM1_GRC-3013"
-            ],
-            "exclude_group_ids": [],
-            "exclude_feature_ids": []
-          },
-          "resolved_feature_count_hint": 3
-        }
-      ],
-      "core_state_ids": [
-        47,
-        164,
-        182,
-        184,
-        185,
-        186,
-        187,
-        731
-      ],
+      "release_lookup_iso2": "GR",
       "resolved_feature_count_hint": 63,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Italy releasable for a mainland Greek protectorate that excludes the directly controlled Italian island arc."
-    },
-    {
-      "tag": "EGY",
-      "display_name": "Italian Egypt",
-      "color_hex": "#7a9e66",
-      "capital_state_id": 907,
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "ENG"
-      ],
-      "release_lookup_iso2": "EG",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962"
       ],
       "scenario_only": true,
+      "tag": "GRE",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 907,
+      "color_hex": "#7a9e66",
+      "companion_actions": [
+        {
+          "action_type": "ownership_transfer",
+          "auto_apply_on_core_territory": true,
+          "basis": "historical_reference",
+          "description": "Transfers the Suez canal zone to direct Italian control when Italian Egypt is applied.",
+          "hidden_in_ui": false,
+          "id": "suez_canal_zone_to_ita",
+          "label": "Transfer Suez Canal Zone To Italy",
+          "preset_source": {
+            "exclude_feature_ids": [],
+            "exclude_group_ids": [],
+            "feature_ids": [
+              "EGY-1531",
+              "EGY-1536",
+              "EGY-1538"
+            ],
+            "group_ids": [],
+            "name": "",
+            "type": "feature_ids"
+          },
+          "resolved_feature_count_hint": 3,
+          "target_owner_tag": "ITA"
+        }
+      ],
+      "core_state_ids": [
+        446,
+        447,
+        452,
+        453,
+        456,
+        457,
+        552,
+        907
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Italian Egypt",
+      "entry_kind": "releasable",
+      "notes": "Italy releasable for an Egyptian protectorate. Auto-transfers the Suez canal zone to direct Italian control.",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ENG"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "EGY-1530",
           "EGY-1531",
@@ -935,71 +951,40 @@
           "EGY-1557",
           "EGY-1558"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [
-        {
-          "id": "suez_canal_zone_to_ita",
-          "label": "Transfer Suez Canal Zone To Italy",
-          "description": "Transfers the Suez canal zone to direct Italian control when Italian Egypt is applied.",
-          "basis": "historical_reference",
-          "action_type": "ownership_transfer",
-          "target_owner_tag": "ITA",
-          "auto_apply_on_core_territory": true,
-          "hidden_in_ui": false,
-          "preset_source": {
-            "type": "feature_ids",
-            "name": "",
-            "group_ids": [],
-            "feature_ids": [
-              "EGY-1531",
-              "EGY-1536",
-              "EGY-1538"
-            ],
-            "exclude_group_ids": [],
-            "exclude_feature_ids": []
-          },
-          "resolved_feature_count_hint": 3
-        }
-      ],
-      "core_state_ids": [
-        446,
-        447,
-        452,
-        453,
-        456,
-        457,
-        552,
-        907
-      ],
+      "release_lookup_iso2": "EG",
       "resolved_feature_count_hint": 26,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Italy releasable for an Egyptian protectorate. Auto-transfers the Suez canal zone to direct Italian control."
-    },
-    {
-      "tag": "PAL",
-      "display_name": "Italian Palestine",
-      "color_hex": "#557d47",
-      "capital_state_id": 454,
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "PAL"
-      ],
-      "release_lookup_iso2": "IL",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962"
       ],
       "scenario_only": true,
+      "tag": "EGY",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 454,
+      "color_hex": "#557d47",
+      "companion_actions": [],
+      "core_state_ids": [
+        454
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Italian Palestine",
+      "entry_kind": "releasable",
+      "notes": "Italy releasable for the Italian Palestine settlement.",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "PAL"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "GAZ+00?",
           "ISR-3053",
@@ -1010,40 +995,40 @@
           "ISR-3058",
           "WEB+00?"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        454
-      ],
+      "release_lookup_iso2": "IL",
       "resolved_feature_count_hint": 8,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Italy releasable for the Italian Palestine settlement."
-    },
-    {
-      "tag": "JOR",
-      "display_name": "Italian Transjordan",
-      "color_hex": "#486b3a",
-      "capital_state_id": 455,
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "JOR"
-      ],
-      "release_lookup_iso2": "JO",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962"
       ],
       "scenario_only": true,
+      "tag": "PAL",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 455,
+      "color_hex": "#486b3a",
+      "companion_actions": [],
+      "core_state_ids": [
+        455
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Italian Transjordan",
+      "entry_kind": "releasable",
+      "notes": "Italy releasable for the Italian Transjordan settlement.",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "JOR"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "JOR-849",
           "JOR-850",
@@ -1058,40 +1043,41 @@
           "JOR-859",
           "JOR-860"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        455
-      ],
+      "release_lookup_iso2": "JO",
       "resolved_feature_count_hint": 12,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Italy releasable for the Italian Transjordan settlement."
-    },
-    {
-      "tag": "TUN",
-      "display_name": "Tunisian Protectorate",
-      "color_hex": "#638853",
-      "capital_state_id": 458,
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "release_lookup_iso2": "TN",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962"
       ],
       "scenario_only": true,
+      "tag": "JOR",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 458,
+      "color_hex": "#638853",
+      "companion_actions": [],
+      "core_state_ids": [
+        458,
+        665
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Tunisian Protectorate",
+      "entry_kind": "releasable",
+      "notes": "Italy releasable for the Tunisian protectorate settlement.",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "TUN-101",
           "TUN-102",
@@ -1117,41 +1103,43 @@
           "TUN-97",
           "TUN-98"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        458,
-        665
-      ],
+      "release_lookup_iso2": "TN",
       "resolved_feature_count_hint": 23,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Italy releasable for the Tunisian protectorate settlement."
-    },
-    {
-      "tag": "SYR",
-      "display_name": "Syrian Protectorate",
-      "color_hex": "#58724b",
-      "capital_state_id": 554,
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "SYR"
-      ],
-      "release_lookup_iso2": "SY",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962"
       ],
       "scenario_only": true,
+      "tag": "TUN",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 554,
+      "color_hex": "#58724b",
+      "companion_actions": [],
+      "core_state_ids": [
+        554,
+        677,
+        680,
+        799
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Syrian Protectorate",
+      "entry_kind": "releasable",
+      "notes": "Italy releasable for the Syrian protectorate settlement.",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "SYR"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "SYR-135",
           "SYR-136",
@@ -1168,43 +1156,40 @@
           "SYR-4843",
           "SYR-5261"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        554,
-        677,
-        680,
-        799
-      ],
+      "release_lookup_iso2": "SY",
       "resolved_feature_count_hint": 14,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Italy releasable for the Syrian protectorate settlement."
-    },
-    {
-      "tag": "LEB",
-      "display_name": "Lebanese Protectorate",
-      "color_hex": "#739766",
-      "capital_state_id": 553,
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "LEB"
-      ],
-      "release_lookup_iso2": "LB",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962"
       ],
       "scenario_only": true,
+      "tag": "SYR",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 553,
+      "color_hex": "#739766",
+      "companion_actions": [],
+      "core_state_ids": [
+        553
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Lebanese Protectorate",
+      "entry_kind": "releasable",
+      "notes": "Italy releasable for the Lebanese protectorate settlement.",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "LEB"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "LBN-3022",
           "LBN-3023",
@@ -1213,79 +1198,25 @@
           "LBN-3059",
           "LBN-3060"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        553
-      ],
+      "release_lookup_iso2": "LB",
       "resolved_feature_count_hint": 6,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Italy releasable for the Lebanese protectorate settlement."
-    },
-    {
-      "tag": "CHI",
-      "display_name": "Nanjing China",
-      "color_hex": "#4a5db3",
-      "capital_state_id": 1035,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "CHI",
-        "ENG",
-        "FRA",
-        "GXC",
-        "JAP",
-        "MAN",
-        "MEN",
-        "POR",
-        "PRC",
-        "SHX",
-        "SIK",
-        "TIB",
-        "XSM",
-        "YUN"
-      ],
-      "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
       "scenario_ids": [
-        "tno_1962",
-        "hoi4_1936",
-        "hoi4_1939"
+        "tno_1962"
       ],
       "scenario_only": true,
+      "tag": "LEB",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
-      "preset_source": {
-        "type": "feature_selection",
-        "name": "",
-        "group_ids": [
-          "CN_Jiangsu",
-          "CN_Anhui",
-          "CN_Jiangxi",
-          "CN_Henan",
-          "CN_Hubei",
-          "CN_Hunan",
-          "CN_Sichuan",
-          "CN_Chongqing"
-        ],
-        "feature_ids": [],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": [
-          "CN_CITY_17275852B35342422356290",
-          "CN_CITY_17275852B43185565483198",
-          "CN_CITY_17275852B47014980073641",
-          "CN_CITY_17275852B47950992751133",
-          "CN_CITY_17275852B74822957782790",
-          "CN_CITY_17275852B77624704817132",
-          "CN_CITY_17275852B92159102315867",
-          "CN_CITY_17275852B93800386737284"
-        ]
-      },
-      "default_boundary_variant_id": "",
       "boundary_variants": [],
+      "capital_state_id": 1035,
+      "color_hex": "#4a5db3",
       "companion_actions": [],
       "core_state_ids": [
         283,
@@ -1365,38 +1296,93 @@
         1045,
         1046
       ],
-      "resolved_feature_count_hint": 737,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the Nanjing-centered central Chinese client government."
-    },
-    {
-      "tag": "MAN",
-      "display_name": "Manchukuo",
-      "color_hex": "#ff7847",
-      "capital_state_id": 328,
+      "default_boundary_variant_id": "",
+      "display_name": "Nanjing China",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the Nanjing-centered central Chinese client government.",
       "parent_owner_tag": "JAP",
       "parent_owner_tags": [
+        "CHI",
+        "ENG",
+        "FRA",
+        "GXC",
         "JAP",
-        "MAN"
+        "MAN",
+        "MEN",
+        "POR",
+        "PRC",
+        "SHX",
+        "SIK",
+        "TIB",
+        "XSM",
+        "YUN"
       ],
+      "preset_source": {
+        "exclude_feature_ids": [
+          "CN_CITY_17275852B35342422356290",
+          "CN_CITY_17275852B43185565483198",
+          "CN_CITY_17275852B47014980073641",
+          "CN_CITY_17275852B47950992751133",
+          "CN_CITY_17275852B74822957782790",
+          "CN_CITY_17275852B77624704817132",
+          "CN_CITY_17275852B92159102315867",
+          "CN_CITY_17275852B93800386737284"
+        ],
+        "exclude_group_ids": [],
+        "feature_ids": [],
+        "group_ids": [
+          "CN_Jiangsu",
+          "CN_Anhui",
+          "CN_Jiangxi",
+          "CN_Henan",
+          "CN_Hubei",
+          "CN_Hunan",
+          "CN_Sichuan",
+          "CN_Chongqing"
+        ],
+        "name": "",
+        "type": "feature_selection"
+      },
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 737,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "CHI",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 328,
+      "color_hex": "#ff7847",
+      "companion_actions": [],
+      "core_state_ids": [
+        328,
+        610,
+        714,
+        715,
+        716,
+        717,
+        745,
+        761
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Manchukuo",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable restoring the Manchukuo owner footprint.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP",
+        "MAN"
+      ],
       "preset_source": {
-        "type": "feature_selection",
-        "name": "",
-        "group_ids": [
-          "CN_Heilongjiang",
-          "CN_Jilin",
-          "CN_Liaoning"
-        ],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "CN_CITY_17275852B22736277138860",
           "CN_CITY_17275852B65388914557323",
@@ -1445,51 +1431,53 @@
           "CN_CITY_17275852B83634722552305",
           "CN_CITY_17275852B20323770219280"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [
+          "CN_Heilongjiang",
+          "CN_Jilin",
+          "CN_Liaoning"
+        ],
+        "name": "",
+        "type": "feature_selection"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        328,
-        610,
-        714,
-        715,
-        716,
-        717,
-        745,
-        761
-      ],
-      "resolved_feature_count_hint": 235,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable restoring the Manchukuo owner footprint."
-    },
-    {
-      "tag": "MEN",
-      "display_name": "Mengjiang",
-      "color_hex": "#b9ff98",
-      "capital_state_id": 1043,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "CHI",
-        "MEN",
-        "SHX"
-      ],
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 235,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "MAN",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 1043,
+      "color_hex": "#b9ff98",
+      "companion_actions": [],
+      "core_state_ids": [
+        611,
+        612,
+        621,
+        746,
+        1039,
+        1043
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Mengjiang",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable restoring the Mengjiang owner footprint.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "CHI",
+        "MEN",
+        "SHX"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "CN_CITY_17275852B193788097700",
           "CN_CITY_17275852B22182624504514",
@@ -1510,52 +1498,36 @@
           "CN_CITY_17275852B97242903030707",
           "CN_CITY_17275852B97301454350730"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        611,
-        612,
-        621,
-        746,
-        1039,
-        1043
-      ],
-      "resolved_feature_count_hint": 18,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable restoring the Mengjiang owner footprint."
-    },
-    {
-      "tag": "NCP",
-      "display_name": "North China Political Council",
-      "color_hex": "#8f6b3a",
-      "capital_state_id": null,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [],
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 18,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "MEN",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": null,
+      "color_hex": "#8f6b3a",
+      "companion_actions": [],
+      "core_state_ids": [],
+      "default_boundary_variant_id": "",
+      "display_name": "North China Political Council",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the North China Political Council covering the North China coastal plain.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [],
       "preset_source": {
-        "type": "feature_selection",
-        "name": "",
-        "group_ids": [
-          "CN_Hebei",
-          "CN_Beijing",
-          "CN_Tianjin",
-          "CN_Shandong"
-        ],
-        "feature_ids": [],
-        "exclude_group_ids": [],
         "exclude_feature_ids": [
           "CN_CITY_17275852B20323770219280",
           "CN_CITY_17275852B21529969500985",
@@ -1566,161 +1538,149 @@
           "CN_CITY_17275852B66983384026241",
           "CN_CITY_17275852B78610390708344",
           "CN_CITY_17275852B83634722552305"
-        ]
+        ],
+        "exclude_group_ids": [],
+        "feature_ids": [],
+        "group_ids": [
+          "CN_Hebei",
+          "CN_Beijing",
+          "CN_Tianjin",
+          "CN_Shandong"
+        ],
+        "name": "",
+        "type": "feature_selection"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [],
-      "resolved_feature_count_hint": 267,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the North China Political Council covering the North China coastal plain."
-    },
-    {
-      "tag": "RGC",
-      "display_name": "Reformed Government of China",
-      "color_hex": "#b67f2a",
-      "capital_state_id": null,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [],
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 267,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "NCP",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": null,
+      "color_hex": "#b67f2a",
+      "companion_actions": [],
+      "core_state_ids": [],
+      "default_boundary_variant_id": "",
+      "display_name": "Reformed Government of China",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the lower Yangtze and southeast-coast collaboration regime.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [],
       "preset_source": {
-        "type": "hierarchy_group_ids",
-        "name": "",
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
+        "feature_ids": [],
         "group_ids": [
           "CN_Zhejiang",
           "CN_Fujian",
           "CN_Shanghai"
         ],
-        "feature_ids": [],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "name": "",
+        "type": "hierarchy_group_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [],
-      "resolved_feature_count_hint": 171,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the lower Yangtze and southeast-coast collaboration regime."
-    },
-    {
-      "tag": "GNG",
-      "display_name": "Guangdong National Government",
-      "color_hex": "#d96f4c",
-      "capital_state_id": null,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [],
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 171,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "RGC",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": null,
+      "color_hex": "#d96f4c",
+      "companion_actions": [],
+      "core_state_ids": [],
+      "default_boundary_variant_id": "",
+      "display_name": "Guangdong National Government",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the Guangdong-Hainan south-coast client state.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [],
       "preset_source": {
-        "type": "hierarchy_group_ids",
-        "name": "",
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
+        "feature_ids": [],
         "group_ids": [
           "CN_Guangdong",
           "CN_Hainan"
         ],
-        "feature_ids": [],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "name": "",
+        "type": "hierarchy_group_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [],
-      "resolved_feature_count_hint": 113,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the Guangdong-Hainan south-coast client state."
-    },
-    {
-      "tag": "YUN",
-      "display_name": "Yunnan",
-      "color_hex": "#729450",
-      "capital_state_id": 325,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "YUN"
-      ],
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 113,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "GNG",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
-      "preset_source": {
-        "type": "hierarchy_group_ids",
-        "name": "",
-        "group_ids": [
-          "CN_Yunnan",
-          "CN_Guizhou"
-        ],
-        "feature_ids": [],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
-      },
-      "default_boundary_variant_id": "",
       "boundary_variants": [],
+      "capital_state_id": 325,
+      "color_hex": "#729450",
       "companion_actions": [],
       "core_state_ids": [
         325,
         747
       ],
-      "resolved_feature_count_hint": 208,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the southwestern Yunnan sphere including Guizhou."
-    },
-    {
-      "tag": "GXC",
-      "display_name": "Guangxi Clique",
-      "color_hex": "#477161",
-      "capital_state_id": 594,
+      "default_boundary_variant_id": "",
+      "display_name": "Yunnan",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the southwestern Yunnan sphere including Guizhou.",
       "parent_owner_tag": "JAP",
       "parent_owner_tags": [
-        "GXC"
+        "YUN"
       ],
+      "preset_source": {
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
+        "feature_ids": [],
+        "group_ids": [
+          "CN_Yunnan",
+          "CN_Guizhou"
+        ],
+        "name": "",
+        "type": "hierarchy_group_ids"
+      },
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 208,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "YUN",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
-      "preset_source": {
-        "type": "hierarchy_group_ids",
-        "name": "",
-        "group_ids": [
-          "CN_Guangxi"
-        ],
-        "feature_ids": [],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
-      },
-      "default_boundary_variant_id": "",
       "boundary_variants": [],
+      "capital_state_id": 594,
+      "color_hex": "#477161",
       "companion_actions": [],
       "core_state_ids": [
         591,
@@ -1730,37 +1690,60 @@
         599,
         1033
       ],
-      "resolved_feature_count_hint": 87,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the Guangxi client clique."
-    },
-    {
-      "tag": "SHX",
-      "display_name": "Shanxi",
-      "color_hex": "#52020f",
-      "capital_state_id": 615,
+      "default_boundary_variant_id": "",
+      "display_name": "Guangxi Clique",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the Guangxi client clique.",
       "parent_owner_tag": "JAP",
       "parent_owner_tags": [
-        "MEN",
-        "SHX"
+        "GXC"
       ],
+      "preset_source": {
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
+        "feature_ids": [],
+        "group_ids": [
+          "CN_Guangxi"
+        ],
+        "name": "",
+        "type": "hierarchy_group_ids"
+      },
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 87,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "GXC",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 615,
+      "color_hex": "#52020f",
+      "companion_actions": [],
+      "core_state_ids": [
+        615,
+        621,
+        746,
+        1043
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Shanxi",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the northern inland Shanxi-Shaanxi collaboration regime.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "MEN",
+        "SHX"
+      ],
       "preset_source": {
-        "type": "feature_selection",
-        "name": "",
-        "group_ids": [
-          "CN_Shanxi",
-          "CN_Shaanxi"
-        ],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "CN_CITY_17275852B12777490029839",
           "CN_CITY_17275852B17909208638027",
@@ -1793,45 +1776,41 @@
           "CN_CITY_17275852B94979203224281",
           "CN_CITY_17275852B97961566945863"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [
+          "CN_Shanxi",
+          "CN_Shaanxi"
+        ],
+        "name": "",
+        "type": "feature_selection"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        615,
-        621,
-        746,
-        1043
-      ],
-      "resolved_feature_count_hint": 234,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the northern inland Shanxi-Shaanxi collaboration regime."
-    },
-    {
-      "tag": "SIC",
-      "display_name": "Xikang-Tibet Administration",
-      "color_hex": "#4e6f8a",
-      "capital_state_id": 1037,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [],
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 234,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "SHX",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 1037,
+      "color_hex": "#4e6f8a",
+      "companion_actions": [],
+      "core_state_ids": [],
+      "default_boundary_variant_id": "",
+      "display_name": "Xikang-Tibet Administration",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the Xikang-Tibet frontier administration.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [],
       "preset_source": {
-        "type": "feature_selection",
-        "name": "",
-        "group_ids": [
-          "CN_Tibet"
-        ],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "CN_CITY_17275852B35342422356290",
           "CN_CITY_17275852B43185565483198",
@@ -1842,40 +1821,40 @@
           "CN_CITY_17275852B92159102315867",
           "CN_CITY_17275852B93800386737284"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [
+          "CN_Tibet"
+        ],
+        "name": "",
+        "type": "feature_selection"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [],
-      "resolved_feature_count_hint": 86,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the Xikang-Tibet frontier administration."
-    },
-    {
-      "tag": "GMA",
-      "display_name": "Gansu Ma Clique",
-      "color_hex": "#a16a39",
-      "capital_state_id": null,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [],
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 86,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "SIC",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": null,
+      "color_hex": "#a16a39",
+      "companion_actions": [],
+      "core_state_ids": [],
+      "default_boundary_variant_id": "",
+      "display_name": "Gansu Ma Clique",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the Gansu-Ningxia Ma sphere after retiring XSM.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [],
       "preset_source": {
-        "type": "feature_selection",
-        "name": "",
-        "group_ids": [
-          "CN_Gansu"
-        ],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "CN_CITY_17275852B1612458148205",
           "CN_CITY_17275852B2020769088678",
@@ -1902,110 +1881,123 @@
           "CN_CITY_17275852B89567569086781",
           "CN_CITY_17275852B92852559512567"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [
+          "CN_Gansu"
+        ],
+        "name": "",
+        "type": "feature_selection"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [],
-      "resolved_feature_count_hint": 107,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the Gansu-Ningxia Ma sphere after retiring XSM."
-    },
-    {
-      "tag": "QMA",
-      "display_name": "Qinghai Ma Clique",
-      "color_hex": "#6f8e4a",
-      "capital_state_id": null,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [],
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 107,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "GMA",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": null,
+      "color_hex": "#6f8e4a",
+      "companion_actions": [],
+      "core_state_ids": [],
+      "default_boundary_variant_id": "",
+      "display_name": "Qinghai Ma Clique",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the Qinghai Ma sphere.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [],
       "preset_source": {
-        "type": "hierarchy_group_ids",
-        "name": "",
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
+        "feature_ids": [],
         "group_ids": [
           "CN_Qinghai"
         ],
-        "feature_ids": [],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "name": "",
+        "type": "hierarchy_group_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [],
-      "resolved_feature_count_hint": 41,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the Qinghai Ma sphere."
-    },
-    {
-      "tag": "XIN",
-      "display_name": "Xinjiang",
-      "color_hex": "#47be98",
-      "capital_state_id": null,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [],
       "release_lookup_iso2": "CN",
-      "entry_kind": "releasable",
+      "resolved_feature_count_hint": 41,
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "QMA",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": null,
+      "color_hex": "#47be98",
+      "companion_actions": [],
+      "core_state_ids": [],
+      "default_boundary_variant_id": "",
+      "display_name": "Xinjiang",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the fragmented Xinjiang client regime.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [],
       "preset_source": {
-        "type": "hierarchy_group_ids",
-        "name": "",
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
+        "feature_ids": [],
         "group_ids": [
           "CN_Xinjiang"
         ],
-        "feature_ids": [],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "name": "",
+        "type": "hierarchy_group_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [],
+      "release_lookup_iso2": "CN",
       "resolved_feature_count_hint": 87,
-      "validation_status": "ok",
+      "scenario_ids": [
+        "tno_1962",
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "scenario_only": true,
+      "tag": "XIN",
       "validation_errors": [],
-      "notes": "Japanese victory releasable for the fragmented Xinjiang client regime."
+      "validation_status": "ok"
     },
     {
-      "tag": "PHI",
-      "display_name": "Philippines",
-      "color_hex": "#4297ea",
+      "allow_manual_overlay": true,
+      "boundary_variants": [],
       "capital_state_id": 327,
+      "color_hex": "#4297ea",
+      "companion_actions": [],
+      "core_state_ids": [
+        327,
+        623,
+        624,
+        625,
+        626,
+        627,
+        628,
+        1025,
+        1026,
+        1027
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Philippines",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the Philippine client republic.",
       "parent_owner_tag": "JAP",
       "parent_owner_tags": [
         "PHI"
       ],
-      "release_lookup_iso2": "PH",
-      "entry_kind": "releasable",
-      "scenario_ids": [
-        "tno_1962",
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "scenario_only": true,
-      "allow_manual_overlay": true,
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "PHL-2511",
           "PHL-2513",
@@ -2125,51 +2117,50 @@
           "PHL-5559",
           "PHL-5560"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        327,
-        623,
-        624,
-        625,
-        626,
-        627,
-        628,
-        1025,
-        1026,
-        1027
-      ],
+      "release_lookup_iso2": "PH",
       "resolved_feature_count_hint": 117,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the Philippine client republic."
-    },
-    {
-      "tag": "INS",
-      "display_name": "Indonesia",
-      "color_hex": "#bf7f36",
-      "capital_state_id": 335,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "INS"
-      ],
-      "release_lookup_iso2": "ID",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "PHI",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 335,
+      "color_hex": "#bf7f36",
+      "companion_actions": [],
+      "core_state_ids": [
+        334,
+        335,
+        667,
+        668,
+        669,
+        672,
+        673,
+        738,
+        1022
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Indonesia",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for the Indonesian archipelago client state.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "INS"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "ID_ADM1_65028918B10722647473585",
           "ID_ADM1_65028918B11286430647546",
@@ -2206,51 +2197,47 @@
           "ID_ADM1_65028918B98829509874887",
           "ID_ADM1_65028918B99918739720671"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        334,
-        335,
-        667,
-        668,
-        669,
-        672,
-        673,
-        738,
-        1022
-      ],
+      "release_lookup_iso2": "ID",
       "resolved_feature_count_hint": 34,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for the Indonesian archipelago client state."
-    },
-    {
-      "tag": "MAL",
-      "display_name": "Malaya",
-      "color_hex": "#bf2b56",
-      "capital_state_id": 336,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "ENG",
-        "MAL"
-      ],
-      "release_lookup_iso2": "MY",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "INS",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 336,
+      "color_hex": "#bf2b56",
+      "companion_actions": [],
+      "core_state_ids": [
+        333,
+        336,
+        1021,
+        1023,
+        1024
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Malaya",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for Malaya and its attached dependencies.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "ENG",
+        "MAL"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "BN_ADM1_BRN-1181",
           "BN_ADM1_BRN-1182",
@@ -2278,46 +2265,50 @@
           "SGP-4874",
           "SGP-4875"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        333,
-        336,
-        1021,
-        1023,
-        1024
-      ],
+      "release_lookup_iso2": "MY",
       "resolved_feature_count_hint": 25,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for Malaya and its attached dependencies."
-    },
-    {
-      "tag": "BRM",
-      "display_name": "Burma",
-      "color_hex": "#a12e4f",
-      "capital_state_id": 995,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "BRM"
-      ],
-      "release_lookup_iso2": "MM",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "MAL",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 995,
+      "color_hex": "#a12e4f",
+      "companion_actions": [],
+      "core_state_ids": [
+        288,
+        640,
+        993,
+        994,
+        995,
+        996,
+        997,
+        998,
+        999
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Burma",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for Burma.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "BRM"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "MMR-2473",
           "MMR-3266",
@@ -2334,50 +2325,44 @@
           "MMR-3296",
           "MMR-3302"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        288,
-        640,
-        993,
-        994,
-        995,
-        996,
-        997,
-        998,
-        999
-      ],
+      "release_lookup_iso2": "MM",
       "resolved_feature_count_hint": 14,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for Burma."
-    },
-    {
-      "tag": "VIN",
-      "display_name": "Vietnam",
-      "color_hex": "#6595ea",
-      "capital_state_id": 671,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "release_lookup_iso2": "VN",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "BRM",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 671,
+      "color_hex": "#6595ea",
+      "companion_actions": [],
+      "core_state_ids": [
+        286,
+        671,
+        1017
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Vietnam",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for Vietnam after separating Laos and Cambodia.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "FRA"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "VNM-429",
           "VNM-444",
@@ -2443,44 +2428,42 @@
           "VNM-512",
           "VNM-5483"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        286,
-        671,
-        1017
-      ],
+      "release_lookup_iso2": "VN",
       "resolved_feature_count_hint": 63,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for Vietnam after separating Laos and Cambodia."
-    },
-    {
-      "tag": "LAO",
-      "display_name": "Laos",
-      "color_hex": "#b06688",
-      "capital_state_id": 670,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "release_lookup_iso2": "LA",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "VIN",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 670,
+      "color_hex": "#b06688",
+      "companion_actions": [],
+      "core_state_ids": [
+        670
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Laos",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for Laos split from the Indochina block.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "FRA"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "LAO-3271",
           "LAO-3272",
@@ -2500,42 +2483,42 @@
           "LAO-3294",
           "LAO-3295"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        670
-      ],
+      "release_lookup_iso2": "LA",
       "resolved_feature_count_hint": 17,
-      "validation_status": "ok",
-      "validation_errors": [],
-      "notes": "Japanese victory releasable for Laos split from the Indochina block."
-    },
-    {
-      "tag": "CAM",
-      "display_name": "Cambodia",
-      "color_hex": "#644796",
-      "capital_state_id": 741,
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "release_lookup_iso2": "KH",
-      "entry_kind": "releasable",
       "scenario_ids": [
         "tno_1962",
         "hoi4_1936",
         "hoi4_1939"
       ],
       "scenario_only": true,
+      "tag": "LAO",
+      "validation_errors": [],
+      "validation_status": "ok"
+    },
+    {
       "allow_manual_overlay": true,
+      "boundary_variants": [],
+      "capital_state_id": 741,
+      "color_hex": "#644796",
+      "companion_actions": [],
+      "core_state_ids": [
+        741
+      ],
+      "default_boundary_variant_id": "",
+      "display_name": "Cambodia",
+      "entry_kind": "releasable",
+      "notes": "Japanese victory releasable for Cambodia split from the Indochina block.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "FRA"
+      ],
       "preset_source": {
-        "type": "feature_ids",
-        "name": "",
-        "group_ids": [],
+        "exclude_feature_ids": [],
+        "exclude_group_ids": [],
         "feature_ids": [
           "KHM-1777",
           "KHM-1778",
@@ -2562,25 +2545,34 @@
           "KHM-1801",
           "KHM-1802"
         ],
-        "exclude_group_ids": [],
-        "exclude_feature_ids": []
+        "group_ids": [],
+        "name": "",
+        "type": "feature_ids"
       },
-      "default_boundary_variant_id": "",
-      "boundary_variants": [],
-      "companion_actions": [],
-      "core_state_ids": [
-        741
-      ],
+      "release_lookup_iso2": "KH",
       "resolved_feature_count_hint": 24,
-      "validation_status": "ok",
+      "scenario_ids": [
+        "tno_1962",
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "scenario_only": true,
+      "tag": "CAM",
       "validation_errors": [],
-      "notes": "Japanese victory releasable for Cambodia split from the Indochina block."
+      "validation_status": "ok"
     }
   ],
   "excluded": [],
+  "generated_at": "2026-03-20T22:00:38.494707+00:00",
+  "scenario_ids": [
+    "tno_1962",
+    "hoi4_1936",
+    "hoi4_1939"
+  ],
   "summary": {
     "entry_count": 32,
     "excluded_count": 0,
     "validation_error_count": 0
-  }
+  },
+  "version": 1
 }

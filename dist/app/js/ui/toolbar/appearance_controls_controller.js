@@ -629,6 +629,7 @@ export function createAppearanceControlsController({
       if (!normalized) return;
       const btn = document.createElement("button");
       btn.className = "color-swatch";
+      btn.classList.toggle("is-selected", normalized === runtimeState.selectedColor);
       btn.type = "button";
       btn.dataset.color = normalized;
       btn.style.backgroundColor = normalized;
