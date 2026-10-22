@@ -1165,6 +1165,50 @@ test("published GPU tiles survive overlapping candidate cancellation and switch 
   assert.ok(gpu.tileSets.at(-1).every(tile => tile.marker !== "stale"));
 });
 
+test("published and overview palettes replay explicit dirty IDs and fall back to full resolution", async t => {
+  const overviewFactory = makeGpuFactory(), primaryFactory = makeGpuFactory();
+  const createGpu = options => {
+    const gpu = primaryFactory.createGpu(options);
+    gpu.createOverview = ({ tiles, palette, revision }) => {
+      const child = overviewFactory.createGpu({ onContextLost() {} });
+      child.setPalette(palette, revision); child.setTiles(tiles); return child;
+    };
+    return gpu;
+  };
+  const colors = { a: "#123456", b: "#654321", c: "#0a0b0c" }, resolved = [];
+  let changed = null;
+  const f = fixture({ displayMode: "raster", directPresentation: true, createGpu,
+    features: [feature("a", null), feature("b", null), feature("c", null)],
+    resolveColor: (_feature, id) => { resolved.push(id); return colors[id]; } });
+  t.after(() => f.owner.dispose());
+  f.identity.colorScope = "table-1";
+  f.h.getChangedColorIds = () => changed;
+  f.owner.draw(); await resolveAll(f); f.owner.draw();
+  const gpu = primaryFactory.instances[0], overview = f.owner.getOverviewFrame();
+  assert.ok(f.owner.getDirectFrame()); assert.ok(overview);
+  const rgba = color => [1, 3, 5].map(index => parseInt(color.slice(index, index + 2), 16)).concat(255);
+  const assertPalette = bytes => {
+    for (const [code, id] of [[1, "a"], [2, "b"], [3, "c"]]) {
+      assert.deepEqual([...bytes.slice(code * 4, code * 4 + 4)], rgba(colors[id]), `palette color for ${id}`);
+    }
+  };
+
+  resolved.length = 0;
+  colors.a = "#abcdef"; changed = ["a"]; f.identity.colorVersion++;
+  f.owner.draw();
+  assert.ok(resolved.length > 0);
+  assert.deepEqual([...new Set(resolved)], ["a"], "a dirty-ID edit must not re-resolve unchanged IDs");
+  assertPalette(gpu.palettes.findLast(entry => entry.revision.startsWith("published:")).bytes);
+  assertPalette(overview.gpu.palettes.at(-1).bytes);
+
+  resolved.length = 0;
+  colors.b = "#fedcba"; changed = null; f.identity.colorScope = "table-2"; f.identity.colorVersion++;
+  f.owner.draw();
+  assert.deepEqual([...new Set(resolved)].sort(), ["a", "b", "c"], "a full refresh breaks the dirty-ID chain");
+  assertPalette(gpu.palettes.findLast(entry => entry.revision.startsWith("published:")).bytes);
+  assertPalette(overview.gpu.palettes.at(-1).bytes);
+});
+
 test("retained palette follows edit undo redo while omitted visible IDs stay opaque", async t => {
   const colors = { a: "#123456", b: "#654321" }, history = [];
   const f = fixture({ displayMode: "raster", directPresentation: true,

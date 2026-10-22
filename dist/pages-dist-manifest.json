@@ -51877,7 +51877,7 @@
     },
     {
       "path": "app/js/ui/dev_workspace.js",
-      "size_bytes": 40240,
+      "size_bytes": 40379,
       "source_kind": "dist"
     },
     {
@@ -51952,7 +51952,7 @@
     },
     {
       "path": "app/js/ui/sidebar.js",
-      "size_bytes": 176159,
+      "size_bytes": 176201,
       "source_kind": "dist"
     },
     {
@@ -52027,7 +52027,7 @@
     },
     {
       "path": "app/js/ui/toolbar.js",
-      "size_bytes": 131983,
+      "size_bytes": 132465,
       "source_kind": "dist"
     },
     {
@@ -52047,7 +52047,7 @@
     },
     {
       "path": "app/js/ui/toolbar/appearance_controls_controller.js",
-      "size_bytes": 41077,
+      "size_bytes": 41163,
       "source_kind": "dist"
     },
     {
@@ -79136,5 +79136,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 1031383859
+  "total_bytes": 1031384608
 }

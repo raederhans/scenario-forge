@@ -10,6 +10,8 @@ import { createPoliticalIdRasterAssetStore, encodePoliticalIdRasterAsset } from 
 import { queryPoliticalIdRasterCandidates } from "./political_id_raster_pick.js";
 
 const GPU_LIMIT = 80 * 1024 * 1024;
+const MAX_COLOR_DELTAS = 32;
+const NO_ENTRIES = Object.freeze([]);
 const projectionMethods = ["scale", "translate", "center", "rotate", "angle", "reflectX", "reflectY", "precision", "clipAngle", "clipExtent"];
 
 function matchesTileRegion(tile, descriptor) {
@@ -145,6 +147,12 @@ export function createPoliticalIdRasterRuntimeOwner({
     }, resolveColor: h.resolveColor });
   const resourceOwner = Symbol("political-id-raster");
   let snapshot = null, sourceVersion = null, paletteVersion = null, colorScope = null, namespace = null;
+  // Explicit dirty-ID palette edits of one accepted source. Published and
+  // overview palettes may replay an unbroken chain from their own version; a
+  // full refresh, scope change or replaced snapshot forces full resolution.
+  let sourceGeneration = 0, colorDeltas = [];
+  let publishedColorState = null, overviewColorState = null;
+  const entryIndexes = new WeakMap();
   let gpu = null, active = null, plan = null, disposed = false, failed = "";
   let gpuTiles = [];
   let renderedCoverage = null;
@@ -373,12 +381,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       foregroundSyncRequested = false;
     }
     if ((!changed && !deferredForegroundOrder) || previewOrder) {
-      if (paletteVersion !== identity.colorVersion) {
-        const changedIds = identity.colorScope != null && identity.colorScope === colorScope
-          ? h.getChangedColorIds?.() ?? null : null;
-        snapshot = source.updateColors(changedIds, { colorRevision: identity.colorVersion });
-        paletteVersion = identity.colorVersion; colorScope = identity.colorScope;
-      }
+      if (paletteVersion !== identity.colorVersion) updateSourceColors(identity);
       rawIdentity = raw;
       account();
       return true;
@@ -425,7 +428,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         else stats.geometryInvalidations += cache.invalidate(next.dirtyBounds).length;
         attempted.clear(); planKey = "";
       }
-      coordinates = nextCoordinates; snapshot = next;
+      coordinates = nextCoordinates; snapshot = next; sourceGeneration++; colorDeltas = [];
       codeToId = new Map(next.entries.map(entry => [entry.code, entry.id]));
       namespace = nextNamespace; sourceVersion = identity.version;
       paletteVersion = identity.colorVersion; colorScope = identity.colorScope;
@@ -514,21 +517,14 @@ export function createPoliticalIdRasterRuntimeOwner({
         attempted.clear();
         planKey = "";
       }
-      snapshot = next;
+      snapshot = next; sourceGeneration++; colorDeltas = [];
       codeToId = new Map(snapshot.entries.map(entry => [entry.code, entry.id]));
       namespace = nextNamespace;
       sourceVersion = identity.version;
       paletteVersion = identity.colorVersion;
       colorScope = identity.colorScope;
     } else if (paletteVersion !== identity.colorVersion) {
-      // Only a caller-owned complete dirty set in the same palette namespace
-      // may narrow color resolution. Table replacement/ocean/style changes fall
-      // back to a full palette refresh even if an older local dirty set exists.
-      const changedIds = identity.colorScope != null && identity.colorScope === colorScope
-        ? h.getChangedColorIds?.() ?? null : null;
-      snapshot = source.updateColors(changedIds, { colorRevision: identity.colorVersion });
-      paletteVersion = identity.colorVersion;
-      colorScope = identity.colorScope;
+      updateSourceColors(identity);
     }
     rawIdentity = raw;
     fittedProjectionKey = nextFitKey;
@@ -1003,6 +999,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         if (directFrame) retainPublishedFrame();
         stagedRejectionReason = "";
         stagedFrame = { tiles, palette: snapshot.palette, entries: snapshot.entries, paletteKey,
+          colorState: currentColorState(paletteVersion),
           gpuPreparation: gpuPreparation?.status === "ready" ? gpuPreparation : null, gpuKey: gpuCandidateKey(),
           committed: nextCommittedPlan, result,
           frame: { gpu, plan, transform: { ...state.zoomTransform }, dpr: state.dpr,
@@ -1053,6 +1050,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       const tilesDoneAt = performance.now();
       publishedEntries = staged.entries;
       publishedPalette = staged.palette.slice();
+      publishedColorState = staged.colorState;
       publishedBaselinePalette = publishedPalette;
       publishedPaletteKey = staged.paletteKey;
       publishedResult = staged.result;
@@ -1107,10 +1105,59 @@ export function createPoliticalIdRasterRuntimeOwner({
     }
   }
 
-  function resolvePublishedPalette(entries, palette) {
+  // Only a caller-owned complete dirty set in the same palette namespace
+  // may narrow color resolution. Table replacement/ocean/style changes fall
+  // back to a full palette refresh even if an older local dirty set exists.
+  function updateSourceColors(identity) {
+    const changedIds = identity.colorScope != null && identity.colorScope === colorScope
+      ? h.getChangedColorIds?.() ?? null : null;
+    snapshot = source.updateColors(changedIds, { colorRevision: identity.colorVersion });
+    if (Array.isArray(changedIds)) {
+      colorDeltas.push({ from: paletteVersion, to: identity.colorVersion, ids: changedIds.slice() });
+      if (colorDeltas.length > MAX_COLOR_DELTAS) colorDeltas.shift();
+    } else {
+      colorDeltas = [];
+    }
+    paletteVersion = identity.colorVersion; colorScope = identity.colorScope;
+  }
+
+  function currentColorState(colorVersion) {
+    return { version: colorVersion, generation: sourceGeneration };
+  }
+
+  // IDs changed since a palette's own color state, or null when no unbroken
+  // explicit chain within the current source reaches the requested version.
+  function collectColorDeltaIds(colorState, colorVersion) {
+    if (!colorState || colorState.generation !== sourceGeneration) return null;
+    if (colorState.version === colorVersion) return [];
+    let version = colorState.version, ids = null;
+    for (const delta of colorDeltas) {
+      if (!ids) {
+        if (delta.from !== version) continue;
+        ids = new Set();
+      } else if (delta.from !== version) return null;
+      for (const id of delta.ids) ids.add(id);
+      version = delta.to;
+      if (version === colorVersion) return [...ids];
+    }
+    return null;
+  }
+
+  function getEntryIndex(entries) {
+    let index = entryIndexes.get(entries);
+    if (!index) {
+      index = new Map(entries.map(entry => [entry.id, entry]));
+      entryIndexes.set(entries, index);
+    }
+    return index;
+  }
+
+  function resolvePublishedPalette(entries, palette, changedIds = null) {
     const colors = palette.slice();
-    const currentEntries = new Map((snapshot?.entries || []).map(entry => [entry.id, entry]));
-    for (const entry of entries) {
+    const currentEntries = getEntryIndex(snapshot?.entries || NO_ENTRIES);
+    const publishedIndex = changedIds ? getEntryIndex(entries) : null;
+    const targets = changedIds ? changedIds.map(id => publishedIndex.get(id)).filter(Boolean) : entries;
+    for (const entry of targets) {
       const color = h.resolveColor(currentEntries.get(entry.id)?.feature || entry.feature, entry.id);
       const rgba = typeof color === "string" && /^#[\da-f]{6}$/i.test(color)
         ? [parseInt(color.slice(1, 3), 16), parseInt(color.slice(3, 5), 16), parseInt(color.slice(5, 7), 16), 255] : color;
@@ -1153,16 +1200,18 @@ export function createPoliticalIdRasterRuntimeOwner({
       presentationState: "overview", geometryCurrent: false };
     overviewCommitted = staged.committed;
     overviewEntries = staged.entries; overviewPalette = staged.palette.slice(); overviewBaselinePalette = overviewPalette; overviewPaletteKey = staged.paletteKey;
+    overviewColorState = staged.colorState;
     overviewReason = "ready";
   }
 
-  function refreshOverviewPalette() {
+  function refreshOverviewPalette(colorVersion = h.getSourceIdentity().colorVersion) {
     if (!overviewFrame?.gpu.isAvailable()) return;
-    const key = `${namespace}:${snapshot?.paletteRevision}:${h.getSourceIdentity().colorVersion}`;
+    const key = `${namespace}:${snapshot?.paletteRevision}:${colorVersion}`;
     if (key === overviewPaletteKey) return;
-    const colors = resolvePublishedPalette(overviewEntries, overviewPalette);
+    const colors = resolvePublishedPalette(overviewEntries, overviewPalette,
+      collectColorDeltaIds(overviewColorState, colorVersion));
     overviewFrame.gpu.setPalette(colors, `overview:${key}`);
-    overviewPalette = colors; overviewPaletteKey = key;
+    overviewPalette = colors; overviewPaletteKey = key; overviewColorState = currentColorState(colorVersion);
     overviewFrame.paletteRevision = snapshot.paletteRevision;
   }
 
@@ -1176,16 +1225,18 @@ export function createPoliticalIdRasterRuntimeOwner({
   }
 
   function retainPublishedFrame() {
-    refreshOverviewPalette();
+    const { colorVersion } = h.getSourceIdentity();
+    refreshOverviewPalette(colorVersion);
     const frame = getDirectFrame();
     if (!frame) return null;
-    const key = `${namespace}:${snapshot?.paletteRevision}:${h.getSourceIdentity().colorVersion}`;
+    const key = `${namespace}:${snapshot?.paletteRevision}:${colorVersion}`;
     if (key !== publishedPaletteKey) {
       // Resolve the published ID set itself: a candidate may omit a still-visible
       // old ID, whose zero alpha in the candidate palette must not punch a hole.
-      const colors = resolvePublishedPalette(publishedEntries, publishedPalette);
+      const colors = resolvePublishedPalette(publishedEntries, publishedPalette,
+        collectColorDeltaIds(publishedColorState, colorVersion));
       gpu.setPalette(colors, `published:${key}`);
-      publishedPalette = colors; publishedPaletteKey = key;
+      publishedPalette = colors; publishedPaletteKey = key; publishedColorState = currentColorState(colorVersion);
       frame.paletteRevision = snapshot?.paletteRevision || 0;
     }
     frame.presentationState = "retained";
@@ -1231,9 +1282,9 @@ export function createPoliticalIdRasterRuntimeOwner({
     const baseline = overview ? overviewBaselinePalette : publishedBaselinePalette;
     const entries = overview ? overviewEntries : publishedEntries;
     const featureId = String(id ?? "").trim();
-    const entry = entries.find(value => value.id === featureId);
+    const entry = getEntryIndex(entries).get(featureId);
     if (!baseline || !entry) return false;
-    const current = snapshot?.entries.find(value => value.id === featureId) || entry;
+    const current = getEntryIndex(snapshot?.entries || NO_ENTRIES).get(featureId) || entry;
     const color = h.resolveColor(current.feature, featureId);
     const rgba = typeof color === "string" && /^#[\da-f]{6}$/i.test(color)
       ? [parseInt(color.slice(1, 3), 16), parseInt(color.slice(3, 5), 16), parseInt(color.slice(5, 7), 16), 255] : color;
@@ -1349,7 +1400,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       tileIdentities = new WeakMap();
       committedPlan = null;
       renderedCoverage = null;
-      snapshot = null;
+      snapshot = null; sourceGeneration++; colorDeltas = [];
       plan = null;
       resourceBudget?.release(resourceOwner);
     },

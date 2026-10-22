@@ -687,6 +687,8 @@ function initDevWorkspace() {
   runtimeState.ui.devWorkspaceCategory = normalizeDevWorkspaceCategory(runtimeState.ui.devWorkspaceCategory);
 
   const renderWorkspace = () => {
+    // Collapsed panel and quickbar show nothing; setExpandedState renders on open.
+    if (!runtimeState.ui.devWorkspaceExpanded) return;
     let activeDevCategory = normalizeDevWorkspaceCategory(runtimeState.ui.devWorkspaceCategory);
     runtimeState.ui.devWorkspaceCategory = activeDevCategory;
 

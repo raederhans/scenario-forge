@@ -15182,7 +15182,7 @@ function handleMouseMove(event) {
 }
 
 function addRecentColor(color) {
-  if (!color) return;
+  if (!color || runtimeState.recentColors[0] === color) return;
   runtimeState.recentColors = runtimeState.recentColors.filter((value) => value !== color);
   runtimeState.recentColors.unshift(color);
   if (runtimeState.recentColors.length > 4) {
