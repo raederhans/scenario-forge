@@ -6707,7 +6707,7 @@ export const STATE_MUTATION_DELEGATING_OWNER_CONTRACT = Object.freeze([
   "compositionSourceFingerprint": "373e42f7fa8b9101bbd7fd7da4d86dcad1fd6fadba685f3ede8c574b52241a1e",
   "factoryModulePath": "js/core/renderer/projected_geometry_bounds_owner.js",
   "factoryExportName": "createProjectedGeometryBoundsOwner",
-  "factorySourceFingerprint": "1cd5ff43a6cb90067f898ecf8412e86cee1c8fed2ca6bdf1e65b1ff0dcd23e21",
+  "factorySourceFingerprint": "d056172ac8d380a45168fe66c4f60afaf0e10ca237fdfba2832de63bf1a1a129",
   "ownerBindingName": "projectedGeometryBoundsOwner",
   "methods": [
     "computeProjectedCoordinateBounds",

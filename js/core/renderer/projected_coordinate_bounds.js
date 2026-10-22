@@ -49,3 +49,45 @@ export function computeProjectedCoordinateBounds(projection, geoObject) {
   visitGeometry(geoObject);
   return buildProjectedBounds(minX, minY, maxX, maxY);
 }
+
+function collectGeometries(geoObject, out) {
+  if (!geoObject || typeof geoObject !== "object") return false;
+  if (geoObject.type === "FeatureCollection") {
+    return Array.isArray(geoObject.features) && geoObject.features.every((feature) => collectGeometries(feature, out));
+  }
+  if (geoObject.type === "Feature") return collectGeometries(geoObject.geometry, out);
+  if (geoObject.type === "GeometryCollection") {
+    return Array.isArray(geoObject.geometries) && geoObject.geometries.every((geometry) => collectGeometries(geometry, out));
+  }
+  if (!Array.isArray(geoObject.coordinates)) return false;
+  out.push(geoObject.coordinates);
+  return true;
+}
+
+// True when every vertex is a valid non-polar lon/lat and all of them fit in a
+// longitude span under 180 degrees. D3 reports world bounds only for a polygon
+// whose ring area accumulates negative (an inverted complement); inside such a
+// span that polygon's geoArea is 4π minus less than 2π, so the area check
+// already rejects it and geoBounds cannot change the verdict.
+export function isCompactLonLatGeometry(geoObject) {
+  const stack = [];
+  if (!collectGeometries(geoObject, stack)) return false;
+  let minLon = Infinity;
+  let maxLon = -Infinity;
+  while (stack.length) {
+    const value = stack.pop();
+    if (typeof value[0] === "number") {
+      const lon = value[0];
+      const lat = value[1];
+      if (!(lon >= -180 && lon <= 180 && lat > -90 && lat < 90)) return false;
+      if (lon < minLon) minLon = lon;
+      if (lon > maxLon) maxLon = lon;
+      continue;
+    }
+    for (const item of value) {
+      if (!Array.isArray(item)) return false;
+      stack.push(item);
+    }
+  }
+  return maxLon - minLon < 180;
+}

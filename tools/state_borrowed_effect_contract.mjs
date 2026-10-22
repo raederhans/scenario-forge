@@ -230,7 +230,7 @@ const callbackInjectionDefinitions =[
       "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
       "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78",
-      "js/core/river_paint/pilot_manifest.js": "e63d24879c44b189d94914f108fdfe5f5f22d52709701b4f753dbe9611711cd9",
+      "js/core/river_paint/pilot_manifest.js": "4c072ddef2346016db47411891374ced1f7e5190b5fa7b350d8a765f267a0d60",
       "js/core/renderer/political_collection_owner.js": "312e201f1d7b683af0777a003ffc8219889ed2e0606a610f1023ccf6392a78aa",
       "js/core/renderer/political_feature_policy.js": "43a3eba1061b38f6609b533a588ce12876ae315d87d2b75aee395d61786d4a6f",
       "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
@@ -260,7 +260,7 @@ const callbackInjectionDefinitions =[
       "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
       "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
       "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78",
-      "js/core/river_paint/pilot_manifest.js": "e63d24879c44b189d94914f108fdfe5f5f22d52709701b4f753dbe9611711cd9",
+      "js/core/river_paint/pilot_manifest.js": "4c072ddef2346016db47411891374ced1f7e5190b5fa7b350d8a765f267a0d60",
       "js/core/renderer/political_collection_owner.js": "312e201f1d7b683af0777a003ffc8219889ed2e0606a610f1023ccf6392a78aa",
       "js/core/renderer/political_feature_policy.js": "43a3eba1061b38f6609b533a588ce12876ae315d87d2b75aee395d61786d4a6f",
       "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
@@ -316,11 +316,11 @@ const callbackInjectionDefinitions =[
       "getRenderPerfMetricsRuntimeOwner"
     ],
     "sourceFingerprints": {
-      "js/core/renderer/projected_coordinate_bounds.js": "ab6d6f787880c11b84f4d685d163b35502073259220c7460d691ac23aa6d8ec8",
+      "js/core/renderer/projected_coordinate_bounds.js": "e6fb2ae1289c8aae16988fe470920b98c1a19bc867a670faff37abaac2925774",
       "js/core/renderer/water_sanitization_snapshot_cache.js": "f3688bebc55ff296b5c9a121fe0ccc74da662198981c8bf55429b239fc23ea38",
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
       "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
-      "js/core/renderer/projected_geometry_bounds_owner.js": "b287dfda55b4e629d77e08cf1ed187e58f2aee8e4f60b1bf17f6ae41f569a747",
+      "js/core/renderer/projected_geometry_bounds_owner.js": "aa0fc59a663f8df7b8b131012cf59c62ba6d6db626b5b5c6c1419c3219d87657",
       "js/core/state/renderer_runtime_state.js": "70b3d7ddd1d469b033aea1b516ba8de98928e0d19c4c7c3fdbfe8f3ffb197968",
       "js/core/state/actions/renderer_cache_actions.js": "4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739",
       "js/core/renderer/projected_bounds_diagnostics_owner.js": "a121edc8b9f0ddb7418614e72a8a8498b412483da0fa47977e396f5c74b55b22",
@@ -362,11 +362,11 @@ const callbackInjectionDefinitions =[
       "getRenderPerfMetricsRuntimeOwner"
     ],
     "sourceFingerprints": {
-      "js/core/renderer/projected_coordinate_bounds.js": "ab6d6f787880c11b84f4d685d163b35502073259220c7460d691ac23aa6d8ec8",
+      "js/core/renderer/projected_coordinate_bounds.js": "e6fb2ae1289c8aae16988fe470920b98c1a19bc867a670faff37abaac2925774",
       "js/core/renderer/water_sanitization_snapshot_cache.js": "f3688bebc55ff296b5c9a121fe0ccc74da662198981c8bf55429b239fc23ea38",
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
       "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
-      "js/core/renderer/projected_geometry_bounds_owner.js": "b287dfda55b4e629d77e08cf1ed187e58f2aee8e4f60b1bf17f6ae41f569a747",
+      "js/core/renderer/projected_geometry_bounds_owner.js": "aa0fc59a663f8df7b8b131012cf59c62ba6d6db626b5b5c6c1419c3219d87657",
       "js/core/state/renderer_runtime_state.js": "70b3d7ddd1d469b033aea1b516ba8de98928e0d19c4c7c3fdbfe8f3ffb197968",
       "js/core/state/actions/renderer_cache_actions.js": "4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739",
       "js/core/renderer/projected_bounds_diagnostics_owner.js": "a121edc8b9f0ddb7418614e72a8a8498b412483da0fa47977e396f5c74b55b22",
@@ -726,11 +726,11 @@ const callbackInjectionDefinitions =[
       "getRenderPerfMetricsRuntimeOwner"
     ],
     "sourceFingerprints": {
-      "js/core/renderer/projected_coordinate_bounds.js": "ab6d6f787880c11b84f4d685d163b35502073259220c7460d691ac23aa6d8ec8",
+      "js/core/renderer/projected_coordinate_bounds.js": "e6fb2ae1289c8aae16988fe470920b98c1a19bc867a670faff37abaac2925774",
       "js/core/renderer/water_sanitization_snapshot_cache.js": "f3688bebc55ff296b5c9a121fe0ccc74da662198981c8bf55429b239fc23ea38",
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
       "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
-      "js/core/renderer/projected_geometry_bounds_owner.js": "b287dfda55b4e629d77e08cf1ed187e58f2aee8e4f60b1bf17f6ae41f569a747",
+      "js/core/renderer/projected_geometry_bounds_owner.js": "aa0fc59a663f8df7b8b131012cf59c62ba6d6db626b5b5c6c1419c3219d87657",
       "js/core/state/renderer_runtime_state.js": "70b3d7ddd1d469b033aea1b516ba8de98928e0d19c4c7c3fdbfe8f3ffb197968",
       "js/core/state/actions/renderer_cache_actions.js": "4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739",
       "js/core/renderer/projected_bounds_diagnostics_owner.js": "a121edc8b9f0ddb7418614e72a8a8498b412483da0fa47977e396f5c74b55b22",
@@ -917,7 +917,7 @@ const riverBorrowedRuntimeDefinition = {
     "js/core/river_paint/runtime.js": "5a7a14eb9ce15a5b24f207bba52898638c36c46faf91cc2316ef1007bace56a2",
     "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
     "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78",
-    "js/core/river_paint/pilot_manifest.js": "e63d24879c44b189d94914f108fdfe5f5f22d52709701b4f753dbe9611711cd9",
+    "js/core/river_paint/pilot_manifest.js": "4c072ddef2346016db47411891374ced1f7e5190b5fa7b350d8a765f267a0d60",
     "js/core/state/actions/river_paint_actions.js": "7b14e409523f8f5617ccb25af777c2e7de846b63f2364c0651145753e787144b"
   },
   "borrowedLocalStorage": [
@@ -1250,7 +1250,7 @@ const riverOwnerSourceFingerprints = Object.freeze({
   "js/core/country_code_aliases.js": "460311cf93c7ffc8004cabbee374a8a76c12fd37c3ab82524d527e7b919c2f67",
   "js/core/state/actions/river_paint_actions.js": "7b14e409523f8f5617ccb25af777c2e7de846b63f2364c0651145753e787144b",
   "js/core/river_paint/runtime.js": "5a7a14eb9ce15a5b24f207bba52898638c36c46faf91cc2316ef1007bace56a2",
-  "js/core/river_paint/pilot_manifest.js": "e63d24879c44b189d94914f108fdfe5f5f22d52709701b4f753dbe9611711cd9",
+  "js/core/river_paint/pilot_manifest.js": "4c072ddef2346016db47411891374ced1f7e5190b5fa7b350d8a765f267a0d60",
   "js/core/river_paint/render_owner.js": "0f0741d8f2000ba1a73c89bbb6d8700bb0bc9dda3499f038efb773711582079c"
 });
 export const STATE_RIVER_OWNER_SOURCE_RECEIPTS = Object.freeze([
