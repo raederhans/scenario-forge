@@ -29,7 +29,7 @@ Every PR runs the same jobs; there is no path-based routing:
 | Job | Contents |
 | --- | --- |
 | `pr-tests` | All Node unit tests (two shards) and all Python unit tests. |
-| `pr-verify-fast` | Public sample project validation, Quick Fill hierarchy data and audit, Pages source references, Pages artifact build and startup shell checks. |
+| `pr-verify-fast` | Public sample project validation, Quick Fill hierarchy data and audit, data catalog health, Pages source references, Pages artifact build and startup shell checks. |
 | `pr-verify-smoke` | Browser smoke, the Golden Demo and the live Quick Fill toolbar smoke (`tools/check_quick_fill_browser.mjs`). |
 | `pr-verify-hgo` | Checks, tests and data validation for the standalone HGO editor. |
 | `PR Verify Required` | Fails when any job above fails; the only required check. |

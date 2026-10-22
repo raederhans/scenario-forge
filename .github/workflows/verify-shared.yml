@@ -69,6 +69,11 @@ jobs:
           python tools/build_quick_fill_hierarchy.py --check
           node tools/audit_quick_fill.mjs
 
+      - name: Check cataloged data health
+        if: inputs.profile == 'pr-fast'
+        # The full catalog contract test is on the nightly slow list; this direct run takes ~15 s.
+        run: python tools/data_health.py
+
       - name: Check Pages source references
         if: inputs.profile == 'pr-fast'
         run: python tools/check_pages_source_graph.py
