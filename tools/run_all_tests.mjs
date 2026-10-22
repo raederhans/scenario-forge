@@ -4,19 +4,49 @@
 //   node tools/run_all_tests.mjs python [--all]
 // Only entries in tests/quarantine.json are skipped (quarantine plus the slow lists).
 // --all ignores the quarantine; nightly uses it so known breakage stays visible.
-import { readdirSync, readFileSync } from "node:fs";
+//
+// A few tests compare sources with the built Pages artifact. dist/ is not tracked, so
+// unless SCENARIO_FORGE_PAGES_ARTIFACT_ROOT or a local dist/ build exists, this builds one
+// into .runtime/pages-test/dist and reuses it while HEAD and the working tree are unchanged.
+import { createHash } from "node:crypto";
+import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 
 const [suite, ...flags] = process.argv.slice(2);
 const all = flags.includes("--all");
 const shard = flags.find(flag => flag.startsWith("--shard="));
 const quarantine = JSON.parse(readFileSync(new URL("../tests/quarantine.json", import.meta.url), "utf8"));
+const TEST_ARTIFACT_ROOT = ".runtime/pages-test/dist";
+const ARTIFACT_STAMP = ".runtime/pages-test/source-stamp.txt";
 
 function run(command, args) {
   console.log(`> ${command} ${args.length > 12 ? `${args.slice(0, 6).join(" ")} … (${args.length} args)` : args.join(" ")}`);
   const result = spawnSync(command, args, { stdio: "inherit" });
   process.exit(result.status ?? 1);
 }
+
+function sourceStamp() {
+  const git = (...args) => spawnSync("git", args, { encoding: "utf8", maxBuffer: 1 << 26 }).stdout || "";
+  return createHash("sha256").update(git("rev-parse", "HEAD")).update(git("status", "--porcelain"))
+    .update(git("diff")).digest("hex");
+}
+
+function ensurePagesArtifact() {
+  if (process.env.SCENARIO_FORGE_PAGES_ARTIFACT_ROOT || existsSync("dist/index.html")) return;
+  const stamp = sourceStamp();
+  const built = existsSync(`${TEST_ARTIFACT_ROOT}/index.html`) && existsSync(ARTIFACT_STAMP)
+    && readFileSync(ARTIFACT_STAMP, "utf8") === stamp;
+  if (!built) {
+    console.log(`> building the Pages artifact into ${TEST_ARTIFACT_ROOT} (no dist/ found)`);
+    rmSync(".runtime/pages-test", { recursive: true, force: true });
+    const result = spawnSync("python", ["tools/build_pages_dist.py", "--output-root", TEST_ARTIFACT_ROOT], { stdio: "inherit" });
+    if (result.status !== 0) process.exit(result.status ?? 1);
+    writeFileSync(ARTIFACT_STAMP, stamp);
+  }
+  process.env.SCENARIO_FORGE_PAGES_ARTIFACT_ROOT = TEST_ARTIFACT_ROOT;
+}
+
+if (suite === "node" || suite === "python") ensurePagesArtifact();
 
 if (suite === "node") {
   const skipped = new Set(all ? [] : [...Object.keys(quarantine.node), ...quarantine.nodeSlow.files]);

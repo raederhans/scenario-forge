@@ -67,32 +67,45 @@ function isScenarioRuntimeReadyForPlaywright(state) {
   return shellOwnerCount > 0 || (landFeatureCount > 0 && colorCount > 0 && chunkIdle);
 }
 
+// The published editor is bundled, so importing ./js/core/*.js by URL there loads a
+// separate, unused copy of each module. Read the live modules through the app test API
+// (js/core/app_test_api.js), which both the source and the bundle install.
+const READ_LIVE_MODULES_SOURCE = `async () => {
+  for (let attempt = 0; attempt < 600 && !globalThis.__scenarioForgeTestApi; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  if (globalThis.__scenarioForgeTestApi) return globalThis.__scenarioForgeTestApi.internals();
+  const load = (path) => import(new URL(path, globalThis.location.href).toString());
+  const [stateModule, interactionFunnel, scenarioDispatcher] = await Promise.all([
+    load("./js/core/state.js"), load("./js/core/interaction_funnel.js"), load("./js/core/scenario_dispatcher.js"),
+  ]);
+  return { state: stateModule.state, interactionFunnel, scenarioDispatcher };
+}`;
+
 async function primeStateRef(page) {
   // Playwright `waitForFunction(async ...)` only waits on the returned Promise object itself,
   // so shared ready gates pin the live singleton state onto `globalThis` first and then poll
   // it synchronously inside `waitForFunction`.
-  await page.evaluate(async (readyPredicateSource) => {
+  await page.evaluate(async ({ readyPredicateSource, readLiveModulesSource }) => {
     globalThis.__playwrightIsScenarioRuntimeReady = Function(`return (${readyPredicateSource});`)();
     if (globalThis.__playwrightStateRef) {
       return true;
     }
-    const stateModuleUrl = new URL("./js/core/state.js", globalThis.location.href).toString();
-    const stateModule = await import(stateModuleUrl);
-    globalThis.__playwrightStateRef = stateModule?.state || null;
+    const modules = await Function(`return (${readLiveModulesSource});`)()();
+    globalThis.__playwrightStateRef = modules?.state || null;
     return !!globalThis.__playwrightStateRef;
-  }, isScenarioRuntimeReadyForPlaywright.toString());
+  }, { readyPredicateSource: isScenarioRuntimeReadyForPlaywright.toString(), readLiveModulesSource: READ_LIVE_MODULES_SOURCE });
 }
 
 async function primeInteractionFunnelDebugRef(page) {
-  await page.evaluate(async () => {
+  await page.evaluate(async (readLiveModulesSource) => {
     if (globalThis.__playwrightInteractionFunnelDebugRef) {
       return true;
     }
-    const funnelModuleUrl = new URL("./js/core/interaction_funnel.js", globalThis.location.href).toString();
-    const funnelModule = await import(funnelModuleUrl);
-    globalThis.__playwrightInteractionFunnelDebugRef = funnelModule?.getInteractionFunnelDebugState || null;
+    const modules = await Function(`return (${readLiveModulesSource});`)()();
+    globalThis.__playwrightInteractionFunnelDebugRef = modules?.interactionFunnel?.getInteractionFunnelDebugState || null;
     return !!globalThis.__playwrightInteractionFunnelDebugRef;
-  });
+  }, READ_LIVE_MODULES_SOURCE);
 }
 
 async function gotoApp(page, targetPath = DEFAULT_APP_PATH, options = {}) {
@@ -104,9 +117,12 @@ async function readBootStateSnapshot(page) {
     return await page.evaluate(async () => {
       const overlay = document.querySelector("#bootOverlay");
       const scenarioStatus = document.querySelector("#scenarioStatus");
-      const stateModuleUrl = new URL("./js/core/state.js", globalThis.location.href).toString();
-      const stateModule = await import(stateModuleUrl);
-      const state = stateModule?.state || {};
+      // Diagnostics only: use the live state without waiting for the test API to appear.
+      const state = globalThis.__playwrightStateRef
+        || (globalThis.__scenarioForgeTestApi
+          ? (await globalThis.__scenarioForgeTestApi.internals()).state
+          : (await import(new URL("./js/core/state.js", globalThis.location.href).toString())).state)
+        || {};
       return {
         bootPhase: String(state.bootPhase || ""),
         bootBlocking: state.bootBlocking === false ? false : !!state.bootBlocking,
@@ -544,7 +560,9 @@ async function applyScenarioAndWaitIdle(page, scenarioId, {
           error: "",
           startedAt: Date.now(),
         };
-        const { applyScenarioByIdCommand } = await import("/js/core/scenario_dispatcher.js");
+        const { applyScenarioByIdCommand } = globalThis.__scenarioForgeTestApi
+          ? (await globalThis.__scenarioForgeTestApi.internals()).scenarioDispatcher
+          : await import("/js/core/scenario_dispatcher.js");
         void (async () => {
           let lastError = null;
           for (let commandAttempt = 0; commandAttempt < 3; commandAttempt += 1) {

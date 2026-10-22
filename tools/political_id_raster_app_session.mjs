@@ -69,11 +69,12 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
     page.on("console", message => { if (message.type() === "error") errors.push(message.text()); });
     for (const script of initScripts) await page.addInitScript(script);
     await page.goto(url.href, { waitUntil: "domcontentloaded", timeout: 60000 });
+    // The published editor is bundled; take its live modules from the app test API
+    // instead of importing js/core/*.js by URL (that would load separate copies).
+    await page.waitForFunction(() => !!globalThis.__scenarioForgeTestApi, null, { timeout: 60000 });
     await page.evaluate(async () => {
-      const renderer = await import(new URL("js/core/map_renderer.js", document.baseURI));
-      const { state } = await import(new URL("js/core/state.js", document.baseURI));
-      const scenarios = await import(new URL("js/core/scenario_manager.js", document.baseURI));
-      window.__rasterTask = { renderer, state, scenarios };
+      const { renderer, state, scenarioManager } = await globalThis.__scenarioForgeTestApi.internals();
+      window.__rasterTask = { renderer, state, scenarios: scenarioManager };
     });
     await waitRasterStartup(page);
     return { browser, context, page, errors, network, warnings };

@@ -6,10 +6,6 @@ on:
       profile:
         required: true
         type: string
-      pages-artifact-only:
-        required: false
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -96,7 +92,7 @@ jobs:
             playwright-browsers-${{ runner.os }}-
 
       - name: Install Playwright Chromium
-        if: inputs.profile == 'pr-smoke' || (inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only)
+        if: inputs.profile == 'pr-smoke' || inputs.profile == 'deploy-minimal'
         run: |
           mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
           max_retries=2
@@ -112,27 +108,13 @@ jobs:
             attempt=$((attempt + 1))
           done
 
-      - name: Build Pages dist
-        if: inputs.profile == 'deploy-minimal' && !inputs.pages-artifact-only
-        run: python tools/build_pages_dist.py
-
       - name: Build Pages artifact from source
-        if: inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only
+        if: inputs.profile == 'deploy-minimal'
         run: python tools/build_pages_dist.py --output-root .runtime/pages-release/dist
-
-      - name: Fail if tracked dist drifted from source
-        if: inputs.profile == 'deploy-minimal' && !inputs.pages-artifact-only
-        run: |
-          git diff --exit-code -- dist/.nojekyll dist/app.js dist/index.html dist/styles.css dist/assets dist/app/index.html dist/app/js dist/app/css dist/app/vendor dist/hgo dist/pages-dist-manifest.json \
-            || { echo "::error::dist/app is out of sync with source. Run 'python tools/build_pages_dist.py' and commit the result."; exit 1; }
-
-      - name: Verify Pages dist startup shell
-        if: inputs.profile == 'deploy-minimal' && !inputs.pages-artifact-only
-        run: python -m unittest tests.test_pages_dist_startup_shell -q
 
       - name: Verify and exercise the Pages artifact
         id: pages_checks
-        if: inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only
+        if: inputs.profile == 'deploy-minimal'
         env:
           SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/pages-release/dist
           PLAYWRIGHT_TEST_BASE_URL: http://127.0.0.1:4173/
@@ -147,7 +129,8 @@ jobs:
           done
           curl --fail --silent http://127.0.0.1:4173/ > /dev/null
           npm run test:e2e:pages-public-release-gate
-          node node_modules/@playwright/test/cli.js test tests/e2e/project_save_load_roundtrip.spec.js --grep 'editing baseline fast hoi4_1936.*roundtrip only' --workers=1 --retries=0
+          # Golden flows on the bundled artifact itself: save/reopen and PNG export.
+          node node_modules/@playwright/test/cli.js test tests/e2e/golden --grep 'saved project|exported PNG' --workers=1 --retries=0
           python tools/pages_artifact_admission.py --artifact-root .runtime/pages-release/dist --run-id github-${{ github.run_id }}-${{ github.run_attempt }} --public-smoke passed --receipt-out .runtime/pages-release/receipt.json --summary-out .runtime/pages-release/summary.json
 
       - name: Upload Pages artifact failure evidence
@@ -165,7 +148,7 @@ jobs:
             .runtime/tests/playwright/
 
       - name: Upload Pages artifact admission
-        if: inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only
+        if: inputs.profile == 'deploy-minimal'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: deploy-admission
@@ -222,6 +205,6 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: deploy-dist
-          path: ${{ inputs.pages-artifact-only && '.runtime/pages-release/dist' || 'dist' }}
+          path: .runtime/pages-release/dist
           # Keep .nojekyll in the handoff artifact; upload-artifact omits hidden files by default.
           include-hidden-files: true

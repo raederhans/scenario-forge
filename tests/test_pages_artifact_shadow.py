@@ -120,7 +120,7 @@ class PagesArtifactShadowTests(unittest.TestCase):
         write_fixture_dist(self.artifact)
 
     def tearDown(self) -> None:
-        build_pages_dist.configure_dist_root()
+        build_pages_dist.configure_dist_root(env={})  # reset to the default root, ignoring the caller's environment
         self.temp_dir.cleanup()
 
     def test_equal_artifact_proves_manifest_tree_and_file_hash_equivalence(self) -> None:
@@ -210,7 +210,7 @@ class PagesArtifactShadowTests(unittest.TestCase):
     def test_output_root_is_runtime_only_and_never_reuses_existing_artifact(self) -> None:
         runtime_root = build_pages_dist.ROOT / ".runtime" / f"pages-artifact-shadow-test-{uuid.uuid4().hex}"
         self.assertEqual(build_pages_dist.configure_dist_root(runtime_root), runtime_root.resolve())
-        build_pages_dist.configure_dist_root()
+        build_pages_dist.configure_dist_root(env={})  # reset to the default root, ignoring the caller's environment
         runtime_root.mkdir(parents=True)
         (runtime_root / "owned-evidence.json").write_text("{}\n", encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "absent or empty"):

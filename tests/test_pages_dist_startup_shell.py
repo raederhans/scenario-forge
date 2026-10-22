@@ -291,60 +291,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
                             for item in geometries))
 
 
-    def test_checked_in_pages_dist_manifest_exists(self) -> None:
-        self.assertTrue(
-            DIST_MANIFEST.exists(),
-            "dist/pages-dist-manifest.json is a checked-in Pages dist contract",
-        )
-        payload = json.loads(DIST_MANIFEST.read_text(encoding="utf-8"))
-        self.assertEqual(payload.get("schema_version"), build_pages_dist.PAGES_DIST_MANIFEST_SCHEMA_VERSION)
-        self.assertIsInstance(payload.get("files"), list)
-        self.assertGreater(len(payload.get("files", [])), 0)
-        for field_name in ("total_bytes", "max_allowed_bytes", "size_gate", "required_files"):
-            with self.subTest(field_name=field_name):
-                self.assertIn(field_name, payload)
-
-    def test_pages_dist_drift_guard_covers_tracked_dist_outputs(self) -> None:
-        try:
-            result = subprocess.run(
-                ["git", "ls-files", "dist"],
-                cwd=REPO_ROOT,
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-        except (FileNotFoundError, subprocess.CalledProcessError) as exc:
-            raise unittest.SkipTest(f"git tracked dist list unavailable: {exc}") from exc
-
-        pathspecs = (
-            "dist/.nojekyll",
-            "dist/app.js",
-            "dist/index.html",
-            "dist/styles.css",
-            "dist/assets",
-            "dist/app/index.html",
-            "dist/app/js",
-            "dist/app/css",
-            "dist/app/vendor",
-            "dist/hgo",
-            "dist/pages-dist-manifest.json",
-        )
-        tracked_paths = [line.strip() for line in result.stdout.splitlines() if line.strip()]
-        uncovered = [
-            path
-            for path in tracked_paths
-            if not any(path == spec or path.startswith(f"{spec}/") for spec in pathspecs)
-        ]
-        self.assertEqual([], uncovered)
-
-        package_scripts = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))["scripts"]
-        workflow_text = VERIFY_SHARED_WORKFLOW.read_text(encoding="utf-8")
-        for spec in pathspecs:
-            with self.subTest(spec=spec):
-                for script_name in ("verify:pages-dist-and-drift", "verify:dist-drift"):
-                    self.assertIn(spec, package_scripts[script_name], script_name)
-                self.assertIn(spec, workflow_text)
-
     def test_landing_generated_cartography_assets_exist(self) -> None:
         source_svg_assets = (
             "hero-cartography.svg",
@@ -1143,7 +1089,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         )
         self.assertEqual(reachability["unresolved_reference_count"], 0)
         self.assertEqual(reachability["unresolved_dynamic_expression_count"], 0)
-        self.assertEqual(reachability["registry_resolved_dynamic_expression_count"], 2)
+        self.assertEqual(reachability["registry_resolved_dynamic_expression_count"], 1)
         self.assertEqual(product_inventory["status"], "complete")
         self.assertEqual(product_inventory["publication_ownership_status"], "complete")
         self.assertEqual(product_inventory["classified_file_count"], len(records))
@@ -1235,7 +1181,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
 
         self.assertEqual(graph["module_entrypoint"], "app/js/main.js")
         self.assertEqual(graph["unresolved_references"], [])
-        self.assertEqual(graph["summary"]["registry_resolved_dynamic_expression_count"], 2)
+        self.assertEqual(graph["summary"]["registry_resolved_dynamic_expression_count"], 1)
         self.assertEqual(
             graph["summary"]["module_count"],
             sum(
@@ -1260,13 +1206,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
         deferred_ui_expressions = nodes_by_path["app/js/bootstrap/deferred_ui_bootstrap.js"][
             "dynamic_import_expressions"
         ]
+        # Literal import() calls resolve directly; no registry entry is needed any more.
         self.assertEqual(
-            [record["registry_id"] for record in deferred_ui_expressions if record["kind"] == "unresolved_dynamic_expression"],
-            ["deferred-ui-bootstrap"],
-        )
-        self.assertEqual(
-            [record["resolution"] for record in deferred_ui_expressions if record["kind"] == "unresolved_dynamic_expression"],
-            ["declarative-registry"],
+            [record for record in deferred_ui_expressions if record["kind"] == "unresolved_dynamic_expression"],
+            [],
         )
         data_service_expressions = nodes_by_path["app/js/core/data_service.js"]["dynamic_import_expressions"]
         self.assertEqual(
@@ -1703,7 +1646,9 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 prefix
                 for rule in build_pages_dist.PAGES_PRODUCT_INVENTORY_RULES
                 for prefix in rule.get("prefixes", ())
-                if prefix.startswith("app/js/")
+                # Source JS is classified by graph reachability; only the compiled
+                # esbuild output is declared, because the source graph does not scan it.
+                if prefix.startswith("app/js/") and prefix != build_pages_dist.EDITOR_BUNDLE_PREFIX
             ]
         )
         with self.assertRaisesRegex(ValueError, "unknown_files=7"):
@@ -2706,7 +2651,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertIn('<meta name="robots" content="noindex,nofollow" />', html)
         self.assertIn('<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />', html)
         self.assertIn('<link rel="alternate icon" href="../assets/favicon.png" type="image/png" />', html)
-        self.assertIn('<link rel="modulepreload" href="js/main.js" />', html)
+        # The published editor loads the esbuild bundle (tools/build_editor_bundle.mjs).
+        self.assertIn('<link rel="modulepreload" href="js/bundle/main.js" />', html)
+        self.assertIn('<script type="module" src="js/bundle/main.js"></script>', html)
+        self.assertTrue((DIST_APP_INDEX.parent / "js" / "bundle" / "main.js").is_file())
         self.assertIn('<link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />', html)
         self.assertNotIn('data-startup-bundle-preload', html)
         self.assertNotIn('startup.bundle.${language}', html)
@@ -2936,6 +2884,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 )
 
         for dist_js_path in sorted(DIST_APP_JS_ROOT.rglob("*.js")):
+            if dist_js_path.is_relative_to(DIST_APP_JS_ROOT / "bundle"):
+                continue  # esbuild output, not a mirror of one source file
             source_relative_path = Path("js") / dist_js_path.relative_to(DIST_APP_JS_ROOT)
             source_path = REPO_ROOT / source_relative_path
             with self.subTest(app_js_mirror=str(source_relative_path).replace("\\", "/")):
@@ -3692,7 +3642,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         upload_block = "\n".join(workflow_lines[upload_block_start : upload_block_start + 4])
 
         self.assertIn(
-            "path: ${{ inputs.pages-artifact-only && '.runtime/pages-release/dist' || 'dist' }}",
+            "path: .runtime/pages-release/dist",
             upload_block,
         )
         self.assertIn("include-hidden-files: true", upload_block)

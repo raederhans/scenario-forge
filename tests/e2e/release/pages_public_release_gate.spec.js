@@ -91,9 +91,10 @@ function publicUrl(pathname = "") {
 
 async function readPublicReleaseGateState(page) {
   return page.evaluate(async () => {
-    const stateModuleUrl = new URL("./js/core/state.js", globalThis.location.href).toString();
-    const { state } = await import(stateModuleUrl);
-    const { getInteractionFunnelDebugState } = await import(new URL("./js/core/interaction_funnel.js", globalThis.location.href).toString());
+    // The deployed editor is bundled: read the live modules through the test API
+    // instead of importing ./js/core/*.js, which would load separate, unused copies.
+    const { state, interactionFunnel } = await globalThis.__scenarioForgeTestApi.internals();
+    const { getInteractionFunnelDebugState } = interactionFunnel;
     const scenarioSelect = document.querySelector("#scenarioSelect");
     return {
       activeScenarioId: String(state.activeScenarioId || ""),
