@@ -62,6 +62,13 @@ Afterwards:
    The canonical hash is the SHA-256 of `JSON.stringify(normalizeRiverPartitionPack(pack))`.
 3. Re-pin `scenario.baselineHash` in `landing/assets/sample-projects/*` and
    their `dist/assets` mirrors to each scenario manifest's new `baseline_hash`.
+4. Regenerate the landing showcase and hero maps with
+   `python tools/build_landing_europe_1936_showcase.py`; their metadata counts
+   scenario features. Copy the changed files to `dist/assets` and update their
+   `size_bytes` (plus `total_bytes` and the `assets` directory total) in
+   `dist/pages-dist-manifest.json`.
+5. Refresh the landing page's hard-coded evidence numbers with
+   `python tools/refresh_landing_evidence_markers.py`.
 
 ## After upstream rebuilds
 

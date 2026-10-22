@@ -303,7 +303,8 @@ export const RENDERER_UI_BOOTSTRAP_RECORDS = [
       "tests/landing_showcase_view_behavior.test.mjs",
       "landing/app.js",
       "landing/assets/europe-1936-showcase.svg",
-      "landing/index.html"
+      "landing/index.html",
+      "tools/refresh_landing_evidence_markers.py"
     ],
     "ownerHints": [
       "renderer-runtime"
