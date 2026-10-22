@@ -56,7 +56,7 @@ preparation. No new mutable field is introduced into application state.
 
 ## Acceptance
 
-`npm run test:node:ownership-retirement` covers the pure graph, packed paint view,
+The unit suite (`npm test`) covers the pure graph, packed paint view,
 scene lifecycle, delegated draw contract and border cache signatures alongside
 P1/P2/P3A behavior. `tools/audit_paint_contours.mjs` checks real topology neighbors,
 coarse/detail source replacement and measured build/paint cost in separate Node

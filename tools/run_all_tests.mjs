@@ -19,15 +19,15 @@ function run(command, args) {
 }
 
 if (suite === "node") {
-  const skipped = new Set(process.platform === "win32" ? [] : quarantine.nodeWindowsOnly.files);
-  if (!all) for (const file of [...Object.keys(quarantine.node), ...quarantine.nodeSlow.files]) skipped.add(file);
+  const skipped = new Set(all ? [] : [...Object.keys(quarantine.node), ...quarantine.nodeSlow.files]);
   const files = readdirSync("tests").filter(name => name.endsWith(".test.mjs"))
     .map(name => `tests/${name}`).filter(file => !skipped.has(file)).sort();
-  for (const file of skipped) console.log(`skipped: ${file} — ${quarantine.node[file] || (quarantine.nodeSlow.files.includes(file) ? quarantine.nodeSlow._reason : quarantine.nodeWindowsOnly._reason)}`);
+  for (const file of skipped) console.log(`skipped: ${file} — ${quarantine.node[file] || quarantine.nodeSlow._reason}`);
   run(process.execPath, ["--test", ...(shard ? [`--test-shard=${shard.slice(8)}`] : []), ...files]);
 } else if (suite === "python") {
   const ignored = all ? [] : [...Object.keys(quarantine.python), ...quarantine.pythonSlow.files];
-  run("python", ["-m", "pytest", "tests", "-n", "auto", "-q", "-p", "no:cacheprovider",
+  // run_python.mjs picks py -3 / python on Windows and python3 / python elsewhere.
+  run(process.execPath, ["tools/run_python.mjs", "-m", "pytest", "tests", "-n", "auto", "-q", "-p", "no:cacheprovider",
     ...ignored.flatMap(file => ["--ignore", file])]);
 } else {
   console.error("usage: node tools/run_all_tests.mjs node|python [--shard=i/n] [--all]");

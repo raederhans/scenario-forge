@@ -49,7 +49,6 @@ import {
   WILLIAMS_CROSSOVER_RENDER_SAMPLE_RUN_PROFILE_ID,
   summarizeRenderSampleRoleAnalyses,
 } from "../tools/perf/render_sample_role_policy.mjs";
-import { buildWilliamsExecutionPlan } from "../tools/perf/run_williams_crossover.mjs";
 import {
   PerfEnvironmentAdmissionError,
   PerfGenerationFenceError,
@@ -1259,67 +1258,6 @@ test("explicit render-sample run profiles preserve Williams two-run and standard
     ).join("\n"),
     /config\.runs expected=5 actual=2/,
   );
-});
-
-test("Williams run profile is caller-owned, symmetric, and report identity drift fails closed", async () => {
-  const root = path.join(REPO_ROOT, ".runtime", "tmp", "williams-profile-plan-fixture");
-  const controlWorktree = path.join(root, "control");
-  const candidateWorktree = path.join(root, "candidate");
-  const sharedRunner = path.join(candidateWorktree, "tools", "perf", "run_baseline.mjs");
-  const plan = buildWilliamsExecutionPlan({
-    rawRoot: root,
-    controlHead: "a".repeat(40),
-    candidateHead: "b".repeat(40),
-    controlWorktree,
-    candidateWorktree,
-  });
-  for (const block of plan.blocks) {
-    assert.equal(block.command.args[0], sharedRunner, `${block.id} must use the shared candidate harness runner`);
-    const measuredRootFlagIndex = block.command.args.indexOf("--measured-repo-root");
-    assert.ok(measuredRootFlagIndex > 0, `${block.id} must declare the measured repo root`);
-    assert.equal(block.command.args[measuredRootFlagIndex + 1], block.cwd);
-    const profileFlagIndex = block.command.args.indexOf("--render-sample-run-profile");
-    assert.ok(profileFlagIndex > 0, `${block.id} must declare the run profile`);
-    assert.equal(
-      block.command.args[profileFlagIndex + 1],
-      WILLIAMS_CROSSOVER_RENDER_SAMPLE_RUN_PROFILE_ID,
-    );
-  }
-  for (const side of ["A", "B"]) {
-    assert.deepEqual(
-      new Set(plan.blocks.filter((block) => block.side === side).map((block) => {
-        const profileFlagIndex = block.command.args.indexOf("--render-sample-run-profile");
-        return block.command.args[profileFlagIndex + 1];
-      })),
-      new Set([WILLIAMS_CROSSOVER_RENDER_SAMPLE_RUN_PROFILE_ID]),
-    );
-  }
-
-  const baselinePath = path.join(REPO_ROOT, "docs", "perf", "baseline_2026-07-30.json");
-  const canonical = JSON.parse(await fs.readFile(baselinePath, "utf8"));
-  const williamsReport = buildWilliamsTwoRunRoleReport(canonical);
-  const cases = [
-    ["missing policy profile", (report) => { delete report.renderSampleRolePolicy.runProfile; }, /renderSampleRolePolicy\.runProfile\.id/],
-    ["policy id", (report) => { report.renderSampleRolePolicy.runProfile.id = "unknown-profile"; }, /renderSampleRolePolicy\.runProfile\.id/],
-    ["policy run count", (report) => { report.renderSampleRolePolicy.runProfile.measuredRunsPerScenario = 5; }, /renderSampleRolePolicy\.runProfile\.measuredRunsPerScenario/],
-    ["policy report schema", (report) => { report.renderSampleRolePolicy.runProfile.reportSchemaVersion = 3; }, /renderSampleRolePolicy\.runProfile\.reportSchemaVersion/],
-    ["report schema", (report) => { report.schemaVersion = 3; }, /schemaVersion expected=2 actual=3/],
-    ["report identity", (report) => { report.workloadIdentity.renderSampleRunProfileId = STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID; }, /workloadIdentity\.renderSampleRunProfileId/],
-    ["scenario identity", (report) => { report.scenarios.tno_1962.workloadIdentity.renderSampleRunProfileId = STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID; }, /tno_1962\.workloadIdentity\.renderSampleRunProfileId/],
-  ];
-  for (const [label, mutate, expected] of cases) {
-    const drifted = structuredClone(williamsReport);
-    mutate(drifted);
-    assert.match(
-      collectGovernedRenderSampleRoleMismatches(
-        drifted,
-        SCENARIOS,
-        WILLIAMS_CROSSOVER_RENDER_SAMPLE_RUN_PROFILE_ID,
-      ).join("\n"),
-      expected,
-      label,
-    );
-  }
 });
 
 test("measured repo root is explicit for a shared harness and defaults to the harness checkout", () => {

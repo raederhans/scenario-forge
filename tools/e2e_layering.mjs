@@ -2,7 +2,6 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import process from "node:process";
-import { buildE2eRoutes } from "./test_route_registry.mjs";
 
 const REPO_ROOT = process.cwd();
 const MANIFEST_PATH = path.join(REPO_ROOT, "tests", "e2e", "test-layer-manifest.json");
@@ -245,9 +244,9 @@ function runSpecs(name, specs, extraArgs) {
 function explainSpec(specPath) {
   validateManifest();
   const normalizedPath = toRepoPath(specPath);
-  const route = buildE2eRoutes().find((candidate) => candidate.sourceRef === normalizedPath);
-  ensure(route, `No E2E route found for ${normalizedPath}.`);
-  console.log(JSON.stringify(route, null, 2));
+  const spec = (readManifest().specs || []).find((candidate) => candidate.specPath === normalizedPath);
+  ensure(spec, `No E2E manifest entry found for ${normalizedPath}.`);
+  console.log(JSON.stringify(spec, null, 2));
 }
 
 function main() {

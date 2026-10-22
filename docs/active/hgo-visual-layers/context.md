@@ -1,9 +1,0 @@
-# Integration context
-
-- Checkout: `C:/Users/raede/.codex/worktrees/hgo-visual-layers/mapcreator`; branch `codex/hgo-visual-layers`; base `2f057a05dc5f55fab2bb8166c7702f0a145c771d`. Origin is `raederhans/scenario-forge`. Root is the only integration owner. The primary checkout's unrelated architecture WIP is preserved.
-- Round8 frozen package: `.runtime/dist/hgo-before-declutter-round9`. Do not replace it. Round9 input/review artifacts: `.runtime/reports/generated/hgo-localization-round9/`. Baseline has 2,084 reviewed IDs, 4,911 translated states and 6,100 unreviewed named land states.
-- Prior verified behavior: resource proportional circles and fixed infrastructure levels; Round8 Node 129 and Python 63 tests; real GPU, export/context recovery and native document invariants. Round9 needs fresh checks for its changed geometry and final package.
-- Root owns localhost:8010 and all browser/build/integration runs. Commands run from this checkout; browser scripts live under `.runtime/tmp/hgo-round9-*`, reports under `.runtime/reports/generated/hgo-metrics-round9/`, screenshots under `.runtime/browser/hgo-metrics-round9/`. One run at a time; children may only read completed artifacts. Stop on assertion failure and inspect before retrying. Preserve the user's existing browser session.
-- Child ownership: resource layout/test module; Europe/Russia review shard; Asia review shard; then the Americas/Africa/Oceania shard. Children cannot commit or push. Root merges reviewed decisions and builds products.
-- CI preflight found the HGO sparse checkout omitted the ten repository source files used by existing localization reproducibility tests. The workflow now declares those inputs explicitly; no test is skipped or weakened.
-- Remote main matched the base at initial fetch. Verify again before merge. Required CI, merged state and deployment are separate claims.
