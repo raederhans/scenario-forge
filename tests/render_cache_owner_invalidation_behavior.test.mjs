@@ -733,3 +733,38 @@ test("direct scene layouts keep small camera margins and invalidate old pixels o
   direct = false;
   assert.equal(owner.getRenderPassLayout("labels").offsetX, 0);
 });
+
+
+test("GPU publication reclaims only invalid auxiliary backing and protects aliases and export scopes", () => withSurfaceDocument(() => {
+  const shared = { width: 20, height: 10 };
+  const invalid = { width: 10, height: 10 };
+  const valid = { width: 30, height: 10 };
+  const political = { width: 40, height: 10 };
+  const cache = createRenderPassCache({ canvases: { political, borders: shared },
+    lastGoodFrame: { canvas: valid, valid: true, stale: true },
+    interactionComposite: { canvas: invalid, valid: false },
+    compositeBuffer: { canvas: invalid }, borderSnapshot: { canvas: shared, valid: false } });
+  const { owner } = createSurfaceOwner({ cache });
+  const before = owner.getSurfaceDiagnostics();
+  assert.equal(before.surfaces.length, 4);
+  const endOuter = owner.retainSurfaceCacheForScope(cache);
+  const endInner = owner.retainSurfaceCacheForScope(cache);
+  assert.equal(owner.releaseObsoleteSceneSurfaces({ directPolitical: true }), 0);
+  endInner();
+  assert.equal(owner.releaseObsoleteSceneSurfaces({ directPolitical: true }), 0);
+  try { throw new Error("export"); } catch {} finally { endOuter(); }
+  assert.equal(owner.releaseObsoleteSceneSurfaces({ directPolitical: true }), 2000);
+  assert.equal(invalid.width, 0);
+  assert.equal(political.width, 0);
+  assert.equal(shared.width, 20);
+  assert.equal(valid.width, 30, "stale valid last-good is still a replay source");
+  assert.equal(cache.canvases.political, undefined);
+  assert.equal(owner.getSurfaceDiagnostics().reclaimedCount, 2);
+  assert.equal(owner.getSurfaceDiagnostics().reclaimedBytes, 2000);
+  assert.equal(owner.releaseObsoleteSceneSurfaces({ directPolitical: true }), 0);
+  assert.equal(owner.getSurfaceDiagnostics().surfaces.find(row => row.width === 30).id,
+    before.surfaces.find(row => row.width === 30).id);
+  assert.ok(owner.ensureCompositeBufferCanvas().width > 0);
+  assert.ok(owner.ensureInteractionCompositeCanvas().width > 0);
+  assert.ok(owner.ensureRenderPassCanvas("political").width > 0);
+}));

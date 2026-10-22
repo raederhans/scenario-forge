@@ -449,3 +449,28 @@ test("owner source excludes renderer lifecycle and cache commit work", () => {
     assert.equal(ownerSource.includes(token), false, `owner source must not include ${token}`);
   }
 });
+
+
+test("direct host avoids allocation and native continuation retains full host semantics", () => {
+  const events = [];
+  const context = { canvas: { width: 400, height: 200 } };
+  const owner = createRenderPassCacheHostOwner({ effects: {
+    ensureRenderPassCanvas: () => { events.push("allocate"); return { getContext: () => context }; },
+    prepareTargetContext: () => { events.push("prepare"); return 3; },
+    withRenderTarget: (_context, draw) => { events.push("enter"); try { return draw(); } finally { events.push("restore"); } },
+  }, getters: { getRenderPassLayout: () => ({ pixelWidth: 400, pixelHeight: 200 }) } });
+  const direct = { staged: true };
+  const args = { passName: "political", transform: { k: 3 }, drawFn: () => assert.fail("ordinary draw") };
+  const result = owner.prepareRenderPassHost({ ...args, drawWithoutCanvas: () => direct });
+  assert.equal(result.hasPassCanvas, false);
+  assert.equal(result.drawResult, direct);
+  assert.deepEqual(events, []);
+  const fallback = owner.prepareRenderPassHost({ ...args, drawWithoutCanvas: runNative => runNative(k => ({ k })) });
+  assert.equal(fallback.hasPassCanvas, true);
+  assert.deepEqual(fallback.drawResult, { k: 3 });
+  assert.deepEqual(events, ["allocate", "enter", "prepare", "restore"]);
+  events.length = 0;
+  assert.throws(() => owner.prepareRenderPassHost({ ...args,
+    drawWithoutCanvas: runNative => runNative(() => { throw new Error("paint failed"); }) }), /paint failed/);
+  assert.equal(events.at(-1), "restore");
+});

@@ -129,6 +129,7 @@ export function createRenderCacheOwner({
   const {
     getRenderPassCacheState, syncSurfaceResourceAccounting, retainSurfaceCacheForScope,
     releaseSurfaceCache, releaseInactivePassSurfaces, clearContextScenarioLayerSurfaces,
+    releaseObsoleteSceneSurfaces, getSurfaceDiagnostics,
     getContextScenarioLayerCacheEntry, clearContextScenarioLayerIdentity,
   } = createRenderCacheSurfaceResources({
     initialCache: state.renderPassCache || null, getValidatedCacheState,
@@ -690,6 +691,8 @@ export function createRenderCacheOwner({
     syncSurfaceResourceAccounting,
     retainSurfaceCacheForScope,
     releaseSurfaceCache,
+    releaseObsoleteSceneSurfaces,
+    getSurfaceDiagnostics,
     releaseInactivePassSurfaces,
     scenarioLayerCache: Object.freeze({
       getSnapshot: getContextScenarioLayerSnapshot,

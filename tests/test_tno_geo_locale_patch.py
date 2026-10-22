@@ -155,14 +155,26 @@ class TnoGeoLocalePatchTest(unittest.TestCase):
             "Gusevsky District": ("RU_RAY_50074027B27880509956465", "贡宾嫩"),
             "Chernyakhovsky District": ("RU_RAY_50074027B90959697167325", "因斯特堡"),
         }
+        # Merged political features keep each reviewed member name in their composed name.
+        merged_into = {
+            member: group["id"]
+            for plan_path in sorted((root / "data" / "political_feature_merges").glob("*.v[0-9]*.json"))
+            for group in json.loads(plan_path.read_text(encoding="utf-8"))["groups"]
+            for member in group["member_ids"]
+        }
 
         for english_name, (feature_id, zh_name) in expected.items():
             with self.subTest(english_name=english_name):
                 self.assertEqual(locales[english_name]["zh"], zh_name)
-                self.assertEqual(locales[f"id::{feature_id}"]["zh"], zh_name)
-                self.assertEqual(startup_locales[english_name]["zh"], zh_name)
-                self.assertEqual(patch[feature_id]["zh"], zh_name)
-                self.assertEqual(zh_patch[feature_id]["zh"], zh_name)
+                runtime_id = merged_into.get(feature_id, feature_id)
+                # Startup locales only keep names of startup features; a merged
+                # member's name lives in its merged feature's composed entry.
+                startup_names = startup_locales[english_name] if runtime_id == feature_id else startup_locales[f"id::{runtime_id}"]
+                for names in (locales[f"id::{runtime_id}"], startup_names, patch[runtime_id], zh_patch[runtime_id]):
+                    if runtime_id == feature_id:
+                        self.assertEqual(names["zh"], zh_name)
+                    else:
+                        self.assertIn(zh_name, names["zh"].split("、"))
 
         context_specific = {
             "id::RU_RAY_50074027B93509676978918": ("Советский городской округ", "蒂尔西特"),

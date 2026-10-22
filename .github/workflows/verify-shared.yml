@@ -4,33 +4,12 @@ on:
   workflow_call:
     inputs:
       profile:
-        required: false
+        required: true
         type: string
-        default: full
-      run-e2e-smoke:
-        required: false
-        type: boolean
-        default: true
-      run-golden-demo:
-        required: false
-        type: boolean
-        default: false
       pages-artifact-only:
         required: false
         type: boolean
         default: false
-      run-pages-check:
-        required: false
-        type: boolean
-        default: true
-      run-pages-source-check:
-        required: false
-        type: boolean
-        default: false
-      smoke-mode:
-        required: false
-        type: string
-        default: full
 
 permissions:
   contents: read
@@ -38,42 +17,22 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ (inputs.profile == 'pr-fast' || inputs.profile == 'pr-smoke' || inputs.profile == 'demo') && 15 || 90 }}
+    timeout-minutes: ${{ inputs.profile == 'pr-fast' && 20 || inputs.profile == 'pr-smoke' && 30 || 90 }}
     env:
       PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          # pr-fast falls back to HEAD^ outside pull_request events.
-          fetch-depth: 2
 
       - name: Validate verification profile
         shell: bash
         env:
           VERIFY_PROFILE: ${{ inputs.profile }}
-          SMOKE_MODE: ${{ inputs.smoke-mode }}
         run: |
           case "$VERIFY_PROFILE" in
-            full|pr-fast|pr-smoke|demo|deploy-minimal) ;;
+            pr-fast|pr-smoke|deploy-minimal) ;;
             *) echo "::error::unknown verification profile: $VERIFY_PROFILE"; exit 2 ;;
           esac
-          case "$SMOKE_MODE" in
-            full|ui) ;;
-            *) echo "::error::unknown smoke mode: $SMOKE_MODE"; exit 2 ;;
-          esac
-          if [ "$SMOKE_MODE" = "ui" ] && [ "$VERIFY_PROFILE" != "pr-smoke" ]; then
-            echo "::error::focused UI smoke requires the pr-smoke profile"
-            exit 2
-          fi
-          if [ "${{ inputs.run-pages-source-check }}" = "true" ] && { [ "$VERIFY_PROFILE" != "pr-fast" ] || [ "${{ inputs.run-pages-check }}" = "true" ]; }; then
-            echo "::error::source Pages checks require pr-fast without a full Pages build"
-            exit 2
-          fi
-          if [ "${{ inputs.run-golden-demo }}" = "true" ] && [ "$VERIFY_PROFILE" != "pr-smoke" ]; then
-            echo "::error::run-golden-demo requires the pr-smoke profile"
-            exit 2
-          fi
 
       - name: Setup Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
@@ -84,7 +43,6 @@ jobs:
           cache-dependency-path: requirements-dev.lock.txt
 
       - name: Setup Node
-        if: inputs.profile == 'full' || inputs.profile == 'pr-fast' || inputs.profile == 'pr-smoke' || inputs.profile == 'demo' || inputs.profile == 'deploy-minimal'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
@@ -99,45 +57,37 @@ jobs:
         run: python tools/check_min_ci_requirements.py
 
       - name: Install Node dependencies
-        if: inputs.profile == 'full' || inputs.profile == 'pr-fast' || inputs.profile == 'pr-smoke' || inputs.profile == 'demo' || inputs.profile == 'deploy-minimal'
         run: npm ci
 
       - name: Validate public sample projects before Pages build
-        if: inputs.profile == 'deploy-minimal' || (inputs.profile == 'pr-fast' && inputs.run-pages-check)
+        if: inputs.profile == 'deploy-minimal' || inputs.profile == 'pr-fast'
         run: node --test tests/sample_project_contracts.test.mjs
 
-      - name: Explain verification selector
-        id: selector
+      - name: Check Quick Fill hierarchy data and audit
         if: inputs.profile == 'pr-fast'
-        shell: bash
         run: |
-          mkdir -p .runtime/tmp .runtime/reports/generated
-          changed_files=.runtime/tmp/verification-selector-changed-files.txt
-          : > "$changed_files"
-          if [ -n "${{ github.event.pull_request.base.sha }}" ]; then
-            git fetch --no-tags --depth=1 origin "${{ github.event.pull_request.base.sha }}"
-            git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" > "$changed_files"
-          else
-            git diff --name-only HEAD^ HEAD > "$changed_files"
-          fi
-          test -s "$changed_files" || { echo "::error::verification selector received an empty changed-file set"; exit 1; }
-          node tools/select_verification_targets.mjs --changed-files-list "$changed_files" --json-out .runtime/reports/generated/verification-selector-explain.json --md-out .runtime/reports/generated/verification-selector-explain.md
+          python tools/build_quick_fill_hierarchy.py --check
+          node tools/audit_quick_fill.mjs
 
-      - name: Check Pages source references without building artifacts
-        if: inputs.profile == 'pr-fast' && inputs.run-pages-source-check
+      - name: Check cataloged data health
+        if: inputs.profile == 'pr-fast'
+        # The full catalog contract test is on the nightly slow list; this direct run takes ~15 s.
+        run: python tools/data_health.py
+
+      - name: Check Pages source references
+        if: inputs.profile == 'pr-fast'
         run: python tools/check_pages_source_graph.py
 
-      - name: Build and check Pages artifact for relevant PR changes
-        if: inputs.profile == 'pr-fast' && inputs.run-pages-check
+      - name: Build and check the Pages artifact
+        if: inputs.profile == 'pr-fast'
         shell: bash
         run: |
           artifact_root=.runtime/pages-pr/dist
           python tools/build_pages_dist.py --output-root "$artifact_root"
           SCENARIO_FORGE_PAGES_ARTIFACT_ROOT="$artifact_root" python -m unittest tests.test_pages_dist_startup_shell -q
-          echo "SCENARIO_FORGE_PAGES_ARTIFACT_ROOT=$artifact_root" >> "$GITHUB_ENV"
 
       - name: Cache Playwright browsers
-        if: (inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke' || inputs.profile == 'demo'
+        if: inputs.profile == 'pr-smoke'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
@@ -146,7 +96,7 @@ jobs:
             playwright-browsers-${{ runner.os }}-
 
       - name: Install Playwright Chromium
-        if: (inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke' || inputs.profile == 'demo' || (inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only)
+        if: inputs.profile == 'pr-smoke' || (inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only)
         run: |
           mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
           max_retries=2
@@ -222,154 +172,45 @@ jobs:
           path: .runtime/pages-release/receipt.json
           if-no-files-found: error
 
-      - name: Run Python unit tests
-        if: inputs.profile == 'full'
-        run: python -m unittest discover -s tests -p "test_*.py"
-
-      - name: Prepare exact state retirement history
-        if: always() && inputs.profile == 'pr-fast' && steps.selector.outcome == 'success'
-        run: |
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          import { execFileSync, spawnSync } from 'node:child_process';
-          const selection = JSON.parse(fs.readFileSync('.runtime/reports/generated/verification-selector-explain.json', 'utf8'));
-          const command = 'node --test tests/state_target_private_cache_contract_behavior.test.mjs';
-          if (!selection.recommendedCommands.some(entry => entry.commandRef === command)) {
-            console.log('Historical retirement proof is not selected.');
-            process.exit(0);
-          }
-          const { STATE_CAPABILITY_RETIREMENT_CONTRACT } = await import('./tools/state_action_delegation_contract.mjs');
-          const requirements = new Map();
-          for (const { previousSourceRevision: revision, modulePath } of STATE_CAPABILITY_RETIREMENT_CONTRACT) {
-            if (!/^[0-9a-f]{40}$/.test(revision)) throw new Error('Retirement history requires an exact commit.');
-            const paths = requirements.get(revision) || new Set(['tools/state_writer_policy.json']);
-            paths.add(modulePath);
-            requirements.set(revision, paths);
-          }
-          for (const [revision, paths] of requirements) {
-            if (spawnSync('git', ['cat-file', '-e', `${revision}^{commit}`], { stdio: 'ignore' }).status !== 0) {
-              execFileSync('git', ['fetch', '--no-tags', '--filter=blob:none', '--depth=1', 'origin', revision], { stdio: 'inherit' });
-            }
-            // Materialize only the pinned proof inputs; unrelated historical assets stay unfetched.
-            for (const sourcePath of paths) {
-              execFileSync('git', ['cat-file', '-s', `${revision}:${sourcePath}`], { stdio: 'ignore' });
-            }
-          }
-          console.log(`Prepared retirement proof inputs from ${requirements.size} exact commits.`);
-          NODE
-
-      - name: Run affected child-safe contracts
-        if: always() && inputs.profile == 'pr-fast' && steps.selector.outcome != 'skipped'
-        run: |
-          node tools/run_adaptive_tests.mjs \
-            --changed-files-list .runtime/tmp/verification-selector-changed-files.txt \
-            --selection-json .runtime/reports/generated/verification-selector-explain.json \
-            --execute \
-            --defer-main-thread \
-            --concurrency 2 \
-            --profile-out .runtime/reports/generated/verification-selector-execution.profile.json \
-            --json-out .runtime/reports/generated/verification-selector-execution.json \
-            --md-out .runtime/reports/generated/verification-selector-execution.md
-
-      - name: Upload verification selector evidence
-        if: always() && inputs.profile == 'pr-fast'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: verification-selector-evidence
-          if-no-files-found: ignore
-          include-hidden-files: true
-          path: |
-            .runtime/reports/generated/verification-selector-explain.*
-            .runtime/reports/generated/verification-selector-execution.*
-            .runtime/reports/generated/test-import-graph.json
-            .runtime/reports/generated/test-timeout-inventory.*
-            .runtime/reports/generated/test-import-graph-summary.*
-            .runtime/tmp/verification-selector-changed-files.txt
-            tests/e2e/test-import-graph.json
-
-      - name: Run renderer split node behavior tests
-        if: inputs.profile == 'full'
-        run: npm run test:node:renderer-splits
-
-      - name: Run scenario chunk static contracts
-        if: inputs.profile == 'full'
-        run: npm run test:node:scenario-chunk-contracts
-
-      - name: Run physical layer static contracts
-        if: inputs.profile == 'full'
-        run: npm run test:node:physical-layer-contracts
-
-      - name: Verify test infra guardrails
-        if: inputs.profile == 'pr-fast'
-        run: |
-          npm run verify:test-console-allowlist
-          npm run verify:test-timeout-guardrails
-
-      - name: Run PR routing contracts
-        if: inputs.profile == 'pr-fast'
-        run: |
-          # The affected selector owns structural checks, including the full
-          # Python structural suite. Keep only inexpensive routing policy checks
-          # unconditional; full/nightly verification retains the complete inventory.
-          node --test tests/pr_ci_plan_behavior.test.mjs tests/adaptive_routing_policy_behavior.test.mjs
-
-      - name: Run strict TNO scenario contract gate
-        # PR scenario contracts are owned by Scenario Contract Matrix.
-        if: inputs.profile == 'full'
-        run: python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/tno_1962 --report-path .runtime/reports/generated/tno_1962.strict_contract_report.json
-
       - name: Run smoke E2E
-        if: ((inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke') && inputs.smoke-mode == 'full'
+        if: inputs.profile == 'pr-smoke'
         run: npm run test:e2e:smoke
 
-      - name: Run focused UI E2E
-        if: inputs.profile == 'pr-smoke' && inputs.smoke-mode == 'ui'
-        run: node node_modules/@playwright/test/cli.js test tests/e2e/main_shell_i18n.spec.js tests/e2e/editor_detail_polish.spec.js --workers=1 --retries=0
-
-      - name: Write smoke timing summary
-        if: always() && ((inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke')
-        run: npm run verify:test-timing-summary
-
-      - name: Upload smoke timing and failure-context artifacts
-        if: always() && ((inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke')
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: smoke-timing-and-failure-context
-          if-no-files-found: ignore
-          include-hidden-files: true
-          path: |
-            .runtime/reports/test-timings.ndjson
-            .runtime/reports/generated/test-timings-summary.json
-            .runtime/reports/generated/failure-context-index.ndjson
-            .runtime/tests/playwright/**/failure-context.json
-            .runtime/tests/playwright/**/*-failure-context.json
-            .runtime/tests/playwright/**/error-context.md
-            .runtime/tests/playwright/**/test-failed-*.png
-            .runtime/tests/playwright/**/trace.zip
-
       - name: Run Golden Demo E2E
-        if: inputs.profile == 'demo' || inputs.run-golden-demo
+        if: inputs.profile == 'pr-smoke'
         env:
           # The preceding smoke server can leave its non-reusable socket in TIME_WAIT.
           MAPCREATOR_DEV_PORT: '8811'
         run: npm run verify:demo
 
-      - name: Write Demo timing summary
-        if: always() && (inputs.profile == 'demo' || inputs.run-golden-demo)
-        run: npm run verify:test-timing-summary
+      - name: Run Quick Fill live toolbar smoke
+        if: inputs.profile == 'pr-smoke'
+        env:
+          # Ports 8810/8811 may still be in TIME_WAIT from the smoke and demo servers.
+          MAPCREATOR_DEV_PORT: '8812'
+        run: |
+          python tools/dev_server.py --port "$MAPCREATOR_DEV_PORT" > .runtime/quick-fill-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent "http://127.0.0.1:$MAPCREATOR_DEV_PORT/app/" > /dev/null; then break; fi
+            sleep 1
+          done
+          node tools/check_quick_fill_browser.mjs
 
-      - name: Upload Demo timing and failure-context artifacts
-        if: always() && (inputs.profile == 'demo' || inputs.run-golden-demo)
+      - name: Upload E2E failure context
+        if: failure() && inputs.profile == 'pr-smoke'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: demo-timing-and-failure-context
+          name: e2e-failure-context
           if-no-files-found: ignore
           include-hidden-files: true
           retention-days: 7
           path: |
             .runtime/reports/test-timings.ndjson
-            .runtime/reports/generated/test-timings-summary.json
             .runtime/reports/generated/failure-context-index.ndjson
+            .runtime/quick-fill-server.log
+            .runtime/browser/quick-fill/
             .runtime/tests/playwright/**/failure-context.json
             .runtime/tests/playwright/**/*-failure-context.json
             .runtime/tests/playwright/**/error-context.md

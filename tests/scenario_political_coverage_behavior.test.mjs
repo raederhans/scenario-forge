@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import test from "node:test";
 import "../js/core/scenario_chunk_format_shared.js";
@@ -54,14 +54,21 @@ test("real TNO detail replaces coarse by canonical identity despite different to
   const { decodeScenarioChunkPayload } = globalThis.__scenarioForgeScenarioChunkFormatShared;
   const read = (name) => decodeScenarioChunkPayload(JSON.parse(readFileSync(new URL(`../data/scenarios/tno_1962/chunks/political.${name}.json`, import.meta.url), "utf8")), topojson);
   const coarse = read("coarse.r0c0");
-  const detail = read("detail.country.ger");
-  const merged = mergeScenarioChunkPayloads("political", [detail, coarse]);
-  const expected = new Map([...detail.features, ...coarse.features].map((feature) => [getFeatureId(feature), feature]));
+  // Large countries are published as numbered parts; the runtime loads every part.
+  const gerParts = readdirSync(new URL("../data/scenarios/tno_1962/chunks/", import.meta.url))
+    .filter((file) => /^political\.detail\.country\.ger\.part\.\d+\.json$/.test(file))
+    .map((file) => read(file.slice("political.".length, -".json".length)));
+  assert.ok(gerParts.length > 0);
+  const detailFeatures = gerParts.flatMap((part) => part.features);
+  const merged = mergeScenarioChunkPayloads("political", [...gerParts, coarse]);
+  const expected = new Set([...detailFeatures, ...coarse.features].map(getFeatureId));
   const actual = new Map(merged.features.map((feature) => [getFeatureId(feature), feature]));
   assert.equal(merged.features.length, expected.size);
   assert.equal(actual.size, expected.size);
-  for (const id of expected.keys()) assert.ok(actual.has(id), `lost political region ${id}`);
-  for (const feature of detail.features) assert.equal(actual.get(getFeatureId(feature)), feature);
+  for (const id of expected) assert.ok(actual.has(id), `lost political region ${id}`);
+  // Parts may repeat a boundary region; whichever copy wins must come from detail, never coarse.
+  const detailSet = new Set(detailFeatures);
+  for (const feature of detailFeatures) assert.ok(detailSet.has(actual.get(getFeatureId(feature))), getFeatureId(feature));
   const overlappingTopologyIds = mergeScenarioChunkPayloads("political", [{ features: [
     { id: 4, properties: { id: "REGION_A" } },
     { id: 4, properties: { id: "REGION_B" } },

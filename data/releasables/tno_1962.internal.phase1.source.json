@@ -1,22 +1,13 @@
 {
-  "version": 1,
   "catalog_id": "tno_1962.internal.phase1",
-  "scenario_ids": [
-    "tno_1962"
-  ],
   "entries": [
     {
-      "tag": "ALG",
-      "display_name_override": "French Algeria",
-      "color_hex_override": "#1746e6",
-      "parent_owner_tag": "FRA",
-      "release_lookup_iso2": "DZ",
-      "scenario_ids": [
-        "tno_1962"
-      ],
       "allow_manual_overlay": true,
+      "color_hex_override": "#1746e6",
+      "display_name_override": "French Algeria",
+      "notes": "France releasable for the retained TNO 1962 French Algeria footprint.",
+      "parent_owner_tag": "FRA",
       "preset_source": {
-        "type": "feature_ids",
         "feature_ids": [
           "DZA-2195",
           "DZA-2196",
@@ -34,93 +25,24 @@
           "ATLWLD_west_med_29",
           "ATLWLD_west_med_31",
           "ATLWLD_west_med_70"
-        ]
+        ],
+        "type": "feature_ids"
       },
-      "notes": "France releasable for the retained TNO 1962 French Algeria footprint."
+      "release_lookup_iso2": "DZ",
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "tag": "ALG"
     },
     {
-      "tag": "BRG",
-      "display_name_override": "Ordensstaat Burgund",
-      "color_hex_override": "#1a1a1a",
-      "parent_owner_tag": "GER",
-      "release_lookup_iso2": "BE",
       "allow_manual_overlay": true,
-      "preset_source": {
-        "type": "feature_ids",
-        "feature_ids": [
-          "BE100",
-          "BE211",
-          "BE212",
-          "BE213",
-          "BE223",
-          "BE224",
-          "BE225",
-          "BE231",
-          "BE232",
-          "BE233",
-          "BE234",
-          "BE235",
-          "BE236",
-          "BE241",
-          "BE242",
-          "BE251",
-          "BE252",
-          "BE253",
-          "BE254",
-          "BE255",
-          "BE256",
-          "BE257",
-          "BE258",
-          "BE310",
-          "BE323",
-          "BE328",
-          "BE329",
-          "BE32A",
-          "BE32B",
-          "BE32C",
-          "BE32D",
-          "BE331",
-          "BE332",
-          "BE334",
-          "BE335",
-          "BE336",
-          "BE341",
-          "BE342",
-          "BE343",
-          "BE344",
-          "BE345",
-          "BE351",
-          "BE352",
-          "BE353",
-          "FR_ARR_59001",
-          "FR_ARR_59002",
-          "FR_ARR_59003",
-          "FR_ARR_59004",
-          "FR_ARR_59005",
-          "FR_ARR_59006",
-          "FR_ARR_62001",
-          "FR_ARR_62002",
-          "FR_ARR_62003",
-          "FR_ARR_62004",
-          "FR_ARR_62005",
-          "FR_ARR_62006",
-          "FR_ARR_62007",
-          "FR_ARR_80001",
-          "FR_ARR_80002",
-          "FR_ARR_80003",
-          "FR_ARR_80004"
-        ]
-      },
-      "notes": "Burgundian releasable with current TNO, Franco-Burgundian War, and early maximum boundary variants.",
-      "default_boundary_variant_id": "current_tno_initial",
       "boundary_variants": [
         {
+          "basis": "tno_current_runtime",
+          "description": "Current TNO-style Burgundy footprint based on Belgium, Nord-Pas-de-Calais, and Somme.",
           "id": "current_tno_initial",
           "label": "Current TNO Initial",
-          "description": "Current TNO-style Burgundy footprint based on Belgium, Nord-Pas-de-Calais, and Somme.",
-          "basis": "tno_current_runtime",
           "preset_source": {
-            "type": "feature_ids",
             "feature_ids": [
               "BE100",
               "BE211",
@@ -174,25 +96,23 @@
               "FR_ARR_59006",
               "FR_ARR_62001",
               "FR_ARR_62002",
-              "FR_ARR_62003",
+              "FR_MRG_7c681aa2032e",
               "FR_ARR_62004",
-              "FR_ARR_62005",
-              "FR_ARR_62006",
               "FR_ARR_62007",
               "FR_ARR_80001",
               "FR_ARR_80002",
               "FR_ARR_80003",
               "FR_ARR_80004"
-            ]
+            ],
+            "type": "feature_ids"
           }
         },
         {
+          "basis": "tno_fbw_plus_project_runtime",
+          "description": "Expanded Burgundy after victory over France, combining the northern TNO footprint with the eastern Burgundian block.",
           "id": "fbw_expanded",
           "label": "Franco-Burgundian War",
-          "description": "Expanded Burgundy after victory over France, combining the northern TNO footprint with the eastern Burgundian block.",
-          "basis": "tno_fbw_plus_project_runtime",
           "preset_source": {
-            "type": "feature_ids",
             "feature_ids": [
               "BE100",
               "BE211",
@@ -246,10 +166,8 @@
               "FR_ARR_59006",
               "FR_ARR_62001",
               "FR_ARR_62002",
-              "FR_ARR_62003",
+              "FR_MRG_7c681aa2032e",
               "FR_ARR_62004",
-              "FR_ARR_62005",
-              "FR_ARR_62006",
               "FR_ARR_62007",
               "FR_ARR_80001",
               "FR_ARR_80002",
@@ -293,16 +211,16 @@
               "FR_ARR_89001",
               "FR_ARR_89002",
               "FR_ARR_89003"
-            ]
+            ],
+            "type": "feature_ids"
           }
         },
         {
+          "basis": "hgo_augmented_runtime",
+          "description": "Maximum early-project Burgundy, extending the expanded wartime footprint deeper into eastern and northeastern France.",
           "id": "early_maximum",
           "label": "Early Maximum",
-          "description": "Maximum early-project Burgundy, extending the expanded wartime footprint deeper into eastern and northeastern France.",
-          "basis": "hgo_augmented_runtime",
           "preset_source": {
-            "type": "feature_ids",
             "feature_ids": [
               "BE100",
               "BE211",
@@ -356,10 +274,8 @@
               "FR_ARR_59006",
               "FR_ARR_62001",
               "FR_ARR_62002",
-              "FR_ARR_62003",
+              "FR_MRG_7c681aa2032e",
               "FR_ARR_62004",
-              "FR_ARR_62005",
-              "FR_ARR_62006",
               "FR_ARR_62007",
               "FR_ARR_80001",
               "FR_ARR_80002",
@@ -431,39 +347,129 @@
               "FR_ARR_88001",
               "FR_ARR_88002",
               "FR_ARR_88003"
-            ]
+            ],
+            "type": "feature_ids"
           }
         }
       ],
+      "color_hex_override": "#1a1a1a",
+      "default_boundary_variant_id": "current_tno_initial",
+      "display_name_override": "Ordensstaat Burgund",
+      "notes": "Burgundian releasable with current TNO, Franco-Burgundian War, and early maximum boundary variants.",
+      "parent_owner_tag": "GER",
+      "preset_source": {
+        "feature_ids": [
+          "BE100",
+          "BE211",
+          "BE212",
+          "BE213",
+          "BE223",
+          "BE224",
+          "BE225",
+          "BE231",
+          "BE232",
+          "BE233",
+          "BE234",
+          "BE235",
+          "BE236",
+          "BE241",
+          "BE242",
+          "BE251",
+          "BE252",
+          "BE253",
+          "BE254",
+          "BE255",
+          "BE256",
+          "BE257",
+          "BE258",
+          "BE310",
+          "BE323",
+          "BE328",
+          "BE329",
+          "BE32A",
+          "BE32B",
+          "BE32C",
+          "BE32D",
+          "BE331",
+          "BE332",
+          "BE334",
+          "BE335",
+          "BE336",
+          "BE341",
+          "BE342",
+          "BE343",
+          "BE344",
+          "BE345",
+          "BE351",
+          "BE352",
+          "BE353",
+          "FR_ARR_59001",
+          "FR_ARR_59002",
+          "FR_ARR_59003",
+          "FR_ARR_59004",
+          "FR_ARR_59005",
+          "FR_ARR_59006",
+          "FR_ARR_62001",
+          "FR_ARR_62002",
+          "FR_MRG_7c681aa2032e",
+          "FR_ARR_62004",
+          "FR_ARR_62007",
+          "FR_ARR_80001",
+          "FR_ARR_80002",
+          "FR_ARR_80003",
+          "FR_ARR_80004"
+        ],
+        "type": "feature_ids"
+      },
+      "release_lookup_iso2": "BE",
       "scenario_ids": [
         "tno_1962"
-      ]
+      ],
+      "tag": "BRG"
     },
     {
-      "tag": "BRI",
+      "notes": "French internal releasable. Runtime geometry reuses the existing Brittany preset.",
       "parent_owner_tag": "FRA",
+      "preset_source": {
+        "name": "Brittany",
+        "type": "legacy_preset_name"
+      },
       "release_lookup_iso2": "FR",
       "scenario_ids": [
         "tno_1962"
       ],
-      "preset_source": {
-        "type": "legacy_preset_name",
-        "name": "Brittany"
-      },
-      "notes": "French internal releasable. Runtime geometry reuses the existing Brittany preset."
+      "tag": "BRI"
     },
     {
-      "tag": "CRO",
-      "display_name_override": "Independent State of Croatia",
-      "color_hex_override": "#5a8f55",
-      "parent_owner_tag": "ITA",
-      "release_lookup_iso2": "HR",
-      "scenario_ids": [
-        "tno_1962"
-      ],
       "allow_manual_overlay": true,
+      "color_hex_override": "#5a8f55",
+      "companion_actions": [
+        {
+          "action_type": "ownership_transfer",
+          "auto_apply_on_core_territory": true,
+          "basis": "historical_reference",
+          "description": "Transfers the Italian Dalmatian coastal claim bundle when Croatia core territory is applied.",
+          "id": "dalmatia_kotor_to_ita",
+          "label": "Transfer Dalmatia + Kotor Bay To Italy",
+          "preset_source": {
+            "feature_ids": [
+              "HR033",
+              "HR034",
+              "HR035",
+              "HR037",
+              "ME_ADM1_MNE-1506",
+              "ME_ADM1_MNE-1507",
+              "ME_ADM1_MNE-1518"
+            ],
+            "type": "feature_ids"
+          },
+          "target_owner_tag": "ITA"
+        }
+      ],
+      "display_name_override": "Independent State of Croatia",
+      "notes": "Italy releasable for a Croatia-centered South Slav settlement. Auto-transfers Dalmatia and the Kotor Bay strip to direct Italian control.",
+      "parent_owner_tag": "ITA",
       "preset_source": {
-        "type": "feature_ids",
         "feature_ids": [
           "HR021",
           "HR022",
@@ -501,45 +507,22 @@
           "BA_ADM1_54001226B17629474923252",
           "BA_ADM1_54001226B66267900922909",
           "BA_ADM1_54001226B82378099338701"
-        ]
+        ],
+        "type": "feature_ids"
       },
-      "companion_actions": [
-        {
-          "id": "dalmatia_kotor_to_ita",
-          "label": "Transfer Dalmatia + Kotor Bay To Italy",
-          "description": "Transfers the Italian Dalmatian coastal claim bundle when Croatia core territory is applied.",
-          "basis": "historical_reference",
-          "action_type": "ownership_transfer",
-          "target_owner_tag": "ITA",
-          "auto_apply_on_core_territory": true,
-          "preset_source": {
-            "type": "feature_ids",
-            "feature_ids": [
-              "HR033",
-              "HR034",
-              "HR035",
-              "HR037",
-              "ME_ADM1_MNE-1506",
-              "ME_ADM1_MNE-1507",
-              "ME_ADM1_MNE-1518"
-            ]
-          }
-        }
-      ],
-      "notes": "Italy releasable for a Croatia-centered South Slav settlement. Auto-transfers Dalmatia and the Kotor Bay strip to direct Italian control."
-    },
-    {
-      "tag": "SER",
-      "display_name_override": "Serbian Administration",
-      "color_hex_override": "#3f6f3d",
-      "parent_owner_tag": "ITA",
-      "release_lookup_iso2": "RS",
+      "release_lookup_iso2": "HR",
       "scenario_ids": [
         "tno_1962"
       ],
+      "tag": "CRO"
+    },
+    {
       "allow_manual_overlay": true,
+      "color_hex_override": "#3f6f3d",
+      "display_name_override": "Serbian Administration",
+      "notes": "Italy releasable for the Serbian-led inland South Slav settlement spanning Serbia, Montenegro, Macedonia, and Kosovo.",
+      "parent_owner_tag": "ITA",
       "preset_source": {
-        "type": "feature_ids",
         "feature_ids": [
           "MK001",
           "MK002",
@@ -625,22 +608,41 @@
           "XK_ADM1_KOS-5913",
           "XK_ADM1_KOS-5914",
           "XK_ADM1_KOS-5915"
-        ]
+        ],
+        "type": "feature_ids"
       },
-      "notes": "Italy releasable for the Serbian-led inland South Slav settlement spanning Serbia, Montenegro, Macedonia, and Kosovo."
-    },
-    {
-      "tag": "GRE",
-      "display_name_override": "Greek Protectorate",
-      "color_hex_override": "#6a965f",
-      "parent_owner_tag": "ITA",
-      "release_lookup_iso2": "GR",
+      "release_lookup_iso2": "RS",
       "scenario_ids": [
         "tno_1962"
       ],
+      "tag": "SER"
+    },
+    {
       "allow_manual_overlay": true,
+      "color_hex_override": "#6a965f",
+      "companion_actions": [
+        {
+          "action_type": "ownership_transfer",
+          "auto_apply_on_core_territory": true,
+          "basis": "historical_reference",
+          "description": "Transfers the Ionian Islands, Crete, and the South Aegean to direct Italian control when the Greek protectorate is applied.",
+          "id": "greek_islands_to_ita",
+          "label": "Transfer Italian Greek Islands To Italy",
+          "preset_source": {
+            "feature_ids": [
+              "GR_ADM1_GRC-2883",
+              "GR_ADM1_GRC-2990",
+              "GR_ADM1_GRC-3013"
+            ],
+            "type": "feature_ids"
+          },
+          "target_owner_tag": "ITA"
+        }
+      ],
+      "display_name_override": "Greek Protectorate",
+      "notes": "Italy releasable for a mainland Greek protectorate that excludes the directly controlled Italian island arc.",
+      "parent_owner_tag": "ITA",
       "preset_source": {
-        "type": "feature_ids",
         "feature_ids": [
           "EL301",
           "EL302",
@@ -705,41 +707,41 @@
           "GR_ADM1_GRC-2991",
           "GR_ADM1_GRC-2992",
           "GR_ADM1_GRC-3001"
-        ]
+        ],
+        "type": "feature_ids"
       },
-      "companion_actions": [
-        {
-          "id": "greek_islands_to_ita",
-          "label": "Transfer Italian Greek Islands To Italy",
-          "description": "Transfers the Ionian Islands, Crete, and the South Aegean to direct Italian control when the Greek protectorate is applied.",
-          "basis": "historical_reference",
-          "action_type": "ownership_transfer",
-          "target_owner_tag": "ITA",
-          "auto_apply_on_core_territory": true,
-          "preset_source": {
-            "type": "feature_ids",
-            "feature_ids": [
-              "GR_ADM1_GRC-2883",
-              "GR_ADM1_GRC-2990",
-              "GR_ADM1_GRC-3013"
-            ]
-          }
-        }
-      ],
-      "notes": "Italy releasable for a mainland Greek protectorate that excludes the directly controlled Italian island arc."
-    },
-    {
-      "tag": "EGY",
-      "display_name_override": "Italian Egypt",
-      "color_hex_override": "#7a9e66",
-      "parent_owner_tag": "ITA",
-      "release_lookup_iso2": "EG",
+      "release_lookup_iso2": "GR",
       "scenario_ids": [
         "tno_1962"
       ],
+      "tag": "GRE"
+    },
+    {
       "allow_manual_overlay": true,
+      "color_hex_override": "#7a9e66",
+      "companion_actions": [
+        {
+          "action_type": "ownership_transfer",
+          "auto_apply_on_core_territory": true,
+          "basis": "historical_reference",
+          "description": "Transfers the Suez canal zone to direct Italian control when Italian Egypt is applied.",
+          "id": "suez_canal_zone_to_ita",
+          "label": "Transfer Suez Canal Zone To Italy",
+          "preset_source": {
+            "feature_ids": [
+              "EGY-1531",
+              "EGY-1536",
+              "EGY-1538"
+            ],
+            "type": "feature_ids"
+          },
+          "target_owner_tag": "ITA"
+        }
+      ],
+      "display_name_override": "Italian Egypt",
+      "notes": "Italy releasable for an Egyptian protectorate. Auto-transfers the Suez canal zone to direct Italian control.",
+      "parent_owner_tag": "ITA",
       "preset_source": {
-        "type": "feature_ids",
         "feature_ids": [
           "EGY-1530",
           "EGY-1531",
@@ -767,41 +769,22 @@
           "EGY-1556",
           "EGY-1557",
           "EGY-1558"
-        ]
+        ],
+        "type": "feature_ids"
       },
-      "companion_actions": [
-        {
-          "id": "suez_canal_zone_to_ita",
-          "label": "Transfer Suez Canal Zone To Italy",
-          "description": "Transfers the Suez canal zone to direct Italian control when Italian Egypt is applied.",
-          "basis": "historical_reference",
-          "action_type": "ownership_transfer",
-          "target_owner_tag": "ITA",
-          "auto_apply_on_core_territory": true,
-          "preset_source": {
-            "type": "feature_ids",
-            "feature_ids": [
-              "EGY-1531",
-              "EGY-1536",
-              "EGY-1538"
-            ]
-          }
-        }
-      ],
-      "notes": "Italy releasable for an Egyptian protectorate. Auto-transfers the Suez canal zone to direct Italian control."
-    },
-    {
-      "tag": "PAL",
-      "display_name_override": "Italian Palestine",
-      "color_hex_override": "#66a56d",
-      "parent_owner_tag": "ITA",
-      "release_lookup_iso2": "IL",
+      "release_lookup_iso2": "EG",
       "scenario_ids": [
         "tno_1962"
       ],
+      "tag": "EGY"
+    },
+    {
       "allow_manual_overlay": true,
+      "color_hex_override": "#66a56d",
+      "display_name_override": "Italian Palestine",
+      "notes": "Italy releasable for the Italian Palestine settlement.",
+      "parent_owner_tag": "ITA",
       "preset_source": {
-        "type": "feature_ids",
         "feature_ids": [
           "GAZ+00?",
           "ISR-3053",
@@ -811,22 +794,22 @@
           "ISR-3057",
           "ISR-3058",
           "WEB+00?"
-        ]
+        ],
+        "type": "feature_ids"
       },
-      "notes": "Italy releasable for the Italian Palestine settlement."
-    },
-    {
-      "tag": "JOR",
-      "display_name_override": "Italian Transjordan",
-      "color_hex_override": "#566c50",
-      "parent_owner_tag": "ITA",
-      "release_lookup_iso2": "JO",
+      "release_lookup_iso2": "IL",
       "scenario_ids": [
         "tno_1962"
       ],
+      "tag": "PAL"
+    },
+    {
       "allow_manual_overlay": true,
+      "color_hex_override": "#566c50",
+      "display_name_override": "Italian Transjordan",
+      "notes": "Italy releasable for the Italian Transjordan settlement.",
+      "parent_owner_tag": "ITA",
       "preset_source": {
-        "type": "feature_ids",
         "feature_ids": [
           "JOR-849",
           "JOR-850",
@@ -840,22 +823,22 @@
           "JOR-858",
           "JOR-859",
           "JOR-860"
-        ]
+        ],
+        "type": "feature_ids"
       },
-      "notes": "Italy releasable for the Italian Transjordan settlement."
-    },
-    {
-      "tag": "TUN",
-      "display_name_override": "Tunisian Protectorate",
-      "color_hex_override": "#638853",
-      "parent_owner_tag": "ITA",
-      "release_lookup_iso2": "TN",
+      "release_lookup_iso2": "JO",
       "scenario_ids": [
         "tno_1962"
       ],
+      "tag": "JOR"
+    },
+    {
       "allow_manual_overlay": true,
+      "color_hex_override": "#638853",
+      "display_name_override": "Tunisian Protectorate",
+      "notes": "Italy releasable for the Tunisian protectorate settlement.",
+      "parent_owner_tag": "ITA",
       "preset_source": {
-        "type": "feature_ids",
         "feature_ids": [
           "TUN-101",
           "TUN-102",
@@ -880,22 +863,22 @@
           "TUN-96",
           "TUN-97",
           "TUN-98"
-        ]
+        ],
+        "type": "feature_ids"
       },
-      "notes": "Italy releasable for the Tunisian protectorate settlement."
-    },
-    {
-      "tag": "SYR",
-      "display_name_override": "Syrian Protectorate",
-      "color_hex_override": "#c8c896",
-      "parent_owner_tag": "ITA",
-      "release_lookup_iso2": "SY",
+      "release_lookup_iso2": "TN",
       "scenario_ids": [
         "tno_1962"
       ],
+      "tag": "TUN"
+    },
+    {
       "allow_manual_overlay": true,
+      "color_hex_override": "#c8c896",
+      "display_name_override": "Syrian Protectorate",
+      "notes": "Italy releasable for the Syrian protectorate settlement.",
+      "parent_owner_tag": "ITA",
       "preset_source": {
-        "type": "feature_ids",
         "feature_ids": [
           "SYR-135",
           "SYR-136",
@@ -911,22 +894,22 @@
           "SYR-146",
           "SYR-4843",
           "SYR-5261"
-        ]
+        ],
+        "type": "feature_ids"
       },
-      "notes": "Italy releasable for the Syrian protectorate settlement."
-    },
-    {
-      "tag": "LEB",
-      "display_name_override": "Lebanese Protectorate",
-      "color_hex_override": "#146b44",
-      "parent_owner_tag": "ITA",
-      "release_lookup_iso2": "LB",
+      "release_lookup_iso2": "SY",
       "scenario_ids": [
         "tno_1962"
       ],
+      "tag": "SYR"
+    },
+    {
       "allow_manual_overlay": true,
+      "color_hex_override": "#146b44",
+      "display_name_override": "Lebanese Protectorate",
+      "notes": "Italy releasable for the Lebanese protectorate settlement.",
+      "parent_owner_tag": "ITA",
       "preset_source": {
-        "type": "feature_ids",
         "feature_ids": [
           "LBN-3022",
           "LBN-3023",
@@ -934,10 +917,19 @@
           "LBN-3025",
           "LBN-3059",
           "LBN-3060"
-        ]
+        ],
+        "type": "feature_ids"
       },
-      "notes": "Italy releasable for the Lebanese protectorate settlement."
+      "release_lookup_iso2": "LB",
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "tag": "LEB"
     }
   ],
-  "excluded": []
+  "excluded": [],
+  "scenario_ids": [
+    "tno_1962"
+  ],
+  "version": 1
 }

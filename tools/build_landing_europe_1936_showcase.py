@@ -490,6 +490,9 @@ def ring_path(
         for lon, lat, *_ in points
         for x, y in [canvas.project(float(lon), float(lat))]
     ]
+    # Vertices closer than the output precision collapse to one point. Which of
+    # them survive simplification differs across platforms' floating point.
+    projected = [vertex for index, vertex in enumerate(projected) if index == 0 or vertex != projected[index - 1]]
     if len(projected) < 3:
         return ""
     if canonical_start and projected[0] == projected[-1]:

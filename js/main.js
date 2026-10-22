@@ -1,6 +1,7 @@
 // App entry point (Phase 13)
 import { state as runtimeState } from "./core/state.js";
 import "./core/data_service.js";
+import "./core/app_test_api.js";
 import {
   setBootPreviewVisibleState,
   setStartupInitialScenarioChunkVisualPromotion,

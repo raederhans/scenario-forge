@@ -427,7 +427,7 @@ test("successful GPU handoff retires legacy navigation while incomplete, vector 
   const begin = source.indexOf("function composeCachedPasses(");
   const end = source.indexOf("function canDrawTransformedPass(", begin);
   for (const mode of ["gpu", "incomplete", "vector", "export"]) {
-    let disposed = 0, overviewClears = 0, gpuPresents = 0, nativeBlits = 0;
+    let disposed = 0, overviewClears = 0, gpuPresents = 0, nativeBlits = 0, released = 0, reuseInvalidations = 0;
     const legacy = { dispose: () => { disposed++; } };
     const scene = { present: () => { gpuPresents++; return mode === "gpu"; }, clear() {} };
     const scope = {
@@ -442,6 +442,8 @@ test("successful GPU handoff retires legacy navigation while incomplete, vector 
       incrementPerfCounter() {}, ensureCompositeBufferCanvas: () => ({}),
       getExactCompositeReuseOwner: () => ({ composeExact: () => ({ ok: true }) }),
       blitCompositeBufferToMain: () => { nativeBlits++; },
+      exactCompositeReuseOwner: { invalidate: () => { reuseInvalidations++; } },
+      getRenderCacheOwner: () => ({ releaseObsoleteSceneSurfaces: ({ directPolitical }) => { assert.equal(directPolitical, true); released++; return 0; } }),
     };
     vm.createContext(scope); vm.runInContext(source.slice(begin, end), scope);
     assert.equal(scope.composeCachedPasses([]), true);
@@ -451,6 +453,9 @@ test("successful GPU handoff retires legacy navigation while incomplete, vector 
     assert.equal(scope.navigationSceneOwner, mode === "gpu" ? null : legacy, mode);
     assert.equal(gpuPresents, mode === "export" || mode === "vector" ? 0 : 2, mode);
     assert.equal(nativeBlits, mode === "gpu" ? 0 : 2, mode);
+    // Only a presented GPU scene retires idle political and composite backings.
+    assert.equal(released, mode === "gpu" ? 2 : 0, mode);
+    assert.equal(reuseInvalidations, mode === "gpu" ? 2 : 0, mode);
   }
 });
 
@@ -484,6 +489,7 @@ test("compose gates political publication on prepared layers and preserves the s
     politicalIdRasterRuntimeOwner: { getDiagnostics: () => ({ stagedPending: true }),
       publishDirectFrame: () => { calls.push("publish-political"); return true; } },
     politicalPassUsesDirectScene: false, navigationSceneOwner: null, incrementPerfCounter() {},
+    exactCompositeReuseOwner: null, getRenderCacheOwner: () => ({ releaseObsoleteSceneSurfaces: () => 0 }),
   };
   vm.createContext(scope); vm.runInContext(source.slice(begin, end), scope);
   assert.equal(scope.composeCachedPasses([]), false);

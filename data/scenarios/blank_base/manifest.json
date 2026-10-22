@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/blank_base/audit.json",
-  "baseline_hash": "112726925d1778cd8f0626bd45bf2ae206a56acf7f1abab9e36b3a99f2cce0f3",
+  "baseline_hash": "e592dbd3eb035048c4de5aa03377032f007aaf1eeee06518298cfcc93e63f58e",
   "bookmark_date": "2026.1.1.12",
   "bookmark_description": "Editable ownerless map canvas with full province geometry and no pre-assigned ownership, controllers, or cores.",
   "bookmark_name": "Blank Map",
@@ -32,7 +32,7 @@
   "runtime_topology_url": "data/scenarios/blank_base/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "blank_base",
-  "snapshot_fingerprint": "181d1c57403a7239d8a7a2beb2bf1beb22717cc865750b47f34370b35715a056",
+  "snapshot_fingerprint": "156e6f405c7decba8b51dea53c32a394a8a9ebf4416f95130f1e84c501d245aa",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "ownerless_restoration_sources": [
@@ -71,7 +71,7 @@
     ],
     "ownerless_topology_source": "data/scenarios/modern_world/runtime_topology.topo.json",
     "ownerless_topology_source_sha256": "917320332f37571d2fa1cca21881e0b5fc2cc9ede4966abe914a1e9259eabf1e",
-    "runtime_topology_sha256": "8de345d7caecbc627c0892a348f05c237795a4a469c57648b6db017c9ecee812"
+    "runtime_topology_sha256": "5ec8b8b55b349aaa1482a67c0e3444d2db61a790fa97bb8ec07a721a5c31343d"
   },
   "special_zone_layers_url": "data/scenarios/blank_base/special_zone_layers.json",
   "style_defaults": {
@@ -88,24 +88,24 @@
   "summary": {
     "approximate_count": 0,
     "blocker_count": 0,
-    "changed_feature_count": 23127,
+    "changed_feature_count": 22855,
     "controller_count": 0,
     "controller_rule_count": 0,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 23127,
+    "feature_count": 22855,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 0,
     "quality_counts": {
-      "ownerless_editable_topology": 23127
+      "ownerless_editable_topology": 22855
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "ownerless_editable_topology": 23127
+      "ownerless_editable_topology": 22855
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,

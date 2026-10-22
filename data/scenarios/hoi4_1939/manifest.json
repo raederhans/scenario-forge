@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1939/audit.json",
-  "baseline_hash": "141c1ffa0ec5df664f8b121a1fd0659503ea3acd47a83c8301d47b0518101e50",
+  "baseline_hash": "da1336f2de80ee73e3a147c30e18684caaf74d20da62ed06115f749ab97aed54",
   "bookmark_date": "1939.8.14.12",
   "bookmark_description": "BLITZKRIEG_DESC",
   "bookmark_name": "BLITZKRIEG_NAME",
@@ -80,6 +80,7 @@
     "special_regions_default": false,
     "water_regions_default": false
   },
+  "political_id_raster_manifest_url": "data/scenarios/hoi4_1939/political_id_raster/manifest.json",
   "render_budget_hints": {
     "detail_zoom_threshold": 1.7,
     "max_optional_chunks": 3,
@@ -90,12 +91,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "453dad3bc10161b6926db3e73d8f5bd1c3f7d8ff77311abf129f6abfb016e04e",
+  "snapshot_fingerprint": "37b94cc4f71fbcf9581a8bc3aec594a47371a5a7ff35232575fd11cd95c7b956",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "605fa74fbe2f1cc084e63666b6687ad7288140bd7c8e1aad144243d1a436ceff",
+    "detail_chunk_manifest_sha256": "526a80b34f7a6229209317b8fa2998249a72eab32c5acd0b68de0e2acff6e6e4",
     "runtime_bootstrap_topology_sha256": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
-    "runtime_topology_sha256": "43e307baa1b7ffa4b00774fdf12c7d96eb0cd0dd219c1c6990384da0c6cddbff"
+    "runtime_topology_sha256": "7c9d51ce73127375eab006cea849798030faaf12adb1c2dc9cfcd54c678411b9"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1939/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -113,29 +114,29 @@
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 17674,
+    "changed_feature_count": 17605,
     "controller_count": 120,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 23418,
+    "feature_count": 23146,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 17217,
+    "manual_reviewed_feature_count": 17148,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 120,
     "quality_counts": {
       "approx_existing_geometry": 457,
       "direct_country_copy": 5744,
-      "manual_reviewed": 17217
+      "manual_reviewed": 17148
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5744,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 17651
+      "manual_rule": 17582
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,
@@ -146,6 +147,5 @@
     "synthetic_owner_feature_count": 23,
     "topology_blocker_count": 0
   },
-  "version": 2,
-  "political_id_raster_manifest_url": "data/scenarios/hoi4_1939/political_id_raster/manifest.json"
+  "version": 2
 }

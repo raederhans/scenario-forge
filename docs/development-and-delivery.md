@@ -2,38 +2,40 @@
 
 [中文](development-and-delivery.zh-CN.md)
 
-Start with the read-only delivery plan:
+## Local checks
 
 ```sh
-npm run pr:plan
-npm run pr:plan -- --base origin/main --json
-npm run pr:plan -- --changed-file js/ui/styled_selects.js
-npm run pr:plan -- --labels ci:perf-strict
+npm test                 # every Node and Python unit test
+npm run test:node        # Node only (tests/*.test.mjs)
+npm run test:python      # Python only (pytest -n auto)
+node --test tests/<file>.test.mjs   # one file
+npm run test:e2e:smoke   # browser smoke
+npm run test:e2e:golden  # golden user flows (about 10 minutes)
 ```
 
-The command uses local Git refs without fetching, writing files or running tests. It separates committed branch changes from pending workspace changes and previews their combined verification requirements. Hosted CI only sees pushed commits. Refresh your target ref when appropriate and check the reported SHAs. Explicit files preview only that scope; labels describe intended PR labels and default to none, without querying or changing GitHub.
+`tests/quarantine.json` is the only skip list on PRs. Every entry needs a reason and leaves as soon as the test is fixed or deleted. Nightly runs everything with `--all`, including the quarantine and the slow lists.
 
 | Stage | Action |
 | --- | --- |
-| Edit | Run the selected behavior tests, or `verify:edit -- --changed-file <path>`. Exercise affected UI behavior with a focused browser check when needed. |
-| Prepare a commit | Review ownership, diff and coverage. Use `verify:commit` when a combined check is needed; it executes tests and defaults to pending workspace changes, not the full committed branch diff. |
-| Push a feature branch | Push the scoped commits within existing authorization; do not automatically repeat the broad `verify:pr` suite. |
-| Merge a PR | CI uses the same PR planning policy. Wait for required checks on the final commit. |
-| Release | Merging to `main` triggers the existing deployment workflow. Confirm CI, merge, artifact admission and live deployment separately. |
+| Edit | Run the test files closest to the change; exercise affected UI with one focused browser check. |
+| Before a commit | `npm test`. Add `npm run verify:pages-dist` when data, packaging or Pages entries change. |
+| Push a feature branch | Push within existing authorization; no extra verification bundle is required. |
+| Merge a PR | Wait for `PR Verify Required` on the final commit. |
+| Release | Merging to `main` triggers deployment. Confirm CI, merge, artifact admission and live deployment separately. |
 
-A plan is not a test result. Resolve unmatched files and route gaps; deferred checks remain unexecuted. `verify:pr` is an explicit broad verification entry point, not a local replica of hosted PR CI or a prerequisite for every push. See [verification maintenance](testing/verify-core.md) for core, nightly and release details. The repository has no commit or push hook that automatically runs these commands.
+## PR checks
 
-PR routing considers the entire change set; mixed changes retain the broader checks:
+Every PR runs the same jobs; there is no path-based routing:
 
-| Scope | PR checks |
+| Job | Contents |
 | --- | --- |
-| README / ordinary Markdown only | Classification and required aggregation remain; test setup, browser and Pages builds are skipped. `docs/testing` is excluded from this exemption. |
-| Registered local UI | Affected contracts, six focused browser tests and Pages source references. Performance sampling remains visible as an observation that the merge gate does not wait for. |
-| Other JS/CSS runtime | Affected contracts, existing smoke, source references and applicable required performance measurement. |
-| Data, dependencies, entries, packaging or CI routing | Full Pages artifact checks and other checks required for the scope. `ci:full` forces full PR routing; `ci:perf-strict` forces strict performance measurement. |
+| `pr-tests` | All Node unit tests (two shards) and all Python unit tests. |
+| `pr-verify-fast` | Public sample project validation, Quick Fill hierarchy data and audit, data catalog health, Pages source references, Pages artifact build and startup shell checks. |
+| `pr-golden` | Golden user flows (two shards): startup, switching and filling in all five scenarios, undo/redo, save and reopen, PNG export, performance budgets. They reach the app only through the DOM and `js/core/app_test_api.js`. |
+| `pr-verify-smoke` | Browser smoke, the Golden Demo and the live Quick Fill toolbar smoke (`tools/check_quick_fill_browser.mjs`). |
+| `pr-verify-hgo` | Checks, tests and data validation for the standalone HGO editor. |
+| `PR Verify Required` | Fails when any job above fails; the only required check. |
 
-The UI scope currently contains only `editor-workspace.css`, `editor-tool-guidance.css`, `styled_selects.js` and `toolbar/tool_guidance.js`; see the complete paths in the [shared policy](../tools/ci/perf_policy.mjs). Additional files cause the entire change set to be reclassified. Unknown paths cannot receive the UI exemption.
+Scenario Contract Matrix (strict data contracts for all five scenarios) and Transport Contract Required also run on every PR and can be rerun from Actions; they are not required checks. Performance gating lives in `perf-pr-gate.yml` and the [performance policy](../tools/ci/perf_policy.mjs).
 
-Run `npm run verify:pages-source-graph` to check current HTML, JS/MJS and CSS references without generating dist. This does not establish data-content, compression or release-artifact integrity; full build and release checks retain those responsibilities.
-
-Saving work to a feature branch does not require first updating from `main` or repeating broad verification. Fetch the target when preparing to merge and check the final commit's required checks. If protection requires an updated branch, merge the latest `main` and wait for that update's CI without adding a local `verify:pr` run. Label changes replan checks. Pages release admission remains separate after merge; Scenario/Transport no longer repeat full audits automatically and retain manual Actions entry points.
+Saving work to a feature branch does not require updating from `main` first. Fetch the target when preparing to merge and check the final commit's required check; Pages release admission stays separate after merge.

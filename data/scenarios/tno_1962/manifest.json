@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/tno_1962/audit.json",
-  "baseline_hash": "7340d2c12600800bab822bfda02d8855686670e358a8d0a2b40a856a46080860",
+  "baseline_hash": "6bea23295029c123e2b111ba4d7b566da7842ebbe5aebb269f825f6b03d4163f",
   "bathymetry_topology_url": "data/scenarios/tno_1962/bathymetry.topo.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
@@ -148,6 +148,7 @@
     "special_regions_default": true,
     "water_regions_default": true
   },
+  "political_id_raster_manifest_url": "data/scenarios/tno_1962/political_id_raster/manifest.json",
   "presentation_features": {
     "atlantropa_relief": true,
     "coastal_accent": true
@@ -170,12 +171,12 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "c136b3da0ba64a61746a4e787dd540bd7a9012fc0977615f676a789118f227c5",
+  "snapshot_fingerprint": "f2b03cd632e543d12f55148ad83156b590201a378fd3018f898c64320abd9335",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "2c9749da6b926f98a870910da12621765df46a443d341fdb8cb39974acf6f208",
+    "detail_chunk_manifest_sha256": "fb63e97448b8b616b9ba62271b13abbca6174ad22106511e1f0438dbd8370a0a",
     "runtime_bootstrap_topology_sha256": "778d8bf0739545699e84b5a5b99decbec670752d1f36ef142ac8399e4e923119",
-    "runtime_topology_sha256": "2de31f99fdf3ccf6d037d2af394d714bc202ced9e3d76ec483105f48ec13ec20"
+    "runtime_topology_sha256": "49dac339534689a6e024f73e36ad6da6f1c2915d3acbc9a4630d16cb2727123b"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
@@ -200,7 +201,7 @@
     }
   },
   "summary": {
-    "approximate_count": 861,
+    "approximate_count": 865,
     "belarus_hybrid_feature_count": 0,
     "blocker_count": 0,
     "changed_feature_count": 2032,
@@ -213,27 +214,27 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 12711,
+    "feature_count": 12439,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 9381,
+    "manual_reviewed_feature_count": 9511,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
     "owner_count": 172,
     "quality_counts": {
-      "approx_existing_geometry": 921,
-      "direct_country_copy": 2578,
-      "manual_reviewed": 9381
+      "approx_existing_geometry": 925,
+      "direct_country_copy": 2639,
+      "manual_reviewed": 9511
     },
     "scenario_atlantropa_feature_count": 726,
     "scenario_rule_blocker_count": 0,
     "scenario_runtime_topology_object_count": 7,
     "source_counts": {
       "controller_rule": 0,
-      "direct_active_owner": 4354,
+      "direct_active_owner": 4468,
       "fallback_mapped_tag": 3,
-      "manual_rule": 6240,
+      "manual_rule": 6293,
       "scenario_generated": 445,
-      "tno_reichskommissariat_baseline": 1838
+      "tno_reichskommissariat_baseline": 1866
     },
     "synthetic_count": 492,
     "synthetic_owner_feature_count": 492,
@@ -248,6 +249,5 @@
   },
   "version": 2,
   "water_regions_mode": "exclusive",
-  "water_regions_url": "data/scenarios/tno_1962/water_regions.geojson",
-  "political_id_raster_manifest_url": "data/scenarios/tno_1962/political_id_raster/manifest.json"
+  "water_regions_url": "data/scenarios/tno_1962/water_regions.geojson"
 }
