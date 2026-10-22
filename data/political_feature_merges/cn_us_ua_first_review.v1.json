@@ -1,0 +1,4233 @@
+{
+  "schema_version": 1,
+  "plan_id": "cn_us_ua_first_review.v1",
+  "candidate_source": "data/political_feature_merges/cn_us_ua_first_review.candidates.json",
+  "constraints": [
+    "owners",
+    "cores",
+    "strategic_value_buckets",
+    "hierarchy_groups",
+    "quick_fill_groups",
+    "china_crosswalk_prefecture",
+    "river_paint_parcels_unchanged",
+    "contiguous"
+  ],
+  "ownership_scenarios": [
+    "hoi4_1936",
+    "hoi4_1939",
+    "modern_world",
+    "tno_1962"
+  ],
+  "strategic_scenarios": [
+    "hoi4_1936",
+    "hoi4_1939"
+  ],
+  "counts": {
+    "candidates": 187,
+    "groups": 141,
+    "merged_members": 335,
+    "features_removed": 194,
+    "split_or_reduced_candidates": 84
+  },
+  "groups": [
+    {
+      "id": "CN_MRG_e9bedc8a8392",
+      "member_ids": [
+        "CN_CITY_17275852B10417226533704",
+        "CN_CITY_17275852B46601481369620",
+        "CN_CITY_17275852B90910208115389"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Xinxian + Guangshanxian + Huangchuanxian",
+        "zh": "新县、光善县、荒川县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B10417226533704": {
+          "en": "Xinxian",
+          "zh": "新县"
+        },
+        "CN_CITY_17275852B46601481369620": {
+          "en": "Guangshanxian",
+          "zh": "光善县"
+        },
+        "CN_CITY_17275852B90910208115389": {
+          "en": "Huangchuanxian",
+          "zh": "荒川县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_427fc101d0bb",
+      "member_ids": [
+        "CN_CITY_17275852B11062842353292",
+        "CN_CITY_17275852B30839777764393"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Xihuaxian + Fugouxian",
+        "zh": "西华县、浮沟县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B11062842353292": {
+          "en": "Xihuaxian",
+          "zh": "西华县"
+        },
+        "CN_CITY_17275852B30839777764393": {
+          "en": "Fugouxian",
+          "zh": "浮沟县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_533faafa0df3",
+      "member_ids": [
+        "CN_CITY_17275852B12009758175917",
+        "CN_CITY_17275852B90293274121417"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Renqiu + Hejian",
+        "zh": "任丘、河间"
+      },
+      "member_names": {
+        "CN_CITY_17275852B12009758175917": {
+          "en": "Renqiu",
+          "zh": "任丘"
+        },
+        "CN_CITY_17275852B90293274121417": {
+          "en": "Hejian",
+          "zh": "河间"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_6c8b997d87f4",
+      "member_ids": [
+        "CN_CITY_17275852B12367976812965",
+        "CN_CITY_17275852B60013836791147",
+        "CN_CITY_17275852B60708257219667"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Jiaxian + Lushanxian + Baofengxian",
+        "zh": "郏县、Lushanxian、宝丰县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B12367976812965": {
+          "en": "Jiaxian",
+          "zh": "郏县"
+        },
+        "CN_CITY_17275852B60013836791147": {
+          "en": "Lushanxian",
+          "zh": "Lushanxian"
+        },
+        "CN_CITY_17275852B60708257219667": {
+          "en": "Baofengxian",
+          "zh": "宝丰县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_41987d66c89b",
+      "member_ids": [
+        "CN_CITY_17275852B14914107047494",
+        "CN_CITY_17275852B61014639645675"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Anyangxian + Tangyinxian",
+        "zh": "安阳县、汤阴县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B14914107047494": {
+          "en": "Anyangxian",
+          "zh": "安阳县"
+        },
+        "CN_CITY_17275852B61014639645675": {
+          "en": "Tangyinxian",
+          "zh": "汤阴县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_19742f026a19",
+      "member_ids": [
+        "CN_CITY_17275852B15402619404646",
+        "CN_CITY_17275852B30063446428877"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Nanhexian + Renxian",
+        "zh": "南河县、任县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B15402619404646": {
+          "en": "Nanhexian",
+          "zh": "南河县"
+        },
+        "CN_CITY_17275852B30063446428877": {
+          "en": "Renxian",
+          "zh": "任县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_57214cfbaf31",
+      "member_ids": [
+        "CN_CITY_17275852B15928071016890",
+        "CN_CITY_17275852B38392968045125",
+        "CN_CITY_17275852B61603419379796"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Lichuanxian + Nanfengxian + Zixixian",
+        "zh": "利川县、南丰县、紫溪县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B15928071016890": {
+          "en": "Lichuanxian",
+          "zh": "利川县"
+        },
+        "CN_CITY_17275852B38392968045125": {
+          "en": "Nanfengxian",
+          "zh": "南丰县"
+        },
+        "CN_CITY_17275852B61603419379796": {
+          "en": "Zixixian",
+          "zh": "紫溪县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_d6f45c057bfc",
+      "member_ids": [
+        "CN_CITY_17275852B15976604032949",
+        "CN_CITY_17275852B66013638365038"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Luquan + Yuanxian",
+        "zh": "鹿泉、原县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B15976604032949": {
+          "en": "Luquan",
+          "zh": "鹿泉"
+        },
+        "CN_CITY_17275852B66013638365038": {
+          "en": "Yuanxian",
+          "zh": "原县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_e16d02489ce6",
+      "member_ids": [
+        "CN_CITY_17275852B17244930809328",
+        "CN_CITY_17275852B79000631743628"
+      ],
+      "parent_id": "CN_Anhui",
+      "names": {
+        "en": "Wuhexian + Guzhenxian",
+        "zh": "五河县、固镇县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B17244930809328": {
+          "en": "Wuhexian",
+          "zh": "五河县"
+        },
+        "CN_CITY_17275852B79000631743628": {
+          "en": "Guzhenxian",
+          "zh": "固镇县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_8028022022b6",
+      "member_ids": [
+        "CN_CITY_17275852B54720396840939",
+        "CN_CITY_17275852B55507691146729"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Xincaixian + Zhengyangxian",
+        "zh": "新彩县、正阳县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B54720396840939": {
+          "en": "Xincaixian",
+          "zh": "新彩县"
+        },
+        "CN_CITY_17275852B55507691146729": {
+          "en": "Zhengyangxian",
+          "zh": "正阳县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_8c69fc20650e",
+      "member_ids": [
+        "CN_CITY_17275852B17915990545621",
+        "CN_CITY_17275852B69472300438393",
+        "CN_CITY_17275852B70455093500286"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Xushuixian + Wangduxian + Qingyuanxian",
+        "zh": "徐水县、望都县、Qingyuanxian"
+      },
+      "member_names": {
+        "CN_CITY_17275852B17915990545621": {
+          "en": "Xushuixian",
+          "zh": "徐水县"
+        },
+        "CN_CITY_17275852B69472300438393": {
+          "en": "Wangduxian",
+          "zh": "望都县"
+        },
+        "CN_CITY_17275852B70455093500286": {
+          "en": "Qingyuanxian",
+          "zh": "Qingyuanxian"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_5c6db60e61b3",
+      "member_ids": [
+        "CN_CITY_17275852B18090329850308",
+        "CN_CITY_17275852B23091947477547",
+        "CN_CITY_17275852B67626464932783"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Shanggaoxian + Wanzaixian + Shanggaoxian",
+        "zh": "上高县、万载县、Shanggaoxian"
+      },
+      "member_names": {
+        "CN_CITY_17275852B18090329850308": {
+          "en": "Shanggaoxian",
+          "zh": "上高县"
+        },
+        "CN_CITY_17275852B23091947477547": {
+          "en": "Wanzaixian",
+          "zh": "万载县"
+        },
+        "CN_CITY_17275852B67626464932783": {
+          "en": "Shanggaoxian",
+          "zh": "Shanggaoxian"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_afbaca334723",
+      "member_ids": [
+        "CN_CITY_17275852B19731807948045",
+        "CN_CITY_17275852B45429218697197",
+        "CN_CITY_17275852B90274183162284"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Wuqiangxian + Wuyixian + Shenzhou",
+        "zh": "武强县、武夷县、神舟"
+      },
+      "member_names": {
+        "CN_CITY_17275852B19731807948045": {
+          "en": "Wuqiangxian",
+          "zh": "武强县"
+        },
+        "CN_CITY_17275852B45429218697197": {
+          "en": "Wuyixian",
+          "zh": "武夷县"
+        },
+        "CN_CITY_17275852B90274183162284": {
+          "en": "Shenzhou",
+          "zh": "神舟"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_b7b350314dc1",
+      "member_ids": [
+        "CN_CITY_17275852B2055839745215",
+        "CN_CITY_17275852B24684038509558",
+        "CN_CITY_17275852B93154995028726"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Luanchuanxian + Ruyang + Songxian",
+        "zh": "栾川县、汝阳、嵩县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B2055839745215": {
+          "en": "Luanchuanxian",
+          "zh": "栾川县"
+        },
+        "CN_CITY_17275852B24684038509558": {
+          "en": "Ruyang",
+          "zh": "汝阳"
+        },
+        "CN_CITY_17275852B93154995028726": {
+          "en": "Songxian",
+          "zh": "嵩县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_bf685b353c1f",
+      "member_ids": [
+        "CN_CITY_17275852B20688362661640",
+        "CN_CITY_17275852B48027257295245",
+        "CN_CITY_17275852B86260962826974"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Anxinxian + Gaoyangxian + Rongchengxian",
+        "zh": "安新县、高阳县、容城县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B20688362661640": {
+          "en": "Anxinxian",
+          "zh": "安新县"
+        },
+        "CN_CITY_17275852B48027257295245": {
+          "en": "Gaoyangxian",
+          "zh": "高阳县"
+        },
+        "CN_CITY_17275852B86260962826974": {
+          "en": "Rongchengxian",
+          "zh": "容城县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_34e4e9cc4fbe",
+      "member_ids": [
+        "CN_CITY_17275852B21011904878760",
+        "CN_CITY_17275852B29896348675191",
+        "CN_CITY_17275852B7444451912335"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Boyexian + Lixian + Anguo",
+        "zh": "博野县、Lixian、安国"
+      },
+      "member_names": {
+        "CN_CITY_17275852B21011904878760": {
+          "en": "Boyexian",
+          "zh": "博野县"
+        },
+        "CN_CITY_17275852B29896348675191": {
+          "en": "Lixian",
+          "zh": "Lixian"
+        },
+        "CN_CITY_17275852B7444451912335": {
+          "en": "Anguo",
+          "zh": "安国"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_dcba081e6d4b",
+      "member_ids": [
+        "CN_CITY_17275852B22610568030006",
+        "CN_CITY_17275852B35414726377112"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Nanyang + Sheqixian",
+        "zh": "南阳、社旗县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B22610568030006": {
+          "en": "Nanyang",
+          "zh": "南阳"
+        },
+        "CN_CITY_17275852B35414726377112": {
+          "en": "Sheqixian",
+          "zh": "社旗县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_a23dd781cd4b",
+      "member_ids": [
+        "CN_CITY_17275852B23042571236095",
+        "CN_CITY_17275852B39849449809026"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Leanxian + Yihuangxian",
+        "zh": "乐县、以黄县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B23042571236095": {
+          "en": "Leanxian",
+          "zh": "乐县"
+        },
+        "CN_CITY_17275852B39849449809026": {
+          "en": "Yihuangxian",
+          "zh": "以黄县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_4c6664a4fd2e",
+      "member_ids": [
+        "CN_CITY_17275852B23676912924817",
+        "CN_CITY_17275852B8841096687907"
+      ],
+      "parent_id": "CN_Anhui",
+      "names": {
+        "en": "Dingyuanxian + Fengyangxian",
+        "zh": "定远县、凤阳县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B23676912924817": {
+          "en": "Dingyuanxian",
+          "zh": "定远县"
+        },
+        "CN_CITY_17275852B8841096687907": {
+          "en": "Fengyangxian",
+          "zh": "凤阳县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_e76984eed8fb",
+      "member_ids": [
+        "CN_CITY_17275852B44956350685295",
+        "CN_CITY_17275852B81329065873888"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Yichuanxian + Yiyangxian",
+        "zh": "Yichuanxian、Yiyangxian"
+      },
+      "member_names": {
+        "CN_CITY_17275852B44956350685295": {
+          "en": "Yichuanxian",
+          "zh": "Yichuanxian"
+        },
+        "CN_CITY_17275852B81329065873888": {
+          "en": "Yiyangxian",
+          "zh": "Yiyangxian"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_398970fc50e7",
+      "member_ids": [
+        "CN_CITY_17275852B24333220567136",
+        "CN_CITY_17275852B39422876200918"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Yongxiuxian + Deanxian",
+        "zh": "永修县、德安县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B24333220567136": {
+          "en": "Yongxiuxian",
+          "zh": "永修县"
+        },
+        "CN_CITY_17275852B39422876200918": {
+          "en": "Deanxian",
+          "zh": "德安县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_b38ab466fa3b",
+      "member_ids": [
+        "CN_CITY_17275852B24882340673968",
+        "CN_CITY_17275852B8103009054716"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Quzhouxian + Yongnianxian",
+        "zh": "衢州县、永年县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B24882340673968": {
+          "en": "Quzhouxian",
+          "zh": "衢州县"
+        },
+        "CN_CITY_17275852B8103009054716": {
+          "en": "Yongnianxian",
+          "zh": "永年县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_0284a41a11c9",
+      "member_ids": [
+        "CN_CITY_17275852B27436635474795",
+        "CN_CITY_17275852B31377284290570"
+      ],
+      "parent_id": "CN_Anhui",
+      "names": {
+        "en": "Qingyangxian + Shitaixian",
+        "zh": "青阳县、石台县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B27436635474795": {
+          "en": "Qingyangxian",
+          "zh": "青阳县"
+        },
+        "CN_CITY_17275852B31377284290570": {
+          "en": "Shitaixian",
+          "zh": "石台县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_9305fada0549",
+      "member_ids": [
+        "CN_CITY_17275852B64087191598728",
+        "CN_CITY_17275852B87718878820627"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Wuningxian + Ruichang",
+        "zh": "武宁县、瑞昌"
+      },
+      "member_names": {
+        "CN_CITY_17275852B64087191598728": {
+          "en": "Wuningxian",
+          "zh": "武宁县"
+        },
+        "CN_CITY_17275852B87718878820627": {
+          "en": "Ruichang",
+          "zh": "瑞昌"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_394c2f1e79d2",
+      "member_ids": [
+        "CN_CITY_17275852B30373565857678",
+        "CN_CITY_17275852B37600232739643"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Changxian + Mencunhuizuzizhixian",
+        "zh": "昌县、孟村回族自治县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B30373565857678": {
+          "en": "Changxian",
+          "zh": "昌县"
+        },
+        "CN_CITY_17275852B37600232739643": {
+          "en": "Mencunhuizuzizhixian",
+          "zh": "孟村回族自治县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_8c437a4ee37b",
+      "member_ids": [
+        "CN_CITY_17275852B431696373370",
+        "CN_CITY_17275852B55754577664448"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Yongqingxian + Guanxian",
+        "zh": "永清县、灌县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B431696373370": {
+          "en": "Yongqingxian",
+          "zh": "永清县"
+        },
+        "CN_CITY_17275852B55754577664448": {
+          "en": "Guanxian",
+          "zh": "灌县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_5305adb06a6c",
+      "member_ids": [
+        "CN_CITY_17275852B31573882035564",
+        "CN_CITY_17275852B72769683371533"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Yushanxian + Shangraoxian",
+        "zh": "玉山县、上饶县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B31573882035564": {
+          "en": "Yushanxian",
+          "zh": "玉山县"
+        },
+        "CN_CITY_17275852B72769683371533": {
+          "en": "Shangraoxian",
+          "zh": "上饶县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_d7d38b1d4e6c",
+      "member_ids": [
+        "CN_CITY_17275852B31757639036873",
+        "CN_CITY_17275852B98150019256975"
+      ],
+      "parent_id": "CN_Anhui",
+      "names": {
+        "en": "Xiuningxian + Yixian",
+        "zh": "休宁县、Yixian"
+      },
+      "member_names": {
+        "CN_CITY_17275852B31757639036873": {
+          "en": "Xiuningxian",
+          "zh": "休宁县"
+        },
+        "CN_CITY_17275852B98150019256975": {
+          "en": "Yixian",
+          "zh": "Yixian"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_03c2697ed1c7",
+      "member_ids": [
+        "CN_CITY_17275852B32258301015981",
+        "CN_CITY_17275852B41151461072680"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Xinxiang + Weihui",
+        "zh": "新乡、伟辉"
+      },
+      "member_names": {
+        "CN_CITY_17275852B32258301015981": {
+          "en": "Xinxiang",
+          "zh": "新乡"
+        },
+        "CN_CITY_17275852B41151461072680": {
+          "en": "Weihui",
+          "zh": "伟辉"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_cb217ae78813",
+      "member_ids": [
+        "CN_CITY_17275852B34450056986470",
+        "CN_CITY_17275852B66433667475820"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Zhangshu + Gaoan",
+        "zh": "樟树、高安"
+      },
+      "member_names": {
+        "CN_CITY_17275852B34450056986470": {
+          "en": "Zhangshu",
+          "zh": "樟树"
+        },
+        "CN_CITY_17275852B66433667475820": {
+          "en": "Gaoan",
+          "zh": "高安"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_3be300af18dc",
+      "member_ids": [
+        "CN_CITY_17275852B35674473625997",
+        "CN_CITY_17275852B9304528417696"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Handanxian + Cixian",
+        "zh": "邯郸县、磁县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B35674473625997": {
+          "en": "Handanxian",
+          "zh": "邯郸县"
+        },
+        "CN_CITY_17275852B9304528417696": {
+          "en": "Cixian",
+          "zh": "磁县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_51c0b9bbbb0a",
+      "member_ids": [
+        "CN_CITY_17275852B35904418947378",
+        "CN_CITY_17275852B51290893529729",
+        "CN_CITY_17275852B76152157086843"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Nangong + Longyaoxian + Juluxian",
+        "zh": "馕、隆尧县、巨鹿县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B35904418947378": {
+          "en": "Nangong",
+          "zh": "馕"
+        },
+        "CN_CITY_17275852B51290893529729": {
+          "en": "Longyaoxian",
+          "zh": "隆尧县"
+        },
+        "CN_CITY_17275852B76152157086843": {
+          "en": "Juluxian",
+          "zh": "巨鹿县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_7c9c7c3d5403",
+      "member_ids": [
+        "CN_CITY_17275852B36890628103019",
+        "CN_CITY_17275852B87149259927291"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Botou + Xianxian",
+        "zh": "泊头、献县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B36890628103019": {
+          "en": "Botou",
+          "zh": "泊头"
+        },
+        "CN_CITY_17275852B87149259927291": {
+          "en": "Xianxian",
+          "zh": "献县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_855b56adb95d",
+      "member_ids": [
+        "CN_CITY_17275852B37858104001226",
+        "CN_CITY_17275852B73903296597057",
+        "CN_CITY_17275852B74776996629025"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Suichuanxian + Taihexian + Wananxian",
+        "zh": "遂川县、Taihexian、万安县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B37858104001226": {
+          "en": "Suichuanxian",
+          "zh": "遂川县"
+        },
+        "CN_CITY_17275852B73903296597057": {
+          "en": "Taihexian",
+          "zh": "Taihexian"
+        },
+        "CN_CITY_17275852B74776996629025": {
+          "en": "Wananxian",
+          "zh": "万安县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_3f1f7652e799",
+      "member_ids": [
+        "CN_CITY_17275852B47297530357355",
+        "CN_CITY_17275852B77342375778801"
+      ],
+      "parent_id": "CN_Anhui",
+      "names": {
+        "en": "Feixixian + Chaohu",
+        "zh": "费西县、Chaohu"
+      },
+      "member_names": {
+        "CN_CITY_17275852B47297530357355": {
+          "en": "Feixixian",
+          "zh": "费西县"
+        },
+        "CN_CITY_17275852B77342375778801": {
+          "en": "Chaohu",
+          "zh": "Chaohu"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_6d6cb2d8c363",
+      "member_ids": [
+        "CN_CITY_17275852B41394272458329",
+        "CN_CITY_17275852B71083235506927"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Shangyouxian + Nankang",
+        "zh": "上犹县、南康"
+      },
+      "member_names": {
+        "CN_CITY_17275852B41394272458329": {
+          "en": "Shangyouxian",
+          "zh": "上犹县"
+        },
+        "CN_CITY_17275852B71083235506927": {
+          "en": "Nankang",
+          "zh": "南康"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_5b41c4449ce8",
+      "member_ids": [
+        "CN_CITY_17275852B42323417187142",
+        "CN_CITY_17275852B61165424028511"
+      ],
+      "parent_id": "CN_Anhui",
+      "names": {
+        "en": "Tianchang + Laianxian",
+        "zh": "天长、来安县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B42323417187142": {
+          "en": "Tianchang",
+          "zh": "天长"
+        },
+        "CN_CITY_17275852B61165424028511": {
+          "en": "Laianxian",
+          "zh": "来安县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_caa06bd6794d",
+      "member_ids": [
+        "CN_CITY_17275852B43446340592902",
+        "CN_CITY_17275852B70748117167042",
+        "CN_CITY_17275852B99539158189120"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Yongfengxian + Jishuixian + Jian",
+        "zh": "永丰县、积水县、Jian"
+      },
+      "member_names": {
+        "CN_CITY_17275852B43446340592902": {
+          "en": "Yongfengxian",
+          "zh": "永丰县"
+        },
+        "CN_CITY_17275852B70748117167042": {
+          "en": "Jishuixian",
+          "zh": "积水县"
+        },
+        "CN_CITY_17275852B99539158189120": {
+          "en": "Jian",
+          "zh": "Jian"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_f2a3fc747532",
+      "member_ids": [
+        "CN_CITY_17275852B55448399697332",
+        "CN_CITY_17275852B8482565791704"
+      ],
+      "parent_id": "CN_Anhui",
+      "names": {
+        "en": "Taihuxian + Qianshanxian",
+        "zh": "太湖县、Qianshanxian"
+      },
+      "member_names": {
+        "CN_CITY_17275852B55448399697332": {
+          "en": "Taihuxian",
+          "zh": "太湖县"
+        },
+        "CN_CITY_17275852B8482565791704": {
+          "en": "Qianshanxian",
+          "zh": "Qianshanxian"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_c5c7b0e9cbd8",
+      "member_ids": [
+        "CN_CITY_17275852B68084346150299",
+        "CN_CITY_17275852B7483411794752"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Shuixian + Qixian",
+        "zh": "水县、七贤"
+      },
+      "member_names": {
+        "CN_CITY_17275852B68084346150299": {
+          "en": "Shuixian",
+          "zh": "水县"
+        },
+        "CN_CITY_17275852B7483411794752": {
+          "en": "Qixian",
+          "zh": "七贤"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_f5f659cc505e",
+      "member_ids": [
+        "CN_CITY_17275852B47245604901224",
+        "CN_CITY_17275852B50412174337680"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Neihuangxian + Huaxian",
+        "zh": "内黄县、滑县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B47245604901224": {
+          "en": "Neihuangxian",
+          "zh": "内黄县"
+        },
+        "CN_CITY_17275852B50412174337680": {
+          "en": "Huaxian",
+          "zh": "滑县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_6c22a284518b",
+      "member_ids": [
+        "CN_CITY_17275852B48217934131504",
+        "CN_CITY_17275852B89533026423026"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Yujiangxian + Guixixian",
+        "zh": "余江县、贵溪县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B48217934131504": {
+          "en": "Yujiangxian",
+          "zh": "余江县"
+        },
+        "CN_CITY_17275852B89533026423026": {
+          "en": "Guixixian",
+          "zh": "贵溪县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_4dbd04851564",
+      "member_ids": [
+        "CN_CITY_17275852B51269093511150",
+        "CN_CITY_17275852B76534884260482",
+        "CN_CITY_17275852B91186135419268"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Ningduxian + Ganxian + Xingguoxian",
+        "zh": "宁都县、赣县、兴国县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B51269093511150": {
+          "en": "Ningduxian",
+          "zh": "宁都县"
+        },
+        "CN_CITY_17275852B76534884260482": {
+          "en": "Ganxian",
+          "zh": "赣县"
+        },
+        "CN_CITY_17275852B91186135419268": {
+          "en": "Xingguoxian",
+          "zh": "兴国县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_a8d7799e7061",
+      "member_ids": [
+        "CN_CITY_17275852B5353146374567",
+        "CN_CITY_17275852B67769801833376",
+        "CN_CITY_17275852B90238227594233"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Wuyuanxian + Hengfengxian + Dexing",
+        "zh": "Wuyuanxian、横峰县、德兴"
+      },
+      "member_names": {
+        "CN_CITY_17275852B5353146374567": {
+          "en": "Wuyuanxian",
+          "zh": "Wuyuanxian"
+        },
+        "CN_CITY_17275852B67769801833376": {
+          "en": "Hengfengxian",
+          "zh": "横峰县"
+        },
+        "CN_CITY_17275852B90238227594233": {
+          "en": "Dexing",
+          "zh": "德兴"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_1130259eb8b0",
+      "member_ids": [
+        "CN_CITY_17275852B53933530490343",
+        "CN_CITY_17275852B64817974651819"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Guangzhongxian + Weixian",
+        "zh": "广中县、Weixian"
+      },
+      "member_names": {
+        "CN_CITY_17275852B53933530490343": {
+          "en": "Guangzhongxian",
+          "zh": "广中县"
+        },
+        "CN_CITY_17275852B64817974651819": {
+          "en": "Weixian",
+          "zh": "Weixian"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_c71520fb477c",
+      "member_ids": [
+        "CN_CITY_17275852B55464189255182",
+        "CN_CITY_17275852B55840349463324"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Mixian + Dongfeng",
+        "zh": "密县、东风"
+      },
+      "member_names": {
+        "CN_CITY_17275852B55464189255182": {
+          "en": "Mixian",
+          "zh": "密县"
+        },
+        "CN_CITY_17275852B55840349463324": {
+          "en": "Dongfeng",
+          "zh": "东风"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_f0bfe71b2f0e",
+      "member_ids": [
+        "CN_CITY_17275852B63987790069029",
+        "CN_CITY_17275852B88170553797239"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Yuzhou + Changge",
+        "zh": "禹州、长葛"
+      },
+      "member_names": {
+        "CN_CITY_17275852B63987790069029": {
+          "en": "Yuzhou",
+          "zh": "禹州"
+        },
+        "CN_CITY_17275852B88170553797239": {
+          "en": "Changge",
+          "zh": "长葛"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_51650d15c050",
+      "member_ids": [
+        "CN_CITY_17275852B58371513472148",
+        "CN_CITY_17275852B95887002471957"
+      ],
+      "parent_id": "CN_Hebei",
+      "names": {
+        "en": "Xingtangxian + Lingshouxian",
+        "zh": "行唐县、灵寿县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B58371513472148": {
+          "en": "Xingtangxian",
+          "zh": "行唐县"
+        },
+        "CN_CITY_17275852B95887002471957": {
+          "en": "Lingshouxian",
+          "zh": "灵寿县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_47f5cbedadef",
+      "member_ids": [
+        "CN_CITY_17275852B63877453406832",
+        "CN_CITY_17275852B88707811573248"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Fengxinxian + Jinganxian",
+        "zh": "奉新县、靖安县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B63877453406832": {
+          "en": "Fengxinxian",
+          "zh": "奉新县"
+        },
+        "CN_CITY_17275852B88707811573248": {
+          "en": "Jinganxian",
+          "zh": "靖安县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_b11a43e1dda4",
+      "member_ids": [
+        "CN_CITY_17275852B6082279520202",
+        "CN_CITY_17275852B62617200555443",
+        "CN_CITY_17275852B83134707412237"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Runanxian + Shangcaixian + Queshanxian",
+        "zh": "汝南县、上蔡县、确山县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B6082279520202": {
+          "en": "Runanxian",
+          "zh": "汝南县"
+        },
+        "CN_CITY_17275852B62617200555443": {
+          "en": "Shangcaixian",
+          "zh": "上蔡县"
+        },
+        "CN_CITY_17275852B83134707412237": {
+          "en": "Queshanxian",
+          "zh": "确山县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_0e6318364e8e",
+      "member_ids": [
+        "CN_CITY_17275852B61638108171693",
+        "CN_CITY_17275852B63272164318035"
+      ],
+      "parent_id": "CN_Henan",
+      "names": {
+        "en": "Miyangxian + Shuipingxian",
+        "zh": "泌阳县、水平县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B61638108171693": {
+          "en": "Miyangxian",
+          "zh": "泌阳县"
+        },
+        "CN_CITY_17275852B63272164318035": {
+          "en": "Shuipingxian",
+          "zh": "水平县"
+        }
+      }
+    },
+    {
+      "id": "CN_MRG_1a89a77f2e8a",
+      "member_ids": [
+        "CN_CITY_17275852B69618555412569",
+        "CN_CITY_17275852B81783797021346"
+      ],
+      "parent_id": "CN_Jiangxi",
+      "names": {
+        "en": "Nanchangxian + Xinjianxian",
+        "zh": "南昌县、新建县"
+      },
+      "member_names": {
+        "CN_CITY_17275852B69618555412569": {
+          "en": "Nanchangxian",
+          "zh": "南昌县"
+        },
+        "CN_CITY_17275852B81783797021346": {
+          "en": "Xinjianxian",
+          "zh": "新建县"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_98c46952922a",
+      "member_ids": [
+        "US_CNTY_48001",
+        "US_CNTY_48225"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Anderson County + Houston County",
+        "zh": "安德森、休斯顿"
+      },
+      "member_names": {
+        "US_CNTY_48001": {
+          "en": "Anderson County",
+          "zh": "安德森"
+        },
+        "US_CNTY_48225": {
+          "en": "Houston County",
+          "zh": "休斯顿"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_e5ff30356db3",
+      "member_ids": [
+        "US_CNTY_48003",
+        "US_CNTY_48227",
+        "US_CNTY_48317"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Andrews County + Howard County + Martin County",
+        "zh": "安德鲁斯、霍华德、马丁"
+      },
+      "member_names": {
+        "US_CNTY_48003": {
+          "en": "Andrews County",
+          "zh": "安德鲁斯"
+        },
+        "US_CNTY_48227": {
+          "en": "Howard County",
+          "zh": "霍华德"
+        },
+        "US_CNTY_48317": {
+          "en": "Martin County",
+          "zh": "马丁"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_d2dd8d229fc4",
+      "member_ids": [
+        "US_CNTY_48009",
+        "US_CNTY_48503"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Archer County + Young County",
+        "zh": "射手、年轻的"
+      },
+      "member_names": {
+        "US_CNTY_48009": {
+          "en": "Archer County",
+          "zh": "射手"
+        },
+        "US_CNTY_48503": {
+          "en": "Young County",
+          "zh": "年轻的"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_17d99f82ab74",
+      "member_ids": [
+        "US_CNTY_48011",
+        "US_CNTY_48065",
+        "US_CNTY_48233"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Armstrong County + Carson County + Hutchinson County",
+        "zh": "阿姆斯特朗、卡森、哈钦森"
+      },
+      "member_names": {
+        "US_CNTY_48011": {
+          "en": "Armstrong County",
+          "zh": "阿姆斯特朗"
+        },
+        "US_CNTY_48065": {
+          "en": "Carson County",
+          "zh": "卡森"
+        },
+        "US_CNTY_48233": {
+          "en": "Hutchinson County",
+          "zh": "哈钦森"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_4b9ef4efd3fc",
+      "member_ids": [
+        "US_CNTY_48013",
+        "US_CNTY_48297"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Atascosa County + Live Oak County",
+        "zh": "阿塔斯科萨、活橡木"
+      },
+      "member_names": {
+        "US_CNTY_48013": {
+          "en": "Atascosa County",
+          "zh": "阿塔斯科萨"
+        },
+        "US_CNTY_48297": {
+          "en": "Live Oak County",
+          "zh": "活橡木"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_8831594160d2",
+      "member_ids": [
+        "US_CNTY_48015",
+        "US_CNTY_48477"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Austin County + Washington County",
+        "zh": "奥斯汀、华盛顿"
+      },
+      "member_names": {
+        "US_CNTY_48015": {
+          "en": "Austin County",
+          "zh": "奥斯汀"
+        },
+        "US_CNTY_48477": {
+          "en": "Washington County",
+          "zh": "华盛顿"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_75ade1c370a1",
+      "member_ids": [
+        "US_CNTY_48017",
+        "US_CNTY_48189",
+        "US_CNTY_48279"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Bailey County + Hale County + Lamb County",
+        "zh": "贝利、黑尔、羊肉"
+      },
+      "member_names": {
+        "US_CNTY_48017": {
+          "en": "Bailey County",
+          "zh": "贝利"
+        },
+        "US_CNTY_48189": {
+          "en": "Hale County",
+          "zh": "黑尔"
+        },
+        "US_CNTY_48279": {
+          "en": "Lamb County",
+          "zh": "羊肉"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_a94a72637172",
+      "member_ids": [
+        "US_CNTY_48021",
+        "US_CNTY_48149"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Bastrop County + Fayette County",
+        "zh": "巴斯特罗普、费耶特"
+      },
+      "member_names": {
+        "US_CNTY_48021": {
+          "en": "Bastrop County",
+          "zh": "巴斯特罗普"
+        },
+        "US_CNTY_48149": {
+          "en": "Fayette County",
+          "zh": "费耶特"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_17c9b14fc969",
+      "member_ids": [
+        "US_CNTY_48031",
+        "US_CNTY_48171"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Blanco County + Gillespie County",
+        "zh": "布兰科、吉莱斯皮"
+      },
+      "member_names": {
+        "US_CNTY_48031": {
+          "en": "Blanco County",
+          "zh": "布兰科"
+        },
+        "US_CNTY_48171": {
+          "en": "Gillespie County",
+          "zh": "吉莱斯皮"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_512211db3fed",
+      "member_ids": [
+        "US_CNTY_48033",
+        "US_CNTY_48115",
+        "US_CNTY_48165"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Borden County + Dawson County + Gaines County",
+        "zh": "博登、道森、盖恩斯"
+      },
+      "member_names": {
+        "US_CNTY_48033": {
+          "en": "Borden County",
+          "zh": "博登"
+        },
+        "US_CNTY_48115": {
+          "en": "Dawson County",
+          "zh": "道森"
+        },
+        "US_CNTY_48165": {
+          "en": "Gaines County",
+          "zh": "盖恩斯"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_615a68fb03f7",
+      "member_ids": [
+        "US_CNTY_48039",
+        "US_CNTY_48157",
+        "US_CNTY_48473"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Brazoria County + Fort Bend County + Waller County",
+        "zh": "布拉佐里亚、本德堡、沃勒"
+      },
+      "member_names": {
+        "US_CNTY_48039": {
+          "en": "Brazoria County",
+          "zh": "布拉佐里亚"
+        },
+        "US_CNTY_48157": {
+          "en": "Fort Bend County",
+          "zh": "本德堡"
+        },
+        "US_CNTY_48473": {
+          "en": "Waller County",
+          "zh": "沃勒"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_288c105ab692",
+      "member_ids": [
+        "US_CNTY_48045",
+        "US_CNTY_48191",
+        "US_CNTY_48437"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Briscoe County + Hall County + Swisher County",
+        "zh": "布里斯科、大厅、斯威舍尔"
+      },
+      "member_names": {
+        "US_CNTY_48045": {
+          "en": "Briscoe County",
+          "zh": "布里斯科"
+        },
+        "US_CNTY_48191": {
+          "en": "Hall County",
+          "zh": "大厅"
+        },
+        "US_CNTY_48437": {
+          "en": "Swisher County",
+          "zh": "斯威舍尔"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_de187e0e2d96",
+      "member_ids": [
+        "US_CNTY_48047",
+        "US_CNTY_48247"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Brooks County + Jim Hogg County",
+        "zh": "布鲁克斯、吉姆·霍格"
+      },
+      "member_names": {
+        "US_CNTY_48047": {
+          "en": "Brooks County",
+          "zh": "布鲁克斯"
+        },
+        "US_CNTY_48247": {
+          "en": "Jim Hogg County",
+          "zh": "吉姆·霍格"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_1bbe9dc9722d",
+      "member_ids": [
+        "US_CNTY_48049",
+        "US_CNTY_48333"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Brown County + Mills County",
+        "zh": "棕色的、米尔斯"
+      },
+      "member_names": {
+        "US_CNTY_48049": {
+          "en": "Brown County",
+          "zh": "棕色的"
+        },
+        "US_CNTY_48333": {
+          "en": "Mills County",
+          "zh": "米尔斯"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_954f62972ce9",
+      "member_ids": [
+        "US_CNTY_48051",
+        "US_CNTY_48287",
+        "US_CNTY_48491"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Burleson County + Lee County + Williamson County",
+        "zh": "伯勒森、李、威廉森"
+      },
+      "member_names": {
+        "US_CNTY_48051": {
+          "en": "Burleson County",
+          "zh": "伯勒森"
+        },
+        "US_CNTY_48287": {
+          "en": "Lee County",
+          "zh": "李"
+        },
+        "US_CNTY_48491": {
+          "en": "Williamson County",
+          "zh": "威廉森"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_f13d395034d8",
+      "member_ids": [
+        "US_CNTY_48053",
+        "US_CNTY_48099",
+        "US_CNTY_48281"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Burnet County + Coryell County + Lampasas County",
+        "zh": "伯内特、科里尔、兰帕萨斯"
+      },
+      "member_names": {
+        "US_CNTY_48053": {
+          "en": "Burnet County",
+          "zh": "伯内特"
+        },
+        "US_CNTY_48099": {
+          "en": "Coryell County",
+          "zh": "科里尔"
+        },
+        "US_CNTY_48281": {
+          "en": "Lampasas County",
+          "zh": "兰帕萨斯"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_c69bb874c34c",
+      "member_ids": [
+        "US_CNTY_48057",
+        "US_CNTY_48239"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Calhoun County + Jackson County",
+        "zh": "卡尔霍恩、杰克逊"
+      },
+      "member_names": {
+        "US_CNTY_48057": {
+          "en": "Calhoun County",
+          "zh": "卡尔霍恩"
+        },
+        "US_CNTY_48239": {
+          "en": "Jackson County",
+          "zh": "杰克逊"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_9621d87995de",
+      "member_ids": [
+        "US_CNTY_48063",
+        "US_CNTY_48183",
+        "US_CNTY_48459"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Camp County + Gregg County + Upshur County",
+        "zh": "营、格雷格、厄普舒尔"
+      },
+      "member_names": {
+        "US_CNTY_48063": {
+          "en": "Camp County",
+          "zh": "营"
+        },
+        "US_CNTY_48183": {
+          "en": "Gregg County",
+          "zh": "格雷格"
+        },
+        "US_CNTY_48459": {
+          "en": "Upshur County",
+          "zh": "厄普舒尔"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_799779e62499",
+      "member_ids": [
+        "US_CNTY_48069",
+        "US_CNTY_48369"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Castro County + Parmer County",
+        "zh": "卡斯特罗、帕尔默"
+      },
+      "member_names": {
+        "US_CNTY_48069": {
+          "en": "Castro County",
+          "zh": "卡斯特罗"
+        },
+        "US_CNTY_48369": {
+          "en": "Parmer County",
+          "zh": "帕尔默"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_6a0cd1283040",
+      "member_ids": [
+        "US_CNTY_48073",
+        "US_CNTY_48401"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Cherokee County + Rusk County",
+        "zh": "切罗基、腊斯克"
+      },
+      "member_names": {
+        "US_CNTY_48073": {
+          "en": "Cherokee County",
+          "zh": "切罗基"
+        },
+        "US_CNTY_48401": {
+          "en": "Rusk County",
+          "zh": "腊斯克"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_8d4f8a0a88ae",
+      "member_ids": [
+        "US_CNTY_48237",
+        "US_CNTY_48497"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Jack County + Wise County",
+        "zh": "杰克、明智的"
+      },
+      "member_names": {
+        "US_CNTY_48237": {
+          "en": "Jack County",
+          "zh": "杰克"
+        },
+        "US_CNTY_48497": {
+          "en": "Wise County",
+          "zh": "明智的"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_b167b3b770f9",
+      "member_ids": [
+        "US_CNTY_48079",
+        "US_CNTY_48219",
+        "US_CNTY_48445"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Cochran County + Hockley County + Terry County",
+        "zh": "科克伦、霍克利、特里"
+      },
+      "member_names": {
+        "US_CNTY_48079": {
+          "en": "Cochran County",
+          "zh": "科克伦"
+        },
+        "US_CNTY_48219": {
+          "en": "Hockley County",
+          "zh": "霍克利"
+        },
+        "US_CNTY_48445": {
+          "en": "Terry County",
+          "zh": "特里"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_6b6081bed14d",
+      "member_ids": [
+        "US_CNTY_48081",
+        "US_CNTY_48399",
+        "US_CNTY_48431"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Coke County + Runnels County + Sterling County",
+        "zh": "可乐、沟道、英镑"
+      },
+      "member_names": {
+        "US_CNTY_48081": {
+          "en": "Coke County",
+          "zh": "可乐"
+        },
+        "US_CNTY_48399": {
+          "en": "Runnels County",
+          "zh": "沟道"
+        },
+        "US_CNTY_48431": {
+          "en": "Sterling County",
+          "zh": "英镑"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_4f6a788187a4",
+      "member_ids": [
+        "US_CNTY_48089",
+        "US_CNTY_48285",
+        "US_CNTY_48481"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Colorado County + Lavaca County + Wharton County",
+        "zh": "科罗拉多州、拉瓦卡、沃顿商学院"
+      },
+      "member_names": {
+        "US_CNTY_48089": {
+          "en": "Colorado County",
+          "zh": "科罗拉多州"
+        },
+        "US_CNTY_48285": {
+          "en": "Lavaca County",
+          "zh": "拉瓦卡"
+        },
+        "US_CNTY_48481": {
+          "en": "Wharton County",
+          "zh": "沃顿商学院"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_c4e2ef408a02",
+      "member_ids": [
+        "US_CNTY_48091",
+        "US_CNTY_48209"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Comal County + Hays County",
+        "zh": "科马尔、海斯"
+      },
+      "member_names": {
+        "US_CNTY_48091": {
+          "en": "Comal County",
+          "zh": "科马尔"
+        },
+        "US_CNTY_48209": {
+          "en": "Hays County",
+          "zh": "海斯"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_394fc4c008ec",
+      "member_ids": [
+        "US_CNTY_48093",
+        "US_CNTY_48143"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Comanche County + Erath County",
+        "zh": "科曼奇、俄拉斯"
+      },
+      "member_names": {
+        "US_CNTY_48093": {
+          "en": "Comanche County",
+          "zh": "科曼奇"
+        },
+        "US_CNTY_48143": {
+          "en": "Erath County",
+          "zh": "俄拉斯"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_2d17e071234f",
+      "member_ids": [
+        "US_CNTY_48095",
+        "US_CNTY_48235",
+        "US_CNTY_48451"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Concho County + Irion County + Tom Green County",
+        "zh": "康乔、伊里翁、汤姆·格林"
+      },
+      "member_names": {
+        "US_CNTY_48095": {
+          "en": "Concho County",
+          "zh": "康乔"
+        },
+        "US_CNTY_48235": {
+          "en": "Irion County",
+          "zh": "伊里翁"
+        },
+        "US_CNTY_48451": {
+          "en": "Tom Green County",
+          "zh": "汤姆·格林"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_ee506a8a0124",
+      "member_ids": [
+        "US_CNTY_48097",
+        "US_CNTY_48181",
+        "US_CNTY_48337"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Cooke County + Grayson County + Montague County",
+        "zh": "库克、格雷森、蒙塔古"
+      },
+      "member_names": {
+        "US_CNTY_48097": {
+          "en": "Cooke County",
+          "zh": "库克"
+        },
+        "US_CNTY_48181": {
+          "en": "Grayson County",
+          "zh": "格雷森"
+        },
+        "US_CNTY_48337": {
+          "en": "Montague County",
+          "zh": "蒙塔古"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_867046e7ad47",
+      "member_ids": [
+        "US_CNTY_48101",
+        "US_CNTY_48153",
+        "US_CNTY_48345"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Cottle County + Floyd County + Motley County",
+        "zh": "科特尔、弗洛伊德、莫特利"
+      },
+      "member_names": {
+        "US_CNTY_48101": {
+          "en": "Cottle County",
+          "zh": "科特尔"
+        },
+        "US_CNTY_48153": {
+          "en": "Floyd County",
+          "zh": "弗洛伊德"
+        },
+        "US_CNTY_48345": {
+          "en": "Motley County",
+          "zh": "莫特利"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_b97e9b932c3f",
+      "member_ids": [
+        "US_CNTY_48103",
+        "US_CNTY_48383",
+        "US_CNTY_48461"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Crane County + Reagan County + Upton County",
+        "zh": "起重机、里根、厄普顿"
+      },
+      "member_names": {
+        "US_CNTY_48103": {
+          "en": "Crane County",
+          "zh": "起重机"
+        },
+        "US_CNTY_48383": {
+          "en": "Reagan County",
+          "zh": "里根"
+        },
+        "US_CNTY_48461": {
+          "en": "Upton County",
+          "zh": "厄普顿"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_36c9a8886b71",
+      "member_ids": [
+        "US_CNTY_48105",
+        "US_CNTY_48413",
+        "US_CNTY_48435"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Crockett County + Schleicher County + Sutton County",
+        "zh": "克罗克特、施莱歇尔、萨顿"
+      },
+      "member_names": {
+        "US_CNTY_48105": {
+          "en": "Crockett County",
+          "zh": "克罗克特"
+        },
+        "US_CNTY_48413": {
+          "en": "Schleicher County",
+          "zh": "施莱歇尔"
+        },
+        "US_CNTY_48435": {
+          "en": "Sutton County",
+          "zh": "萨顿"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_c5062d5fe295",
+      "member_ids": [
+        "US_CNTY_48107",
+        "US_CNTY_48125",
+        "US_CNTY_48263"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Crosby County + Dickens County + Kent County",
+        "zh": "克罗斯比、狄更斯、肯特"
+      },
+      "member_names": {
+        "US_CNTY_48107": {
+          "en": "Crosby County",
+          "zh": "克罗斯比"
+        },
+        "US_CNTY_48125": {
+          "en": "Dickens County",
+          "zh": "狄更斯"
+        },
+        "US_CNTY_48263": {
+          "en": "Kent County",
+          "zh": "肯特"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_adb56f6301de",
+      "member_ids": [
+        "US_CNTY_48109",
+        "US_CNTY_48389"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Culberson County + Reeves County",
+        "zh": "卡尔伯森、里夫斯"
+      },
+      "member_names": {
+        "US_CNTY_48109": {
+          "en": "Culberson County",
+          "zh": "卡尔伯森"
+        },
+        "US_CNTY_48389": {
+          "en": "Reeves County",
+          "zh": "里夫斯"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_0afc14e3e73d",
+      "member_ids": [
+        "US_CNTY_48111",
+        "US_CNTY_48421"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Dallam County + Sherman County",
+        "zh": "达拉姆、谢尔曼"
+      },
+      "member_names": {
+        "US_CNTY_48111": {
+          "en": "Dallam County",
+          "zh": "达拉姆"
+        },
+        "US_CNTY_48421": {
+          "en": "Sherman County",
+          "zh": "谢尔曼"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_830e401b2939",
+      "member_ids": [
+        "US_CNTY_48205",
+        "US_CNTY_48359"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Hartley County + Oldham County",
+        "zh": "哈特利、奥尔德姆"
+      },
+      "member_names": {
+        "US_CNTY_48205": {
+          "en": "Hartley County",
+          "zh": "哈特利"
+        },
+        "US_CNTY_48359": {
+          "en": "Oldham County",
+          "zh": "奥尔德姆"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_e3fbfb93451d",
+      "member_ids": [
+        "US_CNTY_48123",
+        "US_CNTY_48469"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "DeWitt County + Victoria County",
+        "zh": "德威特、维多利亚"
+      },
+      "member_names": {
+        "US_CNTY_48123": {
+          "en": "DeWitt County",
+          "zh": "德威特"
+        },
+        "US_CNTY_48469": {
+          "en": "Victoria County",
+          "zh": "维多利亚"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_4ae2dfdcec1e",
+      "member_ids": [
+        "US_CNTY_48129",
+        "US_CNTY_48179"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Donley County + Gray County",
+        "zh": "唐利、灰色的"
+      },
+      "member_names": {
+        "US_CNTY_48129": {
+          "en": "Donley County",
+          "zh": "唐利"
+        },
+        "US_CNTY_48179": {
+          "en": "Gray County",
+          "zh": "灰色的"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_89b358d4e879",
+      "member_ids": [
+        "US_CNTY_48131",
+        "US_CNTY_48249",
+        "US_CNTY_48273"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Duval County + Jim Wells County + Kleberg County",
+        "zh": "杜瓦尔、吉姆·威尔斯、克莱贝格"
+      },
+      "member_names": {
+        "US_CNTY_48131": {
+          "en": "Duval County",
+          "zh": "杜瓦尔"
+        },
+        "US_CNTY_48249": {
+          "en": "Jim Wells County",
+          "zh": "吉姆·威尔斯"
+        },
+        "US_CNTY_48273": {
+          "en": "Kleberg County",
+          "zh": "克莱贝格"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_ea19ceff3aed",
+      "member_ids": [
+        "US_CNTY_48259",
+        "US_CNTY_48265"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Kendall County + Kerr County",
+        "zh": "肯德尔、克尔"
+      },
+      "member_names": {
+        "US_CNTY_48259": {
+          "en": "Kendall County",
+          "zh": "肯德尔"
+        },
+        "US_CNTY_48265": {
+          "en": "Kerr County",
+          "zh": "克尔"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_03d789d015aa",
+      "member_ids": [
+        "US_CNTY_48139",
+        "US_CNTY_48251"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Ellis County + Johnson County",
+        "zh": "埃利斯、约翰逊"
+      },
+      "member_names": {
+        "US_CNTY_48139": {
+          "en": "Ellis County",
+          "zh": "埃利斯"
+        },
+        "US_CNTY_48251": {
+          "en": "Johnson County",
+          "zh": "约翰逊"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_47bf661f9403",
+      "member_ids": [
+        "US_CNTY_48159",
+        "US_CNTY_48223",
+        "US_CNTY_48449"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Franklin County + Hopkins County + Titus County",
+        "zh": "富兰克林、霍普金斯、提图斯"
+      },
+      "member_names": {
+        "US_CNTY_48159": {
+          "en": "Franklin County",
+          "zh": "富兰克林"
+        },
+        "US_CNTY_48223": {
+          "en": "Hopkins County",
+          "zh": "霍普金斯"
+        },
+        "US_CNTY_48449": {
+          "en": "Titus County",
+          "zh": "提图斯"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_57a856465415",
+      "member_ids": [
+        "US_CNTY_48169",
+        "US_CNTY_48305"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Garza County + Lynn County",
+        "zh": "加尔萨、林恩"
+      },
+      "member_names": {
+        "US_CNTY_48169": {
+          "en": "Garza County",
+          "zh": "加尔萨"
+        },
+        "US_CNTY_48305": {
+          "en": "Lynn County",
+          "zh": "林恩"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_daa505131e1c",
+      "member_ids": [
+        "US_CNTY_48203",
+        "US_CNTY_48315"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Harrison County + Marion County",
+        "zh": "哈里森、马里恩"
+      },
+      "member_names": {
+        "US_CNTY_48203": {
+          "en": "Harrison County",
+          "zh": "哈里森"
+        },
+        "US_CNTY_48315": {
+          "en": "Marion County",
+          "zh": "马里恩"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_6f6e5e61f8c1",
+      "member_ids": [
+        "US_CNTY_48207",
+        "US_CNTY_48447"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Haskell County + Throckmorton County",
+        "zh": "哈斯克尔、斯罗克莫顿"
+      },
+      "member_names": {
+        "US_CNTY_48207": {
+          "en": "Haskell County",
+          "zh": "哈斯克尔"
+        },
+        "US_CNTY_48447": {
+          "en": "Throckmorton County",
+          "zh": "斯罗克莫顿"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_f1682b432a7b",
+      "member_ids": [
+        "US_CNTY_48217",
+        "US_CNTY_48293",
+        "US_CNTY_48349"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Hill County + Limestone County + Navarro County",
+        "zh": "爬坡道、石灰石、纳瓦罗"
+      },
+      "member_names": {
+        "US_CNTY_48217": {
+          "en": "Hill County",
+          "zh": "爬坡道"
+        },
+        "US_CNTY_48293": {
+          "en": "Limestone County",
+          "zh": "石灰石"
+        },
+        "US_CNTY_48349": {
+          "en": "Navarro County",
+          "zh": "纳瓦罗"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_f694e67d7337",
+      "member_ids": [
+        "US_CNTY_48221",
+        "US_CNTY_48425"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Hood County + Somervell County",
+        "zh": "兜帽、萨默维尔"
+      },
+      "member_names": {
+        "US_CNTY_48221": {
+          "en": "Hood County",
+          "zh": "兜帽"
+        },
+        "US_CNTY_48425": {
+          "en": "Somervell County",
+          "zh": "萨默维尔"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_b4d3754acb9d",
+      "member_ids": [
+        "US_CNTY_48241",
+        "US_CNTY_48351",
+        "US_CNTY_48403"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Jasper County + Newton County + Sabine County",
+        "zh": "碧玉、牛顿、萨宾"
+      },
+      "member_names": {
+        "US_CNTY_48241": {
+          "en": "Jasper County",
+          "zh": "碧玉"
+        },
+        "US_CNTY_48351": {
+          "en": "Newton County",
+          "zh": "牛顿"
+        },
+        "US_CNTY_48403": {
+          "en": "Sabine County",
+          "zh": "萨宾"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_f34d06f162f6",
+      "member_ids": [
+        "US_CNTY_48253",
+        "US_CNTY_48417"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Jones County + Shackelford County",
+        "zh": "琼斯、沙克尔福德"
+      },
+      "member_names": {
+        "US_CNTY_48253": {
+          "en": "Jones County",
+          "zh": "琼斯"
+        },
+        "US_CNTY_48417": {
+          "en": "Shackelford County",
+          "zh": "沙克尔福德"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_7e1d539ceaf6",
+      "member_ids": [
+        "US_CNTY_48255",
+        "US_CNTY_48493"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Karnes County + Wilson County",
+        "zh": "卡内斯、威尔逊"
+      },
+      "member_names": {
+        "US_CNTY_48255": {
+          "en": "Karnes County",
+          "zh": "卡内斯"
+        },
+        "US_CNTY_48493": {
+          "en": "Wilson County",
+          "zh": "威尔逊"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_548f11247301",
+      "member_ids": [
+        "US_CNTY_48257",
+        "US_CNTY_48397",
+        "US_CNTY_48467"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Kaufman County + Rockwall County + Van Zandt County",
+        "zh": "考夫曼、罗克沃尔、范赞特"
+      },
+      "member_names": {
+        "US_CNTY_48257": {
+          "en": "Kaufman County",
+          "zh": "考夫曼"
+        },
+        "US_CNTY_48397": {
+          "en": "Rockwall County",
+          "zh": "罗克沃尔"
+        },
+        "US_CNTY_48467": {
+          "en": "Van Zandt County",
+          "zh": "范赞特"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_853623a78a85",
+      "member_ids": [
+        "US_CNTY_48267",
+        "US_CNTY_48327"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Kimble County + Menard County",
+        "zh": "金布尔、梅纳德"
+      },
+      "member_names": {
+        "US_CNTY_48267": {
+          "en": "Kimble County",
+          "zh": "金布尔"
+        },
+        "US_CNTY_48327": {
+          "en": "Menard County",
+          "zh": "梅纳德"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_36d7642c780b",
+      "member_ids": [
+        "US_CNTY_48269",
+        "US_CNTY_48275",
+        "US_CNTY_48433"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "King County + Knox County + Stonewall County",
+        "zh": "国王、诺克斯、石墙"
+      },
+      "member_names": {
+        "US_CNTY_48269": {
+          "en": "King County",
+          "zh": "国王"
+        },
+        "US_CNTY_48275": {
+          "en": "Knox County",
+          "zh": "诺克斯"
+        },
+        "US_CNTY_48433": {
+          "en": "Stonewall County",
+          "zh": "石墙"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_6cd8d362b705",
+      "member_ids": [
+        "US_CNTY_48283",
+        "US_CNTY_48311"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "La Salle County + McMullen County",
+        "zh": "拉萨尔、麦克马伦"
+      },
+      "member_names": {
+        "US_CNTY_48283": {
+          "en": "La Salle County",
+          "zh": "拉萨尔"
+        },
+        "US_CNTY_48311": {
+          "en": "McMullen County",
+          "zh": "麦克马伦"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_fa26f33714d2",
+      "member_ids": [
+        "US_CNTY_48289",
+        "US_CNTY_48313"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Leon County + Madison County",
+        "zh": "莱昂、麦迪逊"
+      },
+      "member_names": {
+        "US_CNTY_48289": {
+          "en": "Leon County",
+          "zh": "莱昂"
+        },
+        "US_CNTY_48313": {
+          "en": "Madison County",
+          "zh": "麦迪逊"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_62c6af7a1cf7",
+      "member_ids": [
+        "US_CNTY_48295",
+        "US_CNTY_48357"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Lipscomb County + Ochiltree County",
+        "zh": "利普斯科姆、奥奇特里"
+      },
+      "member_names": {
+        "US_CNTY_48295": {
+          "en": "Lipscomb County",
+          "zh": "利普斯科姆"
+        },
+        "US_CNTY_48357": {
+          "en": "Ochiltree County",
+          "zh": "奥奇特里"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_741f098c1f8e",
+      "member_ids": [
+        "US_CNTY_48299",
+        "US_CNTY_48319"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Llano County + Mason County",
+        "zh": "拉诺、石匠"
+      },
+      "member_names": {
+        "US_CNTY_48299": {
+          "en": "Llano County",
+          "zh": "拉诺"
+        },
+        "US_CNTY_48319": {
+          "en": "Mason County",
+          "zh": "石匠"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_bd1072ae78b5",
+      "member_ids": [
+        "US_CNTY_48463",
+        "US_CNTY_48507"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Uvalde County + Zavala County",
+        "zh": "尤瓦尔德、萨瓦拉"
+      },
+      "member_names": {
+        "US_CNTY_48463": {
+          "en": "Uvalde County",
+          "zh": "尤瓦尔德"
+        },
+        "US_CNTY_48507": {
+          "en": "Zavala County",
+          "zh": "萨瓦拉"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_7d307bfcd590",
+      "member_ids": [
+        "US_CNTY_48335",
+        "US_CNTY_48353",
+        "US_CNTY_48415"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Mitchell County + Nolan County + Scurry County",
+        "zh": "米切尔、诺兰、疾走"
+      },
+      "member_names": {
+        "US_CNTY_48335": {
+          "en": "Mitchell County",
+          "zh": "米切尔"
+        },
+        "US_CNTY_48353": {
+          "en": "Nolan County",
+          "zh": "诺兰"
+        },
+        "US_CNTY_48415": {
+          "en": "Scurry County",
+          "zh": "疾走"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_23dc6cc6e2e4",
+      "member_ids": [
+        "US_CNTY_48373",
+        "US_CNTY_48455"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Polk County + Trinity County",
+        "zh": "波尔克、三位一体"
+      },
+      "member_names": {
+        "US_CNTY_48373": {
+          "en": "Polk County",
+          "zh": "波尔克"
+        },
+        "US_CNTY_48455": {
+          "en": "Trinity County",
+          "zh": "三位一体"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_5a47c06a2dc5",
+      "member_ids": [
+        "US_CNTY_48405",
+        "US_CNTY_48419"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "San Augustine County + Shelby County",
+        "zh": "圣奥古斯丁、谢尔比"
+      },
+      "member_names": {
+        "US_CNTY_48405": {
+          "en": "San Augustine County",
+          "zh": "圣奥古斯丁"
+        },
+        "US_CNTY_48419": {
+          "en": "Shelby County",
+          "zh": "谢尔比"
+        }
+      }
+    },
+    {
+      "id": "US_MRG_f288cf4fe69b",
+      "member_ids": [
+        "US_CNTY_48475",
+        "US_CNTY_48495"
+      ],
+      "parent_id": "US_Texas",
+      "names": {
+        "en": "Ward County + Winkler County",
+        "zh": "沃德、温克勒"
+      },
+      "member_names": {
+        "US_CNTY_48475": {
+          "en": "Ward County",
+          "zh": "沃德"
+        },
+        "US_CNTY_48495": {
+          "en": "Winkler County",
+          "zh": "温克勒"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_b0fab68c785d",
+      "member_ids": [
+        "UA_RAY_74538382B12709317910219",
+        "UA_RAY_74538382B94896655218904",
+        "UA_RAY_74538382B96857740504911"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "names": {
+        "en": "Illintsi + Orativ + Nemyriv",
+        "zh": "眼泪、扬声器、内梅里夫"
+      },
+      "member_names": {
+        "UA_RAY_74538382B12709317910219": {
+          "en": "Illintsi",
+          "zh": "眼泪"
+        },
+        "UA_RAY_74538382B94896655218904": {
+          "en": "Orativ",
+          "zh": "扬声器"
+        },
+        "UA_RAY_74538382B96857740504911": {
+          "en": "Nemyriv",
+          "zh": "内梅里夫"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_6057d7f77511",
+      "member_ids": [
+        "UA_RAY_74538382B1295446134246",
+        "UA_RAY_74538382B57466537231315"
+      ],
+      "parent_id": "UA_Poltava",
+      "names": {
+        "en": "Kotelva + Dykanka",
+        "zh": "科特尔瓦、迪坎卡"
+      },
+      "member_names": {
+        "UA_RAY_74538382B1295446134246": {
+          "en": "Kotelva",
+          "zh": "科特尔瓦"
+        },
+        "UA_RAY_74538382B57466537231315": {
+          "en": "Dykanka",
+          "zh": "迪坎卡"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_e0dcc6adce13",
+      "member_ids": [
+        "UA_RAY_74538382B13053028483551",
+        "UA_RAY_74538382B75855496887574",
+        "UA_RAY_74538382B99424317893885"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "names": {
+        "en": "Popilnia + Andrushivka + Ruzhyn",
+        "zh": "凤梨属、安德鲁希夫卡、鲁任"
+      },
+      "member_names": {
+        "UA_RAY_74538382B13053028483551": {
+          "en": "Popilnia",
+          "zh": "凤梨属"
+        },
+        "UA_RAY_74538382B75855496887574": {
+          "en": "Andrushivka",
+          "zh": "安德鲁希夫卡"
+        },
+        "UA_RAY_74538382B99424317893885": {
+          "en": "Ruzhyn",
+          "zh": "鲁任"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_ec2bf97653b5",
+      "member_ids": [
+        "UA_RAY_74538382B13174941050792",
+        "UA_RAY_74538382B70813216743380"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "names": {
+        "en": "Tulchyn + Tomashpil",
+        "zh": "图尔钦、托马什皮尔"
+      },
+      "member_names": {
+        "UA_RAY_74538382B13174941050792": {
+          "en": "Tulchyn",
+          "zh": "图尔钦"
+        },
+        "UA_RAY_74538382B70813216743380": {
+          "en": "Tomashpil",
+          "zh": "托马什皮尔"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_95a5c2e0f114",
+      "member_ids": [
+        "UA_RAY_74538382B1986372473405",
+        "UA_RAY_74538382B82525342266993"
+      ],
+      "parent_id": "UA_Poltava",
+      "names": {
+        "en": "Hrebinka + Pyriatyn",
+        "zh": "赫雷宾卡、我会尝试"
+      },
+      "member_names": {
+        "UA_RAY_74538382B1986372473405": {
+          "en": "Hrebinka",
+          "zh": "赫雷宾卡"
+        },
+        "UA_RAY_74538382B82525342266993": {
+          "en": "Pyriatyn",
+          "zh": "我会尝试"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_ae35953e4a30",
+      "member_ids": [
+        "UA_RAY_74538382B24202642451616",
+        "UA_RAY_74538382B80669310769437",
+        "UA_RAY_74538382B88010222583687"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "names": {
+        "en": "Bar + Zhmerynka + Murovani Kurylivtsi",
+        "zh": "酒吧、日梅林卡、穆罗瓦尼·库里利夫齐"
+      },
+      "member_names": {
+        "UA_RAY_74538382B24202642451616": {
+          "en": "Bar",
+          "zh": "酒吧"
+        },
+        "UA_RAY_74538382B80669310769437": {
+          "en": "Zhmerynka",
+          "zh": "日梅林卡"
+        },
+        "UA_RAY_74538382B88010222583687": {
+          "en": "Murovani Kurylivtsi",
+          "zh": "穆罗瓦尼·库里利夫齐"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_5e1a623ff8e3",
+      "member_ids": [
+        "UA_RAY_74538382B24211497806867",
+        "UA_RAY_74538382B60535297050868",
+        "UA_RAY_74538382B83988407306770"
+      ],
+      "parent_id": "UA_Poltava",
+      "names": {
+        "en": "Mashivka + Chutove + Karlivka",
+        "zh": "马什夫卡、丘托维、卡利夫卡"
+      },
+      "member_names": {
+        "UA_RAY_74538382B24211497806867": {
+          "en": "Mashivka",
+          "zh": "马什夫卡"
+        },
+        "UA_RAY_74538382B60535297050868": {
+          "en": "Chutove",
+          "zh": "丘托维"
+        },
+        "UA_RAY_74538382B83988407306770": {
+          "en": "Karlivka",
+          "zh": "卡利夫卡"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_39b244f210a7",
+      "member_ids": [
+        "UA_RAY_74538382B28667917897493",
+        "UA_RAY_74538382B30239669246101",
+        "UA_RAY_74538382B32721525373151"
+      ],
+      "parent_id": "UA_Poltava",
+      "names": {
+        "en": "Lubny + Chornukhy + Orzhytsia",
+        "zh": "卢布尼、乔努希、奥尔日西亚"
+      },
+      "member_names": {
+        "UA_RAY_74538382B28667917897493": {
+          "en": "Lubny",
+          "zh": "卢布尼"
+        },
+        "UA_RAY_74538382B30239669246101": {
+          "en": "Chornukhy",
+          "zh": "乔努希"
+        },
+        "UA_RAY_74538382B32721525373151": {
+          "en": "Orzhytsia",
+          "zh": "奥尔日西亚"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_d6223fcd4bc5",
+      "member_ids": [
+        "UA_RAY_74538382B29600786349581",
+        "UA_RAY_74538382B40041339344288"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "names": {
+        "en": "Radomyshl + Malyn",
+        "zh": "拉多梅什尔、马林"
+      },
+      "member_names": {
+        "UA_RAY_74538382B29600786349581": {
+          "en": "Radomyshl",
+          "zh": "拉多梅什尔"
+        },
+        "UA_RAY_74538382B40041339344288": {
+          "en": "Malyn",
+          "zh": "马林"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_b828b24bbda1",
+      "member_ids": [
+        "UA_RAY_74538382B29634078398489",
+        "UA_RAY_74538382B44263254033139",
+        "UA_RAY_74538382B94405396686419"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "names": {
+        "en": "Chernivtsi + Sharhorod + Tyvriv",
+        "zh": "切尔诺夫策、沙霍罗德、特夫里夫"
+      },
+      "member_names": {
+        "UA_RAY_74538382B29634078398489": {
+          "en": "Chernivtsi",
+          "zh": "切尔诺夫策"
+        },
+        "UA_RAY_74538382B44263254033139": {
+          "en": "Sharhorod",
+          "zh": "沙霍罗德"
+        },
+        "UA_RAY_74538382B94405396686419": {
+          "en": "Tyvriv",
+          "zh": "特夫里夫"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_1e5ce8367e34",
+      "member_ids": [
+        "UA_RAY_74538382B30544134807890",
+        "UA_RAY_74538382B34796929779218",
+        "UA_RAY_74538382B97123961313815"
+      ],
+      "parent_id": "UA_Poltava",
+      "names": {
+        "en": "Reshetylivka + Shyshaky + Velyka Bahachka",
+        "zh": "列舍特利夫卡、夏沙基、韦丽卡·巴哈卡"
+      },
+      "member_names": {
+        "UA_RAY_74538382B30544134807890": {
+          "en": "Reshetylivka",
+          "zh": "列舍特利夫卡"
+        },
+        "UA_RAY_74538382B34796929779218": {
+          "en": "Shyshaky",
+          "zh": "夏沙基"
+        },
+        "UA_RAY_74538382B97123961313815": {
+          "en": "Velyka Bahachka",
+          "zh": "韦丽卡·巴哈卡"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_fd8e40834959",
+      "member_ids": [
+        "UA_RAY_74538382B32198153584627",
+        "UA_RAY_74538382B69268260028088"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "names": {
+        "en": "Lypovets + Pohrebyshche",
+        "zh": "利波维茨、波赫雷比什切"
+      },
+      "member_names": {
+        "UA_RAY_74538382B32198153584627": {
+          "en": "Lypovets",
+          "zh": "利波维茨"
+        },
+        "UA_RAY_74538382B69268260028088": {
+          "en": "Pohrebyshche",
+          "zh": "波赫雷比什切"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_ce31c0ac496b",
+      "member_ids": [
+        "UA_RAY_74538382B75813986727772",
+        "UA_RAY_74538382B76388790181712"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "names": {
+        "en": "Teplyk + Trostianets",
+        "zh": "特普雷克、Trostianets"
+      },
+      "member_names": {
+        "UA_RAY_74538382B75813986727772": {
+          "en": "Teplyk",
+          "zh": "特普雷克"
+        },
+        "UA_RAY_74538382B76388790181712": {
+          "en": "Trostianets",
+          "zh": "Trostianets"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_de7e916ec1cb",
+      "member_ids": [
+        "UA_RAY_74538382B34104046396179",
+        "UA_RAY_74538382B83246565510085"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "names": {
+        "en": "Khmilnyk + Lityn",
+        "zh": "赫米尔尼克、点燃"
+      },
+      "member_names": {
+        "UA_RAY_74538382B34104046396179": {
+          "en": "Khmilnyk",
+          "zh": "赫米尔尼克"
+        },
+        "UA_RAY_74538382B83246565510085": {
+          "en": "Lityn",
+          "zh": "点燃"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_44d0fd9d6e14",
+      "member_ids": [
+        "UA_RAY_74538382B38609283059110",
+        "UA_RAY_74538382B95360083052097"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "names": {
+        "en": "Brusyliv + Korostyshiv",
+        "zh": "布鲁西利夫、强调"
+      },
+      "member_names": {
+        "UA_RAY_74538382B38609283059110": {
+          "en": "Brusyliv",
+          "zh": "布鲁西利夫"
+        },
+        "UA_RAY_74538382B95360083052097": {
+          "en": "Korostyshiv",
+          "zh": "强调"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_51ee3e4d0063",
+      "member_ids": [
+        "UA_RAY_74538382B40286307768032",
+        "UA_RAY_74538382B68550856765578"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "names": {
+        "en": "Vilshanka + Holovanivsk",
+        "zh": "维尔尚卡、霍洛万尼夫斯克"
+      },
+      "member_names": {
+        "UA_RAY_74538382B40286307768032": {
+          "en": "Vilshanka",
+          "zh": "维尔尚卡"
+        },
+        "UA_RAY_74538382B68550856765578": {
+          "en": "Holovanivsk",
+          "zh": "霍洛万尼夫斯克"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_9fc8b136c3a6",
+      "member_ids": [
+        "UA_RAY_74538382B40940873671576",
+        "UA_RAY_74538382B69405527085585",
+        "UA_RAY_74538382B96819013794956"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "names": {
+        "en": "Yemilchyne + Luhyny + Korosten",
+        "zh": "耶米尔钦、卢希尼、科罗斯滕"
+      },
+      "member_names": {
+        "UA_RAY_74538382B40940873671576": {
+          "en": "Yemilchyne",
+          "zh": "耶米尔钦"
+        },
+        "UA_RAY_74538382B69405527085585": {
+          "en": "Luhyny",
+          "zh": "卢希尼"
+        },
+        "UA_RAY_74538382B96819013794956": {
+          "en": "Korosten",
+          "zh": "科罗斯滕"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_c74c01b39f8e",
+      "member_ids": [
+        "UA_RAY_74538382B44340415968020",
+        "UA_RAY_74538382B4782887938967",
+        "UA_RAY_74538382B88978880858250"
+      ],
+      "parent_id": "UA_Poltava",
+      "names": {
+        "en": "Novi Sanzhary + Kozelshchyna + Kobeliaky",
+        "zh": "新桑扎里、科泽尔希纳、科比利亚基"
+      },
+      "member_names": {
+        "UA_RAY_74538382B44340415968020": {
+          "en": "Novi Sanzhary",
+          "zh": "新桑扎里"
+        },
+        "UA_RAY_74538382B4782887938967": {
+          "en": "Kozelshchyna",
+          "zh": "科泽尔希纳"
+        },
+        "UA_RAY_74538382B88978880858250": {
+          "en": "Kobeliaky",
+          "zh": "科比利亚基"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_364aab8578b7",
+      "member_ids": [
+        "UA_RAY_74538382B45059422214147",
+        "UA_RAY_74538382B58798821419341"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "names": {
+        "en": "Chudniv + Berdychiv",
+        "zh": "丘德尼夫、别尔季奇夫"
+      },
+      "member_names": {
+        "UA_RAY_74538382B45059422214147": {
+          "en": "Chudniv",
+          "zh": "丘德尼夫"
+        },
+        "UA_RAY_74538382B58798821419341": {
+          "en": "Berdychiv",
+          "zh": "别尔季奇夫"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_8e1ed09f0e12",
+      "member_ids": [
+        "UA_RAY_74538382B48236413060906",
+        "UA_RAY_74538382B65548017442564"
+      ],
+      "parent_id": "UA_Vinnytsia",
+      "names": {
+        "en": "Kalynivka + Koziatyn",
+        "zh": "卡利尼夫卡、科齐亚廷"
+      },
+      "member_names": {
+        "UA_RAY_74538382B48236413060906": {
+          "en": "Kalynivka",
+          "zh": "卡利尼夫卡"
+        },
+        "UA_RAY_74538382B65548017442564": {
+          "en": "Koziatyn",
+          "zh": "科齐亚廷"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_7f067ceac5cb",
+      "member_ids": [
+        "UA_RAY_74538382B5063322332018",
+        "UA_RAY_74538382B60330166440880",
+        "UA_RAY_74538382B63160428645400"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "names": {
+        "en": "Khoroshiv + Cherniakhiv + Pulyny",
+        "zh": "霍罗希夫、切尔尼亚希夫、普利尼"
+      },
+      "member_names": {
+        "UA_RAY_74538382B5063322332018": {
+          "en": "Khoroshiv",
+          "zh": "霍罗希夫"
+        },
+        "UA_RAY_74538382B60330166440880": {
+          "en": "Cherniakhiv",
+          "zh": "切尔尼亚希夫"
+        },
+        "UA_RAY_74538382B63160428645400": {
+          "en": "Pulyny",
+          "zh": "普利尼"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_797d35ccfd2e",
+      "member_ids": [
+        "UA_RAY_74538382B5065610238765",
+        "UA_RAY_74538382B51817175452920"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "names": {
+        "en": "Kropyvnytskyi + Bobrynets",
+        "zh": "克罗佩夫尼茨基、博布里内茨"
+      },
+      "member_names": {
+        "UA_RAY_74538382B5065610238765": {
+          "en": "Kropyvnytskyi",
+          "zh": "克罗佩夫尼茨基"
+        },
+        "UA_RAY_74538382B51817175452920": {
+          "en": "Bobrynets",
+          "zh": "博布里内茨"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_d727a8cfaa69",
+      "member_ids": [
+        "UA_RAY_74538382B57034061820630",
+        "UA_RAY_74538382B73277137080743"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "names": {
+        "en": "Dobrovelychkivka + Novoarkhanhelsk",
+        "zh": "多布罗韦利奇基夫卡、新阿尔汉赫尔斯克"
+      },
+      "member_names": {
+        "UA_RAY_74538382B57034061820630": {
+          "en": "Dobrovelychkivka",
+          "zh": "多布罗韦利奇基夫卡"
+        },
+        "UA_RAY_74538382B73277137080743": {
+          "en": "Novoarkhanhelsk",
+          "zh": "新阿尔汉赫尔斯克"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_dbee0923a48b",
+      "member_ids": [
+        "UA_RAY_74538382B58237861988874",
+        "UA_RAY_74538382B64394372263090",
+        "UA_RAY_74538382B80884786840021"
+      ],
+      "parent_id": "UA_Zhytomyr",
+      "names": {
+        "en": "Baranivka + Romaniv + Liubar",
+        "zh": "巴拉尼夫卡、罗曼尼夫、我很高兴"
+      },
+      "member_names": {
+        "UA_RAY_74538382B58237861988874": {
+          "en": "Baranivka",
+          "zh": "巴拉尼夫卡"
+        },
+        "UA_RAY_74538382B64394372263090": {
+          "en": "Romaniv",
+          "zh": "罗曼尼夫"
+        },
+        "UA_RAY_74538382B80884786840021": {
+          "en": "Liubar",
+          "zh": "我很高兴"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_e3c0520ffdd5",
+      "member_ids": [
+        "UA_RAY_74538382B60018374136133",
+        "UA_RAY_74538382B64662360696322"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "names": {
+        "en": "Kamianka + Oleksandrivka",
+        "zh": "卡米扬卡、奥列克桑德夫卡"
+      },
+      "member_names": {
+        "UA_RAY_74538382B60018374136133": {
+          "en": "Kamianka",
+          "zh": "卡米扬卡"
+        },
+        "UA_RAY_74538382B64662360696322": {
+          "en": "Oleksandrivka",
+          "zh": "奥列克桑德夫卡"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_ba89d2e82c09",
+      "member_ids": [
+        "UA_RAY_74538382B62956114849097",
+        "UA_RAY_74538382B72798454015327",
+        "UA_RAY_74538382B86431925858942"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "names": {
+        "en": "Novomyrhorod + Mala Vyska + Novoukrainka",
+        "zh": "新米尔哥罗德、马拉维斯卡、新乌克兰卡"
+      },
+      "member_names": {
+        "UA_RAY_74538382B62956114849097": {
+          "en": "Novomyrhorod",
+          "zh": "新米尔哥罗德"
+        },
+        "UA_RAY_74538382B72798454015327": {
+          "en": "Mala Vyska",
+          "zh": "马拉维斯卡"
+        },
+        "UA_RAY_74538382B86431925858942": {
+          "en": "Novoukrainka",
+          "zh": "新乌克兰卡"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_7e91c55da78e",
+      "member_ids": [
+        "UA_RAY_74538382B63112784365900",
+        "UA_RAY_74538382B87722024081340",
+        "UA_RAY_74538382B88912930718320"
+      ],
+      "parent_id": "UA_Poltava",
+      "names": {
+        "en": "Myrhorod + Hadiach + Zinkiv",
+        "zh": "米尔哥罗德、哈迪亚克、津基夫"
+      },
+      "member_names": {
+        "UA_RAY_74538382B63112784365900": {
+          "en": "Myrhorod",
+          "zh": "米尔哥罗德"
+        },
+        "UA_RAY_74538382B87722024081340": {
+          "en": "Hadiach",
+          "zh": "哈迪亚克"
+        },
+        "UA_RAY_74538382B88912930718320": {
+          "en": "Zinkiv",
+          "zh": "津基夫"
+        }
+      }
+    },
+    {
+      "id": "UA_MRG_2d1c37bdd071",
+      "member_ids": [
+        "UA_RAY_74538382B69842770208303",
+        "UA_RAY_74538382B83616373915642"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "names": {
+        "en": "Oleksandriia + Znamianka",
+        "zh": "亚历克桑德里亚、兹纳米安卡"
+      },
+      "member_names": {
+        "UA_RAY_74538382B69842770208303": {
+          "en": "Oleksandriia",
+          "zh": "亚历克桑德里亚"
+        },
+        "UA_RAY_74538382B83616373915642": {
+          "en": "Znamianka",
+          "zh": "兹纳米安卡"
+        }
+      }
+    }
+  ],
+  "split_or_reduced_candidates": [
+    {
+      "candidate": [
+        "CN_CITY_17275852B10280834953954",
+        "CN_CITY_17275852B45286123916499"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B10675763964956",
+        "CN_CITY_17275852B58489467965072"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B11062842353292",
+        "CN_CITY_17275852B2228474136637",
+        "CN_CITY_17275852B30839777764393"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B11062842353292",
+          "CN_CITY_17275852B30839777764393"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B11677783822616",
+        "CN_CITY_17275852B25591140968152",
+        "CN_CITY_17275852B97874259231937"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B11831222400516",
+        "CN_CITY_17275852B66267690510959",
+        "CN_CITY_17275852B83104882902138"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B12009758175917",
+        "CN_CITY_17275852B21727756292013",
+        "CN_CITY_17275852B90293274121417"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B12009758175917",
+          "CN_CITY_17275852B90293274121417"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B13720894899448",
+        "CN_CITY_17275852B42150871691362",
+        "CN_CITY_17275852B88630649694026"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B14080596373630",
+        "CN_CITY_17275852B80933238140606"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B14914107047494",
+        "CN_CITY_17275852B41090829126149",
+        "CN_CITY_17275852B61014639645675"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B14914107047494",
+          "CN_CITY_17275852B61014639645675"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B16614537297563",
+        "CN_CITY_17275852B95269391851003"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B16970659563174",
+        "CN_CITY_17275852B3853093148241",
+        "CN_CITY_17275852B41676873149267"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B17244930809328",
+        "CN_CITY_17275852B78831071059765",
+        "CN_CITY_17275852B79000631743628"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B17244930809328",
+          "CN_CITY_17275852B79000631743628"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B17278626690982",
+        "CN_CITY_17275852B54720396840939",
+        "CN_CITY_17275852B55507691146729"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B54720396840939",
+          "CN_CITY_17275852B55507691146729"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B18322727061238",
+        "CN_CITY_17275852B63554143431725"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B18639822721943",
+        "CN_CITY_17275852B50191422864704",
+        "CN_CITY_17275852B60036374298215"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B18660143588191",
+        "CN_CITY_17275852B54478662483461"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B22610568030006",
+        "CN_CITY_17275852B35414726377112",
+        "CN_CITY_17275852B47307455232994"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B22610568030006",
+          "CN_CITY_17275852B35414726377112"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B23039937395207",
+        "CN_CITY_17275852B76570182530435"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B23042571236095",
+        "CN_CITY_17275852B39849449809026",
+        "CN_CITY_17275852B50805542405305"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B23042571236095",
+          "CN_CITY_17275852B39849449809026"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B24021264016342",
+        "CN_CITY_17275852B44956350685295",
+        "CN_CITY_17275852B81329065873888"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B44956350685295",
+          "CN_CITY_17275852B81329065873888"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B24106672686887",
+        "CN_CITY_17275852B81617624799306"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B24333220567136",
+        "CN_CITY_17275852B39422876200918",
+        "CN_CITY_17275852B96228664587587"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B24333220567136",
+          "CN_CITY_17275852B39422876200918"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B24882340673968",
+        "CN_CITY_17275852B31393010637863",
+        "CN_CITY_17275852B8103009054716"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B24882340673968",
+          "CN_CITY_17275852B8103009054716"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B25101176936396",
+        "CN_CITY_17275852B81051002573718"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B25230716975612",
+        "CN_CITY_17275852B52729797795226"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B25648013684247",
+        "CN_CITY_17275852B58903134773136"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B25767544969831",
+        "CN_CITY_17275852B31367125179867",
+        "CN_CITY_17275852B36499134265956"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B26763632681669",
+        "CN_CITY_17275852B56182979447767"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B29212741984798",
+        "CN_CITY_17275852B64087191598728",
+        "CN_CITY_17275852B87718878820627"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B64087191598728",
+          "CN_CITY_17275852B87718878820627"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B29905847665822",
+        "CN_CITY_17275852B73453477463881"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B30631409334147",
+        "CN_CITY_17275852B95874414124304"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B31491185089163",
+        "CN_CITY_17275852B431696373370",
+        "CN_CITY_17275852B55754577664448"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B431696373370",
+          "CN_CITY_17275852B55754577664448"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B31573882035564",
+        "CN_CITY_17275852B57882995260260",
+        "CN_CITY_17275852B72769683371533"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B31573882035564",
+          "CN_CITY_17275852B72769683371533"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B31757639036873",
+        "CN_CITY_17275852B93231482572641",
+        "CN_CITY_17275852B98150019256975"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B31757639036873",
+          "CN_CITY_17275852B98150019256975"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B32258301015981",
+        "CN_CITY_17275852B41151461072680",
+        "CN_CITY_17275852B98747059027351"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B32258301015981",
+          "CN_CITY_17275852B41151461072680"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B36087518478347",
+        "CN_CITY_17275852B37388992508665"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B36890628103019",
+        "CN_CITY_17275852B51175072856676",
+        "CN_CITY_17275852B87149259927291"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B36890628103019",
+          "CN_CITY_17275852B87149259927291"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B37578058694758",
+        "CN_CITY_17275852B800916503217"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B37962942142742",
+        "CN_CITY_17275852B56023235126255",
+        "CN_CITY_17275852B61616021978467"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B3826775936083",
+        "CN_CITY_17275852B85976102347819"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B40039310856406",
+        "CN_CITY_17275852B47297530357355",
+        "CN_CITY_17275852B77342375778801"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B47297530357355",
+          "CN_CITY_17275852B77342375778801"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B41756501926338",
+        "CN_CITY_17275852B42898496791559",
+        "CN_CITY_17275852B71871830431018"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B43166713994651",
+        "CN_CITY_17275852B56434829262827"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B45581719395514",
+        "CN_CITY_17275852B55448399697332",
+        "CN_CITY_17275852B8482565791704"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B55448399697332",
+          "CN_CITY_17275852B8482565791704"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B46380594187155",
+        "CN_CITY_17275852B68084346150299",
+        "CN_CITY_17275852B7483411794752"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B68084346150299",
+          "CN_CITY_17275852B7483411794752"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B47611284562797",
+        "CN_CITY_17275852B59963011340599"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B48217934131504",
+        "CN_CITY_17275852B51390796967225",
+        "CN_CITY_17275852B89533026423026"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B48217934131504",
+          "CN_CITY_17275852B89533026423026"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B48796108703718",
+        "CN_CITY_17275852B71216121267542"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B53933530490343",
+        "CN_CITY_17275852B64817974651819",
+        "CN_CITY_17275852B74264051584102"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B53933530490343",
+          "CN_CITY_17275852B64817974651819"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B55464189255182",
+        "CN_CITY_17275852B55840349463324",
+        "CN_CITY_17275852B98988434995928"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B55464189255182",
+          "CN_CITY_17275852B55840349463324"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B55776769429507",
+        "CN_CITY_17275852B59735937562693",
+        "CN_CITY_17275852B7735540978639"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B5674127157826",
+        "CN_CITY_17275852B63987790069029",
+        "CN_CITY_17275852B88170553797239"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B63987790069029",
+          "CN_CITY_17275852B88170553797239"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B57492284435715",
+        "CN_CITY_17275852B96657206671737"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B59579726815916",
+        "CN_CITY_17275852B67574078001488"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B59616994343756",
+        "CN_CITY_17275852B63877453406832",
+        "CN_CITY_17275852B88707811573248"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B63877453406832",
+          "CN_CITY_17275852B88707811573248"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B61532431382022",
+        "CN_CITY_17275852B66961239610954"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B61638108171693",
+        "CN_CITY_17275852B63272164318035",
+        "CN_CITY_17275852B71435621524955"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B61638108171693",
+          "CN_CITY_17275852B63272164318035"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B65550927062733",
+        "CN_CITY_17275852B96665943782542"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B69224732604429",
+        "CN_CITY_17275852B69310239774277"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B69618555412569",
+        "CN_CITY_17275852B81783797021346",
+        "CN_CITY_17275852B86987062890699"
+      ],
+      "applied": [
+        [
+          "CN_CITY_17275852B69618555412569",
+          "CN_CITY_17275852B81783797021346"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B70255924310381",
+        "CN_CITY_17275852B86070890642714",
+        "CN_CITY_17275852B92700741958693"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B7651699454151",
+        "CN_CITY_17275852B97427850556586"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B7797076027602",
+        "CN_CITY_17275852B79917267034965",
+        "CN_CITY_17275852B90337071234971"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B82772378373798",
+        "CN_CITY_17275852B94743712738136"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "CN_CITY_17275852B88151757349593",
+        "CN_CITY_17275852B9681816955607"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "US_CNTY_48009",
+        "US_CNTY_48023",
+        "US_CNTY_48503"
+      ],
+      "applied": [
+        [
+          "US_CNTY_48009",
+          "US_CNTY_48503"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "US_CNTY_48019",
+        "US_CNTY_48385"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "US_CNTY_48049",
+        "US_CNTY_48083",
+        "US_CNTY_48333"
+      ],
+      "applied": [
+        [
+          "US_CNTY_48049",
+          "US_CNTY_48333"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "US_CNTY_48059",
+        "US_CNTY_48133"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "US_CNTY_48067",
+        "US_CNTY_48343"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "US_CNTY_48077",
+        "US_CNTY_48237",
+        "US_CNTY_48497"
+      ],
+      "applied": [
+        [
+          "US_CNTY_48237",
+          "US_CNTY_48497"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "US_CNTY_48087",
+        "US_CNTY_48211",
+        "US_CNTY_48483"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "US_CNTY_48111",
+        "US_CNTY_48195",
+        "US_CNTY_48421"
+      ],
+      "applied": [
+        [
+          "US_CNTY_48111",
+          "US_CNTY_48421"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "US_CNTY_48117",
+        "US_CNTY_48205",
+        "US_CNTY_48359"
+      ],
+      "applied": [
+        [
+          "US_CNTY_48205",
+          "US_CNTY_48359"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "US_CNTY_48129",
+        "US_CNTY_48179",
+        "US_CNTY_48393"
+      ],
+      "applied": [
+        [
+          "US_CNTY_48129",
+          "US_CNTY_48179"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "US_CNTY_48137",
+        "US_CNTY_48259",
+        "US_CNTY_48265"
+      ],
+      "applied": [
+        [
+          "US_CNTY_48259",
+          "US_CNTY_48265"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "US_CNTY_48155",
+        "US_CNTY_48487"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "US_CNTY_48253",
+        "US_CNTY_48417",
+        "US_CNTY_48429"
+      ],
+      "applied": [
+        [
+          "US_CNTY_48253",
+          "US_CNTY_48417"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "US_CNTY_48325",
+        "US_CNTY_48463",
+        "US_CNTY_48507"
+      ],
+      "applied": [
+        [
+          "US_CNTY_48463",
+          "US_CNTY_48507"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "UA_RAY_74538382B13174941050792",
+        "UA_RAY_74538382B49727252906057",
+        "UA_RAY_74538382B70813216743380"
+      ],
+      "applied": [
+        [
+          "UA_RAY_74538382B13174941050792",
+          "UA_RAY_74538382B70813216743380"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "UA_RAY_74538382B15303326410198",
+        "UA_RAY_74538382B15383579018603",
+        "UA_RAY_74538382B92678915216320"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "UA_RAY_74538382B32839428556025",
+        "UA_RAY_74538382B75813986727772",
+        "UA_RAY_74538382B76388790181712"
+      ],
+      "applied": [
+        [
+          "UA_RAY_74538382B75813986727772",
+          "UA_RAY_74538382B76388790181712"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "UA_RAY_74538382B67308569242211",
+        "UA_RAY_74538382B8481477190191",
+        "UA_RAY_74538382B97447105405204"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "UA_RAY_74538382B69842770208303",
+        "UA_RAY_74538382B79975421345437",
+        "UA_RAY_74538382B83616373915642"
+      ],
+      "applied": [
+        [
+          "UA_RAY_74538382B69842770208303",
+          "UA_RAY_74538382B83616373915642"
+        ]
+      ]
+    }
+  ]
+}

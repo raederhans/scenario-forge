@@ -52522,7 +52522,7 @@
     },
     {
       "path": "assets/europe-1936-showcase.svg",
-      "size_bytes": 254459,
+      "size_bytes": 254470,
       "source_kind": "dist"
     },
     {
@@ -52547,7 +52547,7 @@
     },
     {
       "path": "assets/hero-blank.svg",
-      "size_bytes": 1215077,
+      "size_bytes": 1211654,
       "source_kind": "dist"
     },
     {
@@ -52567,7 +52567,7 @@
     },
     {
       "path": "assets/hero-hoi4-1936.svg",
-      "size_bytes": 281866,
+      "size_bytes": 281902,
       "source_kind": "dist"
     },
     {
@@ -52582,7 +52582,7 @@
     },
     {
       "path": "assets/hero-hoi4-1939.svg",
-      "size_bytes": 349743,
+      "size_bytes": 349779,
       "source_kind": "dist"
     },
     {
@@ -79103,7 +79103,7 @@
     {
       "file_count": 59,
       "path": "assets",
-      "size_bytes": 27297009
+      "size_bytes": 27293669
     },
     {
       "file_count": 21,
@@ -79136,5 +79136,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 1031488523
+  "total_bytes": 1031485183
 }

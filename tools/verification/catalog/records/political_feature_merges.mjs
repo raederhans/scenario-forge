@@ -5,7 +5,7 @@ export function createPoliticalFeatureMergeRecords(existingRecords) {
   return [
     ["contract", "node --test tests/political_feature_merges_contract.test.mjs", [
       "data/political_feature_merges", "tools/apply_political_feature_merges.py", "tools/build_political_feature_merge_plan.py",
-      "tools/merge_political_topology_arcs.mjs",
+      "tools/merge_political_topology_arcs.mjs", "tools/repin_river_partition_packs.py",
       "data/europe_urban.geojson", "data/releasables", "tests/political_feature_merges_contract.test.mjs",
       "tools/verification/catalog/records/political_feature_merges.mjs",
     ]],

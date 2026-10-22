@@ -18,6 +18,7 @@ DATA = ROOT / "data"
 OWNERSHIP_SCENARIOS = ("hoi4_1936", "hoi4_1939", "modern_world", "tno_1962")
 STRATEGIC_SCENARIOS = ("hoi4_1936", "hoi4_1939")
 RIVER_PARTITIONS = DATA / "river_partitions"
+CHINA_CROSSWALK = DATA / "quick_fill/china_prefecture_crosswalk.v1.json"
 ADJACENCY_TOPOLOGY = DATA / "scenarios/tno_1962/runtime_topology.topo.json.gz"
 
 
@@ -57,24 +58,37 @@ def load_assignment_tables() -> dict[str, dict]:
     for scenario in STRATEGIC_SCENARIOS:
         payload = read_json(DATA / f"scenarios/{scenario}/strategic_values.by_feature.json")
         tables[f"{scenario}:strategic_bucket"] = payload["bucket_by_feature"]
+    tables["china_prefecture"] = china_prefectures()
     return tables
 
 
+def china_prefectures() -> dict[str, str]:
+    """China leaf -> crosswalk prefecture, including provinces not yet released to quick-fill."""
+    crosswalk = read_json(CHINA_CROSSWALK)
+    prefectures = {feature_id: key for key, record in crosswalk["groups"].items() for feature_id in record["feature_ids"]}
+    prefectures.update({row["feature_id"]: "unresolved" for row in crosswalk["unresolved"]})
+    return prefectures
+
+
 def assignment_signature(feature_id: str, tables: dict[str, dict], memberships: dict[str, list[str]]) -> str:
-    values = {key: table.get(feature_id) for key, table in tables.items()}
+    values = {key: table.get(feature_id) for key, table in tables.items() if key != "china_prefecture"}
     values["hierarchy"] = memberships.get(feature_id, [])
+    values["china_prefecture"] = tables["china_prefecture"].get(feature_id)
     return json.dumps(values, sort_keys=True, ensure_ascii=False)
 
 
-def load_adjacency() -> dict[str, set[str]]:
+def load_adjacency() -> tuple[dict[str, set[str]], dict[str, str]]:
+    """TNO neighbor graph, plus each feature's source name as the last-resort label."""
     political = read_json(ADJACENCY_TOPOLOGY)["objects"]["political"]
     ids = [str((row.get("properties") or {}).get("id") or row.get("id")) for row in political["geometries"]]
+    source_names = {feature_id: str((row.get("properties") or {}).get("name") or "")
+                    for feature_id, row in zip(ids, political["geometries"])}
     adjacency = {feature_id: set() for feature_id in ids}
     for index, neighbors in enumerate(political["computed_neighbors"]):
         for other in neighbors:
             adjacency[ids[index]].add(ids[other])
             adjacency[ids[other]].add(ids[index])
-    return adjacency
+    return adjacency, source_names
 
 
 def connected_components(members: list[str], adjacency: dict[str, set[str]]) -> list[list[str]]:
@@ -98,9 +112,22 @@ def connected_components(members: list[str], adjacency: dict[str, set[str]]) -> 
 LANGUAGE_SEPARATORS = {"en": " + ", "zh": "、"}
 
 
-def member_name(feature_id: str, locales: dict) -> dict:
-    entry = (locales.get("geo") or {}).get(f"id::{feature_id}") or {}
-    return {language: entry.get(language) or feature_id for language in LANGUAGE_SEPARATORS}
+def load_name_sources() -> list[dict]:
+    """Global locales first, then scenario locale patches (which name ambiguous raw names per ID)."""
+    sources = [{key[4:]: entry for key, entry in (read_json(DATA / "locales.json").get("geo") or {}).items()
+                if key.startswith("id::")}]
+    for path in sorted(DATA.glob("scenarios/*/geo_locale_patch.json")):
+        sources.append(read_json(path).get("geo") or {})
+    return sources
+
+
+def member_name(feature_id: str, name_sources: list[dict], source_names: dict[str, str]) -> dict:
+    names = {}
+    for language in LANGUAGE_SEPARATORS:
+        names[language] = next((source[feature_id][language] for source in name_sources
+                                if isinstance(source.get(feature_id), dict) and source[feature_id].get(language)), None)
+    fallback = source_names.get(feature_id) or feature_id
+    return {language: name or names.get("en") or fallback for language, name in names.items()}
 
 
 def compose_names(member_names: dict[str, dict]) -> dict:
@@ -127,7 +154,7 @@ def river_paint_feature_ids() -> set[str]:
 def build_plan(candidates_path: Path) -> dict:
     candidates = read_json(candidates_path)
     tables, hierarchy = load_assignment_tables(), read_json(DATA / "hierarchy.json")
-    memberships, adjacency, locales = group_memberships(hierarchy), load_adjacency(), read_json(DATA / "locales.json")
+    memberships, (adjacency, source_names), name_sources = group_memberships(hierarchy), load_adjacency(), load_name_sources()
     protected = set(candidates.get("protected_feature_ids") or []) | river_paint_feature_ids()
     groups, splits = [], []
     for candidate in candidates["candidates"]:
@@ -142,7 +169,7 @@ def build_plan(candidates_path: Path) -> dict:
         if len(kept) != 1 or len(kept[0]) != len(candidate["member_ids"]):
             splits.append({"candidate": candidate["member_ids"], "applied": kept})
         for component in kept:
-            member_names = {feature_id: member_name(feature_id, locales) for feature_id in component}
+            member_names = {feature_id: member_name(feature_id, name_sources, source_names) for feature_id in component}
             groups.append({
                 "id": merged_feature_id(component),
                 "member_ids": component,
@@ -161,7 +188,7 @@ def build_plan(candidates_path: Path) -> dict:
         "plan_id": candidates_path.name.replace(".candidates.json", ".v1"),
         "candidate_source": candidates_path.relative_to(ROOT).as_posix(),
         "constraints": ["owners", "cores", "strategic_value_buckets", "hierarchy_groups", "quick_fill_groups",
-                        "river_paint_parcels_unchanged", "contiguous"],
+                        "china_crosswalk_prefecture", "river_paint_parcels_unchanged", "contiguous"],
         "ownership_scenarios": list(OWNERSHIP_SCENARIOS),
         "strategic_scenarios": list(STRATEGIC_SCENARIOS),
         "counts": {"candidates": len(candidates["candidates"]), "groups": len(groups),
