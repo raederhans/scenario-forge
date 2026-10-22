@@ -316,7 +316,7 @@ const callbackInjectionDefinitions =[
       "getRenderPerfMetricsRuntimeOwner"
     ],
     "sourceFingerprints": {
-      "js/core/renderer/projected_coordinate_bounds.js": "28bcc17c77c5e63865bf578172abbee2c6866d0580e0094089cfe84cf433b902",
+      "js/core/renderer/projected_coordinate_bounds.js": "68a975bfd86d5739924d2e201e98213eb45b2cff9b86de5ed5556e2dbfc7fe5b",
       "js/core/renderer/water_sanitization_snapshot_cache.js": "f3688bebc55ff296b5c9a121fe0ccc74da662198981c8bf55429b239fc23ea38",
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
       "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
@@ -362,7 +362,7 @@ const callbackInjectionDefinitions =[
       "getRenderPerfMetricsRuntimeOwner"
     ],
     "sourceFingerprints": {
-      "js/core/renderer/projected_coordinate_bounds.js": "28bcc17c77c5e63865bf578172abbee2c6866d0580e0094089cfe84cf433b902",
+      "js/core/renderer/projected_coordinate_bounds.js": "68a975bfd86d5739924d2e201e98213eb45b2cff9b86de5ed5556e2dbfc7fe5b",
       "js/core/renderer/water_sanitization_snapshot_cache.js": "f3688bebc55ff296b5c9a121fe0ccc74da662198981c8bf55429b239fc23ea38",
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
       "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",
@@ -726,7 +726,7 @@ const callbackInjectionDefinitions =[
       "getRenderPerfMetricsRuntimeOwner"
     ],
     "sourceFingerprints": {
-      "js/core/renderer/projected_coordinate_bounds.js": "28bcc17c77c5e63865bf578172abbee2c6866d0580e0094089cfe84cf433b902",
+      "js/core/renderer/projected_coordinate_bounds.js": "68a975bfd86d5739924d2e201e98213eb45b2cff9b86de5ed5556e2dbfc7fe5b",
       "js/core/renderer/water_sanitization_snapshot_cache.js": "f3688bebc55ff296b5c9a121fe0ccc74da662198981c8bf55429b239fc23ea38",
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
       "js/core/map_renderer.js": "88e41bc36af5f3386eea707c340bda4803aade84ec0549902c6dc8a2abb914d4",

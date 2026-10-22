@@ -56,23 +56,25 @@ function isValidPosition(position) {
   return typeof lon === "number" && lon >= -180 && lon <= 180 && lat > -90 && lat < 90;
 }
 
-function ringLongitudeSpan(ring) {
-  if (!Array.isArray(ring)) return Infinity;
-  let minLon = Infinity;
-  let maxLon = -Infinity;
+// Total longitude travelled along a ring's edges, each edge taking D3's minor
+// arc. Unlike the span, repeated or self-overlapping loops keep adding to it.
+function ringLongitudeTravel(ring) {
+  if (!Array.isArray(ring) || !ring.length) return Infinity;
+  let travel = 0;
+  let previous = null;
   for (const position of ring) {
     if (!isValidPosition(position)) return Infinity;
-    if (position[0] < minLon) minLon = position[0];
-    if (position[0] > maxLon) maxLon = position[0];
+    if (previous) travel += Math.abs(((position[0] - previous[0] + 540) % 360) - 180);
+    previous = position;
   }
-  return maxLon - minLon;
+  return travel;
 }
 
 function isAreaBoundedPolygon(rings) {
   if (!Array.isArray(rings)) return false;
-  let span = 0;
-  for (const ring of rings) span += ringLongitudeSpan(ring);
-  return span < 180;
+  let travel = 0;
+  for (const ring of rings) travel += ringLongitudeTravel(ring);
+  return travel < 180;
 }
 
 function hasValidPositions(value) {
@@ -82,11 +84,14 @@ function hasValidPositions(value) {
 
 // True when geoBounds cannot change D3's spherical verdict. D3 reports world
 // bounds only for a polygon whose summed ring areas are negative (an inverted
-// complement), and normalizes that polygon's geoArea to 4π plus the sum. A ring
-// of valid non-polar vertices spanning Δλ < 180° encloses at most 2·Δλ, so when
-// a polygon's ring spans add up to under 180° the sum stays above -2π and the
-// inverted polygon's area exceeds 2π, which the area check already rejects.
-// Rings that avoid the poles also keep every other polygon's bounds off ±90°.
+// complement), and normalizes that polygon's geoArea to 4π plus the sum. D3 sums
+// one signed triangle (south pole, edge) per edge; with valid non-polar vertices
+// each triangle lies in the lune between the edge's meridians, so its area is at
+// most 2·|Δλ|. When a polygon's edges travel under 180° of longitude in total
+// the sum stays above -2π, so an inverted polygon's area exceeds 2π and the area
+// check already rejects it; that travel also cannot wind around a pole, which
+// keeps every other polygon's bounds off ±90°. This holds for any ring shape,
+// including holes, repeated loops and self-intersections.
 export function isCompactLonLatGeometry(geoObject) {
   if (!geoObject || typeof geoObject !== "object") return false;
   switch (geoObject.type) {

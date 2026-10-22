@@ -978,9 +978,12 @@ test("spherical bounds are computed only when they can change or explain the ver
   assert.equal(corrupt.invalid, true, "out-of-range coordinates still reach the world-bounds check");
   assert.equal(corrupt.isWorldBounds, true);
 
+  // Edges take the minor arc, so a small ring across the antimeridian travels 40°.
   const antimeridian = { type: "Polygon", coordinates: [[[170, 0], [-170, 0], [-170, 10], [170, 10], [170, 0]]] };
-  owner.getSphericalGeometryDiagnostics(antimeridian);
-  assert.equal(diagnostics.calls.geoBounds, 3, "geometry spanning 180 degrees of longitude computes bounds");
+  assert.equal(owner.getSphericalGeometryDiagnostics(antimeridian).bounds, null);
+  const wide = { type: "Polygon", coordinates: [[[0, 0], [100, 0], [100, 10], [0, 10], [0, 0]]] };
+  owner.getSphericalGeometryDiagnostics(wide);
+  assert.equal(diagnostics.calls.geoBounds, 3, "edges travelling 180 degrees of longitude compute bounds");
 });
 
 test("real D3 rejects an inverted compact ring as world bounds and accepts the same ring wound correctly", () => {
@@ -1006,4 +1009,11 @@ test("real D3 rejects an inverted compact ring as world bounds and accepts the s
   assert.equal(stacked.invalid, true);
   const stackedParts = owner.getSphericalGeometryDiagnostics({ type: "MultiPolygon", coordinates: [[clockwise], [wide, wide, wide]] });
   assert.equal(stackedParts.invalid, true);
+
+  // One ring that repeats an inverted loop accumulates area the same way.
+  const loop = wide.slice(0, 4);
+  const repeated = owner.getSphericalGeometryDiagnostics({ type: "Polygon", coordinates: [[...loop, ...loop, ...loop, ...loop, loop[0]]] });
+  assert.equal(repeated.hasExcessiveSphereArea, false);
+  assert.equal(repeated.isWorldBounds, true);
+  assert.equal(repeated.invalid, true);
 });
