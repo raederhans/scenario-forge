@@ -7,6 +7,11 @@ editable feature in **every** scenario and in the shared base data.
 | --- | --- |
 | `europe_de_fr.candidates.json` | Input: adjacent DE NUTS-3 / FR arrondissement candidates from the 2026-10-21 granularity research. |
 | `europe_de_fr.v1.json` | Applied plan: 54 groups, 132 members, 78 features removed. |
+| `cn_us_ua_first_review.candidates.json` | Input: first-review dense-country candidates (Hebei, Henan, Anhui, Jiangxi; Texas; central Ukraine) from the 2026-10-21 TNO granularity research. |
+| `cn_us_ua_first_review.v1.json` | Applied plan: 141 groups, 335 members, 194 features removed. |
+
+Plans are applied one after another; their member sets are disjoint, and every
+consumer (quick-fill, tests) reads all `*.v<N>.json` plans.
 
 ## Deriving the plan
 
@@ -16,6 +21,10 @@ together only where every scenario assigns them identically:
 - owners and cores in `hoi4_1936`, `hoi4_1939`, `modern_world`, `tno_1962`;
 - HOI4 strategic-value buckets (HOI4 states) in both HOI4 scenarios;
 - `hierarchy.json` groups and every quick-fill level (e.g. French departments);
+- the China prefecture crosswalk
+  (`data/quick_fill/china_prefecture_crosswalk.v1.json`), including provinces
+  not yet released to quick-fill, so county merges never cross a prefecture.
+  Unresolved leaves only merge with other unresolved leaves;
 - parents and contour supports of reviewed river-paint packs
   (`data/river_partitions/*.json`) are never merged, because their geometry
   fingerprints are part of each approved pack identity.
@@ -23,7 +32,9 @@ together only where every scenario assigns them identically:
 Inconsistent candidates are split into the largest consistent subsets that are
 still contiguous; singletons stay unmerged. Merged IDs are
 `<country>_MRG_<sha256(sorted members)[:12]>`, so ID-based country fallbacks
-still resolve. Names join the members' names (`en` with ` + `, `zh` with `、`).
+still resolve. Names join the members' names (`en` with ` + `, `zh` with `、`),
+taken from `locales.json`, then scenario `geo_locale_patch.json` files (which
+name leaves whose raw names are ambiguous), then the source topology name.
 
 ## Applying the plan
 
@@ -37,29 +48,36 @@ still resolve. Names join the members' names (`en` with ` + `, `zh` with `、`).
   which delegates chunks, startup bundles and snapshots to the scenario contract
   builder;
 - `hierarchy.json`, `locales.json`, `geo_aliases.json`, country policies,
-  cities, urban areas and releasable catalogs. Scenario-specific names, such as
+  cities, urban areas and releasable catalogs. The China prefecture crosswalk
+  is projected and its input signatures re-pinned to the merged leaves. Scenario-specific names, such as
   TNO's, are composed from that scenario's own member names;
 - population features (`--population-only`, run after the scenarios).
   Population and area are summed and fractions are area-weighted; each document
-  is re-bound to its new topology hash and re-registered.
+  is re-bound to its new topology hash and re-registered;
+- `data/manifest.json` evidence (`sha256`, `size_bytes` and counts) for every
+  output it changed that was in sync beforehand. The repository-footprint CI
+  check rejects stale evidence for managed assets such as
+  `europe_topology.na_v2.json`.
 
 The projector raises on any conflicting many-to-one value and on any ID list
-that contains only part of a group.
+that contains only part of a group, except per-feature annotations (`audit`
+samples and reviewed name collisions), where a lone merged member is valid.
+Quick-fill metadata in `hierarchy.json` is then rebuilt from the projected
+crosswalk and every applied plan.
 
 Afterwards:
 
 1. Regenerate the political ID raster assets with
    `node tools/build_political_id_raster_assets.mjs --base-url <dev server>/app/`
    and again with `--extend true`.
-2. Re-pin the Modern World river-paint packs. The new topology bytes and owner
-   baseline change each pack's `source` (`landDigest`, `baselineHash`), so
-   rebuild every `modern_world_*.json` with `tools/build_river_partitions.py`
-   (same rivers, parents and lake option as its `source`, plus the new
-   `--baseline-hash`). Confirm `parents` and `support` are byte-identical to
-   the reviewed pack. Then regenerate the `.transport.json` downloads with
-   `tools/river_partitions/compact_transport.py`, and replace each pack's
-   `packId` and `canonicalSha256` in `js/core/river_paint/pilot_manifest.js`.
-   The canonical hash is the SHA-256 of `JSON.stringify(normalizeRiverPartitionPack(pack))`.
+2. Re-pin the Modern World river-paint packs with
+   `python tools/repin_river_partition_packs.py`. The new topology bytes and
+   owner baseline change each pack's `source` (`landDigest`, `baselineHash`).
+   The script rebuilds every pack from its own recorded rivers, parents and
+   lake option, refuses any change to `parents` or `support`, regenerates the
+   `.transport.json` downloads, and replaces each `packId` and
+   `canonicalSha256` in `js/core/river_paint/pilot_manifest.js` (and its dist
+   mirror when it was in sync).
 3. Re-pin `scenario.baselineHash` in `landing/assets/sample-projects/*` and
    their `dist/assets` mirrors to each scenario manifest's new `baseline_hash`.
 4. Regenerate the landing showcase and hero maps with
@@ -67,6 +85,7 @@ Afterwards:
    scenario features. Copy the changed files to `dist/assets` and update their
    `size_bytes` (plus `total_bytes` and the `assets` directory total) in
    `dist/pages-dist-manifest.json`.
+
 5. Refresh the landing page's hard-coded evidence numbers with
    `python tools/refresh_landing_evidence_markers.py`.
 

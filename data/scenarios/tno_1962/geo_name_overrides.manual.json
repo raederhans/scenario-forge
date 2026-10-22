@@ -1733,10 +1733,6 @@
       "en": "Mishan",
       "zh": "密山"
     },
-    "CN_CITY_17275852B19731807948045": {
-      "en": "Wuqiangxian",
-      "zh": "武强县"
-    },
     "CN_CITY_17275852B22612364472373": {
       "en": "Zhengxiangbaiqi",
       "zh": "正镶白旗"
@@ -1772,10 +1768,6 @@
     "CN_CITY_17275852B36912897985697": {
       "en": "Gannanxian",
       "zh": "甘南县"
-    },
-    "CN_CITY_17275852B37600232739643": {
-      "en": "Mencunhuizuzizhixian",
-      "zh": "孟村回族自治县"
     },
     "CN_CITY_17275852B38336781870813": {
       "en": "Anxixian",
@@ -1925,10 +1917,6 @@
       "en": "Heihe",
       "zh": "黑河"
     },
-    "CN_CITY_17275852B86260962826974": {
-      "en": "Rongchengxian",
-      "zh": "容城县"
-    },
     "CN_CITY_17275852B86600169878018": {
       "en": "Elunchunzizhiqi",
       "zh": "鄂伦春自治旗"
@@ -1948,6 +1936,18 @@
     "CN_CITY_17275852B96657206671737": {
       "en": "Dachengxian",
       "zh": "大城县"
+    },
+    "CN_MRG_394c2f1e79d2": {
+      "en": "Changxian + Mencunhuizuzizhixian",
+      "zh": "昌县、孟村回族自治县"
+    },
+    "CN_MRG_afbaca334723": {
+      "en": "Wuqiangxian + Wuyixian + Shenzhou",
+      "zh": "武强县、武夷县、神舟"
+    },
+    "CN_MRG_bf685b353c1f": {
+      "en": "Anxinxian + Gaoyangxian + Rongchengxian",
+      "zh": "安新县、高阳县、容城县"
     },
     "DE300": {
       "en": "Germania",
@@ -4029,6 +4029,10 @@
       "en": "Kilimanjaro",
       "zh": "乞力马扎罗"
     },
+    "UA_MRG_797d35ccfd2e": {
+      "en": "Eichhornburg + Bobrynets",
+      "zh": "艾希霍恩堡、博布里内茨"
+    },
     "UA_RAY_74538382B21342332427534": {
       "en": "Artsyz",
       "zh": "阿尔齐兹"
@@ -4072,10 +4076,6 @@
     "UA_RAY_74538382B46561623007945": {
       "en": "Okny",
       "zh": "奥克内"
-    },
-    "UA_RAY_74538382B5065610238765": {
-      "en": "Eichhornburg",
-      "zh": "艾希霍恩堡"
     },
     "UA_RAY_74538382B55212312657182": {
       "en": "Kriwoi Rog",
@@ -4401,10 +4401,6 @@
       "en": "Oklahoma County",
       "zh": "俄克拉荷马县"
     },
-    "US_CNTY_48009": {
-      "en": "Archer County",
-      "zh": "阿彻县"
-    },
     "US_CNTY_48025": {
       "en": "Bee County",
       "zh": "比县"
@@ -4417,29 +4413,9 @@
       "en": "Brazos County",
       "zh": "布拉索斯县"
     },
-    "US_CNTY_48049": {
-      "en": "Brown County",
-      "zh": "布朗县"
-    },
-    "US_CNTY_48063": {
-      "en": "Camp County",
-      "zh": "坎普县"
-    },
     "US_CNTY_48077": {
       "en": "Clay County",
       "zh": "克莱县"
-    },
-    "US_CNTY_48081": {
-      "en": "Coke County",
-      "zh": "科克县"
-    },
-    "US_CNTY_48089": {
-      "en": "Colorado County",
-      "zh": "科罗拉多县"
-    },
-    "US_CNTY_48103": {
-      "en": "Crane County",
-      "zh": "克兰县"
     },
     "US_CNTY_48117": {
       "en": "Deaf Smith County",
@@ -4449,53 +4425,17 @@
       "en": "Falls County",
       "zh": "福尔斯县"
     },
-    "US_CNTY_48179": {
-      "en": "Gray County",
-      "zh": "格雷县"
-    },
-    "US_CNTY_48191": {
-      "en": "Hall County",
-      "zh": "霍尔县"
-    },
-    "US_CNTY_48217": {
-      "en": "Hill County",
-      "zh": "希尔县"
-    },
-    "US_CNTY_48221": {
-      "en": "Hood County",
-      "zh": "胡德县"
-    },
     "US_CNTY_48231": {
       "en": "Hunt County",
       "zh": "亨特县"
-    },
-    "US_CNTY_48241": {
-      "en": "Jasper County",
-      "zh": "贾斯珀县"
     },
     "US_CNTY_48245": {
       "en": "Jefferson County",
       "zh": "杰斐逊县"
     },
-    "US_CNTY_48279": {
-      "en": "Lamb County",
-      "zh": "兰姆县"
-    },
-    "US_CNTY_48293": {
-      "en": "Limestone County",
-      "zh": "莱姆斯通县"
-    },
-    "US_CNTY_48297": {
-      "en": "Live Oak County",
-      "zh": "利夫奥克县"
-    },
     "US_CNTY_48301": {
       "en": "Loving County",
       "zh": "洛文县"
-    },
-    "US_CNTY_48319": {
-      "en": "Mason County",
-      "zh": "梅森县"
     },
     "US_CNTY_48323": {
       "en": "Maverick County",
@@ -4521,49 +4461,9 @@
       "en": "Real County",
       "zh": "雷亚尔县"
     },
-    "US_CNTY_48399": {
-      "en": "Runnels County",
-      "zh": "兰纳尔斯县"
-    },
-    "US_CNTY_48415": {
-      "en": "Scurry County",
-      "zh": "斯卡里县"
-    },
-    "US_CNTY_48431": {
-      "en": "Sterling County",
-      "zh": "斯特灵县"
-    },
-    "US_CNTY_48433": {
-      "en": "Stonewall County",
-      "zh": "斯通沃尔县"
-    },
-    "US_CNTY_48455": {
-      "en": "Trinity County",
-      "zh": "特里尼蒂县"
-    },
-    "US_CNTY_48463": {
-      "en": "Uvalde County",
-      "zh": "尤瓦尔迪县"
-    },
-    "US_CNTY_48481": {
-      "en": "Wharton County",
-      "zh": "沃顿县"
-    },
-    "US_CNTY_48491": {
-      "en": "Williamson County",
-      "zh": "威廉姆森县"
-    },
-    "US_CNTY_48497": {
-      "en": "Wise County",
-      "zh": "怀斯县"
-    },
     "US_CNTY_48499": {
       "en": "Wood County",
       "zh": "伍德县"
-    },
-    "US_CNTY_48503": {
-      "en": "Young County",
-      "zh": "扬县"
     },
     "US_CNTY_49049": {
       "en": "Utah County",
@@ -4572,6 +4472,86 @@
     "US_CNTY_53053": {
       "en": "Pierce County",
       "zh": "皮尔斯县"
+    },
+    "US_MRG_1bbe9dc9722d": {
+      "en": "Brown County + Mills County",
+      "zh": "布朗县、米尔斯"
+    },
+    "US_MRG_23dc6cc6e2e4": {
+      "en": "Polk County + Trinity County",
+      "zh": "波尔克、特里尼蒂县"
+    },
+    "US_MRG_288c105ab692": {
+      "en": "Briscoe County + Hall County + Swisher County",
+      "zh": "布里斯科、霍尔县、斯威舍尔"
+    },
+    "US_MRG_36d7642c780b": {
+      "en": "King County + Knox County + Stonewall County",
+      "zh": "国王、诺克斯、斯通沃尔县"
+    },
+    "US_MRG_4ae2dfdcec1e": {
+      "en": "Donley County + Gray County",
+      "zh": "唐利、格雷县"
+    },
+    "US_MRG_4b9ef4efd3fc": {
+      "en": "Atascosa County + Live Oak County",
+      "zh": "阿塔斯科萨、利夫奥克县"
+    },
+    "US_MRG_4f6a788187a4": {
+      "en": "Colorado County + Lavaca County + Wharton County",
+      "zh": "科罗拉多县、拉瓦卡、沃顿县"
+    },
+    "US_MRG_6b6081bed14d": {
+      "en": "Coke County + Runnels County + Sterling County",
+      "zh": "科克县、兰纳尔斯县、斯特灵县"
+    },
+    "US_MRG_741f098c1f8e": {
+      "en": "Llano County + Mason County",
+      "zh": "拉诺、梅森县"
+    },
+    "US_MRG_75ade1c370a1": {
+      "en": "Bailey County + Hale County + Lamb County",
+      "zh": "贝利、黑尔、兰姆县"
+    },
+    "US_MRG_7d307bfcd590": {
+      "en": "Mitchell County + Nolan County + Scurry County",
+      "zh": "米切尔、诺兰、斯卡里县"
+    },
+    "US_MRG_8d4f8a0a88ae": {
+      "en": "Jack County + Wise County",
+      "zh": "杰克、怀斯县"
+    },
+    "US_MRG_954f62972ce9": {
+      "en": "Burleson County + Lee County + Williamson County",
+      "zh": "伯勒森、李、威廉姆森县"
+    },
+    "US_MRG_9621d87995de": {
+      "en": "Camp County + Gregg County + Upshur County",
+      "zh": "坎普县、格雷格、厄普舒尔"
+    },
+    "US_MRG_b4d3754acb9d": {
+      "en": "Jasper County + Newton County + Sabine County",
+      "zh": "贾斯珀县、牛顿、萨宾"
+    },
+    "US_MRG_b97e9b932c3f": {
+      "en": "Crane County + Reagan County + Upton County",
+      "zh": "克兰县、里根、厄普顿"
+    },
+    "US_MRG_bd1072ae78b5": {
+      "en": "Uvalde County + Zavala County",
+      "zh": "尤瓦尔迪县、萨瓦拉"
+    },
+    "US_MRG_d2dd8d229fc4": {
+      "en": "Archer County + Young County",
+      "zh": "阿彻县、扬县"
+    },
+    "US_MRG_f1682b432a7b": {
+      "en": "Hill County + Limestone County + Navarro County",
+      "zh": "希尔县、莱姆斯通县、纳瓦罗"
+    },
+    "US_MRG_f694e67d7337": {
+      "en": "Hood County + Somervell County",
+      "zh": "胡德县、萨默维尔"
     },
     "US_ZN_01_004__R": {
       "en": "Jefferson County",

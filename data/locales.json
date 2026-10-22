@@ -196372,10 +196372,6 @@
       "en": "Xiangfan",
       "zh": "襄樊"
     },
-    "id::CN_CITY_17275852B10417226533704": {
-      "en": "Xinxian",
-      "zh": "新县"
-    },
     "id::CN_CITY_17275852B10417338286601": {
       "en": "Yuanyang",
       "zh": "元阳"
@@ -196439,10 +196435,6 @@
     "id::CN_CITY_17275852B11052099771689": {
       "en": "Luohuoxian",
       "zh": "炉霍县"
-    },
-    "id::CN_CITY_17275852B11062842353292": {
-      "en": "Xihuaxian",
-      "zh": "西华县"
     },
     "id::CN_CITY_17275852B11085886687529": {
       "en": "Tiandengxian",
@@ -196508,10 +196500,6 @@
       "en": "Nanjiangxian",
       "zh": "南江县"
     },
-    "id::CN_CITY_17275852B12009758175917": {
-      "en": "Renqiu",
-      "zh": "任丘"
-    },
     "id::CN_CITY_17275852B12011318732554": {
       "en": "Fangshanxian",
       "zh": "房山县"
@@ -196539,10 +196527,6 @@
     "id::CN_CITY_17275852B12334721077046": {
       "en": "Yixian",
       "zh": "黟县"
-    },
-    "id::CN_CITY_17275852B12367976812965": {
-      "en": "Jiaxian",
-      "zh": "郏县"
     },
     "id::CN_CITY_17275852B12394774588724": {
       "en": "Funingxian",
@@ -196812,10 +196796,6 @@
       "en": "Dingjiexian",
       "zh": "定界县"
     },
-    "id::CN_CITY_17275852B14914107047494": {
-      "en": "Anyangxian",
-      "zh": "安阳县"
-    },
     "id::CN_CITY_17275852B14993036892796": {
       "en": "Yuananxian",
       "zh": "远安县"
@@ -196847,10 +196827,6 @@
     "id::CN_CITY_17275852B15400645542385": {
       "en": "Jingshanxian",
       "zh": "京山县"
-    },
-    "id::CN_CITY_17275852B15402619404646": {
-      "en": "Nanhexian",
-      "zh": "南河县"
     },
     "id::CN_CITY_17275852B15408269430062": {
       "en": "Hancheng",
@@ -196895,14 +196871,6 @@
     "id::CN_CITY_17275852B15896822448675": {
       "en": "Baishuixian",
       "zh": "白水县"
-    },
-    "id::CN_CITY_17275852B15928071016890": {
-      "en": "Lichuanxian",
-      "zh": "利川县"
-    },
-    "id::CN_CITY_17275852B15976604032949": {
-      "en": "Luquan",
-      "zh": "鹿泉"
     },
     "id::CN_CITY_17275852B15977137196263": {
       "en": "Jiyuan",
@@ -197032,10 +197000,6 @@
       "en": "Jinyangxian",
       "zh": "金阳县"
     },
-    "id::CN_CITY_17275852B17244930809328": {
-      "en": "Wuhexian",
-      "zh": "五河县"
-    },
     "id::CN_CITY_17275852B17278626690982": {
       "en": "Pingyuxian",
       "zh": "平舆县"
@@ -197108,10 +197072,6 @@
       "en": "Daerhanmaominganlianheqi",
       "zh": "达尔罕茂明安联合旗"
     },
-    "id::CN_CITY_17275852B17915990545621": {
-      "en": "Xushuixian",
-      "zh": "徐水县"
-    },
     "id::CN_CITY_17275852B17983837223036": {
       "en": "Hezhe",
       "zh": "赫哲族"
@@ -197119,10 +197079,6 @@
     "id::CN_CITY_17275852B18068640448414": {
       "en": "Gaochunxian",
       "zh": "高淳县"
-    },
-    "id::CN_CITY_17275852B18090329850308": {
-      "en": "Shanggaoxian",
-      "zh": "上高县"
     },
     "id::CN_CITY_17275852B18116448173822": {
       "en": "Longhuixian",
@@ -197268,10 +197224,6 @@
       "en": "Xunyixian",
       "zh": "寻邑县"
     },
-    "id::CN_CITY_17275852B19731807948045": {
-      "en": "Wuqiangxian",
-      "zh": "武强县"
-    },
     "id::CN_CITY_17275852B19798754149723": {
       "en": "Jiashanxian",
       "zh": "嘉善县"
@@ -197384,10 +197336,6 @@
       "en": "Dingxiangxian",
       "zh": "定襄县"
     },
-    "id::CN_CITY_17275852B2055839745215": {
-      "en": "Luanchuanxian",
-      "zh": "栾川县"
-    },
     "id::CN_CITY_17275852B20617662043886": {
       "en": "Tuoketuoqi",
       "zh": "托克托奇"
@@ -197395,10 +197343,6 @@
     "id::CN_CITY_17275852B2067645637252": {
       "en": "Chenghai",
       "zh": "澄海"
-    },
-    "id::CN_CITY_17275852B20688362661640": {
-      "en": "Anxinxian",
-      "zh": "安新县"
     },
     "id::CN_CITY_17275852B20720560043260": {
       "en": "Tacheng",
@@ -197411,10 +197355,6 @@
     "id::CN_CITY_17275852B20799087712877": {
       "en": "Pingdingxian",
       "zh": "平定县"
-    },
-    "id::CN_CITY_17275852B21011904878760": {
-      "en": "Boyexian",
-      "zh": "博野县"
     },
     "id::CN_CITY_17275852B21017336593321": {
       "en": "Chengguxian",
@@ -197588,10 +197528,6 @@
       "en": "Dangyang",
       "zh": "当阳"
     },
-    "id::CN_CITY_17275852B22610568030006": {
-      "en": "Nanyang",
-      "zh": "南阳"
-    },
     "id::CN_CITY_17275852B22612364472373": {
       "en": "Zhengxiangbaiqi",
       "zh": "正镶白旗"
@@ -197656,17 +197592,9 @@
       "en": "Wuweixian",
       "zh": "无为县"
     },
-    "id::CN_CITY_17275852B23042571236095": {
-      "en": "Leanxian",
-      "zh": "乐县"
-    },
     "id::CN_CITY_17275852B23076534841133": {
       "en": "Nonganxian",
       "zh": "农干县"
-    },
-    "id::CN_CITY_17275852B23091947477547": {
-      "en": "Wanzaixian",
-      "zh": "万载县"
     },
     "id::CN_CITY_17275852B23093629641028": {
       "en": "Wugang",
@@ -197707,10 +197635,6 @@
     "id::CN_CITY_17275852B23606039039574": {
       "en": "Suiningxian",
       "zh": "睢宁县"
-    },
-    "id::CN_CITY_17275852B23676912924817": {
-      "en": "Dingyuanxian",
-      "zh": "定远县"
     },
     "id::CN_CITY_17275852B23708909449715": {
       "en": "Wannianxian",
@@ -197755,10 +197679,6 @@
     "id::CN_CITY_17275852B24282650686841": {
       "en": "Benximanzuzizhixian",
       "zh": "本溪满族自治县"
-    },
-    "id::CN_CITY_17275852B24333220567136": {
-      "en": "Yongxiuxian",
-      "zh": "永修县"
     },
     "id::CN_CITY_17275852B2433692358799": {
       "en": "Changxingxian",
@@ -197816,10 +197736,6 @@
       "en": "Qufu",
       "zh": "曲阜"
     },
-    "id::CN_CITY_17275852B24684038509558": {
-      "en": "Ruyang",
-      "zh": "汝阳"
-    },
     "id::CN_CITY_17275852B24717929885720": {
       "en": "Luoyang",
       "zh": "洛阳"
@@ -197851,10 +197767,6 @@
     "id::CN_CITY_17275852B2487854423028": {
       "en": "Zhenlaixian",
       "zh": "镇赉县"
-    },
-    "id::CN_CITY_17275852B24882340673968": {
-      "en": "Quzhouxian",
-      "zh": "衢州县"
     },
     "id::CN_CITY_17275852B2489885382499": {
       "en": "Shehongxian",
@@ -198087,10 +197999,6 @@
     "id::CN_CITY_17275852B27395937985126": {
       "en": "Xuanenxian",
       "zh": "宣恩县"
-    },
-    "id::CN_CITY_17275852B27436635474795": {
-      "en": "Qingyangxian",
-      "zh": "青阳县"
     },
     "id::CN_CITY_17275852B27449390432032": {
       "en": "Maoxian",
@@ -198332,10 +198240,6 @@
       "en": "Luzaixian",
       "zh": "鹿仔县"
     },
-    "id::CN_CITY_17275852B30063446428877": {
-      "en": "Renxian",
-      "zh": "任县"
-    },
     "id::CN_CITY_17275852B30120943168727": {
       "en": "Dongxiangxian",
       "zh": "东乡县"
@@ -198372,10 +198276,6 @@
       "en": "Lanchanglaguzuzizhixian",
       "zh": "兰昌拉古族自治县"
     },
-    "id::CN_CITY_17275852B30373565857678": {
-      "en": "Changxian",
-      "zh": "昌县"
-    },
     "id::CN_CITY_17275852B30377041544199": {
       "en": "Balikunhashakezizhixian",
       "zh": "巴里坤哈萨克自治县"
@@ -198403,10 +198303,6 @@
     "id::CN_CITY_17275852B3078937229580": {
       "en": "Zixing",
       "zh": "资兴"
-    },
-    "id::CN_CITY_17275852B30839777764393": {
-      "en": "Fugouxian",
-      "zh": "浮沟县"
     },
     "id::CN_CITY_17275852B3088754118842": {
       "en": "Yijinhuoluoqi",
@@ -198440,10 +198336,6 @@
       "en": "Kangxian",
       "zh": "康县"
     },
-    "id::CN_CITY_17275852B31377284290570": {
-      "en": "Shitaixian",
-      "zh": "石台县"
-    },
     "id::CN_CITY_17275852B31388311783220": {
       "en": "Kanglexian",
       "zh": "康乐县"
@@ -198468,10 +198360,6 @@
       "en": "Xinyu",
       "zh": "新宇"
     },
-    "id::CN_CITY_17275852B31573882035564": {
-      "en": "Yushanxian",
-      "zh": "玉山县"
-    },
     "id::CN_CITY_17275852B31584297203883": {
       "en": "Rangtangxian",
       "zh": "壤塘县"
@@ -198487,10 +198375,6 @@
     "id::CN_CITY_17275852B31753067259114": {
       "en": "Wenchengxian",
       "zh": "文成县"
-    },
-    "id::CN_CITY_17275852B31757639036873": {
-      "en": "Xiuningxian",
-      "zh": "休宁县"
     },
     "id::CN_CITY_17275852B31837882827561": {
       "en": "Lanshanxian",
@@ -198527,10 +198411,6 @@
     "id::CN_CITY_17275852B32222846476141": {
       "en": "Xinanxian",
       "zh": "西南县"
-    },
-    "id::CN_CITY_17275852B32258301015981": {
-      "en": "Xinxiang",
-      "zh": "新乡"
     },
     "id::CN_CITY_17275852B32324091961089": {
       "en": "Tanghexian",
@@ -198724,10 +198604,6 @@
       "en": "Youxixian",
       "zh": "尤溪县"
     },
-    "id::CN_CITY_17275852B34450056986470": {
-      "en": "Zhangshu",
-      "zh": "樟树"
-    },
     "id::CN_CITY_17275852B34459657062621": {
       "en": "Wulianxian",
       "zh": "五莲县"
@@ -198840,10 +198716,6 @@
       "en": "Daofuxian",
       "zh": "道孚县"
     },
-    "id::CN_CITY_17275852B35414726377112": {
-      "en": "Sheqixian",
-      "zh": "社旗县"
-    },
     "id::CN_CITY_17275852B35416849225692": {
       "en": "Gaozhou",
       "zh": "高州"
@@ -198880,10 +198752,6 @@
       "en": "Datongxian",
       "zh": "大同县"
     },
-    "id::CN_CITY_17275852B35674473625997": {
-      "en": "Handanxian",
-      "zh": "邯郸县"
-    },
     "id::CN_CITY_17275852B35691129963558": {
       "en": "Xiamen",
       "zh": "厦门"
@@ -198895,10 +198763,6 @@
     "id::CN_CITY_17275852B35804698691087": {
       "en": "Yichengxian",
       "zh": "宜城县"
-    },
-    "id::CN_CITY_17275852B35904418947378": {
-      "en": "Nangong",
-      "zh": "馕"
     },
     "id::CN_CITY_17275852B35957304691865": {
       "en": "Shuchangxian",
@@ -199020,10 +198884,6 @@
       "en": "Chengzhou",
       "zh": "承州"
     },
-    "id::CN_CITY_17275852B36890628103019": {
-      "en": "Botou",
-      "zh": "泊头"
-    },
     "id::CN_CITY_17275852B3689978228404": {
       "en": "Linshuxian",
       "zh": "临沭县"
@@ -199120,10 +198980,6 @@
       "en": "Ningde",
       "zh": "宁德"
     },
-    "id::CN_CITY_17275852B37600232739643": {
-      "en": "Mencunhuizuzizhixian",
-      "zh": "孟村回族自治县"
-    },
     "id::CN_CITY_17275852B37647072731744": {
       "en": "Nimuxian",
       "zh": "尼木县"
@@ -199155,10 +199011,6 @@
     "id::CN_CITY_17275852B37857453943231": {
       "en": "Yongtaixian",
       "zh": "永泰县"
-    },
-    "id::CN_CITY_17275852B37858104001226": {
-      "en": "Suichuanxian",
-      "zh": "遂川县"
     },
     "id::CN_CITY_17275852B37882683065696": {
       "en": "Jinkouhequ",
@@ -199211,10 +199063,6 @@
     "id::CN_CITY_17275852B38375506939997": {
       "en": "Dachanghuizuzizhixian",
       "zh": "大厂回族自治县"
-    },
-    "id::CN_CITY_17275852B38392968045125": {
-      "en": "Nanfengxian",
-      "zh": "南丰县"
     },
     "id::CN_CITY_17275852B38426922086125": {
       "en": "Mianyang",
@@ -199324,10 +199172,6 @@
       "en": "Lianjiangxian",
       "zh": "连江县"
     },
-    "id::CN_CITY_17275852B39422876200918": {
-      "en": "Deanxian",
-      "zh": "德安县"
-    },
     "id::CN_CITY_17275852B39472644158112": {
       "en": "Ningxian",
       "zh": "宁县"
@@ -199351,10 +199195,6 @@
     "id::CN_CITY_17275852B39835801597087": {
       "en": "Jinghong",
       "zh": "景洪"
-    },
-    "id::CN_CITY_17275852B39849449809026": {
-      "en": "Yihuangxian",
-      "zh": "以黄县"
     },
     "id::CN_CITY_17275852B39901744129033": {
       "en": "Huaihua",
@@ -199452,10 +199292,6 @@
       "en": "Xunkexian",
       "zh": "逊克县"
     },
-    "id::CN_CITY_17275852B41151461072680": {
-      "en": "Weihui",
-      "zh": "伟辉"
-    },
     "id::CN_CITY_17275852B41153803332766": {
       "en": "Jixian",
       "zh": "集贤"
@@ -199475,10 +199311,6 @@
     "id::CN_CITY_17275852B41312334217118": {
       "en": "Junanxian",
       "zh": "莒南县"
-    },
-    "id::CN_CITY_17275852B41394272458329": {
-      "en": "Shangyouxian",
-      "zh": "上犹县"
     },
     "id::CN_CITY_17275852B41425356149959": {
       "en": "Lanxi",
@@ -199592,10 +199424,6 @@
       "en": "Huanghua",
       "zh": "黄骅"
     },
-    "id::CN_CITY_17275852B42323417187142": {
-      "en": "Tianchang",
-      "zh": "天长"
-    },
     "id::CN_CITY_17275852B42573248116242": {
       "en": "Jining",
       "zh": "济宁"
@@ -199672,10 +199500,6 @@
       "en": "Lixingxian",
       "zh": "力行贤"
     },
-    "id::CN_CITY_17275852B431696373370": {
-      "en": "Yongqingxian",
-      "zh": "永清县"
-    },
     "id::CN_CITY_17275852B43185565483198": {
       "en": "Shiquxian",
       "zh": "石渠县"
@@ -199695,10 +199519,6 @@
     "id::CN_CITY_17275852B4344290320214": {
       "en": "Lulongxian",
       "zh": "卢龙县"
-    },
-    "id::CN_CITY_17275852B43446340592902": {
-      "en": "Yongfengxian",
-      "zh": "永丰县"
     },
     "id::CN_CITY_17275852B4348228396451": {
       "en": "Qinganxian",
@@ -199876,10 +199696,6 @@
       "en": "Jingxixian",
       "zh": "靖西县"
     },
-    "id::CN_CITY_17275852B45429218697197": {
-      "en": "Wuyixian",
-      "zh": "武夷县"
-    },
     "id::CN_CITY_17275852B4543803122554": {
       "en": "Qishanxian",
       "zh": "岐山县"
@@ -200032,10 +199848,6 @@
       "en": "Fenxixian",
       "zh": "汾西县"
     },
-    "id::CN_CITY_17275852B46601481369620": {
-      "en": "Guangshanxian",
-      "zh": "光善县"
-    },
     "id::CN_CITY_17275852B46630816811728": {
       "en": "Jiangshan",
       "zh": "江山"
@@ -200112,17 +199924,9 @@
       "en": "Xiangningxian",
       "zh": "乡宁县"
     },
-    "id::CN_CITY_17275852B47245604901224": {
-      "en": "Neihuangxian",
-      "zh": "内黄县"
-    },
     "id::CN_CITY_17275852B47269106522129": {
       "en": "Jianshanxian",
       "zh": "尖山县"
-    },
-    "id::CN_CITY_17275852B47297530357355": {
-      "en": "Feixixian",
-      "zh": "费西县"
     },
     "id::CN_CITY_17275852B47307455232994": {
       "en": "Xinyexian",
@@ -200224,10 +200028,6 @@
       "en": "Kangdingxian",
       "zh": "康定县"
     },
-    "id::CN_CITY_17275852B48027257295245": {
-      "en": "Gaoyangxian",
-      "zh": "高阳县"
-    },
     "id::CN_CITY_17275852B48079321876635": {
       "en": "Panzhihua",
       "zh": "攀枝花"
@@ -200243,10 +200043,6 @@
     "id::CN_CITY_17275852B48166439477713": {
       "en": "Shilouxian",
       "zh": "石楼县"
-    },
-    "id::CN_CITY_17275852B48217934131504": {
-      "en": "Yujiangxian",
-      "zh": "余江县"
     },
     "id::CN_CITY_17275852B48225866785254": {
       "en": "Nenjiangxian",
@@ -200452,10 +200248,6 @@
       "en": "Honghu",
       "zh": "洪湖"
     },
-    "id::CN_CITY_17275852B50412174337680": {
-      "en": "Huaxian",
-      "zh": "滑县"
-    },
     "id::CN_CITY_17275852B50417809016381": {
       "en": "Abagaqi",
       "zh": "阿巴加吉"
@@ -200544,17 +200336,9 @@
       "en": "Longhai",
       "zh": "龙海"
     },
-    "id::CN_CITY_17275852B51269093511150": {
-      "en": "Ningduxian",
-      "zh": "宁都县"
-    },
     "id::CN_CITY_17275852B51290588380796": {
       "en": "Yangchengxian",
       "zh": "阳城县"
-    },
-    "id::CN_CITY_17275852B51290893529729": {
-      "en": "Longyaoxian",
-      "zh": "隆尧县"
     },
     "id::CN_CITY_17275852B5131093529483": {
       "en": "Haixingxian",
@@ -200784,10 +200568,6 @@
       "en": "Yanqingxian",
       "zh": "延庆县"
     },
-    "id::CN_CITY_17275852B53933530490343": {
-      "en": "Guangzhongxian",
-      "zh": "广中县"
-    },
     "id::CN_CITY_17275852B53940528412094": {
       "en": "Jianxian",
       "zh": "建县"
@@ -200851,10 +200631,6 @@
     "id::CN_CITY_17275852B54694537615111": {
       "en": "Shaoguan",
       "zh": "韶关"
-    },
-    "id::CN_CITY_17275852B54720396840939": {
-      "en": "Xincaixian",
-      "zh": "新彩县"
     },
     "id::CN_CITY_17275852B54721890479732": {
       "en": "Chonghua",
@@ -200924,21 +200700,9 @@
       "en": "Hegang",
       "zh": "鹤岗"
     },
-    "id::CN_CITY_17275852B55448399697332": {
-      "en": "Taihuxian",
-      "zh": "太湖县"
-    },
-    "id::CN_CITY_17275852B55464189255182": {
-      "en": "Mixian",
-      "zh": "密县"
-    },
     "id::CN_CITY_17275852B55481255682008": {
       "en": "Gangbaxian",
       "zh": "岗坝县"
-    },
-    "id::CN_CITY_17275852B55507691146729": {
-      "en": "Zhengyangxian",
-      "zh": "正阳县"
     },
     "id::CN_CITY_17275852B5554348593036": {
       "en": "Nierongxian",
@@ -200960,10 +200724,6 @@
       "en": "Shangzhi",
       "zh": "尚志"
     },
-    "id::CN_CITY_17275852B55754577664448": {
-      "en": "Guanxian",
-      "zh": "灌县"
-    },
     "id::CN_CITY_17275852B55776769429507": {
       "en": "Fanchangxian",
       "zh": "繁昌县"
@@ -200971,10 +200731,6 @@
     "id::CN_CITY_17275852B55803803315704": {
       "en": "Weininglizuhuizumiaozuzizhixian",
       "zh": "威宁黎族回族苗族自治县"
-    },
-    "id::CN_CITY_17275852B55840349463324": {
-      "en": "Dongfeng",
-      "zh": "东风"
     },
     "id::CN_CITY_17275852B55897880766736": {
       "en": "Dehui",
@@ -201220,10 +200976,6 @@
       "en": "Shongtaomiaozuzizhixian",
       "zh": "松桃苗族自治县"
     },
-    "id::CN_CITY_17275852B58371513472148": {
-      "en": "Xingtangxian",
-      "zh": "行唐县"
-    },
     "id::CN_CITY_17275852B58372427564761": {
       "en": "Rizhao",
       "zh": "日照"
@@ -201436,10 +201188,6 @@
       "en": "Shunitezuoqi",
       "zh": "舒尼特左旗"
     },
-    "id::CN_CITY_17275852B60708257219667": {
-      "en": "Baofengxian",
-      "zh": "宝丰县"
-    },
     "id::CN_CITY_17275852B60758311941437": {
       "en": "Heyuan",
       "zh": "河源"
@@ -201452,10 +201200,6 @@
       "en": "Songxixian",
       "zh": "松溪县"
     },
-    "id::CN_CITY_17275852B6082279520202": {
-      "en": "Runanxian",
-      "zh": "汝南县"
-    },
     "id::CN_CITY_17275852B6085068218532": {
       "en": "Wufengtujiazuzizhixian",
       "zh": "五峰土家族自治县"
@@ -201464,10 +201208,6 @@
       "en": "Xiantao",
       "zh": "仙桃"
     },
-    "id::CN_CITY_17275852B61014639645675": {
-      "en": "Tangyinxian",
-      "zh": "汤阴县"
-    },
     "id::CN_CITY_17275852B61069988090989": {
       "en": "Kalaqinzuoqimengguzuzizhixian",
       "zh": "喀喇沁左翼蒙古族自治县"
@@ -201475,10 +201215,6 @@
     "id::CN_CITY_17275852B61145215456285": {
       "en": "Congqing",
       "zh": "重庆"
-    },
-    "id::CN_CITY_17275852B61165424028511": {
-      "en": "Laianxian",
-      "zh": "来安县"
     },
     "id::CN_CITY_17275852B61177414411617": {
       "en": "Guichi",
@@ -201519,14 +201255,6 @@
     "id::CN_CITY_17275852B61532431382022": {
       "en": "Huichangxian",
       "zh": "会昌县"
-    },
-    "id::CN_CITY_17275852B61603419379796": {
-      "en": "Zixixian",
-      "zh": "紫溪县"
-    },
-    "id::CN_CITY_17275852B61638108171693": {
-      "en": "Miyangxian",
-      "zh": "泌阳县"
     },
     "id::CN_CITY_17275852B61653092439657": {
       "en": "Longlixian",
@@ -201628,10 +201356,6 @@
       "en": "Heshunxian",
       "zh": "和顺县"
     },
-    "id::CN_CITY_17275852B62617200555443": {
-      "en": "Shangcaixian",
-      "zh": "上蔡县"
-    },
     "id::CN_CITY_17275852B6266164353662": {
       "en": "Weiyuanxian",
       "zh": "威远县"
@@ -201696,10 +201420,6 @@
       "en": "Wuzaixian",
       "zh": "五寨县"
     },
-    "id::CN_CITY_17275852B63272164318035": {
-      "en": "Shuipingxian",
-      "zh": "水平县"
-    },
     "id::CN_CITY_17275852B6329139279370": {
       "en": "Taijiangxian",
       "zh": "台江县"
@@ -201732,21 +201452,9 @@
       "en": "Luodianxian",
       "zh": "罗店县"
     },
-    "id::CN_CITY_17275852B63877453406832": {
-      "en": "Fengxinxian",
-      "zh": "奉新县"
-    },
-    "id::CN_CITY_17275852B63987790069029": {
-      "en": "Yuzhou",
-      "zh": "禹州"
-    },
     "id::CN_CITY_17275852B64081958226369": {
       "en": "Qiuxian",
       "zh": "邱县"
-    },
-    "id::CN_CITY_17275852B64087191598728": {
-      "en": "Wuningxian",
-      "zh": "武宁县"
     },
     "id::CN_CITY_17275852B64193210644413": {
       "en": "Leiyang",
@@ -201928,10 +201636,6 @@
       "en": "Zhangjiakou",
       "zh": "张家口"
     },
-    "id::CN_CITY_17275852B66013638365038": {
-      "en": "Yuanxian",
-      "zh": "原县"
-    },
     "id::CN_CITY_17275852B66026768477176": {
       "en": "Qinghemenqu",
       "zh": "清河门区"
@@ -201983,10 +201687,6 @@
     "id::CN_CITY_17275852B66405326872057": {
       "en": "Guanyangxian",
       "zh": "灌阳县"
-    },
-    "id::CN_CITY_17275852B66433667475820": {
-      "en": "Gaoan",
-      "zh": "高安"
     },
     "id::CN_CITY_17275852B66559238519647": {
       "en": "Xianfengxian",
@@ -202108,10 +201808,6 @@
       "en": "Lengshuijiang",
       "zh": "冷水江"
     },
-    "id::CN_CITY_17275852B67769801833376": {
-      "en": "Hengfengxian",
-      "zh": "横峰县"
-    },
     "id::CN_CITY_17275852B67896385958718": {
       "en": "Meishanxian",
       "zh": "梅山县"
@@ -202135,10 +201831,6 @@
     "id::CN_CITY_17275852B68037434012837": {
       "en": "Ningshanxian",
       "zh": "宁善县"
-    },
-    "id::CN_CITY_17275852B68084346150299": {
-      "en": "Shuixian",
-      "zh": "水县"
     },
     "id::CN_CITY_17275852B6810466809480": {
       "en": "Yiyang",
@@ -202260,10 +201952,6 @@
       "en": "Yitongmazuzizixian",
       "zh": "伊通满族自治县"
     },
-    "id::CN_CITY_17275852B69472300438393": {
-      "en": "Wangduxian",
-      "zh": "望都县"
-    },
     "id::CN_CITY_17275852B69502424824259": {
       "en": "Manzhouli",
       "zh": "满洲里"
@@ -202271,10 +201959,6 @@
     "id::CN_CITY_17275852B69590886182052": {
       "en": "Huanglingxian",
       "zh": "黄陵县"
-    },
-    "id::CN_CITY_17275852B69618555412569": {
-      "en": "Nanchangxian",
-      "zh": "南昌县"
     },
     "id::CN_CITY_17275852B69801287390069": {
       "en": "Qianan",
@@ -202340,10 +202024,6 @@
       "en": "Chongyangxian",
       "zh": "崇阳县"
     },
-    "id::CN_CITY_17275852B70748117167042": {
-      "en": "Jishuixian",
-      "zh": "积水县"
-    },
     "id::CN_CITY_17275852B7080321063595": {
       "en": "Miyunxian",
       "zh": "密云县"
@@ -202371,10 +202051,6 @@
     "id::CN_CITY_17275852B70958466386582": {
       "en": "Yuchengxian",
       "zh": "玉成县"
-    },
-    "id::CN_CITY_17275852B71083235506927": {
-      "en": "Nankang",
-      "zh": "南康"
     },
     "id::CN_CITY_17275852B71120154646141": {
       "en": "Lijinxian",
@@ -202532,10 +202208,6 @@
       "en": "Zhouningxian",
       "zh": "周宁县"
     },
-    "id::CN_CITY_17275852B72769683371533": {
-      "en": "Shangraoxian",
-      "zh": "上饶县"
-    },
     "id::CN_CITY_17275852B72792517073116": {
       "en": "Tongxian",
       "zh": "通县"
@@ -202660,10 +202332,6 @@
       "en": "Xunhuasalazuzizhixian",
       "zh": "循化撒拉族自治县"
     },
-    "id::CN_CITY_17275852B7444451912335": {
-      "en": "Anguo",
-      "zh": "安国"
-    },
     "id::CN_CITY_17275852B74456563163593": {
       "en": "Chalingxian",
       "zh": "茶陵县"
@@ -202692,10 +202360,6 @@
       "en": "Linqixian",
       "zh": "临七贤"
     },
-    "id::CN_CITY_17275852B74776996629025": {
-      "en": "Wananxian",
-      "zh": "万安县"
-    },
     "id::CN_CITY_17275852B74817202637370": {
       "en": "Xinyang",
       "zh": "信阳"
@@ -202703,10 +202367,6 @@
     "id::CN_CITY_17275852B74822957782790": {
       "en": "Degexian",
       "zh": "德格县"
-    },
-    "id::CN_CITY_17275852B7483411794752": {
-      "en": "Qixian",
-      "zh": "七贤"
     },
     "id::CN_CITY_17275852B74942656401526": {
       "en": "Neijiang",
@@ -202816,10 +202476,6 @@
       "en": "Langxian",
       "zh": "郎县"
     },
-    "id::CN_CITY_17275852B76152157086843": {
-      "en": "Juluxian",
-      "zh": "巨鹿县"
-    },
     "id::CN_CITY_17275852B76272289895068": {
       "en": "Renhuaxian",
       "zh": "仁化县"
@@ -202847,10 +202503,6 @@
     "id::CN_CITY_17275852B76519295903131": {
       "en": "Shefangxian",
       "zh": "射房县"
-    },
-    "id::CN_CITY_17275852B76534884260482": {
-      "en": "Ganxian",
-      "zh": "赣县"
     },
     "id::CN_CITY_17275852B76570182530435": {
       "en": "Hanshanxian",
@@ -203104,10 +202756,6 @@
       "en": "Xuanwei",
       "zh": "宣威"
     },
-    "id::CN_CITY_17275852B79000631743628": {
-      "en": "Guzhenxian",
-      "zh": "固镇县"
-    },
     "id::CN_CITY_17275852B79025742325960": {
       "en": "Zhangye",
       "zh": "张掖"
@@ -203260,10 +202908,6 @@
       "en": "Qingyuan",
       "zh": "清远"
     },
-    "id::CN_CITY_17275852B8103009054716": {
-      "en": "Yongnianxian",
-      "zh": "永年县"
-    },
     "id::CN_CITY_17275852B81051002573718": {
       "en": "Jinxianxian",
       "zh": "进贤县"
@@ -203335,10 +202979,6 @@
     "id::CN_CITY_17275852B81763156476320": {
       "en": "Gaizhou",
       "zh": "盖州"
-    },
-    "id::CN_CITY_17275852B81783797021346": {
-      "en": "Xinjianxian",
-      "zh": "新建县"
     },
     "id::CN_CITY_17275852B81846538801292": {
       "en": "Dawaxian",
@@ -203467,10 +203107,6 @@
     "id::CN_CITY_17275852B83104882902138": {
       "en": "Huaiyuanxian",
       "zh": "怀远县"
-    },
-    "id::CN_CITY_17275852B83134707412237": {
-      "en": "Queshanxian",
-      "zh": "确山县"
     },
     "id::CN_CITY_17275852B83167737560066": {
       "en": "Changlexian",
@@ -203796,10 +203432,6 @@
       "en": "Daguxian",
       "zh": "大古县"
     },
-    "id::CN_CITY_17275852B86260962826974": {
-      "en": "Rongchengxian",
-      "zh": "容城县"
-    },
     "id::CN_CITY_17275852B86267588373141": {
       "en": "Yunfu",
       "zh": "云浮"
@@ -203900,10 +203532,6 @@
       "en": "Laohekou",
       "zh": "你是自由的"
     },
-    "id::CN_CITY_17275852B87149259927291": {
-      "en": "Xianxian",
-      "zh": "献县"
-    },
     "id::CN_CITY_17275852B87182296846240": {
       "en": "Lishui",
       "zh": "丽水"
@@ -203931,10 +203559,6 @@
     "id::CN_CITY_17275852B8760593978321": {
       "en": "Pugexian",
       "zh": "普格县"
-    },
-    "id::CN_CITY_17275852B87718878820627": {
-      "en": "Ruichang",
-      "zh": "瑞昌"
     },
     "id::CN_CITY_17275852B87724179019272": {
       "en": "Kepingxian",
@@ -203972,10 +203596,6 @@
       "en": "Luanxian",
       "zh": "滦县"
     },
-    "id::CN_CITY_17275852B88170553797239": {
-      "en": "Changge",
-      "zh": "长葛"
-    },
     "id::CN_CITY_17275852B88337115455465": {
       "en": "Huguanxian",
       "zh": "壶关县"
@@ -203987,10 +203607,6 @@
     "id::CN_CITY_17275852B88397834773158": {
       "en": "Tiandongxian",
       "zh": "田东县"
-    },
-    "id::CN_CITY_17275852B8841096687907": {
-      "en": "Fengyangxian",
-      "zh": "凤阳县"
     },
     "id::CN_CITY_17275852B88416368639582": {
       "en": "Guidingxian",
@@ -204039,10 +203655,6 @@
     "id::CN_CITY_17275852B88683518272743": {
       "en": "Geerxian",
       "zh": "葛尔贤"
-    },
-    "id::CN_CITY_17275852B88707811573248": {
-      "en": "Jinganxian",
-      "zh": "靖安县"
     },
     "id::CN_CITY_17275852B88708837863828": {
       "en": "Wendeng",
@@ -204108,10 +203720,6 @@
       "en": "Xixiaxian",
       "zh": "西夏县"
     },
-    "id::CN_CITY_17275852B89533026423026": {
-      "en": "Guixixian",
-      "zh": "贵溪县"
-    },
     "id::CN_CITY_17275852B89554286744973": {
       "en": "Jiamusi",
       "zh": "佳木斯"
@@ -204172,10 +203780,6 @@
       "en": "Xinpingyizhudaizuzizhixian",
       "zh": "新平一珠带族自治县"
     },
-    "id::CN_CITY_17275852B90238227594233": {
-      "en": "Dexing",
-      "zh": "德兴"
-    },
     "id::CN_CITY_17275852B90257281612339": {
       "en": "Huilixian",
       "zh": "会理县"
@@ -204188,17 +203792,9 @@
       "en": "Xiaogan",
       "zh": "孝感"
     },
-    "id::CN_CITY_17275852B90274183162284": {
-      "en": "Shenzhou",
-      "zh": "神舟"
-    },
     "id::CN_CITY_17275852B90289163541326": {
       "en": "Dingnanxian",
       "zh": "定南县"
-    },
-    "id::CN_CITY_17275852B90293274121417": {
-      "en": "Hejian",
-      "zh": "河间"
     },
     "id::CN_CITY_17275852B90330591074302": {
       "en": "Suqianxian",
@@ -204276,10 +203872,6 @@
       "en": "Pingshunxian",
       "zh": "平顺县"
     },
-    "id::CN_CITY_17275852B90910208115389": {
-      "en": "Huangchuanxian",
-      "zh": "荒川县"
-    },
     "id::CN_CITY_17275852B90955617897977": {
       "en": "Kangpingxian",
       "zh": "康平县"
@@ -204291,10 +203883,6 @@
     "id::CN_CITY_17275852B90975196028640": {
       "en": "Ninghaixian",
       "zh": "宁海县"
-    },
-    "id::CN_CITY_17275852B91186135419268": {
-      "en": "Xingguoxian",
-      "zh": "兴国县"
     },
     "id::CN_CITY_17275852B91193681213214": {
       "en": "Yaoanxian",
@@ -204496,17 +204084,9 @@
       "en": "Fugongxian",
       "zh": "福贡县"
     },
-    "id::CN_CITY_17275852B9304528417696": {
-      "en": "Cixian",
-      "zh": "磁县"
-    },
     "id::CN_CITY_17275852B93143295309052": {
       "en": "Luopingxian",
       "zh": "罗平县"
-    },
-    "id::CN_CITY_17275852B93154995028726": {
-      "en": "Songxian",
-      "zh": "嵩县"
     },
     "id::CN_CITY_17275852B93202836369350": {
       "en": "Jishanbaoanzudongxiangzusalazuzizhixian",
@@ -204807,10 +204387,6 @@
     "id::CN_CITY_17275852B95874414124304": {
       "en": "Boxiangxian",
       "zh": "博象县"
-    },
-    "id::CN_CITY_17275852B95887002471957": {
-      "en": "Lingshouxian",
-      "zh": "灵寿县"
     },
     "id::CN_CITY_17275852B95898451929539": {
       "en": "Puerhanizhuyizuzizhixian",
@@ -273944,29 +273520,13 @@
       "en": "Krasnoperekopsk",
       "zh": "佩列科普"
     },
-    "id::UA_RAY_74538382B12709317910219": {
-      "en": "Illintsi",
-      "zh": "眼泪"
-    },
     "id::UA_RAY_74538382B1294553244801": {
       "en": "Terebovlia",
       "zh": "特雷博夫利亚"
     },
-    "id::UA_RAY_74538382B1295446134246": {
-      "en": "Kotelva",
-      "zh": "科特尔瓦"
-    },
-    "id::UA_RAY_74538382B13053028483551": {
-      "en": "Popilnia",
-      "zh": "凤梨属"
-    },
     "id::UA_RAY_74538382B13057195168049": {
       "en": "Manhush",
       "zh": "曼胡什"
-    },
-    "id::UA_RAY_74538382B13174941050792": {
-      "en": "Tulchyn",
-      "zh": "图尔钦"
     },
     "id::UA_RAY_74538382B1350322387743": {
       "en": "Sarny",
@@ -274100,10 +273660,6 @@
       "en": "Kostiantynivka",
       "zh": "科斯蒂安特尼夫卡"
     },
-    "id::UA_RAY_74538382B1986372473405": {
-      "en": "Hrebinka",
-      "zh": "赫雷宾卡"
-    },
     "id::UA_RAY_74538382B20048272724198": {
       "en": "Orikhiv",
       "zh": "奥里希夫"
@@ -274212,14 +273768,6 @@
       "en": "Horodysche",
       "zh": "霍罗迪什"
     },
-    "id::UA_RAY_74538382B24202642451616": {
-      "en": "Bar",
-      "zh": "酒吧"
-    },
-    "id::UA_RAY_74538382B24211497806867": {
-      "en": "Mashivka",
-      "zh": "马什夫卡"
-    },
     "id::UA_RAY_74538382B24236776375789": {
       "en": "Sorokyne",
       "zh": "索罗金"
@@ -274276,10 +273824,6 @@
       "en": "Drabiv",
       "zh": "德拉比夫"
     },
-    "id::UA_RAY_74538382B28667917897493": {
-      "en": "Lubny",
-      "zh": "卢布尼"
-    },
     "id::UA_RAY_74538382B28718545705075": {
       "en": "Cherkasy",
       "zh": "切尔卡瑟"
@@ -274300,14 +273844,6 @@
       "en": "Nedryhailiv",
       "zh": "内德里海利夫"
     },
-    "id::UA_RAY_74538382B29600786349581": {
-      "en": "Radomyshl",
-      "zh": "拉多梅什尔"
-    },
-    "id::UA_RAY_74538382B29634078398489": {
-      "en": "Chernivtsi",
-      "zh": "切尔诺夫策"
-    },
     "id::UA_RAY_74538382B29845079622826": {
       "en": "Okhtyrka",
       "zh": "奥赫蒂尔卡"
@@ -274315,10 +273851,6 @@
     "id::UA_RAY_74538382B29888444022224": {
       "en": "Kazanka",
       "zh": "卡赞卡"
-    },
-    "id::UA_RAY_74538382B30239669246101": {
-      "en": "Chornukhy",
-      "zh": "乔努希"
     },
     "id::UA_RAY_74538382B30291492588031": {
       "en": "Vilniansk",
@@ -274335,10 +273867,6 @@
     "id::UA_RAY_74538382B30474831618663": {
       "en": "Horodenka",
       "zh": "霍罗登卡"
-    },
-    "id::UA_RAY_74538382B30544134807890": {
-      "en": "Reshetylivka",
-      "zh": "列舍特利夫卡"
     },
     "id::UA_RAY_74538382B30589256184120": {
       "en": "Bereznehuvate",
@@ -274388,14 +273916,6 @@
       "en": "Uman",
       "zh": "乌曼"
     },
-    "id::UA_RAY_74538382B32198153584627": {
-      "en": "Lypovets",
-      "zh": "利波维茨"
-    },
-    "id::UA_RAY_74538382B32721525373151": {
-      "en": "Orzhytsia",
-      "zh": "奥尔日西亚"
-    },
     "id::UA_RAY_74538382B3276437105714": {
       "en": "Nakhimovskyi",
       "zh": "北狄奥多里克港"
@@ -274428,10 +273948,6 @@
       "en": "Henichesk",
       "zh": "赫尼切斯克"
     },
-    "id::UA_RAY_74538382B34104046396179": {
-      "en": "Khmilnyk",
-      "zh": "赫米尔尼克"
-    },
     "id::UA_RAY_74538382B34306237745090": {
       "en": "Savran",
       "zh": "萨夫兰"
@@ -274443,10 +273959,6 @@
     "id::UA_RAY_74538382B34689599554445": {
       "en": "Hlukhiv",
       "zh": "赫卢希夫"
-    },
-    "id::UA_RAY_74538382B34796929779218": {
-      "en": "Shyshaky",
-      "zh": "夏沙基"
     },
     "id::UA_RAY_74538382B34820599431847": {
       "en": "Mohyliv-Podilskyi",
@@ -274532,10 +274044,6 @@
       "en": "Novoazovsk",
       "zh": "新阿佐夫斯克"
     },
-    "id::UA_RAY_74538382B38609283059110": {
-      "en": "Brusyliv",
-      "zh": "布鲁西利夫"
-    },
     "id::UA_RAY_74538382B3900479393084": {
       "en": "Zalishchyky",
       "zh": "扎利什奇基"
@@ -274564,10 +274072,6 @@
       "en": "Novoaidar",
       "zh": "诺沃艾达尔"
     },
-    "id::UA_RAY_74538382B40041339344288": {
-      "en": "Malyn",
-      "zh": "马林"
-    },
     "id::UA_RAY_74538382B40204431292765": {
       "en": "Pechenihy",
       "zh": "佩切尼希"
@@ -274576,10 +274080,6 @@
       "en": "Velykyy Bereznyi",
       "zh": "韦利基·别列兹尼"
     },
-    "id::UA_RAY_74538382B40286307768032": {
-      "en": "Vilshanka",
-      "zh": "维尔尚卡"
-    },
     "id::UA_RAY_74538382B40671988393633": {
       "en": "Zolotonosha",
       "zh": "佐洛托诺沙"
@@ -274587,10 +274087,6 @@
     "id::UA_RAY_74538382B40749537195929": {
       "en": "Stavyshche",
       "zh": "斯塔维什切"
-    },
-    "id::UA_RAY_74538382B40940873671576": {
-      "en": "Yemilchyne",
-      "zh": "耶米尔钦"
     },
     "id::UA_RAY_74538382B41206945038645": {
       "en": "Tysmenytsia",
@@ -274640,14 +274136,6 @@
       "en": "Chernihiv",
       "zh": "切尔尼戈夫"
     },
-    "id::UA_RAY_74538382B44263254033139": {
-      "en": "Sharhorod",
-      "zh": "沙霍罗德"
-    },
-    "id::UA_RAY_74538382B44340415968020": {
-      "en": "Novi Sanzhary",
-      "zh": "新桑扎里"
-    },
     "id::UA_RAY_74538382B4443211725898": {
       "en": "Tarutyne",
       "zh": "塔鲁坦"
@@ -274663,10 +274151,6 @@
     "id::UA_RAY_74538382B44725547103458": {
       "en": "Reni",
       "zh": "雷尼"
-    },
-    "id::UA_RAY_74538382B45059422214147": {
-      "en": "Chudniv",
-      "zh": "丘德尼夫"
     },
     "id::UA_RAY_74538382B45068545633774": {
       "en": "Seredyna-Buda",
@@ -274732,17 +274216,9 @@
       "en": "Ostroh",
       "zh": "一个马刺"
     },
-    "id::UA_RAY_74538382B4782887938967": {
-      "en": "Kozelshchyna",
-      "zh": "科泽尔希纳"
-    },
     "id::UA_RAY_74538382B47912633354712": {
       "en": "Rozivka",
       "zh": "雌激素"
-    },
-    "id::UA_RAY_74538382B48236413060906": {
-      "en": "Kalynivka",
-      "zh": "卡利尼夫卡"
     },
     "id::UA_RAY_74538382B48347776111848": {
       "en": "Turka",
@@ -274792,14 +274268,6 @@
       "en": "Skole",
       "zh": "学校"
     },
-    "id::UA_RAY_74538382B5063322332018": {
-      "en": "Khoroshiv",
-      "zh": "霍罗希夫"
-    },
-    "id::UA_RAY_74538382B5065610238765": {
-      "en": "Kropyvnytskyi",
-      "zh": "克罗佩夫尼茨基"
-    },
     "id::UA_RAY_74538382B5074223078849": {
       "en": "Synelnykove",
       "zh": "西内尔尼科夫"
@@ -274815,10 +274283,6 @@
     "id::UA_RAY_74538382B51634820959847": {
       "en": "Ivanychi",
       "zh": "伊万内基"
-    },
-    "id::UA_RAY_74538382B51817175452920": {
-      "en": "Bobrynets",
-      "zh": "博布里内茨"
     },
     "id::UA_RAY_74538382B51879903679765": {
       "en": "Perechyn",
@@ -274936,17 +274400,9 @@
       "en": "Dubno",
       "zh": "杜布诺"
     },
-    "id::UA_RAY_74538382B57034061820630": {
-      "en": "Dobrovelychkivka",
-      "zh": "多布罗韦利奇基夫卡"
-    },
     "id::UA_RAY_74538382B5714887404176": {
       "en": "Shatsk",
       "zh": "沙茨克"
-    },
-    "id::UA_RAY_74538382B57466537231315": {
-      "en": "Dykanka",
-      "zh": "迪坎卡"
     },
     "id::UA_RAY_74538382B57516616644069": {
       "en": "Korsun-Shevchenkivskyi",
@@ -274963,14 +274419,6 @@
     "id::UA_RAY_74538382B57790499946350": {
       "en": "Yakymivka",
       "zh": "亚基米夫卡"
-    },
-    "id::UA_RAY_74538382B58237861988874": {
-      "en": "Baranivka",
-      "zh": "巴拉尼夫卡"
-    },
-    "id::UA_RAY_74538382B58798821419341": {
-      "en": "Berdychiv",
-      "zh": "别尔季奇夫"
     },
     "id::UA_RAY_74538382B58806562521535": {
       "en": "Derhachi",
@@ -275000,10 +274448,6 @@
       "en": "Voznesensk",
       "zh": "沃兹涅先斯克"
     },
-    "id::UA_RAY_74538382B60018374136133": {
-      "en": "Kamianka",
-      "zh": "卡米扬卡"
-    },
     "id::UA_RAY_74538382B60058274039512": {
       "en": "Sloviansk",
       "zh": "斯拉夫"
@@ -275012,17 +274456,9 @@
       "en": "Nosivka",
       "zh": "诺西夫卡"
     },
-    "id::UA_RAY_74538382B60330166440880": {
-      "en": "Cherniakhiv",
-      "zh": "切尔尼亚希夫"
-    },
     "id::UA_RAY_74538382B60331079617508": {
       "en": "Krolevets",
       "zh": "克罗莱维特"
-    },
-    "id::UA_RAY_74538382B60535297050868": {
-      "en": "Chutove",
-      "zh": "丘托维"
     },
     "id::UA_RAY_74538382B60808123109786": {
       "en": "Beryslav",
@@ -275084,21 +274520,9 @@
       "en": "Volovets",
       "zh": "沃洛韦茨"
     },
-    "id::UA_RAY_74538382B62956114849097": {
-      "en": "Novomyrhorod",
-      "zh": "新米尔哥罗德"
-    },
-    "id::UA_RAY_74538382B63112784365900": {
-      "en": "Myrhorod",
-      "zh": "米尔哥罗德"
-    },
     "id::UA_RAY_74538382B63146168478131": {
       "en": "Bilovodsk",
       "zh": "比洛沃茨克"
-    },
-    "id::UA_RAY_74538382B63160428645400": {
-      "en": "Pulyny",
-      "zh": "普利尼"
     },
     "id::UA_RAY_74538382B63824501838973": {
       "en": "Nadvirna",
@@ -275120,17 +274544,9 @@
       "en": "Svatove",
       "zh": "婚礼派对"
     },
-    "id::UA_RAY_74538382B64394372263090": {
-      "en": "Romaniv",
-      "zh": "罗曼尼夫"
-    },
     "id::UA_RAY_74538382B6439769638360": {
       "en": "Nova Vodolaha",
       "zh": "新沃多拉哈"
-    },
-    "id::UA_RAY_74538382B64662360696322": {
-      "en": "Oleksandrivka",
-      "zh": "奥列克桑德夫卡"
     },
     "id::UA_RAY_74538382B64717019630205": {
       "en": "Kreminna",
@@ -275143,10 +274559,6 @@
     "id::UA_RAY_74538382B65177906747126": {
       "en": "Hornostaivka",
       "zh": "霍诺斯塔伊夫卡"
-    },
-    "id::UA_RAY_74538382B65548017442564": {
-      "en": "Koziatyn",
-      "zh": "科齐亚廷"
     },
     "id::UA_RAY_74538382B65631972109498": {
       "en": "Bohorodchany",
@@ -275196,10 +274608,6 @@
       "en": "Shostka",
       "zh": "肖斯特卡"
     },
-    "id::UA_RAY_74538382B68550856765578": {
-      "en": "Holovanivsk",
-      "zh": "霍洛万尼夫斯克"
-    },
     "id::UA_RAY_74538382B6869191817667": {
       "en": "Zachepylivka",
       "zh": "扎切佩利夫卡"
@@ -275216,14 +274624,6 @@
       "en": "Slavuta",
       "zh": "斯拉武塔"
     },
-    "id::UA_RAY_74538382B69268260028088": {
-      "en": "Pohrebyshche",
-      "zh": "波赫雷比什切"
-    },
-    "id::UA_RAY_74538382B69405527085585": {
-      "en": "Luhyny",
-      "zh": "卢希尼"
-    },
     "id::UA_RAY_74538382B69457923953865": {
       "en": "Mahdalynivka",
       "zh": "马赫达利尼夫卡"
@@ -275232,17 +274632,9 @@
       "en": "Bratske",
       "zh": "布拉茨克"
     },
-    "id::UA_RAY_74538382B69842770208303": {
-      "en": "Oleksandriia",
-      "zh": "亚历克桑德里亚"
-    },
     "id::UA_RAY_74538382B70043309892570": {
       "en": "Zboriv",
       "zh": "兹博里夫"
-    },
-    "id::UA_RAY_74538382B70813216743380": {
-      "en": "Tomashpil",
-      "zh": "托马什皮尔"
     },
     "id::UA_RAY_74538382B71334227440013": {
       "en": "Volochysk",
@@ -275284,10 +274676,6 @@
       "en": "Kodyma",
       "zh": "科季马"
     },
-    "id::UA_RAY_74538382B72798454015327": {
-      "en": "Mala Vyska",
-      "zh": "马拉维斯卡"
-    },
     "id::UA_RAY_74538382B72863696789776": {
       "en": "Novopskov",
       "zh": "诺沃普斯科夫"
@@ -275299,10 +274687,6 @@
     "id::UA_RAY_74538382B73193392833506": {
       "en": "Korop",
       "zh": "科罗普"
-    },
-    "id::UA_RAY_74538382B73277137080743": {
-      "en": "Novoarkhanhelsk",
-      "zh": "新阿尔汉赫尔斯克"
     },
     "id::UA_RAY_74538382B73482868346165": {
       "en": "Zhydachiv",
@@ -275339,14 +274723,6 @@
     "id::UA_RAY_74538382B7503756017754": {
       "en": "Stara Syniava",
       "zh": "斯塔拉·西尼亚瓦"
-    },
-    "id::UA_RAY_74538382B75813986727772": {
-      "en": "Teplyk",
-      "zh": "特普雷克"
-    },
-    "id::UA_RAY_74538382B75855496887574": {
-      "en": "Andrushivka",
-      "zh": "安德鲁希夫卡"
     },
     "id::UA_RAY_74538382B76274417735531": {
       "en": "Obukhiv",
@@ -275424,14 +274800,6 @@
       "en": "Nyzhniohirskyi",
       "zh": "尼日尼奥尔希尔斯基"
     },
-    "id::UA_RAY_74538382B80669310769437": {
-      "en": "Zhmerynka",
-      "zh": "日梅林卡"
-    },
-    "id::UA_RAY_74538382B80884786840021": {
-      "en": "Liubar",
-      "zh": "我很高兴"
-    },
     "id::UA_RAY_74538382B81176113996215": {
       "en": "Zarichne",
       "zh": "扎里奇内"
@@ -275452,10 +274820,6 @@
       "en": "Lysianka",
       "zh": "莱西安卡"
     },
-    "id::UA_RAY_74538382B82525342266993": {
-      "en": "Pyriatyn",
-      "zh": "我会尝试"
-    },
     "id::UA_RAY_74538382B82550284733464": {
       "en": "Kalush",
       "zh": "卡卢什"
@@ -275468,17 +274832,9 @@
       "en": "Antratsyt",
       "zh": "安特拉瑟特"
     },
-    "id::UA_RAY_74538382B83246565510085": {
-      "en": "Lityn",
-      "zh": "点燃"
-    },
     "id::UA_RAY_74538382B83290488809947": {
       "en": "Velyka Lepetkya",
       "zh": "维利卡·莱佩特基亚"
-    },
-    "id::UA_RAY_74538382B83616373915642": {
-      "en": "Znamianka",
-      "zh": "兹纳米安卡"
     },
     "id::UA_RAY_74538382B83638043560631": {
       "en": "Kaniv",
@@ -275487,10 +274843,6 @@
     "id::UA_RAY_74538382B83702656309397": {
       "en": "Khust",
       "zh": "库斯特"
-    },
-    "id::UA_RAY_74538382B83988407306770": {
-      "en": "Karlivka",
-      "zh": "卡利夫卡"
     },
     "id::UA_RAY_74538382B84040377374615": {
       "en": "Simferopol",
@@ -275536,10 +274888,6 @@
       "en": "Velyks Mykhailivka",
       "zh": "韦利克斯·米哈伊利夫卡"
     },
-    "id::UA_RAY_74538382B86431925858942": {
-      "en": "Novoukrainka",
-      "zh": "新乌克兰卡"
-    },
     "id::UA_RAY_74538382B86462977342473": {
       "en": "Korets",
       "zh": "合唱团的"
@@ -275563,14 +274911,6 @@
     "id::UA_RAY_74538382B87705908812983": {
       "en": "Holo Prystan",
       "zh": "赫洛·普里斯坦"
-    },
-    "id::UA_RAY_74538382B87722024081340": {
-      "en": "Hadiach",
-      "zh": "哈迪亚克"
-    },
-    "id::UA_RAY_74538382B88010222583687": {
-      "en": "Murovani Kurylivtsi",
-      "zh": "穆罗瓦尼·库里利夫齐"
     },
     "id::UA_RAY_74538382B88063181617759": {
       "en": "Piatykhatky",
@@ -275607,14 +274947,6 @@
     "id::UA_RAY_74538382B88874986196834": {
       "en": "Tlumach",
       "zh": "特卢马赫"
-    },
-    "id::UA_RAY_74538382B88912930718320": {
-      "en": "Zinkiv",
-      "zh": "津基夫"
-    },
-    "id::UA_RAY_74538382B88978880858250": {
-      "en": "Kobeliaky",
-      "zh": "科比利亚基"
     },
     "id::UA_RAY_74538382B88986400051477": {
       "en": "Tatarbunary",
@@ -275728,17 +275060,9 @@
       "en": "Kryve Ozero",
       "zh": "克里夫·奥泽罗"
     },
-    "id::UA_RAY_74538382B94405396686419": {
-      "en": "Tyvriv",
-      "zh": "特夫里夫"
-    },
     "id::UA_RAY_74538382B9478118461291": {
       "en": "Volodymyr",
       "zh": "弗拉基米尔"
-    },
-    "id::UA_RAY_74538382B94896655218904": {
-      "en": "Orativ",
-      "zh": "扬声器"
     },
     "id::UA_RAY_74538382B95195670192940": {
       "en": "Zbarazh",
@@ -275747,10 +275071,6 @@
     "id::UA_RAY_74538382B95291552499633": {
       "en": "Izmali",
       "zh": "伊兹梅尔"
-    },
-    "id::UA_RAY_74538382B95360083052097": {
-      "en": "Korostyshiv",
-      "zh": "强调"
     },
     "id::UA_RAY_74538382B95492559683598": {
       "en": "Melitopol",
@@ -275763,18 +275083,6 @@
     "id::UA_RAY_74538382B96313823976943": {
       "en": "Berehove",
       "zh": "别列霍夫"
-    },
-    "id::UA_RAY_74538382B96819013794956": {
-      "en": "Korosten",
-      "zh": "科罗斯滕"
-    },
-    "id::UA_RAY_74538382B96857740504911": {
-      "en": "Nemyriv",
-      "zh": "内梅里夫"
-    },
-    "id::UA_RAY_74538382B97123961313815": {
-      "en": "Velyka Bahachka",
-      "zh": "韦丽卡·巴哈卡"
     },
     "id::UA_RAY_74538382B97249439308301": {
       "en": "Sokal",
@@ -275823,10 +275131,6 @@
     "id::UA_RAY_74538382B9928068726640": {
       "en": "Bohuslav",
       "zh": "博胡斯拉夫"
-    },
-    "id::UA_RAY_74538382B99424317893885": {
-      "en": "Ruzhyn",
-      "zh": "鲁任"
     },
     "id::UA_RAY_74538382B99860915109561": {
       "en": "Blahovishchenske",
@@ -279680,14 +278984,6 @@
       "en": "Shelby County",
       "zh": "谢尔比"
     },
-    "id::US_CNTY_48001": {
-      "en": "Anderson County",
-      "zh": "安德森"
-    },
-    "id::US_CNTY_48003": {
-      "en": "Andrews County",
-      "zh": "安德鲁斯"
-    },
     "id::US_CNTY_48005": {
       "en": "Angelina County",
       "zh": "安吉丽娜"
@@ -279696,33 +278992,9 @@
       "en": "Aransas County",
       "zh": "阿兰萨斯"
     },
-    "id::US_CNTY_48009": {
-      "en": "Archer County",
-      "zh": "射手"
-    },
-    "id::US_CNTY_48011": {
-      "en": "Armstrong County",
-      "zh": "阿姆斯特朗"
-    },
-    "id::US_CNTY_48013": {
-      "en": "Atascosa County",
-      "zh": "阿塔斯科萨"
-    },
-    "id::US_CNTY_48015": {
-      "en": "Austin County",
-      "zh": "奥斯汀"
-    },
-    "id::US_CNTY_48017": {
-      "en": "Bailey County",
-      "zh": "贝利"
-    },
     "id::US_CNTY_48019": {
       "en": "Bandera County",
       "zh": "班德拉"
-    },
-    "id::US_CNTY_48021": {
-      "en": "Bastrop County",
-      "zh": "巴斯特罗普"
     },
     "id::US_CNTY_48023": {
       "en": "Baylor County",
@@ -279740,14 +279012,6 @@
       "en": "Bexar County",
       "zh": "贝克萨"
     },
-    "id::US_CNTY_48031": {
-      "en": "Blanco County",
-      "zh": "布兰科"
-    },
-    "id::US_CNTY_48033": {
-      "en": "Borden County",
-      "zh": "博登"
-    },
     "id::US_CNTY_48035": {
       "en": "Bosque County",
       "zh": "博斯克"
@@ -279755,10 +279019,6 @@
     "id::US_CNTY_48037": {
       "en": "Bowie County",
       "zh": "鲍伊"
-    },
-    "id::US_CNTY_48039": {
-      "en": "Brazoria County",
-      "zh": "布拉佐里亚"
     },
     "id::US_CNTY_48041": {
       "en": "Brazos County",
@@ -279768,33 +279028,9 @@
       "en": "Brewster County",
       "zh": "布鲁斯特"
     },
-    "id::US_CNTY_48045": {
-      "en": "Briscoe County",
-      "zh": "布里斯科"
-    },
-    "id::US_CNTY_48047": {
-      "en": "Brooks County",
-      "zh": "布鲁克斯"
-    },
-    "id::US_CNTY_48049": {
-      "en": "Brown County",
-      "zh": "棕色的"
-    },
-    "id::US_CNTY_48051": {
-      "en": "Burleson County",
-      "zh": "伯勒森"
-    },
-    "id::US_CNTY_48053": {
-      "en": "Burnet County",
-      "zh": "伯内特"
-    },
     "id::US_CNTY_48055": {
       "en": "Caldwell County",
       "zh": "考德威尔"
-    },
-    "id::US_CNTY_48057": {
-      "en": "Calhoun County",
-      "zh": "卡尔霍恩"
     },
     "id::US_CNTY_48059": {
       "en": "Callahan County",
@@ -279804,29 +279040,13 @@
       "en": "Cameron County",
       "zh": "卡梅伦"
     },
-    "id::US_CNTY_48063": {
-      "en": "Camp County",
-      "zh": "营"
-    },
-    "id::US_CNTY_48065": {
-      "en": "Carson County",
-      "zh": "卡森"
-    },
     "id::US_CNTY_48067": {
       "en": "Cass County",
       "zh": "卡斯"
     },
-    "id::US_CNTY_48069": {
-      "en": "Castro County",
-      "zh": "卡斯特罗"
-    },
     "id::US_CNTY_48071": {
       "en": "Chambers County",
       "zh": "钱伯斯"
-    },
-    "id::US_CNTY_48073": {
-      "en": "Cherokee County",
-      "zh": "切罗基"
     },
     "id::US_CNTY_48075": {
       "en": "Childress County",
@@ -279835,14 +279055,6 @@
     "id::US_CNTY_48077": {
       "en": "Clay County",
       "zh": "黏土"
-    },
-    "id::US_CNTY_48079": {
-      "en": "Cochran County",
-      "zh": "科克伦"
-    },
-    "id::US_CNTY_48081": {
-      "en": "Coke County",
-      "zh": "可乐"
     },
     "id::US_CNTY_48083": {
       "en": "Coleman County",
@@ -279856,61 +279068,9 @@
       "en": "Collingsworth County",
       "zh": "科林斯沃斯"
     },
-    "id::US_CNTY_48089": {
-      "en": "Colorado County",
-      "zh": "科罗拉多州"
-    },
-    "id::US_CNTY_48091": {
-      "en": "Comal County",
-      "zh": "科马尔"
-    },
-    "id::US_CNTY_48093": {
-      "en": "Comanche County",
-      "zh": "科曼奇"
-    },
-    "id::US_CNTY_48095": {
-      "en": "Concho County",
-      "zh": "康乔"
-    },
-    "id::US_CNTY_48097": {
-      "en": "Cooke County",
-      "zh": "库克"
-    },
-    "id::US_CNTY_48099": {
-      "en": "Coryell County",
-      "zh": "科里尔"
-    },
-    "id::US_CNTY_48101": {
-      "en": "Cottle County",
-      "zh": "科特尔"
-    },
-    "id::US_CNTY_48103": {
-      "en": "Crane County",
-      "zh": "起重机"
-    },
-    "id::US_CNTY_48105": {
-      "en": "Crockett County",
-      "zh": "克罗克特"
-    },
-    "id::US_CNTY_48107": {
-      "en": "Crosby County",
-      "zh": "克罗斯比"
-    },
-    "id::US_CNTY_48109": {
-      "en": "Culberson County",
-      "zh": "卡尔伯森"
-    },
-    "id::US_CNTY_48111": {
-      "en": "Dallam County",
-      "zh": "达拉姆"
-    },
     "id::US_CNTY_48113": {
       "en": "Dallas",
       "zh": "达拉斯"
-    },
-    "id::US_CNTY_48115": {
-      "en": "Dawson County",
-      "zh": "道森"
     },
     "id::US_CNTY_48117": {
       "en": "Deaf Smith County",
@@ -279924,25 +279084,9 @@
       "en": "Denton County",
       "zh": "丹顿"
     },
-    "id::US_CNTY_48123": {
-      "en": "DeWitt County",
-      "zh": "德威特"
-    },
-    "id::US_CNTY_48125": {
-      "en": "Dickens County",
-      "zh": "狄更斯"
-    },
     "id::US_CNTY_48127": {
       "en": "Dimmit County",
       "zh": "迪米特"
-    },
-    "id::US_CNTY_48129": {
-      "en": "Donley County",
-      "zh": "唐利"
-    },
-    "id::US_CNTY_48131": {
-      "en": "Duval County",
-      "zh": "杜瓦尔"
     },
     "id::US_CNTY_48133": {
       "en": "Eastland County",
@@ -279956,17 +279100,9 @@
       "en": "Edwards County",
       "zh": "爱德华兹"
     },
-    "id::US_CNTY_48139": {
-      "en": "Ellis County",
-      "zh": "埃利斯"
-    },
     "id::US_CNTY_48141": {
       "en": "El Paso County",
       "zh": "埃尔帕索"
-    },
-    "id::US_CNTY_48143": {
-      "en": "Erath County",
-      "zh": "俄拉斯"
     },
     "id::US_CNTY_48145": {
       "en": "Falls County",
@@ -279976,29 +279112,13 @@
       "en": "Fannin County",
       "zh": "范宁"
     },
-    "id::US_CNTY_48149": {
-      "en": "Fayette County",
-      "zh": "费耶特"
-    },
     "id::US_CNTY_48151": {
       "en": "Fisher County",
       "zh": "费舍尔"
     },
-    "id::US_CNTY_48153": {
-      "en": "Floyd County",
-      "zh": "弗洛伊德"
-    },
     "id::US_CNTY_48155": {
       "en": "Foard County",
       "zh": "福特"
-    },
-    "id::US_CNTY_48157": {
-      "en": "Fort Bend County",
-      "zh": "本德堡"
-    },
-    "id::US_CNTY_48159": {
-      "en": "Franklin County",
-      "zh": "富兰克林"
     },
     "id::US_CNTY_48161": {
       "en": "Freestone County",
@@ -280008,21 +279128,9 @@
       "en": "Frio County",
       "zh": "弗里奥"
     },
-    "id::US_CNTY_48165": {
-      "en": "Gaines County",
-      "zh": "盖恩斯"
-    },
     "id::US_CNTY_48167": {
       "en": "Galveston County",
       "zh": "加尔维斯顿"
-    },
-    "id::US_CNTY_48169": {
-      "en": "Garza County",
-      "zh": "加尔萨"
-    },
-    "id::US_CNTY_48171": {
-      "en": "Gillespie County",
-      "zh": "吉莱斯皮"
     },
     "id::US_CNTY_48173": {
       "en": "Glasscock County",
@@ -280036,18 +279144,6 @@
       "en": "Gonzales County",
       "zh": "冈萨雷斯"
     },
-    "id::US_CNTY_48179": {
-      "en": "Gray County",
-      "zh": "灰色的"
-    },
-    "id::US_CNTY_48181": {
-      "en": "Grayson County",
-      "zh": "格雷森"
-    },
-    "id::US_CNTY_48183": {
-      "en": "Gregg County",
-      "zh": "格雷格"
-    },
     "id::US_CNTY_48185": {
       "en": "Grimes County",
       "zh": "格莱姆斯"
@@ -280055,14 +279151,6 @@
     "id::US_CNTY_48187": {
       "en": "Guadalupe County",
       "zh": "瓜达卢佩"
-    },
-    "id::US_CNTY_48189": {
-      "en": "Hale County",
-      "zh": "黑尔"
-    },
-    "id::US_CNTY_48191": {
-      "en": "Hall County",
-      "zh": "大厅"
     },
     "id::US_CNTY_48193": {
       "en": "Hamilton County",
@@ -280084,22 +279172,6 @@
       "en": "Houston",
       "zh": "休斯敦"
     },
-    "id::US_CNTY_48203": {
-      "en": "Harrison County",
-      "zh": "哈里森"
-    },
-    "id::US_CNTY_48205": {
-      "en": "Hartley County",
-      "zh": "哈特利"
-    },
-    "id::US_CNTY_48207": {
-      "en": "Haskell County",
-      "zh": "哈斯克尔"
-    },
-    "id::US_CNTY_48209": {
-      "en": "Hays County",
-      "zh": "海斯"
-    },
     "id::US_CNTY_48211": {
       "en": "Hemphill County",
       "zh": "亨普希尔"
@@ -280112,30 +279184,6 @@
       "en": "Hidalgo County",
       "zh": "伊达尔戈"
     },
-    "id::US_CNTY_48217": {
-      "en": "Hill County",
-      "zh": "爬坡道"
-    },
-    "id::US_CNTY_48219": {
-      "en": "Hockley County",
-      "zh": "霍克利"
-    },
-    "id::US_CNTY_48221": {
-      "en": "Hood County",
-      "zh": "兜帽"
-    },
-    "id::US_CNTY_48223": {
-      "en": "Hopkins County",
-      "zh": "霍普金斯"
-    },
-    "id::US_CNTY_48225": {
-      "en": "Houston County",
-      "zh": "休斯顿"
-    },
-    "id::US_CNTY_48227": {
-      "en": "Howard County",
-      "zh": "霍华德"
-    },
     "id::US_CNTY_48229": {
       "en": "Hudspeth County",
       "zh": "哈德斯佩斯"
@@ -280143,26 +279191,6 @@
     "id::US_CNTY_48231": {
       "en": "Hunt County",
       "zh": "打猎"
-    },
-    "id::US_CNTY_48233": {
-      "en": "Hutchinson County",
-      "zh": "哈钦森"
-    },
-    "id::US_CNTY_48235": {
-      "en": "Irion County",
-      "zh": "伊里翁"
-    },
-    "id::US_CNTY_48237": {
-      "en": "Jack County",
-      "zh": "杰克"
-    },
-    "id::US_CNTY_48239": {
-      "en": "Jackson County",
-      "zh": "杰克逊"
-    },
-    "id::US_CNTY_48241": {
-      "en": "Jasper County",
-      "zh": "碧玉"
     },
     "id::US_CNTY_48243": {
       "en": "Jeff Davis County",
@@ -280172,113 +279200,21 @@
       "en": "Jefferson County",
       "zh": "杰斐逊"
     },
-    "id::US_CNTY_48247": {
-      "en": "Jim Hogg County",
-      "zh": "吉姆·霍格"
-    },
-    "id::US_CNTY_48249": {
-      "en": "Jim Wells County",
-      "zh": "吉姆·威尔斯"
-    },
-    "id::US_CNTY_48251": {
-      "en": "Johnson County",
-      "zh": "约翰逊"
-    },
-    "id::US_CNTY_48253": {
-      "en": "Jones County",
-      "zh": "琼斯"
-    },
-    "id::US_CNTY_48255": {
-      "en": "Karnes County",
-      "zh": "卡内斯"
-    },
-    "id::US_CNTY_48257": {
-      "en": "Kaufman County",
-      "zh": "考夫曼"
-    },
-    "id::US_CNTY_48259": {
-      "en": "Kendall County",
-      "zh": "肯德尔"
-    },
     "id::US_CNTY_48261": {
       "en": "Kenedy County",
       "zh": "肯尼迪"
-    },
-    "id::US_CNTY_48263": {
-      "en": "Kent County",
-      "zh": "肯特"
-    },
-    "id::US_CNTY_48265": {
-      "en": "Kerr County",
-      "zh": "克尔"
-    },
-    "id::US_CNTY_48267": {
-      "en": "Kimble County",
-      "zh": "金布尔"
-    },
-    "id::US_CNTY_48269": {
-      "en": "King County",
-      "zh": "国王"
     },
     "id::US_CNTY_48271": {
       "en": "Kinney County",
       "zh": "金尼"
     },
-    "id::US_CNTY_48273": {
-      "en": "Kleberg County",
-      "zh": "克莱贝格"
-    },
-    "id::US_CNTY_48275": {
-      "en": "Knox County",
-      "zh": "诺克斯"
-    },
     "id::US_CNTY_48277": {
       "en": "Lamar County",
       "zh": "拉马尔"
     },
-    "id::US_CNTY_48279": {
-      "en": "Lamb County",
-      "zh": "羊肉"
-    },
-    "id::US_CNTY_48281": {
-      "en": "Lampasas County",
-      "zh": "兰帕萨斯"
-    },
-    "id::US_CNTY_48283": {
-      "en": "La Salle County",
-      "zh": "拉萨尔"
-    },
-    "id::US_CNTY_48285": {
-      "en": "Lavaca County",
-      "zh": "拉瓦卡"
-    },
-    "id::US_CNTY_48287": {
-      "en": "Lee County",
-      "zh": "李"
-    },
-    "id::US_CNTY_48289": {
-      "en": "Leon County",
-      "zh": "莱昂"
-    },
     "id::US_CNTY_48291": {
       "en": "Liberty County",
       "zh": "自由"
-    },
-    "id::US_CNTY_48293": {
-      "en": "Limestone County",
-      "zh": "石灰石"
-    },
-    "id::US_CNTY_48295": {
-      "en": "Lipscomb County",
-      "zh": "利普斯科姆"
-    },
-    "id::US_CNTY_48297": {
-      "en": "Live Oak County",
-      "zh": "活橡木"
-    },
-    "id::US_CNTY_48299": {
-      "en": "Llano County",
-      "zh": "拉诺"
     },
     "id::US_CNTY_48301": {
       "en": "Loving County",
@@ -280288,10 +279224,6 @@
       "en": "Lubbock County",
       "zh": "拉伯克"
     },
-    "id::US_CNTY_48305": {
-      "en": "Lynn County",
-      "zh": "林恩"
-    },
     "id::US_CNTY_48307": {
       "en": "McCulloch County",
       "zh": "麦卡洛克"
@@ -280299,26 +279231,6 @@
     "id::US_CNTY_48309": {
       "en": "McLennan County",
       "zh": "麦克伦南"
-    },
-    "id::US_CNTY_48311": {
-      "en": "McMullen County",
-      "zh": "麦克马伦"
-    },
-    "id::US_CNTY_48313": {
-      "en": "Madison County",
-      "zh": "麦迪逊"
-    },
-    "id::US_CNTY_48315": {
-      "en": "Marion County",
-      "zh": "马里恩"
-    },
-    "id::US_CNTY_48317": {
-      "en": "Martin County",
-      "zh": "马丁"
-    },
-    "id::US_CNTY_48319": {
-      "en": "Mason County",
-      "zh": "石匠"
     },
     "id::US_CNTY_48321": {
       "en": "Matagorda County",
@@ -280332,10 +279244,6 @@
       "en": "Medina County",
       "zh": "麦地那"
     },
-    "id::US_CNTY_48327": {
-      "en": "Menard County",
-      "zh": "梅纳德"
-    },
     "id::US_CNTY_48329": {
       "en": "Midland County",
       "zh": "米德兰"
@@ -280343,18 +279251,6 @@
     "id::US_CNTY_48331": {
       "en": "Milam County",
       "zh": "米拉姆"
-    },
-    "id::US_CNTY_48333": {
-      "en": "Mills County",
-      "zh": "米尔斯"
-    },
-    "id::US_CNTY_48335": {
-      "en": "Mitchell County",
-      "zh": "米切尔"
-    },
-    "id::US_CNTY_48337": {
-      "en": "Montague County",
-      "zh": "蒙塔古"
     },
     "id::US_CNTY_48339": {
       "en": "Montgomery County",
@@ -280368,37 +279264,13 @@
       "en": "Morris County",
       "zh": "莫里斯"
     },
-    "id::US_CNTY_48345": {
-      "en": "Motley County",
-      "zh": "莫特利"
-    },
     "id::US_CNTY_48347": {
       "en": "Nacogdoches County",
       "zh": "纳科多奇斯"
     },
-    "id::US_CNTY_48349": {
-      "en": "Navarro County",
-      "zh": "纳瓦罗"
-    },
-    "id::US_CNTY_48351": {
-      "en": "Newton County",
-      "zh": "牛顿"
-    },
-    "id::US_CNTY_48353": {
-      "en": "Nolan County",
-      "zh": "诺兰"
-    },
     "id::US_CNTY_48355": {
       "en": "Nueces County",
       "zh": "纽埃塞斯"
-    },
-    "id::US_CNTY_48357": {
-      "en": "Ochiltree County",
-      "zh": "奥奇特里"
-    },
-    "id::US_CNTY_48359": {
-      "en": "Oldham County",
-      "zh": "奥尔德姆"
     },
     "id::US_CNTY_48361": {
       "en": "Orange County",
@@ -280416,17 +279288,9 @@
       "en": "Parker County",
       "zh": "派克"
     },
-    "id::US_CNTY_48369": {
-      "en": "Parmer County",
-      "zh": "帕尔默"
-    },
     "id::US_CNTY_48371": {
       "en": "Pecos County",
       "zh": "佩科斯"
-    },
-    "id::US_CNTY_48373": {
-      "en": "Polk County",
-      "zh": "波尔克"
     },
     "id::US_CNTY_48375": {
       "en": "Potter County",
@@ -280444,10 +279308,6 @@
       "en": "Randall County",
       "zh": "兰德尔"
     },
-    "id::US_CNTY_48383": {
-      "en": "Reagan County",
-      "zh": "里根"
-    },
     "id::US_CNTY_48385": {
       "en": "Real County",
       "zh": "真实的"
@@ -280455,10 +279315,6 @@
     "id::US_CNTY_48387": {
       "en": "Red River County",
       "zh": "红河"
-    },
-    "id::US_CNTY_48389": {
-      "en": "Reeves County",
-      "zh": "里夫斯"
     },
     "id::US_CNTY_48391": {
       "en": "Refugio County",
@@ -280472,26 +279328,6 @@
       "en": "Robertson County",
       "zh": "罗伯逊"
     },
-    "id::US_CNTY_48397": {
-      "en": "Rockwall County",
-      "zh": "罗克沃尔"
-    },
-    "id::US_CNTY_48399": {
-      "en": "Runnels County",
-      "zh": "沟道"
-    },
-    "id::US_CNTY_48401": {
-      "en": "Rusk County",
-      "zh": "腊斯克"
-    },
-    "id::US_CNTY_48403": {
-      "en": "Sabine County",
-      "zh": "萨宾"
-    },
-    "id::US_CNTY_48405": {
-      "en": "San Augustine County",
-      "zh": "圣奥古斯丁"
-    },
     "id::US_CNTY_48407": {
       "en": "San Jacinto County",
       "zh": "圣哈辛托"
@@ -280504,33 +279340,9 @@
       "en": "San Saba County",
       "zh": "圣萨巴"
     },
-    "id::US_CNTY_48413": {
-      "en": "Schleicher County",
-      "zh": "施莱歇尔"
-    },
-    "id::US_CNTY_48415": {
-      "en": "Scurry County",
-      "zh": "疾走"
-    },
-    "id::US_CNTY_48417": {
-      "en": "Shackelford County",
-      "zh": "沙克尔福德"
-    },
-    "id::US_CNTY_48419": {
-      "en": "Shelby County",
-      "zh": "谢尔比"
-    },
-    "id::US_CNTY_48421": {
-      "en": "Sherman County",
-      "zh": "谢尔曼"
-    },
     "id::US_CNTY_48423": {
       "en": "Smith County",
       "zh": "史密斯"
-    },
-    "id::US_CNTY_48425": {
-      "en": "Somervell County",
-      "zh": "萨默维尔"
     },
     "id::US_CNTY_48427": {
       "en": "Starr County",
@@ -280539,22 +279351,6 @@
     "id::US_CNTY_48429": {
       "en": "Stephens County",
       "zh": "斯蒂芬斯"
-    },
-    "id::US_CNTY_48431": {
-      "en": "Sterling County",
-      "zh": "英镑"
-    },
-    "id::US_CNTY_48433": {
-      "en": "Stonewall County",
-      "zh": "石墙"
-    },
-    "id::US_CNTY_48435": {
-      "en": "Sutton County",
-      "zh": "萨顿"
-    },
-    "id::US_CNTY_48437": {
-      "en": "Swisher County",
-      "zh": "斯威舍尔"
     },
     "id::US_CNTY_48439": {
       "en": "Tarrant County",
@@ -280568,81 +279364,25 @@
       "en": "Terrell County",
       "zh": "特雷尔"
     },
-    "id::US_CNTY_48445": {
-      "en": "Terry County",
-      "zh": "特里"
-    },
-    "id::US_CNTY_48447": {
-      "en": "Throckmorton County",
-      "zh": "斯罗克莫顿"
-    },
-    "id::US_CNTY_48449": {
-      "en": "Titus County",
-      "zh": "提图斯"
-    },
-    "id::US_CNTY_48451": {
-      "en": "Tom Green County",
-      "zh": "汤姆·格林"
-    },
     "id::US_CNTY_48453": {
       "en": "Travis County",
       "zh": "特拉维斯"
-    },
-    "id::US_CNTY_48455": {
-      "en": "Trinity County",
-      "zh": "三位一体"
     },
     "id::US_CNTY_48457": {
       "en": "Tyler County",
       "zh": "泰勒"
     },
-    "id::US_CNTY_48459": {
-      "en": "Upshur County",
-      "zh": "厄普舒尔"
-    },
-    "id::US_CNTY_48461": {
-      "en": "Upton County",
-      "zh": "厄普顿"
-    },
-    "id::US_CNTY_48463": {
-      "en": "Uvalde County",
-      "zh": "尤瓦尔德"
-    },
     "id::US_CNTY_48465": {
       "en": "Val Verde County",
       "zh": "瓦尔维德"
-    },
-    "id::US_CNTY_48467": {
-      "en": "Van Zandt County",
-      "zh": "范赞特"
-    },
-    "id::US_CNTY_48469": {
-      "en": "Victoria County",
-      "zh": "维多利亚"
     },
     "id::US_CNTY_48471": {
       "en": "Walker County",
       "zh": "沃克"
     },
-    "id::US_CNTY_48473": {
-      "en": "Waller County",
-      "zh": "沃勒"
-    },
-    "id::US_CNTY_48475": {
-      "en": "Ward County",
-      "zh": "沃德"
-    },
-    "id::US_CNTY_48477": {
-      "en": "Washington County",
-      "zh": "华盛顿"
-    },
     "id::US_CNTY_48479": {
       "en": "Webb County",
       "zh": "韦伯"
-    },
-    "id::US_CNTY_48481": {
-      "en": "Wharton County",
-      "zh": "沃顿商学院"
     },
     "id::US_CNTY_48483": {
       "en": "Wheeler County",
@@ -280660,22 +279400,6 @@
       "en": "Willacy County",
       "zh": "威拉西"
     },
-    "id::US_CNTY_48491": {
-      "en": "Williamson County",
-      "zh": "威廉森"
-    },
-    "id::US_CNTY_48493": {
-      "en": "Wilson County",
-      "zh": "威尔逊"
-    },
-    "id::US_CNTY_48495": {
-      "en": "Winkler County",
-      "zh": "温克勒"
-    },
-    "id::US_CNTY_48497": {
-      "en": "Wise County",
-      "zh": "明智的"
-    },
     "id::US_CNTY_48499": {
       "en": "Wood County",
       "zh": "木头"
@@ -280684,17 +279408,9 @@
       "en": "Yoakum County",
       "zh": "约库姆"
     },
-    "id::US_CNTY_48503": {
-      "en": "Young County",
-      "zh": "年轻的"
-    },
     "id::US_CNTY_48505": {
       "en": "Zapata County",
       "zh": "萨帕塔"
-    },
-    "id::US_CNTY_48507": {
-      "en": "Zavala County",
-      "zh": "萨瓦拉"
     },
     "id::US_CNTY_49035": {
       "en": "Salt Lake County",
@@ -295003,6 +293719,570 @@
     "id::FR_MRG_7c681aa2032e": {
       "en": "Boulogne-sur-Mer + Saint-Omer + Calais",
       "zh": "博嫩、圣奥马尔斯、卡勒斯"
+    },
+    "id::CN_MRG_e9bedc8a8392": {
+      "en": "Xinxian + Guangshanxian + Huangchuanxian",
+      "zh": "新县、光善县、荒川县"
+    },
+    "id::CN_MRG_427fc101d0bb": {
+      "en": "Xihuaxian + Fugouxian",
+      "zh": "西华县、浮沟县"
+    },
+    "id::CN_MRG_533faafa0df3": {
+      "en": "Renqiu + Hejian",
+      "zh": "任丘、河间"
+    },
+    "id::CN_MRG_6c8b997d87f4": {
+      "en": "Jiaxian + Lushanxian + Baofengxian",
+      "zh": "郏县、庐山县、宝丰县"
+    },
+    "id::CN_MRG_41987d66c89b": {
+      "en": "Anyangxian + Tangyinxian",
+      "zh": "安阳县、汤阴县"
+    },
+    "id::CN_MRG_19742f026a19": {
+      "en": "Nanhexian + Renxian",
+      "zh": "南河县、任县"
+    },
+    "id::CN_MRG_57214cfbaf31": {
+      "en": "Lichuanxian + Nanfengxian + Zixixian",
+      "zh": "利川县、南丰县、紫溪县"
+    },
+    "id::CN_MRG_d6f45c057bfc": {
+      "en": "Luquan + Yuanxian",
+      "zh": "鹿泉、原县"
+    },
+    "id::CN_MRG_e16d02489ce6": {
+      "en": "Wuhexian + Guzhenxian",
+      "zh": "五河县、固镇县"
+    },
+    "id::CN_MRG_8028022022b6": {
+      "en": "Xincaixian + Zhengyangxian",
+      "zh": "新彩县、正阳县"
+    },
+    "id::CN_MRG_8c69fc20650e": {
+      "en": "Xushuixian + Wangduxian + Qingyuanxian",
+      "zh": "徐水县、望都县、清源县"
+    },
+    "id::CN_MRG_5c6db60e61b3": {
+      "en": "Shanggaoxian + Wanzaixian + Shanggaoxian",
+      "zh": "上高县、万载县、上高县"
+    },
+    "id::CN_MRG_afbaca334723": {
+      "en": "Wuqiangxian + Wuyixian + Shenzhou",
+      "zh": "武强县、武夷县、神舟"
+    },
+    "id::CN_MRG_b7b350314dc1": {
+      "en": "Luanchuanxian + Ruyang + Songxian",
+      "zh": "栾川县、汝阳、嵩县"
+    },
+    "id::CN_MRG_bf685b353c1f": {
+      "en": "Anxinxian + Gaoyangxian + Rongchengxian",
+      "zh": "安新县、高阳县、容城县"
+    },
+    "id::CN_MRG_34e4e9cc4fbe": {
+      "en": "Boyexian + Lixian + Anguo",
+      "zh": "博野县、澧县、安国"
+    },
+    "id::CN_MRG_dcba081e6d4b": {
+      "en": "Nanyang + Sheqixian",
+      "zh": "南阳、社旗县"
+    },
+    "id::CN_MRG_a23dd781cd4b": {
+      "en": "Leanxian + Yihuangxian",
+      "zh": "乐县、以黄县"
+    },
+    "id::CN_MRG_4c6664a4fd2e": {
+      "en": "Dingyuanxian + Fengyangxian",
+      "zh": "定远县、凤阳县"
+    },
+    "id::CN_MRG_398970fc50e7": {
+      "en": "Yongxiuxian + Deanxian",
+      "zh": "永修县、德安县"
+    },
+    "id::CN_MRG_b38ab466fa3b": {
+      "en": "Quzhouxian + Yongnianxian",
+      "zh": "衢州县、永年县"
+    },
+    "id::CN_MRG_0284a41a11c9": {
+      "en": "Qingyangxian + Shitaixian",
+      "zh": "青阳县、石台县"
+    },
+    "id::CN_MRG_9305fada0549": {
+      "en": "Wuningxian + Ruichang",
+      "zh": "武宁县、瑞昌"
+    },
+    "id::CN_MRG_394c2f1e79d2": {
+      "en": "Changxian + Mencunhuizuzizhixian",
+      "zh": "昌县、孟村回族自治县"
+    },
+    "id::CN_MRG_8c437a4ee37b": {
+      "en": "Yongqingxian + Guanxian",
+      "zh": "永清县、灌县"
+    },
+    "id::CN_MRG_5305adb06a6c": {
+      "en": "Yushanxian + Shangraoxian",
+      "zh": "玉山县、上饶县"
+    },
+    "id::CN_MRG_d7d38b1d4e6c": {
+      "en": "Xiuningxian + Yixian",
+      "zh": "休宁县、黟县"
+    },
+    "id::CN_MRG_03c2697ed1c7": {
+      "en": "Xinxiang + Weihui",
+      "zh": "新乡、伟辉"
+    },
+    "id::CN_MRG_cb217ae78813": {
+      "en": "Zhangshu + Gaoan",
+      "zh": "樟树、高安"
+    },
+    "id::CN_MRG_3be300af18dc": {
+      "en": "Handanxian + Cixian",
+      "zh": "邯郸县、磁县"
+    },
+    "id::CN_MRG_51c0b9bbbb0a": {
+      "en": "Nangong + Longyaoxian + Juluxian",
+      "zh": "馕、隆尧县、巨鹿县"
+    },
+    "id::CN_MRG_7c9c7c3d5403": {
+      "en": "Botou + Xianxian",
+      "zh": "泊头、献县"
+    },
+    "id::CN_MRG_855b56adb95d": {
+      "en": "Suichuanxian + Taihexian + Wananxian",
+      "zh": "遂川县、太和县、万安县"
+    },
+    "id::CN_MRG_3f1f7652e799": {
+      "en": "Feixixian + Chaohu",
+      "zh": "费西县、巢湖"
+    },
+    "id::CN_MRG_6d6cb2d8c363": {
+      "en": "Shangyouxian + Nankang",
+      "zh": "上犹县、南康"
+    },
+    "id::CN_MRG_5b41c4449ce8": {
+      "en": "Tianchang + Laianxian",
+      "zh": "天长、来安县"
+    },
+    "id::CN_MRG_caa06bd6794d": {
+      "en": "Yongfengxian + Jishuixian + Jian",
+      "zh": "永丰县、积水县、坚"
+    },
+    "id::CN_MRG_f2a3fc747532": {
+      "en": "Taihuxian + Qianshanxian",
+      "zh": "太湖县、千山县"
+    },
+    "id::CN_MRG_c5c7b0e9cbd8": {
+      "en": "Shuixian + Qixian",
+      "zh": "水县、七贤"
+    },
+    "id::CN_MRG_f5f659cc505e": {
+      "en": "Neihuangxian + Huaxian",
+      "zh": "内黄县、滑县"
+    },
+    "id::CN_MRG_6c22a284518b": {
+      "en": "Yujiangxian + Guixixian",
+      "zh": "余江县、贵溪县"
+    },
+    "id::CN_MRG_4dbd04851564": {
+      "en": "Ningduxian + Ganxian + Xingguoxian",
+      "zh": "宁都县、赣县、兴国县"
+    },
+    "id::CN_MRG_a8d7799e7061": {
+      "en": "Wuyuanxian + Hengfengxian + Dexing",
+      "zh": "五源县、横峰县、德兴"
+    },
+    "id::CN_MRG_1130259eb8b0": {
+      "en": "Guangzhongxian + Weixian",
+      "zh": "广中县、潍县"
+    },
+    "id::CN_MRG_c71520fb477c": {
+      "en": "Mixian + Dongfeng",
+      "zh": "密县、东风"
+    },
+    "id::CN_MRG_f0bfe71b2f0e": {
+      "en": "Yuzhou + Changge",
+      "zh": "禹州、长葛"
+    },
+    "id::CN_MRG_51650d15c050": {
+      "en": "Xingtangxian + Lingshouxian",
+      "zh": "行唐县、灵寿县"
+    },
+    "id::CN_MRG_47f5cbedadef": {
+      "en": "Fengxinxian + Jinganxian",
+      "zh": "奉新县、靖安县"
+    },
+    "id::CN_MRG_b11a43e1dda4": {
+      "en": "Runanxian + Shangcaixian + Queshanxian",
+      "zh": "汝南县、上蔡县、确山县"
+    },
+    "id::CN_MRG_0e6318364e8e": {
+      "en": "Miyangxian + Shuipingxian",
+      "zh": "泌阳县、水平县"
+    },
+    "id::CN_MRG_1a89a77f2e8a": {
+      "en": "Nanchangxian + Xinjianxian",
+      "zh": "南昌县、新建县"
+    },
+    "id::US_MRG_98c46952922a": {
+      "en": "Anderson County + Houston County",
+      "zh": "安德森、休斯顿"
+    },
+    "id::US_MRG_e5ff30356db3": {
+      "en": "Andrews County + Howard County + Martin County",
+      "zh": "安德鲁斯、霍华德、马丁"
+    },
+    "id::US_MRG_d2dd8d229fc4": {
+      "en": "Archer County + Young County",
+      "zh": "射手、年轻的"
+    },
+    "id::US_MRG_17d99f82ab74": {
+      "en": "Armstrong County + Carson County + Hutchinson County",
+      "zh": "阿姆斯特朗、卡森、哈钦森"
+    },
+    "id::US_MRG_4b9ef4efd3fc": {
+      "en": "Atascosa County + Live Oak County",
+      "zh": "阿塔斯科萨、活橡木"
+    },
+    "id::US_MRG_8831594160d2": {
+      "en": "Austin County + Washington County",
+      "zh": "奥斯汀、华盛顿"
+    },
+    "id::US_MRG_75ade1c370a1": {
+      "en": "Bailey County + Hale County + Lamb County",
+      "zh": "贝利、黑尔、羊肉"
+    },
+    "id::US_MRG_a94a72637172": {
+      "en": "Bastrop County + Fayette County",
+      "zh": "巴斯特罗普、费耶特"
+    },
+    "id::US_MRG_17c9b14fc969": {
+      "en": "Blanco County + Gillespie County",
+      "zh": "布兰科、吉莱斯皮"
+    },
+    "id::US_MRG_512211db3fed": {
+      "en": "Borden County + Dawson County + Gaines County",
+      "zh": "博登、道森、盖恩斯"
+    },
+    "id::US_MRG_615a68fb03f7": {
+      "en": "Brazoria County + Fort Bend County + Waller County",
+      "zh": "布拉佐里亚、本德堡、沃勒"
+    },
+    "id::US_MRG_288c105ab692": {
+      "en": "Briscoe County + Hall County + Swisher County",
+      "zh": "布里斯科、大厅、斯威舍尔"
+    },
+    "id::US_MRG_de187e0e2d96": {
+      "en": "Brooks County + Jim Hogg County",
+      "zh": "布鲁克斯、吉姆·霍格"
+    },
+    "id::US_MRG_1bbe9dc9722d": {
+      "en": "Brown County + Mills County",
+      "zh": "棕色的、米尔斯"
+    },
+    "id::US_MRG_954f62972ce9": {
+      "en": "Burleson County + Lee County + Williamson County",
+      "zh": "伯勒森、李、威廉森"
+    },
+    "id::US_MRG_f13d395034d8": {
+      "en": "Burnet County + Coryell County + Lampasas County",
+      "zh": "伯内特、科里尔、兰帕萨斯"
+    },
+    "id::US_MRG_c69bb874c34c": {
+      "en": "Calhoun County + Jackson County",
+      "zh": "卡尔霍恩、杰克逊"
+    },
+    "id::US_MRG_9621d87995de": {
+      "en": "Camp County + Gregg County + Upshur County",
+      "zh": "营、格雷格、厄普舒尔"
+    },
+    "id::US_MRG_799779e62499": {
+      "en": "Castro County + Parmer County",
+      "zh": "卡斯特罗、帕尔默"
+    },
+    "id::US_MRG_6a0cd1283040": {
+      "en": "Cherokee County + Rusk County",
+      "zh": "切罗基、腊斯克"
+    },
+    "id::US_MRG_8d4f8a0a88ae": {
+      "en": "Jack County + Wise County",
+      "zh": "杰克、明智的"
+    },
+    "id::US_MRG_b167b3b770f9": {
+      "en": "Cochran County + Hockley County + Terry County",
+      "zh": "科克伦、霍克利、特里"
+    },
+    "id::US_MRG_6b6081bed14d": {
+      "en": "Coke County + Runnels County + Sterling County",
+      "zh": "可乐、沟道、英镑"
+    },
+    "id::US_MRG_4f6a788187a4": {
+      "en": "Colorado County + Lavaca County + Wharton County",
+      "zh": "科罗拉多州、拉瓦卡、沃顿商学院"
+    },
+    "id::US_MRG_c4e2ef408a02": {
+      "en": "Comal County + Hays County",
+      "zh": "科马尔、海斯"
+    },
+    "id::US_MRG_394fc4c008ec": {
+      "en": "Comanche County + Erath County",
+      "zh": "科曼奇、俄拉斯"
+    },
+    "id::US_MRG_2d17e071234f": {
+      "en": "Concho County + Irion County + Tom Green County",
+      "zh": "康乔、伊里翁、汤姆·格林"
+    },
+    "id::US_MRG_ee506a8a0124": {
+      "en": "Cooke County + Grayson County + Montague County",
+      "zh": "库克、格雷森、蒙塔古"
+    },
+    "id::US_MRG_867046e7ad47": {
+      "en": "Cottle County + Floyd County + Motley County",
+      "zh": "科特尔、弗洛伊德、莫特利"
+    },
+    "id::US_MRG_b97e9b932c3f": {
+      "en": "Crane County + Reagan County + Upton County",
+      "zh": "起重机、里根、厄普顿"
+    },
+    "id::US_MRG_36c9a8886b71": {
+      "en": "Crockett County + Schleicher County + Sutton County",
+      "zh": "克罗克特、施莱歇尔、萨顿"
+    },
+    "id::US_MRG_c5062d5fe295": {
+      "en": "Crosby County + Dickens County + Kent County",
+      "zh": "克罗斯比、狄更斯、肯特"
+    },
+    "id::US_MRG_adb56f6301de": {
+      "en": "Culberson County + Reeves County",
+      "zh": "卡尔伯森、里夫斯"
+    },
+    "id::US_MRG_0afc14e3e73d": {
+      "en": "Dallam County + Sherman County",
+      "zh": "达拉姆、谢尔曼"
+    },
+    "id::US_MRG_830e401b2939": {
+      "en": "Hartley County + Oldham County",
+      "zh": "哈特利、奥尔德姆"
+    },
+    "id::US_MRG_e3fbfb93451d": {
+      "en": "DeWitt County + Victoria County",
+      "zh": "德威特、维多利亚"
+    },
+    "id::US_MRG_4ae2dfdcec1e": {
+      "en": "Donley County + Gray County",
+      "zh": "唐利、灰色的"
+    },
+    "id::US_MRG_89b358d4e879": {
+      "en": "Duval County + Jim Wells County + Kleberg County",
+      "zh": "杜瓦尔、吉姆·威尔斯、克莱贝格"
+    },
+    "id::US_MRG_ea19ceff3aed": {
+      "en": "Kendall County + Kerr County",
+      "zh": "肯德尔、克尔"
+    },
+    "id::US_MRG_03d789d015aa": {
+      "en": "Ellis County + Johnson County",
+      "zh": "埃利斯、约翰逊"
+    },
+    "id::US_MRG_47bf661f9403": {
+      "en": "Franklin County + Hopkins County + Titus County",
+      "zh": "富兰克林、霍普金斯、提图斯"
+    },
+    "id::US_MRG_57a856465415": {
+      "en": "Garza County + Lynn County",
+      "zh": "加尔萨、林恩"
+    },
+    "id::US_MRG_daa505131e1c": {
+      "en": "Harrison County + Marion County",
+      "zh": "哈里森、马里恩"
+    },
+    "id::US_MRG_6f6e5e61f8c1": {
+      "en": "Haskell County + Throckmorton County",
+      "zh": "哈斯克尔、斯罗克莫顿"
+    },
+    "id::US_MRG_f1682b432a7b": {
+      "en": "Hill County + Limestone County + Navarro County",
+      "zh": "爬坡道、石灰石、纳瓦罗"
+    },
+    "id::US_MRG_f694e67d7337": {
+      "en": "Hood County + Somervell County",
+      "zh": "兜帽、萨默维尔"
+    },
+    "id::US_MRG_b4d3754acb9d": {
+      "en": "Jasper County + Newton County + Sabine County",
+      "zh": "碧玉、牛顿、萨宾"
+    },
+    "id::US_MRG_f34d06f162f6": {
+      "en": "Jones County + Shackelford County",
+      "zh": "琼斯、沙克尔福德"
+    },
+    "id::US_MRG_7e1d539ceaf6": {
+      "en": "Karnes County + Wilson County",
+      "zh": "卡内斯、威尔逊"
+    },
+    "id::US_MRG_548f11247301": {
+      "en": "Kaufman County + Rockwall County + Van Zandt County",
+      "zh": "考夫曼、罗克沃尔、范赞特"
+    },
+    "id::US_MRG_853623a78a85": {
+      "en": "Kimble County + Menard County",
+      "zh": "金布尔、梅纳德"
+    },
+    "id::US_MRG_36d7642c780b": {
+      "en": "King County + Knox County + Stonewall County",
+      "zh": "国王、诺克斯、石墙"
+    },
+    "id::US_MRG_6cd8d362b705": {
+      "en": "La Salle County + McMullen County",
+      "zh": "拉萨尔、麦克马伦"
+    },
+    "id::US_MRG_fa26f33714d2": {
+      "en": "Leon County + Madison County",
+      "zh": "莱昂、麦迪逊"
+    },
+    "id::US_MRG_62c6af7a1cf7": {
+      "en": "Lipscomb County + Ochiltree County",
+      "zh": "利普斯科姆、奥奇特里"
+    },
+    "id::US_MRG_741f098c1f8e": {
+      "en": "Llano County + Mason County",
+      "zh": "拉诺、石匠"
+    },
+    "id::US_MRG_bd1072ae78b5": {
+      "en": "Uvalde County + Zavala County",
+      "zh": "尤瓦尔德、萨瓦拉"
+    },
+    "id::US_MRG_7d307bfcd590": {
+      "en": "Mitchell County + Nolan County + Scurry County",
+      "zh": "米切尔、诺兰、疾走"
+    },
+    "id::US_MRG_23dc6cc6e2e4": {
+      "en": "Polk County + Trinity County",
+      "zh": "波尔克、三位一体"
+    },
+    "id::US_MRG_5a47c06a2dc5": {
+      "en": "San Augustine County + Shelby County",
+      "zh": "圣奥古斯丁、谢尔比"
+    },
+    "id::US_MRG_f288cf4fe69b": {
+      "en": "Ward County + Winkler County",
+      "zh": "沃德、温克勒"
+    },
+    "id::UA_MRG_b0fab68c785d": {
+      "en": "Illintsi + Orativ + Nemyriv",
+      "zh": "眼泪、扬声器、内梅里夫"
+    },
+    "id::UA_MRG_6057d7f77511": {
+      "en": "Kotelva + Dykanka",
+      "zh": "科特尔瓦、迪坎卡"
+    },
+    "id::UA_MRG_e0dcc6adce13": {
+      "en": "Popilnia + Andrushivka + Ruzhyn",
+      "zh": "凤梨属、安德鲁希夫卡、鲁任"
+    },
+    "id::UA_MRG_ec2bf97653b5": {
+      "en": "Tulchyn + Tomashpil",
+      "zh": "图尔钦、托马什皮尔"
+    },
+    "id::UA_MRG_95a5c2e0f114": {
+      "en": "Hrebinka + Pyriatyn",
+      "zh": "赫雷宾卡、我会尝试"
+    },
+    "id::UA_MRG_ae35953e4a30": {
+      "en": "Bar + Zhmerynka + Murovani Kurylivtsi",
+      "zh": "酒吧、日梅林卡、穆罗瓦尼·库里利夫齐"
+    },
+    "id::UA_MRG_5e1a623ff8e3": {
+      "en": "Mashivka + Chutove + Karlivka",
+      "zh": "马什夫卡、丘托维、卡利夫卡"
+    },
+    "id::UA_MRG_39b244f210a7": {
+      "en": "Lubny + Chornukhy + Orzhytsia",
+      "zh": "卢布尼、乔努希、奥尔日西亚"
+    },
+    "id::UA_MRG_d6223fcd4bc5": {
+      "en": "Radomyshl + Malyn",
+      "zh": "拉多梅什尔、马林"
+    },
+    "id::UA_MRG_b828b24bbda1": {
+      "en": "Chernivtsi + Sharhorod + Tyvriv",
+      "zh": "切尔诺夫策、沙霍罗德、特夫里夫"
+    },
+    "id::UA_MRG_1e5ce8367e34": {
+      "en": "Reshetylivka + Shyshaky + Velyka Bahachka",
+      "zh": "列舍特利夫卡、夏沙基、韦丽卡·巴哈卡"
+    },
+    "id::UA_MRG_fd8e40834959": {
+      "en": "Lypovets + Pohrebyshche",
+      "zh": "利波维茨、波赫雷比什切"
+    },
+    "id::UA_MRG_ce31c0ac496b": {
+      "en": "Teplyk + Trostianets",
+      "zh": "特普雷克、特罗斯蒂亚内茨"
+    },
+    "id::UA_MRG_de7e916ec1cb": {
+      "en": "Khmilnyk + Lityn",
+      "zh": "赫米尔尼克、点燃"
+    },
+    "id::UA_MRG_44d0fd9d6e14": {
+      "en": "Brusyliv + Korostyshiv",
+      "zh": "布鲁西利夫、强调"
+    },
+    "id::UA_MRG_51ee3e4d0063": {
+      "en": "Vilshanka + Holovanivsk",
+      "zh": "维尔尚卡、霍洛万尼夫斯克"
+    },
+    "id::UA_MRG_9fc8b136c3a6": {
+      "en": "Yemilchyne + Luhyny + Korosten",
+      "zh": "耶米尔钦、卢希尼、科罗斯滕"
+    },
+    "id::UA_MRG_c74c01b39f8e": {
+      "en": "Novi Sanzhary + Kozelshchyna + Kobeliaky",
+      "zh": "新桑扎里、科泽尔希纳、科比利亚基"
+    },
+    "id::UA_MRG_364aab8578b7": {
+      "en": "Chudniv + Berdychiv",
+      "zh": "丘德尼夫、别尔季奇夫"
+    },
+    "id::UA_MRG_8e1ed09f0e12": {
+      "en": "Kalynivka + Koziatyn",
+      "zh": "卡利尼夫卡、科齐亚廷"
+    },
+    "id::UA_MRG_7f067ceac5cb": {
+      "en": "Khoroshiv + Cherniakhiv + Pulyny",
+      "zh": "霍罗希夫、切尔尼亚希夫、普利尼"
+    },
+    "id::UA_MRG_797d35ccfd2e": {
+      "en": "Kropyvnytskyi + Bobrynets",
+      "zh": "克罗佩夫尼茨基、博布里内茨"
+    },
+    "id::UA_MRG_d727a8cfaa69": {
+      "en": "Dobrovelychkivka + Novoarkhanhelsk",
+      "zh": "多布罗韦利奇基夫卡、新阿尔汉赫尔斯克"
+    },
+    "id::UA_MRG_dbee0923a48b": {
+      "en": "Baranivka + Romaniv + Liubar",
+      "zh": "巴拉尼夫卡、罗曼尼夫、我很高兴"
+    },
+    "id::UA_MRG_e3c0520ffdd5": {
+      "en": "Kamianka + Oleksandrivka",
+      "zh": "卡米扬卡、奥列克桑德夫卡"
+    },
+    "id::UA_MRG_ba89d2e82c09": {
+      "en": "Novomyrhorod + Mala Vyska + Novoukrainka",
+      "zh": "新米尔哥罗德、马拉维斯卡、新乌克兰卡"
+    },
+    "id::UA_MRG_7e91c55da78e": {
+      "en": "Myrhorod + Hadiach + Zinkiv",
+      "zh": "米尔哥罗德、哈迪亚克、津基夫"
+    },
+    "id::UA_MRG_2d1c37bdd071": {
+      "en": "Oleksandriia + Znamianka",
+      "zh": "亚历克桑德里亚、兹纳米安卡"
+    },
+    "id::CN_MRG_e76984eed8fb": {
+      "en": "Yichuanxian + Yiyangxian",
+      "zh": "宜川县、弋阳县"
     }
   },
   "ui": {
