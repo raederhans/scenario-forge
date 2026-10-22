@@ -63,6 +63,12 @@ jobs:
         if: inputs.profile == 'deploy-minimal' || inputs.profile == 'pr-fast'
         run: node --test tests/sample_project_contracts.test.mjs
 
+      - name: Check Quick Fill hierarchy data and audit
+        if: inputs.profile == 'pr-fast'
+        run: |
+          python tools/build_quick_fill_hierarchy.py --check
+          node tools/audit_quick_fill.mjs
+
       - name: Check Pages source references
         if: inputs.profile == 'pr-fast'
         run: python tools/check_pages_source_graph.py
@@ -172,6 +178,21 @@ jobs:
           MAPCREATOR_DEV_PORT: '8811'
         run: npm run verify:demo
 
+      - name: Run Quick Fill live toolbar smoke
+        if: inputs.profile == 'pr-smoke'
+        env:
+          # Ports 8810/8811 may still be in TIME_WAIT from the smoke and demo servers.
+          MAPCREATOR_DEV_PORT: '8812'
+        run: |
+          python tools/dev_server.py --port "$MAPCREATOR_DEV_PORT" > .runtime/quick-fill-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent "http://127.0.0.1:$MAPCREATOR_DEV_PORT/app/" > /dev/null; then break; fi
+            sleep 1
+          done
+          node tools/check_quick_fill_browser.mjs
+
       - name: Upload E2E failure context
         if: failure() && inputs.profile == 'pr-smoke'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -183,6 +204,8 @@ jobs:
           path: |
             .runtime/reports/test-timings.ndjson
             .runtime/reports/generated/failure-context-index.ndjson
+            .runtime/quick-fill-server.log
+            .runtime/browser/quick-fill/
             .runtime/tests/playwright/**/failure-context.json
             .runtime/tests/playwright/**/*-failure-context.json
             .runtime/tests/playwright/**/error-context.md

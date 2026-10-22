@@ -29,8 +29,8 @@ npm run test:e2e:smoke   # 浏览器冒烟
 | Job | 内容 |
 | --- | --- |
 | `pr-tests` | 全部 Node 单元测试（2 个分片）和 Python 单元测试。 |
-| `pr-verify-fast` | 公开样例项目校验、Pages 源码引用检查、Pages 产物构建与启动壳检查。 |
-| `pr-verify-smoke` | 浏览器冒烟和 Golden Demo。 |
+| `pr-verify-fast` | 公开样例项目校验、Quick Fill 层级数据与审计、Pages 源码引用检查、Pages 产物构建与启动壳检查。 |
+| `pr-verify-smoke` | 浏览器冒烟、Golden Demo 和 Quick Fill 真实工具栏冒烟（`tools/check_quick_fill_browser.mjs`）。 |
 | `pr-verify-hgo` | 独立 HGO 编辑器的检查、测试和数据校验。 |
 | `PR Verify Required` | 汇总以上 job，任一失败即失败；这是唯一的 required check。 |
 
