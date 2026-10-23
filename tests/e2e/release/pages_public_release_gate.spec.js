@@ -301,14 +301,15 @@ async function writeReleaseSmokeFailureContext(testInfo, snapshot, { attempt, fi
 
 async function readLandingSampleDownloadState(page) {
   return page.evaluate(() => {
-    const cards = Array.from(document.querySelectorAll("[data-sample-project-downloads] .sample-project-downloads__card[data-sample-project-id]"));
-    const openLinks = Array.from(document.querySelectorAll("[data-sample-project-downloads] [data-sample-project-open-link]"));
-    const downloadLinks = Array.from(document.querySelectorAll("[data-sample-project-downloads] [data-sample-project-list-link]"));
+    // The starting-world list in the landing "worlds" chapter.
+    const cards = Array.from(document.querySelectorAll(".world[data-sample-project-id]"));
+    const openLinks = Array.from(document.querySelectorAll(".world [data-sample-project-open-link]"));
+    const downloadLinks = Array.from(document.querySelectorAll(".world [data-sample-project-list-link]"));
     const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
     const overflow = [
-      "[data-sample-project-downloads]",
-      ".sample-project-downloads__card",
-      ".sample-project-downloads__actions a",
+      ".worlds",
+      ".world",
+      ".world__links a",
     ].flatMap((selector) => (
       Array.from(document.querySelectorAll(selector)).map((element) => {
         const rect = element.getBoundingClientRect();
