@@ -3679,8 +3679,7 @@ function getContextPassOrchestratorOwner() {
 
 function getPoliticalIdRasterEligibilityReason() {
   return getPoliticalIdRasterEligibility({ requested: readPoliticalRenderPolicy({ scenarioId: runtimeState.activeScenarioId }).requested, exporting: exportRenderInProgress,
-    debugMode, ready: isBootInteractionReady(), firstVisible: runtimeState.firstVisibleFramePainted,
-    readonly: runtimeState.startupReadonly, unlocking: runtimeState.startupReadonlyUnlockInFlight,
+    debugMode, firstVisible: runtimeState.firstVisibleFramePainted,
     riverPartitions: hasVisibleRiverPartitions(), scenarioId: runtimeState.activeScenarioId });
 }
 

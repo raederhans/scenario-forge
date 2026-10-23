@@ -9,13 +9,12 @@ test("URL overrides the saved experiment without requiring storage access", () =
   assert.equal(readPoliticalIdRasterPreference({ search: "", storage: broken }), false);
   assert.equal(readPoliticalIdRasterPreference({ search: "", storage: { getItem: () => "1" } }), true);
 });
-test("the trial is eligible only after safe startup and only for the three supported scenarios", () => {
-  const base = { requested: true, exporting: false, debugMode: "PROD", ready: true, firstVisible: true,
-    readonly: false, unlocking: false, riverPartitions: false, scenarioId: "hoi4_1939" };
+test("the raster is eligible once a frame is visible and only for the three supported scenarios", () => {
+  const base = { requested: true, exporting: false, debugMode: "PROD", firstVisible: true,
+    riverPartitions: false, scenarioId: "hoi4_1939" };
   for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962"]) assert.equal(getPoliticalIdRasterEligibility({ ...base, scenarioId }), "eligible");
   for (const [patch, reason] of [[{ requested: false }, "off"], [{ scenarioId: "modern_world" }, "unsupported-scenario"],
-    [{ ready: false }, "startup"], [{ firstVisible: false }, "startup"], [{ readonly: true }, "startup"],
-    [{ unlocking: true }, "startup"], [{ exporting: true }, "export"], [{ riverPartitions: true }, "river-partitions"], [{ debugMode: "DEBUG" }, "debug-mode"]]) {
+    [{ firstVisible: false }, "startup"], [{ exporting: true }, "export"], [{ riverPartitions: true }, "river-partitions"], [{ debugMode: "DEBUG" }, "debug-mode"]]) {
     assert.equal(getPoliticalIdRasterEligibility({ ...base, ...patch }), reason);
   }
 });

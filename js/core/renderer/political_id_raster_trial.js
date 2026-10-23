@@ -64,12 +64,14 @@ export function writePoliticalIdRasterPreference(enabled) {
   }
 }
 
-export function getPoliticalIdRasterEligibility({ requested, exporting, debugMode, ready, firstVisible, readonly, unlocking, riverPartitions, scenarioId }) {
+export function getPoliticalIdRasterEligibility({ requested, exporting, debugMode, firstVisible, riverPartitions, scenarioId }) {
   if (!requested) return "off";
   if (!["hoi4_1936", "hoi4_1939", "tno_1962"].includes(scenarioId)) return "unsupported-scenario";
   if (exporting) return "export";
   if (debugMode !== "PROD") return "debug-mode";
-  if (!ready || !firstVisible || readonly || unlocking) return "startup";
+  // Read-only startup may use the raster once a frame is visible: otherwise a
+  // full vector pass is drawn first and replaced by the raster seconds later.
+  if (!firstVisible) return "startup";
   if (riverPartitions) return "river-partitions";
   return "eligible";
 }
