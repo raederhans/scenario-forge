@@ -1,5 +1,5 @@
 // Landing copy. index.html carries the English text as its default; every
-// data-i18n / data-i18n-aria-label / data-i18n-list key must exist in both tables.
+// data-i18n / data-i18n-aria-label / data-i18n-alt / data-i18n-list key must exist in both tables.
 export const COPY = {
   en: {
     metaTitle: "Scenario Forge — Political map studio for alternate history",
@@ -91,6 +91,7 @@ export const COPY = {
     ctaTitle: "Your next world is waiting.",
     ctaPrimary: "Start creating",
     ctaGithub: "View on GitHub",
+    ctaShotAlt: "The Scenario Forge editor: TNO 1962 Europe with the colour library and paint tools",
     footerNote: "A political map studio for alternate history and worldbuilding.",
   },
   zh: {
@@ -182,6 +183,7 @@ export const COPY = {
     ctaTitle: "下一个世界，等你落笔。",
     ctaPrimary: "开始制图",
     ctaGithub: "在 GitHub 上查看",
+    ctaShotAlt: "Scenario Forge 编辑器：TNO 1962 的欧洲，左侧是颜色库，下方是绘制工具",
     footerNote: "为架空历史与世界观创作打造的政治地图工作室。",
   },
 };

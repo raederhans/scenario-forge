@@ -121,10 +121,10 @@ test("with reduced motion the history sweep line clears when the chapter changes
   await openLanding(page);
   const box = await page.locator("[data-track]").boundingBox();
   await page.mouse.click(box.x + box.width * 0.25, box.y + box.height / 2);
-  const front = page.locator("[data-front]");
-  expect(Number(await front.getAttribute("opacity"))).toBeGreaterThan(0.5);
+  const frontOpacity = () => page.locator("[data-front]").evaluate((node) => Number(getComputedStyle(node).opacity));
+  expect(await frontOpacity()).toBeGreaterThan(0.5);
   await jumpToChapter(page, "edit");
-  await expect(front).toHaveAttribute("opacity", "0");
+  await expect.poll(frontOpacity).toBe(0);
 });
 
 test("switching to Chinese translates every labelled element", async ({ page }) => {
@@ -141,6 +141,10 @@ test("switching to Chinese translates every labelled element", async ({ page }) 
     for (const node of document.querySelectorAll("[data-i18n-aria-label]")) {
       const expected = zh[node.dataset.i18nAriaLabel];
       if (!expected || node.getAttribute("aria-label") !== expected) misses.push(node.dataset.i18nAriaLabel);
+    }
+    for (const node of document.querySelectorAll("[data-i18n-alt]")) {
+      const expected = zh[node.dataset.i18nAlt];
+      if (!expected || node.getAttribute("alt") !== expected) misses.push(node.dataset.i18nAlt);
     }
     for (const node of document.querySelectorAll("[data-i18n-list]")) {
       const items = [...node.children].map((item) => item.textContent);
