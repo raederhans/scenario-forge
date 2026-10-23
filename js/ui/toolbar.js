@@ -10,6 +10,7 @@ import { createRiverCellPicker } from "./river_cell_picker.js";
 import { getEditedRiverParentIds } from "../core/river_paint/partition_model.js";
 import { clearAllRiverPaintOverridesState } from "../core/state/actions/river_paint_actions.js";
 import { normalizePaintMode } from "../core/map_editing_policy.js";
+import { createDeferredPanelRender } from "./toolbar/deferred_panel_render.js";
 // Toolbar UI (Phase 13)
 import {
   state as runtimeState,
@@ -1725,19 +1726,15 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "clearReferenceImageFn", clearReferenceImage);
   registerRuntimeHook(state, "updateTransportAppearanceUIFn", renderTransportAppearanceUi);
   // Recent colors feed only the recent strip and the library's recent group.
-  // Paint input coalesces the full library rebuild into the next frame.
-  let recentPaletteLibraryFrame = 0;
+  // The full library rebuild waits until after the paint input's frame, and while
+  // the library is hidden it waits until the library is shown.
+  const recentPaletteLibraryRender = createDeferredPanelRender({
+    render: renderPaletteLibrary,
+    element: paletteLibraryList,
+  });
   registerRuntimeHook(state, "updateRecentUI", () => {
     renderRecentColors();
-    if (recentPaletteLibraryFrame) return;
-    if (typeof globalThis.requestAnimationFrame !== "function") {
-      renderPaletteLibrary();
-      return;
-    }
-    recentPaletteLibraryFrame = globalThis.requestAnimationFrame(() => {
-      recentPaletteLibraryFrame = 0;
-      renderPaletteLibrary();
-    });
+    recentPaletteLibraryRender.request();
   });
   registerRuntimeHook(state, "updateParentBorderCountryListFn", renderParentBorderCountryList);
 
