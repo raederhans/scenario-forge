@@ -275,5 +275,5 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   html.js [data-reveal] { opacity: 1; transform: none; transition: none; }
-  .stage__camera, .hgo__step, .hgo__detail, .btn { transition: none; }
+  .stage__lens, .hgo__step, .hgo__detail, .btn { transition: none; }
 }
