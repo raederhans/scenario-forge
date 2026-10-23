@@ -105,7 +105,7 @@ function initStage(data) {
     fit.k = Math.max(width / data.width, height / data.height);
     fit.ox = (width - data.width * fit.k) / 2;
     fit.oy = (height - data.height * fit.k) / 2;
-    front.style.width = `${(FRONT_WIDTH * fit.k).toFixed(1)}px`;
+    placeFront();
     canvas.width = Math.round(width * fit.scale);
     canvas.height = Math.round(height * fit.scale);
     drawFills();
@@ -197,6 +197,12 @@ function initStage(data) {
   const front = lens.appendChild(Object.assign(document.createElement("div"), { className: "stage__front" }));
   front.dataset.front = "";
   let frontShown = false;
+  // The sweep's left edge in viewBox units; kept so a resize can re-place it.
+  let frontX = 0;
+  function placeFront() {
+    front.style.width = `${(FRONT_WIDTH * fit.k).toFixed(1)}px`;
+    front.style.transform = `translate3d(${(fit.ox + frontX * fit.k).toFixed(1)}px, 0, 0)`;
+  }
   // x is the sweep's left edge in viewBox units; FRONT_WIDTH units wide.
   function setFront(x, opacity) {
     if (opacity <= 0) {
@@ -205,8 +211,9 @@ function initStage(data) {
       return;
     }
     frontShown = true;
+    frontX = x;
     front.style.opacity = opacity.toFixed(3);
-    front.style.transform = `translate3d(${(fit.ox + x * fit.k).toFixed(1)}px, 0, 0)`;
+    placeFront();
   }
   const labelLayers = data.labels.map((labels) => {
     const layer = layerSvg("map-labels");

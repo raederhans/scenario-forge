@@ -127,6 +127,29 @@ test("with reduced motion the history sweep line clears when the chapter changes
   await expect.poll(frontOpacity).toBe(0);
 });
 
+test("a resting history sweep line stays on its map position after a resize", async ({ page }) => {
+  // The sweep's left edge and width in map units, from what is on screen (the map is slice-fitted).
+  const frontOnMap = () => page.evaluate(() => {
+    const [, , mapWidth, mapHeight] = document.querySelector("[data-map]").getAttribute("viewBox").split(" ").map(Number);
+    const lens = document.querySelector("[data-lens]").getBoundingClientRect();
+    const front = document.querySelector("[data-front]");
+    const rect = front.getBoundingClientRect();
+    const k = Math.max(lens.width / mapWidth, lens.height / mapHeight);
+    const ox = (lens.width - mapWidth * k) / 2;
+    return { x: (rect.left - lens.left - ox) / k, width: rect.width / k, opacity: Number(getComputedStyle(front).opacity) };
+  });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openLanding(page);
+  const box = await page.locator("[data-track]").boundingBox();
+  await page.mouse.click(box.x + box.width * 0.25, box.y + box.height / 2);
+  await page.waitForTimeout(400);
+  const before = await frontOnMap();
+  expect(before.opacity).toBeGreaterThan(0.5);
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await expect.poll(async () => Math.abs((await frontOnMap()).x - before.x)).toBeLessThan(1);
+  expect(Math.abs((await frontOnMap()).width - before.width)).toBeLessThan(1);
+});
+
 test("switching to Chinese translates every labelled element", async ({ page }) => {
   await openLanding(page);
   const copy = await readLanding(page);
