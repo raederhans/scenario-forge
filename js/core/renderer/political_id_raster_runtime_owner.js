@@ -386,6 +386,12 @@ export function createPoliticalIdRasterRuntimeOwner({
       account();
       return true;
     }
+    // A first override changes foreground order, so a new source must still be
+    // prepared. Its colors are already known: record them on the current source so
+    // the retained frame updates by dirty IDs instead of re-resolving every entry.
+    if (snapshot && !changedNamespace && !hardInvalidation && paletteVersion !== identity.colorVersion) {
+      updateSourceColors(identity);
+    }
     if (sourcePreparation) return false;
     cancel(); // No obsolete producer can accept a tile while preparation waits.
     attempted.clear();
