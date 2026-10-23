@@ -92,7 +92,7 @@ jobs:
             playwright-browsers-${{ runner.os }}-
 
       - name: Install Playwright Chromium
-        if: inputs.profile == 'pr-smoke' || inputs.profile == 'deploy-minimal'
+        if: inputs.profile == 'pr-smoke'
         run: |
           mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
           max_retries=2
@@ -112,48 +112,13 @@ jobs:
         if: inputs.profile == 'deploy-minimal'
         run: python tools/build_pages_dist.py --output-root .runtime/pages-release/dist
 
-      - name: Verify and exercise the Pages artifact
-        id: pages_checks
+      - name: Check the Pages artifact startup shell
         if: inputs.profile == 'deploy-minimal'
         env:
           SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/pages-release/dist
-          PLAYWRIGHT_TEST_BASE_URL: http://127.0.0.1:4173/
-        run: |
-          python -m unittest tests.test_pages_dist_startup_shell -q
-          python -m http.server 4173 --bind 127.0.0.1 --directory .runtime/pages-release/dist > .runtime/pages-release/server.log 2>&1 &
-          server_pid=$!
-          trap 'kill "$server_pid"' EXIT
-          for attempt in {1..30}; do
-            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then break; fi
-            sleep 1
-          done
-          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
-          npm run test:e2e:pages-public-release-gate
-          # Golden flows on the bundled artifact itself: save/reopen and PNG export.
-          node node_modules/@playwright/test/cli.js test tests/e2e/golden --grep 'saved project|exported PNG' --workers=1 --retries=0
-          python tools/pages_artifact_admission.py --artifact-root .runtime/pages-release/dist --run-id github-${{ github.run_id }}-${{ github.run_attempt }} --public-smoke passed --receipt-out .runtime/pages-release/receipt.json --summary-out .runtime/pages-release/summary.json
-
-      - name: Upload Pages artifact failure evidence
-        if: failure() && steps.pages_checks.outcome == 'failure'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: pages-artifact-failure-evidence
-          include-hidden-files: true
-          if-no-files-found: warn
-          retention-days: 7
-          path: |
-            .runtime/pages-release/server.log
-            .runtime/reports/test-timings.ndjson
-            .runtime/reports/generated/failure-context-index.ndjson
-            .runtime/tests/playwright/
-
-      - name: Upload Pages artifact admission
-        if: inputs.profile == 'deploy-minimal'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: deploy-admission
-          path: .runtime/pages-release/receipt.json
-          if-no-files-found: error
+        # The browser gates run against the uploaded artifact in parallel jobs
+        # (deploy.yml release-checks); the admission job writes the receipt after them.
+        run: python -m unittest tests.test_pages_dist_startup_shell -q
 
       - name: Run smoke E2E
         if: inputs.profile == 'pr-smoke'
