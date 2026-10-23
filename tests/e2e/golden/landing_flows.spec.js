@@ -150,6 +150,16 @@ test("a resting history sweep line stays on its map position after a resize", as
   expect(Math.abs((await frontOnMap()).width - before.width)).toBeLessThan(1);
 });
 
+test("rail and cities show only in the context chapter", async ({ page }) => {
+  await openLanding(page);
+  const shown = () => page.evaluate(() => [".map-rail", ".map-cities"].map((selector) => getComputedStyle(document.querySelector(selector)).display !== "none"));
+  expect(await shown()).toEqual([false, false]);
+  await jumpToChapter(page, "context");
+  await expect.poll(shown).toEqual([true, true]);
+  await jumpToChapter(page, "worlds");
+  await expect.poll(shown).toEqual([false, false]);
+});
+
 test("switching to Chinese translates every labelled element", async ({ page }) => {
   await openLanding(page);
   const copy = await readLanding(page);

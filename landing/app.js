@@ -185,7 +185,8 @@ function initStage(data) {
     return layer;
   });
   const railGroup = layerSvg("map-rail");
-  railGroup.hidden = true;
+  // SVG elements have no `hidden` property; the attribute itself has to be toggled.
+  railGroup.setAttribute("hidden", "");
   // Rail arrives as compound paths, main lines first; each draws in along its own length.
   const railPaths = data.rail.map((d, index) => {
     const path = svgEl("path", { d, pathLength: "1", "stroke-dasharray": "1", "stroke-dashoffset": "1" });
@@ -225,7 +226,7 @@ function initStage(data) {
     return layer;
   });
   const cityGroup = layerSvg("map-cities");
-  cityGroup.hidden = true;
+  cityGroup.setAttribute("hidden", "");
   const cities = data.cities.map((city, index) => {
     const group = svgEl("g", { opacity: "0" });
     const radius = 1.6 + Math.sqrt(city.p / 1e6) * 1.4;
@@ -335,8 +336,8 @@ function initStage(data) {
       fadeLayer(layer, context ? 0 : weight);
     });
     fadeLayer(atlantropa, view.mode === "history" ? smooth(clamp01(view.position - 1)) : (view.mode === "worlds" || view.mode === "outro") && view.world === "1962" ? 1 : 0);
-    railGroup.hidden = !context;
-    cityGroup.hidden = !context;
+    railGroup.toggleAttribute("hidden", !context);
+    cityGroup.toggleAttribute("hidden", !context);
   }
 
   // Rail and cities reveal once when the context chapter opens. Scroll-scrubbing them
