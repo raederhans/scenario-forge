@@ -23,6 +23,7 @@
 .editor-brand { color: var(--text-primary); text-decoration: none; font-weight: 700; white-space: nowrap; font-size: 14px; }
 .editor-project-actions { display: flex; gap: 8px; align-items: center; margin-left: auto; }
 .editor-project-bar button { min-height: 34px; font-size: var(--editor-control-size); white-space: nowrap; }
+.editor-project-bar #workspaceGithubLink { width: auto; min-height: 34px; padding: 6px 14px; font-size: var(--editor-control-size); white-space: nowrap; text-decoration: none; }
 .editor-project-bar #inspectorSidebarTabProject { flex: 0 0 auto; width: auto; padding: 6px 14px; }
 .editor-project-bar #inspectorSidebarTabProject[aria-pressed="true"] { color: #185f8b; background: #e0eef8; }
 .editor-workspace .editor-retired-shell { display: none !important; }
@@ -233,6 +234,8 @@
   .editor-project-actions { gap: 4px; }
   .editor-project-bar button { font-size: 12px; padding: 6px; }
   .editor-project-bar #scenarioGuideBtn { display: none; }
+  .editor-project-bar #workspaceGithubLink { padding: 6px 8px; }
+  .editor-project-bar #workspaceGithubLink span { display: none; }
   .editor-project-bar .editor-scenario-menu > summary { padding: 8px 5px; font-size: 12px; }
   .editor-workspace .bottom-dock-primary { flex-wrap: wrap; justify-content: center; }
 }
@@ -253,4 +256,9 @@
   width: 40px;
   height: 32px;
   padding: 2px;
+}
+
+/* Phone-width bars already overflow; keep the GitHub link from adding to it. */
+@media (max-width: 480px) {
+  .editor-project-bar #workspaceGithubLink { display: none; }
 }

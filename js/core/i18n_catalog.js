@@ -151,6 +151,8 @@ export const UI_COPY_CATALOG = Object.freeze({
 
   "Save project": { zh: "保存项目", en: "Save project" },
   "Export image": { zh: "导出图片", en: "Export image" },
+  "Star on GitHub": { zh: "在 GitHub 点 Star", en: "Star on GitHub" },
+  "Star Scenario Forge on GitHub": { zh: "在 GitHub 为 Scenario Forge 点 Star", en: "Star Scenario Forge on GitHub" },
   "Not saved yet": { zh: "尚未保存", en: "Not saved yet" },
   "Unsaved changes": { zh: "有未保存的修改", en: "Unsaved changes" },
   "Project downloaded": { zh: "项目已下载", en: "Project downloaded" },

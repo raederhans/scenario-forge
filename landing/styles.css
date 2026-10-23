@@ -56,6 +56,8 @@ h1, h2 { font-weight: 400; }
 .nav__products a:hover { color: var(--paper); background: rgba(239, 231, 214, .08); }
 .nav__lang { font: 500 .78rem var(--font-mono); color: var(--paper-dim); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; cursor: pointer; }
 .nav__lang:hover { color: var(--paper); }
+.nav__github { display: inline-flex; align-items: center; gap: 7px; font-size: .8rem; color: var(--paper-dim); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 7px 13px; }
+.nav__github:hover { color: var(--paper); border-color: var(--paper-dim); }
 
 /* ---------- The stage ---------- */
 .story { position: relative; --border: #0b100f; --coast: rgba(239, 231, 214, .32); --label: rgba(250, 245, 234, .92); --halo: rgba(8, 12, 11, .55); --sea-light: 0; }
@@ -275,7 +277,8 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
 
 @media (max-width: 760px) {
   .nav { gap: 10px; }
-  .nav__brand span, .nav__cta { display: none; }
+  .nav__brand span, .nav__cta, .nav__github span { display: none; }
+  .nav__github { padding: 8px; }
   .nav__products a { padding: 6px 10px; }
   .stage-mark--tr, .hgo__readout { display: none; }
   .stage__vignette { background: linear-gradient(0deg, rgba(8, 12, 11, .95) 0%, rgba(8, 12, 11, .5) 45%, rgba(8, 12, 11, .05) 75%); }
