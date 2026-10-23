@@ -15,6 +15,7 @@ import {
   setActivePaletteSource,
 } from "../../core/palette_manager.js";
 import { t } from "../i18n.js";
+import { createDeferredPanelRender } from "./deferred_panel_render.js";
 const state = runtimeState;
 
 function selectPalettePaintColor(appState, rawColor) {
@@ -249,6 +250,12 @@ function createPaletteLibraryPanelController({
   let activeRowKey = "";
   let paletteSourceRequest = 0;
   let paletteLibraryGroupingControls = null;
+  // Recent-color updates rebuild the library after paint, or once it is shown.
+  // Every direct rebuild (toggle, search, grouping, source) marks it fresh.
+  const deferredPaletteLibraryRender = createDeferredPanelRender({
+    render: renderPaletteLibrary,
+    element: paletteLibraryList,
+  });
 
   const ensurePaletteLibrarySectionState = (sourceId) => {
     const key = String(sourceId || "legacy").trim() || "legacy";
@@ -643,6 +650,7 @@ function createPaletteLibraryPanelController({
 
   function renderPaletteLibrary() {
     if (!paletteLibraryList) return;
+    deferredPaletteLibraryRender.markFresh();
 
     const searchTerm = String(runtimeState.paletteLibrarySearch || "").trim().toLowerCase();
     paletteLibrarySearchClear?.classList.toggle("hidden", !searchTerm);
@@ -835,6 +843,7 @@ function createPaletteLibraryPanelController({
     handlePaletteSourceChange,
     handleResize,
     renderPaletteLibrary,
+    requestPaletteLibraryRender: () => deferredPaletteLibraryRender.request(),
     syncPaletteSourceControls,
     syncPanelVisibility,
   };

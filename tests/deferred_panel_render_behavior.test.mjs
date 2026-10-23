@@ -80,6 +80,22 @@ test("a panel hidden after the request was queued skips the rebuild until shown"
   assert.deepEqual(h.log, ["frame", "frame", "render"]);
 });
 
+test("a direct rebuild while stale cancels the queued and on-show rebuilds", () => {
+  const h = harness();
+  h.panel.request();
+  h.panel.markFresh();
+  h.runFrames();
+  h.runTimers();
+  assert.equal(h.log.includes("render"), false, "the queued rebuild is skipped");
+  h.setVisible(false);
+  h.panel.request();
+  h.panel.markFresh();
+  h.setVisible(true);
+  h.runFrames();
+  h.runTimers();
+  assert.equal(h.log.includes("render"), false, "showing an up-to-date panel does not rebuild it");
+});
+
 test("without frame or timer APIs the rebuild runs synchronously", () => {
   const log = [];
   const panel = createDeferredPanelRender({ render: () => log.push("render"), requestFrame: null, setTimer: null, ObserverClass: null });

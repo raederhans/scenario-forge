@@ -10,7 +10,6 @@ import { createRiverCellPicker } from "./river_cell_picker.js";
 import { getEditedRiverParentIds } from "../core/river_paint/partition_model.js";
 import { clearAllRiverPaintOverridesState } from "../core/state/actions/river_paint_actions.js";
 import { normalizePaintMode } from "../core/map_editing_policy.js";
-import { createDeferredPanelRender } from "./toolbar/deferred_panel_render.js";
 // Toolbar UI (Phase 13)
 import {
   state as runtimeState,
@@ -1619,6 +1618,7 @@ function initToolbar({ render } = {}) {
     handlePaletteSourceChange,
     handleResize: handlePaletteLibraryResize,
     renderPaletteLibrary,
+    requestPaletteLibraryRender,
     syncPaletteSourceControls,
     syncPanelVisibility: syncPaletteLibraryPanelVisibility,
   } = paletteLibraryPanelController;
@@ -1728,13 +1728,9 @@ function initToolbar({ render } = {}) {
   // Recent colors feed only the recent strip and the library's recent group.
   // The full library rebuild waits until after the paint input's frame, and while
   // the library is hidden it waits until the library is shown.
-  const recentPaletteLibraryRender = createDeferredPanelRender({
-    render: renderPaletteLibrary,
-    element: paletteLibraryList,
-  });
   registerRuntimeHook(state, "updateRecentUI", () => {
     renderRecentColors();
-    recentPaletteLibraryRender.request();
+    requestPaletteLibraryRender();
   });
   registerRuntimeHook(state, "updateParentBorderCountryListFn", renderParentBorderCountryList);
 

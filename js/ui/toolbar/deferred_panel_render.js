@@ -51,6 +51,10 @@ export function createDeferredPanelRender({
       stale = true;
       if (visible) schedule();
     },
+    // The panel was rebuilt by some other path; a queued or on-show rebuild is not needed.
+    markFresh() {
+      stale = false;
+    },
     dispose() {
       observer?.disconnect();
       observer = null;
