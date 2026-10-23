@@ -50,13 +50,16 @@ jobs:
 
   pr-golden:
     # Golden user flows (tests/e2e/golden): the behavior safety net for the rewrite.
+    # Each editor flow cold-starts the app (~1 min on CI), so they are sharded per
+    # test; file-level sharding put every editor flow on one shard. The landing
+    # flows take seconds and run on their own.
     name: pr-golden (${{ matrix.shard }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        shard: ["1/2", "2/2"]
+        shard: ["1/4", "2/4", "3/4", "4/4", "landing"]
     env:
       PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
     steps:
@@ -87,7 +90,16 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install chromium
       - name: Run golden flows
-        run: node node_modules/@playwright/test/cli.js test tests/e2e/golden --shard=${{ matrix.shard }} --workers=1
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          # --grep/--grep-invert match the full title path, which includes the file name.
+          if [ "$SHARD" = "landing" ]; then
+            set -- --grep 'landing_flows\.spec'
+          else
+            set -- --grep-invert 'landing_flows\.spec' --fully-parallel --shard="$SHARD"
+          fi
+          node node_modules/@playwright/test/cli.js test tests/e2e/golden "$@" --workers=1
       - name: Upload golden failure context
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
