@@ -114,6 +114,15 @@ function initStage(data) {
   // While colours are moving, the seam-hiding stroke is skipped: stroking 150 complex
   // shapes doubled the canvas cost per frame, and hairline seams are invisible in motion.
   let inMotion = false;
+  let motionSettle = 0;
+  function markMotion() {
+    inMotion = true;
+    clearTimeout(motionSettle);
+    motionSettle = setTimeout(() => {
+      inMotion = false;
+      queueDraw();
+    }, 160);
+  }
   function drawFills() {
     drawQueued = false;
     const { k, ox, oy, scale } = fit;
@@ -285,7 +294,9 @@ function initStage(data) {
   function renderHistory() {
     const segment = Math.min(Math.floor(view.position), 1);
     const f = view.position - segment;
-    inMotion = f > 0.001 && f < 0.999;
+    // Seams are re-stroked once the scrubber stops, even between two dated stops.
+    if (f > 0.001 && f < 0.999) markMotion();
+    else inMotion = false;
     for (const atom of atoms) {
       const local = smooth(clamp01((f - atom.x * 0.35) / 0.65));
       paintAtom(atom, lerpRgb(atom.colors[segment], atom.colors[segment + 1], local));
@@ -880,17 +891,24 @@ async function initHgo() {
     gliding = shown !== target;
     if (gliding) requestAnimationFrame(glide);
   };
+  let renderedSize = "";
   return () => {
     const rect = section.getBoundingClientRect();
     target = clamp01(-rect.top / Math.max(1, rect.height - innerHeight));
+    // The camera's scale and anchor come from the stage size, so a resize redraws it
+    // even when the scroll progress has not moved.
+    const size = `${stage.clientWidth}x${stage.clientHeight}`;
+    const resized = size !== renderedSize;
+    renderedSize = size;
     // Off screen (or a jump past it), the camera snaps: nobody should see it glide in.
     const offscreen = rect.bottom < 0 || rect.top > innerHeight;
     if (shown === null || reducedMotion || offscreen) {
-      if (shown === target) return;
+      if (shown === target && !resized) return;
       shown = target;
       render(shown);
       return;
     }
+    if (resized && !gliding) render(shown);
     if (!gliding && shown !== target) {
       gliding = true;
       last = performance.now();
