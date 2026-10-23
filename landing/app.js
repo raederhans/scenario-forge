@@ -15,6 +15,10 @@ const svgEl = (name, attributes = {}) => {
   for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
   return node;
 };
+// Replacing a text node, even with the same text, invalidates layout; skip unchanged writes.
+const setText = (node, text) => {
+  if (node.textContent !== text) node.textContent = text;
+};
 const boxesOverlap = (a, b) => a.x < b.r && a.r > b.x && a.y < b.b && a.b > b.y;
 const toBox = (rect, padX, padY) => ({ x: rect.left - padX, y: rect.top - padY, r: rect.right + padX, b: rect.bottom + padY });
 
@@ -34,6 +38,7 @@ function applyLanguage(next) {
   document.documentElement.lang = next === "zh" ? "zh-CN" : "en";
   for (const node of document.querySelectorAll("[data-i18n]")) node.textContent = strings[node.dataset.i18n];
   for (const node of document.querySelectorAll("[data-i18n-aria-label]")) node.setAttribute("aria-label", strings[node.dataset.i18nAriaLabel]);
+  for (const node of document.querySelectorAll("[data-i18n-alt]")) node.setAttribute("alt", strings[node.dataset.i18nAlt]);
   for (const node of document.querySelectorAll("[data-i18n-list]")) {
     node.replaceChildren(...strings[node.dataset.i18nList].split("|").map((item) => Object.assign(document.createElement("li"), { textContent: item })));
   }
@@ -56,6 +61,12 @@ const INK_RGB = hexToRgb("#141c19");
 const WORLD_STATE = { blank: null, modern: 3, 1936: 0, 1939: 1, 1962: 2 };
 const STYLES = ["game", "atlas", "ink"];
 const WORLDS = ["blank", "modern", "1936", "1939", "1962"];
+// Width of the recolour sweep line, in viewBox units.
+const FRONT_WIDTH = 120;
+// Timed effects stay well under the time a reader takes to scroll through a chapter,
+// so a change has landed before the next one starts.
+const TIMING = { recolour: 800, recolourFromHistory: 700, style: 700, paint: 450, reset: 600, reveal: 1300, settle: 950 };
+
 // Camera per chapter: a pan in viewBox units, never a zoom. A pure translation is
 // composited on the GPU; animating scale re-rasterized the whole map every frame.
 const CAMERAS = {
@@ -94,11 +105,24 @@ function initStage(data) {
     fit.k = Math.max(width / data.width, height / data.height);
     fit.ox = (width - data.width * fit.k) / 2;
     fit.oy = (height - data.height * fit.k) / 2;
+    placeFront();
     canvas.width = Math.round(width * fit.scale);
     canvas.height = Math.round(height * fit.scale);
     drawFills();
   }
   let drawQueued = false;
+  // While colours are moving, the seam-hiding stroke is skipped: stroking 150 complex
+  // shapes doubled the canvas cost per frame, and hairline seams are invisible in motion.
+  let inMotion = false;
+  let motionSettle = 0;
+  function markMotion() {
+    inMotion = true;
+    clearTimeout(motionSettle);
+    motionSettle = setTimeout(() => {
+      inMotion = false;
+      queueDraw();
+    }, 160);
+  }
   function drawFills() {
     drawQueued = false;
     const { k, ox, oy, scale } = fit;
@@ -115,7 +139,7 @@ function initStage(data) {
       context2d.fillStyle = color;
       context2d.strokeStyle = color;
       context2d.fill(atom.path);
-      context2d.stroke(atom.path);
+      if (!inMotion) context2d.stroke(atom.path);
     }
   }
   const queueDraw = () => {
@@ -136,7 +160,18 @@ function initStage(data) {
     }
     return null;
   }
-  const atlantropa = svg.querySelector("[data-atlantropa]");
+  // Every group whose opacity moves on its own gets its own SVG, and so its own
+  // compositor layer: fading one never repaints the thousands of paths around it.
+  function layerSvg(className, before = null) {
+    const layer = svgEl("svg", {
+      class: `stage__map stage__layer ${className}`,
+      viewBox: svg.getAttribute("viewBox"),
+      preserveAspectRatio: svg.getAttribute("preserveAspectRatio"),
+      "aria-hidden": "true",
+    });
+    return lens.insertBefore(layer, before);
+  }
+  const atlantropa = layerSvg("map-atlantropa", svg);
   // Atlantropa: sea and shoals keep their own look; reclaimed land takes its 1962 owner's colour.
   for (const layer of ["water", "shoal"]) {
     if (data.atlantropa[layer]) atlantropa.append(svgEl("path", { class: layer, "fill-rule": "evenodd", d: data.atlantropa[layer] }));
@@ -144,24 +179,54 @@ function initStage(data) {
   for (const land of data.atlantropa.land) {
     atlantropa.append(svgEl("path", { class: "land", "fill-rule": "evenodd", d: land.d, fill: land.c, stroke: land.c }));
   }
-  const borderLayers = data.borders.map((d) => svg.querySelector("[data-borders]").appendChild(svgEl("path", { d })));
-  const labelLayers = data.labels.map((labels) => {
-    const group = svgEl("g");
-    for (const label of labels) {
-      const text = svgEl("text", { x: label.x, y: label.y, "font-size": (label.s * 0.7).toFixed(1) });
-      Object.assign(text.dataset, { en: label.t, zh: label.z });
-      group.append(text);
-    }
-    return svg.querySelector("[data-labels]").appendChild(group);
+  const borderLayers = data.borders.map((d) => {
+    const layer = layerSvg("map-borders");
+    layer.append(svgEl("path", { d }));
+    return layer;
   });
-  const railGroup = svg.querySelector("[data-rail]");
+  const railGroup = layerSvg("map-rail");
+  // SVG elements have no `hidden` property; the attribute itself has to be toggled.
+  railGroup.setAttribute("hidden", "");
   // Rail arrives as compound paths, main lines first; each draws in along its own length.
   const railPaths = data.rail.map((d, index) => {
     const path = svgEl("path", { d, pathLength: "1", "stroke-dasharray": "1", "stroke-dashoffset": "1" });
     path.style.strokeWidth = Math.max(0.5, 1.5 - index * 0.09).toFixed(2);
     return railGroup.appendChild(path);
   });
-  const cityGroup = svg.querySelector("[data-cities]");
+  // The sweep line is an HTML layer moved by transform, not an SVG rect: moving the
+  // rect invalidated the whole map SVG on every frame of every recolour.
+  const front = lens.appendChild(Object.assign(document.createElement("div"), { className: "stage__front" }));
+  front.dataset.front = "";
+  let frontShown = false;
+  // The sweep's left edge in viewBox units; kept so a resize can re-place it.
+  let frontX = 0;
+  function placeFront() {
+    front.style.width = `${(FRONT_WIDTH * fit.k).toFixed(1)}px`;
+    front.style.transform = `translate3d(${(fit.ox + frontX * fit.k).toFixed(1)}px, 0, 0)`;
+  }
+  // x is the sweep's left edge in viewBox units; FRONT_WIDTH units wide.
+  function setFront(x, opacity) {
+    if (opacity <= 0) {
+      if (frontShown) front.style.opacity = "0";
+      frontShown = false;
+      return;
+    }
+    frontShown = true;
+    frontX = x;
+    front.style.opacity = opacity.toFixed(3);
+    placeFront();
+  }
+  const labelLayers = data.labels.map((labels) => {
+    const layer = layerSvg("map-labels");
+    for (const label of labels) {
+      const text = svgEl("text", { x: label.x, y: label.y, "font-size": (label.s * 0.7).toFixed(1) });
+      Object.assign(text.dataset, { en: label.t, zh: label.z });
+      layer.append(text);
+    }
+    return layer;
+  });
+  const cityGroup = layerSvg("map-cities");
+  cityGroup.setAttribute("hidden", "");
   const cities = data.cities.map((city, index) => {
     const group = svgEl("g", { opacity: "0" });
     const radius = 1.6 + Math.sqrt(city.p / 1e6) * 1.4;
@@ -173,7 +238,6 @@ function initStage(data) {
     return cityGroup.appendChild(group);
   });
 
-  const front = svg.querySelector("[data-front]");
   const numeral = stage.querySelector("[data-year-numeral]");
   const family = stage.querySelector("[data-state-family]");
   const date = stage.querySelector("[data-state-date]");
@@ -209,14 +273,15 @@ function initStage(data) {
   }
 
   let sweep = null;
-  function retarget(duration = 1300) {
+  function retarget(duration = TIMING.recolour) {
     for (const atom of atoms) {
       atom.from = atom.shown;
       atom.to = targetRgb(atom);
     }
     if (reducedMotion || duration === 0) {
+      inMotion = false;
       atoms.forEach((atom) => paintAtom(atom, atom.to));
-      front.setAttribute("opacity", "0");
+      setFront(0, 0);
       sweep = null;
       return;
     }
@@ -225,9 +290,9 @@ function initStage(data) {
     const step = (now) => {
       if (sweep !== token) return;
       const t = clamp01((now - start) / duration);
+      inMotion = t < 1;
       for (const atom of atoms) paintAtom(atom, lerpRgb(atom.from, atom.to, smooth(clamp01((t - atom.x * 0.3) / 0.7))));
-      front.setAttribute("x", ((t - 0.35) / 0.3) * data.width - 60);
-      front.setAttribute("opacity", t < 1 && view.mode === "worlds" ? Math.sin(Math.PI * t).toFixed(3) : "0");
+      setFront(((t - 0.35) / 0.3) * data.width - FRONT_WIDTH / 2, t < 1 && view.mode === "worlds" ? Math.sin(Math.PI * t) : 0);
       if (t < 1) requestAnimationFrame(step);
       else sweep = null;
     };
@@ -237,12 +302,14 @@ function initStage(data) {
   function renderHistory() {
     const segment = Math.min(Math.floor(view.position), 1);
     const f = view.position - segment;
+    // Seams are re-stroked once the scrubber stops, even between two dated stops.
+    if (f > 0.001 && f < 0.999) markMotion();
+    else inMotion = false;
     for (const atom of atoms) {
       const local = smooth(clamp01((f - atom.x * 0.35) / 0.65));
       paintAtom(atom, lerpRgb(atom.colors[segment], atom.colors[segment + 1], local));
     }
-    front.setAttribute("x", ((f - 0.325) / 0.35) * data.width - 60);
-    front.setAttribute("opacity", f > 0.001 && f < 0.999 ? Math.sin(Math.PI * f).toFixed(3) : "0");
+    setFront(((f - 0.325) / 0.35) * data.width - FRONT_WIDTH / 2, f > 0.001 && f < 0.999 ? Math.sin(Math.PI * f) : 0);
   }
 
   /* Borders, labels, Atlantropa, rail and cities follow the visible state. */
@@ -254,18 +321,23 @@ function initStage(data) {
     }
     return [1, 0, 0, 0];
   }
+  // A layer at zero is also hidden, so the compositor stops drawing it (the CSS keeps
+  // it visible until its fade-out has finished).
+  function fadeLayer(layer, opacity) {
+    layer.style.opacity = opacity.toFixed(3);
+    layer.style.visibility = opacity > 0 ? "visible" : "hidden";
+  }
   function renderOverlays() {
     const weights = stateWeights();
     const context = view.mode === "context";
-    borderLayers.forEach((layer, index) => { layer.style.opacity = (weights[index] * (context ? 0.45 : 1)).toFixed(3); });
+    borderLayers.forEach((layer, index) => fadeLayer(layer, weights[index] * (context ? 0.45 : 1)));
     labelLayers.forEach((layer, index) => {
       const weight = view.mode === "history" ? clamp01(1 - Math.abs(view.position - index) * 2.4) : weights[index];
-      layer.style.opacity = context ? "0" : weight.toFixed(3);
+      fadeLayer(layer, context ? 0 : weight);
     });
-    const atlantropaShown = view.mode === "history" ? smooth(clamp01(view.position - 1)) : (view.mode === "worlds" || view.mode === "outro") && view.world === "1962" ? 1 : 0;
-    atlantropa.style.opacity = atlantropaShown.toFixed(3);
-    railGroup.hidden = !context;
-    cityGroup.hidden = !context;
+    fadeLayer(atlantropa, view.mode === "history" ? smooth(clamp01(view.position - 1)) : (view.mode === "worlds" || view.mode === "outro") && view.world === "1962" ? 1 : 0);
+    railGroup.toggleAttribute("hidden", !context);
+    cityGroup.toggleAttribute("hidden", !context);
   }
 
   // Rail and cities reveal once when the context chapter opens. Scroll-scrubbing them
@@ -289,7 +361,7 @@ function initStage(data) {
     const token = (reveal = {});
     const step = (now) => {
       if (reveal !== token) return;
-      const t = clamp01((now - start) / 2200);
+      const t = clamp01((now - start) / TIMING.reveal);
       renderReveal(smooth(t));
       if (t < 1 && view.mode === "context") requestAnimationFrame(step);
     };
@@ -302,17 +374,17 @@ function initStage(data) {
     if (view.mode === "history") {
       const segment = Math.min(Math.floor(view.position), 1);
       const f = view.position - segment;
-      numeral.textContent = Math.round(scrubYears[segment] + (scrubYears[segment + 1] - scrubYears[segment]) * smooth(f));
+      setText(numeral, String(Math.round(scrubYears[segment] + (scrubYears[segment + 1] - scrubYears[segment]) * smooth(f))));
       numeral.style.opacity = "";
       stateId = data.states[Math.round(view.position)].id;
     } else if (view.mode === "worlds" || view.mode === "outro") {
       stateId = view.world;
-      numeral.textContent = /^\d+$/.test(view.world) ? view.world : "";
+      setText(numeral, /^\d+$/.test(view.world) ? view.world : "");
     } else {
       stateId = "1936";
     }
-    family.textContent = strings.stateNames[stateId];
-    date.textContent = strings.stateDates[stateId];
+    setText(family, strings.stateNames[stateId]);
+    setText(date, strings.stateDates[stateId]);
   }
 
   function render() {
@@ -379,11 +451,11 @@ function initStage(data) {
       setCamera();
       // History draws its own colours from the scrubber; drop any recolour still in flight.
       if (mode === "history") sweep = null;
-      else retarget(fromHistory ? 900 : 1300);
+      else retarget(fromHistory ? TIMING.recolourFromHistory : TIMING.recolour);
       if (mode === "context") startReveal();
       render();
       // Labels are measured after the camera settles.
-      scheduleDeclutter(reducedMotion ? 0 : 1450);
+      scheduleDeclutter(reducedMotion ? 0 : TIMING.settle);
       document.dispatchEvent(new CustomEvent("landing:mode", { detail: mode }));
     },
     setStyle(style) {
@@ -391,13 +463,13 @@ function initStage(data) {
       view.style = style;
       if (view.mode !== "style") return;
       story.dataset.style = style;
-      retarget(1100);
+      retarget(TIMING.style);
     },
     setWorld(world) {
       if (world === view.world) return;
       view.world = world;
       if (view.mode === "worlds" || view.mode === "outro") {
-        retarget(1300);
+        retarget(TIMING.recolour);
         render();
       }
     },
@@ -410,7 +482,7 @@ function initStage(data) {
       if (before === colour) return false;
       paintHistory.push({ tag, before });
       painted.set(tag, colour);
-      retarget(450);
+      retarget(TIMING.paint);
       return true;
     },
     undo() {
@@ -418,12 +490,12 @@ function initStage(data) {
       if (!last) return;
       if (last.before) painted.set(last.tag, last.before);
       else painted.delete(last.tag);
-      retarget(450);
+      retarget(TIMING.paint);
     },
     reset() {
       painted.clear();
       paintHistory.length = 0;
-      retarget(700);
+      retarget(TIMING.reset);
     },
     paintedCount: () => painted.size,
     canUndo: () => paintHistory.length > 0,
@@ -762,22 +834,21 @@ async function initHgo() {
   placeImage(section.querySelector("[data-hgo-detail]"), detail.src, detail);
   const centre = { x: detail.x + detail.width / 2, y: detail.y + detail.height / 2 };
 
-  // Native-pixel keyframes: world, the detail crop, the focus at pixel scale,
-  // then a pull back so the plate hands over instead of cutting away at ×16.
+  // Native-pixel keyframes: the whole world, a slow push into Europe, then far enough
+  // in that the mod's own pixels show. Holds give each caption time to be read, and the
+  // plate ends on the pixels and fades out rather than snapping back.
   function keyframes(width, height) {
     const narrow = width < 760;
     const fit = Math.max(width / native.width, height / native.height) * (narrow ? 1.6 : 1.05);
     const detailScale = (width * (narrow ? 1.25 : 0.62)) / detail.width;
     const world = { s: fit, x: narrow ? centre.x : native.width / 2, y: narrow ? centre.y + 140 : native.height * 0.46 };
     const crop = { s: detailScale, x: centre.x, y: centre.y };
-    const pixel = { s: narrow ? 11 : 16, x: focus.x, y: focus.y };
+    const pixel = { s: narrow ? 6 : 8, x: focus.x, y: focus.y };
     return [
-      { at: 0.06, ...world },
-      { at: 0.34, ...crop },
+      { at: 0.08, ...world },
       { at: 0.42, ...crop },
-      { at: 0.68, ...pixel },
-      { at: 0.76, ...pixel },
-      { at: 0.97, ...crop, s: detailScale * 0.8 },
+      { at: 0.52, ...crop },
+      { at: 0.8, ...pixel },
     ];
   }
   function cameraAt(progress, frames) {
@@ -795,24 +866,62 @@ async function initHgo() {
     return frames[frames.length - 1];
   }
 
-  return () => {
+  function render(progress) {
     const width = stage.clientWidth;
     const height = stage.clientHeight;
-    const rect = section.getBoundingClientRect();
-    const progress = clamp01(-rect.top / Math.max(1, rect.height - innerHeight));
     const view = cameraAt(progress, keyframes(width, height));
     const anchorX = width * (width < 760 ? 0.5 : 0.64);
     const anchorY = height * (width < 760 ? 0.34 : 0.5);
     camera.style.transform = `translate(${anchorX - view.x * view.s}px, ${anchorY - view.y * view.s}px) scale(${view.s})`;
     section.dataset.detail = view.s > 0.5 ? "on" : "off";
-    veil.style.opacity = progress < 0.07 ? (1 - progress / 0.07).toFixed(3) : progress > 0.86 ? ((progress - 0.86) / 0.14).toFixed(3) : "0";
-    steps.forEach((step, index) => step.classList.toggle("is-active", index === (progress < 0.46 ? 0 : 1)));
-    const counted = reducedMotion ? 1 : smooth(clamp01((progress - 0.06) / 0.3));
+    veil.style.opacity = progress < 0.08 ? (1 - progress / 0.08).toFixed(3) : progress > 0.9 ? ((progress - 0.9) / 0.1).toFixed(3) : "0";
+    steps.forEach((step, index) => step.classList.toggle("is-active", index === (progress < 0.5 ? 0 : 1)));
+    const counted = reducedMotion ? 1 : smooth(clamp01((progress - 0.08) / 0.34));
     const formatter = new Intl.NumberFormat(language === "zh" ? "zh-CN" : "en-US");
-    counters.forEach((node) => { node.textContent = formatter.format(Math.round(meta.counts[node.dataset.count] * counted)); });
-    zoomOut.textContent = `×${view.s < 1 ? view.s.toFixed(2) : view.s.toFixed(1)}`;
-    pxOut.textContent = Math.round(view.x);
-    pyOut.textContent = Math.round(view.y);
+    counters.forEach((node) => setText(node, formatter.format(Math.round(meta.counts[node.dataset.count] * counted))));
+    setText(zoomOut, `×${view.s < 1 ? view.s.toFixed(2) : view.s.toFixed(1)}`);
+    setText(pxOut, String(Math.round(view.x)));
+    setText(pyOut, String(Math.round(view.y)));
+  }
+
+  // The camera follows the scroll position through a short exponential ease, so each
+  // wheel notch becomes a glide instead of a jump in zoom.
+  let shown = null;
+  let target = 0;
+  let last = 0;
+  let gliding = false;
+  const glide = (now) => {
+    const dt = Math.min(64, now - last);
+    last = now;
+    shown += (target - shown) * (1 - Math.exp(-dt / 140));
+    if (Math.abs(target - shown) < 0.0005) shown = target;
+    render(shown);
+    gliding = shown !== target;
+    if (gliding) requestAnimationFrame(glide);
+  };
+  let renderedSize = "";
+  return () => {
+    const rect = section.getBoundingClientRect();
+    target = clamp01(-rect.top / Math.max(1, rect.height - innerHeight));
+    // The camera's scale and anchor come from the stage size, so a resize redraws it
+    // even when the scroll progress has not moved.
+    const size = `${stage.clientWidth}x${stage.clientHeight}`;
+    const resized = size !== renderedSize;
+    renderedSize = size;
+    // Off screen (or a jump past it), the camera snaps: nobody should see it glide in.
+    const offscreen = rect.bottom < 0 || rect.top > innerHeight;
+    if (shown === null || reducedMotion || offscreen) {
+      if (shown === target && !resized) return;
+      shown = target;
+      render(shown);
+      return;
+    }
+    if (resized && !gliding) render(shown);
+    if (!gliding && shown !== target) {
+      gliding = true;
+      last = performance.now();
+      requestAnimationFrame(glide);
+    }
   };
 }
 

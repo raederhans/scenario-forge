@@ -51,25 +51,13 @@
           <canvas class="stage__fills" data-fills aria-hidden="true"></canvas>
           <svg class="stage__map" data-map viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Political map of Europe, redrawn as you scroll" data-i18n-aria-label="mapLabel">
             <defs>
-              <linearGradient id="front" x1="0" x2="1">
-                <stop offset="0" stop-color="#e0a66a" stop-opacity="0" />
-                <stop offset=".5" stop-color="#f1c48d" stop-opacity=".7" />
-                <stop offset="1" stop-color="#e0a66a" stop-opacity="0" />
-              </linearGradient>
               <radialGradient id="cityGlow">
                 <stop offset="0" stop-color="#f3c690" stop-opacity=".55" />
                 <stop offset="1" stop-color="#f3c690" stop-opacity="0" />
               </radialGradient>
             </defs>
-            <g class="stage__camera" data-camera>
-              <g class="map-atlantropa" data-atlantropa></g>
-              <path class="map-coast" data-coast />
-              <g class="map-borders" data-borders></g>
-              <g class="map-rail" data-rail hidden></g>
-              <rect class="stage__front" data-front x="-60" y="0" width="120" height="1000" fill="url(#front)" />
-              <g class="map-labels" data-labels></g>
-              <g class="map-cities" data-cities hidden></g>
-            </g>
+            <!-- Atlantropa, borders, labels, rail and cities are added as their own SVG layers by app.js. -->
+            <path class="map-coast" data-coast />
           </svg>
           </div>
           <div class="stage__vignette" aria-hidden="true"></div>
@@ -214,27 +202,32 @@
       </section>
 
       <section id="faq" class="closing">
-        <div class="closing__faq" data-reveal>
-          <h2 data-i18n="faqTitle">Good to know.</h2>
-          <details open>
-            <summary data-i18n="faqOneQuestion">Do I need to install anything?</summary>
-            <p data-i18n="faqOneAnswer">No. Both editors run in a modern browser, and your projects are saved as files on your own computer.</p>
-          </details>
-          <details>
-            <summary data-i18n="faqTwoQuestion">How are the two editors different?</summary>
-            <p data-i18n="faqTwoAnswer">Scenario Forge edits vector political maps across five starting worlds, with everything above. HGO Atlas edits one mod's native pixel map, state by state. Each has its own project files.</p>
-          </details>
-          <details>
-            <summary data-i18n="faqThreeQuestion">Can I share the maps I make?</summary>
-            <p><span data-i18n="faqThreeAnswer">Yes. The code is MIT-licensed; map data comes from sources such as Natural Earth, geoBoundaries and OpenStreetMap, which keep their own terms.</span>
-              <a href="https://github.com/raederhans/scenario-forge/blob/main/data/source_ledger.json" target="_blank" rel="noreferrer" data-i18n="faqSourcesLink">See all data sources</a></p>
-          </details>
-        </div>
-        <div class="closing__cta" data-reveal>
-          <h2 data-i18n="ctaTitle">Your next world is waiting.</h2>
-          <div class="actions">
-            <a class="btn btn--copper" href="./app/?view=guide" data-i18n="ctaPrimary">Start creating</a>
-            <a class="btn btn--ghost" href="https://github.com/raederhans/scenario-forge" target="_blank" rel="noreferrer" data-i18n="ctaGithub">View on GitHub</a>
+        <div class="closing__inner">
+          <div class="closing__lead" data-reveal>
+            <h2 data-i18n="ctaTitle">Your next world is waiting.</h2>
+            <div class="actions">
+              <a class="btn btn--copper" href="./app/?view=guide" data-i18n="ctaPrimary">Start creating</a>
+              <a class="btn btn--ghost" href="https://github.com/raederhans/scenario-forge" target="_blank" rel="noreferrer" data-i18n="ctaGithub">View on GitHub</a>
+            </div>
+          </div>
+          <figure class="closing__window" data-reveal>
+            <img src="./assets/product-workspace.webp" width="3200" height="1800" loading="lazy" decoding="async" alt="The Scenario Forge editor: TNO 1962 Europe with the colour library and paint tools" data-i18n-alt="ctaShotAlt" />
+          </figure>
+          <div class="closing__faq" data-reveal>
+            <h2 data-i18n="faqTitle">Good to know.</h2>
+            <article>
+              <h3 data-i18n="faqOneQuestion">Do I need to install anything?</h3>
+              <p data-i18n="faqOneAnswer">No. Both editors run in a modern browser, and your projects are saved as files on your own computer.</p>
+            </article>
+            <article>
+              <h3 data-i18n="faqTwoQuestion">How are the two editors different?</h3>
+              <p data-i18n="faqTwoAnswer">Scenario Forge edits vector political maps across five starting worlds, with everything above. HGO Atlas edits one mod's native pixel map, state by state. Each has its own project files.</p>
+            </article>
+            <article>
+              <h3 data-i18n="faqThreeQuestion">Can I share the maps I make?</h3>
+              <p><span data-i18n="faqThreeAnswer">Yes. The code is MIT-licensed; map data comes from sources such as Natural Earth, geoBoundaries and OpenStreetMap, which keep their own terms.</span>
+                <a href="https://github.com/raederhans/scenario-forge/blob/main/data/source_ledger.json" target="_blank" rel="noreferrer" data-i18n="faqSourcesLink">See all data sources</a></p>
+            </article>
           </div>
         </div>
       </section>

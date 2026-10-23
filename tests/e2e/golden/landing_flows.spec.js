@@ -121,10 +121,43 @@ test("with reduced motion the history sweep line clears when the chapter changes
   await openLanding(page);
   const box = await page.locator("[data-track]").boundingBox();
   await page.mouse.click(box.x + box.width * 0.25, box.y + box.height / 2);
-  const front = page.locator("[data-front]");
-  expect(Number(await front.getAttribute("opacity"))).toBeGreaterThan(0.5);
+  const frontOpacity = () => page.locator("[data-front]").evaluate((node) => Number(getComputedStyle(node).opacity));
+  expect(await frontOpacity()).toBeGreaterThan(0.5);
   await jumpToChapter(page, "edit");
-  await expect(front).toHaveAttribute("opacity", "0");
+  await expect.poll(frontOpacity).toBe(0);
+});
+
+test("a resting history sweep line stays on its map position after a resize", async ({ page }) => {
+  // The sweep's left edge and width in map units, from what is on screen (the map is slice-fitted).
+  const frontOnMap = () => page.evaluate(() => {
+    const [, , mapWidth, mapHeight] = document.querySelector("[data-map]").getAttribute("viewBox").split(" ").map(Number);
+    const lens = document.querySelector("[data-lens]").getBoundingClientRect();
+    const front = document.querySelector("[data-front]");
+    const rect = front.getBoundingClientRect();
+    const k = Math.max(lens.width / mapWidth, lens.height / mapHeight);
+    const ox = (lens.width - mapWidth * k) / 2;
+    return { x: (rect.left - lens.left - ox) / k, width: rect.width / k, opacity: Number(getComputedStyle(front).opacity) };
+  });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openLanding(page);
+  const box = await page.locator("[data-track]").boundingBox();
+  await page.mouse.click(box.x + box.width * 0.25, box.y + box.height / 2);
+  await page.waitForTimeout(400);
+  const before = await frontOnMap();
+  expect(before.opacity).toBeGreaterThan(0.5);
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await expect.poll(async () => Math.abs((await frontOnMap()).x - before.x)).toBeLessThan(1);
+  expect(Math.abs((await frontOnMap()).width - before.width)).toBeLessThan(1);
+});
+
+test("rail and cities show only in the context chapter", async ({ page }) => {
+  await openLanding(page);
+  const shown = () => page.evaluate(() => [".map-rail", ".map-cities"].map((selector) => getComputedStyle(document.querySelector(selector)).display !== "none"));
+  expect(await shown()).toEqual([false, false]);
+  await jumpToChapter(page, "context");
+  await expect.poll(shown).toEqual([true, true]);
+  await jumpToChapter(page, "worlds");
+  await expect.poll(shown).toEqual([false, false]);
 });
 
 test("switching to Chinese translates every labelled element", async ({ page }) => {
@@ -141,6 +174,10 @@ test("switching to Chinese translates every labelled element", async ({ page }) 
     for (const node of document.querySelectorAll("[data-i18n-aria-label]")) {
       const expected = zh[node.dataset.i18nAriaLabel];
       if (!expected || node.getAttribute("aria-label") !== expected) misses.push(node.dataset.i18nAriaLabel);
+    }
+    for (const node of document.querySelectorAll("[data-i18n-alt]")) {
+      const expected = zh[node.dataset.i18nAlt];
+      if (!expected || node.getAttribute("alt") !== expected) misses.push(node.dataset.i18nAlt);
     }
     for (const node of document.querySelectorAll("[data-i18n-list]")) {
       const items = [...node.children].map((item) => item.textContent);

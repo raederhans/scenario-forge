@@ -69,8 +69,13 @@ h1, h2 { font-weight: 400; }
 .stage__sea--dark { background: radial-gradient(ellipse 75% 75% at 52% 40%, #1b2b2c, #080d0c); opacity: calc(1 - var(--sea-light)); }
 .stage__sea--light { background: #cfd6cd; opacity: var(--sea-light); }
 /* The camera pans an HTML layer (never scales it), so moving it is pure GPU compositing. */
-.stage__lens { position: absolute; inset: 0; transition: transform 1.4s cubic-bezier(.2, .7, .2, 1); will-change: transform; }
-.stage__front { pointer-events: none; }
+.stage__lens { position: absolute; inset: 0; transition: transform .9s cubic-bezier(.2, .7, .2, 1); will-change: transform; }
+.stage__front {
+  position: absolute; top: 0; bottom: 0; left: 0; opacity: 0; pointer-events: none; will-change: transform, opacity;
+  background: linear-gradient(90deg, rgba(224, 166, 106, 0), rgba(241, 196, 141, .7), rgba(224, 166, 106, 0));
+}
+/* Each fading group is its own SVG layer: opacity changes composite, they never repaint. */
+.stage__layer { will-change: opacity; transition: opacity .6s, visibility .6s; }
 .stage__vignette {
   position: absolute; inset: 0; pointer-events: none; transition: opacity .8s;
   background:
@@ -82,19 +87,18 @@ h1, h2 { font-weight: 400; }
 .stage__veil { position: absolute; inset: 0; z-index: 9; background: var(--ink); opacity: 0; pointer-events: none; }
 
 .story[data-mode="edit"] .stage__fills { cursor: pointer; }
-.map-coast { fill: none; stroke: var(--coast); stroke-width: .8; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none; transition: stroke 1s; }
-.map-borders path { fill: none; stroke: var(--border); stroke-width: 1.1; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none; transition: stroke 1s, opacity .6s; }
-.map-atlantropa { transition: opacity .8s; pointer-events: none; }
+.map-coast { fill: none; stroke: var(--coast); stroke-width: .8; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none; }
+.map-borders path { fill: none; stroke: var(--border); stroke-width: 1.1; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none; }
+.stage__layer.map-atlantropa { transition-duration: .8s; }
 .map-atlantropa .land { stroke-width: .5; }
 .map-atlantropa .shoal { fill: #9fb09a; opacity: .55; }
 .map-atlantropa .water { fill: #17323f; }
 .map-labels text {
   font-family: var(--font-body); font-weight: 600; text-transform: uppercase; letter-spacing: .22em;
   fill: var(--label); paint-order: stroke; stroke: var(--halo); stroke-width: 3px; stroke-linejoin: round;
-  text-anchor: middle; dominant-baseline: middle; pointer-events: none; transition: fill 1s;
+  text-anchor: middle; dominant-baseline: middle; pointer-events: none;
 }
 :lang(zh-CN) .map-labels text { letter-spacing: .3em; }
-.map-labels g { transition: opacity .6s; }
 .map-rail path { fill: none; stroke: var(--copper); stroke-width: 1.1; stroke-linecap: round; vector-effect: non-scaling-stroke; pointer-events: none; }
 .map-rail[hidden], .map-cities[hidden] { display: none; }
 .map-cities { pointer-events: none; }
@@ -157,6 +161,8 @@ h1, h2 { font-weight: 400; }
 .chapter--steps { min-height: calc(var(--steps) * 62svh + 40svh); align-items: flex-start; }
 .chapter--hero { align-items: flex-end; padding-bottom: clamp(140px, 20vh, 210px); }
 .chapter--outro { min-height: 38svh; }
+/* Painting is the one hands-on chapter: give it room to stay on screen while the reader tries it. */
+.chapter[data-chapter="edit"] { min-height: 150svh; }
 .caption {
   pointer-events: auto; width: min(440px, 100%); padding: 28px 28px 26px; border-radius: 12px;
   background: rgba(11, 16, 15, .9); border: 1px solid var(--line);
@@ -198,7 +204,7 @@ h1, h2 { font-weight: 400; }
 .world__links a:hover { color: var(--copper); }
 
 /* ---------- HGO Atlas ---------- */
-.hgo { position: relative; height: 260vh; background: #0a0e0d; }
+.hgo { position: relative; height: 400vh; background: #0a0e0d; }
 .hgo__stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 .hgo__camera { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
 .hgo__camera img { position: absolute; display: block; max-width: none; }
@@ -227,16 +233,34 @@ h1, h2 { font-weight: 400; }
 .hgo__counters dd { margin: 0; font: 400 clamp(1.8rem, 3vw, 2.8rem)/1 var(--font-display); font-variant-numeric: tabular-nums; }
 
 /* ---------- Closing ---------- */
-.closing { max-width: 1320px; margin: 0 auto; padding: clamp(80px, 10vw, 140px) var(--gutter); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: start; }
+/* The closing rises out of the HGO plate's ink: a faint graticule and two glows, so
+   the end of the page still reads as a map table rather than an empty black page. */
+.closing { position: relative; isolation: isolate; overflow: hidden; padding: clamp(96px, 11vw, 160px) var(--gutter) clamp(72px, 8vw, 120px); }
+.closing::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(55% 45% at 80% 22%, rgba(224, 166, 106, .17), transparent 70%),
+    radial-gradient(45% 40% at 8% 92%, rgba(74, 128, 116, .16), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(239, 231, 214, .05) 0 1px, transparent 1px 72px),
+    repeating-linear-gradient(90deg, rgba(239, 231, 214, .05) 0 1px, transparent 1px 72px);
+  -webkit-mask-image: radial-gradient(ellipse 85% 75% at 55% 35%, #000 25%, transparent 80%);
+  mask-image: radial-gradient(ellipse 85% 75% at 55% 35%, #000 25%, transparent 80%);
+}
+.closing__inner { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 96px); align-items: center; }
 .closing h2 { margin: 0 0 18px; font: 400 clamp(2rem, 3.4vw, 3rem)/1 var(--font-display); }
-.closing details { border-top: 1px solid var(--line); padding: 16px 0; }
-.closing summary { cursor: pointer; font-size: 1.02rem; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
-.closing summary::after { content: "+"; font-family: var(--font-mono); color: var(--copper); }
-.closing details[open] summary::after { content: "–"; }
-.closing details p { margin: 10px 0 0; color: var(--paper-dim); }
-.closing details a { color: var(--copper); margin-left: 4px; }
-.closing__cta { padding: 40px; border-radius: 12px; background: radial-gradient(circle at 80% 0%, rgba(224, 166, 106, .18), transparent 60%), var(--ink-3); border: 1px solid var(--line); }
-.closing__cta h2 { font-size: clamp(2.4rem, 4.4vw, 4rem); margin-bottom: 28px; }
+.closing__lead h2 { font-size: clamp(2.6rem, 5vw, 4.4rem); margin-bottom: 32px; }
+.closing__window {
+  margin: 0; border-radius: 14px; overflow: hidden; background: var(--ink-3); border: 1px solid rgba(239, 231, 214, .14);
+  box-shadow: 0 50px 120px -40px rgba(0, 0, 0, .9), 0 0 0 6px rgba(224, 166, 106, .05);
+  transform: perspective(2000px) rotateY(-9deg) rotateX(3deg); transform-origin: left center;
+}
+.closing__window img { display: block; width: 100%; height: auto; }
+.closing__faq { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 4vw, 56px); margin-top: clamp(40px, 6vw, 88px); }
+.closing__faq h2 { grid-column: 1 / -1; margin-bottom: 0; }
+.closing__faq article { border-top: 1px solid var(--line); padding-top: 18px; }
+.closing__faq h3 { margin: 0 0 10px; font: 500 1.02rem/1.35 var(--font-body); color: var(--paper); }
+.closing__faq p { margin: 0; color: var(--paper-dim); }
+.closing__faq a { color: var(--copper); margin-left: 4px; }
 .footer {
   display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; padding: 28px var(--gutter);
   border-top: 1px solid var(--line); font: 400 .74rem var(--font-mono); letter-spacing: .08em; color: var(--paper-faint);
@@ -267,13 +291,13 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
   .hgo__shade { background: linear-gradient(0deg, rgba(10, 14, 13, .95) 0%, rgba(10, 14, 13, .5) 55%, rgba(10, 14, 13, 0) 80%); }
   .hgo__copy { top: auto; bottom: 120px; transform: none; min-height: 230px; }
   .hgo__counters { bottom: 24px; gap: 20px; }
-  .closing { grid-template-columns: 1fr; }
-  .closing__cta { padding: 28px 22px; }
+  .closing__inner, .closing__faq { grid-template-columns: 1fr; }
+  .closing__window { transform: none; }
   .footer nav { margin-left: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   html.js [data-reveal] { opacity: 1; transform: none; transition: none; }
-  .stage__lens, .hgo__step, .hgo__detail, .btn { transition: none; }
+  .stage__lens, .stage__layer, .hgo__step, .hgo__detail, .btn { transition: none; }
 }
