@@ -59,7 +59,7 @@ class ScenarioTopologyDecodeTest(unittest.TestCase):
     def test_landing_builders_do_not_pad_refined_water_arcs(self):
         import tempfile
         from pathlib import Path
-        from tools import build_landing_hero_cartography, build_landing_europe_1936_showcase
+        from tools import build_landing_europe_1936_showcase
 
         payload = {"type": "Topology", "arcs": [
             [[0, 0], [0, 1], [1, 1], [0, 0]],
@@ -72,7 +72,7 @@ class ScenarioTopologyDecodeTest(unittest.TestCase):
             path = Path(directory) / "topology.json"
             path.write_text(json.dumps(payload), encoding="utf-8")
             with patch("topojson.utils.np_array_from_arcs", side_effect=AssertionError("padded allocation")):
-                for builder in (build_landing_hero_cartography, build_landing_europe_1936_showcase):
+                for builder in (build_landing_europe_1936_showcase,):
                     with self.subTest(builder=builder.__name__):
                         self.assertEqual(builder.topology_features(path, "political"), expected)
 

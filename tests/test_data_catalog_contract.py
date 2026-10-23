@@ -21,8 +21,6 @@ from tools.data_health import SCENARIO_REGISTRY_URL, collect_health
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CATALOG_JSON = REPO_ROOT / "data" / "CATALOG.json"
 CATALOG_MD = REPO_ROOT / "data" / "CATALOG.md"
-LANDING_INDEX = REPO_ROOT / "landing" / "index.html"
-LANDING_APP = REPO_ROOT / "landing" / "app.js"
 EXPECTED_SCHEMA_REF_COUNT = 34
 
 
@@ -218,22 +216,6 @@ class DataCatalogContractTest(unittest.TestCase):
         self.assertEqual(entry["schemaRef"], explicit_schema)
         self.assertIn(f"manifest_output:{relative_path}", entry["aliases"])
 
-    def test_landing_catalog_count_matches_checked_in_catalog(self) -> None:
-        payload = self._load_catalog()
-        expected_count = payload.get("counts", {}).get("entries")
-        self.assertIsInstance(expected_count, int)
-        english_copy = "cataloged assets · public project data"
-        chinese_copy = "已编目资产 · 签入数据范围"
-
-        landing_index = LANDING_INDEX.read_text(encoding="utf-8")
-        landing_app = LANDING_APP.read_text(encoding="utf-8")
-
-        self.assertIn(f'data-stat-value="{expected_count}"', landing_index)
-        self.assertIn('data-stat-source="data/CATALOG.json:counts.entries"', landing_index)
-        self.assertIn(f'data-story-evidence-value="{expected_count}">{expected_count}</dd>', landing_index)
-        self.assertIn(english_copy, landing_index)
-        self.assertIn(english_copy, landing_app)
-        self.assertIn(chinese_copy, landing_app)
 
     def test_catalog_excludes_optional_cache_source_assets(self) -> None:
         payload = self._load_catalog()

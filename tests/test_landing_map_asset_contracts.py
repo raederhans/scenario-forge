@@ -93,15 +93,9 @@ class LandingMapGeneratorParityTests(unittest.TestCase):
     def test_europe_generator_matches_checked_in_svg_and_json(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             output_dir = Path(temporary_directory)
-            with (
-                mock.patch.object(europe, "SHOWCASE_SVG", output_dir / europe.SHOWCASE_SVG.name),
-                mock.patch.object(europe, "SHOWCASE_METADATA", output_dir / europe.SHOWCASE_METADATA.name),
-            ):
-                europe.build_showcase()
-                europe.build_hero_scenario_maps(output_dir)
-            raster_assets.optimize_svg_file(output_dir / europe.SHOWCASE_SVG.name)
+            europe.build_hero_scenario_maps(output_dir)
 
-            expected_names = [europe.SHOWCASE_SVG.name, europe.SHOWCASE_METADATA.name]
+            expected_names = []
             for output in europe.HERO_SCENARIO_OUTPUTS.values():
                 expected_names.extend([output["svg"].name, output["metadata"].name])
             for name in expected_names:
@@ -272,10 +266,6 @@ class EuropePoliticalAndLabelContractTests(unittest.TestCase):
                 owner_geometry.covers(Point(float(coordinates[0]), float(coordinates[1]))),
                 f"capital {tag} at {coordinates} lies outside its owners.by_feature geometry",
             )
-
-    def test_showcase_label_boxes_do_not_overlap_at_any_visible_density(self) -> None:
-        boxes = svg_label_boxes(ASSETS / "europe-1936-showcase.svg", tier_zero_only=False)
-        assert_pairwise_disjoint(self, boxes)
 
     def test_nonblank_hero_capital_label_boxes_do_not_overlap(self) -> None:
         for filename in ("hero-hoi4-1936.svg", "hero-hoi4-1939.svg", "hero-tno-1962.svg"):

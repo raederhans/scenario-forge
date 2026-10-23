@@ -207,6 +207,7 @@ DISPOSABLE_DIST_SUFFIXES = {".pyc", ".pyo"}
 LF_NORMALIZED_ROOT_DIST_PATHS = {
     Path("index.html"),
     Path("app.js"),
+    Path("i18n.js"),
     Path("styles.css"),
 }
 LF_NORMALIZED_ROOT_ASSET_SUFFIXES = {".json"}
@@ -454,20 +455,13 @@ PAGES_DYNAMIC_IMPORT_REGISTRY = (
 )
 
 LANDING_PRODUCT_ASSET_PATHS = (
-    "assets/atlas-physical.webp",
-    "assets/europe-1936-showcase.json",
-    "assets/europe-1936-showcase.svg",
-    "assets/export-workbench.webp",
     "assets/favicon.png",
     "assets/favicon.svg",
     "assets/logo-mark.png",
-    "assets/night-lights-political.webp",
+    "assets/product-workspace.webp",
     "assets/sample-runs.json",
-    "assets/showcase-final-map.svg",
-    "assets/showcase-final-map.webp",
     "assets/social-preview.png",
     "assets/social-preview.svg",
-    "assets/workspace-overview.webp",
 )
 
 DEVELOPER_PRODUCT_MODULE_PATHS = (
@@ -655,8 +649,9 @@ PAGES_PRODUCT_INVENTORY_RULES = (
         "paths": LANDING_PRODUCT_ASSET_PATHS,
         "prefixes": (
             "assets/hero-",
+            "assets/hgo-",
+            "assets/history-",
             "assets/japan-preview",
-            "assets/template-",
             "assets/work-",
         ),
     },
@@ -697,6 +692,7 @@ PAGES_PRODUCT_INVENTORY_RULES = (
         "paths": (
             ".nojekyll",
             "app.js",
+            "i18n.js",
             "pages-dist-manifest.json",
             "styles.css",
         ),

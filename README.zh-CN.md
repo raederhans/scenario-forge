@@ -4,59 +4,61 @@
   <p><strong>把世界画成你的版本。</strong></p>
   <p>为架空历史与世界观创作打造的政治地图工作室。</p>
   <p>
-    <a href="https://raederhans.github.io/scenario-forge/app/?view=guide">打开编辑器 ↗</a>
+    <a href="https://raederhans.github.io/scenario-forge/app/?view=guide">打开 Scenario Forge ↗</a>
     &nbsp; · &nbsp;
-    <a href="https://raederhans.github.io/scenario-forge/#sample-runs">浏览地图作品</a>
+    <a href="https://raederhans.github.io/scenario-forge/hgo/">打开 HGO 地图集 ↗</a>
+    &nbsp; · &nbsp;
+    <a href="https://raederhans.github.io/scenario-forge/">官网</a>
     &nbsp; · &nbsp;
     <a href="README.md">English</a>
   </p>
 </div>
 
+一个项目，两个浏览器编辑器：
+
+| | Scenario Forge | HGO 地图集 |
+|---|---|---|
+| **编辑对象** | 矢量政治地图 | Historic Geographic Overhaul 模组的原生像素地图 |
+| **起点世界** | 空白地图、现代世界、HOI4 1936、HOI4 1939、TNO 1962 | HGO 1936：11,894 个州（含 924 个海域）、20,782 个省份 |
+| **打开** | [编辑器 ↗](https://raederhans.github.io/scenario-forge/app/?view=guide) | [HGO 地图集 ↗](https://raederhans.github.io/scenario-forge/hgo/) |
+
+## Scenario Forge
+
 ![Scenario Forge 编辑器实景，展示政治地图画布与编辑工具](landing/assets/product-workspace.webp)
 
-## 从一个起点，画出你的地图
+- **选择世界**，编辑归属、控制区、前线与特殊区域。
+- **编排地图**：配色、边界、标签与图例，加入城市、公路、铁路、地形、河流与夜光。
+- **导出**最高 4× 的 PNG 或 JPG，保存工程以便继续编辑。支持中英文界面。
 
-- **选择世界。** 从空白地图、现代世界、HOI4 1936、HOI4 1939 或 TNO 1962 开始。
-- **改写故事。** 调整归属与控制区，绘制前线，添加文字和战略标记。
-- **编排细节。** 设置配色、边界与图例，加入城市、公路、铁路、地形和河流。
-- **继续创作。** 使用中英文界面，按目标分辨率绘制并导出 PNG/JPG，保存可编辑的 JSON 工程。可在尺寸和内存限制内选择 1×–4×。
+<table>
+  <tr>
+    <td width="50%"><img src="landing/assets/work-alt-history-med.svg" alt="TNO 1962 地中海与亚特兰特罗帕地理"></td>
+    <td width="50%"><img src="landing/assets/work-scenario-switch-europe.svg" alt="HOI4 1936 与 1939 欧洲政治地图对照"></td>
+  </tr>
+  <tr>
+    <td>TNO 1962 · Atlantropa —— <a href="https://raederhans.github.io/scenario-forge/app/?sample=tno-1962-atlantropa-briefing&view=guide">打开示例</a></td>
+    <td>HOI4 1936 → 1939 —— <a href="https://raederhans.github.io/scenario-forge/app/?sample=hoi4-1936-europe-briefing&view=guide">1936</a> · <a href="https://raederhans.github.io/scenario-forge/app/?sample=hoi4-1939-europe-switch&view=guide">1939</a></td>
+  </tr>
+</table>
 
-## 地图作品
+## HGO 地图集
 
-以下概览图由项目数据生成，用于呈现剧本地理与地图编排，并非样例工程默认导出的截图。HOI4 与 TNO 地图展示的是游戏或架空历史设定。
+![HGO 地图集编辑器：带州名标注的 1936 年世界地图与编辑面板](docs/readme/hgo-atlas.webp)
 
-### 另一种地中海
-
-![TNO 1962 地中海概览，展示政治疆界与亚特兰特罗帕地理](landing/assets/work-alt-history-med.svg)
-
-采用 TNO 1962 的国家归属与剧本配色，完整呈现亚特兰特罗帕陆地、浅滩与水域。
-
-[打开 TNO 示例](https://raederhans.github.io/scenario-forge/app/?sample=tno-1962-atlantropa-briefing&view=guide) · [矢量地图](landing/assets/work-alt-history-med.svg)
-
-### 两个年份之间的欧洲
-
-![在相同地理范围内对照 HOI4 1936 与 1939 的政治地图](landing/assets/work-scenario-switch-europe.svg)
-
-在同一区域，对照两个 HOI4 剧本的疆界。
-
-[打开 1936](https://raederhans.github.io/scenario-forge/app/?sample=hoi4-1936-europe-briefing&view=guide) · [打开 1939](https://raederhans.github.io/scenario-forge/app/?sample=hoi4-1939-europe-switch&view=guide) · [全部样例文件](landing/assets/sample-runs.json)
+独立的编辑器，以原生 5120 × 2560 地图打开 HGO 模组的 1936 年世界。为陆地与海域州上色，在国家之间转移归属与核心，重命名地区，并导出整张 PNG。开发说明见 [apps/hgo](apps/hgo/README.zh-CN.md)。
 
 ## 本地运行
 
-在 Windows 上安装 Python 3，并准备好所需运行资源后，运行：
+在 Windows 上安装 Python 3 后运行：
 
 ```powershell
 .\start_dev.bat
 ```
 
-启动脚本会显示本地编辑器地址。环境准备、运行资源、后端预览及开发命令见[本地开发文档](docs/local-development.md)。
+启动脚本会显示本地编辑器地址。环境准备与可选后端（Cloud Saves 与社区功能）见[本地开发文档](docs/local-development.md)。创建 PR 前运行 `npm test`，并参考[开发与交付](docs/development-and-delivery.zh-CN.md)。
 
-提交或创建 PR 前，运行 `npm test`，并参考[开发与交付](docs/development-and-delivery.zh-CN.md)。
+## 许可
 
-## 可用范围与数据来源
-
-主编辑器提供上面的五个底图。[HGO 使用独立的原生像素编辑器](apps/hgo/README.zh-CN.md)，保留可编辑海域，并拥有自己的加载、项目文件、渲染和检查体系。Cloud Saves 与社区功能需要本地后端预览。公路和铁路是当前最成熟的公开交通图层，其他交通与专题数据的预览覆盖程度不同。
-
-代码与文档采用 [MIT 许可证](LICENSE)。第三方数据及衍生地图保留各自的来源条款；复用数据衍生资产前，请查看[数据来源账本](data/source_ledger.json)和地图元数据（[TNO](landing/assets/work-alt-history-med.json)、[HOI4 对照](landing/assets/work-scenario-switch-europe.json)）。
+代码与文档采用 [MIT 许可证](LICENSE)。地图数据沿用各自来源的条款，见[数据来源账本](data/source_ledger.json)。
 
 [反馈问题](https://github.com/raederhans/scenario-forge/issues)

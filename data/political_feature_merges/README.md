@@ -80,14 +80,14 @@ Afterwards:
    mirror when it was in sync).
 3. Re-pin `scenario.baselineHash` in `landing/assets/sample-projects/*` and
    their `dist/assets` mirrors to each scenario manifest's new `baseline_hash`.
-4. Regenerate the landing showcase and hero maps with
+4. Regenerate the landing hero maps with
    `python tools/build_landing_europe_1936_showcase.py`; their metadata counts
    scenario features. Copy the changed files to `dist/assets` and update their
    `size_bytes` (plus `total_bytes` and the `assets` directory total) in
    `dist/pages-dist-manifest.json`.
-
-5. Refresh the landing page's hard-coded evidence numbers with
-   `python tools/refresh_landing_evidence_markers.py`.
+5. Regenerate the landing map stage with
+   `python tools/build_landing_history_scrubber.py`; it cuts the HOI4 1936,
+   HOI4 1939, TNO 1962 and Modern World political features into shared pieces.
 
 ## After upstream rebuilds
 
