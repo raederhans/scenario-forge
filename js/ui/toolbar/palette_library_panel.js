@@ -15,7 +15,7 @@ import {
   setActivePaletteSource,
 } from "../../core/palette_manager.js";
 import { t } from "../i18n.js";
-import { createDeferredPanelRender } from "./deferred_panel_render.js";
+import { createDeferredPanelRender } from "../../core/deferred_panel_render.js";
 const state = runtimeState;
 
 function selectPalettePaintColor(appState, rawColor) {

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createDeferredPanelRender } from "../js/ui/toolbar/deferred_panel_render.js";
+import { createDeferredPanelRender } from "../js/core/deferred_panel_render.js";
 
 function harness() {
   const frames = [], timers = [], log = [];

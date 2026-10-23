@@ -233,6 +233,7 @@ import {
   requestPoliticalRasterWorkerPass,
 } from "./political_raster_worker_client.js";
 import { LegendManager, createRevisionedLegendColorReader } from "./legend_manager.js";
+import { createDeferredPanelRender } from "./deferred_panel_render.js";
 import { createSourceMetricsCache } from "./renderer/source_metrics_cache.js";
 import { createTransientOverlayRenderOwner } from "./renderer/transient_overlay_render_owner.js";
 import { createSelectionOverlayOwner } from "./renderer/selection_overlay_owner.js";
@@ -14765,6 +14766,22 @@ export function renderLegend(uniqueColors = null, labels = null) {
   return getLegendControlOwner().renderLegend(uniqueColors, labels);
 }
 
+// Both legends rescan every painted color after a color change, and the map legend
+// reads its own layout to place itself. Idle render passes refresh them after paint,
+// so a paint click's frame does not pay for it.
+let deferredLegendRender = null;
+function requestLegendRender() {
+  deferredLegendRender ||= createDeferredPanelRender({
+    render: () => {
+      renderLegend();
+      if (typeof runtimeState.updateLegendUI === "function") {
+        runtimeState.updateLegendUI();
+      }
+    },
+  });
+  deferredLegendRender.request();
+}
+
 function ensurePerfOverlayElement() {
   const cache = getRenderPassCacheState();
   if (!cache.perfOverlayEnabled || !rendererSurfaceHost.getMapContainer()) return null;
@@ -14918,10 +14935,7 @@ function render() {
   renderInspectorHighlightOverlayIfNeeded();
   renderHoverOverlayIfNeeded({ eventType: "render-frame" });
   if (runtimeState.renderPhase === RENDER_PHASE_IDLE) {
-    renderLegend();
-    if (typeof runtimeState.updateLegendUI === "function") {
-      runtimeState.updateLegendUI();
-    }
+    requestLegendRender();
   }
   updatePerfOverlay();
   if (startedAt > 0) {
