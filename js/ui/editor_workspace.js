@@ -359,7 +359,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   move("workspaceSaveStatus", top);
   const topActions = make("div", "editor-project-actions");
   top.append(topActions);
-  for (const id of ["workspaceSaveBtn", "workspaceExportBtn", "scenarioGuideBtn", "btnToggleLang", "rightSidebarAccountShelf"]) move(id, topActions);
+  for (const id of ["workspaceSaveBtn", "workspaceExportBtn", "scenarioGuideBtn", "workspaceGithubLink", "btnToggleLang", "rightSidebarAccountShelf"]) move(id, topActions);
   const strategyBtn = button("Edit annotations", "editorStrategicModeBtn", () => {
     const active = !documentRef.body.classList.contains("frontline-mode-active");
     setStrategicMode(active);
