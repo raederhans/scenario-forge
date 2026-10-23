@@ -83,6 +83,50 @@ test("with reduced motion the map camera moves without animating", async ({ page
   await expect.poll(() => lens.evaluate((node) => getComputedStyle(node).transitionDuration.split(",").every((value) => parseFloat(value) === 0))).toBe(true);
 });
 
+async function fillsChecksum(page) {
+  return page.evaluate(() => {
+    const canvas = document.querySelector("[data-fills]");
+    const { data } = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
+    let sum = 0;
+    for (let i = 0; i < data.length; i += 4 * 31) sum = (sum * 31 + data[i] + data[i + 1] * 7 + data[i + 2] * 13) % 1_000_000_007;
+    return sum;
+  });
+}
+
+async function jumpToChapter(page, chapter) {
+  await page.evaluate((name) => {
+    const top = name === "history" ? 0 : document.querySelector(`[data-chapter="${name}"]`).getBoundingClientRect().top + scrollY;
+    scrollTo({ top, behavior: "instant" });
+  }, chapter);
+  await expect(page.locator(`[data-story][data-mode="${chapter}"]`)).toBeAttached();
+}
+
+test("leaving history and coming straight back keeps the map on the chosen date", async ({ page }) => {
+  await openLanding(page);
+  await page.locator("[data-track]").focus();
+  await page.keyboard.press("End");
+  await expect(page.locator("[data-track]")).toHaveAttribute("aria-valuenow", "1962");
+  await page.waitForTimeout(2000);
+  const settled = await fillsChecksum(page);
+  await jumpToChapter(page, "edit");
+  await page.waitForTimeout(150);
+  await jumpToChapter(page, "history");
+  // Longer than the 900 ms recolour the edit chapter started.
+  await page.waitForTimeout(1500);
+  expect(await fillsChecksum(page)).toBe(settled);
+});
+
+test("with reduced motion the history sweep line clears when the chapter changes", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openLanding(page);
+  const box = await page.locator("[data-track]").boundingBox();
+  await page.mouse.click(box.x + box.width * 0.25, box.y + box.height / 2);
+  const front = page.locator("[data-front]");
+  expect(Number(await front.getAttribute("opacity"))).toBeGreaterThan(0.5);
+  await jumpToChapter(page, "edit");
+  await expect(front).toHaveAttribute("opacity", "0");
+});
+
 test("switching to Chinese translates every labelled element", async ({ page }) => {
   await openLanding(page);
   const copy = await readLanding(page);

@@ -216,6 +216,7 @@ function initStage(data) {
     }
     if (reducedMotion || duration === 0) {
       atoms.forEach((atom) => paintAtom(atom, atom.to));
+      front.setAttribute("opacity", "0");
       sweep = null;
       return;
     }
@@ -376,7 +377,9 @@ function initStage(data) {
       // A cartography style belongs to its chapter; the rest of the story uses game colours.
       story.dataset.style = mode === "style" ? view.style : "game";
       setCamera();
-      if (mode !== "history") retarget(fromHistory ? 900 : 1300);
+      // History draws its own colours from the scrubber; drop any recolour still in flight.
+      if (mode === "history") sweep = null;
+      else retarget(fromHistory ? 900 : 1300);
       if (mode === "context") startReveal();
       render();
       // Labels are measured after the camera settles.
