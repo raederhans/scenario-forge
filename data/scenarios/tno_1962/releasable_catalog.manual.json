@@ -232,8 +232,7 @@
               "FR_ARR_58002",
               "FR_ARR_58003",
               "FR_ARR_58004",
-              "FR_ARR_71001",
-              "FR_ARR_71002",
+              "FR_MRG_8cd54e74f796",
               "FR_ARR_71003",
               "FR_ARR_71004",
               "FR_ARR_71005",
@@ -345,8 +344,7 @@
               "FR_ARR_58002",
               "FR_ARR_58003",
               "FR_ARR_58004",
-              "FR_ARR_71001",
-              "FR_ARR_71002",
+              "FR_MRG_8cd54e74f796",
               "FR_ARR_71003",
               "FR_ARR_71004",
               "FR_ARR_71005",
@@ -2572,10 +2570,8 @@
           "preset_source": {
             "feature_ids": [
               "UKN0C",
-              "UKN0F",
+              "UK_MRG_4bda76985a93",
               "UKN0B",
-              "UKN0D",
-              "UKN0E",
               "UKN06",
               "UKN07",
               "UKN09",
@@ -2603,10 +2599,8 @@
       "preset_source": {
         "feature_ids": [
           "UKN0C",
-          "UKN0F",
+          "UK_MRG_4bda76985a93",
           "UKN0B",
-          "UKN0D",
-          "UKN0E",
           "UKN06",
           "UKN07",
           "UKN09",
