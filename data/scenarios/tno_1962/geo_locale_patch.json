@@ -137,11 +137,11 @@
       },
       {
         "base_feature_ids": [
-          "IN_ADM2_76128533B14598081584747",
+          "IN_MRG_3208c5cacd01",
           "IN_ADM2_76128533B87371000929659"
         ],
         "feature_ids": [
-          "IN_ADM2_76128533B14598081584747",
+          "IN_MRG_3208c5cacd01",
           "IN_ADM2_76128533B87371000929659"
         ],
         "raw_name": "Balrampur"
@@ -250,22 +250,22 @@
       {
         "base_feature_ids": [
           "IN_ADM2_76128533B40495457052818",
-          "IN_ADM2_76128533B66145460152555"
+          "IN_MRG_fc4fb7f7372c"
         ],
         "feature_ids": [
           "IN_ADM2_76128533B40495457052818",
-          "IN_ADM2_76128533B66145460152555"
+          "IN_MRG_fc4fb7f7372c"
         ],
         "raw_name": "Bijapur"
       },
       {
         "base_feature_ids": [
           "IN_ADM2_76128533B81964529079574",
-          "IN_ADM2_76128533B85695392289827"
+          "IN_MRG_f61f07205f91"
         ],
         "feature_ids": [
           "IN_ADM2_76128533B81964529079574",
-          "IN_ADM2_76128533B85695392289827"
+          "IN_MRG_f61f07205f91"
         ],
         "raw_name": "Bilaspur"
       },
@@ -1170,11 +1170,11 @@
       },
       {
         "base_feature_ids": [
-          "IN_ADM2_76128533B27201270098470",
+          "IN_MRG_c73911bfb285",
           "IN_ADM2_76128533B35956162202704"
         ],
         "feature_ids": [
-          "IN_ADM2_76128533B27201270098470",
+          "IN_MRG_c73911bfb285",
           "IN_ADM2_76128533B35956162202704"
         ],
         "raw_name": "Hamirpur"
@@ -3633,15 +3633,15 @@
         "reason": "non_unique_raw_name"
       },
       {
-        "feature_id": "CA_FED_35086",
+        "feature_id": "CA_MRG_7b5ba113838a",
         "locale_en": "Peterborough",
         "locale_zh": "彼得伯勒",
         "matching_base_feature_ids": [
-          "CA_FED_35086",
+          "CA_MRG_7b5ba113838a",
           "UKH11"
         ],
         "matching_feature_ids": [
-          "CA_FED_35086",
+          "CA_MRG_7b5ba113838a",
           "UKH11"
         ],
         "owner_tag": "CAN",
@@ -5603,11 +5603,11 @@
         "locale_en": "Peterborough",
         "locale_zh": "彼得伯勒",
         "matching_base_feature_ids": [
-          "CA_FED_35086",
+          "CA_MRG_7b5ba113838a",
           "UKH11"
         ],
         "matching_feature_ids": [
-          "CA_FED_35086",
+          "CA_MRG_7b5ba113838a",
           "UKH11"
         ],
         "owner_tag": "ENG",
@@ -10375,15 +10375,15 @@
         "reason": "non_unique_raw_name"
       },
       {
-        "feature_id": "IN_ADM2_76128533B14598081584747",
+        "feature_id": "IN_MRG_3208c5cacd01",
         "locale_en": "Balrampur",
         "locale_zh": "巴尔拉姆普尔",
         "matching_base_feature_ids": [
-          "IN_ADM2_76128533B14598081584747",
+          "IN_MRG_3208c5cacd01",
           "IN_ADM2_76128533B87371000929659"
         ],
         "matching_feature_ids": [
-          "IN_ADM2_76128533B14598081584747",
+          "IN_MRG_3208c5cacd01",
           "IN_ADM2_76128533B87371000929659"
         ],
         "owner_tag": "RAJ",
@@ -10417,15 +10417,15 @@
         "reason": "non_unique_raw_name"
       },
       {
-        "feature_id": "IN_ADM2_76128533B20647769792365",
+        "feature_id": "IN_MRG_07eb3c8cab39",
         "locale_en": "Pratapgarh",
         "locale_zh": "普拉塔普加尔",
         "matching_base_feature_ids": [
-          "IN_ADM2_76128533B20647769792365",
+          "IN_MRG_07eb3c8cab39",
           "IN_ADM2_76128533B50613523798301"
         ],
         "matching_feature_ids": [
-          "IN_ADM2_76128533B20647769792365",
+          "IN_MRG_07eb3c8cab39",
           "IN_ADM2_76128533B50613523798301"
         ],
         "owner_tag": "RAJ",
@@ -10433,15 +10433,15 @@
         "reason": "non_unique_raw_name"
       },
       {
-        "feature_id": "IN_ADM2_76128533B27201270098470",
+        "feature_id": "IN_MRG_c73911bfb285",
         "locale_en": "Hamirpur",
         "locale_zh": "哈米尔布尔",
         "matching_base_feature_ids": [
-          "IN_ADM2_76128533B27201270098470",
+          "IN_MRG_c73911bfb285",
           "IN_ADM2_76128533B35956162202704"
         ],
         "matching_feature_ids": [
-          "IN_ADM2_76128533B27201270098470",
+          "IN_MRG_c73911bfb285",
           "IN_ADM2_76128533B35956162202704"
         ],
         "owner_tag": "RAJ",
@@ -10453,11 +10453,11 @@
         "locale_en": "Hamirpur",
         "locale_zh": "哈米尔布尔",
         "matching_base_feature_ids": [
-          "IN_ADM2_76128533B27201270098470",
+          "IN_MRG_c73911bfb285",
           "IN_ADM2_76128533B35956162202704"
         ],
         "matching_feature_ids": [
-          "IN_ADM2_76128533B27201270098470",
+          "IN_MRG_c73911bfb285",
           "IN_ADM2_76128533B35956162202704"
         ],
         "owner_tag": "RAJ",
@@ -10486,11 +10486,11 @@
         "locale_zh": "比贾普尔",
         "matching_base_feature_ids": [
           "IN_ADM2_76128533B40495457052818",
-          "IN_ADM2_76128533B66145460152555"
+          "IN_MRG_fc4fb7f7372c"
         ],
         "matching_feature_ids": [
           "IN_ADM2_76128533B40495457052818",
-          "IN_ADM2_76128533B66145460152555"
+          "IN_MRG_fc4fb7f7372c"
         ],
         "owner_tag": "RAJ",
         "raw_name": "Bijapur",
@@ -10517,11 +10517,11 @@
         "locale_en": "Pratapgarh",
         "locale_zh": "普拉塔普加尔",
         "matching_base_feature_ids": [
-          "IN_ADM2_76128533B20647769792365",
+          "IN_MRG_07eb3c8cab39",
           "IN_ADM2_76128533B50613523798301"
         ],
         "matching_feature_ids": [
-          "IN_ADM2_76128533B20647769792365",
+          "IN_MRG_07eb3c8cab39",
           "IN_ADM2_76128533B50613523798301"
         ],
         "owner_tag": "RAJ",
@@ -10545,16 +10545,16 @@
         "reason": "non_unique_raw_name"
       },
       {
-        "feature_id": "IN_ADM2_76128533B66145460152555",
+        "feature_id": "IN_MRG_fc4fb7f7372c",
         "locale_en": "Bijapur",
         "locale_zh": "比贾普尔",
         "matching_base_feature_ids": [
           "IN_ADM2_76128533B40495457052818",
-          "IN_ADM2_76128533B66145460152555"
+          "IN_MRG_fc4fb7f7372c"
         ],
         "matching_feature_ids": [
           "IN_ADM2_76128533B40495457052818",
-          "IN_ADM2_76128533B66145460152555"
+          "IN_MRG_fc4fb7f7372c"
         ],
         "owner_tag": "RAJ",
         "raw_name": "Bijapur",
@@ -10634,27 +10634,27 @@
         "locale_zh": "比拉斯普尔",
         "matching_base_feature_ids": [
           "IN_ADM2_76128533B81964529079574",
-          "IN_ADM2_76128533B85695392289827"
+          "IN_MRG_f61f07205f91"
         ],
         "matching_feature_ids": [
           "IN_ADM2_76128533B81964529079574",
-          "IN_ADM2_76128533B85695392289827"
+          "IN_MRG_f61f07205f91"
         ],
         "owner_tag": "RAJ",
         "raw_name": "Bilaspur",
         "reason": "non_unique_raw_name"
       },
       {
-        "feature_id": "IN_ADM2_76128533B85695392289827",
+        "feature_id": "IN_MRG_f61f07205f91",
         "locale_en": "Bilaspur",
         "locale_zh": "比拉斯普尔",
         "matching_base_feature_ids": [
           "IN_ADM2_76128533B81964529079574",
-          "IN_ADM2_76128533B85695392289827"
+          "IN_MRG_f61f07205f91"
         ],
         "matching_feature_ids": [
           "IN_ADM2_76128533B81964529079574",
-          "IN_ADM2_76128533B85695392289827"
+          "IN_MRG_f61f07205f91"
         ],
         "owner_tag": "RAJ",
         "raw_name": "Bilaspur",
@@ -10665,11 +10665,11 @@
         "locale_en": "Balrampur",
         "locale_zh": "巴尔拉姆普尔",
         "matching_base_feature_ids": [
-          "IN_ADM2_76128533B14598081584747",
+          "IN_MRG_3208c5cacd01",
           "IN_ADM2_76128533B87371000929659"
         ],
         "matching_feature_ids": [
-          "IN_ADM2_76128533B14598081584747",
+          "IN_MRG_3208c5cacd01",
           "IN_ADM2_76128533B87371000929659"
         ],
         "owner_tag": "RAJ",
@@ -20586,15 +20586,15 @@
         "reason": "non_unique_raw_name"
       },
       {
-        "feature_id": "CA_FED_35086",
+        "feature_id": "CA_MRG_7b5ba113838a",
         "locale_en": "Peterborough",
         "locale_zh": "彼得伯勒",
         "matching_base_feature_ids": [
-          "CA_FED_35086",
+          "CA_MRG_7b5ba113838a",
           "UKH11"
         ],
         "matching_feature_ids": [
-          "CA_FED_35086",
+          "CA_MRG_7b5ba113838a",
           "UKH11"
         ],
         "owner_tag": "CAN",
@@ -22556,11 +22556,11 @@
         "locale_en": "Peterborough",
         "locale_zh": "彼得伯勒",
         "matching_base_feature_ids": [
-          "CA_FED_35086",
+          "CA_MRG_7b5ba113838a",
           "UKH11"
         ],
         "matching_feature_ids": [
-          "CA_FED_35086",
+          "CA_MRG_7b5ba113838a",
           "UKH11"
         ],
         "owner_tag": "ENG",
@@ -26307,10 +26307,6 @@
       "en": "Cape Breton—Canso—Antigonish",
       "zh": "布雷顿角—坎索—安蒂戈尼什"
     },
-    "CA_FED_12003": {
-      "en": "Central Nova",
-      "zh": "中央新星"
-    },
     "CA_FED_12004": {
       "en": "Cumberland—Colchester",
       "zh": "坎伯兰—科尔切斯特"
@@ -26331,10 +26327,6 @@
       "en": "Kings—Hants",
       "zh": "国王—汉茨"
     },
-    "CA_FED_12009": {
-      "en": "Sackville—Bedford—Preston",
-      "zh": "萨克维尔—贝德福德—普雷斯顿"
-    },
     "CA_FED_12010": {
       "en": "South Shore—St. Margarets",
       "zh": "南岸—圣玛格丽特"
@@ -26347,17 +26339,9 @@
       "en": "Acadie—Bathurst",
       "zh": "阿卡迪—巴瑟斯特"
     },
-    "CA_FED_13002": {
-      "en": "Beauséjour",
-      "zh": "博塞茹尔"
-    },
     "CA_FED_13003": {
       "en": "Fredericton—Oromocto",
       "zh": "弗雷德里克顿—奥罗莫克托"
-    },
-    "CA_FED_13004": {
-      "en": "Fundy Royal",
-      "zh": "芬迪皇家"
     },
     "CA_FED_13005": {
       "en": "Madawaska—Restigouche",
@@ -26366,14 +26350,6 @@
     "CA_FED_13006": {
       "en": "Miramichi—Grand Lake",
       "zh": "米拉米奇—大湖"
-    },
-    "CA_FED_13007": {
-      "en": "Moncton—Dieppe",
-      "zh": "蒙克顿—迪耶普"
-    },
-    "CA_FED_13008": {
-      "en": "Saint John—Kennebecasis",
-      "zh": "圣约翰-肯尼贝卡西斯"
     },
     "CA_FED_13009": {
       "en": "Saint John—St. Croix",
@@ -26395,14 +26371,6 @@
       "en": "Ahuntsic-Cartierville",
       "zh": "阿洪奇克-卡蒂维尔"
     },
-    "CA_FED_24004": {
-      "en": "Alfred-Pellan",
-      "zh": "阿尔弗雷德-佩兰"
-    },
-    "CA_FED_24005": {
-      "en": "Argenteuil—La Petite-Nation",
-      "zh": "阿让特伊—小民族"
-    },
     "CA_FED_24006": {
       "en": "Beauce",
       "zh": "博斯"
@@ -26415,10 +26383,6 @@
       "en": "Beauport—Limoilou",
       "zh": "博波尔—利莫伊卢"
     },
-    "CA_FED_24009": {
-      "en": "Bécancour—Nicolet—Saurel—Alnôbak",
-      "zh": "贝坎库尔—尼科莱—索雷尔—阿尔诺巴克"
-    },
     "CA_FED_24010": {
       "en": "Bellechasse—Les Etchemins—Lévis",
       "zh": "贝勒沙斯-莱塞奇明-莱维"
@@ -26426,10 +26390,6 @@
     "CA_FED_24011": {
       "en": "Beloeil—Chambly",
       "zh": "贝洛伊尔—尚布利"
-    },
-    "CA_FED_24012": {
-      "en": "Berthier—Maskinongé",
-      "zh": "贝尔蒂埃—马斯基农热"
     },
     "CA_FED_24013": {
       "en": "Bourassa",
@@ -26447,10 +26407,6 @@
       "en": "Charlesbourg—Haute-Saint-Charles",
       "zh": "查尔斯堡—上圣查尔斯"
     },
-    "CA_FED_24017": {
-      "en": "Châteauguay—Les Jardins-de-Napierville",
-      "zh": "沙托盖—内皮尔维尔花园"
-    },
     "CA_FED_24018": {
       "en": "Chicoutimi—Le Fjord",
       "zh": "希库蒂米—勒峡湾"
@@ -26466,14 +26422,6 @@
     "CA_FED_24021": {
       "en": "Côte-Nord—Kawawachikamach—Nitassinan",
       "zh": "北海岸—河瓦近卡马赫—尼塔西南"
-    },
-    "CA_FED_24022": {
-      "en": "Dorval—Lachine—LaSalle",
-      "zh": "多瓦尔—拉钦—拉萨尔"
-    },
-    "CA_FED_24023": {
-      "en": "Drummond",
-      "zh": "德拉蒙德"
     },
     "CA_FED_24024": {
       "en": "Gaspésie—Les Îles-de-la-Madeleine—Listuguj",
@@ -26495,10 +26443,6 @@
       "en": "Hull—Aylmer",
       "zh": "赫尔-艾尔默"
     },
-    "CA_FED_24029": {
-      "en": "Joliette—Manawan",
-      "zh": "乔利埃特—马纳万"
-    },
     "CA_FED_24030": {
       "en": "Jonquière",
       "zh": "容基埃尔"
@@ -26515,10 +26459,6 @@
       "en": "Lac-Saint-Jean",
       "zh": "圣让湖"
     },
-    "CA_FED_24034": {
-      "en": "Lac-Saint-Louis",
-      "zh": "圣路易斯湖"
-    },
     "CA_FED_24035": {
       "en": "LaSalle—Émard—Verdun",
       "zh": "拉萨尔—埃马尔—凡尔登"
@@ -26530,14 +26470,6 @@
     "CA_FED_24037": {
       "en": "Laurier—Sainte-Marie",
       "zh": "劳里尔—圣玛丽"
-    },
-    "CA_FED_24038": {
-      "en": "Laval—Les Îles",
-      "zh": "拉瓦尔—莱斯岛"
-    },
-    "CA_FED_24039": {
-      "en": "Les Pays-d'en-Haut",
-      "zh": "上省"
     },
     "CA_FED_24040": {
       "en": "Lévis—Lotbinière",
@@ -26551,25 +26483,9 @@
       "en": "Longueuil—Saint-Hubert",
       "zh": "隆格伊—圣休伯特"
     },
-    "CA_FED_24043": {
-      "en": "Louis-Hébert",
-      "zh": "路易斯·赫伯特"
-    },
-    "CA_FED_24044": {
-      "en": "Louis-Saint-Laurent—Akiawenhrahk",
-      "zh": "路易·圣洛朗—阿基亚文拉克"
-    },
-    "CA_FED_24045": {
-      "en": "Marc-Aurèle-Fortin",
-      "zh": "马克·奥雷勒·福廷"
-    },
     "CA_FED_24046": {
       "en": "Mégantic—L’Érable—Lotbinière",
       "zh": "梅甘蒂克—拉埃拉布尔—洛比尼埃"
-    },
-    "CA_FED_24047": {
-      "en": "Mirabel",
-      "zh": "米拉贝尔"
     },
     "CA_FED_24048": {
       "en": "Mount Royal",
@@ -26578,14 +26494,6 @@
     "CA_FED_24049": {
       "en": "Mont-Saint-Bruno—L’Acadie",
       "zh": "圣布鲁诺山—阿卡迪"
-    },
-    "CA_FED_24050": {
-      "en": "Montcalm",
-      "zh": "蒙卡尔姆"
-    },
-    "CA_FED_24051": {
-      "en": "Montmorency—Charlevoix",
-      "zh": "蒙莫朗西—沙勒瓦"
     },
     "CA_FED_24052": {
       "en": "Notre-Dame-de-Grâce—Westmount",
@@ -26599,21 +26507,9 @@
       "en": "Papineau",
       "zh": "帕皮诺"
     },
-    "CA_FED_24055": {
-      "en": "Pierre-Boucher—Les Patriotes—Verchères",
-      "zh": "皮埃尔-布歇—爱国者—维谢尔"
-    },
-    "CA_FED_24056": {
-      "en": "Pierrefonds—Dollard",
-      "zh": "皮埃尔丰-多拉德"
-    },
     "CA_FED_24057": {
       "en": "Pontiac—Kitigan Zibi",
       "zh": "庞蒂亚克—Kitigan Zibi"
-    },
-    "CA_FED_24058": {
-      "en": "Portneuf—Jacques-Cartier",
-      "zh": "波特纳夫—雅克·卡地亚"
     },
     "CA_FED_24059": {
       "en": "Québec Centre",
@@ -26623,17 +26519,9 @@
       "en": "Repentigny",
       "zh": "忏悔"
     },
-    "CA_FED_24061": {
-      "en": "Richmond—Arthabaska",
-      "zh": "里士满—阿尔萨巴斯卡"
-    },
     "CA_FED_24062": {
       "en": "Rimouski—La Matapédia",
       "zh": "里穆斯基—拉马塔佩迪亚"
-    },
-    "CA_FED_24063": {
-      "en": "Rivière-des-Mille-Îles",
-      "zh": "千岛河"
     },
     "CA_FED_24064": {
       "en": "Rivière-du-Nord",
@@ -26643,18 +26531,6 @@
       "en": "Rosemont—La Petite-Patrie",
       "zh": "罗斯蒙特—小帕特里"
     },
-    "CA_FED_24066": {
-      "en": "Saint-Hyacinthe—Bagot—Acton",
-      "zh": "圣亚森特—巴戈特—阿克顿"
-    },
-    "CA_FED_24067": {
-      "en": "Saint-Jean",
-      "zh": "圣让"
-    },
-    "CA_FED_24068": {
-      "en": "Saint-Laurent",
-      "zh": "圣洛朗"
-    },
     "CA_FED_24069": {
       "en": "Saint-Léonard—Saint-Michel",
       "zh": "圣莱昂纳德—圣米歇尔"
@@ -26663,10 +26539,6 @@
       "en": "Saint-Maurice—Champlain",
       "zh": "圣莫里斯—尚普兰"
     },
-    "CA_FED_24071": {
-      "en": "Shefford",
-      "zh": "谢福德"
-    },
     "CA_FED_24072": {
       "en": "Sherbrooke",
       "zh": "舍布鲁克"
@@ -26674,10 +26546,6 @@
     "CA_FED_24073": {
       "en": "Terrebonne",
       "zh": "泰雷博讷"
-    },
-    "CA_FED_24074": {
-      "en": "Thérèse-De Blainville",
-      "zh": "泰蕾兹-德布兰维尔"
     },
     "CA_FED_24075": {
       "en": "Trois-Rivières",
@@ -26691,21 +26559,9 @@
       "en": "Ville-Marie—Le Sud-Ouest—Île-des-Soeurs",
       "zh": "玛丽城—南西—苏岛"
     },
-    "CA_FED_24078": {
-      "en": "Vimy",
-      "zh": "维米"
-    },
-    "CA_FED_35001": {
-      "en": "Ajax",
-      "zh": "阿贾克斯"
-    },
     "CA_FED_35002": {
       "en": "Algonquin—Renfrew—Pembroke",
       "zh": "阿冈昆—伦弗鲁—彭布罗克"
-    },
-    "CA_FED_35003": {
-      "en": "Aurora—Oak Ridges—Richmond Hill",
-      "zh": "奥罗拉—橡树岭—列治文山"
     },
     "CA_FED_35004": {
       "en": "Barrie South—Innisfil",
@@ -26739,21 +26595,9 @@
       "en": "Brampton East",
       "zh": "宾顿东"
     },
-    "CA_FED_35012": {
-      "en": "Brampton North—Caledon",
-      "zh": "北布兰普顿—卡利登"
-    },
     "CA_FED_35013": {
       "en": "Brampton South",
       "zh": "布兰普顿南"
-    },
-    "CA_FED_35014": {
-      "en": "Brampton West",
-      "zh": "布兰普顿西"
-    },
-    "CA_FED_35015": {
-      "en": "Brantford—Brant South—Six Nations",
-      "zh": "布兰特福德—布兰特南—六国"
     },
     "CA_FED_35016__tno1962_1": {
       "en": "Bruce—Grey—Owen Sound",
@@ -26775,10 +26619,6 @@
       "en": "Cambridge",
       "zh": "剑桥"
     },
-    "CA_FED_35020": {
-      "en": "Carleton",
-      "zh": "卡尔顿"
-    },
     "CA_FED_35021__tno1962_1": {
       "en": "Chatham-Kent—Leamington",
       "zh": "查塔姆-肯特—利明顿"
@@ -26791,25 +26631,9 @@
       "en": "Davenport",
       "zh": "长椅"
     },
-    "CA_FED_35023": {
-      "en": "Don Valley North",
-      "zh": "当谷北"
-    },
-    "CA_FED_35024": {
-      "en": "Don Valley West",
-      "zh": "当谷西"
-    },
-    "CA_FED_35025": {
-      "en": "Dufferin—Caledon",
-      "zh": "达弗林—卡利登"
-    },
     "CA_FED_35026": {
       "en": "Eglinton—Lawrence",
       "zh": "埃格林顿—劳伦斯"
-    },
-    "CA_FED_35027": {
-      "en": "Elgin—St. Thomas—London South",
-      "zh": "埃尔金—圣托马斯—伦敦南"
     },
     "CA_FED_35028": {
       "en": "Essex",
@@ -26827,21 +26651,9 @@
       "en": "Etobicoke North",
       "zh": "怡陶碧谷北"
     },
-    "CA_FED_35032": {
-      "en": "Flamborough—Glanbrook—Brant North",
-      "zh": "弗兰伯勒—格兰布鲁克—布兰特北"
-    },
     "CA_FED_35033": {
       "en": "Guelph",
       "zh": "圭尔夫"
-    },
-    "CA_FED_35034": {
-      "en": "Haldimand—Norfolk",
-      "zh": "哈尔迪曼德—诺福克"
-    },
-    "CA_FED_35035": {
-      "en": "Haliburton—Kawartha Lakes",
-      "zh": "哈利伯顿—卡沃萨湖"
     },
     "CA_FED_35036": {
       "en": "Hamilton Centre",
@@ -26879,18 +26691,6 @@
       "en": "Hastings—Lennox and Addington—Tyendinaga",
       "zh": "黑斯廷斯—伦诺克斯和阿丁顿—蒂恩迪纳加"
     },
-    "CA_FED_35041": {
-      "en": "Humber River—Black Creek",
-      "zh": "亨伯河—黑溪"
-    },
-    "CA_FED_35042": {
-      "en": "Huron—Bruce",
-      "zh": "休伦湖—布鲁斯"
-    },
-    "CA_FED_35043": {
-      "en": "Kanata",
-      "zh": "彼方"
-    },
     "CA_FED_35044": {
       "en": "Kapuskasing—Timmins—Mushkegowuk",
       "zh": "卡普斯卡辛—蒂明斯—穆什克古乌克"
@@ -26919,21 +26719,9 @@
       "en": "King—Vaughan",
       "zh": "国王—沃恩"
     },
-    "CA_FED_35048": {
-      "en": "Kitchener Centre",
-      "zh": "基奇纳中心"
-    },
     "CA_FED_35049": {
       "en": "Kitchener—Conestoga",
       "zh": "基奇纳—康尼斯托加"
-    },
-    "CA_FED_35050": {
-      "en": "Kitchener South—Hespeler",
-      "zh": "基奇纳南—赫斯佩勒"
-    },
-    "CA_FED_35051": {
-      "en": "Lanark—Frontenac",
-      "zh": "拉纳克—芳特纳克"
     },
     "CA_FED_35052__tno1962_1": {
       "en": "Leeds—Grenville—Thousand Islands—Rideau Lakes",
@@ -26967,10 +26755,6 @@
       "en": "Markham—Unionville",
       "zh": "万锦市—尤宁维尔"
     },
-    "CA_FED_35059": {
-      "en": "Middlesex—London",
-      "zh": "米德尔塞克斯—伦敦"
-    },
     "CA_FED_35060": {
       "en": "Milton East—Halton Hills South",
       "zh": "米尔顿东—荷尔顿山南"
@@ -26983,33 +26767,13 @@
       "en": "Mississauga East—Cooksville",
       "zh": "密西沙加东—库克斯维尔"
     },
-    "CA_FED_35063": {
-      "en": "Mississauga—Erin Mills",
-      "zh": "密西沙加—艾琳米尔斯"
-    },
-    "CA_FED_35064": {
-      "en": "Mississauga—Lakeshore",
-      "zh": "密西沙加—湖滨"
-    },
     "CA_FED_35065": {
       "en": "Mississauga—Malton",
       "zh": "密西沙加—莫尔顿"
     },
-    "CA_FED_35066": {
-      "en": "Mississauga—Streetsville",
-      "zh": "密西沙加—斯特里茨维尔"
-    },
     "CA_FED_35067": {
       "en": "Nepean",
       "zh": "内皮安"
-    },
-    "CA_FED_35068": {
-      "en": "Newmarket—Aurora",
-      "zh": "纽马克特—奥罗拉"
-    },
-    "CA_FED_35069": {
-      "en": "New Tecumseth—Gwillimbury",
-      "zh": "新特康塞斯—格威林伯里"
     },
     "CA_FED_35070": {
       "en": "Niagara Falls—Niagara-on-the-Lake",
@@ -27026,14 +26790,6 @@
     "CA_FED_35073": {
       "en": "Nipissing—Timiskaming",
       "zh": "尼皮辛——提米斯卡明"
-    },
-    "CA_FED_35074": {
-      "en": "Northumberland—Clarke",
-      "zh": "诺森伯兰郡—克拉克"
-    },
-    "CA_FED_35075": {
-      "en": "Oakville East",
-      "zh": "奥克维尔东"
     },
     "CA_FED_35076": {
       "en": "Oakville West",
@@ -27055,14 +26811,6 @@
       "en": "Ottawa—Vanier—Gloucester",
       "zh": "渥太华—瓦尼尔—格洛斯特"
     },
-    "CA_FED_35082": {
-      "en": "Ottawa West—Nepean",
-      "zh": "渥太华西—内皮恩"
-    },
-    "CA_FED_35083": {
-      "en": "Oxford",
-      "zh": "牛津"
-    },
     "CA_FED_35084__tno1962_1": {
       "en": "Parry Sound—Muskoka",
       "zh": "帕里湾—马斯科卡"
@@ -27070,14 +26818,6 @@
     "CA_FED_35084__tno1962_2": {
       "en": "Parry Sound—Muskoka",
       "zh": "帕里湾—马斯科卡"
-    },
-    "CA_FED_35085": {
-      "en": "Perth—Wellington",
-      "zh": "珀斯—惠灵顿"
-    },
-    "CA_FED_35087": {
-      "en": "Pickering—Brooklin",
-      "zh": "皮克林—布鲁克林"
     },
     "CA_FED_35088": {
       "en": "Prescott—Russell—Cumberland",
@@ -27111,29 +26851,9 @@
       "en": "Scarborough—Agincourt",
       "zh": "斯卡伯勒—阿静库尔"
     },
-    "CA_FED_35093": {
-      "en": "Scarborough Centre—Don Valley East",
-      "zh": "士嘉堡中心—当谷东"
-    },
-    "CA_FED_35094": {
-      "en": "Scarborough—Guildwood—Rouge Park",
-      "zh": "斯卡伯勒—吉尔德伍德—胭脂公园"
-    },
-    "CA_FED_35095": {
-      "en": "Scarborough North",
-      "zh": "士嘉堡北"
-    },
     "CA_FED_35096": {
       "en": "Scarborough Southwest",
       "zh": "士嘉堡西南"
-    },
-    "CA_FED_35097": {
-      "en": "Scarborough—Woburn",
-      "zh": "斯卡伯勒—沃本"
-    },
-    "CA_FED_35098": {
-      "en": "Simcoe—Grey",
-      "zh": "西姆科—格雷"
     },
     "CA_FED_35099__tno1962_1": {
       "en": "Simcoe North",
@@ -27187,10 +26907,6 @@
       "en": "Sudbury East—Manitoulin—Nickel Belt",
       "zh": "萨德伯里东—马尼图林—镍矿带"
     },
-    "CA_FED_35105": {
-      "en": "Taiaiako'n—Parkdale—High Park",
-      "zh": "泰亚亚科恩-帕克代尔-海帕克"
-    },
     "CA_FED_35106": {
       "en": "Thornhill",
       "zh": "康希尔"
@@ -27235,10 +26951,6 @@
       "en": "Thunder Bay—Superior North",
       "zh": "桑德贝—高级北区"
     },
-    "CA_FED_35109": {
-      "en": "Toronto Centre",
-      "zh": "多伦多中心"
-    },
     "CA_FED_35110": {
       "en": "Toronto—Danforth",
       "zh": "多伦多—丹福斯"
@@ -27247,10 +26959,6 @@
       "en": "Toronto—St. Paul's",
       "zh": "多伦多—圣保罗"
     },
-    "CA_FED_35112": {
-      "en": "University—Rosedale",
-      "zh": "大学—罗西代尔"
-    },
     "CA_FED_35113": {
       "en": "Vaughan—Woodbridge",
       "zh": "旺市—伍德布里奇"
@@ -27258,10 +26966,6 @@
     "CA_FED_35114": {
       "en": "Waterloo",
       "zh": "滑铁卢"
-    },
-    "CA_FED_35115": {
-      "en": "Wellington—Halton Hills North",
-      "zh": "惠灵顿—荷顿山北"
     },
     "CA_FED_35116": {
       "en": "Whitby",
@@ -27279,18 +26983,6 @@
       "en": "Windsor West",
       "zh": "温莎西"
     },
-    "CA_FED_35120": {
-      "en": "York Centre",
-      "zh": "约克中心"
-    },
-    "CA_FED_35121": {
-      "en": "York—Durham",
-      "zh": "约克—达勒姆"
-    },
-    "CA_FED_35122": {
-      "en": "York South—Weston—Etobicoke",
-      "zh": "约克南—韦斯顿—怡陶碧谷"
-    },
     "CA_FED_46001": {
       "en": "Brandon—Souris",
       "zh": "布兰登-苏里斯"
@@ -27298,18 +26990,6 @@
     "CA_FED_46002": {
       "en": "Churchill—Keewatinook Aski",
       "zh": "丘吉尔—基瓦蒂努克·阿斯基"
-    },
-    "CA_FED_46003": {
-      "en": "Elmwood—Transcona",
-      "zh": "埃尔姆伍德—特兰科纳"
-    },
-    "CA_FED_46004": {
-      "en": "Kildonan—St. Paul",
-      "zh": "基尔多南—圣保罗"
-    },
-    "CA_FED_46005": {
-      "en": "Portage—Lisgar",
-      "zh": "波蒂奇—利斯加"
     },
     "CA_FED_46006": {
       "en": "Provencher",
@@ -27319,33 +26999,9 @@
       "en": "Riding Mountain",
       "zh": "骑马山"
     },
-    "CA_FED_46008": {
-      "en": "St. Boniface—St. Vital",
-      "zh": "圣博尼法斯—圣维塔尔"
-    },
-    "CA_FED_46009": {
-      "en": "Selkirk—Interlake—Eastman",
-      "zh": "塞尔柯克—因特拉克—伊士曼"
-    },
     "CA_FED_46010": {
       "en": "Winnipeg Centre",
       "zh": "温尼伯中心"
-    },
-    "CA_FED_46011": {
-      "en": "Winnipeg North",
-      "zh": "北温尼伯"
-    },
-    "CA_FED_46012": {
-      "en": "Winnipeg South",
-      "zh": "温尼伯南"
-    },
-    "CA_FED_46013": {
-      "en": "Winnipeg South Centre",
-      "zh": "温尼伯南中心"
-    },
-    "CA_FED_46014": {
-      "en": "Winnipeg West",
-      "zh": "温尼伯西"
     },
     "CA_FED_47001": {
       "en": "Battlefords—Lloydminster—Meadow Lake",
@@ -27379,14 +27035,6 @@
       "en": "Regina—Wascana",
       "zh": "里贾纳—瓦斯卡纳"
     },
-    "CA_FED_47009": {
-      "en": "Saskatoon South",
-      "zh": "南萨斯卡通"
-    },
-    "CA_FED_47010": {
-      "en": "Saskatoon—University",
-      "zh": "萨斯卡通—大学"
-    },
     "CA_FED_47011": {
       "en": "Saskatoon West",
       "zh": "萨斯卡通西"
@@ -27403,17 +27051,9 @@
       "en": "Yorkton—Melville",
       "zh": "约克顿—梅尔维尔"
     },
-    "CA_FED_48001": {
-      "en": "Airdrie—Cochrane",
-      "zh": "艾尔德里—科克伦"
-    },
     "CA_FED_48002": {
       "en": "Battle River—Crowfoot",
       "zh": "巴特尔河—克劳福特"
-    },
-    "CA_FED_48003": {
-      "en": "Bow River",
-      "zh": "弓河"
     },
     "CA_FED_48004": {
       "en": "Calgary Centre",
@@ -27423,49 +27063,13 @@
       "en": "Calgary Confederation",
       "zh": "卡尔加里联合会"
     },
-    "CA_FED_48006": {
-      "en": "Calgary Crowfoot",
-      "zh": "卡尔加里克劳福特"
-    },
-    "CA_FED_48007": {
-      "en": "Calgary East",
-      "zh": "卡尔加里东"
-    },
-    "CA_FED_48008": {
-      "en": "Calgary Heritage",
-      "zh": "卡尔加里遗产"
-    },
-    "CA_FED_48009": {
-      "en": "Calgary McKnight",
-      "zh": "卡尔加里·麦克奈特"
-    },
-    "CA_FED_48010": {
-      "en": "Calgary Midnapore",
-      "zh": "卡尔加里米德纳普尔"
-    },
-    "CA_FED_48011": {
-      "en": "Calgary Nose Hill",
-      "zh": "卡尔加里鼻山"
-    },
-    "CA_FED_48012": {
-      "en": "Calgary Shepard",
-      "zh": "卡尔加里谢泼德"
-    },
     "CA_FED_48013": {
       "en": "Calgary Signal Hill",
       "zh": "卡尔加里信号山"
     },
-    "CA_FED_48014": {
-      "en": "Calgary Skyview",
-      "zh": "卡尔加里天空景观酒店"
-    },
     "CA_FED_48015": {
       "en": "Edmonton Centre",
       "zh": "埃德蒙顿中心"
-    },
-    "CA_FED_48016": {
-      "en": "Edmonton Gateway",
-      "zh": "埃德蒙顿门户"
     },
     "CA_FED_48017": {
       "en": "Edmonton Griesbach",
@@ -27479,21 +27083,9 @@
       "en": "Edmonton Northwest",
       "zh": "埃德蒙顿西北"
     },
-    "CA_FED_48020": {
-      "en": "Edmonton Riverbend",
-      "zh": "埃德蒙顿河湾"
-    },
-    "CA_FED_48021": {
-      "en": "Edmonton Southeast",
-      "zh": "埃德蒙顿东南部"
-    },
     "CA_FED_48022": {
       "en": "Edmonton Strathcona",
       "zh": "埃德蒙顿斯特拉斯科纳"
-    },
-    "CA_FED_48023": {
-      "en": "Edmonton West",
-      "zh": "埃德蒙顿西"
     },
     "CA_FED_48024": {
       "en": "Foothills",
@@ -27511,10 +27103,6 @@
       "en": "Lakeland",
       "zh": "莱克兰"
     },
-    "CA_FED_48028": {
-      "en": "Leduc—Wetaskiwin",
-      "zh": "勒杜克—韦塔斯基温"
-    },
     "CA_FED_48029": {
       "en": "Lethbridge",
       "zh": "莱斯布里奇"
@@ -27523,17 +27111,9 @@
       "en": "Medicine Hat—Cardston—Warner",
       "zh": "梅迪辛哈特—卡斯顿—华纳"
     },
-    "CA_FED_48031": {
-      "en": "Parkland",
-      "zh": "帕克兰"
-    },
     "CA_FED_48032": {
       "en": "Peace River—Westlock",
       "zh": "皮斯河—韦斯特洛克"
-    },
-    "CA_FED_48033": {
-      "en": "Ponoka—Didsbury",
-      "zh": "波诺卡—迪兹伯里"
     },
     "CA_FED_48034": {
       "en": "Red Deer",
@@ -27554,10 +27134,6 @@
     "CA_FED_59001": {
       "en": "Abbotsford—South Langley",
       "zh": "阿伯茨福德—南兰利"
-    },
-    "CA_FED_59002": {
-      "en": "Burnaby Central",
-      "zh": "本那比中央"
     },
     "CA_FED_59003": {
       "en": "Burnaby North—Seymour",
@@ -27583,17 +27159,9 @@
       "en": "Coquitlam—Port Coquitlam",
       "zh": "高贵林—高贵林港"
     },
-    "CA_FED_59009": {
-      "en": "Courtenay—Alberni",
-      "zh": "考特尼—阿尔伯尼"
-    },
     "CA_FED_59010": {
       "en": "Cowichan—Malahat—Langford",
       "zh": "考伊琴—马拉哈特—兰福德"
-    },
-    "CA_FED_59011": {
-      "en": "Delta",
-      "zh": "三角洲"
     },
     "CA_FED_59012": {
       "en": "Esquimalt—Saanich—Sooke",
@@ -27623,14 +27191,6 @@
       "en": "Mission—Matsqui—Abbotsford",
       "zh": "米申—马茨奎—阿伯茨福德"
     },
-    "CA_FED_59019": {
-      "en": "Nanaimo—Ladysmith",
-      "zh": "纳奈莫—莱迪史密斯"
-    },
-    "CA_FED_59020": {
-      "en": "New Westminster—Burnaby—Maillardville",
-      "zh": "新威斯敏斯特—本拿比—梅拉德维尔"
-    },
     "CA_FED_59021": {
       "en": "North Island—Powell River",
       "zh": "北岛—鲍威尔河"
@@ -27639,17 +27199,9 @@
       "en": "North Vancouver—Capilano",
       "zh": "北温哥华—卡皮拉诺"
     },
-    "CA_FED_59023": {
-      "en": "Okanagan Lake West—South Kelowna",
-      "zh": "奥卡纳根湖西-南基洛纳"
-    },
     "CA_FED_59024": {
       "en": "Pitt Meadows—Maple Ridge",
       "zh": "皮特梅多斯-枫树岭"
-    },
-    "CA_FED_59025": {
-      "en": "Port Moody—Coquitlam",
-      "zh": "穆迪港—高贵林"
     },
     "CA_FED_59026": {
       "en": "Prince George—Peace River—Northern Rockies",
@@ -27679,10 +27231,6 @@
       "en": "South Surrey—White Rock",
       "zh": "南萨里—白石"
     },
-    "CA_FED_59033": {
-      "en": "Surrey Centre",
-      "zh": "萨里中心"
-    },
     "CA_FED_59034": {
       "en": "Surrey Newton",
       "zh": "萨里牛顿"
@@ -27703,17 +27251,9 @@
       "en": "Vancouver Granville",
       "zh": "温哥华格兰维尔"
     },
-    "CA_FED_59039": {
-      "en": "Vancouver Kingsway",
-      "zh": "温哥华金威"
-    },
     "CA_FED_59040": {
       "en": "Vancouver Quadra",
       "zh": "温哥华四方"
-    },
-    "CA_FED_59041": {
-      "en": "Vernon—Lake Country—Monashee",
-      "zh": "弗农—湖区—莫纳希"
     },
     "CA_FED_59043": {
       "en": "West Vancouver—Sunshine Coast—Sea to Sky Country",
@@ -27730,6 +27270,218 @@
     "CA_FED_62001": {
       "en": "Nunavut",
       "zh": "努勒维特"
+    },
+    "CA_MRG_02a592f4a083": {
+      "en": "Courtenay—Alberni + Nanaimo—Ladysmith",
+      "zh": "考特尼—阿尔伯尼、纳奈莫—莱迪史密斯"
+    },
+    "CA_MRG_096ac84a0cc7": {
+      "en": "Calgary Heritage + Calgary Midnapore",
+      "zh": "卡尔加里遗产、卡尔加里米德纳普尔"
+    },
+    "CA_MRG_0f506b88e592": {
+      "en": "Taiaiako'n—Parkdale—High Park + York South—Weston—Etobicoke",
+      "zh": "泰亚亚科恩-帕克代尔-海帕克、约克南—韦斯顿—怡陶碧谷"
+    },
+    "CA_MRG_1a080100c822": {
+      "en": "Carleton + Lanark—Frontenac",
+      "zh": "卡尔顿、拉纳克—芳特纳克"
+    },
+    "CA_MRG_23b011e3543e": {
+      "en": "New Tecumseth—Gwillimbury + York—Durham",
+      "zh": "新特康塞斯—格威林伯里、约克—达勒姆"
+    },
+    "CA_MRG_24ae99283479": {
+      "en": "Brampton North—Caledon + Brampton West",
+      "zh": "北布兰普顿—卡利登、布兰普顿西"
+    },
+    "CA_MRG_2ebb41be023f": {
+      "en": "Edmonton Gateway + Edmonton Southeast",
+      "zh": "埃德蒙顿门户、埃德蒙顿东南部"
+    },
+    "CA_MRG_2eca2d3aeffd": {
+      "en": "Humber River—Black Creek + York Centre",
+      "zh": "亨伯河—黑溪、约克中心"
+    },
+    "CA_MRG_3e06e9aabd9f": {
+      "en": "Argenteuil—La Petite-Nation + Les Pays-d'en-Haut + Mirabel",
+      "zh": "阿让特伊—小民族、上省、米拉贝尔"
+    },
+    "CA_MRG_410af4197c3c": {
+      "en": "Delta + Surrey Centre",
+      "zh": "三角洲、萨里中心"
+    },
+    "CA_MRG_43ae18b09e32": {
+      "en": "Kildonan—St. Paul + Winnipeg North",
+      "zh": "基尔多南—圣保罗、北温尼伯"
+    },
+    "CA_MRG_46f94b8c5773": {
+      "en": "Central Nova + Sackville—Bedford—Preston",
+      "zh": "中央新星、萨克维尔—贝德福德—普雷斯顿"
+    },
+    "CA_MRG_480215c2f838": {
+      "en": "Beauséjour + Moncton—Dieppe",
+      "zh": "博塞茹尔、蒙克顿—迪耶普"
+    },
+    "CA_MRG_4b867801b8a0": {
+      "en": "Dorval—Lachine—LaSalle + Saint-Laurent",
+      "zh": "多瓦尔—拉钦—拉萨尔、圣洛朗"
+    },
+    "CA_MRG_528f74543a8b": {
+      "en": "Elgin—St. Thomas—London South + Middlesex—London + Oxford",
+      "zh": "埃尔金—圣托马斯—伦敦南、米德尔塞克斯—伦敦、牛津"
+    },
+    "CA_MRG_567d2b874fad": {
+      "en": "Edmonton Riverbend + Edmonton West",
+      "zh": "埃德蒙顿河湾、埃德蒙顿西"
+    },
+    "CA_MRG_57ed93ea7b6f": {
+      "en": "Saskatoon South + Saskatoon—University",
+      "zh": "南萨斯卡通、萨斯卡通—大学"
+    },
+    "CA_MRG_5a20b1bb5941": {
+      "en": "Scarborough Centre—Don Valley East + Scarborough—Woburn",
+      "zh": "士嘉堡中心—当谷东、斯卡伯勒—沃本"
+    },
+    "CA_MRG_5e17f5b2af34": {
+      "en": "Berthier—Maskinongé + Joliette—Manawan + Montcalm",
+      "zh": "贝尔蒂埃—马斯基农热、乔利埃特—马纳万、蒙卡尔姆"
+    },
+    "CA_MRG_653d532898a8": {
+      "en": "Rivière-des-Mille-Îles + Thérèse-De Blainville",
+      "zh": "千岛河、泰蕾兹-德布兰维尔"
+    },
+    "CA_MRG_684250872a47": {
+      "en": "Ajax + Pickering—Brooklin",
+      "zh": "阿贾克斯、皮克林—布鲁克林"
+    },
+    "CA_MRG_705e30d79f5c": {
+      "en": "Mississauga—Lakeshore + Oakville East",
+      "zh": "密西沙加—湖滨、奥克维尔东"
+    },
+    "CA_MRG_73fc08ab0b94": {
+      "en": "Aurora—Oak Ridges—Richmond Hill + Newmarket—Aurora",
+      "zh": "奥罗拉—橡树岭—列治文山、纽马克特—奥罗拉"
+    },
+    "CA_MRG_77a1b136ce43": {
+      "en": "Calgary Crowfoot + Calgary Nose Hill",
+      "zh": "卡尔加里克劳福特、卡尔加里鼻山"
+    },
+    "CA_MRG_7b5ba113838a": {
+      "en": "Haliburton—Kawartha Lakes + Northumberland—Clarke + Peterborough",
+      "zh": "哈利伯顿—卡沃萨湖、诺森伯兰郡—克拉克、彼得伯勒"
+    },
+    "CA_MRG_7cbc6bf7c111": {
+      "en": "Pierre-Boucher—Les Patriotes—Verchères + Saint-Hyacinthe—Bagot—Acton + Shefford",
+      "zh": "皮埃尔-布歇—爱国者—维谢尔、圣亚森特—巴戈特—阿克顿、谢福德"
+    },
+    "CA_MRG_7d4331ee0a5c": {
+      "en": "Mississauga—Erin Mills + Mississauga—Streetsville",
+      "zh": "密西沙加—艾琳米尔斯、密西沙加—斯特里茨维尔"
+    },
+    "CA_MRG_7e7e19718e0f": {
+      "en": "Montmorency—Charlevoix + Portneuf—Jacques-Cartier",
+      "zh": "蒙莫朗西—沙勒瓦、波特纳夫—雅克·卡地亚"
+    },
+    "CA_MRG_80a56ade734c": {
+      "en": "Calgary East + Calgary Shepard",
+      "zh": "卡尔加里东、卡尔加里谢泼德"
+    },
+    "CA_MRG_8219e9529a16": {
+      "en": "Bécancour—Nicolet—Saurel—Alnôbak + Drummond + Richmond—Arthabaska",
+      "zh": "贝坎库尔—尼科莱—索雷尔—阿尔诺巴克、德拉蒙德、里士满—阿尔萨巴斯卡"
+    },
+    "CA_MRG_8516027ac8b5": {
+      "en": "Toronto Centre + University—Rosedale",
+      "zh": "多伦多中心、大学—罗西代尔"
+    },
+    "CA_MRG_86ce9e72c383": {
+      "en": "Elmwood—Transcona + St. Boniface—St. Vital",
+      "zh": "埃尔姆伍德—特兰科纳、圣博尼法斯—圣维塔尔"
+    },
+    "CA_MRG_911ec8320222": {
+      "en": "Brantford—Brant South—Six Nations + Flamborough—Glanbrook—Brant North + Haldimand—Norfolk",
+      "zh": "布兰特福德—布兰特南—六国、弗兰伯勒—格兰布鲁克—布兰特北、哈尔迪曼德—诺福克"
+    },
+    "CA_MRG_9789731d079e": {
+      "en": "Fundy Royal + Saint John—Kennebecasis",
+      "zh": "芬迪皇家、圣约翰-肯尼贝卡西斯"
+    },
+    "CA_MRG_a14ea77f718d": {
+      "en": "Winnipeg South + Winnipeg South Centre",
+      "zh": "温尼伯南、温尼伯南中心"
+    },
+    "CA_MRG_a592db62ce9c": {
+      "en": "Portage—Lisgar + Selkirk—Interlake—Eastman + Winnipeg West",
+      "zh": "波蒂奇—利斯加、塞尔柯克—因特拉克—伊士曼、温尼伯西"
+    },
+    "CA_MRG_ac3bfdb5edd9": {
+      "en": "Kitchener Centre + Kitchener South—Hespeler",
+      "zh": "基奇纳中心、基奇纳南—赫斯佩勒"
+    },
+    "CA_MRG_bf94919e448f": {
+      "en": "Châteauguay—Les Jardins-de-Napierville + Saint-Jean",
+      "zh": "沙托盖—内皮尔维尔花园、圣让"
+    },
+    "CA_MRG_c32aed1df08f": {
+      "en": "Lac-Saint-Louis + Pierrefonds—Dollard",
+      "zh": "圣路易斯湖、皮埃尔丰-多拉德"
+    },
+    "CA_MRG_c4a98756227d": {
+      "en": "Laval—Les Îles + Marc-Aurèle-Fortin",
+      "zh": "拉瓦尔—莱斯岛、马克·奥雷勒·福廷"
+    },
+    "CA_MRG_d08e3259dc76": {
+      "en": "Scarborough—Guildwood—Rouge Park + Scarborough North",
+      "zh": "斯卡伯勒—吉尔德伍德—胭脂公园、士嘉堡北"
+    },
+    "CA_MRG_d16c931e21ca": {
+      "en": "Louis-Hébert + Louis-Saint-Laurent—Akiawenhrahk",
+      "zh": "路易斯·赫伯特、路易·圣洛朗—阿基亚文拉克"
+    },
+    "CA_MRG_d17d84b57368": {
+      "en": "Huron—Bruce + Perth—Wellington",
+      "zh": "休伦湖—布鲁斯、珀斯—惠灵顿"
+    },
+    "CA_MRG_d27584f205e9": {
+      "en": "Kanata + Ottawa West—Nepean",
+      "zh": "彼方、渥太华西—内皮恩"
+    },
+    "CA_MRG_d35dd30542b8": {
+      "en": "Burnaby Central + Vancouver Kingsway",
+      "zh": "本那比中央、温哥华金威"
+    },
+    "CA_MRG_dde82f995deb": {
+      "en": "New Westminster—Burnaby—Maillardville + Port Moody—Coquitlam",
+      "zh": "新威斯敏斯特—本拿比—梅拉德维尔、穆迪港—高贵林"
+    },
+    "CA_MRG_df8fc4dc7fdc": {
+      "en": "Calgary McKnight + Calgary Skyview",
+      "zh": "卡尔加里·麦克奈特、卡尔加里天空景观酒店"
+    },
+    "CA_MRG_e32835bda9ac": {
+      "en": "Airdrie—Cochrane + Bow River",
+      "zh": "艾尔德里—科克伦、弓河"
+    },
+    "CA_MRG_f50bdee7dd4c": {
+      "en": "Don Valley North + Don Valley West",
+      "zh": "当谷北、当谷西"
+    },
+    "CA_MRG_f85fee938b91": {
+      "en": "Alfred-Pellan + Vimy",
+      "zh": "阿尔弗雷德-佩兰、维米"
+    },
+    "CA_MRG_fca877bc83a4": {
+      "en": "Okanagan Lake West—South Kelowna + Vernon—Lake Country—Monashee",
+      "zh": "奥卡纳根湖西-南基洛纳、弗农—湖区—莫纳希"
+    },
+    "CA_MRG_fccdff3ab06c": {
+      "en": "Leduc—Wetaskiwin + Parkland + Ponoka—Didsbury",
+      "zh": "勒杜克—韦塔斯基温、帕克兰、波诺卡—迪兹伯里"
+    },
+    "CA_MRG_fdd421e1a6fe": {
+      "en": "Dufferin—Caledon + Simcoe—Grey + Wellington—Halton Hills North",
+      "zh": "达弗林—卡利登、西姆科—格雷、惠灵顿—荷顿山北"
     },
     "CD_ADM1_COD-1461__tno1962_1": {
       "en": "Équateur",
@@ -41463,21 +41215,9 @@
       "en": "Gulbarga",
       "zh": "古尔伯加"
     },
-    "IN_ADM2_76128533B11082155919544": {
-      "en": "Rajsamand",
-      "zh": "拉杰萨曼德"
-    },
-    "IN_ADM2_76128533B11083100419963": {
-      "en": "Mahoba",
-      "zh": "马霍巴"
-    },
     "IN_ADM2_76128533B11403491783632": {
       "en": "Tirupathur",
       "zh": "蒂鲁巴图尔"
-    },
-    "IN_ADM2_76128533B11421856387892": {
-      "en": "Tamenglong",
-      "zh": "塔猛隆"
     },
     "IN_ADM2_76128533B11651252780045": {
       "en": "Dibang Valley",
@@ -41490,10 +41230,6 @@
     "IN_ADM2_76128533B12079567451207": {
       "en": "Dungarpur",
       "zh": "邓加尔普尔"
-    },
-    "IN_ADM2_76128533B12144400448811": {
-      "en": "Kondagaon",
-      "zh": "康达冈"
     },
     "IN_ADM2_76128533B12197302963241": {
       "en": "Sahibzada Ajit Singh Nagar",
@@ -41539,10 +41275,6 @@
       "en": "Nagaon",
       "zh": "纳加翁"
     },
-    "IN_ADM2_76128533B13552746017223": {
-      "en": "Faridkot",
-      "zh": "法里德科特"
-    },
     "IN_ADM2_76128533B13673614951516": {
       "en": "Chandauli",
       "zh": "尚杜利"
@@ -41559,10 +41291,6 @@
       "en": "Bathinda",
       "zh": "巴廷达"
     },
-    "IN_ADM2_76128533B13908294104682": {
-      "en": "Amethi",
-      "zh": "阿梅蒂"
-    },
     "IN_ADM2_76128533B14033116794334": {
       "en": "Siwan",
       "zh": "斯万"
@@ -41570,10 +41298,6 @@
     "IN_ADM2_76128533B14243635342908": {
       "en": "Bhandara",
       "zh": "班达拉"
-    },
-    "IN_ADM2_76128533B14292125820380": {
-      "en": "Dakshin Bastar Dantewada",
-      "zh": "达克辛·巴斯塔·丹特瓦达"
     },
     "IN_ADM2_76128533B14403163214152": {
       "en": "Bishnupur",
@@ -41591,10 +41315,6 @@
       "en": "Narayanpet",
       "zh": "纳拉扬佩特"
     },
-    "IN_ADM2_76128533B14984770113274": {
-      "en": "Shahid Bhagat Singh Nagar",
-      "zh": "沙希德·巴加特·辛格·纳加尔"
-    },
     "IN_ADM2_76128533B15157901669242": {
       "en": "Majuli",
       "zh": "马朱利"
@@ -41606,10 +41326,6 @@
     "IN_ADM2_76128533B15337568968545": {
       "en": "Erode",
       "zh": "埃罗德"
-    },
-    "IN_ADM2_76128533B15342706434354": {
-      "en": "Etah",
-      "zh": "埃塔"
     },
     "IN_ADM2_76128533B15550697205080": {
       "en": "Chikmagalur",
@@ -41671,17 +41387,9 @@
       "en": "Hailakandi",
       "zh": "海拉坎迪"
     },
-    "IN_ADM2_76128533B16781044866906": {
-      "en": "Jamui",
-      "zh": "贾穆伊"
-    },
     "IN_ADM2_76128533B16811573188243": {
       "en": "Puruliya",
       "zh": "普鲁利亚"
-    },
-    "IN_ADM2_76128533B16889790752134": {
-      "en": "Ariyalur",
-      "zh": "阿里亚鲁尔"
     },
     "IN_ADM2_76128533B17109302371020": {
       "en": "Darjiling",
@@ -41691,14 +41399,6 @@
       "en": "North Goa",
       "zh": "北果阿"
     },
-    "IN_ADM2_76128533B17261532861377": {
-      "en": "Jamtara",
-      "zh": "贾姆塔拉"
-    },
-    "IN_ADM2_76128533B17292264941997": {
-      "en": "Mungeli",
-      "zh": "蒙格利"
-    },
     "IN_ADM2_76128533B17762399278073": {
       "en": "Pashchim Champaran",
       "zh": "西尚帕兰"
@@ -41707,10 +41407,6 @@
       "en": "Mirzapur",
       "zh": "米尔扎普尔"
     },
-    "IN_ADM2_76128533B18648944871057": {
-      "en": "Basti",
-      "zh": "巴斯蒂"
-    },
     "IN_ADM2_76128533B18668117085772": {
       "en": "Tawang",
       "zh": "达旺"
@@ -41718,10 +41414,6 @@
     "IN_ADM2_76128533B1875965515331": {
       "en": "Namsai",
       "zh": "南赛"
-    },
-    "IN_ADM2_76128533B18802630191461": {
-      "en": "Dumka",
-      "zh": "杜姆卡"
     },
     "IN_ADM2_76128533B18834172694083": {
       "en": "Moga",
@@ -41763,10 +41455,6 @@
       "en": "Saran",
       "zh": "萨兰"
     },
-    "IN_ADM2_76128533B1996088953603": {
-      "en": "Sultanpur",
-      "zh": "苏丹普尔"
-    },
     "IN_ADM2_76128533B20298037622173": {
       "en": "South Salmara-Mankachar",
       "zh": "南萨尔马拉-曼卡查尔"
@@ -41783,17 +41471,9 @@
       "en": "Osmanabad",
       "zh": "奥斯马纳巴德"
     },
-    "IN_ADM2_76128533B20502827346807": {
-      "en": "Dindori",
-      "zh": "丁多里"
-    },
     "IN_ADM2_76128533B20504715877560": {
       "en": "Ganderbal",
       "zh": "甘德巴尔"
-    },
-    "IN_ADM2_76128533B20660206691661": {
-      "en": "Auraiya",
-      "zh": "奥莱亚"
     },
     "IN_ADM2_76128533B20683890392439": {
       "en": "Narsimhapur",
@@ -41811,10 +41491,6 @@
       "en": "Morbi",
       "zh": "莫尔比"
     },
-    "IN_ADM2_76128533B21068662878849": {
-      "en": "Kamareddy",
-      "zh": "卡马雷迪"
-    },
     "IN_ADM2_76128533B21119051307760": {
       "en": "Jyotiba Phule Nagar",
       "zh": "乔蒂巴·普勒·纳加尔"
@@ -41822,14 +41498,6 @@
     "IN_ADM2_76128533B21179322085415": {
       "en": "Harda",
       "zh": "哈尔达"
-    },
-    "IN_ADM2_76128533B21485897206517": {
-      "en": "Rajanna Sircilla",
-      "zh": "拉贾纳·瑟西拉"
-    },
-    "IN_ADM2_76128533B21722277889516": {
-      "en": "Sivasagar",
-      "zh": "西瓦萨加尔"
     },
     "IN_ADM2_76128533B21812274124310": {
       "en": "The Nilgiris",
@@ -41875,10 +41543,6 @@
       "en": "Kanpur Nagar",
       "zh": "坎普尔纳加尔"
     },
-    "IN_ADM2_76128533B23735146933631": {
-      "en": "Mandi",
-      "zh": "曼迪"
-    },
     "IN_ADM2_76128533B23858286755005": {
       "en": "Alipurduar",
       "zh": "阿里布尔杜阿尔"
@@ -41887,10 +41551,6 @@
       "en": "Yamunanagar",
       "zh": "亚穆纳讷格尔"
     },
-    "IN_ADM2_76128533B24101991435637": {
-      "en": "Jehanabad",
-      "zh": "杰哈纳巴德"
-    },
     "IN_ADM2_76128533B24594618908349": {
       "en": "Suryapet",
       "zh": "苏里亚佩特"
@@ -41898,10 +41558,6 @@
     "IN_ADM2_76128533B24755983727265": {
       "en": "Saharsa",
       "zh": "萨哈萨"
-    },
-    "IN_ADM2_76128533B24759700890118": {
-      "en": "Rupnagar",
-      "zh": "鲁普纳加尔"
     },
     "IN_ADM2_76128533B24861976740713": {
       "en": "Jhargram",
@@ -41915,10 +41571,6 @@
       "en": "Hardoi",
       "zh": "哈多伊"
     },
-    "IN_ADM2_76128533B25280172436550": {
-      "en": "Nirmal",
-      "zh": "尼尔马尔"
-    },
     "IN_ADM2_76128533B25344721013980": {
       "en": "Dhule",
       "zh": "杜勒"
@@ -41926,10 +41578,6 @@
     "IN_ADM2_76128533B25373378863054": {
       "en": "Purba Medinipur",
       "zh": "普巴梅迪尼普尔"
-    },
-    "IN_ADM2_76128533B25468964623139": {
-      "en": "Anuppur",
-      "zh": "阿努普尔"
     },
     "IN_ADM2_76128533B25576352747885": {
       "en": "Bharatpur",
@@ -41939,10 +41587,6 @@
       "en": "Mandsaur",
       "zh": "曼德绍尔"
     },
-    "IN_ADM2_76128533B2576169508425": {
-      "en": "Kottayam",
-      "zh": "科塔亚姆"
-    },
     "IN_ADM2_76128533B25835998628545": {
       "en": "Dhubri",
       "zh": "杜布里"
@@ -41950,10 +41594,6 @@
     "IN_ADM2_76128533B26296891809198": {
       "en": "Agra",
       "zh": "阿格拉"
-    },
-    "IN_ADM2_76128533B26755490628656": {
-      "en": "Uttar Bastar Kanker",
-      "zh": "北巴斯塔尔坎克尔"
     },
     "IN_ADM2_76128533B26931973511551": {
       "en": "Kushinagar",
@@ -41999,10 +41639,6 @@
       "en": "Sawai Madhopur",
       "zh": "萨瓦伊马多布尔"
     },
-    "IN_ADM2_76128533B28290181894983": {
-      "en": "Mahabubabad",
-      "zh": "马哈布巴巴德"
-    },
     "IN_ADM2_76128533B28294794137747": {
       "en": "Kurnool",
       "zh": "库努尔"
@@ -42039,25 +41675,13 @@
       "en": "Madhepura",
       "zh": "马代普拉"
     },
-    "IN_ADM2_76128533B29330052395581": {
-      "en": "Pathanamthitta",
-      "zh": "帕塔南提塔"
-    },
     "IN_ADM2_76128533B29554440319099": {
       "en": "Mahrajganj",
       "zh": "马哈拉吉甘吉"
     },
-    "IN_ADM2_76128533B29672216830072": {
-      "en": "Sheikhpura",
-      "zh": "谢赫普拉"
-    },
     "IN_ADM2_76128533B2970909480221": {
       "en": "Peren",
       "zh": "佩伦"
-    },
-    "IN_ADM2_76128533B29721759389119": {
-      "en": "Agar",
-      "zh": "阿加尔"
     },
     "IN_ADM2_76128533B29873478326363": {
       "en": "Puducherry",
@@ -42071,10 +41695,6 @@
       "en": "West District",
       "zh": "西区"
     },
-    "IN_ADM2_76128533B30246762498957": {
-      "en": "Bhadradri",
-      "zh": "巴德拉德里"
-    },
     "IN_ADM2_76128533B3026318797185": {
       "en": "Nagpur",
       "zh": "那格浦尔"
@@ -42083,17 +41703,9 @@
       "en": "Sagar",
       "zh": "萨加尔"
     },
-    "IN_ADM2_76128533B30477486088156": {
-      "en": "Shajapur",
-      "zh": "沙贾布尔"
-    },
     "IN_ADM2_76128533B30779259886340": {
       "en": "Imphal East",
       "zh": "因帕尔东"
-    },
-    "IN_ADM2_76128533B31111781432113": {
-      "en": "Siddipet",
-      "zh": "西迪佩特"
     },
     "IN_ADM2_76128533B31127900859310": {
       "en": "Udhampur",
@@ -42127,14 +41739,6 @@
       "en": "Purnia",
       "zh": "普尔尼亚"
     },
-    "IN_ADM2_76128533B32509926596077": {
-      "en": "Dhenkanal",
-      "zh": "登卡纳尔"
-    },
-    "IN_ADM2_76128533B32949331695897": {
-      "en": "Jagatsinghapur",
-      "zh": "贾加辛哈布尔"
-    },
     "IN_ADM2_76128533B32998994032811": {
       "en": "Punch",
       "zh": "蓬奇"
@@ -42147,17 +41751,9 @@
       "en": "Thiruvananthapuram",
       "zh": "特里凡得琅"
     },
-    "IN_ADM2_76128533B33226396095315": {
-      "en": "Komaram Bheem",
-      "zh": "科马拉姆·比姆"
-    },
     "IN_ADM2_76128533B33437990510331": {
       "en": "Saharanpur",
       "zh": "萨哈兰普尔"
-    },
-    "IN_ADM2_76128533B33451850475260": {
-      "en": "Nuapada",
-      "zh": "努阿帕达"
     },
     "IN_ADM2_76128533B33458049385696": {
       "en": "Rohtas",
@@ -42199,14 +41795,6 @@
       "en": "Shrawasti",
       "zh": "舍瓦斯蒂"
     },
-    "IN_ADM2_76128533B35083559759016": {
-      "en": "Idukki",
-      "zh": "伊杜基"
-    },
-    "IN_ADM2_76128533B35129325000613": {
-      "en": "Sabar Kantha",
-      "zh": "萨巴尔坎塔"
-    },
     "IN_ADM2_76128533B35143550659673": {
       "en": "Latehar",
       "zh": "拉特哈尔"
@@ -42235,21 +41823,9 @@
       "en": "Krishnagiri",
       "zh": "克里希纳吉里"
     },
-    "IN_ADM2_76128533B35759455556328": {
-      "en": "North Garo Hills",
-      "zh": "北加罗山"
-    },
     "IN_ADM2_76128533B36164606132718": {
       "en": "Vizianagaram",
       "zh": "维济阿纳加拉姆"
-    },
-    "IN_ADM2_76128533B36594996191182": {
-      "en": "Noney",
-      "zh": "诺尼"
-    },
-    "IN_ADM2_76128533B36625800127334": {
-      "en": "Nawada",
-      "zh": "纳瓦达"
     },
     "IN_ADM2_76128533B36734405131975": {
       "en": "Maldah",
@@ -42283,10 +41859,6 @@
       "en": "Shupiyan",
       "zh": "舒皮岩"
     },
-    "IN_ADM2_76128533B38141181853016": {
-      "en": "Kolasib",
-      "zh": "科拉西布"
-    },
     "IN_ADM2_76128533B38203190611533": {
       "en": "Gaurella Pendra Marwahi",
       "zh": "高雷拉·彭德拉·马尔瓦希"
@@ -42294,10 +41866,6 @@
     "IN_ADM2_76128533B38230828972906": {
       "en": "Kamrup Metropolitan",
       "zh": "坎鲁普大都会"
-    },
-    "IN_ADM2_76128533B38354309367879": {
-      "en": "Adilabad",
-      "zh": "阿迪拉巴德"
     },
     "IN_ADM2_76128533B38548995376745": {
       "en": "Karbi Anglong East",
@@ -42359,17 +41927,9 @@
       "en": "Gorakhpur",
       "zh": "戈勒克布尔"
     },
-    "IN_ADM2_76128533B40480360118262": {
-      "en": "Sangareddy",
-      "zh": "桑加雷迪"
-    },
     "IN_ADM2_76128533B40509297062120": {
       "en": "Siddharthnagar",
       "zh": "悉达多那迦"
-    },
-    "IN_ADM2_76128533B40535123096970": {
-      "en": "East Garo Hills",
-      "zh": "东加罗山"
     },
     "IN_ADM2_76128533B40638696154891": {
       "en": "Faridabad",
@@ -42386,10 +41946,6 @@
     "IN_ADM2_76128533B40923846274136": {
       "en": "Junagadh",
       "zh": "朱纳加德"
-    },
-    "IN_ADM2_76128533B40995085026980": {
-      "en": "Nalbari",
-      "zh": "纳尔巴里"
     },
     "IN_ADM2_76128533B41005496708834": {
       "en": "Sonitpur",
@@ -42483,25 +42039,13 @@
       "en": "Ukhrul",
       "zh": "库鲁尔"
     },
-    "IN_ADM2_76128533B44197302080139": {
-      "en": "Thoubal",
-      "zh": "图巴尔"
-    },
     "IN_ADM2_76128533B44250373880839": {
       "en": "Damoh",
       "zh": "达莫"
     },
-    "IN_ADM2_76128533B44395557448920": {
-      "en": "Balangir",
-      "zh": "巴兰吉尔"
-    },
     "IN_ADM2_76128533B44632955875385": {
       "en": "Chatra",
       "zh": "查特拉"
-    },
-    "IN_ADM2_76128533B4466876522971": {
-      "en": "Umaria",
-      "zh": "乌马里亚"
     },
     "IN_ADM2_76128533B4481773749911": {
       "en": "Krishna",
@@ -42510,10 +42054,6 @@
     "IN_ADM2_76128533B45037556977273": {
       "en": "Gir Somnath",
       "zh": "吉尔·索姆纳特"
-    },
-    "IN_ADM2_76128533B45072089356239": {
-      "en": "Thiruvarur",
-      "zh": "蒂鲁瓦鲁尔"
     },
     "IN_ADM2_76128533B45099378029175": {
       "en": "Banda",
@@ -42535,17 +42075,9 @@
       "en": "Thiruvallur",
       "zh": "蒂鲁瓦卢尔"
     },
-    "IN_ADM2_76128533B45623818137574": {
-      "en": "Arwal",
-      "zh": "阿尔瓦尔"
-    },
     "IN_ADM2_76128533B45655211862788": {
       "en": "Rajouri",
       "zh": "拉朱里"
-    },
-    "IN_ADM2_76128533B46038384763988": {
-      "en": "Rudraprayag",
-      "zh": "鲁德拉普拉亚格"
     },
     "IN_ADM2_76128533B46195204843409": {
       "en": "Ludhiana",
@@ -42567,17 +42099,9 @@
       "en": "Rampur",
       "zh": "兰普尔"
     },
-    "IN_ADM2_76128533B46866455993508": {
-      "en": "Narmada",
-      "zh": "讷尔默达"
-    },
     "IN_ADM2_76128533B46926146855114": {
       "en": "Garhwal",
       "zh": "加瓦尔"
-    },
-    "IN_ADM2_76128533B46979893461805": {
-      "en": "Surajpur",
-      "zh": "苏拉杰布尔"
     },
     "IN_ADM2_76128533B4720703924950": {
       "en": "Unokoti",
@@ -42586,10 +42110,6 @@
     "IN_ADM2_76128533B4743808419896": {
       "en": "Dharmapuri",
       "zh": "达马普里"
-    },
-    "IN_ADM2_76128533B47448948912370": {
-      "en": "Koraput",
-      "zh": "科拉普特"
     },
     "IN_ADM2_76128533B4745348385341": {
       "en": "Araria",
@@ -42607,10 +42127,6 @@
       "en": "Kargil",
       "zh": "卡吉尔"
     },
-    "IN_ADM2_76128533B47772746709007": {
-      "en": "Barpeta",
-      "zh": "巴尔佩塔"
-    },
     "IN_ADM2_76128533B47816398970283": {
       "en": "Ahmadnagar",
       "zh": "艾哈迈德讷格尔"
@@ -42618,14 +42134,6 @@
     "IN_ADM2_76128533B47840093719460": {
       "en": "Bastar",
       "zh": "巴斯塔"
-    },
-    "IN_ADM2_76128533B48075109668277": {
-      "en": "Bangalore Rural",
-      "zh": "班加罗尔乡村"
-    },
-    "IN_ADM2_76128533B48077510234542": {
-      "en": "Kabeerdham",
-      "zh": "卡伯丹姆"
     },
     "IN_ADM2_76128533B48708628358161": {
       "en": "Doda",
@@ -42659,10 +42167,6 @@
       "en": "Lucknow",
       "zh": "勒克瑙"
     },
-    "IN_ADM2_76128533B49456368048033": {
-      "en": "Serchhip",
-      "zh": "塞希普"
-    },
     "IN_ADM2_76128533B49460554954204": {
       "en": "Ghazipur",
       "zh": "加济布尔"
@@ -42671,17 +42175,9 @@
       "en": "Davanagere",
       "zh": "达瓦纳杰雷"
     },
-    "IN_ADM2_76128533B49615943426842": {
-      "en": "Mahisagar",
-      "zh": "马希萨加尔"
-    },
     "IN_ADM2_76128533B49805675626253": {
       "en": "Sahibganj",
       "zh": "萨希布甘杰"
-    },
-    "IN_ADM2_76128533B49867917697487": {
-      "en": "Sirohi",
-      "zh": "西罗日"
     },
     "IN_ADM2_76128533B49993259380917": {
       "en": "Lower Siang",
@@ -42699,10 +42195,6 @@
       "en": "Nashik",
       "zh": "纳西克"
     },
-    "IN_ADM2_76128533B50184713016881": {
-      "en": "Muktsar",
-      "zh": "穆克察尔"
-    },
     "IN_ADM2_76128533B50275440439236": {
       "en": "Saraikela-Kharsawan",
       "zh": "萨拉凯拉-卡萨万"
@@ -42710,10 +42202,6 @@
     "IN_ADM2_76128533B50374927918374": {
       "en": "Nainital",
       "zh": "奈尼塔尔"
-    },
-    "IN_ADM2_76128533B50498617372937": {
-      "en": "Rayagada",
-      "zh": "拉亚加达"
     },
     "IN_ADM2_76128533B50650763703739": {
       "en": "Dhemaji",
@@ -42746,10 +42234,6 @@
     "IN_ADM2_76128533B51402332870635": {
       "en": "Murshidabad",
       "zh": "穆尔什达巴德"
-    },
-    "IN_ADM2_76128533B51799781997546": {
-      "en": "Perambalur",
-      "zh": "佩兰巴鲁尔"
     },
     "IN_ADM2_76128533B51849218363622": {
       "en": "Moradabad",
@@ -42795,10 +42279,6 @@
       "en": "Mancherial",
       "zh": "曼彻里亚尔"
     },
-    "IN_ADM2_76128533B53316015271969": {
-      "en": "Sukma",
-      "zh": "苏克马"
-    },
     "IN_ADM2_76128533B53366745705922": {
       "en": "Birbhum",
       "zh": "伯布姆"
@@ -42810,10 +42290,6 @@
     "IN_ADM2_76128533B53549946596470": {
       "en": "Dewas",
       "zh": "德瓦斯"
-    },
-    "IN_ADM2_76128533B53609934827566": {
-      "en": "Jashpur",
-      "zh": "贾什布尔"
     },
     "IN_ADM2_76128533B53671786151110": {
       "en": "Kohima",
@@ -42855,10 +42331,6 @@
       "en": "Dakshina Kannada",
       "zh": "南卡纳达"
     },
-    "IN_ADM2_76128533B54517225652088": {
-      "en": "Banka",
-      "zh": "班卡"
-    },
     "IN_ADM2_76128533B54652028494758": {
       "en": "Tarn Taran",
       "zh": "塔恩塔兰"
@@ -42894,10 +42366,6 @@
     "IN_ADM2_76128533B5628791558965": {
       "en": "Alwar",
       "zh": "阿尔瓦尔"
-    },
-    "IN_ADM2_76128533B56326354019534": {
-      "en": "Kangpokpi",
-      "zh": "康波皮"
     },
     "IN_ADM2_76128533B56857410767766": {
       "en": "Diu",
@@ -42955,10 +42423,6 @@
       "en": "Nizamabad",
       "zh": "尼扎马巴德"
     },
-    "IN_ADM2_76128533B58527154065354": {
-      "en": "Chittaurgarh",
-      "zh": "奇陶加尔"
-    },
     "IN_ADM2_76128533B58537895532859": {
       "en": "Chamba",
       "zh": "昌巴"
@@ -42970,10 +42434,6 @@
     "IN_ADM2_76128533B58569599021232": {
       "en": "Solan",
       "zh": "索兰"
-    },
-    "IN_ADM2_76128533B58697472287618": {
-      "en": "Godda",
-      "zh": "戈达"
     },
     "IN_ADM2_76128533B58797478961083": {
       "en": "Bhadrak",
@@ -42995,14 +42455,6 @@
       "en": "Srikakulam",
       "zh": "斯里卡古兰"
     },
-    "IN_ADM2_76128533B59459156188335": {
-      "en": "Jalor",
-      "zh": "贾洛尔"
-    },
-    "IN_ADM2_76128533B59504628511334": {
-      "en": "Kendujhar",
-      "zh": "肯杜贾尔"
-    },
     "IN_ADM2_76128533B59596968713717": {
       "en": "Farrukhabad",
       "zh": "法鲁哈巴德"
@@ -43011,17 +42463,9 @@
       "en": "Chandel",
       "zh": "钱德尔"
     },
-    "IN_ADM2_76128533B59866172845044": {
-      "en": "Washim",
-      "zh": "沃辛"
-    },
     "IN_ADM2_76128533B60180372390230": {
       "en": "Ajmer",
       "zh": "阿杰梅尔"
-    },
-    "IN_ADM2_76128533B60186573304899": {
-      "en": "Anugul",
-      "zh": "阿努古尔"
     },
     "IN_ADM2_76128533B60261306484775": {
       "en": "Valsad",
@@ -43063,10 +42507,6 @@
       "en": "Kollam",
       "zh": "奎隆"
     },
-    "IN_ADM2_76128533B61134942989820": {
-      "en": "Tehri Garhwal",
-      "zh": "特里·加瓦尔"
-    },
     "IN_ADM2_76128533B61235952222315": {
       "en": "West Kameng",
       "zh": "西卡门"
@@ -43095,10 +42535,6 @@
       "en": "Tengnoupal",
       "zh": "滕格努帕尔"
     },
-    "IN_ADM2_76128533B62153454383166": {
-      "en": "Aravali",
-      "zh": "阿拉瓦利"
-    },
     "IN_ADM2_76128533B62486414019241": {
       "en": "Saitual",
       "zh": "赛图尔"
@@ -43122,10 +42558,6 @@
     "IN_ADM2_76128533B63117839967753": {
       "en": "South Goa",
       "zh": "南果阿"
-    },
-    "IN_ADM2_76128533B63176236753619": {
-      "en": "Mayiladuthurai",
-      "zh": "马伊拉·杜图拉伊"
     },
     "IN_ADM2_76128533B6330405394721": {
       "en": "Karnal",
@@ -43151,10 +42583,6 @@
       "en": "Amravati",
       "zh": "阿姆拉瓦蒂"
     },
-    "IN_ADM2_76128533B63833971372360": {
-      "en": "Warangal (R)",
-      "zh": "瓦朗加尔 (R)"
-    },
     "IN_ADM2_76128533B6393836306469": {
       "en": "Anantnag",
       "zh": "阿南特纳格"
@@ -43175,10 +42603,6 @@
       "en": "Mahendragarh",
       "zh": "马亨德拉加尔"
     },
-    "IN_ADM2_76128533B64217423710469": {
-      "en": "Bageshwar",
-      "zh": "巴格什瓦尔"
-    },
     "IN_ADM2_76128533B64596101949699": {
       "en": "Kaithal",
       "zh": "凯塔尔"
@@ -43186,10 +42610,6 @@
     "IN_ADM2_76128533B64732849735713": {
       "en": "Jaunpur",
       "zh": "章普尔"
-    },
-    "IN_ADM2_76128533B64749652826710": {
-      "en": "Debagarh",
-      "zh": "德巴加尔"
     },
     "IN_ADM2_76128533B64834018186186": {
       "en": "Vidisha",
@@ -43223,10 +42643,6 @@
       "en": "Dima Hasao",
       "zh": "迪马哈佐夫"
     },
-    "IN_ADM2_76128533B66134271591289": {
-      "en": "Balaghat",
-      "zh": "巴拉加特"
-    },
     "IN_ADM2_76128533B66335428496945": {
       "en": "Shivpuri",
       "zh": "希夫普里"
@@ -43238,10 +42654,6 @@
     "IN_ADM2_76128533B66612397499770": {
       "en": "Bahraich",
       "zh": "巴赖奇"
-    },
-    "IN_ADM2_76128533B66682530790248": {
-      "en": "Kamrup",
-      "zh": "卡姆鲁普"
     },
     "IN_ADM2_76128533B66719908763317": {
       "en": "Kolhapur",
@@ -43315,10 +42727,6 @@
       "en": "Bareilly",
       "zh": "巴雷利"
     },
-    "IN_ADM2_76128533B6884509901047": {
-      "en": "Subarnapur",
-      "zh": "苏巴那普尔"
-    },
     "IN_ADM2_76128533B68984344044805": {
       "en": "Ghaziabad",
       "zh": "加济阿巴德"
@@ -43326,10 +42734,6 @@
     "IN_ADM2_76128533B69412164931619": {
       "en": "Bundi",
       "zh": "邦迪"
-    },
-    "IN_ADM2_76128533B69417260894674": {
-      "en": "Chhota Udaipur",
-      "zh": "乔塔·乌代布尔"
     },
     "IN_ADM2_76128533B69438085511257": {
       "en": "Anand",
@@ -43371,17 +42775,9 @@
       "en": "Ribhoi",
       "zh": "里布伊"
     },
-    "IN_ADM2_76128533B70576899889534": {
-      "en": "Dohad",
-      "zh": "多哈德"
-    },
     "IN_ADM2_76128533B70646408240587": {
       "en": "Chhindwara",
       "zh": "钦德瓦拉"
-    },
-    "IN_ADM2_76128533B70759200975708": {
-      "en": "Kalahandi",
-      "zh": "卡拉汉迪"
     },
     "IN_ADM2_76128533B70842759816811": {
       "en": "Cuttack",
@@ -43431,10 +42827,6 @@
       "en": "Uttar Dinajpur",
       "zh": "北方迪纳杰布尔"
     },
-    "IN_ADM2_76128533B71714250401862": {
-      "en": "Dhamtari",
-      "zh": "达姆塔里"
-    },
     "IN_ADM2_76128533B71824979235503": {
       "en": "Madurai",
       "zh": "马杜赖"
@@ -43475,10 +42867,6 @@
       "en": "Dausa",
       "zh": "道萨"
     },
-    "IN_ADM2_76128533B73854359719990": {
-      "en": "Gajapati",
-      "zh": "加贾帕蒂"
-    },
     "IN_ADM2_76128533B73925919155567": {
       "en": "Azamgarh",
       "zh": "阿扎姆加尔"
@@ -43499,10 +42887,6 @@
       "en": "Kota",
       "zh": "科塔"
     },
-    "IN_ADM2_76128533B74482494441458": {
-      "en": "Bargarh",
-      "zh": "巴尔加尔"
-    },
     "IN_ADM2_76128533B74859418903113": {
       "en": "Thane",
       "zh": "塔那"
@@ -43510,10 +42894,6 @@
     "IN_ADM2_76128533B74887942950962": {
       "en": "Vikarabad",
       "zh": "维卡拉巴德"
-    },
-    "IN_ADM2_76128533B74917207853309": {
-      "en": "Almora",
-      "zh": "阿尔莫拉"
     },
     "IN_ADM2_76128533B74938989340684": {
       "en": "Bara Banki",
@@ -43579,10 +42959,6 @@
       "en": "Gondiya",
       "zh": "贡迪亚"
     },
-    "IN_ADM2_76128533B7643504807381": {
-      "en": "Kanshiram Nagar",
-      "zh": "坎西·拉姆·纳加尔"
-    },
     "IN_ADM2_76128533B76479861129777": {
       "en": "Kheri",
       "zh": "干得好"
@@ -43599,10 +42975,6 @@
       "en": "Neemuch",
       "zh": "尼穆奇"
     },
-    "IN_ADM2_76128533B77336742344288": {
-      "en": "Mamit",
-      "zh": "马米特"
-    },
     "IN_ADM2_76128533B77537928419507": {
       "en": "Shimla",
       "zh": "西姆拉"
@@ -43615,17 +42987,9 @@
       "en": "Kalimpong",
       "zh": "噶伦堡"
     },
-    "IN_ADM2_76128533B78482805703540": {
-      "en": "Seoni",
-      "zh": "塞奥尼"
-    },
     "IN_ADM2_76128533B7851306475665": {
       "en": "Surendranagar",
       "zh": "苏伦德拉讷格尔"
-    },
-    "IN_ADM2_76128533B7879459377699": {
-      "en": "Ambedkar Nagar",
-      "zh": "安贝德卡纳加尔"
     },
     "IN_ADM2_76128533B78904410352326": {
       "en": "Kaimur (Bhabua)",
@@ -43638,10 +43002,6 @@
     "IN_ADM2_76128533B79048012717121": {
       "en": "Guna",
       "zh": "古纳"
-    },
-    "IN_ADM2_76128533B79087524886024": {
-      "en": "Mandla",
-      "zh": "曼陀罗"
     },
     "IN_ADM2_76128533B79135514077232": {
       "en": "Theni",
@@ -43663,10 +43023,6 @@
       "en": "Ramanagara",
       "zh": "拉马纳加拉"
     },
-    "IN_ADM2_76128533B79601545186231": {
-      "en": "Koppal",
-      "zh": "科帕尔"
-    },
     "IN_ADM2_76128533B79652855441225": {
       "en": "Kathua",
       "zh": "卡图亚"
@@ -43683,17 +43039,9 @@
       "en": "Mewat",
       "zh": "梅瓦特"
     },
-    "IN_ADM2_76128533B80299348876357": {
-      "en": "Kanpur Dehat",
-      "zh": "坎普尔德哈特"
-    },
     "IN_ADM2_76128533B80656256583567": {
       "en": "Puri",
       "zh": "普里"
-    },
-    "IN_ADM2_76128533B80772392204057": {
-      "en": "Chikkaballapura",
-      "zh": "奇卡巴拉普拉"
     },
     "IN_ADM2_76128533B80916614857890": {
       "en": "Gumla",
@@ -43702,10 +43050,6 @@
     "IN_ADM2_76128533B80958502091898": {
       "en": "Datia",
       "zh": "达蒂亚"
-    },
-    "IN_ADM2_76128533B80966996849325": {
-      "en": "Kannauj",
-      "zh": "坎瑙杰"
     },
     "IN_ADM2_76128533B81147724102706": {
       "en": "Baleshwar",
@@ -43767,10 +43111,6 @@
       "en": "Yanam",
       "zh": "亚南"
     },
-    "IN_ADM2_76128533B83278580643229": {
-      "en": "Bagalkot",
-      "zh": "巴加尔科特"
-    },
     "IN_ADM2_76128533B83462627230182": {
       "en": "Bhagalpur",
       "zh": "巴加尔普尔"
@@ -43819,10 +43159,6 @@
       "en": "Upper Subansiri",
       "zh": "上苏班西里"
     },
-    "IN_ADM2_76128533B84772375641700": {
-      "en": "Baudh",
-      "zh": "鲍德"
-    },
     "IN_ADM2_76128533B84772439394056": {
       "en": "Mainpuri",
       "zh": "迈恩普里"
@@ -43834,10 +43170,6 @@
     "IN_ADM2_76128533B84927972855096": {
       "en": "Yadgir",
       "zh": "亚德吉尔"
-    },
-    "IN_ADM2_76128533B85157820615002": {
-      "en": "Yadadri Bhongiri",
-      "zh": "亚达德里·邦吉里"
     },
     "IN_ADM2_76128533B85389886560116": {
       "en": "Shimoga",
@@ -43855,10 +43187,6 @@
       "en": "Ratnagiri",
       "zh": "勒特纳吉里"
     },
-    "IN_ADM2_76128533B85917349021677": {
-      "en": "Malkangiri",
-      "zh": "马尔坎吉里"
-    },
     "IN_ADM2_76128533B86048662040782": {
       "en": "Panipat",
       "zh": "帕尼帕特"
@@ -43870,10 +43198,6 @@
     "IN_ADM2_76128533B86368264587575": {
       "en": "Alappuzha",
       "zh": "阿拉普扎"
-    },
-    "IN_ADM2_76128533B86424887513424": {
-      "en": "Hingoli",
-      "zh": "欣戈利"
     },
     "IN_ADM2_76128533B86430586962522": {
       "en": "Viluppuram",
@@ -43903,17 +43227,9 @@
       "en": "Hardwar",
       "zh": "哈德瓦尔"
     },
-    "IN_ADM2_76128533B8798165946807": {
-      "en": "Kandhamal",
-      "zh": "坎德哈马尔"
-    },
     "IN_ADM2_76128533B88214376170788": {
       "en": "Badgam",
       "zh": "巴德加姆"
-    },
-    "IN_ADM2_76128533B88466433485589": {
-      "en": "Nagapattinam",
-      "zh": "纳加帕蒂南"
     },
     "IN_ADM2_76128533B88481188307630": {
       "en": "Muzaffarpur",
@@ -43951,17 +43267,9 @@
       "en": "Tinsukia",
       "zh": "丁苏基亚"
     },
-    "IN_ADM2_76128533B89228414823983": {
-      "en": "Charaideo",
-      "zh": "查拉迪奥"
-    },
     "IN_ADM2_76128533B89286042589317": {
       "en": "Ujjain",
       "zh": "乌贾因"
-    },
-    "IN_ADM2_76128533B8930157583904": {
-      "en": "Jangaon",
-      "zh": "姜加翁"
     },
     "IN_ADM2_76128533B89374164863010": {
       "en": "Vellore",
@@ -43979,10 +43287,6 @@
       "en": "Sivaganga",
       "zh": "西瓦甘加"
     },
-    "IN_ADM2_76128533B89979485471283": {
-      "en": "Narayanpur",
-      "zh": "纳拉扬普尔"
-    },
     "IN_ADM2_76128533B8998698404381": {
       "en": "Sitapur",
       "zh": "西塔普尔"
@@ -43994,10 +43298,6 @@
     "IN_ADM2_76128533B90071703601852": {
       "en": "Pilibhit",
       "zh": "皮利比特"
-    },
-    "IN_ADM2_76128533B90169585758701": {
-      "en": "Balod",
-      "zh": "巴洛德"
     },
     "IN_ADM2_76128533B90384580518633": {
       "en": "Madhubani",
@@ -44015,10 +43315,6 @@
       "en": "Vaishali",
       "zh": "毗舍离"
     },
-    "IN_ADM2_76128533B91472319248603": {
-      "en": "Goalpara",
-      "zh": "戈阿尔帕拉"
-    },
     "IN_ADM2_76128533B91480770176940": {
       "en": "Kokrajhar",
       "zh": "科克拉杰哈尔"
@@ -44026,10 +43322,6 @@
     "IN_ADM2_76128533B91640519747726": {
       "en": "Firozabad",
       "zh": "菲罗扎巴德"
-    },
-    "IN_ADM2_76128533B91818883767147": {
-      "en": "Jajapur",
-      "zh": "贾贾布尔"
     },
     "IN_ADM2_76128533B91871300208785": {
       "en": "Gaya",
@@ -44054,10 +43346,6 @@
     "IN_ADM2_76128533B92985585225784": {
       "en": "Ramban",
       "zh": "兰班"
-    },
-    "IN_ADM2_76128533B93063337202124": {
-      "en": "Gariaband",
-      "zh": "加里亚班德"
     },
     "IN_ADM2_76128533B93113981386565": {
       "en": "Ahmadabad",
@@ -44111,10 +43399,6 @@
       "en": "Changlang",
       "zh": "昌朗"
     },
-    "IN_ADM2_76128533B95642877176862": {
-      "en": "Senapati",
-      "zh": "塞纳帕蒂"
-    },
     "IN_ADM2_76128533B95879808095476": {
       "en": "Mysore",
       "zh": "迈索尔"
@@ -44139,10 +43423,6 @@
       "en": "Shahjahanpur",
       "zh": "沙贾汉布尔"
     },
-    "IN_ADM2_76128533B97126567441665": {
-      "en": "Medak",
-      "zh": "梅达克"
-    },
     "IN_ADM2_76128533B97225684979956": {
       "en": "West Tripura",
       "zh": "西特里普拉邦"
@@ -44155,17 +43435,9 @@
       "en": "Kullu",
       "zh": "库鲁"
     },
-    "IN_ADM2_76128533B9759621355294": {
-      "en": "Mahasamund",
-      "zh": "马哈萨蒙德"
-    },
     "IN_ADM2_76128533B9783509419210": {
       "en": "Pali",
       "zh": "帕利"
-    },
-    "IN_ADM2_76128533B97836280165555": {
-      "en": "Lunglei",
-      "zh": "隆雷"
     },
     "IN_ADM2_76128533B9794868259401": {
       "en": "Bidar",
@@ -44187,14 +43459,6 @@
       "en": "Sangli",
       "zh": "桑里"
     },
-    "IN_ADM2_76128533B98951704707517": {
-      "en": "Kendrapara",
-      "zh": "肯德拉帕拉"
-    },
-    "IN_ADM2_76128533B98985252129882": {
-      "en": "Lakhisarai",
-      "zh": "拉克萨莱"
-    },
     "IN_ADM2_76128533B99037046327658": {
       "en": "Nabarangapur",
       "zh": "纳巴兰加布尔"
@@ -44207,13 +43471,217 @@
       "en": "Tirap",
       "zh": "蒂拉普"
     },
-    "IN_ADM2_76128533B99807650893733": {
-      "en": "Imphal West",
-      "zh": "因帕尔西"
+    "IN_MRG_0240da1df458": {
+      "en": "Rayagada + Kalahandi",
+      "zh": "拉亚加达、卡拉汉迪"
     },
-    "IN_ADM2_76128533B99919205026025": {
-      "en": "Fatehgarh Sahib",
-      "zh": "法塔赫加尔·萨希布"
+    "IN_MRG_07eb3c8cab39": {
+      "en": "Amethi + Sultanpur + Pratapgarh",
+      "zh": "阿梅蒂、苏丹普尔、普拉塔普加尔"
+    },
+    "IN_MRG_0c50a07858d2": {
+      "en": "Koraput + Malkangiri",
+      "zh": "科拉普特、马尔坎吉里"
+    },
+    "IN_MRG_0dc9b69890de": {
+      "en": "Barpeta + Goalpara",
+      "zh": "巴尔佩塔、戈阿尔帕拉"
+    },
+    "IN_MRG_0e1e90dca5bf": {
+      "en": "Balaghat + Seoni",
+      "zh": "巴拉加特、塞奥尼"
+    },
+    "IN_MRG_10207a70afcd": {
+      "en": "Serchhip + Lunglei",
+      "zh": "塞希普、隆雷"
+    },
+    "IN_MRG_10229d52fb7d": {
+      "en": "Sirohi + Jalor",
+      "zh": "西罗日、贾洛尔"
+    },
+    "IN_MRG_1b2b9256168e": {
+      "en": "Auraiya + Kanpur Dehat + Kannauj",
+      "zh": "奥莱亚、坎普尔德哈特、坎瑙杰"
+    },
+    "IN_MRG_1d9b4933bded": {
+      "en": "Jamtara + Dumka + Godda",
+      "zh": "贾姆塔拉、杜姆卡、戈达"
+    },
+    "IN_MRG_2344ccd4873a": {
+      "en": "Shahid Bhagat Singh Nagar + Rupnagar + Fatehgarh Sahib",
+      "zh": "沙希德·巴加特·辛格·纳加尔、鲁普纳加尔、法塔赫加尔·萨希布"
+    },
+    "IN_MRG_317bdbf2051b": {
+      "en": "Jehanabad + Arwal",
+      "zh": "杰哈纳巴德、阿尔瓦尔"
+    },
+    "IN_MRG_3208c5cacd01": {
+      "en": "Balrampur + Surajpur + Jashpur",
+      "zh": "巴尔拉姆普尔、苏拉杰布尔、贾什布尔"
+    },
+    "IN_MRG_35c5386ac534": {
+      "en": "Koppal + Bagalkot",
+      "zh": "科帕尔、巴加尔科特"
+    },
+    "IN_MRG_37328dfe8d45": {
+      "en": "Dindori + Mandla",
+      "zh": "丁多里、曼陀罗"
+    },
+    "IN_MRG_3e581c359307": {
+      "en": "Rajanna Sircilla + Siddipet + Yadadri Bhongiri + Jangaon",
+      "zh": "拉贾纳·瑟西拉、西迪佩特、亚达德里·邦吉里、姜加翁"
+    },
+    "IN_MRG_439a10aa562b": {
+      "en": "Sheikhpura + Nawada",
+      "zh": "谢赫普拉、纳瓦达"
+    },
+    "IN_MRG_46ee484c2760": {
+      "en": "Tamenglong + Noney",
+      "zh": "塔猛隆、诺尼"
+    },
+    "IN_MRG_4947bf9afafe": {
+      "en": "Rudraprayag + Tehri Garhwal",
+      "zh": "鲁德拉普拉亚格、特里·加瓦尔"
+    },
+    "IN_MRG_53f9886bc000": {
+      "en": "Kottayam + Pathanamthitta + Idukki",
+      "zh": "科塔亚姆、帕塔南提塔、伊杜基"
+    },
+    "IN_MRG_5a8caf67d623": {
+      "en": "Nuapada + Balangir + Bargarh",
+      "zh": "努阿帕达、巴兰吉尔、巴尔加尔"
+    },
+    "IN_MRG_5c122f79992b": {
+      "en": "Anugul + Debagarh",
+      "zh": "阿努古尔、德巴加尔"
+    },
+    "IN_MRG_5c48e7d5fc5b": {
+      "en": "Etah + Kanshiram Nagar",
+      "zh": "埃塔、坎西·拉姆·纳加尔"
+    },
+    "IN_MRG_64b26eec8389": {
+      "en": "Agar + Shajapur",
+      "zh": "阿加尔、沙贾布尔"
+    },
+    "IN_MRG_6ba16322cfa2": {
+      "en": "North Garo Hills + East Garo Hills",
+      "zh": "北加罗山、东加罗山"
+    },
+    "IN_MRG_6f037851532e": {
+      "en": "Basti + Ambedkar Nagar",
+      "zh": "巴斯蒂、安贝德卡纳加尔"
+    },
+    "IN_MRG_81646fcfad63": {
+      "en": "Jagatsinghapur + Kendrapara",
+      "zh": "贾加辛哈布尔、肯德拉帕拉"
+    },
+    "IN_MRG_82a7e2758f34": {
+      "en": "Jamui + Banka + Lakhisarai",
+      "zh": "贾穆伊、班卡、拉克萨莱"
+    },
+    "IN_MRG_94ef9201854b": {
+      "en": "Bangalore Rural + Chikkaballapura",
+      "zh": "班加罗尔乡村、奇卡巴拉普拉"
+    },
+    "IN_MRG_9592dd2cf1d9": {
+      "en": "Nirmal + Komaram Bheem + Adilabad",
+      "zh": "尼尔马尔、科马拉姆·比姆、阿迪拉巴德"
+    },
+    "IN_MRG_964f44be21c1": {
+      "en": "Narmada + Chhota Udaipur + Dohad",
+      "zh": "讷尔默达、乔塔·乌代布尔、多哈德"
+    },
+    "IN_MRG_9771ab24083b": {
+      "en": "Subarnapur + Gajapati + Baudh + Kandhamal",
+      "zh": "苏巴那普尔、加贾帕蒂、鲍德、坎德哈马尔"
+    },
+    "IN_MRG_a41c7ad59205": {
+      "en": "Dhamtari + Balod + Gariaband + Mahasamund",
+      "zh": "达姆塔里、巴洛德、加里亚班德、马哈萨蒙德"
+    },
+    "IN_MRG_a9290adb0980": {
+      "en": "Thoubal + Imphal West",
+      "zh": "图巴尔、因帕尔西"
+    },
+    "IN_MRG_a98f3e005f6a": {
+      "en": "Mahabubabad + Bhadradri + Warangal (R)",
+      "zh": "马哈布巴巴德、巴德拉德里、瓦朗加尔 (R)"
+    },
+    "IN_MRG_a9c8dc6c38f7": {
+      "en": "Sabar Kantha + Mahisagar + Aravali",
+      "zh": "萨巴尔坎塔、马希萨加尔、阿拉瓦利"
+    },
+    "IN_MRG_add732cea50c": {
+      "en": "Kangpokpi + Senapati",
+      "zh": "康波皮、塞纳帕蒂"
+    },
+    "IN_MRG_aeb165f4c805": {
+      "en": "Bageshwar + Almora",
+      "zh": "巴格什瓦尔、阿尔莫拉"
+    },
+    "IN_MRG_b507e43e5254": {
+      "en": "Kamareddy + Sangareddy + Medak",
+      "zh": "卡马雷迪、桑加雷迪、梅达克"
+    },
+    "IN_MRG_c195372a6ccc": {
+      "en": "Kolasib + Mamit",
+      "zh": "科拉西布、马米特"
+    },
+    "IN_MRG_c2bed413ca7f": {
+      "en": "Thiruvarur + Mayiladuthurai + Nagapattinam",
+      "zh": "蒂鲁瓦鲁尔、马伊拉·杜图拉伊、纳加帕蒂南"
+    },
+    "IN_MRG_c73911bfb285": {
+      "en": "Mahoba + Hamirpur",
+      "zh": "马霍巴、哈米尔布尔"
+    },
+    "IN_MRG_cc42364d4ba9": {
+      "en": "Ariyalur + Perambalur",
+      "zh": "阿里亚鲁尔、佩兰巴鲁尔"
+    },
+    "IN_MRG_ccf93b344819": {
+      "en": "Sivasagar + Charaideo",
+      "zh": "西瓦萨加尔、查拉迪奥"
+    },
+    "IN_MRG_d52299ba1791": {
+      "en": "Nalbari + Kamrup",
+      "zh": "纳尔巴里、卡姆鲁普"
+    },
+    "IN_MRG_d531e0df892b": {
+      "en": "Rajsamand + Chittaurgarh",
+      "zh": "拉杰萨曼德、奇陶加尔"
+    },
+    "IN_MRG_d70f87866a7e": {
+      "en": "Dhenkanal + Kendujhar + Jajapur",
+      "zh": "登卡纳尔、肯杜贾尔、贾贾布尔"
+    },
+    "IN_MRG_dcf2b9f1d7ca": {
+      "en": "Anuppur + Umaria",
+      "zh": "阿努普尔、乌马里亚"
+    },
+    "IN_MRG_e8f4da0d0535": {
+      "en": "Faridkot + Muktsar",
+      "zh": "法里德科特、穆克察尔"
+    },
+    "IN_MRG_f09ef2e914ec": {
+      "en": "Kondagaon + Uttar Bastar Kanker + Narayanpur",
+      "zh": "康达冈、北巴斯塔尔坎克尔、纳拉扬普尔"
+    },
+    "IN_MRG_f61f07205f91": {
+      "en": "Mandi + Bilaspur",
+      "zh": "曼迪、比拉斯普尔"
+    },
+    "IN_MRG_f8895b87957e": {
+      "en": "Washim + Hingoli",
+      "zh": "沃辛、欣戈利"
+    },
+    "IN_MRG_fc4fb7f7372c": {
+      "en": "Dakshin Bastar Dantewada + Sukma + Bijapur",
+      "zh": "达克辛·巴斯塔·丹特瓦达、苏克马、比贾普尔"
+    },
+    "IN_MRG_fe97969e7e01": {
+      "en": "Mungeli + Kabeerdham",
+      "zh": "蒙格利、卡伯丹姆"
     },
     "IO": {
       "en": "British Indian Ocean Territory",

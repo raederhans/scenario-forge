@@ -1768,7 +1768,7 @@
       "continent_label": "North America",
       "display_name": "Canada",
       "entry_kind": "",
-      "feature_count": 343,
+      "feature_count": 280,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -3706,7 +3706,7 @@
       "continent_label": "Asia",
       "display_name": "India",
       "entry_kind": "",
-      "feature_count": 729,
+      "feature_count": 653,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
