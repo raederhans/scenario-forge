@@ -1,3 +1,4 @@
+import { yieldToBackground } from "../background_yield.js";
 // Research-only coverage tile. Projection and pixel scale must remain fixed for
 // its lifetime; callers rebuild after either changes. Colors never encode IDs.
 const EDGE_FLAG = 0x80000000;
@@ -5,9 +6,7 @@ const MAX_CODE = 0x7fffffff;
 const SLICE_PIXELS = 65536;
 const SLICE_BUDGET_MS = 8;
 const now = () => globalThis.performance?.now?.() ?? Date.now();
-const defaultYieldTask = () => globalThis.scheduler?.yield
-  ? globalThis.scheduler.yield()
-  : new Promise((resolve) => setTimeout(resolve, 0));
+const defaultYieldTask = yieldToBackground;
 
 function checkCancelled(isCancelled) {
   if (!isCancelled()) return;

@@ -1,8 +1,7 @@
+import { yieldToBackground } from "../background_yield.js";
 // Water-only cooperative transport. Source coordinates are never detached or rounded.
 const DEPTH = { Point: 1, MultiPoint: 2, LineString: 2, MultiLineString: 3, Polygon: 3, MultiPolygon: 4 };
-export const yieldWaterTask = () => globalThis.scheduler?.yield
-  ? globalThis.scheduler.yield()
-  : new Promise(resolve => setTimeout(resolve, 0));
+export const yieldWaterTask = yieldToBackground;
 
 export async function packWaterGeometry(updates, {
   signal, yieldTask = yieldWaterTask, scalarBatchSize = 65536,

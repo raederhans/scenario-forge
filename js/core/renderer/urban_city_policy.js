@@ -9,6 +9,7 @@
  */
 import { isScenarioStrategicValuesUsable } from "../scenario/strategic_values.js";
 import { getCityDetailProgress, getCitySettlementRank, getCitySettlementRankWeight } from "./city_reveal_policy.js";
+import { yieldToBackground } from "../background_yield.js";
 
 // Yield after every merge write, including tail copies: a large sorted run
 // must remain interruptible even when the comparator always prefers one side.
@@ -33,8 +34,7 @@ function* stableSortCityEntries(entries, compare) {
 }
 
 async function yieldCityPlanningTask() {
-  if (typeof globalThis.scheduler?.yield === "function") await globalThis.scheduler.yield();
-  else await new Promise((resolve) => setTimeout(resolve, 0));
+  await yieldToBackground();
 }
 
 export function getUrbanCityRenderPassSignatureParts(state, passName) {

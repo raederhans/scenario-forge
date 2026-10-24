@@ -4,6 +4,7 @@ import {
   appendPreparedCountryBorderMeshesState,
   replaceCachedDetailAdmBordersState,
 } from "../state/actions/renderer_cache_actions.js";
+import { yieldToBackground } from "../background_yield.js";
 
 import { getBorderWorkerIdentity, getDefaultBorderWorkerSources,
   hasCachedProvinceBorders, hasCachedLocalBorders } from "./border_mesh_queries.js";
@@ -16,8 +17,7 @@ export function createBorderMeshWorkerRuntime({
   getStaticMeshSourceCountries,
   getDetailAdmMeshBuildState, setDetailAdmMeshBuildState,
   client = createBorderMeshWorkerClient(),
-  yieldControl = () => globalThis.scheduler?.yield
-    ? globalThis.scheduler.yield() : new Promise((resolve) => setTimeout(resolve, 0)),
+  yieldControl = yieldToBackground,
   nowMs = () => performance.now(),
 }) {
   let sceneKey = "";
