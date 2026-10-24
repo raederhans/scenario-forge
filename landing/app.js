@@ -1,2075 +1,985 @@
+import { COPY } from "./i18n.js";
+
+const SVG_NS = "http://www.w3.org/2000/svg";
 const STORAGE_KEY = "scenario_forge_landing_lang";
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const translations = {
-  en: {
-    sourcesSummary: "Sources, map data, and licensing",
-    advancedSummary: "Availability and layer previews",
-    workspaceCaption: "The map. The tools. Your next world.",
-    skipLink: "Skip to content",
-    navWorks: "Maps",
-    navWorkflow: "How it works",
-    navProduct: "Product",
-    navFeatures: "Features",
-    navData: "Evidence",
-    navFaq: "FAQ",
-    navRoadmap: "In progress",
-    headerGithub: "GitHub",
-    headerOpenApp: "Open editor",
-    heroEyebrow: "A mapmaking studio for imagined worlds",
-    heroTitle: "Every world",
-    heroTitleAccent: "starts with a map.",
-    heroBody:
-      "Build alternate histories, redraw borders, and bring your world into focus. A political map editor, right in your browser.",
-    heroPrimaryCta: "Start creating",
-    hgoEditor: "HGO editor",
-    heroSecondaryCta: "Explore the maps ↓",
-    productPreviewLabel: "Scenario Forge generated cartography preview",
-    productStageLabel: "Scenario Forge / Generated atlas",
-    heroChipsLabel: "Hero scenario style",
-    heroMapHudOne: "Political baseline",
-    heroMapHudTwo: "Routes + lights",
-    brandHomeLabel: "Scenario Forge home",
-    primaryNavLabel: "Primary navigation",
-    languageSwitcherLabel: "Language switcher",
-    statsLabel: "Scenario Forge product statistics",
-    productPreviewAlt:
-      "Scenario Forge map editor with its map canvas and editing controls.",
-    heroAltBlank: "Generated neutral blank Europe map with land, water, borders, and grid lines.",
-    heroAltHoi41936: "Generated Scenario Forge HOI4 1936 Europe political map with capital labels.",
-    heroAltHoi41939: "Generated Scenario Forge HOI4 1939 Europe political map with capital labels.",
-    heroAltTno1962:
-      "Generated Scenario Forge TNO 1962 political ownership crop of Europe with capital markers; Atlantropa overlay omitted.",
-    workOneAlt:
-      "Generated TNO 1962 Atlantropa Mediterranean map with political context, salt basins, shoals, and water regions.",
-    workTwoAlt: "Generated HOI4 1936 and 1939 Central Europe comparison map.",
-    workThreeAlt: "Generated Central Japan local transport atlas with roads, rail, urban anchors, stations, terrain, and rivers.",
-    chipBlank: "Blank",
-    chipHoi41936: "HOI4 1936",
-    chipHoi41939: "HOI4 1939",
-    chipTno1962: "TNO 1962 · political crop",
-    statScenarios: "public scenario baselines · current demo",
-    statCities: "source city records · global input",
-    statAliases: "city alias records · global lookup input",
-    statCatalog: "cataloged assets · public project data",
-    statJapan: "road + rail source features · Japan preview input",
-    worksEyebrow: "Selected maps",
-    worksTitle: "One canvas. Different worlds.",
-    worksBody:
-      "Explore scenario and transport maps, then open an editable sample to make it your own.",
-    sampleFiltersLabel: "Sample run filters",
-    sampleRunsPanelLabel: "Sample run gallery",
-    sampleFilterAll: "All",
-    sampleFilterScenario: "Scenario",
-    sampleFilterTransport: "Transport",
-    sampleFilterAtlas: "Atlas output",
-    sampleFilterEvidence: "Evidence-backed",
-    sampleScenarioLabel: "Scenario / baseline",
-    samplePathLabel: "Demo path",
-    sampleExportLabel: "Export target",
-    sampleDemoPath: "Open demo guide",
-    sampleProjectActionsLabel: "Sample project actions",
-    sampleProjectOpen: "Open editable sample",
-    sampleProjectDownload: "Download JSON",
-    sampleRecipeManifest: "All samples",
-    sampleProjectDownloadsTitle: "Browse all five starting points",
-    sampleProjectDownloadsBody: "Start from a sample in the editor, or download its project file.",
-    sampleProjectGuideNote: "Editor links open the sample with the Guide panel so you can edit, export, or download the original JSON.",
-    sampleProjectBlank: "Blank Map starter",
-    sampleProjectModern: "Modern World · Central Japan local transport atlas",
-    sampleProjectHoi41936: "HOI4 1936 Europe briefing",
-    sampleProjectHoi41939: "HOI4 1939 Europe switch",
-    sampleProjectTno: "TNO 1962 Atlantropa briefing",
-    sampleSnapshotTarget: "Published WebP snapshot + SVG source",
-    sampleRecipeLabel: "Layer recipe",
-    sampleRecipeAriaLabel: "Layer recipe",
-    sampleEvidenceLabel: "Map details & sources",
-    workOneLabel: "TNO 1962 briefing map",
-    workOneTitle: "An altered Mediterranean",
-    workOneBody:
-      "TNO 1962: political borders meet the reshaped coastline of Atlantropa.",
-    workOneScenario: "TNO 1962 Europe",
-    workOneRecipeOne: "TNO political owners",
-    workOneRecipeTwo: "Atlantropa basins",
-    workOneRecipeThree: "Coastline detail",
-    workOneRecipeFour: "Mediterranean labels",
-    workOneEvidenceOne: "rendered Atlantropa features · Mediterranean extent · scenario output",
-    workOneEvidenceTwo: "dissolved country owners · Mediterranean extent",
-    workTwoLabel: "HOI4 comparison run",
-    workTwoTitle: "Europe, between two dates",
-    workTwoBody:
-      "Compare the HOI4 1936 and 1939 baselines in the same geographic frame.",
-    workTwoScenario: "HOI4 1936 / HOI4 1939",
-    workTwoRecipeOne: "1936 ownership layer",
-    workTwoRecipeTwo: "1939 ownership layer",
-    workTwoRecipeThree: "Shared comparison viewport",
-    workTwoEvidenceOne: "rendered political features · 1936 · shared Central/Eastern Europe extent",
-    workTwoEvidenceTwo: "rendered political features · 1939 · shared Central/Eastern Europe extent",
-    workThreeLabel: "Central Japan local transport atlas",
-    workThreeTitle: "Connections across Central Japan",
-    workThreeBody:
-      "Roads, rail, and stations set against rivers and terrain.",
-    workThreeScenario: "Central Japan local transport atlas",
-    workThreeRecipeOne: "Road lines",
-    workThreeRecipeTwo: "Rail lines",
-    workThreeRecipeThree: "Major stations",
-    workThreeRecipeFour: "Urban anchors, terrain, and rivers",
-    workThreeEvidenceOne: "rendered road + rail routes · Central Japan local transport atlas",
-    workThreeEvidenceTwo: "major stations · Central Japan local transport atlas",
-    storyEyebrow: "From idea to map",
-    storyTitle: "Make the world your own.",
-    storyBody:
-      "Choose a starting point, shape the details, and take your map with you.",
-    storyStageLabel: "Interactive product story map stage",
-    storyStageChrome: "Scenario Forge story stage",
-    storyComparisonLabel: "Scenario state comparison",
-    storyCompare1936: "1936",
-    storyCompare1939: "1939",
-    storyCompareTno: "TNO 1962",
-    storyEvidenceSummary: "Source-backed evidence",
-    storyEvidenceBaselinesLabel: "public scenario baselines · current demo",
-    storyEvidenceScenarioLabel: "political source features · HOI4 1936 Europe input",
-    storyEvidenceTransportLabel: "road + rail source features · Japan preview input",
-    storyEvidenceCatalogLabel: "cataloged assets · public project data",
-    storyEvidenceExportLabel: "routes + major stations (165 + 18) · Central Japan local transport atlas",
-    storyStepsLabel: "Product story steps",
-    storyAltBaseline: "Generated HOI4 1936 baseline map.",
-    storyAltScenario: "Generated scenario comparison map for HOI4 and TNO baselines.",
-    storyAltTransport: "Generated Japan transport preview map.",
-    storyAltEvidence: "Generated Europe showcase map with source-backed layers.",
-    storyAltExport: "Generated Central Japan local transport atlas output.",
-    storyStageBadgeBaseline: "Baseline selected",
-    storyStageTitleBaseline: "Start from a named public baseline.",
-    storyStageBodyBaseline:
-      "The map begins from a scenario frame with known ownership and geography.",
-    storyStageBadgeScenario: "Political state shaped",
-    storyStageTitleScenario: "Compare world states in one map-reading frame.",
-    storyStageBodyScenario:
-      "The comparison control swaps published views; the editable samples open the ownership and control workflow.",
-    storyStageBadgeTransport: "Context added",
-    storyStageTitleTransport: "Transport and geography turn the map into a readable place.",
-    storyStageBodyTransport:
-      "Roads, rail, city anchors, terrain, rivers, and night context build a richer output from existing data.",
-    storyStageBadgeEvidence: "Scope and sources visible",
-    storyStageTitleEvidence: "Read every count with its evidence boundary.",
-    storyStageBodyEvidence:
-      "The published scenario, catalog, and landing records define each object, extent, and processing stage.",
-    storyStageBadgeExport: "Export-ready",
-    storyStageTitleExport: "The finished map can leave the workbench as a compact story asset.",
-    storyStageBodyExport:
-      "The Central Japan local transport atlas combines transport, city anchors, terrain, and rivers into one presentation view.",
-    storyStepBaselineTitle: "Choose baseline",
-    storyStepBaselineBody: "Start with a blank map or a ready-made scenario.",
-    storyStepBaselineProof: "5 public baselines are registered.",
-    storyStepScenarioTitle: "Shape political state",
-    storyStepScenarioBody: "Edit ownership and control to tell a different history.",
-    storyStepScenarioProof: "1936, 1939, and TNO views share the same map-reading frame.",
-    storyStepTransportTitle: "Add transport/context",
-    storyStepTransportBody:
-      "Bring roads, rail, cities, and terrain into the picture.",
-    storyStepTransportProof: "Japan preview records keep the transport counts visible.",
-    storyStepEvidenceTitle: "Check scope and sources",
-    storyStepEvidenceBody: "Check the map’s coverage and original sources.",
-    storyStepEvidenceProof: "Published records and the source ledger define the evidence boundary.",
-    storyStepExportTitle: "Export the result",
-    storyStepExportBody: "Export an image. Keep the project for your next edit.",
-    storyStepExportProof:
-      "The Central Japan local transport atlas combines roads, rail, stations, city anchors, terrain, and rivers.",
-    showcaseEyebrow: "Evidence explorer",
-    showcaseTitle: "Inspect how one Europe output is assembled.",
-    showcaseBody:
-      "Switch among published political, rail, city-label, capital-anchor, and day-night layers for the HOI4 1936 Europe extent.",
-    showcaseAlt: "Europe 1936 generated scenario showcase map.",
-    showcaseMapLabel: "Europe 1936 generated scenario showcase map",
-    showcaseLayerTabsLabel: "Europe 1936 showcase layers",
-    showcaseLayerPolitical: "Political",
-    showcaseLayerRail: "Rail",
-    showcaseLayerCities: "Cities",
-    showcaseLayerDayNight: "Day-Night",
-    showcaseLayerPoliticalBadge: "HOI4 1936 Europe",
-    showcaseLayerPoliticalTitle:
-      "Political ownership comes from the 1936 scenario data.",
-    showcaseLayerPoliticalBody:
-      "The map colors European territory through Scenario Forge's HOI4 1936 ownership table and country palette.",
-    showcaseLayerRailBadge: "Europe rail network",
-    showcaseLayerRailTitle: "Rail corridors come from the global rail source.",
-    showcaseLayerRailBody:
-      "The rail layer samples visible European lines from the OpenStreetMap-derived transport package.",
-    showcaseLayerCitiesBadge: "City labels + capital anchors",
-    showcaseLayerCitiesTitle: "City labels combine major places with scenario capital anchors.",
-    showcaseLayerCitiesBody:
-      "The layer combines selected labels from the world city catalog with anchors from the HOI4 1936 capital hints table.",
-    showcaseLayerDayNightBadge: "Day-night cycle",
-    showcaseLayerDayNightTitle: "A moving day-night pass makes context layers feel alive.",
-    showcaseLayerDayNightBody:
-      "The overlay combines the Europe scenario map with animated night shade and capital lights, echoing the night-light context used elsewhere in the product.",
-    showcaseMeta:
-      "HOI4 1936 output · Europe extent · 7,177 political source features, 220 selected rail lines, 34 city labels, and 22 capital anchors.",
-    showcaseMetadataFallback: "Layer metadata is unavailable; showing the generated map.",
-    previewEyebrow: "Interactive preview",
-    previewTitle: "Inspect the Japan transport selection before opening the editor.",
-    previewBody:
-      "Four pre-generated WebP layers form an interactive preview that separates source records from routes selected for a readable map.",
-    miniMapLabel: "Japan transport preview",
-    miniMapTitle:
-      "5,899 road and rail source features feed a readable transport and context preview.",
-    miniMapBadge: "Interactive preview",
-    previewSurfaceLabel: "Japan preview map viewport",
-    previewZoomControlsLabel: "Japan preview zoom controls",
-    previewZoomIn: "Zoom in",
-    previewZoomOut: "Zoom out",
-    previewZoomReset: "Reset preview zoom",
-    previewTabsLabel: "Preview layers",
-    previewTabTransport: "Transport",
-    previewTabCities: "Cities",
-    previewTabTerrain: "Terrain",
-    previewTabNight: "Night context",
-    previewImageFallback: "This preview layer is unavailable right now.",
-    previewPanelTransportBadge: "Japan preview · selected routes",
-    previewPanelTransportTitle:
-      "420 rendered routes (260 road + 160 rail) · Japan transport preview.",
-    previewPanelTransportBody:
-      "The preview selects these routes from 5,899 road and rail source features; the featured Central Japan local transport atlas uses its own 165-route local extent.",
-    previewPanelCitiesBadge: "Japan preview · city context",
-    previewPanelCitiesTitle:
-      "32 rendered city anchors · Japan transport preview.",
-    previewPanelCitiesBody:
-      "Selected cities tie the routes to familiar regional hubs.",
-    previewPanelTerrainBadge: "Japan preview · physical context",
-    previewPanelTerrainTitle:
-      "Contours and rivers show how corridors cross the landscape.",
-    previewPanelTerrainBody:
-      "The terrain view selects published contour and river lines inside the preview extent.",
-    previewPanelNightBadge: "Japan preview · night context",
-    previewPanelNightTitle:
-      "88 sampled light points · Japan transport preview.",
-    previewPanelNightBody:
-      "The night layer combines a Black Marble grid sample with historical city anchors.",
-    featuresEyebrow: "Product capabilities",
-    featuresTitle: "A complete mapmaking workspace.",
-    featuresBody:
-      "Political boundaries, geographic detail, and the finishing touches.",
-    featureGroupOneTitle: "Political state",
-    featureGroupOneBody:
-      "Edit ownership, control, frontlines, and special regions across five public baselines.",
-    featurePointPalettes:
-      "Five named baselines are available in the public demo.",
-    featurePointExport: "HGO opens in its own native-pixel editor, with editable sea regions.",
-    featureGroupTwoTitle: "Cartographic control",
-    featureGroupTwoBody:
-      "Set palettes, borders, labels, and legends. Arrange layers to bring the right details forward.",
-    featurePointUndo: "Editing sessions include 80-step undo and redo.",
-    featurePointDistricts:
-      "Administrative districts and hierarchy data support detailed scenario work.",
-    featureGroupThreeTitle: "Geographic context",
-    featureGroupThreeBody:
-      "Add roads, rail, cities, terrain, rivers, and night lights.",
-    featureGroupFourTitle: "Local projects and export",
-    featureGroupFourBody:
-      "Export PNG or JPG at 1×–4×. Save an editable JSON project to pick up where you left off.",
-    featurePointTransport:
-      "Roads and rail are the strongest current public transport paths.",
-    featurePointAudits:
-      "Project files keep the map editable after export.",
-    dataEyebrow: "Evidence and provenance",
-    dataTitle: "Every public number names its object, extent, and processing stage.",
-    dataBody:
-      "The three visible outputs link to published output details, source records, and the license boundary that applies to code, data, and derived assets.",
-    dataCardOneTag: "TNO 1962 output",
-    dataCardOneTitle: "Atlantropa Mediterranean",
-    dataCardOneBody:
-      "724 Atlantropa features and 30 scenario owners in the Mediterranean extent. Open the map record for source files and processing details.",
-    dataCardTwoTag: "HOI4 comparison output",
-    dataCardTwoTitle: "1936 / 1939 Central–Eastern Europe",
-    dataCardTwoBody:
-      "2,626 source political features per scenario · shared Central/Eastern Europe extent · comparison output · record schema 1 · sample manifest updated 2026-06-30.",
-    dataCardThreeTag: "Central Japan atlas output",
-    dataCardThreeTitle: "Central Japan local transport atlas",
-    dataCardThreeBody:
-      "165 rendered routes (95 road + 70 rail) and 18 major stations · 134.1–141.5°E / 33.2–36.8°N · local atlas output · record schema 1 · sample manifest updated 2026-06-30.",
-    dataCardFourTag: "License boundary",
-    dataCardFourTitle: "MIT project, source-specific data terms",
-    dataCardFourBody:
-      "Scenario Forge code and documentation use the MIT License. Third-party datasets and derived assets retain their own source terms and provenance records.",
-    evidenceMetadataLink: "View output details",
-    evidenceSourceLedgerLink: "Review source list",
-    evidenceRoadSourcesLink: "Road source terms",
-    evidenceRailSourcesLink: "Rail source terms",
-    evidenceLicenseLink: "Read the MIT License",
-    editionsEyebrow: "Current boundaries",
-    editionsTitle:
-      "Public demo, local preview, and future direction are separate surfaces.",
-    editionOneBadge: "Current public demo",
-    editionOneTitle: "Five public baselines and browser editing",
-    editionOneBody:
-      "Use political and context layers, save editable project JSON, and export PNG/JPG snapshots at 1x–4x scale.",
-    editionTwoBadge: "Local/developer preview",
-    editionTwoTitle: "HGO 1936 and local backend flows",
-    editionTwoBody:
-      "HGO validation plus Cloud Saves and community workflows run through the local creator setup.",
-    editionThreeBadge: "Future direction",
-    editionThreeTitle: "Shared project and publishing surfaces",
-    editionThreeBody:
-      "Shared project spaces, permissioned publishing, and cloud collaboration remain a future direction. Availability and release dates remain unannounced.",
-    faqEyebrow: "FAQ",
-    faqTitle: "Answers grounded in the current public surface.",
-    faqOneQuestion: "Is Scenario Forge a GIS tool or a map editor?",
-    faqOneAnswer:
-      "Scenario Forge is a scenario-first map workbench for editing political state, composing geographic context, and exporting presentation maps.",
-    faqTwoQuestion: "What data sources does it use?",
-    faqTwoAnswer:
-      "Current source families include Natural Earth, geoBoundaries, GeoNames, NOAA ETOPO, NASA Black Marble, OpenStreetMap, Geofabrik, and country transport sources. Each visible output links to its published details and provenance path.",
-    faqThreeQuestion: "Can I run it locally?",
-    faqThreeAnswer:
-      "The public workbench is a static browser application. HGO validation, larger data refreshes, Cloud Saves, and community workflows belong to the local/developer setup.",
-    faqFourQuestion: "What can I export?",
-    faqFourAnswer:
-      "Export PNG or JPG at 1×–4×, within the image-size and memory limits. Map geometry is rendered for the output resolution. Save a JSON project to keep editing; the gallery also provides its generated maps as SVG.",
-    faqFiveQuestion: "How mature are the transport layers?",
-    faqFiveAnswer:
-      "Roads and rail are the strongest current public transport paths. Airports and ports provide overview context; mineral resources, energy, industry, and logistics remain preview/workbench families.",
-    faqSixQuestion: "How is Scenario Forge licensed?",
-    faqSixAnswer:
-      "Scenario Forge code and documentation are released under the MIT License. Third-party datasets and derived assets retain their own source terms and provenance records. Check each sample’s source links before redistributing data-derived assets.",
-    ctaEyebrow: "Open the workbench",
-    ctaTitle: "Your next world is waiting.",
-    ctaBody:
-      "Open the editor and start with a map.",
-    ctaPrimary: "Start creating",
-    ctaSecondary: "Browse the repository",
-    footerNote:
-      "A political map studio for alternate history and worldbuilding.",
-    footerSources:
-      "Major data families include Natural Earth, geoBoundaries, GeoNames, NOAA ETOPO, NASA Black Marble, OpenStreetMap, and Geofabrik.",
-    footerDemo: "Open demo",
-    footerGithub: "GitHub",
-    metaTitle: "Scenario Forge — Scenario-first political map workbench",
-    metaDescription:
-      "Scenario Forge is a scenario-first political map workbench for alternate history, strategy modding, and geopolitical storytelling.",
-    metaOgDescription:
-      "Build political maps that start from a world state, reshape control, layer context, and export a story-ready result.",
-  },
-  zh: {
-    sourcesSummary: "来源、地图数据与许可",
-    advancedSummary: "功能可用范围与图层预览",
-    workspaceCaption: "地图与工具，构筑你的下一个世界。",
-    skipLink: "跳到正文",
-    navWorks: "地图",
-    navWorkflow: "使用方式",
-    navProduct: "产品",
-    navFeatures: "功能",
-    navData: "证据",
-    navFaq: "FAQ",
-    navRoadmap: "进行中",
-    headerGithub: "GitHub",
-    headerOpenApp: "打开编辑器",
-    heroEyebrow: "为想象中的世界制图",
-    heroTitle: "每个世界，",
-    heroTitleAccent: "从一张地图开始。",
-    heroBody:
-      "选择历史或架空剧本，重绘疆界，添加地理细节。在浏览器里，把你的世界变成地图。",
-    heroPrimaryCta: "开始制图",
-    hgoEditor: "HGO 独立编辑器",
-    heroSecondaryCta: "看看示例地图 ↓",
-    productPreviewLabel: "Scenario Forge 生成式制图预览",
-    productStageLabel: "Scenario Forge / 生成图集",
-    heroChipsLabel: "首屏场景风格",
-    heroMapHudOne: "政治基线",
-    heroMapHudTwo: "路线与夜光",
-    brandHomeLabel: "Scenario Forge 首页",
-    primaryNavLabel: "主导航",
-    languageSwitcherLabel: "语言切换",
-    statsLabel: "Scenario Forge 产品数据",
-    productPreviewAlt: "Scenario Forge 编辑器实景：地图画布与编辑工具。",
-    heroAltBlank: "生成式中性欧洲空白地图，包含陆地、水域、边界和网格线。",
-    heroAltHoi41936: "生成式 Scenario Forge HOI4 1936 欧洲政治地图，包含首都标签。",
-    heroAltHoi41939: "生成式 Scenario Forge HOI4 1939 欧洲政治地图，包含首都标签。",
-    heroAltTno1962: "Scenario Forge 生成的 TNO 1962 欧洲政治归属局部图，包含首都标记；未叠加 Atlantropa 图层。",
-    workOneAlt: "生成式 TNO 1962 地中海 Atlantropa 地图，包含政治语境、盐沼、浅滩和水域。",
-    workTwoAlt: "生成式 HOI4 1936 与 1939 中欧对比地图。",
-    workThreeAlt: "生成式日本中部局部交通图集，包含道路、铁路、城市锚点、车站、地形和河流。",
-    chipBlank: "空白地图",
-    chipHoi41936: "HOI4 1936",
-    chipHoi41939: "HOI4 1939",
-    chipTno1962: "TNO 1962 · 政治局部图",
-    statScenarios: "公开场景基线 · 当前 Demo",
-    statCities: "城市源记录 · 全球输入",
-    statAliases: "城市别名记录 · 全球检索输入",
-    statCatalog: "已编目资产 · 签入数据范围",
-    statJapan: "道路 + 铁路源要素 · 日本预览输入",
-    worksEyebrow: "精选地图",
-    worksTitle: "同一张画布，不同的世界。",
-    worksBody: "从剧本疆界到交通图集，打开可编辑示例，接着创作。",
-    sampleFiltersLabel: "地图筛选",
-    sampleRunsPanelLabel: "示例地图库",
-    sampleFilterAll: "全部",
-    sampleFilterScenario: "场景",
-    sampleFilterTransport: "交通",
-    sampleFilterAtlas: "图集输出",
-    sampleFilterEvidence: "来源证据",
-    sampleScenarioLabel: "场景 / 基线",
-    samplePathLabel: "演示路径",
-    sampleExportLabel: "导出目标",
-    sampleDemoPath: "打开演示指南",
-    sampleProjectActionsLabel: "示例项目操作",
-    sampleProjectOpen: "打开可编辑示例 ↗",
-    sampleProjectDownload: "下载 JSON",
-    sampleRecipeManifest: "全部示例",
-    sampleProjectDownloadsTitle: "查看全部五个起点",
-    sampleProjectDownloadsBody: "在编辑器中打开示例，或下载工程文件。",
-    sampleProjectGuideNote: "编辑器链接会打开带 Guide 面板的示例，方便继续编辑、导出或下载原始 JSON。",
-    sampleProjectBlank: "Blank Map 起步项目",
-    sampleProjectModern: "Modern World · 日本中部局部交通图集",
-    sampleProjectHoi41936: "HOI4 1936 欧洲简报",
-    sampleProjectHoi41939: "HOI4 1939 欧洲切换",
-    sampleProjectTno: "TNO 1962 Atlantropa 简报",
-    sampleSnapshotTarget: "公开 WebP 快照 + SVG 源图",
-    sampleRecipeLabel: "图层配方",
-    sampleRecipeAriaLabel: "图层配方",
-    sampleEvidenceLabel: "地图详情与来源",
-    workOneLabel: "TNO 1962 简报图",
-    workOneTitle: "另一种地中海",
-    workOneBody: "TNO 1962：政治疆界与亚特兰特罗帕改造后的海岸线。",
-    workOneScenario: "TNO 1962 欧洲",
-    workOneRecipeOne: "TNO 政治归属",
-    workOneRecipeTwo: "Atlantropa 盆地",
-    workOneRecipeThree: "海岸线细节",
-    workOneRecipeFour: "地中海标签",
-    workOneEvidenceOne: "已渲染 Atlantropa 要素 · 地中海范围 · 场景输出",
-    workOneEvidenceTwo: "已融合国家归属 · 地中海范围",
-    workTwoLabel: "HOI4 年代对比",
-    workTwoTitle: "两个年份之间的欧洲",
-    workTwoBody: "在同一地理范围内，对照 HOI4 1936 与 1939 的疆界。",
-    workTwoScenario: "HOI4 1936 / HOI4 1939",
-    workTwoRecipeOne: "1936 归属图层",
-    workTwoRecipeTwo: "1939 归属图层",
-    workTwoRecipeThree: "共享对比视口",
-    workTwoEvidenceOne: "已渲染政治要素 · 1936 · 共享中东欧范围",
-    workTwoEvidenceTwo: "已渲染政治要素 · 1939 · 共享中东欧范围",
-    workThreeLabel: "日本中部局部交通图集",
-    workThreeTitle: "串联日本中部",
-    workThreeBody: "让公路、铁路与车站，在河流和地形之间清晰呈现。",
-    workThreeScenario: "日本中部局部交通图集",
-    workThreeRecipeOne: "道路线",
-    workThreeRecipeTwo: "铁路线",
-    workThreeRecipeThree: "主要车站",
-    workThreeRecipeFour: "城市锚点、地形和河流",
-    workThreeEvidenceOne: "已渲染道路 + 铁路线路 · 日本中部局部交通图集",
-    workThreeEvidenceTwo: "主要车站 · 日本中部局部交通图集",
-    storyEyebrow: "从构想到地图",
-    storyTitle: "让世界按你的构想展开。",
-    storyBody: "选一个起点，调整细节，再把地图带走。",
-    storyStageLabel: "可交互产品叙事地图舞台",
-    storyStageChrome: "Scenario Forge 叙事舞台",
-    storyComparisonLabel: "场景状态对比",
-    storyCompare1936: "1936",
-    storyCompare1939: "1939",
-    storyCompareTno: "TNO 1962",
-    storyEvidenceSummary: "来源证据",
-    storyEvidenceBaselinesLabel: "公开场景基线 · 当前 Demo",
-    storyEvidenceScenarioLabel: "政治源要素 · HOI4 1936 欧洲输入",
-    storyEvidenceTransportLabel: "道路 + 铁路源要素 · 日本预览输入",
-    storyEvidenceCatalogLabel: "已编目资产 · 签入数据范围",
-    storyEvidenceExportLabel: "线路 + 主要车站（165 + 18）· 日本中部局部交通图集",
-    storyStepsLabel: "产品叙事步骤",
-    storyAltBaseline: "生成式 HOI4 1936 基线地图。",
-    storyAltScenario: "生成式 HOI4 与 TNO 场景对比地图。",
-    storyAltTransport: "生成式日本交通预览地图。",
-    storyAltEvidence: "带来源图层的生成式欧洲展示地图。",
-    storyAltExport: "生成式日本中部局部交通图集输出。",
-    storyStageBadgeBaseline: "已选择基线",
-    storyStageTitleBaseline: "从命名公开基线开始。",
-    storyStageBodyBaseline: "地图先落在一套明确的场景框架里，归属和地理都有来源。",
-    storyStageBadgeScenario: "已调整政治状态",
-    storyStageTitleScenario: "在同一地图阅读框架中比较世界状态。",
-    storyStageBodyScenario: "对比控件切换公开视图；可编辑示例会进入归属与控制方编辑流程。",
-    storyStageBadgeTransport: "已叠加上下文",
-    storyStageTitleTransport: "交通和地理上下文让地图变成可阅读的地方。",
-    storyStageBodyTransport: "道路、铁路、城市锚点、地形、河流和夜光上下文共同支撑成图。",
-    storyStageBadgeEvidence: "范围与来源可见",
-    storyStageTitleEvidence: "每个计数都带有证据边界。",
-    storyStageBodyEvidence: "公开场景、目录和 landing 记录定义对象、范围与处理阶段。",
-    storyStageBadgeExport: "可导出",
-    storyStageTitleExport: "完成后的地图可以作为紧凑的叙事资产离开工作台。",
-    storyStageBodyExport: "日本中部局部交通图集把交通、城市锚点、地形和河流合成到同一个展示视图。",
-    storyStepBaselineTitle: "选择基线",
-    storyStepBaselineBody: "从空白地图或现成剧本开始。",
-    storyStepBaselineProof: "已登记 5 个公开基线。",
-    storyStepScenarioTitle: "调整政治状态",
-    storyStepScenarioBody: "调整归属与控制区，讲述另一段历史。",
-    storyStepScenarioProof: "1936、1939 和 TNO 视图共享同一地图阅读框架。",
-    storyStepTransportTitle: "叠加交通与上下文",
-    storyStepTransportBody: "加入公路、铁路、城市与地形。",
-    storyStepTransportProof: "日本预览记录保留了交通计数。",
-    storyStepEvidenceTitle: "核对范围与来源",
-    storyStepEvidenceBody: "查看地图覆盖范围与原始来源。",
-    storyStepEvidenceProof: "公开记录与 source ledger 定义证据边界。",
-    storyStepExportTitle: "导出结果",
-    storyStepExportBody: "导出图片，保留工程以便继续编辑。",
-    storyStepExportProof: "日本中部局部交通图集组合了道路、铁路、车站、城市锚点、地形和河流。",
-    showcaseEyebrow: "证据浏览",
-    showcaseTitle: "查看一张欧洲输出如何组合图层。",
-    showcaseBody: "在 HOI4 1936 欧洲范围内切换公开的政治、铁路、城市标签、首都锚点与昼夜图层。",
-    showcaseAlt: "欧洲 1936 场景展示地图。",
-    showcaseMapLabel: "欧洲 1936 场景展示地图",
-    showcaseLayerTabsLabel: "欧洲 1936 展示图层",
-    showcaseLayerPolitical: "政治",
-    showcaseLayerRail: "铁路",
-    showcaseLayerCities: "城市",
-    showcaseLayerDayNight: "昼夜",
-    showcaseLayerPoliticalBadge: "HOI4 1936 欧洲",
-    showcaseLayerPoliticalTitle: "政治归属来自 1936 场景数据。",
-    showcaseLayerPoliticalBody: "欧洲地块颜色来自仓库中的 HOI4 1936 归属表和国家配色。",
-    showcaseLayerRailBadge: "欧洲铁路网络",
-    showcaseLayerRailTitle: "铁路走廊来自 global rail 数据源。",
-    showcaseLayerRailBody: "铁路图层从仓库中 OpenStreetMap 衍生交通包里抽取欧洲可见线路。",
-    showcaseLayerCitiesBadge: "城市标签 + 首都锚点",
-    showcaseLayerCitiesTitle: "城市标签由主要城市与场景首都锚点共同组成。",
-    showcaseLayerCitiesBody: "这一层组合世界城市目录中的选定标签与 HOI4 1936 首都提示表中的锚点。",
-    showcaseLayerDayNightBadge: "昼夜循环",
-    showcaseLayerDayNightTitle: "昼夜变化让上下文图层更有生命感。",
-    showcaseLayerDayNightBody: "这一层把欧洲场景地图、移动夜色和首都光点组合起来，对应产品里的夜光上下文能力。",
-    showcaseMeta: "HOI4 1936 输出 · 欧洲范围 · 7,177 个政治源要素、220 条已选铁路线、34 个城市标签和 22 个首都锚点。",
-    showcaseMetadataFallback: "图层元数据暂不可用，当前显示已生成地图。",
-    previewEyebrow: "可交互预览",
-    previewTitle: "进入编辑器前，先查看日本交通筛选结果。",
-    previewBody: "四张预生成 WebP 通过图层切换形成交互预览，并分别说明源记录与成图所选线路。",
-    miniMapLabel: "日本交通预览",
-    miniMapTitle: "5,899 个道路与铁路源要素进入交通和地理上下文预览。",
-    miniMapBadge: "可交互预览",
-    previewSurfaceLabel: "日本预览地图视口",
-    previewZoomControlsLabel: "日本预览缩放控件",
-    previewZoomIn: "放大",
-    previewZoomOut: "缩小",
-    previewZoomReset: "重置预览缩放",
-    previewTabsLabel: "预览图层",
-    previewTabTransport: "交通",
-    previewTabCities: "城市",
-    previewTabTerrain: "地形",
-    previewTabNight: "夜光上下文",
-    previewImageFallback: "该预览图层暂时不可用。",
-    previewPanelTransportBadge: "日本预览 · 已选线路",
-    previewPanelTransportTitle: "420 条已渲染线路（260 条道路 + 160 条铁路）· 日本交通预览。",
-    previewPanelTransportBody: "预览从 5,899 个道路与铁路源要素中筛选这些线路；日本中部局部交通图集使用独立的 165 条局部线路范围。",
-    previewPanelCitiesBadge: "日本预览 · 城市上下文",
-    previewPanelCitiesTitle: "32 个已渲染城市锚点 · 日本交通预览。",
-    previewPanelCitiesBody: "选定城市把线路连接到熟悉的区域中心。",
-    previewPanelTerrainBadge: "日本预览 · 实体地理上下文",
-    previewPanelTerrainTitle: "等高线与河流呈现交通走廊穿越地形的方式。",
-    previewPanelTerrainBody: "地形视图筛选预览范围内已签入的等高线与河流线。",
-    previewPanelNightBadge: "日本预览 · 夜光上下文",
-    previewPanelNightTitle: "88 个抽样光点 · 日本交通预览。",
-    previewPanelNightBody: "夜光图层组合 Black Marble 网格抽样与历史城市锚点。",
-    featuresEyebrow: "产品能力",
-    featuresTitle: "地图创作所需，尽在一处。",
-    featuresBody: "从政治疆界、地理细节，到最后的视觉调整。",
-    featureGroupOneTitle: "政治状态",
-    featureGroupOneBody: "在五个公开底图中，编辑归属、控制区、前线与特殊区域。",
-    featurePointPalettes: "当前 Demo 提供 5 个命名公开基线。",
-    featurePointExport: "HGO 使用独立的原生像素编辑器，海域同样可编辑。",
-    featureGroupTwoTitle: "制图控制",
-    featureGroupTwoBody: "调整配色、边界、标签与图例，以图层顺序突出重要细节。",
-    featurePointUndo: "编辑会话支持 80 步撤销与重做。",
-    featurePointDistricts: "行政区与层级数据支持细致场景制作。",
-    featureGroupThreeTitle: "地理上下文",
-    featureGroupThreeBody: "加入公路、铁路、城市、地形、河流与夜光。",
-    featureGroupFourTitle: "本地项目与导出",
-    featureGroupFourBody: "以 1×–4× 导出 PNG 或 JPG，保存 JSON 工程以便下次继续。",
-    featurePointTransport: "道路与铁路是当前最强的公开交通路径。",
-    featurePointAudits: "项目文件让成图在导出后继续可编辑。",
-    dataEyebrow: "证据与溯源",
-    dataTitle: "每个公开数字都标明对象、范围与处理阶段。",
-    dataBody: "三个可见输出都链接到公开输出详情、来源记录，以及代码、数据与衍生资产各自适用的许可边界。",
-    dataCardOneTag: "TNO 1962 输出",
-    dataCardOneTitle: "Atlantropa 地中海",
-    dataCardOneBody: "地中海范围内的 724 个 Atlantropa 要素与 30 个剧本归属。来源文件与处理细节见地图记录。",
-    dataCardTwoTag: "HOI4 对比输出",
-    dataCardTwoTitle: "1936 / 1939 中东欧",
-    dataCardTwoBody: "每个场景 2,626 个源政治要素 · 共享中东欧范围 · 对比输出 · 记录格式 1 · 样例清单更新于 2026-06-30。",
-    dataCardThreeTag: "日本中部图集输出",
-    dataCardThreeTitle: "日本中部局部交通图集",
-    dataCardThreeBody: "165 条已渲染线路（95 条道路 + 70 条铁路）与 18 个主要车站 · 134.1–141.5°E / 33.2–36.8°N · 局部图集输出 · 记录格式 1 · 样例清单更新于 2026-06-30。",
-    dataCardFourTag: "许可边界",
-    dataCardFourTitle: "项目采用 MIT，数据遵循各自来源条款",
-    dataCardFourBody: "Scenario Forge 的代码与文档采用 MIT License。第三方数据集及衍生资产保留各自来源条款与溯源记录。",
-    evidenceMetadataLink: "查看输出详情",
-    evidenceSourceLedgerLink: "查看来源清单",
-    evidenceRoadSourcesLink: "道路来源条款",
-    evidenceRailSourcesLink: "铁路来源条款",
-    evidenceLicenseLink: "阅读 MIT License",
-    editionsEyebrow: "当前边界",
-    editionsTitle: "公开 Demo、本地预览与未来方向分别说明。",
-    editionOneBadge: "当前公开 Demo",
-    editionOneTitle: "5 个公开基线与浏览器编辑",
-    editionOneBody: "使用政治与上下文图层，保存可编辑项目 JSON，并按 1x–4x 比例导出 PNG/JPG 快照。",
-    editionTwoBadge: "本地/开发预览",
-    editionTwoTitle: "HGO 1936 与本地后端流程",
-    editionTwoBody: "HGO 验证、Cloud Saves 与社区工作流通过本地创作者设置运行。",
-    editionThreeBadge: "未来方向",
-    editionThreeTitle: "共享项目与发布界面",
-    editionThreeBody: "共享项目空间、权限发布与云端协作属于未来方向，可用性与发布日期仍待公布。",
-    faqEyebrow: "FAQ",
-    faqTitle: "答案以当前公开能力为准。",
-    faqOneQuestion: "Scenario Forge 是 GIS 工具还是地图编辑器？",
-    faqOneAnswer: "Scenario Forge 是场景优先的地图工作台，用于编辑政治状态、组合地理上下文并导出展示地图。",
-    faqTwoQuestion: "它使用哪些数据来源？",
-    faqTwoAnswer: "当前来源包括 Natural Earth、geoBoundaries、GeoNames、NOAA ETOPO、NASA Black Marble、OpenStreetMap、Geofabrik 和各国交通来源。每个可见输出都链接到公开详情与溯源路径。",
-    faqThreeQuestion: "可以在本地运行吗？",
-    faqThreeAnswer: "公开工作台是静态浏览器应用。HGO 验证、更大数据刷新、Cloud Saves 与社区工作流属于本地/开发设置。",
-    faqFourQuestion: "可以导出什么？",
-    faqFourAnswer: "在尺寸与内存限制内，以 1×–4× 导出 PNG 或 JPG；地图几何按输出分辨率绘制。保存 JSON 工程可继续编辑，作品区也提供生成地图的 SVG 文件。",
-    faqFiveQuestion: "交通图层成熟度如何？",
-    faqFiveAnswer: "道路与铁路是当前最强的公开交通路径。机场和港口提供总览上下文；矿产资源、能源、工业与物流保持预览/工作台状态。",
-    faqSixQuestion: "Scenario Forge 使用什么许可？",
-    faqSixAnswer: "Scenario Forge 的代码和文档采用 MIT License。第三方数据集及衍生资产遵循各自的来源条款和溯源记录；分发含数据的衍生成果前，请查看对应样例的来源链接。",
-    ctaEyebrow: "打开工作台",
-    ctaTitle: "下一个世界，等你落笔。",
-    ctaBody: "打开编辑器，从一张地图开始。",
-    ctaPrimary: "开始制图",
-    ctaSecondary: "浏览仓库",
-    footerNote: "为架空历史与世界观创作打造的政治地图工作室。",
-    footerSources: "主要数据来源包括 Natural Earth、geoBoundaries、GeoNames、NOAA ETOPO、NASA Black Marble、OpenStreetMap 与 Geofabrik。",
-    footerDemo: "打开 Demo",
-    footerGithub: "GitHub",
-    metaTitle: "Scenario Forge — 场景优先政治地图工作台",
-    metaDescription: "Scenario Forge 是一个面向架空历史、策略模组制作与地缘政治叙事的场景优先政治地图工作台。",
-    metaOgDescription: "从一个世界状态出发，改写控制与归属，叠加上下文图层，再导出成故事就绪的政治地图。",
-  },
+const clamp01 = (value) => Math.min(1, Math.max(0, value));
+const smooth = (t) => t * t * (3 - 2 * t);
+const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const hexToRgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const lerpRgb = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+const rgbString = (rgb) => `rgb(${rgb.map(Math.round).join(",")})`;
+const svgEl = (name, attributes = {}) => {
+  const node = document.createElementNS(SVG_NS, name);
+  for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+  return node;
 };
+// Replacing a text node, even with the same text, invalidates layout; skip unchanged writes.
+const setText = (node, text) => {
+  if (node.textContent !== text) node.textContent = text;
+};
+const boxesOverlap = (a, b) => a.x < b.r && a.r > b.x && a.y < b.b && a.b > b.y;
+const toBox = (rect, padX, padY) => ({ x: rect.left - padX, y: rect.top - padY, r: rect.right + padX, b: rect.bottom + padY });
 
-const SHOWCASE_LAYER_COPY_KEYS = {
-  political: {
-    badge: "showcaseLayerPoliticalBadge",
-    title: "showcaseLayerPoliticalTitle",
-    body: "showcaseLayerPoliticalBody",
-  },
-  rail: {
-    badge: "showcaseLayerRailBadge",
-    title: "showcaseLayerRailTitle",
-    body: "showcaseLayerRailBody",
-  },
-  cities: {
-    badge: "showcaseLayerCitiesBadge",
-    title: "showcaseLayerCitiesTitle",
-    body: "showcaseLayerCitiesBody",
-  },
-  "day-night": {
-    badge: "showcaseLayerDayNightBadge",
-    title: "showcaseLayerDayNightTitle",
-    body: "showcaseLayerDayNightBody",
-  },
-};
-const SHOWCASE_METADATA_URL = "./assets/europe-1936-showcase.json";
-const DEFAULT_SHOWCASE_LAYER = "political";
-const SHOWCASE_VIEW_WIDTH = 980;
-const SHOWCASE_VIEW_HEIGHT = 620;
-const SHOWCASE_VIEW_SCALES = [1, 1.16, 1.34, 1.58, 1.8];
-const DEFAULT_SHOWCASE_VIEW_SCALE_INDEX = 1;
-const PREVIEW_VIEW_WIDTH = 680;
-const PREVIEW_VIEW_HEIGHT = 440;
-const PREVIEW_VIEW_SCALES = [1, 1.25, 1.55, 1.9, 2.25];
-const DEFAULT_HERO_MODE = "hoi4-1936";
-const HERO_SCENARIO_ASSETS = {
-  blank: {
-    src: "./assets/hero-blank.webp",
-    metadata: "./assets/hero-blank.json",
-    altKey: "heroAltBlank",
-  },
-  "hoi4-1936": {
-    src: "./assets/hero-hoi4-1936.svg",
-    metadata: "./assets/hero-hoi4-1936.json",
-    altKey: "heroAltHoi41936",
-  },
-  "hoi4-1939": {
-    src: "./assets/hero-hoi4-1939.svg",
-    metadata: "./assets/hero-hoi4-1939.json",
-    altKey: "heroAltHoi41939",
-  },
-  "tno-1962": {
-    src: "./assets/hero-tno-1962.svg",
-    metadata: "./assets/hero-tno-1962.json",
-    altKey: "heroAltTno1962",
-  },
-};
-const DEFAULT_PRODUCT_STORY_STEP = "baseline";
-const DEFAULT_PRODUCT_STORY_COMPARISON = "hoi4-1936";
-const PRODUCT_STORY_COMPARISON_ASSETS = {
-  "hoi4-1936": {
-    src: "./assets/hero-hoi4-1936.svg",
-    altKey: "scenario1936Alt",
-  },
-  "hoi4-1939": {
-    src: "./assets/hero-hoi4-1939.svg",
-    altKey: "heroAltHoi41939",
-  },
-  "tno-1962": {
-    src: "./assets/hero-tno-1962.svg",
-    altKey: "heroAltTno1962",
-  },
-};
-const PRODUCT_STORY_STEPS = {
-  baseline: {
-    src: "./assets/hero-blank.svg",
-    altKey: "storyAltBaseline",
-    badgeKey: "storyStageBadgeBaseline",
-    titleKey: "storyStageTitleBaseline",
-    bodyKey: "storyStageBodyBaseline",
-  },
-  scenario: {
-    comparisonDriven: true,
-    altKey: "storyAltScenario",
-    badgeKey: "storyStageBadgeScenario",
-    titleKey: "storyStageTitleScenario",
-    bodyKey: "storyStageBodyScenario",
-  },
-  transport: {
-    src: "./assets/japan-preview-transport.svg",
-    altKey: "storyAltTransport",
-    badgeKey: "storyStageBadgeTransport",
-    titleKey: "storyStageTitleTransport",
-    bodyKey: "storyStageBodyTransport",
-  },
-  evidence: {
-    src: "./assets/hero-blank.svg",
-    altKey: "storyAltEvidence",
-    badgeKey: "storyStageBadgeEvidence",
-    titleKey: "storyStageTitleEvidence",
-    bodyKey: "storyStageBodyEvidence",
-  },
-  export: {
-    src: "./assets/export-workbench.webp",
-    altKey: "storyAltExport",
-    badgeKey: "storyStageBadgeExport",
-    titleKey: "storyStageTitleExport",
-    bodyKey: "storyStageBodyExport",
-  },
-};
+/* ---------- Language ---------- */
 
-Object.assign(translations.en, {
-  "transportOverviewAlt": "Japan road and railway overview with city labels and a transport legend.",
-  "transportOverviewLabel": "THE WIDER NETWORK",
-  "transportOverviewTitle": "See how the region connects.",
-  "transportOverviewBody": "The national view puts the regional atlas in context. Roads and railways stay distinct; city labels and a compact legend make the network readable.",
-  "galleryAllTitle": "Three maps. Three different questions.",
-  "galleryAllBody": "An alternate Mediterranean, a changing Europe, and the connections across Japan. Each map comes with an editable starting point.",
-  "galleryScenarioTitle": "Read the world through its scenario.",
-  "galleryScenarioBody": "TNO 1962 ownership and Atlantropa geography; HOI4 borders in 1936 and 1939. Each view uses its own scenario data.",
-  "galleryTransportTitle": "From national network to regional detail.",
-  "galleryTransportBody": "Follow the road and rail network across Japan, then open the Central Japan sample to work with routes, stations, and geographic context.",
-  "galleryAtlasTitle": "Take the artwork. Keep the editable project.",
-  "galleryAtlasBody": "Download these vector maps as SVG, or open a sample to compose your own PNG or JPG in the export workbench.",
-  "galleryEvidenceTitle": "The data behind every map.",
-  "galleryEvidenceBody": "Ownership, geographic extent, and processing are attached to the map they describe. Open a source record to inspect the exact inputs.",
-  "sampleVectorDownload": "Download SVG",
-  "mapSourceRecord": "Map data & processing",
-  "mapScopeTno": "TNO 1962 ownership, scenario country colours, and Atlantropa land and water. This view does not use modern country borders.",
-  "mapScopeHoi4": "The same Central European extent, shown with the HOI4 1936 and 1939 ownership records.",
-  "mapScopeJapan": "Modern World · Central Japan. Road, rail, station, river, and land data are clipped to this regional extent.",
-  "starterBlankBody": "A clean political base for your own world.",
-  "starterJapanBody": "A regional road-and-rail composition with station context.",
-  "starter1936Body": "The pre-war European baseline, ready to edit.",
-  "starter1939Body": "A second date for comparing borders and control.",
-  "starterTnoBody": "Alternate-history ownership and a transformed Mediterranean.",
-  "storyStageTitleTransport": "Japan, from network to place.",
-  "storyStageBodyTransport": "A separate Modern World example: real road and rail paths, clear city anchors, and a restrained geographic base.",
-  "storyStageTitleEvidence": "Follow the map back to its inputs.",
-  "storyStageBodyEvidence": "Inspect the source record, geographic extent, and layer counts attached to each example.",
-  "storyStageTitleExport": "Compose an image. Keep your project.",
-  "storyStageBodyExport": "Use the export workbench for PNG or JPG, and save the project to continue editing."
-});
-Object.assign(translations.zh, {
-  "transportOverviewAlt": "日本道路与铁路全域概览，包含城市标注与交通图例。",
-  "transportOverviewLabel": "更广阔的交通网络",
-  "transportOverviewTitle": "看清区域之间的联系。",
-  "transportOverviewBody": "全国视图为区域图集提供背景。道路与铁路分层呈现，城市标注与图例帮助读懂线路。",
-  "galleryAllTitle": "三张地图，三个观察世界的角度。",
-  "galleryAllBody": "改造后的地中海、两个年份的欧洲，以及日本的交通联系。每张地图都提供可继续编辑的起点。",
-  "galleryScenarioTitle": "按剧本，读懂这个世界。",
-  "galleryScenarioBody": "TNO 1962 的国家归属与亚特兰特罗帕地理；HOI4 1936 与 1939 的疆界对照。每张图都采用对应剧本的数据。",
-  "galleryTransportTitle": "从全国网络，走进区域细节。",
-  "galleryTransportBody": "先观察日本的道路与铁路网络，再打开日本中部示例，编辑线路、车站与地理上下文。",
-  "galleryAtlasTitle": "带走成图，也保留下一次编辑。",
-  "galleryAtlasBody": "直接下载这些 SVG 矢量图，或打开示例，在导出工作台中制作自己的 PNG / JPG。",
-  "galleryEvidenceTitle": "每张地图，都有对应的来源。",
-  "galleryEvidenceBody": "国家归属、地理范围与处理方式随图展示。打开来源记录，可以核对具体输入，而不必在无关数据中查找。",
-  "sampleVectorDownload": "下载 SVG",
-  "mapSourceRecord": "地图数据与处理记录",
-  "mapScopeTno": "采用 TNO 1962 的归属、剧本国家配色及亚特兰特罗帕陆地与水域，不使用现代国家疆界。",
-  "mapScopeHoi4": "在同一中欧范围内，分别呈现 HOI4 1936 与 1939 的国家归属。",
-  "mapScopeJapan": "现代世界 · 日本中部。道路、铁路、车站、河流与陆地数据按此区域裁切。",
-  "starterBlankBody": "从干净的政治底图开始，构建自己的世界。",
-  "starterJapanBody": "带有车站和地理上下文的区域道路、铁路图。",
-  "starter1936Body": "从战前欧洲基线开始修改。",
-  "starter1939Body": "用另一个年份比较疆界与控制区。",
-  "starterTnoBody": "架空历史的国家归属与改造后的地中海。",
-  "storyStageTitleTransport": "日本：从交通网络到具体地点。",
-  "storyStageBodyTransport": "这是独立的现代世界示例：真实道路与铁路、清晰的城市锚点，以及克制的地理底图。",
-  "storyStageTitleEvidence": "从地图追溯到它的输入。",
-  "storyStageBodyEvidence": "查看每张示例对应的来源记录、地理范围和图层数量。",
-  "storyStageTitleExport": "制作成图，保留工程。",
-  "storyStageBodyExport": "在导出工作台中输出 PNG 或 JPG，保存工程以便继续编辑。"
-});
-Object.assign(translations.en, {
-  "sampleFilterAll": "Scenarios",
-  "sampleFilterEvidence": "Files & sources",
-  "galleryAllTitle": "Europe, across three starting points.",
-  "galleryAllBody": "Compare 1936, 1939 and TNO 1962 in a shared frame, then open the scenario you want to edit.",
-  "galleryEvidenceTitle": "The artwork and its record, together.",
-  "galleryEvidenceBody": "Choose a vector map, an editable project, or the source record behind it.",
-  "galleryTransportBody": "Turn the page between Central Japan and the national network. Both views retain the source road and rail geometry.",
-  "scenario1936Title": "Europe · 1936",
-  "scenario1939Title": "Europe · 1939",
-  "scenario1962Title": "An alternate Europe · 1962",
-  "scenario1936Body": "The HOI4 starting map, before the territorial changes.",
-  "scenario1939Body": "A later starting point, with the same geographic frame.",
-  "scenario1962Body": "TNO ownership and Atlantropa’s reshaped Mediterranean.",
-  "scenario1936Scope": "HOI4 1936 ownership. Borders describe the scenario, not a modern political map.",
-  "scenario1939Scope": "HOI4 1939 ownership. The projection and extent match the 1936 view.",
-  "scenario1962Scope": "TNO 1962 ownership with scenario land, shoals and water regions in the Mediterranean.",
-  "scenario1936Alt": "HOI4 1936 Europe political map.",
-  "scenario1939Alt": "HOI4 1939 Europe political map.",
-  "scenario1962Alt": "TNO 1962 Europe with Atlantropa geography.",
-  "scenarioFeatureCount": "Political source features",
-  "transportPagesLabel": "Transport map pages",
-  "transportRegional": "Central Japan",
-  "transportNational": "All Japan",
-  "workThreeBody": "Roads and railways across the region, with stations and geographic context.",
-  "workThreeLabel": "TRANSPORT / TWO SCALES",
-  "transportOverviewTitle": "Japan’s connected regions",
-  "transportOverviewBody": "A national view of the available road and rail data. Switch back to inspect Central Japan in detail.",
-  "libraryEyebrow": "FROM SOURCE TO FILE",
-  "libraryTitle": "Choose the file for your next step.",
-  "libraryBody": "The SVG is the artwork shown here. The project opens in Scenario Forge; the record documents the map’s extent and inputs.",
-  "formatSvg": "Vector artwork · scalable detail",
-  "formatJson": "Editable project · keep working",
-  "formatRaster": "Export workbench · layout and resolution",
-  "libraryMap": "Map",
-  "libraryArtwork": "Artwork",
-  "libraryProject": "Project",
-  "librarySource": "Sources",
-  "libraryRecord": "Record ↗",
-  "libraryNote": "Transport data has its own coverage and scale. Scenario ownership is a separate input from physical geography.",
-  "storyAltBaseline": "Neutral map with editable administrative subdivisions.",
-  "storyStageBadgeBaseline": "BLANK BASELINE",
-  "storyStageTitleBaseline": "Start with the geography.",
-  "storyStageBodyBaseline": "Neutral subdivisions are ready for your own colors, ownership and story.",
-  "storyAltExport": "Scenario Forge export workbench with composition preview and export settings.",
-  "storyStageTitleExport": "Compose the final image.",
-  "storyStageBodyExport": "Preview the composition, choose image format and resolution, then export.",
-  "storyStageBadgeEvidence": "SOURCE LINEAGE",
-  "storyStageBodyEvidence": "Follow each branch to the record for geography, ownership, transport or context.",
-  "lineageRootLabel": "THE MAP",
-  "lineageRoot": "One composition, traceable layers",
-  "lineageGeography": "Geography",
-  "lineageGeographySource": "Coastlines · administrative subdivisions",
-  "lineageOwnership": "Scenario ownership",
-  "lineageOwnershipSource": "Scenario boundaries · country colors · Atlantropa",
-  "lineageTransport": "Transport network",
-  "lineageTransportSource": "Road geometry · rail geometry · stations",
-  "lineageContext": "Geographic context",
-  "lineageContextSource": "Terrain contours · rivers · city anchors",
-  "lineageRecord": "Inspect source record ↗",
-  "lineageNote": "Each record lists the actual files and the geographic extent used in that map.",
-  "openExportEditor": "Open sample in editor ↗"
-});
-Object.assign(translations.zh, {
-  "sampleFilterAll": "场景",
-  "sampleFilterEvidence": "输出与来源",
-  "galleryAllTitle": "三个年代，同一幅欧洲。",
-  "galleryAllBody": "在统一范围中比较 1936、1939 与 TNO 1962，再打开你想编辑的剧本。",
-  "galleryEvidenceTitle": "成图、工程与来源，一一对应。",
-  "galleryEvidenceBody": "按用途下载矢量地图或工程文件，也可以直接查阅对应的数据记录。",
-  "galleryTransportBody": "在日本中部与全国网络之间翻页；两种尺度都保留来源中的道路与铁路几何。",
-  "scenario1936Title": "欧洲 · 1936",
-  "scenario1939Title": "欧洲 · 1939",
-  "scenario1962Title": "架空欧洲 · 1962",
-  "scenario1936Body": "以 HOI4 的 1936 年国家归属为起点。",
-  "scenario1939Body": "同一地理范围，呈现 1939 年的政治版图。",
-  "scenario1962Body": "TNO 国家归属与 Atlantropa 改造后的地中海。",
-  "scenario1936Scope": "采用 HOI4 1936 剧本归属；边界表达剧本设定。",
-  "scenario1939Scope": "采用 HOI4 1939 剧本归属；投影与范围和 1936 年一致。",
-  "scenario1962Scope": "采用 TNO 1962 剧本归属，包含地中海的剧本陆地、浅滩与水域。",
-  "scenario1936Alt": "HOI4 1936 欧洲政治地图。",
-  "scenario1939Alt": "HOI4 1939 欧洲政治地图。",
-  "scenario1962Alt": "包含 Atlantropa 地貌的 TNO 1962 欧洲地图。",
-  "scenarioFeatureCount": "政治地图来源地块",
-  "transportPagesLabel": "交通地图翻页",
-  "transportRegional": "日本中部",
-  "transportNational": "日本全国",
-  "workThreeBody": "区域道路与铁路网络，辅以车站和地理背景。",
-  "workThreeLabel": "交通 / 两种尺度",
-  "transportOverviewTitle": "日本全国交通网络",
-  "transportOverviewBody": "查看现有道路与铁路数据的全国分布，翻回上一页查看日本中部细节。",
-  "libraryEyebrow": "从来源到文件",
-  "libraryTitle": "选对文件，继续创作。",
-  "libraryBody": "SVG 是这里展示的成图；JSON 工程可在编辑器中继续修改；来源记录说明每张地图的范围与输入。",
-  "formatSvg": "矢量成图 · 放大仍清晰",
-  "formatJson": "可编辑工程 · 保留创作状态",
-  "formatRaster": "导出工作台 · 调整构图与分辨率",
-  "libraryMap": "地图",
-  "libraryArtwork": "成图",
-  "libraryProject": "工程",
-  "librarySource": "来源",
-  "libraryRecord": "记录 ↗",
-  "libraryNote": "交通数据有其覆盖范围与尺度；剧本归属与自然地理是不同的数据层。",
-  "storyAltBaseline": "显示行政地块的空白基线地图。",
-  "storyStageBadgeBaseline": "空白基线",
-  "storyStageTitleBaseline": "从地理底图开始。",
-  "storyStageBodyBaseline": "保留清晰的地块划分，让配色、归属与故事由你决定。",
-  "storyAltExport": "Scenario Forge 导出工作台，包含构图预览与导出设置。",
-  "storyStageTitleExport": "在工作台完成最后的构图。",
-  "storyStageBodyExport": "预览构图，选择图片格式与分辨率，再导出成图。",
-  "storyStageBadgeEvidence": "数据来源关系",
-  "storyStageBodyEvidence": "沿分支查看地理、归属、交通与上下文各自的来源记录。",
-  "lineageRootLabel": "地图展开",
-  "lineageRoot": "地图的四条来源",
-  "lineageGeography": "地理基线",
-  "lineageGeographySource": "海岸线 · 行政地块",
-  "lineageOwnership": "剧本归属",
-  "lineageOwnershipSource": "剧本边界 · 国家配色 · Atlantropa",
-  "lineageTransport": "交通网络",
-  "lineageTransportSource": "道路几何 · 铁路几何 · 车站",
-  "lineageContext": "地理上下文",
-  "lineageContextSource": "地形等高线 · 河流 · 城市锚点",
-  "lineageRecord": "查看来源记录 ↗",
-  "lineageNote": "每份记录列出实际输入文件与地图采用的地理范围。",
-  "openExportEditor": "在编辑器中打开示例 ↗"
-});
-Object.assign(translations.en, { transportNationalScope: "National overview of the available source roads and railways. The editable project opens the Central Japan starting point.", heroAltTno1962: "TNO 1962 Europe with scenario ownership and Atlantropa geography." });
-Object.assign(translations.zh, { transportNationalScope: "全国尺度展示现有来源中的道路与铁路。可编辑工程从日本中部起步。", heroAltTno1962: "TNO 1962 欧洲剧本归属与 Atlantropa 地貌。" });
-const GALLERY_VIEWS = {all: ["galleryAllTitle", "galleryAllBody"], transport: ["galleryTransportTitle", "galleryTransportBody"], evidence: ["galleryEvidenceTitle", "galleryEvidenceBody"]};
-const DEFAULT_SAMPLE_RUN_FILTER = "all";
-const SAMPLE_RUN_FILTERS = new Set(["all", "transport", "evidence"]);
+let language = "en";
+try {
+  language = localStorage.getItem(STORAGE_KEY) === "zh" ? "zh" : "en";
+} catch {
+  // Storage can be unavailable; English stays the default.
+}
+const copy = () => COPY[language];
 
-function getStoredLanguage() {
+function applyLanguage(next) {
+  language = next;
+  const strings = copy();
+  document.documentElement.lang = next === "zh" ? "zh-CN" : "en";
+  for (const node of document.querySelectorAll("[data-i18n]")) node.textContent = strings[node.dataset.i18n];
+  for (const node of document.querySelectorAll("[data-i18n-aria-label]")) node.setAttribute("aria-label", strings[node.dataset.i18nAriaLabel]);
+  for (const node of document.querySelectorAll("[data-i18n-alt]")) node.setAttribute("alt", strings[node.dataset.i18nAlt]);
+  for (const node of document.querySelectorAll("[data-i18n-list]")) {
+    node.replaceChildren(...strings[node.dataset.i18nList].split("|").map((item) => Object.assign(document.createElement("li"), { textContent: item })));
+  }
+  document.title = strings.metaTitle;
+  document.querySelector('meta[name="description"]')?.setAttribute("content", strings.metaDescription);
   try {
-    const value = String(globalThis.localStorage?.getItem(STORAGE_KEY) || "").trim().toLowerCase();
-    return value === "zh" ? "zh" : "en";
-  } catch (_error) {
-    return "en";
+    localStorage.setItem(STORAGE_KEY, next);
+  } catch {
+    // Not persisting the choice is fine.
   }
+  document.dispatchEvent(new Event("landing:language"));
 }
 
-function applyLanguage(language) {
-  const copy = translations[language] || translations.en;
-  document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
-  document.querySelectorAll("[data-i18n]").forEach((node) => {
-    const key = node.getAttribute("data-i18n");
-    if (!key || !(key in copy)) return;
-    node.textContent = copy[key];
+/* ---------- The map stage ---------- */
+
+const PAINT_COLOURS = ["#c8412d", "#e0a66a", "#d6b978", "#87977a", "#3f6f72", "#5b6f9e", "#8e6aa0", "#e8e0cf"];
+const BLANK_RGB = hexToRgb("#8d998f");
+const PAPER_RGB = hexToRgb("#ece3cf");
+const INK_RGB = hexToRgb("#141c19");
+const WORLD_STATE = { blank: null, modern: 3, 1936: 0, 1939: 1, 1962: 2 };
+const STYLES = ["game", "atlas", "ink"];
+const WORLDS = ["blank", "modern", "1936", "1939", "1962"];
+// Width of the recolour sweep line, in viewBox units.
+const FRONT_WIDTH = 120;
+// Timed effects stay well under the time a reader takes to scroll through a chapter,
+// so a change has landed before the next one starts.
+const TIMING = { recolour: 800, recolourFromHistory: 700, style: 700, paint: 450, reset: 600, reveal: 1300, settle: 950 };
+
+// Camera per chapter: a pan in viewBox units, never a zoom. A pure translation is
+// composited on the GPU; animating scale re-rasterized the whole map every frame.
+const CAMERAS = {
+  history: { x: 0, y: 0 },
+  edit: { x: 150, y: 20 },
+  style: { x: 160, y: 0 },
+  context: { x: 120, y: 0 },
+  worlds: { x: 170, y: -10 },
+  outro: { x: 170, y: -10 },
+};
+
+function initStage(data) {
+  const story = document.querySelector("[data-story]");
+  const stage = story.querySelector("[data-stage]");
+  const svg = stage.querySelector("[data-map]");
+  const lens = stage.querySelector("[data-lens]");
+  const scrubYears = data.states.slice(0, 3).map((state) => Number(state.id));
+
+  svg.querySelector("[data-coast]").setAttribute("d", data.coast);
+
+  // Fills live on a canvas: recolouring 150 Path2D shapes per frame is cheap, while
+  // changing SVG fill attributes restyles and repaints the whole SVG each frame.
+  const canvas = stage.querySelector("[data-fills]");
+  const context2d = canvas.getContext("2d");
+  const graticule = new Path2D(data.graticule);
+  const atoms = data.atoms.map((atom) => {
+    const colors = atom.c.map(hexToRgb);
+    return { path: new Path2D(atom.d), x: atom.x, tag: atom.o[0], colors, shown: colors[0].slice(), from: colors[0], to: colors[0] };
   });
-  document.querySelectorAll("[data-i18n-aria-label]").forEach((node) => {
-    const key = node.getAttribute("data-i18n-aria-label");
-    if (!key || !(key in copy)) return;
-    node.setAttribute("aria-label", copy[key]);
-  });
-
-  document.querySelectorAll("[data-i18n-alt]").forEach((node) => {
-    const key = node.getAttribute("data-i18n-alt");
-    if (!key || !(key in copy)) return;
-    node.setAttribute("alt", copy[key]);
-  });
-
-  document.querySelectorAll("[data-lang]").forEach((button) => {
-    const active = button.getAttribute("data-lang") === language;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", active ? "true" : "false");
-  });
-
-  document.title = copy.metaTitle;
-  const description = document.querySelector('meta[name="description"]');
-  const ogDescription = document.querySelector('meta[property="og:description"]');
-  const twitterDescription = document.querySelector('meta[name="twitter:description"]');
-  const ogTitle = document.querySelector('meta[property="og:title"]');
-  const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-
-  if (description) description.setAttribute("content", copy.metaDescription);
-  if (ogDescription) ogDescription.setAttribute("content", copy.metaOgDescription);
-  if (twitterDescription) twitterDescription.setAttribute("content", copy.metaDescription);
-  if (ogTitle) ogTitle.setAttribute("content", copy.metaTitle);
-  if (twitterTitle) twitterTitle.setAttribute("content", copy.metaTitle);
-  formatMetricNumbers(language);
-  updateShowcaseLayerCopy(language);
-  syncSampleRunsFromDom();
-  syncProductStoryFromDom();
-  syncHeroMapFromDom();
-
-  try {
-    globalThis.localStorage?.setItem(STORAGE_KEY, language);
-  } catch (_error) {
-    // noop
+  const fit = { k: 1, ox: 0, oy: 0, scale: 1 };
+  function sizeCanvas() {
+    const width = lens.clientWidth;
+    const height = lens.clientHeight;
+    // Oversample by the largest camera zoom so the map stays sharp when the lens scales it.
+    fit.scale = Math.min(devicePixelRatio || 1, 2);
+    fit.k = Math.max(width / data.width, height / data.height);
+    fit.ox = (width - data.width * fit.k) / 2;
+    fit.oy = (height - data.height * fit.k) / 2;
+    placeFront();
+    canvas.width = Math.round(width * fit.scale);
+    canvas.height = Math.round(height * fit.scale);
+    drawFills();
   }
-}
-
-function formatMetricNumbers(language) {
-  const locale = language === "zh" ? "zh-CN" : "en-US";
-  const formatter = new Intl.NumberFormat(locale);
-  document.querySelectorAll("[data-stat-value]").forEach((node) => {
-    const value = Number.parseInt(node.getAttribute("data-stat-value") || "", 10);
-    if (Number.isNaN(value)) return;
-    node.textContent = formatter.format(value);
-  });
-}
-
-function initMetricCountUp() {
-  const motionQuery = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
-  const statNodes = Array.from(document.querySelectorAll("[data-stat-value]"));
-  if (motionQuery?.matches || !statNodes.length) return;
-
-  const animateNode = (node) => {
-    const target = Number.parseInt(node.getAttribute("data-stat-value") || "", 10);
-    if (Number.isNaN(target) || node.dataset.counted === "true") return;
-    node.dataset.counted = "true";
-    const language = document.documentElement.lang === "zh-CN" ? "zh" : "en";
-    const formatter = new Intl.NumberFormat(language === "zh" ? "zh-CN" : "en-US");
-    const duration = 760;
-    const start = globalThis.performance?.now?.() || Date.now();
-    const tick = (now) => {
-      const elapsed = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - elapsed, 3);
-      node.textContent = formatter.format(Math.round(target * eased));
-      if (elapsed < 1) globalThis.requestAnimationFrame(tick);
-    };
-    globalThis.requestAnimationFrame(tick);
-  };
-
-  if (!("IntersectionObserver" in globalThis)) {
-    statNodes.forEach(animateNode);
-    return;
+  let drawQueued = false;
+  // While colours are moving, the seam-hiding stroke is skipped: stroking 150 complex
+  // shapes doubled the canvas cost per frame, and hairline seams are invisible in motion.
+  let inMotion = false;
+  let motionSettle = 0;
+  function markMotion() {
+    inMotion = true;
+    clearTimeout(motionSettle);
+    motionSettle = setTimeout(() => {
+      inMotion = false;
+      queueDraw();
+    }, 160);
   }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        animateNode(entry.target);
-        observer.unobserve(entry.target);
-      });
-    },
-    { threshold: 0.4 },
-  );
-
-  statNodes.forEach((node) => observer.observe(node));
-}
-
-function initScrollReveal() {
-  const motionQuery = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
-  if (motionQuery?.matches) return;
-
-  const revealNodes = Array.from(document.querySelectorAll(".section-heading[data-reveal], .hero__copy[data-reveal]"));
-  if (!revealNodes.length) return;
-
-  document.documentElement.dataset.reveal = "enabled";
-
-  if (!("IntersectionObserver" in globalThis)) {
-    revealNodes.forEach((node) => node.classList.add("is-revealed"));
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const siblings = Array.from(entry.target.parentElement?.children || []).filter((node) =>
-          node.hasAttribute?.("data-reveal"),
-        );
-        const revealIndex = Math.max(0, siblings.indexOf(entry.target));
-        entry.target.style.setProperty("--reveal-delay", `${Math.min(revealIndex, 8) * 60}ms`);
-        entry.target.classList.add("is-revealed");
-        observer.unobserve(entry.target);
-      });
-    },
-    { threshold: 0.16, rootMargin: "0px 0px -8% 0px" },
-  );
-
-  revealNodes.forEach((node) => observer.observe(node));
-}
-
-function resolveHeroMode(mode) {
-  return Object.prototype.hasOwnProperty.call(HERO_SCENARIO_ASSETS, mode) ? mode : DEFAULT_HERO_MODE;
-}
-
-function decodeHeroAsset(src) {
-  if (!src || typeof globalThis.Image !== "function") return Promise.resolve(false);
-  return new Promise((resolve, reject) => {
-    const preload = new globalThis.Image();
-    preload.decoding = "async";
-    preload.onload = () => {
-      if (typeof preload.decode === "function") {
-        preload.decode().then(() => resolve(true)).catch(() => resolve(true));
-      } else {
-        resolve(true);
-      }
-    };
-    preload.onerror = () => reject(new Error(`Unable to preload ${src}`));
-    preload.src = src;
-  });
-}
-
-function prefetchHeroAssets(activeMode) {
-  const preloadRest = () => {
-    Object.entries(HERO_SCENARIO_ASSETS).forEach(([mode, asset]) => {
-      if (mode === activeMode) return;
-      decodeHeroAsset(asset.src).catch(() => {});
-    });
-  };
-
-  if (typeof globalThis.requestIdleCallback === "function") {
-    globalThis.requestIdleCallback(preloadRest, { timeout: 1800 });
-  } else {
-    globalThis.setTimeout(preloadRest, 300);
-  }
-}
-
-function isCurrentHeroAsset(image, src) {
-  const currentSrc = image.getAttribute("src") || "";
-  const normalizedSrc = src.replace(/^\.\//, "");
-  return currentSrc === src || currentSrc.endsWith(normalizedSrc);
-}
-
-function syncHeroMap(root, mode, options = {}) {
-  const nextMode = resolveHeroMode(mode);
-  const asset = HERO_SCENARIO_ASSETS[nextMode];
-  const image = root.querySelector("[data-hero-image]");
-  const chips = Array.from(document.querySelectorAll("[data-hero-chip]"));
-  const copy = translations[getActiveLanguage()] || translations.en;
-
-  // heroMetadata 跟随当前图片一起切换，保证文案和可见资产都指向同一份生成器 metadata。
-  root.dataset.heroMode = nextMode;
-  if (asset.metadata) {
-    root.dataset.heroMetadata = asset.metadata;
-  }
-
-  if (image) {
-    const swapImage = () => {
-      image.src = asset.src;
-      image.alt = copy[asset.altKey] || copy.productPreviewAlt;
-    };
-    if (isCurrentHeroAsset(image, asset.src) && image.complete && image.naturalWidth > 0) {
-      image.alt = copy[asset.altKey] || copy.productPreviewAlt;
-      root.dataset.heroTransition = "ready";
-      delete root.dataset.heroPendingMode;
-    } else if (options.animate) {
-      root.dataset.heroTransition = "loading";
-      root.dataset.heroPendingMode = nextMode;
-      decodeHeroAsset(asset.src)
-        .catch(() => false)
-        .then(() => {
-          if (root.dataset.heroPendingMode !== nextMode) return;
-          swapImage();
-          root.dataset.heroTransition = "ready";
-          delete root.dataset.heroPendingMode;
-        });
-    } else {
-      delete root.dataset.heroPendingMode;
-      swapImage();
-      root.dataset.heroTransition = "ready";
+  function drawFills() {
+    drawQueued = false;
+    const { k, ox, oy, scale } = fit;
+    context2d.setTransform(1, 0, 0, 1, 0, 0);
+    context2d.clearRect(0, 0, canvas.width, canvas.height);
+    context2d.setTransform(k * scale, 0, 0, k * scale, ox * scale, oy * scale);
+    context2d.lineJoin = "round";
+    context2d.lineWidth = 0.6 / k;
+    context2d.strokeStyle = "rgba(224, 166, 106, .16)";
+    context2d.stroke(graticule);
+    context2d.lineWidth = 0.5;
+    for (const atom of atoms) {
+      const color = rgbString(atom.shown);
+      context2d.fillStyle = color;
+      context2d.strokeStyle = color;
+      context2d.fill(atom.path);
+      if (!inMotion) context2d.stroke(atom.path);
     }
   }
-
-  chips.forEach((chip) => {
-    const active = chip.getAttribute("data-hero-chip") === nextMode;
-    chip.setAttribute("aria-pressed", active ? "true" : "false");
-  });
-}
-
-function syncHeroMapFromDom() {
-  const root = document.querySelector("[data-hero-map]");
-  if (!root) return;
-  syncHeroMap(root, root.dataset.heroMode || DEFAULT_HERO_MODE);
-}
-
-function initHeroMap() {
-  const root = document.querySelector("[data-hero-map]");
-  const chips = Array.from(document.querySelectorAll("[data-hero-chip]"));
-  if (!root || !chips.length) return;
-  const motionQuery = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
-  syncHeroMap(root, root.dataset.heroMode || DEFAULT_HERO_MODE);
-  prefetchHeroAssets(resolveHeroMode(root.dataset.heroMode || DEFAULT_HERO_MODE));
-
-  chips.forEach((chip) => {
-    chip.addEventListener("click", () => {
-      const nextMode = chip.getAttribute("data-hero-chip") || DEFAULT_HERO_MODE;
-      if (resolveHeroMode(root.dataset.heroMode || DEFAULT_HERO_MODE) === resolveHeroMode(nextMode)) return;
-      syncHeroMap(root, nextMode, { animate: !motionQuery?.matches });
-    });
-  });
-}
-
-function resolveProductStoryStep(root, stepId) {
-  if (Object.prototype.hasOwnProperty.call(PRODUCT_STORY_STEPS, stepId)) {
-    delete root.dataset.storyError;
-    return stepId;
-  }
-  root.dataset.storyError = stepId || "missing";
-  return DEFAULT_PRODUCT_STORY_STEP;
-}
-
-function resolveProductStoryComparison(comparisonId) {
-  return Object.prototype.hasOwnProperty.call(PRODUCT_STORY_COMPARISON_ASSETS, comparisonId)
-    ? comparisonId
-    : DEFAULT_PRODUCT_STORY_COMPARISON;
-}
-
-function getProductStoryAsset(root, stepId) {
-  const step = PRODUCT_STORY_STEPS[stepId] || PRODUCT_STORY_STEPS[DEFAULT_PRODUCT_STORY_STEP];
-  if (!step.comparisonDriven) return step;
-  const comparisonId = resolveProductStoryComparison(root.dataset.storyComparison || DEFAULT_PRODUCT_STORY_COMPARISON);
-  return {
-    ...step,
-    ...PRODUCT_STORY_COMPARISON_ASSETS[comparisonId],
+  const queueDraw = () => {
+    if (drawQueued) return;
+    drawQueued = true;
+    requestAnimationFrame(drawFills);
   };
-}
-
-function resolveSampleRunFilter(root, filter) {
-  if (SAMPLE_RUN_FILTERS.has(filter)) {
-    delete root.dataset.sampleFilterError;
-    return filter;
-  }
-  root.dataset.sampleFilterError = filter || "missing";
-  return DEFAULT_SAMPLE_RUN_FILTER;
-}
-
-function sampleRunCardMatches(card, filter) {
-  if (filter === "evidence") return false;
-  if (filter === DEFAULT_SAMPLE_RUN_FILTER) filter = "scenario";
-  return String(card.getAttribute("data-sample-tags") || "")
-    .split(/\s+/)
-    .map((tag) => tag.trim())
-    .filter(Boolean)
-    .includes(filter);
-}
-
-function updateSampleRunsGallery(root) {
-  const filter = resolveSampleRunFilter(root, root.dataset.sampleFilter || DEFAULT_SAMPLE_RUN_FILTER);
-  const buttons = Array.from(root.querySelectorAll("[data-sample-run-filter]"));
-  const cards = Array.from(root.querySelectorAll("[data-sample-run-card]"));
-  let featuredAssigned = false;
-  const library = root.querySelector("[data-output-library]");
-  if (library) library.hidden = filter !== "evidence";
-
-  const copy = translations[getActiveLanguage()] || translations.en;
-  const viewCopy = GALLERY_VIEWS[filter];
-  const viewTitle = root.querySelector("[data-gallery-view-title]");
-  const viewBody = root.querySelector("[data-gallery-view-body]");
-  if (viewTitle) viewTitle.textContent = copy[viewCopy[0]];
-  if (viewBody) viewBody.textContent = copy[viewCopy[1]];
-  root.dataset.sampleVisibleCount = String(cards.filter((card) => sampleRunCardMatches(card, filter)).length);
-  root.dataset.sampleFilter = filter;
-  root.dataset.sampleMotion = isReducedMotionPreferred() ? "reduced" : "standard";
-  updateTransportPage(root);
-
-  buttons.forEach((button) => {
-    const active = button.getAttribute("data-sample-run-filter") === filter;
-    button.setAttribute("aria-pressed", active ? "true" : "false");
-    button.setAttribute("tabindex", active ? "0" : "-1");
-  });
-
-  cards.forEach((card) => {
-    const visible = sampleRunCardMatches(card, filter);
-    card.hidden = !visible;
-    card.dataset.sampleActive = visible ? "true" : "false";
-    card.dataset.sampleFeatured = visible && !featuredAssigned ? "true" : "false";
-    if (visible) featuredAssigned = true;
-  });
-
-  if (featuredAssigned || filter === "evidence") {
-    delete root.dataset.sampleRunEmpty;
-  } else {
-    root.dataset.sampleRunEmpty = "true";
-  }
-}
-
-function syncSampleRunsFromDom() {
-  const root = document.querySelector("[data-sample-runs-root]");
-  if (!root) return;
-  updateSampleRunsGallery(root);
-}
-
-function initSampleRunsGallery() {
-  const root = document.querySelector("[data-sample-runs-root]");
-  if (!root) return;
-
-  const buttons = Array.from(root.querySelectorAll("[data-sample-run-filter]"));
-  if (!buttons.length) return;
-
-  const selectFilter = (filter, options = {}) => {
-    root.dataset.sampleFilter = resolveSampleRunFilter(root, filter);
-    updateSampleRunsGallery(root);
-    if (options.focus) {
-      buttons.find((button) => button.getAttribute("data-sample-run-filter") === root.dataset.sampleFilter)?.focus();
+  // Viewport point -> map viewBox point, through the lens transform.
+  function atomAt(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    const x = ((clientX - rect.left) / rect.width) * lens.clientWidth;
+    const y = ((clientY - rect.top) / rect.height) * lens.clientHeight;
+    const vx = (x - fit.ox) / fit.k;
+    const vy = (y - fit.oy) / fit.k;
+    context2d.setTransform(1, 0, 0, 1, 0, 0);
+    for (let index = atoms.length - 1; index >= 0; index -= 1) {
+      if (context2d.isPointInPath(atoms[index].path, vx, vy)) return atoms[index];
     }
-  };
-
-  buttons.forEach((button, index) => {
-    button.addEventListener("click", () => selectFilter(button.getAttribute("data-sample-run-filter")));
-    button.addEventListener("keydown", (event) => {
-      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-      event.preventDefault();
-      let nextIndex = index;
-      if (event.key === "ArrowRight") nextIndex = (index + 1) % buttons.length;
-      if (event.key === "ArrowLeft") nextIndex = (index - 1 + buttons.length) % buttons.length;
-      if (event.key === "Home") nextIndex = 0;
-      if (event.key === "End") nextIndex = buttons.length - 1;
-      selectFilter(buttons[nextIndex].getAttribute("data-sample-run-filter"), { focus: true });
-    });
-  });
-
-  root.querySelectorAll("[data-transport-page]").forEach((button, index, buttons) => {
-    button.addEventListener("click", () => { root.dataset.transportView = button.getAttribute("data-transport-page"); updateTransportPage(root); });
-    button.addEventListener("keydown", (event) => {
-      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-      event.preventDefault();
-      const next = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1 : (index + 1) % buttons.length;
-      buttons[next].focus(); buttons[next].click();
-    });
-  });
-  updateSampleRunsGallery(root);
-}
-
-function updateTransportPage(root) {
-  const national = root.dataset.transportView === "national";
-  const asset = national ? "japan-preview-transport" : "work-atlas-japan-corridor";
-  const metadata = national ? "japan-preview" : asset;
-  const copy = translations[getActiveLanguage()] || translations.en;
-  const image = root.querySelector("[data-transport-image]");
-  if (!image) return;
-  image.src = `./assets/${asset}.svg`;
-  image.alt = copy[national ? "transportOverviewAlt" : "workThreeAlt"];
-  root.querySelector("[data-transport-title]").textContent = copy[national ? "transportOverviewTitle" : "workThreeTitle"];
-  root.querySelector("[data-transport-body]").textContent = copy[national ? "transportOverviewBody" : "workThreeBody"];
-  const scope = root.querySelector("[data-transport-scope]");
-  if (scope) scope.textContent = copy[national ? "transportNationalScope" : "mapScopeJapan"];
-  root.querySelector("[data-transport-download]").href = image.getAttribute("src");
-  root.querySelector("[data-transport-source]").href = `./assets/${metadata}.json`;
-  root.querySelector("[data-transport-regional-evidence]").hidden = national;
-  root.querySelectorAll("[data-transport-page]").forEach((button) => {
-    button.setAttribute("aria-pressed", String((button.getAttribute("data-transport-page") === "national") === national));
-  });
-}
-
-function updateProductStoryStage(root, language = getActiveLanguage()) {
-  const copy = translations[language] || translations.en;
-  const stepId = resolveProductStoryStep(root, root.dataset.storyStep || DEFAULT_PRODUCT_STORY_STEP);
-  const asset = getProductStoryAsset(root, stepId);
-  const image = root.querySelector("[data-story-stage-image]");
-  const badge = root.querySelector("[data-story-stage-badge]");
-  const title = root.querySelector("[data-story-stage-title]");
-  const body = root.querySelector("[data-story-stage-body]");
-
-  root.dataset.storyStep = stepId;
-  root.dataset.storyComparison = resolveProductStoryComparison(root.dataset.storyComparison || DEFAULT_PRODUCT_STORY_COMPARISON);
-  root.dataset.storyStageAsset = asset.src;
-
-  const tree = root.querySelector("[data-story-source-tree]");
-  const exportAction = root.querySelector("[data-story-export-action]");
-  if (tree) tree.hidden = stepId !== "evidence";
-  if (exportAction) exportAction.hidden = stepId !== "export";
-  if (image) {
-    image.hidden = stepId === "evidence";
-    image.src = asset.src;
-    image.alt = copy[asset.altKey] || "";
-    image.setAttribute("src", asset.src);
-    image.setAttribute("data-i18n-alt", asset.altKey);
+    return null;
   }
-  if (badge) badge.textContent = copy[asset.badgeKey] || "";
-  if (title) title.textContent = copy[asset.titleKey] || "";
-  if (body) body.textContent = copy[asset.bodyKey] || "";
-
-  root.querySelectorAll("[data-story-step-button]").forEach((button) => {
-    const active = button.getAttribute("data-story-step-button") === stepId;
-    button.setAttribute("aria-pressed", active ? "true" : "false");
-    if (active) {
-      button.setAttribute("aria-current", "step");
-    } else {
-      button.removeAttribute?.("aria-current");
-    }
-  });
-
-  const comparisonControls = root.querySelector("[data-story-comparison-controls]");
-  if (comparisonControls) comparisonControls.hidden = !PRODUCT_STORY_STEPS[stepId].comparisonDriven;
-  root.querySelectorAll("[data-story-compare]").forEach((button) => {
-    const active = button.getAttribute("data-story-compare") === root.dataset.storyComparison;
-    button.setAttribute("aria-pressed", active ? "true" : "false");
-  });
-
-  root.querySelectorAll("[data-story-evidence]").forEach((item) => {
-    item.dataset.storyEvidenceActive = item.getAttribute("data-story-evidence") === stepId ? "true" : "false";
-  });
-}
-
-function syncProductStoryFromDom() {
-  const root = document.querySelector("[data-story-root]");
-  if (!root) return;
-  updateProductStoryStage(root);
-}
-
-function initProductStory() {
-  const root = document.querySelector("[data-story-root]");
-  if (!root) return;
-
-  const stepButtons = Array.from(root.querySelectorAll("[data-story-step-button]"));
-  const compareButtons = Array.from(root.querySelectorAll("[data-story-compare]"));
-  if (!stepButtons.length) return;
-
-  const selectStep = (stepId, options = {}) => {
-    root.dataset.storyStep = resolveProductStoryStep(root, stepId);
-    updateProductStoryStage(root);
-    if (options.focus) {
-      stepButtons.find((button) => button.getAttribute("data-story-step-button") === root.dataset.storyStep)?.focus();
-    }
-  };
-
-  stepButtons.forEach((button, index) => {
-    button.addEventListener("click", () => selectStep(button.getAttribute("data-story-step-button")));
-    button.addEventListener("keydown", (event) => {
-      if (!["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft", "Home", "End"].includes(event.key)) return;
-      event.preventDefault();
-      let nextIndex = index;
-      if (event.key === "ArrowDown" || event.key === "ArrowRight") nextIndex = (index + 1) % stepButtons.length;
-      if (event.key === "ArrowUp" || event.key === "ArrowLeft") nextIndex = (index - 1 + stepButtons.length) % stepButtons.length;
-      if (event.key === "Home") nextIndex = 0;
-      if (event.key === "End") nextIndex = stepButtons.length - 1;
-      selectStep(stepButtons[nextIndex].getAttribute("data-story-step-button"), { focus: true });
+  // Every group whose opacity moves on its own gets its own SVG, and so its own
+  // compositor layer: fading one never repaints the thousands of paths around it.
+  function layerSvg(className, before = null) {
+    const layer = svgEl("svg", {
+      class: `stage__map stage__layer ${className}`,
+      viewBox: svg.getAttribute("viewBox"),
+      preserveAspectRatio: svg.getAttribute("preserveAspectRatio"),
+      "aria-hidden": "true",
     });
-  });
-
-  compareButtons.forEach((button, index) => {
-    button.addEventListener("click", () => {
-      root.dataset.storyComparison = resolveProductStoryComparison(button.getAttribute("data-story-compare"));
-      selectStep("scenario");
-    });
-    button.addEventListener("keydown", (event) => {
-      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-      event.preventDefault();
-      let nextIndex = index;
-      if (event.key === "ArrowRight") nextIndex = (index + 1) % compareButtons.length;
-      if (event.key === "ArrowLeft") nextIndex = (index - 1 + compareButtons.length) % compareButtons.length;
-      if (event.key === "Home") nextIndex = 0;
-      if (event.key === "End") nextIndex = compareButtons.length - 1;
-      compareButtons[nextIndex].focus();
-      root.dataset.storyComparison = resolveProductStoryComparison(compareButtons[nextIndex].getAttribute("data-story-compare"));
-      selectStep("scenario");
-    });
-  });
-
-  // Step selection is deliberate: scrolling must not override a user's choice.
-
-  updateProductStoryStage(root);
-}
-
-function initTopbarState() {
-  const topbar = document.querySelector(".topbar");
-  if (!topbar) return;
-  const update = () => {
-    topbar.classList.toggle("is-scrolled", globalThis.scrollY > 12);
-  };
-  update();
-  globalThis.addEventListener("scroll", update, { passive: true });
-}
-
-function initScrollSpy() {
-  const navLinks = Array.from(document.querySelectorAll(".topnav a[href^='#']"));
-  const sections = navLinks
-    .map((link) => {
-      const id = link.getAttribute("href")?.slice(1);
-      return id ? document.getElementById(id) : null;
-    })
-    .filter(Boolean);
-  if (!navLinks.length || !sections.length || !("IntersectionObserver" in globalThis)) return;
-
-  const setActiveSection = (id) => {
-    navLinks.forEach((link) => {
-      const active = link.getAttribute("href") === `#${id}`;
-      link.classList.toggle("is-active", active);
-      if (active) {
-        link.setAttribute("aria-current", "true");
-      } else {
-        link.removeAttribute("aria-current");
-      }
-    });
-  };
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      const visibleEntries = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-      if (visibleEntries[0]?.target?.id) setActiveSection(visibleEntries[0].target.id);
-    },
-    { rootMargin: "-34% 0px -52% 0px", threshold: [0.08, 0.22, 0.4, 0.58] },
-  );
-
-  sections.forEach((section) => observer.observe(section));
-}
-
-function getActiveLanguage() {
-  return document.documentElement.lang === "zh-CN" ? "zh" : "en";
-}
-
-function getShowcaseLayerIds(root) {
-  return String(root.dataset.showcaseLayerIds || Object.keys(SHOWCASE_LAYER_COPY_KEYS).join(","))
-    .split(",")
-    .map((layer) => layer.trim())
-    .filter(Boolean);
-}
-
-function isShowcaseLayerAllowed(root, layer) {
-  return getShowcaseLayerIds(root).includes(layer) && Object.prototype.hasOwnProperty.call(SHOWCASE_LAYER_COPY_KEYS, layer);
-}
-
-function resolveShowcaseLayer(root, layer) {
-  if (isShowcaseLayerAllowed(root, layer)) {
-    delete root.dataset.showcaseLayerError;
+    return lens.insertBefore(layer, before);
+  }
+  const atlantropa = layerSvg("map-atlantropa", svg);
+  // Atlantropa: sea and shoals keep their own look; reclaimed land takes its 1962 owner's colour.
+  for (const layer of ["water", "shoal"]) {
+    if (data.atlantropa[layer]) atlantropa.append(svgEl("path", { class: layer, "fill-rule": "evenodd", d: data.atlantropa[layer] }));
+  }
+  for (const land of data.atlantropa.land) {
+    atlantropa.append(svgEl("path", { class: "land", "fill-rule": "evenodd", d: land.d, fill: land.c, stroke: land.c }));
+  }
+  const borderLayers = data.borders.map((d) => {
+    const layer = layerSvg("map-borders");
+    layer.append(svgEl("path", { d }));
     return layer;
-  }
-  root.dataset.showcaseLayerError = layer || "missing";
-  return null;
-}
-
-function setShowcaseStatus(root, visible) {
-  const status = root.querySelector("[data-showcase-status]");
-  if (status) status.hidden = !visible;
-}
-
-function isReducedMotionPreferred() {
-  return globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
-}
-
-async function loadShowcaseMetadata(root) {
-  if (!globalThis.fetch) return;
-  const response = await fetch(SHOWCASE_METADATA_URL);
-  if (!response.ok) throw new Error(`Unable to load ${SHOWCASE_METADATA_URL}`);
-  const metadata = await response.json();
-  const layerIds = Array.isArray(metadata?.layers)
-    ? metadata.layers.map((layer) => String(layer?.id || "").trim()).filter(Boolean)
-    : [];
-  if (!layerIds.length) throw new Error("Europe showcase metadata is missing layers");
-  root.dataset.showcaseLayerIds = layerIds.join(",");
-}
-
-function setShowcaseSvgLayer(root) {
-  const layer = resolveShowcaseLayer(root, root.dataset.showcaseLayer || DEFAULT_SHOWCASE_LAYER);
-  if (!layer) return;
-  const objectNode = root.querySelector("[data-showcase-object]");
-  if (!objectNode?.contentDocument) return;
-  const svg = objectNode.contentDocument.querySelector("svg");
-  if (!svg) return;
-  // 这里写入 SVG 根节点属性，真实显隐由生成 SVG 内的 CSS/SMIL 合同执行。
-  svg.setAttribute("data-active-layer", layer);
-  const animationState = layer === "day-night" && !isReducedMotionPreferred() ? "running" : "paused";
-  svg.setAttribute("data-showcase-animation", animationState);
-  if (animationState === "running") {
-    svg.unpauseAnimations?.();
-  } else {
-    svg.pauseAnimations?.();
-  }
-}
-
-function getShowcaseCityDetail(scaleIndex) {
-  if (scaleIndex >= 4) return "dense";
-  if (scaleIndex >= 3) return "regional";
-  if (scaleIndex >= 2) return "expanded";
-  return "base";
-}
-
-function getShowcaseSvgViewport(root) {
-  const objectNode = root.querySelector("[data-showcase-object]");
-  if (!objectNode?.contentDocument) return null;
-  return objectNode.contentDocument.querySelector("[data-showcase-viewport]");
-}
-
-function getShowcaseViewState(root) {
-  const scaleIndex = Number.parseInt(root.dataset.showcaseViewScaleIndex || "0", 10);
-  return {
-    scaleIndex: Number.isNaN(scaleIndex) ? 0 : Math.max(0, Math.min(scaleIndex, SHOWCASE_VIEW_SCALES.length - 1)),
-    x: Number.parseFloat(root.dataset.showcaseViewX || "0") || 0,
-    y: Number.parseFloat(root.dataset.showcaseViewY || "0") || 0,
-  };
-}
-
-function clampShowcaseViewPosition(scale, x, y) {
-  if (scale <= 1) return { x: 0, y: 0 };
-  return {
-    x: Math.max(SHOWCASE_VIEW_WIDTH * (1 - scale), Math.min(0, x)),
-    y: Math.max(SHOWCASE_VIEW_HEIGHT * (1 - scale), Math.min(0, y)),
-  };
-}
-
-function getCenteredShowcaseViewPosition(scale) {
-  if (scale <= 1) return { x: 0, y: 0 };
-  return {
-    x: (SHOWCASE_VIEW_WIDTH * (1 - scale)) / 2,
-    y: (SHOWCASE_VIEW_HEIGHT * (1 - scale)) / 2,
-  };
-}
-
-function applyShowcaseViewState(root, nextState) {
-  const scaleIndex = Math.max(0, Math.min(nextState.scaleIndex, SHOWCASE_VIEW_SCALES.length - 1));
-  const scale = SHOWCASE_VIEW_SCALES[scaleIndex];
-  const position = clampShowcaseViewPosition(scale, nextState.x, nextState.y);
-  // data-* 同时驱动外层 CSS、嵌入 SVG 的城市细节层和测试合同，更新时要保持同一波次。
-  root.dataset.showcaseViewScaleIndex = String(scaleIndex);
-  root.dataset.showcaseViewScale = scale.toFixed(2);
-  root.dataset.showcaseViewZoomed = scaleIndex > DEFAULT_SHOWCASE_VIEW_SCALE_INDEX ? "true" : "false";
-  root.dataset.showcaseCityDetail = getShowcaseCityDetail(scaleIndex);
-  root.dataset.showcaseViewX = position.x.toFixed(1);
-  root.dataset.showcaseViewY = position.y.toFixed(1);
-  const viewport = getShowcaseSvgViewport(root);
-  if (viewport) {
-    viewport.setAttribute("transform", `matrix(${scale} 0 0 ${scale} ${position.x.toFixed(1)} ${position.y.toFixed(1)})`);
-  }
-  const objectNode = root.querySelector("[data-showcase-object]");
-  const svg = objectNode?.contentDocument?.querySelector("svg");
-  const touchAction = scaleIndex > DEFAULT_SHOWCASE_VIEW_SCALE_INDEX ? "none" : "pan-y";
-  if (objectNode?.style) {
-    objectNode.style.touchAction = touchAction;
-  }
-  if (svg) {
-    svg.setAttribute("data-showcase-city-detail", root.dataset.showcaseCityDetail);
-    if (svg.style) {
-      svg.style.touchAction = touchAction;
-    }
-  }
-}
-
-function zoomShowcaseView(root, direction) {
-  const state = getShowcaseViewState(root);
-  const currentScale = SHOWCASE_VIEW_SCALES[state.scaleIndex];
-  const nextScaleIndex = Math.max(0, Math.min(state.scaleIndex + direction, SHOWCASE_VIEW_SCALES.length - 1));
-  const nextScale = SHOWCASE_VIEW_SCALES[nextScaleIndex];
-  const centerX = (SHOWCASE_VIEW_WIDTH / 2 - state.x) / currentScale;
-  const centerY = (SHOWCASE_VIEW_HEIGHT / 2 - state.y) / currentScale;
-  applyShowcaseViewState(root, {
-    scaleIndex: nextScaleIndex,
-    x: SHOWCASE_VIEW_WIDTH / 2 - centerX * nextScale,
-    y: SHOWCASE_VIEW_HEIGHT / 2 - centerY * nextScale,
   });
-}
-
-function resetShowcaseView(root) {
-  const scale = SHOWCASE_VIEW_SCALES[DEFAULT_SHOWCASE_VIEW_SCALE_INDEX];
-  const position = getCenteredShowcaseViewPosition(scale);
-  applyShowcaseViewState(root, {
-    scaleIndex: DEFAULT_SHOWCASE_VIEW_SCALE_INDEX,
-    x: position.x,
-    y: position.y,
+  const railGroup = layerSvg("map-rail");
+  // SVG elements have no `hidden` property; the attribute itself has to be toggled.
+  railGroup.setAttribute("hidden", "");
+  // Rail arrives as compound paths, main lines first; each draws in along its own length.
+  const railPaths = data.rail.map((d, index) => {
+    const path = svgEl("path", { d, pathLength: "1", "stroke-dasharray": "1", "stroke-dashoffset": "1" });
+    path.style.strokeWidth = Math.max(0.5, 1.5 - index * 0.09).toFixed(2);
+    return railGroup.appendChild(path);
   });
-}
-
-function isModifiedZoomWheelEvent(event) {
-  return Boolean(event.ctrlKey || event.metaKey || event.altKey);
-}
-
-function initShowcaseView() {
-  const root = document.querySelector("[data-showcase-root]");
-  if (!root) return;
-
-  const objectNode = root.querySelector("[data-showcase-object]");
-  if (!objectNode) return;
-
-  let dragState = null;
-
-  const onWheel = (event) => {
-    if (!isModifiedZoomWheelEvent(event)) return;
-    event.preventDefault();
-    zoomShowcaseView(root, event.deltaY < 0 ? 1 : -1);
-  };
-
-  const onDoubleClick = (event) => {
-    event.preventDefault();
-    const state = getShowcaseViewState(root);
-    if (state.scaleIndex <= DEFAULT_SHOWCASE_VIEW_SCALE_INDEX) {
-      zoomShowcaseView(root, 1);
-    } else {
-      resetShowcaseView(root);
-    }
-  };
-
-  const onPointerDown = (event) => {
-    const state = getShowcaseViewState(root);
-    if (state.scaleIndex <= DEFAULT_SHOWCASE_VIEW_SCALE_INDEX) return;
-    dragState = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      viewX: state.x,
-      viewY: state.y,
-    };
-    root.dataset.showcaseViewDragging = "true";
-    event.currentTarget?.setPointerCapture?.(event.pointerId);
-  };
-
-  const onPointerMove = (event) => {
-    if (!dragState || event.pointerId !== dragState.pointerId) return;
-    applyShowcaseViewState(root, {
-      scaleIndex: getShowcaseViewState(root).scaleIndex,
-      x: dragState.viewX + event.clientX - dragState.startX,
-      y: dragState.viewY + event.clientY - dragState.startY,
-    });
-  };
-
-  const onPointerEnd = (event) => {
-    if (!dragState || event.pointerId !== dragState.pointerId) return;
-    event.currentTarget?.releasePointerCapture?.(event.pointerId);
-    dragState = null;
-    delete root.dataset.showcaseViewDragging;
-  };
-
-  const onKeyDown = (event) => {
-    if (event.key === "+" || event.key === "=") {
-      event.preventDefault();
-      zoomShowcaseView(root, 1);
+  // The sweep line is an HTML layer moved by transform, not an SVG rect: moving the
+  // rect invalidated the whole map SVG on every frame of every recolour.
+  const front = lens.appendChild(Object.assign(document.createElement("div"), { className: "stage__front" }));
+  front.dataset.front = "";
+  let frontShown = false;
+  // The sweep's left edge in viewBox units; kept so a resize can re-place it.
+  let frontX = 0;
+  function placeFront() {
+    front.style.width = `${(FRONT_WIDTH * fit.k).toFixed(1)}px`;
+    front.style.transform = `translate3d(${(fit.ox + frontX * fit.k).toFixed(1)}px, 0, 0)`;
+  }
+  // x is the sweep's left edge in viewBox units; FRONT_WIDTH units wide.
+  function setFront(x, opacity) {
+    if (opacity <= 0) {
+      if (frontShown) front.style.opacity = "0";
+      frontShown = false;
       return;
     }
-    if (event.key === "-" || event.key === "_") {
-      event.preventDefault();
-      zoomShowcaseView(root, -1);
-      return;
-    }
-    if (event.key === "0" || event.key === "Escape") {
-      event.preventDefault();
-      resetShowcaseView(root);
-    }
-  };
-
-  const bindEmbeddedSvg = () => {
-    applyShowcaseViewState(root, getShowcaseViewState(root));
-    const svg = objectNode.contentDocument?.querySelector("svg");
-    if (!svg || svg.dataset.showcaseViewBound === "true") return;
-    svg.dataset.showcaseViewBound = "true";
-    // <object> 内部 SVG 有独立 document，外层 object 和内层 svg 都要绑定，才能同时覆盖加载前后事件。
-    svg.addEventListener("wheel", onWheel, { passive: false });
-    svg.addEventListener("pointerdown", onPointerDown);
-    svg.addEventListener("pointermove", onPointerMove);
-    svg.addEventListener("pointerup", onPointerEnd);
-    svg.addEventListener("pointercancel", onPointerEnd);
-    svg.addEventListener("dblclick", onDoubleClick);
-  };
-
-  objectNode.addEventListener("wheel", onWheel, { passive: false });
-  objectNode.addEventListener("pointerdown", onPointerDown);
-  objectNode.addEventListener("pointermove", onPointerMove);
-  objectNode.addEventListener("pointerup", onPointerEnd);
-  objectNode.addEventListener("pointercancel", onPointerEnd);
-  objectNode.addEventListener("keydown", onKeyDown);
-  objectNode.addEventListener("dblclick", onDoubleClick);
-  objectNode.addEventListener("load", bindEmbeddedSvg);
-  resetShowcaseView(root);
-  bindEmbeddedSvg();
-}
-
-function updateShowcaseLayerCopy(language = getActiveLanguage()) {
-  const root = document.querySelector("[data-showcase-root]");
-  if (!root) return;
-  const layer = resolveShowcaseLayer(root, root.dataset.showcaseLayer || DEFAULT_SHOWCASE_LAYER);
-  if (!layer) return;
-  const keys = SHOWCASE_LAYER_COPY_KEYS[layer];
-  const copy = translations[language] || translations.en;
-  const badge = root.querySelector("[data-showcase-layer-badge]");
-  const title = root.querySelector("[data-showcase-layer-title]");
-  const body = root.querySelector("[data-showcase-layer-body]");
-  if (badge) badge.textContent = copy[keys.badge];
-  if (title) title.textContent = copy[keys.title];
-  if (body) body.textContent = copy[keys.body];
-}
-
-function initShowcaseLayers() {
-  const root = document.querySelector("[data-showcase-root]");
-  if (!root) return;
-
-  const tabs = Array.from(root.querySelectorAll("[data-showcase-layer-tab]"));
-  const panel = root.querySelector("[role=\"tabpanel\"]");
-  if (!tabs.length) return;
-
-  const selectLayer = (tab, shouldFocus = false) => {
-    const layer = resolveShowcaseLayer(root, tab.getAttribute("data-showcase-layer-tab") || DEFAULT_SHOWCASE_LAYER);
-    if (!layer) return;
-    setShowcaseStatus(root, false);
-    root.dataset.showcaseLayer = layer;
-
-    tabs.forEach((item) => {
-      const active = item === tab;
-      item.setAttribute("aria-selected", active ? "true" : "false");
-      item.setAttribute("tabindex", active ? "0" : "-1");
-    });
-    if (panel && tab.id) panel.setAttribute("aria-labelledby", tab.id);
-
-    updateShowcaseLayerCopy();
-    setShowcaseSvgLayer(root);
-    if (shouldFocus) tab.focus();
-  };
-
-  tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => selectLayer(tab));
-    tab.addEventListener("keydown", (event) => {
-      const key = event.key;
-      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(key)) return;
-      event.preventDefault();
-
-      let nextIndex = index;
-      if (key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
-      if (key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
-      if (key === "Home") nextIndex = 0;
-      if (key === "End") nextIndex = tabs.length - 1;
-
-      selectLayer(tabs[nextIndex], true);
-    });
-  });
-
-  const objectNode = root.querySelector("[data-showcase-object]");
-  objectNode?.addEventListener("load", () => setShowcaseSvgLayer(root));
-  const motionQuery = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
-  motionQuery?.addEventListener?.("change", () => setShowcaseSvgLayer(root));
-  motionQuery?.addListener?.(() => setShowcaseSvgLayer(root));
-  loadShowcaseMetadata(root)
-    .then(() => {
-      setShowcaseStatus(root, false);
-      const selectedTab = tabs.find((tab) => tab.getAttribute("aria-selected") === "true") || tabs[0];
-      selectLayer(selectedTab);
-    })
-    .catch((error) => {
-      root.dataset.showcaseLayerError = "metadata";
-      setShowcaseStatus(root, true);
-    });
-  updateShowcaseLayerCopy();
-  setShowcaseSvgLayer(root);
-}
-
-function getPreviewViewState(root) {
-  const scaleIndex = Number.parseInt(root.dataset.previewScaleIndex || "0", 10);
-  return {
-    scaleIndex: Number.isNaN(scaleIndex) ? 0 : Math.max(0, Math.min(scaleIndex, PREVIEW_VIEW_SCALES.length - 1)),
-    x: Number.parseFloat(root.dataset.previewX || "0") || 0,
-    y: Number.parseFloat(root.dataset.previewY || "0") || 0,
-  };
-}
-
-function clampPreviewViewPosition(scale, x, y) {
-  if (scale <= 1) return { x: 0, y: 0 };
-  return {
-    x: Math.max(PREVIEW_VIEW_WIDTH * (1 - scale), Math.min(0, x)),
-    y: Math.max(PREVIEW_VIEW_HEIGHT * (1 - scale), Math.min(0, y)),
-  };
-}
-
-function applyPreviewViewState(root, nextState) {
-  const scaleIndex = Math.max(0, Math.min(nextState.scaleIndex, PREVIEW_VIEW_SCALES.length - 1));
-  const scale = PREVIEW_VIEW_SCALES[scaleIndex];
-  const position = clampPreviewViewPosition(scale, nextState.x, nextState.y);
-  root.dataset.previewScaleIndex = String(scaleIndex);
-  root.dataset.previewScale = scale.toFixed(2);
-  root.dataset.previewZoomed = scale > 1 ? "true" : "false";
-  root.dataset.previewX = position.x.toFixed(1);
-  root.dataset.previewY = position.y.toFixed(1);
-  const viewport = root.querySelector("[data-preview-viewport]");
-  if (viewport) {
-    viewport.style.setProperty("--preview-scale", scale.toFixed(2));
-    viewport.style.setProperty("--preview-x", `${position.x.toFixed(1)}px`);
-    viewport.style.setProperty("--preview-y", `${position.y.toFixed(1)}px`);
+    frontShown = true;
+    frontX = x;
+    front.style.opacity = opacity.toFixed(3);
+    placeFront();
   }
-}
-
-function zoomPreviewView(root, direction) {
-  const state = getPreviewViewState(root);
-  const currentScale = PREVIEW_VIEW_SCALES[state.scaleIndex];
-  const nextScaleIndex = Math.max(0, Math.min(state.scaleIndex + direction, PREVIEW_VIEW_SCALES.length - 1));
-  const nextScale = PREVIEW_VIEW_SCALES[nextScaleIndex];
-  const centerX = (PREVIEW_VIEW_WIDTH / 2 - state.x) / currentScale;
-  const centerY = (PREVIEW_VIEW_HEIGHT / 2 - state.y) / currentScale;
-  applyPreviewViewState(root, {
-    scaleIndex: nextScaleIndex,
-    x: PREVIEW_VIEW_WIDTH / 2 - centerX * nextScale,
-    y: PREVIEW_VIEW_HEIGHT / 2 - centerY * nextScale,
+  const labelLayers = data.labels.map((labels) => {
+    const layer = layerSvg("map-labels");
+    for (const label of labels) {
+      const text = svgEl("text", { x: label.x, y: label.y, "font-size": (label.s * 0.7).toFixed(1) });
+      Object.assign(text.dataset, { en: label.t, zh: label.z });
+      layer.append(text);
+    }
+    return layer;
   });
-}
+  const cityGroup = layerSvg("map-cities");
+  cityGroup.setAttribute("hidden", "");
+  const cities = data.cities.map((city, index) => {
+    const group = svgEl("g", { opacity: "0" });
+    const radius = 1.6 + Math.sqrt(city.p / 1e6) * 1.4;
+    group.append(svgEl("circle", { class: "halo", cx: city.x, cy: city.y, r: (radius * 3.2).toFixed(1) }));
+    group.append(svgEl("circle", { cx: city.x, cy: city.y, r: radius.toFixed(1) }));
+    const text = svgEl("text", { x: city.x + radius + 4, y: city.y + 3 });
+    Object.assign(text.dataset, { en: city.n, zh: city.z });
+    if (index < 18) group.append(text);
+    return cityGroup.appendChild(group);
+  });
 
-function resetPreviewView(root) {
-  applyPreviewViewState(root, { scaleIndex: 0, x: 0, y: 0 });
-}
+  const numeral = stage.querySelector("[data-year-numeral]");
+  const family = stage.querySelector("[data-state-family]");
+  const date = stage.querySelector("[data-state-date]");
+  const tip = stage.querySelector("[data-paint-tip]");
 
-function getPreviewImageForMode(root, mode) {
-  return Array.from(root.querySelectorAll("[data-preview-image]")).find(
-    (image) => image.getAttribute("data-preview-image") === mode,
-  );
-}
+  const view = { mode: "history", position: 0, style: "game", world: "1936" };
+  const painted = new Map();
+  const paintHistory = [];
 
-function syncPreviewImageStatus(root) {
-  const status = root.querySelector("[data-preview-status]");
-  if (!status) return;
-  const mode = root.dataset.previewMode || "transport";
-  const image = getPreviewImageForMode(root, mode);
-  const failed = image?.dataset.previewLoadError === "true";
-  status.hidden = !failed;
-  if (failed) {
-    root.dataset.previewImageError = mode;
-  } else {
-    delete root.dataset.previewImageError;
+  /* Colours: history interpolates directly; every other change sweeps west to east. */
+  function styled(rgb) {
+    if (view.style === "atlas") return lerpRgb(rgb, PAPER_RGB, 0.42);
+    if (view.style === "ink") return lerpRgb(INK_RGB, rgb, 0.24);
+    return rgb;
   }
-}
-
-function initPreviewImageStatus(root) {
-  const images = Array.from(root.querySelectorAll("[data-preview-image]"));
-  images.forEach((image) => {
-    if (image.complete === true && image.naturalWidth === 0 && image.getAttribute("src")) {
-      image.dataset.previewLoadError = "true";
-    }
-    image.addEventListener("error", () => {
-      image.dataset.previewLoadError = "true";
-      syncPreviewImageStatus(root);
-    });
-    image.addEventListener("load", () => {
-      delete image.dataset.previewLoadError;
-      syncPreviewImageStatus(root);
-    });
-  });
-  syncPreviewImageStatus(root);
-}
-
-function initPreviewView() {
-  const root = document.querySelector("[data-preview-root]");
-  const surface = root?.querySelector("[data-preview-surface]");
-  if (!root || !surface) return;
-
-  let dragState = null;
-
-  const onPointerDown = (event) => {
-    if (event.target?.closest?.("[data-preview-zoom]")) return;
-    const state = getPreviewViewState(root);
-    if (PREVIEW_VIEW_SCALES[state.scaleIndex] <= 1) return;
-    dragState = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      viewX: state.x,
-      viewY: state.y,
-    };
-    root.dataset.previewDragging = "true";
-    event.currentTarget?.setPointerCapture?.(event.pointerId);
-  };
-
-  const onPointerMove = (event) => {
-    if (!dragState || event.pointerId !== dragState.pointerId) return;
-    applyPreviewViewState(root, {
-      scaleIndex: getPreviewViewState(root).scaleIndex,
-      x: dragState.viewX + event.clientX - dragState.startX,
-      y: dragState.viewY + event.clientY - dragState.startY,
-    });
-  };
-
-  const onPointerEnd = (event) => {
-    if (!dragState || event.pointerId !== dragState.pointerId) return;
-    event.currentTarget?.releasePointerCapture?.(event.pointerId);
-    dragState = null;
-    delete root.dataset.previewDragging;
-  };
-
-  surface.addEventListener("wheel", (event) => {
-    if (!isModifiedZoomWheelEvent(event)) return;
-    event.preventDefault();
-    zoomPreviewView(root, event.deltaY < 0 ? 1 : -1);
-  }, { passive: false });
-  surface.addEventListener("pointerdown", onPointerDown);
-  surface.addEventListener("pointermove", onPointerMove);
-  surface.addEventListener("pointerup", onPointerEnd);
-  surface.addEventListener("pointercancel", onPointerEnd);
-  surface.addEventListener("dblclick", () => {
-    if (getPreviewViewState(root).scaleIndex > 0) {
-      resetPreviewView(root);
-    } else {
-      zoomPreviewView(root, 1);
-    }
-  });
-  surface.addEventListener("keydown", (event) => {
-    if (event.key === "+" || event.key === "=") {
-      event.preventDefault();
-      zoomPreviewView(root, 1);
-    }
-    if (event.key === "-") {
-      event.preventDefault();
-      zoomPreviewView(root, -1);
-    }
-    if (event.key === "0" || event.key === "Escape") {
-      event.preventDefault();
-      resetPreviewView(root);
-    }
-  });
-  root.querySelectorAll("[data-preview-zoom]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const action = button.getAttribute("data-preview-zoom");
-      if (action === "reset") {
-        resetPreviewView(root);
-      } else {
-        zoomPreviewView(root, action === "1" ? 1 : -1);
+  function targetRgb(atom) {
+    switch (view.mode) {
+      case "edit":
+        return painted.has(atom.tag) ? hexToRgb(painted.get(atom.tag)) : atom.colors[0];
+      case "style":
+        return styled(painted.has(atom.tag) ? hexToRgb(painted.get(atom.tag)) : atom.colors[0]);
+      case "context":
+        return lerpRgb(INK_RGB, atom.colors[0], 0.3);
+      default: {
+        const state = WORLD_STATE[view.world];
+        return state === null ? BLANK_RGB : atom.colors[state];
       }
+    }
+  }
+  function paintAtom(atom, rgb) {
+    atom.shown = rgb;
+    queueDraw();
+  }
+
+  let sweep = null;
+  function retarget(duration = TIMING.recolour) {
+    for (const atom of atoms) {
+      atom.from = atom.shown;
+      atom.to = targetRgb(atom);
+    }
+    if (reducedMotion || duration === 0) {
+      inMotion = false;
+      atoms.forEach((atom) => paintAtom(atom, atom.to));
+      setFront(0, 0);
+      sweep = null;
+      return;
+    }
+    const start = performance.now();
+    const token = (sweep = {});
+    const step = (now) => {
+      if (sweep !== token) return;
+      const t = clamp01((now - start) / duration);
+      inMotion = t < 1;
+      for (const atom of atoms) paintAtom(atom, lerpRgb(atom.from, atom.to, smooth(clamp01((t - atom.x * 0.3) / 0.7))));
+      setFront(((t - 0.35) / 0.3) * data.width - FRONT_WIDTH / 2, t < 1 && view.mode === "worlds" ? Math.sin(Math.PI * t) : 0);
+      if (t < 1) requestAnimationFrame(step);
+      else sweep = null;
+    };
+    requestAnimationFrame(step);
+  }
+
+  function renderHistory() {
+    const segment = Math.min(Math.floor(view.position), 1);
+    const f = view.position - segment;
+    // Seams are re-stroked once the scrubber stops, even between two dated stops.
+    if (f > 0.001 && f < 0.999) markMotion();
+    else inMotion = false;
+    for (const atom of atoms) {
+      const local = smooth(clamp01((f - atom.x * 0.35) / 0.65));
+      paintAtom(atom, lerpRgb(atom.colors[segment], atom.colors[segment + 1], local));
+    }
+    setFront(((f - 0.325) / 0.35) * data.width - FRONT_WIDTH / 2, f > 0.001 && f < 0.999 ? Math.sin(Math.PI * f) : 0);
+  }
+
+  /* Borders, labels, Atlantropa, rail and cities follow the visible state. */
+  function stateWeights() {
+    if (view.mode === "history") return [0, 1, 2, 3].map((index) => clamp01(1 - Math.abs(view.position - index) * 1.4));
+    if (view.mode === "worlds" || view.mode === "outro") {
+      const state = WORLD_STATE[view.world];
+      return [0, 1, 2, 3].map((index) => (index === state ? 1 : 0));
+    }
+    return [1, 0, 0, 0];
+  }
+  // A layer at zero is also hidden, so the compositor stops drawing it (the CSS keeps
+  // it visible until its fade-out has finished).
+  function fadeLayer(layer, opacity) {
+    layer.style.opacity = opacity.toFixed(3);
+    layer.style.visibility = opacity > 0 ? "visible" : "hidden";
+  }
+  function renderOverlays() {
+    const weights = stateWeights();
+    const context = view.mode === "context";
+    borderLayers.forEach((layer, index) => fadeLayer(layer, weights[index] * (context ? 0.45 : 1)));
+    labelLayers.forEach((layer, index) => {
+      const weight = view.mode === "history" ? clamp01(1 - Math.abs(view.position - index) * 2.4) : weights[index];
+      fadeLayer(layer, context ? 0 : weight);
     });
-  });
-  initPreviewImageStatus(root);
-  resetPreviewView(root);
-}
+    fadeLayer(atlantropa, view.mode === "history" ? smooth(clamp01(view.position - 1)) : (view.mode === "worlds" || view.mode === "outro") && view.world === "1962" ? 1 : 0);
+    railGroup.toggleAttribute("hidden", !context);
+    cityGroup.toggleAttribute("hidden", !context);
+  }
 
-function initPreviewTabs() {
-  const root = document.querySelector("[data-preview-root]");
-  if (!root) return;
-
-  const tabs = Array.from(root.querySelectorAll("[data-preview-tab]"));
-  const panels = Array.from(document.querySelectorAll("[data-preview-panel]"));
-  if (!tabs.length || !panels.length) return;
-
-  const selectTab = (tab, shouldFocus = false) => {
-    const mode = tab.getAttribute("data-preview-tab");
-    if (!mode) return;
-    root.dataset.previewMode = mode;
-
-    tabs.forEach((item) => {
-      const active = item === tab;
-      item.setAttribute("aria-selected", active ? "true" : "false");
-      item.setAttribute("tabindex", active ? "0" : "-1");
+  // Rail and cities reveal once when the context chapter opens. Scroll-scrubbing them
+  // re-rasterized thousands of rail segments on every scroll frame.
+  let reveal = null;
+  function renderReveal(t) {
+    railPaths.forEach((path, index) => {
+      const rank = index / railPaths.length;
+      path.setAttribute("stroke-dashoffset", (1 - clamp01(t * 1.7 - rank * 0.7)).toFixed(3));
     });
-
-    panels.forEach((panel) => {
-      panel.hidden = panel.getAttribute("data-preview-panel") !== mode;
+    cities.forEach((city, index) => {
+      city.setAttribute("opacity", clamp01((t * 2 - 0.45 - (index / cities.length) * 0.6) * 4).toFixed(3));
     });
+  }
+  function startReveal() {
+    if (reducedMotion) {
+      renderReveal(1);
+      return;
+    }
+    const start = performance.now();
+    const token = (reveal = {});
+    const step = (now) => {
+      if (reveal !== token) return;
+      const t = clamp01((now - start) / TIMING.reveal);
+      renderReveal(smooth(t));
+      if (t < 1 && view.mode === "context") requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
 
-    syncPreviewImageStatus(root);
+  function renderHud() {
+    const strings = copy();
+    let stateId;
+    if (view.mode === "history") {
+      const segment = Math.min(Math.floor(view.position), 1);
+      const f = view.position - segment;
+      setText(numeral, String(Math.round(scrubYears[segment] + (scrubYears[segment + 1] - scrubYears[segment]) * smooth(f))));
+      numeral.style.opacity = "";
+      stateId = data.states[Math.round(view.position)].id;
+    } else if (view.mode === "worlds" || view.mode === "outro") {
+      stateId = view.world;
+      setText(numeral, /^\d+$/.test(view.world) ? view.world : "");
+    } else {
+      stateId = "1936";
+    }
+    setText(family, strings.stateNames[stateId]);
+    setText(date, strings.stateDates[stateId]);
+  }
 
-    if (shouldFocus) tab.focus();
+  function render() {
+    if (view.mode === "history") renderHistory();
+    renderOverlays();
+    renderHud();
+  }
+
+  /* Labels: largest first; hide any that collide with a shown label or the page's own text. */
+  let declutterTimer = 0;
+  const scheduleDeclutter = (delay) => {
+    clearTimeout(declutterTimer);
+    declutterTimer = setTimeout(declutter, delay);
   };
 
-  tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => selectTab(tab));
-    tab.addEventListener("keydown", (event) => {
-      const key = event.key;
-      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(key)) return;
+  // Writes first, then every measurement in one pass, then the hide decisions:
+  // interleaving them would force one layout per label.
+  function declutter() {
+    const blockers = [".stage-mark--tl", ".stage-mark--tr", ".nav__products"];
+    if (view.mode === "history") blockers.push(".scrubber", ".caption--hero");
+    else blockers.push(`[data-chapter="${view.mode}"] .caption`);
+    const groups = [...labelLayers, cityGroup].map((group) => [...group.querySelectorAll("text")]);
+    for (const texts of groups) {
+      for (const text of texts) {
+        text.removeAttribute("display");
+        if (text.textContent !== text.dataset[language]) text.textContent = text.dataset[language];
+      }
+    }
+    const blocked = blockers
+      .map((selector) => document.querySelector(selector))
+      .filter((node) => node && node.offsetParent !== null)
+      .map((node) => toBox(node.getBoundingClientRect(), 8, 8));
+    const boxes = groups.map((texts) => texts.map((text) => toBox(text.getBoundingClientRect(), 5, 3)));
+    groups.forEach((texts, groupIndex) => {
+      const kept = [...blocked];
+      texts.forEach((text, index) => {
+        const box = boxes[groupIndex][index];
+        if (box.r - box.x < 12 || kept.some((other) => boxesOverlap(box, other))) text.setAttribute("display", "none");
+        else kept.push(box);
+      });
+    });
+  }
+
+  // The SVG is slice-fitted: one viewBox unit is fit.k screen pixels.
+  function setCamera() {
+    const pan = innerWidth >= 760 ? CAMERAS[view.mode] ?? CAMERAS.history : CAMERAS.history;
+    lens.style.transform = `translate(${(pan.x * fit.k).toFixed(1)}px, ${(pan.y * fit.k).toFixed(1)}px)`;
+  }
+  lens.addEventListener("transitionend", (event) => {
+    // transitionend bubbles from every label and border inside the lens; only the camera move counts.
+    if (event.target === lens && event.propertyName === "transform") scheduleDeclutter(0);
+  });
+
+  /* Public controls for the chapters. */
+  const stageApi = {
+    view,
+    setMode(mode) {
+      if (mode === view.mode) return;
+      const fromHistory = view.mode === "history";
+      view.mode = mode;
+      story.dataset.mode = mode;
+      // A cartography style belongs to its chapter; the rest of the story uses game colours.
+      story.dataset.style = mode === "style" ? view.style : "game";
+      setCamera();
+      // History draws its own colours from the scrubber; drop any recolour still in flight.
+      if (mode === "history") sweep = null;
+      else retarget(fromHistory ? TIMING.recolourFromHistory : TIMING.recolour);
+      if (mode === "context") startReveal();
+      render();
+      // Labels are measured after the camera settles.
+      scheduleDeclutter(reducedMotion ? 0 : TIMING.settle);
+      document.dispatchEvent(new CustomEvent("landing:mode", { detail: mode }));
+    },
+    setStyle(style) {
+      if (style === view.style) return;
+      view.style = style;
+      if (view.mode !== "style") return;
+      story.dataset.style = style;
+      retarget(TIMING.style);
+    },
+    setWorld(world) {
+      if (world === view.world) return;
+      view.world = world;
+      if (view.mode === "worlds" || view.mode === "outro") {
+        retarget(TIMING.recolour);
+        render();
+      }
+    },
+    setPosition(position) {
+      view.position = position;
+      if (view.mode === "history") render();
+    },
+    paint(tag, colour) {
+      const before = painted.get(tag) ?? null;
+      if (before === colour) return false;
+      paintHistory.push({ tag, before });
+      painted.set(tag, colour);
+      retarget(TIMING.paint);
+      return true;
+    },
+    undo() {
+      const last = paintHistory.pop();
+      if (!last) return;
+      if (last.before) painted.set(last.tag, last.before);
+      else painted.delete(last.tag);
+      retarget(TIMING.paint);
+    },
+    reset() {
+      painted.clear();
+      paintHistory.length = 0;
+      retarget(TIMING.reset);
+    },
+    paintedCount: () => painted.size,
+    canUndo: () => paintHistory.length > 0,
+    nameOf: (tag) => data.names[0][tag]?.[language === "zh" ? 1 : 0] ?? tag,
+    tip,
+    svg,
+    tagAt: (clientX, clientY) => atomAt(clientX, clientY)?.tag ?? null,
+    hitTarget: canvas,
+    stageMarks: stage,
+  };
+
+  let resizeTimer = 0;
+  addEventListener("resize", () => {
+    sizeCanvas();
+    setCamera();
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => scheduleDeclutter(0), 200);
+  });
+  document.addEventListener("landing:language", () => { declutter(); render(); });
+
+  sizeCanvas();
+  setCamera();
+  render();
+  declutter();
+  return stageApi;
+}
+
+/* ---------- Chapter 0: history scrubber ---------- */
+
+function initScrubber(stage) {
+  const root = document.querySelector("[data-scrubber]");
+  const track = root.querySelector("[data-track]");
+  const thumb = root.querySelector("[data-thumb]");
+  const fill = root.querySelector("[data-fill]");
+  const ticks = [...root.querySelectorAll("[data-tick]")];
+  const playButton = root.querySelector("[data-play]");
+  const last = ticks.length - 1;
+  let animation = null;
+  let playing = !reducedMotion;
+  let holdUntil = performance.now() + 1800;
+  let direction = 1;
+
+  function sync() {
+    const position = stage.view.position;
+    const ratio = position / last;
+    thumb.style.left = `${ratio * 100}%`;
+    fill.style.width = `${ratio * 100}%`;
+    const nearest = Math.round(position);
+    ticks.forEach((tick, index) => tick.classList.toggle("is-current", index === nearest));
+    const year = Number(ticks[nearest].querySelector("b").textContent);
+    track.setAttribute("aria-valuenow", year);
+    track.setAttribute("aria-valuetext", ticks[nearest].textContent.trim());
+  }
+  function setPosition(position) {
+    stage.setPosition(position);
+    sync();
+  }
+  function animateTo(target, duration = 2600) {
+    const from = stage.view.position;
+    if (reducedMotion || from === target) {
+      animation = null;
+      setPosition(target);
+      return;
+    }
+    const start = performance.now();
+    const token = (animation = {});
+    const step = (now) => {
+      if (animation !== token) return;
+      const t = clamp01((now - start) / (duration * Math.abs(target - from)));
+      setPosition(from + (target - from) * easeInOut(t));
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        animation = null;
+        holdUntil = performance.now() + 2200;
+      }
+    };
+    requestAnimationFrame(step);
+  }
+  function setPlaying(next) {
+    playing = next && !reducedMotion;
+    playButton.dataset.state = playing ? "playing" : "paused";
+    playButton.setAttribute("aria-label", copy()[playing ? "pauseLabel" : "playLabel"]);
+    holdUntil = performance.now() + 600;
+  }
+  function autoplay(now) {
+    if (playing && stage.view.mode === "history" && !animation && now > holdUntil && !document.hidden) {
+      let next = Math.round(stage.view.position) + direction;
+      if (next > last || next < 0) {
+        direction *= -1;
+        next = Math.round(stage.view.position) + direction;
+      }
+      animateTo(next);
+    }
+    requestAnimationFrame(autoplay);
+  }
+  const positionFromEvent = (event) => {
+    const rect = track.getBoundingClientRect();
+    return clamp01((event.clientX - rect.left) / rect.width) * last;
+  };
+  track.addEventListener("pointerdown", (event) => {
+    if (event.target.closest("[data-tick]")) return;
+    setPlaying(false);
+    animation = null;
+    track.setPointerCapture(event.pointerId);
+    setPosition(positionFromEvent(event));
+  });
+  track.addEventListener("pointermove", (event) => {
+    if (track.hasPointerCapture(event.pointerId)) setPosition(positionFromEvent(event));
+  });
+  track.addEventListener("keydown", (event) => {
+    const position = stage.view.position;
+    const targets = { ArrowRight: Math.floor(position + 1e-6) + 1, ArrowLeft: Math.ceil(position - 1e-6) - 1, Home: 0, End: last };
+    if (!(event.key in targets)) return;
+    event.preventDefault();
+    setPlaying(false);
+    animateTo(Math.max(0, Math.min(last, targets[event.key])), 1800);
+  });
+  ticks.forEach((tick, index) => tick.addEventListener("click", () => { setPlaying(false); animateTo(index, 1800); }));
+  playButton.addEventListener("click", () => setPlaying(!playing));
+  document.addEventListener("landing:language", () => setPlaying(playing));
+  setPlaying(playing);
+  sync();
+  requestAnimationFrame(autoplay);
+}
+
+/* ---------- Chapter 1: paint ---------- */
+
+function initPaint(stage) {
+  const chapter = document.querySelector('[data-chapter="edit"]');
+  const counter = chapter.querySelector("[data-paint-count]");
+  const undoButton = chapter.querySelector("[data-paint-undo]");
+  const resetButton = chapter.querySelector("[data-paint-reset]");
+  let colour = PAINT_COLOURS[0];
+  const swatches = PAINT_COLOURS.map((value, index) => {
+    const button = Object.assign(document.createElement("button"), { type: "button", className: "swatch" });
+    button.style.setProperty("--c", value);
+    button.setAttribute("role", "radio");
+    button.setAttribute("aria-label", value);
+    button.setAttribute("aria-checked", String(index === 0));
+    button.addEventListener("click", () => {
+      colour = value;
+      swatches.forEach((swatch) => swatch.setAttribute("aria-checked", String(swatch === button)));
+    });
+    return chapter.querySelector("[data-swatches]").appendChild(button);
+  });
+  const sync = () => {
+    counter.textContent = copy().paintCount(stage.paintedCount());
+    undoButton.disabled = !stage.canUndo();
+    resetButton.disabled = stage.paintedCount() === 0;
+  };
+  stage.hitTarget.addEventListener("click", (event) => {
+    if (stage.view.mode !== "edit") return;
+    const tag = stage.tagAt(event.clientX, event.clientY);
+    if (tag && stage.paint(tag, colour)) sync();
+  });
+  stage.hitTarget.addEventListener("pointermove", (event) => {
+    const tag = stage.view.mode === "edit" && event.pointerType === "mouse" ? stage.tagAt(event.clientX, event.clientY) : null;
+    if (!tag) {
+      stage.tip.hidden = true;
+      return;
+    }
+    const box = stage.stageMarks.getBoundingClientRect();
+    stage.tip.hidden = false;
+    stage.tip.textContent = stage.nameOf(tag);
+    stage.tip.style.left = `${event.clientX - box.left}px`;
+    stage.tip.style.top = `${event.clientY - box.top}px`;
+  });
+  stage.hitTarget.addEventListener("pointerleave", () => { stage.tip.hidden = true; });
+  undoButton.addEventListener("click", () => { stage.undo(); sync(); });
+  resetButton.addEventListener("click", () => { stage.reset(); sync(); });
+  document.addEventListener("landing:language", sync);
+  sync();
+}
+
+/* ---------- Navigation: the scroll position is the single source of truth ---------- */
+
+// Clicks never override state that scrolling would later overwrite; they move
+// the page to where that state lives. While a programmatic scroll runs, scroll-
+// derived updates pause, so the map does not flash through the chapters it passes.
+const scrollNav = {
+  active: false,
+  timer: 0,
+  listeners: [],
+  go(top) {
+    this.active = true;
+    scrollTo({ top: Math.max(0, top), behavior: reducedMotion ? "auto" : "smooth" });
+    this.armSettle();
+  },
+  armSettle() {
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.settle(), 180);
+  },
+  settle() {
+    if (!this.active) return;
+    this.active = false;
+    clearTimeout(this.timer);
+    this.listeners.forEach((listener) => listener());
+  },
+  onSettle(listener) {
+    this.listeners.push(listener);
+  },
+};
+addEventListener("scroll", () => { if (scrollNav.active) scrollNav.armSettle(); }, { passive: true });
+addEventListener("scrollend", () => scrollNav.settle());
+// Any direct scrolling input hands control back to the reader immediately.
+for (const type of ["wheel", "touchstart"]) addEventListener(type, () => scrollNav.settle(), { passive: true });
+addEventListener("keydown", (event) => {
+  if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key) && !event.target.closest?.("[role=slider], [role=radiogroup]")) scrollNav.settle();
+});
+
+function initAnchors() {
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest('a[href^="#"]');
+    if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey) return;
+    const target = document.getElementById(link.getAttribute("href").slice(1));
+    if (!target) return;
+    event.preventDefault();
+    history.replaceState(null, "", link.getAttribute("href"));
+    scrollNav.go(target.getBoundingClientRect().top + scrollY);
+  });
+}
+
+/* ---------- Chapters 2–4: scroll-stepped controls ---------- */
+
+function chapterProgress(chapter) {
+  const rect = chapter.getBoundingClientRect();
+  return clamp01((innerHeight * 0.5 - rect.top) / Math.max(1, rect.height - innerHeight * 0.5));
+}
+
+// The page offset where a chapter's step sits in the middle of its scroll range.
+function stepScrollTop(chapter, index, count) {
+  const rect = chapter.getBoundingClientRect();
+  const span = Math.max(1, rect.height - innerHeight * 0.5);
+  return scrollY + rect.top - (innerHeight * 0.5 - ((index + 0.5) / count) * span);
+}
+
+// Radio groups: arrow keys move and select, as the ARIA pattern expects.
+function bindRadioKeys(buttons, select) {
+  buttons.forEach((button, index) => {
+    button.addEventListener("keydown", (event) => {
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+      if (!step) return;
       event.preventDefault();
-
-      let nextIndex = index;
-      if (key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
-      if (key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
-      if (key === "Home") nextIndex = 0;
-      if (key === "End") nextIndex = tabs.length - 1;
-
-      selectTab(tabs[nextIndex], true);
+      const next = buttons[(index + step + buttons.length) % buttons.length];
+      next.focus();
+      select(buttons.indexOf(next));
     });
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const initialLanguage = getStoredLanguage();
-  applyLanguage(initialLanguage);
-  document.querySelectorAll("[data-lang]").forEach((button) => {
-    button.addEventListener("click", () => {
-      applyLanguage(button.getAttribute("data-lang") === "zh" ? "zh" : "en");
+function initSteppedChapters(stage) {
+  const styleChapter = document.querySelector('[data-chapter="style"]');
+  const worldsChapter = document.querySelector('[data-chapter="worlds"]');
+  const styleButtons = [...styleChapter.querySelectorAll("[data-style-option]")];
+  const worldItems = [...worldsChapter.querySelectorAll("[data-world]")];
+  const worldButtons = worldItems.map((item) => item.querySelector(".world__pick"));
+  let styleStep = -1;
+  let worldStep = -1;
+
+  const showStyle = (index) => {
+    styleStep = index;
+    stage.setStyle(STYLES[index]);
+    styleButtons.forEach((button, i) => {
+      button.setAttribute("aria-checked", String(i === index));
+      button.tabIndex = i === index ? 0 : -1;
     });
-  });
-  initPreviewTabs();
-  initPreviewView();
-  initSampleRunsGallery();
-  initProductStory();
-  initShowcaseLayers();
-  initShowcaseView();
-  initHeroMap();
-  initTopbarState();
-  initScrollSpy();
-  initMetricCountUp();
-  initScrollReveal();
-});
+  };
+  const showWorld = (index) => {
+    worldStep = index;
+    stage.setWorld(WORLDS[index]);
+    worldItems.forEach((item, i) => item.classList.toggle("is-active", i === index));
+    worldButtons.forEach((button, i) => button.setAttribute("aria-pressed", String(i === index)));
+  };
+  // A choice applies at once, then the page glides to where that step lives.
+  const chooseStyle = (index) => {
+    showStyle(index);
+    scrollNav.go(stepScrollTop(styleChapter, index, STYLES.length));
+  };
+  const chooseWorld = (index) => {
+    showWorld(index);
+    scrollNav.go(stepScrollTop(worldsChapter, index, WORLDS.length));
+  };
+  styleButtons.forEach((button, index) => button.addEventListener("click", () => chooseStyle(index)));
+  worldButtons.forEach((button, index) => button.addEventListener("click", () => chooseWorld(index)));
+  bindRadioKeys(styleButtons, chooseStyle);
+
+  return () => {
+    if (scrollNav.active) return;
+    const nextStyle = Math.min(STYLES.length - 1, Math.floor(chapterProgress(styleChapter) * STYLES.length));
+    if (nextStyle !== styleStep) showStyle(nextStyle);
+    const nextWorld = Math.min(WORLDS.length - 1, Math.floor(chapterProgress(worldsChapter) * WORLDS.length));
+    if (nextWorld !== worldStep) showWorld(nextWorld);
+  };
+}
+
+function initChapters(stage) {
+  const chapters = [...document.querySelectorAll("[data-chapter]")];
+  const outro = document.querySelector('[data-chapter="outro"]');
+  const veil = document.querySelector("[data-stage-veil]");
+  return () => {
+    // The chapter under the middle of the screen owns the stage; computed from
+    // layout on each frame so it can never lag behind or race a click.
+    if (!scrollNav.active) {
+      const middle = innerHeight * 0.5;
+      const current = chapters.find((chapter) => {
+        const rect = chapter.getBoundingClientRect();
+        return rect.top <= middle && rect.bottom > middle;
+      });
+      if (current) stage.setMode(current.dataset.chapter);
+    }
+    // The stage fades to ink over the outro, so the HGO plate can rise out of the same darkness.
+    const rect = outro.getBoundingClientRect();
+    veil.style.opacity = clamp01((innerHeight - rect.top) / Math.max(1, rect.height)).toFixed(3);
+  };
+}
+
+/* ---------- HGO Atlas ---------- */
+
+async function initHgo() {
+  const meta = await fetch("./assets/hgo-zoom.json").then((response) => response.json());
+  const section = document.querySelector("[data-hgo]");
+  const stage = section.querySelector(".hgo__stage");
+  const camera = section.querySelector("[data-camera]");
+  const veil = section.querySelector("[data-hgo-veil]");
+  const steps = [...section.querySelectorAll("[data-step]")];
+  const counters = [...section.querySelectorAll("[data-count]")];
+  const zoomOut = section.querySelector("[data-zoom]");
+  const pxOut = section.querySelector("[data-px]");
+  const pyOut = section.querySelector("[data-py]");
+  const { native, detail, focus } = meta;
+  const placeImage = (image, src, box) => {
+    image.src = src;
+    Object.assign(image.style, { left: `${box.x}px`, top: `${box.y}px`, width: `${box.width}px`, height: `${box.height}px` });
+  };
+  placeImage(section.querySelector("[data-hgo-world]"), meta.world.src, { x: 0, y: 0, ...native });
+  placeImage(section.querySelector("[data-hgo-detail]"), detail.src, detail);
+  const centre = { x: detail.x + detail.width / 2, y: detail.y + detail.height / 2 };
+
+  // Native-pixel keyframes: the whole world, a slow push into Europe, then far enough
+  // in that the mod's own pixels show. Holds give each caption time to be read, and the
+  // plate ends on the pixels and fades out rather than snapping back.
+  function keyframes(width, height) {
+    const narrow = width < 760;
+    const fit = Math.max(width / native.width, height / native.height) * (narrow ? 1.6 : 1.05);
+    const detailScale = (width * (narrow ? 1.25 : 0.62)) / detail.width;
+    const world = { s: fit, x: narrow ? centre.x : native.width / 2, y: narrow ? centre.y + 140 : native.height * 0.46 };
+    const crop = { s: detailScale, x: centre.x, y: centre.y };
+    const pixel = { s: narrow ? 6 : 8, x: focus.x, y: focus.y };
+    return [
+      { at: 0.08, ...world },
+      { at: 0.42, ...crop },
+      { at: 0.52, ...crop },
+      { at: 0.8, ...pixel },
+    ];
+  }
+  function cameraAt(progress, frames) {
+    if (progress <= frames[0].at) return frames[0];
+    for (let index = 1; index < frames.length; index += 1) {
+      const a = frames[index - 1];
+      const b = frames[index];
+      if (progress > b.at) continue;
+      let t = easeInOut((progress - a.at) / (b.at - a.at));
+      if (reducedMotion) t = Math.round(t);
+      const s = Math.exp(Math.log(a.s) + (Math.log(b.s) - Math.log(a.s)) * t);
+      const w = a.s === b.s ? t : (s - a.s) / (b.s - a.s);
+      return { s, x: a.x + (b.x - a.x) * w, y: a.y + (b.y - a.y) * w };
+    }
+    return frames[frames.length - 1];
+  }
+
+  function render(progress) {
+    const width = stage.clientWidth;
+    const height = stage.clientHeight;
+    const view = cameraAt(progress, keyframes(width, height));
+    const anchorX = width * (width < 760 ? 0.5 : 0.64);
+    const anchorY = height * (width < 760 ? 0.34 : 0.5);
+    camera.style.transform = `translate(${anchorX - view.x * view.s}px, ${anchorY - view.y * view.s}px) scale(${view.s})`;
+    section.dataset.detail = view.s > 0.5 ? "on" : "off";
+    veil.style.opacity = progress < 0.08 ? (1 - progress / 0.08).toFixed(3) : progress > 0.9 ? ((progress - 0.9) / 0.1).toFixed(3) : "0";
+    steps.forEach((step, index) => step.classList.toggle("is-active", index === (progress < 0.5 ? 0 : 1)));
+    const counted = reducedMotion ? 1 : smooth(clamp01((progress - 0.08) / 0.34));
+    const formatter = new Intl.NumberFormat(language === "zh" ? "zh-CN" : "en-US");
+    counters.forEach((node) => setText(node, formatter.format(Math.round(meta.counts[node.dataset.count] * counted))));
+    setText(zoomOut, `×${view.s < 1 ? view.s.toFixed(2) : view.s.toFixed(1)}`);
+    setText(pxOut, String(Math.round(view.x)));
+    setText(pyOut, String(Math.round(view.y)));
+  }
+
+  // The camera follows the scroll position through a short exponential ease, so each
+  // wheel notch becomes a glide instead of a jump in zoom.
+  let shown = null;
+  let target = 0;
+  let last = 0;
+  let gliding = false;
+  const glide = (now) => {
+    const dt = Math.min(64, now - last);
+    last = now;
+    shown += (target - shown) * (1 - Math.exp(-dt / 140));
+    if (Math.abs(target - shown) < 0.0005) shown = target;
+    render(shown);
+    gliding = shown !== target;
+    if (gliding) requestAnimationFrame(glide);
+  };
+  let renderedSize = "";
+  return () => {
+    const rect = section.getBoundingClientRect();
+    target = clamp01(-rect.top / Math.max(1, rect.height - innerHeight));
+    // The camera's scale and anchor come from the stage size, so a resize redraws it
+    // even when the scroll progress has not moved.
+    const size = `${stage.clientWidth}x${stage.clientHeight}`;
+    const resized = size !== renderedSize;
+    renderedSize = size;
+    // Off screen (or a jump past it), the camera snaps: nobody should see it glide in.
+    const offscreen = rect.bottom < 0 || rect.top > innerHeight;
+    if (shown === null || reducedMotion || offscreen) {
+      if (shown === target && !resized) return;
+      shown = target;
+      render(shown);
+      return;
+    }
+    if (resized && !gliding) render(shown);
+    if (!gliding && shown !== target) {
+      gliding = true;
+      last = performance.now();
+      requestAnimationFrame(glide);
+    }
+  };
+}
+
+/* ---------- Boot ---------- */
+
+function initReveal() {
+  const nodes = document.querySelectorAll("[data-reveal]");
+  if (reducedMotion || !("IntersectionObserver" in window)) {
+    nodes.forEach((node) => node.classList.add("is-in"));
+    return;
+  }
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add("is-in");
+      observer.unobserve(entry.target);
+    }
+  }, { rootMargin: "0px 0px -10% 0px" });
+  nodes.forEach((node) => observer.observe(node));
+}
+
+function boot() {
+  document.documentElement.classList.add("js");
+  if (language !== "en") applyLanguage(language);
+  document.querySelector("[data-lang-toggle]").addEventListener("click", () => applyLanguage(language === "en" ? "zh" : "en"));
+  initReveal();
+  initAnchors();
+
+  const nav = document.querySelector(".nav");
+  const scrollWork = [() => nav.classList.toggle("is-scrolled", scrollY > innerHeight * 0.6)];
+  let scheduled = false;
+  const schedule = () => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      scrollWork.forEach((work) => work());
+    });
+  };
+  addEventListener("scroll", schedule, { passive: true });
+  addEventListener("resize", schedule);
+  document.addEventListener("landing:language", schedule);
+
+  fetch("./assets/history-scrubber.json")
+    .then((response) => response.json())
+    .then((data) => {
+      const stage = initStage(data);
+      initScrubber(stage);
+      initPaint(stage);
+      scrollWork.push(initChapters(stage), initSteppedChapters(stage));
+      scrollNav.onSettle(schedule);
+      schedule();
+    })
+    .catch((error) => console.warn("Map data unavailable", error));
+  initHgo()
+    .then((update) => { scrollWork.push(update); schedule(); })
+    .catch((error) => console.warn("HGO plate unavailable", error));
+  schedule();
+}
+
+boot();

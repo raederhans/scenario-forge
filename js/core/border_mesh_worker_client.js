@@ -1,6 +1,7 @@
 import { createWorkerTaskClient } from "./worker_task_client.js";
 import { packTopologyForTransferAsync } from "./topology_transfer_codec.js";
 import { unpackBorderMeshResult } from "./border_mesh_transfer_codec.js";
+import { yieldToBackground } from "./background_yield.js";
 
 function createAbortError() {
   const error = new Error("Border worker request aborted.");
@@ -24,8 +25,7 @@ export async function prepareBorderTopologyForTransfer(topology, options = {}) {
   const {
     signal,
     nowMs = () => performance.now(),
-    yieldControl = () => globalThis.scheduler?.yield
-      ? globalThis.scheduler.yield() : new Promise((resolve) => setTimeout(resolve, 0)),
+    yieldControl = yieldToBackground,
     timeBudgetMs = 4,
     coordinateBatchSize = 16_384,
   } = options;

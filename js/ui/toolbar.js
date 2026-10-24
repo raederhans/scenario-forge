@@ -1618,6 +1618,7 @@ function initToolbar({ render } = {}) {
     handlePaletteSourceChange,
     handleResize: handlePaletteLibraryResize,
     renderPaletteLibrary,
+    requestPaletteLibraryRender,
     syncPaletteSourceControls,
     syncPanelVisibility: syncPaletteLibraryPanelVisibility,
   } = paletteLibraryPanelController;
@@ -1725,19 +1726,11 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "clearReferenceImageFn", clearReferenceImage);
   registerRuntimeHook(state, "updateTransportAppearanceUIFn", renderTransportAppearanceUi);
   // Recent colors feed only the recent strip and the library's recent group.
-  // Paint input coalesces the full library rebuild into the next frame.
-  let recentPaletteLibraryFrame = 0;
+  // The full library rebuild waits until after the paint input's frame, and while
+  // the library is hidden it waits until the library is shown.
   registerRuntimeHook(state, "updateRecentUI", () => {
     renderRecentColors();
-    if (recentPaletteLibraryFrame) return;
-    if (typeof globalThis.requestAnimationFrame !== "function") {
-      renderPaletteLibrary();
-      return;
-    }
-    recentPaletteLibraryFrame = globalThis.requestAnimationFrame(() => {
-      recentPaletteLibraryFrame = 0;
-      renderPaletteLibrary();
-    });
+    requestPaletteLibraryRender();
   });
   registerRuntimeHook(state, "updateParentBorderCountryListFn", renderParentBorderCountryList);
 

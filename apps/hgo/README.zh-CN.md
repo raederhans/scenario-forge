@@ -50,6 +50,8 @@ python -B apps/hgo/tools/validate_dataset.py apps/hgo/assets/default
 python -B apps/hgo/tools/build_app.py --output .runtime/dist/hgo
 ```
 
+默认数据集变化后，在仓库根目录运行 `python tools/build_landing_hgo_zoom.py`，重新生成展示页的 HGO 缩放图。
+
 独立打包器只需 Python 标准库。NumPy、Pillow 用于源数据生成与校验，SciPy 用于离线地理配准；这些均非浏览器依赖。运行时没有 npm、CDN 或字体网络依赖。完整 Pages 构建会把该包放在 `/hgo/`，主编辑器位于 `/app/`。
 
 默认独立包位于 `.runtime/dist/hgo`，返回链接按仓库根目录提供服务时的路径生成。放到其他目录或单独托管时，用 `--main-url` 指定主编辑器地址。

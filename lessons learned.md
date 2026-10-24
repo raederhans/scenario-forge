@@ -133,14 +133,14 @@
 - 颜色、数据、policy 这类 checked-in 合同以当前测试和现有数据为准。
 - 拆出独立按钮时，payload 只带按钮承诺的字段。
 
-### source/dist 同步先看漂移范围
-- 如果源码和 `dist/app` 已有历史漂移，共享大文件优先做 scoped patch。
-- Pages dist 生成会按当前源码树同步所有镜像文件；如果某个已提交源码此前没有同步到 `dist/app`，本轮构建会带出相邻 dist 变化，先用 HEAD 源文件确认归属再判断是否越界。
+### Pages 产物只在 CI 构建，编辑器 JS 经 esbuild 打包
+- `dist/` 不再签入；`tools/build_pages_dist.py` 在 CI 里从源码构建产物，并调用 `tools/build_editor_bundle.mjs` 把 `js/main.js` 及其 import 打包到 `app/js/bundle/`。不要再提交或同步 `dist/`。
+- 打包只能跟随字面量：动态加载写 `import("./x.js")`，资源和 worker 写 `new URL("./x", import.meta.url)`。变量路径的 `import(path)` 会在打包后另外加载一份未打包模块（包括第二个 `state.js`）。
+- 测试或诊断要访问运行中的模块时，走 `window.__scenarioForgeTestApi`（`internals()` 只给诊断用）；按 URL 导入 `./js/core/*.js` 在打包产物里拿到的是另一份实例。
 - 重建拓扑产物时先确认非目标 layer 合同是否能过；如果 full builder 被旧 layer 元数据挡住，targeted rebuild 只能替换本轮 owned layer，并要补数据级验收。
 - 被 strict 合同按字节 hash 的 scenario JSON 必须在 `.gitattributes` 明确 `eol=lf`，否则 Windows checkout 会让本地 strict 误报指纹漂移。
 - `dist/pages-dist-manifest.json`、`data/manifest.json`、根 `dist/assets/*.json` 这类字节合同文件，修改后要同时复核自引用尺寸/hash；生成脚本和 `dist/app` 文本产物都要在 `.gitattributes` 固定 LF。
 - Pages manifest 扫描文件时按 repo-relative POSIX path 排序；直接排序 `Path` 对象会让 Windows 和 Linux 对 mixed-case 发布路径产出不同记录顺序。
-- Renderer owner extraction 只要改到浏览器会加载的 `js/core/**` 模块，就要在 review 收尾跑 `verify:pages-dist` 或等价 drift gate，确保 `dist/app` import 图和源码一致。
 - 覆盖类合同可以用 bbox 作为候选预筛，最终通过条件必须绑定真实 geometry 命中，并用跨 bbox 但不相交的反例测试锁住。
 - Marine Regions source snapshot 接近 GitHub 100MiB 限制时，要把简化规则写进 source spec/provenance，比如 `snapshot_simplify_tolerance`；只压最终 water feature 会留下不可推送的大 snapshot。
 - 只改 water layer 时，优先在现有 `runtime_topology.topo.json` 上替换 `scenario_water`；从 political/land/context 反提再重建会丢失独立的 `scenario_atlantropa` 对象。
@@ -419,7 +419,6 @@
 - checked-in runtime metadata 或 build snapshot 引用新的 ledger/report 时，ledger 文件必须进入 Pages dist 或明确保持 repo-only；metadata 只能写固定合同路径，不能写单次 `--report-path` 运行参数。
 
 ### Pages manifest 冲突用最终树重算
-- rebase 或 merge 时如果 `dist/pages-dist-manifest.json` 和 UI/dist 文件同时变化，先落到最新 main，再跑 `npm run verify:pages-dist` 让生成器按最终 source/dist 树重算发布尺寸。
 - 接手已合入 main 的 renderer/Pages 工作时，如果 `verify:pages-dist` 被既有 size gate 挡住，要把 builder size gate、startup shell、landing showcase 和路径级 dist 漂移分开记录，避免把发布体积红灯误判成目标 owner 回归。
 
 ### 生成产物回读要成套校验
@@ -505,7 +504,6 @@
 - 如果另一个 owner 持续提交 registry-only 状态快照，功能分支反复 rebase 会形成活锁；确认新提交只改 registry 后，用一次 merge 保留状态历史，并在 merge 冲突里写最终整合事实。
 
 ### 分阶段 renderer owner 按附件决定 dist 策略
-- 如果当前阶段明确禁止 `dist/app/**` 改动，把 dist parity review 建议转成 `git diff --name-only HEAD -- dist/app` guard；等专门的 Pages dist 同步阶段再生成镜像。
 
 ### Guide 内触发确认弹窗要验层级
 - 从 popover 内触发全局确认弹窗时，E2E 要覆盖弹窗可见和可点击；`z-index` 低于 Guide popover 会让确认弹窗实际出现在后方，dirty confirm 路径会被误判成逻辑卡住。

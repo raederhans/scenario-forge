@@ -1,4 +1,5 @@
 import { createCanvasGpuSubmissionClient } from "../canvas_gpu_submission_client.js";
+import { yieldToBackground } from "../background_yield.js";
 
 // Private physical-pass candidates only. Cached Path2D inputs must remain
 // immutable until replay completes; pixel reads and mutable paint factories are
@@ -12,9 +13,7 @@ const PAINT_METHODS = new Set(["fill", "stroke", "fillRect", "strokeRect", "clea
 const QUERY_METHODS = new Set([
   "getTransform", "getLineDash", "measureText", "getContextAttributes", "isPointInPath", "isPointInStroke", "isContextLost",
 ]);
-const defaultTimerYield = () => new Promise(resolve => globalThis.setTimeout(resolve, 0));
-const defaultYield = () => typeof globalThis.scheduler?.yield === "function"
-  ? globalThis.scheduler.yield() : defaultTimerYield();
+const defaultYield = yieldToBackground;
 
 function captureArguments(method, args) {
   if (method === "setLineDash") return [Array.from(args[0])];

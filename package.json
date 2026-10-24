@@ -62,12 +62,12 @@
     "test:e2e:layer:all": "node tools/e2e_layering.mjs run all",
     "verify:test:e2e-layers": "node tools/e2e_layering.mjs check",
     "verify:demo": "node node_modules/@playwright/test/cli.js test tests/e2e/sample_guide_deeplink.spec.js --grep @golden-demo --workers=1 --retries=0",
-    "build:landing-showcase": "npm run python -- tools/build_landing_europe_1936_showcase.py",
+    "build:landing-hero-maps": "npm run python -- tools/build_landing_europe_1936_showcase.py",
     "build:landing-work-maps": "npm run python -- tools/build_landing_work_maps.py",
+    "build:landing-history-scrubber": "npm run python -- tools/build_landing_history_scrubber.py",
+    "build:landing-hgo-zoom": "npm run python -- tools/build_landing_hgo_zoom.py",
     "verify:pages-source-graph": "npm run python -- tools/check_pages_source_graph.py",
-    "verify:pages-dist": "npm run python -- tools/build_pages_dist.py && npm run python -- -m unittest tests.test_pages_dist_startup_shell -q && npm run python -- -m unittest tests.test_landing_map_asset_contracts -q && node --test tests/landing_showcase_view_behavior.test.mjs",
-    "verify:pages-dist-and-drift": "npm run python -- tools/build_pages_dist.py && npm run python -- -m unittest tests.test_pages_dist_startup_shell -q && npm run python -- -m unittest tests.test_landing_map_asset_contracts -q && node --test tests/landing_showcase_view_behavior.test.mjs && git diff --exit-code -- dist/.nojekyll dist/app.js dist/index.html dist/styles.css dist/assets dist/app/index.html dist/app/js dist/app/css dist/app/vendor dist/hgo dist/pages-dist-manifest.json",
-    "verify:dist-drift": "npm run python -- tools/build_pages_dist.py && git diff --exit-code -- dist/.nojekyll dist/app.js dist/index.html dist/styles.css dist/assets dist/app/index.html dist/app/js dist/app/css dist/app/vendor dist/hgo dist/pages-dist-manifest.json",
+    "verify:pages-dist": "npm run python -- tools/build_pages_dist.py && npm run python -- -m unittest tests.test_pages_dist_startup_shell -q && npm run python -- -m unittest tests.test_landing_map_asset_contracts -q && node --test tests/landing_page_behavior.test.mjs",
     "build:global-transport-roads": "npm run python -- tools/build_global_transport_roads.py",
     "build:global-transport-rail": "npm run python -- tools/build_global_transport_rail.py",
     "build:global-transport-road-catalog": "npm run python -- tools/build_global_transport_catalogs.py --family road",
@@ -82,12 +82,14 @@
     "verify:quick-fill-data": "python tools/build_quick_fill_hierarchy.py --check && python -m unittest tests.test_quick_fill_hierarchy",
     "build:population-spatial": "npm run python -- tools/build_population_spatial.py --download && npm run python -- tools/register_population_spatial_assets.py",
     "verify:hgo-native": "npm --prefix apps/hgo run check && npm --prefix apps/hgo test && npm --prefix apps/hgo run test:python && npm --prefix apps/hgo run validate:data",
-    "build:hgo-native": "npm --prefix apps/hgo run build"
+    "build:hgo-native": "npm --prefix apps/hgo run build",
+    "build:editor-bundle": "node tools/build_editor_bundle.mjs --app-root dist/app --sourcemap"
   },
   "devDependencies": {
     "@playwright/test": "1.58.2",
     "acorn": "8.17.0",
     "acorn-walk": "8.3.5",
+    "esbuild": "0.24.2",
     "playwright": "1.58.2"
   }
 }

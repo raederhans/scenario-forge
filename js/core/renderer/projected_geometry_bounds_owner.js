@@ -58,28 +58,23 @@ export function createProjectedGeometryBoundsOwner({
     warn = defaultWarn,
   } = helpers;
 
-  let sphericalGeometryDiagnosticsByGeometry = new WeakMap();
-  let safeWaterRegionGeometryPartsByGeometry = new WeakMap();
-  let sanitizedWaterRegionFeatureByGeometry = new WeakMap();
+  // Spherical diagnostics and water part splits depend only on coordinates.
+  // Decoded geometry is never edited in place (every reload or chunk swap
+  // creates new objects), so these caches stay valid across context-layer
+  // revisions; clearing them re-ran geoArea/geoBounds on every chunk promotion.
+  const sphericalGeometryDiagnosticsByGeometry = new WeakMap();
+  const safeWaterRegionGeometryPartsByGeometry = new WeakMap();
+  const sanitizedWaterRegionFeatureByGeometry = new WeakMap();
+  // Snapshots hold whole water collections strongly, so they still end with the
+  // context revision; evicted chunks must not stay alive until a scenario switch.
   const waterSnapshots = createWaterSanitizationSnapshotCache();
-  let waterSanitizationRevision = Number(getContextLayerRevision() || 0);
+  let waterSnapshotRevision = Number(getContextLayerRevision() || 0);
   const waterSphericalSanitizationWarnings = new Set();
   let projectedBoundsByGeometry = new WeakMap();
   let projectedPartBounds = new WeakMap();
-  let polygonPartsByGeometry = new WeakMap();
+  const polygonPartsByGeometry = new WeakMap();
   let boundsProjectionGeneration = -1;
   let boundsScenarioId = "";
-
-  function ensureWaterSanitizationRevision() {
-    const revision = Number(getContextLayerRevision() || 0);
-    if (revision === waterSanitizationRevision) return;
-    waterSanitizationRevision = revision;
-    sphericalGeometryDiagnosticsByGeometry = new WeakMap();
-    safeWaterRegionGeometryPartsByGeometry = new WeakMap();
-    sanitizedWaterRegionFeatureByGeometry = new WeakMap();
-    polygonPartsByGeometry = new WeakMap();
-    waterSnapshots.reset();
-  }
 
   function ensureGeometryBoundsIdentity() {
     const generation = getProjectionGeometryGeneration(getProjection());
@@ -215,14 +210,13 @@ export function createProjectedGeometryBoundsOwner({
   }
 
   function getSphericalGeometryDiagnostics(geoObject) {
-    ensureWaterSanitizationRevision();
     const normalizedGeoObject = normalizeGeoObjectForSphericalDiagnostics(geoObject);
     const d3 = getD3();
     if (!normalizedGeoObject || !d3?.geoArea || !d3?.geoBounds) return null;
     const geometry = geoObject.type === "Feature" && geoObject.geometry
       ? geoObject.geometry : geoObject;
     // Feature properties do not affect D3's spherical calculations. Geometry
-    // identity survives wrapper replacement; revision covers in-place edits.
+    // identity survives wrapper replacement and context revisions.
     const cached = sphericalGeometryDiagnosticsByGeometry.get(geometry);
     if (cached) return cached;
     try {
@@ -250,7 +244,6 @@ export function createProjectedGeometryBoundsOwner({
   }
 
   function collectFeatureHitGeometries(feature) {
-    ensureWaterSanitizationRevision();
     const geometry = feature?.geometry;
     if (!geometry || typeof geometry !== "object") return [];
     if (polygonPartsByGeometry.has(geometry)) return polygonPartsByGeometry.get(geometry);
@@ -261,7 +254,6 @@ export function createProjectedGeometryBoundsOwner({
   }
 
   function collectSafeWaterRegionGeometryPartsInfo(feature) {
-    ensureWaterSanitizationRevision();
     if (!feature || typeof feature !== "object") return { parts: [], rawCount: 0, removedCount: 0 };
     const geometry = feature.geometry;
     if (!geometry || typeof geometry !== "object") return { parts: [], rawCount: 0, removedCount: 0 };
@@ -291,7 +283,6 @@ export function createProjectedGeometryBoundsOwner({
   }
 
   function sanitizeWaterRegionFeature(feature) {
-    ensureWaterSanitizationRevision();
     if (!feature || typeof feature !== "object") return null;
     const geometry = feature.geometry;
     const cached = geometry && sanitizedWaterRegionFeatureByGeometry.get(geometry);
@@ -311,7 +302,11 @@ export function createProjectedGeometryBoundsOwner({
   }
 
   function sanitizeWaterRegionFeatures(features = []) {
-    ensureWaterSanitizationRevision();
+    const contextRevision = Number(getContextLayerRevision() || 0);
+    if (contextRevision !== waterSnapshotRevision) {
+      waterSnapshotRevision = contextRevision;
+      waterSnapshots.reset();
+    }
     const source = Array.isArray(features) ? features : [];
     const scenarioId = String(getActiveScenarioId() || "");
     const reused = waterSnapshots.reuseSequence(source, scenarioId);

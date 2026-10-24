@@ -4,59 +4,61 @@
   <p><strong>Make a world your own.</strong></p>
   <p>A political map studio for alternate history and worldbuilding.</p>
   <p>
-    <a href="https://raederhans.github.io/scenario-forge/app/?view=guide">Open editor ↗</a>
+    <a href="https://raederhans.github.io/scenario-forge/app/?view=guide">Open Scenario Forge ↗</a>
     &nbsp; · &nbsp;
-    <a href="https://raederhans.github.io/scenario-forge/#sample-runs">Explore maps</a>
+    <a href="https://raederhans.github.io/scenario-forge/hgo/">Open HGO Atlas ↗</a>
+    &nbsp; · &nbsp;
+    <a href="https://raederhans.github.io/scenario-forge/">Website</a>
     &nbsp; · &nbsp;
     <a href="README.zh-CN.md">简体中文</a>
   </p>
 </div>
 
+Two browser editors, one project:
+
+| | Scenario Forge | HGO Atlas |
+|---|---|---|
+| **What it edits** | Vector political maps | The Historic Geographic Overhaul mod's native pixel map |
+| **Starting worlds** | Blank Map, Modern World, HOI4 1936, HOI4 1939, TNO 1962 | HGO 1936 — 11,894 states (924 at sea), 20,782 provinces |
+| **Open it** | [Editor ↗](https://raederhans.github.io/scenario-forge/app/?view=guide) | [HGO Atlas ↗](https://raederhans.github.io/scenario-forge/hgo/) |
+
+## Scenario Forge
+
 ![Scenario Forge editor with a political map canvas and editing tools](landing/assets/product-workspace.webp)
 
-## From a starting point to your own map
+- **Choose a world** and edit ownership, control, frontlines and special regions.
+- **Compose the map** with palettes, borders, labels and legends; add cities, roads, rail, terrain, rivers and night lights.
+- **Export** PNG or JPG at up to 4×, and save the project to keep editing. English and Chinese interface.
 
-- **Choose a world.** Start from Blank Map, Modern World, HOI4 1936, HOI4 1939, or TNO 1962.
-- **Reshape the story.** Edit ownership and control, draw frontlines, and add labels and strategic markings.
-- **Compose the details.** Tune palettes, borders, and legends; add cities, roads, rail, terrain, and rivers.
-- **Keep creating.** Work in English or Chinese, export PNG/JPG with resolution-aware map rendering, and save editable JSON projects. Choose 1×–4× within the export size and memory limits.
+<table>
+  <tr>
+    <td width="50%"><img src="landing/assets/work-alt-history-med.svg" alt="TNO 1962 Mediterranean with Atlantropa geography"></td>
+    <td width="50%"><img src="landing/assets/work-scenario-switch-europe.svg" alt="HOI4 1936 and 1939 political maps of Europe side by side"></td>
+  </tr>
+  <tr>
+    <td>TNO 1962 · Atlantropa — <a href="https://raederhans.github.io/scenario-forge/app/?sample=tno-1962-atlantropa-briefing&view=guide">open sample</a></td>
+    <td>HOI4 1936 → 1939 — <a href="https://raederhans.github.io/scenario-forge/app/?sample=hoi4-1936-europe-briefing&view=guide">1936</a> · <a href="https://raederhans.github.io/scenario-forge/app/?sample=hoi4-1939-europe-switch&view=guide">1939</a></td>
+  </tr>
+</table>
 
-## Selected maps
+## HGO Atlas
 
-These overview maps are generated from project data. They illustrate scenario geography and composition; they are not screenshots of the sample projects’ default exports. HOI4 and TNO maps depict game or alternate-history settings.
+![HGO Atlas editor showing the 1936 world map with state labels and the editing panel](docs/readme/hgo-atlas.webp)
 
-### An altered Mediterranean
-
-![TNO 1962 Mediterranean overview with political borders and Atlantropa geography](landing/assets/work-alt-history-med.svg)
-
-TNO 1962 ownership and country colours, with Atlantropa land, shoals, and water.
-
-[Open the TNO sample](https://raederhans.github.io/scenario-forge/app/?sample=tno-1962-atlantropa-briefing&view=guide) · [Vector map](landing/assets/work-alt-history-med.svg)
-
-### Europe, between two dates
-
-![HOI4 1936 and 1939 political maps compared in the same geographic frame](landing/assets/work-scenario-switch-europe.svg)
-
-Compare two HOI4 baselines across the same region.
-
-[Open 1936](https://raederhans.github.io/scenario-forge/app/?sample=hoi4-1936-europe-briefing&view=guide) · [Open 1939](https://raederhans.github.io/scenario-forge/app/?sample=hoi4-1939-europe-switch&view=guide) · [All sample files](landing/assets/sample-runs.json)
+A separate editor for the HGO mod's 1936 world on its native 5120 × 2560 map. Paint land and sea states, transfer ownership and cores between countries, rename regions, and export the full map as PNG. Developer notes: [apps/hgo](apps/hgo/README.md).
 
 ## Run locally
 
-On Windows, with Python 3 installed and the required runtime assets present, run:
+On Windows with Python 3:
 
 ```powershell
 .\start_dev.bat
 ```
 
-The launcher prints the local editor URL. See [local development](docs/local-development.md) for setup, runtime assets, backend previews, and development commands.
+The launcher prints the local editor URL. See [local development](docs/local-development.md) for setup and the optional backend (Cloud Saves and community features). Before opening a PR, run `npm test` and follow [development and delivery](docs/development-and-delivery.md).
 
-Before committing or opening a PR, run `npm test` and follow [development and delivery](docs/development-and-delivery.md).
+## License
 
-## Availability and sources
-
-The main editor includes the five baselines above. [HGO has a separate native-pixel editor](apps/hgo/README.md), with editable sea regions and its own loading, project files, renderer and checks. Cloud Saves and community features require the local backend preview. Roads and rail are the strongest public transport layers; other transport and thematic families have varying preview coverage.
-
-Code and documentation use the [MIT License](LICENSE). Third-party datasets and derived maps retain their source-specific terms. Consult the [source ledger](data/source_ledger.json) and the map metadata ([TNO](landing/assets/work-alt-history-med.json), [HOI4 comparison](landing/assets/work-scenario-switch-europe.json)) before reusing data-derived assets.
+Code and documentation are [MIT](LICENSE). Map data keeps its source terms — see the [source ledger](data/source_ledger.json).
 
 [Report an issue](https://github.com/raederhans/scenario-forge/issues)

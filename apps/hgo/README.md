@@ -60,6 +60,8 @@ python -B tools/build_dataset.py --source-root /path/to/hgo-mod --output assets/
 python -B tools/validate_dataset.py assets/default --source-root /path/to/hgo-mod
 ```
 
+After the default dataset changes, re-render the landing page's HGO zoom images from the repository root with `python tools/build_landing_hgo_zoom.py`.
+
 NumPy is used by the builder and full validator; Pillow is used for reading source BMPs and the synthetic source tests. Neither is a browser dependency, and the app packer uses only Python's standard library. Source mod files are read-only inputs and are never included in the app package. Provenance records source and palette fingerprints; a reproducibility claim requires access to matching source inputs and successful validation.
 
 The native map and names derive from Historic Geographical Overhaul (`hgo_mod_2241701657`). The repository [source ledger](../../data/source_ledger.json) records its origin and source-specific terms; the dataset's [provenance](assets/default/provenance.json) records the exact input files and interpretation diagnostics. The project's code license does not relicense this third-party data.

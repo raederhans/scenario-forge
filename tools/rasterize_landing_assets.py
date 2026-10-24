@@ -21,18 +21,13 @@ RASTER_TARGETS = (
     ("japan-preview-cities.svg", "japan-preview-cities.webp", 2040, 1320, 72),
     ("japan-preview-terrain.svg", "japan-preview-terrain.webp", 2040, 1320, 72),
     ("japan-preview-night.svg", "japan-preview-night.webp", 2040, 1320, 72),
-    ("template-blank.svg", "template-blank.webp", 1120, 720, 76),
-    ("template-modern.svg", "template-modern.webp", 1120, 720, 76),
-    ("template-hoi4.svg", "template-hoi4.webp", 1120, 720, 76),
-    ("template-tno.svg", "template-tno.webp", 1120, 720, 76),
-    ("showcase-final-map.svg", "showcase-final-map.webp", 1120, 720, 76),
     ("work-alt-history-med.svg", "work-alt-history-med.webp", 2240, 1440, 78),
     ("work-scenario-switch-europe.svg", "work-scenario-switch-europe.webp", 1360, 880, 78),
     ("work-atlas-japan-corridor.svg", "work-atlas-japan-corridor.webp", 1360, 880, 78),
 )
 
 # Social cards are consumed as PNG by the Open Graph and Twitter metadata. Keep
-# this separate so the existing 16 SVG-to-WebP delivery targets remain stable.
+# this separate so the SVG-to-WebP delivery targets remain stable.
 PNG_RASTER_TARGETS = (
     ("social-preview.svg", "social-preview.png", 1200, 630, 100),
 )
@@ -55,7 +50,6 @@ def optimize_svg_file(target: Path) -> None:
 
 def run_svgo(selected_sources: set[str] | None = None) -> None:
     for name in (
-        "europe-1936-showcase.svg",
         "work-alt-history-med.svg",
         "work-scenario-switch-europe.svg",
         "work-atlas-japan-corridor.svg",
