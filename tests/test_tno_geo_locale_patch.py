@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from map_builder.quick_fill_hierarchy import load_feature_merge_members
 from tools.build_tno_1962_geo_locale_patch import build_patch
 
 
@@ -216,13 +217,21 @@ class TnoGeoLocalePatchTest(unittest.TestCase):
             "Liubeshiv": ("UA_RAY_74538382B51989583187875", "柳别希夫"),
         }
 
+        # A merged member's fix lives on as one part of its merged feature's composed name.
+        merged_into = {member: group_id for group_id, members in load_feature_merge_members(root / "data").items()
+                       for member in members}
+
         for english_name, (feature_id, zh_name) in expected.items():
             with self.subTest(english_name=english_name):
+                key = merged_into.get(feature_id, feature_id)
                 self.assertEqual(locales[english_name]["zh"], zh_name)
-                self.assertEqual(locales[f"id::{feature_id}"]["zh"], zh_name)
-                self.assertEqual(startup_locales[english_name]["zh"], zh_name)
-                self.assertEqual(patch[feature_id]["zh"], zh_name)
-                self.assertEqual(zh_patch[feature_id]["zh"], zh_name)
+                self.assertIn(zh_name, locales[f"id::{key}"]["zh"].split("、"))
+                if key == feature_id:
+                    self.assertEqual(startup_locales[english_name]["zh"], zh_name)
+                else:  # startup keeps names of startup features only; the member name is gone
+                    self.assertIn(zh_name, startup_locales[f"id::{key}"]["zh"].split("、"))
+                self.assertIn(zh_name, patch[key]["zh"].split("、"))
+                self.assertIn(zh_name, zh_patch[key]["zh"].split("、"))
 
         variants = {
             "Bursa (TR)": "布尔萨",

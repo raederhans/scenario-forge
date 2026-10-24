@@ -8,9 +8,11 @@ consistent subsets that remain contiguous; singletons stay unmerged.
 from __future__ import annotations
 
 import argparse
+import functools
 import gzip
 import hashlib
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,8 +22,9 @@ STRATEGIC_SCENARIOS = ("hoi4_1936", "hoi4_1939")
 RIVER_PARTITIONS = DATA / "river_partitions"
 CHINA_CROSSWALK = DATA / "quick_fill/china_prefecture_crosswalk.v1.json"
 ADJACENCY_TOPOLOGY = DATA / "scenarios/tno_1962/runtime_topology.topo.json.gz"
-# Every topology the apply tool rewrites; a merge must not mix precision and ordinary parcels.
-PRECISION_TOPOLOGIES = (DATA / "europe_topology.na_v2.json", DATA / "europe_topology.runtime_political_v1.json",
+# Every topology the apply tool rewrites. A merge must not mix precision and ordinary
+# parcels, and every member must be valid there: the apply tool unions without repair.
+REWRITTEN_TOPOLOGIES = (DATA / "europe_topology.na_v2.json", DATA / "europe_topology.runtime_political_v1.json",
                         *sorted(DATA.glob("scenarios/*/runtime_topology.topo.json*")))
 
 
@@ -30,6 +33,32 @@ def read_json(path: Path):
         with gzip.open(path, "rt", encoding="utf-8") as handle:
             return json.load(handle)
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+@functools.cache
+def rewritten_topology(path: Path) -> dict:
+    return read_json(path)
+
+
+def invalid_geometry_ids(feature_ids: set[str]) -> set[str]:
+    """Candidate members whose geometry is invalid in any rewritten topology."""
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from map_builder.regional_geometry import _decode_geometry
+
+    invalid: set[str] = set()
+    for path in REWRITTEN_TOPOLOGIES:
+        topology = rewritten_topology(path)
+        for row in topology["objects"]["political"]["geometries"]:
+            feature_id = str((row.get("properties") or {}).get("id") or row.get("id"))
+            if feature_id in feature_ids and feature_id not in invalid:
+                try:
+                    valid = _decode_geometry(topology, row).is_valid
+                except ValueError:
+                    valid = False
+                if not valid:
+                    invalid.add(feature_id)
+    return invalid
 
 
 def merged_feature_id(member_ids: list[str]) -> str:
@@ -61,8 +90,8 @@ def load_assignment_tables() -> dict[str, dict]:
     for scenario in STRATEGIC_SCENARIOS:
         payload = read_json(DATA / f"scenarios/{scenario}/strategic_values.by_feature.json")
         tables[f"{scenario}:strategic_bucket"] = payload["bucket_by_feature"]
-    for path in PRECISION_TOPOLOGIES:
-        precision = read_json(path).get("political_precision_feature_ids")
+    for path in REWRITTEN_TOPOLOGIES:
+        precision = rewritten_topology(path).get("political_precision_feature_ids")
         if precision is not None:
             tables[f"{path.relative_to(DATA).as_posix()}:precision"] = dict.fromkeys(precision, True)
     tables["china_prefecture"] = china_prefectures()
@@ -149,6 +178,13 @@ def compose_names(member_names: dict[str, dict]) -> dict:
             for language, separator in LANGUAGE_SEPARATORS.items()}
 
 
+def fragment_camouflage_feature_ids() -> set[str]:
+    """Features with their own fragment-camouflage display rule; a merge would widen or drop it."""
+    policies = read_json(DATA / "country_feature_policies.json")
+    rules = ((policies.get("display") or {}).get("fragmentCamouflage") or {}).get("rules") or []
+    return {str(feature_id) for rule in rules for feature_id in rule.get("featureIds") or []}
+
+
 def river_paint_feature_ids() -> set[str]:
     """Parents and contour supports of reviewed river-paint packs.
 
@@ -169,7 +205,8 @@ def build_plan(candidates_path: Path) -> dict:
     candidates = read_json(candidates_path)
     tables, hierarchy = load_assignment_tables(), read_json(DATA / "hierarchy.json")
     memberships, (adjacency, source_names), name_sources = group_memberships(hierarchy), load_adjacency(), load_name_sources()
-    protected = set(candidates.get("protected_feature_ids") or []) | river_paint_feature_ids()
+    protected = set(candidates.get("protected_feature_ids") or []) | river_paint_feature_ids() | fragment_camouflage_feature_ids()
+    protected |= invalid_geometry_ids({member for candidate in candidates["candidates"] for member in candidate["member_ids"]})
     groups, splits = [], []
     for candidate in candidates["candidates"]:
         members = [feature_id for feature_id in candidate["member_ids"] if feature_id not in protected]
@@ -202,7 +239,9 @@ def build_plan(candidates_path: Path) -> dict:
         "plan_id": candidates_path.name.replace(".candidates.json", ".v1"),
         "candidate_source": candidates_path.relative_to(ROOT).as_posix(),
         "constraints": ["owners", "cores", "strategic_value_buckets", "hierarchy_groups", "quick_fill_groups",
-                        "china_crosswalk_prefecture", "precision_tier", "river_paint_parcels_unchanged", "contiguous"],
+                        "china_crosswalk_prefecture", "precision_tier", "valid_member_geometry",
+                        "fragment_camouflage_unchanged",
+                        "river_paint_parcels_unchanged", "contiguous"],
         "ownership_scenarios": list(OWNERSHIP_SCENARIOS),
         "strategic_scenarios": list(STRATEGIC_SCENARIOS),
         "counts": {"candidates": len(candidates["candidates"]), "groups": len(groups),
