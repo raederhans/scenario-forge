@@ -1,3 +1,4 @@
+import { yieldToBackground } from "./background_yield.js";
 // Keep the TopoJSON object graph in structured clone, while transferring the large arc numbers.
 export function packTopologyForTransfer(topology) {
   const arcs = topology.arcs || [];
@@ -33,8 +34,7 @@ export function packTopologyForTransfer(topology) {
 export async function packTopologyForTransferAsync(topology, {
   signal,
   nowMs = () => performance.now(),
-  yieldControl = () => globalThis.scheduler?.yield
-    ? globalThis.scheduler.yield() : new Promise((resolve) => setTimeout(resolve, 0)),
+  yieldControl = yieldToBackground,
   timeBudgetMs = 4,
   coordinateBatchSize = 16_384,
 } = {}) {

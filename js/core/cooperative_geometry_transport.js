@@ -1,4 +1,5 @@
 import "./geometry_transfer_codec_shared.js";
+import { yieldToBackground } from "./background_yield.js";
 
 function abortIfNeeded(signal) {
   if (!signal?.aborted) return;
@@ -15,9 +16,7 @@ export async function packGeometryCooperatively(updates, {
   sliceBudgetMs = 4,
   pack = (batch) => globalThis.__scenarioForgeGeometryTransferCodecShared.pack(batch),
   now = () => performance.now(),
-  yieldTask = () => globalThis.scheduler?.yield
-    ? globalThis.scheduler.yield()
-    : new Promise((resolve) => setTimeout(resolve, 0)),
+  yieldTask = yieldToBackground,
 } = {}) {
   if (!Array.isArray(updates) || !Number.isInteger(batchSize) || batchSize < 1) {
     throw new TypeError("Invalid geometry packing batch.");

@@ -1,5 +1,6 @@
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import { getPackedPaintContourMesh } from "./paint_contour_mesh.js";
+import { yieldToBackground } from "../background_yield.js";
 
 export function createBorderDrawOwner({
   state,
@@ -724,8 +725,7 @@ export function createBorderDrawOwner({
 
   function prepareHierarchicalBorders(k, {
     interactive = false, signal, isCurrent = () => true,
-    yieldControl = () => globalThis.scheduler?.yield
-      ? globalThis.scheduler.yield() : new Promise(resolve => setTimeout(resolve, 0)),
+    yieldControl = yieldToBackground,
     nowMs = () => globalThis.performance?.now?.() ?? Date.now(), sliceBudgetMs = 4,
   } = {}) {
     const snapshot = captureBorderPreparation(k, interactive);

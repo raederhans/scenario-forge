@@ -1,3 +1,4 @@
+import { yieldToBackground } from "../background_yield.js";
 // Matrices map source pixels to output device pixels, including DPR. Layers
 // retain their own revision and camera reference; the caller owns that policy.
 const VERTEX = `#version 300 es
@@ -73,7 +74,7 @@ export function createGpuSceneCompositor({ canvas, maxTextureBytes = 256 * 1024 
     textureUploads++;
   }
   async function prepareLayers({ layers = [], getReservedTextureBytes = () => 0, isCurrent = () => true,
-    yieldControl = () => globalThis.scheduler?.yield?.() ?? new Promise(resolve => setTimeout(resolve, 0)), maxPasses = 3,
+    yieldControl = yieldToBackground, maxPasses = 3,
     onProgress = () => {} } = {}) {
     cancelPreparedLayers();
     const job = { textures: new Map(), ready: false, onProgress };

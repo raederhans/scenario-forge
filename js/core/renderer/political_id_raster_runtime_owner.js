@@ -8,6 +8,7 @@ import { createPoliticalIdRasterCoordinateSpace } from "./political_id_raster_co
 import { createPoliticalIdRasterIdentityBuilder } from "./political_id_raster_identity.js";
 import { createPoliticalIdRasterAssetStore, encodePoliticalIdRasterAsset } from "./political_id_raster_assets.js";
 import { queryPoliticalIdRasterCandidates } from "./political_id_raster_pick.js";
+import { yieldToBackground } from "../background_yield.js";
 
 const GPU_LIMIT = 80 * 1024 * 1024;
 const MAX_COLOR_DELTAS = 32;
@@ -348,8 +349,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     sourcePreparation = null;
     sourcePreparationStats.cancelled++;
   }
-  const sourceHostTask = () => globalThis.scheduler?.yield
-    ? globalThis.scheduler.yield() : new Promise(resolve => setTimeout(resolve, 0));
+  const sourceHostTask = yieldToBackground;
 
   // Draw and tile completion may request work, but never collect or publish a
   // complete scene. The accepted source remains immutable until this private

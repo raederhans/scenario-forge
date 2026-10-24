@@ -75,6 +75,7 @@ import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
 import { createCountryLabelSourceOwner } from "./renderer/country_label_source.js";
 import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "./renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "./renderer/urban_layer_render_owner.js";
+import { yieldToBackground } from "./background_yield.js";
 // Hybrid canvas + SVG rendering engine.
 // 这个文件仍是渲染主控壳层：owner/facade 已经拆到子模块，但跨子系统的调度、
 // runtime 句柄和 render pass 编排还集中留在这里。后续修改优先下沉到对应 owner，
@@ -271,7 +272,7 @@ import {
 } from "./unit_counter_presets.js";
 import { enqueueFrameTask, getFrameSchedulerQueueLength } from "./frame_scheduler.js";
 import { flushRenderBoundary, getRenderBoundaryDebugState, requestRender } from "./render_boundary.js";
-import { callRuntimeHook, callRuntimeHooks, captureCompatRuntimeHook, registerRuntimeHook } from "./state/index.js";
+import { callRuntimeHook, callRuntimeHooks, captureCompatRuntimeHook, registerRuntimeHook, requestRuntimeHookAfterPaint } from "./state/index.js";
 import { createUrbanCityPolicyOwner } from "./renderer/urban_city_policy.js";
 import { createCityPaintStyleModel } from "./renderer/city_paint_style_model.js";
 import { createCityLabelOwner } from "./renderer/city_label_owner.js";
@@ -5653,9 +5654,8 @@ function clearPendingDynamicBorderTimer() {
 }
 
 function updateDynamicBorderStatusUI() {
-  if (typeof runtimeState.updateDynamicBorderStatusUIFn === "function") {
-    runtimeState.updateDynamicBorderStatusUIFn();
-  }
+  // Border rebuilds run during chunk promotion; the status line can wait for paint.
+  requestRuntimeHookAfterPaint(runtimeState, "updateDynamicBorderStatusUIFn");
 }
 
 function markDynamicBordersDirty(reason = "") {
@@ -10275,13 +10275,7 @@ function getInteractionInfrastructureStageRank(stage = runtimeState.interactionI
 }
 
 async function yieldToMain() {
-  if (typeof globalThis.scheduler?.yield === "function") {
-    await globalThis.scheduler.yield();
-    return;
-  }
-  await new Promise((resolve) => {
-    globalThis.setTimeout(resolve, 0);
-  });
+  await yieldToBackground();
 }
 
 function rebuildAuxiliaryRegionIndexes() {
@@ -15503,9 +15497,8 @@ function getSpecialZonesWorkbenchCurrentTargetSignature() {
 }
 
 function notifyDevWorkspace() {
-  if (typeof runtimeState.updateDevWorkspaceUIFn === "function") {
-    runtimeState.updateDevWorkspaceUIFn();
-  }
+  // Hover and click paths notify on every hit; rebuild the panel after paint.
+  requestRuntimeHookAfterPaint(runtimeState, "updateDevWorkspaceUIFn");
 }
 
 function isDevSelectionEligibleFeature(feature, featureId = null) {

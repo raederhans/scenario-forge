@@ -4,6 +4,7 @@ import { getObjectIdentityToken } from './object_identity.js';
 import { createWorkerTaskClient } from '../worker_task_client.js';
 import { packGeometryCooperatively } from '../cooperative_geometry_transport.js';
 import { getCountryLabelPolygons as polygons, mergeCountryLabelGroups, unpackCountryLabelTransport } from './country_label_geometry.js';
+import { yieldToBackground } from "../background_yield.js";
 
 const EMPTY = Object.freeze([]);
 const text = value => String(value ?? '').trim();
@@ -21,8 +22,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   isEligible = () => true, onChange = () => {},
   createWorker = () => new Worker(new URL('../../workers/country_label_geometry.worker.js', import.meta.url), { type: 'module' }),
   isWorkerSupported = () => typeof Worker === 'function',
-  yieldTask = () => globalThis.scheduler?.yield ? globalThis.scheduler.yield()
-    : new Promise(resolve => setTimeout(resolve, 0)) } = {}) {
+  yieldTask = yieldToBackground } = {}) {
   const reference = getMapDataBoundary(state).reference;
   let sourceToken = '', revision = 0, status = 'pending', error = '';
   let geometryRecords = EMPTY, countries = EMPTY, features = EMPTY, nameKey = '';

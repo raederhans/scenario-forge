@@ -2,6 +2,7 @@ import {
   getContextCollectionRevision, getContextGeometryRevision, getContextTopologyObjectStamp,
   getStartupContextCollection,
 } from "../state/context_layer_revision.js";
+import { requestRuntimeHookAfterPaint } from "../state/index.js";
 
 export function createContextLayerResolverOwner({
   runtimeState,
@@ -534,9 +535,8 @@ export function createContextLayerResolverOwner({
           + `special_zones=${diag.special_zones?.source || "none"}, `
           + `bathymetry=${runtimeState.activeBathymetrySource || "none"}`
       );
-      if (typeof runtimeState.updateToolbarInputsFn === "function") {
-        runtimeState.updateToolbarInputsFn();
-      }
+      // Runs inside drawCanvas; the toolbar refresh waits for the frame to paint.
+      requestRuntimeHookAfterPaint(runtimeState, "updateToolbarInputsFn");
     }
 
     const hasActiveScenarioPoliticalChunkAuthority = !!(
@@ -580,9 +580,7 @@ export function createContextLayerResolverOwner({
       layerResolverCache.activeChunkScenarioId = activeChunkScenarioId;
       layerResolverCache.bundleMode = runtimeState.topologyBundleMode;
       layerResolverCache.contextRevision = contextRevision;
-      if (typeof runtimeState.updateSpecialZoneEditorUIFn === "function") {
-        runtimeState.updateSpecialZoneEditorUIFn();
-      }
+      requestRuntimeHookAfterPaint(runtimeState, "updateSpecialZoneEditorUIFn");
     }
   }
 
