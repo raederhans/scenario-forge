@@ -15,6 +15,8 @@ from pathlib import Path
 import re
 import unicodedata
 
+import main_sources
+
 # Native entity identities, explicitly constrained to relevant modern search
 # territories. Colonial/macro entities may have multiple territories; a name
 # must still resolve to one Chinese rendering across the complete scope.
@@ -457,16 +459,17 @@ def build(root, output):
         'stateReviews':'apps/hgo/assets/overlays/localization/state_reviews.json',
         'marineRefined':'data/marine_regions.refined.source.geojson','marineAdditional':'data/marine_regions.additional.source.geojson',
         'controls':'apps/hgo/assets/overlays/geography/georeference.json'}
-    raw = {key:(root/path).read_bytes() for key,path in source_paths.items()}
+    # Main-repository inputs come from HGO's pinned snapshots (tools/sync_main_sources.py).
+    raw = {key:(main_sources.read_bytes(root,path) if path.startswith('data/') else (root/path).read_bytes())
+           for key,path in source_paths.items()}
     data = {key:json.loads(value) for key,value in raw.items()}
     dictionary_root=root/'apps/hgo/assets/overlays/localization'
     dictionaries={name:(dictionary_root/name).read_bytes() for name in ['TSPhrases.txt','TSCharacters.txt']}
     simplify=make_simplifier(*(value.decode('utf8') for value in dictionaries.values()))
     country_ref=data['reviewed']['countryReference']
-    country_bytes=(root/country_ref['path']).read_bytes()
-    if hashlib.sha256(country_bytes).hexdigest()!=country_ref['sha256']: raise ValueError('Reviewed country reference changed')
+    if main_sources.archive_sha256(root,country_ref['path'])!=country_ref['sha256']: raise ValueError('Reviewed country reference changed')
     for reference in data['stateReviews'].get('sourceArchives',[]):
-        if hashlib.sha256((root/reference['path']).read_bytes()).hexdigest()!=reference['sha256']:
+        if main_sources.archive_sha256(root,reference['path'])!=reference['sha256']:
             raise ValueError(f'Reviewed state reference changed: {reference["path"]}')
     marine={'features':data['marineRefined']['features']+data['marineAdditional']['features']}
     overlay, report = build_overlay(data['core'],data['places']['places'],data['manifest'],data['catalog'],

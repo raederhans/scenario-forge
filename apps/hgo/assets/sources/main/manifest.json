@@ -1,0 +1,141 @@
+{
+  "archives": {
+    "data/cb_2024_us_county_500k.zip": {
+      "member": "cb_2024_us_county_500k.dbf",
+      "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1"
+    },
+    "data/cities15000.zip": {
+      "member": "cities15000.txt",
+      "sha256": "de3b169ad0bbc5bbc7c09006561b01ac4d191689d66210c68161fe8903885e63"
+    },
+    "data/ne_10m_admin_1_states_provinces.zip": {
+      "member": "ne_10m_admin_1_states_provinces.dbf",
+      "sha256": "efc59726337323058f9446210adc96673179cd344e053666ee3d28cb58ba2b05"
+    },
+    "data/ne_10m_geography_marine_polys.zip": {
+      "member": "ne_10m_geography_marine_polys.dbf",
+      "sha256": "a2d3395904c41e718e02c3ec5bc988712164c524c236fad32d95d282ca303b2a"
+    },
+    "data/ne_10m_lakes.zip": {
+      "member": "ne_10m_lakes.dbf",
+      "sha256": "0803a06f9c3cb4671d89b68c48b142aad9366ba40f665245e12a913fbc61722a"
+    },
+    "data/ne_10m_populated_places.zip": {
+      "member": "ne_10m_populated_places.dbf",
+      "sha256": "cd149186f03d2603e0410da399b980a4357d0ac32d3a2305a49ed3dffcc41d7b"
+    },
+    "data/ne_50m_admin_0_countries.zip": {
+      "member": "ne_50m_admin_0_countries.dbf",
+      "sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139"
+    }
+  },
+  "files": {
+    "data/city_aliases.json": {
+      "byteLength": 30198721,
+      "mainSha256": "22e6ab8d30d5339cbb56571c8a2d939b9abf2bbb8ff98d16e937fc42d258634f",
+      "mode": "copy",
+      "sha256": "22e6ab8d30d5339cbb56571c8a2d939b9abf2bbb8ff98d16e937fc42d258634f",
+      "snapshot": "data/city_aliases.json.gz"
+    },
+    "data/geo_aliases.json": {
+      "byteLength": 7573921,
+      "mainSha256": "5b7ca2ee8605557fb1cc621dd24308662080d2d10aa548be7ad0e35e11e271a7",
+      "mode": "copy",
+      "sha256": "5b7ca2ee8605557fb1cc621dd24308662080d2d10aa548be7ad0e35e11e271a7",
+      "snapshot": "data/geo_aliases.json.gz"
+    },
+    "data/global_physical_semantics.topo.json": {
+      "byteLength": 730100,
+      "mainSha256": "6c2cbc84915781e0ae6f683fa42e343fd437891706295a6ff961bf6f1433550b",
+      "mode": "copy",
+      "sha256": "6c2cbc84915781e0ae6f683fa42e343fd437891706295a6ff961bf6f1433550b",
+      "snapshot": "data/global_physical_semantics.topo.json.gz"
+    },
+    "data/global_rivers.geojson": {
+      "byteLength": 5590332,
+      "mainSha256": "60dbebd1fc2d4f9ba8b6d5327a99960c6bfcbe9c6df1d5d4508d0b70fa950a04",
+      "mode": "copy",
+      "sha256": "60dbebd1fc2d4f9ba8b6d5327a99960c6bfcbe9c6df1d5d4508d0b70fa950a04",
+      "snapshot": "data/global_rivers.geojson.gz"
+    },
+    "data/hgo_catalogs/hgo_place_names.json": {
+      "byteLength": 4969946,
+      "mainSha256": "47c5f6a9359f01c3f08a067ab59891017d2e82e2a144c1bfbd649f184e527e0f",
+      "mode": "copy",
+      "sha256": "47c5f6a9359f01c3f08a067ab59891017d2e82e2a144c1bfbd649f184e527e0f",
+      "snapshot": "data/hgo_catalogs/hgo_place_names.json.gz"
+    },
+    "data/hierarchy.json": {
+      "byteLength": 545864,
+      "mainSha256": "3e067a6de5596e83e7f15b2dac493b10bc8666bb941a2351a5f89cb4ae135e6e",
+      "mode": "copy",
+      "sha256": "3e067a6de5596e83e7f15b2dac493b10bc8666bb941a2351a5f89cb4ae135e6e",
+      "snapshot": "data/hierarchy.json.gz"
+    },
+    "data/locales.json": {
+      "byteLength": 8493463,
+      "mainSha256": "1fa418d43e94308401bbe82b2ebca888e126f0509e556cbaa62d94c65c0c27fc",
+      "mode": "copy",
+      "sha256": "1fa418d43e94308401bbe82b2ebca888e126f0509e556cbaa62d94c65c0c27fc",
+      "snapshot": "data/locales.json.gz"
+    },
+    "data/marine_regions.additional.source.geojson": {
+      "byteLength": 106990,
+      "mainSha256": "17ca01bad5b0c36ecd28349e6cabc213e7925e4efe1cd25b83e6a0b6ef49d29b",
+      "mode": "properties",
+      "sha256": "e0ca78d9956206d1de3779934626236effccc4b714e3ede2960b2fca133c103e",
+      "snapshot": "data/marine_regions.additional.source.geojson.gz"
+    },
+    "data/marine_regions.refined.source.geojson": {
+      "byteLength": 108549,
+      "mainSha256": "0952b1b42f9f5fefe68011cfeb0359520f7e412b0432acd4ce0d6056c43611ff",
+      "mode": "properties",
+      "sha256": "d0cfb7d989f212d9ef6ee5102b55ae6507fd46fccefd4bcf4ae3777574de3ca9",
+      "snapshot": "data/marine_regions.refined.source.geojson.gz"
+    },
+    "data/palettes/hoi4_vanilla.palette.json": {
+      "byteLength": 203719,
+      "mainSha256": "a1c6e52e3c87de2399f2c9cfaeecf889fa3a1603414dcacc0b9c448b418f5578",
+      "mode": "copy",
+      "sha256": "a1c6e52e3c87de2399f2c9cfaeecf889fa3a1603414dcacc0b9c448b418f5578",
+      "snapshot": "data/palettes/hoi4_vanilla.palette.json.gz"
+    },
+    "data/physical_region_labels.geojson": {
+      "byteLength": 133923,
+      "mainSha256": "c47ad8c0c5a448c3883224e6bee948e86f10f0958b9c67029984a4a6e03277c0",
+      "mode": "copy",
+      "sha256": "c47ad8c0c5a448c3883224e6bee948e86f10f0958b9c67029984a4a6e03277c0",
+      "snapshot": "data/physical_region_labels.geojson.gz"
+    },
+    "data/world_cities.geojson": {
+      "byteLength": 22917481,
+      "mainSha256": "de84fc18ffe82741c73a0f1e105a4c77e11ca1ff35546af8d911c774ad9a8655",
+      "mode": "copy",
+      "sha256": "de84fc18ffe82741c73a0f1e105a4c77e11ca1ff35546af8d911c774ad9a8655",
+      "snapshot": "data/world_cities.geojson.gz"
+    },
+    "derived/ne_10m_admin_1_states_provinces.review_records.json": {
+      "byteLength": 63647,
+      "mainSha256": "7903d308da704c16159cc641f2cca9b2d6670c5d99b7a6d9e2fd2afca74fafe3",
+      "mode": "copy",
+      "sha256": "7903d308da704c16159cc641f2cca9b2d6670c5d99b7a6d9e2fd2afca74fafe3",
+      "snapshot": "derived/ne_10m_admin_1_states_provinces.review_records.json.gz"
+    },
+    "js/core/city_lights_modern_asset.js": {
+      "byteLength": 834442,
+      "mainSha256": "d2438a7372c12411e048ea95fc55758fd4c95a1089547f54dd36258d60555dae",
+      "mode": "copy",
+      "sha256": "d2438a7372c12411e048ea95fc55758fd4c95a1089547f54dd36258d60555dae",
+      "snapshot": "js/core/city_lights_modern_asset.js.gz"
+    },
+    "js/core/state_defaults.js": {
+      "byteLength": 61173,
+      "mainSha256": "919b1e871fb86aac5afb3694a96ce0c3c0ab741e0a23ebbef968fda27746e878",
+      "mode": "copy",
+      "sha256": "919b1e871fb86aac5afb3694a96ce0c3c0ab741e0a23ebbef968fda27746e878",
+      "snapshot": "js/core/state_defaults.js.gz"
+    }
+  },
+  "mainCommit": "6cbf40879ff27d0af504c5315d0c560f7fe4e7fe",
+  "schemaVersion": 1
+}

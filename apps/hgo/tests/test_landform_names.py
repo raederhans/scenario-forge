@@ -7,6 +7,7 @@ import unittest
 TOOLS = Path(__file__).resolve().parents[1] / 'tools'
 sys.path.insert(0, str(TOOLS))
 import build_geographic_overlays as geo
+import main_sources
 
 
 class LandformNameTests(unittest.TestCase):
@@ -17,11 +18,11 @@ class LandformNameTests(unittest.TestCase):
             root = Path(temporary)
             output = root / 'apps/hgo/assets/overlays/geography'
             local = root / 'apps/hgo/assets/overlays/localization'
-            for path in (output, local, root / 'data'):
+            for path in (output, local):
                 path.mkdir(parents=True, exist_ok=True)
             source = dict(id='n1', name_en='North-Estonian Coastal Plain', name_zh='波羅的海平原')
-            (root / 'data/physical_region_labels.geojson').write_bytes(
-                geo.encoded(dict(features=[dict(properties=source)])))
+            main_sources.pin(root, 'data/physical_region_labels.geojson',
+                             geo.encoded(dict(features=[dict(properties=source)])))
             (local / 'TSPhrases.txt').write_text('愛沙尼亞\t爱沙尼亚\n', encoding='utf8')
             (local / 'TSCharacters.txt').write_text('羅\t罗\n', encoding='utf8')
             review = dict(schemaVersion=1, entries=[dict(
