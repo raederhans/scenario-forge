@@ -1,6 +1,7 @@
 import {
   buildProjectedBounds,
   computeProjectedCoordinateBounds as computeCoordinateBounds,
+  isCompactLonLatGeometry,
 } from "./projected_coordinate_bounds.js";
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import {
@@ -220,12 +221,15 @@ export function createProjectedGeometryBoundsOwner({
     if (cached) return cached;
     try {
       const area = Number(d3.geoArea(normalizedGeoObject));
-      const bounds = d3.geoBounds(normalizedGeoObject);
+      const hasExcessiveSphereArea = Number.isFinite(area) && area > sphericalGeometryMaxArea;
+      // Bounds only label rejected geometry; skip them when they cannot matter.
+      const bounds = hasExcessiveSphereArea || !isCompactLonLatGeometry(normalizedGeoObject, sphericalGeometryMaxArea)
+        ? d3.geoBounds(normalizedGeoObject) : null;
       const diagnostics = {
         area,
         bounds,
         isWorldBounds: isWorldBounds(bounds),
-        hasExcessiveSphereArea: Number.isFinite(area) && area > sphericalGeometryMaxArea,
+        hasExcessiveSphereArea,
       };
       diagnostics.invalid = diagnostics.isWorldBounds || diagnostics.hasExcessiveSphereArea;
       sphericalGeometryDiagnosticsByGeometry.set(geometry, diagnostics);
