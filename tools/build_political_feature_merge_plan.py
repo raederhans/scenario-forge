@@ -20,6 +20,9 @@ STRATEGIC_SCENARIOS = ("hoi4_1936", "hoi4_1939")
 RIVER_PARTITIONS = DATA / "river_partitions"
 CHINA_CROSSWALK = DATA / "quick_fill/china_prefecture_crosswalk.v1.json"
 ADJACENCY_TOPOLOGY = DATA / "scenarios/tno_1962/runtime_topology.topo.json.gz"
+# Every topology the apply tool rewrites; a merge must not mix precision and ordinary parcels.
+PRECISION_TOPOLOGIES = (DATA / "europe_topology.na_v2.json", DATA / "europe_topology.runtime_political_v1.json",
+                        *sorted(DATA.glob("scenarios/*/runtime_topology.topo.json*")))
 
 
 def read_json(path: Path):
@@ -58,6 +61,10 @@ def load_assignment_tables() -> dict[str, dict]:
     for scenario in STRATEGIC_SCENARIOS:
         payload = read_json(DATA / f"scenarios/{scenario}/strategic_values.by_feature.json")
         tables[f"{scenario}:strategic_bucket"] = payload["bucket_by_feature"]
+    for path in PRECISION_TOPOLOGIES:
+        precision = read_json(path).get("political_precision_feature_ids")
+        if precision is not None:
+            tables[f"{path.relative_to(DATA).as_posix()}:precision"] = dict.fromkeys(precision, True)
     tables["china_prefecture"] = china_prefectures()
     return tables
 
@@ -195,7 +202,7 @@ def build_plan(candidates_path: Path) -> dict:
         "plan_id": candidates_path.name.replace(".candidates.json", ".v1"),
         "candidate_source": candidates_path.relative_to(ROOT).as_posix(),
         "constraints": ["owners", "cores", "strategic_value_buckets", "hierarchy_groups", "quick_fill_groups",
-                        "china_crosswalk_prefecture", "river_paint_parcels_unchanged", "contiguous"],
+                        "china_crosswalk_prefecture", "precision_tier", "river_paint_parcels_unchanged", "contiguous"],
         "ownership_scenarios": list(OWNERSHIP_SCENARIOS),
         "strategic_scenarios": list(STRATEGIC_SCENARIOS),
         "counts": {"candidates": len(candidates["candidates"]), "groups": len(groups),
