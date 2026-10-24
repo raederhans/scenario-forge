@@ -309,11 +309,11 @@
       "artifact_class": "publish",
       "child_count": 9813,
       "description": "Hierarchy and grouping data consumed by scenario and inspector flows.",
-      "group_count": 1521,
+      "group_count": 1525,
       "owner": "init_map_data.hierarchy_locales",
       "role": "hierarchy",
-      "sha256": "3e067a6de5596e83e7f15b2dac493b10bc8666bb941a2351a5f89cb4ae135e6e",
-      "size_bytes": 545864,
+      "sha256": "be9e7b1a3f21f4fa88b3fb0fcbef6c745e13632b416a7172a68241661d23dbea",
+      "size_bytes": 546107,
       "type": "hierarchy"
     },
     "js/core/city_lights_historical_1930_asset.js": {
