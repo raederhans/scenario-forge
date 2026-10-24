@@ -11,12 +11,23 @@ export function readPoliticalIdRasterPreference({ search = globalThis.location?.
   catch { return false; }
 }
 
+// Renderer slices check the policy between steps; parse each search string once.
+let parsedSearch = null;
+function readSearchPolicy(search) {
+  if (parsedSearch?.search !== search) {
+    const params = new URLSearchParams(search);
+    parsedSearch = { search, mode: params.get("political_render_mode"),
+      hasLegacy: params.has("political_id_raster"), legacy: params.get("political_id_raster") };
+  }
+  return parsedSearch;
+}
+
 /** TNO uses the resident raster scene by default; the numeric trial remains hybrid. */
 export function readPoliticalRenderPolicy({ search = globalThis.location?.search || "", storage, scenarioId = "" } = {}) {
-  const params = new URLSearchParams(search);
-  let value = params.get("political_render_mode"), preferenceSource = "url";
-  if (value === null && params.has("political_id_raster")) {
-    value = params.get("political_id_raster") === "1" ? "hybrid" : "vector";
+  const params = readSearchPolicy(search);
+  let value = params.mode, preferenceSource = "url";
+  if (value === null && params.hasLegacy) {
+    value = params.legacy === "1" ? "hybrid" : "vector";
     preferenceSource = "legacy-url";
   }
   if (value === null) {
@@ -64,12 +75,14 @@ export function writePoliticalIdRasterPreference(enabled) {
   }
 }
 
-export function getPoliticalIdRasterEligibility({ requested, exporting, debugMode, ready, firstVisible, readonly, unlocking, riverPartitions, scenarioId }) {
+export function getPoliticalIdRasterEligibility({ requested, exporting, debugMode, firstVisible, riverPartitions, scenarioId }) {
   if (!requested) return "off";
   if (!["hoi4_1936", "hoi4_1939", "tno_1962"].includes(scenarioId)) return "unsupported-scenario";
   if (exporting) return "export";
   if (debugMode !== "PROD") return "debug-mode";
-  if (!ready || !firstVisible || readonly || unlocking) return "startup";
+  // Read-only startup may use the raster once a frame is visible: otherwise a
+  // full vector pass is drawn first and replaced by the raster seconds later.
+  if (!firstVisible) return "startup";
   if (riverPartitions) return "river-partitions";
   return "eligible";
 }

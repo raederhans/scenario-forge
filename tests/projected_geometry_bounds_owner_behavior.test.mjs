@@ -510,7 +510,7 @@ test("spherical diagnostics cache d3 results by geo object identity", () => {
   assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
 });
 
-test("spherical diagnostics share geometry across wrappers and invalidate on revision", () => {
+test("spherical diagnostics share geometry across wrappers and survive context revisions", () => {
   const diagnostics = createD3Diagnostics();
   const { owner, harnessStore } = createHarness({ d3: diagnostics.d3 });
   const geometry = createPolygon([10, 0]);
@@ -519,12 +519,11 @@ test("spherical diagnostics share geometry across wrappers and invalidate on rev
   assert.equal(owner.getSphericalGeometryDiagnostics(geometry), first);
   assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
 
-  geometry.coordinates[0][0][0] = 999;
   harnessStore.contextLayerRevision = 1;
-  assert.equal(owner.getSphericalGeometryDiagnostics(geometry).invalid, true);
+  assert.equal(owner.getSphericalGeometryDiagnostics(geometry), first);
+  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 }, "a chunk swap must not re-diagnose unchanged geometry");
+  assert.equal(owner.getSphericalGeometryDiagnostics(createFeature("A", createPolygon([999, 0]))).invalid, true);
   assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
-  assert.equal(owner.getSphericalGeometryDiagnostics(createFeature("A", createPolygon([10, 0]))).invalid, false);
-  assert.deepEqual(diagnostics.calls, { geoArea: 3, geoBounds: 3 });
 });
 
 test("water part info shares geometry across wrappers without IDs", () => {
@@ -749,17 +748,16 @@ test("water sanitization reuses an unchanged feature sequence and refreshes repl
   assert.deepEqual(owner.sanitizeWaterRegionFeatures([water]), []);
   assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
 
-  water.geometry.coordinates[0][0][0] = 10;
   harnessStore.contextLayerRevision = 1;
-  assert.deepEqual(owner.sanitizeWaterRegionFeatures([water]), [water]);
-  assert.deepEqual(diagnostics.calls, { geoArea: 3, geoBounds: 3 });
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([water]), []);
+  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 }, "a context revision alone keeps the result");
 
-  const replacement = createFeature("WATER", createPolygon([999, 0]));
-  assert.deepEqual(owner.sanitizeWaterRegionFeatures([replacement]), []);
-  assert.deepEqual(diagnostics.calls, { geoArea: 4, geoBounds: 4 });
+  const replacement = createFeature("WATER", createPolygon([20, 0]));
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([replacement]), [replacement]);
+  assert.deepEqual(diagnostics.calls, { geoArea: 3, geoBounds: 3 });
 });
 
-test("water sanitation retains overview across two detail sets and invalidates on context or scenario change", () => {
+test("water sanitation retains overview across two detail sets and context revisions, and invalidates on geometry change", () => {
   const diagnostics = createD3Diagnostics();
   const { owner, harnessStore } = createHarness({ d3: diagnostics.d3 });
   const coarseA = createFeature("COARSE_A", createPolygon([10, 0]));
@@ -775,13 +773,29 @@ test("water sanitation retains overview across two detail sets and invalidates o
   assert.deepEqual(restored, coarse);
   assert.deepEqual(diagnostics.calls, { geoArea: 4, geoBounds: 4 });
 
-  coarseA.geometry.coordinates[0][0][0] = 999;
   harnessStore.contextLayerRevision = 1;
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([coarseA, coarseB]), coarse);
+  assert.deepEqual(diagnostics.calls, { geoArea: 4, geoBounds: 4 });
+  coarseA.geometry = createPolygon([999, 0]);
   assert.deepEqual(owner.sanitizeWaterRegionFeatures([coarseA, coarseB]), [coarseB]);
-  assert.deepEqual(diagnostics.calls, { geoArea: 6, geoBounds: 6 });
+  assert.deepEqual(diagnostics.calls, { geoArea: 5, geoBounds: 5 });
   harnessStore.activeScenarioId = "other";
   owner.sanitizeWaterRegionFeatures([detail]);
   assert.deepEqual(owner.sanitizeWaterRegionFeatures([coarseA, coarseB]), [coarseB]);
+});
+
+test("context revisions release decoded water snapshots but keep live geometry diagnostics", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner, harnessStore } = createHarness({ d3: diagnostics.d3 });
+  const water = createFeature("WATER", createPolygon([10, 0]));
+  owner.sanitizeWaterRegionFeatures([water]);
+  harnessStore.contextLayerRevision = 1;
+  const redecoded = structuredClone(water);
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([redecoded]), [redecoded],
+    "after the snapshot is released a redecoded copy is sanitized on its own");
+  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([water]), [water]);
+  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 }, "live geometry keeps its diagnostics");
 });
 
 test("redecoded equal water coordinates reuse safe geometry while changed points and order recompute", () => {

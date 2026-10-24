@@ -26,6 +26,12 @@ export function appendIntensityFieldPointState(target, channelId, point) {
 }
 export function normalizeIntensityFieldsIntoState(target) {
   assertTarget(target);
+  // 已解码的运行时状态本身就是归一化结果。面板每次刷新都会调用这里，
+  // 先克隆整份 Float32Array 网格再得到相同的值，既慢又会替换网格引用。
+  if (target.intensityFields
+    && normalizeIntensityFieldsState(target.intensityFields) === target.intensityFields) {
+    return target.intensityFields;
+  }
   const current = structuredClone(target.intensityFields);
   return commitIntensityFieldsState(target, normalizeIntensityFieldsState(current));
 }

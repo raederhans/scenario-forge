@@ -190,11 +190,14 @@ test("capture handles expire before replay and asynchronous draw callbacks are r
   assert.deepEqual(h.events, [["yield"]]);
 });
 
-test("capture may use scheduler.yield but fence polling always uses timer tasks", async () => {
+test("capture yields at background priority but fence polling always uses timer tasks", async () => {
   const h = harness(), previous = Object.getOwnPropertyDescriptor(globalThis, "scheduler");
   const previousTimeout = globalThis.setTimeout;
-  let yields = 0, timers = 0;
-  Object.defineProperty(globalThis, "scheduler", { configurable: true, value: { async yield() { yields++; } } });
+  const priorities = [];
+  let timers = 0;
+  Object.defineProperty(globalThis, "scheduler", { configurable: true, value: {
+    async postTask(callback, options) { priorities.push(options?.priority); return callback(); },
+  } });
   globalThis.setTimeout = (callback, delay, ...args) => {
     timers++; assert.equal(delay, 0);
     return previousTimeout(callback, delay, ...args);
@@ -203,7 +206,7 @@ test("capture may use scheduler.yield but fence polling always uses timer tasks"
     const { yieldTask, yieldFenceTask, ...options } = h.options;
     h.options.yieldFenceTask = () => new Promise(resolve => setTimeout(resolve, 0));
     await runCanvasDrawBatches({ ...options, draw(context) { context.fill({}); } });
-    assert.equal(yields, 1, "only the initial capture slice uses scheduler continuation priority");
+    assert.deepEqual(priorities, ["background"], "only the initial capture slice goes through the background scheduler");
     assert.equal(timers, 2, "both zero-timeout fence polls yield through independent timer tasks");
   } finally {
     globalThis.setTimeout = previousTimeout;

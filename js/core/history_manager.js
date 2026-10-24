@@ -24,7 +24,7 @@ import {
 import { restoreSpecialZoneSnapshotState } from "./state/actions/special_zone_actions.js";
 import { markDirty } from "./dirty_state.js";
 import { flushRenderBoundary } from "./render_boundary.js";
-import { callRuntimeHook, callRuntimeHooks } from "./state/index.js";
+import { callRuntimeHook, requestRuntimeHookAfterPaint } from "./state/index.js";
 const state = runtimeState;
 
 function uniqueKeys(values) {
@@ -261,6 +261,8 @@ function canRefreshWaterColorHistoryLocally(ids) {
   });
 }
 
+const AFTER_PAINT_HISTORY_UI_HOOKS = new Set(["updateSwatchUIFn", "updateToolbarInputsFn", "updateStrategicOverlayUIFn"]);
+
 function refreshUiAfterHistory(direction, entry) {
   // undo/redo 之后统一从这里补 UI 和 render side effects，
   // 调用方只负责准备 before/after，不要在外面各自手写半套刷新逻辑。
@@ -307,7 +309,11 @@ function refreshUiAfterHistory(direction, entry) {
       "updateLegendUI",
       "updateStrategicOverlayUIFn",
     ];
-  callRuntimeHooks(state, uiHooks);
+  // 色板、工具栏输入和战略标注面板重建较重，等撤销后的地图先上屏。
+  uiHooks.forEach((hookName) => {
+    if (AFTER_PAINT_HISTORY_UI_HOOKS.has(hookName)) requestRuntimeHookAfterPaint(state, hookName);
+    else callRuntimeHook(state, hookName);
+  });
   flushHistoryRender(`history-${direction}`);
 }
 

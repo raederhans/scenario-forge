@@ -66,6 +66,8 @@ class HistoryManagerStrategicOverlayContractTest(unittest.TestCase):
             const { state } = await import("./js/core/state.js");
             const { bindRenderBoundary } = await import("./js/core/render_boundary.js");
             const { captureHistoryState, pushHistoryEntry, undoHistory, redoHistory } = await import("./js/core/history_manager.js");
+            // 撤销后的色板、工具栏和战略标注面板在下一次绘制后刷新（rAF 之后的 timer）。
+            const afterPaint = () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
 
             const calls = {
               overlayUi: 0,
@@ -166,6 +168,7 @@ class HistoryManagerStrategicOverlayContractTest(unittest.TestCase):
             });
 
             undoHistory();
+            await afterPaint();
             const afterUndo = {
               operationalLines: JSON.parse(JSON.stringify(state.operationalLines)),
               overlayUiCalls: calls.overlayUi,
@@ -178,6 +181,7 @@ class HistoryManagerStrategicOverlayContractTest(unittest.TestCase):
             };
 
             redoHistory();
+            await afterPaint();
             const afterRedo = {
               operationalLines: JSON.parse(JSON.stringify(state.operationalLines)),
               overlayUiCalls: calls.overlayUi,
@@ -251,6 +255,8 @@ class HistoryManagerStrategicOverlayContractTest(unittest.TestCase):
             const { createIntensityFieldsState, sampleIntensityField } = await import("./js/core/intensity_field.js");
             const { updateIntensityFieldChannel } = await import("./js/core/state/intensity_field_state.js");
             const { captureHistoryState, pushHistoryEntry, undoHistory, redoHistory } = await import("./js/core/history_manager.js");
+            // 撤销后的色板、工具栏和战略标注面板在下一次绘制后刷新（rAF 之后的 timer）。
+            const afterPaint = () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
 
             const calls = { toolbar: 0, flushes: [] };
             bindRenderBoundary({
@@ -305,6 +311,7 @@ class HistoryManagerStrategicOverlayContractTest(unittest.TestCase):
 
             pushHistoryEntry({ before, after, meta: { kind: "intensity-field-channel" } });
             undoHistory();
+            await afterPaint();
             const afterUndo = {
               pointId: state.intensityFields.channels.physicalAtlas.points[0].id,
               sample: sampleIntensityField(state.intensityFields, "physicalAtlas", 10, 46),
@@ -312,6 +319,7 @@ class HistoryManagerStrategicOverlayContractTest(unittest.TestCase):
               contourSample: sampleIntensityField(state.intensityFields, "physicalContour", -20, 10),
             };
             redoHistory();
+            await afterPaint();
             const afterRedo = {
               pointId: state.intensityFields.channels.physicalAtlas.points[0].id,
               sample: sampleIntensityField(state.intensityFields, "physicalAtlas", 10, 46),

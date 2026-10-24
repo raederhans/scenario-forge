@@ -26,6 +26,41 @@ const handlerFnsByHookName = new Map();
 const handlerDispatchersByHookName = new Map();
 const compatTargets = new WeakSet();
 
+// 渲染、分片提升、撤销这些热路径里的面板刷新经 requestRuntimeHookAfterPaint 请求，
+// 在下一次绘制之后执行；同一帧里的多次请求只刷新一次，地图像素先上屏。
+// 直接调用钩子（用户操作、测试里的显式刷新）仍然同步执行。
+const pendingAfterPaintHooks = new Map();
+let afterPaintFlushScheduled = false;
+
+function flushAfterPaintNotifications() {
+  afterPaintFlushScheduled = false;
+  const requests = [...pendingAfterPaintHooks];
+  pendingAfterPaintHooks.clear();
+  requests.forEach(([hookName, target]) => {
+    try {
+      target[hookName]?.();
+    } catch (error) {
+      // 一个面板出错不拦住其余面板，但错误仍要作为未捕获异常上报。
+      if (typeof globalThis.reportError === "function") globalThis.reportError(error);
+      else globalThis.setTimeout(() => { throw error; }, 0);
+    }
+  });
+}
+
+function deferNotificationAfterPaint(target, hookName) {
+  const requestFrame = globalThis.requestAnimationFrame;
+  const setTimer = globalThis.setTimeout;
+  // 没有帧调度的环境（Node 测试、worker）保持同步语义。
+  if (typeof requestFrame !== "function" || typeof setTimer !== "function") return false;
+  pendingAfterPaintHooks.set(hookName, target);
+  if (!afterPaintFlushScheduled) {
+    afterPaintFlushScheduled = true;
+    // 帧回调里排的 timer 会在这一帧绘制之后才运行。
+    requestFrame(() => setTimer(flushAfterPaintNotifications, 0));
+  }
+  return true;
+}
+
 // Runtime hook 分为通知型 bus 和有返回值的 handler；两类共享注册入口，但分发语义分开维护。
 function normalizeRuntimeHook(hook) {
   return typeof hook === "function" ? hook : null;
@@ -115,6 +150,16 @@ export function emitRuntimeHookBusEvent(_target, hookName, ...args) {
     return [];
   }
   return emit(STATE_BUS_EVENTS[normalizedHookName], packRuntimeHookArgs(args));
+}
+
+export function requestRuntimeHookAfterPaint(target, hookName) {
+  const normalizedHookName = String(hookName || "").trim();
+  if (!isRuntimeHookBusEventName(normalizedHookName)) {
+    throw new TypeError(`After-paint requests take a notification hook: ${normalizedHookName}`);
+  }
+  // 和原来的 target.hookFn?.() 调用一致，只改变执行时机。
+  if (!target || deferNotificationAfterPaint(target, normalizedHookName)) return;
+  target[normalizedHookName]?.();
 }
 
 export function emitStateBusEvent(eventName, payload) {
