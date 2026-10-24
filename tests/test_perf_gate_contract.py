@@ -144,8 +144,8 @@ function git {
 
     def test_bounded_ui_observes_without_merge_waiting_but_mixed_and_strict_changes_wait(self):
         files = ["js/ui/styled_selects.js", "tests/styled_selects_behavior.test.mjs", "docs/ui/guide.md"]
-        for extra, labels, required in (([], [], False), (["js/core/map_renderer.js"], [], True),
-                                        (["data/unknown.json"], [], True), ([], ["ci:perf-strict"], True)):
+        for extra, labels, required in (([], [], False), (["js/core/map_renderer.js"], [], False),
+                                        (["data/unknown.json"], [], False), ([], ["ci:perf-strict"], True)):
             with self.subTest(extra=extra, labels=labels):
                 audit = self.classify(files + extra, labels=labels)
                 self.assertTrue(audit["should_run_perf"])

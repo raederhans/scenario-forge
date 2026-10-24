@@ -85,7 +85,10 @@ export function classifyPerformance({ changedFiles = [], labels = [], force = fa
   const explicitStrict = labelSet.has("ci:perf-strict") || labelSet.has("ci:full");
   const perfMode = force || explicitStrict ? "strict" : rules.length ? "sample" : "skip";
   const shouldRunPerf = perfMode !== "skip";
-  const requiredForMerge = shouldRunPerf && (perfMode === "strict" || !isBoundedUiChange(files));
+  // Sample runs never enforce regressions, so waiting on them blocked merges
+  // without protecting anything. They stay as non-blocking observations; only an
+  // explicit strict request (label, force or schedule) is a merge requirement.
+  const requiredForMerge = perfMode === "strict";
   const enforced = rules.filter(rule => rule.regression_policy === "enforce").map(rule => rule.name);
   return {
     matched_rules: rules,
