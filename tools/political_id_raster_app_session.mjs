@@ -37,6 +37,34 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
       // Faults exist only in this isolated test context; production deadlines
       // and recovery policy remain untouched.
       window.__rasterAssetFaults = { active: holdRasterAssets && sessionStorage.getItem('raster-release-faults-complete') !== '1', recoveryTimeouts: 0, intercepted: 0, aborted: 0 };
+      if (!window.__rasterAssetFaults.active) return;
+      // Covered Worker output is persisted on idle. If that save lands before
+      // the first recovery probe, the probe reads it back and never reaches the
+      // held network request. Open the asset database only after that probe
+      // has timed out, so the faulted window has no persistent shortcut.
+      const factory = globalThis.indexedDB, open = factory.open.bind(factory);
+      const faultsPending = () => {
+        const faults = window.__rasterAssetFaults;
+        if (faults.active) return true;
+        if (faults.recoveryTimeouts <= 0 || !faults.protectedState) return false;
+        const current = window.__rasterTask?.renderer.getPoliticalIdRasterDiagnostics();
+        return !(current?.assetTimeouts >= faults.protectedState.assetTimeouts + 1);
+      };
+      const handlers = ["upgradeneeded", "success", "error", "blocked"];
+      factory.open = (name, version) => {
+        if (name !== "political-id-raster-assets-v1" || !faultsPending()) return open(name, version);
+        let request = null;
+        const deferred = Object.fromEntries(handlers.map(type => [`on${type}`, null]));
+        Object.defineProperty(deferred, "result", { get: () => request?.result });
+        Object.defineProperty(deferred, "error", { get: () => request?.error ?? null });
+        const poll = setInterval(() => {
+          if (faultsPending()) return;
+          clearInterval(poll);
+          request = open(name, version);
+          for (const type of handlers) request[`on${type}`] = event => deferred[`on${type}`]?.(event);
+        }, 20);
+        return deferred;
+      };
     }, { savedPreference, language, holdRasterAssets });
     if (holdRasterAssets) {
       const held = new Set();
@@ -82,11 +110,11 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
 }
 
 // Initial navigation and cache reload share the same startup boundary.
-export async function waitRasterStartup(page) {
+export async function waitRasterStartup(page, { timeout = 60000 } = {}) {
   await page.waitForFunction(() => {
     const s = window.__rasterTask.state;
     return s.bootPhase === "ready" && !s.startupReadonly && !s.startupReadonlyUnlockInFlight && !s.scenarioApplyInFlight;
-  }, null, { timeout: 60000 });
+  }, null, { timeout });
 }
 
 export async function selectRasterScenario(page, scenarioId) {
@@ -98,14 +126,14 @@ export async function selectRasterScenario(page, scenarioId) {
   await waitRasterView(page, scenarioId);
 }
 
-export async function waitRasterView(page, scenarioId) {
+export async function waitRasterView(page, scenarioId, { timeout = 60000 } = {}) {
   await page.waitForFunction(id => {
     const { renderer, state } = window.__rasterTask;
     const d = renderer.getPoliticalIdRasterDiagnostics();
     return state.activeScenarioId === id && !state.scenarioApplyInFlight && !state.startupReadonly
       && d.selected && !d.pending && d.commits > 0 && !d.failed && d.view
       && ["x", "y", "k"].every(key => Math.abs(d.view[key] - state.zoomTransform[key]) < 1e-7);
-  }, scenarioId, { timeout: 60000 });
+  }, scenarioId, { timeout });
 }
 
 export async function captureRasterView(page, scenarioId, zoom) {
