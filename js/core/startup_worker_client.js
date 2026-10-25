@@ -8,6 +8,8 @@ const STARTUP_WORKER_TIMEOUTS_MS = Object.freeze({
   LOAD_STARTUP_BUNDLE: 45_000,
   LOAD_SCENARIO_RUNTIME_BOOTSTRAP: 30_000,
   DECODE_RUNTIME_CHUNK: 30_000,
+  // Covers downloading the ~90 MB detail topology on a slow connection.
+  LOAD_DETAIL_TOPOLOGY: 180_000,
 });
 
 const MESSAGE_TYPES = Object.freeze({
@@ -15,15 +17,17 @@ const MESSAGE_TYPES = Object.freeze({
   LOAD_STARTUP_BUNDLE: "LOAD_STARTUP_BUNDLE",
   LOAD_SCENARIO_RUNTIME_BOOTSTRAP: "LOAD_SCENARIO_RUNTIME_BOOTSTRAP",
   DECODE_RUNTIME_CHUNK: "DECODE_RUNTIME_CHUNK",
+  LOAD_DETAIL_TOPOLOGY: "LOAD_DETAIL_TOPOLOGY",
   BASE_STARTUP_READY: "BASE_STARTUP_READY",
   STARTUP_BUNDLE_READY: "STARTUP_BUNDLE_READY",
   SCENARIO_RUNTIME_BOOTSTRAP_READY: "SCENARIO_RUNTIME_BOOTSTRAP_READY",
   RUNTIME_CHUNK_READY: "RUNTIME_CHUNK_READY",
+  DETAIL_TOPOLOGY_READY: "DETAIL_TOPOLOGY_READY",
   ERROR: "ERROR",
 });
 
 let taskCounter = 0;
-const startupWorkerTaskClient = createWorkerTaskClient({
+const createStartupWorkerTaskClient = () => createWorkerTaskClient({
   createWorker: () => new Worker(STARTUP_WORKER_URL),
   createTaskId: (type) => `${type}:${Date.now()}:${++taskCounter}`,
   resolveTimeoutMs: resolveTaskTimeoutMs,
@@ -50,6 +54,7 @@ const startupWorkerTaskClient = createWorkerTaskClient({
       : new Error(event?.message || "Startup worker crashed.")
   ),
 });
+const startupWorkerTaskClient = createStartupWorkerTaskClient();
 
 function getSearchParams(search = null) {
   try {
@@ -182,6 +187,21 @@ export async function decodeRuntimeChunkViaWorker({
     chunkPayload: message.chunkPayload || null,
     metrics: message.metrics || null,
   };
+}
+
+// Parsing the detail topology holds a worker for over half a second, so it runs
+// on its own instance instead of delaying chunk decodes queued on the shared
+// one. The instance ends with the task, releasing the worker's copy at once.
+export async function loadDetailTopologyViaWorker({ topologyUrl, timeoutMs = null } = {}) {
+  const client = createStartupWorkerTaskClient();
+  try {
+    const message = await client.dispatchTask(MESSAGE_TYPES.LOAD_DETAIL_TOPOLOGY, {
+      topologyUrl: resolveWorkerResourceUrl(topologyUrl),
+    }, { timeoutMs });
+    return { topology: message.topology || null, metrics: message.metrics || null };
+  } finally {
+    client.terminate(new Error("Detail topology worker finished."));
+  }
 }
 
 export function terminateStartupWorker() {
