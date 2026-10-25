@@ -22,6 +22,32 @@ function readSearchPolicy(search) {
   return parsedSearch;
 }
 
+function readStoredMode(store) {
+  try {
+    const value = store?.getItem(MODE_KEY) ?? null;
+    if (value !== null) return { value, source: "storage" };
+    const legacy = store?.getItem(KEY);
+    if (legacy !== null && legacy !== undefined) return { value: legacy === "1" ? "hybrid" : "vector", source: "legacy-storage" };
+  } catch { /* Blocked storage leaves the default. */ }
+  return { value: null, source: "default" };
+}
+
+// Each localStorage read is a synchronous lookup and the policy is consulted
+// many times per frame. Both keys are written only here; other tabs announce
+// their writes with a storage event.
+let storedMode = null;
+const forgetStoredMode = () => { storedMode = null; };
+globalThis.addEventListener?.("storage", event => {
+  if (event.key === null || event.key === MODE_KEY || event.key === KEY) forgetStoredMode();
+});
+function readDefaultStoredMode() {
+  let store = null;
+  try { store = globalThis.localStorage; } catch { /* Blocked storage leaves the default. */ }
+  // Without storage the store is undefined, which matches no cache at all.
+  if (!storedMode || storedMode.store !== store) storedMode = { store, ...readStoredMode(store) };
+  return storedMode;
+}
+
 /** TNO uses the resident raster scene by default; the numeric trial remains hybrid. */
 export function readPoliticalRenderPolicy({ search = globalThis.location?.search || "", storage, scenarioId = "" } = {}) {
   const params = readSearchPolicy(search);
@@ -30,20 +56,7 @@ export function readPoliticalRenderPolicy({ search = globalThis.location?.search
     value = params.legacy === "1" ? "hybrid" : "vector";
     preferenceSource = "legacy-url";
   }
-  if (value === null) {
-    try {
-      const store = storage ?? globalThis.localStorage;
-      value = store?.getItem(MODE_KEY) ?? null;
-      preferenceSource = "storage";
-      if (value === null) {
-        const legacy = store?.getItem(KEY);
-        if (legacy !== null && legacy !== undefined) {
-          value = legacy === "1" ? "hybrid" : "vector";
-          preferenceSource = "legacy-storage";
-        }
-      }
-    } catch { value = null; }
-  }
+  if (value === null) ({ value, source: preferenceSource } = storage == null ? readDefaultStoredMode() : readStoredMode(storage));
   if (value === null) { value = "auto"; preferenceSource = "default"; }
   const valid = MODES.has(value), mode = valid ? value : "vector";
   const automaticRasterEnabled = scenarioId === "tno_1962";
@@ -55,6 +68,7 @@ export function readPoliticalRenderPolicy({ search = globalThis.location?.search
 
 export function writePoliticalRenderMode(mode) {
   if (!MODES.has(mode)) throw new TypeError("Unknown political render mode.");
+  forgetStoredMode();
   try { globalThis.localStorage?.setItem(MODE_KEY, mode); } catch { /* URL still works. */ }
   if (globalThis.location && globalThis.history) {
     const url = new URL(globalThis.location.href);
@@ -66,6 +80,7 @@ export function writePoliticalRenderMode(mode) {
 
 export function writePoliticalIdRasterPreference(enabled) {
   const value = enabled ? "1" : "0";
+  forgetStoredMode();
   try { globalThis.localStorage?.setItem(KEY, value); globalThis.localStorage?.removeItem(MODE_KEY); } catch { /* Session URL remains usable. */ }
   if (globalThis.location && globalThis.history) {
     const url = new URL(globalThis.location.href);
