@@ -1,0 +1,1213 @@
+{
+  "schema_version": 1,
+  "candidate_set": "india_wave5_rest",
+  "description": "India, second round, division-level target of the 2026-10-25 research (HOI4 1936 candidates; area caps 12,000–45,000 km² by region, convex-hull fill ≥ 0.4, aspect ≤ 3.5). City hosts are protected for capitals, state capitals, major cities and at least 500,000 people; Ladakh, Jammu and Kashmir and Arunachal Pradesh stay locked. Scoped to blank, HOI4 1936/1939 and Modern World, the readers of the HOI4 vanilla releasable catalog; HOI4 states and river-paint packs apply. Parcels of the shared historical display presets stay unmerged.",
+  "protected_feature_ids": [
+    "AL011",
+    "AL012",
+    "AL013",
+    "AL014",
+    "AL015",
+    "AL021",
+    "AL022",
+    "AL031",
+    "AL032",
+    "AL033",
+    "AL034",
+    "AL035",
+    "CY000",
+    "DE211",
+    "DE212",
+    "DE213",
+    "DE214",
+    "DE215",
+    "DE216",
+    "DE219",
+    "DE21D",
+    "DE21F",
+    "DE21I",
+    "DE21J",
+    "DE21K",
+    "DE21M",
+    "DE222",
+    "DE223",
+    "DE224",
+    "DE225",
+    "DE226",
+    "DE228",
+    "DE229",
+    "DE22A",
+    "DE22B",
+    "DE232",
+    "DE233",
+    "DE235",
+    "DE236",
+    "DE237",
+    "DE238",
+    "DE239",
+    "DE23A",
+    "DE243",
+    "DE244",
+    "DE247",
+    "DE249",
+    "DE24A",
+    "DE24D",
+    "DE251",
+    "DE252",
+    "DE253",
+    "DE254",
+    "DE255",
+    "DE256",
+    "DE259",
+    "DE25A",
+    "DE261",
+    "DE263",
+    "DE264",
+    "DE265",
+    "DE266",
+    "DE267",
+    "DE269",
+    "DE26A",
+    "DE26C",
+    "DE271",
+    "DE272",
+    "DE273",
+    "DE274",
+    "DE275",
+    "DE276",
+    "DE277",
+    "DE278",
+    "DE279",
+    "DE27A",
+    "DE27B",
+    "DE27C",
+    "DE27D",
+    "DE27E",
+    "DE300",
+    "DE402",
+    "DE403",
+    "DE404",
+    "DE405",
+    "DE407",
+    "DE409",
+    "DE40B",
+    "DE40C",
+    "DE40F",
+    "DE40G",
+    "DE40I",
+    "DE803",
+    "DE804",
+    "DE80K",
+    "DE80M",
+    "DE80N",
+    "DE80O",
+    "DED21",
+    "DED2C",
+    "DED2D",
+    "DED2E",
+    "DED2F",
+    "DED41",
+    "DED42",
+    "DED43",
+    "DED44",
+    "DED45",
+    "DED51",
+    "DED52",
+    "DED53",
+    "DEE01",
+    "DEE02",
+    "DEE03",
+    "DEE04",
+    "DEE05",
+    "DEE06",
+    "DEE07",
+    "DEE08",
+    "DEE09",
+    "DEE0A",
+    "DEE0B",
+    "DEE0C",
+    "DEE0D",
+    "DEE0E",
+    "DEF01",
+    "DEF02",
+    "DEF03",
+    "DEF04",
+    "DEF06",
+    "DEF07",
+    "DEF08",
+    "DEF09",
+    "DEF0A",
+    "DEF0C",
+    "DEF0D",
+    "DEF0E",
+    "DEF0F",
+    "DE_MRG_08a36bff89a0",
+    "DE_MRG_171e39a343f9",
+    "DE_MRG_22b5c35ff0db",
+    "DE_MRG_348581c848f8",
+    "DE_MRG_3fb6d34d5cec",
+    "DE_MRG_54666399e0ac",
+    "DE_MRG_73019c3017aa",
+    "DE_MRG_88b2cc10d998",
+    "DE_MRG_a235cf36d16c",
+    "DE_MRG_bd0cf439de30",
+    "DE_MRG_bf419442ff08",
+    "DE_MRG_ce73c32b1090",
+    "DE_MRG_d4ab7c811a60",
+    "DE_MRG_d67a0e4a728d",
+    "DE_MRG_d7270b2f4f53",
+    "DE_MRG_ec3ed49e067c",
+    "DK014",
+    "DK_HIST_NORTH_SCHLESWIG",
+    "FR_ARR_04001",
+    "FR_ARR_04002",
+    "FR_ARR_04003",
+    "FR_ARR_04004",
+    "FR_ARR_05001",
+    "FR_ARR_05002",
+    "FR_ARR_06001",
+    "FR_ARR_06002",
+    "FR_ARR_22001",
+    "FR_ARR_22003",
+    "FR_ARR_29001",
+    "FR_ARR_2A001",
+    "FR_ARR_2A004",
+    "FR_ARR_2B002",
+    "FR_ARR_2B003",
+    "FR_ARR_2B005",
+    "FR_ARR_35001",
+    "FR_ARR_35002",
+    "FR_ARR_35003",
+    "FR_ARR_35004",
+    "FR_ARR_56001",
+    "FR_ARR_56002",
+    "FR_ARR_56003",
+    "FR_ARR_57003",
+    "FR_ARR_57005",
+    "FR_ARR_57006",
+    "FR_ARR_57007",
+    "FR_ARR_57009",
+    "FR_ARR_67002",
+    "FR_ARR_67003",
+    "FR_ARR_67004",
+    "FR_ARR_67005",
+    "FR_ARR_67008",
+    "FR_ARR_68001",
+    "FR_ARR_68002",
+    "FR_ARR_68004",
+    "FR_ARR_68006",
+    "FR_ARR_73001",
+    "FR_ARR_73002",
+    "FR_ARR_73003",
+    "FR_ARR_74001",
+    "FR_ARR_74002",
+    "FR_ARR_74003",
+    "FR_ARR_74004",
+    "FR_MRG_5b1fca32ff2c",
+    "FR_MRG_6d703ee3f8dc",
+    "GR_ADM1_GRC-2883",
+    "GR_ADM1_GRC-2990",
+    "GR_ADM1_GRC-3013",
+    "HR033",
+    "HR034",
+    "HR035",
+    "HR037",
+    "ITC11",
+    "ITC12",
+    "ITC13",
+    "ITC14",
+    "ITC15",
+    "ITC16",
+    "ITC17",
+    "ITC18",
+    "ITC20",
+    "ITC31",
+    "ITC32",
+    "ITC33",
+    "ITC34",
+    "ITC41",
+    "ITC42",
+    "ITC43",
+    "ITC44",
+    "ITC46",
+    "ITC47",
+    "ITC48",
+    "ITC49",
+    "ITC4A",
+    "ITC4B",
+    "ITC4C",
+    "ITC4D",
+    "ITF11",
+    "ITF12",
+    "ITF13",
+    "ITF14",
+    "ITF21",
+    "ITF22",
+    "ITF31",
+    "ITF32",
+    "ITF33",
+    "ITF34",
+    "ITF35",
+    "ITF43",
+    "ITF44",
+    "ITF45",
+    "ITF46",
+    "ITF47",
+    "ITF48",
+    "ITF51",
+    "ITF52",
+    "ITF61",
+    "ITF62",
+    "ITF63",
+    "ITF64",
+    "ITF65",
+    "ITG11",
+    "ITG12",
+    "ITG13",
+    "ITG14",
+    "ITG15",
+    "ITG16",
+    "ITG17",
+    "ITG18",
+    "ITG19",
+    "ITG2D",
+    "ITG2E",
+    "ITG2F",
+    "ITG2G",
+    "ITG2H",
+    "ITH31",
+    "ITH32",
+    "ITH33",
+    "ITH34",
+    "ITH35",
+    "ITH36",
+    "ITH37",
+    "ITH41",
+    "ITH42",
+    "ITH43",
+    "ITH44",
+    "ITI11",
+    "ITI12",
+    "ITI13",
+    "ITI14",
+    "ITI15",
+    "ITI16",
+    "ITI17",
+    "ITI18",
+    "ITI19",
+    "ITI1A",
+    "ITI41",
+    "ITI42",
+    "ITI43",
+    "ITI44",
+    "ITI45",
+    "LU_ADM1_LUX-906",
+    "LU_ADM1_LUX-907",
+    "LU_ADM1_LUX-908",
+    "MC_ADMIN0_PASSTHROUGH",
+    "ME_ADM1_MNE-1506",
+    "ME_ADM1_MNE-1507",
+    "ME_ADM1_MNE-1518",
+    "MT001",
+    "MT002",
+    "RUS-2279",
+    "RUS-2280",
+    "RUS-2303",
+    "RUS-2304",
+    "RUS-2305",
+    "RUS-2306",
+    "RUS-2333",
+    "RUS-2334",
+    "RUS-2335",
+    "RUS-2336",
+    "RUS-2337",
+    "RUS-2342",
+    "RUS-2343",
+    "RUS-2353",
+    "RUS-2354",
+    "RUS-2355",
+    "RUS-2356",
+    "RUS-2358",
+    "RUS-2359",
+    "RUS-2360",
+    "RUS-2364",
+    "RUS-2365",
+    "RUS-2371",
+    "RUS-2383",
+    "RUS-2416",
+    "RUS-2417",
+    "SI031",
+    "SI032",
+    "SI033",
+    "SI034",
+    "SI035",
+    "SI036",
+    "SI037",
+    "SI038",
+    "SI041",
+    "SI042",
+    "SI043",
+    "SI044",
+    "UKL14",
+    "UKL17",
+    "UKL18",
+    "UKL21",
+    "UKL22",
+    "UKL23",
+    "UKL24",
+    "UKM50",
+    "UKM63",
+    "UKM64",
+    "UKM65",
+    "UKM66",
+    "UKM71",
+    "UKM73",
+    "UKM75",
+    "UKM78",
+    "UKM81",
+    "UKM82",
+    "UKM91",
+    "UKM92",
+    "UKN06",
+    "UKN07",
+    "UKN08",
+    "UKN09",
+    "UKN0A",
+    "UKN0B",
+    "UKN0C",
+    "UKN0G",
+    "UK_MRG_32be8ff42d1d",
+    "UK_MRG_3af31571b83c",
+    "UK_MRG_4bda76985a93",
+    "UK_MRG_5e86e440be06",
+    "UK_MRG_6b5533cccee5",
+    "UK_MRG_a36fda7ab641",
+    "UK_MRG_e60d28324bee"
+  ],
+  "candidates": [
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B11403491783632",
+        "IN_ADM2_76128533B22687502928564",
+        "IN_ADM2_76128533B45592431373253",
+        "IN_ADM2_76128533B4743808419896",
+        "IN_ADM2_76128533B83644689337946",
+        "IN_ADM2_76128533B86430586962522",
+        "IN_ADM2_76128533B88669134807148",
+        "IN_ADM2_76128533B89374164863010",
+        "IN_ADM2_76128533B89575258858457"
+      ],
+      "parent_id": "IN_Tamil_Nadu"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B12079567451207",
+        "IN_ADM2_76128533B37392223136185",
+        "IN_MRG_10229d52fb7d"
+      ],
+      "parent_id": "IN_Rajasthan"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B12197302963241",
+        "IN_ADM2_76128533B37199077904074",
+        "IN_ADM2_76128533B41747884279129",
+        "IN_MRG_2344ccd4873a"
+      ],
+      "parent_id": "IN_Punjab"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B1222571856670",
+        "IN_ADM2_76128533B12294379827032",
+        "IN_ADM2_76128533B15601995412161",
+        "IN_ADM2_76128533B27414563922025",
+        "IN_ADM2_76128533B35143550659673",
+        "IN_ADM2_76128533B35439951183692",
+        "IN_ADM2_76128533B43180268042348",
+        "IN_ADM2_76128533B44632955875385",
+        "IN_ADM2_76128533B6050540865870",
+        "IN_ADM2_76128533B75529869544465",
+        "IN_ADM2_76128533B79263581040575",
+        "IN_ADM2_76128533B80916614857890"
+      ],
+      "parent_id": "IN_Jharkhand"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B12244045944458",
+        "IN_ADM2_76128533B22722327711505",
+        "IN_ADM2_76128533B42646400584570",
+        "IN_ADM2_76128533B69536039643660",
+        "IN_ADM2_76128533B70554191137208",
+        "IN_ADM2_76128533B86048662040782"
+      ],
+      "parent_id": "IN_Haryana"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B12244320360965",
+        "IN_ADM2_76128533B33458049385696",
+        "IN_ADM2_76128533B66426066081507",
+        "IN_ADM2_76128533B78904410352326"
+      ],
+      "parent_id": "IN_Bihar"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B12343314564708",
+        "IN_ADM2_76128533B66335428496945",
+        "IN_ADM2_76128533B82240600990321"
+      ],
+      "parent_id": "IN_Madhya_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B12694285477701",
+        "IN_ADM2_76128533B24755983727265",
+        "IN_ADM2_76128533B29293163114565",
+        "IN_ADM2_76128533B5855800361016",
+        "IN_ADM2_76128533B66790149147330",
+        "IN_ADM2_76128533B78970756356546"
+      ],
+      "parent_id": "IN_Bihar"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B13272482176343",
+        "IN_ADM2_76128533B21119051307760",
+        "IN_ADM2_76128533B34462889864078",
+        "IN_ADM2_76128533B7545062765383",
+        "IN_ADM2_76128533B84679668760735",
+        "IN_ADM2_76128533B87317961648652"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B13437137070957",
+        "IN_ADM2_76128533B38548995376745"
+      ],
+      "parent_id": "IN_Assam"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B13673614951516",
+        "IN_ADM2_76128533B49460554954204",
+        "IN_ADM2_76128533B52058654769647"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B13697452453823",
+        "IN_ADM2_76128533B97425778881707"
+      ],
+      "parent_id": "IN_Himachal_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B13791982054894",
+        "IN_ADM2_76128533B39051871473194",
+        "IN_ADM2_76128533B41499938690181",
+        "IN_ADM2_76128533B82601690264832",
+        "IN_MRG_e8f4da0d0535"
+      ],
+      "parent_id": "IN_Punjab"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B14033116794334",
+        "IN_ADM2_76128533B19903856317609",
+        "IN_ADM2_76128533B74961596993088",
+        "IN_ADM2_76128533B88481188307630",
+        "IN_ADM2_76128533B91445917652173",
+        "IN_ADM2_76128533B93214480696409"
+      ],
+      "parent_id": "IN_Bihar"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B14243635342908",
+        "IN_ADM2_76128533B36958871695926",
+        "IN_ADM2_76128533B76286653784168"
+      ],
+      "parent_id": "IN_Maharashtra"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B14403163214152",
+        "IN_ADM2_76128533B64881202564500",
+        "IN_ADM2_76128533B82279368215419",
+        "IN_MRG_46ee484c2760",
+        "IN_MRG_a9290adb0980",
+        "IN_MRG_add732cea50c"
+      ],
+      "parent_id": "IN_Manipur"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B14534161138054",
+        "IN_ADM2_76128533B33437990510331",
+        "IN_ADM2_76128533B35465481868600",
+        "IN_ADM2_76128533B87051210355251"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B14968875277413",
+        "IN_ADM2_76128533B58170186574016",
+        "IN_ADM2_76128533B74887942950962"
+      ],
+      "parent_id": "IN_Telangana"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B15157901669242",
+        "IN_ADM2_76128533B334793883930",
+        "IN_ADM2_76128533B55519385298440"
+      ],
+      "parent_id": "IN_Assam"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B15550697205080",
+        "IN_ADM2_76128533B54775433755383",
+        "IN_ADM2_76128533B57609583882472"
+      ],
+      "parent_id": "IN_Karnataka"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B1566053393466",
+        "IN_ADM2_76128533B31161316175613",
+        "IN_ADM2_76128533B39705008578419",
+        "IN_ADM2_76128533B42922918567330",
+        "IN_ADM2_76128533B53791014455989",
+        "IN_ADM2_76128533B79303776608295",
+        "IN_ADM2_76128533B81607600692021"
+      ],
+      "parent_id": "IN_Madhya_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B15835290978888",
+        "IN_MRG_c73911bfb285"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B1621599562140",
+        "IN_ADM2_76128533B52487813780503",
+        "IN_ADM2_76128533B67018657649043",
+        "IN_MRG_3208c5cacd01"
+      ],
+      "parent_id": "IN_Chhattisgarh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B1629699732681",
+        "IN_ADM2_76128533B27604563137530",
+        "IN_ADM2_76128533B31241181851990",
+        "IN_ADM2_76128533B70974512658911"
+      ],
+      "parent_id": "IN_Tamil_Nadu"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B16476001647323",
+        "IN_ADM2_76128533B39046535416628",
+        "IN_ADM2_76128533B63599385776584",
+        "IN_ADM2_76128533B69438085511257",
+        "IN_MRG_964f44be21c1",
+        "IN_MRG_a9c8dc6c38f7"
+      ],
+      "parent_id": "IN_Gujarat"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B16628456658675",
+        "IN_ADM2_76128533B29292403538801",
+        "IN_ADM2_76128533B43335986553000",
+        "IN_ADM2_76128533B47594161132413",
+        "IN_ADM2_76128533B64905184636422",
+        "IN_ADM2_76128533B79600797037735",
+        "IN_MRG_94ef9201854b"
+      ],
+      "parent_id": "IN_Karnataka"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B16674973717653",
+        "IN_MRG_dcf2b9f1d7ca"
+      ],
+      "parent_id": "IN_Madhya_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B16811573188243",
+        "IN_ADM2_76128533B20752885472650"
+      ],
+      "parent_id": "IN_West_Bengal"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B18243475101734",
+        "IN_ADM2_76128533B64732849735713",
+        "IN_ADM2_76128533B87515288456202"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B19335918192159",
+        "IN_ADM2_76128533B51372664315362"
+      ],
+      "parent_id": "IN_Tamil_Nadu"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B19341883513630",
+        "IN_ADM2_76128533B25679991785711",
+        "IN_ADM2_76128533B35167844027544",
+        "IN_ADM2_76128533B42880544505675",
+        "IN_ADM2_76128533B67004768724668",
+        "IN_ADM2_76128533B77191913035963"
+      ],
+      "parent_id": "IN_Madhya_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B19581555782120",
+        "IN_ADM2_76128533B75696328527555",
+        "IN_ADM2_76128533B83861010847920"
+      ],
+      "parent_id": "IN_Kerala"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B19792346411952",
+        "IN_ADM2_76128533B29138015770556"
+      ],
+      "parent_id": "IN_Andhra_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B20298037622173",
+        "IN_ADM2_76128533B25835998628545",
+        "IN_ADM2_76128533B46490409917345",
+        "IN_MRG_0dc9b69890de",
+        "IN_MRG_d52299ba1791"
+      ],
+      "parent_id": "IN_Assam"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B20474666262371",
+        "IN_ADM2_76128533B5215906594478",
+        "IN_ADM2_76128533B98050240849249"
+      ],
+      "parent_id": "IN_Maharashtra"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B20683890392439",
+        "IN_ADM2_76128533B30447764775083",
+        "IN_ADM2_76128533B44250373880839",
+        "IN_ADM2_76128533B45314020251888",
+        "IN_ADM2_76128533B82559220423608"
+      ],
+      "parent_id": "IN_Madhya_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B20732636837048",
+        "IN_ADM2_76128533B43544960343942",
+        "IN_ADM2_76128533B86135761305702",
+        "IN_ADM2_76128533B9783509419210"
+      ],
+      "parent_id": "IN_Rajasthan"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B2080752988715",
+        "IN_ADM2_76128533B42839853072341",
+        "IN_ADM2_76128533B48885555323596",
+        "IN_ADM2_76128533B52902360321344",
+        "IN_ADM2_76128533B7851306475665",
+        "IN_ADM2_76128533B81661995166840"
+      ],
+      "parent_id": "IN_Gujarat"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B21179322085415",
+        "IN_ADM2_76128533B37096001761063",
+        "IN_ADM2_76128533B668165975951",
+        "IN_ADM2_76128533B69481535535995",
+        "IN_ADM2_76128533B71271011331008"
+      ],
+      "parent_id": "IN_Madhya_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B21485639457044",
+        "IN_ADM2_76128533B51363853289247",
+        "IN_ADM2_76128533B91871300208785",
+        "IN_MRG_317bdbf2051b"
+      ],
+      "parent_id": "IN_Bihar"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B23956636471502",
+        "IN_ADM2_76128533B45106682783501",
+        "IN_ADM2_76128533B6330405394721",
+        "IN_ADM2_76128533B64596101949699",
+        "IN_ADM2_76128533B94710820075529",
+        "IN_ADM2_76128533B95049353851516"
+      ],
+      "parent_id": "IN_Haryana"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B24594618908349",
+        "IN_ADM2_76128533B60322704115131",
+        "IN_ADM2_76128533B84398038505400",
+        "IN_ADM2_76128533B96571577519224",
+        "IN_MRG_a98f3e005f6a"
+      ],
+      "parent_id": "IN_Telangana"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B24861976740713",
+        "IN_ADM2_76128533B25373378863054",
+        "IN_ADM2_76128533B88812350838807"
+      ],
+      "parent_id": "IN_West_Bengal"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B25020556592153",
+        "IN_ADM2_76128533B54306414631532",
+        "IN_ADM2_76128533B73736605657091",
+        "IN_MRG_a41c7ad59205",
+        "IN_MRG_fe97969e7e01"
+      ],
+      "parent_id": "IN_Chhattisgarh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B25208535254310",
+        "IN_ADM2_76128533B8998698404381"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B25344721013980",
+        "IN_ADM2_76128533B40156838070",
+        "IN_ADM2_76128533B55603381222870",
+        "IN_ADM2_76128533B61304308285665",
+        "IN_ADM2_76128533B70021405538438"
+      ],
+      "parent_id": "IN_Maharashtra"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B25576352747885",
+        "IN_ADM2_76128533B28138828116492",
+        "IN_ADM2_76128533B34069028331411",
+        "IN_ADM2_76128533B54301724756864",
+        "IN_ADM2_76128533B5628791558965",
+        "IN_ADM2_76128533B64898456093948",
+        "IN_ADM2_76128533B69412164931619",
+        "IN_ADM2_76128533B73809971322123"
+      ],
+      "parent_id": "IN_Rajasthan"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B26931973511551",
+        "IN_ADM2_76128533B40023971667984",
+        "IN_ADM2_76128533B73769926250842",
+        "IN_ADM2_76128533B73925919155567",
+        "IN_ADM2_76128533B88623139855224"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B27432148084533",
+        "IN_ADM2_76128533B32499449492865"
+      ],
+      "parent_id": "IN_Bihar"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B27609096170969",
+        "IN_ADM2_76128533B37486272752374",
+        "IN_ADM2_76128533B61814103412294",
+        "IN_MRG_f8895b87957e"
+      ],
+      "parent_id": "IN_Maharashtra"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B28294794137747",
+        "IN_ADM2_76128533B95075104846315"
+      ],
+      "parent_id": "IN_Andhra_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B284680734793",
+        "IN_ADM2_76128533B33966968116377",
+        "IN_ADM2_76128533B40495457052818",
+        "IN_ADM2_76128533B84927972855096",
+        "IN_MRG_35c5386ac534"
+      ],
+      "parent_id": "IN_Karnataka"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B28521131010314",
+        "IN_MRG_64b26eec8389"
+      ],
+      "parent_id": "IN_Madhya_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B2970909480221",
+        "IN_ADM2_76128533B53671786151110",
+        "IN_ADM2_76128533B58058152513003",
+        "IN_ADM2_76128533B85747247216737"
+      ],
+      "parent_id": "IN_Nagaland"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B31175522938788",
+        "IN_ADM2_76128533B58104976570569",
+        "IN_ADM2_76128533B58493775523243",
+        "IN_ADM2_76128533B71056110198347",
+        "IN_MRG_3e581c359307",
+        "IN_MRG_b507e43e5254"
+      ],
+      "parent_id": "IN_Telangana"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B31246189674263",
+        "IN_ADM2_76128533B49394025943542",
+        "IN_ADM2_76128533B72829420975835",
+        "IN_ADM2_76128533B8892495882090"
+      ],
+      "parent_id": "IN_Telangana"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B34216851275023",
+        "IN_ADM2_76128533B84129562351919",
+        "IN_MRG_5c122f79992b",
+        "IN_MRG_d70f87866a7e"
+      ],
+      "parent_id": "IN_Odisha"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B35956162202704",
+        "IN_ADM2_76128533B58569599021232",
+        "IN_ADM2_76128533B75262864015847",
+        "IN_MRG_f61f07205f91"
+      ],
+      "parent_id": "IN_Himachal_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B36164606132718",
+        "IN_ADM2_76128533B59405966069108"
+      ],
+      "parent_id": "IN_Andhra_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B38203190611533",
+        "IN_ADM2_76128533B6310527412636",
+        "IN_ADM2_76128533B89438858641946"
+      ],
+      "parent_id": "IN_Chhattisgarh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B39238815774480",
+        "IN_ADM2_76128533B8575303957680",
+        "IN_ADM2_76128533B93152786731267"
+      ],
+      "parent_id": "IN_Maharashtra"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B39959897010345",
+        "IN_ADM2_76128533B53549946596470",
+        "IN_ADM2_76128533B57893545331548",
+        "IN_ADM2_76128533B64834018186186",
+        "IN_ADM2_76128533B75548370501185",
+        "IN_ADM2_76128533B79048012717121"
+      ],
+      "parent_id": "IN_Madhya_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B40868676647207",
+        "IN_ADM2_76128533B83462627230182",
+        "IN_MRG_439a10aa562b",
+        "IN_MRG_82a7e2758f34"
+      ],
+      "parent_id": "IN_Bihar"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B40923846274136",
+        "IN_ADM2_76128533B43737470294384",
+        "IN_ADM2_76128533B45037556977273",
+        "IN_ADM2_76128533B84417945851362"
+      ],
+      "parent_id": "IN_Gujarat"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B41976979530466",
+        "IN_ADM2_76128533B63366045987285",
+        "IN_ADM2_76128533B82539771173603"
+      ],
+      "parent_id": "IN_Kerala"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B42153891534463",
+        "IN_ADM2_76128533B70570208114113",
+        "IN_MRG_6ba16322cfa2"
+      ],
+      "parent_id": "IN_Meghalaya"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B45099378029175",
+        "IN_ADM2_76128533B53725063754801",
+        "IN_ADM2_76128533B7124697440629",
+        "IN_ADM2_76128533B98420041301261"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B45381195840581",
+        "IN_ADM2_76128533B49805675626253",
+        "IN_ADM2_76128533B90068096507942",
+        "IN_MRG_1d9b4933bded"
+      ],
+      "parent_id": "IN_Jharkhand"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B46926146855114",
+        "IN_MRG_4947bf9afafe"
+      ],
+      "parent_id": "IN_Uttarakhand"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B47840093719460",
+        "IN_MRG_f09ef2e914ec",
+        "IN_MRG_fc4fb7f7372c"
+      ],
+      "parent_id": "IN_Chhattisgarh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B50275440439236",
+        "IN_ADM2_76128533B60893804631193"
+      ],
+      "parent_id": "IN_Jharkhand"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B50374927918374",
+        "IN_MRG_aeb165f4c805"
+      ],
+      "parent_id": "IN_Uttarakhand"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B50613523798301",
+        "IN_ADM2_76128533B96584288929219"
+      ],
+      "parent_id": "IN_Rajasthan"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B52664671961643",
+        "IN_ADM2_76128533B72109128179340"
+      ],
+      "parent_id": "IN_Andhra_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B53018054761164",
+        "IN_ADM2_76128533B53373614632193",
+        "IN_ADM2_76128533B67054925852429",
+        "IN_MRG_9592dd2cf1d9"
+      ],
+      "parent_id": "IN_Telangana"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B53366745705922",
+        "IN_ADM2_76128533B59121537940607",
+        "IN_ADM2_76128533B81857725777974"
+      ],
+      "parent_id": "IN_West_Bengal"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B54279577656282",
+        "IN_ADM2_76128533B61321395333865",
+        "IN_ADM2_76128533B64003397477352",
+        "IN_ADM2_76128533B89925537847414",
+        "IN_MRG_c2bed413ca7f",
+        "IN_MRG_cc42364d4ba9"
+      ],
+      "parent_id": "IN_Tamil_Nadu"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B54279951806726",
+        "IN_ADM2_76128533B60320291189162",
+        "IN_ADM2_76128533B67530641452031",
+        "IN_MRG_6f037851532e"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B57712033428660",
+        "IN_ADM2_76128533B80958502091898"
+      ],
+      "parent_id": "IN_Madhya_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B57825981663822",
+        "IN_ADM2_76128533B8920527783032",
+        "IN_MRG_ccf93b344819"
+      ],
+      "parent_id": "IN_Assam"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B57995625790051",
+        "IN_ADM2_76128533B70315194619807"
+      ],
+      "parent_id": "IN_Assam"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B58797478961083",
+        "IN_ADM2_76128533B633842538351",
+        "IN_ADM2_76128533B77719785699048",
+        "IN_ADM2_76128533B80656256583567",
+        "IN_ADM2_76128533B81147724102706",
+        "IN_MRG_81646fcfad63"
+      ],
+      "parent_id": "IN_Odisha"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B59596968713717",
+        "IN_ADM2_76128533B79784438258239",
+        "IN_ADM2_76128533B84772439394056",
+        "IN_ADM2_76128533B96870418529164"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B61117593923933",
+        "IN_ADM2_76128533B86368264587575",
+        "IN_MRG_53f9886bc000"
+      ],
+      "parent_id": "IN_Kerala"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B66411945144923",
+        "IN_ADM2_76128533B67210465807627",
+        "IN_ADM2_76128533B82793215586362"
+      ],
+      "parent_id": "IN_Nagaland"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B70646408240587",
+        "IN_MRG_0e1e90dca5bf",
+        "IN_MRG_37328dfe8d45"
+      ],
+      "parent_id": "IN_Madhya_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B71088079535368",
+        "IN_ADM2_76128533B80016894369263"
+      ],
+      "parent_id": "IN_Haryana"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B74057284038879",
+        "IN_MRG_07eb3c8cab39"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B79180273895456",
+        "IN_ADM2_76128533B86721175299079"
+      ],
+      "parent_id": "IN_Karnataka"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B88758450653156",
+        "IN_ADM2_76128533B8878807356913",
+        "IN_ADM2_76128533B91640519747726",
+        "IN_MRG_5c48e7d5fc5b"
+      ],
+      "parent_id": "IN_Uttar_Pradesh"
+    },
+    {
+      "member_ids": [
+        "IN_ADM2_76128533B93441663686573",
+        "IN_MRG_d531e0df892b"
+      ],
+      "parent_id": "IN_Rajasthan"
+    },
+    {
+      "member_ids": [
+        "IN_MRG_0240da1df458",
+        "IN_MRG_9771ab24083b"
+      ],
+      "parent_id": "IN_Odisha"
+    },
+    {
+      "member_ids": [
+        "IN_MRG_10207a70afcd",
+        "IN_MRG_c195372a6ccc"
+      ],
+      "parent_id": "IN_Mizoram"
+    }
+  ]
+}

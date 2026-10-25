@@ -25,6 +25,9 @@ the scenarios a plan names (see *Scenario-scoped plans*).
 | `russia_wave5_{tno,rest}.candidates.json` | Input: Russia, P2 tier of the 2026-10-25 upper-level research (area caps 15,000 / 25,000 / 35,000 / 45,000 km² for European Russia / Urals / Siberia / Far East, convex-hull fill ≥ 0.4, aspect ≤ 3.5). City hosts are protected for capitals, major cities and at least 500,000 people; same-owner TNO neighbours no longer lock. |
 | `russia_wave5_tno.v1.json` | Applied plan scoped to `tno_1962`: 282 groups, 1346 members, 1064 features removed. |
 | `russia_wave5_rest.v1.json` | Applied plan scoped to `blank_base`, `hoi4_1936`, `hoi4_1939`, `modern_world`: 278 groups, 1011 members, 733 features removed. |
+| `india_wave5_{tno,rest}.candidates.json` | Input: India, second round, division-level target of the 2026-10-25 research (area caps 12,000–45,000 km² by region). City hosts are protected for capitals, state capitals, major cities and at least 500,000 people; Ladakh, Jammu and Kashmir and Arunachal Pradesh stay locked. |
+| `india_wave5_tno.v1.json` | Applied plan scoped to `tno_1962`: 95 groups, 368 members, 273 features removed. |
+| `india_wave5_rest.v1.json` | Applied plan scoped to `blank_base`, `hoi4_1936`, `hoi4_1939`, `modern_world`: 90 groups, 351 members, 261 features removed. |
 
 Plans are applied one after another in the order of `apply_order.json`, never
 by file name; the plan tool appends each new plan there. Within each scenario
