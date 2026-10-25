@@ -147,6 +147,8 @@
 .editor-property-panel .city-points-panel { margin: 0; padding: 0; }
 .editor-property-panel .layer-status-strip { margin: 4px 0 12px; }
 .editor-property-panel .city-points-toggle-card { border: 0; background: none; padding: 0 0 12px; }
+/* The property column already scrolls; inner capped lists would nest a second scrollbar. */
+.editor-workspace .editor-property-panel :is(.inspector-action-list, .inspector-action-list-natural, .inspector-family-list) { max-height: none; overflow: visible; }
 .editor-workspace [data-status-tone="off"] { color: var(--text-tertiary); background: transparent; border-color: var(--border-subtle); }
 .editor-workspace .range-row { align-items: baseline; gap: 12px; }
 .editor-workspace .range-label { min-width: 0; white-space: normal; overflow-wrap: break-word; }
