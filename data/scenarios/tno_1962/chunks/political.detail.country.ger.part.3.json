@@ -1695,7 +1695,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_4af99a43d917",
-        "name": "bolesławiecki + lwówecki",
+        "name": "bolesławiecki",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -3536,7 +3536,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_697bf6eafbca",
-        "name": "jaworski + legnicki + złotoryjski",
+        "name": "legnicki (Lower Silesian)",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -5920,7 +5920,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_cda1a954e365",
-        "name": "lubiński + polkowicki",
+        "name": "lubiński",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -8575,7 +8575,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_ae7dcb23076e",
-        "name": "średzki + wołowski",
+        "name": "średzki",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -14729,7 +14729,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_a4d0d3a9760e",
-        "name": "chełmiński + świecki + tucholski",
+        "name": "świecki",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -15772,7 +15772,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_f18bf4792f6a",
-        "name": "golubsko-dobrzyński + rypiński",
+        "name": "rypiński",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -18380,7 +18380,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_7c2fbae3db0b",
-        "name": "mogileński + żniński",
+        "name": "żniński",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -19948,7 +19948,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_fb2ce823eb38",
-        "name": "radziejowski + włocławski",
+        "name": "włocławski (Kuyavian-Pomeranian)",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -32303,7 +32303,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_5ca02af3d829",
-        "name": "poddębicki + zduńskowolski",
+        "name": "zduńskowolski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -51443,7 +51443,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_3bc1f7b63f72",
-        "name": "łomżyński + zambrowski + Łomża",
+        "name": "Łomża",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -57056,7 +57056,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_55eb1a09655e",
-        "name": "chojnicki + kościerski",
+        "name": "chojnicki",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -60111,7 +60111,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_88938957a4dc",
-        "name": "lęborski + pucki + wejherowski",
+        "name": "wejherowski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -62831,7 +62831,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_e9b93261cb76",
-        "name": "starogardzki + tczewski",
+        "name": "starogardzki",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -68505,7 +68505,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_6059e5e8fd2d",
-        "name": "giżycki + mrągowski",
+        "name": "giżycki",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -70766,7 +70766,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_635f3bd9c929",
-        "name": "lidzbarski + olsztyński",
+        "name": "olsztyński (Warmian-Masurian)",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -76853,7 +76853,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_eea8a1b754f3",
-        "name": "chodzieski + gnieźnieński + wągrowiecki",
+        "name": "gnieźnieński",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -78793,7 +78793,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_3384b03f3b03",
-        "name": "gostyński + jarociński + pleszewski",
+        "name": "gostyński",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -79952,7 +79952,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_d07f84128518",
-        "name": "grodziski + kościański + śremski",
+        "name": "kościański",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -81015,7 +81015,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_20e2ba9602ff",
-        "name": "kaliski + kolski + turecki",
+        "name": "kaliski (Greater Poland)",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -82823,7 +82823,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_d48e8dc37f33",
-        "name": "koniński + słupecki + Konin",
+        "name": "koniński",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -86060,7 +86060,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_18fdfa02eca5",
-        "name": "obornicki + szamotulski",
+        "name": "szamotulski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -89202,7 +89202,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_ec5519b4d3cf",
-        "name": "poznański + średzki + wrzesiński",
+        "name": "poznański (Greater Poland)",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -93133,7 +93133,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_ed1992314afe",
-        "name": "białogardzki + świdwiński + łobeski",
+        "name": "białogardzki",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -104291,7 +104291,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b18e5b7f00a3",
-        "name": "Gvardeysky District + Polessky District + Chernyakhovsky District",
+        "name": "Chernyakhovsk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -107047,7 +107047,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f00dfba16127",
-        "name": "Guryevsky District + Светловский городской окру + Zelenogradsky District",
+        "name": "Guryevsky District (Kaliningrad)",
         "cntr_code": "RU",
         "__source": "detail"
       },

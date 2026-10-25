@@ -26988,7 +26988,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c74526b2fdc8",
-        "name": "Cheremisinovsky District + Shchigry",
+        "name": "Cheremisinovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -32344,7 +32344,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7a5b034feeea",
-        "name": "Dolzhansky District + Kolpnyansky District",
+        "name": "Kolpnyansky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -39116,7 +39116,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ff5cc5b501e4",
-        "name": "Komarichsky District + Brasovsky District",
+        "name": "Brasovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -42255,7 +42255,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_dde98369766d",
-        "name": "Троснянский район + Кромской район",
+        "name": "Кромской район",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -47961,7 +47961,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_cc3f09a291db",
-        "name": "Глазуновский район + Свердловский район",
+        "name": "Свердловский район",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -50062,7 +50062,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c4b7fcf9408f",
-        "name": "Шаблыкинский район + Дмитровский район",
+        "name": "Дмитровский район",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -76098,7 +76098,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ab7c9de141c7",
-        "name": "Novoderevenkovsky District + Verkhovsky District + Покровский район",
+        "name": "Verkhovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -79889,7 +79889,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_13bb9d740915",
-        "name": "Mtsensky District + Залегощенский район",
+        "name": "Залегощенский район",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -88109,7 +88109,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ccc631e40d26",
-        "name": "Navlinsky District + Vygonichsky District",
+        "name": "Navlinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -92668,7 +92668,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_85ed17015f49",
-        "name": "Zhiryatinsky District + Pochepsky District",
+        "name": "Pochepsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -102327,7 +102327,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_38e4b64aac65",
-        "name": "Khotynetsky District + Uritsky District + Znamensky District",
+        "name": "Uritsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -108316,7 +108316,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_deee7ff279fc",
-        "name": "Bryansky District + Karachevsky District + Zhukovsky District",
+        "name": "Bryansky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -122318,7 +122318,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_55742c11b5e6",
-        "name": "Dyatkovsky District + городской округ Фокино",
+        "name": "Dyatkovo",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -134524,7 +134524,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a8aa677324f3",
-        "name": "Slavny + Arsenyevsky District",
+        "name": "Arsenyevsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -151476,7 +151476,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a5742bed0bed",
-        "name": "Roslavlsky District + городской округ Десногорск",
+        "name": "Roslavl",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -162756,7 +162756,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bc3ec5d8cee8",
-        "name": "Plavsky District + Щёкинский район",
+        "name": "Shchyokino",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -171780,7 +171780,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_baef030e052d",
-        "name": "Dubrovsky District + Rognedinsky District",
+        "name": "Dubrovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -194981,7 +194981,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3a4ba118143e",
-        "name": "Kozelsky District + Sukhinichsky District",
+        "name": "Kozelsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },

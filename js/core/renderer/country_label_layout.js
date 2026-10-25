@@ -6,6 +6,12 @@ const MAX_CANDIDATES_PER_POLYGON = 32;
 const MAX_FIT_CANDIDATES = 20;
 const DEFAULT_MAX_GRID_SIZE = 32;
 const MAX_GLYPH_ANGLE = 30 * Math.PI / 180;
+// 国名标签的基础字距与按路径长度撑开的上限（单位 em）。
+// 中文字形本身方正，上限放到 0.9em 会让短名读成逐字拆开，因此收紧到 0.25em。
+export const COUNTRY_LABEL_TRACKING = Object.freeze({
+  chinese: Object.freeze({ tracking: 0.12, maxTracking: 0.25 }),
+  latin: Object.freeze({ tracking: 0.08, maxTracking: 0.6 }),
+});
 function finiteNumber(value, fallback = 0) {
   return Number.isFinite(Number(value)) ? Number(value) : fallback;
 }
@@ -868,7 +874,9 @@ function layoutWithTracking(candidate, lines, component, fontSize, options) {
   const availableTracking = Math.min(...lines.map((line) => line.length > 1
     ? (candidate.length * 0.78 / fontSize - line.reduce((sum, glyph) => sum + glyph.advance, 0)) / (line.length - 1)
     : options.tracking));
-  const tracking = Math.max(options.tracking, Math.min(options.maxTracking, availableTracking));
+  // 多行标签只有两三个字一行，再撑开字距会读成竖排拆字，所以多行不超过基础字距。
+  const maxTracking = lines.length > 1 ? options.tracking : options.maxTracking;
+  const tracking = Math.max(options.tracking, Math.min(maxTracking, availableTracking));
   for (const spacing of tracking > options.tracking + 1e-8 ? [tracking, options.tracking] : [options.tracking]) {
     const layout = layoutLabelLines(candidate, lines, component, fontSize, spacing, options.glyphPadding,
       options.maxGlyphAngle, options.maxBendAngle, options.maxAdjacentAngle, options.allowPositionShift);

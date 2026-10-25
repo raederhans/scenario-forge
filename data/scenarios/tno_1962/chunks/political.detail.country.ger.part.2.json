@@ -48011,7 +48011,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_d0e3890ae1d5",
-        "name": "Böblingen + Tübingen, Landkreis",
+        "name": "Böblingen",
         "cntr_code": "DE",
         "admin1_group": "Baden-Württemberg",
         "__source": "detail"
@@ -49395,7 +49395,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_c9a9f2cd9548",
-        "name": "Esslingen + Göppingen",
+        "name": "Esslingen",
         "cntr_code": "DE",
         "admin1_group": "Baden-Württemberg",
         "__source": "detail"
@@ -50989,7 +50989,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_a27167ef8f23",
-        "name": "Ludwigsburg + Rems-Murr-Kreis + Heilbronn, Landkreis",
+        "name": "Ludwigsburg",
         "cntr_code": "DE",
         "admin1_group": "Baden-Württemberg",
         "__source": "detail"
@@ -54253,7 +54253,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_e87b9124c03f",
-        "name": "Hohenlohekreis + Schwäbisch Hall + Ostalbkreis",
+        "name": "Ostalbkreis",
         "cntr_code": "DE",
         "admin1_group": "Baden-Württemberg",
         "__source": "detail"
@@ -62885,7 +62885,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_68ba87808df8",
-        "name": "Calw + Freudenstadt",
+        "name": "Calw",
         "cntr_code": "DE",
         "admin1_group": "Baden-Württemberg",
         "__source": "detail"
@@ -91209,7 +91209,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_bd0cf439de30",
-        "name": "Dachau + Freising",
+        "name": "Freising",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "__source": "detail"
@@ -92637,7 +92637,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_ec3ed49e067c",
-        "name": "Ebersberg + Fürstenfeldbruck + München, Landkreis",
+        "name": "München, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "__source": "detail"
@@ -96473,7 +96473,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_3fb6d34d5cec",
-        "name": "Erding + Mühldorf a. Inn",
+        "name": "Erding",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "__source": "detail"
@@ -98783,7 +98783,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_bf419442ff08",
-        "name": "Landsberg am Lech + Starnberg + Weilheim-Schongau",
+        "name": "Weilheim-Schongau",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "__source": "detail"
@@ -106907,7 +106907,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_d4ab7c811a60",
-        "name": "Landshut, Kreisfreie Stadt + Landshut, Landkreis + Dingolfing-Landau",
+        "name": "Landshut, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "__source": "detail"
@@ -125773,7 +125773,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_08a36bff89a0",
-        "name": "Roth + Weißenburg-Gunzenhausen",
+        "name": "Roth",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "__source": "detail"
@@ -197280,7 +197280,7 @@
       "type": "Feature",
       "properties": {
         "id": "CZ_MRG_a9dfac9d401b",
-        "name": "Jihlava + Třebíč",
+        "name": "Jihlava",
         "cntr_code": "CZ",
         "admin1_group": "Kraj Vysočina",
         "detail_tier": "adm2_full_replacement",
@@ -199799,7 +199799,7 @@
       "type": "Feature",
       "properties": {
         "id": "CZ_MRG_e151f991209d",
-        "name": "Uherské Hradiště + Kroměříž",
+        "name": "Uherské Hradiště",
         "cntr_code": "CZ",
         "admin1_group": "Zlínský kraj",
         "detail_tier": "adm2_full_replacement",
@@ -203565,7 +203565,7 @@
       "type": "Feature",
       "properties": {
         "id": "CZ_MRG_2919911b5bfd",
-        "name": "Vyškov + Hodonín + Brno-Country",
+        "name": "Brno-Country",
         "cntr_code": "CZ",
         "admin1_group": "Jihomoravský kraj",
         "detail_tier": "adm2_full_replacement",

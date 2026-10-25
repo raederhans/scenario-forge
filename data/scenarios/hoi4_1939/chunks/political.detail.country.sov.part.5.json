@@ -6,7 +6,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d12c5659178e",
-        "name": "Sargatsky District + Krutinsky District + Tyukalinsky District",
+        "name": "Tyukalinsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -718,7 +718,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_4f3d82b76f96",
-        "name": "Bolsherechensky District + Kolosovsky District + Bolsheukovsky District",
+        "name": "Bolsherechensky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -2300,7 +2300,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_eec8890e773f",
-        "name": "городской округ Ишим + Ishimsky District",
+        "name": "городской округ Ишим",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -3767,7 +3767,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_2ffc38a0e952",
-        "name": "Kamensky District + городской округ Заречный + Белоярский городской округ",
+        "name": "Kamensky District (Sverdlovsk)",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -5050,7 +5050,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_1be582aeb42b",
-        "name": "городской округ Ревда + Полевской городской округ",
+        "name": "Полевской городской округ",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -5474,7 +5474,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b098cafecfb7",
-        "name": "Krasnoufimsky District + городской округ Красноуфим",
+        "name": "городской округ Красноуфим",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -7180,7 +7180,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7ebff71f4352",
-        "name": "Verkhneye Dubrovo + Берёзовский городской окру",
+        "name": "Берёзовский городской окру (Sverdlovsk)",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -7625,7 +7625,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a2a252b3eba6",
-        "name": "Sarapulsky District + Karakulinsky District",
+        "name": "Sarapulsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -9415,7 +9415,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f7c007e9f564",
-        "name": "Pyshminsky District + Kamyshlovsky District",
+        "name": "Kamyshlovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -14266,7 +14266,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_eeebe5fff052",
-        "name": "Kaltasinsky District + Yanaulsky District",
+        "name": "Yanaulsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -16042,7 +16042,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_71e52c27d399",
-        "name": "Votkinsk + Votkinsky District",
+        "name": "Votkinsk",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -16837,7 +16837,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a5a5eeed1587",
-        "name": "Sharkansky District + Debyossky District",
+        "name": "Sharkansky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -18762,7 +18762,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7663cb1f8f39",
-        "name": "Verkh-Neyvinsky + Новоуральский городской ок",
+        "name": "Новоуральский городской ок",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -20293,7 +20293,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_317bc293c6ec",
-        "name": "Ust-Ishimsky District + Tevrizsky District + Znamensky District",
+        "name": "Tevrizsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -21560,7 +21560,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ef7dc63ecba7",
-        "name": "Асбестовский городской окр + Малышевский городской окру + Rezhevskoy District",
+        "name": "Асбестовский городской окр",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -22107,7 +22107,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_51d05b0cd072",
-        "name": "городской округ Верхняя Пы + Nevyansky District",
+        "name": "городской округ Верхняя Пы",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -24579,7 +24579,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7ab59f492d2a",
-        "name": "Baykalovsky District + Артёмовский городской окру + Irbitsky District",
+        "name": "Артёмовский городской окру (Sverdlovsk)",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -25614,7 +25614,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f22292b3a58a",
-        "name": "городской округ Алапаевско + городской округ Алапаевск",
+        "name": "городской округ Алапаевск",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -27805,7 +27805,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8e30afce3871",
-        "name": "ЗАТО Свободный + городской округ Нижняя Сал + Verkhnesaldinsky Urban Okrug",
+        "name": "Verkhnesaldinsky Urban Okrug",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -27960,7 +27960,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_dafefaea8cbc",
-        "name": "Тавдинский городской округ + Turinsky District + Taborinsky District",
+        "name": "Тавдинский городской округ",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -28659,7 +28659,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d9b430bcd2cb",
-        "name": "Сосьвинский городской окру + городской округ Махнёвское",
+        "name": "Сосьвинский городской окру",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -29907,7 +29907,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3e1c684cc13c",
-        "name": "Nytvensky District + Krasnokamsk District",
+        "name": "Krasnokamsk",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -30517,7 +30517,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_5b10737a994a",
-        "name": "городской округ Красноурал + городской округ Верхняя Ту",
+        "name": "городской округ Красноурал",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",

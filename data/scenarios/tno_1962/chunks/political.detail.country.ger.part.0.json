@@ -1016,7 +1016,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_54666399e0ac",
-        "name": "Brandenburg an der Havel, Kreisfreie Stadt + Havelland + Potsdam-Mittelmark",
+        "name": "Potsdam-Mittelmark",
         "cntr_code": "DE",
         "admin1_group": "Brandenburg",
         "__source": "detail"
@@ -6342,7 +6342,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_a235cf36d16c",
-        "name": "Dahme-Spreewald + Teltow-Fläming",
+        "name": "Dahme-Spreewald",
         "cntr_code": "DE",
         "admin1_group": "Brandenburg",
         "__source": "detail"
@@ -11602,7 +11602,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_171e39a343f9",
-        "name": "Oberhavel + Ostprignitz-Ruppin",
+        "name": "Oberhavel",
         "cntr_code": "DE",
         "admin1_group": "Brandenburg",
         "__source": "detail"
@@ -25796,7 +25796,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_33b1389d946f",
-        "name": "Hersfeld-Rotenburg + Schwalm-Eder-Kreis",
+        "name": "Schwalm-Eder-Kreis",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "__source": "detail"
@@ -33330,7 +33330,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_ce73c32b1090",
-        "name": "Mecklenburgische Seenplatte + Vorpommern-Rügen",
+        "name": "Stralsund",
         "cntr_code": "DE",
         "admin1_group": "Mecklenburg-Vorpommern",
         "__source": "detail"
@@ -50152,7 +50152,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_9e1fff10ce51",
-        "name": "Gifhorn + Peine",
+        "name": "Gifhorn",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "__source": "detail"
@@ -53094,7 +53094,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_46ade2104d23",
-        "name": "Helmstedt + Wolfenbüttel",
+        "name": "Wolfenbüttel",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "__source": "detail"
@@ -54794,7 +54794,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_4ab0c6062d32",
-        "name": "Northeim + Holzminden",
+        "name": "Northeim",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "__source": "detail"
@@ -58264,7 +58264,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_830e5845fb60",
-        "name": "Diepholz + Nienburg (Weser)",
+        "name": "Diepholz",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "__source": "detail"
@@ -60406,7 +60406,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_4fdd27cf49f7",
-        "name": "Hameln-Pyrmont + Schaumburg",
+        "name": "Schaumburg",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "__source": "detail"
@@ -65282,7 +65282,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_5dd80c1fcf77",
-        "name": "Celle + Heidekreis",
+        "name": "Celle",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "__source": "detail"
@@ -74116,7 +74116,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_698a45847033",
-        "name": "Rotenburg (Wümme) + Verden",
+        "name": "Rotenburg (Wümme)",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "__source": "detail"
@@ -80156,7 +80156,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_67a8450f3c9f",
-        "name": "Ammerland + Wesermarsch",
+        "name": "Ammerland",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "__source": "detail"
@@ -81420,7 +81420,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_3a19ae12c637",
-        "name": "Aurich + Friesland (DE) + Wittmund",
+        "name": "Aurich",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "__source": "detail"
@@ -82644,7 +82644,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_c922c0ebada5",
-        "name": "Cloppenburg + Osnabrück, Landkreis + Vechta",
+        "name": "Osnabrück, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "__source": "detail"
@@ -106496,7 +106496,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_70752f860917",
-        "name": "Coesfeld + Unna",
+        "name": "Unna",
         "cntr_code": "DE",
         "admin1_group": "Nordrhein-Westfalen",
         "__source": "detail"
@@ -109912,7 +109912,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_9410ac111320",
-        "name": "Warendorf + Gütersloh",
+        "name": "Gütersloh",
         "cntr_code": "DE",
         "admin1_group": "Nordrhein-Westfalen",
         "__source": "detail"
@@ -111830,7 +111830,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_5adb00f4a83d",
-        "name": "Herford + Minden-Lübbecke",
+        "name": "Minden-Lübbecke",
         "cntr_code": "DE",
         "admin1_group": "Nordrhein-Westfalen",
         "__source": "detail"
@@ -119004,7 +119004,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_6f627c55e7bd",
-        "name": "Hochsauerlandkreis + Olpe + Soest",
+        "name": "Soest",
         "cntr_code": "DE",
         "admin1_group": "Nordrhein-Westfalen",
         "__source": "detail"
@@ -159942,7 +159942,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_d67a0e4a728d",
-        "name": "Dithmarschen + Rendsburg-Eckernförde",
+        "name": "Rendsburg-Eckernförde",
         "cntr_code": "DE",
         "admin1_group": "Schleswig-Holstein",
         "__source": "detail"
@@ -175642,7 +175642,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_c90ee890d36c",
-        "name": "Weimar, Kreisfreie Stadt + Weimarer Land + Saale-Holzland-Kreis",
+        "name": "Saale-Holzland-Kreis",
         "cntr_code": "DE",
         "admin1_group": "Thüringen",
         "__source": "detail"
@@ -178728,7 +178728,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_b86ffe1dd2ea",
-        "name": "Nordhausen + Kyffhäuserkreis + Sömmerda",
+        "name": "Nordhausen",
         "cntr_code": "DE",
         "admin1_group": "Thüringen",
         "__source": "detail"
@@ -181142,7 +181142,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_cc565c282846",
-        "name": "Unstrut-Hainich-Kreis + Eisenach, Kreisfreie Stadt + Wartburgkreis",
+        "name": "Wartburgkreis",
         "cntr_code": "DE",
         "admin1_group": "Thüringen",
         "__source": "detail"
@@ -191751,7 +191751,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_9b20fe0cbb07",
-        "name": "goleniowski + gryficki + kamieński",
+        "name": "goleniowski",
         "cntr_code": "PL",
         "__source": "detail"
       },

@@ -12,7 +12,7 @@ const VALID_LAYERS = new Set(["smoke", "contract", "regression", "feature"]);
 const VALID_EXECUTION_MODES = new Set(["browser", "hybrid", "static-contract"]);
 const LAYER_ORDER = ["smoke", "contract", "regression", "feature", "all"];
 const NON_SMOKE_LAYERS = ["contract", "regression", "feature"];
-const EXPECTED_E2E_SPEC_COUNT = 59;
+const EXPECTED_E2E_SPEC_COUNT = 60;
 // 第一阶段 smoke 明确写死为这 4 个 spec，避免入口再次漂移。
 const FIXED_SMOKE_SPECS = [
   "tests/e2e/main_shell_i18n.spec.js",

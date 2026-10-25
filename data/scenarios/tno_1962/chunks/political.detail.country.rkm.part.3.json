@@ -6,7 +6,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f673f237de3d",
-        "name": "Novogurovsky + Aleksinsky District",
+        "name": "Aleksin",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -4045,7 +4045,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8bb4b9b2f984",
-        "name": "Maloyaroslavetsky District + Ferzikovsky District + Dzerzhinsky District",
+        "name": "Dzerzhinsky District (Kaluga)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -14504,7 +14504,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f1a67cdf0458",
-        "name": "Mosalsky District + Baryatinsky District",
+        "name": "Mosalsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -24193,7 +24193,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3576eb737658",
-        "name": "Meshchovsky District + Babyninsky District",
+        "name": "Babyninsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -34509,7 +34509,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f3808058260f",
-        "name": "Yasnogorsky District + Zaoksky District",
+        "name": "Yasnogorsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -40206,7 +40206,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6ade6e4bbcd7",
-        "name": "Borovsky District + Tarussky District + Zhukovsky District",
+        "name": "Borovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -47567,7 +47567,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e6c4245fecb6",
-        "name": "Serpukhovsky District + Pushchino",
+        "name": "Serpukhovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -56791,7 +56791,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_cddc570472f9",
-        "name": "Medynsky District + Iznoskovsky District + Yukhnovsky District",
+        "name": "Medynsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -72056,7 +72056,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6a431b3749b3",
-        "name": "Leninsky District + Chekhovsky District + Domodedovsky District",
+        "name": "Leninsky District (Moscow)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -80143,7 +80143,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_778d6b9a6bcb",
-        "name": "Dzerzhinsky + Lytkarino + Kotelniki",
+        "name": "Kotelniki",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -80688,7 +80688,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_545993141cd3",
-        "name": "Naro-Fominsky District + Istrinsky District + Ruzsky District",
+        "name": "Istra",
         "cntr_code": "RU",
         "__source": "detail"
       },

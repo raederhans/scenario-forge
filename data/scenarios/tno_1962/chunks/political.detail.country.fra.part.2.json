@@ -12702,7 +12702,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_e9f7d6aaa46e",
-        "name": "Montluçon + Moulins",
+        "name": "Montluçon",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -44766,7 +44766,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_c20888c67931",
-        "name": "Aurillac + Mauriac",
+        "name": "Aurillac",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -76450,7 +76450,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_a48d5d8654a9",
-        "name": "Rochefort + Saintes + Saint-Jean-d'Angély",
+        "name": "Rochefort",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -84284,7 +84284,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_71a8637a4772",
-        "name": "Brive-la-Gaillarde + Tulle + Ussel",
+        "name": "Brive-la-Gaillarde",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -92375,7 +92375,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_c20845af3938",
-        "name": "Aubusson + Guéret",
+        "name": "Guéret",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -100554,7 +100554,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_591a9d51c535",
-        "name": "Bergerac + Périgueux",
+        "name": "Périgueux",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -118259,7 +118259,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_0a0901a977d5",
-        "name": "Die + Valence",
+        "name": "Valence",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -124130,7 +124130,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_8e9054e07aa6",
-        "name": "Blaye + Lesparre-Médoc + Libourne",
+        "name": "Libourne",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -199556,7 +199556,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_edac1467130b",
-        "name": "Ambert + Thiers",
+        "name": "Thiers",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -207976,7 +207976,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_fe4c24f6c0af",
-        "name": "Issoire + Riom",
+        "name": "Riom",
         "cntr_code": "FR",
         "__source": "detail"
       },

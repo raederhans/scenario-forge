@@ -3111,7 +3111,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_931348f653cd",
-        "name": "Leskensky District + Chegemsky District + Chereksky District",
+        "name": "Chegemsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -11264,7 +11264,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ba5f9763e326",
-        "name": "Zolsky District + городской округ Баксан + Baksansky District",
+        "name": "городской округ Баксан",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -14569,7 +14569,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f27c1865f6ff",
-        "name": "городской округ Карабулак + Sunzhensky District",
+        "name": "Sunzhensky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -16375,7 +16375,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_1aa982125dc7",
-        "name": "Malgobeksky District + Nazranovsky District + Malgobek",
+        "name": "Nazranovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -18292,7 +18292,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bc130a312688",
-        "name": "Maysky District + Tersky District + Urvansky District",
+        "name": "Urvansky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -20171,7 +20171,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_591cc0025487",
-        "name": "Naursky District + Nadterechny District + Shelkovskoy District",
+        "name": "Naursky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -24761,7 +24761,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_42431abf423b",
-        "name": "Prokhladny + Prokhladnensky District",
+        "name": "Prokhladny",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -27987,7 +27987,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f090bf11b60f",
-        "name": "Kirovsky District + Stepnovsky District + Kursky District",
+        "name": "Kirovsky District (Stavropol Krai)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -42594,7 +42594,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_37caa326be13",
-        "name": "Sovetsky District + Georgiyevsky District",
+        "name": "Zelenokumsk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -46512,7 +46512,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b74b6298db8e",
-        "name": "Novoselitsky District + Alexandrovsky District",
+        "name": "Alexandrovsky District (Stavropol Krai)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -50293,7 +50293,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c681e3bc5c71",
-        "name": "Blagodarnensky District + Turkmensky District",
+        "name": "Blagodarny",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -55616,7 +55616,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_df9a05a775d2",
-        "name": "Izobilnensky District + Ipatovsky District + Trunovsky District",
+        "name": "Izobilnensky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -63100,7 +63100,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f186479202a4",
-        "name": "Priyutnensky District + Tselinny District",
+        "name": "Tselinny District (Kalmykia)",
         "cntr_code": "RKK",
         "__source": "detail"
       },
@@ -80157,7 +80157,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_aa3ae65083fb",
-        "name": "Sunzhensky District + Achkhoy-Martanovsky District + Urus-Martanovsky District",
+        "name": "Urus-Martanovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -82691,7 +82691,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3e81642c622c",
-        "name": "Pravoberezhny District + Ardonsky District",
+        "name": "Pravoberezhny District",
         "cntr_code": "RU",
         "__source": "detail"
       },

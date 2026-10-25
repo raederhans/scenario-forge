@@ -39,6 +39,7 @@ function mount(t, nodes = new Map()) {
   const originalLanguage = state.currentLanguage;
   const originalLocales = state.locales;
   globalThis.document = {
+    documentElement: { lang: "en" },
     getElementById: (id) => nodes.get(id) || null,
     querySelectorAll: () => [...nodes.values()].filter((node) => node.matches()),
   };
@@ -159,4 +160,18 @@ test("language toggle refreshes each directly scheduled UI hook once and retains
   assert.deepEqual(persisted, [["map_lang", "en"]]);
   assert.equal(search.value, "typed search");
   assert.equal(fileName.textContent, "my-map.json");
+});
+
+test("UI refresh keeps the <html lang> attribute in sync with the active language", async (t) => {
+  mount(t);
+  const originalStorage = globalThis.localStorage;
+  globalThis.localStorage = { setItem: () => {} };
+  t.after(() => { globalThis.localStorage = originalStorage; });
+  updateUIText();
+  assert.equal(document.documentElement.lang, "zh-CN");
+  await toggleLanguage();
+  assert.equal(state.currentLanguage, "en");
+  assert.equal(document.documentElement.lang, "en");
+  await toggleLanguage();
+  assert.equal(document.documentElement.lang, "zh-CN");
 });

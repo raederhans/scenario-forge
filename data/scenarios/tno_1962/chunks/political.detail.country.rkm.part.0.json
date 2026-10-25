@@ -83780,7 +83780,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b0d5b1b01211",
-        "name": "Zapadnodvinsky District + Жарковский район",
+        "name": "Zapadnodvinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -110737,7 +110737,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_257334552b8c",
-        "name": "Toropetsky District + Andreapolsky District",
+        "name": "Toropetsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -137624,7 +137624,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_727dc7a15097",
-        "name": "Maryovsky District + Kholmsky District",
+        "name": "Kholmsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -148184,7 +148184,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a6b0abcdeaa3",
-        "name": "Bologovsky District + ЗАТО Озёрный",
+        "name": "Bologoye",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -163169,7 +163169,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_147b9e791c0f",
-        "name": "Starorussky District + Parfinsky District",
+        "name": "Staraya Russa",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -177756,7 +177756,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_469cb07238ab",
-        "name": "Okulovsky District + Borovichsky District + Moshenskoy District",
+        "name": "Borovichi",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -182545,7 +182545,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_59971f82636d",
-        "name": "Khvoyninsky District + Lyubytinsky District",
+        "name": "Khvoyninsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -219490,7 +219490,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_1ca73d498309",
-        "name": "Kirishsky District + Korotka District",
+        "name": "Korotka District",
         "cntr_code": "RU",
         "__source": "detail"
       },

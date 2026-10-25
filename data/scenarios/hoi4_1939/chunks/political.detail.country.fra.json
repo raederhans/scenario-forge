@@ -3493,7 +3493,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_e9f7d6aaa46e",
-        "name": "Montluçon + Moulins",
+        "name": "Montluçon",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -13900,7 +13900,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_b062e98b7497",
-        "name": "Carcassonne + Limoux",
+        "name": "Carcassonne",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -16802,7 +16802,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_8a5ec14e81e7",
-        "name": "Arles + Istres",
+        "name": "Istres",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -19110,7 +19110,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_c20888c67931",
-        "name": "Aurillac + Mauriac",
+        "name": "Aurillac",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -22116,7 +22116,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_a48d5d8654a9",
-        "name": "Rochefort + Saintes + Saint-Jean-d'Angély",
+        "name": "Rochefort",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -24927,7 +24927,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_71a8637a4772",
-        "name": "Brive-la-Gaillarde + Tulle + Ussel",
+        "name": "Brive-la-Gaillarde",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -27620,7 +27620,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_6d703ee3f8dc",
-        "name": "Guingamp + Saint-Brieuc",
+        "name": "Saint-Brieuc",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -28758,7 +28758,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_c20845af3938",
-        "name": "Aubusson + Guéret",
+        "name": "Guéret",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -29469,7 +29469,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_591a9d51c535",
-        "name": "Bergerac + Périgueux",
+        "name": "Périgueux",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -32525,7 +32525,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_0a0901a977d5",
-        "name": "Die + Valence",
+        "name": "Valence",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -37841,7 +37841,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_5b1fca32ff2c",
-        "name": "Châteaulin + Morlaix + Quimper",
+        "name": "Quimper",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -41221,7 +41221,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_c84e32333c8a",
-        "name": "Alès + Vigan",
+        "name": "Alès",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -44070,7 +44070,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_0d1fb06c5ad5",
-        "name": "Auch + Condom + Mirande",
+        "name": "Auch",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -44881,7 +44881,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_8e9054e07aa6",
-        "name": "Blaye + Lesparre-Médoc + Libourne",
+        "name": "Libourne",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -55781,7 +55781,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_5b351c0f453a",
-        "name": "Dax + Mont-de-Marsan",
+        "name": "Dax",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -69998,7 +69998,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_ef55d0091c1e",
-        "name": "Coutances + Saint-Lô",
+        "name": "Saint-Lô",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -87978,7 +87978,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_a3ac3f104566",
-        "name": "Alençon + Argentan + Mortagne-au-Perche",
+        "name": "Argentan",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -89995,7 +89995,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_7c681aa2032e",
-        "name": "Boulogne-sur-Mer + Saint-Omer + Calais",
+        "name": "Calais",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -90972,7 +90972,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_edac1467130b",
-        "name": "Ambert + Thiers",
+        "name": "Thiers",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -91832,7 +91832,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_fe4c24f6c0af",
-        "name": "Issoire + Riom",
+        "name": "Riom",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -101419,7 +101419,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_8cd54e74f796",
-        "name": "Autun + Chalon-sur-Saône",
+        "name": "Chalon-sur-Saône",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -116279,7 +116279,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_d292a0ff7a4c",
-        "name": "Albi + Castres",
+        "name": "Castres",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -117042,7 +117042,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_fcb0087ac12e",
-        "name": "Castelsarrasin + Montauban",
+        "name": "Montauban",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -117965,7 +117965,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_af825dbec142",
-        "name": "Draguignan + Brignoles",
+        "name": "Draguignan",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -119107,7 +119107,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_d4fcb61264f5",
-        "name": "Apt + Avignon + Carpentras",
+        "name": "Carpentras",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",
@@ -121355,7 +121355,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_294761d79cca",
-        "name": "Châtellerault + Poitiers",
+        "name": "Poitiers",
         "cntr_code": "FR",
         "admin1_group": "",
         "legacy_name": "",

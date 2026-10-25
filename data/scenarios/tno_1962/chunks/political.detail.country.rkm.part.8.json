@@ -11826,7 +11826,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_2cfe9a40e9b7",
-        "name": "Sovetsky District + Oblivsky District",
+        "name": "Oblivsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -22647,7 +22647,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_10b3308f3d85",
-        "name": "Morozovsky District + Tatsinsky District",
+        "name": "Morozovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -31587,7 +31587,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_34e9e32d62ca",
-        "name": "Кашарский район + Bokovsky District + Milyutinsky District",
+        "name": "Кашарский район",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -41885,7 +41885,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7b3c6510fd3f",
-        "name": "Nekhayevsky District + Alexeyevsky district + Uryupinsky District",
+        "name": "Uryupinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -55505,7 +55505,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b32ae436f609",
-        "name": "Frolovsky District + Frolovo + Danilovsky District",
+        "name": "Frolovo",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -62751,7 +62751,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_62d82b3c1fa4",
-        "name": "городской округ Михайловка + Новоаннинский район + Kikvidzensky District",
+        "name": "Mikhaylovka",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -125449,7 +125449,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_60b8dd6fa7be",
-        "name": "Inzhavinsky District + Мучкапский район",
+        "name": "Inzhavinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -134229,7 +134229,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_43f873e0c183",
-        "name": "Zherdevsky District + Uvarovsky District",
+        "name": "Zherdevsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -158852,7 +158852,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e01a5b27cba9",
-        "name": "Bekovsky District + Belinsky District",
+        "name": "Belinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -164942,7 +164942,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6a3f1fee7164",
-        "name": "Rasskazovsky District + Umyotsky District + Kirsanovsky District",
+        "name": "Kirsanov (Tambov)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -170250,7 +170250,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e735cb3d5de0",
-        "name": "Gavrilovsky District + Bondarsky District",
+        "name": "Bondarsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -173217,7 +173217,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_5207bacfde76",
-        "name": "Morshansky District + Sosnovsky District + Tambovsky District",
+        "name": "Tambovsky District (Tambov)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -187469,7 +187469,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d262a19b45fb",
-        "name": "Pachelmsky District + Nizhnelomovsky District",
+        "name": "Nizhnelomovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -212233,7 +212233,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_368752e844fc",
-        "name": "Insarsky District + Kadoshkinsky District + Kovylkinsky District",
+        "name": "Kovylkinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -228060,7 +228060,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_381a0cc60dd8",
-        "name": "Chuchkovsky District + Putyatinsky District",
+        "name": "Chuchkovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },

@@ -4005,7 +4005,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bd33afbb026e",
-        "name": "Nyuksensky District + Tarnogsky District",
+        "name": "Tarnogsky District",
         "cntr_code": "VOL",
         "__source": "detail"
       },
@@ -12600,7 +12600,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c3876f30b780",
-        "name": "Sharyinsky District + Ponazyrevsky District",
+        "name": "Sharyinsky District (Kostroma)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -18597,7 +18597,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e0a377c11b7b",
-        "name": "Kichmengsko-Gorodetsky District + Nikolsky District",
+        "name": "Nikolsky District (Vologda)",
         "cntr_code": "VOL",
         "__source": "detail"
       },
@@ -25383,7 +25383,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d985bc7cb6ba",
-        "name": "Vokhomsky District + Oktyabrsky District + Pavinsky District",
+        "name": "Vokhomsky District",
         "cntr_code": "VOL",
         "__source": "detail"
       },

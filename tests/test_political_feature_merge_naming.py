@@ -6,8 +6,14 @@ from pathlib import Path
 
 from shapely.geometry import box
 
-from tools.apply_political_feature_merges import Merges, merge_geo_aliases, record_scenario_feature_merges
-from tools.build_political_feature_merge_plan import compass_direction, inherit_leaf_assignments, parent_names
+from tools.apply_political_feature_merges import Merges, merge_geo_aliases, record_scenario_feature_merges, rename_view
+from tools.build_political_feature_merge_plan import (
+    assign_representative,
+    compass_direction,
+    disambiguate_representative_names,
+    inherit_leaf_assignments,
+    parent_names,
+)
 
 
 class DirectionalNameTest(unittest.TestCase):
@@ -63,6 +69,88 @@ class MergedNameApplyTest(unittest.TestCase):
         self.assertTrue({"A + B", "C"} <= set(entry["aliases"]))
         self.assertTrue({"勃兰登堡·东部", "甲、乙", "丙"} <= set(entry["search_only_aliases"]))
         self.assertEqual(result["alias_to_stable_key"]["A + B"], "id::DE_MRG_000000000002")
+
+
+def representative_group(*members):
+    return {"id": "RU_MRG_000000000009", "parent_id": "RU_Omsk", "member_ids": list(members),
+            "member_names": {member: {"en": f"{member} District", "zh": f"{member}区"} for member in members}}
+
+
+class RepresentativeNameTest(unittest.TestCase):
+    facts = {
+        "cities": [
+            {"host_feature_id": "RU_B", "population": 900, "name": "Bigtown", "name_en": "Bigtown", "name_zh": "Bigtown"},
+            {"host_feature_id": "RU_A", "population": 500, "name": "Tara", "name_en": "Tara", "name_zh": "塔拉"},
+        ],
+        "population": {"RU_A": {"population": 10, "land_area_km2": 5}, "RU_B": {"population": 30, "land_area_km2": 1},
+                       "RU_C": {"population": 20, "land_area_km2": 9}},
+        "scenario_names": {"tno_1962": {"RU_C": {"en": "RU_C District", "zh": "丙区"}, "RU_B": {"en": "Bee", "zh": "RU_B区"}}},
+    }
+
+    def test_a_city_with_a_chinese_name_wins_then_population_then_area(self):
+        group = representative_group("RU_A", "RU_B")
+        assign_representative(group, self.facts)
+        self.assertEqual((group["names"], group["name_source"], group["representative_id"]),
+                         ({"en": "Tara", "zh": "塔拉"}, "city", "RU_A"))
+        group = representative_group("RU_B", "RU_C")
+        assign_representative(group, self.facts)
+        self.assertEqual((group["names"]["en"], group["name_source"]), ("RU_B District", "population"))
+        facts = {**self.facts, "population": {"RU_B": {"land_area_km2": 1}, "RU_C": {"population": 1, "land_area_km2": 9}}}
+        group = representative_group("RU_B", "RU_C")
+        assign_representative(group, facts)
+        self.assertEqual((group["names"]["en"], group["name_source"]), ("RU_C District", "area"))
+
+    def test_a_scenario_keeps_only_its_own_translations_of_the_member(self):
+        group = representative_group("RU_B", "RU_C")
+        assign_representative(group, self.facts)
+        self.assertEqual(group["scenario_names"], {"tno_1962": {"en": "Bee", "zh": "RU_B区"}})
+        group = representative_group("RU_A", "RU_C")
+        facts = {**self.facts, "cities": []}
+        assign_representative(group, facts)
+        self.assertEqual(group["scenario_names"], {"tno_1962": {"en": "RU_C District", "zh": "丙区"}})
+
+    def test_names_used_in_the_country_take_the_parent_then_a_number(self):
+        with tempfile.TemporaryDirectory() as directory:
+            topology = Path(directory, "topology.json")
+            rows = [{"properties": {"id": feature_id, "cntr_code": "ZZ", "name": name}}
+                    for feature_id, name in (("ZZ_X", "Taken"), ("ZZ_A", "a"), ("ZZ_B", "b"), ("ZZ_C", "c"), ("ZZ_D", "d"))]
+            topology.write_text(json.dumps({"objects": {"political": {"geometries": rows}}}), encoding="utf-8")
+            groups = [{"id": f"ZZ_MRG_{index}", "parent_id": "P", "member_ids": [member], "_population": population,
+                       "names": {"en": en, "zh": zh}} for index, (member, en, zh, population) in
+                      enumerate((("ZZ_A", "TAKEN", "甲", 1), ("ZZ_B", "Twin", "乙", 1), ("ZZ_C", "Twin", "乙", 5), ("ZZ_D", "Free", "丁", 1)))]
+            groups[0]["scenario_names"] = {"tno_1962": {"en": "Other", "zh": "其他"}}
+            disambiguate_representative_names(groups, {}, {}, {"P": {"en": "Omsk", "zh": "鄂木斯克州"}}, topology)
+        self.assertEqual([group["names"]["en"] for group in groups], ["TAKEN (Omsk)", "Twin (Omsk) 2", "Twin (Omsk) 1", "Free"])
+        self.assertEqual(groups[1]["names"]["zh"], "乙（鄂木斯克州）2")
+        self.assertEqual(groups[0]["scenario_names"]["tno_1962"], {"en": "Other (Omsk)", "zh": "其他（鄂木斯克州）"})
+
+
+class RenameOnlyProjectionTest(unittest.TestCase):
+    plan = {"groups": [{
+        "id": "FR_MRG_000000000001", "member_ids": ["FR_A", "FR_B"], "name_source": "city", "representative_id": "FR_B",
+        "names": {"en": "Calais", "zh": "加来"}, "previous_names": {"en": "A + Calais", "zh": "甲、加来区"},
+        "scenario_names": {"tno_1962": {"en": "Kalen", "zh": "卡伦"}},
+        "member_names": {"FR_A": {"en": "A", "zh": "甲"}, "FR_B": {"en": "Calais", "zh": "加来区"}},
+    }]}
+
+    def test_names_change_while_ids_lists_and_other_entries_stay(self):
+        merges = rename_view([self.plan])
+        payload = {"geo": {"id::FR_MRG_000000000001": {"en": "A + Calais", "zh": "甲、加来区"}, "id::FR_X": {"en": "X", "zh": "叉"}},
+                   "ids": ["FR_MRG_000000000001", "FR_X"]}
+        self.assertEqual(merges.project(payload), {**payload, "geo": {**payload["geo"], "id::FR_MRG_000000000001": {"en": "Calais", "zh": "加来"}}})
+        patch = {"geo": {"FR_MRG_000000000001": {"en": "A + Calais", "zh": "甲、加来区"}}}
+        self.assertEqual(merges.for_scenario("tno_1962").project(patch), {"geo": {"FR_MRG_000000000001": {"en": "Kalen", "zh": "卡伦"}}})
+
+    def test_the_joined_name_becomes_search_only_and_still_resolves(self):
+        payload = {"entries": [{"feature_id": "FR_MRG_000000000001", "country_code": "FR", "primary_name": "A + Calais",
+                                "aliases": ["A + Calais", "A"], "search_only_aliases": ["Calais"]}],
+                   "alias_to_stable_key": {"A + Calais": "id::FR_MRG_000000000001", "A": "id::FR_MRG_000000000001"}}
+        result = merge_geo_aliases(payload, rename_view([self.plan]))
+        entry, = result["entries"]
+        self.assertEqual((entry["primary_name"], entry["aliases"]), ("Calais", ["Calais", "A"]))
+        self.assertTrue({"A + Calais", "甲、加来区", "加来"} <= set(entry["search_only_aliases"]))
+        self.assertEqual(result["alias_to_stable_key"]["A + Calais"], "id::FR_MRG_000000000001")
+        self.assertEqual(result["alias_to_stable_key"]["Calais"], "id::FR_MRG_000000000001")
 
 
 class ScenarioFeatureMergeRecordTest(unittest.TestCase):

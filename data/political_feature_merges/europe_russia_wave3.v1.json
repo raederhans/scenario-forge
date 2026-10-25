@@ -41,8 +41,8 @@
       ],
       "parent_id": "GB_England",
       "names": {
-        "en": "Hartlepool and Stockton-on-Tees + Darlington",
-        "zh": "哈特尔普尔和蒂斯河畔斯托克顿、达林顿"
+        "en": "Hartlepool and Stockton-on-Tees",
+        "zh": "哈特尔普尔和蒂斯河畔斯托克顿"
       },
       "member_names": {
         "UKC11": {
@@ -53,7 +53,13 @@
           "en": "Darlington",
           "zh": "达林顿"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hartlepool and Stockton-on-Tees + Darlington",
+        "zh": "哈特尔普尔和蒂斯河畔斯托克顿、达林顿"
+      },
+      "name_source": "population",
+      "representative_id": "UKC11"
     },
     {
       "id": "UK_MRG_117d6a6890fd",
@@ -63,8 +69,8 @@
       ],
       "parent_id": "GB_England",
       "names": {
-        "en": "East Riding of Yorkshire + North Yorkshire CC",
-        "zh": "约克郡东区、北约克郡"
+        "en": "Scarborough",
+        "zh": "斯卡布罗"
       },
       "member_names": {
         "UKE12": {
@@ -75,7 +81,13 @@
           "en": "North Yorkshire CC",
           "zh": "北约克郡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "East Riding of Yorkshire + North Yorkshire CC",
+        "zh": "约克郡东区、北约克郡"
+      },
+      "name_source": "city",
+      "representative_id": "UKE22"
     },
     {
       "id": "UK_MRG_5adcc0eef3cd",
@@ -85,8 +97,8 @@
       ],
       "parent_id": "GB_England",
       "names": {
-        "en": "Chorley and West Lancashire + Sefton",
-        "zh": "乔利和西兰开夏郡、塞夫顿"
+        "en": "Chorley and West Lancashire",
+        "zh": "乔利和西兰开夏郡"
       },
       "member_names": {
         "UKD47": {
@@ -97,7 +109,13 @@
           "en": "Sefton",
           "zh": "塞夫顿"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Chorley and West Lancashire + Sefton",
+        "zh": "乔利和西兰开夏郡、塞夫顿"
+      },
+      "name_source": "population",
+      "representative_id": "UKD47"
     },
     {
       "id": "UK_MRG_2f7c06fdd74c",
@@ -107,8 +125,8 @@
       ],
       "parent_id": "GB_England",
       "names": {
-        "en": "South Nottinghamshire + Leicestershire CC and Rutland",
-        "zh": "南诺丁汉郡、莱斯特郡和拉特兰"
+        "en": "Leicestershire CC and Rutland",
+        "zh": "莱斯特郡和拉特兰"
       },
       "member_names": {
         "UKF16": {
@@ -119,7 +137,13 @@
           "en": "Leicestershire CC and Rutland",
           "zh": "莱斯特郡和拉特兰"
         }
-      }
+      },
+      "previous_names": {
+        "en": "South Nottinghamshire + Leicestershire CC and Rutland",
+        "zh": "南诺丁汉郡、莱斯特郡和拉特兰"
+      },
+      "name_source": "population",
+      "representative_id": "UKF22"
     },
     {
       "id": "UK_MRG_2f501f921535",
@@ -129,8 +153,8 @@
       ],
       "parent_id": "GB_England",
       "names": {
-        "en": "North and West Norfolk + Breckland and South Norfolk",
-        "zh": "诺福克北部和西部、布雷克兰和南诺福克"
+        "en": "Breckland and South Norfolk",
+        "zh": "布雷克兰和南诺福克"
       },
       "member_names": {
         "UKH16": {
@@ -141,7 +165,13 @@
           "en": "Breckland and South Norfolk",
           "zh": "布雷克兰和南诺福克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "North and West Norfolk + Breckland and South Norfolk",
+        "zh": "诺福克北部和西部、布雷克兰和南诺福克"
+      },
+      "name_source": "population",
+      "representative_id": "UKH17"
     },
     {
       "id": "UK_MRG_0c7e7a67089e",
@@ -151,8 +181,8 @@
       ],
       "parent_id": "GB_England",
       "names": {
-        "en": "Camden and City of London + Barnet",
-        "zh": "卡姆登和伦敦金融城、巴尼特"
+        "en": "Camden and City of London",
+        "zh": "卡姆登和伦敦金融城"
       },
       "member_names": {
         "UKI31": {
@@ -163,7 +193,13 @@
           "en": "Barnet",
           "zh": "巴尼特"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Camden and City of London + Barnet",
+        "zh": "卡姆登和伦敦金融城、巴尼特"
+      },
+      "name_source": "population",
+      "representative_id": "UKI31"
     },
     {
       "id": "UK_MRG_b630eccadfbe",
@@ -174,8 +210,8 @@
       ],
       "parent_id": "GB_England",
       "names": {
-        "en": "Kensington & Chelsea and Hammersmith & Fulham + Ealing + Hounslow and Richmond upon Thames",
-        "zh": "肯辛顿与切尔西和哈默史密斯与富勒姆、伊灵、豪恩斯洛和泰晤士河畔里士满"
+        "en": "Hounslow and Richmond upon Thames",
+        "zh": "豪恩斯洛和泰晤士河畔里士满"
       },
       "member_names": {
         "UKI33": {
@@ -190,7 +226,13 @@
           "en": "Hounslow and Richmond upon Thames",
           "zh": "豪恩斯洛和泰晤士河畔里士满"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kensington & Chelsea and Hammersmith & Fulham + Ealing + Hounslow and Richmond upon Thames",
+        "zh": "肯辛顿与切尔西和哈默史密斯与富勒姆、伊灵、豪恩斯洛和泰晤士河畔里士满"
+      },
+      "name_source": "population",
+      "representative_id": "UKI75"
     },
     {
       "id": "UK_MRG_05f15fd7e833",
@@ -201,8 +243,8 @@
       ],
       "parent_id": "GB_England",
       "names": {
-        "en": "Wandsworth + Lewisham and Southwark + Lambeth",
-        "zh": "旺兹沃斯、刘易舍姆和萨瑟克、兰贝斯"
+        "en": "Lewisham and Southwark",
+        "zh": "刘易舍姆和萨瑟克"
       },
       "member_names": {
         "UKI34": {
@@ -217,7 +259,13 @@
           "en": "Lambeth",
           "zh": "兰贝斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Wandsworth + Lewisham and Southwark + Lambeth",
+        "zh": "旺兹沃斯、刘易舍姆和萨瑟克、兰贝斯"
+      },
+      "name_source": "population",
+      "representative_id": "UKI44"
     },
     {
       "id": "UK_MRG_7443877c7a21",
@@ -227,8 +275,8 @@
       ],
       "parent_id": "GB_England",
       "names": {
-        "en": "Hackney and Newham + Tower Hamlets",
-        "zh": "哈克尼和纽汉姆、陶尔哈姆莱茨"
+        "en": "Hackney and Newham",
+        "zh": "哈克尼和纽汉姆"
       },
       "member_names": {
         "UKI41": {
@@ -239,7 +287,13 @@
           "en": "Tower Hamlets",
           "zh": "陶尔哈姆莱茨"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hackney and Newham + Tower Hamlets",
+        "zh": "哈克尼和纽汉姆、陶尔哈姆莱茨"
+      },
+      "name_source": "population",
+      "representative_id": "UKI41"
     },
     {
       "id": "UK_MRG_b91d40f3e558",
@@ -249,8 +303,8 @@
       ],
       "parent_id": "GB_England",
       "names": {
-        "en": "Kent Thames Gateway + West Kent",
-        "zh": "肯特泰晤士河口、西肯特郡"
+        "en": "West Kent",
+        "zh": "西肯特郡"
       },
       "member_names": {
         "UKJ43": {
@@ -261,7 +315,13 @@
           "en": "West Kent",
           "zh": "西肯特郡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kent Thames Gateway + West Kent",
+        "zh": "肯特泰晤士河口、西肯特郡"
+      },
+      "name_source": "population",
+      "representative_id": "UKJ46"
     },
     {
       "id": "UK_MRG_5e86e440be06",
@@ -272,8 +332,8 @@
       ],
       "parent_id": "GB_Wales",
       "names": {
-        "en": "Isle of Anglesey + Gwynedd + Conwy and Denbighshire",
-        "zh": "安格尔西岛、格温内德、康威和登比郡"
+        "en": "Conwy and Denbighshire",
+        "zh": "康威和登比郡"
       },
       "member_names": {
         "UKL11": {
@@ -288,7 +348,13 @@
           "en": "Conwy and Denbighshire",
           "zh": "康威和登比郡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Isle of Anglesey + Gwynedd + Conwy and Denbighshire",
+        "zh": "安格尔西岛、格温内德、康威和登比郡"
+      },
+      "name_source": "population",
+      "representative_id": "UKL13"
     },
     {
       "id": "UK_MRG_e60d28324bee",
@@ -298,8 +364,8 @@
       ],
       "parent_id": "GB_Wales",
       "names": {
-        "en": "Central Valleys + Gwent Valleys",
-        "zh": "中央山谷、格温特山谷"
+        "en": "Gwent Valleys",
+        "zh": "格温特山谷"
       },
       "member_names": {
         "UKL15": {
@@ -310,7 +376,13 @@
           "en": "Gwent Valleys",
           "zh": "格温特山谷"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Central Valleys + Gwent Valleys",
+        "zh": "中央山谷、格温特山谷"
+      },
+      "name_source": "population",
+      "representative_id": "UKL16"
     },
     {
       "id": "UK_MRG_32be8ff42d1d",
@@ -320,8 +392,8 @@
       ],
       "parent_id": "GB_Scotland",
       "names": {
-        "en": "Caithness & Sutherland and Ross & Cromarty + Inverness & Nairn and Moray, Badenoch & Strathspey",
-        "zh": "凯斯内斯和萨瑟兰以及罗斯和克罗马蒂、因弗内斯、奈恩和马里、巴德诺克和斯特拉斯佩"
+        "en": "Inverness",
+        "zh": "因弗内斯"
       },
       "member_names": {
         "UKM61": {
@@ -332,7 +404,13 @@
           "en": "Inverness & Nairn and Moray, Badenoch & Strathspey",
           "zh": "因弗内斯、奈恩和马里、巴德诺克和斯特拉斯佩"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Caithness & Sutherland and Ross & Cromarty + Inverness & Nairn and Moray, Badenoch & Strathspey",
+        "zh": "凯斯内斯和萨瑟兰以及罗斯和克罗马蒂、因弗内斯、奈恩和马里、巴德诺克和斯特拉斯佩"
+      },
+      "name_source": "city",
+      "representative_id": "UKM62"
     },
     {
       "id": "UK_MRG_6b5533cccee5",
@@ -342,8 +420,8 @@
       ],
       "parent_id": "GB_Scotland",
       "names": {
-        "en": "Clackmannanshire and Fife + Perth & Kinross and Stirling",
-        "zh": "克拉克曼南郡和法夫郡、珀斯、金罗斯和斯特灵"
+        "en": "Perth",
+        "zh": "伯斯"
       },
       "member_names": {
         "UKM72": {
@@ -354,7 +432,13 @@
           "en": "Perth & Kinross and Stirling",
           "zh": "珀斯、金罗斯和斯特灵"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Clackmannanshire and Fife + Perth & Kinross and Stirling",
+        "zh": "克拉克曼南郡和法夫郡、珀斯、金罗斯和斯特灵"
+      },
+      "name_source": "city",
+      "representative_id": "UKM77"
     },
     {
       "id": "UK_MRG_a36fda7ab641",
@@ -365,8 +449,8 @@
       ],
       "parent_id": "GB_Scotland",
       "names": {
-        "en": "Falkirk + North Lanarkshire + South Lanarkshire",
-        "zh": "福尔柯克、北拉纳克郡、南拉纳克郡"
+        "en": "North Lanarkshire",
+        "zh": "北拉纳克郡"
       },
       "member_names": {
         "UKM76": {
@@ -381,7 +465,13 @@
           "en": "South Lanarkshire",
           "zh": "南拉纳克郡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Falkirk + North Lanarkshire + South Lanarkshire",
+        "zh": "福尔柯克、北拉纳克郡、南拉纳克郡"
+      },
+      "name_source": "population",
+      "representative_id": "UKM84"
     },
     {
       "id": "UK_MRG_3af31571b83c",
@@ -392,8 +482,8 @@
       ],
       "parent_id": "GB_Scotland",
       "names": {
-        "en": "Inverclyde, East Renfrewshire and Renfrewshire + East Ayrshire and North Ayrshire mainland + South Ayrshire",
-        "zh": "因弗克莱德、东伦弗鲁郡和伦弗鲁郡、东艾尔郡和北艾尔郡大陆、南艾尔郡"
+        "en": "Greenock",
+        "zh": "格里诺克"
       },
       "member_names": {
         "UKM83": {
@@ -408,7 +498,13 @@
           "en": "South Ayrshire",
           "zh": "南艾尔郡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Inverclyde, East Renfrewshire and Renfrewshire + East Ayrshire and North Ayrshire mainland + South Ayrshire",
+        "zh": "因弗克莱德、东伦弗鲁郡和伦弗鲁郡、东艾尔郡和北艾尔郡大陆、南艾尔郡"
+      },
+      "name_source": "city",
+      "representative_id": "UKM83"
     },
     {
       "id": "UK_MRG_4bda76985a93",
@@ -419,8 +515,8 @@
       ],
       "parent_id": "GB_Northern_Ireland",
       "names": {
-        "en": "Antrim and Newtownabbey + Lisburn and Castlereagh + Mid and East Antrim",
-        "zh": "安特里姆和纽敦阿比、利斯本和卡斯尔雷、安特里姆中东部"
+        "en": "Antrim and Newtownabbey",
+        "zh": "安特里姆和纽敦阿比"
       },
       "member_names": {
         "UKN0D": {
@@ -435,7 +531,13 @@
           "en": "Mid and East Antrim",
           "zh": "安特里姆中东部"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Antrim and Newtownabbey + Lisburn and Castlereagh + Mid and East Antrim",
+        "zh": "安特里姆和纽敦阿比、利斯本和卡斯尔雷、安特里姆中东部"
+      },
+      "name_source": "population",
+      "representative_id": "UKN0D"
     },
     {
       "id": "CZ_MRG_23d7414d33c7",
@@ -446,8 +548,8 @@
       ],
       "parent_id": "CZ_Jiho_esk_kraj",
       "names": {
-        "en": "Strakonice + Písek + Tábor",
-        "zh": "斯特拉科尼采、皮塞克、塔博尔"
+        "en": "Tábor",
+        "zh": "塔博尔"
       },
       "member_names": {
         "CZ_ADM2_57006924B10100479283290": {
@@ -462,7 +564,13 @@
           "en": "Tábor",
           "zh": "塔博尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Strakonice + Písek + Tábor",
+        "zh": "斯特拉科尼采、皮塞克、塔博尔"
+      },
+      "name_source": "population",
+      "representative_id": "CZ_ADM2_57006924B74433439756021"
     },
     {
       "id": "CZ_MRG_ea0c37760bf3",
@@ -472,8 +580,8 @@
       ],
       "parent_id": "CZ_St_edo_esk_kraj",
       "names": {
-        "en": "Prague-West + Kladno",
-        "zh": "布拉格西部、克拉德诺"
+        "en": "Prague-West",
+        "zh": "布拉格西部"
       },
       "member_names": {
         "CZ_ADM2_57006924B10827026185454": {
@@ -484,7 +592,13 @@
           "en": "Kladno",
           "zh": "克拉德诺"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Prague-West + Kladno",
+        "zh": "布拉格西部、克拉德诺"
+      },
+      "name_source": "population",
+      "representative_id": "CZ_ADM2_57006924B10827026185454"
     },
     {
       "id": "CZ_MRG_9096ecd76bb9",
@@ -494,8 +608,8 @@
       ],
       "parent_id": "CZ_Pardubick_kraj",
       "names": {
-        "en": "Chrudim + Svitavy",
-        "zh": "赫鲁丁、斯维塔维"
+        "en": "Chrudim",
+        "zh": "赫鲁丁"
       },
       "member_names": {
         "CZ_ADM2_57006924B14129056192165": {
@@ -506,7 +620,13 @@
           "en": "Svitavy",
           "zh": "斯维塔维"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Chrudim + Svitavy",
+        "zh": "赫鲁丁、斯维塔维"
+      },
+      "name_source": "population",
+      "representative_id": "CZ_ADM2_57006924B14129056192165"
     },
     {
       "id": "CZ_MRG_e151f991209d",
@@ -516,8 +636,8 @@
       ],
       "parent_id": "CZ_Zl_nsk_kraj",
       "names": {
-        "en": "Uherské Hradiště + Kroměříž",
-        "zh": "乌赫尔堡、克罗梅日什"
+        "en": "Uherské Hradiště",
+        "zh": "乌赫尔堡"
       },
       "member_names": {
         "CZ_ADM2_57006924B14436380449594": {
@@ -528,7 +648,13 @@
           "en": "Kroměříž",
           "zh": "克罗梅日什"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Uherské Hradiště + Kroměříž",
+        "zh": "乌赫尔堡、克罗梅日什"
+      },
+      "name_source": "population",
+      "representative_id": "CZ_ADM2_57006924B14436380449594"
     },
     {
       "id": "CZ_MRG_9d601ad75aef",
@@ -539,8 +665,8 @@
       ],
       "parent_id": "CZ_Plze_sk_kraj",
       "names": {
-        "en": "Plzeň-North + Plzeň-South + Rokycany",
-        "zh": "比尔森北、比尔森南、罗基卡尼"
+        "en": "Plzeň-North",
+        "zh": "比尔森北"
       },
       "member_names": {
         "CZ_ADM2_57006924B24749184311211": {
@@ -555,7 +681,13 @@
           "en": "Rokycany",
           "zh": "罗基卡尼"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Plzeň-North + Plzeň-South + Rokycany",
+        "zh": "比尔森北、比尔森南、罗基卡尼"
+      },
+      "name_source": "population",
+      "representative_id": "CZ_ADM2_57006924B24749184311211"
     },
     {
       "id": "CZ_MRG_a9dfac9d401b",
@@ -565,8 +697,8 @@
       ],
       "parent_id": "CZ_Kraj_Vyso_ina",
       "names": {
-        "en": "Jihlava + Třebíč",
-        "zh": "伊赫拉瓦、特热比奇"
+        "en": "Jihlava",
+        "zh": "伊赫拉瓦"
       },
       "member_names": {
         "CZ_ADM2_57006924B35034257273333": {
@@ -577,7 +709,13 @@
           "en": "Třebíč",
           "zh": "特热比奇"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Jihlava + Třebíč",
+        "zh": "伊赫拉瓦、特热比奇"
+      },
+      "name_source": "city",
+      "representative_id": "CZ_ADM2_57006924B35034257273333"
     },
     {
       "id": "CZ_MRG_2919911b5bfd",
@@ -588,8 +726,8 @@
       ],
       "parent_id": "CZ_Jihomoravsk_kraj",
       "names": {
-        "en": "Vyškov + Hodonín + Brno-Country",
-        "zh": "维什科夫、霍多宁、布尔诺乡村"
+        "en": "Brno-Country",
+        "zh": "布尔诺乡村"
       },
       "member_names": {
         "CZ_ADM2_57006924B37669195364586": {
@@ -604,7 +742,13 @@
           "en": "Brno-Country",
           "zh": "布尔诺乡村"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Vyškov + Hodonín + Brno-Country",
+        "zh": "维什科夫、霍多宁、布尔诺乡村"
+      },
+      "name_source": "population",
+      "representative_id": "CZ_ADM2_57006924B88312395520389"
     },
     {
       "id": "CZ_MRG_dfeea8e4d5f1",
@@ -614,8 +758,8 @@
       ],
       "parent_id": "CZ_Kraj_Vyso_ina",
       "names": {
-        "en": "Pelhřimov + Havlíčkův Brod",
-        "zh": "佩尔赫日莫夫、哈夫利库夫·布罗德"
+        "en": "Havlíčkův Brod",
+        "zh": "哈夫利库夫·布罗德"
       },
       "member_names": {
         "CZ_ADM2_57006924B47389261447584": {
@@ -626,7 +770,13 @@
           "en": "Havlíčkův Brod",
           "zh": "哈夫利库夫·布罗德"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pelhřimov + Havlíčkův Brod",
+        "zh": "佩尔赫日莫夫、哈夫利库夫·布罗德"
+      },
+      "name_source": "population",
+      "representative_id": "CZ_ADM2_57006924B85481167833175"
     },
     {
       "id": "CZ_MRG_16303fe61c1d",
@@ -637,8 +787,8 @@
       ],
       "parent_id": "CZ_St_edo_esk_kraj",
       "names": {
-        "en": "Příbram + Benešov + Beroun",
-        "zh": "普日布拉姆、贝内绍夫、贝龙"
+        "en": "Příbram",
+        "zh": "普日布拉姆"
       },
       "member_names": {
         "CZ_ADM2_57006924B48464151885273": {
@@ -653,7 +803,13 @@
           "en": "Beroun",
           "zh": "贝龙"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Příbram + Benešov + Beroun",
+        "zh": "普日布拉姆、贝内绍夫、贝龙"
+      },
+      "name_source": "population",
+      "representative_id": "CZ_ADM2_57006924B48464151885273"
     },
     {
       "id": "SK_MRG_e93604b4f2a5",
@@ -663,8 +819,8 @@
       ],
       "parent_id": "Prešovský kraj",
       "names": {
-        "en": "District of Levoca + District of Sabinov",
-        "zh": "莱沃卡区、萨比诺夫区"
+        "en": "District of Sabinov",
+        "zh": "萨比诺夫区"
       },
       "member_names": {
         "SK_ADM2_56367889B11470427915377": {
@@ -675,7 +831,13 @@
           "en": "District of Sabinov",
           "zh": "萨比诺夫区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "District of Levoca + District of Sabinov",
+        "zh": "莱沃卡区、萨比诺夫区"
+      },
+      "name_source": "population",
+      "representative_id": "SK_ADM2_56367889B81744173793240"
     },
     {
       "id": "SK_MRG_b87a765e2485",
@@ -685,8 +847,8 @@
       ],
       "parent_id": "Bratislavský kraj",
       "names": {
-        "en": "District of Pezinok + District of Bratislava III",
-        "zh": "佩济诺克区、布拉迪斯拉发第三区"
+        "en": "District of Pezinok",
+        "zh": "佩济诺克区"
       },
       "member_names": {
         "SK_ADM2_56367889B12595131960891": {
@@ -697,7 +859,13 @@
           "en": "District of Bratislava III",
           "zh": "布拉迪斯拉发第三区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "District of Pezinok + District of Bratislava III",
+        "zh": "佩济诺克区、布拉迪斯拉发第三区"
+      },
+      "name_source": "population",
+      "representative_id": "SK_ADM2_56367889B12595131960891"
     },
     {
       "id": "SK_MRG_da1e3ec3eef0",
@@ -707,8 +875,8 @@
       ],
       "parent_id": "Banskobystrický kraj",
       "names": {
-        "en": "District of Bansks Bystrica + District of Giar nad Hronom",
-        "zh": "班斯卡-比斯特里察、赫龙河畔日亚尔"
+        "en": "Banská Bystrica",
+        "zh": "班斯卡-比斯特里察"
       },
       "member_names": {
         "SK_ADM2_56367889B14109704827124": {
@@ -719,7 +887,13 @@
           "en": "District of Giar nad Hronom",
           "zh": "赫龙河畔日亚尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "District of Bansks Bystrica + District of Giar nad Hronom",
+        "zh": "班斯卡-比斯特里察、赫龙河畔日亚尔"
+      },
+      "name_source": "city",
+      "representative_id": "SK_ADM2_56367889B14109704827124"
     },
     {
       "id": "SK_MRG_351edc5a6c69",
@@ -730,8 +904,8 @@
       ],
       "parent_id": "Trenčiansky kraj",
       "names": {
-        "en": "District of Prievidza + District of Bonovce nad Bebra* + District of Partizonske",
-        "zh": "普列维扎区、贝布拉瓦河畔巴诺夫采、帕尔蒂赞斯凯"
+        "en": "District of Prievidza",
+        "zh": "普列维扎区"
       },
       "member_names": {
         "SK_ADM2_56367889B15992044775212": {
@@ -746,7 +920,13 @@
           "en": "District of Partizonske",
           "zh": "帕尔蒂赞斯凯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "District of Prievidza + District of Bonovce nad Bebra* + District of Partizonske",
+        "zh": "普列维扎区、贝布拉瓦河畔巴诺夫采、帕尔蒂赞斯凯"
+      },
+      "name_source": "population",
+      "representative_id": "SK_ADM2_56367889B15992044775212"
     },
     {
       "id": "SK_MRG_951b03682e38",
@@ -756,8 +936,8 @@
       ],
       "parent_id": "Trnavský kraj",
       "names": {
-        "en": "District of Piertany + District of Hlohovec",
-        "zh": "皮耶什佳尼、赫洛霍韦茨区"
+        "en": "District of Piertany",
+        "zh": "皮耶什佳尼"
       },
       "member_names": {
         "SK_ADM2_56367889B38418286781664": {
@@ -768,7 +948,13 @@
           "en": "District of Hlohovec",
           "zh": "赫洛霍韦茨区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "District of Piertany + District of Hlohovec",
+        "zh": "皮耶什佳尼、赫洛霍韦茨区"
+      },
+      "name_source": "population",
+      "representative_id": "SK_ADM2_56367889B38418286781664"
     },
     {
       "id": "SK_MRG_dac05b35b387",
@@ -779,8 +965,8 @@
       ],
       "parent_id": "Žilinský kraj",
       "names": {
-        "en": "District of Martin + District of Pilina + District of Kysucki Novi Mesto",
-        "zh": "马丁区、日利纳、基苏采新梅斯托"
+        "en": "Žilina",
+        "zh": "日利纳"
       },
       "member_names": {
         "SK_ADM2_56367889B40145685208334": {
@@ -795,7 +981,13 @@
           "en": "District of Kysucki Novi Mesto",
           "zh": "基苏采新梅斯托"
         }
-      }
+      },
+      "previous_names": {
+        "en": "District of Martin + District of Pilina + District of Kysucki Novi Mesto",
+        "zh": "马丁区、日利纳、基苏采新梅斯托"
+      },
+      "name_source": "city",
+      "representative_id": "SK_ADM2_56367889B48474668858137"
     },
     {
       "id": "SK_MRG_6ddeb377aab6",
@@ -805,8 +997,8 @@
       ],
       "parent_id": "Žilinský kraj",
       "names": {
-        "en": "District of Ruromberok + District of Dolne Kub",
-        "zh": "鲁容贝罗克、下库宾"
+        "en": "District of Ruromberok",
+        "zh": "鲁容贝罗克"
       },
       "member_names": {
         "SK_ADM2_56367889B77247555880458": {
@@ -817,7 +1009,13 @@
           "en": "District of Dolne Kub",
           "zh": "下库宾"
         }
-      }
+      },
+      "previous_names": {
+        "en": "District of Ruromberok + District of Dolne Kub",
+        "zh": "鲁容贝罗克、下库宾"
+      },
+      "name_source": "population",
+      "representative_id": "SK_ADM2_56367889B77247555880458"
     },
     {
       "id": "PL_MRG_4af99a43d917",
@@ -827,8 +1025,8 @@
       ],
       "parent_id": "PL_Lower_Silesian",
       "names": {
-        "en": "bolesławiecki + lwówecki",
-        "zh": "博莱斯瓦维茨、利沃维克"
+        "en": "bolesławiecki",
+        "zh": "博莱斯瓦维茨"
       },
       "member_names": {
         "PL_POW_0201": {
@@ -839,7 +1037,13 @@
           "en": "lwówecki",
           "zh": "利沃维克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "bolesławiecki + lwówecki",
+        "zh": "博莱斯瓦维茨、利沃维克"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0201"
     },
     {
       "id": "PL_MRG_4b4e7fcd7031",
@@ -849,8 +1053,8 @@
       ],
       "parent_id": "PL_Lower_Silesian",
       "names": {
-        "en": "dzierżoniowski + ząbkowicki",
-        "zh": "杰若尼奥夫斯基、扎布科维茨基"
+        "en": "dzierżoniowski",
+        "zh": "杰若尼奥夫斯基"
       },
       "member_names": {
         "PL_POW_0202": {
@@ -861,7 +1065,13 @@
           "en": "ząbkowicki",
           "zh": "扎布科维茨基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "dzierżoniowski + ząbkowicki",
+        "zh": "杰若尼奥夫斯基、扎布科维茨基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0202"
     },
     {
       "id": "PL_MRG_cda1a954e365",
@@ -871,8 +1081,8 @@
       ],
       "parent_id": "PL_Lower_Silesian",
       "names": {
-        "en": "lubiński + polkowicki",
-        "zh": "卢宾斯基、波尔科维茨基"
+        "en": "lubiński",
+        "zh": "卢宾斯基"
       },
       "member_names": {
         "PL_POW_0211": {
@@ -883,7 +1093,13 @@
           "en": "polkowicki",
           "zh": "波尔科维茨基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "lubiński + polkowicki",
+        "zh": "卢宾斯基、波尔科维茨基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0211"
     },
     {
       "id": "PL_MRG_697bf6eafbca",
@@ -894,8 +1110,8 @@
       ],
       "parent_id": "PL_Lower_Silesian",
       "names": {
-        "en": "jaworski + legnicki + złotoryjski",
-        "zh": "贾沃斯基、莱格尼察、兹沃托里亚"
+        "en": "legnicki (Lower Silesian)",
+        "zh": "莱格尼察（下西里西亚省）"
       },
       "member_names": {
         "PL_POW_0205": {
@@ -910,7 +1126,13 @@
           "en": "złotoryjski",
           "zh": "兹沃托里亚"
         }
-      }
+      },
+      "previous_names": {
+        "en": "jaworski + legnicki + złotoryjski",
+        "zh": "贾沃斯基、莱格尼察、兹沃托里亚"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0209"
     },
     {
       "id": "PL_MRG_ae7dcb23076e",
@@ -920,8 +1142,8 @@
       ],
       "parent_id": "PL_Lower_Silesian",
       "names": {
-        "en": "średzki + wołowski",
-        "zh": "斯列兹基、沃洛夫斯基"
+        "en": "średzki",
+        "zh": "斯列兹基"
       },
       "member_names": {
         "PL_POW_0218": {
@@ -932,7 +1154,13 @@
           "en": "wołowski",
           "zh": "沃洛夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "średzki + wołowski",
+        "zh": "斯列兹基、沃洛夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0218"
     },
     {
       "id": "PL_MRG_a4d0d3a9760e",
@@ -943,8 +1171,8 @@
       ],
       "parent_id": "PL_Kuyavian_Pomeranian",
       "names": {
-        "en": "chełmiński + świecki + tucholski",
-        "zh": "海乌姆诺、希维茨基、图霍尔斯基"
+        "en": "świecki",
+        "zh": "希维茨基"
       },
       "member_names": {
         "PL_POW_0404": {
@@ -959,7 +1187,13 @@
           "en": "tucholski",
           "zh": "图霍尔斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "chełmiński + świecki + tucholski",
+        "zh": "海乌姆诺、希维茨基、图霍尔斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0414"
     },
     {
       "id": "PL_MRG_f18bf4792f6a",
@@ -969,8 +1203,8 @@
       ],
       "parent_id": "PL_Kuyavian_Pomeranian",
       "names": {
-        "en": "golubsko-dobrzyński + rypiński",
-        "zh": "戈卢布斯科-多布尔津斯基、雷平斯基"
+        "en": "rypiński",
+        "zh": "雷平斯基"
       },
       "member_names": {
         "PL_POW_0405": {
@@ -981,7 +1215,13 @@
           "en": "rypiński",
           "zh": "雷平斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "golubsko-dobrzyński + rypiński",
+        "zh": "戈卢布斯科-多布尔津斯基、雷平斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0412"
     },
     {
       "id": "PL_MRG_7c2fbae3db0b",
@@ -991,8 +1231,8 @@
       ],
       "parent_id": "PL_Kuyavian_Pomeranian",
       "names": {
-        "en": "mogileński + żniński",
-        "zh": "莫吉诺、兹宁斯基"
+        "en": "żniński",
+        "zh": "兹宁斯基"
       },
       "member_names": {
         "PL_POW_0409": {
@@ -1003,7 +1243,13 @@
           "en": "żniński",
           "zh": "兹宁斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "mogileński + żniński",
+        "zh": "莫吉诺、兹宁斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0419"
     },
     {
       "id": "PL_MRG_fb2ce823eb38",
@@ -1013,8 +1259,8 @@
       ],
       "parent_id": "PL_Kuyavian_Pomeranian",
       "names": {
-        "en": "radziejowski + włocławski",
-        "zh": "拉齐约夫斯基、弗沃茨瓦韦克"
+        "en": "włocławski (Kuyavian-Pomeranian)",
+        "zh": "弗沃茨瓦韦克（库亚维-滨海省）"
       },
       "member_names": {
         "PL_POW_0411": {
@@ -1025,7 +1271,13 @@
           "en": "włocławski",
           "zh": "弗沃茨瓦韦克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "radziejowski + włocławski",
+        "zh": "拉齐约夫斯基、弗沃茨瓦韦克"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0418"
     },
     {
       "id": "PL_MRG_4a2bfb6b173f",
@@ -1036,8 +1288,8 @@
       ],
       "parent_id": "PL_Lublin",
       "names": {
-        "en": "biłgorajski + krasnostawski + zamojski",
-        "zh": "比乌戈拉伊、克拉斯内斯塔夫斯基、扎莫希奇"
+        "en": "zamojski",
+        "zh": "扎莫希奇"
       },
       "member_names": {
         "PL_POW_0602": {
@@ -1052,7 +1304,13 @@
           "en": "zamojski",
           "zh": "扎莫希奇"
         }
-      }
+      },
+      "previous_names": {
+        "en": "biłgorajski + krasnostawski + zamojski",
+        "zh": "比乌戈拉伊、克拉斯内斯塔夫斯基、扎莫希奇"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0620"
     },
     {
       "id": "PL_MRG_05ddd04cc90f",
@@ -1062,8 +1320,8 @@
       ],
       "parent_id": "PL_Lublin",
       "names": {
-        "en": "janowski + kraśnicki",
-        "zh": "亚诺夫斯基、克拉希尼基"
+        "en": "kraśnicki",
+        "zh": "克拉希尼基"
       },
       "member_names": {
         "PL_POW_0605": {
@@ -1074,7 +1332,13 @@
           "en": "kraśnicki",
           "zh": "克拉希尼基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "janowski + kraśnicki",
+        "zh": "亚诺夫斯基、克拉希尼基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0607"
     },
     {
       "id": "PL_MRG_57a0cb6e8d35",
@@ -1085,8 +1349,8 @@
       ],
       "parent_id": "PL_Lublin",
       "names": {
-        "en": "lubartowski + parczewski + puławski",
-        "zh": "卢巴尔托夫斯基、帕尔切夫斯基、普瓦夫斯基"
+        "en": "puławski",
+        "zh": "普瓦夫斯基"
       },
       "member_names": {
         "PL_POW_0608": {
@@ -1101,7 +1365,13 @@
           "en": "puławski",
           "zh": "普瓦夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "lubartowski + parczewski + puławski",
+        "zh": "卢巴尔托夫斯基、帕尔切夫斯基、普瓦夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0614"
     },
     {
       "id": "PL_MRG_e17e448ae4e2",
@@ -1112,8 +1382,8 @@
       ],
       "parent_id": "PL_Lublin",
       "names": {
-        "en": "lubelski + opolski + świdnicki",
-        "zh": "卢布林、奥波莱、斯维德尼察"
+        "en": "lubelski (Lublin)",
+        "zh": "卢布林（卢布林省）"
       },
       "member_names": {
         "PL_POW_0609": {
@@ -1128,7 +1398,13 @@
           "en": "świdnicki",
           "zh": "斯维德尼察"
         }
-      }
+      },
+      "previous_names": {
+        "en": "lubelski + opolski + świdnicki",
+        "zh": "卢布林、奥波莱、斯维德尼察"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0609"
     },
     {
       "id": "PL_MRG_8d9132641197",
@@ -1139,8 +1415,8 @@
       ],
       "parent_id": "PL_Lublin",
       "names": {
-        "en": "łukowski + radzyński + rycki",
-        "zh": "卢科夫斯基、拉金斯基、里茨基"
+        "en": "łukowski",
+        "zh": "卢科夫斯基"
       },
       "member_names": {
         "PL_POW_0611": {
@@ -1155,7 +1431,13 @@
           "en": "rycki",
           "zh": "里茨基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "łukowski + radzyński + rycki",
+        "zh": "卢科夫斯基、拉金斯基、里茨基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_0611"
     },
     {
       "id": "PL_MRG_5ca02af3d829",
@@ -1165,8 +1447,8 @@
       ],
       "parent_id": "PL_Lodz",
       "names": {
-        "en": "poddębicki + zduńskowolski",
-        "zh": "波德比茨基、兹敦斯科沃尔斯基"
+        "en": "zduńskowolski",
+        "zh": "兹敦斯科沃尔斯基"
       },
       "member_names": {
         "PL_POW_1011": {
@@ -1177,7 +1459,13 @@
           "en": "zduńskowolski",
           "zh": "兹敦斯科沃尔斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "poddębicki + zduńskowolski",
+        "zh": "波德比茨基、兹敦斯科沃尔斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1019"
     },
     {
       "id": "PL_MRG_4ed00c272094",
@@ -1188,8 +1476,8 @@
       ],
       "parent_id": "PL_Lodz",
       "names": {
-        "en": "rawski + skierniewicki + Skierniewice",
-        "zh": "罗斯基、斯基尔涅维奇、斯基尔涅维采"
+        "en": "rawski",
+        "zh": "罗斯基"
       },
       "member_names": {
         "PL_POW_1013": {
@@ -1204,7 +1492,13 @@
           "en": "Skierniewice",
           "zh": "斯基尔涅维采"
         }
-      }
+      },
+      "previous_names": {
+        "en": "rawski + skierniewicki + Skierniewice",
+        "zh": "罗斯基、斯基尔涅维奇、斯基尔涅维采"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1013"
     },
     {
       "id": "PL_MRG_672367948ccf",
@@ -1215,8 +1509,8 @@
       ],
       "parent_id": "PL_Lesser_Poland",
       "names": {
-        "en": "bocheński + brzeski + tarnowski",
-        "zh": "博赫尼亚、布雷斯特、塔尔诺夫斯基"
+        "en": "tarnowski",
+        "zh": "塔尔诺夫斯基"
       },
       "member_names": {
         "PL_POW_1201": {
@@ -1231,7 +1525,13 @@
           "en": "tarnowski",
           "zh": "塔尔诺夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "bocheński + brzeski + tarnowski",
+        "zh": "博赫尼亚、布雷斯特、塔尔诺夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1216"
     },
     {
       "id": "PL_MRG_d1960b18210a",
@@ -1242,8 +1542,8 @@
       ],
       "parent_id": "PL_Lesser_Poland",
       "names": {
-        "en": "krakowski + miechowski + proszowicki",
-        "zh": "克拉科夫、米霍夫斯基、普罗佐维茨基"
+        "en": "krakowski",
+        "zh": "克拉科夫"
       },
       "member_names": {
         "PL_POW_1206": {
@@ -1258,7 +1558,13 @@
           "en": "proszowicki",
           "zh": "普罗佐维茨基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "krakowski + miechowski + proszowicki",
+        "zh": "克拉科夫、米霍夫斯基、普罗佐维茨基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1206"
     },
     {
       "id": "PL_MRG_28f9056747e2",
@@ -1269,8 +1575,8 @@
       ],
       "parent_id": "PL_Lesser_Poland",
       "names": {
-        "en": "limanowski + myślenicki + wielicki",
-        "zh": "利马诺夫斯基、梅斯莱尼采、维利奇卡"
+        "en": "limanowski",
+        "zh": "利马诺夫斯基"
       },
       "member_names": {
         "PL_POW_1207": {
@@ -1285,7 +1591,13 @@
           "en": "wielicki",
           "zh": "维利奇卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "limanowski + myślenicki + wielicki",
+        "zh": "利马诺夫斯基、梅斯莱尼采、维利奇卡"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1207"
     },
     {
       "id": "PL_MRG_6a243775b00f",
@@ -1295,8 +1607,8 @@
       ],
       "parent_id": "PL_Masovian",
       "names": {
-        "en": "grójecki + piaseczyński",
-        "zh": "格罗耶茨基、皮亚塞奇诺"
+        "en": "piaseczyński",
+        "zh": "皮亚塞奇诺"
       },
       "member_names": {
         "PL_POW_1406": {
@@ -1307,7 +1619,13 @@
           "en": "piaseczyński",
           "zh": "皮亚塞奇诺"
         }
-      }
+      },
+      "previous_names": {
+        "en": "grójecki + piaseczyński",
+        "zh": "格罗耶茨基、皮亚塞奇诺"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1418"
     },
     {
       "id": "PL_MRG_c16d6d416392",
@@ -1318,8 +1636,8 @@
       ],
       "parent_id": "PL_Masovian",
       "names": {
-        "en": "grodziski + pruszkowski + żyrardowski",
-        "zh": "格罗济斯基、普鲁什科夫斯基、日拉多夫斯基"
+        "en": "pruszkowski",
+        "zh": "普鲁什科夫斯基"
       },
       "member_names": {
         "PL_POW_1405": {
@@ -1334,7 +1652,13 @@
           "en": "żyrardowski",
           "zh": "日拉多夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "grodziski + pruszkowski + żyrardowski",
+        "zh": "格罗济斯基、普鲁什科夫斯基、日拉多夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1421"
     },
     {
       "id": "PL_MRG_fe2842d4d685",
@@ -1345,8 +1669,8 @@
       ],
       "parent_id": "PL_Masovian",
       "names": {
-        "en": "lipski + radomski + zwoleński",
-        "zh": "利普斯科县、拉多姆斯基、兹沃连斯基"
+        "en": "radomski",
+        "zh": "拉多姆斯基"
       },
       "member_names": {
         "PL_POW_1409": {
@@ -1361,7 +1685,13 @@
           "en": "zwoleński",
           "zh": "兹沃连斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "lipski + radomski + zwoleński",
+        "zh": "利普斯科县、拉多姆斯基、兹沃连斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1425"
     },
     {
       "id": "PL_MRG_49c8bdd6da87",
@@ -1372,8 +1702,8 @@
       ],
       "parent_id": "PL_Masovian",
       "names": {
-        "en": "miński + otwocki + wołomiński",
-        "zh": "马佐夫舍地区明斯克县、奥特沃克、沃沃明斯基"
+        "en": "wołomiński",
+        "zh": "沃沃明斯基"
       },
       "member_names": {
         "PL_POW_1412": {
@@ -1388,7 +1718,13 @@
           "en": "wołomiński",
           "zh": "沃沃明斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "miński + otwocki + wołomiński",
+        "zh": "马佐夫舍地区明斯克县、奥特沃克、沃沃明斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1434"
     },
     {
       "id": "PL_MRG_6ea9dfea1297",
@@ -1398,8 +1734,8 @@
       ],
       "parent_id": "PL_Masovian",
       "names": {
-        "en": "przysuski + szydłowiecki",
-        "zh": "普日苏斯基、西德沃维茨"
+        "en": "przysuski",
+        "zh": "普日苏斯基"
       },
       "member_names": {
         "PL_POW_1423": {
@@ -1410,7 +1746,13 @@
           "en": "szydłowiecki",
           "zh": "西德沃维茨"
         }
-      }
+      },
+      "previous_names": {
+        "en": "przysuski + szydłowiecki",
+        "zh": "普日苏斯基、西德沃维茨"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1423"
     },
     {
       "id": "PL_MRG_7076d4b3250d",
@@ -1421,8 +1763,8 @@
       ],
       "parent_id": "PL_Subcarpathian",
       "names": {
-        "en": "dębicki + mielecki + ropczycko-sędziszowski",
-        "zh": "登比茨基、梅莱茨基、罗普奇采-森济佐夫斯基"
+        "en": "mielecki",
+        "zh": "梅莱茨基"
       },
       "member_names": {
         "PL_POW_1803": {
@@ -1437,7 +1779,13 @@
           "en": "ropczycko-sędziszowski",
           "zh": "罗普奇采-森济佐夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "dębicki + mielecki + ropczycko-sędziszowski",
+        "zh": "登比茨基、梅莱茨基、罗普奇采-森济佐夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1811"
     },
     {
       "id": "PL_MRG_d8ea546338a5",
@@ -1448,8 +1796,8 @@
       ],
       "parent_id": "PL_Subcarpathian",
       "names": {
-        "en": "leżajski + niżański + stalowowolski",
-        "zh": "莱扎伊斯基、尼赞斯基、斯塔洛沃沃尔斯基"
+        "en": "stalowowolski",
+        "zh": "斯塔洛沃沃尔斯基"
       },
       "member_names": {
         "PL_POW_1808": {
@@ -1464,7 +1812,13 @@
           "en": "stalowowolski",
           "zh": "斯塔洛沃沃尔斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "leżajski + niżański + stalowowolski",
+        "zh": "莱扎伊斯基、尼赞斯基、斯塔洛沃沃尔斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1818"
     },
     {
       "id": "PL_MRG_b96b5d49d900",
@@ -1474,8 +1828,8 @@
       ],
       "parent_id": "PL_Subcarpathian",
       "names": {
-        "en": "tarnobrzeski + Tarnobrzeg",
-        "zh": "塔尔诺布热格、塔尔诺布热格"
+        "en": "tarnobrzeski",
+        "zh": "塔尔诺布热格"
       },
       "member_names": {
         "PL_POW_1820": {
@@ -1486,7 +1840,13 @@
           "en": "Tarnobrzeg",
           "zh": "塔尔诺布热格"
         }
-      }
+      },
+      "previous_names": {
+        "en": "tarnobrzeski + Tarnobrzeg",
+        "zh": "塔尔诺布热格、塔尔诺布热格"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_1820"
     },
     {
       "id": "PL_MRG_3bc1f7b63f72",
@@ -1497,8 +1857,8 @@
       ],
       "parent_id": "PL_Podlaskie",
       "names": {
-        "en": "łomżyński + zambrowski + Łomża",
-        "zh": "沃姆扎、赞布罗夫斯基、沃姆扎"
+        "en": "Łomża",
+        "zh": "沃姆扎"
       },
       "member_names": {
         "PL_POW_2007": {
@@ -1513,7 +1873,13 @@
           "en": "Łomża",
           "zh": "沃姆扎"
         }
-      }
+      },
+      "previous_names": {
+        "en": "łomżyński + zambrowski + Łomża",
+        "zh": "沃姆扎、赞布罗夫斯基、沃姆扎"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2062"
     },
     {
       "id": "PL_MRG_55eb1a09655e",
@@ -1523,8 +1889,8 @@
       ],
       "parent_id": "PL_Pomeranian",
       "names": {
-        "en": "chojnicki + kościerski",
-        "zh": "霍伊尼茨基、科希切尔日纳"
+        "en": "chojnicki",
+        "zh": "霍伊尼茨基"
       },
       "member_names": {
         "PL_POW_2202": {
@@ -1535,7 +1901,13 @@
           "en": "kościerski",
           "zh": "科希切尔日纳"
         }
-      }
+      },
+      "previous_names": {
+        "en": "chojnicki + kościerski",
+        "zh": "霍伊尼茨基、科希切尔日纳"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2202"
     },
     {
       "id": "PL_MRG_e9b93261cb76",
@@ -1545,8 +1917,8 @@
       ],
       "parent_id": "PL_Pomeranian",
       "names": {
-        "en": "starogardzki + tczewski",
-        "zh": "斯塔罗加德、切夫斯基"
+        "en": "starogardzki",
+        "zh": "斯塔罗加德"
       },
       "member_names": {
         "PL_POW_2213": {
@@ -1557,7 +1929,13 @@
           "en": "tczewski",
           "zh": "切夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "starogardzki + tczewski",
+        "zh": "斯塔罗加德、切夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2213"
     },
     {
       "id": "PL_MRG_88938957a4dc",
@@ -1568,8 +1946,8 @@
       ],
       "parent_id": "PL_Pomeranian",
       "names": {
-        "en": "lęborski + pucki + wejherowski",
-        "zh": "伦博克、普基、韦赫罗夫斯基"
+        "en": "wejherowski",
+        "zh": "韦赫罗夫斯基"
       },
       "member_names": {
         "PL_POW_2208": {
@@ -1584,7 +1962,13 @@
           "en": "wejherowski",
           "zh": "韦赫罗夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "lęborski + pucki + wejherowski",
+        "zh": "伦博克、普基、韦赫罗夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2215"
     },
     {
       "id": "PL_MRG_ec568da59ac7",
@@ -1595,8 +1979,8 @@
       ],
       "parent_id": "PL_Silesian",
       "names": {
-        "en": "mikołowski + rybnicki + Żory",
-        "zh": "米科沃夫、雷布尼克、若雷"
+        "en": "mikołowski",
+        "zh": "米科沃夫"
       },
       "member_names": {
         "PL_POW_2408": {
@@ -1611,7 +1995,13 @@
           "en": "Żory",
           "zh": "若雷"
         }
-      }
+      },
+      "previous_names": {
+        "en": "mikołowski + rybnicki + Żory",
+        "zh": "米科沃夫、雷布尼克、若雷"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2408"
     },
     {
       "id": "PL_MRG_ccb2f83ec3cf",
@@ -1621,8 +2011,8 @@
       ],
       "parent_id": "PL_Silesian",
       "names": {
-        "en": "Piekary Śląskie + Siemianowice Śląskie",
-        "zh": "希隆斯克地区佩卡雷、希隆斯克地区谢米亚诺维采"
+        "en": "Siemianowice Śląskie",
+        "zh": "希隆斯克地区谢米亚诺维采"
       },
       "member_names": {
         "PL_POW_2471": {
@@ -1633,7 +2023,13 @@
           "en": "Siemianowice Śląskie",
           "zh": "希隆斯克地区谢米亚诺维采"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Piekary Śląskie + Siemianowice Śląskie",
+        "zh": "希隆斯克地区佩卡雷、希隆斯克地区谢米亚诺维采"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2474"
     },
     {
       "id": "PL_MRG_d9d9ccd218dd",
@@ -1643,8 +2039,8 @@
       ],
       "parent_id": "PL_Holy_Cross",
       "names": {
-        "en": "buski + kazimierski",
-        "zh": "布斯基、卡齐米日"
+        "en": "buski",
+        "zh": "布斯基"
       },
       "member_names": {
         "PL_POW_2601": {
@@ -1655,7 +2051,13 @@
           "en": "kazimierski",
           "zh": "卡齐米日"
         }
-      }
+      },
+      "previous_names": {
+        "en": "buski + kazimierski",
+        "zh": "布斯基、卡齐米日"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2601"
     },
     {
       "id": "PL_MRG_940b9a58b475",
@@ -1665,8 +2067,8 @@
       ],
       "parent_id": "PL_Holy_Cross",
       "names": {
-        "en": "jędrzejowski + pińczowski",
-        "zh": "延德尔热约夫斯基、平佐夫斯基"
+        "en": "jędrzejowski",
+        "zh": "延德尔热约夫斯基"
       },
       "member_names": {
         "PL_POW_2602": {
@@ -1677,7 +2079,13 @@
           "en": "pińczowski",
           "zh": "平佐夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "jędrzejowski + pińczowski",
+        "zh": "延德尔热约夫斯基、平佐夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2602"
     },
     {
       "id": "PL_MRG_9242fdb1805d",
@@ -1688,8 +2096,8 @@
       ],
       "parent_id": "PL_Holy_Cross",
       "names": {
-        "en": "kielecki + konecki + skarżyski",
-        "zh": "凯尔采、孔斯凯县、斯卡日斯基"
+        "en": "kielecki (Holy Cross)",
+        "zh": "凯尔采（圣十字省）"
       },
       "member_names": {
         "PL_POW_2604": {
@@ -1704,7 +2112,13 @@
           "en": "skarżyski",
           "zh": "斯卡日斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "kielecki + konecki + skarżyski",
+        "zh": "凯尔采、孔斯凯县、斯卡日斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2604"
     },
     {
       "id": "PL_MRG_8f55c53666f8",
@@ -1715,8 +2129,8 @@
       ],
       "parent_id": "PL_Holy_Cross",
       "names": {
-        "en": "opatowski + ostrowiecki + sandomierski",
-        "zh": "奥帕托夫斯基、奥斯特罗维耶茨基、桑多梅尔斯基"
+        "en": "ostrowiecki",
+        "zh": "奥斯特罗维耶茨基"
       },
       "member_names": {
         "PL_POW_2606": {
@@ -1731,7 +2145,13 @@
           "en": "sandomierski",
           "zh": "桑多梅尔斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "opatowski + ostrowiecki + sandomierski",
+        "zh": "奥帕托夫斯基、奥斯特罗维耶茨基、桑多梅尔斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2607"
     },
     {
       "id": "PL_MRG_6059e5e8fd2d",
@@ -1741,8 +2161,8 @@
       ],
       "parent_id": "PL_Warmian_Masurian",
       "names": {
-        "en": "giżycki + mrągowski",
-        "zh": "吉日茨基、姆拉戈夫斯基"
+        "en": "giżycki",
+        "zh": "吉日茨基"
       },
       "member_names": {
         "PL_POW_2806": {
@@ -1753,7 +2173,13 @@
           "en": "mrągowski",
           "zh": "姆拉戈夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "giżycki + mrągowski",
+        "zh": "吉日茨基、姆拉戈夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2806"
     },
     {
       "id": "PL_MRG_635f3bd9c929",
@@ -1763,8 +2189,8 @@
       ],
       "parent_id": "PL_Warmian_Masurian",
       "names": {
-        "en": "lidzbarski + olsztyński",
-        "zh": "利兹巴尔斯基、奥尔什丁"
+        "en": "olsztyński (Warmian-Masurian)",
+        "zh": "奥尔什丁（瓦尔米亚-马祖里省）"
       },
       "member_names": {
         "PL_POW_2809": {
@@ -1775,7 +2201,13 @@
           "en": "olsztyński",
           "zh": "奥尔什丁"
         }
-      }
+      },
+      "previous_names": {
+        "en": "lidzbarski + olsztyński",
+        "zh": "利兹巴尔斯基、奥尔什丁"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_2814"
     },
     {
       "id": "PL_MRG_eea8a1b754f3",
@@ -1786,8 +2218,8 @@
       ],
       "parent_id": "PL_Greater_Poland",
       "names": {
-        "en": "chodzieski + gnieźnieński + wągrowiecki",
-        "zh": "霍齐耶日、格涅兹诺、旺格罗维耶茨基"
+        "en": "gnieźnieński",
+        "zh": "格涅兹诺"
       },
       "member_names": {
         "PL_POW_3001": {
@@ -1802,7 +2234,13 @@
           "en": "wągrowiecki",
           "zh": "旺格罗维耶茨基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "chodzieski + gnieźnieński + wągrowiecki",
+        "zh": "霍齐耶日、格涅兹诺、旺格罗维耶茨基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_3003"
     },
     {
       "id": "PL_MRG_3384b03f3b03",
@@ -1813,8 +2251,8 @@
       ],
       "parent_id": "PL_Greater_Poland",
       "names": {
-        "en": "gostyński + jarociński + pleszewski",
-        "zh": "戈斯廷斯基、雅罗钦斯基、普莱舍夫斯基"
+        "en": "gostyński",
+        "zh": "戈斯廷斯基"
       },
       "member_names": {
         "PL_POW_3004": {
@@ -1829,7 +2267,13 @@
           "en": "pleszewski",
           "zh": "普莱舍夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "gostyński + jarociński + pleszewski",
+        "zh": "戈斯廷斯基、雅罗钦斯基、普莱舍夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_3004"
     },
     {
       "id": "PL_MRG_d07f84128518",
@@ -1840,8 +2284,8 @@
       ],
       "parent_id": "PL_Greater_Poland",
       "names": {
-        "en": "grodziski + kościański + śremski",
-        "zh": "格罗济斯基、科希钦斯基、斯雷姆斯基"
+        "en": "kościański",
+        "zh": "科希钦斯基"
       },
       "member_names": {
         "PL_POW_3005": {
@@ -1856,7 +2300,13 @@
           "en": "śremski",
           "zh": "斯雷姆斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "grodziski + kościański + śremski",
+        "zh": "格罗济斯基、科希钦斯基、斯雷姆斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_3011"
     },
     {
       "id": "PL_MRG_20e2ba9602ff",
@@ -1867,8 +2317,8 @@
       ],
       "parent_id": "PL_Greater_Poland",
       "names": {
-        "en": "kaliski + kolski + turecki",
-        "zh": "卡利什、科尔斯基、图雷克"
+        "en": "kaliski (Greater Poland)",
+        "zh": "卡利什（大波兰省）"
       },
       "member_names": {
         "PL_POW_3007": {
@@ -1883,7 +2333,13 @@
           "en": "turecki",
           "zh": "图雷克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "kaliski + kolski + turecki",
+        "zh": "卡利什、科尔斯基、图雷克"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_3007"
     },
     {
       "id": "PL_MRG_d48e8dc37f33",
@@ -1894,8 +2350,8 @@
       ],
       "parent_id": "PL_Greater_Poland",
       "names": {
-        "en": "koniński + słupecki + Konin",
-        "zh": "科宁斯基、斯武普察、科宁"
+        "en": "koniński",
+        "zh": "科宁斯基"
       },
       "member_names": {
         "PL_POW_3010": {
@@ -1910,7 +2366,13 @@
           "en": "Konin",
           "zh": "科宁"
         }
-      }
+      },
+      "previous_names": {
+        "en": "koniński + słupecki + Konin",
+        "zh": "科宁斯基、斯武普察、科宁"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_3010"
     },
     {
       "id": "PL_MRG_18fdfa02eca5",
@@ -1920,8 +2382,8 @@
       ],
       "parent_id": "PL_Greater_Poland",
       "names": {
-        "en": "obornicki + szamotulski",
-        "zh": "奥博尔尼茨基、沙莫图维"
+        "en": "szamotulski",
+        "zh": "沙莫图维"
       },
       "member_names": {
         "PL_POW_3016": {
@@ -1932,7 +2394,13 @@
           "en": "szamotulski",
           "zh": "沙莫图维"
         }
-      }
+      },
+      "previous_names": {
+        "en": "obornicki + szamotulski",
+        "zh": "奥博尔尼茨基、沙莫图维"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_3024"
     },
     {
       "id": "PL_MRG_ec5519b4d3cf",
@@ -1943,8 +2411,8 @@
       ],
       "parent_id": "PL_Greater_Poland",
       "names": {
-        "en": "poznański + średzki + wrzesiński",
-        "zh": "波兹南、斯列兹基、弗热辛斯基"
+        "en": "poznański (Greater Poland)",
+        "zh": "波兹南（大波兰省）"
       },
       "member_names": {
         "PL_POW_3021": {
@@ -1959,7 +2427,13 @@
           "en": "wrzesiński",
           "zh": "弗热辛斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "poznański + średzki + wrzesiński",
+        "zh": "波兹南、斯列兹基、弗热辛斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_3021"
     },
     {
       "id": "PL_MRG_ed1992314afe",
@@ -1970,8 +2444,8 @@
       ],
       "parent_id": "PL_West_Pomeranian",
       "names": {
-        "en": "białogardzki + świdwiński + łobeski",
-        "zh": "比亚沃加尔、斯维德温斯基、沃贝兹"
+        "en": "białogardzki",
+        "zh": "比亚沃加尔"
       },
       "member_names": {
         "PL_POW_3201": {
@@ -1986,7 +2460,13 @@
           "en": "łobeski",
           "zh": "沃贝兹"
         }
-      }
+      },
+      "previous_names": {
+        "en": "białogardzki + świdwiński + łobeski",
+        "zh": "比亚沃加尔、斯维德温斯基、沃贝兹"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_3201"
     },
     {
       "id": "PL_MRG_9b20fe0cbb07",
@@ -1997,8 +2477,8 @@
       ],
       "parent_id": "PL_West_Pomeranian",
       "names": {
-        "en": "goleniowski + gryficki + kamieński",
-        "zh": "戈莱尼奥夫斯基、格里菲采、卡缅斯基"
+        "en": "goleniowski",
+        "zh": "戈莱尼奥夫斯基"
       },
       "member_names": {
         "PL_POW_3204": {
@@ -2013,7 +2493,13 @@
           "en": "kamieński",
           "zh": "卡缅斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "goleniowski + gryficki + kamieński",
+        "zh": "戈莱尼奥夫斯基、格里菲采、卡缅斯基"
+      },
+      "name_source": "population",
+      "representative_id": "PL_POW_3204"
     },
     {
       "id": "FR_MRG_e9f7d6aaa46e",
@@ -2023,8 +2509,8 @@
       ],
       "parent_id": "FR_Auvergne_Rhone_Alpes",
       "names": {
-        "en": "Montluçon + Moulins",
-        "zh": "蒙吕松、穆兰"
+        "en": "Montluçon",
+        "zh": "蒙吕松"
       },
       "member_names": {
         "FR_ARR_03001": {
@@ -2035,7 +2521,13 @@
           "en": "Moulins",
           "zh": "穆兰"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Montluçon + Moulins",
+        "zh": "蒙吕松、穆兰"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_03001"
     },
     {
       "id": "FR_MRG_fe4c24f6c0af",
@@ -2045,8 +2537,8 @@
       ],
       "parent_id": "FR_Auvergne_Rhone_Alpes",
       "names": {
-        "en": "Issoire + Riom",
-        "zh": "伊苏瓦尔、里永"
+        "en": "Riom",
+        "zh": "里永"
       },
       "member_names": {
         "FR_ARR_63003": {
@@ -2057,7 +2549,13 @@
           "en": "Riom",
           "zh": "里永"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Issoire + Riom",
+        "zh": "伊苏瓦尔、里永"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_63004"
     },
     {
       "id": "FR_MRG_b062e98b7497",
@@ -2067,8 +2565,8 @@
       ],
       "parent_id": "FR_Occitanie",
       "names": {
-        "en": "Carcassonne + Limoux",
-        "zh": "卡尔卡松、利穆"
+        "en": "Carcassonne",
+        "zh": "卡尔卡松"
       },
       "member_names": {
         "FR_ARR_11001": {
@@ -2079,7 +2577,13 @@
           "en": "Limoux",
           "zh": "利穆"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Carcassonne + Limoux",
+        "zh": "卡尔卡松、利穆"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_11001"
     },
     {
       "id": "FR_MRG_d292a0ff7a4c",
@@ -2089,8 +2593,8 @@
       ],
       "parent_id": "FR_Occitanie",
       "names": {
-        "en": "Albi + Castres",
-        "zh": "阿尔比、卡斯特尔"
+        "en": "Castres",
+        "zh": "卡斯特尔"
       },
       "member_names": {
         "FR_ARR_81001": {
@@ -2101,7 +2605,13 @@
           "en": "Castres",
           "zh": "卡斯特尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Albi + Castres",
+        "zh": "阿尔比、卡斯特尔"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_81002"
     },
     {
       "id": "FR_MRG_8a5ec14e81e7",
@@ -2111,8 +2621,8 @@
       ],
       "parent_id": "FR_Provence_Alpes_Cote_d_Azur",
       "names": {
-        "en": "Arles + Istres",
-        "zh": "阿尔勒、伊斯特尔"
+        "en": "Istres",
+        "zh": "伊斯特尔"
       },
       "member_names": {
         "FR_ARR_13002": {
@@ -2123,7 +2633,13 @@
           "en": "Istres",
           "zh": "伊斯特尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Arles + Istres",
+        "zh": "阿尔勒、伊斯特尔"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_13004"
     },
     {
       "id": "FR_MRG_c20888c67931",
@@ -2133,8 +2649,8 @@
       ],
       "parent_id": "FR_Auvergne_Rhone_Alpes",
       "names": {
-        "en": "Aurillac + Mauriac",
-        "zh": "奥里亚克、莫里亚克"
+        "en": "Aurillac",
+        "zh": "奥里亚克"
       },
       "member_names": {
         "FR_ARR_15001": {
@@ -2145,7 +2661,13 @@
           "en": "Mauriac",
           "zh": "莫里亚克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Aurillac + Mauriac",
+        "zh": "奥里亚克、莫里亚克"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_15001"
     },
     {
       "id": "FR_MRG_a48d5d8654a9",
@@ -2156,8 +2678,8 @@
       ],
       "parent_id": "FR_Nouvelle_Aquitaine",
       "names": {
-        "en": "Rochefort + Saintes + Saint-Jean-d'Angély",
-        "zh": "罗什福尔、桑特斯、圣让当热利"
+        "en": "Rochefort",
+        "zh": "罗什福尔"
       },
       "member_names": {
         "FR_ARR_17002": {
@@ -2172,7 +2694,13 @@
           "en": "Saint-Jean-d'Angély",
           "zh": "圣让当热利"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rochefort + Saintes + Saint-Jean-d'Angély",
+        "zh": "罗什福尔、桑特斯、圣让当热利"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_17002"
     },
     {
       "id": "FR_MRG_71a8637a4772",
@@ -2183,8 +2711,8 @@
       ],
       "parent_id": "FR_Nouvelle_Aquitaine",
       "names": {
-        "en": "Brive-la-Gaillarde + Tulle + Ussel",
-        "zh": "布里夫拉盖亚尔德、蒂勒、于塞勒"
+        "en": "Brive-la-Gaillarde",
+        "zh": "布里夫拉盖亚尔德"
       },
       "member_names": {
         "FR_ARR_19001": {
@@ -2199,7 +2727,13 @@
           "en": "Ussel",
           "zh": "于塞勒"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Brive-la-Gaillarde + Tulle + Ussel",
+        "zh": "布里夫拉盖亚尔德、蒂勒、于塞勒"
+      },
+      "name_source": "city",
+      "representative_id": "FR_ARR_19001"
     },
     {
       "id": "FR_MRG_8cd54e74f796",
@@ -2209,8 +2743,8 @@
       ],
       "parent_id": "FR_Bourgogne_Franche_Comte",
       "names": {
-        "en": "Autun + Chalon-sur-Saône",
-        "zh": "奥坦、索恩河畔沙隆"
+        "en": "Chalon-sur-Saône",
+        "zh": "索恩河畔沙隆"
       },
       "member_names": {
         "FR_ARR_71001": {
@@ -2221,7 +2755,13 @@
           "en": "Chalon-sur-Saône",
           "zh": "索恩河畔沙隆"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Autun + Chalon-sur-Saône",
+        "zh": "奥坦、索恩河畔沙隆"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_71002"
     },
     {
       "id": "FR_MRG_c20845af3938",
@@ -2231,8 +2771,8 @@
       ],
       "parent_id": "FR_Nouvelle_Aquitaine",
       "names": {
-        "en": "Aubusson + Guéret",
-        "zh": "奥比松、盖雷"
+        "en": "Guéret",
+        "zh": "盖雷"
       },
       "member_names": {
         "FR_ARR_23001": {
@@ -2243,7 +2783,13 @@
           "en": "Guéret",
           "zh": "盖雷"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Aubusson + Guéret",
+        "zh": "奥比松、盖雷"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_23002"
     },
     {
       "id": "FR_MRG_591a9d51c535",
@@ -2253,8 +2799,8 @@
       ],
       "parent_id": "FR_Nouvelle_Aquitaine",
       "names": {
-        "en": "Bergerac + Périgueux",
-        "zh": "贝尔热拉克、佩里格"
+        "en": "Périgueux",
+        "zh": "佩里格"
       },
       "member_names": {
         "FR_ARR_24001": {
@@ -2265,7 +2811,13 @@
           "en": "Périgueux",
           "zh": "佩里格"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bergerac + Périgueux",
+        "zh": "贝尔热拉克、佩里格"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_24003"
     },
     {
       "id": "FR_MRG_0a0901a977d5",
@@ -2275,8 +2827,8 @@
       ],
       "parent_id": "FR_Auvergne_Rhone_Alpes",
       "names": {
-        "en": "Die + Valence",
-        "zh": "迪、瓦朗斯"
+        "en": "Valence",
+        "zh": "瓦朗斯"
       },
       "member_names": {
         "FR_ARR_26001": {
@@ -2287,7 +2839,13 @@
           "en": "Valence",
           "zh": "瓦朗斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Die + Valence",
+        "zh": "迪、瓦朗斯"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_26003"
     },
     {
       "id": "FR_MRG_c84e32333c8a",
@@ -2297,8 +2855,8 @@
       ],
       "parent_id": "FR_Occitanie",
       "names": {
-        "en": "Alès + Vigan",
-        "zh": "阿莱斯、维甘"
+        "en": "Alès",
+        "zh": "阿莱斯"
       },
       "member_names": {
         "FR_ARR_30001": {
@@ -2309,7 +2867,13 @@
           "en": "Vigan",
           "zh": "维甘"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Alès + Vigan",
+        "zh": "阿莱斯、维甘"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_30001"
     },
     {
       "id": "FR_MRG_0d1fb06c5ad5",
@@ -2320,8 +2884,8 @@
       ],
       "parent_id": "FR_Occitanie",
       "names": {
-        "en": "Auch + Condom + Mirande",
-        "zh": "奥赫、孔东、米兰达"
+        "en": "Auch",
+        "zh": "奥赫"
       },
       "member_names": {
         "FR_ARR_32001": {
@@ -2336,7 +2900,13 @@
           "en": "Mirande",
           "zh": "米兰达"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Auch + Condom + Mirande",
+        "zh": "奥赫、孔东、米兰达"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_32001"
     },
     {
       "id": "FR_MRG_8e9054e07aa6",
@@ -2347,8 +2917,8 @@
       ],
       "parent_id": "FR_Nouvelle_Aquitaine",
       "names": {
-        "en": "Blaye + Lesparre-Médoc + Libourne",
-        "zh": "布莱耶、莱斯帕尔-梅多克、利布尔讷"
+        "en": "Libourne",
+        "zh": "利布尔讷"
       },
       "member_names": {
         "FR_ARR_33001": {
@@ -2363,7 +2933,13 @@
           "en": "Libourne",
           "zh": "利布尔讷"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Blaye + Lesparre-Médoc + Libourne",
+        "zh": "布莱耶、莱斯帕尔-梅多克、利布尔讷"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_33005"
     },
     {
       "id": "FR_MRG_5b351c0f453a",
@@ -2373,8 +2949,8 @@
       ],
       "parent_id": "FR_Nouvelle_Aquitaine",
       "names": {
-        "en": "Dax + Mont-de-Marsan",
-        "zh": "达克斯、蒙德马桑"
+        "en": "Dax",
+        "zh": "达克斯"
       },
       "member_names": {
         "FR_ARR_40001": {
@@ -2385,7 +2961,13 @@
           "en": "Mont-de-Marsan",
           "zh": "蒙德马桑"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dax + Mont-de-Marsan",
+        "zh": "达克斯、蒙德马桑"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_40001"
     },
     {
       "id": "FR_MRG_fcb0087ac12e",
@@ -2395,8 +2977,8 @@
       ],
       "parent_id": "FR_Occitanie",
       "names": {
-        "en": "Castelsarrasin + Montauban",
-        "zh": "卡斯特尔萨拉辛、蒙托邦"
+        "en": "Montauban",
+        "zh": "蒙托邦"
       },
       "member_names": {
         "FR_ARR_82001": {
@@ -2407,7 +2989,13 @@
           "en": "Montauban",
           "zh": "蒙托邦"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Castelsarrasin + Montauban",
+        "zh": "卡斯特尔萨拉辛、蒙托邦"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_82002"
     },
     {
       "id": "FR_MRG_edac1467130b",
@@ -2417,8 +3005,8 @@
       ],
       "parent_id": "FR_Auvergne_Rhone_Alpes",
       "names": {
-        "en": "Ambert + Thiers",
-        "zh": "安伯特、梯也尔"
+        "en": "Thiers",
+        "zh": "梯也尔"
       },
       "member_names": {
         "FR_ARR_63001": {
@@ -2429,7 +3017,13 @@
           "en": "Thiers",
           "zh": "梯也尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ambert + Thiers",
+        "zh": "安伯特、梯也尔"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_63005"
     },
     {
       "id": "FR_MRG_af825dbec142",
@@ -2439,8 +3033,8 @@
       ],
       "parent_id": "FR_Provence_Alpes_Cote_d_Azur",
       "names": {
-        "en": "Draguignan + Brignoles",
-        "zh": "德拉吉尼昂、布里尼奥勒"
+        "en": "Draguignan",
+        "zh": "德拉吉尼昂"
       },
       "member_names": {
         "FR_ARR_83001": {
@@ -2451,7 +3045,13 @@
           "en": "Brignoles",
           "zh": "布里尼奥勒"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Draguignan + Brignoles",
+        "zh": "德拉吉尼昂、布里尼奥勒"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_83001"
     },
     {
       "id": "FR_MRG_d4fcb61264f5",
@@ -2462,8 +3062,8 @@
       ],
       "parent_id": "FR_Provence_Alpes_Cote_d_Azur",
       "names": {
-        "en": "Apt + Avignon + Carpentras",
-        "zh": "阿普特、阿维尼翁、卡庞特拉"
+        "en": "Carpentras",
+        "zh": "卡庞特拉"
       },
       "member_names": {
         "FR_ARR_84001": {
@@ -2478,7 +3078,13 @@
           "en": "Carpentras",
           "zh": "卡庞特拉"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Apt + Avignon + Carpentras",
+        "zh": "阿普特、阿维尼翁、卡庞特拉"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_84003"
     },
     {
       "id": "FR_MRG_294761d79cca",
@@ -2488,8 +3094,8 @@
       ],
       "parent_id": "FR_Nouvelle_Aquitaine",
       "names": {
-        "en": "Châtellerault + Poitiers",
-        "zh": "沙泰勒罗、普瓦捷"
+        "en": "Poitiers",
+        "zh": "普瓦捷"
       },
       "member_names": {
         "FR_ARR_86001": {
@@ -2500,7 +3106,13 @@
           "en": "Poitiers",
           "zh": "普瓦捷"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Châtellerault + Poitiers",
+        "zh": "沙泰勒罗、普瓦捷"
+      },
+      "name_source": "city",
+      "representative_id": "FR_ARR_86003"
     },
     {
       "id": "RU_MRG_a7a4db360f52",
@@ -2510,8 +3122,8 @@
       ],
       "parent_id": "RU_Penza",
       "names": {
-        "en": "Gorodishchensky District + Sosnovoborsky District",
-        "zh": "戈罗季申斯基区、索斯诺沃博斯基区"
+        "en": "Gorodishchensky District (Penza)",
+        "zh": "戈罗季申斯基区（奔萨）"
       },
       "member_names": {
         "RU_RAY_50074027B10047375179422": {
@@ -2522,7 +3134,13 @@
           "en": "Sosnovoborsky District",
           "zh": "索斯诺沃博斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Gorodishchensky District + Sosnovoborsky District",
+        "zh": "戈罗季申斯基区、索斯诺沃博斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B10047375179422"
     },
     {
       "id": "RU_MRG_da7099eb5a0f",
@@ -2532,8 +3150,8 @@
       ],
       "parent_id": "RU_Kostroma",
       "names": {
-        "en": "городской округ Буй + Buysky District",
-        "zh": "布伊、布斯基区"
+        "en": "Buy",
+        "zh": "布伊"
       },
       "member_names": {
         "RU_RAY_50074027B10564453072266": {
@@ -2544,7 +3162,13 @@
           "en": "Buysky District",
           "zh": "布斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Буй + Buysky District",
+        "zh": "布伊、布斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B10564453072266"
     },
     {
       "id": "RU_MRG_74d30729755a",
@@ -2554,8 +3178,8 @@
       ],
       "parent_id": "RU_Ryazan",
       "names": {
-        "en": "Ukholovsky District + Sapozhkovsky District",
-        "zh": "乌霍洛夫斯基区、萨波日科夫斯基区"
+        "en": "Sapozhkovsky District",
+        "zh": "萨波日科夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B11739218783380": {
@@ -2566,7 +3190,13 @@
           "en": "Sapozhkovsky District",
           "zh": "萨波日科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ukholovsky District + Sapozhkovsky District",
+        "zh": "乌霍洛夫斯基区、萨波日科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B80970191706208"
     },
     {
       "id": "RU_MRG_381a0cc60dd8",
@@ -2576,8 +3206,8 @@
       ],
       "parent_id": "RU_Ryazan",
       "names": {
-        "en": "Chuchkovsky District + Putyatinsky District",
-        "zh": "楚奇科夫斯基区、普佳金斯基区"
+        "en": "Chuchkovsky District",
+        "zh": "楚奇科夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B42884819284567": {
@@ -2588,7 +3218,13 @@
           "en": "Putyatinsky District",
           "zh": "普佳金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Chuchkovsky District + Putyatinsky District",
+        "zh": "楚奇科夫斯基区、普佳金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B42884819284567"
     },
     {
       "id": "RU_MRG_b8675f108fd4",
@@ -2598,8 +3234,8 @@
       ],
       "parent_id": "RU_Ryazan",
       "names": {
-        "en": "Pitelinsky District + Sasovsky District",
-        "zh": "皮特林斯基区、萨索夫斯基区"
+        "en": "Sasovsky District",
+        "zh": "萨索夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B1267460541966": {
@@ -2610,7 +3246,13 @@
           "en": "Sasovsky District",
           "zh": "萨索夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pitelinsky District + Sasovsky District",
+        "zh": "皮特林斯基区、萨索夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B14493689316236"
     },
     {
       "id": "RU_MRG_c78e9571a541",
@@ -2620,8 +3262,8 @@
       ],
       "parent_id": "RU_Ryazan",
       "names": {
-        "en": "Shilovsky District + Spassky District",
-        "zh": "什洛夫斯基区、斯帕斯基区"
+        "en": "Shilovsky District",
+        "zh": "什洛夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B12959945155350": {
@@ -2632,7 +3274,13 @@
           "en": "Spassky District",
           "zh": "斯帕斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shilovsky District + Spassky District",
+        "zh": "什洛夫斯基区、斯帕斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B12959945155350"
     },
     {
       "id": "RU_MRG_a209550547d0",
@@ -2642,8 +3290,8 @@
       ],
       "parent_id": "RU_Moscow",
       "names": {
-        "en": "Solnechnogorsky District + Dmitrovsky District",
-        "zh": "索尔涅奇诺戈尔斯基区、德米特洛夫斯基区"
+        "en": "Solnechnogorsk",
+        "zh": "索尔涅奇诺戈尔斯克"
       },
       "member_names": {
         "RU_RAY_50074027B13099707200338": {
@@ -2654,7 +3302,13 @@
           "en": "Dmitrovsky District",
           "zh": "德米特洛夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Solnechnogorsky District + Dmitrovsky District",
+        "zh": "索尔涅奇诺戈尔斯基区、德米特洛夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B13099707200338"
     },
     {
       "id": "RU_MRG_ac8b0478bf66",
@@ -2665,8 +3319,8 @@
       ],
       "parent_id": "RU_Nizhny_Novgorod",
       "names": {
-        "en": "Chkalovsky District + Balakhninsky District + Volodarsky District",
-        "zh": "契卡洛夫斯基区、巴拉赫宁斯基区、沃洛达尔斯基区"
+        "en": "Balakhna",
+        "zh": "巴拉赫纳"
       },
       "member_names": {
         "RU_RAY_50074027B13118277330678": {
@@ -2681,7 +3335,13 @@
           "en": "Volodarsky District",
           "zh": "沃洛达尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Chkalovsky District + Balakhninsky District + Volodarsky District",
+        "zh": "契卡洛夫斯基区、巴拉赫宁斯基区、沃洛达尔斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B44553427618842"
     },
     {
       "id": "RU_MRG_23ee001da084",
@@ -2692,8 +3352,8 @@
       ],
       "parent_id": "RU_Penza",
       "names": {
-        "en": "Kameshkirsky District + Lopatinsky District + Maloserdobinsky District",
-        "zh": "卡梅什基尔斯克区、洛帕廷斯基区、马洛谢尔多宾斯基区"
+        "en": "Lopatinsky District",
+        "zh": "洛帕廷斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B13338811228915": {
@@ -2708,7 +3368,13 @@
           "en": "Maloserdobinsky District",
           "zh": "马洛谢尔多宾斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kameshkirsky District + Lopatinsky District + Maloserdobinsky District",
+        "zh": "卡梅什基尔斯克区、洛帕廷斯基区、马洛谢尔多宾斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B37989631797924"
     },
     {
       "id": "RU_MRG_a2a20f78646e",
@@ -2718,8 +3384,8 @@
       ],
       "parent_id": "RU_Ivanovo",
       "names": {
-        "en": "Gavrilovo-Posadsky District + Teykovsky District",
-        "zh": "加夫里洛沃-波萨茨基区、捷科夫斯基区"
+        "en": "Gavrilovo-Posadsky District",
+        "zh": "加夫里洛沃-波萨茨基区"
       },
       "member_names": {
         "RU_RAY_50074027B13593121580919": {
@@ -2730,7 +3396,13 @@
           "en": "Teykovsky District",
           "zh": "捷科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Gavrilovo-Posadsky District + Teykovsky District",
+        "zh": "加夫里洛沃-波萨茨基区、捷科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B13593121580919"
     },
     {
       "id": "RU_MRG_63a26ed5110c",
@@ -2740,8 +3412,8 @@
       ],
       "parent_id": "RU_Republic_of_Mordovia",
       "names": {
-        "en": "Ruzayevsky District + Kochkurovsky District",
-        "zh": "鲁扎耶夫斯基区、科奇库罗夫斯基区"
+        "en": "Ruzayevka",
+        "zh": "鲁扎耶夫卡"
       },
       "member_names": {
         "RU_RAY_50074027B1369332877072": {
@@ -2752,7 +3424,13 @@
           "en": "Kochkurovsky District",
           "zh": "科奇库罗夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ruzayevsky District + Kochkurovsky District",
+        "zh": "鲁扎耶夫斯基区、科奇库罗夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B1369332877072"
     },
     {
       "id": "RU_MRG_81137f16203b",
@@ -2763,8 +3441,8 @@
       ],
       "parent_id": "RU_Tver",
       "names": {
-        "en": "Kesovogorsky District + Krasnokholmsky District + Sonkovsky District",
-        "zh": "克索沃戈尔斯基区、克拉斯诺霍姆斯基区、松科夫斯基区"
+        "en": "Krasnokholmsky District",
+        "zh": "克拉斯诺霍姆斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B1377400485019": {
@@ -2779,7 +3457,13 @@
           "en": "Sonkovsky District",
           "zh": "松科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kesovogorsky District + Krasnokholmsky District + Sonkovsky District",
+        "zh": "克索沃戈尔斯基区、克拉斯诺霍姆斯基区、松科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B34253954513186"
     },
     {
       "id": "RU_MRG_0da64c9d8feb",
@@ -2790,8 +3474,8 @@
       ],
       "parent_id": "RU_Vladimir",
       "names": {
-        "en": "Kameshkovsky District + Yuryev-Polsky + Suzdalsky District",
-        "zh": "卡梅什科夫斯基区、尤里耶夫-波尔斯基、苏兹达尔斯基区"
+        "en": "Suzdalsky District",
+        "zh": "苏兹达尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B14082807895399": {
@@ -2806,7 +3490,13 @@
           "en": "Suzdalsky District",
           "zh": "苏兹达尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kameshkovsky District + Yuryev-Polsky + Suzdalsky District",
+        "zh": "卡梅什科夫斯基区、尤里耶夫-波尔斯基、苏兹达尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B76949575752311"
     },
     {
       "id": "RU_MRG_469cb07238ab",
@@ -2817,8 +3507,8 @@
       ],
       "parent_id": "RU_Novgorod",
       "names": {
-        "en": "Okulovsky District + Borovichsky District + Moshenskoy District",
-        "zh": "奥库洛夫斯基区、博罗维奇斯基区、莫申斯科伊区"
+        "en": "Borovichi",
+        "zh": "博罗维奇"
       },
       "member_names": {
         "RU_RAY_50074027B14127009644769": {
@@ -2833,7 +3523,13 @@
           "en": "Moshenskoy District",
           "zh": "莫申斯科伊区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Okulovsky District + Borovichsky District + Moshenskoy District",
+        "zh": "奥库洛夫斯基区、博罗维奇斯基区、莫申斯科伊区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B22583264361590"
     },
     {
       "id": "RU_MRG_147b9e791c0f",
@@ -2843,8 +3539,8 @@
       ],
       "parent_id": "RU_Novgorod",
       "names": {
-        "en": "Starorussky District + Parfinsky District",
-        "zh": "旧俄罗斯区、帕芬斯基区"
+        "en": "Staraya Russa",
+        "zh": "旧鲁萨"
       },
       "member_names": {
         "RU_RAY_50074027B1455636058200": {
@@ -2855,7 +3551,13 @@
           "en": "Parfinsky District",
           "zh": "帕芬斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Starorussky District + Parfinsky District",
+        "zh": "旧俄罗斯区、帕芬斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B1455636058200"
     },
     {
       "id": "RU_MRG_a5742bed0bed",
@@ -2865,8 +3567,8 @@
       ],
       "parent_id": "RU_Smolensk",
       "names": {
-        "en": "Roslavlsky District + городской округ Десногорск",
-        "zh": "罗斯拉夫区、杰斯诺戈尔斯克"
+        "en": "Roslavl",
+        "zh": "罗斯拉夫尔"
       },
       "member_names": {
         "RU_RAY_50074027B14748896560246": {
@@ -2877,7 +3579,13 @@
           "en": "городской округ Десногорск",
           "zh": "杰斯诺戈尔斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Roslavlsky District + городской округ Десногорск",
+        "zh": "罗斯拉夫区、杰斯诺戈尔斯克"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B14748896560246"
     },
     {
       "id": "RU_MRG_cb93ebd8b7b5",
@@ -2888,8 +3596,8 @@
       ],
       "parent_id": "RU_Nizhny_Novgorod",
       "names": {
-        "en": "Voznesensky District + Pervomaysky District + Diveyevsky District",
-        "zh": "沃兹涅先斯基区、佩沃迈斯基区、季维耶夫斯基区"
+        "en": "Pervomaysky District (Nizhny Novgorod)",
+        "zh": "佩沃迈斯基区（兴登堡施塔特）"
       },
       "member_names": {
         "RU_RAY_50074027B15035787960404": {
@@ -2904,7 +3612,13 @@
           "en": "Diveyevsky District",
           "zh": "季维耶夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Voznesensky District + Pervomaysky District + Diveyevsky District",
+        "zh": "沃兹涅先斯基区、佩沃迈斯基区、季维耶夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B73295675051513"
     },
     {
       "id": "RU_MRG_1c3ec0aee968",
@@ -2914,8 +3628,8 @@
       ],
       "parent_id": "RU_Kostroma",
       "names": {
-        "en": "Ostrovsky District + Sudislavsky District",
-        "zh": "奥斯特洛夫斯基区、苏迪斯拉夫斯基区"
+        "en": "Sudislavsky District",
+        "zh": "苏迪斯拉夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B15366895729841": {
@@ -2926,7 +3640,13 @@
           "en": "Sudislavsky District",
           "zh": "苏迪斯拉夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ostrovsky District + Sudislavsky District",
+        "zh": "奥斯特洛夫斯基区、苏迪斯拉夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B70869052406156"
     },
     {
       "id": "RU_MRG_c74526b2fdc8",
@@ -2936,8 +3656,8 @@
       ],
       "parent_id": "RU_Kursk",
       "names": {
-        "en": "Cheremisinovsky District + Shchigry",
-        "zh": "切列米西诺夫斯基区、希格里"
+        "en": "Cheremisinovsky District",
+        "zh": "切列米西诺夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B15483412569868": {
@@ -2948,7 +3668,13 @@
           "en": "Shchigry",
           "zh": "希格里"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Cheremisinovsky District + Shchigry",
+        "zh": "切列米西诺夫斯基区、希格里"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B15483412569868"
     },
     {
       "id": "RU_MRG_f4a93d25d960",
@@ -2958,8 +3684,8 @@
       ],
       "parent_id": "RU_Tver",
       "names": {
-        "en": "Vyshny Volochyok + Vyshnevolotsky District",
-        "zh": "上沃洛乔克、维什涅沃洛茨基区"
+        "en": "Vyshny Volochyok",
+        "zh": "上沃洛乔克"
       },
       "member_names": {
         "RU_RAY_50074027B16344941885909": {
@@ -2970,7 +3696,13 @@
           "en": "Vyshnevolotsky District",
           "zh": "维什涅沃洛茨基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Vyshny Volochyok + Vyshnevolotsky District",
+        "zh": "上沃洛乔克、维什涅沃洛茨基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B16344941885909"
     },
     {
       "id": "RU_MRG_e94d69805ef1",
@@ -2980,8 +3712,8 @@
       ],
       "parent_id": "RU_Ulyanovsk",
       "names": {
-        "en": "Maynsky District + Karsunsky District",
-        "zh": "梅恩斯基区、卡逊斯基区"
+        "en": "Maynsky District",
+        "zh": "梅恩斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B32751104355592": {
@@ -2992,7 +3724,13 @@
           "en": "Karsunsky District",
           "zh": "卡逊斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Maynsky District + Karsunsky District",
+        "zh": "梅恩斯基区、卡逊斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B32751104355592"
     },
     {
       "id": "RU_MRG_d262a19b45fb",
@@ -3002,8 +3740,8 @@
       ],
       "parent_id": "RU_Penza",
       "names": {
-        "en": "Pachelmsky District + Nizhnelomovsky District",
-        "zh": "帕赫姆斯基区、下洛莫夫斯基区"
+        "en": "Nizhnelomovsky District",
+        "zh": "下洛莫夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B17004521954389": {
@@ -3014,7 +3752,13 @@
           "en": "Nizhnelomovsky District",
           "zh": "下洛莫夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pachelmsky District + Nizhnelomovsky District",
+        "zh": "帕赫姆斯基区、下洛莫夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B61070600907551"
     },
     {
       "id": "RU_MRG_7fa31900ba72",
@@ -3025,8 +3769,8 @@
       ],
       "parent_id": "RU_Saratov",
       "names": {
-        "en": "Sovetsky District + Krasnokutsky + Marksovsky District",
-        "zh": "蒂尔西特、克拉斯诺库茨基、马尔索夫斯基区"
+        "en": "Marksovsky District",
+        "zh": "马尔索夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B17085348963900": {
@@ -3041,7 +3785,13 @@
           "en": "Marksovsky District",
           "zh": "马尔索夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sovetsky District + Krasnokutsky + Marksovsky District",
+        "zh": "蒂尔西特、克拉斯诺库茨基、马尔索夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B43964217190383"
     },
     {
       "id": "RU_MRG_3a4ba118143e",
@@ -3051,8 +3801,8 @@
       ],
       "parent_id": "RU_Kaluga",
       "names": {
-        "en": "Kozelsky District + Sukhinichsky District",
-        "zh": "科泽尔斯基区、苏希尼奇斯基区"
+        "en": "Kozelsky District",
+        "zh": "科泽尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B17146907475963": {
@@ -3063,7 +3813,13 @@
           "en": "Sukhinichsky District",
           "zh": "苏希尼奇斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kozelsky District + Sukhinichsky District",
+        "zh": "科泽尔斯基区、苏希尼奇斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B17146907475963"
     },
     {
       "id": "RU_MRG_593f9791ee89",
@@ -3073,8 +3829,8 @@
       ],
       "parent_id": "RU_Voronezh",
       "names": {
-        "en": "Novousmansky District + Paninsky District",
-        "zh": "新曼斯基区、帕宁斯基区"
+        "en": "Novousmansky District",
+        "zh": "新曼斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B17267835634482": {
@@ -3085,7 +3841,13 @@
           "en": "Paninsky District",
           "zh": "帕宁斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novousmansky District + Paninsky District",
+        "zh": "新曼斯基区、帕宁斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B17267835634482"
     },
     {
       "id": "RU_MRG_2cfe9a40e9b7",
@@ -3095,8 +3857,8 @@
       ],
       "parent_id": "RU_Rostov",
       "names": {
-        "en": "Sovetsky District + Oblivsky District",
-        "zh": "苏联区、奥布利夫斯基区"
+        "en": "Oblivsky District",
+        "zh": "奥布利夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B17370675709037": {
@@ -3107,7 +3869,13 @@
           "en": "Oblivsky District",
           "zh": "奥布利夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sovetsky District + Oblivsky District",
+        "zh": "苏联区、奥布利夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B94941713041307"
     },
     {
       "id": "RU_MRG_04653bd2eb88",
@@ -3117,8 +3885,8 @@
       ],
       "parent_id": "RU_Saratov",
       "names": {
-        "en": "Lysogorsky District + Krasnoarmeysky District",
-        "zh": "利索戈尔斯基区、克拉斯诺阿尔梅斯基区"
+        "en": "Krasnoarmeysk",
+        "zh": "红军城"
       },
       "member_names": {
         "RU_RAY_50074027B17462500662414": {
@@ -3129,7 +3897,13 @@
           "en": "Krasnoarmeysky District",
           "zh": "克拉斯诺阿尔梅斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lysogorsky District + Krasnoarmeysky District",
+        "zh": "利索戈尔斯基区、克拉斯诺阿尔梅斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B42088159596535"
     },
     {
       "id": "RU_MRG_baef030e052d",
@@ -3139,8 +3913,8 @@
       ],
       "parent_id": "RU_Bryansk",
       "names": {
-        "en": "Dubrovsky District + Rognedinsky District",
-        "zh": "杜布罗夫斯基区、罗格涅丁斯基区"
+        "en": "Dubrovsky District",
+        "zh": "杜布罗夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B17649118936683": {
@@ -3151,7 +3925,13 @@
           "en": "Rognedinsky District",
           "zh": "罗格涅丁斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dubrovsky District + Rognedinsky District",
+        "zh": "杜布罗夫斯基区、罗格涅丁斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B17649118936683"
     },
     {
       "id": "RU_MRG_e6c4245fecb6",
@@ -3161,8 +3941,8 @@
       ],
       "parent_id": "RU_Moscow",
       "names": {
-        "en": "Serpukhovsky District + Pushchino",
-        "zh": "谢尔普霍夫斯基区、海德施塔特"
+        "en": "Serpukhovsky District",
+        "zh": "谢尔普霍夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B18050530060536": {
@@ -3173,7 +3953,13 @@
           "en": "Pushchino",
           "zh": "海德施塔特"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Serpukhovsky District + Pushchino",
+        "zh": "谢尔普霍夫斯基区、海德施塔特"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B18050530060536"
     },
     {
       "id": "RU_MRG_ff5cc5b501e4",
@@ -3183,8 +3969,8 @@
       ],
       "parent_id": "RU_Bryansk",
       "names": {
-        "en": "Komarichsky District + Brasovsky District",
-        "zh": "科马里奇区、布拉索夫斯基区"
+        "en": "Brasovsky District",
+        "zh": "布拉索夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B18051595811170": {
@@ -3195,7 +3981,13 @@
           "en": "Brasovsky District",
           "zh": "布拉索夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Komarichsky District + Brasovsky District",
+        "zh": "科马里奇区、布拉索夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B85288825972975"
     },
     {
       "id": "RU_MRG_5d11e491ebbb",
@@ -3205,8 +3997,8 @@
       ],
       "parent_id": "RU_Moscow",
       "names": {
-        "en": "Klinsky District + Volokolamsky District",
-        "zh": "克林斯基区、沃洛科拉姆斯基区"
+        "en": "Klin",
+        "zh": "克林"
       },
       "member_names": {
         "RU_RAY_50074027B80887817772253": {
@@ -3217,7 +4009,13 @@
           "en": "Volokolamsky District",
           "zh": "沃洛科拉姆斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Klinsky District + Volokolamsky District",
+        "zh": "克林斯基区、沃洛科拉姆斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B80887817772253"
     },
     {
       "id": "RU_MRG_cddc570472f9",
@@ -3228,8 +4026,8 @@
       ],
       "parent_id": "RU_Kaluga",
       "names": {
-        "en": "Medynsky District + Iznoskovsky District + Yukhnovsky District",
-        "zh": "梅丁斯基区、伊兹诺斯科夫斯基区、尤赫诺夫斯基区"
+        "en": "Medynsky District",
+        "zh": "梅丁斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B18815652496789": {
@@ -3244,7 +4042,13 @@
           "en": "Yukhnovsky District",
           "zh": "尤赫诺夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Medynsky District + Iznoskovsky District + Yukhnovsky District",
+        "zh": "梅丁斯基区、伊兹诺斯科夫斯基区、尤赫诺夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B18815652496789"
     },
     {
       "id": "RU_MRG_a1cbe886988c",
@@ -3254,8 +4058,8 @@
       ],
       "parent_id": "RU_Lipetsk",
       "names": {
-        "en": "Dobrovsky District + Chaplyginsky District",
-        "zh": "多布罗夫斯基区、查普利金斯基区"
+        "en": "Chaplyginsky District",
+        "zh": "查普利金斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B18889738151841": {
@@ -3266,7 +4070,13 @@
           "en": "Chaplyginsky District",
           "zh": "查普利金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dobrovsky District + Chaplyginsky District",
+        "zh": "多布罗夫斯基区、查普利金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B23501118343691"
     },
     {
       "id": "RU_MRG_60b8dd6fa7be",
@@ -3276,8 +4086,8 @@
       ],
       "parent_id": "RU_Tambov",
       "names": {
-        "en": "Inzhavinsky District + Мучкапский район",
-        "zh": "因扎文斯基区、穆奇卡普斯基区"
+        "en": "Inzhavinsky District",
+        "zh": "因扎文斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B19046348458450": {
@@ -3288,7 +4098,13 @@
           "en": "Мучкапский район",
           "zh": "穆奇卡普斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Inzhavinsky District + Мучкапский район",
+        "zh": "因扎文斯基区、穆奇卡普斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B19046348458450"
     },
     {
       "id": "RU_MRG_c4b7fcf9408f",
@@ -3298,8 +4114,8 @@
       ],
       "parent_id": "RU_Oryol",
       "names": {
-        "en": "Шаблыкинский район + Дмитровский район",
-        "zh": "沙布利金斯基区、德米特洛夫斯基区"
+        "en": "Дмитровский район",
+        "zh": "德米特洛夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B19794863003797": {
@@ -3310,7 +4126,13 @@
           "en": "Дмитровский район",
           "zh": "德米特洛夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Шаблыкинский район + Дмитровский район",
+        "zh": "沙布利金斯基区、德米特洛夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B57397655492572"
     },
     {
       "id": "RU_MRG_8bb4b9b2f984",
@@ -3321,8 +4143,8 @@
       ],
       "parent_id": "RU_Kaluga",
       "names": {
-        "en": "Maloyaroslavetsky District + Ferzikovsky District + Dzerzhinsky District",
-        "zh": "小亚罗斯拉韦茨基区、费济科夫斯基区、捷尔任斯基区"
+        "en": "Dzerzhinsky District (Kaluga)",
+        "zh": "捷尔任斯基区（卡卢加州）"
       },
       "member_names": {
         "RU_RAY_50074027B20110747351222": {
@@ -3337,7 +4159,13 @@
           "en": "Dzerzhinsky District",
           "zh": "捷尔任斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Maloyaroslavetsky District + Ferzikovsky District + Dzerzhinsky District",
+        "zh": "小亚罗斯拉韦茨基区、费济科夫斯基区、捷尔任斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B78017463980316"
     },
     {
       "id": "RU_MRG_545993141cd3",
@@ -3348,8 +4176,8 @@
       ],
       "parent_id": "RU_Moscow",
       "names": {
-        "en": "Naro-Fominsky District + Istrinsky District + Ruzsky District",
-        "zh": "纳罗-福明斯基区、伊斯特林斯基区、鲁兹斯基区"
+        "en": "Istra",
+        "zh": "伊斯特拉"
       },
       "member_names": {
         "RU_RAY_50074027B20152914209721": {
@@ -3364,7 +4192,13 @@
           "en": "Ruzsky District",
           "zh": "鲁兹斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Naro-Fominsky District + Istrinsky District + Ruzsky District",
+        "zh": "纳罗-福明斯基区、伊斯特林斯基区、鲁兹斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B22082895013138"
     },
     {
       "id": "RU_MRG_4810f49b101a",
@@ -3374,8 +4208,8 @@
       ],
       "parent_id": "RU_Republic_of_Mordovia",
       "names": {
-        "en": "Yelnikovsky District + Krasnoslobodsky District",
-        "zh": "叶利尼科夫斯基区、克拉斯诺斯洛博茨基区"
+        "en": "Krasnoslobodsky District",
+        "zh": "克拉斯诺斯洛博茨基区"
       },
       "member_names": {
         "RU_RAY_50074027B48107721888556": {
@@ -3386,7 +4220,13 @@
           "en": "Krasnoslobodsky District",
           "zh": "克拉斯诺斯洛博茨基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yelnikovsky District + Krasnoslobodsky District",
+        "zh": "叶利尼科夫斯基区、克拉斯诺斯洛博茨基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B54197079783848"
     },
     {
       "id": "RU_MRG_b0d5b1b01211",
@@ -3396,8 +4236,8 @@
       ],
       "parent_id": "RU_Tver",
       "names": {
-        "en": "Zapadnodvinsky District + Жарковский район",
-        "zh": "萨帕德诺德文斯基区、扎尔科夫斯基区"
+        "en": "Zapadnodvinsky District",
+        "zh": "萨帕德诺德文斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B20832299139760": {
@@ -3408,7 +4248,13 @@
           "en": "Жарковский район",
           "zh": "扎尔科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zapadnodvinsky District + Жарковский район",
+        "zh": "萨帕德诺德文斯基区、扎尔科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B20832299139760"
     },
     {
       "id": "RU_MRG_a6b0abcdeaa3",
@@ -3418,8 +4264,8 @@
       ],
       "parent_id": "RU_Tver",
       "names": {
-        "en": "Bologovsky District + ЗАТО Озёрный",
-        "zh": "博洛戈夫斯基区、扎托·奥泽尔尼"
+        "en": "Bologoye",
+        "zh": "博洛戈耶"
       },
       "member_names": {
         "RU_RAY_50074027B2110229009062": {
@@ -3430,7 +4276,13 @@
           "en": "ЗАТО Озёрный",
           "zh": "扎托·奥泽尔尼"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bologovsky District + ЗАТО Озёрный",
+        "zh": "博洛戈夫斯基区、扎托·奥泽尔尼"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B2110229009062"
     },
     {
       "id": "RU_MRG_c651c5ba9d10",
@@ -3440,8 +4292,8 @@
       ],
       "parent_id": "RU_Moscow",
       "names": {
-        "en": "городской округ Павловский + Elektrogorsk",
-        "zh": "巴甫洛夫斯基、施特龙贝格"
+        "en": "городской округ Павловский",
+        "zh": "巴甫洛夫斯基"
       },
       "member_names": {
         "RU_RAY_50074027B21229273843366": {
@@ -3452,7 +4304,13 @@
           "en": "Elektrogorsk",
           "zh": "施特龙贝格"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Павловский + Elektrogorsk",
+        "zh": "巴甫洛夫斯基、施特龙贝格"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B21229273843366"
     },
     {
       "id": "RU_MRG_415d81df9895",
@@ -3463,8 +4321,8 @@
       ],
       "parent_id": "RU_Vologda",
       "names": {
-        "en": "Vologodsky District + Ust-Kubinsky District + Kharovsky District",
-        "zh": "沃洛戈斯基区、乌斯季库宾斯基区、哈罗夫斯基区"
+        "en": "Vologodsky District",
+        "zh": "沃洛戈斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B21235649033503": {
@@ -3479,7 +4337,13 @@
           "en": "Kharovsky District",
           "zh": "哈罗夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Vologodsky District + Ust-Kubinsky District + Kharovsky District",
+        "zh": "沃洛戈斯基区、乌斯季库宾斯基区、哈罗夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B21235649033503"
     },
     {
       "id": "RU_MRG_ec43e0811141",
@@ -3490,8 +4354,8 @@
       ],
       "parent_id": "RU_Yaroslavl",
       "names": {
-        "en": "Pereslavsky District + городской округ Переславль + Rostovsky District",
-        "zh": "佩列斯拉夫斯基区、佩列斯拉夫尔、罗斯托夫斯基区"
+        "en": "Rostov",
+        "zh": "罗斯托夫"
       },
       "member_names": {
         "RU_RAY_50074027B22618712178528": {
@@ -3506,7 +4370,13 @@
           "en": "Rostovsky District",
           "zh": "罗斯托夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pereslavsky District + городской округ Переславль + Rostovsky District",
+        "zh": "佩列斯拉夫斯基区、佩列斯拉夫尔、罗斯托夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B68091690939556"
     },
     {
       "id": "RU_MRG_b3191ccdd3f6",
@@ -3517,8 +4387,8 @@
       ],
       "parent_id": "RU_Nizhny_Novgorod",
       "names": {
-        "en": "городской округ Выкса + Sosnovsky District + Ardatovsky District",
-        "zh": "维克萨、索斯诺夫斯基区、阿尔达托夫斯基区"
+        "en": "Vyksa",
+        "zh": "维克萨"
       },
       "member_names": {
         "RU_RAY_50074027B22900695292775": {
@@ -3533,7 +4403,13 @@
           "en": "Ardatovsky District",
           "zh": "阿尔达托夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Выкса + Sosnovsky District + Ardatovsky District",
+        "zh": "维克萨、索斯诺夫斯基区、阿尔达托夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B22900695292775"
     },
     {
       "id": "RU_MRG_f673f237de3d",
@@ -3543,8 +4419,8 @@
       ],
       "parent_id": "RU_Tula",
       "names": {
-        "en": "Novogurovsky + Aleksinsky District",
-        "zh": "诺沃古洛夫斯基、阿列克辛斯基区"
+        "en": "Aleksin",
+        "zh": "阿列克辛"
       },
       "member_names": {
         "RU_RAY_50074027B23276046717969": {
@@ -3555,7 +4431,13 @@
           "en": "Aleksinsky District",
           "zh": "阿列克辛斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novogurovsky + Aleksinsky District",
+        "zh": "诺沃古洛夫斯基、阿列克辛斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B51377831861734"
     },
     {
       "id": "RU_MRG_3e1534e482c3",
@@ -3565,8 +4447,8 @@
       ],
       "parent_id": "RU_Kostroma",
       "names": {
-        "en": "Volgorechensk + Nerekhtsky District",
-        "zh": "伏尔加列琴斯克、涅列赫茨基区"
+        "en": "Nerekhtsky District",
+        "zh": "涅列赫茨基区"
       },
       "member_names": {
         "RU_RAY_50074027B23851869033021": {
@@ -3577,7 +4459,13 @@
           "en": "Nerekhtsky District",
           "zh": "涅列赫茨基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Volgorechensk + Nerekhtsky District",
+        "zh": "伏尔加列琴斯克、涅列赫茨基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B4836269138055"
     },
     {
       "id": "RU_MRG_56cbe6d02d2f",
@@ -3588,8 +4476,8 @@
       ],
       "parent_id": "RU_Ryazan",
       "names": {
-        "en": "Klepikovsky District + Kasimov + Kasimovsky District",
-        "zh": "克莱皮科夫斯基区、卡西莫夫、卡西莫夫斯基区"
+        "en": "Kasimov",
+        "zh": "卡西莫夫"
       },
       "member_names": {
         "RU_RAY_50074027B2454352114598": {
@@ -3604,7 +4492,13 @@
           "en": "Kasimovsky District",
           "zh": "卡西莫夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Klepikovsky District + Kasimov + Kasimovsky District",
+        "zh": "克莱皮科夫斯基区、卡西莫夫、卡西莫夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B34924268174095"
     },
     {
       "id": "RU_MRG_13bb9d740915",
@@ -3614,8 +4508,8 @@
       ],
       "parent_id": "RU_Oryol",
       "names": {
-        "en": "Mtsensky District + Залегощенский район",
-        "zh": "姆岑斯基区、扎列戈申斯基区"
+        "en": "Залегощенский район",
+        "zh": "扎列戈申斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B25608767413280": {
@@ -3626,7 +4520,13 @@
           "en": "Залегощенский район",
           "zh": "扎列戈申斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mtsensky District + Залегощенский район",
+        "zh": "姆岑斯基区、扎列戈申斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B88897948274968"
     },
     {
       "id": "RU_MRG_bc3ec5d8cee8",
@@ -3636,8 +4536,8 @@
       ],
       "parent_id": "RU_Tula",
       "names": {
-        "en": "Plavsky District + Щёкинский район",
-        "zh": "普拉夫斯基区、谢金斯基区"
+        "en": "Shchyokino",
+        "zh": "曉基諾"
       },
       "member_names": {
         "RU_RAY_50074027B25235389992485": {
@@ -3648,7 +4548,13 @@
           "en": "Щёкинский район",
           "zh": "谢金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Plavsky District + Щёкинский район",
+        "zh": "普拉夫斯基区、谢金斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B83450646469259"
     },
     {
       "id": "RU_MRG_778d6b9a6bcb",
@@ -3659,8 +4565,8 @@
       ],
       "parent_id": "RU_Moscow",
       "names": {
-        "en": "Dzerzhinsky + Lytkarino + Kotelniki",
-        "zh": "捷尔任斯基、利特卡林、科泰尔尼基"
+        "en": "Kotelniki",
+        "zh": "科泰尔尼基"
       },
       "member_names": {
         "RU_RAY_50074027B25483853572662": {
@@ -3675,7 +4581,13 @@
           "en": "Kotelniki",
           "zh": "科泰尔尼基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dzerzhinsky + Lytkarino + Kotelniki",
+        "zh": "捷尔任斯基、利特卡林、科泰尔尼基"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B68468594847899"
     },
     {
       "id": "RU_MRG_368752e844fc",
@@ -3686,8 +4598,8 @@
       ],
       "parent_id": "RU_Republic_of_Mordovia",
       "names": {
-        "en": "Insarsky District + Kadoshkinsky District + Kovylkinsky District",
-        "zh": "因萨尔斯基区、卡多什金斯基区、科维尔金斯基区"
+        "en": "Kovylkinsky District",
+        "zh": "科维尔金斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B26085968733730": {
@@ -3702,7 +4614,13 @@
           "en": "Kovylkinsky District",
           "zh": "科维尔金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Insarsky District + Kadoshkinsky District + Kovylkinsky District",
+        "zh": "因萨尔斯基区、卡多什金斯基区、科维尔金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B94925275747983"
     },
     {
       "id": "RU_MRG_6a3f1fee7164",
@@ -3713,8 +4631,8 @@
       ],
       "parent_id": "RU_Tambov",
       "names": {
-        "en": "Rasskazovsky District + Umyotsky District + Kirsanovsky District",
-        "zh": "拉斯卡佐夫斯基区、乌苗茨基区、基尔萨诺夫斯基区"
+        "en": "Kirsanov (Tambov)",
+        "zh": "基尔萨诺夫（坦波夫）"
       },
       "member_names": {
         "RU_RAY_50074027B26754478076862": {
@@ -3729,7 +4647,13 @@
           "en": "Kirsanovsky District",
           "zh": "基尔萨诺夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rasskazovsky District + Umyotsky District + Kirsanovsky District",
+        "zh": "拉斯卡佐夫斯基区、乌苗茨基区、基尔萨诺夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B81039118008346"
     },
     {
       "id": "RU_MRG_7255406b3d18",
@@ -3739,8 +4663,8 @@
       ],
       "parent_id": "RU_Ulyanovsk",
       "names": {
-        "en": "Pavlovsky District + Starokulatkinsky District",
-        "zh": "巴甫洛夫斯基区、斯塔奥库拉特金斯基区"
+        "en": "Pavlovsky District (Ulyanovsk)",
+        "zh": "巴甫洛夫斯基区（乌里扬诺夫斯克）"
       },
       "member_names": {
         "RU_RAY_50074027B26881476548446": {
@@ -3751,7 +4675,13 @@
           "en": "Starokulatkinsky District",
           "zh": "斯塔奥库拉特金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pavlovsky District + Starokulatkinsky District",
+        "zh": "巴甫洛夫斯基区、斯塔奥库拉特金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B26881476548446"
     },
     {
       "id": "RU_MRG_10b3308f3d85",
@@ -3761,8 +4691,8 @@
       ],
       "parent_id": "RU_Rostov",
       "names": {
-        "en": "Morozovsky District + Tatsinsky District",
-        "zh": "莫罗佐夫斯基区、塔钦斯基区"
+        "en": "Morozovsky District",
+        "zh": "莫罗佐夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B28094875464545": {
@@ -3773,7 +4703,13 @@
           "en": "Tatsinsky District",
           "zh": "塔钦斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Morozovsky District + Tatsinsky District",
+        "zh": "莫罗佐夫斯基区、塔钦斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B28094875464545"
     },
     {
       "id": "RU_MRG_3d995b252c3d",
@@ -3783,8 +4719,8 @@
       ],
       "parent_id": "RU_Ryazan",
       "names": {
-        "en": "Ryazansky District + Rybnovsky District",
-        "zh": "梁赞区、雷布诺夫斯基区"
+        "en": "Ryazansky District",
+        "zh": "梁赞区"
       },
       "member_names": {
         "RU_RAY_50074027B29015555579536": {
@@ -3795,7 +4731,13 @@
           "en": "Rybnovsky District",
           "zh": "雷布诺夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ryazansky District + Rybnovsky District",
+        "zh": "梁赞区、雷布诺夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B29015555579536"
     },
     {
       "id": "RU_MRG_1ca73d498309",
@@ -3805,8 +4747,8 @@
       ],
       "parent_id": "RU_Leningrad",
       "names": {
-        "en": "Kirishsky District + Korotka District",
-        "zh": "基里什斯基区、科罗特卡区"
+        "en": "Korotka District",
+        "zh": "科罗特卡区"
       },
       "member_names": {
         "RU_RAY_50074027B29065403831186": {
@@ -3817,7 +4759,13 @@
           "en": "Korotka District",
           "zh": "科罗特卡区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kirishsky District + Korotka District",
+        "zh": "基里什斯基区、科罗特卡区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B73132462922089"
     },
     {
       "id": "RU_MRG_aca4b754b06a",
@@ -3828,8 +4776,8 @@
       ],
       "parent_id": "RU_Ivanovo",
       "names": {
-        "en": "Savinsky District + Shuysky District + Rodnikovsky District",
-        "zh": "萨文斯基区、舒伊斯基区、罗德尼科夫斯基区"
+        "en": "Rodnikovsky District",
+        "zh": "罗德尼科夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B29124350884657": {
@@ -3844,7 +4792,13 @@
           "en": "Rodnikovsky District",
           "zh": "罗德尼科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Savinsky District + Shuysky District + Rodnikovsky District",
+        "zh": "萨文斯基区、舒伊斯基区、罗德尼科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B67433895500830"
     },
     {
       "id": "RU_MRG_e82122fbf2b7",
@@ -3855,8 +4809,8 @@
       ],
       "parent_id": "RU_Saratov",
       "names": {
-        "en": "Atkarsky District + Yekaterinovsky District + Petrovsky District",
-        "zh": "阿特卡斯基区、叶卡捷琳诺夫斯基区、彼得罗夫斯基区"
+        "en": "Atkarsk",
+        "zh": "阿特卡尔斯克"
       },
       "member_names": {
         "RU_RAY_50074027B29140399551672": {
@@ -3871,7 +4825,13 @@
           "en": "Petrovsky District",
           "zh": "彼得罗夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Atkarsky District + Yekaterinovsky District + Petrovsky District",
+        "zh": "阿特卡斯基区、叶卡捷琳诺夫斯基区、彼得罗夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B29140399551672"
     },
     {
       "id": "RU_MRG_7b3c6510fd3f",
@@ -3882,8 +4842,8 @@
       ],
       "parent_id": "RU_Volgograd",
       "names": {
-        "en": "Nekhayevsky District + Alexeyevsky district + Uryupinsky District",
-        "zh": "涅卡耶夫斯基区、阿列克谢耶夫斯基区、乌留平斯基区"
+        "en": "Uryupinsky District",
+        "zh": "乌留平斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B30425971595491": {
@@ -3898,7 +4858,13 @@
           "en": "Uryupinsky District",
           "zh": "乌留平斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nekhayevsky District + Alexeyevsky district + Uryupinsky District",
+        "zh": "涅卡耶夫斯基区、阿列克谢耶夫斯基区、乌留平斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B78770724987560"
     },
     {
       "id": "RU_MRG_59971f82636d",
@@ -3908,8 +4874,8 @@
       ],
       "parent_id": "RU_Novgorod",
       "names": {
-        "en": "Khvoyninsky District + Lyubytinsky District",
-        "zh": "赫沃宁斯基区、柳比廷斯基区"
+        "en": "Khvoyninsky District",
+        "zh": "赫沃宁斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B30677500922853": {
@@ -3920,7 +4886,13 @@
           "en": "Lyubytinsky District",
           "zh": "柳比廷斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Khvoyninsky District + Lyubytinsky District",
+        "zh": "赫沃宁斯基区、柳比廷斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B30677500922853"
     },
     {
       "id": "RU_MRG_b32ae436f609",
@@ -3931,8 +4903,8 @@
       ],
       "parent_id": "RU_Volgograd",
       "names": {
-        "en": "Frolovsky District + Frolovo + Danilovsky District",
-        "zh": "弗罗洛夫斯基区、弗罗洛沃、丹尼洛夫斯基区"
+        "en": "Frolovo",
+        "zh": "弗罗洛沃"
       },
       "member_names": {
         "RU_RAY_50074027B30734657532987": {
@@ -3947,7 +4919,13 @@
           "en": "Danilovsky District",
           "zh": "丹尼洛夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Frolovsky District + Frolovo + Danilovsky District",
+        "zh": "弗罗洛夫斯基区、弗罗洛沃、丹尼洛夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B43985127135500"
     },
     {
       "id": "RU_MRG_331d25aa905a",
@@ -3958,8 +4936,8 @@
       ],
       "parent_id": "RU_Ulyanovsk",
       "names": {
-        "en": "Terengulsky District + Baryshsky District + Kuzovatovsky District",
-        "zh": "捷伦古斯基区、巴里什斯基区、库佐瓦托夫斯基区"
+        "en": "Baryshsky District",
+        "zh": "巴里什斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B30791393709139": {
@@ -3974,7 +4952,13 @@
           "en": "Kuzovatovsky District",
           "zh": "库佐瓦托夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Terengulsky District + Baryshsky District + Kuzovatovsky District",
+        "zh": "捷伦古斯基区、巴里什斯基区、库佐瓦托夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B6225554740"
     },
     {
       "id": "RU_MRG_f75032a5f7dc",
@@ -3984,8 +4968,8 @@
       ],
       "parent_id": "RU_Moscow",
       "names": {
-        "en": "Ramensky District + Zhukovsky",
-        "zh": "拉缅斯基区、茹科夫斯基"
+        "en": "Ramensky District",
+        "zh": "拉缅斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B31656643140728": {
@@ -3996,7 +4980,13 @@
           "en": "Zhukovsky",
           "zh": "茹科夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ramensky District + Zhukovsky",
+        "zh": "拉缅斯基区、茹科夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B31656643140728"
     },
     {
       "id": "RU_MRG_6cf2ac643f4e",
@@ -4007,8 +4997,8 @@
       ],
       "parent_id": "RU_Lipetsk",
       "names": {
-        "en": "Usmansky District + Dobrinsky District + Gryazinsky District",
-        "zh": "乌斯曼斯基区、多布林斯基区、格里亚津斯基区"
+        "en": "Gryazi",
+        "zh": "格里亚济"
       },
       "member_names": {
         "RU_RAY_50074027B32900327411316": {
@@ -4023,7 +5013,13 @@
           "en": "Gryazinsky District",
           "zh": "格里亚津斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Usmansky District + Dobrinsky District + Gryazinsky District",
+        "zh": "乌斯曼斯基区、多布林斯基区、格里亚津斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B92054036106311"
     },
     {
       "id": "RU_MRG_7a5b034feeea",
@@ -4033,8 +5029,8 @@
       ],
       "parent_id": "RU_Oryol",
       "names": {
-        "en": "Dolzhansky District + Kolpnyansky District",
-        "zh": "多尔然斯基区、科尔普尼亚斯基区"
+        "en": "Kolpnyansky District",
+        "zh": "科尔普尼亚斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B32921543768208": {
@@ -4045,7 +5041,13 @@
           "en": "Kolpnyansky District",
           "zh": "科尔普尼亚斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dolzhansky District + Kolpnyansky District",
+        "zh": "多尔然斯基区、科尔普尼亚斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B5930376026307"
     },
     {
       "id": "RU_MRG_c3b8cb206f5e",
@@ -4056,8 +5058,8 @@
       ],
       "parent_id": "RU_Penza",
       "names": {
-        "en": "Shemysheysky District + Kolyshleysky District + Penzensky District",
-        "zh": "谢梅谢斯基区、科雷什莱斯基区、彭赞斯基区"
+        "en": "Penzensky District",
+        "zh": "彭赞斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B33430522439153": {
@@ -4072,7 +5074,13 @@
           "en": "Penzensky District",
           "zh": "彭赞斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shemysheysky District + Kolyshleysky District + Penzensky District",
+        "zh": "谢梅谢斯基区、科雷什莱斯基区、彭赞斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B80360504553287"
     },
     {
       "id": "RU_MRG_e01a5b27cba9",
@@ -4082,8 +5090,8 @@
       ],
       "parent_id": "RU_Penza",
       "names": {
-        "en": "Bekovsky District + Belinsky District",
-        "zh": "别科夫斯基区、别林斯基区"
+        "en": "Belinsky District",
+        "zh": "别林斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B33955098057066": {
@@ -4094,7 +5102,13 @@
           "en": "Belinsky District",
           "zh": "别林斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bekovsky District + Belinsky District",
+        "zh": "别科夫斯基区、别林斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B92332534245428"
     },
     {
       "id": "RU_MRG_6a431b3749b3",
@@ -4105,8 +5119,8 @@
       ],
       "parent_id": "RU_Moscow",
       "names": {
-        "en": "Leninsky District + Chekhovsky District + Domodedovsky District",
-        "zh": "列宁斯基区、契诃夫区、多莫杰多夫斯基区"
+        "en": "Leninsky District (Moscow)",
+        "zh": "列宁斯基区（莫斯科）"
       },
       "member_names": {
         "RU_RAY_50074027B34201544951901": {
@@ -4121,7 +5135,13 @@
           "en": "Domodedovsky District",
           "zh": "多莫杰多夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Leninsky District + Chekhovsky District + Domodedovsky District",
+        "zh": "列宁斯基区、契诃夫区、多莫杰多夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B34201544951901"
     },
     {
       "id": "RU_MRG_38e4b64aac65",
@@ -4132,8 +5152,8 @@
       ],
       "parent_id": "RU_Oryol",
       "names": {
-        "en": "Khotynetsky District + Uritsky District + Znamensky District",
-        "zh": "霍特涅茨基区、乌里茨基区、兹纳缅斯基区"
+        "en": "Uritsky District",
+        "zh": "乌里茨基区"
       },
       "member_names": {
         "RU_RAY_50074027B35076866768597": {
@@ -4148,7 +5168,13 @@
           "en": "Znamensky District",
           "zh": "兹纳缅斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Khotynetsky District + Uritsky District + Znamensky District",
+        "zh": "霍特涅茨基区、乌里茨基区、兹纳缅斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B4750302119031"
     },
     {
       "id": "RU_MRG_dde98369766d",
@@ -4158,8 +5184,8 @@
       ],
       "parent_id": "RU_Oryol",
       "names": {
-        "en": "Троснянский район + Кромской район",
-        "zh": "特罗斯尼亚斯基区、克罗姆斯基区"
+        "en": "Кромской район",
+        "zh": "克罗姆斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B36797886891217": {
@@ -4170,7 +5196,13 @@
           "en": "Кромской район",
           "zh": "克罗姆斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Троснянский район + Кромской район",
+        "zh": "特罗斯尼亚斯基区、克罗姆斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B95250955348263"
     },
     {
       "id": "RU_MRG_f3808058260f",
@@ -4180,8 +5212,8 @@
       ],
       "parent_id": "RU_Tula",
       "names": {
-        "en": "Yasnogorsky District + Zaoksky District",
-        "zh": "亚斯诺戈尔斯基区、扎奥斯基区"
+        "en": "Yasnogorsky District",
+        "zh": "亚斯诺戈尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B3712621076023": {
@@ -4192,7 +5224,13 @@
           "en": "Zaoksky District",
           "zh": "扎奥斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yasnogorsky District + Zaoksky District",
+        "zh": "亚斯诺戈尔斯基区、扎奥斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B3712621076023"
     },
     {
       "id": "RU_MRG_bf28b90ebe97",
@@ -4202,8 +5240,8 @@
       ],
       "parent_id": "RU_Nizhny_Novgorod",
       "names": {
-        "en": "Vachsky District + Navashinsky District",
-        "zh": "瓦赫斯基区、纳瓦辛斯基区"
+        "en": "Navashinsky District",
+        "zh": "纳瓦辛斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B37485482167842": {
@@ -4214,7 +5252,13 @@
           "en": "Navashinsky District",
           "zh": "纳瓦辛斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Vachsky District + Navashinsky District",
+        "zh": "瓦赫斯基区、纳瓦辛斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B59380103658968"
     },
     {
       "id": "RU_MRG_ea618303a3ad",
@@ -4224,8 +5268,8 @@
       ],
       "parent_id": "RU_Yaroslavl",
       "names": {
-        "en": "Gavrilov-Yamsky District + Borisoglebsky",
-        "zh": "加夫里洛夫-亚姆斯基区、鲍里索格列布斯基"
+        "en": "Gavrilov-Yamsky District",
+        "zh": "加夫里洛夫-亚姆斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B3790619846909": {
@@ -4236,7 +5280,13 @@
           "en": "Borisoglebsky",
           "zh": "鲍里索格列布斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Gavrilov-Yamsky District + Borisoglebsky",
+        "zh": "加夫里洛夫-亚姆斯基区、鲍里索格列布斯基"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B3790619846909"
     },
     {
       "id": "RU_MRG_6540bcc440b9",
@@ -4247,8 +5297,8 @@
       ],
       "parent_id": "RU_Lipetsk",
       "names": {
-        "en": "Izmalkovsky District + Dolgorukovsky District + Stanovlyansky District",
-        "zh": "伊兹马尔科夫斯基区、多尔戈鲁科夫斯基区、斯坦诺夫良斯基区"
+        "en": "Dolgorukovsky District",
+        "zh": "多尔戈鲁科夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B39379754001306": {
@@ -4263,7 +5313,13 @@
           "en": "Stanovlyansky District",
           "zh": "斯坦诺夫良斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Izmalkovsky District + Dolgorukovsky District + Stanovlyansky District",
+        "zh": "伊兹马尔科夫斯基区、多尔戈鲁科夫斯基区、斯坦诺夫良斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B406681110073"
     },
     {
       "id": "RU_MRG_0be016c8605b",
@@ -4273,8 +5329,8 @@
       ],
       "parent_id": "RU_Tver",
       "names": {
-        "en": "Sandovsky District + Lesnoy District",
-        "zh": "桑多夫斯基区、列斯诺伊区"
+        "en": "Sandovsky District",
+        "zh": "桑多夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B40241966667878": {
@@ -4285,7 +5341,13 @@
           "en": "Lesnoy District",
           "zh": "列斯诺伊区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sandovsky District + Lesnoy District",
+        "zh": "桑多夫斯基区、列斯诺伊区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B40241966667878"
     },
     {
       "id": "RU_MRG_1899c681a78b",
@@ -4295,8 +5357,8 @@
       ],
       "parent_id": "RU_Ivanovo",
       "names": {
-        "en": "Puchezhsky District + Sokolsky District",
-        "zh": "普切日斯基区、索科尔区"
+        "en": "Sokolsky District (Ivanovo)",
+        "zh": "索科尔区（约翰尼斯施塔特）"
       },
       "member_names": {
         "RU_RAY_50074027B40734262020014": {
@@ -4307,7 +5369,13 @@
           "en": "Sokolsky District",
           "zh": "索科尔区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Puchezhsky District + Sokolsky District",
+        "zh": "普切日斯基区、索科尔区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B66263808531670"
     },
     {
       "id": "RU_MRG_ab7c9de141c7",
@@ -4318,8 +5386,8 @@
       ],
       "parent_id": "RU_Oryol",
       "names": {
-        "en": "Novoderevenkovsky District + Verkhovsky District + Покровский район",
-        "zh": "新捷列文科夫斯基区、维尔霍夫斯基区、波克罗夫斯基区"
+        "en": "Verkhovsky District",
+        "zh": "维尔霍夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B41611232560877": {
@@ -4334,7 +5402,13 @@
           "en": "Покровский район",
           "zh": "波克罗夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novoderevenkovsky District + Verkhovsky District + Покровский район",
+        "zh": "新捷列文科夫斯基区、维尔霍夫斯基区、波克罗夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B71880735316962"
     },
     {
       "id": "RU_MRG_d0fe64d9350d",
@@ -4344,8 +5418,8 @@
       ],
       "parent_id": "RU_Tver",
       "names": {
-        "en": "Molokovsky District + Bezhetsky District",
-        "zh": "莫洛科夫斯基区、别热茨基区"
+        "en": "Bezhetsk",
+        "zh": "别热茨克"
       },
       "member_names": {
         "RU_RAY_50074027B78120049658984": {
@@ -4356,7 +5430,13 @@
           "en": "Bezhetsky District",
           "zh": "别热茨基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Molokovsky District + Bezhetsky District",
+        "zh": "莫洛科夫斯基区、别热茨基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B8686405046800"
     },
     {
       "id": "RU_MRG_cc3f09a291db",
@@ -4366,8 +5446,8 @@
       ],
       "parent_id": "RU_Oryol",
       "names": {
-        "en": "Глазуновский район + Свердловский район",
-        "zh": "格拉祖诺夫斯基区、斯维尔德洛夫斯克区"
+        "en": "Свердловский район",
+        "zh": "斯维尔德洛夫斯克区"
       },
       "member_names": {
         "RU_RAY_50074027B42576603860104": {
@@ -4378,7 +5458,13 @@
           "en": "Свердловский район",
           "zh": "斯维尔德洛夫斯克区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Глазуновский район + Свердловский район",
+        "zh": "格拉祖诺夫斯基区、斯维尔德洛夫斯克区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B52619887233676"
     },
     {
       "id": "RU_MRG_7877124b56e9",
@@ -4388,8 +5474,8 @@
       ],
       "parent_id": "RU_Vladimir",
       "names": {
-        "en": "Raduzhny + Sudogodsky District",
-        "zh": "拉杜日内、苏多戈斯基区"
+        "en": "Sudogodsky District",
+        "zh": "苏多戈斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B45265467842416": {
@@ -4400,7 +5486,13 @@
           "en": "Sudogodsky District",
           "zh": "苏多戈斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Raduzhny + Sudogodsky District",
+        "zh": "拉杜日内、苏多戈斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B81665578369848"
     },
     {
       "id": "RU_MRG_3942a3c5e59c",
@@ -4411,8 +5503,8 @@
       ],
       "parent_id": "RU_Voronezh",
       "names": {
-        "en": "Buturlinovsky District + Pavlovsky District + Подгоренский район",
-        "zh": "布图利诺夫斯基区、巴甫洛夫斯基区、波德戈伦斯基区"
+        "en": "Pavlovsky District (Voronezh)",
+        "zh": "巴甫洛夫斯基区（曼施泰因施塔特）"
       },
       "member_names": {
         "RU_RAY_50074027B45623068595544": {
@@ -4427,7 +5519,13 @@
           "en": "Подгоренский район",
           "zh": "波德戈伦斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Buturlinovsky District + Pavlovsky District + Подгоренский район",
+        "zh": "布图利诺夫斯基区、巴甫洛夫斯基区、波德戈伦斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B76820364018998"
     },
     {
       "id": "RU_MRG_bc152a08afac",
@@ -4437,8 +5535,8 @@
       ],
       "parent_id": "RU_Nizhny_Novgorod",
       "names": {
-        "en": "Лукояновский район + Shatkovsky District",
-        "zh": "卢科亚诺夫斯基区、沙特科夫斯基区"
+        "en": "Лукояновский район",
+        "zh": "卢科亚诺夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B45789522772838": {
@@ -4449,7 +5547,13 @@
           "en": "Shatkovsky District",
           "zh": "沙特科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Лукояновский район + Shatkovsky District",
+        "zh": "卢科亚诺夫斯基区、沙特科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B45789522772838"
     },
     {
       "id": "RU_MRG_5207bacfde76",
@@ -4460,8 +5564,8 @@
       ],
       "parent_id": "RU_Tambov",
       "names": {
-        "en": "Morshansky District + Sosnovsky District + Tambovsky District",
-        "zh": "莫尚斯基区、索斯诺夫斯基区、坦博夫斯基区"
+        "en": "Tambovsky District (Tambov)",
+        "zh": "坦博夫斯基区（坦波夫）"
       },
       "member_names": {
         "RU_RAY_50074027B46410454933627": {
@@ -4476,7 +5580,13 @@
           "en": "Tambovsky District",
           "zh": "坦博夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Morshansky District + Sosnovsky District + Tambovsky District",
+        "zh": "莫尚斯基区、索斯诺夫斯基区、坦博夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B69297352683544"
     },
     {
       "id": "RU_MRG_257334552b8c",
@@ -4486,8 +5596,8 @@
       ],
       "parent_id": "RU_Tver",
       "names": {
-        "en": "Toropetsky District + Andreapolsky District",
-        "zh": "托罗佩茨基区、安德烈亚波尔斯基区"
+        "en": "Toropetsky District",
+        "zh": "托罗佩茨基区"
       },
       "member_names": {
         "RU_RAY_50074027B46949418764648": {
@@ -4498,7 +5608,13 @@
           "en": "Andreapolsky District",
           "zh": "安德烈亚波尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Toropetsky District + Andreapolsky District",
+        "zh": "托罗佩茨基区、安德烈亚波尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B46949418764648"
     },
     {
       "id": "RU_MRG_85ed17015f49",
@@ -4508,8 +5624,8 @@
       ],
       "parent_id": "RU_Bryansk",
       "names": {
-        "en": "Zhiryatinsky District + Pochepsky District",
-        "zh": "日里亚廷斯基区、波切普斯基区"
+        "en": "Pochepsky District",
+        "zh": "波切普斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B47044475011866": {
@@ -4520,7 +5636,13 @@
           "en": "Pochepsky District",
           "zh": "波切普斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zhiryatinsky District + Pochepsky District",
+        "zh": "日里亚廷斯基区、波切普斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B90519354478842"
     },
     {
       "id": "RU_MRG_74d5c4da86d9",
@@ -4531,8 +5653,8 @@
       ],
       "parent_id": "RU_Tver",
       "names": {
-        "en": "Rameshkovsky District + Likhoslavlsky District + Spirovsky District",
-        "zh": "拉梅什科夫斯基区、利霍斯拉夫利斯基区、斯皮罗夫斯基区"
+        "en": "Likhoslavlsky District",
+        "zh": "利霍斯拉夫利斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B48186281489768": {
@@ -4547,7 +5669,13 @@
           "en": "Spirovsky District",
           "zh": "斯皮罗夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rameshkovsky District + Likhoslavlsky District + Spirovsky District",
+        "zh": "拉梅什科夫斯基区、利霍斯拉夫利斯基区、斯皮罗夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B52176996438245"
     },
     {
       "id": "RU_MRG_62d82b3c1fa4",
@@ -4558,8 +5686,8 @@
       ],
       "parent_id": "RU_Volgograd",
       "names": {
-        "en": "городской округ Михайловка + Новоаннинский район + Kikvidzensky District",
-        "zh": "米哈伊洛夫卡、新安宁斯基区、基克维岑斯基区"
+        "en": "Mikhaylovka",
+        "zh": "米哈伊洛夫卡"
       },
       "member_names": {
         "RU_RAY_50074027B50990181265443": {
@@ -4574,7 +5702,13 @@
           "en": "Kikvidzensky District",
           "zh": "基克维岑斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Михайловка + Новоаннинский район + Kikvidzensky District",
+        "zh": "米哈伊洛夫卡、新安宁斯基区、基克维岑斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B50990181265443"
     },
     {
       "id": "RU_MRG_ccc631e40d26",
@@ -4584,8 +5718,8 @@
       ],
       "parent_id": "RU_Bryansk",
       "names": {
-        "en": "Navlinsky District + Vygonichsky District",
-        "zh": "纳夫林斯基区、维戈尼奇区"
+        "en": "Navlinsky District",
+        "zh": "纳夫林斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B51743204091789": {
@@ -4596,7 +5730,13 @@
           "en": "Vygonichsky District",
           "zh": "维戈尼奇区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Navlinsky District + Vygonichsky District",
+        "zh": "纳夫林斯基区、维戈尼奇区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B51743204091789"
     },
     {
       "id": "RU_MRG_725bf9a02991",
@@ -4606,8 +5746,8 @@
       ],
       "parent_id": "RU_Voronezh",
       "names": {
-        "en": "городской округ Нововороне + Kashirsky District",
-        "zh": "新沃罗内、卡希尔斯基区"
+        "en": "Kashirsky District",
+        "zh": "卡希尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B52849645773608": {
@@ -4618,7 +5758,13 @@
           "en": "Kashirsky District",
           "zh": "卡希尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Нововороне + Kashirsky District",
+        "zh": "新沃罗内、卡希尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B74267439483107"
     },
     {
       "id": "RU_MRG_f49f6eed3fd4",
@@ -4628,8 +5774,8 @@
       ],
       "parent_id": "RU_Moscow",
       "names": {
-        "en": "Kolomensky District + городской округ Озёры",
-        "zh": "科洛缅斯基区、湖"
+        "en": "Kolomensky District",
+        "zh": "科洛缅斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B53096131610196": {
@@ -4640,7 +5786,13 @@
           "en": "городской округ Озёры",
           "zh": "湖"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kolomensky District + городской округ Озёры",
+        "zh": "科洛缅斯基区、湖"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B53096131610196"
     },
     {
       "id": "RU_MRG_55742c11b5e6",
@@ -4650,8 +5802,8 @@
       ],
       "parent_id": "RU_Bryansk",
       "names": {
-        "en": "Dyatkovsky District + городской округ Фокино",
-        "zh": "迪亚特科夫斯基区、福基诺"
+        "en": "Dyatkovo",
+        "zh": "佳季科沃"
       },
       "member_names": {
         "RU_RAY_50074027B53513829509946": {
@@ -4662,7 +5814,13 @@
           "en": "городской округ Фокино",
           "zh": "福基诺"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dyatkovsky District + городской округ Фокино",
+        "zh": "迪亚特科夫斯基区、福基诺"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B53513829509946"
     },
     {
       "id": "RU_MRG_bab5c9d8e609",
@@ -4672,8 +5830,8 @@
       ],
       "parent_id": "RU_Ivanovo",
       "names": {
-        "en": "Lukhsky District + Verkhnelandekhovsky District",
-        "zh": "卢赫斯基区、上兰德霍夫斯基区"
+        "en": "Lukhsky District",
+        "zh": "卢赫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B583940631310": {
@@ -4684,7 +5842,13 @@
           "en": "Verkhnelandekhovsky District",
           "zh": "上兰德霍夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lukhsky District + Verkhnelandekhovsky District",
+        "zh": "卢赫斯基区、上兰德霍夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B583940631310"
     },
     {
       "id": "RU_MRG_8dec32e7062d",
@@ -4695,8 +5859,8 @@
       ],
       "parent_id": "RU_Penza",
       "names": {
-        "en": "Luninsky District + Bessonovsky District + Issinsky District",
-        "zh": "卢宁斯基区、贝索诺夫斯基区、伊辛斯基区"
+        "en": "Bessonovsky District",
+        "zh": "贝索诺夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B55518064379024": {
@@ -4711,7 +5875,13 @@
           "en": "Issinsky District",
           "zh": "伊辛斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Luninsky District + Bessonovsky District + Issinsky District",
+        "zh": "卢宁斯基区、贝索诺夫斯基区、伊辛斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B85740995014634"
     },
     {
       "id": "RU_MRG_a8aa677324f3",
@@ -4721,8 +5891,8 @@
       ],
       "parent_id": "RU_Tula",
       "names": {
-        "en": "Slavny + Arsenyevsky District",
-        "zh": "斯拉夫尼、阿尔谢尼耶夫斯基区"
+        "en": "Arsenyevsky District",
+        "zh": "阿尔谢尼耶夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B96436280638251": {
@@ -4733,7 +5903,13 @@
           "en": "Arsenyevsky District",
           "zh": "阿尔谢尼耶夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Slavny + Arsenyevsky District",
+        "zh": "斯拉夫尼、阿尔谢尼耶夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B97726544276204"
     },
     {
       "id": "RU_MRG_236358043a6b",
@@ -4743,8 +5919,8 @@
       ],
       "parent_id": "RU_Voronezh",
       "names": {
-        "en": "Semiluksky District + Ramonsky District",
-        "zh": "塞米卢克斯区、拉蒙斯基区"
+        "en": "Semiluksky District",
+        "zh": "塞米卢克斯区"
       },
       "member_names": {
         "RU_RAY_50074027B57466691773091": {
@@ -4755,7 +5931,13 @@
           "en": "Ramonsky District",
           "zh": "拉蒙斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Semiluksky District + Ramonsky District",
+        "zh": "塞米卢克斯区、拉蒙斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B57466691773091"
     },
     {
       "id": "RU_MRG_a106abba15c7",
@@ -4766,8 +5948,8 @@
       ],
       "parent_id": "RU_Ryazan",
       "names": {
-        "en": "Ryazhsky District + Korablinsky District + Starozhilovsky District",
-        "zh": "里亚日斯基区、科拉布林斯基区、旧日洛夫斯基区"
+        "en": "Ryazhsky District",
+        "zh": "里亚日斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B57510051325718": {
@@ -4782,7 +5964,13 @@
           "en": "Starozhilovsky District",
           "zh": "旧日洛夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ryazhsky District + Korablinsky District + Starozhilovsky District",
+        "zh": "里亚日斯基区、科拉布林斯基区、旧日洛夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B57510051325718"
     },
     {
       "id": "RU_MRG_e735cb3d5de0",
@@ -4792,8 +5980,8 @@
       ],
       "parent_id": "RU_Tambov",
       "names": {
-        "en": "Gavrilovsky District + Bondarsky District",
-        "zh": "加夫里洛夫斯基区、邦达斯基区"
+        "en": "Bondarsky District",
+        "zh": "邦达斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B57701505702472": {
@@ -4804,7 +5992,13 @@
           "en": "Bondarsky District",
           "zh": "邦达斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Gavrilovsky District + Bondarsky District",
+        "zh": "加夫里洛夫斯基区、邦达斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B88649718835128"
     },
     {
       "id": "RU_MRG_9ee6ccf8117c",
@@ -4814,8 +6008,8 @@
       ],
       "parent_id": "RU_Tula",
       "names": {
-        "en": "Tyoplo-Ogaryovsky District + Volovsky District",
-        "zh": "季奥普洛-奥加廖夫斯基区、沃洛夫斯基区"
+        "en": "Volovsky District (Tula)",
+        "zh": "沃洛夫斯基区（图拉州）"
       },
       "member_names": {
         "RU_RAY_50074027B59410881738957": {
@@ -4826,7 +6020,13 @@
           "en": "Volovsky District",
           "zh": "沃洛夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tyoplo-Ogaryovsky District + Volovsky District",
+        "zh": "季奥普洛-奥加廖夫斯基区、沃洛夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B59433529885901"
     },
     {
       "id": "RU_MRG_deee7ff279fc",
@@ -4837,8 +6037,8 @@
       ],
       "parent_id": "RU_Bryansk",
       "names": {
-        "en": "Bryansky District + Karachevsky District + Zhukovsky District",
-        "zh": "布良斯基区、卡拉切夫斯基区、茹科夫斯基区"
+        "en": "Bryansky District",
+        "zh": "布良斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B59916875948138": {
@@ -4853,7 +6053,13 @@
           "en": "Zhukovsky District",
           "zh": "茹科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bryansky District + Karachevsky District + Zhukovsky District",
+        "zh": "布良斯基区、卡拉切夫斯基区、茹科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B59916875948138"
     },
     {
       "id": "RU_MRG_6ade6e4bbcd7",
@@ -4864,8 +6070,8 @@
       ],
       "parent_id": "RU_Kaluga",
       "names": {
-        "en": "Borovsky District + Tarussky District + Zhukovsky District",
-        "zh": "博罗夫斯基区、塔鲁斯基区、茹科夫斯基区"
+        "en": "Borovsky District",
+        "zh": "博罗夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B62532131027212": {
@@ -4880,7 +6086,13 @@
           "en": "Zhukovsky District",
           "zh": "茹科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Borovsky District + Tarussky District + Zhukovsky District",
+        "zh": "博罗夫斯基区、塔鲁斯基区、茹科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B62532131027212"
     },
     {
       "id": "RU_MRG_5bab1314350d",
@@ -4890,8 +6102,8 @@
       ],
       "parent_id": "RU_Tambov",
       "names": {
-        "en": "Michurinsky District + Nikiforovsky District",
-        "zh": "米丘林斯基区、尼基福罗夫斯基区"
+        "en": "Michurinsky District",
+        "zh": "米丘林斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B63245115489451": {
@@ -4902,7 +6114,13 @@
           "en": "Nikiforovsky District",
           "zh": "尼基福罗夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Michurinsky District + Nikiforovsky District",
+        "zh": "米丘林斯基区、尼基福罗夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B63245115489451"
     },
     {
       "id": "RU_MRG_bc039a5db22c",
@@ -4913,8 +6131,8 @@
       ],
       "parent_id": "RU_Vladimir",
       "names": {
-        "en": "Melenkovsky District + Gus-Khrustalny District + городской округ Гусь-Хруст",
-        "zh": "梅林科夫斯基区、古斯-赫鲁斯塔尼区、古斯赫鲁斯特尔内"
+        "en": "Gus'-Khrustal'nyy",
+        "zh": "古斯赫鲁斯特尔内"
       },
       "member_names": {
         "RU_RAY_50074027B63852169258250": {
@@ -4929,7 +6147,13 @@
           "en": "городской округ Гусь-Хруст",
           "zh": "古斯赫鲁斯特尔内"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Melenkovsky District + Gus-Khrustalny District + городской округ Гусь-Хруст",
+        "zh": "梅林科夫斯基区、古斯-赫鲁斯塔尼区、古斯赫鲁斯特尔内"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B92950284592103"
     },
     {
       "id": "RU_MRG_8bae009baf0d",
@@ -4940,8 +6164,8 @@
       ],
       "parent_id": "RU_Voronezh",
       "names": {
-        "en": "Anninsky District + Talovsky District + Ertilsky District",
-        "zh": "安宁斯基区、塔洛夫斯基区、埃尔捷利斯基区"
+        "en": "Anninsky District",
+        "zh": "安宁斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B65877189026029": {
@@ -4956,7 +6180,13 @@
           "en": "Ertilsky District",
           "zh": "埃尔捷利斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Anninsky District + Talovsky District + Ertilsky District",
+        "zh": "安宁斯基区、塔洛夫斯基区、埃尔捷利斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B65877189026029"
     },
     {
       "id": "RU_MRG_3e327de823aa",
@@ -4966,8 +6196,8 @@
       ],
       "parent_id": "RU_Republic_of_Mordovia",
       "names": {
-        "en": "Chamzinsky District + Romodanovsky District",
-        "zh": "查姆津斯基区、罗莫达诺夫斯基区"
+        "en": "Chamzinsky District",
+        "zh": "查姆津斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B68079497432246": {
@@ -4978,7 +6208,13 @@
           "en": "Romodanovsky District",
           "zh": "罗莫达诺夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Chamzinsky District + Romodanovsky District",
+        "zh": "查姆津斯基区、罗莫达诺夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B68079497432246"
     },
     {
       "id": "RU_MRG_43f873e0c183",
@@ -4988,8 +6224,8 @@
       ],
       "parent_id": "RU_Tambov",
       "names": {
-        "en": "Zherdevsky District + Uvarovsky District",
-        "zh": "热尔杰夫斯基区、乌瓦罗夫斯基区"
+        "en": "Zherdevsky District",
+        "zh": "热尔杰夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B70638917680756": {
@@ -5000,7 +6236,13 @@
           "en": "Uvarovsky District",
           "zh": "乌瓦罗夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zherdevsky District + Uvarovsky District",
+        "zh": "热尔杰夫斯基区、乌瓦罗夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B70638917680756"
     },
     {
       "id": "RU_MRG_c4615cedcd6d",
@@ -5010,8 +6252,8 @@
       ],
       "parent_id": "RU_Yaroslavl",
       "names": {
-        "en": "Некоузский район + Брейтовский район",
-        "zh": "内库兹斯基区、布赖托夫斯基区"
+        "en": "Некоузский район",
+        "zh": "内库兹斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B72401708546708": {
@@ -5022,7 +6264,13 @@
           "en": "Брейтовский район",
           "zh": "布赖托夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Некоузский район + Брейтовский район",
+        "zh": "内库兹斯基区、布赖托夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B72401708546708"
     },
     {
       "id": "RU_MRG_34e9e32d62ca",
@@ -5033,8 +6281,8 @@
       ],
       "parent_id": "RU_Rostov",
       "names": {
-        "en": "Кашарский район + Bokovsky District + Milyutinsky District",
-        "zh": "卡沙尔区、博科夫斯基区、米柳金斯基区"
+        "en": "Кашарский район",
+        "zh": "卡沙尔区"
       },
       "member_names": {
         "RU_RAY_50074027B74380853885106": {
@@ -5049,7 +6297,13 @@
           "en": "Milyutinsky District",
           "zh": "米柳金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Кашарский район + Bokovsky District + Milyutinsky District",
+        "zh": "卡沙尔区、博科夫斯基区、米柳金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B74380853885106"
     },
     {
       "id": "RU_MRG_727dc7a15097",
@@ -5059,8 +6313,8 @@
       ],
       "parent_id": "RU_Novgorod",
       "names": {
-        "en": "Maryovsky District + Kholmsky District",
-        "zh": "马廖夫斯基区、霍尔姆斯基区"
+        "en": "Kholmsky District",
+        "zh": "霍尔姆斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B74954429375583": {
@@ -5071,7 +6325,13 @@
           "en": "Kholmsky District",
           "zh": "霍尔姆斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Maryovsky District + Kholmsky District",
+        "zh": "马廖夫斯基区、霍尔姆斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B76460702893183"
     },
     {
       "id": "RU_MRG_73b7c86083a9",
@@ -5082,8 +6342,8 @@
       ],
       "parent_id": "RU_Nizhny_Novgorod",
       "names": {
-        "en": "Bogorodsky District + Pavlovsky District + Dalnekonstantinovsky District",
-        "zh": "博戈罗德斯基区、巴甫洛夫斯基区、达尔内康斯坦丁诺夫斯基区"
+        "en": "Pavlovsky District (Nizhny Novgorod)",
+        "zh": "巴甫洛夫斯基区（兴登堡施塔特）"
       },
       "member_names": {
         "RU_RAY_50074027B75775497066849": {
@@ -5098,7 +6358,13 @@
           "en": "Dalnekonstantinovsky District",
           "zh": "达尔内康斯坦丁诺夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bogorodsky District + Pavlovsky District + Dalnekonstantinovsky District",
+        "zh": "博戈罗德斯基区、巴甫洛夫斯基区、达尔内康斯坦丁诺夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B90170074824117"
     },
     {
       "id": "RU_MRG_3576eb737658",
@@ -5108,8 +6374,8 @@
       ],
       "parent_id": "RU_Kaluga",
       "names": {
-        "en": "Meshchovsky District + Babyninsky District",
-        "zh": "梅霍夫斯基区、巴巴宁斯基区"
+        "en": "Babyninsky District",
+        "zh": "巴巴宁斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B79232491116527": {
@@ -5120,7 +6386,13 @@
           "en": "Babyninsky District",
           "zh": "巴巴宁斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Meshchovsky District + Babyninsky District",
+        "zh": "梅霍夫斯基区、巴巴宁斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B80712703380192"
     },
     {
       "id": "RU_MRG_960481e90ae6",
@@ -5130,8 +6402,8 @@
       ],
       "parent_id": "RU_Tula",
       "names": {
-        "en": "Bogoroditsky District + Uzlovsky District",
-        "zh": "博戈罗季茨基区、乌兹洛夫斯基区"
+        "en": "Bogoroditsk",
+        "zh": "博戈罗季茨克"
       },
       "member_names": {
         "RU_RAY_50074027B80052568352424": {
@@ -5142,7 +6414,13 @@
           "en": "Uzlovsky District",
           "zh": "乌兹洛夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bogoroditsky District + Uzlovsky District",
+        "zh": "博戈罗季茨基区、乌兹洛夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B80052568352424"
     },
     {
       "id": "RU_MRG_f1a67cdf0458",
@@ -5152,8 +6430,8 @@
       ],
       "parent_id": "RU_Kaluga",
       "names": {
-        "en": "Mosalsky District + Baryatinsky District",
-        "zh": "莫萨尔斯基区、巴里亚廷斯基区"
+        "en": "Mosalsky District",
+        "zh": "莫萨尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B82235438820873": {
@@ -5164,7 +6442,13 @@
           "en": "Baryatinsky District",
           "zh": "巴里亚廷斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mosalsky District + Baryatinsky District",
+        "zh": "莫萨尔斯基区、巴里亚廷斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B82235438820873"
     },
     {
       "id": "UA_MRG_87ad72dae9b5",
@@ -5175,8 +6459,8 @@
       ],
       "parent_id": "UA_Zaporizhzhia",
       "names": {
-        "en": "Mykhailivka + Vasylivka + Tokmak",
-        "zh": "米哈伊利夫卡、瓦西利夫卡、旋钮"
+        "en": "Tokmak",
+        "zh": "旋钮"
       },
       "member_names": {
         "UA_RAY_74538382B10558448482031": {
@@ -5191,7 +6475,13 @@
           "en": "Tokmak",
           "zh": "旋钮"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mykhailivka + Vasylivka + Tokmak",
+        "zh": "米哈伊利夫卡、瓦西利夫卡、旋钮"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B76878796003824"
     },
     {
       "id": "UA_MRG_1d698b91bc32",
@@ -5202,8 +6492,8 @@
       ],
       "parent_id": "UA_Cherkasy",
       "names": {
-        "en": "Chornobai + Drabiv + Zolotonosha",
-        "zh": "切尔诺拜、德拉比夫、佐洛托诺沙"
+        "en": "Zolotonosha",
+        "zh": "佐洛托诺沙"
       },
       "member_names": {
         "UA_RAY_74538382B10652079074389": {
@@ -5218,7 +6508,13 @@
           "en": "Zolotonosha",
           "zh": "佐洛托诺沙"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Chornobai + Drabiv + Zolotonosha",
+        "zh": "切尔诺拜、德拉比夫、佐洛托诺沙"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B40671988393633"
     },
     {
       "id": "UA_MRG_fbcb4404788c",
@@ -5228,8 +6524,8 @@
       ],
       "parent_id": "UA_Cherkasy",
       "names": {
-        "en": "Mankivka + Talne",
-        "zh": "曼基夫卡、楼层"
+        "en": "Talne",
+        "zh": "楼层"
       },
       "member_names": {
         "UA_RAY_74538382B11416649963923": {
@@ -5240,7 +6536,13 @@
           "en": "Talne",
           "zh": "楼层"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mankivka + Talne",
+        "zh": "曼基夫卡、楼层"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B77501055867639"
     },
     {
       "id": "UA_MRG_4f13a104316f",
@@ -5251,8 +6553,8 @@
       ],
       "parent_id": "UA_Cherkasy",
       "names": {
-        "en": "Katerynopil + Zvenyhorodka + Lysianka",
-        "zh": "卡特里诺波尔、兹韦尼霍罗德卡、莱西安卡"
+        "en": "Zvenyhorodka",
+        "zh": "兹韦尼霍罗德卡"
       },
       "member_names": {
         "UA_RAY_74538382B12367365780771": {
@@ -5267,7 +6569,13 @@
           "en": "Lysianka",
           "zh": "莱西安卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Katerynopil + Zvenyhorodka + Lysianka",
+        "zh": "卡特里诺波尔、兹韦尼霍罗德卡、莱西安卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B54532398243130"
     },
     {
       "id": "UA_MRG_93291f71dff3",
@@ -5278,8 +6586,8 @@
       ],
       "parent_id": "UA_Rivne",
       "names": {
-        "en": "Sarny + Volodymyrets + Kostopil",
-        "zh": "鹿、弗拉基米雷茨、科斯托波尔"
+        "en": "Kostopil",
+        "zh": "科斯托波尔"
       },
       "member_names": {
         "UA_RAY_74538382B1350322387743": {
@@ -5294,7 +6602,13 @@
           "en": "Kostopil",
           "zh": "科斯托波尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sarny + Volodymyrets + Kostopil",
+        "zh": "鹿、弗拉基米雷茨、科斯托波尔"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B91945064938376"
     },
     {
       "id": "UA_MRG_70858b70843b",
@@ -5305,8 +6619,8 @@
       ],
       "parent_id": "UA_Kharkiv",
       "names": {
-        "en": "Valky + Bohodukhiv + Nova Vodolaha",
-        "zh": "瓦尔基、博霍杜赫夫、新沃多拉哈"
+        "en": "Nova Vodolaha",
+        "zh": "新沃多拉哈"
       },
       "member_names": {
         "UA_RAY_74538382B13527376036469": {
@@ -5321,7 +6635,13 @@
           "en": "Nova Vodolaha",
           "zh": "新沃多拉哈"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Valky + Bohodukhiv + Nova Vodolaha",
+        "zh": "瓦尔基、博霍杜赫夫、新沃多拉哈"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B6439769638360"
     },
     {
       "id": "UA_MRG_837595aeea03",
@@ -5331,8 +6651,8 @@
       ],
       "parent_id": "UA_Donetsk",
       "names": {
-        "en": "Marinka + Pokrovsk",
-        "zh": "通道、波克罗夫斯克"
+        "en": "Marinka",
+        "zh": "通道"
       },
       "member_names": {
         "UA_RAY_74538382B30318275969007": {
@@ -5343,7 +6663,13 @@
           "en": "Pokrovsk",
           "zh": "波克罗夫斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Marinka + Pokrovsk",
+        "zh": "通道、波克罗夫斯克"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B30318275969007"
     },
     {
       "id": "UA_MRG_73aa15b32010",
@@ -5353,8 +6679,8 @@
       ],
       "parent_id": "UA_Mykolaiv",
       "names": {
-        "en": "Yelanets + Voznesensk",
-        "zh": "叶拉涅茨、沃兹涅先斯克"
+        "en": "Yelanets",
+        "zh": "叶拉涅茨"
       },
       "member_names": {
         "UA_RAY_74538382B14537158586651": {
@@ -5365,7 +6691,13 @@
           "en": "Voznesensk",
           "zh": "沃兹涅先斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yelanets + Voznesensk",
+        "zh": "叶拉涅茨、沃兹涅先斯克"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B14537158586651"
     },
     {
       "id": "UA_MRG_1e19f7d437d0",
@@ -5375,8 +6707,8 @@
       ],
       "parent_id": "UA_Kharkiv",
       "names": {
-        "en": "Krasnohrad + Kehychivka",
-        "zh": "克拉斯诺赫拉迪、克希奇夫卡"
+        "en": "Krasnohrad",
+        "zh": "克拉斯诺赫拉迪"
       },
       "member_names": {
         "UA_RAY_74538382B7695117672354": {
@@ -5387,7 +6719,13 @@
           "en": "Kehychivka",
           "zh": "克希奇夫卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Krasnohrad + Kehychivka",
+        "zh": "克拉斯诺赫拉迪、克希奇夫卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B7695117672354"
     },
     {
       "id": "UA_MRG_97cb7eda9f1d",
@@ -5398,8 +6736,8 @@
       ],
       "parent_id": "UA_Kharkiv",
       "names": {
-        "en": "Barvinkove + Izium + Balakliia",
-        "zh": "巴尔文科夫、伊兹乌姆、巴拉克利亚"
+        "en": "Izium",
+        "zh": "伊兹乌姆"
       },
       "member_names": {
         "UA_RAY_74538382B15610245236220": {
@@ -5414,6 +6752,18 @@
           "en": "Balakliia",
           "zh": "巴拉克利亚"
         }
+      },
+      "previous_names": {
+        "en": "Barvinkove + Izium + Balakliia",
+        "zh": "巴尔文科夫、伊兹乌姆、巴拉克利亚"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B31027470477493",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Izium",
+          "zh": "伊久姆"
+        }
       }
     },
     {
@@ -5424,8 +6774,8 @@
       ],
       "parent_id": "UA_Mykolaiv",
       "names": {
-        "en": "Arbuzynka + Bratske",
-        "zh": "阿尔布任卡、布拉茨克"
+        "en": "Bratske",
+        "zh": "布拉茨克"
       },
       "member_names": {
         "UA_RAY_74538382B18710182758525": {
@@ -5436,7 +6786,13 @@
           "en": "Bratske",
           "zh": "布拉茨克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Arbuzynka + Bratske",
+        "zh": "阿尔布任卡、布拉茨克"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B69774355156403"
     },
     {
       "id": "UA_MRG_8f0f1aca728a",
@@ -5446,8 +6802,8 @@
       ],
       "parent_id": "UA_Kyiv",
       "names": {
-        "en": "Baryshivka + Boryspil",
-        "zh": "巴雷什夫卡、鲍里斯波尔"
+        "en": "Boryspil",
+        "zh": "鲍里斯波尔"
       },
       "member_names": {
         "UA_RAY_74538382B22204754731181": {
@@ -5457,6 +6813,18 @@
         "UA_RAY_74538382B74226948291525": {
           "en": "Boryspil",
           "zh": "鲍里斯波尔"
+        }
+      },
+      "previous_names": {
+        "en": "Baryshivka + Boryspil",
+        "zh": "巴雷什夫卡、鲍里斯波尔"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B74226948291525",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Boryspil",
+          "zh": "博里斯波尔"
         }
       }
     },
@@ -5468,8 +6836,8 @@
       ],
       "parent_id": "UA_Kyiv",
       "names": {
-        "en": "Rokytne + Kaharlyk",
-        "zh": "罗基特内、卡哈雷克"
+        "en": "Kaharlyk",
+        "zh": "卡哈雷克"
       },
       "member_names": {
         "UA_RAY_74538382B34512881177192": {
@@ -5480,7 +6848,13 @@
           "en": "Kaharlyk",
           "zh": "卡哈雷克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rokytne + Kaharlyk",
+        "zh": "罗基特内、卡哈雷克"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B43652074637145"
     },
     {
       "id": "UA_MRG_167b1c61b320",
@@ -5491,8 +6865,8 @@
       ],
       "parent_id": "UA_Kharkiv",
       "names": {
-        "en": "Kupiansk + Borova + Shevchenkove",
-        "zh": "库潘斯克、博罗娃、舍甫琴科夫"
+        "en": "Kupiansk",
+        "zh": "库皮扬斯克"
       },
       "member_names": {
         "UA_RAY_74538382B18579699267219": {
@@ -5507,7 +6881,13 @@
           "en": "Shevchenkove",
           "zh": "舍甫琴科夫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kupiansk + Borova + Shevchenkove",
+        "zh": "库潘斯克、博罗娃、舍甫琴科夫"
+      },
+      "name_source": "city",
+      "representative_id": "UA_RAY_74538382B18579699267219"
     },
     {
       "id": "UA_MRG_26d00b8ec232",
@@ -5518,8 +6898,8 @@
       ],
       "parent_id": "UA_Kharkiv",
       "names": {
-        "en": "Zmiiv + Pervomaiskyi + Chuhuiv",
-        "zh": "兹米夫、佩尔沃迈斯基、楚胡伊夫"
+        "en": "Zmiiv",
+        "zh": "兹米夫"
       },
       "member_names": {
         "UA_RAY_74538382B19382473130603": {
@@ -5534,7 +6914,13 @@
           "en": "Chuhuiv",
           "zh": "楚胡伊夫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zmiiv + Pervomaiskyi + Chuhuiv",
+        "zh": "兹米夫、佩尔沃迈斯基、楚胡伊夫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B19382473130603"
     },
     {
       "id": "UA_MRG_72c94a3ccd70",
@@ -5545,8 +6931,8 @@
       ],
       "parent_id": "UA_Ivano_Frankivsk",
       "names": {
-        "en": "Halych + Rohatyn + Kalush",
-        "zh": "哈利奇、罗哈廷、卡卢什"
+        "en": "Kalush",
+        "zh": "卡卢什"
       },
       "member_names": {
         "UA_RAY_74538382B19576586324749": {
@@ -5561,7 +6947,13 @@
           "en": "Kalush",
           "zh": "卡卢什"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Halych + Rohatyn + Kalush",
+        "zh": "哈利奇、罗哈廷、卡卢什"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B82550284733464"
     },
     {
       "id": "UA_MRG_8e995a06a742",
@@ -5572,8 +6964,8 @@
       ],
       "parent_id": "UA_Donetsk",
       "names": {
-        "en": "Kostiantynivka + Bakhmut + Lyman",
-        "zh": "科斯蒂安特尼夫卡、巴克穆特、莱曼"
+        "en": "Kostiantynivka",
+        "zh": "科斯蒂安特尼夫卡"
       },
       "member_names": {
         "UA_RAY_74538382B19842336540914": {
@@ -5588,7 +6980,13 @@
           "en": "Lyman",
           "zh": "莱曼"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kostiantynivka + Bakhmut + Lyman",
+        "zh": "科斯蒂安特尼夫卡、巴克穆特、莱曼"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B19842336540914"
     },
     {
       "id": "UA_MRG_98ce0c6febb4",
@@ -5598,8 +6996,8 @@
       ],
       "parent_id": "UA_Sumy",
       "names": {
-        "en": "Lebedyn + Trostianets",
-        "zh": "莱贝登、特罗斯蒂亚内茨"
+        "en": "Lebedyn",
+        "zh": "莱贝登"
       },
       "member_names": {
         "UA_RAY_74538382B20601682218189": {
@@ -5610,7 +7008,13 @@
           "en": "Trostianets",
           "zh": "特罗斯蒂亚内茨"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lebedyn + Trostianets",
+        "zh": "莱贝登、特罗斯蒂亚内茨"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B20601682218189"
     },
     {
       "id": "UA_MRG_08e978d66245",
@@ -5620,8 +7024,8 @@
       ],
       "parent_id": "UA_Odessa",
       "names": {
-        "en": "Artsyi + Tatarbunary",
-        "zh": "阿尔齐兹、鞑靼布那里"
+        "en": "Artsyi",
+        "zh": "阿尔齐兹"
       },
       "member_names": {
         "UA_RAY_74538382B21342332427534": {
@@ -5631,6 +7035,18 @@
         "UA_RAY_74538382B88986400051477": {
           "en": "Tatarbunary",
           "zh": "鞑靼布那里"
+        }
+      },
+      "previous_names": {
+        "en": "Artsyi + Tatarbunary",
+        "zh": "阿尔齐兹、鞑靼布那里"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B21342332427534",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Artsyz",
+          "zh": "阿尔齐兹"
         }
       }
     },
@@ -5643,8 +7059,8 @@
       ],
       "parent_id": "UA_Volyn",
       "names": {
-        "en": "Kovel + Turiisk + Stara Vyzhivka",
-        "zh": "科韦尔、游客、斯塔拉·维日夫卡"
+        "en": "Kovel",
+        "zh": "科韦利"
       },
       "member_names": {
         "UA_RAY_74538382B22320856317626": {
@@ -5659,7 +7075,13 @@
           "en": "Stara Vyzhivka",
           "zh": "斯塔拉·维日夫卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kovel + Turiisk + Stara Vyzhivka",
+        "zh": "科韦尔、游客、斯塔拉·维日夫卡"
+      },
+      "name_source": "city",
+      "representative_id": "UA_RAY_74538382B22320856317626"
     },
     {
       "id": "UA_MRG_bde664b68d7f",
@@ -5669,8 +7091,8 @@
       ],
       "parent_id": "UA_Chernihiv",
       "names": {
-        "en": "Pryluky + Varva",
-        "zh": "普雷卢基、瓦尔瓦"
+        "en": "Pryluky",
+        "zh": "普雷卢基"
       },
       "member_names": {
         "UA_RAY_74538382B22435039987726": {
@@ -5681,7 +7103,13 @@
           "en": "Varva",
           "zh": "瓦尔瓦"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pryluky + Varva",
+        "zh": "普雷卢基、瓦尔瓦"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B22435039987726"
     },
     {
       "id": "UA_MRG_76175923bdd1",
@@ -5691,8 +7119,8 @@
       ],
       "parent_id": "UA_Kyiv",
       "names": {
-        "en": "Tetiiv + Volodarka",
-        "zh": "弦、沃洛达尔卡"
+        "en": "Tetiiv",
+        "zh": "弦"
       },
       "member_names": {
         "UA_RAY_74538382B22798691386848": {
@@ -5703,7 +7131,13 @@
           "en": "Volodarka",
           "zh": "沃洛达尔卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tetiiv + Volodarka",
+        "zh": "弦、沃洛达尔卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B22798691386848"
     },
     {
       "id": "UA_MRG_4a445701c4c6",
@@ -5713,8 +7147,8 @@
       ],
       "parent_id": "UA_Cherkasy",
       "names": {
-        "en": "Horodysche + Korsun-Shevchenkivskyi",
-        "zh": "霍罗迪什、科尔孙-舍甫琴科夫斯基"
+        "en": "Korsun-Shevchenkivskyi",
+        "zh": "科尔孙-舍甫琴科夫斯基"
       },
       "member_names": {
         "UA_RAY_74538382B24094017923435": {
@@ -5725,7 +7159,13 @@
           "en": "Korsun-Shevchenkivskyi",
           "zh": "科尔孙-舍甫琴科夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Horodysche + Korsun-Shevchenkivskyi",
+        "zh": "霍罗迪什、科尔孙-舍甫琴科夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B57516616644069"
     },
     {
       "id": "UA_MRG_5041b17a3e61",
@@ -5735,8 +7175,8 @@
       ],
       "parent_id": "UA_Khmelnytskyi",
       "names": {
-        "en": "Shepetika + Polonne",
-        "zh": "舍佩蒂卡、波兰人"
+        "en": "Shepetika",
+        "zh": "舍佩蒂卡"
       },
       "member_names": {
         "UA_RAY_74538382B24249088550475": {
@@ -5747,7 +7187,13 @@
           "en": "Polonne",
           "zh": "波兰人"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shepetika + Polonne",
+        "zh": "舍佩蒂卡、波兰人"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B24249088550475"
     },
     {
       "id": "UA_MRG_d4f151f823ef",
@@ -5757,8 +7203,8 @@
       ],
       "parent_id": "UA_Lviv",
       "names": {
-        "en": "Stryi + Zhydachiv",
-        "zh": "斯特里、日达奇夫"
+        "en": "Stryi",
+        "zh": "斯特里"
       },
       "member_names": {
         "UA_RAY_74538382B24886275593146": {
@@ -5769,7 +7215,13 @@
           "en": "Zhydachiv",
           "zh": "日达奇夫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Stryi + Zhydachiv",
+        "zh": "斯特里、日达奇夫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B24886275593146"
     },
     {
       "id": "UA_MRG_ab85624a51f5",
@@ -5780,8 +7232,8 @@
       ],
       "parent_id": "UA_Lviv",
       "names": {
-        "en": "Zolochiv + Peremyshliany + Busk",
-        "zh": "佐洛奇夫、佩列梅什利亚尼、巴斯克"
+        "en": "Zolochiv (Lviv)",
+        "zh": "佐洛奇夫（利沃夫州）"
       },
       "member_names": {
         "UA_RAY_74538382B27097146636711": {
@@ -5796,7 +7248,13 @@
           "en": "Busk",
           "zh": "巴斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zolochiv + Peremyshliany + Busk",
+        "zh": "佐洛奇夫、佩列梅什利亚尼、巴斯克"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B27097146636711"
     },
     {
       "id": "UA_MRG_f49493422ebe",
@@ -5806,8 +7264,8 @@
       ],
       "parent_id": "UA_Chernihiv",
       "names": {
-        "en": "Sosnytsia + Koriukivka",
-        "zh": "索斯尼察、科柳基夫卡"
+        "en": "Sosnytsia",
+        "zh": "索斯尼察"
       },
       "member_names": {
         "UA_RAY_74538382B2815970127948": {
@@ -5818,7 +7276,13 @@
           "en": "Koriukivka",
           "zh": "科柳基夫卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sosnytsia + Koriukivka",
+        "zh": "索斯尼察、科柳基夫卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B2815970127948"
     },
     {
       "id": "UA_MRG_91f1c11e596f",
@@ -5829,8 +7293,8 @@
       ],
       "parent_id": "UA_Sumy",
       "names": {
-        "en": "Nedryhailiv + Romny + Lypova Dolyna",
-        "zh": "内德里海利夫、罗姆尼、利波娃·多琳娜"
+        "en": "Romny",
+        "zh": "罗姆尼"
       },
       "member_names": {
         "UA_RAY_74538382B29387965575909": {
@@ -5845,7 +7309,13 @@
           "en": "Lypova Dolyna",
           "zh": "利波娃·多琳娜"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nedryhailiv + Romny + Lypova Dolyna",
+        "zh": "内德里海利夫、罗姆尼、利波娃·多琳娜"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B59597845190856"
     },
     {
       "id": "UA_MRG_01673e94c186",
@@ -5856,8 +7326,8 @@
       ],
       "parent_id": "UA_Mykolaiv",
       "names": {
-        "en": "Kazanka + Bereznehuvate + Novyi Buh",
-        "zh": "卡赞卡、别列兹涅胡瓦特、诺维·布赫"
+        "en": "Novyi Buh",
+        "zh": "诺维·布赫"
       },
       "member_names": {
         "UA_RAY_74538382B29888444022224": {
@@ -5872,7 +7342,13 @@
           "en": "Novyi Buh",
           "zh": "诺维·布赫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kazanka + Bereznehuvate + Novyi Buh",
+        "zh": "卡赞卡、别列兹涅胡瓦特、诺维·布赫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B79754688878625"
     },
     {
       "id": "UA_MRG_9e7d5f1ce841",
@@ -5883,8 +7359,8 @@
       ],
       "parent_id": "UA_Zaporizhzhia",
       "names": {
-        "en": "Vilniansk + Huliaipole + Novomykolaivka",
-        "zh": "维尔纽斯、胡利亚波尔、新科莱夫卡"
+        "en": "Vilniansk",
+        "zh": "维尔纽斯"
       },
       "member_names": {
         "UA_RAY_74538382B30291492588031": {
@@ -5899,7 +7375,13 @@
           "en": "Novomykolaivka",
           "zh": "新科莱夫卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Vilniansk + Huliaipole + Novomykolaivka",
+        "zh": "维尔纽斯、胡利亚波尔、新科莱夫卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B30291492588031"
     },
     {
       "id": "UA_MRG_049fbd166854",
@@ -5910,8 +7392,8 @@
       ],
       "parent_id": "UA_Zakarpattia",
       "names": {
-        "en": "Irshava + Svaliava + Mukachevo",
-        "zh": "伊尔沙瓦、斯瓦利亚瓦、穆卡切沃"
+        "en": "Mukachevo",
+        "zh": "穆卡切沃"
       },
       "member_names": {
         "UA_RAY_74538382B3065549299103": {
@@ -5926,7 +7408,13 @@
           "en": "Mukachevo",
           "zh": "穆卡切沃"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Irshava + Svaliava + Mukachevo",
+        "zh": "伊尔沙瓦、斯瓦利亚瓦、穆卡切沃"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B46145703776809"
     },
     {
       "id": "UA_MRG_570a8d4dd729",
@@ -5937,8 +7425,8 @@
       ],
       "parent_id": "UA_Zaporizhzhia",
       "names": {
-        "en": "Prymorsk + Chernihivka + Pryazovske",
-        "zh": "普里莫尔斯克、切尔尼希夫卡、普里亚佐夫斯克"
+        "en": "Prymorsk",
+        "zh": "普里莫尔斯克"
       },
       "member_names": {
         "UA_RAY_74538382B30714686760712": {
@@ -5953,7 +7441,13 @@
           "en": "Pryazovske",
           "zh": "普里亚佐夫斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Prymorsk + Chernihivka + Pryazovske",
+        "zh": "普里莫尔斯克、切尔尼希夫卡、普里亚佐夫斯克"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B30714686760712"
     },
     {
       "id": "UA_MRG_c2b5f29d91e8",
@@ -5963,8 +7457,8 @@
       ],
       "parent_id": "UA_Kharkiv",
       "names": {
-        "en": "Krasnokutsk + Kolomak",
-        "zh": "克拉斯诺库茨克、鸽子"
+        "en": "Krasnokutsk",
+        "zh": "克拉斯诺库茨克"
       },
       "member_names": {
         "UA_RAY_74538382B32195622732164": {
@@ -5975,7 +7469,13 @@
           "en": "Kolomak",
           "zh": "鸽子"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Krasnokutsk + Kolomak",
+        "zh": "克拉斯诺库茨克、鸽子"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B32195622732164"
     },
     {
       "id": "UA_MRG_9cc4d817d067",
@@ -5986,8 +7486,8 @@
       ],
       "parent_id": "UA_Dnipropetrovsk",
       "names": {
-        "en": "Verkhnodniprovsk + Krynychky + Piatykhatky",
-        "zh": "上诺德尼普夫斯克、克雷内奇基、五分球"
+        "en": "Piatykhatky",
+        "zh": "五分球"
       },
       "member_names": {
         "UA_RAY_74538382B32904543558628": {
@@ -6002,7 +7502,13 @@
           "en": "Piatykhatky",
           "zh": "五分球"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Verkhnodniprovsk + Krynychky + Piatykhatky",
+        "zh": "上诺德尼普夫斯克、克雷内奇基、五分球"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B88063181617759"
     },
     {
       "id": "UA_MRG_de7101fe7980",
@@ -6012,8 +7518,8 @@
       ],
       "parent_id": "UA_Zaporizhzhia",
       "names": {
-        "en": "Velyka Bilozerka + Vesele",
-        "zh": "韦丽卡·比洛泽卡、快乐的"
+        "en": "Vesele",
+        "zh": "快乐的"
       },
       "member_names": {
         "UA_RAY_74538382B79382588901711": {
@@ -6024,7 +7530,13 @@
           "en": "Vesele",
           "zh": "快乐的"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Velyka Bilozerka + Vesele",
+        "zh": "韦丽卡·比洛泽卡、快乐的"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B83069910659837"
     },
     {
       "id": "UA_MRG_456d7658c3df",
@@ -6035,8 +7547,8 @@
       ],
       "parent_id": "UA_Luhansk",
       "names": {
-        "en": "Bilokurakyne + Novoaidar + Starobilsk",
-        "zh": "比洛库拉金、诺沃艾达尔、斯塔罗比尔斯克"
+        "en": "Starobilsk",
+        "zh": "斯塔罗比尔斯克"
       },
       "member_names": {
         "UA_RAY_74538382B35138885386576": {
@@ -6051,7 +7563,13 @@
           "en": "Starobilsk",
           "zh": "斯塔罗比尔斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bilokurakyne + Novoaidar + Starobilsk",
+        "zh": "比洛库拉金、诺沃艾达尔、斯塔罗比尔斯克"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B4772976790762"
     },
     {
       "id": "UA_MRG_6e5a94ff967b",
@@ -6062,8 +7580,8 @@
       ],
       "parent_id": "UA_Khmelnytskyi",
       "names": {
-        "en": "Vinkivtsi + Yarmolyntsi + Dunaivti",
-        "zh": "温基夫齐、亚尔莫林齐、杜奈夫蒂"
+        "en": "Dunaivti",
+        "zh": "杜奈夫蒂"
       },
       "member_names": {
         "UA_RAY_74538382B36449186606554": {
@@ -6078,7 +7596,13 @@
           "en": "Dunaivti",
           "zh": "杜奈夫蒂"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Vinkivtsi + Yarmolyntsi + Dunaivti",
+        "zh": "温基夫齐、亚尔莫林齐、杜奈夫蒂"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B65826514960499"
     },
     {
       "id": "UA_MRG_7db72d35cf6c",
@@ -6088,8 +7612,8 @@
       ],
       "parent_id": "UA_Chernihiv",
       "names": {
-        "en": "Kozelets + Nosivka",
-        "zh": "科泽莱茨、诺西夫卡"
+        "en": "Kozelets",
+        "zh": "科泽莱茨"
       },
       "member_names": {
         "UA_RAY_74538382B36516129113863": {
@@ -6100,7 +7624,13 @@
           "en": "Nosivka",
           "zh": "诺西夫卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kozelets + Nosivka",
+        "zh": "科泽莱茨、诺西夫卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B36516129113863"
     },
     {
       "id": "UA_MRG_6b24f46af3f8",
@@ -6111,8 +7641,8 @@
       ],
       "parent_id": "UA_Kyiv",
       "names": {
-        "en": "Fastiv + Vasylkiv + Obukhiv",
-        "zh": "法斯蒂夫、瓦西尔基夫、奥布希夫"
+        "en": "Fastiv",
+        "zh": "法斯蒂夫"
       },
       "member_names": {
         "UA_RAY_74538382B37624707153101": {
@@ -6127,6 +7657,18 @@
           "en": "Obukhiv",
           "zh": "奥布希夫"
         }
+      },
+      "previous_names": {
+        "en": "Fastiv + Vasylkiv + Obukhiv",
+        "zh": "法斯蒂夫、瓦西尔基夫、奥布希夫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B37624707153101",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Fastiv",
+          "zh": "法斯托夫"
+        }
       }
     },
     {
@@ -6138,8 +7680,8 @@
       ],
       "parent_id": "UA_Mykolaiv",
       "names": {
-        "en": "Bashtanka + Mykolaiv + Nova Odesa",
-        "zh": "巴什坦卡、尼古拉耶夫、新敖德萨"
+        "en": "Mykolaiv (Mykolaiv)",
+        "zh": "尼古拉耶夫（尼古拉耶夫）"
       },
       "member_names": {
         "UA_RAY_74538382B39145583667330": {
@@ -6154,7 +7696,13 @@
           "en": "Nova Odesa",
           "zh": "新敖德萨"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bashtanka + Mykolaiv + Nova Odesa",
+        "zh": "巴什坦卡、尼古拉耶夫、新敖德萨"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B8424812087391"
     },
     {
       "id": "UA_MRG_ff6ac32ac4e3",
@@ -6165,8 +7713,8 @@
       ],
       "parent_id": "UA_Volyn",
       "names": {
-        "en": "Kivertsi + Manevychi + Rozhyshche",
-        "zh": "基韦尔齐、马内维奇、罗日什切"
+        "en": "Manevychi",
+        "zh": "马内维奇"
       },
       "member_names": {
         "UA_RAY_74538382B39410931329464": {
@@ -6181,7 +7729,13 @@
           "en": "Rozhyshche",
           "zh": "罗日什切"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kivertsi + Manevychi + Rozhyshche",
+        "zh": "基韦尔齐、马内维奇、罗日什切"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B50995532185808"
     },
     {
       "id": "UA_MRG_b54ca702a003",
@@ -6191,8 +7745,8 @@
       ],
       "parent_id": "UA_Cherkasy",
       "names": {
-        "en": "Smila + Shpola",
-        "zh": "斯米拉、什波拉"
+        "en": "Smila",
+        "zh": "斯米拉"
       },
       "member_names": {
         "UA_RAY_74538382B39705713449097": {
@@ -6203,7 +7757,13 @@
           "en": "Shpola",
           "zh": "什波拉"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Smila + Shpola",
+        "zh": "斯米拉、什波拉"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B39705713449097"
     },
     {
       "id": "UA_MRG_8c4b9e4808b7",
@@ -6213,8 +7773,8 @@
       ],
       "parent_id": "UA_Rivne",
       "names": {
-        "en": "Demydivka + Mlyniv",
-        "zh": "德米迪夫卡、姆利尼夫"
+        "en": "Mlyniv",
+        "zh": "姆利尼夫"
       },
       "member_names": {
         "UA_RAY_74538382B42037419255148": {
@@ -6225,7 +7785,13 @@
           "en": "Mlyniv",
           "zh": "姆利尼夫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Demydivka + Mlyniv",
+        "zh": "德米迪夫卡、姆利尼夫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B5882796525163"
     },
     {
       "id": "UA_MRG_b75cd2d6110f",
@@ -6236,8 +7802,8 @@
       ],
       "parent_id": "UA_Dnipropetrovsk",
       "names": {
-        "en": "Novomoskovsk + Synelnykove + Mahdalynivka",
-        "zh": "新莫斯科斯克、西内尔尼科夫、马赫达利尼夫卡"
+        "en": "Novomoskovsk",
+        "zh": "新莫斯科斯克"
       },
       "member_names": {
         "UA_RAY_74538382B42349939916707": {
@@ -6252,7 +7818,13 @@
           "en": "Mahdalynivka",
           "zh": "马赫达利尼夫卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novomoskovsk + Synelnykove + Mahdalynivka",
+        "zh": "新莫斯科斯克、西内尔尼科夫、马赫达利尼夫卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B42349939916707"
     },
     {
       "id": "UA_MRG_1a8aac8d6778",
@@ -6263,8 +7835,8 @@
       ],
       "parent_id": "UA_Zaporizhzhia",
       "names": {
-        "en": "Rozivka + Polohy + Bilmak",
-        "zh": "雌激素、地点、比尔马克"
+        "en": "Polohy",
+        "zh": "地点"
       },
       "member_names": {
         "UA_RAY_74538382B47912633354712": {
@@ -6279,7 +7851,13 @@
           "en": "Bilmak",
           "zh": "比尔马克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rozivka + Polohy + Bilmak",
+        "zh": "雌激素、地点、比尔马克"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B66940770579939"
     },
     {
       "id": "UA_MRG_c5aa2c8a6048",
@@ -6289,8 +7867,8 @@
       ],
       "parent_id": "UA_Dnipropetrovsk",
       "names": {
-        "en": "Pokrovske + Vasylkivka",
-        "zh": "封面、瓦西尔基夫卡"
+        "en": "Pokrovske",
+        "zh": "封面"
       },
       "member_names": {
         "UA_RAY_74538382B48526487653487": {
@@ -6301,7 +7879,13 @@
           "en": "Vasylkivka",
           "zh": "瓦西尔基夫卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pokrovske + Vasylkivka",
+        "zh": "封面、瓦西尔基夫卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B48526487653487"
     },
     {
       "id": "UA_MRG_71f8199a8d07",
@@ -6312,8 +7896,8 @@
       ],
       "parent_id": "UA_Khmelnytskyi",
       "names": {
-        "en": "Krasyliv + Starokostiantyniv + Stara Syniava",
-        "zh": "克拉西利夫、斯塔罗科斯坦蒂尼夫、斯塔拉·西尼亚瓦"
+        "en": "Starokostiantyniv",
+        "zh": "斯塔罗科斯坦蒂尼夫"
       },
       "member_names": {
         "UA_RAY_74538382B48627824985747": {
@@ -6328,7 +7912,13 @@
           "en": "Stara Syniava",
           "zh": "斯塔拉·西尼亚瓦"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Krasyliv + Starokostiantyniv + Stara Syniava",
+        "zh": "克拉西利夫、斯塔罗科斯坦蒂尼夫、斯塔拉·西尼亚瓦"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B5461763089897"
     },
     {
       "id": "UA_MRG_0d6137080058",
@@ -6339,8 +7929,8 @@
       ],
       "parent_id": "UA_Ternopil",
       "names": {
-        "en": "Pidhaitsi + Monastyryska + Buchach",
-        "zh": "饮食、修道院俄语、布哈赫"
+        "en": "Monastyryska",
+        "zh": "修道院俄语"
       },
       "member_names": {
         "UA_RAY_74538382B49196130715862": {
@@ -6355,7 +7945,13 @@
           "en": "Buchach",
           "zh": "布哈赫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pidhaitsi + Monastyryska + Buchach",
+        "zh": "饮食、修道院俄语、布哈赫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B71617713265509"
     },
     {
       "id": "UA_MRG_2b67cdceafd7",
@@ -6366,8 +7962,8 @@
       ],
       "parent_id": "UA_Odessa",
       "names": {
-        "en": "Ananiv + Zakharivka + Shyriaieve",
-        "zh": "阿纳尼夫、扎哈利夫卡、希里亚耶夫"
+        "en": "Shyriaieve",
+        "zh": "希里亚耶夫"
       },
       "member_names": {
         "UA_RAY_74538382B50409761093729": {
@@ -6382,7 +7978,13 @@
           "en": "Shyriaieve",
           "zh": "希里亚耶夫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ananiv + Zakharivka + Shyriaieve",
+        "zh": "阿纳尼夫、扎哈利夫卡、希里亚耶夫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B78856367012354"
     },
     {
       "id": "UA_MRG_9c6077315d06",
@@ -6392,8 +7994,8 @@
       ],
       "parent_id": "UA_Ternopil",
       "names": {
-        "en": "Berezhany + Kozova",
-        "zh": "别列扎尼、科佐娃"
+        "en": "Berezhany",
+        "zh": "别列扎尼"
       },
       "member_names": {
         "UA_RAY_74538382B5205170334636": {
@@ -6404,7 +8006,13 @@
           "en": "Kozova",
           "zh": "科佐娃"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Berezhany + Kozova",
+        "zh": "别列扎尼、科佐娃"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B5205170334636"
     },
     {
       "id": "UA_MRG_c8f134fbd5da",
@@ -6414,8 +8022,8 @@
       ],
       "parent_id": "UA_Chernihiv",
       "names": {
-        "en": "Talalaivka + Bakhmach",
-        "zh": "你的孩子、巴赫马赫"
+        "en": "Bakhmach",
+        "zh": "巴赫马赫"
       },
       "member_names": {
         "UA_RAY_74538382B53480442802738": {
@@ -6426,7 +8034,13 @@
           "en": "Bakhmach",
           "zh": "巴赫马赫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Talalaivka + Bakhmach",
+        "zh": "你的孩子、巴赫马赫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B54341051528669"
     },
     {
       "id": "UA_MRG_07e4f868c3fb",
@@ -6436,8 +8050,8 @@
       ],
       "parent_id": "UA_Sumy",
       "names": {
-        "en": "Krolevets + Shostka",
-        "zh": "克罗莱维特、肖斯特卡"
+        "en": "Shostka",
+        "zh": "绍斯特卡"
       },
       "member_names": {
         "UA_RAY_74538382B60331079617508": {
@@ -6448,7 +8062,13 @@
           "en": "Shostka",
           "zh": "肖斯特卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Krolevets + Shostka",
+        "zh": "克罗莱维特、肖斯特卡"
+      },
+      "name_source": "city",
+      "representative_id": "UA_RAY_74538382B68405573431293"
     },
     {
       "id": "UA_MRG_30161412737f",
@@ -6458,8 +8078,8 @@
       ],
       "parent_id": "UA_Luhansk",
       "names": {
-        "en": "Svatove + Kreminna",
-        "zh": "婚礼派对、更加奶油味"
+        "en": "Svatove",
+        "zh": "婚礼派对"
       },
       "member_names": {
         "UA_RAY_74538382B64368506092138": {
@@ -6470,7 +8090,13 @@
           "en": "Kreminna",
           "zh": "更加奶油味"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Svatove + Kreminna",
+        "zh": "婚礼派对、更加奶油味"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B64368506092138"
     },
     {
       "id": "UA_MRG_228c317a869c",
@@ -6480,8 +8106,8 @@
       ],
       "parent_id": "UA_Kyiv",
       "names": {
-        "en": "Borodianka + Makariv",
-        "zh": "博罗季安卡、马卡里夫"
+        "en": "Borodianka",
+        "zh": "博罗季安卡"
       },
       "member_names": {
         "UA_RAY_74538382B66487059537692": {
@@ -6492,7 +8118,13 @@
           "en": "Makariv",
           "zh": "马卡里夫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Borodianka + Makariv",
+        "zh": "博罗季安卡、马卡里夫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B66487059537692"
     },
     {
       "id": "UA_MRG_4224fabffe3b",
@@ -6502,8 +8134,8 @@
       ],
       "parent_id": "UA_Chernihiv",
       "names": {
-        "en": "Kulykivka + Mena",
-        "zh": "库雷基夫卡、梅纳"
+        "en": "Mena",
+        "zh": "梅纳"
       },
       "member_names": {
         "UA_RAY_74538382B79532442350116": {
@@ -6514,7 +8146,13 @@
           "en": "Mena",
           "zh": "梅纳"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kulykivka + Mena",
+        "zh": "库雷基夫卡、梅纳"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B90390774066886"
     },
     {
       "id": "UA_MRG_57c49cfe4029",
@@ -6524,8 +8162,8 @@
       ],
       "parent_id": "UA_Khmelnytskyi",
       "names": {
-        "en": "Derazhnia + Letychiv",
-        "zh": "德拉兹尼亚、列特奇夫"
+        "en": "Letychiv",
+        "zh": "列特奇夫"
       },
       "member_names": {
         "UA_RAY_74538382B86638641463315": {
@@ -6536,7 +8174,13 @@
           "en": "Letychiv",
           "zh": "列特奇夫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Derazhnia + Letychiv",
+        "zh": "德拉兹尼亚、列特奇夫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B98424349787745"
     },
     {
       "id": "UA_MRG_35715f97812f",
@@ -6546,8 +8190,8 @@
       ],
       "parent_id": "UA_Ivano_Frankivsk",
       "names": {
-        "en": "Tlumach + Kolomyia",
-        "zh": "特卢马赫、科洛梅亚"
+        "en": "Kolomyia",
+        "zh": "科洛梅亚"
       },
       "member_names": {
         "UA_RAY_74538382B88874986196834": {
@@ -6558,7 +8202,13 @@
           "en": "Kolomyia",
           "zh": "科洛梅亚"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tlumach + Kolomyia",
+        "zh": "特卢马赫、科洛梅亚"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B92026031653361"
     }
   ],
   "split_or_reduced_candidates": [

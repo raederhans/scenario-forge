@@ -11103,7 +11103,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bee0bb9c2edd",
-        "name": "Mukhorshibirsky Rayon + Tarbagataysky Rayon",
+        "name": "Mukhorshibirsky Rayon",
         "cntr_code": "BRY",
         "__source": "detail"
       },
@@ -13422,7 +13422,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3992f91b7378",
-        "name": "Ivolginsky District + Selenginsky Rayon",
+        "name": "Ivolginsky District",
         "cntr_code": "BRY",
         "__source": "detail"
       },
@@ -24241,7 +24241,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f6312a148f5b",
-        "name": "Zaigrayevsky Rayon + Khorinsky Rayon + Kizhinginsky Rayon",
+        "name": "Zaigrayevsky Rayon",
         "cntr_code": "BRY",
         "__source": "detail"
       },

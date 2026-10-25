@@ -6,7 +6,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_5d11e491ebbb",
-        "name": "Klinsky District + Volokolamsky District",
+        "name": "Klin",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -14453,7 +14453,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a209550547d0",
-        "name": "Solnechnogorsky District + Dmitrovsky District",
+        "name": "Solnechnogorsk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -70296,7 +70296,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_81137f16203b",
-        "name": "Kesovogorsky District + Krasnokholmsky District + Sonkovsky District",
+        "name": "Krasnokholmsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -76551,7 +76551,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d0fe64d9350d",
-        "name": "Molokovsky District + Bezhetsky District",
+        "name": "Bezhetsk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -82567,7 +82567,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_74d5c4da86d9",
-        "name": "Rameshkovsky District + Likhoslavlsky District + Spirovsky District",
+        "name": "Likhoslavlsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -88348,7 +88348,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f4a93d25d960",
-        "name": "Vyshny Volochyok + Vyshnevolotsky District",
+        "name": "Vyshny Volochyok",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -102029,7 +102029,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_0be016c8605b",
-        "name": "Sandovsky District + Lesnoy District",
+        "name": "Sandovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -112836,7 +112836,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c4615cedcd6d",
-        "name": "Некоузский район + Брейтовский район",
+        "name": "Некоузский район",
         "cntr_code": "RU",
         "__source": "detail"
       },

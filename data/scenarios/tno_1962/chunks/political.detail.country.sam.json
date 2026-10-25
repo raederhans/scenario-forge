@@ -3989,7 +3989,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6b0c8db39991",
-        "name": "Krasnoarmeysky District + Pestravsky District",
+        "name": "Pestravsky District",
         "cntr_code": "SAM",
         "__source": "detail"
       },
@@ -6276,7 +6276,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6b6a075bbf36",
-        "name": "Alexeyevsky District + Bolsheglushitsky District",
+        "name": "Bolsheglushitsky District",
         "cntr_code": "SAM",
         "__source": "detail"
       },
@@ -14263,7 +14263,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_59fd0de59d37",
-        "name": "Кинельский район + Krasnoyarsky District + Neftegorsky District",
+        "name": "Krasnoyarsky District (Samara)",
         "cntr_code": "SAM",
         "__source": "detail"
       },
@@ -21331,7 +21331,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_4ddc97ea36c1",
-        "name": "Borsky District + Kinel-Cherkassky District + Pokhvistnevsky District",
+        "name": "Kinel-Cherkassky District",
         "cntr_code": "SAM",
         "__source": "detail"
       },
@@ -37568,7 +37568,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e0a6982b1a84",
-        "name": "Bizhbulyaksky District + Yermekeyevsky District",
+        "name": "Bizhbulyaksky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -43000,7 +43000,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_22ecbd2b45b0",
-        "name": "Isaklinsky District + Klyavlinsky District + Sergiyevsky District",
+        "name": "Sergiyevsky District",
         "cntr_code": "SAM",
         "__source": "detail"
       },
@@ -60277,7 +60277,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_4d1eb2a853b6",
-        "name": "Novomalyklinsky District + Melekessky District",
+        "name": "Melekessky District",
         "cntr_code": "SAM",
         "__source": "detail"
       },
@@ -66397,7 +66397,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_09d845e05419",
-        "name": "Bugulminsky District + Bavlinsky District",
+        "name": "Bugulma",
         "cntr_code": "RU",
         "__source": "detail"
       },

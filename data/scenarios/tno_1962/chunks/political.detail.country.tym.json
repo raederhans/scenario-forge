@@ -3916,7 +3916,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8298b9d45571",
-        "name": "Zverinogolovsky District + Kurtamyshsky District",
+        "name": "Kurtamyshsky District",
         "cntr_code": "TYM",
         "__source": "detail"
       },
@@ -10731,7 +10731,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_30cade9a7e6f",
-        "name": "Vargashinsky District + Mokrousovsky District + Lebyazhyevsky District",
+        "name": "Vargashinsky District",
         "cntr_code": "TYM",
         "__source": "detail"
       },
@@ -15822,7 +15822,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a5221179bd90",
-        "name": "Belozersky District + Ketovsky District",
+        "name": "Ketovsky District",
         "cntr_code": "TYM",
         "__source": "detail"
       },

@@ -9181,7 +9181,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_46f94b8c5773",
-        "name": "Central Nova + Sackville—Bedford—Preston",
+        "name": "New Glasgow",
         "cntr_code": "CA",
         "admin1_group": "Nova Scotia",
         "detail_tier": "standard",
@@ -10754,7 +10754,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_480215c2f838",
-        "name": "Beauséjour + Moncton—Dieppe",
+        "name": "Moncton",
         "cntr_code": "CA",
         "admin1_group": "New Brunswick",
         "detail_tier": "standard",
@@ -11156,7 +11156,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_9789731d079e",
-        "name": "Fundy Royal + Saint John—Kennebecasis",
+        "name": "Saint John",
         "cntr_code": "CA",
         "admin1_group": "New Brunswick",
         "detail_tier": "standard",
@@ -18938,7 +18938,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_f85fee938b91",
-        "name": "Alfred-Pellan + Vimy",
+        "name": "Alfred-Pellan",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -19043,7 +19043,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_3e06e9aabd9f",
-        "name": "Argenteuil—La Petite-Nation + Les Pays-d'en-Haut + Mirabel",
+        "name": "Argenteuil—La Petite-Nation",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -20099,7 +20099,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_8219e9529a16",
-        "name": "Bécancour—Nicolet—Saurel—Alnôbak + Drummond + Richmond—Arthabaska",
+        "name": "Drummondville",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -20858,7 +20858,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_5e17f5b2af34",
-        "name": "Berthier—Maskinongé + Joliette—Manawan + Montcalm",
+        "name": "Joliette",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -21831,7 +21831,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_bf94919e448f",
-        "name": "Châteauguay—Les Jardins-de-Napierville + Saint-Jean",
+        "name": "Saint-Jean",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -25538,7 +25538,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_4b867801b8a0",
-        "name": "Dorval—Lachine—LaSalle + Saint-Laurent",
+        "name": "Saint-Laurent",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -28196,7 +28196,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_c32aed1df08f",
-        "name": "Lac-Saint-Louis + Pierrefonds—Dollard",
+        "name": "Pierrefonds—Dollard",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -28920,7 +28920,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_c4a98756227d",
-        "name": "Laval—Les Îles + Marc-Aurèle-Fortin",
+        "name": "Marc-Aurèle-Fortin",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -29314,7 +29314,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_d16c931e21ca",
-        "name": "Louis-Hébert + Louis-Saint-Laurent—Akiawenhrahk",
+        "name": "Louis-Saint-Laurent—Akiawenhrahk",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -30044,7 +30044,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_7e7e19718e0f",
-        "name": "Montmorency—Charlevoix + Portneuf—Jacques-Cartier",
+        "name": "Montmorency—Charlevoix",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -30614,7 +30614,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_7cbc6bf7c111",
-        "name": "Pierre-Boucher—Les Patriotes—Verchères + Saint-Hyacinthe—Bagot—Acton + Shefford",
+        "name": "Shefford",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -32149,7 +32149,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_653d532898a8",
-        "name": "Rivière-des-Mille-Îles + Thérèse-De Blainville",
+        "name": "Thérèse-De Blainville",
         "cntr_code": "CA",
         "admin1_group": "Quebec",
         "detail_tier": "standard",
@@ -33327,7 +33327,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_684250872a47",
-        "name": "Ajax + Pickering—Brooklin",
+        "name": "Pickering—Brooklin",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -33633,7 +33633,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_73fc08ab0b94",
-        "name": "Aurora—Oak Ridges—Richmond Hill + Newmarket—Aurora",
+        "name": "Aurora—Oak Ridges—Richmond Hill",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -34264,7 +34264,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_24ae99283479",
-        "name": "Brampton North—Caledon + Brampton West",
+        "name": "Brampton North—Caledon",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -34394,7 +34394,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_911ec8320222",
-        "name": "Brantford—Brant South—Six Nations + Flamborough—Glanbrook—Brant North + Haldimand—Norfolk",
+        "name": "Brantford—Brant South—Six Nations",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -35054,7 +35054,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_1a080100c822",
-        "name": "Carleton + Lanark—Frontenac",
+        "name": "Carleton",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -35618,7 +35618,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_f50bdee7dd4c",
-        "name": "Don Valley North + Don Valley West",
+        "name": "Toronto",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -35689,7 +35689,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_fdd421e1a6fe",
-        "name": "Dufferin—Caledon + Simcoe—Grey + Wellington—Halton Hills North",
+        "name": "Orangeville",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -36005,7 +36005,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_528f74543a8b",
-        "name": "Elgin—St. Thomas—London South + Middlesex—London + Oxford",
+        "name": "Elgin—St. Thomas—London South",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -36599,7 +36599,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_7b5ba113838a",
-        "name": "Haliburton—Kawartha Lakes + Northumberland—Clarke + Peterborough",
+        "name": "Peterborough",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -37343,7 +37343,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_2eca2d3aeffd",
-        "name": "Humber River—Black Creek + York Centre",
+        "name": "Humber River—Black Creek",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -37406,7 +37406,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_d17d84b57368",
-        "name": "Huron—Bruce + Perth—Wellington",
+        "name": "Perth—Wellington",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -37593,7 +37593,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_d27584f205e9",
-        "name": "Kanata + Ottawa West—Nepean",
+        "name": "Ottawa West—Nepean",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -39767,7 +39767,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_ac3bfdb5edd9",
-        "name": "Kitchener Centre + Kitchener South—Hespeler",
+        "name": "Kitchener",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -40630,7 +40630,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_7d4331ee0a5c",
-        "name": "Mississauga—Erin Mills + Mississauga—Streetsville",
+        "name": "Mississauga—Streetsville",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -40685,7 +40685,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_705e30d79f5c",
-        "name": "Mississauga—Lakeshore + Oakville East",
+        "name": "Mississauga—Lakeshore",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -40854,7 +40854,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_23b011e3543e",
-        "name": "New Tecumseth—Gwillimbury + York—Durham",
+        "name": "York—Durham",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -43037,7 +43037,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_5a20b1bb5941",
-        "name": "Scarborough Centre—Don Valley East + Scarborough—Woburn",
+        "name": "Scarborough Centre—Don Valley East",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -43092,7 +43092,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_d08e3259dc76",
-        "name": "Scarborough—Guildwood—Rouge Park + Scarborough North",
+        "name": "Scarborough North",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -44505,7 +44505,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_0f506b88e592",
-        "name": "Taiaiako'n—Parkdale—High Park + York South—Weston—Etobicoke",
+        "name": "York South—Weston—Etobicoke",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -46409,7 +46409,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_8516027ac8b5",
-        "name": "Toronto Centre + University—Rosedale",
+        "name": "University—Rosedale",
         "cntr_code": "CA",
         "admin1_group": "Ontario",
         "detail_tier": "standard",
@@ -49176,7 +49176,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_86ce9e72c383",
-        "name": "Elmwood—Transcona + St. Boniface—St. Vital",
+        "name": "St. Boniface—St. Vital",
         "cntr_code": "CA",
         "admin1_group": "Manitoba",
         "detail_tier": "standard",
@@ -49275,7 +49275,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_43ae18b09e32",
-        "name": "Kildonan—St. Paul + Winnipeg North",
+        "name": "Kildonan—St. Paul",
         "cntr_code": "CA",
         "admin1_group": "Manitoba",
         "detail_tier": "standard",
@@ -49346,7 +49346,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_a592db62ce9c",
-        "name": "Portage—Lisgar + Selkirk—Interlake—Eastman + Winnipeg West",
+        "name": "Selkirk",
         "cntr_code": "CA",
         "admin1_group": "Manitoba",
         "detail_tier": "standard",
@@ -51688,7 +51688,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_a14ea77f718d",
-        "name": "Winnipeg South + Winnipeg South Centre",
+        "name": "Winnipeg South Centre",
         "cntr_code": "CA",
         "admin1_group": "Manitoba",
         "detail_tier": "standard",
@@ -53801,7 +53801,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_57ed93ea7b6f",
-        "name": "Saskatoon South + Saskatoon—University",
+        "name": "Saskatoon—University",
         "cntr_code": "CA",
         "admin1_group": "Saskatchewan",
         "detail_tier": "standard",
@@ -54868,7 +54868,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_e32835bda9ac",
-        "name": "Airdrie—Cochrane + Bow River",
+        "name": "Brooks",
         "cntr_code": "CA",
         "admin1_group": "Alberta",
         "detail_tier": "standard",
@@ -56056,7 +56056,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_77a1b136ce43",
-        "name": "Calgary Crowfoot + Calgary Nose Hill",
+        "name": "Calgary Nose Hill",
         "cntr_code": "CA",
         "admin1_group": "Alberta",
         "detail_tier": "standard",
@@ -56207,7 +56207,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_80a56ade734c",
-        "name": "Calgary East + Calgary Shepard",
+        "name": "Calgary East",
         "cntr_code": "CA",
         "admin1_group": "Alberta",
         "detail_tier": "standard",
@@ -56298,7 +56298,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_096ac84a0cc7",
-        "name": "Calgary Heritage + Calgary Midnapore",
+        "name": "Calgary Heritage",
         "cntr_code": "CA",
         "admin1_group": "Alberta",
         "detail_tier": "standard",
@@ -56397,7 +56397,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_df8fc4dc7fdc",
-        "name": "Calgary McKnight + Calgary Skyview",
+        "name": "Calgary McKnight",
         "cntr_code": "CA",
         "admin1_group": "Alberta",
         "detail_tier": "standard",
@@ -56602,7 +56602,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_2ebb41be023f",
-        "name": "Edmonton Gateway + Edmonton Southeast",
+        "name": "Edmonton Southeast",
         "cntr_code": "CA",
         "admin1_group": "Alberta",
         "detail_tier": "standard",
@@ -56870,7 +56870,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_567d2b874fad",
-        "name": "Edmonton Riverbend + Edmonton West",
+        "name": "Edmonton West",
         "cntr_code": "CA",
         "admin1_group": "Alberta",
         "detail_tier": "standard",
@@ -59050,7 +59050,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_fccdff3ab06c",
-        "name": "Leduc—Wetaskiwin + Parkland + Ponoka—Didsbury",
+        "name": "Wetaskiwin",
         "cntr_code": "CA",
         "admin1_group": "Alberta",
         "detail_tier": "standard",
@@ -63547,7 +63547,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_d35dd30542b8",
-        "name": "Burnaby Central + Vancouver Kingsway",
+        "name": "Vancouver Kingsway",
         "cntr_code": "CA",
         "admin1_group": "British Columbia",
         "detail_tier": "standard",
@@ -66706,7 +66706,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_02a592f4a083",
-        "name": "Courtenay—Alberni + Nanaimo—Ladysmith",
+        "name": "Nanaimo",
         "cntr_code": "CA",
         "admin1_group": "British Columbia",
         "detail_tier": "standard",
@@ -67772,7 +67772,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_410af4197c3c",
-        "name": "Delta + Surrey Centre",
+        "name": "Delta",
         "cntr_code": "CA",
         "admin1_group": "British Columbia",
         "detail_tier": "standard",
@@ -71444,7 +71444,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_dde82f995deb",
-        "name": "New Westminster—Burnaby—Maillardville + Port Moody—Coquitlam",
+        "name": "Port Moody—Coquitlam",
         "cntr_code": "CA",
         "admin1_group": "British Columbia",
         "detail_tier": "standard",
@@ -73225,7 +73225,7 @@
       "type": "Feature",
       "properties": {
         "id": "CA_MRG_fca877bc83a4",
-        "name": "Okanagan Lake West—South Kelowna + Vernon—Lake Country—Monashee",
+        "name": "Vernon—Lake Country—Monashee",
         "cntr_code": "CA",
         "admin1_group": "British Columbia",
         "detail_tier": "standard",
