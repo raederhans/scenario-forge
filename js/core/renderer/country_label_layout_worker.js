@@ -16,8 +16,8 @@ export function createCountryLabelLayoutWorkerHandler() {
       countries.set(countryCode, record);
     }
     const fitPolygons = filterCountryLabelHoles(record.polygons, options?.minHoleArea);
-    // Thresholds retaining the same rings share candidates, including adjacent
-    // zoom bands. Raw geometry remains intact for stricter future fits.
+    // Thresholds retaining the same rings share candidates, including text or
+    // font refits. Raw geometry remains intact for stricter future fits.
     const key = `${options?.allowArcs === true}:${fitPolygons.map((polygon) => polygon.length).join(",")}`;
     const candidateBuilt = !record.candidateSets.has(key);
     const candidateStartedAt = nowMs();
