@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import gzip
 import json
+import math
 import tempfile
 import unittest
 from pathlib import Path
@@ -19,6 +20,11 @@ ASSETS = REPO_ROOT / "landing" / "assets"
 
 def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def oklab_distance(first: str, second: str) -> float:
+    (l1, c1, h1), (l2, c2, h2) = scrubber.hex_to_oklch(first), scrubber.hex_to_oklch(second)
+    return math.dist((l1, c1 * math.cos(h1), c1 * math.sin(h1)), (l2, c2 * math.cos(h2), c2 * math.sin(h2)))
 
 
 def blend(rgb: tuple[int, int, int], coverage: float) -> list[int]:
@@ -113,14 +119,30 @@ class MapStageAssetTest(unittest.TestCase):
             countries.append(read_json(paths["countries"])["countries"])
 
         changed = 0
+        shown = [{} for _state in payload["states"]]
         for atom in payload["atoms"]:
             self.assertEqual(len(atom["c"]), len(scrubber.STATES))
             for state_index, (tag, colour) in enumerate(zip(atom["o"], atom["c"])):
-                expected = scrubber.hero.clamp_hex((countries[state_index].get(tag) or {}).get("color_hex"), "#3a4a45") if tag else "#3a4a45"
                 state_id = payload["states"][state_index]["id"]
-                self.assertEqual(colour, expected, f"{tag} in {state_id}: re-run tools/build_landing_history_scrubber.py")
+                self.assertEqual(shown[state_index].setdefault(tag, colour), colour, f"{tag} has one colour in {state_id}")
+                # The stage keeps the game's hue and only lifts it for the dark sea.
+                game_lightness, game_chroma, game_hue = scrubber.hex_to_oklch(countries[state_index][tag]["color_hex"])
+                lightness, chroma, hue = scrubber.hex_to_oklch(colour)
+                self.assertGreaterEqual(lightness, 0.46, f"{tag} in {state_id} is too dark for the stage")
+                if game_chroma > 0.04 and chroma > 0.04:
+                    drift = abs(math.remainder(hue - game_hue, math.tau))
+                    self.assertLess(drift, 0.2, f"{tag} in {state_id}: hue moved; re-run tools/build_landing_history_scrubber.py")
             changed += len(set(atom["o"])) > 1
         self.assertGreater(changed, len(payload["atoms"]) // 2, "most atoms should change owner across the states")
+
+    def test_german_sphere_neighbours_stay_apart(self) -> None:
+        payload = read_json(ASSETS / "history-scrubber.json")
+        # The game draws Germany and its Reichskommissariate as near-identical greys.
+        colours = {atom["o"][2]: atom["c"][2] for atom in payload["atoms"]}
+        neighbours = [("GER", "RKP"), ("GER", "RKO"), ("RKP", "RKO"), ("RKP", "RKU"), ("RKO", "RKU"),
+                      ("RKO", "RKM"), ("RKU", "RKM"), ("RKU", "RKK"), ("RKM", "RKK")]
+        for tag, other in neighbours:
+            self.assertGreater(oklab_distance(colours[tag], colours[other]), 0.05, f"{tag} and {other} look the same in 1962")
 
     def test_every_state_has_borders_labels_and_names(self) -> None:
         payload = read_json(ASSETS / "history-scrubber.json")
