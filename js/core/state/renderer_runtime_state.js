@@ -354,6 +354,10 @@ export function applyRendererSurfaceBridgeState(target, handles = {}) {
   return target;
 }
 
+// Shape template only: normalization copies every default it fills in, so the
+// shared template is never handed out or mutated.
+let renderPassCacheShape = null;
+
 export function ensureRenderPassCacheState(
   target,
   {
@@ -361,8 +365,8 @@ export function ensureRenderPassCacheState(
     renderPassNames = [],
   } = {},
 ) {
-  const defaults = createDefaultRenderPassCacheState();
-  if (!target || typeof target !== "object") return defaults;
+  if (!target || typeof target !== "object") return createDefaultRenderPassCacheState();
+  renderPassCacheShape ||= createDefaultRenderPassCacheState();
   const renderPassCacheDescriptor = Object.getOwnPropertyDescriptor(
     target,
     "renderPassCache",
@@ -371,10 +375,10 @@ export function ensureRenderPassCacheState(
     !renderPassCacheDescriptor
     || !Object.hasOwn(renderPassCacheDescriptor, "value")
   ) {
-    commitRenderPassCacheState(target, defaults);
+    commitRenderPassCacheState(target, createDefaultRenderPassCacheState());
   }
   const renderPassCache = normalizeRenderPassCacheState(target.renderPassCache, {
-    defaults,
+    defaults: renderPassCacheShape,
     cloneZoomTransform,
     renderPassNames,
   });

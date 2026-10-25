@@ -13,22 +13,41 @@ function hasOwnField(value, fieldName) {
   return Object.hasOwn(value, fieldName);
 }
 
-function matchesDefaultShape(value, defaultValue) {
-  if (defaultValue instanceof Map) return value instanceof Map;
-  if (defaultValue instanceof Set) return value instanceof Set;
-  if (Array.isArray(defaultValue)) return Array.isArray(value);
-  if (defaultValue === null) return true;
+// The cache is read on every render; compile each defaults shape once instead
+// of walking it with Object.entries per read.
+const compiledShapeMatchers = new WeakMap();
+
+function compileShapeMatcher(defaultValue) {
+  if (defaultValue instanceof Map) return (value) => value instanceof Map;
+  if (defaultValue instanceof Set) return (value) => value instanceof Set;
+  if (Array.isArray(defaultValue)) return (value) => Array.isArray(value);
+  if (defaultValue === null) return () => true;
   if (typeof defaultValue === "number") {
-    return typeof value === "number" && Number.isFinite(value);
+    return (value) => typeof value === "number" && Number.isFinite(value);
   }
   if (typeof defaultValue !== "object") {
-    return typeof value === typeof defaultValue;
+    const expectedType = typeof defaultValue;
+    return (value) => typeof value === expectedType;
   }
-  if (!isObjectHolder(value)) return false;
-  return Object.entries(defaultValue).every(([fieldName, nestedDefault]) => (
-    hasOwnField(value, fieldName)
-    && matchesDefaultShape(value[fieldName], nestedDefault)
+  const fields = Object.entries(defaultValue).map(([fieldName, nestedDefault]) => (
+    [fieldName, compileShapeMatcher(nestedDefault)]
   ));
+  return (value) => {
+    if (!isObjectHolder(value)) return false;
+    for (const [fieldName, matches] of fields) {
+      if (!hasOwnField(value, fieldName) || !matches(value[fieldName])) return false;
+    }
+    return true;
+  };
+}
+
+function getShapeMatcher(defaults) {
+  let matcher = compiledShapeMatchers.get(defaults);
+  if (!matcher) {
+    matcher = compileShapeMatcher(defaults);
+    compiledShapeMatchers.set(defaults, matcher);
+  }
+  return matcher;
 }
 
 function isNormalizedRenderPassCache(cache, defaults, renderPassNames) {
@@ -50,9 +69,7 @@ function isNormalizedRenderPassCache(cache, defaults, renderPassNames) {
     !hasOwnField(cache, "politicalPathWarmupHandle")
     || !isNullableObjectHolder(cache.politicalPathWarmupHandle)
   ) return false;
-  return Object.entries(defaults).every(([fieldName, defaultValue]) => (
-    hasOwnField(cache, fieldName) && matchesDefaultShape(cache[fieldName], defaultValue)
-  ));
+  return getShapeMatcher(defaults)(cache);
 }
 
 function normalizeDefaultShape(value, defaultValue) {
