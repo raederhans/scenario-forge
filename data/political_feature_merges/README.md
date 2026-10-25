@@ -19,6 +19,9 @@ the scenarios a plan names (see *Scenario-scoped plans*).
 | `russia_china_wave4.v1.json` | Applied plan: 248 groups, 656 members, 408 features removed. |
 | `benelux_wave5.candidates.json` | Input: Belgium and the Netherlands, two to three groups per province (provinces recovered from GISCO NUTS-2 and added to `hierarchy.json`). City hosts are protected for capitals, major cities and cities of at least 250,000. Applied to every scenario, because the shared HOI4 vanilla releasable catalog lists Flemish and Walloon parcels. |
 | `benelux_wave5.v1.json` | Applied plan: 20 groups, 50 members, 30 features removed (Belgium 44 → 25, the Netherlands 40 → 29). |
+| `germany_poland_wave5_{tno,rest}.candidates.json` | Input: Germany (HOI4-state level) and Poland (voivodeship level) from the 2026-10-25 central Europe research. City hosts are protected for capitals, major cities and at least 250,000 people; parcels of the shared historical display presets and candidates crossing a vanilla releasable boundary variant stay unmerged. |
+| `germany_poland_wave5_tno.v1.json` | Applied plan scoped to `tno_1962`: 54 groups, 272 members, 218 features removed. |
+| `germany_poland_wave5_rest.v1.json` | Applied plan scoped to `blank_base`, `hoi4_1936`, `hoi4_1939`, `modern_world`: 48 groups, 173 members, 125 features removed. |
 
 Plans are applied one after another in the order of `apply_order.json`, never
 by file name; the plan tool appends each new plan there. Within each scenario
@@ -35,7 +38,8 @@ from an earlier plan that applies to every scenario of the later one.
 scenarios. Owners, cores and HOI4 states come from those scenarios alone, and
 contiguity must hold in each of them. A scope names both HOI4 scenarios or
 neither. Hierarchy, quick-fill, China prefecture and every protection rule stay
-global. The plan tool refuses a candidate member that an applied plan already
+global, except river-paint packs: they belong to one scenario (`sceneId`), so
+only a scope that includes it protects their parcels. The plan tool refuses a candidate member that an applied plan already
 merged away in any scenario of the new scope. The apply tool then:
 
 - leaves the base topologies, `hierarchy.json` and the China crosswalk
@@ -49,8 +53,10 @@ merged away in any scenario of the new scope. The apply tool then:
   scenario's alias view, startup and full alike, and leaves the shared
   (startup) alias map unprojected so other scenarios keep the members;
 - projects a global file only when every scenario that reads it is in scope
-  (the TNO releasable catalog for `tno_1962`), refuses a plan that touches any
-  other shared file, and leaves city host IDs on the members;
+  (the TNO releasable catalog for `tno_1962`; the HOI4 vanilla catalog for
+  blank, both HOI4 scenarios and Modern World), leaves a file none of whose
+  readers is in scope untouched, refuses a plan that touches a file read both
+  inside and outside the scope, and leaves city host IDs on the members;
 - rewrites population features of the scoped scenarios only.
 
 ## Deriving the plan

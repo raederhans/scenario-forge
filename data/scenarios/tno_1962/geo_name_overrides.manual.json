@@ -2629,21 +2629,25 @@
       "en": "Jan Mayen",
       "zh": "扬马延岛"
     },
-    "PL_MRG_49c8bdd6da87": {
-      "en": "wołomiński",
-      "zh": "沃沃明斯基"
+    "PL_MRG_4a7fdf2f215b": {
+      "en": "Masovian · South 2",
+      "zh": "马佐夫舍省·南部2"
     },
-    "PL_MRG_9242fdb1805d": {
-      "en": "kielecki (Holy Cross)",
-      "zh": "凯尔采（圣十字省）"
+    "PL_MRG_8119670edfb9": {
+      "en": "Silesian · South",
+      "zh": "西里西亚省·南部"
     },
-    "PL_MRG_ccb2f83ec3cf": {
-      "en": "Siemianowice Śląskie",
-      "zh": "希隆斯克地区谢米亚诺维采"
+    "PL_MRG_81a04ac05a78": {
+      "en": "Masovian · East",
+      "zh": "马佐夫舍省·东部"
     },
-    "PL_MRG_fe2842d4d685": {
-      "en": "radomski",
-      "zh": "拉多姆斯基"
+    "PL_MRG_d43cd846ec6f": {
+      "en": "Łódź · Northwest",
+      "zh": "罗兹省·西北部"
+    },
+    "PL_MRG_f3a4768ac693": {
+      "en": "Holy Cross · West",
+      "zh": "圣十字省·西部"
     },
     "PL_POW_0264": {
       "en": "Breslau",
@@ -2652,10 +2656,6 @@
     "PL_POW_0463": {
       "en": "Thorn",
       "zh": "托恩"
-    },
-    "PL_POW_1009": {
-      "en": "pajęczański",
-      "zh": "帕延奇诺县"
     },
     "PL_POW_1061": {
       "en": "Litzmannstadt",
@@ -2668,10 +2668,6 @@
     "PL_POW_1261": {
       "en": "Krakau",
       "zh": "克拉考"
-    },
-    "PL_POW_1408": {
-      "en": "legionowski",
-      "zh": "莱吉奥诺沃县"
     },
     "PL_POW_1465": {
       "en": "Warschau",

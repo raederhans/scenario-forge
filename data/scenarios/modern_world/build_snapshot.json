@@ -4,21 +4,21 @@
   "contract_version": "2026-05-01.v1",
   "durations": {},
   "environment": {},
-  "feature_count": 21715,
+  "feature_count": 21590,
   "generated_at": "2026-09-27T13:55:57.885587+00:00",
   "input_sha": {
     "capital_hints.json": "f4cf95c356f1e1a7ce3bd00032e20b6a8b476e9da16362fcedb760e8ec24eb35",
     "city_overrides.json": "72719c5856c836e2cef55fe43b13237de4f815f9e0e1e6e9d8ac39395100ac3e",
-    "cores.by_feature.json": "819f441debc929a1db2891a23ee48f2c399db1bb4730a85dbc110e58ac3ba932",
-    "countries.json": "1e9863c3cb2b4754145ecd755c261b25115781834578c310759dcb0fe478fe5e",
-    "owners.by_feature.json": "81613d9ee8ecc5eacd9086fde38f83c10503e65de7553b52f0299dfb66998b9b",
-    "runtime_topology.topo.json": "6a63c2ddc0880ab598cf4ab9fa4c72c9f2c5f4fd540ab9fcb6ff7a0c2221277e",
+    "cores.by_feature.json": "201296a31f6a2831c8e6094956a0ca625cbbe1554273d8f7d1623ee1f6f2ee1e",
+    "countries.json": "0f172691d0052fafaae6c13fb5024a2a441bf8b4167e40798e01f58541b4e8dc",
+    "owners.by_feature.json": "8b71cadd0abf1eb037a1c345f4e56f1e2d21e68d2b7d6f2a5f84b3089deb85c3",
+    "runtime_topology.topo.json": "209159ae18dfbad125b3aff89bd619b4660bed94c232c1b2e01dfc510bde276c",
     "special_zone_layers.json": "4565092b196e374cdf1054eaf5bf0f2982f7f028f14ff7d183984f7dfa75b56f"
   },
   "output_sha": {},
   "profile": "lightweight_base",
   "report_paths": {},
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "e0b81faa857be2eedac7748f52524c7230d527fea19a1f8337ce0eba0f7acc86",
+  "snapshot_fingerprint": "98ce181084d8610b40e289b98a6ef03778dd8630fd2ab29ea6557d3ac5f811d8",
   "water_count": 0
 }

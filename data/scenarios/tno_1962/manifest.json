@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/tno_1962/audit.json",
-  "baseline_hash": "1ad6c2b8dd4ed1b3388d9cf8e6ab6a45c7bb167f85c13e9897fefb47268a5219",
+  "baseline_hash": "a7b924957134586856e4e4897456aeefd6fb07deeaf32ce8cd490838a247f894",
   "bathymetry_topology_url": "data/scenarios/tno_1962/bathymetry.topo.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
@@ -137,6 +137,390 @@
   "geo_locale_patch_url": "data/scenarios/tno_1962/geo_locale_patch.json",
   "geo_locale_patch_url_en": "data/scenarios/tno_1962/geo_locale_patch.en.json",
   "geo_locale_patch_url_zh": "data/scenarios/tno_1962/geo_locale_patch.zh.json",
+  "hierarchy_overrides": {
+    "feature_merges": {
+      "DE_MRG_0fbf2afc9b39": [
+        "DEC03",
+        "DEC06"
+      ],
+      "DE_MRG_1df83dc7f94e": [
+        "DEB17",
+        "DEB1A",
+        "DEB1B",
+        "DEB35",
+        "DEB39",
+        "DE_MRG_ea826ec181b8"
+      ],
+      "DE_MRG_20201cf9567d": [
+        "DEG06",
+        "DEG0H",
+        "DE_MRG_98e486211a34",
+        "DE_MRG_ac1a1840dec2",
+        "DE_MRG_cc565c282846"
+      ],
+      "DE_MRG_262d5b07c5d7": [
+        "DEA45",
+        "DE_MRG_5adb00f4a83d"
+      ],
+      "DE_MRG_2783e6e8c42b": [
+        "DEB14",
+        "DEB1C",
+        "DEB1D",
+        "DEB3D",
+        "DE_MRG_bceaa37f49ef",
+        "DE_MRG_c6f2d9d3d036"
+      ],
+      "DE_MRG_29a5db20c272": [
+        "DEA14",
+        "DEA16",
+        "DEA17",
+        "DEA18",
+        "DEA19",
+        "DEA1C",
+        "DEA1D",
+        "DEA1F",
+        "DEA24",
+        "DEA26",
+        "DEA27",
+        "DEA2A",
+        "DEA2B",
+        "DEA2C",
+        "DEA31"
+      ],
+      "DE_MRG_31e7d8731feb": [
+        "DE936",
+        "DE_MRG_698a45847033"
+      ],
+      "DE_MRG_330d1045d5ff": [
+        "DEA5A",
+        "DE_MRG_6f627c55e7bd"
+      ],
+      "DE_MRG_3d2c992489d7": [
+        "DE11C",
+        "DE144",
+        "DE145",
+        "DE_MRG_c9a9f2cd9548",
+        "DE_MRG_e87b9124c03f"
+      ],
+      "DE_MRG_4000ef7b1fc9": [
+        "DE_MRG_33b1389d946f",
+        "DE_MRG_d561808c92a5"
+      ],
+      "DE_MRG_49bfd3282189": [
+        "DE942",
+        "DE943",
+        "DE944",
+        "DE945",
+        "DE94D",
+        "DE_MRG_3a19ae12c637",
+        "DE_MRG_67a8450f3c9f",
+        "DE_MRG_c922c0ebada5"
+      ],
+      "DE_MRG_5f2116b1dec1": [
+        "DEG01",
+        "DEG02",
+        "DEG03",
+        "DEG0C",
+        "DEG0L",
+        "DE_MRG_b86ffe1dd2ea",
+        "DE_MRG_c90ee890d36c"
+      ],
+      "DE_MRG_627c28127d09": [
+        "DE123",
+        "DE128",
+        "DE129",
+        "DE12B",
+        "DE135",
+        "DE_MRG_68ba87808df8"
+      ],
+      "DE_MRG_6c5feb42bb1d": [
+        "DE724",
+        "DE_MRG_3b750624bff4",
+        "DE_MRG_e2617eca3f85"
+      ],
+      "DE_MRG_7165d0e64b22": [
+        "DE911",
+        "DE912",
+        "DE913",
+        "DE925",
+        "DE_MRG_46ade2104d23",
+        "DE_MRG_4ab0c6062d32",
+        "DE_MRG_4fdd27cf49f7"
+      ],
+      "DE_MRG_71c87ea87bb8": [
+        "DE146",
+        "DE148",
+        "DE149"
+      ],
+      "DE_MRG_734ca34a5700": [
+        "DEB31",
+        "DEB33",
+        "DEB34",
+        "DEB36",
+        "DEB38",
+        "DEB3C",
+        "DEB3I"
+      ],
+      "DE_MRG_9f7a3fcacc08": [
+        "DE941",
+        "DE_MRG_5dd80c1fcf77",
+        "DE_MRG_830e5845fb60"
+      ],
+      "DE_MRG_a9aef085e5ee": [
+        "DE932",
+        "DE933",
+        "DE935",
+        "DE939"
+      ],
+      "DE_MRG_a9c190d720fe": [
+        "DEA36",
+        "DEA44",
+        "DEA47",
+        "DEA53",
+        "DEA54",
+        "DEA55",
+        "DEA56",
+        "DEA58",
+        "DE_MRG_70752f860917",
+        "DE_MRG_9410ac111320"
+      ],
+      "DE_MRG_ad30df0f83f2": [
+        "DE93A",
+        "DE_MRG_9e1fff10ce51"
+      ],
+      "DE_MRG_b3d2cb60c548": [
+        "DE916",
+        "DE91C"
+      ],
+      "DE_MRG_dad579df8df6": [
+        "DE711",
+        "DE713",
+        "DE715",
+        "DE717",
+        "DE71B",
+        "DE71D",
+        "DE_MRG_77741e43de3f",
+        "DE_MRG_e2f350a636b5"
+      ],
+      "DE_MRG_e2376e215153": [
+        "DE734",
+        "DE737"
+      ],
+      "DE_MRG_f070f3674dfa": [
+        "DE117",
+        "DE127",
+        "DE137",
+        "DE141",
+        "DE143",
+        "DE_MRG_a27167ef8f23",
+        "DE_MRG_d0e3890ae1d5"
+      ],
+      "DE_MRG_f39dea3fad08": [
+        "DEB12",
+        "DEB13",
+        "DEB18"
+      ],
+      "PL_MRG_05f1ad6eedaa": [
+        "PL_MRG_28f9056747e2",
+        "PL_MRG_672367948ccf",
+        "PL_MRG_d1960b18210a",
+        "PL_POW_1203",
+        "PL_POW_1204",
+        "PL_POW_1212",
+        "PL_POW_1213",
+        "PL_POW_1218",
+        "PL_POW_1263"
+      ],
+      "PL_MRG_328be0e18e73": [
+        "PL_MRG_6a243775b00f",
+        "PL_MRG_c16d6d416392",
+        "PL_POW_1403",
+        "PL_POW_1414",
+        "PL_POW_1428"
+      ],
+      "PL_MRG_3692a96e99b1": [
+        "PL_MRG_4ed00c272094",
+        "PL_POW_1005",
+        "PL_POW_1006",
+        "PL_POW_1007",
+        "PL_POW_1010",
+        "PL_POW_1012",
+        "PL_POW_1016",
+        "PL_POW_1021",
+        "PL_POW_1062"
+      ],
+      "PL_MRG_36976cf4d062": [
+        "PL_MRG_20e2ba9602ff",
+        "PL_MRG_d48e8dc37f33"
+      ],
+      "PL_MRG_44c900e7cbdd": [
+        "PL_MRG_3bc1f7b63f72",
+        "PL_POW_2003",
+        "PL_POW_2008",
+        "PL_POW_2013"
+      ],
+      "PL_MRG_4762ef33a34f": [
+        "PL_MRG_8f55c53666f8",
+        "PL_MRG_d9d9ccd218dd",
+        "PL_POW_2611",
+        "PL_POW_2612"
+      ],
+      "PL_MRG_48e6927d3544": [
+        "PL_MRG_7c2fbae3db0b",
+        "PL_MRG_fb2ce823eb38",
+        "PL_POW_0407",
+        "PL_POW_0410",
+        "PL_POW_0413",
+        "PL_POW_0464"
+      ],
+      "PL_MRG_4a7fdf2f215b": [
+        "PL_MRG_6ea9dfea1297",
+        "PL_MRG_fe2842d4d685",
+        "PL_POW_1401",
+        "PL_POW_1407"
+      ],
+      "PL_MRG_4df6ad2dc703": [
+        "PL_MRG_4a2bfb6b173f",
+        "PL_POW_0664"
+      ],
+      "PL_MRG_50494ed51da4": [
+        "PL_MRG_ed1992314afe",
+        "PL_POW_3208"
+      ],
+      "PL_MRG_6143971238b3": [
+        "PL_POW_2404",
+        "PL_POW_2409",
+        "PL_POW_2416",
+        "PL_POW_2465"
+      ],
+      "PL_MRG_7e3204328b62": [
+        "PL_MRG_7076d4b3250d",
+        "PL_MRG_b96b5d49d900",
+        "PL_MRG_d8ea546338a5",
+        "PL_POW_1802",
+        "PL_POW_1806",
+        "PL_POW_1810",
+        "PL_POW_1814",
+        "PL_POW_1816",
+        "PL_POW_1819"
+      ],
+      "PL_MRG_8119670edfb9": [
+        "PL_MRG_ccb2f83ec3cf",
+        "PL_MRG_ec568da59ac7",
+        "PL_POW_2401",
+        "PL_POW_2402",
+        "PL_POW_2410",
+        "PL_POW_2414",
+        "PL_POW_2463",
+        "PL_POW_2467",
+        "PL_POW_2468",
+        "PL_POW_2470",
+        "PL_POW_2472",
+        "PL_POW_2473",
+        "PL_POW_2476",
+        "PL_POW_2477"
+      ],
+      "PL_MRG_81a04ac05a78": [
+        "PL_MRG_49c8bdd6da87",
+        "PL_POW_1408",
+        "PL_POW_1410",
+        "PL_POW_1426",
+        "PL_POW_1429",
+        "PL_POW_1432",
+        "PL_POW_1433",
+        "PL_POW_1435",
+        "PL_POW_1464"
+      ],
+      "PL_MRG_afde07ef7e52": [
+        "PL_MRG_9b20fe0cbb07",
+        "PL_POW_3202",
+        "PL_POW_3212",
+        "PL_POW_3214"
+      ],
+      "PL_MRG_be82540e6cf0": [
+        "PL_MRG_18fdfa02eca5",
+        "PL_MRG_eea8a1b754f3"
+      ],
+      "PL_MRG_c16eaf95213a": [
+        "PL_POW_1601",
+        "PL_POW_1605",
+        "PL_POW_1609",
+        "PL_POW_1661"
+      ],
+      "PL_MRG_c5cfb391c06f": [
+        "PL_MRG_57a0cb6e8d35",
+        "PL_MRG_8d9132641197"
+      ],
+      "PL_MRG_c908eb11c602": [
+        "PL_MRG_6059e5e8fd2d",
+        "PL_MRG_635f3bd9c929"
+      ],
+      "PL_MRG_cb41a08029c6": [
+        "PL_MRG_05ddd04cc90f",
+        "PL_MRG_e17e448ae4e2",
+        "PL_POW_0610"
+      ],
+      "PL_MRG_ce21dcd4a2c0": [
+        "PL_MRG_a4d0d3a9760e",
+        "PL_MRG_f18bf4792f6a",
+        "PL_POW_0417",
+        "PL_POW_0462"
+      ],
+      "PL_MRG_d33963acec0d": [
+        "PL_MRG_3384b03f3b03",
+        "PL_MRG_d07f84128518",
+        "PL_MRG_ec5519b4d3cf",
+        "PL_POW_3061"
+      ],
+      "PL_MRG_d43cd846ec6f": [
+        "PL_MRG_5ca02af3d829",
+        "PL_POW_1001",
+        "PL_POW_1002",
+        "PL_POW_1004",
+        "PL_POW_1008",
+        "PL_POW_1009",
+        "PL_POW_1020"
+      ],
+      "PL_MRG_e9f1a2130857": [
+        "PL_MRG_4b4e7fcd7031",
+        "PL_MRG_697bf6eafbca",
+        "PL_POW_0215",
+        "PL_POW_0217",
+        "PL_POW_0219",
+        "PL_POW_0223",
+        "PL_POW_0262",
+        "PL_POW_0265"
+      ],
+      "PL_MRG_eb17d6c2a513": [
+        "PL_MRG_4af99a43d917",
+        "PL_MRG_ae7dcb23076e",
+        "PL_MRG_cda1a954e365",
+        "PL_POW_0203"
+      ],
+      "PL_MRG_eb6bfbc84cb1": [
+        "PL_MRG_55eb1a09655e",
+        "PL_MRG_88938957a4dc",
+        "PL_MRG_e9b93261cb76",
+        "PL_POW_2204",
+        "PL_POW_2205"
+      ],
+      "PL_MRG_f3a4768ac693": [
+        "PL_MRG_9242fdb1805d",
+        "PL_MRG_940b9a58b475",
+        "PL_POW_2613"
+      ],
+      "PL_MRG_fe627fbb2f9c": [
+        "PL_POW_1402",
+        "PL_POW_1404",
+        "PL_POW_1411",
+        "PL_POW_1419",
+        "PL_POW_1420",
+        "PL_POW_1424",
+        "PL_POW_1427",
+        "PL_POW_1462"
+      ]
+    }
+  },
   "mesh_pack_url": "data/scenarios/tno_1962/mesh_pack.json",
   "owners_url": "data/scenarios/tno_1962/owners.by_feature.json",
   "palette_id": "tno",
@@ -171,12 +555,12 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "8ec4bd0b18c21ed88cb7933782e2ff510f6c8fe4063b9d2a67f3cdf1b6745bf6",
+  "snapshot_fingerprint": "5f705900edcb81ae3ccad1d0b0995327254fa6dba5227a050aa6b94bb1fd7681",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "42d2a61c68040fd07f7837a2cab9150bfbe398ef566d567be12794ab6d1975b9",
+    "detail_chunk_manifest_sha256": "508cf8ff5d230384ecdd14d80c91e157d0b9dbe6f456552b90b9662e3fdcc5a7",
     "runtime_bootstrap_topology_sha256": "778d8bf0739545699e84b5a5b99decbec670752d1f36ef142ac8399e4e923119",
-    "runtime_topology_sha256": "a42d5cadb06c3d01d24c15f563b50b6045fd5b2ca1d45711ff06dffa07c0137d"
+    "runtime_topology_sha256": "67e1c7c00664ab07cb444234bea6f070bc95eed3f9804984cd8609f1004660e8"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
@@ -214,27 +598,27 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 11478,
+    "feature_count": 11260,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 10032,
+    "manual_reviewed_feature_count": 10086,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
     "owner_count": 172,
     "quality_counts": {
       "approx_existing_geometry": 992,
       "direct_country_copy": 2696,
-      "manual_reviewed": 10032
+      "manual_reviewed": 10086
     },
     "scenario_atlantropa_feature_count": 726,
     "scenario_rule_blocker_count": 0,
     "scenario_runtime_topology_object_count": 7,
     "source_counts": {
       "controller_rule": 0,
-      "direct_active_owner": 4597,
+      "direct_active_owner": 4639,
       "fallback_mapped_tag": 3,
       "manual_rule": 6564,
       "scenario_generated": 445,
-      "tno_reichskommissariat_baseline": 2111
+      "tno_reichskommissariat_baseline": 2123
     },
     "synthetic_count": 492,
     "synthetic_owner_feature_count": 492,

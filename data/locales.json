@@ -290699,6 +290699,330 @@
     "id::CN_MRG_41df7818325c": {
       "en": "Liling",
       "zh": "醴陵"
+    },
+    "id::DE_MRG_f070f3674dfa": {
+      "en": "Baden-Württemberg · Central",
+      "zh": "巴登-符腾堡州·中部"
+    },
+    "id::DE_MRG_3d2c992489d7": {
+      "en": "Baden-Württemberg · Northeast",
+      "zh": "巴登-符腾堡州·东北部"
+    },
+    "id::DE_MRG_71c87ea87bb8": {
+      "en": "Baden-Württemberg · Southeast",
+      "zh": "巴登-符腾堡州·东南部"
+    },
+    "id::DE_MRG_627c28127d09": {
+      "en": "Baden-Württemberg · Northwest",
+      "zh": "巴登-符腾堡州·西北部"
+    },
+    "id::DE_MRG_dad579df8df6": {
+      "en": "Hesse · Southwest",
+      "zh": "黑森州·西南部"
+    },
+    "id::DE_MRG_6c5feb42bb1d": {
+      "en": "Hesse · Central",
+      "zh": "黑森州·中部"
+    },
+    "id::DE_MRG_4000ef7b1fc9": {
+      "en": "Hesse · Northeast 1",
+      "zh": "黑森州·东北部1"
+    },
+    "id::DE_MRG_e2376e215153": {
+      "en": "Hesse · Northeast 2",
+      "zh": "黑森州·东北部2"
+    },
+    "id::DE_MRG_7165d0e64b22": {
+      "en": "Lower Saxony · Southeast 1",
+      "zh": "下萨克森州·东南部1"
+    },
+    "id::DE_MRG_31e7d8731feb": {
+      "en": "Lower Saxony · North 2",
+      "zh": "下萨克森州·北部2"
+    },
+    "id::DE_MRG_ad30df0f83f2": {
+      "en": "Lower Saxony · East",
+      "zh": "下萨克森州·东部"
+    },
+    "id::DE_MRG_9f7a3fcacc08": {
+      "en": "Lower Saxony · Central",
+      "zh": "下萨克森州·中部"
+    },
+    "id::DE_MRG_b3d2cb60c548": {
+      "en": "Lower Saxony · Southeast 2",
+      "zh": "下萨克森州·东南部2"
+    },
+    "id::DE_MRG_a9aef085e5ee": {
+      "en": "Lower Saxony · North 1",
+      "zh": "下萨克森州·北部1"
+    },
+    "id::DE_MRG_49bfd3282189": {
+      "en": "Lower Saxony · West",
+      "zh": "下萨克森州·西部"
+    },
+    "id::DE_MRG_29a5db20c272": {
+      "en": "North Rhine-Westphalia · Southwest",
+      "zh": "北莱茵-威斯特法伦州·西南部"
+    },
+    "id::DE_MRG_a9c190d720fe": {
+      "en": "North Rhine-Westphalia · Northeast 1",
+      "zh": "北莱茵-威斯特法伦州·东北部1"
+    },
+    "id::DE_MRG_330d1045d5ff": {
+      "en": "North Rhine-Westphalia · Southeast",
+      "zh": "北莱茵-威斯特法伦州·东南部"
+    },
+    "id::DE_MRG_262d5b07c5d7": {
+      "en": "North Rhine-Westphalia · Northeast 2",
+      "zh": "北莱茵-威斯特法伦州·东北部2"
+    },
+    "id::DE_MRG_f39dea3fad08": {
+      "en": "Rhineland-Palatinate · North",
+      "zh": "莱茵兰-普法尔茨州·北部"
+    },
+    "id::DE_MRG_2783e6e8c42b": {
+      "en": "Rhineland-Palatinate · Central",
+      "zh": "莱茵兰-普法尔茨州·中部"
+    },
+    "id::DE_MRG_1df83dc7f94e": {
+      "en": "Rhineland-Palatinate · Northeast",
+      "zh": "莱茵兰-普法尔茨州·东北部"
+    },
+    "id::DE_MRG_734ca34a5700": {
+      "en": "Rhineland-Palatinate · Southeast",
+      "zh": "莱茵兰-普法尔茨州·东南部"
+    },
+    "id::DE_MRG_0fbf2afc9b39": {
+      "en": "Saarland · Northeast",
+      "zh": "萨尔州·东北部"
+    },
+    "id::DE_MRG_5f2116b1dec1": {
+      "en": "Thuringia · Northeast",
+      "zh": "图林根州·东北部"
+    },
+    "id::DE_MRG_20201cf9567d": {
+      "en": "Thuringia · Central",
+      "zh": "图林根州·中部"
+    },
+    "id::PL_MRG_cb41a08029c6": {
+      "en": "Lublin · Southwest",
+      "zh": "卢布林省·西南部"
+    },
+    "id::PL_MRG_4df6ad2dc703": {
+      "en": "Lublin · South",
+      "zh": "卢布林省·南部"
+    },
+    "id::PL_MRG_c5cfb391c06f": {
+      "en": "Lublin · Northwest",
+      "zh": "卢布林省·西北部"
+    },
+    "id::PL_MRG_be82540e6cf0": {
+      "en": "Greater Poland · North",
+      "zh": "大波兰省·北部"
+    },
+    "id::PL_MRG_36976cf4d062": {
+      "en": "Greater Poland · East",
+      "zh": "大波兰省·东部"
+    },
+    "id::PL_MRG_d33963acec0d": {
+      "en": "Greater Poland · Central",
+      "zh": "大波兰省·中部"
+    },
+    "id::PL_MRG_05f1ad6eedaa": {
+      "en": "Lesser Poland · North",
+      "zh": "小波兰省·北部"
+    },
+    "id::PL_MRG_44c900e7cbdd": {
+      "en": "Podlaskie · Southwest",
+      "zh": "波德拉谢省·西南部"
+    },
+    "id::PL_MRG_81a04ac05a78": {
+      "en": "Masovian · East",
+      "zh": "马佐夫舍省·东部"
+    },
+    "id::PL_MRG_328be0e18e73": {
+      "en": "Masovian · South 1",
+      "zh": "马佐夫舍省·南部1"
+    },
+    "id::PL_MRG_4a7fdf2f215b": {
+      "en": "Masovian · South 2",
+      "zh": "马佐夫舍省·南部2"
+    },
+    "id::PL_MRG_eb17d6c2a513": {
+      "en": "Lower Silesian · Northwest",
+      "zh": "下西里西亚省·西北部"
+    },
+    "id::PL_MRG_e9f1a2130857": {
+      "en": "Lower Silesian · Central",
+      "zh": "下西里西亚省·中部"
+    },
+    "id::PL_MRG_3692a96e99b1": {
+      "en": "Łódź · East",
+      "zh": "罗兹省·东部"
+    },
+    "id::PL_MRG_eb6bfbc84cb1": {
+      "en": "Pomeranian · Central",
+      "zh": "滨海省·中部"
+    },
+    "id::PL_MRG_d43cd846ec6f": {
+      "en": "Łódź · Northwest",
+      "zh": "罗兹省·西北部"
+    },
+    "id::PL_MRG_c908eb11c602": {
+      "en": "Warmian-Masurian · Central",
+      "zh": "瓦尔米亚-马祖里省·中部"
+    },
+    "id::PL_MRG_7e3204328b62": {
+      "en": "Subcarpathian · Northwest",
+      "zh": "喀尔巴阡山省·西北部"
+    },
+    "id::PL_MRG_48e6927d3544": {
+      "en": "Kuyavian-Pomeranian · Southwest",
+      "zh": "库亚维-滨海省·西南部"
+    },
+    "id::PL_MRG_ce21dcd4a2c0": {
+      "en": "Kuyavian-Pomeranian · North",
+      "zh": "库亚维-滨海省·北部"
+    },
+    "id::PL_MRG_4762ef33a34f": {
+      "en": "Holy Cross · East",
+      "zh": "圣十字省·东部"
+    },
+    "id::PL_MRG_f3a4768ac693": {
+      "en": "Holy Cross · West",
+      "zh": "圣十字省·西部"
+    },
+    "id::PL_MRG_afde07ef7e52": {
+      "en": "West Pomeranian · West",
+      "zh": "西滨海省·西部"
+    },
+    "id::PL_MRG_50494ed51da4": {
+      "en": "West Pomeranian · Northeast",
+      "zh": "西滨海省·东北部"
+    },
+    "id::PL_MRG_8119670edfb9": {
+      "en": "Silesian · South",
+      "zh": "西里西亚省·南部"
+    },
+    "id::PL_MRG_fe627fbb2f9c": {
+      "en": "Masovian · Northwest",
+      "zh": "马佐夫舍省·西北部"
+    },
+    "id::PL_MRG_c16eaf95213a": {
+      "en": "Opole · Central",
+      "zh": "奥波莱省·中部"
+    },
+    "id::PL_MRG_6143971238b3": {
+      "en": "Silesian · Northeast",
+      "zh": "西里西亚省·东北部"
+    },
+    "id::DE_MRG_f34d2e45905c": {
+      "en": "Baden-Württemberg · Northeast",
+      "zh": "巴登-符腾堡州·东北部"
+    },
+    "id::DE_MRG_22c9cf77ef75": {
+      "en": "Baden-Württemberg · Central",
+      "zh": "巴登-符腾堡州·中部"
+    },
+    "id::DE_MRG_976ddeb64a7e": {
+      "en": "Baden-Württemberg · West",
+      "zh": "巴登-符腾堡州·西部"
+    },
+    "id::DE_MRG_2ae474a7f489": {
+      "en": "Hesse · Southwest",
+      "zh": "黑森州·西南部"
+    },
+    "id::DE_MRG_6939ec6a71b5": {
+      "en": "Lower Saxony · North",
+      "zh": "下萨克森州·北部"
+    },
+    "id::DE_MRG_756edd2ccd0e": {
+      "en": "North Rhine-Westphalia · West",
+      "zh": "北莱茵-威斯特法伦州·西部"
+    },
+    "id::DE_MRG_7e21e0275cb4": {
+      "en": "North Rhine-Westphalia · South",
+      "zh": "北莱茵-威斯特法伦州·南部"
+    },
+    "id::DE_MRG_91d5581f4558": {
+      "en": "Rhineland-Palatinate · Central",
+      "zh": "莱茵兰-普法尔茨州·中部"
+    },
+    "id::DE_MRG_4fd11cacb00e": {
+      "en": "Rhineland-Palatinate · Northeast",
+      "zh": "莱茵兰-普法尔茨州·东北部"
+    },
+    "id::DE_MRG_f85082030596": {
+      "en": "Rhineland-Palatinate · Southeast",
+      "zh": "莱茵兰-普法尔茨州·东南部"
+    },
+    "id::PL_MRG_7d57be806a08": {
+      "en": "Greater Poland · Central",
+      "zh": "大波兰省·中部"
+    },
+    "id::PL_MRG_28fa0ad78ed7": {
+      "en": "Lesser Poland · Central",
+      "zh": "小波兰省·中部"
+    },
+    "id::PL_MRG_27e4456cebfb": {
+      "en": "Lesser Poland · Northwest",
+      "zh": "小波兰省·西北部"
+    },
+    "id::PL_MRG_d1659e5d5f46": {
+      "en": "Masovian · East",
+      "zh": "马佐夫舍省·东部"
+    },
+    "id::PL_MRG_cbc1e164f4f5": {
+      "en": "Lower Silesian · Central",
+      "zh": "下西里西亚省·中部"
+    },
+    "id::PL_MRG_22b31683d713": {
+      "en": "Łódź · Northeast",
+      "zh": "罗兹省·东北部"
+    },
+    "id::PL_MRG_9e4e875a7bcd": {
+      "en": "Pomeranian · South",
+      "zh": "滨海省·南部"
+    },
+    "id::PL_MRG_727dd6268093": {
+      "en": "Pomeranian · North",
+      "zh": "滨海省·北部"
+    },
+    "id::PL_MRG_f9d904f8526d": {
+      "en": "Subcarpathian · West",
+      "zh": "喀尔巴阡山省·西部"
+    },
+    "id::PL_MRG_a40b880dd29e": {
+      "en": "Subcarpathian · Northwest",
+      "zh": "喀尔巴阡山省·西北部"
+    },
+    "id::PL_MRG_8eb255b99121": {
+      "en": "Subcarpathian · Northeast",
+      "zh": "喀尔巴阡山省·东北部"
+    },
+    "id::PL_MRG_00a3d762301a": {
+      "en": "Kuyavian-Pomeranian · Southwest",
+      "zh": "库亚维-滨海省·西南部"
+    },
+    "id::PL_MRG_dc742975570c": {
+      "en": "Kuyavian-Pomeranian · South",
+      "zh": "库亚维-滨海省·南部"
+    },
+    "id::PL_MRG_c93ffd9ad4b7": {
+      "en": "Kuyavian-Pomeranian · North",
+      "zh": "库亚维-滨海省·北部"
+    },
+    "id::PL_MRG_da0973bb9d4c": {
+      "en": "Holy Cross · East",
+      "zh": "圣十字省·东部"
+    },
+    "id::PL_MRG_646fabd5a455": {
+      "en": "Holy Cross · Northwest",
+      "zh": "圣十字省·西北部"
+    },
+    "id::PL_MRG_ce923fa4742b": {
+      "en": "West Pomeranian · West",
+      "zh": "西滨海省·西部"
     }
   },
   "ui": {

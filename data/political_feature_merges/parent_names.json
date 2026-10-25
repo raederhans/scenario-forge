@@ -80,6 +80,70 @@
       "en": "Shanxi",
       "zh": "山西省"
     },
+    "DE_Baden_W_rttemberg": {
+      "en": "Baden-Württemberg",
+      "zh": "巴登-符腾堡州"
+    },
+    "DE_Bayern": {
+      "en": "Bavaria",
+      "zh": "巴伐利亚州"
+    },
+    "DE_Berlin": {
+      "en": "Berlin",
+      "zh": "柏林"
+    },
+    "DE_Brandenburg": {
+      "en": "Brandenburg",
+      "zh": "勃兰登堡州"
+    },
+    "DE_Bremen": {
+      "en": "Bremen",
+      "zh": "不来梅"
+    },
+    "DE_Hamburg": {
+      "en": "Hamburg",
+      "zh": "汉堡"
+    },
+    "DE_Hessen": {
+      "en": "Hesse",
+      "zh": "黑森州"
+    },
+    "DE_Mecklenburg_Vorpommern": {
+      "en": "Mecklenburg-Western Pomerania",
+      "zh": "梅克伦堡-前波美拉尼亚州"
+    },
+    "DE_Niedersachsen": {
+      "en": "Lower Saxony",
+      "zh": "下萨克森州"
+    },
+    "DE_Nordrhein_Westfalen": {
+      "en": "North Rhine-Westphalia",
+      "zh": "北莱茵-威斯特法伦州"
+    },
+    "DE_Rheinland_Pfalz": {
+      "en": "Rhineland-Palatinate",
+      "zh": "莱茵兰-普法尔茨州"
+    },
+    "DE_Saarland": {
+      "en": "Saarland",
+      "zh": "萨尔州"
+    },
+    "DE_Sachsen": {
+      "en": "Saxony",
+      "zh": "萨克森州"
+    },
+    "DE_Sachsen_Anhalt": {
+      "en": "Saxony-Anhalt",
+      "zh": "萨克森-安哈尔特州"
+    },
+    "DE_Schleswig_Holstein": {
+      "en": "Schleswig-Holstein",
+      "zh": "石勒苏益格-荷尔斯泰因州"
+    },
+    "DE_Th_ringen": {
+      "en": "Thuringia",
+      "zh": "图林根州"
+    },
     "NL_Drenthe": {
       "en": "Drenthe",
       "zh": "德伦特省"
@@ -140,6 +204,14 @@
       "en": "Kuyavian-Pomeranian",
       "zh": "库亚维-滨海省"
     },
+    "PL_Lesser_Poland": {
+      "en": "Lesser Poland",
+      "zh": "小波兰省"
+    },
+    "PL_Lodz": {
+      "en": "Łódź",
+      "zh": "罗兹省"
+    },
     "PL_Lower_Silesian": {
       "en": "Lower Silesian",
       "zh": "下西里西亚省"
@@ -148,9 +220,41 @@
       "en": "Lublin",
       "zh": "卢布林省"
     },
+    "PL_Lubusz": {
+      "en": "Lubusz",
+      "zh": "卢布斯卡省"
+    },
+    "PL_Masovian": {
+      "en": "Masovian",
+      "zh": "马佐夫舍省"
+    },
+    "PL_Opole": {
+      "en": "Opole",
+      "zh": "奥波莱省"
+    },
+    "PL_Podlaskie": {
+      "en": "Podlaskie",
+      "zh": "波德拉谢省"
+    },
+    "PL_Pomeranian": {
+      "en": "Pomeranian",
+      "zh": "滨海省"
+    },
+    "PL_Silesian": {
+      "en": "Silesian",
+      "zh": "西里西亚省"
+    },
+    "PL_Subcarpathian": {
+      "en": "Subcarpathian",
+      "zh": "喀尔巴阡山省"
+    },
     "PL_Warmian_Masurian": {
       "en": "Warmian-Masurian",
       "zh": "瓦尔米亚-马祖里省"
+    },
+    "PL_West_Pomeranian": {
+      "en": "West Pomeranian",
+      "zh": "西滨海省"
     },
     "RU_Altai_Republic": {
       "en": "Altai Krai",

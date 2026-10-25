@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 137,
-    "feature_count": 22185,
+    "feature_count": 22060,
     "water_count": 0
   },
   "controller_changes": [],
@@ -31783,32 +31783,6 @@
     {
       "country_code": "PL",
       "critical": true,
-      "feature_id": "PL_POW_0217",
-      "feature_name": "strzeliński",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
-      "feature_id": "PL_POW_0219",
-      "feature_name": "świdnicki",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
       "feature_id": "PL_POW_0220",
       "feature_name": "trzebnicki",
       "from_tag": "POL",
@@ -31874,34 +31848,8 @@
     {
       "country_code": "PL",
       "critical": true,
-      "feature_id": "PL_POW_0262",
-      "feature_name": "Legnica",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
       "feature_id": "PL_POW_0264",
       "feature_name": "Wrocław",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
-      "feature_id": "PL_POW_0265",
-      "feature_name": "Wałbrzych",
       "from_tag": "POL",
       "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
       "quality": "manual_reviewed",
@@ -32472,19 +32420,6 @@
     {
       "country_code": "PL",
       "critical": true,
-      "feature_id": "PL_POW_3202",
-      "feature_name": "choszczeński",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
       "feature_id": "PL_POW_3203",
       "feature_name": "drawski",
       "from_tag": "POL",
@@ -32500,19 +32435,6 @@
       "critical": true,
       "feature_id": "PL_POW_3206",
       "feature_name": "gryfiński",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
-      "feature_id": "PL_POW_3208",
-      "feature_name": "kołobrzeski",
       "from_tag": "POL",
       "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
       "quality": "manual_reviewed",
@@ -32578,19 +32500,6 @@
       "critical": true,
       "feature_id": "PL_POW_3213",
       "feature_name": "sławieński",
-      "from_tag": "POL",
-      "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
-      "quality": "manual_reviewed",
-      "rule_id": "germany_frontier_1936",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "GER"
-    },
-    {
-      "country_code": "PL",
-      "critical": true,
-      "feature_id": "PL_POW_3214",
-      "feature_name": "stargardzki",
       "from_tag": "POL",
       "notes": "German 1936 eastern frontier including East Prussia and western territories now inside Poland.",
       "quality": "manual_reviewed",
@@ -215149,10 +215058,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 704,
+      "controller_feature_count": 621,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 704,
+      "feature_count": 621,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -216656,10 +216565,10 @@
     "POL": {
       "base_iso2": "PL",
       "continent_label": "Europe",
-      "controller_feature_count": 298,
+      "controller_feature_count": 256,
       "display_name": "Poland",
       "entry_kind": "",
-      "feature_count": 298,
+      "feature_count": 256,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -218926,41 +218835,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "67f4d6192d9ae5b370d1fc02a5e3453aa3248045d91fb76f41d14b2ad560e7c0",
+  "snapshot_fingerprint": "2d25337f8b360d065c90235ad758107cee96a7dcc9a18bd7f212c75f0c9bb7c5",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "9b64f4e38bc6b2ebd0fe4608a6dc771aa365b5efb4de0a40037952b9e1d4b1d1",
-    "detail_chunk_manifest_sha256": "ab54ae738f7ed4250680d93931abd85c8efa8a30e1429d669fa14066e54e3801",
+    "build_snapshot_sha256": "5c03c5487ca5ddb30d7c83283b8ce36297cca08352df56b50c6ba7675e10a2b5",
+    "detail_chunk_manifest_sha256": "b3e988a610af13c8b4242665c0ec35dd48a5318b893553fb66d64440936b7ceb",
     "runtime_bootstrap_topology_sha256": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
-    "runtime_topology_sha256": "0cbdeb87217531984bb6fdb1533f6953b7a93adddd90850de01b19f3fefc25fa"
+    "runtime_topology_sha256": "d43ebf0e121b0c2627afc7cd5895db9a15468e2a9331b199722e5ed5cfcd7fcd"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 16419,
+    "changed_feature_count": 16412,
     "controller_count": 127,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 22185,
+    "feature_count": 22060,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 15965,
+    "manual_reviewed_feature_count": 15958,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 127,
     "quality_counts": {
       "approx_existing_geometry": 454,
       "direct_country_copy": 5821,
-      "manual_reviewed": 15965
+      "manual_reviewed": 15958
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5821,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 16396
+      "manual_rule": 16389
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

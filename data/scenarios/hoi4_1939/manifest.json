@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1939/audit.json",
-  "baseline_hash": "3a131d3d759dddf365e018a0b08bc32b7c7f5aa956865a300fbd67def26ffe67",
+  "baseline_hash": "c4761cd36f0a9a5d255665dc26fd954d284d08577625f9242d449ccaabe5795f",
   "bookmark_date": "1939.8.14.12",
   "bookmark_description": "BLITZKRIEG_DESC",
   "bookmark_name": "BLITZKRIEG_NAME",
@@ -70,6 +70,279 @@
   "geo_locale_patch_url": "data/scenarios/hoi4_1939/geo_locale_patch.json",
   "geo_locale_patch_url_en": "data/scenarios/hoi4_1939/geo_locale_patch.en.json",
   "geo_locale_patch_url_zh": "data/scenarios/hoi4_1939/geo_locale_patch.zh.json",
+  "hierarchy_overrides": {
+    "feature_merges": {
+      "DE_MRG_0fbf2afc9b39": [
+        "DEC03",
+        "DEC06"
+      ],
+      "DE_MRG_20201cf9567d": [
+        "DEG06",
+        "DEG0H",
+        "DE_MRG_98e486211a34",
+        "DE_MRG_ac1a1840dec2",
+        "DE_MRG_cc565c282846"
+      ],
+      "DE_MRG_22c9cf77ef75": [
+        "DE11C",
+        "DE141",
+        "DE143",
+        "DE_MRG_c9a9f2cd9548",
+        "DE_MRG_d0e3890ae1d5"
+      ],
+      "DE_MRG_262d5b07c5d7": [
+        "DEA45",
+        "DE_MRG_5adb00f4a83d"
+      ],
+      "DE_MRG_2ae474a7f489": [
+        "DE711",
+        "DE713",
+        "DE71B",
+        "DE724",
+        "DE_MRG_3b750624bff4",
+        "DE_MRG_77741e43de3f",
+        "DE_MRG_e2617eca3f85",
+        "DE_MRG_e2f350a636b5"
+      ],
+      "DE_MRG_330d1045d5ff": [
+        "DEA5A",
+        "DE_MRG_6f627c55e7bd"
+      ],
+      "DE_MRG_4000ef7b1fc9": [
+        "DE_MRG_33b1389d946f",
+        "DE_MRG_d561808c92a5"
+      ],
+      "DE_MRG_49bfd3282189": [
+        "DE942",
+        "DE943",
+        "DE944",
+        "DE945",
+        "DE94D",
+        "DE_MRG_3a19ae12c637",
+        "DE_MRG_67a8450f3c9f",
+        "DE_MRG_c922c0ebada5"
+      ],
+      "DE_MRG_4fd11cacb00e": [
+        "DEB1A",
+        "DEB1B",
+        "DE_MRG_ea826ec181b8"
+      ],
+      "DE_MRG_5f2116b1dec1": [
+        "DEG01",
+        "DEG02",
+        "DEG03",
+        "DEG0C",
+        "DEG0L",
+        "DE_MRG_b86ffe1dd2ea",
+        "DE_MRG_c90ee890d36c"
+      ],
+      "DE_MRG_6939ec6a71b5": [
+        "DE932",
+        "DE939"
+      ],
+      "DE_MRG_7165d0e64b22": [
+        "DE911",
+        "DE912",
+        "DE913",
+        "DE925",
+        "DE_MRG_46ade2104d23",
+        "DE_MRG_4ab0c6062d32",
+        "DE_MRG_4fdd27cf49f7"
+      ],
+      "DE_MRG_756edd2ccd0e": [
+        "DEA16",
+        "DEA17",
+        "DEA31"
+      ],
+      "DE_MRG_7e21e0275cb4": [
+        "DEA18",
+        "DEA19",
+        "DEA2A",
+        "DEA2B"
+      ],
+      "DE_MRG_91d5581f4558": [
+        "DEB14",
+        "DEB1C",
+        "DEB3D",
+        "DE_MRG_bceaa37f49ef",
+        "DE_MRG_c6f2d9d3d036"
+      ],
+      "DE_MRG_976ddeb64a7e": [
+        "DE129",
+        "DE12B",
+        "DE135",
+        "DE_MRG_68ba87808df8"
+      ],
+      "DE_MRG_9f7a3fcacc08": [
+        "DE941",
+        "DE_MRG_5dd80c1fcf77",
+        "DE_MRG_830e5845fb60"
+      ],
+      "DE_MRG_a9c190d720fe": [
+        "DEA36",
+        "DEA44",
+        "DEA47",
+        "DEA53",
+        "DEA54",
+        "DEA55",
+        "DEA56",
+        "DEA58",
+        "DE_MRG_70752f860917",
+        "DE_MRG_9410ac111320"
+      ],
+      "DE_MRG_ad30df0f83f2": [
+        "DE93A",
+        "DE_MRG_9e1fff10ce51"
+      ],
+      "DE_MRG_b3d2cb60c548": [
+        "DE916",
+        "DE91C"
+      ],
+      "DE_MRG_e2376e215153": [
+        "DE734",
+        "DE737"
+      ],
+      "DE_MRG_f34d2e45905c": [
+        "DE117",
+        "DE127",
+        "DE_MRG_a27167ef8f23",
+        "DE_MRG_e87b9124c03f"
+      ],
+      "DE_MRG_f85082030596": [
+        "DEB36",
+        "DEB3C"
+      ],
+      "PL_MRG_00a3d762301a": [
+        "PL_MRG_7c2fbae3db0b",
+        "PL_POW_0410"
+      ],
+      "PL_MRG_22b31683d713": [
+        "PL_MRG_4ed00c272094",
+        "PL_POW_1005",
+        "PL_POW_1006",
+        "PL_POW_1016",
+        "PL_POW_1021"
+      ],
+      "PL_MRG_27e4456cebfb": [
+        "PL_POW_1203",
+        "PL_POW_1212",
+        "PL_POW_1213"
+      ],
+      "PL_MRG_28fa0ad78ed7": [
+        "PL_MRG_28f9056747e2",
+        "PL_MRG_672367948ccf",
+        "PL_MRG_d1960b18210a",
+        "PL_POW_1204",
+        "PL_POW_1218",
+        "PL_POW_1263"
+      ],
+      "PL_MRG_44c900e7cbdd": [
+        "PL_MRG_3bc1f7b63f72",
+        "PL_POW_2003",
+        "PL_POW_2008",
+        "PL_POW_2013"
+      ],
+      "PL_MRG_4a7fdf2f215b": [
+        "PL_MRG_6ea9dfea1297",
+        "PL_MRG_fe2842d4d685",
+        "PL_POW_1401",
+        "PL_POW_1407"
+      ],
+      "PL_MRG_4df6ad2dc703": [
+        "PL_MRG_4a2bfb6b173f",
+        "PL_POW_0664"
+      ],
+      "PL_MRG_50494ed51da4": [
+        "PL_MRG_ed1992314afe",
+        "PL_POW_3208"
+      ],
+      "PL_MRG_646fabd5a455": [
+        "PL_MRG_9242fdb1805d",
+        "PL_POW_2613"
+      ],
+      "PL_MRG_727dd6268093": [
+        "PL_MRG_88938957a4dc",
+        "PL_POW_2204",
+        "PL_POW_2205"
+      ],
+      "PL_MRG_7d57be806a08": [
+        "PL_MRG_3384b03f3b03",
+        "PL_MRG_d07f84128518",
+        "PL_MRG_ec5519b4d3cf"
+      ],
+      "PL_MRG_8eb255b99121": [
+        "PL_POW_1810",
+        "PL_POW_1814"
+      ],
+      "PL_MRG_9e4e875a7bcd": [
+        "PL_MRG_55eb1a09655e",
+        "PL_MRG_e9b93261cb76"
+      ],
+      "PL_MRG_a40b880dd29e": [
+        "PL_MRG_b96b5d49d900",
+        "PL_POW_1806"
+      ],
+      "PL_MRG_be82540e6cf0": [
+        "PL_MRG_18fdfa02eca5",
+        "PL_MRG_eea8a1b754f3"
+      ],
+      "PL_MRG_c5cfb391c06f": [
+        "PL_MRG_57a0cb6e8d35",
+        "PL_MRG_8d9132641197"
+      ],
+      "PL_MRG_c908eb11c602": [
+        "PL_MRG_6059e5e8fd2d",
+        "PL_MRG_635f3bd9c929"
+      ],
+      "PL_MRG_c93ffd9ad4b7": [
+        "PL_MRG_a4d0d3a9760e",
+        "PL_POW_0417",
+        "PL_POW_0462"
+      ],
+      "PL_MRG_cb41a08029c6": [
+        "PL_MRG_05ddd04cc90f",
+        "PL_MRG_e17e448ae4e2",
+        "PL_POW_0610"
+      ],
+      "PL_MRG_cbc1e164f4f5": [
+        "PL_MRG_4af99a43d917",
+        "PL_MRG_4b4e7fcd7031",
+        "PL_MRG_697bf6eafbca",
+        "PL_MRG_ae7dcb23076e",
+        "PL_MRG_cda1a954e365",
+        "PL_POW_0217",
+        "PL_POW_0219",
+        "PL_POW_0262",
+        "PL_POW_0265"
+      ],
+      "PL_MRG_ce923fa4742b": [
+        "PL_MRG_9b20fe0cbb07",
+        "PL_POW_3202",
+        "PL_POW_3214"
+      ],
+      "PL_MRG_d1659e5d5f46": [
+        "PL_POW_1426",
+        "PL_POW_1429",
+        "PL_POW_1433",
+        "PL_POW_1464"
+      ],
+      "PL_MRG_da0973bb9d4c": [
+        "PL_MRG_8f55c53666f8",
+        "PL_POW_2611",
+        "PL_POW_2612"
+      ],
+      "PL_MRG_dc742975570c": [
+        "PL_MRG_fb2ce823eb38",
+        "PL_POW_0407",
+        "PL_POW_0464"
+      ],
+      "PL_MRG_f9d904f8526d": [
+        "PL_MRG_7076d4b3250d",
+        "PL_POW_1816",
+        "PL_POW_1819"
+      ]
+    }
+  },
   "mesh_pack_url": "data/scenarios/hoi4_1939/mesh_pack.json",
   "owners_url": "data/scenarios/hoi4_1939/owners.by_feature.json",
   "palette_id": "hoi4_vanilla",
@@ -91,12 +364,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "773ec807ea059fb7c6f70dd5a04f77d98d37da712ef0a42fd321e5b5b13a8a30",
+  "snapshot_fingerprint": "2919864819bfee20a5716bb2c87db61226b50806b0749b5676961ba1f9da7cf0",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "83040b13db728f1f52c70a7e5623e1fcc8a5904634b22f117b3518f771efc0bc",
+    "detail_chunk_manifest_sha256": "c4593d15cd7c05204f12445b4d0db070b57b2a824aa752a3bbafa1266bb602fb",
     "runtime_bootstrap_topology_sha256": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
-    "runtime_topology_sha256": "0cbdeb87217531984bb6fdb1533f6953b7a93adddd90850de01b19f3fefc25fa"
+    "runtime_topology_sha256": "d43ebf0e121b0c2627afc7cd5895db9a15468e2a9331b199722e5ed5cfcd7fcd"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1939/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -114,29 +387,29 @@
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 16496,
+    "changed_feature_count": 16489,
     "controller_count": 120,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 22185,
+    "feature_count": 22060,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 16042,
+    "manual_reviewed_feature_count": 16035,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 120,
     "quality_counts": {
       "approx_existing_geometry": 454,
       "direct_country_copy": 5744,
-      "manual_reviewed": 16042
+      "manual_reviewed": 16035
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5744,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 16473
+      "manual_rule": 16466
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

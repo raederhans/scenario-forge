@@ -64,6 +64,10 @@ GLOBAL_PROJECTED = (
 # Scenarios that read each projected global file. A scoped plan projects a file only
 # when it covers every reader; cities keep their members and fall back to the scenario tag.
 GLOBAL_READERS = {
+    # The vanilla catalog is the default for every scenario without its own releasable_catalog_url;
+    # TNO 1962 names its own catalog.
+    "releasables/hoi4_vanilla.internal.phase1.catalog.json": ("blank_base", "hoi4_1936", "hoi4_1939", "modern_world"),
+    "releasables/hoi4_vanilla.internal.phase1.source.json": ("blank_base", "hoi4_1936", "hoi4_1939", "modern_world"),
     "releasables/tno_1962.internal.phase1.catalog.json": ("tno_1962",),
     "releasables/tno_1962.internal.phase1.source.json": ("tno_1962",),
 }
@@ -685,8 +689,11 @@ def global_projected_paths(merges: Merges) -> list[Path]:
     selected = []
     for path in paths:
         name = path.relative_to(DATA).as_posix()
-        if set(GLOBAL_READERS.get(name, SCENARIOS)) <= set(merges.scenarios):
+        readers = set(GLOBAL_READERS.get(name, SCENARIOS))
+        if readers <= set(merges.scenarios):
             selected.append(path)
+        elif not readers & set(merges.scenarios):
+            continue  # none of its readers changes, so the file keeps the members
         elif name not in SCOPED_UNPROJECTED:
             text = path.read_text(encoding="utf-8")
             touched = sorted(member for member in merges.remap if f'"{member}"' in text)
