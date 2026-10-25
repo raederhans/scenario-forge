@@ -8,16 +8,13 @@ const CHINESE_FONT = '"Map Noto Serif SC", "Noto Serif SC", "Songti SC", SimSun,
 const fontWeight = (font) => font === CHINESE_FONT ? 400 : 500;
 const displayText = (name, language) => {
   const text = String(name || "").trim();
-  // Full capitals suit short titles; retain the supplied case of multiword
-  // names so long English labels do not pay an avoidable width penalty.
-  return language.startsWith("en") && !/\s/u.test(text) ? text.toLocaleUpperCase("en") : text;
+  // Strategy-map titles are spaced capitals; tracking stretches them along
+  // the territory instead of shrinking multiword names to mixed case.
+  return language.startsWith("en") ? text.toLocaleUpperCase("en") : text;
 };
 const METRIC_FONT_SIZE = 100;
 const MAX_CACHED_FITS = 4;
 const MAX_PENDING_WORKER_FITS = 8;
-// Subpixel interior slivers from mixed-resolution borders must not sever a
-// label baseline. Reintroduce each hole once it reaches one screen pixel.
-const MIN_LABEL_HOLE_SCREEN_AREA = 1;
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const segmenter = typeof Intl.Segmenter === "function" ? new Intl.Segmenter(undefined, { granularity: "grapheme" }) : null;
 
@@ -144,21 +141,22 @@ export function projectCountryLabelPolygons(feature, projection, geoStream) {
   return polygons;
 }
 
-function getZoomBand(k) {
-  // Four bands per doubling keep the refit step below 19%. Size limits are
-  // expressed at the band's upper end, so no in-band zoom can exceed the cap.
-  const index = Math.floor(Math.log2(k) * 4 + 1e-9);
-  const upperScale = 2 ** ((index + 1) / 4);
-  const screenFontLimit = clamp(20 + 3 * Math.log2(Math.max(1, upperScale)), 20, 32);
-  return { index, upperScale, minFontSize: 0.6 / upperScale, maxFontSize: screenFontLimit / upperScale };
-}
+// Titles are fitted once in projected map units, like lettering printed on
+// the map. Zoom only scales them, so position, curve and size never jump;
+// the screen size alone fades a title in when legible and out when oversized.
+const LAYOUT_MIN_FONT_SIZE = 0.12;
+const LAYOUT_MAX_FONT_SIZE = 96;
+const LAYOUT_MIN_HOLE_AREA = 4;
+const FADE_IN_START_PX = 7;
+const FADE_IN_END_PX = 10;
+const FADE_OUT_START_PX = 120;
+const FADE_OUT_END_PX = 200;
+const MAX_ALPHA = 0.82;
 
-function getVisibilityAlpha(fontSizePx, visibleArea) {
-  // Territory controls the hierarchy; name length only gates legibility.
-  // Once readable, larger labels never disappear merely because of their size.
-  const territoryReveal = clamp((Math.sqrt(visibleArea) - 28) / 32, 0, 1);
-  const readable = clamp((fontSizePx - 8) / 2, 0, 1);
-  return territoryReveal * readable * 0.9;
+function getVisibilityAlpha(fontSizePx) {
+  const legible = clamp((fontSizePx - FADE_IN_START_PX) / (FADE_IN_END_PX - FADE_IN_START_PX), 0, 1);
+  const overview = clamp((FADE_OUT_END_PX - fontSizePx) / (FADE_OUT_END_PX - FADE_OUT_START_PX), 0, 1);
+  return legible * overview * MAX_ALPHA;
 }
 
 function screenBox(box, transform, padding) {
@@ -220,15 +218,11 @@ export function isCountryLabelDefinitelyInvisible(entry, transform, paintBounds)
   return entry.components.every(component => {
     if (!component?.bounds || ![component.bounds.x, component.bounds.y, component.bounds.w, component.bounds.h].every(Number.isFinite)
       || component.bounds.w < 0 || component.bounds.h < 0 || !Number.isFinite(component.area) || component.area < 0) return false;
-    const visibleArea = visibleComponentArea(component, transform, paintBounds);
-    if (!Number.isFinite(visibleArea) || visibleArea < 0) return false;
-    // Readability saturates at fontSizePx=10; country opacity is at most one.
-    // Thus no fitted glyph size or placement can reach the drawing threshold.
-    const maximumAlpha = getVisibilityAlpha(10, visibleArea);
-    // Keep the exact mathematical cutoff too: floating rounding just below
-    // 0.05 must not discard a country at the boundary.
-    return visibleArea < (28 + 32 * (0.05 / 0.9)) ** 2
-      && Number.isFinite(maximumAlpha) && maximumAlpha < 0.05;
+    // Fitted glyph ink lies inside the component, and a capital's ink is at
+    // least half its font size. Its longest side therefore bounds any fit.
+    // Only the legibility fade applies: a smaller fit may escape the overview fade.
+    const maximumFontPx = 2 * Math.max(component.bounds.w, component.bounds.h) * transform.k;
+    return maximumFontPx < FADE_IN_START_PX + 0.05 / MAX_ALPHA * (FADE_IN_END_PX - FADE_IN_START_PX);
   });
 }
 
@@ -402,25 +396,24 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     return layoutWorkers[index] || null;
   }
 
-  function prepareFit(entry, context, text, key, isChinese, font, zoomBand, view) {
+  function prepareFit(entry, context, text, key, isChinese, font, view) {
     if (workerFailed) {
       storeFit(entry, key, null);
       return;
     }
-    const viewport = getViewportSize();
     const options = {
       glyphs: getGlyphMetrics(context, text, font), glyphPadding: 0.06,
-      minFontSize: zoomBand.minFontSize, maxFontSize: zoomBand.maxFontSize, tracking: isChinese ? 0.03 : 0.015,
-      maxTracking: isChinese ? 0.14 : 0.08,
-      minHoleArea: MIN_LABEL_HOLE_SCREEN_AREA / zoomBand.upperScale ** 2,
-      readableFontSize: 10 / (zoomBand.upperScale / 2 ** 0.25),
-      // Exact fits use the layout algorithm's stable ranking. A completed old
-      // band must not make the same final input choose a different candidate.
+      minFontSize: LAYOUT_MIN_FONT_SIZE, maxFontSize: LAYOUT_MAX_FONT_SIZE,
+      // Wide letter spacing lets a title span its territory as on a strategy map.
+      tracking: isChinese ? 0.12 : 0.08, maxTracking: isChinese ? 0.9 : 0.6,
+      minHoleArea: LAYOUT_MIN_HOLE_AREA,
+      // Legibility is decided per zoom while drawing; the fit itself only
+      // ranks wrapping and arcs by the size they achieve.
+      readableFontSize: Number.MAX_VALUE,
       maxAlternatives: 3,
       maxTiltDegrees: 30, allowArcs: true,
       preferGentleArcs: true,
-      minArcComponentArea: viewport.width * viewport.height * 0.035 / zoomBand.upperScale ** 2,
-      maxArcTiltDegrees: isChinese ? 10 : 15, maxArcBendDegrees: isChinese ? 14 : 22,
+      maxArcTiltDegrees: isChinese ? 12 : 18, maxArcBendDegrees: isChinese ? 18 : 28,
       allowMultiline: true, allowPositionShift: true,
     };
     const slot = typeof helpers.onInvalidate === "function" ? getLayoutWorker(entry) : null;
@@ -525,16 +518,15 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     return geometryCache;
   }
 
-  function getFitKey(text, language, font, zoomBand, viewport) {
-    // Arc eligibility depends on viewport area. Keep band last so a compatible
-    // cached band can still provide temporary navigation feedback.
-    return `${textGeneration}\n${language}\n${font}\n${text}\n${viewport.width}:${viewport.height}\n${zoomBand.index}`;
+  function getFitKey(text, language, font) {
+    // Map-space fits depend on neither zoom nor viewport.
+    return `${textGeneration}\n${language}\n${font}\n${text}`;
   }
 
   function getViewFitRequest(entry, view, onInvisible = null) {
     const text = displayText(view.records.get(entry.countryCode)?.name, view.language);
     if (!text) return null;
-    const key = getFitKey(text, view.language, view.font, view.zoomBand, view.viewport);
+    const key = getFitKey(text, view.language, view.font);
     if (entry.polygons) {
       if (!entry.bounds) return null;
       const box = screenBox(entry.bounds, view.transform, 0);
@@ -567,7 +559,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       // Projection can establish that a country does not need a fit at all.
       if (entry.polygons && getViewFitRequest(entry, view) && nowMs() - start < 12) {
         target.save();
-        try { prepareFit(entry, target, text, key, view.isChinese, view.font, view.zoomBand, view); }
+        try { prepareFit(entry, target, text, key, view.isChinese, view.font, view); }
         finally { target.restore(); }
       }
       prepared += 1;
@@ -658,7 +650,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     const raw = getTransform() || {}, language = String(getLanguage() || "en"), isChinese = language.startsWith("zh");
     const view = { geometry: getGeometry(source, projection), projection, countries: source.countries, viewport: { ...viewport },
       transform: { x: Number(raw.x) || 0, y: Number(raw.y) || 0, k }, language, isChinese,
-      font: isChinese ? CHINESE_FONT : ENGLISH_FONT, zoomBand: getZoomBand(k), textGeneration,
+      font: isChinese ? CHINESE_FONT : ENGLISH_FONT, textGeneration,
       paintBounds: { ...(getPaintBounds() || { minX: 0, minY: 0, maxX: viewport.width, maxY: viewport.height }) },
       records: new Map((source.countries || []).map(record => [record.countryCode, record])) };
     if (!collectPendingFits(view).length || workerFailed) return null;
@@ -694,11 +686,10 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     const language = String(getLanguage() || "en");
     const isChinese = language.startsWith("zh");
     const font = isChinese ? CHINESE_FONT : ENGLISH_FONT;
-    const zoomBand = getZoomBand(k);
     const hierarchy = getMapLabelHierarchy(k, state);
     const geometry = getGeometry(source, projection);
     const records = new Map((source.countries || []).map((record) => [record.countryCode, record]));
-    const fitView = { records, language, font, zoomBand, transform, paintBounds, projection, isChinese,
+    const fitView = { records, language, font, transform, paintBounds, projection, isChinese,
       geometry, textGeneration, countries: source.countries, viewport: { ...viewport } };
     const deferred = typeof helpers.onInvalidate === "function";
     const pending = [];
@@ -729,64 +720,57 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
         let fit = entry.fits.get(key);
         if (!entry.fits.has(key) && deferred) {
           pending.push({ entry, text, key });
-          const textKey = key.slice(0, key.lastIndexOf("\n") + 1);
-          // A pending band may retain a validated fit of the same text/font.
-          // No coordinates are resized, and readiness still waits for the
-          // requested band. Oversized old fits cannot bypass the screen cap.
-          fit = [...entry.fits].reverse().find(([cachedKey, cachedFit]) =>
-            cachedKey.startsWith(textKey) && cachedFit && cachedFit.fontSize * k <= 32
-            && (cachedFit.minHoleArea || 0) <= MIN_LABEL_HOLE_SCREEN_AREA / zoomBand.upperScale ** 2)?.[1];
-          if (!fit) return null;
+          return null;
         } else if (!entry.fits.has(key)) {
-          prepareFit(entry, context, text, key, isChinese, font, zoomBand, fitView);
+          prepareFit(entry, context, text, key, isChinese, font, fitView);
           fit = entry.fits.get(key);
         }
         const visibleArea = visibleTerritoryArea(entry, transform, paintBounds);
         if (!fit) reject(entry, text, null, "noFit", visibleArea);
         if (!fit) return null;
+        // Rank by whole territory, not its visible part, so panning never
+        // reorders priorities or moves a title between components.
         const groups = (fit.componentFits?.length ? fit.componentFits : [fit]).slice(0, 3).map((group) => {
           const component = entry.components.find((part) => part.polygonIndex === group.polygonIndex)
             || entry.components[0];
-          return { fit: group, component, visibleArea: visibleComponentArea(component, transform, paintBounds) };
-        }).sort((a, b) => b.visibleArea - a.visibleArea || (b.component?.area || 0) - (a.component?.area || 0));
-        return { entry, fit, groups, text, visibleArea: groups[0]?.visibleArea || 0 };
-      }).filter(Boolean).sort((a, b) => b.visibleArea - a.visibleArea
+          return { fit: group, component, area: component?.area || 0 };
+        }).sort((a, b) => b.area - a.area);
+        return { entry, fit, groups, text, visibleArea, area: groups[0]?.area || 0 };
+      }).filter(Boolean).sort((a, b) => b.area - a.area
         || String(a.entry.countryCode).localeCompare(String(b.entry.countryCode)));
       for (const { entry, fit: primaryFit, groups, text, visibleArea } of fitted) {
         let placement = null;
         let reason = "Visibility";
-        const dominant = groups[0];
-        // A blocked mainland title must not jump to a minor overseas territory
-        // while the mainland still dominates this view. Panning away restores
-        // the independently prepared overseas placements.
-        const placementGroups = dominant && groups.length > 1
-          && dominant.visibleArea >= (dominant.component?.area || 0) * k ** 2 * 0.5
-          && dominant.visibleArea > groups[1].visibleArea * 2.5 ? [dominant] : groups;
-        const placements = placementGroups.flatMap((group) => [group.fit, ...(group.fit.alternatives || []).slice(0, 3)]
-          .map((fit) => ({ ...group, fit })));
-        for (const { fit, component, visibleArea: componentArea } of placements) {
-          if (fit.fontSize * k > 32 || (fit.minHoleArea || 0) > MIN_LABEL_HOLE_SCREEN_AREA / zoomBand.upperScale ** 2) continue;
-          const countryOpacity = getCountryLabelOpacity(hierarchy, (component?.area || 0) * k ** 2, viewport.width * viewport.height);
-          const alpha = getVisibilityAlpha(fit.fontSize * k, componentArea) * countryOpacity;
-          if (alpha < 0.05) continue;
-          // Viewport checks use fitted glyph bounds. Collision padding
-          // alone should not make an otherwise complete edge label disappear.
-          const inkBoxes = fit.glyphs.filter((glyph) => glyph.text.trim())
-            .map((glyph) => screenBox(glyph.box, transform, 0));
-          const boxes = fit.glyphs.filter((glyph) => glyph.text.trim())
-            .map((glyph) => screenBox(glyph.box, transform, 1.5));
-          if (!inkBoxes.length || inkBoxes.some((box) => ![box.x, box.y, box.w, box.h].every(Number.isFinite)
-            || box.x < paintBounds.minX || box.y < paintBounds.minY || box.x + box.w > paintBounds.maxX
-            || box.y + box.h > paintBounds.maxY)) {
-            reason = "Viewport";
-            continue;
+        // A blocked mainland title must not jump to a minor overseas territory.
+        // Only a mainland title wholly off screen yields to the next component.
+        const dominantOnly = groups.length > 1 && groups[0].area > groups[1].area * 2.5;
+        for (const [groupIndex, group] of groups.entries()) {
+          let groupOnScreen = false;
+          for (const fit of [group.fit, ...(group.fit.alternatives || []).slice(0, 3)]) {
+            const countryOpacity = getCountryLabelOpacity(hierarchy, group.area * k ** 2, viewport.width * viewport.height);
+            const alpha = getVisibilityAlpha(fit.fontSize * k) * countryOpacity;
+            if (alpha < 0.05) continue;
+            const inkBoxes = fit.glyphs.filter((glyph) => glyph.text.trim())
+              .map((glyph) => screenBox(glyph.box, transform, 0));
+            const boxes = fit.glyphs.filter((glyph) => glyph.text.trim())
+              .map((glyph) => screenBox(glyph.box, transform, 1.5));
+            // Titles may run past the edge like printed map lettering; only
+            // a title with no ink in the paint area is skipped.
+            if (!inkBoxes.length || inkBoxes.some((box) => ![box.x, box.y, box.w, box.h].every(Number.isFinite))
+              || inkBoxes.every((box) => box.x + box.w < paintBounds.minX || box.y + box.h < paintBounds.minY
+                || box.x > paintBounds.maxX || box.y > paintBounds.maxY)) {
+              reason = "Viewport";
+              continue;
+            }
+            groupOnScreen = true;
+            if (boxes.some((box) => occupiedBoxes.some((occupied) => doScreenLabelBoxesOverlap(box, occupied)))) {
+              reason = "Collision";
+              continue;
+            }
+            placement = { fit, alpha, boxes };
+            break;
           }
-          if (boxes.some((box) => occupiedBoxes.some((occupied) => doScreenLabelBoxesOverlap(box, occupied)))) {
-            reason = "Collision";
-            continue;
-          }
-          placement = { fit, alpha, boxes };
-          break;
+          if (placement || (groupIndex === 0 && dominantOnly && groupOnScreen)) break;
         }
         if (!placement) {
           reject(entry, text, primaryFit.fontSize * k, reason, visibleArea);
@@ -796,20 +780,23 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
         occupiedBoxes.push(...boxes);
         context.font = `${fontWeight(font)} ${fit.fontSize}px ${font}`;
         context.globalAlpha = alpha;
-        context.lineWidth = 0.45 / k;
+        // The halo is part of the lettering and scales with it.
+        context.lineWidth = fit.fontSize * 0.14;
         const colors = getCountryLabelColors(entry.countryCode);
         context.strokeStyle = colors.stroke;
         context.fillStyle = colors.fill;
-        for (const glyph of fit.glyphs) {
-          if (!glyph.text.trim()) continue;
-          context.save();
-          context.translate(glyph.x, glyph.y);
-          context.rotate(glyph.angle);
-          context.strokeText(glyph.text, 0, 0);
-          context.fillText(glyph.text, 0, 0);
-          context.restore();
-          diagnostics.glyphsDrawn += 1;
+        const glyphs = fit.glyphs.filter((glyph) => glyph.text.trim());
+        // Stroke every glyph before filling so a halo never covers a neighbor.
+        for (const paint of ["strokeText", "fillText"]) {
+          for (const glyph of glyphs) {
+            context.save();
+            context.translate(glyph.x, glyph.y);
+            context.rotate(glyph.angle);
+            context[paint](glyph.text, 0, 0);
+            context.restore();
+          }
         }
+        diagnostics.glyphsDrawn += glyphs.length;
         diagnostics.drawn += 1;
         diagnostics.lastLabels.push({ countryCode: entry.countryCode, text,
           fontSizePx: fit.fontSize * k, alpha, candidateIndex: fit.candidateIndex, polygonIndex: fit.polygonIndex,
@@ -856,7 +843,6 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     const transform = getTransform() || { k: 1, x: 0, y: 0 };
     const viewport = getViewportSize();
     const paintBounds = getPaintBounds() || { minX: 0, minY: 0, maxX: viewport.width, maxY: viewport.height };
-    const zoomBand = getZoomBand(Number(transform.k) || 1);
     return geometryCache.entries.reduce((count, entry) => {
       const text = displayText(records.get(entry.countryCode)?.name, language);
       if (!text) return count;
@@ -865,7 +851,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       const box = screenBox(entry.bounds, transform, 0);
       if (box.x + box.w < paintBounds.minX + 2 || box.y + box.h < paintBounds.minY + 2 || box.x > paintBounds.maxX - 2 || box.y > paintBounds.maxY - 2) return count;
       if (isCountryLabelDefinitelyInvisible(entry, transform, paintBounds)) return count;
-      return count + Number(!entry.fits.has(getFitKey(text, language, font, zoomBand, viewport)));
+      return count + Number(!entry.fits.has(getFitKey(text, language, font)));
     }, 0);
   }
 
