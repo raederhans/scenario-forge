@@ -1581,7 +1581,7 @@ export function createProjectSupportDiagnosticsController({
     const input = document.createElement("input");
     input.type = "text";
     input.className = "legend-input";
-    input.placeholder = `Category ${index + 1}`;
+    input.placeholder = t("Category {index}", "ui").replace("{index}", String(index + 1));
     input.setAttribute("aria-label", `${t("Legend", "ui")} ${index + 1}: ${color}`);
     input.value = legendManager.getLabel(color, state);
     input.addEventListener("input", (event) => {
