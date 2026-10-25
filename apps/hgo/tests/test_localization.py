@@ -1,13 +1,11 @@
 import json
-import hashlib
 from pathlib import Path
-import struct
 import sys
 import unittest
-import zipfile
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
 from build_localization import build_overlay, repair_name, encoded, make_simplifier, normalize
+import main_sources
 
 
 class LocalizationTests(unittest.TestCase):
@@ -146,7 +144,8 @@ class LocalizationTests(unittest.TestCase):
 
     def test_committed_overlay_is_reproducible_from_source_files(self):
         root=Path(__file__).resolve().parents[3]
-        read=lambda path:json.loads((root/path).read_bytes())
+        # Main-repository inputs are HGO's pinned snapshots, not live main data.
+        read=lambda path:main_sources.read_json(root,path) if path.startswith('data/') else json.loads((root/path).read_bytes())
         base=root/'apps/hgo/assets/overlays/localization'
         simplify=make_simplifier(*[(base/name).read_text(encoding='utf8') for name in ['TSPhrases.txt','TSCharacters.txt']])
         overlay,report=build_overlay(read('apps/hgo/assets/default/core.json'),
@@ -168,25 +167,15 @@ class LocalizationTests(unittest.TestCase):
         entries=[row for row in review['entries'] if row.get('group')=='round3-other-primary-admin']
         self.assertTrue(entries,'The bounded round-three source review is retained')
         archive=next(item for item in review['sourceArchives'] if item['path']=='data/ne_10m_admin_1_states_provinces.zip')
-        self.assertEqual(hashlib.sha256((root/archive['path']).read_bytes()).hexdigest(),archive['sha256'])
-        with zipfile.ZipFile(root/archive['path']) as source:
-            data=source.read(archive['member'])
-        count=struct.unpack_from('<I',data,4)[0]
-        header,width=struct.unpack_from('<HH',data,8)
-        fields=[];offset=1
-        for pos in range(32,header-1,32):
-            if data[pos]==13:break
-            name=data[pos:pos+11].split(b'\0')[0].decode('ascii');size=data[pos+16]
-            fields.append((name,offset,size));offset+=size
-        records={}
-        for start in range(header,header+count*width,width):
-            record={name:data[start+off:start+off+size].decode('utf8').strip(' \0') for name,off,size in fields}
-            records[record['ne_id']]=record
+        self.assertEqual(main_sources.archive_sha256(root,archive['path']),archive['sha256'])
+        pinned=main_sources.read_json(root,'derived/ne_10m_admin_1_states_provinces.review_records.json')
+        self.assertEqual((pinned['archive'],pinned['member']),(archive['path'],archive['member']))
+        records={record['ne_id']:record for record in pinned['records']}
         for entry in entries:
             sources=[item for item in entry['evidence'] if isinstance(item,dict) and item.get('member')==archive['member']]
             self.assertTrue(sources,entry['id'])
             for source in sources:
-                record=records[source['ne_id']]
+                record=records[str(source['ne_id'])]
                 for key in ['name','name_en','name_zh','adm1_code','iso_a2']:
                     self.assertEqual(source[key],record[key],(entry['id'],key))
                 self.assertIn(normalize(entry['original']),[normalize(record['name']),normalize(record['name_en'])],entry['id'])

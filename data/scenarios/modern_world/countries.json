@@ -1768,7 +1768,7 @@
       "continent_label": "North America",
       "display_name": "Canada",
       "entry_kind": "",
-      "feature_count": 343,
+      "feature_count": 280,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -2040,7 +2040,7 @@
       "continent_label": "Asia",
       "display_name": "China",
       "entry_kind": "",
-      "feature_count": 2328,
+      "feature_count": 2162,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -2244,7 +2244,7 @@
       "continent_label": "Europe",
       "display_name": "Czechia",
       "entry_kind": "",
-      "feature_count": 172,
+      "feature_count": 159,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -2788,7 +2788,7 @@
       "continent_label": "Europe",
       "display_name": "France",
       "entry_kind": "",
-      "feature_count": 312,
+      "feature_count": 286,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -2856,7 +2856,7 @@
       "continent_label": "Europe",
       "display_name": "United Kingdom",
       "entry_kind": "",
-      "feature_count": 467,
+      "feature_count": 444,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -3706,7 +3706,7 @@
       "continent_label": "Asia",
       "display_name": "India",
       "entry_kind": "",
-      "feature_count": 729,
+      "feature_count": 653,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -5780,7 +5780,7 @@
       "continent_label": "Europe",
       "display_name": "Poland",
       "entry_kind": "",
-      "feature_count": 380,
+      "feature_count": 304,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -6120,7 +6120,7 @@
       "continent_label": "Europe",
       "display_name": "Russia",
       "entry_kind": "",
-      "feature_count": 12131,
+      "feature_count": 11737,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -6426,7 +6426,7 @@
       "continent_label": "Europe",
       "display_name": "Slovakia",
       "entry_kind": "",
-      "feature_count": 79,
+      "feature_count": 70,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -7208,7 +7208,7 @@
       "continent_label": "Europe",
       "display_name": "Ukraine",
       "entry_kind": "",
-      "feature_count": 1031,
+      "feature_count": 946,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [

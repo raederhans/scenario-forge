@@ -1,6 +1,6 @@
 {
   "coverage_ledger_hashes": {
-    "atlantropa_donor_ledger": "5c4a74eba10022bf5e557b87fee94cad601fc1d5b22762c09c587d5d21e9b393",
+    "atlantropa_donor_ledger": "2f0d837e0a2f1f6e57089b71f59e8206c8691871a658dbd5e363eff0f4697334",
     "geometry_drop_audit": "92eb9483f35ac36bb0e65e610d6d880b4dc0065736340acc6037f7326496e0f8"
   },
   "coverage_ledger_paths": {
@@ -15,12 +15,12 @@
   },
   "generated_at": "2026-05-31T23:17:04Z",
   "layer_chunk_counts": {
-    "political": 195,
+    "political": 192,
     "relief": 4,
     "scenario_atlantropa": 3,
     "water": 9
   },
-  "political_chunk_count": 195,
+  "political_chunk_count": 192,
   "runtime_topology_object_count": 7,
   "runtime_topology_object_names": [
     "context_land_mask",
@@ -35,6 +35,6 @@
   "scenario_atlantropa_chunk_count": 3,
   "scenario_id": "tno_1962",
   "startup_topology_url": "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
-  "total_chunk_count": 211,
+  "total_chunk_count": 208,
   "version": 1
 }

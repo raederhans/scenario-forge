@@ -11,9 +11,13 @@ import math
 from pathlib import Path
 import re
 import struct
+import sys
 
 import numpy as np
 from scipy.ndimage import distance_transform_edt
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import main_sources  # noqa: E402
 
 SCHEMA = 1
 FORMAT = 'hgo-illumination-overlays'
@@ -95,9 +99,9 @@ def _load_json_asset(manifest_path, manifest, name):
     return asset, payload
 
 
-def read_city_lights(path):
-    path = Path(path)
-    raw = path.read_bytes()
+def read_city_lights(path=None):
+    # Without an explicit file, read HGO's pinned snapshot of the main asset.
+    raw = Path(path).read_bytes() if path is not None else main_sources.read_bytes(Path(__file__).resolve().parents[3], SOURCE_JS_RELATIVE)
     try:
         text = raw.decode('utf-8')
     except UnicodeDecodeError as error:
@@ -365,14 +369,13 @@ def build(base_manifest_path, geography_manifest_path, city_lights_path, output)
 
 def main():
     here = Path(__file__).resolve()
-    repository_root = here.parents[3]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--base-manifest', type=Path,
                         default=here.parents[1] / 'assets/default/manifest.json')
     parser.add_argument('--geography-manifest', type=Path,
                         default=here.parents[1] / 'assets/overlays/geography/manifest.json')
-    parser.add_argument('--city-lights-source', type=Path,
-                        default=repository_root / SOURCE_JS_RELATIVE)
+    parser.add_argument('--city-lights-source', type=Path, default=None,
+                        help='Defaults to the pinned snapshot from tools/sync_main_sources.py.')
     parser.add_argument('--output', type=Path,
                         default=here.parents[1] / 'assets/overlays/illumination')
     args = parser.parse_args()

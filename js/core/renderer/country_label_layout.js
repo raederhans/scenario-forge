@@ -887,7 +887,7 @@ export function fitCountryLabel(candidates, options = {}, preparationTiming = nu
   const minFontSize = Math.max(0, finiteNumber(options.minFontSize, 1));
   const maxFontSize = Math.max(minFontSize, finiteNumber(options.maxFontSize, minFontSize));
   const tracking = finiteNumber(options.tracking, 0);
-  const maxTracking = Math.max(tracking, Math.min(0.24, finiteNumber(options.maxTracking, tracking)));
+  const maxTracking = Math.max(tracking, Math.min(1, finiteNumber(options.maxTracking, tracking)));
   const glyphPadding = Math.max(0, finiteNumber(options.glyphPadding, 0));
   const maxGlyphAngle = Math.max(0, Math.min(MAX_GLYPH_ANGLE, finiteNumber(options.maxTiltDegrees, 30) * Math.PI / 180));
   const maxBendAngle = Math.max(0, Math.min(Math.PI / 3, finiteNumber(options.maxBendDegrees, 60) * Math.PI / 180));
@@ -1031,7 +1031,8 @@ function translatedFit(fit, component, dx, dy) {
 function selectComponentFit(fits, { readableFontSize, preferredCandidateIndex, maxAlternatives, preferredTolerance, component }) {
   const readableFits = fits.filter((fit) => fit.fontSize >= readableFontSize);
   const eligible = readableFits.length ? readableFits : fits;
-  const largestReadableFont = readableFits.length ? Math.max(...readableFits.map((fit) => fit.fontSize)) : Infinity;
+  // Without a readable fit, gentle arcs still compete against the largest one.
+  const largestReadableFont = Math.max(...eligible.map((fit) => fit.fontSize));
   const eligibleFits = eligible.map(({ gentleArcScore, ...fit }) => ({ ...fit,
     score: Number.isFinite(gentleArcScore) && fit.fontSize >= largestReadableFont * 0.94 ? gentleArcScore : fit.score,
   }));

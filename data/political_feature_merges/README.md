@@ -9,6 +9,12 @@ editable feature in **every** scenario and in the shared base data.
 | `europe_de_fr.v1.json` | Applied plan: 54 groups, 132 members, 78 features removed. |
 | `cn_us_ua_first_review.candidates.json` | Input: first-review dense-country candidates (Hebei, Henan, Anhui, Jiangxi; Texas; central Ukraine) from the 2026-10-21 TNO granularity research. |
 | `cn_us_ua_first_review.v1.json` | Applied plan: 141 groups, 335 members, 194 features removed. |
+| `india_canada_first_review.candidates.json` | Input: India (regional variant over corrected state parents) and Canada (regional variant, minus two unions above 50,000 km²) candidates from the 2026-10-23 TNO granularity research. |
+| `india_canada_first_review.v1.json` | Applied plan: 106 groups, 245 members, 139 features removed. |
+| `europe_russia_wave3.candidates.json` | Input: Codex-reviewed UK, Czechia, Slovakia and Poland candidates (2026-10-21 Europe granularity research), southern/eastern France and the Moscow Reichskommissariat (RKM) parcels in TNO (2026-10-21 granularity pilot), and the remaining Ukraine candidates of the 2026-10-21 dense-country research except `UA_Kherson`, whose parent mixes Crimean source IDs. |
+| `europe_russia_wave3.v1.json` | Applied plan: 271 groups, 655 members, 384 features removed. |
+| `russia_china_wave4.candidates.json` | Input: Russia outside the Moscow Reichskommissariat, generated with the Codex protection engine under the RKM pilot rules, and the Codex 2026-10-21 v2 candidates for Shanxi, Shaanxi, Hunan, Guizhou and Guangxi. Groups whose union has a convex-hull fill below 0.4, an aspect above 3.5 or an area above 50,000 km² are left out. |
+| `russia_china_wave4.v1.json` | Applied plan: 248 groups, 656 members, 408 features removed. |
 
 Plans are applied one after another; their member sets are disjoint, and every
 consumer (quick-fill, tests) reads all `*.v<N>.json` plans.
@@ -25,6 +31,14 @@ together only where every scenario assigns them identically:
   (`data/quick_fill/china_prefecture_crosswalk.v1.json`), including provinces
   not yet released to quick-fill, so county merges never cross a prefecture.
   Unresolved leaves only merge with other unresolved leaves;
+- `political_precision_feature_ids` membership in every topology the apply
+  tool rewrites (base topologies and each scenario runtime topology), so a
+  merge never mixes precision and ordinary parcels;
+- members whose geometry is invalid in any of those topologies are never
+  merged, because the apply tool unions exact coordinates without repair;
+- features with their own `display.fragmentCamouflage` rule in
+  `country_feature_policies.json` are never merged, since a merge would widen
+  or drop that rule;
 - parents and contour supports of reviewed river-paint packs
   (`data/river_partitions/*.json`) are never merged, because their geometry
   fingerprints are part of each approved pack identity.

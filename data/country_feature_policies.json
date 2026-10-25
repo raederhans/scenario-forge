@@ -788,39 +788,30 @@
         {
           "ids": [
             "UKM50",
-            "UKM61",
-            "UKM62",
+            "UK_MRG_32be8ff42d1d",
             "UKM63",
             "UKM64",
             "UKM65",
             "UKM66",
             "UKM71",
-            "UKM72",
+            "UK_MRG_6b5533cccee5",
             "UKM73",
             "UKM75",
-            "UKM76",
-            "UKM77",
+            "UK_MRG_a36fda7ab641",
             "UKM78",
             "UKM81",
             "UKM82",
-            "UKM83",
-            "UKM84",
+            "UK_MRG_3af31571b83c",
             "UKM91",
-            "UKM92",
-            "UKM93",
-            "UKM94",
-            "UKM95"
+            "UKM92"
           ],
           "name": "Scotland"
         },
         {
           "ids": [
-            "UKL11",
-            "UKL12",
-            "UKL13",
+            "UK_MRG_5e86e440be06",
             "UKL14",
-            "UKL15",
-            "UKL16",
+            "UK_MRG_e60d28324bee",
             "UKL17",
             "UKL18",
             "UKL21",
@@ -839,9 +830,7 @@
             "UKN0A",
             "UKN0B",
             "UKN0C",
-            "UKN0D",
-            "UKN0E",
-            "UKN0F",
+            "UK_MRG_4bda76985a93",
             "UKN0G"
           ],
           "name": "Northern Ireland"
