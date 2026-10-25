@@ -1050,3 +1050,70 @@ test("real D3 keeps the world-bounds check when the configured area limit exceed
   assert.equal(diagnostics.isWorldBounds, true);
   assert.equal(diagnostics.invalid, true);
 });
+
+test("real D3 keeps the world-bounds check for edges that round onto a pole", () => {
+  const sandbox = {};
+  vm.runInNewContext(fs.readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), sandbox);
+  const { d3 } = sandbox;
+  const { owner } = createHarness({ d3 });
+  const equator = [[-180, 0], [-90, 0], [0, 0], [90, 0], [180, 0]];
+  // Neither arc reaches a pole, but D3 rounds each one's extreme onto it.
+  const nearAntipodal = owner.getSphericalGeometryDiagnostics({ type: "MultiLineString", coordinates: [
+    [[0, 89], [179.99999, 89]], [[0, -89], [179.99999, -89]], equator,
+  ] });
+  assert.equal(nearAntipodal.isWorldBounds, true);
+  assert.equal(nearAntipodal.invalid, true);
+  // Ends 180° apart just off the equator: the arc crosses the pole even though
+  // the colatitude is nearly a right angle.
+  const equatorialAntipodal = owner.getSphericalGeometryDiagnostics({ type: "MultiLineString", coordinates: [
+    [[-30, 1e-9], [150, 1e-9]], [[-30, -1e-9], [150, -1e-9]], equator,
+  ] });
+  assert.equal(equatorialAntipodal.isWorldBounds, true);
+  assert.equal(equatorialAntipodal.invalid, true);
+
+  const capped = (lat) => [[0, lat * 0.989], [0, lat], [60, lat], [60, lat * 0.989], [0, lat * 0.989]];
+  const north = capped(89.99999999), south = capped(-89.99999999).reverse();
+  const bands = [-180, -60, 60].map((lon) => [[lon, 0], [lon, 10], [lon + 120, 10], [lon + 120, 0], [lon, 0]]);
+  const polarCaps = owner.getSphericalGeometryDiagnostics({ type: "MultiPolygon", coordinates: [[north], [south], ...bands.map((ring) => [ring])] });
+  assert.equal(polarCaps.hasExcessiveSphereArea, false);
+  assert.equal(polarCaps.isWorldBounds, true);
+  assert.equal(polarCaps.invalid, true);
+});
+
+test("real D3 bounds of accepted near-polar edges never touch a pole", () => {
+  const sandbox = {};
+  vm.runInNewContext(fs.readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), sandbox);
+  const { d3 } = sandbox;
+  const geoBounds = d3.geoBounds;
+  let boundsChecked = 0, accepted = 0;
+  const { owner } = createHarness({ d3: { geoArea: d3.geoArea, geoBounds: (geometry) => { boundsChecked += 1; return geoBounds(geometry); } } });
+  let seed = 7;
+  const random = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+  const sign = () => (random() < 0.5 ? 1 : -1);
+  const latitude = () => {
+    const kind = random();
+    if (kind < 0.5) return sign() * (90 - 10 ** (-1 - random() * 10));
+    if (kind < 0.7) return sign() * 10 ** (-1 - random() * 12);
+    return random() * 180 - 90;
+  };
+  const longitude = (from) => {
+    const kind = random();
+    const span = kind < 0.15 ? 180 : kind < 0.6 ? 180 - 10 ** (-random() * 13) : random() * 120;
+    return Math.max(-180, Math.min(180, ((from + (random() < 0.5 ? span : -span) + 540) % 360) - 180));
+  };
+  for (let index = 0; index < 20000; index += 1) {
+    const a = [random() * 360 - 180, latitude()];
+    const b = [longitude(a[0]), random() < 0.5 ? a[1] : latitude()];
+    const geometry = index % 2
+      ? { type: "LineString", coordinates: [a, b] }
+      : { type: "Polygon", coordinates: [[a, [a[0], b[1]], b, [b[0], a[1]], a]] };
+    const before = boundsChecked;
+    const diagnostics = owner.getSphericalGeometryDiagnostics(geometry);
+    if (boundsChecked !== before) continue;
+    accepted += 1;
+    const [[, south], [, north]] = geoBounds(geometry);
+    assert.ok(south > -90 && north < 90, `skipped bounds touch a pole: ${JSON.stringify(geometry.coordinates)}`);
+    assert.equal(diagnostics.invalid, false);
+  }
+  assert.ok(accepted > 2000, `too few edges took the fast path: ${accepted}`);
+});
