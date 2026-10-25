@@ -35,7 +35,8 @@ from an earlier plan that applies to every scenario of the later one.
 scenarios. Owners, cores and HOI4 states come from those scenarios alone, and
 contiguity must hold in each of them. A scope names both HOI4 scenarios or
 neither. Hierarchy, quick-fill, China prefecture and every protection rule stay
-global. The plan tool refuses a candidate member that an applied plan already
+global, except river-paint packs: they belong to one scenario (`sceneId`), so
+only a scope that includes it protects their parcels. The plan tool refuses a candidate member that an applied plan already
 merged away in any scenario of the new scope. The apply tool then:
 
 - leaves the base topologies, `hierarchy.json` and the China crosswalk

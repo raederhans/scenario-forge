@@ -64,6 +64,10 @@ GLOBAL_PROJECTED = (
 # Scenarios that read each projected global file. A scoped plan projects a file only
 # when it covers every reader; cities keep their members and fall back to the scenario tag.
 GLOBAL_READERS = {
+    # The vanilla catalog is the default for every scenario without its own releasable_catalog_url;
+    # TNO 1962 names its own catalog.
+    "releasables/hoi4_vanilla.internal.phase1.catalog.json": ("blank_base", "hoi4_1936", "hoi4_1939", "modern_world"),
+    "releasables/hoi4_vanilla.internal.phase1.source.json": ("blank_base", "hoi4_1936", "hoi4_1939", "modern_world"),
     "releasables/tno_1962.internal.phase1.catalog.json": ("tno_1962",),
     "releasables/tno_1962.internal.phase1.source.json": ("tno_1962",),
 }

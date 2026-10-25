@@ -311,17 +311,20 @@ def fragment_camouflage_feature_ids() -> set[str]:
     return {str(feature_id) for rule in rules for feature_id in rule.get("featureIds") or []}
 
 
-def river_paint_feature_ids() -> set[str]:
+def river_paint_feature_ids(scenarios: tuple[str, ...] | None = None) -> set[str]:
     """Parents and contour supports of reviewed river-paint packs.
 
     Their geometry fingerprints are part of each approved pack identity, so
-    merging them would invalidate reviewed river cells.
+    merging them would invalidate reviewed river cells. A scoped plan only
+    rewrites its own scenarios, so packs of other scenarios stay intact.
     """
     ids: set[str] = set()
     for path in sorted(RIVER_PARTITIONS.glob("*.json")):
         if path.name.endswith(".transport.json"):
             continue
         pack = read_json(path)
+        if scenarios is not None and pack.get("sceneId") not in scenarios:
+            continue
         for key in ("parents", "support"):
             ids.update(str(row["parentId"]) for row in pack.get(key) or [])
     return ids
@@ -390,7 +393,7 @@ def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None, 
     memberships, name_sources = group_memberships(hierarchy), load_name_sources()
     scoped_leaves, scoped_final = scoped_lineage(scenarios) if scenarios is not None else ({}, {})
     inherit_leaf_assignments(scoped_leaves, memberships, tables["china_prefecture"])
-    protected = set(candidates.get("protected_feature_ids") or []) | river_paint_feature_ids() | fragment_camouflage_feature_ids()
+    protected = set(candidates.get("protected_feature_ids") or []) | river_paint_feature_ids(scenarios) | fragment_camouflage_feature_ids()
     protected |= invalid_geometry_ids({member for candidate in candidates["candidates"] for member in candidate["member_ids"]},
                                       rewritten_topologies(scenarios))
     groups, splits = [], []
