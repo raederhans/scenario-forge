@@ -2278,7 +2278,7 @@
       "continent_label": "Europe",
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 550,
+      "feature_count": 479,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -5780,7 +5780,7 @@
       "continent_label": "Europe",
       "display_name": "Poland",
       "entry_kind": "",
-      "feature_count": 304,
+      "feature_count": 250,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [

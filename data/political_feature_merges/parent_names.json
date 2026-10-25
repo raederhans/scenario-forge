@@ -204,6 +204,14 @@
       "en": "Kuyavian-Pomeranian",
       "zh": "库亚维-滨海省"
     },
+    "PL_Lesser_Poland": {
+      "en": "Lesser Poland",
+      "zh": "小波兰省"
+    },
+    "PL_Lodz": {
+      "en": "Łódź",
+      "zh": "罗兹省"
+    },
     "PL_Lower_Silesian": {
       "en": "Lower Silesian",
       "zh": "下西里西亚省"
@@ -212,9 +220,41 @@
       "en": "Lublin",
       "zh": "卢布林省"
     },
+    "PL_Lubusz": {
+      "en": "Lubusz",
+      "zh": "卢布斯卡省"
+    },
+    "PL_Masovian": {
+      "en": "Masovian",
+      "zh": "马佐夫舍省"
+    },
+    "PL_Opole": {
+      "en": "Opole",
+      "zh": "奥波莱省"
+    },
+    "PL_Podlaskie": {
+      "en": "Podlaskie",
+      "zh": "波德拉谢省"
+    },
+    "PL_Pomeranian": {
+      "en": "Pomeranian",
+      "zh": "滨海省"
+    },
+    "PL_Silesian": {
+      "en": "Silesian",
+      "zh": "西里西亚省"
+    },
+    "PL_Subcarpathian": {
+      "en": "Subcarpathian",
+      "zh": "喀尔巴阡山省"
+    },
     "PL_Warmian_Masurian": {
       "en": "Warmian-Masurian",
       "zh": "瓦尔米亚-马祖里省"
+    },
+    "PL_West_Pomeranian": {
+      "en": "West Pomeranian",
+      "zh": "西滨海省"
     },
     "RU_Altai_Republic": {
       "en": "Altai Krai",

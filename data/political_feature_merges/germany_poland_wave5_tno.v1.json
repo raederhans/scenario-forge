@@ -1,0 +1,2180 @@
+{
+  "schema_version": 1,
+  "plan_id": "germany_poland_wave5_tno.v1",
+  "candidate_source": "data/political_feature_merges/germany_poland_wave5_tno.candidates.json",
+  "scenarios": [
+    "tno_1962"
+  ],
+  "constraints": [
+    "owners",
+    "cores",
+    "strategic_value_buckets",
+    "hierarchy_groups",
+    "quick_fill_groups",
+    "china_crosswalk_prefecture",
+    "precision_tier",
+    "valid_member_geometry",
+    "fragment_camouflage_unchanged",
+    "river_paint_parcels_unchanged",
+    "contiguous"
+  ],
+  "ownership_scenarios": [
+    "tno_1962"
+  ],
+  "strategic_scenarios": [],
+  "counts": {
+    "candidates": 63,
+    "groups": 54,
+    "merged_members": 272,
+    "features_removed": 218,
+    "split_or_reduced_candidates": 9
+  },
+  "groups": [
+    {
+      "id": "DE_MRG_f070f3674dfa",
+      "member_ids": [
+        "DE117",
+        "DE127",
+        "DE137",
+        "DE141",
+        "DE143",
+        "DE_MRG_a27167ef8f23",
+        "DE_MRG_d0e3890ae1d5"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg",
+      "names": {
+        "en": "Baden-Württemberg · Central",
+        "zh": "巴登-符腾堡州·中部"
+      },
+      "member_names": {
+        "DE117": {
+          "en": "Heilbronn, Stadtkreis",
+          "zh": "海尔布隆市区"
+        },
+        "DE127": {
+          "en": "Neckar-Odenwald-Kreis",
+          "zh": "内卡-奥登瓦尔德区"
+        },
+        "DE137": {
+          "en": "Tuttlingen",
+          "zh": "图特林根"
+        },
+        "DE141": {
+          "en": "Reutlingen",
+          "zh": "罗伊特林根"
+        },
+        "DE143": {
+          "en": "Zollernalbkreis",
+          "zh": "佐勒纳尔布县"
+        },
+        "DE_MRG_a27167ef8f23": {
+          "en": "Ludwigsburg",
+          "zh": "路德维希堡"
+        },
+        "DE_MRG_d0e3890ae1d5": {
+          "en": "Böblingen",
+          "zh": "伯布林根"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_3d2c992489d7",
+      "member_ids": [
+        "DE11C",
+        "DE144",
+        "DE145",
+        "DE_MRG_c9a9f2cd9548",
+        "DE_MRG_e87b9124c03f"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg",
+      "names": {
+        "en": "Baden-Württemberg · Northeast",
+        "zh": "巴登-符腾堡州·东北部"
+      },
+      "member_names": {
+        "DE11C": {
+          "en": "Heidenheim",
+          "zh": "海登海姆"
+        },
+        "DE144": {
+          "en": "Ulm, Stadtkreis",
+          "zh": "乌尔姆市区"
+        },
+        "DE145": {
+          "en": "Alb-Donau-Kreis",
+          "zh": "阿尔布-多瑙-克雷斯"
+        },
+        "DE_MRG_c9a9f2cd9548": {
+          "en": "Esslingen",
+          "zh": "埃斯林根"
+        },
+        "DE_MRG_e87b9124c03f": {
+          "en": "Ostalbkreis",
+          "zh": "奥斯塔布克赖斯"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_71c87ea87bb8",
+      "member_ids": [
+        "DE146",
+        "DE148",
+        "DE149"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg",
+      "names": {
+        "en": "Baden-Württemberg · Southeast",
+        "zh": "巴登-符腾堡州·东南部"
+      },
+      "member_names": {
+        "DE146": {
+          "en": "Biberach",
+          "zh": "比伯拉赫"
+        },
+        "DE148": {
+          "en": "Ravensburg",
+          "zh": "拉芬斯堡"
+        },
+        "DE149": {
+          "en": "Sigmaringen",
+          "zh": "西格马林根"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_627c28127d09",
+      "member_ids": [
+        "DE123",
+        "DE128",
+        "DE129",
+        "DE12B",
+        "DE135",
+        "DE_MRG_68ba87808df8"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg",
+      "names": {
+        "en": "Baden-Württemberg · Northwest",
+        "zh": "巴登-符腾堡州·西北部"
+      },
+      "member_names": {
+        "DE123": {
+          "en": "Karlsruhe, Landkreis",
+          "zh": "卡尔斯鲁厄区"
+        },
+        "DE128": {
+          "en": "Rhein-Neckar-Kreis",
+          "zh": "莱茵-内卡地区"
+        },
+        "DE129": {
+          "en": "Pforzheim, Stadtkreis",
+          "zh": "普福尔茨海姆市区"
+        },
+        "DE12B": {
+          "en": "Enzkreis",
+          "zh": "恩兹克莱斯"
+        },
+        "DE135": {
+          "en": "Rottweil",
+          "zh": "罗特韦尔"
+        },
+        "DE_MRG_68ba87808df8": {
+          "en": "Calw",
+          "zh": "卡尔夫"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_dad579df8df6",
+      "member_ids": [
+        "DE711",
+        "DE713",
+        "DE715",
+        "DE717",
+        "DE71B",
+        "DE71D",
+        "DE_MRG_77741e43de3f",
+        "DE_MRG_e2f350a636b5"
+      ],
+      "parent_id": "DE_Hessen",
+      "names": {
+        "en": "Hesse · Southwest",
+        "zh": "黑森州·西南部"
+      },
+      "member_names": {
+        "DE711": {
+          "en": "Darmstadt, Kreisfreie Stadt",
+          "zh": "达姆施塔特, 自由城"
+        },
+        "DE713": {
+          "en": "Offenbach am Main, Kreisfreie Stadt",
+          "zh": "美因河畔奥芬巴赫，无区市"
+        },
+        "DE715": {
+          "en": "Bergstraße",
+          "zh": "伯格大街"
+        },
+        "DE717": {
+          "en": "Groß-Gerau",
+          "zh": "大盖劳"
+        },
+        "DE71B": {
+          "en": "Odenwaldkreis",
+          "zh": "奥登瓦尔德区"
+        },
+        "DE71D": {
+          "en": "Rheingau-Taunus-Kreis",
+          "zh": "莱茵高-陶努斯地区"
+        },
+        "DE_MRG_77741e43de3f": {
+          "en": "Offenbach, Landkreis",
+          "zh": "奥芬巴赫区"
+        },
+        "DE_MRG_e2f350a636b5": {
+          "en": "Hochtaunuskreis",
+          "zh": "上陶努斯克雷斯"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_6c5feb42bb1d",
+      "member_ids": [
+        "DE724",
+        "DE_MRG_3b750624bff4",
+        "DE_MRG_e2617eca3f85"
+      ],
+      "parent_id": "DE_Hessen",
+      "names": {
+        "en": "Hesse · Central",
+        "zh": "黑森州·中部"
+      },
+      "member_names": {
+        "DE724": {
+          "en": "Marburg-Biedenkopf",
+          "zh": "马尔堡-比登科普夫"
+        },
+        "DE_MRG_3b750624bff4": {
+          "en": "Lahn-Dill-Kreis",
+          "zh": "兰迪尔区"
+        },
+        "DE_MRG_e2617eca3f85": {
+          "en": "Gießen",
+          "zh": "吉森"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_4000ef7b1fc9",
+      "member_ids": [
+        "DE_MRG_33b1389d946f",
+        "DE_MRG_d561808c92a5"
+      ],
+      "parent_id": "DE_Hessen",
+      "names": {
+        "en": "Hesse · Northeast 1",
+        "zh": "黑森州·东北部1"
+      },
+      "member_names": {
+        "DE_MRG_33b1389d946f": {
+          "en": "Schwalm-Eder-Kreis",
+          "zh": "施瓦尔姆-埃德圆"
+        },
+        "DE_MRG_d561808c92a5": {
+          "en": "Fulda",
+          "zh": "富尔达"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_e2376e215153",
+      "member_ids": [
+        "DE734",
+        "DE737"
+      ],
+      "parent_id": "DE_Hessen",
+      "names": {
+        "en": "Hesse · Northeast 2",
+        "zh": "黑森州·东北部2"
+      },
+      "member_names": {
+        "DE734": {
+          "en": "Kassel, Landkreis",
+          "zh": "卡塞尔区"
+        },
+        "DE737": {
+          "en": "Werra-Meißner-Kreis",
+          "zh": "韦拉-迈斯纳区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_7165d0e64b22",
+      "member_ids": [
+        "DE911",
+        "DE912",
+        "DE913",
+        "DE925",
+        "DE_MRG_46ade2104d23",
+        "DE_MRG_4ab0c6062d32",
+        "DE_MRG_4fdd27cf49f7"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Lower Saxony · Southeast 1",
+        "zh": "下萨克森州·东南部1"
+      },
+      "member_names": {
+        "DE911": {
+          "en": "Braunschweig, Kreisfreie Stadt",
+          "zh": "布伦瑞克, 克莱斯自由城"
+        },
+        "DE912": {
+          "en": "Salzgitter, Kreisfreie Stadt",
+          "zh": "萨尔茨吉特，无区市"
+        },
+        "DE913": {
+          "en": "Wolfsburg, Kreisfreie Stadt",
+          "zh": "沃尔夫斯堡，独立城市"
+        },
+        "DE925": {
+          "en": "Hildesheim",
+          "zh": "希尔德斯海姆"
+        },
+        "DE_MRG_46ade2104d23": {
+          "en": "Wolfenbüttel",
+          "zh": "沃尔芬比特尔"
+        },
+        "DE_MRG_4ab0c6062d32": {
+          "en": "Northeim",
+          "zh": "诺特海姆"
+        },
+        "DE_MRG_4fdd27cf49f7": {
+          "en": "Schaumburg",
+          "zh": "绍姆堡"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_31e7d8731feb",
+      "member_ids": [
+        "DE936",
+        "DE_MRG_698a45847033"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Lower Saxony · North 2",
+        "zh": "下萨克森州·北部2"
+      },
+      "member_names": {
+        "DE936": {
+          "en": "Osterholz",
+          "zh": "奥斯特霍尔茨"
+        },
+        "DE_MRG_698a45847033": {
+          "en": "Rotenburg (Wümme)",
+          "zh": "罗滕堡 (乌姆)"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_ad30df0f83f2",
+      "member_ids": [
+        "DE93A",
+        "DE_MRG_9e1fff10ce51"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Lower Saxony · East",
+        "zh": "下萨克森州·东部"
+      },
+      "member_names": {
+        "DE93A": {
+          "en": "Uelzen",
+          "zh": "于尔岑"
+        },
+        "DE_MRG_9e1fff10ce51": {
+          "en": "Gifhorn",
+          "zh": "吉夫霍恩"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_9f7a3fcacc08",
+      "member_ids": [
+        "DE941",
+        "DE_MRG_5dd80c1fcf77",
+        "DE_MRG_830e5845fb60"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Lower Saxony · Central",
+        "zh": "下萨克森州·中部"
+      },
+      "member_names": {
+        "DE941": {
+          "en": "Delmenhorst, Kreisfreie Stadt",
+          "zh": "德尔门霍斯特（独立城市）"
+        },
+        "DE_MRG_5dd80c1fcf77": {
+          "en": "Celle",
+          "zh": "策勒"
+        },
+        "DE_MRG_830e5845fb60": {
+          "en": "Diepholz",
+          "zh": "迪普霍尔茨"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_b3d2cb60c548",
+      "member_ids": [
+        "DE916",
+        "DE91C"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Lower Saxony · Southeast 2",
+        "zh": "下萨克森州·东南部2"
+      },
+      "member_names": {
+        "DE916": {
+          "en": "Goslar",
+          "zh": "戈斯拉尔"
+        },
+        "DE91C": {
+          "en": "Göttingen",
+          "zh": "哥廷根"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_a9aef085e5ee",
+      "member_ids": [
+        "DE932",
+        "DE933",
+        "DE935",
+        "DE939"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Lower Saxony · North 1",
+        "zh": "下萨克森州·北部1"
+      },
+      "member_names": {
+        "DE932": {
+          "en": "Cuxhaven",
+          "zh": "库克斯港"
+        },
+        "DE933": {
+          "en": "Harburg",
+          "zh": "哈尔堡"
+        },
+        "DE935": {
+          "en": "Lüneburg, Landkreis",
+          "zh": "吕讷堡区"
+        },
+        "DE939": {
+          "en": "Stade",
+          "zh": "施塔德"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_49bfd3282189",
+      "member_ids": [
+        "DE942",
+        "DE943",
+        "DE944",
+        "DE945",
+        "DE94D",
+        "DE_MRG_3a19ae12c637",
+        "DE_MRG_67a8450f3c9f",
+        "DE_MRG_c922c0ebada5"
+      ],
+      "parent_id": "DE_Niedersachsen",
+      "names": {
+        "en": "Lower Saxony · West",
+        "zh": "下萨克森州·西部"
+      },
+      "member_names": {
+        "DE942": {
+          "en": "Emden, Kreisfreie Stadt",
+          "zh": "埃姆登, 克莱斯自由城"
+        },
+        "DE943": {
+          "en": "Oldenburg (Oldenburg), Kreisfreie Stadt",
+          "zh": "奥尔登堡（独立城市）"
+        },
+        "DE944": {
+          "en": "Osnabrück, Kreisfreie Stadt",
+          "zh": "奥斯纳布吕克，无区城市"
+        },
+        "DE945": {
+          "en": "Wilhelmshaven, Kreisfreie Stadt",
+          "zh": "威廉港，无区市"
+        },
+        "DE94D": {
+          "en": "Oldenburg, Landkreis",
+          "zh": "奥尔登堡区"
+        },
+        "DE_MRG_3a19ae12c637": {
+          "en": "Aurich",
+          "zh": "奥里希"
+        },
+        "DE_MRG_67a8450f3c9f": {
+          "en": "Ammerland",
+          "zh": "阿默兰"
+        },
+        "DE_MRG_c922c0ebada5": {
+          "en": "Osnabrück, Landkreis",
+          "zh": "奥斯纳布吕克区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_29a5db20c272",
+      "member_ids": [
+        "DEA14",
+        "DEA16",
+        "DEA17",
+        "DEA18",
+        "DEA19",
+        "DEA1C",
+        "DEA1D",
+        "DEA1F",
+        "DEA24",
+        "DEA26",
+        "DEA27",
+        "DEA2A",
+        "DEA2B",
+        "DEA2C",
+        "DEA31"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen",
+      "names": {
+        "en": "North Rhine-Westphalia · Southwest",
+        "zh": "北莱茵-威斯特法伦州·西南部"
+      },
+      "member_names": {
+        "DEA14": {
+          "en": "Krefeld, Kreisfreie Stadt",
+          "zh": "克雷菲尔德，独立城市"
+        },
+        "DEA16": {
+          "en": "Mülheim an der Ruhr, Kreisfreie Stadt",
+          "zh": "鲁尔河畔米尔海姆，无区市"
+        },
+        "DEA17": {
+          "en": "Oberhausen, Kreisfreie Stadt",
+          "zh": "奥伯豪森，独立城市"
+        },
+        "DEA18": {
+          "en": "Remscheid, Kreisfreie Stadt",
+          "zh": "雷姆沙伊德，无区市"
+        },
+        "DEA19": {
+          "en": "Solingen, Kreisfreie Stadt",
+          "zh": "索林根，独立城市"
+        },
+        "DEA1C": {
+          "en": "Mettmann",
+          "zh": "梅特曼"
+        },
+        "DEA1D": {
+          "en": "Rhein-Kreis Neuss",
+          "zh": "莱茵河区诺伊斯"
+        },
+        "DEA1F": {
+          "en": "Wesel",
+          "zh": "韦塞尔"
+        },
+        "DEA24": {
+          "en": "Leverkusen, Kreisfreie Stadt",
+          "zh": "勒沃库森，独立城市"
+        },
+        "DEA26": {
+          "en": "Düren",
+          "zh": "迪伦"
+        },
+        "DEA27": {
+          "en": "Rhein-Erft-Kreis",
+          "zh": "莱茵-埃尔夫特区"
+        },
+        "DEA2A": {
+          "en": "Oberbergischer Kreis",
+          "zh": "奥伯贝格区"
+        },
+        "DEA2B": {
+          "en": "Rheinisch-Bergischer Kreis",
+          "zh": "莱茵-贝尔吉舍县"
+        },
+        "DEA2C": {
+          "en": "Rhein-Sieg-Kreis",
+          "zh": "莱茵-锡格区"
+        },
+        "DEA31": {
+          "en": "Bottrop, Kreisfreie Stadt",
+          "zh": "博特罗普, 克莱斯自由城"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_a9c190d720fe",
+      "member_ids": [
+        "DEA36",
+        "DEA44",
+        "DEA47",
+        "DEA53",
+        "DEA54",
+        "DEA55",
+        "DEA56",
+        "DEA58",
+        "DE_MRG_70752f860917",
+        "DE_MRG_9410ac111320"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen",
+      "names": {
+        "en": "North Rhine-Westphalia · Northeast 1",
+        "zh": "北莱茵-威斯特法伦州·东北部1"
+      },
+      "member_names": {
+        "DEA36": {
+          "en": "Recklinghausen",
+          "zh": "雷克林豪森"
+        },
+        "DEA44": {
+          "en": "Höxter",
+          "zh": "赫克斯特"
+        },
+        "DEA47": {
+          "en": "Paderborn",
+          "zh": "帕德博恩"
+        },
+        "DEA53": {
+          "en": "Hagen, Kreisfreie Stadt",
+          "zh": "哈根，无区市"
+        },
+        "DEA54": {
+          "en": "Hamm, Kreisfreie Stadt",
+          "zh": "哈姆，独立城市"
+        },
+        "DEA55": {
+          "en": "Herne, Kreisfreie Stadt",
+          "zh": "赫恩，独立城市"
+        },
+        "DEA56": {
+          "en": "Ennepe-Ruhr-Kreis",
+          "zh": "埃内普-鲁尔-县"
+        },
+        "DEA58": {
+          "en": "Märkischer Kreis",
+          "zh": "马克雪县"
+        },
+        "DE_MRG_70752f860917": {
+          "en": "Unna",
+          "zh": "离开"
+        },
+        "DE_MRG_9410ac111320": {
+          "en": "Gütersloh",
+          "zh": "居特斯洛"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_330d1045d5ff",
+      "member_ids": [
+        "DEA5A",
+        "DE_MRG_6f627c55e7bd"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen",
+      "names": {
+        "en": "North Rhine-Westphalia · Southeast",
+        "zh": "北莱茵-威斯特法伦州·东南部"
+      },
+      "member_names": {
+        "DEA5A": {
+          "en": "Siegen-Wittgenstein",
+          "zh": "齐根-维特根斯坦"
+        },
+        "DE_MRG_6f627c55e7bd": {
+          "en": "Soest",
+          "zh": "索斯特"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_262d5b07c5d7",
+      "member_ids": [
+        "DEA45",
+        "DE_MRG_5adb00f4a83d"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen",
+      "names": {
+        "en": "North Rhine-Westphalia · Northeast 2",
+        "zh": "北莱茵-威斯特法伦州·东北部2"
+      },
+      "member_names": {
+        "DEA45": {
+          "en": "Lippe",
+          "zh": "嘴唇"
+        },
+        "DE_MRG_5adb00f4a83d": {
+          "en": "Minden-Lübbecke",
+          "zh": "明登-吕贝克"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_f39dea3fad08",
+      "member_ids": [
+        "DEB12",
+        "DEB13",
+        "DEB18"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz",
+      "names": {
+        "en": "Rhineland-Palatinate · North",
+        "zh": "莱茵兰-普法尔茨州·北部"
+      },
+      "member_names": {
+        "DEB12": {
+          "en": "Ahrweiler",
+          "zh": "阿尔韦勒"
+        },
+        "DEB13": {
+          "en": "Altenkirchen (Westerwald)",
+          "zh": "阿尔滕基兴 (韦斯特瓦尔德)"
+        },
+        "DEB18": {
+          "en": "Neuwied",
+          "zh": "纽维德"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_2783e6e8c42b",
+      "member_ids": [
+        "DEB14",
+        "DEB1C",
+        "DEB1D",
+        "DEB3D",
+        "DE_MRG_bceaa37f49ef",
+        "DE_MRG_c6f2d9d3d036"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz",
+      "names": {
+        "en": "Rhineland-Palatinate · Central",
+        "zh": "莱茵兰-普法尔茨州·中部"
+      },
+      "member_names": {
+        "DEB14": {
+          "en": "Bad Kreuznach",
+          "zh": "巴特克罗伊茨纳赫"
+        },
+        "DEB1C": {
+          "en": "Cochem-Zell",
+          "zh": "科赫姆-采尔"
+        },
+        "DEB1D": {
+          "en": "Rhein-Hunsrück-Kreis",
+          "zh": "莱茵-洪斯吕克区"
+        },
+        "DEB3D": {
+          "en": "Donnersbergkreis",
+          "zh": "多纳斯贝格区"
+        },
+        "DE_MRG_bceaa37f49ef": {
+          "en": "Kaiserslautern, Kreisfreie Stadt",
+          "zh": "凯撒斯劳滕，独立城市"
+        },
+        "DE_MRG_c6f2d9d3d036": {
+          "en": "Bernkastel-Wittlich",
+          "zh": "贝恩卡斯特尔-维特利希"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_1df83dc7f94e",
+      "member_ids": [
+        "DEB17",
+        "DEB1A",
+        "DEB1B",
+        "DEB35",
+        "DEB39",
+        "DE_MRG_ea826ec181b8"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz",
+      "names": {
+        "en": "Rhineland-Palatinate · Northeast",
+        "zh": "莱茵兰-普法尔茨州·东北部"
+      },
+      "member_names": {
+        "DEB17": {
+          "en": "Mayen-Koblenz",
+          "zh": "马延-科布伦茨"
+        },
+        "DEB1A": {
+          "en": "Rhein-Lahn-Kreis",
+          "zh": "莱茵-拉恩区"
+        },
+        "DEB1B": {
+          "en": "Westerwaldkreis",
+          "zh": "韦斯特瓦尔德县"
+        },
+        "DEB35": {
+          "en": "Mainz, Kreisfreie Stadt",
+          "zh": "美因茨，独立城市"
+        },
+        "DEB39": {
+          "en": "Worms, Kreisfreie Stadt",
+          "zh": "蠕虫，独立城市"
+        },
+        "DE_MRG_ea826ec181b8": {
+          "en": "Mainz-Bingen",
+          "zh": "美因茨-宾根"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_734ca34a5700",
+      "member_ids": [
+        "DEB31",
+        "DEB33",
+        "DEB34",
+        "DEB36",
+        "DEB38",
+        "DEB3C",
+        "DEB3I"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz",
+      "names": {
+        "en": "Rhineland-Palatinate · Southeast",
+        "zh": "莱茵兰-普法尔茨州·东南部"
+      },
+      "member_names": {
+        "DEB31": {
+          "en": "Frankenthal (Pfalz), Kreisfreie Stadt",
+          "zh": "弗兰肯塔尔 (普法尔茨), 克莱斯自由城"
+        },
+        "DEB33": {
+          "en": "Landau in der Pfalz, Kreisfreie Stadt",
+          "zh": "兰道（Landau），普法尔茨州无区市"
+        },
+        "DEB34": {
+          "en": "Ludwigshafen am Rhein, Kreisfreie Stadt",
+          "zh": "莱茵河畔路德维希港，无区市"
+        },
+        "DEB36": {
+          "en": "Neustadt an der Weinstraße, Kreisfreie Stadt",
+          "zh": "Neustadt an der Weinstraße，无区城市"
+        },
+        "DEB38": {
+          "en": "Speyer, Kreisfreie Stadt",
+          "zh": "施派尔，独立城市"
+        },
+        "DEB3C": {
+          "en": "Bad Dürkheim",
+          "zh": "巴特迪克海姆"
+        },
+        "DEB3I": {
+          "en": "Rhein-Pfalz-Kreis",
+          "zh": "莱茵-普法尔茨州"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_0fbf2afc9b39",
+      "member_ids": [
+        "DEC03",
+        "DEC06"
+      ],
+      "parent_id": "DE_Saarland",
+      "names": {
+        "en": "Saarland · Northeast",
+        "zh": "萨尔州·东北部"
+      },
+      "member_names": {
+        "DEC03": {
+          "en": "Neunkirchen",
+          "zh": "诺因基兴"
+        },
+        "DEC06": {
+          "en": "St. Wendel",
+          "zh": "圣温德尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_5f2116b1dec1",
+      "member_ids": [
+        "DEG01",
+        "DEG02",
+        "DEG03",
+        "DEG0C",
+        "DEG0L",
+        "DE_MRG_b86ffe1dd2ea",
+        "DE_MRG_c90ee890d36c"
+      ],
+      "parent_id": "DE_Th_ringen",
+      "names": {
+        "en": "Thuringia · Northeast",
+        "zh": "图林根州·东北部"
+      },
+      "member_names": {
+        "DEG01": {
+          "en": "Erfurt, Kreisfreie Stadt",
+          "zh": "爱尔福特, 自由城"
+        },
+        "DEG02": {
+          "en": "Gera, Kreisfreie Stadt",
+          "zh": "格拉，独立城市"
+        },
+        "DEG03": {
+          "en": "Jena, Kreisfreie Stadt",
+          "zh": "耶拿，独立城市"
+        },
+        "DEG0C": {
+          "en": "Gotha",
+          "zh": "哥达"
+        },
+        "DEG0L": {
+          "en": "Greiz",
+          "zh": "格赖兹"
+        },
+        "DE_MRG_b86ffe1dd2ea": {
+          "en": "Nordhausen",
+          "zh": "诺德豪森"
+        },
+        "DE_MRG_c90ee890d36c": {
+          "en": "Saale-Holzland-Kreis",
+          "zh": "萨勒-霍尔茨兰区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "DE_MRG_20201cf9567d",
+      "member_ids": [
+        "DEG06",
+        "DEG0H",
+        "DE_MRG_98e486211a34",
+        "DE_MRG_ac1a1840dec2",
+        "DE_MRG_cc565c282846"
+      ],
+      "parent_id": "DE_Th_ringen",
+      "names": {
+        "en": "Thuringia · Central",
+        "zh": "图林根州·中部"
+      },
+      "member_names": {
+        "DEG06": {
+          "en": "Eichsfeld",
+          "zh": "艾希斯菲尔德"
+        },
+        "DEG0H": {
+          "en": "Sonneberg",
+          "zh": "索内贝格"
+        },
+        "DE_MRG_98e486211a34": {
+          "en": "Schmalkalden-Meiningen",
+          "zh": "施马尔卡尔登-迈宁根"
+        },
+        "DE_MRG_ac1a1840dec2": {
+          "en": "Saalfeld-Rudolstadt",
+          "zh": "萨尔费尔德-鲁多尔施塔特"
+        },
+        "DE_MRG_cc565c282846": {
+          "en": "Wartburgkreis",
+          "zh": "瓦尔特堡区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_cb41a08029c6",
+      "member_ids": [
+        "PL_MRG_05ddd04cc90f",
+        "PL_MRG_e17e448ae4e2",
+        "PL_POW_0610"
+      ],
+      "parent_id": "PL_Lublin",
+      "names": {
+        "en": "Lublin · Southwest",
+        "zh": "卢布林省·西南部"
+      },
+      "member_names": {
+        "PL_MRG_05ddd04cc90f": {
+          "en": "kraśnicki",
+          "zh": "克拉希尼基"
+        },
+        "PL_MRG_e17e448ae4e2": {
+          "en": "lubelski (Lublin)",
+          "zh": "卢布林（卢布林省）"
+        },
+        "PL_POW_0610": {
+          "en": "łęczyński",
+          "zh": "文钦斯基"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_4df6ad2dc703",
+      "member_ids": [
+        "PL_MRG_4a2bfb6b173f",
+        "PL_POW_0664"
+      ],
+      "parent_id": "PL_Lublin",
+      "names": {
+        "en": "Lublin · South",
+        "zh": "卢布林省·南部"
+      },
+      "member_names": {
+        "PL_MRG_4a2bfb6b173f": {
+          "en": "zamojski",
+          "zh": "扎莫希奇"
+        },
+        "PL_POW_0664": {
+          "en": "Zamość",
+          "zh": "扎莫施"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_c5cfb391c06f",
+      "member_ids": [
+        "PL_MRG_57a0cb6e8d35",
+        "PL_MRG_8d9132641197"
+      ],
+      "parent_id": "PL_Lublin",
+      "names": {
+        "en": "Lublin · Northwest",
+        "zh": "卢布林省·西北部"
+      },
+      "member_names": {
+        "PL_MRG_57a0cb6e8d35": {
+          "en": "puławski",
+          "zh": "普瓦夫斯基"
+        },
+        "PL_MRG_8d9132641197": {
+          "en": "łukowski",
+          "zh": "卢科夫斯基"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_be82540e6cf0",
+      "member_ids": [
+        "PL_MRG_18fdfa02eca5",
+        "PL_MRG_eea8a1b754f3"
+      ],
+      "parent_id": "PL_Greater_Poland",
+      "names": {
+        "en": "Greater Poland · North",
+        "zh": "大波兰省·北部"
+      },
+      "member_names": {
+        "PL_MRG_18fdfa02eca5": {
+          "en": "szamotulski",
+          "zh": "沙莫图维"
+        },
+        "PL_MRG_eea8a1b754f3": {
+          "en": "gnieźnieński",
+          "zh": "格涅兹诺"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_36976cf4d062",
+      "member_ids": [
+        "PL_MRG_20e2ba9602ff",
+        "PL_MRG_d48e8dc37f33"
+      ],
+      "parent_id": "PL_Greater_Poland",
+      "names": {
+        "en": "Greater Poland · East",
+        "zh": "大波兰省·东部"
+      },
+      "member_names": {
+        "PL_MRG_20e2ba9602ff": {
+          "en": "kaliski (Greater Poland)",
+          "zh": "卡利什（大波兰省）"
+        },
+        "PL_MRG_d48e8dc37f33": {
+          "en": "koniński",
+          "zh": "科宁斯基"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_d33963acec0d",
+      "member_ids": [
+        "PL_MRG_3384b03f3b03",
+        "PL_MRG_d07f84128518",
+        "PL_MRG_ec5519b4d3cf",
+        "PL_POW_3061"
+      ],
+      "parent_id": "PL_Greater_Poland",
+      "names": {
+        "en": "Greater Poland · Central",
+        "zh": "大波兰省·中部"
+      },
+      "member_names": {
+        "PL_MRG_3384b03f3b03": {
+          "en": "gostyński",
+          "zh": "戈斯廷斯基"
+        },
+        "PL_MRG_d07f84128518": {
+          "en": "kościański",
+          "zh": "科希钦斯基"
+        },
+        "PL_MRG_ec5519b4d3cf": {
+          "en": "poznański (Greater Poland)",
+          "zh": "波兹南（大波兰省）"
+        },
+        "PL_POW_3061": {
+          "en": "Kalisz",
+          "zh": "卡利什"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_05f1ad6eedaa",
+      "member_ids": [
+        "PL_MRG_28f9056747e2",
+        "PL_MRG_672367948ccf",
+        "PL_MRG_d1960b18210a",
+        "PL_POW_1203",
+        "PL_POW_1204",
+        "PL_POW_1212",
+        "PL_POW_1213",
+        "PL_POW_1218",
+        "PL_POW_1263"
+      ],
+      "parent_id": "PL_Lesser_Poland",
+      "names": {
+        "en": "Lesser Poland · North",
+        "zh": "小波兰省·北部"
+      },
+      "member_names": {
+        "PL_MRG_28f9056747e2": {
+          "en": "limanowski",
+          "zh": "利马诺夫斯基"
+        },
+        "PL_MRG_672367948ccf": {
+          "en": "tarnowski",
+          "zh": "塔尔诺夫斯基"
+        },
+        "PL_MRG_d1960b18210a": {
+          "en": "krakowski",
+          "zh": "克拉科夫"
+        },
+        "PL_POW_1203": {
+          "en": "chrzanowski",
+          "zh": "赫扎诺夫斯基"
+        },
+        "PL_POW_1204": {
+          "en": "dąbrowski",
+          "zh": "达布罗斯基"
+        },
+        "PL_POW_1212": {
+          "en": "olkuski",
+          "zh": "奥尔库斯基"
+        },
+        "PL_POW_1213": {
+          "en": "oświęcimski",
+          "zh": "奥斯威辛斯基"
+        },
+        "PL_POW_1218": {
+          "en": "wadowicki",
+          "zh": "瓦多维采"
+        },
+        "PL_POW_1263": {
+          "en": "Tarnów",
+          "zh": "塔尔诺"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_44c900e7cbdd",
+      "member_ids": [
+        "PL_MRG_3bc1f7b63f72",
+        "PL_POW_2003",
+        "PL_POW_2008",
+        "PL_POW_2013"
+      ],
+      "parent_id": "PL_Podlaskie",
+      "names": {
+        "en": "Podlaskie · Southwest",
+        "zh": "波德拉谢省·西南部"
+      },
+      "member_names": {
+        "PL_MRG_3bc1f7b63f72": {
+          "en": "Łomża",
+          "zh": "沃姆扎"
+        },
+        "PL_POW_2003": {
+          "en": "bielski",
+          "zh": "别尔斯基"
+        },
+        "PL_POW_2008": {
+          "en": "moniecki",
+          "zh": "莫涅茨基"
+        },
+        "PL_POW_2013": {
+          "en": "wysokomazowiecki",
+          "zh": "维索基马佐维茨基"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_81a04ac05a78",
+      "member_ids": [
+        "PL_MRG_49c8bdd6da87",
+        "PL_POW_1408",
+        "PL_POW_1410",
+        "PL_POW_1426",
+        "PL_POW_1429",
+        "PL_POW_1432",
+        "PL_POW_1433",
+        "PL_POW_1435",
+        "PL_POW_1464"
+      ],
+      "parent_id": "PL_Masovian",
+      "names": {
+        "en": "Masovian · East",
+        "zh": "马佐夫舍省·东部"
+      },
+      "member_names": {
+        "PL_MRG_49c8bdd6da87": {
+          "en": "wołomiński",
+          "zh": "沃沃明斯基"
+        },
+        "PL_POW_1408": {
+          "en": "legionowski",
+          "zh": "莱吉奥诺沃县"
+        },
+        "PL_POW_1410": {
+          "en": "łosicki",
+          "zh": "沃西茨基"
+        },
+        "PL_POW_1426": {
+          "en": "siedlecki",
+          "zh": "谢德尔采"
+        },
+        "PL_POW_1429": {
+          "en": "sokołowski",
+          "zh": "索科沃夫斯基"
+        },
+        "PL_POW_1432": {
+          "en": "warszawski zachodni",
+          "zh": "华沙西区"
+        },
+        "PL_POW_1433": {
+          "en": "węgrowski",
+          "zh": "文格罗斯基"
+        },
+        "PL_POW_1435": {
+          "en": "wyszkowski",
+          "zh": "维斯科夫斯基"
+        },
+        "PL_POW_1464": {
+          "en": "Siedlce",
+          "zh": "谢德尔采"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_328be0e18e73",
+      "member_ids": [
+        "PL_MRG_6a243775b00f",
+        "PL_MRG_c16d6d416392",
+        "PL_POW_1403",
+        "PL_POW_1414",
+        "PL_POW_1428"
+      ],
+      "parent_id": "PL_Masovian",
+      "names": {
+        "en": "Masovian · South 1",
+        "zh": "马佐夫舍省·南部1"
+      },
+      "member_names": {
+        "PL_MRG_6a243775b00f": {
+          "en": "piaseczyński",
+          "zh": "皮亚塞奇诺"
+        },
+        "PL_MRG_c16d6d416392": {
+          "en": "pruszkowski",
+          "zh": "普鲁什科夫斯基"
+        },
+        "PL_POW_1403": {
+          "en": "garwoliński",
+          "zh": "加尔沃林"
+        },
+        "PL_POW_1414": {
+          "en": "nowodworski",
+          "zh": "新德沃尔"
+        },
+        "PL_POW_1428": {
+          "en": "sochaczewski",
+          "zh": "索哈切夫斯基"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_4a7fdf2f215b",
+      "member_ids": [
+        "PL_MRG_6ea9dfea1297",
+        "PL_MRG_fe2842d4d685",
+        "PL_POW_1401",
+        "PL_POW_1407"
+      ],
+      "parent_id": "PL_Masovian",
+      "names": {
+        "en": "Masovian · South 2",
+        "zh": "马佐夫舍省·南部2"
+      },
+      "member_names": {
+        "PL_MRG_6ea9dfea1297": {
+          "en": "przysuski",
+          "zh": "普日苏斯基"
+        },
+        "PL_MRG_fe2842d4d685": {
+          "en": "radomski",
+          "zh": "拉多姆斯基"
+        },
+        "PL_POW_1401": {
+          "en": "białobrzeski",
+          "zh": "比亚沃布热斯基"
+        },
+        "PL_POW_1407": {
+          "en": "kozienicki",
+          "zh": "科齐尼茨基"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_eb17d6c2a513",
+      "member_ids": [
+        "PL_MRG_4af99a43d917",
+        "PL_MRG_ae7dcb23076e",
+        "PL_MRG_cda1a954e365",
+        "PL_POW_0203"
+      ],
+      "parent_id": "PL_Lower_Silesian",
+      "names": {
+        "en": "Lower Silesian · Northwest",
+        "zh": "下西里西亚省·西北部"
+      },
+      "member_names": {
+        "PL_MRG_4af99a43d917": {
+          "en": "bolesławiecki",
+          "zh": "博莱斯瓦维茨"
+        },
+        "PL_MRG_ae7dcb23076e": {
+          "en": "średzki",
+          "zh": "斯列兹基"
+        },
+        "PL_MRG_cda1a954e365": {
+          "en": "lubiński",
+          "zh": "卢宾斯基"
+        },
+        "PL_POW_0203": {
+          "en": "głogowski",
+          "zh": "格沃戈夫斯基"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_e9f1a2130857",
+      "member_ids": [
+        "PL_MRG_4b4e7fcd7031",
+        "PL_MRG_697bf6eafbca",
+        "PL_POW_0215",
+        "PL_POW_0217",
+        "PL_POW_0219",
+        "PL_POW_0223",
+        "PL_POW_0262",
+        "PL_POW_0265"
+      ],
+      "parent_id": "PL_Lower_Silesian",
+      "names": {
+        "en": "Lower Silesian · Central",
+        "zh": "下西里西亚省·中部"
+      },
+      "member_names": {
+        "PL_MRG_4b4e7fcd7031": {
+          "en": "dzierżoniowski",
+          "zh": "杰若尼奥夫斯基"
+        },
+        "PL_MRG_697bf6eafbca": {
+          "en": "legnicki (Lower Silesian)",
+          "zh": "莱格尼察（下西里西亚省）"
+        },
+        "PL_POW_0215": {
+          "en": "oławski",
+          "zh": "奥瓦瓦"
+        },
+        "PL_POW_0217": {
+          "en": "strzeliński",
+          "zh": "斯特泽林斯基"
+        },
+        "PL_POW_0219": {
+          "en": "świdnicki",
+          "zh": "斯维德尼察"
+        },
+        "PL_POW_0223": {
+          "en": "wrocławski",
+          "zh": "弗罗茨瓦夫"
+        },
+        "PL_POW_0262": {
+          "en": "Legnica",
+          "zh": "莱格尼察"
+        },
+        "PL_POW_0265": {
+          "en": "Wałbrzych",
+          "zh": "瓦乌布日赫"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_3692a96e99b1",
+      "member_ids": [
+        "PL_MRG_4ed00c272094",
+        "PL_POW_1005",
+        "PL_POW_1006",
+        "PL_POW_1007",
+        "PL_POW_1010",
+        "PL_POW_1012",
+        "PL_POW_1016",
+        "PL_POW_1021",
+        "PL_POW_1062"
+      ],
+      "parent_id": "PL_Lodz",
+      "names": {
+        "en": "Łódź · East",
+        "zh": "罗兹省·东部"
+      },
+      "member_names": {
+        "PL_MRG_4ed00c272094": {
+          "en": "rawski",
+          "zh": "罗斯基"
+        },
+        "PL_POW_1005": {
+          "en": "łowicki",
+          "zh": "沃维茨基"
+        },
+        "PL_POW_1006": {
+          "en": "łódzki wschodni",
+          "zh": "罗兹东部"
+        },
+        "PL_POW_1007": {
+          "en": "opoczyński",
+          "zh": "奥波茨钦斯基"
+        },
+        "PL_POW_1010": {
+          "en": "piotrkowski",
+          "zh": "皮奥特科夫斯基"
+        },
+        "PL_POW_1012": {
+          "en": "radomszczański",
+          "zh": "拉多姆斯科"
+        },
+        "PL_POW_1016": {
+          "en": "tomaszowski",
+          "zh": "托马佐夫斯基"
+        },
+        "PL_POW_1021": {
+          "en": "brzeziński",
+          "zh": "布热津斯基"
+        },
+        "PL_POW_1062": {
+          "en": "Piotrków Trybunalski",
+          "zh": "佩特里考"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_eb6bfbc84cb1",
+      "member_ids": [
+        "PL_MRG_55eb1a09655e",
+        "PL_MRG_88938957a4dc",
+        "PL_MRG_e9b93261cb76",
+        "PL_POW_2204",
+        "PL_POW_2205"
+      ],
+      "parent_id": "PL_Pomeranian",
+      "names": {
+        "en": "Pomeranian · Central",
+        "zh": "滨海省·中部"
+      },
+      "member_names": {
+        "PL_MRG_55eb1a09655e": {
+          "en": "chojnicki",
+          "zh": "霍伊尼茨基"
+        },
+        "PL_MRG_88938957a4dc": {
+          "en": "wejherowski",
+          "zh": "韦赫罗夫斯基"
+        },
+        "PL_MRG_e9b93261cb76": {
+          "en": "starogardzki",
+          "zh": "斯塔罗加德"
+        },
+        "PL_POW_2204": {
+          "en": "gdański",
+          "zh": "格但斯克"
+        },
+        "PL_POW_2205": {
+          "en": "kartuski",
+          "zh": "卡尔图齐"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_d43cd846ec6f",
+      "member_ids": [
+        "PL_MRG_5ca02af3d829",
+        "PL_POW_1001",
+        "PL_POW_1002",
+        "PL_POW_1004",
+        "PL_POW_1008",
+        "PL_POW_1009",
+        "PL_POW_1020"
+      ],
+      "parent_id": "PL_Lodz",
+      "names": {
+        "en": "Łódź · Northwest",
+        "zh": "罗兹省·西北部"
+      },
+      "member_names": {
+        "PL_MRG_5ca02af3d829": {
+          "en": "zduńskowolski",
+          "zh": "兹敦斯科沃尔斯基"
+        },
+        "PL_POW_1001": {
+          "en": "bełchatowski",
+          "zh": "别尔哈托夫"
+        },
+        "PL_POW_1002": {
+          "en": "kutnowski",
+          "zh": "库特诺夫斯基"
+        },
+        "PL_POW_1004": {
+          "en": "łęczycki",
+          "zh": "文茨基"
+        },
+        "PL_POW_1008": {
+          "en": "pabianicki",
+          "zh": "帕比亚尼采"
+        },
+        "PL_POW_1009": {
+          "en": "pajęczański",
+          "zh": "帕延奇诺县"
+        },
+        "PL_POW_1020": {
+          "en": "zgierski",
+          "zh": "兹盖尔兹"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_c908eb11c602",
+      "member_ids": [
+        "PL_MRG_6059e5e8fd2d",
+        "PL_MRG_635f3bd9c929"
+      ],
+      "parent_id": "PL_Warmian_Masurian",
+      "names": {
+        "en": "Warmian-Masurian · Central",
+        "zh": "瓦尔米亚-马祖里省·中部"
+      },
+      "member_names": {
+        "PL_MRG_6059e5e8fd2d": {
+          "en": "giżycki",
+          "zh": "吉日茨基"
+        },
+        "PL_MRG_635f3bd9c929": {
+          "en": "olsztyński (Warmian-Masurian)",
+          "zh": "奥尔什丁（瓦尔米亚-马祖里省）"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_7e3204328b62",
+      "member_ids": [
+        "PL_MRG_7076d4b3250d",
+        "PL_MRG_b96b5d49d900",
+        "PL_MRG_d8ea546338a5",
+        "PL_POW_1802",
+        "PL_POW_1806",
+        "PL_POW_1810",
+        "PL_POW_1814",
+        "PL_POW_1816",
+        "PL_POW_1819"
+      ],
+      "parent_id": "PL_Subcarpathian",
+      "names": {
+        "en": "Subcarpathian · Northwest",
+        "zh": "喀尔巴阡山省·西北部"
+      },
+      "member_names": {
+        "PL_MRG_7076d4b3250d": {
+          "en": "mielecki",
+          "zh": "梅莱茨基"
+        },
+        "PL_MRG_b96b5d49d900": {
+          "en": "tarnobrzeski",
+          "zh": "塔尔诺布热格"
+        },
+        "PL_MRG_d8ea546338a5": {
+          "en": "stalowowolski",
+          "zh": "斯塔洛沃沃尔斯基"
+        },
+        "PL_POW_1802": {
+          "en": "brzozowski",
+          "zh": "布佐佐夫斯基"
+        },
+        "PL_POW_1806": {
+          "en": "kolbuszowski",
+          "zh": "科尔布佐夫斯基"
+        },
+        "PL_POW_1810": {
+          "en": "łańcucki",
+          "zh": "兰卡特"
+        },
+        "PL_POW_1814": {
+          "en": "przeworski",
+          "zh": "普热沃斯基"
+        },
+        "PL_POW_1816": {
+          "en": "rzeszowski",
+          "zh": "热舒夫"
+        },
+        "PL_POW_1819": {
+          "en": "strzyżowski",
+          "zh": "斯特日佐夫斯基"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_48e6927d3544",
+      "member_ids": [
+        "PL_MRG_7c2fbae3db0b",
+        "PL_MRG_fb2ce823eb38",
+        "PL_POW_0407",
+        "PL_POW_0410",
+        "PL_POW_0413",
+        "PL_POW_0464"
+      ],
+      "parent_id": "PL_Kuyavian_Pomeranian",
+      "names": {
+        "en": "Kuyavian-Pomeranian · Southwest",
+        "zh": "库亚维-滨海省·西南部"
+      },
+      "member_names": {
+        "PL_MRG_7c2fbae3db0b": {
+          "en": "żniński",
+          "zh": "兹宁斯基"
+        },
+        "PL_MRG_fb2ce823eb38": {
+          "en": "włocławski (Kuyavian-Pomeranian)",
+          "zh": "弗沃茨瓦韦克（库亚维-滨海省）"
+        },
+        "PL_POW_0407": {
+          "en": "inowrocławski",
+          "zh": "伊诺弗罗茨瓦夫斯基"
+        },
+        "PL_POW_0410": {
+          "en": "nakielski",
+          "zh": "纳基尔斯基"
+        },
+        "PL_POW_0413": {
+          "en": "sępoleński",
+          "zh": "塞波尔诺"
+        },
+        "PL_POW_0464": {
+          "en": "Włocławek",
+          "zh": "弗沃茨瓦韦克"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_ce21dcd4a2c0",
+      "member_ids": [
+        "PL_MRG_a4d0d3a9760e",
+        "PL_MRG_f18bf4792f6a",
+        "PL_POW_0417",
+        "PL_POW_0462"
+      ],
+      "parent_id": "PL_Kuyavian_Pomeranian",
+      "names": {
+        "en": "Kuyavian-Pomeranian · North",
+        "zh": "库亚维-滨海省·北部"
+      },
+      "member_names": {
+        "PL_MRG_a4d0d3a9760e": {
+          "en": "świecki",
+          "zh": "希维茨基"
+        },
+        "PL_MRG_f18bf4792f6a": {
+          "en": "rypiński",
+          "zh": "雷平斯基"
+        },
+        "PL_POW_0417": {
+          "en": "wąbrzeski",
+          "zh": "瓦布热斯基"
+        },
+        "PL_POW_0462": {
+          "en": "Grudziądz",
+          "zh": "格鲁齐亚兹"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_4762ef33a34f",
+      "member_ids": [
+        "PL_MRG_8f55c53666f8",
+        "PL_MRG_d9d9ccd218dd",
+        "PL_POW_2611",
+        "PL_POW_2612"
+      ],
+      "parent_id": "PL_Holy_Cross",
+      "names": {
+        "en": "Holy Cross · East",
+        "zh": "圣十字省·东部"
+      },
+      "member_names": {
+        "PL_MRG_8f55c53666f8": {
+          "en": "ostrowiecki",
+          "zh": "奥斯特罗维耶茨基"
+        },
+        "PL_MRG_d9d9ccd218dd": {
+          "en": "buski",
+          "zh": "布斯基"
+        },
+        "PL_POW_2611": {
+          "en": "starachowicki",
+          "zh": "斯塔拉霍维奇"
+        },
+        "PL_POW_2612": {
+          "en": "staszowski",
+          "zh": "斯塔佐夫斯基"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_f3a4768ac693",
+      "member_ids": [
+        "PL_MRG_9242fdb1805d",
+        "PL_MRG_940b9a58b475",
+        "PL_POW_2613"
+      ],
+      "parent_id": "PL_Holy_Cross",
+      "names": {
+        "en": "Holy Cross · West",
+        "zh": "圣十字省·西部"
+      },
+      "member_names": {
+        "PL_MRG_9242fdb1805d": {
+          "en": "kielecki (Holy Cross)",
+          "zh": "凯尔采（圣十字省）"
+        },
+        "PL_MRG_940b9a58b475": {
+          "en": "jędrzejowski",
+          "zh": "延德尔热约夫斯基"
+        },
+        "PL_POW_2613": {
+          "en": "włoszczowski",
+          "zh": "沃什佐夫斯基"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_afde07ef7e52",
+      "member_ids": [
+        "PL_MRG_9b20fe0cbb07",
+        "PL_POW_3202",
+        "PL_POW_3212",
+        "PL_POW_3214"
+      ],
+      "parent_id": "PL_West_Pomeranian",
+      "names": {
+        "en": "West Pomeranian · West",
+        "zh": "西滨海省·西部"
+      },
+      "member_names": {
+        "PL_MRG_9b20fe0cbb07": {
+          "en": "goleniowski",
+          "zh": "戈莱尼奥夫斯基"
+        },
+        "PL_POW_3202": {
+          "en": "choszczeński",
+          "zh": "霍什奇诺"
+        },
+        "PL_POW_3212": {
+          "en": "pyrzycki",
+          "zh": "皮日茨基"
+        },
+        "PL_POW_3214": {
+          "en": "stargardzki",
+          "zh": "斯塔加德"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_50494ed51da4",
+      "member_ids": [
+        "PL_MRG_ed1992314afe",
+        "PL_POW_3208"
+      ],
+      "parent_id": "PL_West_Pomeranian",
+      "names": {
+        "en": "West Pomeranian · Northeast",
+        "zh": "西滨海省·东北部"
+      },
+      "member_names": {
+        "PL_MRG_ed1992314afe": {
+          "en": "białogardzki",
+          "zh": "比亚沃加尔"
+        },
+        "PL_POW_3208": {
+          "en": "kołobrzeski",
+          "zh": "科沃布热格"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_8119670edfb9",
+      "member_ids": [
+        "PL_MRG_ccb2f83ec3cf",
+        "PL_MRG_ec568da59ac7",
+        "PL_POW_2401",
+        "PL_POW_2402",
+        "PL_POW_2410",
+        "PL_POW_2414",
+        "PL_POW_2463",
+        "PL_POW_2467",
+        "PL_POW_2468",
+        "PL_POW_2470",
+        "PL_POW_2472",
+        "PL_POW_2473",
+        "PL_POW_2476",
+        "PL_POW_2477"
+      ],
+      "parent_id": "PL_Silesian",
+      "names": {
+        "en": "Silesian · South",
+        "zh": "西里西亚省·南部"
+      },
+      "member_names": {
+        "PL_MRG_ccb2f83ec3cf": {
+          "en": "Siemianowice Śląskie",
+          "zh": "希隆斯克地区谢米亚诺维采"
+        },
+        "PL_MRG_ec568da59ac7": {
+          "en": "mikołowski",
+          "zh": "米科沃夫"
+        },
+        "PL_POW_2401": {
+          "en": "będziński",
+          "zh": "本津"
+        },
+        "PL_POW_2402": {
+          "en": "bielski",
+          "zh": "别尔斯基"
+        },
+        "PL_POW_2410": {
+          "en": "pszczyński",
+          "zh": "普什奇纳"
+        },
+        "PL_POW_2414": {
+          "en": "bieruńsko-lędziński",
+          "zh": "别伦斯科-伦津斯基"
+        },
+        "PL_POW_2463": {
+          "en": "Chorzów",
+          "zh": "霍茹夫"
+        },
+        "PL_POW_2467": {
+          "en": "Jastrzębie-Zdrój",
+          "zh": "亚斯特热比-兹德鲁伊"
+        },
+        "PL_POW_2468": {
+          "en": "Jaworzno",
+          "zh": "亚沃日诺"
+        },
+        "PL_POW_2470": {
+          "en": "Mysłowice",
+          "zh": "梅斯沃维采"
+        },
+        "PL_POW_2472": {
+          "en": "Ruda Śląska",
+          "zh": "鲁达·斯拉斯卡"
+        },
+        "PL_POW_2473": {
+          "en": "Rybnik",
+          "zh": "雷布尼克"
+        },
+        "PL_POW_2476": {
+          "en": "Świętochłowice",
+          "zh": "斯维托赫沃维采"
+        },
+        "PL_POW_2477": {
+          "en": "Tychy",
+          "zh": "蒂黑"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_fe627fbb2f9c",
+      "member_ids": [
+        "PL_POW_1402",
+        "PL_POW_1404",
+        "PL_POW_1411",
+        "PL_POW_1419",
+        "PL_POW_1420",
+        "PL_POW_1424",
+        "PL_POW_1427",
+        "PL_POW_1462"
+      ],
+      "parent_id": "PL_Masovian",
+      "names": {
+        "en": "Masovian · Northwest",
+        "zh": "马佐夫舍省·西北部"
+      },
+      "member_names": {
+        "PL_POW_1402": {
+          "en": "ciechanowski",
+          "zh": "切哈诺夫斯基"
+        },
+        "PL_POW_1404": {
+          "en": "gostyniński",
+          "zh": "戈斯蒂宁斯基"
+        },
+        "PL_POW_1411": {
+          "en": "makowski",
+          "zh": "马科夫斯基"
+        },
+        "PL_POW_1419": {
+          "en": "płocki",
+          "zh": "普沃茨克"
+        },
+        "PL_POW_1420": {
+          "en": "płoński",
+          "zh": "普翁斯基"
+        },
+        "PL_POW_1424": {
+          "en": "pułtuski",
+          "zh": "普乌图斯基"
+        },
+        "PL_POW_1427": {
+          "en": "sierpecki",
+          "zh": "谢尔佩基"
+        },
+        "PL_POW_1462": {
+          "en": "Płock",
+          "zh": "普沃茨克"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_c16eaf95213a",
+      "member_ids": [
+        "PL_POW_1601",
+        "PL_POW_1605",
+        "PL_POW_1609",
+        "PL_POW_1661"
+      ],
+      "parent_id": "PL_Opole",
+      "names": {
+        "en": "Opole · Central",
+        "zh": "奥波莱省·中部"
+      },
+      "member_names": {
+        "PL_POW_1601": {
+          "en": "brzeski",
+          "zh": "布雷斯特"
+        },
+        "PL_POW_1605": {
+          "en": "krapkowicki",
+          "zh": "克拉普科维奇"
+        },
+        "PL_POW_1609": {
+          "en": "opolski",
+          "zh": "奥波莱"
+        },
+        "PL_POW_1661": {
+          "en": "Opole",
+          "zh": "奥波莱"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "PL_MRG_6143971238b3",
+      "member_ids": [
+        "PL_POW_2404",
+        "PL_POW_2409",
+        "PL_POW_2416",
+        "PL_POW_2465"
+      ],
+      "parent_id": "PL_Silesian",
+      "names": {
+        "en": "Silesian · Northeast",
+        "zh": "西里西亚省·东北部"
+      },
+      "member_names": {
+        "PL_POW_2404": {
+          "en": "częstochowski",
+          "zh": "琴斯托霍瓦"
+        },
+        "PL_POW_2409": {
+          "en": "myszkowski",
+          "zh": "梅什科夫斯基"
+        },
+        "PL_POW_2416": {
+          "en": "zawierciański",
+          "zh": "扎维尔切"
+        },
+        "PL_POW_2465": {
+          "en": "Dąbrowa Górnicza",
+          "zh": "丹布罗瓦·戈尔尼察"
+        }
+      },
+      "name_source": "parent_direction"
+    }
+  ],
+  "split_or_reduced_candidates": [
+    {
+      "candidate": [
+        "DE211",
+        "DE219",
+        "DE226",
+        "DE236",
+        "DE_MRG_73019c3017aa"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE223",
+        "DE224",
+        "DE22B",
+        "DE232",
+        "DE238",
+        "DE_MRG_d4ab7c811a60"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE21I",
+        "DE21J",
+        "DE_MRG_3fb6d34d5cec",
+        "DE_MRG_bd0cf439de30",
+        "DE_MRG_ec3ed49e067c"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE275",
+        "DE276",
+        "DE_MRG_bf419442ff08"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE252",
+        "DE253",
+        "DE255",
+        "DE259",
+        "DE_MRG_08a36bff89a0",
+        "DE_MRG_22b5c35ff0db",
+        "DE_MRG_348581c848f8",
+        "DE_MRG_88b2cc10d998",
+        "DE_MRG_d7270b2f4f53"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE404",
+        "DE_MRG_171e39a343f9",
+        "DE_MRG_54666399e0ac"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DE803",
+        "DE80K"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DEE03",
+        "DEE06"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "DEF04",
+        "DEF0A"
+      ],
+      "applied": []
+    }
+  ]
+}

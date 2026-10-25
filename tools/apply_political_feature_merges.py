@@ -689,8 +689,11 @@ def global_projected_paths(merges: Merges) -> list[Path]:
     selected = []
     for path in paths:
         name = path.relative_to(DATA).as_posix()
-        if set(GLOBAL_READERS.get(name, SCENARIOS)) <= set(merges.scenarios):
+        readers = set(GLOBAL_READERS.get(name, SCENARIOS))
+        if readers <= set(merges.scenarios):
             selected.append(path)
+        elif not readers & set(merges.scenarios):
+            continue  # none of its readers changes, so the file keeps the members
         elif name not in SCOPED_UNPROJECTED:
             text = path.read_text(encoding="utf-8")
             touched = sorted(member for member in merges.remap if f'"{member}"' in text)

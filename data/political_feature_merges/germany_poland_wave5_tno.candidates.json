@@ -1,0 +1,1207 @@
+{
+  "schema_version": 1,
+  "candidate_set": "germany_poland_wave5_tno",
+  "description": "Germany (HOI4-state level, area cap 10,000 km²) and Poland (voivodeship level) from the 2026-10-25 central Europe research, v2 policy: city hosts protected for capitals, major cities and at least 250,000 people; same-owner neighbours no longer lock; historical frontiers, targets, preset outer boundaries and country borders kept. Scoped to TNO 1962 owners; river-paint packs, which belong to modern_world, do not apply. Parcels listed in the shared historical display presets (country_feature_policies.json) stay unmerged, since a scoped plan cannot project that file.",
+  "protected_feature_ids": [
+    "AL011",
+    "AL012",
+    "AL013",
+    "AL014",
+    "AL015",
+    "AL021",
+    "AL022",
+    "AL031",
+    "AL032",
+    "AL033",
+    "AL034",
+    "AL035",
+    "CY000",
+    "DE111",
+    "DE122",
+    "DE124",
+    "DE125",
+    "DE126",
+    "DE131",
+    "DE132",
+    "DE133",
+    "DE134",
+    "DE136",
+    "DE138",
+    "DE139",
+    "DE13A",
+    "DE147",
+    "DE211",
+    "DE212",
+    "DE213",
+    "DE214",
+    "DE215",
+    "DE216",
+    "DE219",
+    "DE21D",
+    "DE21F",
+    "DE21I",
+    "DE21J",
+    "DE21K",
+    "DE21M",
+    "DE222",
+    "DE223",
+    "DE224",
+    "DE225",
+    "DE226",
+    "DE228",
+    "DE229",
+    "DE22A",
+    "DE22B",
+    "DE232",
+    "DE233",
+    "DE235",
+    "DE236",
+    "DE237",
+    "DE238",
+    "DE239",
+    "DE23A",
+    "DE243",
+    "DE244",
+    "DE247",
+    "DE249",
+    "DE24A",
+    "DE24D",
+    "DE251",
+    "DE252",
+    "DE253",
+    "DE254",
+    "DE255",
+    "DE256",
+    "DE259",
+    "DE25A",
+    "DE261",
+    "DE263",
+    "DE264",
+    "DE265",
+    "DE266",
+    "DE267",
+    "DE269",
+    "DE26A",
+    "DE26C",
+    "DE271",
+    "DE272",
+    "DE273",
+    "DE274",
+    "DE275",
+    "DE276",
+    "DE277",
+    "DE278",
+    "DE279",
+    "DE27A",
+    "DE27B",
+    "DE27C",
+    "DE27D",
+    "DE27E",
+    "DE300",
+    "DE402",
+    "DE403",
+    "DE404",
+    "DE405",
+    "DE407",
+    "DE409",
+    "DE40B",
+    "DE40C",
+    "DE40F",
+    "DE40G",
+    "DE40I",
+    "DE501",
+    "DE600",
+    "DE712",
+    "DE714",
+    "DE731",
+    "DE803",
+    "DE804",
+    "DE80K",
+    "DE80M",
+    "DE80N",
+    "DE80O",
+    "DE929",
+    "DE949",
+    "DE94B",
+    "DE94C",
+    "DEA11",
+    "DEA12",
+    "DEA13",
+    "DEA15",
+    "DEA1A",
+    "DEA1B",
+    "DEA1E",
+    "DEA22",
+    "DEA23",
+    "DEA28",
+    "DEA29",
+    "DEA2D",
+    "DEA32",
+    "DEA33",
+    "DEA34",
+    "DEA41",
+    "DEA51",
+    "DEA52",
+    "DEB11",
+    "DEB23",
+    "DEB25",
+    "DEB3E",
+    "DEB3H",
+    "DEB3K",
+    "DEC01",
+    "DEC02",
+    "DEC04",
+    "DEC05",
+    "DED21",
+    "DED2C",
+    "DED2D",
+    "DED2E",
+    "DED2F",
+    "DED41",
+    "DED42",
+    "DED43",
+    "DED44",
+    "DED45",
+    "DED51",
+    "DED52",
+    "DED53",
+    "DEE01",
+    "DEE02",
+    "DEE03",
+    "DEE04",
+    "DEE05",
+    "DEE06",
+    "DEE07",
+    "DEE08",
+    "DEE09",
+    "DEE0A",
+    "DEE0B",
+    "DEE0C",
+    "DEE0D",
+    "DEE0E",
+    "DEF01",
+    "DEF02",
+    "DEF03",
+    "DEF04",
+    "DEF06",
+    "DEF07",
+    "DEF08",
+    "DEF09",
+    "DEF0A",
+    "DEF0C",
+    "DEF0D",
+    "DEF0E",
+    "DEF0F",
+    "DE_MRG_08a36bff89a0",
+    "DE_MRG_171e39a343f9",
+    "DE_MRG_22b5c35ff0db",
+    "DE_MRG_348581c848f8",
+    "DE_MRG_3fb6d34d5cec",
+    "DE_MRG_54666399e0ac",
+    "DE_MRG_73019c3017aa",
+    "DE_MRG_88b2cc10d998",
+    "DE_MRG_a235cf36d16c",
+    "DE_MRG_bd0cf439de30",
+    "DE_MRG_bf419442ff08",
+    "DE_MRG_ce73c32b1090",
+    "DE_MRG_d4ab7c811a60",
+    "DE_MRG_d67a0e4a728d",
+    "DE_MRG_d7270b2f4f53",
+    "DE_MRG_ec3ed49e067c",
+    "DK014",
+    "DK_HIST_NORTH_SCHLESWIG",
+    "FR_ARR_04001",
+    "FR_ARR_04002",
+    "FR_ARR_04003",
+    "FR_ARR_04004",
+    "FR_ARR_05001",
+    "FR_ARR_05002",
+    "FR_ARR_06001",
+    "FR_ARR_06002",
+    "FR_ARR_22001",
+    "FR_ARR_22003",
+    "FR_ARR_29001",
+    "FR_ARR_2A001",
+    "FR_ARR_2A004",
+    "FR_ARR_2B002",
+    "FR_ARR_2B003",
+    "FR_ARR_2B005",
+    "FR_ARR_35001",
+    "FR_ARR_35002",
+    "FR_ARR_35003",
+    "FR_ARR_35004",
+    "FR_ARR_56001",
+    "FR_ARR_56002",
+    "FR_ARR_56003",
+    "FR_ARR_57003",
+    "FR_ARR_57005",
+    "FR_ARR_57006",
+    "FR_ARR_57007",
+    "FR_ARR_57009",
+    "FR_ARR_67002",
+    "FR_ARR_67003",
+    "FR_ARR_67004",
+    "FR_ARR_67005",
+    "FR_ARR_67008",
+    "FR_ARR_68001",
+    "FR_ARR_68002",
+    "FR_ARR_68004",
+    "FR_ARR_68006",
+    "FR_ARR_73001",
+    "FR_ARR_73002",
+    "FR_ARR_73003",
+    "FR_ARR_74001",
+    "FR_ARR_74002",
+    "FR_ARR_74003",
+    "FR_ARR_74004",
+    "FR_MRG_5b1fca32ff2c",
+    "FR_MRG_6d703ee3f8dc",
+    "GR_ADM1_GRC-2883",
+    "GR_ADM1_GRC-2990",
+    "GR_ADM1_GRC-3013",
+    "HR033",
+    "HR034",
+    "HR035",
+    "HR037",
+    "ITC11",
+    "ITC12",
+    "ITC13",
+    "ITC14",
+    "ITC15",
+    "ITC16",
+    "ITC17",
+    "ITC18",
+    "ITC20",
+    "ITC31",
+    "ITC32",
+    "ITC33",
+    "ITC34",
+    "ITC41",
+    "ITC42",
+    "ITC43",
+    "ITC44",
+    "ITC46",
+    "ITC47",
+    "ITC48",
+    "ITC49",
+    "ITC4A",
+    "ITC4B",
+    "ITC4C",
+    "ITC4D",
+    "ITF11",
+    "ITF12",
+    "ITF13",
+    "ITF14",
+    "ITF21",
+    "ITF22",
+    "ITF31",
+    "ITF32",
+    "ITF33",
+    "ITF34",
+    "ITF35",
+    "ITF43",
+    "ITF44",
+    "ITF45",
+    "ITF46",
+    "ITF47",
+    "ITF48",
+    "ITF51",
+    "ITF52",
+    "ITF61",
+    "ITF62",
+    "ITF63",
+    "ITF64",
+    "ITF65",
+    "ITG11",
+    "ITG12",
+    "ITG13",
+    "ITG14",
+    "ITG15",
+    "ITG16",
+    "ITG17",
+    "ITG18",
+    "ITG19",
+    "ITG2D",
+    "ITG2E",
+    "ITG2F",
+    "ITG2G",
+    "ITG2H",
+    "ITH31",
+    "ITH32",
+    "ITH33",
+    "ITH34",
+    "ITH35",
+    "ITH36",
+    "ITH37",
+    "ITH41",
+    "ITH42",
+    "ITH43",
+    "ITH44",
+    "ITI11",
+    "ITI12",
+    "ITI13",
+    "ITI14",
+    "ITI15",
+    "ITI16",
+    "ITI17",
+    "ITI18",
+    "ITI19",
+    "ITI1A",
+    "ITI41",
+    "ITI42",
+    "ITI43",
+    "ITI44",
+    "ITI45",
+    "LU_ADM1_LUX-906",
+    "LU_ADM1_LUX-907",
+    "LU_ADM1_LUX-908",
+    "MC_ADMIN0_PASSTHROUGH",
+    "ME_ADM1_MNE-1506",
+    "ME_ADM1_MNE-1507",
+    "ME_ADM1_MNE-1518",
+    "MT001",
+    "MT002",
+    "PL_POW_0204",
+    "PL_POW_0206",
+    "PL_POW_0207",
+    "PL_POW_0208",
+    "PL_POW_0210",
+    "PL_POW_0213",
+    "PL_POW_0214",
+    "PL_POW_0220",
+    "PL_POW_0221",
+    "PL_POW_0225",
+    "PL_POW_0264",
+    "PL_POW_0401",
+    "PL_POW_0402",
+    "PL_POW_0403",
+    "PL_POW_0406",
+    "PL_POW_0408",
+    "PL_POW_0415",
+    "PL_POW_0461",
+    "PL_POW_0463",
+    "PL_POW_0601",
+    "PL_POW_0603",
+    "PL_POW_0604",
+    "PL_POW_0618",
+    "PL_POW_0619",
+    "PL_POW_0663",
+    "PL_POW_0801",
+    "PL_POW_0802",
+    "PL_POW_0803",
+    "PL_POW_0804",
+    "PL_POW_0805",
+    "PL_POW_0806",
+    "PL_POW_0808",
+    "PL_POW_0809",
+    "PL_POW_0811",
+    "PL_POW_0812",
+    "PL_POW_1003",
+    "PL_POW_1014",
+    "PL_POW_1017",
+    "PL_POW_1018",
+    "PL_POW_1061",
+    "PL_POW_1205",
+    "PL_POW_1210",
+    "PL_POW_1211",
+    "PL_POW_1215",
+    "PL_POW_1217",
+    "PL_POW_1261",
+    "PL_POW_1413",
+    "PL_POW_1415",
+    "PL_POW_1422",
+    "PL_POW_1437",
+    "PL_POW_1463",
+    "PL_POW_1465",
+    "PL_POW_1602",
+    "PL_POW_1603",
+    "PL_POW_1604",
+    "PL_POW_1606",
+    "PL_POW_1607",
+    "PL_POW_1608",
+    "PL_POW_1610",
+    "PL_POW_1611",
+    "PL_POW_1801",
+    "PL_POW_1804",
+    "PL_POW_1805",
+    "PL_POW_1807",
+    "PL_POW_1809",
+    "PL_POW_1813",
+    "PL_POW_1817",
+    "PL_POW_1821",
+    "PL_POW_1863",
+    "PL_POW_2001",
+    "PL_POW_2002",
+    "PL_POW_2004",
+    "PL_POW_2005",
+    "PL_POW_2006",
+    "PL_POW_2009",
+    "PL_POW_2010",
+    "PL_POW_2011",
+    "PL_POW_2012",
+    "PL_POW_2061",
+    "PL_POW_2201",
+    "PL_POW_2203",
+    "PL_POW_2207",
+    "PL_POW_2209",
+    "PL_POW_2210",
+    "PL_POW_2212",
+    "PL_POW_2216",
+    "PL_POW_2261",
+    "PL_POW_2262",
+    "PL_POW_2403",
+    "PL_POW_2405",
+    "PL_POW_2406",
+    "PL_POW_2407",
+    "PL_POW_2411",
+    "PL_POW_2413",
+    "PL_POW_2415",
+    "PL_POW_2417",
+    "PL_POW_2461",
+    "PL_POW_2462",
+    "PL_POW_2464",
+    "PL_POW_2466",
+    "PL_POW_2469",
+    "PL_POW_2475",
+    "PL_POW_2478",
+    "PL_POW_2661",
+    "PL_POW_2801",
+    "PL_POW_2802",
+    "PL_POW_2803",
+    "PL_POW_2804",
+    "PL_POW_2805",
+    "PL_POW_2807",
+    "PL_POW_2808",
+    "PL_POW_2811",
+    "PL_POW_2812",
+    "PL_POW_2813",
+    "PL_POW_2815",
+    "PL_POW_2816",
+    "PL_POW_2817",
+    "PL_POW_2818",
+    "PL_POW_2819",
+    "PL_POW_2862",
+    "PL_POW_3002",
+    "PL_POW_3008",
+    "PL_POW_3012",
+    "PL_POW_3013",
+    "PL_POW_3014",
+    "PL_POW_3015",
+    "PL_POW_3017",
+    "PL_POW_3018",
+    "PL_POW_3019",
+    "PL_POW_3022",
+    "PL_POW_3029",
+    "PL_POW_3031",
+    "PL_POW_3064",
+    "PL_POW_3203",
+    "PL_POW_3206",
+    "PL_POW_3209",
+    "PL_POW_3210",
+    "PL_POW_3211",
+    "PL_POW_3213",
+    "PL_POW_3215",
+    "PL_POW_3217",
+    "PL_POW_3262",
+    "PL_POW_3263",
+    "RUS-2279",
+    "RUS-2280",
+    "RUS-2303",
+    "RUS-2304",
+    "RUS-2305",
+    "RUS-2306",
+    "RUS-2333",
+    "RUS-2334",
+    "RUS-2335",
+    "RUS-2336",
+    "RUS-2337",
+    "RUS-2342",
+    "RUS-2343",
+    "RUS-2353",
+    "RUS-2354",
+    "RUS-2355",
+    "RUS-2356",
+    "RUS-2358",
+    "RUS-2359",
+    "RUS-2360",
+    "RUS-2364",
+    "RUS-2365",
+    "RUS-2371",
+    "RUS-2383",
+    "RUS-2416",
+    "RUS-2417",
+    "SI031",
+    "SI032",
+    "SI033",
+    "SI034",
+    "SI035",
+    "SI036",
+    "SI037",
+    "SI038",
+    "SI041",
+    "SI042",
+    "SI043",
+    "SI044",
+    "UKL14",
+    "UKL17",
+    "UKL18",
+    "UKL21",
+    "UKL22",
+    "UKL23",
+    "UKL24",
+    "UKM50",
+    "UKM63",
+    "UKM64",
+    "UKM65",
+    "UKM66",
+    "UKM71",
+    "UKM73",
+    "UKM75",
+    "UKM78",
+    "UKM81",
+    "UKM82",
+    "UKM91",
+    "UKM92",
+    "UKN06",
+    "UKN07",
+    "UKN08",
+    "UKN09",
+    "UKN0A",
+    "UKN0B",
+    "UKN0C",
+    "UKN0G",
+    "UK_MRG_32be8ff42d1d",
+    "UK_MRG_3af31571b83c",
+    "UK_MRG_4bda76985a93",
+    "UK_MRG_5e86e440be06",
+    "UK_MRG_6b5533cccee5",
+    "UK_MRG_a36fda7ab641",
+    "UK_MRG_e60d28324bee"
+  ],
+  "candidates": [
+    {
+      "member_ids": [
+        "DE117",
+        "DE127",
+        "DE137",
+        "DE141",
+        "DE143",
+        "DE_MRG_a27167ef8f23",
+        "DE_MRG_d0e3890ae1d5"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE11C",
+        "DE144",
+        "DE145",
+        "DE_MRG_c9a9f2cd9548",
+        "DE_MRG_e87b9124c03f"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE146",
+        "DE148",
+        "DE149"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE123",
+        "DE128",
+        "DE129",
+        "DE12B",
+        "DE135",
+        "DE_MRG_68ba87808df8"
+      ],
+      "parent_id": "DE_Baden_W_rttemberg"
+    },
+    {
+      "member_ids": [
+        "DE211",
+        "DE219",
+        "DE226",
+        "DE236",
+        "DE_MRG_73019c3017aa"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE223",
+        "DE224",
+        "DE22B",
+        "DE232",
+        "DE238",
+        "DE_MRG_d4ab7c811a60"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE21I",
+        "DE21J",
+        "DE_MRG_3fb6d34d5cec",
+        "DE_MRG_bd0cf439de30",
+        "DE_MRG_ec3ed49e067c"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE275",
+        "DE276",
+        "DE_MRG_bf419442ff08"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE252",
+        "DE253",
+        "DE255",
+        "DE259",
+        "DE_MRG_08a36bff89a0",
+        "DE_MRG_22b5c35ff0db",
+        "DE_MRG_348581c848f8",
+        "DE_MRG_88b2cc10d998",
+        "DE_MRG_d7270b2f4f53"
+      ],
+      "parent_id": "DE_Bayern"
+    },
+    {
+      "member_ids": [
+        "DE404",
+        "DE_MRG_171e39a343f9",
+        "DE_MRG_54666399e0ac"
+      ],
+      "parent_id": "DE_Brandenburg"
+    },
+    {
+      "member_ids": [
+        "DE711",
+        "DE713",
+        "DE715",
+        "DE717",
+        "DE71B",
+        "DE71D",
+        "DE_MRG_77741e43de3f",
+        "DE_MRG_e2f350a636b5"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE724",
+        "DE_MRG_3b750624bff4",
+        "DE_MRG_e2617eca3f85"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE_MRG_33b1389d946f",
+        "DE_MRG_d561808c92a5"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE734",
+        "DE737"
+      ],
+      "parent_id": "DE_Hessen"
+    },
+    {
+      "member_ids": [
+        "DE803",
+        "DE80K"
+      ],
+      "parent_id": "DE_Mecklenburg_Vorpommern"
+    },
+    {
+      "member_ids": [
+        "DE911",
+        "DE912",
+        "DE913",
+        "DE925",
+        "DE_MRG_46ade2104d23",
+        "DE_MRG_4ab0c6062d32",
+        "DE_MRG_4fdd27cf49f7"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE936",
+        "DE_MRG_698a45847033"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE93A",
+        "DE_MRG_9e1fff10ce51"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE941",
+        "DE_MRG_5dd80c1fcf77",
+        "DE_MRG_830e5845fb60"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE916",
+        "DE91C"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE932",
+        "DE933",
+        "DE935",
+        "DE939"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DE942",
+        "DE943",
+        "DE944",
+        "DE945",
+        "DE94D",
+        "DE_MRG_3a19ae12c637",
+        "DE_MRG_67a8450f3c9f",
+        "DE_MRG_c922c0ebada5"
+      ],
+      "parent_id": "DE_Niedersachsen"
+    },
+    {
+      "member_ids": [
+        "DEA14",
+        "DEA16",
+        "DEA17",
+        "DEA18",
+        "DEA19",
+        "DEA1C",
+        "DEA1D",
+        "DEA1F",
+        "DEA24",
+        "DEA26",
+        "DEA27",
+        "DEA2A",
+        "DEA2B",
+        "DEA2C",
+        "DEA31"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen"
+    },
+    {
+      "member_ids": [
+        "DEA36",
+        "DEA44",
+        "DEA47",
+        "DEA53",
+        "DEA54",
+        "DEA55",
+        "DEA56",
+        "DEA58",
+        "DE_MRG_70752f860917",
+        "DE_MRG_9410ac111320"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen"
+    },
+    {
+      "member_ids": [
+        "DEA5A",
+        "DE_MRG_6f627c55e7bd"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen"
+    },
+    {
+      "member_ids": [
+        "DEA45",
+        "DE_MRG_5adb00f4a83d"
+      ],
+      "parent_id": "DE_Nordrhein_Westfalen"
+    },
+    {
+      "member_ids": [
+        "DEB12",
+        "DEB13",
+        "DEB18"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz"
+    },
+    {
+      "member_ids": [
+        "DEB14",
+        "DEB1C",
+        "DEB1D",
+        "DEB3D",
+        "DE_MRG_bceaa37f49ef",
+        "DE_MRG_c6f2d9d3d036"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz"
+    },
+    {
+      "member_ids": [
+        "DEB17",
+        "DEB1A",
+        "DEB1B",
+        "DEB35",
+        "DEB39",
+        "DE_MRG_ea826ec181b8"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz"
+    },
+    {
+      "member_ids": [
+        "DEB31",
+        "DEB33",
+        "DEB34",
+        "DEB36",
+        "DEB38",
+        "DEB3C",
+        "DEB3I"
+      ],
+      "parent_id": "DE_Rheinland_Pfalz"
+    },
+    {
+      "member_ids": [
+        "DEC03",
+        "DEC06"
+      ],
+      "parent_id": "DE_Saarland"
+    },
+    {
+      "member_ids": [
+        "DEE03",
+        "DEE06"
+      ],
+      "parent_id": "DE_Sachsen_Anhalt"
+    },
+    {
+      "member_ids": [
+        "DEF04",
+        "DEF0A"
+      ],
+      "parent_id": "DE_Schleswig_Holstein"
+    },
+    {
+      "member_ids": [
+        "DEG01",
+        "DEG02",
+        "DEG03",
+        "DEG0C",
+        "DEG0L",
+        "DE_MRG_b86ffe1dd2ea",
+        "DE_MRG_c90ee890d36c"
+      ],
+      "parent_id": "DE_Th_ringen"
+    },
+    {
+      "member_ids": [
+        "DEG06",
+        "DEG0H",
+        "DE_MRG_98e486211a34",
+        "DE_MRG_ac1a1840dec2",
+        "DE_MRG_cc565c282846"
+      ],
+      "parent_id": "DE_Th_ringen"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_05ddd04cc90f",
+        "PL_MRG_e17e448ae4e2",
+        "PL_POW_0610"
+      ],
+      "parent_id": "PL_Lublin"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_4a2bfb6b173f",
+        "PL_POW_0664"
+      ],
+      "parent_id": "PL_Lublin"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_57a0cb6e8d35",
+        "PL_MRG_8d9132641197"
+      ],
+      "parent_id": "PL_Lublin"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_18fdfa02eca5",
+        "PL_MRG_eea8a1b754f3"
+      ],
+      "parent_id": "PL_Greater_Poland"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_20e2ba9602ff",
+        "PL_MRG_d48e8dc37f33"
+      ],
+      "parent_id": "PL_Greater_Poland"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_3384b03f3b03",
+        "PL_MRG_d07f84128518",
+        "PL_MRG_ec5519b4d3cf",
+        "PL_POW_3061"
+      ],
+      "parent_id": "PL_Greater_Poland"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_28f9056747e2",
+        "PL_MRG_672367948ccf",
+        "PL_MRG_d1960b18210a",
+        "PL_POW_1203",
+        "PL_POW_1204",
+        "PL_POW_1212",
+        "PL_POW_1213",
+        "PL_POW_1218",
+        "PL_POW_1263"
+      ],
+      "parent_id": "PL_Lesser_Poland"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_3bc1f7b63f72",
+        "PL_POW_2003",
+        "PL_POW_2008",
+        "PL_POW_2013"
+      ],
+      "parent_id": "PL_Podlaskie"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_49c8bdd6da87",
+        "PL_POW_1408",
+        "PL_POW_1410",
+        "PL_POW_1426",
+        "PL_POW_1429",
+        "PL_POW_1432",
+        "PL_POW_1433",
+        "PL_POW_1435",
+        "PL_POW_1464"
+      ],
+      "parent_id": "PL_Masovian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_6a243775b00f",
+        "PL_MRG_c16d6d416392",
+        "PL_POW_1403",
+        "PL_POW_1414",
+        "PL_POW_1428"
+      ],
+      "parent_id": "PL_Masovian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_6ea9dfea1297",
+        "PL_MRG_fe2842d4d685",
+        "PL_POW_1401",
+        "PL_POW_1407"
+      ],
+      "parent_id": "PL_Masovian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_4af99a43d917",
+        "PL_MRG_ae7dcb23076e",
+        "PL_MRG_cda1a954e365",
+        "PL_POW_0203"
+      ],
+      "parent_id": "PL_Lower_Silesian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_4b4e7fcd7031",
+        "PL_MRG_697bf6eafbca",
+        "PL_POW_0215",
+        "PL_POW_0217",
+        "PL_POW_0219",
+        "PL_POW_0223",
+        "PL_POW_0262",
+        "PL_POW_0265"
+      ],
+      "parent_id": "PL_Lower_Silesian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_4ed00c272094",
+        "PL_POW_1005",
+        "PL_POW_1006",
+        "PL_POW_1007",
+        "PL_POW_1010",
+        "PL_POW_1012",
+        "PL_POW_1016",
+        "PL_POW_1021",
+        "PL_POW_1062"
+      ],
+      "parent_id": "PL_Lodz"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_55eb1a09655e",
+        "PL_MRG_88938957a4dc",
+        "PL_MRG_e9b93261cb76",
+        "PL_POW_2204",
+        "PL_POW_2205"
+      ],
+      "parent_id": "PL_Pomeranian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_5ca02af3d829",
+        "PL_POW_1001",
+        "PL_POW_1002",
+        "PL_POW_1004",
+        "PL_POW_1008",
+        "PL_POW_1009",
+        "PL_POW_1020"
+      ],
+      "parent_id": "PL_Lodz"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_6059e5e8fd2d",
+        "PL_MRG_635f3bd9c929"
+      ],
+      "parent_id": "PL_Warmian_Masurian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_7076d4b3250d",
+        "PL_MRG_b96b5d49d900",
+        "PL_MRG_d8ea546338a5",
+        "PL_POW_1802",
+        "PL_POW_1806",
+        "PL_POW_1810",
+        "PL_POW_1814",
+        "PL_POW_1816",
+        "PL_POW_1819"
+      ],
+      "parent_id": "PL_Subcarpathian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_7c2fbae3db0b",
+        "PL_MRG_fb2ce823eb38",
+        "PL_POW_0407",
+        "PL_POW_0410",
+        "PL_POW_0413",
+        "PL_POW_0464"
+      ],
+      "parent_id": "PL_Kuyavian_Pomeranian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_a4d0d3a9760e",
+        "PL_MRG_f18bf4792f6a",
+        "PL_POW_0417",
+        "PL_POW_0462"
+      ],
+      "parent_id": "PL_Kuyavian_Pomeranian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_8f55c53666f8",
+        "PL_MRG_d9d9ccd218dd",
+        "PL_POW_2611",
+        "PL_POW_2612"
+      ],
+      "parent_id": "PL_Holy_Cross"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_9242fdb1805d",
+        "PL_MRG_940b9a58b475",
+        "PL_POW_2613"
+      ],
+      "parent_id": "PL_Holy_Cross"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_9b20fe0cbb07",
+        "PL_POW_3202",
+        "PL_POW_3212",
+        "PL_POW_3214"
+      ],
+      "parent_id": "PL_West_Pomeranian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_ed1992314afe",
+        "PL_POW_3208"
+      ],
+      "parent_id": "PL_West_Pomeranian"
+    },
+    {
+      "member_ids": [
+        "PL_MRG_ccb2f83ec3cf",
+        "PL_MRG_ec568da59ac7",
+        "PL_POW_2401",
+        "PL_POW_2402",
+        "PL_POW_2410",
+        "PL_POW_2414",
+        "PL_POW_2463",
+        "PL_POW_2467",
+        "PL_POW_2468",
+        "PL_POW_2470",
+        "PL_POW_2472",
+        "PL_POW_2473",
+        "PL_POW_2476",
+        "PL_POW_2477"
+      ],
+      "parent_id": "PL_Silesian"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1402",
+        "PL_POW_1404",
+        "PL_POW_1411",
+        "PL_POW_1419",
+        "PL_POW_1420",
+        "PL_POW_1424",
+        "PL_POW_1427",
+        "PL_POW_1462"
+      ],
+      "parent_id": "PL_Masovian"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1601",
+        "PL_POW_1605",
+        "PL_POW_1609",
+        "PL_POW_1661"
+      ],
+      "parent_id": "PL_Opole"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2404",
+        "PL_POW_2409",
+        "PL_POW_2416",
+        "PL_POW_2465"
+      ],
+      "parent_id": "PL_Silesian"
+    }
+  ]
+}
