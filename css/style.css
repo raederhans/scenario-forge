@@ -11025,14 +11025,31 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   color: var(--text-primary);
 }
 
+/* Fixed slot: the tab is always in the flow before #countryList, filled or
+   empty, so selecting a country never pushes the list rows down. The height
+   fits the header plus a one-line title and one-line meta (about 93px). */
 .selected-land-country-quick-tab {
   display: grid;
+  align-content: start;
   gap: 7px;
+  box-sizing: border-box;
+  height: 96px;
   margin-top: 8px;
   padding: 9px;
+  overflow: hidden;
   border: 1px solid rgba(32, 76, 119, 0.16);
   border-radius: 8px;
   background: rgba(245, 249, 254, 0.78);
+}
+
+.selected-land-country-quick-tab.is-empty {
+  visibility: hidden;
+}
+
+.selected-land-country-quick-card :is(.country-select-title, .country-select-meta) {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .selected-land-country-quick-header {

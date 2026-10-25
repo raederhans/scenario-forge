@@ -387,26 +387,21 @@ export function createCountryInspectorController({
     const host = list?.parentElement;
     if (!host) return;
 
-    const countryState = resolveSelectedLandInspectorCountryState();
+    // The quick tab keeps a fixed-height slot before the list from the first
+    // render, so showing or clearing it never moves the rows under the pointer.
     let tab = host.querySelector("[data-selected-land-country-quick-tab]");
-    if (!countryState) {
-      if (tab) {
-        tab.classList.add("hidden");
-        tab.setAttribute("aria-hidden", "true");
-        tab.replaceChildren();
-      }
-      return;
-    }
-
     if (!tab) {
       tab = document.createElement("div");
       tab.className = "selected-land-country-quick-tab";
       tab.dataset.selectedLandCountryQuickTab = "true";
       host.insertBefore(tab, list);
     }
-    tab.classList.remove("hidden");
-    tab.setAttribute("aria-hidden", "false");
+
+    const countryState = resolveSelectedLandInspectorCountryState();
+    tab.classList.toggle("is-empty", !countryState);
+    tab.setAttribute("aria-hidden", String(!countryState));
     tab.replaceChildren();
+    if (!countryState) return;
 
     const header = document.createElement("div");
     header.className = "selected-land-country-quick-header";

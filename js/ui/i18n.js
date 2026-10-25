@@ -76,7 +76,16 @@ function applyDeclarativeTranslations(root = document) {
   });
 }
 
+function syncDocumentLanguage() {
+  // <html lang> 跟随运行时语言，让屏幕阅读器、浏览器字体回退和翻译插件识别中文界面。
+  const root = document?.documentElement;
+  if (!root) return;
+  const lang = runtimeState.currentLanguage === "zh" ? "zh-CN" : "en";
+  if (root.lang !== lang) root.lang = lang;
+}
+
 function updateUIText() {
+  syncDocumentLanguage();
   applyDeclarativeTranslations(document);
 
   const uiMap = [
