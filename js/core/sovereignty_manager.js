@@ -13,10 +13,17 @@ import {
 } from "./feature_identity.js";
 import { resolveDataAssetUrl } from "./runtime_asset_registry.js";
 import { planProjectFeatureMigration } from "./project_feature_migration.js";
+import {
+  collectProjectFeatureIds,
+  migrateMergedFeatureProjectData,
+  resolveFeatureMergeLineage,
+} from "./feature_merge_migration.js";
 const state = runtimeState;
 
 const FEATURE_MIGRATION_URLS = [resolveDataAssetUrl("feature_migrations:by_hybrid_v1")];
+const FEATURE_MERGE_LINEAGE_URL = resolveDataAssetUrl("feature_migrations:political_feature_merges");
 let featureMigrationMapPromise = null;
+let featureMergeLineagePromise = null;
 
 function normalizeOwnerCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
@@ -217,6 +224,31 @@ async function loadFeatureMigrationMap({ fetchImpl = globalThis.fetch } = {}) {
   return featureMigrationMapPromise;
 }
 
+async function migrateAcrossFeatureMerges(data, validFeatureIds, { fetchImpl = globalThis.fetch, scenarioId = "" } = {}) {
+  if (!featureMergeLineagePromise) {
+    featureMergeLineagePromise = (async () => {
+      if (typeof fetchImpl !== "function") return null;
+      try {
+        const response = await fetchImpl(FEATURE_MERGE_LINEAGE_URL, { cache: "no-store" });
+        if (!response?.ok) {
+          console.warn(`Unable to load feature merge lineage: ${FEATURE_MERGE_LINEAGE_URL} (${response?.status || "n/a"})`);
+          return null;
+        }
+        return await response.json();
+      } catch (error) {
+        console.warn(`Failed to load feature merge lineage ${FEATURE_MERGE_LINEAGE_URL}:`, error);
+        return null;
+      }
+    })();
+  }
+  const lineage = await featureMergeLineagePromise;
+  if (!Array.isArray(lineage?.plans)) {
+    featureMergeLineagePromise = null;
+    return null;
+  }
+  return migrateMergedFeatureProjectData(data, resolveFeatureMergeLineage(lineage, scenarioId), validFeatureIds);
+}
+
 function remapFeatureScopedEntries(entries, validFeatureIds, migrationMap) {
   const source = entries && typeof entries === "object" ? entries : {};
   const remapped = {};
@@ -315,15 +347,24 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
     return payload;
   }
 
+  const sourceVisualOverrides = payload.visualOverrides || {};
+  const mergeMigration = collectProjectFeatureIds(payload).some((id) => !normalizedValidFeatureIds.has(id))
+    ? await migrateAcrossFeatureMerges(payload, normalizedValidFeatureIds, {
+      fetchImpl, scenarioId: String(payload.scenario?.id || scenarioManifest?.scenario_id || "").trim(),
+    })
+    : null;
+  if (mergeMigration) payload = mergeMigration.data;
+  const mergeSummary = mergeMigration?.summary || { migratedEntries: 0, droppedEntries: 0, createdEntries: 0 };
   const nextVisualOverrides = payload.visualOverrides || {};
   const visualPartition = partitionFeatureScopedEntries(nextVisualOverrides, normalizedValidFeatureIds);
   const reportMigration = (migratedEntries = 0) => {
     if (typeof onMigration !== "function") return;
-    const sourceCount = Object.keys(nextVisualOverrides).length;
-    const retainedCount = Object.keys(visualPartition.retained).length;
+    // Merged targets are not saved entries; their sources count as migrated or ignored.
+    const sourceCount = Object.keys(sourceVisualOverrides).length;
+    const retainedCount = Object.keys(visualPartition.retained).length - mergeSummary.createdEntries;
     onMigration({
-      migratedEntries: migratedEntries + (explicitMigration?.summary.migratedEntries || 0),
-      ignoredEntries: Math.max(0, sourceCount - retainedCount - migratedEntries),
+      migratedEntries: migratedEntries + mergeSummary.migratedEntries + (explicitMigration?.summary.migratedEntries || 0),
+      ignoredEntries: Math.max(0, sourceCount - retainedCount - migratedEntries - mergeSummary.migratedEntries),
     });
   };
   if (!visualPartition.needsMigration) {

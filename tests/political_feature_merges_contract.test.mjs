@@ -100,6 +100,14 @@ test("merge plan groups are disjoint, contiguous candidates with bilingual names
   }
 });
 
+test("saved-project merge lineage matches the applied plans in order", () => {
+  const lineage = JSON.parse(fs.readFileSync(path.join(root, "data/feature-migrations/political_feature_merges.v1.json"), "utf8"));
+  assert.deepEqual(lineage, { version: 1, plans: order.map((name, index) => ({
+    plan: name, scenarios: plans[index].scenarios ?? null,
+    groups: Object.fromEntries(plans[index].groups.map(group => [group.id, group.member_ids])),
+  })) });
+});
+
 test("runtime assets contain no merged-away political feature IDs", () => {
   assert.ok(sampleProjects.length && sampleProjects.every(sample => scenarios.includes(sample.scenario)));
   const stale = [

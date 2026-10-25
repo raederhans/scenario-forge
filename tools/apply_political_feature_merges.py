@@ -34,7 +34,7 @@ from shapely.geometry import shape  # noqa: E402
 from shapely.ops import unary_union  # noqa: E402
 
 from map_builder.json_source import read_json_source, write_runtime_topology_source  # noqa: E402
-from map_builder.political_feature_merge_plans import ordered_plans  # noqa: E402
+from map_builder.political_feature_merge_plans import ordered_plans, plan_scenarios, validate_scope, write_lineage  # noqa: E402
 from map_builder.regional_geometry import (  # noqa: E402
     _compact_arcs,
     _decode_geometry,
@@ -81,9 +81,8 @@ class Merges:
         self.groups = plan["groups"]
         # A plan without "scenarios" also rewrites the base topologies and shared hierarchy.
         self.scoped = "scenarios" in plan
-        self.scenarios = tuple(plan["scenarios"]) if self.scoped else SCENARIOS
-        if not self.scenarios or not set(self.scenarios) <= set(SCENARIOS):
-            raise ValueError(f"Unknown or empty scenario scope: {self.scenarios}")
+        self.scenarios = plan_scenarios(plan)
+        validate_scope(self.scenarios)
         self.by_id = {group["id"]: group for group in self.groups}
         self.remap = {member: group["id"] for group in self.groups for member in group["member_ids"]}
 
@@ -663,6 +662,7 @@ def main() -> None:
         report[scenario_id] = apply_scenario(scenario_id, merges)
         print(json.dumps({scenario_id: {k: v for k, v in report[scenario_id].items() if k != "fixes"}}, ensure_ascii=False), flush=True)
     if not args.skip_global:
+        report["lineage"] = write_lineage(DATA)
         report["population"] = apply_population(merges)
         report["manifest"] = refresh_manifest(in_sync)
     print(json.dumps({key: value for key, value in report.items() if key not in SCENARIOS}, ensure_ascii=False))

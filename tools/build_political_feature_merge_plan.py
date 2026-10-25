@@ -23,6 +23,11 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from map_builder.political_feature_merge_plans import consumed_members, register_plan, validate_scope  # noqa: E402
+
 DATA = ROOT / "data"
 OWNERSHIP_SCENARIOS = ("hoi4_1936", "hoi4_1939", "modern_world", "tno_1962")
 ALL_SCENARIOS = ("blank_base", *OWNERSHIP_SCENARIOS)
@@ -334,9 +339,14 @@ def hierarchy_parent(member_ids: list[str], memberships: dict[str, list[str]]) -
 
 def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None, naming: str = "parent_direction",
                city_minimum: int = CITY_MIN_POPULATION) -> dict:
-    if scenarios is not None and (not scenarios or not set(scenarios) <= set(ALL_SCENARIOS)):
-        raise ValueError(f"Unknown or empty scenario scope: {scenarios}")
+    if scenarios is not None:
+        validate_scope(scenarios)
     candidates = read_json(candidates_path)
+    # A member an applied plan already merged away (in any scenario of this scope) cannot merge again.
+    consumed = consumed_members(DATA, scenarios or ALL_SCENARIOS)
+    if stale := sorted({f"{member} ({consumed[member]})" for candidate in candidates["candidates"]
+                        for member in candidate["member_ids"] if member in consumed}):
+        raise ValueError(f"Candidate members were already merged by applied plans: {stale[:5]}")
     tables, hierarchy = load_assignment_tables(scenarios), read_json(DATA / "hierarchy.json")
     adjacency, source_names = load_adjacency() if scenarios is None else scoped_adjacency(scenarios)
     memberships, name_sources = group_memberships(hierarchy), load_name_sources()
@@ -410,7 +420,6 @@ def main() -> None:
     output.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     if output.parent == DATA / "political_feature_merges":
         # A new plan applies after every plan already listed.
-        from map_builder.political_feature_merge_plans import register_plan
         register_plan(DATA, output.name)
     print(json.dumps(plan["counts"]))
 

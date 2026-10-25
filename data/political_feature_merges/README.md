@@ -30,15 +30,20 @@ from an earlier plan that applies to every scenario of the later one.
 
 `--scenarios tno_1962` (plan field `"scenarios"`) applies a plan only to those
 scenarios. Owners, cores and HOI4 states come from those scenarios alone, and
-contiguity must hold in each of them. Hierarchy, quick-fill, China prefecture
-and every protection rule stay global. The apply tool then:
+contiguity must hold in each of them. A scope names both HOI4 scenarios or
+neither. Hierarchy, quick-fill, China prefecture and every protection rule stay
+global. The plan tool refuses a candidate member that an applied plan already
+merged away in any scenario of the new scope. The apply tool then:
 
 - leaves the base topologies, `hierarchy.json` and the China crosswalk
   unchanged, and records the merges in each scoped scenario's
   `manifest.json` under `hierarchy_overrides.feature_merges`, from which
   `js/core/scenario_hierarchy.js` projects the shared hierarchy;
 - adds merged entries to `locales.json` and `geo_aliases.json` while keeping
-  the members' entries;
+  the members' entries. In the scoped scenarios the members' aliases name the
+  merged feature: in `geo_aliases.startup.json`
+  (`tools/build_startup_bootstrap_assets.py`) and in the full alias map
+  (`js/core/scenario_localization_state.js`);
 - projects a global file only when every scenario that reads it is in scope
   (the TNO releasable catalog for `tno_1962`), refuses a plan that touches any
   other shared file, and leaves city host IDs on the members;
@@ -123,33 +128,43 @@ samples and reviewed name collisions), where a lone merged member is valid.
 Quick-fill metadata in `hierarchy.json` is then rebuilt from the projected
 crosswalk and every applied plan.
 
-Afterwards:
+Afterwards, `python tools/refresh_political_feature_merge_downstream.py --plan <plan>
+--base-url <dev server>/app/ --landing-python "<WSL python>"` runs these steps for
+the plan's scenarios only (`--dry-run` lists them):
 
-1. Regenerate the political ID raster assets with
-   `node tools/build_political_id_raster_assets.mjs --base-url <dev server>/app/`
-   and again with `--extend true`.
-2. Re-pin the Modern World river-paint packs with
-   `python tools/repin_river_partition_packs.py`. The new topology bytes and
+1. The political ID raster assets of the scoped HOI4 1936, HOI4 1939 and TNO 1962
+   scenarios (`node tools/build_political_id_raster_assets.mjs --scenario <id>`,
+   then again with `--extend true`). The dev server must serve this checkout.
+2. When `modern_world` is in scope, the river-paint packs
+   (`python tools/repin_river_partition_packs.py`). The new topology bytes and
    owner baseline change each pack's `source` (`landDigest`, `baselineHash`).
    The script rebuilds every pack from its own recorded rivers, parents and
    lake option, refuses any change to `parents` or `support`, regenerates the
    `.transport.json` downloads, and replaces each `packId` and
-   `canonicalSha256` in `js/core/river_paint/pilot_manifest.js` (and its dist
-   mirror when it was in sync).
-3. Re-pin `scenario.baselineHash` in `landing/assets/sample-projects/*` and
-   their `dist/assets` mirrors to each scenario manifest's new `baseline_hash`.
-4. Regenerate the landing hero maps with
-   `python tools/build_landing_europe_1936_showcase.py`; their metadata counts
-   scenario features. Copy the changed files to `dist/assets` and update their
-   `size_bytes` (plus `total_bytes` and the `assets` directory total) in
-   `dist/pages-dist-manifest.json`.
-5. Regenerate the landing map stage with
-   `python tools/build_landing_history_scrubber.py`; it cuts the HOI4 1936,
-   HOI4 1939, TNO 1962 and Modern World political features into shared pieces.
+   `canonicalSha256` in `js/core/river_paint/pilot_manifest.js`.
+3. `scenario.baselineHash` in the scoped `landing/assets/sample-projects/*`.
+4. The landing hero maps (`tools/build_landing_europe_1936_showcase.py`, for
+   blank, HOI4 1936/1939 and TNO 1962), whose metadata counts scenario features,
+   and the landing map stage (`tools/build_landing_history_scrubber.py`, for
+   HOI4 1936/1939, TNO 1962 and Modern World). CI compares these bytes on Linux,
+   so run them with the WSL interpreter.
+
+## Saved projects
+
+The apply tool writes `data/feature-migrations/political_feature_merges.v1.json`
+(the applied plans in order, runtime key
+`feature_migrations:political_feature_merges`). When a saved project names IDs
+the current scenario lacks, `js/core/feature_merge_migration.js` resolves each
+through every later merge of that scenario to its final feature. A merged
+feature takes a saved value only when the saved IDs cover all of its members
+with one identical value (member lists must contain all members); anything
+else is dropped and counted in the import summary's ignored entries. Anchors
+inside a member move to the merged feature.
 
 ## After upstream rebuilds
 
 Any rebuild that regenerates these assets from upstream sources restores the old
-parcels. Run the apply tool (then population and rasters) again.
+parcels. Run the apply tool for every plan in `apply_order.json` order, then
+the downstream script above.
 `tests/political_feature_merges_contract.test.mjs` fails while any runtime asset
 still contains a merged-away ID.

@@ -273,3 +273,17 @@ for (const changedInput of ["baseGeoLocales", "baseGeoAliasToStableKey", "scenar
     if (changedInput === "cities") assert.equal(snapshot.locales.geo.HOST.en, "Changed city");
   });
 }
+
+test("scenario-scoped merges point member aliases at the merged feature only in that scenario", async () => {
+  const baseAliasMap = { Zmeinogorsky: "id::RU_D", Kuryinsky: "id::RU_E", Barnaul: "id::RU_F" };
+  const featureMerges = { RU_MRG_T: ["RU_D", "RU_E"] };
+  const options = { yieldControl: async () => {} };
+  const tno = await prepareScenarioLocalizationState({
+    activeScenarioId: "tno_1962", activeScenarioManifest: { hierarchy_overrides: { feature_merges: featureMerges } },
+  }, { baseGeoLocales: {}, baseAliasMap }, options);
+  assert.deepEqual(tno.aliasToStableKey, { Zmeinogorsky: "id::RU_MRG_T", Kuryinsky: "id::RU_MRG_T", Barnaul: "id::RU_F" });
+  const hoi4 = await prepareScenarioLocalizationState({ activeScenarioId: "hoi4_1936", activeScenarioManifest: {} },
+    { baseGeoLocales: {}, baseAliasMap }, options);
+  assert.deepEqual(hoi4.aliasToStableKey, baseAliasMap);
+  assert.equal(baseAliasMap.Zmeinogorsky, "id::RU_D");
+});

@@ -8,8 +8,26 @@ ORDER_FILE = "political_feature_merges/apply_order.json"
 SCENARIOS = ("blank_base", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962")
 
 
+# Scenarios that share one assignment source; a scoped plan covers all of them or none.
+SCENARIO_FAMILIES = (("hoi4_1936", "hoi4_1939"),)
+
+
 def plan_scenarios(plan: dict) -> tuple[str, ...]:
     return tuple(plan["scenarios"]) if "scenarios" in plan else SCENARIOS
+
+
+def validate_scope(scenarios: tuple[str, ...]) -> None:
+    if not scenarios or not set(scenarios) <= set(SCENARIOS):
+        raise ValueError(f"Unknown or empty scenario scope: {scenarios}")
+    for family in SCENARIO_FAMILIES:
+        if 0 < len(set(family) & set(scenarios)) < len(family):
+            raise ValueError(f"Scenario scope must include all or none of {family}: {scenarios}")
+
+
+def consumed_members(data_dir: Path, scenarios: tuple[str, ...]) -> dict[str, str]:
+    """Feature ID -> applied plan that already merged it away in any of these scenarios."""
+    return {member: name for name, plan in ordered_plans(data_dir) if set(plan_scenarios(plan)) & set(scenarios)
+            for group in plan["groups"] for member in group["member_ids"]}
 
 
 def ordered_plans(data_dir: Path) -> list[tuple[str, dict]]:
@@ -26,6 +44,7 @@ def ordered_plans(data_dir: Path) -> list[tuple[str, dict]]:
     plans, produced = [], {}
     for name in order:
         plan = json.loads((plan_dir / name).read_text(encoding="utf-8"))
+        validate_scope(plan_scenarios(plan))
         scenarios = set(plan_scenarios(plan))
         for group in plan["groups"]:
             for member in group["member_ids"]:
@@ -34,6 +53,28 @@ def ordered_plans(data_dir: Path) -> list[tuple[str, dict]]:
             produced[group["id"]] = scenarios
         plans.append((name, plan))
     return plans
+
+
+LINEAGE_FILE = "feature-migrations/political_feature_merges.v1.json"
+
+
+def lineage_payload(data_dir: Path) -> dict:
+    """Runtime merge lineage for saved-project migration (js/core/feature_merge_migration.js)."""
+    return {
+        "version": 1,
+        "plans": [{"plan": name, "scenarios": list(plan["scenarios"]) if "scenarios" in plan else None,
+                   "groups": {group["id"]: group["member_ids"] for group in plan["groups"]}}
+                  for name, plan in ordered_plans(data_dir)],
+    }
+
+
+def write_lineage(data_dir: Path) -> bool:
+    path = data_dir / LINEAGE_FILE
+    text = json.dumps(lineage_payload(data_dir), ensure_ascii=False, separators=(",", ":")) + "\n"
+    if path.exists() and path.read_text(encoding="utf-8") == text:
+        return False
+    path.write_text(text, encoding="utf-8", newline="\n")
+    return True
 
 
 def register_plan(data_dir: Path, name: str) -> None:

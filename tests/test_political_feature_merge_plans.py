@@ -4,7 +4,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from map_builder.political_feature_merge_plans import ordered_plans, register_plan
+from map_builder.political_feature_merge_plans import consumed_members, ordered_plans, register_plan, validate_scope
+from tools.refresh_political_feature_merge_downstream import steps
 
 
 def write_plans(data_dir: Path, plans: dict[str, dict], order: list[str]) -> None:
@@ -54,6 +55,26 @@ class OrderedPlansTest(unittest.TestCase):
             register_plan(data_dir, "two.v1.json")
             order = json.loads((data_dir / "political_feature_merges/apply_order.json").read_text(encoding="utf-8"))["plans"]
             self.assertEqual(order, ["one.v1.json", "two.v1.json"])
+
+    def test_hoi4_scenarios_are_scoped_together(self):
+        validate_scope(("hoi4_1936", "hoi4_1939", "tno_1962"))
+        with self.assertRaisesRegex(ValueError, "all or none"):
+            validate_scope(("hoi4_1936",))
+        with self.assertRaisesRegex(ValueError, "all or none"):
+            self.check({"a.v1.json": plan(("DE_MRG_1", ["DE1", "DE2"]), scenarios=["hoi4_1939"])}, ["a.v1.json"])
+
+    def test_members_consumed_in_any_scoped_scenario_are_reported(self):
+        with tempfile.TemporaryDirectory() as directory:
+            write_plans(Path(directory), {"a.v1.json": plan(("RU_MRG_1", ["RU1", "RU2"]), scenarios=["tno_1962"])}, ["a.v1.json"])
+            self.assertEqual(consumed_members(Path(directory), ("hoi4_1936", "tno_1962")), {"RU1": "a.v1.json", "RU2": "a.v1.json"})
+            self.assertEqual(consumed_members(Path(directory), ("hoi4_1936", "hoi4_1939")), {})
+
+    def test_downstream_steps_follow_the_plan_scope(self):
+        names = lambda scenarios: [name for name, _ in steps(scenarios, "http://127.0.0.1:8008/app/", ["python"])]
+        self.assertEqual(names(("tno_1962",)), ["political ID raster tno_1962", "political ID raster tno_1962 --extend true",
+                                               "landing sample baselines", "landing hero maps", "landing map stage"])
+        self.assertEqual(names(("modern_world",)), ["Modern World river-paint packs", "landing sample baselines", "landing map stage"])
+        self.assertEqual(names(("blank_base",)), ["landing sample baselines", "landing hero maps"])
 
 
 if __name__ == "__main__":
