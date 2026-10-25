@@ -13,6 +13,8 @@ editable feature in **every** scenario and in the shared base data.
 | `india_canada_first_review.v1.json` | Applied plan: 106 groups, 245 members, 139 features removed. |
 | `europe_russia_wave3.candidates.json` | Input: Codex-reviewed UK, Czechia, Slovakia and Poland candidates (2026-10-21 Europe granularity research), southern/eastern France and the Moscow Reichskommissariat (RKM) parcels in TNO (2026-10-21 granularity pilot), and the remaining Ukraine candidates of the 2026-10-21 dense-country research except `UA_Kherson`, whose parent mixes Crimean source IDs. |
 | `europe_russia_wave3.v1.json` | Applied plan: 271 groups, 655 members, 384 features removed. |
+| `russia_china_wave4.candidates.json` | Input: Russia outside the Moscow Reichskommissariat, generated with the Codex protection engine under the RKM pilot rules, and the Codex 2026-10-21 v2 candidates for Shanxi, Shaanxi, Hunan, Guizhou and Guangxi. Groups whose union has a convex-hull fill below 0.4, an aspect above 3.5 or an area above 50,000 km² are left out. |
+| `russia_china_wave4.v1.json` | Applied plan: 248 groups, 656 members, 408 features removed. |
 
 Plans are applied one after another; their member sets are disjoint, and every
 consumer (quick-fill, tests) reads all `*.v<N>.json` plans.
