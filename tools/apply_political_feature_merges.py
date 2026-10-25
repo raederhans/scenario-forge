@@ -34,6 +34,7 @@ from shapely.geometry import shape  # noqa: E402
 from shapely.ops import unary_union  # noqa: E402
 
 from map_builder.json_source import read_json_source, write_runtime_topology_source  # noqa: E402
+from map_builder.political_feature_merge_plans import ordered_plans, plan_scenarios, validate_scope, write_lineage  # noqa: E402
 from map_builder.regional_geometry import (  # noqa: E402
     _compact_arcs,
     _decode_geometry,
@@ -60,6 +61,13 @@ GLOBAL_PROJECTED = (
     "releasables/hoi4_vanilla.internal.phase1.catalog.json", "releasables/hoi4_vanilla.internal.phase1.source.json",
     "releasables/tno_1962.internal.phase1.catalog.json", "releasables/tno_1962.internal.phase1.source.json",
 )
+# Scenarios that read each projected global file. A scoped plan projects a file only
+# when it covers every reader; cities keep their members and fall back to the scenario tag.
+GLOBAL_READERS = {
+    "releasables/tno_1962.internal.phase1.catalog.json": ("tno_1962",),
+    "releasables/tno_1962.internal.phase1.source.json": ("tno_1962",),
+}
+SCOPED_UNPROJECTED = ("world_cities.geojson", "europe_urban.geojson")
 CHINA_CROSSWALK = "quick_fill/china_prefecture_crosswalk.v1.json"
 POPULATION_FEATURES = "thematic_layers/population/ghsl_population_2020_v1/features"
 LANGUAGE_SEPARATORS = {"en": " + ", "zh": "、"}
@@ -71,6 +79,10 @@ PER_FEATURE_ANNOTATIONS = ("$.audit.", "$.reviewed_collision_feature_ids")
 class Merges:
     def __init__(self, plan: dict):
         self.groups = plan["groups"]
+        # A plan without "scenarios" also rewrites the base topologies and shared hierarchy.
+        self.scoped = "scenarios" in plan
+        self.scenarios = plan_scenarios(plan)
+        validate_scope(self.scenarios)
         self.by_id = {group["id"]: group for group in self.groups}
         self.remap = {member: group["id"] for group in self.groups for member in group["member_ids"]}
 
@@ -97,6 +109,10 @@ class Merges:
                 merged = {}
                 for language, separator in LANGUAGE_SEPARATORS.items():
                     if not any(language in entry for entry in entries):
+                        continue
+                    if group.get("name_source", "members") != "members":
+                        # Parent/direction and city names replace member names, including an earlier merge's.
+                        merged[language] = group["names"][language]
                         continue
                     names = [((value.get(prefix + member) or {}).get(language)
                               or group["member_names"][member][language]) for member in group["member_ids"]]
@@ -322,6 +338,29 @@ def apply_scenario_extras(scenario_dir: Path, merges: Merges) -> list[str]:
     return changed
 
 
+def record_scenario_feature_merges(manifest_path: Path, merges: Merges, applied: list[str]) -> None:
+    """Record scoped merges for js/core/scenario_hierarchy.js, which projects the shared hierarchy.
+
+    Members are expressed in shared-hierarchy IDs: an earlier scoped merge that
+    is merged again is replaced by its own members, and ``feature_redirects``
+    keeps its ID pointing at the final feature for aliases that still name it.
+    """
+    manifest = load_json(manifest_path)
+    overrides = manifest.setdefault("hierarchy_overrides", {})
+    recorded = dict(overrides.get("feature_merges") or {})
+    redirects = dict(overrides.get("feature_redirects") or {})
+    for group_id in applied:
+        members = merges.by_id[group_id]["member_ids"]
+        consumed = [member for member in members if member in recorded]
+        recorded[group_id] = [leaf for member in members for leaf in recorded.pop(member, [member])]
+        redirects = {source: group_id if target in consumed else target for source, target in redirects.items()}
+        redirects.update(dict.fromkeys(consumed, group_id))
+    overrides["feature_merges"] = dict(sorted(recorded.items()))
+    if redirects:
+        overrides["feature_redirects"] = dict(sorted(redirects.items()))
+    write_json(manifest_path, manifest)
+
+
 def apply_scenario(scenario_id: str, merges: Merges) -> dict:
     scenario_dir = DATA / "scenarios" / scenario_id
     topology_path = scenario_dir / "runtime_topology.topo.json"
@@ -332,6 +371,8 @@ def apply_scenario(scenario_id: str, merges: Merges) -> dict:
     removed = sorted(member for group_id in applied for member in merges.by_id[group_id]["member_ids"])
     strategic_path = scenario_dir / "strategic_values.by_feature.json"
     extras = apply_scenario_extras(scenario_dir, merges)
+    if merges.scoped and applied:
+        record_scenario_feature_merges(scenario_dir / "manifest.json", merges, applied)
     write_runtime_topology_source(scenario_dir, topology)
     fixes = refresh_scenario(scenario_dir, assignments, removed)
     if strategic_path.exists():
@@ -343,7 +384,8 @@ def apply_scenario(scenario_id: str, merges: Merges) -> dict:
 
 def apply_locales(merges: Merges) -> None:
     def transform(payload: dict) -> dict:
-        payload = merges.project(payload)
+        # Scoped plans add merged names; other scenarios still name the members.
+        payload = copy.deepcopy(payload) if merges.scoped else merges.project(payload)
         # Members with no ID-keyed name used the raw-name fallback; the merged name has none.
         for group in merges.groups:
             payload["geo"].setdefault("id::" + group["id"], dict(group["names"]))
@@ -398,8 +440,8 @@ def apply_china_crosswalk(merges: Merges) -> None:
     rewrite(DATA / CHINA_CROSSWALK, transform)
 
 
-def apply_quick_fill() -> None:
-    """Rebuild hierarchy quick-fill metadata from the projected crosswalk and every applied plan."""
+def apply_quick_fill(through: str | None = None) -> None:
+    """Rebuild hierarchy quick-fill metadata from the projected crosswalk and the plans applied so far."""
     from map_builder.quick_fill_hierarchy import build_quick_fill_metadata, load_crosswalk, load_feature_merge_members
 
     topology = load_json(DATA / "europe_topology.runtime_political_v1.json")
@@ -407,7 +449,7 @@ def apply_quick_fill() -> None:
 
     def transform(hierarchy: dict) -> dict:
         return {**hierarchy, "quick_fill": build_quick_fill_metadata(
-            hierarchy, properties, load_crosswalk(DATA), load_feature_merge_members(DATA))}
+            hierarchy, properties, load_crosswalk(DATA), load_feature_merge_members(DATA, through))}
 
     rewrite(DATA / "hierarchy.json", transform)
 
@@ -476,8 +518,10 @@ def merge_geo_aliases(payload: dict, merges: Merges) -> dict:
     entries, merged_entries = [], {}
     for entry in payload["entries"]:
         group_id = merges.remap.get(entry.get("feature_id"))
-        if not group_id:
+        if not group_id or merges.scoped:
+            # Scoped plans keep member entries for the scenarios where they stay separate.
             entries.append(entry)
+        if not group_id:
             continue
         group = merges.by_id[group_id]
         target = merged_entries.setdefault(group_id, {
@@ -486,15 +530,22 @@ def merge_geo_aliases(payload: dict, merges: Merges) -> dict:
         })
         for key in ("aliases", "search_only_aliases"):
             target[key] = list(dict.fromkeys(target[key] + list(entry.get(key) or [])))
+    for group_id, target in merged_entries.items():
+        group = merges.by_id[group_id]
+        if group.get("name_source", "members") != "members":
+            # Member names, and an earlier merge's composed name, stay searchable.
+            names = [group["names"]["zh"], *(name for member in group["member_names"].values() for name in member.values())]
+            target["search_only_aliases"] = list(dict.fromkeys(target["search_only_aliases"] + names))
     entries.extend(merged_entries.values())
     payload["entries"] = entries
-    aliases = {alias: merges.map_id(key) for alias, key in payload["alias_to_stable_key"].items()}
+    keep = (lambda key: key) if merges.scoped else merges.map_id
+    aliases = {alias: keep(key) for alias, key in payload["alias_to_stable_key"].items()}
     for group_id, entry in merged_entries.items():
         aliases.setdefault(entry["primary_name"], f"id::{group_id}")
     payload["alias_to_stable_key"] = aliases
     # A sample of aliases shared by several features; a merged member keeps its row under the merged key.
     for row in payload.get("ambiguous_aliases_sample") or []:
-        row["stable_keys"] = list(dict.fromkeys(merges.map_id(key) for key in row["stable_keys"]))
+        row["stable_keys"] = list(dict.fromkeys(keep(key) for key in row["stable_keys"]))
     payload["entry_count"], payload["alias_count"] = len(entries), len(aliases)
     return payload
 
@@ -507,6 +558,8 @@ def apply_population(merges: Merges) -> list[str]:
     layer = json.loads(layer_original)
     changed = []
     for scenario_id, descriptor in layer["scenarios"].items():
+        if scenario_id not in merges.scenarios:
+            continue
         path = ROOT / descriptor["features_url"]
         scenario_manifest = load_json(DATA / "scenarios" / scenario_id / "manifest.json")
         geometry_version = hashlib.sha256((ROOT / scenario_manifest["runtime_topology_url"]).read_bytes()).hexdigest()
@@ -562,6 +615,24 @@ def merge_population(payload: dict, merges: Merges, name: str) -> dict:
     return payload
 
 
+def global_projected_paths(merges: Merges) -> list[Path]:
+    """Global files to project; a scoped plan refuses to touch one that other scenarios also read."""
+    paths = [DATA / name for name in GLOBAL_PROJECTED if (DATA / name).exists()]
+    if not merges.scoped:
+        return paths
+    selected = []
+    for path in paths:
+        name = path.relative_to(DATA).as_posix()
+        if set(GLOBAL_READERS.get(name, SCENARIOS)) <= set(merges.scenarios):
+            selected.append(path)
+        elif name not in SCOPED_UNPROJECTED:
+            text = path.read_text(encoding="utf-8")
+            touched = sorted(member for member in merges.remap if f'"{member}"' in text)
+            if touched:
+                raise ValueError(f"{name} is read by scenarios outside {merges.scenarios}: {touched[:5]}")
+    return selected
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--plan", default="data/political_feature_merges/europe_de_fr.v1.json")
@@ -572,6 +643,9 @@ def main() -> None:
     parser.add_argument("--manifest-only", action="store_true", help="Only refresh data/manifest.json evidence.")
     args = parser.parse_args()
     merges = Merges(load_json(ROOT / args.plan))
+    # Replays follow apply_order.json, never file-name order.
+    if Path(args.plan).name not in dict(ordered_plans(DATA)):
+        raise ValueError(f"{args.plan} is not listed in data/political_feature_merges/apply_order.json")
     if args.quick_fill_only:
         apply_quick_fill()
         return
@@ -583,18 +657,21 @@ def main() -> None:
         return
     report = {}
     in_sync = manifest_in_sync()
-    if not args.skip_global:
+    if not args.skip_global and not merges.scoped:
         report["base_topologies"] = apply_base_topologies(merges)
         apply_hierarchy(merges)
         apply_china_crosswalk(merges)
-        apply_quick_fill()
+        # A replay must not expect members of plans that are not applied yet.
+        apply_quick_fill(Path(args.plan).name)
+    if not args.skip_global:
         apply_locales(merges)
         apply_geo_aliases(merges)
-        report["global"] = project_files([DATA / name for name in GLOBAL_PROJECTED if (DATA / name).exists()], merges)
-    for scenario_id in args.scenario or SCENARIOS:
+        report["global"] = project_files(global_projected_paths(merges), merges)
+    for scenario_id in [scenario for scenario in args.scenario or SCENARIOS if scenario in merges.scenarios]:
         report[scenario_id] = apply_scenario(scenario_id, merges)
         print(json.dumps({scenario_id: {k: v for k, v in report[scenario_id].items() if k != "fixes"}}, ensure_ascii=False), flush=True)
     if not args.skip_global:
+        report["lineage"] = write_lineage(DATA)
         report["population"] = apply_population(merges)
         report["manifest"] = refresh_manifest(in_sync)
     print(json.dumps({key: value for key, value in report.items() if key not in SCENARIOS}, ensure_ascii=False))
