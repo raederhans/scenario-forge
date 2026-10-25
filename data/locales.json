@@ -293151,6 +293151,578 @@
     "id::RU_MRG_8b0c0a06cfbe": {
       "en": "Dagestan · Central 1",
       "zh": "达吉斯坦共和国·中部1"
+    },
+    "id::IN_MRG_cee31aca9a07": {
+      "en": "Tamil Nadu · Northeast",
+      "zh": "泰米尔纳德邦·东北部"
+    },
+    "id::IN_MRG_7779e13ac7b3": {
+      "en": "Himachal Pradesh · South",
+      "zh": "喜马偕尔邦·南部"
+    },
+    "id::IN_MRG_7b0c2a483228": {
+      "en": "Rajasthan · South 1",
+      "zh": "拉贾斯坦邦·南部1"
+    },
+    "id::IN_MRG_48dd97061f04": {
+      "en": "Punjab · Southeast",
+      "zh": "旁遮普邦·东南部"
+    },
+    "id::IN_MRG_883b10e5d00a": {
+      "en": "Jharkhand · Northeast",
+      "zh": "贾坎德邦·东北部"
+    },
+    "id::IN_MRG_05eafa4e7092": {
+      "en": "Haryana · South",
+      "zh": "哈里亚纳邦·南部"
+    },
+    "id::IN_MRG_21b7f1089cf4": {
+      "en": "Bihar · West",
+      "zh": "比哈尔邦·西部"
+    },
+    "id::IN_MRG_4b3f04e0f052": {
+      "en": "Madhya Pradesh · North",
+      "zh": "中央邦·北部"
+    },
+    "id::IN_MRG_daa0ed708975": {
+      "en": "Bihar · East 1",
+      "zh": "比哈尔邦·东部1"
+    },
+    "id::IN_MRG_bf71f4fd25b0": {
+      "en": "Uttar Pradesh · Northwest 1",
+      "zh": "北方邦·西北部1"
+    },
+    "id::IN_MRG_c5914ea1f4cc": {
+      "en": "Assam · Central",
+      "zh": "阿萨姆邦·中部"
+    },
+    "id::IN_MRG_6cb5e15ba7ae": {
+      "en": "Uttar Pradesh · East 1",
+      "zh": "北方邦·东部1"
+    },
+    "id::IN_MRG_4d898a5137a3": {
+      "en": "Himachal Pradesh · West",
+      "zh": "喜马偕尔邦·西部"
+    },
+    "id::IN_MRG_09081ee1d22c": {
+      "en": "Punjab · Southwest",
+      "zh": "旁遮普邦·西南部"
+    },
+    "id::IN_MRG_65081ed5bb9a": {
+      "en": "Bihar · Northwest",
+      "zh": "比哈尔邦·西北部"
+    },
+    "id::IN_MRG_63ee40e30267": {
+      "en": "Maharashtra · East 2",
+      "zh": "马哈拉施特拉邦·东部2"
+    },
+    "id::IN_MRG_d2159d107015": {
+      "en": "Manipur · North",
+      "zh": "曼尼普尔邦·北部"
+    },
+    "id::IN_MRG_708a258c7bc8": {
+      "en": "Uttar Pradesh · Northwest 2",
+      "zh": "北方邦·西北部2"
+    },
+    "id::IN_MRG_a944b57d54cb": {
+      "en": "Telangana · Southwest 2",
+      "zh": "特伦甘纳邦·西南部2"
+    },
+    "id::IN_MRG_0156878691b5": {
+      "en": "Assam · East",
+      "zh": "阿萨姆邦·东部"
+    },
+    "id::IN_MRG_d11bffed2078": {
+      "en": "Karnataka · South",
+      "zh": "卡纳塔克邦·南部"
+    },
+    "id::IN_MRG_6ac4bd6d39d9": {
+      "en": "Jharkhand · Southwest",
+      "zh": "贾坎德邦·西南部"
+    },
+    "id::IN_MRG_28701b62eace": {
+      "en": "Madhya Pradesh · Northeast",
+      "zh": "中央邦·东北部"
+    },
+    "id::IN_MRG_344720d94b02": {
+      "en": "Uttar Pradesh · Southwest",
+      "zh": "北方邦·西南部"
+    },
+    "id::IN_MRG_65d1ff50f969": {
+      "en": "Tamil Nadu · South",
+      "zh": "泰米尔纳德邦·南部"
+    },
+    "id::IN_MRG_b291003b6f41": {
+      "en": "Gujarat · East",
+      "zh": "古吉拉特邦·东部"
+    },
+    "id::IN_MRG_c2a8b7b28b23": {
+      "en": "Karnataka · Southeast",
+      "zh": "卡纳塔克邦·东南部"
+    },
+    "id::IN_MRG_c37939012a0d": {
+      "en": "Madhya Pradesh · East 1",
+      "zh": "中央邦·东部1"
+    },
+    "id::IN_MRG_dfae0079ed8c": {
+      "en": "West Bengal · Southwest",
+      "zh": "西孟加拉邦·西南部"
+    },
+    "id::IN_MRG_5b5a79a728e7": {
+      "en": "Uttar Pradesh · Southeast 2",
+      "zh": "北方邦·东南部2"
+    },
+    "id::IN_MRG_464251afa31f": {
+      "en": "Tamil Nadu · Central",
+      "zh": "泰米尔纳德邦·中部"
+    },
+    "id::IN_MRG_f73955d59e52": {
+      "en": "Madhya Pradesh · West 1",
+      "zh": "中央邦·西部1"
+    },
+    "id::IN_MRG_886776fba38b": {
+      "en": "Kerala · Central",
+      "zh": "喀拉拉邦·中部"
+    },
+    "id::IN_MRG_4c31a6ef59fd": {
+      "en": "Andhra Pradesh · Northeast 1",
+      "zh": "安得拉邦·东北部1"
+    },
+    "id::IN_MRG_20593aed5942": {
+      "en": "Maharashtra · South",
+      "zh": "马哈拉施特拉邦·南部"
+    },
+    "id::IN_MRG_0d3b03a56cac": {
+      "en": "Madhya Pradesh · Southwest 1",
+      "zh": "中央邦·西南部1"
+    },
+    "id::IN_MRG_6832ada5b624": {
+      "en": "Rajasthan · Northeast",
+      "zh": "拉贾斯坦邦·东北部"
+    },
+    "id::IN_MRG_0f1924c89ced": {
+      "en": "Gujarat · North",
+      "zh": "古吉拉特邦·北部"
+    },
+    "id::IN_MRG_0002559134aa": {
+      "en": "Madhya Pradesh · Southwest 2",
+      "zh": "中央邦·西南部2"
+    },
+    "id::IN_MRG_4f750131bc07": {
+      "en": "Bihar · Southwest",
+      "zh": "比哈尔邦·西南部"
+    },
+    "id::IN_MRG_91cd3b059324": {
+      "en": "Andhra Pradesh · Southwest",
+      "zh": "安得拉邦·西南部"
+    },
+    "id::IN_MRG_5002491fef3c": {
+      "en": "Haryana · Northeast",
+      "zh": "哈里亚纳邦·东北部"
+    },
+    "id::IN_MRG_0de8d89a2f89": {
+      "en": "Telangana · East",
+      "zh": "特伦甘纳邦·东部"
+    },
+    "id::IN_MRG_556898e710b4": {
+      "en": "Chhattisgarh · Central",
+      "zh": "恰蒂斯加尔邦·中部"
+    },
+    "id::IN_MRG_7b87bbb2489c": {
+      "en": "Uttar Pradesh · Central",
+      "zh": "北方邦·中部"
+    },
+    "id::IN_MRG_795568efe4e3": {
+      "en": "Maharashtra · Northwest",
+      "zh": "马哈拉施特拉邦·西北部"
+    },
+    "id::IN_MRG_6c3faeb50bb6": {
+      "en": "West Bengal · South",
+      "zh": "西孟加拉邦·南部"
+    },
+    "id::IN_MRG_33e99e4bc668": {
+      "en": "Rajasthan · East",
+      "zh": "拉贾斯坦邦·东部"
+    },
+    "id::IN_MRG_384a85847c3e": {
+      "en": "Bihar · East 2",
+      "zh": "比哈尔邦·东部2"
+    },
+    "id::IN_MRG_16da719e5c4e": {
+      "en": "Maharashtra · East 1",
+      "zh": "马哈拉施特拉邦·东部1"
+    },
+    "id::IN_MRG_446f3f4f281d": {
+      "en": "Andhra Pradesh · West",
+      "zh": "安得拉邦·西部"
+    },
+    "id::IN_MRG_1acfce2cdace": {
+      "en": "Karnataka · North",
+      "zh": "卡纳塔克邦·北部"
+    },
+    "id::IN_MRG_f050f1c4b3c9": {
+      "en": "Madhya Pradesh · West 2",
+      "zh": "中央邦·西部2"
+    },
+    "id::IN_MRG_3938fc2b4f6a": {
+      "en": "Nagaland · Southwest",
+      "zh": "那加兰邦·西南部"
+    },
+    "id::IN_MRG_dc594d605425": {
+      "en": "Madhya Pradesh · Central",
+      "zh": "中央邦·中部"
+    },
+    "id::IN_MRG_7345206f129a": {
+      "en": "Telangana · Southwest 1",
+      "zh": "特伦甘纳邦·西南部1"
+    },
+    "id::IN_MRG_77d8a688f4ee": {
+      "en": "Odisha · Northeast",
+      "zh": "奥里萨邦·东北部"
+    },
+    "id::IN_MRG_39e1573b0992": {
+      "en": "Himachal Pradesh · Central",
+      "zh": "喜马偕尔邦·中部"
+    },
+    "id::IN_MRG_20483c2d9ff2": {
+      "en": "Andhra Pradesh · Northeast 2",
+      "zh": "安得拉邦·东北部2"
+    },
+    "id::IN_MRG_349db36c32d3": {
+      "en": "Punjab · Northeast",
+      "zh": "旁遮普邦·东北部"
+    },
+    "id::IN_MRG_5f8577d839fb": {
+      "en": "Chhattisgarh · Northeast",
+      "zh": "恰蒂斯加尔邦·东北部"
+    },
+    "id::IN_MRG_8835ef71e194": {
+      "en": "Maharashtra · Southwest",
+      "zh": "马哈拉施特拉邦·西南部"
+    },
+    "id::IN_MRG_5df0a61bbde6": {
+      "en": "Bihar · Southeast",
+      "zh": "比哈尔邦·东南部"
+    },
+    "id::IN_MRG_f0850bb4446c": {
+      "en": "Gujarat · Southwest",
+      "zh": "古吉拉特邦·西南部"
+    },
+    "id::IN_MRG_bcb41c4f14e5": {
+      "en": "Kerala · Northwest",
+      "zh": "喀拉拉邦·西北部"
+    },
+    "id::IN_MRG_50e2da4682da": {
+      "en": "Meghalaya · North",
+      "zh": "梅加拉亚邦·北部"
+    },
+    "id::IN_MRG_562abe2f30d2": {
+      "en": "Uttar Pradesh · South",
+      "zh": "北方邦·南部"
+    },
+    "id::IN_MRG_7e018f926260": {
+      "en": "Assam · West",
+      "zh": "阿萨姆邦·西部"
+    },
+    "id::IN_MRG_46833068a470": {
+      "en": "Uttarakhand · West",
+      "zh": "北阿坎德邦·西部"
+    },
+    "id::IN_MRG_7bdc9fb12bc4": {
+      "en": "Maharashtra · Central",
+      "zh": "马哈拉施特拉邦·中部"
+    },
+    "id::IN_MRG_d5c4dbfe1bc8": {
+      "en": "Chhattisgarh · South",
+      "zh": "恰蒂斯加尔邦·南部"
+    },
+    "id::IN_MRG_b9f4a2a4e279": {
+      "en": "Madhya Pradesh · East 2",
+      "zh": "中央邦·东部2"
+    },
+    "id::IN_MRG_3ec3695dfc4f": {
+      "en": "Jharkhand · South",
+      "zh": "贾坎德邦·南部"
+    },
+    "id::IN_MRG_1a5f5037ac4f": {
+      "en": "Uttarakhand · Southeast",
+      "zh": "北阿坎德邦·东南部"
+    },
+    "id::IN_MRG_8aa5d9ed9b9f": {
+      "en": "Rajasthan · South 2",
+      "zh": "拉贾斯坦邦·南部2"
+    },
+    "id::IN_MRG_a655f8eae163": {
+      "en": "Telangana · North",
+      "zh": "特伦甘纳邦·北部"
+    },
+    "id::IN_MRG_61856fc517ff": {
+      "en": "West Bengal · Central",
+      "zh": "西孟加拉邦·中部"
+    },
+    "id::IN_MRG_f1db88056d17": {
+      "en": "Nagaland · Central",
+      "zh": "那加兰邦·中部"
+    },
+    "id::IN_MRG_5bd2f4f1a695": {
+      "en": "Uttar Pradesh · East 2",
+      "zh": "北方邦·东部2"
+    },
+    "id::IN_MRG_73b8798a7214": {
+      "en": "Assam · Northeast",
+      "zh": "阿萨姆邦·东北部"
+    },
+    "id::IN_MRG_0872aaddca5c": {
+      "en": "Assam · South",
+      "zh": "阿萨姆邦·南部"
+    },
+    "id::IN_MRG_e361a0c62816": {
+      "en": "Odisha · East",
+      "zh": "奥里萨邦·东部"
+    },
+    "id::IN_MRG_90b3ba03aaeb": {
+      "en": "Uttar Pradesh · Northwest 3",
+      "zh": "北方邦·西北部3"
+    },
+    "id::IN_MRG_a3f42a5bb822": {
+      "en": "Kerala · Southeast",
+      "zh": "喀拉拉邦·东南部"
+    },
+    "id::IN_MRG_b72e2285c63a": {
+      "en": "Odisha · Southwest",
+      "zh": "奥里萨邦·西南部"
+    },
+    "id::IN_MRG_03a3f2ee1465": {
+      "en": "Uttar Pradesh · Southeast 3",
+      "zh": "北方邦·东南部3"
+    },
+    "id::IN_MRG_d74786467839": {
+      "en": "Rajasthan · North",
+      "zh": "拉贾斯坦邦·北部"
+    },
+    "id::IN_MRG_cba921b13656": {
+      "en": "Madhya Pradesh · Southeast",
+      "zh": "中央邦·东南部"
+    },
+    "id::IN_MRG_7b27a9a03d70": {
+      "en": "Haryana · Southeast",
+      "zh": "哈里亚纳邦·东南部"
+    },
+    "id::IN_MRG_a2b5d06404de": {
+      "en": "Uttar Pradesh · Southeast 1",
+      "zh": "北方邦·东南部1"
+    },
+    "id::IN_MRG_e6a1c49f03e8": {
+      "en": "Karnataka · West",
+      "zh": "卡纳塔克邦·西部"
+    },
+    "id::IN_MRG_76ffa0bf6d57": {
+      "en": "Uttar Pradesh · West",
+      "zh": "北方邦·西部"
+    },
+    "id::IN_MRG_fb0ec8ba1cb5": {
+      "en": "Rajasthan · Southeast",
+      "zh": "拉贾斯坦邦·东南部"
+    },
+    "id::IN_MRG_1b5e5dff8662": {
+      "en": "Rajasthan · Southwest",
+      "zh": "拉贾斯坦邦·西南部"
+    },
+    "id::IN_MRG_fbe0a94c6ca5": {
+      "en": "Mizoram · Northwest",
+      "zh": "米佐拉姆邦·西北部"
+    },
+    "id::IN_MRG_7c8345e3fc08": {
+      "en": "Tamil Nadu · Northeast",
+      "zh": "泰米尔纳德邦·东北部"
+    },
+    "id::IN_MRG_c84cc721f026": {
+      "en": "Rajasthan · South 1",
+      "zh": "拉贾斯坦邦·南部1"
+    },
+    "id::IN_MRG_4dd33fabb06a": {
+      "en": "Punjab · Northeast",
+      "zh": "旁遮普邦·东北部"
+    },
+    "id::IN_MRG_778f7e31e2ac": {
+      "en": "Jharkhand · West",
+      "zh": "贾坎德邦·西部"
+    },
+    "id::IN_MRG_ad1b1cb9dc7d": {
+      "en": "Madhya Pradesh · North 1",
+      "zh": "中央邦·北部1"
+    },
+    "id::IN_MRG_e87fa35f6b6e": {
+      "en": "Uttar Pradesh · Southeast 1",
+      "zh": "北方邦·东南部1"
+    },
+    "id::IN_MRG_80df85ac2cf1": {
+      "en": "Himachal Pradesh · Central",
+      "zh": "喜马偕尔邦·中部"
+    },
+    "id::IN_MRG_862fe17f65b9": {
+      "en": "Punjab · South",
+      "zh": "旁遮普邦·南部"
+    },
+    "id::IN_MRG_ed11798c23bd": {
+      "en": "Telangana · Southwest",
+      "zh": "特伦甘纳邦·西南部"
+    },
+    "id::IN_MRG_20e0c11ac976": {
+      "en": "Karnataka · South",
+      "zh": "卡纳塔克邦·南部"
+    },
+    "id::IN_MRG_cf5f1caa9d83": {
+      "en": "Madhya Pradesh · Northeast",
+      "zh": "中央邦·东北部"
+    },
+    "id::IN_MRG_87a650d2ea07": {
+      "en": "Chhattisgarh · Northeast 1",
+      "zh": "恰蒂斯加尔邦·东北部1"
+    },
+    "id::IN_MRG_edd2f1905c7c": {
+      "en": "Tamil Nadu · South",
+      "zh": "泰米尔纳德邦·南部"
+    },
+    "id::IN_MRG_de032a25050a": {
+      "en": "Madhya Pradesh · East",
+      "zh": "中央邦·东部"
+    },
+    "id::IN_MRG_8460086baf42": {
+      "en": "Uttar Pradesh · Southeast 3",
+      "zh": "北方邦·东南部3"
+    },
+    "id::IN_MRG_b34cfe503c0e": {
+      "en": "Tamil Nadu · Central",
+      "zh": "泰米尔纳德邦·中部"
+    },
+    "id::IN_MRG_bdd5d79e2c3c": {
+      "en": "Assam · West",
+      "zh": "阿萨姆邦·西部"
+    },
+    "id::IN_MRG_ffed35f9503d": {
+      "en": "Maharashtra · South",
+      "zh": "马哈拉施特拉邦·南部"
+    },
+    "id::IN_MRG_94d6879ff899": {
+      "en": "Madhya Pradesh · Central 2",
+      "zh": "中央邦·中部2"
+    },
+    "id::IN_MRG_7faf281261de": {
+      "en": "Rajasthan · Central",
+      "zh": "拉贾斯坦邦·中部"
+    },
+    "id::IN_MRG_42f3f9105904": {
+      "en": "Haryana · Northeast",
+      "zh": "哈里亚纳邦·东北部"
+    },
+    "id::IN_MRG_169df8d18d42": {
+      "en": "West Bengal · South",
+      "zh": "西孟加拉邦·南部"
+    },
+    "id::IN_MRG_58d0077e7cf9": {
+      "en": "Maharashtra · Northwest",
+      "zh": "马哈拉施特拉邦·西北部"
+    },
+    "id::IN_MRG_a95a73e18acf": {
+      "en": "Uttar Pradesh · East 1",
+      "zh": "北方邦·东部1"
+    },
+    "id::IN_MRG_4131800236a5": {
+      "en": "Andhra Pradesh · West",
+      "zh": "安得拉邦·西部"
+    },
+    "id::IN_MRG_5e70f0363dee": {
+      "en": "Karnataka · North",
+      "zh": "卡纳塔克邦·北部"
+    },
+    "id::IN_MRG_d5f85f8d70f9": {
+      "en": "Nagaland · Southwest",
+      "zh": "那加兰邦·西南部"
+    },
+    "id::IN_MRG_5efd18a5a879": {
+      "en": "Telangana · West",
+      "zh": "特伦甘纳邦·西部"
+    },
+    "id::IN_MRG_754bc8685c80": {
+      "en": "Telangana · South",
+      "zh": "特伦甘纳邦·南部"
+    },
+    "id::IN_MRG_4151783f27ba": {
+      "en": "Odisha · Northeast",
+      "zh": "奥里萨邦·东北部"
+    },
+    "id::IN_MRG_51471f01d80d": {
+      "en": "Himachal Pradesh · Southwest",
+      "zh": "喜马偕尔邦·西南部"
+    },
+    "id::IN_MRG_cc69c82470de": {
+      "en": "Chhattisgarh · Northeast 2",
+      "zh": "恰蒂斯加尔邦·东北部2"
+    },
+    "id::IN_MRG_21ba14a92f11": {
+      "en": "Maharashtra · Southwest",
+      "zh": "马哈拉施特拉邦·西南部"
+    },
+    "id::IN_MRG_90a8716fe1b8": {
+      "en": "Madhya Pradesh · Central 1",
+      "zh": "中央邦·中部1"
+    },
+    "id::IN_MRG_dfe0e83efbc8": {
+      "en": "Gujarat · Southwest",
+      "zh": "古吉拉特邦·西南部"
+    },
+    "id::IN_MRG_32d3e8bf17e8": {
+      "en": "Kerala · Northwest",
+      "zh": "喀拉拉邦·西北部"
+    },
+    "id::IN_MRG_d8950e2a8fd9": {
+      "en": "Meghalaya · Northwest",
+      "zh": "梅加拉亚邦·西北部"
+    },
+    "id::IN_MRG_5e3bc1b7d349": {
+      "en": "Jharkhand · Northeast",
+      "zh": "贾坎德邦·东北部"
+    },
+    "id::IN_MRG_cd7d5e34ecf6": {
+      "en": "Andhra Pradesh · Southwest",
+      "zh": "安得拉邦·西南部"
+    },
+    "id::IN_MRG_af11073db84a": {
+      "en": "Telangana · North",
+      "zh": "特伦甘纳邦·北部"
+    },
+    "id::IN_MRG_27c1cd96cd5d": {
+      "en": "Tamil Nadu · Southeast",
+      "zh": "泰米尔纳德邦·东南部"
+    },
+    "id::IN_MRG_8c423602963b": {
+      "en": "Madhya Pradesh · North 2",
+      "zh": "中央邦·北部2"
+    },
+    "id::IN_MRG_49c1611c85b6": {
+      "en": "Odisha · East",
+      "zh": "奥里萨邦·东部"
+    },
+    "id::IN_MRG_c04ae1fa2776": {
+      "en": "Uttar Pradesh · Northwest 3",
+      "zh": "北方邦·西北部3"
+    },
+    "id::IN_MRG_8ccca7dbd193": {
+      "en": "Nagaland · North",
+      "zh": "那加兰邦·北部"
+    },
+    "id::IN_MRG_bdfc7ccb8a08": {
+      "en": "Uttar Pradesh · West",
+      "zh": "北方邦·西部"
+    },
+    "id::IN_MRG_6dcfb635492b": {
+      "en": "Rajasthan · Southeast",
+      "zh": "拉贾斯坦邦·东南部"
+    },
+    "id::IN_MRG_30abc2f669f0": {
+      "en": "Odisha · Southwest",
+      "zh": "奥里萨邦·西南部"
     }
   },
   "ui": {

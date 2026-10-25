@@ -144,6 +144,102 @@
       "en": "Thuringia",
       "zh": "图林根州"
     },
+    "IN_Andhra_Pradesh": {
+      "en": "Andhra Pradesh",
+      "zh": "安得拉邦"
+    },
+    "IN_Assam": {
+      "en": "Assam",
+      "zh": "阿萨姆邦"
+    },
+    "IN_Bihar": {
+      "en": "Bihar",
+      "zh": "比哈尔邦"
+    },
+    "IN_Chhattisgarh": {
+      "en": "Chhattisgarh",
+      "zh": "恰蒂斯加尔邦"
+    },
+    "IN_Gujarat": {
+      "en": "Gujarat",
+      "zh": "古吉拉特邦"
+    },
+    "IN_Haryana": {
+      "en": "Haryana",
+      "zh": "哈里亚纳邦"
+    },
+    "IN_Himachal_Pradesh": {
+      "en": "Himachal Pradesh",
+      "zh": "喜马偕尔邦"
+    },
+    "IN_Jharkhand": {
+      "en": "Jharkhand",
+      "zh": "贾坎德邦"
+    },
+    "IN_Karnataka": {
+      "en": "Karnataka",
+      "zh": "卡纳塔克邦"
+    },
+    "IN_Kerala": {
+      "en": "Kerala",
+      "zh": "喀拉拉邦"
+    },
+    "IN_Madhya_Pradesh": {
+      "en": "Madhya Pradesh",
+      "zh": "中央邦"
+    },
+    "IN_Maharashtra": {
+      "en": "Maharashtra",
+      "zh": "马哈拉施特拉邦"
+    },
+    "IN_Manipur": {
+      "en": "Manipur",
+      "zh": "曼尼普尔邦"
+    },
+    "IN_Meghalaya": {
+      "en": "Meghalaya",
+      "zh": "梅加拉亚邦"
+    },
+    "IN_Mizoram": {
+      "en": "Mizoram",
+      "zh": "米佐拉姆邦"
+    },
+    "IN_Nagaland": {
+      "en": "Nagaland",
+      "zh": "那加兰邦"
+    },
+    "IN_Odisha": {
+      "en": "Odisha",
+      "zh": "奥里萨邦"
+    },
+    "IN_Punjab": {
+      "en": "Punjab",
+      "zh": "旁遮普邦"
+    },
+    "IN_Rajasthan": {
+      "en": "Rajasthan",
+      "zh": "拉贾斯坦邦"
+    },
+    "IN_Tamil_Nadu": {
+      "en": "Tamil Nadu",
+      "zh": "泰米尔纳德邦"
+    },
+    "IN_Telangana": {
+      "en": "Telangana",
+      "zh": "特伦甘纳邦"
+    },
+    "IN_Uttar_Pradesh": {
+      "en": "Uttar Pradesh",
+      "zh": "北方邦"
+    },
+    "IN_Uttarakhand": {
+      "en": "Uttarakhand",
+      "zh": "北阿坎德邦"
+    },
+    "IN_West_Bengal": {
+      "en": "West Bengal",
+      "zh": "西孟加拉邦"
+    },
     "NL_Drenthe": {
       "en": "Drenthe",
       "zh": "德伦特省"

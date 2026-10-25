@@ -1,0 +1,3111 @@
+{
+  "schema_version": 1,
+  "plan_id": "india_wave5_tno.v1",
+  "candidate_source": "data/political_feature_merges/india_wave5_tno.candidates.json",
+  "scenarios": [
+    "tno_1962"
+  ],
+  "constraints": [
+    "owners",
+    "cores",
+    "strategic_value_buckets",
+    "hierarchy_groups",
+    "quick_fill_groups",
+    "china_crosswalk_prefecture",
+    "precision_tier",
+    "member_properties",
+    "valid_member_geometry",
+    "fragment_camouflage_unchanged",
+    "river_paint_parcels_unchanged",
+    "contiguous"
+  ],
+  "ownership_scenarios": [
+    "tno_1962"
+  ],
+  "strategic_scenarios": [],
+  "counts": {
+    "candidates": 95,
+    "groups": 95,
+    "merged_members": 368,
+    "features_removed": 273,
+    "split_or_reduced_candidates": 0
+  },
+  "groups": [
+    {
+      "id": "IN_MRG_cee31aca9a07",
+      "member_ids": [
+        "IN_ADM2_76128533B11403491783632",
+        "IN_ADM2_76128533B22687502928564",
+        "IN_ADM2_76128533B35717069663408",
+        "IN_ADM2_76128533B45592431373253",
+        "IN_ADM2_76128533B4743808419896",
+        "IN_ADM2_76128533B83644689337946",
+        "IN_ADM2_76128533B86430586962522",
+        "IN_ADM2_76128533B88669134807148",
+        "IN_ADM2_76128533B89374164863010",
+        "IN_ADM2_76128533B89575258858457"
+      ],
+      "parent_id": "IN_Tamil_Nadu",
+      "names": {
+        "en": "Tamil Nadu · Northeast",
+        "zh": "泰米尔纳德邦·东北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B11403491783632": {
+          "en": "Tirupathur",
+          "zh": "蒂鲁巴图尔"
+        },
+        "IN_ADM2_76128533B22687502928564": {
+          "en": "Ranipet",
+          "zh": "拉尼佩特"
+        },
+        "IN_ADM2_76128533B35717069663408": {
+          "en": "Krishnagiri",
+          "zh": "克里希纳吉里"
+        },
+        "IN_ADM2_76128533B45592431373253": {
+          "en": "Thiruvallur",
+          "zh": "蒂鲁瓦卢尔"
+        },
+        "IN_ADM2_76128533B4743808419896": {
+          "en": "Dharmapuri",
+          "zh": "达马普里"
+        },
+        "IN_ADM2_76128533B83644689337946": {
+          "en": "Kancheepuram",
+          "zh": "干吉布勒姆"
+        },
+        "IN_ADM2_76128533B86430586962522": {
+          "en": "Viluppuram",
+          "zh": "维鲁普兰"
+        },
+        "IN_ADM2_76128533B88669134807148": {
+          "en": "Chengalputtu",
+          "zh": "成加尔普图"
+        },
+        "IN_ADM2_76128533B89374164863010": {
+          "en": "Vellore",
+          "zh": "韦洛尔"
+        },
+        "IN_ADM2_76128533B89575258858457": {
+          "en": "Tiruvannamalai",
+          "zh": "蒂鲁瓦纳马莱"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_7779e13ac7b3",
+      "member_ids": [
+        "IN_ADM2_76128533B11802210119774",
+        "IN_ADM2_76128533B58569599021232"
+      ],
+      "parent_id": "IN_Himachal_Pradesh",
+      "names": {
+        "en": "Himachal Pradesh · South",
+        "zh": "喜马偕尔邦·南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B11802210119774": {
+          "en": "Sirmaur",
+          "zh": "西尔莫尔"
+        },
+        "IN_ADM2_76128533B58569599021232": {
+          "en": "Solan",
+          "zh": "索兰"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_7b0c2a483228",
+      "member_ids": [
+        "IN_ADM2_76128533B12079567451207",
+        "IN_ADM2_76128533B37392223136185",
+        "IN_ADM2_76128533B93441663686573",
+        "IN_MRG_d531e0df892b"
+      ],
+      "parent_id": "IN_Rajasthan",
+      "names": {
+        "en": "Rajasthan · South 1",
+        "zh": "拉贾斯坦邦·南部1"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B12079567451207": {
+          "en": "Dungarpur",
+          "zh": "邓加尔普尔"
+        },
+        "IN_ADM2_76128533B37392223136185": {
+          "en": "Udaipur",
+          "zh": "乌代布尔"
+        },
+        "IN_ADM2_76128533B93441663686573": {
+          "en": "Bhilwara",
+          "zh": "比尔瓦拉"
+        },
+        "IN_MRG_d531e0df892b": {
+          "en": "Chittaurgarh",
+          "zh": "奇陶加尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_48dd97061f04",
+      "member_ids": [
+        "IN_ADM2_76128533B12197302963241",
+        "IN_ADM2_76128533B39051871473194",
+        "IN_ADM2_76128533B39368211148513",
+        "IN_ADM2_76128533B41499938690181",
+        "IN_ADM2_76128533B82601690264832"
+      ],
+      "parent_id": "IN_Punjab",
+      "names": {
+        "en": "Punjab · Southeast",
+        "zh": "旁遮普邦·东南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B12197302963241": {
+          "en": "Sahibzada Ajit Singh Nagar",
+          "zh": "萨希布扎达·阿吉特·辛格·纳加尔"
+        },
+        "IN_ADM2_76128533B39051871473194": {
+          "en": "Barnala",
+          "zh": "巴尔纳拉"
+        },
+        "IN_ADM2_76128533B39368211148513": {
+          "en": "Patiala",
+          "zh": "帕蒂亚拉"
+        },
+        "IN_ADM2_76128533B41499938690181": {
+          "en": "Mansa",
+          "zh": "曼萨"
+        },
+        "IN_ADM2_76128533B82601690264832": {
+          "en": "Sangrur",
+          "zh": "桑格鲁尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_883b10e5d00a",
+      "member_ids": [
+        "IN_ADM2_76128533B1222571856670",
+        "IN_ADM2_76128533B43180268042348",
+        "IN_ADM2_76128533B44632955875385",
+        "IN_ADM2_76128533B45381195840581",
+        "IN_ADM2_76128533B49805675626253",
+        "IN_ADM2_76128533B6050540865870",
+        "IN_ADM2_76128533B75529869544465",
+        "IN_ADM2_76128533B79263581040575",
+        "IN_ADM2_76128533B90068096507942",
+        "IN_MRG_1d9b4933bded"
+      ],
+      "parent_id": "IN_Jharkhand",
+      "names": {
+        "en": "Jharkhand · Northeast",
+        "zh": "贾坎德邦·东北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B1222571856670": {
+          "en": "Hazaribagh",
+          "zh": "哈扎里巴格"
+        },
+        "IN_ADM2_76128533B43180268042348": {
+          "en": "Kodarma",
+          "zh": "科达玛"
+        },
+        "IN_ADM2_76128533B44632955875385": {
+          "en": "Chatra",
+          "zh": "查特拉"
+        },
+        "IN_ADM2_76128533B45381195840581": {
+          "en": "Pakur",
+          "zh": "巴库尔"
+        },
+        "IN_ADM2_76128533B49805675626253": {
+          "en": "Sahibganj",
+          "zh": "萨希布甘杰"
+        },
+        "IN_ADM2_76128533B6050540865870": {
+          "en": "Palamu",
+          "zh": "帕拉穆"
+        },
+        "IN_ADM2_76128533B75529869544465": {
+          "en": "Giridih",
+          "zh": "吉里迪"
+        },
+        "IN_ADM2_76128533B79263581040575": {
+          "en": "Ramgarh",
+          "zh": "拉姆加尔"
+        },
+        "IN_ADM2_76128533B90068096507942": {
+          "en": "Deoghar",
+          "zh": "德奥加尔"
+        },
+        "IN_MRG_1d9b4933bded": {
+          "en": "Dumka",
+          "zh": "杜姆卡"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_05eafa4e7092",
+      "member_ids": [
+        "IN_ADM2_76128533B12244045944458",
+        "IN_ADM2_76128533B22722327711505",
+        "IN_ADM2_76128533B42646400584570",
+        "IN_ADM2_76128533B69536039643660",
+        "IN_ADM2_76128533B70554191137208",
+        "IN_ADM2_76128533B86048662040782"
+      ],
+      "parent_id": "IN_Haryana",
+      "names": {
+        "en": "Haryana · South",
+        "zh": "哈里亚纳邦·南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B12244045944458": {
+          "en": "Rohtak",
+          "zh": "罗赫塔克"
+        },
+        "IN_ADM2_76128533B22722327711505": {
+          "en": "Rewari",
+          "zh": "雷瓦里"
+        },
+        "IN_ADM2_76128533B42646400584570": {
+          "en": "Bhiwani",
+          "zh": "比瓦尼"
+        },
+        "IN_ADM2_76128533B69536039643660": {
+          "en": "Sonipat",
+          "zh": "索尼帕特"
+        },
+        "IN_ADM2_76128533B70554191137208": {
+          "en": "Jhajjar",
+          "zh": "贾贾尔"
+        },
+        "IN_ADM2_76128533B86048662040782": {
+          "en": "Panipat",
+          "zh": "帕尼帕特"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_21b7f1089cf4",
+      "member_ids": [
+        "IN_ADM2_76128533B12244320360965",
+        "IN_ADM2_76128533B33458049385696",
+        "IN_ADM2_76128533B66426066081507",
+        "IN_ADM2_76128533B78904410352326"
+      ],
+      "parent_id": "IN_Bihar",
+      "names": {
+        "en": "Bihar · West",
+        "zh": "比哈尔邦·西部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B12244320360965": {
+          "en": "Buxar",
+          "zh": "布克萨尔"
+        },
+        "IN_ADM2_76128533B33458049385696": {
+          "en": "Rohtas",
+          "zh": "罗塔斯"
+        },
+        "IN_ADM2_76128533B66426066081507": {
+          "en": "Bhojpur",
+          "zh": "博杰布尔"
+        },
+        "IN_ADM2_76128533B78904410352326": {
+          "en": "Kaimur (Bhabua)",
+          "zh": "凯穆尔（巴布亚）"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_4b3f04e0f052",
+      "member_ids": [
+        "IN_ADM2_76128533B12343314564708",
+        "IN_ADM2_76128533B57712033428660",
+        "IN_ADM2_76128533B66335428496945",
+        "IN_ADM2_76128533B80958502091898",
+        "IN_ADM2_76128533B82240600990321"
+      ],
+      "parent_id": "IN_Madhya_Pradesh",
+      "names": {
+        "en": "Madhya Pradesh · North",
+        "zh": "中央邦·北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B12343314564708": {
+          "en": "Morena",
+          "zh": "莫雷纳"
+        },
+        "IN_ADM2_76128533B57712033428660": {
+          "en": "Bhind",
+          "zh": "宾德"
+        },
+        "IN_ADM2_76128533B66335428496945": {
+          "en": "Shivpuri",
+          "zh": "希夫普里"
+        },
+        "IN_ADM2_76128533B80958502091898": {
+          "en": "Datia",
+          "zh": "达蒂亚"
+        },
+        "IN_ADM2_76128533B82240600990321": {
+          "en": "Sheopur",
+          "zh": "谢奥普尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_daa0ed708975",
+      "member_ids": [
+        "IN_ADM2_76128533B12694285477701",
+        "IN_ADM2_76128533B24755983727265",
+        "IN_ADM2_76128533B29293163114565",
+        "IN_ADM2_76128533B5855800361016",
+        "IN_ADM2_76128533B66790149147330",
+        "IN_ADM2_76128533B78970756356546"
+      ],
+      "parent_id": "IN_Bihar",
+      "names": {
+        "en": "Bihar · East 1",
+        "zh": "比哈尔邦·东部1"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B12694285477701": {
+          "en": "Darbhanga",
+          "zh": "达尔班加"
+        },
+        "IN_ADM2_76128533B24755983727265": {
+          "en": "Saharsa",
+          "zh": "萨哈萨"
+        },
+        "IN_ADM2_76128533B29293163114565": {
+          "en": "Madhepura",
+          "zh": "马代普拉"
+        },
+        "IN_ADM2_76128533B5855800361016": {
+          "en": "Begusarai",
+          "zh": "贝古萨莱"
+        },
+        "IN_ADM2_76128533B66790149147330": {
+          "en": "Samastipur",
+          "zh": "萨马斯蒂普尔"
+        },
+        "IN_ADM2_76128533B78970756356546": {
+          "en": "Khagaria",
+          "zh": "卡加利亚"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_bf71f4fd25b0",
+      "member_ids": [
+        "IN_ADM2_76128533B13272482176343",
+        "IN_ADM2_76128533B21119051307760",
+        "IN_ADM2_76128533B34462889864078",
+        "IN_ADM2_76128533B7545062765383",
+        "IN_ADM2_76128533B84679668760735",
+        "IN_ADM2_76128533B87317961648652"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · Northwest 1",
+        "zh": "北方邦·西北部1"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B13272482176343": {
+          "en": "Bulandshahr",
+          "zh": "布兰德沙赫尔"
+        },
+        "IN_ADM2_76128533B21119051307760": {
+          "en": "Jyotiba Phule Nagar",
+          "zh": "乔蒂巴·普勒·纳加尔"
+        },
+        "IN_ADM2_76128533B34462889864078": {
+          "en": "Gautam Buddha Nagar",
+          "zh": "乔达姆·佛陀·纳加尔"
+        },
+        "IN_ADM2_76128533B7545062765383": {
+          "en": "Sambhal",
+          "zh": "桑巴尔"
+        },
+        "IN_ADM2_76128533B84679668760735": {
+          "en": "Budaun",
+          "zh": "布道恩"
+        },
+        "IN_ADM2_76128533B87317961648652": {
+          "en": "Hapur",
+          "zh": "哈普尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_c5914ea1f4cc",
+      "member_ids": [
+        "IN_ADM2_76128533B13437137070957",
+        "IN_ADM2_76128533B38548995376745",
+        "IN_ADM2_76128533B70315194619807"
+      ],
+      "parent_id": "IN_Assam",
+      "names": {
+        "en": "Assam · Central",
+        "zh": "阿萨姆邦·中部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B13437137070957": {
+          "en": "Nagaon",
+          "zh": "纳加翁"
+        },
+        "IN_ADM2_76128533B38548995376745": {
+          "en": "Karbi Anglong East",
+          "zh": "卡比安隆东"
+        },
+        "IN_ADM2_76128533B70315194619807": {
+          "en": "Hojai",
+          "zh": "霍贾伊"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_6cb5e15ba7ae",
+      "member_ids": [
+        "IN_ADM2_76128533B13673614951516",
+        "IN_ADM2_76128533B26931973511551",
+        "IN_ADM2_76128533B40023971667984",
+        "IN_ADM2_76128533B49460554954204",
+        "IN_ADM2_76128533B73769926250842"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · East 1",
+        "zh": "北方邦·东部1"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B13673614951516": {
+          "en": "Chandauli",
+          "zh": "尚杜利"
+        },
+        "IN_ADM2_76128533B26931973511551": {
+          "en": "Kushinagar",
+          "zh": "拘尸那迦"
+        },
+        "IN_ADM2_76128533B40023971667984": {
+          "en": "Deoria",
+          "zh": "迪奥里亚"
+        },
+        "IN_ADM2_76128533B49460554954204": {
+          "en": "Ghazipur",
+          "zh": "加济布尔"
+        },
+        "IN_ADM2_76128533B73769926250842": {
+          "en": "Ballia",
+          "zh": "巴利亚"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_4d898a5137a3",
+      "member_ids": [
+        "IN_ADM2_76128533B13697452453823",
+        "IN_ADM2_76128533B75262864015847"
+      ],
+      "parent_id": "IN_Himachal_Pradesh",
+      "names": {
+        "en": "Himachal Pradesh · West",
+        "zh": "喜马偕尔邦·西部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B13697452453823": {
+          "en": "Kangra",
+          "zh": "坎格拉"
+        },
+        "IN_ADM2_76128533B75262864015847": {
+          "en": "Una",
+          "zh": "一个"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_09081ee1d22c",
+      "member_ids": [
+        "IN_ADM2_76128533B13791982054894",
+        "IN_ADM2_76128533B18834172694083",
+        "IN_MRG_e8f4da0d0535"
+      ],
+      "parent_id": "IN_Punjab",
+      "names": {
+        "en": "Punjab · Southwest",
+        "zh": "旁遮普邦·西南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B13791982054894": {
+          "en": "Bathinda",
+          "zh": "巴廷达"
+        },
+        "IN_ADM2_76128533B18834172694083": {
+          "en": "Moga",
+          "zh": "莫加"
+        },
+        "IN_MRG_e8f4da0d0535": {
+          "en": "Muktsar",
+          "zh": "穆克察尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_65081ed5bb9a",
+      "member_ids": [
+        "IN_ADM2_76128533B14033116794334",
+        "IN_ADM2_76128533B19903856317609",
+        "IN_ADM2_76128533B74961596993088",
+        "IN_ADM2_76128533B88481188307630",
+        "IN_ADM2_76128533B91445917652173",
+        "IN_ADM2_76128533B93214480696409"
+      ],
+      "parent_id": "IN_Bihar",
+      "names": {
+        "en": "Bihar · Northwest",
+        "zh": "比哈尔邦·西北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B14033116794334": {
+          "en": "Siwan",
+          "zh": "斯万"
+        },
+        "IN_ADM2_76128533B19903856317609": {
+          "en": "Saran",
+          "zh": "萨兰"
+        },
+        "IN_ADM2_76128533B74961596993088": {
+          "en": "Sheohar",
+          "zh": "谢奥哈尔"
+        },
+        "IN_ADM2_76128533B88481188307630": {
+          "en": "Muzaffarpur",
+          "zh": "穆扎法尔布尔"
+        },
+        "IN_ADM2_76128533B91445917652173": {
+          "en": "Vaishali",
+          "zh": "毗舍离"
+        },
+        "IN_ADM2_76128533B93214480696409": {
+          "en": "Gopalganj",
+          "zh": "戈帕尔甘杰"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_63ee40e30267",
+      "member_ids": [
+        "IN_ADM2_76128533B14243635342908",
+        "IN_ADM2_76128533B36958871695926",
+        "IN_ADM2_76128533B76286653784168"
+      ],
+      "parent_id": "IN_Maharashtra",
+      "names": {
+        "en": "Maharashtra · East 2",
+        "zh": "马哈拉施特拉邦·东部2"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B14243635342908": {
+          "en": "Bhandara",
+          "zh": "班达拉"
+        },
+        "IN_ADM2_76128533B36958871695926": {
+          "en": "Gadchiroli",
+          "zh": "加奇罗利"
+        },
+        "IN_ADM2_76128533B76286653784168": {
+          "en": "Gondiya",
+          "zh": "贡迪亚"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_d2159d107015",
+      "member_ids": [
+        "IN_ADM2_76128533B14403163214152",
+        "IN_ADM2_76128533B64881202564500",
+        "IN_ADM2_76128533B82279368215419",
+        "IN_MRG_46ee484c2760",
+        "IN_MRG_a9290adb0980",
+        "IN_MRG_add732cea50c"
+      ],
+      "parent_id": "IN_Manipur",
+      "names": {
+        "en": "Manipur · North",
+        "zh": "曼尼普尔邦·北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B14403163214152": {
+          "en": "Bishnupur",
+          "zh": "比什努布尔"
+        },
+        "IN_ADM2_76128533B64881202564500": {
+          "en": "Jiribam",
+          "zh": "吉里巴姆"
+        },
+        "IN_ADM2_76128533B82279368215419": {
+          "en": "Kakching",
+          "zh": "卡钦"
+        },
+        "IN_MRG_46ee484c2760": {
+          "en": "Tamenglong",
+          "zh": "塔猛隆"
+        },
+        "IN_MRG_a9290adb0980": {
+          "en": "Imphal West",
+          "zh": "因帕尔西"
+        },
+        "IN_MRG_add732cea50c": {
+          "en": "Senapati",
+          "zh": "塞纳帕蒂"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_708a258c7bc8",
+      "member_ids": [
+        "IN_ADM2_76128533B14534161138054",
+        "IN_ADM2_76128533B33437990510331",
+        "IN_ADM2_76128533B35465481868600",
+        "IN_ADM2_76128533B87051210355251"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · Northwest 2",
+        "zh": "北方邦·西北部2"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B14534161138054": {
+          "en": "Bijnor",
+          "zh": "比诺尔"
+        },
+        "IN_ADM2_76128533B33437990510331": {
+          "en": "Saharanpur",
+          "zh": "萨哈兰普尔"
+        },
+        "IN_ADM2_76128533B35465481868600": {
+          "en": "Samli",
+          "zh": "沙姆利"
+        },
+        "IN_ADM2_76128533B87051210355251": {
+          "en": "Muzaffarnagar",
+          "zh": "穆扎法尔纳加尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_a944b57d54cb",
+      "member_ids": [
+        "IN_ADM2_76128533B14968875277413",
+        "IN_ADM2_76128533B31175522938788",
+        "IN_ADM2_76128533B58170186574016",
+        "IN_ADM2_76128533B71056110198347",
+        "IN_ADM2_76128533B74887942950962"
+      ],
+      "parent_id": "IN_Telangana",
+      "names": {
+        "en": "Telangana · Southwest 2",
+        "zh": "特伦甘纳邦·西南部2"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B14968875277413": {
+          "en": "Narayanpet",
+          "zh": "纳拉扬佩特"
+        },
+        "IN_ADM2_76128533B31175522938788": {
+          "en": "Rangareddy",
+          "zh": "兰加雷迪"
+        },
+        "IN_ADM2_76128533B58170186574016": {
+          "en": "Mahabubnagar",
+          "zh": "马哈布那加尔"
+        },
+        "IN_ADM2_76128533B71056110198347": {
+          "en": "Medchal",
+          "zh": "梅德查尔"
+        },
+        "IN_ADM2_76128533B74887942950962": {
+          "en": "Vikarabad",
+          "zh": "维卡拉巴德"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_0156878691b5",
+      "member_ids": [
+        "IN_ADM2_76128533B15157901669242",
+        "IN_ADM2_76128533B334793883930",
+        "IN_ADM2_76128533B55519385298440"
+      ],
+      "parent_id": "IN_Assam",
+      "names": {
+        "en": "Assam · East",
+        "zh": "阿萨姆邦·东部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B15157901669242": {
+          "en": "Majuli",
+          "zh": "马朱利"
+        },
+        "IN_ADM2_76128533B334793883930": {
+          "en": "Jorhat",
+          "zh": "乔尔哈特"
+        },
+        "IN_ADM2_76128533B55519385298440": {
+          "en": "Golaghat",
+          "zh": "戈拉加特"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_d11bffed2078",
+      "member_ids": [
+        "IN_ADM2_76128533B15550697205080",
+        "IN_ADM2_76128533B54775433755383",
+        "IN_ADM2_76128533B57609583882472"
+      ],
+      "parent_id": "IN_Karnataka",
+      "names": {
+        "en": "Karnataka · South",
+        "zh": "卡纳塔克邦·南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B15550697205080": {
+          "en": "Chikmagalur",
+          "zh": "奇克马卢尔"
+        },
+        "IN_ADM2_76128533B54775433755383": {
+          "en": "Hassan",
+          "zh": "哈桑"
+        },
+        "IN_ADM2_76128533B57609583882472": {
+          "en": "Kodagu",
+          "zh": "科达古"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_6ac4bd6d39d9",
+      "member_ids": [
+        "IN_ADM2_76128533B15601995412161",
+        "IN_ADM2_76128533B35143550659673",
+        "IN_ADM2_76128533B80916614857890"
+      ],
+      "parent_id": "IN_Jharkhand",
+      "names": {
+        "en": "Jharkhand · Southwest",
+        "zh": "贾坎德邦·西南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B15601995412161": {
+          "en": "Simdega",
+          "zh": "西姆德加"
+        },
+        "IN_ADM2_76128533B35143550659673": {
+          "en": "Latehar",
+          "zh": "拉特哈尔"
+        },
+        "IN_ADM2_76128533B80916614857890": {
+          "en": "Gumla",
+          "zh": "古姆拉"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_28701b62eace",
+      "member_ids": [
+        "IN_ADM2_76128533B1566053393466",
+        "IN_ADM2_76128533B38767180038480",
+        "IN_ADM2_76128533B42922918567330"
+      ],
+      "parent_id": "IN_Madhya_Pradesh",
+      "names": {
+        "en": "Madhya Pradesh · Northeast",
+        "zh": "中央邦·东北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B1566053393466": {
+          "en": "Tikamgarh",
+          "zh": "蒂卡姆加尔"
+        },
+        "IN_ADM2_76128533B38767180038480": {
+          "en": "Niwari",
+          "zh": "尼瓦里"
+        },
+        "IN_ADM2_76128533B42922918567330": {
+          "en": "Chhatarpur",
+          "zh": "恰塔尔普尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_344720d94b02",
+      "member_ids": [
+        "IN_ADM2_76128533B15835290978888",
+        "IN_MRG_c73911bfb285"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · Southwest",
+        "zh": "北方邦·西南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B15835290978888": {
+          "en": "Jalaun",
+          "zh": "贾劳恩"
+        },
+        "IN_MRG_c73911bfb285": {
+          "en": "Hamirpur (Uttar Pradesh)",
+          "zh": "哈米尔布尔（西尔莫尔）"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_65d1ff50f969",
+      "member_ids": [
+        "IN_ADM2_76128533B1629699732681",
+        "IN_ADM2_76128533B27604563137530",
+        "IN_ADM2_76128533B31241181851990",
+        "IN_ADM2_76128533B54279577656282",
+        "IN_ADM2_76128533B61321395333865",
+        "IN_ADM2_76128533B64003397477352",
+        "IN_ADM2_76128533B70974512658911",
+        "IN_ADM2_76128533B89925537847414",
+        "IN_MRG_c2bed413ca7f",
+        "IN_MRG_cc42364d4ba9"
+      ],
+      "parent_id": "IN_Tamil_Nadu",
+      "names": {
+        "en": "Tamil Nadu · South",
+        "zh": "泰米尔纳德邦·南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B1629699732681": {
+          "en": "Ramanathapuram",
+          "zh": "拉马纳塔普拉姆"
+        },
+        "IN_ADM2_76128533B27604563137530": {
+          "en": "Tenkasi",
+          "zh": "滕卡西"
+        },
+        "IN_ADM2_76128533B31241181851990": {
+          "en": "Thoothukkudi",
+          "zh": "图图库迪"
+        },
+        "IN_ADM2_76128533B54279577656282": {
+          "en": "Thanjavur",
+          "zh": "坦贾武尔"
+        },
+        "IN_ADM2_76128533B61321395333865": {
+          "en": "Cuddalore",
+          "zh": "古德洛尔"
+        },
+        "IN_ADM2_76128533B64003397477352": {
+          "en": "Pudukkottai",
+          "zh": "普杜科泰"
+        },
+        "IN_ADM2_76128533B70974512658911": {
+          "en": "Virudhunagar",
+          "zh": "维鲁杜讷格尔"
+        },
+        "IN_ADM2_76128533B89925537847414": {
+          "en": "Sivaganga",
+          "zh": "西瓦甘加"
+        },
+        "IN_MRG_c2bed413ca7f": {
+          "en": "Thiruvarur",
+          "zh": "蒂鲁瓦鲁尔"
+        },
+        "IN_MRG_cc42364d4ba9": {
+          "en": "Ariyalur",
+          "zh": "阿里亚鲁尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_b291003b6f41",
+      "member_ids": [
+        "IN_ADM2_76128533B16476001647323",
+        "IN_ADM2_76128533B39046535416628",
+        "IN_ADM2_76128533B63599385776584",
+        "IN_ADM2_76128533B69438085511257",
+        "IN_MRG_964f44be21c1",
+        "IN_MRG_a9c8dc6c38f7"
+      ],
+      "parent_id": "IN_Gujarat",
+      "names": {
+        "en": "Gujarat · East",
+        "zh": "古吉拉特邦·东部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B16476001647323": {
+          "en": "Panch Mahals",
+          "zh": "潘奇·玛哈斯"
+        },
+        "IN_ADM2_76128533B39046535416628": {
+          "en": "Kheda",
+          "zh": "赫达"
+        },
+        "IN_ADM2_76128533B63599385776584": {
+          "en": "Bharuch",
+          "zh": "巴鲁奇"
+        },
+        "IN_ADM2_76128533B69438085511257": {
+          "en": "Anand",
+          "zh": "阿南德"
+        },
+        "IN_MRG_964f44be21c1": {
+          "en": "Dohad",
+          "zh": "多哈德"
+        },
+        "IN_MRG_a9c8dc6c38f7": {
+          "en": "Sabar Kantha",
+          "zh": "萨巴尔坎塔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_c2a8b7b28b23",
+      "member_ids": [
+        "IN_ADM2_76128533B16628456658675",
+        "IN_ADM2_76128533B29292403538801",
+        "IN_ADM2_76128533B43335986553000",
+        "IN_ADM2_76128533B47594161132413",
+        "IN_ADM2_76128533B64905184636422",
+        "IN_ADM2_76128533B79600797037735",
+        "IN_MRG_94ef9201854b"
+      ],
+      "parent_id": "IN_Karnataka",
+      "names": {
+        "en": "Karnataka · Southeast",
+        "zh": "卡纳塔克邦·东南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B16628456658675": {
+          "en": "Chamarajanagar",
+          "zh": "查马拉贾纳加尔"
+        },
+        "IN_ADM2_76128533B29292403538801": {
+          "en": "Kolar",
+          "zh": "科拉尔"
+        },
+        "IN_ADM2_76128533B43335986553000": {
+          "en": "Mandya",
+          "zh": "曼迪亚"
+        },
+        "IN_ADM2_76128533B47594161132413": {
+          "en": "Chitradurga",
+          "zh": "奇特拉杜尔加"
+        },
+        "IN_ADM2_76128533B64905184636422": {
+          "en": "Tumkur",
+          "zh": "图姆库尔"
+        },
+        "IN_ADM2_76128533B79600797037735": {
+          "en": "Ramanagara",
+          "zh": "拉马纳加拉"
+        },
+        "IN_MRG_94ef9201854b": {
+          "en": "Chikkaballapura",
+          "zh": "奇卡巴拉普拉"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_c37939012a0d",
+      "member_ids": [
+        "IN_ADM2_76128533B16674973717653",
+        "IN_ADM2_76128533B31161316175613",
+        "IN_ADM2_76128533B39705008578419",
+        "IN_ADM2_76128533B79303776608295",
+        "IN_ADM2_76128533B81607600692021",
+        "IN_MRG_dcf2b9f1d7ca"
+      ],
+      "parent_id": "IN_Madhya_Pradesh",
+      "names": {
+        "en": "Madhya Pradesh · East 1",
+        "zh": "中央邦·东部1"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B16674973717653": {
+          "en": "Katni",
+          "zh": "卡特尼"
+        },
+        "IN_ADM2_76128533B31161316175613": {
+          "en": "Rewa",
+          "zh": "雷瓦"
+        },
+        "IN_ADM2_76128533B39705008578419": {
+          "en": "Satna",
+          "zh": "萨特纳"
+        },
+        "IN_ADM2_76128533B79303776608295": {
+          "en": "Shahdol",
+          "zh": "沙赫多"
+        },
+        "IN_ADM2_76128533B81607600692021": {
+          "en": "Panna",
+          "zh": "般那"
+        },
+        "IN_MRG_dcf2b9f1d7ca": {
+          "en": "Anuppur",
+          "zh": "阿努普尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_dfae0079ed8c",
+      "member_ids": [
+        "IN_ADM2_76128533B16811573188243",
+        "IN_ADM2_76128533B20752885472650"
+      ],
+      "parent_id": "IN_West_Bengal",
+      "names": {
+        "en": "West Bengal · Southwest",
+        "zh": "西孟加拉邦·西南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B16811573188243": {
+          "en": "Puruliya",
+          "zh": "普鲁利亚"
+        },
+        "IN_ADM2_76128533B20752885472650": {
+          "en": "Bankura",
+          "zh": "班库拉"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_5b5a79a728e7",
+      "member_ids": [
+        "IN_ADM2_76128533B18243475101734",
+        "IN_ADM2_76128533B52058654769647",
+        "IN_ADM2_76128533B87515288456202"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · Southeast 2",
+        "zh": "北方邦·东南部2"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B18243475101734": {
+          "en": "Mirzapur",
+          "zh": "米尔扎普尔"
+        },
+        "IN_ADM2_76128533B52058654769647": {
+          "en": "Sonbhadra",
+          "zh": "颂巴陀罗"
+        },
+        "IN_ADM2_76128533B87515288456202": {
+          "en": "Sant Ravidas Nagar (Bhadohi)",
+          "zh": "圣拉维达斯纳加尔 (Bhadohi)"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_464251afa31f",
+      "member_ids": [
+        "IN_ADM2_76128533B19335918192159",
+        "IN_ADM2_76128533B28879432621383",
+        "IN_ADM2_76128533B51372664315362"
+      ],
+      "parent_id": "IN_Tamil_Nadu",
+      "names": {
+        "en": "Tamil Nadu · Central",
+        "zh": "泰米尔纳德邦·中部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B19335918192159": {
+          "en": "Karur",
+          "zh": "卡鲁尔"
+        },
+        "IN_ADM2_76128533B28879432621383": {
+          "en": "Dindigul",
+          "zh": "丁迪古尔"
+        },
+        "IN_ADM2_76128533B51372664315362": {
+          "en": "Namakkal",
+          "zh": "纳马卡尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_f73955d59e52",
+      "member_ids": [
+        "IN_ADM2_76128533B19341883513630",
+        "IN_ADM2_76128533B25679991785711",
+        "IN_ADM2_76128533B35167844027544",
+        "IN_ADM2_76128533B42880544505675",
+        "IN_ADM2_76128533B67004768724668",
+        "IN_ADM2_76128533B77191913035963"
+      ],
+      "parent_id": "IN_Madhya_Pradesh",
+      "names": {
+        "en": "Madhya Pradesh · West 1",
+        "zh": "中央邦·西部1"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B19341883513630": {
+          "en": "Ratlam",
+          "zh": "拉特拉姆"
+        },
+        "IN_ADM2_76128533B25679991785711": {
+          "en": "Mandsaur",
+          "zh": "曼德绍尔"
+        },
+        "IN_ADM2_76128533B35167844027544": {
+          "en": "Alirajpur",
+          "zh": "阿利拉吉普尔"
+        },
+        "IN_ADM2_76128533B42880544505675": {
+          "en": "Dhar",
+          "zh": "达尔"
+        },
+        "IN_ADM2_76128533B67004768724668": {
+          "en": "Jhabua",
+          "zh": "贾布阿"
+        },
+        "IN_ADM2_76128533B77191913035963": {
+          "en": "Neemuch",
+          "zh": "尼穆奇"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_886776fba38b",
+      "member_ids": [
+        "IN_ADM2_76128533B19581555782120",
+        "IN_ADM2_76128533B75696328527555",
+        "IN_ADM2_76128533B83861010847920"
+      ],
+      "parent_id": "IN_Kerala",
+      "names": {
+        "en": "Kerala · Central",
+        "zh": "喀拉拉邦·中部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B19581555782120": {
+          "en": "Palakkad",
+          "zh": "帕拉卡德"
+        },
+        "IN_ADM2_76128533B75696328527555": {
+          "en": "Thrissur",
+          "zh": "特里苏尔"
+        },
+        "IN_ADM2_76128533B83861010847920": {
+          "en": "Malappuram",
+          "zh": "马拉普拉姆"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_4c31a6ef59fd",
+      "member_ids": [
+        "IN_ADM2_76128533B19792346411952",
+        "IN_ADM2_76128533B29138015770556"
+      ],
+      "parent_id": "IN_Andhra_Pradesh",
+      "names": {
+        "en": "Andhra Pradesh · Northeast 1",
+        "zh": "安得拉邦·东北部1"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B19792346411952": {
+          "en": "West Godavari",
+          "zh": "西戈达瓦里"
+        },
+        "IN_ADM2_76128533B29138015770556": {
+          "en": "East Godavari",
+          "zh": "东戈达瓦里"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_20593aed5942",
+      "member_ids": [
+        "IN_ADM2_76128533B20474666262371",
+        "IN_ADM2_76128533B98050240849249"
+      ],
+      "parent_id": "IN_Maharashtra",
+      "names": {
+        "en": "Maharashtra · South",
+        "zh": "马哈拉施特拉邦·南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B20474666262371": {
+          "en": "Osmanabad",
+          "zh": "奥斯马纳巴德"
+        },
+        "IN_ADM2_76128533B98050240849249": {
+          "en": "Latur",
+          "zh": "懒惰的"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_0d3b03a56cac",
+      "member_ids": [
+        "IN_ADM2_76128533B20683890392439",
+        "IN_ADM2_76128533B39959897010345",
+        "IN_ADM2_76128533B45314020251888",
+        "IN_ADM2_76128533B53549946596470",
+        "IN_ADM2_76128533B82559220423608"
+      ],
+      "parent_id": "IN_Madhya_Pradesh",
+      "names": {
+        "en": "Madhya Pradesh · Southwest 1",
+        "zh": "中央邦·西南部1"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B20683890392439": {
+          "en": "Narsimhapur",
+          "zh": "纳西姆哈普尔"
+        },
+        "IN_ADM2_76128533B39959897010345": {
+          "en": "Sehore",
+          "zh": "塞霍雷"
+        },
+        "IN_ADM2_76128533B45314020251888": {
+          "en": "Hoshangabad",
+          "zh": "霍尚加巴德"
+        },
+        "IN_ADM2_76128533B53549946596470": {
+          "en": "Dewas",
+          "zh": "德瓦斯"
+        },
+        "IN_ADM2_76128533B82559220423608": {
+          "en": "Betul",
+          "zh": "桦木"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_6832ada5b624",
+      "member_ids": [
+        "IN_ADM2_76128533B20732636837048",
+        "IN_ADM2_76128533B43544960343942",
+        "IN_ADM2_76128533B86135761305702"
+      ],
+      "parent_id": "IN_Rajasthan",
+      "names": {
+        "en": "Rajasthan · Northeast",
+        "zh": "拉贾斯坦邦·东北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B20732636837048": {
+          "en": "Sikar",
+          "zh": "西卡"
+        },
+        "IN_ADM2_76128533B43544960343942": {
+          "en": "Nagaur",
+          "zh": "纳高尔"
+        },
+        "IN_ADM2_76128533B86135761305702": {
+          "en": "Jhunjhunun",
+          "zh": "均朱努"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_0f1924c89ced",
+      "member_ids": [
+        "IN_ADM2_76128533B2080752988715",
+        "IN_ADM2_76128533B42839853072341",
+        "IN_ADM2_76128533B48885555323596",
+        "IN_ADM2_76128533B52902360321344",
+        "IN_ADM2_76128533B7851306475665",
+        "IN_ADM2_76128533B81661995166840"
+      ],
+      "parent_id": "IN_Gujarat",
+      "names": {
+        "en": "Gujarat · North",
+        "zh": "古吉拉特邦·北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B2080752988715": {
+          "en": "Morbi",
+          "zh": "莫尔比"
+        },
+        "IN_ADM2_76128533B42839853072341": {
+          "en": "Patan",
+          "zh": "帕坦"
+        },
+        "IN_ADM2_76128533B48885555323596": {
+          "en": "Batod",
+          "zh": "巴托德"
+        },
+        "IN_ADM2_76128533B52902360321344": {
+          "en": "Banas Kantha",
+          "zh": "巴纳斯·坎塔"
+        },
+        "IN_ADM2_76128533B7851306475665": {
+          "en": "Surendranagar",
+          "zh": "苏伦德拉讷格尔"
+        },
+        "IN_ADM2_76128533B81661995166840": {
+          "en": "Mahesana",
+          "zh": "摩赫萨那"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_0002559134aa",
+      "member_ids": [
+        "IN_ADM2_76128533B21179322085415",
+        "IN_ADM2_76128533B37096001761063",
+        "IN_ADM2_76128533B668165975951",
+        "IN_ADM2_76128533B69481535535995",
+        "IN_ADM2_76128533B71271011331008"
+      ],
+      "parent_id": "IN_Madhya_Pradesh",
+      "names": {
+        "en": "Madhya Pradesh · Southwest 2",
+        "zh": "中央邦·西南部2"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B21179322085415": {
+          "en": "Harda",
+          "zh": "哈尔达"
+        },
+        "IN_ADM2_76128533B37096001761063": {
+          "en": "Burhanpur",
+          "zh": "布尔汉普尔"
+        },
+        "IN_ADM2_76128533B668165975951": {
+          "en": "Barwani",
+          "zh": "巴尔瓦尼"
+        },
+        "IN_ADM2_76128533B69481535535995": {
+          "en": "Khargone (West Nimar)",
+          "zh": "卡贡（西尼玛）"
+        },
+        "IN_ADM2_76128533B71271011331008": {
+          "en": "Khandwa (East Nimar)",
+          "zh": "坎德瓦（东尼马尔）"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_4f750131bc07",
+      "member_ids": [
+        "IN_ADM2_76128533B21485639457044",
+        "IN_ADM2_76128533B51363853289247",
+        "IN_ADM2_76128533B91871300208785",
+        "IN_MRG_317bdbf2051b"
+      ],
+      "parent_id": "IN_Bihar",
+      "names": {
+        "en": "Bihar · Southwest",
+        "zh": "比哈尔邦·西南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B21485639457044": {
+          "en": "Aurangabad",
+          "zh": "奥兰加巴德"
+        },
+        "IN_ADM2_76128533B51363853289247": {
+          "en": "Nalanda",
+          "zh": "那烂陀"
+        },
+        "IN_ADM2_76128533B91871300208785": {
+          "en": "Gaya",
+          "zh": "伽耶"
+        },
+        "IN_MRG_317bdbf2051b": {
+          "en": "Jehanabad",
+          "zh": "杰哈纳巴德"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_91cd3b059324",
+      "member_ids": [
+        "IN_ADM2_76128533B22471914548132",
+        "IN_ADM2_76128533B72109128179340"
+      ],
+      "parent_id": "IN_Andhra_Pradesh",
+      "names": {
+        "en": "Andhra Pradesh · Southwest",
+        "zh": "安得拉邦·西南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B22471914548132": {
+          "en": "Chittoor",
+          "zh": "奇特托尔"
+        },
+        "IN_ADM2_76128533B72109128179340": {
+          "en": "Kadapa(YSR)",
+          "zh": "卡达帕(YSR)"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_5002491fef3c",
+      "member_ids": [
+        "IN_ADM2_76128533B23956636471502",
+        "IN_ADM2_76128533B45106682783501",
+        "IN_ADM2_76128533B58876508630362",
+        "IN_ADM2_76128533B6330405394721",
+        "IN_ADM2_76128533B64596101949699",
+        "IN_ADM2_76128533B94710820075529",
+        "IN_ADM2_76128533B95049353851516"
+      ],
+      "parent_id": "IN_Haryana",
+      "names": {
+        "en": "Haryana · Northeast",
+        "zh": "哈里亚纳邦·东北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B23956636471502": {
+          "en": "Yamunanagar",
+          "zh": "亚穆纳讷格尔"
+        },
+        "IN_ADM2_76128533B45106682783501": {
+          "en": "Jind",
+          "zh": "金德"
+        },
+        "IN_ADM2_76128533B58876508630362": {
+          "en": "Panchkula",
+          "zh": "潘切库拉"
+        },
+        "IN_ADM2_76128533B6330405394721": {
+          "en": "Karnal",
+          "zh": "卡纳尔"
+        },
+        "IN_ADM2_76128533B64596101949699": {
+          "en": "Kaithal",
+          "zh": "凯塔尔"
+        },
+        "IN_ADM2_76128533B94710820075529": {
+          "en": "Kurukshetra",
+          "zh": "库茹柴陀"
+        },
+        "IN_ADM2_76128533B95049353851516": {
+          "en": "Ambala",
+          "zh": "安巴拉"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_0de8d89a2f89",
+      "member_ids": [
+        "IN_ADM2_76128533B24594618908349",
+        "IN_ADM2_76128533B60322704115131",
+        "IN_ADM2_76128533B84398038505400",
+        "IN_ADM2_76128533B96571577519224",
+        "IN_MRG_a98f3e005f6a"
+      ],
+      "parent_id": "IN_Telangana",
+      "names": {
+        "en": "Telangana · East",
+        "zh": "特伦甘纳邦·东部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B24594618908349": {
+          "en": "Suryapet",
+          "zh": "苏里亚佩特"
+        },
+        "IN_ADM2_76128533B60322704115131": {
+          "en": "Jayashankar",
+          "zh": "贾亚尚卡尔"
+        },
+        "IN_ADM2_76128533B84398038505400": {
+          "en": "Mulugu",
+          "zh": "穆卢古"
+        },
+        "IN_ADM2_76128533B96571577519224": {
+          "en": "Khammam",
+          "zh": "卡曼"
+        },
+        "IN_MRG_a98f3e005f6a": {
+          "en": "Bhadradri",
+          "zh": "巴德拉德里"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_556898e710b4",
+      "member_ids": [
+        "IN_ADM2_76128533B25020556592153",
+        "IN_ADM2_76128533B54306414631532",
+        "IN_ADM2_76128533B73736605657091",
+        "IN_MRG_a41c7ad59205",
+        "IN_MRG_fe97969e7e01"
+      ],
+      "parent_id": "IN_Chhattisgarh",
+      "names": {
+        "en": "Chhattisgarh · Central",
+        "zh": "恰蒂斯加尔邦·中部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B25020556592153": {
+          "en": "Rajnandgaon",
+          "zh": "拉杰南德冈"
+        },
+        "IN_ADM2_76128533B54306414631532": {
+          "en": "Baloda Bazar",
+          "zh": "巴洛达巴扎尔"
+        },
+        "IN_ADM2_76128533B73736605657091": {
+          "en": "Bemetra",
+          "zh": "贝梅特拉"
+        },
+        "IN_MRG_a41c7ad59205": {
+          "en": "Mahasamund",
+          "zh": "马哈萨蒙德"
+        },
+        "IN_MRG_fe97969e7e01": {
+          "en": "Kabeerdham",
+          "zh": "卡伯丹姆"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_7b87bbb2489c",
+      "member_ids": [
+        "IN_ADM2_76128533B25208535254310",
+        "IN_ADM2_76128533B8998698404381"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · Central",
+        "zh": "北方邦·中部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B25208535254310": {
+          "en": "Hardoi",
+          "zh": "哈多伊"
+        },
+        "IN_ADM2_76128533B8998698404381": {
+          "en": "Sitapur",
+          "zh": "西塔普尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_795568efe4e3",
+      "member_ids": [
+        "IN_ADM2_76128533B25344721013980",
+        "IN_ADM2_76128533B40156838070",
+        "IN_ADM2_76128533B61304308285665"
+      ],
+      "parent_id": "IN_Maharashtra",
+      "names": {
+        "en": "Maharashtra · Northwest",
+        "zh": "马哈拉施特拉邦·西北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B25344721013980": {
+          "en": "Dhule",
+          "zh": "杜勒"
+        },
+        "IN_ADM2_76128533B40156838070": {
+          "en": "Jalgaon",
+          "zh": "贾尔冈"
+        },
+        "IN_ADM2_76128533B61304308285665": {
+          "en": "Nandurbar",
+          "zh": "南都巴尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_6c3faeb50bb6",
+      "member_ids": [
+        "IN_ADM2_76128533B25373378863054",
+        "IN_ADM2_76128533B88812350838807"
+      ],
+      "parent_id": "IN_West_Bengal",
+      "names": {
+        "en": "West Bengal · South",
+        "zh": "西孟加拉邦·南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B25373378863054": {
+          "en": "Purba Medinipur",
+          "zh": "普巴梅迪尼普尔"
+        },
+        "IN_ADM2_76128533B88812350838807": {
+          "en": "Paschim Medinipur",
+          "zh": "帕希姆·梅迪尼普尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_33e99e4bc668",
+      "member_ids": [
+        "IN_ADM2_76128533B25576352747885",
+        "IN_ADM2_76128533B28138828116492",
+        "IN_ADM2_76128533B34069028331411",
+        "IN_ADM2_76128533B54301724756864",
+        "IN_ADM2_76128533B5628791558965",
+        "IN_ADM2_76128533B64898456093948",
+        "IN_ADM2_76128533B69412164931619",
+        "IN_ADM2_76128533B73809971322123"
+      ],
+      "parent_id": "IN_Rajasthan",
+      "names": {
+        "en": "Rajasthan · East",
+        "zh": "拉贾斯坦邦·东部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B25576352747885": {
+          "en": "Bharatpur",
+          "zh": "巴拉特普尔"
+        },
+        "IN_ADM2_76128533B28138828116492": {
+          "en": "Sawai Madhopur",
+          "zh": "萨瓦伊马多布尔"
+        },
+        "IN_ADM2_76128533B34069028331411": {
+          "en": "Karauli",
+          "zh": "卡劳利"
+        },
+        "IN_ADM2_76128533B54301724756864": {
+          "en": "Tonk",
+          "zh": "唐克"
+        },
+        "IN_ADM2_76128533B5628791558965": {
+          "en": "Alwar",
+          "zh": "阿尔瓦尔"
+        },
+        "IN_ADM2_76128533B64898456093948": {
+          "en": "Dhaulpur",
+          "zh": "道尔普尔"
+        },
+        "IN_ADM2_76128533B69412164931619": {
+          "en": "Bundi",
+          "zh": "邦迪"
+        },
+        "IN_ADM2_76128533B73809971322123": {
+          "en": "Dausa",
+          "zh": "道萨"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_384a85847c3e",
+      "member_ids": [
+        "IN_ADM2_76128533B27432148084533",
+        "IN_ADM2_76128533B32499449492865"
+      ],
+      "parent_id": "IN_Bihar",
+      "names": {
+        "en": "Bihar · East 2",
+        "zh": "比哈尔邦·东部2"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B27432148084533": {
+          "en": "Katihar",
+          "zh": "卡蒂哈尔"
+        },
+        "IN_ADM2_76128533B32499449492865": {
+          "en": "Purnia",
+          "zh": "普尔尼亚"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_16da719e5c4e",
+      "member_ids": [
+        "IN_ADM2_76128533B27609096170969",
+        "IN_ADM2_76128533B37486272752374",
+        "IN_ADM2_76128533B61814103412294",
+        "IN_MRG_f8895b87957e"
+      ],
+      "parent_id": "IN_Maharashtra",
+      "names": {
+        "en": "Maharashtra · East 1",
+        "zh": "马哈拉施特拉邦·东部1"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B27609096170969": {
+          "en": "Parbhani",
+          "zh": "帕尔巴尼"
+        },
+        "IN_ADM2_76128533B37486272752374": {
+          "en": "Wardha",
+          "zh": "瓦尔达"
+        },
+        "IN_ADM2_76128533B61814103412294": {
+          "en": "Yavatmal",
+          "zh": "亚瓦特马尔"
+        },
+        "IN_MRG_f8895b87957e": {
+          "en": "Washim",
+          "zh": "沃辛"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_446f3f4f281d",
+      "member_ids": [
+        "IN_ADM2_76128533B28294794137747",
+        "IN_ADM2_76128533B52664671961643"
+      ],
+      "parent_id": "IN_Andhra_Pradesh",
+      "names": {
+        "en": "Andhra Pradesh · West",
+        "zh": "安得拉邦·西部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B28294794137747": {
+          "en": "Kurnool",
+          "zh": "库努尔"
+        },
+        "IN_ADM2_76128533B52664671961643": {
+          "en": "Anantapur",
+          "zh": "阿纳纳塔普尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_1acfce2cdace",
+      "member_ids": [
+        "IN_ADM2_76128533B284680734793",
+        "IN_ADM2_76128533B33966968116377",
+        "IN_ADM2_76128533B40495457052818",
+        "IN_ADM2_76128533B92621859299479",
+        "IN_MRG_35c5386ac534"
+      ],
+      "parent_id": "IN_Karnataka",
+      "names": {
+        "en": "Karnataka · North",
+        "zh": "卡纳塔克邦·北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B284680734793": {
+          "en": "Raichur",
+          "zh": "赖丘尔"
+        },
+        "IN_ADM2_76128533B33966968116377": {
+          "en": "Gadag",
+          "zh": "加达格"
+        },
+        "IN_ADM2_76128533B40495457052818": {
+          "en": "Bijapur",
+          "zh": "比贾普尔"
+        },
+        "IN_ADM2_76128533B92621859299479": {
+          "en": "Bellary",
+          "zh": "贝拉里"
+        },
+        "IN_MRG_35c5386ac534": {
+          "en": "Bagalkot",
+          "zh": "巴加尔科特"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_f050f1c4b3c9",
+      "member_ids": [
+        "IN_ADM2_76128533B28521131010314",
+        "IN_MRG_64b26eec8389"
+      ],
+      "parent_id": "IN_Madhya_Pradesh",
+      "names": {
+        "en": "Madhya Pradesh · West 2",
+        "zh": "中央邦·西部2"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B28521131010314": {
+          "en": "Rajgarh",
+          "zh": "拉杰加尔"
+        },
+        "IN_MRG_64b26eec8389": {
+          "en": "Shajapur",
+          "zh": "沙贾布尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_3938fc2b4f6a",
+      "member_ids": [
+        "IN_ADM2_76128533B2970909480221",
+        "IN_ADM2_76128533B85747247216737"
+      ],
+      "parent_id": "IN_Nagaland",
+      "names": {
+        "en": "Nagaland · Southwest",
+        "zh": "那加兰邦·西南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B2970909480221": {
+          "en": "Peren",
+          "zh": "佩伦"
+        },
+        "IN_ADM2_76128533B85747247216737": {
+          "en": "Dimapur",
+          "zh": "迪马普尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_dc594d605425",
+      "member_ids": [
+        "IN_ADM2_76128533B30447764775083",
+        "IN_ADM2_76128533B44250373880839",
+        "IN_ADM2_76128533B57893545331548",
+        "IN_ADM2_76128533B64834018186186",
+        "IN_ADM2_76128533B75548370501185",
+        "IN_ADM2_76128533B79048012717121"
+      ],
+      "parent_id": "IN_Madhya_Pradesh",
+      "names": {
+        "en": "Madhya Pradesh · Central",
+        "zh": "中央邦·中部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B30447764775083": {
+          "en": "Sagar",
+          "zh": "萨加尔"
+        },
+        "IN_ADM2_76128533B44250373880839": {
+          "en": "Damoh",
+          "zh": "达莫"
+        },
+        "IN_ADM2_76128533B57893545331548": {
+          "en": "Raisen",
+          "zh": "赖森"
+        },
+        "IN_ADM2_76128533B64834018186186": {
+          "en": "Vidisha",
+          "zh": "维迪沙"
+        },
+        "IN_ADM2_76128533B75548370501185": {
+          "en": "Ashoknagar",
+          "zh": "阿肖克纳加尔"
+        },
+        "IN_ADM2_76128533B79048012717121": {
+          "en": "Guna",
+          "zh": "古纳"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_7345206f129a",
+      "member_ids": [
+        "IN_ADM2_76128533B31246189674263",
+        "IN_ADM2_76128533B49394025943542",
+        "IN_ADM2_76128533B58493775523243",
+        "IN_ADM2_76128533B72829420975835",
+        "IN_ADM2_76128533B8892495882090",
+        "IN_MRG_3e581c359307",
+        "IN_MRG_b507e43e5254"
+      ],
+      "parent_id": "IN_Telangana",
+      "names": {
+        "en": "Telangana · Southwest 1",
+        "zh": "特伦甘纳邦·西南部1"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B31246189674263": {
+          "en": "Nagarkurnool",
+          "zh": "纳加尔库努尔"
+        },
+        "IN_ADM2_76128533B49394025943542": {
+          "en": "Wanaparthy",
+          "zh": "瓦纳帕西"
+        },
+        "IN_ADM2_76128533B58493775523243": {
+          "en": "Nizamabad",
+          "zh": "尼扎马巴德"
+        },
+        "IN_ADM2_76128533B72829420975835": {
+          "en": "Jogulamba",
+          "zh": "乔古兰巴"
+        },
+        "IN_ADM2_76128533B8892495882090": {
+          "en": "Nalgonda",
+          "zh": "纳尔贡达"
+        },
+        "IN_MRG_3e581c359307": {
+          "en": "Siddipet",
+          "zh": "西迪佩特"
+        },
+        "IN_MRG_b507e43e5254": {
+          "en": "Sangareddy",
+          "zh": "桑加雷迪"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_77d8a688f4ee",
+      "member_ids": [
+        "IN_ADM2_76128533B34216851275023",
+        "IN_ADM2_76128533B84129562351919",
+        "IN_ADM2_76128533B93240759409313",
+        "IN_MRG_5c122f79992b",
+        "IN_MRG_d70f87866a7e"
+      ],
+      "parent_id": "IN_Odisha",
+      "names": {
+        "en": "Odisha · Northeast",
+        "zh": "奥里萨邦·东北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B34216851275023": {
+          "en": "Mayurbhanj",
+          "zh": "马尤尔班吉"
+        },
+        "IN_ADM2_76128533B84129562351919": {
+          "en": "Sambalpur",
+          "zh": "桑巴尔普尔"
+        },
+        "IN_ADM2_76128533B93240759409313": {
+          "en": "Jharsuguda",
+          "zh": "贾尔苏古达"
+        },
+        "IN_MRG_5c122f79992b": {
+          "en": "Anugul",
+          "zh": "阿努古尔"
+        },
+        "IN_MRG_d70f87866a7e": {
+          "en": "Kendujhar",
+          "zh": "肯杜贾尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_39e1573b0992",
+      "member_ids": [
+        "IN_ADM2_76128533B35956162202704",
+        "IN_ADM2_76128533B97425778881707",
+        "IN_MRG_f61f07205f91"
+      ],
+      "parent_id": "IN_Himachal_Pradesh",
+      "names": {
+        "en": "Himachal Pradesh · Central",
+        "zh": "喜马偕尔邦·中部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B35956162202704": {
+          "en": "Hamirpur",
+          "zh": "哈米尔布尔"
+        },
+        "IN_ADM2_76128533B97425778881707": {
+          "en": "Kullu",
+          "zh": "库鲁"
+        },
+        "IN_MRG_f61f07205f91": {
+          "en": "Mandi",
+          "zh": "曼迪"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_20483c2d9ff2",
+      "member_ids": [
+        "IN_ADM2_76128533B36164606132718",
+        "IN_ADM2_76128533B59405966069108"
+      ],
+      "parent_id": "IN_Andhra_Pradesh",
+      "names": {
+        "en": "Andhra Pradesh · Northeast 2",
+        "zh": "安得拉邦·东北部2"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B36164606132718": {
+          "en": "Vizianagaram",
+          "zh": "维济阿纳加拉姆"
+        },
+        "IN_ADM2_76128533B59405966069108": {
+          "en": "Srikakulam",
+          "zh": "斯里卡古兰"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_349db36c32d3",
+      "member_ids": [
+        "IN_ADM2_76128533B37199077904074",
+        "IN_ADM2_76128533B41747884279129",
+        "IN_MRG_2344ccd4873a"
+      ],
+      "parent_id": "IN_Punjab",
+      "names": {
+        "en": "Punjab · Northeast",
+        "zh": "旁遮普邦·东北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B37199077904074": {
+          "en": "Kapurthala",
+          "zh": "卡普尔塔拉"
+        },
+        "IN_ADM2_76128533B41747884279129": {
+          "en": "Hoshiarpur",
+          "zh": "霍希亚尔布尔"
+        },
+        "IN_MRG_2344ccd4873a": {
+          "en": "Rupnagar",
+          "zh": "鲁普纳加尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_5f8577d839fb",
+      "member_ids": [
+        "IN_ADM2_76128533B38203190611533",
+        "IN_ADM2_76128533B52487813780503",
+        "IN_ADM2_76128533B6310527412636",
+        "IN_ADM2_76128533B67018657649043",
+        "IN_ADM2_76128533B89438858641946",
+        "IN_MRG_3208c5cacd01"
+      ],
+      "parent_id": "IN_Chhattisgarh",
+      "names": {
+        "en": "Chhattisgarh · Northeast",
+        "zh": "恰蒂斯加尔邦·东北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B38203190611533": {
+          "en": "Gaurella Pendra Marwahi",
+          "zh": "高雷拉·彭德拉·马尔瓦希"
+        },
+        "IN_ADM2_76128533B52487813780503": {
+          "en": "Surguja",
+          "zh": "苏尔古贾"
+        },
+        "IN_ADM2_76128533B6310527412636": {
+          "en": "Janjgir-Champa",
+          "zh": "占吉吉尔-占巴"
+        },
+        "IN_ADM2_76128533B67018657649043": {
+          "en": "Raigarh",
+          "zh": "莱加尔"
+        },
+        "IN_ADM2_76128533B89438858641946": {
+          "en": "Korba",
+          "zh": "科尔巴"
+        },
+        "IN_MRG_3208c5cacd01": {
+          "en": "Jashpur",
+          "zh": "贾什布尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_8835ef71e194",
+      "member_ids": [
+        "IN_ADM2_76128533B39238815774480",
+        "IN_ADM2_76128533B8575303957680",
+        "IN_ADM2_76128533B93152786731267",
+        "IN_ADM2_76128533B99895802074414"
+      ],
+      "parent_id": "IN_Maharashtra",
+      "names": {
+        "en": "Maharashtra · Southwest",
+        "zh": "马哈拉施特拉邦·西南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B39238815774480": {
+          "en": "Sindhudurg",
+          "zh": "辛杜杜格"
+        },
+        "IN_ADM2_76128533B8575303957680": {
+          "en": "Ratnagiri",
+          "zh": "勒特纳吉里"
+        },
+        "IN_ADM2_76128533B93152786731267": {
+          "en": "Satara",
+          "zh": "萨塔拉"
+        },
+        "IN_ADM2_76128533B99895802074414": {
+          "en": "Raigarh",
+          "zh": "莱加尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_5df0a61bbde6",
+      "member_ids": [
+        "IN_ADM2_76128533B40868676647207",
+        "IN_ADM2_76128533B83462627230182",
+        "IN_MRG_439a10aa562b",
+        "IN_MRG_82a7e2758f34"
+      ],
+      "parent_id": "IN_Bihar",
+      "names": {
+        "en": "Bihar · Southeast",
+        "zh": "比哈尔邦·东南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B40868676647207": {
+          "en": "Munger",
+          "zh": "芒格"
+        },
+        "IN_ADM2_76128533B83462627230182": {
+          "en": "Bhagalpur",
+          "zh": "巴加尔普尔"
+        },
+        "IN_MRG_439a10aa562b": {
+          "en": "Nawada",
+          "zh": "纳瓦达"
+        },
+        "IN_MRG_82a7e2758f34": {
+          "en": "Banka",
+          "zh": "班卡"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_f0850bb4446c",
+      "member_ids": [
+        "IN_ADM2_76128533B40923846274136",
+        "IN_ADM2_76128533B43737470294384",
+        "IN_ADM2_76128533B45037556977273",
+        "IN_ADM2_76128533B74381554567803",
+        "IN_ADM2_76128533B84417945851362"
+      ],
+      "parent_id": "IN_Gujarat",
+      "names": {
+        "en": "Gujarat · Southwest",
+        "zh": "古吉拉特邦·西南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B40923846274136": {
+          "en": "Junagadh",
+          "zh": "朱纳加德"
+        },
+        "IN_ADM2_76128533B43737470294384": {
+          "en": "Amreli",
+          "zh": "阿姆雷利"
+        },
+        "IN_ADM2_76128533B45037556977273": {
+          "en": "Gir Somnath",
+          "zh": "吉尔·索姆纳特"
+        },
+        "IN_ADM2_76128533B74381554567803": {
+          "en": "Devbhumi Dwarka",
+          "zh": "德布胡米·德瓦卡"
+        },
+        "IN_ADM2_76128533B84417945851362": {
+          "en": "Porbandar",
+          "zh": "波尔本德尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_bcb41c4f14e5",
+      "member_ids": [
+        "IN_ADM2_76128533B41246169049488",
+        "IN_ADM2_76128533B41976979530466",
+        "IN_ADM2_76128533B63366045987285",
+        "IN_ADM2_76128533B82539771173603"
+      ],
+      "parent_id": "IN_Kerala",
+      "names": {
+        "en": "Kerala · Northwest",
+        "zh": "喀拉拉邦·西北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B41246169049488": {
+          "en": "Mahe",
+          "zh": "马埃岛"
+        },
+        "IN_ADM2_76128533B41976979530466": {
+          "en": "Kannur",
+          "zh": "坎努尔"
+        },
+        "IN_ADM2_76128533B63366045987285": {
+          "en": "Kasaragod",
+          "zh": "卡萨拉戈德"
+        },
+        "IN_ADM2_76128533B82539771173603": {
+          "en": "Wayanad",
+          "zh": "瓦亚纳德"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_50e2da4682da",
+      "member_ids": [
+        "IN_ADM2_76128533B42153891534463",
+        "IN_ADM2_76128533B70570208114113",
+        "IN_MRG_6ba16322cfa2"
+      ],
+      "parent_id": "IN_Meghalaya",
+      "names": {
+        "en": "Meghalaya · North",
+        "zh": "梅加拉亚邦·北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B42153891534463": {
+          "en": "West Khasi Hills",
+          "zh": "西卡西山"
+        },
+        "IN_ADM2_76128533B70570208114113": {
+          "en": "Ribhoi",
+          "zh": "里布伊"
+        },
+        "IN_MRG_6ba16322cfa2": {
+          "en": "East Garo Hills",
+          "zh": "东加罗山"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_562abe2f30d2",
+      "member_ids": [
+        "IN_ADM2_76128533B45099378029175",
+        "IN_ADM2_76128533B53725063754801",
+        "IN_ADM2_76128533B7124697440629",
+        "IN_ADM2_76128533B98420041301261"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · South",
+        "zh": "北方邦·南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B45099378029175": {
+          "en": "Banda",
+          "zh": "班达"
+        },
+        "IN_ADM2_76128533B53725063754801": {
+          "en": "Chitrakoot",
+          "zh": "奇特拉库特"
+        },
+        "IN_ADM2_76128533B7124697440629": {
+          "en": "Fatehpur",
+          "zh": "法塔赫布尔"
+        },
+        "IN_ADM2_76128533B98420041301261": {
+          "en": "Kaushambi",
+          "zh": "考尚比"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_7e018f926260",
+      "member_ids": [
+        "IN_ADM2_76128533B46490409917345",
+        "IN_ADM2_76128533B96719327593873",
+        "IN_MRG_0dc9b69890de",
+        "IN_MRG_d52299ba1791"
+      ],
+      "parent_id": "IN_Assam",
+      "names": {
+        "en": "Assam · West",
+        "zh": "阿萨姆邦·西部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B46490409917345": {
+          "en": "Bongaigaon",
+          "zh": "邦盖冈"
+        },
+        "IN_ADM2_76128533B96719327593873": {
+          "en": "Darrang",
+          "zh": "达朗"
+        },
+        "IN_MRG_0dc9b69890de": {
+          "en": "Barpeta",
+          "zh": "巴尔佩塔"
+        },
+        "IN_MRG_d52299ba1791": {
+          "en": "Guwahati",
+          "zh": "古瓦哈提"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_46833068a470",
+      "member_ids": [
+        "IN_ADM2_76128533B46926146855114",
+        "IN_MRG_4947bf9afafe"
+      ],
+      "parent_id": "IN_Uttarakhand",
+      "names": {
+        "en": "Uttarakhand · West",
+        "zh": "北阿坎德邦·西部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B46926146855114": {
+          "en": "Garhwal",
+          "zh": "加瓦尔"
+        },
+        "IN_MRG_4947bf9afafe": {
+          "en": "Tehri Garhwal",
+          "zh": "特里·加瓦尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_7bdc9fb12bc4",
+      "member_ids": [
+        "IN_ADM2_76128533B47816398970283",
+        "IN_ADM2_76128533B5215906594478",
+        "IN_ADM2_76128533B55603381222870",
+        "IN_ADM2_76128533B70021405538438"
+      ],
+      "parent_id": "IN_Maharashtra",
+      "names": {
+        "en": "Maharashtra · Central",
+        "zh": "马哈拉施特拉邦·中部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B47816398970283": {
+          "en": "Ahmadnagar",
+          "zh": "艾哈迈德讷格尔"
+        },
+        "IN_ADM2_76128533B5215906594478": {
+          "en": "Bid",
+          "zh": "比德"
+        },
+        "IN_ADM2_76128533B55603381222870": {
+          "en": "Jalna",
+          "zh": "贾尔纳"
+        },
+        "IN_ADM2_76128533B70021405538438": {
+          "en": "Buldana",
+          "zh": "布尔达纳"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_d5c4dbfe1bc8",
+      "member_ids": [
+        "IN_ADM2_76128533B47840093719460",
+        "IN_MRG_f09ef2e914ec",
+        "IN_MRG_fc4fb7f7372c"
+      ],
+      "parent_id": "IN_Chhattisgarh",
+      "names": {
+        "en": "Chhattisgarh · South",
+        "zh": "恰蒂斯加尔邦·南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B47840093719460": {
+          "en": "Bastar",
+          "zh": "巴斯塔"
+        },
+        "IN_MRG_f09ef2e914ec": {
+          "en": "Uttar Bastar Kanker",
+          "zh": "北巴斯塔尔坎克尔"
+        },
+        "IN_MRG_fc4fb7f7372c": {
+          "en": "Dakshin Bastar Dantewada",
+          "zh": "达克辛·巴斯塔·丹特瓦达"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_b9f4a2a4e279",
+      "member_ids": [
+        "IN_ADM2_76128533B50014751336341",
+        "IN_ADM2_76128533B53791014455989"
+      ],
+      "parent_id": "IN_Madhya_Pradesh",
+      "names": {
+        "en": "Madhya Pradesh · East 2",
+        "zh": "中央邦·东部2"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B50014751336341": {
+          "en": "Singrauli",
+          "zh": "辛格劳利"
+        },
+        "IN_ADM2_76128533B53791014455989": {
+          "en": "Sidhi",
+          "zh": "锡迪"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_3ec3695dfc4f",
+      "member_ids": [
+        "IN_ADM2_76128533B50275440439236",
+        "IN_ADM2_76128533B60893804631193"
+      ],
+      "parent_id": "IN_Jharkhand",
+      "names": {
+        "en": "Jharkhand · South",
+        "zh": "贾坎德邦·南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B50275440439236": {
+          "en": "Saraikela-Kharsawan",
+          "zh": "萨拉凯拉-卡萨万"
+        },
+        "IN_ADM2_76128533B60893804631193": {
+          "en": "Pashchimi Singhbhum",
+          "zh": "帕什奇米·辛格布姆"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_1a5f5037ac4f",
+      "member_ids": [
+        "IN_ADM2_76128533B50374927918374",
+        "IN_MRG_aeb165f4c805"
+      ],
+      "parent_id": "IN_Uttarakhand",
+      "names": {
+        "en": "Uttarakhand · Southeast",
+        "zh": "北阿坎德邦·东南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B50374927918374": {
+          "en": "Nainital",
+          "zh": "奈尼塔尔"
+        },
+        "IN_MRG_aeb165f4c805": {
+          "en": "Almora",
+          "zh": "阿尔莫拉"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_8aa5d9ed9b9f",
+      "member_ids": [
+        "IN_ADM2_76128533B50613523798301",
+        "IN_ADM2_76128533B96584288929219"
+      ],
+      "parent_id": "IN_Rajasthan",
+      "names": {
+        "en": "Rajasthan · South 2",
+        "zh": "拉贾斯坦邦·南部2"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B50613523798301": {
+          "en": "Pratapgarh",
+          "zh": "普拉塔普加尔"
+        },
+        "IN_ADM2_76128533B96584288929219": {
+          "en": "Banswara",
+          "zh": "班斯瓦拉"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_a655f8eae163",
+      "member_ids": [
+        "IN_ADM2_76128533B53018054761164",
+        "IN_ADM2_76128533B53373614632193",
+        "IN_ADM2_76128533B58104976570569",
+        "IN_ADM2_76128533B67054925852429",
+        "IN_MRG_9592dd2cf1d9"
+      ],
+      "parent_id": "IN_Telangana",
+      "names": {
+        "en": "Telangana · North",
+        "zh": "特伦甘纳邦·北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B53018054761164": {
+          "en": "Mancherial",
+          "zh": "曼彻里亚尔"
+        },
+        "IN_ADM2_76128533B53373614632193": {
+          "en": "Peddapalli",
+          "zh": "佩达帕利"
+        },
+        "IN_ADM2_76128533B58104976570569": {
+          "en": "Karimnagar",
+          "zh": "卡里姆讷格尔"
+        },
+        "IN_ADM2_76128533B67054925852429": {
+          "en": "Jagtial",
+          "zh": "贾格蒂亚尔"
+        },
+        "IN_MRG_9592dd2cf1d9": {
+          "en": "Adilabad",
+          "zh": "阿迪拉巴德"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_61856fc517ff",
+      "member_ids": [
+        "IN_ADM2_76128533B53366745705922",
+        "IN_ADM2_76128533B59121537940607",
+        "IN_ADM2_76128533B81857725777974"
+      ],
+      "parent_id": "IN_West_Bengal",
+      "names": {
+        "en": "West Bengal · Central",
+        "zh": "西孟加拉邦·中部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B53366745705922": {
+          "en": "Birbhum",
+          "zh": "伯布姆"
+        },
+        "IN_ADM2_76128533B59121537940607": {
+          "en": "Barddhaman",
+          "zh": "巴达曼"
+        },
+        "IN_ADM2_76128533B81857725777974": {
+          "en": "Hugli",
+          "zh": "胡格利"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_f1db88056d17",
+      "member_ids": [
+        "IN_ADM2_76128533B53671786151110",
+        "IN_ADM2_76128533B58058152513003",
+        "IN_ADM2_76128533B66411945144923",
+        "IN_ADM2_76128533B67210465807627",
+        "IN_ADM2_76128533B82793215586362"
+      ],
+      "parent_id": "IN_Nagaland",
+      "names": {
+        "en": "Nagaland · Central",
+        "zh": "那加兰邦·中部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B53671786151110": {
+          "en": "Kohima",
+          "zh": "科希马"
+        },
+        "IN_ADM2_76128533B58058152513003": {
+          "en": "Zunheboto",
+          "zh": "尊赫博托"
+        },
+        "IN_ADM2_76128533B66411945144923": {
+          "en": "Longleng",
+          "zh": "龙冷"
+        },
+        "IN_ADM2_76128533B67210465807627": {
+          "en": "Wokha",
+          "zh": "沃卡"
+        },
+        "IN_ADM2_76128533B82793215586362": {
+          "en": "Mokokchung",
+          "zh": "莫科克松"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_5bd2f4f1a695",
+      "member_ids": [
+        "IN_ADM2_76128533B54279951806726",
+        "IN_ADM2_76128533B60320291189162",
+        "IN_ADM2_76128533B67530641452031",
+        "IN_MRG_6f037851532e"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · East 2",
+        "zh": "北方邦·东部2"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B54279951806726": {
+          "en": "Sant Kabir Nagar",
+          "zh": "圣卡比尔纳加尔"
+        },
+        "IN_ADM2_76128533B60320291189162": {
+          "en": "Faizabad",
+          "zh": "法扎巴德"
+        },
+        "IN_ADM2_76128533B67530641452031": {
+          "en": "Gonda",
+          "zh": "贡达"
+        },
+        "IN_MRG_6f037851532e": {
+          "en": "Ambedkar Nagar",
+          "zh": "安贝德卡纳加尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_73b8798a7214",
+      "member_ids": [
+        "IN_ADM2_76128533B57825981663822",
+        "IN_ADM2_76128533B8920527783032",
+        "IN_MRG_ccf93b344819"
+      ],
+      "parent_id": "IN_Assam",
+      "names": {
+        "en": "Assam · Northeast",
+        "zh": "阿萨姆邦·东北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B57825981663822": {
+          "en": "Dibrugarh",
+          "zh": "迪布鲁加尔"
+        },
+        "IN_ADM2_76128533B8920527783032": {
+          "en": "Tinsukia",
+          "zh": "丁苏基亚"
+        },
+        "IN_MRG_ccf93b344819": {
+          "en": "Sivasagar",
+          "zh": "西瓦萨加尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_0872aaddca5c",
+      "member_ids": [
+        "IN_ADM2_76128533B57995625790051",
+        "IN_ADM2_76128533B66125202864966"
+      ],
+      "parent_id": "IN_Assam",
+      "names": {
+        "en": "Assam · South",
+        "zh": "阿萨姆邦·南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B57995625790051": {
+          "en": "Karbi Anglong West",
+          "zh": "卡比·安隆·西"
+        },
+        "IN_ADM2_76128533B66125202864966": {
+          "en": "Dima Hasao",
+          "zh": "迪马哈佐夫"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_e361a0c62816",
+      "member_ids": [
+        "IN_ADM2_76128533B58797478961083",
+        "IN_ADM2_76128533B81147724102706",
+        "IN_MRG_81646fcfad63"
+      ],
+      "parent_id": "IN_Odisha",
+      "names": {
+        "en": "Odisha · East",
+        "zh": "奥里萨邦·东部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B58797478961083": {
+          "en": "Bhadrak",
+          "zh": "巴德拉克"
+        },
+        "IN_ADM2_76128533B81147724102706": {
+          "en": "Baleshwar",
+          "zh": "巴莱什瓦尔"
+        },
+        "IN_MRG_81646fcfad63": {
+          "en": "Kendrapara",
+          "zh": "肯德拉帕拉"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_90b3ba03aaeb",
+      "member_ids": [
+        "IN_ADM2_76128533B59596968713717",
+        "IN_ADM2_76128533B96870418529164"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · Northwest 3",
+        "zh": "北方邦·西北部3"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B59596968713717": {
+          "en": "Farrukhabad",
+          "zh": "法鲁哈巴德"
+        },
+        "IN_ADM2_76128533B96870418529164": {
+          "en": "Shahjahanpur",
+          "zh": "沙贾汉布尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_a3f42a5bb822",
+      "member_ids": [
+        "IN_ADM2_76128533B61117593923933",
+        "IN_ADM2_76128533B86368264587575",
+        "IN_MRG_53f9886bc000"
+      ],
+      "parent_id": "IN_Kerala",
+      "names": {
+        "en": "Kerala · Southeast",
+        "zh": "喀拉拉邦·东南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B61117593923933": {
+          "en": "Kollam",
+          "zh": "奎隆"
+        },
+        "IN_ADM2_76128533B86368264587575": {
+          "en": "Alappuzha",
+          "zh": "阿拉普扎"
+        },
+        "IN_MRG_53f9886bc000": {
+          "en": "Kottayam",
+          "zh": "科塔亚姆"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_b72e2285c63a",
+      "member_ids": [
+        "IN_ADM2_76128533B633842538351",
+        "IN_ADM2_76128533B80656256583567",
+        "IN_MRG_0240da1df458",
+        "IN_MRG_9771ab24083b"
+      ],
+      "parent_id": "IN_Odisha",
+      "names": {
+        "en": "Odisha · Southwest",
+        "zh": "奥里萨邦·西南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B633842538351": {
+          "en": "Ganjam",
+          "zh": "甘贾姆"
+        },
+        "IN_ADM2_76128533B80656256583567": {
+          "en": "Puri",
+          "zh": "普里"
+        },
+        "IN_MRG_0240da1df458": {
+          "en": "Kalahandi",
+          "zh": "卡拉汉迪"
+        },
+        "IN_MRG_9771ab24083b": {
+          "en": "Kandhamal",
+          "zh": "坎德哈马尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_03a3f2ee1465",
+      "member_ids": [
+        "IN_ADM2_76128533B64732849735713",
+        "IN_ADM2_76128533B73925919155567"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · Southeast 3",
+        "zh": "北方邦·东南部3"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B64732849735713": {
+          "en": "Jaunpur",
+          "zh": "章普尔"
+        },
+        "IN_ADM2_76128533B73925919155567": {
+          "en": "Azamgarh",
+          "zh": "阿扎姆加尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_d74786467839",
+      "member_ids": [
+        "IN_ADM2_76128533B66825707357376",
+        "IN_ADM2_76128533B92044109913630"
+      ],
+      "parent_id": "IN_Rajasthan",
+      "names": {
+        "en": "Rajasthan · North",
+        "zh": "拉贾斯坦邦·北部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B66825707357376": {
+          "en": "Churu",
+          "zh": "丘鲁"
+        },
+        "IN_ADM2_76128533B92044109913630": {
+          "en": "Hanumangarh",
+          "zh": "哈努曼加尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_cba921b13656",
+      "member_ids": [
+        "IN_ADM2_76128533B70646408240587",
+        "IN_MRG_0e1e90dca5bf",
+        "IN_MRG_37328dfe8d45"
+      ],
+      "parent_id": "IN_Madhya_Pradesh",
+      "names": {
+        "en": "Madhya Pradesh · Southeast",
+        "zh": "中央邦·东南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B70646408240587": {
+          "en": "Chhindwara",
+          "zh": "钦德瓦拉"
+        },
+        "IN_MRG_0e1e90dca5bf": {
+          "en": "Balaghat",
+          "zh": "巴拉加特"
+        },
+        "IN_MRG_37328dfe8d45": {
+          "en": "Mandla",
+          "zh": "曼陀罗"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_7b27a9a03d70",
+      "member_ids": [
+        "IN_ADM2_76128533B71088079535368",
+        "IN_ADM2_76128533B80016894369263"
+      ],
+      "parent_id": "IN_Haryana",
+      "names": {
+        "en": "Haryana · Southeast",
+        "zh": "哈里亚纳邦·东南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B71088079535368": {
+          "en": "Palwal",
+          "zh": "帕尔瓦尔"
+        },
+        "IN_ADM2_76128533B80016894369263": {
+          "en": "Mewat",
+          "zh": "梅瓦特"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_a2b5d06404de",
+      "member_ids": [
+        "IN_ADM2_76128533B74057284038879",
+        "IN_MRG_07eb3c8cab39"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · Southeast 1",
+        "zh": "北方邦·东南部1"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B74057284038879": {
+          "en": "Rae Bareli",
+          "zh": "雷·巴雷利"
+        },
+        "IN_MRG_07eb3c8cab39": {
+          "en": "Pratapgarh (Uttar Pradesh)",
+          "zh": "普拉塔普加尔（西尔莫尔）"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_e6a1c49f03e8",
+      "member_ids": [
+        "IN_ADM2_76128533B79180273895456",
+        "IN_ADM2_76128533B86721175299079"
+      ],
+      "parent_id": "IN_Karnataka",
+      "names": {
+        "en": "Karnataka · West",
+        "zh": "卡纳塔克邦·西部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B79180273895456": {
+          "en": "Uttara Kannada",
+          "zh": "北卡纳达"
+        },
+        "IN_ADM2_76128533B86721175299079": {
+          "en": "Haveri",
+          "zh": "哈韦里"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_76ffa0bf6d57",
+      "member_ids": [
+        "IN_ADM2_76128533B79784438258239",
+        "IN_ADM2_76128533B84772439394056",
+        "IN_ADM2_76128533B8878807356913",
+        "IN_ADM2_76128533B91640519747726",
+        "IN_MRG_5c48e7d5fc5b"
+      ],
+      "parent_id": "IN_Uttar_Pradesh",
+      "names": {
+        "en": "Uttar Pradesh · West",
+        "zh": "北方邦·西部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B79784438258239": {
+          "en": "Etawah",
+          "zh": "埃塔瓦"
+        },
+        "IN_ADM2_76128533B84772439394056": {
+          "en": "Mainpuri",
+          "zh": "迈恩普里"
+        },
+        "IN_ADM2_76128533B8878807356913": {
+          "en": "Mahamaya Nagar",
+          "zh": "摩诃玛雅那加"
+        },
+        "IN_ADM2_76128533B91640519747726": {
+          "en": "Firozabad",
+          "zh": "菲罗扎巴德"
+        },
+        "IN_MRG_5c48e7d5fc5b": {
+          "en": "Etah",
+          "zh": "埃塔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_fb0ec8ba1cb5",
+      "member_ids": [
+        "IN_ADM2_76128533B91943656836526",
+        "IN_ADM2_76128533B98308664713511"
+      ],
+      "parent_id": "IN_Rajasthan",
+      "names": {
+        "en": "Rajasthan · Southeast",
+        "zh": "拉贾斯坦邦·东南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B91943656836526": {
+          "en": "Jhalawar",
+          "zh": "贾拉瓦"
+        },
+        "IN_ADM2_76128533B98308664713511": {
+          "en": "Baran",
+          "zh": "巴兰"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_1b5e5dff8662",
+      "member_ids": [
+        "IN_ADM2_76128533B9783509419210",
+        "IN_MRG_10229d52fb7d"
+      ],
+      "parent_id": "IN_Rajasthan",
+      "names": {
+        "en": "Rajasthan · Southwest",
+        "zh": "拉贾斯坦邦·西南部"
+      },
+      "member_names": {
+        "IN_ADM2_76128533B9783509419210": {
+          "en": "Pali",
+          "zh": "帕利"
+        },
+        "IN_MRG_10229d52fb7d": {
+          "en": "Jalor",
+          "zh": "贾洛尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "IN_MRG_fbe0a94c6ca5",
+      "member_ids": [
+        "IN_MRG_10207a70afcd",
+        "IN_MRG_c195372a6ccc"
+      ],
+      "parent_id": "IN_Mizoram",
+      "names": {
+        "en": "Mizoram · Northwest",
+        "zh": "米佐拉姆邦·西北部"
+      },
+      "member_names": {
+        "IN_MRG_10207a70afcd": {
+          "en": "Lunglei",
+          "zh": "隆雷"
+        },
+        "IN_MRG_c195372a6ccc": {
+          "en": "Kolasib",
+          "zh": "科拉西布"
+        }
+      },
+      "name_source": "parent_direction"
+    }
+  ],
+  "split_or_reduced_candidates": []
+}

@@ -15,7 +15,7 @@
         ],
         "zoom": 100,
         "level": -3,
-        "featureCount": 9809
+        "featureCount": 9548
       },
       {
         "dpr": 1,
@@ -25,7 +25,7 @@
         ],
         "zoom": 130,
         "level": -1,
-        "featureCount": 9809
+        "featureCount": 9548
       },
       {
         "dpr": 2,
@@ -35,7 +35,7 @@
         ],
         "zoom": 100,
         "level": 1,
-        "featureCount": 9809
+        "featureCount": 9548
       },
       {
         "dpr": 2,
@@ -45,7 +45,7 @@
         ],
         "zoom": 130,
         "level": 3,
-        "featureCount": 9809
+        "featureCount": 9548
       },
       {
         "dpr": 1.25,
@@ -55,7 +55,7 @@
         ],
         "zoom": 100,
         "level": -1,
-        "featureCount": 9809
+        "featureCount": 9548
       },
       {
         "dpr": 1.25,
@@ -65,7 +65,7 @@
         ],
         "zoom": 130,
         "level": 0,
-        "featureCount": 9809
+        "featureCount": 9548
       },
       {
         "dpr": 1.5,
@@ -75,7 +75,7 @@
         ],
         "zoom": 100,
         "level": 0,
-        "featureCount": 9809
+        "featureCount": 9548
       },
       {
         "dpr": 1.5,
@@ -85,7 +85,7 @@
         ],
         "zoom": 130,
         "level": 2,
-        "featureCount": 9809
+        "featureCount": 9548
       }
     ]
   },
@@ -105,6 +105,14 @@
       "compression": "gzip",
       "compressedByteLength": 1199,
       "sha256": "23205b810830089896e0c08d6320024e09e69114e171f4f12b089d0f70a81de3"
+    },
+    {
+      "identity": "political-id-raster:v1:02cbd18d5ff40e804538053fde9a6084a64f1ea17f18e0eb3d74d9b8f979e47c",
+      "url": "./52821a548847f7cadb2184f96e0e774df81817c6236f7b4afbb168efb283de07.pidr.gz",
+      "byteLength": 2590224,
+      "compression": "gzip",
+      "compressedByteLength": 579126,
+      "sha256": "52821a548847f7cadb2184f96e0e774df81817c6236f7b4afbb168efb283de07"
     },
     {
       "identity": "political-id-raster:v1:0603bc415f91916e259bd50dded8d43b1b6fbb74c91a0240ba0d3eb7661033f6",
@@ -291,6 +299,14 @@
       "sha256": "319b3853345fd5d1a23e587b79bea7d9a277eb70f67602fc551ebe18182b772b"
     },
     {
+      "identity": "political-id-raster:v1:290260bed46144cced67ef068ae408303699b8994bfda9a7c8cffcd529d703e7",
+      "url": "./e6f87856ca50a6ba661f94040ed214327558563b8bc915b95380f39a5c88fadf.pidr.gz",
+      "byteLength": 2705984,
+      "compression": "gzip",
+      "compressedByteLength": 746702,
+      "sha256": "e6f87856ca50a6ba661f94040ed214327558563b8bc915b95380f39a5c88fadf"
+    },
+    {
       "identity": "political-id-raster:v1:2960d8fc0cd22e7af49526bdd1be1f2c8921574abe26e218a0759936281171cc",
       "url": "./632105b2aaba933e77570272c589adbb3fcd9725000d70b5ad17eed1315e20c1.pidr.gz",
       "byteLength": 1051672,
@@ -403,14 +419,6 @@
       "sha256": "fd3b9fa6f6af53fc92bb8d07f9a7297b3d16da1d587ef340d8a6b8680cbd85e6"
     },
     {
-      "identity": "political-id-raster:v1:3beaf77928d90668fbc93f55fc58dade1d0bc97d070c0b32c9f1655c12d20057",
-      "url": "./a8228fd962f25988a57f7c6c672481f92371d50fed343dcaa973d409d9e58603.pidr.gz",
-      "byteLength": 2625040,
-      "compression": "gzip",
-      "compressedByteLength": 596716,
-      "sha256": "a8228fd962f25988a57f7c6c672481f92371d50fed343dcaa973d409d9e58603"
-    },
-    {
       "identity": "political-id-raster:v1:3cd53834fe6a79d7cc4b10f2a6ab5536eb8f0012b80847279d55e18c6f98b311",
       "url": "./87c94ca68d763ad3b9391cc720600ab5fcab793478510d17db7b180d3ccd70d5.pidr.gz",
       "byteLength": 1048744,
@@ -433,6 +441,22 @@
       "compression": "gzip",
       "compressedByteLength": 1201,
       "sha256": "6b764b3bd49720fa53f4d8c9672d940333a8c4a998aac88283524fb7e3ab0295"
+    },
+    {
+      "identity": "political-id-raster:v1:438ec78fae11af38d12b995a175728b513286be46bc6de91fa06b29afe71d205",
+      "url": "./f2ad19376217da42e39742ec84d7d6f0712cb9e76163d880f8ad57eb4fe56ba7.pidr.gz",
+      "byteLength": 2785144,
+      "compression": "gzip",
+      "compressedByteLength": 742916,
+      "sha256": "f2ad19376217da42e39742ec84d7d6f0712cb9e76163d880f8ad57eb4fe56ba7"
+    },
+    {
+      "identity": "political-id-raster:v1:43b4816cb6f308f4e03201a24509ddae9e5f1bc6c6da59ddc4eb2df8a4a34358",
+      "url": "./3724088a39ab1c81f60745d332c71cc2bd2bb892ec01f99074314755eaf124b0.pidr.gz",
+      "byteLength": 3009420,
+      "compression": "gzip",
+      "compressedByteLength": 860758,
+      "sha256": "3724088a39ab1c81f60745d332c71cc2bd2bb892ec01f99074314755eaf124b0"
     },
     {
       "identity": "political-id-raster:v1:45c537a481c6808cad29a0ac3e20f56b8e7c683816de90b3d1c5c0329f8a5d4a",
@@ -481,14 +505,6 @@
       "compression": "gzip",
       "compressedByteLength": 1200,
       "sha256": "e1cbd322f333e4f68351e49778071b3892bc5c2406b23fc47d98cc64928261c5"
-    },
-    {
-      "identity": "political-id-raster:v1:4c93670b4f8585da89d8140c0ee0c18121c2cd1d3e35e56e641c437da5bf9431",
-      "url": "./ee9ab9dd6fb35bfdf987e9086ecfb27ce8fc73106abae44188bf667b097e996e.pidr.gz",
-      "byteLength": 3048264,
-      "compression": "gzip",
-      "compressedByteLength": 881914,
-      "sha256": "ee9ab9dd6fb35bfdf987e9086ecfb27ce8fc73106abae44188bf667b097e996e"
     },
     {
       "identity": "political-id-raster:v1:514203da8965ee553629c973177015b3984432c5970b70bc37bafc27411fe669",
@@ -553,14 +569,6 @@
       "compression": "gzip",
       "compressedByteLength": 1198,
       "sha256": "52a50868adc079cc9bcbd8af66d2d2aa8a55dd1b961496bb94de8e63209b3cd9"
-    },
-    {
-      "identity": "political-id-raster:v1:5f448422cd3a0af4609fa6e7cf2229f5019a7d755990ed0bf6e98fdc69a29d77",
-      "url": "./5046061cb4f5a9ea9397168d7a780840215cb92327c3a01e26c38065445683ab.pidr.gz",
-      "byteLength": 2108268,
-      "compression": "gzip",
-      "compressedByteLength": 422680,
-      "sha256": "5046061cb4f5a9ea9397168d7a780840215cb92327c3a01e26c38065445683ab"
     },
     {
       "identity": "political-id-raster:v1:61a32995d35754d07d092639c1fdf8c52e4948de6bfed18786119e6b54b0aaed",
@@ -731,14 +739,6 @@
       "sha256": "5c8eb596891ec2d696ffedd3d4db20054069e74c8a6415767aa2b32aecb656f4"
     },
     {
-      "identity": "political-id-raster:v1:7b9acb5f356b6d42bfcedb8796f51ea6b2656d38fbfa93d8a48af3c8d38a43be",
-      "url": "./894e41404170445b5e6ace393aa5eaba557655ad7a781ba22b636c4e1f4863f1.pidr.gz",
-      "byteLength": 2285328,
-      "compression": "gzip",
-      "compressedByteLength": 584991,
-      "sha256": "894e41404170445b5e6ace393aa5eaba557655ad7a781ba22b636c4e1f4863f1"
-    },
-    {
       "identity": "political-id-raster:v1:7d019983bb4212add85e3aab5a17a66e75acbb3a13daf43f05d465e3ae9bb81d",
       "url": "./144d01dfdfed22ea962bafda870a2fe4968a8e7ac4387a8ce1f07c8be85b5574.pidr.gz",
       "byteLength": 1048744,
@@ -763,6 +763,14 @@
       "sha256": "8687d787ee2d66e6a391c9d2ca485f446692c78d4c7630c990365611928c0ae8"
     },
     {
+      "identity": "political-id-raster:v1:8304ec6a1d150c93c566435b797ad941e14f7d8b354c48999ae2bea6072ae547",
+      "url": "./b890bef182fa2a7f17c58a0d82c4057920c8bef35316660ee7c38e9b3f2ef104.pidr.gz",
+      "byteLength": 2257364,
+      "compression": "gzip",
+      "compressedByteLength": 570239,
+      "sha256": "b890bef182fa2a7f17c58a0d82c4057920c8bef35316660ee7c38e9b3f2ef104"
+    },
+    {
       "identity": "political-id-raster:v1:842330a08cfdc064bffc12dbdb947027f335a9a832163c792fc3c2dc2ca53303",
       "url": "./9125f05c7fbac913e00cad0c2ffa6e5bbd581600f05287155f0cfbc712883ce0.pidr.gz",
       "byteLength": 1180164,
@@ -785,6 +793,14 @@
       "compression": "gzip",
       "compressedByteLength": 1196,
       "sha256": "e397a711b54bcc115def1f6ac75e7fe672110bed77b3161ee54c90349d4cbe68"
+    },
+    {
+      "identity": "political-id-raster:v1:8992d07115ea688e9768efde3c43313a84dff980ca12dc2fbd0adeb4b8c645e7",
+      "url": "./e4dcf48fc9042ec98a4376b454d34f4813d08a8489a04bc9000e6cb5277cca7f.pidr.gz",
+      "byteLength": 2845996,
+      "compression": "gzip",
+      "compressedByteLength": 713680,
+      "sha256": "e4dcf48fc9042ec98a4376b454d34f4813d08a8489a04bc9000e6cb5277cca7f"
     },
     {
       "identity": "political-id-raster:v1:8a1b3c90d857a9388453b24e90c6ea93f5aff9f7d92cfcb3b7be025fe08c9dd4",
@@ -835,20 +851,20 @@
       "sha256": "3f5fbe45c1127ef63b0354b99494f97fbc228855841101fb5259b00267c8a838"
     },
     {
-      "identity": "political-id-raster:v1:965f16dbd4bb5db5b207cf6c27df035529da2b68a6273676a29327228d8be01d",
-      "url": "./99e3146661a05086703fec8b8e1debbd6af14afab0a238e8fe67b047454c97e9.pidr.gz",
-      "byteLength": 2743324,
-      "compression": "gzip",
-      "compressedByteLength": 765213,
-      "sha256": "99e3146661a05086703fec8b8e1debbd6af14afab0a238e8fe67b047454c97e9"
-    },
-    {
       "identity": "political-id-raster:v1:96676e64a77f35bfc88085c1d61fe08359af2f134d89d2eb6fe498892fc19edd",
       "url": "./9b27d5b5ef50f2a5122fcf2841232566178a7dff0ec9df63e2b434501c1d821e.pidr.gz",
       "byteLength": 1510328,
       "compression": "gzip",
       "compressedByteLength": 168374,
       "sha256": "9b27d5b5ef50f2a5122fcf2841232566178a7dff0ec9df63e2b434501c1d821e"
+    },
+    {
+      "identity": "political-id-raster:v1:96d124fc9a16cb6efcefcadad9f6fffcb71514577fec81f9db6cf0d5a2c3b565",
+      "url": "./e45a0f8bc830664c774108c58c79018999ff12b9c3e9c0f160ceca3bb1c9963a.pidr.gz",
+      "byteLength": 2738208,
+      "compression": "gzip",
+      "compressedByteLength": 684912,
+      "sha256": "e45a0f8bc830664c774108c58c79018999ff12b9c3e9c0f160ceca3bb1c9963a"
     },
     {
       "identity": "political-id-raster:v1:973f363f81fbe0bc5d65e0e79f585fc0900c15b359721a629c944e623c2f444b",
@@ -1027,6 +1043,14 @@
       "sha256": "13cf48f59d5595353643ffb58527960597926b7078a202bf34749e0e04794e97"
     },
     {
+      "identity": "political-id-raster:v1:bb4d305b2eb4b1582057b6e08b6a1ada7cdab7da25a93597aa398cdd095c6ff2",
+      "url": "./d750d689a9fdb5104f0b919ab9a884c22223e034d8d055fd5958e83699fdd8ad.pidr.gz",
+      "byteLength": 2094348,
+      "compression": "gzip",
+      "compressedByteLength": 415302,
+      "sha256": "d750d689a9fdb5104f0b919ab9a884c22223e034d8d055fd5958e83699fdd8ad"
+    },
+    {
       "identity": "political-id-raster:v1:bbfb7cb4e52d4106d64c7a9c2b2988ee200334b8cf1c9e1a012aa83ee821daf8",
       "url": "./17d585a42ef4c47a6b840ae7f981efdf5c94aefb065f62782b35a49d54e375b0.pidr.gz",
       "byteLength": 1048744,
@@ -1083,14 +1107,6 @@
       "sha256": "60552a7cc1d5f97cf781db823b63ba596671ab48ecbb618b556608ad7922d82f"
     },
     {
-      "identity": "political-id-raster:v1:c3720e0d98d4f7313934b32f97d9cd70f316a8eefb56a051f1e183e529d5ab1a",
-      "url": "./63052e157dcdf701ee46c87fcf032a31c2c12381ba3c1c036dd5dad92cb6c0d5.pidr.gz",
-      "byteLength": 2892356,
-      "compression": "gzip",
-      "compressedByteLength": 737085,
-      "sha256": "63052e157dcdf701ee46c87fcf032a31c2c12381ba3c1c036dd5dad92cb6c0d5"
-    },
-    {
       "identity": "political-id-raster:v1:c51f35907be8226c4912102f2a9a7406976d5e2f7ab7cbe14853e9741f819963",
       "url": "./7a1c038d4c561dc6c9d28a21a74063fad7a09a986f5290285d92ae96e74233fc.pidr.gz",
       "byteLength": 1049688,
@@ -1139,14 +1155,6 @@
       "sha256": "c7c1ca0f31e8ec23347cd6c54aa2261bf32d25fdb9a4c9067e9e9bc5b15534cc"
     },
     {
-      "identity": "political-id-raster:v1:d24c83c159641e06c67c3f5b3e333b8e53c50e0dd5502d010fc633f26861dbd9",
-      "url": "./ab181b82a32184739ad8cae93cac3caac09a18f3aeb3d39ce43acdab4f098c98.pidr.gz",
-      "byteLength": 2818816,
-      "compression": "gzip",
-      "compressedByteLength": 760136,
-      "sha256": "ab181b82a32184739ad8cae93cac3caac09a18f3aeb3d39ce43acdab4f098c98"
-    },
-    {
       "identity": "political-id-raster:v1:d48f5e082b4cac4f3b85ba345e2835006ff76dab9440378b5d877723dce8f6f2",
       "url": "./bd229646aa596ba165f17ea803fe37d5965982e3025fb8e45e830ece5f7eca74.pidr.gz",
       "byteLength": 1048744,
@@ -1169,14 +1177,6 @@
       "compression": "gzip",
       "compressedByteLength": 1198,
       "sha256": "de9291eee55203fe515285aa89bc5b4561b5eae1efc63ca916b8b30484e9615f"
-    },
-    {
-      "identity": "political-id-raster:v1:dd2694de6a1c0789c28dab5f19bce3d07ed08f50007164178ff19a138245553c",
-      "url": "./08bc6a2c6fc0b3b7749c03e8f97cae1a979698f721c32248dfec0c86c28596d0.pidr.gz",
-      "byteLength": 2771760,
-      "compression": "gzip",
-      "compressedByteLength": 702406,
-      "sha256": "08bc6a2c6fc0b3b7749c03e8f97cae1a979698f721c32248dfec0c86c28596d0"
     },
     {
       "identity": "political-id-raster:v1:ddcffb179b8764f801dfe0281342efbbb65d5b3dea79ede30ce02531680ae740",
@@ -1217,14 +1217,6 @@
       "compression": "gzip",
       "compressedByteLength": 1199,
       "sha256": "17f90930e7ec27b4efaf163877e4041fe7322c5b834471777b6a97fb71f9bd56"
-    },
-    {
-      "identity": "political-id-raster:v1:e5c5b21b6040e4082e92a280d2eed88ca7ee669d626d0449d8da87b0e213c8cc",
-      "url": "./42920f7e0c1f62e2f6cdc4cf4feba8c1778e38134962838a9474f285700b5333.pidr.gz",
-      "byteLength": 2739024,
-      "compression": "gzip",
-      "compressedByteLength": 763808,
-      "sha256": "42920f7e0c1f62e2f6cdc4cf4feba8c1778e38134962838a9474f285700b5333"
     },
     {
       "identity": "political-id-raster:v1:e5f6bcac22dbc734d6715d07ca0addab917ecc2c050f2787df31e4411ae6b6c4",
@@ -1339,6 +1331,14 @@
       "sha256": "6bd8a6bcaa924efa6514dd934d22c0b28889d6ffab83b312180189042fc1a949"
     },
     {
+      "identity": "political-id-raster:v1:f917915aef1b8d39a396be423daebe6290b57a3800721c1ef035245e0ae11f1f",
+      "url": "./4599a545962d0452dfc083e03103b3182bf0dade61d98ba5d3298f25e737a19c.pidr.gz",
+      "byteLength": 2710092,
+      "compression": "gzip",
+      "compressedByteLength": 747862,
+      "sha256": "4599a545962d0452dfc083e03103b3182bf0dade61d98ba5d3298f25e737a19c"
+    },
+    {
       "identity": "political-id-raster:v1:fce99372203c7387fb5ff838cf2e73e08ddc6e6257238a1eaec7ba00e172b582",
       "url": "./e5adf4521d6e0514cf9fc2fc3e37c584e8838f2ec36c15b48171777852304037.pidr.gz",
       "byteLength": 1048744,
@@ -1358,11 +1358,11 @@
   "sources": [
     {
       "path": "data/scenarios/hoi4_1936/manifest.json",
-      "sha256": "1610b516ad911875d32fe88abae3f9bdef9a4fc382184d1f14ba4b45452676a3"
+      "sha256": "256b7f6139179b2987a4eed1aaaffdf83f9edeb2c82ebdaac917444f41856064"
     },
     {
       "path": "data/scenarios/hoi4_1936/detail_chunks.manifest.json",
-      "sha256": "bd7259a1f4b456b6d52030ed5bd1e807df70cee6526ed103bab1a8a14483917d"
+      "sha256": "2e59c9b22f688c4ae327510470c269900e1064fc27ec97dd5b6cc4448554961f"
     },
     {
       "path": "data/scenarios/hoi4_1936/runtime_topology.bootstrap.topo.json",
