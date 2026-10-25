@@ -34,6 +34,7 @@ from shapely.geometry import shape  # noqa: E402
 from shapely.ops import unary_union  # noqa: E402
 
 from map_builder.json_source import read_json_source, write_runtime_topology_source  # noqa: E402
+from map_builder.political_feature_merge_plans import ordered_plans  # noqa: E402
 from map_builder.regional_geometry import (  # noqa: E402
     _compact_arcs,
     _decode_geometry,
@@ -109,6 +110,10 @@ class Merges:
                 merged = {}
                 for language, separator in LANGUAGE_SEPARATORS.items():
                     if not any(language in entry for entry in entries):
+                        continue
+                    if group.get("name_source", "members") != "members":
+                        # Parent/direction and city names replace member names, including an earlier merge's.
+                        merged[language] = group["names"][language]
                         continue
                     names = [((value.get(prefix + member) or {}).get(language)
                               or group["member_names"][member][language]) for member in group["member_ids"]]
@@ -518,6 +523,12 @@ def merge_geo_aliases(payload: dict, merges: Merges) -> dict:
         })
         for key in ("aliases", "search_only_aliases"):
             target[key] = list(dict.fromkeys(target[key] + list(entry.get(key) or [])))
+    for group_id, target in merged_entries.items():
+        group = merges.by_id[group_id]
+        if group.get("name_source", "members") != "members":
+            # Member names, and an earlier merge's composed name, stay searchable.
+            names = [group["names"]["zh"], *(name for member in group["member_names"].values() for name in member.values())]
+            target["search_only_aliases"] = list(dict.fromkeys(target["search_only_aliases"] + names))
     entries.extend(merged_entries.values())
     payload["entries"] = entries
     keep = (lambda key: key) if merges.scoped else merges.map_id
@@ -625,6 +636,9 @@ def main() -> None:
     parser.add_argument("--manifest-only", action="store_true", help="Only refresh data/manifest.json evidence.")
     args = parser.parse_args()
     merges = Merges(load_json(ROOT / args.plan))
+    # Replays follow apply_order.json, never file-name order.
+    if Path(args.plan).name not in dict(ordered_plans(DATA)):
+        raise ValueError(f"{args.plan} is not listed in data/political_feature_merges/apply_order.json")
     if args.quick_fill_only:
         apply_quick_fill()
         return

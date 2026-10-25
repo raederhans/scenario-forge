@@ -7,12 +7,13 @@ import { fileURLToPath } from "node:url";
 
 // Applied plans are materialized by tools/apply_political_feature_merges.py.
 // Any upstream rebuild that restores a merged-away runtime ID must re-run it.
-// Plans apply in file-name order; a plan with "scenarios" applies only there,
-// and a later plan may merge an earlier merged feature again.
+// Plans apply in apply_order.json order; a plan with "scenarios" applies only
+// there, and a later plan may merge an earlier merged feature again.
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const planDir = path.join(root, "data/political_feature_merges");
-const plans = fs.readdirSync(planDir).filter(name => /\.v\d+\.json$/.test(name)).sort()
-  .map(name => JSON.parse(fs.readFileSync(path.join(planDir, name), "utf8")));
+const planFiles = fs.readdirSync(planDir).filter(name => /\.v\d+\.json$/.test(name));
+const order = JSON.parse(fs.readFileSync(path.join(planDir, "apply_order.json"), "utf8")).plans;
+const plans = order.map(name => JSON.parse(fs.readFileSync(path.join(planDir, name), "utf8")));
 const groups = plans.flatMap(plan => plan.groups);
 const scenarios = ["blank_base", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962"];
 const appliesTo = (plan, scenario) => !plan.scenarios || plan.scenarios.includes(scenario);
@@ -75,8 +76,18 @@ function scenarioStaleIds(id) {
 
 test("merge plan groups are disjoint, contiguous candidates with bilingual names", () => {
   assert.ok(plans.length >= 2);
+  assert.deepEqual([...order].sort(), [...planFiles].sort());
+  assert.equal(new Set(order).size, order.length);
+  const produced = new Map();
   for (const plan of plans) {
     assert.ok(!plan.scenarios || (plan.scenarios.length && plan.scenarios.every(id => scenarios.includes(id))));
+    const scope = plan.scenarios || scenarios;
+    for (const group of plan.groups) {
+      for (const member of group.member_ids.filter(id => id.includes("_MRG_"))) {
+        assert.ok(scope.every(id => produced.get(member)?.includes(id)), `${group.id}: ${member} must come from an earlier plan`);
+      }
+      produced.set(group.id, scope);
+    }
   }
   for (const scenario of scenarios) {
     const memberIds = scenarioGroups(scenario).flatMap(group => group.member_ids);

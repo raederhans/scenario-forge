@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 import re
 
+from map_builder.political_feature_merge_plans import ordered_plans
+
 ALIASES = {
     "CN": ("province", "Province"), "FR": ("region", "Region"),
     "DE": ("state", "State"), "US": ("state", "State"),
@@ -168,8 +170,7 @@ def load_feature_merge_members(data_dir: Path) -> dict[str, list[str]]:
     Scenario-scoped plans leave the shared hierarchy unchanged and are skipped.
     """
     members: dict[str, list[str]] = {}
-    for path in sorted((data_dir / "political_feature_merges").glob("*.v[0-9]*.json")):
-        plan = json.loads(path.read_text(encoding="utf-8"))
+    for _name, plan in ordered_plans(data_dir):
         if "scenarios" in plan:
             continue
         for group in plan.get("groups", []):

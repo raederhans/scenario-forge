@@ -17,11 +17,14 @@ the scenarios a plan names (see *Scenario-scoped plans*).
 | `russia_china_wave4.candidates.json` | Input: Russia outside the Moscow Reichskommissariat, generated with the Codex protection engine under the RKM pilot rules, and the Codex 2026-10-21 v2 candidates for Shanxi, Shaanxi, Hunan, Guizhou and Guangxi. Groups whose union has a convex-hull fill below 0.4, an aspect above 3.5 or an area above 50,000 km² are left out. |
 | `russia_china_wave4.v1.json` | Applied plan: 248 groups, 656 members, 408 features removed. |
 
-Plans are applied one after another in file-name order; within each scenario
-their member sets are disjoint, and every consumer (quick-fill, tests) reads all
-`*.v<N>.json` plans. A later plan may list an earlier merged feature
-(`*_MRG_*`) as a member: the plan IDs then chain (A, B → M1; M1, C → M2), so
-replaying the plans in order after an upstream rebuild yields the same result.
+Plans are applied one after another in the order of `apply_order.json`, never
+by file name; the plan tool appends each new plan there. Within each scenario
+their member sets are disjoint, and every consumer (apply tool, quick-fill,
+tests) reads the plans through that order. A later plan may list an earlier
+merged feature (`*_MRG_*`) as a member: the plan IDs then chain (A, B → M1;
+M1, C → M2), so replaying the plans in order after an upstream rebuild yields
+the same result. The order is rejected when a merged member does not come
+from an earlier plan that applies to every scenario of the later one.
 
 ### Scenario-scoped plans
 
@@ -68,9 +71,26 @@ together only where every scenario assigns them identically:
 Inconsistent candidates are split into the largest consistent subsets that are
 still contiguous; singletons stay unmerged. Merged IDs are
 `<country>_MRG_<sha256(sorted members)[:12]>`, so ID-based country fallbacks
-still resolve. Names join the members' names (`en` with ` + `, `zh` with `、`),
-taken from `locales.json`, then scenario `geo_locale_patch.json` files (which
-name leaves whose raw names are ambiguous), then the source topology name.
+still resolve.
+
+Groups are named (`--naming parent_direction`, the default):
+
+- after the largest city they host (`world_cities.geojson`, population at least
+  `--city-min-population`, default 1,000,000);
+- otherwise `<parent> · <direction>` / `<上级>·<方位>`, the compass sector
+  (北部, 东北部, … 西北部, or 中部 near the centre) of the group's centroid
+  around its parent's. A group covering its whole parent takes the parent's
+  name, and repeated names in one parent are numbered by descending area.
+
+The parent is the candidate's `parent_id` (or the one hierarchy group holding
+every member). Its names come from the candidate's `parent_names`, then the
+reviewed `parent_names.json` (`{"parents": {id: {en, zh}}}`), then an exact
+`locales.json` match of the hierarchy label; a parent without a bilingual name
+fails the plan. Member names (`member_names`) still join the members' names
+from `locales.json`, then scenario `geo_locale_patch.json` files, then the
+source topology name; they stay searchable as aliases. `--naming members`
+keeps the older joined names (`en` with ` + `, `zh` with `、`), which the
+plans applied before this rule use.
 
 ## Applying the plan
 
@@ -86,7 +106,9 @@ name leaves whose raw names are ambiguous), then the source topology name.
 - `hierarchy.json`, `locales.json`, `geo_aliases.json`, country policies,
   cities, urban areas and releasable catalogs. The China prefecture crosswalk
   is projected and its input signatures re-pinned to the merged leaves. Scenario-specific names, such as
-  TNO's, are composed from that scenario's own member names;
+  TNO's, are composed from that scenario's own member names for joined names;
+  a parent/direction or city name replaces every member's name (including an
+  earlier merge's), and the members' names become `search_only_aliases`;
 - population features (`--population-only`, run after the scenarios).
   Population and area are summed and fractions are area-weighted; each document
   is re-bound to its new topology hash and re-registered;

@@ -17,6 +17,8 @@ import functools
 import gzip
 import hashlib
 import json
+import math
+import re
 import sys
 from pathlib import Path
 
@@ -198,6 +200,101 @@ def compose_names(member_names: dict[str, dict]) -> dict:
             for language, separator in LANGUAGE_SEPARATORS.items()}
 
 
+# Compass sectors clockwise from north, then the centre of the parent.
+DIRECTIONS = (("North", "北部"), ("Northeast", "东北部"), ("East", "东部"), ("Southeast", "东南部"),
+              ("South", "南部"), ("Southwest", "西南部"), ("West", "西部"), ("Northwest", "西北部"))
+CENTRAL = ("Central", "中部")
+# A group whose centroid lies within this fraction of the parent's half extent is central.
+CENTRAL_RADIUS = 0.25
+CITY_MIN_POPULATION = 1_000_000
+
+
+PARENT_NAMES = DATA / "political_feature_merges/parent_names.json"
+
+
+def parent_names(parent_id: str, hierarchy: dict, raw_names: dict, override: dict | None, reviewed: dict | None = None) -> dict:
+    """Parent name in each language: the candidate's, the reviewed table's, else the hierarchy label's."""
+    reviewed = reviewed or {}
+    if override or parent_id in reviewed:
+        return dict(override or reviewed[parent_id])
+    label = (hierarchy.get("labels") or {}).get(parent_id or "") or ""
+    english = re.sub(r"^[A-Z]{2} - ", "", label)
+    # Only exact label matches: a shortened label can hit an unrelated raw name.
+    chinese = next(((raw_names.get(key) or {}).get("zh") for key in (label, english) if (raw_names.get(key) or {}).get("zh")), None)
+    if not english or not chinese:
+        raise ValueError(f"{parent_id}: no bilingual parent name; add it to {PARENT_NAMES.name} or the candidate's parent_names")
+    return {"en": english, "zh": chinese}
+
+
+def largest_city(feature_ids: set[str], cities: list[dict], minimum: int) -> dict | None:
+    hosted = [city for city in cities if city.get("host_feature_id") in feature_ids and (city.get("population") or 0) >= minimum]
+    if not hosted:
+        return None
+    city = max(hosted, key=lambda row: row["population"])
+    return {"en": city.get("name_en") or city["name"], "zh": city.get("name_zh") or city.get("name_en") or city["name"]}
+
+
+def compass_direction(shape, parent_shape) -> tuple[str, str]:
+    """Sector of a group's centroid around its parent's, in locally scaled degrees."""
+    point, centre = shape.centroid, parent_shape.centroid
+    min_x, min_y, max_x, max_y = parent_shape.bounds
+    scale = math.cos(math.radians(centre.y))
+    dx, dy = (point.x - centre.x) * scale, point.y - centre.y
+    half_width, half_height = max((max_x - min_x) * scale / 2, 1e-9), max((max_y - min_y) / 2, 1e-9)
+    if math.hypot(dx / half_width, dy / half_height) < CENTRAL_RADIUS:
+        return CENTRAL
+    bearing = math.degrees(math.atan2(dx, dy)) % 360
+    return DIRECTIONS[round(bearing / 45) % 8]
+
+
+def directional_names(groups: list[dict], topology_path: Path, hierarchy: dict, raw_names: dict,
+                      parent_overrides: dict[str, dict], cities: list[dict], city_minimum: int) -> None:
+    """Name each group "<parent>·<direction>", or after its largest city; member names stay aliases.
+
+    Groups that cover their whole parent take the parent name. Repeated names in
+    one parent are numbered by descending area. A parent outside the hierarchy
+    needs ``parent_names`` on its candidates.
+    """
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from map_builder.regional_geometry import _decode_geometry
+    from shapely.ops import unary_union
+
+    topology = rewritten_topology(topology_path)
+    rows = {str((row.get("properties") or {}).get("id") or row.get("id")): row for row in topology["objects"]["political"]["geometries"]}
+    shape = functools.cache(lambda feature_id: _decode_geometry(topology, rows[feature_id]))
+    reviewed = read_json(PARENT_NAMES).get("parents", {}) if PARENT_NAMES.exists() else {}
+    by_name: dict[tuple[str, str], list[dict]] = {}
+    # A research parent outside the hierarchy spans this plan's groups that name it.
+    planned: dict[str, list[str]] = {}
+    for group in groups:
+        planned.setdefault(group["parent_id"], []).extend(group["member_ids"])
+    for group in groups:
+        parent_id = group["parent_id"]
+        siblings = [member for member in (hierarchy.get("groups") or {}).get(parent_id) or planned[parent_id] if member in rows]
+        city = largest_city(set(group["member_ids"]), cities, city_minimum)
+        if city:
+            group["names"], group["name_source"] = city, "city"
+        else:
+            parent = parent_names(parent_id, hierarchy, raw_names, parent_overrides.get(parent_id), reviewed)
+            if set(siblings) <= set(group["member_ids"]):
+                group["names"], group["name_source"] = parent, "parent"
+            else:
+                english, chinese = compass_direction(unary_union([shape(m) for m in group["member_ids"]]),
+                                                     unary_union([shape(m) for m in siblings]))
+                group["names"] = {"en": f"{parent['en']} · {english}", "zh": f"{parent['zh']}·{chinese}"}
+                group["name_source"] = "parent_direction"
+        group["_area"] = sum(shape(member).area for member in group["member_ids"])
+        by_name.setdefault((parent_id, group["names"]["en"]), []).append(group)
+    for same in by_name.values():
+        if len(same) > 1 and same[0]["name_source"] != "city":
+            for number, group in enumerate(sorted(same, key=lambda item: -item["_area"]), start=1):
+                group["names"] = {language: f"{name} {number}" if language == "en" else f"{name}{number}"
+                                  for language, name in group["names"].items()}
+    for group in groups:
+        del group["_area"]
+
+
 def fragment_camouflage_feature_ids() -> set[str]:
     """Features with their own fragment-camouflage display rule; a merge would widen or drop it."""
     policies = read_json(DATA / "country_feature_policies.json")
@@ -230,7 +327,13 @@ def scoped_adjacency(scenarios: tuple[str, ...]) -> tuple[dict[str, set[str]], d
     return adjacency, source_names
 
 
-def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None) -> dict:
+def hierarchy_parent(member_ids: list[str], memberships: dict[str, list[str]]) -> str | None:
+    shared = set.intersection(*({key[6:] for key in memberships.get(member, []) if key.startswith("group:")} for member in member_ids))
+    return min(shared) if len(shared) == 1 else None
+
+
+def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None, naming: str = "parent_direction",
+               city_minimum: int = CITY_MIN_POPULATION) -> dict:
     if scenarios is not None and (not scenarios or not set(scenarios) <= set(ALL_SCENARIOS)):
         raise ValueError(f"Unknown or empty scenario scope: {scenarios}")
     candidates = read_json(candidates_path)
@@ -257,10 +360,16 @@ def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None) 
             groups.append({
                 "id": merged_feature_id(component),
                 "member_ids": component,
-                "parent_id": candidate.get("parent_id"),
+                "parent_id": candidate.get("parent_id") or hierarchy_parent(component, memberships),
                 "names": compose_names(member_names),
                 "member_names": member_names,
             })
+    if naming == "parent_direction" and groups:
+        overrides = {candidate["parent_id"]: candidate["parent_names"] for candidate in candidates["candidates"]
+                     if candidate.get("parent_id") and candidate.get("parent_names")}
+        cities = [row["properties"] for row in read_json(DATA / "world_cities.geojson")["features"]]
+        directional_names(groups, ADJACENCY_TOPOLOGY if scenarios is None else scenario_topology(scenarios[0]),
+                          hierarchy, name_sources[1], overrides, cities, city_minimum)
     seen: dict[str, str] = {}
     for group in groups:
         for feature_id in group["member_ids"]:
@@ -291,9 +400,18 @@ def main() -> None:
     parser.add_argument("--output", default="data/political_feature_merges/europe_de_fr.v1.json")
     parser.add_argument("--scenarios", nargs="+", choices=ALL_SCENARIOS,
                         help="Apply only to these scenarios (default: every scenario and the base topologies).")
+    parser.add_argument("--naming", choices=("parent_direction", "members"), default="parent_direction",
+                        help="Name groups '<parent>·<direction>' or after their largest city (default), or join member names.")
+    parser.add_argument("--city-min-population", type=int, default=CITY_MIN_POPULATION)
     args = parser.parse_args()
-    plan = build_plan(ROOT / args.candidates, tuple(args.scenarios) if args.scenarios else None)
-    (ROOT / args.output).write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    plan = build_plan(ROOT / args.candidates, tuple(args.scenarios) if args.scenarios else None,
+                      args.naming, args.city_min_population)
+    output = ROOT / args.output
+    output.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    if output.parent == DATA / "political_feature_merges":
+        # A new plan applies after every plan already listed.
+        from map_builder.political_feature_merge_plans import register_plan
+        register_plan(DATA, output.name)
     print(json.dumps(plan["counts"]))
 
 
