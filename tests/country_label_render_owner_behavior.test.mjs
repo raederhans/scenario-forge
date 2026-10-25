@@ -721,7 +721,7 @@ test("normalized real glyph metrics, graphemes and language fonts participate in
   owner.drawCountryLabels(1);
   assert.equal(fitCalls[1].maxArcTiltDegrees, 12);
   assert.equal(fitCalls[1].maxArcBendDegrees, 18);
-  assert.equal(fitCalls[1].maxTracking, 0.9);
+  assert.equal(fitCalls[1].maxTracking, 0.25);
   assert.equal(owner.getDiagnostics().geometryBuilds, 1);
   assert.equal(owner.getDiagnostics().fitBuilds, 2);
   assert.match(context.events.filter(([event]) => event === "measure").at(-1)[2], /^400 100px "Map Noto Serif SC"/);
