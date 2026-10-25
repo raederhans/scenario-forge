@@ -8026,6 +8026,11 @@
         "role": "feature_migration_table",
         "family_id": "hybrid_v1"
       },
+      "feature_migrations:political_feature_merges": {
+        "url": "data/feature-migrations/political_feature_merges.v1.json",
+        "role": "feature_migration_table",
+        "family_id": "political_feature_merges_v1"
+      },
       "unit_counter_manifest:hoi4": {
         "url": "data/unit_counter_libraries/hoi4/manifest.json",
         "role": "unit_counter_manifest",

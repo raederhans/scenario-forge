@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-10-01T02:49:46.447775+00:00",
   "counts": {
-    "entries": 1370,
+    "entries": 1371,
     "by_role": {
       "bathymetry_topology": 1,
       "build_manifest": 1,
@@ -14,7 +14,7 @@
       "country_feature_policies": 1,
       "detail_topology_na_v1": 1,
       "detail_topology_na_v2": 1,
-      "feature_migration_table": 1,
+      "feature_migration_table": 2,
       "geo_aliases": 1,
       "hgo_flags_index": 1,
       "hgo_flags_png_manifest": 1,
@@ -75,11 +75,11 @@
     "by_format": {
       "geojson": 152,
       "javascript": 2,
-      "json": 1043,
+      "json": 1044,
       "topojson": 173
     },
     "by_read_mode": {
-      "json": 1368,
+      "json": 1369,
       "module": 2
     }
   },
@@ -243,6 +243,19 @@
       "schemaRef": "schema://json/object/v1",
       "hashRef": "",
       "owner": "runtime_asset_registry.assets.feature_migrations:by_hybrid_v1",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "feature_migrations:political_feature_merges",
+      "url": "data/feature-migrations/political_feature_merges.v1.json",
+      "role": "feature_migration_table",
+      "format": "json",
+      "schemaRef": "schema://json/object/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.feature_migrations:political_feature_merges",
       "cachePolicy": "default",
       "sourceId": "",
       "readMode": "json",

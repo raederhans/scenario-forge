@@ -190,6 +190,7 @@ export function createStartupDataPipelineOwner({
         } else while (loadIsCurrent()) {
           const snapshot = {
             activeScenarioId: state.activeScenarioId,
+            activeScenarioManifest: state.activeScenarioManifest,
             currentScenarioApplyRequestId: state.currentScenarioApplyRequestId,
             locales: state.locales,
             baseGeoLocales: state.baseGeoLocales,
@@ -282,6 +283,7 @@ export function createStartupDataPipelineOwner({
           // tied to the exact apply request and presentation used to prepare it.
           const snapshot = {
             activeScenarioId: state.activeScenarioId,
+            activeScenarioManifest: state.activeScenarioManifest,
             currentScenarioApplyRequestId: state.currentScenarioApplyRequestId,
             locales: state.locales,
             baseGeoLocales: state.baseGeoLocales,

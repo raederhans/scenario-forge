@@ -212,8 +212,27 @@ function* buildScenarioGeoLocalization(target, { baseGeoLocales = target.baseGeo
     yield* copyLocalizationEntries(geo, source);
   }
   yield* copyLocalizationEntries(aliasToStableKey, baseAliasMap);
+  remapScenarioMergedAliases(aliasToStableKey, target.activeScenarioManifest?.hierarchy_overrides);
   yield* copyLocalizationEntries(aliasToStableKey, patch.aliasToStableKey);
   return { geo, aliasToStableKey, synchronizedNamePatch };
+}
+
+// Scenario-scoped merges keep their members in the shared alias map; in this
+// scenario those aliases, and those of an earlier scoped merge merged again,
+// name the final merged feature. The shared map itself stays unprojected.
+function remapScenarioMergedAliases(aliasToStableKey, overrides) {
+  const featureMerges = overrides?.feature_merges;
+  if (!featureMerges || typeof featureMerges !== "object") return;
+  const merged = new Map();
+  Object.entries(featureMerges).forEach(([mergedId, members]) => {
+    if (Array.isArray(members)) members.forEach((member) => merged.set(`id::${member}`, `id::${mergedId}`));
+  });
+  Object.entries(overrides.feature_redirects || {}).forEach(([source, mergedId]) => {
+    if (typeof mergedId === "string") merged.set(`id::${source}`, `id::${mergedId}`);
+  });
+  for (const [alias, stableKey] of Object.entries(aliasToStableKey)) {
+    if (merged.has(stableKey)) aliasToStableKey[alias] = merged.get(stableKey);
+  }
 }
 
 // The caller retains the live localization while this private snapshot is built.
@@ -241,7 +260,7 @@ function applyScenarioGeoLocalization(candidate) {
 
 function getLocalizationInputIdentity(target) {
   return [
-    target.activeScenarioId,
+    target.activeScenarioId, target.activeScenarioManifest?.hierarchy_overrides,
     target.baseGeoLocales, target.baseGeoAliasToStableKey,
     target.worldCitiesData, target.ruCityOverrides,
     target.scenarioCityOverridesData, target.scenarioCityOverridesData?.cities,
@@ -277,6 +296,7 @@ function commitScenarioLocalization(cityOverridesPayload, geoLocalePatchPayload,
 function createLocalizationTarget(cityOverridesPayload, geoLocalePatchPayload) {
   return {
     activeScenarioId: runtimeState.activeScenarioId,
+    activeScenarioManifest: runtimeState.activeScenarioManifest,
     baseGeoLocales: runtimeState.baseGeoLocales,
     baseGeoAliasToStableKey: runtimeState.baseGeoAliasToStableKey,
     worldCitiesData: runtimeState.worldCitiesData,

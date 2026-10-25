@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 import re
 
+from map_builder.political_feature_merge_plans import ordered_plans
+
 ALIASES = {
     "CN": ("province", "Province"), "FR": ("region", "Region"),
     "DE": ("state", "State"), "US": ("state", "State"),
@@ -160,13 +162,27 @@ def build_quick_fill_metadata(
     return {"version": 1, "semantics": "geographic_editing_groups_not_historical_administration", "countries": countries}
 
 
-def load_feature_merge_members(data_dir: Path) -> dict[str, list[str]]:
-    """Merged political feature ID -> member IDs from applied merge plans."""
+def load_feature_merge_members(data_dir: Path, through: str | None = None) -> dict[str, list[str]]:
+    """Surviving merged political feature ID -> source leaf IDs from applied merge plans.
+
+    A later plan may merge an earlier merged feature again; that intermediate ID
+    no longer exists, so it is left out and its members are expanded to leaves.
+    ``through`` stops after that plan, as when the plans are replayed in order.
+    Scenario-scoped plans leave the shared hierarchy unchanged and are skipped.
+    """
     members: dict[str, list[str]] = {}
-    for path in sorted((data_dir / "political_feature_merges").glob("*.v[0-9]*.json")):
-        for group in json.loads(path.read_text(encoding="utf-8")).get("groups", []):
-            members[str(group["id"])] = [str(member) for member in group["member_ids"]]
-    return members
+    for name, plan in ordered_plans(data_dir):
+        if "scenarios" not in plan:
+            for group in plan.get("groups", []):
+                members[str(group["id"])] = [str(member) for member in group["member_ids"]]
+        if name == through:
+            break
+    consumed = {member for group_members in members.values() for member in group_members}
+
+    def leaves(feature_id: str) -> list[str]:
+        return [leaf for member in members[feature_id] for leaf in (leaves(member) if member in members else [member])]
+
+    return {feature_id: leaves(feature_id) for feature_id in members if feature_id not in consumed}
 
 
 def load_crosswalk(data_dir: Path) -> dict | None:
