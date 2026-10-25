@@ -9844,7 +9844,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e6619735ec77",
-        "name": "Novooskolsky District + Chernyansky District",
+        "name": "Novooskolsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -13352,7 +13352,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_193c9476a10d",
-        "name": "Rakityansky District + Prokhorovsky District + Yakovlevsky District",
+        "name": "Yakovlevsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -37134,7 +37134,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_23138a4426a1",
-        "name": "Bolshesoldatsky District + Medvensky District",
+        "name": "Medvensky District",
         "cntr_code": "RKU",
         "__source": "detail"
       },
@@ -58144,7 +58144,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_570a8d4dd729",
-        "name": "Prymorsk + Chernihivka + Pryazovske",
+        "name": "Prymorsk",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -60194,7 +60194,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_01673e94c186",
-        "name": "Kazanka + Bereznehuvate + Novyi Buh",
+        "name": "Novyi Buh",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -60862,7 +60862,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_873c83173170",
-        "name": "Bashtanka + Mykolaiv + Nova Odesa",
+        "name": "Mykolaiv (Mykolaiv)",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -61831,7 +61831,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_73aa15b32010",
-        "name": "Yelanets + Voznesensk",
+        "name": "Yelanets",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -62138,7 +62138,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_b417c43a40cb",
-        "name": "Arbuzynka + Bratske",
+        "name": "Bratske",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -63594,7 +63594,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_de7101fe7980",
-        "name": "Velyka Bilozerka + Vesele",
+        "name": "Vesele",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -64198,7 +64198,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_87ad72dae9b5",
-        "name": "Mykhailivka + Vasylivka + Tokmak",
+        "name": "Tokmak",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -65331,7 +65331,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_1a8aac8d6778",
-        "name": "Rozivka + Polohy + Bilmak",
+        "name": "Polohy",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -65999,7 +65999,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_9e7d5f1ce841",
-        "name": "Vilniansk + Huliaipole + Novomykolaivka",
+        "name": "Vilniansk",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -68213,7 +68213,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_837595aeea03",
-        "name": "Marinka + Pokrovsk",
+        "name": "Marinka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -69596,7 +69596,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_8e995a06a742",
-        "name": "Kostiantynivka + Bakhmut + Lyman",
+        "name": "Kostiantynivka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -72656,7 +72656,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_456d7658c3df",
-        "name": "Bilokurakyne + Novoaidar + Starobilsk",
+        "name": "Starobilsk",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -73331,7 +73331,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_30161412737f",
-        "name": "Svatove + Kreminna",
+        "name": "Svatove",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -76843,7 +76843,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_9cc4d817d067",
-        "name": "Verkhnodniprovsk + Krynychky + Piatykhatky",
+        "name": "Piatykhatky",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -78430,7 +78430,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_c5aa2c8a6048",
-        "name": "Pokrovske + Vasylkivka",
+        "name": "Pokrovske",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -79018,7 +79018,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_b75cd2d6110f",
-        "name": "Novomoskovsk + Synelnykove + Mahdalynivka",
+        "name": "Novomoskovsk",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -81018,7 +81018,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_97cb7eda9f1d",
-        "name": "Barvinkove + Izium + Balakliia",
+        "name": "Izium",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -82063,7 +82063,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_167b1c61b320",
-        "name": "Kupiansk + Borova + Shevchenkove",
+        "name": "Kupiansk",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -82751,7 +82751,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_26d00b8ec232",
-        "name": "Zmiiv + Pervomaiskyi + Chuhuiv",
+        "name": "Zmiiv",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -83310,7 +83310,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_1e19f7d437d0",
-        "name": "Krasnohrad + Kehychivka",
+        "name": "Krasnohrad",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -84428,7 +84428,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_70858b70843b",
-        "name": "Valky + Bohodukhiv + Nova Vodolaha",
+        "name": "Nova Vodolaha",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -85936,7 +85936,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_c2b5f29d91e8",
-        "name": "Krasnokutsk + Kolomak",
+        "name": "Krasnokutsk",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -86239,7 +86239,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_797d35ccfd2e",
-        "name": "Kropyvnytskyi + Bobrynets",
+        "name": "Bobrynets",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -86783,7 +86783,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_51ee3e4d0063",
-        "name": "Vilshanka + Holovanivsk",
+        "name": "Holovanivsk",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -88110,7 +88110,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_d727a8cfaa69",
-        "name": "Dobrovelychkivka + Novoarkhanhelsk",
+        "name": "Dobrovelychkivka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -88413,7 +88413,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ba89d2e82c09",
-        "name": "Novomyrhorod + Mala Vyska + Novoukrainka",
+        "name": "Novoukrainka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -89221,7 +89221,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_2d1c37bdd071",
-        "name": "Oleksandriia + Znamianka",
+        "name": "Oleksandriia",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -90631,7 +90631,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_e3c0520ffdd5",
-        "name": "Kamianka + Oleksandrivka",
+        "name": "Kamianka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -90958,7 +90958,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_c74c01b39f8e",
-        "name": "Novi Sanzhary + Kozelshchyna + Kobeliaky",
+        "name": "Novi Sanzhary",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -91886,7 +91886,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_5e1a623ff8e3",
-        "name": "Mashivka + Chutove + Karlivka",
+        "name": "Karlivka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -92666,7 +92666,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_6057d7f77511",
-        "name": "Kotelva + Dykanka",
+        "name": "Kotelva",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -93029,7 +93029,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_1e5ce8367e34",
-        "name": "Reshetylivka + Shyshaky + Velyka Bahachka",
+        "name": "Reshetylivka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -93990,7 +93990,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_7e91c55da78e",
-        "name": "Myrhorod + Hadiach + Zinkiv",
+        "name": "Myrhorod",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -94722,7 +94722,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_39b244f210a7",
-        "name": "Lubny + Chornukhy + Orzhytsia",
+        "name": "Lubny",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -95382,7 +95382,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_95a5c2e0f114",
-        "name": "Hrebinka + Pyriatyn",
+        "name": "Pyriatyn",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -96291,7 +96291,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_98ce0c6febb4",
-        "name": "Lebedyn + Trostianets",
+        "name": "Lebedyn",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -97252,7 +97252,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_91f1c11e596f",
-        "name": "Nedryhailiv + Romny + Lypova Dolyna",
+        "name": "Romny",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -98779,7 +98779,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_07e4f868c3fb",
-        "name": "Krolevets + Shostka",
+        "name": "Shostka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -100234,7 +100234,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_1d698b91bc32",
-        "name": "Chornobai + Drabiv + Zolotonosha",
+        "name": "Zolotonosha",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -100846,7 +100846,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_b54ca702a003",
-        "name": "Smila + Shpola",
+        "name": "Smila",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -101438,7 +101438,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_4a445701c4c6",
-        "name": "Horodysche + Korsun-Shevchenkivskyi",
+        "name": "Korsun-Shevchenkivskyi",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -102849,7 +102849,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_fbcb4404788c",
-        "name": "Mankivka + Talne",
+        "name": "Talne",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -103152,7 +103152,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_4f13a104316f",
-        "name": "Katerynopil + Zvenyhorodka + Lysianka",
+        "name": "Zvenyhorodka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -103888,7 +103888,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ce31c0ac496b",
-        "name": "Teplyk + Trostianets",
+        "name": "Trostianets",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -104400,7 +104400,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_b0fab68c785d",
-        "name": "Illintsi + Orativ + Nemyriv",
+        "name": "Illintsi",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -105466,7 +105466,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_fd8e40834959",
-        "name": "Lypovets + Pohrebyshche",
+        "name": "Lypovets",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -105837,7 +105837,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_8e1ed09f0e12",
-        "name": "Kalynivka + Koziatyn",
+        "name": "Koziatyn",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -106377,7 +106377,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ec2bf97653b5",
-        "name": "Tulchyn + Tomashpil",
+        "name": "Tulchyn",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -106869,7 +106869,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_b828b24bbda1",
-        "name": "Chernivtsi + Sharhorod + Tyvriv",
+        "name": "Sharhorod",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -107485,7 +107485,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ae35953e4a30",
-        "name": "Bar + Zhmerynka + Murovani Kurylivtsi",
+        "name": "Zhmerynka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -107816,7 +107816,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_de7e916ec1cb",
-        "name": "Khmilnyk + Lityn",
+        "name": "Khmilnyk",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -108115,7 +108115,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_c8f134fbd5da",
-        "name": "Talalaivka + Bakhmach",
+        "name": "Bakhmach",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -109193,7 +109193,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_bde664b68d7f",
-        "name": "Pryluky + Varva",
+        "name": "Pryluky",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -109978,7 +109978,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_f49493422ebe",
-        "name": "Sosnytsia + Koriukivka",
+        "name": "Sosnytsia",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -110490,7 +110490,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_4224fabffe3b",
-        "name": "Kulykivka + Mena",
+        "name": "Mena",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -111203,7 +111203,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_7db72d35cf6c",
-        "name": "Kozelets + Nosivka",
+        "name": "Kozelets",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -113133,7 +113133,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_8f0f1aca728a",
-        "name": "Baryshivka + Boryspil",
+        "name": "Boryspil",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -113452,7 +113452,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_76175923bdd1",
-        "name": "Tetiiv + Volodarka",
+        "name": "Tetiiv",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -114627,7 +114627,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_a96bf83a0ff4",
-        "name": "Rokytne + Kaharlyk",
+        "name": "Kaharlyk",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -115600,7 +115600,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_6b24f46af3f8",
-        "name": "Fastiv + Vasylkiv + Obukhiv",
+        "name": "Fastiv",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -116481,7 +116481,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_228c317a869c",
-        "name": "Borodianka + Makariv",
+        "name": "Borodianka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -118474,7 +118474,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_6e5a94ff967b",
-        "name": "Vinkivtsi + Yarmolyntsi + Dunaivti",
+        "name": "Dunaivti",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -119114,7 +119114,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_57c49cfe4029",
-        "name": "Derazhnia + Letychiv",
+        "name": "Letychiv",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -120264,7 +120264,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_71f8199a8d07",
-        "name": "Krasyliv + Starokostiantyniv + Stara Syniava",
+        "name": "Starokostiantyniv",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -121394,7 +121394,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_5041b17a3e61",
-        "name": "Shepetika + Polonne",
+        "name": "Shepetika",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -122046,7 +122046,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_e0dcc6adce13",
-        "name": "Popilnia + Andrushivka + Ruzhyn",
+        "name": "Popilnia",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -122493,7 +122493,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_44d0fd9d6e14",
-        "name": "Brusyliv + Korostyshiv",
+        "name": "Korostyshiv",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -122792,7 +122792,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_364aab8578b7",
-        "name": "Chudniv + Berdychiv",
+        "name": "Berdychiv",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -123103,7 +123103,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_dbee0923a48b",
-        "name": "Baranivka + Romaniv + Liubar",
+        "name": "Baranivka",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -123855,7 +123855,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_d6223fcd4bc5",
-        "name": "Radomyshl + Malyn",
+        "name": "Malyn",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -124178,7 +124178,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_7f067ceac5cb",
-        "name": "Khoroshiv + Cherniakhiv + Pulyny",
+        "name": "Pulyny",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -125079,7 +125079,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_9fc8b136c3a6",
-        "name": "Yemilchyne + Luhyny + Korosten",
+        "name": "Korosten",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -126967,7 +126967,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_93291f71dff3",
-        "name": "Sarny + Volodymyrets + Kostopil",
+        "name": "Kostopil",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -128439,7 +128439,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_8c4b9e4808b7",
-        "name": "Demydivka + Mlyniv",
+        "name": "Mlyniv",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -128827,7 +128827,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ff6ac32ac4e3",
-        "name": "Kivertsi + Manevychi + Rozhyshche",
+        "name": "Manevychi",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -130480,7 +130480,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_76b1b94d5856",
-        "name": "Kovel + Turiisk + Stara Vyzhivka",
+        "name": "Kovel",
         "cntr_code": "UA",
         "__source": "detail"
       },

@@ -3962,7 +3962,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8fc678e94f2a",
-        "name": "Tavrichesky District + Azovsky Nemetsky National District",
+        "name": "Tavrichesky District",
         "cntr_code": "OMS",
         "__source": "detail"
       },
@@ -5830,7 +5830,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3ffed98d7485",
-        "name": "Moskalensky District + Maryanovsky District + Isilkulsky District",
+        "name": "Isilkulsky District",
         "cntr_code": "OMS",
         "__source": "detail"
       },
@@ -8169,7 +8169,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_077f46c83ea0",
-        "name": "Kormilovsky District + Lyubinsky District + Omsky District",
+        "name": "Omsky District",
         "cntr_code": "OMS",
         "__source": "detail"
       },
@@ -16617,7 +16617,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d12c5659178e",
-        "name": "Sargatsky District + Krutinsky District + Tyukalinsky District",
+        "name": "Tyukalinsky District",
         "cntr_code": "OMS",
         "__source": "detail"
       },
@@ -18788,7 +18788,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_4f3d82b76f96",
-        "name": "Bolsherechensky District + Kolosovsky District + Bolsheukovsky District",
+        "name": "Bolsherechensky District",
         "cntr_code": "OMS",
         "__source": "detail"
       },
@@ -22986,7 +22986,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_eec8890e773f",
-        "name": "городской округ Ишим + Ishimsky District",
+        "name": "городской округ Ишим",
         "cntr_code": "OMS",
         "__source": "detail"
       },
@@ -29155,7 +29155,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_317bc293c6ec",
-        "name": "Ust-Ishimsky District + Tevrizsky District + Znamensky District",
+        "name": "Tevrizsky District",
         "cntr_code": "OMS",
         "__source": "detail"
       },

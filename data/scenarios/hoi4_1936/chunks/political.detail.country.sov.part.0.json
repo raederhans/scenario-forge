@@ -7344,7 +7344,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ff5cc5b501e4",
-        "name": "Komarichsky District + Brasovsky District",
+        "name": "Brasovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -9823,7 +9823,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ccc631e40d26",
-        "name": "Navlinsky District + Vygonichsky District",
+        "name": "Navlinsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -10248,7 +10248,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_85ed17015f49",
-        "name": "Zhiryatinsky District + Pochepsky District",
+        "name": "Pochepsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -10485,7 +10485,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_deee7ff279fc",
-        "name": "Bryansky District + Karachevsky District + Zhukovsky District",
+        "name": "Bryansky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -11468,7 +11468,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_55742c11b5e6",
-        "name": "Dyatkovsky District + городской округ Фокино",
+        "name": "Dyatkovo",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -12954,7 +12954,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a5742bed0bed",
-        "name": "Roslavlsky District + городской округ Десногорск",
+        "name": "Roslavl",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -13687,7 +13687,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_baef030e052d",
-        "name": "Dubrovsky District + Rognedinsky District",
+        "name": "Dubrovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -14609,7 +14609,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f1a67cdf0458",
-        "name": "Mosalsky District + Baryatinsky District",
+        "name": "Mosalsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -20171,7 +20171,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b0d5b1b01211",
-        "name": "Zapadnodvinsky District + Жарковский район",
+        "name": "Zapadnodvinsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -22694,7 +22694,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_257334552b8c",
-        "name": "Toropetsky District + Andreapolsky District",
+        "name": "Toropetsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -25792,7 +25792,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_727dc7a15097",
-        "name": "Maryovsky District + Kholmsky District",
+        "name": "Kholmsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -27194,7 +27194,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f4a93d25d960",
-        "name": "Vyshny Volochyok + Vyshnevolotsky District",
+        "name": "Vyshny Volochyok",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -27653,7 +27653,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a6b0abcdeaa3",
-        "name": "Bologovsky District + ЗАТО Озёрный",
+        "name": "Bologoye",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -30162,7 +30162,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_147b9e791c0f",
-        "name": "Starorussky District + Parfinsky District",
+        "name": "Staraya Russa",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -32480,7 +32480,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_469cb07238ab",
-        "name": "Okulovsky District + Borovichsky District + Moshenskoy District",
+        "name": "Borovichi",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -33143,7 +33143,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_59971f82636d",
-        "name": "Khvoyninsky District + Lyubytinsky District",
+        "name": "Khvoyninsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -36844,7 +36844,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_1ca73d498309",
-        "name": "Kirishsky District + Korotka District",
+        "name": "Korotka District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -46881,7 +46881,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c7dcc7efb71b",
-        "name": "городской округ Кировск + городской округ Апатиты",
+        "name": "Apatity",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -47298,7 +47298,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c4cc806170c7",
-        "name": "Olenegorsk + городской округ Мончегорск",
+        "name": "Monchegorsk",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -47429,7 +47429,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8ec2184da20a",
-        "name": "ЗАТО Североморск + Koutero District + Kuola District",
+        "name": "Severomorsk",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -53670,7 +53670,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_01673e94c186",
-        "name": "Kazanka + Bereznehuvate + Novyi Buh",
+        "name": "Novyi Buh",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -53876,7 +53876,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_873c83173170",
-        "name": "Bashtanka + Mykolaiv + Nova Odesa",
+        "name": "Mykolaiv (Mykolaiv)",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -54207,7 +54207,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_73aa15b32010",
-        "name": "Yelanets + Voznesensk",
+        "name": "Yelanets",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -54318,7 +54318,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_b417c43a40cb",
-        "name": "Arbuzynka + Bratske",
+        "name": "Bratske",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -55062,7 +55062,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_2b67cdceafd7",
-        "name": "Ananiv + Zakharivka + Shyriaieve",
+        "name": "Shyriaieve",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -56559,7 +56559,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_9cc4d817d067",
-        "name": "Verkhnodniprovsk + Krynychky + Piatykhatky",
+        "name": "Piatykhatky",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -56965,7 +56965,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_797d35ccfd2e",
-        "name": "Kropyvnytskyi + Bobrynets",
+        "name": "Bobrynets",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -57141,7 +57141,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_51ee3e4d0063",
-        "name": "Vilshanka + Holovanivsk",
+        "name": "Holovanivsk",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -57496,7 +57496,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_d727a8cfaa69",
-        "name": "Dobrovelychkivka + Novoarkhanhelsk",
+        "name": "Dobrovelychkivka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -57581,7 +57581,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ba89d2e82c09",
-        "name": "Novomyrhorod + Mala Vyska + Novoukrainka",
+        "name": "Novoukrainka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -57787,7 +57787,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_2d1c37bdd071",
-        "name": "Oleksandriia + Znamianka",
+        "name": "Oleksandriia",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -58131,7 +58131,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_e3c0520ffdd5",
-        "name": "Kamianka + Oleksandrivka",
+        "name": "Kamianka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -58216,7 +58216,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_c74c01b39f8e",
-        "name": "Novi Sanzhary + Kozelshchyna + Kobeliaky",
+        "name": "Novi Sanzhary",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -58529,7 +58529,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_6057d7f77511",
-        "name": "Kotelva + Dykanka",
+        "name": "Kotelva",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -58618,7 +58618,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_1e5ce8367e34",
-        "name": "Reshetylivka + Shyshaky + Velyka Bahachka",
+        "name": "Reshetylivka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -58941,7 +58941,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_7e91c55da78e",
-        "name": "Myrhorod + Hadiach + Zinkiv",
+        "name": "Myrhorod",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -59195,7 +59195,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_39b244f210a7",
-        "name": "Lubny + Chornukhy + Orzhytsia",
+        "name": "Lubny",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -59381,7 +59381,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_95a5c2e0f114",
-        "name": "Hrebinka + Pyriatyn",
+        "name": "Pyriatyn",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -59480,7 +59480,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_98ce0c6febb4",
-        "name": "Lebedyn + Trostianets",
+        "name": "Lebedyn",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -59609,7 +59609,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_91f1c11e596f",
-        "name": "Nedryhailiv + Romny + Lypova Dolyna",
+        "name": "Romny",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -60086,7 +60086,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_07e4f868c3fb",
-        "name": "Krolevets + Shostka",
+        "name": "Shostka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -60535,7 +60535,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_1d698b91bc32",
-        "name": "Chornobai + Drabiv + Zolotonosha",
+        "name": "Zolotonosha",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -60737,7 +60737,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_b54ca702a003",
-        "name": "Smila + Shpola",
+        "name": "Smila",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -60923,7 +60923,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_4a445701c4c6",
-        "name": "Horodysche + Korsun-Shevchenkivskyi",
+        "name": "Korsun-Shevchenkivskyi",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -61308,7 +61308,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_fbcb4404788c",
-        "name": "Mankivka + Talne",
+        "name": "Talne",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -61425,7 +61425,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_4f13a104316f",
-        "name": "Katerynopil + Zvenyhorodka + Lysianka",
+        "name": "Zvenyhorodka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -61627,7 +61627,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ce31c0ac496b",
-        "name": "Teplyk + Trostianets",
+        "name": "Trostianets",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -61803,7 +61803,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_b0fab68c785d",
-        "name": "Illintsi + Orativ + Nemyriv",
+        "name": "Illintsi",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -62125,7 +62125,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_fd8e40834959",
-        "name": "Lypovets + Pohrebyshche",
+        "name": "Lypovets",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -62218,7 +62218,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_8e1ed09f0e12",
-        "name": "Kalynivka + Koziatyn",
+        "name": "Koziatyn",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -62382,7 +62382,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ec2bf97653b5",
-        "name": "Tulchyn + Tomashpil",
+        "name": "Tulchyn",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -62556,7 +62556,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_b828b24bbda1",
-        "name": "Chernivtsi + Sharhorod + Tyvriv",
+        "name": "Sharhorod",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -62776,7 +62776,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ae35953e4a30",
-        "name": "Bar + Zhmerynka + Murovani Kurylivtsi",
+        "name": "Zhmerynka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -62907,7 +62907,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_de7e916ec1cb",
-        "name": "Khmilnyk + Lityn",
+        "name": "Khmilnyk",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -63006,7 +63006,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_c8f134fbd5da",
-        "name": "Talalaivka + Bakhmach",
+        "name": "Bakhmach",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -63376,7 +63376,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_bde664b68d7f",
-        "name": "Pryluky + Varva",
+        "name": "Pryluky",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -63609,7 +63609,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_f49493422ebe",
-        "name": "Sosnytsia + Koriukivka",
+        "name": "Sosnytsia",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -63799,7 +63799,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_4224fabffe3b",
-        "name": "Kulykivka + Mena",
+        "name": "Mena",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -64100,7 +64100,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_7db72d35cf6c",
-        "name": "Kozelets + Nosivka",
+        "name": "Kozelets",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -64780,7 +64780,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_8f0f1aca728a",
-        "name": "Baryshivka + Boryspil",
+        "name": "Boryspil",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -64875,7 +64875,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_76175923bdd1",
-        "name": "Tetiiv + Volodarka",
+        "name": "Tetiiv",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -65206,7 +65206,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_a96bf83a0ff4",
-        "name": "Rokytne + Kaharlyk",
+        "name": "Kaharlyk",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -65479,7 +65479,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_6b24f46af3f8",
-        "name": "Fastiv + Vasylkiv + Obukhiv",
+        "name": "Fastiv",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -65768,7 +65768,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_228c317a869c",
-        "name": "Borodianka + Makariv",
+        "name": "Borodianka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -66371,7 +66371,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_6e5a94ff967b",
-        "name": "Vinkivtsi + Yarmolyntsi + Dunaivti",
+        "name": "Dunaivti",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -66559,7 +66559,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_57c49cfe4029",
-        "name": "Derazhnia + Letychiv",
+        "name": "Letychiv",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -66893,7 +66893,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_71f8199a8d07",
-        "name": "Krasyliv + Starokostiantyniv + Stara Syniava",
+        "name": "Starokostiantyniv",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -67245,7 +67245,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_5041b17a3e61",
-        "name": "Shepetika + Polonne",
+        "name": "Shepetika",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -67477,7 +67477,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_e0dcc6adce13",
-        "name": "Popilnia + Andrushivka + Ruzhyn",
+        "name": "Popilnia",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -67638,7 +67638,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_44d0fd9d6e14",
-        "name": "Brusyliv + Korostyshiv",
+        "name": "Korostyshiv",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -67737,7 +67737,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_364aab8578b7",
-        "name": "Chudniv + Berdychiv",
+        "name": "Berdychiv",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -67860,7 +67860,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_dbee0923a48b",
-        "name": "Baranivka + Romaniv + Liubar",
+        "name": "Baranivka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -68086,7 +68086,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_d6223fcd4bc5",
-        "name": "Radomyshl + Malyn",
+        "name": "Malyn",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -68181,7 +68181,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_7f067ceac5cb",
-        "name": "Khoroshiv + Cherniakhiv + Pulyny",
+        "name": "Pulyny",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -68484,7 +68484,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_9fc8b136c3a6",
-        "name": "Yemilchyne + Luhyny + Korosten",
+        "name": "Korosten",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",

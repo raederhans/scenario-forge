@@ -55005,7 +55005,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c7dcc7efb71b",
-        "name": "городской округ Кировск + городской округ Апатиты",
+        "name": "Apatity",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -58100,7 +58100,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c4cc806170c7",
-        "name": "Olenegorsk + городской округ Мончегорск",
+        "name": "Monchegorsk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -58675,7 +58675,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8ec2184da20a",
-        "name": "ЗАТО Североморск + Koutero District + Kuola District",
+        "name": "Severomorsk",
         "cntr_code": "RU",
         "__source": "detail"
       },

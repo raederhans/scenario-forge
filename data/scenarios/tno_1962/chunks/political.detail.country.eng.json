@@ -6,7 +6,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_5b67c89ee498",
-        "name": "Hartlepool and Stockton-on-Tees + Darlington",
+        "name": "Hartlepool and Stockton-on-Tees",
         "cntr_code": "GB",
         "admin1_group": "England",
         "__source": "detail"
@@ -17882,7 +17882,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_5adcc0eef3cd",
-        "name": "Chorley and West Lancashire + Sefton",
+        "name": "Chorley and West Lancashire",
         "cntr_code": "GB",
         "admin1_group": "England",
         "__source": "detail"
@@ -23908,7 +23908,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_117d6a6890fd",
-        "name": "East Riding of Yorkshire + North Yorkshire CC",
+        "name": "Scarborough",
         "cntr_code": "GB",
         "admin1_group": "England",
         "__source": "detail"
@@ -40718,7 +40718,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_2f7c06fdd74c",
-        "name": "South Nottinghamshire + Leicestershire CC and Rutland",
+        "name": "Leicestershire CC and Rutland",
         "cntr_code": "GB",
         "admin1_group": "England",
         "__source": "detail"
@@ -71192,7 +71192,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_2f501f921535",
-        "name": "North and West Norfolk + Breckland and South Norfolk",
+        "name": "Breckland and South Norfolk",
         "cntr_code": "GB",
         "admin1_group": "England",
         "__source": "detail"
@@ -83438,7 +83438,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_0c7e7a67089e",
-        "name": "Camden and City of London + Barnet",
+        "name": "Camden and City of London",
         "cntr_code": "GB",
         "admin1_group": "England",
         "__source": "detail"
@@ -84404,7 +84404,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_b630eccadfbe",
-        "name": "Kensington & Chelsea and Hammersmith & Fulham + Ealing + Hounslow and Richmond upon Thames",
+        "name": "Hounslow and Richmond upon Thames",
         "cntr_code": "GB",
         "admin1_group": "England",
         "__source": "detail"
@@ -85144,7 +85144,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_05f15fd7e833",
-        "name": "Wandsworth + Lewisham and Southwark + Lambeth",
+        "name": "Lewisham and Southwark",
         "cntr_code": "GB",
         "admin1_group": "England",
         "__source": "detail"
@@ -85764,7 +85764,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_7443877c7a21",
-        "name": "Hackney and Newham + Tower Hamlets",
+        "name": "Hackney and Newham",
         "cntr_code": "GB",
         "admin1_group": "England",
         "__source": "detail"
@@ -107952,7 +107952,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_b91d40f3e558",
-        "name": "Kent Thames Gateway + West Kent",
+        "name": "West Kent",
         "cntr_code": "GB",
         "admin1_group": "England",
         "__source": "detail"

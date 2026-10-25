@@ -49265,7 +49265,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_1c3ec0aee968",
-        "name": "Ostrovsky District + Sudislavsky District",
+        "name": "Sudislavsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -61662,7 +61662,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_da7099eb5a0f",
-        "name": "городской округ Буй + Buysky District",
+        "name": "Buy",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -114934,7 +114934,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_415d81df9895",
-        "name": "Vologodsky District + Ust-Kubinsky District + Kharovsky District",
+        "name": "Vologodsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },

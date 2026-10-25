@@ -1442,7 +1442,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_25eea59124e3",
-        "name": "Khorolsky District + Chernigovsky District + Mikhaylovsky District",
+        "name": "Chernigovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -2492,7 +2492,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c84f2ed9c6ef",
-        "name": "Birobidzhansky District + Obluchensky District + Birobidzhan",
+        "name": "Birobidzhan",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -3432,7 +3432,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_27667b37cabf",
-        "name": "Zavitinsky District + городской округ Прогресс + Bureysky District",
+        "name": "Bureysky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -3909,7 +3909,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_db3cc2dd744a",
-        "name": "Romnensky District + Oktyabrsky District + Belogorsky District",
+        "name": "Oktyabrsky District (Amur)",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -7763,7 +7763,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_2abe6bddb595",
-        "name": "Karymsky District + Shilkinsky District + Duldurginsky District",
+        "name": "Shilkinsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -8518,7 +8518,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b99b9e1ffaef",
-        "name": "Olovyanninsky District + Mogoytuysky District + Aginsky District",
+        "name": "Olovyanninsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -9071,7 +9071,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6d68a0fd3c3c",
-        "name": "Baleysky District + Alexandrovo-Zavodsky District + Shelopuginsky District",
+        "name": "Baleysky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -9998,7 +9998,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bee0bb9c2edd",
-        "name": "Mukhorshibirsky Rayon + Tarbagataysky Rayon",
+        "name": "Mukhorshibirsky Rayon",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -10256,7 +10256,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3992f91b7378",
-        "name": "Ivolginsky District + Selenginsky Rayon",
+        "name": "Ivolginsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -11837,7 +11837,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f6312a148f5b",
-        "name": "Zaigrayevsky Rayon + Khorinsky Rayon + Kizhinginsky Rayon",
+        "name": "Zaigrayevsky Rayon",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -14099,7 +14099,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_59f6abe0ef5a",
-        "name": "Sretensky District + Nerchinsky District + Chernyshevsky District",
+        "name": "Chernyshevsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -17728,7 +17728,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f9fc260bcac5",
-        "name": "Эхирит-Булагатский район + Баяндаевский район",
+        "name": "Эхирит-Булагатский район",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -30334,7 +30334,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8db0a9d55bd2",
-        "name": "Irbeysky Rayon + Sayansky Rayon",
+        "name": "Irbeysky Rayon",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -33381,7 +33381,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_15c4c99da0ea",
-        "name": "Nizhneingashsky Rayon + Ilansky Rayon",
+        "name": "Nizhneingashsky Rayon",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",

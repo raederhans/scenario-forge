@@ -11998,7 +11998,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6540bcc440b9",
-        "name": "Izmalkovsky District + Dolgorukovsky District + Stanovlyansky District",
+        "name": "Dolgorukovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -57066,7 +57066,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3942a3c5e59c",
-        "name": "Buturlinovsky District + Pavlovsky District + Подгоренский район",
+        "name": "Pavlovsky District (Voronezh)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -68084,7 +68084,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_725bf9a02991",
-        "name": "городской округ Нововороне + Kashirsky District",
+        "name": "Kashirsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -69331,7 +69331,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8bae009baf0d",
-        "name": "Anninsky District + Talovsky District + Ertilsky District",
+        "name": "Anninsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -76421,7 +76421,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_593f9791ee89",
-        "name": "Novousmansky District + Paninsky District",
+        "name": "Novousmansky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -83983,7 +83983,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_236358043a6b",
-        "name": "Semiluksky District + Ramonsky District",
+        "name": "Semiluksky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -92259,7 +92259,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6cf2ac643f4e",
-        "name": "Usmansky District + Dobrinsky District + Gryazinsky District",
+        "name": "Gryazi",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -106391,7 +106391,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_5bab1314350d",
-        "name": "Michurinsky District + Nikiforovsky District",
+        "name": "Michurinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -118609,7 +118609,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a1cbe886988c",
-        "name": "Dobrovsky District + Chaplyginsky District",
+        "name": "Chaplyginsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -131347,7 +131347,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a106abba15c7",
-        "name": "Ryazhsky District + Korablinsky District + Starozhilovsky District",
+        "name": "Ryazhsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -144911,7 +144911,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_74d30729755a",
-        "name": "Ukholovsky District + Sapozhkovsky District",
+        "name": "Sapozhkovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -182143,7 +182143,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_9ee6ccf8117c",
-        "name": "Tyoplo-Ogaryovsky District + Volovsky District",
+        "name": "Volovsky District (Tula)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -186358,7 +186358,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_960481e90ae6",
-        "name": "Bogoroditsky District + Uzlovsky District",
+        "name": "Bogoroditsk",
         "cntr_code": "RU",
         "__source": "detail"
       },

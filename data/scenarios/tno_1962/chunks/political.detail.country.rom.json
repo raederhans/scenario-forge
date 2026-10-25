@@ -11133,7 +11133,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_2b67cdceafd7",
-        "name": "Ananiv + Zakharivka + Shyriaieve",
+        "name": "Shyriaieve",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -14632,7 +14632,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_08e978d66245",
-        "name": "Artsyi + Tatarbunary",
+        "name": "Artsyi",
         "cntr_code": "UA",
         "__source": "detail"
       },

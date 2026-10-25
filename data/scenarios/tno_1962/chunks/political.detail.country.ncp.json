@@ -757,7 +757,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_533faafa0df3",
-        "name": "Renqiu + Hejian",
+        "name": "Renqiu",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -1076,7 +1076,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_41987d66c89b",
-        "name": "Anyangxian + Tangyinxian",
+        "name": "Anyangxian (Henan)",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -1217,7 +1217,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_19742f026a19",
-        "name": "Nanhexian + Renxian",
+        "name": "Renxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -1290,7 +1290,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_d6f45c057bfc",
-        "name": "Luquan + Yuanxian",
+        "name": "Luquan",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -1845,7 +1845,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_8c69fc20650e",
-        "name": "Xushuixian + Wangduxian + Qingyuanxian",
+        "name": "Qingyuanxian (Hebei)",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -2755,7 +2755,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_afbaca334723",
-        "name": "Wuqiangxian + Wuyixian + Shenzhou",
+        "name": "Shenzhou",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -3189,7 +3189,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_bf685b353c1f",
-        "name": "Anxinxian + Gaoyangxian + Rongchengxian",
+        "name": "Anxinxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -3286,7 +3286,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_34e4e9cc4fbe",
-        "name": "Boyexian + Lixian + Anguo",
+        "name": "Lixian (Hebei)",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -4075,7 +4075,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_b38ab466fa3b",
-        "name": "Quzhouxian + Yongnianxian",
+        "name": "Yongnianxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -4842,7 +4842,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_394c2f1e79d2",
-        "name": "Changxian + Mencunhuizuzizhixian",
+        "name": "Changxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -5273,7 +5273,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_03c2697ed1c7",
-        "name": "Xinxiang + Weihui",
+        "name": "Xinxiang",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -6280,7 +6280,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_3be300af18dc",
-        "name": "Handanxian + Cixian",
+        "name": "Handanxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -6435,7 +6435,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_51c0b9bbbb0a",
-        "name": "Nangong + Longyaoxian + Juluxian",
+        "name": "Nangong",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -6782,7 +6782,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_7c9c7c3d5403",
-        "name": "Botou + Xianxian",
+        "name": "Botou",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -8675,7 +8675,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_8c437a4ee37b",
-        "name": "Yongqingxian + Guanxian",
+        "name": "Yongqingxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -10066,7 +10066,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_f5f659cc505e",
-        "name": "Neihuangxian + Huaxian",
+        "name": "Huaxian (Henan)",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -11925,7 +11925,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_1130259eb8b0",
-        "name": "Guangzhongxian + Weixian",
+        "name": "Weixian (Hebei)",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -13017,7 +13017,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_51650d15c050",
-        "name": "Xingtangxian + Lingshouxian",
+        "name": "Xingtangxian",
         "cntr_code": "CN",
         "__source": "detail"
       },

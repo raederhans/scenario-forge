@@ -17020,7 +17020,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d5cd5d634999",
-        "name": "Anivsky District + Honto District + Maoka District",
+        "name": "Maoka District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -20921,7 +20921,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_248dd5882219",
-        "name": "Makarovsky District + Dolinsky District + Tomarinsky District",
+        "name": "Dolinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -24171,7 +24171,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6b0074e9f94b",
-        "name": "Uglegorsky District + Smirnykhovsky District + Poronaysky District",
+        "name": "Poronaysky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -26982,7 +26982,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_5dbc0427f580",
-        "name": "Tymovsky District + Nogliksky District",
+        "name": "Tymovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },

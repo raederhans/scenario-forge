@@ -123,7 +123,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_26d52bd3f389",
-        "name": "Fangshanxian + Jiaochengxian + Wenshuixian + Lanxian",
+        "name": "Wenshuixian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -521,7 +521,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_62b5e8747ba5",
-        "name": "Shencixian + Wuzaixian",
+        "name": "Shencixian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -638,7 +638,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_093183003948",
-        "name": "Lichengxian + Wuxiangxian",
+        "name": "Wuxiangxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -847,7 +847,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_5da384536a83",
-        "name": "Qianxian + Liquanxian + Yongshouxian + Jingyangxian + Wugongxian",
+        "name": "Qianxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -1032,7 +1032,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_380671e40a1c",
-        "name": "Jiexiu + Lingxian",
+        "name": "Jiexiu",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -1328,7 +1328,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_9b9b2d2aa43a",
-        "name": "Daixian + Dingxiangxian + Wutaixian + Ningwuxian + Fanxian + Yuanping",
+        "name": "Yuanping",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -1605,7 +1605,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_27a184e8ab38",
-        "name": "Yushexian + Zuoquanxian + Xiyangxian + Heshunxian",
+        "name": "Xiyangxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -1896,7 +1896,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_09f3d32020e4",
-        "name": "Binxian + Changwuxian + Xunyixian",
+        "name": "Binxian (Shaanxi)",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -2166,7 +2166,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_bbc31f7c4dea",
-        "name": "Loufanxian + Gujiao",
+        "name": "Gujiao",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -2380,7 +2380,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_7e34a2c431cf",
-        "name": "Hanyinxian + Shiquanxian",
+        "name": "Hanyinxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -2537,7 +2537,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_a0f43f47d72e",
-        "name": "Baishuixian + Chengchengxian + Puchengxian",
+        "name": "Puchengxian (Shaanxi)",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -2690,7 +2690,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_b59c07833274",
-        "name": "Danfengxian + Shangnanxian + Luonanxian + Shanyangxian",
+        "name": "Luonanxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -3326,7 +3326,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_20fbce9fead7",
-        "name": "Chengguxian + Fopingxian + Yangxian",
+        "name": "Chengguxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -3531,7 +3531,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_6cfe5096a6ab",
-        "name": "Yichuanxian + Luochuanxian + Huanglongxian",
+        "name": "Luochuanxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -3736,7 +3736,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_03e48d4d8cb7",
-        "name": "Hengshanxian + Mizhixian + Yulin",
+        "name": "Yulin (Shaanxi)",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -4081,7 +4081,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_293f7b8a3ba2",
-        "name": "Qianyangxian + Qishanxian + Linyouxian + Longxian + Fengxiangxian",
+        "name": "Fengxiangxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -4490,7 +4490,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_ad9de4c133ee",
-        "name": "Fufengxian + Meixian",
+        "name": "Fufengxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -4611,7 +4611,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_011734794f16",
-        "name": "Lintongxian + Lantianxian + Gaoling + Changanxian",
+        "name": "Lintongxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -5122,7 +5122,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_e2dc46a8c2b2",
-        "name": "Zhidanxian + Ganquanxian + Fuxian + Huanglingxian + Ansaixian",
+        "name": "Ansaixian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -5814,7 +5814,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_3811ff27587a",
-        "name": "Nanzhengxian + Mianxian + Ningqiangxian + Liubaxian",
+        "name": "Nanzhengxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -6795,7 +6795,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_ed13ca65f52b",
-        "name": "Wenxixian + Jishanxian + Xinjiangxian + Jiangxian",
+        "name": "Houma",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -7423,7 +7423,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_15274e317fd6",
-        "name": "Yichengxian + Fushanxian + Houma + Quwoxian",
+        "name": "Yichengxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -7834,7 +7834,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_509032e83f5b",
-        "name": "Fenyangxian + Xiaoyi",
+        "name": "Fenyangxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -7955,7 +7955,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_114c09629107",
-        "name": "Taibaixian + Fengxian",
+        "name": "Fengxian (Shaanxi)",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -8192,7 +8192,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_787af341608b",
-        "name": "Xiangyuanxian + Tunliuxian + Qinxian + Qinyuanxian",
+        "name": "Xiangyuanxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -8514,7 +8514,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_3cb8ad8288ff",
-        "name": "Anzhexian + Changzixian",
+        "name": "Changzixian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -8728,7 +8728,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_323d6e10e986",
-        "name": "Baihexian + Xunyangxian",
+        "name": "Xunyangxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -8962,7 +8962,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_31ba4a677ea0",
-        "name": "Fenxixian + Guxian + Hongtongxian",
+        "name": "Hongtongxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -9422,7 +9422,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_f37770e5ef82",
-        "name": "Lucheng + Huguanxian + Pingshunxian",
+        "name": "Huguanxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -10396,7 +10396,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_bcac2fdc52e8",
-        "name": "Yangchengxian + Qinshuixian",
+        "name": "Yangchengxian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -11095,7 +11095,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_005ada82e050",
-        "name": "Gaoping + Lingchuanxian",
+        "name": "Gaoping",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -14277,7 +14277,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_e4d1257a0bd1",
-        "name": "Langaoxian + Zhenpingxian + Pinglixian",
+        "name": "Pinglixian",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -14680,7 +14680,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_3ff67345ed78",
-        "name": "Shanyinxian + Yingxian",
+        "name": "Yingxian (Shanxi)",
         "cntr_code": "CN",
         "__source": "detail"
       },
@@ -15107,7 +15107,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_08f0b7755ac2",
-        "name": "Qixian + Pingyaoxian",
+        "name": "Pingyaoxian",
         "cntr_code": "CN",
         "__source": "detail"
       },

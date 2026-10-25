@@ -2876,7 +2876,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_9d9bddbd62f8",
-        "name": "Malokarachayevsky District + Ust-Dzhegutinsky District",
+        "name": "Malokarachayevsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -14851,7 +14851,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_372658bff17e",
-        "name": "Abazinsky District + Adyge-Khablsky District",
+        "name": "Abazinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -38131,7 +38131,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_42dcfb6eec5e",
-        "name": "Tuapsinsky District + Apsheronsky District",
+        "name": "Tuapse",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -43372,7 +43372,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_73932f56c8d6",
-        "name": "Seversky District + городской округ Горячий Кл",
+        "name": "Goryachiy Klyuch",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -53882,7 +53882,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f6d9746e521a",
-        "name": "Krasnogvardeysky District + Teuchezhsky District + Takhtamukaysky District",
+        "name": "Takhtamukaysky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -60908,7 +60908,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_5ba368436fac",
-        "name": "Andropovsky District + Kochubeyevsky District",
+        "name": "Kochubeyevsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -67042,7 +67042,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_1ab0a785a7fc",
-        "name": "Shovgenovsky District + Koshekhablsky District + Giaginsky District",
+        "name": "Giaginsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -72392,7 +72392,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_5407579b5570",
-        "name": "Tbilissky District + Novokubansky District + Kurganinsky District",
+        "name": "Kurganinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -87034,7 +87034,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_750a15603b8f",
-        "name": "Gulkevichsky District + Kavkazsky District",
+        "name": "Kropotkin",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -91372,7 +91372,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_27a7f048a0b1",
-        "name": "Ust-Labinsky District + Dinskoy District",
+        "name": "Dinskoy District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -94933,7 +94933,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_654102762e97",
-        "name": "Korenovsky District + Timashyovsky District",
+        "name": "Timashyovsk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -96824,7 +96824,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a540d65edaa9",
-        "name": "Vyselkovsky District + Tikhoretsky District",
+        "name": "Tikhoretsk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -106775,7 +106775,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e11c923f0c38",
-        "name": "Сальский район + Целинский район",
+        "name": "Salsk",
         "cntr_code": "RKK",
         "__source": "detail"
       },
@@ -108844,7 +108844,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a2ce0ba9fa04",
-        "name": "Gorodovikovsky District + Yashaltinsky District",
+        "name": "Gorodovikovsky District",
         "cntr_code": "RKK",
         "__source": "detail"
       },
@@ -110545,7 +110545,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_840596f23cf8",
-        "name": "Пролетарский район + Орловский район",
+        "name": "Орловский район (Rostov)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -123013,7 +123013,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8fa758ae0a77",
-        "name": "Anapa Urban Okrug + Slavyansky District + Krymsky District",
+        "name": "Slavyansky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -130359,7 +130359,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_4bba5623a1e6",
-        "name": "Kalininsky District + Krasnoarmeysky District + Primorsko-Akhtarsky District",
+        "name": "Krasnoarmeysky District (Krasnodar Krai)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -140192,7 +140192,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d5a146ea7ae0",
-        "name": "Щербиновский район + Starominsky District + Yeysky District",
+        "name": "Yeysk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -142437,7 +142437,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_db950fa68d86",
-        "name": "Bryukhovetsky District + Kanevskoy District",
+        "name": "Kanevskoy District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -148356,7 +148356,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f3309369affa",
-        "name": "Krylovsky District + Kushchovsky District",
+        "name": "Kushchovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },

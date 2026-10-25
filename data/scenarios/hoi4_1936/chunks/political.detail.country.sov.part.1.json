@@ -199,7 +199,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_42dcfb6eec5e",
-        "name": "Tuapsinsky District + Apsheronsky District",
+        "name": "Tuapse",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -640,7 +640,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_73932f56c8d6",
-        "name": "Seversky District + городской округ Горячий Кл",
+        "name": "Goryachiy Klyuch",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -1379,7 +1379,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f6d9746e521a",
-        "name": "Krasnogvardeysky District + Teuchezhsky District + Takhtamukaysky District",
+        "name": "Takhtamukaysky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -1897,7 +1897,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_27a7f048a0b1",
-        "name": "Ust-Labinsky District + Dinskoy District",
+        "name": "Dinskoy District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -2260,7 +2260,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_654102762e97",
-        "name": "Korenovsky District + Timashyovsky District",
+        "name": "Timashyovsk",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -3014,7 +3014,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8fa758ae0a77",
-        "name": "Anapa Urban Okrug + Slavyansky District + Krymsky District",
+        "name": "Slavyansky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -4018,7 +4018,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_4bba5623a1e6",
-        "name": "Kalininsky District + Krasnoarmeysky District + Primorsko-Akhtarsky District",
+        "name": "Krasnoarmeysky District (Krasnodar Krai)",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -5990,7 +5990,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d5a146ea7ae0",
-        "name": "Щербиновский район + Starominsky District + Yeysky District",
+        "name": "Yeysk",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -7098,7 +7098,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e6619735ec77",
-        "name": "Novooskolsky District + Chernyansky District",
+        "name": "Novooskolsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -7580,7 +7580,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_193c9476a10d",
-        "name": "Rakityansky District + Prokhorovsky District + Yakovlevsky District",
+        "name": "Yakovlevsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -11202,7 +11202,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_23138a4426a1",
-        "name": "Bolshesoldatsky District + Medvensky District",
+        "name": "Medvensky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -13564,7 +13564,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c74526b2fdc8",
-        "name": "Cheremisinovsky District + Shchigry",
+        "name": "Cheremisinovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -14181,7 +14181,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7a5b034feeea",
-        "name": "Dolzhansky District + Kolpnyansky District",
+        "name": "Kolpnyansky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -14436,7 +14436,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6540bcc440b9",
-        "name": "Izmalkovsky District + Dolgorukovsky District + Stanovlyansky District",
+        "name": "Dolgorukovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -15475,7 +15475,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_dde98369766d",
-        "name": "Троснянский район + Кромской район",
+        "name": "Кромской район",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -15804,7 +15804,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_cc3f09a291db",
-        "name": "Глазуновский район + Свердловский район",
+        "name": "Свердловский район",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -16025,7 +16025,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c4b7fcf9408f",
-        "name": "Шаблыкинский район + Дмитровский район",
+        "name": "Дмитровский район",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -16408,7 +16408,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_db950fa68d86",
-        "name": "Bryukhovetsky District + Kanevskoy District",
+        "name": "Kanevskoy District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -16985,7 +16985,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f3309369affa",
-        "name": "Krylovsky District + Kushchovsky District",
+        "name": "Kushchovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -19997,7 +19997,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_725bf9a02991",
-        "name": "городской округ Нововороне + Kashirsky District",
+        "name": "Kashirsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -20345,7 +20345,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_593f9791ee89",
-        "name": "Novousmansky District + Paninsky District",
+        "name": "Novousmansky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -20845,7 +20845,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_236358043a6b",
-        "name": "Semiluksky District + Ramonsky District",
+        "name": "Semiluksky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -22147,7 +22147,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a1cbe886988c",
-        "name": "Dobrovsky District + Chaplyginsky District",
+        "name": "Chaplyginsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -25174,7 +25174,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ab7c9de141c7",
-        "name": "Novoderevenkovsky District + Verkhovsky District + Покровский район",
+        "name": "Verkhovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -25660,7 +25660,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_13bb9d740915",
-        "name": "Mtsensky District + Залегощенский район",
+        "name": "Залегощенский район",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -27407,7 +27407,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_38e4b64aac65",
-        "name": "Khotynetsky District + Uritsky District + Znamensky District",
+        "name": "Uritsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -28324,7 +28324,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a8aa677324f3",
-        "name": "Slavny + Arsenyevsky District",
+        "name": "Arsenyevsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -28986,7 +28986,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_9ee6ccf8117c",
-        "name": "Tyoplo-Ogaryovsky District + Volovsky District",
+        "name": "Volovsky District (Tula)",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -29299,7 +29299,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bc3ec5d8cee8",
-        "name": "Plavsky District + Щёкинский район",
+        "name": "Shchyokino",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -29578,7 +29578,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_960481e90ae6",
-        "name": "Bogoroditsky District + Uzlovsky District",
+        "name": "Bogoroditsk",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -30504,7 +30504,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3a4ba118143e",
-        "name": "Kozelsky District + Sukhinichsky District",
+        "name": "Kozelsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -32089,7 +32089,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f673f237de3d",
-        "name": "Novogurovsky + Aleksinsky District",
+        "name": "Aleksin",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -32354,7 +32354,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8bb4b9b2f984",
-        "name": "Maloyaroslavetsky District + Ferzikovsky District + Dzerzhinsky District",
+        "name": "Dzerzhinsky District (Kaluga)",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -33465,7 +33465,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3576eb737658",
-        "name": "Meshchovsky District + Babyninsky District",
+        "name": "Babyninsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -33917,7 +33917,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f3808058260f",
-        "name": "Yasnogorsky District + Zaoksky District",
+        "name": "Yasnogorsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -34190,7 +34190,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6ade6e4bbcd7",
-        "name": "Borovsky District + Tarussky District + Zhukovsky District",
+        "name": "Borovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -34714,7 +34714,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e6c4245fecb6",
-        "name": "Serpukhovsky District + Pushchino",
+        "name": "Serpukhovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -35238,7 +35238,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_cddc570472f9",
-        "name": "Medynsky District + Iznoskovsky District + Yukhnovsky District",
+        "name": "Medynsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -36022,7 +36022,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f49f6eed3fd4",
-        "name": "Kolomensky District + городской округ Озёры",
+        "name": "Kolomensky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -38132,7 +38132,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6a431b3749b3",
-        "name": "Leninsky District + Chekhovsky District + Domodedovsky District",
+        "name": "Leninsky District (Moscow)",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -38936,7 +38936,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f75032a5f7dc",
-        "name": "Ramensky District + Zhukovsky",
+        "name": "Ramensky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -39303,7 +39303,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_778d6b9a6bcb",
-        "name": "Dzerzhinsky + Lytkarino + Kotelniki",
+        "name": "Kotelniki",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -39446,7 +39446,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_545993141cd3",
-        "name": "Naro-Fominsky District + Istrinsky District + Ruzsky District",
+        "name": "Istra",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -41135,7 +41135,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_5d11e491ebbb",
-        "name": "Klinsky District + Volokolamsky District",
+        "name": "Klin",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -44618,7 +44618,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3d995b252c3d",
-        "name": "Ryazansky District + Rybnovsky District",
+        "name": "Ryazansky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -45605,7 +45605,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c651c5ba9d10",
-        "name": "городской округ Павловский + Elektrogorsk",
+        "name": "городской округ Павловский",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -47561,7 +47561,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a209550547d0",
-        "name": "Solnechnogorsky District + Dmitrovsky District",
+        "name": "Solnechnogorsk",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -50967,7 +50967,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_81137f16203b",
-        "name": "Kesovogorsky District + Krasnokholmsky District + Sonkovsky District",
+        "name": "Krasnokholmsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -51514,7 +51514,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d0fe64d9350d",
-        "name": "Molokovsky District + Bezhetsky District",
+        "name": "Bezhetsk",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -52195,7 +52195,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_74d5c4da86d9",
-        "name": "Rameshkovsky District + Likhoslavlsky District + Spirovsky District",
+        "name": "Likhoslavlsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -53418,7 +53418,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_0be016c8605b",
-        "name": "Sandovsky District + Lesnoy District",
+        "name": "Sandovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -54321,7 +54321,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ec43e0811141",
-        "name": "Pereslavsky District + городской округ Переславль + Rostovsky District",
+        "name": "Rostov",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -54993,7 +54993,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ea618303a3ad",
-        "name": "Gavrilov-Yamsky District + Borisoglebsky",
+        "name": "Gavrilov-Yamsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -57528,7 +57528,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_415d81df9895",
-        "name": "Vologodsky District + Ust-Kubinsky District + Kharovsky District",
+        "name": "Vologodsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -60234,7 +60234,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c4615cedcd6d",
-        "name": "Некоузский район + Брейтовский район",
+        "name": "Некоузский район",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -66047,7 +66047,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_570a8d4dd729",
-        "name": "Prymorsk + Chernihivka + Pryazovske",
+        "name": "Prymorsk",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -66208,7 +66208,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_de7101fe7980",
-        "name": "Velyka Bilozerka + Vesele",
+        "name": "Vesele",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -66408,7 +66408,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_87ad72dae9b5",
-        "name": "Mykhailivka + Vasylivka + Tokmak",
+        "name": "Tokmak",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -66785,7 +66785,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_1a8aac8d6778",
-        "name": "Rozivka + Polohy + Bilmak",
+        "name": "Polohy",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -67001,7 +67001,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_9e7d5f1ce841",
-        "name": "Vilniansk + Huliaipole + Novomykolaivka",
+        "name": "Vilniansk",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -67659,7 +67659,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_837595aeea03",
-        "name": "Marinka + Pokrovsk",
+        "name": "Marinka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -68090,7 +68090,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_8e995a06a742",
-        "name": "Kostiantynivka + Bakhmut + Lyman",
+        "name": "Kostiantynivka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -69076,7 +69076,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_456d7658c3df",
-        "name": "Bilokurakyne + Novoaidar + Starobilsk",
+        "name": "Starobilsk",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -69273,7 +69273,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_30161412737f",
-        "name": "Svatove + Kreminna",
+        "name": "Svatove",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -70016,7 +70016,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_c5aa2c8a6048",
-        "name": "Pokrovske + Vasylkivka",
+        "name": "Pokrovske",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -70186,7 +70186,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_b75cd2d6110f",
-        "name": "Novomoskovsk + Synelnykove + Mahdalynivka",
+        "name": "Novomoskovsk",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -70798,7 +70798,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_97cb7eda9f1d",
-        "name": "Barvinkove + Izium + Balakliia",
+        "name": "Izium",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -71113,7 +71113,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_167b1c61b320",
-        "name": "Kupiansk + Borova + Shevchenkove",
+        "name": "Kupiansk",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -71371,7 +71371,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_26d00b8ec232",
-        "name": "Zmiiv + Pervomaiskyi + Chuhuiv",
+        "name": "Zmiiv",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -71530,7 +71530,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_1e19f7d437d0",
-        "name": "Krasnohrad + Kehychivka",
+        "name": "Krasnohrad",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -71846,7 +71846,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_70858b70843b",
-        "name": "Valky + Bohodukhiv + Nova Vodolaha",
+        "name": "Nova Vodolaha",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -72268,7 +72268,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_c2b5f29d91e8",
-        "name": "Krasnokutsk + Kolomak",
+        "name": "Krasnokutsk",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -72367,7 +72367,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_5e1a623ff8e3",
-        "name": "Mashivka + Chutove + Karlivka",
+        "name": "Karlivka",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",

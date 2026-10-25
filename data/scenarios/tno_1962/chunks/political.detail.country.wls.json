@@ -6,7 +6,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_5e86e440be06",
-        "name": "Isle of Anglesey + Gwynedd + Conwy and Denbighshire",
+        "name": "Conwy and Denbighshire",
         "cntr_code": "GB",
         "admin1_group": "Wales",
         "__source": "detail"
@@ -4084,7 +4084,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_e60d28324bee",
-        "name": "Central Valleys + Gwent Valleys",
+        "name": "Gwent Valleys",
         "cntr_code": "GB",
         "admin1_group": "Wales",
         "__source": "detail"

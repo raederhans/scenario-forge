@@ -6,7 +6,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_26d52bd3f389",
-        "name": "Fangshanxian + Jiaochengxian + Wenshuixian + Lanxian",
+        "name": "Wenshuixian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -269,7 +269,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_62b5e8747ba5",
-        "name": "Shencixian + Wuzaixian",
+        "name": "Shencixian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -390,7 +390,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_093183003948",
-        "name": "Lichengxian + Wuxiangxian",
+        "name": "Wuxiangxian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -758,7 +758,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_380671e40a1c",
-        "name": "Jiexiu + Lingxian",
+        "name": "Jiexiu",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -913,7 +913,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_9b9b2d2aa43a",
-        "name": "Daixian + Dingxiangxian + Wutaixian + Ningwuxian + Fanxian + Yuanping",
+        "name": "Yuanping",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -1194,7 +1194,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_27a184e8ab38",
-        "name": "Yushexian + Zuoquanxian + Xiyangxian + Heshunxian",
+        "name": "Xiyangxian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -1596,7 +1596,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_bbc31f7c4dea",
-        "name": "Loufanxian + Gujiao",
+        "name": "Gujiao",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -3452,7 +3452,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_ce6e418fb13a",
-        "name": "Tianzhenxian + Datongxian + Guanglingxian + Lingqiuxian + Hunyuanxian + Yanggaoxian",
+        "name": "Hunyuanxian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -3837,7 +3837,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_ed13ca65f52b",
-        "name": "Wenxixian + Jishanxian + Xinjiangxian + Jiangxian",
+        "name": "Houma",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -4296,7 +4296,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_15274e317fd6",
-        "name": "Yichengxian + Fushanxian + Houma + Quwoxian",
+        "name": "Yichengxian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -5025,7 +5025,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_509032e83f5b",
-        "name": "Fenyangxian + Xiaoyi",
+        "name": "Fenyangxian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -5406,7 +5406,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_787af341608b",
-        "name": "Xiangyuanxian + Tunliuxian + Qinxian + Qinyuanxian",
+        "name": "Xiangyuanxian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -5736,7 +5736,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_3cb8ad8288ff",
-        "name": "Anzhexian + Changzixian",
+        "name": "Changzixian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -6089,7 +6089,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_31ba4a677ea0",
-        "name": "Fenxixian + Guxian + Hongtongxian",
+        "name": "Hongtongxian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -6450,7 +6450,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_f37770e5ef82",
-        "name": "Lucheng + Huguanxian + Pingshunxian",
+        "name": "Huguanxian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -7668,7 +7668,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_bcac2fdc52e8",
-        "name": "Yangchengxian + Qinshuixian",
+        "name": "Yangchengxian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -7993,7 +7993,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_005ada82e050",
-        "name": "Gaoping + Lingchuanxian",
+        "name": "Gaoping",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -11321,7 +11321,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_3ff67345ed78",
-        "name": "Shanyinxian + Yingxian",
+        "name": "Yingxian (Shanxi)",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -12325,7 +12325,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_08f0b7755ac2",
-        "name": "Qixian + Pingyaoxian",
+        "name": "Pingyaoxian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",

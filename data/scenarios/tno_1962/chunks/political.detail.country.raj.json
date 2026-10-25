@@ -660,7 +660,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_d531e0df892b",
-        "name": "Rajsamand + Chittaurgarh",
+        "name": "Chittaurgarh",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -1363,7 +1363,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_c73911bfb285",
-        "name": "Mahoba + Hamirpur",
+        "name": "Hamirpur (Uttar Pradesh)",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -2283,7 +2283,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_f09ef2e914ec",
-        "name": "Kondagaon + Uttar Bastar Kanker + Narayanpur",
+        "name": "Uttar Bastar Kanker",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -4323,7 +4323,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_e8f4da0d0535",
-        "name": "Faridkot + Muktsar",
+        "name": "Muktsar",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -5076,7 +5076,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_07eb3c8cab39",
-        "name": "Amethi + Sultanpur + Pratapgarh",
+        "name": "Pratapgarh (Uttar Pradesh)",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -5763,7 +5763,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_fc4fb7f7372c",
-        "name": "Dakshin Bastar Dantewada + Sukma + Bijapur",
+        "name": "Dakshin Bastar Dantewada",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -6409,7 +6409,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_3208c5cacd01",
-        "name": "Balrampur + Surajpur + Jashpur",
+        "name": "Jashpur",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -7594,7 +7594,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_2344ccd4873a",
-        "name": "Shahid Bhagat Singh Nagar + Rupnagar + Fatehgarh Sahib",
+        "name": "Rupnagar",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -8261,7 +8261,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_5c48e7d5fc5b",
-        "name": "Etah + Kanshiram Nagar",
+        "name": "Etah",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -11499,7 +11499,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_cc42364d4ba9",
-        "name": "Ariyalur + Perambalur",
+        "name": "Ariyalur",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -11885,7 +11885,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_fe97969e7e01",
-        "name": "Mungeli + Kabeerdham",
+        "name": "Kabeerdham",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -12477,7 +12477,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_6f037851532e",
-        "name": "Basti + Ambedkar Nagar",
+        "name": "Ambedkar Nagar",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -15213,7 +15213,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_37328dfe8d45",
-        "name": "Dindori + Mandla",
+        "name": "Mandla",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -15720,7 +15720,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_1b2b9256168e",
-        "name": "Auraiya + Kanpur Dehat + Kannauj",
+        "name": "Kanpur Dehat",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -17032,7 +17032,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_b507e43e5254",
-        "name": "Kamareddy + Sangareddy + Medak",
+        "name": "Sangareddy",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -17737,7 +17737,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_3e581c359307",
-        "name": "Rajanna Sircilla + Siddipet + Yadadri Bhongiri + Jangaon",
+        "name": "Siddipet",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -19967,7 +19967,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_f61f07205f91",
-        "name": "Mandi + Bilaspur",
+        "name": "Mandi",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -21351,7 +21351,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_9592dd2cf1d9",
-        "name": "Nirmal + Komaram Bheem + Adilabad",
+        "name": "Adilabad",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -22077,7 +22077,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_dcf2b9f1d7ca",
-        "name": "Anuppur + Umaria",
+        "name": "Anuppur",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -23180,7 +23180,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_53f9886bc000",
-        "name": "Kottayam + Pathanamthitta + Idukki",
+        "name": "Kottayam",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -26456,7 +26456,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_a98f3e005f6a",
-        "name": "Mahabubabad + Bhadradri + Warangal (R)",
+        "name": "Bhadradri",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -28984,7 +28984,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_64b26eec8389",
-        "name": "Agar + Shajapur",
+        "name": "Shajapur",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -31828,7 +31828,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_d70f87866a7e",
-        "name": "Dhenkanal + Kendujhar + Jajapur",
+        "name": "Kendujhar",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -32293,7 +32293,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_81646fcfad63",
-        "name": "Jagatsinghapur + Kendrapara",
+        "name": "Kendrapara",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -33073,7 +33073,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_5a8caf67d623",
-        "name": "Nuapada + Balangir + Bargarh",
+        "name": "Balangir",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -34744,7 +34744,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_a9c8dc6c38f7",
-        "name": "Sabar Kantha + Mahisagar + Aravali",
+        "name": "Sabar Kantha",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -47373,7 +47373,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_c2bed413ca7f",
-        "name": "Thiruvarur + Mayiladuthurai + Nagapattinam",
+        "name": "Thiruvarur",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -48903,7 +48903,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_4947bf9afafe",
-        "name": "Rudraprayag + Tehri Garhwal",
+        "name": "Tehri Garhwal",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -49966,7 +49966,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_964f44be21c1",
-        "name": "Narmada + Chhota Udaipur + Dohad",
+        "name": "Dohad",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -50925,7 +50925,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_0c50a07858d2",
-        "name": "Koraput + Malkangiri",
+        "name": "Koraput",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -53473,7 +53473,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_94ef9201854b",
-        "name": "Bangalore Rural + Chikkaballapura",
+        "name": "Chikkaballapura",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -54910,7 +54910,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_10229d52fb7d",
-        "name": "Sirohi + Jalor",
+        "name": "Jalor",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -56628,7 +56628,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_0240da1df458",
-        "name": "Rayagada + Kalahandi",
+        "name": "Kalahandi",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -69705,7 +69705,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_f8895b87957e",
-        "name": "Washim + Hingoli",
+        "name": "Washim",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -70589,7 +70589,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_5c122f79992b",
-        "name": "Anugul + Debagarh",
+        "name": "Anugul",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -77537,7 +77537,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_aeb165f4c805",
-        "name": "Bageshwar + Almora",
+        "name": "Almora",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -80078,7 +80078,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_0e1e90dca5bf",
-        "name": "Balaghat + Seoni",
+        "name": "Balaghat",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -83989,7 +83989,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_9771ab24083b",
-        "name": "Subarnapur + Gajapati + Baudh + Kandhamal",
+        "name": "Kandhamal",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -89258,7 +89258,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_a41c7ad59205",
-        "name": "Dhamtari + Balod + Gariaband + Mahasamund",
+        "name": "Mahasamund",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -100283,7 +100283,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_35c5386ac534",
-        "name": "Koppal + Bagalkot",
+        "name": "Bagalkot",
         "cntr_code": "IN",
         "__source": "detail"
       },
