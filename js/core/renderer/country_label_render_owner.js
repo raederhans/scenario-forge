@@ -1,4 +1,4 @@
-import { buildCountryLabelCandidates, filterCountryLabelHoles, fitCountryLabel } from "./country_label_layout.js";
+import { buildCountryLabelCandidates, COUNTRY_LABEL_TRACKING, filterCountryLabelHoles, fitCountryLabel } from "./country_label_layout.js";
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import { doScreenLabelBoxesOverlap } from "./screen_label_placement.js";
 import { getMapLabelHierarchy, getCountryLabelOpacity } from "./map_label_hierarchy.js";
@@ -405,7 +405,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       glyphs: getGlyphMetrics(context, text, font), glyphPadding: 0.06,
       minFontSize: LAYOUT_MIN_FONT_SIZE, maxFontSize: LAYOUT_MAX_FONT_SIZE,
       // Wide letter spacing lets a title span its territory as on a strategy map.
-      tracking: isChinese ? 0.12 : 0.08, maxTracking: isChinese ? 0.9 : 0.6,
+      ...(isChinese ? COUNTRY_LABEL_TRACKING.chinese : COUNTRY_LABEL_TRACKING.latin),
       minHoleArea: LAYOUT_MIN_HOLE_AREA,
       // Legibility is decided per zoom while drawing; the fit itself only
       // ranks wrapping and arcs by the size they achieve.

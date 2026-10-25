@@ -281,3 +281,37 @@ test("population thematic legend replaces paint categories and refreshes source 
   assert.deepEqual(h.labels(), ["Red"]);
   assert.equal(h.body().querySelector(".map-legend-section-title"), null);
 });
+
+test("scenario paint without named labels keeps the legend hidden", (t) => {
+  const h = harness(t);
+  h.model.activeScenarioId = "hoi4_1936";
+  h.model.hasScenarioVisualEdits = true;
+  h.model.colors = ["#ff0000", "#00ff00", "#0000ff"];
+  h.model.labelMap = { "#00ff00": "   " };
+  h.render();
+  assert.equal(h.element().hidden, true);
+  assert.deepEqual(h.labels(), []);
+});
+
+for (const activeScenarioId of ["hoi4_1936", ""]) {
+  test(`only named colors render as legend rows (scenario: ${activeScenarioId || "none"})`, (t) => {
+    const h = harness(t);
+    h.model.activeScenarioId = activeScenarioId;
+    h.model.colors = ["#ff0000", "#00ff00", "#0000ff"];
+    h.model.labelMap = { "#00ff00": "Allies", "#0000ff": "" };
+    h.render();
+    assert.equal(h.element().hidden, false);
+    assert.deepEqual(h.labels(), ["Allies"]);
+    assert.equal(h.body().querySelectorAll(".map-legend-swatch")[0].style.backgroundColor, "#00ff00");
+  });
+}
+
+test("special zone layers still show the legend when no color is named", (t) => {
+  const h = harness(t);
+  h.model.activeScenarioId = "hoi4_1936";
+  h.model.labelMap = {};
+  h.model.specialZoneLegendLayers = [{ id: "zone", name: "Zone", style: { fill: "pink" } }];
+  h.render();
+  assert.equal(h.element().hidden, false);
+  assert.deepEqual(h.labels(), ["Zone"]);
+});

@@ -123,6 +123,7 @@ import {
   TRANSPORT_WORKBENCH_INSPECTOR_TABS,
 } from "./toolbar/transport_workbench_controller.js";
 import { createWorkspaceChromeSupportSurfaceController } from "./toolbar/workspace_chrome_support_surface_controller.js";
+import { shouldShowDeveloperModeEntry } from "./toolbar/developer_mode_visibility.js";
 const state = runtimeState;
 
 function composePaletteLibraryOperation() {
@@ -524,9 +525,28 @@ function initToolbar({ render } = {}) {
     });
   };
 
+  const readStoredDeveloperMode = () => {
+    try {
+      return globalThis.localStorage?.getItem(DEVELOPER_MODE_STORAGE_KEY) ?? null;
+    } catch {
+      return null;
+    }
+  };
+
+  const isDeveloperModeEntryVisible = () => shouldShowDeveloperModeEntry({
+    hostname: globalThis.location?.hostname,
+    search: globalThis.location?.search,
+    storedDeveloperMode: readStoredDeveloperMode(),
+  });
+
   const syncDeveloperModeUi = () => {
+    // 快捷键显式开启的开发者模式是内存中的 opt-in：即使存储被阻止、主机也不是本地，入口与开启态都要保留。
+    const entryVisible = isDeveloperModeEntryVisible() || !!runtimeState.ui.developerMode;
     document.body?.classList.toggle("developer-mode", !!runtimeState.ui.developerMode);
     if (developerModeBtn) {
+      // .zoom-btn 自带 display，单靠 hidden 属性压不住，同时挂全局 .hidden 类。
+      developerModeBtn.hidden = !entryVisible;
+      developerModeBtn.classList.toggle("hidden", !entryVisible);
       const buttonLabel = runtimeState.ui.developerMode
         ? t("Hide development workspace", "ui")
         : t("Show development workspace", "ui");
@@ -560,12 +580,10 @@ function initToolbar({ render } = {}) {
     syncDeveloperModeUi();
   };
 
-  try {
-    const storedDeveloperMode = globalThis.localStorage?.getItem(DEVELOPER_MODE_STORAGE_KEY);
-    if (storedDeveloperMode === "true" || storedDeveloperMode === "false") {
-      runtimeState.ui.developerMode = storedDeveloperMode === "true";
-    }
-  } catch {}
+  const storedDeveloperMode = readStoredDeveloperMode();
+  if (storedDeveloperMode === "true" || storedDeveloperMode === "false") {
+    runtimeState.ui.developerMode = storedDeveloperMode === "true";
+  }
   updateLanguageToggleUi();
   syncDeveloperModeUi();
 
