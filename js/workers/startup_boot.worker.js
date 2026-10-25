@@ -14,10 +14,12 @@ const MESSAGE_TYPES = Object.freeze({
   LOAD_STARTUP_BUNDLE: "LOAD_STARTUP_BUNDLE",
   LOAD_SCENARIO_RUNTIME_BOOTSTRAP: "LOAD_SCENARIO_RUNTIME_BOOTSTRAP",
   DECODE_RUNTIME_CHUNK: "DECODE_RUNTIME_CHUNK",
+  LOAD_DETAIL_TOPOLOGY: "LOAD_DETAIL_TOPOLOGY",
   BASE_STARTUP_READY: "BASE_STARTUP_READY",
   STARTUP_BUNDLE_READY: "STARTUP_BUNDLE_READY",
   SCENARIO_RUNTIME_BOOTSTRAP_READY: "SCENARIO_RUNTIME_BOOTSTRAP_READY",
   RUNTIME_CHUNK_READY: "RUNTIME_CHUNK_READY",
+  DETAIL_TOPOLOGY_READY: "DETAIL_TOPOLOGY_READY",
   CANCEL_TASK: "CANCEL_TASK",
   ERROR: "ERROR",
 });
@@ -367,9 +369,11 @@ function postWorkerMessage(type, payload, { signal = null } = {}) {
   throwIfAborted(signal);
   const startupReady = type === MESSAGE_TYPES.BASE_STARTUP_READY
     || type === MESSAGE_TYPES.STARTUP_BUNDLE_READY
-    || type === MESSAGE_TYPES.SCENARIO_RUNTIME_BOOTSTRAP_READY;
+    || type === MESSAGE_TYPES.SCENARIO_RUNTIME_BOOTSTRAP_READY
+    || type === MESSAGE_TYPES.DETAIL_TOPOLOGY_READY;
   const allowCloneFallback = type === MESSAGE_TYPES.BASE_STARTUP_READY
-    || type === MESSAGE_TYPES.STARTUP_BUNDLE_READY;
+    || type === MESSAGE_TYPES.STARTUP_BUNDLE_READY
+    || type === MESSAGE_TYPES.DETAIL_TOPOLOGY_READY;
   if (startupReady || type === MESSAGE_TYPES.RUNTIME_CHUNK_READY) {
     const field = startupReady ? "message" : (payload.chunkPayload ? "chunkPayload" : "decodedCollections");
     const startedAt = nowMs();
@@ -454,6 +458,18 @@ async function handleLoadBaseStartup(message) {
       locales: localesResult.metrics || null,
       geoAliases: geoAliasesResult.metrics || null,
     },
+  });
+}
+
+// The ~90 MB detail topology is decoded here so the main thread only rebuilds
+// its arcs from transferred buffers instead of parsing the whole text.
+async function handleLoadDetailTopology(message) {
+  const taskId = String(message?.taskId || "").trim();
+  const topologyResult = await fetchJsonResource(String(message?.topologyUrl || "").trim(), "topologyDetail");
+  postWorkerMessage(MESSAGE_TYPES.DETAIL_TOPOLOGY_READY, {
+    taskId,
+    topology: topologyResult.payload,
+    metrics: { ...(topologyResult.metrics || {}), featureCount: getPoliticalGeometryCount(topologyResult.payload) },
   });
 }
 
@@ -702,6 +718,9 @@ async function dispatchMessage(message) {
       return;
     case MESSAGE_TYPES.DECODE_RUNTIME_CHUNK:
       await dispatchDecodeRuntimeChunk(message);
+      return;
+    case MESSAGE_TYPES.LOAD_DETAIL_TOPOLOGY:
+      await handleLoadDetailTopology(message);
       return;
     case MESSAGE_TYPES.CANCEL_TASK:
       cancelDecodeRuntimeChunk(message);

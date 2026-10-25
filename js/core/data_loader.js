@@ -12,6 +12,7 @@ import {
 } from "./startup_cache.js";
 import {
   loadBaseStartupViaWorker,
+  loadDetailTopologyViaWorker,
   shouldUseStartupWorker,
 } from "./startup_worker_client.js";
 import {
@@ -1011,6 +1012,23 @@ async function loadTopologyUrlWithMetrics(d3Client, url, label) {
   };
 }
 
+// The detail topology arrives after the map is interactive; parsing its ~90 MB
+// on the main thread blocked input for several hundred milliseconds. A worker
+// parses it and transfers the arcs as buffers. Any worker failure falls back to
+// the main-thread load, so the worker only changes where the work happens.
+async function loadDetailTopologyUrl(d3Client, url, label) {
+  if (shouldUseStartupWorker()) {
+    try {
+      const { topology, metrics } = await loadDetailTopologyViaWorker({ topologyUrl: url });
+      console.info(`[data_loader] Loaded ${label} topology ${url} in a worker (${getPoliticalGeometryCount(topology)} features).`);
+      return { topology, metrics: { ...(metrics || {}), worker: true } };
+    } catch (error) {
+      console.warn(`[data_loader] Worker load of ${label} topology failed; loading on the main thread.`, error);
+    }
+  }
+  return loadTopologyUrlWithMetrics(d3Client, url, label);
+}
+
 /**
  * Load and parse a JSON resource with execution metrics.
  *
@@ -1222,7 +1240,7 @@ async function loadDetailTopologyWithFallback({
   let firstError = null;
   for (const candidate of deduped) {
     try {
-      const { topology, metrics } = await loadTopologyUrlWithMetrics(
+      const { topology, metrics } = await loadDetailTopologyUrl(
         d3Client,
         candidate.url,
         `detail(${candidate.key})`

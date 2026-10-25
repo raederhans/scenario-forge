@@ -106,3 +106,37 @@ test("deferred detail remains single-topology when every candidate lacks politic
     assert.deepEqual(calls.filter((url) => url !== "runtime-political"), Object.values(sources));
   });
 });
+
+test("detail topology loads through a worker and falls back to the main thread when the worker fails", async () => {
+  const valid = { type: "Topology", objects: { political: { type: "GeometryCollection",
+    geometries: [{ id: "detail", type: "Polygon", arcs: [[0]] }] } }, arcs: [[[0, 0], [1, 0]]] };
+  const previousWorker = globalThis.Worker;
+  let workerReply = null;
+  const workerRequests = [];
+  globalThis.Worker = class {
+    postMessage(message) {
+      workerRequests.push(message);
+      queueMicrotask(() => this.onmessage({ data: workerReply(message) }));
+    }
+    terminate() {}
+  };
+  try {
+    await withFakeLoader({ [sources.na_v2]: valid }, async (d3Client, calls) => {
+      workerReply = message => ({ type: "DETAIL_TOPOLOGY_READY", taskId: message.taskId, topology: structuredClone(valid), metrics: {} });
+      const viaWorker = await loadDeferredDetailBundle({ d3Client, includeRuntimePolitical: false });
+      assert.deepEqual(viaWorker.topologyDetail, valid);
+      assert.equal(viaWorker.detailSourceUsed, "na_v2");
+      assert.equal(workerRequests.at(-1).type, "LOAD_DETAIL_TOPOLOGY");
+      assert.match(workerRequests.at(-1).topologyUrl, /europe_topology\.na_v2\.json$/);
+      assert.deepEqual(calls, [], "a worker load makes no main-thread request");
+
+      workerReply = message => ({ type: "ERROR", taskId: message.taskId, message: "worker parse failed" });
+      const fallback = await loadDeferredDetailBundle({ d3Client, includeRuntimePolitical: false });
+      assert.equal(fallback.topologyDetail, valid);
+      assert.equal(fallback.detailSourceUsed, "na_v2");
+      assert.deepEqual(calls, [sources.na_v2], "a failed worker load is retried on the main thread");
+    });
+  } finally {
+    if (previousWorker === undefined) delete globalThis.Worker; else globalThis.Worker = previousWorker;
+  }
+});
