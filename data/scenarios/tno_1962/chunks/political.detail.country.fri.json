@@ -2764,7 +2764,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_46ee484c2760",
-        "name": "Tamenglong + Noney",
+        "name": "Tamenglong",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -4682,7 +4682,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_82a7e2758f34",
-        "name": "Jamui + Banka + Lakhisarai",
+        "name": "Banka",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -5501,7 +5501,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_1d9b4933bded",
-        "name": "Jamtara + Dumka + Godda",
+        "name": "Dumka",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -7187,7 +7187,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_ccf93b344819",
-        "name": "Sivasagar + Charaideo",
+        "name": "Sivasagar",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -8168,7 +8168,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_317bdbf2051b",
-        "name": "Jehanabad + Arwal",
+        "name": "Jehanabad",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -10580,7 +10580,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_439a10aa562b",
-        "name": "Sheikhpura + Nawada",
+        "name": "Nawada",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -12525,7 +12525,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_6ba16322cfa2",
-        "name": "North Garo Hills + East Garo Hills",
+        "name": "East Garo Hills",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -12883,7 +12883,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_c195372a6ccc",
-        "name": "Kolasib + Mamit",
+        "name": "Kolasib",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -14500,7 +14500,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_d52299ba1791",
-        "name": "Nalbari + Kamrup",
+        "name": "Guwahati",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -15901,7 +15901,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_a9290adb0980",
-        "name": "Thoubal + Imphal West",
+        "name": "Imphal West",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -16893,7 +16893,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_0dc9b69890de",
-        "name": "Barpeta + Goalpara",
+        "name": "Barpeta",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -17687,7 +17687,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_10207a70afcd",
-        "name": "Serchhip + Lunglei",
+        "name": "Lunglei",
         "cntr_code": "IN",
         "__source": "detail"
       },
@@ -20064,7 +20064,7 @@
       "type": "Feature",
       "properties": {
         "id": "IN_MRG_add732cea50c",
-        "name": "Kangpokpi + Senapati",
+        "name": "Senapati",
         "cntr_code": "IN",
         "__source": "detail"
       },

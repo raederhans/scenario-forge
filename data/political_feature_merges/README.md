@@ -95,8 +95,54 @@ reviewed `parent_names.json` (`{"parents": {id: {en, zh}}}`), then an exact
 fails the plan. Member names (`member_names`) still join the members' names
 from `locales.json`, then scenario `geo_locale_patch.json` files, then the
 source topology name; they stay searchable as aliases. `--naming members`
-keeps the older joined names (`en` with ` + `, `zh` with `、`), which the
-plans applied before this rule use.
+keeps the older joined names (`en` with ` + `, `zh` with `、`).
+
+### Representative names
+
+`--naming representative` names a group after one place
+(`name_source` and `representative_id` record which):
+
+1. `city`: the most populous city the members host in `world_cities.geojson`
+   whose `name_zh` is actually Chinese (a city without a Chinese name is skipped,
+   so both languages name the same place);
+2. `population`: otherwise the member with the largest population in the GHSL
+   population layer;
+3. `area`: when a member has no population, the member with the largest land area.
+
+A scenario that translates the representative member itself (TNO's
+`geo_locale_patch.json`) keeps its own name in `scenario_names.<scenario>`, but
+only in the languages where it differs from the member's global name; a city
+name follows the scenario only when it is the member's own name. The apply
+tool writes those names into that scenario's files and the plan names
+everywhere else.
+
+Names must stay distinguishable within a country. A name (English
+case-insensitive, or Chinese) that another feature of the same `cntr_code`
+already uses, or that several groups receive, gets its parent in brackets:
+`Name (Parent)` / `名称（上级）`, with parent names resolved as above
+(`parent_names.json` holds the reviewed ones). Groups that still share a name
+are numbered by descending population (`Name (Parent) 2`).
+
+The plans listed in `apply_order.json` up to `russia_china_wave4.v1.json` were
+renamed this way after they were applied:
+
+```
+python tools/build_political_feature_merge_plan.py --rename <plan> [<plan> ...]
+python tools/apply_political_feature_merges.py --rename-only <plan> [<plan> ...]
+```
+
+`--rename` reads the members' cities, population and scenario names as they
+were before the merge (the parent of the commit that added each plan, or
+`--facts-ref`), keeps IDs and members, and stores the joined name as
+`previous_names`. `--rename-only` projects the names with the same projector as
+a merge, over each merged ID as its own member: `locales.json`,
+`geo_aliases.json` (the joined names move to `search_only_aliases` and keep
+their `alias_to_stable_key` entries), the topologies' `name` property, the
+scenario patches and overrides, and then refreshes chunks, startup subsets and
+bundles through `refresh_scenario`, re-binds the population documents to the
+new topology bytes and refreshes the manifest evidence. Geometry, IDs and
+owners do not change, but the topology bytes do, so run the downstream script
+afterwards (with the last renamed plan, which covers every scenario).
 
 ## Applying the plan
 
@@ -113,8 +159,8 @@ plans applied before this rule use.
   cities, urban areas and releasable catalogs. The China prefecture crosswalk
   is projected and its input signatures re-pinned to the merged leaves. Scenario-specific names, such as
   TNO's, are composed from that scenario's own member names for joined names;
-  a parent/direction or city name replaces every member's name (including an
-  earlier merge's), and the members' names become `search_only_aliases`;
+  a parent/direction, city or representative name replaces every member's name
+  (including an earlier merge's), and the members' names become `search_only_aliases`;
 - population features (`--population-only`, run after the scenarios).
   Population and area are summed and fractions are area-weighted; each document
   is re-bound to its new topology hash and re-registered;

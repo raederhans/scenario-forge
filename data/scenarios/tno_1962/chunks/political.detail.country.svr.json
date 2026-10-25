@@ -2311,7 +2311,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_4f4508e949aa",
-        "name": "Chebarkulsky District + Uysky District",
+        "name": "Chebarkulsky District",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -14763,7 +14763,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bb5f84a15d47",
-        "name": "Korkinsky District + Kopeysk",
+        "name": "Kopeysk",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -16563,7 +16563,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_76828e58eb68",
-        "name": "Argayashsky District + Озёрский городской округ + Sosnovsky District",
+        "name": "Озёрский городской округ",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -22250,7 +22250,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a8de19d9bade",
-        "name": "Karabash + Kyshtym + Kusinsky District",
+        "name": "Kyshtym",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -24737,7 +24737,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_53baf490481a",
-        "name": "Snezhinsk + Kunashaksky District + Kaslinsky District",
+        "name": "Snezhinsk",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -36591,7 +36591,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_2ffc38a0e952",
-        "name": "Kamensky District + городской округ Заречный + Белоярский городской округ",
+        "name": "Kamensky District (Sverdlovsk)",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -40612,7 +40612,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_1be582aeb42b",
-        "name": "городской округ Ревда + Полевской городской округ",
+        "name": "Полевской городской округ",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -44094,7 +44094,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7ebff71f4352",
-        "name": "Verkhneye Dubrovo + Берёзовский городской окру",
+        "name": "Берёзовский городской окру (Sverdlovsk)",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -47300,7 +47300,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f7c007e9f564",
-        "name": "Pyshminsky District + Kamyshlovsky District",
+        "name": "Kamyshlovsky District",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -52265,7 +52265,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7663cb1f8f39",
-        "name": "Verkh-Neyvinsky + Новоуральский городской ок",
+        "name": "Новоуральский городской ок",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -53786,7 +53786,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ef7dc63ecba7",
-        "name": "Асбестовский городской окр + Малышевский городской окру + Rezhevskoy District",
+        "name": "Асбестовский городской окр",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -54954,7 +54954,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_51d05b0cd072",
-        "name": "городской округ Верхняя Пы + Nevyansky District",
+        "name": "городской округ Верхняя Пы",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -61633,7 +61633,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7ab59f492d2a",
-        "name": "Baykalovsky District + Артёмовский городской окру + Irbitsky District",
+        "name": "Артёмовский городской окру (Sverdlovsk)",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -68496,7 +68496,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f22292b3a58a",
-        "name": "городской округ Алапаевско + городской округ Алапаевск",
+        "name": "городской округ Алапаевск",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -69965,7 +69965,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8e30afce3871",
-        "name": "ЗАТО Свободный + городской округ Нижняя Сал + Verkhnesaldinsky Urban Okrug",
+        "name": "Verkhnesaldinsky Urban Okrug",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -70792,7 +70792,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_dafefaea8cbc",
-        "name": "Тавдинский городской округ + Turinsky District + Taborinsky District",
+        "name": "Тавдинский городской округ",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -74809,7 +74809,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d9b430bcd2cb",
-        "name": "Сосьвинский городской окру + городской округ Махнёвское",
+        "name": "Сосьвинский городской окру",
         "cntr_code": "SVR",
         "__source": "detail"
       },
@@ -77807,7 +77807,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_5b10737a994a",
-        "name": "городской округ Красноурал + городской округ Верхняя Ту",
+        "name": "городской округ Красноурал",
         "cntr_code": "SVR",
         "__source": "detail"
       },

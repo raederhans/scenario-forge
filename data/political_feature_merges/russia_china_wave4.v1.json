@@ -42,8 +42,8 @@
       ],
       "parent_id": "RU_Omsk",
       "names": {
-        "en": "Ust-Ishimsky District + Tevrizsky District + Znamensky District",
-        "zh": "乌斯季伊希姆斯基区、捷夫里斯基区、兹纳缅斯基区"
+        "en": "Tevrizsky District",
+        "zh": "捷夫里斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B10003621776126": {
@@ -58,7 +58,13 @@
           "en": "Znamensky District",
           "zh": "兹纳缅斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ust-Ishimsky District + Tevrizsky District + Znamensky District",
+        "zh": "乌斯季伊希姆斯基区、捷夫里斯基区、兹纳缅斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B25730099940493"
     },
     {
       "id": "RU_MRG_bee0bb9c2edd",
@@ -68,8 +74,8 @@
       ],
       "parent_id": "RU_Republic_of_Buryatia",
       "names": {
-        "en": "Mukhorshibirsky Rayon + Tarbagataysky Rayon",
-        "zh": "穆霍什比尔斯基区、塔尔巴加泰区"
+        "en": "Mukhorshibirsky Rayon",
+        "zh": "穆霍什比尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B10017540039169": {
@@ -80,7 +86,13 @@
           "en": "Tarbagataysky Rayon",
           "zh": "塔尔巴加泰区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mukhorshibirsky Rayon + Tarbagataysky Rayon",
+        "zh": "穆霍什比尔斯基区、塔尔巴加泰区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B10017540039169"
     },
     {
       "id": "RU_MRG_654102762e97",
@@ -90,8 +102,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Korenovsky District + Timashyovsky District",
-        "zh": "科伦诺夫斯基区、季马绍夫斯基区"
+        "en": "Timashyovsk",
+        "zh": "季马绍夫斯克"
       },
       "member_names": {
         "RU_RAY_50074027B1002284890628": {
@@ -102,7 +114,13 @@
           "en": "Timashyovsky District",
           "zh": "季马绍夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Korenovsky District + Timashyovsky District",
+        "zh": "科伦诺夫斯基区、季马绍夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B81881238417917"
     },
     {
       "id": "RU_MRG_eec8890e773f",
@@ -112,8 +130,8 @@
       ],
       "parent_id": "RU_Tyumen",
       "names": {
-        "en": "городской округ Ишим + Ishimsky District",
-        "zh": "伊希姆、伊希姆斯基区"
+        "en": "городской округ Ишим",
+        "zh": "伊希姆"
       },
       "member_names": {
         "RU_RAY_50074027B10203743497329": {
@@ -124,7 +142,13 @@
           "en": "Ishimsky District",
           "zh": "伊希姆斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Ишим + Ishimsky District",
+        "zh": "伊希姆、伊希姆斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B10203743497329"
     },
     {
       "id": "RU_MRG_1ab0a785a7fc",
@@ -135,8 +159,8 @@
       ],
       "parent_id": "RU_Republic_of_Adygea",
       "names": {
-        "en": "Shovgenovsky District + Koshekhablsky District + Giaginsky District",
-        "zh": "绍夫格诺夫斯基区、科舍哈布尔斯基区、贾金斯基区"
+        "en": "Giaginsky District",
+        "zh": "贾金斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B1043871686505": {
@@ -151,7 +175,13 @@
           "en": "Giaginsky District",
           "zh": "贾金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shovgenovsky District + Koshekhablsky District + Giaginsky District",
+        "zh": "绍夫格诺夫斯基区、科舍哈布尔斯基区、贾金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B84455378599764"
     },
     {
       "id": "RU_MRG_763309207c3e",
@@ -162,8 +192,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Bystroistoksky District + Petropavlovsky District + Smolensky District",
-        "zh": "比斯特罗斯托克区、彼得罗巴甫洛夫斯基区、斯摩棱斯基区"
+        "en": "Smolensky District (Altai Krai)",
+        "zh": "斯摩棱斯基区（阿尔泰边疆区）"
       },
       "member_names": {
         "RU_RAY_50074027B1058063804271": {
@@ -178,7 +208,13 @@
           "en": "Smolensky District",
           "zh": "斯摩棱斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bystroistoksky District + Petropavlovsky District + Smolensky District",
+        "zh": "比斯特罗斯托克区、彼得罗巴甫洛夫斯基区、斯摩棱斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B84951526666168"
     },
     {
       "id": "RU_MRG_6b0074e9f94b",
@@ -189,8 +225,8 @@
       ],
       "parent_id": "RU_Sakhalin",
       "names": {
-        "en": "Uglegorsky District + Smirnykhovsky District + Poronaysky District",
-        "zh": "乌格列戈尔斯基区、斯米尔尼霍夫斯基区、波罗奈斯基区"
+        "en": "Poronaysky District",
+        "zh": "波罗奈斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B10653527260039": {
@@ -205,6 +241,18 @@
           "en": "Poronaysky District",
           "zh": "波罗奈斯基区"
         }
+      },
+      "previous_names": {
+        "en": "Uglegorsky District + Smirnykhovsky District + Poronaysky District",
+        "zh": "乌格列戈尔斯基区、斯米尔尼霍夫斯基区、波罗奈斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B63762585695828",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Shikuka District",
+          "zh": "敷香区"
+        }
       }
     },
     {
@@ -215,8 +263,8 @@
       ],
       "parent_id": "RU_Omsk",
       "names": {
-        "en": "Tavrichesky District + Azovsky Nemetsky National District",
-        "zh": "塔夫里切斯基区、亚速涅梅茨基国家区"
+        "en": "Tavrichesky District",
+        "zh": "塔夫里切斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B10746223441661": {
@@ -227,7 +275,13 @@
           "en": "Azovsky Nemetsky National District",
           "zh": "亚速涅梅茨基国家区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tavrichesky District + Azovsky Nemetsky National District",
+        "zh": "塔夫里切斯基区、亚速涅梅茨基国家区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B10746223441661"
     },
     {
       "id": "RU_MRG_03fe31da4ec4",
@@ -237,8 +291,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Burlinsky District + Khabarsky District",
-        "zh": "伯林斯基区、哈巴尔斯基区"
+        "en": "Khabarsky District",
+        "zh": "哈巴尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B10781871905366": {
@@ -249,7 +303,13 @@
           "en": "Khabarsky District",
           "zh": "哈巴尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Burlinsky District + Khabarsky District",
+        "zh": "伯林斯基区、哈巴尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B77344027071403"
     },
     {
       "id": "RU_MRG_8db0a9d55bd2",
@@ -259,8 +319,8 @@
       ],
       "parent_id": "RU_Krasnoyarsk_Krai",
       "names": {
-        "en": "Irbeysky Rayon + Sayansky Rayon",
-        "zh": "伊尔贝斯基区、萨彦斯基区"
+        "en": "Irbeysky Rayon",
+        "zh": "伊尔贝斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B10793047244322": {
@@ -271,7 +331,13 @@
           "en": "Sayansky Rayon",
           "zh": "萨彦斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Irbeysky Rayon + Sayansky Rayon",
+        "zh": "伊尔贝斯基区、萨彦斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B10793047244322"
     },
     {
       "id": "RU_MRG_45a27fa282d6",
@@ -281,8 +347,8 @@
       ],
       "parent_id": "RU_Novosibirsk",
       "names": {
-        "en": "Maslyaninsky District + Toguchinsky District",
-        "zh": "马斯利亚宁斯基区、托古钦斯基区"
+        "en": "Toguchinsky District",
+        "zh": "托古钦斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B10801739097409": {
@@ -293,7 +359,13 @@
           "en": "Toguchinsky District",
           "zh": "托古钦斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Maslyaninsky District + Toguchinsky District",
+        "zh": "马斯利亚宁斯基区、托古钦斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B1384423554557"
     },
     {
       "id": "RU_MRG_e0a377c11b7b",
@@ -303,8 +375,8 @@
       ],
       "parent_id": "RU_Vologda",
       "names": {
-        "en": "Kichmengsko-Gorodetsky District + Nikolsky District",
-        "zh": "基奇蒙斯科-戈罗杰茨基区、尼科利斯基区"
+        "en": "Nikolsky District (Vologda)",
+        "zh": "尼科利斯基区（沃洛格达）"
       },
       "member_names": {
         "RU_RAY_50074027B10865784748365": {
@@ -315,7 +387,13 @@
           "en": "Nikolsky District",
           "zh": "尼科利斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kichmengsko-Gorodetsky District + Nikolsky District",
+        "zh": "基奇蒙斯科-戈罗杰茨基区、尼科利斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B49802974490397"
     },
     {
       "id": "RU_MRG_9db237a6b59e",
@@ -326,8 +404,8 @@
       ],
       "parent_id": "RU_Mari_El_Republic",
       "names": {
-        "en": "Sernursky District + Novotoryalsky District + Paranginsky District",
-        "zh": "塞尔努斯基区、新托里亚斯基区、帕兰金斯基区"
+        "en": "Sernursky District",
+        "zh": "塞尔努斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B11474618491234": {
@@ -342,7 +420,13 @@
           "en": "Paranginsky District",
           "zh": "帕兰金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sernursky District + Novotoryalsky District + Paranginsky District",
+        "zh": "塞尔努斯基区、新托里亚斯基区、帕兰金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B11474618491234"
     },
     {
       "id": "RU_MRG_3ffed98d7485",
@@ -353,8 +437,8 @@
       ],
       "parent_id": "RU_Omsk",
       "names": {
-        "en": "Moskalensky District + Maryanovsky District + Isilkulsky District",
-        "zh": "莫斯卡连斯基区、马里亚诺夫斯基区、伊西尔库尔斯基区"
+        "en": "Isilkulsky District",
+        "zh": "伊西尔库尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B1154757309769": {
@@ -369,7 +453,13 @@
           "en": "Isilkulsky District",
           "zh": "伊西尔库尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Moskalensky District + Maryanovsky District + Isilkulsky District",
+        "zh": "莫斯卡连斯基区、马里亚诺夫斯基区、伊西尔库尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B77832194224419"
     },
     {
       "id": "RU_MRG_110b1d987f63",
@@ -380,8 +470,8 @@
       ],
       "parent_id": "RU_Chuvash_Republic",
       "names": {
-        "en": "Alikovsky District + Krasnoarmeysky District + Tsivilsky District",
-        "zh": "阿利科夫斯基区、红军区、齐维尔斯基区"
+        "en": "Tsivilsky District",
+        "zh": "齐维尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B11949553415975": {
@@ -396,7 +486,13 @@
           "en": "Tsivilsky District",
           "zh": "齐维尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Alikovsky District + Krasnoarmeysky District + Tsivilsky District",
+        "zh": "阿利科夫斯基区、红军区、齐维尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B65238711486063"
     },
     {
       "id": "RU_MRG_f6312a148f5b",
@@ -407,8 +503,8 @@
       ],
       "parent_id": "RU_Republic_of_Buryatia",
       "names": {
-        "en": "Zaigrayevsky Rayon + Khorinsky Rayon + Kizhinginsky Rayon",
-        "zh": "扎伊格拉耶夫斯基区、霍林斯基区、基津金斯基区"
+        "en": "Zaigrayevsky Rayon",
+        "zh": "扎伊格拉耶夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B11980599165555": {
@@ -423,7 +519,13 @@
           "en": "Kizhinginsky Rayon",
           "zh": "基津金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zaigrayevsky Rayon + Khorinsky Rayon + Kizhinginsky Rayon",
+        "zh": "扎伊格拉耶夫斯基区、霍林斯基区、基津金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B11980599165555"
     },
     {
       "id": "RU_MRG_23138a4426a1",
@@ -433,8 +535,8 @@
       ],
       "parent_id": "RU_Kursk",
       "names": {
-        "en": "Bolshesoldatsky District + Medvensky District",
-        "zh": "博尔谢索尔达斯基区、梅德文斯基区"
+        "en": "Medvensky District",
+        "zh": "梅德文斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B12057415827309": {
@@ -445,7 +547,13 @@
           "en": "Medvensky District",
           "zh": "梅德文斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bolshesoldatsky District + Medvensky District",
+        "zh": "博尔谢索尔达斯基区、梅德文斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B24816705084371"
     },
     {
       "id": "RU_MRG_8298b9d45571",
@@ -455,8 +563,8 @@
       ],
       "parent_id": "RU_Kurgan",
       "names": {
-        "en": "Zverinogolovsky District + Kurtamyshsky District",
-        "zh": "兹韦里诺戈洛夫斯基区、库尔塔梅什区"
+        "en": "Kurtamyshsky District",
+        "zh": "库尔塔梅什区"
       },
       "member_names": {
         "RU_RAY_50074027B12125827466721": {
@@ -467,7 +575,13 @@
           "en": "Kurtamyshsky District",
           "zh": "库尔塔梅什区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zverinogolovsky District + Kurtamyshsky District",
+        "zh": "兹韦里诺戈洛夫斯基区、库尔塔梅什区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B38017248664200"
     },
     {
       "id": "RU_MRG_59fd0de59d37",
@@ -478,8 +592,8 @@
       ],
       "parent_id": "RU_Samara",
       "names": {
-        "en": "Кинельский район + Krasnoyarsky District + Neftegorsky District",
-        "zh": "基内尔斯基区、克拉斯诺亚尔斯基区、涅夫捷戈尔斯基区"
+        "en": "Krasnoyarsky District (Samara)",
+        "zh": "克拉斯诺亚尔斯基区（伏尔加施塔特）"
       },
       "member_names": {
         "RU_RAY_50074027B13106807035026": {
@@ -494,7 +608,13 @@
           "en": "Neftegorsky District",
           "zh": "涅夫捷戈尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Кинельский район + Krasnoyarsky District + Neftegorsky District",
+        "zh": "基内尔斯基区、克拉斯诺亚尔斯基区、涅夫捷戈尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B162254919557"
     },
     {
       "id": "RU_MRG_2358dbd480f8",
@@ -505,8 +625,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "городской округ Славгород + Tabunsky District + German National District",
-        "zh": "斯拉夫哥罗德、塔本斯基区、德国国家区"
+        "en": "городской округ Славгород",
+        "zh": "斯拉夫哥罗德"
       },
       "member_names": {
         "RU_RAY_50074027B1336621418144": {
@@ -521,7 +641,13 @@
           "en": "German National District",
           "zh": "德国国家区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Славгород + Tabunsky District + German National District",
+        "zh": "斯拉夫哥罗德、塔本斯基区、德国国家区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B1336621418144"
     },
     {
       "id": "RU_MRG_e6e892e6d34d",
@@ -532,8 +658,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Shebalinsky Rayon + Altaysky District + Chemalsky Rayon",
-        "zh": "舍巴林斯基区、阿勒泰地区、切马尔斯基区"
+        "en": "Altaysky District",
+        "zh": "阿勒泰地区"
       },
       "member_names": {
         "RU_RAY_50074027B1388901491568": {
@@ -548,7 +674,13 @@
           "en": "Chemalsky Rayon",
           "zh": "切马尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shebalinsky Rayon + Altaysky District + Chemalsky Rayon",
+        "zh": "舍巴林斯基区、阿勒泰地区、切马尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B57641669015548"
     },
     {
       "id": "RU_MRG_a5a5eeed1587",
@@ -558,8 +690,8 @@
       ],
       "parent_id": "RU_Udmurt_Republic",
       "names": {
-        "en": "Sharkansky District + Debyossky District",
-        "zh": "沙坎斯基区、德比奥斯区"
+        "en": "Sharkansky District",
+        "zh": "沙坎斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B14005639506062": {
@@ -570,7 +702,13 @@
           "en": "Debyossky District",
           "zh": "德比奥斯区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sharkansky District + Debyossky District",
+        "zh": "沙坎斯基区、德比奥斯区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B14005639506062"
     },
     {
       "id": "RU_MRG_3e1c684cc13c",
@@ -580,8 +718,8 @@
       ],
       "parent_id": "RU_Perm_Krai",
       "names": {
-        "en": "Nytvensky District + Krasnokamsk District",
-        "zh": "尼特文斯基区、克拉斯诺卡姆斯克区"
+        "en": "Krasnokamsk",
+        "zh": "克拉斯诺卡姆斯克"
       },
       "member_names": {
         "RU_RAY_50074027B14010959057624": {
@@ -592,7 +730,13 @@
           "en": "Krasnokamsk District",
           "zh": "克拉斯诺卡姆斯克区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nytvensky District + Krasnokamsk District",
+        "zh": "尼特文斯基区、克拉斯诺卡姆斯克区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B71344810408417"
     },
     {
       "id": "RU_MRG_f7c007e9f564",
@@ -602,8 +746,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "Pyshminsky District + Kamyshlovsky District",
-        "zh": "皮什明斯基区、卡梅什洛夫斯基区"
+        "en": "Kamyshlovsky District",
+        "zh": "卡梅什洛夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B50410806068929": {
@@ -614,7 +758,13 @@
           "en": "Kamyshlovsky District",
           "zh": "卡梅什洛夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pyshminsky District + Kamyshlovsky District",
+        "zh": "皮什明斯基区、卡梅什洛夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B5367199922404"
     },
     {
       "id": "RU_MRG_aa3ae65083fb",
@@ -625,8 +775,8 @@
       ],
       "parent_id": "RU_Chechen_Republic",
       "names": {
-        "en": "Sunzhensky District + Achkhoy-Martanovsky District + Urus-Martanovsky District",
-        "zh": "孙真斯基区、阿奇霍伊-马尔塔诺夫斯基区、乌鲁斯-马尔塔诺夫斯基区"
+        "en": "Urus-Martanovsky District",
+        "zh": "乌鲁斯-马尔塔诺夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B14481941865109": {
@@ -641,7 +791,13 @@
           "en": "Urus-Martanovsky District",
           "zh": "乌鲁斯-马尔塔诺夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sunzhensky District + Achkhoy-Martanovsky District + Urus-Martanovsky District",
+        "zh": "孙真斯基区、阿奇霍伊-马尔塔诺夫斯基区、乌鲁斯-马尔塔诺夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B89871819113429"
     },
     {
       "id": "RU_MRG_e6619735ec77",
@@ -651,8 +807,8 @@
       ],
       "parent_id": "RU_Belgorod",
       "names": {
-        "en": "Novooskolsky District + Chernyansky District",
-        "zh": "新斯科尔斯基区、切尔尼亚斯基区"
+        "en": "Novooskolsky District",
+        "zh": "新斯科尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B14625580335307": {
@@ -663,7 +819,13 @@
           "en": "Chernyansky District",
           "zh": "切尔尼亚斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novooskolsky District + Chernyansky District",
+        "zh": "新斯科尔斯基区、切尔尼亚斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B14625580335307"
     },
     {
       "id": "RU_MRG_30cade9a7e6f",
@@ -674,8 +836,8 @@
       ],
       "parent_id": "RU_Kurgan",
       "names": {
-        "en": "Vargashinsky District + Mokrousovsky District + Lebyazhyevsky District",
-        "zh": "瓦尔加辛斯基区、莫克鲁索夫斯基区、列比亚日耶夫斯基区"
+        "en": "Vargashinsky District",
+        "zh": "瓦尔加辛斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B14760341290043": {
@@ -690,7 +852,13 @@
           "en": "Lebyazhyevsky District",
           "zh": "列比亚日耶夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Vargashinsky District + Mokrousovsky District + Lebyazhyevsky District",
+        "zh": "瓦尔加辛斯基区、莫克鲁索夫斯基区、列比亚日耶夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B14760341290043"
     },
     {
       "id": "RU_MRG_d5cd5d634999",
@@ -701,8 +869,8 @@
       ],
       "parent_id": "RU_Sakhalin",
       "names": {
-        "en": "Anivsky District + Honto District + Maoka District",
-        "zh": "阿尼夫斯基区、本斗区、真冈区"
+        "en": "Maoka District",
+        "zh": "真冈区"
       },
       "member_names": {
         "RU_RAY_50074027B1484336690213": {
@@ -717,7 +885,13 @@
           "en": "Maoka District",
           "zh": "真冈区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Anivsky District + Honto District + Maoka District",
+        "zh": "阿尼夫斯基区、本斗区、真冈区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B78352455339224"
     },
     {
       "id": "RU_MRG_76828e58eb68",
@@ -728,8 +902,8 @@
       ],
       "parent_id": "RU_Chelyabinsk",
       "names": {
-        "en": "Argayashsky District + Озёрский городской округ + Sosnovsky District",
-        "zh": "阿尔加什斯基区、奥焦斯基、索斯诺夫斯基区"
+        "en": "Озёрский городской округ",
+        "zh": "奥焦斯基"
       },
       "member_names": {
         "RU_RAY_50074027B14926078948215": {
@@ -744,7 +918,13 @@
           "en": "Sosnovsky District",
           "zh": "索斯诺夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Argayashsky District + Озёрский городской округ + Sosnovsky District",
+        "zh": "阿尔加什斯基区、奥焦斯基、索斯诺夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B32271657283037"
     },
     {
       "id": "RU_MRG_15c4c99da0ea",
@@ -754,8 +934,8 @@
       ],
       "parent_id": "RU_Krasnoyarsk_Krai",
       "names": {
-        "en": "Nizhneingashsky Rayon + Ilansky Rayon",
-        "zh": "下宁加什区、伊兰斯基区"
+        "en": "Nizhneingashsky Rayon",
+        "zh": "下宁加什区"
       },
       "member_names": {
         "RU_RAY_50074027B15054947326156": {
@@ -766,7 +946,13 @@
           "en": "Ilansky Rayon",
           "zh": "伊兰斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nizhneingashsky Rayon + Ilansky Rayon",
+        "zh": "下宁加什区、伊兰斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B15054947326156"
     },
     {
       "id": "RU_MRG_b18e5b7f00a3",
@@ -777,8 +963,8 @@
       ],
       "parent_id": "RU_Kaliningrad",
       "names": {
-        "en": "Gvardeysky District + Polessky District + Chernyakhovsky District",
-        "zh": "塔皮奥、拉比奥、因斯特堡"
+        "en": "Chernyakhovsk",
+        "zh": "车亚可夫斯克"
       },
       "member_names": {
         "RU_RAY_50074027B15138360662510": {
@@ -793,7 +979,13 @@
           "en": "Chernyakhovsky District",
           "zh": "因斯特堡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Gvardeysky District + Polessky District + Chernyakhovsky District",
+        "zh": "塔皮奥、拉比奥、因斯特堡"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B90959697167325"
     },
     {
       "id": "RU_MRG_d5a146ea7ae0",
@@ -804,8 +996,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Щербиновский район + Starominsky District + Yeysky District",
-        "zh": "谢尔比诺夫斯基区、斯塔罗明斯基区、叶伊斯克区"
+        "en": "Yeysk",
+        "zh": "叶伊斯克"
       },
       "member_names": {
         "RU_RAY_50074027B15278437738801": {
@@ -820,7 +1012,13 @@
           "en": "Yeysky District",
           "zh": "叶伊斯克区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Щербиновский район + Starominsky District + Yeysky District",
+        "zh": "谢尔比诺夫斯基区、斯塔罗明斯基区、叶伊斯克区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B91132812213332"
     },
     {
       "id": "RU_MRG_2ffc38a0e952",
@@ -831,8 +1029,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "Kamensky District + городской округ Заречный + Белоярский городской округ",
-        "zh": "卡缅斯基区、扎列奇尼、别洛亚尔斯克"
+        "en": "Kamensky District (Sverdlovsk)",
+        "zh": "卡缅斯基区（斯维尔德洛夫斯克）"
       },
       "member_names": {
         "RU_RAY_50074027B15595970902062": {
@@ -847,7 +1045,13 @@
           "en": "Белоярский городской округ",
           "zh": "别洛亚尔斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kamensky District + городской округ Заречный + Белоярский городской округ",
+        "zh": "卡缅斯基区、扎列奇尼、别洛亚尔斯克"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B15595970902062"
     },
     {
       "id": "RU_MRG_1c96074cd4b0",
@@ -857,8 +1061,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Klyuchevsky District + Kulundinsky District",
-        "zh": "克柳切夫斯基区、库伦丁斯基区"
+        "en": "Kulundinsky District",
+        "zh": "库伦丁斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B35507316918508": {
@@ -869,7 +1073,13 @@
           "en": "Kulundinsky District",
           "zh": "库伦丁斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Klyuchevsky District + Kulundinsky District",
+        "zh": "克柳切夫斯基区、库伦丁斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B77576750758664"
     },
     {
       "id": "RU_MRG_78e8fa70f082",
@@ -880,8 +1090,8 @@
       ],
       "parent_id": "RU_Republic_of_Dagestan",
       "names": {
-        "en": "Tabasaransky District + Derbentsky District + Khivsky District",
-        "zh": "塔巴萨兰斯基区、杰尔宾斯基区、希夫斯基区"
+        "en": "Derbentsky District",
+        "zh": "杰尔宾斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B15853700614625": {
@@ -896,7 +1106,13 @@
           "en": "Khivsky District",
           "zh": "希夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tabasaransky District + Derbentsky District + Khivsky District",
+        "zh": "塔巴萨兰斯基区、杰尔宾斯基区、希夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B29857646142193"
     },
     {
       "id": "RU_MRG_ca9a21b6ea60",
@@ -907,8 +1123,8 @@
       ],
       "parent_id": "RU_Chechen_Republic",
       "names": {
-        "en": "Nozhay-Yurtovsky District + Kurchaloyevsky District + Gudermessky District",
-        "zh": "诺扎伊-尤尔托夫斯基区、库尔恰洛耶夫斯基区、古德梅斯基区"
+        "en": "Gudermessky District",
+        "zh": "古德梅斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B15870529107302": {
@@ -923,7 +1139,13 @@
           "en": "Gudermessky District",
           "zh": "古德梅斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nozhay-Yurtovsky District + Kurchaloyevsky District + Gudermessky District",
+        "zh": "诺扎伊-尤尔托夫斯基区、库尔恰洛耶夫斯基区、古德梅斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B48349289288581"
     },
     {
       "id": "RU_MRG_f00dfba16127",
@@ -934,8 +1156,8 @@
       ],
       "parent_id": "RU_Kaliningrad",
       "names": {
-        "en": "Guryevsky District + Светловский городской окру + Zelenogradsky District",
-        "zh": "古里耶夫斯基区、齐默尔布德、克兰茨"
+        "en": "Guryevsky District (Kaliningrad)",
+        "zh": "古里耶夫斯基区（柯尼斯堡）"
       },
       "member_names": {
         "RU_RAY_50074027B15875894926215": {
@@ -950,7 +1172,13 @@
           "en": "Zelenogradsky District",
           "zh": "克兰茨"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Guryevsky District + Светловский городской окру + Zelenogradsky District",
+        "zh": "古里耶夫斯基区、齐默尔布德、克兰茨"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B15875894926215"
     },
     {
       "id": "RU_MRG_33c9fb373a65",
@@ -960,8 +1188,8 @@
       ],
       "parent_id": "RU_Kirov",
       "names": {
-        "en": "Bogorodsky District + Nemsky District",
-        "zh": "博戈罗德斯基区、涅姆斯基区"
+        "en": "Nemsky District",
+        "zh": "涅姆斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B16188868533688": {
@@ -972,7 +1200,13 @@
           "en": "Nemsky District",
           "zh": "涅姆斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bogorodsky District + Nemsky District",
+        "zh": "博戈罗德斯基区、涅姆斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B76252732369206"
     },
     {
       "id": "RU_MRG_5b10737a994a",
@@ -982,8 +1216,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "городской округ Красноурал + городской округ Верхняя Ту",
-        "zh": "克拉斯努拉尔、上图"
+        "en": "городской округ Красноурал",
+        "zh": "克拉斯努拉尔"
       },
       "member_names": {
         "RU_RAY_50074027B16274342774122": {
@@ -994,7 +1228,13 @@
           "en": "городской округ Верхняя Ту",
           "zh": "上图"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Красноурал + городской округ Верхняя Ту",
+        "zh": "克拉斯努拉尔、上图"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B16274342774122"
     },
     {
       "id": "RU_MRG_eeebe5fff052",
@@ -1004,8 +1244,8 @@
       ],
       "parent_id": "RU_Bashkortostan",
       "names": {
-        "en": "Kaltasinsky District + Yanaulsky District",
-        "zh": "卡尔塔辛斯基区、亚瑙尔斯基区"
+        "en": "Yanaulsky District",
+        "zh": "亚瑙尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B18234841679410": {
@@ -1016,7 +1256,13 @@
           "en": "Yanaulsky District",
           "zh": "亚瑙尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kaltasinsky District + Yanaulsky District",
+        "zh": "卡尔塔辛斯基区、亚瑙尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B54201439795646"
     },
     {
       "id": "RU_MRG_61ce738540d1",
@@ -1027,8 +1273,8 @@
       ],
       "parent_id": "RU_Primorsky_Krai",
       "names": {
-        "en": "Shkotovsky District + ЗАТО Фокино + Partizansk",
-        "zh": "什科托夫斯基区、福基诺、游击队"
+        "en": "Partizansk",
+        "zh": "游击队"
       },
       "member_names": {
         "RU_RAY_50074027B1667365379281": {
@@ -1043,6 +1289,18 @@
           "en": "Partizansk",
           "zh": "游击队"
         }
+      },
+      "previous_names": {
+        "en": "Shkotovsky District + ЗАТО Фокино + Partizansk",
+        "zh": "什科托夫斯基区、福基诺、游击队"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B87569969608847",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Suchan",
+          "zh": "苏城"
+        }
       }
     },
     {
@@ -1054,8 +1312,8 @@
       ],
       "parent_id": "RU_Sakhalin",
       "names": {
-        "en": "Makarovsky District + Dolinsky District + Tomarinsky District",
-        "zh": "马卡罗夫斯基区、多林斯基区、托马林斯基区"
+        "en": "Dolinsky District",
+        "zh": "多林斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B16795795282951": {
@@ -1070,6 +1328,18 @@
           "en": "Tomarinsky District",
           "zh": "托马林斯基区"
         }
+      },
+      "previous_names": {
+        "en": "Makarovsky District + Dolinsky District + Tomarinsky District",
+        "zh": "马卡罗夫斯基区、多林斯基区、托马林斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B30510351041396",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Ochiai District",
+          "zh": "落合区"
+        }
       }
     },
     {
@@ -1080,8 +1350,8 @@
       ],
       "parent_id": "RU_Samara",
       "names": {
-        "en": "Alexeyevsky District + Bolsheglushitsky District",
-        "zh": "阿列克谢耶夫斯基区、博尔舍格卢希茨基区"
+        "en": "Bolsheglushitsky District",
+        "zh": "博尔舍格卢希茨基区"
       },
       "member_names": {
         "RU_RAY_50074027B16822435870965": {
@@ -1092,7 +1362,13 @@
           "en": "Bolsheglushitsky District",
           "zh": "博尔舍格卢希茨基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Alexeyevsky District + Bolsheglushitsky District",
+        "zh": "阿列克谢耶夫斯基区、博尔舍格卢希茨基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B18696350968774"
     },
     {
       "id": "RU_MRG_ba58fc93c701",
@@ -1103,8 +1379,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Tyumentsevsky District + Shelabolikhinsky District + Pavlovsky District",
-        "zh": "秋门采夫斯基区、谢拉博利欣斯基区、巴甫洛夫斯基区"
+        "en": "Pavlovsky District (Altai Krai)",
+        "zh": "巴甫洛夫斯基区（阿尔泰边疆区）"
       },
       "member_names": {
         "RU_RAY_50074027B1715913537377": {
@@ -1119,7 +1395,13 @@
           "en": "Pavlovsky District",
           "zh": "巴甫洛夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tyumentsevsky District + Shelabolikhinsky District + Pavlovsky District",
+        "zh": "秋门采夫斯基区、谢拉博利欣斯基区、巴甫洛夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B76855541737815"
     },
     {
       "id": "RU_MRG_c6e84d1c3252",
@@ -1130,8 +1412,8 @@
       ],
       "parent_id": "RU_Bashkortostan",
       "names": {
-        "en": "Ufimsky District + Birsky District + Kushnarenkovsky District",
-        "zh": "乌菲姆斯基区、伯斯基区、库什纳连科夫斯基区"
+        "en": "Birsk",
+        "zh": "比尔斯克"
       },
       "member_names": {
         "RU_RAY_50074027B1781761308143": {
@@ -1146,7 +1428,13 @@
           "en": "Kushnarenkovsky District",
           "zh": "库什纳连科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ufimsky District + Birsky District + Kushnarenkovsky District",
+        "zh": "乌菲姆斯基区、伯斯基区、库什纳连科夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B76889132837156"
     },
     {
       "id": "RU_MRG_c84f2ed9c6ef",
@@ -1157,8 +1445,8 @@
       ],
       "parent_id": "RU_Jewish",
       "names": {
-        "en": "Birobidzhansky District + Obluchensky District + Birobidzhan",
-        "zh": "比罗比詹斯基区、奥布卢琴斯基区、比罗比詹"
+        "en": "Birobidzhan",
+        "zh": "比罗比詹"
       },
       "member_names": {
         "RU_RAY_50074027B18064199701976": {
@@ -1173,7 +1461,13 @@
           "en": "Birobidzhan",
           "zh": "比罗比詹"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Birobidzhansky District + Obluchensky District + Birobidzhan",
+        "zh": "比罗比詹斯基区、奥布卢琴斯基区、比罗比詹"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B88547261644185"
     },
     {
       "id": "RU_MRG_d12c5659178e",
@@ -1184,8 +1478,8 @@
       ],
       "parent_id": "RU_Omsk",
       "names": {
-        "en": "Sargatsky District + Krutinsky District + Tyukalinsky District",
-        "zh": "萨尔加茨基区、克鲁廷斯基区、秋卡林斯基区"
+        "en": "Tyukalinsky District",
+        "zh": "秋卡林斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B1814535898991": {
@@ -1200,7 +1494,13 @@
           "en": "Tyukalinsky District",
           "zh": "秋卡林斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sargatsky District + Krutinsky District + Tyukalinsky District",
+        "zh": "萨尔加茨基区、克鲁廷斯基区、秋卡林斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B81841250799510"
     },
     {
       "id": "RU_MRG_3992f91b7378",
@@ -1210,8 +1510,8 @@
       ],
       "parent_id": "RU_Republic_of_Buryatia",
       "names": {
-        "en": "Ivolginsky District + Selenginsky Rayon",
-        "zh": "伊沃尔金斯基区、色楞金斯基区"
+        "en": "Ivolginsky District",
+        "zh": "伊沃尔金斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B18238462468960": {
@@ -1222,7 +1522,13 @@
           "en": "Selenginsky Rayon",
           "zh": "色楞金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ivolginsky District + Selenginsky Rayon",
+        "zh": "伊沃尔金斯基区、色楞金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B18238462468960"
     },
     {
       "id": "RU_MRG_a8de19d9bade",
@@ -1233,8 +1539,8 @@
       ],
       "parent_id": "RU_Chelyabinsk",
       "names": {
-        "en": "Karabash + Kyshtym + Kusinsky District",
-        "zh": "卡拉巴什、克什特姆、库辛斯基区"
+        "en": "Kyshtym",
+        "zh": "克什特姆"
       },
       "member_names": {
         "RU_RAY_50074027B1839066901705": {
@@ -1249,7 +1555,13 @@
           "en": "Kusinsky District",
           "zh": "库辛斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Karabash + Kyshtym + Kusinsky District",
+        "zh": "卡拉巴什、克什特姆、库辛斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B82466107763770"
     },
     {
       "id": "RU_MRG_4ddc97ea36c1",
@@ -1260,8 +1572,8 @@
       ],
       "parent_id": "RU_Samara",
       "names": {
-        "en": "Borsky District + Kinel-Cherkassky District + Pokhvistnevsky District",
-        "zh": "博斯基区、基内尔-切尔卡斯基区、波赫维斯特涅夫斯基区"
+        "en": "Kinel-Cherkassky District",
+        "zh": "基内尔-切尔卡斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B18672352117044": {
@@ -1276,7 +1588,13 @@
           "en": "Pokhvistnevsky District",
           "zh": "波赫维斯特涅夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Borsky District + Kinel-Cherkassky District + Pokhvistnevsky District",
+        "zh": "博斯基区、基内尔-切尔卡斯基区、波赫维斯特涅夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B64491392404782"
     },
     {
       "id": "RU_MRG_27a7f048a0b1",
@@ -1286,8 +1604,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Ust-Labinsky District + Dinskoy District",
-        "zh": "乌斯季拉宾斯基区、丁斯科伊区"
+        "en": "Dinskoy District",
+        "zh": "丁斯科伊区"
       },
       "member_names": {
         "RU_RAY_50074027B18948886510373": {
@@ -1298,7 +1616,13 @@
           "en": "Dinskoy District",
           "zh": "丁斯科伊区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ust-Labinsky District + Dinskoy District",
+        "zh": "乌斯季拉宾斯基区、丁斯科伊区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B49723341067759"
     },
     {
       "id": "RU_MRG_f6d9746e521a",
@@ -1309,8 +1633,8 @@
       ],
       "parent_id": "RU_Republic_of_Adygea",
       "names": {
-        "en": "Krasnogvardeysky District + Teuchezhsky District + Takhtamukaysky District",
-        "zh": "克拉斯诺瓦尔杰斯基区、特乌切日斯基区、塔赫塔穆凯斯基区"
+        "en": "Takhtamukaysky District",
+        "zh": "塔赫塔穆凯斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B19439417163926": {
@@ -1325,7 +1649,13 @@
           "en": "Takhtamukaysky District",
           "zh": "塔赫塔穆凯斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Krasnogvardeysky District + Teuchezhsky District + Takhtamukaysky District",
+        "zh": "克拉斯诺瓦尔杰斯基区、特乌切日斯基区、塔赫塔穆凯斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B82435573005497"
     },
     {
       "id": "RU_MRG_fbedb5ba4063",
@@ -1335,8 +1665,8 @@
       ],
       "parent_id": "RU_Primorsky_Krai",
       "names": {
-        "en": "Anuchinsky District + Partizansky District",
-        "zh": "阿努钦斯基区、游击队区"
+        "en": "Partizansky District (Primorsky Krai)",
+        "zh": "游击队区（滨海边疆区）"
       },
       "member_names": {
         "RU_RAY_50074027B195011387686": {
@@ -1346,6 +1676,18 @@
         "RU_RAY_50074027B95296004893180": {
           "en": "Partizansky District",
           "zh": "游击队区"
+        }
+      },
+      "previous_names": {
+        "en": "Anuchinsky District + Partizansky District",
+        "zh": "阿努钦斯基区、游击队区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B95296004893180",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Suchan District (Primorsky Krai)",
+          "zh": "苏城区（滨海边疆区）"
         }
       }
     },
@@ -1357,8 +1699,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Tuapsinsky District + Apsheronsky District",
-        "zh": "图阿普辛斯基区、阿普歇伦斯克区"
+        "en": "Tuapse",
+        "zh": "图阿普谢"
       },
       "member_names": {
         "RU_RAY_50074027B19666041312542": {
@@ -1369,7 +1711,13 @@
           "en": "Apsheronsky District",
           "zh": "阿普歇伦斯克区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tuapsinsky District + Apsheronsky District",
+        "zh": "图阿普辛斯基区、阿普歇伦斯克区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B19666041312542"
     },
     {
       "id": "RU_MRG_27667b37cabf",
@@ -1380,8 +1728,8 @@
       ],
       "parent_id": "RU_Amur",
       "names": {
-        "en": "Zavitinsky District + городской округ Прогресс + Bureysky District",
-        "zh": "扎维廷斯基区、普罗格列斯、布列斯基区"
+        "en": "Bureysky District",
+        "zh": "布列斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B19676517709313": {
@@ -1396,7 +1744,13 @@
           "en": "Bureysky District",
           "zh": "布列斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zavitinsky District + городской округ Прогресс + Bureysky District",
+        "zh": "扎维廷斯基区、普罗格列斯、布列斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B91367283057981"
     },
     {
       "id": "RU_MRG_1aa982125dc7",
@@ -1407,8 +1761,8 @@
       ],
       "parent_id": "RU_Republic_of_Ingushetia",
       "names": {
-        "en": "Malgobeksky District + Nazranovsky District + Malgobek",
-        "zh": "马尔戈贝克斯基区、纳兹拉诺夫斯基区、马尔戈贝"
+        "en": "Nazranovsky District",
+        "zh": "纳兹拉诺夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B20046535673194": {
@@ -1423,7 +1777,13 @@
           "en": "Malgobek",
           "zh": "马尔戈贝"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Malgobeksky District + Nazranovsky District + Malgobek",
+        "zh": "马尔戈贝克斯基区、纳兹拉诺夫斯基区、马尔戈贝"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B24746180593094"
     },
     {
       "id": "RU_MRG_f090bf11b60f",
@@ -1434,8 +1794,8 @@
       ],
       "parent_id": "RU_Stavropol_Krai",
       "names": {
-        "en": "Kirovsky District + Stepnovsky District + Kursky District",
-        "zh": "基洛夫斯基区、斯特普诺夫斯基区、库尔斯克区"
+        "en": "Kirovsky District (Stavropol Krai)",
+        "zh": "基洛夫斯基区（斯塔夫罗波尔边疆区）"
       },
       "member_names": {
         "RU_RAY_50074027B20112378755200": {
@@ -1450,7 +1810,13 @@
           "en": "Kursky District",
           "zh": "库尔斯克区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kirovsky District + Stepnovsky District + Kursky District",
+        "zh": "基洛夫斯基区、斯特普诺夫斯基区、库尔斯克区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B20112378755200"
     },
     {
       "id": "RU_MRG_ef463885ab7b",
@@ -1461,8 +1827,8 @@
       ],
       "parent_id": "RU_Novosibirsk",
       "names": {
-        "en": "Karasuksky District + Bagansky District + Krasnozyorsky District",
-        "zh": "卡拉苏斯基区、巴甘斯基区、克拉斯诺焦斯基区"
+        "en": "Karasuksky District",
+        "zh": "卡拉苏斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B20308709748837": {
@@ -1477,7 +1843,13 @@
           "en": "Krasnozyorsky District",
           "zh": "克拉斯诺焦斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Karasuksky District + Bagansky District + Krasnozyorsky District",
+        "zh": "卡拉苏斯基区、巴甘斯基区、克拉斯诺焦斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B20308709748837"
     },
     {
       "id": "RU_MRG_931348f653cd",
@@ -1488,8 +1860,8 @@
       ],
       "parent_id": "RU_Kabardino_Balkaria",
       "names": {
-        "en": "Leskensky District + Chegemsky District + Chereksky District",
-        "zh": "莱斯肯斯基区、切格姆斯基区、切列斯基区"
+        "en": "Chegemsky District",
+        "zh": "切格姆斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B20388837191884": {
@@ -1504,7 +1876,13 @@
           "en": "Chereksky District",
           "zh": "切列斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Leskensky District + Chegemsky District + Chereksky District",
+        "zh": "莱斯肯斯基区、切格姆斯基区、切列斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B29250362520572"
     },
     {
       "id": "RU_MRG_6b0c8db39991",
@@ -1514,8 +1892,8 @@
       ],
       "parent_id": "RU_Samara",
       "names": {
-        "en": "Krasnoarmeysky District + Pestravsky District",
-        "zh": "克拉斯诺阿尔梅斯基区、佩斯特拉夫斯基区"
+        "en": "Pestravsky District",
+        "zh": "佩斯特拉夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B21578169027167": {
@@ -1526,7 +1904,13 @@
           "en": "Pestravsky District",
           "zh": "佩斯特拉夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Krasnoarmeysky District + Pestravsky District",
+        "zh": "克拉斯诺阿尔梅斯基区、佩斯特拉夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B22639528653177"
     },
     {
       "id": "RU_MRG_193c9476a10d",
@@ -1537,8 +1921,8 @@
       ],
       "parent_id": "RU_Belgorod",
       "names": {
-        "en": "Rakityansky District + Prokhorovsky District + Yakovlevsky District",
-        "zh": "拉基延斯基区、普罗霍罗夫斯基区、雅科夫列夫斯基区"
+        "en": "Yakovlevsky District",
+        "zh": "雅科夫列夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B21708284067948": {
@@ -1553,7 +1937,13 @@
           "en": "Yakovlevsky District",
           "zh": "雅科夫列夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rakityansky District + Prokhorovsky District + Yakovlevsky District",
+        "zh": "拉基延斯基区、普罗霍罗夫斯基区、雅科夫列夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B68221421938538"
     },
     {
       "id": "RU_MRG_7ab59f492d2a",
@@ -1564,8 +1954,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "Baykalovsky District + Артёмовский городской окру + Irbitsky District",
-        "zh": "贝卡洛夫斯基区、阿尔乔姆、伊尔比茨基区"
+        "en": "Артёмовский городской окру (Sverdlovsk)",
+        "zh": "阿尔乔姆（斯维尔德洛夫斯克）"
       },
       "member_names": {
         "RU_RAY_50074027B21858159893222": {
@@ -1580,7 +1970,13 @@
           "en": "Irbitsky District",
           "zh": "伊尔比茨基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Baykalovsky District + Артёмовский городской окру + Irbitsky District",
+        "zh": "贝卡洛夫斯基区、阿尔乔姆、伊尔比茨基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B74305253047814"
     },
     {
       "id": "RU_MRG_da08ccbf24e6",
@@ -1591,8 +1987,8 @@
       ],
       "parent_id": "RU_Tuva_Republic",
       "names": {
-        "en": "Tandinsky Kozhuun + Chedi-Kholsky Kozhuun + Кызылский кожуун",
-        "zh": "坦丁斯基·科朱恩、切迪-科尔斯基·科朱恩、克孜勒·科朱恩"
+        "en": "Tandinsky Kozhuun",
+        "zh": "坦丁斯基·科朱恩"
       },
       "member_names": {
         "RU_RAY_50074027B2225303493131": {
@@ -1607,7 +2003,13 @@
           "en": "Кызылский кожуун",
           "zh": "克孜勒·科朱恩"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tandinsky Kozhuun + Chedi-Kholsky Kozhuun + Кызылский кожуун",
+        "zh": "坦丁斯基·科朱恩、切迪-科尔斯基·科朱恩、克孜勒·科朱恩"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B2225303493131"
     },
     {
       "id": "RU_MRG_a540d65edaa9",
@@ -1617,8 +2019,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Vyselkovsky District + Tikhoretsky District",
-        "zh": "维谢尔科夫斯基区、季霍列茨克区"
+        "en": "Tikhoretsk",
+        "zh": "季霍列茨克"
       },
       "member_names": {
         "RU_RAY_50074027B59000898267433": {
@@ -1629,7 +2031,13 @@
           "en": "Tikhoretsky District",
           "zh": "季霍列茨克区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Vyselkovsky District + Tikhoretsky District",
+        "zh": "维谢尔科夫斯基区、季霍列茨克区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B85824641289458"
     },
     {
       "id": "RU_MRG_60d7253b0e0a",
@@ -1640,8 +2048,8 @@
       ],
       "parent_id": "RU_Primorsky_Krai",
       "names": {
-        "en": "Лесозаводский городской ок + Кировский район + Yakovlevsky District",
-        "zh": "莱索扎沃茨基市、基洛夫斯基区、雅科夫列夫斯基区"
+        "en": "Лесозаводский городской ок",
+        "zh": "莱索扎沃茨基市"
       },
       "member_names": {
         "RU_RAY_50074027B22497972741045": {
@@ -1656,6 +2064,18 @@
           "en": "Yakovlevsky District",
           "zh": "雅科夫列夫斯基区"
         }
+      },
+      "previous_names": {
+        "en": "Лесозаводский городской ок + Кировский район + Yakovlevsky District",
+        "zh": "莱索扎沃茨基市、基洛夫斯基区、雅科夫列夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B22497972741045",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Usuri Ula",
+          "zh": "乌苏里"
+        }
       }
     },
     {
@@ -1666,8 +2086,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Bryukhovetsky District + Kanevskoy District",
-        "zh": "布留霍维茨基区、卡涅夫斯科伊区"
+        "en": "Kanevskoy District",
+        "zh": "卡涅夫斯科伊区"
       },
       "member_names": {
         "RU_RAY_50074027B22848064203653": {
@@ -1678,7 +2098,13 @@
           "en": "Kanevskoy District",
           "zh": "卡涅夫斯科伊区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bryukhovetsky District + Kanevskoy District",
+        "zh": "布留霍维茨基区、卡涅夫斯科伊区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B79440197793571"
     },
     {
       "id": "RU_MRG_5ba368436fac",
@@ -1688,8 +2114,8 @@
       ],
       "parent_id": "RU_Stavropol_Krai",
       "names": {
-        "en": "Andropovsky District + Kochubeyevsky District",
-        "zh": "安德罗波夫斯基区、科丘别耶夫斯基区"
+        "en": "Kochubeyevsky District",
+        "zh": "科丘别耶夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B23040761518375": {
@@ -1700,7 +2126,13 @@
           "en": "Kochubeyevsky District",
           "zh": "科丘别耶夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Andropovsky District + Kochubeyevsky District",
+        "zh": "安德罗波夫斯基区、科丘别耶夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B87659673023041"
     },
     {
       "id": "RU_MRG_04be1b530cc3",
@@ -1710,8 +2142,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Zmeinogorsky District + Kuryinsky District",
-        "zh": "兹梅诺戈尔斯基区、库林斯基区"
+        "en": "Zmeinogorsky District",
+        "zh": "兹梅诺戈尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B23416918655185": {
@@ -1722,7 +2154,13 @@
           "en": "Kuryinsky District",
           "zh": "库林斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zmeinogorsky District + Kuryinsky District",
+        "zh": "兹梅诺戈尔斯基区、库林斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B23416918655185"
     },
     {
       "id": "RU_MRG_1abe3c12baeb",
@@ -1732,8 +2170,8 @@
       ],
       "parent_id": "RU_Kirov",
       "names": {
-        "en": "Urzhumsky District + Lebyazhsky District",
-        "zh": "乌尔茹姆斯基区、列比亚日区"
+        "en": "Urzhumsky District",
+        "zh": "乌尔茹姆斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B34615541367614": {
@@ -1744,7 +2182,13 @@
           "en": "Lebyazhsky District",
           "zh": "列比亚日区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Urzhumsky District + Lebyazhsky District",
+        "zh": "乌尔茹姆斯基区、列比亚日区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B34615541367614"
     },
     {
       "id": "RU_MRG_4f4508e949aa",
@@ -1754,8 +2198,8 @@
       ],
       "parent_id": "RU_Chelyabinsk",
       "names": {
-        "en": "Chebarkulsky District + Uysky District",
-        "zh": "切巴尔库尔斯基区、乌伊斯基区"
+        "en": "Chebarkulsky District",
+        "zh": "切巴尔库尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B23829204276737": {
@@ -1766,7 +2210,13 @@
           "en": "Uysky District",
           "zh": "乌伊斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Chebarkulsky District + Uysky District",
+        "zh": "切巴尔库尔斯基区、乌伊斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B23829204276737"
     },
     {
       "id": "RU_MRG_4418a955e4ff",
@@ -1776,8 +2226,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Ust-Kalmansky District + Ust-Pristansky District",
-        "zh": "乌斯季卡尔曼斯基区、乌斯季普里斯坦斯基区"
+        "en": "Ust-Kalmansky District",
+        "zh": "乌斯季卡尔曼斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B23870764100253": {
@@ -1788,7 +2238,13 @@
           "en": "Ust-Pristansky District",
           "zh": "乌斯季普里斯坦斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ust-Kalmansky District + Ust-Pristansky District",
+        "zh": "乌斯季卡尔曼斯基区、乌斯季普里斯坦斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B23870764100253"
     },
     {
       "id": "RU_MRG_ba5f9763e326",
@@ -1799,8 +2255,8 @@
       ],
       "parent_id": "RU_Kabardino_Balkaria",
       "names": {
-        "en": "Zolsky District + городской округ Баксан + Baksansky District",
-        "zh": "佐尔斯基区、巴克桑、巴克桑斯基区"
+        "en": "городской округ Баксан",
+        "zh": "巴克桑"
       },
       "member_names": {
         "RU_RAY_50074027B24008669313719": {
@@ -1815,7 +2271,13 @@
           "en": "Baksansky District",
           "zh": "巴克桑斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zolsky District + городской округ Баксан + Baksansky District",
+        "zh": "佐尔斯基区、巴克桑、巴克桑斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B54955313211480"
     },
     {
       "id": "RU_MRG_8fa758ae0a77",
@@ -1826,8 +2288,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Anapa Urban Okrug + Slavyansky District + Krymsky District",
-        "zh": "阿纳帕、斯拉维扬斯基区、克雷姆斯基区"
+        "en": "Slavyansky District",
+        "zh": "斯拉维扬斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B25007552172362": {
@@ -1842,7 +2304,13 @@
           "en": "Krymsky District",
           "zh": "克雷姆斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Anapa Urban Okrug + Slavyansky District + Krymsky District",
+        "zh": "阿纳帕、斯拉维扬斯基区、克雷姆斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B3957636086664"
     },
     {
       "id": "RU_MRG_330f810ce193",
@@ -1853,8 +2321,8 @@
       ],
       "parent_id": "RU_Kemerovo",
       "names": {
-        "en": "Yashkinsky District + Юргинский район + Topkinsky District",
-        "zh": "亚什金斯基区、尤金斯基区、托普金斯基区"
+        "en": "Topkinsky District",
+        "zh": "托普金斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B25441119122085": {
@@ -1869,7 +2337,13 @@
           "en": "Topkinsky District",
           "zh": "托普金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yashkinsky District + Юргинский район + Topkinsky District",
+        "zh": "亚什金斯基区、尤金斯基区、托普金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B58317509577397"
     },
     {
       "id": "RU_MRG_19fb94f201eb",
@@ -1879,8 +2353,8 @@
       ],
       "parent_id": "RU_Kirov",
       "names": {
-        "en": "Sovetsky District + Pizhansky District",
-        "zh": "苏维埃区、皮詹斯基区"
+        "en": "Sovetsk",
+        "zh": "苏维埃茨克"
       },
       "member_names": {
         "RU_RAY_50074027B25745585862808": {
@@ -1891,7 +2365,13 @@
           "en": "Pizhansky District",
           "zh": "皮詹斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sovetsky District + Pizhansky District",
+        "zh": "苏维埃区、皮詹斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B25745585862808"
     },
     {
       "id": "RU_MRG_2abe6bddb595",
@@ -1902,8 +2382,8 @@
       ],
       "parent_id": "RU_Zabaykalsky_Krai",
       "names": {
-        "en": "Karymsky District + Shilkinsky District + Duldurginsky District",
-        "zh": "卡里姆斯基区、希尔金斯基区、杜尔杜尔金斯基区"
+        "en": "Shilkinsky District",
+        "zh": "希尔金斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B26231250423767": {
@@ -1918,7 +2398,13 @@
           "en": "Duldurginsky District",
           "zh": "杜尔杜尔金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Karymsky District + Shilkinsky District + Duldurginsky District",
+        "zh": "卡里姆斯基区、希尔金斯基区、杜尔杜尔金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B29408552391691"
     },
     {
       "id": "RU_MRG_ccdeed8f9fd9",
@@ -1928,8 +2414,8 @@
       ],
       "parent_id": "RU_Novosibirsk",
       "names": {
-        "en": "Barabinsky District + Chanovsky District",
-        "zh": "巴拉宾斯基区、查诺夫斯基区"
+        "en": "Barabinsky District",
+        "zh": "巴拉宾斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B26458158998268": {
@@ -1940,7 +2426,13 @@
           "en": "Chanovsky District",
           "zh": "查诺夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Barabinsky District + Chanovsky District",
+        "zh": "巴拉宾斯基区、查诺夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B26458158998268"
     },
     {
       "id": "RU_MRG_6d68a0fd3c3c",
@@ -1951,8 +2443,8 @@
       ],
       "parent_id": "RU_Zabaykalsky_Krai",
       "names": {
-        "en": "Baleysky District + Alexandrovo-Zavodsky District + Shelopuginsky District",
-        "zh": "巴列斯基区、亚历山德罗沃-扎沃茨基区、舍洛普金斯基区"
+        "en": "Baleysky District",
+        "zh": "巴列斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B27187336625975": {
@@ -1967,7 +2459,13 @@
           "en": "Shelopuginsky District",
           "zh": "舍洛普金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Baleysky District + Alexandrovo-Zavodsky District + Shelopuginsky District",
+        "zh": "巴列斯基区、亚历山德罗沃-扎沃茨基区、舍洛普金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B27187336625975"
     },
     {
       "id": "RU_MRG_c3876f30b780",
@@ -1977,8 +2475,8 @@
       ],
       "parent_id": "RU_Kostroma",
       "names": {
-        "en": "Sharyinsky District + Ponazyrevsky District",
-        "zh": "沙林斯基区、波纳济列夫斯基区"
+        "en": "Sharyinsky District (Kostroma)",
+        "zh": "沙林斯基区（科斯特罗姆）"
       },
       "member_names": {
         "RU_RAY_50074027B27301406962779": {
@@ -1989,7 +2487,13 @@
           "en": "Ponazyrevsky District",
           "zh": "波纳济列夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sharyinsky District + Ponazyrevsky District",
+        "zh": "沙林斯基区、波纳济列夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B27301406962779"
     },
     {
       "id": "RU_MRG_f81bbccb0e01",
@@ -2000,8 +2504,8 @@
       ],
       "parent_id": "RU_Bashkortostan",
       "names": {
-        "en": "Kumertau + Ishimbaysky District + Meleuzovsky District",
-        "zh": "库默陶、伊辛巴伊斯基区、梅莱佐夫斯基区"
+        "en": "Kumertau",
+        "zh": "库梅尔套"
       },
       "member_names": {
         "RU_RAY_50074027B27931316124988": {
@@ -2016,7 +2520,13 @@
           "en": "Meleuzovsky District",
           "zh": "梅莱佐夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kumertau + Ishimbaysky District + Meleuzovsky District",
+        "zh": "库默陶、伊辛巴伊斯基区、梅莱佐夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B27931316124988"
     },
     {
       "id": "RU_MRG_b098cafecfb7",
@@ -2026,8 +2536,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "Krasnoufimsky District + городской округ Красноуфим",
-        "zh": "克拉斯努菲姆斯基区、克拉斯努菲姆"
+        "en": "городской округ Красноуфим",
+        "zh": "克拉斯努菲姆"
       },
       "member_names": {
         "RU_RAY_50074027B28793608868851": {
@@ -2038,7 +2548,13 @@
           "en": "городской округ Красноуфим",
           "zh": "克拉斯努菲姆"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Krasnoufimsky District + городской округ Красноуфим",
+        "zh": "克拉斯努菲姆斯基区、克拉斯努菲姆"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B84166945515495"
     },
     {
       "id": "RU_MRG_51d05b0cd072",
@@ -2048,8 +2564,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "городской округ Верхняя Пы + Nevyansky District",
-        "zh": "上皮、涅维扬斯基区"
+        "en": "городской округ Верхняя Пы",
+        "zh": "上皮"
       },
       "member_names": {
         "RU_RAY_50074027B29117855811227": {
@@ -2059,6 +2575,18 @@
         "RU_RAY_50074027B913230287563": {
           "en": "Nevyansky District",
           "zh": "涅维扬斯基区"
+        }
+      },
+      "previous_names": {
+        "en": "городской округ Верхняя Пы + Nevyansky District",
+        "zh": "上皮、涅维扬斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B29117855811227",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "городской округ Верхняя Пы",
+          "zh": "上佩什马"
         }
       }
     },
@@ -2071,8 +2599,8 @@
       ],
       "parent_id": "RU_Novosibirsk",
       "names": {
-        "en": "Zdvinsky District + Dovolensky District + Kochkovsky District",
-        "zh": "兹德文斯基区、多沃连斯基区、科奇科夫斯基区"
+        "en": "Dovolensky District",
+        "zh": "多沃连斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B30403513393594": {
@@ -2087,7 +2615,13 @@
           "en": "Kochkovsky District",
           "zh": "科奇科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zdvinsky District + Dovolensky District + Kochkovsky District",
+        "zh": "兹德文斯基区、多沃连斯基区、科奇科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B58386304143379"
     },
     {
       "id": "RU_MRG_18b505b29a4e",
@@ -2097,8 +2631,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Novichikhinsky District + Shipunovsky District",
-        "zh": "诺维奇欣斯基区、希普诺夫斯基区"
+        "en": "Shipunovsky District",
+        "zh": "希普诺夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B30406481833497": {
@@ -2109,7 +2643,13 @@
           "en": "Shipunovsky District",
           "zh": "希普诺夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novichikhinsky District + Shipunovsky District",
+        "zh": "诺维奇欣斯基区、希普诺夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B95923812375268"
     },
     {
       "id": "RU_MRG_47107030a018",
@@ -2120,8 +2660,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Gorno-Altaysk + Sovetsky District + Mayminsky Rayon",
-        "zh": "戈尔诺-阿尔泰斯克、苏维埃区、梅明斯基区"
+        "en": "Gorno-Altaysk",
+        "zh": "戈尔诺-阿尔泰斯克"
       },
       "member_names": {
         "RU_RAY_50074027B30829642015709": {
@@ -2136,6 +2676,18 @@
           "en": "Mayminsky Rayon",
           "zh": "梅明斯基区"
         }
+      },
+      "previous_names": {
+        "en": "Gorno-Altaysk + Sovetsky District + Mayminsky Rayon",
+        "zh": "戈尔诺-阿尔泰斯克、苏维埃区、梅明斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B30829642015709",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Oyrot-Tura",
+          "zh": "奥伊罗特-图拉"
+        }
       }
     },
     {
@@ -2147,8 +2699,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "Асбестовский городской окр + Малышевский городской окру + Rezhevskoy District",
-        "zh": "阿斯贝斯托夫斯基市区、马利舍夫斯基城区、列热夫斯科伊区"
+        "en": "Асбестовский городской окр",
+        "zh": "阿斯贝斯托夫斯基市区"
       },
       "member_names": {
         "RU_RAY_50074027B31277912642085": {
@@ -2163,7 +2715,13 @@
           "en": "Rezhevskoy District",
           "zh": "列热夫斯科伊区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Асбестовский городской окр + Малышевский городской окру + Rezhevskoy District",
+        "zh": "阿斯贝斯托夫斯基市区、马利舍夫斯基城区、列热夫斯科伊区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B31277912642085"
     },
     {
       "id": "RU_MRG_49823857e689",
@@ -2174,8 +2732,8 @@
       ],
       "parent_id": "RU_Republic_of_Tatarstan",
       "names": {
-        "en": "Atninsky District + Pestrechinsky District + Vysokogorsky District",
-        "zh": "阿特宁斯基区、佩斯特列钦斯基区、维索科戈尔斯基区"
+        "en": "Vysokogorsky District",
+        "zh": "维索科戈尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B31759300167438": {
@@ -2190,7 +2748,13 @@
           "en": "Vysokogorsky District",
           "zh": "维索科戈尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Atninsky District + Pestrechinsky District + Vysokogorsky District",
+        "zh": "阿特宁斯基区、佩斯特列钦斯基区、维索科戈尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B93752716386466"
     },
     {
       "id": "RU_MRG_352667918fc2",
@@ -2201,8 +2765,8 @@
       ],
       "parent_id": "RU_Chechen_Republic",
       "names": {
-        "en": "Shatoysky District + Vedensky District + Shalinsky District",
-        "zh": "沙托伊斯基区、韦坚斯基区、沙林斯基区"
+        "en": "Shalinsky District (Chechnya)",
+        "zh": "沙林斯基区（车臣共和国）"
       },
       "member_names": {
         "RU_RAY_50074027B31953791322816": {
@@ -2217,7 +2781,13 @@
           "en": "Shalinsky District",
           "zh": "沙林斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shatoysky District + Vedensky District + Shalinsky District",
+        "zh": "沙托伊斯基区、韦坚斯基区、沙林斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B68796128629281"
     },
     {
       "id": "RU_MRG_3e81642c622c",
@@ -2227,8 +2797,8 @@
       ],
       "parent_id": "RU_Republic_of_North_Ossetia_Alania",
       "names": {
-        "en": "Pravoberezhny District + Ardonsky District",
-        "zh": "普拉沃别列日内区、阿东斯基区"
+        "en": "Pravoberezhny District",
+        "zh": "普拉沃别列日内区"
       },
       "member_names": {
         "RU_RAY_50074027B32129611538850": {
@@ -2239,7 +2809,13 @@
           "en": "Ardonsky District",
           "zh": "阿东斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pravoberezhny District + Ardonsky District",
+        "zh": "普拉沃别列日内区、阿东斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B32129611538850"
     },
     {
       "id": "RU_MRG_25eea59124e3",
@@ -2250,8 +2826,8 @@
       ],
       "parent_id": "RU_Primorsky_Krai",
       "names": {
-        "en": "Khorolsky District + Chernigovsky District + Mikhaylovsky District",
-        "zh": "霍罗尔斯基区、切尔尼戈夫斯基区、米哈伊洛夫斯基区"
+        "en": "Chernigovsky District",
+        "zh": "切尔尼戈夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B32360932940824": {
@@ -2266,7 +2842,13 @@
           "en": "Mikhaylovsky District",
           "zh": "米哈伊洛夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Khorolsky District + Chernigovsky District + Mikhaylovsky District",
+        "zh": "霍罗尔斯基区、切尔尼戈夫斯基区、米哈伊洛夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B35514912815018"
     },
     {
       "id": "RU_MRG_a2a252b3eba6",
@@ -2276,8 +2858,8 @@
       ],
       "parent_id": "RU_Udmurt_Republic",
       "names": {
-        "en": "Sarapulsky District + Karakulinsky District",
-        "zh": "萨拉普尔斯基区、卡拉库林斯基区"
+        "en": "Sarapulsky District",
+        "zh": "萨拉普尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B32613603530958": {
@@ -2288,7 +2870,13 @@
           "en": "Karakulinsky District",
           "zh": "卡拉库林斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sarapulsky District + Karakulinsky District",
+        "zh": "萨拉普尔斯基区、卡拉库林斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B32613603530958"
     },
     {
       "id": "RU_MRG_37caa326be13",
@@ -2298,8 +2886,8 @@
       ],
       "parent_id": "RU_Stavropol_Krai",
       "names": {
-        "en": "Sovetsky District + Georgiyevsky District",
-        "zh": "苏联区、格奥尔基耶夫斯基区"
+        "en": "Zelenokumsk",
+        "zh": "泽列诺库姆斯克"
       },
       "member_names": {
         "RU_RAY_50074027B33071735903653": {
@@ -2310,7 +2898,13 @@
           "en": "Georgiyevsky District",
           "zh": "格奥尔基耶夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sovetsky District + Georgiyevsky District",
+        "zh": "苏联区、格奥尔基耶夫斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B33071735903653"
     },
     {
       "id": "RU_MRG_0fa9348c8062",
@@ -2321,8 +2915,8 @@
       ],
       "parent_id": "RU_Republic_of_Dagestan",
       "names": {
-        "en": "Tarumovsky District + Nogaysky District + городской округ Южно-Сухок",
-        "zh": "塔鲁莫夫斯基区、诺盖斯基区、南苏霍克"
+        "en": "Tarumovsky District",
+        "zh": "塔鲁莫夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B33311431944008": {
@@ -2337,7 +2931,13 @@
           "en": "городской округ Южно-Сухок",
           "zh": "南苏霍克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tarumovsky District + Nogaysky District + городской округ Южно-Сухок",
+        "zh": "塔鲁莫夫斯基区、诺盖斯基区、南苏霍克"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B33311431944008"
     },
     {
       "id": "RU_MRG_09d845e05419",
@@ -2347,8 +2947,8 @@
       ],
       "parent_id": "RU_Republic_of_Tatarstan",
       "names": {
-        "en": "Bugulminsky District + Bavlinsky District",
-        "zh": "布古明斯基区、巴夫林斯基区"
+        "en": "Bugulma",
+        "zh": "布古利马"
       },
       "member_names": {
         "RU_RAY_50074027B53591318245597": {
@@ -2359,7 +2959,13 @@
           "en": "Bavlinsky District",
           "zh": "巴夫林斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bugulminsky District + Bavlinsky District",
+        "zh": "布古明斯基区、巴夫林斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B53591318245597"
     },
     {
       "id": "RU_MRG_b74b6298db8e",
@@ -2369,8 +2975,8 @@
       ],
       "parent_id": "RU_Stavropol_Krai",
       "names": {
-        "en": "Novoselitsky District + Alexandrovsky District",
-        "zh": "新沃塞利茨基区、亚历山德罗夫斯基区"
+        "en": "Alexandrovsky District (Stavropol Krai)",
+        "zh": "亚历山德罗夫斯基区（斯塔夫罗波尔边疆区）"
       },
       "member_names": {
         "RU_RAY_50074027B34154553331377": {
@@ -2381,7 +2987,13 @@
           "en": "Alexandrovsky District",
           "zh": "亚历山德罗夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novoselitsky District + Alexandrovsky District",
+        "zh": "新沃塞利茨基区、亚历山德罗夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B36835452024659"
     },
     {
       "id": "RU_MRG_db3cc2dd744a",
@@ -2392,8 +3004,8 @@
       ],
       "parent_id": "RU_Amur",
       "names": {
-        "en": "Romnensky District + Oktyabrsky District + Belogorsky District",
-        "zh": "罗姆年斯基区、十月区、别洛戈尔斯基区"
+        "en": "Oktyabrsky District (Amur)",
+        "zh": "十月区（阿穆尔河）"
       },
       "member_names": {
         "RU_RAY_50074027B34244221839846": {
@@ -2408,7 +3020,13 @@
           "en": "Belogorsky District",
           "zh": "别洛戈尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Romnensky District + Oktyabrsky District + Belogorsky District",
+        "zh": "罗姆年斯基区、十月区、别洛戈尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B5426948431093"
     },
     {
       "id": "RU_MRG_7663cb1f8f39",
@@ -2418,8 +3036,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "Verkh-Neyvinsky + Новоуральский городской ок",
-        "zh": "韦尔赫-涅文斯基、新乌拉尔斯克市还可以"
+        "en": "Новоуральский городской ок",
+        "zh": "新乌拉尔斯克市还可以"
       },
       "member_names": {
         "RU_RAY_50074027B34285240101585": {
@@ -2429,6 +3047,18 @@
         "RU_RAY_50074027B6339965141747": {
           "en": "Новоуральский городской ок",
           "zh": "新乌拉尔斯克市还可以"
+        }
+      },
+      "previous_names": {
+        "en": "Verkh-Neyvinsky + Новоуральский городской ок",
+        "zh": "韦尔赫-涅文斯基、新乌拉尔斯克市还可以"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B6339965141747",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Новоуральский городской ок",
+          "zh": "新乌拉尔斯克"
         }
       }
     },
@@ -2440,8 +3070,8 @@
       ],
       "parent_id": "RU_Kurgan",
       "names": {
-        "en": "Belozersky District + Ketovsky District",
-        "zh": "别洛泽尔斯基区、克托夫斯基区"
+        "en": "Ketovsky District",
+        "zh": "克托夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B34790783107353": {
@@ -2452,7 +3082,13 @@
           "en": "Ketovsky District",
           "zh": "克托夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Belozersky District + Ketovsky District",
+        "zh": "别洛泽尔斯基区、克托夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B80523103546976"
     },
     {
       "id": "RU_MRG_22ecbd2b45b0",
@@ -2463,8 +3099,8 @@
       ],
       "parent_id": "RU_Samara",
       "names": {
-        "en": "Isaklinsky District + Klyavlinsky District + Sergiyevsky District",
-        "zh": "伊萨克林斯基区、克利亚夫林斯基区、谢尔吉耶夫斯基区"
+        "en": "Sergiyevsky District",
+        "zh": "谢尔吉耶夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B3504076174591": {
@@ -2479,7 +3115,13 @@
           "en": "Sergiyevsky District",
           "zh": "谢尔吉耶夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Isaklinsky District + Klyavlinsky District + Sergiyevsky District",
+        "zh": "伊萨克林斯基区、克利亚夫林斯基区、谢尔吉耶夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B62598395721325"
     },
     {
       "id": "RU_MRG_df9a05a775d2",
@@ -2490,8 +3132,8 @@
       ],
       "parent_id": "RU_Stavropol_Krai",
       "names": {
-        "en": "Izobilnensky District + Ipatovsky District + Trunovsky District",
-        "zh": "伊佐比尔年斯基区、伊帕托夫斯基区、特鲁诺夫斯基区"
+        "en": "Izobilnensky District",
+        "zh": "伊佐比尔年斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B3524132868691": {
@@ -2506,7 +3148,13 @@
           "en": "Trunovsky District",
           "zh": "特鲁诺夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Izobilnensky District + Ipatovsky District + Trunovsky District",
+        "zh": "伊佐比尔年斯基区、伊帕托夫斯基区、特鲁诺夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B3524132868691"
     },
     {
       "id": "RU_MRG_4bba5623a1e6",
@@ -2517,8 +3165,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Kalininsky District + Krasnoarmeysky District + Primorsko-Akhtarsky District",
-        "zh": "加里宁斯基区、克拉斯诺阿尔梅斯基区、滨海边疆区-阿赫塔尔斯基区"
+        "en": "Krasnoarmeysky District (Krasnodar Krai)",
+        "zh": "克拉斯诺阿尔梅斯基区（克拉斯诺达尔边疆区）"
       },
       "member_names": {
         "RU_RAY_50074027B35360178464915": {
@@ -2533,7 +3181,13 @@
           "en": "Primorsko-Akhtarsky District",
           "zh": "滨海边疆区-阿赫塔尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kalininsky District + Krasnoarmeysky District + Primorsko-Akhtarsky District",
+        "zh": "加里宁斯基区、克拉斯诺阿尔梅斯基区、滨海边疆区-阿赫塔尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B66360660487898"
     },
     {
       "id": "RU_MRG_f186479202a4",
@@ -2543,8 +3197,8 @@
       ],
       "parent_id": "RU_Republic_of_Kalmykia",
       "names": {
-        "en": "Priyutnensky District + Tselinny District",
-        "zh": "普里尤特涅斯基区、采林内区"
+        "en": "Tselinny District (Kalmykia)",
+        "zh": "采林内区（卡尔梅克共和国）"
       },
       "member_names": {
         "RU_RAY_50074027B35442546459500": {
@@ -2555,7 +3209,13 @@
           "en": "Tselinny District",
           "zh": "采林内区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Priyutnensky District + Tselinny District",
+        "zh": "普里尤特涅斯基区、采林内区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B72549152854781"
     },
     {
       "id": "RU_MRG_dc5d71a87d07",
@@ -2566,8 +3226,8 @@
       ],
       "parent_id": "RU_Republic_of_Dagestan",
       "names": {
-        "en": "Babayurtovsky District + Buynaksky District + Kumtorkalinsky District",
-        "zh": "巴巴尤托夫斯基区、布伊纳克斯区、库姆托卡林斯基区"
+        "en": "Buynaksky District",
+        "zh": "布伊纳克斯区"
       },
       "member_names": {
         "RU_RAY_50074027B35779351568121": {
@@ -2582,7 +3242,13 @@
           "en": "Kumtorkalinsky District",
           "zh": "库姆托卡林斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Babayurtovsky District + Buynaksky District + Kumtorkalinsky District",
+        "zh": "巴巴尤托夫斯基区、布伊纳克斯区、库姆托卡林斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B63833693822647"
     },
     {
       "id": "RU_MRG_c681e3bc5c71",
@@ -2592,8 +3258,8 @@
       ],
       "parent_id": "RU_Stavropol_Krai",
       "names": {
-        "en": "Blagodarnensky District + Turkmensky District",
-        "zh": "布拉戈达涅斯基区、土库曼地区"
+        "en": "Blagodarny",
+        "zh": "布拉戈达尔内"
       },
       "member_names": {
         "RU_RAY_50074027B60644389127931": {
@@ -2604,7 +3270,13 @@
           "en": "Turkmensky District",
           "zh": "土库曼地区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Blagodarnensky District + Turkmensky District",
+        "zh": "布拉戈达涅斯基区、土库曼地区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B60644389127931"
     },
     {
       "id": "RU_MRG_7ebff71f4352",
@@ -2614,8 +3286,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "Verkhneye Dubrovo + Берёзовский городской окру",
-        "zh": "上杜布罗沃、别廖佐夫斯基"
+        "en": "Берёзовский городской окру (Sverdlovsk)",
+        "zh": "别廖佐夫斯基（斯维尔德洛夫斯克）"
       },
       "member_names": {
         "RU_RAY_50074027B37150470601583": {
@@ -2626,7 +3298,13 @@
           "en": "Берёзовский городской окру",
           "zh": "别廖佐夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Verkhneye Dubrovo + Берёзовский городской окру",
+        "zh": "上杜布罗沃、别廖佐夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B45280576569410"
     },
     {
       "id": "RU_MRG_750a15603b8f",
@@ -2636,8 +3314,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Gulkevichsky District + Kavkazsky District",
-        "zh": "古尔科维奇区、高加索区"
+        "en": "Kropotkin",
+        "zh": "克鲁泡特金"
       },
       "member_names": {
         "RU_RAY_50074027B37615161597227": {
@@ -2648,7 +3326,13 @@
           "en": "Kavkazsky District",
           "zh": "高加索区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Gulkevichsky District + Kavkazsky District",
+        "zh": "古尔科维奇区、高加索区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B73205299166740"
     },
     {
       "id": "RU_MRG_41fee6249b5d",
@@ -2659,8 +3343,8 @@
       ],
       "parent_id": "RU_Primorsky_Krai",
       "names": {
-        "en": "Olginsky District + Kavalerovsky District + Chuguyevsky District",
-        "zh": "奥尔金斯基区、卡瓦列罗夫斯基区、楚古耶夫斯基区"
+        "en": "Kavalerovsky District",
+        "zh": "卡瓦列罗夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B38107602783596": {
@@ -2675,7 +3359,13 @@
           "en": "Chuguyevsky District",
           "zh": "楚古耶夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Olginsky District + Kavalerovsky District + Chuguyevsky District",
+        "zh": "奥尔金斯基区、卡瓦列罗夫斯基区、楚古耶夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B48805255710473"
     },
     {
       "id": "RU_MRG_4d1eb2a853b6",
@@ -2685,8 +3375,8 @@
       ],
       "parent_id": "RU_Ulyanovsk",
       "names": {
-        "en": "Novomalyklinsky District + Melekessky District",
-        "zh": "新马利克林斯基区、梅莱凯斯基区"
+        "en": "Melekessky District",
+        "zh": "梅莱凯斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B38118635608765": {
@@ -2697,7 +3387,13 @@
           "en": "Melekessky District",
           "zh": "梅莱凯斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novomalyklinsky District + Melekessky District",
+        "zh": "新马利克林斯基区、梅莱凯斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B42412545361426"
     },
     {
       "id": "RU_MRG_9d9bddbd62f8",
@@ -2707,8 +3403,8 @@
       ],
       "parent_id": "RU_Karachay_Cherkess_Republic",
       "names": {
-        "en": "Malokarachayevsky District + Ust-Dzhegutinsky District",
-        "zh": "马洛卡拉恰耶夫斯基区、乌斯季杰古廷斯基区"
+        "en": "Malokarachayevsky District",
+        "zh": "马洛卡拉恰耶夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B38217754219372": {
@@ -2719,7 +3415,13 @@
           "en": "Ust-Dzhegutinsky District",
           "zh": "乌斯季杰古廷斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Malokarachayevsky District + Ust-Dzhegutinsky District",
+        "zh": "马洛卡拉恰耶夫斯基区、乌斯季杰古廷斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B38217754219372"
     },
     {
       "id": "RU_MRG_bb60e0c589a5",
@@ -2729,8 +3431,8 @@
       ],
       "parent_id": "RU_Bashkortostan",
       "names": {
-        "en": "Ilishevsky District + Dyurtyulinsky District",
-        "zh": "伊利舍夫斯基区、久尔秋林斯基区"
+        "en": "Dyurtyulinsky District",
+        "zh": "久尔秋林斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B40913001273973": {
@@ -2741,7 +3443,13 @@
           "en": "Dyurtyulinsky District",
           "zh": "久尔秋林斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ilishevsky District + Dyurtyulinsky District",
+        "zh": "伊利舍夫斯基区、久尔秋林斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B95707595483889"
     },
     {
       "id": "RU_MRG_8e30afce3871",
@@ -2752,8 +3460,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "ЗАТО Свободный + городской округ Нижняя Сал + Verkhnesaldinsky Urban Okrug",
-        "zh": "扎托·斯沃博德内、下萨尔、上萨尔丁"
+        "en": "Verkhnesaldinsky Urban Okrug",
+        "zh": "上萨尔丁"
       },
       "member_names": {
         "RU_RAY_50074027B39416650406639": {
@@ -2768,7 +3476,13 @@
           "en": "Verkhnesaldinsky Urban Okrug",
           "zh": "上萨尔丁"
         }
-      }
+      },
+      "previous_names": {
+        "en": "ЗАТО Свободный + городской округ Нижняя Сал + Verkhnesaldinsky Urban Okrug",
+        "zh": "扎托·斯沃博德内、下萨尔、上萨尔丁"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B77128141881548"
     },
     {
       "id": "RU_MRG_dafefaea8cbc",
@@ -2779,8 +3493,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "Тавдинский городской округ + Turinsky District + Taborinsky District",
-        "zh": "塔夫金斯基、图林斯基区、塔博林斯基区"
+        "en": "Тавдинский городской округ",
+        "zh": "塔夫金斯基"
       },
       "member_names": {
         "RU_RAY_50074027B39462320896821": {
@@ -2795,7 +3509,13 @@
           "en": "Taborinsky District",
           "zh": "塔博林斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Тавдинский городской округ + Turinsky District + Taborinsky District",
+        "zh": "塔夫金斯基、图林斯基区、塔博林斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B39462320896821"
     },
     {
       "id": "RU_MRG_b3da0fe8b826",
@@ -2806,8 +3526,8 @@
       ],
       "parent_id": "RU_Novosibirsk",
       "names": {
-        "en": "Kochenyovsky District + Chulymsky District + Kargatsky District",
-        "zh": "科切尼奥夫斯基区、丘林姆斯基区、卡尔加茨基区"
+        "en": "Kochenyovsky District",
+        "zh": "科切尼奥夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B39854197147849": {
@@ -2822,7 +3542,13 @@
           "en": "Kargatsky District",
           "zh": "卡尔加茨基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kochenyovsky District + Chulymsky District + Kargatsky District",
+        "zh": "科切尼奥夫斯基区、丘林姆斯基区、卡尔加茨基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B39854197147849"
     },
     {
       "id": "RU_MRG_b3b6d1956b2b",
@@ -2833,8 +3559,8 @@
       ],
       "parent_id": "RU_Novosibirsk",
       "names": {
-        "en": "Novosibirsky District + Iskitimsky District + Moshkovsky District",
-        "zh": "新西伯利亚区、伊斯基季姆斯基区、莫什科夫斯基区"
+        "en": "Novosibirsky District",
+        "zh": "新西伯利亚区"
       },
       "member_names": {
         "RU_RAY_50074027B40944163415540": {
@@ -2849,7 +3575,13 @@
           "en": "Moshkovsky District",
           "zh": "莫什科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novosibirsky District + Iskitimsky District + Moshkovsky District",
+        "zh": "新西伯利亚区、伊斯基季姆斯基区、莫什科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B40944163415540"
     },
     {
       "id": "RU_MRG_5407579b5570",
@@ -2860,8 +3592,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Tbilissky District + Novokubansky District + Kurganinsky District",
-        "zh": "第比利斯区、新库班斯基区、库尔干宁区"
+        "en": "Kurganinsky District",
+        "zh": "库尔干宁区"
       },
       "member_names": {
         "RU_RAY_50074027B41156818689431": {
@@ -2876,7 +3608,13 @@
           "en": "Kurganinsky District",
           "zh": "库尔干宁区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tbilissky District + Novokubansky District + Kurganinsky District",
+        "zh": "第比利斯区、新库班斯基区、库尔干宁区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B93120265182537"
     },
     {
       "id": "RU_MRG_28e9df08980a",
@@ -2886,8 +3624,8 @@
       ],
       "parent_id": "RU_Republic_of_Khakassia",
       "names": {
-        "en": "Altaysky Rayon + Beysky Rayon",
-        "zh": "阿勒泰区、贝斯基区"
+        "en": "Beysky Rayon",
+        "zh": "贝斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B42495202262481": {
@@ -2898,7 +3636,13 @@
           "en": "Beysky Rayon",
           "zh": "贝斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Altaysky Rayon + Beysky Rayon",
+        "zh": "阿勒泰区、贝斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B98895209347227"
     },
     {
       "id": "RU_MRG_bd33afbb026e",
@@ -2908,8 +3652,8 @@
       ],
       "parent_id": "RU_Vologda",
       "names": {
-        "en": "Nyuksensky District + Tarnogsky District",
-        "zh": "纽克先斯基区、塔尔诺斯基区"
+        "en": "Tarnogsky District",
+        "zh": "塔尔诺斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B42819317151918": {
@@ -2920,7 +3664,13 @@
           "en": "Tarnogsky District",
           "zh": "塔尔诺斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nyuksensky District + Tarnogsky District",
+        "zh": "纽克先斯基区、塔尔诺斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B85218865173974"
     },
     {
       "id": "RU_MRG_5dbc0427f580",
@@ -2930,8 +3680,8 @@
       ],
       "parent_id": "RU_Sakhalin",
       "names": {
-        "en": "Tymovsky District + Nogliksky District",
-        "zh": "季莫夫斯基区、诺格利斯基区"
+        "en": "Tymovsky District",
+        "zh": "季莫夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B43754658654229": {
@@ -2942,7 +3692,13 @@
           "en": "Nogliksky District",
           "zh": "诺格利斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tymovsky District + Nogliksky District",
+        "zh": "季莫夫斯基区、诺格利斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B43754658654229"
     },
     {
       "id": "RU_MRG_d9b430bcd2cb",
@@ -2952,8 +3708,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "Сосьвинский городской окру + городской округ Махнёвское",
-        "zh": "索斯文斯基城区、马赫涅夫斯科耶"
+        "en": "Сосьвинский городской окру",
+        "zh": "索斯文斯基城区"
       },
       "member_names": {
         "RU_RAY_50074027B44910664086930": {
@@ -2964,7 +3720,13 @@
           "en": "городской округ Махнёвское",
           "zh": "马赫涅夫斯科耶"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Сосьвинский городской окру + городской округ Махнёвское",
+        "zh": "索斯文斯基城区、马赫涅夫斯科耶"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B44910664086930"
     },
     {
       "id": "RU_MRG_769c6062ebee",
@@ -2975,8 +3737,8 @@
       ],
       "parent_id": "RU_Republic_of_Dagestan",
       "names": {
-        "en": "Kaytagsky District + Akushinsky District + Dakhadayevsky District",
-        "zh": "凯塔斯基区、阿库申斯基区、达哈达耶夫斯基区"
+        "en": "Akushinsky District",
+        "zh": "阿库申斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B46464127774733": {
@@ -2991,7 +3753,13 @@
           "en": "Dakhadayevsky District",
           "zh": "达哈达耶夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kaytagsky District + Akushinsky District + Dakhadayevsky District",
+        "zh": "凯塔斯基区、阿库申斯基区、达哈达耶夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B7177074133240"
     },
     {
       "id": "RU_MRG_f3309369affa",
@@ -3001,8 +3769,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Krylovsky District + Kushchovsky District",
-        "zh": "克雷洛夫斯基区、库什霍夫区"
+        "en": "Kushchovsky District",
+        "zh": "库什霍夫区"
       },
       "member_names": {
         "RU_RAY_50074027B46802558233398": {
@@ -3013,7 +3781,13 @@
           "en": "Kushchovsky District",
           "zh": "库什霍夫区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Krylovsky District + Kushchovsky District",
+        "zh": "克雷洛夫斯基区、库什霍夫区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B79449199028894"
     },
     {
       "id": "RU_MRG_59f6abe0ef5a",
@@ -3024,8 +3798,8 @@
       ],
       "parent_id": "RU_Zabaykalsky_Krai",
       "names": {
-        "en": "Sretensky District + Nerchinsky District + Chernyshevsky District",
-        "zh": "斯列坚斯基区、尼布楚区、车尔尼雪夫斯基区"
+        "en": "Chernyshevsky District",
+        "zh": "车尔尼雪夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B47040377041373": {
@@ -3040,7 +3814,13 @@
           "en": "Chernyshevsky District",
           "zh": "车尔尼雪夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sretensky District + Nerchinsky District + Chernyshevsky District",
+        "zh": "斯列坚斯基区、尼布楚区、车尔尼雪夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B72033015120911"
     },
     {
       "id": "RU_MRG_f27c1865f6ff",
@@ -3050,8 +3830,8 @@
       ],
       "parent_id": "RU_Republic_of_Ingushetia",
       "names": {
-        "en": "городской округ Карабулак + Sunzhensky District",
-        "zh": "卡拉布拉克、孙真斯基区"
+        "en": "Sunzhensky District",
+        "zh": "孙真斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B58124154899615": {
@@ -3062,7 +3842,13 @@
           "en": "Sunzhensky District",
           "zh": "孙真斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Карабулак + Sunzhensky District",
+        "zh": "卡拉布拉克、孙真斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B66225114135116"
     },
     {
       "id": "RU_MRG_42431abf423b",
@@ -3072,8 +3858,8 @@
       ],
       "parent_id": "RU_Kabardino_Balkaria",
       "names": {
-        "en": "Prokhladny + Prokhladnensky District",
-        "zh": "普罗赫拉德内、普罗赫拉德涅斯基区"
+        "en": "Prokhladny",
+        "zh": "普罗赫拉德内"
       },
       "member_names": {
         "RU_RAY_50074027B49340709214089": {
@@ -3084,7 +3870,13 @@
           "en": "Prokhladnensky District",
           "zh": "普罗赫拉德涅斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Prokhladny + Prokhladnensky District",
+        "zh": "普罗赫拉德内、普罗赫拉德涅斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B49340709214089"
     },
     {
       "id": "RU_MRG_4f3d82b76f96",
@@ -3095,8 +3887,8 @@
       ],
       "parent_id": "RU_Omsk",
       "names": {
-        "en": "Bolsherechensky District + Kolosovsky District + Bolsheukovsky District",
-        "zh": "博谢列琴斯基区、科洛索夫斯基区、博尔舍科夫斯基区"
+        "en": "Bolsherechensky District",
+        "zh": "博谢列琴斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B50058998089809": {
@@ -3111,7 +3903,13 @@
           "en": "Bolsheukovsky District",
           "zh": "博尔舍科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bolsherechensky District + Kolosovsky District + Bolsheukovsky District",
+        "zh": "博谢列琴斯基区、科洛索夫斯基区、博尔舍科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B50058998089809"
     },
     {
       "id": "RU_MRG_d266dca34c0f",
@@ -3122,8 +3920,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Topchikhinsky District + Aleysky District + Kalmansky District",
-        "zh": "托普奇欣斯基区、阿列斯基区、卡尔曼斯基区"
+        "en": "Topchikhinsky District",
+        "zh": "托普奇欣斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B50389061014103": {
@@ -3138,7 +3936,13 @@
           "en": "Kalmansky District",
           "zh": "卡尔曼斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Topchikhinsky District + Aleysky District + Kalmansky District",
+        "zh": "托普奇欣斯基区、阿列斯基区、卡尔曼斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B50389061014103"
     },
     {
       "id": "RU_MRG_591cc0025487",
@@ -3149,8 +3953,8 @@
       ],
       "parent_id": "RU_Chechen_Republic",
       "names": {
-        "en": "Naursky District + Nadterechny District + Shelkovskoy District",
-        "zh": "瑙尔斯基区、纳德捷列奇内区、谢尔科夫斯基区"
+        "en": "Naursky District",
+        "zh": "瑙尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B51311162419153": {
@@ -3165,7 +3969,13 @@
           "en": "Shelkovskoy District",
           "zh": "谢尔科夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Naursky District + Nadterechny District + Shelkovskoy District",
+        "zh": "瑙尔斯基区、纳德捷列奇内区、谢尔科夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B51311162419153"
     },
     {
       "id": "RU_MRG_a6d5183bdf54",
@@ -3176,8 +3986,8 @@
       ],
       "parent_id": "RU_Republic_of_Dagestan",
       "names": {
-        "en": "Agulsky District + Kurakhsky District + Suleyman-Stalsky District",
-        "zh": "阿古尔斯基区、库拉赫斯基区、苏莱曼-斯塔斯基区"
+        "en": "Suleyman-Stalsky District",
+        "zh": "苏莱曼-斯塔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B51517271317611": {
@@ -3192,7 +4002,13 @@
           "en": "Suleyman-Stalsky District",
           "zh": "苏莱曼-斯塔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Agulsky District + Kurakhsky District + Suleyman-Stalsky District",
+        "zh": "阿古尔斯基区、库拉赫斯基区、苏莱曼-斯塔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B8472367264626"
     },
     {
       "id": "RU_MRG_8ec2184da20a",
@@ -3203,8 +4019,8 @@
       ],
       "parent_id": "RU_Murmansk",
       "names": {
-        "en": "ЗАТО Североморск + Koutero District + Kuola District",
-        "zh": "北莫尔斯克、科特罗区、科拉区"
+        "en": "Severomorsk",
+        "zh": "北莫爾斯克"
       },
       "member_names": {
         "RU_RAY_50074027B51628846179321": {
@@ -3219,7 +4035,13 @@
           "en": "Kuola District",
           "zh": "科拉区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "ЗАТО Североморск + Koutero District + Kuola District",
+        "zh": "北莫尔斯克、科特罗区、科拉区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B51628846179321"
     },
     {
       "id": "RU_MRG_bc130a312688",
@@ -3230,8 +4052,8 @@
       ],
       "parent_id": "RU_Kabardino_Balkaria",
       "names": {
-        "en": "Maysky District + Tersky District + Urvansky District",
-        "zh": "梅斯基区、特尔斯基区、乌尔万斯基区"
+        "en": "Urvansky District",
+        "zh": "乌尔万斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B51961501821019": {
@@ -3246,7 +4068,13 @@
           "en": "Urvansky District",
           "zh": "乌尔万斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Maysky District + Tersky District + Urvansky District",
+        "zh": "梅斯基区、特尔斯基区、乌尔万斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B76252599277621"
     },
     {
       "id": "RU_MRG_6ed49a2fba50",
@@ -3257,8 +4085,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Pervomaysky District + Talmensky District + Kosikhinsky District",
-        "zh": "五一区、塔尔缅斯基区、科西欣斯基区"
+        "en": "Pervomaysky District (Altai Krai)",
+        "zh": "五一区（阿尔泰边疆区）"
       },
       "member_names": {
         "RU_RAY_50074027B52463258949821": {
@@ -3273,7 +4101,13 @@
           "en": "Kosikhinsky District",
           "zh": "科西欣斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pervomaysky District + Talmensky District + Kosikhinsky District",
+        "zh": "五一区、塔尔缅斯基区、科西欣斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B52463258949821"
     },
     {
       "id": "RU_MRG_278b291b44d1",
@@ -3284,8 +4118,8 @@
       ],
       "parent_id": "RU_Chuvash_Republic",
       "names": {
-        "en": "Kanash + Yantikovsky District + Kanashsky District",
-        "zh": "卡纳什、扬季科夫斯基区、卡纳什区"
+        "en": "Kanash",
+        "zh": "卡纳什"
       },
       "member_names": {
         "RU_RAY_50074027B52506699729579": {
@@ -3300,7 +4134,13 @@
           "en": "Kanashsky District",
           "zh": "卡纳什区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kanash + Yantikovsky District + Kanashsky District",
+        "zh": "卡纳什、扬季科夫斯基区、卡纳什区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B52506699729579"
     },
     {
       "id": "RU_MRG_15cd872120f3",
@@ -3310,8 +4150,8 @@
       ],
       "parent_id": "RU_Republic_of_Dagestan",
       "names": {
-        "en": "городской округ Кизилюрт + Kizilyurtovsky District",
-        "zh": "克孜柳尔特、克孜柳托夫斯基区"
+        "en": "Kizilyurtovsky District",
+        "zh": "克孜柳托夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B53033522945954": {
@@ -3322,7 +4162,13 @@
           "en": "Kizilyurtovsky District",
           "zh": "克孜柳托夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Кизилюрт + Kizilyurtovsky District",
+        "zh": "克孜柳尔特、克孜柳托夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B65452337868679"
     },
     {
       "id": "RU_MRG_372658bff17e",
@@ -3332,8 +4178,8 @@
       ],
       "parent_id": "RU_Karachay_Cherkess_Republic",
       "names": {
-        "en": "Abazinsky District + Adyge-Khablsky District",
-        "zh": "阿巴津斯基区、阿迪格-哈布尔斯基区"
+        "en": "Abazinsky District",
+        "zh": "阿巴津斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B53532228090008": {
@@ -3344,7 +4190,13 @@
           "en": "Adyge-Khablsky District",
           "zh": "阿迪格-哈布尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Abazinsky District + Adyge-Khablsky District",
+        "zh": "阿巴津斯基区、阿迪格-哈布尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B53532228090008"
     },
     {
       "id": "RU_MRG_b99b9e1ffaef",
@@ -3355,8 +4207,8 @@
       ],
       "parent_id": "RU_Zabaykalsky_Krai",
       "names": {
-        "en": "Olovyanninsky District + Mogoytuysky District + Aginsky District",
-        "zh": "奥洛维扬宁斯基区、莫戈图伊斯基区、阿金斯基区"
+        "en": "Olovyanninsky District",
+        "zh": "奥洛维扬宁斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B53968863670029": {
@@ -3371,7 +4223,13 @@
           "en": "Aginsky District",
           "zh": "阿金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Olovyanninsky District + Mogoytuysky District + Aginsky District",
+        "zh": "奥洛维扬宁斯基区、莫戈图伊斯基区、阿金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B53968863670029"
     },
     {
       "id": "RU_MRG_53baf490481a",
@@ -3382,8 +4240,8 @@
       ],
       "parent_id": "RU_Chelyabinsk",
       "names": {
-        "en": "Snezhinsk + Kunashaksky District + Kaslinsky District",
-        "zh": "斯涅任斯克、库沙克斯基区、卡斯林斯基区"
+        "en": "Snezhinsk",
+        "zh": "斯涅任斯克"
       },
       "member_names": {
         "RU_RAY_50074027B55283752941545": {
@@ -3398,7 +4256,13 @@
           "en": "Kaslinsky District",
           "zh": "卡斯林斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Snezhinsk + Kunashaksky District + Kaslinsky District",
+        "zh": "斯涅任斯克、库沙克斯基区、卡斯林斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B55283752941545"
     },
     {
       "id": "RU_MRG_e0a6982b1a84",
@@ -3408,8 +4272,8 @@
       ],
       "parent_id": "RU_Bashkortostan",
       "names": {
-        "en": "Bizhbulyaksky District + Yermekeyevsky District",
-        "zh": "比日布利亚克区、叶尔梅克耶夫斯基区"
+        "en": "Bizhbulyaksky District",
+        "zh": "比日布利亚克区"
       },
       "member_names": {
         "RU_RAY_50074027B55822806641588": {
@@ -3420,7 +4284,13 @@
           "en": "Yermekeyevsky District",
           "zh": "叶尔梅克耶夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bizhbulyaksky District + Yermekeyevsky District",
+        "zh": "比日布利亚克区、叶尔梅克耶夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B55822806641588"
     },
     {
       "id": "RU_MRG_b61ec94d7cc6",
@@ -3430,8 +4300,8 @@
       ],
       "parent_id": "RU_Republic_of_Dagestan",
       "names": {
-        "en": "Sergokalinsky District + Kayakentsky District",
-        "zh": "谢尔戈卡林斯基区、卡亚肯斯基区"
+        "en": "Kayakentsky District",
+        "zh": "卡亚肯斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B56929828542337": {
@@ -3442,7 +4312,13 @@
           "en": "Kayakentsky District",
           "zh": "卡亚肯斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sergokalinsky District + Kayakentsky District",
+        "zh": "谢尔戈卡林斯基区、卡亚肯斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B83524270497208"
     },
     {
       "id": "RU_MRG_840596f23cf8",
@@ -3452,8 +4328,8 @@
       ],
       "parent_id": "RU_Rostov",
       "names": {
-        "en": "Пролетарский район + Орловский район",
-        "zh": "无产阶级区、奥廖尔区"
+        "en": "Орловский район (Rostov)",
+        "zh": "奥廖尔区（罗斯托夫州）"
       },
       "member_names": {
         "RU_RAY_50074027B5738534492612": {
@@ -3464,7 +4340,13 @@
           "en": "Орловский район",
           "zh": "奥廖尔区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Пролетарский район + Орловский район",
+        "zh": "无产阶级区、奥廖尔区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B8830125873264"
     },
     {
       "id": "RU_MRG_d985bc7cb6ba",
@@ -3475,8 +4357,8 @@
       ],
       "parent_id": "RU_Kostroma",
       "names": {
-        "en": "Vokhomsky District + Oktyabrsky District + Pavinsky District",
-        "zh": "沃霍姆斯基区、十月区、帕文斯基区"
+        "en": "Vokhomsky District",
+        "zh": "沃霍姆斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B57869521400916": {
@@ -3491,7 +4373,13 @@
           "en": "Pavinsky District",
           "zh": "帕文斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Vokhomsky District + Oktyabrsky District + Pavinsky District",
+        "zh": "沃霍姆斯基区、十月区、帕文斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B57869521400916"
     },
     {
       "id": "RU_MRG_3c16652be846",
@@ -3501,8 +4389,8 @@
       ],
       "parent_id": "RU_Orenburg",
       "names": {
-        "en": "Novosergiyevsky District + Переволоцкий район",
-        "zh": "新谢尔吉耶夫斯基区、佩列沃洛茨基区"
+        "en": "Novosergiyevsky District",
+        "zh": "新谢尔吉耶夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B59785641495471": {
@@ -3513,7 +4401,13 @@
           "en": "Переволоцкий район",
           "zh": "佩列沃洛茨基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novosergiyevsky District + Переволоцкий район",
+        "zh": "新谢尔吉耶夫斯基区、佩列沃洛茨基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B59785641495471"
     },
     {
       "id": "RU_MRG_e11c923f0c38",
@@ -3523,8 +4417,8 @@
       ],
       "parent_id": "RU_Rostov",
       "names": {
-        "en": "Сальский район + Целинский район",
-        "zh": "萨尔斯基区、采林斯基区"
+        "en": "Salsk",
+        "zh": "萨利斯克"
       },
       "member_names": {
         "RU_RAY_50074027B64441195091452": {
@@ -3535,7 +4429,13 @@
           "en": "Целинский район",
           "zh": "采林斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Сальский район + Целинский район",
+        "zh": "萨尔斯基区、采林斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B64441195091452"
     },
     {
       "id": "RU_MRG_c4cc806170c7",
@@ -3545,8 +4445,8 @@
       ],
       "parent_id": "RU_Murmansk",
       "names": {
-        "en": "Olenegorsk + городской округ Мончегорск",
-        "zh": "奥列涅戈尔斯克、蒙切戈尔斯克"
+        "en": "Monchegorsk",
+        "zh": "蒙切戈尔斯克"
       },
       "member_names": {
         "RU_RAY_50074027B65160650442922": {
@@ -3557,7 +4457,13 @@
           "en": "городской округ Мончегорск",
           "zh": "蒙切戈尔斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Olenegorsk + городской округ Мончегорск",
+        "zh": "奥列涅戈尔斯克、蒙切戈尔斯克"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B81667503680870"
     },
     {
       "id": "RU_MRG_bb517d694577",
@@ -3567,8 +4473,8 @@
       ],
       "parent_id": "RU_Astrakhan",
       "names": {
-        "en": "Kamyzyaksky District + Privolzhsky District",
-        "zh": "卡梅济亚克区、普里沃尔日区"
+        "en": "Kamyzyaksky District",
+        "zh": "卡梅济亚克区"
       },
       "member_names": {
         "RU_RAY_50074027B65649433423925": {
@@ -3579,7 +4485,13 @@
           "en": "Privolzhsky District",
           "zh": "普里沃尔日区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kamyzyaksky District + Privolzhsky District",
+        "zh": "卡梅济亚克区、普里沃尔日区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B65649433423925"
     },
     {
       "id": "RU_MRG_077f46c83ea0",
@@ -3590,8 +4502,8 @@
       ],
       "parent_id": "RU_Omsk",
       "names": {
-        "en": "Kormilovsky District + Lyubinsky District + Omsky District",
-        "zh": "科尔米洛夫斯基区、柳宾斯基区、鄂木斯克区"
+        "en": "Omsky District",
+        "zh": "鄂木斯克区"
       },
       "member_names": {
         "RU_RAY_50074027B66046349705368": {
@@ -3606,7 +4518,13 @@
           "en": "Omsky District",
           "zh": "鄂木斯克区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kormilovsky District + Lyubinsky District + Omsky District",
+        "zh": "科尔米洛夫斯基区、柳宾斯基区、鄂木斯克区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B84115521908944"
     },
     {
       "id": "RU_MRG_c2999ea662d8",
@@ -3617,8 +4535,8 @@
       ],
       "parent_id": "RU_Kirov",
       "names": {
-        "en": "Arbazhsky District + Orichevsky District + Verkhoshizhemsky District",
-        "zh": "阿尔巴日斯基区、奥里切夫斯基区、上希热姆斯基区"
+        "en": "Orichevsky District",
+        "zh": "奥里切夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B66059213577212": {
@@ -3633,7 +4551,13 @@
           "en": "Verkhoshizhemsky District",
           "zh": "上希热姆斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Arbazhsky District + Orichevsky District + Verkhoshizhemsky District",
+        "zh": "阿尔巴日斯基区、奥里切夫斯基区、上希热姆斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B82042542483419"
     },
     {
       "id": "RU_MRG_f9fc260bcac5",
@@ -3643,8 +4567,8 @@
       ],
       "parent_id": "RU_Irkutsk",
       "names": {
-        "en": "Эхирит-Булагатский район + Баяндаевский район",
-        "zh": "埃希里特-布拉加特区、巴扬达耶夫斯基区"
+        "en": "Эхирит-Булагатский район",
+        "zh": "埃希里特-布拉加特区"
       },
       "member_names": {
         "RU_RAY_50074027B66325545457343": {
@@ -3655,7 +4579,13 @@
           "en": "Баяндаевский район",
           "zh": "巴扬达耶夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Эхирит-Булагатский район + Баяндаевский район",
+        "zh": "埃希里特-布拉加特区、巴扬达耶夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B66325545457343"
     },
     {
       "id": "RU_MRG_c7dcc7efb71b",
@@ -3665,8 +4595,8 @@
       ],
       "parent_id": "RU_Murmansk",
       "names": {
-        "en": "городской округ Кировск + городской округ Апатиты",
-        "zh": "基洛夫斯克、阿帕蒂"
+        "en": "Apatity",
+        "zh": "阿帕季特"
       },
       "member_names": {
         "RU_RAY_50074027B69941183131076": {
@@ -3677,7 +4607,13 @@
           "en": "городской округ Апатиты",
           "zh": "阿帕蒂"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Кировск + городской округ Апатиты",
+        "zh": "基洛夫斯克、阿帕蒂"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B77663912086268"
     },
     {
       "id": "RU_MRG_784147403049",
@@ -3687,8 +4623,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Mamontovsky District + Rebrikhinsky District",
-        "zh": "马蒙托夫斯基区、列布里欣斯基区"
+        "en": "Rebrikhinsky District",
+        "zh": "列布里欣斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B70201567000150": {
@@ -3699,7 +4635,13 @@
           "en": "Rebrikhinsky District",
           "zh": "列布里欣斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mamontovsky District + Rebrikhinsky District",
+        "zh": "马蒙托夫斯基区、列布里欣斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B77273209658100"
     },
     {
       "id": "RU_MRG_53076b618d56",
@@ -3710,8 +4652,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Romanovsky District + Bayevsky District + Zavyalovsky District",
-        "zh": "罗曼诺夫斯基区、巴耶夫斯基区、扎维亚洛夫斯基区"
+        "en": "Zavyalovsky District (Altai Krai)",
+        "zh": "扎维亚洛夫斯基区（阿尔泰边疆区）"
       },
       "member_names": {
         "RU_RAY_50074027B71087427061133": {
@@ -3726,7 +4668,13 @@
           "en": "Zavyalovsky District",
           "zh": "扎维亚洛夫斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Romanovsky District + Bayevsky District + Zavyalovsky District",
+        "zh": "罗曼诺夫斯基区、巴耶夫斯基区、扎维亚洛夫斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B82856800380020"
     },
     {
       "id": "RU_MRG_f22292b3a58a",
@@ -3736,8 +4684,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "городской округ Алапаевско + городской округ Алапаевск",
-        "zh": "阿拉帕耶夫斯科、阿拉帕耶夫斯克"
+        "en": "городской округ Алапаевск",
+        "zh": "阿拉帕耶夫斯克"
       },
       "member_names": {
         "RU_RAY_50074027B71545540908305": {
@@ -3748,7 +4696,13 @@
           "en": "городской округ Алапаевск",
           "zh": "阿拉帕耶夫斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Алапаевско + городской округ Алапаевск",
+        "zh": "阿拉帕耶夫斯科、阿拉帕耶夫斯克"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B9981749344230"
     },
     {
       "id": "RU_MRG_25e2a56635c5",
@@ -3758,8 +4712,8 @@
       ],
       "parent_id": "RU_Altai_Republic",
       "names": {
-        "en": "Blagoveshchensky District + Rodinsky District",
-        "zh": "布拉戈维申斯基区、罗丁斯基区"
+        "en": "Blagoveshchensky District (Altai Krai)",
+        "zh": "布拉戈维申斯基区（阿尔泰边疆区）"
       },
       "member_names": {
         "RU_RAY_50074027B71899291249917": {
@@ -3770,7 +4724,13 @@
           "en": "Rodinsky District",
           "zh": "罗丁斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Blagoveshchensky District + Rodinsky District",
+        "zh": "布拉戈维申斯基区、罗丁斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B71899291249917"
     },
     {
       "id": "RU_MRG_dd0c9c3625d6",
@@ -3781,8 +4741,8 @@
       ],
       "parent_id": "RU_Republic_of_Tatarstan",
       "names": {
-        "en": "Tyulyachinsky District + Arsky District + Sabinsky District",
-        "zh": "秋亚钦斯基区、阿尔斯基区、萨宾斯基区"
+        "en": "Arsky District",
+        "zh": "阿尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B72145172947925": {
@@ -3797,7 +4757,13 @@
           "en": "Sabinsky District",
           "zh": "萨宾斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tyulyachinsky District + Arsky District + Sabinsky District",
+        "zh": "秋亚钦斯基区、阿尔斯基区、萨宾斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B850716987435"
     },
     {
       "id": "RU_MRG_71e52c27d399",
@@ -3807,8 +4773,8 @@
       ],
       "parent_id": "RU_Udmurt_Republic",
       "names": {
-        "en": "Votkinsk + Votkinsky District",
-        "zh": "沃特金斯克、沃特金斯基区"
+        "en": "Votkinsk",
+        "zh": "沃特金斯克"
       },
       "member_names": {
         "RU_RAY_50074027B7291114603308": {
@@ -3819,7 +4785,13 @@
           "en": "Votkinsky District",
           "zh": "沃特金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Votkinsk + Votkinsky District",
+        "zh": "沃特金斯克、沃特金斯基区"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B7291114603308"
     },
     {
       "id": "RU_MRG_3f65aeea39a8",
@@ -3829,8 +4801,8 @@
       ],
       "parent_id": "RU_Republic_of_Dagestan",
       "names": {
-        "en": "Gergebilsky District + Levashinsky District",
-        "zh": "盖尔盖比尔斯基区、列瓦辛斯基区"
+        "en": "Levashinsky District",
+        "zh": "列瓦辛斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B72951354106577": {
@@ -3841,7 +4813,13 @@
           "en": "Levashinsky District",
           "zh": "列瓦辛斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Gergebilsky District + Levashinsky District",
+        "zh": "盖尔盖比尔斯基区、列瓦辛斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B79943879791576"
     },
     {
       "id": "RU_MRG_91c0b63be7fb",
@@ -3852,8 +4830,8 @@
       ],
       "parent_id": "RU_Chuvash_Republic",
       "names": {
-        "en": "Krasnochetaysky District + Shumerlinsky District + Vurnarsky District",
-        "zh": "克拉斯诺切塔斯基区、舒默林斯基区、沃尔纳尔斯基区"
+        "en": "Vurnarsky District",
+        "zh": "沃尔纳尔斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B7324166481764": {
@@ -3868,7 +4846,13 @@
           "en": "Vurnarsky District",
           "zh": "沃尔纳尔斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Krasnochetaysky District + Shumerlinsky District + Vurnarsky District",
+        "zh": "克拉斯诺切塔斯基区、舒默林斯基区、沃尔纳尔斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B93874351360304"
     },
     {
       "id": "RU_MRG_a2ce0ba9fa04",
@@ -3878,8 +4862,8 @@
       ],
       "parent_id": "RU_Republic_of_Kalmykia",
       "names": {
-        "en": "Gorodovikovsky District + Yashaltinsky District",
-        "zh": "戈罗多维科夫斯基区、亚沙尔金斯基区"
+        "en": "Gorodovikovsky District",
+        "zh": "戈罗多维科夫斯基区"
       },
       "member_names": {
         "RU_RAY_50074027B75102551172104": {
@@ -3890,7 +4874,13 @@
           "en": "Yashaltinsky District",
           "zh": "亚沙尔金斯基区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Gorodovikovsky District + Yashaltinsky District",
+        "zh": "戈罗多维科夫斯基区、亚沙尔金斯基区"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B75102551172104"
     },
     {
       "id": "RU_MRG_1be582aeb42b",
@@ -3900,8 +4890,8 @@
       ],
       "parent_id": "RU_Sverdlovsk",
       "names": {
-        "en": "городской округ Ревда + Полевской городской округ",
-        "zh": "雷夫达、波列夫斯基"
+        "en": "Полевской городской округ",
+        "zh": "波列夫斯基"
       },
       "member_names": {
         "RU_RAY_50074027B80098888986721": {
@@ -3912,7 +4902,13 @@
           "en": "Полевской городской округ",
           "zh": "波列夫斯基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "городской округ Ревда + Полевской городской округ",
+        "zh": "雷夫达、波列夫斯基"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B92699557632668"
     },
     {
       "id": "RU_MRG_1a8b8a532d94",
@@ -3922,8 +4918,8 @@
       ],
       "parent_id": "RU_Krasnoyarsk_Krai",
       "names": {
-        "en": "Sharypovsky Rayon + городской округ Шарыпово",
-        "zh": "沙里波夫斯基区、沙里波沃"
+        "en": "городской округ Шарыпово",
+        "zh": "沙里波沃"
       },
       "member_names": {
         "RU_RAY_50074027B89004724588312": {
@@ -3934,7 +4930,13 @@
           "en": "городской округ Шарыпово",
           "zh": "沙里波沃"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sharypovsky Rayon + городской округ Шарыпово",
+        "zh": "沙里波夫斯基区、沙里波沃"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B92108534487256"
     },
     {
       "id": "RU_MRG_73932f56c8d6",
@@ -3944,8 +4946,8 @@
       ],
       "parent_id": "RU_Krasnodar_Krai",
       "names": {
-        "en": "Seversky District + городской округ Горячий Кл",
-        "zh": "谢韦尔斯基区、戈里亚奇克柳奇"
+        "en": "Goryachiy Klyuch",
+        "zh": "戈里亚奇克柳奇"
       },
       "member_names": {
         "RU_RAY_50074027B89083918550968": {
@@ -3956,7 +4958,13 @@
           "en": "городской округ Горячий Кл",
           "zh": "戈里亚奇克柳奇"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Seversky District + городской округ Горячий Кл",
+        "zh": "谢韦尔斯基区、戈里亚奇克柳奇"
+      },
+      "name_source": "city",
+      "representative_id": "RU_RAY_50074027B93366024646378"
     },
     {
       "id": "RU_MRG_bb5f84a15d47",
@@ -3966,8 +4974,8 @@
       ],
       "parent_id": "RU_Chelyabinsk",
       "names": {
-        "en": "Korkinsky District + Kopeysk",
-        "zh": "科尔金斯基区、科佩斯克"
+        "en": "Kopeysk",
+        "zh": "科佩斯克"
       },
       "member_names": {
         "RU_RAY_50074027B90016896372270": {
@@ -3978,7 +4986,13 @@
           "en": "Kopeysk",
           "zh": "科佩斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Korkinsky District + Kopeysk",
+        "zh": "科尔金斯基区、科佩斯克"
+      },
+      "name_source": "population",
+      "representative_id": "RU_RAY_50074027B99074376232586"
     },
     {
       "id": "CN_MRG_ad1c7dfff247",
@@ -3988,8 +5002,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Xintianxian + Qiyangxian",
-        "zh": "新田县、祁阳县"
+        "en": "Qiyangxian",
+        "zh": "祁阳县"
       },
       "member_names": {
         "CN_CITY_17275852B10035790927173": {
@@ -4000,7 +5014,13 @@
           "en": "Qiyangxian",
           "zh": "祁阳县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Xintianxian + Qiyangxian",
+        "zh": "新田县、祁阳县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B68439932269720"
     },
     {
       "id": "CN_MRG_e323fb3516d2",
@@ -4010,8 +5030,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Qidongxian + Changningxian",
-        "zh": "启东县、长宁县"
+        "en": "Qidongxian",
+        "zh": "启东县"
       },
       "member_names": {
         "CN_CITY_17275852B32936611389076": {
@@ -4022,7 +5042,13 @@
           "en": "Changningxian",
           "zh": "长宁县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Qidongxian + Changningxian",
+        "zh": "启东县、长宁县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B32936611389076"
     },
     {
       "id": "CN_MRG_4291f6684555",
@@ -4032,8 +5058,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Jiahexian + Guiyangxian",
-        "zh": "嘉禾县、贵阳县"
+        "en": "Guiyangxian",
+        "zh": "贵阳县"
       },
       "member_names": {
         "CN_CITY_17275852B42949216390922": {
@@ -4044,7 +5070,13 @@
           "en": "Guiyangxian",
           "zh": "贵阳县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Jiahexian + Guiyangxian",
+        "zh": "嘉禾县、贵阳县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B523615453255"
     },
     {
       "id": "CN_MRG_811ae32de700",
@@ -4054,8 +5086,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Danzhaixian + Leishanxian",
-        "zh": "丹寨县、雷山县"
+        "en": "Danzhaixian",
+        "zh": "丹寨县"
       },
       "member_names": {
         "CN_CITY_17275852B10784646999249": {
@@ -4066,7 +5098,13 @@
           "en": "Leishanxian",
           "zh": "雷山县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Danzhaixian + Leishanxian",
+        "zh": "丹寨县、雷山县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B10784646999249"
     },
     {
       "id": "CN_MRG_b960732fa4b5",
@@ -4077,8 +5115,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Liboxian + Sandushuizuzizhixian + Dushanxian",
-        "zh": "荔波县、三都水族自治县、独山县"
+        "en": "Sandushuizuzizhixian",
+        "zh": "三都水族自治县"
       },
       "member_names": {
         "CN_CITY_17275852B45356467847081": {
@@ -4093,7 +5131,13 @@
           "en": "Dushanxian",
           "zh": "独山县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Liboxian + Sandushuizuzizhixian + Dushanxian",
+        "zh": "荔波县、三都水族自治县、独山县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B57744324768407"
     },
     {
       "id": "CN_MRG_6afd9e47518e",
@@ -4103,8 +5147,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Tiandengxian + Daxinxian",
-        "zh": "天等县、大新县"
+        "en": "Tiandengxian",
+        "zh": "天等县"
       },
       "member_names": {
         "CN_CITY_17275852B11085886687529": {
@@ -4115,7 +5159,13 @@
           "en": "Daxinxian",
           "zh": "大新县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tiandengxian + Daxinxian",
+        "zh": "天等县、大新县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B11085886687529"
     },
     {
       "id": "CN_MRG_97bd4300598a",
@@ -4127,8 +5177,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Pingguoxian + Tianyangxian + Tiandongxian + Debaoxian",
-        "zh": "平果县、天阳县、田东县、德保县"
+        "en": "Pingguoxian",
+        "zh": "平果县"
       },
       "member_names": {
         "CN_CITY_17275852B11835060574612": {
@@ -4147,7 +5197,13 @@
           "en": "Debaoxian",
           "zh": "德保县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pingguoxian + Tianyangxian + Tiandongxian + Debaoxian",
+        "zh": "平果县、天阳县、田东县、德保县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B11835060574612"
     },
     {
       "id": "CN_MRG_5062affbdbed",
@@ -4158,8 +5214,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Yongfuxian + Linguixian + Lipuxian",
-        "zh": "永福县、临桂县、荔浦县"
+        "en": "Linguixian",
+        "zh": "临桂县"
       },
       "member_names": {
         "CN_CITY_17275852B11374124837351": {
@@ -4174,7 +5230,13 @@
           "en": "Lipuxian",
           "zh": "荔浦县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yongfuxian + Linguixian + Lipuxian",
+        "zh": "永福县、临桂县、荔浦县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B18221903056206"
     },
     {
       "id": "CN_MRG_9e687b93a31d",
@@ -4184,8 +5246,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Binyangxian + Hengxian",
-        "zh": "宾阳县、横县"
+        "en": "Hengxian",
+        "zh": "横县"
       },
       "member_names": {
         "CN_CITY_17275852B11386974868733": {
@@ -4196,7 +5258,13 @@
           "en": "Hengxian",
           "zh": "横县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Binyangxian + Hengxian",
+        "zh": "宾阳县、横县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B45805035523406"
     },
     {
       "id": "CN_MRG_54a435d63591",
@@ -4206,8 +5274,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Lingshanxian + Pubeixian",
-        "zh": "灵山县、浦北县"
+        "en": "Lingshanxian",
+        "zh": "灵山县"
       },
       "member_names": {
         "CN_CITY_17275852B26690160376255": {
@@ -4218,7 +5286,13 @@
           "en": "Pubeixian",
           "zh": "浦北县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lingshanxian + Pubeixian",
+        "zh": "灵山县、浦北县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B26690160376255"
     },
     {
       "id": "CN_MRG_371d5c1ed7c0",
@@ -4228,8 +5302,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Bobaixian + Luchuanxian",
-        "zh": "博白县、陆川县"
+        "en": "Bobaixian",
+        "zh": "博白县"
       },
       "member_names": {
         "CN_CITY_17275852B53915190353866": {
@@ -4240,7 +5314,13 @@
           "en": "Luchuanxian",
           "zh": "陆川县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bobaixian + Luchuanxian",
+        "zh": "博白县、陆川县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B53915190353866"
     },
     {
       "id": "CN_MRG_8cc7d8c53bc9",
@@ -4250,8 +5330,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Heshan + Xinchengxian",
-        "zh": "鹤山、新城县"
+        "en": "Xinchengxian (Guangxi)",
+        "zh": "新城县（广西壮族自治区）"
       },
       "member_names": {
         "CN_CITY_17275852B1821978982236": {
@@ -4262,7 +5342,13 @@
           "en": "Xinchengxian",
           "zh": "新城县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Heshan + Xinchengxian",
+        "zh": "鹤山、新城县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B98647576585138"
     },
     {
       "id": "CN_MRG_5422a4ca4ebb",
@@ -4273,8 +5359,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Wumingxian + Longanxian + Mashanxian",
-        "zh": "武鸣县、龙安县、马山县"
+        "en": "Wumingxian",
+        "zh": "武鸣县"
       },
       "member_names": {
         "CN_CITY_17275852B19231985776314": {
@@ -4289,7 +5375,13 @@
           "en": "Mashanxian",
           "zh": "马山县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Wumingxian + Longanxian + Mashanxian",
+        "zh": "武鸣县、龙安县、马山县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B19231985776314"
     },
     {
       "id": "CN_MRG_4ed89cf1f6b1",
@@ -4300,8 +5392,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Longlixian + Fuquanxian + Guidingxian",
-        "zh": "龙里县、福泉县、贵定县"
+        "en": "Fuquanxian",
+        "zh": "福泉县"
       },
       "member_names": {
         "CN_CITY_17275852B61653092439657": {
@@ -4316,7 +5408,13 @@
           "en": "Guidingxian",
           "zh": "贵定县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Longlixian + Fuquanxian + Guidingxian",
+        "zh": "龙里县、福泉县、贵定县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B70502263910192"
     },
     {
       "id": "CN_MRG_26d52bd3f389",
@@ -4328,8 +5426,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Fangshanxian + Jiaochengxian + Wenshuixian + Lanxian",
-        "zh": "房山县、交城县、汶水县、岚县"
+        "en": "Wenshuixian",
+        "zh": "汶水县"
       },
       "member_names": {
         "CN_CITY_17275852B12011318732554": {
@@ -4348,7 +5446,13 @@
           "en": "Lanxian",
           "zh": "岚县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Fangshanxian + Jiaochengxian + Wenshuixian + Lanxian",
+        "zh": "房山县、交城县、汶水县、岚县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B34576616832621"
     },
     {
       "id": "CN_MRG_bbc31f7c4dea",
@@ -4358,8 +5462,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Loufanxian + Gujiao",
-        "zh": "楼烦县、古交"
+        "en": "Gujiao",
+        "zh": "古交"
       },
       "member_names": {
         "CN_CITY_17275852B14545081951484": {
@@ -4370,7 +5474,13 @@
           "en": "Gujiao",
           "zh": "古交"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Loufanxian + Gujiao",
+        "zh": "楼烦县、古交"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B51414725464738"
     },
     {
       "id": "CN_MRG_62b5e8747ba5",
@@ -4380,8 +5490,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Shencixian + Wuzaixian",
-        "zh": "神池县、五寨县"
+        "en": "Shencixian",
+        "zh": "神池县"
       },
       "member_names": {
         "CN_CITY_17275852B1239940213034": {
@@ -4392,7 +5502,13 @@
           "en": "Wuzaixian",
           "zh": "五寨县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shencixian + Wuzaixian",
+        "zh": "神池县、五寨县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B1239940213034"
     },
     {
       "id": "CN_MRG_093183003948",
@@ -4402,8 +5518,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Lichengxian + Wuxiangxian",
-        "zh": "黎城县、武乡县"
+        "en": "Wuxiangxian",
+        "zh": "武乡县"
       },
       "member_names": {
         "CN_CITY_17275852B12713301916629": {
@@ -4414,7 +5530,13 @@
           "en": "Wuxiangxian",
           "zh": "武乡县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lichengxian + Wuxiangxian",
+        "zh": "黎城县、武乡县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B75868249170069"
     },
     {
       "id": "CN_MRG_27a184e8ab38",
@@ -4426,8 +5548,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Yushexian + Zuoquanxian + Xiyangxian + Heshunxian",
-        "zh": "榆社县、左权县、西洋县、和顺县"
+        "en": "Xiyangxian",
+        "zh": "西洋县"
       },
       "member_names": {
         "CN_CITY_17275852B13887697009949": {
@@ -4446,7 +5568,13 @@
           "en": "Heshunxian",
           "zh": "和顺县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yushexian + Zuoquanxian + Xiyangxian + Heshunxian",
+        "zh": "榆社县、左权县、西洋县、和顺县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B36814978882729"
     },
     {
       "id": "CN_MRG_13220d13d5c4",
@@ -4457,8 +5585,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Tianlinxian + Lingyunxian + Longlingezuzizhixian",
-        "zh": "田林县、凌云县、隆林各族自治县"
+        "en": "Longlingezuzizhixian",
+        "zh": "隆林各族自治县"
       },
       "member_names": {
         "CN_CITY_17275852B12900023256683": {
@@ -4473,7 +5601,13 @@
           "en": "Longlingezuzizhixian",
           "zh": "隆林各族自治县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tianlinxian + Lingyunxian + Longlingezuzizhixian",
+        "zh": "田林县、凌云县、隆林各族自治县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B18423645201900"
     },
     {
       "id": "CN_MRG_5da384536a83",
@@ -4486,8 +5620,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Qianxian + Liquanxian + Yongshouxian + Jingyangxian + Wugongxian",
-        "zh": "乾县、礼泉县、永寿县、泾阳县、武功县"
+        "en": "Qianxian",
+        "zh": "乾县"
       },
       "member_names": {
         "CN_CITY_17275852B12916935567443": {
@@ -4510,7 +5644,13 @@
           "en": "Wugongxian",
           "zh": "武功县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Qianxian + Liquanxian + Yongshouxian + Jingyangxian + Wugongxian",
+        "zh": "乾县、礼泉县、永寿县、泾阳县、武功县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B12916935567443"
     },
     {
       "id": "CN_MRG_ad9de4c133ee",
@@ -4520,8 +5660,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Fufengxian + Meixian",
-        "zh": "扶风县、梅县"
+        "en": "Fufengxian",
+        "zh": "扶风县"
       },
       "member_names": {
         "CN_CITY_17275852B22628063668790": {
@@ -4532,7 +5672,13 @@
           "en": "Meixian",
           "zh": "梅县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Fufengxian + Meixian",
+        "zh": "扶风县、梅县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B22628063668790"
     },
     {
       "id": "CN_MRG_05adc3fc83ec",
@@ -4544,8 +5690,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Congjiangxian + Rongjiangxian + Lipingxian + Jinpingxian",
-        "zh": "从江县、榕江县、黎平县、锦屏县"
+        "en": "Lipingxian",
+        "zh": "黎平县"
       },
       "member_names": {
         "CN_CITY_17275852B1299641415779": {
@@ -4564,7 +5710,13 @@
           "en": "Jinpingxian",
           "zh": "锦屏县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Congjiangxian + Rongjiangxian + Lipingxian + Jinpingxian",
+        "zh": "从江县、榕江县、黎平县、锦屏县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B36926194183008"
     },
     {
       "id": "CN_MRG_380671e40a1c",
@@ -4574,8 +5726,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Jiexiu + Lingxian",
-        "zh": "介休、陵县"
+        "en": "Jiexiu",
+        "zh": "介休"
       },
       "member_names": {
         "CN_CITY_17275852B13106762197059": {
@@ -4586,7 +5738,13 @@
           "en": "Lingxian",
           "zh": "陵县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Jiexiu + Lingxian",
+        "zh": "介休、陵县"
+      },
+      "name_source": "city",
+      "representative_id": "CN_CITY_17275852B13106762197059"
     },
     {
       "id": "CN_MRG_509032e83f5b",
@@ -4596,8 +5754,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Fenyangxian + Xiaoyi",
-        "zh": "汾阳县、孝义"
+        "en": "Fenyangxian",
+        "zh": "汾阳县"
       },
       "member_names": {
         "CN_CITY_17275852B41072678089088": {
@@ -4608,7 +5766,13 @@
           "en": "Xiaoyi",
           "zh": "孝义"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Fenyangxian + Xiaoyi",
+        "zh": "汾阳县、孝义"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B41072678089088"
     },
     {
       "id": "CN_MRG_3811ff27587a",
@@ -4620,8 +5784,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Nanzhengxian + Mianxian + Ningqiangxian + Liubaxian",
-        "zh": "南郑县、勉县、宁强县、留坝县"
+        "en": "Nanzhengxian",
+        "zh": "南郑县"
       },
       "member_names": {
         "CN_CITY_17275852B28376820162593": {
@@ -4640,7 +5804,13 @@
           "en": "Liubaxian",
           "zh": "留坝县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nanzhengxian + Mianxian + Ningqiangxian + Liubaxian",
+        "zh": "南郑县、勉县、宁强县、留坝县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B28376820162593"
     },
     {
       "id": "CN_MRG_114c09629107",
@@ -4650,8 +5820,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Taibaixian + Fengxian",
-        "zh": "太白县、奉贤"
+        "en": "Fengxian (Shaanxi)",
+        "zh": "奉贤（陕西省）"
       },
       "member_names": {
         "CN_CITY_17275852B4205897347371": {
@@ -4662,7 +5832,13 @@
           "en": "Fengxian",
           "zh": "奉贤"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Taibaixian + Fengxian",
+        "zh": "太白县、奉贤"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B5870259608463"
     },
     {
       "id": "CN_MRG_daab50ad3f6e",
@@ -4673,8 +5849,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Yongxingxian + Zixing + Anrenxian",
-        "zh": "永兴县、资兴、安仁县"
+        "en": "Zixing",
+        "zh": "资兴"
       },
       "member_names": {
         "CN_CITY_17275852B13515438475644": {
@@ -4689,7 +5865,13 @@
           "en": "Anrenxian",
           "zh": "安仁县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yongxingxian + Zixing + Anrenxian",
+        "zh": "永兴县、资兴、安仁县"
+      },
+      "name_source": "city",
+      "representative_id": "CN_CITY_17275852B3078937229580"
     },
     {
       "id": "CN_MRG_1f0a33afd376",
@@ -4699,8 +5881,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Youxian + Chalingxian",
-        "zh": "攸县、茶陵县"
+        "en": "Youxian",
+        "zh": "攸县"
       },
       "member_names": {
         "CN_CITY_17275852B19179665041659": {
@@ -4711,7 +5893,13 @@
           "en": "Chalingxian",
           "zh": "茶陵县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Youxian + Chalingxian",
+        "zh": "攸县、茶陵县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B19179665041659"
     },
     {
       "id": "CN_MRG_2e32a6a2bcdc",
@@ -4721,8 +5909,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Leiyang + Hengnanxian",
-        "zh": "耒阳、横南县"
+        "en": "Leiyang",
+        "zh": "耒阳"
       },
       "member_names": {
         "CN_CITY_17275852B64193210644413": {
@@ -4733,7 +5921,13 @@
           "en": "Hengnanxian",
           "zh": "横南县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Leiyang + Hengnanxian",
+        "zh": "耒阳、横南县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B64193210644413"
     },
     {
       "id": "CN_MRG_9b9b2d2aa43a",
@@ -4747,8 +5941,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Daixian + Dingxiangxian + Wutaixian + Ningwuxian + Fanxian + Yuanping",
-        "zh": "代县、定襄县、五台县、宁武县、范闲、原平"
+        "en": "Yuanping",
+        "zh": "原平"
       },
       "member_names": {
         "CN_CITY_17275852B13851932381153": {
@@ -4775,7 +5969,13 @@
           "en": "Yuanping",
           "zh": "原平"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Daixian + Dingxiangxian + Wutaixian + Ningwuxian + Fanxian + Yuanping",
+        "zh": "代县、定襄县、五台县、宁武县、范闲、原平"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B85778198402865"
     },
     {
       "id": "CN_MRG_3ff67345ed78",
@@ -4785,8 +5985,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Shanyinxian + Yingxian",
-        "zh": "山阴县、应县"
+        "en": "Yingxian (Shanxi)",
+        "zh": "应县（山西省）"
       },
       "member_names": {
         "CN_CITY_17275852B79289816536365": {
@@ -4797,7 +5997,13 @@
           "en": "Yingxian",
           "zh": "应县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shanyinxian + Yingxian",
+        "zh": "山阴县、应县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B87734958139562"
     },
     {
       "id": "CN_MRG_84ae8cea2227",
@@ -4810,8 +6016,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Duyun + Luodianxian + Huishuixian + Changshunxian + Pingtangxian",
-        "zh": "都匀、罗店县、惠水县、长顺县、平塘县"
+        "en": "Duyun",
+        "zh": "都匀"
       },
       "member_names": {
         "CN_CITY_17275852B13930467534942": {
@@ -4834,7 +6040,13 @@
           "en": "Pingtangxian",
           "zh": "平塘县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Duyun + Luodianxian + Huishuixian + Changshunxian + Pingtangxian",
+        "zh": "都匀、罗店县、惠水县、长顺县、平塘县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B13930467534942"
     },
     {
       "id": "CN_MRG_09f3d32020e4",
@@ -4845,8 +6057,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Binxian + Changwuxian + Xunyixian",
-        "zh": "宾县、长武县、寻邑县"
+        "en": "Binxian (Shaanxi)",
+        "zh": "宾县（陕西省）"
       },
       "member_names": {
         "CN_CITY_17275852B13967783635879": {
@@ -4861,7 +6073,13 @@
           "en": "Xunyixian",
           "zh": "寻邑县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Binxian + Changwuxian + Xunyixian",
+        "zh": "宾县、长武县、寻邑县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B13967783635879"
     },
     {
       "id": "CN_MRG_293f7b8a3ba2",
@@ -4874,8 +6092,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Qianyangxian + Qishanxian + Linyouxian + Longxian + Fengxiangxian",
-        "zh": "千阳县、岐山县、临游县、陇县、凤翔县"
+        "en": "Fengxiangxian",
+        "zh": "凤翔县"
       },
       "member_names": {
         "CN_CITY_17275852B21304278263440": {
@@ -4898,7 +6116,13 @@
           "en": "Fengxiangxian",
           "zh": "凤翔县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Qianyangxian + Qishanxian + Linyouxian + Longxian + Fengxiangxian",
+        "zh": "千阳县、岐山县、临游县、陇县、凤翔县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B98192542852822"
     },
     {
       "id": "CN_MRG_bd402a3fa1f8",
@@ -4910,8 +6134,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Ningyuanxian + Yongzhou + Daoxian + Shuangpaixian",
-        "zh": "宁远县、永州、道县、双牌县"
+        "en": "Ningyuanxian",
+        "zh": "宁远县"
       },
       "member_names": {
         "CN_CITY_17275852B14415354149273": {
@@ -4930,7 +6154,13 @@
           "en": "Shuangpaixian",
           "zh": "双牌县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ningyuanxian + Yongzhou + Daoxian + Shuangpaixian",
+        "zh": "宁远县、永州、道县、双牌县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B14415354149273"
     },
     {
       "id": "CN_MRG_96d6919d5c64",
@@ -4942,8 +6172,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Dahuayaozuzizhixian + Donglanxian + Fengshanxian + Bamayaozuzizhixian",
-        "zh": "大化瑶族自治县、东兰县、凤山仙、巴马窑族自治县"
+        "en": "Bamayaozuzizhixian",
+        "zh": "巴马窑族自治县"
       },
       "member_names": {
         "CN_CITY_17275852B15295182424688": {
@@ -4962,7 +6192,13 @@
           "en": "Bamayaozuzizhixian",
           "zh": "巴马窑族自治县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dahuayaozuzizhixian + Donglanxian + Fengshanxian + Bamayaozuzizhixian",
+        "zh": "大化瑶族自治县、东兰县、凤山仙、巴马窑族自治县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B97789498538539"
     },
     {
       "id": "CN_MRG_a0f43f47d72e",
@@ -4973,8 +6209,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Baishuixian + Chengchengxian + Puchengxian",
-        "zh": "白水县、成城县、蒲城县"
+        "en": "Puchengxian (Shaanxi)",
+        "zh": "蒲城县（陕西省）"
       },
       "member_names": {
         "CN_CITY_17275852B15896822448675": {
@@ -4989,7 +6225,13 @@
           "en": "Puchengxian",
           "zh": "蒲城县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Baishuixian + Chengchengxian + Puchengxian",
+        "zh": "白水县、成城县、蒲城县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B49153306123360"
     },
     {
       "id": "CN_MRG_25e49cf89270",
@@ -5001,8 +6243,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Guzhangxian + Yongshunxian + Huayuanxian + Baojingxian",
-        "zh": "古丈县、永顺县、花园县、保靖县"
+        "en": "Yongshunxian",
+        "zh": "永顺县"
       },
       "member_names": {
         "CN_CITY_17275852B15433557997872": {
@@ -5021,7 +6263,13 @@
           "en": "Baojingxian",
           "zh": "保靖县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Guzhangxian + Yongshunxian + Huayuanxian + Baojingxian",
+        "zh": "古丈县、永顺县、花园县、保靖县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B35553151358336"
     },
     {
       "id": "CN_MRG_7e34a2c431cf",
@@ -5031,8 +6279,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Hanyinxian + Shiquanxian",
-        "zh": "汉阴县、石泉县"
+        "en": "Hanyinxian",
+        "zh": "汉阴县"
       },
       "member_names": {
         "CN_CITY_17275852B15592299634658": {
@@ -5043,7 +6291,13 @@
           "en": "Shiquanxian",
           "zh": "石泉县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hanyinxian + Shiquanxian",
+        "zh": "汉阴县、石泉县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B15592299634658"
     },
     {
       "id": "CN_MRG_e4d1257a0bd1",
@@ -5054,8 +6308,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Langaoxian + Zhenpingxian + Pinglixian",
-        "zh": "岚高县、镇平县、平利县"
+        "en": "Pinglixian",
+        "zh": "平利县"
       },
       "member_names": {
         "CN_CITY_17275852B76880456470909": {
@@ -5070,7 +6324,13 @@
           "en": "Pinglixian",
           "zh": "平利县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Langaoxian + Zhenpingxian + Pinglixian",
+        "zh": "岚高县、镇平县、平利县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B99126402028408"
     },
     {
       "id": "CN_MRG_b59c07833274",
@@ -5082,8 +6342,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Danfengxian + Shangnanxian + Luonanxian + Shanyangxian",
-        "zh": "丹凤县、上南县、洛南县、山阳县"
+        "en": "Luonanxian",
+        "zh": "洛南县"
       },
       "member_names": {
         "CN_CITY_17275852B16991484935868": {
@@ -5102,7 +6362,13 @@
           "en": "Shanyangxian",
           "zh": "山阳县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Danfengxian + Shangnanxian + Luonanxian + Shanyangxian",
+        "zh": "丹凤县、上南县、洛南县、山阳县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B53979328510347"
     },
     {
       "id": "CN_MRG_3fcfe274ae51",
@@ -5112,8 +6378,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Rongshuimiaozuzizhixian + Ronganxian",
-        "zh": "融水苗族自治县、融安县"
+        "en": "Rongshuimiaozuzizhixian",
+        "zh": "融水苗族自治县"
       },
       "member_names": {
         "CN_CITY_17275852B3705885122066": {
@@ -5124,7 +6390,13 @@
           "en": "Ronganxian",
           "zh": "融安县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rongshuimiaozuzizhixian + Ronganxian",
+        "zh": "融水苗族自治县、融安县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B3705885122066"
     },
     {
       "id": "CN_MRG_20fbce9fead7",
@@ -5135,8 +6407,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Chengguxian + Fopingxian + Yangxian",
-        "zh": "城固县、佛坪县、洋县"
+        "en": "Chengguxian",
+        "zh": "城固县"
       },
       "member_names": {
         "CN_CITY_17275852B21017336593321": {
@@ -5151,7 +6423,13 @@
           "en": "Yangxian",
           "zh": "洋县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Chengguxian + Fopingxian + Yangxian",
+        "zh": "城固县、佛坪县、洋县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B21017336593321"
     },
     {
       "id": "CN_MRG_ee37cc33a1fc",
@@ -5161,8 +6439,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Nanxian + Yuanjiang",
-        "zh": "南县、元江"
+        "en": "Nanxian",
+        "zh": "南县"
       },
       "member_names": {
         "CN_CITY_17275852B48723612203998": {
@@ -5173,7 +6451,13 @@
           "en": "Yuanjiang",
           "zh": "元江"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nanxian + Yuanjiang",
+        "zh": "南县、元江"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B48723612203998"
     },
     {
       "id": "CN_MRG_5af65ef24d47",
@@ -5183,8 +6467,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Miluo + Pingjiangxian",
-        "zh": "汨罗、平江县"
+        "en": "Miluo",
+        "zh": "汨罗"
       },
       "member_names": {
         "CN_CITY_17275852B51477400341578": {
@@ -5195,7 +6479,13 @@
           "en": "Pingjiangxian",
           "zh": "平江县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Miluo + Pingjiangxian",
+        "zh": "汨罗、平江县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B51477400341578"
     },
     {
       "id": "CN_MRG_f7ffc8864b6f",
@@ -5206,8 +6496,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Longhuixian + Suiningxian + Dongkouxian",
-        "zh": "龙回县、睢宁县、洞口县"
+        "en": "Longhuixian",
+        "zh": "龙回县"
       },
       "member_names": {
         "CN_CITY_17275852B18116448173822": {
@@ -5222,7 +6512,13 @@
           "en": "Dongkouxian",
           "zh": "洞口县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Longhuixian + Suiningxian + Dongkouxian",
+        "zh": "龙回县、睢宁县、洞口县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B18116448173822"
     },
     {
       "id": "CN_MRG_e27f5cb03fed",
@@ -5232,8 +6528,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Chishui + Xishuixian",
-        "zh": "赤水、习水县"
+        "en": "Xishuixian (Guizhou)",
+        "zh": "习水县（贵州省）"
       },
       "member_names": {
         "CN_CITY_17275852B19549053034507": {
@@ -5244,7 +6540,13 @@
           "en": "Xishuixian",
           "zh": "习水县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Chishui + Xishuixian",
+        "zh": "赤水、习水县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B66126931571645"
     },
     {
       "id": "CN_MRG_2b668454dc72",
@@ -5255,8 +6557,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Xingrenxian + Puanxian + Qinglongxian",
-        "zh": "兴仁县、普安县、晴隆县"
+        "en": "Xingrenxian",
+        "zh": "兴仁县"
       },
       "member_names": {
         "CN_CITY_17275852B67915553823587": {
@@ -5271,7 +6573,13 @@
           "en": "Qinglongxian",
           "zh": "晴隆县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Xingrenxian + Puanxian + Qinglongxian",
+        "zh": "兴仁县、普安县、晴隆县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B67915553823587"
     },
     {
       "id": "CN_MRG_8e007746d816",
@@ -5281,8 +6589,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Nayongxian + Zhijinxian",
-        "zh": "纳雍县、织金线"
+        "en": "Zhijinxian (Guizhou)",
+        "zh": "织金线（贵州省）"
       },
       "member_names": {
         "CN_CITY_17275852B78387074097744": {
@@ -5293,7 +6601,13 @@
           "en": "Zhijinxian",
           "zh": "织金线"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nayongxian + Zhijinxian",
+        "zh": "纳雍县、织金线"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B92361823429539"
     },
     {
       "id": "CN_MRG_787af341608b",
@@ -5305,8 +6619,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Xiangyuanxian + Tunliuxian + Qinxian + Qinyuanxian",
-        "zh": "象远县、屯留县、勤县、沁源县"
+        "en": "Xiangyuanxian",
+        "zh": "象远县"
       },
       "member_names": {
         "CN_CITY_17275852B42815221346034": {
@@ -5325,7 +6639,13 @@
           "en": "Qinyuanxian",
           "zh": "沁源县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Xiangyuanxian + Tunliuxian + Qinxian + Qinyuanxian",
+        "zh": "象远县、屯留县、勤县、沁源县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B42815221346034"
     },
     {
       "id": "CN_MRG_08f0b7755ac2",
@@ -5335,8 +6655,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Qixian + Pingyaoxian",
-        "zh": "七贤、平遥县"
+        "en": "Pingyaoxian",
+        "zh": "平遥县"
       },
       "member_names": {
         "CN_CITY_17275852B86103581978560": {
@@ -5347,7 +6667,13 @@
           "en": "Pingyaoxian",
           "zh": "平遥县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Qixian + Pingyaoxian",
+        "zh": "七贤、平遥县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B94693859337976"
     },
     {
       "id": "CN_MRG_6cfe5096a6ab",
@@ -5358,8 +6684,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Yichuanxian + Luochuanxian + Huanglongxian",
-        "zh": "宜川县、洛川县、黄龙县"
+        "en": "Luochuanxian",
+        "zh": "洛川县"
       },
       "member_names": {
         "CN_CITY_17275852B21100527045866": {
@@ -5374,7 +6700,13 @@
           "en": "Huanglongxian",
           "zh": "黄龙县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yichuanxian + Luochuanxian + Huanglongxian",
+        "zh": "宜川县、洛川县、黄龙县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B21944814919046"
     },
     {
       "id": "CN_MRG_03e48d4d8cb7",
@@ -5385,8 +6717,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Hengshanxian + Mizhixian + Yulin",
-        "zh": "横山县、米脂县、榆林"
+        "en": "Yulin (Shaanxi)",
+        "zh": "榆林（陕西省）"
       },
       "member_names": {
         "CN_CITY_17275852B21226359210240": {
@@ -5401,7 +6733,13 @@
           "en": "Yulin",
           "zh": "榆林"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hengshanxian + Mizhixian + Yulin",
+        "zh": "横山县、米脂县、榆林"
+      },
+      "name_source": "city",
+      "representative_id": "CN_CITY_17275852B78338650280434"
     },
     {
       "id": "CN_MRG_e3bada8615fa",
@@ -5412,8 +6750,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Zhaopingxian + Fuchuanyaozuzizhixian + Zhongshanxian",
-        "zh": "昭平县、富川瑶族自治县、中山县"
+        "en": "Zhongshanxian",
+        "zh": "中山县"
       },
       "member_names": {
         "CN_CITY_17275852B21404145859662": {
@@ -5428,7 +6766,13 @@
           "en": "Zhongshanxian",
           "zh": "中山县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zhaopingxian + Fuchuanyaozuzizhixian + Zhongshanxian",
+        "zh": "昭平县、富川瑶族自治县、中山县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B81653312527897"
     },
     {
       "id": "CN_MRG_abf8e714368a",
@@ -5442,8 +6786,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Ziyuanxian + Gongchengyaozuzizhixian + Xinganxian + Lingchuanxian + Guanyangxian + Quanzhouxian",
-        "zh": "紫苑县、恭城瑶族自治县、新干县、陵川县、灌阳县、泉州县"
+        "en": "Quanzhouxian",
+        "zh": "泉州县"
       },
       "member_names": {
         "CN_CITY_17275852B22147912838561": {
@@ -5470,7 +6814,13 @@
           "en": "Quanzhouxian",
           "zh": "泉州县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ziyuanxian + Gongchengyaozuzizhixian + Xinganxian + Lingchuanxian + Guanyangxian + Quanzhouxian",
+        "zh": "紫苑县、恭城瑶族自治县、新干县、陵川县、灌阳县、泉州县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B77313722911095"
     },
     {
       "id": "CN_MRG_6dbf8b5106e5",
@@ -5481,8 +6831,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Mayangmiaozuzizhixian + Chenxixian + Xupuxian",
-        "zh": "麻阳苗族自治县、陈溪贤、溆浦县"
+        "en": "Xupuxian",
+        "zh": "溆浦县"
       },
       "member_names": {
         "CN_CITY_17275852B22216868831768": {
@@ -5497,7 +6847,13 @@
           "en": "Xupuxian",
           "zh": "溆浦县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mayangmiaozuzizhixian + Chenxixian + Xupuxian",
+        "zh": "麻阳苗族自治县、陈溪贤、溆浦县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B92967278599953"
     },
     {
       "id": "CN_MRG_33a2768f5b98",
@@ -5507,8 +6863,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Luxixian + Jishou",
-        "zh": "泸西县、吉首"
+        "en": "Jishou",
+        "zh": "吉首"
       },
       "member_names": {
         "CN_CITY_17275852B38679457330989": {
@@ -5519,7 +6875,13 @@
           "en": "Jishou",
           "zh": "吉首"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Luxixian + Jishou",
+        "zh": "泸西县、吉首"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B45646665441180"
     },
     {
       "id": "CN_MRG_38c583fdd544",
@@ -5530,8 +6892,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Linlixian + Lixian + Shimenxian",
-        "zh": "临澧县、澧县、石门县"
+        "en": "Jinshi",
+        "zh": "津市"
       },
       "member_names": {
         "CN_CITY_17275852B22870349933730": {
@@ -5546,7 +6908,13 @@
           "en": "Shimenxian",
           "zh": "石门县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Linlixian + Lixian + Shimenxian",
+        "zh": "临澧县、澧县、石门县"
+      },
+      "name_source": "city",
+      "representative_id": "CN_CITY_17275852B90974000054978"
     },
     {
       "id": "CN_MRG_011734794f16",
@@ -5558,8 +6926,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Lintongxian + Lantianxian + Gaoling + Changanxian",
-        "zh": "临潼县、蓝田县、高岭、长安县"
+        "en": "Lintongxian",
+        "zh": "临潼县"
       },
       "member_names": {
         "CN_CITY_17275852B22970456667649": {
@@ -5578,7 +6946,13 @@
           "en": "Changanxian",
           "zh": "长安县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lintongxian + Lantianxian + Gaoling + Changanxian",
+        "zh": "临潼县、蓝田县、高岭、长安县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B22970456667649"
     },
     {
       "id": "CN_MRG_b254335108f6",
@@ -5590,8 +6964,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Zhaodongxian + Zhaoyangxian + Xinzhaoxian + Xinlingxian",
-        "zh": "肇东县、昭阳县、新昭县、新陵县"
+        "en": "Shaoyang (Hunan)",
+        "zh": "邵阳（湖南省）"
       },
       "member_names": {
         "CN_CITY_17275852B45551980478134": {
@@ -5610,7 +6984,13 @@
           "en": "Xinlingxian",
           "zh": "新陵县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zhaodongxian + Zhaoyangxian + Xinzhaoxian + Xinlingxian",
+        "zh": "肇东县、昭阳县、新昭县、新陵县"
+      },
+      "name_source": "city",
+      "representative_id": "CN_CITY_17275852B72472413631255"
     },
     {
       "id": "CN_MRG_f548e602acc9",
@@ -5621,8 +7001,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Meitanxian + Suiyangxian + Zhenganxian",
-        "zh": "湄潭县、睢阳县、正安县"
+        "en": "Zhenganxian",
+        "zh": "正安县"
       },
       "member_names": {
         "CN_CITY_17275852B24603325650065": {
@@ -5637,7 +7017,13 @@
           "en": "Zhenganxian",
           "zh": "正安县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Meitanxian + Suiyangxian + Zhenganxian",
+        "zh": "湄潭县、睢阳县、正安县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B56427926968047"
     },
     {
       "id": "CN_MRG_4508995da9a6",
@@ -5647,8 +7033,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Zhunyixian + Tongzhixian",
-        "zh": "遵义县、同治县"
+        "en": "Zhunyixian",
+        "zh": "遵义县"
       },
       "member_names": {
         "CN_CITY_17275852B28786375442580": {
@@ -5659,7 +7045,13 @@
           "en": "Tongzhixian",
           "zh": "同治县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zhunyixian + Tongzhixian",
+        "zh": "遵义县、同治县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B28786375442580"
     },
     {
       "id": "CN_MRG_e2dc46a8c2b2",
@@ -5672,8 +7064,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Zhidanxian + Ganquanxian + Fuxian + Huanglingxian + Ansaixian",
-        "zh": "志丹县、甘泉县、富县、黄陵县、安塞县"
+        "en": "Ansaixian",
+        "zh": "安塞县"
       },
       "member_names": {
         "CN_CITY_17275852B25721670330334": {
@@ -5696,7 +7088,13 @@
           "en": "Ansaixian",
           "zh": "安塞县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zhidanxian + Ganquanxian + Fuxian + Huanglingxian + Ansaixian",
+        "zh": "志丹县、甘泉县、富县、黄陵县、安塞县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B99998846476531"
     },
     {
       "id": "CN_MRG_00e6621cea37",
@@ -5707,8 +7105,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Taojiangxian + Yiyang + Anhuaxian",
-        "zh": "桃江县、益阳、安化县"
+        "en": "Anhuaxian",
+        "zh": "安化县"
       },
       "member_names": {
         "CN_CITY_17275852B92236610357248": {
@@ -5723,7 +7121,13 @@
           "en": "Anhuaxian",
           "zh": "安化县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Taojiangxian + Yiyang + Anhuaxian",
+        "zh": "桃江县、益阳、安化县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B99031090286931"
     },
     {
       "id": "CN_MRG_51e8f2b715e9",
@@ -5733,8 +7137,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Xiangxiang + Xiangtanxian",
-        "zh": "香香、湘潭县"
+        "en": "Xiangtanxian",
+        "zh": "湘潭县"
       },
       "member_names": {
         "CN_CITY_17275852B30234534234292": {
@@ -5745,7 +7149,13 @@
           "en": "Xiangtanxian",
           "zh": "湘潭县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Xiangxiang + Xiangtanxian",
+        "zh": "香香、湘潭县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B86900087147794"
     },
     {
       "id": "CN_MRG_224b4845f904",
@@ -5755,8 +7165,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Hengdongxian + Hengshanxian",
-        "zh": "横东县、横山县"
+        "en": "Hengdongxian",
+        "zh": "横东县"
       },
       "member_names": {
         "CN_CITY_17275852B36913005944946": {
@@ -5767,7 +7177,13 @@
           "en": "Hengshanxian",
           "zh": "横山县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hengdongxian + Hengshanxian",
+        "zh": "横东县、横山县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B36913005944946"
     },
     {
       "id": "CN_MRG_f9315adbf3b5",
@@ -5777,8 +7193,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Lianyuan + Shuangfengxian",
-        "zh": "涟源、双峰县"
+        "en": "Lianyuan",
+        "zh": "涟源"
       },
       "member_names": {
         "CN_CITY_17275852B57117829941514": {
@@ -5789,7 +7205,13 @@
           "en": "Shuangfengxian",
           "zh": "双峰县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lianyuan + Shuangfengxian",
+        "zh": "涟源、双峰县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B57117829941514"
     },
     {
       "id": "CN_MRG_ed13ca65f52b",
@@ -5801,8 +7223,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Wenxixian + Jishanxian + Xinjiangxian + Jiangxian",
-        "zh": "闻喜县、稷山县、新疆县、绛县"
+        "en": "Houma",
+        "zh": "侯马"
       },
       "member_names": {
         "CN_CITY_17275852B33861937081684": {
@@ -5821,7 +7243,13 @@
           "en": "Jiangxian",
           "zh": "绛县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Wenxixian + Jishanxian + Xinjiangxian + Jiangxian",
+        "zh": "闻喜县、稷山县、新疆县、绛县"
+      },
+      "name_source": "city",
+      "representative_id": "CN_CITY_17275852B61470591992739"
     },
     {
       "id": "CN_MRG_28be4724b847",
@@ -5832,8 +7260,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Zhenyuanxian + Sansuixian + Shibingxian",
-        "zh": "镇远县、三穗县、施秉县"
+        "en": "Zhenyuanxian (Guizhou)",
+        "zh": "镇远县（贵州省）"
       },
       "member_names": {
         "CN_CITY_17275852B28348637919965": {
@@ -5848,7 +7276,13 @@
           "en": "Shibingxian",
           "zh": "施秉县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zhenyuanxian + Sansuixian + Shibingxian",
+        "zh": "镇远县、三穗县、施秉县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B28348637919965"
     },
     {
       "id": "CN_MRG_3c1607582833",
@@ -5859,8 +7293,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Huangpingxian + Taijiangxian + Jianhexian",
-        "zh": "黄平县、台江县、剑河县"
+        "en": "Huangpingxian",
+        "zh": "黄平县"
       },
       "member_names": {
         "CN_CITY_17275852B51623847556135": {
@@ -5875,7 +7309,13 @@
           "en": "Jianhexian",
           "zh": "剑河县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Huangpingxian + Taijiangxian + Jianhexian",
+        "zh": "黄平县、台江县、剑河县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B51623847556135"
     },
     {
       "id": "CN_MRG_ce6e418fb13a",
@@ -5889,8 +7329,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Tianzhenxian + Datongxian + Guanglingxian + Lingqiuxian + Hunyuanxian + Yanggaoxian",
-        "zh": "天镇县、大同县、广陵县、灵丘县、浑源县、阳高县"
+        "en": "Hunyuanxian",
+        "zh": "浑源县"
       },
       "member_names": {
         "CN_CITY_17275852B3191374563012": {
@@ -5917,7 +7357,13 @@
           "en": "Yanggaoxian",
           "zh": "阳高县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tianzhenxian + Datongxian + Guanglingxian + Lingqiuxian + Hunyuanxian + Yanggaoxian",
+        "zh": "天镇县、大同县、广陵县、灵丘县、浑源县、阳高县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B47591156995264"
     },
     {
       "id": "CN_MRG_15274e317fd6",
@@ -5929,8 +7375,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Yichengxian + Fushanxian + Houma + Quwoxian",
-        "zh": "宜城县、浮山县、侯马、曲沃县"
+        "en": "Yichengxian",
+        "zh": "宜城县"
       },
       "member_names": {
         "CN_CITY_17275852B35804698691087": {
@@ -5949,7 +7395,13 @@
           "en": "Quwoxian",
           "zh": "曲沃县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yichengxian + Fushanxian + Houma + Quwoxian",
+        "zh": "宜城县、浮山县、侯马、曲沃县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B35804698691087"
     },
     {
       "id": "CN_MRG_6a93b7948d7c",
@@ -5959,8 +7411,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Zhenningbuyizumiaozuzizhixian + Guanlingbuyizumiaozuzizhixian",
-        "zh": "镇宁布依族苗族自治县、关岭布依族苗族自治县"
+        "en": "Guanlingbuyizumiaozuzizhixian",
+        "zh": "关岭布依族苗族自治县"
       },
       "member_names": {
         "CN_CITY_17275852B36752743694305": {
@@ -5971,7 +7423,13 @@
           "en": "Guanlingbuyizumiaozuzizhixian",
           "zh": "关岭布依族苗族自治县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zhenningbuyizumiaozuzizhixian + Guanlingbuyizumiaozuzizhixian",
+        "zh": "镇宁布依族苗族自治县、关岭布依族苗族自治县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B94455930416876"
     },
     {
       "id": "CN_MRG_5fbd1e9aa77f",
@@ -5982,8 +7440,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Zhenfengxian + Anlongxian + Cehengxian",
-        "zh": "贞丰县、安龙县、册横县"
+        "en": "Anlongxian",
+        "zh": "安龙县"
       },
       "member_names": {
         "CN_CITY_17275852B44999461452722": {
@@ -5998,7 +7456,13 @@
           "en": "Cehengxian",
           "zh": "册横县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zhenfengxian + Anlongxian + Cehengxian",
+        "zh": "贞丰县、安龙县、册横县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B5924538173176"
     },
     {
       "id": "CN_MRG_9a5f1e882f00",
@@ -6010,8 +7474,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Yinjiangtujiazumiaozuzizhixian + Sinanxian + Jiangkouxian + Tongren",
-        "zh": "印江土家族苗族自治县、思南县、江口县、铜仁"
+        "en": "Tongren",
+        "zh": "铜仁"
       },
       "member_names": {
         "CN_CITY_17275852B37148110931226": {
@@ -6030,7 +7494,13 @@
           "en": "Tongren",
           "zh": "铜仁"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yinjiangtujiazumiaozuzizhixian + Sinanxian + Jiangkouxian + Tongren",
+        "zh": "印江土家族苗族自治县、思南县、江口县、铜仁"
+      },
+      "name_source": "city",
+      "representative_id": "CN_CITY_17275852B95161944311697"
     },
     {
       "id": "CN_MRG_987772a55e2a",
@@ -6040,8 +7510,8 @@
       ],
       "parent_id": "CN_Guizhou",
       "names": {
-        "en": "Yanhetujiazuzizhixian + Dejiangxian",
-        "zh": "沿河土家族自治县、德江县"
+        "en": "Yanhetujiazuzizhixian",
+        "zh": "沿河土家族自治县"
       },
       "member_names": {
         "CN_CITY_17275852B62846804466804": {
@@ -6052,7 +7522,13 @@
           "en": "Dejiangxian",
           "zh": "德江县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yanhetujiazuzizhixian + Dejiangxian",
+        "zh": "沿河土家族自治县、德江县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B62846804466804"
     },
     {
       "id": "CN_MRG_3cb8ad8288ff",
@@ -6062,8 +7538,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Anzhexian + Changzixian",
-        "zh": "安泽县、长子县"
+        "en": "Changzixian",
+        "zh": "长子县"
       },
       "member_names": {
         "CN_CITY_17275852B44333012315851": {
@@ -6074,7 +7550,13 @@
           "en": "Changzixian",
           "zh": "长子县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Anzhexian + Changzixian",
+        "zh": "安泽县、长子县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B61772244043024"
     },
     {
       "id": "CN_MRG_31ba4a677ea0",
@@ -6085,8 +7567,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Fenxixian + Guxian + Hongtongxian",
-        "zh": "汾西县、古县、洪洞县"
+        "en": "Hongtongxian",
+        "zh": "洪洞县"
       },
       "member_names": {
         "CN_CITY_17275852B4659725270810": {
@@ -6101,7 +7583,13 @@
           "en": "Hongtongxian",
           "zh": "洪洞县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Fenxixian + Guxian + Hongtongxian",
+        "zh": "汾西县、古县、洪洞县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B97203796912274"
     },
     {
       "id": "CN_MRG_bcac2fdc52e8",
@@ -6111,8 +7599,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Yangchengxian + Qinshuixian",
-        "zh": "阳城县、沁水县"
+        "en": "Yangchengxian",
+        "zh": "阳城县"
       },
       "member_names": {
         "CN_CITY_17275852B51290588380796": {
@@ -6123,7 +7611,13 @@
           "en": "Qinshuixian",
           "zh": "沁水县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yangchengxian + Qinshuixian",
+        "zh": "阳城县、沁水县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B51290588380796"
     },
     {
       "id": "CN_MRG_323d6e10e986",
@@ -6133,8 +7627,8 @@
       ],
       "parent_id": "CN_Shaanxi",
       "names": {
-        "en": "Baihexian + Xunyangxian",
-        "zh": "白河县、旬阳县"
+        "en": "Xunyangxian",
+        "zh": "旬阳县"
       },
       "member_names": {
         "CN_CITY_17275852B44985225082096": {
@@ -6145,7 +7639,13 @@
           "en": "Xunyangxian",
           "zh": "旬阳县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Baihexian + Xunyangxian",
+        "zh": "白河县、旬阳县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B47814877183274"
     },
     {
       "id": "CN_MRG_14e9e4cde2f8",
@@ -6155,8 +7655,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Jingzhoumiaozhudongzuzizhixian + Tongzhoudongzuzizhixian",
-        "zh": "荆州庙珠洞祖子之线、通州东族自治县"
+        "en": "Jingzhoumiaozhudongzuzizhixian",
+        "zh": "荆州庙珠洞祖子之线"
       },
       "member_names": {
         "CN_CITY_17275852B46408721575403": {
@@ -6166,6 +7666,18 @@
         "CN_CITY_17275852B99235497139571": {
           "en": "Tongzhoudongzuzizhixian",
           "zh": "通州东族自治县"
+        }
+      },
+      "previous_names": {
+        "en": "Jingzhoumiaozhudongzuzizhixian + Tongzhoudongzuzizhixian",
+        "zh": "荆州庙珠洞祖子之线、通州东族自治县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B46408721575403",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jingzhoumiaozhudongzuzizhixian",
+          "zh": "荆州苗族侗族自治县"
         }
       }
     },
@@ -6178,8 +7690,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Lucheng + Huguanxian + Pingshunxian",
-        "zh": "鹿城、壶关县、平顺县"
+        "en": "Huguanxian",
+        "zh": "壶关县"
       },
       "member_names": {
         "CN_CITY_17275852B47556128611215": {
@@ -6194,7 +7706,13 @@
           "en": "Pingshunxian",
           "zh": "平顺县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lucheng + Huguanxian + Pingshunxian",
+        "zh": "鹿城、壶关县、平顺县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B88337115455465"
     },
     {
       "id": "CN_MRG_005ada82e050",
@@ -6204,8 +7722,8 @@
       ],
       "parent_id": "CN_Shanxi",
       "names": {
-        "en": "Gaoping + Lingchuanxian",
-        "zh": "高平、陵川县"
+        "en": "Gaoping",
+        "zh": "高平"
       },
       "member_names": {
         "CN_CITY_17275852B56366929075393": {
@@ -6216,7 +7734,13 @@
           "en": "Lingchuanxian",
           "zh": "陵川县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Gaoping + Lingchuanxian",
+        "zh": "高平、陵川县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B56366929075393"
     },
     {
       "id": "CN_MRG_9712017200b8",
@@ -6226,8 +7750,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Pingnanxian + Guiping",
-        "zh": "屏南县、桂平"
+        "en": "Guiping",
+        "zh": "桂平"
       },
       "member_names": {
         "CN_CITY_17275852B54668809399872": {
@@ -6238,7 +7762,13 @@
           "en": "Guiping",
           "zh": "桂平"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pingnanxian + Guiping",
+        "zh": "屏南县、桂平"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B58322219662995"
     },
     {
       "id": "CN_MRG_6be183a6cf2d",
@@ -6249,8 +7779,8 @@
       ],
       "parent_id": "CN_Guangxi",
       "names": {
-        "en": "Wuxuanxian + Jinxiuyaozuzizhixian + Xiangzhouxian",
-        "zh": "武宣县、金秀瑶族自治县、香洲县"
+        "en": "Wuxuanxian",
+        "zh": "武宣县"
       },
       "member_names": {
         "CN_CITY_17275852B5503806020979": {
@@ -6265,7 +7795,13 @@
           "en": "Xiangzhouxian",
           "zh": "香洲县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Wuxuanxian + Jinxiuyaozuzizhixian + Xiangzhouxian",
+        "zh": "武宣县、金秀瑶族自治县、香洲县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B5503806020979"
     },
     {
       "id": "CN_MRG_41df7818325c",
@@ -6275,8 +7811,8 @@
       ],
       "parent_id": "CN_Hunan",
       "names": {
-        "en": "Liling + Zhuzhouxian",
-        "zh": "醴陵、株洲县"
+        "en": "Liling",
+        "zh": "醴陵"
       },
       "member_names": {
         "CN_CITY_17275852B58036174254783": {
@@ -6287,7 +7823,13 @@
           "en": "Zhuzhouxian",
           "zh": "株洲县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Liling + Zhuzhouxian",
+        "zh": "醴陵、株洲县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B58036174254783"
     }
   ],
   "split_or_reduced_candidates": [

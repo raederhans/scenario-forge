@@ -6,7 +6,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c78e9571a541",
-        "name": "Shilovsky District + Spassky District",
+        "name": "Shilovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -4643,7 +4643,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b8675f108fd4",
-        "name": "Pitelinsky District + Sasovsky District",
+        "name": "Sasovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -12042,7 +12042,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_56cbe6d02d2f",
-        "name": "Klepikovsky District + Kasimov + Kasimovsky District",
+        "name": "Kasimov",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -28525,7 +28525,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f49f6eed3fd4",
-        "name": "Kolomensky District + городской округ Озёры",
+        "name": "Kolomensky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -57255,7 +57255,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f75032a5f7dc",
-        "name": "Ramensky District + Zhukovsky",
+        "name": "Ramensky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -76875,7 +76875,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3d995b252c3d",
-        "name": "Ryazansky District + Rybnovsky District",
+        "name": "Ryazansky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -92206,7 +92206,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bc039a5db22c",
-        "name": "Melenkovsky District + Gus-Khrustalny District + городской округ Гусь-Хруст",
+        "name": "Gus'-Khrustal'nyy",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -102158,7 +102158,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7877124b56e9",
-        "name": "Raduzhny + Sudogodsky District",
+        "name": "Sudogodsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -109586,7 +109586,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c651c5ba9d10",
-        "name": "городской округ Павловский + Elektrogorsk",
+        "name": "городской округ Павловский",
         "cntr_code": "RU",
         "__source": "detail"
       },

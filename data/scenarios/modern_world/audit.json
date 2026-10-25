@@ -645,13 +645,13 @@
   "profile": "lightweight_base",
   "reverse_coverage_gap_count": 0,
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "0c1571da772cdf001f8d448975b18f13cac8302147913b67e882179884b0776d",
+  "snapshot_fingerprint": "204207c4639c7a37f761ab1dac7885c7f0ae9b0f42736189b69595e9f85c3be9",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "f15f6892c6da6f93377d180cb7c2033bbc7fc0da3fa0543dc39d5937e6a08695",
+    "build_snapshot_sha256": "f298c29086cfae9e0f44a6a1e0c693dfbcc81d94eb4185ed78492de63cc37a26",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
-    "runtime_topology_sha256": "45b95690d9b049129a83ee59af892419cd4279d630630300637b0c24b66d9703",
+    "runtime_topology_sha256": "7929a0a56b35c65ec56c4c224c59398424cc29324f43e61951c3dc1b177db4fb",
     "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a"
   },
   "summary": {

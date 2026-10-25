@@ -14619,7 +14619,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_2abe6bddb595",
-        "name": "Karymsky District + Shilkinsky District + Duldurginsky District",
+        "name": "Shilkinsky District",
         "cntr_code": "CHT",
         "__source": "detail"
       },
@@ -20074,7 +20074,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b99b9e1ffaef",
-        "name": "Olovyanninsky District + Mogoytuysky District + Aginsky District",
+        "name": "Olovyanninsky District",
         "cntr_code": "CHT",
         "__source": "detail"
       },
@@ -24377,7 +24377,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6d68a0fd3c3c",
-        "name": "Baleysky District + Alexandrovo-Zavodsky District + Shelopuginsky District",
+        "name": "Baleysky District",
         "cntr_code": "CHT",
         "__source": "detail"
       },
@@ -35418,7 +35418,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_59f6abe0ef5a",
-        "name": "Sretensky District + Nerchinsky District + Chernyshevsky District",
+        "name": "Chernyshevsky District",
         "cntr_code": "CHT",
         "__source": "detail"
       },

@@ -13628,7 +13628,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_04653bd2eb88",
-        "name": "Lysogorsky District + Krasnoarmeysky District",
+        "name": "Krasnoarmeysk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -49153,7 +49153,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7fa31900ba72",
-        "name": "Sovetsky District + Krasnokutsky + Marksovsky District",
+        "name": "Marksovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -96204,7 +96204,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e82122fbf2b7",
-        "name": "Atkarsky District + Yekaterinovsky District + Petrovsky District",
+        "name": "Atkarsk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -102679,7 +102679,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_23ee001da084",
-        "name": "Kameshkirsky District + Lopatinsky District + Maloserdobinsky District",
+        "name": "Lopatinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -107736,7 +107736,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c3b8cb206f5e",
-        "name": "Shemysheysky District + Kolyshleysky District + Penzensky District",
+        "name": "Penzensky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -126362,7 +126362,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_7255406b3d18",
-        "name": "Pavlovsky District + Starokulatkinsky District",
+        "name": "Pavlovsky District (Ulyanovsk)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -162199,7 +162199,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8dec32e7062d",
-        "name": "Luninsky District + Bessonovsky District + Issinsky District",
+        "name": "Bessonovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -168792,7 +168792,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_63a26ed5110c",
-        "name": "Ruzayevsky District + Kochkurovsky District",
+        "name": "Ruzayevka",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -187847,7 +187847,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a7a4db360f52",
-        "name": "Gorodishchensky District + Sosnovoborsky District",
+        "name": "Gorodishchensky District (Penza)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -192698,7 +192698,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_331d25aa905a",
-        "name": "Terengulsky District + Baryshsky District + Kuzovatovsky District",
+        "name": "Baryshsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -214881,7 +214881,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e94d69805ef1",
-        "name": "Maynsky District + Karsunsky District",
+        "name": "Maynsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },

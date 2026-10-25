@@ -1358,11 +1358,11 @@
   "sources": [
     {
       "path": "data/scenarios/hoi4_1939/manifest.json",
-      "sha256": "224cea30a005b4deb094702dff396745b501b234abd90979e4d07b2a26e8d95d"
+      "sha256": "45d30313eddd2edba328dca4ede24d137be1855824c046b0be7e04d3df748c02"
     },
     {
       "path": "data/scenarios/hoi4_1939/detail_chunks.manifest.json",
-      "sha256": "6b9186e17e6d26148e840604dcaddbde91d6bebfd430a1feb351a068cd7e79ce"
+      "sha256": "a6cda17fb3b73e9997ceb4448c8a68bdd2d70d776908ad66d0b5ac39f46b0de6"
     },
     {
       "path": "data/scenarios/hoi4_1939/runtime_topology.bootstrap.topo.json",

@@ -217,7 +217,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_61ce738540d1",
-        "name": "Shkotovsky District + ЗАТО Фокино + Partizansk",
+        "name": "Partizansk",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -721,7 +721,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_fbedb5ba4063",
-        "name": "Anuchinsky District + Partizansky District",
+        "name": "Partizansky District (Primorsky Krai)",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -1076,7 +1076,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_41fee6249b5d",
-        "name": "Olginsky District + Kavalerovsky District + Chuguyevsky District",
+        "name": "Kavalerovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -2005,7 +2005,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_60d7253b0e0a",
-        "name": "Лесозаводский городской ок + Кировский район + Yakovlevsky District",
+        "name": "Лесозаводский городской ок",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -4501,7 +4501,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d5cd5d634999",
-        "name": "Anivsky District + Honto District + Maoka District",
+        "name": "Maoka District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -6946,7 +6946,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_248dd5882219",
-        "name": "Makarovsky District + Dolinsky District + Tomarinsky District",
+        "name": "Dolinsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -9509,7 +9509,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6b0074e9f94b",
-        "name": "Uglegorsky District + Smirnykhovsky District + Poronaysky District",
+        "name": "Poronaysky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -11935,7 +11935,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_5dbc0427f580",
-        "name": "Tymovsky District + Nogliksky District",
+        "name": "Tymovsky District",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",

@@ -93352,7 +93352,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_954f62972ce9",
-        "name": "Burleson County + Lee County + Williamson County",
+        "name": "Williamson County (Texas)",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -93926,7 +93926,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_89b358d4e879",
-        "name": "Duval County + Jim Wells County + Kleberg County",
+        "name": "Kingsville",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -94410,7 +94410,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_5a47c06a2dc5",
-        "name": "San Augustine County + Shelby County",
+        "name": "Shelby County (Texas)",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -95236,7 +95236,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_615a68fb03f7",
-        "name": "Brazoria County + Fort Bend County + Waller County",
+        "name": "Freeport",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -95647,7 +95647,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_03d789d015aa",
-        "name": "Ellis County + Johnson County",
+        "name": "Cleburne",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -96036,7 +96036,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_9621d87995de",
-        "name": "Camp County + Gregg County + Upshur County",
+        "name": "Longview",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -96309,7 +96309,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_fa26f33714d2",
-        "name": "Leon County + Madison County",
+        "name": "Leon County (Texas)",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -96544,7 +96544,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_f1682b432a7b",
-        "name": "Hill County + Limestone County + Navarro County",
+        "name": "Navarro County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -96854,7 +96854,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_548f11247301",
-        "name": "Kaufman County + Rockwall County + Van Zandt County",
+        "name": "Kaufman County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -96973,7 +96973,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_c5062d5fe295",
-        "name": "Crosby County + Dickens County + Kent County",
+        "name": "Crosby County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -97028,7 +97028,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_36c9a8886b71",
-        "name": "Crockett County + Schleicher County + Sutton County",
+        "name": "Sutton County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -97203,7 +97203,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_7d307bfcd590",
-        "name": "Mitchell County + Nolan County + Scurry County",
+        "name": "Scurry County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -99110,7 +99110,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_b167b3b770f9",
-        "name": "Cochran County + Hockley County + Terry County",
+        "name": "Hockley County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -99303,7 +99303,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_4f6a788187a4",
-        "name": "Colorado County + Lavaca County + Wharton County",
+        "name": "Wharton County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -99494,7 +99494,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_f288cf4fe69b",
-        "name": "Ward County + Winkler County",
+        "name": "Ward County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -99641,7 +99641,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_98c46952922a",
-        "name": "Anderson County + Houston County",
+        "name": "Anderson County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -100247,7 +100247,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_867046e7ad47",
-        "name": "Cottle County + Floyd County + Motley County",
+        "name": "Floyd County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -100314,7 +100314,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_e3fbfb93451d",
-        "name": "DeWitt County + Victoria County",
+        "name": "Victoria",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -100493,7 +100493,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_47bf661f9403",
-        "name": "Franklin County + Hopkins County + Titus County",
+        "name": "Hopkins County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -100842,7 +100842,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_23dc6cc6e2e4",
-        "name": "Polk County + Trinity County",
+        "name": "Polk County (Texas)",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -101045,7 +101045,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_8831594160d2",
-        "name": "Austin County + Washington County",
+        "name": "Washington County (Texas)",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -101997,7 +101997,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_36d7642c780b",
-        "name": "King County + Knox County + Stonewall County",
+        "name": "Knox County (Texas)",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -102870,7 +102870,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_b97e9b932c3f",
-        "name": "Crane County + Reagan County + Upton County",
+        "name": "Crane County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -102961,7 +102961,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_b4d3754acb9d",
-        "name": "Jasper County + Newton County + Sabine County",
+        "name": "Jasper County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -103380,7 +103380,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_adb56f6301de",
-        "name": "Culberson County + Reeves County",
+        "name": "Pecos",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -103567,7 +103567,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_288c105ab692",
-        "name": "Briscoe County + Hall County + Swisher County",
+        "name": "Swisher County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -104549,7 +104549,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_daa505131e1c",
-        "name": "Harrison County + Marion County",
+        "name": "Harrison County (Texas)",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -104930,7 +104930,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_bd1072ae78b5",
-        "name": "Uvalde County + Zavala County",
+        "name": "Uvalde County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -104977,7 +104977,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_6a0cd1283040",
-        "name": "Cherokee County + Rusk County",
+        "name": "Rusk County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -105244,7 +105244,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_e5ff30356db3",
-        "name": "Andrews County + Howard County + Martin County",
+        "name": "Big Spring",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -105625,7 +105625,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_c69bb874c34c",
-        "name": "Calhoun County + Jackson County",
+        "name": "Port Lavaca",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -105874,7 +105874,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_8d4f8a0a88ae",
-        "name": "Jack County + Wise County",
+        "name": "Wise County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -105929,7 +105929,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_853623a78a85",
-        "name": "Kimble County + Menard County",
+        "name": "Kimble County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -105992,7 +105992,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_f13d395034d8",
-        "name": "Burnet County + Coryell County + Lampasas County",
+        "name": "Coryell County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -106203,7 +106203,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_6cd8d362b705",
-        "name": "La Salle County + McMullen County",
+        "name": "La Salle County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -107189,7 +107189,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_d2dd8d229fc4",
-        "name": "Archer County + Young County",
+        "name": "Young County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -107531,7 +107531,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_1bbe9dc9722d",
-        "name": "Brown County + Mills County",
+        "name": "Brownwood",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -107909,7 +107909,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_57a856465415",
-        "name": "Garza County + Lynn County",
+        "name": "Garza County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -108094,7 +108094,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_799779e62499",
-        "name": "Castro County + Parmer County",
+        "name": "Parmer County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -108303,7 +108303,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_c4e2ef408a02",
-        "name": "Comal County + Hays County",
+        "name": "New Braunfels",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -108469,7 +108469,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_17c9b14fc969",
-        "name": "Blanco County + Gillespie County",
+        "name": "Gillespie County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -108528,7 +108528,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_4b9ef4efd3fc",
-        "name": "Atascosa County + Live Oak County",
+        "name": "Atascosa County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -108603,7 +108603,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_4ae2dfdcec1e",
-        "name": "Donley County + Gray County",
+        "name": "Gray County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -108650,7 +108650,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_de187e0e2d96",
-        "name": "Brooks County + Jim Hogg County",
+        "name": "Falfurrias",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -108737,7 +108737,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_830e401b2939",
-        "name": "Hartley County + Oldham County",
+        "name": "Dalhart",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -108784,7 +108784,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_512211db3fed",
-        "name": "Borden County + Dawson County + Gaines County",
+        "name": "Gaines County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -108946,7 +108946,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_ee506a8a0124",
-        "name": "Cooke County + Grayson County + Montague County",
+        "name": "Sherman",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -109344,7 +109344,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_62c6af7a1cf7",
-        "name": "Lipscomb County + Ochiltree County",
+        "name": "Ochiltree County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -110261,7 +110261,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_0afc14e3e73d",
-        "name": "Dallam County + Sherman County",
+        "name": "Dallam County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -110359,7 +110359,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_6b6081bed14d",
-        "name": "Coke County + Runnels County + Sterling County",
+        "name": "Runnels County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -110504,7 +110504,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_ea19ceff3aed",
-        "name": "Kendall County + Kerr County",
+        "name": "Kerr County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -110839,7 +110839,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_a94a72637172",
-        "name": "Bastrop County + Fayette County",
+        "name": "Bastrop County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -111166,7 +111166,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_75ade1c370a1",
-        "name": "Bailey County + Hale County + Lamb County",
+        "name": "Hale County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -111513,7 +111513,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_f694e67d7337",
-        "name": "Hood County + Somervell County",
+        "name": "Hood County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -111607,7 +111607,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_2d17e071234f",
-        "name": "Concho County + Irion County + Tom Green County",
+        "name": "San Angelo",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -111726,7 +111726,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_6f6e5e61f8c1",
-        "name": "Haskell County + Throckmorton County",
+        "name": "Haskell County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -111773,7 +111773,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_394fc4c008ec",
-        "name": "Comanche County + Erath County",
+        "name": "Erath County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -111922,7 +111922,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_17d99f82ab74",
-        "name": "Armstrong County + Carson County + Hutchinson County",
+        "name": "Hutchinson County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -111977,7 +111977,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_741f098c1f8e",
-        "name": "Llano County + Mason County",
+        "name": "Llano County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -112878,7 +112878,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_7e1d539ceaf6",
-        "name": "Karnes County + Wilson County",
+        "name": "Wilson County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",
@@ -112961,7 +112961,7 @@
       "type": "Feature",
       "properties": {
         "id": "US_MRG_f34d06f162f6",
-        "name": "Jones County + Shackelford County",
+        "name": "Jones County",
         "cntr_code": "US",
         "admin1_group": "Texas",
         "detail_tier": "fine",

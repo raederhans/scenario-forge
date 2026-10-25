@@ -12617,7 +12617,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c6e84d1c3252",
-        "name": "Ufimsky District + Birsky District + Kushnarenkovsky District",
+        "name": "Birsk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -32293,7 +32293,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bb60e0c589a5",
-        "name": "Ilishevsky District + Dyurtyulinsky District",
+        "name": "Dyurtyulinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -62228,7 +62228,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a2a252b3eba6",
-        "name": "Sarapulsky District + Karakulinsky District",
+        "name": "Sarapulsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -83292,7 +83292,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_eeebe5fff052",
-        "name": "Kaltasinsky District + Yanaulsky District",
+        "name": "Yanaulsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -111604,7 +111604,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_71e52c27d399",
-        "name": "Votkinsk + Votkinsky District",
+        "name": "Votkinsk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -116459,7 +116459,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a5a5eeed1587",
-        "name": "Sharkansky District + Debyossky District",
+        "name": "Sharkansky District",
         "cntr_code": "RU",
         "__source": "detail"
       },

@@ -467,14 +467,6 @@
       "sha256": "e1cbd322f333e4f68351e49778071b3892bc5c2406b23fc47d98cc64928261c5"
     },
     {
-      "identity": "political-id-raster:v1:507e7bceff3a172db8259923af047e54955bf51be65a0b21e66eca5478b68bcc",
-      "url": "./81ceecc50b4d6ca25dc0726adf1b81e1be883088ee892e70f9b8df6e81da7636.pidr.gz",
-      "byteLength": 2830232,
-      "compression": "gzip",
-      "compressedByteLength": 811861,
-      "sha256": "81ceecc50b4d6ca25dc0726adf1b81e1be883088ee892e70f9b8df6e81da7636"
-    },
-    {
       "identity": "political-id-raster:v1:5153c803166214dda7b7c43bbab81979f37f5f41c7f5014693c601146f22d41d",
       "url": "./3d9d36427f0763336fb84302cbb496e6dc016d3822211d8126c9586d74f366da.pidr.gz",
       "byteLength": 1048744,
@@ -1358,11 +1350,11 @@
   "sources": [
     {
       "path": "data/scenarios/hoi4_1936/manifest.json",
-      "sha256": "0bfadd8905bce2630790879381d9ae21cbfc5eff11bb35c9bfb0c860f8244fc1"
+      "sha256": "28d1857fda4176ea11b93cae0e10bbd645fc90acf157eab8c50bf53e567cc39c"
     },
     {
       "path": "data/scenarios/hoi4_1936/detail_chunks.manifest.json",
-      "sha256": "16ef35c435eb49dcc86f453354f37a2512c2e52bf63c084764b28cb026cfeeff"
+      "sha256": "59beb25d876cb4e799380fa1653774ff916af939d9ee54f5388ded1126d47cb6"
     },
     {
       "path": "data/scenarios/hoi4_1936/runtime_topology.bootstrap.topo.json",

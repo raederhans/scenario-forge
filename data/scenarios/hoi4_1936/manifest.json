@@ -95,12 +95,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1936/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "d240457c8c852f1b05f7aba0e949aebb588e3c8f4ad1b6f239e57aa408ce0d2e",
+  "snapshot_fingerprint": "5944380b8a9c35a59aabd363cbc804b7c45fe9be57ccebc7b5a9b714b0f09f65",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "16ef35c435eb49dcc86f453354f37a2512c2e52bf63c084764b28cb026cfeeff",
+    "detail_chunk_manifest_sha256": "59beb25d876cb4e799380fa1653774ff916af939d9ee54f5388ded1126d47cb6",
     "runtime_bootstrap_topology_sha256": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
-    "runtime_topology_sha256": "817f900d81f38c38cb2c56da7fc2e2efea33571cb7038731e7c6869b54a03f2e"
+    "runtime_topology_sha256": "6f23ef699cd07e6c409846293ddf4c999efea3c636efbf9b1c51c7c78112c9f0"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1936/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",

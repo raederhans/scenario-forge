@@ -1,0 +1,104 @@
+{
+  "parents": {
+    "CN_Anhui": {
+      "en": "Anhui",
+      "zh": "安徽省"
+    },
+    "CN_Guangxi": {
+      "en": "Guangxi",
+      "zh": "广西壮族自治区"
+    },
+    "CN_Guizhou": {
+      "en": "Guizhou",
+      "zh": "贵州省"
+    },
+    "CN_Hebei": {
+      "en": "Hebei",
+      "zh": "河北省"
+    },
+    "CN_Henan": {
+      "en": "Henan",
+      "zh": "河南省"
+    },
+    "CN_Hunan": {
+      "en": "Hunan",
+      "zh": "湖南省"
+    },
+    "CN_Jiangxi": {
+      "en": "Jiangxi",
+      "zh": "江西省"
+    },
+    "CN_Shaanxi": {
+      "en": "Shaanxi",
+      "zh": "陕西省"
+    },
+    "CN_Shanxi": {
+      "en": "Shanxi",
+      "zh": "山西省"
+    },
+    "PL_Greater_Poland": {
+      "en": "Greater Poland",
+      "zh": "大波兰省"
+    },
+    "PL_Holy_Cross": {
+      "en": "Holy Cross",
+      "zh": "圣十字省"
+    },
+    "PL_Kuyavian_Pomeranian": {
+      "en": "Kuyavian-Pomeranian",
+      "zh": "库亚维-滨海省"
+    },
+    "PL_Lower_Silesian": {
+      "en": "Lower Silesian",
+      "zh": "下西里西亚省"
+    },
+    "PL_Lublin": {
+      "en": "Lublin",
+      "zh": "卢布林省"
+    },
+    "PL_Warmian_Masurian": {
+      "en": "Warmian-Masurian",
+      "zh": "瓦尔米亚-马祖里省"
+    },
+    "RU_Altai_Republic": {
+      "en": "Altai Krai",
+      "zh": "阿尔泰边疆区"
+    },
+    "RU_Chechen_Republic": {
+      "en": "Chechnya",
+      "zh": "车臣共和国"
+    },
+    "RU_Kaluga": {
+      "en": "Kaluga",
+      "zh": "卡卢加州"
+    },
+    "RU_Krasnodar_Krai": {
+      "en": "Krasnodar Krai",
+      "zh": "克拉斯诺达尔边疆区"
+    },
+    "RU_Primorsky_Krai": {
+      "en": "Primorsky Krai",
+      "zh": "滨海边疆区"
+    },
+    "RU_Republic_of_Kalmykia": {
+      "en": "Kalmykia",
+      "zh": "卡尔梅克共和国"
+    },
+    "RU_Rostov": {
+      "en": "Rostov",
+      "zh": "罗斯托夫州"
+    },
+    "RU_Stavropol_Krai": {
+      "en": "Stavropol Krai",
+      "zh": "斯塔夫罗波尔边疆区"
+    },
+    "RU_Tula": {
+      "en": "Tula",
+      "zh": "图拉州"
+    },
+    "UA_Lviv": {
+      "en": "Lviv",
+      "zh": "利沃夫州"
+    }
+  }
+}

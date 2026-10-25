@@ -40125,7 +40125,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_b062e98b7497",
-        "name": "Carcassonne + Limoux",
+        "name": "Carcassonne",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -69813,7 +69813,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_8a5ec14e81e7",
-        "name": "Arles + Istres",
+        "name": "Istres",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -81850,7 +81850,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_c84e32333c8a",
-        "name": "Alès + Vigan",
+        "name": "Alès",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -109413,7 +109413,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_0d1fb06c5ad5",
-        "name": "Auch + Condom + Mirande",
+        "name": "Auch",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -134144,7 +134144,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_5b351c0f453a",
-        "name": "Dax + Mont-de-Marsan",
+        "name": "Dax",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -200194,7 +200194,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_d292a0ff7a4c",
-        "name": "Albi + Castres",
+        "name": "Castres",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -207765,7 +207765,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_fcb0087ac12e",
-        "name": "Castelsarrasin + Montauban",
+        "name": "Montauban",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -216652,7 +216652,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_af825dbec142",
-        "name": "Draguignan + Brignoles",
+        "name": "Draguignan",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -225108,7 +225108,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_d4fcb61264f5",
-        "name": "Apt + Avignon + Carpentras",
+        "name": "Carpentras",
         "cntr_code": "FR",
         "__source": "detail"
       },

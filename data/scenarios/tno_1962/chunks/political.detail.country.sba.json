@@ -20564,7 +20564,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_8db0a9d55bd2",
-        "name": "Irbeysky Rayon + Sayansky Rayon",
+        "name": "Irbeysky Rayon",
         "cntr_code": "SBA",
         "__source": "detail"
       },
@@ -30218,7 +30218,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_15c4c99da0ea",
-        "name": "Nizhneingashsky Rayon + Ilansky Rayon",
+        "name": "Nizhneingashsky Rayon",
         "cntr_code": "SBA",
         "__source": "detail"
       },

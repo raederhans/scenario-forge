@@ -2175,7 +2175,7 @@
       "type": "Feature",
       "properties": {
         "id": "SK_MRG_6ddeb377aab6",
-        "name": "District of Ruromberok + District of Dolne Kub",
+        "name": "District of Ruromberok",
         "cntr_code": "SK",
         "admin1_group": "Žilinský kraj",
         "detail_tier": "adm2_full_replacement",
@@ -7163,7 +7163,7 @@
       "type": "Feature",
       "properties": {
         "id": "SK_MRG_da1e3ec3eef0",
-        "name": "District of Bansks Bystrica + District of Giar nad Hronom",
+        "name": "Banská Bystrica",
         "cntr_code": "SK",
         "admin1_group": "Banskobystrický kraj",
         "detail_tier": "adm2_full_replacement",
@@ -10368,7 +10368,7 @@
       "type": "Feature",
       "properties": {
         "id": "SK_MRG_951b03682e38",
-        "name": "District of Piertany + District of Hlohovec",
+        "name": "District of Piertany",
         "cntr_code": "SK",
         "admin1_group": "Trnavský kraj",
         "detail_tier": "adm2_full_replacement",
@@ -22932,7 +22932,7 @@
       "type": "Feature",
       "properties": {
         "id": "SK_MRG_dac05b35b387",
-        "name": "District of Martin + District of Pilina + District of Kysucki Novi Mesto",
+        "name": "Žilina",
         "cntr_code": "SK",
         "admin1_group": "Žilinský kraj",
         "detail_tier": "adm2_full_replacement",
@@ -41056,7 +41056,7 @@
       "type": "Feature",
       "properties": {
         "id": "SK_MRG_b87a765e2485",
-        "name": "District of Pezinok + District of Bratislava III",
+        "name": "District of Pezinok",
         "cntr_code": "SK",
         "admin1_group": "Bratislavský kraj",
         "detail_tier": "adm2_full_replacement",
@@ -70409,7 +70409,7 @@
       "type": "Feature",
       "properties": {
         "id": "SK_MRG_351edc5a6c69",
-        "name": "District of Prievidza + District of Bonovce nad Bebra* + District of Partizonske",
+        "name": "District of Prievidza",
         "cntr_code": "SK",
         "admin1_group": "Trenčiansky kraj",
         "detail_tier": "adm2_full_replacement",
@@ -84113,7 +84113,7 @@
       "type": "Feature",
       "properties": {
         "id": "SK_MRG_e93604b4f2a5",
-        "name": "District of Levoca + District of Sabinov",
+        "name": "District of Sabinov",
         "cntr_code": "SK",
         "admin1_group": "Prešovský kraj",
         "detail_tier": "adm2_full_replacement",

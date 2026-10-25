@@ -5850,7 +5850,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_73019c3017aa",
-        "name": "Amberg, Kreisfreie Stadt + Amberg-Sulzbach",
+        "name": "Amberg-Sulzbach",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "__source": "detail"
@@ -12844,7 +12844,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_348581c848f8",
-        "name": "Bamberg, Kreisfreie Stadt + Bamberg, Landkreis + Lichtenfels",
+        "name": "Bamberg, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "__source": "detail"
@@ -14708,7 +14708,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_22b5c35ff0db",
-        "name": "Bayreuth, Kreisfreie Stadt + Bayreuth, Landkreis + Kulmbach",
+        "name": "Bayreuth, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "__source": "detail"
@@ -18622,7 +18622,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_88b2cc10d998",
-        "name": "Forchheim + Erlangen-Höchstadt + Fürth, Landkreis",
+        "name": "Erlangen-Höchstadt",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "__source": "detail"
@@ -29232,7 +29232,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_d7270b2f4f53",
-        "name": "Schweinfurt, Kreisfreie Stadt + Kitzingen + Schweinfurt, Landkreis",
+        "name": "Schweinfurt, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "__source": "detail"
@@ -44054,7 +44054,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_77741e43de3f",
-        "name": "Darmstadt-Dieburg + Offenbach, Landkreis",
+        "name": "Offenbach, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "__source": "detail"
@@ -46194,7 +46194,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_e2f350a636b5",
-        "name": "Hochtaunuskreis + Main-Taunus-Kreis",
+        "name": "Hochtaunuskreis",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "__source": "detail"
@@ -47298,7 +47298,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_e2617eca3f85",
-        "name": "Main-Kinzig-Kreis + Wetteraukreis + Gießen, Landkreis",
+        "name": "Gießen",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "__source": "detail"
@@ -51592,7 +51592,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_3b750624bff4",
-        "name": "Lahn-Dill-Kreis + Limburg-Weilburg",
+        "name": "Lahn-Dill-Kreis",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "__source": "detail"
@@ -53048,7 +53048,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_d561808c92a5",
-        "name": "Vogelsbergkreis + Fulda",
+        "name": "Fulda",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "__source": "detail"
@@ -60324,7 +60324,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_c6f2d9d3d036",
-        "name": "Birkenfeld + Bernkastel-Wittlich + Vulkaneifel",
+        "name": "Bernkastel-Wittlich",
         "cntr_code": "DE",
         "admin1_group": "Rheinland-Pfalz",
         "__source": "detail"
@@ -74794,7 +74794,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_bceaa37f49ef",
-        "name": "Kaiserslautern, Kreisfreie Stadt + Kaiserslautern, Landkreis + Kusel",
+        "name": "Kaiserslautern, Kreisfreie Stadt",
         "cntr_code": "DE",
         "admin1_group": "Rheinland-Pfalz",
         "__source": "detail"
@@ -77896,7 +77896,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_ea826ec181b8",
-        "name": "Alzey-Worms + Mainz-Bingen",
+        "name": "Mainz-Bingen",
         "cntr_code": "DE",
         "admin1_group": "Rheinland-Pfalz",
         "__source": "detail"
@@ -89856,7 +89856,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_98e486211a34",
-        "name": "Suhl, Kreisfreie Stadt + Schmalkalden-Meiningen + Hildburghausen",
+        "name": "Schmalkalden-Meiningen",
         "cntr_code": "DE",
         "admin1_group": "Thüringen",
         "__source": "detail"
@@ -91840,7 +91840,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_ac1a1840dec2",
-        "name": "Ilm-Kreis + Saalfeld-Rudolstadt + Saale-Orla-Kreis",
+        "name": "Saalfeld-Rudolstadt",
         "cntr_code": "DE",
         "admin1_group": "Thüringen",
         "__source": "detail"
@@ -97533,7 +97533,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_4b4e7fcd7031",
-        "name": "dzierżoniowski + ząbkowicki",
+        "name": "dzierżoniowski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -105415,7 +105415,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_ec568da59ac7",
-        "name": "mikołowski + rybnicki + Żory",
+        "name": "mikołowski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -110732,7 +110732,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_ccb2f83ec3cf",
-        "name": "Piekary Śląskie + Siemianowice Śląskie",
+        "name": "Siemianowice Śląskie",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -133063,7 +133063,7 @@
       "type": "Feature",
       "properties": {
         "id": "CZ_MRG_9d601ad75aef",
-        "name": "Plzeň-North + Plzeň-South + Rokycany",
+        "name": "Plzeň-North",
         "cntr_code": "CZ",
         "admin1_group": "Plzeňský kraj",
         "detail_tier": "adm2_full_replacement",
@@ -138206,7 +138206,7 @@
       "type": "Feature",
       "properties": {
         "id": "CZ_MRG_ea0c37760bf3",
-        "name": "Prague-West + Kladno",
+        "name": "Prague-West",
         "cntr_code": "CZ",
         "admin1_group": "Středočeský kraj",
         "detail_tier": "adm2_full_replacement",
@@ -148011,7 +148011,7 @@
       "type": "Feature",
       "properties": {
         "id": "CZ_MRG_9096ecd76bb9",
-        "name": "Chrudim + Svitavy",
+        "name": "Chrudim",
         "cntr_code": "CZ",
         "admin1_group": "Pardubický kraj",
         "detail_tier": "adm2_full_replacement",
@@ -155594,7 +155594,7 @@
       "type": "Feature",
       "properties": {
         "id": "CZ_MRG_16303fe61c1d",
-        "name": "Příbram + Benešov + Beroun",
+        "name": "Příbram",
         "cntr_code": "CZ",
         "admin1_group": "Středočeský kraj",
         "detail_tier": "adm2_full_replacement",
@@ -162642,7 +162642,7 @@
       "type": "Feature",
       "properties": {
         "id": "CZ_MRG_23d7414d33c7",
-        "name": "Strakonice + Písek + Tábor",
+        "name": "Tábor",
         "cntr_code": "CZ",
         "admin1_group": "Jihočeský kraj",
         "detail_tier": "adm2_full_replacement",
@@ -165621,7 +165621,7 @@
       "type": "Feature",
       "properties": {
         "id": "CZ_MRG_dfeea8e4d5f1",
-        "name": "Pelhřimov + Havlíčkův Brod",
+        "name": "Havlíčkův Brod",
         "cntr_code": "CZ",
         "admin1_group": "Kraj Vysočina",
         "detail_tier": "adm2_full_replacement",

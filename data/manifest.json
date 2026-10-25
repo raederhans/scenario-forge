@@ -116,9 +116,9 @@
       "raw_world_bounds_geometries": 37,
       "role": "detail_topology_na_v2",
       "schema_ref": "schema://topology/detail_political_bundle_v2",
-      "sha256": "d219d865b06ea2930952f9c1df2996ac828e4d86de25918716d7c8641365c9d8",
+      "sha256": "6ba39cccdc8f90b7533510ad43b914c72d684d44e25b21d14bbd08e117792bbc",
       "simplification": "detail_publish_v2",
-      "size_bytes": 89890222,
+      "size_bytes": 89868658,
       "target_zoom_range": [
         1.7,
         20
@@ -140,9 +140,9 @@
       "raw_world_bounds_geometries": 442,
       "role": "runtime_political_topology",
       "schema_ref": "schema://topology/runtime_political_v1",
-      "sha256": "817f900d81f38c38cb2c56da7fc2e2efea33571cb7038731e7c6869b54a03f2e",
+      "sha256": "6f23ef699cd07e6c409846293ddf4c999efea3c636efbf9b1c51c7c78112c9f0",
       "simplification": "runtime_projection_v1",
-      "size_bytes": 32390280,
+      "size_bytes": 32368716,
       "target_zoom_range": [
         1.7,
         20
@@ -151,15 +151,15 @@
       "world_bounds_geometries": 149
     },
     "geo_aliases.json": {
-      "alias_count": 49171,
+      "alias_count": 49322,
       "artifact_class": "publish",
       "conflict_count": 0,
       "description": "Canonical geographic alias index.",
       "entry_count": 21324,
       "owner": "init_map_data.hierarchy_locales",
       "role": "geo_aliases",
-      "sha256": "bee555a3dfe74886e2a37df918a03f6d6307d5d840e389139762a2eb9bfe32aa",
-      "size_bytes": 7465843,
+      "sha256": "e72b73006d50db5c3ae9846fdd194b52c1646a79661a703d8ced1fadee6cf711",
+      "size_bytes": 7506178,
       "type": "geo_aliases"
     },
     "global_contours.major.topo.json": {
@@ -363,8 +363,8 @@
       "geo_entry_count": 72704,
       "owner": "init_map_data.hierarchy_locales",
       "role": "locales",
-      "sha256": "1c97cdb738ea1b51d69dfab6fe0af7da1057168d1dcf532737aaf71a2353090a",
-      "size_bytes": 8429157,
+      "sha256": "6cd0744a4658db5925de2e15848c84e059709006e2afb758abc19727ac6f57c2",
+      "size_bytes": 8386695,
       "type": "locales",
       "ui_entry_count": 2090
     },
@@ -614,8 +614,8 @@
       "owner": "quick_fill_hierarchy",
       "role": "quick_fill_prefecture_crosswalk",
       "schema_ref": "schema://quick_fill/prefecture_crosswalk/v1",
-      "sha256": "f71e651e06c354b2c36a268bf3448fdae0874bbc217819ea490319588277f99d",
-      "size_bytes": 144092,
+      "sha256": "ac42ea79fe06441799f8fd73534a44d94a7fe603f8aa1213cfdd158d8b04b6db",
+      "size_bytes": 143930,
       "type": "json"
     },
     "quick_fill/reference/china-pca-2017.json": {
@@ -633,8 +633,8 @@
       "description": "Manual runtime asset registry shared by JS resolvers and build manifest generation.",
       "owner": "data/runtime_asset_registry.json",
       "role": "runtime_asset_registry",
-      "sha256": "8dcc18d001a3fb1992e75565c62b34237906b3876fc49b2fc67b45a1fc1ad09c",
-      "size_bytes": 387237
+      "sha256": "cc6c9fe01cec779ec93755913a004747fed394afc625a6014d8431a81d7b6ba3",
+      "size_bytes": 387460
     },
     "thematic_layers/index.json": {
       "role": "thematic_layer_catalog",
@@ -966,7 +966,7 @@
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_manifest.schema.json",
       "size_bytes": 187828,
-      "sha256": "a6a4f3838c50241941588d1be2596af7a62796a308a52fd4d816abda60da6e3a",
+      "sha256": "bc1d1ce5755000c7c16090d2cced055bde260ee4ec8a1232f96c1843e9474f5d",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/overview.json": {
@@ -986,7 +986,7 @@
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
       "size_bytes": 5441867,
-      "sha256": "c569665ae4473e8efcb9ce82d49d1a63a204925066b78dbf7ed8fd775420351e",
+      "sha256": "feecc43ae79a72f07b50e37c12747e206f1c498f47da9ffce33b70b7cd625736",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/hoi4_1936.json": {
@@ -996,7 +996,7 @@
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
       "size_bytes": 5842346,
-      "sha256": "33f47df537ca6240859c66e5e4f6860b1bde98a60b18d7d8e5fbcee84bd6f988",
+      "sha256": "d1ce78a6e7b1ac1509f5a24db2ae12b90d956965fbe6bb04a5e78d39d749f3dc",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/hoi4_1939.json": {
@@ -1006,7 +1006,7 @@
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
       "size_bytes": 5842346,
-      "sha256": "1eb849f3aa4ca7939d6cc8537ee8b158d178e7014ea1c9c3e558a606ff40d70e",
+      "sha256": "7322934036d3e1ecad396be39bc3b351cc37e175c74c5266b9ea06306d411163",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/features/tno_1962.json": {
@@ -1016,7 +1016,7 @@
       "owner": "population_spatial",
       "schema_ref": "map_builder/schemas/population_spatial_features.schema.json",
       "size_bytes": 2988386,
-      "sha256": "b069d906377e9271d938fdcc9878a6ea444e095019bad69217119e3c744f26a0",
+      "sha256": "3c8c88c0d40815629b1dc1546cefced022db2022ce9031efc051def674497093",
       "description": "GHSL 2020 spatial population. Full feature statistics; lazy count-conserving heatmap tiles."
     },
     "thematic_layers/population/ghsl_population_2020_v1/tiles/r384_c1152.json": {

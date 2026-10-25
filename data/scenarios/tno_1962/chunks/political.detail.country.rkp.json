@@ -1109,7 +1109,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_4a2bfb6b173f",
-        "name": "biłgorajski + krasnostawski + zamojski",
+        "name": "zamojski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -4062,7 +4062,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_05ddd04cc90f",
-        "name": "janowski + kraśnicki",
+        "name": "kraśnicki",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -4749,7 +4749,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_57a0cb6e8d35",
-        "name": "lubartowski + parczewski + puławski",
+        "name": "puławski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -6180,7 +6180,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_e17e448ae4e2",
-        "name": "lubelski + opolski + świdnicki",
+        "name": "lubelski (Lublin)",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -8122,7 +8122,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_8d9132641197",
-        "name": "łukowski + radzyński + rycki",
+        "name": "łukowski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -14788,7 +14788,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_4ed00c272094",
-        "name": "rawski + skierniewicki + Skierniewice",
+        "name": "rawski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -16830,7 +16830,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_672367948ccf",
-        "name": "bocheński + brzeski + tarnowski",
+        "name": "tarnowski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -19610,7 +19610,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_d1960b18210a",
-        "name": "krakowski + miechowski + proszowicki",
+        "name": "krakowski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -21013,7 +21013,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_28f9056747e2",
-        "name": "limanowski + myślenicki + wielicki",
+        "name": "limanowski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -29018,7 +29018,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_c16d6d416392",
-        "name": "grodziski + pruszkowski + żyrardowski",
+        "name": "pruszkowski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -29697,7 +29697,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_6a243775b00f",
-        "name": "grójecki + piaseczyński",
+        "name": "piaseczyński",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -31578,7 +31578,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_fe2842d4d685",
-        "name": "lipski + radomski + zwoleński",
+        "name": "radomski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -33248,7 +33248,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_49c8bdd6da87",
-        "name": "miński + otwocki + wołomiński",
+        "name": "wołomiński",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -34796,7 +34796,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_6ea9dfea1297",
-        "name": "przysuski + szydłowiecki",
+        "name": "przysuski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -41056,7 +41056,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_7076d4b3250d",
-        "name": "dębicki + mielecki + ropczycko-sędziszowski",
+        "name": "mielecki",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -44625,7 +44625,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_d8ea546338a5",
-        "name": "leżajski + niżański + stalowowolski",
+        "name": "stalowowolski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -49865,7 +49865,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_b96b5d49d900",
-        "name": "tarnobrzeski + Tarnobrzeg",
+        "name": "tarnobrzeski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -53921,7 +53921,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_d9d9ccd218dd",
-        "name": "buski + kazimierski",
+        "name": "buski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -54852,7 +54852,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_940b9a58b475",
-        "name": "jędrzejowski + pińczowski",
+        "name": "jędrzejowski",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -55743,7 +55743,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_9242fdb1805d",
-        "name": "kielecki + konecki + skarżyski",
+        "name": "kielecki (Holy Cross)",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -57136,7 +57136,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_8f55c53666f8",
-        "name": "opatowski + ostrowiecki + sandomierski",
+        "name": "ostrowiecki",
         "cntr_code": "PL",
         "__source": "detail"
       },
@@ -62695,7 +62695,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_9c6077315d06",
-        "name": "Berezhany + Kozova",
+        "name": "Berezhany",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -62934,7 +62934,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_0d6137080058",
-        "name": "Pidhaitsi + Monastyryska + Buchach",
+        "name": "Monastyryska",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -63273,7 +63273,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_35715f97812f",
-        "name": "Tlumach + Kolomyia",
+        "name": "Kolomyia",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -64501,7 +64501,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_72c94a3ccd70",
-        "name": "Halych + Rohatyn + Kalush",
+        "name": "Kalush",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -65025,7 +65025,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ab85624a51f5",
-        "name": "Zolochiv + Peremyshliany + Busk",
+        "name": "Zolochiv (Lviv)",
         "cntr_code": "UA",
         "__source": "detail"
       },
@@ -65356,7 +65356,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_d4f151f823ef",
-        "name": "Stryi + Zhydachiv",
+        "name": "Stryi",
         "cntr_code": "UA",
         "__source": "detail"
       },

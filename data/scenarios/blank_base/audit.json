@@ -18,10 +18,10 @@
   "profile": "lightweight_base",
   "reverse_coverage_gap_count": 0,
   "scenario_id": "blank_base",
-  "snapshot_fingerprint": "5cd8ddd4388d358f26cc27ae138b4652b177cd4b47b113b52dc6a40016e60e34",
+  "snapshot_fingerprint": "766aa05afaf52310f49238597729464e15f0c969b650e61e300f53f0c7645cf2",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "59b2a516a80bbfd3789a0863bf1c97186fd6894e55fa6b9c2b499e0e0fbb37bd",
+    "build_snapshot_sha256": "20f9f24ec0aedeb22d2e8422451bca8d580bca9dea3d924b8df7144a9c5ba9d2",
     "ownerless_restoration_sources": [
       {
         "path": "data/ne_10m_admin_1_states_provinces.shp",
@@ -58,7 +58,7 @@
     ],
     "ownerless_topology_source": "data/scenarios/modern_world/runtime_topology.topo.json",
     "ownerless_topology_source_sha256": "917320332f37571d2fa1cca21881e0b5fc2cc9ede4966abe914a1e9259eabf1e",
-    "runtime_topology_sha256": "fbd7412a2e417094fc01e7e6c93658531b8fdde1c854d082f911abea88a0d24d"
+    "runtime_topology_sha256": "6e07651b88921616b954ce99dc3ff2ed1f7c215bb35ad8df5c5e6fce6175a3e5"
   },
   "summary": {
     "approximate_count": 0,

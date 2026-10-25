@@ -21310,7 +21310,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_49823857e689",
-        "name": "Atninsky District + Pestrechinsky District + Vysokogorsky District",
+        "name": "Vysokogorsky District",
         "cntr_code": "TAT",
         "__source": "detail"
       },
@@ -29482,7 +29482,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_dd0c9c3625d6",
-        "name": "Tyulyachinsky District + Arsky District + Sabinsky District",
+        "name": "Arsky District",
         "cntr_code": "TAT",
         "__source": "detail"
       },
@@ -63615,7 +63615,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_9db237a6b59e",
-        "name": "Sernursky District + Novotoryalsky District + Paranginsky District",
+        "name": "Sernursky District",
         "cntr_code": "TAT",
         "__source": "detail"
       },
@@ -73999,7 +73999,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_1abe3c12baeb",
-        "name": "Urzhumsky District + Lebyazhsky District",
+        "name": "Urzhumsky District",
         "cntr_code": "TAT",
         "__source": "detail"
       },
@@ -82192,7 +82192,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_19fb94f201eb",
-        "name": "Sovetsky District + Pizhansky District",
+        "name": "Sovetsk",
         "cntr_code": "TAT",
         "__source": "detail"
       },
@@ -85169,7 +85169,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_33c9fb373a65",
-        "name": "Bogorodsky District + Nemsky District",
+        "name": "Nemsky District",
         "cntr_code": "TAT",
         "__source": "detail"
       },
@@ -90972,7 +90972,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c2999ea662d8",
-        "name": "Arbazhsky District + Orichevsky District + Verkhoshizhemsky District",
+        "name": "Orichevsky District",
         "cntr_code": "TAT",
         "__source": "detail"
       },
