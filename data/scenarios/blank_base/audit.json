@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 0,
-    "feature_count": 21769,
+    "feature_count": 21036,
     "water_count": 0
   },
   "diagnostics": {
@@ -18,10 +18,10 @@
   "profile": "lightweight_base",
   "reverse_coverage_gap_count": 0,
   "scenario_id": "blank_base",
-  "snapshot_fingerprint": "5c8bfa902f85273e0f7b7f1b3675d1d2cd608e4bb5b994cba1f8d8deaf92b942",
+  "snapshot_fingerprint": "e025fade33da604c0f997bc1151e46202a5b0f3dd6db0680cb2bd35bd32dd174",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "2aca76d9faa4b57cfedd8c26266abbf1f9ed4de683dec6a23f8b541500b19ef7",
+    "build_snapshot_sha256": "940d4e19f0384fc741631d27316f62e0dbf912b8a705d878c30b2ed8c98b38c5",
     "ownerless_restoration_sources": [
       {
         "path": "data/ne_10m_admin_1_states_provinces.shp",
@@ -58,29 +58,29 @@
     ],
     "ownerless_topology_source": "data/scenarios/modern_world/runtime_topology.topo.json",
     "ownerless_topology_source_sha256": "917320332f37571d2fa1cca21881e0b5fc2cc9ede4966abe914a1e9259eabf1e",
-    "runtime_topology_sha256": "79ea7fb58b1e9f8fd6728d5b43291ae15534ff01a5dc57fc0497ef45cc93a601"
+    "runtime_topology_sha256": "b4b2b4003c08194f0d73173e4bc8d9cea5a75807cece18ab94e0491e2d8d07e9"
   },
   "summary": {
     "approximate_count": 0,
     "blocker_count": 0,
-    "changed_feature_count": 21769,
+    "changed_feature_count": 21036,
     "controller_count": 0,
     "controller_rule_count": 0,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 21769,
+    "feature_count": 21036,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 0,
     "quality_counts": {
-      "ownerless_editable_topology": 21769
+      "ownerless_editable_topology": 21036
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "ownerless_editable_topology": 21769
+      "ownerless_editable_topology": 21036
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,

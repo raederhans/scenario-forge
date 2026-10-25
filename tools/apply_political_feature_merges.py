@@ -387,7 +387,15 @@ def apply_scenario(scenario_id: str, merges: Merges) -> dict:
     extras = apply_scenario_extras(scenario_dir, merges)
     if merges.scoped and applied:
         record_scenario_feature_merges(scenario_dir / "manifest.json", merges, applied)
-    write_runtime_topology_source(scenario_dir, topology)
+    written = write_runtime_topology_source(scenario_dir, topology)
+    # Shrinking below the storage limit switches .topo.json.gz to plain JSON (and back),
+    # so the manifest must follow before the refresh derives its sidecars from it.
+    manifest_path = scenario_dir / "manifest.json"
+    manifest = load_json(manifest_path)
+    url = written.relative_to(ROOT).as_posix()
+    if manifest.get("runtime_topology_url") != url:
+        manifest["runtime_topology_url"] = url
+        write_json(manifest_path, manifest)
     fixes = refresh_scenario(scenario_dir, assignments, removed)
     if strategic_path.exists():
         strategic = load_json(strategic_path)
