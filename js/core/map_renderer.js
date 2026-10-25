@@ -5983,7 +5983,35 @@ function appendUniqueFeatureCollections(primaryCollection, extraCollection, { pu
   return result;
 }
 
+let frameEffectiveWater = null;
+
+function getFrameEffectiveWaterInputs(atlantropaWater, scenarioWaterFeatures) {
+  const manifest = runtimeState.activeScenarioManifest;
+  const baseFeatures = runtimeState.waterRegionsData?.features;
+  const lakeFeatures = runtimeState.contextLayerExternalDataByName?.lakes?.features;
+  return [
+    baseFeatures, baseFeatures?.length, scenarioWaterFeatures, scenarioWaterFeatures?.length,
+    lakeFeatures, lakeFeatures?.length, runtimeState.activeScenarioId || "", isScenarioWaterTopologyExclusiveMode(),
+    manifest?.excluded_water_region_ids, manifest?.excluded_water_region_groups, runtimeState.contextLayerRevision,
+    ...atlantropaWater,
+  ];
+}
+
 function getEffectiveWaterRegionFeatures(atlantropaFeatures = getEffectiveAtlantropaFeatures(), scenarioWaterFeatures = runtimeState.scenarioWaterRegionsData?.features) {
+  // Only the default scenario list is reused within a frame; one-off lists
+  // (navigation previews) always resolve.
+  const frame = scenarioWaterFeatures === runtimeState.scenarioWaterRegionsData?.features ? frameEffectiveWater : null;
+  const inputs = frame ? getFrameEffectiveWaterInputs(atlantropaFeatures.water, scenarioWaterFeatures) : null;
+  if (frame?.entry && frame.entry.inputs.length === inputs.length
+    && frame.entry.inputs.every((value, index) => value === inputs[index])) {
+    return frame.entry.result;
+  }
+  const result = resolveAndSanitizeEffectiveWaterRegionFeatures(atlantropaFeatures, scenarioWaterFeatures);
+  if (frame) frame.entry = { inputs, result };
+  return result;
+}
+
+function resolveAndSanitizeEffectiveWaterRegionFeatures(atlantropaFeatures, scenarioWaterFeatures) {
   const exclusions = { ids: getScenarioExcludedWaterRegionIds(), groups: getScenarioExcludedWaterRegionGroups() };
   const scenarioFeatures = [
     ...(Array.isArray(scenarioWaterFeatures)
@@ -6156,6 +6184,10 @@ function getAtlantropaSurfaceKind(feature) {
 }
 
 function isAtlantropaSeaFeature(feature) {
+  // Both checks need an Atlantropa property; ordinary features skip the
+  // per-feature string and country-code normalization.
+  const props = feature?.properties;
+  if (!props?.atl_color_rule && !props?.atl_surface_kind) return false;
   if (getAtlantropaColorRule(feature) === "atlantropa_sea") {
     return true;
   }
@@ -14272,7 +14304,15 @@ function reconcileRenderFrameResources() {
 }
 
 function drawCanvas() {
-  getDrawCanvasOrchestrationOwner().drawCanvasFrame();
+  // Render signatures resolve the effective water list several times per frame;
+  // within one synchronous frame its inputs cannot change, so reuse it there.
+  const outerFrameWater = frameEffectiveWater;
+  frameEffectiveWater = outerFrameWater || { entry: null };
+  try {
+    getDrawCanvasOrchestrationOwner().drawCanvasFrame();
+  } finally {
+    frameEffectiveWater = outerFrameWater;
+  }
 }
 
 function readRenderPerfMetricDuration(metricName, minSequence = 0) {

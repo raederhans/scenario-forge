@@ -12,7 +12,8 @@ const identitySource = readFileSync(new URL("../js/core/renderer/object_identity
   .replace("export function", "function");
 const names = [
   "getScenarioAtlantropaRevisionToken", "getScenarioSurfaceVersionParts", "getScenarioSurfaceVersionSignal", "getScenarioWaterVisualRevisionToken",
-  "getEffectiveWaterRegionFeatures", "getEffectiveAtlantropaFeatures", "getAtlantropaRenderLayer",
+  "getEffectiveWaterRegionFeatures", "getFrameEffectiveWaterInputs", "resolveAndSanitizeEffectiveWaterRegionFeatures",
+  "getEffectiveAtlantropaFeatures", "getAtlantropaRenderLayer",
   "isScenarioAtlantropaVisible", "getScenarioWaterRegionsMode", "isScenarioWaterTopologyExclusiveMode",
   "getScenarioExcludedWaterRegionIds", "getScenarioExcludedWaterRegionGroups", "isScenarioWaterRegion",
   "isWaterRegionExcludedByScenario", "getScenarioDetailPhaseSignatureToken",
@@ -40,6 +41,8 @@ export function createHarness(source = rendererSource) {
     resolveEffectiveWaterRegionFeatures,
     rendererSourceMetrics: createSourceMetricsCache(),
     runtimeState: state,
+    // Outside drawCanvas there is no per-frame reuse.
+    frameEffectiveWater: null,
     SCENARIO_PRESENTATION_FEATURES: { ATLANTROPA_RELIEF: "atlantropa" },
     scenarioHasPresentationFeature: (manifest) => !!manifest.legacyAtlantropa,
     sanitizeWaterRegionFeatures: (features) => features.filter((entry) => !entry.properties.unsafe),
@@ -233,4 +236,22 @@ test("water cache invalidates when ocean style, loaded bathymetry or depth paint
   assert.notEqual(loaded, styled);
   h.state.intensityFields = { channels: { oceanDepth: { revision: 3 } } };
   assert.notEqual(h.water(), loaded);
+});
+
+test("within one render frame the effective water list resolves once until an input changes", () => {
+  const h = createHarness();
+  let resolves = 0;
+  const resolve = h.context.resolveEffectiveWaterRegionFeatures;
+  h.context.resolveEffectiveWaterRegionFeatures = (...args) => { resolves++; return resolve(...args); };
+  h.context.frameEffectiveWater = { entry: null };
+  const first = h.water();
+  assert.equal(h.water(), first);
+  assert.equal(resolves, 1);
+  h.state.scenarioWaterRegionsData.features.push(feature("added", { scenario_id: "tno" }));
+  assert.match(h.water(), /water-effective:4\|water-scenario:2/);
+  assert.equal(resolves, 2);
+  h.context.frameEffectiveWater = null;
+  h.water();
+  h.water();
+  assert.equal(resolves, 4, "outside a frame every call resolves");
 });
