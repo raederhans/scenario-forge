@@ -1063,6 +1063,13 @@ test("real D3 keeps the world-bounds check for edges that round onto a pole", ()
   ] });
   assert.equal(nearAntipodal.isWorldBounds, true);
   assert.equal(nearAntipodal.invalid, true);
+  // Ends 180° apart just off the equator: the arc crosses the pole even though
+  // the colatitude is nearly a right angle.
+  const equatorialAntipodal = owner.getSphericalGeometryDiagnostics({ type: "MultiLineString", coordinates: [
+    [[-30, 1e-9], [150, 1e-9]], [[-30, -1e-9], [150, -1e-9]], equator,
+  ] });
+  assert.equal(equatorialAntipodal.isWorldBounds, true);
+  assert.equal(equatorialAntipodal.invalid, true);
 
   const capped = (lat) => [[0, lat * 0.989], [0, lat], [60, lat], [60, lat * 0.989], [0, lat * 0.989]];
   const north = capped(89.99999999), south = capped(-89.99999999).reverse();
@@ -1082,9 +1089,16 @@ test("real D3 bounds of accepted near-polar edges never touch a pole", () => {
   const { owner } = createHarness({ d3: { geoArea: d3.geoArea, geoBounds: (geometry) => { boundsChecked += 1; return geoBounds(geometry); } } });
   let seed = 7;
   const random = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
-  const latitude = () => random() < 0.7 ? (random() < 0.5 ? 1 : -1) * (90 - 10 ** (-1 - random() * 10)) : random() * 180 - 90;
+  const sign = () => (random() < 0.5 ? 1 : -1);
+  const latitude = () => {
+    const kind = random();
+    if (kind < 0.5) return sign() * (90 - 10 ** (-1 - random() * 10));
+    if (kind < 0.7) return sign() * 10 ** (-1 - random() * 12);
+    return random() * 180 - 90;
+  };
   const longitude = (from) => {
-    const span = random() < 0.5 ? 180 - 10 ** (-random() * 9) : random() * 120;
+    const kind = random();
+    const span = kind < 0.15 ? 180 : kind < 0.6 ? 180 - 10 ** (-random() * 13) : random() * 120;
     return Math.max(-180, Math.min(180, ((from + (random() < 0.5 ? span : -span) + 540) % 360) - 180));
   };
   for (let index = 0; index < 20000; index += 1) {

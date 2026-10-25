@@ -65,12 +65,19 @@ function edgeLongitudeSpan(a, b) {
   return Math.abs(((b[0] - a[0] + 540) % 360) - 180);
 }
 
+// Spans this close to 180° are rejected outright: near the equator tan c is
+// large enough to amplify the rounding of Δλ itself past the clearance.
+const MIN_ANTIPODAL_GAP = 1e-9;
+
 // With both ends at least c from the nearer pole, a minor arc spanning Δλ stays
 // at least atan(tan c · cos(Δλ/2)) from it, the symmetric case being the worst.
-// Δλ = 180° gives zero: that arc runs over the pole.
+// cos(Δλ/2) is taken as sin((180° - Δλ)/2) so that Δλ = 180°, an arc over the
+// pole, gives exactly zero; cos(π/2) does not.
 function clearsPoles(a, b, span) {
+  const gap = 180 - span;
+  if (!(gap >= MIN_ANTIPODAL_GAP)) return false;
   const colatitude = (90 - Math.max(Math.abs(a[1]), Math.abs(b[1]))) * RADIANS;
-  return Math.tan(colatitude) * Math.cos((span * RADIANS) / 2) >= MIN_POLE_CLEARANCE;
+  return Math.tan(colatitude) * Math.sin((gap * RADIANS) / 2) >= MIN_POLE_CLEARANCE;
 }
 
 // Total longitude travelled along a ring's edges, each edge taking D3's minor
