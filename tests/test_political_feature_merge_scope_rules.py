@@ -59,5 +59,31 @@ class RiverPackScopeTest(unittest.TestCase):
         self.assertEqual(self.protected(("tno_1962",)), set())
 
 
+class MemberPropertiesTest(unittest.TestCase):
+    """Members that disagree on a non-name topology property get different signatures."""
+
+    def signatures(self):
+        with tempfile.TemporaryDirectory() as directory:
+            data = Path(directory)
+            scenario = data / "scenarios/tno_1962"
+            scenario.mkdir(parents=True)
+            for kind in ("owners", "cores"):
+                (scenario / f"{kind}.by_feature.json").write_text(json.dumps({kind: {}}), encoding="utf-8")
+            topology = scenario / "runtime_topology.topo.json"
+            topology.write_text(json.dumps({"objects": {"political": {"geometries": [
+                {"properties": {"id": "RU1", "name": "A", "cntr_code": "RU"}},
+                {"properties": {"id": "RU2", "name": "B", "cntr_code": "RU"}},
+                {"properties": {"id": "RU3", "name": "C", "cntr_code": "SVR"}},
+            ]}}}), encoding="utf-8")
+            with patch.object(plan_tool, "DATA", data), patch.object(plan_tool, "china_prefectures", lambda: {}),                     patch.object(plan_tool, "rewritten_topologies", lambda scenarios: (topology,)):
+                tables = plan_tool.load_assignment_tables(("tno_1962",))
+            return {fid: plan_tool.assignment_signature(fid, tables, {}) for fid in ("RU1", "RU2", "RU3")}
+
+    def test_differing_country_codes_do_not_share_a_signature(self):
+        signatures = self.signatures()
+        self.assertEqual(signatures["RU1"], signatures["RU2"])
+        self.assertNotEqual(signatures["RU1"], signatures["RU3"])
+
+
 if __name__ == "__main__":
     unittest.main()

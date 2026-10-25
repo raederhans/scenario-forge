@@ -34,7 +34,10 @@ ALL_SCENARIOS = ("blank_base", *OWNERSHIP_SCENARIOS)
 STRATEGIC_SCENARIOS = ("hoi4_1936", "hoi4_1939")
 RIVER_PARTITIONS = DATA / "river_partitions"
 CHINA_CROSSWALK = DATA / "quick_fill/china_prefecture_crosswalk.v1.json"
-ADJACENCY_TOPOLOGY = DATA / "scenarios/tno_1962/runtime_topology.topo.json.gz"
+ADJACENCY_SCENARIO = "tno_1962"
+# Properties a merged feature takes from its plan; every other property must agree across members
+# (keep in step with NAME_KEYS in tools/apply_political_feature_merges.py).
+PROPERTY_NAME_KEYS = {"id", "name", "name_local", "legacy_name", "anchor_county_name", "adm1_name"}
 # Every topology the apply tool rewrites. A merge must not mix precision and ordinary
 # parcels, and every member must be valid there: the apply tool unions without repair.
 REWRITTEN_TOPOLOGIES = (DATA / "europe_topology.na_v2.json", DATA / "europe_topology.runtime_political_v1.json",
@@ -114,9 +117,18 @@ def load_assignment_tables(scenarios: tuple[str, ...] | None = None) -> dict[str
         payload = read_json(DATA / f"scenarios/{scenario}/strategic_values.by_feature.json")
         tables[f"{scenario}:strategic_bucket"] = payload["bucket_by_feature"]
     for path in rewritten_topologies(scenarios):
-        precision = rewritten_topology(path).get("political_precision_feature_ids")
+        topology = rewritten_topology(path)
+        name = path.relative_to(DATA).as_posix()
+        precision = topology.get("political_precision_feature_ids")
         if precision is not None:
-            tables[f"{path.relative_to(DATA).as_posix()}:precision"] = dict.fromkeys(precision, True)
+            tables[f"{name}:precision"] = dict.fromkeys(precision, True)
+        # The apply tool keeps one property set per merged feature, so members must agree on
+        # every non-name property (e.g. a TNO parcel coded with its warlord instead of RU).
+        tables[f"{name}:properties"] = {
+            str(properties.get("id") or row.get("id")): json.dumps(
+                {key: value for key, value in properties.items() if key not in PROPERTY_NAME_KEYS}, sort_keys=True)
+            for row in topology["objects"]["political"]["geometries"]
+            for properties in [row.get("properties") or {}]}
     tables["china_prefecture"] = china_prefectures()
     return tables
 
@@ -140,9 +152,9 @@ def scoped(names: tuple[str, ...], scenarios: tuple[str, ...] | None) -> list[st
     return [name for name in names if scenarios is None or name in scenarios]
 
 
-def load_adjacency(path: Path = ADJACENCY_TOPOLOGY) -> tuple[dict[str, set[str]], dict[str, str]]:
+def load_adjacency(path: Path | None = None) -> tuple[dict[str, set[str]], dict[str, str]]:
     """Neighbor graph (TNO by default), plus each feature's source name as the last-resort label."""
-    political = read_json(path)["objects"]["political"]
+    political = read_json(path or scenario_topology(ADJACENCY_SCENARIO))["objects"]["political"]
     ids = [str((row.get("properties") or {}).get("id") or row.get("id")) for row in political["geometries"]]
     source_names = {feature_id: str((row.get("properties") or {}).get("name") or "")
                     for feature_id, row in zip(ids, political["geometries"])}
@@ -563,7 +575,7 @@ def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None, 
         representative_names(groups, load_member_facts(), hierarchy, name_sources[1], overrides)
     if naming == "parent_direction" and groups:
         cities = [row["properties"] for row in read_json(DATA / "world_cities.geojson")["features"]]
-        directional_names(groups, ADJACENCY_TOPOLOGY if scenarios is None else scenario_topology(scenarios[0]),
+        directional_names(groups, scenario_topology(ADJACENCY_SCENARIO) if scenarios is None else scenario_topology(scenarios[0]),
                           hierarchy, name_sources[1], overrides, cities, city_minimum, scoped_final)
     seen: dict[str, str] = {}
     for group in groups:
@@ -577,7 +589,7 @@ def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None, 
         "candidate_source": candidates_path.relative_to(ROOT).as_posix(),
         **({} if scenarios is None else {"scenarios": list(scenarios)}),
         "constraints": ["owners", "cores", "strategic_value_buckets", "hierarchy_groups", "quick_fill_groups",
-                        "china_crosswalk_prefecture", "precision_tier", "valid_member_geometry",
+                        "china_crosswalk_prefecture", "precision_tier", "member_properties", "valid_member_geometry",
                         "fragment_camouflage_unchanged",
                         "river_paint_parcels_unchanged", "contiguous"],
         "ownership_scenarios": scoped(OWNERSHIP_SCENARIOS, scenarios),

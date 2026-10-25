@@ -28,7 +28,7 @@
   },
   "source_files": [
     "data/scenarios/tno_1962/manifest.json",
-    "data/scenarios/tno_1962/runtime_topology.topo.json.gz",
+    "data/scenarios/tno_1962/runtime_topology.topo.json",
     "data/scenarios/tno_1962/owners.by_feature.json",
     "data/scenarios/tno_1962/countries.json",
     "data/scenarios/tno_1962/capital_defaults.partial.json",
@@ -38,7 +38,7 @@
   ],
   "feature_counts": {
     "territories": 32,
-    "political_features": 2574,
+    "political_features": 2339,
     "capitals": 7,
     "base_land_features_inspected": 22185,
     "base_land_features_candidates": 5697,
@@ -63,7 +63,7 @@
   },
   "counts": {
     "territories": 32,
-    "political_features": 2574,
+    "political_features": 2339,
     "capitals": 7,
     "base_land_features_inspected": 22185,
     "base_land_features_candidates": 5697,

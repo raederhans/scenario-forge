@@ -260,37 +260,297 @@
       "en": "Altai Krai",
       "zh": "阿尔泰边疆区"
     },
+    "RU_Amur": {
+      "en": "Amur",
+      "zh": "阿穆尔州"
+    },
+    "RU_Arkhangelsk": {
+      "en": "Arkhangelsk",
+      "zh": "阿尔汉格尔斯克州"
+    },
+    "RU_Astrakhan": {
+      "en": "Astrakhan",
+      "zh": "阿斯特拉罕州"
+    },
+    "RU_Bashkortostan": {
+      "en": "Bashkortostan",
+      "zh": "巴什科尔托斯坦共和国"
+    },
+    "RU_Belgorod": {
+      "en": "Belgorod",
+      "zh": "别尔哥罗德州"
+    },
+    "RU_Bryansk": {
+      "en": "Bryansk",
+      "zh": "布良斯克州"
+    },
     "RU_Chechen_Republic": {
       "en": "Chechnya",
       "zh": "车臣共和国"
+    },
+    "RU_Chelyabinsk": {
+      "en": "Chelyabinsk",
+      "zh": "车里雅宾斯克州"
+    },
+    "RU_Chuvash_Republic": {
+      "en": "Chuvashia",
+      "zh": "楚瓦什共和国"
+    },
+    "RU_Irkutsk": {
+      "en": "Irkutsk",
+      "zh": "伊尔库茨克州"
+    },
+    "RU_Ivanovo": {
+      "en": "Ivanovo",
+      "zh": "伊万诺沃州"
+    },
+    "RU_Kabardino_Balkaria": {
+      "en": "Kabardino-Balkaria",
+      "zh": "卡巴尔达-巴尔卡尔共和国"
+    },
+    "RU_Kaliningrad": {
+      "en": "Kaliningrad",
+      "zh": "加里宁格勒州"
     },
     "RU_Kaluga": {
       "en": "Kaluga",
       "zh": "卡卢加州"
     },
+    "RU_Kamchatka_Krai": {
+      "en": "Kamchatka Krai",
+      "zh": "堪察加边疆区"
+    },
+    "RU_Karachay_Cherkess_Republic": {
+      "en": "Karachay-Cherkessia",
+      "zh": "卡拉恰伊-切尔克斯共和国"
+    },
+    "RU_Karelia": {
+      "en": "Karelia",
+      "zh": "卡累利阿共和国"
+    },
+    "RU_Kemerovo": {
+      "en": "Kemerovo",
+      "zh": "克麦罗沃州"
+    },
+    "RU_Khabarovsk_Krai": {
+      "en": "Khabarovsk Krai",
+      "zh": "哈巴罗夫斯克边疆区"
+    },
+    "RU_Kirov": {
+      "en": "Kirov",
+      "zh": "基洛夫州"
+    },
+    "RU_Komi_Republic": {
+      "en": "Komi",
+      "zh": "科米共和国"
+    },
+    "RU_Kostroma": {
+      "en": "Kostroma",
+      "zh": "科斯特罗马州"
+    },
     "RU_Krasnodar_Krai": {
       "en": "Krasnodar Krai",
       "zh": "克拉斯诺达尔边疆区"
+    },
+    "RU_Krasnoyarsk_Krai": {
+      "en": "Krasnoyarsk Krai",
+      "zh": "克拉斯诺亚尔斯克边疆区"
+    },
+    "RU_Kurgan": {
+      "en": "Kurgan",
+      "zh": "库尔干州"
+    },
+    "RU_Kursk": {
+      "en": "Kursk",
+      "zh": "库尔斯克州"
+    },
+    "RU_Leningrad": {
+      "en": "Leningrad",
+      "zh": "列宁格勒州"
+    },
+    "RU_Lipetsk": {
+      "en": "Lipetsk",
+      "zh": "利佩茨克州"
+    },
+    "RU_Mari_El_Republic": {
+      "en": "Mari El",
+      "zh": "马里埃尔共和国"
+    },
+    "RU_Moscow": {
+      "en": "Moscow",
+      "zh": "莫斯科州"
+    },
+    "RU_Murmansk": {
+      "en": "Murmansk",
+      "zh": "摩尔曼斯克州"
+    },
+    "RU_Nizhny_Novgorod": {
+      "en": "Nizhny Novgorod",
+      "zh": "下诺夫哥罗德州"
+    },
+    "RU_Novgorod": {
+      "en": "Novgorod",
+      "zh": "诺夫哥罗德州"
+    },
+    "RU_Novosibirsk": {
+      "en": "Novosibirsk",
+      "zh": "新西伯利亚州"
+    },
+    "RU_Omsk": {
+      "en": "Omsk",
+      "zh": "鄂木斯克州"
+    },
+    "RU_Orenburg": {
+      "en": "Orenburg",
+      "zh": "奥伦堡州"
+    },
+    "RU_Oryol": {
+      "en": "Oryol",
+      "zh": "奥廖尔州"
+    },
+    "RU_Penza": {
+      "en": "Penza",
+      "zh": "奔萨州"
+    },
+    "RU_Perm_Krai": {
+      "en": "Perm Krai",
+      "zh": "彼尔姆边疆区"
     },
     "RU_Primorsky_Krai": {
       "en": "Primorsky Krai",
       "zh": "滨海边疆区"
     },
+    "RU_Pskov": {
+      "en": "Pskov",
+      "zh": "普斯科夫州"
+    },
+    "RU_Republic_of_Adygea": {
+      "en": "Adygea",
+      "zh": "阿迪格共和国"
+    },
+    "RU_Republic_of_Buryatia": {
+      "en": "Buryatia",
+      "zh": "布里亚特共和国"
+    },
+    "RU_Republic_of_Dagestan": {
+      "en": "Dagestan",
+      "zh": "达吉斯坦共和国"
+    },
+    "RU_Republic_of_Ingushetia": {
+      "en": "Ingushetia",
+      "zh": "印古什共和国"
+    },
     "RU_Republic_of_Kalmykia": {
       "en": "Kalmykia",
       "zh": "卡尔梅克共和国"
+    },
+    "RU_Republic_of_Khakassia": {
+      "en": "Khakassia",
+      "zh": "哈卡斯共和国"
+    },
+    "RU_Republic_of_Mordovia": {
+      "en": "Mordovia",
+      "zh": "莫尔多瓦共和国"
+    },
+    "RU_Republic_of_North_Ossetia_Alania": {
+      "en": "North Ossetia–Alania",
+      "zh": "北奥塞梯-阿兰共和国"
+    },
+    "RU_Republic_of_Tatarstan": {
+      "en": "Tatarstan",
+      "zh": "鞑靼斯坦共和国"
     },
     "RU_Rostov": {
       "en": "Rostov",
       "zh": "罗斯托夫州"
     },
+    "RU_Ryazan": {
+      "en": "Ryazan",
+      "zh": "梁赞州"
+    },
+    "RU_Sakha_Republic": {
+      "en": "Sakha",
+      "zh": "萨哈共和国"
+    },
+    "RU_Sakhalin": {
+      "en": "Sakhalin",
+      "zh": "萨哈林州"
+    },
+    "RU_Samara": {
+      "en": "Samara",
+      "zh": "萨马拉州"
+    },
+    "RU_Saratov": {
+      "en": "Saratov",
+      "zh": "萨拉托夫州"
+    },
+    "RU_Smolensk": {
+      "en": "Smolensk",
+      "zh": "斯摩棱斯克州"
+    },
     "RU_Stavropol_Krai": {
       "en": "Stavropol Krai",
       "zh": "斯塔夫罗波尔边疆区"
     },
+    "RU_Sverdlovsk": {
+      "en": "Sverdlovsk",
+      "zh": "斯维尔德洛夫斯克州"
+    },
+    "RU_Tambov": {
+      "en": "Tambov",
+      "zh": "坦波夫州"
+    },
+    "RU_Tomsk": {
+      "en": "Tomsk",
+      "zh": "托木斯克州"
+    },
     "RU_Tula": {
       "en": "Tula",
       "zh": "图拉州"
+    },
+    "RU_Tuva_Republic": {
+      "en": "Tuva",
+      "zh": "图瓦共和国"
+    },
+    "RU_Tver": {
+      "en": "Tver",
+      "zh": "特维尔州"
+    },
+    "RU_Tyumen": {
+      "en": "Tyumen",
+      "zh": "秋明州"
+    },
+    "RU_Udmurt_Republic": {
+      "en": "Udmurtia",
+      "zh": "乌德穆尔特共和国"
+    },
+    "RU_Ulyanovsk": {
+      "en": "Ulyanovsk",
+      "zh": "乌里扬诺夫斯克州"
+    },
+    "RU_Vladimir": {
+      "en": "Vladimir",
+      "zh": "弗拉基米尔州"
+    },
+    "RU_Volgograd": {
+      "en": "Volgograd",
+      "zh": "伏尔加格勒州"
+    },
+    "RU_Vologda": {
+      "en": "Vologda",
+      "zh": "沃洛格达州"
+    },
+    "RU_Voronezh": {
+      "en": "Voronezh",
+      "zh": "沃罗涅日州"
+    },
+    "RU_Yaroslavl": {
+      "en": "Yaroslavl",
+      "zh": "雅罗斯拉夫尔州"
+    },
+    "RU_Zabaykalsky_Krai": {
+      "en": "Zabaykalsky Krai",
+      "zh": "外贝加尔边疆区"
     },
     "UA_Lviv": {
       "en": "Lviv",
