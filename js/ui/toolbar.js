@@ -540,11 +540,8 @@ function initToolbar({ render } = {}) {
   });
 
   const syncDeveloperModeUi = () => {
-    const entryVisible = isDeveloperModeEntryVisible();
-    if (!entryVisible && runtimeState.ui.developerMode) {
-      // 入口不可见时不保留开启态：下方沿用关闭开发者模式时的工作台释放逻辑。
-      runtimeState.ui.developerMode = false;
-    }
+    // 快捷键显式开启的开发者模式是内存中的 opt-in：即使存储被阻止、主机也不是本地，入口与开启态都要保留。
+    const entryVisible = isDeveloperModeEntryVisible() || !!runtimeState.ui.developerMode;
     document.body?.classList.toggle("developer-mode", !!runtimeState.ui.developerMode);
     if (developerModeBtn) {
       // .zoom-btn 自带 display，单靠 hidden 属性压不住，同时挂全局 .hidden 类。
