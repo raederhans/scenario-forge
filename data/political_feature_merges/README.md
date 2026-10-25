@@ -40,10 +40,11 @@ merged away in any scenario of the new scope. The apply tool then:
   `manifest.json` under `hierarchy_overrides.feature_merges`, from which
   `js/core/scenario_hierarchy.js` projects the shared hierarchy;
 - adds merged entries to `locales.json` and `geo_aliases.json` while keeping
-  the members' entries. In the scoped scenarios the members' aliases name the
-  merged feature: in `geo_aliases.startup.json`
-  (`tools/build_startup_bootstrap_assets.py`) and in the full alias map
-  (`js/core/scenario_localization_state.js`);
+  the members' entries. In the scoped scenarios the members' aliases, and those
+  of an earlier scoped merge (`hierarchy_overrides.feature_redirects`), name
+  the merged feature: `js/core/scenario_localization_state.js` projects the
+  scenario's alias view, startup and full alike, and leaves the shared
+  (startup) alias map unprojected so other scenarios keep the members;
 - projects a global file only when every scenario that reads it is in scope
   (the TNO releasable catalog for `tno_1962`), refuses a plan that touches any
   other shared file, and leaves city host IDs on the members;

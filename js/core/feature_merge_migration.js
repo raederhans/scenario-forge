@@ -27,11 +27,15 @@ export function resolveFeatureMergeLineage(lineage, scenarioId = "") {
 // A merged feature takes a saved value only when the saved IDs cover all of its
 // leaves with one identical value; anything else is dropped. Missing paint on a
 // member means its default, not consent to copy a neighbour's edit.
+// A member stays valid in the shared base topology after a scenario-scoped
+// merge, so membership in this scenario's lineage decides, not ID validity.
 export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) {
   const { isMerged, resolve, leavesOf } = lineage;
-  const summary = { migratedEntries: 0, droppedEntries: 0, createdEntries: 0 };
+  const counts = () => ({ migratedEntries: 0, droppedEntries: 0 });
+  const summary = { visualOverrides: { ...counts(), createdEntries: 0 }, auxiliary: counts() };
+  const { visualOverrides: visual, auxiliary } = summary;
   const targetOf = (id) => {
-    if (typeof id !== "string" || validFeatureIds.has(id) || !isMerged(id)) return null;
+    if (typeof id !== "string" || !isMerged(id)) return null;
     const target = resolve(id);
     return validFeatureIds.has(target) ? target : null;
   };
@@ -58,10 +62,10 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) 
       if (!Object.hasOwn(result, target) && covers(sources, target)
         && sources.every((source) => JSON.stringify(entries[source]) === value)) {
         result[target] = entries[sources[0]];
-        summary.migratedEntries += sources.length;
-        summary.createdEntries += 1;
+        visual.migratedEntries += sources.length;
+        visual.createdEntries += 1;
       } else {
-        summary.droppedEntries += sources.length;
+        visual.droppedEntries += sources.length;
       }
     }
     return result;
@@ -74,9 +78,9 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) 
     for (const [target, sources] of groups) {
       if (covers(sources, target)) {
         result.push(target);
-        summary.migratedEntries += sources.length;
+        auxiliary.migratedEntries += sources.length;
       } else {
-        summary.droppedEntries += sources.length;
+        auxiliary.droppedEntries += sources.length;
       }
     }
     return [...new Set(result)];
@@ -85,7 +89,7 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) 
   function remapAnchor(id) {
     const target = targetOf(id);
     if (!target) return id;
-    summary.migratedEntries += 1;
+    auxiliary.migratedEntries += 1;
     return target;
   }
 

@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from map_builder.political_feature_merge_plans import consumed_members, ordered_plans, register_plan, validate_scope
+from map_builder.quick_fill_hierarchy import load_feature_merge_members
 from tools.refresh_political_feature_merge_downstream import steps
 
 
@@ -75,6 +76,13 @@ class OrderedPlansTest(unittest.TestCase):
                                                "landing sample baselines", "landing hero maps", "landing map stage"])
         self.assertEqual(names(("modern_world",)), ["Modern World river-paint packs", "landing sample baselines", "landing map stage"])
         self.assertEqual(names(("blank_base",)), ["landing sample baselines", "landing hero maps"])
+
+    def test_quick_fill_members_follow_the_replayed_prefix(self):
+        with tempfile.TemporaryDirectory() as directory:
+            write_plans(Path(directory), {"a.v1.json": plan(("FR_MRG_1", ["FR_ARR_751", "FR_ARR_752"])),
+                                          "b.v1.json": plan(("FR_MRG_2", ["FR_MRG_1", "FR_ARR_753"]))}, ["a.v1.json", "b.v1.json"])
+            self.assertEqual(load_feature_merge_members(Path(directory), "a.v1.json"), {"FR_MRG_1": ["FR_ARR_751", "FR_ARR_752"]})
+            self.assertEqual(load_feature_merge_members(Path(directory)), {"FR_MRG_2": ["FR_ARR_751", "FR_ARR_752", "FR_ARR_753"]})
 
 
 if __name__ == "__main__":

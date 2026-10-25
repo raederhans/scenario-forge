@@ -133,15 +133,6 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
         self.assertEqual(bundle_shell["arcs"], shell["arcs"])
         self.assertEqual(bundle_shell["transform"], shell["transform"])
 
-    def test_startup_aliases_point_scoped_merge_members_at_the_merged_feature(self) -> None:
-        full = {"alias_to_stable_key": {"Zmeinogorsky": "id::RU_D", "Barnaul": "id::RU_F", "Nowhere": "id::RU_X"}}
-        locales = {"geo": {"id::RU_MRG_T": {"en": "T"}, "id::RU_F": {"en": "Barnaul"}, "id::RU_D": {"en": "D"}}}
-        payload = build_startup_bootstrap_assets.build_startup_geo_aliases_payload(
-            full, locales, feature_merges={"RU_MRG_T": ["RU_D", "RU_E"]})
-        self.assertEqual(payload["alias_to_stable_key"], {"Zmeinogorsky": "id::RU_MRG_T", "Barnaul": "id::RU_F"})
-        unscoped = build_startup_bootstrap_assets.build_startup_geo_aliases_payload(full, locales)
-        self.assertEqual(unscoped["alias_to_stable_key"]["Zmeinogorsky"], "id::RU_D")
-
     def test_build_bootstrap_runtime_topology_keeps_runtime_shell_only(self) -> None:
         full_topology = {
             "type": "Topology",

@@ -348,23 +348,29 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
   }
 
   const sourceVisualOverrides = payload.visualOverrides || {};
-  const mergeMigration = collectProjectFeatureIds(payload).some((id) => !normalizedValidFeatureIds.has(id))
+  // Members of this scenario's scoped merges stay valid in the shared base topology.
+  const scopedMembers = new Set(Object.values(scenarioManifest?.hierarchy_overrides?.feature_merges || {})
+    .flatMap((members) => (Array.isArray(members) ? members : [])));
+  const mergeMigration = collectProjectFeatureIds(payload).some((id) => !normalizedValidFeatureIds.has(id) || scopedMembers.has(id))
     ? await migrateAcrossFeatureMerges(payload, normalizedValidFeatureIds, {
       fetchImpl, scenarioId: String(payload.scenario?.id || scenarioManifest?.scenario_id || "").trim(),
     })
     : null;
   if (mergeMigration) payload = mergeMigration.data;
-  const mergeSummary = mergeMigration?.summary || { migratedEntries: 0, droppedEntries: 0, createdEntries: 0 };
+  const mergedVisual = mergeMigration?.summary.visualOverrides || { migratedEntries: 0, droppedEntries: 0, createdEntries: 0 };
+  const mergedAuxiliary = mergeMigration?.summary.auxiliary || { migratedEntries: 0, droppedEntries: 0 };
   const nextVisualOverrides = payload.visualOverrides || {};
   const visualPartition = partitionFeatureScopedEntries(nextVisualOverrides, normalizedValidFeatureIds);
   const reportMigration = (migratedEntries = 0) => {
     if (typeof onMigration !== "function") return;
-    // Merged targets are not saved entries; their sources count as migrated or ignored.
+    // Colour counts compare saved colour entries only; merged targets are not saved entries.
     const sourceCount = Object.keys(sourceVisualOverrides).length;
-    const retainedCount = Object.keys(visualPartition.retained).length - mergeSummary.createdEntries;
+    const retainedCount = Object.keys(visualPartition.retained).length - mergedVisual.createdEntries;
     onMigration({
-      migratedEntries: migratedEntries + mergeSummary.migratedEntries + (explicitMigration?.summary.migratedEntries || 0),
-      ignoredEntries: Math.max(0, sourceCount - retainedCount - migratedEntries - mergeSummary.migratedEntries),
+      migratedEntries: migratedEntries + mergedVisual.migratedEntries + mergedAuxiliary.migratedEntries
+        + (explicitMigration?.summary.migratedEntries || 0),
+      ignoredEntries: Math.max(0, sourceCount - retainedCount - migratedEntries - mergedVisual.migratedEntries)
+        + mergedAuxiliary.droppedEntries,
     });
   };
   if (!visualPartition.needsMigration) {

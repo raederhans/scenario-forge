@@ -352,15 +352,7 @@ def build_startup_geo_aliases_payload(
     full_geo_aliases: dict,
     startup_locales: dict,
     startup_support_whitelist: dict | None = None,
-    feature_merges: dict | None = None,
 ) -> dict:
-    """Startup alias subset; ``feature_merges`` (the scenario manifest's scoped
-    merges) points members' aliases at their merged feature."""
-    merged_keys = {
-        f"id::{member}": f"id::{merged_id}"
-        for merged_id, members in (feature_merges or {}).items()
-        for member in members
-    }
     required_geo_keys = {
         _normalize_key(key)
         for key in (startup_locales.get("geo", {}) if isinstance(startup_locales, dict) else {}).keys()
@@ -372,7 +364,6 @@ def build_startup_geo_aliases_payload(
     for alias, stable_key in alias_map.items():
         normalized_alias = _normalize_key(alias)
         normalized_stable_key = _normalize_key(stable_key)
-        normalized_stable_key = merged_keys.get(normalized_stable_key, normalized_stable_key)
         if not normalized_alias or not normalized_stable_key:
             continue
         if normalized_stable_key.startswith("city::") or normalized_alias.startswith("city::"):
@@ -536,13 +527,10 @@ def build_startup_support_assets(
         scenario_geo_patch,
         startup_support_whitelist=startup_support_whitelist,
     )
-    manifest_path = startup_locales_output_path.parent / "manifest.json"
-    scenario_manifest = read_json_strict(manifest_path) if manifest_path.exists() else {}
     startup_geo_aliases = build_startup_geo_aliases_payload(
         full_geo_aliases,
         startup_locales,
         startup_support_whitelist=startup_support_whitelist,
-        feature_merges=(scenario_manifest.get("hierarchy_overrides") or {}).get("feature_merges"),
     )
     _write_minified_json(startup_locales_output_path, startup_locales)
     _write_minified_json(startup_geo_aliases_output_path, startup_geo_aliases)

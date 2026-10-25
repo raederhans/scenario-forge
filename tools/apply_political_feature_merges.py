@@ -342,14 +342,22 @@ def record_scenario_feature_merges(manifest_path: Path, merges: Merges, applied:
     """Record scoped merges for js/core/scenario_hierarchy.js, which projects the shared hierarchy.
 
     Members are expressed in shared-hierarchy IDs: an earlier scoped merge that
-    is merged again is replaced by its own members.
+    is merged again is replaced by its own members, and ``feature_redirects``
+    keeps its ID pointing at the final feature for aliases that still name it.
     """
     manifest = load_json(manifest_path)
-    recorded = dict((manifest.get("hierarchy_overrides") or {}).get("feature_merges") or {})
+    overrides = manifest.setdefault("hierarchy_overrides", {})
+    recorded = dict(overrides.get("feature_merges") or {})
+    redirects = dict(overrides.get("feature_redirects") or {})
     for group_id in applied:
         members = merges.by_id[group_id]["member_ids"]
+        consumed = [member for member in members if member in recorded]
         recorded[group_id] = [leaf for member in members for leaf in recorded.pop(member, [member])]
-    manifest.setdefault("hierarchy_overrides", {})["feature_merges"] = dict(sorted(recorded.items()))
+        redirects = {source: group_id if target in consumed else target for source, target in redirects.items()}
+        redirects.update(dict.fromkeys(consumed, group_id))
+    overrides["feature_merges"] = dict(sorted(recorded.items()))
+    if redirects:
+        overrides["feature_redirects"] = dict(sorted(redirects.items()))
     write_json(manifest_path, manifest)
 
 
@@ -432,8 +440,8 @@ def apply_china_crosswalk(merges: Merges) -> None:
     rewrite(DATA / CHINA_CROSSWALK, transform)
 
 
-def apply_quick_fill() -> None:
-    """Rebuild hierarchy quick-fill metadata from the projected crosswalk and every applied plan."""
+def apply_quick_fill(through: str | None = None) -> None:
+    """Rebuild hierarchy quick-fill metadata from the projected crosswalk and the plans applied so far."""
     from map_builder.quick_fill_hierarchy import build_quick_fill_metadata, load_crosswalk, load_feature_merge_members
 
     topology = load_json(DATA / "europe_topology.runtime_political_v1.json")
@@ -441,7 +449,7 @@ def apply_quick_fill() -> None:
 
     def transform(hierarchy: dict) -> dict:
         return {**hierarchy, "quick_fill": build_quick_fill_metadata(
-            hierarchy, properties, load_crosswalk(DATA), load_feature_merge_members(DATA))}
+            hierarchy, properties, load_crosswalk(DATA), load_feature_merge_members(DATA, through))}
 
     rewrite(DATA / "hierarchy.json", transform)
 
@@ -653,7 +661,8 @@ def main() -> None:
         report["base_topologies"] = apply_base_topologies(merges)
         apply_hierarchy(merges)
         apply_china_crosswalk(merges)
-        apply_quick_fill()
+        # A replay must not expect members of plans that are not applied yet.
+        apply_quick_fill(Path(args.plan).name)
     if not args.skip_global:
         apply_locales(merges)
         apply_geo_aliases(merges)

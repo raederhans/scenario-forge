@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from map_builder.political_feature_merge_plans import consumed_members, register_plan, validate_scope  # noqa: E402
+from map_builder.political_feature_merge_plans import consumed_members, ordered_plans, register_plan, validate_scope  # noqa: E402
 
 DATA = ROOT / "data"
 OWNERSHIP_SCENARIOS = ("hoi4_1936", "hoi4_1939", "modern_world", "tno_1962")
@@ -253,7 +253,8 @@ def compass_direction(shape, parent_shape) -> tuple[str, str]:
 
 
 def directional_names(groups: list[dict], topology_path: Path, hierarchy: dict, raw_names: dict,
-                      parent_overrides: dict[str, dict], cities: list[dict], city_minimum: int) -> None:
+                      parent_overrides: dict[str, dict], cities: list[dict], city_minimum: int,
+                      current_id: dict[str, str] | None = None) -> None:
     """Name each group "<parent>·<direction>", or after its largest city; member names stay aliases.
 
     Groups that cover their whole parent take the parent name. Repeated names in
@@ -276,7 +277,10 @@ def directional_names(groups: list[dict], topology_path: Path, hierarchy: dict, 
         planned.setdefault(group["parent_id"], []).extend(group["member_ids"])
     for group in groups:
         parent_id = group["parent_id"]
-        siblings = [member for member in (hierarchy.get("groups") or {}).get(parent_id) or planned[parent_id] if member in rows]
+        # Shared hierarchy members, as they exist after this scope's earlier scoped merges.
+        siblings = list(dict.fromkeys((current_id or {}).get(member, member)
+                                      for member in (hierarchy.get("groups") or {}).get(parent_id) or planned[parent_id]))
+        siblings = [member for member in siblings if member in rows]
         city = largest_city(set(group["member_ids"]), cities, city_minimum)
         if city:
             group["names"], group["name_source"] = city, "city"
@@ -332,6 +336,40 @@ def scoped_adjacency(scenarios: tuple[str, ...]) -> tuple[dict[str, set[str]], d
     return adjacency, source_names
 
 
+def scoped_lineage(scenarios: tuple[str, ...]) -> tuple[dict[str, list[str]], dict[str, str]]:
+    """Merged IDs that exist only in these scenarios: shared-hierarchy leaves, and member -> final ID."""
+    leaves: dict[str, list[str]] = {}
+    final: dict[str, str] = {}
+    for _name, plan in ordered_plans(DATA):
+        if "scenarios" not in plan or not set(scenarios) <= set(plan["scenarios"]):
+            continue
+        for group in plan["groups"]:
+            leaves[group["id"]] = [leaf for member in group["member_ids"] for leaf in leaves.get(member, [member])]
+            for member in group["member_ids"]:
+                final[member] = group["id"]
+    for member in list(final):
+        while final[member] in final:
+            final[member] = final[final[member]]
+    for group_id, group_leaves in leaves.items():
+        for leaf in group_leaves:
+            final[leaf] = final.get(group_id, group_id)
+    return leaves, final
+
+
+def inherit_leaf_assignments(leaves: dict[str, list[str]], memberships: dict[str, list[str]], prefectures: dict[str, str]) -> None:
+    """A scoped merged ID is absent from the shared hierarchy; it takes its leaves' groups,
+    and a mixed one gets a signature nothing else shares, so it never merges."""
+    for merged_id, group_leaves in leaves.items():
+        groups = {tuple(memberships.get(leaf, [])) for leaf in group_leaves}
+        prefecture = {prefectures.get(leaf) for leaf in group_leaves}
+        memberships[merged_id] = list(groups.pop()) if len(groups) == 1 else [f"inconsistent:{merged_id}"]
+        if len(prefecture) == 1:
+            if (value := prefecture.pop()) is not None:
+                prefectures[merged_id] = value
+        else:
+            prefectures[merged_id] = f"inconsistent:{merged_id}"
+
+
 def hierarchy_parent(member_ids: list[str], memberships: dict[str, list[str]]) -> str | None:
     shared = set.intersection(*({key[6:] for key in memberships.get(member, []) if key.startswith("group:")} for member in member_ids))
     return min(shared) if len(shared) == 1 else None
@@ -350,6 +388,8 @@ def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None, 
     tables, hierarchy = load_assignment_tables(scenarios), read_json(DATA / "hierarchy.json")
     adjacency, source_names = load_adjacency() if scenarios is None else scoped_adjacency(scenarios)
     memberships, name_sources = group_memberships(hierarchy), load_name_sources()
+    scoped_leaves, scoped_final = scoped_lineage(scenarios) if scenarios is not None else ({}, {})
+    inherit_leaf_assignments(scoped_leaves, memberships, tables["china_prefecture"])
     protected = set(candidates.get("protected_feature_ids") or []) | river_paint_feature_ids() | fragment_camouflage_feature_ids()
     protected |= invalid_geometry_ids({member for candidate in candidates["candidates"] for member in candidate["member_ids"]},
                                       rewritten_topologies(scenarios))
@@ -379,7 +419,7 @@ def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None, 
                      if candidate.get("parent_id") and candidate.get("parent_names")}
         cities = [row["properties"] for row in read_json(DATA / "world_cities.geojson")["features"]]
         directional_names(groups, ADJACENCY_TOPOLOGY if scenarios is None else scenario_topology(scenarios[0]),
-                          hierarchy, name_sources[1], overrides, cities, city_minimum)
+                          hierarchy, name_sources[1], overrides, cities, city_minimum, scoped_final)
     seen: dict[str, str] = {}
     for group in groups:
         for feature_id in group["member_ids"]:
