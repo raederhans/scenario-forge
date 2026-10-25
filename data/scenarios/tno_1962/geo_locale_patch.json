@@ -25339,33 +25339,9 @@
       "en": "Bezirk Antwerpen",
       "zh": "安特卫普"
     },
-    "BE212": {
-      "en": "Bezirk Mecheln",
-      "zh": "梅赫伦"
-    },
-    "BE213": {
-      "en": "Bezirk Turnhout",
-      "zh": "蒂恩豪特区"
-    },
-    "BE223": {
-      "en": "Bezirk Tongern",
-      "zh": "通厄恩"
-    },
-    "BE224": {
-      "en": "Bezirk Hasselt",
-      "zh": "哈瑟尔特"
-    },
     "BE225": {
       "en": "Bezirk Maaseik",
       "zh": "马瑟克"
-    },
-    "BE231": {
-      "en": "Bezirk Aalst",
-      "zh": "阿尔斯特"
-    },
-    "BE232": {
-      "en": "Bezirk Dendermünde",
-      "zh": "登德明德"
     },
     "BE233": {
       "en": "Bezirk Eeklo",
@@ -25374,10 +25350,6 @@
     "BE234": {
       "en": "Bezirk Gent",
       "zh": "根特"
-    },
-    "BE235": {
-      "en": "Bezirk Oudenaarde",
-      "zh": "奥德纳尔德"
     },
     "BE236": {
       "en": "Bezirk Sankt Nikolaus",
@@ -25391,93 +25363,17 @@
       "en": "Bezirk Löwen",
       "zh": "勒汶"
     },
-    "BE251": {
-      "en": "Bezirk Brügge",
-      "zh": "布吕格"
-    },
-    "BE252": {
-      "en": "Bezirk Diksmuide",
-      "zh": "迪克斯迈德"
-    },
-    "BE253": {
-      "en": "Bezirk Ypern",
-      "zh": "伊珀恩"
-    },
-    "BE254": {
-      "en": "Bezirk Kortrijk",
-      "zh": "科特赖兴"
-    },
-    "BE255": {
-      "en": "Bezirk Ostende",
-      "zh": "奥斯滕德"
-    },
-    "BE256": {
-      "en": "Bezirk Russelaere",
-      "zh": "吕瑟拉勒"
-    },
-    "BE257": {
-      "en": "Bezirk Thielt",
-      "zh": "蒂尔特"
-    },
-    "BE258": {
-      "en": "Bezirk Furnes",
-      "zh": "菲尔讷"
-    },
     "BE310": {
       "en": "Bezirk Nivelles",
       "zh": "尼韦勒区"
-    },
-    "BE323": {
-      "en": "Bezirk Bergen",
-      "zh": "贝亨"
-    },
-    "BE328": {
-      "en": "Bezirk Doornik-Moeskroen",
-      "zh": "多尔尼克-穆斯克龙区"
-    },
-    "BE329": {
-      "en": "Bezirk La Louvière",
-      "zh": "拉卢维耶尔"
-    },
-    "BE32A": {
-      "en": "Bezirk Aat",
-      "zh": "阿特"
     },
     "BE32B": {
       "en": "Bezirk Charleroi",
       "zh": "沙勒鲁瓦"
     },
-    "BE32C": {
-      "en": "Bezirk Zinnik",
-      "zh": "济尼克"
-    },
-    "BE32D": {
-      "en": "Bezirk Thuin",
-      "zh": "蒂安"
-    },
-    "BE331": {
-      "en": "Bezirk Hoei",
-      "zh": "胡伊"
-    },
     "BE332": {
       "en": "Bezirk Lüttich",
       "zh": "吕蒂希"
-    },
-    "BE334": {
-      "en": "Bezirk Borgworm",
-      "zh": "博格沃姆"
-    },
-    "BE335": {
-      "en": "Bezirk Velwisch — Französische Gemeinden",
-      "zh": "费尔维施法语市镇"
-    },
-    "BE336": {
-      "en": "Bezirk Verviers — Deutschsprachige Gemeinschaft",
-      "zh": "费尔维耶德语共同体区"
-    },
-    "BE341": {
-      "en": "Bezirk Arel",
-      "zh": "阿雷尔区"
     },
     "BE342": {
       "en": "Bezirk Bastenaken",
@@ -25487,25 +25383,53 @@
       "en": "Bezirk Marche-en-Famenne",
       "zh": "马尔什-昂法梅讷"
     },
-    "BE344": {
-      "en": "Bezirk Neufchâteau",
-      "zh": "讷沙托"
-    },
-    "BE345": {
-      "en": "Bezirk Virton",
-      "zh": "维尔滕"
-    },
     "BE351": {
       "en": "Bezirk Dinant",
       "zh": "迪南区"
     },
-    "BE352": {
-      "en": "Bezirk Namen",
-      "zh": "纳门"
+    "BE_MRG_15f4aef6c612": {
+      "en": "Hainaut · Northwest",
+      "zh": "埃诺省·西北部"
     },
-    "BE353": {
-      "en": "Bezirk Philippeville",
-      "zh": "菲利普维尔"
+    "BE_MRG_24ed7b411331": {
+      "en": "West Flanders · Southeast",
+      "zh": "西佛兰德省·东南部"
+    },
+    "BE_MRG_38ea003ab243": {
+      "en": "Antwerp · Central",
+      "zh": "安特卫普省·中部"
+    },
+    "BE_MRG_49096f4ef44b": {
+      "en": "Liege · Central",
+      "zh": "列日省·中部"
+    },
+    "BE_MRG_6a92ca76474d": {
+      "en": "Namur · Northwest",
+      "zh": "那慕尔省·西北部"
+    },
+    "BE_MRG_7dbe84a470bd": {
+      "en": "West Flanders · Southwest",
+      "zh": "西佛兰德省·西南部"
+    },
+    "BE_MRG_81cfb513b60d": {
+      "en": "East Flanders · South",
+      "zh": "东佛兰德省·南部"
+    },
+    "BE_MRG_923fe66661e2": {
+      "en": "West Flanders · North",
+      "zh": "西佛兰德省·北部"
+    },
+    "BE_MRG_a29e92a10668": {
+      "en": "Limburg · South",
+      "zh": "比利时林堡省·南部"
+    },
+    "BE_MRG_d49081148862": {
+      "en": "Luxembourg · South",
+      "zh": "比利时卢森堡省·南部"
+    },
+    "BE_MRG_f7a8cd5ecd9e": {
+      "en": "Hainaut · Southeast",
+      "zh": "埃诺省·东南部"
     },
     "BF_ADM1_92566538B19127906733451": {
       "en": "Hauts-Bassins",
@@ -46879,14 +46803,6 @@
       "en": "Chontales",
       "zh": "琼塔莱斯"
     },
-    "NL111": {
-      "en": "Oost-Groningen",
-      "zh": "东格罗宁根"
-    },
-    "NL112": {
-      "en": "Delfzijl en omgeving",
-      "zh": "代尔夫宰尔及周边"
-    },
     "NL113": {
       "en": "Overig Groningen",
       "zh": "格罗宁根腹地"
@@ -46895,49 +46811,17 @@
       "en": "Noord-Friesland",
       "zh": "北弗里斯兰"
     },
-    "NL125": {
-      "en": "Zuidwest-Friesland",
-      "zh": "弗里斯兰西南部"
-    },
-    "NL126": {
-      "en": "Zuidoost-Friesland",
-      "zh": "弗里斯兰东南部"
-    },
     "NL131": {
       "en": "Noord-Drenthe",
       "zh": "北德伦特"
-    },
-    "NL132": {
-      "en": "Zuidoost-Drenthe",
-      "zh": "东南德伦特"
-    },
-    "NL133": {
-      "en": "Zuidwest-Drenthe",
-      "zh": "西南德伦特"
-    },
-    "NL211": {
-      "en": "Noord-Overijssel",
-      "zh": "上艾瑟尔北部"
-    },
-    "NL212": {
-      "en": "Zuidwest-Overijssel",
-      "zh": "上艾瑟尔西南部"
     },
     "NL213": {
       "en": "Twente",
       "zh": "特温特"
     },
-    "NL221": {
-      "en": "Veluwe",
-      "zh": "费吕韦"
-    },
     "NL224": {
       "en": "Zuidwest-Gelderland",
       "zh": "海尔德兰西南部"
-    },
-    "NL225": {
-      "en": "Achterhoek",
-      "zh": "阿赫特霍克"
     },
     "NL226": {
       "en": "Arnhem/Nimwegen",
@@ -46955,25 +46839,13 @@
       "en": "Kop van Noord-Holland",
       "zh": "北荷兰角"
     },
-    "NL323": {
-      "en": "IJmond",
-      "zh": "艾蒙德"
-    },
     "NL324": {
       "en": "Agglomeratie Haarlem",
       "zh": "哈勒姆都会区"
     },
-    "NL325": {
-      "en": "Zaanstreek",
-      "zh": "赞河地区"
-    },
     "NL327": {
       "en": "Het Gooi en Vechtstreek",
       "zh": "古伊和费赫特地区"
-    },
-    "NL328": {
-      "en": "Alkmaar en omgeving",
-      "zh": "阿尔克马尔及周边"
     },
     "NL329": {
       "en": "Groot-Amsterdam",
@@ -46987,17 +46859,9 @@
       "en": "Delft en Westland",
       "zh": "代尔夫特和韦斯特兰"
     },
-    "NL337": {
-      "en": "Agglomeratie Leiden en Bollenstreek",
-      "zh": "莱顿—博伦斯特雷克都会区"
-    },
     "NL33A": {
       "en": "Zuidoost-Zuid-Holland",
       "zh": "南荷兰东南部"
-    },
-    "NL33B": {
-      "en": "Oost-Zuid-Holland",
-      "zh": "南荷兰东部"
     },
     "NL33C": {
       "en": "Groot-Rijnmond",
@@ -47011,18 +46875,6 @@
       "en": "Overig Zeeland",
       "zh": "西兰主体地区"
     },
-    "NL411": {
-      "en": "West-Noord-Brabant",
-      "zh": "北布拉班特西部"
-    },
-    "NL412": {
-      "en": "Midden-Noord-Brabant",
-      "zh": "北布拉班特中部"
-    },
-    "NL413": {
-      "en": "Noordoost-Noord-Brabant",
-      "zh": "北布拉班特东北部"
-    },
     "NL414": {
       "en": "Zuidoost-Noord-Brabant",
       "zh": "北布拉班特东南部"
@@ -47031,13 +46883,41 @@
       "en": "Noord-Limburg",
       "zh": "北林堡"
     },
-    "NL422": {
-      "en": "Midden-Limburg",
-      "zh": "林堡中部"
+    "NL_MRG_19568adfd807": {
+      "en": "North Holland · West",
+      "zh": "北荷兰省·西部"
     },
-    "NL423": {
-      "en": "Zuid-Limburg",
-      "zh": "南林堡"
+    "NL_MRG_39ca088797c0": {
+      "en": "Friesland · South",
+      "zh": "弗里斯兰省·南部"
+    },
+    "NL_MRG_45a7250c2862": {
+      "en": "Groningen · Southeast",
+      "zh": "格罗宁根省·东南部"
+    },
+    "NL_MRG_7e9ad361b25e": {
+      "en": "Drenthe · South",
+      "zh": "德伦特省·南部"
+    },
+    "NL_MRG_99b7c61b066f": {
+      "en": "North Brabant · Central",
+      "zh": "北布拉班特省·中部"
+    },
+    "NL_MRG_b67b46af8948": {
+      "en": "Gelderland · Northeast",
+      "zh": "海尔德兰省·东北部"
+    },
+    "NL_MRG_c127cb50cada": {
+      "en": "Limburg · South",
+      "zh": "荷兰林堡省·南部"
+    },
+    "NL_MRG_cfd8aead1a35": {
+      "en": "South Holland · Northeast",
+      "zh": "南荷兰省·东北部"
+    },
+    "NL_MRG_dfb52b5927e9": {
+      "en": "Overijssel · Northwest",
+      "zh": "上艾瑟尔省·西北部"
     },
     "NO020": {
       "en": "Innlandet",

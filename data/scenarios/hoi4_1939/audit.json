@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 129,
-    "feature_count": 22215,
+    "feature_count": 22185,
     "water_count": 0
   },
   "controller_changes": [],
@@ -215258,10 +215258,10 @@
     "BEL": {
       "base_iso2": "BE",
       "continent_label": "Europe",
-      "controller_feature_count": 44,
+      "controller_feature_count": 25,
       "display_name": "Belgium",
       "entry_kind": "",
-      "feature_count": 44,
+      "feature_count": 25,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -216295,10 +216295,10 @@
     "HOL": {
       "base_iso2": "NL",
       "continent_label": "Europe",
-      "controller_feature_count": 50,
+      "controller_feature_count": 39,
       "display_name": "Netherlands",
       "entry_kind": "",
-      "feature_count": 50,
+      "feature_count": 39,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -219780,13 +219780,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1939",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "cf5326592a9d58d334abdb7b7696e16af3550fcfba674a34ed697073377fa8ea",
+  "snapshot_fingerprint": "773ec807ea059fb7c6f70dd5a04f77d98d37da712ef0a42fd321e5b5b13a8a30",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "785363fc68f5fcebd5349ef0708da6d10c5b94047a9769c826e2abb52e3d1c14",
-    "detail_chunk_manifest_sha256": "a6cda17fb3b73e9997ceb4448c8a68bdd2d70d776908ad66d0b5ac39f46b0de6",
+    "build_snapshot_sha256": "f39c28309a589f6fd1daa74985ce56374c672349201d437e8cbb498909af65d8",
+    "detail_chunk_manifest_sha256": "83040b13db728f1f52c70a7e5623e1fcc8a5904634b22f117b3518f771efc0bc",
     "runtime_bootstrap_topology_sha256": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
-    "runtime_topology_sha256": "6f23ef699cd07e6c409846293ddf4c999efea3c636efbf9b1c51c7c78112c9f0"
+    "runtime_topology_sha256": "0cbdeb87217531984bb6fdb1533f6953b7a93adddd90850de01b19f3fefc25fa"
   },
   "summary": {
     "approximate_count": 457,
@@ -219798,7 +219798,7 @@
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 22215,
+    "feature_count": 22185,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 16042,
     "manual_reviewed_region_count": 13,

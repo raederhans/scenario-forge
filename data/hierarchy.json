@@ -11940,6 +11940,106 @@
       "US_ZN_56_001__R",
       "US_ZN_56_002__R",
       "US_ZN_56_003__R"
+    ],
+    "BE_Antwerp": [
+      "BE211",
+      "BE_MRG_38ea003ab243"
+    ],
+    "BE_Brussels": [
+      "BE100"
+    ],
+    "BE_East_Flanders": [
+      "BE_MRG_81cfb513b60d",
+      "BE233",
+      "BE234",
+      "BE236"
+    ],
+    "BE_Flemish_Brabant": [
+      "BE241",
+      "BE242"
+    ],
+    "BE_Hainaut": [
+      "BE_MRG_f7a8cd5ecd9e",
+      "BE_MRG_15f4aef6c612",
+      "BE32B"
+    ],
+    "BE_Liege": [
+      "BE_MRG_49096f4ef44b",
+      "BE332"
+    ],
+    "BE_Limburg_BE": [
+      "BE_MRG_a29e92a10668",
+      "BE225"
+    ],
+    "BE_Luxembourg_BE": [
+      "BE_MRG_d49081148862",
+      "BE342",
+      "BE343"
+    ],
+    "BE_Namur": [
+      "BE351",
+      "BE_MRG_6a92ca76474d"
+    ],
+    "BE_Walloon_Brabant": [
+      "BE310"
+    ],
+    "BE_West_Flanders": [
+      "BE_MRG_923fe66661e2",
+      "BE_MRG_7dbe84a470bd",
+      "BE_MRG_24ed7b411331"
+    ],
+    "NL_Drenthe": [
+      "NL131",
+      "NL_MRG_7e9ad361b25e"
+    ],
+    "NL_Flevoland": [
+      "NL230"
+    ],
+    "NL_Friesland": [
+      "NL124",
+      "NL_MRG_39ca088797c0"
+    ],
+    "NL_Gelderland": [
+      "NL_MRG_b67b46af8948",
+      "NL224",
+      "NL226"
+    ],
+    "NL_Groningen": [
+      "NL_MRG_45a7250c2862",
+      "NL113"
+    ],
+    "NL_Limburg_NL": [
+      "NL421",
+      "NL_MRG_c127cb50cada"
+    ],
+    "NL_North_Brabant": [
+      "NL_MRG_99b7c61b066f",
+      "NL414"
+    ],
+    "NL_North_Holland": [
+      "NL321",
+      "NL_MRG_19568adfd807",
+      "NL324",
+      "NL327",
+      "NL329"
+    ],
+    "NL_Overijssel": [
+      "NL_MRG_dfb52b5927e9",
+      "NL213"
+    ],
+    "NL_South_Holland": [
+      "NL332",
+      "NL333",
+      "NL_MRG_cfd8aead1a35",
+      "NL33A",
+      "NL33C"
+    ],
+    "NL_Utrecht": [
+      "NL310"
+    ],
+    "NL_Zeeland": [
+      "NL341",
+      "NL342"
     ]
   },
   "labels": {
@@ -13467,7 +13567,30 @@
     "US_Washington": "Washington",
     "US_Wisconsin": "Wisconsin",
     "US_West_Virginia": "West Virginia",
-    "US_Wyoming": "Wyoming"
+    "US_Wyoming": "Wyoming",
+    "BE_Antwerp": "Antwerp",
+    "BE_Brussels": "Brussels-Capital Region",
+    "BE_East_Flanders": "East Flanders",
+    "BE_Flemish_Brabant": "Flemish Brabant",
+    "BE_Hainaut": "Hainaut",
+    "BE_Liege": "Liege",
+    "BE_Limburg_BE": "Limburg (Belgium)",
+    "BE_Luxembourg_BE": "Luxembourg (Belgium)",
+    "BE_Namur": "Namur",
+    "BE_Walloon_Brabant": "Walloon Brabant",
+    "BE_West_Flanders": "West Flanders",
+    "NL_Drenthe": "Drenthe",
+    "NL_Flevoland": "Flevoland",
+    "NL_Friesland": "Friesland",
+    "NL_Gelderland": "Gelderland",
+    "NL_Groningen": "Groningen",
+    "NL_Limburg_NL": "Limburg (Netherlands)",
+    "NL_North_Brabant": "North Brabant",
+    "NL_North_Holland": "North Holland",
+    "NL_Overijssel": "Overijssel",
+    "NL_South_Holland": "South Holland",
+    "NL_Utrecht": "Utrecht",
+    "NL_Zeeland": "Zeeland"
   },
   "interaction_policies": {
     "CN": {

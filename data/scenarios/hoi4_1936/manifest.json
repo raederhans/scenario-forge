@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1936/audit.json",
-  "baseline_hash": "d6e7b4b0e800c7ef762daef933fd14f9a41cf7b1b58a3453c916ce61e0533df5",
+  "baseline_hash": "21cdeb6d4cd2334de38a560f56aa89ba99b65a80361bfea967bdf8bb8537e4ca",
   "bookmark_date": "1936.1.1.12",
   "bookmark_description": "GATHERING_STORM_DESC",
   "bookmark_name": "GATHERING_STORM_NAME",
@@ -95,12 +95,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1936/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "5944380b8a9c35a59aabd363cbc804b7c45fe9be57ccebc7b5a9b714b0f09f65",
+  "snapshot_fingerprint": "67f4d6192d9ae5b370d1fc02a5e3453aa3248045d91fb76f41d14b2ad560e7c0",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "59beb25d876cb4e799380fa1653774ff916af939d9ee54f5388ded1126d47cb6",
+    "detail_chunk_manifest_sha256": "ab54ae738f7ed4250680d93931abd85c8efa8a30e1429d669fa14066e54e3801",
     "runtime_bootstrap_topology_sha256": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
-    "runtime_topology_sha256": "6f23ef699cd07e6c409846293ddf4c999efea3c636efbf9b1c51c7c78112c9f0"
+    "runtime_topology_sha256": "0cbdeb87217531984bb6fdb1533f6953b7a93adddd90850de01b19f3fefc25fa"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1936/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -124,7 +124,7 @@
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 22215,
+    "feature_count": 22185,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 15965,
     "manual_reviewed_region_count": 13,

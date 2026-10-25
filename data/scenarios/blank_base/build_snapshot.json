@@ -4,7 +4,7 @@
   "contract_version": "2026-05-01.v1",
   "durations": {},
   "environment": {},
-  "feature_count": 21924,
+  "feature_count": 21894,
   "generated_at": "2026-10-09T04:45:08.827883+00:00",
   "input_sha": {
     "capital_hints.json": "92d397769fe5695ee895174cf569378a35b88eee9da91483498196fc861c2e86",
@@ -12,13 +12,13 @@
     "cores.by_feature.json": "2dab11f5bebf058fb19d364aad8e78bfceacda7712c57c62aa3cd328faf032b7",
     "countries.json": "96979a1c14ac4c5f83d5b622e92844afa07a1c2cec98fc0826ec1a086fea67ea",
     "owners.by_feature.json": "d21b6824b8fa35208c1c0a0faa3c3ce4664cdc633950ab811d865f1be46bbfb9",
-    "runtime_topology.topo.json": "6e07651b88921616b954ce99dc3ff2ed1f7c215bb35ad8df5c5e6fce6175a3e5",
+    "runtime_topology.topo.json": "1a7a0197e871004db7815ad1b56662d54839b9d5dd2b8146422b565c0a74b335",
     "special_zone_layers.json": "4565092b196e374cdf1054eaf5bf0f2982f7f028f14ff7d183984f7dfa75b56f"
   },
   "output_sha": {},
   "profile": "lightweight_base",
   "report_paths": {},
   "scenario_id": "blank_base",
-  "snapshot_fingerprint": "766aa05afaf52310f49238597729464e15f0c969b650e61e300f53f0c7645cf2",
+  "snapshot_fingerprint": "4d6d07952d2211a45834fe36eebed99d61db378e78e0bc91bcc21e32deaec720",
   "water_count": 0
 }
