@@ -43,7 +43,8 @@ globalThis.addEventListener?.("storage", event => {
 function readDefaultStoredMode() {
   let store = null;
   try { store = globalThis.localStorage; } catch { /* Blocked storage leaves the default. */ }
-  if (storedMode?.store !== store) storedMode = { store, ...readStoredMode(store) };
+  // Without storage the store is undefined, which matches no cache at all.
+  if (!storedMode || storedMode.store !== store) storedMode = { store, ...readStoredMode(store) };
   return storedMode;
 }
 

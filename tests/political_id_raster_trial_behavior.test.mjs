@@ -199,3 +199,18 @@ test("the saved policy is read once and refreshed by local writes, other tabs an
   assert.equal(policy.readPoliticalRenderPolicy({ scenarioId: "tno_1962", storage: policyStore({}) }).effectiveMode, "raster",
     "an explicit store bypasses the cache");
 });
+
+test("without any storage the saved policy falls back to the default", async t => {
+  const originals = Object.fromEntries(["localStorage", "location"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  t.after(() => { for (const [key, descriptor] of Object.entries(originals)) {
+    if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key];
+  } });
+  delete globalThis.localStorage;
+  Object.defineProperty(globalThis, "location", { configurable: true, value: { search: "" } });
+  const policy = await import(`../js/core/renderer/political_id_raster_trial.js?no-storage=${Date.now()}`);
+  for (let call = 0; call < 2; call++) {
+    const result = policy.readPoliticalRenderPolicy({ scenarioId: "tno_1962" });
+    assert.equal(result.preferenceSource, "default");
+    assert.equal(result.effectiveMode, "raster");
+  }
+});
