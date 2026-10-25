@@ -2040,7 +2040,7 @@
       "continent_label": "Asia",
       "display_name": "China",
       "entry_kind": "",
-      "feature_count": 2328,
+      "feature_count": 2162,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -6120,7 +6120,7 @@
       "continent_label": "Europe",
       "display_name": "Russia",
       "entry_kind": "",
-      "feature_count": 11979,
+      "feature_count": 11737,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [

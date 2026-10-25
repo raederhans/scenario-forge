@@ -1701,10 +1701,6 @@
       "en": "Jintan",
       "zh": "金坛"
     },
-    "CN_CITY_17275852B12916935567443": {
-      "en": "Qianxian",
-      "zh": "乾县"
-    },
     "CN_CITY_17275852B13666567623021": {
       "en": "Siping",
       "zh": "四平"
@@ -1940,6 +1936,10 @@
     "CN_MRG_394c2f1e79d2": {
       "en": "Changxian + Mencunhuizuzizhixian",
       "zh": "昌县、孟村回族自治县"
+    },
+    "CN_MRG_5da384536a83": {
+      "en": "Qianxian + Liquanxian + Yongshouxian + Jingyangxian + Wugongxian",
+      "zh": "乾县、礼泉县、永寿县、泾阳县、武功县"
     },
     "CN_MRG_afbaca334723": {
       "en": "Wuqiangxian + Wuyixian + Shenzhou",
@@ -2813,17 +2813,189 @@
       "en": "Paulusburg",
       "zh": "保卢斯堡"
     },
+    "RU_MRG_110b1d987f63": {
+      "en": "Alikovsky District + Krasnoarmeysky District + Tsivilsky District",
+      "zh": "阿利科夫斯基区、红军区、齐维尔斯基区"
+    },
+    "RU_MRG_19fb94f201eb": {
+      "en": "Sovetsky District + Pizhansky District",
+      "zh": "苏维埃区、皮詹斯基区"
+    },
+    "RU_MRG_2358dbd480f8": {
+      "en": "городской округ Славгород + Tabunsky District + German National District",
+      "zh": "斯拉夫哥罗德、塔本斯基区、德意志民族区"
+    },
+    "RU_MRG_248dd5882219": {
+      "en": "Shiritoru District + Ochiai District + Tomarioru District",
+      "zh": "知取区、落合区、泊居区"
+    },
+    "RU_MRG_25e2a56635c5": {
+      "en": "Blagoveshchensky District + Rodinsky District",
+      "zh": "布拉戈维申斯基区、罗丁斯基区"
+    },
+    "RU_MRG_25eea59124e3": {
+      "en": "Khorolsky District + Chernigovsky District + Mikhaylovsky District",
+      "zh": "霍罗尔斯基区、切尔尼戈夫斯基区、米哈伊洛夫斯基区"
+    },
+    "RU_MRG_2ffc38a0e952": {
+      "en": "Kamensky District + городской округ Заречный + Белоярский городской округ",
+      "zh": "卡缅斯基区、扎列奇尼、别洛亚尔斯克"
+    },
+    "RU_MRG_317bc293c6ec": {
+      "en": "Ust-Ishimsky District + Tevrizsky District + Znamensky District",
+      "zh": "乌斯季伊希姆斯基区、捷夫里斯基区、兹纳缅斯基区"
+    },
+    "RU_MRG_33c9fb373a65": {
+      "en": "Bogorodsky District + Nemsky District",
+      "zh": "博戈罗茨基区、涅姆斯基区"
+    },
+    "RU_MRG_42dcfb6eec5e": {
+      "en": "Tuapsinsky District + Apsheronsky District",
+      "zh": "图阿普辛斯基区、阿普歇伦斯克区"
+    },
+    "RU_MRG_47107030a018": {
+      "en": "Oyrot-Tura + Sovetsky District + Mayminsky Rayon",
+      "zh": "奥伊罗特-图拉、苏维埃区、梅明斯基区"
+    },
+    "RU_MRG_51d05b0cd072": {
+      "en": "городской округ Верхняя Пы + Nevyansky District",
+      "zh": "上佩什马、涅维扬斯基区"
+    },
+    "RU_MRG_53076b618d56": {
+      "en": "Romanovsky District + Bayevsky District + Zavyalovsky District",
+      "zh": "罗曼诺夫斯基区、巴耶夫斯基区、扎维亚洛夫斯基区"
+    },
     "RU_MRG_545993141cd3": {
       "en": "Naro-Fominsky District + Woskressensk + Ruzsky District",
       "zh": "纳罗-福明斯基区、沃斯克列先斯克、鲁兹斯基区"
+    },
+    "RU_MRG_59fd0de59d37": {
+      "en": "Кинельский район + Krasnoyarsky District + Neftegorsky District",
+      "zh": "基内尔斯基区、克拉斯诺亚尔斯基区、涅夫捷戈尔斯基区"
+    },
+    "RU_MRG_5b10737a994a": {
+      "en": "городской округ Красноурал + городской округ Верхняя Ту",
+      "zh": "克拉斯努拉尔、上图拉"
+    },
+    "RU_MRG_60d7253b0e0a": {
+      "en": "Usuri Ula + Uspenka District + Yakovlevsky District",
+      "zh": "乌苏里、乌斯片卡区、雅科夫列夫斯基区"
+    },
+    "RU_MRG_61ce738540d1": {
+      "en": "Shkotovsky District + Promyslovka + Suchan",
+      "zh": "什科托夫斯基区、普罗梅斯洛夫卡、苏城"
+    },
+    "RU_MRG_6b0074e9f94b": {
+      "en": "Esutoru District + Smirnykhovsky District + Shikuka District",
+      "zh": "惠须取区、斯米尔尼霍夫斯基区、敷香区"
+    },
+    "RU_MRG_6b0c8db39991": {
+      "en": "Krasnoarmeysky District + Pestravsky District",
+      "zh": "红军区、佩斯特拉夫斯基区"
+    },
+    "RU_MRG_6b6a075bbf36": {
+      "en": "Alexeyevsky District + Bolsheglushitsky District",
+      "zh": "阿列克谢耶夫斯基区、博尔舍格卢希茨基区"
+    },
+    "RU_MRG_6ed49a2fba50": {
+      "en": "Pervomaysky District + Talmensky District + Kosikhinsky District",
+      "zh": "五一区、塔尔缅斯基区、科西欣斯基区"
+    },
+    "RU_MRG_73932f56c8d6": {
+      "en": "Seversky District + Goryachy Klyuch",
+      "zh": "谢韦尔斯基区、戈里亚奇克柳奇"
+    },
+    "RU_MRG_763309207c3e": {
+      "en": "Bystroistoksky District + Petropavlovsky District + Smolensky District",
+      "zh": "比斯特罗斯托克区、彼得罗巴甫洛夫斯基区、斯摩棱斯基区"
+    },
+    "RU_MRG_7663cb1f8f39": {
+      "en": "Verkh-Neyvinsky + Новоуральский городской ок",
+      "zh": "韦尔赫-涅文斯基、新乌拉尔斯克"
+    },
+    "RU_MRG_76828e58eb68": {
+      "en": "Argayashsky District + Озёрский городской округ + Sosnovsky District",
+      "zh": "阿尔加什斯基区、奥焦斯基、索斯诺夫斯基区"
+    },
+    "RU_MRG_7ab59f492d2a": {
+      "en": "Baykalovsky District + Артёмовский городской окру + Irbitsky District",
+      "zh": "贝卡洛夫斯基区、阿尔乔姆、伊尔比茨基区"
+    },
+    "RU_MRG_7ebff71f4352": {
+      "en": "Verkhneye Dubrovo + Берёзовский городской окру",
+      "zh": "上杜布罗沃、别廖佐夫斯基"
+    },
+    "RU_MRG_8e30afce3871": {
+      "en": "ЗАТО Свободный + городской округ Нижняя Сал + Verkhnesaldinsky Urban Okrug",
+      "zh": "斯沃博德内、下萨尔、上萨尔丁"
+    },
+    "RU_MRG_8ec2184da20a": {
+      "en": "ЗАТО Североморск + Koutero District + Kuola District",
+      "zh": "北莫尔斯克、科乌泰罗区、科拉区"
+    },
+    "RU_MRG_8fc678e94f2a": {
+      "en": "Tavrichesky District + Azovsky Nemetsky National District",
+      "zh": "塔夫里切斯基区、亚速德意志民族区"
+    },
+    "RU_MRG_a5221179bd90": {
+      "en": "Belozersky District + Ketovsky District",
+      "zh": "别洛泽尔斯基区、克托夫斯基区"
+    },
+    "RU_MRG_a540d65edaa9": {
+      "en": "Vyselkovsky District + Tikhoretsky District",
+      "zh": "维谢尔科夫斯基区、季霍列茨克区"
+    },
+    "RU_MRG_b18e5b7f00a3": {
+      "en": "Tapiau + Labiau + Insterburg",
+      "zh": "塔皮奥、拉比奥、因斯特堡"
+    },
+    "RU_MRG_ba58fc93c701": {
+      "en": "Tyumentsevsky District + Shelabolikhinsky District + Pavlovsky District",
+      "zh": "秋门采夫斯基区、谢拉博利欣斯基区、巴甫洛夫斯基区"
     },
     "RU_MRG_bc039a5db22c": {
       "en": "Melenkovsky District + Gus-Khrustalny District + Gus-Khrustalny",
       "zh": "梅林科夫斯基区、古斯-赫鲁斯塔尼区、古斯赫鲁斯特尔内"
     },
+    "RU_MRG_c7dcc7efb71b": {
+      "en": "Hiipinä + Apatiitti",
+      "zh": "希皮奈、阿帕蒂蒂"
+    },
+    "RU_MRG_c84f2ed9c6ef": {
+      "en": "Ch'imuniwochi District + Obluchensky District + Birobidzhan",
+      "zh": "奇穆尼窝集区、奥布卢琴斯基区、比罗比詹"
+    },
+    "RU_MRG_d5a146ea7ae0": {
+      "en": "Щербиновский район + Starominsky District + Yeysky District",
+      "zh": "谢尔比诺夫斯基区、斯塔罗明斯基区、叶伊斯克区"
+    },
+    "RU_MRG_d5cd5d634999": {
+      "en": "Rutaka District + Honto District + Maoka District",
+      "zh": "留多加区、本斗区、真冈区"
+    },
+    "RU_MRG_d985bc7cb6ba": {
+      "en": "Vokhomsky District + Oktyabrsky District + Pavinsky District",
+      "zh": "沃霍姆斯基区、十月区、帕文斯基区"
+    },
+    "RU_MRG_db3cc2dd744a": {
+      "en": "Romnensky District + Oktyabrsky District + Belogorsky District",
+      "zh": "罗姆年斯基区、十月区、别洛戈尔斯基区"
+    },
+    "RU_MRG_e0a377c11b7b": {
+      "en": "Kichmengsko-Gorodetsky District + Nikolsky District",
+      "zh": "基奇蒙斯科-戈罗杰茨基区、尼科利斯基区"
+    },
     "RU_MRG_e6c4245fecb6": {
       "en": "Serpukhovsky District + Heidestadt",
       "zh": "谢尔普霍夫斯基区、海德施塔特"
+    },
+    "RU_MRG_f00dfba16127": {
+      "en": "Guryevsky District + Zimmerbude + Cranz",
+      "zh": "古里耶夫斯基区、齐默尔布德、克兰茨"
+    },
+    "RU_MRG_fbedb5ba4063": {
+      "en": "Anuchinsky District + Suchan District",
+      "zh": "阿努钦斯基区、苏城区"
     },
     "RU_RAY_50074027B10504727773087": {
       "en": "городской округ Большой Ка",
@@ -2832,10 +3004,6 @@
     "RU_RAY_50074027B10506947859679": {
       "en": "Voskresensky District",
       "zh": "沃斯克列先斯基区"
-    },
-    "RU_RAY_50074027B10653527260039": {
-      "en": "Esutoru District",
-      "zh": "惠须取区"
     },
     "RU_RAY_50074027B10994626105324": {
       "en": "Ludwigsort",
@@ -2869,21 +3037,9 @@
       "en": "Ivanovsky District",
       "zh": "伊万诺夫斯基区"
     },
-    "RU_RAY_50074027B1484336690213": {
-      "en": "Rutaka District",
-      "zh": "留多加区"
-    },
     "RU_RAY_50074027B15083426907231": {
       "en": "городской округ Жатай",
       "zh": "扎泰"
-    },
-    "RU_RAY_50074027B15138360662510": {
-      "en": "Tapiau",
-      "zh": "塔皮奥"
-    },
-    "RU_RAY_50074027B15595970902062": {
-      "en": "Kamensky District",
-      "zh": "卡缅斯基区"
     },
     "RU_RAY_50074027B15782484108203": {
       "en": "Preußisch Eylau",
@@ -2901,22 +3057,6 @@
       "en": "Severny District",
       "zh": "北区"
     },
-    "RU_RAY_50074027B16188868533688": {
-      "en": "Bogorodsky District",
-      "zh": "博戈罗茨基区"
-    },
-    "RU_RAY_50074027B162254919557": {
-      "en": "Krasnoyarsky District",
-      "zh": "克拉斯诺亚尔斯基区"
-    },
-    "RU_RAY_50074027B16795795282951": {
-      "en": "Shiritoru District",
-      "zh": "知取区"
-    },
-    "RU_RAY_50074027B16822435870965": {
-      "en": "Alexeyevsky District",
-      "zh": "阿列克谢耶夫斯基区"
-    },
     "RU_RAY_50074027B16902666202816": {
       "en": "ЗАТО Звёздный",
       "zh": "兹维奥兹德内"
@@ -2932,10 +3072,6 @@
     "RU_RAY_50074027B17433324636715": {
       "en": "Нижнетуринский городской о",
       "zh": "下图拉"
-    },
-    "RU_RAY_50074027B18064199701976": {
-      "en": "Ch'imuniwochi District",
-      "zh": "奇穆尼窝集区"
     },
     "RU_RAY_50074027B18123411923849": {
       "en": "Oktyabrsky District",
@@ -2973,29 +3109,13 @@
       "en": "Kontupohja District",
       "zh": "孔图波希亚区"
     },
-    "RU_RAY_50074027B19588857007790": {
-      "en": "Petropavlovsky District",
-      "zh": "彼得罗巴甫洛夫斯基区"
-    },
-    "RU_RAY_50074027B20728982890731": {
-      "en": "Labiau",
-      "zh": "拉比奥"
-    },
     "RU_RAY_50074027B21233041988666": {
       "en": "Woronesch",
       "zh": "沃罗涅日"
     },
-    "RU_RAY_50074027B21578169027167": {
-      "en": "Krasnoarmeysky District",
-      "zh": "红军区"
-    },
     "RU_RAY_50074027B21604114440864": {
       "en": "Gubkin",
       "zh": "古布金"
-    },
-    "RU_RAY_50074027B22497972741045": {
-      "en": "Usuri Ula",
-      "zh": "乌苏里"
     },
     "RU_RAY_50074027B2294674519719": {
       "en": "Maikha",
@@ -3029,17 +3149,9 @@
       "en": "Heiligenbeil",
       "zh": "海利根拜尔"
     },
-    "RU_RAY_50074027B25745585862808": {
-      "en": "Sovetsky District",
-      "zh": "苏维埃区"
-    },
     "RU_RAY_50074027B26854249827151": {
       "en": "Beryozovsky District",
       "zh": "别廖佐夫斯基区"
-    },
-    "RU_RAY_50074027B27185032673214": {
-      "en": "Krasnoarmeysky District",
-      "zh": "红军区"
     },
     "RU_RAY_50074027B27848812268076": {
       "en": "ЗАТО Солнечный",
@@ -3065,10 +3177,6 @@
       "en": "Sovetsky District",
       "zh": "苏维埃区"
     },
-    "RU_RAY_50074027B29117855811227": {
-      "en": "городской округ Верхняя Пы",
-      "zh": "上佩什马"
-    },
     "RU_RAY_50074027B29183274260449": {
       "en": "городской округ Архангельс",
       "zh": "阿尔汉格尔斯克"
@@ -3085,17 +3193,9 @@
       "en": "Tselinny District",
       "zh": "采林内区"
     },
-    "RU_RAY_50074027B30510351041396": {
-      "en": "Ochiai District",
-      "zh": "落合区"
-    },
     "RU_RAY_50074027B3081285107988": {
       "en": "Tselinny District",
       "zh": "采林内区"
-    },
-    "RU_RAY_50074027B30829642015709": {
-      "en": "Oyrot-Tura",
-      "zh": "奥伊罗特-图拉"
     },
     "RU_RAY_50074027B31680341094146": {
       "en": "Kainsk District",
@@ -3137,10 +3237,6 @@
       "en": "городской округ Салават",
       "zh": "萨拉瓦特"
     },
-    "RU_RAY_50074027B34790783107353": {
-      "en": "Belozersky District",
-      "zh": "别洛泽尔斯基区"
-    },
     "RU_RAY_50074027B35606429719645": {
       "en": "Kostamus",
       "zh": "科斯塔穆斯"
@@ -3181,10 +3277,6 @@
       "en": "Platenfurt",
       "zh": "普拉滕富特"
     },
-    "RU_RAY_50074027B39416650406639": {
-      "en": "ЗАТО Свободный",
-      "zh": "斯沃博德内"
-    },
     "RU_RAY_50074027B39817723955170": {
       "en": "Alatyr",
       "zh": "阿拉特里"
@@ -3192,10 +3284,6 @@
     "RU_RAY_50074027B40609596354067": {
       "en": "Nevinnomyssk",
       "zh": "涅温诺梅斯克"
-    },
-    "RU_RAY_50074027B40650082048510": {
-      "en": "Znamensky District",
-      "zh": "兹纳缅斯基区"
     },
     "RU_RAY_50074027B40993243777694": {
       "en": "Rschew",
@@ -3233,10 +3321,6 @@
       "en": "Krasnoarmeysky District",
       "zh": "红军区"
     },
-    "RU_RAY_50074027B43628650883925": {
-      "en": "Apsheronsky District",
-      "zh": "阿普歇伦斯克区"
-    },
     "RU_RAY_50074027B43921475786516": {
       "en": "Ebenrode",
       "zh": "埃本罗德"
@@ -3257,10 +3341,6 @@
       "en": "Johannesstadt",
       "zh": "约翰尼斯施塔特"
     },
-    "RU_RAY_50074027B45280576569410": {
-      "en": "Берёзовский городской окру",
-      "zh": "别廖佐夫斯基"
-    },
     "RU_RAY_50074027B45476358417172": {
       "en": "Belovsky District",
       "zh": "别洛夫斯基区"
@@ -3273,10 +3353,6 @@
       "en": "Langouwai",
       "zh": "漤沟崴"
     },
-    "RU_RAY_50074027B4723997737950": {
-      "en": "Mikhaylovsky District",
-      "zh": "米哈伊洛夫斯基区"
-    },
     "RU_RAY_50074027B47678701169486": {
       "en": "Miaojie District",
       "zh": "庙街区"
@@ -3284,14 +3360,6 @@
     "RU_RAY_50074027B47783670520754": {
       "en": "Krasnogorsky District",
       "zh": "克拉斯诺戈尔斯基区"
-    },
-    "RU_RAY_50074027B48263627343832": {
-      "en": "Uspenka District",
-      "zh": "乌斯片卡区"
-    },
-    "RU_RAY_50074027B49802974490397": {
-      "en": "Nikolsky District",
-      "zh": "尼科利斯基区"
     },
     "RU_RAY_50074027B49841574383841": {
       "en": "Orel",
@@ -3345,10 +3413,6 @@
       "en": "городской округ Стерлитама",
       "zh": "斯捷尔利塔马克"
     },
-    "RU_RAY_50074027B52463258949821": {
-      "en": "Pervomaysky District",
-      "zh": "五一区"
-    },
     "RU_RAY_50074027B52464361757597": {
       "en": "Yiluhewei District",
       "zh": "伊鲁河区"
@@ -3357,21 +3421,9 @@
       "en": "Kolchugino District",
       "zh": "科利丘吉诺区"
     },
-    "RU_RAY_50074027B53689487296267": {
-      "en": "Promyslovka",
-      "zh": "普罗梅斯洛夫卡"
-    },
     "RU_RAY_50074027B53939252162264": {
       "en": "Rostow am Don",
       "zh": "顿河畔罗斯托夫"
-    },
-    "RU_RAY_50074027B53964407639404": {
-      "en": "Koutero District",
-      "zh": "科乌泰罗区"
-    },
-    "RU_RAY_50074027B5426948431093": {
-      "en": "Oktyabrsky District",
-      "zh": "十月区"
     },
     "RU_RAY_50074027B54461280140401": {
       "en": "Bohori",
@@ -3421,10 +3473,6 @@
       "en": "городской округ Зея",
       "zh": "结雅"
     },
-    "RU_RAY_50074027B59926713884050": {
-      "en": "Oktyabrsky District",
-      "zh": "十月区"
-    },
     "RU_RAY_50074027B60413300894613": {
       "en": "городской округ Сибай",
       "zh": "锡拜"
@@ -3444,14 +3492,6 @@
     "RU_RAY_50074027B63397808648693": {
       "en": "Yaozhi District",
       "zh": "曜之区"
-    },
-    "RU_RAY_50074027B6339965141747": {
-      "en": "Новоуральский городской ок",
-      "zh": "新乌拉尔斯克"
-    },
-    "RU_RAY_50074027B63762585695828": {
-      "en": "Shikuka District",
-      "zh": "敷香区"
     },
     "RU_RAY_50074027B63792180900852": {
       "en": "Niuleimanho",
@@ -3489,49 +3529,25 @@
       "en": "Goeringstadt",
       "zh": "戈林施塔特"
     },
-    "RU_RAY_50074027B6845547292517": {
-      "en": "Honto District",
-      "zh": "本斗区"
-    },
     "RU_RAY_50074027B69153114446918": {
       "en": "Bondyuzhsky District",
       "zh": "邦久日斯基区"
-    },
-    "RU_RAY_50074027B69941183131076": {
-      "en": "Hiipinä",
-      "zh": "希皮奈"
     },
     "RU_RAY_50074027B70684285161137": {
       "en": "Mishkinsky District",
       "zh": "米什金斯基区"
     },
-    "RU_RAY_50074027B71087427061133": {
-      "en": "Romanovsky District",
-      "zh": "罗曼诺夫斯基区"
-    },
     "RU_RAY_50074027B71338417410099": {
       "en": "Oktyabrsky District",
       "zh": "十月区"
-    },
-    "RU_RAY_50074027B71899291249917": {
-      "en": "Blagoveshchensky District",
-      "zh": "布拉戈维申斯基区"
     },
     "RU_RAY_50074027B71952656261998": {
       "en": "Ivashchenkovo",
       "zh": "伊瓦申科沃"
     },
-    "RU_RAY_50074027B72223889697429": {
-      "en": "Zimmerbude",
-      "zh": "齐默尔布德"
-    },
     "RU_RAY_50074027B72395378197129": {
       "en": "Sovetsky District",
       "zh": "苏维埃区"
-    },
-    "RU_RAY_50074027B72834669384190": {
-      "en": "German National District",
-      "zh": "德意志民族区"
     },
     "RU_RAY_50074027B73402533028604": {
       "en": "Bogotolsky Rayon",
@@ -3540,10 +3556,6 @@
     "RU_RAY_50074027B73956111205177": {
       "en": "Lipezk",
       "zh": "利佩茨克"
-    },
-    "RU_RAY_50074027B74305253047814": {
-      "en": "Артёмовский городской окру",
-      "zh": "阿尔乔姆"
     },
     "RU_RAY_50074027B74690038503000": {
       "en": "Yiluhewei",
@@ -3581,10 +3593,6 @@
       "en": "Sverdlovsk Municipality",
       "zh": "斯维尔德洛夫斯克市"
     },
-    "RU_RAY_50074027B76855541737815": {
-      "en": "Pavlovsky District",
-      "zh": "巴甫洛夫斯基区"
-    },
     "RU_RAY_50074027B77320350284147": {
       "en": "Twer",
       "zh": "特维尔"
@@ -3593,10 +3601,6 @@
       "en": "Klugeburg",
       "zh": "克卢格堡"
     },
-    "RU_RAY_50074027B77663912086268": {
-      "en": "Apatiitti",
-      "zh": "阿帕蒂蒂"
-    },
     "RU_RAY_50074027B78184598260115": {
       "en": "Äänislinna District",
       "zh": "艾尼斯林纳区"
@@ -3604,14 +3608,6 @@
     "RU_RAY_50074027B78200612798540": {
       "en": "Neukuhren",
       "zh": "诺伊库伦"
-    },
-    "RU_RAY_50074027B78352455339224": {
-      "en": "Maoka District",
-      "zh": "真冈区"
-    },
-    "RU_RAY_50074027B79924738274126": {
-      "en": "Azovsky Nemetsky National District",
-      "zh": "亚速德意志民族区"
     },
     "RU_RAY_50074027B80044850298489": {
       "en": "North Chishima District",
@@ -3653,10 +3649,6 @@
       "en": "Ust-Cheptsa District",
       "zh": "乌斯季切普察区"
     },
-    "RU_RAY_50074027B82856800380020": {
-      "en": "Zavyalovsky District",
-      "zh": "扎维亚洛夫斯基区"
-    },
     "RU_RAY_50074027B83808818851185": {
       "en": "Горноуральский городской о",
       "zh": "戈尔诺乌拉尔斯基"
@@ -3664,10 +3656,6 @@
     "RU_RAY_50074027B83821761201565": {
       "en": "Ust-Cheptsa",
       "zh": "乌斯季切普察"
-    },
-    "RU_RAY_50074027B84951526666168": {
-      "en": "Smolensky District",
-      "zh": "斯摩棱斯基区"
     },
     "RU_RAY_50074027B85308151104910": {
       "en": "Palmnicken",
@@ -3681,14 +3669,6 @@
       "en": "Берёзовский городской окру",
       "zh": "别廖佐夫斯基"
     },
-    "RU_RAY_50074027B85824641289458": {
-      "en": "Tikhoretsky District",
-      "zh": "季霍列茨克区"
-    },
-    "RU_RAY_50074027B85935779911627": {
-      "en": "Sovetsky District",
-      "zh": "苏维埃区"
-    },
     "RU_RAY_50074027B86215702387170": {
       "en": "Neu-Kiel",
       "zh": "新基尔"
@@ -3700,10 +3680,6 @@
     "RU_RAY_50074027B87542455562769": {
       "en": "Spassky District",
       "zh": "斯帕斯基区"
-    },
-    "RU_RAY_50074027B87569969608847": {
-      "en": "Suchan",
-      "zh": "苏城"
     },
     "RU_RAY_50074027B87683621003887": {
       "en": "Guderianstadt",
@@ -3725,14 +3701,6 @@
       "en": "Gondatti District",
       "zh": "贡达季区"
     },
-    "RU_RAY_50074027B89083918550968": {
-      "en": "Seversky District",
-      "zh": "谢韦尔斯基区"
-    },
-    "RU_RAY_50074027B89212805690722": {
-      "en": "Cranz",
-      "zh": "克兰茨"
-    },
     "RU_RAY_50074027B89252490479976": {
       "en": "Jekaterinodar",
       "zh": "叶卡捷琳诺达尔"
@@ -3753,21 +3721,9 @@
       "en": "Oktyabrsky District",
       "zh": "十月区"
     },
-    "RU_RAY_50074027B908465227031": {
-      "en": "Sosnovsky District",
-      "zh": "索斯诺夫斯基区"
-    },
     "RU_RAY_50074027B90926067565803": {
       "en": "Zheleznogorsk",
       "zh": "热列兹诺哥尔斯克"
-    },
-    "RU_RAY_50074027B90959697167325": {
-      "en": "Insterburg",
-      "zh": "因斯特堡"
-    },
-    "RU_RAY_50074027B91132812213332": {
-      "en": "Yeysky District",
-      "zh": "叶伊斯克区"
     },
     "RU_RAY_50074027B91359365494051": {
       "en": "Spassky District",
@@ -3789,14 +3745,6 @@
       "en": "Shalinsky District",
       "zh": "沙林斯基区"
     },
-    "RU_RAY_50074027B93262234465303": {
-      "en": "городской округ Верхняя Ту",
-      "zh": "上图拉"
-    },
-    "RU_RAY_50074027B93366024646378": {
-      "en": "Goryachy Klyuch",
-      "zh": "戈里亚奇克柳奇"
-    },
     "RU_RAY_50074027B93509676978918": {
       "en": "Tilsit",
       "zh": "蒂尔西特"
@@ -3813,17 +3761,9 @@
       "en": "Melekess",
       "zh": "梅列克斯"
     },
-    "RU_RAY_50074027B94989951930639": {
-      "en": "Tomarioru District",
-      "zh": "泊居区"
-    },
     "RU_RAY_50074027B95212793065375": {
       "en": "Volzhsky District",
       "zh": "伏尔加区"
-    },
-    "RU_RAY_50074027B95296004893180": {
-      "en": "Suchan District",
-      "zh": "苏城区"
     },
     "RU_RAY_50074027B95696969871843": {
       "en": "городской округ Боготол",
@@ -3836,10 +3776,6 @@
     "RU_RAY_50074027B96584787026473": {
       "en": "Noworossijsk",
       "zh": "新罗西斯克"
-    },
-    "RU_RAY_50074027B96900300661151": {
-      "en": "Yakovlevsky District",
-      "zh": "雅科夫列夫斯基区"
     },
     "RU_RAY_50074027B97493150269350": {
       "en": "Goering",

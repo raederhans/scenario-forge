@@ -7,6 +7,7 @@ from pathlib import Path
 
 from shapely.geometry import box, mapping
 
+from map_builder.quick_fill_hierarchy import load_feature_merge_members
 from tools.atlantropa_identity import reconcile_island_identity
 from tools.patch_tno_1962_bundle import (
     ATLANTROPA_REGION_CONFIGS,
@@ -144,9 +145,12 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
         cores = json.loads((SCENARIO_DIR / "cores.by_feature.json").read_text(encoding="utf-8"))["cores"]
         manual = json.loads((SCENARIO_DIR / "scenario_manual_overrides.json").read_text(encoding="utf-8"))["assignments"]
         mutations = json.loads((SCENARIO_DIR / "scenario_mutations.json").read_text(encoding="utf-8"))["assignments_by_feature_id"]
+        # A reference district may since have been merged; its merged feature keeps the owner.
+        merged_into = {member: group_id for group_id, members in load_feature_merge_members(SCENARIO_DIR.parents[1]).items()
+                       for member in members}
         for city_id, (owner, district_id) in self.CITY_DISTRICT_PAIRS.items():
             with self.subTest(city_id=city_id):
-                self.assertEqual(owners[district_id], owner)
+                self.assertEqual(owners[merged_into.get(district_id, district_id)], owner)
                 self.assertEqual(owners[city_id], owner)
                 self.assertEqual(cores[city_id], [owner])
                 self.assertEqual(manual[city_id], {"owner": owner, "cores": [owner]})

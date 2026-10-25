@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 0,
-    "feature_count": 22153,
+    "feature_count": 21745,
     "water_count": 0
   },
   "diagnostics": {
@@ -645,13 +645,13 @@
   "profile": "lightweight_base",
   "reverse_coverage_gap_count": 0,
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "d1e2a8cdaab7a2c6f994a6555192214bbe471a5a13969f64769391a0fb13b61a",
+  "snapshot_fingerprint": "0c1571da772cdf001f8d448975b18f13cac8302147913b67e882179884b0776d",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "e2856f5973a3886ba656de3c23d7aa782942317facd6e78e792caf9cba2dd4e0",
+    "build_snapshot_sha256": "f15f6892c6da6f93377d180cb7c2033bbc7fc0da3fa0543dc39d5937e6a08695",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
-    "runtime_topology_sha256": "ee9ef878984d96f32a00734bbc382314a2249e7fc05cc02cede1fbeb65466a50",
+    "runtime_topology_sha256": "45b95690d9b049129a83ee59af892419cd4279d630630300637b0c24b66d9703",
     "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a"
   },
   "summary": {
@@ -663,18 +663,18 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 22153,
+    "feature_count": 21745,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 202,
     "quality_counts": {
-      "direct_country_copy": 22153
+      "direct_country_copy": 21745
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "canonical_baseline": 22153
+      "canonical_baseline": 21745
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,

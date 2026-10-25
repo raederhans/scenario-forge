@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1936/audit.json",
-  "baseline_hash": "0d9511a765bbda39d40e687cf317097e94d63f401c3bffb9c7c8613abbff4923",
+  "baseline_hash": "d6e7b4b0e800c7ef762daef933fd14f9a41cf7b1b58a3453c916ce61e0533df5",
   "bookmark_date": "1936.1.1.12",
   "bookmark_description": "GATHERING_STORM_DESC",
   "bookmark_name": "GATHERING_STORM_NAME",
@@ -95,12 +95,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1936/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "de6f3210d3b581113df798dbb53ed405dc406e0b8afaf2bd13adf3bded887e1d",
+  "snapshot_fingerprint": "d240457c8c852f1b05f7aba0e949aebb588e3c8f4ad1b6f239e57aa408ce0d2e",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "0788aa0f02aabe1b546208beb3b0c941b1dc296b13c4a6bdd6d3559bb2f7e486",
+    "detail_chunk_manifest_sha256": "16ef35c435eb49dcc86f453354f37a2512c2e52bf63c084764b28cb026cfeeff",
     "runtime_bootstrap_topology_sha256": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
-    "runtime_topology_sha256": "b727f703fd9b9c954785afa06442130df49cb0ca68283c7ef26db48815334579"
+    "runtime_topology_sha256": "817f900d81f38c38cb2c56da7fc2e2efea33571cb7038731e7c6869b54a03f2e"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1936/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -118,29 +118,29 @@
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 16934,
+    "changed_feature_count": 16419,
     "controller_count": 127,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 22623,
+    "feature_count": 22215,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 16477,
+    "manual_reviewed_feature_count": 15965,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 127,
     "quality_counts": {
-      "approx_existing_geometry": 457,
+      "approx_existing_geometry": 454,
       "direct_country_copy": 5821,
-      "manual_reviewed": 16477
+      "manual_reviewed": 15965
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5821,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 16911
+      "manual_rule": 16396
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,
