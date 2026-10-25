@@ -10,6 +10,7 @@ const {
 } = require("./support/playwright-app");
 const { mergeSmokeFailureSelectors } = require("./support/playwright-selectors");
 const { getConsoleIgnorePatterns } = require("./support/expectations/console-allowlist");
+const { readConsoleIssue, isNativeGpuReadbackDiagnostic, attachNativeGpuDiagnostics } = require("./support/native-gpu-diagnostics");
 
 test.setTimeout(120000);
 const SCENARIO_ID = 'tno_1962';
@@ -34,6 +35,7 @@ async function readScenarioShellRuntime(page) {
 
 test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
   const consoleIssues = [];
+  const nativeGpuDiagnostics = [];
   const networkFailures = [];
   const expectedConsolePatterns = getConsoleIgnorePatterns(__filename);
   const bathymetryRequests = [];
@@ -51,7 +53,11 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
   page.on('console', (msg) => {
     const type = msg.type();
     if (type === 'error' || type === 'warning') {
-      consoleIssues.push({ type, text: msg.text() });
+      // Headless Chromium has no GPU compositing, so presenting the TNO WebGL scene makes
+      // ANGLE report a readback notice; keep it as an artifact, not a console failure.
+      const issue = readConsoleIssue(msg);
+      if (isNativeGpuReadbackDiagnostic(issue, page.url())) nativeGpuDiagnostics.push(issue);
+      else consoleIssues.push({ type, text: issue.text });
     }
   });
 
@@ -179,6 +185,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
     fs.mkdirSync(path.dirname(shotPath), { recursive: true });
     await page.screenshot({ path: shotPath, fullPage: true });
 
+    await attachNativeGpuDiagnostics(testInfo, nativeGpuDiagnostics);
     const actionableConsoleIssues = consoleIssues.filter(
       (issue) => !expectedConsolePatterns.some((pattern) => pattern.test(issue.text)),
     );
