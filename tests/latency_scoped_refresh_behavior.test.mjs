@@ -122,6 +122,8 @@ function bootstrapFixture({ useRealRefresh = false } = {}) {
   vm.createContext(scope); vm.runInContext(source, scope);
   const owner = scope.createDeferredDetailPromotionOwner({ runtimeState: f.state, helpers: {
     schedulePostReadyPoliticalReconcile: () => calls.push(["reconcile"]), canRunPostReadyIdleWork: () => true,
+    // The sandbox only queues timers; the input yield after loading resolves at once here.
+    yieldToInput: async () => {},
   } });
   return { ...f, owner, calls, queued, loadRequests, resolveLoad };
 }

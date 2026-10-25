@@ -86,15 +86,39 @@ export function createContextLayerResolverOwner({
   // layer score 用于比较 primary/detail 数据源覆盖质量：
   // normalizedArea 体现地理覆盖范围，densityBoost 体现要素密度，
   // 两者合成后写入 layerDataDiagnostics.*Score，便于定位来源切换原因。
+  // 覆盖范围取顶点经纬度的外接框，而不是球面 geoBounds：它不计边在两端点之外的
+  // 弧度外凸，也不识别覆盖极点的多边形，但用来比较两个数据源已经足够，且省去对
+  // 每个顶点的球面计算（TNO 的 water_regions 一次就要约 340 ms 主线程时间）。
+  function getVertexLonLatExtent(collection) {
+    let minLon = Infinity, minLat = Infinity, maxLon = -Infinity, maxLat = -Infinity;
+    const visitCoordinates = (coordinates) => {
+      if (!Array.isArray(coordinates)) return;
+      if (typeof coordinates[0] === "number") {
+        const [lon, lat] = coordinates;
+        if (lon < minLon) minLon = lon;
+        if (lon > maxLon) maxLon = lon;
+        if (lat < minLat) minLat = lat;
+        if (lat > maxLat) maxLat = lat;
+        return;
+      }
+      for (const child of coordinates) visitCoordinates(child);
+    };
+    const visitGeometry = (geometry) => {
+      if (geometry?.type === "GeometryCollection") geometry.geometries?.forEach(visitGeometry);
+      else visitCoordinates(geometry?.coordinates);
+    };
+    for (const feature of collection.features) visitGeometry(feature?.geometry);
+    return [[minLon, minLat], [maxLon, maxLat]];
+  }
+
   function computeLayerCoverageScore(collection) {
-    if (!collection?.features?.length || !globalThis.d3?.geoBounds) return 0;
+    if (!collection?.features?.length) return 0;
     const cached = getCollectionDerivations(collection);
     if (cached.coverageScore !== undefined) return cached.coverageScore;
     try {
-      const [[minLon, minLat], [maxLon, maxLat]] = globalThis.d3.geoBounds(collection);
+      const [[minLon, minLat], [maxLon, maxLat]] = getVertexLonLatExtent(collection);
       if (![minLon, minLat, maxLon, maxLat].every(Number.isFinite)) return 0;
-      let width = maxLon - minLon;
-      if (width < 0) width += 360;
+      const width = Math.max(0, maxLon - minLon);
       const height = Math.max(0, maxLat - minLat);
       const normalizedArea = clamp((width * height) / (360 * 180), 0, 1);
       const densityBoost = Math.min(1, Math.log10(collection.features.length + 1) / 4);
