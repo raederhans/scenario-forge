@@ -133,7 +133,8 @@ function initStage(data) {
     context2d.lineWidth = 0.6 / k;
     context2d.strokeStyle = "rgba(224, 166, 106, .16)";
     context2d.stroke(graticule);
-    context2d.lineWidth = 0.5;
+    // At least ~1.2 device pixels: a thinner stroke leaves the anti-aliased seam showing.
+    context2d.lineWidth = Math.max(0.5, 1.2 / (k * scale));
     for (const atom of atoms) {
       const color = rgbString(atom.shown);
       context2d.fillStyle = color;
@@ -172,13 +173,15 @@ function initStage(data) {
     return lens.insertBefore(layer, before);
   }
   const atlantropa = layerSvg("map-atlantropa", svg);
-  // Atlantropa: sea and shoals keep their own look; reclaimed land takes its 1962 owner's colour.
-  for (const layer of ["water", "shoal"]) {
-    if (data.atlantropa[layer]) atlantropa.append(svgEl("path", { class: layer, "fill-rule": "evenodd", d: data.atlantropa[layer] }));
-  }
+  // Atlantropa: the lowered sea is the page's own sea, shoals keep their own look and
+  // reclaimed land takes its 1962 owner's colour. The coast moves with it.
+  if (data.atlantropa.shoal) atlantropa.append(svgEl("path", { class: "shoal", "fill-rule": "evenodd", d: data.atlantropa.shoal }));
   for (const land of data.atlantropa.land) {
     atlantropa.append(svgEl("path", { class: "land", "fill-rule": "evenodd", d: land.d, fill: land.c, stroke: land.c }));
   }
+  atlantropa.append(svgEl("path", { class: "map-coast", d: data.atlantropa.coast }));
+  const oldCoast = layerSvg("map-old-coast");
+  oldCoast.append(svgEl("path", { class: "map-coast", d: data.atlantropa.old_coast }));
   const borderLayers = data.borders.map((d) => {
     const layer = layerSvg("map-borders");
     layer.append(svgEl("path", { d }));
@@ -335,7 +338,9 @@ function initStage(data) {
       const weight = view.mode === "history" ? clamp01(1 - Math.abs(view.position - index) * 2.4) : weights[index];
       fadeLayer(layer, context ? 0 : weight);
     });
-    fadeLayer(atlantropa, view.mode === "history" ? smooth(clamp01(view.position - 1)) : (view.mode === "worlds" || view.mode === "outro") && view.world === "1962" ? 1 : 0);
+    const atlantropaShown = view.mode === "history" ? smooth(clamp01(view.position - 1)) : (view.mode === "worlds" || view.mode === "outro") && view.world === "1962" ? 1 : 0;
+    fadeLayer(atlantropa, atlantropaShown);
+    fadeLayer(oldCoast, 1 - atlantropaShown);
     railGroup.toggleAttribute("hidden", !context);
     cityGroup.toggleAttribute("hidden", !context);
   }

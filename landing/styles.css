@@ -91,10 +91,10 @@ h1, h2 { font-weight: 400; }
 .story[data-mode="edit"] .stage__fills { cursor: pointer; }
 .map-coast { fill: none; stroke: var(--coast); stroke-width: .8; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none; }
 .map-borders path { fill: none; stroke: var(--border); stroke-width: 1.1; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none; }
-.stage__layer.map-atlantropa { transition-duration: .8s; }
+.stage__layer.map-atlantropa, .stage__layer.map-old-coast { transition-duration: .8s; }
 .map-atlantropa .land { stroke-width: .5; }
-.map-atlantropa .shoal { fill: #9fb09a; opacity: .55; }
-.map-atlantropa .water { fill: #17323f; }
+/* TNO's shoal colour (#3a5d70), lifted like the land for the dark sea. */
+.map-atlantropa .shoal { fill: #5b8296; opacity: .45; }
 .map-labels text {
   font-family: var(--font-body); font-weight: 600; text-transform: uppercase; letter-spacing: .22em;
   fill: var(--label); paint-order: stroke; stroke: var(--halo); stroke-width: 3px; stroke-linejoin: round;
