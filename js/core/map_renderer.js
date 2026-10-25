@@ -1030,10 +1030,6 @@ function getLegendControlOwner() {
       specialZoneLegendLayers: LegendManager.getSpecialZoneLayers(runtimeState),
       thematicLegend: getPopulationLegend(runtimeState) || getThematicWgiLegend(runtimeState),
       labelMap: labels || LegendManager.getLabels(state),
-      activeScenarioId: runtimeState.activeScenarioId,
-      hasScenarioVisualEdits: !!runtimeState.activeScenarioId && (
-        Object.keys(runtimeState.visualOverrides || {}).length > 0
-      ),
     }),
     getControlState: () => LegendManager.getControlState(state),
     getControlLimits: () => LegendManager.getControlLimits(),
