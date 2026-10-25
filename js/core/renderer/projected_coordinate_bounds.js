@@ -56,6 +56,23 @@ function isValidPosition(position) {
   return typeof lon === "number" && lon >= -180 && lon <= 180 && lat > -90 && lat < 90;
 }
 
+const RADIANS = Math.PI / 180;
+// D3 takes an edge's latitude extreme from its great circle's normal; within
+// about 1e-8 rad of a pole the sine rounds to 1 and the extreme to exactly ±90°.
+const MIN_POLE_CLEARANCE = 1e-6;
+
+function edgeLongitudeSpan(a, b) {
+  return Math.abs(((b[0] - a[0] + 540) % 360) - 180);
+}
+
+// With both ends at least c from the nearer pole, a minor arc spanning Δλ stays
+// at least atan(tan c · cos(Δλ/2)) from it, the symmetric case being the worst.
+// Δλ = 180° gives zero: that arc runs over the pole.
+function clearsPoles(a, b, span) {
+  const colatitude = (90 - Math.max(Math.abs(a[1]), Math.abs(b[1]))) * RADIANS;
+  return Math.tan(colatitude) * Math.cos((span * RADIANS) / 2) >= MIN_POLE_CLEARANCE;
+}
+
 // Total longitude travelled along a ring's edges, each edge taking D3's minor
 // arc. Unlike the span, repeated or self-overlapping loops keep adding to it.
 function ringLongitudeTravel(ring) {
@@ -64,7 +81,11 @@ function ringLongitudeTravel(ring) {
   let previous = null;
   for (const position of ring) {
     if (!isValidPosition(position)) return Infinity;
-    if (previous) travel += Math.abs(((position[0] - previous[0] + 540) % 360) - 180);
+    if (previous) {
+      const span = edgeLongitudeSpan(previous, position);
+      if (!clearsPoles(previous, position, span)) return Infinity;
+      travel += span;
+    }
     previous = position;
   }
   return travel;
@@ -77,13 +98,12 @@ function isAreaBoundedPolygon(rings, maxTravel) {
   return travel < maxTravel;
 }
 
-// A minor arc reaches a pole only when its ends are 180° apart in longitude.
 function isPoleFreeLine(line) {
   if (!Array.isArray(line) || !line.length) return false;
   let previous = null;
   for (const position of line) {
     if (!isValidPosition(position)) return false;
-    if (previous && Math.abs(((position[0] - previous[0] + 540) % 360) - 180) >= 180) return false;
+    if (previous && !clearsPoles(previous, position, edgeLongitudeSpan(previous, position))) return false;
     previous = position;
   }
   return true;
@@ -97,8 +117,8 @@ function isPoleFreeLine(line) {
 // edge's meridians, so its area is at most 2·|Δλ|. A polygon whose edges travel
 // T radians of longitude in total therefore has an inverted area above 4π - 2T,
 // which the area check rejects while T < (4π - maxArea) / 2. Travel under 180°
-// also cannot wind around a pole, and a line whose edges each span under 180°
-// never reaches one, so no other geometry's bounds touch ±90°. This holds for
+// also cannot wind around a pole, and every accepted edge keeps clear of both
+// poles, so no other geometry's bounds touch ±90°. This holds for
 // any ring shape, including holes, repeated loops and self-intersections.
 export function isCompactLonLatGeometry(geoObject, maxArea = Math.PI * 2) {
   const maxTravel = Math.min(180, ((Math.PI * 4 - maxArea) / 2) * (180 / Math.PI));
