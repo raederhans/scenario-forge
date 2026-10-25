@@ -662,3 +662,58 @@ test("scenario topology chunks still decode to GeoJSON before geometry transfer"
   assert.equal(posted[0].geometryTransport.field, "chunkPayload");
   assert.deepEqual(restoreWorkerResponse(posted[0]).chunkPayload, decodeArcFeatureCollection(topology, topology.objects.political));
 });
+
+test("detail topology parses in its own worker, transfers its arcs and ends that worker", async () => {
+  const detail = {
+    type: "Topology",
+    arcs: [Array.from({ length: 9_000 }, (_, index) => [index + 0.123456789012345, -index - 0.5]), [[1, 2], [3, 4]]],
+    objects: {
+      political: { type: "GeometryCollection", geometries: [{ type: "Polygon", arcs: [[0, -2]], id: "D", properties: { name: "细节" } }] },
+      water_regions: { type: "GeometryCollection", geometries: [{ type: "Polygon", arcs: [[1]], id: "W", properties: {} }] },
+    },
+  };
+  let workerHarness = null;
+  let startupWorkerClient = null;
+  let failNextFetch = false;
+  const originalWorker = globalThis.Worker;
+  const workers = [];
+  class FakeWorker {
+    constructor() { workers.push(this); this.onmessage = null; this.onerror = null; }
+    postMessage(message) { workerHarness.self.onmessage({ data: structuredClone(message) }); }
+    terminate() { this.terminated = true; }
+  }
+  try {
+    workerHarness = createWorkerHarness({
+      fetchResource: async () => {
+        if (failNextFetch) { failNextFetch = false; return { ok: false, status: 404, statusText: "Not Found" }; }
+        return { ok: true, text: async () => JSON.stringify(detail) };
+      },
+      onPostMessage(message, transferables) {
+        workers.at(-1).onmessage({ data: structuredClone(message, { transfer: transferables }) });
+      },
+    });
+    globalThis.Worker = FakeWorker;
+    startupWorkerClient = await import(
+      new URL(`../js/core/startup_worker_client.js?detail-worker=${Date.now()}`, import.meta.url),
+    );
+
+    const result = await startupWorkerClient.loadDetailTopologyViaWorker({ topologyUrl: "/detail.json" });
+    const wire = workerHarness.posted[0];
+    assert.equal(wire.type, "DETAIL_TOPOLOGY_READY");
+    assert.equal(wire.geometryTransport.payload.encoding, "geo-f64-v2", "the arcs travel as Float64 buffers");
+    assert.equal(workerHarness.transferLists[0].length, 2);
+    assert.deepEqual(result.topology, detail);
+    assert.equal(result.topology.arcs[0][1][0], 1.123456789012345);
+    assert.equal(result.metrics.featureCount, 1);
+    assert.equal(workers.length, 1);
+    assert.equal(workers[0].terminated, true, "the dedicated worker ends with its task");
+
+    failNextFetch = true;
+    await assert.rejects(startupWorkerClient.loadDetailTopologyViaWorker({ topologyUrl: "/missing.json" }), /404/);
+    assert.equal(workers.length, 2);
+    assert.equal(workers[1].terminated, true, "a failed task also ends its worker");
+  } finally {
+    startupWorkerClient?.terminateStartupWorker();
+    globalThis.Worker = originalWorker;
+  }
+});
