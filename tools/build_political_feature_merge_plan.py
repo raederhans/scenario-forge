@@ -4,6 +4,11 @@ A candidate group is only merged where every scenario assigns its members
 identically: owners, cores, HOI4 strategic-value buckets, hierarchy groups and
 every quick-fill level. Inconsistent candidates are split into the largest
 consistent subsets that remain contiguous; singletons stay unmerged.
+
+With ``--scenarios`` the plan applies only to those scenarios: owners, cores and
+HOI4 states are read from them alone, and only their runtime topologies are
+rewritten. Hierarchy, quick-fill, China prefecture and protection rules stay
+global, because the shared hierarchy keeps the unmerged members.
 """
 from __future__ import annotations
 
@@ -18,6 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 OWNERSHIP_SCENARIOS = ("hoi4_1936", "hoi4_1939", "modern_world", "tno_1962")
+ALL_SCENARIOS = ("blank_base", *OWNERSHIP_SCENARIOS)
 STRATEGIC_SCENARIOS = ("hoi4_1936", "hoi4_1939")
 RIVER_PARTITIONS = DATA / "river_partitions"
 CHINA_CROSSWALK = DATA / "quick_fill/china_prefecture_crosswalk.v1.json"
@@ -26,6 +32,16 @@ ADJACENCY_TOPOLOGY = DATA / "scenarios/tno_1962/runtime_topology.topo.json.gz"
 # parcels, and every member must be valid there: the apply tool unions without repair.
 REWRITTEN_TOPOLOGIES = (DATA / "europe_topology.na_v2.json", DATA / "europe_topology.runtime_political_v1.json",
                         *sorted(DATA.glob("scenarios/*/runtime_topology.topo.json*")))
+
+
+def scenario_topology(scenario: str) -> Path:
+    path = DATA / f"scenarios/{scenario}/runtime_topology.topo.json"
+    return path if path.exists() else path.with_name(path.name + ".gz")
+
+
+def rewritten_topologies(scenarios: tuple[str, ...] | None) -> tuple[Path, ...]:
+    """Topologies a plan rewrites: all of them, or only the scoped scenarios' runtime topologies."""
+    return REWRITTEN_TOPOLOGIES if scenarios is None else tuple(scenario_topology(s) for s in scenarios)
 
 
 def read_json(path: Path):
@@ -40,14 +56,14 @@ def rewritten_topology(path: Path) -> dict:
     return read_json(path)
 
 
-def invalid_geometry_ids(feature_ids: set[str]) -> set[str]:
+def invalid_geometry_ids(feature_ids: set[str], topologies: tuple[Path, ...] = REWRITTEN_TOPOLOGIES) -> set[str]:
     """Candidate members whose geometry is invalid in any rewritten topology."""
     if str(ROOT) not in sys.path:
         sys.path.insert(0, str(ROOT))
     from map_builder.regional_geometry import _decode_geometry
 
     invalid: set[str] = set()
-    for path in REWRITTEN_TOPOLOGIES:
+    for path in topologies:
         topology = rewritten_topology(path)
         for row in topology["objects"]["political"]["geometries"]:
             feature_id = str((row.get("properties") or {}).get("id") or row.get("id"))
@@ -81,16 +97,16 @@ def group_memberships(hierarchy: dict) -> dict[str, list[str]]:
     return {key: sorted(value) for key, value in memberships.items()}
 
 
-def load_assignment_tables() -> dict[str, dict]:
+def load_assignment_tables(scenarios: tuple[str, ...] | None = None) -> dict[str, dict]:
     tables: dict[str, dict] = {}
-    for scenario in OWNERSHIP_SCENARIOS:
+    for scenario in scoped(OWNERSHIP_SCENARIOS, scenarios):
         for kind in ("owners", "cores"):
             payload = read_json(DATA / f"scenarios/{scenario}/{kind}.by_feature.json")
             tables[f"{scenario}:{kind}"] = payload.get(kind, payload) if isinstance(payload, dict) else payload
-    for scenario in STRATEGIC_SCENARIOS:
+    for scenario in scoped(STRATEGIC_SCENARIOS, scenarios):
         payload = read_json(DATA / f"scenarios/{scenario}/strategic_values.by_feature.json")
         tables[f"{scenario}:strategic_bucket"] = payload["bucket_by_feature"]
-    for path in REWRITTEN_TOPOLOGIES:
+    for path in rewritten_topologies(scenarios):
         precision = rewritten_topology(path).get("political_precision_feature_ids")
         if precision is not None:
             tables[f"{path.relative_to(DATA).as_posix()}:precision"] = dict.fromkeys(precision, True)
@@ -113,9 +129,13 @@ def assignment_signature(feature_id: str, tables: dict[str, dict], memberships: 
     return json.dumps(values, sort_keys=True, ensure_ascii=False)
 
 
-def load_adjacency() -> tuple[dict[str, set[str]], dict[str, str]]:
-    """TNO neighbor graph, plus each feature's source name as the last-resort label."""
-    political = read_json(ADJACENCY_TOPOLOGY)["objects"]["political"]
+def scoped(names: tuple[str, ...], scenarios: tuple[str, ...] | None) -> list[str]:
+    return [name for name in names if scenarios is None or name in scenarios]
+
+
+def load_adjacency(path: Path = ADJACENCY_TOPOLOGY) -> tuple[dict[str, set[str]], dict[str, str]]:
+    """Neighbor graph (TNO by default), plus each feature's source name as the last-resort label."""
+    political = read_json(path)["objects"]["political"]
     ids = [str((row.get("properties") or {}).get("id") or row.get("id")) for row in political["geometries"]]
     source_names = {feature_id: str((row.get("properties") or {}).get("name") or "")
                     for feature_id, row in zip(ids, political["geometries"])}
@@ -201,12 +221,25 @@ def river_paint_feature_ids() -> set[str]:
     return ids
 
 
-def build_plan(candidates_path: Path) -> dict:
+def scoped_adjacency(scenarios: tuple[str, ...]) -> tuple[dict[str, set[str]], dict[str, str]]:
+    """Neighbors in every scoped scenario, so a group is contiguous wherever it is applied."""
+    adjacency, source_names = load_adjacency(scenario_topology(scenarios[0]))
+    for scenario in scenarios[1:]:
+        other, _ = load_adjacency(scenario_topology(scenario))
+        adjacency = {feature_id: neighbors & other[feature_id] for feature_id, neighbors in adjacency.items() if feature_id in other}
+    return adjacency, source_names
+
+
+def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None) -> dict:
+    if scenarios is not None and (not scenarios or not set(scenarios) <= set(ALL_SCENARIOS)):
+        raise ValueError(f"Unknown or empty scenario scope: {scenarios}")
     candidates = read_json(candidates_path)
-    tables, hierarchy = load_assignment_tables(), read_json(DATA / "hierarchy.json")
-    memberships, (adjacency, source_names), name_sources = group_memberships(hierarchy), load_adjacency(), load_name_sources()
+    tables, hierarchy = load_assignment_tables(scenarios), read_json(DATA / "hierarchy.json")
+    adjacency, source_names = load_adjacency() if scenarios is None else scoped_adjacency(scenarios)
+    memberships, name_sources = group_memberships(hierarchy), load_name_sources()
     protected = set(candidates.get("protected_feature_ids") or []) | river_paint_feature_ids() | fragment_camouflage_feature_ids()
-    protected |= invalid_geometry_ids({member for candidate in candidates["candidates"] for member in candidate["member_ids"]})
+    protected |= invalid_geometry_ids({member for candidate in candidates["candidates"] for member in candidate["member_ids"]},
+                                      rewritten_topologies(scenarios))
     groups, splits = [], []
     for candidate in candidates["candidates"]:
         members = [feature_id for feature_id in candidate["member_ids"] if feature_id not in protected]
@@ -238,12 +271,13 @@ def build_plan(candidates_path: Path) -> dict:
         "schema_version": 1,
         "plan_id": candidates_path.name.replace(".candidates.json", ".v1"),
         "candidate_source": candidates_path.relative_to(ROOT).as_posix(),
+        **({} if scenarios is None else {"scenarios": list(scenarios)}),
         "constraints": ["owners", "cores", "strategic_value_buckets", "hierarchy_groups", "quick_fill_groups",
                         "china_crosswalk_prefecture", "precision_tier", "valid_member_geometry",
                         "fragment_camouflage_unchanged",
                         "river_paint_parcels_unchanged", "contiguous"],
-        "ownership_scenarios": list(OWNERSHIP_SCENARIOS),
-        "strategic_scenarios": list(STRATEGIC_SCENARIOS),
+        "ownership_scenarios": scoped(OWNERSHIP_SCENARIOS, scenarios),
+        "strategic_scenarios": scoped(STRATEGIC_SCENARIOS, scenarios),
         "counts": {"candidates": len(candidates["candidates"]), "groups": len(groups),
                    "merged_members": len(seen), "features_removed": len(seen) - len(groups), "split_or_reduced_candidates": len(splits)},
         "groups": groups,
@@ -255,8 +289,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidates", default="data/political_feature_merges/europe_de_fr.candidates.json")
     parser.add_argument("--output", default="data/political_feature_merges/europe_de_fr.v1.json")
+    parser.add_argument("--scenarios", nargs="+", choices=ALL_SCENARIOS,
+                        help="Apply only to these scenarios (default: every scenario and the base topologies).")
     args = parser.parse_args()
-    plan = build_plan(ROOT / args.candidates)
+    plan = build_plan(ROOT / args.candidates, tuple(args.scenarios) if args.scenarios else None)
     (ROOT / args.output).write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps(plan["counts"]))
 

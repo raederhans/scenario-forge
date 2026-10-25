@@ -1,7 +1,8 @@
 # Political feature merges
 
 Merged political features replace several adjacent source parcels with one
-editable feature in **every** scenario and in the shared base data.
+editable feature in **every** scenario and in the shared base data, or only in
+the scenarios a plan names (see *Scenario-scoped plans*).
 
 | File | Role |
 | --- | --- |
@@ -16,8 +17,29 @@ editable feature in **every** scenario and in the shared base data.
 | `russia_china_wave4.candidates.json` | Input: Russia outside the Moscow Reichskommissariat, generated with the Codex protection engine under the RKM pilot rules, and the Codex 2026-10-21 v2 candidates for Shanxi, Shaanxi, Hunan, Guizhou and Guangxi. Groups whose union has a convex-hull fill below 0.4, an aspect above 3.5 or an area above 50,000 km² are left out. |
 | `russia_china_wave4.v1.json` | Applied plan: 248 groups, 656 members, 408 features removed. |
 
-Plans are applied one after another; their member sets are disjoint, and every
-consumer (quick-fill, tests) reads all `*.v<N>.json` plans.
+Plans are applied one after another in file-name order; within each scenario
+their member sets are disjoint, and every consumer (quick-fill, tests) reads all
+`*.v<N>.json` plans. A later plan may list an earlier merged feature
+(`*_MRG_*`) as a member: the plan IDs then chain (A, B → M1; M1, C → M2), so
+replaying the plans in order after an upstream rebuild yields the same result.
+
+### Scenario-scoped plans
+
+`--scenarios tno_1962` (plan field `"scenarios"`) applies a plan only to those
+scenarios. Owners, cores and HOI4 states come from those scenarios alone, and
+contiguity must hold in each of them. Hierarchy, quick-fill, China prefecture
+and every protection rule stay global. The apply tool then:
+
+- leaves the base topologies, `hierarchy.json` and the China crosswalk
+  unchanged, and records the merges in each scoped scenario's
+  `manifest.json` under `hierarchy_overrides.feature_merges`, from which
+  `js/core/scenario_hierarchy.js` projects the shared hierarchy;
+- adds merged entries to `locales.json` and `geo_aliases.json` while keeping
+  the members' entries;
+- projects a global file only when every scenario that reads it is in scope
+  (the TNO releasable catalog for `tno_1962`), refuses a plan that touches any
+  other shared file, and leaves city host IDs on the members;
+- rewrites population features of the scoped scenarios only.
 
 ## Deriving the plan
 
