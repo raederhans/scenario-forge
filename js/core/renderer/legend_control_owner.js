@@ -439,16 +439,12 @@ export function createLegendControlOwner({
       return;
     }
 
-    const { colors, specialZoneLegendLayers, labelMap, activeScenarioId, hasScenarioVisualEdits, thematicLegend } =
-      getLegendModel(uniqueColors, labels);
-    const hasMeaningfulLabels = !!thematicLegend || colors.some((color) => {
-      const key = String(color || "").toLowerCase();
-      return String(labelMap?.[key] || "").trim().length > 0;
+    const { colors, specialZoneLegendLayers, labelMap, thematicLegend } = getLegendModel(uniqueColors, labels);
+    // The map overlay only lists colors the user has named; unnamed paint colors stay off the map.
+    const colorRows = thematicLegend?.entries || colors.flatMap((color) => {
+      const label = String(labelMap?.[String(color || "").toLowerCase()] || "").trim();
+      return label ? [{ color, label }] : [];
     });
-    const colorRows = thematicLegend?.entries || colors.map((color, index) => ({
-      color,
-      label: labelMap?.[String(color || "").toLowerCase()] || `Category ${index + 1}`,
-    }));
     const specialZoneRows = specialZoneLegendLayers.map((layer) => ({
       color: layer.style?.fill || "#8b5cf6",
       label: layer.name || layer.id,
@@ -459,13 +455,6 @@ export function createLegendControlOwner({
     const shouldRebuild = legendKey !== lastLegendKey;
 
     if (!colorRows.length && !specialZoneLegendLayers.length) {
-      controlElement.hidden = true;
-      stopLegendDrag();
-      stopLegendResize();
-      return;
-    }
-
-    if (activeScenarioId && !hasMeaningfulLabels && !hasScenarioVisualEdits && !specialZoneLegendLayers.length) {
       controlElement.hidden = true;
       stopLegendDrag();
       stopLegendResize();

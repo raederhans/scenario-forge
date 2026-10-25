@@ -290702,6 +290702,10 @@
     }
   },
   "ui": {
+    "Category {index}": {
+      "en": "Category {index}",
+      "zh": "类别 {index}"
+    },
     "Political display mode": {
       "en": "Political display mode",
       "zh": "政治层显示模式"

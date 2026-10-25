@@ -258,6 +258,7 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Continuous Cycle": { zh: "连续循环", en: "Continuous Cycle" },
   "Cycle Speed": { zh: "循环速度", en: "Cycle Speed" },
   "{seconds}s / day": { zh: "{seconds} 秒 / 天", en: "{seconds}s / day" },
+  "Category {index}": { zh: "类别 {index}", en: "Category {index}" },
   "≈ {km} km": { zh: "约 {km} 公里", en: "≈ {km} km" },
   "Loading palette suggestions": { zh: "正在加载色板建议", en: "Loading palette suggestions" },
   "No palette suggestions": { zh: "暂无色板建议", en: "No palette suggestions" },
