@@ -40,9 +40,8 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
       if (!window.__rasterAssetFaults.active) return;
       // Covered Worker output is persisted on idle. If that save lands before
       // the first recovery probe, the probe reads it back and never reaches the
-      // held network request. Open the asset database only after that probe
-      // has timed out, so the faulted window has no persistent shortcut.
-      const factory = globalThis.indexedDB, open = factory.open.bind(factory);
+      // held network request. The raster Worker owns the asset database, so a
+      // prelude there opens it only after the page reports that probe timed out.
       const faultsPending = () => {
         const faults = window.__rasterAssetFaults;
         if (faults.active) return true;
@@ -50,21 +49,49 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
         const current = window.__rasterTask?.renderer.getPoliticalIdRasterDiagnostics();
         return !(current?.assetTimeouts >= faults.protectedState.assetTimeouts + 1);
       };
-      const handlers = ["upgradeneeded", "success", "error", "blocked"];
-      factory.open = (name, version) => {
-        if (name !== "political-id-raster-assets-v1" || !faultsPending()) return open(name, version);
-        let request = null;
-        const deferred = Object.fromEntries(handlers.map(type => [`on${type}`, null]));
-        Object.defineProperty(deferred, "result", { get: () => request?.result });
-        Object.defineProperty(deferred, "error", { get: () => request?.error ?? null });
-        const poll = setInterval(() => {
-          if (faultsPending()) return;
-          clearInterval(poll);
-          request = open(name, version);
-          for (const type of handlers) request[`on${type}`] = event => deferred[`on${type}`]?.(event);
-        }, 20);
-        return deferred;
+      const gate = "__rasterAssetDatabaseGate";
+      const prelude = () => {
+        const factory = self.indexedDB, open = factory.open.bind(factory);
+        const handlers = ["upgradeneeded", "success", "error", "blocked"];
+        let released = false; const waiting = [];
+        // Registered before the runtime's onmessage, so the gate never reaches it.
+        self.addEventListener("message", event => {
+          if (event.data?.[gate] !== "open") return;
+          event.stopImmediatePropagation();
+          released = true; waiting.splice(0).forEach(resume => resume());
+        });
+        factory.open = (name, version) => {
+          if (name !== "political-id-raster-assets-v1" || released) return open(name, version);
+          let request = null;
+          const deferred = Object.fromEntries(handlers.map(type => [`on${type}`, null]));
+          Object.defineProperty(deferred, "result", { get: () => request?.result });
+          Object.defineProperty(deferred, "error", { get: () => request?.error ?? null });
+          waiting.push(() => {
+            request = open(name, version);
+            for (const type of handlers) request[`on${type}`] = event => deferred[`on${type}`]?.(event);
+          });
+          return deferred;
+        };
       };
+      const preludeUrl = URL.createObjectURL(new Blob([`const gate = ${JSON.stringify(gate)}; (${prelude})();`], { type: "text/javascript" }));
+      const NativeWorker = window.Worker, gated = [];
+      window.Worker = function Worker(url, options) {
+        const href = new URL(String(url), location.href).href;
+        if (options?.type !== "module" || !href.endsWith("/political_id_raster.worker.js") || !faultsPending()) {
+          return new NativeWorker(url, options);
+        }
+        // Static imports evaluate in order: the prelude runs before the runtime module.
+        const entry = URL.createObjectURL(new Blob([`import ${JSON.stringify(preludeUrl)}; import ${JSON.stringify(href)};`], { type: "text/javascript" }));
+        const worker = new NativeWorker(entry, options);
+        gated.push(worker);
+        return worker;
+      };
+      window.Worker.prototype = NativeWorker.prototype;
+      const poll = setInterval(() => {
+        if (faultsPending()) return;
+        clearInterval(poll);
+        for (const worker of gated.splice(0)) worker.postMessage({ [gate]: "open" });
+      }, 20);
     }, { savedPreference, language, holdRasterAssets });
     if (holdRasterAssets) {
       const held = new Set();
