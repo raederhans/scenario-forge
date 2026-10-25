@@ -13449,8 +13449,8 @@ function getCountryLabelRenderOwner() {
       getCountryLabelColors: (code) => {
         const luminance = getCanvasColorRelativeLuminance(getAdmin0BackgroundFillColor(code));
         return Number.isFinite(luminance) && luminance < 0.18
-          ? { fill: "#f4f1e7", stroke: "rgba(16, 24, 32, 0.5)" }
-          : { fill: "#172b35", stroke: "rgba(255, 252, 241, 0.4)" };
+          ? { fill: "#f4f1e7", stroke: "rgba(16, 24, 32, 0.3)" }
+          : { fill: "#172b35", stroke: "rgba(255, 252, 241, 0.22)" };
       },
     },
     helpers: {
