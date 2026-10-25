@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1939/audit.json",
-  "baseline_hash": "809267620f3cb6fa3fdec7f4dcea2e2f098150f8df783610c22ca70e0af07169",
+  "baseline_hash": "3a131d3d759dddf365e018a0b08bc32b7c7f5aa956865a300fbd67def26ffe67",
   "bookmark_date": "1939.8.14.12",
   "bookmark_description": "BLITZKRIEG_DESC",
   "bookmark_name": "BLITZKRIEG_NAME",
@@ -91,12 +91,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "33b8ac1d1d995887266bd2571d8c20e3adee7c87c50c3a64458cefdf0be6e147",
+  "snapshot_fingerprint": "21957d2a33715fa183b3534cc5da614266226434403d088cee4ddfc77d7ab105",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "6b9186e17e6d26148e840604dcaddbde91d6bebfd430a1feb351a068cd7e79ce",
+    "detail_chunk_manifest_sha256": "fea64ac24b3cbc81410016fb9e1cb398943413c240bbf46b596fecf9a94d2362",
     "runtime_bootstrap_topology_sha256": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
-    "runtime_topology_sha256": "817f900d81f38c38cb2c56da7fc2e2efea33571cb7038731e7c6869b54a03f2e"
+    "runtime_topology_sha256": "65f1afc075f00a8af862bca0f54e8c2d595307f2b29f7248c8a70582f9663db4"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1939/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -120,7 +120,7 @@
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 22215,
+    "feature_count": 22185,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 16042,
     "manual_reviewed_region_count": 13,

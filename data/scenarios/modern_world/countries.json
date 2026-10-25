@@ -1292,7 +1292,7 @@
       "continent_label": "Europe",
       "display_name": "Belgium",
       "entry_kind": "",
-      "feature_count": 44,
+      "feature_count": 25,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -5440,7 +5440,7 @@
       "continent_label": "Europe",
       "display_name": "Netherlands",
       "entry_kind": "",
-      "feature_count": 41,
+      "feature_count": 30,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [

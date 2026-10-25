@@ -7,6 +7,16 @@ import { createUrbanCityPolicyOwner } from '../js/core/renderer/urban_city_polic
 const read = path => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
 const base = { ...read('../data/locales.json').geo, ...read('../data/city_aliases.json').geo };
 const patch = read('../data/scenarios/tno_1962/geo_locale_patch.json').geo;
+const mergePlans = read('../data/political_feature_merges/apply_order.json').plans
+  .map(name => read(`../data/political_feature_merges/${name}`))
+  .filter(plan => !plan.scenarios || plan.scenarios.includes('tno_1962'));
+function mergedInto(id) {
+  for (const plan of mergePlans) {
+    const group = plan.groups.find(entry => entry.member_ids.includes(id));
+    if (group) id = group.id;
+  }
+  return id;
+}
 const world = read('../data/world_cities.geojson');
 const overrides = read('../data/scenarios/tno_1962/city_overrides.json');
 
@@ -84,8 +94,12 @@ test('city mistranslations are corrected without raw-name or region collisions',
   }
   assert.equal(patch.JE.zh, '泽西岛');
   assert.equal(patch.FI1D8.zh, '卡伊努');
-  assert.equal(patch.NL33B.zh, '南荷兰东部');
-  assert.equal(patch.NL411.zh, '北布拉班特西部');
+  // A merged region is named by its parent and direction; the reviewed member names no longer show.
+  for (const [id, zh] of [['NL33B', '南荷兰东部'], ['NL411', '北布拉班特西部']]) {
+    const merged = mergedInto(id);
+    if (merged === id) assert.equal(patch[id].zh, zh);
+    else assert.match(patch[merged].zh, /^\S+·\S+$/);
+  }
 });
 
 test('leaving TNO restores base names after Northwest European overrides', () => {
