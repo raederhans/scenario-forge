@@ -6,6 +6,7 @@ the scenarios a plan names (see *Scenario-scoped plans*).
 
 | File | Role |
 | --- | --- |
+| `parent_names.json` | Reviewed bilingual parent names used by `parent_direction` naming. |
 | `europe_de_fr.candidates.json` | Input: adjacent DE NUTS-3 / FR arrondissement candidates from the 2026-10-21 granularity research. |
 | `europe_de_fr.v1.json` | Applied plan: 54 groups, 132 members, 78 features removed. |
 | `cn_us_ua_first_review.candidates.json` | Input: first-review dense-country candidates (Hebei, Henan, Anhui, Jiangxi; Texas; central Ukraine) from the 2026-10-21 TNO granularity research. |
@@ -16,6 +17,8 @@ the scenarios a plan names (see *Scenario-scoped plans*).
 | `europe_russia_wave3.v1.json` | Applied plan: 271 groups, 655 members, 384 features removed. |
 | `russia_china_wave4.candidates.json` | Input: Russia outside the Moscow Reichskommissariat, generated with the Codex protection engine under the RKM pilot rules, and the Codex 2026-10-21 v2 candidates for Shanxi, Shaanxi, Hunan, Guizhou and Guangxi. Groups whose union has a convex-hull fill below 0.4, an aspect above 3.5 or an area above 50,000 km² are left out. |
 | `russia_china_wave4.v1.json` | Applied plan: 248 groups, 656 members, 408 features removed. |
+| `benelux_wave5.candidates.json` | Input: Belgium and the Netherlands, two to three groups per province (provinces recovered from GISCO NUTS-2 and added to `hierarchy.json`). City hosts are protected for capitals, major cities and cities of at least 250,000. Applied to every scenario, because the shared HOI4 vanilla releasable catalog lists Flemish and Walloon parcels. |
+| `benelux_wave5.v1.json` | Applied plan: 20 groups, 50 members, 30 features removed (Belgium 44 → 25, the Netherlands 40 → 29). |
 
 Plans are applied one after another in the order of `apply_order.json`, never
 by file name; the plan tool appends each new plan there. Within each scenario

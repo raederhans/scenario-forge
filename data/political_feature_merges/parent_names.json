@@ -1,0 +1,96 @@
+{
+  "parents": {
+    "BE_Antwerp": {
+      "en": "Antwerp",
+      "zh": "安特卫普省"
+    },
+    "BE_Brussels": {
+      "en": "Brussels-Capital Region",
+      "zh": "布鲁塞尔首都大区"
+    },
+    "BE_East_Flanders": {
+      "en": "East Flanders",
+      "zh": "东佛兰德省"
+    },
+    "BE_Flemish_Brabant": {
+      "en": "Flemish Brabant",
+      "zh": "弗拉芒布拉班特省"
+    },
+    "BE_Hainaut": {
+      "en": "Hainaut",
+      "zh": "埃诺省"
+    },
+    "BE_Liege": {
+      "en": "Liege",
+      "zh": "列日省"
+    },
+    "BE_Limburg_BE": {
+      "en": "Limburg",
+      "zh": "比利时林堡省"
+    },
+    "BE_Luxembourg_BE": {
+      "en": "Luxembourg",
+      "zh": "比利时卢森堡省"
+    },
+    "BE_Namur": {
+      "en": "Namur",
+      "zh": "那慕尔省"
+    },
+    "BE_Walloon_Brabant": {
+      "en": "Walloon Brabant",
+      "zh": "瓦隆布拉班特省"
+    },
+    "BE_West_Flanders": {
+      "en": "West Flanders",
+      "zh": "西佛兰德省"
+    },
+    "NL_Drenthe": {
+      "en": "Drenthe",
+      "zh": "德伦特省"
+    },
+    "NL_Flevoland": {
+      "en": "Flevoland",
+      "zh": "弗莱福兰省"
+    },
+    "NL_Friesland": {
+      "en": "Friesland",
+      "zh": "弗里斯兰省"
+    },
+    "NL_Gelderland": {
+      "en": "Gelderland",
+      "zh": "海尔德兰省"
+    },
+    "NL_Groningen": {
+      "en": "Groningen",
+      "zh": "格罗宁根省"
+    },
+    "NL_Limburg_NL": {
+      "en": "Limburg",
+      "zh": "荷兰林堡省"
+    },
+    "NL_North_Brabant": {
+      "en": "North Brabant",
+      "zh": "北布拉班特省"
+    },
+    "NL_North_Holland": {
+      "en": "North Holland",
+      "zh": "北荷兰省"
+    },
+    "NL_Overijssel": {
+      "en": "Overijssel",
+      "zh": "上艾瑟尔省"
+    },
+    "NL_South_Holland": {
+      "en": "South Holland",
+      "zh": "南荷兰省"
+    },
+    "NL_Utrecht": {
+      "en": "Utrecht",
+      "zh": "乌得勒支省"
+    },
+    "NL_Zeeland": {
+      "en": "Zeeland",
+      "zh": "泽兰省"
+    }
+  }
+}

@@ -1,0 +1,586 @@
+{
+  "schema_version": 1,
+  "plan_id": "benelux_wave5.v1",
+  "candidate_source": "data/political_feature_merges/benelux_wave5.candidates.json",
+  "constraints": [
+    "owners",
+    "cores",
+    "strategic_value_buckets",
+    "hierarchy_groups",
+    "quick_fill_groups",
+    "china_crosswalk_prefecture",
+    "precision_tier",
+    "valid_member_geometry",
+    "fragment_camouflage_unchanged",
+    "river_paint_parcels_unchanged",
+    "contiguous"
+  ],
+  "ownership_scenarios": [
+    "hoi4_1936",
+    "hoi4_1939",
+    "modern_world",
+    "tno_1962"
+  ],
+  "strategic_scenarios": [
+    "hoi4_1936",
+    "hoi4_1939"
+  ],
+  "counts": {
+    "candidates": 21,
+    "groups": 20,
+    "merged_members": 50,
+    "features_removed": 30,
+    "split_or_reduced_candidates": 3
+  },
+  "groups": [
+    {
+      "id": "BE_MRG_38ea003ab243",
+      "member_ids": [
+        "BE212",
+        "BE213"
+      ],
+      "parent_id": "BE_Antwerp",
+      "names": {
+        "en": "Antwerp · Central",
+        "zh": "安特卫普省·中部"
+      },
+      "member_names": {
+        "BE212": {
+          "en": "Arr. Mechelen",
+          "zh": "梅赫伦区"
+        },
+        "BE213": {
+          "en": "Arr. Turnhout",
+          "zh": "蒂恩豪特区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "BE_MRG_a29e92a10668",
+      "member_ids": [
+        "BE223",
+        "BE224"
+      ],
+      "parent_id": "BE_Limburg_BE",
+      "names": {
+        "en": "Limburg · South",
+        "zh": "比利时林堡省·南部"
+      },
+      "member_names": {
+        "BE223": {
+          "en": "Arr. Tongeren",
+          "zh": "通厄恩区"
+        },
+        "BE224": {
+          "en": "Arr. Hasselt",
+          "zh": "哈瑟尔特区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "BE_MRG_81cfb513b60d",
+      "member_ids": [
+        "BE231",
+        "BE232",
+        "BE235"
+      ],
+      "parent_id": "BE_East_Flanders",
+      "names": {
+        "en": "East Flanders · South",
+        "zh": "东佛兰德省·南部"
+      },
+      "member_names": {
+        "BE231": {
+          "en": "Arr. Aalst",
+          "zh": "阿尔斯特区"
+        },
+        "BE232": {
+          "en": "Arr. Dendermonde",
+          "zh": "登德明德区"
+        },
+        "BE235": {
+          "en": "Arr. Oudenaarde",
+          "zh": "奥德纳尔德区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "BE_MRG_923fe66661e2",
+      "member_ids": [
+        "BE251",
+        "BE255",
+        "BE258"
+      ],
+      "parent_id": "BE_West_Flanders",
+      "names": {
+        "en": "West Flanders · North",
+        "zh": "西佛兰德省·北部"
+      },
+      "member_names": {
+        "BE251": {
+          "en": "Arr. Brugge",
+          "zh": "布吕赫区"
+        },
+        "BE255": {
+          "en": "Arr. Oostende",
+          "zh": "奥斯滕德区"
+        },
+        "BE258": {
+          "en": "Arr. Veurne",
+          "zh": "菲尔讷区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "BE_MRG_7dbe84a470bd",
+      "member_ids": [
+        "BE252",
+        "BE253"
+      ],
+      "parent_id": "BE_West_Flanders",
+      "names": {
+        "en": "West Flanders · Southwest",
+        "zh": "西佛兰德省·西南部"
+      },
+      "member_names": {
+        "BE252": {
+          "en": "Arr. Diksmuide",
+          "zh": "迪克斯迈德区"
+        },
+        "BE253": {
+          "en": "Arr. Ieper",
+          "zh": "伊珀恩区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "BE_MRG_24ed7b411331",
+      "member_ids": [
+        "BE254",
+        "BE256",
+        "BE257"
+      ],
+      "parent_id": "BE_West_Flanders",
+      "names": {
+        "en": "West Flanders · Southeast",
+        "zh": "西佛兰德省·东南部"
+      },
+      "member_names": {
+        "BE254": {
+          "en": "Arr. Kortrijk",
+          "zh": "科特赖克区"
+        },
+        "BE256": {
+          "en": "Arr. Roeselare",
+          "zh": "鲁瑟拉勒区"
+        },
+        "BE257": {
+          "en": "Arr. Tielt",
+          "zh": "蒂尔特区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "BE_MRG_f7a8cd5ecd9e",
+      "member_ids": [
+        "BE323",
+        "BE329",
+        "BE32C",
+        "BE32D"
+      ],
+      "parent_id": "BE_Hainaut",
+      "names": {
+        "en": "Hainaut · Southeast",
+        "zh": "埃诺省·东南部"
+      },
+      "member_names": {
+        "BE323": {
+          "en": "Arr. Mons",
+          "zh": "贝亨区"
+        },
+        "BE329": {
+          "en": "Arr. La Louvière",
+          "zh": "拉卢维耶尔区"
+        },
+        "BE32C": {
+          "en": "Arr. Soignies",
+          "zh": "济尼克区"
+        },
+        "BE32D": {
+          "en": "Arr. Thuin",
+          "zh": "蒂安区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "BE_MRG_15f4aef6c612",
+      "member_ids": [
+        "BE328",
+        "BE32A"
+      ],
+      "parent_id": "BE_Hainaut",
+      "names": {
+        "en": "Hainaut · Northwest",
+        "zh": "埃诺省·西北部"
+      },
+      "member_names": {
+        "BE328": {
+          "en": "Arr. Tournai-Mouscron",
+          "zh": "多尔尼克-穆斯克龙区"
+        },
+        "BE32A": {
+          "en": "Arr. Ath",
+          "zh": "阿特区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "BE_MRG_49096f4ef44b",
+      "member_ids": [
+        "BE331",
+        "BE334",
+        "BE335",
+        "BE336"
+      ],
+      "parent_id": "BE_Liege",
+      "names": {
+        "en": "Liege · Central",
+        "zh": "列日省·中部"
+      },
+      "member_names": {
+        "BE331": {
+          "en": "Arr. Huy",
+          "zh": "胡伊区"
+        },
+        "BE334": {
+          "en": "Arr. Waremme",
+          "zh": "博格沃姆区"
+        },
+        "BE335": {
+          "en": "Arr. Verviers — communes francophones",
+          "zh": "费尔维耶法语市镇区"
+        },
+        "BE336": {
+          "en": "Bezirk Verviers — Deutschsprachige Gemeinschaft",
+          "zh": "费尔维耶德语共同体区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "BE_MRG_d49081148862",
+      "member_ids": [
+        "BE341",
+        "BE345",
+        "BE344"
+      ],
+      "parent_id": "BE_Luxembourg_BE",
+      "names": {
+        "en": "Luxembourg · South",
+        "zh": "比利时卢森堡省·南部"
+      },
+      "member_names": {
+        "BE341": {
+          "en": "Arr. Arlon",
+          "zh": "阿雷尔区"
+        },
+        "BE345": {
+          "en": "Arr. Virton",
+          "zh": "维尔通区"
+        },
+        "BE344": {
+          "en": "Arr. Neufchâteau",
+          "zh": "讷沙托区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "BE_MRG_6a92ca76474d",
+      "member_ids": [
+        "BE352",
+        "BE353"
+      ],
+      "parent_id": "BE_Namur",
+      "names": {
+        "en": "Namur · Northwest",
+        "zh": "那慕尔省·西北部"
+      },
+      "member_names": {
+        "BE352": {
+          "en": "Arr. Namur",
+          "zh": "纳门区"
+        },
+        "BE353": {
+          "en": "Arr. Philippeville",
+          "zh": "菲利普维尔区"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "NL_MRG_45a7250c2862",
+      "member_ids": [
+        "NL111",
+        "NL112"
+      ],
+      "parent_id": "NL_Groningen",
+      "names": {
+        "en": "Groningen · Southeast",
+        "zh": "格罗宁根省·东南部"
+      },
+      "member_names": {
+        "NL111": {
+          "en": "Oost-Groningen",
+          "zh": "东格罗宁根"
+        },
+        "NL112": {
+          "en": "Delfzijl en omgeving",
+          "zh": "代尔夫宰尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "NL_MRG_39ca088797c0",
+      "member_ids": [
+        "NL125",
+        "NL126"
+      ],
+      "parent_id": "NL_Friesland",
+      "names": {
+        "en": "Friesland · South",
+        "zh": "弗里斯兰省·南部"
+      },
+      "member_names": {
+        "NL125": {
+          "en": "Zuidwest-Friesland",
+          "zh": "弗里斯兰西南部"
+        },
+        "NL126": {
+          "en": "Zuidoost-Friesland",
+          "zh": "弗里斯兰东南部"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "NL_MRG_7e9ad361b25e",
+      "member_ids": [
+        "NL132",
+        "NL133"
+      ],
+      "parent_id": "NL_Drenthe",
+      "names": {
+        "en": "Drenthe · South",
+        "zh": "德伦特省·南部"
+      },
+      "member_names": {
+        "NL132": {
+          "en": "Zuidoost-Drenthe",
+          "zh": "东南德伦特"
+        },
+        "NL133": {
+          "en": "Zuidwest-Drenthe",
+          "zh": "西南德伦特"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "NL_MRG_dfb52b5927e9",
+      "member_ids": [
+        "NL211",
+        "NL212"
+      ],
+      "parent_id": "NL_Overijssel",
+      "names": {
+        "en": "Overijssel · Northwest",
+        "zh": "上艾瑟尔省·西北部"
+      },
+      "member_names": {
+        "NL211": {
+          "en": "Noord-Overijssel",
+          "zh": "上艾瑟尔北部"
+        },
+        "NL212": {
+          "en": "Zuidwest-Overijssel",
+          "zh": "上艾瑟尔西南部"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "NL_MRG_b67b46af8948",
+      "member_ids": [
+        "NL221",
+        "NL225"
+      ],
+      "parent_id": "NL_Gelderland",
+      "names": {
+        "en": "Gelderland · Northeast",
+        "zh": "海尔德兰省·东北部"
+      },
+      "member_names": {
+        "NL221": {
+          "en": "Veluwe",
+          "zh": "费吕韦"
+        },
+        "NL225": {
+          "en": "Achterhoek",
+          "zh": "阿赫特霍克"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "NL_MRG_19568adfd807",
+      "member_ids": [
+        "NL323",
+        "NL325",
+        "NL328"
+      ],
+      "parent_id": "NL_North_Holland",
+      "names": {
+        "en": "North Holland · West",
+        "zh": "北荷兰省·西部"
+      },
+      "member_names": {
+        "NL323": {
+          "en": "IJmond",
+          "zh": "艾蒙德"
+        },
+        "NL325": {
+          "en": "Zaanstreek",
+          "zh": "赞河地区"
+        },
+        "NL328": {
+          "en": "Alkmaar en omgeving",
+          "zh": "阿尔克马尔"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "NL_MRG_cfd8aead1a35",
+      "member_ids": [
+        "NL337",
+        "NL33B"
+      ],
+      "parent_id": "NL_South_Holland",
+      "names": {
+        "en": "South Holland · Northeast",
+        "zh": "南荷兰省·东北部"
+      },
+      "member_names": {
+        "NL337": {
+          "en": "Agglomeratie Leiden en Bollenstreek",
+          "zh": "莱顿—博伦斯特雷克都会区"
+        },
+        "NL33B": {
+          "en": "Oost-Zuid-Holland",
+          "zh": "东南荷兰"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "NL_MRG_99b7c61b066f",
+      "member_ids": [
+        "NL411",
+        "NL412",
+        "NL413"
+      ],
+      "parent_id": "NL_North_Brabant",
+      "names": {
+        "en": "North Brabant · Central",
+        "zh": "北布拉班特省·中部"
+      },
+      "member_names": {
+        "NL411": {
+          "en": "West-Noord-Brabant",
+          "zh": "西北布拉班特"
+        },
+        "NL412": {
+          "en": "Midden-Noord-Brabant",
+          "zh": "中北布拉班特"
+        },
+        "NL413": {
+          "en": "Noordoost-Noord-Brabant",
+          "zh": "北布拉班特东北部"
+        }
+      },
+      "name_source": "parent_direction"
+    },
+    {
+      "id": "NL_MRG_c127cb50cada",
+      "member_ids": [
+        "NL422",
+        "NL423"
+      ],
+      "parent_id": "NL_Limburg_NL",
+      "names": {
+        "en": "Limburg · South",
+        "zh": "荷兰林堡省·南部"
+      },
+      "member_names": {
+        "NL422": {
+          "en": "Midden-Limburg",
+          "zh": "林堡中部"
+        },
+        "NL423": {
+          "en": "Zuid-Limburg",
+          "zh": "南林堡"
+        }
+      },
+      "name_source": "parent_direction"
+    }
+  ],
+  "split_or_reduced_candidates": [
+    {
+      "candidate": [
+        "BE231",
+        "BE232",
+        "BE235",
+        "BE236"
+      ],
+      "applied": [
+        [
+          "BE231",
+          "BE232",
+          "BE235"
+        ]
+      ]
+    },
+    {
+      "candidate": [
+        "BE342",
+        "BE343"
+      ],
+      "applied": []
+    },
+    {
+      "candidate": [
+        "NL321",
+        "NL323",
+        "NL325",
+        "NL328"
+      ],
+      "applied": [
+        [
+          "NL323",
+          "NL325",
+          "NL328"
+        ]
+      ]
+    }
+  ]
+}

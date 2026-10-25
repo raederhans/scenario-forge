@@ -3,7 +3,7 @@
   "scenario": {
     "id": "modern_world",
     "version": 2,
-    "baselineHash": "263c72c92b801cec15839bdc9f48cd3e7655350a4e75d60445503190a345cca6",
+    "baselineHash": "3d73c9399e0834f8bb5b5683bf9b01b9c9f822f699e8736e51fa039051fe1114",
     "viewMode": "ownership"
   },
   "mapSemanticMode": "ownership",
