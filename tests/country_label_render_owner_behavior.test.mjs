@@ -153,22 +153,26 @@ test("current-view readiness includes scheduled fits but does not wait for offsc
 
 test("visibility upper bound preserves threshold, unknown geometry and any potentially visible component", () => {
   const transform = { x: 0, y: 0, k: 1 }, viewport = { minX: 0, minY: 0, maxX: 800, maxY: 700 };
-  const bounds = { x: 20, y: 20, w: 100, h: 100 };
-  const entry = area => ({ polygons: [[]], components: [{ area, bounds }] });
-  const thresholdArea = (28 + 32 * (0.05 / 0.9)) ** 2;
-  assert.equal(isCountryLabelDefinitelyInvisible(entry(100), transform, viewport), true);
-  assert.equal(isCountryLabelDefinitelyInvisible(entry(thresholdArea * (1 - 1e-10)), transform, viewport), true);
-  assert.equal(isCountryLabelDefinitelyInvisible(entry(thresholdArea), transform, viewport), false,
+  // A fit's ink lies inside its component, so twice the longest side bounds
+  // its screen font; alpha reaches 0.05 at 7 + 0.05 / 0.82 * 3 pixels.
+  const thresholdSide = (7 + 0.05 / 0.82 * 3) / 2;
+  const entry = (side, area = side * side) => ({ polygons: [[]], components: [{ area, bounds: { x: 20, y: 20, w: side, h: side / 3 } }] });
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(2), transform, viewport), true);
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(thresholdSide * (1 - 1e-10)), transform, viewport), true);
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(thresholdSide), transform, viewport), false,
     "the alpha=0.05 mathematical boundary still needs its exact fit");
-  assert.equal(isCountryLabelDefinitelyInvisible(entry(thresholdArea * (1 + 1e-10)), transform, viewport), false);
-  const two = entry(100); two.components.push({ area: 10000, bounds });
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(2), { ...transform, k: 3 }, viewport), false,
+    "magnification makes the same map-space title potentially legible");
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(1000), transform, viewport), false,
+    "a large territory may still carry a smaller, unfaded title");
+  const two = entry(2); two.components.push(entry(100).components[0]);
   assert.equal(isCountryLabelDefinitelyInvisible(two, transform, viewport), false);
-  for (const unknown of [entry(NaN), entry(Infinity), { ...entry(100), polygons: null },
-    { polygons: [[]], components: [] }, { polygons: [[]], components: [{ area: 100, bounds: { ...bounds, w: Infinity } }] }]) {
+  for (const unknown of [entry(2, NaN), entry(2, Infinity), { ...entry(2), polygons: null },
+    { polygons: [[]], components: [] }, { polygons: [[]], components: [{ area: 4, bounds: { x: 0, y: 0, w: Infinity, h: 2 } }] }]) {
     assert.equal(isCountryLabelDefinitelyInvisible(unknown, transform, viewport), false);
   }
-  assert.equal(isCountryLabelDefinitelyInvisible(entry(100), { ...transform, k: NaN }, viewport), false);
-  assert.equal(isCountryLabelDefinitelyInvisible(entry(100), transform, { ...viewport, maxX: NaN }), false);
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(2), { ...transform, k: NaN }, viewport), false);
+  assert.equal(isCountryLabelDefinitelyInvisible(entry(2), transform, { ...viewport, maxX: NaN }), false);
 });
 
 test("tiny countries skip worker fits and regain exact preparation when zoom makes them potentially visible", async () => {
@@ -178,10 +182,10 @@ test("tiny countries skip worker fits and regain exact preparation when zoom mak
     scheduleWork: callback => callbacks.push(callback), onInvalidate() {},
     createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
   } });
-  h.source.countries[0].feature.geometry.coordinates = [squareRing(50, 50, 10)];
+  h.source.countries[0].feature.geometry.coordinates = [squareRing(50, 50, 3)];
   const first = h.owner.prepareCurrentView(1);
   callbacks.shift()(); await first;
-  assert.equal(messages.length, 0, "projected visible area proves that even a maximally readable font is invisible");
+  assert.equal(messages.length, 0, "projected extent proves that even the largest possible title is illegible");
   assert.equal(h.owner.isReadyForCurrentView(), true);
   assert.equal(h.owner.drawCountryLabels(1), 0);
   assert.equal(h.owner.getDiagnostics().skippedByVisibilityUpperBound, 1);
@@ -198,14 +202,14 @@ test("tiny countries skip worker fits and regain exact preparation when zoom mak
   assert.equal(h.owner.getDiagnostics().geometryBuilds, 1);
 });
 
-test("a partially visible country starts fitting after panning reveals enough of the same geometry", async () => {
+test("an offscreen country starts fitting after panning reveals the same geometry", async () => {
   const callbacks = [], messages = [];
   let worker;
   const h = createHarness({ helperOptions: { nowMs: () => 0,
     scheduleWork: callback => callbacks.push(callback), onInvalidate() {},
     createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
   } });
-  h.source.countries[0].feature.geometry.coordinates = [squareRing(795, 50, 100)];
+  h.source.countries[0].feature.geometry.coordinates = [squareRing(805, 50, 100)];
   const partial = h.owner.prepareCurrentView(1);
   callbacks.shift()(); await partial;
   assert.equal(messages.length, 0);
@@ -298,9 +302,9 @@ test("four lazy country workers preserve exact results, stable geometry ownershi
   assert.equal(invalidations, 1);
   assert.equal(h.owner.isReadyForCurrentView(), true);
   h.state.zoomTransform.k = 1.3;
-  await drain(h.owner.prepareCurrentView(1.3));
-  assert.equal(uploads, 12, "later bands reuse each country's only worker geometry copy");
-  assert.equal(invalidations, 2);
+  assert.equal(h.owner.prepareCurrentView(1.3), null, "map-space fits survive zoom without new worker requests");
+  assert.equal(uploads, 12);
+  assert.equal(invalidations, 1);
   const diagnostics = h.owner.getDiagnostics();
   assert.equal(diagnostics.workerCount, 4);
   assert.equal(diagnostics.workersCreated, 4);
@@ -477,65 +481,24 @@ test("explicit cancellation releases the private view and late replies cannot pu
   assert.equal(owner.isReadyForCurrentView(), true);
 });
 
-test("final exact country fit is independent of completed warm fits and cancelled reply dispatch order", async () => {
-  const candidates = [85, 105].map(y => ({ polygonIndex: 0, kind: "horizontal", angle: 0,
-    points: [{ x: 40, y }, { x: 150, y }], length: 110, clearance: 55 }));
-  const run = async (order) => {
-    const callbacks = [], messages = [];
-    let worker;
-    const h = createHarness({ names: ["BRAZIL"], realLayout: true, helperOptions: {
-      nowMs: () => 0, scheduleWork: callback => callbacks.push(callback), onInvalidate() {},
-      createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
-    } });
-    const warming = h.owner.prepareCurrentView(1);
-    callbacks.shift()();
-    const first = messages[0];
-    const warmFit = fitCountryLabel(candidates, { ...first.options, polygons: first.polygons,
-      minFontSize: 12, maxFontSize: 12, maxAlternatives: 0, preferredCandidateIndex: 1 });
-    assert.equal(warmFit.candidateIndex, 1, "a real equal-score alternate provides the warm history");
-    const deliverWarm = () => worker.onmessage({ data: { requestId: first.requestId, fit: warmFit } });
-    if (order === "completed-warm") deliverWarm();
-    else h.owner.cancelPreparation();
-    await warming;
-    if (order === "cancelled-before-dispatch") deliverWarm();
-    h.state.zoomTransform.k = 1.3;
-    const current = h.owner.prepareCurrentView(1.3);
-    while (callbacks.length) callbacks.shift()();
-    const target = messages[1];
-    if (order === "cancelled-after-dispatch") deliverWarm();
-    assert.equal(target.options.preferredCandidateIndex, undefined,
-      "final input cannot inherit whichever band happened to finish before dispatch");
-    const fit = fitCountryLabel(candidates, { ...target.options, polygons: first.polygons,
-      minFontSize: 12, maxFontSize: 12, maxAlternatives: 0 });
-    assert.equal(fit.candidateIndex, 0);
-    worker.onmessage({ data: { requestId: target.requestId, fit } });
-    await current;
-    assert.equal(h.owner.isReadyForCurrentView(), true);
-    h.owner.drawCountryLabels(1.3);
-    return { fit, labels: h.owner.getDiagnostics().lastLabels,
-      glyphs: h.context.events.filter(([event]) => ["translate", "rotate", "fill", "stroke"].includes(event)) };
-  };
-  const cold = await run("cancelled-after-dispatch");
-  assert.deepEqual(await run("cancelled-before-dispatch"), cold);
-  assert.deepEqual(await run("completed-warm"), cold,
-    "warming the cache may change latency but never the final candidate or glyph positions");
-});
-
-test("viewport-dependent country fits use bounded distinct cache entries", () => {
+test("zoom and viewport changes reuse the single map-space fit and its glyph positions", () => {
   const h = createHarness();
   h.owner.drawCountryLabels(1);
   assert.equal(h.fitCalls.length, 1);
-  h.setViewportWidth(801);
-  assert.equal(h.owner.isReadyForCurrentView(), false, "arc-area inputs changed within the same zoom band");
-  h.owner.drawCountryLabels(1);
-  assert.equal(h.fitCalls.length, 2);
-  assert.notEqual(h.fitCalls[0].minArcComponentArea, h.fitCalls[1].minArcComponentArea);
-  for (let width = 802; width < 810; width++) {
+  const options = h.fitCalls[0];
+  assert.equal(options.minFontSize < 1, true, "small territories may fit tiny map-space titles");
+  assert.equal(options.maxFontSize > 32, true, "large territories are not capped by a screen font");
+  for (const [k, width] of [[1.3, 800], [2, 801], [4, 1200], [0.8, 640]]) {
+    h.state.zoomTransform.k = k;
     h.setViewportWidth(width);
-    h.owner.drawCountryLabels(1);
-    assert.ok(h.owner.getDiagnostics().cachedFits <= 4);
+    assert.equal(h.owner.isReadyForCurrentView(), true);
+    h.owner.drawCountryLabels(k);
   }
-  assert.equal(h.owner.getDiagnostics().cachedFits, 4);
+  assert.equal(h.fitCalls.length, 1, "neither zoom nor viewport refits a title");
+  assert.equal(h.owner.getDiagnostics().cachedFits, 1);
+  const translations = h.context.events.filter(([event]) => event === "translate");
+  assert.deepEqual(new Set(translations.map(([, x, y]) => `${x},${y}`)).size, 2,
+    "every draw reuses the same map-space glyph origins");
 });
 
 test("a host preparation exception settles once, stays failed without retry and recovers on a new source", async () => {
@@ -580,6 +543,8 @@ test("owner aggregates small worker timing and prepared-index accounting without
   for (const [k, workerMs, fitMs, candidateBuildMs, preparedGeometryBuildMs, preparedGeometryBytes] of [
     [1, 10, 8, 2, 3, 100], [1.3, 7, 6, 1, 2, 120],
   ]) {
+    // Fits are zoom independent; a font change requests the second one.
+    if (k !== 1) owner.clearTextCache();
     state.zoomTransform.k = k;
     const pending = owner.prepareCurrentView(k);
     callbacks.shift()();
@@ -739,23 +704,24 @@ test("normalized real glyph metrics, graphemes and language fonts participate in
   assert.equal(fitCalls[0].glyphPadding, 0.06);
   assert.match(context.events.find(([event]) => event === "measure")[2], /^500 100px "Map Garamond"/);
   assert.match(context.events.find(([event]) => event === "fill")[2], /^500 .*"Map Garamond", "Palatino Linotype", Georgia, serif$/);
-  assert.equal(context.events.find(([event]) => event === "stroke")[4], 0.45);
+  assert.ok(Math.abs(context.events.find(([event]) => event === "stroke")[4] - 12 * 0.14) < 1e-9,
+    "the halo is part of the map-space lettering");
   assert.equal(fitCalls[0].allowArcs, true);
   assert.equal(fitCalls[0].preferGentleArcs, true);
-  assert.ok(fitCalls[0].minArcComponentArea > 0);
-  assert.equal(fitCalls[0].maxArcTiltDegrees, 15);
-  assert.equal(fitCalls[0].maxArcBendDegrees, 22);
-  assert.equal(fitCalls[0].maxTracking, 0.08);
-  assert.ok(Math.abs(fitCalls[0].minHoleArea - 1 / Math.sqrt(2)) < 1e-8);
-  assert.equal(fitCalls[0].readableFontSize, 10, "readability is measured at the band lower edge, not its upper edge");
+  assert.equal(fitCalls[0].maxArcTiltDegrees, 18);
+  assert.equal(fitCalls[0].maxArcBendDegrees, 28);
+  assert.equal(fitCalls[0].tracking, 0.08);
+  assert.equal(fitCalls[0].maxTracking, 0.6);
+  assert.equal(fitCalls[0].minHoleArea, 4);
+  assert.equal(fitCalls[0].readableFontSize, Number.MAX_VALUE, "legibility is a drawing decision, not a fit input");
   assert.equal(fitCalls[0].maxTiltDegrees, 30);
   assert.ok(context.events.find(([event]) => event === "measure")[2].includes("100px"));
   state.language = "zh";
   source.countries[0].name = "中国";
   owner.drawCountryLabels(1);
-  assert.equal(fitCalls[1].maxArcTiltDegrees, 10);
-  assert.equal(fitCalls[1].maxArcBendDegrees, 14);
-  assert.equal(fitCalls[1].maxTracking, 0.14);
+  assert.equal(fitCalls[1].maxArcTiltDegrees, 12);
+  assert.equal(fitCalls[1].maxArcBendDegrees, 18);
+  assert.equal(fitCalls[1].maxTracking, 0.9);
   assert.equal(owner.getDiagnostics().geometryBuilds, 1);
   assert.equal(owner.getDiagnostics().fitBuilds, 2);
   assert.match(context.events.filter(([event]) => event === "measure").at(-1)[2], /^400 100px "Map Noto Serif SC"/);
@@ -769,12 +735,14 @@ test("normalized real glyph metrics, graphemes and language fonts participate in
   assert.equal(owner.isReadyForCurrentView(), true);
 });
 
-test("fine glyph boxes allow gaps, but city collisions and viewport clipping reject full labels", () => {
+test("fine glyph boxes allow gaps, city collisions reject titles and edge titles may run off screen", () => {
   const { owner, state } = createHarness();
   assert.equal(owner.drawCountryLabels(1, { occupiedBoxes: [{ x: 77.6, y: 80, w: 0.8, h: 10 }] }), 1);
   assert.equal(owner.drawCountryLabels(1, { occupiedBoxes: [{ x: 69, y: 80, w: 2, h: 10 }] }), 0);
   state.zoomTransform.x = -70;
-  assert.equal(owner.drawCountryLabels(1), 0);
+  assert.equal(owner.drawCountryLabels(1), 1, "a title partly past the edge stays in place like printed lettering");
+  state.zoomTransform.x = -100;
+  assert.equal(owner.drawCountryLabels(1), 0, "a title with no ink on screen is skipped");
   state.zoomTransform.x = -900;
   owner.clearTextCache();
   owner.drawCountryLabels(1);
@@ -838,21 +806,28 @@ test("macro label orchestration reserves capitals then countries then other city
   assert.deepEqual(events, ["cities"]);
 });
 
-test("large-country labels survive magnification with a bounded screen font", () => {
+test("map-space titles scale exactly with zoom and fade out once oversized", () => {
   const { owner, state } = createHarness({ names: ["TEST"], realLayout: true });
   assert.equal(owner.drawCountryLabels(1), 1);
   const original = owner.getDiagnostics().lastLabels[0];
-  for (const k of [2, 4, 8, 16]) {
+  let faded = 0;
+  for (const k of [1.5, 2, 4, 8]) {
     state.zoomTransform = { x: 400 - 95 * k, y: 350 - 95 * k, k };
-    assert.equal(owner.drawCountryLabels(k), 1, `a centered major country remains labelled at ${k}x`);
+    const expected = original.fontSizePx * k;
+    const drawn = owner.drawCountryLabels(k);
+    if (expected >= 200) { assert.equal(drawn, 0, `an oversized title hands over at ${k}x`); faded++; continue; }
+    assert.equal(drawn, 1);
     const label = owner.getDiagnostics().lastLabels[0];
-    assert.ok(label.fontSizePx >= 10 && label.fontSizePx <= 32);
-    assert.equal(label.alpha, original.alpha, "magnification does not fade a readable major country");
+    assert.ok(Math.abs(label.fontSizePx - expected) < 1e-9, "zoom never refits or resizes a title");
+    assert.equal(label.candidateIndex, original.candidateIndex);
+    if (expected <= 120) assert.equal(label.alpha, original.alpha);
   }
+  assert.ok(faded > 0);
+  assert.equal(owner.getDiagnostics().fitBuilds, 1);
 });
 
 test("country text steps into the background only while city text is enabled", () => {
-  const { owner, state } = createHarness({ names: ["TEST"], realLayout: true });
+  const { owner, state } = createHarness({ names: ["AAAAAAAAAAAAAA"], realLayout: true });
   state.showCityPoints = true;
   assert.equal(owner.drawCountryLabels(1), 1);
   const baseAlpha = owner.getDiagnostics().lastLabels[0].alpha;
@@ -873,11 +848,11 @@ test("country text steps into the background only while city text is enabled", (
   assert.equal(owner.getDiagnostics().fitBuilds, fitBuilds, "hierarchy switches change paint, not geometry fitting");
 });
 
-test("long English display names preserve their supplied case and share export readiness keys", () => {
+test("English display names render as capitals and share export readiness keys", () => {
   const { owner, source, fitCalls } = createHarness({ names: ["New Zealand"] });
   assert.equal(owner.drawCountryLabels(1), 1);
-  assert.equal(owner.getDiagnostics().lastLabels[0].text, "New Zealand");
-  assert.equal(fitCalls[0].glyphs.map((glyph) => glyph.text).join(""), "New Zealand");
+  assert.equal(owner.getDiagnostics().lastLabels[0].text, "NEW ZEALAND");
+  assert.equal(fitCalls[0].glyphs.map((glyph) => glyph.text).join(""), "NEW ZEALAND");
   assert.equal(owner.isReadyForCurrentView(), true);
   assert.equal(source.countries[0].name, "New Zealand");
   owner.drawCountryLabels(1);
@@ -894,7 +869,7 @@ test("a small country remains labelled locally while a large country's fade is s
   source.countries[0].feature.geometry.coordinates = [[[20, 20], [35, 20], [35, 35], [20, 35], [20, 20]]];
   state.zoomTransform = { x: 235, y: 185, k: 6 };
   assert.equal(owner.drawCountryLabels(6), 1);
-  assert.equal(owner.getDiagnostics().lastLabels[0].alpha, 0.9);
+  assert.equal(owner.getDiagnostics().lastLabels[0].alpha, 0.82);
   const large = createHarness({ names: ["LARGE"], realLayout: true });
   large.state.showCityPoints = true;
   for (const x of [-170, -500, -650]) {
@@ -918,11 +893,12 @@ test("territory rather than short versus long readable names determines visibili
 
 test("remote islands cannot use an inflated aggregate bbox to reveal tiny territories", () => {
   const { owner, source } = createHarness({ names: ["AA"], fontSizes: [12] });
-  const square = (x) => [[[x, 20], [x + 10, 20], [x + 10, 30], [x, 30], [x, 20]]];
+  const square = (x) => [[[x, 20], [x + 3, 20], [x + 3, 23], [x, 23], [x, 20]]];
   source.countries[0].feature.geometry = { type: "MultiPolygon", coordinates: [square(20), square(600)] };
   assert.equal(owner.drawCountryLabels(1), 0);
   assert.equal(owner.getDiagnostics().rejectedByVisibility, 1);
-  assert.equal(owner.getDiagnostics().rejectedLabels[0].visibleArea, 100);
+  assert.equal(owner.getDiagnostics().skippedByVisibilityUpperBound, 1);
+  assert.equal(owner.getDiagnostics().rejectedLabels[0].visibleArea, 9);
 });
 
 test("separate mainland and overseas fits survive panning without refitting or duplicate titles", () => {
@@ -940,7 +916,7 @@ test("separate mainland and overseas fits survive panning without refitting or d
   assert.equal(owner.getDiagnostics().lastLabels.length, 1);
   state.zoomTransform = { x: 0, y: 0, k: 1 };
   owner.drawCountryLabels(1);
-  assert.equal(owner.getDiagnostics().fitBuilds, builds + 1, "only the new zoom band fits; panning reuses component fits");
+  assert.equal(owner.getDiagnostics().fitBuilds, builds, "neither zoom nor panning refits component titles");
 });
 
 test("a blocked dominant mainland cannot relocate its country title to a minor overseas territory", () => {
@@ -964,87 +940,51 @@ test("overseas visibility and local fade use the territory carrying the label", 
   assert.equal(owner.drawCountryLabels(6), 1, "the distant mainland must not suppress this small overseas label");
   const label = owner.getDiagnostics().lastLabels[0];
   assert.equal(label.polygonIndex, 1);
-  const expected = 0.9 * (1 - (625 * 36 / (800 * 700) - 0.02) / 0.08);
+  const sizeFade = Math.min(1, Math.max(0, (200 - label.fontSizePx) / 80));
+  const expected = 0.82 * sizeFade * (1 - (625 * 36 / (800 * 700) - 0.02) / 0.08);
   assert.ok(Math.abs(label.alpha - expected) < 1e-8);
   state.zoomTransform = { x: 400 - 120 * 6, y: 350 - 60 * 6, k: 6 };
-  assert.equal(owner.drawCountryLabels(6), 0, "the large mainland still yields to cities at the same zoom");
-  state.showCityPoints = false;
-  assert.equal(owner.drawCountryLabels(6), 1);
+  assert.equal(owner.drawCountryLabels(6), 0, "the oversized mainland title has handed over at this zoom");
 });
 
-test("same-band pan reuses fits, while bounded band caches reuse recent scales", () => {
+test("pan and zoom reuse one cached fit per country", () => {
   const { owner, state } = createHarness();
   for (const k of [1, 1.2, 1.5, 2, 3, 4, 6, 8]) {
-    state.zoomTransform = { x: 400 - 80 * k, y: 350 - 90 * k, k };
-    owner.drawCountryLabels(k);
-    assert.ok(owner.getDiagnostics().cachedFits <= 4);
+    for (const x of [0, 10, 20]) {
+      state.zoomTransform = { x: 400 - 80 * k + x, y: 350 - 90 * k, k };
+      owner.drawCountryLabels(k);
+    }
   }
-  const builds = owner.getDiagnostics().fitBuilds;
-  for (const x of [10, 20, 30]) {
-    state.zoomTransform = { x: 400 - 80 * 8 + x, y: 350 - 90 * 8, k: 8 };
-    owner.drawCountryLabels(8);
-  }
-  state.zoomTransform = { x: 400 - 80 * 6, y: 350 - 90 * 6, k: 6 };
-  owner.drawCountryLabels(6);
-  assert.equal(owner.getDiagnostics().fitBuilds, builds, "pans and returning to a cached band do not fit again");
+  assert.equal(owner.getDiagnostics().fitBuilds, 1);
+  assert.equal(owner.getDiagnostics().cachedFits, 1);
 });
 
-test("rapid zoom caps pending per-country worker fits and resumes the current band", () => {
-  const callbacks = [], messages = [];
-  let worker;
-  const { owner, state } = createHarness({ helperOptions: {
-    onInvalidate() {}, scheduleWork: (callback) => callbacks.push(callback),
-    createWorker: () => (worker = { postMessage: (message) => messages.push(message), terminate() {} }),
-  } });
-  for (const k of [1, 1.2, 1.5, 2, 3, 4, 6, 8]) {
-    state.zoomTransform = { x: 400 - 95 * k, y: 350 - 95 * k, k };
-    owner.drawCountryLabels(k);
-    callbacks.shift()?.();
-  }
-  assert.equal(messages.length, 4);
-  assert.equal(owner.getDiagnostics().pendingWorkerFits, 4);
-  assert.equal(owner.isReadyForCurrentView(), false);
-  const handle = createCountryLabelLayoutWorkerHandler();
-  for (const message of messages.splice(0)) worker.onmessage({ data: handle(message) });
-  owner.drawCountryLabels(8);
-  callbacks.shift()();
-  assert.equal(messages.length, 1, "current uncached band resumes after pending work completes");
-  worker.onmessage({ data: handle(messages.shift()) });
-  assert.equal(owner.drawCountryLabels(8), 1);
-  assert.equal(owner.isReadyForCurrentView(), true);
-  assert.equal(owner.getDiagnostics().cachedFits, 4);
-});
-
-test("delayed zoom-band workers preserve safe same-text labels while readiness stays pending", () => {
+test("rapid zoom requests one worker fit per country and publishes it at every scale", () => {
   const callbacks = [], messages = [];
   let worker;
   const { owner, state, source } = createHarness({ names: ["TEST"], helperOptions: {
     onInvalidate() {}, scheduleWork: (callback) => callbacks.push(callback),
     createWorker: () => (worker = { postMessage: (message) => messages.push(message), terminate() {} }),
   } });
-  const handle = createCountryLabelLayoutWorkerHandler();
-  owner.drawCountryLabels(1);
-  callbacks.shift()();
-  worker.onmessage({ data: handle(messages.shift()) });
-  assert.equal(owner.drawCountryLabels(1), 1);
-  state.zoomTransform.k = 1.2;
-  assert.equal(owner.drawCountryLabels(1.2), 1, "a safe old fit remains painted during worker preparation");
+  for (const k of [1, 1.2, 1.5, 2, 3, 4, 6, 8]) {
+    state.zoomTransform = { x: 400 - 95 * k, y: 350 - 95 * k, k };
+    assert.equal(owner.drawCountryLabels(k), 0, "nothing is painted before the only fit arrives");
+    callbacks.shift()?.();
+  }
+  assert.equal(messages.length, 1);
   assert.equal(owner.isReadyForCurrentView(), false);
-  assert.equal(owner.getDiagnostics().pendingFits, 1);
-  callbacks.shift()();
-  assert.equal(messages[0].polygons, undefined);
-  state.zoomTransform.x = 10;
-  assert.equal(owner.drawCountryLabels(1.2), 1, "in-band pan can use the same safe fallback");
-  assert.equal(owner.getDiagnostics().geometryBuilds, 1);
-  assert.equal(owner.getDiagnostics().candidateBuilds, 1);
-  assert.equal(messages.length, 1, "pan cannot enqueue another fit request");
+  const handle = createCountryLabelLayoutWorkerHandler();
   worker.onmessage({ data: handle(messages.shift()) });
-  assert.equal(owner.drawCountryLabels(1.2), 1);
   assert.equal(owner.isReadyForCurrentView(), true);
-  assert.equal(owner.getDiagnostics().candidateBuilds, 1, "the worker reuses projected candidates across bands");
+  for (const k of [2, 1.5, 1]) {
+    state.zoomTransform = { x: 400 - 95 * k, y: 350 - 95 * k, k };
+    assert.equal(owner.drawCountryLabels(k), 1);
+  }
+  assert.equal(callbacks.length, 0);
+  assert.equal(messages.length, 0, "zoom never queues another fit");
   state.language = "zh";
   source.countries[0].name = "中国";
-  assert.equal(owner.drawCountryLabels(1.2), 0, "a prior language must not appear as a pending fallback");
+  assert.equal(owner.drawCountryLabels(1), 0, "a prior language must not appear while its replacement is pending");
 });
 
 test("offscreen projection skips worker preparation until panning into view", () => {
@@ -1071,41 +1011,18 @@ test("offscreen projection skips worker preparation until panning into view", ()
   assert.equal(owner.isReadyForCurrentView(), true);
 });
 
-test("zoom fallback cannot retain a fit that discarded a hole significant in the new band", () => {
-  const callbacks = [], messages = [];
-  let worker;
-  const { owner, state, source } = createHarness({ names: ["TEST"], helperOptions: {
-    onInvalidate() {}, scheduleWork: (callback) => callbacks.push(callback),
-    createWorker: () => (worker = { postMessage: (message) => messages.push(message), terminate() {} }),
-  } });
-  source.countries[0].feature.geometry.coordinates.push([[75, 95], [75.8, 95], [75.8, 95.8], [75, 95.8], [75, 95]]);
-  const handle = createCountryLabelLayoutWorkerHandler();
-  owner.drawCountryLabels(1);
-  callbacks.shift()();
-  const first = handle(messages.shift());
-  assert.ok(first.fit.minHoleArea > 0, "the small hole was intentionally discarded at the first band");
-  worker.onmessage({ data: first });
-  assert.equal(owner.drawCountryLabels(1), 1);
-  state.zoomTransform.k = 1.2;
-  assert.equal(owner.drawCountryLabels(1.2), 0, "an increasingly visible hole invalidates the old fallback");
-  assert.equal(owner.isReadyForCurrentView(), false);
-  callbacks.shift()();
-  const next = handle(messages.shift());
-  assert.equal(next.fit.minHoleArea, 0, "the new band fit checks the now-significant hole strictly");
-  worker.onmessage({ data: next });
-  assert.equal(owner.drawCountryLabels(1.2), 1);
-  assert.equal(owner.isReadyForCurrentView(), true);
-});
-
-test("a fully visible edge label ignores collision padding and tries cached viewport alternatives", () => {
+test("edge titles ignore collision padding, stay in place while partly visible and try alternatives when not", () => {
   const { owner, state } = createHarness({ alternatives: [30] });
   state.zoomTransform.y = -79;
   assert.equal(owner.drawCountryLabels(1), 1, "padding crossing the viewport does not clip actual glyph boxes");
   state.zoomTransform.y = -85;
   assert.equal(owner.drawCountryLabels(1), 1);
-  assert.equal(owner.getDiagnostics().lastLabels[0].candidateIndex, 1);
-  assert.equal(owner.getDiagnostics().fitBuilds, 1);
+  assert.equal(owner.getDiagnostics().lastLabels[0].candidateIndex, 0, "a partly visible title does not jump");
   state.zoomTransform.y = -115;
+  assert.equal(owner.drawCountryLabels(1), 1);
+  assert.equal(owner.getDiagnostics().lastLabels[0].candidateIndex, 1, "an offscreen primary yields to a visible alternative");
+  assert.equal(owner.getDiagnostics().fitBuilds, 1);
+  state.zoomTransform.y = -150;
   assert.equal(owner.drawCountryLabels(1), 0);
   assert.equal(owner.getDiagnostics().rejectedByViewport, 1);
   assert.equal(owner.getDiagnostics().rejectedLabels[0].reason, "Viewport");

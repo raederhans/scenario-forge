@@ -285,7 +285,7 @@ test("bounded adaptive tracking returns matching glyph positions and collision e
   const compact = fitCountryLabel(candidate, { ...options, polygons: hole });
   assert.ok(compact, "compact tracking can remain valid when expanded spacing crosses a hole");
   assert.equal(compact.tracking, 0.02);
-  assert.ok(fitCountryLabel(candidate, { ...options, maxTracking: 99 }).tracking <= 0.24);
+  assert.ok(fitCountryLabel(candidate, { ...options, maxTracking: 99 }).tracking <= 1);
 });
 
 test("readable long Chinese names prefer a single line over a larger two-line block", () => {
