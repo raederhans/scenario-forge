@@ -101,16 +101,24 @@ export function createBorderCanvasPreparationOwner({
       controller: new AbortController(), ready: false, promise: null, stats: null };
     candidate = job;
     charge(reservation, { bitmaps: bytes * 2, gpuTextures: bytes });
-    const current = () => candidate === job && !job.controller.signal.aborted && !closingPromise
-      && Object.is(readSnapshot()?.key, job.key) && canvasMatches(job);
+    const live = () => candidate === job && !job.controller.signal.aborted && !closingPromise && canvasMatches(job);
+    const current = () => live() && Object.is(readSnapshot()?.key, job.key);
     job.promise = Promise.resolve().then(async () => {
       if (!current()) throw abortError();
       consumer ||= createGpuConsumer();
-      const result = await runCanvasDrawBatches({ canvas, signal: job.controller.signal, isCurrent: current,
+      // Between batches only the cheap checks run: building the snapshot key
+      // re-signs every pass input. A changed view reaches prepare() on its next
+      // render, which aborts this job; the key is checked again before ready.
+      const result = await runCanvasDrawBatches({ canvas, signal: job.controller.signal, isCurrent: live,
         batchSize: Number.MAX_SAFE_INTEGER, maxBatchWork: 8192, getPaintWork, gpuConsumer: consumer,
         // Root installs and restores its render target only inside this sync
         // callback. All runner yields happen after that scope has closed.
-        draw: context => draw(context, snapshot) });
+        draw: context => {
+          draw(context, snapshot);
+          // Capture can start missing source work; never replay commands
+          // recorded from sources that are already superseded.
+          if (!current()) throw abortError();
+        } });
       if (!current()) throw abortError();
       job.ready = true;
       job.stats = stats = { ...result.stats };

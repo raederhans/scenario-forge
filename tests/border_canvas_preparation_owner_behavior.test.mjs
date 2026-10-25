@@ -593,3 +593,58 @@ for (const sourceKind of ["mesh", "contour", "none"]) {
     await h.owner.clear();
   });
 }
+
+function replayFixture() {
+  const h = { snapshot: { key: "scene-a", layout: { pixelWidth: 20, pixelHeight: 10 }, reference: { x: 0, y: 0, k: 1 } },
+    snapshotReads: 0, consumes: 0, gate: null, strokes: 6 };
+  const workerStats = Object.fromEntries(["workerContextInitMs", "workerTextureSetupMs", "workerContextCreationCount",
+    "workerContextReuseCount", "workerUploadMs", "workerFenceMs", "workerFlushMs", "workerFenceWaitMs",
+    "workerErrorCheckMs", "workerCleanupMs", "workerTotalMs"].map(name => [name, 0]));
+  h.owner = createBorderCanvasPreparationOwner({
+    readSnapshot: () => { h.snapshotReads++; return h.snapshot; },
+    readCache: () => ({ dirty: { borders: true }, canvases: {} }),
+    createCanvas() {
+      const context = { reset() {}, beginPath() {}, stroke() {} };
+      return { width: 0, height: 0, getContext: () => context };
+    },
+    createGpuConsumer: () => ({
+      async consume(bitmap) { h.consumes++; bitmap.close(); await h.gate?.promise; return workerStats; },
+      async dispose() {},
+    }),
+    runCanvasDrawBatches: input => runCanvasDrawBatches({ ...input, now: () => 0, yieldTask: async () => {},
+      createBitmap: async canvas => ({ width: canvas.width, height: canvas.height, close() {} }) }),
+    draw(context) { for (let index = 0; index < h.strokes; index++) { context.beginPath(); context.stroke(); } },
+    getPaintWork: () => 8192,
+  });
+  return h;
+}
+
+test("replay batches read the border snapshot a fixed number of times, however many batches run", async () => {
+  const reads = [];
+  for (const strokes of [2, 12]) {
+    const h = replayFixture();
+    h.strokes = strokes;
+    await h.owner.prepare();
+    assert.equal(h.consumes, strokes, "each stroke is its own batch");
+    assert.ok(h.owner.takeReady());
+    reads.push(h.snapshotReads);
+  }
+  assert.equal(reads[0], reads[1]);
+});
+
+test("a view change during replay cancels the candidate at the next prepare and it never becomes ready", async () => {
+  const h = replayFixture();
+  h.gate = deferred();
+  const running = h.owner.prepare();
+  while (h.consumes === 0) await tick();
+  h.snapshot = { ...h.snapshot, key: "scene-b" };
+  // The aborted candidate keeps its single slot until its cleanup completes.
+  assert.equal(h.owner.prepare(), running);
+  h.gate.resolve();
+  await running;
+  assert.equal(h.consumes, 1, "the aborted candidate stops after the batch in flight");
+  assert.equal(h.owner.takeReady(), null);
+  h.gate = null;
+  await h.owner.prepare();
+  assert.equal(h.owner.takeReady()?.key, "scene-b", "only the current view's candidate is adopted");
+});
