@@ -2705,6 +2705,22 @@
       "en": "Jan Mayen",
       "zh": "扬马延岛"
     },
+    "PL_MRG_49c8bdd6da87": {
+      "en": "miński + otwocki + wołomiński",
+      "zh": "马佐夫舍地区明斯克县、奥特沃克、沃沃明斯基"
+    },
+    "PL_MRG_9242fdb1805d": {
+      "en": "kielecki + konecki + skarżyski",
+      "zh": "凯尔采、孔斯凯县、斯卡日斯基"
+    },
+    "PL_MRG_ccb2f83ec3cf": {
+      "en": "Piekary Śląskie + Siemianowice Śląskie",
+      "zh": "希隆斯克地区佩卡雷、希隆斯克地区谢米亚诺维采"
+    },
+    "PL_MRG_fe2842d4d685": {
+      "en": "lipski + radomski + zwoleński",
+      "zh": "利普斯科县、拉多姆斯基、兹沃连斯基"
+    },
     "PL_POW_0264": {
       "en": "Breslau",
       "zh": "布雷斯劳"
@@ -2733,14 +2749,6 @@
       "en": "legionowski",
       "zh": "莱吉奥诺沃县"
     },
-    "PL_POW_1409": {
-      "en": "lipski",
-      "zh": "利普斯科县"
-    },
-    "PL_POW_1412": {
-      "en": "miński",
-      "zh": "马佐夫舍地区明斯克县"
-    },
     "PL_POW_1465": {
       "en": "Warschau",
       "zh": "华沙"
@@ -2765,21 +2773,9 @@
       "en": "Tschenstochau",
       "zh": "琴斯托霍瓦"
     },
-    "PL_POW_2471": {
-      "en": "Piekary Śląskie",
-      "zh": "希隆斯克地区佩卡雷"
-    },
-    "PL_POW_2474": {
-      "en": "Siemianowice Śląskie",
-      "zh": "希隆斯克地区谢米亚诺维采"
-    },
     "PL_POW_2475": {
       "en": "Sosnowitz",
       "zh": "索斯诺维茨"
-    },
-    "PL_POW_2605": {
-      "en": "konecki",
-      "zh": "孔斯凯县"
     },
     "PL_POW_2661": {
       "en": "Kieltz",
@@ -2816,6 +2812,18 @@
     "RU_CITY_VOLGOGRAD": {
       "en": "Paulusburg",
       "zh": "保卢斯堡"
+    },
+    "RU_MRG_545993141cd3": {
+      "en": "Naro-Fominsky District + Woskressensk + Ruzsky District",
+      "zh": "纳罗-福明斯基区、沃斯克列先斯克、鲁兹斯基区"
+    },
+    "RU_MRG_bc039a5db22c": {
+      "en": "Melenkovsky District + Gus-Khrustalny District + Gus-Khrustalny",
+      "zh": "梅林科夫斯基区、古斯-赫鲁斯塔尼区、古斯赫鲁斯特尔内"
+    },
+    "RU_MRG_e6c4245fecb6": {
+      "en": "Serpukhovsky District + Heidestadt",
+      "zh": "谢尔普霍夫斯基区、海德施塔特"
     },
     "RU_RAY_50074027B10504727773087": {
       "en": "городской округ Большой Ка",
@@ -2984,10 +2992,6 @@
     "RU_RAY_50074027B21604114440864": {
       "en": "Gubkin",
       "zh": "古布金"
-    },
-    "RU_RAY_50074027B22082895013138": {
-      "en": "Woskressensk",
-      "zh": "沃斯克列先斯克"
     },
     "RU_RAY_50074027B22497972741045": {
       "en": "Usuri Ula",
@@ -3605,10 +3609,6 @@
       "en": "Maoka District",
       "zh": "真冈区"
     },
-    "RU_RAY_50074027B78363579504678": {
-      "en": "Heidestadt",
-      "zh": "海德施塔特"
-    },
     "RU_RAY_50074027B79924738274126": {
       "en": "Azovsky Nemetsky National District",
       "zh": "亚速德意志民族区"
@@ -3788,10 +3788,6 @@
     "RU_RAY_50074027B92726681569999": {
       "en": "Shalinsky District",
       "zh": "沙林斯基区"
-    },
-    "RU_RAY_50074027B92950284592103": {
-      "en": "Gus-Khrustalny",
-      "zh": "古斯赫鲁斯特尔内"
     },
     "RU_RAY_50074027B93262234465303": {
       "en": "городской округ Верхняя Ту",
@@ -4029,13 +4025,13 @@
       "en": "Kilimanjaro",
       "zh": "乞力马扎罗"
     },
+    "UA_MRG_08e978d66245": {
+      "en": "Artsyz + Tatarbunary",
+      "zh": "阿尔齐兹、鞑靼布那里"
+    },
     "UA_MRG_797d35ccfd2e": {
       "en": "Eichhornburg + Bobrynets",
       "zh": "艾希霍恩堡、博布里内茨"
-    },
-    "UA_RAY_74538382B21342332427534": {
-      "en": "Artsyz",
-      "zh": "阿尔齐兹"
     },
     "UA_RAY_74538382B23045356862491": {
       "en": "Reichenaustadt",
@@ -4149,10 +4145,6 @@
       "en": "Kingston upon Hull",
       "zh": "赫尔河畔金斯顿市"
     },
-    "UKE22": {
-      "en": "North Yorkshire",
-      "zh": "北约克郡"
-    },
     "UKF24": {
       "en": "West Northamptonshire",
       "zh": "北安普敦郡西部"
@@ -4181,10 +4173,6 @@
       "en": "Cambridgeshire",
       "zh": "剑桥郡"
     },
-    "UKH16": {
-      "en": "North and West Norfolk",
-      "zh": "诺福克北部和西部"
-    },
     "UKH34": {
       "en": "Essex Haven Gateway",
       "zh": "埃塞克斯港湾地区"
@@ -4192,10 +4180,6 @@
     "UKH36": {
       "en": "Heart of Essex",
       "zh": "埃塞克斯中部"
-    },
-    "UKI42": {
-      "en": "Tower Hamlets",
-      "zh": "塔村区"
     },
     "UKI53": {
       "en": "Redbridge and Waltham Forest",
@@ -4229,10 +4213,6 @@
       "en": "Edinburgh",
       "zh": "爱丁堡市"
     },
-    "UKM93": {
-      "en": "East Ayrshire and North Ayrshire mainland",
-      "zh": "东艾尔郡与北艾尔郡本土"
-    },
     "UKN08": {
       "en": "Newry, Mourne and Down",
       "zh": "纽里、莫恩与唐"
@@ -4245,9 +4225,25 @@
       "en": "Derry City and Strabane",
       "zh": "德里市与斯特拉班"
     },
-    "UKN0E": {
-      "en": "Lisburn and Castlereagh",
-      "zh": "利斯伯恩与卡斯尔雷"
+    "UK_MRG_117d6a6890fd": {
+      "en": "East Riding of Yorkshire + North Yorkshire",
+      "zh": "约克郡东区、北约克郡"
+    },
+    "UK_MRG_2f501f921535": {
+      "en": "North and West Norfolk + Breckland and South Norfolk",
+      "zh": "诺福克北部和西部、布雷克兰和南诺福克"
+    },
+    "UK_MRG_3af31571b83c": {
+      "en": "Inverclyde, East Renfrewshire and Renfrewshire + East Ayrshire and North Ayrshire mainland + South Ayrshire",
+      "zh": "因弗克莱德、东伦弗鲁郡和伦弗鲁郡、东艾尔郡与北艾尔郡本土、南艾尔郡"
+    },
+    "UK_MRG_4bda76985a93": {
+      "en": "Antrim and Newtownabbey + Lisburn and Castlereagh + Mid and East Antrim",
+      "zh": "安特里姆和纽敦阿比、利斯伯恩与卡斯尔雷、安特里姆中东部"
+    },
+    "UK_MRG_7443877c7a21": {
+      "en": "Hackney and Newham + Tower Hamlets",
+      "zh": "哈克尼和纽汉姆、塔村区"
     },
     "US_CNTY_04017": {
       "en": "Navajo County",

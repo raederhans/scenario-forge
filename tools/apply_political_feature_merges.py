@@ -174,8 +174,11 @@ def merge_topology(topology: dict, merges: Merges, arc_merged: dict) -> list[str
         expected = unary_union([_decode_geometry(topology, member) for member in members])
         geometry = copy.deepcopy(arc_merged.get(group["id"]))
         if geometry is not None:
-            decoded = _decode_geometry(topology, geometry)
-            if not decoded.is_valid or not decoded.equals(expected):
+            try:
+                decoded = _decode_geometry(topology, geometry)
+            except ValueError:  # mergeArcs can also leave a ring with fewer than four points
+                decoded = None
+            if decoded is None or not decoded.is_valid or not decoded.equals(expected):
                 geometry = None
         if geometry is None:
             # mergeArcs can keep a self-touching ring; encode the exact union
@@ -535,17 +538,24 @@ def merge_population(payload: dict, merges: Merges, name: str) -> dict:
             continue
         if not all(rows):
             raise ValueError(f"{name}: partial population rows for {group['id']}")
-        population = sum(float(row["population"]) for row in rows)
-        area = sum(float(row["land_area_km2"]) for row in rows)
-        merged = dict(rows[0])
-        merged.update({
-            "population": population,
-            "land_area_km2": area,
-            "density": population / area if area else 0.0,
-            **{key: sum(float(row[key]) * float(row["land_area_km2"]) for row in rows) / area if area else 0.0
-               for key in ("coverage_fraction", "overlap_fraction", "raw_coverage_fraction") if key in rows[0]},
-            "status": "ok" if all(row.get("status") == "ok" for row in rows) else next(row["status"] for row in rows if row.get("status") != "ok"),
-        })
+        # The registrar's contract: "ok" has a density, "partial_coverage" a population
+        # but no density, and any other status leaves both unknown.
+        unknown = next((row["status"] for row in rows if row.get("population") is None), None)
+        if unknown:
+            merged = dict(next(row for row in rows if row.get("population") is None))
+        else:
+            population = sum(float(row["population"]) for row in rows)
+            area = sum(float(row["land_area_km2"]) for row in rows)
+            status = "ok" if all(row.get("status") == "ok" for row in rows) else "partial_coverage"
+            merged = dict(rows[0])
+            merged.update({
+                "population": population,
+                "land_area_km2": area,
+                "density": (population / area if area else 0.0) if status == "ok" else None,
+                **{key: sum(float(row[key]) * float(row["land_area_km2"]) for row in rows) / area if area else 0.0
+                   for key in ("coverage_fraction", "overlap_fraction", "raw_coverage_fraction") if key in rows[0]},
+                "status": status,
+            })
         for member in group["member_ids"]:
             features.pop(member)
         features[group["id"]] = merged
