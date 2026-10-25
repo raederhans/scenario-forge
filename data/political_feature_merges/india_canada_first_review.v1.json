@@ -39,8 +39,8 @@
       ],
       "parent_id": "IN_Rajasthan",
       "names": {
-        "en": "Rajsamand + Chittaurgarh",
-        "zh": "拉杰萨曼德、奇陶加尔"
+        "en": "Chittaurgarh",
+        "zh": "奇陶加尔"
       },
       "member_names": {
         "IN_ADM2_76128533B11082155919544": {
@@ -51,7 +51,13 @@
           "en": "Chittaurgarh",
           "zh": "奇陶加尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rajsamand + Chittaurgarh",
+        "zh": "拉杰萨曼德、奇陶加尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B58527154065354"
     },
     {
       "id": "IN_MRG_c73911bfb285",
@@ -61,8 +67,8 @@
       ],
       "parent_id": "IN_Uttar_Pradesh",
       "names": {
-        "en": "Mahoba + Hamirpur",
-        "zh": "马霍巴、哈米尔布尔"
+        "en": "Hamirpur (Uttar Pradesh)",
+        "zh": "哈米尔布尔（西尔莫尔）"
       },
       "member_names": {
         "IN_ADM2_76128533B11083100419963": {
@@ -73,7 +79,13 @@
           "en": "Hamirpur",
           "zh": "哈米尔布尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mahoba + Hamirpur",
+        "zh": "马霍巴、哈米尔布尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B27201270098470"
     },
     {
       "id": "IN_MRG_46ee484c2760",
@@ -83,8 +95,8 @@
       ],
       "parent_id": "IN_Manipur",
       "names": {
-        "en": "Tamenglong + Noney",
-        "zh": "塔猛隆、诺尼"
+        "en": "Tamenglong",
+        "zh": "塔猛隆"
       },
       "member_names": {
         "IN_ADM2_76128533B11421856387892": {
@@ -95,7 +107,13 @@
           "en": "Noney",
           "zh": "诺尼"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tamenglong + Noney",
+        "zh": "塔猛隆、诺尼"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B11421856387892"
     },
     {
       "id": "IN_MRG_f09ef2e914ec",
@@ -106,8 +124,8 @@
       ],
       "parent_id": "IN_Chhattisgarh",
       "names": {
-        "en": "Kondagaon + Uttar Bastar Kanker + Narayanpur",
-        "zh": "康达冈、北巴斯塔尔坎克尔、纳拉扬普尔"
+        "en": "Uttar Bastar Kanker",
+        "zh": "北巴斯塔尔坎克尔"
       },
       "member_names": {
         "IN_ADM2_76128533B12144400448811": {
@@ -122,7 +140,13 @@
           "en": "Narayanpur",
           "zh": "纳拉扬普尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kondagaon + Uttar Bastar Kanker + Narayanpur",
+        "zh": "康达冈、北巴斯塔尔坎克尔、纳拉扬普尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B26755490628656"
     },
     {
       "id": "IN_MRG_e8f4da0d0535",
@@ -132,8 +156,8 @@
       ],
       "parent_id": "IN_Punjab",
       "names": {
-        "en": "Faridkot + Muktsar",
-        "zh": "法里德科特、穆克察尔"
+        "en": "Muktsar",
+        "zh": "穆克察尔"
       },
       "member_names": {
         "IN_ADM2_76128533B13552746017223": {
@@ -144,7 +168,13 @@
           "en": "Muktsar",
           "zh": "穆克察尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Faridkot + Muktsar",
+        "zh": "法里德科特、穆克察尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B50184713016881"
     },
     {
       "id": "IN_MRG_07eb3c8cab39",
@@ -155,8 +185,8 @@
       ],
       "parent_id": "IN_Uttar_Pradesh",
       "names": {
-        "en": "Amethi + Sultanpur + Pratapgarh",
-        "zh": "阿梅蒂、苏丹普尔、普拉塔普加尔"
+        "en": "Pratapgarh (Uttar Pradesh)",
+        "zh": "普拉塔普加尔（西尔莫尔）"
       },
       "member_names": {
         "IN_ADM2_76128533B13908294104682": {
@@ -171,7 +201,13 @@
           "en": "Pratapgarh",
           "zh": "普拉塔普加尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Amethi + Sultanpur + Pratapgarh",
+        "zh": "阿梅蒂、苏丹普尔、普拉塔普加尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B20647769792365"
     },
     {
       "id": "IN_MRG_fc4fb7f7372c",
@@ -182,8 +218,8 @@
       ],
       "parent_id": "IN_Chhattisgarh",
       "names": {
-        "en": "Dakshin Bastar Dantewada + Sukma + Bijapur",
-        "zh": "达克辛·巴斯塔·丹特瓦达、苏克马、比贾普尔"
+        "en": "Dakshin Bastar Dantewada",
+        "zh": "达克辛·巴斯塔·丹特瓦达"
       },
       "member_names": {
         "IN_ADM2_76128533B14292125820380": {
@@ -198,7 +234,13 @@
           "en": "Bijapur",
           "zh": "比贾普尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dakshin Bastar Dantewada + Sukma + Bijapur",
+        "zh": "达克辛·巴斯塔·丹特瓦达、苏克马、比贾普尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B14292125820380"
     },
     {
       "id": "IN_MRG_3208c5cacd01",
@@ -209,8 +251,8 @@
       ],
       "parent_id": "IN_Chhattisgarh",
       "names": {
-        "en": "Balrampur + Surajpur + Jashpur",
-        "zh": "巴尔拉姆普尔、苏拉杰布尔、贾什布尔"
+        "en": "Jashpur",
+        "zh": "贾什布尔"
       },
       "member_names": {
         "IN_ADM2_76128533B14598081584747": {
@@ -225,7 +267,13 @@
           "en": "Jashpur",
           "zh": "贾什布尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Balrampur + Surajpur + Jashpur",
+        "zh": "巴尔拉姆普尔、苏拉杰布尔、贾什布尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B53609934827566"
     },
     {
       "id": "IN_MRG_2344ccd4873a",
@@ -236,8 +284,8 @@
       ],
       "parent_id": "IN_Punjab",
       "names": {
-        "en": "Shahid Bhagat Singh Nagar + Rupnagar + Fatehgarh Sahib",
-        "zh": "沙希德·巴加特·辛格·纳加尔、鲁普纳加尔、法塔赫加尔·萨希布"
+        "en": "Rupnagar",
+        "zh": "鲁普纳加尔"
       },
       "member_names": {
         "IN_ADM2_76128533B14984770113274": {
@@ -252,7 +300,13 @@
           "en": "Fatehgarh Sahib",
           "zh": "法塔赫加尔·萨希布"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shahid Bhagat Singh Nagar + Rupnagar + Fatehgarh Sahib",
+        "zh": "沙希德·巴加特·辛格·纳加尔、鲁普纳加尔、法塔赫加尔·萨希布"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B24759700890118"
     },
     {
       "id": "IN_MRG_5c48e7d5fc5b",
@@ -262,8 +316,8 @@
       ],
       "parent_id": "IN_Uttar_Pradesh",
       "names": {
-        "en": "Etah + Kanshiram Nagar",
-        "zh": "埃塔、坎西·拉姆·纳加尔"
+        "en": "Etah",
+        "zh": "埃塔"
       },
       "member_names": {
         "IN_ADM2_76128533B15342706434354": {
@@ -274,7 +328,13 @@
           "en": "Kanshiram Nagar",
           "zh": "坎西·拉姆·纳加尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Etah + Kanshiram Nagar",
+        "zh": "埃塔、坎西·拉姆·纳加尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B15342706434354"
     },
     {
       "id": "IN_MRG_82a7e2758f34",
@@ -285,8 +345,8 @@
       ],
       "parent_id": "IN_Bihar",
       "names": {
-        "en": "Jamui + Banka + Lakhisarai",
-        "zh": "贾穆伊、班卡、拉克萨莱"
+        "en": "Banka",
+        "zh": "班卡"
       },
       "member_names": {
         "IN_ADM2_76128533B16781044866906": {
@@ -301,7 +361,13 @@
           "en": "Lakhisarai",
           "zh": "拉克萨莱"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Jamui + Banka + Lakhisarai",
+        "zh": "贾穆伊、班卡、拉克萨莱"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B54517225652088"
     },
     {
       "id": "IN_MRG_cc42364d4ba9",
@@ -311,8 +377,8 @@
       ],
       "parent_id": "IN_Tamil_Nadu",
       "names": {
-        "en": "Ariyalur + Perambalur",
-        "zh": "阿里亚鲁尔、佩兰巴鲁尔"
+        "en": "Ariyalur",
+        "zh": "阿里亚鲁尔"
       },
       "member_names": {
         "IN_ADM2_76128533B16889790752134": {
@@ -323,7 +389,13 @@
           "en": "Perambalur",
           "zh": "佩兰巴鲁尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ariyalur + Perambalur",
+        "zh": "阿里亚鲁尔、佩兰巴鲁尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B16889790752134"
     },
     {
       "id": "IN_MRG_1d9b4933bded",
@@ -334,8 +406,8 @@
       ],
       "parent_id": "IN_Jharkhand",
       "names": {
-        "en": "Jamtara + Dumka + Godda",
-        "zh": "贾姆塔拉、杜姆卡、戈达"
+        "en": "Dumka",
+        "zh": "杜姆卡"
       },
       "member_names": {
         "IN_ADM2_76128533B17261532861377": {
@@ -350,7 +422,13 @@
           "en": "Godda",
           "zh": "戈达"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Jamtara + Dumka + Godda",
+        "zh": "贾姆塔拉、杜姆卡、戈达"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B18802630191461"
     },
     {
       "id": "IN_MRG_fe97969e7e01",
@@ -360,8 +438,8 @@
       ],
       "parent_id": "IN_Chhattisgarh",
       "names": {
-        "en": "Mungeli + Kabeerdham",
-        "zh": "蒙格利、卡伯丹姆"
+        "en": "Kabeerdham",
+        "zh": "卡伯丹姆"
       },
       "member_names": {
         "IN_ADM2_76128533B17292264941997": {
@@ -372,7 +450,13 @@
           "en": "Kabeerdham",
           "zh": "卡伯丹姆"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mungeli + Kabeerdham",
+        "zh": "蒙格利、卡伯丹姆"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B48077510234542"
     },
     {
       "id": "IN_MRG_6f037851532e",
@@ -382,8 +466,8 @@
       ],
       "parent_id": "IN_Uttar_Pradesh",
       "names": {
-        "en": "Basti + Ambedkar Nagar",
-        "zh": "巴斯蒂、安贝德卡纳加尔"
+        "en": "Ambedkar Nagar",
+        "zh": "安贝德卡纳加尔"
       },
       "member_names": {
         "IN_ADM2_76128533B18648944871057": {
@@ -394,7 +478,13 @@
           "en": "Ambedkar Nagar",
           "zh": "安贝德卡纳加尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Basti + Ambedkar Nagar",
+        "zh": "巴斯蒂、安贝德卡纳加尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B7879459377699"
     },
     {
       "id": "IN_MRG_37328dfe8d45",
@@ -404,8 +494,8 @@
       ],
       "parent_id": "IN_Madhya_Pradesh",
       "names": {
-        "en": "Dindori + Mandla",
-        "zh": "丁多里、曼陀罗"
+        "en": "Mandla",
+        "zh": "曼陀罗"
       },
       "member_names": {
         "IN_ADM2_76128533B20502827346807": {
@@ -416,7 +506,13 @@
           "en": "Mandla",
           "zh": "曼陀罗"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dindori + Mandla",
+        "zh": "丁多里、曼陀罗"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B79087524886024"
     },
     {
       "id": "IN_MRG_1b2b9256168e",
@@ -427,8 +523,8 @@
       ],
       "parent_id": "IN_Uttar_Pradesh",
       "names": {
-        "en": "Auraiya + Kanpur Dehat + Kannauj",
-        "zh": "奥莱亚、坎普尔德哈特、坎瑙杰"
+        "en": "Kanpur Dehat",
+        "zh": "坎普尔德哈特"
       },
       "member_names": {
         "IN_ADM2_76128533B20660206691661": {
@@ -443,7 +539,13 @@
           "en": "Kannauj",
           "zh": "坎瑙杰"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Auraiya + Kanpur Dehat + Kannauj",
+        "zh": "奥莱亚、坎普尔德哈特、坎瑙杰"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B80299348876357"
     },
     {
       "id": "IN_MRG_b507e43e5254",
@@ -454,8 +556,8 @@
       ],
       "parent_id": "IN_Telangana",
       "names": {
-        "en": "Kamareddy + Sangareddy + Medak",
-        "zh": "卡马雷迪、桑加雷迪、梅达克"
+        "en": "Sangareddy",
+        "zh": "桑加雷迪"
       },
       "member_names": {
         "IN_ADM2_76128533B21068662878849": {
@@ -470,7 +572,13 @@
           "en": "Medak",
           "zh": "梅达克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kamareddy + Sangareddy + Medak",
+        "zh": "卡马雷迪、桑加雷迪、梅达克"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B40480360118262"
     },
     {
       "id": "IN_MRG_3e581c359307",
@@ -482,8 +590,8 @@
       ],
       "parent_id": "IN_Telangana",
       "names": {
-        "en": "Rajanna Sircilla + Siddipet + Yadadri Bhongiri + Jangaon",
-        "zh": "拉贾纳·瑟西拉、西迪佩特、亚达德里·邦吉里、姜加翁"
+        "en": "Siddipet",
+        "zh": "西迪佩特"
       },
       "member_names": {
         "IN_ADM2_76128533B21485897206517": {
@@ -502,7 +610,13 @@
           "en": "Jangaon",
           "zh": "姜加翁"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rajanna Sircilla + Siddipet + Yadadri Bhongiri + Jangaon",
+        "zh": "拉贾纳·瑟西拉、西迪佩特、亚达德里·邦吉里、姜加翁"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B31111781432113"
     },
     {
       "id": "IN_MRG_ccf93b344819",
@@ -512,8 +626,8 @@
       ],
       "parent_id": "IN_Assam",
       "names": {
-        "en": "Sivasagar + Charaideo",
-        "zh": "西瓦萨加尔、查拉迪奥"
+        "en": "Sivasagar",
+        "zh": "西瓦萨加尔"
       },
       "member_names": {
         "IN_ADM2_76128533B21722277889516": {
@@ -524,7 +638,13 @@
           "en": "Charaideo",
           "zh": "查拉迪奥"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sivasagar + Charaideo",
+        "zh": "西瓦萨加尔、查拉迪奥"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B21722277889516"
     },
     {
       "id": "IN_MRG_f61f07205f91",
@@ -534,8 +654,8 @@
       ],
       "parent_id": "IN_Himachal_Pradesh",
       "names": {
-        "en": "Mandi + Bilaspur",
-        "zh": "曼迪、比拉斯普尔"
+        "en": "Mandi",
+        "zh": "曼迪"
       },
       "member_names": {
         "IN_ADM2_76128533B23735146933631": {
@@ -546,7 +666,13 @@
           "en": "Bilaspur",
           "zh": "比拉斯普尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mandi + Bilaspur",
+        "zh": "曼迪、比拉斯普尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B23735146933631"
     },
     {
       "id": "IN_MRG_317bdbf2051b",
@@ -556,8 +682,8 @@
       ],
       "parent_id": "IN_Bihar",
       "names": {
-        "en": "Jehanabad + Arwal",
-        "zh": "杰哈纳巴德、阿尔瓦尔"
+        "en": "Jehanabad",
+        "zh": "杰哈纳巴德"
       },
       "member_names": {
         "IN_ADM2_76128533B24101991435637": {
@@ -568,7 +694,13 @@
           "en": "Arwal",
           "zh": "阿尔瓦尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Jehanabad + Arwal",
+        "zh": "杰哈纳巴德、阿尔瓦尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B24101991435637"
     },
     {
       "id": "IN_MRG_9592dd2cf1d9",
@@ -579,8 +711,8 @@
       ],
       "parent_id": "IN_Telangana",
       "names": {
-        "en": "Nirmal + Komaram Bheem + Adilabad",
-        "zh": "尼尔马尔、科马拉姆·比姆、阿迪拉巴德"
+        "en": "Adilabad",
+        "zh": "阿迪拉巴德"
       },
       "member_names": {
         "IN_ADM2_76128533B25280172436550": {
@@ -595,7 +727,13 @@
           "en": "Adilabad",
           "zh": "阿迪拉巴德"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nirmal + Komaram Bheem + Adilabad",
+        "zh": "尼尔马尔、科马拉姆·比姆、阿迪拉巴德"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B38354309367879"
     },
     {
       "id": "IN_MRG_dcf2b9f1d7ca",
@@ -605,8 +743,8 @@
       ],
       "parent_id": "IN_Madhya_Pradesh",
       "names": {
-        "en": "Anuppur + Umaria",
-        "zh": "阿努普尔、乌马里亚"
+        "en": "Anuppur",
+        "zh": "阿努普尔"
       },
       "member_names": {
         "IN_ADM2_76128533B25468964623139": {
@@ -617,7 +755,13 @@
           "en": "Umaria",
           "zh": "乌马里亚"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Anuppur + Umaria",
+        "zh": "阿努普尔、乌马里亚"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B25468964623139"
     },
     {
       "id": "IN_MRG_53f9886bc000",
@@ -628,8 +772,8 @@
       ],
       "parent_id": "IN_Kerala",
       "names": {
-        "en": "Kottayam + Pathanamthitta + Idukki",
-        "zh": "科塔亚姆、帕塔南提塔、伊杜基"
+        "en": "Kottayam",
+        "zh": "科塔亚姆"
       },
       "member_names": {
         "IN_ADM2_76128533B2576169508425": {
@@ -644,7 +788,13 @@
           "en": "Idukki",
           "zh": "伊杜基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kottayam + Pathanamthitta + Idukki",
+        "zh": "科塔亚姆、帕塔南提塔、伊杜基"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B2576169508425"
     },
     {
       "id": "IN_MRG_a98f3e005f6a",
@@ -655,8 +805,8 @@
       ],
       "parent_id": "IN_Telangana",
       "names": {
-        "en": "Mahabubabad + Bhadradri + Warangal (R)",
-        "zh": "马哈布巴巴德、巴德拉德里、瓦朗加尔 (R)"
+        "en": "Bhadradri",
+        "zh": "巴德拉德里"
       },
       "member_names": {
         "IN_ADM2_76128533B28290181894983": {
@@ -671,7 +821,13 @@
           "en": "Warangal (R)",
           "zh": "瓦朗加尔 (R)"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mahabubabad + Bhadradri + Warangal (R)",
+        "zh": "马哈布巴巴德、巴德拉德里、瓦朗加尔 (R)"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B30246762498957"
     },
     {
       "id": "IN_MRG_439a10aa562b",
@@ -681,8 +837,8 @@
       ],
       "parent_id": "IN_Bihar",
       "names": {
-        "en": "Sheikhpura + Nawada",
-        "zh": "谢赫普拉、纳瓦达"
+        "en": "Nawada",
+        "zh": "纳瓦达"
       },
       "member_names": {
         "IN_ADM2_76128533B29672216830072": {
@@ -693,7 +849,13 @@
           "en": "Nawada",
           "zh": "纳瓦达"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sheikhpura + Nawada",
+        "zh": "谢赫普拉、纳瓦达"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B36625800127334"
     },
     {
       "id": "IN_MRG_64b26eec8389",
@@ -703,8 +865,8 @@
       ],
       "parent_id": "IN_Madhya_Pradesh",
       "names": {
-        "en": "Agar + Shajapur",
-        "zh": "阿加尔、沙贾布尔"
+        "en": "Shajapur",
+        "zh": "沙贾布尔"
       },
       "member_names": {
         "IN_ADM2_76128533B29721759389119": {
@@ -715,7 +877,13 @@
           "en": "Shajapur",
           "zh": "沙贾布尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Agar + Shajapur",
+        "zh": "阿加尔、沙贾布尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B30477486088156"
     },
     {
       "id": "IN_MRG_d70f87866a7e",
@@ -726,8 +894,8 @@
       ],
       "parent_id": "IN_Odisha",
       "names": {
-        "en": "Dhenkanal + Kendujhar + Jajapur",
-        "zh": "登卡纳尔、肯杜贾尔、贾贾布尔"
+        "en": "Kendujhar",
+        "zh": "肯杜贾尔"
       },
       "member_names": {
         "IN_ADM2_76128533B32509926596077": {
@@ -742,7 +910,13 @@
           "en": "Jajapur",
           "zh": "贾贾布尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dhenkanal + Kendujhar + Jajapur",
+        "zh": "登卡纳尔、肯杜贾尔、贾贾布尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B59504628511334"
     },
     {
       "id": "IN_MRG_81646fcfad63",
@@ -752,8 +926,8 @@
       ],
       "parent_id": "IN_Odisha",
       "names": {
-        "en": "Jagatsinghapur + Kendrapara",
-        "zh": "贾加辛哈布尔、肯德拉帕拉"
+        "en": "Kendrapara",
+        "zh": "肯德拉帕拉"
       },
       "member_names": {
         "IN_ADM2_76128533B32949331695897": {
@@ -764,7 +938,13 @@
           "en": "Kendrapara",
           "zh": "肯德拉帕拉"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Jagatsinghapur + Kendrapara",
+        "zh": "贾加辛哈布尔、肯德拉帕拉"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B98951704707517"
     },
     {
       "id": "IN_MRG_5a8caf67d623",
@@ -775,8 +955,8 @@
       ],
       "parent_id": "IN_Odisha",
       "names": {
-        "en": "Nuapada + Balangir + Bargarh",
-        "zh": "努阿帕达、巴兰吉尔、巴尔加尔"
+        "en": "Balangir",
+        "zh": "巴兰吉尔"
       },
       "member_names": {
         "IN_ADM2_76128533B33451850475260": {
@@ -791,7 +971,13 @@
           "en": "Bargarh",
           "zh": "巴尔加尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nuapada + Balangir + Bargarh",
+        "zh": "努阿帕达、巴兰吉尔、巴尔加尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B44395557448920"
     },
     {
       "id": "IN_MRG_a9c8dc6c38f7",
@@ -802,8 +988,8 @@
       ],
       "parent_id": "IN_Gujarat",
       "names": {
-        "en": "Sabar Kantha + Mahisagar + Aravali",
-        "zh": "萨巴尔坎塔、马希萨加尔、阿拉瓦利"
+        "en": "Sabar Kantha",
+        "zh": "萨巴尔坎塔"
       },
       "member_names": {
         "IN_ADM2_76128533B35129325000613": {
@@ -818,7 +1004,13 @@
           "en": "Aravali",
           "zh": "阿拉瓦利"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sabar Kantha + Mahisagar + Aravali",
+        "zh": "萨巴尔坎塔、马希萨加尔、阿拉瓦利"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B35129325000613"
     },
     {
       "id": "IN_MRG_6ba16322cfa2",
@@ -828,8 +1020,8 @@
       ],
       "parent_id": "IN_Meghalaya",
       "names": {
-        "en": "North Garo Hills + East Garo Hills",
-        "zh": "北加罗山、东加罗山"
+        "en": "East Garo Hills",
+        "zh": "东加罗山"
       },
       "member_names": {
         "IN_ADM2_76128533B35759455556328": {
@@ -840,7 +1032,13 @@
           "en": "East Garo Hills",
           "zh": "东加罗山"
         }
-      }
+      },
+      "previous_names": {
+        "en": "North Garo Hills + East Garo Hills",
+        "zh": "北加罗山、东加罗山"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B40535123096970"
     },
     {
       "id": "IN_MRG_c195372a6ccc",
@@ -850,8 +1048,8 @@
       ],
       "parent_id": "IN_Mizoram",
       "names": {
-        "en": "Kolasib + Mamit",
-        "zh": "科拉西布、马米特"
+        "en": "Kolasib",
+        "zh": "科拉西布"
       },
       "member_names": {
         "IN_ADM2_76128533B38141181853016": {
@@ -862,7 +1060,13 @@
           "en": "Mamit",
           "zh": "马米特"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kolasib + Mamit",
+        "zh": "科拉西布、马米特"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B38141181853016"
     },
     {
       "id": "IN_MRG_d52299ba1791",
@@ -872,8 +1076,8 @@
       ],
       "parent_id": "IN_Assam",
       "names": {
-        "en": "Nalbari + Kamrup",
-        "zh": "纳尔巴里、卡姆鲁普"
+        "en": "Guwahati",
+        "zh": "古瓦哈提"
       },
       "member_names": {
         "IN_ADM2_76128533B40995085026980": {
@@ -884,7 +1088,13 @@
           "en": "Kamrup",
           "zh": "卡姆鲁普"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nalbari + Kamrup",
+        "zh": "纳尔巴里、卡姆鲁普"
+      },
+      "name_source": "city",
+      "representative_id": "IN_ADM2_76128533B66682530790248"
     },
     {
       "id": "IN_MRG_a9290adb0980",
@@ -894,8 +1104,8 @@
       ],
       "parent_id": "IN_Manipur",
       "names": {
-        "en": "Thoubal + Imphal West",
-        "zh": "图巴尔、因帕尔西"
+        "en": "Imphal West",
+        "zh": "因帕尔西"
       },
       "member_names": {
         "IN_ADM2_76128533B44197302080139": {
@@ -906,7 +1116,13 @@
           "en": "Imphal West",
           "zh": "因帕尔西"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Thoubal + Imphal West",
+        "zh": "图巴尔、因帕尔西"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B99807650893733"
     },
     {
       "id": "IN_MRG_c2bed413ca7f",
@@ -917,8 +1133,8 @@
       ],
       "parent_id": "IN_Tamil_Nadu",
       "names": {
-        "en": "Thiruvarur + Mayiladuthurai + Nagapattinam",
-        "zh": "蒂鲁瓦鲁尔、马伊拉·杜图拉伊、纳加帕蒂南"
+        "en": "Thiruvarur",
+        "zh": "蒂鲁瓦鲁尔"
       },
       "member_names": {
         "IN_ADM2_76128533B45072089356239": {
@@ -933,7 +1149,13 @@
           "en": "Nagapattinam",
           "zh": "纳加帕蒂南"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Thiruvarur + Mayiladuthurai + Nagapattinam",
+        "zh": "蒂鲁瓦鲁尔、马伊拉·杜图拉伊、纳加帕蒂南"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B45072089356239"
     },
     {
       "id": "IN_MRG_4947bf9afafe",
@@ -943,8 +1165,8 @@
       ],
       "parent_id": "IN_Uttarakhand",
       "names": {
-        "en": "Rudraprayag + Tehri Garhwal",
-        "zh": "鲁德拉普拉亚格、特里·加瓦尔"
+        "en": "Tehri Garhwal",
+        "zh": "特里·加瓦尔"
       },
       "member_names": {
         "IN_ADM2_76128533B46038384763988": {
@@ -955,7 +1177,13 @@
           "en": "Tehri Garhwal",
           "zh": "特里·加瓦尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rudraprayag + Tehri Garhwal",
+        "zh": "鲁德拉普拉亚格、特里·加瓦尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B61134942989820"
     },
     {
       "id": "IN_MRG_964f44be21c1",
@@ -966,8 +1194,8 @@
       ],
       "parent_id": "IN_Gujarat",
       "names": {
-        "en": "Narmada + Chhota Udaipur + Dohad",
-        "zh": "讷尔默达、乔塔·乌代布尔、多哈德"
+        "en": "Dohad",
+        "zh": "多哈德"
       },
       "member_names": {
         "IN_ADM2_76128533B46866455993508": {
@@ -982,7 +1210,13 @@
           "en": "Dohad",
           "zh": "多哈德"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Narmada + Chhota Udaipur + Dohad",
+        "zh": "讷尔默达、乔塔·乌代布尔、多哈德"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B70576899889534"
     },
     {
       "id": "IN_MRG_0c50a07858d2",
@@ -992,8 +1226,8 @@
       ],
       "parent_id": "IN_Odisha",
       "names": {
-        "en": "Koraput + Malkangiri",
-        "zh": "科拉普特、马尔坎吉里"
+        "en": "Koraput",
+        "zh": "科拉普特"
       },
       "member_names": {
         "IN_ADM2_76128533B47448948912370": {
@@ -1004,7 +1238,13 @@
           "en": "Malkangiri",
           "zh": "马尔坎吉里"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Koraput + Malkangiri",
+        "zh": "科拉普特、马尔坎吉里"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B47448948912370"
     },
     {
       "id": "IN_MRG_0dc9b69890de",
@@ -1014,8 +1254,8 @@
       ],
       "parent_id": "IN_Assam",
       "names": {
-        "en": "Barpeta + Goalpara",
-        "zh": "巴尔佩塔、戈阿尔帕拉"
+        "en": "Barpeta",
+        "zh": "巴尔佩塔"
       },
       "member_names": {
         "IN_ADM2_76128533B47772746709007": {
@@ -1026,7 +1266,13 @@
           "en": "Goalpara",
           "zh": "戈阿尔帕拉"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Barpeta + Goalpara",
+        "zh": "巴尔佩塔、戈阿尔帕拉"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B47772746709007"
     },
     {
       "id": "IN_MRG_94ef9201854b",
@@ -1036,8 +1282,8 @@
       ],
       "parent_id": "IN_Karnataka",
       "names": {
-        "en": "Bangalore Rural + Chikkaballapura",
-        "zh": "班加罗尔乡村、奇卡巴拉普拉"
+        "en": "Chikkaballapura",
+        "zh": "奇卡巴拉普拉"
       },
       "member_names": {
         "IN_ADM2_76128533B48075109668277": {
@@ -1048,7 +1294,13 @@
           "en": "Chikkaballapura",
           "zh": "奇卡巴拉普拉"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bangalore Rural + Chikkaballapura",
+        "zh": "班加罗尔乡村、奇卡巴拉普拉"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B80772392204057"
     },
     {
       "id": "IN_MRG_10207a70afcd",
@@ -1058,8 +1310,8 @@
       ],
       "parent_id": "IN_Mizoram",
       "names": {
-        "en": "Serchhip + Lunglei",
-        "zh": "塞希普、隆雷"
+        "en": "Lunglei",
+        "zh": "隆雷"
       },
       "member_names": {
         "IN_ADM2_76128533B49456368048033": {
@@ -1070,7 +1322,13 @@
           "en": "Lunglei",
           "zh": "隆雷"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Serchhip + Lunglei",
+        "zh": "塞希普、隆雷"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B97836280165555"
     },
     {
       "id": "IN_MRG_10229d52fb7d",
@@ -1080,8 +1338,8 @@
       ],
       "parent_id": "IN_Rajasthan",
       "names": {
-        "en": "Sirohi + Jalor",
-        "zh": "西罗日、贾洛尔"
+        "en": "Jalor",
+        "zh": "贾洛尔"
       },
       "member_names": {
         "IN_ADM2_76128533B49867917697487": {
@@ -1092,7 +1350,13 @@
           "en": "Jalor",
           "zh": "贾洛尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Sirohi + Jalor",
+        "zh": "西罗日、贾洛尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B59459156188335"
     },
     {
       "id": "IN_MRG_0240da1df458",
@@ -1102,8 +1366,8 @@
       ],
       "parent_id": "IN_Odisha",
       "names": {
-        "en": "Rayagada + Kalahandi",
-        "zh": "拉亚加达、卡拉汉迪"
+        "en": "Kalahandi",
+        "zh": "卡拉汉迪"
       },
       "member_names": {
         "IN_ADM2_76128533B50498617372937": {
@@ -1114,7 +1378,13 @@
           "en": "Kalahandi",
           "zh": "卡拉汉迪"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rayagada + Kalahandi",
+        "zh": "拉亚加达、卡拉汉迪"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B70759200975708"
     },
     {
       "id": "IN_MRG_add732cea50c",
@@ -1124,8 +1394,8 @@
       ],
       "parent_id": "IN_Manipur",
       "names": {
-        "en": "Kangpokpi + Senapati",
-        "zh": "康波皮、塞纳帕蒂"
+        "en": "Senapati",
+        "zh": "塞纳帕蒂"
       },
       "member_names": {
         "IN_ADM2_76128533B56326354019534": {
@@ -1136,7 +1406,13 @@
           "en": "Senapati",
           "zh": "塞纳帕蒂"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kangpokpi + Senapati",
+        "zh": "康波皮、塞纳帕蒂"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B95642877176862"
     },
     {
       "id": "IN_MRG_f8895b87957e",
@@ -1146,8 +1422,8 @@
       ],
       "parent_id": "IN_Maharashtra",
       "names": {
-        "en": "Washim + Hingoli",
-        "zh": "沃辛、欣戈利"
+        "en": "Washim",
+        "zh": "沃辛"
       },
       "member_names": {
         "IN_ADM2_76128533B59866172845044": {
@@ -1158,7 +1434,13 @@
           "en": "Hingoli",
           "zh": "欣戈利"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Washim + Hingoli",
+        "zh": "沃辛、欣戈利"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B59866172845044"
     },
     {
       "id": "IN_MRG_5c122f79992b",
@@ -1168,8 +1450,8 @@
       ],
       "parent_id": "IN_Odisha",
       "names": {
-        "en": "Anugul + Debagarh",
-        "zh": "阿努古尔、德巴加尔"
+        "en": "Anugul",
+        "zh": "阿努古尔"
       },
       "member_names": {
         "IN_ADM2_76128533B60186573304899": {
@@ -1180,7 +1462,13 @@
           "en": "Debagarh",
           "zh": "德巴加尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Anugul + Debagarh",
+        "zh": "阿努古尔、德巴加尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B60186573304899"
     },
     {
       "id": "IN_MRG_aeb165f4c805",
@@ -1190,8 +1478,8 @@
       ],
       "parent_id": "IN_Uttarakhand",
       "names": {
-        "en": "Bageshwar + Almora",
-        "zh": "巴格什瓦尔、阿尔莫拉"
+        "en": "Almora",
+        "zh": "阿尔莫拉"
       },
       "member_names": {
         "IN_ADM2_76128533B64217423710469": {
@@ -1202,7 +1490,13 @@
           "en": "Almora",
           "zh": "阿尔莫拉"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bageshwar + Almora",
+        "zh": "巴格什瓦尔、阿尔莫拉"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B74917207853309"
     },
     {
       "id": "IN_MRG_0e1e90dca5bf",
@@ -1212,8 +1506,8 @@
       ],
       "parent_id": "IN_Madhya_Pradesh",
       "names": {
-        "en": "Balaghat + Seoni",
-        "zh": "巴拉加特、塞奥尼"
+        "en": "Balaghat",
+        "zh": "巴拉加特"
       },
       "member_names": {
         "IN_ADM2_76128533B66134271591289": {
@@ -1224,7 +1518,13 @@
           "en": "Seoni",
           "zh": "塞奥尼"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Balaghat + Seoni",
+        "zh": "巴拉加特、塞奥尼"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B66134271591289"
     },
     {
       "id": "IN_MRG_9771ab24083b",
@@ -1236,8 +1536,8 @@
       ],
       "parent_id": "IN_Odisha",
       "names": {
-        "en": "Subarnapur + Gajapati + Baudh + Kandhamal",
-        "zh": "苏巴那普尔、加贾帕蒂、鲍德、坎德哈马尔"
+        "en": "Kandhamal",
+        "zh": "坎德哈马尔"
       },
       "member_names": {
         "IN_ADM2_76128533B6884509901047": {
@@ -1256,7 +1556,13 @@
           "en": "Kandhamal",
           "zh": "坎德哈马尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Subarnapur + Gajapati + Baudh + Kandhamal",
+        "zh": "苏巴那普尔、加贾帕蒂、鲍德、坎德哈马尔"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B8798165946807"
     },
     {
       "id": "IN_MRG_a41c7ad59205",
@@ -1268,8 +1574,8 @@
       ],
       "parent_id": "IN_Chhattisgarh",
       "names": {
-        "en": "Dhamtari + Balod + Gariaband + Mahasamund",
-        "zh": "达姆塔里、巴洛德、加里亚班德、马哈萨蒙德"
+        "en": "Mahasamund",
+        "zh": "马哈萨蒙德"
       },
       "member_names": {
         "IN_ADM2_76128533B71714250401862": {
@@ -1288,7 +1594,13 @@
           "en": "Mahasamund",
           "zh": "马哈萨蒙德"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dhamtari + Balod + Gariaband + Mahasamund",
+        "zh": "达姆塔里、巴洛德、加里亚班德、马哈萨蒙德"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B9759621355294"
     },
     {
       "id": "IN_MRG_35c5386ac534",
@@ -1298,8 +1610,8 @@
       ],
       "parent_id": "IN_Karnataka",
       "names": {
-        "en": "Koppal + Bagalkot",
-        "zh": "科帕尔、巴加尔科特"
+        "en": "Bagalkot",
+        "zh": "巴加尔科特"
       },
       "member_names": {
         "IN_ADM2_76128533B79601545186231": {
@@ -1310,7 +1622,13 @@
           "en": "Bagalkot",
           "zh": "巴加尔科特"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Koppal + Bagalkot",
+        "zh": "科帕尔、巴加尔科特"
+      },
+      "name_source": "population",
+      "representative_id": "IN_ADM2_76128533B83278580643229"
     },
     {
       "id": "CA_MRG_46f94b8c5773",
@@ -1320,8 +1638,8 @@
       ],
       "parent_id": "CA_Nova_Scotia",
       "names": {
-        "en": "Central Nova + Sackville—Bedford—Preston",
-        "zh": "中央新星、萨克维尔—贝德福德—普雷斯顿"
+        "en": "New Glasgow",
+        "zh": "新格拉斯哥"
       },
       "member_names": {
         "CA_FED_12003": {
@@ -1332,7 +1650,13 @@
           "en": "Sackville—Bedford—Preston",
           "zh": "萨克维尔—贝德福德—普雷斯顿"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Central Nova + Sackville—Bedford—Preston",
+        "zh": "中央新星、萨克维尔—贝德福德—普雷斯顿"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_12003"
     },
     {
       "id": "CA_MRG_480215c2f838",
@@ -1342,8 +1666,8 @@
       ],
       "parent_id": "CA_New_Brunswick",
       "names": {
-        "en": "Beauséjour + Moncton—Dieppe",
-        "zh": "博塞茹尔、蒙克顿—迪耶普"
+        "en": "Moncton",
+        "zh": "蒙克顿"
       },
       "member_names": {
         "CA_FED_13002": {
@@ -1354,7 +1678,13 @@
           "en": "Moncton—Dieppe",
           "zh": "蒙克顿—迪耶普"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Beauséjour + Moncton—Dieppe",
+        "zh": "博塞茹尔、蒙克顿—迪耶普"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_13007"
     },
     {
       "id": "CA_MRG_9789731d079e",
@@ -1364,8 +1694,8 @@
       ],
       "parent_id": "CA_New_Brunswick",
       "names": {
-        "en": "Fundy Royal + Saint John—Kennebecasis",
-        "zh": "芬迪皇家、圣约翰-肯尼贝卡西斯"
+        "en": "Saint John",
+        "zh": "圣约翰"
       },
       "member_names": {
         "CA_FED_13004": {
@@ -1376,7 +1706,13 @@
           "en": "Saint John—Kennebecasis",
           "zh": "圣约翰-肯尼贝卡西斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Fundy Royal + Saint John—Kennebecasis",
+        "zh": "芬迪皇家、圣约翰-肯尼贝卡西斯"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_13008"
     },
     {
       "id": "CA_MRG_f85fee938b91",
@@ -1386,8 +1722,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Alfred-Pellan + Vimy",
-        "zh": "阿尔弗雷德-佩兰、维米"
+        "en": "Alfred-Pellan",
+        "zh": "阿尔弗雷德-佩兰"
       },
       "member_names": {
         "CA_FED_24004": {
@@ -1398,7 +1734,13 @@
           "en": "Vimy",
           "zh": "维米"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Alfred-Pellan + Vimy",
+        "zh": "阿尔弗雷德-佩兰、维米"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_24004"
     },
     {
       "id": "CA_MRG_3e06e9aabd9f",
@@ -1409,8 +1751,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Argenteuil—La Petite-Nation + Les Pays-d'en-Haut + Mirabel",
-        "zh": "阿让特伊—小民族、上省、米拉贝尔"
+        "en": "Argenteuil—La Petite-Nation",
+        "zh": "阿让特伊—小民族"
       },
       "member_names": {
         "CA_FED_24005": {
@@ -1425,7 +1767,13 @@
           "en": "Mirabel",
           "zh": "米拉贝尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Argenteuil—La Petite-Nation + Les Pays-d'en-Haut + Mirabel",
+        "zh": "阿让特伊—小民族、上省、米拉贝尔"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_24005"
     },
     {
       "id": "CA_MRG_8219e9529a16",
@@ -1436,8 +1784,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Bécancour—Nicolet—Saurel—Alnôbak + Drummond + Richmond—Arthabaska",
-        "zh": "贝坎库尔—尼科莱—索雷尔—阿尔诺巴克、德拉蒙德、里士满—阿尔萨巴斯卡"
+        "en": "Drummondville",
+        "zh": "德拉蒙"
       },
       "member_names": {
         "CA_FED_24009": {
@@ -1452,7 +1800,13 @@
           "en": "Richmond—Arthabaska",
           "zh": "里士满—阿尔萨巴斯卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bécancour—Nicolet—Saurel—Alnôbak + Drummond + Richmond—Arthabaska",
+        "zh": "贝坎库尔—尼科莱—索雷尔—阿尔诺巴克、德拉蒙德、里士满—阿尔萨巴斯卡"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_24023"
     },
     {
       "id": "CA_MRG_5e17f5b2af34",
@@ -1463,8 +1817,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Berthier—Maskinongé + Joliette—Manawan + Montcalm",
-        "zh": "贝尔蒂埃—马斯基农热、乔利埃特—马纳万、蒙卡尔姆"
+        "en": "Joliette",
+        "zh": "若列特"
       },
       "member_names": {
         "CA_FED_24012": {
@@ -1479,7 +1833,13 @@
           "en": "Montcalm",
           "zh": "蒙卡尔姆"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Berthier—Maskinongé + Joliette—Manawan + Montcalm",
+        "zh": "贝尔蒂埃—马斯基农热、乔利埃特—马纳万、蒙卡尔姆"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_24029"
     },
     {
       "id": "CA_MRG_bf94919e448f",
@@ -1489,8 +1849,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Châteauguay—Les Jardins-de-Napierville + Saint-Jean",
-        "zh": "沙托盖—内皮尔维尔花园、圣让"
+        "en": "Saint-Jean",
+        "zh": "圣让"
       },
       "member_names": {
         "CA_FED_24017": {
@@ -1501,7 +1861,13 @@
           "en": "Saint-Jean",
           "zh": "圣让"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Châteauguay—Les Jardins-de-Napierville + Saint-Jean",
+        "zh": "沙托盖—内皮尔维尔花园、圣让"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_24067"
     },
     {
       "id": "CA_MRG_4b867801b8a0",
@@ -1511,8 +1877,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Dorval—Lachine—LaSalle + Saint-Laurent",
-        "zh": "多瓦尔—拉钦—拉萨尔、圣洛朗"
+        "en": "Saint-Laurent",
+        "zh": "圣洛朗"
       },
       "member_names": {
         "CA_FED_24022": {
@@ -1523,7 +1889,13 @@
           "en": "Saint-Laurent",
           "zh": "圣洛朗"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dorval—Lachine—LaSalle + Saint-Laurent",
+        "zh": "多瓦尔—拉钦—拉萨尔、圣洛朗"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_24068"
     },
     {
       "id": "CA_MRG_c32aed1df08f",
@@ -1533,8 +1905,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Lac-Saint-Louis + Pierrefonds—Dollard",
-        "zh": "圣路易斯湖、皮埃尔丰-多拉德"
+        "en": "Pierrefonds—Dollard",
+        "zh": "皮埃尔丰-多拉德"
       },
       "member_names": {
         "CA_FED_24034": {
@@ -1545,7 +1917,13 @@
           "en": "Pierrefonds—Dollard",
           "zh": "皮埃尔丰-多拉德"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lac-Saint-Louis + Pierrefonds—Dollard",
+        "zh": "圣路易斯湖、皮埃尔丰-多拉德"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_24056"
     },
     {
       "id": "CA_MRG_c4a98756227d",
@@ -1555,8 +1933,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Laval—Les Îles + Marc-Aurèle-Fortin",
-        "zh": "拉瓦尔—莱斯岛、马克·奥雷勒·福廷"
+        "en": "Marc-Aurèle-Fortin",
+        "zh": "马克·奥雷勒·福廷"
       },
       "member_names": {
         "CA_FED_24038": {
@@ -1567,7 +1945,13 @@
           "en": "Marc-Aurèle-Fortin",
           "zh": "马克·奥雷勒·福廷"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Laval—Les Îles + Marc-Aurèle-Fortin",
+        "zh": "拉瓦尔—莱斯岛、马克·奥雷勒·福廷"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_24045"
     },
     {
       "id": "CA_MRG_d16c931e21ca",
@@ -1577,8 +1961,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Louis-Hébert + Louis-Saint-Laurent—Akiawenhrahk",
-        "zh": "路易斯·赫伯特、路易·圣洛朗—阿基亚文拉克"
+        "en": "Louis-Saint-Laurent—Akiawenhrahk",
+        "zh": "路易·圣洛朗—阿基亚文拉克"
       },
       "member_names": {
         "CA_FED_24043": {
@@ -1589,7 +1973,13 @@
           "en": "Louis-Saint-Laurent—Akiawenhrahk",
           "zh": "路易·圣洛朗—阿基亚文拉克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Louis-Hébert + Louis-Saint-Laurent—Akiawenhrahk",
+        "zh": "路易斯·赫伯特、路易·圣洛朗—阿基亚文拉克"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_24044"
     },
     {
       "id": "CA_MRG_7e7e19718e0f",
@@ -1599,8 +1989,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Montmorency—Charlevoix + Portneuf—Jacques-Cartier",
-        "zh": "蒙莫朗西—沙勒瓦、波特纳夫—雅克·卡地亚"
+        "en": "Montmorency—Charlevoix",
+        "zh": "蒙莫朗西—沙勒瓦"
       },
       "member_names": {
         "CA_FED_24051": {
@@ -1611,7 +2001,13 @@
           "en": "Portneuf—Jacques-Cartier",
           "zh": "波特纳夫—雅克·卡地亚"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Montmorency—Charlevoix + Portneuf—Jacques-Cartier",
+        "zh": "蒙莫朗西—沙勒瓦、波特纳夫—雅克·卡地亚"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_24051"
     },
     {
       "id": "CA_MRG_7cbc6bf7c111",
@@ -1622,8 +2018,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Pierre-Boucher—Les Patriotes—Verchères + Saint-Hyacinthe—Bagot—Acton + Shefford",
-        "zh": "皮埃尔-布歇—爱国者—维谢尔、圣亚森特—巴戈特—阿克顿、谢福德"
+        "en": "Shefford",
+        "zh": "谢福德"
       },
       "member_names": {
         "CA_FED_24055": {
@@ -1638,7 +2034,13 @@
           "en": "Shefford",
           "zh": "谢福德"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Pierre-Boucher—Les Patriotes—Verchères + Saint-Hyacinthe—Bagot—Acton + Shefford",
+        "zh": "皮埃尔-布歇—爱国者—维谢尔、圣亚森特—巴戈特—阿克顿、谢福德"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_24071"
     },
     {
       "id": "CA_MRG_653d532898a8",
@@ -1648,8 +2050,8 @@
       ],
       "parent_id": "CA_Quebec",
       "names": {
-        "en": "Rivière-des-Mille-Îles + Thérèse-De Blainville",
-        "zh": "千岛河、泰蕾兹-德布兰维尔"
+        "en": "Thérèse-De Blainville",
+        "zh": "泰蕾兹-德布兰维尔"
       },
       "member_names": {
         "CA_FED_24063": {
@@ -1660,7 +2062,13 @@
           "en": "Thérèse-De Blainville",
           "zh": "泰蕾兹-德布兰维尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rivière-des-Mille-Îles + Thérèse-De Blainville",
+        "zh": "千岛河、泰蕾兹-德布兰维尔"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_24074"
     },
     {
       "id": "CA_MRG_684250872a47",
@@ -1670,8 +2078,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Ajax + Pickering—Brooklin",
-        "zh": "阿贾克斯、皮克林—布鲁克林"
+        "en": "Pickering—Brooklin",
+        "zh": "皮克林—布鲁克林"
       },
       "member_names": {
         "CA_FED_35001": {
@@ -1682,7 +2090,13 @@
           "en": "Pickering—Brooklin",
           "zh": "皮克林—布鲁克林"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ajax + Pickering—Brooklin",
+        "zh": "阿贾克斯、皮克林—布鲁克林"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35087"
     },
     {
       "id": "CA_MRG_73fc08ab0b94",
@@ -1692,8 +2106,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Aurora—Oak Ridges—Richmond Hill + Newmarket—Aurora",
-        "zh": "奥罗拉—橡树岭—列治文山、纽马克特—奥罗拉"
+        "en": "Aurora—Oak Ridges—Richmond Hill",
+        "zh": "奥罗拉—橡树岭—列治文山"
       },
       "member_names": {
         "CA_FED_35003": {
@@ -1704,7 +2118,13 @@
           "en": "Newmarket—Aurora",
           "zh": "纽马克特—奥罗拉"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Aurora—Oak Ridges—Richmond Hill + Newmarket—Aurora",
+        "zh": "奥罗拉—橡树岭—列治文山、纽马克特—奥罗拉"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35003"
     },
     {
       "id": "CA_MRG_24ae99283479",
@@ -1714,8 +2134,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Brampton North—Caledon + Brampton West",
-        "zh": "北布兰普顿—卡利登、布兰普顿西"
+        "en": "Brampton North—Caledon",
+        "zh": "北布兰普顿—卡利登"
       },
       "member_names": {
         "CA_FED_35012": {
@@ -1726,7 +2146,13 @@
           "en": "Brampton West",
           "zh": "布兰普顿西"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Brampton North—Caledon + Brampton West",
+        "zh": "北布兰普顿—卡利登、布兰普顿西"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35012"
     },
     {
       "id": "CA_MRG_911ec8320222",
@@ -1737,8 +2163,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Brantford—Brant South—Six Nations + Flamborough—Glanbrook—Brant North + Haldimand—Norfolk",
-        "zh": "布兰特福德—布兰特南—六国、弗兰伯勒—格兰布鲁克—布兰特北、哈尔迪曼德—诺福克"
+        "en": "Brantford—Brant South—Six Nations",
+        "zh": "布兰特福德—布兰特南—六国"
       },
       "member_names": {
         "CA_FED_35015": {
@@ -1753,7 +2179,13 @@
           "en": "Haldimand—Norfolk",
           "zh": "哈尔迪曼德—诺福克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Brantford—Brant South—Six Nations + Flamborough—Glanbrook—Brant North + Haldimand—Norfolk",
+        "zh": "布兰特福德—布兰特南—六国、弗兰伯勒—格兰布鲁克—布兰特北、哈尔迪曼德—诺福克"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35015"
     },
     {
       "id": "CA_MRG_1a080100c822",
@@ -1763,8 +2195,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Carleton + Lanark—Frontenac",
-        "zh": "卡尔顿、拉纳克—芳特纳克"
+        "en": "Carleton",
+        "zh": "卡尔顿"
       },
       "member_names": {
         "CA_FED_35020": {
@@ -1775,7 +2207,13 @@
           "en": "Lanark—Frontenac",
           "zh": "拉纳克—芳特纳克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Carleton + Lanark—Frontenac",
+        "zh": "卡尔顿、拉纳克—芳特纳克"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35020"
     },
     {
       "id": "CA_MRG_f50bdee7dd4c",
@@ -1785,8 +2223,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Don Valley North + Don Valley West",
-        "zh": "当谷北、当谷西"
+        "en": "Toronto",
+        "zh": "多伦多"
       },
       "member_names": {
         "CA_FED_35023": {
@@ -1797,7 +2235,13 @@
           "en": "Don Valley West",
           "zh": "当谷西"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Don Valley North + Don Valley West",
+        "zh": "当谷北、当谷西"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_35024"
     },
     {
       "id": "CA_MRG_fdd421e1a6fe",
@@ -1808,8 +2252,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Dufferin—Caledon + Simcoe—Grey + Wellington—Halton Hills North",
-        "zh": "达弗林—卡利登、西姆科—格雷、惠灵顿—荷顿山北"
+        "en": "Orangeville",
+        "zh": "奥兰治维尔"
       },
       "member_names": {
         "CA_FED_35025": {
@@ -1824,7 +2268,13 @@
           "en": "Wellington—Halton Hills North",
           "zh": "惠灵顿—荷顿山北"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dufferin—Caledon + Simcoe—Grey + Wellington—Halton Hills North",
+        "zh": "达弗林—卡利登、西姆科—格雷、惠灵顿—荷顿山北"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_35025"
     },
     {
       "id": "CA_MRG_528f74543a8b",
@@ -1835,8 +2285,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Elgin—St. Thomas—London South + Middlesex—London + Oxford",
-        "zh": "埃尔金—圣托马斯—伦敦南、米德尔塞克斯—伦敦、牛津"
+        "en": "Elgin—St. Thomas—London South",
+        "zh": "埃尔金—圣托马斯—伦敦南"
       },
       "member_names": {
         "CA_FED_35027": {
@@ -1851,7 +2301,13 @@
           "en": "Oxford",
           "zh": "牛津"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Elgin—St. Thomas—London South + Middlesex—London + Oxford",
+        "zh": "埃尔金—圣托马斯—伦敦南、米德尔塞克斯—伦敦、牛津"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35027"
     },
     {
       "id": "CA_MRG_7b5ba113838a",
@@ -1862,8 +2318,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Haliburton—Kawartha Lakes + Northumberland—Clarke + Peterborough",
-        "zh": "哈利伯顿—卡沃萨湖、诺森伯兰郡—克拉克、彼得伯勒"
+        "en": "Peterborough",
+        "zh": "彼得堡"
       },
       "member_names": {
         "CA_FED_35035": {
@@ -1878,7 +2334,13 @@
           "en": "Peterborough",
           "zh": "彼得伯勒"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Haliburton—Kawartha Lakes + Northumberland—Clarke + Peterborough",
+        "zh": "哈利伯顿—卡沃萨湖、诺森伯兰郡—克拉克、彼得伯勒"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_35086"
     },
     {
       "id": "CA_MRG_2eca2d3aeffd",
@@ -1888,8 +2350,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Humber River—Black Creek + York Centre",
-        "zh": "亨伯河—黑溪、约克中心"
+        "en": "Humber River—Black Creek",
+        "zh": "亨伯河—黑溪"
       },
       "member_names": {
         "CA_FED_35041": {
@@ -1900,7 +2362,13 @@
           "en": "York Centre",
           "zh": "约克中心"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Humber River—Black Creek + York Centre",
+        "zh": "亨伯河—黑溪、约克中心"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35041"
     },
     {
       "id": "CA_MRG_d17d84b57368",
@@ -1910,8 +2378,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Huron—Bruce + Perth—Wellington",
-        "zh": "休伦湖—布鲁斯、珀斯—惠灵顿"
+        "en": "Perth—Wellington",
+        "zh": "珀斯—惠灵顿"
       },
       "member_names": {
         "CA_FED_35042": {
@@ -1922,7 +2390,13 @@
           "en": "Perth—Wellington",
           "zh": "珀斯—惠灵顿"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Huron—Bruce + Perth—Wellington",
+        "zh": "休伦湖—布鲁斯、珀斯—惠灵顿"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35085"
     },
     {
       "id": "CA_MRG_d27584f205e9",
@@ -1932,8 +2406,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Kanata + Ottawa West—Nepean",
-        "zh": "彼方、渥太华西—内皮恩"
+        "en": "Ottawa West—Nepean",
+        "zh": "渥太华西—内皮恩"
       },
       "member_names": {
         "CA_FED_35043": {
@@ -1944,7 +2418,13 @@
           "en": "Ottawa West—Nepean",
           "zh": "渥太华西—内皮恩"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kanata + Ottawa West—Nepean",
+        "zh": "彼方、渥太华西—内皮恩"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35082"
     },
     {
       "id": "CA_MRG_ac3bfdb5edd9",
@@ -1954,8 +2434,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Kitchener Centre + Kitchener South—Hespeler",
-        "zh": "基奇纳中心、基奇纳南—赫斯佩勒"
+        "en": "Kitchener",
+        "zh": "基秦拿"
       },
       "member_names": {
         "CA_FED_35048": {
@@ -1966,7 +2446,13 @@
           "en": "Kitchener South—Hespeler",
           "zh": "基奇纳南—赫斯佩勒"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kitchener Centre + Kitchener South—Hespeler",
+        "zh": "基奇纳中心、基奇纳南—赫斯佩勒"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_35050"
     },
     {
       "id": "CA_MRG_7d4331ee0a5c",
@@ -1976,8 +2462,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Mississauga—Erin Mills + Mississauga—Streetsville",
-        "zh": "密西沙加—艾琳米尔斯、密西沙加—斯特里茨维尔"
+        "en": "Mississauga—Streetsville",
+        "zh": "密西沙加—斯特里茨维尔"
       },
       "member_names": {
         "CA_FED_35063": {
@@ -1988,7 +2474,13 @@
           "en": "Mississauga—Streetsville",
           "zh": "密西沙加—斯特里茨维尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mississauga—Erin Mills + Mississauga—Streetsville",
+        "zh": "密西沙加—艾琳米尔斯、密西沙加—斯特里茨维尔"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35066"
     },
     {
       "id": "CA_MRG_705e30d79f5c",
@@ -1998,8 +2490,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Mississauga—Lakeshore + Oakville East",
-        "zh": "密西沙加—湖滨、奥克维尔东"
+        "en": "Mississauga—Lakeshore",
+        "zh": "密西沙加—湖滨"
       },
       "member_names": {
         "CA_FED_35064": {
@@ -2010,7 +2502,13 @@
           "en": "Oakville East",
           "zh": "奥克维尔东"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mississauga—Lakeshore + Oakville East",
+        "zh": "密西沙加—湖滨、奥克维尔东"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35064"
     },
     {
       "id": "CA_MRG_23b011e3543e",
@@ -2020,8 +2518,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "New Tecumseth—Gwillimbury + York—Durham",
-        "zh": "新特康塞斯—格威林伯里、约克—达勒姆"
+        "en": "York—Durham",
+        "zh": "约克—达勒姆"
       },
       "member_names": {
         "CA_FED_35069": {
@@ -2032,7 +2530,13 @@
           "en": "York—Durham",
           "zh": "约克—达勒姆"
         }
-      }
+      },
+      "previous_names": {
+        "en": "New Tecumseth—Gwillimbury + York—Durham",
+        "zh": "新特康塞斯—格威林伯里、约克—达勒姆"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35121"
     },
     {
       "id": "CA_MRG_5a20b1bb5941",
@@ -2042,8 +2546,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Scarborough Centre—Don Valley East + Scarborough—Woburn",
-        "zh": "士嘉堡中心—当谷东、斯卡伯勒—沃本"
+        "en": "Scarborough Centre—Don Valley East",
+        "zh": "士嘉堡中心—当谷东"
       },
       "member_names": {
         "CA_FED_35093": {
@@ -2054,7 +2558,13 @@
           "en": "Scarborough—Woburn",
           "zh": "斯卡伯勒—沃本"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Scarborough Centre—Don Valley East + Scarborough—Woburn",
+        "zh": "士嘉堡中心—当谷东、斯卡伯勒—沃本"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35093"
     },
     {
       "id": "CA_MRG_d08e3259dc76",
@@ -2064,8 +2574,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Scarborough—Guildwood—Rouge Park + Scarborough North",
-        "zh": "斯卡伯勒—吉尔德伍德—胭脂公园、士嘉堡北"
+        "en": "Scarborough North",
+        "zh": "士嘉堡北"
       },
       "member_names": {
         "CA_FED_35094": {
@@ -2076,7 +2586,13 @@
           "en": "Scarborough North",
           "zh": "士嘉堡北"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Scarborough—Guildwood—Rouge Park + Scarborough North",
+        "zh": "斯卡伯勒—吉尔德伍德—胭脂公园、士嘉堡北"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35095"
     },
     {
       "id": "CA_MRG_0f506b88e592",
@@ -2086,8 +2602,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Taiaiako'n—Parkdale—High Park + York South—Weston—Etobicoke",
-        "zh": "泰亚亚科恩-帕克代尔-海帕克、约克南—韦斯顿—怡陶碧谷"
+        "en": "York South—Weston—Etobicoke",
+        "zh": "约克南—韦斯顿—怡陶碧谷"
       },
       "member_names": {
         "CA_FED_35105": {
@@ -2098,7 +2614,13 @@
           "en": "York South—Weston—Etobicoke",
           "zh": "约克南—韦斯顿—怡陶碧谷"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Taiaiako'n—Parkdale—High Park + York South—Weston—Etobicoke",
+        "zh": "泰亚亚科恩-帕克代尔-海帕克、约克南—韦斯顿—怡陶碧谷"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35122"
     },
     {
       "id": "CA_MRG_8516027ac8b5",
@@ -2108,8 +2630,8 @@
       ],
       "parent_id": "CA_Ontario",
       "names": {
-        "en": "Toronto Centre + University—Rosedale",
-        "zh": "多伦多中心、大学—罗西代尔"
+        "en": "University—Rosedale",
+        "zh": "大学—罗西代尔"
       },
       "member_names": {
         "CA_FED_35109": {
@@ -2120,7 +2642,13 @@
           "en": "University—Rosedale",
           "zh": "大学—罗西代尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Toronto Centre + University—Rosedale",
+        "zh": "多伦多中心、大学—罗西代尔"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_35112"
     },
     {
       "id": "CA_MRG_86ce9e72c383",
@@ -2130,8 +2658,8 @@
       ],
       "parent_id": "CA_Manitoba",
       "names": {
-        "en": "Elmwood—Transcona + St. Boniface—St. Vital",
-        "zh": "埃尔姆伍德—特兰科纳、圣博尼法斯—圣维塔尔"
+        "en": "St. Boniface—St. Vital",
+        "zh": "圣博尼法斯—圣维塔尔"
       },
       "member_names": {
         "CA_FED_46003": {
@@ -2142,7 +2670,13 @@
           "en": "St. Boniface—St. Vital",
           "zh": "圣博尼法斯—圣维塔尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Elmwood—Transcona + St. Boniface—St. Vital",
+        "zh": "埃尔姆伍德—特兰科纳、圣博尼法斯—圣维塔尔"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_46008"
     },
     {
       "id": "CA_MRG_43ae18b09e32",
@@ -2152,8 +2686,8 @@
       ],
       "parent_id": "CA_Manitoba",
       "names": {
-        "en": "Kildonan—St. Paul + Winnipeg North",
-        "zh": "基尔多南—圣保罗、北温尼伯"
+        "en": "Kildonan—St. Paul",
+        "zh": "基尔多南—圣保罗"
       },
       "member_names": {
         "CA_FED_46004": {
@@ -2164,7 +2698,13 @@
           "en": "Winnipeg North",
           "zh": "北温尼伯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kildonan—St. Paul + Winnipeg North",
+        "zh": "基尔多南—圣保罗、北温尼伯"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_46004"
     },
     {
       "id": "CA_MRG_a592db62ce9c",
@@ -2175,8 +2715,8 @@
       ],
       "parent_id": "CA_Manitoba",
       "names": {
-        "en": "Portage—Lisgar + Selkirk—Interlake—Eastman + Winnipeg West",
-        "zh": "波蒂奇—利斯加、塞尔柯克—因特拉克—伊士曼、温尼伯西"
+        "en": "Selkirk",
+        "zh": "塞尔奇克"
       },
       "member_names": {
         "CA_FED_46005": {
@@ -2191,7 +2731,13 @@
           "en": "Winnipeg West",
           "zh": "温尼伯西"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Portage—Lisgar + Selkirk—Interlake—Eastman + Winnipeg West",
+        "zh": "波蒂奇—利斯加、塞尔柯克—因特拉克—伊士曼、温尼伯西"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_46009"
     },
     {
       "id": "CA_MRG_a14ea77f718d",
@@ -2201,8 +2747,8 @@
       ],
       "parent_id": "CA_Manitoba",
       "names": {
-        "en": "Winnipeg South + Winnipeg South Centre",
-        "zh": "温尼伯南、温尼伯南中心"
+        "en": "Winnipeg South Centre",
+        "zh": "温尼伯南中心"
       },
       "member_names": {
         "CA_FED_46012": {
@@ -2213,7 +2759,13 @@
           "en": "Winnipeg South Centre",
           "zh": "温尼伯南中心"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Winnipeg South + Winnipeg South Centre",
+        "zh": "温尼伯南、温尼伯南中心"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_46013"
     },
     {
       "id": "CA_MRG_57ed93ea7b6f",
@@ -2223,8 +2775,8 @@
       ],
       "parent_id": "CA_Saskatchewan",
       "names": {
-        "en": "Saskatoon South + Saskatoon—University",
-        "zh": "南萨斯卡通、萨斯卡通—大学"
+        "en": "Saskatoon—University",
+        "zh": "萨斯卡通—大学"
       },
       "member_names": {
         "CA_FED_47009": {
@@ -2235,7 +2787,13 @@
           "en": "Saskatoon—University",
           "zh": "萨斯卡通—大学"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Saskatoon South + Saskatoon—University",
+        "zh": "南萨斯卡通、萨斯卡通—大学"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_47010"
     },
     {
       "id": "CA_MRG_e32835bda9ac",
@@ -2245,8 +2803,8 @@
       ],
       "parent_id": "CA_Alberta",
       "names": {
-        "en": "Airdrie—Cochrane + Bow River",
-        "zh": "艾尔德里—科克伦、弓河"
+        "en": "Brooks",
+        "zh": "布鲁克斯"
       },
       "member_names": {
         "CA_FED_48001": {
@@ -2257,7 +2815,13 @@
           "en": "Bow River",
           "zh": "弓河"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Airdrie—Cochrane + Bow River",
+        "zh": "艾尔德里—科克伦、弓河"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_48003"
     },
     {
       "id": "CA_MRG_77a1b136ce43",
@@ -2267,8 +2831,8 @@
       ],
       "parent_id": "CA_Alberta",
       "names": {
-        "en": "Calgary Crowfoot + Calgary Nose Hill",
-        "zh": "卡尔加里克劳福特、卡尔加里鼻山"
+        "en": "Calgary Nose Hill",
+        "zh": "卡尔加里鼻山"
       },
       "member_names": {
         "CA_FED_48006": {
@@ -2279,7 +2843,13 @@
           "en": "Calgary Nose Hill",
           "zh": "卡尔加里鼻山"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Calgary Crowfoot + Calgary Nose Hill",
+        "zh": "卡尔加里克劳福特、卡尔加里鼻山"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_48011"
     },
     {
       "id": "CA_MRG_80a56ade734c",
@@ -2289,8 +2859,8 @@
       ],
       "parent_id": "CA_Alberta",
       "names": {
-        "en": "Calgary East + Calgary Shepard",
-        "zh": "卡尔加里东、卡尔加里谢泼德"
+        "en": "Calgary East",
+        "zh": "卡尔加里东"
       },
       "member_names": {
         "CA_FED_48007": {
@@ -2301,7 +2871,13 @@
           "en": "Calgary Shepard",
           "zh": "卡尔加里谢泼德"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Calgary East + Calgary Shepard",
+        "zh": "卡尔加里东、卡尔加里谢泼德"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_48007"
     },
     {
       "id": "CA_MRG_096ac84a0cc7",
@@ -2311,8 +2887,8 @@
       ],
       "parent_id": "CA_Alberta",
       "names": {
-        "en": "Calgary Heritage + Calgary Midnapore",
-        "zh": "卡尔加里遗产、卡尔加里米德纳普尔"
+        "en": "Calgary Heritage",
+        "zh": "卡尔加里遗产"
       },
       "member_names": {
         "CA_FED_48008": {
@@ -2323,7 +2899,13 @@
           "en": "Calgary Midnapore",
           "zh": "卡尔加里米德纳普尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Calgary Heritage + Calgary Midnapore",
+        "zh": "卡尔加里遗产、卡尔加里米德纳普尔"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_48008"
     },
     {
       "id": "CA_MRG_df8fc4dc7fdc",
@@ -2333,8 +2915,8 @@
       ],
       "parent_id": "CA_Alberta",
       "names": {
-        "en": "Calgary McKnight + Calgary Skyview",
-        "zh": "卡尔加里·麦克奈特、卡尔加里天空景观酒店"
+        "en": "Calgary McKnight",
+        "zh": "卡尔加里·麦克奈特"
       },
       "member_names": {
         "CA_FED_48009": {
@@ -2345,7 +2927,13 @@
           "en": "Calgary Skyview",
           "zh": "卡尔加里天空景观酒店"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Calgary McKnight + Calgary Skyview",
+        "zh": "卡尔加里·麦克奈特、卡尔加里天空景观酒店"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_48009"
     },
     {
       "id": "CA_MRG_2ebb41be023f",
@@ -2355,8 +2943,8 @@
       ],
       "parent_id": "CA_Alberta",
       "names": {
-        "en": "Edmonton Gateway + Edmonton Southeast",
-        "zh": "埃德蒙顿门户、埃德蒙顿东南部"
+        "en": "Edmonton Southeast",
+        "zh": "埃德蒙顿东南部"
       },
       "member_names": {
         "CA_FED_48016": {
@@ -2367,7 +2955,13 @@
           "en": "Edmonton Southeast",
           "zh": "埃德蒙顿东南部"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Edmonton Gateway + Edmonton Southeast",
+        "zh": "埃德蒙顿门户、埃德蒙顿东南部"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_48021"
     },
     {
       "id": "CA_MRG_567d2b874fad",
@@ -2377,8 +2971,8 @@
       ],
       "parent_id": "CA_Alberta",
       "names": {
-        "en": "Edmonton Riverbend + Edmonton West",
-        "zh": "埃德蒙顿河湾、埃德蒙顿西"
+        "en": "Edmonton West",
+        "zh": "埃德蒙顿西"
       },
       "member_names": {
         "CA_FED_48020": {
@@ -2389,7 +2983,13 @@
           "en": "Edmonton West",
           "zh": "埃德蒙顿西"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Edmonton Riverbend + Edmonton West",
+        "zh": "埃德蒙顿河湾、埃德蒙顿西"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_48023"
     },
     {
       "id": "CA_MRG_fccdff3ab06c",
@@ -2400,8 +3000,8 @@
       ],
       "parent_id": "CA_Alberta",
       "names": {
-        "en": "Leduc—Wetaskiwin + Parkland + Ponoka—Didsbury",
-        "zh": "勒杜克—韦塔斯基温、帕克兰、波诺卡—迪兹伯里"
+        "en": "Wetaskiwin",
+        "zh": "韦塔斯基温"
       },
       "member_names": {
         "CA_FED_48028": {
@@ -2416,7 +3016,13 @@
           "en": "Ponoka—Didsbury",
           "zh": "波诺卡—迪兹伯里"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Leduc—Wetaskiwin + Parkland + Ponoka—Didsbury",
+        "zh": "勒杜克—韦塔斯基温、帕克兰、波诺卡—迪兹伯里"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_48028"
     },
     {
       "id": "CA_MRG_d35dd30542b8",
@@ -2426,8 +3032,8 @@
       ],
       "parent_id": "CA_British_Columbia",
       "names": {
-        "en": "Burnaby Central + Vancouver Kingsway",
-        "zh": "本那比中央、温哥华金威"
+        "en": "Vancouver Kingsway",
+        "zh": "温哥华金威"
       },
       "member_names": {
         "CA_FED_59002": {
@@ -2438,7 +3044,13 @@
           "en": "Vancouver Kingsway",
           "zh": "温哥华金威"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Burnaby Central + Vancouver Kingsway",
+        "zh": "本那比中央、温哥华金威"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_59039"
     },
     {
       "id": "CA_MRG_02a592f4a083",
@@ -2448,8 +3060,8 @@
       ],
       "parent_id": "CA_British_Columbia",
       "names": {
-        "en": "Courtenay—Alberni + Nanaimo—Ladysmith",
-        "zh": "考特尼—阿尔伯尼、纳奈莫—莱迪史密斯"
+        "en": "Nanaimo",
+        "zh": "纳奈莫"
       },
       "member_names": {
         "CA_FED_59009": {
@@ -2460,7 +3072,13 @@
           "en": "Nanaimo—Ladysmith",
           "zh": "纳奈莫—莱迪史密斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Courtenay—Alberni + Nanaimo—Ladysmith",
+        "zh": "考特尼—阿尔伯尼、纳奈莫—莱迪史密斯"
+      },
+      "name_source": "city",
+      "representative_id": "CA_FED_59019"
     },
     {
       "id": "CA_MRG_410af4197c3c",
@@ -2470,8 +3088,8 @@
       ],
       "parent_id": "CA_British_Columbia",
       "names": {
-        "en": "Delta + Surrey Centre",
-        "zh": "三角洲、萨里中心"
+        "en": "Delta",
+        "zh": "三角洲"
       },
       "member_names": {
         "CA_FED_59011": {
@@ -2482,7 +3100,13 @@
           "en": "Surrey Centre",
           "zh": "萨里中心"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Delta + Surrey Centre",
+        "zh": "三角洲、萨里中心"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_59011"
     },
     {
       "id": "CA_MRG_dde82f995deb",
@@ -2492,8 +3116,8 @@
       ],
       "parent_id": "CA_British_Columbia",
       "names": {
-        "en": "New Westminster—Burnaby—Maillardville + Port Moody—Coquitlam",
-        "zh": "新威斯敏斯特—本拿比—梅拉德维尔、穆迪港—高贵林"
+        "en": "Port Moody—Coquitlam",
+        "zh": "穆迪港—高贵林"
       },
       "member_names": {
         "CA_FED_59020": {
@@ -2504,7 +3128,13 @@
           "en": "Port Moody—Coquitlam",
           "zh": "穆迪港—高贵林"
         }
-      }
+      },
+      "previous_names": {
+        "en": "New Westminster—Burnaby—Maillardville + Port Moody—Coquitlam",
+        "zh": "新威斯敏斯特—本拿比—梅拉德维尔、穆迪港—高贵林"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_59025"
     },
     {
       "id": "CA_MRG_fca877bc83a4",
@@ -2514,8 +3144,8 @@
       ],
       "parent_id": "CA_British_Columbia",
       "names": {
-        "en": "Okanagan Lake West—South Kelowna + Vernon—Lake Country—Monashee",
-        "zh": "奥卡纳根湖西-南基洛纳、弗农—湖区—莫纳希"
+        "en": "Vernon—Lake Country—Monashee",
+        "zh": "弗农—湖区—莫纳希"
       },
       "member_names": {
         "CA_FED_59023": {
@@ -2526,7 +3156,13 @@
           "en": "Vernon—Lake Country—Monashee",
           "zh": "弗农—湖区—莫纳希"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Okanagan Lake West—South Kelowna + Vernon—Lake Country—Monashee",
+        "zh": "奥卡纳根湖西-南基洛纳、弗农—湖区—莫纳希"
+      },
+      "name_source": "population",
+      "representative_id": "CA_FED_59041"
     }
   ],
   "split_or_reduced_candidates": [

@@ -2296,7 +2296,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_32be8ff42d1d",
-        "name": "Caithness & Sutherland and Ross & Cromarty + Inverness & Nairn and Moray, Badenoch & Strathspey",
+        "name": "Inverness",
         "cntr_code": "GB",
         "admin1_group": "Scotland",
         "__source": "detail"
@@ -17814,7 +17814,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_6b5533cccee5",
-        "name": "Clackmannanshire and Fife + Perth & Kinross and Stirling",
+        "name": "Perth",
         "cntr_code": "GB",
         "admin1_group": "Scotland",
         "__source": "detail"
@@ -22210,7 +22210,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_a36fda7ab641",
-        "name": "Falkirk + North Lanarkshire + South Lanarkshire",
+        "name": "North Lanarkshire",
         "cntr_code": "GB",
         "admin1_group": "Scotland",
         "__source": "detail"
@@ -27340,7 +27340,7 @@
       "type": "Feature",
       "properties": {
         "id": "UK_MRG_3af31571b83c",
-        "name": "Inverclyde, East Renfrewshire and Renfrewshire + East Ayrshire and North Ayrshire mainland + South Ayrshire",
+        "name": "Greenock",
         "cntr_code": "GB",
         "admin1_group": "Scotland",
         "__source": "detail"

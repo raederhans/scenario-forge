@@ -11075,7 +11075,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_04be1b530cc3",
-        "name": "Zmeinogorsky District + Kuryinsky District",
+        "name": "Zmeinogorsky District",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -20075,7 +20075,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_e6e892e6d34d",
-        "name": "Shebalinsky Rayon + Altaysky District + Chemalsky Rayon",
+        "name": "Altaysky District",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -30365,7 +30365,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_4418a955e4ff",
-        "name": "Ust-Kalmansky District + Ust-Pristansky District",
+        "name": "Ust-Kalmansky District",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -32661,7 +32661,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_763309207c3e",
-        "name": "Bystroistoksky District + Petropavlovsky District + Smolensky District",
+        "name": "Smolensky District (Altai Krai)",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -35124,7 +35124,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_18b505b29a4e",
-        "name": "Novichikhinsky District + Shipunovsky District",
+        "name": "Shipunovsky District",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -37135,7 +37135,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_1c96074cd4b0",
-        "name": "Klyuchevsky District + Kulundinsky District",
+        "name": "Kulundinsky District",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -37958,7 +37958,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_47107030a018",
-        "name": "Gorno-Altaysk + Sovetsky District + Mayminsky Rayon",
+        "name": "Gorno-Altaysk",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -41420,7 +41420,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_d266dca34c0f",
-        "name": "Topchikhinsky District + Aleysky District + Kalmansky District",
+        "name": "Topchikhinsky District",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -44740,7 +44740,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_25e2a56635c5",
-        "name": "Blagoveshchensky District + Rodinsky District",
+        "name": "Blagoveshchensky District (Altai Krai)",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -46067,7 +46067,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_53076b618d56",
-        "name": "Romanovsky District + Bayevsky District + Zavyalovsky District",
+        "name": "Zavyalovsky District (Altai Krai)",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -47706,7 +47706,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_784147403049",
-        "name": "Mamontovsky District + Rebrikhinsky District",
+        "name": "Rebrikhinsky District",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -50616,7 +50616,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_2358dbd480f8",
-        "name": "городской округ Славгород + Tabunsky District + German National District",
+        "name": "городской округ Славгород",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -52154,7 +52154,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ba58fc93c701",
-        "name": "Tyumentsevsky District + Shelabolikhinsky District + Pavlovsky District",
+        "name": "Pavlovsky District (Altai Krai)",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -57725,7 +57725,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_03fe31da4ec4",
-        "name": "Burlinsky District + Khabarsky District",
+        "name": "Khabarsky District",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -59508,7 +59508,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_6ed49a2fba50",
-        "name": "Pervomaysky District + Talmensky District + Kosikhinsky District",
+        "name": "Pervomaysky District (Altai Krai)",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -67823,7 +67823,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ef463885ab7b",
-        "name": "Karasuksky District + Bagansky District + Krasnozyorsky District",
+        "name": "Karasuksky District",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -98809,7 +98809,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a0da05ed6a33",
-        "name": "Zdvinsky District + Dovolensky District + Kochkovsky District",
+        "name": "Dovolensky District",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -105520,7 +105520,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_45a27fa282d6",
-        "name": "Maslyaninsky District + Toguchinsky District",
+        "name": "Toguchinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -111477,7 +111477,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b3b6d1956b2b",
-        "name": "Novosibirsky District + Iskitimsky District + Moshkovsky District",
+        "name": "Novosibirsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -126890,7 +126890,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ccdeed8f9fd9",
-        "name": "Barabinsky District + Chanovsky District",
+        "name": "Barabinsky District",
         "cntr_code": "NOV",
         "__source": "detail"
       },
@@ -129915,7 +129915,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b3da0fe8b826",
-        "name": "Kochenyovsky District + Chulymsky District + Kargatsky District",
+        "name": "Kochenyovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -155416,7 +155416,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_330f810ce193",
-        "name": "Yashkinsky District + Юргинский район + Topkinsky District",
+        "name": "Topkinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },

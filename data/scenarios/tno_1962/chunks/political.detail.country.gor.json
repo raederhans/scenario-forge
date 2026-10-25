@@ -10957,7 +10957,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_278b291b44d1",
-        "name": "Kanash + Yantikovsky District + Kanashsky District",
+        "name": "Kanash",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -25449,7 +25449,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_91c0b63be7fb",
-        "name": "Krasnochetaysky District + Shumerlinsky District + Vurnarsky District",
+        "name": "Vurnarsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -68635,7 +68635,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_110b1d987f63",
-        "name": "Alikovsky District + Krasnoarmeysky District + Tsivilsky District",
+        "name": "Tsivilsky District",
         "cntr_code": "GOR",
         "__source": "detail"
       },

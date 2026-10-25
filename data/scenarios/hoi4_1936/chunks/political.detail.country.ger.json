@@ -63,7 +63,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_d0e3890ae1d5",
-        "name": "Böblingen + Tübingen, Landkreis",
+        "name": "Böblingen",
         "cntr_code": "DE",
         "admin1_group": "Baden-Württemberg",
         "legacy_name": "",
@@ -160,7 +160,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_c9a9f2cd9548",
-        "name": "Esslingen + Göppingen",
+        "name": "Esslingen",
         "cntr_code": "DE",
         "admin1_group": "Baden-Württemberg",
         "legacy_name": "",
@@ -247,7 +247,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_a27167ef8f23",
-        "name": "Ludwigsburg + Rems-Murr-Kreis + Heilbronn, Landkreis",
+        "name": "Ludwigsburg",
         "cntr_code": "DE",
         "admin1_group": "Baden-Württemberg",
         "legacy_name": "",
@@ -517,7 +517,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_e87b9124c03f",
-        "name": "Hohenlohekreis + Schwäbisch Hall + Ostalbkreis",
+        "name": "Ostalbkreis",
         "cntr_code": "DE",
         "admin1_group": "Baden-Württemberg",
         "legacy_name": "",
@@ -1635,7 +1635,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_68ba87808df8",
-        "name": "Calw + Freudenstadt",
+        "name": "Calw",
         "cntr_code": "DE",
         "admin1_group": "Baden-Württemberg",
         "legacy_name": "",
@@ -4061,7 +4061,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_bd0cf439de30",
-        "name": "Dachau + Freising",
+        "name": "Freising",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "legacy_name": "",
@@ -4164,7 +4164,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_ec3ed49e067c",
-        "name": "Ebersberg + Fürstenfeldbruck + München, Landkreis",
+        "name": "München, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "legacy_name": "",
@@ -4428,7 +4428,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_3fb6d34d5cec",
-        "name": "Erding + Mühldorf a. Inn",
+        "name": "Erding",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "legacy_name": "",
@@ -4636,7 +4636,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_bf419442ff08",
-        "name": "Landsberg am Lech + Starnberg + Weilheim-Schongau",
+        "name": "Weilheim-Schongau",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "legacy_name": "",
@@ -5346,7 +5346,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_d4ab7c811a60",
-        "name": "Landshut, Kreisfreie Stadt + Landshut, Landkreis + Dingolfing-Landau",
+        "name": "Landshut, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "legacy_name": "",
@@ -6256,7 +6256,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_73019c3017aa",
-        "name": "Amberg, Kreisfreie Stadt + Amberg-Sulzbach",
+        "name": "Amberg-Sulzbach",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "legacy_name": "",
@@ -7211,7 +7211,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_348581c848f8",
-        "name": "Bamberg, Kreisfreie Stadt + Bamberg, Landkreis + Lichtenfels",
+        "name": "Bamberg, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "legacy_name": "",
@@ -7334,7 +7334,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_22b5c35ff0db",
-        "name": "Bayreuth, Kreisfreie Stadt + Bayreuth, Landkreis + Kulmbach",
+        "name": "Bayreuth, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "legacy_name": "",
@@ -7678,7 +7678,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_88b2cc10d998",
-        "name": "Forchheim + Erlangen-Höchstadt + Fürth, Landkreis",
+        "name": "Erlangen-Höchstadt",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "legacy_name": "",
@@ -8700,7 +8700,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_08a36bff89a0",
-        "name": "Roth + Weißenburg-Gunzenhausen",
+        "name": "Roth",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "legacy_name": "",
@@ -8896,7 +8896,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_d7270b2f4f53",
-        "name": "Schweinfurt, Kreisfreie Stadt + Kitzingen + Schweinfurt, Landkreis",
+        "name": "Schweinfurt, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Bayern",
         "legacy_name": "",
@@ -11116,7 +11116,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_54666399e0ac",
-        "name": "Brandenburg an der Havel, Kreisfreie Stadt + Havelland + Potsdam-Mittelmark",
+        "name": "Potsdam-Mittelmark",
         "cntr_code": "DE",
         "admin1_group": "Brandenburg",
         "legacy_name": "",
@@ -11595,7 +11595,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_a235cf36d16c",
-        "name": "Dahme-Spreewald + Teltow-Fläming",
+        "name": "Dahme-Spreewald",
         "cntr_code": "DE",
         "admin1_group": "Brandenburg",
         "legacy_name": "",
@@ -12012,7 +12012,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_171e39a343f9",
-        "name": "Oberhavel + Ostprignitz-Ruppin",
+        "name": "Oberhavel",
         "cntr_code": "DE",
         "admin1_group": "Brandenburg",
         "legacy_name": "",
@@ -13436,7 +13436,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_77741e43de3f",
-        "name": "Darmstadt-Dieburg + Offenbach, Landkreis",
+        "name": "Offenbach, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "legacy_name": "",
@@ -13630,7 +13630,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_e2f350a636b5",
-        "name": "Hochtaunuskreis + Main-Taunus-Kreis",
+        "name": "Hochtaunuskreis",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "legacy_name": "",
@@ -13721,7 +13721,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_e2617eca3f85",
-        "name": "Main-Kinzig-Kreis + Wetteraukreis + Gießen, Landkreis",
+        "name": "Gießen",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "legacy_name": "",
@@ -14066,7 +14066,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_3b750624bff4",
-        "name": "Lahn-Dill-Kreis + Limburg-Weilburg",
+        "name": "Lahn-Dill-Kreis",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "legacy_name": "",
@@ -14266,7 +14266,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_d561808c92a5",
-        "name": "Vogelsbergkreis + Fulda",
+        "name": "Fulda",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "legacy_name": "",
@@ -14466,7 +14466,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_33b1389d946f",
-        "name": "Hersfeld-Rotenburg + Schwalm-Eder-Kreis",
+        "name": "Schwalm-Eder-Kreis",
         "cntr_code": "DE",
         "admin1_group": "Hessen",
         "legacy_name": "",
@@ -15112,7 +15112,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_ce73c32b1090",
-        "name": "Mecklenburgische Seenplatte + Vorpommern-Rügen",
+        "name": "Stralsund",
         "cntr_code": "DE",
         "admin1_group": "Mecklenburg-Vorpommern",
         "legacy_name": "",
@@ -16798,7 +16798,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_9e1fff10ce51",
-        "name": "Gifhorn + Peine",
+        "name": "Gifhorn",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "legacy_name": "",
@@ -17034,7 +17034,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_46ade2104d23",
-        "name": "Helmstedt + Wolfenbüttel",
+        "name": "Wolfenbüttel",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "legacy_name": "",
@@ -17185,7 +17185,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_4ab0c6062d32",
-        "name": "Northeim + Holzminden",
+        "name": "Northeim",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "legacy_name": "",
@@ -17409,7 +17409,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_830e5845fb60",
-        "name": "Diepholz + Nienburg (Weser)",
+        "name": "Diepholz",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "legacy_name": "",
@@ -17592,7 +17592,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_4fdd27cf49f7",
-        "name": "Hameln-Pyrmont + Schaumburg",
+        "name": "Schaumburg",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "legacy_name": "",
@@ -17965,7 +17965,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_5dd80c1fcf77",
-        "name": "Celle + Heidekreis",
+        "name": "Celle",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "legacy_name": "",
@@ -18665,7 +18665,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_698a45847033",
-        "name": "Rotenburg (Wümme) + Verden",
+        "name": "Rotenburg (Wümme)",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "legacy_name": "",
@@ -19295,7 +19295,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_67a8450f3c9f",
-        "name": "Ammerland + Wesermarsch",
+        "name": "Ammerland",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "legacy_name": "",
@@ -19490,7 +19490,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_3a19ae12c637",
-        "name": "Aurich + Friesland (DE) + Wittmund",
+        "name": "Aurich",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "legacy_name": "",
@@ -19681,7 +19681,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_c922c0ebada5",
-        "name": "Cloppenburg + Osnabrück, Landkreis + Vechta",
+        "name": "Osnabrück, Landkreis",
         "cntr_code": "DE",
         "admin1_group": "Niedersachsen",
         "legacy_name": "",
@@ -22630,7 +22630,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_70752f860917",
-        "name": "Coesfeld + Unna",
+        "name": "Unna",
         "cntr_code": "DE",
         "admin1_group": "Nordrhein-Westfalen",
         "legacy_name": "",
@@ -22971,7 +22971,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_9410ac111320",
-        "name": "Warendorf + Gütersloh",
+        "name": "Gütersloh",
         "cntr_code": "DE",
         "admin1_group": "Nordrhein-Westfalen",
         "legacy_name": "",
@@ -23147,7 +23147,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_5adb00f4a83d",
-        "name": "Herford + Minden-Lübbecke",
+        "name": "Minden-Lübbecke",
         "cntr_code": "DE",
         "admin1_group": "Nordrhein-Westfalen",
         "legacy_name": "",
@@ -23939,7 +23939,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_6f627c55e7bd",
-        "name": "Hochsauerlandkreis + Olpe + Soest",
+        "name": "Soest",
         "cntr_code": "DE",
         "admin1_group": "Nordrhein-Westfalen",
         "legacy_name": "",
@@ -24624,7 +24624,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_c6f2d9d3d036",
-        "name": "Birkenfeld + Bernkastel-Wittlich + Vulkaneifel",
+        "name": "Bernkastel-Wittlich",
         "cntr_code": "DE",
         "admin1_group": "Rheinland-Pfalz",
         "legacy_name": "",
@@ -25687,7 +25687,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_bceaa37f49ef",
-        "name": "Kaiserslautern, Kreisfreie Stadt + Kaiserslautern, Landkreis + Kusel",
+        "name": "Kaiserslautern, Kreisfreie Stadt",
         "cntr_code": "DE",
         "admin1_group": "Rheinland-Pfalz",
         "legacy_name": "",
@@ -26174,7 +26174,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_ea826ec181b8",
-        "name": "Alzey-Worms + Mainz-Bingen",
+        "name": "Mainz-Bingen",
         "cntr_code": "DE",
         "admin1_group": "Rheinland-Pfalz",
         "legacy_name": "",
@@ -30370,7 +30370,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_d67a0e4a728d",
-        "name": "Dithmarschen + Rendsburg-Eckernförde",
+        "name": "Rendsburg-Eckernförde",
         "cntr_code": "DE",
         "admin1_group": "Schleswig-Holstein",
         "legacy_name": "",
@@ -31991,7 +31991,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_98e486211a34",
-        "name": "Suhl, Kreisfreie Stadt + Schmalkalden-Meiningen + Hildburghausen",
+        "name": "Schmalkalden-Meiningen",
         "cntr_code": "DE",
         "admin1_group": "Thüringen",
         "legacy_name": "",
@@ -32134,7 +32134,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_c90ee890d36c",
-        "name": "Weimar, Kreisfreie Stadt + Weimarer Land + Saale-Holzland-Kreis",
+        "name": "Saale-Holzland-Kreis",
         "cntr_code": "DE",
         "admin1_group": "Thüringen",
         "legacy_name": "",
@@ -32336,7 +32336,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_b86ffe1dd2ea",
-        "name": "Nordhausen + Kyffhäuserkreis + Sömmerda",
+        "name": "Nordhausen",
         "cntr_code": "DE",
         "admin1_group": "Thüringen",
         "legacy_name": "",
@@ -32487,7 +32487,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_cc565c282846",
-        "name": "Unstrut-Hainich-Kreis + Eisenach, Kreisfreie Stadt + Wartburgkreis",
+        "name": "Wartburgkreis",
         "cntr_code": "DE",
         "admin1_group": "Thüringen",
         "legacy_name": "",
@@ -32731,7 +32731,7 @@
       "type": "Feature",
       "properties": {
         "id": "DE_MRG_ac1a1840dec2",
-        "name": "Ilm-Kreis + Saalfeld-Rudolstadt + Saale-Orla-Kreis",
+        "name": "Saalfeld-Rudolstadt",
         "cntr_code": "DE",
         "admin1_group": "Thüringen",
         "legacy_name": "",
@@ -33125,7 +33125,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_4af99a43d917",
-        "name": "bolesławiecki + lwówecki",
+        "name": "bolesławiecki",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -33512,7 +33512,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_4b4e7fcd7031",
-        "name": "dzierżoniowski + ząbkowicki",
+        "name": "dzierżoniowski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -34269,7 +34269,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_697bf6eafbca",
-        "name": "jaworski + legnicki + złotoryjski",
+        "name": "legnicki (Lower Silesian)",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -35626,7 +35626,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_cda1a954e365",
-        "name": "lubiński + polkowicki",
+        "name": "lubiński",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -36851,7 +36851,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_ae7dcb23076e",
-        "name": "średzki + wołowski",
+        "name": "średzki",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -47278,7 +47278,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_6059e5e8fd2d",
-        "name": "giżycki + mrągowski",
+        "name": "giżycki",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -48255,7 +48255,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_635f3bd9c929",
-        "name": "lidzbarski + olsztyński",
+        "name": "olsztyński (Warmian-Masurian)",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -50986,7 +50986,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_ed1992314afe",
-        "name": "białogardzki + świdwiński + łobeski",
+        "name": "białogardzki",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -52121,7 +52121,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_9b20fe0cbb07",
-        "name": "goleniowski + gryficki + kamieński",
+        "name": "goleniowski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -56697,7 +56697,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b18e5b7f00a3",
-        "name": "Gvardeysky District + Polessky District + Chernyakhovsky District",
+        "name": "Chernyakhovsk",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",
@@ -57149,7 +57149,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_f00dfba16127",
-        "name": "Guryevsky District + Светловский городской окру + Zelenogradsky District",
+        "name": "Guryevsky District (Kaliningrad)",
         "cntr_code": "RU",
         "admin1_group": "",
         "legacy_name": "",

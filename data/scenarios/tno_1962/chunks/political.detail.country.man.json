@@ -47346,7 +47346,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_61ce738540d1",
-        "name": "Shkotovsky District + ЗАТО Фокино + Partizansk",
+        "name": "Partizansk",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -52156,7 +52156,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_fbedb5ba4063",
-        "name": "Anuchinsky District + Partizansky District",
+        "name": "Partizansky District (Primorsky Krai)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -57955,7 +57955,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_41fee6249b5d",
-        "name": "Olginsky District + Kavalerovsky District + Chuguyevsky District",
+        "name": "Kavalerovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -63663,7 +63663,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_25eea59124e3",
-        "name": "Khorolsky District + Chernigovsky District + Mikhaylovsky District",
+        "name": "Chernigovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -66870,7 +66870,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_60d7253b0e0a",
-        "name": "Лесозаводский городской ок + Кировский район + Yakovlevsky District",
+        "name": "Лесозаводский городской ок",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -108772,7 +108772,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_c84f2ed9c6ef",
-        "name": "Birobidzhansky District + Obluchensky District + Birobidzhan",
+        "name": "Birobidzhan",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -137124,7 +137124,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_27667b37cabf",
-        "name": "Zavitinsky District + городской округ Прогресс + Bureysky District",
+        "name": "Bureysky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -144712,7 +144712,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_db3cc2dd744a",
-        "name": "Romnensky District + Oktyabrsky District + Belogorsky District",
+        "name": "Oktyabrsky District (Amur)",
         "cntr_code": "RU",
         "__source": "detail"
       },

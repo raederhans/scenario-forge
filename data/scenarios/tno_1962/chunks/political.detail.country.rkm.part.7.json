@@ -12351,7 +12351,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_0da64c9d8feb",
-        "name": "Kameshkovsky District + Yuryev-Polsky + Suzdalsky District",
+        "name": "Suzdalsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -19598,7 +19598,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a2a20f78646e",
-        "name": "Gavrilovo-Posadsky District + Teykovsky District",
+        "name": "Gavrilovo-Posadsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -27615,7 +27615,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ac8b0478bf66",
-        "name": "Chkalovsky District + Balakhninsky District + Volodarsky District",
+        "name": "Balakhna",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -40250,7 +40250,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_aca4b754b06a",
-        "name": "Savinsky District + Shuysky District + Rodnikovsky District",
+        "name": "Rodnikovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -59154,7 +59154,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bab5c9d8e609",
-        "name": "Lukhsky District + Verkhnelandekhovsky District",
+        "name": "Lukhsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -63828,7 +63828,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_1899c681a78b",
-        "name": "Puchezhsky District + Sokolsky District",
+        "name": "Sokolsky District (Ivanovo)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -93824,7 +93824,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3e1534e482c3",
-        "name": "Volgorechensk + Nerekhtsky District",
+        "name": "Nerekhtsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -97895,7 +97895,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ec43e0811141",
-        "name": "Pereslavsky District + городской округ Переславль + Rostovsky District",
+        "name": "Rostov",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -107079,7 +107079,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ea618303a3ad",
-        "name": "Gavrilov-Yamsky District + Borisoglebsky",
+        "name": "Gavrilov-Yamsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },

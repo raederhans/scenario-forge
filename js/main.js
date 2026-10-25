@@ -617,15 +617,28 @@ async function bootstrap() {
       });
     }
 
-    await ensureStartupInitialScenarioChunkVisualReady({
+    // initial-chunk-visual / warmup-flush 覆盖 first-visible 前后的首屏 chunk 提升与首帧 flush，便于和 total 对账。
+    startBootMetric("initial-chunk-visual");
+    const initialChunkVisualPromotion = await ensureStartupInitialScenarioChunkVisualReady({
       reason: "startup-initial-visual",
       d3Client,
     });
+    finishBootMetric("initial-chunk-visual", {
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      status: String(initialChunkVisualPromotion?.status || (initialChunkVisualPromotion ? "ok" : "skipped")),
+      promotedVisibleFeatureCount: Number(initialChunkVisualPromotion?.promotedVisibleFeatureCount || 0),
+      promotedTotalFeatureCount: Number(initialChunkVisualPromotion?.promotedTotalFeatureCount || 0),
+    });
 
     setBootState("warmup");
+    startBootMetric("warmup-flush");
     invalidateAllRenderPasses("bootstrap-first-political-frame");
-    await waitForStartupRenderSettle(runtimeState);
+    const startupRenderSettled = await waitForStartupRenderSettle(runtimeState);
     renderDispatcher.flush();
+    finishBootMetric("warmup-flush", {
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      renderSettled: !!startupRenderSettled,
+    });
     assertStartupFirstVisibleFrameAccepted("bootstrap-first-political-frame");
 
     // Phase: 触发 detail promotion | Input: 当前 scenario/state/renderDispatcher | Output: ready state 或 readonly 解锁调度。

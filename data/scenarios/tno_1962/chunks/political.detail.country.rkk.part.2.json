@@ -5480,7 +5480,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_a6d5183bdf54",
-        "name": "Agulsky District + Kurakhsky District + Suleyman-Stalsky District",
+        "name": "Suleyman-Stalsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -8094,7 +8094,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_78e8fa70f082",
-        "name": "Tabasaransky District + Derbentsky District + Khivsky District",
+        "name": "Derbentsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -10768,7 +10768,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_769c6062ebee",
-        "name": "Kaytagsky District + Akushinsky District + Dakhadayevsky District",
+        "name": "Akushinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -18572,7 +18572,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3f65aeea39a8",
-        "name": "Gergebilsky District + Levashinsky District",
+        "name": "Levashinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -26125,7 +26125,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_352667918fc2",
-        "name": "Shatoysky District + Vedensky District + Shalinsky District",
+        "name": "Shalinsky District (Chechnya)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -28736,7 +28736,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_dc5d71a87d07",
-        "name": "Babayurtovsky District + Buynaksky District + Kumtorkalinsky District",
+        "name": "Buynaksky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -37885,7 +37885,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_ca9a21b6ea60",
-        "name": "Nozhay-Yurtovsky District + Kurchaloyevsky District + Gudermessky District",
+        "name": "Gudermessky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -42364,7 +42364,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_15cd872120f3",
-        "name": "городской округ Кизилюрт + Kizilyurtovsky District",
+        "name": "Kizilyurtovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -47527,7 +47527,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_0fa9348c8062",
-        "name": "Tarumovsky District + Nogaysky District + городской округ Южно-Сухок",
+        "name": "Tarumovsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -66506,7 +66506,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b61ec94d7cc6",
-        "name": "Sergokalinsky District + Kayakentsky District",
+        "name": "Kayakentsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -67799,7 +67799,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bb517d694577",
-        "name": "Kamyzyaksky District + Privolzhsky District",
+        "name": "Kamyzyaksky District",
         "cntr_code": "RKK",
         "__source": "detail"
       },

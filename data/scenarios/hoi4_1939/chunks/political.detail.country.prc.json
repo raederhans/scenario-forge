@@ -151,7 +151,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_6cfe5096a6ab",
-        "name": "Yichuanxian + Luochuanxian + Huanglongxian",
+        "name": "Luochuanxian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -362,7 +362,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_03e48d4d8cb7",
-        "name": "Hengshanxian + Mizhixian + Yulin",
+        "name": "Yulin (Shaanxi)",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",
@@ -932,7 +932,7 @@
       "type": "Feature",
       "properties": {
         "id": "CN_MRG_e2dc46a8c2b2",
-        "name": "Zhidanxian + Ganquanxian + Fuxian + Huanglingxian + Ansaixian",
+        "name": "Ansaixian",
         "cntr_code": "CN",
         "admin1_group": "",
         "legacy_name": "",

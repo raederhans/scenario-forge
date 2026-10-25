@@ -17493,7 +17493,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_6d703ee3f8dc",
-        "name": "Guingamp + Saint-Brieuc",
+        "name": "Saint-Brieuc",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -63775,7 +63775,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_5b1fca32ff2c",
-        "name": "Châteaulin + Morlaix + Quimper",
+        "name": "Quimper",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -162276,7 +162276,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_ef55d0091c1e",
-        "name": "Coutances + Saint-Lô",
+        "name": "Saint-Lô",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -200731,7 +200731,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_a3ac3f104566",
-        "name": "Alençon + Argentan + Mortagne-au-Perche",
+        "name": "Argentan",
         "cntr_code": "FR",
         "__source": "detail"
       },
@@ -257842,7 +257842,7 @@
       "type": "Feature",
       "properties": {
         "id": "FR_MRG_294761d79cca",
-        "name": "Châtellerault + Poitiers",
+        "name": "Poitiers",
         "cntr_code": "FR",
         "__source": "detail"
       },

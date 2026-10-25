@@ -865,7 +865,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_a4d0d3a9760e",
-        "name": "chełmiński + świecki + tucholski",
+        "name": "świecki",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -1308,7 +1308,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_f18bf4792f6a",
-        "name": "golubsko-dobrzyński + rypiński",
+        "name": "rypiński",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -2420,7 +2420,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_7c2fbae3db0b",
-        "name": "mogileński + żniński",
+        "name": "żniński",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -3112,7 +3112,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_fb2ce823eb38",
-        "name": "radziejowski + włocławski",
+        "name": "włocławski (Kuyavian-Pomeranian)",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -5303,7 +5303,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_4a2bfb6b173f",
-        "name": "biłgorajski + krasnostawski + zamojski",
+        "name": "zamojski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -6608,7 +6608,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_05ddd04cc90f",
-        "name": "janowski + kraśnicki",
+        "name": "kraśnicki",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -6893,7 +6893,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_57a0cb6e8d35",
-        "name": "lubartowski + parczewski + puławski",
+        "name": "puławski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -7472,7 +7472,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_e17e448ae4e2",
-        "name": "lubelski + opolski + świdnicki",
+        "name": "lubelski (Lublin)",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -8354,7 +8354,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_8d9132641197",
-        "name": "łukowski + radzyński + rycki",
+        "name": "łukowski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -12589,7 +12589,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_5ca02af3d829",
-        "name": "poddębicki + zduńskowolski",
+        "name": "zduńskowolski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -13285,7 +13285,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_4ed00c272094",
-        "name": "rawski + skierniewicki + Skierniewice",
+        "name": "rawski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -15384,7 +15384,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_672367948ccf",
-        "name": "bocheński + brzeski + tarnowski",
+        "name": "tarnowski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -16584,7 +16584,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_d1960b18210a",
-        "name": "krakowski + miechowski + proszowicki",
+        "name": "krakowski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -17217,7 +17217,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_28f9056747e2",
-        "name": "limanowski + myślenicki + wielicki",
+        "name": "limanowski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -20794,7 +20794,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_c16d6d416392",
-        "name": "grodziski + pruszkowski + żyrardowski",
+        "name": "pruszkowski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -21099,7 +21099,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_6a243775b00f",
-        "name": "grójecki + piaseczyński",
+        "name": "piaseczyński",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -21948,7 +21948,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_fe2842d4d685",
-        "name": "lipski + radomski + zwoleński",
+        "name": "radomski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -22969,7 +22969,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_49c8bdd6da87",
-        "name": "miński + otwocki + wołomiński",
+        "name": "wołomiński",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -25789,7 +25789,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_6ea9dfea1297",
-        "name": "przysuski + szydłowiecki",
+        "name": "przysuski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -29390,7 +29390,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_7076d4b3250d",
-        "name": "dębicki + mielecki + ropczycko-sędziszowski",
+        "name": "mielecki",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -30839,7 +30839,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_d8ea546338a5",
-        "name": "leżajski + niżański + stalowowolski",
+        "name": "stalowowolski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -33041,7 +33041,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_b96b5d49d900",
-        "name": "tarnobrzeski + Tarnobrzeg",
+        "name": "tarnobrzeski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -35624,7 +35624,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_3bc1f7b63f72",
-        "name": "łomżyński + zambrowski + Łomża",
+        "name": "Łomża",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -38332,7 +38332,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_55eb1a09655e",
-        "name": "chojnicki + kościerski",
+        "name": "chojnicki",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -39707,7 +39707,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_88938957a4dc",
-        "name": "lęborski + pucki + wejherowski",
+        "name": "wejherowski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -40913,7 +40913,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_e9b93261cb76",
-        "name": "starogardzki + tczewski",
+        "name": "starogardzki",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -43792,7 +43792,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_ec568da59ac7",
-        "name": "mikołowski + rybnicki + Żory",
+        "name": "mikołowski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -46871,7 +46871,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_ccb2f83ec3cf",
-        "name": "Piekary Śląskie + Siemianowice Śląskie",
+        "name": "Siemianowice Śląskie",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -47480,7 +47480,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_d9d9ccd218dd",
-        "name": "buski + kazimierski",
+        "name": "buski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -47867,7 +47867,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_940b9a58b475",
-        "name": "jędrzejowski + pińczowski",
+        "name": "jędrzejowski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -48250,7 +48250,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_9242fdb1805d",
-        "name": "kielecki + konecki + skarżyski",
+        "name": "kielecki (Holy Cross)",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -48823,7 +48823,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_8f55c53666f8",
-        "name": "opatowski + ostrowiecki + sandomierski",
+        "name": "ostrowiecki",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -49998,7 +49998,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_eea8a1b754f3",
-        "name": "chodzieski + gnieźnieński + wągrowiecki",
+        "name": "gnieźnieński",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -50844,7 +50844,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_3384b03f3b03",
-        "name": "gostyński + jarociński + pleszewski",
+        "name": "gostyński",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -51325,7 +51325,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_d07f84128518",
-        "name": "grodziski + kościański + śremski",
+        "name": "kościański",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -51766,7 +51766,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_20e2ba9602ff",
-        "name": "kaliski + kolski + turecki",
+        "name": "kaliski (Greater Poland)",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -52508,7 +52508,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_d48e8dc37f33",
-        "name": "koniński + słupecki + Konin",
+        "name": "koniński",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -53949,7 +53949,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_18fdfa02eca5",
-        "name": "obornicki + szamotulski",
+        "name": "szamotulski",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -55389,7 +55389,7 @@
       "type": "Feature",
       "properties": {
         "id": "PL_MRG_ec5519b4d3cf",
-        "name": "poznański + średzki + wrzesiński",
+        "name": "poznański (Greater Poland)",
         "cntr_code": "PL",
         "admin1_group": "",
         "legacy_name": "",
@@ -61420,7 +61420,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_93291f71dff3",
-        "name": "Sarny + Volodymyrets + Kostopil",
+        "name": "Kostopil",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -61968,7 +61968,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_8c4b9e4808b7",
-        "name": "Demydivka + Mlyniv",
+        "name": "Mlyniv",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -62916,7 +62916,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_9c6077315d06",
-        "name": "Berezhany + Kozova",
+        "name": "Berezhany",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -62991,7 +62991,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_0d6137080058",
-        "name": "Pidhaitsi + Monastyryska + Buchach",
+        "name": "Monastyryska",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -63122,7 +63122,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ff6ac32ac4e3",
-        "name": "Kivertsi + Manevychi + Rozhyshche",
+        "name": "Manevychi",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -63751,7 +63751,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_76b1b94d5856",
-        "name": "Kovel + Turiisk + Stara Vyzhivka",
+        "name": "Kovel",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -64150,7 +64150,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_35715f97812f",
-        "name": "Tlumach + Kolomyia",
+        "name": "Kolomyia",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -64636,7 +64636,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_72c94a3ccd70",
-        "name": "Halych + Rohatyn + Kalush",
+        "name": "Kalush",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -64838,7 +64838,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_ab85624a51f5",
-        "name": "Zolochiv + Peremyshliany + Busk",
+        "name": "Zolochiv (Lviv)",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",
@@ -64971,7 +64971,7 @@
       "type": "Feature",
       "properties": {
         "id": "UA_MRG_d4f151f823ef",
-        "name": "Stryi + Zhydachiv",
+        "name": "Stryi",
         "cntr_code": "UA",
         "admin1_group": "",
         "legacy_name": "",

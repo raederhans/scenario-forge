@@ -5255,7 +5255,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_4810f49b101a",
-        "name": "Yelnikovsky District + Krasnoslobodsky District",
+        "name": "Krasnoslobodsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -10670,7 +10670,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_3e327de823aa",
-        "name": "Chamzinsky District + Romodanovsky District",
+        "name": "Chamzinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -66511,7 +66511,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bc152a08afac",
-        "name": "Лукояновский район + Shatkovsky District",
+        "name": "Лукояновский район",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -73776,7 +73776,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_cb93ebd8b7b5",
-        "name": "Voznesensky District + Pervomaysky District + Diveyevsky District",
+        "name": "Pervomaysky District (Nizhny Novgorod)",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -110004,7 +110004,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_b3191ccdd3f6",
-        "name": "городской округ Выкса + Sosnovsky District + Ardatovsky District",
+        "name": "Vyksa",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -123074,7 +123074,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_bf28b90ebe97",
-        "name": "Vachsky District + Navashinsky District",
+        "name": "Navashinsky District",
         "cntr_code": "RU",
         "__source": "detail"
       },
@@ -129980,7 +129980,7 @@
       "type": "Feature",
       "properties": {
         "id": "RU_MRG_73b7c86083a9",
-        "name": "Bogorodsky District + Pavlovsky District + Dalnekonstantinovsky District",
+        "name": "Pavlovsky District (Nizhny Novgorod)",
         "cntr_code": "RU",
         "__source": "detail"
       },
