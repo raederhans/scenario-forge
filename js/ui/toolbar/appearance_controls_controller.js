@@ -12,6 +12,7 @@ import {
   setAppearanceStyleGroupState,
 } from "../../core/state/actions/appearance_actions.js";
 import { setSelectedColorState } from "../../core/state/actions/appearance_selection_actions.js";
+import { callRuntimeHook } from "../../core/state/index.js";
 import { getPhysicalContextLayerRequests } from "../../core/state_defaults.js";
 import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
 import { normalizeHexColor } from "../../core/palette_manager.js";
@@ -637,6 +638,9 @@ export function createAppearanceControlsController({
       btn.setAttribute("aria-label", `${t("Recent", "ui")}: ${normalized}`);
       btn.addEventListener("click", () => {
         setSelectedColorState(runtimeState, normalized);
+        if (runtimeState.currentTool === "select") {
+          callRuntimeHook(runtimeState, "runToolSelectionFn", "fill", { feedbackLabel: t("Switched to fill tool", "ui") });
+        }
         updateSwatchUI();
       });
       recentContainer.appendChild(btn);

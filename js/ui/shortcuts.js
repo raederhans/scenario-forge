@@ -8,6 +8,7 @@ import { setSelectedColorState } from "../core/state/actions/appearance_selectio
 import { FileManager } from "../core/file_manager.js";
 import { redoHistory, undoHistory } from "../core/history_manager.js";
 import { flushRenderBoundary } from "../core/render_boundary.js";
+import { t } from "./i18n.js";
 import {
   cancelActiveStrategicInteractionModes,
   cancelSpecialZoneDraw,
@@ -35,7 +36,7 @@ function setCurrentTool(tool) {
     return;
   }
   runtimeState.currentTool = tool;
-  if (tool === "eyedropper") {
+  if (tool === "eyedropper" || tool === "select") {
     runtimeState.brushModeEnabled = false;
     runtimeState.brushPanModifierActive = false;
   }
@@ -63,7 +64,7 @@ function toggleBrushMode() {
     return;
   }
   runtimeState.brushModeEnabled = !runtimeState.brushModeEnabled;
-  if (runtimeState.brushModeEnabled && runtimeState.currentTool === "eyedropper") {
+  if (runtimeState.brushModeEnabled && (runtimeState.currentTool === "eyedropper" || runtimeState.currentTool === "select")) {
     runtimeState.currentTool = "fill";
   }
   syncToolUi();
@@ -81,6 +82,9 @@ function pickQuickSwatch(index) {
   const color = String(button?.dataset?.color || "").trim();
   if (!color) return false;
   setSelectedColorState(runtimeState, color);
+  if (runtimeState.currentTool === "select") {
+    callRuntimeHook(runtimeState, "runToolSelectionFn", "fill", { feedbackLabel: t("Switched to fill tool", "ui") });
+  }
   emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_SWATCH_UI);
   return true;
 }
@@ -200,6 +204,11 @@ function initShortcuts() {
       return;
     }
 
+    if (!modifier && lower === "v") {
+      event.preventDefault();
+      setCurrentTool("select");
+      return;
+    }
     if (!modifier && lower === "f") {
       event.preventDefault();
       setCurrentTool("fill");

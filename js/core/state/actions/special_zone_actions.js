@@ -381,7 +381,7 @@ export function activateSpecialZoneMembershipToolState(target, tool = "multi") {
   const normalizedTool = String(tool || "multi").trim() || "multi";
   target.specialZoneMembershipTool = normalizedTool;
   if (target.currentTool !== "special-zone-membership") {
-    target.specialZonePreviousTool = String(target.currentTool || "fill");
+    target.specialZonePreviousTool = String(target.currentTool || "select");
   }
   target.currentTool = "special-zone-membership";
   target.brushModeEnabled = false;
@@ -391,7 +391,7 @@ export function activateSpecialZoneMembershipToolState(target, tool = "multi") {
 
 export function exitSpecialZoneMembershipToolState(target) {
   if (!target || typeof target !== "object") return "";
-  const previousTool = String(target.specialZonePreviousTool || "fill");
+  const previousTool = String(target.specialZonePreviousTool || "select");
   target.currentTool = previousTool;
   target.specialZonePreviousTool = "";
   return previousTool;

@@ -383,6 +383,54 @@ function traceNames(trace) {
   return trace.map(([name]) => name);
 }
 
+test("select land syncs the inspector without loading detail, painting or recording edits", async () => {
+  const harness = await createTransactionOwner({
+    state: { currentTool: "select" },
+    services: {
+      ensureLeafDetailReady: () => assert.fail("selection must not load leaf detail"),
+      handleRiverPaintClick: () => assert.fail("selection must not edit river cells"),
+    },
+  });
+  Object.assign(harness.hit, { targetType: "land", id: "land-1", countryCode: "AA" });
+  await harness.owner.handleClick({});
+  assert.deepEqual(harness.trace.find(([name]) => name === "syncInspectorCountryToLandSelection"), [
+    "syncInspectorCountryToLandSelection", harness.state.landIndex.get("land-1"), "land-1", harness.hit,
+  ]);
+  assert.deepEqual(harness.trace.at(-1), ["noteRenderAction", "select-land", 17]);
+  assert.deepEqual(harness.trace.filter(([name]) => name === "requestInteractionRender"), [
+    ["requestInteractionRender", "select-land"],
+  ]);
+  for (const forbidden of ["applyVisualSubdivisionFill", "applyFeatureVisualOverrideTransaction", "setClickSelectedColor", "captureHistoryState", "commitHistoryEntry", "markDirty"]) {
+    assert.equal(traceNames(harness.trace).includes(forbidden), false, forbidden);
+  }
+});
+
+test("select water retains selection without filling, sampling or recording edits", async () => {
+  const harness = await createTransactionOwner({ state: { currentTool: "select" } });
+  Object.assign(harness.hit, { targetType: "water", id: "water-1" });
+  await harness.owner.handleClick({});
+  assert.deepEqual(harness.trace.find(([name]) => name === "setClickSelectedWaterRegionId"), [
+    "setClickSelectedWaterRegionId", "water-1",
+  ]);
+  assert.deepEqual(harness.trace.at(-1), ["noteRenderAction", "select-water", 17]);
+  for (const forbidden of ["applyWaterRegionFill", "removeClickWaterRegionOverride", "setClickSelectedColor", "captureHistoryState", "commitHistoryEntry", "markDirty"]) {
+    assert.equal(traceNames(harness.trace).includes(forbidden), false, forbidden);
+  }
+});
+
+test("select special region retains selection without sampling or recording edits", async () => {
+  const harness = await createTransactionOwner({ state: { currentTool: "select" } });
+  Object.assign(harness.hit, { targetType: "special", id: "special-1" });
+  await harness.owner.handleClick({});
+  assert.deepEqual(harness.trace.find(([name]) => name === "setClickSelectedSpecialRegionId"), [
+    "setClickSelectedSpecialRegionId", "special-1",
+  ]);
+  assert.deepEqual(harness.trace.at(-1), ["noteRenderAction", "select-special", 17]);
+  for (const forbidden of ["getSpecialRegionColor", "setClickSelectedColor", "captureHistoryState", "commitHistoryEntry", "markDirty"]) {
+    assert.equal(traceNames(harness.trace).includes(forbidden), false, forbidden);
+  }
+});
+
 test("empty hit clears water then special and invalidates each selection exactly once", async () => {
   const harness = await createTransactionOwner({
     state: { selectedWaterRegionId: "water-1", selectedSpecialRegionId: "special-1" },
