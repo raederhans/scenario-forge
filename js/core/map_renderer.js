@@ -2545,8 +2545,12 @@ function resolveClassifiedBorderFeature(feature, id) {
   const parentId = feature?.properties?.__riverParentId || id;
   const borderKey = resolveBorderIdentity(id, feature);
   const reference = canonicalCountryCode(getDisplayOwnerCode(parent, parentId));
-  const parentKey = borderDistrictGroups.get(borderKey)?.get(parentId)
+  const districts = borderDistrictGroups.get(borderKey);
+  const parentKey = districts?.get(parentId)
     || (reference === borderKey ? runtimeState.parentGroupByFeatureId?.get(parentId) : '') || '';
+  // A country with scenario districts uses them as its only subdivision; its
+  // source admin1 lines (e.g. the German Länder) would redraw a retired system.
+  if (districts) return { borderKey, parentKey, provinceKey: '' };
   const admin1 = getAdmin1Group(parent);
   const sourceCountry = canonicalCountryCode(getFeatureCountryCodeNormalized(parent));
   return { borderKey, parentKey,
@@ -2587,6 +2591,12 @@ function getPaintContourRuntimeOwner() {
       getFeatures: () => getRiverPaintRuntime(runtimeState).surfaces(),
       getFeatureId,
       resolveClassification: resolveClassifiedBorderFeature,
+      getWaterMaskSources: () => ({
+        land: runtimeState.showScenarioAtlantropa === false ? runtimeState.landBgData
+          : runtimeState.scenarioLandMaskData || runtimeState.scenarioContextLandMaskData || runtimeState.landBgData,
+        water: getEffectiveWaterRegionFeatures(),
+        addedLand: buildAtlantropaLandLikeFeatureCollection(),
+      }),
       getClassificationRevision: () => [runtimeState.sovereignBaseColors, getBorderPaletteRevision(),
         runtimeState.scenarioDistrictGroupsData, runtimeState.scenarioDataGeneration, runtimeState.parentGroupByFeatureId,
         runtimeState.scenarioCountriesByTag],
@@ -2692,7 +2702,6 @@ function getBorderDrawOwner() {
       buildDetailAdmMeshSignature,
       clamp,
       drawScenarioCoastalAccentLayer,
-      drawCoastalTransition,
       getCoastlineCollectionForZoom,
       getInternalBorderStrokeColor,
       getSafeCanvasColor,
@@ -11578,9 +11587,6 @@ function drawScenarioCoastalAccentLayer(k, { interactive = false } = {}) {
   return getOceanRenderOwner().drawScenarioCoastalAccentLayer(k, { interactive });
 }
 
-function drawCoastalTransition(k, options) {
-  return getOceanRenderOwner().drawCoastalTransition(k, options);
-}
 
 function resolveOceanMask() {
   let mode = OCEAN_MASK_MODE_SPHERE_MINUS_LAND;

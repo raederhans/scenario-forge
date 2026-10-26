@@ -148,12 +148,18 @@ test("collection caches leave live style and ocean fill reads intact", () => {
   assert.equal(policy.sortBathymetryFeaturesForFill(selected), sorted);
 });
 
-test("coastal accents retain zoom width floors, density and interaction attenuation", () => {
+test("coastal accents retain screen-space widths, density and interaction attenuation", () => {
   const { live, policy } = createHarness();
   const shore = feature(0, { kind: "new_shoreline", parent_id: "atlantropa_med" });
   assert.equal(policy.getScenarioCoastalAccentOverlayVisualConfig(shore, 1).alpha, 0.42);
   live.density = 1;
   assert.equal(policy.getScenarioCoastalAccentOverlayVisualConfig(shore, 1).alpha, 0.42 * 0.78);
   assert.equal(policy.getScenarioCoastalAccentOverlayVisualConfig(shore, 1, { interactive: true }).alpha, 0.3 * 0.78);
-  assert.equal(policy.getScenarioCoastalAccentOverlayVisualConfig(shore, 10).lineWidth, 0.95);
+  assert.equal(policy.getScenarioCoastalAccentOverlayVisualConfig(shore, 10).lineWidth, 1.22 / 10);
+  for (const k of [1, 4, 8]) {
+    for (const interactive of [false, true]) {
+      assert.equal(policy.getScenarioCoastalAccentLineWidth(k, { interactive }) * k, interactive ? 1.05 : 1.28);
+      assert.equal(policy.getScenarioCoastalAccentLineWidth(k, { interactive, overlay: true }) * k, 1.22);
+    }
+  }
 });

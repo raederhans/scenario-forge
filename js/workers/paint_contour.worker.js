@@ -7,8 +7,9 @@ self.onmessage = ({ data }) => {
   if (type === 'CANCEL_TASK') return;
   try {
     let result = null;
-    if (type === 'BEGIN') { builder = createPaintContourGraphBuilder(); finished = false; dirty = true; }
+    if (type === 'BEGIN') { builder = createPaintContourGraphBuilder({ nearSeamTolerance: data.nearSeamTolerance }); finished = false; dirty = true; }
     else if (!builder) throw new Error('Paint contour source is not registered');
+    else if (type === 'WATER') { builder.setWaterMask(data.waterMask); dirty = true; }
     else if (type === 'PATCH') {
       const certified = data.certifiedEquivalent === true;
       if (certified && (!finished || dirty || data.removedIds?.length)) throw new Error('No completed unchanged contour graph');

@@ -9,7 +9,7 @@ import { createPaintContourMesh } from '../js/core/renderer/paint_contour_mesh.j
 let scalarInternals;
 function readScalarInternals() {
   return scalarInternals ||= readFile(new URL('../js/core/renderer/paint_contour_graph.js', import.meta.url), 'utf8')
-    .then(source => import(`data:text/javascript;base64,${Buffer.from(`${source}\nexport { createCompactEdges, sourceEdgeQuery, sourceCollinear };`).toString('base64')}`));
+    .then(source => import(`data:text/javascript;base64,${Buffer.from(`${source.replace('./paint_contour_water_mask.js', new URL('../js/core/renderer/paint_contour_water_mask.js', import.meta.url).href)}\nexport { createCompactEdges, sourceEdgeQuery, sourceCollinear };`).toString('base64')}`));
 }
 
 function legacySourceEdgeQuery(edges, occupied) {
@@ -226,7 +226,7 @@ function compactFixture() {
 
 function graphBytes(graph) {
   const hash = createHash('sha256');
-  hash.update(JSON.stringify([graph.featureIds, graph.diagnostics]));
+  hash.update(JSON.stringify([graph.featureIds, Object.fromEntries(Object.entries(graph.diagnostics).filter(([key]) => !key.startsWith('nearSeam')))]));
   for (const value of [graph.coordinates, graph.offsets, graph.owners]) hash.update(Buffer.from(value.buffer, value.byteOffset, value.byteLength));
   return hash.digest('hex');
 }
