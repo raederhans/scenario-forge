@@ -13748,6 +13748,28 @@ button.scenario-action-card:hover {
   .bottom-dock:not(.is-collapsed) .dock-group-mode { display: flex !important; }
 }
 
+@media (min-width: 1280px) {
+  @container (min-width: 721px) {
+    .bottom-dock-primary {
+      gap: 6px;
+    }
+
+    .bottom-dock-primary > .dock-group + .dock-group {
+      padding-left: 6px;
+    }
+
+    .dock-group-mode .dock-segmented-control {
+      grid-template-columns: max-content max-content;
+    }
+
+    .dock-color-stack {
+      flex-direction: column;
+      align-items: flex-start;
+      flex-wrap: nowrap;
+    }
+  }
+}
+
 @media (max-width: 1023px) {
   .sidebar-drawer-close {
     display: inline-flex;
