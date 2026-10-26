@@ -11,6 +11,7 @@ const {
   openApp,
   parkMouse,
   readStatus,
+  screenPoint,
   selectFillTool,
   switchScenario,
   waitForSettled,
@@ -42,6 +43,22 @@ test("startup reaches an editable, rendered map", async ({ page }) => {
   expect(errors).toEqual([]);
   test.info().annotations.push({ type: "startupMs", description: String(startupMs) });
   expect(startupMs, "cold startup to an editable, settled map").toBeLessThan(PERF_BUDGETS.startupMs);
+});
+
+test("first map click only selects without creating history or dirty state", async ({ page }) => {
+  test.setTimeout(180_000);
+  const errors = collectPageErrors(page);
+  await openApp(page);
+  await waitForSettled(page);
+  const point = await screenPoint(page);
+  await page.mouse.click(point.x, point.y);
+  await waitForSettled(page);
+  expect(await page.evaluate(() => globalThis.__scenarioForgeTestApi.history())).toEqual({ undo: 0, redo: 0 });
+  expect(await page.evaluate(() => globalThis.__scenarioForgeTestApi.isDirty())).toBe(false);
+  const selection = await page.evaluate(() => globalThis.__scenarioForgeTestApi.selection());
+  expect(selection.selectedInspectorCountryCode).toBeTruthy();
+  expect(selection.currentTool).toBe("select");
+  expect(errors).toEqual([]);
 });
 
 for (const scenarioId of SCENARIO_IDS) {

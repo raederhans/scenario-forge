@@ -2,7 +2,7 @@ const { test, expect } = require("@playwright/test");
 const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require("./support/playwright-app");
 
 async function expectDockCommandsToFit(page, width) {
-  const ids = ["toolFillBtn", "toolEraserBtn", "toolEyedropperBtn", "brushModeBtn",
+  const ids = ["toolSelectBtn", "toolFillBtn", "toolEraserBtn", "toolEyedropperBtn", "brushModeBtn",
     "undoBtn", "redoBtn", "presetPolitical", "paintModeVisualBtn", "selectedColorPreview"];
   await expect(page.locator("#paintModePoliticalBtn")).toHaveCount(0);
   const boxes = [];

@@ -283,6 +283,7 @@ test("new base ocean sectors inherit saved parent colors and support independent
   await expect.poll(() => page.evaluate(() => globalThis.__playwrightStateRef?.selectedWaterRegionId)).toBe(targetId);
   await waitForRenderIdle(page, { timeout: 30_000 });
   const inherited = await sampleCanvasPatch(page, [-30, 30]);
+  await page.locator("#toolFillBtn").click();
   await page.mouse.click(point.x, point.y);
   await expect.poll(() => page.evaluate(() => globalThis.__playwrightStateRef?.waterRegionOverrides?.marine_northeast_atlantic_ocean)).toBe("#ff00ff");
   await waitForRenderIdle(page, { timeout: 30_000 });

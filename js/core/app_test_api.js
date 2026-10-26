@@ -7,7 +7,7 @@
 
 import { state } from "./state.js";
 
-const API_VERSION = 1;
+const API_VERSION = 2;
 
 function chunkIdle(loadState) {
   return !loadState.pendingPromotion
@@ -89,6 +89,15 @@ function isDirty() {
   return !!state.isDirty;
 }
 
+function selection() {
+  return {
+    currentTool: state.currentTool,
+    selectedInspectorCountryCode: state.selectedInspectorCountryCode,
+    selectedWaterRegionId: state.selectedWaterRegionId,
+    selectedSpecialRegionId: state.selectedSpecialRegionId,
+  };
+}
+
 // NOT part of the stable contract above. Release and raster diagnostics still inspect
 // internals; on a bundled build, importing ./js/core/*.js by URL would load a second,
 // unused copy of each module, so they get the live instances from here instead.
@@ -111,6 +120,7 @@ export function installAppTestApi(target = globalThis) {
     editedFeatureColors,
     history,
     isDirty,
+    selection,
     internals,
   });
 }

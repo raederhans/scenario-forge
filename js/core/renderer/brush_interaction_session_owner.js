@@ -123,7 +123,7 @@ export function createBrushInteractionSessionOwner(runtimeState, {
     }
     if (handlePhysicalIntensityPointerDown(event)) return;
     if (handleSpecialZoneMembershipPointerDown(event)) return;
-    if (!runtimeState.brushModeEnabled || runtimeState.currentTool === "eyedropper" || runtimeState.specialZoneEditor?.active) return;
+    if (!runtimeState.brushModeEnabled || runtimeState.currentTool === "eyedropper" || runtimeState.currentTool === "select" || runtimeState.specialZoneEditor?.active) return;
     if (isBrushNavigationModifier(event)) return;
     if ((event.buttons & 1) !== 1) return;
     if (event?.preventDefault) event.preventDefault();
@@ -146,7 +146,7 @@ export function createBrushInteractionSessionOwner(runtimeState, {
       return;
     }
     const brushSession = getBrushSession();
-    if (!brushSession || !runtimeState.brushModeEnabled || runtimeState.currentTool === "eyedropper" || runtimeState.specialZoneEditor?.active) {
+    if (!brushSession || !runtimeState.brushModeEnabled || runtimeState.currentTool === "eyedropper" || runtimeState.currentTool === "select" || runtimeState.specialZoneEditor?.active) {
       return;
     }
     if ((event.buttons & 1) !== 1) {
