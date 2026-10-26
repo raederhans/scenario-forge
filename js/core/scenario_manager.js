@@ -1050,6 +1050,12 @@ async function applyScenarioBundle(
     });
     throw error;
   }
+  const activeScenarioId = runtimeState.activeScenarioId;
+  if (activeScenarioId && runtimeState.scenarioRegistry?.scenarios?.some((entry) => entry.scenario_id === activeScenarioId)) {
+    try {
+      globalThis.localStorage.setItem("map_last_scenario", activeScenarioId);
+    } catch (_error) {}
+  }
 }
 
 async function runScenarioApplyRequest(request) {

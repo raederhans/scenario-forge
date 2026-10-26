@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
+import * as startupSupport from "../js/bootstrap/startup_bootstrap_support.js";
+import { getSampleProjectIdFromUrl, resolveSampleProjectFromManifest, fetchSampleProjectManifest } from "../js/core/sample_project_registry.js";
 
 import { initLongAnimationFrameObserver, waitForStartupRenderSettle } from "../js/bootstrap/startup_bootstrap_support.js";
 import { state as runtimeState } from "../js/core/state.js";
@@ -17,6 +20,70 @@ function restoreGlobalProperty(name, hadProperty, value) {
   }
   delete globalThis[name];
 }
+
+async function resolveStartupScenarioId(registry) {
+  const source = readFileSync(new URL("../js/bootstrap/startup_data_pipeline.js", import.meta.url), "utf8")
+    .replace(/^import[\s\S]*?from "[^"]+";\r?\n/gm, "")
+    .replace("export function createStartupDataPipelineOwner", "function createStartupDataPipelineOwner");
+  const dependencies = {
+    ...startupSupport,
+    getSampleProjectIdFromUrl,
+    fetchSampleProjectManifest,
+    resolveSampleProjectFromManifest,
+    resolveScenarioRegistryUrl: () => "test-registry",
+    loadScenarioRegistry: async () => registry,
+    loadStartupBundleViaWorker: async () => ({ payload: {} }),
+    createStartupScenarioBundleFromPayload: async () => ({ manifest: {} }),
+    validateScenarioRuntimeShellContract: () => ({ ok: true }),
+  };
+  const createOwner = new Function(...Object.keys(dependencies), `${source}\nreturn createStartupDataPipelineOwner;`)(...Object.values(dependencies));
+  const startup = createOwner({ state: {} }).resolveStartupScenarioBootstrap();
+  const result = await startup.scenarioBundlePromise;
+  assert.equal(result.ok, true);
+  return startup.requestedDefaultScenarioIdPromise;
+}
+
+for (const { name, search, remembered, expected, throws = false, removed = false } of [
+  { name: "URL override precedes remembered scenario", search: "?default_scenario=explicit", remembered: "saved", expected: "explicit" },
+  { name: "URL disable precedes remembered scenario", search: "?default_scenario=none", remembered: "saved", expected: "" },
+  { name: "remembered scenario precedes meta", remembered: "saved", expected: "saved" },
+  { name: "unknown remembered scenario is removed and falls back to meta", remembered: "removed", expected: "meta", removed: true },
+  { name: "unavailable storage falls back to meta", throws: true, expected: "meta" },
+]) {
+  test(name, async () => {
+    const originals = ["location", "document", "localStorage"].map((key) => [key, Object.hasOwn(globalThis, key), globalThis[key]]);
+    const removals = [];
+    try {
+      globalThis.location = { search: search || "" };
+      globalThis.document = { querySelector: () => ({ getAttribute: () => "meta" }) };
+      globalThis.localStorage = {
+        getItem(key) {
+          assert.equal(key, "map_last_scenario");
+          if (throws) throw new Error("storage unavailable");
+          return remembered;
+        },
+        removeItem(key) { removals.push(key); },
+      };
+      assert.equal(await resolveStartupScenarioId({ scenarios: [{ scenario_id: "saved" }] }), expected);
+      assert.deepEqual(removals, removed ? ["map_last_scenario"] : []);
+    } finally {
+      originals.forEach(([key, had, value]) => restoreGlobalProperty(key, had, value));
+    }
+  });
+}
+
+test("sample deeplink selects the sample scenario during startup", async () => {
+  const originals = ["location", "document", "fetch"].map((key) => [key, Object.hasOwn(globalThis, key), globalThis[key]]);
+  const manifest = JSON.parse(readFileSync(new URL("../landing/assets/sample-runs.json", import.meta.url), "utf8"));
+  try {
+    globalThis.location = { search: "?sample=modern-world-japan-corridor" };
+    globalThis.document = { querySelector: () => ({ getAttribute: () => "tno_1962" }) };
+    globalThis.fetch = async () => ({ ok: true, json: async () => manifest });
+    assert.equal(await resolveStartupScenarioId({ scenarios: [{ scenario_id: "modern_world" }] }), "modern_world");
+  } finally {
+    originals.forEach(([key, had, value]) => restoreGlobalProperty(key, had, value));
+  }
+});
 
 test("startup waits for layout interaction to settle without accepting a frame itself", async () => {
   const state = { renderPhase: "interacting", firstVisibleFramePainted: false };

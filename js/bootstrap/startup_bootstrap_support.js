@@ -287,6 +287,14 @@ export function isDefaultScenarioDisabledOverride(value = "") {
   return String(value || "").trim().toLowerCase() === DEFAULT_SCENARIO_DISABLED_OVERRIDE;
 }
 
+export function getRememberedScenarioId() {
+  try {
+    return String(globalThis.localStorage.getItem("map_last_scenario") || "").trim();
+  } catch (_error) {
+    return "";
+  }
+}
+
 export function shouldDisableConfiguredDefaultScenario() {
   try {
     const params = typeof globalThis.URLSearchParams === "function"

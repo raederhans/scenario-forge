@@ -32,6 +32,7 @@ import {
   createStartupBundleLoadDiagnostics,
   formatStartupRuntimeShellContractFailure,
   getConfiguredDefaultScenarioId,
+  getRememberedScenarioId,
   getStartupBundleLanguage,
   getStartupBundleUrl,
   getStartupScenarioSupportUrl,
@@ -40,6 +41,9 @@ import {
   processHierarchyData,
   shouldDisableConfiguredDefaultScenario,
 } from "./startup_bootstrap_support.js";
+import { getSampleProjectIdFromUrl } from "../core/sample_project_url.js";
+import { fetchSampleProjectManifest, resolveSampleProjectFromManifest } from "../core/sample_project_registry.js";
+
 import {
   beginBaseCitySupportLoad,
   beginFullLocalizationLoad,
@@ -73,6 +77,32 @@ import {
   registerRuntimeHook,
 } from "../core/state/index.js";
 
+async function resolveStartupScenarioId(registry) {
+  const override = new URLSearchParams(globalThis.location?.search || "").get("default_scenario");
+  if (String(override || "").trim()) return getConfiguredDefaultScenarioId();
+  const sampleId = getSampleProjectIdFromUrl();
+  if (sampleId) {
+    let sampleProject;
+    try {
+      sampleProject = resolveSampleProjectFromManifest(await fetchSampleProjectManifest(), sampleId);
+    } catch (_error) {
+      sampleProject = null;
+    }
+    if (sampleProject?.scenarioId) return sampleProject.scenarioId;
+  }
+  const rememberedId = getRememberedScenarioId();
+  if (rememberedId) {
+    if (registry.scenarios?.some((entry) => entry.scenario_id === rememberedId)) return rememberedId;
+    try {
+      globalThis.localStorage.removeItem("map_last_scenario");
+    } catch (_error) {}
+  }
+  const scenarioId = getConfiguredDefaultScenarioId() || String(registry?.default_scenario_id || "").trim();
+  if (!scenarioId) {
+    throw new Error(`Default scenario is not configured in ${resolveScenarioRegistryUrl()}.`);
+  }
+  return scenarioId;
+}
 const CONTEXT_LAYER_LOAD_ORDER = [
   "lakes",
   "rivers",
@@ -656,19 +686,9 @@ export function createStartupDataPipelineOwner({
     const scenarioRegistryPromise = loadScenarioRegistry({ d3Client });
     const registryDefaultScenarioIdPromise = defaultScenarioDisabled
       ? Promise.resolve("")
-      : configuredDefaultScenarioId
-      ? Promise.resolve(configuredDefaultScenarioId)
-      : scenarioRegistryPromise.then((registry) => {
-        const defaultScenarioId = String(registry?.default_scenario_id || "").trim();
-        if (!defaultScenarioId) {
-          throw new Error(`Default scenario is not configured in ${resolveScenarioRegistryUrl()}.`);
-        }
-        return defaultScenarioId;
-      });
+      : scenarioRegistryPromise.then(resolveStartupScenarioId);
     const requestedDefaultScenarioIdPromise = defaultScenarioDisabled
       ? Promise.resolve("")
-      : configuredDefaultScenarioId
-      ? Promise.resolve(configuredDefaultScenarioId)
       : registryDefaultScenarioIdPromise;
     const startupBundleLanguage = getStartupBundleLanguage();
     startBootMetric?.("scenario-bundle");
