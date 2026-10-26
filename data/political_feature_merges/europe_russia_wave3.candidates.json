@@ -1,0 +1,3963 @@
+{
+  "schema_version": 1,
+  "candidate_set": "europe_russia_wave3",
+  "description": "Codex-reviewed European candidates from the 2026-10-21 Europe granularity research (UK, Czechia, Slovakia, Poland) and granularity pilot (southern/eastern France; Moscow Reichskommissariat RKM in TNO), plus the remaining Ukraine candidates from the 2026-10-21 dense-country research, excluding UA_Kherson whose parent mixes Crimean source IDs. Groups have at most three members sharing a positive-length boundary; protected IDs are national/owner/historical-front borders, major-city hosts and detected river boundaries.",
+  "protected_feature_ids": [
+    "CZ_ADM2_57006924B13474079400168",
+    "CZ_ADM2_57006924B13920789422451",
+    "CZ_ADM2_57006924B20358302460191",
+    "CZ_ADM2_57006924B21154438881940",
+    "CZ_ADM2_57006924B26083217891381",
+    "CZ_ADM2_57006924B26779967263881",
+    "CZ_ADM2_57006924B30982913442521",
+    "CZ_ADM2_57006924B32669310027153",
+    "CZ_ADM2_57006924B32813693256962",
+    "CZ_ADM2_57006924B34464963037986",
+    "CZ_ADM2_57006924B3568693077695",
+    "CZ_ADM2_57006924B40201864279221",
+    "CZ_ADM2_57006924B50363024387408",
+    "CZ_ADM2_57006924B50757157558324",
+    "CZ_ADM2_57006924B55732331485961",
+    "CZ_ADM2_57006924B55772558323280",
+    "CZ_ADM2_57006924B56764577868008",
+    "CZ_ADM2_57006924B57972685793284",
+    "CZ_ADM2_57006924B5960993849333",
+    "CZ_ADM2_57006924B61075462930500",
+    "CZ_ADM2_57006924B6194040717331",
+    "CZ_ADM2_57006924B62007249383837",
+    "CZ_ADM2_57006924B6298598328883",
+    "CZ_ADM2_57006924B63031935780571",
+    "CZ_ADM2_57006924B65385651307074",
+    "CZ_ADM2_57006924B65826634483108",
+    "CZ_ADM2_57006924B6655388448820",
+    "CZ_ADM2_57006924B67004616478789",
+    "CZ_ADM2_57006924B67285149942805",
+    "CZ_ADM2_57006924B71753966872420",
+    "CZ_ADM2_57006924B72008682408189",
+    "CZ_ADM2_57006924B73132069516203",
+    "CZ_ADM2_57006924B74936445485800",
+    "CZ_ADM2_57006924B8762756005554",
+    "CZ_ADM2_57006924B90452896246775",
+    "CZ_ADM2_57006924B91865699855455",
+    "CZ_ADM2_57006924B92931687173289",
+    "CZ_ADM2_57006924B95695201424764",
+    "CZ_ADM2_57006924B96542005161261",
+    "FR_ARR_01001",
+    "FR_ARR_01002",
+    "FR_ARR_01003",
+    "FR_ARR_01004",
+    "FR_ARR_04001",
+    "FR_ARR_04002",
+    "FR_ARR_04003",
+    "FR_ARR_04004",
+    "FR_ARR_05001",
+    "FR_ARR_05002",
+    "FR_ARR_06001",
+    "FR_ARR_06002",
+    "FR_ARR_08001",
+    "FR_ARR_08002",
+    "FR_ARR_08003",
+    "FR_ARR_09001",
+    "FR_ARR_09003",
+    "FR_ARR_10001",
+    "FR_ARR_10002",
+    "FR_ARR_10003",
+    "FR_ARR_13001",
+    "FR_ARR_13003",
+    "FR_ARR_21002",
+    "FR_ARR_21003",
+    "FR_ARR_25001",
+    "FR_ARR_25002",
+    "FR_ARR_25003",
+    "FR_ARR_30002",
+    "FR_ARR_31002",
+    "FR_ARR_31003",
+    "FR_ARR_33002",
+    "FR_ARR_34003",
+    "FR_ARR_38001",
+    "FR_ARR_38002",
+    "FR_ARR_39001",
+    "FR_ARR_39002",
+    "FR_ARR_39003",
+    "FR_ARR_42003",
+    "FR_ARR_51001",
+    "FR_ARR_51002",
+    "FR_ARR_51003",
+    "FR_ARR_51004",
+    "FR_ARR_52001",
+    "FR_ARR_52002",
+    "FR_ARR_54001",
+    "FR_ARR_54002",
+    "FR_ARR_54003",
+    "FR_ARR_54004",
+    "FR_ARR_55003",
+    "FR_ARR_57003",
+    "FR_ARR_57005",
+    "FR_ARR_57006",
+    "FR_ARR_57007",
+    "FR_ARR_57009",
+    "FR_ARR_58001",
+    "FR_ARR_58003",
+    "FR_ARR_58004",
+    "FR_ARR_63002",
+    "FR_ARR_64001",
+    "FR_ARR_64002",
+    "FR_ARR_65001",
+    "FR_ARR_65002",
+    "FR_ARR_66001",
+    "FR_ARR_66002",
+    "FR_ARR_66003",
+    "FR_ARR_67002",
+    "FR_ARR_67003",
+    "FR_ARR_67004",
+    "FR_ARR_67005",
+    "FR_ARR_67008",
+    "FR_ARR_68001",
+    "FR_ARR_68002",
+    "FR_ARR_68004",
+    "FR_ARR_68006",
+    "FR_ARR_69001",
+    "FR_ARR_70001",
+    "FR_ARR_70002",
+    "FR_ARR_71003",
+    "FR_ARR_71004",
+    "FR_ARR_71005",
+    "FR_ARR_73001",
+    "FR_ARR_73002",
+    "FR_ARR_73003",
+    "FR_ARR_74001",
+    "FR_ARR_74002",
+    "FR_ARR_74003",
+    "FR_ARR_74004",
+    "FR_ARR_83002",
+    "FR_ARR_87002",
+    "FR_ARR_88001",
+    "FR_ARR_88003",
+    "FR_ARR_89001",
+    "FR_ARR_89002",
+    "FR_ARR_89003",
+    "FR_ARR_90001",
+    "PL_POW_0204",
+    "PL_POW_0206",
+    "PL_POW_0207",
+    "PL_POW_0208",
+    "PL_POW_0210",
+    "PL_POW_0213",
+    "PL_POW_0214",
+    "PL_POW_0220",
+    "PL_POW_0221",
+    "PL_POW_0225",
+    "PL_POW_0262",
+    "PL_POW_0264",
+    "PL_POW_0265",
+    "PL_POW_0401",
+    "PL_POW_0402",
+    "PL_POW_0403",
+    "PL_POW_0406",
+    "PL_POW_0408",
+    "PL_POW_0415",
+    "PL_POW_0461",
+    "PL_POW_0462",
+    "PL_POW_0463",
+    "PL_POW_0464",
+    "PL_POW_0601",
+    "PL_POW_0603",
+    "PL_POW_0604",
+    "PL_POW_0618",
+    "PL_POW_0619",
+    "PL_POW_0663",
+    "PL_POW_0801",
+    "PL_POW_0802",
+    "PL_POW_0803",
+    "PL_POW_0804",
+    "PL_POW_0805",
+    "PL_POW_0806",
+    "PL_POW_0808",
+    "PL_POW_0809",
+    "PL_POW_0811",
+    "PL_POW_0812",
+    "PL_POW_0861",
+    "PL_POW_0862",
+    "PL_POW_1001",
+    "PL_POW_1002",
+    "PL_POW_1003",
+    "PL_POW_1004",
+    "PL_POW_1005",
+    "PL_POW_1006",
+    "PL_POW_1008",
+    "PL_POW_1009",
+    "PL_POW_1010",
+    "PL_POW_1012",
+    "PL_POW_1014",
+    "PL_POW_1017",
+    "PL_POW_1018",
+    "PL_POW_1020",
+    "PL_POW_1021",
+    "PL_POW_1061",
+    "PL_POW_1203",
+    "PL_POW_1205",
+    "PL_POW_1210",
+    "PL_POW_1211",
+    "PL_POW_1212",
+    "PL_POW_1213",
+    "PL_POW_1215",
+    "PL_POW_1217",
+    "PL_POW_1218",
+    "PL_POW_1261",
+    "PL_POW_1263",
+    "PL_POW_1404",
+    "PL_POW_1408",
+    "PL_POW_1410",
+    "PL_POW_1411",
+    "PL_POW_1413",
+    "PL_POW_1414",
+    "PL_POW_1415",
+    "PL_POW_1416",
+    "PL_POW_1419",
+    "PL_POW_1420",
+    "PL_POW_1422",
+    "PL_POW_1424",
+    "PL_POW_1426",
+    "PL_POW_1428",
+    "PL_POW_1429",
+    "PL_POW_1433",
+    "PL_POW_1435",
+    "PL_POW_1437",
+    "PL_POW_1462",
+    "PL_POW_1463",
+    "PL_POW_1465",
+    "PL_POW_1602",
+    "PL_POW_1603",
+    "PL_POW_1604",
+    "PL_POW_1606",
+    "PL_POW_1607",
+    "PL_POW_1608",
+    "PL_POW_1610",
+    "PL_POW_1611",
+    "PL_POW_1661",
+    "PL_POW_1801",
+    "PL_POW_1804",
+    "PL_POW_1805",
+    "PL_POW_1807",
+    "PL_POW_1809",
+    "PL_POW_1813",
+    "PL_POW_1817",
+    "PL_POW_1821",
+    "PL_POW_1863",
+    "PL_POW_2001",
+    "PL_POW_2002",
+    "PL_POW_2004",
+    "PL_POW_2005",
+    "PL_POW_2006",
+    "PL_POW_2008",
+    "PL_POW_2009",
+    "PL_POW_2010",
+    "PL_POW_2011",
+    "PL_POW_2012",
+    "PL_POW_2013",
+    "PL_POW_2061",
+    "PL_POW_2201",
+    "PL_POW_2203",
+    "PL_POW_2207",
+    "PL_POW_2209",
+    "PL_POW_2210",
+    "PL_POW_2212",
+    "PL_POW_2216",
+    "PL_POW_2261",
+    "PL_POW_2262",
+    "PL_POW_2401",
+    "PL_POW_2402",
+    "PL_POW_2403",
+    "PL_POW_2404",
+    "PL_POW_2405",
+    "PL_POW_2406",
+    "PL_POW_2407",
+    "PL_POW_2409",
+    "PL_POW_2410",
+    "PL_POW_2411",
+    "PL_POW_2413",
+    "PL_POW_2414",
+    "PL_POW_2415",
+    "PL_POW_2416",
+    "PL_POW_2417",
+    "PL_POW_2461",
+    "PL_POW_2462",
+    "PL_POW_2463",
+    "PL_POW_2464",
+    "PL_POW_2465",
+    "PL_POW_2466",
+    "PL_POW_2468",
+    "PL_POW_2469",
+    "PL_POW_2472",
+    "PL_POW_2473",
+    "PL_POW_2475",
+    "PL_POW_2477",
+    "PL_POW_2478",
+    "PL_POW_2661",
+    "PL_POW_2801",
+    "PL_POW_2802",
+    "PL_POW_2803",
+    "PL_POW_2804",
+    "PL_POW_2805",
+    "PL_POW_2807",
+    "PL_POW_2808",
+    "PL_POW_2811",
+    "PL_POW_2812",
+    "PL_POW_2813",
+    "PL_POW_2815",
+    "PL_POW_2816",
+    "PL_POW_2817",
+    "PL_POW_2818",
+    "PL_POW_2819",
+    "PL_POW_2861",
+    "PL_POW_2862",
+    "PL_POW_3002",
+    "PL_POW_3008",
+    "PL_POW_3012",
+    "PL_POW_3013",
+    "PL_POW_3014",
+    "PL_POW_3015",
+    "PL_POW_3017",
+    "PL_POW_3018",
+    "PL_POW_3019",
+    "PL_POW_3022",
+    "PL_POW_3029",
+    "PL_POW_3031",
+    "PL_POW_3061",
+    "PL_POW_3064",
+    "PL_POW_3203",
+    "PL_POW_3206",
+    "PL_POW_3209",
+    "PL_POW_3210",
+    "PL_POW_3211",
+    "PL_POW_3213",
+    "PL_POW_3215",
+    "PL_POW_3217",
+    "PL_POW_3261",
+    "PL_POW_3262",
+    "PL_POW_3263",
+    "RU_CITY_MOSCOW",
+    "RU_CITY_SAINT_PETERSBURG",
+    "RU_CITY_VOLGOGRAD",
+    "RU_RAY_50074027B10833307399195",
+    "RU_RAY_50074027B10927861897289",
+    "RU_RAY_50074027B11248416654629",
+    "RU_RAY_50074027B11359862812061",
+    "RU_RAY_50074027B11673707761487",
+    "RU_RAY_50074027B12014197778868",
+    "RU_RAY_50074027B12225471433206",
+    "RU_RAY_50074027B12458178899629",
+    "RU_RAY_50074027B12942583135720",
+    "RU_RAY_50074027B13034578172477",
+    "RU_RAY_50074027B15861675069153",
+    "RU_RAY_50074027B15993714165206",
+    "RU_RAY_50074027B16069237925080",
+    "RU_RAY_50074027B16419878353574",
+    "RU_RAY_50074027B17585807614250",
+    "RU_RAY_50074027B18130432160638",
+    "RU_RAY_50074027B18690673383913",
+    "RU_RAY_50074027B19414322011791",
+    "RU_RAY_50074027B19510763976720",
+    "RU_RAY_50074027B19530680502078",
+    "RU_RAY_50074027B19694965074272",
+    "RU_RAY_50074027B19806335982571",
+    "RU_RAY_50074027B20331318716688",
+    "RU_RAY_50074027B20500956922329",
+    "RU_RAY_50074027B20858489153060",
+    "RU_RAY_50074027B21233041988666",
+    "RU_RAY_50074027B21852504227041",
+    "RU_RAY_50074027B22646243288292",
+    "RU_RAY_50074027B22819891790259",
+    "RU_RAY_50074027B22914789357492",
+    "RU_RAY_50074027B23214282298262",
+    "RU_RAY_50074027B23400927091238",
+    "RU_RAY_50074027B23588907409637",
+    "RU_RAY_50074027B23939913802573",
+    "RU_RAY_50074027B24977094270558",
+    "RU_RAY_50074027B25563950651561",
+    "RU_RAY_50074027B27498645809538",
+    "RU_RAY_50074027B28906353717530",
+    "RU_RAY_50074027B29424671559681",
+    "RU_RAY_50074027B29719141572028",
+    "RU_RAY_50074027B30801426940346",
+    "RU_RAY_50074027B31053338553791",
+    "RU_RAY_50074027B31853797856912",
+    "RU_RAY_50074027B3226583010199",
+    "RU_RAY_50074027B32606930376124",
+    "RU_RAY_50074027B33015220799314",
+    "RU_RAY_50074027B33020072188575",
+    "RU_RAY_50074027B33024478162838",
+    "RU_RAY_50074027B33448065960180",
+    "RU_RAY_50074027B34419784992527",
+    "RU_RAY_50074027B34579677769219",
+    "RU_RAY_50074027B34758270921269",
+    "RU_RAY_50074027B35283992627642",
+    "RU_RAY_50074027B35438167156879",
+    "RU_RAY_50074027B37574948551047",
+    "RU_RAY_50074027B3936819954606",
+    "RU_RAY_50074027B39404018386654",
+    "RU_RAY_50074027B39925719961609",
+    "RU_RAY_50074027B40310096212326",
+    "RU_RAY_50074027B41270272155212",
+    "RU_RAY_50074027B41378027449281",
+    "RU_RAY_50074027B41884175029467",
+    "RU_RAY_50074027B43084003717333",
+    "RU_RAY_50074027B44154738908147",
+    "RU_RAY_50074027B44365109797977",
+    "RU_RAY_50074027B44469290153568",
+    "RU_RAY_50074027B44480084064397",
+    "RU_RAY_50074027B44960058886802",
+    "RU_RAY_50074027B45026883350225",
+    "RU_RAY_50074027B45607076105456",
+    "RU_RAY_50074027B46350199135430",
+    "RU_RAY_50074027B46415378872622",
+    "RU_RAY_50074027B47797242403348",
+    "RU_RAY_50074027B4882309977182",
+    "RU_RAY_50074027B48970806712504",
+    "RU_RAY_50074027B49278461872326",
+    "RU_RAY_50074027B49435645657248",
+    "RU_RAY_50074027B49841574383841",
+    "RU_RAY_50074027B50735791430679",
+    "RU_RAY_50074027B50737742198919",
+    "RU_RAY_50074027B51055674062633",
+    "RU_RAY_50074027B51935162594441",
+    "RU_RAY_50074027B5223158268211",
+    "RU_RAY_50074027B52561768019817",
+    "RU_RAY_50074027B53088143353720",
+    "RU_RAY_50074027B54184638100605",
+    "RU_RAY_50074027B55270503343274",
+    "RU_RAY_50074027B5612057998042",
+    "RU_RAY_50074027B5631740772865",
+    "RU_RAY_50074027B5636373346867",
+    "RU_RAY_50074027B56853684893187",
+    "RU_RAY_50074027B57358126207690",
+    "RU_RAY_50074027B577743545764",
+    "RU_RAY_50074027B58076034090645",
+    "RU_RAY_50074027B5815274244108",
+    "RU_RAY_50074027B5850420655248",
+    "RU_RAY_50074027B59467297897339",
+    "RU_RAY_50074027B59910785690021",
+    "RU_RAY_50074027B60606739466906",
+    "RU_RAY_50074027B60613312877229",
+    "RU_RAY_50074027B61241799946425",
+    "RU_RAY_50074027B61304390335978",
+    "RU_RAY_50074027B61494461730219",
+    "RU_RAY_50074027B6375195539146",
+    "RU_RAY_50074027B63959238488311",
+    "RU_RAY_50074027B64055482679717",
+    "RU_RAY_50074027B64424235385581",
+    "RU_RAY_50074027B64455240716412",
+    "RU_RAY_50074027B65236051616648",
+    "RU_RAY_50074027B65302111599244",
+    "RU_RAY_50074027B65544968176864",
+    "RU_RAY_50074027B65559666214840",
+    "RU_RAY_50074027B66126711442497",
+    "RU_RAY_50074027B66604107182111",
+    "RU_RAY_50074027B6686274683844__tno1962_2",
+    "RU_RAY_50074027B66955592022274",
+    "RU_RAY_50074027B67860704242461",
+    "RU_RAY_50074027B68317438478241",
+    "RU_RAY_50074027B68450782776786",
+    "RU_RAY_50074027B68460090008050",
+    "RU_RAY_50074027B71157437388348",
+    "RU_RAY_50074027B72026568542942",
+    "RU_RAY_50074027B72027623217592",
+    "RU_RAY_50074027B73956111205177",
+    "RU_RAY_50074027B74235850605725",
+    "RU_RAY_50074027B75402656675224",
+    "RU_RAY_50074027B756292024869",
+    "RU_RAY_50074027B75699624456558",
+    "RU_RAY_50074027B77320350284147",
+    "RU_RAY_50074027B77582248025356",
+    "RU_RAY_50074027B79073499253750",
+    "RU_RAY_50074027B79622248219149",
+    "RU_RAY_50074027B79799250945808",
+    "RU_RAY_50074027B80046840644847",
+    "RU_RAY_50074027B81144067595181",
+    "RU_RAY_50074027B81414238636592",
+    "RU_RAY_50074027B82446470850578",
+    "RU_RAY_50074027B8291962289284",
+    "RU_RAY_50074027B83468204849825",
+    "RU_RAY_50074027B83572278411540",
+    "RU_RAY_50074027B84391084656620",
+    "RU_RAY_50074027B86355118616383",
+    "RU_RAY_50074027B87627181065564",
+    "RU_RAY_50074027B87706467004865",
+    "RU_RAY_50074027B88070495991427",
+    "RU_RAY_50074027B88311001056531",
+    "RU_RAY_50074027B884948676219",
+    "RU_RAY_50074027B89339381411937",
+    "RU_RAY_50074027B89601962521741",
+    "RU_RAY_50074027B90033070951488",
+    "RU_RAY_50074027B90075090103235",
+    "RU_RAY_50074027B90093816910352",
+    "RU_RAY_50074027B91265302364221",
+    "RU_RAY_50074027B91439993213773",
+    "RU_RAY_50074027B92070848873743",
+    "RU_RAY_50074027B92679153214442",
+    "RU_RAY_50074027B93522804484377",
+    "RU_RAY_50074027B9417606654384",
+    "RU_RAY_50074027B94286516956529",
+    "RU_RAY_50074027B94464987655513",
+    "RU_RAY_50074027B95256084907759",
+    "RU_RAY_50074027B95764525225523",
+    "RU_RAY_50074027B96351262112158",
+    "RU_RAY_50074027B96444957835233",
+    "RU_RAY_50074027B97204580379125",
+    "RU_RAY_50074027B97493150269350",
+    "RU_RAY_50074027B98073914217058",
+    "RU_RAY_50074027B9814729903160",
+    "RU_RAY_50074027B98725284766499",
+    "RU_RAY_50074027B98786634162425",
+    "RU_RAY_50074027B98916186680858",
+    "RU_RAY_50074027B99227036451137",
+    "RU_RAY_50074027B99661625153049",
+    "RU_RAY_50074027B99837917118854",
+    "RU_RAY_50074027B99894122533642",
+    "SK_ADM2_56367889B13739678014174",
+    "SK_ADM2_56367889B1447043738985",
+    "SK_ADM2_56367889B14569056094647",
+    "SK_ADM2_56367889B15205076567490",
+    "SK_ADM2_56367889B15407569919112",
+    "SK_ADM2_56367889B16879144707830",
+    "SK_ADM2_56367889B17286119603144",
+    "SK_ADM2_56367889B18200948818921",
+    "SK_ADM2_56367889B24002183790147",
+    "SK_ADM2_56367889B25974753894430",
+    "SK_ADM2_56367889B27848609458937",
+    "SK_ADM2_56367889B2947656286883",
+    "SK_ADM2_56367889B31823009041462",
+    "SK_ADM2_56367889B36066360363210",
+    "SK_ADM2_56367889B37832117679378",
+    "SK_ADM2_56367889B40480781512108",
+    "SK_ADM2_56367889B42847558326348",
+    "SK_ADM2_56367889B45513137004516",
+    "SK_ADM2_56367889B46930466225258",
+    "SK_ADM2_56367889B47622109691322",
+    "SK_ADM2_56367889B4918056975771",
+    "SK_ADM2_56367889B50490339994693",
+    "SK_ADM2_56367889B51237059400968",
+    "SK_ADM2_56367889B51496625279666",
+    "SK_ADM2_56367889B51514564384482",
+    "SK_ADM2_56367889B53553144532917",
+    "SK_ADM2_56367889B57285771161703",
+    "SK_ADM2_56367889B57985107422825",
+    "SK_ADM2_56367889B58167623425022",
+    "SK_ADM2_56367889B59585277732331",
+    "SK_ADM2_56367889B61252856682831",
+    "SK_ADM2_56367889B62094256812316",
+    "SK_ADM2_56367889B62553648042075",
+    "SK_ADM2_56367889B62817588919968",
+    "SK_ADM2_56367889B65708067786299",
+    "SK_ADM2_56367889B65848289259275",
+    "SK_ADM2_56367889B66923754975257",
+    "SK_ADM2_56367889B68595341554064",
+    "SK_ADM2_56367889B690835779632",
+    "SK_ADM2_56367889B72151249658777",
+    "SK_ADM2_56367889B7741755639355",
+    "SK_ADM2_56367889B78366861694162",
+    "SK_ADM2_56367889B81133001321420",
+    "SK_ADM2_56367889B83569782265262",
+    "SK_ADM2_56367889B87068302757109",
+    "SK_ADM2_56367889B89309998682201",
+    "SK_ADM2_56367889B9282010334294",
+    "SK_ADM2_56367889B94927774956455",
+    "SK_ADM2_56367889B94951233476884",
+    "SK_ADM2_56367889B96980961358907",
+    "SK_ADM2_56367889B97071895480744",
+    "SK_ADM2_56367889B99469568447767",
+    "UA_RAY_74538382B10043952621964",
+    "UA_RAY_74538382B10593574397068",
+    "UA_RAY_74538382B1113173119948",
+    "UA_RAY_74538382B11484774081003",
+    "UA_RAY_74538382B12626856106214",
+    "UA_RAY_74538382B13057195168049",
+    "UA_RAY_74538382B13559545331448",
+    "UA_RAY_74538382B1361262622940",
+    "UA_RAY_74538382B14499181024319",
+    "UA_RAY_74538382B15580280288408",
+    "UA_RAY_74538382B16168555985033",
+    "UA_RAY_74538382B16544098233158",
+    "UA_RAY_74538382B17175920641899",
+    "UA_RAY_74538382B17610954663111",
+    "UA_RAY_74538382B17645619358290",
+    "UA_RAY_74538382B19184608500024",
+    "UA_RAY_74538382B19402975726216",
+    "UA_RAY_74538382B19464931464269",
+    "UA_RAY_74538382B19676868566368",
+    "UA_RAY_74538382B20694939957091",
+    "UA_RAY_74538382B20988283989287",
+    "UA_RAY_74538382B2161330582129",
+    "UA_RAY_74538382B21863106612225",
+    "UA_RAY_74538382B22557738225705",
+    "UA_RAY_74538382B23045356862491",
+    "UA_RAY_74538382B23081700474846",
+    "UA_RAY_74538382B23242546961479",
+    "UA_RAY_74538382B23907235979788",
+    "UA_RAY_74538382B24000649598641",
+    "UA_RAY_74538382B24236776375789",
+    "UA_RAY_74538382B26202854770966",
+    "UA_RAY_74538382B28282753236246",
+    "UA_RAY_74538382B28718545705075",
+    "UA_RAY_74538382B28831490249541",
+    "UA_RAY_74538382B29269701893700",
+    "UA_RAY_74538382B30351514928450",
+    "UA_RAY_74538382B30474831618663",
+    "UA_RAY_74538382B3075345491126",
+    "UA_RAY_74538382B31362091857930",
+    "UA_RAY_74538382B3276437105714",
+    "UA_RAY_74538382B32943992723151",
+    "UA_RAY_74538382B33094259068281",
+    "UA_RAY_74538382B34306237745090",
+    "UA_RAY_74538382B34689599554445",
+    "UA_RAY_74538382B34820599431847",
+    "UA_RAY_74538382B34887074672752",
+    "UA_RAY_74538382B35146860339147",
+    "UA_RAY_74538382B35301744305605",
+    "UA_RAY_74538382B35313257426644",
+    "UA_RAY_74538382B36501884751905",
+    "UA_RAY_74538382B36709578446445",
+    "UA_RAY_74538382B36897928857836",
+    "UA_RAY_74538382B36929178896395",
+    "UA_RAY_74538382B36952464312213",
+    "UA_RAY_74538382B36980255523800",
+    "UA_RAY_74538382B37171380171685",
+    "UA_RAY_74538382B3760492540112",
+    "UA_RAY_74538382B37791268598116",
+    "UA_RAY_74538382B37973254287789",
+    "UA_RAY_74538382B38253727574875",
+    "UA_RAY_74538382B3900479393084",
+    "UA_RAY_74538382B39784518508744",
+    "UA_RAY_74538382B40204965193592",
+    "UA_RAY_74538382B41206945038645",
+    "UA_RAY_74538382B42144983760497",
+    "UA_RAY_74538382B42406222783177",
+    "UA_RAY_74538382B42847215196778",
+    "UA_RAY_74538382B43402639614828",
+    "UA_RAY_74538382B44220139144156",
+    "UA_RAY_74538382B4443211725898",
+    "UA_RAY_74538382B44501351674000",
+    "UA_RAY_74538382B44725547103458",
+    "UA_RAY_74538382B45068545633774",
+    "UA_RAY_74538382B45881397075814",
+    "UA_RAY_74538382B4607226007855",
+    "UA_RAY_74538382B46392233077619",
+    "UA_RAY_74538382B46561623007945",
+    "UA_RAY_74538382B46710488362187",
+    "UA_RAY_74538382B46813680897661",
+    "UA_RAY_74538382B46853229377150",
+    "UA_RAY_74538382B47122589681539",
+    "UA_RAY_74538382B4751802602524",
+    "UA_RAY_74538382B47818615416103",
+    "UA_RAY_74538382B48347776111848",
+    "UA_RAY_74538382B49148069101278",
+    "UA_RAY_74538382B49623999622134",
+    "UA_RAY_74538382B50216081867244",
+    "UA_RAY_74538382B50426750850815",
+    "UA_RAY_74538382B51195623672150",
+    "UA_RAY_74538382B51634820959847",
+    "UA_RAY_74538382B51989583187875",
+    "UA_RAY_74538382B52096657726601",
+    "UA_RAY_74538382B52142389762962",
+    "UA_RAY_74538382B52931084418443",
+    "UA_RAY_74538382B53011721841283",
+    "UA_RAY_74538382B54113761495064",
+    "UA_RAY_74538382B54958880930265",
+    "UA_RAY_74538382B55212312657182",
+    "UA_RAY_74538382B55408999642819",
+    "UA_RAY_74538382B55698458190122",
+    "UA_RAY_74538382B56277130334747",
+    "UA_RAY_74538382B56756126132930",
+    "UA_RAY_74538382B57022409328323",
+    "UA_RAY_74538382B5714887404176",
+    "UA_RAY_74538382B57692221763967",
+    "UA_RAY_74538382B57991939893011",
+    "UA_RAY_74538382B58806562521535",
+    "UA_RAY_74538382B59316427092609",
+    "UA_RAY_74538382B59394362470608",
+    "UA_RAY_74538382B60058274039512",
+    "UA_RAY_74538382B60890943260132",
+    "UA_RAY_74538382B60921908613861",
+    "UA_RAY_74538382B60964237816069",
+    "UA_RAY_74538382B62779126534418",
+    "UA_RAY_74538382B62918888567345",
+    "UA_RAY_74538382B63146168478131",
+    "UA_RAY_74538382B63824501838973",
+    "UA_RAY_74538382B66987741978303",
+    "UA_RAY_74538382B6752863603231",
+    "UA_RAY_74538382B68112456325611",
+    "UA_RAY_74538382B68255145682197",
+    "UA_RAY_74538382B68825553908118",
+    "UA_RAY_74538382B69155666487417",
+    "UA_RAY_74538382B71334227440013",
+    "UA_RAY_74538382B72123275564902",
+    "UA_RAY_74538382B72369548204787",
+    "UA_RAY_74538382B72519912366476",
+    "UA_RAY_74538382B72647920433352",
+    "UA_RAY_74538382B72863696789776",
+    "UA_RAY_74538382B73630411968214",
+    "UA_RAY_74538382B7363516927626",
+    "UA_RAY_74538382B73944053970257",
+    "UA_RAY_74538382B74407255776409",
+    "UA_RAY_74538382B77165188287872",
+    "UA_RAY_74538382B77535249747568",
+    "UA_RAY_74538382B78037249212092",
+    "UA_RAY_74538382B7822777781560",
+    "UA_RAY_74538382B79592812488535",
+    "UA_RAY_74538382B80134977422421",
+    "UA_RAY_74538382B80427643782366",
+    "UA_RAY_74538382B81176113996215",
+    "UA_RAY_74538382B811800225931",
+    "UA_RAY_74538382B83226976460707",
+    "UA_RAY_74538382B83702656309397",
+    "UA_RAY_74538382B84040377374615",
+    "UA_RAY_74538382B84300639272242",
+    "UA_RAY_74538382B85427402456891",
+    "UA_RAY_74538382B85654458417277",
+    "UA_RAY_74538382B86026417899488",
+    "UA_RAY_74538382B86462977342473",
+    "UA_RAY_74538382B86672078093677",
+    "UA_RAY_74538382B8704633300515",
+    "UA_RAY_74538382B87091028068119",
+    "UA_RAY_74538382B88125912704040",
+    "UA_RAY_74538382B88282912225835",
+    "UA_RAY_74538382B88368635206807",
+    "UA_RAY_74538382B89155529549277",
+    "UA_RAY_74538382B89307192182420",
+    "UA_RAY_74538382B89403854124425",
+    "UA_RAY_74538382B90476934992990",
+    "UA_RAY_74538382B90572707310825",
+    "UA_RAY_74538382B91393089585676",
+    "UA_RAY_74538382B91689640579793",
+    "UA_RAY_74538382B9177697938380",
+    "UA_RAY_74538382B91806639169097",
+    "UA_RAY_74538382B91909296876216",
+    "UA_RAY_74538382B92147387256537",
+    "UA_RAY_74538382B92550814183987",
+    "UA_RAY_74538382B927387955127",
+    "UA_RAY_74538382B94391556881320",
+    "UA_RAY_74538382B9478118461291",
+    "UA_RAY_74538382B95291552499633",
+    "UA_RAY_74538382B95492559683598",
+    "UA_RAY_74538382B95854535176158",
+    "UA_RAY_74538382B96313823976943",
+    "UA_RAY_74538382B97249439308301",
+    "UA_RAY_74538382B97324557643268",
+    "UA_RAY_74538382B9733134987595",
+    "UA_RAY_74538382B97641778556925",
+    "UA_RAY_74538382B97836372307066",
+    "UA_RAY_74538382B98557569749448",
+    "UA_RAY_74538382B99156650022607",
+    "UA_RAY_74538382B99860915109561",
+    "UKC12",
+    "UKC21",
+    "UKC22",
+    "UKC23",
+    "UKD12",
+    "UKD33",
+    "UKD34",
+    "UKD35",
+    "UKD36",
+    "UKD37",
+    "UKD41",
+    "UKD42",
+    "UKD45",
+    "UKD46",
+    "UKD61",
+    "UKD63",
+    "UKD71",
+    "UKD72",
+    "UKD74",
+    "UKE11",
+    "UKE21",
+    "UKE31",
+    "UKE32",
+    "UKE41",
+    "UKE42",
+    "UKE44",
+    "UKE45",
+    "UKF11",
+    "UKF12",
+    "UKF14",
+    "UKF15",
+    "UKF21",
+    "UKF24",
+    "UKF30",
+    "UKG11",
+    "UKG12",
+    "UKG21",
+    "UKG22",
+    "UKG23",
+    "UKG24",
+    "UKG31",
+    "UKG32",
+    "UKG33",
+    "UKG36",
+    "UKG37",
+    "UKG38",
+    "UKG39",
+    "UKH11",
+    "UKH12",
+    "UKH14",
+    "UKH15",
+    "UKH21",
+    "UKH23",
+    "UKH24",
+    "UKH31",
+    "UKH34",
+    "UKH36",
+    "UKH37",
+    "UKI32",
+    "UKI43",
+    "UKI51",
+    "UKI52",
+    "UKI53",
+    "UKI54",
+    "UKI62",
+    "UKI63",
+    "UKI72",
+    "UKI74",
+    "UKJ11",
+    "UKJ12",
+    "UKJ13",
+    "UKJ14",
+    "UKJ21",
+    "UKJ22",
+    "UKJ25",
+    "UKJ28",
+    "UKJ31",
+    "UKJ32",
+    "UKJ37",
+    "UKJ41",
+    "UKJ44",
+    "UKJ45",
+    "UKK11",
+    "UKK12",
+    "UKK13",
+    "UKK14",
+    "UKK23",
+    "UKK24",
+    "UKK25",
+    "UKK30",
+    "UKK41",
+    "UKK43",
+    "UKL18",
+    "UKL21",
+    "UKL22",
+    "UKL23",
+    "UKL24",
+    "UKM50",
+    "UKM71",
+    "UKM75",
+    "UKM82",
+    "UKM91",
+    "UKM92",
+    "UKN06",
+    "UKN07",
+    "UKN08",
+    "UKN0A",
+    "UKN0B",
+    "UKN0C",
+    "UKN0G"
+  ],
+  "candidates": [
+    {
+      "member_ids": [
+        "UKC11",
+        "UKC13"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_bae13b14cff8"
+    },
+    {
+      "member_ids": [
+        "UKC14",
+        "UKE12",
+        "UKE22"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_ef10e4e68261"
+    },
+    {
+      "member_ids": [
+        "UKD47",
+        "UKD73"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_cea3c065f6d1"
+    },
+    {
+      "member_ids": [
+        "UKD62",
+        "UKF13"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_683dbfb4fe18"
+    },
+    {
+      "member_ids": [
+        "UKF16",
+        "UKF22",
+        "UKG13"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_241c3040bf7b"
+    },
+    {
+      "member_ids": [
+        "UKH16",
+        "UKH17"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_a0325bfe5ef6"
+    },
+    {
+      "member_ids": [
+        "UKI31",
+        "UKI71"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_3f1bc6abef04"
+    },
+    {
+      "member_ids": [
+        "UKI33",
+        "UKI73",
+        "UKI75"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_0c1fc20858ee"
+    },
+    {
+      "member_ids": [
+        "UKI34",
+        "UKI44",
+        "UKI45"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_f933555ecc54"
+    },
+    {
+      "member_ids": [
+        "UKI41",
+        "UKI42"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_140c8265d204"
+    },
+    {
+      "member_ids": [
+        "UKI61",
+        "UKJ43",
+        "UKJ46"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_7b10b4d7d5a3"
+    },
+    {
+      "member_ids": [
+        "UKJ35",
+        "UKJ36",
+        "UKK15"
+      ],
+      "parent_id": "GB_England",
+      "research_id": "RESEARCH_GB_11fbdfe6eec6"
+    },
+    {
+      "member_ids": [
+        "UKL11",
+        "UKL12",
+        "UKL13"
+      ],
+      "parent_id": "GB_Wales",
+      "research_id": "RESEARCH_GB_7640d81cafc2"
+    },
+    {
+      "member_ids": [
+        "UKL15",
+        "UKL16",
+        "UKL17"
+      ],
+      "parent_id": "GB_Wales",
+      "research_id": "RESEARCH_GB_cd0a88fa3e3a"
+    },
+    {
+      "member_ids": [
+        "UKM61",
+        "UKM62",
+        "UKM63"
+      ],
+      "parent_id": "GB_Scotland",
+      "research_id": "RESEARCH_GB_25844d91b4b3"
+    },
+    {
+      "member_ids": [
+        "UKM72",
+        "UKM77",
+        "UKM81"
+      ],
+      "parent_id": "GB_Scotland",
+      "research_id": "RESEARCH_GB_e4f5af885907"
+    },
+    {
+      "member_ids": [
+        "UKM76",
+        "UKM84",
+        "UKM95"
+      ],
+      "parent_id": "GB_Scotland",
+      "research_id": "RESEARCH_GB_0470348a79c1"
+    },
+    {
+      "member_ids": [
+        "UKM83",
+        "UKM93",
+        "UKM94"
+      ],
+      "parent_id": "GB_Scotland",
+      "research_id": "RESEARCH_GB_bbacbd7bd818"
+    },
+    {
+      "member_ids": [
+        "UKN0D",
+        "UKN0E",
+        "UKN0F"
+      ],
+      "parent_id": "GB_Northern_Ireland",
+      "research_id": "RESEARCH_GB_b5efe3441107"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B10100479283290",
+        "CZ_ADM2_57006924B60448668577783",
+        "CZ_ADM2_57006924B74433439756021"
+      ],
+      "parent_id": "CZ_Jiho_esk_kraj",
+      "research_id": "RESEARCH_CZ_0eb15b94204d"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B10827026185454",
+        "CZ_ADM2_57006924B42074087272310",
+        "CZ_ADM2_57006924B99788800999519"
+      ],
+      "parent_id": "CZ_St_edo_esk_kraj",
+      "research_id": "RESEARCH_CZ_2706cd0001cf"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B14129056192165",
+        "CZ_ADM2_57006924B8877246488305"
+      ],
+      "parent_id": "CZ_Pardubick_kraj",
+      "research_id": "RESEARCH_CZ_eb88c3a7ce85"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B14436380449594",
+        "CZ_ADM2_57006924B59836523347755"
+      ],
+      "parent_id": "CZ_Zl_nsk_kraj",
+      "research_id": "RESEARCH_CZ_520a115efb2a"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B17496332064462",
+        "CZ_ADM2_57006924B20341688327038"
+      ],
+      "parent_id": "CZ_Olomouck_kraj",
+      "research_id": "RESEARCH_CZ_22db7f68434e"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B23642111246292",
+        "CZ_ADM2_57006924B25962740711880",
+        "CZ_ADM2_57006924B9844142294582"
+      ],
+      "parent_id": "CZ_St_edo_esk_kraj",
+      "research_id": "RESEARCH_CZ_9bd0df0ca0c2"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B24749184311211",
+        "CZ_ADM2_57006924B26466431753540",
+        "CZ_ADM2_57006924B76318940607058"
+      ],
+      "parent_id": "CZ_Plze_sk_kraj",
+      "research_id": "RESEARCH_CZ_5e78bb9e4124"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B28286346415780",
+        "CZ_ADM2_57006924B40654694205882"
+      ],
+      "parent_id": "CZ_steck_kraj",
+      "research_id": "RESEARCH_CZ_b6a39304affd"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B35034257273333",
+        "CZ_ADM2_57006924B42369994804969"
+      ],
+      "parent_id": "CZ_Kraj_Vyso_ina",
+      "research_id": "RESEARCH_CZ_2a7609aeb51f"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B37669195364586",
+        "CZ_ADM2_57006924B82111344983201",
+        "CZ_ADM2_57006924B88312395520389"
+      ],
+      "parent_id": "CZ_Jihomoravsk_kraj",
+      "research_id": "RESEARCH_CZ_80a53bfee13f"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B46613202139284",
+        "CZ_ADM2_57006924B86980162402648",
+        "CZ_ADM2_57006924B9167412778740"
+      ],
+      "parent_id": "CZ_St_edo_esk_kraj",
+      "research_id": "RESEARCH_CZ_e06bffb57aa4"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B47389261447584",
+        "CZ_ADM2_57006924B48131365256783",
+        "CZ_ADM2_57006924B85481167833175"
+      ],
+      "parent_id": "CZ_Kraj_Vyso_ina",
+      "research_id": "RESEARCH_CZ_6fc23224953f"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B48464151885273",
+        "CZ_ADM2_57006924B72367242001240",
+        "CZ_ADM2_57006924B82146122340181"
+      ],
+      "parent_id": "CZ_St_edo_esk_kraj",
+      "research_id": "RESEARCH_CZ_e21b9b17a3b8"
+    },
+    {
+      "member_ids": [
+        "CZ_ADM2_57006924B61995402941039",
+        "CZ_ADM2_57006924B98928131689088"
+      ],
+      "parent_id": "CZ_Kr_lov_hradeck_kraj",
+      "research_id": "RESEARCH_CZ_d033aa18c516"
+    },
+    {
+      "member_ids": [
+        "SK_ADM2_56367889B11470427915377",
+        "SK_ADM2_56367889B81744173793240"
+      ],
+      "parent_id": "Prešovský kraj",
+      "research_id": "RESEARCH_SK_b8275aaf15ce"
+    },
+    {
+      "member_ids": [
+        "SK_ADM2_56367889B12595131960891",
+        "SK_ADM2_56367889B76322005427385"
+      ],
+      "parent_id": "Bratislavský kraj",
+      "research_id": "RESEARCH_SK_ec78de62a65a"
+    },
+    {
+      "member_ids": [
+        "SK_ADM2_56367889B14109704827124",
+        "SK_ADM2_56367889B61609274598716"
+      ],
+      "parent_id": "Banskobystrický kraj",
+      "research_id": "RESEARCH_SK_65c4b331b913"
+    },
+    {
+      "member_ids": [
+        "SK_ADM2_56367889B15992044775212",
+        "SK_ADM2_56367889B26614689162342",
+        "SK_ADM2_56367889B98642751890096"
+      ],
+      "parent_id": "Trenčiansky kraj",
+      "research_id": "RESEARCH_SK_11cb76a11ad9"
+    },
+    {
+      "member_ids": [
+        "SK_ADM2_56367889B38418286781664",
+        "SK_ADM2_56367889B62739535395269",
+        "SK_ADM2_56367889B9717038533065"
+      ],
+      "parent_id": "Trnavský kraj",
+      "research_id": "RESEARCH_SK_c4dd985ddd86"
+    },
+    {
+      "member_ids": [
+        "SK_ADM2_56367889B40145685208334",
+        "SK_ADM2_56367889B48474668858137",
+        "SK_ADM2_56367889B52678955481324"
+      ],
+      "parent_id": "Žilinský kraj",
+      "research_id": "RESEARCH_SK_da7a548164a6"
+    },
+    {
+      "member_ids": [
+        "SK_ADM2_56367889B77247555880458",
+        "SK_ADM2_56367889B88920022363437"
+      ],
+      "parent_id": "Žilinský kraj",
+      "research_id": "RESEARCH_SK_a8dc8c1ba5fd"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0201",
+        "PL_POW_0212"
+      ],
+      "parent_id": "PL_Lower_Silesian",
+      "research_id": "RESEARCH_PL_7b6f084c5a3d"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0202",
+        "PL_POW_0224"
+      ],
+      "parent_id": "PL_Lower_Silesian",
+      "research_id": "RESEARCH_PL_038c1877b0a6"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0203",
+        "PL_POW_0211",
+        "PL_POW_0216"
+      ],
+      "parent_id": "PL_Lower_Silesian",
+      "research_id": "RESEARCH_PL_e323f1f3e328"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0205",
+        "PL_POW_0209",
+        "PL_POW_0226"
+      ],
+      "parent_id": "PL_Lower_Silesian",
+      "research_id": "RESEARCH_PL_91805063a775"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0215",
+        "PL_POW_0219",
+        "PL_POW_0223"
+      ],
+      "parent_id": "PL_Lower_Silesian",
+      "research_id": "RESEARCH_PL_1f216616944e"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0218",
+        "PL_POW_0222"
+      ],
+      "parent_id": "PL_Lower_Silesian",
+      "research_id": "RESEARCH_PL_7743a363b942"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0404",
+        "PL_POW_0414",
+        "PL_POW_0416"
+      ],
+      "parent_id": "PL_Kuyavian_Pomeranian",
+      "research_id": "RESEARCH_PL_1f03cf83a672"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0405",
+        "PL_POW_0412",
+        "PL_POW_0417"
+      ],
+      "parent_id": "PL_Kuyavian_Pomeranian",
+      "research_id": "RESEARCH_PL_213b77b14bbc"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0407",
+        "PL_POW_0409",
+        "PL_POW_0419"
+      ],
+      "parent_id": "PL_Kuyavian_Pomeranian",
+      "research_id": "RESEARCH_PL_64465941c0b0"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0410",
+        "PL_POW_0413"
+      ],
+      "parent_id": "PL_Kuyavian_Pomeranian",
+      "research_id": "RESEARCH_PL_7bfbddec3fe8"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0411",
+        "PL_POW_0418"
+      ],
+      "parent_id": "PL_Kuyavian_Pomeranian",
+      "research_id": "RESEARCH_PL_c52154b3e42b"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0602",
+        "PL_POW_0606",
+        "PL_POW_0620"
+      ],
+      "parent_id": "PL_Lublin",
+      "research_id": "RESEARCH_PL_d8d7dd7afdb9"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0605",
+        "PL_POW_0607"
+      ],
+      "parent_id": "PL_Lublin",
+      "research_id": "RESEARCH_PL_aff3700ce173"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0608",
+        "PL_POW_0613",
+        "PL_POW_0614"
+      ],
+      "parent_id": "PL_Lublin",
+      "research_id": "RESEARCH_PL_a6fbeef80114"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0609",
+        "PL_POW_0612",
+        "PL_POW_0617"
+      ],
+      "parent_id": "PL_Lublin",
+      "research_id": "RESEARCH_PL_22152104ffd1"
+    },
+    {
+      "member_ids": [
+        "PL_POW_0611",
+        "PL_POW_0615",
+        "PL_POW_0616"
+      ],
+      "parent_id": "PL_Lublin",
+      "research_id": "RESEARCH_PL_67c037c3c75d"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1007",
+        "PL_POW_1016"
+      ],
+      "parent_id": "PL_Lodz",
+      "research_id": "RESEARCH_PL_11a4baa0e03d"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1011",
+        "PL_POW_1019"
+      ],
+      "parent_id": "PL_Lodz",
+      "research_id": "RESEARCH_PL_93ba0074c71b"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1013",
+        "PL_POW_1015",
+        "PL_POW_1063"
+      ],
+      "parent_id": "PL_Lodz",
+      "research_id": "RESEARCH_PL_3eca563cdf4c"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1201",
+        "PL_POW_1202",
+        "PL_POW_1216"
+      ],
+      "parent_id": "PL_Lesser_Poland",
+      "research_id": "RESEARCH_PL_2f11082a8670"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1206",
+        "PL_POW_1208",
+        "PL_POW_1214"
+      ],
+      "parent_id": "PL_Lesser_Poland",
+      "research_id": "RESEARCH_PL_dc883f9699f6"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1207",
+        "PL_POW_1209",
+        "PL_POW_1219"
+      ],
+      "parent_id": "PL_Lesser_Poland",
+      "research_id": "RESEARCH_PL_6a74eadd08fa"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1401",
+        "PL_POW_1406",
+        "PL_POW_1418"
+      ],
+      "parent_id": "PL_Masovian",
+      "research_id": "RESEARCH_PL_a4db95aeca63"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1403",
+        "PL_POW_1407"
+      ],
+      "parent_id": "PL_Masovian",
+      "research_id": "RESEARCH_PL_8ce26d0d65f5"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1405",
+        "PL_POW_1421",
+        "PL_POW_1438"
+      ],
+      "parent_id": "PL_Masovian",
+      "research_id": "RESEARCH_PL_0049dcca9d20"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1409",
+        "PL_POW_1425",
+        "PL_POW_1436"
+      ],
+      "parent_id": "PL_Masovian",
+      "research_id": "RESEARCH_PL_9d6bed98af51"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1412",
+        "PL_POW_1417",
+        "PL_POW_1434"
+      ],
+      "parent_id": "PL_Masovian",
+      "research_id": "RESEARCH_PL_dbe89744f6af"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1423",
+        "PL_POW_1430"
+      ],
+      "parent_id": "PL_Masovian",
+      "research_id": "RESEARCH_PL_1a21fe0bf68b"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1605",
+        "PL_POW_1609"
+      ],
+      "parent_id": "PL_Opole",
+      "research_id": "RESEARCH_PL_a9a2af32b2a6"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1802",
+        "PL_POW_1819"
+      ],
+      "parent_id": "PL_Subcarpathian",
+      "research_id": "RESEARCH_PL_38b0002ef4ff"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1803",
+        "PL_POW_1811",
+        "PL_POW_1815"
+      ],
+      "parent_id": "PL_Subcarpathian",
+      "research_id": "RESEARCH_PL_2906060641a3"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1806",
+        "PL_POW_1810",
+        "PL_POW_1816"
+      ],
+      "parent_id": "PL_Subcarpathian",
+      "research_id": "RESEARCH_PL_f142f948fe78"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1808",
+        "PL_POW_1812",
+        "PL_POW_1818"
+      ],
+      "parent_id": "PL_Subcarpathian",
+      "research_id": "RESEARCH_PL_6f4542119924"
+    },
+    {
+      "member_ids": [
+        "PL_POW_1820",
+        "PL_POW_1864"
+      ],
+      "parent_id": "PL_Subcarpathian",
+      "research_id": "RESEARCH_PL_8ea35c537dd7"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2007",
+        "PL_POW_2014",
+        "PL_POW_2062"
+      ],
+      "parent_id": "PL_Podlaskie",
+      "research_id": "RESEARCH_PL_3fa8060676f3"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2202",
+        "PL_POW_2205",
+        "PL_POW_2206"
+      ],
+      "parent_id": "PL_Pomeranian",
+      "research_id": "RESEARCH_PL_87c36d314774"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2204",
+        "PL_POW_2213",
+        "PL_POW_2214"
+      ],
+      "parent_id": "PL_Pomeranian",
+      "research_id": "RESEARCH_PL_9f5916a0b059"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2208",
+        "PL_POW_2211",
+        "PL_POW_2215"
+      ],
+      "parent_id": "PL_Pomeranian",
+      "research_id": "RESEARCH_PL_1b289d90a682"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2408",
+        "PL_POW_2412",
+        "PL_POW_2479"
+      ],
+      "parent_id": "PL_Silesian",
+      "research_id": "RESEARCH_PL_b220cade22e8"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2471",
+        "PL_POW_2474"
+      ],
+      "parent_id": "PL_Silesian",
+      "research_id": "RESEARCH_PL_e601b5ade804"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2601",
+        "PL_POW_2603",
+        "PL_POW_2612"
+      ],
+      "parent_id": "PL_Holy_Cross",
+      "research_id": "RESEARCH_PL_876ff1b5ceaa"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2602",
+        "PL_POW_2608",
+        "PL_POW_2613"
+      ],
+      "parent_id": "PL_Holy_Cross",
+      "research_id": "RESEARCH_PL_06926aee65ae"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2604",
+        "PL_POW_2605",
+        "PL_POW_2610"
+      ],
+      "parent_id": "PL_Holy_Cross",
+      "research_id": "RESEARCH_PL_8071eccf9196"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2606",
+        "PL_POW_2607",
+        "PL_POW_2609"
+      ],
+      "parent_id": "PL_Holy_Cross",
+      "research_id": "RESEARCH_PL_ea7c2b4c4604"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2806",
+        "PL_POW_2810"
+      ],
+      "parent_id": "PL_Warmian_Masurian",
+      "research_id": "RESEARCH_PL_944eee8f1d80"
+    },
+    {
+      "member_ids": [
+        "PL_POW_2809",
+        "PL_POW_2814"
+      ],
+      "parent_id": "PL_Warmian_Masurian",
+      "research_id": "RESEARCH_PL_ff5be91abb23"
+    },
+    {
+      "member_ids": [
+        "PL_POW_3001",
+        "PL_POW_3003",
+        "PL_POW_3028"
+      ],
+      "parent_id": "PL_Greater_Poland",
+      "research_id": "RESEARCH_PL_61c293db7d41"
+    },
+    {
+      "member_ids": [
+        "PL_POW_3004",
+        "PL_POW_3006",
+        "PL_POW_3020"
+      ],
+      "parent_id": "PL_Greater_Poland",
+      "research_id": "RESEARCH_PL_81093d251069"
+    },
+    {
+      "member_ids": [
+        "PL_POW_3005",
+        "PL_POW_3011",
+        "PL_POW_3026"
+      ],
+      "parent_id": "PL_Greater_Poland",
+      "research_id": "RESEARCH_PL_7c7cb17f44aa"
+    },
+    {
+      "member_ids": [
+        "PL_POW_3007",
+        "PL_POW_3009",
+        "PL_POW_3027"
+      ],
+      "parent_id": "PL_Greater_Poland",
+      "research_id": "RESEARCH_PL_c879f5400eaf"
+    },
+    {
+      "member_ids": [
+        "PL_POW_3010",
+        "PL_POW_3023",
+        "PL_POW_3062"
+      ],
+      "parent_id": "PL_Greater_Poland",
+      "research_id": "RESEARCH_PL_5476b87d84e7"
+    },
+    {
+      "member_ids": [
+        "PL_POW_3016",
+        "PL_POW_3024"
+      ],
+      "parent_id": "PL_Greater_Poland",
+      "research_id": "RESEARCH_PL_238adcf655d9"
+    },
+    {
+      "member_ids": [
+        "PL_POW_3021",
+        "PL_POW_3025",
+        "PL_POW_3030"
+      ],
+      "parent_id": "PL_Greater_Poland",
+      "research_id": "RESEARCH_PL_c4e56d63ac16"
+    },
+    {
+      "member_ids": [
+        "PL_POW_3201",
+        "PL_POW_3216",
+        "PL_POW_3218"
+      ],
+      "parent_id": "PL_West_Pomeranian",
+      "research_id": "RESEARCH_PL_c37f1947fcdc"
+    },
+    {
+      "member_ids": [
+        "PL_POW_3204",
+        "PL_POW_3205",
+        "PL_POW_3207"
+      ],
+      "parent_id": "PL_West_Pomeranian",
+      "research_id": "RESEARCH_PL_8b51f3b1ea3d"
+    },
+    {
+      "member_ids": [
+        "PL_POW_3212",
+        "PL_POW_3214"
+      ],
+      "parent_id": "PL_West_Pomeranian",
+      "research_id": "RESEARCH_PL_eb4e37d89494"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_03001",
+        "FR_ARR_03002"
+      ],
+      "parent_id": "FR_Auvergne_Rhone_Alpes",
+      "research_id": "PILOT_FR_1dd1f2318b87"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_03003",
+        "FR_ARR_63003",
+        "FR_ARR_63004"
+      ],
+      "parent_id": "FR_Auvergne_Rhone_Alpes",
+      "research_id": "PILOT_FR_ee3545ee287b"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_07001",
+        "FR_ARR_07002",
+        "FR_ARR_07003"
+      ],
+      "parent_id": "FR_Auvergne_Rhone_Alpes",
+      "research_id": "PILOT_FR_a8475807e214"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_09002",
+        "FR_ARR_11001",
+        "FR_ARR_11002"
+      ],
+      "parent_id": "FR_Occitanie",
+      "research_id": "PILOT_FR_dc6abbd5d798"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_11003",
+        "FR_ARR_12001",
+        "FR_ARR_34001"
+      ],
+      "parent_id": "FR_Occitanie",
+      "research_id": "PILOT_FR_9b797b529198"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_12002",
+        "FR_ARR_48002"
+      ],
+      "parent_id": "FR_Occitanie",
+      "research_id": "PILOT_FR_4376a9393011"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_12003",
+        "FR_ARR_81001",
+        "FR_ARR_81002"
+      ],
+      "parent_id": "FR_Occitanie",
+      "research_id": "PILOT_FR_8ba4bd22ebae"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_13002",
+        "FR_ARR_13004"
+      ],
+      "parent_id": "FR_Provence_Alpes_Cote_d_Azur",
+      "research_id": "PILOT_FR_581ae712b345"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_15001",
+        "FR_ARR_15002"
+      ],
+      "parent_id": "FR_Auvergne_Rhone_Alpes",
+      "research_id": "PILOT_FR_c2e3804b953d"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_15003",
+        "FR_ARR_43001",
+        "FR_ARR_43002"
+      ],
+      "parent_id": "FR_Auvergne_Rhone_Alpes",
+      "research_id": "PILOT_FR_20c474b522b4"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_16001",
+        "FR_ARR_16002",
+        "FR_ARR_17001"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_da181e6c6f14"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_16003",
+        "FR_ARR_86002",
+        "FR_ARR_87001"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_67d78a77cf6e"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_17002",
+        "FR_ARR_17004",
+        "FR_ARR_17005"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_747dd0be2b40"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_17003",
+        "FR_ARR_79002"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_e7b8b83f7702"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_19001",
+        "FR_ARR_19002",
+        "FR_ARR_19003"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_dbefd8112398"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_21001",
+        "FR_ARR_71001",
+        "FR_ARR_71002"
+      ],
+      "parent_id": "FR_Bourgogne_Franche_Comte",
+      "research_id": "PILOT_FR_d8c7b497d2ff"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_23001",
+        "FR_ARR_23002"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_6110111626b3"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_24001",
+        "FR_ARR_24002",
+        "FR_ARR_24003"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_60573039ff94"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_26001",
+        "FR_ARR_26003",
+        "FR_ARR_38003"
+      ],
+      "parent_id": "FR_Auvergne_Rhone_Alpes",
+      "research_id": "PILOT_FR_7866879c601a"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_30001",
+        "FR_ARR_30003",
+        "FR_ARR_34002"
+      ],
+      "parent_id": "FR_Occitanie",
+      "research_id": "PILOT_FR_4d2f60ea274d"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_32001",
+        "FR_ARR_32002",
+        "FR_ARR_32003"
+      ],
+      "parent_id": "FR_Occitanie",
+      "research_id": "PILOT_FR_40ca7de593e8"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_33001",
+        "FR_ARR_33004",
+        "FR_ARR_33005"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_6654e2069ec7"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_33003",
+        "FR_ARR_40001",
+        "FR_ARR_40002"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_22945be57f66"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_42001",
+        "FR_ARR_42002",
+        "FR_ARR_69002"
+      ],
+      "parent_id": "FR_Auvergne_Rhone_Alpes",
+      "research_id": "PILOT_FR_f6a51cf25e8c"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_46001",
+        "FR_ARR_82001",
+        "FR_ARR_82002"
+      ],
+      "parent_id": "FR_Occitanie",
+      "research_id": "PILOT_FR_5f16214ab706"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_46002",
+        "FR_ARR_46003"
+      ],
+      "parent_id": "FR_Occitanie",
+      "research_id": "PILOT_FR_7d591fa92fb7"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_47001",
+        "FR_ARR_47003",
+        "FR_ARR_47004"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_aa69bba94cff"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_52003",
+        "FR_ARR_55001",
+        "FR_ARR_55002"
+      ],
+      "parent_id": "FR_Grand_Est",
+      "research_id": "PILOT_FR_ba4e80f04071"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_63001",
+        "FR_ARR_63005"
+      ],
+      "parent_id": "FR_Auvergne_Rhone_Alpes",
+      "research_id": "PILOT_FR_6e9108ff4d0c"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_79001",
+        "FR_ARR_79003"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_a941d135034f"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_83001",
+        "FR_ARR_83003"
+      ],
+      "parent_id": "FR_Provence_Alpes_Cote_d_Azur",
+      "research_id": "PILOT_FR_28955f7efffb"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_84001",
+        "FR_ARR_84002",
+        "FR_ARR_84003"
+      ],
+      "parent_id": "FR_Provence_Alpes_Cote_d_Azur",
+      "research_id": "PILOT_FR_3b45338b5a0e"
+    },
+    {
+      "member_ids": [
+        "FR_ARR_86001",
+        "FR_ARR_86003"
+      ],
+      "parent_id": "FR_Nouvelle_Aquitaine",
+      "research_id": "PILOT_FR_f20e9050362b"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B10047375179422",
+        "RU_RAY_50074027B95345501761420"
+      ],
+      "parent_id": "RU_Penza",
+      "research_id": "PILOT_RKM_6f4e568f6e32"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B10564453072266",
+        "RU_RAY_50074027B94137620198910"
+      ],
+      "parent_id": "RU_Kostroma",
+      "research_id": "PILOT_RKM_da48c3bf8744"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B11739218783380",
+        "RU_RAY_50074027B80970191706208"
+      ],
+      "parent_id": "RU_Ryazan",
+      "research_id": "PILOT_RKM_07af650e67e3"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B12197449065569",
+        "RU_RAY_50074027B42884819284567",
+        "RU_RAY_50074027B64410877276980"
+      ],
+      "parent_id": "RU_Ryazan",
+      "research_id": "PILOT_RKM_c6a75edb977c"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B1267460541966",
+        "RU_RAY_50074027B14493689316236"
+      ],
+      "parent_id": "RU_Ryazan",
+      "research_id": "PILOT_RKM_ede77577ed82"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B12959945155350",
+        "RU_RAY_50074027B23450993160232"
+      ],
+      "parent_id": "RU_Ryazan",
+      "research_id": "PILOT_RKM_29976a350316"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B13099707200338",
+        "RU_RAY_50074027B91883426895496"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_1f25465af591"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B13118277330678",
+        "RU_RAY_50074027B44553427618842",
+        "RU_RAY_50074027B51459937565873"
+      ],
+      "parent_id": "RU_Nizhny_Novgorod",
+      "research_id": "PILOT_RKM_589435fc82e3"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B13338811228915",
+        "RU_RAY_50074027B37989631797924",
+        "RU_RAY_50074027B83032590123913"
+      ],
+      "parent_id": "RU_Penza",
+      "research_id": "PILOT_RKM_2077fa915793"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B13593121580919",
+        "RU_RAY_50074027B82737074949933"
+      ],
+      "parent_id": "RU_Ivanovo",
+      "research_id": "PILOT_RKM_11a5c1ccab10"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B1369332877072",
+        "RU_RAY_50074027B45263305213778",
+        "RU_RAY_50074027B61439072113324"
+      ],
+      "parent_id": "RU_Republic_of_Mordovia",
+      "research_id": "PILOT_RKM_b8249d286f67"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B1377400485019",
+        "RU_RAY_50074027B34253954513186",
+        "RU_RAY_50074027B47826619995294"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_0d51496f1d66"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B14082807895399",
+        "RU_RAY_50074027B41459889235162",
+        "RU_RAY_50074027B76949575752311"
+      ],
+      "parent_id": "RU_Vladimir",
+      "research_id": "PILOT_RKM_426938a888d0"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B14127009644769",
+        "RU_RAY_50074027B22583264361590",
+        "RU_RAY_50074027B86116341254332"
+      ],
+      "parent_id": "RU_Novgorod",
+      "research_id": "PILOT_RKM_4c505ae3c5c0"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B14322785686831",
+        "RU_RAY_50074027B43413058399728"
+      ],
+      "parent_id": "RU_Bryansk",
+      "research_id": "PILOT_RKM_d7d6e029a8a6"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B1455636058200",
+        "RU_RAY_50074027B288807250684",
+        "RU_RAY_50074027B74072623645183"
+      ],
+      "parent_id": "RU_Novgorod",
+      "research_id": "PILOT_RKM_5b5ff24b446e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B14748896560246",
+        "RU_RAY_50074027B86751713422815"
+      ],
+      "parent_id": "RU_Smolensk",
+      "research_id": "PILOT_RKM_faa8974db521"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B15035787960404",
+        "RU_RAY_50074027B73295675051513",
+        "RU_RAY_50074027B96001263702675"
+      ],
+      "parent_id": "RU_Nizhny_Novgorod",
+      "research_id": "PILOT_RKM_eb7840f3f3a3"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B15366895729841",
+        "RU_RAY_50074027B70869052406156"
+      ],
+      "parent_id": "RU_Kostroma",
+      "research_id": "PILOT_RKM_08f3cf74c8d4"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B15483412569868",
+        "RU_RAY_50074027B17176791055739"
+      ],
+      "parent_id": "RU_Kursk",
+      "research_id": "PILOT_RKM_6d9414fe8d31"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B1576720764455",
+        "RU_RAY_50074027B49862990703614",
+        "RU_RAY_50074027B61282999994048"
+      ],
+      "parent_id": "RU_Smolensk",
+      "research_id": "PILOT_RKM_8f6bdd5cac0d"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B15931535578582",
+        "RU_RAY_50074027B8026791979770"
+      ],
+      "parent_id": "RU_Leningrad",
+      "research_id": "PILOT_RKM_09a8f838d3a8"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B16344941885909",
+        "RU_RAY_50074027B63283607391559",
+        "RU_RAY_50074027B88465469838398"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_0eb64165e94e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B16927318600651",
+        "RU_RAY_50074027B32751104355592",
+        "RU_RAY_50074027B41203602270428"
+      ],
+      "parent_id": "RU_Ulyanovsk",
+      "research_id": "PILOT_RKM_35790291b9ac"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B17004521954389",
+        "RU_RAY_50074027B39013591979664",
+        "RU_RAY_50074027B61070600907551"
+      ],
+      "parent_id": "RU_Penza",
+      "research_id": "PILOT_RKM_500e28c029dc"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B17085348963900",
+        "RU_RAY_50074027B3122922424455",
+        "RU_RAY_50074027B43964217190383"
+      ],
+      "parent_id": "RU_Saratov",
+      "research_id": "PILOT_RKM_5a979d14a516"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B17120098061813",
+        "RU_RAY_50074027B40508596999373"
+      ],
+      "parent_id": "RU_Saratov",
+      "research_id": "PILOT_RKM_3b14f115985e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B17146907475963",
+        "RU_RAY_50074027B46506051810958",
+        "RU_RAY_50074027B70457965645531"
+      ],
+      "parent_id": "RU_Kaluga",
+      "research_id": "PILOT_RKM_1c2c8f652601"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B17267835634482",
+        "RU_RAY_50074027B48935220930511"
+      ],
+      "parent_id": "RU_Voronezh",
+      "research_id": "PILOT_RKM_bb9f90c7d2ec"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B17370675709037",
+        "RU_RAY_50074027B94941713041307"
+      ],
+      "parent_id": "RU_Rostov",
+      "research_id": "PILOT_RKM_c3767ad624d5"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B17462500662414",
+        "RU_RAY_50074027B42088159596535",
+        "RU_RAY_50074027B84968233393875"
+      ],
+      "parent_id": "RU_Saratov",
+      "research_id": "PILOT_RKM_c5b1e5f711b8"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B17649118936683",
+        "RU_RAY_50074027B6006272281600"
+      ],
+      "parent_id": "RU_Bryansk",
+      "research_id": "PILOT_RKM_f58c6812fac3"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B18050530060536",
+        "RU_RAY_50074027B78363579504678"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_6db68280a664"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B18051595811170",
+        "RU_RAY_50074027B85288825972975"
+      ],
+      "parent_id": "RU_Bryansk",
+      "research_id": "PILOT_RKM_90a51c5c1d72"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B18113841305478",
+        "RU_RAY_50074027B56804226705732",
+        "RU_RAY_50074027B69883291623230"
+      ],
+      "parent_id": "RU_Smolensk",
+      "research_id": "PILOT_RKM_6f5008850b55"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B18420557368957",
+        "RU_RAY_50074027B80887817772253",
+        "RU_RAY_50074027B83953487714475"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_9d2470a6c41f"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B18815652496789",
+        "RU_RAY_50074027B28156856549850",
+        "RU_RAY_50074027B88473509358367"
+      ],
+      "parent_id": "RU_Kaluga",
+      "research_id": "PILOT_RKM_317e5dc71a52"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B18889738151841",
+        "RU_RAY_50074027B23501118343691"
+      ],
+      "parent_id": "RU_Lipetsk",
+      "research_id": "PILOT_RKM_8f3948ff0dad"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B18989205794522",
+        "RU_RAY_50074027B2543339656282",
+        "RU_RAY_50074027B74911120269056"
+      ],
+      "parent_id": "RU_Vladimir",
+      "research_id": "PILOT_RKM_79463966b17f"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B19046348458450",
+        "RU_RAY_50074027B30757720122598"
+      ],
+      "parent_id": "RU_Tambov",
+      "research_id": "PILOT_RKM_2d335b65808b"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B19794863003797",
+        "RU_RAY_50074027B57397655492572"
+      ],
+      "parent_id": "RU_Oryol",
+      "research_id": "PILOT_RKM_d3cbea851f01"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B20008990351917",
+        "RU_RAY_50074027B87044205310914"
+      ],
+      "parent_id": "RU_Kursk",
+      "research_id": "PILOT_RKM_d152c33772a2"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B20110747351222",
+        "RU_RAY_50074027B2892628221094",
+        "RU_RAY_50074027B78017463980316"
+      ],
+      "parent_id": "RU_Kaluga",
+      "research_id": "PILOT_RKM_1489da6672f4"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B20152914209721",
+        "RU_RAY_50074027B22082895013138",
+        "RU_RAY_50074027B4325562474452"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_65e408fa7cbd"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B20381279339181",
+        "RU_RAY_50074027B48107721888556",
+        "RU_RAY_50074027B54197079783848"
+      ],
+      "parent_id": "RU_Republic_of_Mordovia",
+      "research_id": "PILOT_RKM_27e7a10b2ebf"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B20588169296379",
+        "RU_RAY_50074027B72584368770024"
+      ],
+      "parent_id": "RU_Tambov",
+      "research_id": "PILOT_RKM_1c2b0d508da4"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B20832299139760",
+        "RU_RAY_50074027B89425886208612"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_957343b25bb3"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B2110229009062",
+        "RU_RAY_50074027B27817439173567"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_7f9b0094223f"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B21229273843366",
+        "RU_RAY_50074027B81611401929093"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_fefb34d1054e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B21235649033503",
+        "RU_RAY_50074027B69024023911401",
+        "RU_RAY_50074027B82098160440566"
+      ],
+      "parent_id": "RU_Vologda",
+      "research_id": "PILOT_RKM_749502ccae1f"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B22618712178528",
+        "RU_RAY_50074027B35817816722243",
+        "RU_RAY_50074027B68091690939556"
+      ],
+      "parent_id": "RU_Yaroslavl",
+      "research_id": "PILOT_RKM_ce53b6b51dd3"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B22900695292775",
+        "RU_RAY_50074027B6563040372631",
+        "RU_RAY_50074027B75586198550724"
+      ],
+      "parent_id": "RU_Nizhny_Novgorod",
+      "research_id": "PILOT_RKM_bd909d362b1d"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B23123118816327",
+        "RU_RAY_50074027B70214193667243",
+        "RU_RAY_50074027B70894779203586"
+      ],
+      "parent_id": "RU_Ivanovo",
+      "research_id": "PILOT_RKM_da4a6571366d"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B23250289134297",
+        "RU_RAY_50074027B88217560441212"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_73e43a815f32"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B23276046717969",
+        "RU_RAY_50074027B51377831861734"
+      ],
+      "parent_id": "RU_Tula",
+      "research_id": "PILOT_RKM_0da9868b0e93"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B23851869033021",
+        "RU_RAY_50074027B4836269138055"
+      ],
+      "parent_id": "RU_Kostroma",
+      "research_id": "PILOT_RKM_870c420d41ec"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B2454352114598",
+        "RU_RAY_50074027B34924268174095",
+        "RU_RAY_50074027B952471773897"
+      ],
+      "parent_id": "RU_Ryazan",
+      "research_id": "PILOT_RKM_cd82136766b1"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B24648015441",
+        "RU_RAY_50074027B25608767413280",
+        "RU_RAY_50074027B88897948274968"
+      ],
+      "parent_id": "RU_Oryol",
+      "research_id": "PILOT_RKM_beafd25fed7c"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B24884281398381",
+        "RU_RAY_50074027B65847339807164"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_38578018b8e0"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B25235389992485",
+        "RU_RAY_50074027B43424705439755",
+        "RU_RAY_50074027B83450646469259"
+      ],
+      "parent_id": "RU_Tula",
+      "research_id": "PILOT_RKM_02cc005211e0"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B25483853572662",
+        "RU_RAY_50074027B57510400521900",
+        "RU_RAY_50074027B68468594847899"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_c648536148b4"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B26085968733730",
+        "RU_RAY_50074027B41662162601550",
+        "RU_RAY_50074027B94925275747983"
+      ],
+      "parent_id": "RU_Republic_of_Mordovia",
+      "research_id": "PILOT_RKM_bc27f6d100d3"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B26116812937865",
+        "RU_RAY_50074027B42768647793562"
+      ],
+      "parent_id": "RU_Voronezh",
+      "research_id": "PILOT_RKM_ab83f9a6deec"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B26754478076862",
+        "RU_RAY_50074027B67373736543485",
+        "RU_RAY_50074027B81039118008346"
+      ],
+      "parent_id": "RU_Tambov",
+      "research_id": "PILOT_RKM_b99416f5e990"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B26881476548446",
+        "RU_RAY_50074027B39714216537329"
+      ],
+      "parent_id": "RU_Ulyanovsk",
+      "research_id": "PILOT_RKM_6db29054bb7e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B27503140764450",
+        "RU_RAY_50074027B91331971685203"
+      ],
+      "parent_id": "RU_Kaluga",
+      "research_id": "PILOT_RKM_042a39c7d2e1"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B28094875464545",
+        "RU_RAY_50074027B40609517499429"
+      ],
+      "parent_id": "RU_Rostov",
+      "research_id": "PILOT_RKM_a65ffd2f96b3"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B29015555579536",
+        "RU_RAY_50074027B74590888277886"
+      ],
+      "parent_id": "RU_Ryazan",
+      "research_id": "PILOT_RKM_9afe3406a0c5"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B29065403831186",
+        "RU_RAY_50074027B56817088939843",
+        "RU_RAY_50074027B73132462922089"
+      ],
+      "parent_id": "RU_Leningrad",
+      "research_id": "PILOT_RKM_1ef1caa8bbca"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B29077199453439",
+        "RU_RAY_50074027B86610415322123"
+      ],
+      "parent_id": "RU_Voronezh",
+      "research_id": "PILOT_RKM_ce0bf082f5dd"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B29124350884657",
+        "RU_RAY_50074027B35857604801459",
+        "RU_RAY_50074027B67433895500830"
+      ],
+      "parent_id": "RU_Ivanovo",
+      "research_id": "PILOT_RKM_ede5bbd4929c"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B29140399551672",
+        "RU_RAY_50074027B61635819691965",
+        "RU_RAY_50074027B63365100968819"
+      ],
+      "parent_id": "RU_Saratov",
+      "research_id": "PILOT_RKM_ff37942effa2"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B30033426196700",
+        "RU_RAY_50074027B54625123209820",
+        "RU_RAY_50074027B64424707524567"
+      ],
+      "parent_id": "RU_Smolensk",
+      "research_id": "PILOT_RKM_ca3cb6449479"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B30225382519639",
+        "RU_RAY_50074027B50863792176748"
+      ],
+      "parent_id": "RU_Kostroma",
+      "research_id": "PILOT_RKM_ad217ba6a018"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B30425971595491",
+        "RU_RAY_50074027B49589303292329",
+        "RU_RAY_50074027B78770724987560"
+      ],
+      "parent_id": "RU_Volgograd",
+      "research_id": "PILOT_RKM_d88acbf5ab6b"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B30677500922853",
+        "RU_RAY_50074027B83227700733720"
+      ],
+      "parent_id": "RU_Novgorod",
+      "research_id": "PILOT_RKM_8cbf429080b8"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B30734657532987",
+        "RU_RAY_50074027B43985127135500",
+        "RU_RAY_50074027B56228072351606"
+      ],
+      "parent_id": "RU_Volgograd",
+      "research_id": "PILOT_RKM_63de7945bcd9"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B30791393709139",
+        "RU_RAY_50074027B6225554740",
+        "RU_RAY_50074027B84991914011553"
+      ],
+      "parent_id": "RU_Ulyanovsk",
+      "research_id": "PILOT_RKM_af4bbc4b108c"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B31656643140728",
+        "RU_RAY_50074027B71616252647937"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_18c223d8bb40"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B32900327411316",
+        "RU_RAY_50074027B33643069420630",
+        "RU_RAY_50074027B92054036106311"
+      ],
+      "parent_id": "RU_Lipetsk",
+      "research_id": "PILOT_RKM_8b895f65c092"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B32921543768208",
+        "RU_RAY_50074027B5930376026307"
+      ],
+      "parent_id": "RU_Oryol",
+      "research_id": "PILOT_RKM_3011ba21d270"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B33430522439153",
+        "RU_RAY_50074027B74191443200882",
+        "RU_RAY_50074027B80360504553287"
+      ],
+      "parent_id": "RU_Penza",
+      "research_id": "PILOT_RKM_7d17df1e9761"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B33955098057066",
+        "RU_RAY_50074027B59373964913994",
+        "RU_RAY_50074027B92332534245428"
+      ],
+      "parent_id": "RU_Penza",
+      "research_id": "PILOT_RKM_f23f1582d52e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B34201544951901",
+        "RU_RAY_50074027B38418473006455",
+        "RU_RAY_50074027B8228357618159"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_92f27b4d03b8"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B34532862724666",
+        "RU_RAY_50074027B51076628931359",
+        "RU_RAY_50074027B93968807426390"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_4ae814361187"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B34646981134025",
+        "RU_RAY_50074027B65240404072853"
+      ],
+      "parent_id": "RU_Kaluga",
+      "research_id": "PILOT_RKM_957108badf27"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B34939639698741",
+        "RU_RAY_50074027B98842183632399"
+      ],
+      "parent_id": "RU_Saratov",
+      "research_id": "PILOT_RKM_41c393264d51"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B35076866768597",
+        "RU_RAY_50074027B4750302119031",
+        "RU_RAY_50074027B85698147130580"
+      ],
+      "parent_id": "RU_Oryol",
+      "research_id": "PILOT_RKM_b2628c7081a7"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B36141655472455",
+        "RU_RAY_50074027B70945075501675"
+      ],
+      "parent_id": "RU_Voronezh",
+      "research_id": "PILOT_RKM_da6008c31e9c"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B3638705238012",
+        "RU_RAY_50074027B97238953837028"
+      ],
+      "parent_id": "RU_Pskov",
+      "research_id": "PILOT_RKM_0c8f1c098516"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B36797886891217",
+        "RU_RAY_50074027B95250955348263"
+      ],
+      "parent_id": "RU_Oryol",
+      "research_id": "PILOT_RKM_2ea102a42dd6"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B3691210145247",
+        "RU_RAY_50074027B88958089507858"
+      ],
+      "parent_id": "RU_Volgograd",
+      "research_id": "PILOT_RKM_11d3c8c39a4d"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B3712621076023",
+        "RU_RAY_50074027B81825421899732"
+      ],
+      "parent_id": "RU_Tula",
+      "research_id": "PILOT_RKM_fd88f2cc3730"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B37288894870067",
+        "RU_RAY_50074027B73776930226055",
+        "RU_RAY_50074027B83580242970033"
+      ],
+      "parent_id": "RU_Kostroma",
+      "research_id": "PILOT_RKM_27f2cef6de71"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B37485482167842",
+        "RU_RAY_50074027B59380103658968"
+      ],
+      "parent_id": "RU_Nizhny_Novgorod",
+      "research_id": "PILOT_RKM_7950721d0071"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B3790619846909",
+        "RU_RAY_50074027B90540436425293"
+      ],
+      "parent_id": "RU_Yaroslavl",
+      "research_id": "PILOT_RKM_fe6af919371b"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B38387906709835",
+        "RU_RAY_50074027B50723374068736"
+      ],
+      "parent_id": "RU_Yaroslavl",
+      "research_id": "PILOT_RKM_ca52fb973f2d"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B38429551881690",
+        "RU_RAY_50074027B81264038936345"
+      ],
+      "parent_id": "RU_Saratov",
+      "research_id": "PILOT_RKM_62126d5cb1b6"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B39379754001306",
+        "RU_RAY_50074027B406681110073",
+        "RU_RAY_50074027B50010682267438"
+      ],
+      "parent_id": "RU_Lipetsk",
+      "research_id": "PILOT_RKM_fcf124c49c78"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B40241966667878",
+        "RU_RAY_50074027B69061888979402"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_6b5b004ff4d1"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B40605874483535",
+        "RU_RAY_50074027B7029470838345",
+        "RU_RAY_50074027B93829822833305"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_3365511ba40e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B40734262020014",
+        "RU_RAY_50074027B66263808531670",
+        "RU_RAY_50074027B81093411628760"
+      ],
+      "parent_id": "RU_Ivanovo",
+      "research_id": "PILOT_RKM_ca30e4aefc5e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B41611232560877",
+        "RU_RAY_50074027B71880735316962",
+        "RU_RAY_50074027B75668260238350"
+      ],
+      "parent_id": "RU_Oryol",
+      "research_id": "PILOT_RKM_62282414973a"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B41990649279119",
+        "RU_RAY_50074027B64963077612696",
+        "RU_RAY_50074027B76241451442662"
+      ],
+      "parent_id": "RU_Novgorod",
+      "research_id": "PILOT_RKM_d9d95c58a7b9"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B42465403886102",
+        "RU_RAY_50074027B78120049658984",
+        "RU_RAY_50074027B8686405046800"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_9e44f88c7567"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B42576603860104",
+        "RU_RAY_50074027B52619887233676",
+        "RU_RAY_50074027B96977469246759"
+      ],
+      "parent_id": "RU_Oryol",
+      "research_id": "PILOT_RKM_33db48a35136"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B44140984881832",
+        "RU_RAY_50074027B97620600227870"
+      ],
+      "parent_id": "RU_Voronezh",
+      "research_id": "PILOT_RKM_533492f30e39"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B44809995530073",
+        "RU_RAY_50074027B57654378646001"
+      ],
+      "parent_id": "RU_Smolensk",
+      "research_id": "PILOT_RKM_178423b13fef"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B45265467842416",
+        "RU_RAY_50074027B81665578369848"
+      ],
+      "parent_id": "RU_Vladimir",
+      "research_id": "PILOT_RKM_9b339ed9fae3"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B45623068595544",
+        "RU_RAY_50074027B76820364018998",
+        "RU_RAY_50074027B82911601424103"
+      ],
+      "parent_id": "RU_Voronezh",
+      "research_id": "PILOT_RKM_08c21e3a387e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B45789522772838",
+        "RU_RAY_50074027B6888827238248",
+        "RU_RAY_50074027B80985405095550"
+      ],
+      "parent_id": "RU_Nizhny_Novgorod",
+      "research_id": "PILOT_RKM_a03c57626c9a"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B45865503319449",
+        "RU_RAY_50074027B93528412842449"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_58e17cbca870"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B46410454933627",
+        "RU_RAY_50074027B63247354154361",
+        "RU_RAY_50074027B69297352683544"
+      ],
+      "parent_id": "RU_Tambov",
+      "research_id": "PILOT_RKM_7c0e98769a25"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B46949418764648",
+        "RU_RAY_50074027B85792653210823"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_163c24ae38b6"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B47044475011866",
+        "RU_RAY_50074027B90519354478842"
+      ],
+      "parent_id": "RU_Bryansk",
+      "research_id": "PILOT_RKM_4aafa8bb7311"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B47205761512659",
+        "RU_RAY_50074027B9877275388102"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_261f48b4231f"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B48186281489768",
+        "RU_RAY_50074027B52176996438245",
+        "RU_RAY_50074027B65038390852667"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_0c24860088d2"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B48378771916611",
+        "RU_RAY_50074027B5206924624978",
+        "RU_RAY_50074027B63773787473749"
+      ],
+      "parent_id": "RU_Smolensk",
+      "research_id": "PILOT_RKM_e7ee722dd6e2"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B48616413135567",
+        "RU_RAY_50074027B91350281968565"
+      ],
+      "parent_id": "RU_Ulyanovsk",
+      "research_id": "PILOT_RKM_40950aebc7b1"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B48702169720764",
+        "RU_RAY_50074027B64101804823838"
+      ],
+      "parent_id": "RU_Novgorod",
+      "research_id": "PILOT_RKM_842eb9c086a0"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B48803928009277",
+        "RU_RAY_50074027B52521252875752"
+      ],
+      "parent_id": "RU_Volgograd",
+      "research_id": "PILOT_RKM_ea335409cc10"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B50990181265443",
+        "RU_RAY_50074027B85222820836528",
+        "RU_RAY_50074027B96829973998974"
+      ],
+      "parent_id": "RU_Volgograd",
+      "research_id": "PILOT_RKM_ee04941a4ba1"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B51743204091789",
+        "RU_RAY_50074027B54359744091565"
+      ],
+      "parent_id": "RU_Bryansk",
+      "research_id": "PILOT_RKM_5633c7153fb7"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B5200893795069",
+        "RU_RAY_50074027B82170692527887"
+      ],
+      "parent_id": "RU_Tula",
+      "research_id": "PILOT_RKM_0c04a20c153d"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B52849645773608",
+        "RU_RAY_50074027B74267439483107"
+      ],
+      "parent_id": "RU_Voronezh",
+      "research_id": "PILOT_RKM_67af93802c9c"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B53096131610196",
+        "RU_RAY_50074027B57730030228269"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_3d86e6b9a70d"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B53513829509946",
+        "RU_RAY_50074027B56135401776723"
+      ],
+      "parent_id": "RU_Bryansk",
+      "research_id": "PILOT_RKM_2ac66cdc6700"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B53551011789267",
+        "RU_RAY_50074027B6413114687626"
+      ],
+      "parent_id": "RU_Moscow",
+      "research_id": "PILOT_RKM_bc3ec3c7ab49"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B54399908520525",
+        "RU_RAY_50074027B62337632468938",
+        "RU_RAY_50074027B85998410999634"
+      ],
+      "parent_id": "RU_Ryazan",
+      "research_id": "PILOT_RKM_96b79b76de83"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B5463501652966",
+        "RU_RAY_50074027B64235660199713"
+      ],
+      "parent_id": "RU_Republic_of_Mordovia",
+      "research_id": "PILOT_RKM_19c364303e61"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B55061952513406",
+        "RU_RAY_50074027B583940631310",
+        "RU_RAY_50074027B96199792850147"
+      ],
+      "parent_id": "RU_Ivanovo",
+      "research_id": "PILOT_RKM_dbdb96e751ca"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B55232682824043",
+        "RU_RAY_50074027B96946895822668",
+        "RU_RAY_50074027B97646617766813"
+      ],
+      "parent_id": "RU_Lipetsk",
+      "research_id": "PILOT_RKM_96bed1c3d9ac"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B55465693339267",
+        "RU_RAY_50074027B60205066083435",
+        "RU_RAY_50074027B97827439207559"
+      ],
+      "parent_id": "RU_Volgograd",
+      "research_id": "PILOT_RKM_41c67562114d"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B55518064379024",
+        "RU_RAY_50074027B85740995014634",
+        "RU_RAY_50074027B91579670484508"
+      ],
+      "parent_id": "RU_Penza",
+      "research_id": "PILOT_RKM_984bbbafa7c9"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B55766532929568",
+        "RU_RAY_50074027B96436280638251",
+        "RU_RAY_50074027B97726544276204"
+      ],
+      "parent_id": "RU_Tula",
+      "research_id": "PILOT_RKM_fec6571c1a3a"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B57466691773091",
+        "RU_RAY_50074027B74756274305659",
+        "RU_RAY_50074027B77063582616712"
+      ],
+      "parent_id": "RU_Voronezh",
+      "research_id": "PILOT_RKM_69952f1505b5"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B57510051325718",
+        "RU_RAY_50074027B59012002161228",
+        "RU_RAY_50074027B73987381767955"
+      ],
+      "parent_id": "RU_Ryazan",
+      "research_id": "PILOT_RKM_2f11afb4a0dd"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B57701505702472",
+        "RU_RAY_50074027B88649718835128"
+      ],
+      "parent_id": "RU_Tambov",
+      "research_id": "PILOT_RKM_6c37953cc3d1"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B59410881738957",
+        "RU_RAY_50074027B59433529885901",
+        "RU_RAY_50074027B87454276613950"
+      ],
+      "parent_id": "RU_Tula",
+      "research_id": "PILOT_RKM_2c753edf3b4c"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B59916875948138",
+        "RU_RAY_50074027B67414101470814",
+        "RU_RAY_50074027B9330372411827"
+      ],
+      "parent_id": "RU_Bryansk",
+      "research_id": "PILOT_RKM_ff7ab94497eb"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B60097792769672",
+        "RU_RAY_50074027B68742604318629"
+      ],
+      "parent_id": "RU_Volgograd",
+      "research_id": "PILOT_RKM_d3dbbb187c82"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B62097006871085",
+        "RU_RAY_50074027B66142781124541"
+      ],
+      "parent_id": "RU_Vladimir",
+      "research_id": "PILOT_RKM_421730dcab2e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B62532131027212",
+        "RU_RAY_50074027B69421313663929",
+        "RU_RAY_50074027B72625958167548"
+      ],
+      "parent_id": "RU_Kaluga",
+      "research_id": "PILOT_RKM_e2e56a57925c"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B63245115489451",
+        "RU_RAY_50074027B71432098829169"
+      ],
+      "parent_id": "RU_Tambov",
+      "research_id": "PILOT_RKM_eac8a73dc555"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B63852169258250",
+        "RU_RAY_50074027B75401126842300",
+        "RU_RAY_50074027B92950284592103"
+      ],
+      "parent_id": "RU_Vladimir",
+      "research_id": "PILOT_RKM_d5900d18600d"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B65356127838974",
+        "RU_RAY_50074027B65758721423350",
+        "RU_RAY_50074027B97557760790791"
+      ],
+      "parent_id": "RU_Saratov",
+      "research_id": "PILOT_RKM_b12280663a23"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B65877189026029",
+        "RU_RAY_50074027B78405683001719",
+        "RU_RAY_50074027B97366472220000"
+      ],
+      "parent_id": "RU_Voronezh",
+      "research_id": "PILOT_RKM_ef5a1bfa39b0"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B663818596015",
+        "RU_RAY_50074027B91908607754232"
+      ],
+      "parent_id": "RU_Ivanovo",
+      "research_id": "PILOT_RKM_f0226c1a1f3e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B66704601514509",
+        "RU_RAY_50074027B80385124466315"
+      ],
+      "parent_id": "RU_Yaroslavl",
+      "research_id": "PILOT_RKM_ea3e8b886c50"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B67711550367692",
+        "RU_RAY_50074027B86327538271047",
+        "RU_RAY_50074027B93750651156452"
+      ],
+      "parent_id": "RU_Lipetsk",
+      "research_id": "PILOT_RKM_0e1f9be034c3"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B68079497432246",
+        "RU_RAY_50074027B7226310490059",
+        "RU_RAY_50074027B82305080344018"
+      ],
+      "parent_id": "RU_Republic_of_Mordovia",
+      "research_id": "PILOT_RKM_57f2d9226e57"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B69119196585413",
+        "RU_RAY_50074027B91751745286968"
+      ],
+      "parent_id": "RU_Yaroslavl",
+      "research_id": "PILOT_RKM_36823703fe6f"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B70316841618042",
+        "RU_RAY_50074027B80661595039357"
+      ],
+      "parent_id": "RU_Tula",
+      "research_id": "PILOT_RKM_ab9c757ad36e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B70638917680756",
+        "RU_RAY_50074027B73215865605150"
+      ],
+      "parent_id": "RU_Tambov",
+      "research_id": "PILOT_RKM_aab057049421"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B72401708546708",
+        "RU_RAY_50074027B93588140268289"
+      ],
+      "parent_id": "RU_Yaroslavl",
+      "research_id": "PILOT_RKM_6cb207076d0d"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B73384356253915",
+        "RU_RAY_50074027B99360860809249"
+      ],
+      "parent_id": "RU_Voronezh",
+      "research_id": "PILOT_RKM_ee38d8ad0881"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B74380853885106",
+        "RU_RAY_50074027B98929721511190",
+        "RU_RAY_50074027B99990943382139"
+      ],
+      "parent_id": "RU_Rostov",
+      "research_id": "PILOT_RKM_d98ea22eab7f"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B74954429375583",
+        "RU_RAY_50074027B76460702893183"
+      ],
+      "parent_id": "RU_Novgorod",
+      "research_id": "PILOT_RKM_32a8f91930c8"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B75775497066849",
+        "RU_RAY_50074027B90170074824117",
+        "RU_RAY_50074027B93187461966352"
+      ],
+      "parent_id": "RU_Nizhny_Novgorod",
+      "research_id": "PILOT_RKM_428f68bbcb13"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B75950164154064",
+        "RU_RAY_50074027B83204669366012"
+      ],
+      "parent_id": "RU_Rostov",
+      "research_id": "PILOT_RKM_67444a596af2"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B79232491116527",
+        "RU_RAY_50074027B80712703380192"
+      ],
+      "parent_id": "RU_Kaluga",
+      "research_id": "PILOT_RKM_be8243a3f223"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B80052568352424",
+        "RU_RAY_50074027B81777921408308",
+        "RU_RAY_50074027B97565558072550"
+      ],
+      "parent_id": "RU_Tula",
+      "research_id": "PILOT_RKM_5401342fcd9e"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B82235438820873",
+        "RU_RAY_50074027B92335046217720",
+        "RU_RAY_50074027B97903584501374"
+      ],
+      "parent_id": "RU_Kaluga",
+      "research_id": "PILOT_RKM_f996075167d4"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B8395031141899",
+        "RU_RAY_50074027B91001506415746"
+      ],
+      "parent_id": "RU_Yaroslavl",
+      "research_id": "PILOT_RKM_70799a92a3e2"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B84921708867300",
+        "RU_RAY_50074027B98063999610594"
+      ],
+      "parent_id": "RU_Oryol",
+      "research_id": "PILOT_RKM_6b92deb4a602"
+    },
+    {
+      "member_ids": [
+        "RU_RAY_50074027B9131015079757",
+        "RU_RAY_50074027B92690998673598"
+      ],
+      "parent_id": "RU_Tver",
+      "research_id": "PILOT_RKM_201a63038c66"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B10558448482031",
+        "UA_RAY_74538382B57736951089932",
+        "UA_RAY_74538382B76878796003824"
+      ],
+      "parent_id": "UA_Zaporizhzhia",
+      "research_id": "RESEARCH_UA_e09d9504a039"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B10652079074389",
+        "UA_RAY_74538382B28496412060318",
+        "UA_RAY_74538382B40671988393633"
+      ],
+      "parent_id": "UA_Cherkasy",
+      "research_id": "RESEARCH_UA_833843eed250"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B11416649963923",
+        "UA_RAY_74538382B77501055867639",
+        "UA_RAY_74538382B91941622572963"
+      ],
+      "parent_id": "UA_Cherkasy",
+      "research_id": "RESEARCH_UA_4bb5c6cd4e84"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B1179884845086",
+        "UA_RAY_74538382B48774443336138",
+        "UA_RAY_74538382B92549368661816"
+      ],
+      "parent_id": "UA_Dnipropetrovsk",
+      "research_id": "RESEARCH_UA_18ea64e6d009"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B12367365780771",
+        "UA_RAY_74538382B54532398243130",
+        "UA_RAY_74538382B82178564879136"
+      ],
+      "parent_id": "UA_Cherkasy",
+      "research_id": "RESEARCH_UA_0aed65939657"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B1350322387743",
+        "UA_RAY_74538382B53393246886202",
+        "UA_RAY_74538382B91945064938376"
+      ],
+      "parent_id": "UA_Rivne",
+      "research_id": "RESEARCH_UA_701ce0c5be34"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B13527376036469",
+        "UA_RAY_74538382B2478883224653",
+        "UA_RAY_74538382B6439769638360"
+      ],
+      "parent_id": "UA_Kharkiv",
+      "research_id": "RESEARCH_UA_4105dc18aea7"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B13823475744665",
+        "UA_RAY_74538382B30318275969007",
+        "UA_RAY_74538382B91884310989160"
+      ],
+      "parent_id": "UA_Donetsk",
+      "research_id": "RESEARCH_UA_b4af36f39f32"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B14537158586651",
+        "UA_RAY_74538382B59692398614753"
+      ],
+      "parent_id": "UA_Mykolaiv",
+      "research_id": "RESEARCH_UA_4cab1ffa9742"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B150351319009",
+        "UA_RAY_74538382B7695117672354",
+        "UA_RAY_74538382B98857993780727"
+      ],
+      "parent_id": "UA_Kharkiv",
+      "research_id": "RESEARCH_UA_c7b5dff9e41a"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B15303326410198",
+        "UA_RAY_74538382B15383579018603",
+        "UA_RAY_74538382B92678915216320"
+      ],
+      "parent_id": "UA_Poltava",
+      "research_id": "RESEARCH_UA_7114dd1c0d60"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B15610245236220",
+        "UA_RAY_74538382B31027470477493",
+        "UA_RAY_74538382B8134714446697"
+      ],
+      "parent_id": "UA_Kharkiv",
+      "research_id": "RESEARCH_UA_9c2d59831ed5"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B15723930579981",
+        "UA_RAY_74538382B18710182758525",
+        "UA_RAY_74538382B69774355156403"
+      ],
+      "parent_id": "UA_Mykolaiv",
+      "research_id": "RESEARCH_UA_63d8743c9ea1"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B16214498015051",
+        "UA_RAY_74538382B22204754731181",
+        "UA_RAY_74538382B74226948291525"
+      ],
+      "parent_id": "UA_Kyiv",
+      "research_id": "RESEARCH_UA_3dfeb7a1982f"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B17419757649625",
+        "UA_RAY_74538382B34512881177192",
+        "UA_RAY_74538382B43652074637145"
+      ],
+      "parent_id": "UA_Kyiv",
+      "research_id": "RESEARCH_UA_c9fdc4b0c0e1"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B17839198127311",
+        "UA_RAY_74538382B99908513430661"
+      ],
+      "parent_id": "UA_Donetsk",
+      "research_id": "RESEARCH_UA_16225508a1ae"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B18579699267219",
+        "UA_RAY_74538382B21323031073558",
+        "UA_RAY_74538382B88288170046577"
+      ],
+      "parent_id": "UA_Kharkiv",
+      "research_id": "RESEARCH_UA_8bfe48221f2d"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B19382473130603",
+        "UA_RAY_74538382B2803467564734",
+        "UA_RAY_74538382B29130308321511"
+      ],
+      "parent_id": "UA_Kharkiv",
+      "research_id": "RESEARCH_UA_deb5941c2448"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B19576586324749",
+        "UA_RAY_74538382B68321020452379",
+        "UA_RAY_74538382B82550284733464"
+      ],
+      "parent_id": "UA_Ivano_Frankivsk",
+      "research_id": "RESEARCH_UA_b18232f809b0"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B19842336540914",
+        "UA_RAY_74538382B24070697851653",
+        "UA_RAY_74538382B94134496915826"
+      ],
+      "parent_id": "UA_Donetsk",
+      "research_id": "RESEARCH_UA_4ae8fc617a16"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B20601682218189",
+        "UA_RAY_74538382B23206158813586",
+        "UA_RAY_74538382B29845079622826"
+      ],
+      "parent_id": "UA_Sumy",
+      "research_id": "RESEARCH_UA_494d9d19c1e6"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B21342332427534",
+        "UA_RAY_74538382B88986400051477"
+      ],
+      "parent_id": "UA_Odessa",
+      "research_id": "RESEARCH_UA_0e760d87e123"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B21914315222818",
+        "UA_RAY_74538382B92973355473211"
+      ],
+      "parent_id": "UA_Dnipropetrovsk",
+      "research_id": "RESEARCH_UA_caa99236184b"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B22320856317626",
+        "UA_RAY_74538382B27163197759285",
+        "UA_RAY_74538382B62397743463351"
+      ],
+      "parent_id": "UA_Volyn",
+      "research_id": "RESEARCH_UA_757f4e58920f"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B22435039987726",
+        "UA_RAY_74538382B64867960998855",
+        "UA_RAY_74538382B66083941235299"
+      ],
+      "parent_id": "UA_Chernihiv",
+      "research_id": "RESEARCH_UA_a22f71c369ea"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B22798691386848",
+        "UA_RAY_74538382B617661136852",
+        "UA_RAY_74538382B88503218872177"
+      ],
+      "parent_id": "UA_Kyiv",
+      "research_id": "RESEARCH_UA_f0a56eff278c"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B24094017923435",
+        "UA_RAY_74538382B57516616644069"
+      ],
+      "parent_id": "UA_Cherkasy",
+      "research_id": "RESEARCH_UA_fb38a836fde5"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B24249088550475",
+        "UA_RAY_74538382B39868472225272"
+      ],
+      "parent_id": "UA_Khmelnytskyi",
+      "research_id": "RESEARCH_UA_9fff825cc9f0"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B24886275593146",
+        "UA_RAY_74538382B46794704390703",
+        "UA_RAY_74538382B73482868346165"
+      ],
+      "parent_id": "UA_Lviv",
+      "research_id": "RESEARCH_UA_a0cb7c64cb13"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B27097146636711",
+        "UA_RAY_74538382B58827440346499",
+        "UA_RAY_74538382B89589789730679"
+      ],
+      "parent_id": "UA_Lviv",
+      "research_id": "RESEARCH_UA_6cf5dca28bc5"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B2815970127948",
+        "UA_RAY_74538382B49232640151190",
+        "UA_RAY_74538382B73193392833506"
+      ],
+      "parent_id": "UA_Chernihiv",
+      "research_id": "RESEARCH_UA_d394075a386f"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B29387965575909",
+        "UA_RAY_74538382B59597845190856",
+        "UA_RAY_74538382B62400854629938"
+      ],
+      "parent_id": "UA_Sumy",
+      "research_id": "RESEARCH_UA_e29d0a2c9255"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B29888444022224",
+        "UA_RAY_74538382B30589256184120",
+        "UA_RAY_74538382B79754688878625"
+      ],
+      "parent_id": "UA_Mykolaiv",
+      "research_id": "RESEARCH_UA_047c5e8e1bfb"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B30291492588031",
+        "UA_RAY_74538382B69145371014174",
+        "UA_RAY_74538382B7651650713813"
+      ],
+      "parent_id": "UA_Zaporizhzhia",
+      "research_id": "RESEARCH_UA_7f55f14461e5"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B3065549299103",
+        "UA_RAY_74538382B32054609841265",
+        "UA_RAY_74538382B46145703776809"
+      ],
+      "parent_id": "UA_Zakarpattia",
+      "research_id": "RESEARCH_UA_1ab75fca0397"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B30714686760712",
+        "UA_RAY_74538382B52479778935773",
+        "UA_RAY_74538382B73890092439247"
+      ],
+      "parent_id": "UA_Zaporizhzhia",
+      "research_id": "RESEARCH_UA_47bd37ba3938"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B32195622732164",
+        "UA_RAY_74538382B81311905240304"
+      ],
+      "parent_id": "UA_Kharkiv",
+      "research_id": "RESEARCH_UA_5e47af0a4b40"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B32904543558628",
+        "UA_RAY_74538382B62641944087949",
+        "UA_RAY_74538382B88063181617759"
+      ],
+      "parent_id": "UA_Dnipropetrovsk",
+      "research_id": "RESEARCH_UA_9cf3682e7019"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B3314448443504",
+        "UA_RAY_74538382B79382588901711",
+        "UA_RAY_74538382B83069910659837"
+      ],
+      "parent_id": "UA_Zaporizhzhia",
+      "research_id": "RESEARCH_UA_e24c4f9dfade"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B35138885386576",
+        "UA_RAY_74538382B39903021428362",
+        "UA_RAY_74538382B4772976790762"
+      ],
+      "parent_id": "UA_Luhansk",
+      "research_id": "RESEARCH_UA_de253613e676"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B36449186606554",
+        "UA_RAY_74538382B47304203822520",
+        "UA_RAY_74538382B65826514960499"
+      ],
+      "parent_id": "UA_Khmelnytskyi",
+      "research_id": "RESEARCH_UA_76c73dcab53f"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B36516129113863",
+        "UA_RAY_74538382B51921119694159",
+        "UA_RAY_74538382B60114922915625"
+      ],
+      "parent_id": "UA_Chernihiv",
+      "research_id": "RESEARCH_UA_d78b86fb0a04"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B37624707153101",
+        "UA_RAY_74538382B61184512329122",
+        "UA_RAY_74538382B76274417735531"
+      ],
+      "parent_id": "UA_Kyiv",
+      "research_id": "RESEARCH_UA_d85ec1316c84"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B39145583667330",
+        "UA_RAY_74538382B8424812087391",
+        "UA_RAY_74538382B84492064754997"
+      ],
+      "parent_id": "UA_Mykolaiv",
+      "research_id": "RESEARCH_UA_6fa958443e1a"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B39410931329464",
+        "UA_RAY_74538382B50995532185808",
+        "UA_RAY_74538382B88565682266832"
+      ],
+      "parent_id": "UA_Volyn",
+      "research_id": "RESEARCH_UA_eb80dddb22b3"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B39705713449097",
+        "UA_RAY_74538382B74898399385279"
+      ],
+      "parent_id": "UA_Cherkasy",
+      "research_id": "RESEARCH_UA_75f5523e0320"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B42037419255148",
+        "UA_RAY_74538382B5882796525163"
+      ],
+      "parent_id": "UA_Rivne",
+      "research_id": "RESEARCH_UA_b90dce01dffa"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B42349939916707",
+        "UA_RAY_74538382B5074223078849",
+        "UA_RAY_74538382B69457923953865"
+      ],
+      "parent_id": "UA_Dnipropetrovsk",
+      "research_id": "RESEARCH_UA_ce7b6c073378"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B47612746607547",
+        "UA_RAY_74538382B7147656565480"
+      ],
+      "parent_id": "UA_Kyiv",
+      "research_id": "RESEARCH_UA_50737dd74f8a"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B47912633354712",
+        "UA_RAY_74538382B66940770579939",
+        "UA_RAY_74538382B9912324904593"
+      ],
+      "parent_id": "UA_Zaporizhzhia",
+      "research_id": "RESEARCH_UA_de9763cadac3"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B48526487653487",
+        "UA_RAY_74538382B93071120022649"
+      ],
+      "parent_id": "UA_Dnipropetrovsk",
+      "research_id": "RESEARCH_UA_e0d43e0e8047"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B48627824985747",
+        "UA_RAY_74538382B5461763089897",
+        "UA_RAY_74538382B7503756017754"
+      ],
+      "parent_id": "UA_Khmelnytskyi",
+      "research_id": "RESEARCH_UA_6de011500bbd"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B49196130715862",
+        "UA_RAY_74538382B71617713265509",
+        "UA_RAY_74538382B92053116813832"
+      ],
+      "parent_id": "UA_Ternopil",
+      "research_id": "RESEARCH_UA_aaa50224ced4"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B50409761093729",
+        "UA_RAY_74538382B64363500151928",
+        "UA_RAY_74538382B78856367012354"
+      ],
+      "parent_id": "UA_Odessa",
+      "research_id": "RESEARCH_UA_d5f7b9af7af1"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B52051409545176",
+        "UA_RAY_74538382B56857399435570"
+      ],
+      "parent_id": "UA_Kharkiv",
+      "research_id": "RESEARCH_UA_92b5c363ae78"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B5205170334636",
+        "UA_RAY_74538382B56097972279611",
+        "UA_RAY_74538382B70043309892570"
+      ],
+      "parent_id": "UA_Ternopil",
+      "research_id": "RESEARCH_UA_e95f619270ae"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B53480442802738",
+        "UA_RAY_74538382B54341051528669",
+        "UA_RAY_74538382B98672866452807"
+      ],
+      "parent_id": "UA_Chernihiv",
+      "research_id": "RESEARCH_UA_d58f016ed099"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B5599119898653",
+        "UA_RAY_74538382B71954626153569"
+      ],
+      "parent_id": "UA_Dnipropetrovsk",
+      "research_id": "RESEARCH_UA_0fe178df8e26"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B60331079617508",
+        "UA_RAY_74538382B68405573431293"
+      ],
+      "parent_id": "UA_Sumy",
+      "research_id": "RESEARCH_UA_807aac2d575f"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B62388892645700",
+        "UA_RAY_74538382B83638043560631"
+      ],
+      "parent_id": "UA_Cherkasy",
+      "research_id": "RESEARCH_UA_0b50977e9444"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B64368506092138",
+        "UA_RAY_74538382B64717019630205"
+      ],
+      "parent_id": "UA_Luhansk",
+      "research_id": "RESEARCH_UA_7ce5b325418a"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B66487059537692",
+        "UA_RAY_74538382B93599873315599"
+      ],
+      "parent_id": "UA_Kyiv",
+      "research_id": "RESEARCH_UA_2574b6973cbc"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B67308569242211",
+        "UA_RAY_74538382B8481477190191",
+        "UA_RAY_74538382B97447105405204"
+      ],
+      "parent_id": "UA_Kirovohrad",
+      "research_id": "RESEARCH_UA_7004e8a21a15"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B79532442350116",
+        "UA_RAY_74538382B90390774066886"
+      ],
+      "parent_id": "UA_Chernihiv",
+      "research_id": "RESEARCH_UA_9a834f84afce"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B86638641463315",
+        "UA_RAY_74538382B98424349787745"
+      ],
+      "parent_id": "UA_Khmelnytskyi",
+      "research_id": "RESEARCH_UA_752650f4f8f6"
+    },
+    {
+      "member_ids": [
+        "UA_RAY_74538382B88874986196834",
+        "UA_RAY_74538382B92026031653361"
+      ],
+      "parent_id": "UA_Ivano_Frankivsk",
+      "research_id": "RESEARCH_UA_cefb4691d50b"
+    }
+  ]
+}

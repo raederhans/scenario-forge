@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "dataset": {
+    "id": "hgo-1936",
+    "revision": "453de59d3dce29d2c3ea3387d573953a85ae4e1e3cd320afb61d60783f933e23"
+  },
+  "native": {
+    "width": 5120,
+    "height": 2560
+  },
+  "world": {
+    "src": "./assets/hgo-world.webp",
+    "width": 2560,
+    "height": 1280
+  },
+  "detail": {
+    "src": "./assets/hgo-europe.webp",
+    "x": 2400,
+    "y": 420,
+    "width": 1040,
+    "height": 650
+  },
+  "focus": {
+    "x": 2838,
+    "y": 688
+  },
+  "counts": {
+    "states": 11894,
+    "water_states": 924,
+    "provinces": 20782
+  }
+}

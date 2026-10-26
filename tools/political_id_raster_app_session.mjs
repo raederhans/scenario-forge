@@ -37,6 +37,61 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
       // Faults exist only in this isolated test context; production deadlines
       // and recovery policy remain untouched.
       window.__rasterAssetFaults = { active: holdRasterAssets && sessionStorage.getItem('raster-release-faults-complete') !== '1', recoveryTimeouts: 0, intercepted: 0, aborted: 0 };
+      if (!window.__rasterAssetFaults.active) return;
+      // Covered Worker output is persisted on idle. If that save lands before
+      // the first recovery probe, the probe reads it back and never reaches the
+      // held network request. The raster Worker owns the asset database, so a
+      // prelude there opens it only after the page reports that probe timed out.
+      const faultsPending = () => {
+        const faults = window.__rasterAssetFaults;
+        if (faults.active) return true;
+        if (faults.recoveryTimeouts <= 0 || !faults.protectedState) return false;
+        const current = window.__rasterTask?.renderer.getPoliticalIdRasterDiagnostics();
+        return !(current?.assetTimeouts >= faults.protectedState.assetTimeouts + 1);
+      };
+      const gate = "__rasterAssetDatabaseGate";
+      const prelude = () => {
+        const factory = self.indexedDB, open = factory.open.bind(factory);
+        const handlers = ["upgradeneeded", "success", "error", "blocked"];
+        let released = false; const waiting = [];
+        // Registered before the runtime's onmessage, so the gate never reaches it.
+        self.addEventListener("message", event => {
+          if (event.data?.[gate] !== "open") return;
+          event.stopImmediatePropagation();
+          released = true; waiting.splice(0).forEach(resume => resume());
+        });
+        factory.open = (name, version) => {
+          if (name !== "political-id-raster-assets-v1" || released) return open(name, version);
+          let request = null;
+          const deferred = Object.fromEntries(handlers.map(type => [`on${type}`, null]));
+          Object.defineProperty(deferred, "result", { get: () => request?.result });
+          Object.defineProperty(deferred, "error", { get: () => request?.error ?? null });
+          waiting.push(() => {
+            request = open(name, version);
+            for (const type of handlers) request[`on${type}`] = event => deferred[`on${type}`]?.(event);
+          });
+          return deferred;
+        };
+      };
+      const preludeUrl = URL.createObjectURL(new Blob([`const gate = ${JSON.stringify(gate)}; (${prelude})();`], { type: "text/javascript" }));
+      const NativeWorker = window.Worker, gated = [];
+      window.Worker = function Worker(url, options) {
+        const href = new URL(String(url), location.href).href;
+        if (options?.type !== "module" || !href.endsWith("/political_id_raster.worker.js") || !faultsPending()) {
+          return new NativeWorker(url, options);
+        }
+        // Static imports evaluate in order: the prelude runs before the runtime module.
+        const entry = URL.createObjectURL(new Blob([`import ${JSON.stringify(preludeUrl)}; import ${JSON.stringify(href)};`], { type: "text/javascript" }));
+        const worker = new NativeWorker(entry, options);
+        gated.push(worker);
+        return worker;
+      };
+      window.Worker.prototype = NativeWorker.prototype;
+      const poll = setInterval(() => {
+        if (faultsPending()) return;
+        clearInterval(poll);
+        for (const worker of gated.splice(0)) worker.postMessage({ [gate]: "open" });
+      }, 20);
     }, { savedPreference, language, holdRasterAssets });
     if (holdRasterAssets) {
       const held = new Set();
@@ -69,11 +124,12 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
     page.on("console", message => { if (message.type() === "error") errors.push(message.text()); });
     for (const script of initScripts) await page.addInitScript(script);
     await page.goto(url.href, { waitUntil: "domcontentloaded", timeout: 60000 });
+    // The published editor is bundled; take its live modules from the app test API
+    // instead of importing js/core/*.js by URL (that would load separate copies).
+    await page.waitForFunction(() => !!globalThis.__scenarioForgeTestApi, null, { timeout: 60000 });
     await page.evaluate(async () => {
-      const renderer = await import(new URL("js/core/map_renderer.js", document.baseURI));
-      const { state } = await import(new URL("js/core/state.js", document.baseURI));
-      const scenarios = await import(new URL("js/core/scenario_manager.js", document.baseURI));
-      window.__rasterTask = { renderer, state, scenarios };
+      const { renderer, state, scenarioManager } = await globalThis.__scenarioForgeTestApi.internals();
+      window.__rasterTask = { renderer, state, scenarios: scenarioManager };
     });
     await waitRasterStartup(page);
     return { browser, context, page, errors, network, warnings };
@@ -81,11 +137,11 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
 }
 
 // Initial navigation and cache reload share the same startup boundary.
-export async function waitRasterStartup(page) {
+export async function waitRasterStartup(page, { timeout = 60000 } = {}) {
   await page.waitForFunction(() => {
     const s = window.__rasterTask.state;
     return s.bootPhase === "ready" && !s.startupReadonly && !s.startupReadonlyUnlockInFlight && !s.scenarioApplyInFlight;
-  }, null, { timeout: 60000 });
+  }, null, { timeout });
 }
 
 export async function selectRasterScenario(page, scenarioId) {
@@ -97,14 +153,14 @@ export async function selectRasterScenario(page, scenarioId) {
   await waitRasterView(page, scenarioId);
 }
 
-export async function waitRasterView(page, scenarioId) {
+export async function waitRasterView(page, scenarioId, { timeout = 60000 } = {}) {
   await page.waitForFunction(id => {
     const { renderer, state } = window.__rasterTask;
     const d = renderer.getPoliticalIdRasterDiagnostics();
     return state.activeScenarioId === id && !state.scenarioApplyInFlight && !state.startupReadonly
       && d.selected && !d.pending && d.commits > 0 && !d.failed && d.view
       && ["x", "y", "k"].every(key => Math.abs(d.view[key] - state.zoomTransform[key]) < 1e-7);
-  }, scenarioId, { timeout: 60000 });
+  }, scenarioId, { timeout });
 }
 
 export async function captureRasterView(page, scenarioId, zoom) {

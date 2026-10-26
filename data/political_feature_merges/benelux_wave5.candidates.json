@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "candidate_set": "benelux_wave5",
+  "description": "Belgium and the Netherlands, two to three groups per province (provinces recovered from GISCO NUTS-2, 84/84 exact, and added to hierarchy.json). City hosts are protected for capitals, major cities and cities of at least 250,000, plus river-paint parcels. One plan for every scenario: a scenario-scoped plan would have to project the shared HOI4 vanilla releasable catalog, which lists Flemish and Walloon parcels.",
+  "protected_feature_ids": [
+    "BE100",
+    "BE211",
+    "BE234",
+    "BE32B",
+    "BE332",
+    "NL224",
+    "NL226",
+    "NL310",
+    "NL324",
+    "NL329",
+    "NL332",
+    "NL33A",
+    "NL33C",
+    "NL414"
+  ],
+  "candidates": [
+    {
+      "member_ids": [
+        "BE212",
+        "BE213"
+      ],
+      "parent_id": "BE_Antwerp"
+    },
+    {
+      "member_ids": [
+        "BE223",
+        "BE224"
+      ],
+      "parent_id": "BE_Limburg_BE"
+    },
+    {
+      "member_ids": [
+        "BE231",
+        "BE232",
+        "BE235",
+        "BE236"
+      ],
+      "parent_id": "BE_East_Flanders"
+    },
+    {
+      "member_ids": [
+        "BE251",
+        "BE255",
+        "BE258"
+      ],
+      "parent_id": "BE_West_Flanders"
+    },
+    {
+      "member_ids": [
+        "BE252",
+        "BE253"
+      ],
+      "parent_id": "BE_West_Flanders"
+    },
+    {
+      "member_ids": [
+        "BE254",
+        "BE256",
+        "BE257"
+      ],
+      "parent_id": "BE_West_Flanders"
+    },
+    {
+      "member_ids": [
+        "BE323",
+        "BE329",
+        "BE32C",
+        "BE32D"
+      ],
+      "parent_id": "BE_Hainaut"
+    },
+    {
+      "member_ids": [
+        "BE328",
+        "BE32A"
+      ],
+      "parent_id": "BE_Hainaut"
+    },
+    {
+      "member_ids": [
+        "BE331",
+        "BE334",
+        "BE335",
+        "BE336"
+      ],
+      "parent_id": "BE_Liege"
+    },
+    {
+      "member_ids": [
+        "BE341",
+        "BE345",
+        "BE344"
+      ],
+      "parent_id": "BE_Luxembourg_BE"
+    },
+    {
+      "member_ids": [
+        "BE342",
+        "BE343"
+      ],
+      "parent_id": "BE_Luxembourg_BE"
+    },
+    {
+      "member_ids": [
+        "BE352",
+        "BE353"
+      ],
+      "parent_id": "BE_Namur"
+    },
+    {
+      "member_ids": [
+        "NL111",
+        "NL112"
+      ],
+      "parent_id": "NL_Groningen"
+    },
+    {
+      "member_ids": [
+        "NL125",
+        "NL126"
+      ],
+      "parent_id": "NL_Friesland"
+    },
+    {
+      "member_ids": [
+        "NL132",
+        "NL133"
+      ],
+      "parent_id": "NL_Drenthe"
+    },
+    {
+      "member_ids": [
+        "NL211",
+        "NL212"
+      ],
+      "parent_id": "NL_Overijssel"
+    },
+    {
+      "member_ids": [
+        "NL221",
+        "NL225"
+      ],
+      "parent_id": "NL_Gelderland"
+    },
+    {
+      "member_ids": [
+        "NL321",
+        "NL323",
+        "NL325",
+        "NL328"
+      ],
+      "parent_id": "NL_North_Holland"
+    },
+    {
+      "member_ids": [
+        "NL337",
+        "NL33B"
+      ],
+      "parent_id": "NL_South_Holland"
+    },
+    {
+      "member_ids": [
+        "NL411",
+        "NL412",
+        "NL413"
+      ],
+      "parent_id": "NL_North_Brabant"
+    },
+    {
+      "member_ids": [
+        "NL422",
+        "NL423"
+      ],
+      "parent_id": "NL_Limburg_NL"
+    }
+  ]
+}

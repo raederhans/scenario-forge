@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getEffectiveScenarioHierarchy, getEffectiveScenarioHierarchyFromInputs } from "../js/core/scenario_hierarchy.js";
+import {
+  expandScenarioFeatureIds, getEffectiveScenarioHierarchy, getEffectiveScenarioHierarchyFromInputs, projectScenarioFeatureIds,
+} from "../js/core/scenario_hierarchy.js";
 import { createQuickFillHierarchyResolver } from "../js/core/quick_fill_hierarchy.js";
 import { createParentBorderGroupingPolicy } from "../js/core/renderer/parent_border_grouping_policy.js";
 import { getQuickFillLevelModel } from "../js/ui/toolbar/quick_fill_level_controls.js";
@@ -20,7 +22,8 @@ function bindConsumers(path, names, runtime) {
     return source.slice(node.start, node.end);
   }).join("\n");
   return new Function("runtimeState", "getEffectiveScenarioHierarchy", "normalizeCountryCode",
-    `${declarations}\nreturn { ${names.join(", ")} };`)(runtime, getEffectiveScenarioHierarchy, normalizeCountryCodeAlias);
+    "expandScenarioFeatureIds", "projectScenarioFeatureIds", `${declarations}\nreturn { ${names.join(", ")} };`)(
+    runtime, getEffectiveScenarioHierarchy, normalizeCountryCodeAlias, expandScenarioFeatureIds, projectScenarioFeatureIds);
 }
 
 function fixture() {
@@ -120,7 +123,8 @@ test("quick-fill and border consumers plus source-bound sidebar and releasable c
   runtime.hierarchyGroupsByCode = new Map([["US", [{ id: "US_old", children: ["US_ZN_31_1__R"] }]]]);
   const { getHierarchyGroupsForCode } = bindConsumers("../js/ui/sidebar.js", ["getHierarchyGroupsForCode"], runtime);
   const { resolveFeatureIdsFromPresetSource } = bindConsumers("../js/core/releasable_manager.js",
-    ["normalizePresetSource", "resolveFeatureIdsFromPresetSource"], runtime);
+    ["normalizePresetSource", "getActiveFeatureMergeOverride", "projectSharedFeatureIds",
+      "resolveFeatureIdsFromPresetSource", "resolveMemberFeatureIdsFromPresetSource"], runtime);
   const sidebar = getHierarchyGroupsForCode("US");
   assert.equal(sidebar.length, 51);
   assert.deepEqual(sidebar.find(g => g.id === "US_State_0").children, groups.US_State_0);
@@ -130,4 +134,26 @@ test("quick-fill and border consumers plus source-bound sidebar and releasable c
   }
   runtime.activeScenarioManifest = null;
   assert.equal(getHierarchyGroupsForCode("US")[0].id, "US_old");
+});
+
+test("scenario feature merges replace their members in groups and quick-fill levels", () => {
+  const base = {
+    groups: { CN_Shanxi: ["CN_A", "CN_B", "CN_C"], FR_X: ["FR_ARR_26001"] },
+    labels: { CN_Shanxi: "Shanxi", FR_X: "X" },
+    quick_fill: { countries: { CN: { levels: { prefecture: {
+      groups: { CN_PREF_1405: { feature_ids: ["CN_A", "CN_B"] } }, unmapped_feature_ids: ["CN_C"],
+    } } } } },
+  };
+  const before = structuredClone(base);
+  const override = { feature_merges: { CN_MRG_000000000001: ["CN_A", "CN_B"] } };
+  const result = getEffectiveScenarioHierarchyFromInputs(base, override);
+  assert.deepEqual(result.groups.CN_Shanxi, ["CN_MRG_000000000001", "CN_C"]);
+  assert.deepEqual(result.groups.FR_X, base.groups.FR_X);
+  assert.deepEqual(result.quick_fill.countries.CN.levels.prefecture.groups.CN_PREF_1405.feature_ids, ["CN_MRG_000000000001"]);
+  assert.deepEqual(result.quick_fill.countries.CN.levels.prefecture.unmapped_feature_ids, ["CN_C"]);
+  assert.deepEqual(base, before);
+  assert.equal(getEffectiveScenarioHierarchyFromInputs(base, override), result);
+  for (const feature_merges of [{ CN_M: ["CN_A"] }, { CN_M: ["CN_A", "CN_B"], CN_N: ["CN_B", "CN_C"] }]) {
+    assert.equal(getEffectiveScenarioHierarchyFromInputs(base, { feature_merges }), base);
+  }
 });

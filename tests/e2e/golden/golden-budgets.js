@@ -4,6 +4,7 @@
 // that. Tighten them as the rewrite makes the app faster.
 const PERF_BUDGETS = Object.freeze({
   startupMs: 120_000,
+  viewableMs: 30_000,
   fillInteractionMs: 800,
 });
 

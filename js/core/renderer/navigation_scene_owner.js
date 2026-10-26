@@ -6,6 +6,7 @@ import { getObjectIdentityToken } from "./object_identity.js";
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import { isScenarioPoliticalBaseChunk } from "../scenario_chunk_manager.js";
 import { pageResourceBudget } from "../runtime_resource_budget.js";
+import { yieldToBackground } from "../background_yield.js";
 
 // Navigation owns a small, whole-scene raster. Viewport chunk promotion is not
 // a paint edit, and must not discard the only frame that covers a fast pan.
@@ -13,7 +14,7 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
   createWorkerClient = createGeometryRasterWorkerClient,
   createCanvas = () => document.createElement("canvas"),
   resourceBudget = pageResourceBudget,
-  yieldTask = () => globalThis.scheduler?.yield ? globalThis.scheduler.yield() : new Promise((resolve) => setTimeout(resolve, 0)),
+  yieldTask = yieldToBackground,
 }) {
   let paintRevision = null;
   let paintSignature = "";

@@ -48,15 +48,16 @@ dist/styles.css text eol=lf
 landing/index.html text eol=lf
 landing/app.js text eol=lf
 landing/styles.css text eol=lf
+landing/i18n.js text eol=lf
 landing/assets/*.svg text eol=lf
-landing/assets/europe-1936-showcase.json text eol=lf
 landing/assets/hero-*.json text eol=lf
+landing/assets/hgo-zoom.json text eol=lf
+landing/assets/history-scrubber.json text eol=lf
 landing/assets/japan-preview*.json text eol=lf
 landing/assets/sample-runs.json text eol=lf
 landing/assets/sample-projects/*.project.json text eol=lf
 landing/assets/work-*.json text eol=lf
 dist/assets/*.svg text eol=lf
-dist/assets/europe-1936-showcase.json text eol=lf
 dist/assets/hero-*.json text eol=lf
 dist/assets/japan-preview*.json text eol=lf
 dist/assets/sample-runs.json text eol=lf
@@ -71,7 +72,7 @@ dist/app/**/*.svg text eol=lf
 dist/app/**/*.txt text eol=lf
 docs/active/**/*.md text eol=lf
 docs/archive/**/*.md text eol=lf
-tests/landing_showcase_view_behavior.test.mjs text eol=lf
+tests/landing_page_behavior.test.mjs text eol=lf
 tools/svgo.landing.config.mjs text eol=lf
 
 # Independent HGO Pages package contains byte-verified native assets.

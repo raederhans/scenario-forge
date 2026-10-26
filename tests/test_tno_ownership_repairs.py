@@ -7,6 +7,7 @@ from pathlib import Path
 
 from shapely.geometry import box, mapping
 
+from map_builder.political_feature_merge_plans import ordered_plans, plan_scenarios
 from tools.atlantropa_identity import reconcile_island_identity
 from tools.patch_tno_1962_bundle import (
     ATLANTROPA_REGION_CONFIGS,
@@ -20,6 +21,16 @@ from tools.patch_tno_1962_bundle import (
 
 
 SCENARIO_DIR = Path(__file__).resolve().parents[1] / "data" / "scenarios" / "tno_1962"
+
+
+def tno_feature(feature_id: str) -> str:
+    """The TNO feature a source parcel ended up in, following every merge plan applied to TNO."""
+    for _, plan in ordered_plans(SCENARIO_DIR.parents[1]):
+        if "tno_1962" in plan_scenarios(plan):
+            for group in plan["groups"]:
+                if feature_id in group["member_ids"]:
+                    feature_id = group["id"]
+    return feature_id
 
 
 class TnoIberianAtlantropaOwnershipTest(unittest.TestCase):
@@ -144,13 +155,16 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
         cores = json.loads((SCENARIO_DIR / "cores.by_feature.json").read_text(encoding="utf-8"))["cores"]
         manual = json.loads((SCENARIO_DIR / "scenario_manual_overrides.json").read_text(encoding="utf-8"))["assignments"]
         mutations = json.loads((SCENARIO_DIR / "scenario_mutations.json").read_text(encoding="utf-8"))["assignments_by_feature_id"]
+        # A city face or its reference district may since have been merged; the merged feature keeps the owner.
         for city_id, (owner, district_id) in self.CITY_DISTRICT_PAIRS.items():
             with self.subTest(city_id=city_id):
-                self.assertEqual(owners[district_id], owner)
-                self.assertEqual(owners[city_id], owner)
-                self.assertEqual(cores[city_id], [owner])
-                self.assertEqual(manual[city_id], {"owner": owner, "cores": [owner]})
-                self.assertEqual(mutations[city_id], manual[city_id])
+                face = tno_feature(city_id)
+                self.assertEqual(owners[tno_feature(district_id)], owner)
+                self.assertEqual(owners[face], owner)
+                self.assertEqual(cores[face], [owner])
+                # A face merged with its district also carries the district's controller entry.
+                self.assertEqual({key: manual[face][key] for key in ("owner", "cores")}, {"owner": owner, "cores": [owner]})
+                self.assertEqual(mutations[face], manual[face])
 
     def test_manual_replay_repairs_city_faces_without_absorbing_legitimate_enclaves(self) -> None:
         manual = json.loads((SCENARIO_DIR / "scenario_manual_overrides.json").read_text(encoding="utf-8"))
@@ -166,7 +180,7 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
         cores = {"cores": {fid: [tag] for fid, tag in old_owners.items()}}
         apply_dev_manual_overrides(
             {"countries": {}}, owners, {"controllers": dict(old_owners)}, cores,
-            {"assignments": {fid: manual["assignments"][fid] for fid in self.CITY_DISTRICT_PAIRS}}, {},
+            {"assignments": {fid: manual["assignments"][tno_feature(fid)] for fid in self.CITY_DISTRICT_PAIRS}}, {},
         )
         for fid, (tag, _) in self.CITY_DISTRICT_PAIRS.items():
             self.assertEqual(owners["owners"][fid], tag)
@@ -190,7 +204,7 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
             with self.subTest(feature_id=fid):
                 self.assertEqual(owners["owners"][fid], tag)
                 self.assertEqual(cores["cores"][fid], [tag])
-                self.assertEqual(published[fid], tag)
+                self.assertEqual(published[tno_feature(fid)], tag)
 
     def test_russian_rules_do_not_reintroduce_conflicting_city_assignments(self) -> None:
         rules = json.loads((SCENARIO_DIR.parents[1] / "scenario-rules" /

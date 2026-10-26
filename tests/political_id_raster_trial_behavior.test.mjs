@@ -9,13 +9,12 @@ test("URL overrides the saved experiment without requiring storage access", () =
   assert.equal(readPoliticalIdRasterPreference({ search: "", storage: broken }), false);
   assert.equal(readPoliticalIdRasterPreference({ search: "", storage: { getItem: () => "1" } }), true);
 });
-test("the trial is eligible only after safe startup and only for the three supported scenarios", () => {
-  const base = { requested: true, exporting: false, debugMode: "PROD", ready: true, firstVisible: true,
-    readonly: false, unlocking: false, riverPartitions: false, scenarioId: "hoi4_1939" };
+test("the raster is eligible once a frame is visible and only for the three supported scenarios", () => {
+  const base = { requested: true, exporting: false, debugMode: "PROD", firstVisible: true,
+    riverPartitions: false, scenarioId: "hoi4_1939" };
   for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962"]) assert.equal(getPoliticalIdRasterEligibility({ ...base, scenarioId }), "eligible");
   for (const [patch, reason] of [[{ requested: false }, "off"], [{ scenarioId: "modern_world" }, "unsupported-scenario"],
-    [{ ready: false }, "startup"], [{ firstVisible: false }, "startup"], [{ readonly: true }, "startup"],
-    [{ unlocking: true }, "startup"], [{ exporting: true }, "export"], [{ riverPartitions: true }, "river-partitions"], [{ debugMode: "DEBUG" }, "debug-mode"]]) {
+    [{ firstVisible: false }, "startup"], [{ exporting: true }, "export"], [{ riverPartitions: true }, "river-partitions"], [{ debugMode: "DEBUG" }, "debug-mode"]]) {
     assert.equal(getPoliticalIdRasterEligibility({ ...base, ...patch }), reason);
   }
 });
@@ -157,4 +156,61 @@ test("paired native and hybrid baselines wait for their real completed political
   assert.equal(residentFrameReady(s,{effectiveMode:"vector"}),true);
   assert.equal(residentFrameReady(s,{effectiveMode:"hybrid",displayState:"accelerated"}),false);
   assert.equal(residentFrameReady(s,{effectiveMode:"hybrid",displayState:"precise"}),true);
+});
+
+test("the saved policy is read once and refreshed by local writes, other tabs and a replaced store", async t => {
+  const originals = Object.fromEntries(["localStorage", "location", "history", "addEventListener"]
+    .map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  t.after(() => { for (const [key, descriptor] of Object.entries(originals)) {
+    if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key];
+  } });
+  const listeners = [];
+  Object.defineProperty(globalThis, "addEventListener", { configurable: true, value: (type, listener) => listeners.push({ type, listener }) });
+  Object.defineProperty(globalThis, "location", { configurable: true, value: { search: "", href: "https://example.test/app/" } });
+  Object.defineProperty(globalThis, "history", { configurable: true, value: { state: {}, replaceState() {} } });
+  const createStore = values => {
+    const store = { reads: 0, getItem: key => { store.reads++; return values.get(key) ?? null; },
+      setItem: (key, value) => values.set(key, String(value)), removeItem: key => values.delete(key) };
+    return store;
+  };
+  const values = new Map([["scenario-forge-political-render-mode", "vector"]]);
+  let store = createStore(values);
+  Object.defineProperty(globalThis, "localStorage", { configurable: true, get: () => store });
+  const policy = await import(`../js/core/renderer/political_id_raster_trial.js?fresh=${Date.now()}`);
+  const mode = () => policy.readPoliticalRenderPolicy({ scenarioId: "tno_1962" }).effectiveMode;
+
+  assert.equal(mode(), "vector");
+  assert.equal(mode(), "vector");
+  assert.equal(store.reads, 1, "repeated reads reuse the saved preference");
+
+  policy.writePoliticalRenderMode("hybrid");
+  assert.equal(mode(), "hybrid", "a local write refreshes the next read");
+
+  values.set("scenario-forge-political-render-mode", "vector");
+  const storage = listeners.filter(entry => entry.type === "storage");
+  assert.equal(storage.length, 1);
+  storage[0].listener({ key: "unrelated" });
+  assert.equal(mode(), "hybrid", "unrelated keys keep the cached preference");
+  storage[0].listener({ key: "scenario-forge-political-render-mode" });
+  assert.equal(mode(), "vector", "another tab's write refreshes the next read");
+
+  store = createStore(new Map([["scenario-forge-political-id-raster", "1"]]));
+  assert.equal(mode(), "hybrid", "a replaced store is read afresh");
+  assert.equal(policy.readPoliticalRenderPolicy({ scenarioId: "tno_1962", storage: policyStore({}) }).effectiveMode, "raster",
+    "an explicit store bypasses the cache");
+});
+
+test("without any storage the saved policy falls back to the default", async t => {
+  const originals = Object.fromEntries(["localStorage", "location"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  t.after(() => { for (const [key, descriptor] of Object.entries(originals)) {
+    if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key];
+  } });
+  delete globalThis.localStorage;
+  Object.defineProperty(globalThis, "location", { configurable: true, value: { search: "" } });
+  const policy = await import(`../js/core/renderer/political_id_raster_trial.js?no-storage=${Date.now()}`);
+  for (let call = 0; call < 2; call++) {
+    const result = policy.readPoliticalRenderPolicy({ scenarioId: "tno_1962" });
+    assert.equal(result.preferenceSource, "default");
+    assert.equal(result.effectiveMode, "raster");
+  }
 });

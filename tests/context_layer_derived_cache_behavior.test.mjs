@@ -78,7 +78,8 @@ test("shared real TopoJSON across scenarios reuses decoding, coverage and urban 
   f.state.topologyDetail = topology("detail");
   f.resolver.ensureLayerDataFromTopology();
   assert.equal(f.calls.decode, 14);
-  assert.equal(f.calls.bounds, 16);
+  // Coverage scores take vertex extents; only the two urban capability scans use spherical bounds.
+  assert.equal(f.calls.bounds, 2);
   assert.equal(f.calls.owner, 2);
   assert.equal(f.state.urbanLayerCapability.adaptiveAvailable, true);
   const original = f.state.landBgData;
@@ -185,12 +186,11 @@ test("failed decode and unavailable bounds do not poison later successful geogra
     if (boundsFailing) throw new Error("temporary bounds failure");
     return originalBounds(...args);
   };
-  assert.equal(f.resolver.computeLayerCoverageScore(collection), 0);
-  boundsFailing = false;
-  assert.ok(f.resolver.computeLayerCoverageScore(collection) > 0);
+  // Coverage takes vertex extents, so a failing spherical bounds pass cannot zero it.
   const before = f.calls.bounds;
-  f.resolver.computeLayerCoverageScore(collection);
+  assert.ok(f.resolver.computeLayerCoverageScore(collection) > 0);
   assert.equal(f.calls.bounds, before);
+  boundsFailing = false;
   const urban = structuredClone(collection);
   urban.features[0].geometry.coordinates[0].reverse();
   boundsFailing = true;
@@ -213,7 +213,7 @@ test("actual lake, urban and contour publication writers preserve unrelated topo
   commitContextLayerCollection(f.state, "urban", externalUrban, { bumpRevision: true });
   f.resolver.ensureLayerDataFromTopology();
   assert.equal(f.calls.decode, before.decode);
-  assert.equal(f.calls.bounds - before.bounds, 2, "only new external urban capability and coverage are scanned");
+  assert.equal(f.calls.bounds - before.bounds, 1, "only the new external urban capability is scanned");
   assert.equal(f.state.urbanData, externalUrban);
   assert.equal(f.state.urbanLayerCapability.adaptiveAvailable, true);
   commitPhysicalContourDisplayState(f.state, { major: { features: [] }, minor: { features: [] } });
@@ -348,4 +348,22 @@ test("absent, partial and malformed startup decode bundles preserve ordinary Top
   assert.equal(f.calls.decode - before, 3, "missing or malformed collections use normal resolver decoding");
   assert.deepEqual(nextState.riversData, topojson.feature(nextState.topologyPrimary, nextState.topologyPrimary.objects.rivers));
   assert.deepEqual(nextState.urbanData, topojson.feature(nextState.topologyPrimary, nextState.topologyPrimary.objects.urban));
+});
+
+test("coverage score spans every vertex of points, multipolygons and geometry collections", t => {
+  const f = fixture(t);
+  const collection = { type: "FeatureCollection", features: [
+    { type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [-60, -10] } },
+    { type: "Feature", properties: {}, geometry: { type: "MultiPolygon", coordinates: [[[[0, 0], [30, 0], [30, 20], [0, 0]]]] } },
+    { type: "Feature", properties: {}, geometry: { type: "GeometryCollection", geometries: [
+      { type: "LineString", coordinates: [[100, 40], [120, 50]] },
+    ] } },
+    { type: "Feature", properties: {}, geometry: null },
+  ] };
+  // Extent [-60, -10] to [120, 50]: 180° × 60° of a 360° × 180° world, with four features.
+  const expected = (180 * 60) / (360 * 180) * 0.8 + (Math.log10(5) / 4) * 0.2;
+  assert.ok(Math.abs(f.resolver.computeLayerCoverageScore(collection) - expected) < 1e-12);
+  assert.equal(f.resolver.computeLayerCoverageScore({ type: "FeatureCollection", features: [
+    { type: "Feature", properties: {}, geometry: null },
+  ] }), 0, "a collection without coordinates has no coverage");
 });

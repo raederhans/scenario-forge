@@ -123,6 +123,7 @@ import {
   TRANSPORT_WORKBENCH_INSPECTOR_TABS,
 } from "./toolbar/transport_workbench_controller.js";
 import { createWorkspaceChromeSupportSurfaceController } from "./toolbar/workspace_chrome_support_surface_controller.js";
+import { shouldShowDeveloperModeEntry } from "./toolbar/developer_mode_visibility.js";
 const state = runtimeState;
 
 function composePaletteLibraryOperation() {
@@ -171,6 +172,9 @@ function renderPalette(themeName) {
     btn.title = normalized;
     btn.addEventListener("click", () => {
       selectPalettePaintColor(runtimeState, normalized);
+      if (runtimeState.currentTool === "select") {
+        callRuntimeHook(runtimeState, "runToolSelectionFn", "fill", { feedbackLabel: t("Switched to fill tool", "ui") });
+      }
       callRuntimeHook(state, "updateSwatchUIFn");
     });
     paletteGrid.appendChild(btn);
@@ -524,9 +528,28 @@ function initToolbar({ render } = {}) {
     });
   };
 
+  const readStoredDeveloperMode = () => {
+    try {
+      return globalThis.localStorage?.getItem(DEVELOPER_MODE_STORAGE_KEY) ?? null;
+    } catch {
+      return null;
+    }
+  };
+
+  const isDeveloperModeEntryVisible = () => shouldShowDeveloperModeEntry({
+    hostname: globalThis.location?.hostname,
+    search: globalThis.location?.search,
+    storedDeveloperMode: readStoredDeveloperMode(),
+  });
+
   const syncDeveloperModeUi = () => {
+    // 快捷键显式开启的开发者模式是内存中的 opt-in：即使存储被阻止、主机也不是本地，入口与开启态都要保留。
+    const entryVisible = isDeveloperModeEntryVisible() || !!runtimeState.ui.developerMode;
     document.body?.classList.toggle("developer-mode", !!runtimeState.ui.developerMode);
     if (developerModeBtn) {
+      // .zoom-btn 自带 display，单靠 hidden 属性压不住，同时挂全局 .hidden 类。
+      developerModeBtn.hidden = !entryVisible;
+      developerModeBtn.classList.toggle("hidden", !entryVisible);
       const buttonLabel = runtimeState.ui.developerMode
         ? t("Hide development workspace", "ui")
         : t("Show development workspace", "ui");
@@ -560,12 +583,10 @@ function initToolbar({ render } = {}) {
     syncDeveloperModeUi();
   };
 
-  try {
-    const storedDeveloperMode = globalThis.localStorage?.getItem(DEVELOPER_MODE_STORAGE_KEY);
-    if (storedDeveloperMode === "true" || storedDeveloperMode === "false") {
-      runtimeState.ui.developerMode = storedDeveloperMode === "true";
-    }
-  } catch {}
+  const storedDeveloperMode = readStoredDeveloperMode();
+  if (storedDeveloperMode === "true" || storedDeveloperMode === "false") {
+    runtimeState.ui.developerMode = storedDeveloperMode === "true";
+  }
   updateLanguageToggleUi();
   syncDeveloperModeUi();
 
@@ -742,6 +763,11 @@ function initToolbar({ render } = {}) {
   const syncPanelToggleButtons = () => {
     leftPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("left-drawer-open")));
     rightPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("right-drawer-open")));
+    document.getElementById("editorInspectorToggleBtn")?.setAttribute("aria-expanded", String(
+      drawerMedia.matches
+        ? document.body.classList.contains("right-drawer-open")
+        : !document.body.classList.contains("right-sidebar-collapsed")
+    ));
     let openDrawer = false;
     for (const side of ["left", "right"]) {
       const sidebar = document.getElementById(`${side}Sidebar`);
@@ -1273,13 +1299,15 @@ function initToolbar({ render } = {}) {
       ? "Eraser"
       : tool === "eyedropper"
         ? "Eyedropper"
-        : "Fill",
+        : tool === "select"
+          ? "Select tool"
+          : "Fill",
     "ui"
   );
 
   const setToolCursorClass = () => {
     if (!mapContainer) return;
-    mapContainer.classList.remove("tool-fill", "tool-eraser", "tool-eyedropper", "tool-special-zone", "tool-pan-override");
+    mapContainer.classList.remove("tool-select", "tool-fill", "tool-eraser", "tool-eyedropper", "tool-special-zone", "tool-pan-override");
     if (runtimeState.specialZoneEditor?.active || runtimeState.currentTool === "special-zone-membership") {
       mapContainer.classList.add("tool-special-zone");
       return;
@@ -1288,7 +1316,7 @@ function initToolbar({ render } = {}) {
       mapContainer.classList.add("tool-pan-override");
       return;
     }
-    mapContainer.classList.add(`tool-${runtimeState.currentTool || "fill"}`);
+    mapContainer.classList.add(`tool-${runtimeState.currentTool || "select"}`);
   };
 
   const renderDirty = (reason) => {
@@ -1618,6 +1646,7 @@ function initToolbar({ render } = {}) {
     handlePaletteSourceChange,
     handleResize: handlePaletteLibraryResize,
     renderPaletteLibrary,
+    requestPaletteLibraryRender,
     syncPaletteSourceControls,
     syncPanelVisibility: syncPaletteLibraryPanelVisibility,
   } = paletteLibraryPanelController;
@@ -1725,19 +1754,11 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "clearReferenceImageFn", clearReferenceImage);
   registerRuntimeHook(state, "updateTransportAppearanceUIFn", renderTransportAppearanceUi);
   // Recent colors feed only the recent strip and the library's recent group.
-  // Paint input coalesces the full library rebuild into the next frame.
-  let recentPaletteLibraryFrame = 0;
+  // The full library rebuild waits until after the paint input's frame, and while
+  // the library is hidden it waits until the library is shown.
   registerRuntimeHook(state, "updateRecentUI", () => {
     renderRecentColors();
-    if (recentPaletteLibraryFrame) return;
-    if (typeof globalThis.requestAnimationFrame !== "function") {
-      renderPaletteLibrary();
-      return;
-    }
-    recentPaletteLibraryFrame = globalThis.requestAnimationFrame(() => {
-      recentPaletteLibraryFrame = 0;
-      renderPaletteLibrary();
-    });
+    requestPaletteLibraryRender();
   });
   registerRuntimeHook(state, "updateParentBorderCountryListFn", renderParentBorderCountryList);
 
@@ -1935,9 +1956,9 @@ function initToolbar({ render } = {}) {
   }
 
   const runToolSelection = (tool, { dismissHint = true, feedbackLabel = "" } = {}) => {
-    const nextTool = tool || "fill";
+    const nextTool = tool || "select";
     runtimeState.currentTool = nextTool;
-    if (nextTool === "eyedropper") {
+    if (nextTool === "eyedropper" || nextTool === "select") {
       runtimeState.brushModeEnabled = false;
       runtimeState.brushPanModifierActive = false;
     }
@@ -1950,7 +1971,7 @@ function initToolbar({ render } = {}) {
 
   const runBrushModeToggle = (nextValue = !runtimeState.brushModeEnabled, { dismissHint = true } = {}) => {
     runtimeState.brushModeEnabled = !!nextValue;
-    if (runtimeState.brushModeEnabled && runtimeState.currentTool === "eyedropper") {
+    if (runtimeState.brushModeEnabled && (runtimeState.currentTool === "eyedropper" || runtimeState.currentTool === "select")) {
       runtimeState.currentTool = "fill";
     }
     updateToolUI();
@@ -2012,13 +2033,16 @@ function initToolbar({ render } = {}) {
   if (customColor) {
     customColor.addEventListener("input", (event) => {
       selectPalettePaintColor(runtimeState, event.target.value);
+      if (runtimeState.currentTool === "select") {
+        callRuntimeHook(runtimeState, "runToolSelectionFn", "fill", { feedbackLabel: t("Switched to fill tool", "ui") });
+      }
       updateSwatchUI();
     });
   }
 
   toolButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      runToolSelection(button.dataset.tool || "fill");
+      runToolSelection(button.dataset.tool || "select");
     });
   });
 

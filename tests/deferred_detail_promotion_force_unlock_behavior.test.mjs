@@ -6,6 +6,7 @@ import {
   commitStartupReadonlyStateFields,
   setBootStateFields,
 } from "../js/core/state/actions/boot_actions.js";
+import { state as rendererState } from "../js/core/state.js";
 
 async function drainMicrotasks() {
   await Promise.resolve();
@@ -77,4 +78,51 @@ test("forced readonly unlock schedules a ready sample exactly once when UI is re
   assert.deepEqual(bootPhases, ["interaction-infra", "ready"]);
   assert.equal(runtimeFixture.startupReadonly, false);
   assert.equal(sampleScheduleCount, 1);
+});
+
+function detailPromotionFixture() {
+  const h = { yields: 0 };
+  let markYielded;
+  h.yielded = new Promise(resolve => { markYielded = resolve; });
+  const gate = new Promise(resolve => { h.release = resolve; });
+  h.state = { activeScenarioId: "tno_1962", sceneGeneration: 1, topologyBundleMode: "single",
+    detailDeferred: true, detailPromotionCompleted: false, detailPromotionInFlight: false };
+  h.detail = { type: "Topology", objects: { political: { type: "GeometryCollection", geometries: [] } }, arcs: [] };
+  h.owner = createDeferredDetailPromotionOwner({ runtimeState: h.state, helpers: {
+    loadDetailBundle: async () => ({ topologyDetail: h.detail, topologyBundleMode: "composite", detailSourceUsed: "na_v2" }),
+    yieldToInput: () => { h.yields++; markYielded(); return gate; },
+  } });
+  // Settles on the yield, or on the promotion if it finishes without one.
+  h.reachYield = promotion => Promise.race([h.yielded, promotion]);
+  return h;
+}
+
+test("detail promotion yields to input between loading the bundle and applying it", async () => {
+  const h = detailPromotionFixture();
+  const promotion = h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false });
+  await h.reachYield(promotion);
+  assert.equal(h.yields, 1);
+  assert.equal(h.state.topologyDetail, undefined, "nothing is applied before the yield returns");
+  h.release();
+  assert.equal(await promotion, true);
+  assert.equal(h.state.topologyDetail, h.detail);
+  assert.equal(h.state.detailPromotionCompleted, true);
+  assert.equal(h.state.detailPromotionInFlight, false);
+});
+
+test("a scene change during the yield discards the loaded detail bundle", async t => {
+  const h = detailPromotionFixture();
+  // Read-only startup keeps the stale request from scheduling its own retry.
+  h.state.startupReadonly = true;
+  // The refresh scope reads the renderer's live scene.
+  const previousGeneration = rendererState.sceneGeneration;
+  t.after(() => { rendererState.sceneGeneration = previousGeneration; });
+  const promotion = h.owner.ensureDetailTopologyReady({ applyMapData: false, flushPendingFocusRefresh: false });
+  await h.reachYield(promotion);
+  rendererState.sceneGeneration = (Number(previousGeneration) || 0) + 1;
+  h.release();
+  assert.equal(await promotion, false);
+  assert.equal(h.state.topologyDetail, undefined);
+  assert.equal(h.state.detailPromotionCompleted, false);
+  assert.equal(h.state.detailPromotionInFlight, false);
 });

@@ -30,6 +30,83 @@ function mergeHierarchy(base, override) {
   };
 }
 
+// Member ID -> merged ID of a scenario's feature merges, or null when the record is invalid.
+const mergeTargets = new WeakMap();
+function featureMergeTargets(merges) {
+  if (!isRecord(merges)) return null;
+  if (mergeTargets.has(merges)) return mergeTargets.get(merges);
+  let target = new Map();
+  for (const [mergedId, members] of Object.entries(merges)) {
+    if (!mergedId || !Array.isArray(members) || members.length < 2
+      || !members.every((member) => typeof member === "string" && member && !target.has(member))) {
+      target = null;
+      break;
+    }
+    members.forEach((member) => target.set(member, mergedId));
+  }
+  mergeTargets.set(merges, target);
+  return target;
+}
+
+// Shared feature-ID lists (historical display presets, the vanilla releasable
+// catalog) keep the members of scenario-scoped merges. A merged feature joins a
+// list only when the list names all of its members; a list that names only some
+// drops them and reports the merged ID in `partial`, so a list never grows.
+export function projectScenarioFeatureIds(ids, override) {
+  const list = Array.isArray(ids) ? ids : [];
+  const target = featureMergeTargets(override?.feature_merges);
+  if (!target) return { ids: [...new Set(list)], partial: [] };
+  const present = new Set(list);
+  const projected = new Set();
+  const partial = new Map();
+  for (const id of list) {
+    const mergedId = target.get(id);
+    if (!mergedId) {
+      projected.add(id);
+    } else if (override.feature_merges[mergedId].every((member) => present.has(member))) {
+      projected.add(mergedId);
+    } else if (!partial.has(mergedId)) {
+      partial.set(mergedId, override.feature_merges[mergedId].filter((member) => !present.has(member)));
+    }
+  }
+  return { ids: [...projected], partial: [...partial].map(([mergedId, missing]) => ({ mergedId, missing })) };
+}
+
+// The inverse for set arithmetic in member IDs: merged IDs of the projected
+// hierarchy become their members again.
+export function expandScenarioFeatureIds(ids, override) {
+  const merges = featureMergeTargets(override?.feature_merges) ? override.feature_merges : {};
+  return (Array.isArray(ids) ? ids : []).flatMap((id) => Object.hasOwn(merges, id) ? merges[id] : [id]);
+}
+
+// Scenario-scoped political feature merges ({mergedId: memberIds}) replace their
+// members in every group and quick-fill level. The shared hierarchy keeps the
+// members for scenarios where they stay separate.
+function projectFeatureMerges(base, merges) {
+  const target = featureMergeTargets(merges);
+  if (!target) return base;
+  const project = (ids) => Array.isArray(ids) ? [...new Set(ids.map((id) => target.get(id) ?? id))] : ids;
+  const mapValues = (record, fn) => Object.fromEntries(Object.entries(record).map(([key, value]) => [key, fn(value)]));
+  const projectLevel = (level) => !isRecord(level) ? level : {
+    ...level,
+    ...(Array.isArray(level.unmapped_feature_ids) ? { unmapped_feature_ids: project(level.unmapped_feature_ids) } : {}),
+    ...(isRecord(level.groups) ? { groups: mapValues(level.groups, (group) =>
+      isRecord(group) ? { ...group, feature_ids: project(group.feature_ids) } : group) } : {}),
+  };
+  const countries = base.quick_fill?.countries;
+  return {
+    ...base,
+    groups: mapValues(base.groups || {}, project),
+    ...(isRecord(countries) ? { quick_fill: { ...base.quick_fill, countries: mapValues(countries, (spec) =>
+      isRecord(spec?.levels) ? { ...spec, levels: mapValues(spec.levels, projectLevel) } : spec) } } : {}),
+  };
+}
+
+function applyOverride(base, override) {
+  // A country snapshot that is absent or invalid leaves the projected hierarchy as is.
+  return mergeHierarchy(isRecord(override.feature_merges) ? projectFeatureMerges(base, override.feature_merges) : base, override);
+}
+
 export function getEffectiveScenarioHierarchy(runtimeState) {
   const base = runtimeState?.hierarchyData;
   const override = runtimeState?.activeScenarioManifest?.hierarchy_overrides;
@@ -43,6 +120,6 @@ export function getEffectiveScenarioHierarchyFromInputs(base, override) {
     byOverride = new WeakMap();
     effectiveHierarchies.set(base, byOverride);
   }
-  if (!byOverride.has(override)) byOverride.set(override, mergeHierarchy(base, override));
+  if (!byOverride.has(override)) byOverride.set(override, applyOverride(base, override));
   return byOverride.get(override);
 }

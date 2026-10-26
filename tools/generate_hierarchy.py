@@ -632,6 +632,28 @@ def build_admin2_groups(adm2_path: Path, adm1_path: Path, iso_code: str, child_p
     return groups, labels
 
 
+# Natural Earth draws Diu as part of Gujarat, so the overlap rule cannot see the union territory.
+INDIA_ADM1_OVERRIDES = {"Diu": "Dadra and Nagar Haveli and Daman and Diu"}
+
+
+def largest_overlap_names(adm2, adm1, name_col):
+    """ADM2 index -> name of the ADM1 polygon covering most of its equal-area extent.
+
+    The first intersecting polygon is not enough: coarse state outlines touch
+    neighbouring districts, which then land in the wrong state.
+    """
+    metric_crs = getattr(cfg, "AREA_CRS", "EPSG:6933") if cfg is not None else "EPSG:6933"
+    left = ensure_crs(adm2)[["geometry"]].to_crs(metric_crs)
+    left["geometry"] = left.geometry.make_valid()
+    left["adm2_index"] = left.index
+    right = ensure_crs(adm1).to_crs(metric_crs)
+    right["geometry"] = right.geometry.make_valid()
+    pieces = gpd.overlay(left, right, how="intersection", keep_geom_type=True)
+    pieces["overlap_area"] = pieces.geometry.area
+    best = pieces.sort_values("overlap_area", ascending=False).drop_duplicates("adm2_index")
+    return best.set_index("adm2_index")[name_col]
+
+
 def build_india_groups(adm2_path: Path, adm1_path: Path | None = None):
     gdf = gpd.read_file(adm2_path)
     if "shapeID" not in gdf.columns:
@@ -661,10 +683,10 @@ def build_india_groups(adm2_path: Path, adm1_path: Path | None = None):
 
                 if not adm1.empty:
                     adm1 = adm1[[name_col, "geometry"]].copy()
-                    joined = gpd.sjoin(gdf, adm1, how="left", predicate="intersects")
-                    if name_col in joined.columns and not joined[name_col].isna().all():
-                        name_map = joined[name_col].groupby(level=0).first()
-                        gdf["adm1_name"] = gdf.index.to_series().map(name_map).fillna(gdf["adm1_name"])
+                    name_map = largest_overlap_names(gdf, adm1, name_col)
+                    gdf["adm1_name"] = gdf.index.to_series().map(name_map).fillna(gdf["adm1_name"])
+                    for adm2_name, adm1_name in INDIA_ADM1_OVERRIDES.items():
+                        gdf.loc[gdf["shapeName"] == adm2_name, "adm1_name"] = adm1_name
         except Exception:
             pass
 

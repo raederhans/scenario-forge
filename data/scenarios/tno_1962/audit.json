@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
-    "chunk_count": 211,
-    "feature_count": 12439,
+    "chunk_count": 202,
+    "feature_count": 9949,
     "water_count": 285
   },
   "controller_changes": [
@@ -21938,87 +21938,269 @@
     },
     "polar_materialization": {
       "classified_feature_ids": [
+        "BE_MRG_15f4aef6c612",
+        "BE_MRG_24ed7b411331",
+        "BE_MRG_38ea003ab243",
+        "BE_MRG_49096f4ef44b",
+        "BE_MRG_6a92ca76474d",
+        "BE_MRG_7dbe84a470bd",
+        "BE_MRG_81cfb513b60d",
+        "BE_MRG_923fe66661e2",
+        "BE_MRG_a29e92a10668",
+        "BE_MRG_d49081148862",
+        "BE_MRG_f7a8cd5ecd9e",
+        "CA_MRG_02a592f4a083",
+        "CA_MRG_096ac84a0cc7",
+        "CA_MRG_0f506b88e592",
+        "CA_MRG_1a080100c822",
+        "CA_MRG_23b011e3543e",
+        "CA_MRG_24ae99283479",
+        "CA_MRG_2ebb41be023f",
+        "CA_MRG_2eca2d3aeffd",
+        "CA_MRG_3e06e9aabd9f",
+        "CA_MRG_410af4197c3c",
+        "CA_MRG_43ae18b09e32",
+        "CA_MRG_46f94b8c5773",
+        "CA_MRG_480215c2f838",
+        "CA_MRG_4b867801b8a0",
+        "CA_MRG_528f74543a8b",
+        "CA_MRG_567d2b874fad",
+        "CA_MRG_57ed93ea7b6f",
+        "CA_MRG_5a20b1bb5941",
+        "CA_MRG_5e17f5b2af34",
+        "CA_MRG_653d532898a8",
+        "CA_MRG_684250872a47",
+        "CA_MRG_705e30d79f5c",
+        "CA_MRG_73fc08ab0b94",
+        "CA_MRG_77a1b136ce43",
+        "CA_MRG_7b5ba113838a",
+        "CA_MRG_7cbc6bf7c111",
+        "CA_MRG_7d4331ee0a5c",
+        "CA_MRG_7e7e19718e0f",
+        "CA_MRG_80a56ade734c",
+        "CA_MRG_8219e9529a16",
+        "CA_MRG_8516027ac8b5",
+        "CA_MRG_86ce9e72c383",
+        "CA_MRG_911ec8320222",
+        "CA_MRG_9789731d079e",
+        "CA_MRG_a14ea77f718d",
+        "CA_MRG_a592db62ce9c",
+        "CA_MRG_ac3bfdb5edd9",
+        "CA_MRG_bf94919e448f",
+        "CA_MRG_c32aed1df08f",
+        "CA_MRG_c4a98756227d",
+        "CA_MRG_d08e3259dc76",
+        "CA_MRG_d16c931e21ca",
+        "CA_MRG_d17d84b57368",
+        "CA_MRG_d27584f205e9",
+        "CA_MRG_d35dd30542b8",
+        "CA_MRG_dde82f995deb",
+        "CA_MRG_df8fc4dc7fdc",
+        "CA_MRG_e32835bda9ac",
+        "CA_MRG_f50bdee7dd4c",
+        "CA_MRG_f85fee938b91",
+        "CA_MRG_fca877bc83a4",
+        "CA_MRG_fccdff3ab06c",
+        "CA_MRG_fdd421e1a6fe",
+        "CN_MRG_005ada82e050",
+        "CN_MRG_00e6621cea37",
+        "CN_MRG_011734794f16",
         "CN_MRG_0284a41a11c9",
         "CN_MRG_03c2697ed1c7",
+        "CN_MRG_03e48d4d8cb7",
+        "CN_MRG_05adc3fc83ec",
+        "CN_MRG_08f0b7755ac2",
+        "CN_MRG_093183003948",
+        "CN_MRG_09f3d32020e4",
         "CN_MRG_0e6318364e8e",
         "CN_MRG_1130259eb8b0",
+        "CN_MRG_114c09629107",
+        "CN_MRG_13220d13d5c4",
+        "CN_MRG_14e9e4cde2f8",
+        "CN_MRG_15274e317fd6",
         "CN_MRG_19742f026a19",
         "CN_MRG_1a89a77f2e8a",
+        "CN_MRG_1f0a33afd376",
+        "CN_MRG_20fbce9fead7",
+        "CN_MRG_224b4845f904",
+        "CN_MRG_25e49cf89270",
+        "CN_MRG_26d52bd3f389",
+        "CN_MRG_27a184e8ab38",
+        "CN_MRG_28be4724b847",
+        "CN_MRG_293f7b8a3ba2",
+        "CN_MRG_2b668454dc72",
+        "CN_MRG_2e32a6a2bcdc",
+        "CN_MRG_31ba4a677ea0",
+        "CN_MRG_323d6e10e986",
+        "CN_MRG_33a2768f5b98",
         "CN_MRG_34e4e9cc4fbe",
+        "CN_MRG_371d5c1ed7c0",
+        "CN_MRG_380671e40a1c",
+        "CN_MRG_3811ff27587a",
+        "CN_MRG_38c583fdd544",
         "CN_MRG_394c2f1e79d2",
         "CN_MRG_398970fc50e7",
         "CN_MRG_3be300af18dc",
+        "CN_MRG_3c1607582833",
+        "CN_MRG_3cb8ad8288ff",
         "CN_MRG_3f1f7652e799",
+        "CN_MRG_3fcfe274ae51",
+        "CN_MRG_3ff67345ed78",
         "CN_MRG_41987d66c89b",
+        "CN_MRG_41df7818325c",
         "CN_MRG_427fc101d0bb",
+        "CN_MRG_4291f6684555",
+        "CN_MRG_4508995da9a6",
         "CN_MRG_47f5cbedadef",
         "CN_MRG_4c6664a4fd2e",
         "CN_MRG_4dbd04851564",
+        "CN_MRG_4ed89cf1f6b1",
+        "CN_MRG_5062affbdbed",
+        "CN_MRG_509032e83f5b",
         "CN_MRG_51650d15c050",
         "CN_MRG_51c0b9bbbb0a",
+        "CN_MRG_51e8f2b715e9",
         "CN_MRG_5305adb06a6c",
         "CN_MRG_533faafa0df3",
+        "CN_MRG_5422a4ca4ebb",
+        "CN_MRG_54a435d63591",
         "CN_MRG_57214cfbaf31",
+        "CN_MRG_5af65ef24d47",
         "CN_MRG_5b41c4449ce8",
         "CN_MRG_5c6db60e61b3",
+        "CN_MRG_5da384536a83",
+        "CN_MRG_5fbd1e9aa77f",
+        "CN_MRG_62b5e8747ba5",
+        "CN_MRG_6a93b7948d7c",
+        "CN_MRG_6afd9e47518e",
+        "CN_MRG_6be183a6cf2d",
         "CN_MRG_6c22a284518b",
         "CN_MRG_6c8b997d87f4",
+        "CN_MRG_6cfe5096a6ab",
         "CN_MRG_6d6cb2d8c363",
+        "CN_MRG_6dbf8b5106e5",
+        "CN_MRG_787af341608b",
         "CN_MRG_7c9c7c3d5403",
+        "CN_MRG_7e34a2c431cf",
         "CN_MRG_8028022022b6",
+        "CN_MRG_811ae32de700",
+        "CN_MRG_84ae8cea2227",
         "CN_MRG_855b56adb95d",
         "CN_MRG_8c437a4ee37b",
         "CN_MRG_8c69fc20650e",
+        "CN_MRG_8cc7d8c53bc9",
+        "CN_MRG_8e007746d816",
         "CN_MRG_9305fada0549",
+        "CN_MRG_96d6919d5c64",
+        "CN_MRG_9712017200b8",
+        "CN_MRG_97bd4300598a",
+        "CN_MRG_987772a55e2a",
+        "CN_MRG_9a5f1e882f00",
+        "CN_MRG_9b9b2d2aa43a",
+        "CN_MRG_9e687b93a31d",
+        "CN_MRG_a0f43f47d72e",
         "CN_MRG_a23dd781cd4b",
         "CN_MRG_a8d7799e7061",
+        "CN_MRG_abf8e714368a",
+        "CN_MRG_ad1c7dfff247",
+        "CN_MRG_ad9de4c133ee",
         "CN_MRG_afbaca334723",
         "CN_MRG_b11a43e1dda4",
+        "CN_MRG_b254335108f6",
         "CN_MRG_b38ab466fa3b",
+        "CN_MRG_b59c07833274",
         "CN_MRG_b7b350314dc1",
+        "CN_MRG_b960732fa4b5",
+        "CN_MRG_bbc31f7c4dea",
+        "CN_MRG_bcac2fdc52e8",
+        "CN_MRG_bd402a3fa1f8",
         "CN_MRG_bf685b353c1f",
         "CN_MRG_c5c7b0e9cbd8",
         "CN_MRG_c71520fb477c",
         "CN_MRG_caa06bd6794d",
         "CN_MRG_cb217ae78813",
+        "CN_MRG_ce6e418fb13a",
         "CN_MRG_d6f45c057bfc",
         "CN_MRG_d7d38b1d4e6c",
+        "CN_MRG_daab50ad3f6e",
         "CN_MRG_dcba081e6d4b",
         "CN_MRG_e16d02489ce6",
+        "CN_MRG_e27f5cb03fed",
+        "CN_MRG_e2dc46a8c2b2",
+        "CN_MRG_e323fb3516d2",
+        "CN_MRG_e3bada8615fa",
+        "CN_MRG_e4d1257a0bd1",
         "CN_MRG_e76984eed8fb",
         "CN_MRG_e9bedc8a8392",
+        "CN_MRG_ed13ca65f52b",
+        "CN_MRG_ee37cc33a1fc",
         "CN_MRG_f0bfe71b2f0e",
         "CN_MRG_f2a3fc747532",
+        "CN_MRG_f37770e5ef82",
+        "CN_MRG_f548e602acc9",
         "CN_MRG_f5f659cc505e",
+        "CN_MRG_f7ffc8864b6f",
+        "CN_MRG_f9315adbf3b5",
+        "CZ_MRG_16303fe61c1d",
+        "CZ_MRG_23d7414d33c7",
+        "CZ_MRG_2919911b5bfd",
+        "CZ_MRG_9096ecd76bb9",
+        "CZ_MRG_9d601ad75aef",
+        "CZ_MRG_a9dfac9d401b",
+        "CZ_MRG_dfeea8e4d5f1",
+        "CZ_MRG_e151f991209d",
+        "CZ_MRG_ea0c37760bf3",
         "DE_MRG_08a36bff89a0",
+        "DE_MRG_0fbf2afc9b39",
         "DE_MRG_171e39a343f9",
+        "DE_MRG_1df83dc7f94e",
+        "DE_MRG_20201cf9567d",
         "DE_MRG_22b5c35ff0db",
+        "DE_MRG_262d5b07c5d7",
+        "DE_MRG_2783e6e8c42b",
+        "DE_MRG_29a5db20c272",
+        "DE_MRG_31e7d8731feb",
+        "DE_MRG_330d1045d5ff",
         "DE_MRG_33b1389d946f",
         "DE_MRG_348581c848f8",
         "DE_MRG_3a19ae12c637",
         "DE_MRG_3b750624bff4",
+        "DE_MRG_3d2c992489d7",
         "DE_MRG_3fb6d34d5cec",
+        "DE_MRG_4000ef7b1fc9",
         "DE_MRG_46ade2104d23",
+        "DE_MRG_49bfd3282189",
         "DE_MRG_4ab0c6062d32",
         "DE_MRG_4fdd27cf49f7",
         "DE_MRG_54666399e0ac",
         "DE_MRG_5adb00f4a83d",
         "DE_MRG_5dd80c1fcf77",
+        "DE_MRG_5f2116b1dec1",
+        "DE_MRG_627c28127d09",
         "DE_MRG_67a8450f3c9f",
         "DE_MRG_68ba87808df8",
         "DE_MRG_698a45847033",
+        "DE_MRG_6c5feb42bb1d",
         "DE_MRG_6f627c55e7bd",
         "DE_MRG_70752f860917",
+        "DE_MRG_7165d0e64b22",
+        "DE_MRG_71c87ea87bb8",
         "DE_MRG_73019c3017aa",
+        "DE_MRG_734ca34a5700",
         "DE_MRG_77741e43de3f",
         "DE_MRG_830e5845fb60",
         "DE_MRG_88b2cc10d998",
         "DE_MRG_9410ac111320",
         "DE_MRG_98e486211a34",
         "DE_MRG_9e1fff10ce51",
+        "DE_MRG_9f7a3fcacc08",
         "DE_MRG_a235cf36d16c",
         "DE_MRG_a27167ef8f23",
+        "DE_MRG_a9aef085e5ee",
+        "DE_MRG_a9c190d720fe",
         "DE_MRG_ac1a1840dec2",
+        "DE_MRG_ad30df0f83f2",
+        "DE_MRG_b3d2cb60c548",
         "DE_MRG_b86ffe1dd2ea",
         "DE_MRG_bceaa37f49ef",
         "DE_MRG_bd0cf439de30",
@@ -22034,17 +22216,199 @@
         "DE_MRG_d561808c92a5",
         "DE_MRG_d67a0e4a728d",
         "DE_MRG_d7270b2f4f53",
+        "DE_MRG_dad579df8df6",
+        "DE_MRG_e2376e215153",
         "DE_MRG_e2617eca3f85",
         "DE_MRG_e2f350a636b5",
         "DE_MRG_e87b9124c03f",
         "DE_MRG_ea826ec181b8",
         "DE_MRG_ec3ed49e067c",
+        "DE_MRG_f070f3674dfa",
+        "DE_MRG_f39dea3fad08",
+        "FR_MRG_0a0901a977d5",
+        "FR_MRG_0d1fb06c5ad5",
+        "FR_MRG_294761d79cca",
+        "FR_MRG_591a9d51c535",
         "FR_MRG_5b1fca32ff2c",
+        "FR_MRG_5b351c0f453a",
         "FR_MRG_6d703ee3f8dc",
+        "FR_MRG_71a8637a4772",
         "FR_MRG_7c681aa2032e",
+        "FR_MRG_8a5ec14e81e7",
+        "FR_MRG_8cd54e74f796",
+        "FR_MRG_8e9054e07aa6",
         "FR_MRG_a3ac3f104566",
+        "FR_MRG_a48d5d8654a9",
+        "FR_MRG_af825dbec142",
+        "FR_MRG_b062e98b7497",
+        "FR_MRG_c20845af3938",
+        "FR_MRG_c20888c67931",
+        "FR_MRG_c84e32333c8a",
+        "FR_MRG_d292a0ff7a4c",
+        "FR_MRG_d4fcb61264f5",
+        "FR_MRG_e9f7d6aaa46e",
+        "FR_MRG_edac1467130b",
         "FR_MRG_ef55d0091c1e",
+        "FR_MRG_fcb0087ac12e",
+        "FR_MRG_fe4c24f6c0af",
         "GF_PRIMARY",
+        "IN_MRG_0002559134aa",
+        "IN_MRG_0156878691b5",
+        "IN_MRG_0240da1df458",
+        "IN_MRG_03a3f2ee1465",
+        "IN_MRG_05eafa4e7092",
+        "IN_MRG_07eb3c8cab39",
+        "IN_MRG_0872aaddca5c",
+        "IN_MRG_09081ee1d22c",
+        "IN_MRG_0c50a07858d2",
+        "IN_MRG_0d3b03a56cac",
+        "IN_MRG_0dc9b69890de",
+        "IN_MRG_0de8d89a2f89",
+        "IN_MRG_0e1e90dca5bf",
+        "IN_MRG_0f1924c89ced",
+        "IN_MRG_10207a70afcd",
+        "IN_MRG_10229d52fb7d",
+        "IN_MRG_16da719e5c4e",
+        "IN_MRG_1a5f5037ac4f",
+        "IN_MRG_1acfce2cdace",
+        "IN_MRG_1b2b9256168e",
+        "IN_MRG_1b5e5dff8662",
+        "IN_MRG_1d9b4933bded",
+        "IN_MRG_20483c2d9ff2",
+        "IN_MRG_20593aed5942",
+        "IN_MRG_21b7f1089cf4",
+        "IN_MRG_2344ccd4873a",
+        "IN_MRG_28701b62eace",
+        "IN_MRG_317bdbf2051b",
+        "IN_MRG_3208c5cacd01",
+        "IN_MRG_33e99e4bc668",
+        "IN_MRG_344720d94b02",
+        "IN_MRG_349db36c32d3",
+        "IN_MRG_35c5386ac534",
+        "IN_MRG_37328dfe8d45",
+        "IN_MRG_384a85847c3e",
+        "IN_MRG_3938fc2b4f6a",
+        "IN_MRG_39e1573b0992",
+        "IN_MRG_3e581c359307",
+        "IN_MRG_3ec3695dfc4f",
+        "IN_MRG_439a10aa562b",
+        "IN_MRG_446f3f4f281d",
+        "IN_MRG_464251afa31f",
+        "IN_MRG_46833068a470",
+        "IN_MRG_46ee484c2760",
+        "IN_MRG_48dd97061f04",
+        "IN_MRG_4947bf9afafe",
+        "IN_MRG_4b3f04e0f052",
+        "IN_MRG_4c31a6ef59fd",
+        "IN_MRG_4d898a5137a3",
+        "IN_MRG_4f750131bc07",
+        "IN_MRG_5002491fef3c",
+        "IN_MRG_50e2da4682da",
+        "IN_MRG_53f9886bc000",
+        "IN_MRG_556898e710b4",
+        "IN_MRG_562abe2f30d2",
+        "IN_MRG_5a8caf67d623",
+        "IN_MRG_5b5a79a728e7",
+        "IN_MRG_5bd2f4f1a695",
+        "IN_MRG_5c122f79992b",
+        "IN_MRG_5c48e7d5fc5b",
+        "IN_MRG_5df0a61bbde6",
+        "IN_MRG_5f8577d839fb",
+        "IN_MRG_61856fc517ff",
+        "IN_MRG_63ee40e30267",
+        "IN_MRG_64b26eec8389",
+        "IN_MRG_65081ed5bb9a",
+        "IN_MRG_65d1ff50f969",
+        "IN_MRG_6832ada5b624",
+        "IN_MRG_6ac4bd6d39d9",
+        "IN_MRG_6ba16322cfa2",
+        "IN_MRG_6c3faeb50bb6",
+        "IN_MRG_6cb5e15ba7ae",
+        "IN_MRG_6f037851532e",
+        "IN_MRG_708a258c7bc8",
+        "IN_MRG_7345206f129a",
+        "IN_MRG_73b8798a7214",
+        "IN_MRG_76ffa0bf6d57",
+        "IN_MRG_7779e13ac7b3",
+        "IN_MRG_77d8a688f4ee",
+        "IN_MRG_795568efe4e3",
+        "IN_MRG_7b0c2a483228",
+        "IN_MRG_7b27a9a03d70",
+        "IN_MRG_7b87bbb2489c",
+        "IN_MRG_7bdc9fb12bc4",
+        "IN_MRG_7e018f926260",
+        "IN_MRG_81646fcfad63",
+        "IN_MRG_82a7e2758f34",
+        "IN_MRG_8835ef71e194",
+        "IN_MRG_883b10e5d00a",
+        "IN_MRG_886776fba38b",
+        "IN_MRG_8aa5d9ed9b9f",
+        "IN_MRG_90b3ba03aaeb",
+        "IN_MRG_91cd3b059324",
+        "IN_MRG_94ef9201854b",
+        "IN_MRG_9592dd2cf1d9",
+        "IN_MRG_964f44be21c1",
+        "IN_MRG_9771ab24083b",
+        "IN_MRG_a2b5d06404de",
+        "IN_MRG_a3f42a5bb822",
+        "IN_MRG_a41c7ad59205",
+        "IN_MRG_a655f8eae163",
+        "IN_MRG_a9290adb0980",
+        "IN_MRG_a944b57d54cb",
+        "IN_MRG_a98f3e005f6a",
+        "IN_MRG_a9c8dc6c38f7",
+        "IN_MRG_add732cea50c",
+        "IN_MRG_aeb165f4c805",
+        "IN_MRG_b291003b6f41",
+        "IN_MRG_b507e43e5254",
+        "IN_MRG_b72e2285c63a",
+        "IN_MRG_b9f4a2a4e279",
+        "IN_MRG_bcb41c4f14e5",
+        "IN_MRG_bf71f4fd25b0",
+        "IN_MRG_c195372a6ccc",
+        "IN_MRG_c2a8b7b28b23",
+        "IN_MRG_c2bed413ca7f",
+        "IN_MRG_c37939012a0d",
+        "IN_MRG_c5914ea1f4cc",
+        "IN_MRG_c73911bfb285",
+        "IN_MRG_cba921b13656",
+        "IN_MRG_cc42364d4ba9",
+        "IN_MRG_ccf93b344819",
+        "IN_MRG_cee31aca9a07",
+        "IN_MRG_d11bffed2078",
+        "IN_MRG_d2159d107015",
+        "IN_MRG_d52299ba1791",
+        "IN_MRG_d531e0df892b",
+        "IN_MRG_d5c4dbfe1bc8",
+        "IN_MRG_d70f87866a7e",
+        "IN_MRG_d74786467839",
+        "IN_MRG_daa0ed708975",
+        "IN_MRG_dc594d605425",
+        "IN_MRG_dcf2b9f1d7ca",
+        "IN_MRG_dfae0079ed8c",
+        "IN_MRG_e361a0c62816",
+        "IN_MRG_e6a1c49f03e8",
+        "IN_MRG_e8f4da0d0535",
+        "IN_MRG_f050f1c4b3c9",
+        "IN_MRG_f0850bb4446c",
+        "IN_MRG_f09ef2e914ec",
+        "IN_MRG_f1db88056d17",
+        "IN_MRG_f61f07205f91",
+        "IN_MRG_f73955d59e52",
+        "IN_MRG_f8895b87957e",
+        "IN_MRG_fb0ec8ba1cb5",
+        "IN_MRG_fbe0a94c6ca5",
+        "IN_MRG_fc4fb7f7372c",
+        "IN_MRG_fe97969e7e01",
+        "NL_MRG_19568adfd807",
+        "NL_MRG_39ca088797c0",
+        "NL_MRG_45a7250c2862",
+        "NL_MRG_7e9ad361b25e",
+        "NL_MRG_99b7c61b066f",
+        "NL_MRG_b67b46af8948",
+        "NL_MRG_c127cb50cada",
+        "NL_MRG_cfd8aead1a35",
+        "NL_MRG_dfb52b5927e9",
         "NO_PRIMARY_GAP_15",
         "NO_PRIMARY_GAP_16",
         "NO_PRIMARY_GAP_26",
@@ -22054,38 +22418,750 @@
         "NO_PRIMARY_GAP_30",
         "NO_PRIMARY_GAP_31",
         "NO_PRIMARY_GAP_32",
+        "PL_MRG_05ddd04cc90f",
+        "PL_MRG_05f1ad6eedaa",
+        "PL_MRG_18fdfa02eca5",
+        "PL_MRG_20e2ba9602ff",
+        "PL_MRG_28f9056747e2",
+        "PL_MRG_328be0e18e73",
+        "PL_MRG_3384b03f3b03",
+        "PL_MRG_3692a96e99b1",
+        "PL_MRG_36976cf4d062",
+        "PL_MRG_3bc1f7b63f72",
+        "PL_MRG_44c900e7cbdd",
+        "PL_MRG_4762ef33a34f",
+        "PL_MRG_48e6927d3544",
+        "PL_MRG_49c8bdd6da87",
+        "PL_MRG_4a2bfb6b173f",
+        "PL_MRG_4a7fdf2f215b",
+        "PL_MRG_4af99a43d917",
+        "PL_MRG_4b4e7fcd7031",
+        "PL_MRG_4df6ad2dc703",
+        "PL_MRG_4ed00c272094",
+        "PL_MRG_50494ed51da4",
+        "PL_MRG_55eb1a09655e",
+        "PL_MRG_57a0cb6e8d35",
+        "PL_MRG_5ca02af3d829",
+        "PL_MRG_6059e5e8fd2d",
+        "PL_MRG_6143971238b3",
+        "PL_MRG_635f3bd9c929",
+        "PL_MRG_672367948ccf",
+        "PL_MRG_697bf6eafbca",
+        "PL_MRG_6a243775b00f",
+        "PL_MRG_6ea9dfea1297",
+        "PL_MRG_7076d4b3250d",
+        "PL_MRG_7c2fbae3db0b",
+        "PL_MRG_7e3204328b62",
+        "PL_MRG_8119670edfb9",
+        "PL_MRG_81a04ac05a78",
+        "PL_MRG_88938957a4dc",
+        "PL_MRG_8d9132641197",
+        "PL_MRG_8f55c53666f8",
+        "PL_MRG_9242fdb1805d",
+        "PL_MRG_940b9a58b475",
+        "PL_MRG_9b20fe0cbb07",
+        "PL_MRG_a4d0d3a9760e",
+        "PL_MRG_ae7dcb23076e",
+        "PL_MRG_afde07ef7e52",
+        "PL_MRG_b96b5d49d900",
+        "PL_MRG_be82540e6cf0",
+        "PL_MRG_c16d6d416392",
+        "PL_MRG_c16eaf95213a",
+        "PL_MRG_c5cfb391c06f",
+        "PL_MRG_c908eb11c602",
+        "PL_MRG_cb41a08029c6",
+        "PL_MRG_ccb2f83ec3cf",
+        "PL_MRG_cda1a954e365",
+        "PL_MRG_ce21dcd4a2c0",
+        "PL_MRG_d07f84128518",
+        "PL_MRG_d1960b18210a",
+        "PL_MRG_d33963acec0d",
+        "PL_MRG_d43cd846ec6f",
+        "PL_MRG_d48e8dc37f33",
+        "PL_MRG_d8ea546338a5",
+        "PL_MRG_d9d9ccd218dd",
+        "PL_MRG_e17e448ae4e2",
+        "PL_MRG_e9b93261cb76",
+        "PL_MRG_e9f1a2130857",
+        "PL_MRG_eb17d6c2a513",
+        "PL_MRG_eb6bfbc84cb1",
+        "PL_MRG_ec5519b4d3cf",
+        "PL_MRG_ec568da59ac7",
+        "PL_MRG_ed1992314afe",
+        "PL_MRG_eea8a1b754f3",
+        "PL_MRG_f18bf4792f6a",
+        "PL_MRG_f3a4768ac693",
+        "PL_MRG_fb2ce823eb38",
+        "PL_MRG_fe2842d4d685",
+        "PL_MRG_fe627fbb2f9c",
+        "RU_MRG_03fe31da4ec4",
+        "RU_MRG_04653bd2eb88",
+        "RU_MRG_047db3618f7e",
+        "RU_MRG_049b9f6aad55",
+        "RU_MRG_04be1b530cc3",
+        "RU_MRG_0647b9498b2f",
+        "RU_MRG_0693730687b9",
+        "RU_MRG_070e676051d2",
+        "RU_MRG_0712bf4c0b09",
+        "RU_MRG_077f46c83ea0",
+        "RU_MRG_09d845e05419",
+        "RU_MRG_0a65d5f58393",
+        "RU_MRG_0acb872c94fa",
+        "RU_MRG_0be016c8605b",
+        "RU_MRG_0c1434a780d8",
+        "RU_MRG_0c628fcdf9bb",
+        "RU_MRG_0c880ba23868",
+        "RU_MRG_0d726a437af0",
+        "RU_MRG_0da64c9d8feb",
+        "RU_MRG_0e93885d5cdc",
+        "RU_MRG_0fa9348c8062",
+        "RU_MRG_0fb1aeee6a65",
+        "RU_MRG_0fd0c43c03f0",
+        "RU_MRG_10b3308f3d85",
+        "RU_MRG_10f0f86a91af",
+        "RU_MRG_110b1d987f63",
+        "RU_MRG_12b2bddafaa1",
+        "RU_MRG_13bb9d740915",
+        "RU_MRG_13fef5f74a14",
+        "RU_MRG_147b9e791c0f",
+        "RU_MRG_15c4c99da0ea",
+        "RU_MRG_15cb29330a1c",
+        "RU_MRG_15cd872120f3",
+        "RU_MRG_16df1bb3876e",
+        "RU_MRG_177777beb337",
+        "RU_MRG_1899c681a78b",
+        "RU_MRG_18b505b29a4e",
+        "RU_MRG_193c9476a10d",
+        "RU_MRG_194bb325d1de",
+        "RU_MRG_1976f6232412",
+        "RU_MRG_19c10dbc9bb7",
+        "RU_MRG_19dc7bbc7bcb",
+        "RU_MRG_19fb94f201eb",
+        "RU_MRG_1a8b8a532d94",
+        "RU_MRG_1aa982125dc7",
+        "RU_MRG_1ab0a785a7fc",
+        "RU_MRG_1abe3c12baeb",
+        "RU_MRG_1be582aeb42b",
+        "RU_MRG_1c3ec0aee968",
+        "RU_MRG_1c96074cd4b0",
+        "RU_MRG_1ca73d498309",
+        "RU_MRG_1dafa9ab0c1a",
+        "RU_MRG_1ff20bc12a63",
+        "RU_MRG_200894813435",
+        "RU_MRG_21258bfc1110",
+        "RU_MRG_21f622bb3b2b",
+        "RU_MRG_22ecbd2b45b0",
+        "RU_MRG_23138a4426a1",
+        "RU_MRG_2358dbd480f8",
+        "RU_MRG_236358043a6b",
+        "RU_MRG_23ee001da084",
+        "RU_MRG_248dd5882219",
+        "RU_MRG_252059f2380f",
+        "RU_MRG_257334552b8c",
+        "RU_MRG_25e2a56635c5",
+        "RU_MRG_25eea59124e3",
+        "RU_MRG_25fe3261ce8f",
+        "RU_MRG_2722edc6e6c6",
+        "RU_MRG_27667b37cabf",
+        "RU_MRG_278b291b44d1",
+        "RU_MRG_27a7f048a0b1",
+        "RU_MRG_27e41ded5b0a",
+        "RU_MRG_286bec35becb",
+        "RU_MRG_28e9df08980a",
+        "RU_MRG_2944a9264c44",
+        "RU_MRG_29478c5fffa6",
+        "RU_MRG_2953c850d23a",
+        "RU_MRG_2abe6bddb595",
+        "RU_MRG_2b95a26406ca",
+        "RU_MRG_2cfe9a40e9b7",
+        "RU_MRG_2d748058088f",
+        "RU_MRG_2d8a56fb0da2",
+        "RU_MRG_2e2abc445545",
+        "RU_MRG_2eace9e3f217",
+        "RU_MRG_2ffc38a0e952",
+        "RU_MRG_3051f8fc54f7",
+        "RU_MRG_30cade9a7e6f",
+        "RU_MRG_317bc293c6ec",
+        "RU_MRG_32d32da1ff70",
+        "RU_MRG_330f810ce193",
+        "RU_MRG_331d25aa905a",
+        "RU_MRG_333dbd033786",
+        "RU_MRG_33c9fb373a65",
+        "RU_MRG_34e9e32d62ca",
+        "RU_MRG_352667918fc2",
+        "RU_MRG_352ca37aab63",
+        "RU_MRG_354d159a9201",
+        "RU_MRG_3576eb737658",
+        "RU_MRG_3598dda004bb",
+        "RU_MRG_35a5c1e09dd4",
+        "RU_MRG_368752e844fc",
+        "RU_MRG_372658bff17e",
+        "RU_MRG_37caa326be13",
+        "RU_MRG_381a0cc60dd8",
+        "RU_MRG_38e4b64aac65",
+        "RU_MRG_392ec3a802cd",
+        "RU_MRG_3937e6a0a228",
+        "RU_MRG_3942a3c5e59c",
+        "RU_MRG_3992f91b7378",
+        "RU_MRG_39c0ca250c57",
+        "RU_MRG_3a4ba118143e",
+        "RU_MRG_3bf1b1438247",
+        "RU_MRG_3c16652be846",
+        "RU_MRG_3c1f8e056188",
+        "RU_MRG_3ca144c1d18a",
+        "RU_MRG_3d5ebfb76db3",
+        "RU_MRG_3d995b252c3d",
+        "RU_MRG_3e1534e482c3",
+        "RU_MRG_3e1c684cc13c",
+        "RU_MRG_3e327de823aa",
+        "RU_MRG_3e81642c622c",
+        "RU_MRG_3f26ea354786",
+        "RU_MRG_3f321dca003c",
+        "RU_MRG_3f65aeea39a8",
+        "RU_MRG_3ffed98d7485",
+        "RU_MRG_415d81df9895",
+        "RU_MRG_4177d5ccfc4d",
+        "RU_MRG_41fee6249b5d",
+        "RU_MRG_421f6b2285d7",
+        "RU_MRG_42431abf423b",
+        "RU_MRG_427102c526cb",
+        "RU_MRG_42dcfb6eec5e",
+        "RU_MRG_43641c4798c6",
+        "RU_MRG_43f873e0c183",
+        "RU_MRG_4418a955e4ff",
+        "RU_MRG_4421c17551c2",
+        "RU_MRG_44732ad635df",
+        "RU_MRG_451862161429",
+        "RU_MRG_4543c51c6bdd",
+        "RU_MRG_45a27fa282d6",
+        "RU_MRG_45cb6d83fff3",
+        "RU_MRG_46291296feb9",
+        "RU_MRG_467ab67728ff",
+        "RU_MRG_469cb07238ab",
+        "RU_MRG_47107030a018",
+        "RU_MRG_47cb081b29d0",
+        "RU_MRG_480afb1927f5",
+        "RU_MRG_4810f49b101a",
+        "RU_MRG_4844dd62c5ed",
+        "RU_MRG_48dc139f3c1a",
+        "RU_MRG_49823857e689",
+        "RU_MRG_4a1ad9caacda",
+        "RU_MRG_4a2de1a12369",
+        "RU_MRG_4b5d89b2801b",
+        "RU_MRG_4b9b280cad80",
+        "RU_MRG_4bba5623a1e6",
+        "RU_MRG_4bf779af7de8",
+        "RU_MRG_4c7d723b93b0",
+        "RU_MRG_4d1eb2a853b6",
+        "RU_MRG_4ddc97ea36c1",
+        "RU_MRG_4ed360a39448",
+        "RU_MRG_4f3d82b76f96",
+        "RU_MRG_4f4508e949aa",
+        "RU_MRG_510edc918f57",
+        "RU_MRG_5152587ee975",
+        "RU_MRG_51d05b0cd072",
+        "RU_MRG_5207bacfde76",
+        "RU_MRG_52b3b8d7dc12",
+        "RU_MRG_53076b618d56",
+        "RU_MRG_53baf490481a",
+        "RU_MRG_5407579b5570",
+        "RU_MRG_545993141cd3",
+        "RU_MRG_54883923bf50",
+        "RU_MRG_54d291c64dfc",
+        "RU_MRG_54f19a93b9db",
+        "RU_MRG_54feb62370de",
+        "RU_MRG_55742c11b5e6",
+        "RU_MRG_563983f18fe2",
+        "RU_MRG_565e6f7cc145",
+        "RU_MRG_56cbe6d02d2f",
+        "RU_MRG_56d7f2c40815",
+        "RU_MRG_56ed27ec6e18",
+        "RU_MRG_57d8687f784e",
+        "RU_MRG_58dfbd1fa64b",
+        "RU_MRG_591cc0025487",
+        "RU_MRG_5936db92540a",
+        "RU_MRG_593f9791ee89",
+        "RU_MRG_59971f82636d",
+        "RU_MRG_59f6abe0ef5a",
+        "RU_MRG_59fd0de59d37",
+        "RU_MRG_5b10737a994a",
+        "RU_MRG_5ba368436fac",
+        "RU_MRG_5bab1314350d",
+        "RU_MRG_5bb5ee0b1fb6",
+        "RU_MRG_5ca04a85c3f4",
+        "RU_MRG_5cb2fb3991d9",
+        "RU_MRG_5d11e491ebbb",
+        "RU_MRG_5d719442f15d",
+        "RU_MRG_5dbc0427f580",
+        "RU_MRG_5eb4927958c7",
+        "RU_MRG_60459cf53f51",
+        "RU_MRG_60904da04ba2",
+        "RU_MRG_60a416f16ad5",
+        "RU_MRG_60b8dd6fa7be",
+        "RU_MRG_60d7253b0e0a",
+        "RU_MRG_61ce738540d1",
+        "RU_MRG_62d43bf78311",
+        "RU_MRG_62d82b3c1fa4",
+        "RU_MRG_62e1cda9654b",
+        "RU_MRG_639437e5ad6b",
+        "RU_MRG_639caddb97b7",
+        "RU_MRG_63a26ed5110c",
+        "RU_MRG_63e9553ae883",
+        "RU_MRG_646292257107",
+        "RU_MRG_6540bcc440b9",
+        "RU_MRG_654102762e97",
+        "RU_MRG_655667242e72",
+        "RU_MRG_67a510ab42f2",
+        "RU_MRG_67d918167343",
+        "RU_MRG_69c47d13e0ea",
+        "RU_MRG_69fe24997bd8",
+        "RU_MRG_6a3f1fee7164",
+        "RU_MRG_6a431b3749b3",
+        "RU_MRG_6ac3b28a1717",
+        "RU_MRG_6ade6e4bbcd7",
+        "RU_MRG_6b0074e9f94b",
+        "RU_MRG_6b0c8db39991",
+        "RU_MRG_6b6a075bbf36",
+        "RU_MRG_6b6c39533363",
+        "RU_MRG_6be12ffb1d4d",
+        "RU_MRG_6cf2ac643f4e",
+        "RU_MRG_6d68a0fd3c3c",
+        "RU_MRG_6dc9d50b794a",
+        "RU_MRG_6df85226925c",
+        "RU_MRG_6ed49a2fba50",
+        "RU_MRG_6f87652d4746",
+        "RU_MRG_6fb6a80f7b8a",
+        "RU_MRG_7023cdeaace9",
+        "RU_MRG_70ed82134bd7",
+        "RU_MRG_71433587cf08",
+        "RU_MRG_71c5eef625de",
+        "RU_MRG_71e52c27d399",
+        "RU_MRG_7255406b3d18",
+        "RU_MRG_725bf9a02991",
+        "RU_MRG_727dc7a15097",
+        "RU_MRG_728513759ce7",
+        "RU_MRG_72b0f3ba03bc",
+        "RU_MRG_72ee4e9306fc",
+        "RU_MRG_7378a30fad9a",
+        "RU_MRG_73932f56c8d6",
+        "RU_MRG_73b7c86083a9",
+        "RU_MRG_7425ae2cbd84",
+        "RU_MRG_7451af4e8c07",
+        "RU_MRG_74d30729755a",
+        "RU_MRG_74d5c4da86d9",
+        "RU_MRG_750a15603b8f",
+        "RU_MRG_75d0b3503bfa",
+        "RU_MRG_75e8b19921bc",
+        "RU_MRG_763309207c3e",
+        "RU_MRG_7663cb1f8f39",
+        "RU_MRG_76828e58eb68",
+        "RU_MRG_769c6062ebee",
+        "RU_MRG_76bad646959e",
+        "RU_MRG_7750087e40dd",
+        "RU_MRG_778d6b9a6bcb",
+        "RU_MRG_7820c72ce322",
+        "RU_MRG_782d749bb689",
+        "RU_MRG_784147403049",
+        "RU_MRG_7845e1b7a36b",
+        "RU_MRG_7877124b56e9",
+        "RU_MRG_78e8fa70f082",
+        "RU_MRG_79a4de3821cf",
+        "RU_MRG_79d73fa9760d",
+        "RU_MRG_79f3aaa40be4",
+        "RU_MRG_7a5b034feeea",
+        "RU_MRG_7ab59f492d2a",
+        "RU_MRG_7b3c6510fd3f",
+        "RU_MRG_7d69ba02c4da",
+        "RU_MRG_7e1c8281813e",
+        "RU_MRG_7e27efeffa0f",
+        "RU_MRG_7ebff71f4352",
+        "RU_MRG_7f673bbbcb21",
+        "RU_MRG_7fa31900ba72",
+        "RU_MRG_7fb0671d3e3b",
+        "RU_MRG_7fc798b3eeaf",
+        "RU_MRG_7fee908b63f6",
+        "RU_MRG_807631e65728",
+        "RU_MRG_81137f16203b",
+        "RU_MRG_8175cbc6e17d",
+        "RU_MRG_82288501a613",
+        "RU_MRG_8298b9d45571",
+        "RU_MRG_82b17e00b64e",
+        "RU_MRG_83744c263574",
+        "RU_MRG_840596f23cf8",
+        "RU_MRG_841bc7215ac5",
+        "RU_MRG_84a69ede33b5",
+        "RU_MRG_85ed17015f49",
+        "RU_MRG_86cd0c7f0325",
+        "RU_MRG_877b0d1f2d9d",
+        "RU_MRG_87f974ef0b94",
+        "RU_MRG_8833cbf157a6",
+        "RU_MRG_884ab2e1b411",
+        "RU_MRG_8a04555b8e14",
+        "RU_MRG_8a665b108348",
+        "RU_MRG_8ab72609576c",
+        "RU_MRG_8b55818839ef",
+        "RU_MRG_8bae009baf0d",
+        "RU_MRG_8bb4b9b2f984",
+        "RU_MRG_8db0a9d55bd2",
+        "RU_MRG_8dec32e7062d",
+        "RU_MRG_8e30afce3871",
+        "RU_MRG_8e6e2af7d4de",
+        "RU_MRG_8ec2184da20a",
+        "RU_MRG_8fa758ae0a77",
+        "RU_MRG_8fc678e94f2a",
+        "RU_MRG_90d3823663be",
+        "RU_MRG_90ed61ead343",
+        "RU_MRG_91548f408632",
+        "RU_MRG_91c0b63be7fb",
+        "RU_MRG_91f1efdf8bc5",
+        "RU_MRG_931348f653cd",
+        "RU_MRG_9444b3a17676",
+        "RU_MRG_94e7015e40d9",
+        "RU_MRG_960481e90ae6",
+        "RU_MRG_9604e71e10fc",
+        "RU_MRG_962b67068c91",
+        "RU_MRG_9630c25ee3c6",
+        "RU_MRG_96394847a7bb",
+        "RU_MRG_971db00ecf98",
+        "RU_MRG_975a1a106b2a",
+        "RU_MRG_977d68d87d87",
+        "RU_MRG_984ceffa7ee6",
+        "RU_MRG_99718fc516b9",
+        "RU_MRG_9a1edb58046a",
+        "RU_MRG_9a973c050065",
+        "RU_MRG_9d8deba56899",
+        "RU_MRG_9d9bddbd62f8",
+        "RU_MRG_9db237a6b59e",
+        "RU_MRG_9ed0f4973e0f",
+        "RU_MRG_9ee6ccf8117c",
+        "RU_MRG_9ef1aa17db33",
+        "RU_MRG_9f87451cc870",
+        "RU_MRG_9fe77f7052b1",
+        "RU_MRG_a0da05ed6a33",
+        "RU_MRG_a0ecef08b321",
+        "RU_MRG_a106abba15c7",
+        "RU_MRG_a1cbe886988c",
+        "RU_MRG_a209550547d0",
+        "RU_MRG_a22e47cb6b1f",
+        "RU_MRG_a2a20f78646e",
+        "RU_MRG_a2a252b3eba6",
+        "RU_MRG_a2ce0ba9fa04",
+        "RU_MRG_a5221179bd90",
+        "RU_MRG_a540d65edaa9",
+        "RU_MRG_a5742bed0bed",
+        "RU_MRG_a5a5eeed1587",
+        "RU_MRG_a610e18b7598",
+        "RU_MRG_a6b0abcdeaa3",
+        "RU_MRG_a6d5183bdf54",
+        "RU_MRG_a7a4db360f52",
+        "RU_MRG_a87b79d2be5d",
+        "RU_MRG_a8aa677324f3",
+        "RU_MRG_a8de19d9bade",
+        "RU_MRG_a94cbc9022fc",
+        "RU_MRG_aa3ae65083fb",
+        "RU_MRG_ab56c6057a73",
+        "RU_MRG_ab652814dff4",
+        "RU_MRG_ab7c9de141c7",
+        "RU_MRG_ac8b0478bf66",
+        "RU_MRG_aca4b754b06a",
+        "RU_MRG_ad1e693ffed2",
+        "RU_MRG_adb14e0f8093",
+        "RU_MRG_ae8913c1637c",
+        "RU_MRG_aedb5f9ed3b1",
+        "RU_MRG_af4de1ed4f9c",
+        "RU_MRG_b098cafecfb7",
+        "RU_MRG_b0d5b1b01211",
+        "RU_MRG_b18e5b7f00a3",
+        "RU_MRG_b202c10408ff",
+        "RU_MRG_b2d1407cd933",
+        "RU_MRG_b3191ccdd3f6",
+        "RU_MRG_b32ae436f609",
+        "RU_MRG_b3b6d1956b2b",
+        "RU_MRG_b3da0fe8b826",
+        "RU_MRG_b5cd1e7d4be4",
+        "RU_MRG_b61ec94d7cc6",
+        "RU_MRG_b63c46baafca",
+        "RU_MRG_b706be984552",
+        "RU_MRG_b74b6298db8e",
+        "RU_MRG_b7986b68045a",
+        "RU_MRG_b8675f108fd4",
+        "RU_MRG_b88d938191a1",
+        "RU_MRG_b963a8bb44cb",
+        "RU_MRG_b99b9e1ffaef",
+        "RU_MRG_ba58fc93c701",
+        "RU_MRG_ba5f9763e326",
+        "RU_MRG_bab5c9d8e609",
+        "RU_MRG_baef030e052d",
+        "RU_MRG_bb517d694577",
+        "RU_MRG_bb5f84a15d47",
+        "RU_MRG_bb60e0c589a5",
+        "RU_MRG_bb701cc86b7c",
+        "RU_MRG_bba373fa6104",
+        "RU_MRG_bc039a5db22c",
+        "RU_MRG_bc130a312688",
+        "RU_MRG_bc152a08afac",
+        "RU_MRG_bc3ec5d8cee8",
+        "RU_MRG_bccb1225fada",
+        "RU_MRG_bd33afbb026e",
+        "RU_MRG_bd4e5d799db8",
+        "RU_MRG_bd522f576b8e",
+        "RU_MRG_bd67d5dbed08",
+        "RU_MRG_be20933bc7c3",
+        "RU_MRG_be43d5dec8c0",
+        "RU_MRG_be7ea0c7c033",
+        "RU_MRG_bec756719bb4",
+        "RU_MRG_bee0bb9c2edd",
+        "RU_MRG_bf28b90ebe97",
+        "RU_MRG_bfc2cf574a56",
+        "RU_MRG_c2999ea662d8",
+        "RU_MRG_c3876f30b780",
+        "RU_MRG_c3b410784a1f",
+        "RU_MRG_c3b8cb206f5e",
+        "RU_MRG_c3cc17c29955",
+        "RU_MRG_c425c5a5ca50",
+        "RU_MRG_c4615cedcd6d",
+        "RU_MRG_c49d8cb805dc",
+        "RU_MRG_c4b7fcf9408f",
+        "RU_MRG_c4cc806170c7",
+        "RU_MRG_c60bafc0ae96",
+        "RU_MRG_c651c5ba9d10",
+        "RU_MRG_c663e09bf172",
+        "RU_MRG_c681e3bc5c71",
+        "RU_MRG_c68b90a156ce",
+        "RU_MRG_c6e84d1c3252",
+        "RU_MRG_c74526b2fdc8",
+        "RU_MRG_c78e9571a541",
+        "RU_MRG_c7dcc7efb71b",
+        "RU_MRG_c84f2ed9c6ef",
+        "RU_MRG_c8a0780621bb",
+        "RU_MRG_c90be9cc4d47",
+        "RU_MRG_ca213480791c",
+        "RU_MRG_ca9a21b6ea60",
+        "RU_MRG_cabe21f75eb0",
+        "RU_MRG_cb687e18e225",
+        "RU_MRG_cb7ab64b43b7",
+        "RU_MRG_cb93ebd8b7b5",
+        "RU_MRG_cc3f09a291db",
+        "RU_MRG_ccc631e40d26",
+        "RU_MRG_ccdeed8f9fd9",
+        "RU_MRG_cd478b5a76eb",
+        "RU_MRG_cddc570472f9",
+        "RU_MRG_d0fe64d9350d",
+        "RU_MRG_d12c5659178e",
+        "RU_MRG_d262a19b45fb",
+        "RU_MRG_d266dca34c0f",
+        "RU_MRG_d3a65ab636f6",
+        "RU_MRG_d3e21f6b65d6",
+        "RU_MRG_d3f284416aa5",
+        "RU_MRG_d5519e91a94b",
+        "RU_MRG_d5a146ea7ae0",
+        "RU_MRG_d5cd5d634999",
+        "RU_MRG_d665fd9ba683",
+        "RU_MRG_d67a36c17dc4",
+        "RU_MRG_d6b32b8b244a",
+        "RU_MRG_d6e7399b8ed9",
+        "RU_MRG_d7ef4389d36f",
+        "RU_MRG_d7f648c07bd4",
+        "RU_MRG_d860090dc575",
+        "RU_MRG_d8b55b2980d4",
+        "RU_MRG_d985bc7cb6ba",
+        "RU_MRG_d9b430bcd2cb",
+        "RU_MRG_da08ccbf24e6",
+        "RU_MRG_da0982e025af",
+        "RU_MRG_da32271f14c8",
+        "RU_MRG_da7099eb5a0f",
+        "RU_MRG_dafab256f046",
+        "RU_MRG_dafefaea8cbc",
+        "RU_MRG_db3cc2dd744a",
+        "RU_MRG_db950fa68d86",
+        "RU_MRG_dc59f2179593",
+        "RU_MRG_dc5d71a87d07",
+        "RU_MRG_dd0c9c3625d6",
+        "RU_MRG_dde98369766d",
+        "RU_MRG_deee7ff279fc",
+        "RU_MRG_df33d486fbcc",
+        "RU_MRG_df9a05a775d2",
+        "RU_MRG_dfc881d403c4",
+        "RU_MRG_dfe6c1e5f415",
+        "RU_MRG_e00f867dd81d",
+        "RU_MRG_e01a5b27cba9",
+        "RU_MRG_e03e6af00269",
+        "RU_MRG_e0a377c11b7b",
+        "RU_MRG_e0a6982b1a84",
+        "RU_MRG_e0ee40fde9b4",
+        "RU_MRG_e11c923f0c38",
+        "RU_MRG_e275078969d8",
+        "RU_MRG_e472f12334cb",
+        "RU_MRG_e5e9822050ff",
+        "RU_MRG_e6619735ec77",
+        "RU_MRG_e6c4245fecb6",
+        "RU_MRG_e6e892e6d34d",
+        "RU_MRG_e72df9dafd76",
+        "RU_MRG_e735cb3d5de0",
+        "RU_MRG_e770cd31cdb4",
+        "RU_MRG_e82122fbf2b7",
+        "RU_MRG_e85ce6b2cbb5",
+        "RU_MRG_e94d69805ef1",
+        "RU_MRG_e9567e283174",
+        "RU_MRG_e9b55eb4987e",
+        "RU_MRG_ea618303a3ad",
+        "RU_MRG_eb6edd92ee8d",
+        "RU_MRG_ebc5961355f4",
+        "RU_MRG_ec43e0811141",
+        "RU_MRG_ed434db4b357",
+        "RU_MRG_eec8890e773f",
+        "RU_MRG_eeebe5fff052",
+        "RU_MRG_ef463885ab7b",
+        "RU_MRG_ef7dc63ecba7",
+        "RU_MRG_f00dfba16127",
+        "RU_MRG_f01d51060a16",
+        "RU_MRG_f090bf11b60f",
+        "RU_MRG_f186479202a4",
+        "RU_MRG_f18f0befdc5e",
+        "RU_MRG_f1a67cdf0458",
+        "RU_MRG_f1c57006ab38",
+        "RU_MRG_f22292b3a58a",
+        "RU_MRG_f27518461032",
+        "RU_MRG_f27c1865f6ff",
+        "RU_MRG_f3309369affa",
+        "RU_MRG_f3808058260f",
+        "RU_MRG_f38bf2291525",
+        "RU_MRG_f3d2b13e0b30",
+        "RU_MRG_f3dfc0448ede",
+        "RU_MRG_f47338e16e14",
+        "RU_MRG_f49f6eed3fd4",
+        "RU_MRG_f4a93d25d960",
+        "RU_MRG_f5d0364a5d76",
+        "RU_MRG_f6312a148f5b",
+        "RU_MRG_f673f237de3d",
+        "RU_MRG_f6d9746e521a",
+        "RU_MRG_f703f8a6bf50",
+        "RU_MRG_f74231f65cbd",
+        "RU_MRG_f75032a5f7dc",
+        "RU_MRG_f7a972994e86",
+        "RU_MRG_f7c007e9f564",
+        "RU_MRG_f81bbccb0e01",
+        "RU_MRG_f84bc369d8b3",
+        "RU_MRG_f99008b0bde7",
+        "RU_MRG_f9fc260bcac5",
+        "RU_MRG_fbedb5ba4063",
+        "RU_MRG_fc10904ad88d",
+        "RU_MRG_fdf63a493917",
+        "RU_MRG_fec102300fdc",
+        "RU_MRG_ff5cc5b501e4",
         "RU_RAY_50074027B10379539839705__tno1962_1",
         "RU_RAY_50074027B66849950652275__tno1962_1",
         "RU_RAY_50074027B6686274683844__tno1962_1",
         "RU_RAY_50074027B6686274683844__tno1962_2",
+        "SK_MRG_351edc5a6c69",
+        "SK_MRG_6ddeb377aab6",
+        "SK_MRG_951b03682e38",
+        "SK_MRG_b87a765e2485",
+        "SK_MRG_da1e3ec3eef0",
+        "SK_MRG_dac05b35b387",
+        "SK_MRG_e93604b4f2a5",
+        "UA_MRG_01673e94c186",
+        "UA_MRG_049fbd166854",
+        "UA_MRG_07e4f868c3fb",
+        "UA_MRG_08e978d66245",
+        "UA_MRG_0d6137080058",
+        "UA_MRG_167b1c61b320",
+        "UA_MRG_1a8aac8d6778",
+        "UA_MRG_1d698b91bc32",
+        "UA_MRG_1e19f7d437d0",
         "UA_MRG_1e5ce8367e34",
+        "UA_MRG_228c317a869c",
+        "UA_MRG_26d00b8ec232",
+        "UA_MRG_2b67cdceafd7",
         "UA_MRG_2d1c37bdd071",
+        "UA_MRG_30161412737f",
+        "UA_MRG_35715f97812f",
         "UA_MRG_364aab8578b7",
         "UA_MRG_39b244f210a7",
+        "UA_MRG_4224fabffe3b",
         "UA_MRG_44d0fd9d6e14",
+        "UA_MRG_456d7658c3df",
+        "UA_MRG_4a445701c4c6",
+        "UA_MRG_4f13a104316f",
+        "UA_MRG_5041b17a3e61",
         "UA_MRG_51ee3e4d0063",
+        "UA_MRG_570a8d4dd729",
+        "UA_MRG_57c49cfe4029",
         "UA_MRG_5e1a623ff8e3",
         "UA_MRG_6057d7f77511",
+        "UA_MRG_6b24f46af3f8",
+        "UA_MRG_6e5a94ff967b",
+        "UA_MRG_70858b70843b",
+        "UA_MRG_71f8199a8d07",
+        "UA_MRG_72c94a3ccd70",
+        "UA_MRG_73aa15b32010",
+        "UA_MRG_76175923bdd1",
+        "UA_MRG_76b1b94d5856",
         "UA_MRG_797d35ccfd2e",
+        "UA_MRG_7db72d35cf6c",
         "UA_MRG_7e91c55da78e",
         "UA_MRG_7f067ceac5cb",
+        "UA_MRG_837595aeea03",
+        "UA_MRG_873c83173170",
+        "UA_MRG_87ad72dae9b5",
+        "UA_MRG_8c4b9e4808b7",
         "UA_MRG_8e1ed09f0e12",
+        "UA_MRG_8e995a06a742",
+        "UA_MRG_8f0f1aca728a",
+        "UA_MRG_91f1c11e596f",
+        "UA_MRG_93291f71dff3",
         "UA_MRG_95a5c2e0f114",
+        "UA_MRG_97cb7eda9f1d",
+        "UA_MRG_98ce0c6febb4",
+        "UA_MRG_9c6077315d06",
+        "UA_MRG_9cc4d817d067",
+        "UA_MRG_9e7d5f1ce841",
         "UA_MRG_9fc8b136c3a6",
+        "UA_MRG_a96bf83a0ff4",
+        "UA_MRG_ab85624a51f5",
         "UA_MRG_ae35953e4a30",
         "UA_MRG_b0fab68c785d",
+        "UA_MRG_b417c43a40cb",
+        "UA_MRG_b54ca702a003",
+        "UA_MRG_b75cd2d6110f",
         "UA_MRG_b828b24bbda1",
         "UA_MRG_ba89d2e82c09",
+        "UA_MRG_bde664b68d7f",
+        "UA_MRG_c2b5f29d91e8",
+        "UA_MRG_c5aa2c8a6048",
         "UA_MRG_c74c01b39f8e",
+        "UA_MRG_c8f134fbd5da",
         "UA_MRG_ce31c0ac496b",
+        "UA_MRG_d4f151f823ef",
         "UA_MRG_d6223fcd4bc5",
         "UA_MRG_d727a8cfaa69",
         "UA_MRG_dbee0923a48b",
+        "UA_MRG_de7101fe7980",
         "UA_MRG_de7e916ec1cb",
         "UA_MRG_e0dcc6adce13",
         "UA_MRG_e3c0520ffdd5",
         "UA_MRG_ec2bf97653b5",
+        "UA_MRG_f49493422ebe",
+        "UA_MRG_fbcb4404788c",
         "UA_MRG_fd8e40834959",
+        "UA_MRG_ff6ac32ac4e3",
+        "UK_MRG_05f15fd7e833",
+        "UK_MRG_0c7e7a67089e",
+        "UK_MRG_117d6a6890fd",
+        "UK_MRG_2f501f921535",
+        "UK_MRG_2f7c06fdd74c",
+        "UK_MRG_32be8ff42d1d",
+        "UK_MRG_3af31571b83c",
+        "UK_MRG_4bda76985a93",
+        "UK_MRG_5adcc0eef3cd",
+        "UK_MRG_5b67c89ee498",
+        "UK_MRG_5e86e440be06",
+        "UK_MRG_6b5533cccee5",
+        "UK_MRG_7443877c7a21",
+        "UK_MRG_a36fda7ab641",
+        "UK_MRG_b630eccadfbe",
+        "UK_MRG_b91d40f3e558",
+        "UK_MRG_e60d28324bee",
         "US_MRG_03d789d015aa",
         "US_MRG_0afc14e3e73d",
         "US_MRG_17c9b14fc969",
@@ -110946,10 +112022,10 @@
     "ALT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 21,
+      "controller_feature_count": 15,
       "display_name": "Oirotia",
       "entry_kind": "scenario_country",
-      "feature_count": 21,
+      "feature_count": 15,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -110962,7 +112038,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 21
+        "approx_existing_geometry": 25
       },
       "rule_sources": [
         "tno_1962_russia_alt"
@@ -111375,10 +112451,10 @@
     "BKR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 19,
+      "controller_feature_count": 5,
       "display_name": "Bashkir",
       "entry_kind": "scenario_country",
-      "feature_count": 19,
+      "feature_count": 5,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -111391,7 +112467,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 19
+        "manual_reviewed": 24
       },
       "rule_sources": [
         "tno_1962_russia_bkr"
@@ -111532,10 +112608,10 @@
     "BRG": {
       "base_iso2": "BE",
       "continent_label": "Europe",
-      "controller_feature_count": 88,
+      "controller_feature_count": 69,
       "display_name": "Ordensstaat Burgund",
       "entry_kind": "scenario_country",
-      "feature_count": 88,
+      "feature_count": 69,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -111550,7 +112626,7 @@
       "provenance_iso2": "BE",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 91
+        "manual_reviewed": 102
       },
       "rule_sources": [
         "tno_1962_brg_baseline"
@@ -111602,10 +112678,10 @@
     "BRY": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 28,
+      "controller_feature_count": 19,
       "display_name": "Buryat Soviet Socialist Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 28,
+      "feature_count": 19,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -111618,7 +112694,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 28
+        "manual_reviewed": 35
       },
       "rule_sources": [
         "tno_1962_bry_manual_override"
@@ -111767,10 +112843,10 @@
     "CAN": {
       "base_iso2": "CA",
       "continent_label": "North America",
-      "controller_feature_count": 378,
+      "controller_feature_count": 315,
       "display_name": "Canada",
       "entry_kind": "",
-      "feature_count": 378,
+      "feature_count": 315,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -111783,7 +112859,7 @@
       "provenance_iso2": "CA",
       "quality": "direct_country_copy",
       "quality_breakdown": {
-        "direct_country_copy": 378
+        "direct_country_copy": 431
       },
       "rule_sources": [],
       "scenario_only": false,
@@ -111831,10 +112907,10 @@
     "CHI": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 665,
+      "controller_feature_count": 633,
       "display_name": "Republic of China",
       "entry_kind": "scenario_subject",
-      "feature_count": 665,
+      "feature_count": 633,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -111849,7 +112925,7 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 743
+        "manual_reviewed": 764
       },
       "rule_sources": [
         "japan_nanjing_china_client_1962"
@@ -111897,10 +112973,10 @@
     "CHT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 32,
+      "controller_feature_count": 23,
       "display_name": "Far Eastern Tsardom",
       "entry_kind": "scenario_country",
-      "feature_count": 32,
+      "feature_count": 23,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -111913,7 +112989,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 32
+        "manual_reviewed": 37
       },
       "rule_sources": [
         "tno_1962_cht_manual_override"
@@ -112217,10 +113293,10 @@
     "ENG": {
       "base_iso2": "GB",
       "continent_label": "Europe",
-      "controller_feature_count": 135,
+      "controller_feature_count": 123,
       "display_name": "Britain",
       "entry_kind": "",
-      "feature_count": 135,
+      "feature_count": 123,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -112233,7 +113309,7 @@
       "provenance_iso2": "GB",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 135
+        "approx_existing_geometry": 145
       },
       "rule_sources": [
         "british_colonies",
@@ -112285,10 +113361,10 @@
     "FIC": {
       "base_iso2": "RU",
       "continent_label": "Asia",
-      "controller_feature_count": 13,
+      "controller_feature_count": 9,
       "display_name": "Far Eastern Intervention Committee",
       "entry_kind": "scenario_country",
-      "feature_count": 13,
+      "feature_count": 9,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112301,7 +113377,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 13
+        "manual_reviewed": 14
       },
       "rule_sources": [
         "tno_1962_fic_far_east_split"
@@ -112318,10 +113394,10 @@
     "FIN": {
       "base_iso2": "FI",
       "continent_label": "Europe",
-      "controller_feature_count": 56,
+      "controller_feature_count": 46,
       "display_name": "Finland",
       "entry_kind": "",
-      "feature_count": 56,
+      "feature_count": 46,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -112334,7 +113410,7 @@
       "provenance_iso2": "FI",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 56
+        "manual_reviewed": 64
       },
       "rule_sources": [
         "finnish_aland"
@@ -112351,10 +113427,10 @@
     "FRA": {
       "base_iso2": "FR",
       "continent_label": "Europe",
-      "controller_feature_count": 251,
+      "controller_feature_count": 225,
       "display_name": "France",
       "entry_kind": "",
-      "feature_count": 251,
+      "feature_count": 225,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -112367,7 +113443,7 @@
       "provenance_iso2": "FR",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 261
+        "approx_existing_geometry": 282
       },
       "rule_sources": [
         "french_colonies"
@@ -112384,10 +113460,10 @@
     "FRI": {
       "base_iso2": "IN",
       "continent_label": "Asia",
-      "controller_feature_count": 199,
+      "controller_feature_count": 124,
       "display_name": "Azad Hind",
       "entry_kind": "scenario_subject",
-      "feature_count": 199,
+      "feature_count": 124,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112402,7 +113478,7 @@
       "provenance_iso2": "IN",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 199
+        "manual_reviewed": 233
       },
       "rule_sources": [
         "japan_azad_hind_client_1962"
@@ -112555,10 +113631,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 770,
+      "controller_feature_count": 538,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 770,
+      "feature_count": 538,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -112571,7 +113647,7 @@
       "provenance_iso2": "DE",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 889
+        "manual_reviewed": 970
       },
       "rule_sources": [
         "germany_frontier_1936",
@@ -112662,10 +113738,10 @@
     "GOR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 48,
+      "controller_feature_count": 17,
       "display_name": "13th Panzer Army - Gorky",
       "entry_kind": "scenario_country",
-      "feature_count": 48,
+      "feature_count": 17,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112678,7 +113754,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 48
+        "manual_reviewed": 57
       },
       "rule_sources": [
         "tno_1962_gor_manual_override"
@@ -112827,10 +113903,10 @@
     "GUI": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 82,
+      "controller_feature_count": 52,
       "display_name": "Guizhou Clique",
       "entry_kind": "scenario_subject",
-      "feature_count": 82,
+      "feature_count": 52,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112845,7 +113921,7 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 82
+        "manual_reviewed": 98
       },
       "rule_sources": [
         "japan_guizhou_clique_client_1962"
@@ -112862,10 +113938,10 @@
     "GXC": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 87,
+      "controller_feature_count": 59,
       "display_name": "Guangxi Clique",
       "entry_kind": "scenario_subject",
-      "feature_count": 87,
+      "feature_count": 59,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112880,7 +113956,7 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 87
+        "manual_reviewed": 102
       },
       "rule_sources": [
         "japan_guangxi_client_1962"
@@ -113025,10 +114101,10 @@
     "HUN": {
       "base_iso2": "HU",
       "continent_label": "Europe",
-      "controller_feature_count": 49,
+      "controller_feature_count": 47,
       "display_name": "Hungary",
       "entry_kind": "",
-      "feature_count": 49,
+      "feature_count": 47,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -113041,7 +114117,7 @@
       "provenance_iso2": "HU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 49
+        "manual_reviewed": 50
       },
       "rule_sources": [
         "hungary_south_slovakia_1939",
@@ -113224,10 +114300,10 @@
     "IRK": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 18,
+      "controller_feature_count": 10,
       "display_name": "Far Eastern Presidium",
       "entry_kind": "scenario_country",
-      "feature_count": 18,
+      "feature_count": 10,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113240,7 +114316,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 18
+        "manual_reviewed": 21
       },
       "rule_sources": [
         "tno_1962_irk_manual_override"
@@ -113321,10 +114397,10 @@
     "JAP": {
       "base_iso2": "JP",
       "continent_label": "Asia",
-      "controller_feature_count": 108,
+      "controller_feature_count": 96,
       "display_name": "Japan",
       "entry_kind": "",
-      "feature_count": 108,
+      "feature_count": 96,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -113337,7 +114413,7 @@
       "provenance_iso2": "JP",
       "quality": "direct_country_copy",
       "quality_breakdown": {
-        "direct_country_copy": 108
+        "direct_country_copy": 114
       },
       "rule_sources": [
         "jidong_japanese_occupation"
@@ -113455,10 +114531,10 @@
     "KOM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 18,
+      "controller_feature_count": 11,
       "display_name": "Komi Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 18,
+      "feature_count": 11,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113471,7 +114547,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 18
+        "manual_reviewed": 22
       },
       "rule_sources": [
         "tno_1962_kom_manual_override"
@@ -113523,10 +114599,10 @@
     "KRS": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 16,
+      "controller_feature_count": 5,
       "display_name": "Krasnoyarsk",
       "entry_kind": "scenario_country",
-      "feature_count": 16,
+      "feature_count": 5,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113539,7 +114615,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 16
+        "manual_reviewed": 18
       },
       "rule_sources": [
         "tno_1962_krs_manual_override"
@@ -113791,10 +114867,10 @@
     "MAG": {
       "base_iso2": "MAG",
       "continent_label": "Europe",
-      "controller_feature_count": 13,
+      "controller_feature_count": 9,
       "display_name": "Magnitogorsk",
       "entry_kind": "scenario_country",
-      "feature_count": 13,
+      "feature_count": 9,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113807,7 +114883,7 @@
       "provenance_iso2": "MAG",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 13
+        "manual_reviewed": 15
       },
       "rule_sources": [
         "dev_manual_tag_create"
@@ -113859,10 +114935,10 @@
     "MAN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 323,
+      "controller_feature_count": 286,
       "display_name": "Manchukuo",
       "entry_kind": "scenario_subject",
-      "feature_count": 323,
+      "feature_count": 286,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113877,7 +114953,7 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 323
+        "manual_reviewed": 341
       },
       "rule_sources": [
         "japan_manchukuo_protectorate_1962"
@@ -113927,10 +115003,10 @@
     "MEN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 79,
+      "controller_feature_count": 74,
       "display_name": "Mengjiang",
       "entry_kind": "scenario_subject",
-      "feature_count": 79,
+      "feature_count": 74,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113945,7 +115021,7 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 79
+        "manual_reviewed": 80
       },
       "rule_sources": [
         "japan_mengjiang_protectorate_1962"
@@ -114286,10 +115362,10 @@
     "NIE": {
       "base_iso2": "NIE",
       "continent_label": "",
-      "controller_feature_count": 9,
+      "controller_feature_count": 7,
       "display_name": "Northern-Ireland",
       "entry_kind": "scenario_subject",
-      "feature_count": 9,
+      "feature_count": 7,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114304,7 +115380,7 @@
       "provenance_iso2": "NIE",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 9
+        "manual_reviewed": 10
       },
       "rule_sources": [
         "dev_manual_tag_create"
@@ -114321,10 +115397,10 @@
     "NOV": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 132,
+      "controller_feature_count": 39,
       "display_name": "Novosibirsk",
       "entry_kind": "scenario_country",
-      "feature_count": 132,
+      "feature_count": 39,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -114337,7 +115413,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 132
+        "manual_reviewed": 169
       },
       "rule_sources": [
         "tno_1962_russia_nov"
@@ -114416,10 +115492,10 @@
     "OMS": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 51,
+      "controller_feature_count": 25,
       "display_name": "Omsk",
       "entry_kind": "scenario_country",
-      "feature_count": 51,
+      "feature_count": 25,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -114432,7 +115508,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 51
+        "approx_existing_geometry": 63
       },
       "rule_sources": [
         "tno_1962_russia_oms"
@@ -114513,10 +115589,10 @@
     "ORN": {
       "base_iso2": "ORN",
       "continent_label": "Europe",
-      "controller_feature_count": 14,
+      "controller_feature_count": 7,
       "display_name": "Orenburg",
       "entry_kind": "scenario_country",
-      "feature_count": 14,
+      "feature_count": 7,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114529,7 +115605,7 @@
       "provenance_iso2": "ORN",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 14
+        "manual_reviewed": 18
       },
       "rule_sources": [
         "dev_manual_tag_create"
@@ -114579,10 +115655,10 @@
     "OUR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 26,
+      "controller_feature_count": 11,
       "display_name": "Orenburg-Ural Union",
       "entry_kind": "scenario_country",
-      "feature_count": 26,
+      "feature_count": 11,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114595,7 +115671,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 26
+        "manual_reviewed": 32
       },
       "rule_sources": [
         "tno_1962_our_manual_override"
@@ -114773,10 +115849,10 @@
     "PFC": {
       "base_iso2": "RU",
       "continent_label": "Asia",
-      "controller_feature_count": 19,
+      "controller_feature_count": 18,
       "display_name": "Far Eastern Pacific Fleet Command",
       "entry_kind": "scenario_country",
-      "feature_count": 19,
+      "feature_count": 18,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114789,7 +115865,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 19
+        "manual_reviewed": 20
       },
       "rule_sources": [
         "tno_1962_pfc_far_east_split"
@@ -115068,10 +116144,10 @@
     "RAJ": {
       "base_iso2": "IN",
       "continent_label": "Asia",
-      "controller_feature_count": 512,
+      "controller_feature_count": 238,
       "display_name": "British Raj",
       "entry_kind": "scenario_country",
-      "feature_count": 512,
+      "feature_count": 238,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115084,7 +116160,7 @@
       "provenance_iso2": "IN",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 512
+        "manual_reviewed": 626
       },
       "rule_sources": [
         "tno_1962_independent_raj"
@@ -115169,10 +116245,10 @@
     "RKK": {
       "base_iso2": "GE",
       "continent_label": "Asia",
-      "controller_feature_count": 339,
+      "controller_feature_count": 173,
       "display_name": "Reichskommissariat Kaukasien",
       "entry_kind": "scenario_country",
-      "feature_count": 339,
+      "feature_count": 173,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115187,7 +116263,7 @@
       "provenance_iso2": "GE",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 339
+        "manual_reviewed": 416
       },
       "rule_sources": [
         "tno_baseline_rkk"
@@ -115204,10 +116280,10 @@
     "RKM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 768,
+      "controller_feature_count": 206,
       "display_name": "Reichskommissariat Moskowien",
       "entry_kind": "scenario_country",
-      "feature_count": 768,
+      "feature_count": 206,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115222,7 +116298,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 768
+        "manual_reviewed": 975
       },
       "rule_sources": [
         "tno_baseline_rkm"
@@ -115239,10 +116315,10 @@
     "RKN": {
       "base_iso2": "NL",
       "continent_label": "Europe",
-      "controller_feature_count": 40,
+      "controller_feature_count": 29,
       "display_name": "Reichskommissariat Niederlande",
       "entry_kind": "scenario_country",
-      "feature_count": 40,
+      "feature_count": 29,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115257,7 +116333,7 @@
       "provenance_iso2": "NL",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 40
+        "manual_reviewed": 49
       },
       "rule_sources": [
         "tno_baseline_rkn"
@@ -115309,10 +116385,10 @@
     "RKO": {
       "base_iso2": "LT",
       "continent_label": "Europe",
-      "controller_feature_count": 68,
+      "controller_feature_count": 64,
       "display_name": "Reichskommissariat Ostland",
       "entry_kind": "scenario_country",
-      "feature_count": 68,
+      "feature_count": 64,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115327,7 +116403,7 @@
       "provenance_iso2": "LT",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 68
+        "manual_reviewed": 69
       },
       "rule_sources": [
         "tno_baseline_rko"
@@ -115344,10 +116420,10 @@
     "RKP": {
       "base_iso2": "PL",
       "continent_label": "Europe",
-      "controller_feature_count": 180,
+      "controller_feature_count": 84,
       "display_name": "General Government of Poland",
       "entry_kind": "scenario_country",
-      "feature_count": 180,
+      "feature_count": 84,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115362,7 +116438,7 @@
       "provenance_iso2": "PL",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 180
+        "manual_reviewed": 219
       },
       "rule_sources": [
         "tno_baseline_rkp"
@@ -115379,10 +116455,10 @@
     "RKU": {
       "base_iso2": "UA",
       "continent_label": "Europe",
-      "controller_feature_count": 381,
+      "controller_feature_count": 287,
       "display_name": "Reichskommissariat Ukraine",
       "entry_kind": "scenario_country",
-      "feature_count": 381,
+      "feature_count": 287,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115397,7 +116473,7 @@
       "provenance_iso2": "UA",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 450
+        "manual_reviewed": 504
       },
       "rule_sources": [
         "tno_baseline_rku"
@@ -115414,10 +116490,10 @@
     "ROM": {
       "base_iso2": "RO",
       "continent_label": "Europe",
-      "controller_feature_count": 119,
+      "controller_feature_count": 116,
       "display_name": "Romania",
       "entry_kind": "",
-      "feature_count": 119,
+      "feature_count": 116,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115430,7 +116506,7 @@
       "provenance_iso2": "RO",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 119
+        "manual_reviewed": 121
       },
       "rule_sources": [
         "romania_bessarabia_1936"
@@ -115480,10 +116556,10 @@
     "RUR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 43,
+      "controller_feature_count": 18,
       "display_name": "Rurik Kingdom",
       "entry_kind": "scenario_country",
-      "feature_count": 43,
+      "feature_count": 18,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115496,7 +116572,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 43
+        "manual_reviewed": 51
       },
       "rule_sources": [
         "tno_1962_rur_manual_override"
@@ -115579,10 +116655,10 @@
     "SAM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 74,
+      "controller_feature_count": 17,
       "display_name": "Russian Liberation Army",
       "entry_kind": "scenario_country",
-      "feature_count": 74,
+      "feature_count": 17,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115595,7 +116671,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 73,
+        "approx_existing_geometry": 92,
         "manual_reviewed": 1
       },
       "rule_sources": [
@@ -115644,10 +116720,10 @@
     "SBA": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 26,
+      "controller_feature_count": 13,
       "display_name": "Siberian Black Army",
       "entry_kind": "scenario_country",
-      "feature_count": 26,
+      "feature_count": 13,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115660,7 +116736,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 26
+        "manual_reviewed": 33
       },
       "rule_sources": [
         "tno_1962_sba_manual_override"
@@ -115677,10 +116753,10 @@
     "SCO": {
       "base_iso2": "GB",
       "continent_label": "Europe",
-      "controller_feature_count": 22,
+      "controller_feature_count": 16,
       "display_name": "Scotland",
       "entry_kind": "",
-      "feature_count": 22,
+      "feature_count": 16,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115693,7 +116769,7 @@
       "provenance_iso2": "GB",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 22
+        "manual_reviewed": 26
       },
       "rule_sources": [
         "tno_1962_sco_baseline"
@@ -115780,10 +116856,10 @@
     "SHX": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 196,
+      "controller_feature_count": 125,
       "display_name": "Shanxi",
       "entry_kind": "scenario_subject",
-      "feature_count": 196,
+      "feature_count": 125,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115798,7 +116874,7 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 196
+        "manual_reviewed": 230
       },
       "rule_sources": [
         "japan_shanxi_client_1962"
@@ -115910,10 +116986,10 @@
     "SLO": {
       "base_iso2": "SK",
       "continent_label": "Europe",
-      "controller_feature_count": 67,
+      "controller_feature_count": 58,
       "display_name": "Slovakia",
       "entry_kind": "",
-      "feature_count": 67,
+      "feature_count": 58,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115926,7 +117002,7 @@
       "provenance_iso2": "SK",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 67
+        "manual_reviewed": 74
       },
       "rule_sources": [
         "1939_slovakia_puppet_state"
@@ -115978,10 +117054,10 @@
     "SVR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 106,
+      "controller_feature_count": 21,
       "display_name": "Ural Military District",
       "entry_kind": "scenario_country",
-      "feature_count": 106,
+      "feature_count": 21,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115994,7 +117070,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 106
+        "approx_existing_geometry": 136
       },
       "rule_sources": [
         "tno_1962_svr_manual_override"
@@ -116110,10 +117186,10 @@
     "TAN": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 24,
+      "controller_feature_count": 21,
       "display_name": "People's Revolutionary Council",
       "entry_kind": "scenario_country",
-      "feature_count": 24,
+      "feature_count": 21,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116126,7 +117202,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 24
+        "approx_existing_geometry": 26
       },
       "rule_sources": [
         "tno_1962_tan_manual_override"
@@ -116143,10 +117219,10 @@
     "TAT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 70,
+      "controller_feature_count": 12,
       "display_name": "Tatar Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 70,
+      "feature_count": 12,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116159,7 +117235,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 70
+        "manual_reviewed": 86
       },
       "rule_sources": [
         "tno_1962_tat_manual_override"
@@ -116277,10 +117353,10 @@
     "TOM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 25,
+      "controller_feature_count": 17,
       "display_name": "Tomsk",
       "entry_kind": "scenario_country",
-      "feature_count": 25,
+      "feature_count": 17,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116293,7 +117369,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 25
+        "approx_existing_geometry": 29
       },
       "rule_sources": [
         "tno_1962_russia_tom"
@@ -116378,10 +117454,10 @@
     "TYM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 35,
+      "controller_feature_count": 14,
       "display_name": "Tyumen",
       "entry_kind": "scenario_country",
-      "feature_count": 35,
+      "feature_count": 14,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116394,7 +117470,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 35
+        "manual_reviewed": 41
       },
       "rule_sources": [
         "tno_1962_tym_manual_override"
@@ -116768,10 +117844,10 @@
     "VOL": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 31,
+      "controller_feature_count": 15,
       "display_name": "Vologda Neutral Zone",
       "entry_kind": "scenario_country",
-      "feature_count": 31,
+      "feature_count": 15,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116784,7 +117860,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 31
+        "manual_reviewed": 41
       },
       "rule_sources": [
         "tno_1962_vol_manual_override"
@@ -116832,10 +117908,10 @@
     "VYT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 62,
+      "controller_feature_count": 11,
       "display_name": "Vyatka",
       "entry_kind": "scenario_country",
-      "feature_count": 62,
+      "feature_count": 11,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116848,7 +117924,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 62
+        "manual_reviewed": 77
       },
       "rule_sources": [
         "tno_1962_russia_vyt"
@@ -116865,10 +117941,10 @@
     "WLS": {
       "base_iso2": "GB",
       "continent_label": "Europe",
-      "controller_feature_count": 12,
+      "controller_feature_count": 9,
       "display_name": "Wales",
       "entry_kind": "",
-      "feature_count": 12,
+      "feature_count": 9,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116881,7 +117957,7 @@
       "provenance_iso2": "GB",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 12
+        "manual_reviewed": 14
       },
       "rule_sources": [
         "tno_1962_wls_baseline"
@@ -116898,10 +117974,10 @@
     "WRS": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 30,
+      "controller_feature_count": 27,
       "display_name": "West Russian Revolutionary Front",
       "entry_kind": "scenario_country",
-      "feature_count": 30,
+      "feature_count": 27,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116914,7 +117990,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 30
+        "manual_reviewed": 31
       },
       "rule_sources": [
         "tno_1962_wrs_manual_override"
@@ -117030,10 +118106,10 @@
     "YAK": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 14,
+      "controller_feature_count": 11,
       "display_name": "Sakha Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 14,
+      "feature_count": 11,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117046,7 +118122,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 14
+        "manual_reviewed": 17
       },
       "rule_sources": [
         "tno_1962_yak_manual_override"
@@ -117195,10 +118271,10 @@
     "ZLT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 25,
+      "controller_feature_count": 7,
       "display_name": "Zlatoust",
       "entry_kind": "scenario_country",
-      "feature_count": 25,
+      "feature_count": 7,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -117211,7 +118287,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 25
+        "approx_existing_geometry": 31
       },
       "rule_sources": [
         "tno_1962_russia_zlt"
@@ -117231,16 +118307,16 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "f2b03cd632e543d12f55148ad83156b590201a378fd3018f898c64320abd9335",
+  "snapshot_fingerprint": "8354afd8f66f56ee03d5ab8d66fca3c14fda804585b8f9a51522090fad9c17d7",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "9fd13c681c18eb678656bcf6444b3982cc3d03586f2dd53f48183129d9ed3418",
-    "detail_chunk_manifest_sha256": "fb63e97448b8b616b9ba62271b13abbca6174ad22106511e1f0438dbd8370a0a",
+    "build_snapshot_sha256": "de9e7c837c416a805222d1f93dc8a363276351aac88e95930e75a4c13357db70",
+    "detail_chunk_manifest_sha256": "bebef4199598aeb02cae406473458b8da7b5ad044ce66b632b73bbb87fdb55d9",
     "runtime_bootstrap_topology_sha256": "778d8bf0739545699e84b5a5b99decbec670752d1f36ef142ac8399e4e923119",
-    "runtime_topology_sha256": "49dac339534689a6e024f73e36ad6da6f1c2915d3acbc9a4630d16cb2727123b"
+    "runtime_topology_sha256": "439d91326b79d95db7face889ffe750698529bf31f578edb4105715be7153230"
   },
   "summary": {
-    "approximate_count": 865,
+    "approximate_count": 973,
     "belarus_hybrid_feature_count": 0,
     "blocker_count": 0,
     "changed_feature_count": 2032,
@@ -117253,27 +118329,27 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 12439,
+    "feature_count": 9949,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 9511,
+    "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
     "owner_count": 172,
     "quality_counts": {
-      "approx_existing_geometry": 925,
-      "direct_country_copy": 2639,
-      "manual_reviewed": 9511
+      "approx_existing_geometry": 1033,
+      "direct_country_copy": 2698,
+      "manual_reviewed": 10420
     },
     "scenario_atlantropa_feature_count": 726,
     "scenario_rule_blocker_count": 0,
     "scenario_runtime_topology_object_count": 7,
     "source_counts": {
       "controller_rule": 0,
-      "direct_active_owner": 4468,
+      "direct_active_owner": 4647,
       "fallback_mapped_tag": 3,
-      "manual_rule": 6293,
+      "manual_rule": 6803,
       "scenario_generated": 445,
-      "tno_reichskommissariat_baseline": 1866
+      "tno_reichskommissariat_baseline": 2253
     },
     "synthetic_count": 492,
     "synthetic_owner_feature_count": 492,

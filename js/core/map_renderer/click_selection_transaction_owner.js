@@ -157,7 +157,10 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
 
   async function handleClick(event, _interactionContext = null) {
     let state = getClickState();
-    if (state.startupReadonly) {
+    if (state.startupReadonly && (state.currentTool !== "select"
+      || state.specialZoneEditor?.active || state.operationalLineEditor?.active
+      || state.operationGraphicsEditor?.active || state.unitCounterEditor?.active
+      || state.isEditingPreset)) {
       if (event?.preventDefault) event.preventDefault();
       blockStartupReadonlyInteraction();
       return;
@@ -257,7 +260,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       return;
     }
     updateDevSelectedHit(hit);
-    if (handleSpecialZoneMembershipClick(hit, event)) return;
+    if (!state.startupReadonly && handleSpecialZoneMembershipClick(hit, event)) return;
     if (target.kind === "special") {
       const specialFeature = state.specialRegionsById.get(id);
       if (!specialFeature) return;
@@ -268,6 +271,10 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       if (previousWaterRegionId) refreshWaterRegionSidebarRowsNow([previousWaterRegionId]);
       refreshSpecialRegionSidebarRowsNow([previousSpecialRegionId, id]);
       requestInteractionRender("select-special-region");
+      if (state.currentTool === "select") {
+        noteRenderAction("select-special", actionStart);
+        return;
+      }
       if (state.currentTool === "eyedropper") {
         const picked = getSpecialRegionColor(id, specialFeature);
         if (picked) setClickSelectedColor(picked, { updateSwatch: true });
@@ -306,6 +313,11 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       if (macroOceanSelectionOnly) {
         requestInteractionRender("click-select-open-ocean");
         noteRenderAction("click-select-open-ocean", actionStart);
+        return;
+      }
+      if (state.currentTool === "select") {
+        requestInteractionRender("select-water");
+        noteRenderAction("select-water", actionStart);
         return;
       }
       if (state.currentTool === "eraser") {
@@ -359,6 +371,12 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       noteRenderAction(changedSelection ? "dev-selection-toggle" : "dev-selection-sync", actionStart);
       return;
     }
+    if (state.currentTool === "select") {
+      syncInspectorCountryToLandSelection(feature, landId, landHit);
+      requestInteractionRender("select-land");
+      noteRenderAction("select-land", actionStart);
+      return;
+    }
     let countryCode = landHit.countryCode || getFeatureCountryCodeNormalized(feature);
     if (!(await ensureLeafDetailReady(countryCode, { announce: true }))) {
       return;
@@ -379,6 +397,14 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
         countryCode = landHit.countryCode || getFeatureCountryCodeNormalized(feature);
         updateDevSelectedHit(landHit);
       }
+    }
+    // The user may switch to the select tool while leaf detail loads; that click
+    // must only inspect, never fall through to a paint.
+    if (state.currentTool === "select") {
+      syncInspectorCountryToLandSelection(feature, landId, landHit);
+      requestInteractionRender("select-land");
+      noteRenderAction("select-land", actionStart);
+      return;
     }
     if (!state.isEditingPreset && handleRiverPaintClick(landHit)) return;
     const targetIds = resolveInteractionTargetIds(feature, landId);

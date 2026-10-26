@@ -4,22 +4,67 @@ A candidate group is only merged where every scenario assigns its members
 identically: owners, cores, HOI4 strategic-value buckets, hierarchy groups and
 every quick-fill level. Inconsistent candidates are split into the largest
 consistent subsets that remain contiguous; singletons stay unmerged.
+
+With ``--scenarios`` the plan applies only to those scenarios: owners, cores and
+HOI4 states are read from them alone, and only their runtime topologies are
+rewritten. Hierarchy, quick-fill, China prefecture and protection rules stay
+global, because the shared hierarchy keeps the unmerged members.
 """
 from __future__ import annotations
 
 import argparse
+import copy
+import functools
 import gzip
 import hashlib
 import json
+import math
+import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from map_builder.political_feature_merge_plans import (  # noqa: E402
+    consumed_members, ordered_plans, plan_scenarios, register_plan, validate_scope,
+)
+
 DATA = ROOT / "data"
 OWNERSHIP_SCENARIOS = ("hoi4_1936", "hoi4_1939", "modern_world", "tno_1962")
+ALL_SCENARIOS = ("blank_base", *OWNERSHIP_SCENARIOS)
 STRATEGIC_SCENARIOS = ("hoi4_1936", "hoi4_1939")
 RIVER_PARTITIONS = DATA / "river_partitions"
 CHINA_CROSSWALK = DATA / "quick_fill/china_prefecture_crosswalk.v1.json"
-ADJACENCY_TOPOLOGY = DATA / "scenarios/tno_1962/runtime_topology.topo.json.gz"
+ADJACENCY_SCENARIO = "tno_1962"
+# Properties a merged feature takes from its plan; every other property must agree across members
+# (keep in step with NAME_KEYS in tools/apply_political_feature_merges.py).
+PROPERTY_NAME_KEYS = {"id", "name", "name_local", "legacy_name", "anchor_county_name", "adm1_name"}
+# Every topology the apply tool rewrites. A merge must not mix precision and ordinary
+# parcels, and every member must be valid there: the apply tool unions without repair.
+# Shared files whose ID lists name features (historical display presets, releasable
+# preset sources), with the scenarios that read them. A group must lie wholly inside
+# or outside each list its scenarios read: the apply tool projects these lists, or for
+# a scoped plan the frontend does (js/core/releasable_manager.js), and neither may
+# widen or split a list.
+SHARED_ID_LIST_READERS = {
+    "country_feature_policies.json": ALL_SCENARIOS,
+    "releasables/hoi4_vanilla.internal.phase1.catalog.json": ("blank_base", "hoi4_1936", "hoi4_1939", "modern_world"),
+    "releasables/tno_1962.internal.phase1.catalog.json": ("tno_1962",),
+}
+REWRITTEN_TOPOLOGIES = (DATA / "europe_topology.na_v2.json", DATA / "europe_topology.runtime_political_v1.json",
+                        *sorted(DATA.glob("scenarios/*/runtime_topology.topo.json*")))
+
+
+def scenario_topology(scenario: str) -> Path:
+    path = DATA / f"scenarios/{scenario}/runtime_topology.topo.json"
+    return path if path.exists() else path.with_name(path.name + ".gz")
+
+
+def rewritten_topologies(scenarios: tuple[str, ...] | None) -> tuple[Path, ...]:
+    """Topologies a plan rewrites: all of them, or only the scoped scenarios' runtime topologies."""
+    return REWRITTEN_TOPOLOGIES if scenarios is None else tuple(scenario_topology(s) for s in scenarios)
 
 
 def read_json(path: Path):
@@ -27,6 +72,32 @@ def read_json(path: Path):
         with gzip.open(path, "rt", encoding="utf-8") as handle:
             return json.load(handle)
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+@functools.cache
+def rewritten_topology(path: Path) -> dict:
+    return read_json(path)
+
+
+def invalid_geometry_ids(feature_ids: set[str], topologies: tuple[Path, ...] = REWRITTEN_TOPOLOGIES) -> set[str]:
+    """Candidate members whose geometry is invalid in any rewritten topology."""
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from map_builder.regional_geometry import _decode_geometry
+
+    invalid: set[str] = set()
+    for path in topologies:
+        topology = rewritten_topology(path)
+        for row in topology["objects"]["political"]["geometries"]:
+            feature_id = str((row.get("properties") or {}).get("id") or row.get("id"))
+            if feature_id in feature_ids and feature_id not in invalid:
+                try:
+                    valid = _decode_geometry(topology, row).is_valid
+                except ValueError:
+                    valid = False
+                if not valid:
+                    invalid.add(feature_id)
+    return invalid
 
 
 def merged_feature_id(member_ids: list[str]) -> str:
@@ -49,15 +120,28 @@ def group_memberships(hierarchy: dict) -> dict[str, list[str]]:
     return {key: sorted(value) for key, value in memberships.items()}
 
 
-def load_assignment_tables() -> dict[str, dict]:
+def load_assignment_tables(scenarios: tuple[str, ...] | None = None) -> dict[str, dict]:
     tables: dict[str, dict] = {}
-    for scenario in OWNERSHIP_SCENARIOS:
+    for scenario in scoped(OWNERSHIP_SCENARIOS, scenarios):
         for kind in ("owners", "cores"):
             payload = read_json(DATA / f"scenarios/{scenario}/{kind}.by_feature.json")
             tables[f"{scenario}:{kind}"] = payload.get(kind, payload) if isinstance(payload, dict) else payload
-    for scenario in STRATEGIC_SCENARIOS:
+    for scenario in scoped(STRATEGIC_SCENARIOS, scenarios):
         payload = read_json(DATA / f"scenarios/{scenario}/strategic_values.by_feature.json")
         tables[f"{scenario}:strategic_bucket"] = payload["bucket_by_feature"]
+    for path in rewritten_topologies(scenarios):
+        topology = rewritten_topology(path)
+        name = path.relative_to(DATA).as_posix()
+        precision = topology.get("political_precision_feature_ids")
+        if precision is not None:
+            tables[f"{name}:precision"] = dict.fromkeys(precision, True)
+        # The apply tool keeps one property set per merged feature, so members must agree on
+        # every non-name property (e.g. a TNO parcel coded with its warlord instead of RU).
+        tables[f"{name}:properties"] = {
+            str(properties.get("id") or row.get("id")): json.dumps(
+                {key: value for key, value in properties.items() if key not in PROPERTY_NAME_KEYS}, sort_keys=True)
+            for row in topology["objects"]["political"]["geometries"]
+            for properties in [row.get("properties") or {}]}
     tables["china_prefecture"] = china_prefectures()
     return tables
 
@@ -77,9 +161,13 @@ def assignment_signature(feature_id: str, tables: dict[str, dict], memberships: 
     return json.dumps(values, sort_keys=True, ensure_ascii=False)
 
 
-def load_adjacency() -> tuple[dict[str, set[str]], dict[str, str]]:
-    """TNO neighbor graph, plus each feature's source name as the last-resort label."""
-    political = read_json(ADJACENCY_TOPOLOGY)["objects"]["political"]
+def scoped(names: tuple[str, ...], scenarios: tuple[str, ...] | None) -> list[str]:
+    return [name for name in names if scenarios is None or name in scenarios]
+
+
+def load_adjacency(path: Path | None = None) -> tuple[dict[str, set[str]], dict[str, str]]:
+    """Neighbor graph (TNO by default), plus each feature's source name as the last-resort label."""
+    political = read_json(path or scenario_topology(ADJACENCY_SCENARIO))["objects"]["political"]
     ids = [str((row.get("properties") or {}).get("id") or row.get("id")) for row in political["geometries"]]
     source_names = {feature_id: str((row.get("properties") or {}).get("name") or "")
                     for feature_id, row in zip(ids, political["geometries"])}
@@ -142,27 +230,440 @@ def compose_names(member_names: dict[str, dict]) -> dict:
             for language, separator in LANGUAGE_SEPARATORS.items()}
 
 
-def river_paint_feature_ids() -> set[str]:
+# Compass sectors clockwise from north, then the centre of the parent.
+DIRECTIONS = (("North", "北部"), ("Northeast", "东北部"), ("East", "东部"), ("Southeast", "东南部"),
+              ("South", "南部"), ("Southwest", "西南部"), ("West", "西部"), ("Northwest", "西北部"))
+CENTRAL = ("Central", "中部")
+# A group whose centroid lies within this fraction of the parent's half extent is central.
+CENTRAL_RADIUS = 0.25
+CITY_MIN_POPULATION = 1_000_000
+
+
+PARENT_NAMES = DATA / "political_feature_merges/parent_names.json"
+
+
+def parent_names(parent_id: str, hierarchy: dict, raw_names: dict, override: dict | None, reviewed: dict | None = None) -> dict:
+    """Parent name in each language: the candidate's, the reviewed table's, else the hierarchy label's."""
+    reviewed = reviewed or {}
+    if override or parent_id in reviewed:
+        return {language: name for language, name in (override or reviewed[parent_id]).items() if language in ("en", "zh")}
+    label = (hierarchy.get("labels") or {}).get(parent_id or "") or ""
+    english = re.sub(r"^[A-Z]{2} - ", "", label)
+    # Only exact label matches: a shortened label can hit an unrelated raw name.
+    chinese = next(((raw_names.get(key) or {}).get("zh") for key in (label, english) if (raw_names.get(key) or {}).get("zh")), None)
+    if not english or not chinese:
+        raise ValueError(f"{parent_id}: no bilingual parent name; add it to {PARENT_NAMES.name} or the candidate's parent_names")
+    return {"en": english, "zh": chinese}
+
+
+def scenario_parent_names(group: dict, parent: dict, scenarios: tuple[str, ...], reviewed: dict) -> None:
+    """Swap the global parent in a "<parent>·<direction>" or parent name for a scenario's own
+    (``parent_names.json`` ``scenarios``), e.g. Königsberg for Kaliningrad in TNO 1962."""
+    own = (reviewed.get(group["parent_id"]) or {}).get("scenarios") or {}
+    names = {}
+    for scenario in scenarios:
+        if scenario not in own:
+            continue
+        if not all(group["names"][language].startswith(parent[language]) for language in ("en", "zh")):
+            raise ValueError(f"{group['id']}: name {group['names']} does not start with its parent {parent}")
+        names[scenario] = {language: own[scenario][language] + group["names"][language][len(parent[language]):]
+                           for language in ("en", "zh")}
+    if names:
+        group["scenario_names"] = names
+    else:
+        group.pop("scenario_names", None)
+
+
+def largest_city(feature_ids: set[str], cities: list[dict], minimum: int) -> dict | None:
+    hosted = [city for city in cities if city.get("host_feature_id") in feature_ids and (city.get("population") or 0) >= minimum]
+    if not hosted:
+        return None
+    city = max(hosted, key=lambda row: row["population"])
+    return {"en": city.get("name_en") or city["name"], "zh": city.get("name_zh") or city.get("name_en") or city["name"]}
+
+
+def compass_direction(shape, parent_shape) -> tuple[str, str]:
+    """Sector of a group's centroid around its parent's, in locally scaled degrees."""
+    point, centre = shape.centroid, parent_shape.centroid
+    min_x, min_y, max_x, max_y = parent_shape.bounds
+    scale = math.cos(math.radians(centre.y))
+    dx, dy = (point.x - centre.x) * scale, point.y - centre.y
+    half_width, half_height = max((max_x - min_x) * scale / 2, 1e-9), max((max_y - min_y) / 2, 1e-9)
+    if math.hypot(dx / half_width, dy / half_height) < CENTRAL_RADIUS:
+        return CENTRAL
+    bearing = math.degrees(math.atan2(dx, dy)) % 360
+    return DIRECTIONS[round(bearing / 45) % 8]
+
+
+def directional_names(groups: list[dict], topology_path: Path, hierarchy: dict, raw_names: dict,
+                      parent_overrides: dict[str, dict], cities: list[dict], city_minimum: int,
+                      current_id: dict[str, str] | None = None, scenarios: tuple[str, ...] = ()) -> None:
+    """Name each group "<parent>·<direction>", or after its largest city; member names stay aliases.
+
+    Groups that cover their whole parent take the parent name. Repeated names in
+    one parent are numbered by descending area. A parent outside the hierarchy
+    needs ``parent_names`` on its candidates. Each scenario in ``scenarios`` with its
+    own reviewed parent name gets that name in ``scenario_names``.
+    """
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from map_builder.regional_geometry import _decode_geometry
+    from shapely.ops import unary_union
+
+    topology = rewritten_topology(topology_path)
+    rows = {str((row.get("properties") or {}).get("id") or row.get("id")): row for row in topology["objects"]["political"]["geometries"]}
+    shape = functools.cache(lambda feature_id: _decode_geometry(topology, rows[feature_id]))
+    reviewed = read_json(PARENT_NAMES).get("parents", {}) if PARENT_NAMES.exists() else {}
+    by_name: dict[tuple[str, str], list[dict]] = {}
+    # A research parent outside the hierarchy spans this plan's groups that name it.
+    planned: dict[str, list[str]] = {}
+    for group in groups:
+        planned.setdefault(group["parent_id"], []).extend(group["member_ids"])
+    for group in groups:
+        parent_id = group["parent_id"]
+        # Shared hierarchy members, as they exist after this scope's earlier scoped merges.
+        siblings = list(dict.fromkeys((current_id or {}).get(member, member)
+                                      for member in (hierarchy.get("groups") or {}).get(parent_id) or planned[parent_id]))
+        siblings = [member for member in siblings if member in rows]
+        city = largest_city(set(group["member_ids"]), cities, city_minimum)
+        if city:
+            group["names"], group["name_source"] = city, "city"
+        else:
+            parent = group["_parent"] = parent_names(parent_id, hierarchy, raw_names, parent_overrides.get(parent_id), reviewed)
+            if set(siblings) <= set(group["member_ids"]):
+                group["names"], group["name_source"] = parent, "parent"
+            else:
+                english, chinese = compass_direction(unary_union([shape(m) for m in group["member_ids"]]),
+                                                     unary_union([shape(m) for m in siblings]))
+                group["names"] = {"en": f"{parent['en']} · {english}", "zh": f"{parent['zh']}·{chinese}"}
+                group["name_source"] = "parent_direction"
+        group["_area"] = sum(shape(member).area for member in group["member_ids"])
+        by_name.setdefault((parent_id, group["names"]["en"]), []).append(group)
+    for same in by_name.values():
+        if len(same) > 1 and same[0]["name_source"] != "city":
+            for number, group in enumerate(sorted(same, key=lambda item: -item["_area"]), start=1):
+                group["names"] = {language: f"{name} {number}" if language == "en" else f"{name}{number}"
+                                  for language, name in group["names"].items()}
+    for group in groups:
+        del group["_area"]
+        if "_parent" in group and group["parent_id"] not in parent_overrides:
+            scenario_parent_names(group, group["_parent"], scenarios, reviewed)
+        group.pop("_parent", None)
+
+
+POPULATION_FEATURES = DATA / "thematic_layers/population/ghsl_population_2020_v1/features"
+CJK = re.compile(r"[\u3400-\u9fff]")
+
+
+def read_json_at(path: Path, ref: str | None = None):
+    """A data file from the working tree, or as it was at a git ref."""
+    if ref is None:
+        return read_json(path)
+    import subprocess
+    blob = subprocess.run(["git", "show", f"{ref}:{path.relative_to(ROOT).as_posix()}"], cwd=ROOT,
+                          capture_output=True, check=True).stdout
+    return json.loads(gzip.decompress(blob) if path.suffix == ".gz" else blob)
+
+
+def load_member_facts(ref: str | None = None) -> dict:
+    """Cities, member population/area and scenario member names, before the members are merged away."""
+    population: dict[str, dict] = {}
+    for scenario in ("modern_world", *STRATEGIC_SCENARIOS, "tno_1962"):
+        for feature_id, row in read_json_at(POPULATION_FEATURES / f"{scenario}.json", ref)["features"].items():
+            population.setdefault(feature_id, row)
+    return {
+        "cities": [row["properties"] for row in read_json_at(DATA / "world_cities.geojson", ref)["features"]],
+        "population": population,
+        "global_names": read_json_at(DATA / "locales.json", ref).get("geo") or {},
+        "scenario_names": {path.parent.name: read_json_at(path, ref).get("geo") or {}
+                           for path in sorted(DATA.glob("scenarios/*/geo_locale_patch.json"))},
+    }
+
+
+def pre_merge_ref(plan_path: Path) -> str:
+    """Parent of the commit that added an applied plan: the data before its members were merged."""
+    import subprocess
+    added = subprocess.run(["git", "log", "--diff-filter=A", "--format=%H", "--", plan_path.relative_to(ROOT).as_posix()],
+                           cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
+    if not added:
+        raise ValueError(f"{plan_path.name} is not committed; name it from the working tree instead")
+    return added[-1] + "^"
+
+
+def representative_member(group: dict, facts: dict) -> tuple[dict, str, str]:
+    """(names, name_source, representative member) by city, then population, then area."""
+    members = group["member_ids"]
+    hosted = [city for city in facts["cities"] if city.get("host_feature_id") in members and CJK.search(city.get("name_zh") or "")]
+    if hosted:
+        city = max(hosted, key=lambda row: row.get("population") or 0)
+        return {"en": city.get("name_en") or city["name"], "zh": city["name_zh"]}, "city", city["host_feature_id"]
+    rows = [facts["population"].get(member) or {} for member in members]
+    if all(row.get("population") is not None for row in rows):
+        key, source = "population", "population"
+    else:
+        key, source = "land_area_km2", "area"
+    best = max(range(len(members)), key=lambda index: rows[index].get(key) or 0)
+    return dict(group["member_names"][members[best]]), source, members[best]
+
+
+def scenario_representative_names(group: dict, facts: dict) -> dict[str, dict]:
+    """A scenario that names the representative member itself (TNO) keeps that name.
+
+    Only languages where the scenario's member name differs from the global one
+    are taken; a city name follows the scenario only where it is the member's own name.
+    """
+    member = group["representative_id"]
+    own = group["member_names"][member]
+    if group["name_source"] == "city" and group["names"]["en"].casefold() != own["en"].casefold():
+        return {}
+    names = {}
+    for scenario, geo in facts["scenario_names"].items():
+        entry = geo.get(member)
+        if isinstance(entry, dict):
+            scenario_name = {language: entry[language] if entry.get(language) and entry[language] != own[language]
+                             else group["names"][language] for language in LANGUAGE_SEPARATORS}
+            if scenario_name != group["names"]:
+                names[scenario] = scenario_name
+    return names
+
+
+# Scenarios whose own member names survive a merge, as aliases and, without an own parent name, the display name.
+OWN_NAME_SCENARIOS = ("tno_1962",)
+# Administrative affixes that alone do not make a scenario name its own (区/县, "District", "Arr.").
+ZH_AFFIX = re.compile(r"(地区|区|县|市|州|省|镇|乡|郡)$")
+CYRILLIC = re.compile(r"[Ѐ-ӿ]")
+EN_AFFIX = re.compile(r"\b(arr|bezirk|district|rayon|raion|municipality|municipal|okrug|county|city)\b|\W", re.IGNORECASE)
+
+
+def own_scenario_names(group: dict, geo: dict, global_geo: dict) -> tuple[dict[str, dict], set[str]]:
+    """Members (not earlier merges) that a scenario's locale patch names itself, and those it renames.
+
+    An own name differs from the member's global name beyond administrative affixes,
+    or fills a language the global locales lack. A rename is an own name that can
+    name the group: its English is not an untransliterated (Cyrillic) source name.
+    """
+    own, renamed = {}, set()
+    for member in group["member_ids"]:
+        entry, base = geo.get(member), group["member_names"][member]
+        if "_MRG_" in member or not isinstance(entry, dict):
+            continue
+        names = {language: entry.get(language) or base[language] for language in ("en", "zh")}
+        differs = (ZH_AFFIX.sub("", names["zh"]) != ZH_AFFIX.sub("", base["zh"])
+                   or EN_AFFIX.sub("", names["en"].casefold()) != EN_AFFIX.sub("", base["en"].casefold()))
+        if differs or not all((global_geo.get(f"id::{member}") or {}).get(language) for language in ("en", "zh")):
+            own[member] = names
+        if differs and not CYRILLIC.search(names["en"]):
+            renamed.add(member)
+    return own, renamed
+
+
+def scenario_member_names(groups: list[dict], facts: dict, scenarios: tuple[str, ...]) -> None:
+    """Keep a scenario's own member names in ``scenario_member_names`` (searchable aliases); a group the
+    scenario has no own parent name for is named after its representative renamed member:
+    the largest city, then population, then area."""
+    for group in groups:
+        group.pop("scenario_member_names", None)
+        for scenario in (scenario for scenario in OWN_NAME_SCENARIOS if scenario in scenarios):
+            own, renamed = own_scenario_names(group, facts["scenario_names"].get(scenario) or {}, facts["global_names"])
+            if not own:
+                continue
+            group.setdefault("scenario_member_names", {})[scenario] = own
+            # Representative names already chose their member; parent names describe no place of the scenario's.
+            if renamed and group.get("name_source") in ("parent", "parent_direction") and scenario not in group.get("scenario_names", {}):
+                _, _, member = representative_member({**group, "member_ids": [m for m in group["member_ids"] if m in renamed]}, facts)
+                group.setdefault("scenario_names", {})[scenario] = dict(own[member])
+
+
+def country_name_index(topology_path: Path, exclude: set[str]) -> tuple[dict[str, str], dict[str, set[str]]]:
+    """Feature -> country, and each country's names (English casefolded and Chinese) outside ``exclude``."""
+    geo = read_json(DATA / "locales.json").get("geo") or {}
+    countries, taken = {}, {}
+    for row in rewritten_topology(topology_path)["objects"]["political"]["geometries"]:
+        properties = row.get("properties") or {}
+        feature_id = str(properties.get("id") or row.get("id"))
+        countries[feature_id] = str(properties.get("cntr_code") or feature_id[:2])
+        if feature_id in exclude:
+            continue
+        names = geo.get(f"id::{feature_id}") or geo.get(str(properties.get("name") or "")) or {}
+        bucket = taken.setdefault(countries[feature_id], set())
+        bucket.update(name for name in (str(properties.get("name") or "").casefold(),
+                                        (names.get("en") or "").casefold(), names.get("zh")) if name)
+    return countries, taken
+
+
+def assign_representative(group: dict, facts: dict) -> None:
+    group["names"], group["name_source"], group["representative_id"] = representative_member(group, facts)
+    if scenario_names := scenario_representative_names(group, facts):
+        group["scenario_names"] = scenario_names
+    group["_population"] = sum((facts["population"].get(member) or {}).get("population") or 0 for member in group["member_ids"])
+
+
+def representative_names(groups: list[dict], facts: dict, hierarchy: dict, raw_names: dict,
+                         parent_overrides: dict[str, dict] | None = None) -> None:
+    """Name each group after its most representative place; the members stay searchable aliases."""
+    for group in groups:
+        assign_representative(group, facts)
+    disambiguate_representative_names(groups, hierarchy, raw_names, parent_overrides or {})
+
+
+def disambiguate_representative_names(groups: list[dict], hierarchy: dict, raw_names: dict, parent_overrides: dict[str, dict],
+                                      topology_path: Path = DATA / "europe_topology.runtime_political_v1.json") -> None:
+    """A name already used in the same country (by another feature or group) gets its parent in brackets;
+    groups still equal after that are numbered by descending population."""
+    exclude = {feature_id for group in groups for feature_id in (group["id"], *group["member_ids"])}
+    countries, taken = country_name_index(topology_path, exclude)
+    country = lambda group: countries.get(group["id"]) or countries.get(group["member_ids"][0]) or group["id"][:2]
+    keys = lambda names: {names["en"].casefold(), names["zh"]}
+    counts: dict[tuple[str, str], int] = {}
+    for group in groups:
+        for key in keys(group["names"]):
+            counts[country(group), key] = counts.get((country(group), key), 0) + 1
+    reviewed = read_json(PARENT_NAMES).get("parents", {}) if PARENT_NAMES.exists() else {}
+    suffixed: dict[tuple[str, str], list[dict]] = {}
+    for group in groups:
+        code = country(group)
+        if not any(key in taken.get(code, ()) or counts[code, key] > 1 for key in keys(group["names"])):
+            continue
+        parent = parent_names(group["parent_id"], hierarchy, raw_names, parent_overrides.get(group["parent_id"]), reviewed)
+        suffix = {"en": f" ({parent['en']})", "zh": f"（{parent['zh']}）"}
+        for names in (group["names"], *group.get("scenario_names", {}).values()):
+            names.update({language: name + suffix[language] for language, name in names.items()})
+        suffixed.setdefault((code, group["names"]["en"].casefold()), []).append(group)
+    for same in suffixed.values():
+        if len(same) > 1:
+            for number, group in enumerate(sorted(same, key=lambda item: -item["_population"]), start=1):
+                for names in (group["names"], *group.get("scenario_names", {}).values()):
+                    names.update({language: f"{name} {number}" if language == "en" else f"{name}{number}"
+                                  for language, name in names.items()})
+    for group in groups:
+        group.pop("_population", None)
+
+
+def fragment_camouflage_feature_ids() -> set[str]:
+    """Features with their own fragment-camouflage display rule; a merge would widen or drop it."""
+    policies = read_json(DATA / "country_feature_policies.json")
+    rules = ((policies.get("display") or {}).get("fragmentCamouflage") or {}).get("rules") or []
+    return {str(feature_id) for rule in rules for feature_id in rule.get("featureIds") or []}
+
+
+def shared_id_list_memberships(scenarios: tuple[str, ...] | None = None,
+                               scoped_leaves: dict[str, list[str]] | None = None) -> dict[str, list[str]]:
+    """Feature id -> every shared ID list (file and JSON path) naming it that these scenarios read.
+
+    Shared files keep the leaves of a scoped merged ID (only the scope's own catalog
+    names the merged ID); it takes their lists as well, and leaves that disagree give
+    it a signature nothing else shares.
+    """
+    lists: dict[str, set[str]] = {}
+
+    def walk(value, at: str) -> None:
+        if isinstance(value, list) and value and all(isinstance(item, str) for item in value):
+            for feature_id in value:
+                lists.setdefault(feature_id, set()).add(at)
+        elif isinstance(value, list):
+            for index, item in enumerate(value):
+                walk(item, f"{at}[{index}]")
+        elif isinstance(value, dict):
+            for key, item in value.items():
+                walk(item, f"{at}.{key}")
+
+    for name, readers in SHARED_ID_LIST_READERS.items():
+        if (DATA / name).exists() and (scenarios is None or set(readers) & set(scenarios)):
+            walk(read_json(DATA / name), f"{name}:$")
+    memberships = {feature_id: sorted(keys) for feature_id, keys in lists.items()}
+    for merged_id, leaves in (scoped_leaves or {}).items():
+        keys = {tuple(memberships.get(leaf, [])) for leaf in leaves}
+        own = memberships.get(merged_id, [])
+        memberships[merged_id] = sorted({*own, *keys.pop()}) if len(keys) == 1 else [f"inconsistent:{merged_id}"]
+    return memberships
+
+
+def river_paint_feature_ids(scenarios: tuple[str, ...] | None = None) -> set[str]:
     """Parents and contour supports of reviewed river-paint packs.
 
     Their geometry fingerprints are part of each approved pack identity, so
-    merging them would invalidate reviewed river cells.
+    merging them would invalidate reviewed river cells. A scoped plan only
+    rewrites its own scenarios, so packs of other scenarios stay intact.
     """
     ids: set[str] = set()
     for path in sorted(RIVER_PARTITIONS.glob("*.json")):
         if path.name.endswith(".transport.json"):
             continue
         pack = read_json(path)
+        if scenarios is not None and pack.get("sceneId") not in scenarios:
+            continue
         for key in ("parents", "support"):
             ids.update(str(row["parentId"]) for row in pack.get(key) or [])
     return ids
 
 
-def build_plan(candidates_path: Path) -> dict:
+def scoped_adjacency(scenarios: tuple[str, ...]) -> tuple[dict[str, set[str]], dict[str, str]]:
+    """Neighbors in every scoped scenario, so a group is contiguous wherever it is applied."""
+    adjacency, source_names = load_adjacency(scenario_topology(scenarios[0]))
+    for scenario in scenarios[1:]:
+        other, _ = load_adjacency(scenario_topology(scenario))
+        adjacency = {feature_id: neighbors & other[feature_id] for feature_id, neighbors in adjacency.items() if feature_id in other}
+    return adjacency, source_names
+
+
+def scoped_lineage(scenarios: tuple[str, ...]) -> tuple[dict[str, list[str]], dict[str, str]]:
+    """Merged IDs that exist only in these scenarios: shared-hierarchy leaves, and member -> final ID."""
+    leaves: dict[str, list[str]] = {}
+    final: dict[str, str] = {}
+    for _name, plan in ordered_plans(DATA):
+        if "scenarios" not in plan or not set(scenarios) <= set(plan["scenarios"]):
+            continue
+        for group in plan["groups"]:
+            leaves[group["id"]] = [leaf for member in group["member_ids"] for leaf in leaves.get(member, [member])]
+            for member in group["member_ids"]:
+                final[member] = group["id"]
+    for member in list(final):
+        while final[member] in final:
+            final[member] = final[final[member]]
+    for group_id, group_leaves in leaves.items():
+        for leaf in group_leaves:
+            final[leaf] = final.get(group_id, group_id)
+    return leaves, final
+
+
+def inherit_leaf_assignments(leaves: dict[str, list[str]], memberships: dict[str, list[str]], prefectures: dict[str, str]) -> None:
+    """A scoped merged ID is absent from the shared hierarchy; it takes its leaves' groups,
+    and a mixed one gets a signature nothing else shares, so it never merges."""
+    for merged_id, group_leaves in leaves.items():
+        groups = {tuple(memberships.get(leaf, [])) for leaf in group_leaves}
+        prefecture = {prefectures.get(leaf) for leaf in group_leaves}
+        memberships[merged_id] = list(groups.pop()) if len(groups) == 1 else [f"inconsistent:{merged_id}"]
+        if len(prefecture) == 1:
+            if (value := prefecture.pop()) is not None:
+                prefectures[merged_id] = value
+        else:
+            prefectures[merged_id] = f"inconsistent:{merged_id}"
+
+
+def hierarchy_parent(member_ids: list[str], memberships: dict[str, list[str]]) -> str | None:
+    shared = set.intersection(*({key[6:] for key in memberships.get(member, []) if key.startswith("group:")} for member in member_ids))
+    return min(shared) if len(shared) == 1 else None
+
+
+def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None, naming: str = "parent_direction",
+               city_minimum: int = CITY_MIN_POPULATION) -> dict:
+    if scenarios is not None:
+        validate_scope(scenarios)
     candidates = read_json(candidates_path)
-    tables, hierarchy = load_assignment_tables(), read_json(DATA / "hierarchy.json")
-    memberships, (adjacency, source_names), name_sources = group_memberships(hierarchy), load_adjacency(), load_name_sources()
-    protected = set(candidates.get("protected_feature_ids") or []) | river_paint_feature_ids()
+    # A member an applied plan already merged away (in any scenario of this scope) cannot merge again.
+    consumed = consumed_members(DATA, scenarios or ALL_SCENARIOS)
+    if stale := sorted({f"{member} ({consumed[member]})" for candidate in candidates["candidates"]
+                        for member in candidate["member_ids"] if member in consumed}):
+        raise ValueError(f"Candidate members were already merged by applied plans: {stale[:5]}")
+    tables, hierarchy = load_assignment_tables(scenarios), read_json(DATA / "hierarchy.json")
+    adjacency, source_names = load_adjacency() if scenarios is None else scoped_adjacency(scenarios)
+    memberships, name_sources = group_memberships(hierarchy), load_name_sources()
+    scoped_leaves, scoped_final = scoped_lineage(scenarios) if scenarios is not None else ({}, {})
+    inherit_leaf_assignments(scoped_leaves, memberships, tables["china_prefecture"])
+    tables["shared_id_lists"] = shared_id_list_memberships(scenarios, scoped_leaves)
+    protected = set(candidates.get("protected_feature_ids") or []) | river_paint_feature_ids(scenarios) | fragment_camouflage_feature_ids()
+    protected |= invalid_geometry_ids({member for candidate in candidates["candidates"] for member in candidate["member_ids"]},
+                                      rewritten_topologies(scenarios))
     groups, splits = [], []
     for candidate in candidates["candidates"]:
         members = [feature_id for feature_id in candidate["member_ids"] if feature_id not in protected]
@@ -180,10 +681,20 @@ def build_plan(candidates_path: Path) -> dict:
             groups.append({
                 "id": merged_feature_id(component),
                 "member_ids": component,
-                "parent_id": candidate.get("parent_id"),
+                "parent_id": candidate.get("parent_id") or hierarchy_parent(component, memberships),
                 "names": compose_names(member_names),
                 "member_names": member_names,
             })
+    overrides = {candidate["parent_id"]: candidate["parent_names"] for candidate in candidates["candidates"]
+                 if candidate.get("parent_id") and candidate.get("parent_names")}
+    if naming == "representative" and groups:
+        representative_names(groups, load_member_facts(), hierarchy, name_sources[1], overrides)
+    if naming == "parent_direction" and groups:
+        cities = [row["properties"] for row in read_json(DATA / "world_cities.geojson")["features"]]
+        directional_names(groups, scenario_topology(ADJACENCY_SCENARIO) if scenarios is None else scenario_topology(scenarios[0]),
+                          hierarchy, name_sources[1], overrides, cities, city_minimum, scoped_final, scenarios or ALL_SCENARIOS)
+    if naming != "members" and groups:
+        scenario_member_names(groups, load_member_facts(), scenarios or ALL_SCENARIOS)
     seen: dict[str, str] = {}
     for group in groups:
         for feature_id in group["member_ids"]:
@@ -194,10 +705,13 @@ def build_plan(candidates_path: Path) -> dict:
         "schema_version": 1,
         "plan_id": candidates_path.name.replace(".candidates.json", ".v1"),
         "candidate_source": candidates_path.relative_to(ROOT).as_posix(),
+        **({} if scenarios is None else {"scenarios": list(scenarios)}),
         "constraints": ["owners", "cores", "strategic_value_buckets", "hierarchy_groups", "quick_fill_groups",
-                        "china_crosswalk_prefecture", "river_paint_parcels_unchanged", "contiguous"],
-        "ownership_scenarios": list(OWNERSHIP_SCENARIOS),
-        "strategic_scenarios": list(STRATEGIC_SCENARIOS),
+                        "china_crosswalk_prefecture", "precision_tier", "member_properties", "valid_member_geometry",
+                        "fragment_camouflage_unchanged", "shared_id_lists_whole",
+                        "river_paint_parcels_unchanged", "contiguous"],
+        "ownership_scenarios": scoped(OWNERSHIP_SCENARIOS, scenarios),
+        "strategic_scenarios": scoped(STRATEGIC_SCENARIOS, scenarios),
         "counts": {"candidates": len(candidates["candidates"]), "groups": len(groups),
                    "merged_members": len(seen), "features_removed": len(seen) - len(groups), "split_or_reduced_candidates": len(splits)},
         "groups": groups,
@@ -205,13 +719,94 @@ def build_plan(candidates_path: Path) -> dict:
     }
 
 
+def rename_applied_plans(plan_paths: list[Path], facts_ref: str | None = None) -> dict[str, int]:
+    """Give applied joined-name plans representative names, without touching IDs or members.
+
+    Facts come from before each plan's merge (the parent of the commit that
+    added it, or ``facts_ref``). The joined names stay as ``previous_names`` for
+    ``apply_political_feature_merges.py --rename-only``.
+    """
+    hierarchy, raw_names = read_json(DATA / "hierarchy.json"), load_name_sources()[1]
+    plans = {path: read_json(path) for path in plan_paths}
+    groups, renamed = [], {}
+    for path, plan in plans.items():
+        if "scenarios" in plan or any("_MRG_" in member for group in plan["groups"] for member in group["member_ids"]):
+            raise ValueError(f"{path.name}: renaming scoped or chained plans is not supported")
+        facts = load_member_facts(facts_ref or pre_merge_ref(path))
+        for group in plan["groups"]:
+            if group.get("name_source", "members") != "members":
+                continue
+            group["previous_names"] = dict(group["names"])
+            assign_representative(group, facts)
+            groups.append(group)
+            renamed[path.name] = renamed.get(path.name, 0) + 1
+    disambiguate_representative_names(groups, hierarchy, raw_names, {})
+    for path, plan in plans.items():
+        path.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    return renamed
+
+
+def rename_parents_in_applied_plans(plan_paths: list[Path], facts_ref: str | None = None) -> dict[str, int]:
+    """Refresh applied plans' scenario names: own parents from ``parent_names.json``, then
+    the scenario's own member names as they were before each plan's merge (or at ``facts_ref``).
+
+    IDs, members and global names stay; ``previous_names`` (the names already
+    projected) lets ``apply_political_feature_merges.py --rename-only`` re-project them.
+    """
+    hierarchy, raw_names = read_json(DATA / "hierarchy.json"), load_name_sources()[1]
+    reviewed = read_json(PARENT_NAMES).get("parents", {})
+    changed = {}
+    for path in plan_paths:
+        plan = read_json(path)
+        scenarios = plan_scenarios(plan)
+        before = {group["id"]: (copy.deepcopy(group.get("scenario_names")), group.get("scenario_member_names"))
+                  for group in plan["groups"]}
+        named = [group for group in plan["groups"] if group.get("name_source", "members") != "members"]
+        for group in named:
+            if group.get("name_source") in ("parent", "parent_direction") and group["parent_id"] in reviewed:
+                parent = parent_names(group["parent_id"], hierarchy, raw_names, None, reviewed)
+                scenario_parent_names(group, parent, scenarios, reviewed)
+            elif group.get("name_source") in ("parent", "parent_direction"):
+                group.pop("scenario_names", None)
+        if set(OWN_NAME_SCENARIOS) & set(scenarios):
+            scenario_member_names(named, load_member_facts(facts_ref or pre_merge_ref(path)), scenarios)
+        for group in named:
+            if (group.get("scenario_names"), group.get("scenario_member_names")) != before[group["id"]]:
+                group.setdefault("previous_names", dict(group["names"]))
+                changed[path.name] = changed.get(path.name, 0) + 1
+        path.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    return changed
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidates", default="data/political_feature_merges/europe_de_fr.candidates.json")
     parser.add_argument("--output", default="data/political_feature_merges/europe_de_fr.v1.json")
+    parser.add_argument("--scenarios", nargs="+", choices=ALL_SCENARIOS,
+                        help="Apply only to these scenarios (default: every scenario and the base topologies).")
+    parser.add_argument("--naming", choices=("parent_direction", "representative", "members"), default="parent_direction",
+                        help="Name groups '<parent>·<direction>' or after their largest city (default), after their most "
+                             "representative place, or join member names.")
+    parser.add_argument("--rename", nargs="+", metavar="PLAN",
+                        help="Rename applied joined-name plans with representative names in place (IDs and members unchanged).")
+    parser.add_argument("--rename-parents", nargs="+", metavar="PLAN",
+                        help="Refresh applied plans' scenario parent names from parent_names.json in place.")
+    parser.add_argument("--facts-ref", help="With --rename: git ref holding the unmerged members (default: before each plan).")
+    parser.add_argument("--city-min-population", type=int, default=CITY_MIN_POPULATION)
     args = parser.parse_args()
-    plan = build_plan(ROOT / args.candidates)
-    (ROOT / args.output).write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    if args.rename_parents:
+        print(json.dumps(rename_parents_in_applied_plans([ROOT / path for path in args.rename_parents], args.facts_ref)))
+        return
+    if args.rename:
+        print(json.dumps(rename_applied_plans([ROOT / path for path in args.rename], args.facts_ref)))
+        return
+    plan = build_plan(ROOT / args.candidates, tuple(args.scenarios) if args.scenarios else None,
+                      args.naming, args.city_min_population)
+    output = ROOT / args.output
+    output.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    if output.parent == DATA / "political_feature_merges":
+        # A new plan applies after every plan already listed.
+        register_plan(DATA, output.name)
     print(json.dumps(plan["counts"]))
 
 

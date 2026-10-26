@@ -23,9 +23,15 @@ from PIL import Image, ImageDraw
 from scipy.spatial import Delaunay, cKDTree
 from scipy.ndimage import distance_transform_edt
 from build_localization import make_simplifier
+import main_sources
 
 
 ROOT = Path(__file__).resolve().parents[3]
+
+
+def source_bytes(root, path):
+    """HGO files come from the app; main-repository files from pinned snapshots."""
+    return main_sources.read_bytes(root, path) if path.startswith(('data/', 'js/')) else (Path(root)/path).read_bytes()
 WIDTH, HEIGHT = 5120, 2560
 MAX_EDGE_DEGREES = 35.0
 CLASSES = ['basin_lowlands', 'mountain_high_relief', 'mountain_hills',
@@ -609,7 +615,7 @@ def prepare_label_names(root, labels):
              'apps/hgo/assets/overlays/geography/name_reviews.json',
              'apps/hgo/assets/overlays/localization/TSPhrases.txt',
              'apps/hgo/assets/overlays/localization/TSCharacters.txt']
-    raw = [(root/path).read_bytes() for path in paths]
+    raw = [source_bytes(root, path) for path in paths]
     source = {feature['properties']['id']: feature['properties']
               for feature in json.loads(raw[0])['features']}
     reviews = json.loads(raw[1])
@@ -712,7 +718,7 @@ def build(root=ROOT, source_root=None, output=None):
                     'data/world_cities.geojson', 'data/global_physical_semantics.topo.json',
                     'data/global_rivers.geojson', 'data/physical_region_labels.geojson', 'js/core/state_defaults.js']
     model, strict_transform = build_georeference(read_json(dataset/'places.json')['places'],
-                                         read_json(root/'data/world_cities.geojson')['features'])
+                                         json.loads(source_bytes(root, 'data/world_cities.geojson'))['features'])
     water = native_water(dataset)
     strict_inverse, strict_confidence = raster_inverse(model)
     inverse,confidence,broad_inverse,broad_confidence = add_smooth_registration(model)
@@ -728,7 +734,7 @@ def build(root=ROOT, source_root=None, output=None):
                             sampleMethod='native-aligned 10-pixel center grid, WTR excluded for land fraction',
                             unsupported='Reference: farther than 500 native px from city controls or failed inverse. Broad illumination: outside lon +/-180, lat [-60,85], failed inverse or fold. Polar and remote domains remain approximate or unsupported.')
     physical_inverse, physical_confidence = enlarge_geographic_grid(inverse,confidence,2560,1280)
-    modern_physical = warp_physical(physical_source_raster(read_json(root/'data/global_physical_semantics.topo.json')),
+    modern_physical = warp_physical(physical_source_raster(json.loads(source_bytes(root, 'data/global_physical_semantics.topo.json'))),
                              physical_inverse, physical_confidence, sample_native(water, 2560, 1280))
     terrain_path = source_root/'map/terrain.bmp'
     native_terrain = native_rivers = None
@@ -751,9 +757,9 @@ def build(root=ROOT, source_root=None, output=None):
         native_class = lookup[sample_native(native_terrain,2560,1280)]
         native_class[sample_native(water,2560,1280)] = 0
     physical = (native_class<<4) | modern_physical
-    rivers, river_stats = river_raster(read_json(root/'data/global_rivers.geojson')['features'], forward, water,
+    rivers, river_stats = river_raster(json.loads(source_bytes(root, 'data/global_rivers.geojson'))['features'], forward, water,
                                       confidence,native_rivers)
-    label_features = read_json(root/'data/physical_region_labels.geojson')['features']
+    label_features = json.loads(source_bytes(root, 'data/physical_region_labels.geojson'))['features']
     labels = []
     for feature in label_features:
         if feature['geometry']['type'] != 'Point':
@@ -801,7 +807,7 @@ def build(root=ROOT, source_root=None, output=None):
     (output/'labels.json').write_bytes(label_bytes)
     assets['georeference'] = dict(url='georeference.json', encoding='json', byteLength=len(georef_bytes), sha256=digest(georef_bytes))
     assets['labels'] = dict(url='labels.json', encoding='json', byteLength=len(label_bytes), sha256=digest(label_bytes))
-    palette_text = (root/'js/core/state_defaults.js').read_text(encoding='utf-8')
+    palette_text = source_bytes(root, 'js/core/state_defaults.js').decode('utf-8')
     palette_body = re.search(r'const PHYSICAL_ATLAS_PALETTE = \{(.*?)\};', palette_text, re.S).group(1)
     colors = dict(re.findall(r'([a-z_]+):\s*"(#[0-9a-fA-F]{6})"', palette_body))
     colors['urban'] = '#b8a58c'
@@ -834,7 +840,7 @@ def build(root=ROOT, source_root=None, output=None):
                     rivers=river_stats, nativeCrosscheck=native_crosscheck, coverage=model['coverage'],
                     temporalPolicy='Modern physical reference, not a measured 1936 surface or a game simulation.',
                     hillshade={'status':'deferred', 'reason':'Native heightmap has only two values; no trustworthy registered DEM in this build.'},
-                    sources=[dict(path=path, sha256=digest((root/path).read_bytes())) for path in source_paths])
+                    sources=[dict(path=path, sha256=digest(source_bytes(root, path))) for path in source_paths])
     for source_path in ('map/terrain.bmp','map/rivers.bmp','common/terrain/00_terrain.txt'):
         source_file=source_root/source_path
         if source_file.exists():

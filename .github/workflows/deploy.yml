@@ -4,11 +4,6 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
-    inputs:
-      artifact_only:
-        description: Deploy the verified source-built artifact (default); disable only for a legacy tracked-dist revision.
-        type: boolean
-        default: true
 
 concurrency:
   # 策略：同一分支只保留最新部署任务，旧任务自动取消。
@@ -20,17 +15,157 @@ jobs:
     uses: ./.github/workflows/verify-shared.yml
     with:
       profile: deploy-minimal
-      pages-artifact-only: ${{ github.event_name != 'workflow_dispatch' || inputs.artifact_only }}
+
+  release-checks:
+    # The full browser gate against the built artifact, split so the slices run in
+    # parallel instead of ~20 minutes in series. Each raster profile is a serial
+    # describe and stays whole; "rest" is a grep-invert so new profiles land there.
+    name: release-checks (${{ matrix.slice }})
+    runs-on: ubuntu-latest
+    needs: verify
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        slice: [hoi4_1936, hoi4_1939, tno_1962, rest, golden-artifact]
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-browsers-${{ runner.os }}-
+
+      - name: Install Playwright Chromium
+        run: |
+          mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
+          max_retries=2
+          attempt=0
+          until npx playwright install chromium; do
+            if [ "$attempt" -ge "$max_retries" ]; then
+              echo "playwright install chromium failed after $((attempt + 1)) attempts"
+              exit 1
+            fi
+            sleep_seconds=$((2 ** attempt))
+            echo "playwright install chromium failed on attempt $((attempt + 1)); retry in ${sleep_seconds}s"
+            sleep "$sleep_seconds"
+            attempt=$((attempt + 1))
+          done
+
+      - name: Download built dist artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: deploy-dist
+          path: .runtime/pages-release/dist
+
+      - name: Exercise the Pages artifact
+        id: pages_checks
+        env:
+          SLICE: ${{ matrix.slice }}
+          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/pages-release/dist
+          PLAYWRIGHT_TEST_BASE_URL: http://127.0.0.1:4173/
+        run: |
+          python -m http.server 4173 --bind 127.0.0.1 --directory .runtime/pages-release/dist > .runtime/pages-release/server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
+          case "$SLICE" in
+            hoi4_1936|hoi4_1939)
+              npm run test:e2e:pages-public-release-gate -- --grep "public Pages raster $SLICE " ;;
+            tno_1962)
+              npm run test:e2e:pages-public-release-gate -- --grep 'public Pages raster tno_1962 (?!large)' ;;
+            rest)
+              npm run test:e2e:pages-public-release-gate -- --grep-invert 'public Pages raster (hoi4_1936 |hoi4_1939 |tno_1962 (?!large))' ;;
+            golden-artifact)
+              # Golden flows on the bundled artifact itself: save/reopen and PNG export.
+              node node_modules/@playwright/test/cli.js test tests/e2e/golden --grep 'saved project|exported PNG' --workers=1 --retries=0 ;;
+            *)
+              echo "::error::unknown release-check slice: $SLICE"; exit 2 ;;
+          esac
+
+      - name: Upload Pages artifact failure evidence
+        if: failure() && steps.pages_checks.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pages-artifact-failure-evidence-${{ matrix.slice }}
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
+          path: |
+            .runtime/pages-release/server.log
+            .runtime/reports/test-timings.ndjson
+            .runtime/reports/generated/failure-context-index.ndjson
+            .runtime/tests/playwright/
+
+  admission:
+    # Admit the artifact only after every release-check slice passed.
+    runs-on: ubuntu-latest
+    needs: release-checks
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout artifact admission
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.gitignore
+            /tools/build_pages_dist.py
+            /tools/pages_artifact_admission.py
+            /tools/pages_artifact_root.py
+            /tools/pages_artifact_shadow.py
+
+      - name: Download built dist artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: deploy-dist
+          path: .runtime/pages-release/dist
+
+      - name: Write Pages artifact admission
+        run: python tools/pages_artifact_admission.py --artifact-root .runtime/pages-release/dist --run-id github-${{ github.run_id }}-${{ github.run_attempt }} --public-smoke passed --receipt-out .runtime/pages-release/receipt.json --summary-out .runtime/pages-release/summary.json
+
+      - name: Upload Pages artifact admission
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: deploy-admission
+          path: .runtime/pages-release/receipt.json
+          if-no-files-found: error
 
   build:
     runs-on: ubuntu-latest
-    needs: verify
+    needs: admission
     permissions:
       contents: read
       pages: write
     steps:
       - name: Checkout artifact verifier
-        if: github.event_name != 'workflow_dispatch' || inputs.artifact_only
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           sparse-checkout-cone-mode: false
@@ -44,41 +179,18 @@ jobs:
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: deploy-dist
-          path: ${{ (github.event_name != 'workflow_dispatch' || inputs.artifact_only) && '.runtime/pages-release/dist' || 'dist' }}
+          path: .runtime/pages-release/dist
 
       - name: Download Pages artifact admission
-        if: github.event_name != 'workflow_dispatch' || inputs.artifact_only
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: deploy-admission
           path: .runtime/pages-release
 
       - name: Verify artifact source and downloaded bytes
-        if: github.event_name != 'workflow_dispatch' || inputs.artifact_only
         env:
           EXPECTED_SOURCE_SHA: ${{ github.sha }}
         run: python tools/pages_artifact_admission.py --artifact-root .runtime/pages-release/dist --verify-receipt .runtime/pages-release/receipt.json --expected-source-sha "$EXPECTED_SOURCE_SHA"
-
-      - name: Validate dist artifact payload
-        if: github.event_name == 'workflow_dispatch' && !inputs.artifact_only
-        run: |
-          test -f dist/index.html
-          test -f dist/app/index.html
-          test -f dist/.nojekyll
-          test -f dist/app/js/main.js
-          test -f dist/app/data/scenarios/index.json
-          test -f dist/pages-dist-manifest.json
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          manifest = json.loads(Path("dist/pages-dist-manifest.json").read_text(encoding="utf-8"))
-          total_bytes = int(manifest["total_bytes"])
-          max_allowed_bytes = int(manifest["max_allowed_bytes"])
-          if total_bytes > max_allowed_bytes:
-              raise SystemExit(f"dist size {total_bytes} exceeds gate {max_allowed_bytes}")
-          print(f"dist size ok: {total_bytes / (1024 * 1024):.2f} MiB")
-          PY
 
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
@@ -86,7 +198,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
-          path: ${{ (github.event_name != 'workflow_dispatch' || inputs.artifact_only) && '.runtime/pages-release/dist' || 'dist' }}
+          path: .runtime/pages-release/dist
 
   deploy:
     environment:
@@ -155,7 +267,7 @@ jobs:
           PLAYWRIGHT_TEST_BASE_URL: ${{ steps.deployment.outputs.page_url }}
         run: |
           # The complete gate, including every raster profile, already ran against
-          # this exact artifact before upload (verify-shared deploy-minimal). After
+          # this exact artifact before upload (release-checks). After
           # publication only confirm CDN availability; repeating the heavy raster
           # timing checks here failed on CDN timing after the site was already live.
           npm run test:e2e:pages-public-release-gate -- --grep-invert "public Pages raster"
@@ -236,7 +348,7 @@ jobs:
 
   timing-summary:
     name: Deployment timing summary
-    needs: [verify, build, deploy]
+    needs: [verify, release-checks, admission, build, deploy]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 3

@@ -50,8 +50,10 @@ export function readSettledRasterFrame({ zoom, captureReference = false, precise
     pixels: actual.length / 4, changed, maximum, meanMax: total / (actual.length / 4), above32Ratio: above32 / (actual.length / 4) };
 }
 
-async function settled(page, precise = false) {
-  const ready = await page.waitForFunction(readSettledRasterFrame, { precise, settleOnly: true }, { timeout: 30000 });
+const NORMAL_STARTUP_SETTLE_DEADLINE_MS = 100000;
+
+async function settled(page, precise = false, timeout = 30000) {
+  const ready = await page.waitForFunction(readSettledRasterFrame, { precise, settleOnly: true }, { timeout });
   await ready.dispose();
 }
 
@@ -327,7 +329,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       assert.ok(report.states.some(value => value.displayState === "precise"));
     }
     report.preference = await page.evaluate(async () => {
-      const { readPoliticalIdRasterPreference } = await import(new URL("js/core/renderer/political_id_raster_trial.js", document.baseURI));
+      const { readPoliticalIdRasterPreference } = (await globalThis.__scenarioForgeTestApi.internals()).rasterTrial;
       return { saved: readPoliticalIdRasterPreference({ search: "" }), forcedOff: readPoliticalIdRasterPreference({ search: "?political_id_raster=0" }) };
     });
     assert.deepEqual(report.preference, { saved: true, forcedOff: false });
@@ -360,9 +362,11 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     const url = new URL(page.url()); url.searchParams.set('political_id_raster', '1');
     await page.goto(url.href, { waitUntil: 'domcontentloaded' });
     mark('navigationCompleteMs');
+    // The bundled editor installs the test API when main.js runs; use its live modules.
+    await page.waitForFunction(() => !!globalThis.__scenarioForgeTestApi);
     await page.evaluate(async () => {
-      window.__rasterTask = { renderer: await import(new URL('js/core/map_renderer.js', document.baseURI)),
-        ...(await import(new URL('js/core/state.js', document.baseURI))) };
+      const { renderer, state } = await globalThis.__scenarioForgeTestApi.internals();
+      window.__rasterTask = { renderer, state };
     });
     mark('importsCompleteMs');
     timing.bootAtImport = await page.evaluate(() => {
@@ -370,11 +374,14 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       return { bootPhase: s.bootPhase, readonly: s.startupReadonly,
         unlocking: s.startupReadonlyUnlockInFlight, applying: s.scenarioApplyInFlight };
     });
-    // Match initial navigation: coverage gets its own window after startup.
-    // The enclosing phase still has its original 120-second total deadline.
-    await waitRasterStartup(page); mark('startupReadyMs');
-    await waitRasterView(page, scenarioId); mark('rasterReadyMs');
-    await settled(page, true); mark('settledMs');
+    // Settling ends after the last staged geometry promotion and the deferred
+    // full background rebuild, which run on the navigation clock, not after
+    // raster coverage. One deadline from navigation covers startup, coverage
+    // and settling; it stays inside the phase's 120-second watchdog.
+    const remaining = () => Math.max(1, started + NORMAL_STARTUP_SETTLE_DEADLINE_MS - performance.now());
+    await waitRasterStartup(page, { timeout: remaining() }); mark('startupReadyMs');
+    await waitRasterView(page, scenarioId, { timeout: remaining() }); mark('rasterReadyMs');
+    await settled(page, true, remaining()); mark('settledMs');
     await page.waitForFunction(() => {
       const assets = window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().assets;
       return assets.pendingReads === 0 && assets.pendingWrites === 0;

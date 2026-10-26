@@ -39,8 +39,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Xinxian + Guangshanxian + Huangchuanxian",
-        "zh": "新县、光善县、荒川县"
+        "en": "Huangchuanxian",
+        "zh": "荒川县"
       },
       "member_names": {
         "CN_CITY_17275852B10417226533704": {
@@ -55,7 +55,13 @@
           "en": "Huangchuanxian",
           "zh": "荒川县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Xinxian + Guangshanxian + Huangchuanxian",
+        "zh": "新县、光善县、荒川县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B90910208115389"
     },
     {
       "id": "CN_MRG_427fc101d0bb",
@@ -65,8 +71,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Xihuaxian + Fugouxian",
-        "zh": "西华县、浮沟县"
+        "en": "Xihuaxian",
+        "zh": "西华县"
       },
       "member_names": {
         "CN_CITY_17275852B11062842353292": {
@@ -77,7 +83,13 @@
           "en": "Fugouxian",
           "zh": "浮沟县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Xihuaxian + Fugouxian",
+        "zh": "西华县、浮沟县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B11062842353292"
     },
     {
       "id": "CN_MRG_533faafa0df3",
@@ -87,8 +99,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Renqiu + Hejian",
-        "zh": "任丘、河间"
+        "en": "Renqiu",
+        "zh": "任丘"
       },
       "member_names": {
         "CN_CITY_17275852B12009758175917": {
@@ -99,7 +111,13 @@
           "en": "Hejian",
           "zh": "河间"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Renqiu + Hejian",
+        "zh": "任丘、河间"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B12009758175917"
     },
     {
       "id": "CN_MRG_6c8b997d87f4",
@@ -110,8 +128,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Jiaxian + Lushanxian + Baofengxian",
-        "zh": "郏县、庐山县、宝丰县"
+        "en": "Lushanxian (Henan)",
+        "zh": "庐山县（河南省）"
       },
       "member_names": {
         "CN_CITY_17275852B12367976812965": {
@@ -126,7 +144,13 @@
           "en": "Baofengxian",
           "zh": "宝丰县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Jiaxian + Lushanxian + Baofengxian",
+        "zh": "郏县、庐山县、宝丰县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B60013836791147"
     },
     {
       "id": "CN_MRG_41987d66c89b",
@@ -136,8 +160,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Anyangxian + Tangyinxian",
-        "zh": "安阳县、汤阴县"
+        "en": "Anyangxian (Henan)",
+        "zh": "安阳县（河南省）"
       },
       "member_names": {
         "CN_CITY_17275852B14914107047494": {
@@ -148,7 +172,13 @@
           "en": "Tangyinxian",
           "zh": "汤阴县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Anyangxian + Tangyinxian",
+        "zh": "安阳县、汤阴县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B14914107047494"
     },
     {
       "id": "CN_MRG_19742f026a19",
@@ -158,8 +188,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Nanhexian + Renxian",
-        "zh": "南河县、任县"
+        "en": "Renxian",
+        "zh": "任县"
       },
       "member_names": {
         "CN_CITY_17275852B15402619404646": {
@@ -170,7 +200,13 @@
           "en": "Renxian",
           "zh": "任县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nanhexian + Renxian",
+        "zh": "南河县、任县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B30063446428877"
     },
     {
       "id": "CN_MRG_57214cfbaf31",
@@ -181,8 +217,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Lichuanxian + Nanfengxian + Zixixian",
-        "zh": "利川县、南丰县、紫溪县"
+        "en": "Nanfengxian",
+        "zh": "南丰县"
       },
       "member_names": {
         "CN_CITY_17275852B15928071016890": {
@@ -197,7 +233,13 @@
           "en": "Zixixian",
           "zh": "紫溪县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lichuanxian + Nanfengxian + Zixixian",
+        "zh": "利川县、南丰县、紫溪县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B38392968045125"
     },
     {
       "id": "CN_MRG_d6f45c057bfc",
@@ -207,8 +249,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Luquan + Yuanxian",
-        "zh": "鹿泉、原县"
+        "en": "Luquan",
+        "zh": "鹿泉"
       },
       "member_names": {
         "CN_CITY_17275852B15976604032949": {
@@ -219,7 +261,13 @@
           "en": "Yuanxian",
           "zh": "原县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Luquan + Yuanxian",
+        "zh": "鹿泉、原县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B15976604032949"
     },
     {
       "id": "CN_MRG_e16d02489ce6",
@@ -229,8 +277,8 @@
       ],
       "parent_id": "CN_Anhui",
       "names": {
-        "en": "Wuhexian + Guzhenxian",
-        "zh": "五河县、固镇县"
+        "en": "Guzhenxian",
+        "zh": "固镇县"
       },
       "member_names": {
         "CN_CITY_17275852B17244930809328": {
@@ -241,7 +289,13 @@
           "en": "Guzhenxian",
           "zh": "固镇县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Wuhexian + Guzhenxian",
+        "zh": "五河县、固镇县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B79000631743628"
     },
     {
       "id": "CN_MRG_8028022022b6",
@@ -251,8 +305,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Xincaixian + Zhengyangxian",
-        "zh": "新彩县、正阳县"
+        "en": "Xincaixian",
+        "zh": "新彩县"
       },
       "member_names": {
         "CN_CITY_17275852B54720396840939": {
@@ -263,7 +317,13 @@
           "en": "Zhengyangxian",
           "zh": "正阳县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Xincaixian + Zhengyangxian",
+        "zh": "新彩县、正阳县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B54720396840939"
     },
     {
       "id": "CN_MRG_8c69fc20650e",
@@ -274,8 +334,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Xushuixian + Wangduxian + Qingyuanxian",
-        "zh": "徐水县、望都县、清源县"
+        "en": "Qingyuanxian (Hebei)",
+        "zh": "清源县（河北省）"
       },
       "member_names": {
         "CN_CITY_17275852B17915990545621": {
@@ -290,7 +350,13 @@
           "en": "Qingyuanxian",
           "zh": "清源县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Xushuixian + Wangduxian + Qingyuanxian",
+        "zh": "徐水县、望都县、清源县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B70455093500286"
     },
     {
       "id": "CN_MRG_5c6db60e61b3",
@@ -301,8 +367,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Shanggaoxian + Wanzaixian + Shanggaoxian",
-        "zh": "上高县、万载县、上高县"
+        "en": "Wanzaixian",
+        "zh": "万载县"
       },
       "member_names": {
         "CN_CITY_17275852B18090329850308": {
@@ -317,7 +383,13 @@
           "en": "Shanggaoxian",
           "zh": "上高县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shanggaoxian + Wanzaixian + Shanggaoxian",
+        "zh": "上高县、万载县、上高县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B23091947477547"
     },
     {
       "id": "CN_MRG_afbaca334723",
@@ -328,8 +400,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Wuqiangxian + Wuyixian + Shenzhou",
-        "zh": "武强县、武夷县、神舟"
+        "en": "Shenzhou",
+        "zh": "神舟"
       },
       "member_names": {
         "CN_CITY_17275852B19731807948045": {
@@ -344,7 +416,13 @@
           "en": "Shenzhou",
           "zh": "神舟"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Wuqiangxian + Wuyixian + Shenzhou",
+        "zh": "武强县、武夷县、神舟"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B90274183162284"
     },
     {
       "id": "CN_MRG_b7b350314dc1",
@@ -355,8 +433,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Luanchuanxian + Ruyang + Songxian",
-        "zh": "栾川县、汝阳、嵩县"
+        "en": "Songxian",
+        "zh": "嵩县"
       },
       "member_names": {
         "CN_CITY_17275852B2055839745215": {
@@ -371,7 +449,13 @@
           "en": "Songxian",
           "zh": "嵩县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Luanchuanxian + Ruyang + Songxian",
+        "zh": "栾川县、汝阳、嵩县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B93154995028726"
     },
     {
       "id": "CN_MRG_bf685b353c1f",
@@ -382,8 +466,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Anxinxian + Gaoyangxian + Rongchengxian",
-        "zh": "安新县、高阳县、容城县"
+        "en": "Anxinxian",
+        "zh": "安新县"
       },
       "member_names": {
         "CN_CITY_17275852B20688362661640": {
@@ -398,7 +482,13 @@
           "en": "Rongchengxian",
           "zh": "容城县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Anxinxian + Gaoyangxian + Rongchengxian",
+        "zh": "安新县、高阳县、容城县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B20688362661640"
     },
     {
       "id": "CN_MRG_34e4e9cc4fbe",
@@ -409,8 +499,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Boyexian + Lixian + Anguo",
-        "zh": "博野县、澧县、安国"
+        "en": "Lixian (Hebei)",
+        "zh": "澧县（河北省）"
       },
       "member_names": {
         "CN_CITY_17275852B21011904878760": {
@@ -425,7 +515,13 @@
           "en": "Anguo",
           "zh": "安国"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Boyexian + Lixian + Anguo",
+        "zh": "博野县、澧县、安国"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B29896348675191"
     },
     {
       "id": "CN_MRG_dcba081e6d4b",
@@ -435,8 +531,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Nanyang + Sheqixian",
-        "zh": "南阳、社旗县"
+        "en": "Nanyang (Henan)",
+        "zh": "南阳（河南省）"
       },
       "member_names": {
         "CN_CITY_17275852B22610568030006": {
@@ -447,7 +543,13 @@
           "en": "Sheqixian",
           "zh": "社旗县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nanyang + Sheqixian",
+        "zh": "南阳、社旗县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B22610568030006"
     },
     {
       "id": "CN_MRG_a23dd781cd4b",
@@ -457,8 +559,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Leanxian + Yihuangxian",
-        "zh": "乐县、以黄县"
+        "en": "Leanxian",
+        "zh": "乐县"
       },
       "member_names": {
         "CN_CITY_17275852B23042571236095": {
@@ -469,7 +571,13 @@
           "en": "Yihuangxian",
           "zh": "以黄县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Leanxian + Yihuangxian",
+        "zh": "乐县、以黄县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B23042571236095"
     },
     {
       "id": "CN_MRG_4c6664a4fd2e",
@@ -479,8 +587,8 @@
       ],
       "parent_id": "CN_Anhui",
       "names": {
-        "en": "Dingyuanxian + Fengyangxian",
-        "zh": "定远县、凤阳县"
+        "en": "Dingyuanxian",
+        "zh": "定远县"
       },
       "member_names": {
         "CN_CITY_17275852B23676912924817": {
@@ -491,7 +599,13 @@
           "en": "Fengyangxian",
           "zh": "凤阳县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dingyuanxian + Fengyangxian",
+        "zh": "定远县、凤阳县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B23676912924817"
     },
     {
       "id": "CN_MRG_e76984eed8fb",
@@ -501,8 +615,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Yichuanxian + Yiyangxian",
-        "zh": "宜川县、弋阳县"
+        "en": "Yichuanxian",
+        "zh": "宜川县"
       },
       "member_names": {
         "CN_CITY_17275852B44956350685295": {
@@ -513,7 +627,13 @@
           "en": "Yiyangxian",
           "zh": "弋阳县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yichuanxian + Yiyangxian",
+        "zh": "宜川县、弋阳县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B44956350685295"
     },
     {
       "id": "CN_MRG_398970fc50e7",
@@ -523,8 +643,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Yongxiuxian + Deanxian",
-        "zh": "永修县、德安县"
+        "en": "Yongxiuxian",
+        "zh": "永修县"
       },
       "member_names": {
         "CN_CITY_17275852B24333220567136": {
@@ -535,7 +655,13 @@
           "en": "Deanxian",
           "zh": "德安县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yongxiuxian + Deanxian",
+        "zh": "永修县、德安县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B24333220567136"
     },
     {
       "id": "CN_MRG_b38ab466fa3b",
@@ -545,8 +671,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Quzhouxian + Yongnianxian",
-        "zh": "衢州县、永年县"
+        "en": "Yongnianxian",
+        "zh": "永年县"
       },
       "member_names": {
         "CN_CITY_17275852B24882340673968": {
@@ -557,7 +683,13 @@
           "en": "Yongnianxian",
           "zh": "永年县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Quzhouxian + Yongnianxian",
+        "zh": "衢州县、永年县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B8103009054716"
     },
     {
       "id": "CN_MRG_0284a41a11c9",
@@ -567,8 +699,8 @@
       ],
       "parent_id": "CN_Anhui",
       "names": {
-        "en": "Qingyangxian + Shitaixian",
-        "zh": "青阳县、石台县"
+        "en": "Qingyangxian (Anhui)",
+        "zh": "青阳县（安徽省）"
       },
       "member_names": {
         "CN_CITY_17275852B27436635474795": {
@@ -579,7 +711,13 @@
           "en": "Shitaixian",
           "zh": "石台县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Qingyangxian + Shitaixian",
+        "zh": "青阳县、石台县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B27436635474795"
     },
     {
       "id": "CN_MRG_9305fada0549",
@@ -589,8 +727,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Wuningxian + Ruichang",
-        "zh": "武宁县、瑞昌"
+        "en": "Ruichang",
+        "zh": "瑞昌"
       },
       "member_names": {
         "CN_CITY_17275852B64087191598728": {
@@ -601,7 +739,13 @@
           "en": "Ruichang",
           "zh": "瑞昌"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Wuningxian + Ruichang",
+        "zh": "武宁县、瑞昌"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B87718878820627"
     },
     {
       "id": "CN_MRG_394c2f1e79d2",
@@ -611,8 +755,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Changxian + Mencunhuizuzizhixian",
-        "zh": "昌县、孟村回族自治县"
+        "en": "Changxian",
+        "zh": "昌县"
       },
       "member_names": {
         "CN_CITY_17275852B30373565857678": {
@@ -623,7 +767,13 @@
           "en": "Mencunhuizuzizhixian",
           "zh": "孟村回族自治县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Changxian + Mencunhuizuzizhixian",
+        "zh": "昌县、孟村回族自治县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B30373565857678"
     },
     {
       "id": "CN_MRG_8c437a4ee37b",
@@ -633,8 +783,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Yongqingxian + Guanxian",
-        "zh": "永清县、灌县"
+        "en": "Yongqingxian",
+        "zh": "永清县"
       },
       "member_names": {
         "CN_CITY_17275852B431696373370": {
@@ -645,7 +795,13 @@
           "en": "Guanxian",
           "zh": "灌县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yongqingxian + Guanxian",
+        "zh": "永清县、灌县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B431696373370"
     },
     {
       "id": "CN_MRG_5305adb06a6c",
@@ -655,8 +811,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Yushanxian + Shangraoxian",
-        "zh": "玉山县、上饶县"
+        "en": "Shangraoxian",
+        "zh": "上饶县"
       },
       "member_names": {
         "CN_CITY_17275852B31573882035564": {
@@ -667,7 +823,13 @@
           "en": "Shangraoxian",
           "zh": "上饶县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yushanxian + Shangraoxian",
+        "zh": "玉山县、上饶县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B72769683371533"
     },
     {
       "id": "CN_MRG_d7d38b1d4e6c",
@@ -677,8 +839,8 @@
       ],
       "parent_id": "CN_Anhui",
       "names": {
-        "en": "Xiuningxian + Yixian",
-        "zh": "休宁县、黟县"
+        "en": "Xiuningxian",
+        "zh": "休宁县"
       },
       "member_names": {
         "CN_CITY_17275852B31757639036873": {
@@ -689,7 +851,13 @@
           "en": "Yixian",
           "zh": "黟县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Xiuningxian + Yixian",
+        "zh": "休宁县、黟县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B31757639036873"
     },
     {
       "id": "CN_MRG_03c2697ed1c7",
@@ -699,8 +867,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Xinxiang + Weihui",
-        "zh": "新乡、伟辉"
+        "en": "Xinxiang",
+        "zh": "新乡"
       },
       "member_names": {
         "CN_CITY_17275852B32258301015981": {
@@ -711,7 +879,13 @@
           "en": "Weihui",
           "zh": "伟辉"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Xinxiang + Weihui",
+        "zh": "新乡、伟辉"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B32258301015981"
     },
     {
       "id": "CN_MRG_cb217ae78813",
@@ -721,8 +895,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Zhangshu + Gaoan",
-        "zh": "樟树、高安"
+        "en": "Gaoan",
+        "zh": "高安"
       },
       "member_names": {
         "CN_CITY_17275852B34450056986470": {
@@ -733,7 +907,13 @@
           "en": "Gaoan",
           "zh": "高安"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Zhangshu + Gaoan",
+        "zh": "樟树、高安"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B66433667475820"
     },
     {
       "id": "CN_MRG_3be300af18dc",
@@ -743,8 +923,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Handanxian + Cixian",
-        "zh": "邯郸县、磁县"
+        "en": "Handanxian",
+        "zh": "邯郸县"
       },
       "member_names": {
         "CN_CITY_17275852B35674473625997": {
@@ -755,7 +935,13 @@
           "en": "Cixian",
           "zh": "磁县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Handanxian + Cixian",
+        "zh": "邯郸县、磁县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B35674473625997"
     },
     {
       "id": "CN_MRG_51c0b9bbbb0a",
@@ -766,8 +952,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Nangong + Longyaoxian + Juluxian",
-        "zh": "馕、隆尧县、巨鹿县"
+        "en": "Nangong",
+        "zh": "南宫"
       },
       "member_names": {
         "CN_CITY_17275852B35904418947378": {
@@ -782,7 +968,13 @@
           "en": "Juluxian",
           "zh": "巨鹿县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nangong + Longyaoxian + Juluxian",
+        "zh": "馕、隆尧县、巨鹿县"
+      },
+      "name_source": "city",
+      "representative_id": "CN_CITY_17275852B35904418947378"
     },
     {
       "id": "CN_MRG_7c9c7c3d5403",
@@ -792,8 +984,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Botou + Xianxian",
-        "zh": "泊头、献县"
+        "en": "Botou",
+        "zh": "泊头"
       },
       "member_names": {
         "CN_CITY_17275852B36890628103019": {
@@ -804,7 +996,13 @@
           "en": "Xianxian",
           "zh": "献县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Botou + Xianxian",
+        "zh": "泊头、献县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B36890628103019"
     },
     {
       "id": "CN_MRG_855b56adb95d",
@@ -815,8 +1013,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Suichuanxian + Taihexian + Wananxian",
-        "zh": "遂川县、太和县、万安县"
+        "en": "Suichuanxian",
+        "zh": "遂川县"
       },
       "member_names": {
         "CN_CITY_17275852B37858104001226": {
@@ -831,7 +1029,13 @@
           "en": "Wananxian",
           "zh": "万安县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Suichuanxian + Taihexian + Wananxian",
+        "zh": "遂川县、太和县、万安县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B37858104001226"
     },
     {
       "id": "CN_MRG_3f1f7652e799",
@@ -841,8 +1045,8 @@
       ],
       "parent_id": "CN_Anhui",
       "names": {
-        "en": "Feixixian + Chaohu",
-        "zh": "费西县、巢湖"
+        "en": "Feixixian",
+        "zh": "费西县"
       },
       "member_names": {
         "CN_CITY_17275852B47297530357355": {
@@ -853,7 +1057,13 @@
           "en": "Chaohu",
           "zh": "巢湖"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Feixixian + Chaohu",
+        "zh": "费西县、巢湖"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B47297530357355"
     },
     {
       "id": "CN_MRG_6d6cb2d8c363",
@@ -863,8 +1073,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Shangyouxian + Nankang",
-        "zh": "上犹县、南康"
+        "en": "Nankang",
+        "zh": "南康"
       },
       "member_names": {
         "CN_CITY_17275852B41394272458329": {
@@ -875,7 +1085,13 @@
           "en": "Nankang",
           "zh": "南康"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shangyouxian + Nankang",
+        "zh": "上犹县、南康"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B71083235506927"
     },
     {
       "id": "CN_MRG_5b41c4449ce8",
@@ -885,8 +1101,8 @@
       ],
       "parent_id": "CN_Anhui",
       "names": {
-        "en": "Tianchang + Laianxian",
-        "zh": "天长、来安县"
+        "en": "Tianchang",
+        "zh": "天长"
       },
       "member_names": {
         "CN_CITY_17275852B42323417187142": {
@@ -897,7 +1113,13 @@
           "en": "Laianxian",
           "zh": "来安县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tianchang + Laianxian",
+        "zh": "天长、来安县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B42323417187142"
     },
     {
       "id": "CN_MRG_caa06bd6794d",
@@ -908,8 +1130,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Yongfengxian + Jishuixian + Jian",
-        "zh": "永丰县、积水县、坚"
+        "en": "Jian (Jiangxi)",
+        "zh": "坚（江西省）"
       },
       "member_names": {
         "CN_CITY_17275852B43446340592902": {
@@ -924,7 +1146,13 @@
           "en": "Jian",
           "zh": "坚"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yongfengxian + Jishuixian + Jian",
+        "zh": "永丰县、积水县、坚"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B99539158189120"
     },
     {
       "id": "CN_MRG_f2a3fc747532",
@@ -934,8 +1162,8 @@
       ],
       "parent_id": "CN_Anhui",
       "names": {
-        "en": "Taihuxian + Qianshanxian",
-        "zh": "太湖县、千山县"
+        "en": "Qianshanxian (Anhui)",
+        "zh": "千山县（安徽省）"
       },
       "member_names": {
         "CN_CITY_17275852B55448399697332": {
@@ -946,7 +1174,13 @@
           "en": "Qianshanxian",
           "zh": "千山县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Taihuxian + Qianshanxian",
+        "zh": "太湖县、千山县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B8482565791704"
     },
     {
       "id": "CN_MRG_c5c7b0e9cbd8",
@@ -956,8 +1190,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Shuixian + Qixian",
-        "zh": "水县、七贤"
+        "en": "Qixian (Henan)",
+        "zh": "七贤（河南省）"
       },
       "member_names": {
         "CN_CITY_17275852B68084346150299": {
@@ -968,7 +1202,13 @@
           "en": "Qixian",
           "zh": "七贤"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Shuixian + Qixian",
+        "zh": "水县、七贤"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B7483411794752"
     },
     {
       "id": "CN_MRG_f5f659cc505e",
@@ -978,8 +1218,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Neihuangxian + Huaxian",
-        "zh": "内黄县、滑县"
+        "en": "Huaxian (Henan)",
+        "zh": "滑县（河南省）"
       },
       "member_names": {
         "CN_CITY_17275852B47245604901224": {
@@ -990,7 +1230,13 @@
           "en": "Huaxian",
           "zh": "滑县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Neihuangxian + Huaxian",
+        "zh": "内黄县、滑县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B50412174337680"
     },
     {
       "id": "CN_MRG_6c22a284518b",
@@ -1000,8 +1246,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Yujiangxian + Guixixian",
-        "zh": "余江县、贵溪县"
+        "en": "Guixixian",
+        "zh": "贵溪县"
       },
       "member_names": {
         "CN_CITY_17275852B48217934131504": {
@@ -1012,7 +1258,13 @@
           "en": "Guixixian",
           "zh": "贵溪县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yujiangxian + Guixixian",
+        "zh": "余江县、贵溪县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B89533026423026"
     },
     {
       "id": "CN_MRG_4dbd04851564",
@@ -1023,8 +1275,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Ningduxian + Ganxian + Xingguoxian",
-        "zh": "宁都县、赣县、兴国县"
+        "en": "Ningduxian",
+        "zh": "宁都县"
       },
       "member_names": {
         "CN_CITY_17275852B51269093511150": {
@@ -1039,7 +1291,13 @@
           "en": "Xingguoxian",
           "zh": "兴国县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ningduxian + Ganxian + Xingguoxian",
+        "zh": "宁都县、赣县、兴国县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B51269093511150"
     },
     {
       "id": "CN_MRG_a8d7799e7061",
@@ -1050,8 +1308,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Wuyuanxian + Hengfengxian + Dexing",
-        "zh": "五源县、横峰县、德兴"
+        "en": "Wuyuanxian (Jiangxi)",
+        "zh": "五源县（江西省）"
       },
       "member_names": {
         "CN_CITY_17275852B5353146374567": {
@@ -1066,7 +1324,13 @@
           "en": "Dexing",
           "zh": "德兴"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Wuyuanxian + Hengfengxian + Dexing",
+        "zh": "五源县、横峰县、德兴"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B5353146374567"
     },
     {
       "id": "CN_MRG_1130259eb8b0",
@@ -1076,8 +1340,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Guangzhongxian + Weixian",
-        "zh": "广中县、潍县"
+        "en": "Weixian (Hebei)",
+        "zh": "潍县（河北省）"
       },
       "member_names": {
         "CN_CITY_17275852B53933530490343": {
@@ -1088,7 +1352,13 @@
           "en": "Weixian",
           "zh": "潍县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Guangzhongxian + Weixian",
+        "zh": "广中县、潍县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B64817974651819"
     },
     {
       "id": "CN_MRG_c71520fb477c",
@@ -1098,8 +1368,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Mixian + Dongfeng",
-        "zh": "密县、东风"
+        "en": "Dongfeng",
+        "zh": "东风"
       },
       "member_names": {
         "CN_CITY_17275852B55464189255182": {
@@ -1110,7 +1380,13 @@
           "en": "Dongfeng",
           "zh": "东风"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mixian + Dongfeng",
+        "zh": "密县、东风"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B55840349463324"
     },
     {
       "id": "CN_MRG_f0bfe71b2f0e",
@@ -1120,8 +1396,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Yuzhou + Changge",
-        "zh": "禹州、长葛"
+        "en": "Yuzhou",
+        "zh": "禹州"
       },
       "member_names": {
         "CN_CITY_17275852B63987790069029": {
@@ -1132,7 +1408,13 @@
           "en": "Changge",
           "zh": "长葛"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yuzhou + Changge",
+        "zh": "禹州、长葛"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B63987790069029"
     },
     {
       "id": "CN_MRG_51650d15c050",
@@ -1142,8 +1424,8 @@
       ],
       "parent_id": "CN_Hebei",
       "names": {
-        "en": "Xingtangxian + Lingshouxian",
-        "zh": "行唐县、灵寿县"
+        "en": "Xingtangxian",
+        "zh": "行唐县"
       },
       "member_names": {
         "CN_CITY_17275852B58371513472148": {
@@ -1154,7 +1436,13 @@
           "en": "Lingshouxian",
           "zh": "灵寿县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Xingtangxian + Lingshouxian",
+        "zh": "行唐县、灵寿县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B58371513472148"
     },
     {
       "id": "CN_MRG_47f5cbedadef",
@@ -1164,8 +1452,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Fengxinxian + Jinganxian",
-        "zh": "奉新县、靖安县"
+        "en": "Fengxinxian",
+        "zh": "奉新县"
       },
       "member_names": {
         "CN_CITY_17275852B63877453406832": {
@@ -1176,7 +1464,13 @@
           "en": "Jinganxian",
           "zh": "靖安县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Fengxinxian + Jinganxian",
+        "zh": "奉新县、靖安县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B63877453406832"
     },
     {
       "id": "CN_MRG_b11a43e1dda4",
@@ -1187,8 +1481,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Runanxian + Shangcaixian + Queshanxian",
-        "zh": "汝南县、上蔡县、确山县"
+        "en": "Shangcaixian",
+        "zh": "上蔡县"
       },
       "member_names": {
         "CN_CITY_17275852B6082279520202": {
@@ -1203,7 +1497,13 @@
           "en": "Queshanxian",
           "zh": "确山县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Runanxian + Shangcaixian + Queshanxian",
+        "zh": "汝南县、上蔡县、确山县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B62617200555443"
     },
     {
       "id": "CN_MRG_0e6318364e8e",
@@ -1213,8 +1513,8 @@
       ],
       "parent_id": "CN_Henan",
       "names": {
-        "en": "Miyangxian + Shuipingxian",
-        "zh": "泌阳县、水平县"
+        "en": "Miyangxian",
+        "zh": "泌阳县"
       },
       "member_names": {
         "CN_CITY_17275852B61638108171693": {
@@ -1225,7 +1525,13 @@
           "en": "Shuipingxian",
           "zh": "水平县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Miyangxian + Shuipingxian",
+        "zh": "泌阳县、水平县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B61638108171693"
     },
     {
       "id": "CN_MRG_1a89a77f2e8a",
@@ -1235,8 +1541,8 @@
       ],
       "parent_id": "CN_Jiangxi",
       "names": {
-        "en": "Nanchangxian + Xinjianxian",
-        "zh": "南昌县、新建县"
+        "en": "Nanchangxian",
+        "zh": "南昌县"
       },
       "member_names": {
         "CN_CITY_17275852B69618555412569": {
@@ -1247,7 +1553,13 @@
           "en": "Xinjianxian",
           "zh": "新建县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nanchangxian + Xinjianxian",
+        "zh": "南昌县、新建县"
+      },
+      "name_source": "population",
+      "representative_id": "CN_CITY_17275852B69618555412569"
     },
     {
       "id": "US_MRG_98c46952922a",
@@ -1257,8 +1569,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Anderson County + Houston County",
-        "zh": "安德森、休斯顿"
+        "en": "Anderson County",
+        "zh": "安德森"
       },
       "member_names": {
         "US_CNTY_48001": {
@@ -1269,7 +1581,13 @@
           "en": "Houston County",
           "zh": "休斯顿"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Anderson County + Houston County",
+        "zh": "安德森、休斯顿"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48001"
     },
     {
       "id": "US_MRG_e5ff30356db3",
@@ -1280,8 +1598,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Andrews County + Howard County + Martin County",
-        "zh": "安德鲁斯、霍华德、马丁"
+        "en": "Big Spring",
+        "zh": "大泉"
       },
       "member_names": {
         "US_CNTY_48003": {
@@ -1296,7 +1614,13 @@
           "en": "Martin County",
           "zh": "马丁"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Andrews County + Howard County + Martin County",
+        "zh": "安德鲁斯、霍华德、马丁"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48227"
     },
     {
       "id": "US_MRG_d2dd8d229fc4",
@@ -1306,8 +1630,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Archer County + Young County",
-        "zh": "射手、年轻的"
+        "en": "Young County",
+        "zh": "年轻的"
       },
       "member_names": {
         "US_CNTY_48009": {
@@ -1317,6 +1641,30 @@
         "US_CNTY_48503": {
           "en": "Young County",
           "zh": "年轻的"
+        }
+      },
+      "previous_names": {
+        "en": "Archer County + Young County",
+        "zh": "射手、年轻的"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48503",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Young County",
+          "zh": "扬县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48009": {
+            "en": "Archer County",
+            "zh": "阿彻县"
+          },
+          "US_CNTY_48503": {
+            "en": "Young County",
+            "zh": "扬县"
+          }
         }
       }
     },
@@ -1329,8 +1677,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Armstrong County + Carson County + Hutchinson County",
-        "zh": "阿姆斯特朗、卡森、哈钦森"
+        "en": "Hutchinson County",
+        "zh": "哈钦森"
       },
       "member_names": {
         "US_CNTY_48011": {
@@ -1345,7 +1693,13 @@
           "en": "Hutchinson County",
           "zh": "哈钦森"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Armstrong County + Carson County + Hutchinson County",
+        "zh": "阿姆斯特朗、卡森、哈钦森"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48233"
     },
     {
       "id": "US_MRG_4b9ef4efd3fc",
@@ -1355,8 +1709,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Atascosa County + Live Oak County",
-        "zh": "阿塔斯科萨、活橡木"
+        "en": "Atascosa County",
+        "zh": "阿塔斯科萨"
       },
       "member_names": {
         "US_CNTY_48013": {
@@ -1366,6 +1720,20 @@
         "US_CNTY_48297": {
           "en": "Live Oak County",
           "zh": "活橡木"
+        }
+      },
+      "previous_names": {
+        "en": "Atascosa County + Live Oak County",
+        "zh": "阿塔斯科萨、活橡木"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48013",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48297": {
+            "en": "Live Oak County",
+            "zh": "利夫奥克县"
+          }
         }
       }
     },
@@ -1377,8 +1745,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Austin County + Washington County",
-        "zh": "奥斯汀、华盛顿"
+        "en": "Washington County (Texas)",
+        "zh": "华盛顿（德克萨斯州）"
       },
       "member_names": {
         "US_CNTY_48015": {
@@ -1389,7 +1757,13 @@
           "en": "Washington County",
           "zh": "华盛顿"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Austin County + Washington County",
+        "zh": "奥斯汀、华盛顿"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48477"
     },
     {
       "id": "US_MRG_75ade1c370a1",
@@ -1400,8 +1774,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Bailey County + Hale County + Lamb County",
-        "zh": "贝利、黑尔、羊肉"
+        "en": "Hale County",
+        "zh": "黑尔"
       },
       "member_names": {
         "US_CNTY_48017": {
@@ -1416,6 +1790,20 @@
           "en": "Lamb County",
           "zh": "羊肉"
         }
+      },
+      "previous_names": {
+        "en": "Bailey County + Hale County + Lamb County",
+        "zh": "贝利、黑尔、羊肉"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48189",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48279": {
+            "en": "Lamb County",
+            "zh": "兰姆县"
+          }
+        }
       }
     },
     {
@@ -1426,8 +1814,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Bastrop County + Fayette County",
-        "zh": "巴斯特罗普、费耶特"
+        "en": "Bastrop County",
+        "zh": "巴斯特罗普"
       },
       "member_names": {
         "US_CNTY_48021": {
@@ -1438,7 +1826,13 @@
           "en": "Fayette County",
           "zh": "费耶特"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bastrop County + Fayette County",
+        "zh": "巴斯特罗普、费耶特"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48021"
     },
     {
       "id": "US_MRG_17c9b14fc969",
@@ -1448,8 +1842,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Blanco County + Gillespie County",
-        "zh": "布兰科、吉莱斯皮"
+        "en": "Gillespie County",
+        "zh": "吉莱斯皮"
       },
       "member_names": {
         "US_CNTY_48031": {
@@ -1460,7 +1854,13 @@
           "en": "Gillespie County",
           "zh": "吉莱斯皮"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Blanco County + Gillespie County",
+        "zh": "布兰科、吉莱斯皮"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48171"
     },
     {
       "id": "US_MRG_512211db3fed",
@@ -1471,8 +1871,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Borden County + Dawson County + Gaines County",
-        "zh": "博登、道森、盖恩斯"
+        "en": "Gaines County",
+        "zh": "盖恩斯"
       },
       "member_names": {
         "US_CNTY_48033": {
@@ -1487,7 +1887,13 @@
           "en": "Gaines County",
           "zh": "盖恩斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Borden County + Dawson County + Gaines County",
+        "zh": "博登、道森、盖恩斯"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48165"
     },
     {
       "id": "US_MRG_615a68fb03f7",
@@ -1498,8 +1904,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Brazoria County + Fort Bend County + Waller County",
-        "zh": "布拉佐里亚、本德堡、沃勒"
+        "en": "Freeport",
+        "zh": "自由港"
       },
       "member_names": {
         "US_CNTY_48039": {
@@ -1514,7 +1920,13 @@
           "en": "Waller County",
           "zh": "沃勒"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Brazoria County + Fort Bend County + Waller County",
+        "zh": "布拉佐里亚、本德堡、沃勒"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48039"
     },
     {
       "id": "US_MRG_288c105ab692",
@@ -1525,8 +1937,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Briscoe County + Hall County + Swisher County",
-        "zh": "布里斯科、大厅、斯威舍尔"
+        "en": "Swisher County",
+        "zh": "斯威舍尔"
       },
       "member_names": {
         "US_CNTY_48045": {
@@ -1541,6 +1953,20 @@
           "en": "Swisher County",
           "zh": "斯威舍尔"
         }
+      },
+      "previous_names": {
+        "en": "Briscoe County + Hall County + Swisher County",
+        "zh": "布里斯科、大厅、斯威舍尔"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48437",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48191": {
+            "en": "Hall County",
+            "zh": "霍尔县"
+          }
+        }
       }
     },
     {
@@ -1551,8 +1977,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Brooks County + Jim Hogg County",
-        "zh": "布鲁克斯、吉姆·霍格"
+        "en": "Falfurrias",
+        "zh": "法爾菲里厄斯"
       },
       "member_names": {
         "US_CNTY_48047": {
@@ -1563,7 +1989,13 @@
           "en": "Jim Hogg County",
           "zh": "吉姆·霍格"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Brooks County + Jim Hogg County",
+        "zh": "布鲁克斯、吉姆·霍格"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48047"
     },
     {
       "id": "US_MRG_1bbe9dc9722d",
@@ -1573,8 +2005,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Brown County + Mills County",
-        "zh": "棕色的、米尔斯"
+        "en": "Brownwood",
+        "zh": "布朗伍德"
       },
       "member_names": {
         "US_CNTY_48049": {
@@ -1584,6 +2016,20 @@
         "US_CNTY_48333": {
           "en": "Mills County",
           "zh": "米尔斯"
+        }
+      },
+      "previous_names": {
+        "en": "Brown County + Mills County",
+        "zh": "棕色的、米尔斯"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48049",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48049": {
+            "en": "Brown County",
+            "zh": "布朗县"
+          }
         }
       }
     },
@@ -1596,8 +2042,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Burleson County + Lee County + Williamson County",
-        "zh": "伯勒森、李、威廉森"
+        "en": "Williamson County (Texas)",
+        "zh": "威廉森（德克萨斯州）"
       },
       "member_names": {
         "US_CNTY_48051": {
@@ -1612,6 +2058,26 @@
           "en": "Williamson County",
           "zh": "威廉森"
         }
+      },
+      "previous_names": {
+        "en": "Burleson County + Lee County + Williamson County",
+        "zh": "伯勒森、李、威廉森"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48491",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Williamson County (Texas)",
+          "zh": "威廉姆森县（德克萨斯州）"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48491": {
+            "en": "Williamson County",
+            "zh": "威廉姆森县"
+          }
+        }
       }
     },
     {
@@ -1623,8 +2089,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Burnet County + Coryell County + Lampasas County",
-        "zh": "伯内特、科里尔、兰帕萨斯"
+        "en": "Coryell County",
+        "zh": "科里尔"
       },
       "member_names": {
         "US_CNTY_48053": {
@@ -1639,7 +2105,13 @@
           "en": "Lampasas County",
           "zh": "兰帕萨斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Burnet County + Coryell County + Lampasas County",
+        "zh": "伯内特、科里尔、兰帕萨斯"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48099"
     },
     {
       "id": "US_MRG_c69bb874c34c",
@@ -1649,8 +2121,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Calhoun County + Jackson County",
-        "zh": "卡尔霍恩、杰克逊"
+        "en": "Port Lavaca",
+        "zh": "拉瓦卡港"
       },
       "member_names": {
         "US_CNTY_48057": {
@@ -1661,7 +2133,13 @@
           "en": "Jackson County",
           "zh": "杰克逊"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Calhoun County + Jackson County",
+        "zh": "卡尔霍恩、杰克逊"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48057"
     },
     {
       "id": "US_MRG_9621d87995de",
@@ -1672,8 +2150,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Camp County + Gregg County + Upshur County",
-        "zh": "营、格雷格、厄普舒尔"
+        "en": "Longview",
+        "zh": "朗維尤"
       },
       "member_names": {
         "US_CNTY_48063": {
@@ -1688,6 +2166,20 @@
           "en": "Upshur County",
           "zh": "厄普舒尔"
         }
+      },
+      "previous_names": {
+        "en": "Camp County + Gregg County + Upshur County",
+        "zh": "营、格雷格、厄普舒尔"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48183",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48063": {
+            "en": "Camp County",
+            "zh": "坎普县"
+          }
+        }
       }
     },
     {
@@ -1698,8 +2190,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Castro County + Parmer County",
-        "zh": "卡斯特罗、帕尔默"
+        "en": "Parmer County",
+        "zh": "帕尔默"
       },
       "member_names": {
         "US_CNTY_48069": {
@@ -1710,7 +2202,13 @@
           "en": "Parmer County",
           "zh": "帕尔默"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Castro County + Parmer County",
+        "zh": "卡斯特罗、帕尔默"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48369"
     },
     {
       "id": "US_MRG_6a0cd1283040",
@@ -1720,8 +2218,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Cherokee County + Rusk County",
-        "zh": "切罗基、腊斯克"
+        "en": "Rusk County",
+        "zh": "腊斯克"
       },
       "member_names": {
         "US_CNTY_48073": {
@@ -1732,7 +2230,13 @@
           "en": "Rusk County",
           "zh": "腊斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Cherokee County + Rusk County",
+        "zh": "切罗基、腊斯克"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48401"
     },
     {
       "id": "US_MRG_8d4f8a0a88ae",
@@ -1742,8 +2246,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Jack County + Wise County",
-        "zh": "杰克、明智的"
+        "en": "Wise County",
+        "zh": "明智的"
       },
       "member_names": {
         "US_CNTY_48237": {
@@ -1753,6 +2257,26 @@
         "US_CNTY_48497": {
           "en": "Wise County",
           "zh": "明智的"
+        }
+      },
+      "previous_names": {
+        "en": "Jack County + Wise County",
+        "zh": "杰克、明智的"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48497",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Wise County",
+          "zh": "怀斯县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48497": {
+            "en": "Wise County",
+            "zh": "怀斯县"
+          }
         }
       }
     },
@@ -1765,8 +2289,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Cochran County + Hockley County + Terry County",
-        "zh": "科克伦、霍克利、特里"
+        "en": "Hockley County",
+        "zh": "霍克利"
       },
       "member_names": {
         "US_CNTY_48079": {
@@ -1781,7 +2305,13 @@
           "en": "Terry County",
           "zh": "特里"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Cochran County + Hockley County + Terry County",
+        "zh": "科克伦、霍克利、特里"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48219"
     },
     {
       "id": "US_MRG_6b6081bed14d",
@@ -1792,8 +2322,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Coke County + Runnels County + Sterling County",
-        "zh": "可乐、沟道、英镑"
+        "en": "Runnels County",
+        "zh": "沟道"
       },
       "member_names": {
         "US_CNTY_48081": {
@@ -1808,6 +2338,34 @@
           "en": "Sterling County",
           "zh": "英镑"
         }
+      },
+      "previous_names": {
+        "en": "Coke County + Runnels County + Sterling County",
+        "zh": "可乐、沟道、英镑"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48399",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Runnels County",
+          "zh": "兰纳尔斯县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48081": {
+            "en": "Coke County",
+            "zh": "科克县"
+          },
+          "US_CNTY_48399": {
+            "en": "Runnels County",
+            "zh": "兰纳尔斯县"
+          },
+          "US_CNTY_48431": {
+            "en": "Sterling County",
+            "zh": "斯特灵县"
+          }
+        }
       }
     },
     {
@@ -1819,8 +2377,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Colorado County + Lavaca County + Wharton County",
-        "zh": "科罗拉多州、拉瓦卡、沃顿商学院"
+        "en": "Wharton County",
+        "zh": "沃顿商学院"
       },
       "member_names": {
         "US_CNTY_48089": {
@@ -1835,6 +2393,26 @@
           "en": "Wharton County",
           "zh": "沃顿商学院"
         }
+      },
+      "previous_names": {
+        "en": "Colorado County + Lavaca County + Wharton County",
+        "zh": "科罗拉多州、拉瓦卡、沃顿商学院"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48481",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Wharton County",
+          "zh": "沃顿县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48481": {
+            "en": "Wharton County",
+            "zh": "沃顿县"
+          }
+        }
       }
     },
     {
@@ -1845,8 +2423,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Comal County + Hays County",
-        "zh": "科马尔、海斯"
+        "en": "New Braunfels",
+        "zh": "新布朗费尔斯"
       },
       "member_names": {
         "US_CNTY_48091": {
@@ -1857,7 +2435,13 @@
           "en": "Hays County",
           "zh": "海斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Comal County + Hays County",
+        "zh": "科马尔、海斯"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48091"
     },
     {
       "id": "US_MRG_394fc4c008ec",
@@ -1867,8 +2451,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Comanche County + Erath County",
-        "zh": "科曼奇、俄拉斯"
+        "en": "Erath County",
+        "zh": "俄拉斯"
       },
       "member_names": {
         "US_CNTY_48093": {
@@ -1879,7 +2463,13 @@
           "en": "Erath County",
           "zh": "俄拉斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Comanche County + Erath County",
+        "zh": "科曼奇、俄拉斯"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48143"
     },
     {
       "id": "US_MRG_2d17e071234f",
@@ -1890,8 +2480,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Concho County + Irion County + Tom Green County",
-        "zh": "康乔、伊里翁、汤姆·格林"
+        "en": "San Angelo",
+        "zh": "圣安吉洛"
       },
       "member_names": {
         "US_CNTY_48095": {
@@ -1906,7 +2496,13 @@
           "en": "Tom Green County",
           "zh": "汤姆·格林"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Concho County + Irion County + Tom Green County",
+        "zh": "康乔、伊里翁、汤姆·格林"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48451"
     },
     {
       "id": "US_MRG_ee506a8a0124",
@@ -1917,8 +2513,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Cooke County + Grayson County + Montague County",
-        "zh": "库克、格雷森、蒙塔古"
+        "en": "Sherman",
+        "zh": "谢尔曼"
       },
       "member_names": {
         "US_CNTY_48097": {
@@ -1933,7 +2529,13 @@
           "en": "Montague County",
           "zh": "蒙塔古"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Cooke County + Grayson County + Montague County",
+        "zh": "库克、格雷森、蒙塔古"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48181"
     },
     {
       "id": "US_MRG_867046e7ad47",
@@ -1944,8 +2546,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Cottle County + Floyd County + Motley County",
-        "zh": "科特尔、弗洛伊德、莫特利"
+        "en": "Floyd County",
+        "zh": "弗洛伊德"
       },
       "member_names": {
         "US_CNTY_48101": {
@@ -1960,7 +2562,13 @@
           "en": "Motley County",
           "zh": "莫特利"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Cottle County + Floyd County + Motley County",
+        "zh": "科特尔、弗洛伊德、莫特利"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48153"
     },
     {
       "id": "US_MRG_b97e9b932c3f",
@@ -1971,8 +2579,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Crane County + Reagan County + Upton County",
-        "zh": "起重机、里根、厄普顿"
+        "en": "Crane County",
+        "zh": "起重机"
       },
       "member_names": {
         "US_CNTY_48103": {
@@ -1987,6 +2595,26 @@
           "en": "Upton County",
           "zh": "厄普顿"
         }
+      },
+      "previous_names": {
+        "en": "Crane County + Reagan County + Upton County",
+        "zh": "起重机、里根、厄普顿"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48103",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Crane County",
+          "zh": "克兰县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48103": {
+            "en": "Crane County",
+            "zh": "克兰县"
+          }
+        }
       }
     },
     {
@@ -1998,8 +2626,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Crockett County + Schleicher County + Sutton County",
-        "zh": "克罗克特、施莱歇尔、萨顿"
+        "en": "Sutton County",
+        "zh": "萨顿"
       },
       "member_names": {
         "US_CNTY_48105": {
@@ -2014,7 +2642,13 @@
           "en": "Sutton County",
           "zh": "萨顿"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Crockett County + Schleicher County + Sutton County",
+        "zh": "克罗克特、施莱歇尔、萨顿"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48435"
     },
     {
       "id": "US_MRG_c5062d5fe295",
@@ -2025,8 +2659,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Crosby County + Dickens County + Kent County",
-        "zh": "克罗斯比、狄更斯、肯特"
+        "en": "Crosby County",
+        "zh": "克罗斯比"
       },
       "member_names": {
         "US_CNTY_48107": {
@@ -2041,7 +2675,13 @@
           "en": "Kent County",
           "zh": "肯特"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Crosby County + Dickens County + Kent County",
+        "zh": "克罗斯比、狄更斯、肯特"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48107"
     },
     {
       "id": "US_MRG_adb56f6301de",
@@ -2051,8 +2691,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Culberson County + Reeves County",
-        "zh": "卡尔伯森、里夫斯"
+        "en": "Pecos",
+        "zh": "貝可斯"
       },
       "member_names": {
         "US_CNTY_48109": {
@@ -2063,7 +2703,13 @@
           "en": "Reeves County",
           "zh": "里夫斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Culberson County + Reeves County",
+        "zh": "卡尔伯森、里夫斯"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48389"
     },
     {
       "id": "US_MRG_0afc14e3e73d",
@@ -2073,8 +2719,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Dallam County + Sherman County",
-        "zh": "达拉姆、谢尔曼"
+        "en": "Dallam County",
+        "zh": "达拉姆"
       },
       "member_names": {
         "US_CNTY_48111": {
@@ -2085,7 +2731,13 @@
           "en": "Sherman County",
           "zh": "谢尔曼"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dallam County + Sherman County",
+        "zh": "达拉姆、谢尔曼"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48111"
     },
     {
       "id": "US_MRG_830e401b2939",
@@ -2095,8 +2747,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Hartley County + Oldham County",
-        "zh": "哈特利、奥尔德姆"
+        "en": "Dalhart",
+        "zh": "达尔哈特"
       },
       "member_names": {
         "US_CNTY_48205": {
@@ -2107,7 +2759,13 @@
           "en": "Oldham County",
           "zh": "奥尔德姆"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hartley County + Oldham County",
+        "zh": "哈特利、奥尔德姆"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48205"
     },
     {
       "id": "US_MRG_e3fbfb93451d",
@@ -2117,8 +2775,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "DeWitt County + Victoria County",
-        "zh": "德威特、维多利亚"
+        "en": "Victoria",
+        "zh": "维多利亚"
       },
       "member_names": {
         "US_CNTY_48123": {
@@ -2129,7 +2787,13 @@
           "en": "Victoria County",
           "zh": "维多利亚"
         }
-      }
+      },
+      "previous_names": {
+        "en": "DeWitt County + Victoria County",
+        "zh": "德威特、维多利亚"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48469"
     },
     {
       "id": "US_MRG_4ae2dfdcec1e",
@@ -2139,8 +2803,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Donley County + Gray County",
-        "zh": "唐利、灰色的"
+        "en": "Gray County",
+        "zh": "灰色的"
       },
       "member_names": {
         "US_CNTY_48129": {
@@ -2150,6 +2814,26 @@
         "US_CNTY_48179": {
           "en": "Gray County",
           "zh": "灰色的"
+        }
+      },
+      "previous_names": {
+        "en": "Donley County + Gray County",
+        "zh": "唐利、灰色的"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48179",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Gray County",
+          "zh": "格雷县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48179": {
+            "en": "Gray County",
+            "zh": "格雷县"
+          }
         }
       }
     },
@@ -2162,8 +2846,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Duval County + Jim Wells County + Kleberg County",
-        "zh": "杜瓦尔、吉姆·威尔斯、克莱贝格"
+        "en": "Kingsville",
+        "zh": "金斯維爾"
       },
       "member_names": {
         "US_CNTY_48131": {
@@ -2178,7 +2862,13 @@
           "en": "Kleberg County",
           "zh": "克莱贝格"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Duval County + Jim Wells County + Kleberg County",
+        "zh": "杜瓦尔、吉姆·威尔斯、克莱贝格"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48273"
     },
     {
       "id": "US_MRG_ea19ceff3aed",
@@ -2188,8 +2878,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Kendall County + Kerr County",
-        "zh": "肯德尔、克尔"
+        "en": "Kerr County",
+        "zh": "克尔"
       },
       "member_names": {
         "US_CNTY_48259": {
@@ -2200,7 +2890,13 @@
           "en": "Kerr County",
           "zh": "克尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kendall County + Kerr County",
+        "zh": "肯德尔、克尔"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48265"
     },
     {
       "id": "US_MRG_03d789d015aa",
@@ -2210,8 +2906,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Ellis County + Johnson County",
-        "zh": "埃利斯、约翰逊"
+        "en": "Cleburne",
+        "zh": "克利本"
       },
       "member_names": {
         "US_CNTY_48139": {
@@ -2222,7 +2918,13 @@
           "en": "Johnson County",
           "zh": "约翰逊"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ellis County + Johnson County",
+        "zh": "埃利斯、约翰逊"
+      },
+      "name_source": "city",
+      "representative_id": "US_CNTY_48251"
     },
     {
       "id": "US_MRG_47bf661f9403",
@@ -2233,8 +2935,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Franklin County + Hopkins County + Titus County",
-        "zh": "富兰克林、霍普金斯、提图斯"
+        "en": "Hopkins County",
+        "zh": "霍普金斯"
       },
       "member_names": {
         "US_CNTY_48159": {
@@ -2249,7 +2951,13 @@
           "en": "Titus County",
           "zh": "提图斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Franklin County + Hopkins County + Titus County",
+        "zh": "富兰克林、霍普金斯、提图斯"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48223"
     },
     {
       "id": "US_MRG_57a856465415",
@@ -2259,8 +2967,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Garza County + Lynn County",
-        "zh": "加尔萨、林恩"
+        "en": "Garza County",
+        "zh": "加尔萨"
       },
       "member_names": {
         "US_CNTY_48169": {
@@ -2271,7 +2979,13 @@
           "en": "Lynn County",
           "zh": "林恩"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Garza County + Lynn County",
+        "zh": "加尔萨、林恩"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48169"
     },
     {
       "id": "US_MRG_daa505131e1c",
@@ -2281,8 +2995,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Harrison County + Marion County",
-        "zh": "哈里森、马里恩"
+        "en": "Harrison County (Texas)",
+        "zh": "哈里森（德克萨斯州）"
       },
       "member_names": {
         "US_CNTY_48203": {
@@ -2293,7 +3007,13 @@
           "en": "Marion County",
           "zh": "马里恩"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Harrison County + Marion County",
+        "zh": "哈里森、马里恩"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48203"
     },
     {
       "id": "US_MRG_6f6e5e61f8c1",
@@ -2303,8 +3023,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Haskell County + Throckmorton County",
-        "zh": "哈斯克尔、斯罗克莫顿"
+        "en": "Haskell County",
+        "zh": "哈斯克尔"
       },
       "member_names": {
         "US_CNTY_48207": {
@@ -2315,7 +3035,13 @@
           "en": "Throckmorton County",
           "zh": "斯罗克莫顿"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Haskell County + Throckmorton County",
+        "zh": "哈斯克尔、斯罗克莫顿"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48207"
     },
     {
       "id": "US_MRG_f1682b432a7b",
@@ -2326,8 +3052,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Hill County + Limestone County + Navarro County",
-        "zh": "爬坡道、石灰石、纳瓦罗"
+        "en": "Navarro County",
+        "zh": "纳瓦罗"
       },
       "member_names": {
         "US_CNTY_48217": {
@@ -2342,6 +3068,24 @@
           "en": "Navarro County",
           "zh": "纳瓦罗"
         }
+      },
+      "previous_names": {
+        "en": "Hill County + Limestone County + Navarro County",
+        "zh": "爬坡道、石灰石、纳瓦罗"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48349",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48217": {
+            "en": "Hill County",
+            "zh": "希尔县"
+          },
+          "US_CNTY_48293": {
+            "en": "Limestone County",
+            "zh": "莱姆斯通县"
+          }
+        }
       }
     },
     {
@@ -2352,8 +3096,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Hood County + Somervell County",
-        "zh": "兜帽、萨默维尔"
+        "en": "Hood County",
+        "zh": "兜帽"
       },
       "member_names": {
         "US_CNTY_48221": {
@@ -2363,6 +3107,26 @@
         "US_CNTY_48425": {
           "en": "Somervell County",
           "zh": "萨默维尔"
+        }
+      },
+      "previous_names": {
+        "en": "Hood County + Somervell County",
+        "zh": "兜帽、萨默维尔"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48221",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Hood County",
+          "zh": "胡德县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48221": {
+            "en": "Hood County",
+            "zh": "胡德县"
+          }
         }
       }
     },
@@ -2375,8 +3139,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Jasper County + Newton County + Sabine County",
-        "zh": "碧玉、牛顿、萨宾"
+        "en": "Jasper County",
+        "zh": "碧玉"
       },
       "member_names": {
         "US_CNTY_48241": {
@@ -2391,6 +3155,26 @@
           "en": "Sabine County",
           "zh": "萨宾"
         }
+      },
+      "previous_names": {
+        "en": "Jasper County + Newton County + Sabine County",
+        "zh": "碧玉、牛顿、萨宾"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48241",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jasper County",
+          "zh": "贾斯珀县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48241": {
+            "en": "Jasper County",
+            "zh": "贾斯珀县"
+          }
+        }
       }
     },
     {
@@ -2401,8 +3185,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Jones County + Shackelford County",
-        "zh": "琼斯、沙克尔福德"
+        "en": "Jones County",
+        "zh": "琼斯"
       },
       "member_names": {
         "US_CNTY_48253": {
@@ -2413,7 +3197,13 @@
           "en": "Shackelford County",
           "zh": "沙克尔福德"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Jones County + Shackelford County",
+        "zh": "琼斯、沙克尔福德"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48253"
     },
     {
       "id": "US_MRG_7e1d539ceaf6",
@@ -2423,8 +3213,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Karnes County + Wilson County",
-        "zh": "卡内斯、威尔逊"
+        "en": "Wilson County",
+        "zh": "威尔逊"
       },
       "member_names": {
         "US_CNTY_48255": {
@@ -2435,7 +3225,13 @@
           "en": "Wilson County",
           "zh": "威尔逊"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Karnes County + Wilson County",
+        "zh": "卡内斯、威尔逊"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48493"
     },
     {
       "id": "US_MRG_548f11247301",
@@ -2446,8 +3242,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Kaufman County + Rockwall County + Van Zandt County",
-        "zh": "考夫曼、罗克沃尔、范赞特"
+        "en": "Kaufman County",
+        "zh": "考夫曼"
       },
       "member_names": {
         "US_CNTY_48257": {
@@ -2462,7 +3258,13 @@
           "en": "Van Zandt County",
           "zh": "范赞特"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kaufman County + Rockwall County + Van Zandt County",
+        "zh": "考夫曼、罗克沃尔、范赞特"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48257"
     },
     {
       "id": "US_MRG_853623a78a85",
@@ -2472,8 +3274,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Kimble County + Menard County",
-        "zh": "金布尔、梅纳德"
+        "en": "Kimble County",
+        "zh": "金布尔"
       },
       "member_names": {
         "US_CNTY_48267": {
@@ -2484,7 +3286,13 @@
           "en": "Menard County",
           "zh": "梅纳德"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kimble County + Menard County",
+        "zh": "金布尔、梅纳德"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48267"
     },
     {
       "id": "US_MRG_36d7642c780b",
@@ -2495,8 +3303,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "King County + Knox County + Stonewall County",
-        "zh": "国王、诺克斯、石墙"
+        "en": "Knox County (Texas)",
+        "zh": "诺克斯（德克萨斯州）"
       },
       "member_names": {
         "US_CNTY_48269": {
@@ -2511,6 +3319,24 @@
           "en": "Stonewall County",
           "zh": "石墙"
         }
+      },
+      "previous_names": {
+        "en": "King County + Knox County + Stonewall County",
+        "zh": "国王、诺克斯、石墙"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48275",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48269": {
+            "en": "King County",
+            "zh": "金县"
+          },
+          "US_CNTY_48433": {
+            "en": "Stonewall County",
+            "zh": "斯通沃尔县"
+          }
+        }
       }
     },
     {
@@ -2521,8 +3347,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "La Salle County + McMullen County",
-        "zh": "拉萨尔、麦克马伦"
+        "en": "La Salle County",
+        "zh": "拉萨尔"
       },
       "member_names": {
         "US_CNTY_48283": {
@@ -2533,7 +3359,13 @@
           "en": "McMullen County",
           "zh": "麦克马伦"
         }
-      }
+      },
+      "previous_names": {
+        "en": "La Salle County + McMullen County",
+        "zh": "拉萨尔、麦克马伦"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48283"
     },
     {
       "id": "US_MRG_fa26f33714d2",
@@ -2543,8 +3375,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Leon County + Madison County",
-        "zh": "莱昂、麦迪逊"
+        "en": "Leon County (Texas)",
+        "zh": "莱昂（德克萨斯州）"
       },
       "member_names": {
         "US_CNTY_48289": {
@@ -2555,7 +3387,13 @@
           "en": "Madison County",
           "zh": "麦迪逊"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Leon County + Madison County",
+        "zh": "莱昂、麦迪逊"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48289"
     },
     {
       "id": "US_MRG_62c6af7a1cf7",
@@ -2565,8 +3403,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Lipscomb County + Ochiltree County",
-        "zh": "利普斯科姆、奥奇特里"
+        "en": "Ochiltree County",
+        "zh": "奥奇特里"
       },
       "member_names": {
         "US_CNTY_48295": {
@@ -2577,7 +3415,13 @@
           "en": "Ochiltree County",
           "zh": "奥奇特里"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lipscomb County + Ochiltree County",
+        "zh": "利普斯科姆、奥奇特里"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48357"
     },
     {
       "id": "US_MRG_741f098c1f8e",
@@ -2587,8 +3431,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Llano County + Mason County",
-        "zh": "拉诺、石匠"
+        "en": "Llano County",
+        "zh": "拉诺"
       },
       "member_names": {
         "US_CNTY_48299": {
@@ -2598,6 +3442,20 @@
         "US_CNTY_48319": {
           "en": "Mason County",
           "zh": "石匠"
+        }
+      },
+      "previous_names": {
+        "en": "Llano County + Mason County",
+        "zh": "拉诺、石匠"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48299",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48319": {
+            "en": "Mason County",
+            "zh": "梅森县"
+          }
         }
       }
     },
@@ -2609,8 +3467,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Uvalde County + Zavala County",
-        "zh": "尤瓦尔德、萨瓦拉"
+        "en": "Uvalde County",
+        "zh": "尤瓦尔德"
       },
       "member_names": {
         "US_CNTY_48463": {
@@ -2620,6 +3478,26 @@
         "US_CNTY_48507": {
           "en": "Zavala County",
           "zh": "萨瓦拉"
+        }
+      },
+      "previous_names": {
+        "en": "Uvalde County + Zavala County",
+        "zh": "尤瓦尔德、萨瓦拉"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48463",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Uvalde County",
+          "zh": "尤瓦尔迪县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48463": {
+            "en": "Uvalde County",
+            "zh": "尤瓦尔迪县"
+          }
         }
       }
     },
@@ -2632,8 +3510,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Mitchell County + Nolan County + Scurry County",
-        "zh": "米切尔、诺兰、疾走"
+        "en": "Scurry County",
+        "zh": "疾走"
       },
       "member_names": {
         "US_CNTY_48335": {
@@ -2648,6 +3526,26 @@
           "en": "Scurry County",
           "zh": "疾走"
         }
+      },
+      "previous_names": {
+        "en": "Mitchell County + Nolan County + Scurry County",
+        "zh": "米切尔、诺兰、疾走"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48415",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Scurry County",
+          "zh": "斯卡里县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48415": {
+            "en": "Scurry County",
+            "zh": "斯卡里县"
+          }
+        }
       }
     },
     {
@@ -2658,8 +3556,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Polk County + Trinity County",
-        "zh": "波尔克、三位一体"
+        "en": "Polk County (Texas)",
+        "zh": "波尔克（德克萨斯州）"
       },
       "member_names": {
         "US_CNTY_48373": {
@@ -2669,6 +3567,20 @@
         "US_CNTY_48455": {
           "en": "Trinity County",
           "zh": "三位一体"
+        }
+      },
+      "previous_names": {
+        "en": "Polk County + Trinity County",
+        "zh": "波尔克、三位一体"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48373",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48455": {
+            "en": "Trinity County",
+            "zh": "特里尼蒂县"
+          }
         }
       }
     },
@@ -2680,8 +3592,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "San Augustine County + Shelby County",
-        "zh": "圣奥古斯丁、谢尔比"
+        "en": "Shelby County (Texas)",
+        "zh": "谢尔比（德克萨斯州）"
       },
       "member_names": {
         "US_CNTY_48405": {
@@ -2692,7 +3604,13 @@
           "en": "Shelby County",
           "zh": "谢尔比"
         }
-      }
+      },
+      "previous_names": {
+        "en": "San Augustine County + Shelby County",
+        "zh": "圣奥古斯丁、谢尔比"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48419"
     },
     {
       "id": "US_MRG_f288cf4fe69b",
@@ -2702,8 +3620,8 @@
       ],
       "parent_id": "US_Texas",
       "names": {
-        "en": "Ward County + Winkler County",
-        "zh": "沃德、温克勒"
+        "en": "Ward County",
+        "zh": "沃德"
       },
       "member_names": {
         "US_CNTY_48475": {
@@ -2714,7 +3632,13 @@
           "en": "Winkler County",
           "zh": "温克勒"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ward County + Winkler County",
+        "zh": "沃德、温克勒"
+      },
+      "name_source": "population",
+      "representative_id": "US_CNTY_48475"
     },
     {
       "id": "UA_MRG_b0fab68c785d",
@@ -2725,8 +3649,8 @@
       ],
       "parent_id": "UA_Vinnytsia",
       "names": {
-        "en": "Illintsi + Orativ + Nemyriv",
-        "zh": "眼泪、扬声器、内梅里夫"
+        "en": "Illintsi",
+        "zh": "眼泪"
       },
       "member_names": {
         "UA_RAY_74538382B12709317910219": {
@@ -2741,7 +3665,13 @@
           "en": "Nemyriv",
           "zh": "内梅里夫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Illintsi + Orativ + Nemyriv",
+        "zh": "眼泪、扬声器、内梅里夫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B12709317910219"
     },
     {
       "id": "UA_MRG_6057d7f77511",
@@ -2751,8 +3681,8 @@
       ],
       "parent_id": "UA_Poltava",
       "names": {
-        "en": "Kotelva + Dykanka",
-        "zh": "科特尔瓦、迪坎卡"
+        "en": "Kotelva",
+        "zh": "科特尔瓦"
       },
       "member_names": {
         "UA_RAY_74538382B1295446134246": {
@@ -2763,7 +3693,13 @@
           "en": "Dykanka",
           "zh": "迪坎卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kotelva + Dykanka",
+        "zh": "科特尔瓦、迪坎卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B1295446134246"
     },
     {
       "id": "UA_MRG_e0dcc6adce13",
@@ -2774,8 +3710,8 @@
       ],
       "parent_id": "UA_Zhytomyr",
       "names": {
-        "en": "Popilnia + Andrushivka + Ruzhyn",
-        "zh": "凤梨属、安德鲁希夫卡、鲁任"
+        "en": "Popilnia",
+        "zh": "凤梨属"
       },
       "member_names": {
         "UA_RAY_74538382B13053028483551": {
@@ -2790,7 +3726,13 @@
           "en": "Ruzhyn",
           "zh": "鲁任"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Popilnia + Andrushivka + Ruzhyn",
+        "zh": "凤梨属、安德鲁希夫卡、鲁任"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B13053028483551"
     },
     {
       "id": "UA_MRG_ec2bf97653b5",
@@ -2800,8 +3742,8 @@
       ],
       "parent_id": "UA_Vinnytsia",
       "names": {
-        "en": "Tulchyn + Tomashpil",
-        "zh": "图尔钦、托马什皮尔"
+        "en": "Tulchyn",
+        "zh": "图尔钦"
       },
       "member_names": {
         "UA_RAY_74538382B13174941050792": {
@@ -2812,7 +3754,13 @@
           "en": "Tomashpil",
           "zh": "托马什皮尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Tulchyn + Tomashpil",
+        "zh": "图尔钦、托马什皮尔"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B13174941050792"
     },
     {
       "id": "UA_MRG_95a5c2e0f114",
@@ -2822,8 +3770,8 @@
       ],
       "parent_id": "UA_Poltava",
       "names": {
-        "en": "Hrebinka + Pyriatyn",
-        "zh": "赫雷宾卡、我会尝试"
+        "en": "Pyriatyn",
+        "zh": "我会尝试"
       },
       "member_names": {
         "UA_RAY_74538382B1986372473405": {
@@ -2834,7 +3782,13 @@
           "en": "Pyriatyn",
           "zh": "我会尝试"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hrebinka + Pyriatyn",
+        "zh": "赫雷宾卡、我会尝试"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B82525342266993"
     },
     {
       "id": "UA_MRG_ae35953e4a30",
@@ -2845,8 +3799,8 @@
       ],
       "parent_id": "UA_Vinnytsia",
       "names": {
-        "en": "Bar + Zhmerynka + Murovani Kurylivtsi",
-        "zh": "酒吧、日梅林卡、穆罗瓦尼·库里利夫齐"
+        "en": "Zhmerynka",
+        "zh": "日梅林卡"
       },
       "member_names": {
         "UA_RAY_74538382B24202642451616": {
@@ -2861,7 +3815,13 @@
           "en": "Murovani Kurylivtsi",
           "zh": "穆罗瓦尼·库里利夫齐"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bar + Zhmerynka + Murovani Kurylivtsi",
+        "zh": "酒吧、日梅林卡、穆罗瓦尼·库里利夫齐"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B80669310769437"
     },
     {
       "id": "UA_MRG_5e1a623ff8e3",
@@ -2872,8 +3832,8 @@
       ],
       "parent_id": "UA_Poltava",
       "names": {
-        "en": "Mashivka + Chutove + Karlivka",
-        "zh": "马什夫卡、丘托维、卡利夫卡"
+        "en": "Karlivka",
+        "zh": "卡利夫卡"
       },
       "member_names": {
         "UA_RAY_74538382B24211497806867": {
@@ -2888,7 +3848,13 @@
           "en": "Karlivka",
           "zh": "卡利夫卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mashivka + Chutove + Karlivka",
+        "zh": "马什夫卡、丘托维、卡利夫卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B83988407306770"
     },
     {
       "id": "UA_MRG_39b244f210a7",
@@ -2899,8 +3865,8 @@
       ],
       "parent_id": "UA_Poltava",
       "names": {
-        "en": "Lubny + Chornukhy + Orzhytsia",
-        "zh": "卢布尼、乔努希、奥尔日西亚"
+        "en": "Lubny",
+        "zh": "卢布尼"
       },
       "member_names": {
         "UA_RAY_74538382B28667917897493": {
@@ -2915,7 +3881,13 @@
           "en": "Orzhytsia",
           "zh": "奥尔日西亚"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lubny + Chornukhy + Orzhytsia",
+        "zh": "卢布尼、乔努希、奥尔日西亚"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B28667917897493"
     },
     {
       "id": "UA_MRG_d6223fcd4bc5",
@@ -2925,8 +3897,8 @@
       ],
       "parent_id": "UA_Zhytomyr",
       "names": {
-        "en": "Radomyshl + Malyn",
-        "zh": "拉多梅什尔、马林"
+        "en": "Malyn",
+        "zh": "马林"
       },
       "member_names": {
         "UA_RAY_74538382B29600786349581": {
@@ -2937,7 +3909,13 @@
           "en": "Malyn",
           "zh": "马林"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Radomyshl + Malyn",
+        "zh": "拉多梅什尔、马林"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B40041339344288"
     },
     {
       "id": "UA_MRG_b828b24bbda1",
@@ -2948,8 +3926,8 @@
       ],
       "parent_id": "UA_Vinnytsia",
       "names": {
-        "en": "Chernivtsi + Sharhorod + Tyvriv",
-        "zh": "切尔诺夫策、沙霍罗德、特夫里夫"
+        "en": "Sharhorod",
+        "zh": "沙霍罗德"
       },
       "member_names": {
         "UA_RAY_74538382B29634078398489": {
@@ -2964,7 +3942,13 @@
           "en": "Tyvriv",
           "zh": "特夫里夫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Chernivtsi + Sharhorod + Tyvriv",
+        "zh": "切尔诺夫策、沙霍罗德、特夫里夫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B44263254033139"
     },
     {
       "id": "UA_MRG_1e5ce8367e34",
@@ -2975,8 +3959,8 @@
       ],
       "parent_id": "UA_Poltava",
       "names": {
-        "en": "Reshetylivka + Shyshaky + Velyka Bahachka",
-        "zh": "列舍特利夫卡、夏沙基、韦丽卡·巴哈卡"
+        "en": "Reshetylivka",
+        "zh": "列舍特利夫卡"
       },
       "member_names": {
         "UA_RAY_74538382B30544134807890": {
@@ -2991,7 +3975,13 @@
           "en": "Velyka Bahachka",
           "zh": "韦丽卡·巴哈卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Reshetylivka + Shyshaky + Velyka Bahachka",
+        "zh": "列舍特利夫卡、夏沙基、韦丽卡·巴哈卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B30544134807890"
     },
     {
       "id": "UA_MRG_fd8e40834959",
@@ -3001,8 +3991,8 @@
       ],
       "parent_id": "UA_Vinnytsia",
       "names": {
-        "en": "Lypovets + Pohrebyshche",
-        "zh": "利波维茨、波赫雷比什切"
+        "en": "Lypovets",
+        "zh": "利波维茨"
       },
       "member_names": {
         "UA_RAY_74538382B32198153584627": {
@@ -3013,7 +4003,13 @@
           "en": "Pohrebyshche",
           "zh": "波赫雷比什切"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lypovets + Pohrebyshche",
+        "zh": "利波维茨、波赫雷比什切"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B32198153584627"
     },
     {
       "id": "UA_MRG_ce31c0ac496b",
@@ -3023,8 +4019,8 @@
       ],
       "parent_id": "UA_Vinnytsia",
       "names": {
-        "en": "Teplyk + Trostianets",
-        "zh": "特普雷克、特罗斯蒂亚内茨"
+        "en": "Trostianets",
+        "zh": "特罗斯蒂亚内茨"
       },
       "member_names": {
         "UA_RAY_74538382B75813986727772": {
@@ -3035,7 +4031,13 @@
           "en": "Trostianets",
           "zh": "特罗斯蒂亚内茨"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Teplyk + Trostianets",
+        "zh": "特普雷克、特罗斯蒂亚内茨"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B76388790181712"
     },
     {
       "id": "UA_MRG_de7e916ec1cb",
@@ -3045,8 +4047,8 @@
       ],
       "parent_id": "UA_Vinnytsia",
       "names": {
-        "en": "Khmilnyk + Lityn",
-        "zh": "赫米尔尼克、点燃"
+        "en": "Khmilnyk",
+        "zh": "赫米尔尼克"
       },
       "member_names": {
         "UA_RAY_74538382B34104046396179": {
@@ -3056,6 +4058,26 @@
         "UA_RAY_74538382B83246565510085": {
           "en": "Lityn",
           "zh": "点燃"
+        }
+      },
+      "previous_names": {
+        "en": "Khmilnyk + Lityn",
+        "zh": "赫米尔尼克、点燃"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B34104046396179",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Khmilnyk",
+          "zh": "赫米利尼克"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B34104046396179": {
+            "en": "Khmilnyk",
+            "zh": "赫米利尼克"
+          }
         }
       }
     },
@@ -3067,8 +4089,8 @@
       ],
       "parent_id": "UA_Zhytomyr",
       "names": {
-        "en": "Brusyliv + Korostyshiv",
-        "zh": "布鲁西利夫、强调"
+        "en": "Korostyshiv",
+        "zh": "强调"
       },
       "member_names": {
         "UA_RAY_74538382B38609283059110": {
@@ -3079,7 +4101,13 @@
           "en": "Korostyshiv",
           "zh": "强调"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Brusyliv + Korostyshiv",
+        "zh": "布鲁西利夫、强调"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B95360083052097"
     },
     {
       "id": "UA_MRG_51ee3e4d0063",
@@ -3089,8 +4117,8 @@
       ],
       "parent_id": "UA_Kirovohrad",
       "names": {
-        "en": "Vilshanka + Holovanivsk",
-        "zh": "维尔尚卡、霍洛万尼夫斯克"
+        "en": "Holovanivsk",
+        "zh": "霍洛万尼夫斯克"
       },
       "member_names": {
         "UA_RAY_74538382B40286307768032": {
@@ -3101,7 +4129,13 @@
           "en": "Holovanivsk",
           "zh": "霍洛万尼夫斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Vilshanka + Holovanivsk",
+        "zh": "维尔尚卡、霍洛万尼夫斯克"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B68550856765578"
     },
     {
       "id": "UA_MRG_9fc8b136c3a6",
@@ -3112,8 +4146,8 @@
       ],
       "parent_id": "UA_Zhytomyr",
       "names": {
-        "en": "Yemilchyne + Luhyny + Korosten",
-        "zh": "耶米尔钦、卢希尼、科罗斯滕"
+        "en": "Korosten",
+        "zh": "科罗斯坚"
       },
       "member_names": {
         "UA_RAY_74538382B40940873671576": {
@@ -3128,7 +4162,13 @@
           "en": "Korosten",
           "zh": "科罗斯滕"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Yemilchyne + Luhyny + Korosten",
+        "zh": "耶米尔钦、卢希尼、科罗斯滕"
+      },
+      "name_source": "city",
+      "representative_id": "UA_RAY_74538382B96819013794956"
     },
     {
       "id": "UA_MRG_c74c01b39f8e",
@@ -3139,8 +4179,8 @@
       ],
       "parent_id": "UA_Poltava",
       "names": {
-        "en": "Novi Sanzhary + Kozelshchyna + Kobeliaky",
-        "zh": "新桑扎里、科泽尔希纳、科比利亚基"
+        "en": "Novi Sanzhary",
+        "zh": "新桑扎里"
       },
       "member_names": {
         "UA_RAY_74538382B44340415968020": {
@@ -3155,7 +4195,13 @@
           "en": "Kobeliaky",
           "zh": "科比利亚基"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novi Sanzhary + Kozelshchyna + Kobeliaky",
+        "zh": "新桑扎里、科泽尔希纳、科比利亚基"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B44340415968020"
     },
     {
       "id": "UA_MRG_364aab8578b7",
@@ -3165,8 +4211,8 @@
       ],
       "parent_id": "UA_Zhytomyr",
       "names": {
-        "en": "Chudniv + Berdychiv",
-        "zh": "丘德尼夫、别尔季奇夫"
+        "en": "Berdychiv",
+        "zh": "别尔季奇夫"
       },
       "member_names": {
         "UA_RAY_74538382B45059422214147": {
@@ -3176,6 +4222,26 @@
         "UA_RAY_74538382B58798821419341": {
           "en": "Berdychiv",
           "zh": "别尔季奇夫"
+        }
+      },
+      "previous_names": {
+        "en": "Chudniv + Berdychiv",
+        "zh": "丘德尼夫、别尔季奇夫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B58798821419341",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Berdychiv",
+          "zh": "别尔季切夫"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B58798821419341": {
+            "en": "Berdychiv",
+            "zh": "别尔季切夫"
+          }
         }
       }
     },
@@ -3187,8 +4253,8 @@
       ],
       "parent_id": "UA_Vinnytsia",
       "names": {
-        "en": "Kalynivka + Koziatyn",
-        "zh": "卡利尼夫卡、科齐亚廷"
+        "en": "Koziatyn",
+        "zh": "科齐亚廷"
       },
       "member_names": {
         "UA_RAY_74538382B48236413060906": {
@@ -3199,7 +4265,13 @@
           "en": "Koziatyn",
           "zh": "科齐亚廷"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kalynivka + Koziatyn",
+        "zh": "卡利尼夫卡、科齐亚廷"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B65548017442564"
     },
     {
       "id": "UA_MRG_7f067ceac5cb",
@@ -3210,8 +4282,8 @@
       ],
       "parent_id": "UA_Zhytomyr",
       "names": {
-        "en": "Khoroshiv + Cherniakhiv + Pulyny",
-        "zh": "霍罗希夫、切尔尼亚希夫、普利尼"
+        "en": "Pulyny",
+        "zh": "普利尼"
       },
       "member_names": {
         "UA_RAY_74538382B5063322332018": {
@@ -3226,7 +4298,13 @@
           "en": "Pulyny",
           "zh": "普利尼"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Khoroshiv + Cherniakhiv + Pulyny",
+        "zh": "霍罗希夫、切尔尼亚希夫、普利尼"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B63160428645400"
     },
     {
       "id": "UA_MRG_797d35ccfd2e",
@@ -3236,8 +4314,8 @@
       ],
       "parent_id": "UA_Kirovohrad",
       "names": {
-        "en": "Kropyvnytskyi + Bobrynets",
-        "zh": "克罗佩夫尼茨基、博布里内茨"
+        "en": "Bobrynets",
+        "zh": "博布里内茨"
       },
       "member_names": {
         "UA_RAY_74538382B5065610238765": {
@@ -3247,6 +4325,20 @@
         "UA_RAY_74538382B51817175452920": {
           "en": "Bobrynets",
           "zh": "博布里内茨"
+        }
+      },
+      "previous_names": {
+        "en": "Kropyvnytskyi + Bobrynets",
+        "zh": "克罗佩夫尼茨基、博布里内茨"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B51817175452920",
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B5065610238765": {
+            "en": "Eichhornburg",
+            "zh": "艾希霍恩堡"
+          }
         }
       }
     },
@@ -3258,8 +4350,8 @@
       ],
       "parent_id": "UA_Kirovohrad",
       "names": {
-        "en": "Dobrovelychkivka + Novoarkhanhelsk",
-        "zh": "多布罗韦利奇基夫卡、新阿尔汉赫尔斯克"
+        "en": "Dobrovelychkivka",
+        "zh": "多布罗韦利奇基夫卡"
       },
       "member_names": {
         "UA_RAY_74538382B57034061820630": {
@@ -3270,7 +4362,13 @@
           "en": "Novoarkhanhelsk",
           "zh": "新阿尔汉赫尔斯克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dobrovelychkivka + Novoarkhanhelsk",
+        "zh": "多布罗韦利奇基夫卡、新阿尔汉赫尔斯克"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B57034061820630"
     },
     {
       "id": "UA_MRG_dbee0923a48b",
@@ -3281,8 +4379,8 @@
       ],
       "parent_id": "UA_Zhytomyr",
       "names": {
-        "en": "Baranivka + Romaniv + Liubar",
-        "zh": "巴拉尼夫卡、罗曼尼夫、我很高兴"
+        "en": "Baranivka",
+        "zh": "巴拉尼夫卡"
       },
       "member_names": {
         "UA_RAY_74538382B58237861988874": {
@@ -3297,7 +4395,13 @@
           "en": "Liubar",
           "zh": "我很高兴"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Baranivka + Romaniv + Liubar",
+        "zh": "巴拉尼夫卡、罗曼尼夫、我很高兴"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B58237861988874"
     },
     {
       "id": "UA_MRG_e3c0520ffdd5",
@@ -3307,8 +4411,8 @@
       ],
       "parent_id": "UA_Kirovohrad",
       "names": {
-        "en": "Kamianka + Oleksandrivka",
-        "zh": "卡米扬卡、奥列克桑德夫卡"
+        "en": "Kamianka",
+        "zh": "卡米扬卡"
       },
       "member_names": {
         "UA_RAY_74538382B60018374136133": {
@@ -3319,7 +4423,13 @@
           "en": "Oleksandrivka",
           "zh": "奥列克桑德夫卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kamianka + Oleksandrivka",
+        "zh": "卡米扬卡、奥列克桑德夫卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B60018374136133"
     },
     {
       "id": "UA_MRG_ba89d2e82c09",
@@ -3330,8 +4440,8 @@
       ],
       "parent_id": "UA_Kirovohrad",
       "names": {
-        "en": "Novomyrhorod + Mala Vyska + Novoukrainka",
-        "zh": "新米尔哥罗德、马拉维斯卡、新乌克兰卡"
+        "en": "Novoukrainka",
+        "zh": "新乌克兰卡"
       },
       "member_names": {
         "UA_RAY_74538382B62956114849097": {
@@ -3346,7 +4456,13 @@
           "en": "Novoukrainka",
           "zh": "新乌克兰卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Novomyrhorod + Mala Vyska + Novoukrainka",
+        "zh": "新米尔哥罗德、马拉维斯卡、新乌克兰卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B86431925858942"
     },
     {
       "id": "UA_MRG_7e91c55da78e",
@@ -3357,8 +4473,8 @@
       ],
       "parent_id": "UA_Poltava",
       "names": {
-        "en": "Myrhorod + Hadiach + Zinkiv",
-        "zh": "米尔哥罗德、哈迪亚克、津基夫"
+        "en": "Myrhorod",
+        "zh": "米尔哥罗德"
       },
       "member_names": {
         "UA_RAY_74538382B63112784365900": {
@@ -3373,6 +4489,20 @@
           "en": "Zinkiv",
           "zh": "津基夫"
         }
+      },
+      "previous_names": {
+        "en": "Myrhorod + Hadiach + Zinkiv",
+        "zh": "米尔哥罗德、哈迪亚克、津基夫"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B63112784365900",
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B87722024081340": {
+            "en": "Hadiach",
+            "zh": "哈佳奇"
+          }
+        }
       }
     },
     {
@@ -3383,8 +4513,8 @@
       ],
       "parent_id": "UA_Kirovohrad",
       "names": {
-        "en": "Oleksandriia + Znamianka",
-        "zh": "亚历克桑德里亚、兹纳米安卡"
+        "en": "Oleksandriia",
+        "zh": "亚历克桑德里亚"
       },
       "member_names": {
         "UA_RAY_74538382B69842770208303": {
@@ -3395,7 +4525,13 @@
           "en": "Znamianka",
           "zh": "兹纳米安卡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Oleksandriia + Znamianka",
+        "zh": "亚历克桑德里亚、兹纳米安卡"
+      },
+      "name_source": "population",
+      "representative_id": "UA_RAY_74538382B69842770208303"
     }
   ],
   "split_or_reduced_candidates": [

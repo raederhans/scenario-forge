@@ -10,6 +10,7 @@ import {
   commitStartupReadonlyStateFields,
   replaceBootMetricsState,
   setBootStateFields,
+  setBootSubProgress,
 } from "../js/core/state/actions/boot_actions.js";
 
 const BOOT_STATE_KEYS = Object.freeze([
@@ -56,10 +57,12 @@ test("boot snapshot restore preserves active and inactive timestamps and metrics
 });
 
 function createDocumentStub() {
+  const classes = new Set();
   return {
     body: {
       classList: {
-        toggle() {},
+        contains: (name) => classes.has(name),
+        toggle(name, active) { active ? classes.add(name) : classes.delete(name); },
       },
     },
     getElementById() {
@@ -73,7 +76,7 @@ function createDocumentStub() {
 function createBootShellDocument() {
   const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
   const nodes = new Map();
-  for (const match of html.matchAll(/<[a-z][^>]*\bid="(boot[^"]+)"[^>]*>/gi)) {
+  for (const match of html.matchAll(/<[a-z][^>]*\bid="(boot[^"]+|startupReadonly[^"]+)"[^>]*>/gi)) {
     const tag = match[0];
     const classes = new Set((tag.match(/\bclass="([^"]*)"/)?.[1] || "").split(/\s+/));
     const listeners = new Map();
@@ -93,7 +96,20 @@ function createBootShellDocument() {
       click() { listeners.get("click")?.(); },
     });
   }
-  return { ...createDocumentStub(), getElementById: (id) => nodes.get(id) || null };
+  const panel = { children: [], appendChild(node) { this.children.push(node); nodes.set(node.id, node); } };
+  nodes.get("bootOverlayTitle").parentElement = panel;
+  return {
+    ...createDocumentStub(),
+    getElementById: (id) => nodes.get(id) || null,
+    createElement() {
+      return {
+        children: [], textContent: "", attributes: new Map(),
+        appendChild(node) { this.children.push(node); },
+        setAttribute(name, value) { this.attributes.set(name, value); },
+        getAttribute(name) { return this.attributes.get(name); },
+      };
+    },
+  };
 }
 
 test("shipping boot shell exposes recovery actions and separates error details in both languages", () => {
@@ -238,4 +254,138 @@ test("boot overlay preserves readonly activation time and clears it on ordinary 
       delete globalThis.document;
     }
   }
+});
+
+function withProgressHarness(run) {
+  const keys = ["bootPhase", "bootMessage", "bootProgress", "bootSubProgress", "bootBlocking",
+    "bootError", "bootCanContinueWithoutScenario", "scenarioRegistry", "activeScenarioId", "currentLanguage",
+    "startupReadonly", "startupReadonlyReason", "startupReadonlyUnlockInFlight", "startupReadonlySince",
+    "firstVisibleFramePainted", "bootPreviewVisible"];
+  const saved = snapshotProperties(runtimeState, keys);
+  const globals = Object.getOwnPropertyDescriptors(globalThis);
+  const frames = [];
+  let now = 0;
+  const controller = createStartupBootOverlayController();
+  try {
+    globalThis.document = createBootShellDocument();
+    globalThis.performance = { now: () => now };
+    globalThis.requestAnimationFrame = (callback) => { frames.push(callback); return frames.length; };
+    globalThis.cancelAnimationFrame = () => {};
+    setBootStateFields(runtimeState, { phase: "shell", progress: 0, blocking: true });
+    setBootSubProgress(runtimeState, null);
+    controller.initializeBootOverlay();
+    run(controller, () => {
+      now += 60000;
+      frames.splice(0).forEach((callback) => callback(now));
+    });
+  } finally {
+    controller.setBootState("ready");
+    for (const [key, value] of saved) runtimeState[key] = value;
+    for (const key of ["document", "performance", "requestAnimationFrame", "cancelAnimationFrame"]) {
+      if (globals[key]) Object.defineProperty(globalThis, key, globals[key]);
+      else delete globalThis[key];
+    }
+  }
+}
+
+test("readonly reveal shows the banner and removes the blocking body class", () => {
+  withProgressHarness((controller) => {
+    const banner = document.getElementById("startupReadonlyBanner");
+    banner.classList.toggle("hidden", true);
+    controller.setStartupReadonlyState(true, { reason: "detail-promotion" });
+    assert.equal(document.body.classList.contains("app-booting"), true);
+    assert.equal(banner.hidden, true);
+    assert.equal(banner.classList.contains("hidden"), true);
+    controller.setBootState("interaction-infra", { blocking: false });
+    assert.equal(runtimeState.startupReadonly, true);
+    assert.equal(banner.hidden, false);
+    assert.equal(banner.classList.contains("hidden"), false);
+    assert.equal(document.body.classList.contains("app-booting"), false);
+    assert.equal(document.body.classList.contains("app-startup-readonly"), true);
+    assert.equal(document.getElementById("bootOverlay").classList.contains("hidden"), true);
+    controller.setStartupReadonlyState(false);
+    controller.setBootState("ready");
+    assert.equal(banner.hidden, true);
+    assert.equal(banner.classList.contains("hidden"), true);
+  });
+});
+
+test("accepted first frame enables peek until ready", () => {
+  withProgressHarness((controller) => {
+    runtimeState.firstVisibleFramePainted = false;
+    controller.setBootState("initial-chunk-visual", { blocking: true });
+    const overlay = document.getElementById("bootOverlay");
+    assert.equal(overlay.classList.contains("is-peek"), false);
+    runtimeState.firstVisibleFramePainted = true;
+    controller.setBootPreviewVisible(true);
+    assert.equal(overlay.classList.contains("is-peek"), true);
+    assert.equal(runtimeState.bootBlocking, true);
+    controller.setBootState("ready");
+    assert.equal(overlay.classList.contains("is-peek"), false);
+  });
+});
+
+test("progress does not increase as time passes", () => {
+  withProgressHarness((controller, advanceClock) => {
+    controller.setBootState("base-data");
+    advanceClock();
+    assert.equal(runtimeState.bootProgress, 3);
+    assert.equal(document.getElementById("bootOverlayProgressText").textContent, "3%");
+  });
+});
+
+test("chunk sub-progress advances the visible progress monotonically", () => {
+  withProgressHarness((controller) => {
+    controller.setBootState("initial-chunk-visual");
+    setBootSubProgress(runtimeState, { done: 1, total: 4 });
+    assert.equal(runtimeState.bootProgress, 52);
+    assert.equal(document.getElementById("bootOverlayProgressBar").style.width, "52%");
+    setBootSubProgress(runtimeState, { done: 3, total: 4 });
+    assert.equal(runtimeState.bootProgress, 76);
+    setBootSubProgress(runtimeState, { done: 1, total: 4 });
+    assert.equal(runtimeState.bootProgress, 76);
+    setBootSubProgress(runtimeState, { done: 4, total: 4 });
+    assert.equal(runtimeState.bootProgress, 88);
+  });
+});
+
+test("phase transitions use window minima without moving backwards and update steps", () => {
+  withProgressHarness((controller) => {
+    for (const [phase, minimum] of [["shell", 0], ["base-data", 3], ["scenario-bundle", 16],
+      ["scenario-apply", 36], ["initial-chunk-visual", 40], ["warmup", 88],
+      ["detail-promotion", 90], ["interaction-infra", 92]]) {
+      controller.setBootState(phase);
+      assert.equal(runtimeState.bootProgress, minimum);
+    }
+    const steps = document.getElementById("bootOverlaySteps").children;
+    assert.equal(steps[0].getAttribute("data-status"), "completed");
+    assert.equal(steps[7].getAttribute("data-status"), "active");
+    assert.equal(steps[8].getAttribute("data-status"), "pending");
+    controller.setBootState("base-data");
+    assert.equal(runtimeState.bootProgress, 92);
+    controller.setBootState("ready");
+    assert.equal(runtimeState.bootProgress, 100);
+  });
+});
+
+test("scenario messages use registry display names in both languages and otherwise the id", () => {
+  withProgressHarness((controller) => {
+    runtimeState.activeScenarioId = "";
+    runtimeState.scenarioRegistry = {
+      default_scenario_id: "hoi4_1936",
+      scenarios: [{ scenario_id: "hoi4_1936", display_name: "HOI4 1936" }],
+    };
+    for (const language of ["en", "zh"]) {
+      setCurrentLanguage(runtimeState, language);
+      for (const phase of ["scenario-bundle", "scenario-apply"]) {
+        controller.setBootState(phase);
+        const message = document.getElementById("bootOverlayMessage").textContent;
+        assert.ok(message.includes("HOI4 1936"));
+        assert.ok(!message.includes("TNO 1962"));
+      }
+    }
+    runtimeState.activeScenarioId = "custom_scenario";
+    controller.setBootState("scenario-bundle");
+    assert.ok(document.getElementById("bootOverlayMessage").textContent.includes("custom_scenario"));
+  });
 });

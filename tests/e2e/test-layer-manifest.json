@@ -271,9 +271,23 @@
       "ownerHint": "ui-shell"
     },
     {
+      "specPath": "tests/e2e/sidebar_layout_shift_regression.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "sidebar-shell",
+      "ownerHint": "ui-shell"
+    },
+    {
       "specPath": "tests/e2e/startup_bundle_recovery_contract.spec.js",
       "primaryLayer": "contract",
       "executionMode": "hybrid",
+      "domain": "startup",
+      "ownerHint": "startup-runtime"
+    },
+    {
+      "specPath": "tests/e2e/startup_readonly_reveal.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
       "domain": "startup",
       "ownerHint": "startup-runtime"
     },

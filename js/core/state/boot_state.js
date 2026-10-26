@@ -44,6 +44,7 @@ export function createDefaultBootState() {
     bootPhase: "shell",
     bootMessage: "Starting workspace…",
     bootProgress: 0,
+    bootSubProgress: null,
     bootBlocking: true,
     bootPreviewVisible: false,
     bootError: "",

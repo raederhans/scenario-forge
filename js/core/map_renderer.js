@@ -38,7 +38,10 @@ import { createRenderPassSignaturePolicy } from './renderer/render_pass_signatur
 import { createProjectedBoundsDiagnosticsOwner } from "./renderer/projected_bounds_diagnostics_owner.js";
 import { createPixelRatioPolicy } from "./renderer/pixel_ratio_policy.js";
 import { normalizeDisplayQuality } from "./renderer/display_quality_policy.js";
-import { separatesPoliticalBorders } from "./renderer/political_border_policy.js";
+import { separatesPoliticalBorders, isPoliticalBorderEnabled } from "./renderer/political_border_policy.js";
+import { createBorderIdentityResolver } from "./renderer/border_identity.js";
+import { getScenarioCountryTags } from "./state/actions/scenario_activation_actions.js";
+import { normalizeScenarioDistrictGroupsPayload } from "./scenario_districts.js";
 import { createPoliticalBorderRuntime } from "./renderer/political_border_runtime.js";
 import { EXPORT_RENDER_BUDGET_BYTES, estimateExportRenderBytes } from "./renderer/export_render_budget.js";
 import { createPhysicalIntensityInteractionOwner } from "./renderer/physical_intensity_interaction_owner.js";
@@ -75,6 +78,7 @@ import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
 import { createCountryLabelSourceOwner } from "./renderer/country_label_source.js";
 import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "./renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "./renderer/urban_layer_render_owner.js";
+import { yieldToBackground } from "./background_yield.js";
 // Hybrid canvas + SVG rendering engine.
 // 这个文件仍是渲染主控壳层：owner/facade 已经拆到子模块，但跨子系统的调度、
 // runtime 句柄和 render pass 编排还集中留在这里。后续修改优先下沉到对应 owner，
@@ -233,6 +237,7 @@ import {
   requestPoliticalRasterWorkerPass,
 } from "./political_raster_worker_client.js";
 import { LegendManager, createRevisionedLegendColorReader } from "./legend_manager.js";
+import { createDeferredPanelRender } from "./deferred_panel_render.js";
 import { createSourceMetricsCache } from "./renderer/source_metrics_cache.js";
 import { createTransientOverlayRenderOwner } from "./renderer/transient_overlay_render_owner.js";
 import { createSelectionOverlayOwner } from "./renderer/selection_overlay_owner.js";
@@ -270,7 +275,7 @@ import {
 } from "./unit_counter_presets.js";
 import { enqueueFrameTask, getFrameSchedulerQueueLength } from "./frame_scheduler.js";
 import { flushRenderBoundary, getRenderBoundaryDebugState, requestRender } from "./render_boundary.js";
-import { callRuntimeHook, callRuntimeHooks, captureCompatRuntimeHook, registerRuntimeHook } from "./state/index.js";
+import { callRuntimeHook, callRuntimeHooks, captureCompatRuntimeHook, registerRuntimeHook, requestRuntimeHookAfterPaint } from "./state/index.js";
 import { createUrbanCityPolicyOwner } from "./renderer/urban_city_policy.js";
 import { createCityPaintStyleModel } from "./renderer/city_paint_style_model.js";
 import { createCityLabelOwner } from "./renderer/city_label_owner.js";
@@ -1028,10 +1033,6 @@ function getLegendControlOwner() {
       specialZoneLegendLayers: LegendManager.getSpecialZoneLayers(runtimeState),
       thematicLegend: getPopulationLegend(runtimeState) || getThematicWgiLegend(runtimeState),
       labelMap: labels || LegendManager.getLabels(state),
-      activeScenarioId: runtimeState.activeScenarioId,
-      hasScenarioVisualEdits: !!runtimeState.activeScenarioId && (
-        Object.keys(runtimeState.visualOverrides || {}).length > 0
-      ),
     }),
     getControlState: () => LegendManager.getControlState(state),
     getControlLimits: () => LegendManager.getControlLimits(),
@@ -2495,12 +2496,110 @@ function getRiverPaintEditorOwner() {
 }
 
 let paintContourRuntimeOwner = null;
+let borderPaletteSource = null, borderPaletteColorRevision = -1, borderPaletteRevision = '';
+function getBorderPaletteRevision() {
+  if (borderPaletteSource !== runtimeState.sovereignBaseColors || borderPaletteColorRevision !== runtimeState.colorRevision) {
+    borderPaletteSource = runtimeState.sovereignBaseColors;
+    borderPaletteColorRevision = runtimeState.colorRevision;
+    borderPaletteRevision = JSON.stringify(borderPaletteSource || {});
+  }
+  return borderPaletteRevision;
+}
+let borderCountryTagsSource, borderCountryTags = null;
+function getBorderCountryTags() {
+  if (borderCountryTagsSource !== runtimeState.scenarioCountriesByTag) {
+    borderCountryTagsSource = runtimeState.scenarioCountriesByTag;
+    borderCountryTags = getScenarioCountryTags(borderCountryTagsSource);
+  }
+  return borderCountryTags;
+}
+const resolveBorderIdentity = createBorderIdentityResolver({
+  sovereignBaseColors: () => runtimeState.sovereignBaseColors,
+  getCountryTags: getBorderCountryTags,
+  getRevision: getBorderPaletteRevision,
+  getReferenceOwner: (id, feature) => {
+    const parent = getRiverPaintRuntime(runtimeState).getParentFeature(feature);
+    return canonicalCountryCode(getDisplayOwnerCode(parent, feature?.properties?.__riverParentId || id));
+  },
+  getOverrideColor: (id, feature) => feature?.properties?.__riverParentId
+    ? runtimeState.riverPaint?.overrides?.[id] || runtimeState.visualOverrides?.[feature.properties.__riverParentId]
+    : runtimeState.visualOverrides?.[id],
+});
+let borderDistrictSource = null, borderDistrictGeneration = -1, borderDistrictGroups = new Map();
+function resolveClassifiedBorderFeature(feature, id) {
+  if (borderDistrictSource !== runtimeState.scenarioDistrictGroupsData
+    || borderDistrictGeneration !== runtimeState.scenarioDataGeneration) {
+    borderDistrictSource = runtimeState.scenarioDistrictGroupsData;
+    borderDistrictGeneration = runtimeState.scenarioDataGeneration;
+    borderDistrictGroups = new Map();
+    const payload = normalizeScenarioDistrictGroupsPayload(borderDistrictSource);
+    for (const [tag, record] of Object.entries(payload.tags)) {
+      const groups = new Map();
+      for (const [districtId, district] of Object.entries(record.districts)) {
+        for (const featureId of district.feature_ids) groups.set(featureId, `${tag}::${districtId}`);
+      }
+      borderDistrictGroups.set(tag, groups);
+    }
+  }
+  const parent = getRiverPaintRuntime(runtimeState).getParentFeature(feature);
+  const parentId = feature?.properties?.__riverParentId || id;
+  const borderKey = resolveBorderIdentity(id, feature);
+  const reference = canonicalCountryCode(getDisplayOwnerCode(parent, parentId));
+  const districts = borderDistrictGroups.get(borderKey);
+  const parentKey = districts?.get(parentId)
+    || (reference === borderKey ? runtimeState.parentGroupByFeatureId?.get(parentId) : '') || '';
+  // A country with scenario districts uses them as its only subdivision; its
+  // source admin1 lines (e.g. the German Länder) would redraw a retired system.
+  if (districts) return { borderKey, parentKey, provinceKey: '' };
+  const admin1 = getAdmin1Group(parent);
+  const sourceCountry = canonicalCountryCode(getFeatureCountryCodeNormalized(parent));
+  return { borderKey, parentKey,
+    provinceKey: admin1 && isBorderHomeCountry(borderKey, sourceCountry) ? `${sourceCountry}::${admin1}` : '' };
+}
+// Occupied or annexed land (German Bohemia, Austria, Poland) keeps no province
+// lines of its former country; only the owner's own source country does.
+function isBorderHomeCountry(borderKey, sourceCountry) {
+  if (!sourceCountry || borderKey === sourceCountry) return true;
+  const countries = runtimeState.scenarioCountriesByTag;
+  if (!countries || typeof countries !== "object") return true;
+  const record = countries[borderKey];
+  if (!record) return false;
+  return [record.base_iso2, record.lookup_iso2].some(code => code && canonicalCountryCode(code) === sourceCountry);
+}
+// Supported parent-border countries only grow within one scene, so painting a
+// country's last district edge away keeps its enabled preference for undo.
+let parentBorderSupportScene = "", parentBorderSupportKeys = new Set();
+function getClassifiedBorderMeshes() {
+  const classification = getPaintContourRuntimeOwner().getClassification();
+  if (classification) {
+    const scene = `${runtimeState.activeScenarioId || ""}|${runtimeState.sceneGeneration || 0}`;
+    if (scene !== parentBorderSupportScene) { parentBorderSupportScene = scene; parentBorderSupportKeys = new Set(); }
+    for (const key of classification.parent.keys()) parentBorderSupportKeys.add(key);
+    const supported = [...parentBorderSupportKeys].sort();
+    if (supported.length !== runtimeState.parentBorderSupportedCountries?.length
+      || supported.some((key, index) => key !== runtimeState.parentBorderSupportedCountries[index])) {
+      runtimeState.parentBorderSupportedCountries = supported;
+      runtimeState.updateParentBorderCountryListFn?.();
+    }
+  }
+  return classification;
+}
 function getPaintContourRuntimeOwner() {
   if (!paintContourRuntimeOwner) {
     paintContourRuntimeOwner = createPaintContourRuntime({
       state: runtimeState,
       getFeatures: () => getRiverPaintRuntime(runtimeState).surfaces(),
       getFeatureId,
+      resolveClassification: resolveClassifiedBorderFeature,
+      getWaterMaskSources: () => ({
+        land: runtimeState.showScenarioAtlantropa === false ? runtimeState.landBgData
+          : runtimeState.scenarioLandMaskData || runtimeState.scenarioContextLandMaskData || runtimeState.landBgData,
+        water: getEffectiveWaterRegionFeatures(),
+        addedLand: buildAtlantropaLandLikeFeatureCollection(),
+      }),
+      getClassificationRevision: () => [runtimeState.sovereignBaseColors, getBorderPaletteRevision(),
+        runtimeState.scenarioDistrictGroupsData, runtimeState.scenarioDataGeneration, runtimeState.parentGroupByFeatureId,
+        runtimeState.scenarioCountriesByTag],
       resolveBoundaryKey: (feature, id) => {
         const parent = getRiverPaintRuntime(runtimeState).getParentFeature(feature);
         return canonicalCountryCode(getDisplayOwnerCode(parent, feature?.properties?.__riverParentId || id));
@@ -2603,15 +2702,20 @@ function getBorderDrawOwner() {
       buildDetailAdmMeshSignature,
       clamp,
       drawScenarioCoastalAccentLayer,
-      drawCoastalTransition,
       getCoastlineCollectionForZoom,
       getInternalBorderStrokeColor,
       getSafeCanvasColor,
       getVisibleCountryCodesForBorderMeshes,
       isUsableMesh,
       getPaintContourMeshes: () => getPaintContourRuntimeOwner().getMeshes(),
+      getClassifiedBorderMeshes,
       drawRiverInternalContours: options => getRiverContourRenderOwner().draw(options),
-      getPoliticalBorderMeshes: () => getPoliticalBorderRuntimeOwner().getMeshes(),
+      getPoliticalBorderMeshes: () => {
+        const classification = getClassifiedBorderMeshes();
+        return classification
+          ? (isPoliticalBorderEnabled(runtimeState) ? classification.country : [])
+          : getPoliticalBorderRuntimeOwner().getMeshes();
+      },
       sanitizePolyline,
       scheduleDeferredHeavyBorderMeshes,
       reconcileDetailAdmBorders: (meta) => getBorderMeshOwner().reconcileDetailAdmBorders(meta),
@@ -3679,8 +3783,7 @@ function getContextPassOrchestratorOwner() {
 
 function getPoliticalIdRasterEligibilityReason() {
   return getPoliticalIdRasterEligibility({ requested: readPoliticalRenderPolicy({ scenarioId: runtimeState.activeScenarioId }).requested, exporting: exportRenderInProgress,
-    debugMode, ready: isBootInteractionReady(), firstVisible: runtimeState.firstVisibleFramePainted,
-    readonly: runtimeState.startupReadonly, unlocking: runtimeState.startupReadonlyUnlockInFlight,
+    debugMode, firstVisible: runtimeState.firstVisibleFramePainted,
     riverPartitions: hasVisibleRiverPartitions(), scenarioId: runtimeState.activeScenarioId });
 }
 
@@ -4302,7 +4405,7 @@ function getDrawCanvasOrchestrationOwner() {
         ensureLayerDataFromTopology();
         // Cached viewport frames also need to select the current contour pack.
         if (runtimeState.renderPhase !== RENDER_PHASE_INTERACTING
-          && !runtimeState.bootBlocking && !runtimeState.scenarioApplyInFlight) {
+          && !runtimeState.bootBlocking && !runtimeState.startupReadonly && !runtimeState.scenarioApplyInFlight) {
           ensureContourLodForView();
           ensurePhysicalAtlasDetailForView();
         }
@@ -5652,9 +5755,8 @@ function clearPendingDynamicBorderTimer() {
 }
 
 function updateDynamicBorderStatusUI() {
-  if (typeof runtimeState.updateDynamicBorderStatusUIFn === "function") {
-    runtimeState.updateDynamicBorderStatusUIFn();
-  }
+  // Border rebuilds run during chunk promotion; the status line can wait for paint.
+  requestRuntimeHookAfterPaint(runtimeState, "updateDynamicBorderStatusUIFn");
 }
 
 function markDynamicBordersDirty(reason = "") {
@@ -5983,7 +6085,35 @@ function appendUniqueFeatureCollections(primaryCollection, extraCollection, { pu
   return result;
 }
 
+let frameEffectiveWater = null;
+
+function getFrameEffectiveWaterInputs(atlantropaWater, scenarioWaterFeatures) {
+  const manifest = runtimeState.activeScenarioManifest;
+  const baseFeatures = runtimeState.waterRegionsData?.features;
+  const lakeFeatures = runtimeState.contextLayerExternalDataByName?.lakes?.features;
+  return [
+    baseFeatures, baseFeatures?.length, scenarioWaterFeatures, scenarioWaterFeatures?.length,
+    lakeFeatures, lakeFeatures?.length, runtimeState.activeScenarioId || "", isScenarioWaterTopologyExclusiveMode(),
+    manifest?.excluded_water_region_ids, manifest?.excluded_water_region_groups, runtimeState.contextLayerRevision,
+    ...atlantropaWater,
+  ];
+}
+
 function getEffectiveWaterRegionFeatures(atlantropaFeatures = getEffectiveAtlantropaFeatures(), scenarioWaterFeatures = runtimeState.scenarioWaterRegionsData?.features) {
+  // Only the default scenario list is reused within a frame; one-off lists
+  // (navigation previews) always resolve.
+  const frame = scenarioWaterFeatures === runtimeState.scenarioWaterRegionsData?.features ? frameEffectiveWater : null;
+  const inputs = frame ? getFrameEffectiveWaterInputs(atlantropaFeatures.water, scenarioWaterFeatures) : null;
+  if (frame?.entry && frame.entry.inputs.length === inputs.length
+    && frame.entry.inputs.every((value, index) => value === inputs[index])) {
+    return frame.entry.result;
+  }
+  const result = resolveAndSanitizeEffectiveWaterRegionFeatures(atlantropaFeatures, scenarioWaterFeatures);
+  if (frame) frame.entry = { inputs, result };
+  return result;
+}
+
+function resolveAndSanitizeEffectiveWaterRegionFeatures(atlantropaFeatures, scenarioWaterFeatures) {
   const exclusions = { ids: getScenarioExcludedWaterRegionIds(), groups: getScenarioExcludedWaterRegionGroups() };
   const scenarioFeatures = [
     ...(Array.isArray(scenarioWaterFeatures)
@@ -6156,6 +6286,10 @@ function getAtlantropaSurfaceKind(feature) {
 }
 
 function isAtlantropaSeaFeature(feature) {
+  // Both checks need an Atlantropa property; ordinary features skip the
+  // per-feature string and country-code normalization.
+  const props = feature?.properties;
+  if (!props?.atl_color_rule && !props?.atl_surface_kind) return false;
   if (getAtlantropaColorRule(feature) === "atlantropa_sea") {
     return true;
   }
@@ -10274,13 +10408,7 @@ function getInteractionInfrastructureStageRank(stage = runtimeState.interactionI
 }
 
 async function yieldToMain() {
-  if (typeof globalThis.scheduler?.yield === "function") {
-    await globalThis.scheduler.yield();
-    return;
-  }
-  await new Promise((resolve) => {
-    globalThis.setTimeout(resolve, 0);
-  });
+  await yieldToBackground();
 }
 
 function rebuildAuxiliaryRegionIndexes() {
@@ -11459,9 +11587,6 @@ function drawScenarioCoastalAccentLayer(k, { interactive = false } = {}) {
   return getOceanRenderOwner().drawScenarioCoastalAccentLayer(k, { interactive });
 }
 
-function drawCoastalTransition(k, options) {
-  return getOceanRenderOwner().drawCoastalTransition(k, options);
-}
 
 function resolveOceanMask() {
   let mode = OCEAN_MASK_MODE_SPHERE_MINUS_LAND;
@@ -13455,8 +13580,8 @@ function getCountryLabelRenderOwner() {
       getCountryLabelColors: (code) => {
         const luminance = getCanvasColorRelativeLuminance(getAdmin0BackgroundFillColor(code));
         return Number.isFinite(luminance) && luminance < 0.18
-          ? { fill: "#f4f1e7", stroke: "rgba(16, 24, 32, 0.5)" }
-          : { fill: "#172b35", stroke: "rgba(255, 252, 241, 0.4)" };
+          ? { fill: "#f4f1e7", stroke: "rgba(16, 24, 32, 0.3)" }
+          : { fill: "#172b35", stroke: "rgba(255, 252, 241, 0.22)" };
       },
     },
     helpers: {
@@ -14278,7 +14403,15 @@ function reconcileRenderFrameResources() {
 }
 
 function drawCanvas() {
-  getDrawCanvasOrchestrationOwner().drawCanvasFrame();
+  // Render signatures resolve the effective water list several times per frame;
+  // within one synchronous frame its inputs cannot change, so reuse it there.
+  const outerFrameWater = frameEffectiveWater;
+  frameEffectiveWater = outerFrameWater || { entry: null };
+  try {
+    getDrawCanvasOrchestrationOwner().drawCanvasFrame();
+  } finally {
+    frameEffectiveWater = outerFrameWater;
+  }
 }
 
 function readRenderPerfMetricDuration(metricName, minSequence = 0) {
@@ -14765,6 +14898,22 @@ export function renderLegend(uniqueColors = null, labels = null) {
   return getLegendControlOwner().renderLegend(uniqueColors, labels);
 }
 
+// Both legends rescan every painted color after a color change, and the map legend
+// reads its own layout to place itself. Idle render passes refresh them after paint,
+// so a paint click's frame does not pay for it.
+let deferredLegendRender = null;
+function requestLegendRender() {
+  deferredLegendRender ||= createDeferredPanelRender({
+    render: () => {
+      renderLegend();
+      if (typeof runtimeState.updateLegendUI === "function") {
+        runtimeState.updateLegendUI();
+      }
+    },
+  });
+  deferredLegendRender.request();
+}
+
 function ensurePerfOverlayElement() {
   const cache = getRenderPassCacheState();
   if (!cache.perfOverlayEnabled || !rendererSurfaceHost.getMapContainer()) return null;
@@ -14918,10 +15067,7 @@ function render() {
   renderInspectorHighlightOverlayIfNeeded();
   renderHoverOverlayIfNeeded({ eventType: "render-frame" });
   if (runtimeState.renderPhase === RENDER_PHASE_IDLE) {
-    renderLegend();
-    if (typeof runtimeState.updateLegendUI === "function") {
-      runtimeState.updateLegendUI();
-    }
+    requestLegendRender();
   }
   updatePerfOverlay();
   if (startedAt > 0) {
@@ -15489,9 +15635,8 @@ function getSpecialZonesWorkbenchCurrentTargetSignature() {
 }
 
 function notifyDevWorkspace() {
-  if (typeof runtimeState.updateDevWorkspaceUIFn === "function") {
-    runtimeState.updateDevWorkspaceUIFn();
-  }
+  // Hover and click paths notify on every hit; rebuild the panel after paint.
+  requestRuntimeHookAfterPaint(runtimeState, "updateDevWorkspaceUIFn");
 }
 
 function isDevSelectionEligibleFeature(feature, featureId = null) {

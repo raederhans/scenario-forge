@@ -52,6 +52,7 @@ STARTUP_REACHABILITY_CATEGORIES = (
     "unknown",
 )
 PAGES_MODULE_ENTRYPOINT = "app/js/main.js"
+EDITOR_BUNDLE_PREFIX = "app/js/bundle/"
 PAGES_HTML_ENTRYPOINTS = (
     ("landing", "index.html"),
     ("editor", "app/index.html"),
@@ -105,6 +106,7 @@ REQUIRED_DIST_FILES = (
     "app/index.html",
     ".nojekyll",
     "app/js/main.js",
+    "app/js/bundle/main.js",
     "app/data/CATALOG.json",
     "app/data/scenarios/index.json",
     "hgo/index.html",
@@ -205,6 +207,7 @@ DISPOSABLE_DIST_SUFFIXES = {".pyc", ".pyo"}
 LF_NORMALIZED_ROOT_DIST_PATHS = {
     Path("index.html"),
     Path("app.js"),
+    Path("i18n.js"),
     Path("styles.css"),
 }
 LF_NORMALIZED_ROOT_ASSET_SUFFIXES = {".json"}
@@ -438,21 +441,6 @@ process.stdout.write(JSON.stringify({ modules }));
 
 PAGES_DYNAMIC_IMPORT_REGISTRY = (
     {
-        "id": "deferred-ui-bootstrap",
-        "source": "app/js/bootstrap/deferred_ui_bootstrap.js",
-        "expression_index": 0,
-        "expected_expression": "path",
-        "source_binding": "DEFERRED_UI_MODULE_PATHS",
-        "source_binding_resolution": "module-relative",
-        "targets": (
-            "app/js/ui/toolbar.js",
-            "app/js/ui/sidebar.js",
-            "app/js/ui/scenario_controls.js",
-            "app/js/ui/styled_selects.js",
-            "app/js/ui/shortcuts.js",
-        ),
-    },
-    {
         "id": "data-service-runtime-modules",
         "source": "app/js/core/data_service.js",
         "expression_index": 0,
@@ -467,20 +455,13 @@ PAGES_DYNAMIC_IMPORT_REGISTRY = (
 )
 
 LANDING_PRODUCT_ASSET_PATHS = (
-    "assets/atlas-physical.webp",
-    "assets/europe-1936-showcase.json",
-    "assets/europe-1936-showcase.svg",
-    "assets/export-workbench.webp",
     "assets/favicon.png",
     "assets/favicon.svg",
     "assets/logo-mark.png",
-    "assets/night-lights-political.webp",
+    "assets/product-workspace.webp",
     "assets/sample-runs.json",
-    "assets/showcase-final-map.svg",
-    "assets/showcase-final-map.webp",
     "assets/social-preview.png",
     "assets/social-preview.svg",
-    "assets/workspace-overview.webp",
 )
 
 DEVELOPER_PRODUCT_MODULE_PATHS = (
@@ -562,6 +543,14 @@ SCENARIO_PRODUCT_MODULE_PATHS = (
 )
 
 PAGES_PRODUCT_INVENTORY_RULES = (
+    {
+        # esbuild output loaded by app/index.html (tools/build_editor_bundle.mjs).
+        "id": "editor-bundle",
+        "category": "startup-critical",
+        "owner": "editor-bundle",
+        "override_reachability": True,
+        "prefixes": (EDITOR_BUNDLE_PREFIX,),
+    },
     {
         "id": "hgo-native-editor",
         "category": "on-demand-product",
@@ -660,8 +649,9 @@ PAGES_PRODUCT_INVENTORY_RULES = (
         "paths": LANDING_PRODUCT_ASSET_PATHS,
         "prefixes": (
             "assets/hero-",
+            "assets/hgo-",
+            "assets/history-",
             "assets/japan-preview",
-            "assets/template-",
             "assets/work-",
         ),
     },
@@ -702,6 +692,7 @@ PAGES_PRODUCT_INVENTORY_RULES = (
         "paths": (
             ".nojekyll",
             "app.js",
+            "i18n.js",
             "pages-dist-manifest.json",
             "styles.css",
         ),
@@ -980,6 +971,33 @@ def inject_editor_noindex(index_path: Path) -> None:
     if marker in content:
         content = content.replace(marker, marker + noindex, 1)
         write_text_lf(index_path, content)
+
+
+EDITOR_SOURCE_ENTRY = 'src="js/main.js"'
+EDITOR_BUNDLE_ENTRY = 'src="js/bundle/main.js"'
+
+
+def build_editor_bundle() -> dict:
+    """Bundle the editor's main-thread JS into app/js/bundle and point app/index.html at it.
+
+    The raw app/js tree stays published: web workers and runtime data modules load from it.
+    """
+    result = subprocess.run(
+        ["node", str(ROOT / "tools" / "build_editor_bundle.mjs"), "--app-root", str(APP_DIST_ROOT)],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    summary = json.loads(result.stdout.strip().splitlines()[-1])
+    index_path = APP_DIST_ROOT / "index.html"
+    html = index_path.read_text(encoding="utf-8")
+    if html.count(EDITOR_SOURCE_ENTRY) != 1 or 'rel="modulepreload" href="js/main.js"' not in html:
+        raise RuntimeError("editor index.html no longer has exactly one js/main.js entry to replace")
+    html = html.replace(EDITOR_SOURCE_ENTRY, EDITOR_BUNDLE_ENTRY).replace(
+        'rel="modulepreload" href="js/main.js"', 'rel="modulepreload" href="js/bundle/main.js"')
+    write_text_lf(index_path, html)
+    return summary
 
 
 def build_editor_dist(editor_entry: Path) -> None:
@@ -2091,7 +2109,10 @@ def build_pages_module_graph(
         if (
             path.endswith((".js", ".mjs"))
             if source_texts is not None
+            # app/js/bundle is esbuild output: esbuild already resolved its imports, and
+            # its minified, hashed chunks cannot match source-keyed registry entries.
             else path.startswith(("app/js/", "hgo/src/")) and path.endswith(".js")
+            and not path.startswith(EDITOR_BUNDLE_PREFIX)
         )
     )
     nodes_by_path: dict[str, dict] = {}
@@ -2994,6 +3015,7 @@ def main(argv: list[str] | None = None) -> None:
     reset_dist()
     build_landing_dist(landing_entry)
     build_editor_dist(editor_entry)
+    bundle_summary = build_editor_bundle()
     build_hgo_app(ROOT / "apps" / "hgo", DIST_ROOT / "hgo", main_url="../app/")
     copy_runtime_data()
     write_nojekyll()
@@ -3006,6 +3028,7 @@ def main(argv: list[str] | None = None) -> None:
     print(f"[build_pages_dist] editor source: {repo_display_path(editor_entry, root=ROOT)}")
     print(f"[build_pages_dist] output: {DIST_ROOT}")
     print(f"[build_pages_dist] manifest: {repo_display_path(DIST_MANIFEST_PATH, root=ROOT)}")
+    print(f"[build_pages_dist] editor bundle: {bundle_summary['files']} files, {bundle_summary['totalBytes'] / 1024:.0f} KiB")
     print(f"[build_pages_dist] total size: {total_bytes / (1024 * 1024):.2f} MiB")
 
 

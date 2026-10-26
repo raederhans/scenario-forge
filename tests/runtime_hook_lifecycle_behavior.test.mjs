@@ -5,6 +5,7 @@ import vm from "node:vm";
 import {
   callRequiredRuntimeHook, callRuntimeHook, registerRuntimeHook,
   registerOwnedRuntimeHook, readRuntimeHook, subscribeStateBusEvent, off, STATE_BUS_EVENTS,
+  requestRuntimeHookAfterPaint,
 } from "../js/core/state/index.js";
 
 for (const name of ["updateScenarioUIFn", "noteFirstVisibleFramePaintedFn"]) {
@@ -180,4 +181,42 @@ test("real scenario owner reinitializes DOM listeners and old release cannot det
   f.pending.forEach(resolve => resolve());
   await flush();
   assert.equal(f.renders(), before, "disposed owner ignores DOM, hooks, and late registry completion");
+});
+
+test("after-paint panel requests coalesce until the frame paints; direct hook calls stay synchronous", () => {
+  const name = "updateToolbarInputsFn";
+  const frames = [], timers = [];
+  const previous = { requestAnimationFrame: globalThis.requestAnimationFrame, setTimeout: globalThis.setTimeout };
+  globalThis.requestAnimationFrame = (callback) => frames.push(callback);
+  globalThis.setTimeout = (callback) => timers.push(callback);
+  const target = {};
+  let calls = 0;
+  const dispose = registerOwnedRuntimeHook(target, name, () => { calls += 1; });
+  try {
+    requestRuntimeHookAfterPaint(target, name);
+    requestRuntimeHookAfterPaint(target, name);
+    assert.equal(calls, 0, "nothing runs inside the requesting frame");
+    assert.equal(frames.length, 1, "a burst schedules one frame");
+    frames.shift()();
+    assert.equal(calls, 0, "frame callbacks run before paint, so the refresh waits for a timer");
+    timers.shift()();
+    assert.equal(calls, 1, "the burst refreshes once");
+
+    callRuntimeHook(target, name);
+    target[name]();
+    assert.equal(calls, 3, "direct calls keep their synchronous effect");
+    assert.equal(frames.length, 0);
+    assert.throws(() => requestRuntimeHookAfterPaint(target, "noteFirstVisibleFramePaintedFn"), /notification hook/);
+  } finally {
+    dispose();
+    globalThis.requestAnimationFrame = previous.requestAnimationFrame;
+    globalThis.setTimeout = previous.setTimeout;
+  }
+});
+
+test("after-paint requests run immediately without a frame scheduler and call the target's own hook", () => {
+  const spy = [];
+  const harness = { updateDynamicBorderStatusUIFn: () => spy.push("own") };
+  requestRuntimeHookAfterPaint(harness, "updateDynamicBorderStatusUIFn");
+  assert.deepEqual(spy, ["own"]);
 });

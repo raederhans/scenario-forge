@@ -4,7 +4,7 @@
 
 import { PALETTE_THEMES, state as runtimeState } from "../../core/state.js";
 import { selectPalettePaintColorState } from "../../core/state/actions/palette_library_actions.js";
-import { callCompatRuntimeHook } from "../../core/state/index.js";
+import { callCompatRuntimeHook, callRuntimeHook } from "../../core/state/index.js";
 import { patchUiChromeState } from "../../core/state/actions/ui_chrome_actions.js";
 import {
   buildPaletteLibraryEntries,
@@ -15,6 +15,7 @@ import {
   setActivePaletteSource,
 } from "../../core/palette_manager.js";
 import { t } from "../i18n.js";
+import { createDeferredPanelRender } from "../../core/deferred_panel_render.js";
 const state = runtimeState;
 
 function selectPalettePaintColor(appState, rawColor) {
@@ -249,6 +250,12 @@ function createPaletteLibraryPanelController({
   let activeRowKey = "";
   let paletteSourceRequest = 0;
   let paletteLibraryGroupingControls = null;
+  // Recent-color updates rebuild the library after paint, or once it is shown.
+  // Every direct rebuild (toggle, search, grouping, source) marks it fresh.
+  const deferredPaletteLibraryRender = createDeferredPanelRender({
+    render: renderPaletteLibrary,
+    element: paletteLibraryList,
+  });
 
   const ensurePaletteLibrarySectionState = (sourceId) => {
     const key = String(sourceId || "legacy").trim() || "legacy";
@@ -307,6 +314,9 @@ function createPaletteLibraryPanelController({
 
   const selectPaletteLibraryEntry = (entry) => {
     selectPalettePaintColor(runtimeState, entry.color);
+    if (runtimeState.currentTool === "select") {
+      callRuntimeHook(runtimeState, "runToolSelectionFn", "fill", { feedbackLabel: t("Switched to fill tool", "ui") });
+    }
     activeRowKey = entry.key;
     updateSwatchUI?.();
     syncPaletteLibraryRowFocus();
@@ -643,6 +653,7 @@ function createPaletteLibraryPanelController({
 
   function renderPaletteLibrary() {
     if (!paletteLibraryList) return;
+    deferredPaletteLibraryRender.markFresh();
 
     const searchTerm = String(runtimeState.paletteLibrarySearch || "").trim().toLowerCase();
     paletteLibrarySearchClear?.classList.toggle("hidden", !searchTerm);
@@ -835,6 +846,7 @@ function createPaletteLibraryPanelController({
     handlePaletteSourceChange,
     handleResize,
     renderPaletteLibrary,
+    requestPaletteLibraryRender: () => deferredPaletteLibraryRender.request(),
     syncPaletteSourceControls,
     syncPanelVisibility,
   };

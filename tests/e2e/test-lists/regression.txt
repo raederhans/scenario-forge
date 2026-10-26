@@ -21,6 +21,8 @@ river_overlap_visibility.spec.js
 river_paint.spec.js
 scenario_boundary_regression.spec.js
 shortcut_history_render_boundary.spec.js
+sidebar_layout_shift_regression.spec.js
+startup_readonly_reveal.spec.js
 texture_overlay_regression.spec.js
 tno_atlantropa_coastline.spec.js
 water_cache_strategy_regression.spec.js

@@ -16,11 +16,22 @@ import { getDeferredPromotionDelay } from "./startup_bootstrap_support.js";
 
 const MAX_FORCED_STARTUP_INFRA_RETRIES = 2;
 
+// Parsing the detail bundle and refreshing the map from it would otherwise run
+// as one long task. A user-visible task lets input and a frame go first, unlike
+// scheduler.yield(), whose continuation runs ahead of the next frame.
+function yieldToInputDefault() {
+  const scheduler = globalThis.scheduler;
+  if (typeof scheduler?.postTask === "function") return scheduler.postTask(() => {}, { priority: "user-visible" });
+  return new Promise((resolve) => globalThis.setTimeout(resolve, 0));
+}
+
 export function createDeferredDetailPromotionOwner({
   runtimeState,
   helpers = {},
 } = {}) {
   const {
+    loadDetailBundle = loadDeferredDetailBundle,
+    yieldToInput = yieldToInputDefault,
     buildInteractionInfrastructureAfterStartup = buildInteractionInfrastructureAfterStartupDefault,
     canRunPostReadyIdleWork,
     checkpointBootMetric,
@@ -181,10 +192,13 @@ export function createDeferredDetailPromotionOwner({
         runtimePoliticalTopology,
         topologyBundleMode,
         detailSourceUsed,
-      } = await loadDeferredDetailBundle({
+      } = await loadDetailBundle({
         detailSourceKey: runtimeState.detailSourceRequested,
         includeRuntimePolitical,
       });
+      // Equivalent to a slightly slower download: the scene check below
+      // already covers anything that changes during the wait.
+      await yieldToInput();
 
       if (!isScenarioRefreshSceneCurrent(previousRefreshState, captureScenarioRefreshState())
         || includeRuntimePolitical !== shouldAdoptDeferredRuntimePoliticalTopology()) {

@@ -60,42 +60,6 @@ export function createOceanRenderOwner({
     sortBathymetryFeaturesForFill = (collection) => Array.isArray(collection?.features) ? collection.features : [],
   } = helpers;
 
-  function drawCoastalTransition(k, { lineWidth = 0, buildPath } = {}) {
-    const context = getContext();
-    if (!context || typeof buildPath !== "function" || !(lineWidth > 0)) return false;
-    const coastStyle = runtimeState.styleConfig?.coastlines || {};
-    const opacity = clamp(
-      Number.isFinite(Number(coastStyle.opacity)) ? Number(coastStyle.opacity) : 0.8,
-      0,
-      1
-    );
-    if (!(opacity > 0)) return false;
-    // The generic ocean clip can fall back to ocean-only or sphere-only when
-    // no land mask is usable; that fallback cannot prove a sea-side transition.
-    if (!getPhysicalLandMaskInfo()?.collection) return false;
-    const zoom = Number.isFinite(Number(k)) && Number(k) > 0 ? Number(k) : 1;
-    context.save();
-    try {
-      // Topology ocean can still cover scenario reclaimed land. Use the
-      // current physical land exclusion and conservatively suppress Atlantropa
-      // even when the fine coastline comes from dedicated scenario geometry.
-      applyOceanClipMask(OCEAN_MASK_MODE_SPHERE_MINUS_LAND);
-      clipOutAtlantropaAccentRegions();
-      context.strokeStyle = "#d7ebf5";
-      context.globalAlpha = opacity * 0.13;
-      // The water clip keeps only the sea half of this narrow screen-space rim.
-      context.lineWidth = lineWidth + (2.2 / zoom);
-      context.lineJoin = "round";
-      context.lineCap = "round";
-      const path = buildPath();
-      if (path && typeof path === "object") context.stroke(path);
-      else context.stroke();
-    } finally {
-      context.restore();
-    }
-    return true;
-  }
-
   function drawBathymetryBands(collection, oceanStyle) {
     const context = getContext();
     const pathCanvas = getPathCanvas();
@@ -258,37 +222,6 @@ export function createOceanRenderOwner({
     if (!context || !isScenarioCoastalAccentEnabled()) return;
     const coastlineDecision = resolveCoastlineTopologySource();
     const usesScenarioCoastlineSource = coastlineDecision?.source === "scenario";
-    const baseCoastlineCollection = getCoastlineCollectionForZoom(k);
-    const coastlineCollection = interactive
-      ? baseCoastlineCollection
-      : getViewportAwareCoastlineCollection(baseCoastlineCollection, k);
-    const coastlineWidth = getScenarioCoastalAccentLineWidth(k, { interactive });
-    const densityThreshold = k < COASTLINE_LOD_LOW_ZOOM_MAX
-      ? COASTLINE_ACCENT_DENSITY_THRESHOLD_LOW
-      : k < COASTLINE_LOD_MID_ZOOM_MAX
-        ? COASTLINE_ACCENT_DENSITY_THRESHOLD_MID
-        : Infinity;
-    const entries = [];
-    coastlineCollection.forEach((mesh) => {
-      if (!isUsableMesh(mesh)) return;
-      mesh.coordinates.forEach((line) => {
-        const densityStats = interactive
-          ? { density: 0 }
-          : getProjectedLineDensityStats(line);
-        const densityScale = densityStats.density > densityThreshold
-          ? (k < COASTLINE_LOD_LOW_ZOOM_MAX ? COASTLINE_ACCENT_DENSITY_ALPHA_LOW : COASTLINE_ACCENT_DENSITY_ALPHA_MID)
-          : 1;
-        entries.push({
-          geometry: {
-            type: "LineString",
-            coordinates: line,
-          },
-          alpha: (interactive ? 0.28 : 0.4) * densityScale,
-          lineWidth: coastlineWidth * (densityScale < 1 ? COASTLINE_ACCENT_DENSITY_WIDTH_SCALE : 1),
-        });
-      });
-    });
-    drawCoastalAccentStrokeBuckets(entries, { clipAtlantropa: !usesScenarioCoastlineSource });
     if (!usesScenarioCoastlineSource) {
       drawScenarioCoastalAccentOverlays(k, { interactive });
     }
@@ -378,7 +311,6 @@ export function createOceanRenderOwner({
     drawBathymetryBands,
     drawBathymetryContours,
     drawCoastalAccentStrokeBuckets,
-    drawCoastalTransition,
     drawOceanStyle,
     drawScenarioCoastalAccentLayer,
     drawScenarioCoastalAccentOverlays,

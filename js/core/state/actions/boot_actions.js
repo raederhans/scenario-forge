@@ -1,3 +1,5 @@
+import { emit } from "../bus.js";
+
 // Canonical boot/startup state mutations.
 // Callers keep lifecycle ordering, hooks, metrics, scheduling, and DOM effects.
 
@@ -242,4 +244,9 @@ export function setUiShellDebugTerritorySeededState(target, active) {
   const nextActive = !!active;
   target.uiShellDebugTerritorySeeded = nextActive;
   return nextActive;
+}
+
+export function setBootSubProgress(target, progress) {
+  target.bootSubProgress = progress;
+  emit("boot-sub-progress", target);
 }

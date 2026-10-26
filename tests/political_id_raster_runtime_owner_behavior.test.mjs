@@ -1734,3 +1734,37 @@ test("retained direct scene stays editable while source preparation waits and di
   assert.equal(f.owner.getDiagnostics().sourcePreparation.committed, 0);
   assert.equal(f.owner.getPendingWorkCount(), 0);
 });
+
+test("a first paint that changes foreground order still updates the retained palette by its dirty IDs only", async (t) => {
+  const resolved = [];
+  const bounds = { minX: -160, minY: -160, maxX: -140, maxY: -140 };
+  const f = fixture({ directPresentation: true, displayMode: "raster",
+    features: [feature("a", bounds), feature("b", bounds)],
+    resolveColor: item => { resolved.push(item.id); return item.color; } });
+  t.after(() => f.owner.dispose());
+  f.identity.colorScope = "table-1";
+  f.h.getChangedColorIds = () => ["a"];
+  f.owner.draw(); await resolveAll(f); f.owner.draw();
+  const oldFrame = f.owner.getDirectFrame();
+  const gates = [];
+  f.h.yieldSourcePreparation = () => new Promise(resolve => gates.push(resolve));
+  f.h.prepareFeatures = async () => [...f.features];
+
+  // A first override promotes "a" into the foreground: the source version changes
+  // together with its color, so a background source preparation must start.
+  resolved.length = 0;
+  f.features[0].color = "#ff0000";
+  f.identity.version++;
+  f.identity.colorVersion++;
+  assert.equal(typeof f.owner.prepareSource().then, "function", "the order change still prepares a new source");
+  assert.equal(f.owner.getDirectFrame(), oldFrame);
+  // The current source and the retained frame each resolve the dirty ID once.
+  assert.deepEqual([...new Set(resolved)], ["a"], "the click frame resolves only the painted feature, not every entry");
+  assert.deepEqual([...f.gpus[0].palettes.at(-1).bytes.slice(4, 8)], [255, 0, 0, 255]);
+
+  for (let guard = 0; f.owner.isSourcePreparing() && guard < 10; guard++) {
+    for (const resume of gates.splice(0)) resume();
+    await tick();
+  }
+  assert.equal(f.owner.getDiagnostics().sourcePreparation.committed, 1, "the foreground order is still committed");
+});

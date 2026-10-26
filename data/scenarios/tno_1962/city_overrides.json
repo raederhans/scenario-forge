@@ -195,7 +195,7 @@
           "zh": "维尔维耶"
         },
         "city_id": "CITY::gn::2784821",
-        "host_feature_id": "BE335",
+        "host_feature_id": "BE_MRG_49096f4ef44b",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Velwisch",
@@ -209,7 +209,7 @@
           "zh": "图尔奈"
         },
         "city_id": "CITY::gn::2785341",
-        "host_feature_id": "BE328",
+        "host_feature_id": "BE_MRG_15f4aef6c612",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Dornick",
@@ -223,7 +223,7 @@
           "zh": "通厄伦"
         },
         "city_id": "CITY::gn::2785389",
-        "host_feature_id": "BE223",
+        "host_feature_id": "BE_MRG_a29e92a10668",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Tongern",
@@ -237,7 +237,7 @@
           "zh": "蒂尔特"
         },
         "city_id": "CITY::gn::2785476",
-        "host_feature_id": "BE257",
+        "host_feature_id": "BE_MRG_24ed7b411331",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Thielt",
@@ -251,7 +251,7 @@
           "zh": "苏瓦尼"
         },
         "city_id": "CITY::gn::2786420",
-        "host_feature_id": "BE32C",
+        "host_feature_id": "BE_MRG_f7a8cd5ecd9e",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Zinnik",
@@ -279,7 +279,7 @@
           "zh": "鲁瑟拉勒"
         },
         "city_id": "CITY::gn::2787889",
-        "host_feature_id": "BE256",
+        "host_feature_id": "BE_MRG_24ed7b411331",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Russelaere",
@@ -307,7 +307,7 @@
           "zh": "佩吕韦尔"
         },
         "city_id": "CITY::gn::2789162",
-        "host_feature_id": "BE328",
+        "host_feature_id": "BE_MRG_15f4aef6c612",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Peruwelz",
@@ -321,7 +321,7 @@
           "zh": "梅赫伦"
         },
         "city_id": "CITY::gn::2791537",
-        "host_feature_id": "BE212",
+        "host_feature_id": "BE_MRG_38ea003ab243",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Mecheln",
@@ -349,7 +349,7 @@
           "zh": "拉卢维耶尔"
         },
         "city_id": "CITY::gn::2793508",
-        "host_feature_id": "BE329",
+        "host_feature_id": "BE_MRG_f7a8cd5ecd9e",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "La Louviere",
@@ -363,7 +363,7 @@
           "zh": "科特赖克"
         },
         "city_id": "CITY::gn::2794055",
-        "host_feature_id": "BE254",
+        "host_feature_id": "BE_MRG_24ed7b411331",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Kortreik",
@@ -377,7 +377,7 @@
           "zh": "伊珀尔"
         },
         "city_id": "CITY::gn::2795100",
-        "host_feature_id": "BE253",
+        "host_feature_id": "BE_MRG_7dbe84a470bd",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Ypern",
@@ -391,7 +391,7 @@
           "zh": "于伊"
         },
         "city_id": "CITY::gn::2795113",
-        "host_feature_id": "BE331",
+        "host_feature_id": "BE_MRG_49096f4ef44b",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Hoei",
@@ -447,7 +447,7 @@
           "zh": "登德尔蒙德"
         },
         "city_id": "CITY::gn::2799645",
-        "host_feature_id": "BE232",
+        "host_feature_id": "BE_MRG_81cfb513b60d",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Dendermünde",
@@ -489,7 +489,7 @@
           "zh": "阿特"
         },
         "city_id": "CITY::gn::2803010",
-        "host_feature_id": "BE32A",
+        "host_feature_id": "BE_MRG_15f4aef6c612",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Aat",
@@ -1469,7 +1469,7 @@
           "zh": "蒙斯"
         },
         "city_id": "CITY::ne::1159120321",
-        "host_feature_id": "BE323",
+        "host_feature_id": "BE_MRG_f7a8cd5ecd9e",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Bergen",
@@ -1483,7 +1483,7 @@
           "zh": "阿尔隆"
         },
         "city_id": "CITY::ne::1159121119",
-        "host_feature_id": "BE341",
+        "host_feature_id": "BE_MRG_d49081148862",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Arel",
@@ -2379,7 +2379,7 @@
           "zh": "布鲁日"
         },
         "city_id": "CITY::ne::1159144553",
-        "host_feature_id": "BE251",
+        "host_feature_id": "BE_MRG_923fe66661e2",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Brügge",
@@ -2393,7 +2393,7 @@
           "zh": "那慕尔"
         },
         "city_id": "CITY::ne::1159144557",
-        "host_feature_id": "BE352",
+        "host_feature_id": "BE_MRG_6a92ca76474d",
         "resolution": "scenario_city_override",
         "scenario_name": {
           "en": "Namen",
@@ -38908,7 +38908,7 @@
         "en": "Kungur",
         "zh": "昆古尔"
       },
-      "host_feature_id": "RU_RAY_50074027B96019567685522",
+      "host_feature_id": "RU_MRG_f3d2b13e0b30",
       "stable_key": "id::CITY::ne::1159139111"
     },
     "CITY::ne::1159139121": {

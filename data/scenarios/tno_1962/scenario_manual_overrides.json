@@ -24,6 +24,454 @@
       ],
       "owner": "IBR"
     },
+    "BE_MRG_15f4aef6c612": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "BE_MRG_24ed7b411331": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "BE_MRG_38ea003ab243": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "BE_MRG_49096f4ef44b": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "BE_MRG_6a92ca76474d": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "BE_MRG_7dbe84a470bd": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "BE_MRG_81cfb513b60d": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "BE_MRG_923fe66661e2": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "BE_MRG_a29e92a10668": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "BE_MRG_d49081148862": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "BE_MRG_f7a8cd5ecd9e": {
+      "controller": "BRG",
+      "cores": [
+        "BRG"
+      ],
+      "owner": "BRG"
+    },
+    "CA_MRG_02a592f4a083": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_096ac84a0cc7": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_0f506b88e592": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_1a080100c822": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_23b011e3543e": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_24ae99283479": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_2ebb41be023f": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_2eca2d3aeffd": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_3e06e9aabd9f": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_410af4197c3c": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_43ae18b09e32": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_46f94b8c5773": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_480215c2f838": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_4b867801b8a0": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_528f74543a8b": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_567d2b874fad": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_57ed93ea7b6f": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_5a20b1bb5941": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_5e17f5b2af34": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_653d532898a8": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_684250872a47": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_705e30d79f5c": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_73fc08ab0b94": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_77a1b136ce43": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_7b5ba113838a": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_7cbc6bf7c111": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_7d4331ee0a5c": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_7e7e19718e0f": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_80a56ade734c": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_8219e9529a16": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_8516027ac8b5": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_86ce9e72c383": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_911ec8320222": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_9789731d079e": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_a14ea77f718d": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_a592db62ce9c": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_ac3bfdb5edd9": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_bf94919e448f": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_c32aed1df08f": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_c4a98756227d": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_d08e3259dc76": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_d16c931e21ca": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_d17d84b57368": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_d27584f205e9": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_d35dd30542b8": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_dde82f995deb": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_df8fc4dc7fdc": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_e32835bda9ac": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_f50bdee7dd4c": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_f85fee938b91": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_fca877bc83a4": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_fccdff3ab06c": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
+    "CA_MRG_fdd421e1a6fe": {
+      "controller": "CAN",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "CAN"
+    },
     "CN_CITY_17275852B11052099771689": {
       "controller": "XIK",
       "cores": [
@@ -150,6 +598,27 @@
       ],
       "owner": "XIK"
     },
+    "CN_MRG_005ada82e050": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_00e6621cea37": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_011734794f16": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
+    },
     "CN_MRG_0284a41a11c9": {
       "controller": "CHI",
       "cores": [
@@ -163,6 +632,41 @@
         "CHI"
       ],
       "owner": "NCP"
+    },
+    "CN_MRG_03e48d4d8cb7": {
+      "controller": "SHX",
+      "cores": [
+        "PRC"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_05adc3fc83ec": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_08f0b7755ac2": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_093183003948": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_09f3d32020e4": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
     },
     "CN_MRG_0e6318364e8e": {
       "controller": "CHI",
@@ -178,6 +682,34 @@
       ],
       "owner": "NCP"
     },
+    "CN_MRG_114c09629107": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_13220d13d5c4": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_14e9e4cde2f8": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_15274e317fd6": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
     "CN_MRG_19742f026a19": {
       "controller": "NCP",
       "cores": [
@@ -192,12 +724,131 @@
       ],
       "owner": "CHI"
     },
+    "CN_MRG_1f0a33afd376": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_20fbce9fead7": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_224b4845f904": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_25e49cf89270": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_26d52bd3f389": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_27a184e8ab38": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_28be4724b847": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_293f7b8a3ba2": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_2b668454dc72": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_2e32a6a2bcdc": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_31ba4a677ea0": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_323d6e10e986": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_33a2768f5b98": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
     "CN_MRG_34e4e9cc4fbe": {
       "controller": "NCP",
       "cores": [
         "CHI"
       ],
       "owner": "NCP"
+    },
+    "CN_MRG_371d5c1ed7c0": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_380671e40a1c": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_3811ff27587a": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_38c583fdd544": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
     },
     "CN_MRG_394c2f1e79d2": {
       "controller": "NCP",
@@ -220,12 +871,40 @@
       ],
       "owner": "NCP"
     },
+    "CN_MRG_3c1607582833": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_3cb8ad8288ff": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
     "CN_MRG_3f1f7652e799": {
       "controller": "CHI",
       "cores": [
         "CHI"
       ],
       "owner": "CHI"
+    },
+    "CN_MRG_3fcfe274ae51": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_3ff67345ed78": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
     },
     "CN_MRG_41987d66c89b": {
       "controller": "NCP",
@@ -234,12 +913,33 @@
       ],
       "owner": "NCP"
     },
+    "CN_MRG_41df7818325c": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
     "CN_MRG_427fc101d0bb": {
       "controller": "CHI",
       "cores": [
         "CHI"
       ],
       "owner": "CHI"
+    },
+    "CN_MRG_4291f6684555": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_4508995da9a6": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
     },
     "CN_MRG_47f5cbedadef": {
       "controller": "CHI",
@@ -262,6 +962,27 @@
       ],
       "owner": "CHI"
     },
+    "CN_MRG_4ed89cf1f6b1": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_5062affbdbed": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_509032e83f5b": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
     "CN_MRG_51650d15c050": {
       "controller": "NCP",
       "cores": [
@@ -275,6 +996,13 @@
         "CHI"
       ],
       "owner": "NCP"
+    },
+    "CN_MRG_51e8f2b715e9": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
     },
     "CN_MRG_5305adb06a6c": {
       "controller": "CHI",
@@ -290,7 +1018,28 @@
       ],
       "owner": "NCP"
     },
+    "CN_MRG_5422a4ca4ebb": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_54a435d63591": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
     "CN_MRG_57214cfbaf31": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_5af65ef24d47": {
       "controller": "CHI",
       "cores": [
         "CHI"
@@ -311,6 +1060,48 @@
       ],
       "owner": "CHI"
     },
+    "CN_MRG_5da384536a83": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_5fbd1e9aa77f": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_62b5e8747ba5": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_6a93b7948d7c": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_6afd9e47518e": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_6be183a6cf2d": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
     "CN_MRG_6c22a284518b": {
       "controller": "CHI",
       "cores": [
@@ -325,12 +1116,33 @@
       ],
       "owner": "CHI"
     },
+    "CN_MRG_6cfe5096a6ab": {
+      "controller": "SHX",
+      "cores": [
+        "PRC"
+      ],
+      "owner": "SHX"
+    },
     "CN_MRG_6d6cb2d8c363": {
       "controller": "CHI",
       "cores": [
         "CHI"
       ],
       "owner": "CHI"
+    },
+    "CN_MRG_6dbf8b5106e5": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_787af341608b": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
     },
     "CN_MRG_7c9c7c3d5403": {
       "controller": "NCP",
@@ -339,12 +1151,33 @@
       ],
       "owner": "NCP"
     },
+    "CN_MRG_7e34a2c431cf": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
+    },
     "CN_MRG_8028022022b6": {
       "controller": "CHI",
       "cores": [
         "CHI"
       ],
       "owner": "CHI"
+    },
+    "CN_MRG_811ae32de700": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_84ae8cea2227": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
     },
     "CN_MRG_855b56adb95d": {
       "controller": "CHI",
@@ -367,12 +1200,82 @@
       ],
       "owner": "NCP"
     },
+    "CN_MRG_8cc7d8c53bc9": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_8e007746d816": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
     "CN_MRG_9305fada0549": {
       "controller": "CHI",
       "cores": [
         "CHI"
       ],
       "owner": "CHI"
+    },
+    "CN_MRG_96d6919d5c64": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_9712017200b8": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_97bd4300598a": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_987772a55e2a": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_9a5f1e882f00": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_9b9b2d2aa43a": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_9e687b93a31d": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_a0f43f47d72e": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
     },
     "CN_MRG_a23dd781cd4b": {
       "controller": "CHI",
@@ -388,6 +1291,27 @@
       ],
       "owner": "CHI"
     },
+    "CN_MRG_abf8e714368a": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_ad1c7dfff247": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_ad9de4c133ee": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
+    },
     "CN_MRG_afbaca334723": {
       "controller": "NCP",
       "cores": [
@@ -402,6 +1326,13 @@
       ],
       "owner": "CHI"
     },
+    "CN_MRG_b254335108f6": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
     "CN_MRG_b38ab466fa3b": {
       "controller": "NCP",
       "cores": [
@@ -409,7 +1340,42 @@
       ],
       "owner": "NCP"
     },
+    "CN_MRG_b59c07833274": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
+    },
     "CN_MRG_b7b350314dc1": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_b960732fa4b5": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_bbc31f7c4dea": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_bcac2fdc52e8": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_bd402a3fa1f8": {
       "controller": "CHI",
       "cores": [
         "CHI"
@@ -451,6 +1417,13 @@
       ],
       "owner": "CHI"
     },
+    "CN_MRG_ce6e418fb13a": {
+      "controller": "MEN",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "MEN"
+    },
     "CN_MRG_d6f45c057bfc": {
       "controller": "NCP",
       "cores": [
@@ -459,6 +1432,13 @@
       "owner": "NCP"
     },
     "CN_MRG_d7d38b1d4e6c": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_daab50ad3f6e": {
       "controller": "CHI",
       "cores": [
         "CHI"
@@ -479,6 +1459,41 @@
       ],
       "owner": "CHI"
     },
+    "CN_MRG_e27f5cb03fed": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
+    "CN_MRG_e2dc46a8c2b2": {
+      "controller": "SHX",
+      "cores": [
+        "PRC"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_e323fb3516d2": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_e3bada8615fa": {
+      "controller": "GXC",
+      "cores": [
+        "GXC"
+      ],
+      "owner": "GXC"
+    },
+    "CN_MRG_e4d1257a0bd1": {
+      "controller": "SHX",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "SHX"
+    },
     "CN_MRG_e76984eed8fb": {
       "controller": "CHI",
       "cores": [
@@ -487,6 +1502,20 @@
       "owner": "CHI"
     },
     "CN_MRG_e9bedc8a8392": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_ed13ca65f52b": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_ee37cc33a1fc": {
       "controller": "CHI",
       "cores": [
         "CHI"
@@ -507,6 +1536,20 @@
       ],
       "owner": "CHI"
     },
+    "CN_MRG_f37770e5ef82": {
+      "controller": "SHX",
+      "cores": [
+        "SHX"
+      ],
+      "owner": "SHX"
+    },
+    "CN_MRG_f548e602acc9": {
+      "controller": "GUI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "GUI"
+    },
     "CN_MRG_f5f659cc505e": {
       "controller": "NCP",
       "cores": [
@@ -514,7 +1557,91 @@
       ],
       "owner": "NCP"
     },
+    "CN_MRG_f7ffc8864b6f": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CN_MRG_f9315adbf3b5": {
+      "controller": "CHI",
+      "cores": [
+        "CHI"
+      ],
+      "owner": "CHI"
+    },
+    "CZ_MRG_16303fe61c1d": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "CZ_MRG_23d7414d33c7": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "CZ_MRG_2919911b5bfd": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "CZ_MRG_9096ecd76bb9": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "CZ_MRG_9d601ad75aef": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "CZ_MRG_a9dfac9d401b": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "CZ_MRG_dfeea8e4d5f1": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "CZ_MRG_e151f991209d": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "CZ_MRG_ea0c37760bf3": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
     "DE_MRG_08a36bff89a0": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_0fbf2afc9b39": {
       "controller": "GER",
       "cores": [
         "GER"
@@ -528,6 +1655,20 @@
       ],
       "owner": "GER"
     },
+    "DE_MRG_1df83dc7f94e": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_20201cf9567d": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
     "DE_MRG_22b5c35ff0db": {
       "controller": "GER",
       "cores": [
@@ -535,7 +1676,35 @@
       ],
       "owner": "GER"
     },
-    "DE_MRG_33b1389d946f": {
+    "DE_MRG_262d5b07c5d7": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_2783e6e8c42b": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_29a5db20c272": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_31e7d8731feb": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_330d1045d5ff": {
       "controller": "GER",
       "cores": [
         "GER"
@@ -549,14 +1718,7 @@
       ],
       "owner": "GER"
     },
-    "DE_MRG_3a19ae12c637": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_3b750624bff4": {
+    "DE_MRG_3d2c992489d7": {
       "controller": "GER",
       "cores": [
         "GER"
@@ -570,21 +1732,14 @@
       ],
       "owner": "GER"
     },
-    "DE_MRG_46ade2104d23": {
+    "DE_MRG_4000ef7b1fc9": {
       "controller": "GER",
       "cores": [
         "GER"
       ],
       "owner": "GER"
     },
-    "DE_MRG_4ab0c6062d32": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_4fdd27cf49f7": {
+    "DE_MRG_49bfd3282189": {
       "controller": "GER",
       "cores": [
         "GER"
@@ -598,49 +1753,35 @@
       ],
       "owner": "GER"
     },
-    "DE_MRG_5adb00f4a83d": {
+    "DE_MRG_5f2116b1dec1": {
       "controller": "GER",
       "cores": [
         "GER"
       ],
       "owner": "GER"
     },
-    "DE_MRG_5dd80c1fcf77": {
+    "DE_MRG_627c28127d09": {
       "controller": "GER",
       "cores": [
         "GER"
       ],
       "owner": "GER"
     },
-    "DE_MRG_67a8450f3c9f": {
+    "DE_MRG_6c5feb42bb1d": {
       "controller": "GER",
       "cores": [
         "GER"
       ],
       "owner": "GER"
     },
-    "DE_MRG_68ba87808df8": {
+    "DE_MRG_7165d0e64b22": {
       "controller": "GER",
       "cores": [
         "GER"
       ],
       "owner": "GER"
     },
-    "DE_MRG_698a45847033": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_6f627c55e7bd": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_70752f860917": {
+    "DE_MRG_71c87ea87bb8": {
       "controller": "GER",
       "cores": [
         "GER"
@@ -654,14 +1795,7 @@
       ],
       "owner": "GER"
     },
-    "DE_MRG_77741e43de3f": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_830e5845fb60": {
+    "DE_MRG_734ca34a5700": {
       "controller": "GER",
       "cores": [
         "GER"
@@ -675,21 +1809,7 @@
       ],
       "owner": "GER"
     },
-    "DE_MRG_9410ac111320": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_98e486211a34": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_9e1fff10ce51": {
+    "DE_MRG_9f7a3fcacc08": {
       "controller": "GER",
       "cores": [
         "GER"
@@ -703,28 +1823,28 @@
       ],
       "owner": "GER"
     },
-    "DE_MRG_a27167ef8f23": {
+    "DE_MRG_a9aef085e5ee": {
       "controller": "GER",
       "cores": [
         "GER"
       ],
       "owner": "GER"
     },
-    "DE_MRG_ac1a1840dec2": {
+    "DE_MRG_a9c190d720fe": {
       "controller": "GER",
       "cores": [
         "GER"
       ],
       "owner": "GER"
     },
-    "DE_MRG_b86ffe1dd2ea": {
+    "DE_MRG_ad30df0f83f2": {
       "controller": "GER",
       "cores": [
         "GER"
       ],
       "owner": "GER"
     },
-    "DE_MRG_bceaa37f49ef": {
+    "DE_MRG_b3d2cb60c548": {
       "controller": "GER",
       "cores": [
         "GER"
@@ -745,41 +1865,6 @@
       ],
       "owner": "GER"
     },
-    "DE_MRG_c6f2d9d3d036": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_c90ee890d36c": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_c922c0ebada5": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_c9a9f2cd9548": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_cc565c282846": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
     "DE_MRG_ce73c32b1090": {
       "controller": "GER",
       "cores": [
@@ -787,21 +1872,7 @@
       ],
       "owner": "GER"
     },
-    "DE_MRG_d0e3890ae1d5": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
     "DE_MRG_d4ab7c811a60": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_d561808c92a5": {
       "controller": "GER",
       "cores": [
         "GER"
@@ -822,28 +1893,14 @@
       ],
       "owner": "GER"
     },
-    "DE_MRG_e2617eca3f85": {
+    "DE_MRG_dad579df8df6": {
       "controller": "GER",
       "cores": [
         "GER"
       ],
       "owner": "GER"
     },
-    "DE_MRG_e2f350a636b5": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_e87b9124c03f": {
-      "controller": "GER",
-      "cores": [
-        "GER"
-      ],
-      "owner": "GER"
-    },
-    "DE_MRG_ea826ec181b8": {
+    "DE_MRG_e2376e215153": {
       "controller": "GER",
       "cores": [
         "GER"
@@ -857,7 +1914,56 @@
       ],
       "owner": "GER"
     },
+    "DE_MRG_f070f3674dfa": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "DE_MRG_f39dea3fad08": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "FR_MRG_0a0901a977d5": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_0d1fb06c5ad5": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_294761d79cca": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_591a9d51c535": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
     "FR_MRG_5b1fca32ff2c": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_5b351c0f453a": {
       "controller": "FRA",
       "cores": [
         "FRA"
@@ -871,6 +1977,13 @@
       ],
       "owner": "FRA"
     },
+    "FR_MRG_71a8637a4772": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
     "FR_MRG_7c681aa2032e": {
       "controller": "BRG",
       "cores": [
@@ -878,7 +1991,98 @@
       ],
       "owner": "BRG"
     },
+    "FR_MRG_8a5ec14e81e7": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_8cd54e74f796": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_8e9054e07aa6": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
     "FR_MRG_a3ac3f104566": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_a48d5d8654a9": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_af825dbec142": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_b062e98b7497": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_c20845af3938": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_c20888c67931": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_c84e32333c8a": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_d292a0ff7a4c": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_d4fcb61264f5": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_e9f7d6aaa46e": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_edac1467130b": {
       "controller": "FRA",
       "cores": [
         "FRA"
@@ -892,12 +2096,784 @@
       ],
       "owner": "FRA"
     },
+    "FR_MRG_fcb0087ac12e": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
+    "FR_MRG_fe4c24f6c0af": {
+      "controller": "FRA",
+      "cores": [
+        "FRA"
+      ],
+      "owner": "FRA"
+    },
     "GF_PRIMARY": {
       "controller": "GY",
       "cores": [
         "GY"
       ],
       "owner": "GY"
+    },
+    "IN_MRG_0002559134aa": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_0156878691b5": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_03a3f2ee1465": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_05eafa4e7092": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_0872aaddca5c": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_09081ee1d22c": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_0c50a07858d2": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_0d3b03a56cac": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_0de8d89a2f89": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_0f1924c89ced": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_16da719e5c4e": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_1a5f5037ac4f": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_1acfce2cdace": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_1b2b9256168e": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_1b5e5dff8662": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_20483c2d9ff2": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_20593aed5942": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_21b7f1089cf4": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_28701b62eace": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_33e99e4bc668": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_344720d94b02": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_349db36c32d3": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_384a85847c3e": {
+      "controller": "FRI",
+      "cores": [
+        "FRI"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_3938fc2b4f6a": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_39e1573b0992": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_3ec3695dfc4f": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_446f3f4f281d": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_464251afa31f": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_46833068a470": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_48dd97061f04": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_4b3f04e0f052": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_4c31a6ef59fd": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_4d898a5137a3": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_4f750131bc07": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_5002491fef3c": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_50e2da4682da": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_556898e710b4": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_562abe2f30d2": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_5a8caf67d623": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_5b5a79a728e7": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_5bd2f4f1a695": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_5df0a61bbde6": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_5f8577d839fb": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_61856fc517ff": {
+      "controller": "FRI",
+      "cores": [
+        "FRI"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_63ee40e30267": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_65081ed5bb9a": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_65d1ff50f969": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_6832ada5b624": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_6ac4bd6d39d9": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_6c3faeb50bb6": {
+      "controller": "FRI",
+      "cores": [
+        "FRI"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_6cb5e15ba7ae": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_708a258c7bc8": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_7345206f129a": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_73b8798a7214": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_76ffa0bf6d57": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_7779e13ac7b3": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_77d8a688f4ee": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_795568efe4e3": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_7b0c2a483228": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_7b27a9a03d70": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_7b87bbb2489c": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_7bdc9fb12bc4": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_7e018f926260": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_8835ef71e194": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_883b10e5d00a": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_886776fba38b": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_8aa5d9ed9b9f": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_90b3ba03aaeb": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_91cd3b059324": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_a2b5d06404de": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_a3f42a5bb822": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_a655f8eae163": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_a944b57d54cb": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_b291003b6f41": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_b72e2285c63a": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_b9f4a2a4e279": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_bcb41c4f14e5": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_bf71f4fd25b0": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_c2a8b7b28b23": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_c37939012a0d": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_c5914ea1f4cc": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_cba921b13656": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_cee31aca9a07": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_d11bffed2078": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_d2159d107015": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_d5c4dbfe1bc8": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_d74786467839": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_daa0ed708975": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_dc594d605425": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_dfae0079ed8c": {
+      "controller": "FRI",
+      "cores": [
+        "FRI"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_e361a0c62816": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_e6a1c49f03e8": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_f050f1c4b3c9": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_f0850bb4446c": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_f1db88056d17": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "IN_MRG_f73955d59e52": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_fb0ec8ba1cb5": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_MRG_fbe0a94c6ca5": {
+      "controller": "FRI",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "FRI"
+    },
+    "NL_MRG_19568adfd807": {
+      "controller": "RKN",
+      "cores": [
+        "HOL",
+        "RKN"
+      ],
+      "owner": "RKN"
+    },
+    "NL_MRG_39ca088797c0": {
+      "controller": "RKN",
+      "cores": [
+        "HOL",
+        "RKN"
+      ],
+      "owner": "RKN"
+    },
+    "NL_MRG_45a7250c2862": {
+      "controller": "RKN",
+      "cores": [
+        "HOL",
+        "RKN"
+      ],
+      "owner": "RKN"
+    },
+    "NL_MRG_7e9ad361b25e": {
+      "controller": "RKN",
+      "cores": [
+        "HOL",
+        "RKN"
+      ],
+      "owner": "RKN"
+    },
+    "NL_MRG_99b7c61b066f": {
+      "controller": "RKN",
+      "cores": [
+        "HOL",
+        "RKN"
+      ],
+      "owner": "RKN"
+    },
+    "NL_MRG_b67b46af8948": {
+      "controller": "RKN",
+      "cores": [
+        "HOL",
+        "RKN"
+      ],
+      "owner": "RKN"
+    },
+    "NL_MRG_c127cb50cada": {
+      "controller": "RKN",
+      "cores": [
+        "HOL",
+        "RKN"
+      ],
+      "owner": "RKN"
+    },
+    "NL_MRG_cfd8aead1a35": {
+      "controller": "RKN",
+      "cores": [
+        "HOL",
+        "RKN"
+      ],
+      "owner": "RKN"
+    },
+    "NL_MRG_dfb52b5927e9": {
+      "controller": "RKN",
+      "cores": [
+        "HOL",
+        "RKN"
+      ],
+      "owner": "RKN"
     },
     "NO_PRIMARY_GAP_15": {
       "controller": "RKNO",
@@ -962,6 +2938,202 @@
       ],
       "owner": "RKNO"
     },
+    "PL_MRG_05f1ad6eedaa": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_328be0e18e73": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_3692a96e99b1": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_36976cf4d062": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_44c900e7cbdd": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_4762ef33a34f": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_48e6927d3544": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_4a7fdf2f215b": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_4df6ad2dc703": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_50494ed51da4": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_6143971238b3": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_7e3204328b62": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_8119670edfb9": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_81a04ac05a78": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_afde07ef7e52": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_be82540e6cf0": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_c16eaf95213a": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_c5cfb391c06f": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_c908eb11c602": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_cb41a08029c6": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_ce21dcd4a2c0": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_d33963acec0d": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_d43cd846ec6f": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_e9f1a2130857": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_eb17d6c2a513": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_eb6bfbc84cb1": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "PL_MRG_f3a4768ac693": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "PL_MRG_fe627fbb2f9c": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
     "RS228": {
       "cores": [
         "SER"
@@ -973,6 +3145,2141 @@
         "WRS"
       ],
       "owner": "WRS"
+    },
+    "RU_MRG_047db3618f7e": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_MRG_049b9f6aad55": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_0647b9498b2f": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_0693730687b9": {
+      "controller": "WRS",
+      "cores": [
+        "WRS"
+      ],
+      "owner": "WRS"
+    },
+    "RU_MRG_070e676051d2": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_0712bf4c0b09": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_0a65d5f58393": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_0acb872c94fa": {
+      "controller": "KOM",
+      "cores": [
+        "KOM"
+      ],
+      "owner": "KOM"
+    },
+    "RU_MRG_0c1434a780d8": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_0c628fcdf9bb": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_0c880ba23868": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_MRG_0d726a437af0": {
+      "controller": "ZLT",
+      "cores": [
+        "ZLT"
+      ],
+      "owner": "ZLT"
+    },
+    "RU_MRG_0e93885d5cdc": {
+      "controller": "OUR",
+      "cores": [
+        "OUR"
+      ],
+      "owner": "OUR"
+    },
+    "RU_MRG_0fb1aeee6a65": {
+      "controller": "VOL",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "VOL"
+    },
+    "RU_MRG_0fd0c43c03f0": {
+      "controller": "VYT",
+      "cores": [
+        "VYT"
+      ],
+      "owner": "VYT"
+    },
+    "RU_MRG_10f0f86a91af": {
+      "controller": "SBA",
+      "cores": [
+        "SBA"
+      ],
+      "owner": "SBA"
+    },
+    "RU_MRG_12b2bddafaa1": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_13fef5f74a14": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_15cb29330a1c": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_16df1bb3876e": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_MRG_177777beb337": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_194bb325d1de": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_1976f6232412": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_19c10dbc9bb7": {
+      "controller": "BRY",
+      "cores": [
+        "BRY"
+      ],
+      "owner": "BRY"
+    },
+    "RU_MRG_19dc7bbc7bcb": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_1dafa9ab0c1a": {
+      "controller": "VYT",
+      "cores": [
+        "VYT"
+      ],
+      "owner": "VYT"
+    },
+    "RU_MRG_1ff20bc12a63": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_MRG_200894813435": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_21258bfc1110": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_21f622bb3b2b": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_252059f2380f": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_25fe3261ce8f": {
+      "controller": "ALT",
+      "cores": [
+        "ALT"
+      ],
+      "owner": "ALT"
+    },
+    "RU_MRG_2722edc6e6c6": {
+      "controller": "RUR",
+      "cores": [
+        "RUR"
+      ],
+      "owner": "RUR"
+    },
+    "RU_MRG_27e41ded5b0a": {
+      "controller": "VYT",
+      "cores": [
+        "VYT"
+      ],
+      "owner": "VYT"
+    },
+    "RU_MRG_286bec35becb": {
+      "controller": "KOM",
+      "cores": [
+        "KOM"
+      ],
+      "owner": "KOM"
+    },
+    "RU_MRG_2944a9264c44": {
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ],
+      "owner": "MAG"
+    },
+    "RU_MRG_29478c5fffa6": {
+      "controller": "RUR",
+      "cores": [
+        "RUR"
+      ],
+      "owner": "RUR"
+    },
+    "RU_MRG_2953c850d23a": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_2abe6bddb595": {
+      "controller": "CHT",
+      "cores": [
+        "CHT"
+      ],
+      "owner": "CHT"
+    },
+    "RU_MRG_2b95a26406ca": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_2cfe9a40e9b7": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_2d748058088f": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_2d8a56fb0da2": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_MRG_2e2abc445545": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_2eace9e3f217": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_MRG_3051f8fc54f7": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_MRG_317bc293c6ec": {
+      "controller": "OMS",
+      "cores": [
+        "OMS"
+      ],
+      "owner": "OMS"
+    },
+    "RU_MRG_32d32da1ff70": {
+      "controller": "ALT",
+      "cores": [
+        "ALT"
+      ],
+      "owner": "ALT"
+    },
+    "RU_MRG_333dbd033786": {
+      "controller": "BKR",
+      "cores": [
+        "BKR"
+      ],
+      "owner": "BKR"
+    },
+    "RU_MRG_352ca37aab63": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_354d159a9201": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_MRG_3598dda004bb": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_35a5c1e09dd4": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_381a0cc60dd8": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_392ec3a802cd": {
+      "controller": "MAG",
+      "cores": [
+        "OUR"
+      ],
+      "owner": "MAG"
+    },
+    "RU_MRG_3937e6a0a228": {
+      "controller": "VYT",
+      "cores": [
+        "VYT"
+      ],
+      "owner": "VYT"
+    },
+    "RU_MRG_39c0ca250c57": {
+      "controller": "IRK",
+      "cores": [
+        "IRK"
+      ],
+      "owner": "IRK"
+    },
+    "RU_MRG_3bf1b1438247": {
+      "controller": "VOL",
+      "cores": [
+        "VOL"
+      ],
+      "owner": "VOL"
+    },
+    "RU_MRG_3c1f8e056188": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_3ca144c1d18a": {
+      "controller": "TAT",
+      "cores": [
+        "TAT"
+      ],
+      "owner": "TAT"
+    },
+    "RU_MRG_3d5ebfb76db3": {
+      "controller": "RKK",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_3f26ea354786": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_3f321dca003c": {
+      "controller": "ZLT",
+      "cores": [
+        "ZLT"
+      ],
+      "owner": "ZLT"
+    },
+    "RU_MRG_4177d5ccfc4d": {
+      "controller": "FIN",
+      "cores": [
+        "FIN"
+      ],
+      "owner": "FIN"
+    },
+    "RU_MRG_421f6b2285d7": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "RU_MRG_427102c526cb": {
+      "controller": "ZLT",
+      "cores": [
+        "ZLT"
+      ],
+      "owner": "ZLT"
+    },
+    "RU_MRG_43641c4798c6": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_43f873e0c183": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_4421c17551c2": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_44732ad635df": {
+      "controller": "JAP",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JAP"
+    },
+    "RU_MRG_451862161429": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_4543c51c6bdd": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_45cb6d83fff3": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_46291296feb9": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_467ab67728ff": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_47cb081b29d0": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_480afb1927f5": {
+      "controller": "TAT",
+      "cores": [
+        "TAT"
+      ],
+      "owner": "TAT"
+    },
+    "RU_MRG_4844dd62c5ed": {
+      "controller": "BRY",
+      "cores": [
+        "BRY"
+      ],
+      "owner": "BRY"
+    },
+    "RU_MRG_48dc139f3c1a": {
+      "controller": "VOL",
+      "cores": [
+        "VOL"
+      ],
+      "owner": "VOL"
+    },
+    "RU_MRG_4a1ad9caacda": {
+      "controller": "SBA",
+      "cores": [
+        "SBA"
+      ],
+      "owner": "SBA"
+    },
+    "RU_MRG_4a2de1a12369": {
+      "controller": "GOR",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "GOR"
+    },
+    "RU_MRG_4b5d89b2801b": {
+      "controller": "GOR",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "GOR"
+    },
+    "RU_MRG_4b9b280cad80": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_MRG_4bf779af7de8": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_4c7d723b93b0": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_4ed360a39448": {
+      "controller": "FIN",
+      "cores": [
+        "FIN"
+      ],
+      "owner": "FIN"
+    },
+    "RU_MRG_510edc918f57": {
+      "controller": "VOL",
+      "cores": [
+        "VOL"
+      ],
+      "owner": "VOL"
+    },
+    "RU_MRG_5152587ee975": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_52b3b8d7dc12": {
+      "controller": "TAN",
+      "cores": [
+        "TAN"
+      ],
+      "owner": "TAN"
+    },
+    "RU_MRG_54883923bf50": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_54d291c64dfc": {
+      "controller": "ZLT",
+      "cores": [
+        "ZLT"
+      ],
+      "owner": "ZLT"
+    },
+    "RU_MRG_54f19a93b9db": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_MRG_54feb62370de": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_55742c11b5e6": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_563983f18fe2": {
+      "controller": "TAT",
+      "cores": [
+        "TAT"
+      ],
+      "owner": "TAT"
+    },
+    "RU_MRG_565e6f7cc145": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_56d7f2c40815": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_56ed27ec6e18": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_MRG_57d8687f784e": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_58dfbd1fa64b": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_5936db92540a": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_59971f82636d": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_59f6abe0ef5a": {
+      "controller": "CHT",
+      "cores": [
+        "CHT"
+      ],
+      "owner": "CHT"
+    },
+    "RU_MRG_5bb5ee0b1fb6": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_5ca04a85c3f4": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_5cb2fb3991d9": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_5d719442f15d": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_5eb4927958c7": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_60459cf53f51": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_60904da04ba2": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_60a416f16ad5": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_62d43bf78311": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_62e1cda9654b": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_639437e5ad6b": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_MRG_639caddb97b7": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_63e9553ae883": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_MRG_646292257107": {
+      "controller": "ORN",
+      "cores": [
+        "ORN"
+      ],
+      "owner": "ORN"
+    },
+    "RU_MRG_655667242e72": {
+      "controller": "PFC",
+      "cores": [
+        "PFC"
+      ],
+      "owner": "PFC"
+    },
+    "RU_MRG_67a510ab42f2": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_MRG_67d918167343": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_69c47d13e0ea": {
+      "controller": "JAP",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JAP"
+    },
+    "RU_MRG_69fe24997bd8": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_6ac3b28a1717": {
+      "controller": "YAK",
+      "cores": [
+        "YAK"
+      ],
+      "owner": "YAK"
+    },
+    "RU_MRG_6b6c39533363": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_MRG_6be12ffb1d4d": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_6d68a0fd3c3c": {
+      "controller": "CHT",
+      "cores": [
+        "CHT"
+      ],
+      "owner": "CHT"
+    },
+    "RU_MRG_6dc9d50b794a": {
+      "controller": "RKM",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_6df85226925c": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_6f87652d4746": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_6fb6a80f7b8a": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_7023cdeaace9": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_70ed82134bd7": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_71433587cf08": {
+      "controller": "GER",
+      "cores": [
+        "GER"
+      ],
+      "owner": "GER"
+    },
+    "RU_MRG_71c5eef625de": {
+      "controller": "TAT",
+      "cores": [
+        "TAT"
+      ],
+      "owner": "TAT"
+    },
+    "RU_MRG_728513759ce7": {
+      "controller": "RKK",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_72b0f3ba03bc": {
+      "controller": "TAT",
+      "cores": [
+        "TAT"
+      ],
+      "owner": "TAT"
+    },
+    "RU_MRG_72ee4e9306fc": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_7378a30fad9a": {
+      "controller": "IRK",
+      "cores": [
+        "IRK"
+      ],
+      "owner": "IRK"
+    },
+    "RU_MRG_7425ae2cbd84": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_7451af4e8c07": {
+      "controller": "TAT",
+      "cores": [
+        "TAT"
+      ],
+      "owner": "TAT"
+    },
+    "RU_MRG_75d0b3503bfa": {
+      "controller": "KOM",
+      "cores": [
+        "KOM"
+      ],
+      "owner": "KOM"
+    },
+    "RU_MRG_75e8b19921bc": {
+      "controller": "OUR",
+      "cores": [
+        "OUR"
+      ],
+      "owner": "OUR"
+    },
+    "RU_MRG_76bad646959e": {
+      "controller": "SBA",
+      "cores": [
+        "SBA"
+      ],
+      "owner": "SBA"
+    },
+    "RU_MRG_7750087e40dd": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_7820c72ce322": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_782d749bb689": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_7845e1b7a36b": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_79a4de3821cf": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_MRG_79d73fa9760d": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_79f3aaa40be4": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_7d69ba02c4da": {
+      "controller": "VOL",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "VOL"
+    },
+    "RU_MRG_7e1c8281813e": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_MRG_7e27efeffa0f": {
+      "controller": "BRY",
+      "cores": [
+        "BRY"
+      ],
+      "owner": "BRY"
+    },
+    "RU_MRG_7f673bbbcb21": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_7fb0671d3e3b": {
+      "controller": "YAK",
+      "cores": [
+        "YAK"
+      ],
+      "owner": "YAK"
+    },
+    "RU_MRG_7fc798b3eeaf": {
+      "controller": "FIN",
+      "cores": [
+        "FIN"
+      ],
+      "owner": "FIN"
+    },
+    "RU_MRG_7fee908b63f6": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_MRG_807631e65728": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_8175cbc6e17d": {
+      "controller": "TAT",
+      "cores": [
+        "TAT"
+      ],
+      "owner": "TAT"
+    },
+    "RU_MRG_82288501a613": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_82b17e00b64e": {
+      "controller": "RUR",
+      "cores": [
+        "RUR"
+      ],
+      "owner": "RUR"
+    },
+    "RU_MRG_83744c263574": {
+      "controller": "FIN",
+      "cores": [
+        "FIN"
+      ],
+      "owner": "FIN"
+    },
+    "RU_MRG_841bc7215ac5": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_84a69ede33b5": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_86cd0c7f0325": {
+      "controller": "VYT",
+      "cores": [
+        "VYT"
+      ],
+      "owner": "VYT"
+    },
+    "RU_MRG_877b0d1f2d9d": {
+      "controller": "OMS",
+      "cores": [
+        "OMS"
+      ],
+      "owner": "OMS"
+    },
+    "RU_MRG_87f974ef0b94": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_MRG_8833cbf157a6": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_884ab2e1b411": {
+      "controller": "KOM",
+      "cores": [
+        "KOM"
+      ],
+      "owner": "KOM"
+    },
+    "RU_MRG_8a04555b8e14": {
+      "controller": "TAT",
+      "cores": [
+        "TAT"
+      ],
+      "owner": "TAT"
+    },
+    "RU_MRG_8a665b108348": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_MRG_8ab72609576c": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_8b55818839ef": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_8e6e2af7d4de": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_MRG_8ec2184da20a": {
+      "controller": "FIN",
+      "cores": [
+        "FIN"
+      ],
+      "owner": "FIN"
+    },
+    "RU_MRG_90d3823663be": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_90ed61ead343": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_91548f408632": {
+      "controller": "RUR",
+      "cores": [
+        "RUR"
+      ],
+      "owner": "RUR"
+    },
+    "RU_MRG_91f1efdf8bc5": {
+      "controller": "GOR",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "GOR"
+    },
+    "RU_MRG_9444b3a17676": {
+      "controller": "VYT",
+      "cores": [
+        "VYT"
+      ],
+      "owner": "VYT"
+    },
+    "RU_MRG_94e7015e40d9": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_9604e71e10fc": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_962b67068c91": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_9630c25ee3c6": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_96394847a7bb": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_971db00ecf98": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_975a1a106b2a": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_977d68d87d87": {
+      "controller": "BKR",
+      "cores": [
+        "BKR"
+      ],
+      "owner": "BKR"
+    },
+    "RU_MRG_984ceffa7ee6": {
+      "controller": "OUR",
+      "cores": [
+        "OUR"
+      ],
+      "owner": "OUR"
+    },
+    "RU_MRG_99718fc516b9": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_9a1edb58046a": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_9a973c050065": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_9d8deba56899": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_9ed0f4973e0f": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_MRG_9ef1aa17db33": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_9f87451cc870": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_9fe77f7052b1": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_a0ecef08b321": {
+      "controller": "KRS",
+      "cores": [
+        "KRS"
+      ],
+      "owner": "KRS"
+    },
+    "RU_MRG_a22e47cb6b1f": {
+      "controller": "TYM",
+      "cores": [
+        "TYM"
+      ],
+      "owner": "TYM"
+    },
+    "RU_MRG_a610e18b7598": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_a87b79d2be5d": {
+      "controller": "GOR",
+      "cores": [
+        "GOR"
+      ],
+      "owner": "GOR"
+    },
+    "RU_MRG_a94cbc9022fc": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_ab56c6057a73": {
+      "controller": "VOL",
+      "cores": [
+        "VOL"
+      ],
+      "owner": "VOL"
+    },
+    "RU_MRG_ab652814dff4": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_ad1e693ffed2": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_adb14e0f8093": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_ae8913c1637c": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_aedb5f9ed3b1": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_af4de1ed4f9c": {
+      "controller": "OMS",
+      "cores": [
+        "OMS"
+      ],
+      "owner": "OMS"
+    },
+    "RU_MRG_b202c10408ff": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_b2d1407cd933": {
+      "controller": "OUR",
+      "cores": [
+        "OUR"
+      ],
+      "owner": "OUR"
+    },
+    "RU_MRG_b5cd1e7d4be4": {
+      "controller": "VYT",
+      "cores": [
+        "VYT"
+      ],
+      "owner": "VYT"
+    },
+    "RU_MRG_b63c46baafca": {
+      "controller": "RUR",
+      "cores": [
+        "RUR"
+      ],
+      "owner": "RUR"
+    },
+    "RU_MRG_b706be984552": {
+      "controller": "ALT",
+      "cores": [
+        "ALT"
+      ],
+      "owner": "ALT"
+    },
+    "RU_MRG_b74b6298db8e": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_b7986b68045a": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_b8675f108fd4": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_b88d938191a1": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_b963a8bb44cb": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_b99b9e1ffaef": {
+      "controller": "CHT",
+      "cores": [
+        "CHT"
+      ],
+      "owner": "CHT"
+    },
+    "RU_MRG_baef030e052d": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_bb701cc86b7c": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_bba373fa6104": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_MRG_bccb1225fada": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_bd4e5d799db8": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_MRG_bd522f576b8e": {
+      "controller": "TYM",
+      "cores": [
+        "TYM"
+      ],
+      "owner": "TYM"
+    },
+    "RU_MRG_bd67d5dbed08": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_be20933bc7c3": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_be43d5dec8c0": {
+      "controller": "SBA",
+      "cores": [
+        "SBA"
+      ],
+      "owner": "SBA"
+    },
+    "RU_MRG_be7ea0c7c033": {
+      "controller": "FIN",
+      "cores": [
+        "FIN"
+      ],
+      "owner": "FIN"
+    },
+    "RU_MRG_bec756719bb4": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_MRG_bfc2cf574a56": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_c3b410784a1f": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_c3cc17c29955": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_c425c5a5ca50": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_c49d8cb805dc": {
+      "controller": "BKR",
+      "cores": [
+        "BKR"
+      ],
+      "owner": "BKR"
+    },
+    "RU_MRG_c60bafc0ae96": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_c663e09bf172": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_c68b90a156ce": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_c78e9571a541": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_c84f2ed9c6ef": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_MRG_c8a0780621bb": {
+      "controller": "OUR",
+      "cores": [
+        "OUR"
+      ],
+      "owner": "OUR"
+    },
+    "RU_MRG_c90be9cc4d47": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_ca213480791c": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_cabe21f75eb0": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_cb687e18e225": {
+      "controller": "OMS",
+      "cores": [
+        "OMS"
+      ],
+      "owner": "OMS"
+    },
+    "RU_MRG_cb7ab64b43b7": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_cd478b5a76eb": {
+      "controller": "RKM",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_d12c5659178e": {
+      "controller": "OMS",
+      "cores": [
+        "OMS"
+      ],
+      "owner": "OMS"
+    },
+    "RU_MRG_d3a65ab636f6": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_d3e21f6b65d6": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_d3f284416aa5": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_d5519e91a94b": {
+      "controller": "OMS",
+      "cores": [
+        "OMS"
+      ],
+      "owner": "OMS"
+    },
+    "RU_MRG_d665fd9ba683": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_d67a36c17dc4": {
+      "controller": "ORN",
+      "cores": [
+        "OUR"
+      ],
+      "owner": "ORN"
+    },
+    "RU_MRG_d6b32b8b244a": {
+      "controller": "KRS",
+      "cores": [
+        "KRS"
+      ],
+      "owner": "KRS"
+    },
+    "RU_MRG_d6e7399b8ed9": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_d7ef4389d36f": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_d7f648c07bd4": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_d860090dc575": {
+      "controller": "YAK",
+      "cores": [
+        "YAK"
+      ],
+      "owner": "YAK"
+    },
+    "RU_MRG_d8b55b2980d4": {
+      "controller": "VYT",
+      "cores": [
+        "VYT"
+      ],
+      "owner": "VYT"
+    },
+    "RU_MRG_da0982e025af": {
+      "controller": "TAT",
+      "cores": [
+        "TAT"
+      ],
+      "owner": "TAT"
+    },
+    "RU_MRG_da32271f14c8": {
+      "controller": "ORN",
+      "cores": [
+        "ORN"
+      ],
+      "owner": "ORN"
+    },
+    "RU_MRG_dafab256f046": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_dafefaea8cbc": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_dc59f2179593": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "RU_MRG_deee7ff279fc": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_df33d486fbcc": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_df9a05a775d2": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_dfc881d403c4": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_dfe6c1e5f415": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_e00f867dd81d": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_e03e6af00269": {
+      "controller": "RUR",
+      "cores": [
+        "RUR"
+      ],
+      "owner": "RUR"
+    },
+    "RU_MRG_e0a377c11b7b": {
+      "controller": "VOL",
+      "cores": [
+        "VOL"
+      ],
+      "owner": "VOL"
+    },
+    "RU_MRG_e0ee40fde9b4": {
+      "controller": "RUR",
+      "cores": [
+        "RUR"
+      ],
+      "owner": "RUR"
+    },
+    "RU_MRG_e275078969d8": {
+      "controller": "TYM",
+      "cores": [
+        "TYM"
+      ],
+      "owner": "TYM"
+    },
+    "RU_MRG_e472f12334cb": {
+      "controller": "VYT",
+      "cores": [
+        "VYT"
+      ],
+      "owner": "VYT"
+    },
+    "RU_MRG_e5e9822050ff": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_e72df9dafd76": {
+      "controller": "BRY",
+      "cores": [
+        "BRY"
+      ],
+      "owner": "BRY"
+    },
+    "RU_MRG_e770cd31cdb4": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_e85ce6b2cbb5": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_e9567e283174": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_e9b55eb4987e": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_MRG_eb6edd92ee8d": {
+      "controller": "FIC",
+      "cores": [
+        "FIC"
+      ],
+      "owner": "FIC"
+    },
+    "RU_MRG_ebc5961355f4": {
+      "controller": "SBA",
+      "cores": [
+        "SBA"
+      ],
+      "owner": "SBA"
+    },
+    "RU_MRG_ed434db4b357": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_ef463885ab7b": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_f01d51060a16": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_f18f0befdc5e": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_f1c57006ab38": {
+      "controller": "RKK",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_f27518461032": {
+      "controller": "OMS",
+      "cores": [
+        "OMS"
+      ],
+      "owner": "OMS"
+    },
+    "RU_MRG_f38bf2291525": {
+      "controller": "CHT",
+      "cores": [
+        "CHT"
+      ],
+      "owner": "CHT"
+    },
+    "RU_MRG_f3d2b13e0b30": {
+      "controller": "BKR",
+      "cores": [
+        "BKR"
+      ],
+      "owner": "BKR"
+    },
+    "RU_MRG_f3dfc0448ede": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_f47338e16e14": {
+      "controller": "ZLT",
+      "cores": [
+        "ZLT"
+      ],
+      "owner": "ZLT"
+    },
+    "RU_MRG_f5d0364a5d76": {
+      "controller": "GOR",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "GOR"
+    },
+    "RU_MRG_f6312a148f5b": {
+      "controller": "BRY",
+      "cores": [
+        "BRY"
+      ],
+      "owner": "BRY"
+    },
+    "RU_MRG_f703f8a6bf50": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_f74231f65cbd": {
+      "controller": "RKK",
+      "cores": [
+        "RKK"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_f7a972994e86": {
+      "controller": "GOR",
+      "cores": [
+        "GOR"
+      ],
+      "owner": "GOR"
+    },
+    "RU_MRG_f84bc369d8b3": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "RU_MRG_f99008b0bde7": {
+      "controller": "RKK",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKK"
+    },
+    "RU_MRG_fc10904ad88d": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_MRG_fdf63a493917": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_MRG_fec102300fdc": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
     },
     "RU_RAY_50074027B10379539839705__tno1962_1": {
       "controller": "TOM",
@@ -995,39 +5302,12 @@
       ],
       "owner": "ORS"
     },
-    "RU_RAY_50074027B1436275614224": {
-      "controller": "ORN",
-      "cores": [
-        "ORN"
-      ],
-      "owner": "ORN"
-    },
-    "RU_RAY_50074027B1688129398280": {
-      "controller": "MAG",
-      "cores": [
-        "OUR"
-      ],
-      "owner": "MAG"
-    },
     "RU_RAY_50074027B16928982325503": {
       "controller": "ORS",
       "cores": [
         "SVR"
       ],
       "owner": "ORS"
-    },
-    "RU_RAY_50074027B18536602285327": {
-      "cores": [
-        "RUR"
-      ],
-      "owner": "RUR"
-    },
-    "RU_RAY_50074027B20766953749366": {
-      "controller": "MAG",
-      "cores": [
-        "OUR"
-      ],
-      "owner": "MAG"
     },
     "RU_RAY_50074027B21488641063420": {
       "controller": "MAG",
@@ -1048,13 +5328,6 @@
         "KRS"
       ],
       "owner": "KRS"
-    },
-    "RU_RAY_50074027B23901278564844": {
-      "controller": "ORN",
-      "cores": [
-        "ORN"
-      ],
-      "owner": "ORN"
     },
     "RU_RAY_50074027B2401368915177": {
       "controller": "PFC",
@@ -1132,13 +5405,6 @@
       ],
       "owner": "ORN"
     },
-    "RU_RAY_50074027B32656053456514": {
-      "controller": "MAG",
-      "cores": [
-        "OUR"
-      ],
-      "owner": "MAG"
-    },
     "RU_RAY_50074027B34738491600615": {
       "controller": "BOP",
       "cores": [
@@ -1193,20 +5459,6 @@
       ],
       "owner": "ORS"
     },
-    "RU_RAY_50074027B43089956732561": {
-      "controller": "MAG",
-      "cores": [
-        "OUR"
-      ],
-      "owner": "MAG"
-    },
-    "RU_RAY_50074027B43884412711869": {
-      "controller": "MAG",
-      "cores": [
-        "OUR"
-      ],
-      "owner": "MAG"
-    },
     "RU_RAY_50074027B44738927608854": {
       "controller": "SVR",
       "cores": [
@@ -1228,19 +5480,6 @@
       ],
       "owner": "ONG"
     },
-    "RU_RAY_50074027B45994623884743": {
-      "controller": "ORN",
-      "cores": [
-        "OUR"
-      ],
-      "owner": "ORN"
-    },
-    "RU_RAY_50074027B47936450781023": {
-      "cores": [
-        "RUR"
-      ],
-      "owner": "RUR"
-    },
     "RU_RAY_50074027B49390035135032": {
       "controller": "ONG",
       "cores": [
@@ -1254,13 +5493,6 @@
         "WRS"
       ],
       "owner": "ONG"
-    },
-    "RU_RAY_50074027B51975947955569": {
-      "controller": "ORN",
-      "cores": [
-        "ORN"
-      ],
-      "owner": "ORN"
     },
     "RU_RAY_50074027B5291843877359": {
       "controller": "ONG",
@@ -1302,13 +5534,6 @@
       ],
       "owner": "RKK"
     },
-    "RU_RAY_50074027B59785641495471": {
-      "controller": "ORN",
-      "cores": [
-        "ORN"
-      ],
-      "owner": "ORN"
-    },
     "RU_RAY_50074027B60413300894613": {
       "controller": "MAG",
       "cores": [
@@ -1322,13 +5547,6 @@
         "SVR"
       ],
       "owner": "ORS"
-    },
-    "RU_RAY_50074027B63939328308322": {
-      "controller": "MAG",
-      "cores": [
-        "OUR"
-      ],
-      "owner": "MAG"
     },
     "RU_RAY_50074027B66770935409727": {
       "controller": "ONG",
@@ -1400,13 +5618,6 @@
       ],
       "owner": "MAG"
     },
-    "RU_RAY_50074027B85521720356059": {
-      "controller": "ORN",
-      "cores": [
-        "ORN"
-      ],
-      "owner": "ORN"
-    },
     "RU_RAY_50074027B86150609365879": {
       "controller": "ORS",
       "cores": [
@@ -1414,26 +5625,12 @@
       ],
       "owner": "ORS"
     },
-    "RU_RAY_50074027B88013185762354": {
-      "controller": "ORN",
-      "cores": [
-        "OUR"
-      ],
-      "owner": "ORN"
-    },
     "RU_RAY_50074027B90298108562486": {
       "controller": "ORS",
       "cores": [
         "OUR"
       ],
       "owner": "ORS"
-    },
-    "RU_RAY_50074027B90614779989095": {
-      "controller": "ORN",
-      "cores": [
-        "OUR"
-      ],
-      "owner": "ORN"
     },
     "RU_RAY_50074027B91746933948416": {
       "cores": [
@@ -1448,25 +5645,54 @@
       ],
       "owner": "BOP"
     },
-    "RU_RAY_50074027B95058446933868": {
-      "controller": "ORN",
+    "SK_MRG_351edc5a6c69": {
+      "controller": "SLO",
       "cores": [
-        "ORN"
+        "SLO"
       ],
-      "owner": "ORN"
+      "owner": "SLO"
     },
-    "RU_RAY_50074027B96019567685522": {
+    "SK_MRG_6ddeb377aab6": {
+      "controller": "SLO",
       "cores": [
-        "BKR"
+        "SLO"
       ],
-      "owner": "BKR"
+      "owner": "SLO"
     },
-    "RU_RAY_50074027B99663793376292": {
-      "controller": "ORN",
+    "SK_MRG_951b03682e38": {
+      "controller": "SLO",
       "cores": [
-        "ORN"
+        "SLO"
       ],
-      "owner": "ORN"
+      "owner": "SLO"
+    },
+    "SK_MRG_b87a765e2485": {
+      "controller": "SLO",
+      "cores": [
+        "SLO"
+      ],
+      "owner": "SLO"
+    },
+    "SK_MRG_da1e3ec3eef0": {
+      "controller": "SLO",
+      "cores": [
+        "SLO"
+      ],
+      "owner": "SLO"
+    },
+    "SK_MRG_dac05b35b387": {
+      "controller": "SLO",
+      "cores": [
+        "SLO"
+      ],
+      "owner": "SLO"
+    },
+    "SK_MRG_e93604b4f2a5": {
+      "controller": "SLO",
+      "cores": [
+        "SLO"
+      ],
+      "owner": "SLO"
     },
     "SM_ADM1_SMR-4883": {
       "cores": [
@@ -1522,6 +5748,69 @@
       ],
       "owner": "ITA"
     },
+    "UA_MRG_01673e94c186": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_049fbd166854": {
+      "controller": "HUN",
+      "cores": [
+        "HUN"
+      ],
+      "owner": "HUN"
+    },
+    "UA_MRG_07e4f868c3fb": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_08e978d66245": {
+      "controller": "ROM",
+      "cores": [
+        "ROM"
+      ],
+      "owner": "ROM"
+    },
+    "UA_MRG_0d6137080058": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "UA_MRG_167b1c61b320": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_1a8aac8d6778": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_1d698b91bc32": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_1e19f7d437d0": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
     "UA_MRG_1e5ce8367e34": {
       "controller": "RKU",
       "cores": [
@@ -1529,12 +5818,47 @@
       ],
       "owner": "RKU"
     },
+    "UA_MRG_228c317a869c": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_26d00b8ec232": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_2b67cdceafd7": {
+      "controller": "ROM",
+      "cores": [
+        "ROM"
+      ],
+      "owner": "ROM"
+    },
     "UA_MRG_2d1c37bdd071": {
       "controller": "RKU",
       "cores": [
         "RKU"
       ],
       "owner": "RKU"
+    },
+    "UA_MRG_30161412737f": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_35715f97812f": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
     },
     "UA_MRG_364aab8578b7": {
       "controller": "RKU",
@@ -1550,6 +5874,13 @@
       ],
       "owner": "RKU"
     },
+    "UA_MRG_4224fabffe3b": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
     "UA_MRG_44d0fd9d6e14": {
       "controller": "RKU",
       "cores": [
@@ -1557,7 +5888,49 @@
       ],
       "owner": "RKU"
     },
+    "UA_MRG_456d7658c3df": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_4a445701c4c6": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_4f13a104316f": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_5041b17a3e61": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
     "UA_MRG_51ee3e4d0063": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_570a8d4dd729": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_57c49cfe4029": {
       "controller": "RKU",
       "cores": [
         "RKU"
@@ -1578,7 +5951,70 @@
       ],
       "owner": "RKU"
     },
+    "UA_MRG_6b24f46af3f8": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_6e5a94ff967b": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_70858b70843b": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_71f8199a8d07": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_72c94a3ccd70": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "UA_MRG_73aa15b32010": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_76175923bdd1": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_76b1b94d5856": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
     "UA_MRG_797d35ccfd2e": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_7db72d35cf6c": {
       "controller": "RKU",
       "cores": [
         "RKU"
@@ -1599,7 +6035,63 @@
       ],
       "owner": "RKU"
     },
+    "UA_MRG_837595aeea03": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_873c83173170": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_87ad72dae9b5": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_8c4b9e4808b7": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
     "UA_MRG_8e1ed09f0e12": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_8e995a06a742": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_8f0f1aca728a": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_91f1c11e596f": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_93291f71dff3": {
       "controller": "RKU",
       "cores": [
         "RKU"
@@ -1613,12 +6105,61 @@
       ],
       "owner": "RKU"
     },
+    "UA_MRG_97cb7eda9f1d": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_98ce0c6febb4": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_9c6077315d06": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
+    },
+    "UA_MRG_9cc4d817d067": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_9e7d5f1ce841": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
     "UA_MRG_9fc8b136c3a6": {
       "controller": "RKU",
       "cores": [
         "RKU"
       ],
       "owner": "RKU"
+    },
+    "UA_MRG_a96bf83a0ff4": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_ab85624a51f5": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
     },
     "UA_MRG_ae35953e4a30": {
       "controller": "RKU",
@@ -1628,6 +6169,27 @@
       "owner": "RKU"
     },
     "UA_MRG_b0fab68c785d": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_b417c43a40cb": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_b54ca702a003": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_b75cd2d6110f": {
       "controller": "RKU",
       "cores": [
         "RKU"
@@ -1648,7 +6210,35 @@
       ],
       "owner": "RKU"
     },
+    "UA_MRG_bde664b68d7f": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_c2b5f29d91e8": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_c5aa2c8a6048": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
     "UA_MRG_c74c01b39f8e": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_c8f134fbd5da": {
       "controller": "RKU",
       "cores": [
         "RKU"
@@ -1661,6 +6251,13 @@
         "RKU"
       ],
       "owner": "RKU"
+    },
+    "UA_MRG_d4f151f823ef": {
+      "controller": "RKP",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "RKP"
     },
     "UA_MRG_d6223fcd4bc5": {
       "controller": "RKU",
@@ -1677,6 +6274,13 @@
       "owner": "RKU"
     },
     "UA_MRG_dbee0923a48b": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_de7101fe7980": {
       "controller": "RKU",
       "cores": [
         "RKU"
@@ -1711,7 +6315,28 @@
       ],
       "owner": "RKU"
     },
+    "UA_MRG_f49493422ebe": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_fbcb4404788c": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
     "UA_MRG_fd8e40834959": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "UA_MRG_ff6ac32ac4e3": {
       "controller": "RKU",
       "cores": [
         "RKU"
@@ -1760,26 +6385,124 @@
       ],
       "owner": "NIE"
     },
-    "UKN0D": {
+    "UK_MRG_05f15fd7e833": {
+      "controller": "ENG",
+      "cores": [
+        "ENG"
+      ],
+      "owner": "ENG"
+    },
+    "UK_MRG_0c7e7a67089e": {
+      "controller": "ENG",
+      "cores": [
+        "ENG"
+      ],
+      "owner": "ENG"
+    },
+    "UK_MRG_117d6a6890fd": {
+      "controller": "ENG",
+      "cores": [
+        "ENG"
+      ],
+      "owner": "ENG"
+    },
+    "UK_MRG_2f501f921535": {
+      "controller": "ENG",
+      "cores": [
+        "ENG"
+      ],
+      "owner": "ENG"
+    },
+    "UK_MRG_2f7c06fdd74c": {
+      "controller": "ENG",
+      "cores": [
+        "ENG"
+      ],
+      "owner": "ENG"
+    },
+    "UK_MRG_32be8ff42d1d": {
+      "controller": "SCO",
+      "cores": [
+        "SCO"
+      ],
+      "owner": "SCO"
+    },
+    "UK_MRG_3af31571b83c": {
+      "controller": "SCO",
+      "cores": [
+        "SCO"
+      ],
+      "owner": "SCO"
+    },
+    "UK_MRG_4bda76985a93": {
       "controller": "NIE",
       "cores": [
         "NIE"
       ],
       "owner": "NIE"
     },
-    "UKN0E": {
-      "controller": "NIE",
+    "UK_MRG_5adcc0eef3cd": {
+      "controller": "ENG",
       "cores": [
-        "NIE"
+        "ENG"
       ],
-      "owner": "NIE"
+      "owner": "ENG"
     },
-    "UKN0F": {
-      "controller": "NIE",
+    "UK_MRG_5b67c89ee498": {
+      "controller": "ENG",
       "cores": [
-        "NIE"
+        "ENG"
       ],
-      "owner": "NIE"
+      "owner": "ENG"
+    },
+    "UK_MRG_5e86e440be06": {
+      "controller": "WLS",
+      "cores": [
+        "WLS"
+      ],
+      "owner": "WLS"
+    },
+    "UK_MRG_6b5533cccee5": {
+      "controller": "SCO",
+      "cores": [
+        "SCO"
+      ],
+      "owner": "SCO"
+    },
+    "UK_MRG_7443877c7a21": {
+      "controller": "ENG",
+      "cores": [
+        "ENG"
+      ],
+      "owner": "ENG"
+    },
+    "UK_MRG_a36fda7ab641": {
+      "controller": "SCO",
+      "cores": [
+        "SCO"
+      ],
+      "owner": "SCO"
+    },
+    "UK_MRG_b630eccadfbe": {
+      "controller": "ENG",
+      "cores": [
+        "ENG"
+      ],
+      "owner": "ENG"
+    },
+    "UK_MRG_b91d40f3e558": {
+      "controller": "ENG",
+      "cores": [
+        "ENG"
+      ],
+      "owner": "ENG"
+    },
+    "UK_MRG_e60d28324bee": {
+      "controller": "WLS",
+      "cores": [
+        "WLS"
+      ],
+      "owner": "WLS"
     },
     "US_MRG_03d789d015aa": {
       "controller": "USA",

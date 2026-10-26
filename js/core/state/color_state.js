@@ -71,7 +71,7 @@ export function createDefaultColorState() {
     selectedInspectorCountryCode: "",
     inspectorExpansionInitialized: false,
     inspectorHighlightCountryCode: "",
-    currentTool: "fill",
+    currentTool: "select",
     brushModeEnabled: false,
     brushPanModifierActive: false,
   };

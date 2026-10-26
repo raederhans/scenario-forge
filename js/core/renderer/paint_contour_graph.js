@@ -1,3 +1,5 @@
+import { packContourPolygons, createContourPolygonQuery, createContourWaterQuery } from './paint_contour_water_mask.js';
+
 // Geometry-only shared-edge graph for the composed land surface. No country,
 // ownership, palette, projection or viewport state participates in adjacency.
 // Coordinates are snapped to 1e-7 degrees for identity, not for rendering.
@@ -423,7 +425,283 @@ function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occu
   return { shared, remaining };
 }
 
-function sharedSegments(edges, diagnostics, precisions) {
+function nearSeamSegments(edges, shared, diagnostics, tolerance, land, polygons) {
+  if (!(tolerance > 0)) return [];
+  const distanceLimit = (tolerance + 1e-12) ** 2;
+  const started = performance.now(), memory = globalThis.process?.memoryUsage?.();
+  const grid = new Map(), queries = new Map(), pairs = new Map();
+  const ax = new Float64Array(edges.length), ay = new Float64Array(edges.length);
+  const bx = new Float64Array(edges.length), by = new Float64Array(edges.length);
+  const vx = new Float64Array(edges.length), vy = new Float64Array(edges.length);
+  const lengths = new Float64Array(edges.length), owners = new Uint32Array(edges.length);
+  const signs = new Int8Array(edges.length);
+  const cellKey = (x, y) => x * 65536 + y;
+  const gridSize = tolerance * 4;
+  const padding = tolerance + 1e-12;
+  let size = 0, ownerCount = 0, gridEntries = 0;
+  for (const edge of edges) {
+    const x0 = edgeCoordinate(edge, false, 0, true), y0 = edgeCoordinate(edge, false, 1, true);
+    const x1 = edgeCoordinate(edge, true, 0, true), y1 = edgeCoordinate(edge, true, 1, true);
+    const dx = x1 - x0, dy = y1 - y0, length = Math.hypot(dx, dy);
+    if (!length || Math.abs(dx) > 180) continue;
+    const member = edge.members[0], owner = Math.abs(member) - 1, index = size++;
+    ax[index] = x0; ay[index] = y0; bx[index] = x1; by[index] = y1;
+    vx[index] = dx; vy[index] = dy; lengths[index] = length;
+    owners[index] = owner; signs[index] = Math.sign(member);
+    ownerCount = Math.max(ownerCount, owner + 1);
+    for (let x = Math.floor(Math.min(x0, x1) / gridSize); x <= Math.floor(Math.max(x0, x1) / gridSize); x++) {
+      for (let y = Math.floor(Math.min(y0, y1) / gridSize); y <= Math.floor(Math.max(y0, y1) / gridSize); y++) {
+        const key = cellKey(x, y);
+        grid.set(key, (grid.get(key) || 0) + 1); gridEntries++;
+      }
+    }
+  }
+  for (const owner of polygons.keys()) ownerCount = Math.max(ownerCount, owner + 1);
+  const buckets = new Uint32Array(grid.size * 2 + gridEntries);
+  let offset = 0;
+  for (const [key, count] of grid) { grid.set(key, offset); offset += count + 2; }
+  for (let index = 0; index < size; index++) {
+    for (let x = Math.floor(Math.min(ax[index], bx[index]) / gridSize); x <= Math.floor(Math.max(ax[index], bx[index]) / gridSize); x++) {
+      for (let y = Math.floor(Math.min(ay[index], by[index]) / gridSize); y <= Math.floor(Math.max(ay[index], by[index]) / gridSize); y++) {
+        const at = grid.get(cellKey(x, y)), count = buckets[at + 1]++;
+        if (!count) buckets[at] = owners[index];
+        else if (buckets[at] !== owners[index]) buckets[at] = 0xffffffff;
+        buckets[at + 2 + count] = index;
+      }
+    }
+  }
+  function contains(owner, x, y) {
+    let query = queries.get(owner);
+    if (!query) { query = createContourPolygonQuery(polygons.get(owner), false); queries.set(owner, query); }
+    return query(x, y);
+  }
+  diagnostics.nearSeamIndexMs = performance.now() - started;
+  const seen = new Uint32Array(size);
+  const order = new Uint32Array(size), ownerOffsets = new Uint32Array(ownerCount + 1);
+  for (let i = 0; i < size; i++) ownerOffsets[owners[i] + 1]++;
+  for (let i = 1; i <= ownerCount; i++) ownerOffsets[i] += ownerOffsets[i - 1];
+  for (let i = 0; i < size; i++) order[ownerOffsets[owners[i]]++] = i;
+  let candidateEdges = new Uint32Array(64), candidateLo = new Float64Array(64), candidateHi = new Float64Array(64);
+  let candidateNext = new Int32Array(64), activeCandidates = new Uint32Array(64);
+  const groupHead = new Int32Array(ownerCount), groupTail = new Int32Array(ownerCount);
+  groupHead.fill(-1);
+  const groups = [], cuts = [];
+  for (const index of order) {
+    let candidateCount = 0;
+    groups.length = 0;
+    const dx = vx[index], dy = vy[index], length = lengths[index], owner = owners[index], sign = signs[index];
+    const minX = Math.min(ax[index], bx[index]) - padding, maxX = Math.max(ax[index], bx[index]) + padding;
+    const minY = Math.min(ay[index], by[index]) - padding, maxY = Math.max(ay[index], by[index]) + padding;
+    const distanceAt = (other, t) => {
+      const x = ax[index] + dx * t - ax[other], y = ay[index] + dy * t - ay[other];
+      const u = Math.max(0, Math.min(1, (x * vx[other] + y * vy[other]) / (lengths[other] * lengths[other])));
+      return (x - vx[other] * u) ** 2 + (y - vy[other] * u) ** 2;
+    };
+    for (let x = Math.floor(minX / gridSize); x <= Math.floor(maxX / gridSize); x++) {
+      for (let y = Math.floor(minY / gridSize); y <= Math.floor(maxY / gridSize); y++) {
+        const bucket = grid.get(cellKey(x, y));
+        if (bucket === undefined || buckets[bucket] === owner) continue;
+        for (let slot = bucket + 2, end = slot + buckets[bucket + 1]; slot < end; slot++) {
+          const otherIndex = buckets[slot];
+          if (seen[otherIndex] === index + 1) continue;
+          seen[otherIndex] = index + 1;
+          const other = otherIndex;
+          if ((ax[other] < minX && bx[other] < minX) || (ax[other] > maxX && bx[other] > maxX)
+            || (ay[other] < minY && by[other] < minY) || (ay[other] > maxY && by[other] > maxY)) continue;
+          if (owner === owners[other] || (dx * vx[other] + dy * vy[other]) * sign * signs[other] >= -0.5 * length * lengths[other]) continue;
+          if (owner > owners[other] && pairs.get(owners[other] * ownerCount + owner)?.sides[0].length) continue;
+          const t0 = ((ax[other] - ax[index]) * dx + (ay[other] - ay[index]) * dy) / (length * length);
+          const t1 = ((bx[other] - ax[index]) * dx + (by[other] - ay[index]) * dy) / (length * length);
+          let lo = Math.max(0, Math.min(t0, t1)), hi = Math.min(1, Math.max(t0, t1));
+          if (hi - lo <= 1e-12) continue;
+          const d0 = ((ax[index] + dx * lo - ax[other]) * vy[other] - (ay[index] + dy * lo - ay[other]) * vx[other]) / lengths[other];
+          const d1 = ((ax[index] + dx * hi - ax[other]) * vy[other] - (ay[index] + dy * hi - ay[other]) * vx[other]) / lengths[other];
+          if (d0 * d1 > 0 && Math.min(d0 * d0, d1 * d1) > distanceLimit) continue;
+          const limit = distanceLimit, leftDistance = distanceAt(other, lo), rightDistance = distanceAt(other, hi);
+          if (leftDistance > limit || rightDistance > limit) {
+            const middle = d0 === d1 ? (lo + hi) / 2 : Math.max(lo, Math.min(hi, lo - d0 * (hi - lo) / (d1 - d0)));
+            let inside = leftDistance < rightDistance ? lo : hi;
+            if (distanceAt(other, middle) < distanceAt(other, inside)) inside = middle;
+            if (distanceAt(other, inside) > limit) continue;
+            if (leftDistance > limit) {
+              let outside = lo, hit = inside;
+              while (hit - outside > 1e-12) {
+                const t = (outside + hit) / 2;
+                if (distanceAt(other, t) <= limit) hit = t; else outside = t;
+              }
+              lo = hit;
+            }
+            if (rightDistance > limit) {
+              let outside = hi, hit = inside;
+              while (outside - hit > 1e-12) {
+                const t = (outside + hit) / 2;
+                if (distanceAt(other, t) <= limit) hit = t; else outside = t;
+              }
+              hi = hit;
+            }
+          }
+          if (candidateCount === candidateEdges.length) {
+            const capacity = candidateCount * 2;
+            const nextEdges = new Uint32Array(capacity), nextLo = new Float64Array(capacity), nextHi = new Float64Array(capacity), nextLinks = new Int32Array(capacity);
+            nextEdges.set(candidateEdges); nextLo.set(candidateLo); nextHi.set(candidateHi); nextLinks.set(candidateNext);
+            candidateEdges = nextEdges; candidateLo = nextLo; candidateHi = nextHi; candidateNext = nextLinks;
+            activeCandidates = new Uint32Array(capacity);
+          }
+          const c = candidateCount++, otherOwner = owners[other];
+          candidateEdges[c] = other; candidateLo[c] = lo; candidateHi[c] = hi; candidateNext[c] = -1;
+          if (groupHead[otherOwner] < 0) { groupHead[otherOwner] = c; groups.push(otherOwner); }
+          else candidateNext[groupTail[otherOwner]] = c;
+          groupTail[otherOwner] = c;
+        }
+      }
+    }
+    for (const otherOwner of groups) {
+      const head = groupHead[otherOwner];
+      groupHead[otherOwner] = -1;
+      cuts.length = 0;
+      for (let c = head; c >= 0; c = candidateNext[c]) cuts.push(candidateLo[c], candidateHi[c]);
+      cuts.sort((a, b) => a - b);
+      let run = null;
+      function emit() {
+        if (!run) return;
+        const pair = [Math.min(owner, run.owner), Math.max(owner, run.owner)], key = pair[0] * ownerCount + pair[1];
+        let entry = pairs.get(key); if (!entry) pairs.set(key, entry = { pair, sides: [[], []] });
+        entry.sides[owner === pair[0] ? 0 : 1].push({
+          start: [ax[index] + dx * run.lo, ay[index] + dy * run.lo], end: [ax[index] + dx * run.hi, ay[index] + dy * run.hi], pair, a: null, b: null, startSlot: 0, endSlot: 0,
+        });
+        run = null;
+      }
+      for (let cut = 1; cut < cuts.length; cut++) {
+        const lo = cuts[cut - 1], hi = cuts[cut];
+        if (hi - lo <= 1e-12) continue;
+        let activeCount = 0;
+        const middle = (lo + hi) / 2;
+        for (let c = head; c >= 0; c = candidateNext[c]) {
+          if (middle >= candidateLo[c] && middle <= candidateHi[c]) activeCandidates[activeCount++] = candidateEdges[c];
+        }
+        if (!activeCount) { emit(); continue; }
+        const count = Math.max(1, Math.ceil((hi - lo) * length / (tolerance / 4)));
+        for (let sample = 0; sample < count; sample++) {
+          const from = lo + (hi - lo) * sample / count, to = lo + (hi - lo) * (sample + 1) / count;
+          const t = (from + to) / 2, px = ax[index] + dx * t, py = ay[index] + dy * t;
+          let nearest = -1, nx = 0, ny = 0, distance = distanceLimit;
+          for (let c = 0; c < activeCount; c++) {
+            const other = activeCandidates[c];
+            const u = Math.max(0, Math.min(1, ((px - ax[other]) * vx[other] + (py - ay[other]) * vy[other]) / (lengths[other] * lengths[other])));
+            const qx = ax[other] + vx[other] * u, qy = ay[other] + vy[other] * u;
+            const d = (qx - px) ** 2 + (qy - py) ** 2;
+            if (d <= distance) { nearest = owners[other]; nx = (px + qx) / 2; ny = (py + qy) / 2; distance = d; }
+          }
+          if (nearest >= 0) {
+            const x = nx, y = ny;
+            const accepted = (land ? land(x, y) : distance <= (0.01 + 1e-12) ** 2)
+              || contains(owner, x, y) || contains(nearest, x, y);
+            if (!accepted) { diagnostics.nearSeamRejectedWater++; nearest = -1; }
+          }
+          if (run && run.owner !== nearest) emit();
+          if (nearest >= 0) {
+            if (!run) run = { owner: nearest, lo: from, hi: to };
+            else run.hi = to;
+          }
+        }
+      }
+      emit();
+    }
+  }
+  const searchedAt = performance.now();
+  diagnostics.nearSeamSearchMs = searchedAt - started - diagnostics.nearSeamIndexMs;
+  let vertexCapacity = 8, endpointCount = 0;
+  for (const entry of pairs.values()) endpointCount += (entry.sides[0].length || entry.sides[1].length) * 2;
+  while (vertexCapacity < endpointCount * 2) vertexCapacity *= 2;
+  const vertexX = new Int32Array(vertexCapacity), vertexY = new Int32Array(vertexCapacity);
+  const vertexPair = new Uint32Array(vertexCapacity), degrees = new Uint32Array(vertexCapacity);
+  function vertexSlot(pair, x, y) {
+    let slot = (Math.imul(x, 0x85ebca6b) ^ Math.imul(y, 0xc2b2ae35) ^ Math.imul(pair, 0x9e3779b9)) >>> 0;
+    slot = (slot ^ slot >>> 16) & (vertexCapacity - 1);
+    while (vertexPair[slot] && (vertexPair[slot] !== pair || vertexX[slot] !== x || vertexY[slot] !== y)) slot = (slot + 1) & (vertexCapacity - 1);
+    vertexPair[slot] = pair; vertexX[slot] = x; vertexY[slot] = y;
+    return slot;
+  }
+  let pairIndex = 0;
+  for (const entry of pairs.values()) {
+    const selected = entry.sides[0].length ? entry.sides[0] : entry.sides[1];
+    pairIndex++;
+    entry.selected = selected; entry.joinCells = new Set(); entry.points = new Map();
+    for (const edge of selected) {
+      edge.a = coordinate(edge.start); edge.b = coordinate(edge.end);
+      edge.startSlot = vertexSlot(pairIndex, edge.a[0], edge.a[1]);
+      edge.endSlot = vertexSlot(pairIndex, edge.b[0], edge.b[1]);
+      degrees[edge.startSlot]++; degrees[edge.endSlot]++;
+    }
+  }
+  for (const entry of pairs.values()) {
+    for (const edge of entry.selected) for (let end = 0; end < 2; end++) {
+      if (degrees[end ? edge.endSlot : edge.startSlot] !== 1) continue;
+      const point = end ? edge.end : edge.start, radius = tolerance + 1 / SCALE;
+      for (let x = Math.floor((point[0] - radius) / gridSize); x <= Math.floor((point[0] + radius) / gridSize); x++) {
+        for (let y = Math.floor((point[1] - radius) / gridSize); y <= Math.floor((point[1] + radius) / gridSize); y++) entry.joinCells.add(cellKey(x, y));
+      }
+    }
+  }
+  for (const edge of shared) {
+    const entry = pairs.get(edge.pair[0] * ownerCount + edge.pair[1]);
+    if (!entry) continue;
+    for (let end = 0; end < 2; end++) {
+      const x = edgeCoordinate(edge, !!end, 0), y = edgeCoordinate(edge, !!end, 1);
+      if (!entry.joinCells.has(cellKey(Math.floor(x / SCALE / gridSize), Math.floor(y / SCALE / gridSize)))) continue;
+      const key = `${x},${y}`;
+      if (entry.points.has(key)) entry.points.delete(key);
+      else entry.points.set(key, end ? edge.end : edge.start);
+    }
+  }
+  const result = [];
+  for (const { selected, points: endpointMap } of pairs.values()) {
+    const points = [...endpointMap.values()];
+    for (const edge of selected) {
+      let insertions = null;
+      const origin = edge.start, dx = edge.end[0] - origin[0], dy = edge.end[1] - origin[1];
+      for (let side = 0; side < 2; side++) {
+        const end = side ? 'end' : 'start';
+        if (degrees[side ? edge.endSlot : edge.startSlot] !== 1) continue;
+        let distance = tolerance ** 2, nearest = null;
+        for (const point of points) {
+          const d = (edge[end][0] - point[0]) ** 2 + (edge[end][1] - point[1]) ** 2;
+          if (d < distance) { nearest = point; distance = d; }
+        }
+        if (nearest) {
+          const t = ((nearest[0] - origin[0]) * dx + (nearest[1] - origin[1]) * dy) / (dx * dx + dy * dy);
+          if (t > 0 && t < 1) {
+            if (!insertions) insertions = [{ t, point: nearest }];
+            else if (!insertions.some(entry => entry.point === nearest)) insertions.push({ t, point: nearest });
+          } else if ((end === 'start' && t <= 0) || (end === 'end' && t >= 1)) {
+            edge[end] = nearest; edge[end === 'start' ? 'a' : 'b'] = coordinate(nearest);
+          }
+        }
+      }
+      if (!insertions) {
+        if (compare(edge.a, edge.b)) result.push(edge);
+        continue;
+      }
+      insertions.sort((a, b) => a.t - b.t);
+      const path = [edge.start, ...insertions.map(entry => entry.point), edge.end];
+      for (let i = 1; i < path.length; i++) {
+        const start = path[i - 1], end = path[i], a = coordinate(start), b = coordinate(end);
+        if (compare(a, b)) result.push({ start, end, a, b, pair: edge.pair });
+      }
+    }
+  }
+  diagnostics.nearSeamSegments = result.length;
+  diagnostics.nearSeamJoinMs = performance.now() - searchedAt;
+  diagnostics.nearSeamMs = performance.now() - started;
+  if (memory) {
+    const after = globalThis.process.memoryUsage();
+    diagnostics.nearSeamHeapDeltaBytes = after.heapUsed - memory.heapUsed;
+    diagnostics.nearSeamArrayBufferDeltaBytes = after.arrayBuffers - memory.arrayBuffers;
+  }
+  return result;
+}
+
+function sharedSegments(edges, diagnostics, precisions, options, polygons) {
   const shared = [], unmatched = [];
   for (const edge of edges.values()) {
     const pair = pairFor(edge.members);
@@ -441,13 +719,13 @@ function sharedSegments(edges, diagnostics, precisions) {
   // coordinate grid. Fine/fine boundaries retain 1e-7 identity, even if close.
   // Compare unresolved edges at that grid, require two unique opposite sides,
   // and render the coarser line. Ambiguous overlaps are never welded.
-  const remaining = source.remaining;
+  let remaining = source.remaining;
   const coarseEdges = remaining.filter(edge => precisions.get(Math.abs(edge.members[0]) - 1) === 4);
-  let joinedSources = 0;
   if (coarseEdges.length) {
     const grid = 1000;
     const snap = point => point.map(n => Math.round(n / grid) * grid);
     const candidates = new Map();
+    const unquantized = [];
     const quantize = edge => {
       let a = snap(edge.a), b = snap(edge.b);
       const order = compare(a, b);
@@ -459,29 +737,42 @@ function sharedSegments(edges, diagnostics, precisions) {
         coarse: precisions.get(Math.abs(edge.members[0]) - 1) === 4, source: edge };
     };
     for (const edge of remaining) {
-      const q = quantize(edge); if (!q) continue;
+      const q = quantize(edge); if (!q) { unquantized.push(edge); continue; }
       const key = `${keyOf(q.a)};${keyOf(q.b)}`;
       const group = candidates.get(key);
       if (group) group.push(q); else candidates.set(key, [q]);
     }
     const leftover = [];
     const validMixed = list => list.some(e => e.coarse) && list.some(e => !e.coarse);
-    const joined = new Set();
     for (const group of candidates.values()) {
       const pair = validMixed(group) ? pairFor(group.flatMap(e => e.members)) : null;
       if (pair) {
         const edge = group.find(e => e.coarse);
         shared.push({ ...edge, pair }); diagnostics.quantizedSharedSegments += 1;
-        for (const candidate of group) joined.add(candidate.source);
       } else if (group.length === 1) leftover.push(group[0]);
-      else if (validMixed(group)) diagnostics.ambiguousQuantizedSegments += 1;
+      else {
+        unquantized.push(...group.map(edge => edge.source));
+        if (validMixed(group)) diagnostics.ambiguousQuantizedSegments += 1;
+      }
     }
     const quantized = nodeEdges(leftover, diagnostics, validMixed, 'quantizedSharedSegments');
     for (const edge of quantized.shared) shared.push(edge);
-    for (const edge of quantized.repaired) joined.add(edge.source);
-    joinedSources = joined.size;
+    remaining = unquantized;
+    for (const edge of quantized.remaining) {
+      const original = edge.source, q = quantize(original);
+      const axis = Math.abs(q.b[0] - q.a[0]) >= Math.abs(q.b[1] - q.a[1]) ? 0 : 1;
+      const forward = q.members[0] === original.members[0];
+      const first = forward ? original.start : original.end, last = forward ? original.end : original.start;
+      const interpolate = point => {
+        const t = (point[axis] - q.a[axis]) / (q.b[axis] - q.a[axis]);
+        return first.map((value, i) => value + (last[i] - value) * t);
+      };
+      const start = interpolate(edge.a), end = interpolate(edge.b);
+      remaining.push(copyEdge(original, { start, end, a: coordinate(start), b: coordinate(end), members: q.members }));
+    }
   }
-  diagnostics.oneSidedSegments = remaining.length - joinedSources;
+  diagnostics.oneSidedSegments = remaining.length;
+  for (const edge of nearSeamSegments(remaining, shared, diagnostics, options.nearSeamTolerance, options.land, polygons)) shared.push(edge);
   return shared;
 }
 
@@ -547,14 +838,17 @@ function packChains(segments, featureIds, diagnostics) {
     diagnostics: { ...diagnostics, arcCount: paths.length, pointCount, packedBytes: coordinates.byteLength + offsets.byteLength + owners.byteLength } };
 }
 
-export function createPaintContourGraphBuilder() {
+export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMask = null } = {}) {
   const edges = createCompactEdges(), idToIndex = new Map(), featureIds = [], featureEdges = new Map();
   const invalidRingsById = new Map(), precisions = new Map();
+  const polygons = new Map();
+  let land = createContourWaterQuery(waterMask);
   function remove(featureId) {
     const id = idToIndex.get(String(featureId));
     if (id === undefined) return;
     for (const edge of featureEdges.get(id) || []) edges.removeMember(edge, id + 1);
     featureEdges.delete(id); invalidRingsById.delete(id); precisions.delete(id);
+    polygons.delete(id);
   }
   function add({ id: rawId, geometry, coordinatePrecision = 7 }) {
     const featureId = String(rawId || '').trim();
@@ -564,9 +858,11 @@ export function createPaintContourGraphBuilder() {
     if (id === undefined) { id = featureIds.length; featureIds.push(featureId); idToIndex.set(featureId, id); }
     precisions.set(id, coordinatePrecision === 4 ? 4 : 7);
     const touched = [];
+    const containmentPolygons = [];
     let invalidRings = 0;
     function polygon(rings) {
       if (!Array.isArray(rings)) return;
+      const validRings = [];
       rings.forEach((ring, ringIndex) => {
         if (!Array.isArray(ring) || ring.length < 4) { invalidRings += 1; return; }
         let snapped = ring.map(coordinate);
@@ -580,6 +876,7 @@ export function createPaintContourGraphBuilder() {
           snapped = [...snapped.slice(0, -1), snapped[0]];
         }
         const side = ringSide(ring, ringIndex > 0);
+        validRings.push(ring);
         for (let i = 0; i < snapped.length - 1; i += 1) {
           const order = compare(snapped[i], snapped[i + 1]);
           if (!order) continue;
@@ -590,6 +887,7 @@ export function createPaintContourGraphBuilder() {
           if (edges.addMember(edge, member)) touched.push(edge);
         }
       });
+      if (validRings.length) containmentPolygons.push(validRings);
     }
     function visit(value) {
       if (value?.type === 'Polygon') polygon(value.coordinates);
@@ -597,19 +895,22 @@ export function createPaintContourGraphBuilder() {
       else if (value?.type === 'GeometryCollection') (value.geometries || []).forEach(visit);
     }
     visit(geometry);
+    if (nearSeamTolerance > 0) polygons.set(id, packContourPolygons({ type: 'MultiPolygon', coordinates: containmentPolygons }));
     featureEdges.set(id, Uint32Array.from(touched));
     invalidRingsById.set(id, invalidRings);
   }
   return Object.freeze({
+    setWaterMask(mask) { waterMask = mask; land = createContourWaterQuery(mask); },
     patch(features = [], removedIds = []) { removedIds.forEach(remove); features.forEach(add); },
     finish() {
       const diagnostics = { featureCount: featureEdges.size, segmentCount: edges.size, invalidRings: [...invalidRingsById.values()].reduce((sum, count) => sum + count, 0),
         ambiguousSegments: 0, exactSharedSegments: 0, nodedSharedSegments: 0, sourceNodedSharedSegments: 0,
         sourceLineComparisons: 0, sourceLineMaxBucket: 0, sourceLineSkippedBuckets: 0, sourceLineSkippedGroups: 0,
-        quantizedSharedSegments: 0, ambiguousQuantizedSegments: 0, oneSidedSegments: 0 };
+        quantizedSharedSegments: 0, ambiguousQuantizedSegments: 0, oneSidedSegments: 0,
+        nearSeamSegments: 0, nearSeamRejectedWater: 0, nearSeamMaskMissing: !waterMask, nearSeamMs: 0 };
       edges.beginRead();
       let segments;
-      try { segments = sharedSegments(edges, diagnostics, precisions); }
+      try { segments = sharedSegments(edges, diagnostics, precisions, { nearSeamTolerance, land }, polygons); }
       finally { edges.endRead(); }
       // Packing must not keep views for the unshared world coastline alive.
       // Only accepted shared segments survive into the output phase.
@@ -620,8 +921,8 @@ export function createPaintContourGraphBuilder() {
   });
 }
 
-export function buildPaintContourGraph(features = []) {
-  const builder = createPaintContourGraphBuilder();
+export function buildPaintContourGraph(features = [], options) {
+  const builder = createPaintContourGraphBuilder(options);
   builder.patch(features);
   return builder.finish();
 }

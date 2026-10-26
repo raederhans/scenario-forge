@@ -37,8 +37,8 @@
       ],
       "parent_id": "DE_Baden_W_rttemberg",
       "names": {
-        "en": "Böblingen + Tübingen, Landkreis",
-        "zh": "伯布林根、蒂宾根区"
+        "en": "Böblingen",
+        "zh": "伯布林根"
       },
       "member_names": {
         "DE112": {
@@ -49,7 +49,13 @@
           "en": "Tübingen, Landkreis",
           "zh": "蒂宾根区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Böblingen + Tübingen, Landkreis",
+        "zh": "伯布林根、蒂宾根区"
+      },
+      "name_source": "population",
+      "representative_id": "DE112"
     },
     {
       "id": "DE_MRG_c9a9f2cd9548",
@@ -59,8 +65,8 @@
       ],
       "parent_id": "DE_Baden_W_rttemberg",
       "names": {
-        "en": "Esslingen + Göppingen",
-        "zh": "埃斯林根、格平根"
+        "en": "Esslingen",
+        "zh": "埃斯林根"
       },
       "member_names": {
         "DE113": {
@@ -71,7 +77,13 @@
           "en": "Göppingen",
           "zh": "格平根"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Esslingen + Göppingen",
+        "zh": "埃斯林根、格平根"
+      },
+      "name_source": "population",
+      "representative_id": "DE113"
     },
     {
       "id": "DE_MRG_a27167ef8f23",
@@ -82,8 +94,8 @@
       ],
       "parent_id": "DE_Baden_W_rttemberg",
       "names": {
-        "en": "Ludwigsburg + Rems-Murr-Kreis + Heilbronn, Landkreis",
-        "zh": "路德维希堡、雷姆斯-穆尔圆、海尔布隆区"
+        "en": "Ludwigsburg",
+        "zh": "路德维希堡"
       },
       "member_names": {
         "DE115": {
@@ -98,7 +110,13 @@
           "en": "Heilbronn, Landkreis",
           "zh": "海尔布隆区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ludwigsburg + Rems-Murr-Kreis + Heilbronn, Landkreis",
+        "zh": "路德维希堡、雷姆斯-穆尔圆、海尔布隆区"
+      },
+      "name_source": "population",
+      "representative_id": "DE115"
     },
     {
       "id": "DE_MRG_e87b9124c03f",
@@ -109,8 +127,8 @@
       ],
       "parent_id": "DE_Baden_W_rttemberg",
       "names": {
-        "en": "Hohenlohekreis + Schwäbisch Hall + Ostalbkreis",
-        "zh": "霍恩洛厄区、施韦比施哈尔、奥斯塔布克赖斯"
+        "en": "Ostalbkreis",
+        "zh": "奥斯塔布克赖斯"
       },
       "member_names": {
         "DE119": {
@@ -125,7 +143,13 @@
           "en": "Ostalbkreis",
           "zh": "奥斯塔布克赖斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hohenlohekreis + Schwäbisch Hall + Ostalbkreis",
+        "zh": "霍恩洛厄区、施韦比施哈尔、奥斯塔布克赖斯"
+      },
+      "name_source": "population",
+      "representative_id": "DE11D"
     },
     {
       "id": "DE_MRG_68ba87808df8",
@@ -135,8 +159,8 @@
       ],
       "parent_id": "DE_Baden_W_rttemberg",
       "names": {
-        "en": "Calw + Freudenstadt",
-        "zh": "卡尔夫、弗罗伊登施塔特"
+        "en": "Calw",
+        "zh": "卡尔夫"
       },
       "member_names": {
         "DE12A": {
@@ -147,7 +171,13 @@
           "en": "Freudenstadt",
           "zh": "弗罗伊登施塔特"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Calw + Freudenstadt",
+        "zh": "卡尔夫、弗罗伊登施塔特"
+      },
+      "name_source": "population",
+      "representative_id": "DE12A"
     },
     {
       "id": "DE_MRG_bd0cf439de30",
@@ -157,8 +187,8 @@
       ],
       "parent_id": "DE_Bayern",
       "names": {
-        "en": "Dachau + Freising",
-        "zh": "达豪、弗赖辛"
+        "en": "Freising",
+        "zh": "弗赖辛"
       },
       "member_names": {
         "DE217": {
@@ -169,7 +199,13 @@
           "en": "Freising",
           "zh": "弗赖辛"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dachau + Freising",
+        "zh": "达豪、弗赖辛"
+      },
+      "name_source": "population",
+      "representative_id": "DE21B"
     },
     {
       "id": "DE_MRG_ec3ed49e067c",
@@ -180,8 +216,8 @@
       ],
       "parent_id": "DE_Bayern",
       "names": {
-        "en": "Ebersberg + Fürstenfeldbruck + München, Landkreis",
-        "zh": "埃伯斯贝格、菲尔斯滕费尔德布鲁克、慕尼黑, 区"
+        "en": "München, Landkreis",
+        "zh": "慕尼黑, 区"
       },
       "member_names": {
         "DE218": {
@@ -196,7 +232,13 @@
           "en": "München, Landkreis",
           "zh": "慕尼黑, 区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ebersberg + Fürstenfeldbruck + München, Landkreis",
+        "zh": "埃伯斯贝格、菲尔斯滕费尔德布鲁克、慕尼黑, 区"
+      },
+      "name_source": "population",
+      "representative_id": "DE21H"
     },
     {
       "id": "DE_MRG_3fb6d34d5cec",
@@ -206,8 +248,8 @@
       ],
       "parent_id": "DE_Bayern",
       "names": {
-        "en": "Erding + Mühldorf a. Inn",
-        "zh": "埃尔丁、米尔多夫 A.客栈"
+        "en": "Erding",
+        "zh": "埃尔丁"
       },
       "member_names": {
         "DE21A": {
@@ -218,7 +260,13 @@
           "en": "Mühldorf a. Inn",
           "zh": "米尔多夫 A.客栈"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Erding + Mühldorf a. Inn",
+        "zh": "埃尔丁、米尔多夫 A.客栈"
+      },
+      "name_source": "population",
+      "representative_id": "DE21A"
     },
     {
       "id": "DE_MRG_bf419442ff08",
@@ -229,8 +277,8 @@
       ],
       "parent_id": "DE_Bayern",
       "names": {
-        "en": "Landsberg am Lech + Starnberg + Weilheim-Schongau",
-        "zh": "莱希河畔兰茨贝格、施塔恩贝格、魏尔海姆-雄高"
+        "en": "Weilheim-Schongau",
+        "zh": "魏尔海姆-雄高"
       },
       "member_names": {
         "DE21E": {
@@ -245,7 +293,13 @@
           "en": "Weilheim-Schongau",
           "zh": "魏尔海姆-雄高"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Landsberg am Lech + Starnberg + Weilheim-Schongau",
+        "zh": "莱希河畔兰茨贝格、施塔恩贝格、魏尔海姆-雄高"
+      },
+      "name_source": "population",
+      "representative_id": "DE21N"
     },
     {
       "id": "DE_MRG_d4ab7c811a60",
@@ -256,8 +310,8 @@
       ],
       "parent_id": "DE_Bayern",
       "names": {
-        "en": "Landshut, Kreisfreie Stadt + Landshut, Landkreis + Dingolfing-Landau",
-        "zh": "兰茨胡特，独立城市、兰茨胡特区、丁戈尔芬-兰道"
+        "en": "Landshut, Landkreis",
+        "zh": "兰茨胡特区"
       },
       "member_names": {
         "DE221": {
@@ -272,7 +326,13 @@
           "en": "Dingolfing-Landau",
           "zh": "丁戈尔芬-兰道"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Landshut, Kreisfreie Stadt + Landshut, Landkreis + Dingolfing-Landau",
+        "zh": "兰茨胡特，独立城市、兰茨胡特区、丁戈尔芬-兰道"
+      },
+      "name_source": "population",
+      "representative_id": "DE227"
     },
     {
       "id": "DE_MRG_73019c3017aa",
@@ -282,8 +342,8 @@
       ],
       "parent_id": "DE_Bayern",
       "names": {
-        "en": "Amberg, Kreisfreie Stadt + Amberg-Sulzbach",
-        "zh": "安贝格, 克莱斯自由城、安贝格-苏尔茨巴赫"
+        "en": "Amberg-Sulzbach",
+        "zh": "安贝格-苏尔茨巴赫"
       },
       "member_names": {
         "DE231": {
@@ -294,7 +354,13 @@
           "en": "Amberg-Sulzbach",
           "zh": "安贝格-苏尔茨巴赫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Amberg, Kreisfreie Stadt + Amberg-Sulzbach",
+        "zh": "安贝格, 克莱斯自由城、安贝格-苏尔茨巴赫"
+      },
+      "name_source": "population",
+      "representative_id": "DE234"
     },
     {
       "id": "DE_MRG_08a36bff89a0",
@@ -304,8 +370,8 @@
       ],
       "parent_id": "DE_Bayern",
       "names": {
-        "en": "Roth + Weißenburg-Gunzenhausen",
-        "zh": "罗斯、魏森堡-贡岑豪森"
+        "en": "Roth",
+        "zh": "罗斯"
       },
       "member_names": {
         "DE25B": {
@@ -316,7 +382,13 @@
           "en": "Weißenburg-Gunzenhausen",
           "zh": "魏森堡-贡岑豪森"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Roth + Weißenburg-Gunzenhausen",
+        "zh": "罗斯、魏森堡-贡岑豪森"
+      },
+      "name_source": "population",
+      "representative_id": "DE25B"
     },
     {
       "id": "DE_MRG_348581c848f8",
@@ -327,8 +399,8 @@
       ],
       "parent_id": "DE_Bayern",
       "names": {
-        "en": "Bamberg, Kreisfreie Stadt + Bamberg, Landkreis + Lichtenfels",
-        "zh": "班贝格, 克莱斯自由城、班贝格县、利希滕费尔斯"
+        "en": "Bamberg, Landkreis",
+        "zh": "班贝格县"
       },
       "member_names": {
         "DE241": {
@@ -343,7 +415,13 @@
           "en": "Lichtenfels",
           "zh": "利希滕费尔斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bamberg, Kreisfreie Stadt + Bamberg, Landkreis + Lichtenfels",
+        "zh": "班贝格, 克莱斯自由城、班贝格县、利希滕费尔斯"
+      },
+      "name_source": "population",
+      "representative_id": "DE245"
     },
     {
       "id": "DE_MRG_22b5c35ff0db",
@@ -354,8 +432,8 @@
       ],
       "parent_id": "DE_Bayern",
       "names": {
-        "en": "Bayreuth, Kreisfreie Stadt + Bayreuth, Landkreis + Kulmbach",
-        "zh": "拜罗伊特, 克莱斯自由城、拜罗伊特, 兰德克莱斯、库姆巴赫"
+        "en": "Bayreuth, Landkreis",
+        "zh": "拜罗伊特, 兰德克莱斯"
       },
       "member_names": {
         "DE242": {
@@ -370,7 +448,13 @@
           "en": "Kulmbach",
           "zh": "库姆巴赫"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Bayreuth, Kreisfreie Stadt + Bayreuth, Landkreis + Kulmbach",
+        "zh": "拜罗伊特, 克莱斯自由城、拜罗伊特, 兰德克莱斯、库姆巴赫"
+      },
+      "name_source": "population",
+      "representative_id": "DE246"
     },
     {
       "id": "DE_MRG_88b2cc10d998",
@@ -381,8 +465,8 @@
       ],
       "parent_id": "DE_Bayern",
       "names": {
-        "en": "Forchheim + Erlangen-Höchstadt + Fürth, Landkreis",
-        "zh": "福希海姆、埃尔兰根-赫希施塔特、菲尔特, 兰德克赖斯"
+        "en": "Erlangen-Höchstadt",
+        "zh": "埃尔兰根-赫希施塔特"
       },
       "member_names": {
         "DE248": {
@@ -397,7 +481,13 @@
           "en": "Fürth, Landkreis",
           "zh": "菲尔特, 兰德克赖斯"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Forchheim + Erlangen-Höchstadt + Fürth, Landkreis",
+        "zh": "福希海姆、埃尔兰根-赫希施塔特、菲尔特, 兰德克赖斯"
+      },
+      "name_source": "population",
+      "representative_id": "DE257"
     },
     {
       "id": "DE_MRG_d7270b2f4f53",
@@ -408,8 +498,8 @@
       ],
       "parent_id": "DE_Bayern",
       "names": {
-        "en": "Schweinfurt, Kreisfreie Stadt + Kitzingen + Schweinfurt, Landkreis",
-        "zh": "施韦因富特，独立城市、基青根、施韦因富特区"
+        "en": "Schweinfurt, Landkreis",
+        "zh": "施韦因富特区"
       },
       "member_names": {
         "DE262": {
@@ -424,7 +514,13 @@
           "en": "Schweinfurt, Landkreis",
           "zh": "施韦因富特区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Schweinfurt, Kreisfreie Stadt + Kitzingen + Schweinfurt, Landkreis",
+        "zh": "施韦因富特，独立城市、基青根、施韦因富特区"
+      },
+      "name_source": "population",
+      "representative_id": "DE26B"
     },
     {
       "id": "DE_MRG_54666399e0ac",
@@ -435,8 +531,8 @@
       ],
       "parent_id": "DE_Brandenburg",
       "names": {
-        "en": "Brandenburg an der Havel, Kreisfreie Stadt + Havelland + Potsdam-Mittelmark",
-        "zh": "哈弗尔河畔勃兰登堡, 克莱斯自由城、哈弗兰、波茨坦-米特尔马克"
+        "en": "Potsdam-Mittelmark",
+        "zh": "波茨坦-米特尔马克"
       },
       "member_names": {
         "DE401": {
@@ -451,7 +547,13 @@
           "en": "Potsdam-Mittelmark",
           "zh": "波茨坦-米特尔马克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Brandenburg an der Havel, Kreisfreie Stadt + Havelland + Potsdam-Mittelmark",
+        "zh": "哈弗尔河畔勃兰登堡, 克莱斯自由城、哈弗兰、波茨坦-米特尔马克"
+      },
+      "name_source": "population",
+      "representative_id": "DE40E"
     },
     {
       "id": "DE_MRG_a235cf36d16c",
@@ -461,8 +563,8 @@
       ],
       "parent_id": "DE_Brandenburg",
       "names": {
-        "en": "Dahme-Spreewald + Teltow-Fläming",
-        "zh": "达默-施普雷瓦尔德、特尔托-弗莱明"
+        "en": "Dahme-Spreewald",
+        "zh": "达默-施普雷瓦尔德"
       },
       "member_names": {
         "DE406": {
@@ -473,7 +575,13 @@
           "en": "Teltow-Fläming",
           "zh": "特尔托-弗莱明"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dahme-Spreewald + Teltow-Fläming",
+        "zh": "达默-施普雷瓦尔德、特尔托-弗莱明"
+      },
+      "name_source": "population",
+      "representative_id": "DE406"
     },
     {
       "id": "DE_MRG_171e39a343f9",
@@ -483,8 +591,8 @@
       ],
       "parent_id": "DE_Brandenburg",
       "names": {
-        "en": "Oberhavel + Ostprignitz-Ruppin",
-        "zh": "奥伯哈维尔、奥斯特普里尼茨-鲁平"
+        "en": "Oberhavel",
+        "zh": "奥伯哈维尔"
       },
       "member_names": {
         "DE40A": {
@@ -495,7 +603,13 @@
           "en": "Ostprignitz-Ruppin",
           "zh": "奥斯特普里尼茨-鲁平"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Oberhavel + Ostprignitz-Ruppin",
+        "zh": "奥伯哈维尔、奥斯特普里尼茨-鲁平"
+      },
+      "name_source": "population",
+      "representative_id": "DE40A"
     },
     {
       "id": "DE_MRG_77741e43de3f",
@@ -505,8 +619,8 @@
       ],
       "parent_id": "DE_Hessen",
       "names": {
-        "en": "Darmstadt-Dieburg + Offenbach, Landkreis",
-        "zh": "达姆施塔特-迪堡、奥芬巴赫区"
+        "en": "Offenbach, Landkreis",
+        "zh": "奥芬巴赫区"
       },
       "member_names": {
         "DE716": {
@@ -517,7 +631,13 @@
           "en": "Offenbach, Landkreis",
           "zh": "奥芬巴赫区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Darmstadt-Dieburg + Offenbach, Landkreis",
+        "zh": "达姆施塔特-迪堡、奥芬巴赫区"
+      },
+      "name_source": "population",
+      "representative_id": "DE71C"
     },
     {
       "id": "DE_MRG_e2f350a636b5",
@@ -527,8 +647,8 @@
       ],
       "parent_id": "DE_Hessen",
       "names": {
-        "en": "Hochtaunuskreis + Main-Taunus-Kreis",
-        "zh": "上陶努斯克雷斯、美因-陶努斯-县"
+        "en": "Hochtaunuskreis",
+        "zh": "上陶努斯克雷斯"
       },
       "member_names": {
         "DE718": {
@@ -539,7 +659,13 @@
           "en": "Main-Taunus-Kreis",
           "zh": "美因-陶努斯-县"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hochtaunuskreis + Main-Taunus-Kreis",
+        "zh": "上陶努斯克雷斯、美因-陶努斯-县"
+      },
+      "name_source": "population",
+      "representative_id": "DE718"
     },
     {
       "id": "DE_MRG_e2617eca3f85",
@@ -550,8 +676,8 @@
       ],
       "parent_id": "DE_Hessen",
       "names": {
-        "en": "Main-Kinzig-Kreis + Wetteraukreis + Gießen, Landkreis",
-        "zh": "美茵-金齐希区、韦特劳克雷斯、吉森区"
+        "en": "Gießen",
+        "zh": "吉森"
       },
       "member_names": {
         "DE719": {
@@ -566,7 +692,13 @@
           "en": "Gießen, Landkreis",
           "zh": "吉森区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Main-Kinzig-Kreis + Wetteraukreis + Gießen, Landkreis",
+        "zh": "美茵-金齐希区、韦特劳克雷斯、吉森区"
+      },
+      "name_source": "city",
+      "representative_id": "DE721"
     },
     {
       "id": "DE_MRG_3b750624bff4",
@@ -576,8 +708,8 @@
       ],
       "parent_id": "DE_Hessen",
       "names": {
-        "en": "Lahn-Dill-Kreis + Limburg-Weilburg",
-        "zh": "兰迪尔区、林堡-魏尔堡"
+        "en": "Lahn-Dill-Kreis",
+        "zh": "兰迪尔区"
       },
       "member_names": {
         "DE722": {
@@ -588,7 +720,13 @@
           "en": "Limburg-Weilburg",
           "zh": "林堡-魏尔堡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Lahn-Dill-Kreis + Limburg-Weilburg",
+        "zh": "兰迪尔区、林堡-魏尔堡"
+      },
+      "name_source": "population",
+      "representative_id": "DE722"
     },
     {
       "id": "DE_MRG_d561808c92a5",
@@ -598,8 +736,8 @@
       ],
       "parent_id": "DE_Hessen",
       "names": {
-        "en": "Vogelsbergkreis + Fulda",
-        "zh": "福格尔斯贝格地区、富尔达"
+        "en": "Fulda",
+        "zh": "富尔达"
       },
       "member_names": {
         "DE725": {
@@ -610,7 +748,13 @@
           "en": "Fulda",
           "zh": "富尔达"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Vogelsbergkreis + Fulda",
+        "zh": "福格尔斯贝格地区、富尔达"
+      },
+      "name_source": "population",
+      "representative_id": "DE732"
     },
     {
       "id": "DE_MRG_33b1389d946f",
@@ -620,8 +764,8 @@
       ],
       "parent_id": "DE_Hessen",
       "names": {
-        "en": "Hersfeld-Rotenburg + Schwalm-Eder-Kreis",
-        "zh": "赫斯菲尔德-罗滕堡、施瓦尔姆-埃德圆"
+        "en": "Schwalm-Eder-Kreis",
+        "zh": "施瓦尔姆-埃德圆"
       },
       "member_names": {
         "DE733": {
@@ -632,7 +776,13 @@
           "en": "Schwalm-Eder-Kreis",
           "zh": "施瓦尔姆-埃德圆"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hersfeld-Rotenburg + Schwalm-Eder-Kreis",
+        "zh": "赫斯菲尔德-罗滕堡、施瓦尔姆-埃德圆"
+      },
+      "name_source": "population",
+      "representative_id": "DE735"
     },
     {
       "id": "DE_MRG_ce73c32b1090",
@@ -642,8 +792,8 @@
       ],
       "parent_id": "DE_Mecklenburg_Vorpommern",
       "names": {
-        "en": "Mecklenburgische Seenplatte + Vorpommern-Rügen",
-        "zh": "梅克伦堡湖区、西波美拉尼亚-吕根岛"
+        "en": "Stralsund",
+        "zh": "施特拉尔松德"
       },
       "member_names": {
         "DE80J": {
@@ -654,7 +804,13 @@
           "en": "Vorpommern-Rügen",
           "zh": "西波美拉尼亚-吕根岛"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Mecklenburgische Seenplatte + Vorpommern-Rügen",
+        "zh": "梅克伦堡湖区、西波美拉尼亚-吕根岛"
+      },
+      "name_source": "city",
+      "representative_id": "DE80L"
     },
     {
       "id": "DE_MRG_9e1fff10ce51",
@@ -664,8 +820,8 @@
       ],
       "parent_id": "DE_Niedersachsen",
       "names": {
-        "en": "Gifhorn + Peine",
-        "zh": "吉夫霍恩、惩罚"
+        "en": "Gifhorn",
+        "zh": "吉夫霍恩"
       },
       "member_names": {
         "DE914": {
@@ -676,7 +832,13 @@
           "en": "Peine",
           "zh": "惩罚"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Gifhorn + Peine",
+        "zh": "吉夫霍恩、惩罚"
+      },
+      "name_source": "population",
+      "representative_id": "DE914"
     },
     {
       "id": "DE_MRG_46ade2104d23",
@@ -686,8 +848,8 @@
       ],
       "parent_id": "DE_Niedersachsen",
       "names": {
-        "en": "Helmstedt + Wolfenbüttel",
-        "zh": "赫尔姆施泰特、沃尔芬比特尔"
+        "en": "Wolfenbüttel",
+        "zh": "沃尔芬比特尔"
       },
       "member_names": {
         "DE917": {
@@ -698,7 +860,13 @@
           "en": "Wolfenbüttel",
           "zh": "沃尔芬比特尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Helmstedt + Wolfenbüttel",
+        "zh": "赫尔姆施泰特、沃尔芬比特尔"
+      },
+      "name_source": "population",
+      "representative_id": "DE91B"
     },
     {
       "id": "DE_MRG_4ab0c6062d32",
@@ -708,8 +876,8 @@
       ],
       "parent_id": "DE_Niedersachsen",
       "names": {
-        "en": "Northeim + Holzminden",
-        "zh": "诺特海姆、霍尔兹明登"
+        "en": "Northeim",
+        "zh": "诺特海姆"
       },
       "member_names": {
         "DE918": {
@@ -720,7 +888,13 @@
           "en": "Holzminden",
           "zh": "霍尔兹明登"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Northeim + Holzminden",
+        "zh": "诺特海姆、霍尔兹明登"
+      },
+      "name_source": "population",
+      "representative_id": "DE918"
     },
     {
       "id": "DE_MRG_830e5845fb60",
@@ -730,8 +904,8 @@
       ],
       "parent_id": "DE_Niedersachsen",
       "names": {
-        "en": "Diepholz + Nienburg (Weser)",
-        "zh": "迪普霍尔茨、宁堡（威悉河）"
+        "en": "Diepholz",
+        "zh": "迪普霍尔茨"
       },
       "member_names": {
         "DE922": {
@@ -742,7 +916,13 @@
           "en": "Nienburg (Weser)",
           "zh": "宁堡（威悉河）"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Diepholz + Nienburg (Weser)",
+        "zh": "迪普霍尔茨、宁堡（威悉河）"
+      },
+      "name_source": "population",
+      "representative_id": "DE922"
     },
     {
       "id": "DE_MRG_4fdd27cf49f7",
@@ -752,8 +932,8 @@
       ],
       "parent_id": "DE_Niedersachsen",
       "names": {
-        "en": "Hameln-Pyrmont + Schaumburg",
-        "zh": "哈默尔恩-皮尔蒙特、绍姆堡"
+        "en": "Schaumburg",
+        "zh": "绍姆堡"
       },
       "member_names": {
         "DE923": {
@@ -764,7 +944,13 @@
           "en": "Schaumburg",
           "zh": "绍姆堡"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hameln-Pyrmont + Schaumburg",
+        "zh": "哈默尔恩-皮尔蒙特、绍姆堡"
+      },
+      "name_source": "population",
+      "representative_id": "DE928"
     },
     {
       "id": "DE_MRG_5dd80c1fcf77",
@@ -774,8 +960,8 @@
       ],
       "parent_id": "DE_Niedersachsen",
       "names": {
-        "en": "Celle + Heidekreis",
-        "zh": "策勒、希斯圆环"
+        "en": "Celle",
+        "zh": "策勒"
       },
       "member_names": {
         "DE931": {
@@ -786,7 +972,13 @@
           "en": "Heidekreis",
           "zh": "希斯圆环"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Celle + Heidekreis",
+        "zh": "策勒、希斯圆环"
+      },
+      "name_source": "population",
+      "representative_id": "DE931"
     },
     {
       "id": "DE_MRG_698a45847033",
@@ -796,8 +988,8 @@
       ],
       "parent_id": "DE_Niedersachsen",
       "names": {
-        "en": "Rotenburg (Wümme) + Verden",
-        "zh": "罗滕堡 (乌姆)、世界"
+        "en": "Rotenburg (Wümme)",
+        "zh": "罗滕堡 (乌姆)"
       },
       "member_names": {
         "DE937": {
@@ -808,7 +1000,13 @@
           "en": "Verden",
           "zh": "世界"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Rotenburg (Wümme) + Verden",
+        "zh": "罗滕堡 (乌姆)、世界"
+      },
+      "name_source": "population",
+      "representative_id": "DE937"
     },
     {
       "id": "DE_MRG_67a8450f3c9f",
@@ -818,8 +1016,8 @@
       ],
       "parent_id": "DE_Niedersachsen",
       "names": {
-        "en": "Ammerland + Wesermarsch",
-        "zh": "阿默兰、威悉马什"
+        "en": "Ammerland",
+        "zh": "阿默兰"
       },
       "member_names": {
         "DE946": {
@@ -830,7 +1028,13 @@
           "en": "Wesermarsch",
           "zh": "威悉马什"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ammerland + Wesermarsch",
+        "zh": "阿默兰、威悉马什"
+      },
+      "name_source": "population",
+      "representative_id": "DE946"
     },
     {
       "id": "DE_MRG_3a19ae12c637",
@@ -841,8 +1045,8 @@
       ],
       "parent_id": "DE_Niedersachsen",
       "names": {
-        "en": "Aurich + Friesland (DE) + Wittmund",
-        "zh": "奥里希、弗里斯兰（德国）、维特蒙德"
+        "en": "Aurich",
+        "zh": "奥里希"
       },
       "member_names": {
         "DE947": {
@@ -857,7 +1061,13 @@
           "en": "Wittmund",
           "zh": "维特蒙德"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Aurich + Friesland (DE) + Wittmund",
+        "zh": "奥里希、弗里斯兰（德国）、维特蒙德"
+      },
+      "name_source": "population",
+      "representative_id": "DE947"
     },
     {
       "id": "DE_MRG_c922c0ebada5",
@@ -868,8 +1078,8 @@
       ],
       "parent_id": "DE_Niedersachsen",
       "names": {
-        "en": "Cloppenburg + Osnabrück, Landkreis + Vechta",
-        "zh": "克洛彭堡、奥斯纳布吕克区、维希塔"
+        "en": "Osnabrück, Landkreis",
+        "zh": "奥斯纳布吕克区"
       },
       "member_names": {
         "DE948": {
@@ -884,7 +1094,13 @@
           "en": "Vechta",
           "zh": "维希塔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Cloppenburg + Osnabrück, Landkreis + Vechta",
+        "zh": "克洛彭堡、奥斯纳布吕克区、维希塔"
+      },
+      "name_source": "population",
+      "representative_id": "DE94E"
     },
     {
       "id": "DE_MRG_70752f860917",
@@ -894,8 +1110,8 @@
       ],
       "parent_id": "DE_Nordrhein_Westfalen",
       "names": {
-        "en": "Coesfeld + Unna",
-        "zh": "科斯费尔德、离开"
+        "en": "Unna",
+        "zh": "离开"
       },
       "member_names": {
         "DEA35": {
@@ -906,7 +1122,13 @@
           "en": "Unna",
           "zh": "离开"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Coesfeld + Unna",
+        "zh": "科斯费尔德、离开"
+      },
+      "name_source": "population",
+      "representative_id": "DEA5C"
     },
     {
       "id": "DE_MRG_9410ac111320",
@@ -916,8 +1138,8 @@
       ],
       "parent_id": "DE_Nordrhein_Westfalen",
       "names": {
-        "en": "Warendorf + Gütersloh",
-        "zh": "瓦伦多夫、居特斯洛"
+        "en": "Gütersloh",
+        "zh": "居特斯洛"
       },
       "member_names": {
         "DEA38": {
@@ -928,7 +1150,13 @@
           "en": "Gütersloh",
           "zh": "居特斯洛"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Warendorf + Gütersloh",
+        "zh": "瓦伦多夫、居特斯洛"
+      },
+      "name_source": "population",
+      "representative_id": "DEA42"
     },
     {
       "id": "DE_MRG_5adb00f4a83d",
@@ -938,8 +1166,8 @@
       ],
       "parent_id": "DE_Nordrhein_Westfalen",
       "names": {
-        "en": "Herford + Minden-Lübbecke",
-        "zh": "赫尔福德、明登-吕贝克"
+        "en": "Minden-Lübbecke",
+        "zh": "明登-吕贝克"
       },
       "member_names": {
         "DEA43": {
@@ -950,7 +1178,13 @@
           "en": "Minden-Lübbecke",
           "zh": "明登-吕贝克"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Herford + Minden-Lübbecke",
+        "zh": "赫尔福德、明登-吕贝克"
+      },
+      "name_source": "population",
+      "representative_id": "DEA46"
     },
     {
       "id": "DE_MRG_6f627c55e7bd",
@@ -961,8 +1195,8 @@
       ],
       "parent_id": "DE_Nordrhein_Westfalen",
       "names": {
-        "en": "Hochsauerlandkreis + Olpe + Soest",
-        "zh": "霍赫绍尔兰区、奥尔佩、索斯特"
+        "en": "Soest",
+        "zh": "索斯特"
       },
       "member_names": {
         "DEA57": {
@@ -977,7 +1211,13 @@
           "en": "Soest",
           "zh": "索斯特"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Hochsauerlandkreis + Olpe + Soest",
+        "zh": "霍赫绍尔兰区、奥尔佩、索斯特"
+      },
+      "name_source": "population",
+      "representative_id": "DEA5B"
     },
     {
       "id": "DE_MRG_c6f2d9d3d036",
@@ -988,8 +1228,8 @@
       ],
       "parent_id": "DE_Rheinland_Pfalz",
       "names": {
-        "en": "Birkenfeld + Bernkastel-Wittlich + Vulkaneifel",
-        "zh": "比肯费尔德、贝恩卡斯特尔-维特利希、埃菲尔火山"
+        "en": "Bernkastel-Wittlich",
+        "zh": "贝恩卡斯特尔-维特利希"
       },
       "member_names": {
         "DEB15": {
@@ -1004,7 +1244,13 @@
           "en": "Vulkaneifel",
           "zh": "埃菲尔火山"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Birkenfeld + Bernkastel-Wittlich + Vulkaneifel",
+        "zh": "比肯费尔德、贝恩卡斯特尔-维特利希、埃菲尔火山"
+      },
+      "name_source": "population",
+      "representative_id": "DEB22"
     },
     {
       "id": "DE_MRG_bceaa37f49ef",
@@ -1015,8 +1261,8 @@
       ],
       "parent_id": "DE_Rheinland_Pfalz",
       "names": {
-        "en": "Kaiserslautern, Kreisfreie Stadt + Kaiserslautern, Landkreis + Kusel",
-        "zh": "凯撒斯劳滕，独立城市、凯撒斯劳滕区、库塞尔"
+        "en": "Kaiserslautern, Kreisfreie Stadt",
+        "zh": "凯撒斯劳滕，独立城市"
       },
       "member_names": {
         "DEB32": {
@@ -1031,7 +1277,13 @@
           "en": "Kusel",
           "zh": "库塞尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Kaiserslautern, Kreisfreie Stadt + Kaiserslautern, Landkreis + Kusel",
+        "zh": "凯撒斯劳滕，独立城市、凯撒斯劳滕区、库塞尔"
+      },
+      "name_source": "population",
+      "representative_id": "DEB32"
     },
     {
       "id": "DE_MRG_ea826ec181b8",
@@ -1041,8 +1293,8 @@
       ],
       "parent_id": "DE_Rheinland_Pfalz",
       "names": {
-        "en": "Alzey-Worms + Mainz-Bingen",
-        "zh": "阿尔蔡-沃尔姆斯、美因茨-宾根"
+        "en": "Mainz-Bingen",
+        "zh": "美因茨-宾根"
       },
       "member_names": {
         "DEB3B": {
@@ -1053,7 +1305,13 @@
           "en": "Mainz-Bingen",
           "zh": "美因茨-宾根"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Alzey-Worms + Mainz-Bingen",
+        "zh": "阿尔蔡-沃尔姆斯、美因茨-宾根"
+      },
+      "name_source": "population",
+      "representative_id": "DEB3J"
     },
     {
       "id": "DE_MRG_d67a0e4a728d",
@@ -1063,8 +1321,8 @@
       ],
       "parent_id": "DE_Schleswig_Holstein",
       "names": {
-        "en": "Dithmarschen + Rendsburg-Eckernförde",
-        "zh": "迪特马尔申、伦茨堡-埃肯弗德"
+        "en": "Rendsburg-Eckernförde",
+        "zh": "伦茨堡-埃肯弗德"
       },
       "member_names": {
         "DEF05": {
@@ -1075,7 +1333,13 @@
           "en": "Rendsburg-Eckernförde",
           "zh": "伦茨堡-埃肯弗德"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Dithmarschen + Rendsburg-Eckernförde",
+        "zh": "迪特马尔申、伦茨堡-埃肯弗德"
+      },
+      "name_source": "population",
+      "representative_id": "DEF0B"
     },
     {
       "id": "DE_MRG_98e486211a34",
@@ -1086,8 +1350,8 @@
       ],
       "parent_id": "DE_Th_ringen",
       "names": {
-        "en": "Suhl, Kreisfreie Stadt + Schmalkalden-Meiningen + Hildburghausen",
-        "zh": "苏尔，独立城市、施马尔卡尔登-迈宁根、希尔德布格豪森"
+        "en": "Schmalkalden-Meiningen",
+        "zh": "施马尔卡尔登-迈宁根"
       },
       "member_names": {
         "DEG04": {
@@ -1102,7 +1366,13 @@
           "en": "Hildburghausen",
           "zh": "希尔德布格豪森"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Suhl, Kreisfreie Stadt + Schmalkalden-Meiningen + Hildburghausen",
+        "zh": "苏尔，独立城市、施马尔卡尔登-迈宁根、希尔德布格豪森"
+      },
+      "name_source": "population",
+      "representative_id": "DEG0B"
     },
     {
       "id": "DE_MRG_c90ee890d36c",
@@ -1113,8 +1383,8 @@
       ],
       "parent_id": "DE_Th_ringen",
       "names": {
-        "en": "Weimar, Kreisfreie Stadt + Weimarer Land + Saale-Holzland-Kreis",
-        "zh": "魏玛，独立城市、魏玛国家、萨勒-霍尔茨兰区"
+        "en": "Saale-Holzland-Kreis",
+        "zh": "萨勒-霍尔茨兰区"
       },
       "member_names": {
         "DEG05": {
@@ -1129,7 +1399,13 @@
           "en": "Saale-Holzland-Kreis",
           "zh": "萨勒-霍尔茨兰区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Weimar, Kreisfreie Stadt + Weimarer Land + Saale-Holzland-Kreis",
+        "zh": "魏玛，独立城市、魏玛国家、萨勒-霍尔茨兰区"
+      },
+      "name_source": "population",
+      "representative_id": "DEG0J"
     },
     {
       "id": "DE_MRG_b86ffe1dd2ea",
@@ -1140,8 +1416,8 @@
       ],
       "parent_id": "DE_Th_ringen",
       "names": {
-        "en": "Nordhausen + Kyffhäuserkreis + Sömmerda",
-        "zh": "诺德豪森、凯夫豪瑟区、索默达"
+        "en": "Nordhausen",
+        "zh": "诺德豪森"
       },
       "member_names": {
         "DEG07": {
@@ -1156,7 +1432,13 @@
           "en": "Sömmerda",
           "zh": "索默达"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Nordhausen + Kyffhäuserkreis + Sömmerda",
+        "zh": "诺德豪森、凯夫豪瑟区、索默达"
+      },
+      "name_source": "population",
+      "representative_id": "DEG07"
     },
     {
       "id": "DE_MRG_cc565c282846",
@@ -1167,8 +1449,8 @@
       ],
       "parent_id": "DE_Th_ringen",
       "names": {
-        "en": "Unstrut-Hainich-Kreis + Eisenach, Kreisfreie Stadt + Wartburgkreis",
-        "zh": "温斯特鲁特-海尼希区、艾森纳赫, 克莱斯自由城、瓦尔特堡区"
+        "en": "Wartburgkreis",
+        "zh": "瓦尔特堡区"
       },
       "member_names": {
         "DEG09": {
@@ -1183,7 +1465,13 @@
           "en": "Wartburgkreis",
           "zh": "瓦尔特堡区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Unstrut-Hainich-Kreis + Eisenach, Kreisfreie Stadt + Wartburgkreis",
+        "zh": "温斯特鲁特-海尼希区、艾森纳赫, 克莱斯自由城、瓦尔特堡区"
+      },
+      "name_source": "population",
+      "representative_id": "DEG0P"
     },
     {
       "id": "DE_MRG_ac1a1840dec2",
@@ -1194,8 +1482,8 @@
       ],
       "parent_id": "DE_Th_ringen",
       "names": {
-        "en": "Ilm-Kreis + Saalfeld-Rudolstadt + Saale-Orla-Kreis",
-        "zh": "伊尔姆区、萨尔费尔德-鲁多尔施塔特、萨勒-奥尔拉区"
+        "en": "Saalfeld-Rudolstadt",
+        "zh": "萨尔费尔德-鲁多尔施塔特"
       },
       "member_names": {
         "DEG0F": {
@@ -1210,7 +1498,13 @@
           "en": "Saale-Orla-Kreis",
           "zh": "萨勒-奥尔拉区"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Ilm-Kreis + Saalfeld-Rudolstadt + Saale-Orla-Kreis",
+        "zh": "伊尔姆区、萨尔费尔德-鲁多尔施塔特、萨勒-奥尔拉区"
+      },
+      "name_source": "population",
+      "representative_id": "DEG0I"
     },
     {
       "id": "FR_MRG_ef55d0091c1e",
@@ -1220,8 +1514,8 @@
       ],
       "parent_id": "FR_Normandie",
       "names": {
-        "en": "Coutances + Saint-Lô",
-        "zh": "库坦塞斯、圣洛"
+        "en": "Saint-Lô",
+        "zh": "圣洛"
       },
       "member_names": {
         "FR_ARR_50003": {
@@ -1232,7 +1526,13 @@
           "en": "Saint-Lô",
           "zh": "圣洛"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Coutances + Saint-Lô",
+        "zh": "库坦塞斯、圣洛"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_50004"
     },
     {
       "id": "FR_MRG_6d703ee3f8dc",
@@ -1242,8 +1542,8 @@
       ],
       "parent_id": "FR_Bretagne",
       "names": {
-        "en": "Guingamp + Saint-Brieuc",
-        "zh": "甘冈、圣布里厄"
+        "en": "Saint-Brieuc",
+        "zh": "圣布里厄"
       },
       "member_names": {
         "FR_ARR_22002": {
@@ -1254,7 +1554,13 @@
           "en": "Saint-Brieuc",
           "zh": "圣布里厄"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Guingamp + Saint-Brieuc",
+        "zh": "甘冈、圣布里厄"
+      },
+      "name_source": "city",
+      "representative_id": "FR_ARR_22004"
     },
     {
       "id": "FR_MRG_5b1fca32ff2c",
@@ -1265,8 +1571,8 @@
       ],
       "parent_id": "FR_Bretagne",
       "names": {
-        "en": "Châteaulin + Morlaix + Quimper",
-        "zh": "沙托兰、莫尔莱、坎佩尔"
+        "en": "Quimper",
+        "zh": "坎佩尔"
       },
       "member_names": {
         "FR_ARR_29002": {
@@ -1281,7 +1587,13 @@
           "en": "Quimper",
           "zh": "坎佩尔"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Châteaulin + Morlaix + Quimper",
+        "zh": "沙托兰、莫尔莱、坎佩尔"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_29004"
     },
     {
       "id": "FR_MRG_a3ac3f104566",
@@ -1292,8 +1604,8 @@
       ],
       "parent_id": "FR_Normandie",
       "names": {
-        "en": "Alençon + Argentan + Mortagne-au-Perche",
-        "zh": "阿朗松、阿根廷、莫尔塔涅奥佩尔什"
+        "en": "Argentan",
+        "zh": "阿根廷"
       },
       "member_names": {
         "FR_ARR_61001": {
@@ -1308,7 +1620,13 @@
           "en": "Mortagne-au-Perche",
           "zh": "莫尔塔涅奥佩尔什"
         }
-      }
+      },
+      "previous_names": {
+        "en": "Alençon + Argentan + Mortagne-au-Perche",
+        "zh": "阿朗松、阿根廷、莫尔塔涅奥佩尔什"
+      },
+      "name_source": "population",
+      "representative_id": "FR_ARR_61002"
     },
     {
       "id": "FR_MRG_7c681aa2032e",
@@ -1319,8 +1637,8 @@
       ],
       "parent_id": "FR_Hauts_de_France",
       "names": {
-        "en": "Boulogne-sur-Mer + Saint-Omer + Calais",
-        "zh": "博嫩、圣奥马尔斯、卡勒斯"
+        "en": "Calais",
+        "zh": "加来"
       },
       "member_names": {
         "FR_ARR_62003": {
@@ -1334,6 +1652,34 @@
         "FR_ARR_62006": {
           "en": "Calais",
           "zh": "卡勒斯"
+        }
+      },
+      "previous_names": {
+        "en": "Boulogne-sur-Mer + Saint-Omer + Calais",
+        "zh": "博嫩、圣奥马尔斯、卡勒斯"
+      },
+      "name_source": "city",
+      "representative_id": "FR_ARR_62006",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Kalen",
+          "zh": "卡伦"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "FR_ARR_62003": {
+            "en": "Bonen",
+            "zh": "博嫩"
+          },
+          "FR_ARR_62005": {
+            "en": "Sint-Omaars",
+            "zh": "圣奥马尔斯"
+          },
+          "FR_ARR_62006": {
+            "en": "Kalen",
+            "zh": "卡伦"
+          }
         }
       }
     }

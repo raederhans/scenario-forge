@@ -351,9 +351,11 @@ test("real modern-world geometry uses geographic origin and reports coverage wit
     if (key) countries.add(key);
     if (observation.status !== "value") assert.equal(observation.value, null);
   }
-  assert.equal(counts.value + counts.missing + counts.unmatched, topology.objects.political.geometries.length);
-  assert.ok(counts.value > 22000);
+  const total = topology.objects.political.geometries.length;
+  t.diagnostic(`Modern-world features: ${JSON.stringify(counts)}; explicit geographic countries: ${countries.size}`);
+  assert.equal(counts.value + counts.missing + counts.unmatched, total);
+  // A share rather than a count: parcel merges keep lowering the feature total.
+  assert.ok(counts.value / total > 0.95);
   assert.equal(counts.missing, 0);
   assert.ok(counts.unmatched > 0);
-  t.diagnostic(`Modern-world features: ${JSON.stringify(counts)}; explicit geographic countries: ${countries.size}`);
 });

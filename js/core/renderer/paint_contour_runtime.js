@@ -1,6 +1,8 @@
 import { getContourCoordinatePrecision } from '../paint_contour_source.js';
 import { createPaintContourWorkerClient } from '../paint_contour_worker_client.js';
 import { createPaintContourMesh } from './paint_contour_mesh.js';
+import { createBorderClassification } from './border_classification.js';
+import { packContourWaterMaskCooperatively } from './paint_contour_water_mask.js';
 
 const EMPTY = Object.freeze([]);
 // Compare only fields sent by contourGeometry, without serialization, hashes or
@@ -40,6 +42,12 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   getBoundaryRevision = () => 0,
   separatePoliticalBorders = () => false,
   isArcEligible = () => true,
+  resolveClassification = null,
+  getClassificationRevision = () => [],
+  getWaterRevision = () => [state.scenarioLandMaskData, state.scenarioContextLandMaskData,
+    state.landBgData, state.scenarioWaterRegionsData, state.waterRegionsData,
+    state.contextLayerExternalDataByName?.lakes, state.scenarioAtlantropaData, state.showScenarioAtlantropa],
+  getWaterMaskSources = () => ({}),
   client = createPaintContourWorkerClient(),
   schedule = callback => setTimeout(callback, 0),
   yieldControl = () => new Promise(resolve => setTimeout(resolve, 0)),
@@ -47,17 +55,25 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
 } = {}) {
   let scene = '', sourceRef = null, sourceSignal = '', sourceVersion = 0, generation = 0;
   let sourceInputs = null;
+  let waterRevision = [], registeredWaterRevision = null;
   let topologyRevision = -1, geometryEpoch = 0, registeredEpoch = -1;
   let featuresById = new Map(), precisionById = new Map(), registered = null, registeredPrecision = null, view = null;
   let acknowledgedGraph = null;
   let inFlight = null, scheduled = false, revision = 0, paintRevision = -1;
   let boundaryRevision = null, bordersSeparated = false;
+  // A geometry rebuild within one scene keeps the last paint-aware borders;
+  // reverting to reference borders would revive edges the user painted away.
+  let classificationRevision = [], classified = false, lastClassification = null;
+  const shouldClassify = () => !!resolveClassification && !!state.activeScenarioId
+    && state.activeScenarioId !== 'blank_base' && state.mapSemanticMode !== 'blank';
   let status = 'idle', error = '', graphDiagnostics = null, builds = 0, sentFeatures = 0;
   let reuseAcks = 0, comparedFeatures = 0, equalFeatures = 0, comparisonYields = 0, comparisonMaxSliceMs = 0;
-  const sceneIdentity = () => [state.activeScenarioId || '', state.sceneGeneration || 0].join('|');
+  const nearSeamsEnabled = () => !!state.activeScenarioId && state.activeScenarioId !== 'blank_base' && state.mapSemanticMode !== 'blank';
+  const sceneIdentity = () => [state.activeScenarioId || '', state.sceneGeneration || 0, nearSeamsEnabled()].join('|');
   function clear() {
     generation += 1; client.dispose(); registered = null; registeredPrecision = null; view = null; inFlight = null;
-    acknowledgedGraph = null;
+    acknowledgedGraph = null; lastClassification = null;
+    registeredWaterRevision = null;
     status = 'idle'; error = ''; graphDiagnostics = null; revision += 1;
   }
   function queue() {
@@ -70,8 +86,11 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     const sameScene = scene === nextScene;
     if (scene !== nextScene) { clear(); scene = nextScene; sourceRef = null; }
     const features = getFeatures() || EMPTY;
-    const inputs = [state.scenarioDataGeneration || 0, state.showScenarioAtlantropa, state.showWaterRegions, state.mapSemanticMode];
-    const sameInputs = sourceInputs?.every((value, index) => value === inputs[index]);
+    const nextWaterRevision = getWaterRevision();
+    const waterChanged = nextWaterRevision.length !== waterRevision.length || nextWaterRevision.some((value, index) => value !== waterRevision[index]);
+    waterRevision = nextWaterRevision;
+    const inputs = [state.scenarioDataGeneration || 0, state.showScenarioAtlantropa, state.showWaterRegions, state.mapSemanticMode, ...waterRevision];
+    const sameInputs = sourceInputs?.length === inputs.length && sourceInputs.every((value, index) => value === inputs[index]);
     const signal = [state.topologyRevision || 0, ...inputs].join('|');
     if (sourceRef === features && signal === sourceSignal && sameInputs) return;
     const nextTopologyRevision = Number(state.topologyRevision || 0);
@@ -104,7 +123,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     }
     const geometryChanged = next.size !== featuresById.size || [...next].some(([id, feature]) => featuresById.get(id)?.geometry !== feature.geometry || precisionById.get(id) !== nextPrecision.get(id));
     featuresById = next; precisionById = nextPrecision;
-    if (geometryChanged || forcedGeometryRefresh || status === 'idle') {
+    if (geometryChanged || forcedGeometryRefresh || waterChanged || status === 'idle') {
       sourceVersion += 1; view = null; revision += 1; status = next.size ? 'building' : 'empty';
       if (!next.size) { clear(); featuresById = next; status = 'empty'; }
       else queue();
@@ -115,16 +134,44 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     const next = Number(state.colorRevision || 0);
     const nextBoundaryRevision = String(getBoundaryRevision());
     const nextBordersSeparated = !!separatePoliticalBorders();
-    const boundaryChanged = nextBoundaryRevision !== boundaryRevision || nextBordersSeparated !== bordersSeparated;
+    const nextClassificationRevision = getClassificationRevision();
+    const modeChanged = classified !== shouldClassify();
+    if (modeChanged) createView();
+    const boundaryChanged = nextBoundaryRevision !== boundaryRevision || nextBordersSeparated !== bordersSeparated
+      || modeChanged || nextClassificationRevision.length !== classificationRevision.length
+      || nextClassificationRevision.some((value, index) => value !== classificationRevision[index]);
     if (!force && next === paintRevision && !boundaryChanged && ids == null) return;
     const scoped = !force && !boundaryChanged && ids && next === paintRevision + 1 ? ids : null;
-    if (view.refresh(scoped)) revision += 1;
+    const changed = view.refresh(scoped) || modeChanged;
+    if (changed) revision += 1;
     paintRevision = next;
     boundaryRevision = nextBoundaryRevision;
     bordersSeparated = nextBordersSeparated;
+    classificationRevision = nextClassificationRevision;
+    if (changed && (classified || modeChanged)) onChange('paint-contours-colors');
+  }
+  function createView() {
+    classified = shouldClassify();
+    view = classified
+      ? createBorderClassification(acknowledgedGraph, id => {
+        const feature = featuresById.get(id);
+        return { ...resolveClassification(feature, id), color: resolveColor(feature, id) };
+      }, { isArcEligible })
+      : createPaintContourMesh(acknowledgedGraph, id => {
+        const feature = featuresById.get(id);
+        return feature ? resolveColor(feature, id) : null;
+      }, {
+        resolveBoundaryKey: id => {
+          const feature = featuresById.get(id);
+          return feature ? resolveBoundaryKey(feature, id) : null;
+        },
+        separatePoliticalBorders,
+        isArcEligible,
+      });
   }
   function start() {
     const ownedGeneration = generation, ownedVersion = sourceVersion, snapshot = featuresById;
+    const snapshotWaterRevision = waterRevision;
     const epoch = geometryEpoch, snapshotPrecision = precisionById;
     const changed = [], removed = [];
     let equivalent = true;
@@ -178,11 +225,19 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
         } finally { iterator.return(); }
         syncSource();
         if (!current()) throw abort();
-        const reset = !registered, reuse = !reset && !!acknowledgedGraph && equivalent && !removed.length;
+        const reset = !registered;
+        const waterChanged = reset || !registeredWaterRevision || snapshotWaterRevision.length !== registeredWaterRevision.length
+          || snapshotWaterRevision.some((value, index) => value !== registeredWaterRevision[index]);
+        const reuse = !reset && !waterChanged && !!acknowledgedGraph && equivalent && !removed.length;
+        const waterMask = waterChanged ? await packContourWaterMaskCooperatively(getWaterMaskSources(), async () => {
+          await yieldControl(); syncSource(); if (!current()) throw abort();
+        }) : undefined;
+        if (!current()) throw abort();
         sentFeatures += changed.length;
         if (!reuse) builds++;
         dispatched = true;
-        const graph = await client.build(changed, removed, { reset, reuse, certifiedEquivalent: reuse && changed.length > 0 });
+        const graph = await client.build(changed, removed, { reset, reuse, certifiedEquivalent: reuse && changed.length > 0,
+          waterMask, nearSeamTolerance: nearSeamsEnabled() ? 0.05 : 0 });
         if (!owned()) return;
         syncSource();
         if (!owned()) return;
@@ -191,31 +246,23 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
           reuseAcks++;
         } else acknowledgedGraph = graph;
         registered = snapshot; registeredPrecision = snapshotPrecision; registeredEpoch = epoch;
+        registeredWaterRevision = snapshotWaterRevision;
         if (!current()) return;
         // One full graph, owned by the latest real Worker ACK. Recreate the
         // current view so colors, ownership and eligibility are read afresh.
-        view = createPaintContourMesh(acknowledgedGraph, id => {
-          const feature = featuresById.get(id);
-          return feature ? resolveColor(feature, id) : null;
-        }, {
-          resolveBoundaryKey: id => {
-            const feature = featuresById.get(id);
-            return feature ? resolveBoundaryKey(feature, id) : null;
-          },
-          separatePoliticalBorders,
-          isArcEligible,
-        });
+        createView();
         graphDiagnostics = acknowledgedGraph.diagnostics;
         paintRevision = Number(state.colorRevision || 0);
         boundaryRevision = String(getBoundaryRevision());
         bordersSeparated = !!separatePoliticalBorders();
+        classificationRevision = getClassificationRevision();
         status = 'ready'; revision += 1;
         onChange('paint-contours-ready');
       } catch (failure) {
         if (!owned()) return;
         if (!dispatched && failure?.name === 'AbortError' && !current()) return;
         // A failed/stale geometry result must never revive reference borders.
-        view = null; acknowledgedGraph = null; registered = null; registeredPrecision = null;
+        view = null; acknowledgedGraph = null; registered = null; registeredPrecision = null; lastClassification = null;
         status = 'error'; error = failure?.message || String(failure);
         client.dispose(); revision += 1; onChange('paint-contours-error');
       } finally {
@@ -243,6 +290,11 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     ensureReady,
     hasPendingWork: () => scheduled || !!inFlight || status === 'building',
     getMeshes() { syncSource(); syncPaint(); return view?.getActiveArcCount() ? [view.getMesh()] : EMPTY; },
+    getClassification() {
+      syncSource(); syncPaint();
+      if (classified && view) lastClassification = view.getMeshes();
+      return shouldClassify() ? lastClassification : null;
+    },
     getRevision() { syncSource(); syncPaint(); return revision; },
     // Call immediately after the publisher's topology bump, before other reads.
     // This certifies immutable geometry identities, not an in-place mutation.
@@ -250,7 +302,8 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     notifyPaintChanged(ids = null) { const before = revision; syncSource(); syncPaint(ids); return revision !== before; },
     diagnostics() { syncSource(); syncPaint(); return { status, error, revision, sourceVersion, builds, sentFeatures,
       activeArcCount: view?.getActiveArcCount() || 0, reuseAcks, comparedFeatures, equalFeatures,
-      comparisonYields, comparisonMaxSliceMs, ...graphDiagnostics }; },
+      comparisonYields, comparisonMaxSliceMs, ...graphDiagnostics,
+      classificationArcs: classified && view ? view.getCounts() : null }; },
     dispose() { clear(); scene = ''; sourceRef = null; featuresById = new Map(); precisionById = new Map(); },
   });
 }

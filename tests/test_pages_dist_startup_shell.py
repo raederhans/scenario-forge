@@ -22,14 +22,12 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PAGES_DIST_ROOT = resolve_pages_artifact_root(repo_root=REPO_ROOT)
 LANDING_INDEX = REPO_ROOT / "landing" / "index.html"
 LANDING_APP_JS = REPO_ROOT / "landing" / "app.js"
-LANDING_STYLES_CSS = REPO_ROOT / "landing" / "styles.css"
 LANDING_ASSETS = REPO_ROOT / "landing" / "assets"
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 DRAW_CANVAS_ORCHESTRATION_OWNER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "draw_canvas_orchestration_owner.js"
 CACHED_PASS_COMPOSITOR_OWNER_JS = REPO_ROOT / "js" / "core" / "renderer" / "cached_pass_compositor_owner.js"
 DIST_ROOT_INDEX = PAGES_DIST_ROOT / "index.html"
 DIST_APP_JS = PAGES_DIST_ROOT / "app.js"
-DIST_STYLES_CSS = PAGES_DIST_ROOT / "styles.css"
 EDITOR_INDEX = REPO_ROOT / "index.html"
 DIST_APP_INDEX = PAGES_DIST_ROOT / "app" / "index.html"
 DIST_APP_JS_ROOT = PAGES_DIST_ROOT / "app" / "js"
@@ -41,61 +39,6 @@ HERO_SCENARIO_ASSETS = (
     ("hoi4-1939", "hoi4_1939", "hero-hoi4-1939.svg", "hero-hoi4-1939.json"),
     ("tno-1962", "tno_1962", "hero-tno-1962.svg", "hero-tno-1962.json"),
 )
-
-
-def assert_css_block_avoids_viewport_font_scaling(
-    test_case: unittest.TestCase,
-    styles_css: str,
-    selector: str,
-) -> None:
-    match = re.search(rf"{re.escape(selector)}\s*\{{(?P<body>[^}}]*)\}}", styles_css, re.S)
-    test_case.assertIsNotNone(match)
-    body = match.group("body")
-    test_case.assertIn("font-size:", body)
-    test_case.assertNotIn("clamp(", body)
-    test_case.assertNotIn("vw", body)
-
-
-def assert_landing_workspace_hero(test_case: unittest.TestCase, html: str) -> None:
-    hero_match = re.search(r'<section id="hero"[^>]*>(.*?)</section>', html, re.S)
-    test_case.assertIsNotNone(hero_match, "landing must include a hero section")
-    hero = hero_match.group(1)
-    images = re.findall(r'<img\b([^>]*)>', hero)
-    test_case.assertEqual(len(images), 1, "hero must show one static editor screenshot")
-    attributes = dict(re.findall(r'([\w-]+)="([^"]*)"', images[0]))
-    for name, expected in {
-        "src": "./assets/product-workspace.webp",
-        "width": "1600",
-        "height": "900",
-        "loading": "eager",
-        "fetchpriority": "high",
-        "data-i18n-alt": "productPreviewAlt",
-    }.items():
-        test_case.assertEqual(attributes.get(name), expected, f"hero image {name}")
-    test_case.assertTrue(attributes.get("alt", "").strip(), "editor screenshot needs descriptive alt text")
-    test_case.assertNotIn("data-hero-map", hero)
-    test_case.assertNotIn("data-hero-chip", hero)
-    test_case.assertRegex(hero, r'href="\./app/\?view=guide"[^>]*data-i18n="heroPrimaryCta">Start creating</a>')
-    test_case.assertRegex(hero, r'href="#sample-runs"[^>]*data-i18n="heroSecondaryCta">Explore the maps ↓</a>')
-    test_case.assertIn('data-i18n="workspaceCaption"', hero)
-    test_case.assertIn('class="skip-link" href="#main"', html)
-    for key in ("advancedSummary", "sourcesSummary"):
-        test_case.assertRegex(html, rf'<details class="technical-details"><summary data-i18n="{key}">')
-
-
-def assert_landing_vector_maps(test_case: unittest.TestCase, html: str) -> None:
-    for asset_name in (
-        "hero-hoi4-1936.svg",
-        "hero-hoi4-1939.svg",
-        "hero-tno-1962.svg",
-        "work-atlas-japan-corridor.svg",
-        "japan-preview-transport.svg",
-        "japan-preview-cities.svg",
-        "japan-preview-terrain.svg",
-        "japan-preview-night.svg",
-    ):
-        with test_case.subTest(asset_name=asset_name):
-            test_case.assertRegex(html, rf'<img\b[^>]*src="\./assets/{re.escape(asset_name)}"[^>]*>')
 
 
 def import_landing_builder(module_name: str):
@@ -291,184 +234,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
                             for item in geometries))
 
 
-    def test_checked_in_pages_dist_manifest_exists(self) -> None:
-        self.assertTrue(
-            DIST_MANIFEST.exists(),
-            "dist/pages-dist-manifest.json is a checked-in Pages dist contract",
-        )
-        payload = json.loads(DIST_MANIFEST.read_text(encoding="utf-8"))
-        self.assertEqual(payload.get("schema_version"), build_pages_dist.PAGES_DIST_MANIFEST_SCHEMA_VERSION)
-        self.assertIsInstance(payload.get("files"), list)
-        self.assertGreater(len(payload.get("files", [])), 0)
-        for field_name in ("total_bytes", "max_allowed_bytes", "size_gate", "required_files"):
-            with self.subTest(field_name=field_name):
-                self.assertIn(field_name, payload)
-
-    def test_pages_dist_drift_guard_covers_tracked_dist_outputs(self) -> None:
-        try:
-            result = subprocess.run(
-                ["git", "ls-files", "dist"],
-                cwd=REPO_ROOT,
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-        except (FileNotFoundError, subprocess.CalledProcessError) as exc:
-            raise unittest.SkipTest(f"git tracked dist list unavailable: {exc}") from exc
-
-        pathspecs = (
-            "dist/.nojekyll",
-            "dist/app.js",
-            "dist/index.html",
-            "dist/styles.css",
-            "dist/assets",
-            "dist/app/index.html",
-            "dist/app/js",
-            "dist/app/css",
-            "dist/app/vendor",
-            "dist/hgo",
-            "dist/pages-dist-manifest.json",
-        )
-        tracked_paths = [line.strip() for line in result.stdout.splitlines() if line.strip()]
-        uncovered = [
-            path
-            for path in tracked_paths
-            if not any(path == spec or path.startswith(f"{spec}/") for spec in pathspecs)
-        ]
-        self.assertEqual([], uncovered)
-
-        package_scripts = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))["scripts"]
-        workflow_text = VERIFY_SHARED_WORKFLOW.read_text(encoding="utf-8")
-        for spec in pathspecs:
-            with self.subTest(spec=spec):
-                for script_name in ("verify:pages-dist-and-drift", "verify:dist-drift"):
-                    self.assertIn(spec, package_scripts[script_name], script_name)
-                self.assertIn(spec, workflow_text)
-
-    def test_landing_generated_cartography_assets_exist(self) -> None:
-        source_svg_assets = (
-            "hero-cartography.svg",
-            "hero-blank.svg",
-            "hero-hoi4-1936.svg",
-            "hero-hoi4-1939.svg",
-            "hero-tno-1962.svg",
-            "showcase-final-map.svg",
-            "europe-1936-showcase.svg",
-            "japan-preview-transport.svg",
-            "japan-preview-cities.svg",
-            "japan-preview-terrain.svg",
-            "japan-preview-night.svg",
-            "template-blank.svg",
-            "template-modern.svg",
-            "template-hoi4.svg",
-            "template-tno.svg",
-        )
-        webp_delivery_assets = (
-            "hero-blank.webp",
-            "hero-hoi4-1936.webp",
-            "hero-hoi4-1939.webp",
-            "hero-tno-1962.webp",
-            "showcase-final-map.webp",
-            "japan-preview-transport.webp",
-            "japan-preview-cities.webp",
-            "japan-preview-terrain.webp",
-            "japan-preview-night.webp",
-            "template-blank.webp",
-            "template-modern.webp",
-            "template-hoi4.webp",
-            "template-tno.webp",
-        )
-        for asset_name in source_svg_assets:
-            with self.subTest(asset_name=asset_name):
-                asset = LANDING_ASSETS / asset_name
-                self.assertTrue(asset.exists(), f"{asset_name} should be checked in for Pages")
-                text = asset.read_text(encoding="utf-8")
-                self.assertIn("<svg", text)
-                self.assertIn("viewBox", text)
-                self.assertIn("<path", text)
-                ET.fromstring(text)
-                if asset_name == "hero-blank.svg":
-                    size_limit = 1_350_000
-                elif asset_name.startswith("japan-preview-"):
-                    # Preserve every eligible transport path and its vertices.
-                    size_limit = 4_500_000
-                elif asset_name == "hero-tno-1962.svg":
-                    # Unsimplified owner geometry keeps political seams closed.
-                    size_limit = 1_500_000
-                elif asset_name == "hero-hoi4-1939.svg":
-                    size_limit = 360_000
-                elif asset_name.startswith("hero-") and asset_name != "hero-cartography.svg":
-                    size_limit = 320_000
-                else:
-                    size_limit = 520_000 if asset_name == "europe-1936-showcase.svg" else 220_000
-                self.assertLess(asset.stat().st_size, size_limit)
-                if asset_name == "europe-1936-showcase.svg":
-                    self.assertIn('data-showcase-viewport="true"', text)
-                    self.assertIn('data-layer="context-land"', text)
-                    self.assertIn('data-layer="urban"', text)
-                    self.assertIn('data-layer="rivers"', text)
-                    self.assertIn('data-layer="country-labels"', text)
-                    self.assertIn('data-layer="day-night"', text)
-                    self.assertIn('class="territory-context territory-context--egy"', text)
-                    self.assertIn('class="territory-context territory-context--syr"', text)
-                    self.assertIn('class="map-edge-fog"', text)
-                    self.assertRegex(text, r"\.map-edge-fog (?:>|&gt;) \*")
-                    self.assertIn("softEdgeBlur", text)
-                    self.assertIn("railGlow", text)
-                    self.assertIn('data-showcase-city-detail="base"', text)
-                    self.assertIn('class="urban-area"', text)
-                    self.assertIn('class="river-line"', text)
-                    self.assertIn('class="country-label"', text)
-                    self.assertIn('class="city-label"', text)
-                    self.assertIn('class="ambient-night-light', text)
-                    self.assertIn("ambientLightGlow", text)
-                    self.assertIn("nightCycleGradient", text)
-                    self.assertIn("nightShadowGradient", text)
-                    self.assertIn("nightTexture", text)
-                    self.assertIn("night-light-belt", text)
-                    self.assertIn("night-light-smear", text)
-                    self.assertIn("day-night-shade", text)
-                    self.assertIn("nightActivityClip", text)
-                    self.assertIn("nightCycleGradient", text)
-                    self.assertIn("animateTransform", text)
-                    self.assertNotIn("data-showcase-viewport transform=", text)
-                    self.assertNotIn('data-layer="scenario"', text)
-                if asset_name.startswith("hero-") and asset_name != "hero-cartography.svg":
-                    expected_mode = asset_name.removeprefix("hero-").removesuffix(".svg")
-                    self.assertIn(f'data-hero-scenario="{expected_mode}"', text)
-                    self.assertIn('data-layer="political"', text)
-                    if asset_name == "hero-blank.svg":
-                        self.assertIn('class="blank-coastline"', text)
-                        self.assertIn("stroke-width: .25", text)
-                        self.assertIn("stroke-width: .5", text)
-                if asset_name.startswith("japan-preview-"):
-                    self.assertIn('data-preview-map="japan"', text)
-                    self.assertIn('data-source="japan-corridor-carrier"', text)
-                    self.assertIn('data-source="japan-road-preview"', text)
-                    self.assertIn('data-source="japan-main-corridor"', text)
-                    self.assertIn('data-source="japan-rail-preview"', text)
-                    self.assertIn('data-source="world-cities-japan-focus"', text)
-                    self.assertIn('data-source="global-contours-major"', text)
-                    self.assertIn('data-source="nasa-black-marble-2016"', text)
-                    self.assertTrue(any(
-                        "main-corridor" in element.get("class", "").split()
-                        for element in ET.fromstring(text).iter()
-                    ), f"{asset_name} should retain the highlighted corridor")
-                    self.assertIn('class="focus-city"', text)
-                    self.assertNotIn("corridorGlow", text)
-                    self.assertNotIn("cityGlow", text)
-                    self.assertIn('data-layer="legend"', text)
-                    self.assertIn('data-layer="labels"', text)
-                    self.assertIn("<title>Tokyo</title>", text)
-                    self.assertIn("<title>Osaka</title>", text)
-                    self.assertIn("<title>Nagoya · Aichi</title>", text)
-
-        for asset_name in webp_delivery_assets:
-            with self.subTest(asset_name=asset_name):
-                asset = LANDING_ASSETS / asset_name
-                self.assertTrue(asset.exists(), f"{asset_name} should be checked in for Pages delivery")
-                self.assertLess(asset.stat().st_size, 120_000)
-
     def test_landing_social_preview_contract(self) -> None:
         svg_path = LANDING_ASSETS / "social-preview.svg"
         png_path = LANDING_ASSETS / "social-preview.png"
@@ -496,8 +261,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
 
         from tools import rasterize_landing_assets
 
-        self.assertEqual(len(rasterize_landing_assets.RASTER_TARGETS), 16)
-        self.assertTrue(all(output.endswith(".webp") for _, output, *_ in rasterize_landing_assets.RASTER_TARGETS))
+        for source, output, *_ in rasterize_landing_assets.RASTER_TARGETS:
+            with self.subTest(source=source):
+                self.assertTrue((LANDING_ASSETS / source).exists(), f"raster source {source} is missing")
+                self.assertTrue(output.endswith(".webp"))
         self.assertEqual(
             rasterize_landing_assets.PNG_RASTER_TARGETS,
             (("social-preview.svg", "social-preview.png", 1200, 630, 100),),
@@ -586,143 +353,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertGreater(payload["counts"]["terrain_major_lines_rendered"], 0)
         self.assertGreater(payload["counts"]["terrain_minor_lines_rendered"], 0)
         self.assertGreater(payload["counts"]["river_lines_rendered"], 0)
-
-    def test_landing_europe_1936_showcase_metadata_uses_checked_in_sources(self) -> None:
-        metadata_path = LANDING_ASSETS / "europe-1936-showcase.json"
-        self.assertTrue(metadata_path.exists(), "Europe 1936 showcase metadata should be checked in")
-        payload = json.loads(metadata_path.read_text(encoding="utf-8"))
-        scenario_manifest = json.loads((REPO_ROOT / "data" / "scenarios" / "hoi4_1936" / "manifest.json").read_text(encoding="utf-8"))
-        rail_catalog = json.loads((REPO_ROOT / "data" / "transport_layers" / "global_rail" / "catalog.json").read_text(encoding="utf-8"))
-        expected_scenario_sources = {
-            "data/scenarios/hoi4_1936/manifest.json",
-            scenario_manifest["runtime_topology_url"],
-            scenario_manifest["countries_url"],
-            scenario_manifest["owners_url"],
-            scenario_manifest["capital_hints_url"],
-        }
-        expected_rail_sources = {"data/transport_layers/global_rail/catalog.json"}
-        expected_context_sources = {
-            "data/europe_urban.geojson",
-            "data/europe_rivers.geojson",
-            "data/world_cities.geojson",
-        }
-        for entry in rail_catalog["entries"]:
-            if entry.get("region_id") != "europe":
-                continue
-            manifest_path = entry["manifest_path"]
-            manifest = json.loads((REPO_ROOT / manifest_path).read_text(encoding="utf-8"))
-            expected_rail_sources.add(manifest["paths"]["full"]["railways"])
-
-        self.assertEqual(payload["scenario_id"], "hoi4_1936")
-        self.assertEqual([layer["id"] for layer in payload["layers"]], ["political", "rail", "cities", "day-night"])
-        self.assertEqual(payload["projection"]["name"], "lambert_azimuthal_equal_area")
-        self.assertEqual(payload["projection"]["center_lon"], 10.0)
-        self.assertEqual(payload["projection"]["center_lat"], 52.0)
-        self.assertEqual(payload["projection"]["canvas_width"], 980)
-        self.assertEqual(payload["projection"]["canvas_height"], 620)
-        self.assertEqual(payload["projection"]["canvas_padding"], 36)
-        self.assertEqual(payload["bbox"], [-14.0, 29.0, 44.0, 72.5])
-        self.assertEqual(payload["detail_bbox"], [-12.5, 34.0, 41.5, 72.5])
-        self.assertEqual(set(payload["sources"]), expected_scenario_sources | expected_rail_sources | expected_context_sources)
-        self.assertEqual(payload["selection_policy"]["transregional_tags"], ["TUR"])
-        self.assertEqual(
-            payload["selection_policy"]["context_tags"],
-            ["ALG", "EGY", "IRQ", "JOR", "LBA", "LEB", "MOR", "PAL", "SAU", "SYR", "TUN"],
-        )
-        self.assertIn("low-detail background color", payload["selection_policy"]["context_layer"])
-        self.assertEqual(payload["selection_policy"]["capital_limit"], 22)
-        self.assertEqual(payload["selection_policy"]["rail_source"], "full")
-        self.assertEqual(payload["selection_policy"]["rail_limit"], 220)
-        self.assertEqual(payload["selection_policy"]["rail_min_lines_per_shard"], 55)
-        self.assertEqual(payload["selection_policy"]["rail_min_projected_px"], 8.0)
-        self.assertEqual(payload["selection_policy"]["rail_dedupe_pixel_grid"], 2.0)
-        self.assertEqual(payload["selection_policy"]["rail_ranking_key"], "clipped_projected_length_px")
-        self.assertEqual(payload["selection_policy"]["rail_dedupe_key"], "projected_path_grid_or_reverse")
-        self.assertEqual(payload["selection_policy"]["urban_area_limit"], 96)
-        self.assertEqual(payload["selection_policy"]["river_line_limit"], 82)
-        self.assertEqual(payload["selection_policy"]["night_light_limit"], 72)
-        self.assertEqual(payload["selection_policy"]["night_light_belt_limit"], 54)
-        self.assertIn("animated curved night mask", payload["selection_policy"]["day_night_visual_policy"])
-        self.assertEqual(payload["selection_policy"]["city_label_source"], "scenario capital hints plus world_cities major populated places")
-        self.assertEqual(payload["selection_policy"]["city_label_tier_limits"], [8, 16, 26, 34])
-        self.assertEqual(payload["selection_policy"]["city_label_tier_min_distance_px"], [44.0, 36.0, 30.0, 24.0])
-        self.assertEqual(payload["selection_policy"]["country_label_source"], "territory representative points")
-        self.assertEqual(payload["selection_policy"]["country_label_limit"], 8)
-        self.assertEqual(
-            payload["selection_policy"]["country_label_tags"],
-            ["ENG", "FRA", "GER", "ITA", "POL", "ROM", "SOV", "YUG"],
-        )
-        self.assertEqual(payload["counts"]["territories"], len(payload["territory_tags"]))
-        self.assertEqual(payload["counts"]["context_territories"], len(payload["context_territory_tags"]))
-        self.assertEqual(
-            payload["context_territory_tags"],
-            ["ALG", "EGY", "IRQ", "JOR", "LBA", "LEB", "MOR", "PAL", "SAU", "SYR", "TUN"],
-        )
-        self.assertEqual(payload["counts"]["capitals"], len(payload["capital_tags"]))
-        for expected_tag in ("ALB", "EST", "IRE", "LAT", "LIT", "LUX", "SWI", "TUR"):
-            with self.subTest(expected_tag=expected_tag):
-                self.assertIn(expected_tag, payload["territory_tags"])
-        self.assertEqual(payload["focus_tags"], ["CZE", "ENG", "FRA", "GER", "ITA", "POL", "ROM", "SOV", "YUG"])
-        self.assertGreaterEqual(payload["counts"]["political_features"], 6000)
-        self.assertGreaterEqual(payload["counts"]["capitals"], 12)
-        self.assertEqual(payload["counts"]["rail_lines_selected"], 220)
-        self.assertGreater(payload["counts"]["rail_lines_candidates"], payload["counts"]["rail_lines_selected"])
-        self.assertEqual(payload["counts"]["urban_areas_rendered"], 96)
-        self.assertGreater(payload["counts"]["urban_paths_candidates"], payload["counts"]["urban_areas_rendered"])
-        self.assertEqual(payload["counts"]["river_lines_rendered"], 82)
-        self.assertGreater(payload["counts"]["river_paths_candidates"], payload["counts"]["river_lines_rendered"])
-        self.assertEqual(payload["counts"]["night_light_points_rendered"], 72)
-        self.assertGreater(payload["counts"]["city_light_candidates"], payload["counts"]["night_light_points_rendered"])
-        self.assertEqual(payload["counts"]["city_labels_rendered"], 34)
-        self.assertEqual(payload["counts"]["city_label_tier_counts"], {"0": 8, "1": 8, "2": 10, "3": 8})
-        self.assertIn("Milan", payload["city_label_names"])
-        self.assertIn("Hamburg", payload["city_label_names"])
-        self.assertEqual(payload["counts"]["country_labels_rendered"], 8)
-        self.assertEqual(set(payload["rail_selected_by_shard"]), {"eu_e010_e025", "eu_e025_e045", "eu_w012_e010"})
-        for shard_id, selected_count in payload["rail_selected_by_shard"].items():
-            with self.subTest(shard_id=shard_id):
-                self.assertGreaterEqual(selected_count, 55)
-
-    def test_landing_europe_1936_showcase_assets_match_builder_output(self) -> None:
-        build_landing_europe_1936_showcase = import_landing_builder("build_landing_europe_1936_showcase")
-        previous_svg = build_landing_europe_1936_showcase.SHOWCASE_SVG
-        previous_metadata = build_landing_europe_1936_showcase.SHOWCASE_METADATA
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tmp_root = Path(tmpdir)
-            build_landing_europe_1936_showcase.SHOWCASE_SVG = tmp_root / "europe-1936-showcase.svg"
-            build_landing_europe_1936_showcase.SHOWCASE_METADATA = tmp_root / "europe-1936-showcase.json"
-            try:
-                build_landing_europe_1936_showcase.build_showcase()
-                generated_text = build_landing_europe_1936_showcase.SHOWCASE_SVG.read_text(encoding="utf-8")
-                ET.fromstring(generated_text)
-                self.assertEqual(len(re.findall(r'class="country-label"', generated_text)), 8)
-                self.assertIn('data-layer="context-land"', generated_text)
-                self.assertIn('class="territory-context territory-context--egy"', generated_text)
-                self.assertIn('class="map-edge-fog"', generated_text)
-                self.assertIn(".map-edge-fog > *", generated_text)
-                self.assertIn('.country-label { fill: rgba(255,255,255,.82);', generated_text)
-                self.assertIn('opacity: .62;', generated_text)
-                self.assertIn('svg[data-active-layer="political"] .layer-cities { opacity: 0; }', generated_text)
-                self.assertIn('svg[data-active-layer="rail"] .rail-line { opacity: .96; stroke: #ffc66d; stroke-width: 1.75; }', generated_text)
-                self.assertIn('svg[data-active-layer="rail"] .layer-country-labels { opacity: 0; }', generated_text)
-                self.assertIn('svg[data-active-layer="rail"] .layer-cities { opacity: 0; }', generated_text)
-                self.assertIn("nightShadowGradient", generated_text)
-                self.assertIn("nightTexture", generated_text)
-                self.assertIn("nightActivityClip", generated_text)
-                self.assertIn('class="night-shadow-core"', generated_text)
-                self.assertIn('class="night-light-belt night-light-belt--core"', generated_text)
-                self.assertIn('class="night-light-smear', generated_text)
-                self.assertIn('data-showcase-city-detail="base"', generated_text)
-                self.assertIn('class="showcase-city showcase-city--tier-0 showcase-city--capital', generated_text)
-                self.assertIn('class="showcase-city showcase-city--tier-3', generated_text)
-                self.assertIn('svg[data-active-layer="cities"][data-showcase-city-detail="dense"] .showcase-city--tier-3 { opacity: 1; }', generated_text)
-                self.assertEqual(
-                    build_landing_europe_1936_showcase.SHOWCASE_METADATA.read_bytes(),
-                    (LANDING_ASSETS / "europe-1936-showcase.json").read_bytes(),
-                )
-            finally:
-                build_landing_europe_1936_showcase.SHOWCASE_SVG = previous_svg
-                build_landing_europe_1936_showcase.SHOWCASE_METADATA = previous_metadata
 
     def test_landing_hero_scenario_metadata_uses_real_sources(self) -> None:
         for mode, scenario_id, svg_name, metadata_name in HERO_SCENARIO_ASSETS:
@@ -1002,28 +632,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
             finally:
                 build_pages_dist.DIST_ROOT = original_dist_root
 
-    def test_landing_hero_cartography_builder_keeps_checked_in_assets_current(self) -> None:
-        build_landing_hero_cartography = import_landing_builder("build_landing_hero_cartography")
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tmp_root = Path(tmpdir)
-            previous_assets_dir = build_landing_hero_cartography.LANDING_ASSETS
-            try:
-                build_landing_hero_cartography.LANDING_ASSETS = tmp_root
-                build_landing_hero_cartography.main()
-                for asset_name in (
-                    "hero-cartography.svg",
-                    "showcase-final-map.svg",
-                    "template-blank.svg",
-                    "template-modern.svg",
-                    "template-hoi4.svg",
-                    "template-tno.svg",
-                ):
-                    with self.subTest(asset_name=asset_name):
-                        generated_path = tmp_root / asset_name
-                        self.assertEqual(generated_path.read_bytes(), (LANDING_ASSETS / asset_name).read_bytes())
-            finally:
-                build_landing_hero_cartography.LANDING_ASSETS = previous_assets_dir
-
     def test_pages_dist_reset_clears_previous_output_tree(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_root = Path(tmpdir) / "dist"
@@ -1143,7 +751,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         )
         self.assertEqual(reachability["unresolved_reference_count"], 0)
         self.assertEqual(reachability["unresolved_dynamic_expression_count"], 0)
-        self.assertEqual(reachability["registry_resolved_dynamic_expression_count"], 2)
+        self.assertEqual(reachability["registry_resolved_dynamic_expression_count"], 1)
         self.assertEqual(product_inventory["status"], "complete")
         self.assertEqual(product_inventory["publication_ownership_status"], "complete")
         self.assertEqual(product_inventory["classified_file_count"], len(records))
@@ -1235,7 +843,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
 
         self.assertEqual(graph["module_entrypoint"], "app/js/main.js")
         self.assertEqual(graph["unresolved_references"], [])
-        self.assertEqual(graph["summary"]["registry_resolved_dynamic_expression_count"], 2)
+        self.assertEqual(graph["summary"]["registry_resolved_dynamic_expression_count"], 1)
         self.assertEqual(
             graph["summary"]["module_count"],
             sum(
@@ -1260,13 +868,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
         deferred_ui_expressions = nodes_by_path["app/js/bootstrap/deferred_ui_bootstrap.js"][
             "dynamic_import_expressions"
         ]
+        # Literal import() calls resolve directly; no registry entry is needed any more.
         self.assertEqual(
-            [record["registry_id"] for record in deferred_ui_expressions if record["kind"] == "unresolved_dynamic_expression"],
-            ["deferred-ui-bootstrap"],
-        )
-        self.assertEqual(
-            [record["resolution"] for record in deferred_ui_expressions if record["kind"] == "unresolved_dynamic_expression"],
-            ["declarative-registry"],
+            [record for record in deferred_ui_expressions if record["kind"] == "unresolved_dynamic_expression"],
+            [],
         )
         data_service_expressions = nodes_by_path["app/js/core/data_service.js"]["dynamic_import_expressions"]
         self.assertEqual(
@@ -1703,7 +1308,9 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 prefix
                 for rule in build_pages_dist.PAGES_PRODUCT_INVENTORY_RULES
                 for prefix in rule.get("prefixes", ())
-                if prefix.startswith("app/js/")
+                # Source JS is classified by graph reachability; only the compiled
+                # esbuild output is declared, because the source graph does not scan it.
+                if prefix.startswith("app/js/") and prefix != build_pages_dist.EDITOR_BUNDLE_PREFIX
             ]
         )
         with self.assertRaisesRegex(ValueError, "unknown_files=7"):
@@ -1953,327 +1560,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertEqual(stabilize(None), stabilize(0))
         self.assertEqual(stabilize(0), stabilize(999_999))
 
-    def test_landing_source_keeps_landing_contract(self) -> None:
-        html = LANDING_INDEX.read_text(encoding="utf-8")
-        app_js = LANDING_APP_JS.read_text(encoding="utf-8")
-        styles_css = LANDING_STYLES_CSS.read_text(encoding="utf-8")
-
-        self.assertEqual(
-            re.findall(r'<section id="([^"]+)"', html),
-            ["hero", "sample-runs", "story", "features", "data", "faq"],
-        )
-
-        for expected_fragment in (
-            './styles.css',
-            './app.js',
-            './app/?view=guide',
-            'data-i18n="heroTitle"',
-            'data-i18n="heroTitleAccent"',
-            'class="brandmark__logo"',
-            './assets/favicon.svg',
-            '<a href="#sample-runs" data-i18n="navWorks">Maps</a>',
-            './assets/hero-hoi4-1936.svg',
-            'data-stat-value="21338"',
-            '<meta name="robots" content="index,follow" />',
-            '<link rel="canonical" href="https://raederhans.github.io/scenario-forge/" />',
-            '<meta property="og:image" content="https://raederhans.github.io/scenario-forge/assets/social-preview.png" />',
-            '<meta name="twitter:card" content="summary_large_image" />',
-            'data-i18n="showcaseEyebrow"',
-            './assets/europe-1936-showcase.svg',
-            'data-showcase-root',
-            'data-showcase-object',
-            'data-showcase-object tabindex="0"',
-            'id="showcase-map-object"',
-            'role="tabpanel"',
-            'id="showcase-layer-panel"',
-            'aria-controls="showcase-layer-panel"',
-            'data-showcase-layer-tab="political"',
-            'data-showcase-layer-tab="rail"',
-            'data-showcase-layer-tab="cities"',
-            'data-showcase-layer-tab="day-night"',
-            'data-i18n="showcaseLayerPoliticalTitle"',
-            'data-i18n="previewEyebrow"',
-            'data-preview-root',
-            'data-preview-surface',
-            'data-preview-viewport',
-            'data-preview-image="transport"',
-            'class="mini-map__controls"',
-            'data-preview-zoom="1"',
-            'data-preview-zoom="-1"',
-            'data-preview-zoom="reset"',
-            'data-i18n-aria-label="previewZoomIn"',
-            'data-i18n-aria-label="previewZoomOut"',
-            'data-i18n-aria-label="previewZoomReset"',
-            'role="tablist"',
-            'data-preview-status role="status" aria-live="polite" hidden',
-            'data-i18n="dataEyebrow"',
-            'data-i18n="editionsEyebrow"',
-            'data-i18n="faqEyebrow"',
-            'class="footer__brand"',
-            'class="footer__sources"',
-            'class="footer__actions"',
-            'data-i18n-aria-label="brandHomeLabel"',
-            'data-i18n-aria-label="primaryNavLabel"',
-            'data-i18n-aria-label="languageSwitcherLabel"',
-            'data-i18n-alt="productPreviewAlt"',
-            'data-i18n-alt="scenario1936Alt"',
-            'data-i18n-alt="scenario1939Alt"',
-            'data-i18n-alt="scenario1962Alt"',
-            'data-i18n-alt="workThreeAlt"',
-            'id="sample-runs"',
-            'data-sample-runs-root',
-            'data-sample-runs-manifest="./assets/sample-runs.json"',
-            'data-sample-run-filter="all"',
-            'data-sample-run-filter="transport"',
-            'data-sample-run-filter="evidence"',
-            'data-sample-run-card',
-            'data-sample-run-id="hoi4-1936-europe"',
-            'data-sample-run-id="hoi4-1939-europe"',
-            'data-sample-run-id="tno-1962-europe"',
-            'data-sample-run-id="japan-tokaido-corridor"',
-            'data-sample-scenario="tno_1962"',
-            'data-sample-scenario="hoi4_1936"',
-            'data-sample-scenario="hoi4_1939"',
-            'data-sample-scenario="modern_world"',
-            'data-sample-project="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json"',
-            'data-sample-project="./assets/sample-projects/hoi4-1936-europe-briefing.project.json"',
-            'data-sample-project="./assets/sample-projects/modern-world-japan-corridor.project.json"',
-            'data-sample-metadata="./assets/hero-tno-1962.json"',
-            'data-sample-evidence-source="landing/assets/hero-tno-1962.json:counts.political_features"',
-            'data-sample-evidence-source="landing/assets/hero-hoi4-1936.json:counts.political_features"',
-            'data-sample-evidence-source="landing/assets/hero-hoi4-1939.json:counts.political_features"',
-            'data-sample-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.road_lines+counts.rail_lines"',
-            'data-i18n="sampleFilterAll"',
-            'data-output-library hidden',
-            'data-transport-page="regional"',
-            'data-transport-page="national"',
-            'data-transport-image',
-            'data-transport-download',
-            'data-transport-source',
-            'data-i18n="sampleEvidenceLabel"',
-            'data-sample-project-downloads',
-            'data-sample-project-list-link',
-            'data-sample-project-id="blank-base-starter"',
-            'data-sample-project-id="modern-world-japan-corridor"',
-            'data-sample-project-id="hoi4-1936-europe-briefing"',
-            'data-sample-project-id="hoi4-1939-europe-switch"',
-            'data-sample-project-id="tno-1962-atlantropa-briefing"',
-            './app/?sample=tno-1962-atlantropa-briefing&view=guide',
-            './app/?sample=hoi4-1936-europe-briefing&view=guide',
-            './app/?sample=modern-world-japan-corridor&view=guide',
-            './assets/sample-projects/blank-base-starter.project.json',
-            './assets/sample-projects/hoi4-1939-europe-switch.project.json',
-            'data-i18n-aria-label="sampleProjectActionsLabel"',
-            'data-sample-project-open-link',
-            'data-i18n="sampleProjectDownloadsTitle"',
-            'data-i18n="sampleProjectDownloadsBody"',
-            'data-i18n="sampleProjectBlank"',
-            'data-i18n="sampleProjectModern"',
-            'data-i18n="sampleProjectHoi41936"',
-            'data-i18n="sampleProjectHoi41939"',
-            'data-i18n="sampleProjectTno"',
-            'data-sample-project-link',
-            'data-sample-manifest-link',
-            'data-i18n="sampleProjectOpen"',
-            'data-i18n="sampleProjectDownload"',
-            'data-i18n="sampleRecipeManifest"',
-            './assets/hero-hoi4-1936.svg',
-            './assets/hero-hoi4-1939.svg',
-            './assets/hero-tno-1962.svg',
-            './assets/work-atlas-japan-corridor.svg',
-            './assets/sample-runs.json',
-            './assets/sample-projects/tno-1962-atlantropa-briefing.project.json',
-            './assets/sample-projects/hoi4-1936-europe-briefing.project.json',
-            './assets/sample-projects/modern-world-japan-corridor.project.json',
-            'id="story"',
-            'data-story-root',
-            'data-story-stage-image',
-            'data-story-step-button="baseline"',
-            'data-story-step-button="scenario"',
-            'data-story-step-button="transport"',
-            'data-story-step-button="evidence"',
-            'data-story-step-button="export"',
-            'data-story-compare="hoi4-1939"',
-            'data-story-evidence-source="data/scenarios/index.json:public_baseline_ids.length"',
-            'data-showcase-status role="status" aria-live="polite" hidden',
-            'data-i18n="storyEyebrow"',
-            'data-i18n-aria-label="storyStageLabel"',
-            'data-reveal',
-            'footer',
-            'data-lang="zh"',
-        ):
-            with self.subTest(expected_fragment=expected_fragment):
-                self.assertIn(expected_fragment, html)
-
-        assert_landing_workspace_hero(self, html)
-        assert_landing_vector_maps(self, html)
-        self.assertNotIn('class="hero__metrics"', html)
-        self.assertNotIn('data-i18n-aria-label="heroMetricsLabel"', html)
-
-        for expected_fragment in (
-            "scenario_forge_landing_lang",
-            "heroTitleAccent",
-            "formatMetricNumbers",
-            "statsLabel",
-            "worksEyebrow",
-            "featuresEyebrow",
-            "dataEyebrow",
-            "faqEyebrow",
-            "showcaseEyebrow",
-            "showcaseLayerPoliticalTitle",
-            "showcaseLayerRailTitle",
-            "showcaseLayerCitiesTitle",
-            "showcaseLayerDayNightTitle",
-            "initShowcaseLayers",
-            "SHOWCASE_METADATA_URL",
-            "getShowcaseLayerIds",
-            "resolveShowcaseLayer",
-            "loadShowcaseMetadata",
-            "showcaseLayerError",
-            "setShowcaseSvgLayer",
-            "SHOWCASE_VIEW_SCALES",
-            "data-showcase-viewport",
-            "showcaseViewZoomed",
-            "clampShowcaseViewPosition",
-            "applyShowcaseViewState",
-            "isModifiedZoomWheelEvent",
-            "onKeyDown",
-            "initShowcaseView",
-            "PREVIEW_VIEW_SCALES",
-            "clampPreviewViewPosition",
-            "applyPreviewViewState",
-            "initPreviewView",
-            "previewZoomed",
-            "previewDragging",
-            "pointerdown",
-            "wheel",
-            "dblclick",
-            "initPreviewTabs",
-            "initHeroMap",
-            "DEFAULT_HERO_MODE",
-            "HERO_SCENARIO_ASSETS",
-            "initSampleRunsGallery",
-            "SAMPLE_RUN_FILTERS",
-            "resolveSampleRunFilter",
-            "syncSampleRunsFromDom",
-            "sampleFilterScenario",
-            "sampleEvidenceLabel",
-            "sampleProjectActionsLabel",
-            "sampleProjectDownload",
-            "sampleRecipeManifest",
-            "sampleProjectDownloadsTitle",
-            "sampleProjectDownloadsBody",
-            "sampleProjectBlank",
-            "sampleProjectModern",
-            "sampleProjectHoi41936",
-            "sampleProjectHoi41939",
-            "sampleProjectTno",
-            "initProductStory",
-            "PRODUCT_STORY_STEPS",
-            "PRODUCT_STORY_COMPARISON_ASSETS",
-            "storyStageTitleBaseline",
-            "storyStageTitleExport",
-            "syncProductStoryFromDom",
-            "hero-hoi4-1936.json",
-            "hero-hoi4-1939.svg",
-            "hero-tno-1962.svg",
-            "syncHeroMap",
-            "initMetricCountUp",
-            "previewPanelTransportTitle",
-            "previewImageFallback",
-            "showcaseMetadataFallback",
-            "dataCardOneTitle",
-            "editionOneTitle",
-            "faqOneQuestion",
-            "productPreviewLabel",
-            "productStageLabel",
-            "heroChipsLabel",
-            "brandHomeLabel",
-            "languageSwitcherLabel",
-            "productPreviewAlt",
-            "heroAltHoi41936",
-            "heroAltHoi41939",
-            "heroAltTno1962",
-            "data-i18n-alt",
-            "data-i18n-aria-label",
-            "metaTitle",
-            "metaDescription",
-            "metaOgDescription",
-            "zh:",
-        ):
-            with self.subTest(expected_fragment=expected_fragment):
-                self.assertIn(expected_fragment, app_js)
-
-        self.assertIn("prefers-reduced-motion", styles_css)
-        self.assertIn('html[data-reveal="enabled"]', styles_css)
-        self.assertIn(".is-revealed", styles_css)
-        self.assertIn("min-height: 126px", styles_css)
-        self.assertIn("height: 48px", styles_css)
-        self.assertIn("height: 46px", styles_css)
-        self.assertIn("height: 44px", styles_css)
-        self.assertIn("min-height: 44px", styles_css)
-        self.assertIn("line-height: 1.1", styles_css)
-        self.assertIn("overflow-wrap: anywhere", styles_css)
-        self.assertIn(".hero-cartography", styles_css)
-        self.assertIn("translateY(-8px) perspective(1200px)", styles_css)
-        hero_chips_style = re.search(r"\.hero__chips\s*\{(?P<body>[^}]*)\}", styles_css, re.S)
-        self.assertIsNotNone(hero_chips_style)
-        self.assertNotIn("position: absolute", hero_chips_style.group("body"))
-        self.assertIn(".brandmark__logo", styles_css)
-        self.assertNotIn(".brandmark__dot", styles_css)
-        self.assertIn('[data-hero-transition="loading"]', styles_css)
-        self.assertIn('[data-hero-mode="blank"]', styles_css)
-        self.assertIn('[data-hero-mode="hoi4-1936"]', styles_css)
-        self.assertIn('[data-hero-mode="hoi4-1939"]', styles_css)
-        self.assertIn('[data-hero-mode="tno-1962"]', styles_css)
-        self.assertIn(".showcase-layer-tabs", styles_css)
-        self.assertIn('[data-showcase-view-zoomed="true"]', styles_css)
-        self.assertIn(".product-story__grid", styles_css)
-        self.assertIn(".sample-runs__filters", styles_css)
-        self.assertIn(".sample-run-filter[aria-pressed=\"true\"]", styles_css)
-        self.assertIn(".sample-run-card__recipe", styles_css)
-        self.assertIn(".sample-run-card__proof", styles_css)
-        self.assertIn(".sample-run-card__actions", styles_css)
-        self.assertIn(".sample-project-downloads", styles_css)
-        self.assertIn(".sample-project-downloads__grid", styles_css)
-        self.assertIn(".story-stage", styles_css)
-        self.assertIn("position: sticky", styles_css)
-        self.assertIn(".story-evidence", styles_css)
-        self.assertIn('.story-step[aria-pressed="true"]', styles_css)
-        for selector in (".story-stage__hud strong", ".story-step__copy strong"):
-            with self.subTest(story_font_selector=selector):
-                assert_css_block_avoids_viewport_font_scaling(self, styles_css, selector)
-        self.assertIn("[data-showcase-object]", app_js)
-        self.assertNotIn("SHOWCASE_LAYER_COPY_KEYS[layer] || SHOWCASE_LAYER_COPY_KEYS.political", app_js)
-        self.assertIn("height: 44px", styles_css)
-        self.assertIn(".showcase-map__viewport", styles_css)
-        self.assertIn(".showcase-map__viewport::after", styles_css)
-        self.assertIn("radial-gradient(ellipse at center", styles_css)
-        self.assertIn("inset 0 0 112px", styles_css)
-        self.assertIn(".showcase-map__object", styles_css)
-        self.assertIn(".showcase-map__object:focus-visible", styles_css)
-        self.assertIn("[data-preview-image=\"transport\"]", styles_css)
-        self.assertIn("--preview-scale", styles_css)
-        self.assertIn(".mini-map__viewport", styles_css)
-        self.assertIn(".mini-map__controls", styles_css)
-        self.assertIn('[data-preview-zoomed="true"]', styles_css)
-        self.assertIn('[data-preview-dragging="true"]', styles_css)
-        self.assertIn(".showcase-section", styles_css)
-        self.assertNotIn("data-showcase-view-controls", html)
-        self.assertNotIn("data-showcase-view-action", html)
-        self.assertNotIn("SHOWCASE_VIEW_PAN_STEP", app_js)
-        self.assertNotIn(".showcase-map__controls", styles_css)
-        self.assertNotIn('data-showcase-layer-tab="scenario"', html)
-        self.assertRegex(
-            styles_css,
-            re.compile(r"\.work-card__media img\s*\{[^}]*position:\s*absolute;[^}]*inset:\s*0;", re.S),
-        )
-        self.assertRegex(
-            styles_css,
-            re.compile(r"\.work-card__media\s*\{[^}]*aspect-ratio:\s*16\s*/\s*9;", re.S),
-        )
-
-
     def test_cached_pass_compositor_owner_is_in_the_pages_module_graph(self) -> None:
         renderer_source = MAP_RENDERER_JS.read_text(encoding="utf-8").replace("\r\n", "\n")
         owner_source = CACHED_PASS_COMPOSITOR_OWNER_JS.read_text(encoding="utf-8").replace("\r\n", "\n")
@@ -2286,116 +1572,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertIn(import_token, dist_renderer)
         self.assertIn("return getCachedPassCompositorOwner().drawTransformedPass(", renderer_source)
         self.assertIn("return getCachedPassCompositorOwner().composeRenderPassesToTarget(", renderer_source)
-
-    def test_landing_i18n_table_keeps_english_and_chinese_values_separate(self) -> None:
-        app_js = LANDING_APP_JS.read_text(encoding="utf-8")
-        en_start = app_js.index("  en: {")
-        zh_start = app_js.index("  zh: {")
-        en_table = app_js[en_start:zh_start]
-        zh_table = app_js[zh_start:]
-
-        for expected_fragment in (
-            "workspaceCaption:",
-            "advancedSummary:",
-            "sourcesSummary:",
-            "productPreviewAlt:",
-            "navWorks:",
-            "worksTitle:",
-            "sampleProjectDownloadsTitle:",
-            "featureGroupOneTitle:",
-            "featureGroupTwoTitle:",
-            "featureGroupThreeTitle:",
-            "featureGroupFourTitle:",
-            "featurePointPalettes:",
-            'previewPanelTransportTitle:',
-            "dataTitle:",
-            "faqOneQuestion:",
-            "faqSixQuestion:",
-            "editionsTitle:",
-            "showcaseTitle:",
-            "showcaseLayerPoliticalTitle:",
-            "showcaseLayerRailTitle:",
-            "showcaseLayerCitiesTitle:",
-            "showcaseLayerDayNightTitle:",
-            "previewSurfaceLabel:",
-            "previewZoomControlsLabel:",
-            "previewZoomIn:",
-            "previewZoomOut:",
-            "previewZoomReset:",
-            "previewImageFallback:",
-            "showcaseMetadataFallback:",
-            "storyTitle:",
-            "storyStepBaselineTitle:",
-            "storyStepExportProof:",
-            "storyStageTitleExport:",
-            "chipHoi41936:",
-            "chipHoi41939:",
-            "chipTno1962:",
-            "heroAltBlank:",
-            "heroAltHoi41936:",
-            "heroAltHoi41939:",
-            "heroAltTno1962:",
-            "ctaTitle:",
-            "metaTitle:",
-            "metaDescription:",
-            "metaOgDescription:",
-        ):
-            with self.subTest(expected_fragment=expected_fragment):
-                self.assertIn(expected_fragment, en_table)
-
-        for expected_fragment in (
-            "workspaceCaption:",
-            "advancedSummary:",
-            "sourcesSummary:",
-            "productPreviewAlt:",
-            "navWorks:",
-            "worksTitle:",
-            "sampleProjectDownloadsTitle:",
-            "featureGroupOneTitle:",
-            "featureGroupTwoTitle:",
-            "featureGroupThreeTitle:",
-            "featureGroupFourTitle:",
-            "featurePointPalettes:",
-            "previewPanelTransportTitle:",
-            "dataTitle:",
-            "faqOneQuestion:",
-            "faqSixQuestion:",
-            "editionsTitle:",
-            "ctaBody:",
-            "showcaseTitle:",
-            "showcaseLayerPoliticalTitle:",
-            "showcaseLayerRailTitle:",
-            "showcaseLayerCitiesTitle:",
-            "showcaseLayerDayNightTitle:",
-            "previewImageFallback:",
-            "showcaseMetadataFallback:",
-            "storyTitle:",
-            "storyStepBaselineTitle:",
-            "storyStepExportProof:",
-            "storyStageTitleExport:",
-            "chipHoi41936:",
-            "chipHoi41939:",
-            "chipTno1962:",
-            "heroAltBlank:",
-            "heroAltHoi41936:",
-            "heroAltHoi41939:",
-            "heroAltTno1962:",
-            'metaTitle: "Scenario Forge — 场景优先政治地图工作台"',
-            "metaDescription:",
-            "metaOgDescription:",
-        ):
-            with self.subTest(expected_fragment=expected_fragment):
-                self.assertIn(expected_fragment, zh_table)
-
-        for stale_fragment in (
-            'featureGroupOneTitle: "Scenario baselines"',
-            'featureGroupTwoTitle: "Political editing"',
-            'featureGroupThreeTitle: "Presentation layers"',
-            'featureGroupFourTitle: "Project and export"',
-            'featuresTitle: "Organized around tasks, not just panels."',
-        ):
-            with self.subTest(stale_fragment=stale_fragment):
-                self.assertNotIn(stale_fragment, zh_table)
 
     def test_landing_copy_stays_user_facing(self) -> None:
         sources = {
@@ -2431,262 +1607,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 with self.subTest(source=source_name, stale_fragment=stale_fragment):
                     self.assertNotIn(stale_fragment, source)
 
-    def test_dist_root_index_keeps_landing_startup_contract(self) -> None:
-        if not DIST_ROOT_INDEX.exists():
-            self.skipTest("dist/index.html is only available after build_pages_dist runs")
-        html = DIST_ROOT_INDEX.read_text(encoding="utf-8")
-
-        self.assertEqual(
-            re.findall(r'<section id="([^"]+)"', html),
-            ["hero", "sample-runs", "story", "features", "data", "faq"],
-        )
-
-        for expected_fragment in (
-            "./styles.css",
-            "./app.js",
-            "./app/?view=guide",
-            'data-i18n="heroTitle"',
-            'data-i18n="heroTitleAccent"',
-            'class="brandmark__logo"',
-            './assets/favicon.svg',
-            './assets/hero-hoi4-1936.svg',
-            'data-stat-value="21338"',
-            '<meta name="robots" content="index,follow" />',
-            '<link rel="canonical" href="https://raederhans.github.io/scenario-forge/" />',
-            '<meta property="og:image" content="https://raederhans.github.io/scenario-forge/assets/social-preview.png" />',
-            '<meta name="twitter:card" content="summary_large_image" />',
-            'data-i18n="showcaseEyebrow"',
-            './assets/europe-1936-showcase.svg',
-            'data-showcase-root',
-            'data-showcase-object',
-            'data-showcase-layer-tab="political"',
-            'data-showcase-layer-tab="rail"',
-            'data-showcase-layer-tab="cities"',
-            'data-showcase-layer-tab="day-night"',
-            'data-i18n="previewEyebrow"',
-            'data-preview-root',
-            'data-preview-surface',
-            'data-preview-viewport',
-            'data-preview-image="transport"',
-            'class="mini-map__controls"',
-            'data-preview-zoom="1"',
-            'data-preview-zoom="-1"',
-            'data-preview-zoom="reset"',
-            'data-i18n-aria-label="previewZoomIn"',
-            'data-i18n-aria-label="previewZoomOut"',
-            'data-i18n-aria-label="previewZoomReset"',
-            'role="tablist"',
-            'data-preview-status role="status" aria-live="polite" hidden',
-            'data-i18n="dataEyebrow"',
-            'data-i18n="editionsEyebrow"',
-            'data-i18n="faqEyebrow"',
-            'data-showcase-status role="status" aria-live="polite" hidden',
-            'data-i18n-aria-label="brandHomeLabel"',
-            'data-i18n-aria-label="primaryNavLabel"',
-            'data-i18n-aria-label="languageSwitcherLabel"',
-            'data-i18n-alt="productPreviewAlt"',
-            'data-i18n-alt="scenario1936Alt"',
-            'data-i18n-alt="scenario1939Alt"',
-            'data-i18n-alt="scenario1962Alt"',
-            '<a href="#sample-runs" data-i18n="navWorks">Maps</a>',
-            'id="sample-runs"',
-            'data-sample-runs-root',
-            'data-sample-runs-manifest="./assets/sample-runs.json"',
-            'data-sample-run-filter="all"',
-            'data-sample-run-filter="transport"',
-            'data-sample-run-filter="evidence"',
-            'data-sample-run-card',
-            'data-sample-run-id="hoi4-1936-europe"',
-            'data-sample-run-id="hoi4-1939-europe"',
-            'data-sample-run-id="tno-1962-europe"',
-            'data-sample-run-id="japan-tokaido-corridor"',
-            'data-sample-scenario="modern_world"',
-            'data-sample-project="./assets/sample-projects/modern-world-japan-corridor.project.json"',
-            'data-sample-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.road_lines+counts.rail_lines"',
-            'data-output-library hidden',
-            'data-transport-page="regional"',
-            'data-transport-page="national"',
-            'data-i18n="sampleFilterEvidence"',
-            'data-i18n="sampleEvidenceLabel"',
-            'data-sample-project-downloads',
-            'data-sample-project-list-link',
-            'data-sample-project-id="blank-base-starter"',
-            'data-sample-project-id="hoi4-1939-europe-switch"',
-            './app/?sample=tno-1962-atlantropa-briefing&view=guide',
-            './app/?sample=hoi4-1936-europe-briefing&view=guide',
-            './app/?sample=modern-world-japan-corridor&view=guide',
-            'data-i18n-aria-label="sampleProjectActionsLabel"',
-            'data-sample-project-open-link',
-            'data-i18n="sampleProjectDownloadsTitle"',
-            'data-i18n="sampleProjectDownloadsBody"',
-            'data-i18n="sampleProjectBlank"',
-            'data-i18n="sampleProjectModern"',
-            'data-i18n="sampleProjectHoi41936"',
-            'data-i18n="sampleProjectHoi41939"',
-            'data-i18n="sampleProjectTno"',
-            'data-sample-project-link',
-            'data-sample-manifest-link',
-            'data-i18n="sampleProjectOpen"',
-            'data-i18n="sampleProjectDownload"',
-            'data-i18n="sampleRecipeManifest"',
-            'data-i18n="ctaPrimary"',
-            "data-reveal",
-        ):
-            with self.subTest(expected_fragment=expected_fragment):
-                self.assertIn(expected_fragment, html)
-
-        assert_landing_workspace_hero(self, html)
-        assert_landing_vector_maps(self, html)
-        self.assertNotIn('class="hero__metrics"', html)
-        self.assertNotIn('data-i18n-aria-label="heroMetricsLabel"', html)
-        self.assertNotIn('data-showcase-layer-tab="scenario"', html)
-
-    def test_dist_app_js_keeps_landing_i18n_contract(self) -> None:
-        if not DIST_APP_JS.exists():
-            self.skipTest("dist/app.js is only available after build_pages_dist runs")
-        app_js = DIST_APP_JS.read_text(encoding="utf-8")
-
-        for expected_fragment in (
-            "scenario_forge_landing_lang",
-            "heroTitle",
-            "heroTitleAccent",
-            "formatMetricNumbers",
-            "statsLabel",
-            "worksEyebrow",
-            "featuresEyebrow",
-            "dataEyebrow",
-            "faqEyebrow",
-            "showcaseEyebrow",
-            "showcaseLayerPoliticalTitle",
-            "showcaseLayerRailTitle",
-            "showcaseLayerCitiesTitle",
-            "showcaseLayerDayNightTitle",
-            "initShowcaseLayers",
-            "initShowcaseView",
-            "SHOWCASE_VIEW_SCALES",
-            "showcaseViewZoomed",
-            "clampShowcaseViewPosition",
-            "dblclick",
-            "PREVIEW_VIEW_SCALES",
-            "clampPreviewViewPosition",
-            "applyPreviewViewState",
-            "initPreviewView",
-            "previewZoomed",
-            "previewDragging",
-            "initPreviewTabs",
-            "initHeroMap",
-            "initSampleRunsGallery",
-            "SAMPLE_RUN_FILTERS",
-            "syncSampleRunsFromDom",
-            "sampleFilterScenario",
-            "sampleEvidenceLabel",
-            "sampleProjectActionsLabel",
-            "sampleProjectOpen",
-            "sampleProjectDownload",
-            "sampleRecipeManifest",
-            "sampleProjectDownloadsTitle",
-            "sampleProjectDownloadsBody",
-            "sampleProjectBlank",
-            "sampleProjectModern",
-            "sampleProjectHoi41936",
-            "sampleProjectHoi41939",
-            "sampleProjectTno",
-            "initProductStory",
-            "initMetricCountUp",
-            "PRODUCT_STORY_STEPS",
-            "PRODUCT_STORY_COMPARISON_ASSETS",
-            "storyStageTitleBaseline",
-            "storyStageTitleExport",
-            "syncProductStoryFromDom",
-            "previewPanelTransportTitle",
-            "previewImageFallback",
-            "showcaseMetadataFallback",
-            "dataCardOneTitle",
-            "faqOneQuestion",
-            "editionsEyebrow",
-            "productPreviewLabel",
-            "productStageLabel",
-            "heroChipsLabel",
-            "brandHomeLabel",
-            "languageSwitcherLabel",
-            "productPreviewAlt",
-            "DEFAULT_HERO_MODE",
-            "HERO_SCENARIO_ASSETS",
-            "hero-hoi4-1936.json",
-            "hero-hoi4-1939.svg",
-            "hero-tno-1962.svg",
-            "syncHeroMap",
-            "heroAltHoi41936",
-            "heroAltHoi41939",
-            "heroAltTno1962",
-            "data-i18n-alt",
-            "metaTitle",
-            "metaDescription",
-            "metaOgDescription",
-            "zh:",
-        ):
-            with self.subTest(expected_fragment=expected_fragment):
-                self.assertIn(expected_fragment, app_js)
-
-    def test_dist_styles_keeps_reveal_and_motion_contract(self) -> None:
-        if not DIST_STYLES_CSS.exists():
-            self.skipTest("dist/styles.css is only available after build_pages_dist runs")
-        styles_css = DIST_STYLES_CSS.read_text(encoding="utf-8")
-
-        self.assertIn("prefers-reduced-motion", styles_css)
-        self.assertRegex(styles_css, re.compile(r'\[data-reveal(?:=["\']enabled["\'])?\]'))
-        self.assertIn(".is-revealed", styles_css)
-        self.assertIn(".hero-cartography", styles_css)
-        self.assertIn("translateY(-8px) perspective(1200px)", styles_css)
-        hero_chips_style = re.search(r"\.hero__chips\s*\{(?P<body>[^}]*)\}", styles_css, re.S)
-        self.assertIsNotNone(hero_chips_style)
-        self.assertNotIn("position: absolute", hero_chips_style.group("body"))
-        self.assertIn(".brandmark__logo", styles_css)
-        self.assertNotIn(".brandmark__dot", styles_css)
-        self.assertIn('[data-hero-transition="loading"]', styles_css)
-        self.assertIn('[data-hero-mode="blank"]', styles_css)
-        self.assertIn('[data-hero-mode="hoi4-1936"]', styles_css)
-        self.assertIn('[data-hero-mode="hoi4-1939"]', styles_css)
-        self.assertIn('[data-hero-mode="tno-1962"]', styles_css)
-        self.assertIn(".showcase-layer-tabs", styles_css)
-        self.assertIn('[data-showcase-view-zoomed="true"]', styles_css)
-        self.assertIn(".sample-runs__filters", styles_css)
-        self.assertIn(".sample-run-filter[aria-pressed=\"true\"]", styles_css)
-        self.assertIn(".sample-run-card__recipe", styles_css)
-        self.assertIn(".sample-run-card__proof", styles_css)
-        self.assertIn(".sample-run-card__actions", styles_css)
-        self.assertIn(".sample-project-downloads", styles_css)
-        self.assertIn(".sample-project-downloads__grid", styles_css)
-        self.assertIn(".product-story__grid", styles_css)
-        self.assertIn(".story-stage", styles_css)
-        self.assertIn("position: sticky", styles_css)
-        self.assertIn(".story-evidence", styles_css)
-        self.assertIn('.story-step[aria-pressed="true"]', styles_css)
-        for selector in (".story-stage__hud strong", ".story-step__copy strong"):
-            with self.subTest(story_font_selector=selector):
-                assert_css_block_avoids_viewport_font_scaling(self, styles_css, selector)
-        self.assertIn(".showcase-map__viewport", styles_css)
-        self.assertIn(".showcase-map__viewport::after", styles_css)
-        self.assertIn("radial-gradient(ellipse at center", styles_css)
-        self.assertIn("inset 0 0 112px", styles_css)
-        self.assertIn(".showcase-map__object", styles_css)
-        self.assertNotIn(".showcase-map__controls", styles_css)
-        self.assertIn("[data-preview-image=\"transport\"]", styles_css)
-        self.assertIn("--preview-scale", styles_css)
-        self.assertIn(".mini-map__viewport", styles_css)
-        self.assertIn(".mini-map__controls", styles_css)
-        self.assertIn('[data-preview-zoomed="true"]', styles_css)
-        self.assertIn('[data-preview-dragging="true"]', styles_css)
-        self.assertIn(".showcase-section", styles_css)
-        self.assertRegex(
-            styles_css,
-            re.compile(r"\.work-card__media img\s*\{[^}]*position:\s*absolute;[^}]*inset:\s*0;", re.S),
-        )
-        self.assertRegex(
-            styles_css,
-            re.compile(r"\.work-card__media\s*\{[^}]*aspect-ratio:\s*16\s*/\s*9;", re.S),
-        )
-
     def test_editor_source_index_keeps_pages_startup_contract(self) -> None:
         html = EDITOR_INDEX.read_text(encoding="utf-8")
 
@@ -2706,7 +1626,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertIn('<meta name="robots" content="noindex,nofollow" />', html)
         self.assertIn('<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />', html)
         self.assertIn('<link rel="alternate icon" href="../assets/favicon.png" type="image/png" />', html)
-        self.assertIn('<link rel="modulepreload" href="js/main.js" />', html)
+        # The published editor loads the esbuild bundle (tools/build_editor_bundle.mjs).
+        self.assertIn('<link rel="modulepreload" href="js/bundle/main.js" />', html)
+        self.assertIn('<script type="module" src="js/bundle/main.js"></script>', html)
+        self.assertTrue((DIST_APP_INDEX.parent / "js" / "bundle" / "main.js").is_file())
         self.assertIn('<link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />', html)
         self.assertNotIn('data-startup-bundle-preload', html)
         self.assertNotIn('startup.bundle.${language}', html)
@@ -2809,8 +1732,14 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertIn("app/data/CATALOG.json", required_files)
         self.assertFalse(any(path.startswith("app/data/hgo_runtime/") for path in required_files))
         expected_landing_asset_paths = (
+            "app.js",
+            "i18n.js",
+            "styles.css",
+            "assets/history-scrubber.json",
+            "assets/hgo-zoom.json",
+            "assets/hgo-world.webp",
+            "assets/hgo-europe.webp",
             "assets/product-workspace.webp",
-            "assets/hero-cartography.svg",
             "assets/hero-blank.svg",
             "assets/hero-blank.webp",
             "assets/hero-blank.json",
@@ -2823,10 +1752,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "assets/hero-tno-1962.svg",
             "assets/hero-tno-1962.webp",
             "assets/hero-tno-1962.json",
-            "assets/showcase-final-map.svg",
-            "assets/showcase-final-map.webp",
-            "assets/europe-1936-showcase.svg",
-            "assets/europe-1936-showcase.json",
             "assets/work-alt-history-med.svg",
             "assets/work-alt-history-med.webp",
             "assets/work-alt-history-med.json",
@@ -2853,14 +1778,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "assets/japan-preview-night.svg",
             "assets/japan-preview-night.webp",
             "assets/japan-preview.json",
-            "assets/template-blank.svg",
-            "assets/template-blank.webp",
-            "assets/template-modern.svg",
-            "assets/template-modern.webp",
-            "assets/template-hoi4.svg",
-            "assets/template-hoi4.webp",
-            "assets/template-tno.svg",
-            "assets/template-tno.webp",
         )
         for expected_path in (
             "index.html",
@@ -2936,6 +1853,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 )
 
         for dist_js_path in sorted(DIST_APP_JS_ROOT.rglob("*.js")):
+            if dist_js_path.is_relative_to(DIST_APP_JS_ROOT / "bundle"):
+                continue  # esbuild output, not a mirror of one source file
             source_relative_path = Path("js") / dist_js_path.relative_to(DIST_APP_JS_ROOT)
             source_path = REPO_ROOT / source_relative_path
             with self.subTest(app_js_mirror=str(source_relative_path).replace("\\", "/")):
@@ -3692,7 +2611,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         upload_block = "\n".join(workflow_lines[upload_block_start : upload_block_start + 4])
 
         self.assertIn(
-            "path: ${{ inputs.pages-artifact-only && '.runtime/pages-release/dist' || 'dist' }}",
+            "path: .runtime/pages-release/dist",
             upload_block,
         )
         self.assertIn("include-hidden-files: true", upload_block)

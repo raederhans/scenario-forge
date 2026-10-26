@@ -42,6 +42,7 @@ function createHarness({
   projection = ([lon, lat]) => [lon * 10 + 1, lat * -5 + 2],
   d3 = null,
   features = {},
+  constants = {},
 } = {}) {
   const harnessStore = {
     activeScenarioId: "tno_1962",
@@ -70,6 +71,7 @@ function createHarness({
   };
   const owner = createProjectedGeometryBoundsOwner({
     state: harnessStore,
+    constants,
     getters: {
       getProjection: () => projection,
       getPathCanvas: () => (pathCanvasEnabled ? path : null),
@@ -501,30 +503,29 @@ test("spherical diagnostics cache d3 results by geo object identity", () => {
 
   assert.deepEqual(owner.getSphericalGeometryDiagnostics(geometry), {
     area: 1,
-    bounds: [[10, 20], [20, 30]],
+    bounds: null,
     isWorldBounds: false,
     hasExcessiveSphereArea: false,
     invalid: false,
   });
   assert.equal(owner.getSphericalGeometryDiagnostics(geometry)?.invalid, false);
-  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+  assert.equal(diagnostics.calls.geoArea, 1);
 });
 
-test("spherical diagnostics share geometry across wrappers and invalidate on revision", () => {
+test("spherical diagnostics share geometry across wrappers and survive context revisions", () => {
   const diagnostics = createD3Diagnostics();
   const { owner, harnessStore } = createHarness({ d3: diagnostics.d3 });
   const geometry = createPolygon([10, 0]);
   const first = owner.getSphericalGeometryDiagnostics(createFeature("A", geometry));
   assert.equal(owner.getSphericalGeometryDiagnostics(createFeature("B", geometry)), first);
   assert.equal(owner.getSphericalGeometryDiagnostics(geometry), first);
-  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+  assert.equal(diagnostics.calls.geoArea, 1);
 
-  geometry.coordinates[0][0][0] = 999;
   harnessStore.contextLayerRevision = 1;
-  assert.equal(owner.getSphericalGeometryDiagnostics(geometry).invalid, true);
-  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
-  assert.equal(owner.getSphericalGeometryDiagnostics(createFeature("A", createPolygon([10, 0]))).invalid, false);
-  assert.deepEqual(diagnostics.calls, { geoArea: 3, geoBounds: 3 });
+  assert.equal(owner.getSphericalGeometryDiagnostics(geometry), first);
+  assert.equal(diagnostics.calls.geoArea, 1, "a chunk swap must not re-diagnose unchanged geometry");
+  assert.equal(owner.getSphericalGeometryDiagnostics(createFeature("A", createPolygon([999, 0]))).invalid, true);
+  assert.equal(diagnostics.calls.geoArea, 2);
 });
 
 test("water part info shares geometry across wrappers without IDs", () => {
@@ -541,7 +542,7 @@ test("water part info shares geometry across wrappers without IDs", () => {
   const secondSanitized = owner.sanitizeWaterRegionFeature(second);
   assert.equal(secondSanitized.properties, second.properties);
   assert.equal(secondSanitized.geometry, firstSanitized.geometry);
-  assert.deepEqual(diagnostics.calls, { geoArea: 3, geoBounds: 3 });
+  assert.equal(diagnostics.calls.geoArea, 3);
 });
 
 test("sanitized feature and sequence reuse rebind current properties and top-level metadata", () => {
@@ -563,7 +564,7 @@ test("sanitized feature and sequence reuse rebind current properties and top-lev
     assert.equal(sanitized.properties, feature.properties);
     assert.equal(sanitized.bbox, feature.bbox);
   }
-  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
+  assert.equal(diagnostics.calls.geoArea, 2);
 });
 
 test("replacing a feature geometry cannot poison the cached geometry or decoded snapshot", () => {
@@ -577,9 +578,9 @@ test("replacing a feature geometry cannot poison the cached geometry or decoded 
   assert.equal(owner.sanitizeWaterRegionFeature(wrapper), wrapper);
   const decoded = createFeature("WATER", structuredClone(originalGeometry));
   assert.equal(owner.sanitizeWaterRegionFeatures([decoded])[0].geometry, originalGeometry);
-  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+  assert.equal(diagnostics.calls.geoArea, 1);
   assert.equal(owner.sanitizeWaterRegionFeature(feature), null);
-  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
+  assert.equal(diagnostics.calls.geoArea, 2);
 });
 
 test("real D3 water reuse preserves holes and antimeridian geometry and rejects changed hole coordinates", async () => {
@@ -608,7 +609,7 @@ test("real D3 water reuse preserves holes and antimeridian geometry and rejects 
   assert.equal(d3.geoContains(first, [0, 0]), false, "the lake hole must remain empty");
   assert.equal(d3.geoContains(first, [5, 0]), true);
   assert.equal(d3.geoContains(first, [179, 0]), true);
-  assert.deepEqual(diagnosticCalls, { geoArea: 3, geoBounds: 3 });
+  assert.equal(diagnosticCalls.geoArea, 3);
 
   const wrapper = { ...original, properties: { id: "WATER", name: "current" } };
   assert.equal(owner.sanitizeWaterRegionFeature(wrapper).geometry, first.geometry);
@@ -616,7 +617,7 @@ test("real D3 water reuse preserves holes and antimeridian geometry and rejects 
   const [reused] = owner.sanitizeWaterRegionFeatures([decoded]);
   assert.equal(reused.geometry, first.geometry);
   assert.equal(reused.properties, decoded.properties);
-  assert.deepEqual(diagnosticCalls, { geoArea: 3, geoBounds: 3 });
+  assert.equal(diagnosticCalls.geoArea, 3);
   owner.computeProjectedFeatureBounds(first);
   owner.computeProjectedFeatureBounds(reused);
   assert.equal(calls.pathBounds, 1, "sanitized geometry identity must retain projected bounds");
@@ -627,7 +628,7 @@ test("real D3 water reuse preserves holes and antimeridian geometry and rejects 
   assert.notEqual(updated.geometry, first.geometry);
   assert.equal(updated.geometry.coordinates[0][1][1][0], 3);
   assert.equal(d3.geoContains(updated, [0, 0]), false);
-  assert.deepEqual(diagnosticCalls, { geoArea: 6, geoBounds: 6 });
+  assert.equal(diagnosticCalls.geoArea, 6);
 });
 
 test("spherical diagnostics mark world bounds and excessive sphere area invalid", () => {
@@ -738,28 +739,27 @@ test("water sanitization reuses an unchanged feature sequence and refreshes repl
   const water = createFeature("WATER", createPolygon([10, 0]));
   const first = owner.sanitizeWaterRegionFeatures([water]);
   assert.equal(first[0], water);
-  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+  assert.equal(diagnostics.calls.geoArea, 1);
 
   first.pop();
   const reused = owner.sanitizeWaterRegionFeatures([water]);
   assert.deepEqual(reused, [water], "a caller changing its result must not poison the cached source");
-  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+  assert.equal(diagnostics.calls.geoArea, 1);
 
   water.geometry = createPolygon([999, 0]);
   assert.deepEqual(owner.sanitizeWaterRegionFeatures([water]), []);
-  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
+  assert.equal(diagnostics.calls.geoArea, 2);
 
-  water.geometry.coordinates[0][0][0] = 10;
   harnessStore.contextLayerRevision = 1;
-  assert.deepEqual(owner.sanitizeWaterRegionFeatures([water]), [water]);
-  assert.deepEqual(diagnostics.calls, { geoArea: 3, geoBounds: 3 });
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([water]), []);
+  assert.equal(diagnostics.calls.geoArea, 2, "a context revision alone keeps the result");
 
-  const replacement = createFeature("WATER", createPolygon([999, 0]));
-  assert.deepEqual(owner.sanitizeWaterRegionFeatures([replacement]), []);
-  assert.deepEqual(diagnostics.calls, { geoArea: 4, geoBounds: 4 });
+  const replacement = createFeature("WATER", createPolygon([20, 0]));
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([replacement]), [replacement]);
+  assert.equal(diagnostics.calls.geoArea, 3);
 });
 
-test("water sanitation retains overview across two detail sets and invalidates on context or scenario change", () => {
+test("water sanitation retains overview across two detail sets and context revisions, and invalidates on geometry change", () => {
   const diagnostics = createD3Diagnostics();
   const { owner, harnessStore } = createHarness({ d3: diagnostics.d3 });
   const coarseA = createFeature("COARSE_A", createPolygon([10, 0]));
@@ -769,19 +769,35 @@ test("water sanitation retains overview across two detail sets and invalidates o
   const coarse = owner.sanitizeWaterRegionFeatures([coarseA, coarseB]);
   owner.sanitizeWaterRegionFeatures([detail]);
   owner.sanitizeWaterRegionFeatures([secondDetail]);
-  assert.deepEqual(diagnostics.calls, { geoArea: 4, geoBounds: 4 });
+  assert.equal(diagnostics.calls.geoArea, 4);
   const restored = owner.sanitizeWaterRegionFeatures([coarseA, coarseB]);
   assert.notEqual(restored, coarse);
   assert.deepEqual(restored, coarse);
-  assert.deepEqual(diagnostics.calls, { geoArea: 4, geoBounds: 4 });
+  assert.equal(diagnostics.calls.geoArea, 4);
 
-  coarseA.geometry.coordinates[0][0][0] = 999;
   harnessStore.contextLayerRevision = 1;
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([coarseA, coarseB]), coarse);
+  assert.equal(diagnostics.calls.geoArea, 4);
+  coarseA.geometry = createPolygon([999, 0]);
   assert.deepEqual(owner.sanitizeWaterRegionFeatures([coarseA, coarseB]), [coarseB]);
-  assert.deepEqual(diagnostics.calls, { geoArea: 6, geoBounds: 6 });
+  assert.equal(diagnostics.calls.geoArea, 5);
   harnessStore.activeScenarioId = "other";
   owner.sanitizeWaterRegionFeatures([detail]);
   assert.deepEqual(owner.sanitizeWaterRegionFeatures([coarseA, coarseB]), [coarseB]);
+});
+
+test("context revisions release decoded water snapshots but keep live geometry diagnostics", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner, harnessStore } = createHarness({ d3: diagnostics.d3 });
+  const water = createFeature("WATER", createPolygon([10, 0]));
+  owner.sanitizeWaterRegionFeatures([water]);
+  harnessStore.contextLayerRevision = 1;
+  const redecoded = structuredClone(water);
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([redecoded]), [redecoded],
+    "after the snapshot is released a redecoded copy is sanitized on its own");
+  assert.equal(diagnostics.calls.geoArea, 2);
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([water]), [water]);
+  assert.equal(diagnostics.calls.geoArea, 2, "live geometry keeps its diagnostics");
 });
 
 test("redecoded equal water coordinates reuse safe geometry while changed points and order recompute", () => {
@@ -789,24 +805,24 @@ test("redecoded equal water coordinates reuse safe geometry while changed points
   const { owner } = createHarness({ d3: diagnostics.d3 });
   const original = createFeature("WATER", createPolygon([10, 0]));
   const [first] = owner.sanitizeWaterRegionFeatures([original]);
-  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+  assert.equal(diagnostics.calls.geoArea, 1);
 
   const decoded = structuredClone(original);
   decoded.properties.name = "current metadata";
   const [reused] = owner.sanitizeWaterRegionFeatures([decoded]);
   assert.equal(reused.geometry, first.geometry);
   assert.equal(reused.properties.name, "current metadata");
-  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+  assert.equal(diagnostics.calls.geoArea, 1);
 
   const changedPoint = structuredClone(original);
   changedPoint.geometry.coordinates[0][1][0] += 0.25;
   owner.sanitizeWaterRegionFeatures([changedPoint]);
-  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
+  assert.equal(diagnostics.calls.geoArea, 2);
 
   const reordered = structuredClone(original);
   reordered.geometry.coordinates[0].reverse();
   owner.sanitizeWaterRegionFeatures([reordered]);
-  assert.deepEqual(diagnostics.calls, { geoArea: 3, geoBounds: 3 });
+  assert.equal(diagnostics.calls.geoArea, 3);
 });
 
 test("repeated water list resolution skips sanitation bookkeeping for unchanged unsafe parts", () => {
@@ -827,7 +843,7 @@ test("repeated water list resolution skips sanitation bookkeeping for unchanged 
   assert.equal(second[0], first[0]);
   assert.equal(idReads, 1, "an unchanged list should not rescan unsafe part IDs");
   assert.equal(calls.metrics.length, 1);
-  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
+  assert.equal(diagnostics.calls.geoArea, 2);
 });
 
 test("clearProjectedBoundsCache clears projected bounds and triggers host water path cleanup", () => {
@@ -842,7 +858,7 @@ test("clearProjectedBoundsCache clears projected bounds and triggers host water 
 
   assert.equal(harnessStore.projectedBoundsById.size, 0);
   assert.equal(calls.resetHostWaterPathCaches, 1);
-  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+  assert.equal(diagnostics.calls.geoArea, 1);
 });
 
 // ---------------------------------------------------------------------------
@@ -960,4 +976,144 @@ test("clearProjectedBoundsCache remains full reset and calls resetHostWaterPathC
   assert.equal(owner.getProjectedFeatureBounds(feature, { allowCompute: false }), null);
   assert.equal(harnessStore.projectedBoundsById.size, 0);
   assert.equal(calls.resetHostWaterPathCaches, 1);
+});
+
+test("spherical bounds are computed only when they can change or explain the verdict", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner } = createHarness({ d3: diagnostics.d3 });
+
+  assert.equal(owner.getSphericalGeometryDiagnostics(createPolygon([10, 10])).bounds, null);
+  assert.equal(diagnostics.calls.geoBounds, 0, "compact valid geometry skips geoBounds");
+
+  const oversized = owner.getSphericalGeometryDiagnostics(createPolygon([500, 0]));
+  assert.equal(oversized.invalid, true);
+  assert.deepEqual(oversized.bounds, [[10, 20], [20, 30]], "rejected geometry keeps bounds for its diagnostic");
+  assert.equal(diagnostics.calls.geoBounds, 1);
+
+  const corrupt = owner.getSphericalGeometryDiagnostics(createPolygon([999, 0]));
+  assert.equal(corrupt.invalid, true, "out-of-range coordinates still reach the world-bounds check");
+  assert.equal(corrupt.isWorldBounds, true);
+
+  // Edges take the minor arc, so a small ring across the antimeridian travels 40°.
+  const antimeridian = { type: "Polygon", coordinates: [[[170, 0], [-170, 0], [-170, 10], [170, 10], [170, 0]]] };
+  assert.equal(owner.getSphericalGeometryDiagnostics(antimeridian).bounds, null);
+  const wide = { type: "Polygon", coordinates: [[[0, 0], [100, 0], [100, 10], [0, 10], [0, 0]]] };
+  owner.getSphericalGeometryDiagnostics(wide);
+  assert.equal(diagnostics.calls.geoBounds, 3, "edges travelling 180 degrees of longitude compute bounds");
+});
+
+test("real D3 rejects an inverted compact ring as world bounds and accepts the same ring wound correctly", () => {
+  const sandbox = {};
+  vm.runInNewContext(fs.readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), sandbox);
+  const { d3 } = sandbox;
+  const { owner } = createHarness({ d3 });
+  const clockwise = [[0, 0], [0, 10], [10, 10], [10, 0], [0, 0]];
+  const valid = owner.getSphericalGeometryDiagnostics({ type: "Polygon", coordinates: [clockwise] });
+  assert.equal(valid.invalid, false);
+  assert.equal(valid.bounds, null);
+  const inverted = owner.getSphericalGeometryDiagnostics({ type: "Polygon", coordinates: [clockwise.slice().reverse()] });
+  assert.equal(inverted.invalid, true);
+  assert.equal(inverted.hasExcessiveSphereArea, true);
+  assert.equal(inverted.isWorldBounds, true);
+
+  // Repeated inverted rings accumulate past a hemisphere before D3 normalizes
+  // the area, so the area alone looks valid; only geoBounds rejects it.
+  const wide = [[0, 0], [150, 0], [150, 80], [0, 80], [0, 0]];
+  const stacked = owner.getSphericalGeometryDiagnostics({ type: "Polygon", coordinates: [wide, wide, wide] });
+  assert.equal(stacked.hasExcessiveSphereArea, false);
+  assert.equal(stacked.isWorldBounds, true);
+  assert.equal(stacked.invalid, true);
+  const stackedParts = owner.getSphericalGeometryDiagnostics({ type: "MultiPolygon", coordinates: [[clockwise], [wide, wide, wide]] });
+  assert.equal(stackedParts.invalid, true);
+
+  // One ring that repeats an inverted loop accumulates area the same way.
+  const loop = wide.slice(0, 4);
+  const repeated = owner.getSphericalGeometryDiagnostics({ type: "Polygon", coordinates: [[...loop, ...loop, ...loop, ...loop, loop[0]]] });
+  assert.equal(repeated.hasExcessiveSphereArea, false);
+  assert.equal(repeated.isWorldBounds, true);
+  assert.equal(repeated.invalid, true);
+
+  // An edge whose ends are 180° apart takes the minor arc over a pole.
+  const polarLine = owner.getSphericalGeometryDiagnostics({ type: "LineString", coordinates: [[180, 80], [0, 0], [-180, -45]] });
+  assert.equal(polarLine.isWorldBounds, true);
+  assert.equal(polarLine.invalid, true);
+});
+
+test("real D3 keeps the world-bounds check when the configured area limit exceeds a hemisphere", () => {
+  const sandbox = {};
+  vm.runInNewContext(fs.readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), sandbox);
+  const { d3 } = sandbox;
+  const { owner } = createHarness({ d3, constants: { sphericalGeometryMaxArea: Math.PI * 4 } });
+  const reversedSquare = { type: "Polygon", coordinates: [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]] };
+  const diagnostics = owner.getSphericalGeometryDiagnostics(reversedSquare);
+  assert.equal(diagnostics.hasExcessiveSphereArea, false);
+  assert.equal(diagnostics.isWorldBounds, true);
+  assert.equal(diagnostics.invalid, true);
+});
+
+test("real D3 keeps the world-bounds check for edges that round onto a pole", () => {
+  const sandbox = {};
+  vm.runInNewContext(fs.readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), sandbox);
+  const { d3 } = sandbox;
+  const { owner } = createHarness({ d3 });
+  const equator = [[-180, 0], [-90, 0], [0, 0], [90, 0], [180, 0]];
+  // Neither arc reaches a pole, but D3 rounds each one's extreme onto it.
+  const nearAntipodal = owner.getSphericalGeometryDiagnostics({ type: "MultiLineString", coordinates: [
+    [[0, 89], [179.99999, 89]], [[0, -89], [179.99999, -89]], equator,
+  ] });
+  assert.equal(nearAntipodal.isWorldBounds, true);
+  assert.equal(nearAntipodal.invalid, true);
+  // Ends 180° apart just off the equator: the arc crosses the pole even though
+  // the colatitude is nearly a right angle.
+  const equatorialAntipodal = owner.getSphericalGeometryDiagnostics({ type: "MultiLineString", coordinates: [
+    [[-30, 1e-9], [150, 1e-9]], [[-30, -1e-9], [150, -1e-9]], equator,
+  ] });
+  assert.equal(equatorialAntipodal.isWorldBounds, true);
+  assert.equal(equatorialAntipodal.invalid, true);
+
+  const capped = (lat) => [[0, lat * 0.989], [0, lat], [60, lat], [60, lat * 0.989], [0, lat * 0.989]];
+  const north = capped(89.99999999), south = capped(-89.99999999).reverse();
+  const bands = [-180, -60, 60].map((lon) => [[lon, 0], [lon, 10], [lon + 120, 10], [lon + 120, 0], [lon, 0]]);
+  const polarCaps = owner.getSphericalGeometryDiagnostics({ type: "MultiPolygon", coordinates: [[north], [south], ...bands.map((ring) => [ring])] });
+  assert.equal(polarCaps.hasExcessiveSphereArea, false);
+  assert.equal(polarCaps.isWorldBounds, true);
+  assert.equal(polarCaps.invalid, true);
+});
+
+test("real D3 bounds of accepted near-polar edges never touch a pole", () => {
+  const sandbox = {};
+  vm.runInNewContext(fs.readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), sandbox);
+  const { d3 } = sandbox;
+  const geoBounds = d3.geoBounds;
+  let boundsChecked = 0, accepted = 0;
+  const { owner } = createHarness({ d3: { geoArea: d3.geoArea, geoBounds: (geometry) => { boundsChecked += 1; return geoBounds(geometry); } } });
+  let seed = 7;
+  const random = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+  const sign = () => (random() < 0.5 ? 1 : -1);
+  const latitude = () => {
+    const kind = random();
+    if (kind < 0.5) return sign() * (90 - 10 ** (-1 - random() * 10));
+    if (kind < 0.7) return sign() * 10 ** (-1 - random() * 12);
+    return random() * 180 - 90;
+  };
+  const longitude = (from) => {
+    const kind = random();
+    const span = kind < 0.15 ? 180 : kind < 0.6 ? 180 - 10 ** (-random() * 13) : random() * 120;
+    return Math.max(-180, Math.min(180, ((from + (random() < 0.5 ? span : -span) + 540) % 360) - 180));
+  };
+  for (let index = 0; index < 20000; index += 1) {
+    const a = [random() * 360 - 180, latitude()];
+    const b = [longitude(a[0]), random() < 0.5 ? a[1] : latitude()];
+    const geometry = index % 2
+      ? { type: "LineString", coordinates: [a, b] }
+      : { type: "Polygon", coordinates: [[a, [a[0], b[1]], b, [b[0], a[1]], a]] };
+    const before = boundsChecked;
+    const diagnostics = owner.getSphericalGeometryDiagnostics(geometry);
+    if (boundsChecked !== before) continue;
+    accepted += 1;
+    const [[, south], [, north]] = geoBounds(geometry);
+    assert.ok(south > -90 && north < 90, `skipped bounds touch a pole: ${JSON.stringify(geometry.coordinates)}`);
+    assert.equal(diagnostics.invalid, false);
+  }
+  assert.ok(accepted > 2000, `too few edges took the fast path: ${accepted}`);
 });

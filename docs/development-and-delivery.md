@@ -13,6 +13,8 @@ npm run test:e2e:smoke   # browser smoke
 npm run test:e2e:golden  # golden user flows (about 10 minutes)
 ```
 
+`dist/` is not tracked. CI builds the Pages artifact from source with `tools/build_pages_dist.py`, which bundles the editor's JavaScript into `app/js/bundle/` with `tools/build_editor_bundle.mjs` (esbuild). Run `npm run verify:pages-dist` for a local build.
+
 `tests/quarantine.json` is the only skip list on PRs. Every entry needs a reason and leaves as soon as the test is fixed or deleted. Nightly runs everything with `--all`, including the quarantine and the slow lists.
 
 | Stage | Action |
@@ -21,7 +23,7 @@ npm run test:e2e:golden  # golden user flows (about 10 minutes)
 | Before a commit | `npm test`. Add `npm run verify:pages-dist` when data, packaging or Pages entries change. |
 | Push a feature branch | Push within existing authorization; no extra verification bundle is required. |
 | Merge a PR | Wait for `PR Verify Required` on the final commit. |
-| Release | Merging to `main` triggers deployment. Confirm CI, merge, artifact admission and live deployment separately. |
+| Release | Merging to `main` triggers deployment: the artifact is built once, the release gate runs per scenario in parallel, and admission is written only after every slice passes. Confirm CI, merge, artifact admission and live deployment separately. |
 
 ## PR checks
 
@@ -31,7 +33,7 @@ Every PR runs the same jobs; there is no path-based routing:
 | --- | --- |
 | `pr-tests` | All Node unit tests (two shards) and all Python unit tests. |
 | `pr-verify-fast` | Public sample project validation, Quick Fill hierarchy data and audit, data catalog health, Pages source references, Pages artifact build and startup shell checks. |
-| `pr-golden` | Golden user flows (two shards): startup, switching and filling in all five scenarios, undo/redo, save and reopen, PNG export, performance budgets. They reach the app only through the DOM and `js/core/app_test_api.js`. |
+| `pr-golden` | Golden user flows (editor flows sharded per test into four jobs, landing flows in a fifth): startup, switching and filling in all five scenarios, undo/redo, save and reopen, PNG export, performance budgets. They reach the app only through the DOM and `js/core/app_test_api.js`. |
 | `pr-verify-smoke` | Browser smoke, the Golden Demo and the live Quick Fill toolbar smoke (`tools/check_quick_fill_browser.mjs`). |
 | `pr-verify-hgo` | Checks, tests and data validation for the standalone HGO editor. |
 | `PR Verify Required` | Fails when any job above fails; the only required check. |

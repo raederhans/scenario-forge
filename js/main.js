@@ -4,6 +4,7 @@ import "./core/data_service.js";
 import "./core/app_test_api.js";
 import {
   setBootPreviewVisibleState,
+  setBootSubProgress,
   setStartupInitialScenarioChunkVisualPromotion,
   setStartupInteractionMode,
   setUiHydrationState,
@@ -116,6 +117,7 @@ function checkpointFirstVisibleFrameMetrics() {
   if (String(state.activeScenarioId || "").trim()) {
     checkpointBootMetricOnce("first-visible-scenario");
   }
+  setBootPreviewVisible(true);
   return state.bootMetrics;
 }
 
@@ -401,9 +403,9 @@ async function finalizeReadyState(renderDispatcher) {
     shouldEnterStartupReadonly
     && startupBootstrapStrategy === "chunked-coarse-first";
   if (shouldUseChunkedCoarseStartup) {
-    // chunked-coarse-first 已有可点击粗粒度政治层，先建 basic hit 基础设施再放行 ready，完整交互设施继续延后。
+    setStartupReadonlyState(true, { reason: "detail-promotion" });
     setBootState("interaction-infra", {
-      blocking: true,
+      blocking: false,
       progress: Math.max(Number(runtimeState.bootProgress) || 0, getBootProgressWindow("detail-promotion").min),
       canContinueWithoutScenario: false,
     });
@@ -617,15 +619,30 @@ async function bootstrap() {
       });
     }
 
-    await ensureStartupInitialScenarioChunkVisualReady({
+    // initial-chunk-visual / warmup-flush 覆盖 first-visible 前后的首屏 chunk 提升与首帧 flush，便于和 total 对账。
+    setBootState("initial-chunk-visual");
+    startBootMetric("initial-chunk-visual");
+    const initialChunkVisualPromotion = await ensureStartupInitialScenarioChunkVisualReady({
       reason: "startup-initial-visual",
       d3Client,
     });
+    finishBootMetric("initial-chunk-visual", {
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      status: String(initialChunkVisualPromotion?.status || (initialChunkVisualPromotion ? "ok" : "skipped")),
+      promotedVisibleFeatureCount: Number(initialChunkVisualPromotion?.promotedVisibleFeatureCount || 0),
+      promotedTotalFeatureCount: Number(initialChunkVisualPromotion?.promotedTotalFeatureCount || 0),
+    });
+    setBootSubProgress(runtimeState, null);
 
     setBootState("warmup");
+    startBootMetric("warmup-flush");
     invalidateAllRenderPasses("bootstrap-first-political-frame");
-    await waitForStartupRenderSettle(runtimeState);
+    const startupRenderSettled = await waitForStartupRenderSettle(runtimeState);
     renderDispatcher.flush();
+    finishBootMetric("warmup-flush", {
+      activeScenarioId: String(runtimeState.activeScenarioId || ""),
+      renderSettled: !!startupRenderSettled,
+    });
     assertStartupFirstVisibleFrameAccepted("bootstrap-first-political-frame");
 
     // Phase: 触发 detail promotion | Input: 当前 scenario/state/renderDispatcher | Output: ready state 或 readonly 解锁调度。

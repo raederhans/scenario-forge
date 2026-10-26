@@ -6,8 +6,9 @@
 // Keep it small: add a query only when a golden flow needs it.
 
 import { state } from "./state.js";
+import { getPoliticalIdRasterDiagnostics } from "./map_renderer/public.js";
 
-const API_VERSION = 1;
+const API_VERSION = 2;
 
 function chunkIdle(loadState) {
   return !loadState.pendingPromotion
@@ -31,9 +32,8 @@ let rendererModule = null;
 
 // The GPU raster path presents frames asynchronously after the render phase reports idle.
 // Pixels are stable only once no raster work is pending and the presented view matches the zoom.
-async function rasterPresented() {
-  rendererModule ||= await import("./map_renderer.js");
-  const raster = rendererModule.getPoliticalIdRasterDiagnostics?.();
+function rasterPresented() {
+  const raster = getPoliticalIdRasterDiagnostics();
   if (!raster?.selected) return true;
   if (raster.displayState === "preparing" || raster.pending || raster.stagedPending || raster.refinementPending) return false;
   if (raster.gpu?.pendingFrameReady || raster.gpuPreparation?.pending) return false;
@@ -46,7 +46,7 @@ async function rasterPresented() {
     && Math.abs(view.y - (zoom.y ?? 0)) < 0.5;
 }
 
-async function status() {
+function status() {
   const loadState = state.runtimeChunkLoadState || {};
   const interactive = state.bootBlocking === false
     && !state.scenarioApplyInFlight
@@ -57,11 +57,28 @@ async function status() {
   return {
     bootError: String(state.bootError || ""),
     scenarioId: String(state.activeScenarioId || ""),
+    phase: String(state.bootPhase || ""),
+    blocking: state.bootBlocking !== false,
+    startupReadonly: !!state.startupReadonly,
+    viewable: !!state.firstVisibleFramePainted && state.bootBlocking === false,
     // Editing is allowed (startup may open read-only until full data arrives).
     editable: interactive && !state.startupReadonly,
     interactive,
+    viewport: {
+      x: Number(state.zoomTransform?.x || 0),
+      y: Number(state.zoomTransform?.y || 0),
+      k: Number(state.zoomTransform?.k || 1),
+      bounds: state.getViewportGeoBoundsFn?.() || null,
+    },
+    chunks: {
+      idle: chunkIdle(loadState),
+      pendingReason: String(loadState.pendingReason || ""),
+      requiredChunkIds: [...(loadState.lastSelection?.requiredChunkIds || [])],
+      loadedChunkIds: [...(state.activeScenarioChunks?.loadedChunkIds || [])],
+      viewportBounds: loadState.lastSelection?.viewportBbox || null,
+    },
     // Everything that affects pixels has settled: data, chunks, render passes and GPU presentation.
-    settled: pipelineIdle && await rasterPresented(),
+    settled: pipelineIdle && rasterPresented(),
   };
 }
 
@@ -89,6 +106,29 @@ function isDirty() {
   return !!state.isDirty;
 }
 
+function selection() {
+  return {
+    currentTool: state.currentTool,
+    selectedInspectorCountryCode: state.selectedInspectorCountryCode,
+    selectedWaterRegionId: state.selectedWaterRegionId,
+    selectedSpecialRegionId: state.selectedSpecialRegionId,
+  };
+}
+
+// NOT part of the stable contract above. Release and raster diagnostics still inspect
+// internals; on a bundled build, importing ./js/core/*.js by URL would load a second,
+// unused copy of each module, so they get the live instances from here instead.
+async function internals() {
+  const [renderer, rasterTrial, interactionFunnel, scenarioDispatcher, scenarioManager] = await Promise.all([
+    import("./map_renderer.js"),
+    import("./renderer/political_id_raster_trial.js"),
+    import("./interaction_funnel.js"),
+    import("./scenario_dispatcher.js"),
+    import("./scenario_manager.js"),
+  ]);
+  return { state, renderer, rasterTrial, interactionFunnel, scenarioDispatcher, scenarioManager };
+}
+
 export function installAppTestApi(target = globalThis) {
   target.__scenarioForgeTestApi = Object.freeze({
     version: API_VERSION,
@@ -97,6 +137,8 @@ export function installAppTestApi(target = globalThis) {
     editedFeatureColors,
     history,
     isDirty,
+    selection,
+    internals,
   });
 }
 

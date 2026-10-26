@@ -2,6 +2,14 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Inspector": { zh: "检查器", en: "Inspector" },
+  "Layer settings": { zh: "图层设置", en: "Layer settings" },
+  "Scenario": { zh: "剧本", en: "Scenario" },
+  "Mode": { zh: "模式", en: "Mode" },
+  "Country": { zh: "国家", en: "Country" },
+  "Select tool": { zh: "选择工具", en: "Select tool" },
+  "Switched to fill tool": { zh: "已切换到填充工具", en: "Switched to fill tool" },
+  "Click to inspect a region or country. Press F to switch to fill before painting.": { zh: "点击查看区域或国家。绘制前按 F 切换到填充工具。", en: "Click to inspect a region or country. Press F to switch to fill before painting." },
   "Population heatmap could not be loaded. Retry.": { zh: "人口热力加载失败，请重试。", en: "Population heatmap could not be loaded. Retry." },
   "Loading population heatmap…": { zh: "正在加载人口热力…", en: "Loading population heatmap…" },
   "Showing overview; refining this view…": { zh: "已显示全局概览，正在细化当前视野…", en: "Showing overview; refining this view…" },
@@ -151,6 +159,8 @@ export const UI_COPY_CATALOG = Object.freeze({
 
   "Save project": { zh: "保存项目", en: "Save project" },
   "Export image": { zh: "导出图片", en: "Export image" },
+  "Star on GitHub": { zh: "在 GitHub 点 Star", en: "Star on GitHub" },
+  "Star Scenario Forge on GitHub": { zh: "在 GitHub 为 Scenario Forge 点 Star", en: "Star Scenario Forge on GitHub" },
   "Not saved yet": { zh: "尚未保存", en: "Not saved yet" },
   "Unsaved changes": { zh: "有未保存的修改", en: "Unsaved changes" },
   "Project downloaded": { zh: "项目已下载", en: "Project downloaded" },
@@ -256,6 +266,7 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Continuous Cycle": { zh: "连续循环", en: "Continuous Cycle" },
   "Cycle Speed": { zh: "循环速度", en: "Cycle Speed" },
   "{seconds}s / day": { zh: "{seconds} 秒 / 天", en: "{seconds}s / day" },
+  "Category {index}": { zh: "类别 {index}", en: "Category {index}" },
   "≈ {km} km": { zh: "约 {km} 公里", en: "≈ {km} km" },
   "Loading palette suggestions": { zh: "正在加载色板建议", en: "Loading palette suggestions" },
   "No palette suggestions": { zh: "暂无色板建议", en: "No palette suggestions" },

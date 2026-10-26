@@ -1,5 +1,6 @@
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import { getPackedPaintContourMesh } from "./paint_contour_mesh.js";
+import { yieldToBackground } from "../background_yield.js";
 
 export function createBorderDrawOwner({
   state,
@@ -59,7 +60,6 @@ export function createBorderDrawOwner({
     clamp = (value, min, max) => Math.min(max, Math.max(min, value)),
     buildCountryParentBorderMeshes = () => [],
     buildDetailAdmMeshSignature = () => ({ detailCountries: [], signature: "" }),
-    drawCoastalTransition = () => false,
     drawScenarioCoastalAccentLayer = () => {},
     drawRiverInternalContours = () => {},
     getCoastlineCollectionForZoom = () => [],
@@ -69,12 +69,28 @@ export function createBorderDrawOwner({
     isUsableMesh = () => false,
     getPaintContourMeshes = () => [],
     getPoliticalBorderMeshes = () => [],
+    getClassifiedBorderMeshes = () => null,
     sanitizePolyline = (line) => (Array.isArray(line) ? line : []),
     scheduleDeferredHeavyBorderMeshes = () => {},
     reconcileDetailAdmBorders = () => {},
     setVisibleInternalBorderMeshSignature = () => {},
     createBoundaryPath = () => new Path2D(),
   } = helpers;
+
+  function internalMeshes(classification, category, code) {
+    if (classification) {
+      const mesh = classification[category].get(code);
+      return mesh ? [mesh] : [];
+    }
+    const cache = { local: state.cachedLocalBordersByCountry, province: state.cachedProvinceBordersByCountry,
+      parent: state.cachedParentBordersByCountry };
+    return cache[category]?.get(code);
+  }
+  function internalCountries(classification) {
+    return classification
+      ? new Set([...classification.local.keys(), ...classification.province.keys(), ...classification.parent.keys()])
+      : getVisibleCountryCodesForBorderMeshes();
+  }
 
   let meshGeometryCache = new WeakMap();
   let meshCoordinateSources = new WeakMap();
@@ -225,9 +241,7 @@ export function createBorderDrawOwner({
       context.beginPath();
       meshes.forEach((mesh) => pathCanvas(mesh));
     };
-    // Clipping must precede path construction. Canvas save/restore preserves
-    // the current path, so the fine stroke can reuse the transition geometry.
-    if (!drawCoastalTransition(k, { lineWidth, buildPath })) buildPath();
+    buildPath();
     context.strokeStyle = strokeStyle;
     context.lineWidth = lineWidth;
     context.lineJoin = boundaryDefaultLineJoin;
@@ -551,12 +565,14 @@ export function createBorderDrawOwner({
   }
 
   function captureBorderPreparation(k, interactive) {
+    const classification = getClassifiedBorderMeshes();
     const projection = getProjection();
     const generation = getProjectionGeometryGeneration(projection);
     const viewport = capturePathViewport(k, interactive);
-    const visible = interactive ? [] : [...getVisibleCountryCodesForBorderMeshes()];
+    const visible = interactive ? [] : [...internalCountries(classification)];
     const parents = interactive || state.parentBordersVisible === false ? []
-      : (state.parentBorderSupportedCountries || []).filter(code => !!state.parentBorderEnabledByCountry?.[code]);
+      : (classification ? [...classification.parent.keys()] : state.parentBorderSupportedCountries || [])
+        .filter(code => !!state.parentBorderEnabledByCountry?.[code]);
     const requests = [];
     const key = [k, interactive, projection, generation, ...(viewport?.key || [null]), state.zoomTransform?.k, state.activeScenarioId, state.sceneGeneration,
       state.scenarioDataGeneration, state.currentScenarioApplyRequestId,
@@ -571,10 +587,10 @@ export function createBorderDrawOwner({
       }
     };
     if (!interactive) {
-      if (k >= localBordersMinZoom) for (const code of visible) add(state.cachedLocalBordersByCountry?.get(code), "internal-local");
-      for (const code of visible) add(state.cachedProvinceBordersByCountry?.get(code), "internal-province");
-      if (k >= detailAdmBordersMinZoom) add(state.cachedDetailAdmBorders);
-      for (const code of parents) add(state.cachedParentBordersByCountry?.get(code));
+      if (k >= localBordersMinZoom) for (const code of visible) add(internalMeshes(classification, 'local', code), "internal-local");
+      for (const code of visible) add(internalMeshes(classification, 'province', code), "internal-province");
+      if (!classification && k >= detailAdmBordersMinZoom) add(state.cachedDetailAdmBorders);
+      for (const code of parents) add(internalMeshes(classification, 'parent', code));
     }
     add(getPaintContourMeshes());
     add(getPoliticalBorderMeshes());
@@ -586,10 +602,10 @@ export function createBorderDrawOwner({
         : getCoastlineCollectionForZoom(k);
       add(coasts, "coastline", true);
     }
-    return { key, requests, parents, projection, generation, k, interactive, viewport,
+    return { key, requests, parents, classification, projection, generation, k, interactive, viewport,
       supported: typeof globalThis.Path2D === "function" && typeof globalThis.Path2D.prototype.addPath === "function"
         && typeof projection?.stream === "function"
-        && (!parents.length || state.cachedParentBordersByCountry instanceof Map)
+        && (!!classification || !parents.length || state.cachedParentBordersByCountry instanceof Map)
         && requests.every(({ mesh }) => mesh.type === "MultiLineString"
           && (getPackedPaintContourMesh(mesh) || Array.isArray(mesh.coordinates))) };
   }
@@ -724,8 +740,7 @@ export function createBorderDrawOwner({
 
   function prepareHierarchicalBorders(k, {
     interactive = false, signal, isCurrent = () => true,
-    yieldControl = () => globalThis.scheduler?.yield
-      ? globalThis.scheduler.yield() : new Promise(resolve => setTimeout(resolve, 0)),
+    yieldControl = yieldToBackground,
     nowMs = () => globalThis.performance?.now?.() ?? Date.now(), sliceBudgetMs = 4,
   } = {}) {
     const snapshot = captureBorderPreparation(k, interactive);
@@ -743,7 +758,7 @@ export function createBorderDrawOwner({
       if (!current()) return false;
       // Parent mesh construction belongs to the existing source owner. Warm a
       // missing source once before taking the final geometry snapshot.
-      for (const code of job.snapshot.parents) {
+      for (const code of job.snapshot.classification ? [] : job.snapshot.parents) {
         if (!state.cachedParentBordersByCountry?.has(code)) {
           if (!(state.cachedParentBordersByCountry instanceof Map)) return false;
           state.cachedParentBordersByCountry.set(code, buildCountryParentBorderMeshes(code));
@@ -873,6 +888,7 @@ export function createBorderDrawOwner({
   function drawHierarchicalBorders(k, { interactive = false } = {}) {
     const context = getContext();
     if (!context) return;
+    const classification = getClassifiedBorderMeshes();
     const kEff = clamp(k, 1, 8);
     const t = (kEff - 1) / 7;
     const kDenom = Math.max(0.0001, k);
@@ -894,7 +910,7 @@ export function createBorderDrawOwner({
 
     const empireWidthBase = Number(empire.width) || 1.2;
     const internalWidthBase = Number(internal.width) || 0.5;
-    const coastWidthBase = Number(coast.width) || 1.2;
+    const coastWidthBase = Number.isFinite(Number(coast.width)) ? Number(coast.width) : 1.2;
     const parentWidthBase = Number(parent.width) || 1.1;
     const internalOpacity = clamp(
       Number.isFinite(Number(internal.opacity)) ? Number(internal.opacity) : 1,
@@ -911,6 +927,8 @@ export function createBorderDrawOwner({
       0,
       1
     );
+    const coastWidth = (coastWidthBase * 0.8) / kDenom;
+    const coastAlpha = coastOpacity * 0.875;
     const parentOpacity = clamp(
       Number.isFinite(Number(parent.opacity)) ? Number(parent.opacity) : 0.85,
       0,
@@ -947,8 +965,7 @@ export function createBorderDrawOwner({
       miterLimit: boundaryDefaultMiterLimit });
 
     if (interactive) {
-      const coastWidth = (coastWidthBase * 0.88) / kDenom;
-      const drawCanonicalCoastlines = coastOpacity > 0;
+      const drawCanonicalCoastlines = coastOpacity > 0 && coastWidth > 0;
       const coastlineLow = drawCanonicalCoastlines
         ? (
           state.cachedCoastlinesLow?.length
@@ -963,8 +980,9 @@ export function createBorderDrawOwner({
       drawMeshCollection(politicalMeshes, empireColor, politicalWidth, { transformMesh: empireMeshTransform });
 
       if (drawCanonicalCoastlines) {
-        context.globalAlpha = coastOpacity * 0.78;
+        context.globalAlpha = coastAlpha;
         drawCoastlineCollection(coastlineLow, coastColor, coastWidth, k, { transformMesh: coastlineMeshTransform });
+        drawScenarioCoastalAccentLayer(k, { interactive });
       }
 
       context.globalAlpha = 1.0;
@@ -999,7 +1017,6 @@ export function createBorderDrawOwner({
       0.48 * internalBorderLocalAlphaScale
     );
     const parentAlpha = clamp(parentOpacity * (0.55 + 0.25 * t), 0.30, 0.90);
-    const coastAlpha = coastOpacity * clamp(0.74 + 0.12 * t, 0.74, 0.86);
     const detailAdmAlpha = clamp(
       internalOpacity * (0.20 + 0.12 * t) * detailAdmBorderAlphaScale,
       0,
@@ -1023,17 +1040,16 @@ export function createBorderDrawOwner({
       internalWidthBase * 0.40 * (0.70 + 0.55 * t) * lowZoomWidthScale
     ) * internalBorderLocalWidthScale / kDenom;
     const parentWidth = (parentWidthBase * (0.90 + 0.35 * t)) / kDenom;
-    const coastWidth = (coastWidthBase * (0.90 + 0.30 * t)) / kDenom;
     const detailAdmWidth = Math.max(
       detailAdmBorderMinWidth,
       internalWidthBase * 0.42 * (0.72 + 0.40 * t) * lowZoomWidthScale
     ) * detailAdmBorderWidthScale / kDenom;
-    const drawCanonicalCoastlines = coastOpacity > 0;
+    const drawCanonicalCoastlines = coastOpacity > 0 && coastWidth > 0;
     const coastlineCollection = drawCanonicalCoastlines
       ? getViewportAwareCoastlineCollection(getCoastlineCollectionForZoom(k), k)
       : null;
-    const visibleCountryCodes = getVisibleCountryCodesForBorderMeshes();
-    if (visibleCountryCodes.size > 0) {
+    const visibleCountryCodes = internalCountries(classification);
+    if (!classification && visibleCountryCodes.size > 0) {
       const includeProvinceMeshes = k >= provinceBordersTransitionEndZoom;
       const includeLocalMeshes = k >= localBordersMinZoom;
       const nextVisibleMeshSignature = [
@@ -1053,7 +1069,7 @@ export function createBorderDrawOwner({
     if (k >= localBordersMinZoom) {
       context.globalAlpha = localAlpha;
       visibleCountryCodes.forEach((countryCode) => {
-        const meshes = state.cachedLocalBordersByCountry?.get(countryCode) || [];
+        const meshes = internalMeshes(classification, 'local', countryCode) || [];
         drawMeshCollection(
           meshes,
           getInternalBorderStrokeColor(countryCode, internalColor),
@@ -1065,7 +1081,7 @@ export function createBorderDrawOwner({
 
     context.globalAlpha = provinceAlpha;
     visibleCountryCodes.forEach((countryCode) => {
-      const meshes = state.cachedProvinceBordersByCountry?.get(countryCode) || [];
+      const meshes = internalMeshes(classification, 'province', countryCode) || [];
       drawMeshCollection(
         meshes,
         getInternalBorderStrokeColor(countryCode, internalColor),
@@ -1074,25 +1090,25 @@ export function createBorderDrawOwner({
       );
     });
 
-    if (k >= detailAdmBordersMinZoom) {
+    if (!classification && k >= detailAdmBordersMinZoom) {
       const detailAdmMeta = buildDetailAdmMeshSignature(visibleCountryCodes, k);
       reconcileDetailAdmBorders(detailAdmMeta);
     }
 
-    if (k >= detailAdmBordersMinZoom) {
+    if (!classification && k >= detailAdmBordersMinZoom) {
       context.globalAlpha = detailAdmAlpha;
       drawMeshCollection(state.cachedDetailAdmBorders, detailAdmBorderColor, detailAdmWidth);
     }
 
     const enabledParentCountries = state.parentBordersVisible === false
       ? []
-      : (state.parentBorderSupportedCountries || []).filter(
+      : (classification ? [...classification.parent.keys()] : state.parentBorderSupportedCountries || []).filter(
         (countryCode) => !!state.parentBorderEnabledByCountry?.[countryCode]
       );
     if (enabledParentCountries.length > 0) {
       context.globalAlpha = parentAlpha;
       enabledParentCountries.forEach((countryCode) => {
-        let meshes = state.cachedParentBordersByCountry?.get(countryCode);
+        let meshes = internalMeshes(classification, 'parent', countryCode);
         if (!meshes) {
           meshes = buildCountryParentBorderMeshes(countryCode);
           if (state.cachedParentBordersByCountry instanceof Map) {

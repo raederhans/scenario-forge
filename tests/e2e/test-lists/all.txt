@@ -36,7 +36,9 @@ scenario_controls_dispatcher_contract.spec.js
 scenario_shell_overlay_contract.spec.js
 shortcut_history_render_boundary.spec.js
 sidebar_default_collapse.spec.js
+sidebar_layout_shift_regression.spec.js
 startup_bundle_recovery_contract.spec.js
+startup_readonly_reveal.spec.js
 strategic_overlay_counter_canvas_smoke.spec.js
 strategic_overlay_editing.spec.js
 strategic_overlay_roundtrip.spec.js

@@ -1,0 +1,17 @@
+{
+  "description": "Plans are applied, and replayed after upstream rebuilds, in this order. A merged member (*_MRG_*) must come from an earlier plan.",
+  "plans": [
+    "europe_de_fr.v1.json",
+    "cn_us_ua_first_review.v1.json",
+    "india_canada_first_review.v1.json",
+    "europe_russia_wave3.v1.json",
+    "russia_china_wave4.v1.json",
+    "benelux_wave5.v1.json",
+    "germany_poland_wave5_tno.v1.json",
+    "germany_poland_wave5_rest.v1.json",
+    "russia_wave5_tno.v1.json",
+    "russia_wave5_rest.v1.json",
+    "india_wave5_tno.v1.json",
+    "india_wave5_rest.v1.json"
+  ]
+}

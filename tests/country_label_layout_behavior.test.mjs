@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildCountryLabelCandidates, filterCountryLabelHoles, fitCountryLabel } from "../js/core/renderer/country_label_layout.js";
+import { buildCountryLabelCandidates, COUNTRY_LABEL_TRACKING, filterCountryLabelHoles, fitCountryLabel } from "../js/core/renderer/country_label_layout.js";
 import { createCountryLabelLayoutWorkerHandler } from "../js/core/renderer/country_label_layout_worker.js";
 
 function rectangle(x, y, width, height) {
@@ -285,7 +285,7 @@ test("bounded adaptive tracking returns matching glyph positions and collision e
   const compact = fitCountryLabel(candidate, { ...options, polygons: hole });
   assert.ok(compact, "compact tracking can remain valid when expanded spacing crosses a hole");
   assert.equal(compact.tracking, 0.02);
-  assert.ok(fitCountryLabel(candidate, { ...options, maxTracking: 99 }).tracking <= 0.24);
+  assert.ok(fitCountryLabel(candidate, { ...options, maxTracking: 99 }).tracking <= 1);
 });
 
 test("readable long Chinese names prefer a single line over a larger two-line block", () => {
@@ -782,4 +782,23 @@ test("arc layouts produce changing glyph angles while respecting adjacent and to
   assert.ok(Math.max(...angles) - Math.min(...angles) > 0.005);
   assert.ok(Math.max(...angles) - Math.min(...angles) <= Math.PI / 3 + 1e-8);
   assert.ok(angles.slice(1).every((angle, index) => Math.abs(angle - angles[index]) <= 12 * Math.PI / 180 + 1e-8));
+});
+
+test("Chinese dominion names on narrow tall territories keep compact tracking", () => {
+  const { chinese } = COUNTRY_LABEL_TRACKING;
+  assert.ok(chinese.maxTracking <= 0.25, "the Chinese tracking cap stays compact");
+  const base = { glyphs: glyphs("加拿大自治领", { advance: 1, left: 0, right: 1, ascent: 0.88, descent: 0.12 }),
+    glyphPadding: 0.06, minFontSize: 1, maxFontSize: 12, readableFontSize: Number.MAX_VALUE,
+    allowMultiline: true, allowPositionShift: true, ...chinese };
+  const tall = multiPolygon(rectangle(0, 0, 60, 120));
+  for (const maxTracking of [chinese.maxTracking, 0.9]) {
+    const stacked = fitCountryLabel(buildCountryLabelCandidates(tall), { ...base, polygons: tall, maxTracking });
+    assert.equal(stacked.lineCount, 2);
+    assert.ok(stacked.tracking <= chinese.tracking + 1e-9,
+      `stacked lines keep the base tracking under a ${maxTracking}em cap, got ${stacked.tracking}`);
+  }
+  const wide = multiPolygon(rectangle(0, 0, 300, 40));
+  const single = fitCountryLabel(buildCountryLabelCandidates(wide), { ...base, polygons: wide });
+  assert.equal(single.lineCount, 1);
+  assert.ok(single.tracking <= 0.25 + 1e-9, `a single line stays within 0.25em, got ${single.tracking}`);
 });

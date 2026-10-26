@@ -346,6 +346,7 @@ function createHarness({
     controller,
     countryInspectorSelected,
     host,
+    list,
     runtimeState,
     get coverageCalls() {
       return coverageCalls;
@@ -455,7 +456,7 @@ test("HGO identity detail uses medium artwork before resolver preferred small ar
   }
 });
 
-test("selected land country quick tab appears only for current map land selection", () => {
+test("selected land country quick tab keeps one slot before the list and fills it only for current map land selection", () => {
   const previousDocument = globalThis.document;
   globalThis.document = createTestDocument();
 
@@ -476,15 +477,23 @@ test("selected land country quick tab appears only for current map land selectio
     });
 
     harness.controller.renderList();
-    assert.equal(harness.host.querySelector("[data-selected-land-country-quick-tab]"), null);
+    // The slot exists before any selection so filling it later cannot move the list.
+    const slot = harness.host.querySelector("[data-selected-land-country-quick-tab]");
+    assert.ok(slot);
+    assert.equal(harness.host.children[harness.host.children.indexOf(harness.list) - 1], slot);
+    assert.equal(slot.classList.contains("is-empty"), true);
+    assert.equal(slot.classList.contains("hidden"), false);
+    assert.equal(slot.getAttribute("aria-hidden"), "true");
+    assert.equal(textOf(slot), "");
 
     selectedLandCode = "ABK";
     harness.runtimeState.selectedInspectorCountryCode = "ABK";
     harness.controller.renderCountryInspectorDetail();
 
     let tab = harness.host.querySelector("[data-selected-land-country-quick-tab]");
-    assert.ok(tab);
-    assert.equal(tab.classList.contains("hidden"), false);
+    assert.equal(tab, slot);
+    assert.equal(tab.classList.contains("is-empty"), false);
+    assert.equal(tab.getAttribute("aria-hidden"), "false");
     assert.match(textOf(tab), /Selected map country/);
     assert.match(textOf(tab), /Scenario Abkhazia/);
     assert.match(textOf(tab), /ABK/);
@@ -505,8 +514,11 @@ test("selected land country quick tab appears only for current map land selectio
     harness.controller.renderCountryInspectorDetail();
 
     tab = harness.host.querySelector("[data-selected-land-country-quick-tab]");
-    assert.ok(tab);
-    assert.equal(tab.classList.contains("hidden"), true);
+    assert.equal(tab, slot);
+    assert.equal(harness.host.children[harness.host.children.indexOf(harness.list) - 1], slot);
+    assert.equal(tab.classList.contains("is-empty"), true);
+    assert.equal(tab.classList.contains("hidden"), false);
+    assert.equal(tab.getAttribute("aria-hidden"), "true");
     assert.equal(textOf(tab), "");
   } finally {
     globalThis.document = previousDocument;

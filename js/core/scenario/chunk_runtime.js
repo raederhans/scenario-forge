@@ -1,6 +1,7 @@
 // Chunk runtime controller.
 // 这个模块只负责 chunk runtime 的 runtimeState、selection、promotion、refresh/schedule。
 // facade、startup cache、hydrate 主交易仍留在 scenario_resources.js。
+import { setBootSubProgress } from "../state/actions/boot_actions.js";
 
 import {
   getChunkIdListSignature,
@@ -2845,7 +2846,12 @@ function createScenarioChunkRuntimeController({
     }
     const chunkLoadStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
     const requiredPayloadEntries = await loadScenarioChunkPayloadEntries(
-      bundle, selection.requiredChunks, { d3Client },
+      bundle, selection.requiredChunks, {
+        d3Client,
+        ...(startupInitialPoliticalOnly ? {
+          onChunkLoaded: ({ loaded, total }) => setBootSubProgress(runtimeState, { done: loaded, total }),
+        } : {}),
+      },
     );
     if (!isScenarioChunkRefreshCurrent(loadState, {
       scenarioId,
