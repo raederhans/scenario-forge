@@ -16,6 +16,22 @@ import { createPoliticalCollectionOwner } from '../js/core/renderer/political_co
 import { fragmentCamouflageRules } from '../js/core/country_feature_policies.js';
 import { getMapDataBoundary } from '../js/core/map_data_boundary.js';
 
+test('select in river edit mode returns the original hit without side effects', async () => {
+  const { state, hit } = await makeFixture();
+  state.currentTool = 'select';
+  assert.equal(state.riverPaint.editMode, true);
+  const before = structuredClone({ riverPaint: state.riverPaint, visualOverrides: state.visualOverrides, selectedColor: state.selectedColor });
+  const runtime = createRiverPaintRuntime(state, { geoContains: () => assert.fail('selection must not refine river geometry') });
+  const unexpectedEdit = () => assert.fail('selection must not edit river cells');
+  const editor = createRiverPaintEditorOwner({ state, captureHistoryState: unexpectedEdit,
+    commitHistoryEntry: unexpectedEdit, refreshParents: unexpectedEdit, markDirty: unexpectedEdit,
+    addRecentColor: unexpectedEdit, selectColor: unexpectedEdit, announce: unexpectedEdit });
+  const refined = runtime.refineHit(hit, [1, .5]);
+  assert.equal(refined, hit);
+  assert.equal(editor.handleClick(refined), false);
+  assert.deepEqual({ riverPaint: state.riverPaint, visualOverrides: state.visualOverrides, selectedColor: state.selectedColor }, before);
+});
+
 test('point targeting distinguishes both banks while preserving canonical parent ID', async () => {
   const { state, hit, cells } = await makeFixture(); const runtime = createRiverPaintRuntime(state, { geoContains: d3.geoContains });
   const lower = runtime.refineHit(hit, [1, .5]), upper = runtime.refineHit(hit, [1, 1.5]);

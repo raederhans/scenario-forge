@@ -40,6 +40,27 @@ function harness({ flushBrushPatchPreview = null } = {}) {
   return { owner, state, calls, modes, event, getSession: () => session };
 }
 
+test("select pointerdown and drag do not create a brush session or apply paint", () => {
+  const h = harness();
+  h.state.currentTool = "select";
+  h.owner.handleBrushPointerDown(h.event());
+  h.owner.handleBrushPointerMove(h.event(10));
+  assert.equal(h.getSession(), null);
+  assert.deepEqual(h.calls.map(([name]) => name), ["physical-down", "physical-move"]);
+});
+
+test("select pointermove does not paint through an existing brush session", () => {
+  const h = harness();
+  h.owner.handleBrushPointerDown(h.event());
+  const session = h.getSession();
+  h.state.currentTool = "select";
+  h.calls.length = 0;
+  h.owner.handleBrushPointerMove(h.event(10));
+  assert.equal(session.dragging, false);
+  assert.equal(session.changed, false);
+  assert.deepEqual(h.calls.map(([name]) => name), ["physical-move"]);
+});
+
 test("brush crosses drag threshold, previews changes and commits one ordered history transaction", () => {
   const h = harness();
   h.owner.handleBrushPointerDown(h.event());

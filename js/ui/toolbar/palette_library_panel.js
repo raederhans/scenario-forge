@@ -4,7 +4,7 @@
 
 import { PALETTE_THEMES, state as runtimeState } from "../../core/state.js";
 import { selectPalettePaintColorState } from "../../core/state/actions/palette_library_actions.js";
-import { callCompatRuntimeHook } from "../../core/state/index.js";
+import { callCompatRuntimeHook, callRuntimeHook } from "../../core/state/index.js";
 import { patchUiChromeState } from "../../core/state/actions/ui_chrome_actions.js";
 import {
   buildPaletteLibraryEntries,
@@ -314,6 +314,9 @@ function createPaletteLibraryPanelController({
 
   const selectPaletteLibraryEntry = (entry) => {
     selectPalettePaintColor(runtimeState, entry.color);
+    if (runtimeState.currentTool === "select") {
+      callRuntimeHook(runtimeState, "runToolSelectionFn", "fill", { feedbackLabel: t("Switched to fill tool", "ui") });
+    }
     activeRowKey = entry.key;
     updateSwatchUI?.();
     syncPaletteLibraryRowFocus();

@@ -2,6 +2,9 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Select tool": { zh: "选择工具", en: "Select tool" },
+  "Switched to fill tool": { zh: "已切换到填充工具", en: "Switched to fill tool" },
+  "Click to inspect a region or country. Press F to switch to fill before painting.": { zh: "点击查看区域或国家。绘制前按 F 切换到填充工具。", en: "Click to inspect a region or country. Press F to switch to fill before painting." },
   "Population heatmap could not be loaded. Retry.": { zh: "人口热力加载失败，请重试。", en: "Population heatmap could not be loaded. Retry." },
   "Loading population heatmap…": { zh: "正在加载人口热力…", en: "Loading population heatmap…" },
   "Showing overview; refining this view…": { zh: "已显示全局概览，正在细化当前视野…", en: "Showing overview; refining this view…" },
