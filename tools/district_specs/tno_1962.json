@@ -1,0 +1,1661 @@
+{
+  "version": 1,
+  "scenario_id": "tno_1962",
+  "description": "tno_1962 剧本大区（district）分配规格。由 tools/build_tno_district_groups.py 读取，生成 data/scenarios/tno_1962/district_groups.manual.json。第一批范围：德国、欧洲各帝国专员辖区与总督府、法国、英格兰、意大利、伊比利亚联盟；其余国家留待后续批次。",
+  "tags": {
+    "GER": {
+      "source": "TNO 大德意志帝国：沿用二战末期帝国大区（Reichsgau）划分；奥地利按 Alpen- und Donau-Reichsgaue，捷克分苏台德帝国大区与波希米亚-摩拉维亚保护国，克里米亚为哥特大区。行政区内部再细分（如巴伐利亚三大区）按历史 Gau 边界近似到 NUTS2。被吞并/占领地区（波兰、捷克、奥地利、卢森堡、阿尔萨斯-洛林、下施蒂利亚与卡尼奥拉、克里米亚等）一律按帝国体制归入相应大区，不沿用原国家行政区。",
+      "districts": [
+        {
+          "id": "ostpreussen",
+          "name_en": "Gau East Prussia",
+          "name_zh": "东普鲁士大区",
+          "match": [
+            {
+              "prov": [
+                "PL_Warmian_Masurian",
+                "RU_Kaliningrad",
+                "PL_Podlaskie",
+                "PL_Masovian"
+              ]
+            },
+            {
+              "cntr": [
+                "LT"
+              ]
+            }
+          ],
+          "note": "含比亚韦斯托克区与齐希瑙行政区"
+        },
+        {
+          "id": "danzig_westpreussen",
+          "name_en": "Reichsgau Danzig-West Prussia",
+          "name_zh": "但泽-西普鲁士帝国大区",
+          "match": [
+            {
+              "prov": [
+                "PL_Pomeranian",
+                "PL_Kuyavian_Pomeranian"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "wartheland",
+          "name_en": "Reichsgau Wartheland",
+          "name_zh": "瓦尔特兰帝国大区",
+          "match": [
+            {
+              "prov": [
+                "PL_Greater_Poland",
+                "PL_Lodz"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "pommern",
+          "name_en": "Gau Pomerania",
+          "name_zh": "波美拉尼亚大区",
+          "match": [
+            {
+              "prov": [
+                "PL_West_Pomeranian"
+              ]
+            },
+            {
+              "id": [
+                "DK014"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mecklenburg",
+          "name_en": "Gau Mecklenburg",
+          "name_zh": "梅克伦堡大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Mecklenburg_Vorpommern"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mark_brandenburg",
+          "name_en": "Gau March of Brandenburg & Germania",
+          "name_zh": "勃兰登堡边区与日耳曼尼亚",
+          "match": [
+            {
+              "prov": [
+                "DE_Brandenburg",
+                "DE_Berlin",
+                "PL_Lubusz"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "niederschlesien",
+          "name_en": "Gau Lower Silesia",
+          "name_zh": "下西里西亚大区",
+          "match": [
+            {
+              "prov": [
+                "PL_Lower_Silesian"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "oberschlesien",
+          "name_en": "Gau Upper Silesia",
+          "name_zh": "上西里西亚大区",
+          "match": [
+            {
+              "prov": [
+                "PL_Opole",
+                "PL_Silesian"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sudetenland",
+          "name_en": "Reichsgau Sudetenland",
+          "name_zh": "苏台德帝国大区",
+          "match": [
+            {
+              "prov": [
+                "CZ_Karlovarsk_kraj",
+                "CZ_steck_kraj",
+                "CZ_Libereck_kraj"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "protektorat_boehmen_maehren",
+          "name_en": "Protectorate of Bohemia and Moravia",
+          "name_zh": "波希米亚-摩拉维亚保护国",
+          "match": [
+            {
+              "prov": [
+                "CZ_Hlavn_m_sto_Praha",
+                "CZ_St_edo_esk_kraj",
+                "CZ_Plze_sk_kraj",
+                "CZ_Jiho_esk_kraj",
+                "CZ_Kr_lov_hradeck_kraj",
+                "CZ_Pardubick_kraj",
+                "CZ_Kraj_Vyso_ina",
+                "CZ_Jihomoravsk_kraj",
+                "CZ_Olomouck_kraj",
+                "CZ_Zl_nsk_kraj",
+                "CZ_Moravskoslezsk_kraj"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "wien_niederdonau",
+          "name_en": "Reichsgau Vienna & Lower Danube",
+          "name_zh": "维也纳与下多瑙帝国大区",
+          "match": [
+            {
+              "id_prefix": [
+                "AT11",
+                "AT12",
+                "AT13"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "oberdonau",
+          "name_en": "Reichsgau Upper Danube",
+          "name_zh": "上多瑙帝国大区",
+          "match": [
+            {
+              "id_prefix": [
+                "AT31"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "salzburg",
+          "name_en": "Reichsgau Salzburg",
+          "name_zh": "萨尔茨堡帝国大区",
+          "match": [
+            {
+              "id_prefix": [
+                "AT32"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "tirol_vorarlberg",
+          "name_en": "Reichsgau Tyrol-Vorarlberg",
+          "name_zh": "蒂罗尔-福拉尔贝格帝国大区",
+          "match": [
+            {
+              "id_prefix": [
+                "AT33",
+                "AT34"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "steiermark",
+          "name_en": "Reichsgau Styria",
+          "name_zh": "施蒂利亚帝国大区",
+          "match": [
+            {
+              "id_prefix": [
+                "AT22",
+                "SI031",
+                "SI032",
+                "SI034",
+                "SI035",
+                "SI036"
+              ]
+            }
+          ],
+          "note": "含下施蒂利亚"
+        },
+        {
+          "id": "kaernten_krain",
+          "name_en": "Reichsgau Carinthia & Carniola",
+          "name_zh": "克恩滕与卡尼奥拉帝国大区",
+          "match": [
+            {
+              "id_prefix": [
+                "AT21",
+                "SI033",
+                "SI037",
+                "SI041",
+                "SI042"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "schleswig_holstein",
+          "name_en": "Gau Schleswig-Holstein & Hamburg",
+          "name_zh": "石勒苏益格-荷尔斯泰因与汉堡大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Schleswig_Holstein",
+                "DE_Hamburg",
+                "DK_Sydjylland"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hannover_weser_ems",
+          "name_en": "Gau Hanover & Weser-Ems",
+          "name_zh": "汉诺威与威悉-埃姆斯大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Niedersachsen",
+                "DE_Bremen"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "westfalen",
+          "name_en": "Gau Westphalia",
+          "name_zh": "威斯特法伦大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Nordrhein_Westfalen"
+              ],
+              "id_prefix": [
+                "DEA3",
+                "DEA4",
+                "DEA5"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "rheinland",
+          "name_en": "Gau Rhineland (Düsseldorf & Cologne-Aachen)",
+          "name_zh": "莱茵兰大区（杜塞尔多夫与科隆-亚琛）",
+          "match": [
+            {
+              "prov": [
+                "DE_Nordrhein_Westfalen"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hessen_nassau",
+          "name_en": "Gau Hesse-Nassau & Electoral Hesse",
+          "name_zh": "黑森-拿骚与库尔黑森大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Hessen"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "moselland",
+          "name_en": "Gau Moselland",
+          "name_zh": "摩泽尔兰大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Rheinland_Pfalz"
+              ],
+              "id_prefix": [
+                "DEB1",
+                "DEB2"
+              ]
+            },
+            {
+              "cntr": [
+                "LU"
+              ]
+            }
+          ],
+          "note": "含卢森堡"
+        },
+        {
+          "id": "westmark",
+          "name_en": "Gau Westmark",
+          "name_zh": "西部边区大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Saarland",
+                "DE_Rheinland_Pfalz"
+              ]
+            },
+            {
+              "id_prefix": [
+                "FR_ARR_57"
+              ]
+            }
+          ],
+          "note": "萨尔、普法尔茨与洛林"
+        },
+        {
+          "id": "baden_elsass",
+          "name_en": "Gau Baden-Alsace",
+          "name_zh": "巴登-阿尔萨斯大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Baden_W_rttemberg"
+              ],
+              "id_prefix": [
+                "DE12",
+                "DE13"
+              ]
+            },
+            {
+              "id_prefix": [
+                "FR_ARR_67",
+                "FR_ARR_68",
+                "FR_ARR_90"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "wuerttemberg",
+          "name_en": "Gau Württemberg-Hohenzollern",
+          "name_zh": "符腾堡-霍亨索伦大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Baden_W_rttemberg"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "muenchen_oberbayern",
+          "name_en": "Gau Munich-Upper Bavaria & Swabia",
+          "name_zh": "慕尼黑-上巴伐利亚与施瓦本大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Bayern"
+              ],
+              "id_prefix": [
+                "DE21",
+                "DE27"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bayreuth",
+          "name_en": "Gau Bayreuth (Bavarian Ostmark)",
+          "name_zh": "拜罗伊特大区（巴伐利亚东部边区）",
+          "match": [
+            {
+              "prov": [
+                "DE_Bayern"
+              ],
+              "id_prefix": [
+                "DE22",
+                "DE23",
+                "DE24"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "franken",
+          "name_en": "Gau Franconia & Main-Franconia",
+          "name_zh": "法兰克尼亚与美因-法兰克尼亚大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Bayern"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sachsen",
+          "name_en": "Gau Saxony",
+          "name_zh": "萨克森大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Sachsen"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "thueringen",
+          "name_en": "Gau Thuringia",
+          "name_zh": "图林根大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Th_ringen"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "magdeburg_halle",
+          "name_en": "Gau Magdeburg-Anhalt & Halle-Merseburg",
+          "name_zh": "马格德堡-安哈尔特与哈雷-梅泽堡大区",
+          "match": [
+            {
+              "prov": [
+                "DE_Sachsen_Anhalt"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "gotengau",
+          "name_en": "Gotengau (Crimea)",
+          "name_zh": "哥特大区（克里米亚）",
+          "match": [
+            {
+              "cntr": [
+                "UA"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "reich_overseas",
+          "name_en": "Reich Overseas Bases",
+          "name_zh": "帝国海外据点",
+          "match": [
+            {
+              "cntr": [
+                "FO",
+                "GG",
+                "JE",
+                "GB",
+                "KM"
+              ]
+            }
+          ],
+          "note": "法罗、海峡群岛、怀特岛、设得兰与科摩罗；TNO 未设定，按“直辖据点”合并"
+        }
+      ]
+    },
+    "RKP": {
+      "source": "TNO 中 RKP 对应波兰总督府（Generalgouvernement），沿用五个 Distrikt。",
+      "districts": [
+        {
+          "id": "distrikt_krakau",
+          "name_en": "District of Kraków",
+          "name_zh": "克拉科夫区",
+          "match": [
+            {
+              "prov": [
+                "PL_Lesser_Poland",
+                "PL_Silesian",
+                "PL_Subcarpathian"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "distrikt_warschau",
+          "name_en": "District of Warsaw",
+          "name_zh": "华沙区",
+          "match": [
+            {
+              "prov": [
+                "PL_Masovian"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "distrikt_radom",
+          "name_en": "District of Radom",
+          "name_zh": "拉多姆区",
+          "match": [
+            {
+              "prov": [
+                "PL_Holy_Cross",
+                "PL_Lodz"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "distrikt_lublin",
+          "name_en": "District of Lublin",
+          "name_zh": "卢布林区",
+          "match": [
+            {
+              "prov": [
+                "PL_Lublin"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "distrikt_galizien",
+          "name_en": "District of Galicia",
+          "name_zh": "加利西亚区",
+          "match": [
+            {
+              "prov": [
+                "UA_Lviv",
+                "UA_Ternopil",
+                "UA_Ivano_Frankivsk"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "RKU": {
+      "source": "乌克兰帝国专员辖区：沿用历史总区（Generalbezirk），并按东扩后的 TNO 疆域补出切尔尼戈夫、哈尔科夫、顿涅茨（斯大林诺-伏罗希洛夫格勒）总区（东部三区为推断）。",
+      "districts": [
+        {
+          "id": "wolhynien_podolien",
+          "name_en": "General District Volhynia-Podolia",
+          "name_zh": "沃里尼亚-波多利亚总区",
+          "match": [
+            {
+              "prov": [
+                "UA_Volyn",
+                "UA_Rivne",
+                "UA_Khmelnytskyi"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "shitomir",
+          "name_en": "General District Zhytomyr",
+          "name_zh": "日托米尔总区",
+          "match": [
+            {
+              "prov": [
+                "UA_Zhytomyr",
+                "UA_Vinnytsia"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "kiew",
+          "name_en": "General District Kiev",
+          "name_zh": "基辅总区",
+          "match": [
+            {
+              "prov": [
+                "UA_Kyiv",
+                "UA_Cherkasy"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "tschernigow",
+          "name_en": "General District Chernigov",
+          "name_zh": "切尔尼戈夫总区",
+          "match": [
+            {
+              "prov": [
+                "UA_Chernihiv",
+                "UA_Sumy"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dnjepropetrowsk",
+          "name_en": "General District Dnepropetrovsk",
+          "name_zh": "第聂伯罗彼得罗夫斯克总区",
+          "match": [
+            {
+              "prov": [
+                "UA_Dnipropetrovsk",
+                "UA_Poltava"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "nikolajew",
+          "name_en": "General District Nikolaev",
+          "name_zh": "尼古拉耶夫总区",
+          "match": [
+            {
+              "prov": [
+                "UA_Mykolaiv",
+                "UA_Kirovohrad"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "taurien",
+          "name_en": "General District Taurida",
+          "name_zh": "塔夫利达总区",
+          "match": [
+            {
+              "prov": [
+                "UA_Kherson",
+                "UA_Zaporizhzhia"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "charkow",
+          "name_en": "General District Kharkov",
+          "name_zh": "哈尔科夫总区",
+          "match": [
+            {
+              "prov": [
+                "UA_Kharkiv",
+                "RU_Belgorod",
+                "RU_Kursk"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "donez",
+          "name_en": "General District Donets",
+          "name_zh": "顿涅茨总区",
+          "match": [
+            {
+              "prov": [
+                "UA_Donetsk",
+                "UA_Luhansk",
+                "RU_Rostov"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "RKM": {
+      "source": "莫斯科帝国专员辖区：TNO 未公开总区划分，按东方部规划的总区思路与州界推断。",
+      "districts": [
+        {
+          "id": "ingermanland",
+          "name_en": "General District Ingria",
+          "name_zh": "英格里亚总区",
+          "match": [
+            {
+              "prov": [
+                "RU_Leningrad",
+                "RU_Saint_Petersburg",
+                "RU_Novgorod",
+                "RU_Pskov"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "smolensk",
+          "name_en": "General District Smolensk",
+          "name_zh": "斯摩棱斯克总区",
+          "match": [
+            {
+              "prov": [
+                "RU_Smolensk",
+                "RU_Bryansk",
+                "BY_Mogilev"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "moskau",
+          "name_en": "General District Moscow",
+          "name_zh": "莫斯科总区",
+          "match": [
+            {
+              "prov": [
+                "RU_Moscow",
+                "RU_Tver",
+                "RU_Kaluga"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "tula",
+          "name_en": "General District Tula",
+          "name_zh": "图拉总区",
+          "match": [
+            {
+              "prov": [
+                "RU_Tula",
+                "RU_Ryazan",
+                "RU_Oryol",
+                "RU_Kursk"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "woronesch",
+          "name_en": "General District Voronezh",
+          "name_zh": "沃罗涅日总区",
+          "match": [
+            {
+              "prov": [
+                "RU_Voronezh",
+                "RU_Tambov",
+                "RU_Lipetsk"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "jaroslawl",
+          "name_en": "General District Yaroslavl",
+          "name_zh": "雅罗斯拉夫尔总区",
+          "match": [
+            {
+              "prov": [
+                "RU_Yaroslavl",
+                "RU_Kostroma",
+                "RU_Ivanovo",
+                "RU_Vologda",
+                "RU_Arkhangelsk"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "gorki",
+          "name_en": "General District Gorky",
+          "name_zh": "高尔基总区",
+          "match": [
+            {
+              "prov": [
+                "RU_Nizhny_Novgorod",
+                "RU_Vladimir",
+                "RU_Chuvash_Republic",
+                "RU_Republic_of_Mordovia",
+                "RU_Republic_of_Tatarstan"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "saratow",
+          "name_en": "General District Saratov",
+          "name_zh": "萨拉托夫总区",
+          "match": [
+            {
+              "prov": [
+                "RU_Saratov",
+                "RU_Penza",
+                "RU_Ulyanovsk",
+                "RU_Samara"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "stalingrad",
+          "name_en": "General District Don-Volga",
+          "name_zh": "顿河-伏尔加总区",
+          "match": [
+            {
+              "prov": [
+                "RU_Volgograd",
+                "RU_Rostov",
+                "RU_Astrakhan",
+                "RU_Republic_of_Kalmykia"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "RKO": {
+      "source": "东方帝国专员辖区：沿用爱沙尼亚、拉脱维亚、立陶宛、白鲁塞尼亚四个总区；普斯科夫一带为 TNO 扩张部分，单列普斯科夫总区（推断）。",
+      "districts": [
+        {
+          "id": "estland",
+          "name_en": "General District Estonia",
+          "name_zh": "爱沙尼亚总区",
+          "match": [
+            {
+              "cntr": [
+                "EE"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "lettland",
+          "name_en": "General District Latvia",
+          "name_zh": "拉脱维亚总区",
+          "match": [
+            {
+              "cntr": [
+                "LV"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "litauen",
+          "name_en": "General District Lithuania",
+          "name_zh": "立陶宛总区",
+          "match": [
+            {
+              "cntr": [
+                "LT"
+              ]
+            },
+            {
+              "prov": [
+                "PL_Podlaskie"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "weissruthenien",
+          "name_en": "General District White Ruthenia",
+          "name_zh": "白鲁塞尼亚总区",
+          "match": [
+            {
+              "prov": [
+                "BY_*"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "pleskau",
+          "name_en": "General District Pskov",
+          "name_zh": "普斯科夫总区",
+          "match": [
+            {
+              "prov": [
+                "RU_Pskov",
+                "RU_Leningrad"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "RKK": {
+      "source": "高加索帝国专员辖区：按东方部规划的总专员辖区（格鲁吉亚、阿塞拜疆、库班、斯塔夫罗波尔/捷列克、山地民族、卡尔梅克）推断；亚美尼亚不在本剧本辖区内。",
+      "districts": [
+        {
+          "id": "aserbaidschan",
+          "name_en": "General Commissariat Azerbaijan",
+          "name_zh": "阿塞拜疆总专员辖区",
+          "match": [
+            {
+              "cntr": [
+                "AZ"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "georgien",
+          "name_en": "General Commissariat Georgia",
+          "name_zh": "格鲁吉亚总专员辖区",
+          "match": [
+            {
+              "cntr": [
+                "GE"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "kuban",
+          "name_en": "General Commissariat Kuban",
+          "name_zh": "库班总专员辖区",
+          "match": [
+            {
+              "prov": [
+                "RU_Krasnodar_Krai",
+                "RU_Republic_of_Adygea",
+                "RU_Rostov"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "stawropol",
+          "name_en": "General Commissariat Stavropol-Terek",
+          "name_zh": "斯塔夫罗波尔-捷列克总专员辖区",
+          "match": [
+            {
+              "prov": [
+                "RU_Stavropol_Krai",
+                "RU_Karachay_Cherkess_Republic"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bergvoelker",
+          "name_en": "General Commissariat Mountain Peoples",
+          "name_zh": "山地民族总专员辖区",
+          "match": [
+            {
+              "prov": [
+                "RU_Kabardino_Balkaria",
+                "RU_Republic_of_North_Ossetia_Alania",
+                "RU_Republic_of_Ingushetia",
+                "RU_Chechen_Republic",
+                "RU_Republic_of_Dagestan"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "kalmueckien",
+          "name_en": "General Commissariat Kalmykia",
+          "name_zh": "卡尔梅克总专员辖区",
+          "match": [
+            {
+              "prov": [
+                "RU_Republic_of_Kalmykia",
+                "RU_Astrakhan"
+              ]
+            },
+            {
+              "name_prefix": [
+                "Kalmykia ·",
+                "Astrakhan ·"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "RKN": {
+      "source": "尼德兰帝国专员辖区：按北、东、西、南四个总区合并荷兰各省（推断）。",
+      "districts": [
+        {
+          "id": "nord",
+          "name_en": "Northern Netherlands",
+          "name_zh": "尼德兰北部总区",
+          "match": [
+            {
+              "prov": [
+                "NL_Groningen",
+                "NL_Friesland",
+                "NL_Drenthe"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ost",
+          "name_en": "Eastern Netherlands",
+          "name_zh": "尼德兰东部总区",
+          "match": [
+            {
+              "prov": [
+                "NL_Overijssel",
+                "NL_Gelderland",
+                "NL_Flevoland",
+                "NL_Utrecht"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "west",
+          "name_en": "Holland & Zeeland",
+          "name_zh": "荷兰与泽兰总区",
+          "match": [
+            {
+              "prov": [
+                "NL_North_Holland",
+                "NL_South_Holland",
+                "NL_Zeeland"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sued",
+          "name_en": "Southern Netherlands",
+          "name_zh": "尼德兰南部总区",
+          "match": [
+            {
+              "prov": [
+                "NL_North_Brabant",
+                "NL_Limburg_NL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "RKNO": {
+      "source": "挪威帝国专员辖区：按挪威传统地区合并郡（推断）。",
+      "districts": [
+        {
+          "id": "nordnorge",
+          "name_en": "Northern Norway",
+          "name_zh": "北挪威",
+          "match": [
+            {
+              "id_prefix": [
+                "NO071",
+                "NO074",
+                "NO0B1"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "trondelag",
+          "name_en": "Trøndelag & Møre",
+          "name_zh": "特伦德拉格与默勒",
+          "match": [
+            {
+              "id_prefix": [
+                "NO060",
+                "NO0A3"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "vestlandet",
+          "name_en": "Western & Southern Norway",
+          "name_zh": "西挪威与南挪威",
+          "match": [
+            {
+              "id_prefix": [
+                "NO092",
+                "NO0A1",
+                "NO0A2"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ostlandet",
+          "name_en": "Eastern Norway",
+          "name_zh": "东挪威",
+          "match": [
+            {
+              "id_prefix": [
+                "NO020",
+                "NO081",
+                "NO082",
+                "NO091"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "ITA": {
+      "source": "TNO 意大利帝国：本土按 NUTS1 大区合并，另列尼斯-萨伏依、达尔马提亚总督区（含科托尔）、阿尔巴尼亚与苏伊士运河区；Atlantropa 新陆地就近归入沿岸大区。",
+      "districts": [
+        {
+          "id": "nord_ovest",
+          "name_en": "Northwestern Italy",
+          "name_zh": "意大利西北部",
+          "match": [
+            {
+              "id_prefix": [
+                "ITC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "nizza_savoia",
+          "name_en": "Nice & Savoy",
+          "name_zh": "尼斯与萨伏依",
+          "match": [
+            {
+              "cntr": [
+                "FR"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "nord_est",
+          "name_en": "Northeastern Italy & Julian March",
+          "name_zh": "意大利东北部与尤利安边区",
+          "match": [
+            {
+              "id_prefix": [
+                "ITH"
+              ]
+            },
+            {
+              "cntr": [
+                "ITA"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "centro",
+          "name_en": "Central Italy",
+          "name_zh": "意大利中部",
+          "match": [
+            {
+              "id_prefix": [
+                "ITI"
+              ]
+            },
+            {
+              "cntr": [
+                "SM"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sud",
+          "name_en": "Southern Italy",
+          "name_zh": "意大利南部",
+          "match": [
+            {
+              "id_prefix": [
+                "ITF"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "sicilia",
+          "name_en": "Sicily",
+          "name_zh": "西西里",
+          "match": [
+            {
+              "id": [
+                "ATLISL_sicily_tunis_sicily"
+              ]
+            },
+            {
+              "atl": [
+                "sicily_tunis"
+              ]
+            }
+          ],
+          "note": "本剧本中西西里为 Atlantropa 重建岛屿"
+        },
+        {
+          "id": "sardegna",
+          "name_en": "Sardinia",
+          "name_zh": "撒丁",
+          "match": [
+            {
+              "id": [
+                "ATLISL_tyrrhenian_sardinia"
+              ]
+            }
+          ],
+          "note": "本剧本中撒丁为 Atlantropa 重建岛屿"
+        },
+        {
+          "id": "dalmazia",
+          "name_en": "Governorate of Dalmatia",
+          "name_zh": "达尔马提亚总督区",
+          "match": [
+            {
+              "cntr": [
+                "HR",
+                "ME"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "albania",
+          "name_en": "Albania",
+          "name_zh": "阿尔巴尼亚",
+          "match": [
+            {
+              "cntr": [
+                "AL"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "suez",
+          "name_en": "Suez Canal Zone",
+          "name_zh": "苏伊士运河区",
+          "match": [
+            {
+              "cntr": [
+                "EG"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "FRA": {
+      "source": "TNO 法国：按旧省区与现代大区合并，阿尔及尔一带与南方领地单列。",
+      "districts": [
+        {
+          "id": "paris",
+          "name_en": "Île-de-France",
+          "name_zh": "法兰西岛",
+          "match": [
+            {
+              "prov": [
+                "FR_Ile_de_France"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "nord_est",
+          "name_en": "North & East",
+          "name_zh": "北部与东部",
+          "match": [
+            {
+              "prov": [
+                "FR_Hauts_de_France",
+                "FR_Grand_Est"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "normandie",
+          "name_en": "Normandy",
+          "name_zh": "诺曼底",
+          "match": [
+            {
+              "prov": [
+                "FR_Normandie"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bretagne_loire",
+          "name_en": "Brittany & Loire",
+          "name_zh": "布列塔尼与卢瓦尔",
+          "match": [
+            {
+              "prov": [
+                "FR_Bretagne",
+                "FR_Pays_de_la_Loire"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "centre",
+          "name_en": "Centre",
+          "name_zh": "中央",
+          "match": [
+            {
+              "prov": [
+                "FR_Centre_Val_de_Loire"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "bourgogne",
+          "name_en": "Burgundy & Franche-Comté",
+          "name_zh": "勃艮第与弗朗什-孔泰",
+          "match": [
+            {
+              "prov": [
+                "FR_Bourgogne_Franche_Comte"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "aquitaine",
+          "name_en": "Aquitaine",
+          "name_zh": "阿基坦",
+          "match": [
+            {
+              "prov": [
+                "FR_Nouvelle_Aquitaine"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "languedoc",
+          "name_en": "Languedoc & Gascony",
+          "name_zh": "朗格多克与加斯科涅",
+          "match": [
+            {
+              "prov": [
+                "FR_Occitanie"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "rhone_alpes",
+          "name_en": "Auvergne & Rhône-Alpes",
+          "name_zh": "奥弗涅与罗讷-阿尔卑斯",
+          "match": [
+            {
+              "prov": [
+                "FR_Auvergne_Rhone_Alpes"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "provence",
+          "name_en": "Provence",
+          "name_zh": "普罗旺斯",
+          "match": [
+            {
+              "prov": [
+                "FR_Provence_Alpes_Cote_d_Azur"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "algerie_outre_mer",
+          "name_en": "Algiers & Overseas",
+          "name_zh": "阿尔及尔与海外领地",
+          "match": [
+            {
+              "id_prefix": [
+                "DZA-"
+              ]
+            },
+            {
+              "cntr": [
+                "TF"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "IBR": {
+      "source": "伊比利亚联盟：西班牙按 NUTS1 大区，葡萄牙本土单列（本剧本不含加那利、亚速尔与马德拉），海外属地按地域合并。",
+      "districts": [
+        {
+          "id": "noroeste",
+          "name_en": "Northwest Spain",
+          "name_zh": "西班牙西北部",
+          "match": [
+            {
+              "id_prefix": [
+                "ES1"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "noreste",
+          "name_en": "Northeast Spain & Andorra",
+          "name_zh": "西班牙东北部与安道尔",
+          "match": [
+            {
+              "id_prefix": [
+                "ES2"
+              ]
+            },
+            {
+              "cntr": [
+                "AD"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "centro",
+          "name_en": "Central Spain",
+          "name_zh": "西班牙中部",
+          "match": [
+            {
+              "id_prefix": [
+                "ES3",
+                "ES4"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "levante",
+          "name_en": "Catalonia, Valencia & Balearics",
+          "name_zh": "加泰罗尼亚、瓦伦西亚与巴利阿里",
+          "match": [
+            {
+              "id_prefix": [
+                "ES5"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "andalucia",
+          "name_en": "Andalusia & Murcia",
+          "name_zh": "安达卢西亚与穆尔西亚",
+          "match": [
+            {
+              "id_prefix": [
+                "ES6"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "portugal",
+          "name_en": "Portugal",
+          "name_zh": "葡萄牙",
+          "match": [
+            {
+              "id_prefix": [
+                "PT1"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "marruecos",
+          "name_en": "Morocco & Sahara",
+          "name_zh": "摩洛哥与撒哈拉",
+          "match": [
+            {
+              "id_prefix": [
+                "MAR-",
+                "EH_"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ultramar_africa",
+          "name_en": "African Overseas Provinces",
+          "name_zh": "非洲海外省",
+          "match": [
+            {
+              "cntr": [
+                "CV",
+                "GW",
+                "ST"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "timor",
+          "name_en": "Timor",
+          "name_zh": "帝汶",
+          "match": [
+            {
+              "cntr": [
+                "TL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "ENG": {
+      "source": "英格兰：按 NUTS1 地区合并，印度洋属地单列。",
+      "districts": [
+        {
+          "id": "north_east",
+          "name_en": "North East",
+          "name_zh": "东北",
+          "match": [
+            {
+              "id_prefix": [
+                "UKC"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "north_west",
+          "name_en": "North West",
+          "name_zh": "西北",
+          "match": [
+            {
+              "id_prefix": [
+                "UKD"
+              ]
+            },
+            {
+              "cntr": [
+                "IM"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "yorkshire",
+          "name_en": "Yorkshire & Humber",
+          "name_zh": "约克郡与亨伯",
+          "match": [
+            {
+              "id_prefix": [
+                "UKE"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "east_midlands",
+          "name_en": "East Midlands",
+          "name_zh": "东米德兰",
+          "match": [
+            {
+              "id_prefix": [
+                "UKF"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "west_midlands",
+          "name_en": "West Midlands",
+          "name_zh": "西米德兰",
+          "match": [
+            {
+              "id_prefix": [
+                "UKG"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "east_anglia",
+          "name_en": "East of England",
+          "name_zh": "英格兰东部",
+          "match": [
+            {
+              "id_prefix": [
+                "UKH"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "london",
+          "name_en": "London",
+          "name_zh": "伦敦",
+          "match": [
+            {
+              "id_prefix": [
+                "UKI"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "south_east",
+          "name_en": "South East",
+          "name_zh": "东南",
+          "match": [
+            {
+              "id_prefix": [
+                "UKJ"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "south_west",
+          "name_en": "South West",
+          "name_zh": "西南",
+          "match": [
+            {
+              "id_prefix": [
+                "UKK"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "indian_ocean",
+          "name_en": "Indian Ocean Territories",
+          "name_zh": "印度洋属地",
+          "match": [
+            {
+              "cntr": [
+                "IO",
+                "MU",
+                "SC"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
