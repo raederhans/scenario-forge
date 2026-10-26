@@ -287,7 +287,7 @@ export function createBathymetryStylePolicy(runtimeState, {
     if (k < COASTLINE_LOD_MID_ZOOM_MAX) {
       return baseWidth;
     }
-    return Math.max(baseWidth, overlay ? COASTLINE_ACCENT_OVERLAY_MIN_WIDTH_PX : COASTLINE_ACCENT_MIN_WIDTH_PX);
+    return Math.max(baseWidth, (overlay ? COASTLINE_ACCENT_OVERLAY_MIN_WIDTH_PX : COASTLINE_ACCENT_MIN_WIDTH_PX) / Math.max(0.0001, k));
   }
 
   function isAtlantropaScenarioShorelineOverlay(feature) {
