@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getEffectiveScenarioHierarchy, getEffectiveScenarioHierarchyFromInputs } from "../js/core/scenario_hierarchy.js";
+import {
+  expandScenarioFeatureIds, getEffectiveScenarioHierarchy, getEffectiveScenarioHierarchyFromInputs, projectScenarioFeatureIds,
+} from "../js/core/scenario_hierarchy.js";
 import { createQuickFillHierarchyResolver } from "../js/core/quick_fill_hierarchy.js";
 import { createParentBorderGroupingPolicy } from "../js/core/renderer/parent_border_grouping_policy.js";
 import { getQuickFillLevelModel } from "../js/ui/toolbar/quick_fill_level_controls.js";
@@ -20,7 +22,8 @@ function bindConsumers(path, names, runtime) {
     return source.slice(node.start, node.end);
   }).join("\n");
   return new Function("runtimeState", "getEffectiveScenarioHierarchy", "normalizeCountryCode",
-    `${declarations}\nreturn { ${names.join(", ")} };`)(runtime, getEffectiveScenarioHierarchy, normalizeCountryCodeAlias);
+    "expandScenarioFeatureIds", "projectScenarioFeatureIds", `${declarations}\nreturn { ${names.join(", ")} };`)(
+    runtime, getEffectiveScenarioHierarchy, normalizeCountryCodeAlias, expandScenarioFeatureIds, projectScenarioFeatureIds);
 }
 
 function fixture() {
@@ -120,7 +123,8 @@ test("quick-fill and border consumers plus source-bound sidebar and releasable c
   runtime.hierarchyGroupsByCode = new Map([["US", [{ id: "US_old", children: ["US_ZN_31_1__R"] }]]]);
   const { getHierarchyGroupsForCode } = bindConsumers("../js/ui/sidebar.js", ["getHierarchyGroupsForCode"], runtime);
   const { resolveFeatureIdsFromPresetSource } = bindConsumers("../js/core/releasable_manager.js",
-    ["normalizePresetSource", "resolveFeatureIdsFromPresetSource"], runtime);
+    ["normalizePresetSource", "getActiveFeatureMergeOverride", "projectSharedFeatureIds",
+      "resolveFeatureIdsFromPresetSource", "resolveMemberFeatureIdsFromPresetSource"], runtime);
   const sidebar = getHierarchyGroupsForCode("US");
   assert.equal(sidebar.length, 51);
   assert.deepEqual(sidebar.find(g => g.id === "US_State_0").children, groups.US_State_0);
