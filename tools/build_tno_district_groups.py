@@ -193,12 +193,13 @@ def load_features(scenario_dir: Path = SCENARIO_DIR):
     return records
 
 
-def id_has_prefix(record, prefix):
-    if record["id"].startswith(prefix):
+def id_has_prefix(record, prefixes):
+    prefixes = tuple(prefixes)
+    if record["id"].startswith(prefixes):
         return True
-    # 合并块 ID 不带 NUTS 编码，按多数成员的前缀判断。
+    # 合并块 ID 不带 NUTS 编码：命中子句中任一前缀的成员合计过半即算匹配。
     leaves = record["leaves"]
-    return bool(leaves) and sum(leaf.startswith(prefix) for leaf in leaves) * 2 > len(leaves)
+    return bool(leaves) and sum(leaf.startswith(prefixes) for leaf in leaves) * 2 > len(leaves)
 
 
 def clause_matches(clause, record):
@@ -208,7 +209,7 @@ def clause_matches(clause, record):
         return False
     if "id" in clause and record["id"] not in clause["id"]:
         return False
-    if "id_prefix" in clause and not any(id_has_prefix(record, prefix) for prefix in clause["id_prefix"]):
+    if "id_prefix" in clause and not id_has_prefix(record, clause["id_prefix"]):
         return False
     if "name" in clause and record["name"] not in clause["name"]:
         return False
