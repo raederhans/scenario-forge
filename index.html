@@ -2342,8 +2342,8 @@
           </div>
 
           <div id="toolHudChip" class="tool-hud-chip hidden" aria-live="polite"></div>
-          <div id="mapOnboardingHint" class="map-onboarding-hint" data-i18n="Select a region to start painting, or use Auto-Fill to color all countries">
-            Select a region to start painting, or use Auto-Fill to color all countries
+          <div id="mapOnboardingHint" class="map-onboarding-hint" data-i18n="Click to inspect a region or country. Press F to switch to fill before painting.">
+            Click to inspect a region or country. Press F to switch to fill before painting.
           </div>
           <div id="scenarioContextBar" class="scenario-context-bar">
             <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context" data-i18n-aria-label="Collapse scenario context">-</button>
@@ -2413,6 +2413,11 @@
               <div class="dock-group dock-group-tools" role="group" aria-label="Tools" data-i18n-aria-label="Tools" title="Tools" data-i18n-title="Tools">
                 <span id="lblCurrentTool" class="visually-hidden">Tools</span>
                 <div class="dock-button-row dock-button-row-tools" role="toolbar" data-i18n-aria-label="Current tool">
+                  <button id="toolSelectBtn" class="btn-tool dock-tool-btn" data-tool="select" type="button" aria-label="Select tool" title="Select tool" data-i18n-aria-label="Select tool" data-i18n-title="Select tool">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="m5 3 14 9-7 1-3 7L5 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+                    </svg>
+                  </button>
                   <button id="toolFillBtn" class="btn-tool dock-tool-btn" data-tool="fill" type="button" aria-label="Fill tool" title="Fill tool" data-i18n-aria-label="Fill tool" data-i18n-title="Fill tool">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M14.5 4.5 19.5 9.5 10 19H5v-5l9.5-9.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>

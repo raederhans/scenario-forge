@@ -9897,6 +9897,10 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   pointer-events: none;
 }
 
+#mapContainer.tool-select {
+  cursor: default;
+}
+
 #mapContainer.tool-fill {
   cursor: crosshair;
 }

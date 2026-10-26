@@ -4,6 +4,7 @@ export function createToolGuidance({ documentRef = document, state, t }) {
   if (!dock) return { sync() {} };
   const view = documentRef.defaultView;
   const entries = [
+    ["toolSelectBtn", "Select tool", "V"],
     ["toolFillBtn", "Fill tool", "F"],
     ["toolEraserBtn", "Eraser tool", "E"],
     ["toolEyedropperBtn", "Eyedropper tool", "I"],

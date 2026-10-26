@@ -268,6 +268,10 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       if (previousWaterRegionId) refreshWaterRegionSidebarRowsNow([previousWaterRegionId]);
       refreshSpecialRegionSidebarRowsNow([previousSpecialRegionId, id]);
       requestInteractionRender("select-special-region");
+      if (state.currentTool === "select") {
+        noteRenderAction("select-special", actionStart);
+        return;
+      }
       if (state.currentTool === "eyedropper") {
         const picked = getSpecialRegionColor(id, specialFeature);
         if (picked) setClickSelectedColor(picked, { updateSwatch: true });
@@ -306,6 +310,11 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       if (macroOceanSelectionOnly) {
         requestInteractionRender("click-select-open-ocean");
         noteRenderAction("click-select-open-ocean", actionStart);
+        return;
+      }
+      if (state.currentTool === "select") {
+        requestInteractionRender("select-water");
+        noteRenderAction("select-water", actionStart);
         return;
       }
       if (state.currentTool === "eraser") {
@@ -357,6 +366,11 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       const changedSelection = toggleFeatureInDevSelection(landId);
       syncInspectorCountryToLandSelection(feature, landId, landHit);
       noteRenderAction(changedSelection ? "dev-selection-toggle" : "dev-selection-sync", actionStart);
+      return;
+    }
+    if (state.currentTool === "select") {
+      syncInspectorCountryToLandSelection(feature, landId, landHit);
+      noteRenderAction("select-land", actionStart);
       return;
     }
     let countryCode = landHit.countryCode || getFeatureCountryCodeNormalized(feature);

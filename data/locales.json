@@ -296434,6 +296434,18 @@
       "en": "Fill tool",
       "zh": "填充工具"
     },
+    "Select tool": {
+      "en": "Select tool",
+      "zh": "选择工具"
+    },
+    "Switched to fill tool": {
+      "en": "Switched to fill tool",
+      "zh": "已切换到填充工具"
+    },
+    "Click to inspect a region or country. Press F to switch to fill before painting.": {
+      "en": "Click to inspect a region or country. Press F to switch to fill before painting.",
+      "zh": "点击查看区域或国家。绘制前按 F 切换到填充工具。"
+    },
     "Filter airport status using normalized official status categories.": {
       "en": "Filter airport status using normalized official status categories.",
       "zh": "使用规范化的官方状态类别过滤机场状态。"

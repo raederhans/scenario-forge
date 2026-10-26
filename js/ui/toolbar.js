@@ -1291,13 +1291,15 @@ function initToolbar({ render } = {}) {
       ? "Eraser"
       : tool === "eyedropper"
         ? "Eyedropper"
-        : "Fill",
+        : tool === "select"
+          ? "Select tool"
+          : "Fill",
     "ui"
   );
 
   const setToolCursorClass = () => {
     if (!mapContainer) return;
-    mapContainer.classList.remove("tool-fill", "tool-eraser", "tool-eyedropper", "tool-special-zone", "tool-pan-override");
+    mapContainer.classList.remove("tool-select", "tool-fill", "tool-eraser", "tool-eyedropper", "tool-special-zone", "tool-pan-override");
     if (runtimeState.specialZoneEditor?.active || runtimeState.currentTool === "special-zone-membership") {
       mapContainer.classList.add("tool-special-zone");
       return;
@@ -1306,7 +1308,7 @@ function initToolbar({ render } = {}) {
       mapContainer.classList.add("tool-pan-override");
       return;
     }
-    mapContainer.classList.add(`tool-${runtimeState.currentTool || "fill"}`);
+    mapContainer.classList.add(`tool-${runtimeState.currentTool || "select"}`);
   };
 
   const renderDirty = (reason) => {
@@ -1946,7 +1948,7 @@ function initToolbar({ render } = {}) {
   }
 
   const runToolSelection = (tool, { dismissHint = true, feedbackLabel = "" } = {}) => {
-    const nextTool = tool || "fill";
+    const nextTool = tool || "select";
     runtimeState.currentTool = nextTool;
     if (nextTool === "eyedropper") {
       runtimeState.brushModeEnabled = false;
@@ -1961,7 +1963,7 @@ function initToolbar({ render } = {}) {
 
   const runBrushModeToggle = (nextValue = !runtimeState.brushModeEnabled, { dismissHint = true } = {}) => {
     runtimeState.brushModeEnabled = !!nextValue;
-    if (runtimeState.brushModeEnabled && runtimeState.currentTool === "eyedropper") {
+    if (runtimeState.brushModeEnabled && (runtimeState.currentTool === "eyedropper" || runtimeState.currentTool === "select")) {
       runtimeState.currentTool = "fill";
     }
     updateToolUI();
@@ -2023,13 +2025,16 @@ function initToolbar({ render } = {}) {
   if (customColor) {
     customColor.addEventListener("input", (event) => {
       selectPalettePaintColor(runtimeState, event.target.value);
+      if (runtimeState.currentTool === "select") {
+        callRuntimeHook(runtimeState, "runToolSelectionFn", "fill", { feedbackLabel: t("Switched to fill tool", "ui") });
+      }
       updateSwatchUI();
     });
   }
 
   toolButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      runToolSelection(button.dataset.tool || "fill");
+      runToolSelection(button.dataset.tool || "select");
     });
   });
 

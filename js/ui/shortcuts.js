@@ -63,7 +63,7 @@ function toggleBrushMode() {
     return;
   }
   runtimeState.brushModeEnabled = !runtimeState.brushModeEnabled;
-  if (runtimeState.brushModeEnabled && runtimeState.currentTool === "eyedropper") {
+  if (runtimeState.brushModeEnabled && (runtimeState.currentTool === "eyedropper" || runtimeState.currentTool === "select")) {
     runtimeState.currentTool = "fill";
   }
   syncToolUi();
@@ -200,6 +200,11 @@ function initShortcuts() {
       return;
     }
 
+    if (!modifier && lower === "v") {
+      event.preventDefault();
+      setCurrentTool("select");
+      return;
+    }
     if (!modifier && lower === "f") {
       event.preventDefault();
       setCurrentTool("fill");
