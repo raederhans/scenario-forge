@@ -4,7 +4,7 @@
   "description": "tno_1962 剧本大区（district）分配规格。由 tools/build_tno_district_groups.py 读取，生成 data/scenarios/tno_1962/district_groups.manual.json。",
   "tags": {
     "GER": {
-      "source": "TNO 大德意志帝国：沿用二战末期帝国大区（Reichsgau）划分；奥地利按 Alpen- und Donau-Reichsgaue，捷克分苏台德与保护国（波希米亚/摩拉维亚），克里米亚为哥特大区。行政区内部再细分（如巴伐利亚三大区）按历史 Gau 边界近似到 NUTS2。",
+      "source": "TNO 大德意志帝国：沿用二战末期帝国大区（Reichsgau）划分；奥地利按 Alpen- und Donau-Reichsgaue，捷克分苏台德帝国大区与波希米亚-摩拉维亚保护国，克里米亚为哥特大区。行政区内部再细分（如巴伐利亚三大区）按历史 Gau 边界近似到 NUTS2。被吞并/占领地区（波兰、捷克、奥地利、卢森堡、阿尔萨斯-洛林、下施蒂利亚与卡尼奥拉、克里米亚等）一律按帝国体制归入相应大区，不沿用原国家行政区。",
       "districts": [
         {
           "id": "ostpreussen",
@@ -136,9 +136,9 @@
           ]
         },
         {
-          "id": "boehmen",
-          "name_en": "Bohemia",
-          "name_zh": "波希米亚",
+          "id": "protektorat_boehmen_maehren",
+          "name_en": "Protectorate of Bohemia and Moravia",
+          "name_zh": "波希米亚-摩拉维亚保护国",
           "match": [
             {
               "prov": [
@@ -147,18 +147,7 @@
                 "CZ_Plze_sk_kraj",
                 "CZ_Jiho_esk_kraj",
                 "CZ_Kr_lov_hradeck_kraj",
-                "CZ_Pardubick_kraj"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "maehren",
-          "name_en": "Moravia",
-          "name_zh": "摩拉维亚",
-          "match": [
-            {
-              "prov": [
+                "CZ_Pardubick_kraj",
                 "CZ_Kraj_Vyso_ina",
                 "CZ_Jihomoravsk_kraj",
                 "CZ_Olomouck_kraj",
