@@ -398,6 +398,14 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
         updateDevSelectedHit(landHit);
       }
     }
+    // The user may switch to the select tool while leaf detail loads; that click
+    // must only inspect, never fall through to a paint.
+    if (state.currentTool === "select") {
+      syncInspectorCountryToLandSelection(feature, landId, landHit);
+      requestInteractionRender("select-land");
+      noteRenderAction("select-land", actionStart);
+      return;
+    }
     if (!state.isEditingPreset && handleRiverPaintClick(landHit)) return;
     const targetIds = resolveInteractionTargetIds(feature, landId);
 
