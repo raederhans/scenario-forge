@@ -3,6 +3,7 @@
 
 export const UI_COPY_CATALOG = Object.freeze({
   "Inspector": { zh: "检查器", en: "Inspector" },
+  "Layer settings": { zh: "图层设置", en: "Layer settings" },
   "Scenario": { zh: "剧本", en: "Scenario" },
   "Mode": { zh: "模式", en: "Mode" },
   "Country": { zh: "国家", en: "Country" },
