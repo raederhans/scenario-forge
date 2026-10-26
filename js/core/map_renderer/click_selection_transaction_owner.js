@@ -157,7 +157,10 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
 
   async function handleClick(event, _interactionContext = null) {
     let state = getClickState();
-    if (state.startupReadonly) {
+    if (state.startupReadonly && (state.currentTool !== "select"
+      || state.specialZoneEditor?.active || state.operationalLineEditor?.active
+      || state.operationGraphicsEditor?.active || state.unitCounterEditor?.active
+      || state.isEditingPreset)) {
       if (event?.preventDefault) event.preventDefault();
       blockStartupReadonlyInteraction();
       return;
@@ -257,7 +260,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       return;
     }
     updateDevSelectedHit(hit);
-    if (handleSpecialZoneMembershipClick(hit, event)) return;
+    if (!state.startupReadonly && handleSpecialZoneMembershipClick(hit, event)) return;
     if (target.kind === "special") {
       const specialFeature = state.specialRegionsById.get(id);
       if (!specialFeature) return;
