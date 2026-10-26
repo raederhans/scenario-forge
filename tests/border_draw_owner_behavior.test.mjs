@@ -25,7 +25,7 @@ function installBoundaryPath(t) {
   t.after(() => { if (original === undefined) delete globalThis.Path2D; else globalThis.Path2D = original; });
 }
 
-function createPreparedBorderHarness({ long = false, constants = {}, paintMesh = null } = {}) {
+function createPreparedBorderHarness({ long = false, constants = {}, paintMesh = null, classification = null } = {}) {
   const counts = { direct: 0, stream: 0, streamPoints: 0, pathCanvas: 0, river: 0, accent: 0, reconcile: 0 };
   const nativePaths = [];
   let baseProjection = d3.geoEqualEarth().scale(170).translate([200, 160]).clipExtent([[0, 0], [400, 320]]).precision(0.08);
@@ -77,7 +77,9 @@ function createPreparedBorderHarness({ long = false, constants = {}, paintMesh =
     createBoundaryPath: () => { const path = new RecordingBoundaryPath(); nativePaths.push(path); return path; },
     sanitizePolyline, isUsableMesh: value => !!value?.coordinates?.length,
     // Fresh wrappers must not invalidate the same geometry snapshot.
-    getPaintContourMeshes: () => [paint], getPoliticalBorderMeshes: () => [political],
+    getPaintContourMeshes: () => classification ? classification.paint : [paint],
+    getPoliticalBorderMeshes: () => classification ? classification.country : [political],
+    getClassifiedBorderMeshes: () => classification,
     getCoastlineCollectionForZoom: () => [coast, coast2],
     getVisibleCountryCodesForBorderMeshes: () => new Set(visible),
     getInternalBorderStrokeColor: (code, color) => code === "AA" ? color : "#778899",
@@ -349,6 +351,56 @@ function createOwner({ interactive = false, helpers = {} } = {}) {
   });
   return { owner, context, coastalAccentCalls, state };
 }
+
+test('classified internal borders use effective country buckets and suppress legacy detail meshes', () => {
+  const line = offset => ({ type: 'MultiLineString', coordinates: [[[offset, 0], [offset + 100, 100]]] });
+  let classification = { country: [], paint: [], local: new Map([['BBB', line(10)]]),
+    province: new Map([['BBB', line(20)]]), parent: new Map([['BBB', line(30)]]) };
+  let reconciles = 0, builds = 0, schedules = 0;
+  const h = createOwner({ helpers: { getClassifiedBorderMeshes: () => classification,
+    getPaintContourMeshes: () => [], getPoliticalBorderMeshes: () => [],
+    getInternalBorderStrokeColor: code => code === 'BBB' ? '#abcdef' : '#111111',
+    reconcileDetailAdmBorders: () => reconciles++, buildCountryParentBorderMeshes: () => { builds++; return []; },
+    scheduleDeferredHeavyBorderMeshes: () => schedules++,
+  } });
+  h.state.styleConfig.coastlines.opacity = 0;
+  h.state.styleConfig.internalBorders.opacity = 1;
+  h.state.parentBorderEnabledByCountry.BBB = true;
+  h.state.cachedDetailAdmBorders = [mesh];
+  h.owner.drawHierarchicalBorders(5);
+  assert.deepEqual(h.context.strokes.map(stroke => stroke.strokeStyle), ['#abcdef', '#abcdef', '#444444']);
+  assert.equal(reconciles + builds + schedules, 0);
+  h.context.strokes.length = 0;
+  h.state.parentBorderEnabledByCountry.BBB = false;
+  h.owner.drawHierarchicalBorders(5);
+  assert.equal(h.context.strokes.length, 2);
+  classification = null;
+  h.owner.drawHierarchicalBorders(5);
+  assert.equal(reconciles, 1);
+  assert.equal(schedules, 1);
+});
+
+test('classified packed meshes prepare the same paths as direct drawing without legacy cache warmup', async t => {
+  installBoundaryPath(t);
+  const packed = offset => createPackedLineMesh({ coordinates: Float64Array.from([offset, 0, offset + 20, 20]),
+    offsets: Uint32Array.from([0, 2]), arcs: Uint32Array.from([0]) });
+  const classification = { country: [packed(30)], paint: [packed(-10)],
+    local: new Map([['BB', packed(-30)]]), province: new Map([['BB', packed(10)]]),
+    parent: new Map([['BB', packed(50)]]) };
+  for (const interactive of [false, true]) {
+    const direct = createPreparedBorderHarness({ classification });
+    const prepared = createPreparedBorderHarness({ classification });
+    for (const h of [direct, prepared]) h.state.parentBorderEnabledByCountry.BB = true;
+    direct.owner.drawHierarchicalBorders(5, { interactive });
+    assert.equal(await prepared.owner.prepareHierarchicalBorders(5, { interactive, yieldControl: async () => {} }), true);
+    const streams = prepared.counts.stream;
+    prepared.owner.drawHierarchicalBorders(5, { interactive });
+    assert.deepEqual(prepared.context.strokes, direct.context.strokes);
+    assert.equal(prepared.counts.stream, streams);
+    assert.equal(prepared.counts.reconcile, 0);
+    assert.equal(prepared.state.cachedParentBordersByCountry.has('BB'), false);
+  }
+});
 
 test("river contours inherit paint contour style before global border strokes in settled and interactive passes", () => {
   for (const interactive of [false, true]) {

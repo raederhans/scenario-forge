@@ -16,6 +16,43 @@ export function applyPaletteOwnerColorState(target, ownerCode, color) {
   target.sovereignBaseColors[ownerCode] = color;
 }
 
+// Only scenario countries take part: ISO aliases (DE for GER) share their
+// country's color on purpose. Preferred (fixed) colors keep their value.
+export function uniquifyScenarioDefaultColors(colors, { tags = null, preferred = [] } = {}) {
+  const result = { ...colors };
+  const normalize = color => String(color).trim().toLowerCase();
+  const isHex = color => /^#[0-9a-f]{6}$/.test(normalize(color));
+  const used = new Set(Object.values(colors).map(normalize));
+  const seen = new Set();
+  const eligible = Object.keys(colors).filter(tag => isHex(colors[tag]) && (!tags || tags.has(tag)));
+  const first = new Set(preferred);
+  const ordered = [...eligible.filter(tag => first.has(tag)).sort(), ...eligible.filter(tag => !first.has(tag)).sort()];
+  for (const tag of ordered) {
+    const color = normalize(colors[tag]);
+    if (!seen.has(color)) { seen.add(color); continue; }
+    const rgb = [1, 3, 5].map(offset => parseInt(color.slice(offset, offset + 2), 16));
+    let replacement;
+    for (let distance = 1; !replacement; distance++) {
+      for (let channel = 2; channel >= 0 && !replacement; channel--) {
+        for (const delta of [distance, -distance]) {
+          if (rgb[channel] + delta < 0 || rgb[channel] + delta > 255) continue;
+          const candidate = rgb.map((value, index) => value + (index === channel ? delta : 0));
+          const hex = `#${candidate.map(value => value.toString(16).padStart(2, '0')).join('')}`;
+          if (!used.has(hex)) { replacement = hex; break; }
+        }
+      }
+    }
+    result[tag] = replacement;
+    used.add(replacement);
+  }
+  return result;
+}
+
+export function getScenarioCountryTags(countriesByTag) {
+  if (countriesByTag instanceof Map) return new Set(countriesByTag.keys());
+  return countriesByTag && typeof countriesByTag === "object" ? new Set(Object.keys(countriesByTag)) : null;
+}
+
 export function trimScenarioBundleCacheState(target, recencyOrder, targetId) {
   // The caller retains its Map identity; only a short string-ID order crosses
   // this write boundary. Published bundles are never copied.
@@ -546,9 +583,16 @@ export function commitScenarioActivationState(target, patch) {
     Array.isArray(patch.scenarioGeneratedColorTags)
       ? [...patch.scenarioGeneratedColorTags]
       : [];
-  target.scenarioFixedOwnerColors =
-    { ...(patch.scenarioFixedOwnerColors || {}) };
-  target.sovereignBaseColors = { ...(patch.sovereignBaseColors || {}) };
+  // Border identity is read from exact base colors, so equal defaults are split
+  // once over the complete palette; fixed colors follow the same replacement.
+  const baseColors = patch.sovereignBaseColors || {};
+  const fixedColors = patch.scenarioFixedOwnerColors || {};
+  target.sovereignBaseColors = uniquifyScenarioDefaultColors(baseColors, {
+    tags: getScenarioCountryTags(patch.scenarioCountriesByTag), preferred: Object.keys(fixedColors),
+  });
+  target.scenarioFixedOwnerColors = Object.fromEntries(Object.entries(fixedColors).map(([tag, color]) => [tag,
+    String(color).trim().toLowerCase() === String(baseColors[tag] ?? "").trim().toLowerCase()
+      ? target.sovereignBaseColors[tag] : color]));
   return true;
 }
 

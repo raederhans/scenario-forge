@@ -6,6 +6,55 @@ import { createPaintContourRuntime } from '../js/core/renderer/paint_contour_run
 import { createPaintContourGraphBuilder } from '../js/core/renderer/paint_contour_graph.js';
 import { createPaintContourWorkerClient } from '../js/core/paint_contour_worker_client.js';
 import { getPackedPaintContourMesh } from '../js/core/renderer/paint_contour_mesh.js';
+import { createBorderIdentityResolver } from '../js/core/renderer/border_identity.js';
+
+test('scenario classification reuses the graph, refreshes dirty arcs and invalidates borders on grouping or palette changes', async () => {
+  let palette = { A: '#ff0000', B: '#00ff00' }, districts = {}, h;
+  const overrides = {}, resolved = [];
+  const identity = createBorderIdentityResolver({ sovereignBaseColors: () => palette,
+    getReferenceOwner: id => h.owners[id], getOverrideColor: id => overrides[id] });
+  h = harness({ resolveClassification: (feature, id) => {
+    resolved.push(id);
+    return { borderKey: identity(id), parentKey: districts[id] || '', provinceKey: 'same' };
+  }, getClassificationRevision: () => [palette, districts] });
+  assert.equal(h.runtime.getClassification(), null);
+  await h.flush(); await h.finish();
+  assert.equal(h.runtime.getClassification().country.length, 1);
+  resolved.length = 0;
+  overrides.B = '#ff0000'; h.colors.B = '#ff0000'; h.state.colorRevision++;
+  assert.equal(h.runtime.notifyPaintChanged(['B']), true);
+  assert.deepEqual(resolved, ['B']);
+  assert.equal(h.runtime.getClassification().country.length, 0);
+  assert.equal(h.runtime.getClassification().local.has('A'), true);
+  assert.deepEqual(h.runtime.getMeshes(), []);
+  const changes = h.changes.length;
+  districts = { A: 'west', B: 'east' }; resolved.length = 0;
+  assert.equal(h.runtime.getClassification().parent.has('A'), true);
+  assert.deepEqual(resolved, ['A', 'B']);
+  assert.equal(h.changes.length, changes + 1);
+  palette = { A: '#000001', B: '#00ff00' };
+  assert.equal(h.runtime.getClassification().country.length, 1);
+  assert.equal(h.runtime.diagnostics().builds, 1);
+  h.state.activeScenarioId = '';
+  assert.equal(h.runtime.getClassification(), null);
+  await h.flush(); await h.finish();
+  assert.equal(h.runtime.getClassification(), null);
+});
+
+test('a geometry rebuild in the same scene keeps painted borders instead of reviving reference borders', async () => {
+  const keys = { A: 'A', B: 'B' };
+  const h = harness({ resolveClassification: (feature, id) => ({ borderKey: keys[id], parentKey: '', provinceKey: '' }) });
+  h.runtime.getClassification(); await h.flush(); await h.finish();
+  keys.B = 'A'; h.colors.B = h.colors.A; h.state.colorRevision++;
+  h.runtime.notifyPaintChanged(['B']);
+  assert.equal(h.runtime.getClassification().country.length, 0);
+  h.state.land = [h.a, { ...h.b, geometry: rect('B', 1).geometry }];
+  assert.equal(h.runtime.getClassification().country.length, 0, 'rebuild must not fall back to reference borders');
+  await h.flush(); await h.finish();
+  assert.equal(h.runtime.getClassification().country.length, 0);
+  h.state.sceneGeneration = 1;
+  assert.equal(h.runtime.getClassification(), null, 'a new scene never reuses the previous scene borders');
+});
 
 const rect=(id,x)=>({id,geometry:{type:'Polygon',coordinates:[[[x,0],[x+1,0],[x+1,1],[x,1],[x,0]]]}});
 function harness(runtimeOptions = {}) {
