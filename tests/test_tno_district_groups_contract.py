@@ -27,7 +27,10 @@ class TnoDistrictGroupsContractTest(unittest.TestCase):
     def test_spec_tags_are_all_published(self) -> None:
         self.assertEqual(self.payload["scenario_id"], "tno_1962")
         self.assertEqual(set(self.payload["tags"]), set(self.spec["tags"]))
-        for tag in ("GER", "FRA", "ENG", "ITA", "IBR", "RKM", "RKU", "RKO", "RKP", "RKN"):
+        for tag in (
+            "GER", "FRA", "ENG", "ITA", "IBR", "RKM", "RKU", "RKO", "RKP", "RKN",
+            "USA", "CHI", "CAN", "MEX", "NCP", "FRI", "TUR", "JAP", "MAN", "RAJ", "KOR",
+        ):
             self.assertIn(tag, self.payload["tags"])
 
     def test_feature_ids_exist_and_belong_to_tag(self) -> None:
