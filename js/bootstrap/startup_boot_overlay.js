@@ -4,25 +4,31 @@ import {
   replaceBootMetricsState,
   setBootPreviewVisibleState,
   setBootStateFields,
+  setBootSubProgress,
 } from "../core/state/actions/boot_actions.js";
+import { on, off } from "../core/state/bus.js";
 import { callRuntimeHook } from "../core/state/index.js";
 import { getBootLanguage, nowMs } from "./startup_bootstrap_support.js";
 const state = runtimeState;
 
 const BOOT_PHASE_WINDOWS = {
-  shell: { min: 0, max: 8, durationMs: 900 },
-  "base-data": { min: 8, max: 52, durationMs: 8800 },
-  "scenario-bundle": { min: 52, max: 80, durationMs: 6400 },
-  "scenario-apply": { min: 80, max: 94, durationMs: 3400 },
-  warmup: { min: 94, max: 96, durationMs: 1200 },
-  "detail-promotion": { min: 96, max: 98, durationMs: 2200 },
-  "interaction-infra": { min: 98, max: 99, durationMs: 2800 },
-  ready: { min: 100, max: 100, durationMs: 0 },
-  error: { min: 0, max: 99, durationMs: 0 },
+  shell: { min: 0, max: 3 },
+  "base-data": { min: 3, max: 16 },
+  "scenario-bundle": { min: 16, max: 36 },
+  "scenario-apply": { min: 36, max: 40 },
+  "initial-chunk-visual": { min: 40, max: 88 },
+  warmup: { min: 88, max: 90 },
+  "detail-promotion": { min: 90, max: 92 },
+  "interaction-infra": { min: 92, max: 99 },
+  ready: { min: 100, max: 100 },
+  error: { min: 0, max: 99 },
 };
+const BOOT_STEPS = Object.keys(BOOT_PHASE_WINDOWS).filter((phase) => phase !== "error");
 
 const BOOT_COPY = {
   en: {
+    steps: { completed: "Completed", active: "In progress", pending: "Pending" },
+    "initial-chunk-visual": { title: "Loading visible map chunks", message: "Preparing the initial scenario map." },
     shell: {
       title: "Preparing application shell",
       message: "Loading the workspace frame before interaction unlocks.",
@@ -35,11 +41,11 @@ const BOOT_COPY = {
     },
     "scenario-bundle": {
       title: "Loading default scenario",
-      message: "Preparing the TNO 1962 scenario bundle for the first visible frame.",
+      message: "Preparing the {scenario} scenario bundle for the first visible frame.",
     },
     "scenario-apply": {
       title: "Applying default scenario",
-      message: "Composing ownership, controllers, runtime topology, and UI state in one pass.",
+      message: "Composing ownership, controllers, runtime topology, and UI state for {scenario}.",
     },
     warmup: {
       title: "Finalizing first render",
@@ -65,6 +71,8 @@ const BOOT_COPY = {
     },
   },
   zh: {
+    steps: { completed: "已完成", active: "进行中", pending: "待处理" },
+    "initial-chunk-visual": { title: "正在加载首屏地图分片", message: "正在准备剧本首屏地图。" },
     shell: {
       title: "正在准备应用框架",
       message: "先完成工作区壳层初始化，再开放交互。",
@@ -77,11 +85,11 @@ const BOOT_COPY = {
     },
     "scenario-bundle": {
       title: "正在加载默认剧本",
-      message: "正在准备 TNO 1962 剧本包，用于首个可见画面。",
+      message: "正在准备 {scenario} 剧本包，用于首个可见画面。",
     },
     "scenario-apply": {
       title: "正在应用默认剧本",
-      message: "正在一次性组合归属、控制、运行时拓扑和 UI 状态。",
+      message: "正在为 {scenario} 组合归属、控制、运行时拓扑和 UI 状态。",
     },
     warmup: {
       title: "正在完成首帧渲染",
@@ -125,7 +133,10 @@ const STARTUP_READONLY_COPY = {
 
 function getBootCopy(phase = runtimeState.bootPhase) {
   const language = getBootLanguage();
-  return BOOT_COPY[language]?.[phase] || BOOT_COPY.en[phase] || BOOT_COPY.en.shell;
+  const copy = BOOT_COPY[language]?.[phase] || BOOT_COPY.en[phase] || BOOT_COPY.en.shell;
+  const scenarioId = runtimeState.activeScenarioId || runtimeState.scenarioRegistry?.default_scenario_id || "";
+  const scenario = runtimeState.scenarioRegistry?.scenarios?.find((entry) => entry.scenario_id === scenarioId);
+  return { ...copy, message: copy.message?.replace("{scenario}", scenario?.display_name || scenarioId) };
 }
 
 function getBootDom() {
@@ -171,8 +182,8 @@ export function resolveStartupInteractionMode() {
 export function createStartupBootOverlayController() {
   let bootOverlayBound = false;
   let bootContinueHandler = null;
-  let bootProgressAnimationHandle = null;
-  let bootProgressPhaseStartedAt = nowMs();
+  let bootSubProgressListener = null;
+  let stepNodes = [];
   let startupReadonlyUnlockHandle = null;
   let bootMetricsLogged = false;
 
@@ -194,34 +205,25 @@ export function createStartupBootOverlayController() {
     return BOOT_PHASE_WINDOWS[phase] || BOOT_PHASE_WINDOWS.shell;
   };
 
-  const sampleBootPhaseProgress = (phase = runtimeState.bootPhase) => {
-    const window = getBootProgressWindow(phase);
-    if (phase === "ready") {
-      return 100;
-    }
-    if (phase === "error") {
-      return Math.max(window.min, Math.min(99, Number(runtimeState.bootProgress || window.min)));
-    }
-    const elapsedMs = Math.max(0, nowMs() - bootProgressPhaseStartedAt);
-    const ratio = window.durationMs > 0
-      ? Math.min(1, elapsedMs / window.durationMs)
-      : 1;
-    const next = window.min + ((window.max - window.min) * ratio);
-    return Math.max(window.min, Math.min(window.max, next));
-  };
-
-  const stopBootProgressAnimation = () => {
-    if (bootProgressAnimationHandle !== null) {
-      globalThis.cancelAnimationFrame?.(bootProgressAnimationHandle);
-      bootProgressAnimationHandle = null;
-    }
-  };
-
   const syncBootOverlay = () => {
     if (typeof document === "undefined") {
       return;
     }
+    const window = getBootProgressWindow();
+    const subProgress = runtimeState.bootSubProgress;
+    if (subProgress?.total > 0 && runtimeState.bootPhase !== "error") {
+      const next = window.min + (window.max - window.min) * Math.min(1, subProgress.done / subProgress.total);
+      setBootStateFields(state, { progress: Math.max(runtimeState.bootProgress, next) });
+    }
     const dom = getBootDom();
+    const stepCopy = BOOT_COPY[getBootLanguage()].steps;
+    const currentStep = BOOT_STEPS.indexOf(runtimeState.bootPhase);
+    stepNodes.forEach((node, index) => {
+      const status = index < currentStep || runtimeState.bootPhase === "ready"
+        ? "completed" : index === currentStep ? "active" : "pending";
+      node.textContent = `${getBootCopy(BOOT_STEPS[index]).title} — ${stepCopy[status]}`;
+      node.setAttribute("data-status", status);
+    });
     const copy = getBootCopy(runtimeState.bootPhase);
     const shellCopy = getBootCopy("shell");
     const failed = runtimeState.bootPhase === "error";
@@ -297,23 +299,6 @@ export function createStartupBootOverlayController() {
     }
   };
 
-  const startBootProgressAnimation = () => {
-    stopBootProgressAnimation();
-    const tick = () => {
-      bootProgressAnimationHandle = null;
-      if (runtimeState.bootPhase === "ready" || runtimeState.bootPhase === "error") {
-        return;
-      }
-      const nextProgress = sampleBootPhaseProgress(runtimeState.bootPhase);
-      if (nextProgress > runtimeState.bootProgress) {
-        setBootStateFields(state, { progress: nextProgress });
-        syncBootOverlay();
-      }
-      bootProgressAnimationHandle = globalThis.requestAnimationFrame?.(tick) ?? null;
-    };
-    bootProgressAnimationHandle = globalThis.requestAnimationFrame?.(tick) ?? null;
-  };
-
   const clearStartupReadonlyUnlockHandle = () => {
     if (startupReadonlyUnlockHandle === null) return;
     globalThis.clearTimeout?.(startupReadonlyUnlockHandle);
@@ -355,6 +340,14 @@ export function createStartupBootOverlayController() {
         void bootContinueHandler();
       }
     });
+    const steps = document.createElement("ol");
+    steps.id = "bootOverlaySteps";
+    stepNodes = BOOT_STEPS.map(() => {
+      const node = document.createElement("li");
+      steps.appendChild(node);
+      return node;
+    });
+    dom.title.parentElement.appendChild(steps);
     bootOverlayBound = true;
     syncBootOverlay();
   };
@@ -369,6 +362,7 @@ export function createStartupBootOverlayController() {
       canContinueWithoutScenario = false,
     } = {},
   ) => {
+    setBootSubProgress(state, null);
     setBootStateFields(state, {
       phase,
       message: message ?? getBootCopy(phase).message,
@@ -384,17 +378,19 @@ export function createStartupBootOverlayController() {
     }
     const window = getBootProgressWindow(phase);
     if (progress === null) {
-      bootProgressPhaseStartedAt = nowMs();
-      setBootStateFields(state, { progress: window.min });
+      setBootStateFields(state, { progress: Math.max(runtimeState.bootProgress, window.min) });
     } else {
       setBootStateFields(state, {
-        progress: Math.max(window.min, Math.min(window.max, Number(progress || 0))),
+        progress: Math.max(runtimeState.bootProgress, window.min, Math.min(window.max, Number(progress || 0))),
       });
     }
     if (phase === "ready" || phase === "error") {
-      stopBootProgressAnimation();
-    } else {
-      startBootProgressAnimation();
+      off("boot-sub-progress", bootSubProgressListener);
+      bootSubProgressListener = null;
+    } else if (!bootSubProgressListener) {
+      bootSubProgressListener = on("boot-sub-progress", (target) => {
+        if (target === state) syncBootOverlay();
+      });
     }
     syncBootOverlay();
     callRuntimeHook(state, "updateScenarioUIFn");

@@ -38,7 +38,10 @@ import { createRenderPassSignaturePolicy } from './renderer/render_pass_signatur
 import { createProjectedBoundsDiagnosticsOwner } from "./renderer/projected_bounds_diagnostics_owner.js";
 import { createPixelRatioPolicy } from "./renderer/pixel_ratio_policy.js";
 import { normalizeDisplayQuality } from "./renderer/display_quality_policy.js";
-import { separatesPoliticalBorders } from "./renderer/political_border_policy.js";
+import { separatesPoliticalBorders, isPoliticalBorderEnabled } from "./renderer/political_border_policy.js";
+import { createBorderIdentityResolver } from "./renderer/border_identity.js";
+import { getScenarioCountryTags } from "./state/actions/scenario_activation_actions.js";
+import { normalizeScenarioDistrictGroupsPayload } from "./scenario_districts.js";
 import { createPoliticalBorderRuntime } from "./renderer/political_border_runtime.js";
 import { EXPORT_RENDER_BUDGET_BYTES, estimateExportRenderBytes } from "./renderer/export_render_budget.js";
 import { createPhysicalIntensityInteractionOwner } from "./renderer/physical_intensity_interaction_owner.js";
@@ -2493,12 +2496,87 @@ function getRiverPaintEditorOwner() {
 }
 
 let paintContourRuntimeOwner = null;
+let borderPaletteSource = null, borderPaletteColorRevision = -1, borderPaletteRevision = '';
+function getBorderPaletteRevision() {
+  if (borderPaletteSource !== runtimeState.sovereignBaseColors || borderPaletteColorRevision !== runtimeState.colorRevision) {
+    borderPaletteSource = runtimeState.sovereignBaseColors;
+    borderPaletteColorRevision = runtimeState.colorRevision;
+    borderPaletteRevision = JSON.stringify(borderPaletteSource || {});
+  }
+  return borderPaletteRevision;
+}
+let borderCountryTagsSource, borderCountryTags = null;
+function getBorderCountryTags() {
+  if (borderCountryTagsSource !== runtimeState.scenarioCountriesByTag) {
+    borderCountryTagsSource = runtimeState.scenarioCountriesByTag;
+    borderCountryTags = getScenarioCountryTags(borderCountryTagsSource);
+  }
+  return borderCountryTags;
+}
+const resolveBorderIdentity = createBorderIdentityResolver({
+  sovereignBaseColors: () => runtimeState.sovereignBaseColors,
+  getCountryTags: getBorderCountryTags,
+  getRevision: getBorderPaletteRevision,
+  getReferenceOwner: (id, feature) => {
+    const parent = getRiverPaintRuntime(runtimeState).getParentFeature(feature);
+    return canonicalCountryCode(getDisplayOwnerCode(parent, feature?.properties?.__riverParentId || id));
+  },
+  getOverrideColor: (id, feature) => feature?.properties?.__riverParentId
+    ? runtimeState.riverPaint?.overrides?.[id] || runtimeState.visualOverrides?.[feature.properties.__riverParentId]
+    : runtimeState.visualOverrides?.[id],
+});
+let borderDistrictSource = null, borderDistrictGeneration = -1, borderDistrictGroups = new Map();
+function resolveClassifiedBorderFeature(feature, id) {
+  if (borderDistrictSource !== runtimeState.scenarioDistrictGroupsData
+    || borderDistrictGeneration !== runtimeState.scenarioDataGeneration) {
+    borderDistrictSource = runtimeState.scenarioDistrictGroupsData;
+    borderDistrictGeneration = runtimeState.scenarioDataGeneration;
+    borderDistrictGroups = new Map();
+    const payload = normalizeScenarioDistrictGroupsPayload(borderDistrictSource);
+    for (const [tag, record] of Object.entries(payload.tags)) {
+      const groups = new Map();
+      for (const [districtId, district] of Object.entries(record.districts)) {
+        for (const featureId of district.feature_ids) groups.set(featureId, `${tag}::${districtId}`);
+      }
+      borderDistrictGroups.set(tag, groups);
+    }
+  }
+  const parent = getRiverPaintRuntime(runtimeState).getParentFeature(feature);
+  const parentId = feature?.properties?.__riverParentId || id;
+  const borderKey = resolveBorderIdentity(id, feature);
+  const reference = canonicalCountryCode(getDisplayOwnerCode(parent, parentId));
+  const parentKey = borderDistrictGroups.get(borderKey)?.get(parentId)
+    || (reference === borderKey ? runtimeState.parentGroupByFeatureId?.get(parentId) : '') || '';
+  const admin1 = getAdmin1Group(parent);
+  return { borderKey, parentKey, provinceKey: admin1 ? `${getFeatureCountryCodeNormalized(parent)}::${admin1}` : '' };
+}
+// Supported parent-border countries only grow within one scene, so painting a
+// country's last district edge away keeps its enabled preference for undo.
+let parentBorderSupportScene = "", parentBorderSupportKeys = new Set();
+function getClassifiedBorderMeshes() {
+  const classification = getPaintContourRuntimeOwner().getClassification();
+  if (classification) {
+    const scene = `${runtimeState.activeScenarioId || ""}|${runtimeState.sceneGeneration || 0}`;
+    if (scene !== parentBorderSupportScene) { parentBorderSupportScene = scene; parentBorderSupportKeys = new Set(); }
+    for (const key of classification.parent.keys()) parentBorderSupportKeys.add(key);
+    const supported = [...parentBorderSupportKeys].sort();
+    if (supported.length !== runtimeState.parentBorderSupportedCountries?.length
+      || supported.some((key, index) => key !== runtimeState.parentBorderSupportedCountries[index])) {
+      runtimeState.parentBorderSupportedCountries = supported;
+      runtimeState.updateParentBorderCountryListFn?.();
+    }
+  }
+  return classification;
+}
 function getPaintContourRuntimeOwner() {
   if (!paintContourRuntimeOwner) {
     paintContourRuntimeOwner = createPaintContourRuntime({
       state: runtimeState,
       getFeatures: () => getRiverPaintRuntime(runtimeState).surfaces(),
       getFeatureId,
+      resolveClassification: resolveClassifiedBorderFeature,
+      getClassificationRevision: () => [runtimeState.sovereignBaseColors, getBorderPaletteRevision(),
+        runtimeState.scenarioDistrictGroupsData, runtimeState.scenarioDataGeneration, runtimeState.parentGroupByFeatureId],
       resolveBoundaryKey: (feature, id) => {
         const parent = getRiverPaintRuntime(runtimeState).getParentFeature(feature);
         return canonicalCountryCode(getDisplayOwnerCode(parent, feature?.properties?.__riverParentId || id));
@@ -2608,8 +2686,14 @@ function getBorderDrawOwner() {
       getVisibleCountryCodesForBorderMeshes,
       isUsableMesh,
       getPaintContourMeshes: () => getPaintContourRuntimeOwner().getMeshes(),
+      getClassifiedBorderMeshes,
       drawRiverInternalContours: options => getRiverContourRenderOwner().draw(options),
-      getPoliticalBorderMeshes: () => getPoliticalBorderRuntimeOwner().getMeshes(),
+      getPoliticalBorderMeshes: () => {
+        const classification = getClassifiedBorderMeshes();
+        return classification
+          ? (isPoliticalBorderEnabled(runtimeState) ? classification.country : [])
+          : getPoliticalBorderRuntimeOwner().getMeshes();
+      },
       sanitizePolyline,
       scheduleDeferredHeavyBorderMeshes,
       reconcileDetailAdmBorders: (meta) => getBorderMeshOwner().reconcileDetailAdmBorders(meta),

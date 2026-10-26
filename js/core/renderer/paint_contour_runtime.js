@@ -1,6 +1,7 @@
 import { getContourCoordinatePrecision } from '../paint_contour_source.js';
 import { createPaintContourWorkerClient } from '../paint_contour_worker_client.js';
 import { createPaintContourMesh } from './paint_contour_mesh.js';
+import { createBorderClassification } from './border_classification.js';
 
 const EMPTY = Object.freeze([]);
 // Compare only fields sent by contourGeometry, without serialization, hashes or
@@ -40,6 +41,8 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   getBoundaryRevision = () => 0,
   separatePoliticalBorders = () => false,
   isArcEligible = () => true,
+  resolveClassification = null,
+  getClassificationRevision = () => [],
   client = createPaintContourWorkerClient(),
   schedule = callback => setTimeout(callback, 0),
   yieldControl = () => new Promise(resolve => setTimeout(resolve, 0)),
@@ -52,12 +55,17 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   let acknowledgedGraph = null;
   let inFlight = null, scheduled = false, revision = 0, paintRevision = -1;
   let boundaryRevision = null, bordersSeparated = false;
+  // A geometry rebuild within one scene keeps the last paint-aware borders;
+  // reverting to reference borders would revive edges the user painted away.
+  let classificationRevision = [], classified = false, lastClassification = null;
+  const shouldClassify = () => !!resolveClassification && !!state.activeScenarioId
+    && state.activeScenarioId !== 'blank_base' && state.mapSemanticMode !== 'blank';
   let status = 'idle', error = '', graphDiagnostics = null, builds = 0, sentFeatures = 0;
   let reuseAcks = 0, comparedFeatures = 0, equalFeatures = 0, comparisonYields = 0, comparisonMaxSliceMs = 0;
   const sceneIdentity = () => [state.activeScenarioId || '', state.sceneGeneration || 0].join('|');
   function clear() {
     generation += 1; client.dispose(); registered = null; registeredPrecision = null; view = null; inFlight = null;
-    acknowledgedGraph = null;
+    acknowledgedGraph = null; lastClassification = null;
     status = 'idle'; error = ''; graphDiagnostics = null; revision += 1;
   }
   function queue() {
@@ -115,13 +123,40 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     const next = Number(state.colorRevision || 0);
     const nextBoundaryRevision = String(getBoundaryRevision());
     const nextBordersSeparated = !!separatePoliticalBorders();
-    const boundaryChanged = nextBoundaryRevision !== boundaryRevision || nextBordersSeparated !== bordersSeparated;
+    const nextClassificationRevision = getClassificationRevision();
+    const modeChanged = classified !== shouldClassify();
+    if (modeChanged) createView();
+    const boundaryChanged = nextBoundaryRevision !== boundaryRevision || nextBordersSeparated !== bordersSeparated
+      || modeChanged || nextClassificationRevision.length !== classificationRevision.length
+      || nextClassificationRevision.some((value, index) => value !== classificationRevision[index]);
     if (!force && next === paintRevision && !boundaryChanged && ids == null) return;
     const scoped = !force && !boundaryChanged && ids && next === paintRevision + 1 ? ids : null;
-    if (view.refresh(scoped)) revision += 1;
+    const changed = view.refresh(scoped) || modeChanged;
+    if (changed) revision += 1;
     paintRevision = next;
     boundaryRevision = nextBoundaryRevision;
     bordersSeparated = nextBordersSeparated;
+    classificationRevision = nextClassificationRevision;
+    if (changed && (classified || modeChanged)) onChange('paint-contours-colors');
+  }
+  function createView() {
+    classified = shouldClassify();
+    view = classified
+      ? createBorderClassification(acknowledgedGraph, id => {
+        const feature = featuresById.get(id);
+        return { ...resolveClassification(feature, id), color: resolveColor(feature, id) };
+      }, { isArcEligible })
+      : createPaintContourMesh(acknowledgedGraph, id => {
+        const feature = featuresById.get(id);
+        return feature ? resolveColor(feature, id) : null;
+      }, {
+        resolveBoundaryKey: id => {
+          const feature = featuresById.get(id);
+          return feature ? resolveBoundaryKey(feature, id) : null;
+        },
+        separatePoliticalBorders,
+        isArcEligible,
+      });
   }
   function start() {
     const ownedGeneration = generation, ownedVersion = sourceVersion, snapshot = featuresById;
@@ -194,28 +229,19 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
         if (!current()) return;
         // One full graph, owned by the latest real Worker ACK. Recreate the
         // current view so colors, ownership and eligibility are read afresh.
-        view = createPaintContourMesh(acknowledgedGraph, id => {
-          const feature = featuresById.get(id);
-          return feature ? resolveColor(feature, id) : null;
-        }, {
-          resolveBoundaryKey: id => {
-            const feature = featuresById.get(id);
-            return feature ? resolveBoundaryKey(feature, id) : null;
-          },
-          separatePoliticalBorders,
-          isArcEligible,
-        });
+        createView();
         graphDiagnostics = acknowledgedGraph.diagnostics;
         paintRevision = Number(state.colorRevision || 0);
         boundaryRevision = String(getBoundaryRevision());
         bordersSeparated = !!separatePoliticalBorders();
+        classificationRevision = getClassificationRevision();
         status = 'ready'; revision += 1;
         onChange('paint-contours-ready');
       } catch (failure) {
         if (!owned()) return;
         if (!dispatched && failure?.name === 'AbortError' && !current()) return;
         // A failed/stale geometry result must never revive reference borders.
-        view = null; acknowledgedGraph = null; registered = null; registeredPrecision = null;
+        view = null; acknowledgedGraph = null; registered = null; registeredPrecision = null; lastClassification = null;
         status = 'error'; error = failure?.message || String(failure);
         client.dispose(); revision += 1; onChange('paint-contours-error');
       } finally {
@@ -243,6 +269,11 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     ensureReady,
     hasPendingWork: () => scheduled || !!inFlight || status === 'building',
     getMeshes() { syncSource(); syncPaint(); return view?.getActiveArcCount() ? [view.getMesh()] : EMPTY; },
+    getClassification() {
+      syncSource(); syncPaint();
+      if (classified && view) lastClassification = view.getMeshes();
+      return shouldClassify() ? lastClassification : null;
+    },
     getRevision() { syncSource(); syncPaint(); return revision; },
     // Call immediately after the publisher's topology bump, before other reads.
     // This certifies immutable geometry identities, not an in-place mutation.
