@@ -19,7 +19,7 @@ the scenarios a plan names (see *Scenario-scoped plans*).
 | `russia_china_wave4.v1.json` | Applied plan: 248 groups, 656 members, 408 features removed. |
 | `benelux_wave5.candidates.json` | Input: Belgium and the Netherlands, two to three groups per province (provinces recovered from GISCO NUTS-2 and added to `hierarchy.json`). City hosts are protected for capitals, major cities and cities of at least 250,000. Applied to every scenario, because the shared HOI4 vanilla releasable catalog lists Flemish and Walloon parcels. |
 | `benelux_wave5.v1.json` | Applied plan: 20 groups, 50 members, 30 features removed (Belgium 44 → 25, the Netherlands 40 → 29). |
-| `germany_poland_wave5_{tno,rest}.candidates.json` | Input: Germany (HOI4-state level) and Poland (voivodeship level) from the 2026-10-25 central Europe research. City hosts are protected for capitals, major cities and at least 250,000 people; parcels of the shared historical display presets and candidates crossing a vanilla releasable boundary variant stay unmerged. |
+| `germany_poland_wave5_{tno,rest}.candidates.json` | Input: Germany (HOI4-state level) and Poland (voivodeship level) from the 2026-10-25 central Europe research. City hosts are protected for capitals, major cities and at least 250,000 people; parcels of the shared historical display presets and candidates crossing a vanilla releasable boundary variant stay unmerged (written before presets and the vanilla catalog were projected per scenario). |
 | `germany_poland_wave5_tno.v1.json` | Applied plan scoped to `tno_1962`: 54 groups, 272 members, 218 features removed. |
 | `germany_poland_wave5_rest.v1.json` | Applied plan scoped to `blank_base`, `hoi4_1936`, `hoi4_1939`, `modern_world`: 48 groups, 173 members, 125 features removed. |
 | `russia_wave5_{tno,rest}.candidates.json` | Input: Russia, P2 tier of the 2026-10-25 upper-level research (area caps 15,000 / 25,000 / 35,000 / 45,000 km² for European Russia / Urals / Siberia / Far East, convex-hull fill ≥ 0.4, aspect ≤ 3.5). City hosts are protected for capitals, major cities and at least 500,000 people; same-owner TNO neighbours no longer lock. |
@@ -63,6 +63,18 @@ merged away in any scenario of the new scope. The apply tool then:
   blank, both HOI4 scenarios and Modern World), leaves a file none of whose
   readers is in scope untouched, refuses a plan that touches a file read both
   inside and outside the scope, and leaves city host IDs on the members;
+- except for the historical display presets (`country_feature_policies.json`
+  `display.presets`) and the preset sources of the HOI4 vanilla releasable
+  catalog and its source file (`preset_source.feature_ids` /
+  `exclude_feature_ids`, also under `boundary_variants` and
+  `companion_actions`): these keep the members, and
+  `js/core/releasable_manager.js` projects them through the active scenario's
+  `feature_merges` when it builds presets and resolves releasables. A merged
+  feature counts only when a list names all of its members; a list naming only
+  some drops them and logs the merged ID, so a preset never grows. The apply
+  tool refuses a plan whose group is only partly in one of these lists, or
+  whose members appear anywhere else in those files (for example
+  `fragmentCamouflage`), before writing anything;
 - rewrites population features of the scoped scenarios only.
 
 ## Deriving the plan
@@ -85,6 +97,10 @@ together only where every scenario assigns them identically:
   keeps one property set;
 - members whose geometry is invalid in any of those topologies are never
   merged, because the apply tool unions exact coordinates without repair;
+- members must lie wholly inside or outside every shared ID list their
+  scenarios read (historical display presets, releasable preset sources of the
+  vanilla catalog and, for TNO, its own catalog); a scoped merged member takes
+  its leaves' lists;
 - features with their own `display.fragmentCamouflage` rule in
   `country_feature_policies.json` are never merged, since a merge would widen
   or drop that rule;

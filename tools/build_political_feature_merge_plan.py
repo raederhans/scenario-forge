@@ -43,6 +43,16 @@ ADJACENCY_SCENARIO = "tno_1962"
 PROPERTY_NAME_KEYS = {"id", "name", "name_local", "legacy_name", "anchor_county_name", "adm1_name"}
 # Every topology the apply tool rewrites. A merge must not mix precision and ordinary
 # parcels, and every member must be valid there: the apply tool unions without repair.
+# Shared files whose ID lists name features (historical display presets, releasable
+# preset sources), with the scenarios that read them. A group must lie wholly inside
+# or outside each list its scenarios read: the apply tool projects these lists, or for
+# a scoped plan the frontend does (js/core/releasable_manager.js), and neither may
+# widen or split a list.
+SHARED_ID_LIST_READERS = {
+    "country_feature_policies.json": ALL_SCENARIOS,
+    "releasables/hoi4_vanilla.internal.phase1.catalog.json": ("blank_base", "hoi4_1936", "hoi4_1939", "modern_world"),
+    "releasables/tno_1962.internal.phase1.catalog.json": ("tno_1962",),
+}
 REWRITTEN_TOPOLOGIES = (DATA / "europe_topology.na_v2.json", DATA / "europe_topology.runtime_political_v1.json",
                         *sorted(DATA.glob("scenarios/*/runtime_topology.topo.json*")))
 
@@ -536,6 +546,38 @@ def fragment_camouflage_feature_ids() -> set[str]:
     return {str(feature_id) for rule in rules for feature_id in rule.get("featureIds") or []}
 
 
+def shared_id_list_memberships(scenarios: tuple[str, ...] | None = None,
+                               scoped_leaves: dict[str, list[str]] | None = None) -> dict[str, list[str]]:
+    """Feature id -> every shared ID list (file and JSON path) naming it that these scenarios read.
+
+    Shared files keep the leaves of a scoped merged ID (only the scope's own catalog
+    names the merged ID); it takes their lists as well, and leaves that disagree give
+    it a signature nothing else shares.
+    """
+    lists: dict[str, set[str]] = {}
+
+    def walk(value, at: str) -> None:
+        if isinstance(value, list) and value and all(isinstance(item, str) for item in value):
+            for feature_id in value:
+                lists.setdefault(feature_id, set()).add(at)
+        elif isinstance(value, list):
+            for index, item in enumerate(value):
+                walk(item, f"{at}[{index}]")
+        elif isinstance(value, dict):
+            for key, item in value.items():
+                walk(item, f"{at}.{key}")
+
+    for name, readers in SHARED_ID_LIST_READERS.items():
+        if (DATA / name).exists() and (scenarios is None or set(readers) & set(scenarios)):
+            walk(read_json(DATA / name), f"{name}:$")
+    memberships = {feature_id: sorted(keys) for feature_id, keys in lists.items()}
+    for merged_id, leaves in (scoped_leaves or {}).items():
+        keys = {tuple(memberships.get(leaf, [])) for leaf in leaves}
+        own = memberships.get(merged_id, [])
+        memberships[merged_id] = sorted({*own, *keys.pop()}) if len(keys) == 1 else [f"inconsistent:{merged_id}"]
+    return memberships
+
+
 def river_paint_feature_ids(scenarios: tuple[str, ...] | None = None) -> set[str]:
     """Parents and contour supports of reviewed river-paint packs.
 
@@ -618,6 +660,7 @@ def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None, 
     memberships, name_sources = group_memberships(hierarchy), load_name_sources()
     scoped_leaves, scoped_final = scoped_lineage(scenarios) if scenarios is not None else ({}, {})
     inherit_leaf_assignments(scoped_leaves, memberships, tables["china_prefecture"])
+    tables["shared_id_lists"] = shared_id_list_memberships(scenarios, scoped_leaves)
     protected = set(candidates.get("protected_feature_ids") or []) | river_paint_feature_ids(scenarios) | fragment_camouflage_feature_ids()
     protected |= invalid_geometry_ids({member for candidate in candidates["candidates"] for member in candidate["member_ids"]},
                                       rewritten_topologies(scenarios))
@@ -665,7 +708,7 @@ def build_plan(candidates_path: Path, scenarios: tuple[str, ...] | None = None, 
         **({} if scenarios is None else {"scenarios": list(scenarios)}),
         "constraints": ["owners", "cores", "strategic_value_buckets", "hierarchy_groups", "quick_fill_groups",
                         "china_crosswalk_prefecture", "precision_tier", "member_properties", "valid_member_geometry",
-                        "fragment_camouflage_unchanged",
+                        "fragment_camouflage_unchanged", "shared_id_lists_whole",
                         "river_paint_parcels_unchanged", "contiguous"],
         "ownership_scenarios": scoped(OWNERSHIP_SCENARIOS, scenarios),
         "strategic_scenarios": scoped(STRATEGIC_SCENARIOS, scenarios),
