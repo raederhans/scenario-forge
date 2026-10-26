@@ -696,7 +696,11 @@ export function createStartupDataPipelineOwner({
     const scenarioRegistryPromise = loadScenarioRegistry({ d3Client });
     const registryDefaultScenarioIdPromise = defaultScenarioDisabled
       ? Promise.resolve("")
-      : scenarioRegistryPromise.then(resolveStartupScenarioId);
+      : scenarioRegistryPromise.then(resolveStartupScenarioId, (error) => {
+        if (!configuredDefaultScenarioId) throw error;
+        console.warn(`[boot] Scenario registry lookup failed; using configured default scenario "${configuredDefaultScenarioId}".`);
+        return configuredDefaultScenarioId;
+      });
     const requestedDefaultScenarioIdPromise = defaultScenarioDisabled
       ? Promise.resolve("")
       : registryDefaultScenarioIdPromise;

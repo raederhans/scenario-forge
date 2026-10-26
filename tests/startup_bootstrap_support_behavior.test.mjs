@@ -21,7 +21,7 @@ function restoreGlobalProperty(name, hadProperty, value) {
   delete globalThis[name];
 }
 
-async function resolveStartupScenarioId(registry, overrides = {}) {
+function createStartupScenarioBootstrap(registry, overrides = {}) {
   const source = readFileSync(new URL("../js/bootstrap/startup_data_pipeline.js", import.meta.url), "utf8")
     .replace(/^import[\s\S]*?from "[^"]+";\r?\n/gm, "")
     .replace("export function createStartupDataPipelineOwner", "function createStartupDataPipelineOwner");
@@ -38,11 +38,47 @@ async function resolveStartupScenarioId(registry, overrides = {}) {
     ...overrides,
   };
   const createOwner = new Function(...Object.keys(dependencies), `${source}\nreturn createStartupDataPipelineOwner;`)(...Object.values(dependencies));
-  const startup = createOwner({ state: {} }).resolveStartupScenarioBootstrap();
+  return createOwner({ state: {} }).resolveStartupScenarioBootstrap();
+}
+
+async function resolveStartupScenarioId(registry, overrides = {}) {
+  const startup = createStartupScenarioBootstrap(registry, overrides);
   const result = await startup.scenarioBundlePromise;
   assert.equal(result.ok, true);
   return startup.requestedDefaultScenarioIdPromise;
 }
+
+test("registry failure preserves the meta default without reading remembered scenarios", async () => {
+  const originals = ["location", "document"].map((key) => [key, Object.hasOwn(globalThis, key), globalThis[key]]);
+  const registryError = new Error("registry unavailable");
+  const warnings = [];
+  try {
+    globalThis.location = { search: "" };
+    globalThis.document = { querySelector: () => ({ getAttribute: () => "meta" }) };
+    const startup = createStartupScenarioBootstrap(null, {
+      loadScenarioRegistry: async () => { throw registryError; },
+      getRememberedScenarioId: () => assert.fail("cannot validate memory without a registry"),
+      loadScenarioBundle: async () => { throw registryError; },
+      console: { warn(message) { warnings.push(message); } },
+    });
+    assert.equal(await startup.requestedDefaultScenarioIdPromise, "meta");
+    assert.match(warnings[0], /^\[boot\].*registry.*meta/);
+    await startup.scenarioBundlePromise;
+  } finally {
+    originals.forEach(([key, had, value]) => restoreGlobalProperty(key, had, value));
+  }
+});
+
+test("registry failure without a configured default preserves the original error", async () => {
+  const registryError = new Error("registry unavailable");
+  const startup = createStartupScenarioBootstrap(null, {
+    loadScenarioRegistry: async () => { throw registryError; },
+    getConfiguredDefaultScenarioId: () => "",
+    shouldDisableConfiguredDefaultScenario: () => false,
+  });
+  await assert.rejects(startup.requestedDefaultScenarioIdPromise, (error) => error === registryError);
+  await startup.scenarioBundlePromise;
+});
 
 for (const { name, search, remembered, expected, throws = false, removed = false } of [
   { name: "URL override precedes remembered scenario", search: "?default_scenario=explicit", remembered: "saved", expected: "explicit" },
