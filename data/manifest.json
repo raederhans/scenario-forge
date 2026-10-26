@@ -151,15 +151,15 @@
       "world_bounds_geometries": 149
     },
     "geo_aliases.json": {
-      "alias_count": 49933,
+      "alias_count": 50303,
       "artifact_class": "publish",
       "conflict_count": 0,
       "description": "Canonical geographic alias index.",
       "entry_count": 22141,
       "owner": "init_map_data.hierarchy_locales",
       "role": "geo_aliases",
-      "sha256": "9093a1beeb51deb5e6816df16c55438771632e6757a1bbba8e9482bad097396e",
-      "size_bytes": 8187095,
+      "sha256": "2c8107e1f9e9e1fbb8c27aa9ce7737da03b53c4e4398ebccb5c1d1ef1c8b0bed",
+      "size_bytes": 8209064,
       "type": "geo_aliases"
     },
     "global_contours.major.topo.json": {

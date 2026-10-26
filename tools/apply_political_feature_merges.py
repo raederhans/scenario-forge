@@ -363,6 +363,28 @@ def apply_scenario_extras(scenario_dir: Path, merges: Merges) -> list[str]:
     return changed
 
 
+def apply_scenario_names(scenario_dir: Path, merges: Merges, feature_ids: set[str]) -> list[str]:
+    """Write each present group's own scenario name (plan ``scenario_names``) into the
+    scenario's locale patches, which take precedence over the global locales.
+
+    Projection only renames entries the patch already had; a group whose members
+    had no scenario name would otherwise fall back to the global name.
+    """
+    names = {group["id"]: group["scenario_names"][merges.scenario] for group in merges.groups
+             if merges.scenario in (group.get("scenario_names") or {}) and group["id"] in feature_ids}
+    changed = []
+    for path in sorted(scenario_dir.glob("geo_locale_patch*.json")) if names else ():
+        def transform(payload: dict) -> dict:
+            payload = copy.deepcopy(payload)
+            for group_id, scenario_name in names.items():
+                payload["geo"].pop("id::" + group_id, None)
+                payload["geo"][group_id] = dict(scenario_name)
+            return payload
+        if rewrite(path, transform):
+            changed.append(path.name)
+    return changed
+
+
 def record_scenario_feature_merges(manifest_path: Path, merges: Merges, applied: list[str]) -> None:
     """Record scoped merges for js/core/scenario_hierarchy.js, which projects the shared hierarchy.
 
@@ -387,6 +409,7 @@ def record_scenario_feature_merges(manifest_path: Path, merges: Merges, applied:
 
 
 def apply_scenario(scenario_id: str, merges: Merges) -> dict:
+    merges = merges.for_scenario(scenario_id)
     scenario_dir = DATA / "scenarios" / scenario_id
     topology_path = scenario_dir / "runtime_topology.topo.json"
     source_path = topology_path if topology_path.exists() else topology_path.with_name(topology_path.name + ".gz")
@@ -396,6 +419,7 @@ def apply_scenario(scenario_id: str, merges: Merges) -> dict:
     removed = sorted(member for group_id in applied for member in merges.by_id[group_id]["member_ids"])
     strategic_path = scenario_dir / "strategic_values.by_feature.json"
     extras = apply_scenario_extras(scenario_dir, merges)
+    extras += apply_scenario_names(scenario_dir, merges, set(applied))
     if merges.scoped and applied:
         record_scenario_feature_merges(scenario_dir / "manifest.json", merges, applied)
     written = write_runtime_topology_source(scenario_dir, topology)
@@ -547,6 +571,31 @@ def apply_geo_aliases(merges: Merges) -> None:
     rewrite(DATA / "geo_aliases.json", lambda payload: merge_geo_aliases(copy.deepcopy(payload), merges))
 
 
+def apply_scenario_member_aliases(merges: Merges) -> None:
+    rewrite(DATA / "geo_aliases.json", lambda payload: add_scenario_member_aliases(copy.deepcopy(payload), merges))
+
+
+def add_scenario_member_aliases(payload: dict, merges: Merges) -> dict:
+    """Members' own scenario names (plan ``scenario_member_names``) stay searchable on the merged feature.
+
+    A scenario resolves the shared alias map, with its scoped merges remapped
+    (js/core/scenario_localization_state.js), so these point at the merged ID; an
+    alias another feature already uses keeps its target.
+    """
+    entries = {entry.get("feature_id"): entry for entry in payload["entries"]}
+    aliases = payload["alias_to_stable_key"]
+    for group in merges.groups:
+        names = [name for members in (group.get("scenario_member_names") or {}).values()
+                 for member in members.values() for name in member.values()]
+        if group["id"] in entries:
+            entry = entries[group["id"]]
+            entry["search_only_aliases"] = list(dict.fromkeys(list(entry.get("search_only_aliases") or []) + names))
+        for name in names:
+            aliases.setdefault(name, f"id::{group['id']}")
+    payload["alias_count"] = len(aliases)
+    return payload
+
+
 def merge_geo_aliases(payload: dict, merges: Merges) -> dict:
     entries, merged_entries = [], {}
     for entry in payload["entries"]:
@@ -571,7 +620,7 @@ def merge_geo_aliases(payload: dict, merges: Merges) -> dict:
             names = [group["names"]["zh"], *previous, *(name for member in group["member_names"].values() for name in member.values())]
             target["search_only_aliases"] = list(dict.fromkeys(target["search_only_aliases"] + names))
             # A renamed group's joined name is no longer a display alias.
-            target["aliases"] = [alias for alias in target["aliases"] if alias not in previous]
+            target["aliases"] = [alias for alias in target["aliases"] if alias not in previous or alias == group["names"]["en"]]
     entries.extend(merged_entries.values())
     payload["entries"] = entries
     keep = (lambda key: key) if merges.scoped else merges.map_id
@@ -676,20 +725,27 @@ def rename_topology(topology: dict, merges: Merges) -> bool:
 def rename_only(merges: Merges, scenarios: list[str]) -> dict:
     """Project new names of applied merges into every name-bearing asset, without re-merging geometry."""
     report, in_sync = {}, manifest_in_sync()
+    # Groups whose global name is already projected (only a scenario name moved) leave the global files alone.
+    geo = load_json(DATA / "locales.json")["geo"]
+    renamed = Merges({"groups": [group for group in merges.groups
+                                 if (geo.get("id::" + group["id"]) or geo.get(group["id"])) != group["names"]]})
     for name in BASE_TOPOLOGIES:
         topology = read_any(DATA / name)
-        if rename_topology(topology, merges):
+        if rename_topology(topology, renamed):
             write_compact(DATA / name, topology)
     # The crosswalk's input signature covers China leaf names.
-    apply_china_crosswalk(merges)
-    apply_locales(merges)
-    apply_geo_aliases(merges)
+    apply_china_crosswalk(renamed)
+    apply_locales(renamed)
+    apply_geo_aliases(renamed)
+    apply_scenario_member_aliases(merges)
     for scenario_id in scenarios:
         scenario_dir = DATA / "scenarios" / scenario_id
         topology = read_any(scenario_dir / "runtime_topology.topo.json")
         if rename_topology(topology, merges):
             write_runtime_topology_source(scenario_dir, topology)
-        extras = apply_scenario_extras(scenario_dir, merges.for_scenario(scenario_id))
+        view = merges.for_scenario(scenario_id)
+        extras = apply_scenario_extras(scenario_dir, view)
+        extras += apply_scenario_names(scenario_dir, view, {feature_id(row) for row in topology["objects"]["political"]["geometries"]})
         # No assignment changes: the contract builder only rebuilds chunks, startup subsets and bundles.
         refresh_scenario(scenario_dir, {}, [])
         report[scenario_id] = extras
@@ -794,6 +850,7 @@ def main() -> None:
         global_paths = global_projected_paths(merges)
         apply_locales(merges)
         apply_geo_aliases(merges)
+        apply_scenario_member_aliases(merges)
         report["global"] = project_files(global_paths, merges)
     for scenario_id in [scenario for scenario in args.scenario or SCENARIOS if scenario in merges.scenarios]:
         report[scenario_id] = apply_scenario(scenario_id, merges)

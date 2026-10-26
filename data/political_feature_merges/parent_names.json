@@ -2,27 +2,63 @@
   "parents": {
     "BE_Antwerp": {
       "en": "Antwerp",
-      "zh": "安特卫普省"
+      "zh": "安特卫普省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Antwerpen",
+          "zh": "安特卫普省"
+        }
+      }
     },
     "BE_Brussels": {
       "en": "Brussels-Capital Region",
-      "zh": "布鲁塞尔首都大区"
+      "zh": "布鲁塞尔首都大区",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Hauptstadtbezirk Brüssel",
+          "zh": "布鲁塞尔首都区"
+        }
+      }
     },
     "BE_East_Flanders": {
       "en": "East Flanders",
-      "zh": "东佛兰德省"
+      "zh": "东佛兰德省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Ostflandern",
+          "zh": "东佛兰德省"
+        }
+      }
     },
     "BE_Flemish_Brabant": {
       "en": "Flemish Brabant",
-      "zh": "弗拉芒布拉班特省"
+      "zh": "弗拉芒布拉班特省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Flämisch-Brabant",
+          "zh": "弗拉芒布拉班特省"
+        }
+      }
     },
     "BE_Hainaut": {
       "en": "Hainaut",
-      "zh": "埃诺省"
+      "zh": "埃诺省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Hennegau",
+          "zh": "埃诺省"
+        }
+      }
     },
     "BE_Liege": {
       "en": "Liege",
-      "zh": "列日省"
+      "zh": "列日省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Lüttich",
+          "zh": "吕蒂希省"
+        }
+      }
     },
     "BE_Limburg_BE": {
       "en": "Limburg",
@@ -30,7 +66,13 @@
     },
     "BE_Luxembourg_BE": {
       "en": "Luxembourg",
-      "zh": "比利时卢森堡省"
+      "zh": "比利时卢森堡省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Luxemburg",
+          "zh": "比利时卢森堡省"
+        }
+      }
     },
     "BE_Namur": {
       "en": "Namur",
@@ -38,11 +80,23 @@
     },
     "BE_Walloon_Brabant": {
       "en": "Walloon Brabant",
-      "zh": "瓦隆布拉班特省"
+      "zh": "瓦隆布拉班特省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Wallonisch-Brabant",
+          "zh": "瓦隆布拉班特省"
+        }
+      }
     },
     "BE_West_Flanders": {
       "en": "West Flanders",
-      "zh": "西佛兰德省"
+      "zh": "西佛兰德省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Westflandern",
+          "zh": "西佛兰德省"
+        }
+      }
     },
     "CN_Anhui": {
       "en": "Anhui",
@@ -90,7 +144,13 @@
     },
     "DE_Berlin": {
       "en": "Berlin",
-      "zh": "柏林"
+      "zh": "柏林",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Germania",
+          "zh": "日耳曼尼亚"
+        }
+      }
     },
     "DE_Brandenburg": {
       "en": "Brandenburg",
@@ -254,7 +314,13 @@
     },
     "NL_Gelderland": {
       "en": "Gelderland",
-      "zh": "海尔德兰省"
+      "zh": "海尔德兰省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Geldern",
+          "zh": "海尔德兰省"
+        }
+      }
     },
     "NL_Groningen": {
       "en": "Groningen",
@@ -266,11 +332,23 @@
     },
     "NL_North_Brabant": {
       "en": "North Brabant",
-      "zh": "北布拉班特省"
+      "zh": "北布拉班特省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Nordbrabant",
+          "zh": "北布拉班特省"
+        }
+      }
     },
     "NL_North_Holland": {
       "en": "North Holland",
-      "zh": "北荷兰省"
+      "zh": "北荷兰省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Nordholland",
+          "zh": "北荷兰省"
+        }
+      }
     },
     "NL_Overijssel": {
       "en": "Overijssel",
@@ -278,7 +356,13 @@
     },
     "NL_South_Holland": {
       "en": "South Holland",
-      "zh": "南荷兰省"
+      "zh": "南荷兰省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Südholland",
+          "zh": "南荷兰省"
+        }
+      }
     },
     "NL_Utrecht": {
       "en": "Utrecht",
@@ -286,71 +370,173 @@
     },
     "NL_Zeeland": {
       "en": "Zeeland",
-      "zh": "泽兰省"
+      "zh": "泽兰省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Seeland",
+          "zh": "泽兰省"
+        }
+      }
     },
     "PL_Greater_Poland": {
       "en": "Greater Poland",
-      "zh": "大波兰省"
+      "zh": "大波兰省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Großpolen",
+          "zh": "大波兰"
+        }
+      }
     },
     "PL_Holy_Cross": {
       "en": "Holy Cross",
-      "zh": "圣十字省"
+      "zh": "圣十字省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Heiligkreuz",
+          "zh": "圣十字"
+        }
+      }
     },
     "PL_Kuyavian_Pomeranian": {
       "en": "Kuyavian-Pomeranian",
-      "zh": "库亚维-滨海省"
+      "zh": "库亚维-滨海省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Kujawien-Pommern",
+          "zh": "库亚维-波美拉尼亚"
+        }
+      }
     },
     "PL_Lesser_Poland": {
       "en": "Lesser Poland",
-      "zh": "小波兰省"
+      "zh": "小波兰省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Kleinpolen",
+          "zh": "小波兰"
+        }
+      }
     },
     "PL_Lodz": {
       "en": "Łódź",
-      "zh": "罗兹省"
+      "zh": "罗兹省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Litzmannstadt",
+          "zh": "利茨曼施塔特"
+        }
+      }
     },
     "PL_Lower_Silesian": {
       "en": "Lower Silesian",
-      "zh": "下西里西亚省"
+      "zh": "下西里西亚省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Niederschlesien",
+          "zh": "下西里西亚"
+        }
+      }
     },
     "PL_Lublin": {
       "en": "Lublin",
-      "zh": "卢布林省"
+      "zh": "卢布林省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Lublin",
+          "zh": "卢布林"
+        }
+      }
     },
     "PL_Lubusz": {
       "en": "Lubusz",
-      "zh": "卢布斯卡省"
+      "zh": "卢布斯卡省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Lebuser Land",
+          "zh": "卢布斯"
+        }
+      }
     },
     "PL_Masovian": {
       "en": "Masovian",
-      "zh": "马佐夫舍省"
+      "zh": "马佐夫舍省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Masowien",
+          "zh": "马佐夫舍"
+        }
+      }
     },
     "PL_Opole": {
       "en": "Opole",
-      "zh": "奥波莱省"
+      "zh": "奥波莱省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Oppeln",
+          "zh": "奥珀伦"
+        }
+      }
     },
     "PL_Podlaskie": {
       "en": "Podlaskie",
-      "zh": "波德拉谢省"
+      "zh": "波德拉谢省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Podlachien",
+          "zh": "波德拉谢"
+        }
+      }
     },
     "PL_Pomeranian": {
       "en": "Pomeranian",
-      "zh": "滨海省"
+      "zh": "滨海省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Pommerellen",
+          "zh": "波美雷利亚"
+        }
+      }
     },
     "PL_Silesian": {
       "en": "Silesian",
-      "zh": "西里西亚省"
+      "zh": "西里西亚省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Oberschlesien",
+          "zh": "上西里西亚"
+        }
+      }
     },
     "PL_Subcarpathian": {
       "en": "Subcarpathian",
-      "zh": "喀尔巴阡山省"
+      "zh": "喀尔巴阡山省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Karpatenvorland",
+          "zh": "喀尔巴阡山麓"
+        }
+      }
     },
     "PL_Warmian_Masurian": {
       "en": "Warmian-Masurian",
-      "zh": "瓦尔米亚-马祖里省"
+      "zh": "瓦尔米亚-马祖里省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Ermland-Masuren",
+          "zh": "瓦尔米亚-马祖里"
+        }
+      }
     },
     "PL_West_Pomeranian": {
       "en": "West Pomeranian",
-      "zh": "西滨海省"
+      "zh": "西滨海省",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Westpommern",
+          "zh": "西波美拉尼亚"
+        }
+      }
     },
     "RU_Altai_Republic": {
       "en": "Altai Krai",
@@ -378,7 +564,13 @@
     },
     "RU_Bryansk": {
       "en": "Bryansk",
-      "zh": "布良斯克州"
+      "zh": "布良斯克州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Brjansk",
+          "zh": "布良斯克"
+        }
+      }
     },
     "RU_Chechen_Republic": {
       "en": "Chechnya",
@@ -406,7 +598,13 @@
     },
     "RU_Kaliningrad": {
       "en": "Kaliningrad",
-      "zh": "加里宁格勒州"
+      "zh": "加里宁格勒州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Königsberg",
+          "zh": "柯尼斯堡"
+        }
+      }
     },
     "RU_Kaluga": {
       "en": "Kaluga",
@@ -430,11 +628,23 @@
     },
     "RU_Khabarovsk_Krai": {
       "en": "Khabarovsk Krai",
-      "zh": "哈巴罗夫斯克边疆区"
+      "zh": "哈巴罗夫斯克边疆区",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Bohori",
+          "zh": "伯力"
+        }
+      }
     },
     "RU_Kirov": {
       "en": "Kirov",
-      "zh": "基洛夫州"
+      "zh": "基洛夫州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Vyatka",
+          "zh": "维亚特卡"
+        }
+      }
     },
     "RU_Komi_Republic": {
       "en": "Komi",
@@ -446,7 +656,13 @@
     },
     "RU_Krasnodar_Krai": {
       "en": "Krasnodar Krai",
-      "zh": "克拉斯诺达尔边疆区"
+      "zh": "克拉斯诺达尔边疆区",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Jekaterinodar",
+          "zh": "叶卡捷琳诺达尔"
+        }
+      }
     },
     "RU_Krasnoyarsk_Krai": {
       "en": "Krasnoyarsk Krai",
@@ -466,7 +682,13 @@
     },
     "RU_Lipetsk": {
       "en": "Lipetsk",
-      "zh": "利佩茨克州"
+      "zh": "利佩茨克州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Lipezk",
+          "zh": "利佩茨克"
+        }
+      }
     },
     "RU_Mari_El_Republic": {
       "en": "Mari El",
@@ -474,11 +696,23 @@
     },
     "RU_Moscow": {
       "en": "Moscow",
-      "zh": "莫斯科州"
+      "zh": "莫斯科州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Moskau",
+          "zh": "莫斯科"
+        }
+      }
     },
     "RU_Murmansk": {
       "en": "Murmansk",
-      "zh": "摩尔曼斯克州"
+      "zh": "摩尔曼斯克州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Muurmanni",
+          "zh": "穆尔曼尼"
+        }
+      }
     },
     "RU_Nizhny_Novgorod": {
       "en": "Nizhny Novgorod",
@@ -486,7 +720,13 @@
     },
     "RU_Novgorod": {
       "en": "Novgorod",
-      "zh": "诺夫哥罗德州"
+      "zh": "诺夫哥罗德州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Holmgard",
+          "zh": "霍尔姆加德"
+        }
+      }
     },
     "RU_Novosibirsk": {
       "en": "Novosibirsk",
@@ -558,7 +798,13 @@
     },
     "RU_Rostov": {
       "en": "Rostov",
-      "zh": "罗斯托夫州"
+      "zh": "罗斯托夫州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Rostow",
+          "zh": "罗斯托夫"
+        }
+      }
     },
     "RU_Ryazan": {
       "en": "Ryazan",
@@ -570,7 +816,13 @@
     },
     "RU_Sakhalin": {
       "en": "Sakhalin",
-      "zh": "萨哈林州"
+      "zh": "萨哈林州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Karafuto",
+          "zh": "桦太"
+        }
+      }
     },
     "RU_Samara": {
       "en": "Samara",
@@ -578,11 +830,23 @@
     },
     "RU_Saratov": {
       "en": "Saratov",
-      "zh": "萨拉托夫州"
+      "zh": "萨拉托夫州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Platenfurt",
+          "zh": "普拉滕富特"
+        }
+      }
     },
     "RU_Smolensk": {
       "en": "Smolensk",
-      "zh": "斯摩棱斯克州"
+      "zh": "斯摩棱斯克州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Klugeburg",
+          "zh": "克卢格堡"
+        }
+      }
     },
     "RU_Stavropol_Krai": {
       "en": "Stavropol Krai",
@@ -610,7 +874,13 @@
     },
     "RU_Tver": {
       "en": "Tver",
-      "zh": "特维尔州"
+      "zh": "特维尔州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Twer",
+          "zh": "特维尔"
+        }
+      }
     },
     "RU_Tyumen": {
       "en": "Tyumen",
@@ -622,7 +892,13 @@
     },
     "RU_Ulyanovsk": {
       "en": "Ulyanovsk",
-      "zh": "乌里扬诺夫斯克州"
+      "zh": "乌里扬诺夫斯克州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Goeringstadt",
+          "zh": "戈林施塔特"
+        }
+      }
     },
     "RU_Vladimir": {
       "en": "Vladimir",
@@ -630,7 +906,13 @@
     },
     "RU_Volgograd": {
       "en": "Volgograd",
-      "zh": "伏尔加格勒州"
+      "zh": "伏尔加格勒州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Paulusburg",
+          "zh": "保卢斯堡"
+        }
+      }
     },
     "RU_Vologda": {
       "en": "Vologda",
@@ -638,11 +920,23 @@
     },
     "RU_Voronezh": {
       "en": "Voronezh",
-      "zh": "沃罗涅日州"
+      "zh": "沃罗涅日州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Woronesch",
+          "zh": "沃罗涅日"
+        }
+      }
     },
     "RU_Yaroslavl": {
       "en": "Yaroslavl",
-      "zh": "雅罗斯拉夫尔州"
+      "zh": "雅罗斯拉夫尔州",
+      "scenarios": {
+        "tno_1962": {
+          "en": "Jaroslawl",
+          "zh": "雅罗斯拉夫尔"
+        }
+      }
     },
     "RU_Zabaykalsky_Krai": {
       "en": "Zabaykalsky Krai",

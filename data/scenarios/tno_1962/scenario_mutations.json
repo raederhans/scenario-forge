@@ -9386,47 +9386,47 @@
       "zh": "迪南区"
     },
     "BE_MRG_15f4aef6c612": {
-      "en": "Hainaut · Northwest",
+      "en": "Hennegau · Northwest",
       "zh": "埃诺省·西北部"
     },
     "BE_MRG_24ed7b411331": {
-      "en": "West Flanders · Southeast",
+      "en": "Westflandern · Southeast",
       "zh": "西佛兰德省·东南部"
     },
     "BE_MRG_38ea003ab243": {
-      "en": "Antwerp · Central",
+      "en": "Antwerpen · Central",
       "zh": "安特卫普省·中部"
     },
     "BE_MRG_49096f4ef44b": {
-      "en": "Liege · Central",
-      "zh": "列日省·中部"
+      "en": "Lüttich · Central",
+      "zh": "吕蒂希省·中部"
     },
     "BE_MRG_6a92ca76474d": {
-      "en": "Namur · Northwest",
-      "zh": "那慕尔省·西北部"
+      "en": "Bezirk Namen",
+      "zh": "纳门"
     },
     "BE_MRG_7dbe84a470bd": {
-      "en": "West Flanders · Southwest",
+      "en": "Westflandern · Southwest",
       "zh": "西佛兰德省·西南部"
     },
     "BE_MRG_81cfb513b60d": {
-      "en": "East Flanders · South",
+      "en": "Ostflandern · South",
       "zh": "东佛兰德省·南部"
     },
     "BE_MRG_923fe66661e2": {
-      "en": "West Flanders · North",
+      "en": "Westflandern · North",
       "zh": "西佛兰德省·北部"
     },
     "BE_MRG_a29e92a10668": {
-      "en": "Limburg · South",
-      "zh": "比利时林堡省·南部"
+      "en": "Bezirk Tongern",
+      "zh": "通厄恩"
     },
     "BE_MRG_d49081148862": {
-      "en": "Luxembourg · South",
+      "en": "Luxemburg · South",
       "zh": "比利时卢森堡省·南部"
     },
     "BE_MRG_f7a8cd5ecd9e": {
-      "en": "Hainaut · Southeast",
+      "en": "Hennegau · Southeast",
       "zh": "埃诺省·东南部"
     },
     "BY_RAY_67162791B30498032594927": {
@@ -10118,19 +10118,19 @@
       "zh": "西兰主体地区"
     },
     "NL_MRG_19568adfd807": {
-      "en": "North Holland · West",
+      "en": "Nordholland · West",
       "zh": "北荷兰省·西部"
     },
     "NL_MRG_45a7250c2862": {
-      "en": "Groningen · Southeast",
-      "zh": "格罗宁根省·东南部"
+      "en": "Delfzijl en omgeving",
+      "zh": "代尔夫宰尔及周边"
     },
     "NL_MRG_99b7c61b066f": {
-      "en": "North Brabant · Central",
+      "en": "Nordbrabant · Central",
       "zh": "北布拉班特省·中部"
     },
     "NL_MRG_cfd8aead1a35": {
-      "en": "South Holland · Northeast",
+      "en": "Südholland · Northeast",
       "zh": "南荷兰省·东北部"
     },
     "NO020": {
@@ -10170,8 +10170,8 @@
       "zh": "保卢斯堡"
     },
     "RU_MRG_070e676051d2": {
-      "en": "Novosibirsk · East 2",
-      "zh": "新西伯利亚州·东部2"
+      "en": "Ob",
+      "zh": "鄂毕"
     },
     "RU_MRG_0a65d5f58393": {
       "en": "Altai Krai · Northwest 2",
@@ -10194,16 +10194,16 @@
       "zh": "萨马拉州·东南部"
     },
     "RU_MRG_21258bfc1110": {
-      "en": "Nizhny Novgorod · Northwest",
-      "zh": "下诺夫哥罗德州·西北部"
+      "en": "Hortonburg",
+      "zh": "霍顿堡"
     },
     "RU_MRG_252059f2380f": {
       "en": "Altai Krai · Central",
       "zh": "阿尔泰边疆区·中部"
     },
     "RU_MRG_29478c5fffa6": {
-      "en": "Krasnoyarsk Krai · South 6",
-      "zh": "克拉斯诺亚尔斯克边疆区·南部6"
+      "en": "Bogotolsky Rayon",
+      "zh": "波戈托尔区"
     },
     "RU_MRG_2953c850d23a": {
       "en": "Altai Krai · Southeast",
@@ -10214,8 +10214,8 @@
       "zh": "斯维尔德洛夫斯克州·西南部1"
     },
     "RU_MRG_2d8a56fb0da2": {
-      "en": "Ulyanovsk · Northeast",
-      "zh": "乌里扬诺夫斯克州·东北部"
+      "en": "Goeringstadt · Northeast",
+      "zh": "戈林施塔特·东北部"
     },
     "RU_MRG_2eace9e3f217": {
       "en": "Amur · South 4",
@@ -10246,16 +10246,16 @@
       "zh": "彼尔姆边疆区·南部3"
     },
     "RU_MRG_44732ad635df": {
-      "en": "Sakhalin · Central",
-      "zh": "萨哈林州·中部"
+      "en": "Karafuto · Central",
+      "zh": "桦太·中部"
     },
     "RU_MRG_45cb6d83fff3": {
       "en": "Altai Krai · Northwest 1",
       "zh": "阿尔泰边疆区·西北部1"
     },
     "RU_MRG_480afb1927f5": {
-      "en": "Tatarstan · Central",
-      "zh": "鞑靼斯坦共和国·中部"
+      "en": "Rajon Nischnekamsk",
+      "zh": "下卡姆斯克区"
     },
     "RU_MRG_4a2de1a12369": {
       "en": "Chuvashia · Central",
@@ -10266,24 +10266,24 @@
       "zh": "托木斯克州·南部"
     },
     "RU_MRG_54f19a93b9db": {
-      "en": "Primorsky Krai · Central",
-      "zh": "滨海边疆区·中部"
+      "en": "Yezhuhe",
+      "zh": "野猪河"
     },
     "RU_MRG_563983f18fe2": {
       "en": "Mari El · East",
       "zh": "马里埃尔共和国·东部"
     },
     "RU_MRG_56ed27ec6e18": {
-      "en": "Tatarstan · Southeast 2",
-      "zh": "鞑靼斯坦共和国·东南部2"
+      "en": "Novopismyansky District",
+      "zh": "新皮斯米扬卡区"
     },
     "RU_MRG_639437e5ad6b": {
       "en": "Tatarstan · Southwest",
       "zh": "鞑靼斯坦共和国·西南部"
     },
     "RU_MRG_639caddb97b7": {
-      "en": "Kemerovo · Northwest",
-      "zh": "克麦罗沃州·西北部"
+      "en": "Kolchugino District",
+      "zh": "科利丘吉诺区"
     },
     "RU_MRG_63e9553ae883": {
       "en": "Amur · South 3",
@@ -10294,32 +10294,32 @@
       "zh": "奥伦堡州·西部1"
     },
     "RU_MRG_69c47d13e0ea": {
-      "en": "Sakhalin · South",
-      "zh": "萨哈林州·南部"
+      "en": "Karafuto · South",
+      "zh": "桦太·南部"
     },
     "RU_MRG_6b6c39533363": {
-      "en": "Primorsky Krai · South",
-      "zh": "滨海边疆区·南部"
+      "en": "Huangtukanzi",
+      "zh": "黄土坎子"
     },
     "RU_MRG_6be12ffb1d4d": {
       "en": "Altai Krai · West",
       "zh": "阿尔泰边疆区·西部"
     },
     "RU_MRG_72b0f3ba03bc": {
-      "en": "Kirov · Central",
-      "zh": "基洛夫州·中部"
+      "en": "Vyatka · Central",
+      "zh": "维亚特卡·中部"
     },
     "RU_MRG_7451af4e8c07": {
-      "en": "Kirov · Southeast",
-      "zh": "基洛夫州·东南部"
+      "en": "Vyatka · Southeast",
+      "zh": "维亚特卡·东南部"
     },
     "RU_MRG_7750087e40dd": {
       "en": "Sverdlovsk · Southwest 2",
       "zh": "斯维尔德洛夫斯克州·西南部2"
     },
     "RU_MRG_79a4de3821cf": {
-      "en": "Primorsky Krai · Southwest",
-      "zh": "滨海边疆区·西南部"
+      "en": "Haishenwai",
+      "zh": "海参崴"
     },
     "RU_MRG_79d73fa9760d": {
       "en": "Altai Krai · North",
@@ -10334,12 +10334,12 @@
       "zh": "阿穆尔州·东南部"
     },
     "RU_MRG_7fc798b3eeaf": {
-      "en": "Karelia · South 1",
-      "zh": "卡累利阿共和国·南部1"
+      "en": "Kontupohja District",
+      "zh": "孔图波希亚区"
     },
     "RU_MRG_83744c263574": {
-      "en": "Murmansk · Central",
-      "zh": "摩尔曼斯克州·中部"
+      "en": "Muurmanni · Central",
+      "zh": "穆尔曼尼·中部"
     },
     "RU_MRG_84a69ede33b5": {
       "en": "Altai Krai · Northeast",
@@ -10350,8 +10350,8 @@
       "zh": "乌德穆尔特共和国·南部"
     },
     "RU_MRG_8e6e2af7d4de": {
-      "en": "Samara · West 1",
-      "zh": "萨马拉州·西部1"
+      "en": "Ivashchenkovo",
+      "zh": "伊瓦申科沃"
     },
     "RU_MRG_8ec2184da20a": {
       "en": "Severomorsk",
@@ -10366,8 +10366,8 @@
       "zh": "托木斯克州·东南部2"
     },
     "RU_MRG_9ed0f4973e0f": {
-      "en": "Amur · South 2",
-      "zh": "阿穆尔州·南部2"
+      "en": "Niuleimanho",
+      "zh": "纽勒们河"
     },
     "RU_MRG_a87b79d2be5d": {
       "en": "Chuvashia · North",
@@ -10378,12 +10378,12 @@
       "zh": "斯维尔德洛夫斯克州·东南部"
     },
     "RU_MRG_bba373fa6104": {
-      "en": "Khabarovsk Krai · South 2",
-      "zh": "哈巴罗夫斯克边疆区·南部2"
+      "en": "Bohori · South 2",
+      "zh": "伯力·南部2"
     },
     "RU_MRG_bd4e5d799db8": {
-      "en": "Samara · Central",
-      "zh": "萨马拉州·中部"
+      "en": "Novosamarovsk",
+      "zh": "新萨马罗夫斯克"
     },
     "RU_MRG_bd522f576b8e": {
       "en": "Kurgan · Northeast",
@@ -10394,12 +10394,12 @@
       "zh": "克拉斯诺亚尔斯克边疆区·南部3"
     },
     "RU_MRG_be7ea0c7c033": {
-      "en": "Karelia · South 3",
-      "zh": "卡累利阿共和国·南部3"
+      "en": "Äänislinna District",
+      "zh": "艾尼斯林纳区"
     },
     "RU_MRG_bec756719bb4": {
-      "en": "Khabarovsk Krai · South 3",
-      "zh": "哈巴罗夫斯克边疆区·南部3"
+      "en": "Bohori · South 3",
+      "zh": "伯力·南部3"
     },
     "RU_MRG_c84f2ed9c6ef": {
       "en": "Birobidzhan",
@@ -10426,8 +10426,8 @@
       "zh": "乌德穆尔特共和国·北部2"
     },
     "RU_MRG_da0982e025af": {
-      "en": "Kirov · Southwest 1",
-      "zh": "基洛夫州·西南部1"
+      "en": "Vyatka · Southwest 1",
+      "zh": "维亚特卡·西南部1"
     },
     "RU_MRG_da32271f14c8": {
       "en": "Orenburg · Northwest 2",
@@ -10438,12 +10438,12 @@
       "zh": "斯维尔德洛夫斯克州·中部"
     },
     "RU_MRG_e00f867dd81d": {
-      "en": "Ulyanovsk · Central",
-      "zh": "乌里扬诺夫斯克州·中部"
+      "en": "Goeringstadt · Central",
+      "zh": "戈林施塔特·中部"
     },
     "RU_MRG_e03e6af00269": {
-      "en": "Khakassia · North",
-      "zh": "哈卡斯共和国·北部"
+      "en": "Saralinsky District",
+      "zh": "萨拉林斯基区"
     },
     "RU_MRG_e0a377c11b7b": {
       "en": "Nikolsky District (Vologda)",
@@ -10454,8 +10454,8 @@
       "zh": "库尔干州·西南部"
     },
     "RU_MRG_e770cd31cdb4": {
-      "en": "Tula · West",
-      "zh": "图拉州·西部"
+      "en": "Goebbels",
+      "zh": "戈培尔"
     },
     "RU_MRG_eb6edd92ee8d": {
       "en": "Amur · South 1",

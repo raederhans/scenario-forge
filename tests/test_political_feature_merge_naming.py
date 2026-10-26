@@ -1,4 +1,5 @@
 from __future__ import annotations
+import copy
 import json
 import tempfile
 import unittest
@@ -6,13 +7,17 @@ from pathlib import Path
 
 from shapely.geometry import box
 
-from tools.apply_political_feature_merges import Merges, merge_geo_aliases, record_scenario_feature_merges, rename_view
+from tools.apply_political_feature_merges import (
+    Merges, add_scenario_member_aliases, apply_scenario_names, merge_geo_aliases, record_scenario_feature_merges, rename_view,
+)
 from tools.build_political_feature_merge_plan import (
     assign_representative,
     compass_direction,
     disambiguate_representative_names,
     inherit_leaf_assignments,
     parent_names,
+    scenario_member_names,
+    scenario_parent_names,
 )
 
 
@@ -166,6 +171,105 @@ class ScenarioFeatureMergeRecordTest(unittest.TestCase):
             overrides = json.loads(path.read_text(encoding="utf-8"))["hierarchy_overrides"]
         self.assertEqual(overrides["feature_merges"], {"RU_MRG_U": ["RU_D", "RU_E", "RU_G", "RU_H"]})
         self.assertEqual(overrides["feature_redirects"], {"RU_MRG_S": "RU_MRG_U", "RU_MRG_T": "RU_MRG_U"})
+
+
+class ScenarioParentNameTest(unittest.TestCase):
+    reviewed = {"RU_Kaliningrad": {"en": "Kaliningrad", "zh": "加里宁格勒州",
+                                   "scenarios": {"tno_1962": {"en": "Königsberg", "zh": "柯尼斯堡"}}}}
+    parent = {"en": "Kaliningrad", "zh": "加里宁格勒州"}
+
+    def group(self, en="Kaliningrad · Central 2", zh="加里宁格勒州·中部2"):
+        return {"id": "RU_MRG_000000000001", "parent_id": "RU_Kaliningrad", "member_ids": ["RU_A", "RU_B"],
+                "name_source": "parent_direction", "names": {"en": en, "zh": zh},
+                "member_names": {"RU_A": {"en": "A", "zh": "甲"}, "RU_B": {"en": "B", "zh": "乙"}}}
+
+    def test_a_scenario_parent_name_wins_only_in_that_scenario(self):
+        group = self.group()
+        scenario_parent_names(group, self.parent, ("hoi4_1936", "tno_1962"), self.reviewed)
+        self.assertEqual(group["names"], {"en": "Kaliningrad · Central 2", "zh": "加里宁格勒州·中部2"})
+        self.assertEqual(group["scenario_names"], {"tno_1962": {"en": "Königsberg · Central 2", "zh": "柯尼斯堡·中部2"}})
+        self.assertEqual(parent_names("RU_Kaliningrad", {}, {}, None, self.reviewed), self.parent)
+        outside = self.group()
+        scenario_parent_names(outside, self.parent, ("hoi4_1936",), self.reviewed)
+        self.assertNotIn("scenario_names", outside)
+
+    def test_projection_writes_the_scenario_name_and_keeps_the_global_one_elsewhere(self):
+        group = self.group()
+        scenario_parent_names(group, self.parent, ("hoi4_1936", "tno_1962"), self.reviewed)
+        group["previous_names"] = dict(group["names"])
+        merges = rename_view([{"groups": [group]}])
+        locales = {"geo": {"id::RU_MRG_000000000001": dict(group["names"])}}
+        self.assertEqual(merges.project(locales), locales)
+        with tempfile.TemporaryDirectory() as directory:
+            for scenario, geo in (("tno_1962", {}), ("hoi4_1936", {"RU_MRG_000000000001": dict(group["names"])})):
+                scenario_dir = Path(directory, scenario)
+                scenario_dir.mkdir()
+                Path(scenario_dir, "geo_locale_patch.json").write_text(json.dumps({"geo": geo}), encoding="utf-8")
+                view = merges.for_scenario(scenario)
+                apply_scenario_names(scenario_dir, view, {"RU_MRG_000000000001"})
+            tno = json.loads(Path(directory, "tno_1962", "geo_locale_patch.json").read_text(encoding="utf-8"))
+            hoi4 = json.loads(Path(directory, "hoi4_1936", "geo_locale_patch.json").read_text(encoding="utf-8"))
+        self.assertEqual(tno["geo"]["RU_MRG_000000000001"], {"en": "Königsberg · Central 2", "zh": "柯尼斯堡·中部2"})
+        self.assertEqual(hoi4["geo"]["RU_MRG_000000000001"], {"en": "Kaliningrad · Central 2", "zh": "加里宁格勒州·中部2"})
+
+    def test_an_unchanged_global_name_stays_a_display_alias(self):
+        group = {**self.group(), "previous_names": self.group()["names"]}
+        payload = {"entries": [{"feature_id": "RU_MRG_000000000001", "country_code": "RU", "primary_name": "Kaliningrad · Central 2",
+                                "aliases": ["Kaliningrad · Central 2"], "search_only_aliases": []}],
+                   "alias_to_stable_key": {"Kaliningrad · Central 2": "id::RU_MRG_000000000001"}}
+        entry, = merge_geo_aliases(payload, rename_view([{"groups": [group]}]))["entries"]
+        self.assertEqual(entry["aliases"], ["Kaliningrad · Central 2"])
+
+
+class ScenarioMemberNameTest(unittest.TestCase):
+    facts = {
+        "cities": [{"host_feature_id": "BE_C", "population": 9, "name": "Kortrijk", "name_en": "Kortrijk", "name_zh": "科特赖克"}],
+        "population": {"BE_A": {"population": 50}, "BE_B": {"population": 40}, "BE_C": {"population": 30}, "BE_D": {"population": 1}},
+        "global_names": {f"id::{member}": {"en": member, "zh": member} for member in ("BE_A", "BE_B", "BE_C")},
+        "scenario_names": {"tno_1962": {
+            "BE_A": {"en": "Arr. BE_A", "zh": "BE_A区"},       # affix only: not its own name
+            "BE_B": {"en": "Bezirk Brügge", "zh": "布吕格"},   # rename
+            "BE_C": {"en": "Bezirk Kortrijk", "zh": "科特赖兴"},  # rename hosting the largest city
+            "BE_D": {"en": "Дельта", "zh": "德尔塔"},          # only TNO names it, in Cyrillic
+        }},
+    }
+
+    def group(self, source):
+        members = ["BE_A", "BE_B", "BE_C", "BE_D"]
+        return {"id": "BE_MRG_000000000001", "parent_id": "BE_West_Flanders", "member_ids": members, "name_source": source,
+                "names": {"en": "West Flanders · North", "zh": "西佛兰德省·北部"},
+                "member_names": {member: {"en": member, "zh": member} for member in members}}
+
+    def test_a_parent_named_group_takes_its_representative_renamed_member(self):
+        group = self.group("parent_direction")
+        scenario_member_names([group], self.facts, ("hoi4_1936", "tno_1962"))
+        self.assertEqual(group["scenario_names"], {"tno_1962": {"en": "Bezirk Kortrijk", "zh": "科特赖兴"}})
+        self.assertEqual(set(group["scenario_member_names"]["tno_1962"]), {"BE_B", "BE_C", "BE_D"})
+        self.assertEqual(group["names"]["zh"], "西佛兰德省·北部")
+
+    def test_own_parent_and_representative_names_stay_and_other_scenarios_are_untouched(self):
+        group = {**self.group("parent_direction"), "scenario_names": {"tno_1962": {"en": "Westflandern · North", "zh": "西佛兰德省·北部"}}}
+        scenario_member_names([group], self.facts, ("tno_1962",))
+        self.assertEqual(group["scenario_names"]["tno_1962"]["en"], "Westflandern · North")
+        representative = self.group("population")
+        scenario_member_names([representative], self.facts, ("tno_1962",))
+        self.assertNotIn("scenario_names", representative)
+        self.assertIn("BE_B", representative["scenario_member_names"]["tno_1962"])
+        outside = self.group("parent_direction")
+        scenario_member_names([outside], self.facts, ("hoi4_1936",))
+        self.assertFalse({"scenario_names", "scenario_member_names"} & set(outside))
+
+    def test_member_names_become_aliases_without_taking_used_ones(self):
+        group = self.group("parent_direction")
+        scenario_member_names([group], self.facts, ("tno_1962",))
+        payload = {"entries": [{"feature_id": group["id"], "aliases": [], "search_only_aliases": []}],
+                   "alias_to_stable_key": {"德尔塔": "id::NL_X"}}
+        result = add_scenario_member_aliases(payload, Merges({"groups": [group]}))
+        self.assertEqual(result["alias_to_stable_key"]["布吕格"], "id::BE_MRG_000000000001")
+        self.assertEqual(result["alias_to_stable_key"]["Bezirk Kortrijk"], "id::BE_MRG_000000000001")
+        self.assertEqual(result["alias_to_stable_key"]["德尔塔"], "id::NL_X")
+        self.assertIn("Дельта", result["entries"][0]["search_only_aliases"])
+        self.assertEqual(add_scenario_member_aliases(copy.deepcopy(result), Merges({"groups": [group]})), result)
 
 
 if __name__ == "__main__":

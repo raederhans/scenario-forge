@@ -75,7 +75,17 @@
           "zh": "乌留平斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Paulusburg · Northwest 2",
+          "zh": "保卢斯堡·西北部2"
+        }
+      },
+      "previous_names": {
+        "en": "Volgograd · Northwest 2",
+        "zh": "伏尔加格勒州·西北部2"
+      }
     },
     {
       "id": "RU_MRG_4ed360a39448",
@@ -98,7 +108,17 @@
           "zh": "扎奥焦尔斯克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Muurmanni · North",
+          "zh": "穆尔曼尼·北部"
+        }
+      },
+      "previous_names": {
+        "en": "Murmansk · North",
+        "zh": "摩尔曼斯克州·北部"
+      }
     },
     {
       "id": "RU_MRG_32d32da1ff70",
@@ -167,7 +187,25 @@
           "zh": "尼古拉耶夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Paulusburg · East",
+          "zh": "保卢斯堡·东部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B37574948551047": {
+            "en": "Kamyschin",
+            "zh": "卡梅申"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Volgograd · East",
+        "zh": "伏尔加格勒州·东部"
+      }
     },
     {
       "id": "RU_MRG_2eace9e3f217",
@@ -190,7 +228,19 @@
           "zh": "谢里雪夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B81556625456237": {
+            "en": "городской округ Белогорск",
+            "zh": "别洛戈尔斯克"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Amur · South 4",
+        "zh": "阿穆尔州·南部4"
+      }
     },
     {
       "id": "RU_MRG_be7ea0c7c033",
@@ -213,7 +263,25 @@
           "zh": "艾尼森兰塔区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B78184598260115": {
+            "en": "Äänislinna District",
+            "zh": "艾尼斯林纳区"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Äänislinna District",
+          "zh": "艾尼斯林纳区"
+        }
+      },
+      "previous_names": {
+        "en": "Karelia · South 3",
+        "zh": "卡累利阿共和国·南部3"
+      }
     },
     {
       "id": "RU_MRG_655667242e72",
@@ -282,7 +350,25 @@
           "zh": "布列斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B63792180900852": {
+            "en": "Niuleimanho",
+            "zh": "纽勒们河"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Niuleimanho",
+          "zh": "纽勒们河"
+        }
+      },
+      "previous_names": {
+        "en": "Amur · South 2",
+        "zh": "阿穆尔州·南部2"
+      }
     },
     {
       "id": "RU_MRG_bec756719bb4",
@@ -305,7 +391,29 @@
           "zh": "共青团"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Bohori · South 3",
+          "zh": "伯力·南部3"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B51031481762719": {
+            "en": "Chumin",
+            "zh": "诸民"
+          },
+          "RU_RAY_50074027B24833845285067": {
+            "en": "Chumin District",
+            "zh": "诸民区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Khabarovsk Krai · South 3",
+        "zh": "哈巴罗夫斯克边疆区·南部3"
+      }
     },
     {
       "id": "RU_MRG_90d3823663be",
@@ -374,7 +482,17 @@
           "zh": "图阿普谢"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jekaterinodar · South",
+          "zh": "叶卡捷琳诺达尔·南部"
+        }
+      },
+      "previous_names": {
+        "en": "Krasnodar Krai · South",
+        "zh": "克拉斯诺达尔边疆区·南部"
+      }
     },
     {
       "id": "RU_MRG_60904da04ba2",
@@ -443,7 +561,19 @@
           "zh": "巴克恰尔斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B55969640981213": {
+            "en": "городской округ Кедровый",
+            "zh": "凯德罗维"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Tomsk · South",
+        "zh": "托木斯克州·南部"
+      }
     },
     {
       "id": "RU_MRG_984ceffa7ee6",
@@ -489,7 +619,17 @@
           "zh": "日诺夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Paulusburg · North",
+          "zh": "保卢斯堡·北部"
+        }
+      },
+      "previous_names": {
+        "en": "Volgograd · North",
+        "zh": "伏尔加格勒州·北部"
+      }
     },
     {
       "id": "RU_MRG_4421c17551c2",
@@ -535,7 +675,17 @@
           "zh": "博罗维奇"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Holmgard · East",
+          "zh": "霍尔姆加德·东部"
+        }
+      },
+      "previous_names": {
+        "en": "Novgorod · East",
+        "zh": "诺夫哥罗德州·东部"
+      }
     },
     {
       "id": "RU_MRG_4177d5ccfc4d",
@@ -604,7 +754,23 @@
           "zh": "伊万诺夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B32863300227960": {
+            "en": "Tambovsky District",
+            "zh": "坦波夫斯基区"
+          },
+          "RU_RAY_50074027B14672397481772": {
+            "en": "Ivanovsky District",
+            "zh": "伊万诺夫斯基区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Amur · South 3",
+        "zh": "阿穆尔州·南部3"
+      }
     },
     {
       "id": "RU_MRG_cb7ab64b43b7",
@@ -650,7 +816,17 @@
           "zh": "德米扬斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Holmgard · South",
+          "zh": "霍尔姆加德·南部"
+        }
+      },
+      "previous_names": {
+        "en": "Novgorod · South",
+        "zh": "诺夫哥罗德州·南部"
+      }
     },
     {
       "id": "RU_MRG_da32271f14c8",
@@ -696,7 +872,17 @@
           "zh": "塞拉菲莫维奇区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Paulusburg · West",
+          "zh": "保卢斯堡·西部"
+        }
+      },
+      "previous_names": {
+        "en": "Volgograd · West",
+        "zh": "伏尔加格勒州·西部"
+      }
     },
     {
       "id": "RU_MRG_9d8deba56899",
@@ -719,7 +905,17 @@
           "zh": "科捷尔尼科夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Paulusburg · Southwest 2",
+          "zh": "保卢斯堡·西南部2"
+        }
+      },
+      "previous_names": {
+        "en": "Volgograd · Southwest 2",
+        "zh": "伏尔加格勒州·西南部2"
+      }
     },
     {
       "id": "RU_MRG_d5519e91a94b",
@@ -880,7 +1076,17 @@
           "zh": "齐莫夫尼科夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Rostow · Southeast 2",
+          "zh": "罗斯托夫·东南部2"
+        }
+      },
+      "previous_names": {
+        "en": "Rostov · Southeast 2",
+        "zh": "罗斯托夫州·东南部2"
+      }
     },
     {
       "id": "RU_MRG_5152587ee975",
@@ -926,7 +1132,17 @@
           "zh": "扎韦廷斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Rostow · East",
+          "zh": "罗斯托夫·东部"
+        }
+      },
+      "previous_names": {
+        "en": "Rostov · East",
+        "zh": "罗斯托夫州·东部"
+      }
     },
     {
       "id": "RU_MRG_ebc5961355f4",
@@ -972,7 +1188,17 @@
           "zh": "卢扎区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Vyatka · Northwest 2",
+          "zh": "维亚特卡·西北部2"
+        }
+      },
+      "previous_names": {
+        "en": "Kirov · Northwest 2",
+        "zh": "基洛夫州·西北部2"
+      }
     },
     {
       "id": "RU_MRG_48dc139f3c1a",
@@ -1041,7 +1267,17 @@
           "zh": "纳戈尔斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Vyatka · Northeast",
+          "zh": "维亚特卡·东北部"
+        }
+      },
+      "previous_names": {
+        "en": "Kirov · Northeast",
+        "zh": "基洛夫州·东北部"
+      }
     },
     {
       "id": "RU_MRG_884ab2e1b411",
@@ -1064,7 +1300,17 @@
           "zh": "奥穆特宁斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Vyatka · East",
+          "zh": "维亚特卡·东部"
+        }
+      },
+      "previous_names": {
+        "en": "Kirov · East",
+        "zh": "基洛夫州·东部"
+      }
     },
     {
       "id": "RU_MRG_4543c51c6bdd",
@@ -1156,7 +1402,25 @@
           "zh": "普拉萨区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B19345825479949": {
+            "en": "Kontupohja District",
+            "zh": "孔图波希亚区"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Kontupohja District",
+          "zh": "孔图波希亚区"
+        }
+      },
+      "previous_names": {
+        "en": "Karelia · South 1",
+        "zh": "卡累利阿共和国·南部1"
+      }
     },
     {
       "id": "RU_MRG_96394847a7bb",
@@ -1432,7 +1696,25 @@
           "zh": "瓦宁斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Bohori · South 2",
+          "zh": "伯力·南部2"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B63397808648693": {
+            "en": "Yaozhi District",
+            "zh": "曜之区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Khabarovsk Krai · South 2",
+        "zh": "哈巴罗夫斯克边疆区·南部2"
+      }
     },
     {
       "id": "RU_MRG_7e1c8281813e",
@@ -1478,7 +1760,17 @@
           "zh": "纳奈斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Bohori · South 1",
+          "zh": "伯力·南部1"
+        }
+      },
+      "previous_names": {
+        "en": "Khabarovsk Krai · South 1",
+        "zh": "哈巴罗夫斯克边疆区·南部1"
+      }
     },
     {
       "id": "RU_MRG_82b17e00b64e",
@@ -1562,7 +1854,17 @@
           "zh": "库尔干宁区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jekaterinodar · East",
+          "zh": "叶卡捷琳诺达尔·东部"
+        }
+      },
+      "previous_names": {
+        "en": "Krasnodar Krai · East",
+        "zh": "克拉斯诺达尔边疆区·东部"
+      }
     },
     {
       "id": "RU_MRG_4b5d89b2801b",
@@ -1618,7 +1920,25 @@
           "zh": "斯拉维扬斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jekaterinodar · West 2",
+          "zh": "叶卡捷琳诺达尔·西部2"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B96584787026473": {
+            "en": "Noworossijsk",
+            "zh": "新罗西斯克"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Krasnodar Krai · West 2",
+        "zh": "克拉斯诺达尔边疆区·西部2"
+      }
     },
     {
       "id": "RU_MRG_9f87451cc870",
@@ -1646,7 +1966,17 @@
           "zh": "萨利斯克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Rostow · South",
+          "zh": "罗斯托夫·南部"
+        }
+      },
+      "previous_names": {
+        "en": "Rostov · South",
+        "zh": "罗斯托夫州·南部"
+      }
     },
     {
       "id": "RU_MRG_bd67d5dbed08",
@@ -1674,7 +2004,17 @@
           "zh": "沃尔斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Platenfurt · Northeast",
+          "zh": "普拉滕富特·东北部"
+        }
+      },
+      "previous_names": {
+        "en": "Saratov · Northeast",
+        "zh": "萨拉托夫州·东北部"
+      }
     },
     {
       "id": "RU_MRG_b7986b68045a",
@@ -1702,7 +2042,17 @@
           "zh": "列宁斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Paulusburg · Southeast",
+          "zh": "保卢斯堡·东南部"
+        }
+      },
+      "previous_names": {
+        "en": "Volgograd · Southeast",
+        "zh": "伏尔加格勒州·东南部"
+      }
     },
     {
       "id": "RU_MRG_8833cbf157a6",
@@ -1730,7 +2080,17 @@
           "zh": "普加乔夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Platenfurt · East 2",
+          "zh": "普拉滕富特·东部2"
+        }
+      },
+      "previous_names": {
+        "en": "Saratov · East 2",
+        "zh": "萨拉托夫州·东部2"
+      }
     },
     {
       "id": "RU_MRG_0fd0c43c03f0",
@@ -1847,7 +2207,17 @@
           "zh": "巴拉绍夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Platenfurt · West 3",
+          "zh": "普拉滕富特·西部3"
+        }
+      },
+      "previous_names": {
+        "en": "Saratov · West 3",
+        "zh": "萨拉托夫州·西部3"
+      }
     },
     {
       "id": "RU_MRG_c90be9cc4d47",
@@ -1875,7 +2245,17 @@
           "zh": "上沃洛乔克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Twer · Northwest",
+          "zh": "特维尔·西北部"
+        }
+      },
+      "previous_names": {
+        "en": "Tver · Northwest",
+        "zh": "特维尔州·西北部"
+      }
     },
     {
       "id": "RU_MRG_6fb6a80f7b8a",
@@ -1903,7 +2283,17 @@
           "zh": "卡沙尔区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Rostow · North",
+          "zh": "罗斯托夫·北部"
+        }
+      },
+      "previous_names": {
+        "en": "Rostov · North",
+        "zh": "罗斯托夫州·北部"
+      }
     },
     {
       "id": "RU_MRG_451862161429",
@@ -1931,7 +2321,17 @@
           "zh": "米哈伊洛夫卡"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Paulusburg · Northwest 1",
+          "zh": "保卢斯堡·西北部1"
+        }
+      },
+      "previous_names": {
+        "en": "Volgograd · Northwest 1",
+        "zh": "伏尔加格勒州·西北部1"
+      }
     },
     {
       "id": "RU_MRG_7d69ba02c4da",
@@ -1959,7 +2359,19 @@
           "zh": "沙林斯基区（科斯特罗姆）"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B91982770240457": {
+            "en": "Manturovsky District",
+            "zh": "曼图罗夫斯基区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Kostroma · East",
+        "zh": "科斯特罗马州·东部"
+      }
     },
     {
       "id": "RU_MRG_bd4e5d799db8",
@@ -1992,7 +2404,29 @@
           "zh": "克拉斯诺亚尔斯基区（伏尔加施塔特）"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B81019147084957": {
+            "en": "Novosamarovsk",
+            "zh": "新萨马罗夫斯克"
+          },
+          "RU_RAY_50074027B51169643005911": {
+            "en": "Volzhsky District",
+            "zh": "伏尔加区"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Novosamarovsk",
+          "zh": "新萨马罗夫斯克"
+        }
+      },
+      "previous_names": {
+        "en": "Samara · Central",
+        "zh": "萨马拉州·中部"
+      }
     },
     {
       "id": "RU_MRG_19dc7bbc7bcb",
@@ -2058,7 +2492,17 @@
           "zh": "克拉斯诺阿尔梅斯基区（克拉斯诺达尔边疆区）"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jekaterinodar · West 1",
+          "zh": "叶卡捷琳诺达尔·西部1"
+        }
+      },
+      "previous_names": {
+        "en": "Krasnodar Krai · West 1",
+        "zh": "克拉斯诺达尔边疆区·西部1"
+      }
     },
     {
       "id": "RU_MRG_dfe6c1e5f415",
@@ -2124,7 +2568,19 @@
           "zh": "伊格林斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B86556777533997": {
+            "en": "Krasnogorsky District",
+            "zh": "克拉斯诺戈尔斯基区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Udmurtia · North 2",
+        "zh": "乌德穆尔特共和国·北部2"
+      }
     },
     {
       "id": "RU_MRG_56ed27ec6e18",
@@ -2157,7 +2613,25 @@
           "zh": "布古利马"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B33360577835690": {
+            "en": "Novopismyansky District",
+            "zh": "新皮斯米扬卡区"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Novopismyansky District",
+          "zh": "新皮斯米扬卡区"
+        }
+      },
+      "previous_names": {
+        "en": "Tatarstan · Southeast 2",
+        "zh": "鞑靼斯坦共和国·东南部2"
+      }
     },
     {
       "id": "RU_MRG_3f321dca003c",
@@ -2190,7 +2664,19 @@
           "zh": "十月区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B90499708128895": {
+            "en": "Oktyabrsky District",
+            "zh": "十月区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Perm Krai · South 3",
+        "zh": "彼尔姆边疆区·南部3"
+      }
     },
     {
       "id": "RU_MRG_bfc2cf574a56",
@@ -2223,7 +2709,17 @@
           "zh": "巴甫洛夫斯基区（乌里扬诺夫斯克）"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Goeringstadt · South",
+          "zh": "戈林施塔特·南部"
+        }
+      },
+      "previous_names": {
+        "en": "Ulyanovsk · South",
+        "zh": "乌里扬诺夫斯克州·南部"
+      }
     },
     {
       "id": "RU_MRG_dc59f2179593",
@@ -2256,7 +2752,25 @@
           "zh": "雅科夫列夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B21604114440864": {
+            "en": "Gubkin",
+            "zh": "古布金"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Gubkin",
+          "zh": "古布金"
+        }
+      },
+      "previous_names": {
+        "en": "Belgorod · Northwest",
+        "zh": "别尔哥罗德州·西北部"
+      }
     },
     {
       "id": "RU_MRG_0fb1aeee6a65",
@@ -2345,7 +2859,17 @@
           "zh": "谢利扎罗夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Twer · West 2",
+          "zh": "特维尔·西部2"
+        }
+      },
+      "previous_names": {
+        "en": "Tver · West 2",
+        "zh": "特维尔州·西部2"
+      }
     },
     {
       "id": "RU_MRG_fdf63a493917",
@@ -2373,7 +2897,17 @@
           "zh": "弗罗洛沃"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Paulusburg · Central",
+          "zh": "保卢斯堡·中部"
+        }
+      },
+      "previous_names": {
+        "en": "Volgograd · Central",
+        "zh": "伏尔加格勒州·中部"
+      }
     },
     {
       "id": "RU_MRG_f1c57006ab38",
@@ -2406,7 +2940,17 @@
           "zh": "奥廖尔区（罗斯托夫州）"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Rostow · Southeast 1",
+          "zh": "罗斯托夫·东南部1"
+        }
+      },
+      "previous_names": {
+        "en": "Rostov · Southeast 1",
+        "zh": "罗斯托夫州·东南部1"
+      }
     },
     {
       "id": "RU_MRG_5936db92540a",
@@ -2439,7 +2983,17 @@
           "zh": "罗斯托夫"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jaroslawl · South",
+          "zh": "雅罗斯拉夫尔·南部"
+        }
+      },
+      "previous_names": {
+        "en": "Yaroslavl · South",
+        "zh": "雅罗斯拉夫尔州·南部"
+      }
     },
     {
       "id": "RU_MRG_b2d1407cd933",
@@ -2561,7 +3115,17 @@
           "zh": "巴甫洛夫斯基区（曼施泰因施塔特）"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Woronesch · Southwest",
+          "zh": "沃罗涅日·西南部"
+        }
+      },
+      "previous_names": {
+        "en": "Voronezh · Southwest",
+        "zh": "沃罗涅日州·西南部"
+      }
     },
     {
       "id": "RU_MRG_bccb1225fada",
@@ -2594,7 +3158,17 @@
           "zh": "阿特卡尔斯克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Platenfurt · Northwest",
+          "zh": "普拉滕富特·西北部"
+        }
+      },
+      "previous_names": {
+        "en": "Saratov · Northwest",
+        "zh": "萨拉托夫州·西北部"
+      }
     },
     {
       "id": "RU_MRG_da0982e025af",
@@ -2622,7 +3196,17 @@
           "zh": "奥里切夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Vyatka · Southwest 1",
+          "zh": "维亚特卡·西南部1"
+        }
+      },
+      "previous_names": {
+        "en": "Kirov · Southwest 1",
+        "zh": "基洛夫州·西南部1"
+      }
     },
     {
       "id": "RU_MRG_94e7015e40d9",
@@ -2683,7 +3267,19 @@
           "zh": "努尔拉茨基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B87542455562769": {
+            "en": "Spassky District",
+            "zh": "斯帕斯基区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Tatarstan · Southwest",
+        "zh": "鞑靼斯坦共和国·西南部"
+      }
     },
     {
       "id": "RU_MRG_0c1434a780d8",
@@ -2716,7 +3312,17 @@
           "zh": "别热茨克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Twer · Northeast 1",
+          "zh": "特维尔·东北部1"
+        }
+      },
+      "previous_names": {
+        "en": "Tver · Northeast 1",
+        "zh": "特维尔州·东北部1"
+      }
     },
     {
       "id": "RU_MRG_70ed82134bd7",
@@ -2749,7 +3355,17 @@
           "zh": "加里宁斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Platenfurt · West 2",
+          "zh": "普拉滕富特·西部2"
+        }
+      },
+      "previous_names": {
+        "en": "Saratov · West 2",
+        "zh": "萨拉托夫州·西部2"
+      }
     },
     {
       "id": "RU_MRG_f18f0befdc5e",
@@ -2777,7 +3393,17 @@
           "zh": "奥特拉德内区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jekaterinodar · Southeast",
+          "zh": "叶卡捷琳诺达尔·东南部"
+        }
+      },
+      "previous_names": {
+        "en": "Krasnodar Krai · Southeast",
+        "zh": "克拉斯诺达尔边疆区·东南部"
+      }
     },
     {
       "id": "RU_MRG_962b67068c91",
@@ -2810,7 +3436,17 @@
           "zh": "安宁斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Woronesch · North",
+          "zh": "沃罗涅日·北部"
+        }
+      },
+      "previous_names": {
+        "en": "Voronezh · North",
+        "zh": "沃罗涅日州·北部"
+      }
     },
     {
       "id": "RU_MRG_8a665b108348",
@@ -2904,7 +3540,17 @@
           "zh": "旧鲁萨"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Holmgard · Southwest",
+          "zh": "霍尔姆加德·西南部"
+        }
+      },
+      "previous_names": {
+        "en": "Novgorod · Southwest",
+        "zh": "诺夫哥罗德州·西南部"
+      }
     },
     {
       "id": "RU_MRG_90ed61ead343",
@@ -2932,7 +3578,17 @@
           "zh": "红军城"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Platenfurt · West 1",
+          "zh": "普拉滕富特·西部1"
+        }
+      },
+      "previous_names": {
+        "en": "Saratov · West 1",
+        "zh": "萨拉托夫州·西部1"
+      }
     },
     {
       "id": "RU_MRG_1976f6232412",
@@ -2993,7 +3649,17 @@
           "zh": "波舍洪斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jaroslawl · Northeast",
+          "zh": "雅罗斯拉夫尔·东北部"
+        }
+      },
+      "previous_names": {
+        "en": "Yaroslavl · Northeast",
+        "zh": "雅罗斯拉夫尔州·东北部"
+      }
     },
     {
       "id": "RU_MRG_12b2bddafaa1",
@@ -3054,7 +3720,17 @@
           "zh": "托罗佩茨基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Twer · West 1",
+          "zh": "特维尔·西部1"
+        }
+      },
+      "previous_names": {
+        "en": "Tver · West 1",
+        "zh": "特维尔州·西部1"
+      }
     },
     {
       "id": "RU_MRG_2d8a56fb0da2",
@@ -3087,7 +3763,25 @@
           "zh": "切尔达克林斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Goeringstadt · Northeast",
+          "zh": "戈林施塔特·东北部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B94297625349092": {
+            "en": "Melekess",
+            "zh": "梅列克斯"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Ulyanovsk · Northeast",
+        "zh": "乌里扬诺夫斯克州·东北部"
+      }
     },
     {
       "id": "RU_MRG_646292257107",
@@ -3120,7 +3814,19 @@
           "zh": "新谢尔吉耶夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B85521720356059": {
+            "en": "Krasnogvardeysky District",
+            "zh": "赤卫军区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Orenburg · West 1",
+        "zh": "奥伦堡州·西部1"
+      }
     },
     {
       "id": "RU_MRG_d67a36c17dc4",
@@ -3148,7 +3854,19 @@
           "zh": "奥伦堡区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B45994623884743": {
+            "en": "Oktyabrsky District",
+            "zh": "十月区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Orenburg · Central 1",
+        "zh": "奥伦堡州·中部1"
+      }
     },
     {
       "id": "RU_MRG_427102c526cb",
@@ -3336,7 +4054,17 @@
           "zh": "涅姆斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Vyatka · Southeast",
+          "zh": "维亚特卡·东南部"
+        }
+      },
+      "previous_names": {
+        "en": "Kirov · Southeast",
+        "zh": "基洛夫州·东南部"
+      }
     },
     {
       "id": "RU_MRG_5eb4927958c7",
@@ -3369,7 +4097,17 @@
           "zh": "叶尔绍夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Platenfurt · East 1",
+          "zh": "普拉滕富特·东部1"
+        }
+      },
+      "previous_names": {
+        "en": "Saratov · East 1",
+        "zh": "萨拉托夫州·东部1"
+      }
     },
     {
       "id": "RU_MRG_b706be984552",
@@ -3420,7 +4158,17 @@
           "zh": "马尔索夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Platenfurt · Central",
+          "zh": "普拉滕富特·中部"
+        }
+      },
+      "previous_names": {
+        "en": "Saratov · Central",
+        "zh": "萨拉托夫州·中部"
+      }
     },
     {
       "id": "RU_MRG_0712bf4c0b09",
@@ -3453,7 +4201,17 @@
           "zh": "叶伊斯克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jekaterinodar · North",
+          "zh": "叶卡捷琳诺达尔·北部"
+        }
+      },
+      "previous_names": {
+        "en": "Krasnodar Krai · North",
+        "zh": "克拉斯诺达尔边疆区·北部"
+      }
     },
     {
       "id": "RU_MRG_0c628fcdf9bb",
@@ -3486,7 +4244,17 @@
           "zh": "桑多夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Twer · Northeast 2",
+          "zh": "特维尔·东北部2"
+        }
+      },
+      "previous_names": {
+        "en": "Tver · Northeast 2",
+        "zh": "特维尔州·东北部2"
+      }
     },
     {
       "id": "RU_MRG_83744c263574",
@@ -3514,7 +4282,17 @@
           "zh": "阿帕季特"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Muurmanni · Central",
+          "zh": "穆尔曼尼·中部"
+        }
+      },
+      "previous_names": {
+        "en": "Murmansk · Central",
+        "zh": "摩尔曼斯克州·中部"
+      }
     },
     {
       "id": "RU_MRG_c49d8cb805dc",
@@ -3580,7 +4358,17 @@
           "zh": "诺夫哥罗德斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Holmgard · Northwest",
+          "zh": "霍尔姆加德·西北部"
+        }
+      },
+      "previous_names": {
+        "en": "Novgorod · Northwest",
+        "zh": "诺夫哥罗德州·西北部"
+      }
     },
     {
       "id": "RU_MRG_2944a9264c44",
@@ -3669,7 +4457,17 @@
           "zh": "达罗夫斯科伊区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Vyatka · Northwest 1",
+          "zh": "维亚特卡·西北部1"
+        }
+      },
+      "previous_names": {
+        "en": "Kirov · Northwest 1",
+        "zh": "基洛夫州·西北部1"
+      }
     },
     {
       "id": "RU_MRG_f3dfc0448ede",
@@ -3702,7 +4500,17 @@
           "zh": "卡拉乔夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Paulusburg · Southwest 1",
+          "zh": "保卢斯堡·西南部1"
+        }
+      },
+      "previous_names": {
+        "en": "Volgograd · Southwest 1",
+        "zh": "伏尔加格勒州·西南部1"
+      }
     },
     {
       "id": "RU_MRG_e03e6af00269",
@@ -3730,7 +4538,25 @@
           "zh": "希林斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B30190639810101": {
+            "en": "Saralinsky District",
+            "zh": "萨拉林斯基区"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Saralinsky District",
+          "zh": "萨拉林斯基区"
+        }
+      },
+      "previous_names": {
+        "en": "Khakassia · North",
+        "zh": "哈卡斯共和国·北部"
+      }
     },
     {
       "id": "RU_MRG_c3cc17c29955",
@@ -3796,7 +4622,29 @@
           "zh": "多林斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Karafuto · South",
+          "zh": "桦太·南部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B51591038721699": {
+            "en": "Toyohara",
+            "zh": "丰原"
+          },
+          "RU_RAY_50074027B32170687572128": {
+            "en": "Otomari District",
+            "zh": "大泊区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Sakhalin · South",
+        "zh": "萨哈林州·南部"
+      }
     },
     {
       "id": "RU_MRG_54f19a93b9db",
@@ -3829,7 +4677,37 @@
           "zh": "伊曼山区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B88266732999715": {
+            "en": "Yiman",
+            "zh": "伊曼"
+          },
+          "RU_RAY_50074027B76781633158797": {
+            "en": "Yiman District",
+            "zh": "伊曼区"
+          },
+          "RU_RAY_50074027B74787590931103": {
+            "en": "Yezhuhe",
+            "zh": "野猪河"
+          },
+          "RU_RAY_50074027B81751073232011": {
+            "en": "Iman Highlands District",
+            "zh": "伊曼山区"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Yezhuhe",
+          "zh": "野猪河"
+        }
+      },
+      "previous_names": {
+        "en": "Primorsky Krai · Central",
+        "zh": "滨海边疆区·中部"
+      }
     },
     {
       "id": "RU_MRG_dfc881d403c4",
@@ -4002,7 +4880,29 @@
           "zh": "卡瓦列罗夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B37999402407739": {
+            "en": "Huangtukanzi",
+            "zh": "黄土坎子"
+          },
+          "RU_RAY_50074027B41108131456102": {
+            "en": "Sudzukhe District",
+            "zh": "苏祖河区"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Huangtukanzi",
+          "zh": "黄土坎子"
+        }
+      },
+      "previous_names": {
+        "en": "Primorsky Krai · South",
+        "zh": "滨海边疆区·南部"
+      }
     },
     {
       "id": "RU_MRG_e72df9dafd76",
@@ -4208,7 +5108,19 @@
           "zh": "图伦斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B2445180989787": {
+            "en": "городской округ Тулун",
+            "zh": "图伦"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Irkutsk · Southwest 3",
+        "zh": "伊尔库茨克州·西南部3"
+      }
     },
     {
       "id": "RU_MRG_87f974ef0b94",
@@ -4287,7 +5199,25 @@
           "zh": "季莫夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Karafuto · Central",
+          "zh": "桦太·中部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B38604187853765": {
+            "en": "Ako District",
+            "zh": "亚港区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Sakhalin · Central",
+        "zh": "萨哈林州·中部"
+      }
     },
     {
       "id": "RU_MRG_67d918167343",
@@ -4320,7 +5250,33 @@
           "zh": "十月区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Rostow · West",
+          "zh": "罗斯托夫·西部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B33448065960180": {
+            "en": "Schachty",
+            "zh": "沙赫特"
+          },
+          "RU_RAY_50074027B88311001056531": {
+            "en": "Novoshakhtinsk",
+            "zh": "新沙赫京斯克"
+          },
+          "RU_RAY_50074027B32606930376124": {
+            "en": "Nowotscherkassk",
+            "zh": "新切尔卡斯克"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Rostov · West",
+        "zh": "罗斯托夫州·西部"
+      }
     },
     {
       "id": "RU_MRG_62d43bf78311",
@@ -4467,7 +5423,17 @@
           "zh": "梅恩斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Goeringstadt · Northwest",
+          "zh": "戈林施塔特·西北部"
+        }
+      },
+      "previous_names": {
+        "en": "Ulyanovsk · Northwest",
+        "zh": "乌里扬诺夫斯克州·西北部"
+      }
     },
     {
       "id": "RU_MRG_a94cbc9022fc",
@@ -4505,7 +5471,17 @@
           "zh": "格里巴诺夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Woronesch · East",
+          "zh": "沃罗涅日·东部"
+        }
+      },
+      "previous_names": {
+        "en": "Voronezh · East",
+        "zh": "沃罗涅日州·东部"
+      }
     },
     {
       "id": "RU_MRG_7f673bbbcb21",
@@ -4591,7 +5567,25 @@
           "zh": "巴里什斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Goeringstadt · Central",
+          "zh": "戈林施塔特·中部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B97493150269350": {
+            "en": "Goering",
+            "zh": "戈林"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Ulyanovsk · Central",
+        "zh": "乌里扬诺夫斯克州·中部"
+      }
     },
     {
       "id": "RU_MRG_f5d0364a5d76",
@@ -4733,7 +5727,17 @@
           "zh": "维亚泽姆斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Klugeburg · East",
+          "zh": "克卢格堡·东部"
+        }
+      },
+      "previous_names": {
+        "en": "Smolensk · East",
+        "zh": "斯摩棱斯克州·东部"
+      }
     },
     {
       "id": "RU_MRG_a87b79d2be5d",
@@ -4948,7 +5952,23 @@
           "zh": "斯沃博德年斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B49864748885643": {
+            "en": "городской округ Благовещен",
+            "zh": "布拉戈维申斯克"
+          },
+          "RU_RAY_50074027B13558455717271": {
+            "en": "Blagoveshchensky District",
+            "zh": "布拉戈维申斯基区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Amur · South 1",
+        "zh": "阿穆尔州·南部1"
+      }
     },
     {
       "id": "RU_MRG_21258bfc1110",
@@ -4986,7 +6006,25 @@
           "zh": "科维宁斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B28906353717530": {
+            "en": "Hortonburg",
+            "zh": "霍顿堡"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Hortonburg",
+          "zh": "霍顿堡"
+        }
+      },
+      "previous_names": {
+        "en": "Nizhny Novgorod · Northwest",
+        "zh": "下诺夫哥罗德州·西北部"
+      }
     },
     {
       "id": "RU_MRG_5bb5ee0b1fb6",
@@ -5029,7 +6067,25 @@
           "zh": "莫罗佐夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Rostow · Central",
+          "zh": "罗斯托夫·中部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B75402656675224": {
+            "en": "Wolgodonstadt",
+            "zh": "伏尔加顿施塔特"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Rostov · Central",
+        "zh": "罗斯托夫州·中部"
+      }
     },
     {
       "id": "RU_MRG_60a416f16ad5",
@@ -5125,7 +6181,19 @@
           "zh": "沃尔纳尔斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B81849525408444": {
+            "en": "Komsomolsky District",
+            "zh": "共青团区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Chuvashia · Central",
+        "zh": "楚瓦什共和国·中部"
+      }
     },
     {
       "id": "RU_MRG_7fee908b63f6",
@@ -5201,7 +6269,17 @@
           "zh": "卡拉切夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Woronesch · Southeast",
+          "zh": "沃罗涅日·东南部"
+        }
+      },
+      "previous_names": {
+        "en": "Voronezh · Southeast",
+        "zh": "沃罗涅日州·东南部"
+      }
     },
     {
       "id": "RU_MRG_82288501a613",
@@ -5292,7 +6370,17 @@
           "zh": "纳夫林斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Brjansk · Central",
+          "zh": "布良斯克·中部"
+        }
+      },
+      "previous_names": {
+        "en": "Bryansk · Central",
+        "zh": "布良斯克州·中部"
+      }
     },
     {
       "id": "RU_MRG_9ef1aa17db33",
@@ -5340,7 +6428,25 @@
           "zh": "瑙尔斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B22946859849779": {
+            "en": "Grosny",
+            "zh": "格罗兹尼"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Grosny",
+          "zh": "格罗兹尼"
+        }
+      },
+      "previous_names": {
+        "en": "Chechnya · Central",
+        "zh": "车臣共和国·中部"
+      }
     },
     {
       "id": "RU_MRG_8a04555b8e14",
@@ -5469,7 +6575,19 @@
           "zh": "伊尔贝斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B58243495740479": {
+            "en": "ЗАТО Зеленогорск",
+            "zh": "泽列诺戈尔斯克"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Krasnoyarsk Krai · South 3",
+        "zh": "克拉斯诺亚尔斯克边疆区·南部3"
+      }
     },
     {
       "id": "RU_MRG_9444b3a17676",
@@ -5674,7 +6792,19 @@
           "zh": "托木斯克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B43945287193008": {
+            "en": "ЗАТО Северск",
+            "zh": "谢韦尔斯克"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Tomsk · Southeast 2",
+        "zh": "托木斯克州·东南部2"
+      }
     },
     {
       "id": "RU_MRG_56d7f2c40815",
@@ -5712,7 +6842,17 @@
           "zh": "罗斯拉夫尔"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Klugeburg · South",
+          "zh": "克卢格堡·南部"
+        }
+      },
+      "previous_names": {
+        "en": "Smolensk · South",
+        "zh": "斯摩棱斯克州·南部"
+      }
     },
     {
       "id": "RU_MRG_563983f18fe2",
@@ -5765,7 +6905,23 @@
           "zh": "塞尔努斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B95212793065375": {
+            "en": "Volzhsky District",
+            "zh": "伏尔加区"
+          },
+          "RU_RAY_50074027B72395378197129": {
+            "en": "Sovetsky District",
+            "zh": "苏维埃区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Mari El · East",
+        "zh": "马里埃尔共和国·东部"
+      }
     },
     {
       "id": "RU_MRG_ae8913c1637c",
@@ -5813,7 +6969,17 @@
           "zh": "格里亚济"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Lipezk · Northeast",
+          "zh": "利佩茨克·东北部"
+        }
+      },
+      "previous_names": {
+        "en": "Lipetsk · Northeast",
+        "zh": "利佩茨克州·东北部"
+      }
     },
     {
       "id": "RU_MRG_f47338e16e14",
@@ -5846,7 +7012,19 @@
           "zh": "克拉斯努菲姆"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B92726681569999": {
+            "en": "Shalinsky District",
+            "zh": "沙林斯基区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Sverdlovsk · Southwest 3",
+        "zh": "斯维尔德洛夫斯克州·西南部3"
+      }
     },
     {
       "id": "RU_MRG_df33d486fbcc",
@@ -5937,7 +7115,25 @@
           "zh": "新斯科尔斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B23731895824617": {
+            "en": "Stary Oskol",
+            "zh": "旧奥斯科尔"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Stary Oskol",
+          "zh": "旧奥斯科尔"
+        }
+      },
+      "previous_names": {
+        "en": "Belgorod · East",
+        "zh": "别尔哥罗德州·东部"
+      }
     },
     {
       "id": "RU_MRG_bb701cc86b7c",
@@ -6018,7 +7214,17 @@
           "zh": "多尔戈鲁科夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Lipezk · Southwest",
+          "zh": "利佩茨克·西南部"
+        }
+      },
+      "previous_names": {
+        "en": "Lipetsk · Southwest",
+        "zh": "利佩茨克州·西南部"
+      }
     },
     {
       "id": "RU_MRG_b202c10408ff",
@@ -6066,7 +7272,25 @@
           "zh": "乌里茨基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B49841574383841": {
+            "en": "Orel",
+            "zh": "奥廖尔"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Orel",
+          "zh": "奥廖尔"
+        }
+      },
+      "previous_names": {
+        "en": "Oryol · West",
+        "zh": "奥廖尔州·西部"
+      }
     },
     {
       "id": "RU_MRG_f3d2b13e0b30",
@@ -6109,7 +7333,19 @@
           "zh": "克拉斯诺卡姆斯克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B16902666202816": {
+            "en": "ЗАТО Звёздный",
+            "zh": "兹维奥兹德内"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Perm Krai · South 2",
+        "zh": "彼尔姆边疆区·南部2"
+      }
     },
     {
       "id": "RU_MRG_047db3618f7e",
@@ -6271,7 +7507,17 @@
           "zh": "利霍斯拉夫利斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Twer · East",
+          "zh": "特维尔·东部"
+        }
+      },
+      "previous_names": {
+        "en": "Tver · East",
+        "zh": "特维尔州·东部"
+      }
     },
     {
       "id": "RU_MRG_75d0b3503bfa",
@@ -6395,7 +7641,25 @@
           "zh": "斯塔里茨基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Twer · South",
+          "zh": "特维尔·南部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B40993243777694": {
+            "en": "Rschew",
+            "zh": "勒热夫"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Tver · South",
+        "zh": "特维尔州·南部"
+      }
     },
     {
       "id": "RU_MRG_f01d51060a16",
@@ -6438,7 +7702,29 @@
           "zh": "彼得罗夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B40609596354067": {
+            "en": "Nevinnomyssk",
+            "zh": "涅温诺梅斯克"
+          },
+          "RU_RAY_50074027B37471881817771": {
+            "en": "Stawropol",
+            "zh": "斯塔夫罗波尔"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Stawropol",
+          "zh": "斯塔夫罗波尔"
+        }
+      },
+      "previous_names": {
+        "en": "Stavropol Krai · West",
+        "zh": "斯塔夫罗波尔边疆区·西部"
+      }
     },
     {
       "id": "RU_MRG_728513759ce7",
@@ -6486,7 +7772,17 @@
           "zh": "亚速区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Rostow · Southwest",
+          "zh": "罗斯托夫·西南部"
+        }
+      },
+      "previous_names": {
+        "en": "Rostov · Southwest",
+        "zh": "罗斯托夫州·西南部"
+      }
     },
     {
       "id": "RU_MRG_fec102300fdc",
@@ -6577,7 +7873,29 @@
           "zh": "斯洛博茨科伊区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Vyatka · Central",
+          "zh": "维亚特卡·中部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B83821761201565": {
+            "en": "Ust-Cheptsa",
+            "zh": "乌斯季切普察"
+          },
+          "RU_RAY_50074027B82698883305703": {
+            "en": "Ust-Cheptsa District",
+            "zh": "乌斯季切普察区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Kirov · Central",
+        "zh": "基洛夫州·中部"
+      }
     },
     {
       "id": "RU_MRG_3937e6a0a228",
@@ -6673,7 +7991,17 @@
           "zh": "科特尔尼奇区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Vyatka · Southwest 2",
+          "zh": "维亚特卡·西南部2"
+        }
+      },
+      "previous_names": {
+        "en": "Kirov · Southwest 2",
+        "zh": "基洛夫州·西南部2"
+      }
     },
     {
       "id": "RU_MRG_d7ef4389d36f",
@@ -6716,7 +8044,19 @@
           "zh": "斯涅任斯克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B43506275184231": {
+            "en": "Krasnoarmeysky District",
+            "zh": "红军区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Chelyabinsk · North",
+        "zh": "车里雅宾斯克州·北部"
+      }
     },
     {
       "id": "RU_MRG_480afb1927f5",
@@ -6769,7 +8109,33 @@
           "zh": "马马季斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B69153114446918": {
+            "en": "Bondyuzhsky District",
+            "zh": "邦久日斯基区"
+          },
+          "RU_RAY_50074027B75126231322425": {
+            "en": "Rajon Nischnekamsk",
+            "zh": "下卡姆斯克区"
+          },
+          "RU_RAY_50074027B65680649502190": {
+            "en": "Alexeyevsky District",
+            "zh": "阿列克谢耶夫斯基区"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Rajon Nischnekamsk",
+          "zh": "下卡姆斯克区"
+        }
+      },
+      "previous_names": {
+        "en": "Tatarstan · Central",
+        "zh": "鞑靼斯坦共和国·中部"
+      }
     },
     {
       "id": "RU_MRG_6dc9d50b794a",
@@ -6994,7 +8360,17 @@
           "zh": "季霍列茨克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jekaterinodar · Northeast",
+          "zh": "叶卡捷琳诺达尔·东北部"
+        }
+      },
+      "previous_names": {
+        "en": "Krasnodar Krai · Northeast",
+        "zh": "克拉斯诺达尔边疆区·东北部"
+      }
     },
     {
       "id": "RU_MRG_21f622bb3b2b",
@@ -7148,7 +8524,17 @@
           "zh": "塞米卢克斯区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Woronesch · Northwest",
+          "zh": "沃罗涅日·西北部"
+        }
+      },
+      "previous_names": {
+        "en": "Voronezh · Northwest",
+        "zh": "沃罗涅日州·西北部"
+      }
     },
     {
       "id": "RU_MRG_8175cbc6e17d",
@@ -7244,7 +8630,17 @@
           "zh": "内库兹斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Jaroslawl · West",
+          "zh": "雅罗斯拉夫尔·西部"
+        }
+      },
+      "previous_names": {
+        "en": "Yaroslavl · West",
+        "zh": "雅罗斯拉夫尔州·西部"
+      }
     },
     {
       "id": "RU_MRG_9fe77f7052b1",
@@ -7426,7 +8822,17 @@
           "zh": "乌尔茹姆斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Vyatka · South",
+          "zh": "维亚特卡·南部"
+        }
+      },
+      "previous_names": {
+        "en": "Kirov · South",
+        "zh": "基洛夫州·南部"
+      }
     },
     {
       "id": "RU_MRG_5ca04a85c3f4",
@@ -7565,7 +8971,25 @@
           "zh": "佩斯特拉夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B71952656261998": {
+            "en": "Ivashchenkovo",
+            "zh": "伊瓦申科沃"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Ivashchenkovo",
+          "zh": "伊瓦申科沃"
+        }
+      },
+      "previous_names": {
+        "en": "Samara · West 1",
+        "zh": "萨马拉州·西部1"
+      }
     },
     {
       "id": "RU_MRG_16df1bb3876e",
@@ -7646,7 +9070,19 @@
           "zh": "布拉戈维申斯基区（阿尔泰边疆区）"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B15799482797585": {
+            "en": "Mikhaylovsky District",
+            "zh": "米哈伊洛夫斯基区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Altai Krai · West",
+        "zh": "阿尔泰边疆区·西部"
+      }
     },
     {
       "id": "RU_MRG_f27518461032",
@@ -7775,7 +9211,19 @@
           "zh": "索斯文斯基城区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B17433324636715": {
+            "en": "Нижнетуринский городской о",
+            "zh": "下图拉"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Sverdlovsk · Central",
+        "zh": "斯维尔德洛夫斯克州·中部"
+      }
     },
     {
       "id": "RU_MRG_0d726a437af0",
@@ -7876,7 +9324,19 @@
           "zh": "阿拉帕耶夫斯克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B83808818851185": {
+            "en": "Горноуральский городской о",
+            "zh": "戈尔诺乌拉尔斯基"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Sverdlovsk · Southwest 1",
+        "zh": "斯维尔德洛夫斯克州·西南部1"
+      }
     },
     {
       "id": "RU_MRG_a22e47cb6b1f",
@@ -8048,7 +9508,19 @@
           "zh": "米什金斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B74833358041679": {
+            "en": "Mishkinsky District",
+            "zh": "米什金斯基区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Kurgan · Southwest",
+        "zh": "库尔干州·西南部"
+      }
     },
     {
       "id": "RU_MRG_252059f2380f",
@@ -8134,7 +9606,19 @@
           "zh": "扎维亚洛夫斯基区（阿尔泰边疆区）"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B42226450891188": {
+            "en": "Kamensky District",
+            "zh": "卡缅斯基区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Altai Krai · Northwest 2",
+        "zh": "阿尔泰边疆区·西北部2"
+      }
     },
     {
       "id": "RU_MRG_cb687e18e225",
@@ -8258,7 +9742,19 @@
           "zh": "阿勒泰地区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B47783670520754": {
+            "en": "Krasnogorsky District",
+            "zh": "克拉斯诺戈尔斯基区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Altai Krai · Southeast",
+        "zh": "阿尔泰边疆区·东南部"
+      }
     },
     {
       "id": "RU_MRG_a0ecef08b321",
@@ -8450,7 +9946,25 @@
           "zh": "克林"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Moskau · West",
+          "zh": "莫斯科·西部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B3207695915667": {
+            "en": "Glockenburg",
+            "zh": "格洛肯堡"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Moscow · West",
+        "zh": "莫斯科州·西部"
+      }
     },
     {
       "id": "RU_MRG_cabe21f75eb0",
@@ -8566,7 +10080,17 @@
           "zh": "斯图平斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Moskau · Southeast",
+          "zh": "莫斯科·东南部"
+        }
+      },
+      "previous_names": {
+        "en": "Moscow · Southeast",
+        "zh": "莫斯科州·东南部"
+      }
     },
     {
       "id": "RU_MRG_c663e09bf172",
@@ -8735,7 +10259,25 @@
           "zh": "索尔涅奇诺戈尔斯克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Moskau · North",
+          "zh": "莫斯科·北部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B86215702387170": {
+            "en": "Neu-Kiel",
+            "zh": "新基尔"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Moscow · North",
+        "zh": "莫斯科州·北部"
+      }
     },
     {
       "id": "RU_MRG_975a1a106b2a",
@@ -8904,7 +10446,25 @@
           "zh": "图拉"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B61494461730219": {
+            "en": "Goebbels",
+            "zh": "戈培尔"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Goebbels",
+          "zh": "戈培尔"
+        }
+      },
+      "previous_names": {
+        "en": "Tula · West",
+        "zh": "图拉州·西部"
+      }
     },
     {
       "id": "RU_MRG_421f6b2285d7",
@@ -8977,7 +10537,25 @@
           "zh": "梅德文斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B87683621003887": {
+            "en": "Guderianstadt",
+            "zh": "古德里安施塔特"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Guderianstadt",
+          "zh": "古德里安施塔特"
+        }
+      },
+      "previous_names": {
+        "en": "Kursk · Central",
+        "zh": "库尔斯克州·中部"
+      }
     },
     {
       "id": "RU_MRG_841bc7215ac5",
@@ -9045,7 +10623,25 @@
           "zh": "维尔霍夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B38735593525636": {
+            "en": "Liwny",
+            "zh": "利夫内"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Liwny",
+          "zh": "利夫内"
+        }
+      },
+      "previous_names": {
+        "en": "Oryol · East",
+        "zh": "奥廖尔州·东部"
+      }
     },
     {
       "id": "RU_MRG_75e8b19921bc",
@@ -9209,7 +10805,17 @@
           "zh": "杜霍夫辛斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Klugeburg · North",
+          "zh": "克卢格堡·北部"
+        }
+      },
+      "previous_names": {
+        "en": "Smolensk · North",
+        "zh": "斯摩棱斯克州·北部"
+      }
     },
     {
       "id": "RU_MRG_47cb081b29d0",
@@ -9287,7 +10893,25 @@
           "zh": "希格罗夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B90926067565803": {
+            "en": "Zheleznogorsk",
+            "zh": "热列兹诺哥尔斯克"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Zheleznogorsk",
+          "zh": "热列兹诺哥尔斯克"
+        }
+      },
+      "previous_names": {
+        "en": "Kursk · Northeast",
+        "zh": "库尔斯克州·东北部"
+      }
     },
     {
       "id": "RU_MRG_b88d938191a1",
@@ -9345,7 +10969,29 @@
           "zh": "坦博夫斯基区（坦波夫）"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B61355742422522": {
+            "en": "Koslow",
+            "zh": "科兹洛夫"
+          },
+          "RU_RAY_50074027B81132289602019": {
+            "en": "Morschansk",
+            "zh": "莫尔尚斯克"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Koslow",
+          "zh": "科兹洛夫"
+        }
+      },
+      "previous_names": {
+        "en": "Tambov · Northwest",
+        "zh": "坦波夫州·西北部"
+      }
     },
     {
       "id": "RU_MRG_91548f408632",
@@ -9393,7 +11039,19 @@
           "zh": "新库兹涅茨基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B38623141020563": {
+            "en": "Краснобродский городской о",
+            "zh": "克拉斯诺布罗茨基"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Kemerovo · South 1",
+        "zh": "克麦罗沃州·南部1"
+      }
     },
     {
       "id": "RU_MRG_b63c46baafca",
@@ -9504,7 +11162,23 @@
           "zh": "下谢尔金斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B98412549184479": {
+            "en": "городской округ Верхний Та",
+            "zh": "上塔吉尔"
+          },
+          "RU_RAY_50074027B36040821067036": {
+            "en": "Кировградский городской ок",
+            "zh": "基洛夫格勒"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Sverdlovsk · Southwest 2",
+        "zh": "斯维尔德洛夫斯克州·西南部2"
+      }
     },
     {
       "id": "RU_MRG_29478c5fffa6",
@@ -9557,7 +11231,29 @@
           "zh": "纳扎罗夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B95696969871843": {
+            "en": "городской округ Боготол",
+            "zh": "波戈托尔"
+          },
+          "RU_RAY_50074027B73402533028604": {
+            "en": "Bogotolsky Rayon",
+            "zh": "波戈托尔区"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Bogotolsky Rayon",
+          "zh": "波戈托尔区"
+        }
+      },
+      "previous_names": {
+        "en": "Krasnoyarsk Krai · South 6",
+        "zh": "克拉斯诺亚尔斯克边疆区·南部6"
+      }
     },
     {
       "id": "RU_MRG_43641c4798c6",
@@ -9683,7 +11379,33 @@
           "zh": "托普金斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B51538172041047": {
+            "en": "Kolchugino",
+            "zh": "科利丘吉诺"
+          },
+          "RU_RAY_50074027B53133560580416": {
+            "en": "Kolchugino District",
+            "zh": "科利丘吉诺区"
+          },
+          "RU_RAY_50074027B15875512450628": {
+            "en": "Guryevsky District",
+            "zh": "古里耶夫斯基区"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Kolchugino District",
+          "zh": "科利丘吉诺区"
+        }
+      },
+      "previous_names": {
+        "en": "Kemerovo · Northwest",
+        "zh": "克麦罗沃州·西北部"
+      }
     },
     {
       "id": "RU_MRG_79a4de3821cf",
@@ -9746,7 +11468,45 @@
           "zh": "切尔尼戈夫斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B10504727773087": {
+            "en": "городской округ Большой Ка",
+            "zh": "大卡缅"
+          },
+          "RU_RAY_50074027B46643568009996": {
+            "en": "Langouwai",
+            "zh": "漤沟崴"
+          },
+          "RU_RAY_50074027B58297077135629": {
+            "en": "Haishenwai",
+            "zh": "海参崴"
+          },
+          "RU_RAY_50074027B2294674519719": {
+            "en": "Maikha",
+            "zh": "蚂蚁河"
+          },
+          "RU_RAY_50074027B33926607160791": {
+            "en": "Shuangchengzi",
+            "zh": "双城子"
+          },
+          "RU_RAY_50074027B71338417410099": {
+            "en": "Oktyabrsky District",
+            "zh": "十月区"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Haishenwai",
+          "zh": "海参崴"
+        }
+      },
+      "previous_names": {
+        "en": "Primorsky Krai · Southwest",
+        "zh": "滨海边疆区·西南部"
+      }
     },
     {
       "id": "RU_MRG_79d73fa9760d",
@@ -9832,7 +11592,19 @@
           "zh": "扎林斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B3081285107988": {
+            "en": "Tselinny District",
+            "zh": "采林内区"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Altai Krai · Northeast",
+        "zh": "阿尔泰边疆区·东北部"
+      }
     },
     {
       "id": "RU_MRG_6df85226925c",
@@ -9900,7 +11672,25 @@
           "zh": "阿库申斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B38701103870150": {
+            "en": "Derbent",
+            "zh": "杰尔宾特"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Derbent",
+          "zh": "杰尔宾特"
+        }
+      },
+      "previous_names": {
+        "en": "Dagestan · Southeast",
+        "zh": "达吉斯坦共和国·东南部"
+      }
     },
     {
       "id": "RU_MRG_c60bafc0ae96",
@@ -10013,7 +11803,29 @@
           "zh": "沙图斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Moskau · East",
+          "zh": "莫斯科·东部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B90178869914073": {
+            "en": "Sternenstadt",
+            "zh": "施特嫩施塔特"
+          },
+          "RU_RAY_50074027B95764525225523": {
+            "en": "Stahlstadt",
+            "zh": "施塔尔施塔特"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Moscow · East",
+        "zh": "莫斯科州·东部"
+      }
     },
     {
       "id": "RU_MRG_46291296feb9",
@@ -10101,7 +11913,29 @@
           "zh": "加夫里洛沃-波萨茨基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B19325401389824": {
+            "en": "Kineschma",
+            "zh": "基涅什马"
+          },
+          "RU_RAY_50074027B44469290153568": {
+            "en": "Johannesstadt",
+            "zh": "约翰尼斯施塔特"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Johannesstadt",
+          "zh": "约翰尼斯施塔特"
+        }
+      },
+      "previous_names": {
+        "en": "Ivanovo · West",
+        "zh": "伊万诺沃州·西部"
+      }
     },
     {
       "id": "RU_MRG_2e2abc445545",
@@ -10237,7 +12071,25 @@
           "zh": "托古钦斯基区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B29341937409288": {
+            "en": "Ob",
+            "zh": "鄂毕"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Ob",
+          "zh": "鄂毕"
+        }
+      },
+      "previous_names": {
+        "en": "Novosibirsk · East 2",
+        "zh": "新西伯利亚州·东部2"
+      }
     },
     {
       "id": "RU_MRG_71433587cf08",
@@ -10295,7 +12147,49 @@
           "zh": "车亚可夫斯克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Königsberg · Central",
+          "zh": "柯尼斯堡·中部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B5014175331817": {
+            "en": "Königsberg",
+            "zh": "柯尼斯堡"
+          },
+          "RU_RAY_50074027B28549884825225": {
+            "en": "Pillau",
+            "zh": "皮劳"
+          },
+          "RU_RAY_50074027B4169206169632": {
+            "en": "Rauschen",
+            "zh": "劳申"
+          },
+          "RU_RAY_50074027B10994626105324": {
+            "en": "Ludwigsort",
+            "zh": "路德维希索特"
+          },
+          "RU_RAY_50074027B85308151104910": {
+            "en": "Palmnicken",
+            "zh": "帕尔姆尼肯"
+          },
+          "RU_RAY_50074027B78200612798540": {
+            "en": "Neukuhren",
+            "zh": "诺伊库伦"
+          },
+          "RU_RAY_50074027B27880509956465": {
+            "en": "Gumbinnen",
+            "zh": "贡宾嫩"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Kaliningrad · Central",
+        "zh": "加里宁格勒州·中部"
+      }
     }
   ],
   "split_or_reduced_candidates": [
