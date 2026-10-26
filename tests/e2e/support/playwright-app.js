@@ -187,6 +187,8 @@ async function waitForAppInteractive(page, { timeout = 90_000 } = {}) {
         state.bootBlocking === false
         && !state.scenarioApplyInFlight
         && !state.startupReadonlyUnlockInFlight
+        // 启动分层揭示后 bootBlocking 会在只读窗口内就变为 false；e2e 的"可交互"仍以解除只读为准。
+        && !state.startupReadonly
       );
     }, undefined, { timeout });
   } catch (error) {
