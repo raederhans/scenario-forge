@@ -36,7 +36,7 @@ function setCurrentTool(tool) {
     return;
   }
   runtimeState.currentTool = tool;
-  if (tool === "eyedropper") {
+  if (tool === "eyedropper" || tool === "select") {
     runtimeState.brushModeEnabled = false;
     runtimeState.brushPanModifierActive = false;
   }

@@ -1953,7 +1953,7 @@ function initToolbar({ render } = {}) {
   const runToolSelection = (tool, { dismissHint = true, feedbackLabel = "" } = {}) => {
     const nextTool = tool || "select";
     runtimeState.currentTool = nextTool;
-    if (nextTool === "eyedropper") {
+    if (nextTool === "eyedropper" || nextTool === "select") {
       runtimeState.brushModeEnabled = false;
       runtimeState.brushPanModifierActive = false;
     }
