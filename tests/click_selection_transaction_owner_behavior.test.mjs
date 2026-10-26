@@ -648,6 +648,40 @@ test("deferred land hydration refreshes the hit and resumes with the latest tool
   assert.equal(traceNames(harness.trace).includes("applyVisualSubdivisionFill"), false);
 });
 
+test("switching to select during land hydration inspects the refreshed land without painting", async () => {
+  let releaseHydration;
+  const hydration = new Promise((resolve) => { releaseHydration = resolve; });
+  let currentTool = "fill";
+  let hitCount = 0;
+  const harness = await createTransactionOwner({
+    state: {
+      landIndex: new Map([
+        ["land-1", { properties: { id: "land-1" } }],
+        ["land-2", { properties: { id: "land-2" } }],
+      ]),
+    },
+    getClickState: (state) => ({ ...state, currentTool }),
+    services: {
+      ensureLeafDetailReady: async () => hydration,
+      getHitFromEvent: () => {
+        hitCount += 1;
+        return { targetType: "land", id: hitCount === 1 ? "land-1" : "land-2", countryCode: "AA", runtimeCountryCode: null };
+      },
+      shouldRequireLeafDetail: () => true,
+    },
+  });
+  const pending = harness.owner.handleClick({});
+  await Promise.resolve();
+  currentTool = "select";
+  releaseHydration(true);
+  await pending;
+  const sync = harness.trace.find(([name]) => name === "syncInspectorCountryToLandSelection");
+  assert.equal(sync[2], "land-2");
+  for (const forbidden of ["applyVisualSubdivisionFill", "applyFeatureVisualOverrideTransaction", "setClickSelectedColor", "captureHistoryState", "commitHistoryEntry", "markDirty"]) {
+    assert.equal(traceNames(harness.trace).includes(forbidden), false, forbidden);
+  }
+});
+
 test("preset admission after hydration delegates the refreshed land id only", async () => {
   const harness = await createTransactionOwner({
     state: { isEditingPreset: true },
