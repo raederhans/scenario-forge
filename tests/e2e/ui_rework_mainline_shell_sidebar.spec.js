@@ -29,6 +29,13 @@ test("shell layout keeps the map wide across compact and wide widths", async ({ 
       await page.mouse.click(point.x, point.y);
       await expect.poll(() => page.evaluate(() => globalThis.__scenarioForgeTestApi.selection().selectedInspectorCountryCode)).not.toBe("");
       await expect(page.locator("body")).not.toHaveClass(/right-sidebar-collapsed/);
+      await expect(page.locator("#editorSegmentInspector")).toHaveAttribute("aria-selected", "true");
+      await page.locator("#editorTaskLayersBtn").click();
+      await page.locator("#appearanceTabBorders").click();
+      await expect(page.locator("#editorSegmentLayers")).toHaveAttribute("aria-selected", "true");
+      await page.locator("#editorSegmentInspector").click();
+      await expect(page.locator("#editorSegmentInspector")).toHaveAttribute("aria-selected", "true");
+      await expect(page.locator("#editorProperty-countries")).toBeVisible();
     }
   }
 });
