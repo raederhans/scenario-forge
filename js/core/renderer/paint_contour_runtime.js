@@ -281,7 +281,8 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     notifyPaintChanged(ids = null) { const before = revision; syncSource(); syncPaint(ids); return revision !== before; },
     diagnostics() { syncSource(); syncPaint(); return { status, error, revision, sourceVersion, builds, sentFeatures,
       activeArcCount: view?.getActiveArcCount() || 0, reuseAcks, comparedFeatures, equalFeatures,
-      comparisonYields, comparisonMaxSliceMs, ...graphDiagnostics }; },
+      comparisonYields, comparisonMaxSliceMs, ...graphDiagnostics,
+      classificationArcs: classified && view ? view.getCounts() : null }; },
     dispose() { clear(); scene = ''; sourceRef = null; featuresById = new Map(); precisionById = new Map(); },
   });
 }
