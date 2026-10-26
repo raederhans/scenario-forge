@@ -1,4 +1,8 @@
-import { getEffectiveScenarioHierarchy } from "./scenario_hierarchy.js";
+import {
+  expandScenarioFeatureIds,
+  getEffectiveScenarioHierarchy,
+  projectScenarioFeatureIds,
+} from "./scenario_hierarchy.js";
 import { countryPresets, state as runtimeState } from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 const state = runtimeState;
@@ -133,9 +137,41 @@ function resolveCatalogEntriesForScenario(scenarioId = runtimeState.activeScenar
   });
 }
 
+// Scenario-scoped feature merges of the active scenario; shared preset and
+// catalog ID lists name their members and are projected on read.
+function getActiveFeatureMergeOverride() {
+  return runtimeState.activeScenarioManifest?.hierarchy_overrides || null;
+}
+
+function projectSharedFeatureIds(ids, details = {}) {
+  const { ids: projected, partial } = projectScenarioFeatureIds(ids, getActiveFeatureMergeOverride());
+  if (partial.length) {
+    console.warn("[releasable] Feature list covers only part of a scenario merge; dropped those members.", {
+      scenarioId: runtimeState.activeScenarioId,
+      ...details,
+      partial,
+    });
+  }
+  return projected;
+}
+
 function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
+  const ids = resolveMemberFeatureIdsFromPresetSource(presetSource, entry);
+  return ids.length
+    ? projectSharedFeatureIds(ids, { tag: normalizeCountryCode(entry.tag), sourceType: String(presetSource?.type || "").trim() })
+    : ids;
+}
+
+// Resolves in member IDs: hierarchy groups of a scenario with feature merges are
+// expanded back to members, so feature and exclusion lists apply exactly.
+function resolveMemberFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
   const normalizedPresetSource = normalizePresetSource(presetSource);
-  const hierarchy = getEffectiveScenarioHierarchy(runtimeState);
+  const effectiveHierarchy = getEffectiveScenarioHierarchy(runtimeState);
+  const override = getActiveFeatureMergeOverride();
+  const groupFeatureIds = (groupId) => {
+    const ids = effectiveHierarchy?.groups?.[groupId];
+    return Array.isArray(ids) ? expandScenarioFeatureIds(ids, override) : [];
+  };
   const sourceType = String(normalizedPresetSource.type || "").trim();
   const tag = normalizeCountryCode(entry.tag);
 
@@ -165,9 +201,6 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
   }
 
   if (sourceType === "hierarchy_group_ids" || sourceType === "feature_selection") {
-    const groups = hierarchy?.groups && typeof hierarchy.groups === "object"
-      ? hierarchy.groups
-      : {};
     const featureIds = new Set();
     normalizedPresetSource.feature_ids.forEach((featureId) => {
       const normalized = String(featureId || "").trim();
@@ -176,8 +209,7 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
       }
     });
     normalizedPresetSource.group_ids.forEach((groupId) => {
-      const ids = Array.isArray(groups[groupId]) ? groups[groupId] : [];
-      ids.forEach((featureId) => {
+      groupFeatureIds(groupId).forEach((featureId) => {
         const normalized = String(featureId || "").trim();
         if (normalized) {
           featureIds.add(normalized);
@@ -185,8 +217,7 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
       });
     });
     normalizedPresetSource.exclude_group_ids.forEach((groupId) => {
-      const ids = Array.isArray(groups[groupId]) ? groups[groupId] : [];
-      ids.forEach((featureId) => {
+      groupFeatureIds(groupId).forEach((featureId) => {
         featureIds.delete(String(featureId || "").trim());
       });
     });
@@ -205,10 +236,7 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
   if (sourceType === "feature_ids") {
     const ids = Array.from(new Set(normalizedPresetSource.feature_ids));
     normalizedPresetSource.group_ids.forEach((groupId) => {
-      const idsForGroup = Array.isArray(hierarchy?.groups?.[groupId])
-        ? hierarchy.groups[groupId]
-        : [];
-      idsForGroup.forEach((featureId) => {
+      groupFeatureIds(groupId).forEach((featureId) => {
         const normalized = String(featureId || "").trim();
         if (normalized && !ids.includes(normalized)) {
           ids.push(normalized);
@@ -573,13 +601,25 @@ function buildScenarioRegionalPresetOverlays() {
   return overlays;
 }
 
+// Historical display presets are shared by every scenario and name member IDs.
+function projectStaticPresets() {
+  if (!getActiveFeatureMergeOverride()?.feature_merges) return countryPresets;
+  return Object.fromEntries(Object.entries(countryPresets || {}).map(([code, presets]) => [
+    code,
+    (Array.isArray(presets) ? presets : []).map((preset) => ({
+      ...preset,
+      ids: projectSharedFeatureIds(clonePreset(preset).ids, { lookupCode: code, presetName: preset?.name }),
+    })),
+  ]));
+}
+
 function rebuildPresetState() {
   const { defaultOverlays, scenarioOverlays } = buildReleasablePresetOverlays();
   const scenarioRegionalPresetOverlays = buildScenarioRegionalPresetOverlays();
   runtimeState.defaultReleasablePresetOverlays = defaultOverlays;
   runtimeState.scenarioReleasablePresetOverlays = scenarioOverlays;
   runtimeState.presetsState = mergePresetLayers(
-    countryPresets,
+    projectStaticPresets(),
     scenarioRegionalPresetOverlays,
     runtimeState.activeScenarioId ? scenarioOverlays : defaultOverlays,
     runtimeState.customPresets || {}

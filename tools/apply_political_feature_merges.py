@@ -21,6 +21,7 @@ import argparse
 import copy
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -72,6 +73,16 @@ GLOBAL_READERS = {
     "releasables/tno_1962.internal.phase1.source.json": ("tno_1962",),
 }
 SCOPED_UNPROJECTED = ("world_cities.geojson", "europe_urban.geojson")
+# Shared ID lists the frontend projects through the active scenario's
+# hierarchy_overrides.feature_merges (js/core/releasable_manager.js): a scoped plan
+# keeps their members, but each list must still name all or none of a group's members.
+RELEASABLE_PRESET_LISTS = re.compile(
+    r"\$\.entries\[\]\.(?:(?:boundary_variants|companion_actions)\[\]\.)?preset_source\.(?:exclude_)?feature_ids")
+FRONTEND_PROJECTED = {
+    "country_feature_policies.json": re.compile(r"\$\.display\.presets\.[^.\[\]]+\[\]\.ids"),
+    "releasables/hoi4_vanilla.internal.phase1.catalog.json": RELEASABLE_PRESET_LISTS,
+    "releasables/hoi4_vanilla.internal.phase1.source.json": RELEASABLE_PRESET_LISTS,
+}
 CHINA_CROSSWALK = "quick_fill/china_prefecture_crosswalk.v1.json"
 POPULATION_FEATURES = "thematic_layers/population/ghsl_population_2020_v1/features"
 LANGUAGE_SEPARATORS = {"en": " + ", "zh": "、"}
@@ -689,6 +700,32 @@ def rename_only(merges: Merges, scenarios: list[str]) -> dict:
     return report
 
 
+def frontend_projection_problems(value, lists: re.Pattern, merges: Merges, at: str = "$") -> tuple[list[str], list[str]]:
+    """Members outside the frontend-projected lists, and lists naming only part of a group."""
+    outside: list[str] = []
+    partial: list[str] = []
+    if isinstance(value, str):
+        if merges.map_id(value) != value:
+            outside.append(f"{at}: {value}")
+    elif isinstance(value, list) and lists.fullmatch(at) and all(isinstance(item, str) for item in value):
+        present = set(value)
+        for group in merges.groups:
+            found = present.intersection(group["member_ids"])
+            if found and len(found) != len(group["member_ids"]):
+                partial.append(f"{at}: {group['id']} {sorted(found)}")
+    else:
+        if isinstance(value, dict):
+            outside += [f"{at}: key {key}" for key in value if merges.map_id(key) != key]
+            items = [(f"{at}.{key}", item) for key, item in value.items()]
+        else:
+            items = [(f"{at}[]", item) for item in value] if isinstance(value, list) else []
+        for item_at, item in items:
+            more_outside, more_partial = frontend_projection_problems(item, lists, merges, item_at)
+            outside += more_outside
+            partial += more_partial
+    return outside, partial
+
+
 def global_projected_paths(merges: Merges) -> list[Path]:
     """Global files to project; a scoped plan refuses to touch one that other scenarios also read."""
     paths = [DATA / name for name in GLOBAL_PROJECTED if (DATA / name).exists()]
@@ -702,6 +739,12 @@ def global_projected_paths(merges: Merges) -> list[Path]:
             selected.append(path)
         elif not readers & set(merges.scenarios):
             continue  # none of its readers changes, so the file keeps the members
+        elif name in FRONTEND_PROJECTED:
+            outside, partial = frontend_projection_problems(load_json(path), FRONTEND_PROJECTED[name], merges)
+            if outside:
+                raise ValueError(f"{name} is read by scenarios outside {merges.scenarios}: {outside[:5]}")
+            if partial:
+                raise ValueError(f"{name}: ID list contains only part of a merged feature: {partial[:5]}")
         elif name not in SCOPED_UNPROJECTED:
             text = path.read_text(encoding="utf-8")
             touched = sorted(member for member in merges.remap if f'"{member}"' in text)
@@ -747,9 +790,11 @@ def main() -> None:
         # A replay must not expect members of plans that are not applied yet.
         apply_quick_fill(Path(args.plan).name)
     if not args.skip_global:
+        # Refuse a plan before writing anything when a shared file cannot take it.
+        global_paths = global_projected_paths(merges)
         apply_locales(merges)
         apply_geo_aliases(merges)
-        report["global"] = project_files(global_projected_paths(merges), merges)
+        report["global"] = project_files(global_paths, merges)
     for scenario_id in [scenario for scenario in args.scenario or SCENARIOS if scenario in merges.scenarios]:
         report[scenario_id] = apply_scenario(scenario_id, merges)
         print(json.dumps({scenario_id: {k: v for k, v in report[scenario_id].items() if k != "fixes"}}, ensure_ascii=False), flush=True)
