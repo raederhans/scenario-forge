@@ -21,7 +21,7 @@ function restoreGlobalProperty(name, hadProperty, value) {
   delete globalThis[name];
 }
 
-async function resolveStartupScenarioId(registry) {
+async function resolveStartupScenarioId(registry, overrides = {}) {
   const source = readFileSync(new URL("../js/bootstrap/startup_data_pipeline.js", import.meta.url), "utf8")
     .replace(/^import[\s\S]*?from "[^"]+";\r?\n/gm, "")
     .replace("export function createStartupDataPipelineOwner", "function createStartupDataPipelineOwner");
@@ -35,6 +35,7 @@ async function resolveStartupScenarioId(registry) {
     loadStartupBundleViaWorker: async () => ({ payload: {} }),
     createStartupScenarioBundleFromPayload: async () => ({ manifest: {} }),
     validateScenarioRuntimeShellContract: () => ({ ok: true }),
+    ...overrides,
   };
   const createOwner = new Function(...Object.keys(dependencies), `${source}\nreturn createStartupDataPipelineOwner;`)(...Object.values(dependencies));
   const startup = createOwner({ state: {} }).resolveStartupScenarioBootstrap();
@@ -83,6 +84,40 @@ test("sample deeplink selects the sample scenario during startup", async () => {
   } finally {
     originals.forEach(([key, had, value]) => restoreGlobalProperty(key, had, value));
   }
+});
+
+test("a hanging sample manifest lookup times out and boots the meta scenario", async () => {
+  let fireTimeout;
+  let timerStarted;
+  const timerReady = new Promise((resolve) => { timerStarted = resolve; });
+  const timer = {};
+  const clearedTimers = [];
+  const warnings = [];
+  const startup = resolveStartupScenarioId({ scenarios: [] }, {
+    getSampleProjectIdFromUrl: () => "modern-world-japan-corridor",
+    fetchSampleProjectManifest: () => new Promise(() => {}),
+    getRememberedScenarioId: () => "",
+    getConfiguredDefaultScenarioId: () => "meta",
+    shouldDisableConfiguredDefaultScenario: () => false,
+    URLSearchParams: class { get() { return null; } },
+    setTimeout(callback, delay) {
+      assert.equal(delay, 3000);
+      fireTimeout = callback;
+      timerStarted();
+      return timer;
+    },
+    clearTimeout(handle) { clearedTimers.push(handle); },
+    console: { warn(message) { warnings.push(message); } },
+  });
+  let settled = false;
+  void startup.then(() => { settled = true; });
+  await timerReady;
+  assert.equal(settled, false);
+  fireTimeout();
+  assert.equal(await startup, "meta");
+  assert.deepEqual(clearedTimers, [timer]);
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /^\[boot\].*timed out/);
 });
 
 test("startup waits for layout interaction to settle without accepting a frame itself", async () => {

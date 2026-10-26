@@ -83,10 +83,20 @@ async function resolveStartupScenarioId(registry) {
   const sampleId = getSampleProjectIdFromUrl();
   if (sampleId) {
     let sampleProject;
+    let timeoutId;
     try {
-      sampleProject = resolveSampleProjectFromManifest(await fetchSampleProjectManifest(), sampleId);
-    } catch (_error) {
+      const manifest = await Promise.race([
+        fetchSampleProjectManifest(),
+        new Promise((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error("Sample manifest request timed out after 3000 ms.")), 3000);
+        }),
+      ]);
+      sampleProject = resolveSampleProjectFromManifest(manifest, sampleId);
+    } catch (error) {
+      console.warn(`[boot] Sample manifest lookup failed; falling back to the default scenario: ${error.message}`);
       sampleProject = null;
+    } finally {
+      clearTimeout(timeoutId);
     }
     if (sampleProject?.scenarioId) return sampleProject.scenarioId;
   }
