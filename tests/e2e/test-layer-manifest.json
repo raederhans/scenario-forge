@@ -285,6 +285,13 @@
       "ownerHint": "startup-runtime"
     },
     {
+      "specPath": "tests/e2e/startup_readonly_reveal.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "startup",
+      "ownerHint": "startup-runtime"
+    },
+    {
       "specPath": "tests/e2e/strategic_overlay_counter_canvas_smoke.spec.js",
       "primaryLayer": "feature",
       "executionMode": "browser",

@@ -85,7 +85,7 @@ export function initScenarioControls() {
     if (events.signal.aborted) return;
     const entries = getScenarioRegistryEntries();
     const isApplyInFlight = !!runtimeState.scenarioApplyInFlight;
-    const isBootBlocking = runtimeState.bootBlocking !== false;
+    const isBootBlocking = runtimeState.bootBlocking !== false || runtimeState.startupReadonly;
     const fatalState = getScenarioFatalRecoveryState();
     const isFatalLocked = !!fatalState;
     const fatalMessage = formatScenarioFatalRecoveryMessage(fatalState);

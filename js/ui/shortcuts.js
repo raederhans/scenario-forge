@@ -101,7 +101,8 @@ function cyclePaintGranularity(direction = 1) {
 
 function allowShortcutDuringStartupReadonly({ key = "", modifier = false } = {}) {
   if (modifier) return false;
-  return key === "+" || key === "=" || key === "-" || key === "_" || key === "0";
+  return key === "+" || key === "=" || key === "-" || key === "_" || key === "0"
+    || key === "Shift" || key === " " || key === "Escape";
 }
 
 function initShortcuts() {
@@ -309,7 +310,7 @@ function initShortcuts() {
   });
 
   window.addEventListener("keyup", (event) => {
-    if (runtimeState.bootBlocking || runtimeState.startupReadonly) return;
+    if (runtimeState.bootBlocking) return;
     if (event.key !== "Shift" && event.key !== " ") return;
     setBrushPanModifier(false);
   });
