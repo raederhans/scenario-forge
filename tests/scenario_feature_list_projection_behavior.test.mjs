@@ -81,3 +81,28 @@ test("releasable preset sources resolve in member IDs before projecting", () => 
     assert.deepEqual(resolveFeatureIdsFromPresetSource(whole, entry), ["e", "DE_MRG_ab", "DE_MRG_cd"]);
   });
 });
+
+test("a scenario catalog naming merged IDs excludes and selects them against hierarchy groups", () => {
+  const entry = { tag: "BAY", release_lookup_iso2: "DE" };
+  withRuntime({ ...scenario({ M: ["a", "b"] }), hierarchyData: { groups: { DE_G: ["a", "b", "c"] } } }, (warnings) => {
+    const resolve = (source) => resolveFeatureIdsFromPresetSource({ type: "feature_selection", ...source }, entry);
+    assert.deepEqual(resolve({ group_ids: ["DE_G"], exclude_feature_ids: ["M"] }), ["c"]);
+    assert.deepEqual(resolve({ feature_ids: ["M"], exclude_group_ids: ["DE_G"] }), []);
+    assert.deepEqual(resolve({ feature_ids: ["M", "c"] }), ["M", "c"]);
+    assert.equal(warnings.length, 1, "only the empty resolution warns");
+  });
+});
+
+test("entries of other scenarios are not resolved against the active scenario's merges", () => {
+  const hoi4Only = { tag: "RKU", release_lookup_iso2: "UA", scenario_ids: ["hoi4_1936"],
+    preset_source: { type: "feature_ids", feature_ids: ["a"] } };
+  withRuntime({ ...scenario({ M: ["a", "b"] }), releasableCatalog: { entries: [hoi4Only] } }, (warnings) => {
+    rebuildPresetState();
+    assert.deepEqual(state.defaultReleasablePresetOverlays, {});
+    // During startup the manifest can arrive before its scenario id: nothing is projected yet.
+    state.activeScenarioId = "";
+    rebuildPresetState();
+    assert.deepEqual(state.defaultReleasablePresetOverlays.UA[0].ids, ["a"]);
+    assert.deepEqual(warnings, []);
+  });
+});

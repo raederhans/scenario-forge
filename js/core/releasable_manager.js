@@ -138,8 +138,10 @@ function resolveCatalogEntriesForScenario(scenarioId = runtimeState.activeScenar
 }
 
 // Scenario-scoped feature merges of the active scenario; shared preset and
-// catalog ID lists name their members and are projected on read.
+// catalog ID lists name their members and are projected on read. During startup
+// a manifest can precede its scenario id; nothing is projected until both agree.
 function getActiveFeatureMergeOverride() {
+  if (!runtimeState.activeScenarioId) return null;
   return runtimeState.activeScenarioManifest?.hierarchy_overrides || null;
 }
 
@@ -162,12 +164,14 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
     : ids;
 }
 
-// Resolves in member IDs: hierarchy groups of a scenario with feature merges are
-// expanded back to members, so feature and exclusion lists apply exactly.
+// Resolves in member IDs: merged IDs of the projected hierarchy and of a scenario's
+// own catalog are expanded back to members, so feature and exclusion lists apply exactly.
 function resolveMemberFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
-  const normalizedPresetSource = normalizePresetSource(presetSource);
-  const effectiveHierarchy = getEffectiveScenarioHierarchy(runtimeState);
   const override = getActiveFeatureMergeOverride();
+  const normalizedPresetSource = normalizePresetSource(presetSource);
+  normalizedPresetSource.feature_ids = [...new Set(expandScenarioFeatureIds(normalizedPresetSource.feature_ids, override))];
+  normalizedPresetSource.exclude_feature_ids = expandScenarioFeatureIds(normalizedPresetSource.exclude_feature_ids, override);
+  const effectiveHierarchy = getEffectiveScenarioHierarchy(runtimeState);
   const groupFeatureIds = (groupId) => {
     const ids = effectiveHierarchy?.groups?.[groupId];
     return Array.isArray(ids) ? expandScenarioFeatureIds(ids, override) : [];
@@ -486,7 +490,9 @@ function buildReleasablePresetOverlays() {
   const defaultOverlays = {};
   const scenarioOverlays = {};
 
-  resolveCatalogEntriesForScenario("").forEach((entry) => {
+  // Default overlays serve the map without a scenario; a scenario's merges would
+  // only misread entries of other scenarios.
+  (runtimeState.activeScenarioId ? [] : resolveCatalogEntriesForScenario("")).forEach((entry) => {
     const tag = normalizeCountryCode(entry.tag);
     const lookupCode = normalizeCountryCode(entry.release_lookup_iso2);
     const featureIds = resolvePresetFeatureIds(entry);
