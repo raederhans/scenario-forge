@@ -838,7 +838,7 @@ function packChains(segments, featureIds, diagnostics) {
     diagnostics: { ...diagnostics, arcCount: paths.length, pointCount, packedBytes: coordinates.byteLength + offsets.byteLength + owners.byteLength } };
 }
 
-export function createPaintContourGraphBuilder({ nearSeamTolerance = 0.05, waterMask = null } = {}) {
+export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMask = null } = {}) {
   const edges = createCompactEdges(), idToIndex = new Map(), featureIds = [], featureEdges = new Map();
   const invalidRingsById = new Map(), precisions = new Map();
   const polygons = new Map();

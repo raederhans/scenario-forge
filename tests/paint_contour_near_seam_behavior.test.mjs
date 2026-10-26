@@ -1,9 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPaintContourGraph } from '../js/core/renderer/paint_contour_graph.js';
+import { buildPaintContourGraph as buildGraph } from '../js/core/renderer/paint_contour_graph.js';
 import { packContourWaterMask, createContourWaterQuery } from '../js/core/renderer/paint_contour_water_mask.js';
 import { createBorderClassification } from '../js/core/renderer/border_classification.js';
 
+// Scenario runtime enables near seams at 0.05°; the builder default stays exact.
+const buildPaintContourGraph = (features, options = {}) => buildGraph(features, { nearSeamTolerance: 0.05, ...options });
 const rect = (id, x0, y0, x1, y1) => ({ id, type: 'Feature', geometry: { type: 'Polygon',
   coordinates: [[[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]]] } });
 const land = packContourWaterMask({ land: rect('land', -10, -10, 10, 10) });

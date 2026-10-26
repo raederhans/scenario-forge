@@ -79,7 +79,7 @@ function harness(runtimeOptions = {}) {
       }
       return new Promise((resolve,reject)=>tasks.push({features,removed,options,resolve:()=>resolve({unchanged:true}),reject}));
     }
-    if(options.reset)builder=createPaintContourGraphBuilder();
+    if(options.reset)builder=createPaintContourGraphBuilder({nearSeamTolerance:options.nearSeamTolerance});
     if(options.waterMask !== undefined)builder.setWaterMask(options.waterMask);
     dirty=true;builder.patch(features,removed);const graph=builder.finish();
     return new Promise((resolve,reject)=>tasks.push({features,removed,options,resolve:()=>{

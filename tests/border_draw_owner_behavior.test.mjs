@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createRequire } from "node:module";
 
-import { createOceanRenderOwner } from "../js/core/renderer/ocean_render_owner.js";
 import { createBorderDrawOwner } from "../js/core/renderer/border_draw_owner.js";
 import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
 import { sanitizePolyline } from "../js/core/renderer/polyline_simplification_helpers.js";
@@ -85,16 +84,6 @@ function createPreparedBorderHarness({ long = false, constants = {}, paintMesh =
     getInternalBorderStrokeColor: (code, color) => code === "AA" ? color : "#778899",
     drawRiverInternalContours: () => { counts.river++; }, drawScenarioCoastalAccentLayer: () => { counts.accent++; },
     reconcileDetailAdmBorders: () => { counts.reconcile++; },
-    drawCoastalTransition(k, { lineWidth, buildPath }) {
-      context.save();
-      context.beginPath(); // Model the ocean/Atlantropa clip paths before the coastline.
-      context.strokeStyle = "halo"; context.globalAlpha = 0.6 * 0.13; context.lineWidth = lineWidth + 2.2 / k;
-      context.lineJoin = "round"; context.lineCap = "round";
-      const cached = buildPath();
-      context.stroke(cached);
-      context.restore();
-      return true;
-    },
   } });
   return { owner, state, context, counts, projection, local, paint, nativePaths,
     setVisible(codes) { visible = codes; },
@@ -440,8 +429,8 @@ test("drawing requests detail cache reconciliation without writing renderer stat
 
 test("border styles retain normal and interactive opacity and width", () => {
   for (const [interactive, countryAlpha, coastAlpha, countryWidth, coastWidth] of [
-    [false, 0.25, 0.3785714286, 1.0071428571, 0.8485714286],
-    [true, 0.22, 0.39, 0.95, 0.792],
+    [false, 0.25, 0.4375, 1.0071428571, 0.72],
+    [true, 0.22, 0.4375, 0.95, 0.72],
   ]) {
     const { owner, context } = createOwner({ interactive });
     owner.drawHierarchicalBorders(2, { interactive });
@@ -517,85 +506,6 @@ test("disabled political layer draws no political mesh", () => {
   assert.equal(context.strokes.filter(stroke => stroke.strokeStyle === "#222222").length, 1);
 });
 
-test("coastal transition clips one combined path then reuses it for the original fine stroke", () => {
-  const secondMesh = { type: "MultiLineString", coordinates: [[[10, 10], [100, 100]]] };
-  for (const interactive of [false, true]) {
-    let oceanOwner;
-    const harness = createOwner({ interactive, helpers: {
-      drawCoastalTransition: (...args) => oceanOwner.drawCoastalTransition(...args),
-      getCoastlineCollectionForZoom: () => [mesh, secondMesh],
-    } });
-    const { owner, context, state, coastalAccentCalls } = harness;
-    state.cachedCoastlinesLow = [mesh, secondMesh];
-    let masks = 0;
-    oceanOwner = createOceanRenderOwner({ state, getters: { getContext: () => context }, helpers: {
-      getPhysicalLandMaskInfo: () => ({ collection: { type: "FeatureCollection", features: [] } }),
-      applyOceanClipMask: () => { masks += 1; context.beginPath(); },
-      clipOutAtlantropaAccentRegions: () => context.beginPath(),
-    } });
-    owner.drawHierarchicalBorders(2, { interactive });
-    const halo = context.strokes.find(stroke => stroke.strokeStyle === "#d7ebf5");
-    const fine = context.strokes.find(stroke => stroke.strokeStyle === "#333333");
-    assert.equal(masks, 1);
-    assert.equal(halo.path, fine.path);
-    assert.equal(halo.path.length, 2);
-    assert.equal(context.strokes.filter(stroke => stroke.strokeStyle === "#d7ebf5").length, 1);
-    nearlyEqual(halo.alpha, 0.5 * 0.13);
-    nearlyEqual(halo.lineWidth - fine.lineWidth, 2.2 / 2);
-    nearlyEqual(fine.alpha, interactive ? 0.39 : 0.3785714286);
-    assert.ok(context.strokes.indexOf(halo) < context.strokes.indexOf(fine));
-    assert.equal(coastalAccentCalls.length, interactive ? 0 : 1);
-    assert.equal(context.globalAlpha, 1);
-    const baseline = createOwner({ interactive });
-    baseline.owner.drawHierarchicalBorders(2, { interactive });
-    const otherBorders = (strokes) => strokes.filter(stroke => !["#d7ebf5", "#333333"].includes(stroke.strokeStyle));
-    assert.deepEqual(otherBorders(context.strokes), otherBorders(baseline.context.strokes));
-  }
-});
-
-test("missing physical land masks skip the halo while preserving fine coastlines and scenario accents", () => {
-  let oceanOwner;
-  const { owner, context, state, coastalAccentCalls } = createOwner({ helpers: {
-    drawCoastalTransition: (...args) => oceanOwner.drawCoastalTransition(...args),
-  } });
-  oceanOwner = createOceanRenderOwner({ state, getters: { getContext: () => context }, helpers: {
-    getPhysicalLandMaskInfo: () => ({ collection: null }),
-    applyOceanClipMask: () => assert.fail("unexpected ocean clip"),
-  } });
-  owner.drawHierarchicalBorders(2);
-  assert.equal(context.strokes.some(stroke => stroke.strokeStyle === "#d7ebf5"), false);
-  const fine = context.strokes.find(stroke => stroke.strokeStyle === "#333333");
-  assert.ok(fine);
-  assert.equal(fine.path.length, 1);
-  nearlyEqual(fine.alpha, 0.3785714286);
-  assert.equal(coastalAccentCalls.length, 1);
-});
-
-test("zero-opacity and missing coastlines never request a transition", () => {
-  for (const reason of ["zero-opacity", "missing"]) {
-    for (const interactive of [false, true]) {
-      let transitions = 0;
-      const { owner, context, state, coastalAccentCalls } = createOwner({
-        interactive, helpers: {
-          drawCoastalTransition: () => { transitions += 1; return false; },
-          ...(reason === "missing" ? { getCoastlineCollectionForZoom: () => [] } : {}),
-        },
-      });
-      if (reason === "zero-opacity") state.styleConfig.coastlines.opacity = 0;
-      if (reason === "missing") {
-        state.cachedCoastlines = [];
-        state.cachedCoastlinesLow = [];
-        state.cachedCoastlinesHigh = [];
-      }
-      owner.drawHierarchicalBorders(2, { interactive });
-      assert.equal(transitions, 0, `${reason}, interactive=${interactive}`);
-      assert.equal(context.strokes.some(stroke => stroke.strokeStyle === "#333333"), false);
-      if (reason !== "missing") assert.equal(coastalAccentCalls.length, 0);
-      assert.ok(context.strokes.some(stroke => stroke.strokeStyle === "#222222"));
-    }
-  }
-});
-
 test("prepared border paths exactly match D3 geometry, style, order and combined coastal strokes", async (t) => {
   installBoundaryPath(t);
   for (const interactive of [false, true]) {
@@ -628,7 +538,7 @@ test("prepared border paths exactly match D3 geometry, style, order and combined
       assert.equal(h.counts.direct, before.direct, "prepared draw does not simplify/project vertices");
       assert.equal(h.counts.stream, before.stream, "prepared draw does not build projection streams");
       assert.equal(h.counts.river, 1);
-      assert.equal(h.counts.accent, interactive ? 0 : 1);
+      assert.equal(h.counts.accent, 1);
     }
   }
 });

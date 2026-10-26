@@ -41,7 +41,6 @@ function fixture({ source = "scenario", enabled = true, coastlines = {} } = {}) 
   const border = createBorderDrawOwner({ state, getters, helpers: {
     getCoastlineCollectionForZoom: () => [coast],
     isUsableMesh: mesh => !!mesh?.coordinates?.length,
-    drawCoastalTransition: ocean.drawCoastalTransition,
     drawScenarioCoastalAccentLayer: ocean.drawScenarioCoastalAccentLayer,
   } });
   const relief = createScenarioReliefOverlayRenderOwner({ state, getters, helpers: {
@@ -77,14 +76,6 @@ for (const interactive of [false, true]) {
     }
   });
 }
-
-test("transition entry does not draw or construct a path", () => {
-  const h = fixture();
-  let built = false;
-  assert.equal(h.ocean.drawCoastalTransition(4, { lineWidth: 1, buildPath() { built = true; } }), false);
-  assert.equal(built, false);
-  assert.deepEqual(h.strokes, []);
-});
 
 test("supplementary shorelines use only the overlay route with constant screen widths", () => {
   for (const k of [1, 4, 8]) {

@@ -60,10 +60,6 @@ export function createOceanRenderOwner({
     sortBathymetryFeaturesForFill = (collection) => Array.isArray(collection?.features) ? collection.features : [],
   } = helpers;
 
-  function drawCoastalTransition() {
-    return false;
-  }
-
   function drawBathymetryBands(collection, oceanStyle) {
     const context = getContext();
     const pathCanvas = getPathCanvas();
@@ -315,7 +311,6 @@ export function createOceanRenderOwner({
     drawBathymetryBands,
     drawBathymetryContours,
     drawCoastalAccentStrokeBuckets,
-    drawCoastalTransition,
     drawOceanStyle,
     drawScenarioCoastalAccentLayer,
     drawScenarioCoastalAccentOverlays,

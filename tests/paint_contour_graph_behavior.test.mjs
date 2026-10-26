@@ -2,11 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { buildPaintContourGraph as buildGraph, createPaintContourGraphBuilder as createBuilder } from '../js/core/renderer/paint_contour_graph.js';
+import { buildPaintContourGraph, createPaintContourGraphBuilder } from '../js/core/renderer/paint_contour_graph.js';
 import { createPaintContourMesh } from '../js/core/renderer/paint_contour_mesh.js';
-
-const buildPaintContourGraph = features => buildGraph(features, { nearSeamTolerance: 0 });
-const createPaintContourGraphBuilder = () => createBuilder({ nearSeamTolerance: 0 });
 
 // Exercise the two internal numerical primitives without widening the public API.
 let scalarInternals;
