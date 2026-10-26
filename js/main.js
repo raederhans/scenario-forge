@@ -4,6 +4,7 @@ import "./core/data_service.js";
 import "./core/app_test_api.js";
 import {
   setBootPreviewVisibleState,
+  setBootSubProgress,
   setStartupInitialScenarioChunkVisualPromotion,
   setStartupInteractionMode,
   setUiHydrationState,
@@ -618,6 +619,7 @@ async function bootstrap() {
     }
 
     // initial-chunk-visual / warmup-flush 覆盖 first-visible 前后的首屏 chunk 提升与首帧 flush，便于和 total 对账。
+    setBootState("initial-chunk-visual");
     startBootMetric("initial-chunk-visual");
     const initialChunkVisualPromotion = await ensureStartupInitialScenarioChunkVisualReady({
       reason: "startup-initial-visual",
@@ -629,6 +631,7 @@ async function bootstrap() {
       promotedVisibleFeatureCount: Number(initialChunkVisualPromotion?.promotedVisibleFeatureCount || 0),
       promotedTotalFeatureCount: Number(initialChunkVisualPromotion?.promotedTotalFeatureCount || 0),
     });
+    setBootSubProgress(runtimeState, null);
 
     setBootState("warmup");
     startBootMetric("warmup-flush");

@@ -29,7 +29,7 @@ for (const mode of ["refresh", "prewarm"]) {
     assert.ok(start >= 0 && end > start);
     const dependencies = { bundle, runtimeState, d3Client: {},
       loadScenarioChunkPayloadEntries: loader.loadScenarioChunkPayloadEntries,
-      selection: { requiredChunks }, coarseSelection: { requiredChunks },
+      selection: { requiredChunks }, coarseSelection: { requiredChunks }, startupInitialPoliticalOnly: false,
       isScenarioChunkRefreshCurrent: () => true, loadState: runtimeState.runtimeChunkLoadState,
       scenarioId: "a", refreshContinuationState: {}, nextSelectionVersion: 1,
       nextRequiredChunkIds: requiredChunks.map((chunk) => chunk.id), nextCacheOnlyChunkIds: [], nextRetainedActiveChunkIds: [],
