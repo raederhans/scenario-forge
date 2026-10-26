@@ -370,6 +370,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
     }
     if (state.currentTool === "select") {
       syncInspectorCountryToLandSelection(feature, landId, landHit);
+      requestInteractionRender("select-land");
       noteRenderAction("select-land", actionStart);
       return;
     }

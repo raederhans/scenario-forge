@@ -172,6 +172,9 @@ function renderPalette(themeName) {
     btn.title = normalized;
     btn.addEventListener("click", () => {
       selectPalettePaintColor(runtimeState, normalized);
+      if (runtimeState.currentTool === "select") {
+        callRuntimeHook(runtimeState, "runToolSelectionFn", "fill", { feedbackLabel: t("Switched to fill tool", "ui") });
+      }
       callRuntimeHook(state, "updateSwatchUIFn");
     });
     paletteGrid.appendChild(btn);

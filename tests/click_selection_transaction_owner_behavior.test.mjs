@@ -397,6 +397,9 @@ test("select land syncs the inspector without loading detail, painting or record
     "syncInspectorCountryToLandSelection", harness.state.landIndex.get("land-1"), "land-1", harness.hit,
   ]);
   assert.deepEqual(harness.trace.at(-1), ["noteRenderAction", "select-land", 17]);
+  assert.deepEqual(harness.trace.filter(([name]) => name === "requestInteractionRender"), [
+    ["requestInteractionRender", "select-land"],
+  ]);
   for (const forbidden of ["applyVisualSubdivisionFill", "applyFeatureVisualOverrideTransaction", "setClickSelectedColor", "captureHistoryState", "commitHistoryEntry", "markDirty"]) {
     assert.equal(traceNames(harness.trace).includes(forbidden), false, forbidden);
   }
