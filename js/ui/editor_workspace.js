@@ -1,6 +1,6 @@
 // The workspace moves existing controls so their business owners keep their
 // element references, event handlers, and native form contracts.
-export function initEditorWorkspace({ documentRef = document, initialSearch = globalThis.location?.search || "", t, setSidebarTab, setStrategicMode, revealProperties = () => {}, onNavigate = () => {} } = {}) {
+export function initEditorWorkspace({ documentRef = document, initialSearch = globalThis.location?.search || "", t, setSidebarTab, setStrategicMode, toggleInspector, revealProperties = () => {}, onNavigate = () => {} } = {}) {
   const get = (id) => documentRef.getElementById(id);
   const left = get("leftSidebarContent");
   const right = get("rightSidebarContent");
@@ -359,6 +359,14 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   move("workspaceSaveStatus", top);
   const topActions = make("div", "editor-project-actions");
   top.append(topActions);
+  const inspectorToggle = button("Inspector", "editorInspectorToggleBtn", toggleInspector);
+  inspectorToggle.setAttribute("aria-controls", "rightSidebar");
+  inspectorToggle.setAttribute("aria-expanded", String(
+    globalThis.matchMedia("(max-width: 1023px)").matches
+      ? documentRef.body.classList.contains("right-drawer-open")
+      : !documentRef.body.classList.contains("right-sidebar-collapsed")
+  ));
+  topActions.append(inspectorToggle);
   for (const id of ["workspaceSaveBtn", "workspaceExportBtn", "scenarioGuideBtn", "workspaceGithubLink", "btnToggleLang", "rightSidebarAccountShelf"]) move(id, topActions);
   const strategyBtn = button("Edit annotations", "editorStrategicModeBtn", () => {
     const active = !documentRef.body.classList.contains("frontline-mode-active");

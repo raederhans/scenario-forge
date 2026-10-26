@@ -1,6 +1,38 @@
 const { test, expect } = require("@playwright/test");
 const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require("./support/playwright-app");
 
+test("shell layout keeps the map wide across compact and wide widths", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.setViewportSize({ width: 375, height: 812 });
+  await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+  await waitForRenderIdle(page);
+  await expect.poll(() => page.locator("#map-canvas").evaluate((canvas) => {
+    const rect = canvas.getBoundingClientRect();
+    return Math.abs(rect.left + rect.width / 2 - innerWidth / 2);
+  })).toBeLessThanOrEqual(20);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+
+  for (const width of [1024, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
+    await waitForAppInteractive(page);
+    await waitForRenderIdle(page);
+    await expect.poll(() => page.locator("#mapContainer").evaluate((node) => node.getBoundingClientRect().width), {
+      message: `map width at ${width}px`,
+    }).toBeGreaterThanOrEqual(width === 1024 ? 700 : width * 0.55);
+    if (width === 1024) {
+      await expect(page.locator("body")).toHaveClass(/right-sidebar-collapsed/);
+      await page.locator("#toolSelectBtn").click();
+      const point = await page.evaluate(() => globalThis.__scenarioForgeTestApi.screenPointForLonLat(121.5, -25.5));
+      expect(point).toBeTruthy();
+      await page.mouse.click(point.x, point.y);
+      await expect.poll(() => page.evaluate(() => globalThis.__scenarioForgeTestApi.selection().selectedInspectorCountryCode)).not.toBe("");
+      await expect(page.locator("body")).not.toHaveClass(/right-sidebar-collapsed/);
+    }
+  }
+});
+
 async function expectDockCommandsToFit(page, width) {
   const ids = ["toolSelectBtn", "toolFillBtn", "toolEraserBtn", "toolEyedropperBtn", "brushModeBtn",
     "undoBtn", "redoBtn", "presetPolitical", "paintModeVisualBtn", "selectedColorPreview"];

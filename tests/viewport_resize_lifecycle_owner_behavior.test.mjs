@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createViewportResizeLifecycleOwner } from "../js/core/renderer/viewport_resize_lifecycle_owner.js";
+import { createViewportReadModelOwner } from "../js/core/renderer/viewport_read_model_owner.js";
 
 function createHarness({
   mapContainer = { clientWidth: 800, clientHeight: 600 },
@@ -423,6 +424,48 @@ test("interactive layout resize sets phase centers content and defers spatial re
     "scheduleDeferredWork",
     "scheduleRenderPhaseIdle",
   ]);
+});
+
+test("phone container resize centers projected content using the new 375px viewport", () => {
+  const state = { width: 1440, height: 900 };
+  const container = { clientWidth: 375, clientHeight: 716 };
+  const fittedBounds = { minX: 16, maxX: 351, minY: 180, maxY: 500 };
+  let fittedViewport;
+  let transform;
+  const readModel = createViewportReadModelOwner({
+    getters: { getViewportDimensions: () => state },
+    capabilities: {
+      getProjectedRenderableContentBoundsSnapshots: () => [fittedBounds],
+      createZoomTransform: (value) => value,
+    },
+  });
+  const owner = createViewportResizeLifecycleOwner({
+    state,
+    getters: { getMapContainer: () => container },
+    effects: {
+      setCanvasSize() {
+        state.width = container.clientWidth;
+        state.height = container.clientHeight;
+        return true;
+      },
+      fitProjection() {
+        fittedViewport = { width: state.width, height: state.height };
+      },
+      resetZoomToFit({ centerContent, centerX, centerY }) {
+        assert.equal(centerContent, true);
+        transform = readModel.getCenteredFitZoomTransform({ centerX, centerY });
+      },
+      enforceZoomConstraints() {
+        assert.fail("container refit must preserve its centered translation");
+      },
+    },
+  });
+
+  owner.handleResize("map-container-resize");
+
+  assert.deepEqual(fittedViewport, { width: 375, height: 716 });
+  assert.equal((fittedBounds.minX + fittedBounds.maxX) / 2 + transform.x, 187.5);
+  assert.equal(transform.y, 0);
 });
 
 test("standard resize enforces zoom constraints after reset", () => {

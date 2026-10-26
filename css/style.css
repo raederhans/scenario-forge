@@ -396,7 +396,7 @@ body.transport-workbench-open.right-drawer-open::after {
 .left-sidebar-collapse-btn,
 .right-sidebar-collapse-btn {
   position: absolute;
-  top: 50%;
+  top: 12px;
   z-index: 31;
   display: inline-flex;
   align-items: center;
@@ -420,12 +420,12 @@ body.transport-workbench-open.right-drawer-open::after {
 
 .left-sidebar-collapse-btn {
   right: 0;
-  transform: translate(50%, -50%);
+  transform: translateX(50%);
 }
 
 .right-sidebar-collapse-btn {
   left: 0;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
 }
 
 .left-sidebar-collapse-btn:hover,
@@ -500,7 +500,7 @@ body.transport-workbench-open.right-drawer-open::after {
   }
 
   body.left-sidebar-collapsed .left-sidebar-collapse-btn {
-    transform: translate(calc(100% + 10px), -50%);
+    transform: translateX(calc(100% + 10px));
   }
 
   body.right-sidebar-collapsed .sidebar-right {
@@ -522,7 +522,7 @@ body.transport-workbench-open.right-drawer-open::after {
   }
 
   body.right-sidebar-collapsed .right-sidebar-collapse-btn {
-    transform: translate(calc(-100% - 10px), -50%);
+    transform: translateX(calc(-100% - 10px));
   }
 }
 

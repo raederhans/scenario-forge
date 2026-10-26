@@ -141,7 +141,7 @@ test("scenario context bar refresh owns labels, selection chip, and safe width",
   assert.equal(nodes.scenarioContextCollapseBtn.textContent, "-");
   assert.equal(nodes.scenarioTransportWorkbenchBtn.textContent, "Transport");
   assert.equal(nodes.scenarioTransportWorkbenchBtn.attributes.get("title"), "Open transport workbench");
-  assert.equal(nodes.scenarioContextBar.style.values.get("--scenario-bar-safe-max-width"), "426px");
+  assert.equal(nodes.scenarioContextBar.style.values.get("--scenario-bar-safe-max-width"), "420px");
   assert.equal(nodes.scenarioContextBar.classList.contains("is-overlay-constrained"), true);
   assert.equal(nodes.scenarioContextBar.classList.contains("is-narrow"), false);
   assert.equal(runtimeState.languageRefreshCount, 1);

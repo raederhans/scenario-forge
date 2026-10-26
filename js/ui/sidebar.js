@@ -2384,6 +2384,9 @@ function initSidebar({ render } = {}) {
     rightSidebarContent?.toggleAttribute("inert", effectiveCollapsed);
     rightSidebarContent?.setAttribute("aria-hidden", effectiveCollapsed ? "true" : "false");
     rightSidebarCollapseBtn?.setAttribute("aria-expanded", effectiveCollapsed ? "false" : "true");
+    document.getElementById("editorInspectorToggleBtn")?.setAttribute("aria-expanded", String(
+      canCollapseRightSidebar() ? !effectiveCollapsed : document.body.classList.contains("right-drawer-open")
+    ));
     const nextSidebarLabel = effectiveCollapsed ? "Expand right sidebar" : "Collapse right sidebar";
     rightSidebarCollapseBtn?.setAttribute("data-i18n-aria-label", nextSidebarLabel);
     rightSidebarCollapseBtn?.setAttribute("aria-label", t(nextSidebarLabel, "ui"));
@@ -2413,10 +2416,11 @@ function initSidebar({ render } = {}) {
   };
 
   const restoreRightSidebarCollapsedState = () => {
+    rightSidebarCollapsePreference = globalThis.matchMedia("(min-width:1024px) and (max-width:1279px)").matches;
     try {
-      rightSidebarCollapsePreference = globalThis.localStorage?.getItem(RIGHT_SIDEBAR_COLLAPSED_KEY) === "true";
+      const saved = globalThis.localStorage?.getItem(RIGHT_SIDEBAR_COLLAPSED_KEY);
+      if (saved !== null && saved !== undefined) rightSidebarCollapsePreference = saved === "true";
     } catch (_error) {
-      rightSidebarCollapsePreference = false;
     }
     setRightSidebarCollapsed(rightSidebarCollapsePreference, { persist: false, refreshLayout: false });
   };
@@ -3802,6 +3806,9 @@ function initSidebar({ render } = {}) {
       const value = String(runtimeState[field] || "");
       if (value && value !== lastEditorSelection[kind] && !document.body.classList.contains("frontline-mode-active")) {
         editorWorkspace?.showProperty(kind);
+        if (runtimeState.currentTool === "select" && document.body.classList.contains("right-sidebar-collapsed")) {
+          setRightSidebarCollapsed(false);
+        }
       }
       lastEditorSelection[kind] = value;
     }
@@ -3956,6 +3963,10 @@ function initSidebar({ render } = {}) {
   renderScenarioAuditPanel();
   editorWorkspace = initEditorWorkspace({
     initialSearch: initialWorkspaceSearch,
+    toggleInspector: () => {
+      if (canCollapseRightSidebar()) setRightSidebarCollapsed(!rightSidebarCollapsePreference);
+      else callRuntimeHook(state, "toggleRightPanelFn");
+    },
     revealProperties: () => {
       if (document.body.classList.contains("right-sidebar-collapsed")) setRightSidebarCollapsed(false);
       if (globalThis.matchMedia("(max-width: 1023px)").matches) {

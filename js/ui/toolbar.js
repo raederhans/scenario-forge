@@ -763,6 +763,11 @@ function initToolbar({ render } = {}) {
   const syncPanelToggleButtons = () => {
     leftPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("left-drawer-open")));
     rightPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("right-drawer-open")));
+    document.getElementById("editorInspectorToggleBtn")?.setAttribute("aria-expanded", String(
+      drawerMedia.matches
+        ? document.body.classList.contains("right-drawer-open")
+        : !document.body.classList.contains("right-sidebar-collapsed")
+    ));
     let openDrawer = false;
     for (const side of ["left", "right"]) {
       const sidebar = document.getElementById(`${side}Sidebar`);

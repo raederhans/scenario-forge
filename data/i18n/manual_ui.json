@@ -1,4 +1,6 @@
 {
+  "Mode": "模式",
+  "Country": "国家",
   "Population heatmap could not be loaded. Retry.": "人口热力加载失败，请重试。",
   "Loading population heatmap…": "正在加载人口热力…",
   "Showing overview; refining this view…": "已显示全局概览，正在细化当前视野…",
