@@ -1654,6 +1654,18 @@
           "en": "Young County",
           "zh": "扬县"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48009": {
+            "en": "Archer County",
+            "zh": "阿彻县"
+          },
+          "US_CNTY_48503": {
+            "en": "Young County",
+            "zh": "扬县"
+          }
+        }
       }
     },
     {
@@ -1715,7 +1727,15 @@
         "zh": "阿塔斯科萨、活橡木"
       },
       "name_source": "population",
-      "representative_id": "US_CNTY_48013"
+      "representative_id": "US_CNTY_48013",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48297": {
+            "en": "Live Oak County",
+            "zh": "利夫奥克县"
+          }
+        }
+      }
     },
     {
       "id": "US_MRG_8831594160d2",
@@ -1776,7 +1796,15 @@
         "zh": "贝利、黑尔、羊肉"
       },
       "name_source": "population",
-      "representative_id": "US_CNTY_48189"
+      "representative_id": "US_CNTY_48189",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48279": {
+            "en": "Lamb County",
+            "zh": "兰姆县"
+          }
+        }
+      }
     },
     {
       "id": "US_MRG_a94a72637172",
@@ -1931,7 +1959,15 @@
         "zh": "布里斯科、大厅、斯威舍尔"
       },
       "name_source": "population",
-      "representative_id": "US_CNTY_48437"
+      "representative_id": "US_CNTY_48437",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48191": {
+            "en": "Hall County",
+            "zh": "霍尔县"
+          }
+        }
+      }
     },
     {
       "id": "US_MRG_de187e0e2d96",
@@ -1987,7 +2023,15 @@
         "zh": "棕色的、米尔斯"
       },
       "name_source": "city",
-      "representative_id": "US_CNTY_48049"
+      "representative_id": "US_CNTY_48049",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48049": {
+            "en": "Brown County",
+            "zh": "布朗县"
+          }
+        }
+      }
     },
     {
       "id": "US_MRG_954f62972ce9",
@@ -2025,6 +2069,14 @@
         "tno_1962": {
           "en": "Williamson County (Texas)",
           "zh": "威廉姆森县（德克萨斯州）"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48491": {
+            "en": "Williamson County",
+            "zh": "威廉姆森县"
+          }
         }
       }
     },
@@ -2120,7 +2172,15 @@
         "zh": "营、格雷格、厄普舒尔"
       },
       "name_source": "city",
-      "representative_id": "US_CNTY_48183"
+      "representative_id": "US_CNTY_48183",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48063": {
+            "en": "Camp County",
+            "zh": "坎普县"
+          }
+        }
+      }
     },
     {
       "id": "US_MRG_799779e62499",
@@ -2210,6 +2270,14 @@
           "en": "Wise County",
           "zh": "怀斯县"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48497": {
+            "en": "Wise County",
+            "zh": "怀斯县"
+          }
+        }
       }
     },
     {
@@ -2282,6 +2350,22 @@
           "en": "Runnels County",
           "zh": "兰纳尔斯县"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48081": {
+            "en": "Coke County",
+            "zh": "科克县"
+          },
+          "US_CNTY_48399": {
+            "en": "Runnels County",
+            "zh": "兰纳尔斯县"
+          },
+          "US_CNTY_48431": {
+            "en": "Sterling County",
+            "zh": "斯特灵县"
+          }
+        }
       }
     },
     {
@@ -2320,6 +2404,14 @@
         "tno_1962": {
           "en": "Wharton County",
           "zh": "沃顿县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48481": {
+            "en": "Wharton County",
+            "zh": "沃顿县"
+          }
         }
       }
     },
@@ -2514,6 +2606,14 @@
         "tno_1962": {
           "en": "Crane County",
           "zh": "克兰县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48103": {
+            "en": "Crane County",
+            "zh": "克兰县"
+          }
         }
       }
     },
@@ -2726,6 +2826,14 @@
         "tno_1962": {
           "en": "Gray County",
           "zh": "格雷县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48179": {
+            "en": "Gray County",
+            "zh": "格雷县"
+          }
         }
       }
     },
@@ -2966,7 +3074,19 @@
         "zh": "爬坡道、石灰石、纳瓦罗"
       },
       "name_source": "population",
-      "representative_id": "US_CNTY_48349"
+      "representative_id": "US_CNTY_48349",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48217": {
+            "en": "Hill County",
+            "zh": "希尔县"
+          },
+          "US_CNTY_48293": {
+            "en": "Limestone County",
+            "zh": "莱姆斯通县"
+          }
+        }
+      }
     },
     {
       "id": "US_MRG_f694e67d7337",
@@ -2999,6 +3119,14 @@
         "tno_1962": {
           "en": "Hood County",
           "zh": "胡德县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48221": {
+            "en": "Hood County",
+            "zh": "胡德县"
+          }
         }
       }
     },
@@ -3038,6 +3166,14 @@
         "tno_1962": {
           "en": "Jasper County",
           "zh": "贾斯珀县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48241": {
+            "en": "Jasper County",
+            "zh": "贾斯珀县"
+          }
         }
       }
     },
@@ -3189,7 +3325,19 @@
         "zh": "国王、诺克斯、石墙"
       },
       "name_source": "population",
-      "representative_id": "US_CNTY_48275"
+      "representative_id": "US_CNTY_48275",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48269": {
+            "en": "King County",
+            "zh": "金县"
+          },
+          "US_CNTY_48433": {
+            "en": "Stonewall County",
+            "zh": "斯通沃尔县"
+          }
+        }
+      }
     },
     {
       "id": "US_MRG_6cd8d362b705",
@@ -3301,7 +3449,15 @@
         "zh": "拉诺、石匠"
       },
       "name_source": "population",
-      "representative_id": "US_CNTY_48299"
+      "representative_id": "US_CNTY_48299",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48319": {
+            "en": "Mason County",
+            "zh": "梅森县"
+          }
+        }
+      }
     },
     {
       "id": "US_MRG_bd1072ae78b5",
@@ -3334,6 +3490,14 @@
         "tno_1962": {
           "en": "Uvalde County",
           "zh": "尤瓦尔迪县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48463": {
+            "en": "Uvalde County",
+            "zh": "尤瓦尔迪县"
+          }
         }
       }
     },
@@ -3374,6 +3538,14 @@
           "en": "Scurry County",
           "zh": "斯卡里县"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48415": {
+            "en": "Scurry County",
+            "zh": "斯卡里县"
+          }
+        }
       }
     },
     {
@@ -3402,7 +3574,15 @@
         "zh": "波尔克、三位一体"
       },
       "name_source": "population",
-      "representative_id": "US_CNTY_48373"
+      "representative_id": "US_CNTY_48373",
+      "scenario_member_names": {
+        "tno_1962": {
+          "US_CNTY_48455": {
+            "en": "Trinity County",
+            "zh": "特里尼蒂县"
+          }
+        }
+      }
     },
     {
       "id": "US_MRG_5a47c06a2dc5",
@@ -3891,6 +4071,14 @@
           "en": "Khmilnyk",
           "zh": "赫米利尼克"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B34104046396179": {
+            "en": "Khmilnyk",
+            "zh": "赫米利尼克"
+          }
+        }
       }
     },
     {
@@ -4047,6 +4235,14 @@
           "en": "Berdychiv",
           "zh": "别尔季切夫"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B58798821419341": {
+            "en": "Berdychiv",
+            "zh": "别尔季切夫"
+          }
+        }
       }
     },
     {
@@ -4136,7 +4332,15 @@
         "zh": "克罗佩夫尼茨基、博布里内茨"
       },
       "name_source": "population",
-      "representative_id": "UA_RAY_74538382B51817175452920"
+      "representative_id": "UA_RAY_74538382B51817175452920",
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B5065610238765": {
+            "en": "Eichhornburg",
+            "zh": "艾希霍恩堡"
+          }
+        }
+      }
     },
     {
       "id": "UA_MRG_d727a8cfaa69",
@@ -4291,7 +4495,15 @@
         "zh": "米尔哥罗德、哈迪亚克、津基夫"
       },
       "name_source": "population",
-      "representative_id": "UA_RAY_74538382B63112784365900"
+      "representative_id": "UA_RAY_74538382B63112784365900",
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B87722024081340": {
+            "en": "Hadiach",
+            "zh": "哈佳奇"
+          }
+        }
+      }
     },
     {
       "id": "UA_MRG_2d1c37bdd071",

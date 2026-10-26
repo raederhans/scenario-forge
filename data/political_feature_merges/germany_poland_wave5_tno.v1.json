@@ -1039,7 +1039,17 @@
           "zh": "文钦斯基"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Lublin · Southwest",
+          "zh": "卢布林·西南部"
+        }
+      },
+      "previous_names": {
+        "en": "Lublin · Southwest",
+        "zh": "卢布林省·西南部"
+      }
     },
     {
       "id": "PL_MRG_4df6ad2dc703",
@@ -1062,7 +1072,17 @@
           "zh": "扎莫施"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Lublin · South",
+          "zh": "卢布林·南部"
+        }
+      },
+      "previous_names": {
+        "en": "Lublin · South",
+        "zh": "卢布林省·南部"
+      }
     },
     {
       "id": "PL_MRG_c5cfb391c06f",
@@ -1085,7 +1105,17 @@
           "zh": "卢科夫斯基"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Lublin · Northwest",
+          "zh": "卢布林·西北部"
+        }
+      },
+      "previous_names": {
+        "en": "Lublin · Northwest",
+        "zh": "卢布林省·西北部"
+      }
     },
     {
       "id": "PL_MRG_be82540e6cf0",
@@ -1108,7 +1138,17 @@
           "zh": "格涅兹诺"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Großpolen · North",
+          "zh": "大波兰·北部"
+        }
+      },
+      "previous_names": {
+        "en": "Greater Poland · North",
+        "zh": "大波兰省·北部"
+      }
     },
     {
       "id": "PL_MRG_36976cf4d062",
@@ -1131,7 +1171,17 @@
           "zh": "科宁斯基"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Großpolen · East",
+          "zh": "大波兰·东部"
+        }
+      },
+      "previous_names": {
+        "en": "Greater Poland · East",
+        "zh": "大波兰省·东部"
+      }
     },
     {
       "id": "PL_MRG_d33963acec0d",
@@ -1164,7 +1214,17 @@
           "zh": "卡利什"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Großpolen · Central",
+          "zh": "大波兰·中部"
+        }
+      },
+      "previous_names": {
+        "en": "Greater Poland · Central",
+        "zh": "大波兰省·中部"
+      }
     },
     {
       "id": "PL_MRG_05f1ad6eedaa",
@@ -1222,7 +1282,17 @@
           "zh": "塔尔诺"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Kleinpolen · North",
+          "zh": "小波兰·北部"
+        }
+      },
+      "previous_names": {
+        "en": "Lesser Poland · North",
+        "zh": "小波兰省·北部"
+      }
     },
     {
       "id": "PL_MRG_44c900e7cbdd",
@@ -1255,7 +1325,17 @@
           "zh": "维索基马佐维茨基"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Podlachien · Southwest",
+          "zh": "波德拉谢·西南部"
+        }
+      },
+      "previous_names": {
+        "en": "Podlaskie · Southwest",
+        "zh": "波德拉谢省·西南部"
+      }
     },
     {
       "id": "PL_MRG_81a04ac05a78",
@@ -1313,7 +1393,25 @@
           "zh": "谢德尔采"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Masowien · East",
+          "zh": "马佐夫舍·东部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "PL_POW_1464": {
+            "en": "Siedlce",
+            "zh": "泽德莱茨"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Masovian · East",
+        "zh": "马佐夫舍省·东部"
+      }
     },
     {
       "id": "PL_MRG_328be0e18e73",
@@ -1351,7 +1449,17 @@
           "zh": "索哈切夫斯基"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Masowien · South 1",
+          "zh": "马佐夫舍·南部1"
+        }
+      },
+      "previous_names": {
+        "en": "Masovian · South 1",
+        "zh": "马佐夫舍省·南部1"
+      }
     },
     {
       "id": "PL_MRG_4a7fdf2f215b",
@@ -1384,7 +1492,17 @@
           "zh": "科齐尼茨基"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Masowien · South 2",
+          "zh": "马佐夫舍·南部2"
+        }
+      },
+      "previous_names": {
+        "en": "Masovian · South 2",
+        "zh": "马佐夫舍省·南部2"
+      }
     },
     {
       "id": "PL_MRG_eb17d6c2a513",
@@ -1417,7 +1535,17 @@
           "zh": "格沃戈夫斯基"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Niederschlesien · Northwest",
+          "zh": "下西里西亚·西北部"
+        }
+      },
+      "previous_names": {
+        "en": "Lower Silesian · Northwest",
+        "zh": "下西里西亚省·西北部"
+      }
     },
     {
       "id": "PL_MRG_e9f1a2130857",
@@ -1470,7 +1598,17 @@
           "zh": "瓦乌布日赫"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Niederschlesien · Central",
+          "zh": "下西里西亚·中部"
+        }
+      },
+      "previous_names": {
+        "en": "Lower Silesian · Central",
+        "zh": "下西里西亚省·中部"
+      }
     },
     {
       "id": "PL_MRG_3692a96e99b1",
@@ -1528,7 +1666,17 @@
           "zh": "佩特里考"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Litzmannstadt · East",
+          "zh": "利茨曼施塔特·东部"
+        }
+      },
+      "previous_names": {
+        "en": "Łódź · East",
+        "zh": "罗兹省·东部"
+      }
     },
     {
       "id": "PL_MRG_eb6bfbc84cb1",
@@ -1566,7 +1714,17 @@
           "zh": "卡尔图齐"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Pommerellen · Central",
+          "zh": "波美雷利亚·中部"
+        }
+      },
+      "previous_names": {
+        "en": "Pomeranian · Central",
+        "zh": "滨海省·中部"
+      }
     },
     {
       "id": "PL_MRG_d43cd846ec6f",
@@ -1614,7 +1772,17 @@
           "zh": "兹盖尔兹"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Litzmannstadt · Northwest",
+          "zh": "利茨曼施塔特·西北部"
+        }
+      },
+      "previous_names": {
+        "en": "Łódź · Northwest",
+        "zh": "罗兹省·西北部"
+      }
     },
     {
       "id": "PL_MRG_c908eb11c602",
@@ -1637,7 +1805,17 @@
           "zh": "奥尔什丁（瓦尔米亚-马祖里省）"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Ermland-Masuren · Central",
+          "zh": "瓦尔米亚-马祖里·中部"
+        }
+      },
+      "previous_names": {
+        "en": "Warmian-Masurian · Central",
+        "zh": "瓦尔米亚-马祖里省·中部"
+      }
     },
     {
       "id": "PL_MRG_7e3204328b62",
@@ -1695,7 +1873,17 @@
           "zh": "斯特日佐夫斯基"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Karpatenvorland · Northwest",
+          "zh": "喀尔巴阡山麓·西北部"
+        }
+      },
+      "previous_names": {
+        "en": "Subcarpathian · Northwest",
+        "zh": "喀尔巴阡山省·西北部"
+      }
     },
     {
       "id": "PL_MRG_48e6927d3544",
@@ -1738,7 +1926,17 @@
           "zh": "弗沃茨瓦韦克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Kujawien-Pommern · Southwest",
+          "zh": "库亚维-波美拉尼亚·西南部"
+        }
+      },
+      "previous_names": {
+        "en": "Kuyavian-Pomeranian · Southwest",
+        "zh": "库亚维-滨海省·西南部"
+      }
     },
     {
       "id": "PL_MRG_ce21dcd4a2c0",
@@ -1771,7 +1969,17 @@
           "zh": "格鲁齐亚兹"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Kujawien-Pommern · North",
+          "zh": "库亚维-波美拉尼亚·北部"
+        }
+      },
+      "previous_names": {
+        "en": "Kuyavian-Pomeranian · North",
+        "zh": "库亚维-滨海省·北部"
+      }
     },
     {
       "id": "PL_MRG_4762ef33a34f",
@@ -1804,7 +2012,17 @@
           "zh": "斯塔佐夫斯基"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Heiligkreuz · East",
+          "zh": "圣十字·东部"
+        }
+      },
+      "previous_names": {
+        "en": "Holy Cross · East",
+        "zh": "圣十字省·东部"
+      }
     },
     {
       "id": "PL_MRG_f3a4768ac693",
@@ -1832,7 +2050,17 @@
           "zh": "沃什佐夫斯基"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Heiligkreuz · West",
+          "zh": "圣十字·西部"
+        }
+      },
+      "previous_names": {
+        "en": "Holy Cross · West",
+        "zh": "圣十字省·西部"
+      }
     },
     {
       "id": "PL_MRG_afde07ef7e52",
@@ -1865,7 +2093,17 @@
           "zh": "斯塔加德"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Westpommern · West",
+          "zh": "西波美拉尼亚·西部"
+        }
+      },
+      "previous_names": {
+        "en": "West Pomeranian · West",
+        "zh": "西滨海省·西部"
+      }
     },
     {
       "id": "PL_MRG_50494ed51da4",
@@ -1888,7 +2126,17 @@
           "zh": "科沃布热格"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Westpommern · Northeast",
+          "zh": "西波美拉尼亚·东北部"
+        }
+      },
+      "previous_names": {
+        "en": "West Pomeranian · Northeast",
+        "zh": "西滨海省·东北部"
+      }
     },
     {
       "id": "PL_MRG_8119670edfb9",
@@ -1971,7 +2219,17 @@
           "zh": "蒂黑"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Oberschlesien · South",
+          "zh": "上西里西亚·南部"
+        }
+      },
+      "previous_names": {
+        "en": "Silesian · South",
+        "zh": "西里西亚省·南部"
+      }
     },
     {
       "id": "PL_MRG_fe627fbb2f9c",
@@ -2024,7 +2282,17 @@
           "zh": "普沃茨克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Masowien · Northwest",
+          "zh": "马佐夫舍·西北部"
+        }
+      },
+      "previous_names": {
+        "en": "Masovian · Northwest",
+        "zh": "马佐夫舍省·西北部"
+      }
     },
     {
       "id": "PL_MRG_c16eaf95213a",
@@ -2057,7 +2325,25 @@
           "zh": "奥波莱"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Oppeln · Central",
+          "zh": "奥珀伦·中部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "PL_POW_1661": {
+            "en": "Opole",
+            "zh": "奥珀恩"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Opole · Central",
+        "zh": "奥波莱省·中部"
+      }
     },
     {
       "id": "PL_MRG_6143971238b3",
@@ -2090,7 +2376,17 @@
           "zh": "丹布罗瓦·戈尔尼察"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Oberschlesien · Northeast",
+          "zh": "上西里西亚·东北部"
+        }
+      },
+      "previous_names": {
+        "en": "Silesian · Northeast",
+        "zh": "西里西亚省·东北部"
+      }
     }
   ],
   "split_or_reduced_candidates": [

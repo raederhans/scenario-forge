@@ -87,7 +87,15 @@
         "zh": "约克郡东区、北约克郡"
       },
       "name_source": "city",
-      "representative_id": "UKE22"
+      "representative_id": "UKE22",
+      "scenario_member_names": {
+        "tno_1962": {
+          "UKE22": {
+            "en": "North Yorkshire",
+            "zh": "北约克郡"
+          }
+        }
+      }
     },
     {
       "id": "UK_MRG_5adcc0eef3cd",
@@ -293,7 +301,15 @@
         "zh": "哈克尼和纽汉姆、陶尔哈姆莱茨"
       },
       "name_source": "population",
-      "representative_id": "UKI41"
+      "representative_id": "UKI41",
+      "scenario_member_names": {
+        "tno_1962": {
+          "UKI42": {
+            "en": "Tower Hamlets",
+            "zh": "塔村区"
+          }
+        }
+      }
     },
     {
       "id": "UK_MRG_b91d40f3e558",
@@ -504,7 +520,15 @@
         "zh": "因弗克莱德、东伦弗鲁郡和伦弗鲁郡、东艾尔郡和北艾尔郡大陆、南艾尔郡"
       },
       "name_source": "city",
-      "representative_id": "UKM83"
+      "representative_id": "UKM83",
+      "scenario_member_names": {
+        "tno_1962": {
+          "UKM93": {
+            "en": "East Ayrshire and North Ayrshire mainland",
+            "zh": "东艾尔郡与北艾尔郡本土"
+          }
+        }
+      }
     },
     {
       "id": "UK_MRG_4bda76985a93",
@@ -537,7 +561,15 @@
         "zh": "安特里姆和纽敦阿比、利斯本和卡斯尔雷、安特里姆中东部"
       },
       "name_source": "population",
-      "representative_id": "UKN0D"
+      "representative_id": "UKN0D",
+      "scenario_member_names": {
+        "tno_1962": {
+          "UKN0E": {
+            "en": "Lisburn and Castlereagh",
+            "zh": "利斯伯恩与卡斯尔雷"
+          }
+        }
+      }
     },
     {
       "id": "CZ_MRG_23d7414d33c7",
@@ -1498,7 +1530,15 @@
         "zh": "罗斯基、斯基尔涅维奇、斯基尔涅维采"
       },
       "name_source": "population",
-      "representative_id": "PL_POW_1013"
+      "representative_id": "PL_POW_1013",
+      "scenario_member_names": {
+        "tno_1962": {
+          "PL_POW_1063": {
+            "en": "Skierniewice",
+            "zh": "斯基尔内维茨"
+          }
+        }
+      }
     },
     {
       "id": "PL_MRG_672367948ccf",
@@ -3959,7 +3999,15 @@
         "zh": "谢尔普霍夫斯基区、海德施塔特"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B18050530060536"
+      "representative_id": "RU_RAY_50074027B18050530060536",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B78363579504678": {
+            "en": "Heidestadt",
+            "zh": "海德施塔特"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_ff5cc5b501e4",
@@ -4198,7 +4246,15 @@
         "zh": "纳罗-福明斯基区、伊斯特林斯基区、鲁兹斯基区"
       },
       "name_source": "city",
-      "representative_id": "RU_RAY_50074027B22082895013138"
+      "representative_id": "RU_RAY_50074027B22082895013138",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B22082895013138": {
+            "en": "Woskressensk",
+            "zh": "沃斯克列先斯克"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_4810f49b101a",
@@ -6153,7 +6209,15 @@
         "zh": "梅林科夫斯基区、古斯-赫鲁斯塔尼区、古斯赫鲁斯特尔内"
       },
       "name_source": "city",
-      "representative_id": "RU_RAY_50074027B92950284592103"
+      "representative_id": "RU_RAY_50074027B92950284592103",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B92950284592103": {
+            "en": "Gus-Khrustalny",
+            "zh": "古斯赫鲁斯特尔内"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_8bae009baf0d",
@@ -6764,6 +6828,14 @@
           "en": "Izium",
           "zh": "伊久姆"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B31027470477493": {
+            "en": "Izium",
+            "zh": "伊久姆"
+          }
+        }
       }
     },
     {
@@ -6825,6 +6897,14 @@
         "tno_1962": {
           "en": "Boryspil",
           "zh": "博里斯波尔"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B74226948291525": {
+            "en": "Boryspil",
+            "zh": "博里斯波尔"
+          }
         }
       }
     },
@@ -6920,7 +7000,15 @@
         "zh": "兹米夫、佩尔沃迈斯基、楚胡伊夫"
       },
       "name_source": "population",
-      "representative_id": "UA_RAY_74538382B19382473130603"
+      "representative_id": "UA_RAY_74538382B19382473130603",
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B29130308321511": {
+            "en": "Chuhuiv",
+            "zh": "楚古耶夫"
+          }
+        }
+      }
     },
     {
       "id": "UA_MRG_72c94a3ccd70",
@@ -6986,7 +7074,15 @@
         "zh": "科斯蒂安特尼夫卡、巴克穆特、莱曼"
       },
       "name_source": "population",
-      "representative_id": "UA_RAY_74538382B19842336540914"
+      "representative_id": "UA_RAY_74538382B19842336540914",
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B24070697851653": {
+            "en": "Bakhmut",
+            "zh": "萨尔茨施塔特"
+          }
+        }
+      }
     },
     {
       "id": "UA_MRG_98ce0c6febb4",
@@ -7047,6 +7143,14 @@
         "tno_1962": {
           "en": "Artsyz",
           "zh": "阿尔齐兹"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B21342332427534": {
+            "en": "Artsyz",
+            "zh": "阿尔齐兹"
+          }
         }
       }
     },
@@ -7668,6 +7772,14 @@
         "tno_1962": {
           "en": "Fastiv",
           "zh": "法斯托夫"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "UA_RAY_74538382B37624707153101": {
+            "en": "Fastiv",
+            "zh": "法斯托夫"
+          }
         }
       }
     },

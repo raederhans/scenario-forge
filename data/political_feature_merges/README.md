@@ -115,6 +115,28 @@ from `locales.json`, then scenario `geo_locale_patch.json` files, then the
 source topology name; they stay searchable as aliases. `--naming members`
 keeps the older joined names (`en` with ` + `, `zh` with `、`).
 
+A reviewed parent can carry its own name per scenario, for a region a scenario
+renames (TNO 1962's German-held oblasts and voivodeships, Karafuto, …):
+
+```json
+"RU_Kaliningrad": {"en": "Kaliningrad", "zh": "加里宁格勒州",
+                   "scenarios": {"tno_1962": {"en": "Königsberg", "zh": "柯尼斯堡"}}}
+```
+
+`names` keep the global parent (they go into `locales.json`); each scenario of
+the plan's scope with its own parent gets `scenario_names.<scenario>`
+(`Königsberg · Central` / `柯尼斯堡·中部`), which the apply tool writes into that
+scenario's `geo_locale_patch*.json`. After editing `parent_names.json`, refresh
+applied plans in place and re-project only the names:
+
+```
+python tools/build_political_feature_merge_plan.py --rename-parents <plan> [<plan> ...]
+python tools/apply_political_feature_merges.py --scenario tno_1962 --rename-only <changed plan> [...]
+```
+
+`--rename-parents` keeps IDs, members and global names, records the projected
+names as `previous_names`, and prints the plans it changed.
+
 ### Representative names
 
 `--naming representative` names a group after one place

@@ -54,7 +54,25 @@
           "zh": "蒂恩豪特区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Antwerpen · Central",
+          "zh": "安特卫普省·中部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "BE212": {
+            "en": "Bezirk Mecheln",
+            "zh": "梅赫伦"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Antwerp · Central",
+        "zh": "安特卫普省·中部"
+      }
     },
     {
       "id": "BE_MRG_a29e92a10668",
@@ -77,7 +95,25 @@
           "zh": "哈瑟尔特区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "BE223": {
+            "en": "Bezirk Tongern",
+            "zh": "通厄恩"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Bezirk Tongern",
+          "zh": "通厄恩"
+        }
+      },
+      "previous_names": {
+        "en": "Limburg · South",
+        "zh": "比利时林堡省·南部"
+      }
     },
     {
       "id": "BE_MRG_81cfb513b60d",
@@ -105,7 +141,25 @@
           "zh": "奥德纳尔德区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Ostflandern · South",
+          "zh": "东佛兰德省·南部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "BE232": {
+            "en": "Bezirk Dendermünde",
+            "zh": "登德明德"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "East Flanders · South",
+        "zh": "东佛兰德省·南部"
+      }
     },
     {
       "id": "BE_MRG_923fe66661e2",
@@ -133,7 +187,33 @@
           "zh": "菲尔讷区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Westflandern · North",
+          "zh": "西佛兰德省·北部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "BE251": {
+            "en": "Bezirk Brügge",
+            "zh": "布吕格"
+          },
+          "BE255": {
+            "en": "Bezirk Ostende",
+            "zh": "奥斯滕德"
+          },
+          "BE258": {
+            "en": "Bezirk Furnes",
+            "zh": "菲尔讷"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "West Flanders · North",
+        "zh": "西佛兰德省·北部"
+      }
     },
     {
       "id": "BE_MRG_7dbe84a470bd",
@@ -156,7 +236,25 @@
           "zh": "伊珀恩区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Westflandern · Southwest",
+          "zh": "西佛兰德省·西南部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "BE253": {
+            "en": "Bezirk Ypern",
+            "zh": "伊珀恩"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "West Flanders · Southwest",
+        "zh": "西佛兰德省·西南部"
+      }
     },
     {
       "id": "BE_MRG_24ed7b411331",
@@ -184,7 +282,33 @@
           "zh": "蒂尔特区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Westflandern · Southeast",
+          "zh": "西佛兰德省·东南部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "BE254": {
+            "en": "Bezirk Kortrijk",
+            "zh": "科特赖兴"
+          },
+          "BE256": {
+            "en": "Bezirk Russelaere",
+            "zh": "吕瑟拉勒"
+          },
+          "BE257": {
+            "en": "Bezirk Thielt",
+            "zh": "蒂尔特"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "West Flanders · Southeast",
+        "zh": "西佛兰德省·东南部"
+      }
     },
     {
       "id": "BE_MRG_f7a8cd5ecd9e",
@@ -217,7 +341,29 @@
           "zh": "蒂安区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Hennegau · Southeast",
+          "zh": "埃诺省·东南部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "BE323": {
+            "en": "Bezirk Bergen",
+            "zh": "贝亨"
+          },
+          "BE32C": {
+            "en": "Bezirk Zinnik",
+            "zh": "济尼克"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Hainaut · Southeast",
+        "zh": "埃诺省·东南部"
+      }
     },
     {
       "id": "BE_MRG_15f4aef6c612",
@@ -240,7 +386,29 @@
           "zh": "阿特区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Hennegau · Northwest",
+          "zh": "埃诺省·西北部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "BE328": {
+            "en": "Bezirk Doornik-Moeskroen",
+            "zh": "多尔尼克-穆斯克龙区"
+          },
+          "BE32A": {
+            "en": "Bezirk Aat",
+            "zh": "阿特"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Hainaut · Northwest",
+        "zh": "埃诺省·西北部"
+      }
     },
     {
       "id": "BE_MRG_49096f4ef44b",
@@ -273,7 +441,33 @@
           "zh": "费尔维耶德语共同体区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Lüttich · Central",
+          "zh": "吕蒂希省·中部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "BE331": {
+            "en": "Bezirk Hoei",
+            "zh": "胡伊"
+          },
+          "BE334": {
+            "en": "Bezirk Borgworm",
+            "zh": "博格沃姆"
+          },
+          "BE335": {
+            "en": "Bezirk Velwisch — Französische Gemeinden",
+            "zh": "费尔维施法语市镇"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Liege · Central",
+        "zh": "列日省·中部"
+      }
     },
     {
       "id": "BE_MRG_d49081148862",
@@ -301,7 +495,29 @@
           "zh": "讷沙托区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Luxemburg · South",
+          "zh": "比利时卢森堡省·南部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "BE341": {
+            "en": "Bezirk Arel",
+            "zh": "阿雷尔区"
+          },
+          "BE345": {
+            "en": "Bezirk Virton",
+            "zh": "维尔滕"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "Luxembourg · South",
+        "zh": "比利时卢森堡省·南部"
+      }
     },
     {
       "id": "BE_MRG_6a92ca76474d",
@@ -324,7 +540,25 @@
           "zh": "菲利普维尔区"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "BE352": {
+            "en": "Bezirk Namen",
+            "zh": "纳门"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Bezirk Namen",
+          "zh": "纳门"
+        }
+      },
+      "previous_names": {
+        "en": "Namur · Northwest",
+        "zh": "那慕尔省·西北部"
+      }
     },
     {
       "id": "NL_MRG_45a7250c2862",
@@ -347,7 +581,25 @@
           "zh": "代尔夫宰尔"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_member_names": {
+        "tno_1962": {
+          "NL112": {
+            "en": "Delfzijl en omgeving",
+            "zh": "代尔夫宰尔及周边"
+          }
+        }
+      },
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Delfzijl en omgeving",
+          "zh": "代尔夫宰尔及周边"
+        }
+      },
+      "previous_names": {
+        "en": "Groningen · Southeast",
+        "zh": "格罗宁根省·东南部"
+      }
     },
     {
       "id": "NL_MRG_39ca088797c0",
@@ -439,7 +691,17 @@
           "zh": "阿赫特霍克"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Geldern · Northeast",
+          "zh": "海尔德兰省·东北部"
+        }
+      },
+      "previous_names": {
+        "en": "Gelderland · Northeast",
+        "zh": "海尔德兰省·东北部"
+      }
     },
     {
       "id": "NL_MRG_19568adfd807",
@@ -467,7 +729,25 @@
           "zh": "阿尔克马尔"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Nordholland · West",
+          "zh": "北荷兰省·西部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "NL328": {
+            "en": "Alkmaar en omgeving",
+            "zh": "阿尔克马尔及周边"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "North Holland · West",
+        "zh": "北荷兰省·西部"
+      }
     },
     {
       "id": "NL_MRG_cfd8aead1a35",
@@ -490,7 +770,25 @@
           "zh": "东南荷兰"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Südholland · Northeast",
+          "zh": "南荷兰省·东北部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "NL33B": {
+            "en": "Oost-Zuid-Holland",
+            "zh": "南荷兰东部"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "South Holland · Northeast",
+        "zh": "南荷兰省·东北部"
+      }
     },
     {
       "id": "NL_MRG_99b7c61b066f",
@@ -518,7 +816,29 @@
           "zh": "北布拉班特东北部"
         }
       },
-      "name_source": "parent_direction"
+      "name_source": "parent_direction",
+      "scenario_names": {
+        "tno_1962": {
+          "en": "Nordbrabant · Central",
+          "zh": "北布拉班特省·中部"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "NL411": {
+            "en": "West-Noord-Brabant",
+            "zh": "北布拉班特西部"
+          },
+          "NL412": {
+            "en": "Midden-Noord-Brabant",
+            "zh": "北布拉班特中部"
+          }
+        }
+      },
+      "previous_names": {
+        "en": "North Brabant · Central",
+        "zh": "北布拉班特省·中部"
+      }
     },
     {
       "id": "NL_MRG_c127cb50cada",

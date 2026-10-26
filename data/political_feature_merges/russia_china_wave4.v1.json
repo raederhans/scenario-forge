@@ -64,7 +64,15 @@
         "zh": "乌斯季伊希姆斯基区、捷夫里斯基区、兹纳缅斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B25730099940493"
+      "representative_id": "RU_RAY_50074027B25730099940493",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B40650082048510": {
+            "en": "Znamensky District",
+            "zh": "兹纳缅斯基区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_bee0bb9c2edd",
@@ -214,7 +222,19 @@
         "zh": "比斯特罗斯托克区、彼得罗巴甫洛夫斯基区、斯摩棱斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B84951526666168"
+      "representative_id": "RU_RAY_50074027B84951526666168",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B19588857007790": {
+            "en": "Petropavlovsky District",
+            "zh": "彼得罗巴甫洛夫斯基区"
+          },
+          "RU_RAY_50074027B84951526666168": {
+            "en": "Smolensky District",
+            "zh": "斯摩棱斯基区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_6b0074e9f94b",
@@ -253,6 +273,18 @@
           "en": "Shikuka District",
           "zh": "敷香区"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B10653527260039": {
+            "en": "Esutoru District",
+            "zh": "惠须取区"
+          },
+          "RU_RAY_50074027B63762585695828": {
+            "en": "Shikuka District",
+            "zh": "敷香区"
+          }
+        }
       }
     },
     {
@@ -281,7 +313,15 @@
         "zh": "塔夫里切斯基区、亚速涅梅茨基国家区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B10746223441661"
+      "representative_id": "RU_RAY_50074027B10746223441661",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B79924738274126": {
+            "en": "Azovsky Nemetsky National District",
+            "zh": "亚速德意志民族区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_03fe31da4ec4",
@@ -393,7 +433,15 @@
         "zh": "基奇蒙斯科-戈罗杰茨基区、尼科利斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B49802974490397"
+      "representative_id": "RU_RAY_50074027B49802974490397",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B49802974490397": {
+            "en": "Nikolsky District",
+            "zh": "尼科利斯基区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_9db237a6b59e",
@@ -492,7 +540,15 @@
         "zh": "阿利科夫斯基区、红军区、齐维尔斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B65238711486063"
+      "representative_id": "RU_RAY_50074027B65238711486063",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B27185032673214": {
+            "en": "Krasnoarmeysky District",
+            "zh": "红军区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_f6312a148f5b",
@@ -647,7 +703,15 @@
         "zh": "斯拉夫哥罗德、塔本斯基区、德国国家区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B1336621418144"
+      "representative_id": "RU_RAY_50074027B1336621418144",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B72834669384190": {
+            "en": "German National District",
+            "zh": "德意志民族区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_e6e892e6d34d",
@@ -891,7 +955,23 @@
         "zh": "阿尼夫斯基区、本斗区、真冈区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B78352455339224"
+      "representative_id": "RU_RAY_50074027B78352455339224",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B1484336690213": {
+            "en": "Rutaka District",
+            "zh": "留多加区"
+          },
+          "RU_RAY_50074027B6845547292517": {
+            "en": "Honto District",
+            "zh": "本斗区"
+          },
+          "RU_RAY_50074027B78352455339224": {
+            "en": "Maoka District",
+            "zh": "真冈区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_76828e58eb68",
@@ -924,7 +1004,15 @@
         "zh": "阿尔加什斯基区、奥焦斯基、索斯诺夫斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B32271657283037"
+      "representative_id": "RU_RAY_50074027B32271657283037",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B908465227031": {
+            "en": "Sosnovsky District",
+            "zh": "索斯诺夫斯基区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_15c4c99da0ea",
@@ -985,7 +1073,23 @@
         "zh": "塔皮奥、拉比奥、因斯特堡"
       },
       "name_source": "city",
-      "representative_id": "RU_RAY_50074027B90959697167325"
+      "representative_id": "RU_RAY_50074027B90959697167325",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B15138360662510": {
+            "en": "Tapiau",
+            "zh": "塔皮奥"
+          },
+          "RU_RAY_50074027B20728982890731": {
+            "en": "Labiau",
+            "zh": "拉比奥"
+          },
+          "RU_RAY_50074027B90959697167325": {
+            "en": "Insterburg",
+            "zh": "因斯特堡"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_d5a146ea7ae0",
@@ -1051,7 +1155,15 @@
         "zh": "卡缅斯基区、扎列奇尼、别洛亚尔斯克"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B15595970902062"
+      "representative_id": "RU_RAY_50074027B15595970902062",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B15595970902062": {
+            "en": "Kamensky District",
+            "zh": "卡缅斯基区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_1c96074cd4b0",
@@ -1178,7 +1290,19 @@
         "zh": "古里耶夫斯基区、齐默尔布德、克兰茨"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B15875894926215"
+      "representative_id": "RU_RAY_50074027B15875894926215",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B72223889697429": {
+            "en": "Zimmerbude",
+            "zh": "齐默尔布德"
+          },
+          "RU_RAY_50074027B89212805690722": {
+            "en": "Cranz",
+            "zh": "克兰茨"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_33c9fb373a65",
@@ -1206,7 +1330,15 @@
         "zh": "博戈罗德斯基区、涅姆斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B76252732369206"
+      "representative_id": "RU_RAY_50074027B76252732369206",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B16188868533688": {
+            "en": "Bogorodsky District",
+            "zh": "博戈罗茨基区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_5b10737a994a",
@@ -1234,7 +1366,15 @@
         "zh": "克拉斯努拉尔、上图"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B16274342774122"
+      "representative_id": "RU_RAY_50074027B16274342774122",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B93262234465303": {
+            "en": "городской округ Верхняя Ту",
+            "zh": "上图拉"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_eeebe5fff052",
@@ -1301,6 +1441,18 @@
           "en": "Suchan",
           "zh": "苏城"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B53689487296267": {
+            "en": "Promyslovka",
+            "zh": "普罗梅斯洛夫卡"
+          },
+          "RU_RAY_50074027B87569969608847": {
+            "en": "Suchan",
+            "zh": "苏城"
+          }
+        }
       }
     },
     {
@@ -1339,6 +1491,22 @@
         "tno_1962": {
           "en": "Ochiai District",
           "zh": "落合区"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B16795795282951": {
+            "en": "Shiritoru District",
+            "zh": "知取区"
+          },
+          "RU_RAY_50074027B30510351041396": {
+            "en": "Ochiai District",
+            "zh": "落合区"
+          },
+          "RU_RAY_50074027B94989951930639": {
+            "en": "Tomarioru District",
+            "zh": "泊居区"
+          }
         }
       }
     },
@@ -1401,7 +1569,15 @@
         "zh": "秋门采夫斯基区、谢拉博利欣斯基区、巴甫洛夫斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B76855541737815"
+      "representative_id": "RU_RAY_50074027B76855541737815",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B76855541737815": {
+            "en": "Pavlovsky District",
+            "zh": "巴甫洛夫斯基区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_c6e84d1c3252",
@@ -1467,7 +1643,15 @@
         "zh": "比罗比詹斯基区、奥布卢琴斯基区、比罗比詹"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B88547261644185"
+      "representative_id": "RU_RAY_50074027B88547261644185",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B18064199701976": {
+            "en": "Ch'imuniwochi District",
+            "zh": "奇穆尼窝集区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_d12c5659178e",
@@ -1688,6 +1872,14 @@
         "tno_1962": {
           "en": "Suchan District (Primorsky Krai)",
           "zh": "苏城区（滨海边疆区）"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B95296004893180": {
+            "en": "Suchan District",
+            "zh": "苏城区"
+          }
         }
       }
     },
@@ -1910,7 +2102,15 @@
         "zh": "克拉斯诺阿尔梅斯基区、佩斯特拉夫斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B22639528653177"
+      "representative_id": "RU_RAY_50074027B22639528653177",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B21578169027167": {
+            "en": "Krasnoarmeysky District",
+            "zh": "红军区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_193c9476a10d",
@@ -1976,7 +2176,15 @@
         "zh": "贝卡洛夫斯基区、阿尔乔姆、伊尔比茨基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B74305253047814"
+      "representative_id": "RU_RAY_50074027B74305253047814",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B74305253047814": {
+            "en": "Артёмовский городской окру",
+            "zh": "阿尔乔姆"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_da08ccbf24e6",
@@ -2075,6 +2283,22 @@
         "tno_1962": {
           "en": "Usuri Ula",
           "zh": "乌苏里"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B22497972741045": {
+            "en": "Usuri Ula",
+            "zh": "乌苏里"
+          },
+          "RU_RAY_50074027B48263627343832": {
+            "en": "Uspenka District",
+            "zh": "乌斯片卡区"
+          },
+          "RU_RAY_50074027B96900300661151": {
+            "en": "Yakovlevsky District",
+            "zh": "雅科夫列夫斯基区"
+          }
         }
       }
     },
@@ -2371,7 +2595,15 @@
         "zh": "苏维埃区、皮詹斯基区"
       },
       "name_source": "city",
-      "representative_id": "RU_RAY_50074027B25745585862808"
+      "representative_id": "RU_RAY_50074027B25745585862808",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B25745585862808": {
+            "en": "Sovetsky District",
+            "zh": "苏维埃区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_2abe6bddb595",
@@ -2588,6 +2820,14 @@
           "en": "городской округ Верхняя Пы",
           "zh": "上佩什马"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B29117855811227": {
+            "en": "городской округ Верхняя Пы",
+            "zh": "上佩什马"
+          }
+        }
       }
     },
     {
@@ -2687,6 +2927,18 @@
         "tno_1962": {
           "en": "Oyrot-Tura",
           "zh": "奥伊罗特-图拉"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B30829642015709": {
+            "en": "Oyrot-Tura",
+            "zh": "奥伊罗特-图拉"
+          },
+          "RU_RAY_50074027B85935779911627": {
+            "en": "Sovetsky District",
+            "zh": "苏维埃区"
+          }
         }
       }
     },
@@ -2848,7 +3100,15 @@
         "zh": "霍罗尔斯基区、切尔尼戈夫斯基区、米哈伊洛夫斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B35514912815018"
+      "representative_id": "RU_RAY_50074027B35514912815018",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B4723997737950": {
+            "en": "Mikhaylovsky District",
+            "zh": "米哈伊洛夫斯基区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_a2a252b3eba6",
@@ -3026,7 +3286,15 @@
         "zh": "罗姆年斯基区、十月区、别洛戈尔斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B5426948431093"
+      "representative_id": "RU_RAY_50074027B5426948431093",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B5426948431093": {
+            "en": "Oktyabrsky District",
+            "zh": "十月区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_7663cb1f8f39",
@@ -3060,6 +3328,14 @@
           "en": "Новоуральский городской ок",
           "zh": "新乌拉尔斯克"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B6339965141747": {
+            "en": "Новоуральский городской ок",
+            "zh": "新乌拉尔斯克"
+          }
+        }
       }
     },
     {
@@ -3088,7 +3364,15 @@
         "zh": "别洛泽尔斯基区、克托夫斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B80523103546976"
+      "representative_id": "RU_RAY_50074027B80523103546976",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B34790783107353": {
+            "en": "Belozersky District",
+            "zh": "别洛泽尔斯基区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_22ecbd2b45b0",
@@ -3304,7 +3588,15 @@
         "zh": "上杜布罗沃、别廖佐夫斯基"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B45280576569410"
+      "representative_id": "RU_RAY_50074027B45280576569410",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B45280576569410": {
+            "en": "Берёзовский городской окру",
+            "zh": "别廖佐夫斯基"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_750a15603b8f",
@@ -3482,7 +3774,15 @@
         "zh": "扎托·斯沃博德内、下萨尔、上萨尔丁"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B77128141881548"
+      "representative_id": "RU_RAY_50074027B77128141881548",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B39416650406639": {
+            "en": "ЗАТО Свободный",
+            "zh": "斯沃博德内"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_dafefaea8cbc",
@@ -4041,7 +4341,15 @@
         "zh": "北莫尔斯克、科特罗区、科拉区"
       },
       "name_source": "city",
-      "representative_id": "RU_RAY_50074027B51628846179321"
+      "representative_id": "RU_RAY_50074027B51628846179321",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B53964407639404": {
+            "en": "Koutero District",
+            "zh": "科乌泰罗区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_bc130a312688",
@@ -4107,7 +4415,15 @@
         "zh": "五一区、塔尔缅斯基区、科西欣斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B52463258949821"
+      "representative_id": "RU_RAY_50074027B52463258949821",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B52463258949821": {
+            "en": "Pervomaysky District",
+            "zh": "五一区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_278b291b44d1",
@@ -4379,7 +4695,15 @@
         "zh": "沃霍姆斯基区、十月区、帕文斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B57869521400916"
+      "representative_id": "RU_RAY_50074027B57869521400916",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B59926713884050": {
+            "en": "Oktyabrsky District",
+            "zh": "十月区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_3c16652be846",
@@ -4613,7 +4937,19 @@
         "zh": "基洛夫斯克、阿帕蒂"
       },
       "name_source": "city",
-      "representative_id": "RU_RAY_50074027B77663912086268"
+      "representative_id": "RU_RAY_50074027B77663912086268",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B69941183131076": {
+            "en": "Hiipinä",
+            "zh": "希皮奈"
+          },
+          "RU_RAY_50074027B77663912086268": {
+            "en": "Apatiitti",
+            "zh": "阿帕蒂蒂"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_784147403049",
@@ -4674,7 +5010,19 @@
         "zh": "罗曼诺夫斯基区、巴耶夫斯基区、扎维亚洛夫斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B82856800380020"
+      "representative_id": "RU_RAY_50074027B82856800380020",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B71087427061133": {
+            "en": "Romanovsky District",
+            "zh": "罗曼诺夫斯基区"
+          },
+          "RU_RAY_50074027B82856800380020": {
+            "en": "Zavyalovsky District",
+            "zh": "扎维亚洛夫斯基区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_f22292b3a58a",
@@ -4730,7 +5078,15 @@
         "zh": "布拉戈维申斯基区、罗丁斯基区"
       },
       "name_source": "population",
-      "representative_id": "RU_RAY_50074027B71899291249917"
+      "representative_id": "RU_RAY_50074027B71899291249917",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B71899291249917": {
+            "en": "Blagoveshchensky District",
+            "zh": "布拉戈维申斯基区"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_dd0c9c3625d6",
@@ -4964,7 +5320,15 @@
         "zh": "谢韦尔斯基区、戈里亚奇克柳奇"
       },
       "name_source": "city",
-      "representative_id": "RU_RAY_50074027B93366024646378"
+      "representative_id": "RU_RAY_50074027B93366024646378",
+      "scenario_member_names": {
+        "tno_1962": {
+          "RU_RAY_50074027B93366024646378": {
+            "en": "Goryachy Klyuch",
+            "zh": "戈里亚奇克柳奇"
+          }
+        }
+      }
     },
     {
       "id": "RU_MRG_bb5f84a15d47",
@@ -7678,6 +8042,14 @@
         "tno_1962": {
           "en": "Jingzhoumiaozhudongzuzizhixian",
           "zh": "荆州苗族侗族自治县"
+        }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "CN_CITY_17275852B46408721575403": {
+            "en": "Jingzhoumiaozhudongzuzizhixian",
+            "zh": "荆州苗族侗族自治县"
+          }
         }
       }
     },

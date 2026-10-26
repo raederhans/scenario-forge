@@ -1665,6 +1665,22 @@
           "en": "Kalen",
           "zh": "卡伦"
         }
+      },
+      "scenario_member_names": {
+        "tno_1962": {
+          "FR_ARR_62003": {
+            "en": "Bonen",
+            "zh": "博嫩"
+          },
+          "FR_ARR_62005": {
+            "en": "Sint-Omaars",
+            "zh": "圣奥马尔斯"
+          },
+          "FR_ARR_62006": {
+            "en": "Kalen",
+            "zh": "卡伦"
+          }
+        }
       }
     }
   ],

@@ -11,7 +11,7 @@
     "city_overrides.json": "76897e1f8191205076629caca73840030ee9165dfb2f5ed2450f5ea75e528312",
     "cores.by_feature.json": "d120055a2154230802826b8f12bdbcf2a952de69495bd1c68373dd8f2edf2b54",
     "countries.json": "0a83f3a6fe967eaf316e8acdb78ce8b8d86a79dfd6b180abe050863b6c93c0ae",
-    "geo_locale_patch.json": "8340db3ceb9b66a86ffe9dd0f733290c47ec342c15eac47ea6ebeab15b4e63de",
+    "geo_locale_patch.json": "5f39ccba380ad141a04e66ac7492af21cf4fe885d1bd63f2f735c6dfab359f85",
     "owners.by_feature.json": "568ab46cd043b2940d7ab54888d41d2b933c3b4ac4279382f79d8e2f43cb1ab2",
     "relief_overlays.geojson": "bea4068e87d1919162261a9264dc1c982ccc5d09a5fd08cb9cafd5ceb860af73",
     "runtime_topology.topo.json": "439d91326b79d95db7face889ffe750698529bf31f578edb4105715be7153230",
@@ -33,14 +33,14 @@
     "runtime_topology.bootstrap.topo.json": "778d8bf0739545699e84b5a5b99decbec670752d1f36ef142ac8399e4e923119",
     "scenario_atlantropa.topo.json": "e817246e3cf343e2ae8c0c81e79b3bf3b4ae87b3c0135433160258b930bf77a1",
     "scenario_atlantropa_metadata.json": "d55d477590f7a10248c6f0f6ef6dd40d95d79b2b31ae3e457709ae7c2ea893a0",
-    "startup.bundle.en.json": "2e6f2231540815fe023387106d9bee32464bfe29851093ae28470f83b41929a3",
-    "startup.bundle.en.json.gz": "fd17f992ce14f251ed60ba5c65b2c296d0604f77b5bc5ccf3c60e0d77faa7172",
-    "startup.bundle.zh.json": "c3f2bb795ae7f054acdecf74275c3689e8ff2567b80a78da0a5c69b043e3b46f",
-    "startup.bundle.zh.json.gz": "d83c5902c67e2caddd13d349cd44792f45c660683d782deb9e0873237a5a03c3"
+    "startup.bundle.en.json": "f6f899d9529c386f6345d3bb185096df5f62572ba6e63ee8287682594786f143",
+    "startup.bundle.en.json.gz": "21e573647a46edef4cb413af4107936f83d5efd9b6af1dec2cc21a73c1ae01d0",
+    "startup.bundle.zh.json": "fca919d7c98c72b567767254bb0f81075386b178675738a40f2fdba7dcd4c474",
+    "startup.bundle.zh.json.gz": "7e665e28c239a684532e904aba85f7c01c1dfbdf5155fc39150ca95cce901a14"
   },
   "profile": "tno_full",
   "report_paths": {},
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "0cd86832374d12ad2b6a6fa591c9fc2005c261124337a2813418a79a3bb64c18",
+  "snapshot_fingerprint": "8354afd8f66f56ee03d5ab8d66fca3c14fda804585b8f9a51522090fad9c17d7",
   "water_count": 285
 }

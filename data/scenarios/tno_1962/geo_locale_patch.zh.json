@@ -2258,47 +2258,47 @@
       "zh": "迪南区"
     },
     "BE_MRG_15f4aef6c612": {
-      "en": "Hainaut · Northwest",
+      "en": "Hennegau · Northwest",
       "zh": "埃诺省·西北部"
     },
     "BE_MRG_24ed7b411331": {
-      "en": "West Flanders · Southeast",
+      "en": "Westflandern · Southeast",
       "zh": "西佛兰德省·东南部"
     },
     "BE_MRG_38ea003ab243": {
-      "en": "Antwerp · Central",
+      "en": "Antwerpen · Central",
       "zh": "安特卫普省·中部"
     },
     "BE_MRG_49096f4ef44b": {
-      "en": "Liege · Central",
-      "zh": "列日省·中部"
+      "en": "Lüttich · Central",
+      "zh": "吕蒂希省·中部"
     },
     "BE_MRG_6a92ca76474d": {
-      "en": "Namur · Northwest",
-      "zh": "那慕尔省·西北部"
+      "en": "Bezirk Namen",
+      "zh": "纳门"
     },
     "BE_MRG_7dbe84a470bd": {
-      "en": "West Flanders · Southwest",
+      "en": "Westflandern · Southwest",
       "zh": "西佛兰德省·西南部"
     },
     "BE_MRG_81cfb513b60d": {
-      "en": "East Flanders · South",
+      "en": "Ostflandern · South",
       "zh": "东佛兰德省·南部"
     },
     "BE_MRG_923fe66661e2": {
-      "en": "West Flanders · North",
+      "en": "Westflandern · North",
       "zh": "西佛兰德省·北部"
     },
     "BE_MRG_a29e92a10668": {
-      "en": "Limburg · South",
-      "zh": "比利时林堡省·南部"
+      "en": "Bezirk Tongern",
+      "zh": "通厄恩"
     },
     "BE_MRG_d49081148862": {
-      "en": "Luxembourg · South",
+      "en": "Luxemburg · South",
       "zh": "比利时卢森堡省·南部"
     },
     "BE_MRG_f7a8cd5ecd9e": {
-      "en": "Hainaut · Southeast",
+      "en": "Hennegau · Southeast",
       "zh": "埃诺省·东南部"
     },
     "BF_ADM1_92566538B19127906733451": {
@@ -22278,7 +22278,7 @@
       "zh": "北林堡"
     },
     "NL_MRG_19568adfd807": {
-      "en": "North Holland · West",
+      "en": "Nordholland · West",
       "zh": "北荷兰省·西部"
     },
     "NL_MRG_39ca088797c0": {
@@ -22286,19 +22286,19 @@
       "zh": "弗里斯兰省·南部"
     },
     "NL_MRG_45a7250c2862": {
-      "en": "Groningen · Southeast",
-      "zh": "格罗宁根省·东南部"
+      "en": "Delfzijl en omgeving",
+      "zh": "代尔夫宰尔及周边"
     },
     "NL_MRG_7e9ad361b25e": {
       "en": "Drenthe · South",
       "zh": "德伦特省·南部"
     },
     "NL_MRG_99b7c61b066f": {
-      "en": "North Brabant · Central",
+      "en": "Nordbrabant · Central",
       "zh": "北布拉班特省·中部"
     },
     "NL_MRG_b67b46af8948": {
-      "en": "Gelderland · Northeast",
+      "en": "Geldern · Northeast",
       "zh": "海尔德兰省·东北部"
     },
     "NL_MRG_c127cb50cada": {
@@ -22306,7 +22306,7 @@
       "zh": "荷兰林堡省·南部"
     },
     "NL_MRG_cfd8aead1a35": {
-      "en": "South Holland · Northeast",
+      "en": "Südholland · Northeast",
       "zh": "南荷兰省·东北部"
     },
     "NL_MRG_dfb52b5927e9": {
@@ -23198,116 +23198,116 @@
       "zh": "卢塞纳"
     },
     "PL_MRG_05f1ad6eedaa": {
-      "en": "Lesser Poland · North",
-      "zh": "小波兰省·北部"
+      "en": "Kleinpolen · North",
+      "zh": "小波兰·北部"
     },
     "PL_MRG_328be0e18e73": {
-      "en": "Masovian · South 1",
-      "zh": "马佐夫舍省·南部1"
+      "en": "Masowien · South 1",
+      "zh": "马佐夫舍·南部1"
     },
     "PL_MRG_3692a96e99b1": {
-      "en": "Łódź · East",
-      "zh": "罗兹省·东部"
+      "en": "Litzmannstadt · East",
+      "zh": "利茨曼施塔特·东部"
     },
     "PL_MRG_36976cf4d062": {
-      "en": "Greater Poland · East",
-      "zh": "大波兰省·东部"
+      "en": "Großpolen · East",
+      "zh": "大波兰·东部"
     },
     "PL_MRG_44c900e7cbdd": {
-      "en": "Podlaskie · Southwest",
-      "zh": "波德拉谢省·西南部"
+      "en": "Podlachien · Southwest",
+      "zh": "波德拉谢·西南部"
     },
     "PL_MRG_4762ef33a34f": {
-      "en": "Holy Cross · East",
-      "zh": "圣十字省·东部"
+      "en": "Heiligkreuz · East",
+      "zh": "圣十字·东部"
     },
     "PL_MRG_48e6927d3544": {
-      "en": "Kuyavian-Pomeranian · Southwest",
-      "zh": "库亚维-滨海省·西南部"
+      "en": "Kujawien-Pommern · Southwest",
+      "zh": "库亚维-波美拉尼亚·西南部"
     },
     "PL_MRG_4a7fdf2f215b": {
-      "en": "Masovian · South 2",
-      "zh": "马佐夫舍省·南部2"
+      "en": "Masowien · South 2",
+      "zh": "马佐夫舍·南部2"
     },
     "PL_MRG_4df6ad2dc703": {
       "en": "Lublin · South",
-      "zh": "卢布林省·南部"
+      "zh": "卢布林·南部"
     },
     "PL_MRG_50494ed51da4": {
-      "en": "West Pomeranian · Northeast",
-      "zh": "西滨海省·东北部"
+      "en": "Westpommern · Northeast",
+      "zh": "西波美拉尼亚·东北部"
     },
     "PL_MRG_6143971238b3": {
-      "en": "Silesian · Northeast",
-      "zh": "西里西亚省·东北部"
+      "en": "Oberschlesien · Northeast",
+      "zh": "上西里西亚·东北部"
     },
     "PL_MRG_7e3204328b62": {
-      "en": "Subcarpathian · Northwest",
-      "zh": "喀尔巴阡山省·西北部"
+      "en": "Karpatenvorland · Northwest",
+      "zh": "喀尔巴阡山麓·西北部"
     },
     "PL_MRG_8119670edfb9": {
-      "en": "Silesian · South",
-      "zh": "西里西亚省·南部"
+      "en": "Oberschlesien · South",
+      "zh": "上西里西亚·南部"
     },
     "PL_MRG_81a04ac05a78": {
-      "en": "Masovian · East",
-      "zh": "马佐夫舍省·东部"
+      "en": "Masowien · East",
+      "zh": "马佐夫舍·东部"
     },
     "PL_MRG_afde07ef7e52": {
-      "en": "West Pomeranian · West",
-      "zh": "西滨海省·西部"
+      "en": "Westpommern · West",
+      "zh": "西波美拉尼亚·西部"
     },
     "PL_MRG_be82540e6cf0": {
-      "en": "Greater Poland · North",
-      "zh": "大波兰省·北部"
+      "en": "Großpolen · North",
+      "zh": "大波兰·北部"
     },
     "PL_MRG_c16eaf95213a": {
-      "en": "Opole · Central",
-      "zh": "奥波莱省·中部"
+      "en": "Oppeln · Central",
+      "zh": "奥珀伦·中部"
     },
     "PL_MRG_c5cfb391c06f": {
       "en": "Lublin · Northwest",
-      "zh": "卢布林省·西北部"
+      "zh": "卢布林·西北部"
     },
     "PL_MRG_c908eb11c602": {
-      "en": "Warmian-Masurian · Central",
-      "zh": "瓦尔米亚-马祖里省·中部"
+      "en": "Ermland-Masuren · Central",
+      "zh": "瓦尔米亚-马祖里·中部"
     },
     "PL_MRG_cb41a08029c6": {
       "en": "Lublin · Southwest",
-      "zh": "卢布林省·西南部"
+      "zh": "卢布林·西南部"
     },
     "PL_MRG_ce21dcd4a2c0": {
-      "en": "Kuyavian-Pomeranian · North",
-      "zh": "库亚维-滨海省·北部"
+      "en": "Kujawien-Pommern · North",
+      "zh": "库亚维-波美拉尼亚·北部"
     },
     "PL_MRG_d33963acec0d": {
-      "en": "Greater Poland · Central",
-      "zh": "大波兰省·中部"
+      "en": "Großpolen · Central",
+      "zh": "大波兰·中部"
     },
     "PL_MRG_d43cd846ec6f": {
-      "en": "Łódź · Northwest",
-      "zh": "罗兹省·西北部"
+      "en": "Litzmannstadt · Northwest",
+      "zh": "利茨曼施塔特·西北部"
     },
     "PL_MRG_e9f1a2130857": {
-      "en": "Lower Silesian · Central",
-      "zh": "下西里西亚省·中部"
+      "en": "Niederschlesien · Central",
+      "zh": "下西里西亚·中部"
     },
     "PL_MRG_eb17d6c2a513": {
-      "en": "Lower Silesian · Northwest",
-      "zh": "下西里西亚省·西北部"
+      "en": "Niederschlesien · Northwest",
+      "zh": "下西里西亚·西北部"
     },
     "PL_MRG_eb6bfbc84cb1": {
-      "en": "Pomeranian · Central",
-      "zh": "滨海省·中部"
+      "en": "Pommerellen · Central",
+      "zh": "波美雷利亚·中部"
     },
     "PL_MRG_f3a4768ac693": {
-      "en": "Holy Cross · West",
-      "zh": "圣十字省·西部"
+      "en": "Heiligkreuz · West",
+      "zh": "圣十字·西部"
     },
     "PL_MRG_fe627fbb2f9c": {
-      "en": "Masovian · Northwest",
-      "zh": "马佐夫舍省·西北部"
+      "en": "Masowien · Northwest",
+      "zh": "马佐夫舍·西北部"
     },
     "PL_POW_0204": {
       "en": "górowski",
@@ -24454,8 +24454,8 @@
       "zh": "鞑靼斯坦共和国·东南部1"
     },
     "RU_MRG_049b9f6aad55": {
-      "en": "Moscow · North",
-      "zh": "莫斯科州·北部"
+      "en": "Moskau · North",
+      "zh": "莫斯科·北部"
     },
     "RU_MRG_0647b9498b2f": {
       "en": "Vologda · West 1",
@@ -24466,28 +24466,28 @@
       "zh": "阿尔汉格尔斯克州·南部"
     },
     "RU_MRG_070e676051d2": {
-      "en": "Novosibirsk · East 2",
-      "zh": "新西伯利亚州·东部2"
+      "en": "Ob",
+      "zh": "鄂毕"
     },
     "RU_MRG_0712bf4c0b09": {
-      "en": "Krasnodar Krai · North",
-      "zh": "克拉斯诺达尔边疆区·北部"
+      "en": "Jekaterinodar · North",
+      "zh": "叶卡捷琳诺达尔·北部"
     },
     "RU_MRG_0a65d5f58393": {
       "en": "Altai Krai · Northwest 2",
       "zh": "阿尔泰边疆区·西北部2"
     },
     "RU_MRG_0acb872c94fa": {
-      "en": "Kirov · Northeast",
-      "zh": "基洛夫州·东北部"
+      "en": "Vyatka · Northeast",
+      "zh": "维亚特卡·东北部"
     },
     "RU_MRG_0c1434a780d8": {
-      "en": "Tver · Northeast 1",
-      "zh": "特维尔州·东北部1"
+      "en": "Twer · Northeast 1",
+      "zh": "特维尔·东北部1"
     },
     "RU_MRG_0c628fcdf9bb": {
-      "en": "Tver · Northeast 2",
-      "zh": "特维尔州·东北部2"
+      "en": "Twer · Northeast 2",
+      "zh": "特维尔·东北部2"
     },
     "RU_MRG_0c880ba23868": {
       "en": "Krasnoyarsk Krai · South 4",
@@ -24522,16 +24522,16 @@
       "zh": "弗拉基米尔州·西北部"
     },
     "RU_MRG_15cb29330a1c": {
-      "en": "Krasnodar Krai · West 2",
-      "zh": "克拉斯诺达尔边疆区·西部2"
+      "en": "Jekaterinodar · West 2",
+      "zh": "叶卡捷琳诺达尔·西部2"
     },
     "RU_MRG_16df1bb3876e": {
       "en": "Samara · Southeast",
       "zh": "萨马拉州·东南部"
     },
     "RU_MRG_177777beb337": {
-      "en": "Saratov · West 3",
-      "zh": "萨拉托夫州·西部3"
+      "en": "Platenfurt · West 3",
+      "zh": "普拉滕富特·西部3"
     },
     "RU_MRG_194bb325d1de": {
       "en": "Kostroma · Southwest",
@@ -24554,16 +24554,16 @@
       "zh": "鞑靼斯坦共和国·东部"
     },
     "RU_MRG_1ff20bc12a63": {
-      "en": "Khabarovsk Krai · South 1",
-      "zh": "哈巴罗夫斯克边疆区·南部1"
+      "en": "Bohori · South 1",
+      "zh": "伯力·南部1"
     },
     "RU_MRG_200894813435": {
       "en": "Ingushetia · Central",
       "zh": "印古什共和国·中部"
     },
     "RU_MRG_21258bfc1110": {
-      "en": "Nizhny Novgorod · Northwest",
-      "zh": "下诺夫哥罗德州·西北部"
+      "en": "Hortonburg",
+      "zh": "霍顿堡"
     },
     "RU_MRG_21f622bb3b2b": {
       "en": "Penza · West",
@@ -24594,8 +24594,8 @@
       "zh": "巴什科尔托斯坦共和国·东南部2"
     },
     "RU_MRG_29478c5fffa6": {
-      "en": "Krasnoyarsk Krai · South 6",
-      "zh": "克拉斯诺亚尔斯克边疆区·南部6"
+      "en": "Bogotolsky Rayon",
+      "zh": "波戈托尔区"
     },
     "RU_MRG_2953c850d23a": {
       "en": "Altai Krai · Southeast",
@@ -24618,8 +24618,8 @@
       "zh": "卡尔梅克共和国·北部2"
     },
     "RU_MRG_2d8a56fb0da2": {
-      "en": "Ulyanovsk · Northeast",
-      "zh": "乌里扬诺夫斯克州·东北部"
+      "en": "Goeringstadt · Northeast",
+      "zh": "戈林施塔特·东北部"
     },
     "RU_MRG_2e2abc445545": {
       "en": "Dagestan · Central",
@@ -24646,8 +24646,8 @@
       "zh": "彼尔姆边疆区·中部2"
     },
     "RU_MRG_352ca37aab63": {
-      "en": "Voronezh · Northwest",
-      "zh": "沃罗涅日州·西北部"
+      "en": "Woronesch · Northwest",
+      "zh": "沃罗涅日·西北部"
     },
     "RU_MRG_354d159a9201": {
       "en": "Samara · Northeast",
@@ -24686,12 +24686,12 @@
       "zh": "莫尔多瓦共和国·中部"
     },
     "RU_MRG_3ca144c1d18a": {
-      "en": "Kirov · South",
-      "zh": "基洛夫州·南部"
+      "en": "Vyatka · South",
+      "zh": "维亚特卡·南部"
     },
     "RU_MRG_3d5ebfb76db3": {
-      "en": "Rostov · East",
-      "zh": "罗斯托夫州·东部"
+      "en": "Rostow · East",
+      "zh": "罗斯托夫·东部"
     },
     "RU_MRG_3f26ea354786": {
       "en": "Vladimir · Southeast",
@@ -24706,8 +24706,8 @@
       "zh": "卡累利阿共和国·南部2"
     },
     "RU_MRG_421f6b2285d7": {
-      "en": "Kursk · Central",
-      "zh": "库尔斯克州·中部"
+      "en": "Guderianstadt",
+      "zh": "古德里安施塔特"
     },
     "RU_MRG_427102c526cb": {
       "en": "Bashkortostan · North 1",
@@ -24726,12 +24726,12 @@
       "zh": "斯塔夫罗波尔边疆区·西北部"
     },
     "RU_MRG_44732ad635df": {
-      "en": "Sakhalin · Central",
-      "zh": "萨哈林州·中部"
+      "en": "Karafuto · Central",
+      "zh": "桦太·中部"
     },
     "RU_MRG_451862161429": {
-      "en": "Volgograd · Northwest 1",
-      "zh": "伏尔加格勒州·西北部1"
+      "en": "Paulusburg · Northwest 1",
+      "zh": "保卢斯堡·西北部1"
     },
     "RU_MRG_4543c51c6bdd": {
       "en": "Leningrad · East",
@@ -24742,20 +24742,20 @@
       "zh": "阿尔泰边疆区·西北部1"
     },
     "RU_MRG_46291296feb9": {
-      "en": "Ivanovo · West",
-      "zh": "伊万诺沃州·西部"
+      "en": "Johannesstadt",
+      "zh": "约翰尼斯施塔特"
     },
     "RU_MRG_467ab67728ff": {
-      "en": "Yaroslavl · West",
-      "zh": "雅罗斯拉夫尔州·西部"
+      "en": "Jaroslawl · West",
+      "zh": "雅罗斯拉夫尔·西部"
     },
     "RU_MRG_47cb081b29d0": {
-      "en": "Kursk · Northeast",
-      "zh": "库尔斯克州·东北部"
+      "en": "Zheleznogorsk",
+      "zh": "热列兹诺哥尔斯克"
     },
     "RU_MRG_480afb1927f5": {
-      "en": "Tatarstan · Central",
-      "zh": "鞑靼斯坦共和国·中部"
+      "en": "Rajon Nischnekamsk",
+      "zh": "下卡姆斯克区"
     },
     "RU_MRG_4844dd62c5ed": {
       "en": "Buryatia · Southwest 2",
@@ -24782,20 +24782,20 @@
       "zh": "托木斯克州·南部"
     },
     "RU_MRG_4bf779af7de8": {
-      "en": "Krasnodar Krai · East",
-      "zh": "克拉斯诺达尔边疆区·东部"
+      "en": "Jekaterinodar · East",
+      "zh": "叶卡捷琳诺达尔·东部"
     },
     "RU_MRG_4c7d723b93b0": {
       "en": "Kalmykia · North 1",
       "zh": "卡尔梅克共和国·北部1"
     },
     "RU_MRG_4ed360a39448": {
-      "en": "Murmansk · North",
-      "zh": "摩尔曼斯克州·北部"
+      "en": "Muurmanni · North",
+      "zh": "穆尔曼尼·北部"
     },
     "RU_MRG_510edc918f57": {
-      "en": "Kirov · Northwest 1",
-      "zh": "基洛夫州·西北部1"
+      "en": "Vyatka · Northwest 1",
+      "zh": "维亚特卡·西北部1"
     },
     "RU_MRG_5152587ee975": {
       "en": "Vologda · Central 2",
@@ -24814,12 +24814,12 @@
       "zh": "彼尔姆边疆区·东北部"
     },
     "RU_MRG_54f19a93b9db": {
-      "en": "Primorsky Krai · Central",
-      "zh": "滨海边疆区·中部"
+      "en": "Yezhuhe",
+      "zh": "野猪河"
     },
     "RU_MRG_54feb62370de": {
-      "en": "Novgorod · South",
-      "zh": "诺夫哥罗德州·南部"
+      "en": "Holmgard · South",
+      "zh": "霍尔姆加德·南部"
     },
     "RU_MRG_55742c11b5e6": {
       "en": "Dyatkovo",
@@ -24830,28 +24830,28 @@
       "zh": "马里埃尔共和国·东部"
     },
     "RU_MRG_565e6f7cc145": {
-      "en": "Yaroslavl · Northeast",
-      "zh": "雅罗斯拉夫尔州·东北部"
+      "en": "Jaroslawl · Northeast",
+      "zh": "雅罗斯拉夫尔·东北部"
     },
     "RU_MRG_56d7f2c40815": {
-      "en": "Smolensk · South",
-      "zh": "斯摩棱斯克州·南部"
+      "en": "Klugeburg · South",
+      "zh": "克卢格堡·南部"
     },
     "RU_MRG_56ed27ec6e18": {
-      "en": "Tatarstan · Southeast 2",
-      "zh": "鞑靼斯坦共和国·东南部2"
+      "en": "Novopismyansky District",
+      "zh": "新皮斯米扬卡区"
     },
     "RU_MRG_57d8687f784e": {
-      "en": "Novgorod · Northwest",
-      "zh": "诺夫哥罗德州·西北部"
+      "en": "Holmgard · Northwest",
+      "zh": "霍尔姆加德·西北部"
     },
     "RU_MRG_58dfbd1fa64b": {
       "en": "Tula · East",
       "zh": "图拉州·东部"
     },
     "RU_MRG_5936db92540a": {
-      "en": "Yaroslavl · South",
-      "zh": "雅罗斯拉夫尔州·南部"
+      "en": "Jaroslawl · South",
+      "zh": "雅罗斯拉夫尔·南部"
     },
     "RU_MRG_59971f82636d": {
       "en": "Khvoyninsky District",
@@ -24862,8 +24862,8 @@
       "zh": "车尔尼雪夫斯基区"
     },
     "RU_MRG_5bb5ee0b1fb6": {
-      "en": "Rostov · Central",
-      "zh": "罗斯托夫州·中部"
+      "en": "Rostow · Central",
+      "zh": "罗斯托夫·中部"
     },
     "RU_MRG_5ca04a85c3f4": {
       "en": "Ryazan · Northwest",
@@ -24878,12 +24878,12 @@
       "zh": "新西伯利亚州·西南部"
     },
     "RU_MRG_5eb4927958c7": {
-      "en": "Saratov · East 1",
-      "zh": "萨拉托夫州·东部1"
+      "en": "Platenfurt · East 1",
+      "zh": "普拉滕富特·东部1"
     },
     "RU_MRG_60459cf53f51": {
-      "en": "Volgograd · West",
-      "zh": "伏尔加格勒州·西部"
+      "en": "Paulusburg · West",
+      "zh": "保卢斯堡·西部"
     },
     "RU_MRG_60904da04ba2": {
       "en": "Astrakhan · Southeast",
@@ -24898,16 +24898,16 @@
       "zh": "卡拉恰伊-切尔克斯共和国·东北部"
     },
     "RU_MRG_62e1cda9654b": {
-      "en": "Volgograd · East",
-      "zh": "伏尔加格勒州·东部"
+      "en": "Paulusburg · East",
+      "zh": "保卢斯堡·东部"
     },
     "RU_MRG_639437e5ad6b": {
       "en": "Tatarstan · Southwest",
       "zh": "鞑靼斯坦共和国·西南部"
     },
     "RU_MRG_639caddb97b7": {
-      "en": "Kemerovo · Northwest",
-      "zh": "克麦罗沃州·西北部"
+      "en": "Kolchugino District",
+      "zh": "科利丘吉诺区"
     },
     "RU_MRG_63e9553ae883": {
       "en": "Amur · South 3",
@@ -24926,12 +24926,12 @@
       "zh": "托木斯克州·东南部1"
     },
     "RU_MRG_67d918167343": {
-      "en": "Rostov · West",
-      "zh": "罗斯托夫州·西部"
+      "en": "Rostow · West",
+      "zh": "罗斯托夫·西部"
     },
     "RU_MRG_69c47d13e0ea": {
-      "en": "Sakhalin · South",
-      "zh": "萨哈林州·南部"
+      "en": "Karafuto · South",
+      "zh": "桦太·南部"
     },
     "RU_MRG_69fe24997bd8": {
       "en": "Novosibirsk · East 1",
@@ -24942,8 +24942,8 @@
       "zh": "萨哈共和国·南部2"
     },
     "RU_MRG_6b6c39533363": {
-      "en": "Primorsky Krai · South",
-      "zh": "滨海边疆区·南部"
+      "en": "Huangtukanzi",
+      "zh": "黄土坎子"
     },
     "RU_MRG_6be12ffb1d4d": {
       "en": "Altai Krai · West",
@@ -24958,56 +24958,56 @@
       "zh": "普斯科夫州·北部"
     },
     "RU_MRG_6df85226925c": {
-      "en": "Dagestan · Southeast",
-      "zh": "达吉斯坦共和国·东南部"
+      "en": "Derbent",
+      "zh": "杰尔宾特"
     },
     "RU_MRG_6f87652d4746": {
-      "en": "Novgorod · Southwest",
-      "zh": "诺夫哥罗德州·西南部"
+      "en": "Holmgard · Southwest",
+      "zh": "霍尔姆加德·西南部"
     },
     "RU_MRG_6fb6a80f7b8a": {
-      "en": "Rostov · North",
-      "zh": "罗斯托夫州·北部"
+      "en": "Rostow · North",
+      "zh": "罗斯托夫·北部"
     },
     "RU_MRG_7023cdeaace9": {
-      "en": "Bryansk · Central",
-      "zh": "布良斯克州·中部"
+      "en": "Brjansk · Central",
+      "zh": "布良斯克·中部"
     },
     "RU_MRG_70ed82134bd7": {
-      "en": "Saratov · West 2",
-      "zh": "萨拉托夫州·西部2"
+      "en": "Platenfurt · West 2",
+      "zh": "普拉滕富特·西部2"
     },
     "RU_MRG_71433587cf08": {
-      "en": "Kaliningrad · Central",
-      "zh": "加里宁格勒州·中部"
+      "en": "Königsberg · Central",
+      "zh": "柯尼斯堡·中部"
     },
     "RU_MRG_71c5eef625de": {
-      "en": "Kirov · Southwest 2",
-      "zh": "基洛夫州·西南部2"
+      "en": "Vyatka · Southwest 2",
+      "zh": "维亚特卡·西南部2"
     },
     "RU_MRG_728513759ce7": {
-      "en": "Rostov · Southwest",
-      "zh": "罗斯托夫州·西南部"
+      "en": "Rostow · Southwest",
+      "zh": "罗斯托夫·西南部"
     },
     "RU_MRG_72b0f3ba03bc": {
-      "en": "Kirov · Central",
-      "zh": "基洛夫州·中部"
+      "en": "Vyatka · Central",
+      "zh": "维亚特卡·中部"
     },
     "RU_MRG_72ee4e9306fc": {
-      "en": "Smolensk · East",
-      "zh": "斯摩棱斯克州·东部"
+      "en": "Klugeburg · East",
+      "zh": "克卢格堡·东部"
     },
     "RU_MRG_7378a30fad9a": {
       "en": "Irkutsk · Southwest 4",
       "zh": "伊尔库茨克州·西南部4"
     },
     "RU_MRG_7425ae2cbd84": {
-      "en": "Ulyanovsk · Northwest",
-      "zh": "乌里扬诺夫斯克州·西北部"
+      "en": "Goeringstadt · Northwest",
+      "zh": "戈林施塔特·西北部"
     },
     "RU_MRG_7451af4e8c07": {
-      "en": "Kirov · Southeast",
-      "zh": "基洛夫州·东南部"
+      "en": "Vyatka · Southeast",
+      "zh": "维亚特卡·东南部"
     },
     "RU_MRG_75d0b3503bfa": {
       "en": "Perm Krai · West",
@@ -25030,16 +25030,16 @@
       "zh": "斯塔夫罗波尔边疆区·东北部"
     },
     "RU_MRG_782d749bb689": {
-      "en": "Tver · East",
-      "zh": "特维尔州·东部"
+      "en": "Twer · East",
+      "zh": "特维尔·东部"
     },
     "RU_MRG_7845e1b7a36b": {
       "en": "Tambov · East",
       "zh": "坦波夫州·东部"
     },
     "RU_MRG_79a4de3821cf": {
-      "en": "Primorsky Krai · Southwest",
-      "zh": "滨海边疆区·西南部"
+      "en": "Haishenwai",
+      "zh": "海参崴"
     },
     "RU_MRG_79d73fa9760d": {
       "en": "Altai Krai · North",
@@ -25070,16 +25070,16 @@
       "zh": "萨哈共和国·南部3"
     },
     "RU_MRG_7fc798b3eeaf": {
-      "en": "Karelia · South 1",
-      "zh": "卡累利阿共和国·南部1"
+      "en": "Kontupohja District",
+      "zh": "孔图波希亚区"
     },
     "RU_MRG_7fee908b63f6": {
       "en": "Pskov · South",
       "zh": "普斯科夫州·南部"
     },
     "RU_MRG_807631e65728": {
-      "en": "Krasnodar Krai · Northeast",
-      "zh": "克拉斯诺达尔边疆区·东北部"
+      "en": "Jekaterinodar · Northeast",
+      "zh": "叶卡捷琳诺达尔·东北部"
     },
     "RU_MRG_8175cbc6e17d": {
       "en": "Tatarstan · Northwest",
@@ -25094,12 +25094,12 @@
       "zh": "伊尔库茨克州·西南部5"
     },
     "RU_MRG_83744c263574": {
-      "en": "Murmansk · Central",
-      "zh": "摩尔曼斯克州·中部"
+      "en": "Muurmanni · Central",
+      "zh": "穆尔曼尼·中部"
     },
     "RU_MRG_841bc7215ac5": {
-      "en": "Oryol · East",
-      "zh": "奥廖尔州·东部"
+      "en": "Liwny",
+      "zh": "利夫内"
     },
     "RU_MRG_84a69ede33b5": {
       "en": "Altai Krai · Northeast",
@@ -25118,12 +25118,12 @@
       "zh": "托木斯克州·东部"
     },
     "RU_MRG_8833cbf157a6": {
-      "en": "Saratov · East 2",
-      "zh": "萨拉托夫州·东部2"
+      "en": "Platenfurt · East 2",
+      "zh": "普拉滕富特·东部2"
     },
     "RU_MRG_884ab2e1b411": {
-      "en": "Kirov · East",
-      "zh": "基洛夫州·东部"
+      "en": "Vyatka · East",
+      "zh": "维亚特卡·东部"
     },
     "RU_MRG_8a04555b8e14": {
       "en": "Udmurtia · Southwest",
@@ -25138,12 +25138,12 @@
       "zh": "秋明州·西北部"
     },
     "RU_MRG_8b55818839ef": {
-      "en": "Tver · South",
-      "zh": "特维尔州·南部"
+      "en": "Twer · South",
+      "zh": "特维尔·南部"
     },
     "RU_MRG_8e6e2af7d4de": {
-      "en": "Samara · West 1",
-      "zh": "萨马拉州·西部1"
+      "en": "Ivashchenkovo",
+      "zh": "伊瓦申科沃"
     },
     "RU_MRG_8ec2184da20a": {
       "en": "Severomorsk",
@@ -25154,8 +25154,8 @@
       "zh": "卡尔梅克共和国·南部"
     },
     "RU_MRG_90ed61ead343": {
-      "en": "Saratov · West 1",
-      "zh": "萨拉托夫州·西部1"
+      "en": "Platenfurt · West 1",
+      "zh": "普拉滕富特·西部1"
     },
     "RU_MRG_91548f408632": {
       "en": "Kemerovo · South 1",
@@ -25178,12 +25178,12 @@
       "zh": "新西伯利亚州·西北部"
     },
     "RU_MRG_962b67068c91": {
-      "en": "Voronezh · North",
-      "zh": "沃罗涅日州·北部"
+      "en": "Woronesch · North",
+      "zh": "沃罗涅日·北部"
     },
     "RU_MRG_9630c25ee3c6": {
-      "en": "Tver · West 1",
-      "zh": "特维尔州·西部1"
+      "en": "Twer · West 1",
+      "zh": "特维尔·西部1"
     },
     "RU_MRG_96394847a7bb": {
       "en": "Astrakhan · South",
@@ -25210,28 +25210,28 @@
       "zh": "托木斯克州·东南部2"
     },
     "RU_MRG_9a1edb58046a": {
-      "en": "Voronezh · Southeast",
-      "zh": "沃罗涅日州·东南部"
+      "en": "Woronesch · Southeast",
+      "zh": "沃罗涅日·东南部"
     },
     "RU_MRG_9a973c050065": {
       "en": "North Ossetia–Alania · North",
       "zh": "北奥塞梯-阿兰共和国·北部"
     },
     "RU_MRG_9d8deba56899": {
-      "en": "Volgograd · Southwest 2",
-      "zh": "伏尔加格勒州·西南部2"
+      "en": "Paulusburg · Southwest 2",
+      "zh": "保卢斯堡·西南部2"
     },
     "RU_MRG_9ed0f4973e0f": {
-      "en": "Amur · South 2",
-      "zh": "阿穆尔州·南部2"
+      "en": "Niuleimanho",
+      "zh": "纽勒们河"
     },
     "RU_MRG_9ef1aa17db33": {
-      "en": "Chechnya · Central",
-      "zh": "车臣共和国·中部"
+      "en": "Grosny",
+      "zh": "格罗兹尼"
     },
     "RU_MRG_9f87451cc870": {
-      "en": "Rostov · South",
-      "zh": "罗斯托夫州·南部"
+      "en": "Rostow · South",
+      "zh": "罗斯托夫·南部"
     },
     "RU_MRG_9fe77f7052b1": {
       "en": "Penza · Northeast",
@@ -25246,20 +25246,20 @@
       "zh": "秋明州·西南部"
     },
     "RU_MRG_a610e18b7598": {
-      "en": "Saratov · Central",
-      "zh": "萨拉托夫州·中部"
+      "en": "Platenfurt · Central",
+      "zh": "普拉滕富特·中部"
     },
     "RU_MRG_a87b79d2be5d": {
       "en": "Chuvashia · North",
       "zh": "楚瓦什共和国·北部"
     },
     "RU_MRG_a94cbc9022fc": {
-      "en": "Voronezh · East",
-      "zh": "沃罗涅日州·东部"
+      "en": "Woronesch · East",
+      "zh": "沃罗涅日·东部"
     },
     "RU_MRG_ab56c6057a73": {
-      "en": "Kirov · Northwest 2",
-      "zh": "基洛夫州·西北部2"
+      "en": "Vyatka · Northwest 2",
+      "zh": "维亚特卡·西北部2"
     },
     "RU_MRG_ab652814dff4": {
       "en": "Chuvashia · South",
@@ -25274,8 +25274,8 @@
       "zh": "梁赞州·西南部"
     },
     "RU_MRG_ae8913c1637c": {
-      "en": "Lipetsk · Northeast",
-      "zh": "利佩茨克州·东北部"
+      "en": "Lipezk · Northeast",
+      "zh": "利佩茨克·东北部"
     },
     "RU_MRG_aedb5f9ed3b1": {
       "en": "Vologda · Central 1",
@@ -25286,8 +25286,8 @@
       "zh": "鄂木斯克州·东北部"
     },
     "RU_MRG_b202c10408ff": {
-      "en": "Oryol · West",
-      "zh": "奥廖尔州·西部"
+      "en": "Orel",
+      "zh": "奥廖尔"
     },
     "RU_MRG_b2d1407cd933": {
       "en": "Bashkortostan · South 2",
@@ -25310,16 +25310,16 @@
       "zh": "亚历山德罗夫斯基区（斯塔夫罗波尔边疆区）"
     },
     "RU_MRG_b7986b68045a": {
-      "en": "Volgograd · Southeast",
-      "zh": "伏尔加格勒州·东南部"
+      "en": "Paulusburg · Southeast",
+      "zh": "保卢斯堡·东南部"
     },
     "RU_MRG_b8675f108fd4": {
       "en": "Sasovsky District",
       "zh": "萨索夫斯基区"
     },
     "RU_MRG_b88d938191a1": {
-      "en": "Tambov · Northwest",
-      "zh": "坦波夫州·西北部"
+      "en": "Koslow",
+      "zh": "科兹洛夫"
     },
     "RU_MRG_b963a8bb44cb": {
       "en": "Nizhny Novgorod · Southwest 1",
@@ -25338,24 +25338,24 @@
       "zh": "斯维尔德洛夫斯克州·东南部"
     },
     "RU_MRG_bba373fa6104": {
-      "en": "Khabarovsk Krai · South 2",
-      "zh": "哈巴罗夫斯克边疆区·南部2"
+      "en": "Bohori · South 2",
+      "zh": "伯力·南部2"
     },
     "RU_MRG_bccb1225fada": {
-      "en": "Saratov · Northwest",
-      "zh": "萨拉托夫州·西北部"
+      "en": "Platenfurt · Northwest",
+      "zh": "普拉滕富特·西北部"
     },
     "RU_MRG_bd4e5d799db8": {
-      "en": "Samara · Central",
-      "zh": "萨马拉州·中部"
+      "en": "Novosamarovsk",
+      "zh": "新萨马罗夫斯克"
     },
     "RU_MRG_bd522f576b8e": {
       "en": "Kurgan · Northeast",
       "zh": "库尔干州·东北部"
     },
     "RU_MRG_bd67d5dbed08": {
-      "en": "Saratov · Northeast",
-      "zh": "萨拉托夫州·东北部"
+      "en": "Platenfurt · Northeast",
+      "zh": "普拉滕富特·东北部"
     },
     "RU_MRG_be20933bc7c3": {
       "en": "Leningrad · Northeast",
@@ -25366,20 +25366,20 @@
       "zh": "克拉斯诺亚尔斯克边疆区·南部3"
     },
     "RU_MRG_be7ea0c7c033": {
-      "en": "Karelia · South 3",
-      "zh": "卡累利阿共和国·南部3"
+      "en": "Äänislinna District",
+      "zh": "艾尼斯林纳区"
     },
     "RU_MRG_bec756719bb4": {
-      "en": "Khabarovsk Krai · South 3",
-      "zh": "哈巴罗夫斯克边疆区·南部3"
+      "en": "Bohori · South 3",
+      "zh": "伯力·南部3"
     },
     "RU_MRG_bfc2cf574a56": {
-      "en": "Ulyanovsk · South",
-      "zh": "乌里扬诺夫斯克州·南部"
+      "en": "Goeringstadt · South",
+      "zh": "戈林施塔特·南部"
     },
     "RU_MRG_c3b410784a1f": {
-      "en": "Tver · West 2",
-      "zh": "特维尔州·西部2"
+      "en": "Twer · West 2",
+      "zh": "特维尔·西部2"
     },
     "RU_MRG_c3cc17c29955": {
       "en": "Vologda · Southwest",
@@ -25394,16 +25394,16 @@
       "zh": "彼尔姆边疆区·中部1"
     },
     "RU_MRG_c60bafc0ae96": {
-      "en": "Moscow · East",
-      "zh": "莫斯科州·东部"
+      "en": "Moskau · East",
+      "zh": "莫斯科·东部"
     },
     "RU_MRG_c663e09bf172": {
       "en": "Mordovia · East",
       "zh": "莫尔多瓦共和国·东部"
     },
     "RU_MRG_c68b90a156ce": {
-      "en": "Novgorod · East",
-      "zh": "诺夫哥罗德州·东部"
+      "en": "Holmgard · East",
+      "zh": "霍尔姆加德·东部"
     },
     "RU_MRG_c78e9571a541": {
       "en": "Shilovsky District",
@@ -25418,8 +25418,8 @@
       "zh": "巴什科尔托斯坦共和国·南部1"
     },
     "RU_MRG_c90be9cc4d47": {
-      "en": "Tver · Northwest",
-      "zh": "特维尔州·西北部"
+      "en": "Twer · Northwest",
+      "zh": "特维尔·西北部"
     },
     "RU_MRG_ca213480791c": {
       "en": "Novosibirsk · Southeast",
@@ -25446,24 +25446,24 @@
       "zh": "秋卡林斯基区"
     },
     "RU_MRG_d3a65ab636f6": {
-      "en": "Moscow · Southeast",
-      "zh": "莫斯科州·东南部"
+      "en": "Moskau · Southeast",
+      "zh": "莫斯科·东南部"
     },
     "RU_MRG_d3e21f6b65d6": {
-      "en": "Volgograd · North",
-      "zh": "伏尔加格勒州·北部"
+      "en": "Paulusburg · North",
+      "zh": "保卢斯堡·北部"
     },
     "RU_MRG_d3f284416aa5": {
-      "en": "Voronezh · Southwest",
-      "zh": "沃罗涅日州·西南部"
+      "en": "Woronesch · Southwest",
+      "zh": "沃罗涅日·西南部"
     },
     "RU_MRG_d5519e91a94b": {
       "en": "Tyumen · Central",
       "zh": "秋明州·中部"
     },
     "RU_MRG_d665fd9ba683": {
-      "en": "Volgograd · Northwest 2",
-      "zh": "伏尔加格勒州·西北部2"
+      "en": "Paulusburg · Northwest 2",
+      "zh": "保卢斯堡·西北部2"
     },
     "RU_MRG_d67a36c17dc4": {
       "en": "Orenburg · Central 1",
@@ -25474,8 +25474,8 @@
       "zh": "克拉斯诺亚尔斯克边疆区·南部1"
     },
     "RU_MRG_d6e7399b8ed9": {
-      "en": "Moscow · West",
-      "zh": "莫斯科州·西部"
+      "en": "Moskau · West",
+      "zh": "莫斯科·西部"
     },
     "RU_MRG_d7ef4389d36f": {
       "en": "Chelyabinsk · North",
@@ -25494,8 +25494,8 @@
       "zh": "乌德穆尔特共和国·北部2"
     },
     "RU_MRG_da0982e025af": {
-      "en": "Kirov · Southwest 1",
-      "zh": "基洛夫州·西南部1"
+      "en": "Vyatka · Southwest 1",
+      "zh": "维亚特卡·西南部1"
     },
     "RU_MRG_da32271f14c8": {
       "en": "Orenburg · Northwest 2",
@@ -25510,8 +25510,8 @@
       "zh": "塔夫金斯基"
     },
     "RU_MRG_dc59f2179593": {
-      "en": "Belgorod · Northwest",
-      "zh": "别尔哥罗德州·西北部"
+      "en": "Gubkin",
+      "zh": "古布金"
     },
     "RU_MRG_deee7ff279fc": {
       "en": "Bryansky District",
@@ -25534,12 +25534,12 @@
       "zh": "下诺夫哥罗德州·南部"
     },
     "RU_MRG_e00f867dd81d": {
-      "en": "Ulyanovsk · Central",
-      "zh": "乌里扬诺夫斯克州·中部"
+      "en": "Goeringstadt · Central",
+      "zh": "戈林施塔特·中部"
     },
     "RU_MRG_e03e6af00269": {
-      "en": "Khakassia · North",
-      "zh": "哈卡斯共和国·北部"
+      "en": "Saralinsky District",
+      "zh": "萨拉林斯基区"
     },
     "RU_MRG_e0a377c11b7b": {
       "en": "Nikolsky District (Vologda)",
@@ -25558,20 +25558,20 @@
       "zh": "彼尔姆边疆区·南部1"
     },
     "RU_MRG_e5e9822050ff": {
-      "en": "Lipetsk · Southwest",
-      "zh": "利佩茨克州·西南部"
+      "en": "Lipezk · Southwest",
+      "zh": "利佩茨克·西南部"
     },
     "RU_MRG_e72df9dafd76": {
       "en": "Zabaykalsky Krai · Southwest 2",
       "zh": "外贝加尔边疆区·西南部2"
     },
     "RU_MRG_e770cd31cdb4": {
-      "en": "Tula · West",
-      "zh": "图拉州·西部"
+      "en": "Goebbels",
+      "zh": "戈培尔"
     },
     "RU_MRG_e85ce6b2cbb5": {
-      "en": "Smolensk · North",
-      "zh": "斯摩棱斯克州·北部"
+      "en": "Klugeburg · North",
+      "zh": "克卢格堡·北部"
     },
     "RU_MRG_e9567e283174": {
       "en": "Penza · Southeast",
@@ -25598,16 +25598,16 @@
       "zh": "卡拉苏斯基区"
     },
     "RU_MRG_f01d51060a16": {
-      "en": "Stavropol Krai · West",
-      "zh": "斯塔夫罗波尔边疆区·西部"
+      "en": "Stawropol",
+      "zh": "斯塔夫罗波尔"
     },
     "RU_MRG_f18f0befdc5e": {
-      "en": "Krasnodar Krai · Southeast",
-      "zh": "克拉斯诺达尔边疆区·东南部"
+      "en": "Jekaterinodar · Southeast",
+      "zh": "叶卡捷琳诺达尔·东南部"
     },
     "RU_MRG_f1c57006ab38": {
-      "en": "Rostov · Southeast 1",
-      "zh": "罗斯托夫州·东南部1"
+      "en": "Rostow · Southeast 1",
+      "zh": "罗斯托夫·东南部1"
     },
     "RU_MRG_f27518461032": {
       "en": "Tyumen · South",
@@ -25622,8 +25622,8 @@
       "zh": "彼尔姆边疆区·南部2"
     },
     "RU_MRG_f3dfc0448ede": {
-      "en": "Volgograd · Southwest 1",
-      "zh": "伏尔加格勒州·西南部1"
+      "en": "Paulusburg · Southwest 1",
+      "zh": "保卢斯堡·西南部1"
     },
     "RU_MRG_f47338e16e14": {
       "en": "Sverdlovsk · Southwest 3",
@@ -25638,32 +25638,32 @@
       "zh": "扎伊格拉耶夫斯基区"
     },
     "RU_MRG_f703f8a6bf50": {
-      "en": "Krasnodar Krai · West 1",
-      "zh": "克拉斯诺达尔边疆区·西部1"
+      "en": "Jekaterinodar · West 1",
+      "zh": "叶卡捷琳诺达尔·西部1"
     },
     "RU_MRG_f74231f65cbd": {
-      "en": "Krasnodar Krai · South",
-      "zh": "克拉斯诺达尔边疆区·南部"
+      "en": "Jekaterinodar · South",
+      "zh": "叶卡捷琳诺达尔·南部"
     },
     "RU_MRG_f7a972994e86": {
       "en": "Mari El · West",
       "zh": "马里埃尔共和国·西部"
     },
     "RU_MRG_f84bc369d8b3": {
-      "en": "Belgorod · East",
-      "zh": "别尔哥罗德州·东部"
+      "en": "Stary Oskol",
+      "zh": "旧奥斯科尔"
     },
     "RU_MRG_f99008b0bde7": {
-      "en": "Rostov · Southeast 2",
-      "zh": "罗斯托夫州·东南部2"
+      "en": "Rostow · Southeast 2",
+      "zh": "罗斯托夫·东南部2"
     },
     "RU_MRG_fc10904ad88d": {
       "en": "Bashkortostan · Northeast",
       "zh": "巴什科尔托斯坦共和国·东北部"
     },
     "RU_MRG_fdf63a493917": {
-      "en": "Volgograd · Central",
-      "zh": "伏尔加格勒州·中部"
+      "en": "Paulusburg · Central",
+      "zh": "保卢斯堡·中部"
     },
     "RU_MRG_fec102300fdc": {
       "en": "Kostroma · Northwest",

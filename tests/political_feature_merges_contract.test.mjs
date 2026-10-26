@@ -130,3 +130,30 @@ test("every scenario topology carries each surviving merged feature exactly once
     }
   }
 });
+
+test("TNO keeps its own names of merged members as the merged feature's name or alias", () => {
+  const scenario = "tno_1962";
+  const dir = path.join(root, "data/scenarios", scenario);
+  const applied = scenarioGroups(scenario);
+  const parentOf = new Map(applied.flatMap(group => group.member_ids.map(member => [member, group.id])));
+  const final = id => (parentOf.has(id) ? final(parentOf.get(id)) : id);
+  const patch = JSON.parse(readText(path.join(dir, "geo_locale_patch.json"))).geo;
+  const aliasData = JSON.parse(readText(path.join(root, "data/geo_aliases.json")));
+  const aliases = aliasData.alias_to_stable_key;
+  const searchOnly = new Map(aliasData.entries.map(entry => [entry.feature_id, new Set(entry.search_only_aliases || [])]));
+  const lost = [];
+  for (const group of applied) {
+    for (const [member, names] of Object.entries(group.scenario_member_names?.[scenario] || {})) {
+      const target = final(group.id);
+      for (const name of Object.values(names)) {
+        const shown = Object.values(patch[target] || {}).includes(name);
+        const alias = aliases[name]?.replace(/^id::/, "");
+        // A name another feature already resolves (a common district name) stays a search-only alias.
+        const searchable = alias ? final(alias) === target || searchOnly.get(group.id)?.has(name) : false;
+        if (!shown && !searchable) lost.push(`${member} ${name} -> ${target}`);
+      }
+    }
+  }
+  assert.ok(applied.some(group => group.scenario_member_names?.[scenario]));
+  assert.deepEqual(lost, []);
+});
