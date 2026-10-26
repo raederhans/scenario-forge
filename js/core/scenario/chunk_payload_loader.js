@@ -49,10 +49,13 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
       if (entry.bundle === bundle) scheduler.reprioritize(request, selected.has(entry.chunkId) ? 1 : -1);
     }
     trimScenarioChunkPayloadCache(bundle, activePayloadIds(bundle));
-    return Promise.all(chunks.map(async (chunk) => ({
-      chunkId: chunk.id,
-      payload: await loadScenarioChunkPayload(bundle, chunk, { priority: 1, ...options }),
-    })));
+    let loaded = 0;
+    return Promise.all(chunks.map(async (chunk) => {
+      const payload = await loadScenarioChunkPayload(bundle, chunk, { priority: 1, ...options });
+      loaded += 1;
+      options?.onChunkLoaded?.({ chunkId: chunk.id, loaded, total: chunks.length });
+      return { chunkId: chunk.id, payload };
+    }));
   }
 
   function resetScenarioChunkRequests(scenarioId) {
