@@ -237,6 +237,8 @@ export function createStartupBootOverlayController() {
       // so we must toggle the `.hidden` class — not the HTML attribute, and
       // not a `--visible` modifier class that doesn't exist in the stylesheet.
       dom.overlay.classList.toggle("hidden", !blocking);
+      dom.overlay.classList.toggle("is-peek", blocking && !failed
+        && runtimeState.bootPhase !== "ready" && !!runtimeState.firstVisibleFramePainted);
       dom.overlay.setAttribute("aria-busy", String(blocking && !failed));
     }
     if (dom.appShell) {
@@ -289,10 +291,8 @@ export function createStartupBootOverlayController() {
     }
     if (dom.readonlyBanner) {
       const readonlyVisible = !!runtimeState.startupReadonly && !blocking;
-      // `.startup-readonly-banner` has no `display` override, so the HTML
-      // `[hidden]` attribute works here. The previous `--visible` class toggle
-      // targeted a CSS rule that does not exist and was dead code.
       dom.readonlyBanner.hidden = !readonlyVisible;
+      dom.readonlyBanner.classList.toggle("hidden", !readonlyVisible);
     }
     if (dom.readonlyMessage) {
       dom.readonlyMessage.textContent = getStartupReadonlyMessage();

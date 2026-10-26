@@ -57,10 +57,12 @@ test("boot snapshot restore preserves active and inactive timestamps and metrics
 });
 
 function createDocumentStub() {
+  const classes = new Set();
   return {
     body: {
       classList: {
-        toggle() {},
+        contains: (name) => classes.has(name),
+        toggle(name, active) { active ? classes.add(name) : classes.delete(name); },
       },
     },
     getElementById() {
@@ -74,7 +76,7 @@ function createDocumentStub() {
 function createBootShellDocument() {
   const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
   const nodes = new Map();
-  for (const match of html.matchAll(/<[a-z][^>]*\bid="(boot[^"]+)"[^>]*>/gi)) {
+  for (const match of html.matchAll(/<[a-z][^>]*\bid="(boot[^"]+|startupReadonly[^"]+)"[^>]*>/gi)) {
     const tag = match[0];
     const classes = new Set((tag.match(/\bclass="([^"]*)"/)?.[1] || "").split(/\s+/));
     const listeners = new Map();
@@ -256,7 +258,9 @@ test("boot overlay preserves readonly activation time and clears it on ordinary 
 
 function withProgressHarness(run) {
   const keys = ["bootPhase", "bootMessage", "bootProgress", "bootSubProgress", "bootBlocking",
-    "bootError", "bootCanContinueWithoutScenario", "scenarioRegistry", "activeScenarioId", "currentLanguage"];
+    "bootError", "bootCanContinueWithoutScenario", "scenarioRegistry", "activeScenarioId", "currentLanguage",
+    "startupReadonly", "startupReadonlyReason", "startupReadonlyUnlockInFlight", "startupReadonlySince",
+    "firstVisibleFramePainted", "bootPreviewVisible"];
   const saved = snapshotProperties(runtimeState, keys);
   const globals = Object.getOwnPropertyDescriptors(globalThis);
   const frames = [];
@@ -283,6 +287,43 @@ function withProgressHarness(run) {
     }
   }
 }
+
+test("readonly reveal shows the banner and removes the blocking body class", () => {
+  withProgressHarness((controller) => {
+    const banner = document.getElementById("startupReadonlyBanner");
+    banner.classList.toggle("hidden", true);
+    controller.setStartupReadonlyState(true, { reason: "detail-promotion" });
+    assert.equal(document.body.classList.contains("app-booting"), true);
+    assert.equal(banner.hidden, true);
+    assert.equal(banner.classList.contains("hidden"), true);
+    controller.setBootState("interaction-infra", { blocking: false });
+    assert.equal(runtimeState.startupReadonly, true);
+    assert.equal(banner.hidden, false);
+    assert.equal(banner.classList.contains("hidden"), false);
+    assert.equal(document.body.classList.contains("app-booting"), false);
+    assert.equal(document.body.classList.contains("app-startup-readonly"), true);
+    assert.equal(document.getElementById("bootOverlay").classList.contains("hidden"), true);
+    controller.setStartupReadonlyState(false);
+    controller.setBootState("ready");
+    assert.equal(banner.hidden, true);
+    assert.equal(banner.classList.contains("hidden"), true);
+  });
+});
+
+test("accepted first frame enables peek until ready", () => {
+  withProgressHarness((controller) => {
+    runtimeState.firstVisibleFramePainted = false;
+    controller.setBootState("initial-chunk-visual", { blocking: true });
+    const overlay = document.getElementById("bootOverlay");
+    assert.equal(overlay.classList.contains("is-peek"), false);
+    runtimeState.firstVisibleFramePainted = true;
+    controller.setBootPreviewVisible(true);
+    assert.equal(overlay.classList.contains("is-peek"), true);
+    assert.equal(runtimeState.bootBlocking, true);
+    controller.setBootState("ready");
+    assert.equal(overlay.classList.contains("is-peek"), false);
+  });
+});
 
 test("progress does not increase as time passes", () => {
   withProgressHarness((controller, advanceClock) => {
