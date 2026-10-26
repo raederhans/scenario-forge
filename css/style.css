@@ -305,10 +305,11 @@ body.transport-workbench-open.right-drawer-open::after {
 .startup-readonly-banner {
   position: fixed;
   left: 50%;
-  bottom: 22px;
+  top: calc(var(--editor-topbar-height, 56px) + 16px + 56px + 16px);
+  bottom: auto;
   z-index: 110;
   transform: translateX(-50%);
-  width: min(680px, calc(100vw - 36px));
+  width: min(560px, calc(100vw - 48px));
   padding: 12px 16px;
   border: 1px solid rgba(22, 35, 51, 0.08);
   border-radius: 16px;
@@ -316,6 +317,18 @@ body.transport-workbench-open.right-drawer-open::after {
   box-shadow: 0 16px 34px rgba(15, 23, 42, 0.14);
   pointer-events: none;
   backdrop-filter: blur(8px);
+}
+
+@media (max-width: 1050px) {
+  .startup-readonly-banner {
+    top: calc(var(--editor-topbar-height, 56px) + 78px + 56px + 16px);
+  }
+}
+
+@media (max-width: 767px) {
+  .startup-readonly-banner {
+    top: calc(var(--editor-topbar-height, 56px) + 68px + 56px + 8px);
+  }
 }
 
 .startup-readonly-banner.hidden {
