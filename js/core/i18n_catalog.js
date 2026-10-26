@@ -2,6 +2,10 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Inspector": { zh: "检查器", en: "Inspector" },
+  "Scenario": { zh: "剧本", en: "Scenario" },
+  "Mode": { zh: "模式", en: "Mode" },
+  "Country": { zh: "国家", en: "Country" },
   "Select tool": { zh: "选择工具", en: "Select tool" },
   "Switched to fill tool": { zh: "已切换到填充工具", en: "Switched to fill tool" },
   "Click to inspect a region or country. Press F to switch to fill before painting.": { zh: "点击查看区域或国家。绘制前按 F 切换到填充工具。", en: "Click to inspect a region or country. Press F to switch to fill before painting." },

@@ -1,9 +1,8 @@
 import { patchUiChromeState } from "../../core/state/actions/ui_chrome_actions.js";
 
-const SCENARIO_BAR_LEFT_OFFSET = 18;
+const SCENARIO_BAR_LEFT_OFFSET = 24;
 const SCENARIO_BAR_MOBILE_LEFT_OFFSET = 12;
 const SCENARIO_BAR_SAFE_GAP = 16;
-const SCENARIO_BAR_MIN_WIDTH = 172;
 const SCENARIO_BAR_BASE_MAX_WIDTH = 560;
 const SCENARIO_BAR_NARROW_WIDTH = 360;
 const SCENARIO_BAR_COMPACT_WIDTH = 420;
@@ -68,16 +67,17 @@ function createScenarioContextBarController({
       || mapContainer?.closest(".map-stage")?.getBoundingClientRect()
       || mapContainer?.getBoundingClientRect()
       || { left: 0, right: globalRef.innerWidth || 0 };
-    const zoomRect = zoomControls.getBoundingClientRect();
     const leftInset = getScenarioOverlayLeftInset();
     const stageWidthLimit = Math.round((overlayRect.right - overlayRect.left) - (leftInset * 2));
-    const rawAvailableWidth = Math.round(
-      zoomRect.left - overlayRect.left - leftInset - SCENARIO_BAR_SAFE_GAP
-    );
-    const availableWidth = Math.max(
-      SCENARIO_BAR_MIN_WIDTH,
-      Math.min(stageWidthLimit, rawAvailableWidth > 0 ? rawAvailableWidth : stageWidthLimit)
-    );
+    let rightControlLeft = zoomControls.getBoundingClientRect().left;
+    if (globalRef.innerWidth <= 1023) {
+      const toggleRect = scenarioContextBar.ownerDocument.getElementById("rightPanelToggle").getBoundingClientRect();
+      rightControlLeft = Math.min(rightControlLeft, toggleRect.left);
+    }
+    const availableWidth = Math.max(0, Math.min(
+      stageWidthLimit,
+      Math.floor(rightControlLeft - overlayRect.left - leftInset - SCENARIO_BAR_SAFE_GAP)
+    ));
     scenarioContextBar.style.setProperty("--scenario-bar-safe-max-width", `${availableWidth}px`);
     scenarioContextBar.classList.toggle("is-overlay-constrained", availableWidth < SCENARIO_BAR_BASE_MAX_WIDTH);
     scenarioContextBar.classList.toggle("is-narrow", availableWidth < SCENARIO_BAR_NARROW_WIDTH);
@@ -106,7 +106,7 @@ function createScenarioContextBarController({
     }
     if (scenarioContextActiveText) {
       scenarioContextActiveText.textContent = activeValue;
-      scenarioContextActiveText.setAttribute("title", `${translateUi("Active")}: ${activeValue}`);
+      scenarioContextActiveText.setAttribute("title", `${translateUi("Country")}: ${activeValue}`);
     }
     if (scenarioContextCollapseBtn) {
       scenarioContextCollapseBtn.textContent = runtimeState.ui.scenarioBarCollapsed ? "+" : "-";

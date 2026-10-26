@@ -293726,6 +293726,10 @@
     }
   },
   "ui": {
+    "Country": {
+      "en": "Country",
+      "zh": "国家"
+    },
     "Category {index}": {
       "en": "Category {index}",
       "zh": "类别 {index}"
