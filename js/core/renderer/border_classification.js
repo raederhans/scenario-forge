@@ -73,8 +73,15 @@ export function createBorderClassification(graph, resolveFeature, { isArcEligibl
     };
     return result;
   }
+  function getCounts() {
+    const counts = {};
+    for (const [category, collection] of Object.entries(buckets)) {
+      counts[category] = Object.fromEntries([...collection].map(([key, bucket]) => [key, bucket.arcs.size]));
+    }
+    return counts;
+  }
   refresh();
-  return { refresh, getMeshes, getRevision: () => revision,
+  return { refresh, getMeshes, getCounts, getRevision: () => revision,
     getActiveArcCount: () => buckets.paint.get('')?.arcs.size || 0,
     getMesh: () => getMeshes().paint[0] };
 }

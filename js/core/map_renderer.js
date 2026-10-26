@@ -2548,7 +2548,19 @@ function resolveClassifiedBorderFeature(feature, id) {
   const parentKey = borderDistrictGroups.get(borderKey)?.get(parentId)
     || (reference === borderKey ? runtimeState.parentGroupByFeatureId?.get(parentId) : '') || '';
   const admin1 = getAdmin1Group(parent);
-  return { borderKey, parentKey, provinceKey: admin1 ? `${getFeatureCountryCodeNormalized(parent)}::${admin1}` : '' };
+  const sourceCountry = canonicalCountryCode(getFeatureCountryCodeNormalized(parent));
+  return { borderKey, parentKey,
+    provinceKey: admin1 && isBorderHomeCountry(borderKey, sourceCountry) ? `${sourceCountry}::${admin1}` : '' };
+}
+// Occupied or annexed land (German Bohemia, Austria, Poland) keeps no province
+// lines of its former country; only the owner's own source country does.
+function isBorderHomeCountry(borderKey, sourceCountry) {
+  if (!sourceCountry || borderKey === sourceCountry) return true;
+  const countries = runtimeState.scenarioCountriesByTag;
+  if (!countries || typeof countries !== "object") return true;
+  const record = countries[borderKey];
+  if (!record) return false;
+  return [record.base_iso2, record.lookup_iso2].some(code => code && canonicalCountryCode(code) === sourceCountry);
 }
 // Supported parent-border countries only grow within one scene, so painting a
 // country's last district edge away keeps its enabled preference for undo.
@@ -2576,7 +2588,8 @@ function getPaintContourRuntimeOwner() {
       getFeatureId,
       resolveClassification: resolveClassifiedBorderFeature,
       getClassificationRevision: () => [runtimeState.sovereignBaseColors, getBorderPaletteRevision(),
-        runtimeState.scenarioDistrictGroupsData, runtimeState.scenarioDataGeneration, runtimeState.parentGroupByFeatureId],
+        runtimeState.scenarioDistrictGroupsData, runtimeState.scenarioDataGeneration, runtimeState.parentGroupByFeatureId,
+        runtimeState.scenarioCountriesByTag],
       resolveBoundaryKey: (feature, id) => {
         const parent = getRiverPaintRuntime(runtimeState).getParentFeature(feature);
         return canonicalCountryCode(getDisplayOwnerCode(parent, feature?.properties?.__riverParentId || id));
