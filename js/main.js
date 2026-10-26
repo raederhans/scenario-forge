@@ -117,6 +117,7 @@ function checkpointFirstVisibleFrameMetrics() {
   if (String(state.activeScenarioId || "").trim()) {
     checkpointBootMetricOnce("first-visible-scenario");
   }
+  setBootPreviewVisible(true);
   return state.bootMetrics;
 }
 
@@ -402,9 +403,9 @@ async function finalizeReadyState(renderDispatcher) {
     shouldEnterStartupReadonly
     && startupBootstrapStrategy === "chunked-coarse-first";
   if (shouldUseChunkedCoarseStartup) {
-    // chunked-coarse-first 已有可点击粗粒度政治层，先建 basic hit 基础设施再放行 ready，完整交互设施继续延后。
+    setStartupReadonlyState(true, { reason: "detail-promotion" });
     setBootState("interaction-infra", {
-      blocking: true,
+      blocking: false,
       progress: Math.max(Number(runtimeState.bootProgress) || 0, getBootProgressWindow("detail-promotion").min),
       canContinueWithoutScenario: false,
     });

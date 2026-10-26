@@ -1,4 +1,6 @@
 {
+  "Mode": "模式",
+  "Country": "国家",
   "Population heatmap could not be loaded. Retry.": "人口热力加载失败，请重试。",
   "Loading population heatmap…": "正在加载人口热力…",
   "Showing overview; refining this view…": "已显示全局概览，正在细化当前视野…",
@@ -499,6 +501,7 @@
   "Import": "导入",
   "Import cancelled": "导入已取消",
   "Inspector": "检查器",
+  "Layer settings": "图层设置",
   "Inspector panels": "检查器面板",
   "Intensity": "强度",
   "Intensity Field": "强度场",

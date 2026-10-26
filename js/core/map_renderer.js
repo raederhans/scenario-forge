@@ -4396,7 +4396,7 @@ function getDrawCanvasOrchestrationOwner() {
         ensureLayerDataFromTopology();
         // Cached viewport frames also need to select the current contour pack.
         if (runtimeState.renderPhase !== RENDER_PHASE_INTERACTING
-          && !runtimeState.bootBlocking && !runtimeState.scenarioApplyInFlight) {
+          && !runtimeState.bootBlocking && !runtimeState.startupReadonly && !runtimeState.scenarioApplyInFlight) {
           ensureContourLodForView();
           ensurePhysicalAtlasDetailForView();
         }

@@ -293726,6 +293726,10 @@
     }
   },
   "ui": {
+    "Country": {
+      "en": "Country",
+      "zh": "国家"
+    },
     "Category {index}": {
       "en": "Category {index}",
       "zh": "类别 {index}"
@@ -296893,6 +296897,10 @@
     "Inspector": {
       "en": "Inspector",
       "zh": "检查器"
+    },
+    "Layer settings": {
+      "en": "Layer settings",
+      "zh": "图层设置"
     },
     "Inspector Group": {
       "en": "Inspector Group",

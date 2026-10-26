@@ -2,8 +2,8 @@
 /* Reserve final shell geometry before deferred controls are mounted. */
 .editor-workspace {
   --editor-topbar-height: 56px;
-  --editor-left-width: 272px;
-  --editor-right-width: 320px;
+  --editor-left-width: clamp(248px, 19vw, 300px);
+  --editor-right-width: clamp(296px, 22vw, 360px);
   --editor-control-size: 0.8125rem;
   --editor-meta-size: 0.75rem;
 }
@@ -115,9 +115,13 @@
 .editor-workspace .preset-delete-action { width: auto; background: transparent; box-shadow: none; color: var(--text-secondary); }
 .editor-workspace .preset-delete-action:hover:not(:disabled) { color: #a12626; background: #fbeeee; }
 .scenario-guide-step-action { margin-top: 8px; width: auto; }
-.editor-properties-header { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 10px; min-height: 64px; box-sizing: border-box; background: var(--bg-panel, #f8fafc); padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); }
-.editor-properties-header #editorPropertiesBackBtn { min-height: 36px; flex-shrink: 0; padding: 6px 8px; font-size: 12px; }
-.editor-properties-header #editorPropertiesBackBtn::before { content: "‹"; margin-right: 5px; font-size: 18px; line-height: 1; }
+.editor-properties-header { position: sticky; top: 0; z-index: 2; display: flex; flex-direction: column; align-items: stretch; gap: 10px; min-height: 64px; box-sizing: border-box; background: var(--bg-panel, #f8fafc); padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); }
+.editor-workspace .editor-properties-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-width: 0; }
+.editor-workspace .editor-properties-heading .editor-properties-title { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.editor-workspace .editor-properties-heading .editor-nav-button { flex: 0 0 auto; width: auto; }
+.editor-workspace .editor-property-segments { display: flex; flex-wrap: wrap; align-items: center; gap: 3px; }
+.editor-workspace .editor-property-segments .editor-nav-button { flex: 0 0 auto; width: auto; }
+.editor-workspace .editor-property-segments .editor-nav-button[aria-selected="true"] { color: #185f8b; background: #e0eef8; font-weight: 650; }
 .editor-properties-title { font-size: 15px; line-height: 1.5; margin: 0; font-weight: 650; }
 .editor-properties-title:focus-visible { outline: 2px solid #287ead; outline-offset: 4px; border-radius: 2px; }
 .editor-properties-body { padding: 16px; }
@@ -161,6 +165,9 @@
 .editor-workspace .editor-task-panel .palette-grid { max-height: none; overflow: visible; }
 .editor-workspace #bottomDock { bottom: 16px; border-radius: 12px; gap: 8px; padding: 8px; width: min(820px, calc(100% - 24px)); max-width: calc(100% - 24px); }
 .editor-workspace #bottomDock:has(#riverPaintNavigation:not([hidden])) { overflow: visible; }
+.editor-workspace .scenario-context-bar { left: 24px; max-width: calc(100% - 48px); }
+.editor-workspace .scenario-context-label { flex-shrink: 0; color: var(--text-primary); font-weight: 600; }
+.editor-workspace .scenario-context-bar:is(.is-narrow, .is-overlay-constrained) .scenario-context-label { display: none; }
 .editor-workspace .bottom-dock-primary { flex-wrap: wrap; gap: 8px; }
 .editor-workspace #paletteGrid { grid-template-columns: repeat(3, 24px); }
 .editor-workspace #paletteGrid > :nth-child(n + 4) { display: none; }
@@ -213,12 +220,12 @@
 @media (prefers-reduced-motion: reduce) {
   .editor-workspace :is(.editor-nav-button, .appearance-tab-btn, .map-content-tab-btn) { transition: none; }
 }
-@media (max-width: 1280px) {
-  .editor-workspace { --editor-left-width: 248px; --editor-right-width: 296px; }
+@media (max-width: 1279px) {
   .editor-project-bar #workspaceSaveStatus { display: none; }
   .editor-workspace .bottom-dock-primary { gap: 4px; }
 }
 @media (min-width: 1024px) {
+  .editor-workspace #leftSidebar, .editor-workspace #rightSidebar { transition-property: background, border-color; }
   .editor-workspace #rightSidebar { max-width: var(--editor-right-width); }
   /* Collapse the shell without squeezing and rewrapping its controls each frame. */
   .editor-workspace #leftSidebarContent { width: calc(var(--editor-left-width) - 1px); }
@@ -230,15 +237,19 @@
   .editor-workspace #leftSidebar, .editor-workspace #rightSidebar { width: min(340px, 88vw); flex-basis: 0; }
   .editor-workspace .sidebar { top: var(--editor-topbar-height); max-height: calc(100dvh - var(--editor-topbar-height)); }
 }
-@media (max-width: 768px) {
-  .editor-project-bar { gap: 5px; padding: 0 8px; }
+@media (max-width: 767px) {
+  .editor-workspace { --editor-topbar-height: 96px; }
+  .editor-project-bar { flex-wrap: wrap; align-content: center; gap: 5px; padding: 4px 8px; }
   .editor-brand { font-size: 12px; max-width: 88px; white-space: normal; }
-  .editor-project-actions { gap: 4px; }
+  .editor-project-actions { gap: 4px; flex-basis: 100%; min-width: 0; justify-content: flex-end; }
   .editor-project-bar button { font-size: 12px; padding: 6px; }
   .editor-project-bar #scenarioGuideBtn { display: none; }
   .editor-project-bar #workspaceGithubLink { padding: 6px 8px; }
   .editor-project-bar #workspaceGithubLink span { display: none; }
+  .editor-project-bar #workspaceGithubLink { display: none; }
   .editor-project-bar .editor-scenario-menu > summary { padding: 8px 5px; font-size: 12px; }
+  .editor-project-bar .editor-scenario-menu > .sidebar-details-body { position: fixed; top: var(--editor-topbar-height); left: 8px; width: calc(100vw - 16px); }
+  .editor-workspace .scenario-context-bar { left: 12px; max-width: calc(100% - 24px); }
   .editor-workspace .bottom-dock-primary { flex-wrap: wrap; justify-content: center; }
 }
 .palette-country-editor {
@@ -260,7 +271,3 @@
   padding: 2px;
 }
 
-/* Phone-width bars already overflow; keep the GitHub link from adding to it. */
-@media (max-width: 480px) {
-  .editor-project-bar #workspaceGithubLink { display: none; }
-}

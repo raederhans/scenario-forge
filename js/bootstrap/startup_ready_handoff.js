@@ -337,7 +337,7 @@ export function createStartupReadyHandoffOwner({
     }
     postReadyScheduler.scheduleTask("post-ready-visual-warmup", async (task) => {
       task.throwIfStale();
-      if (!targetRuntime.bootBlocking) {
+      if (!targetRuntime.bootBlocking && !targetRuntime.startupReadonly) {
         task.commit(() => requestMainRender("post-ready-visual-warmup"));
       }
     }, scopedTaskOptions({
@@ -349,7 +349,7 @@ export function createStartupReadyHandoffOwner({
   }
 
   function schedulePostReadyDeferredContextWarmup() {
-    if (targetRuntime.bootBlocking
+    if (targetRuntime.bootBlocking || targetRuntime.startupReadonly
       || (postReadyContextWarmupScheduled && postReadyContextWarmupIsCurrent?.())) {
       return;
     }
@@ -387,7 +387,7 @@ export function createStartupReadyHandoffOwner({
     postReadyContextWarmupIsCurrent = contextTaskOptions.isCurrent;
     postReadyScheduler.scheduleTask("post-ready-context-warmup", async (task) => {
       task.throwIfStale();
-      if (targetRuntime.bootBlocking) {
+      if (targetRuntime.bootBlocking || targetRuntime.startupReadonly) {
         return;
       }
       // Visibility can change while queued. Re-read it before every optional
@@ -416,7 +416,7 @@ export function createStartupReadyHandoffOwner({
       postReadyScheduler.scheduleTask("post-ready-contour-warmup", async (task) => {
         task.throwIfStale();
         await task.yield();
-        if (targetRuntime.bootBlocking || !targetRuntime.showPhysical
+        if (targetRuntime.bootBlocking || targetRuntime.startupReadonly || !targetRuntime.showPhysical
           || normalizePhysicalStyleConfig(targetRuntime.styleConfig?.physical).mode === "atlas_only") {
           return;
         }

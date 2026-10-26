@@ -107,7 +107,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
 
   function isReducedHoverPhase() {
     return Boolean(state.renderPhase !== renderPhaseIdle || state.isInteracting || state.scenarioApplyInFlight
-      || state.startupReadonly || state.startupReadonlyUnlockInFlight);
+      || state.bootBlocking || state.startupReadonlyUnlockInFlight);
   }
   function hasHoverIds() {
     return Boolean(state.hoveredId || state.hoveredWaterRegionId || state.hoveredSpecialRegionId);

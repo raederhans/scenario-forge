@@ -1,6 +1,6 @@
 // The workspace moves existing controls so their business owners keep their
 // element references, event handlers, and native form contracts.
-export function initEditorWorkspace({ documentRef = document, initialSearch = globalThis.location?.search || "", t, setSidebarTab, setStrategicMode, revealProperties = () => {}, onNavigate = () => {} } = {}) {
+export function initEditorWorkspace({ documentRef = document, initialSearch = globalThis.location?.search || "", t, setSidebarTab, setStrategicMode, toggleInspector, revealProperties = () => {}, onNavigate = () => {} } = {}) {
   const get = (id) => documentRef.getElementById(id);
   const left = get("leftSidebarContent");
   const right = get("rightSidebarContent");
@@ -56,7 +56,28 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   backButton.hidden = true;
   backButton.setAttribute("aria-label", t("Back", "ui"));
   backButton.dataset.i18nAriaLabel = "Back";
-  propertyHeader.append(backButton, title);
+  const segments = make("nav", "editor-property-segments", "", "editorPropertySegments");
+  segments.setAttribute("role", "tablist");
+  const segmentButtons = new Map();
+  const segmentProperties = new Map();
+  for (const [key, label, id] of [
+    ["inspector", "Inspector", "editorSegmentInspector"],
+    ["layers", "Layer settings", "editorSegmentLayers"],
+  ]) {
+    const btn = button(label, id, () => {
+      const propertyKey = segmentProperties.get(key);
+      const trigger = propertyEntries.get(propertyKey)?.trigger;
+      if (trigger) trigger.click();
+      else showProperty(propertyKey);
+    });
+    btn.setAttribute("role", "tab");
+    btn.setAttribute("aria-selected", "false");
+    segments.append(btn);
+    segmentButtons.set(key, btn);
+  }
+  const propertyHeading = make("div", "editor-properties-heading");
+  propertyHeading.append(backButton, title);
+  propertyHeader.append(segments, propertyHeading);
   right.prepend(propertyHeader);
   const properties = make("div", "editor-properties-body", "", "editorPropertiesBody");
   right.append(properties);
@@ -78,7 +99,12 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     host.dataset.i18nAriaLabel = label;
     for (const node of nodes.filter(Boolean)) host.append(node);
     properties.append(host);
-    propertyEntries.set(key, { host, label, task });
+    const segment = task === "layers" ? "layers" : "inspector";
+    propertyEntries.set(key, { host, label, task, segment });
+    if (!segmentProperties.has(segment)) {
+      segmentProperties.set(segment, key);
+      segmentButtons.get(segment).setAttribute("aria-controls", host.id);
+    }
     return host;
   };
   const showProperty = (key, { syncTab = true, reveal = false } = {}) => {
@@ -87,6 +113,11 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     const changed = currentProperty !== key;
     if (changed && workspaceReady && !navigatingBack) propertyHistory.push(currentProperty);
     currentProperty = key;
+    segmentProperties.set(entry.segment, key);
+    setAttribute(segmentButtons.get(entry.segment), "aria-controls", entry.host.id);
+    for (const [segment, btn] of segmentButtons) {
+      setAttribute(btn, "aria-selected", segment === entry.segment);
+    }
     if (entry.task) taskProperties.set(entry.task, key);
     if (syncTab) setSidebarTab(key === "project" ? "project" : "inspector");
     for (const [id, item] of propertyEntries) setHidden(item.host, id !== key);
@@ -359,6 +390,14 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   move("workspaceSaveStatus", top);
   const topActions = make("div", "editor-project-actions");
   top.append(topActions);
+  const inspectorToggle = button("Inspector", "editorInspectorToggleBtn", toggleInspector);
+  inspectorToggle.setAttribute("aria-controls", "rightSidebar");
+  inspectorToggle.setAttribute("aria-expanded", String(
+    globalThis.matchMedia("(max-width: 1023px)").matches
+      ? documentRef.body.classList.contains("right-drawer-open")
+      : !documentRef.body.classList.contains("right-sidebar-collapsed")
+  ));
+  topActions.append(inspectorToggle);
   for (const id of ["workspaceSaveBtn", "workspaceExportBtn", "scenarioGuideBtn", "workspaceGithubLink", "btnToggleLang", "rightSidebarAccountShelf"]) move(id, topActions);
   const strategyBtn = button("Edit annotations", "editorStrategicModeBtn", () => {
     const active = !documentRef.body.classList.contains("frontline-mode-active");
@@ -403,11 +442,16 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   selectObject("countries", { syncTab: false });
   if (requestedProject) showProperty("project", { syncTab: false });
   if (!requestedView) {
-    const requestedEntry = [...propertyEntries.values()].find((entry) => requestedSections.some((id) => {
+    const requestedEntry = [...propertyEntries].find(([key, entry]) => requestedSections.some((id) => {
+      if (id === key) return true;
       const section = get(id);
       return section && entry.host.contains(section);
     }));
-    requestedEntry?.trigger?.click();
+    if (requestedEntry) {
+      const [key, entry] = requestedEntry;
+      if (entry.trigger) entry.trigger.click();
+      else showProperty(key);
+    }
   }
   if (requestedView === "reference") selectTask("assets");
   workspaceReady = true;
