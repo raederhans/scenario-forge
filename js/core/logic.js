@@ -4,6 +4,7 @@ import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { refreshColorState, refreshResolvedColorsForOwners } from "./map_renderer.js";
 import { getCountryCode as getSharedFeatureCountryCode, normalizeFeatureCountryCode } from "./feature_identity.js";
+import { getScenarioCountryTags, uniquifyScenarioDefaultColors } from "./state/actions/scenario_activation_actions.js";
 const state = runtimeState;
 
 function normalizeCountryCode(rawCode) {
@@ -56,10 +57,11 @@ function resetCountryColors() {
   Object.keys(defaultCountryPalette).forEach((code) => {
     countryPalette[code] = defaultCountryPalette[code];
   });
-  runtimeState.sovereignBaseColors = {
-    ...resolvedDefaults,
-    ...(runtimeState.activeScenarioId ? runtimeState.scenarioFixedOwnerColors || {} : {}),
-  };
+  const fixedColors = runtimeState.activeScenarioId ? runtimeState.scenarioFixedOwnerColors || {} : {};
+  runtimeState.sovereignBaseColors = uniquifyScenarioDefaultColors({ ...resolvedDefaults, ...fixedColors }, {
+    tags: runtimeState.activeScenarioId ? getScenarioCountryTags(runtimeState.scenarioCountriesByTag) : null,
+    preferred: Object.keys(fixedColors),
+  });
   runtimeState.colors = {};
   runtimeState.visualOverrides = {};
 
