@@ -75,7 +75,9 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     segments.append(btn);
     segmentButtons.set(key, btn);
   }
-  propertyHeader.append(backButton, segments, title);
+  const propertyHeading = make("div", "editor-properties-heading");
+  propertyHeading.append(backButton, title);
+  propertyHeader.append(segments, propertyHeading);
   right.prepend(propertyHeader);
   const properties = make("div", "editor-properties-body", "", "editorPropertiesBody");
   right.append(properties);

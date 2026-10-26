@@ -107,6 +107,8 @@ function mount(context, initialSearch = "") {
     });
   }
   add("projectSidebarPanel", right);
+  add("frontlineProjectSection", right, "details");
+  add("strategicCommandBar");
   add("inspectorSidebarTabProject", left, "button");
   const previous = { matchMedia: globalThis.matchMedia, MutationObserver: globalThis.MutationObserver };
   globalThis.matchMedia = () => ({ matches: false });
@@ -151,6 +153,18 @@ test("showProperty selects the owning segment and keeps only its property visibl
   h.workspace.showProperty("project");
   expectProperty(h, "project", "Inspector");
   assert.equal(h.sidebarTabs.at(-1), "project");
+});
+
+test("property segments occupy a separate header row from the title and annotation controls", (context) => {
+  const h = mount(context);
+  const segments = h.get("editorPropertySegments");
+  const title = h.get("editorPropertiesTitle");
+  const strategy = h.get("editorStrategicModeBtn");
+  assert.deepEqual(segments.parentNode.children, [segments, title.parentNode]);
+  assert.deepEqual(title.parentNode.children, [h.get("editorPropertiesBackBtn"), title]);
+  assert.notEqual(segments.parentNode, strategy.parentNode);
+  assert.equal(strategy.parentNode, h.get("editorProperty-annotations"));
+  assert.equal(h.get("editorFinishAnnotationsBtn").parentNode, h.get("strategicCommandBar"));
 });
 
 test("segment clicks start at the first property and restore each segment's last property", (context) => {
