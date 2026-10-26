@@ -7,6 +7,10 @@ import { createPaintContourGraphBuilder } from '../js/core/renderer/paint_contou
 import { createPaintContourWorkerClient } from '../js/core/paint_contour_worker_client.js';
 import { getPackedPaintContourMesh } from '../js/core/renderer/paint_contour_mesh.js';
 import { createBorderIdentityResolver } from '../js/core/renderer/border_identity.js';
+import { packContourWaterMask } from '../js/core/renderer/paint_contour_water_mask.js';
+
+const stableDiagnostics = diagnostics => Object.fromEntries(Object.entries(diagnostics)
+  .filter(([key]) => !(key.startsWith('nearSeam') && (key.endsWith('Ms') || key.endsWith('Bytes')))));
 
 test('scenario classification reuses the graph, refreshes dirty arcs and invalidates borders on grouping or palette changes', async () => {
   let palette = { A: '#ff0000', B: '#00ff00' }, districts = {}, h;
@@ -76,6 +80,7 @@ function harness(runtimeOptions = {}) {
       return new Promise((resolve,reject)=>tasks.push({features,removed,options,resolve:()=>resolve({unchanged:true}),reject}));
     }
     if(options.reset)builder=createPaintContourGraphBuilder();
+    if(options.waterMask !== undefined)builder.setWaterMask(options.waterMask);
     dirty=true;builder.patch(features,removed);const graph=builder.finish();
     return new Promise((resolve,reject)=>tasks.push({features,removed,options,resolve:()=>{
       if(ownedDisposals===disposals){finished=true;dirty=false;}resolve(graph);
@@ -208,7 +213,8 @@ test('publication generation or eligibility signal changes still scan every sour
     h.runtime.notifySourcePublished({ previousTopologyRevision: 0 });
     assert.deepEqual(h.scans, { ids: 4, eligible: 4 }, field);
     await h.flush();
-    assert.deepEqual(h.tasks[1].removed, ['B'], field);
+    assert.deepEqual(h.tasks[1].removed, field === 'mapSemanticMode' ? [] : ['B'], field);
+    if (field === 'mapSemanticMode') assert.equal(h.tasks[1].options.nearSeamTolerance, 0);
     await h.finish(); assert.equal(h.runtime.diagnostics().featureCount, 1);
   }
 });
@@ -432,6 +438,41 @@ function loopbackContourWorker({ holdPatch = false, builderFactory = createPaint
   return { worker, sent, replies, receive: packet => scope.self.onmessage({ data: packet }), terminations: () => terminations };
 }
 
+test('water revisions rebuild without geometry transfers and unchanged sources reuse the worker mask', async () => {
+  let revision = 0, calls = 0;
+  let land = { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-1,-1],[4,-1],[4,3],[-1,3],[-1,-1]]] } };
+  const h = harness({ getWaterRevision: () => [revision], getWaterMaskSources: () => { calls++; return { land }; } });
+  h.state.land = [rect('A',0),rect('B',1.03)];
+  h.runtime.getMeshes(); await h.flush(); await h.finish();
+  assert.ok(h.runtime.diagnostics().nearSeamSegments > 0); assert.equal(calls,1);
+  h.state.land = structuredClone(h.state.land); h.runtime.getMeshes(); await h.flush(); await h.finish();
+  assert.equal(h.tasks[1].options.waterMask,undefined); assert.equal(calls,1);
+  land = { type: 'FeatureCollection', features: h.state.land.map(f => ({ ...f, type: 'Feature' })) }; revision++;
+  h.runtime.getMeshes(); await h.flush(); await h.finish();
+  assert.equal(h.tasks[2].features.length,0); assert.equal(h.tasks[2].options.reuse,false);
+  assert.equal(h.runtime.diagnostics().nearSeamSegments,0); assert.equal(calls,2);
+  h.state.sceneGeneration=1;h.runtime.getMeshes();await h.flush();await h.finish();assert.equal(calls,3);
+});
+
+test('water masks transfer once and subsequent geometry updates retain water rejection in the real worker', async () => {
+  for (const supported of [true,false]) {
+    const h = loopbackContourWorker(), client=createPaintContourWorkerClient({createWorker:()=>h.worker,isSupported:()=>supported,yieldToHost:()=>Promise.resolve()});
+    const features=[rect('A',0),rect('B',1.03)];
+    const land={type:'Feature',geometry:{type:'Polygon',coordinates:[[[-1,-1],[4,-1],[4,3],[-1,3],[-1,-1]]]}};
+    try {
+      const first=await client.build(features,[],{reset:true,waterMask:packContourWaterMask({land})});
+      assert.ok(first.diagnostics.nearSeamSegments>0);
+      const waterMask=packContourWaterMask({land:features.map(f=>({...f,type:'Feature'}))});
+      const rejected=await client.build([],[],{waterMask});assert.equal(rejected.diagnostics.nearSeamSegments,0);
+      const next=await client.build(structuredClone(features),[]);assert.equal(next.diagnostics.nearSeamSegments,0);
+      if(supported){
+        const messages=h.sent.filter(m=>m.packet.type==='WATER');assert.equal(messages.length,2);
+        assert.ok(messages.every(m=>m.transferred===6&&m.detached));
+      }
+    } finally {client.dispose();}
+  }
+});
+
 test('worker PATCH transfers lossless Float64 batches and only graph-required metadata in source order', async () => {
   const h = loopbackContourWorker();
   const client = createPaintContourWorkerClient({ createWorker: () => h.worker, isSupported: () => true });
@@ -449,7 +490,9 @@ test('worker PATCH transfers lossless Float64 batches and only graph-required me
     const graph = await client.build(features, [], { reset: true });
     const expected = createPaintContourGraphBuilder();
     expected.patch(features);
-    assert.deepEqual(graph, expected.finish());
+    const reference = expected.finish();
+    assert.deepEqual({ ...graph, diagnostics: stableDiagnostics(graph.diagnostics) },
+      { ...reference, diagnostics: stableDiagnostics(reference.diagnostics) });
     assert.equal(JSON.stringify(features), before, 'only newly allocated codec buffers are transferred');
     assert.deepEqual(h.sent.map(({ packet }) => packet.type), ['BEGIN', 'PATCH', 'PATCH', 'FINISH']);
     const patches = h.sent.filter(({ packet }) => packet.type === 'PATCH');
@@ -740,11 +783,44 @@ test('certified replacements still PATCH in original order and preserve the next
       const update = rect('B',4); reference.patch([update]);
       const expected = reference.finish(), actual = await client.build([update], []);
       assert.deepEqual(actual.featureIds, expected.featureIds);
-      assert.deepEqual(actual.diagnostics, expected.diagnostics);
+      assert.deepEqual(stableDiagnostics(actual.diagnostics), stableDiagnostics(expected.diagnostics));
       for (const key of ['coordinates', 'offsets', 'owners']) {
         const bytes = graph => Buffer.from(graph[key].buffer, graph[key].byteOffset, graph[key].byteLength);
         assert.ok(bytes(actual).equals(bytes(expected)), `${key}: actual PATCH history must equal the original full-FINISH sequence`);
       }
     } finally { client.dispose(); }
   }
+});
+
+
+test('only water geometry references and Atlantropa visibility invalidate the water mask', async () => {
+  const h = harness();
+  h.runtime.getMeshes(); await h.flush(); await h.finish();
+  h.state.contextLayerRevision = 1;
+  h.state.activeScenarioManifest = {};
+  h.state.scenarioLandMaskVersionTag = 'changed';
+  h.state.scenarioContextLandMaskVersionTag = 'changed';
+  h.state.contextLayerExternalDataByName = { unrelated: {} };
+  h.runtime.getMeshes(); await h.flush();
+  assert.equal(h.tasks.length, 1);
+  for (const field of ['scenarioLandMaskData', 'scenarioContextLandMaskData', 'landBgData',
+    'scenarioWaterRegionsData', 'waterRegionsData', 'scenarioAtlantropaData']) {
+    const count = h.tasks.length;
+    h.state[field] = {};
+    h.runtime.getMeshes(); await h.flush();
+    assert.equal(h.tasks.length, count + 1, field);
+    assert.equal(h.tasks.at(-1).options.reuse, false);
+    assert.notEqual(h.tasks.at(-1).options.waterMask, undefined);
+    await h.finish();
+  }
+  const count = h.tasks.length;
+  h.state.contextLayerExternalDataByName.lakes = {};
+  h.runtime.getMeshes(); await h.flush(); await h.finish();
+  assert.equal(h.tasks.length, count + 1);
+  h.state.contextLayerExternalDataByName = { ...h.state.contextLayerExternalDataByName, unrelated: {} };
+  h.runtime.getMeshes(); await h.flush();
+  assert.equal(h.tasks.length, count + 1);
+  h.state.showScenarioAtlantropa = false;
+  h.runtime.getMeshes(); await h.flush(); await h.finish();
+  assert.equal(h.tasks.length, count + 2);
 });

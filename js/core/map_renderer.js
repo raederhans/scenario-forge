@@ -2587,6 +2587,12 @@ function getPaintContourRuntimeOwner() {
       getFeatures: () => getRiverPaintRuntime(runtimeState).surfaces(),
       getFeatureId,
       resolveClassification: resolveClassifiedBorderFeature,
+      getWaterMaskSources: () => ({
+        land: runtimeState.showScenarioAtlantropa === false ? runtimeState.landBgData
+          : runtimeState.scenarioLandMaskData || runtimeState.scenarioContextLandMaskData || runtimeState.landBgData,
+        water: getEffectiveWaterRegionFeatures(),
+        addedLand: buildAtlantropaLandLikeFeatureCollection(),
+      }),
       getClassificationRevision: () => [runtimeState.sovereignBaseColors, getBorderPaletteRevision(),
         runtimeState.scenarioDistrictGroupsData, runtimeState.scenarioDataGeneration, runtimeState.parentGroupByFeatureId,
         runtimeState.scenarioCountriesByTag],

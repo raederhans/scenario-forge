@@ -24,7 +24,8 @@ export function createPaintContourWorkerClient({
   const client = createWorkerTaskClient({ createWorker, resolveMessage: message => message.result });
   let fallback = null, fallbackFinished = false, fallbackDirty = true, generation = 0, controller = new AbortController();
   const abort = () => new DOMException('Stale paint contour request', 'AbortError');
-  async function build(features, removedIds, { reset = false, reuse = false, certifiedEquivalent = false } = {}) {
+  async function build(features, removedIds, { reset = false, reuse = false, certifiedEquivalent = false,
+    waterMask = undefined, nearSeamTolerance = 0.05 } = {}) {
     if (reuse && (reset || removedIds.length || (features.length && !certifiedEquivalent))) throw new TypeError('Contour reuse cannot mutate source');
     if (certifiedEquivalent && (!reuse || reset || removedIds.length || !features.length)) throw new TypeError('Invalid certified contour reuse');
     const current = generation;
@@ -35,6 +36,10 @@ export function createPaintContourWorkerClient({
       let result;
       if (supported) {
         let transfer = [];
+        if (type === 'WATER' && payload.waterMask) {
+          transfer = [payload.waterMask.land, payload.waterMask.water].flatMap(mask =>
+            [mask.coordinates.buffer, mask.ringOffsets.buffer, mask.polygonOffsets.buffer]);
+        }
         if (type === 'PATCH' && payload.features.length) {
           const updates = payload.features.map(({ id, geometry, coordinatePrecision }) => ({
             id, geometry: contourGeometry(geometry), coordinatePrecision,
@@ -54,7 +59,9 @@ export function createPaintContourWorkerClient({
         await yieldToHost();
         if (current !== generation) throw abort();
         if (type === 'BEGIN') {
-          fallback = createPaintContourGraphBuilder(); fallbackFinished = false; fallbackDirty = true;
+          fallback = createPaintContourGraphBuilder({ nearSeamTolerance }); fallbackFinished = false; fallbackDirty = true;
+        } else if (type === 'WATER') {
+          fallback.setWaterMask(payload.waterMask); fallbackDirty = true;
         } else if (type === 'CONFIRM') {
           if (!fallbackFinished || fallbackDirty) throw new Error('No completed unchanged contour graph');
           result = { unchanged: true };
@@ -73,7 +80,8 @@ export function createPaintContourWorkerClient({
       if (current !== generation) throw abort();
       return result;
     };
-    if (reset) await dispatch('BEGIN');
+    if (reset) await dispatch('BEGIN', { nearSeamTolerance });
+    if (waterMask !== undefined) await dispatch('WATER', { waterMask });
     if (removedIds.length) await dispatch('PATCH', { features: [], removedIds });
     let batch = [], points = 0;
     for (const feature of features) {

@@ -2,6 +2,7 @@ import { getContourCoordinatePrecision } from '../paint_contour_source.js';
 import { createPaintContourWorkerClient } from '../paint_contour_worker_client.js';
 import { createPaintContourMesh } from './paint_contour_mesh.js';
 import { createBorderClassification } from './border_classification.js';
+import { packContourWaterMaskCooperatively } from './paint_contour_water_mask.js';
 
 const EMPTY = Object.freeze([]);
 // Compare only fields sent by contourGeometry, without serialization, hashes or
@@ -43,6 +44,10 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   isArcEligible = () => true,
   resolveClassification = null,
   getClassificationRevision = () => [],
+  getWaterRevision = () => [state.scenarioLandMaskData, state.scenarioContextLandMaskData,
+    state.landBgData, state.scenarioWaterRegionsData, state.waterRegionsData,
+    state.contextLayerExternalDataByName?.lakes, state.scenarioAtlantropaData, state.showScenarioAtlantropa],
+  getWaterMaskSources = () => ({}),
   client = createPaintContourWorkerClient(),
   schedule = callback => setTimeout(callback, 0),
   yieldControl = () => new Promise(resolve => setTimeout(resolve, 0)),
@@ -50,6 +55,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
 } = {}) {
   let scene = '', sourceRef = null, sourceSignal = '', sourceVersion = 0, generation = 0;
   let sourceInputs = null;
+  let waterRevision = [], registeredWaterRevision = null;
   let topologyRevision = -1, geometryEpoch = 0, registeredEpoch = -1;
   let featuresById = new Map(), precisionById = new Map(), registered = null, registeredPrecision = null, view = null;
   let acknowledgedGraph = null;
@@ -62,10 +68,12 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     && state.activeScenarioId !== 'blank_base' && state.mapSemanticMode !== 'blank';
   let status = 'idle', error = '', graphDiagnostics = null, builds = 0, sentFeatures = 0;
   let reuseAcks = 0, comparedFeatures = 0, equalFeatures = 0, comparisonYields = 0, comparisonMaxSliceMs = 0;
-  const sceneIdentity = () => [state.activeScenarioId || '', state.sceneGeneration || 0].join('|');
+  const nearSeamsEnabled = () => !!state.activeScenarioId && state.activeScenarioId !== 'blank_base' && state.mapSemanticMode !== 'blank';
+  const sceneIdentity = () => [state.activeScenarioId || '', state.sceneGeneration || 0, nearSeamsEnabled()].join('|');
   function clear() {
     generation += 1; client.dispose(); registered = null; registeredPrecision = null; view = null; inFlight = null;
     acknowledgedGraph = null; lastClassification = null;
+    registeredWaterRevision = null;
     status = 'idle'; error = ''; graphDiagnostics = null; revision += 1;
   }
   function queue() {
@@ -78,8 +86,11 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     const sameScene = scene === nextScene;
     if (scene !== nextScene) { clear(); scene = nextScene; sourceRef = null; }
     const features = getFeatures() || EMPTY;
-    const inputs = [state.scenarioDataGeneration || 0, state.showScenarioAtlantropa, state.showWaterRegions, state.mapSemanticMode];
-    const sameInputs = sourceInputs?.every((value, index) => value === inputs[index]);
+    const nextWaterRevision = getWaterRevision();
+    const waterChanged = nextWaterRevision.length !== waterRevision.length || nextWaterRevision.some((value, index) => value !== waterRevision[index]);
+    waterRevision = nextWaterRevision;
+    const inputs = [state.scenarioDataGeneration || 0, state.showScenarioAtlantropa, state.showWaterRegions, state.mapSemanticMode, ...waterRevision];
+    const sameInputs = sourceInputs?.length === inputs.length && sourceInputs.every((value, index) => value === inputs[index]);
     const signal = [state.topologyRevision || 0, ...inputs].join('|');
     if (sourceRef === features && signal === sourceSignal && sameInputs) return;
     const nextTopologyRevision = Number(state.topologyRevision || 0);
@@ -112,7 +123,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     }
     const geometryChanged = next.size !== featuresById.size || [...next].some(([id, feature]) => featuresById.get(id)?.geometry !== feature.geometry || precisionById.get(id) !== nextPrecision.get(id));
     featuresById = next; precisionById = nextPrecision;
-    if (geometryChanged || forcedGeometryRefresh || status === 'idle') {
+    if (geometryChanged || forcedGeometryRefresh || waterChanged || status === 'idle') {
       sourceVersion += 1; view = null; revision += 1; status = next.size ? 'building' : 'empty';
       if (!next.size) { clear(); featuresById = next; status = 'empty'; }
       else queue();
@@ -160,6 +171,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   }
   function start() {
     const ownedGeneration = generation, ownedVersion = sourceVersion, snapshot = featuresById;
+    const snapshotWaterRevision = waterRevision;
     const epoch = geometryEpoch, snapshotPrecision = precisionById;
     const changed = [], removed = [];
     let equivalent = true;
@@ -213,11 +225,19 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
         } finally { iterator.return(); }
         syncSource();
         if (!current()) throw abort();
-        const reset = !registered, reuse = !reset && !!acknowledgedGraph && equivalent && !removed.length;
+        const reset = !registered;
+        const waterChanged = reset || !registeredWaterRevision || snapshotWaterRevision.length !== registeredWaterRevision.length
+          || snapshotWaterRevision.some((value, index) => value !== registeredWaterRevision[index]);
+        const reuse = !reset && !waterChanged && !!acknowledgedGraph && equivalent && !removed.length;
+        const waterMask = waterChanged ? await packContourWaterMaskCooperatively(getWaterMaskSources(), async () => {
+          await yieldControl(); syncSource(); if (!current()) throw abort();
+        }) : undefined;
+        if (!current()) throw abort();
         sentFeatures += changed.length;
         if (!reuse) builds++;
         dispatched = true;
-        const graph = await client.build(changed, removed, { reset, reuse, certifiedEquivalent: reuse && changed.length > 0 });
+        const graph = await client.build(changed, removed, { reset, reuse, certifiedEquivalent: reuse && changed.length > 0,
+          waterMask, nearSeamTolerance: nearSeamsEnabled() ? 0.05 : 0 });
         if (!owned()) return;
         syncSource();
         if (!owned()) return;
@@ -226,6 +246,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
           reuseAcks++;
         } else acknowledgedGraph = graph;
         registered = snapshot; registeredPrecision = snapshotPrecision; registeredEpoch = epoch;
+        registeredWaterRevision = snapshotWaterRevision;
         if (!current()) return;
         // One full graph, owned by the latest real Worker ACK. Recreate the
         // current view so colors, ownership and eligibility are read afresh.
