@@ -440,3 +440,37 @@ test('coast chains contain uncovered unpaired edges for either ring winding', as
   const near = segments(buildPaintContourGraph([a, overlapping], { waterMask: water, nearSeamTolerance: 0.05 }));
   assert.ok(near.every(([p, q]) => !(p[0] === q[0] && (p[0] === 1 || p[0] === 0.97))), 'both consumed sides are excluded');
 });
+
+
+for (const [name, west, east] of [['touches 180 degrees', 179, 180], ['crosses 180 degrees', 179, -179]]) {
+  test(`coast preserves all four edges when a polygon ${name}`, async () => {
+    const { packContourWaterMask } = await import('../js/core/renderer/paint_contour_water_mask.js');
+    const { createPackedLineMesh } = await import('../js/core/renderer/packed_line_mesh.js');
+    const ring = [[west, 0], [east, 0], [east, 1], [west, 1], [west, 0]];
+    const edgeKey = (a, b) => [a.join(','), b.join(',')].sort().join(';');
+    const expected = ring.slice(1).map((p, i) => edgeKey(ring[i], p)).sort();
+    for (const coordinatePrecision of [4, 7]) for (const reverse of [false, true]) {
+      const geometry = { type: 'Polygon', coordinates: [reverse ? [...ring].reverse() : ring] };
+      const graph = buildPaintContourGraph([{ id: 'A', geometry, coordinatePrecision }], {
+        nearSeamTolerance: 0.05, waterMask: packContourWaterMask({ land: geometry }),
+      });
+      const lines = createPackedLineMesh(graph.coast).coordinates;
+      assert.deepEqual(lines.flatMap(line => line.slice(1).map((p, i) => edgeKey(line[i], p))).sort(), expected);
+    }
+  });
+}
+
+test('coast retains both shores of a narrow water channel', async () => {
+  const { packContourWaterMask } = await import('../js/core/renderer/paint_contour_water_mask.js');
+  const { createPackedLineMesh } = await import('../js/core/renderer/packed_line_mesh.js');
+  const rect = (id, west, east) => ({ id, type: 'Feature', geometry: { type: 'Polygon',
+    coordinates: [[[west, 0], [east, 0], [east, 1], [west, 1], [west, 0]]] } });
+  const features = [rect('A', 0, 1), rect('B', 1.001, 2)];
+  const waterMask = packContourWaterMask({ land: features });
+  for (const nearSeamTolerance of [0, 0.05]) {
+    const graph = buildPaintContourGraph(features, { waterMask, nearSeamTolerance });
+    const edges = createPackedLineMesh(graph.coast).coordinates.flatMap(line => line.slice(1).map((p, i) => [line[i], p]));
+    assert.equal(edges.length, 8);
+    for (const x of [1, 1.001]) assert.ok(edges.some(([a, b]) => a[0] === x && b[0] === x));
+  }
+});

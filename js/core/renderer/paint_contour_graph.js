@@ -178,7 +178,7 @@ function nodeEdges(unmatched, diagnostics, accept = () => true, metric = 'nodedS
   const shared = [], lines = new Map(), repaired = new Set(), remaining = [];
   for (const edge of unmatched) {
     const dx = edge.b[0] - edge.a[0], dy = edge.b[1] - edge.a[1];
-    if (Math.abs(dx) > 180 * SCALE) continue;
+    if (Math.abs(dx) > 180 * SCALE) { remaining.push(edge); continue; }
     const divisor = gcd(dx, dy);
     if (!divisor) continue;
     const ux = dx / divisor, uy = dy / divisor;
@@ -835,9 +835,9 @@ function sharedSegments(edges, diagnostics, precisions, options, polygons) {
     const emit = (lo, hi) => {
       if (hi <= lo) return;
       const t = (lo + hi) / 2;
-      let x = start[0] + dx * t + sign * dy / length * 0.005;
+      let x = start[0] + dx * t + sign * dy / length * 1e-5;
       x = ((x + 180) % 360 + 360) % 360 - 180;
-      if (covered(x, start[1] + dy * t - sign * dx / length * 0.005)) return;
+      if (covered(x, start[1] + dy * t - sign * dx / length * 1e-5)) return;
       const a = point(lo), b = point(hi);
       coast.push({ start: a, end: b, a: coordinate(a), b: coordinate(b) });
     };
