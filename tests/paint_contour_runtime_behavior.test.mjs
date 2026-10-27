@@ -824,3 +824,21 @@ test('only water geometry references and Atlantropa visibility invalidate the wa
   h.runtime.getMeshes(); await h.flush(); await h.finish();
   assert.equal(h.tasks.length, count + 2);
 });
+
+
+test('coast follows the retained classification across rebuilds and resets with the scene', async () => {
+  const h = harness({ resolveClassification: (_feature, id) => ({ borderKey: id }),
+    getWaterMaskSources: () => ({ land: [rect('A', 0).geometry, rect('B', 1).geometry] }) });
+  assert.equal(h.runtime.getCoastMesh(), null);
+  await h.flush(); await h.finish();
+  const classification = h.runtime.getClassification(), coast = h.runtime.getCoastMesh();
+  assert.ok(coast.coordinates.length);
+  h.state.land = [h.a, rect('B', 2)];
+  assert.equal(h.runtime.getClassification(), classification);
+  assert.equal(h.runtime.getCoastMesh(), coast);
+  await h.flush(); await h.finish();
+  assert.notEqual(h.runtime.getCoastMesh(), coast);
+  h.state.sceneGeneration = 1;
+  assert.equal(h.runtime.getClassification(), null);
+  assert.equal(h.runtime.getCoastMesh(), null);
+});

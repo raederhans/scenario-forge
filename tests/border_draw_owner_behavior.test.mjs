@@ -936,3 +936,22 @@ test("parent borders keep their default gray and cap opacity at 0.75", () => {
   assert.equal(h.context.strokes[0].strokeStyle, "#4b5563");
   assert.equal(h.context.strokes[0].alpha, 0.75);
 });
+
+
+test("classified coast replaces reference coast in static and interactive drawing", () => {
+  const coast = createPackedLineMesh({ coordinates: Float64Array.from([10, 10, 30, 30]),
+    offsets: Uint32Array.from([0, 2]), arcs: Uint32Array.from([0]) });
+  const classification = { local: new Map(), province: new Map(), parent: new Map() };
+  for (const interactive of [false, true]) for (const classified of [false, true]) for (const available of [false, true]) {
+    let referenceCalls = 0;
+    const h = createOwner({ interactive, helpers: {
+      getClassifiedBorderMeshes: () => classified ? classification : null,
+      getPaintContourCoastMesh: () => available ? coast : null,
+      getCoastlineCollectionForZoom: () => { referenceCalls++; return [mesh]; },
+    } });
+    h.owner.drawHierarchicalBorders(8, { interactive });
+    const drawn = h.context.strokes.find(stroke => stroke.strokeStyle === '#333333').path;
+    assert.deepEqual(drawn.map(value => value.coordinates), [classified && available ? coast.coordinates : mesh.coordinates]);
+    assert.equal(referenceCalls, classified && available ? 0 : 1);
+  }
+});

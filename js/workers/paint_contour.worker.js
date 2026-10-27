@@ -34,6 +34,7 @@ self.onmessage = ({ data }) => {
     else if (type === 'FINISH') result = builder.finish();
     else throw new Error('Unknown paint contour request');
     const transfer = result && !result.unchanged ? [result.coordinates.buffer, result.offsets.buffer, result.owners.buffer] : [];
+    if (result?.coast) transfer.push(result.coast.coordinates.buffer, result.coast.offsets.buffer, result.coast.arcs.buffer);
     self.postMessage({ type: 'RESULT', taskId, result }, transfer);
     if (type === 'FINISH') { finished = true; dirty = false; }
   } catch (error) {

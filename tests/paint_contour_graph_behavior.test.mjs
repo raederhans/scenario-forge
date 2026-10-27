@@ -407,3 +407,36 @@ test('scalar source collinearity preserves the original floating error operation
   }
   assert.ok(accepted > 0 && rejected > 0);
 });
+
+
+test('coast chains contain uncovered unpaired edges for either ring winding', async () => {
+  const { packContourWaterMask } = await import('../js/core/renderer/paint_contour_water_mask.js');
+  const { createPackedLineMesh } = await import('../js/core/renderer/packed_line_mesh.js');
+  const square = (id, x) => ({ id, geometry: { type: 'Polygon', coordinates: [
+    [[x, 0], [x + 1, 0], [x + 1, 1], [x, 1], [x, 0]],
+  ] } });
+  const a = square('A', 0), b = square('B', 1);
+  const segments = graph => createPackedLineMesh(graph.coast).coordinates.flatMap(line =>
+    line.slice(1).map((p, i) => [line[i], p]));
+  for (const reverse of [false, true]) {
+    if (reverse) a.geometry.coordinates[0].reverse();
+    const waterMask = packContourWaterMask({ land: a.geometry });
+    const graph = buildPaintContourGraph([a], { waterMask });
+    assert.equal(segments(graph).length, 4);
+    assert.deepEqual(new Set(segments(graph).flat().map(p => p.join(','))), new Set(['0,0', '1,0', '1,1', '0,1']));
+  }
+  const graph = buildPaintContourGraph([a, b], { waterMask: packContourWaterMask({ land: [a.geometry, b.geometry] }) });
+  assert.equal(segments(graph).length, 6);
+  assert.ok(segments(graph).every(([p, q]) => !(p[0] === 1 && q[0] === 1)));
+  const surrounding = { type: 'Polygon', coordinates: [[[-2,-2],[4,-2],[4,4],[-2,4],[-2,-2]]] };
+  assert.equal(segments(buildPaintContourGraph([a], { waterMask: packContourWaterMask({ land: surrounding }) })).length, 4, 'base land beyond political edges must not suppress coast');
+  const enclosing = { id: 'enclosing', geometry: surrounding };
+  const enclosed = segments(buildPaintContourGraph([a, enclosing], { waterMask: packContourWaterMask({ land: surrounding }) }));
+  assert.equal(enclosed.length, 4, 'only the enclosing political polygon contributes coast');
+  assert.ok(enclosed.flat().every(([x, y]) => x === -2 || x === 4 || y === -2 || y === 4));
+  assert.equal(buildPaintContourGraph([a]).coast, null);
+  const overlapping = square('B', 0.97);
+  const water = packContourWaterMask({ water: surrounding });
+  const near = segments(buildPaintContourGraph([a, overlapping], { waterMask: water, nearSeamTolerance: 0.05 }));
+  assert.ok(near.every(([p, q]) => !(p[0] === q[0] && (p[0] === 1 || p[0] === 0.97))), 'both consumed sides are excluded');
+});

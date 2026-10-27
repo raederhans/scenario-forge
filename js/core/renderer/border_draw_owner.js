@@ -70,12 +70,18 @@ export function createBorderDrawOwner({
     getPaintContourMeshes = () => [],
     getPoliticalBorderMeshes = () => [],
     getClassifiedBorderMeshes = () => null,
+    getPaintContourCoastMesh = () => null,
     sanitizePolyline = (line) => (Array.isArray(line) ? line : []),
     scheduleDeferredHeavyBorderMeshes = () => {},
     reconcileDetailAdmBorders = () => {},
     setVisibleInternalBorderMeshSignature = () => {},
     createBoundaryPath = () => new Path2D(),
   } = helpers;
+
+  function resolveCoastlineCollection(k, classification) {
+    const mesh = classification ? getPaintContourCoastMesh() : null;
+    return mesh ? [mesh] : getCoastlineCollectionForZoom(k);
+  }
 
   function internalMeshes(classification, category, code) {
     if (classification) {
@@ -583,7 +589,7 @@ export function createBorderDrawOwner({
     add(getPoliticalBorderMeshes());
     const coastOpacity = Number(state.styleConfig?.coastlines?.opacity);
     if ((Number.isFinite(coastOpacity) ? coastOpacity : 0.8) > 0) {
-      const coasts = getCoastlineCollectionForZoom(k);
+      const coasts = resolveCoastlineCollection(k, classification);
       add(coasts, "coastline", true);
     }
     return { key, requests, parents, classification, projection, generation, k, interactive, viewport,
@@ -951,7 +957,7 @@ export function createBorderDrawOwner({
     if (interactive) {
       const drawCanonicalCoastlines = coastOpacity > 0 && coastWidth > 0;
       const coastlineCollection = drawCanonicalCoastlines
-        ? getCoastlineCollectionForZoom(k)
+        ? resolveCoastlineCollection(k, classification)
         : null;
 
       context.globalAlpha = paintAlpha;
@@ -1026,7 +1032,7 @@ export function createBorderDrawOwner({
     ) * detailAdmBorderWidthScale / kDenom;
     const drawCanonicalCoastlines = coastOpacity > 0 && coastWidth > 0;
     const coastlineCollection = drawCanonicalCoastlines
-      ? getViewportAwareCoastlineCollection(getCoastlineCollectionForZoom(k), k)
+      ? getViewportAwareCoastlineCollection(resolveCoastlineCollection(k, classification), k)
       : null;
     const visibleCountryCodes = internalCountries(classification);
     if (!classification && visibleCountryCodes.size > 0) {
