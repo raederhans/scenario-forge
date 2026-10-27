@@ -71,23 +71,6 @@ function projectScenarioOceanStyleDefaultsPatch(rawDefaults) {
   if (Object.prototype.hasOwnProperty.call(rawDefaults, "coastalAccentEnabled")) {
     patch.coastalAccentEnabled = rawDefaults.coastalAccentEnabled;
   }
-  if (Object.prototype.hasOwnProperty.call(rawDefaults, "shallowBandFadeEndZoom")) {
-    patch.shallowBandFadeEndZoom = rawDefaults.shallowBandFadeEndZoom;
-  }
-  if (Object.prototype.hasOwnProperty.call(rawDefaults, "midBandFadeEndZoom")) {
-    patch.midBandFadeEndZoom = rawDefaults.midBandFadeEndZoom;
-  }
-  if (Object.prototype.hasOwnProperty.call(rawDefaults, "deepBandFadeEndZoom")) {
-    patch.deepBandFadeEndZoom = rawDefaults.deepBandFadeEndZoom;
-  }
-  if (Object.prototype.hasOwnProperty.call(rawDefaults, "scenarioSyntheticContourFadeEndZoom")) {
-    patch.scenarioSyntheticContourFadeEndZoom =
-      rawDefaults.scenarioSyntheticContourFadeEndZoom;
-  }
-  if (Object.prototype.hasOwnProperty.call(rawDefaults, "scenarioShallowContourFadeEndZoom")) {
-    patch.scenarioShallowContourFadeEndZoom =
-      rawDefaults.scenarioShallowContourFadeEndZoom;
-  }
   return Object.keys(patch).length ? patch : null;
 }
 

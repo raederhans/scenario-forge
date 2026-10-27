@@ -433,10 +433,10 @@ for (const [preset, beforeZoom, afterZoom] of [["balanced", 3.1, 3.3], ["terrain
 }
 
 
-test("loaded bathymetry invalidates the background signature", () => {
+test("bathymetry style changes invalidate the background signature", () => {
   const { state, policy } = createHarness();
   const before = policy.getRenderPassSignature("background");
-  state.activeBathymetryTopologyUrl = "global.topo.json";
+  state.styleConfig.ocean = { preset: "bathymetry_soft", experimentalAdvancedStyles: true };
   assert.notEqual(policy.getRenderPassSignature("background"), before);
 });
 

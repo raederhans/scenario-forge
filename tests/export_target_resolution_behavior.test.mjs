@@ -357,10 +357,14 @@ for (const pixelRatio of [null, 2]) {
   });
 }
 
-test("export budget reserves both regional bathymetry mask surfaces only with a background pass", () => {
+test("export budget reserves a target-sized texture output and bounded GL canvas only with a background pass", () => {
   const input = { width: 100, height: 80, pixelRatio: 2, passNames: ["background"] };
-  assert.ok(estimateExportRenderBytes({ ...input, bathymetryCoverage: true })
-    >= estimateExportRenderBytes(input) + 100 * 80 * 4 * 8);
+  for (const [width, height] of [[100, 80], [3000, 1000], [3000, 2500]]) {
+    const target = { ...input, width, height };
+    assert.equal(estimateExportRenderBytes({ ...target, bathymetryCoverage: true })
+      - estimateExportRenderBytes(target),
+    (width * height * 4 + Math.min(4096, width * 2) * Math.min(4096, height * 2)) * 4);
+  }
   const withoutBackground = { ...input, passNames: ["labels"] };
   assert.equal(estimateExportRenderBytes({ ...withoutBackground, bathymetryCoverage: true }),
     estimateExportRenderBytes(withoutBackground));

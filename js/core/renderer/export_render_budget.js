@@ -14,7 +14,6 @@ export function estimateExportRenderBytes({ width, height, pixelRatio, passNames
   const targetPixels = Math.round(logicalWidth * ratio) * Math.round(logicalHeight * ratio);
   let passPixels = 0;
   let physicalPixels = 0;
-  let bathymetryPixels = 0;
   let riverContourPixels = 0;
   for (const passName of new Set(passNames)) {
     const overscan = TRANSFORMED_FRAME_PASS_NAMES.includes(passName)
@@ -23,7 +22,6 @@ export function estimateExportRenderBytes({ width, height, pixelRatio, passNames
     const passWidth = Math.floor((logicalWidth + 2 * Math.ceil(logicalWidth * overscan)) * ratio);
     const passHeight = Math.floor((logicalHeight + 2 * Math.ceil(logicalHeight * overscan)) * ratio);
     passPixels += passWidth * passHeight;
-    if (passName === "background") bathymetryPixels = passWidth * passHeight;
     if (passName === "borders") riverContourPixels = passWidth * passHeight;
     if (passName === "physicalBase" || passName === "contextBase") physicalPixels = Math.max(physicalPixels, passWidth * passHeight);
   }
@@ -33,7 +31,9 @@ export function estimateExportRenderBytes({ width, height, pixelRatio, passNames
       * Math.floor((logicalHeight + 2 * Math.ceil(logicalHeight * RENDER_PASS_OVERSCAN_RATIO_PER_SIDE)) * ratio)
     : 0;
   const physicalScratchBytes = physicalIntensity ? physicalPixels * 8 + (physicalPixels <= 2_000_000 ? physicalPixels * 8 : 0) : 0;
-  const bathymetryScratchBytes = bathymetryCoverage ? bathymetryPixels * 8 : 0;
+  const bathymetryScratchBytes = bathymetryCoverage && passNames.includes("background")
+    ? (targetPixels + Math.min(4096, Math.round(logicalWidth * ratio))
+      * Math.min(4096, Math.round(logicalHeight * ratio))) * 4 : 0;
   const riverContourScratchBytes = riverInternalContours ? riverContourPixels * 4 : 0;
   // Include the bounded population presentation surface and image data during export.
   const populationScratchBytes = passNames.includes("populationHeatmap")

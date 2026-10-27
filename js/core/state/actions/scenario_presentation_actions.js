@@ -1,3 +1,4 @@
+import { createDefaultStyleConfig } from "../ui_state.js";
 import { normalizePaintMode } from "../../map_editing_policy.js";
 import { normalizeQuickFillScope } from "../../quick_fill_hierarchy.js";
 // Canonical scenario presentation state authority.
@@ -75,11 +76,6 @@ const SCENARIO_STYLE_DEFAULTS_KEYS_BY_GROUP = Object.freeze({
     "contourStrength",
     "experimentalAdvancedStyles",
     "coastalAccentEnabled",
-    "shallowBandFadeEndZoom",
-    "midBandFadeEndZoom",
-    "deepBandFadeEndZoom",
-    "scenarioSyntheticContourFadeEndZoom",
-    "scenarioShallowContourFadeEndZoom",
   ]),
   internalBorders: Object.freeze(["color", "colorMode", "opacity", "width"]),
   empireBorders: Object.freeze(["color", "opacity", "width"]),
@@ -276,7 +272,9 @@ export function mergeScenarioStyleDefaultsState(target, styleOverride) {
     patchAppearanceStyleGroupState(
       target,
       group,
-      { ...patch },
+      group === "ocean"
+        ? { ...createDefaultStyleConfig().ocean, ...target.styleConfig?.ocean, ...patch }
+        : { ...patch },
       { preserveGroupIdentity: true },
     );
   }

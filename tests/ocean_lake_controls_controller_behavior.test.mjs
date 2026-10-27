@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createOceanLakeControlsController } from "../js/ui/toolbar/ocean_lake_controls_controller.js";
-import { createDefaultStyleConfig } from "../js/core/state/ui_state.js";
+import { normalizeAppearanceStyleSnapshot } from "../js/core/state/appearance_preset_state.js";
+import { mergeScenarioStyleDefaultsState } from "../js/core/state/actions/scenario_presentation_actions.js";
+import { createScenarioOceanFillRestoreRuntime } from "../js/core/scenario/presentation_ocean_fill_restore.js";
+import { createDefaultStyleConfig, restoreImportedStyleConfigState } from "../js/core/state/ui_state.js";
 import { state as runtimeState } from "../js/core/state.js";
 import { clearHistory, undoHistory, redoHistory } from "../js/core/history_manager.js";
 
@@ -156,4 +159,54 @@ test("flat style disables sliders and zero settings remain visible", () => {
   assert.equal(fixture.opacityValue.textContent, "0%");
   assert.equal(fixture.contour.value, "0");
   assert.equal(fixture.contourValue.textContent, "0%");
+});
+
+
+test("new ocean styles and partial project and appearance snapshots use Soft defaults", () => {
+  const expected = { preset: "bathymetry_soft", experimentalAdvancedStyles: true,
+    opacity: 0.9, scale: 1.25, contourStrength: 0 };
+  const project = { styleConfig: { ocean: { fillColor: "#123456", preset: "flat", experimentalAdvancedStyles: false } } };
+  restoreImportedStyleConfigState(project, { ocean: { fillColor: "#abcdef" } });
+  for (const config of [createDefaultStyleConfig(), project.styleConfig,
+    normalizeAppearanceStyleSnapshot({ ocean: { fillColor: "#abcdef" } })]) {
+    for (const [key, value] of Object.entries(expected)) assert.equal(config.ocean[key], value, key);
+  }
+  for (const ocean of [{ experimentalAdvancedStyles: false }, { preset: "flat" },
+    { experimentalAdvancedStyles: false, preset: "flat", opacity: 0, scale: 1, contourStrength: 0 }]) {
+    const target = { styleConfig: createDefaultStyleConfig() };
+    restoreImportedStyleConfigState(target, { ocean });
+    const appearance = normalizeAppearanceStyleSnapshot({ ocean });
+    for (const [key, value] of Object.entries(ocean)) {
+      assert.equal(target.styleConfig.ocean[key], value);
+      assert.equal(appearance.ocean[key], value);
+    }
+  }
+});
+
+test("scenario ocean defaults fill missing fields and restore explicit user choices", () => {
+  const target = { styleConfig: { ocean: { fillColor: "#123456" } } };
+  mergeScenarioStyleDefaultsState(target, { ocean: { fillColor: "#abcdef" } });
+  assert.deepEqual(target.styleConfig.ocean, { ...createDefaultStyleConfig().ocean, fillColor: "#abcdef" });
+  target.styleConfig.ocean.experimentalAdvancedStyles = false;
+  target.styleConfig.ocean.preset = "flat";
+  target.scenarioOceanFillBeforeActivate = null;
+  const before = structuredClone(target.styleConfig.ocean);
+  const runtime = createScenarioOceanFillRestoreRuntime({ state: target });
+  runtime.syncScenarioOceanFillForActivation({ style_defaults: { ocean: { fillColor: "#112233" } } });
+  assert.equal(target.styleConfig.ocean.experimentalAdvancedStyles, false);
+  assert.equal(target.styleConfig.ocean.preset, "flat");
+  runtime.restoreScenarioOceanFillAfterExit();
+  assert.deepEqual(target.styleConfig.ocean, before);
+});
+
+test("Soft defaults render enabled bathymetry controls without changing saved values", () => {
+  const fixture = createFixture();
+  fixture.state.styleConfig = createDefaultStyleConfig();
+  fixture.controller.renderOceanLakeControlsUi();
+  assert.equal(fixture.toggle.checked, true);
+  assert.equal(fixture.select.value, "bathymetry_soft");
+  assert.equal(fixture.opacity.disabled, false);
+  assert.equal(fixture.opacity.value, "90");
+  assert.equal(fixture.scale.value, "125");
+  assert.equal(fixture.contour.value, "0");
 });

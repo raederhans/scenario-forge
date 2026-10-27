@@ -410,11 +410,6 @@ function initToolbar({ render } = {}) {
   const oceanBathymetrySourceValue = document.getElementById("oceanBathymetrySourceValue");
   const oceanBathymetryBandsValue = document.getElementById("oceanBathymetryBandsValue");
   const oceanBathymetryContoursValue = document.getElementById("oceanBathymetryContoursValue");
-  const oceanShallowFadeEndZoom = document.getElementById("oceanShallowFadeEndZoom");
-  const oceanMidFadeEndZoom = document.getElementById("oceanMidFadeEndZoom");
-  const oceanDeepFadeEndZoom = document.getElementById("oceanDeepFadeEndZoom");
-  const oceanScenarioSyntheticContourFadeEndZoom = document.getElementById("oceanScenarioSyntheticContourFadeEndZoom");
-  const oceanScenarioShallowContourFadeEndZoom = document.getElementById("oceanScenarioShallowContourFadeEndZoom");
   const toggleLang = document.getElementById("btnToggleLang");
   const scenarioGuideLanguageToggle = document.getElementById("scenarioGuideLanguageToggle");
   const themeSelect = document.getElementById("themeSelect");
@@ -423,11 +418,6 @@ function initToolbar({ render } = {}) {
   const oceanTextureOpacityValue = document.getElementById("oceanTextureOpacityValue");
   const oceanTextureScaleValue = document.getElementById("oceanTextureScaleValue");
   const oceanContourStrengthValue = document.getElementById("oceanContourStrengthValue");
-  const oceanShallowFadeEndZoomValue = document.getElementById("oceanShallowFadeEndZoomValue");
-  const oceanMidFadeEndZoomValue = document.getElementById("oceanMidFadeEndZoomValue");
-  const oceanDeepFadeEndZoomValue = document.getElementById("oceanDeepFadeEndZoomValue");
-  const oceanScenarioSyntheticContourFadeEndZoomValue = document.getElementById("oceanScenarioSyntheticContourFadeEndZoomValue");
-  const oceanScenarioShallowContourFadeEndZoomValue = document.getElementById("oceanScenarioShallowContourFadeEndZoomValue");
   const appearanceLayerFilter = document.getElementById("appearanceLayerFilter");
   const appearanceFilterItems = Array.from(document.querySelectorAll("[data-appearance-filter-item]"));
   const appearanceSpecialZoneBtn = document.getElementById("appearanceSpecialZoneBtn");
@@ -1434,7 +1424,7 @@ function initToolbar({ render } = {}) {
     updateDockCollapsedUi();
   };
   const normalizeOceanPreset = (value) => {
-    const candidate = String(value || "flat").trim().toLowerCase();
+    const candidate = String(value || "bathymetry_soft").trim().toLowerCase();
     if (candidate === "wave_hachure") {
       return "flat";
     }
@@ -1461,64 +1451,29 @@ function initToolbar({ render } = {}) {
   if (!runtimeState.styleConfig.ocean || typeof runtimeState.styleConfig.ocean !== "object") {
     runtimeState.styleConfig.ocean = {};
   }
-  runtimeState.styleConfig.ocean.preset = normalizeOceanPreset(runtimeState.styleConfig.ocean.preset || "flat");
-  runtimeState.styleConfig.ocean.experimentalAdvancedStyles = runtimeState.styleConfig.ocean.experimentalAdvancedStyles === true;
+  runtimeState.styleConfig.ocean.preset = normalizeOceanPreset(runtimeState.styleConfig.ocean.preset || "bathymetry_soft");
+  runtimeState.styleConfig.ocean.experimentalAdvancedStyles = runtimeState.styleConfig.ocean.experimentalAdvancedStyles ?? true;
   if (!runtimeState.styleConfig.ocean.experimentalAdvancedStyles && OCEAN_ADVANCED_PRESETS.has(runtimeState.styleConfig.ocean.preset)) {
     runtimeState.styleConfig.ocean.preset = "flat";
   }
   runtimeState.styleConfig.ocean.coastalAccentEnabled = runtimeState.styleConfig.ocean.coastalAccentEnabled !== false;
   runtimeState.styleConfig.ocean.fillColor = normalizeOceanFillColor(runtimeState.styleConfig.ocean.fillColor);
   runtimeState.styleConfig.ocean.opacity = clamp(
-    Number.isFinite(Number(runtimeState.styleConfig.ocean.opacity)) ? Number(runtimeState.styleConfig.ocean.opacity) : 0.72,
+    Number.isFinite(Number(runtimeState.styleConfig.ocean.opacity)) ? Number(runtimeState.styleConfig.ocean.opacity) : 0.9,
     0,
     1
   );
   runtimeState.styleConfig.ocean.scale = clamp(
-    Number.isFinite(Number(runtimeState.styleConfig.ocean.scale)) ? Number(runtimeState.styleConfig.ocean.scale) : 1,
+    Number.isFinite(Number(runtimeState.styleConfig.ocean.scale)) ? Number(runtimeState.styleConfig.ocean.scale) : 1.25,
     0.6,
     2.4
   );
   runtimeState.styleConfig.ocean.contourStrength = clamp(
     Number.isFinite(Number(runtimeState.styleConfig.ocean.contourStrength))
       ? Number(runtimeState.styleConfig.ocean.contourStrength)
-      : 0.75,
+      : 0,
     0,
     1
-  );
-  runtimeState.styleConfig.ocean.shallowBandFadeEndZoom = clamp(
-    Number.isFinite(Number(runtimeState.styleConfig.ocean.shallowBandFadeEndZoom))
-      ? Number(runtimeState.styleConfig.ocean.shallowBandFadeEndZoom)
-      : 2.8,
-    2.1,
-    4.8
-  );
-  runtimeState.styleConfig.ocean.midBandFadeEndZoom = clamp(
-    Number.isFinite(Number(runtimeState.styleConfig.ocean.midBandFadeEndZoom))
-      ? Number(runtimeState.styleConfig.ocean.midBandFadeEndZoom)
-      : 3.4,
-    2.7,
-    5.2
-  );
-  runtimeState.styleConfig.ocean.deepBandFadeEndZoom = clamp(
-    Number.isFinite(Number(runtimeState.styleConfig.ocean.deepBandFadeEndZoom))
-      ? Number(runtimeState.styleConfig.ocean.deepBandFadeEndZoom)
-      : 4.2,
-    3.3,
-    6
-  );
-  runtimeState.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom = clamp(
-    Number.isFinite(Number(runtimeState.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom))
-      ? Number(runtimeState.styleConfig.ocean.scenarioSyntheticContourFadeEndZoom)
-      : 3.0,
-    2.1,
-    4.6
-  );
-  runtimeState.styleConfig.ocean.scenarioShallowContourFadeEndZoom = clamp(
-    Number.isFinite(Number(runtimeState.styleConfig.ocean.scenarioShallowContourFadeEndZoom))
-      ? Number(runtimeState.styleConfig.ocean.scenarioShallowContourFadeEndZoom)
-      : 3.4,
-    2.5,
-    5
   );
   runtimeState.styleConfig.lakes = normalizeLakeStyleConfig(runtimeState.styleConfig.lakes);
   if (!runtimeState.styleConfig.internalBorders || typeof runtimeState.styleConfig.internalBorders !== "object") {
@@ -1791,19 +1746,9 @@ function initToolbar({ render } = {}) {
     oceanBathymetrySourceValue,
     oceanBathymetryBandsValue,
     oceanBathymetryContoursValue,
-    oceanShallowFadeEndZoom,
-    oceanMidFadeEndZoom,
-    oceanDeepFadeEndZoom,
-    oceanScenarioSyntheticContourFadeEndZoom,
-    oceanScenarioShallowContourFadeEndZoom,
     oceanTextureOpacityValue,
     oceanTextureScaleValue,
     oceanContourStrengthValue,
-    oceanShallowFadeEndZoomValue,
-    oceanMidFadeEndZoomValue,
-    oceanDeepFadeEndZoomValue,
-    oceanScenarioSyntheticContourFadeEndZoomValue,
-    oceanScenarioShallowContourFadeEndZoomValue,
     requestLayerStatusRefresh: renderLayerStatusSummaries,
   });
   const {

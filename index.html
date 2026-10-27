@@ -224,8 +224,8 @@
                     <h3 id="lblOceanStyleCard" class="appearance-control-card-title" data-i18n="Bathymetry Style">Bathymetry Style</h3>
                     <div class="appearance-control-card-stack">
                       <label class="toggle-label">
-                        <input id="oceanAdvancedStylesToggle" type="checkbox" class="checkbox-input" />
-                        <span id="lblOceanAdvancedStylesToggle">Experimental Bathymetry</span>
+                        <input id="oceanAdvancedStylesToggle" type="checkbox" checked class="checkbox-input" />
+                        <span id="lblOceanAdvancedStylesToggle">Bathymetry</span>
                       </label>
                       <div>
                         <div class="range-row">
@@ -233,7 +233,7 @@
                         </div>
                         <select id="oceanStyleSelect" class="select-input mt-2">
                           <option id="optOceanFlat" value="flat" selected>Flat Blue</option>
-                          <option id="optOceanBathymetrySoft" value="bathymetry_soft" disabled>Bathymetry Soft</option>
+                          <option id="optOceanBathymetrySoft" value="bathymetry_soft" selected disabled>Bathymetry Soft</option>
                           <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled>Bathymetry Contours</option>
                         </select>
                       </div>
@@ -262,23 +262,23 @@
                       <div>
                         <div class="range-row">
                           <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity">Bathymetry opacity</label>
-                          <span id="oceanTextureOpacityValue" class="range-value">72%</span>
+                          <span id="oceanTextureOpacityValue" class="range-value">90%</span>
                         </div>
-                        <input id="oceanTextureOpacity" type="range" min="0" max="100" value="72" class="range-input" />
+                        <input id="oceanTextureOpacity" type="range" min="0" max="100" value="90" class="range-input" />
                       </div>
                       <div>
                         <div class="range-row">
                           <label id="lblOceanScale" class="range-label" for="oceanTextureScale">Depth contrast</label>
-                          <span id="oceanTextureScaleValue" class="range-value">1.00x</span>
+                          <span id="oceanTextureScaleValue" class="range-value">1.25x</span>
                         </div>
-                        <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="100" class="range-input" />
+                        <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="125" class="range-input" />
                       </div>
                       <div>
                         <div class="range-row">
                           <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength">Bathymetry contour strength</label>
-                          <span id="oceanContourStrengthValue" class="range-value">75%</span>
+                          <span id="oceanContourStrengthValue" class="range-value">0%</span>
                         </div>
-                        <input id="oceanContourStrength" type="range" min="0" max="100" value="75" class="range-input" />
+                        <input id="oceanContourStrength" type="range" min="0" max="100" value="0" class="range-input" />
                       </div>
                     </div>
                   </section>
@@ -324,7 +324,7 @@
                     <summary id="lblOceanBathymetryDebug" class="section-header">Bathymetry Debug</summary>
                     <div class="space-y-3 mt-3">
                       <p id="oceanBathymetryDebugHint" class="sidebar-tool-hint">
-                        Data source and loaded feature counts.
+                        Data source, rendering backend and loaded tiles.
                       </p>
                       <div>
                         <div class="range-row">
@@ -339,41 +339,6 @@
                           <span id="lblOceanBathymetryContours" class="range-label" data-i18n="Loaded tiles">Loaded tiles</span>
                           <span id="oceanBathymetryContoursValue" class="range-value">0</span>
                         </div>
-                      </div>
-                      <div hidden>
-                        <div class="range-row">
-                          <label id="lblOceanShallowFadeEndZoom" class="range-label" for="oceanShallowFadeEndZoom">Nearshore Fill Exit</label>
-                          <span id="oceanShallowFadeEndZoomValue" class="range-value">2.80x</span>
-                        </div>
-                        <input id="oceanShallowFadeEndZoom" type="range" min="210" max="480" step="1" value="280" class="range-input" />
-                      </div>
-                      <div hidden>
-                        <div class="range-row">
-                          <label id="lblOceanMidFadeEndZoom" class="range-label" for="oceanMidFadeEndZoom">Mid-depth Fill Exit</label>
-                          <span id="oceanMidFadeEndZoomValue" class="range-value">3.40x</span>
-                        </div>
-                        <input id="oceanMidFadeEndZoom" type="range" min="270" max="520" step="1" value="340" class="range-input" />
-                      </div>
-                      <div hidden>
-                        <div class="range-row">
-                          <label id="lblOceanDeepFadeEndZoom" class="range-label" for="oceanDeepFadeEndZoom">Deep Fill Exit</label>
-                          <span id="oceanDeepFadeEndZoomValue" class="range-value">4.20x</span>
-                        </div>
-                        <input id="oceanDeepFadeEndZoom" type="range" min="330" max="600" step="1" value="420" class="range-input" />
-                      </div>
-                      <div hidden>
-                        <div class="range-row">
-                          <label id="lblOceanScenarioSyntheticContourFadeEndZoom" class="range-label" for="oceanScenarioSyntheticContourFadeEndZoom">Synthetic Contour Exit</label>
-                          <span id="oceanScenarioSyntheticContourFadeEndZoomValue" class="range-value">3.00x</span>
-                        </div>
-                        <input id="oceanScenarioSyntheticContourFadeEndZoom" type="range" min="210" max="460" step="1" value="300" class="range-input" />
-                      </div>
-                      <div hidden>
-                        <div class="range-row">
-                          <label id="lblOceanScenarioShallowContourFadeEndZoom" class="range-label" for="oceanScenarioShallowContourFadeEndZoom">Shallow Scenario Contour Exit</label>
-                          <span id="oceanScenarioShallowContourFadeEndZoomValue" class="range-value">3.40x</span>
-                        </div>
-                        <input id="oceanScenarioShallowContourFadeEndZoom" type="range" min="250" max="500" step="1" value="340" class="range-input" />
                       </div>
                     </div>
                   </details>
