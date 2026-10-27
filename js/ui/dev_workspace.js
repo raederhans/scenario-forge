@@ -944,6 +944,9 @@ function initDevWorkspace() {
 
   bindButtonAction(panel.querySelector("#devScenarioTagInspectorClearHighlightBtn"), () => {
     runtimeState.inspectorHighlightCountryCode = "";
+    runtimeState.inspectorHighlightFeatureIds = [];
+    runtimeState.inspectorHighlightGroupMode = false;
+    runtimeState.inspectorHighlightLabel = "";
     flushDevWorkspaceRender("dev-workspace-tag-inspector-clear-highlight");
     renderWorkspace();
   });
@@ -969,6 +972,9 @@ function initDevWorkspace() {
       };
       runtimeState.selectedInspectorCountryCode = tag;
       runtimeState.inspectorHighlightCountryCode = tag;
+      runtimeState.inspectorHighlightFeatureIds = [];
+      runtimeState.inspectorHighlightGroupMode = false;
+      runtimeState.inspectorHighlightLabel = "";
       flushDevWorkspaceRender("dev-workspace-tag-inspector-select");
       renderWorkspace();
     });

@@ -1010,7 +1010,7 @@ function getSelectionOverlayOwner() {
     getTopojson: () => globalThis.topojson,
     getFeatureId,
     getEntityFeatureId,
-    getFeatureCountryCodeNormalized,
+    getCountryFeatureIds: getFeatureIdsForOwner,
     getDevGroup: () => rendererSurfaceHost.getDevSelectionGroup(),
     getInspectorGroup: () => rendererSurfaceHost.getInspectorHighlightGroup(),
     getPath: () => rendererSurfaceHost.getPathSvg(),
