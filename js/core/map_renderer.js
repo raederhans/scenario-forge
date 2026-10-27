@@ -14355,9 +14355,11 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
 
 // The background pass drew overview depth where detail tiles were still loading.
 function assertBathymetryDetailReadyForExport(passNames) {
-  if (passNames.includes("background") && bathymetryTextureRuntime?.hasPendingDetail()) {
-    throw new Error("Bathymetry detail is still loading; wait a moment before exporting.");
-  }
+  if (!passNames.includes("background") || !bathymetryTextureRuntime?.hasPendingDetail()) return;
+  // An inactive style skips the texture runtime, so its pending flag can be stale.
+  const oceanStyle = getOceanStyleConfig();
+  if (!doesOceanStyleRequireBathymetry(oceanStyle) || !(oceanStyle.opacity > 0)) return;
+  throw new Error("Bathymetry detail is still loading; wait a moment before exporting.");
 }
 
 function composeTransformedFrameToBuffer(
