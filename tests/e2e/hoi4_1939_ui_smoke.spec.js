@@ -9,6 +9,7 @@ const {
 } = require("./support/playwright-app");
 const { mergeSmokeFailureSelectors } = require("./support/playwright-selectors");
 const { getConsoleIgnorePatterns } = require("./support/expectations/console-allowlist");
+const { readConsoleIssue, isNativeGpuReadbackDiagnostic, attachNativeGpuDiagnostics } = require("./support/native-gpu-diagnostics");
 
 test.setTimeout(120000);
 const HOI4_SMOKE_PATH = '/?render_profile=balanced&startup_interaction=readonly&startup_worker=1&startup_cache=1&default_scenario=hoi4_1939';
@@ -22,11 +23,16 @@ test('hoi4 1939 owner-sync smoke', async ({ page }, testInfo) => {
   const consoleIssues = [];
   const networkFailures = [];
   const expectedConsolePatterns = getConsoleIgnorePatterns(__filename);
+  const nativeGpuDiagnostics = [];
 
   page.on('console', (msg) => {
     const type = msg.type();
     if (type === 'error' || type === 'warning') {
-      consoleIssues.push({ type, text: msg.text() });
+      // Bathymetry presents a WebGL depth texture into the 2D ocean pass, so headless
+      // Chromium reports the same ANGLE readback notice as TNO; keep it as an artifact.
+      const issue = readConsoleIssue(msg);
+      if (isNativeGpuReadbackDiagnostic(issue, page.url())) nativeGpuDiagnostics.push(issue);
+      else consoleIssues.push({ type, text: issue.text });
     }
   });
 
@@ -81,6 +87,7 @@ test('hoi4 1939 owner-sync smoke', async ({ page }, testInfo) => {
     fs.mkdirSync(path.dirname(shotPath), { recursive: true });
     await page.screenshot({ path: shotPath, fullPage: true });
 
+    await attachNativeGpuDiagnostics(testInfo, nativeGpuDiagnostics);
     const actionableConsoleIssues = consoleIssues.filter(
       (issue) => !expectedConsolePatterns.some((pattern) => pattern.test(issue.text)),
     );
