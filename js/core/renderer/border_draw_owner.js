@@ -479,24 +479,17 @@ export function createBorderDrawOwner({
       if (zoom < 1.5) {
         return (mesh) => buildMesh(mesh, {
           simplifyDistancePx: 3.6,
-          minLengthPx: 22,
-          minSpanPx: 5,
-          minAreaPx: 20,
           k: zoom,
         });
       }
       if (zoom < 2.4) {
         return (mesh) => buildMesh(mesh, {
           simplifyDistancePx: 2.2,
-          minLengthPx: 14,
-          minSpanPx: 3,
-          minAreaPx: 10,
           k: zoom,
         });
       }
       return (mesh) => buildMesh(mesh, {
         simplifyDistancePx: 0.75,
-        minLengthPx: 4,
         k: zoom,
       });
     }
@@ -504,23 +497,17 @@ export function createBorderDrawOwner({
       if (zoom < 1.25) {
         return (mesh) => buildMesh(mesh, {
           simplifyDistancePx: 2.4,
-          minLengthPx: 16,
-          minSpanPx: 4,
-          minAreaPx: 12,
           k: zoom,
         });
       }
       if (zoom < 1.9) {
         return (mesh) => buildMesh(mesh, {
           simplifyDistancePx: 1.6,
-          minLengthPx: 10,
-          minSpanPx: 2,
           k: zoom,
         });
       }
       return (mesh) => buildMesh(mesh, {
         simplifyDistancePx: 0.6,
-        minLengthPx: 4,
         k: zoom,
       });
     }
@@ -596,10 +583,7 @@ export function createBorderDrawOwner({
     add(getPoliticalBorderMeshes());
     const coastOpacity = Number(state.styleConfig?.coastlines?.opacity);
     if ((Number.isFinite(coastOpacity) ? coastOpacity : 0.8) > 0) {
-      const coasts = interactive
-        ? state.cachedCoastlinesLow?.length ? state.cachedCoastlinesLow
-          : state.cachedCoastlines?.length ? state.cachedCoastlines : state.cachedCoastlinesHigh
-        : getCoastlineCollectionForZoom(k);
+      const coasts = getCoastlineCollectionForZoom(k);
       add(coasts, "coastline", true);
     }
     return { key, requests, parents, classification, projection, generation, k, interactive, viewport,
@@ -966,12 +950,8 @@ export function createBorderDrawOwner({
 
     if (interactive) {
       const drawCanonicalCoastlines = coastOpacity > 0 && coastWidth > 0;
-      const coastlineLow = drawCanonicalCoastlines
-        ? (
-          state.cachedCoastlinesLow?.length
-            ? state.cachedCoastlinesLow
-            : (state.cachedCoastlines?.length ? state.cachedCoastlines : state.cachedCoastlinesHigh)
-        )
+      const coastlineCollection = drawCanonicalCoastlines
+        ? getCoastlineCollectionForZoom(k)
         : null;
 
       context.globalAlpha = paintAlpha;
@@ -981,7 +961,7 @@ export function createBorderDrawOwner({
 
       if (drawCanonicalCoastlines) {
         context.globalAlpha = coastAlpha;
-        drawCoastlineCollection(coastlineLow, coastColor, coastWidth, k, { transformMesh: coastlineMeshTransform });
+        drawCoastlineCollection(coastlineCollection, coastColor, coastWidth, k, { transformMesh: coastlineMeshTransform });
         drawScenarioCoastalAccentLayer(k, { interactive });
       }
 
@@ -1016,7 +996,7 @@ export function createBorderDrawOwner({
       0,
       0.48 * internalBorderLocalAlphaScale
     );
-    const parentAlpha = clamp(parentOpacity * (0.55 + 0.25 * t), 0.30, 0.90);
+    const parentAlpha = clamp(parentOpacity * (0.55 + 0.25 * t), 0.30, 0.75);
     const detailAdmAlpha = clamp(
       internalOpacity * (0.20 + 0.12 * t) * detailAdmBorderAlphaScale,
       0,
@@ -1066,40 +1046,6 @@ export function createBorderDrawOwner({
       }
     }
 
-    if (k >= localBordersMinZoom) {
-      context.globalAlpha = localAlpha;
-      visibleCountryCodes.forEach((countryCode) => {
-        const meshes = internalMeshes(classification, 'local', countryCode) || [];
-        drawMeshCollection(
-          meshes,
-          getInternalBorderStrokeColor(countryCode, internalColor),
-          localWidth,
-          { transformMesh: localMeshTransform }
-        );
-      });
-    }
-
-    context.globalAlpha = provinceAlpha;
-    visibleCountryCodes.forEach((countryCode) => {
-      const meshes = internalMeshes(classification, 'province', countryCode) || [];
-      drawMeshCollection(
-        meshes,
-        getInternalBorderStrokeColor(countryCode, internalColor),
-        provinceWidth,
-        { transformMesh: provinceMeshTransform }
-      );
-    });
-
-    if (!classification && k >= detailAdmBordersMinZoom) {
-      const detailAdmMeta = buildDetailAdmMeshSignature(visibleCountryCodes, k);
-      reconcileDetailAdmBorders(detailAdmMeta);
-    }
-
-    if (!classification && k >= detailAdmBordersMinZoom) {
-      context.globalAlpha = detailAdmAlpha;
-      drawMeshCollection(state.cachedDetailAdmBorders, detailAdmBorderColor, detailAdmWidth);
-    }
-
     const enabledParentCountries = state.parentBordersVisible === false
       ? []
       : (classification ? [...classification.parent.keys()] : state.parentBorderSupportedCountries || []).filter(
@@ -1117,6 +1063,40 @@ export function createBorderDrawOwner({
         }
         drawMeshCollection(meshes, parentColor, parentWidth);
       });
+    }
+
+    context.globalAlpha = provinceAlpha;
+    visibleCountryCodes.forEach((countryCode) => {
+      const meshes = internalMeshes(classification, 'province', countryCode) || [];
+      drawMeshCollection(
+        meshes,
+        getInternalBorderStrokeColor(countryCode, internalColor),
+        provinceWidth,
+        { transformMesh: provinceMeshTransform }
+      );
+    });
+
+    if (k >= localBordersMinZoom) {
+      context.globalAlpha = localAlpha;
+      visibleCountryCodes.forEach((countryCode) => {
+        const meshes = internalMeshes(classification, 'local', countryCode) || [];
+        drawMeshCollection(
+          meshes,
+          getInternalBorderStrokeColor(countryCode, internalColor),
+          localWidth,
+          { transformMesh: localMeshTransform }
+        );
+      });
+    }
+
+    if (!classification && k >= detailAdmBordersMinZoom) {
+      const detailAdmMeta = buildDetailAdmMeshSignature(visibleCountryCodes, k);
+      reconcileDetailAdmBorders(detailAdmMeta);
+    }
+
+    if (!classification && k >= detailAdmBordersMinZoom) {
+      context.globalAlpha = detailAdmAlpha;
+      drawMeshCollection(state.cachedDetailAdmBorders, detailAdmBorderColor, detailAdmWidth);
     }
 
     context.globalAlpha = paintAlpha;
