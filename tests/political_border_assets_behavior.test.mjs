@@ -43,11 +43,11 @@ test('current TNO political mesh retains every known Swiss seam segment across c
   const graph=features=>buildPaintContourGraph(features.map(f=>({id:featureId(f),geometry:f.geometry,
     coordinatePrecision:getContourCoordinatePrecision(f.geometry)})));
   const detailedEdges=graphEdges(graph(detail));
-  // Current manifest geometry includes 14 seam segments for these four features.
+  // Current manifest geometry includes 15 seam segments for these four features.
   // Keep the exact fixture count and verify every segment against the mesh below.
-  assert.equal(detailedEdges.size,14);
+  assert.equal(detailedEdges.size,15);
   assert.deepEqual(graphEdges(graph(coarse.features)),detailedEdges,
-    'repaired coarse geometry must preserve all 14 detailed Swiss seam segments');
+    'repaired coarse geometry must preserve all 15 detailed Swiss seam segments');
   const pack=read(manifest.mesh_pack_url);
   const state={activeScenarioId:'tno_1962',activeScenarioManifest:manifest,activeScenarioMeshPack:pack,
     mapSemanticMode:'political',landData:coarse};
