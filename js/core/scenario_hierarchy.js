@@ -123,3 +123,18 @@ export function getEffectiveScenarioHierarchyFromInputs(base, override) {
   if (!byOverride.has(override)) byOverride.set(override, applyOverride(base, override));
   return byOverride.get(override);
 }
+
+// A scenario country often holds only part of its geographic country (RKM is a
+// corner of RU). Its inspector lists only groups it owns parcels in, each cut
+// down to those parcels, so a group action never paints a neighbour's land.
+export function clipHierarchyGroupsToOwner(groups, ownerCode, getOwnerCode) {
+  const list = Array.isArray(groups) ? groups : [];
+  const target = String(ownerCode || "").trim();
+  if (!target || typeof getOwnerCode !== "function") return list;
+  return list
+    .map((group) => ({
+      ...group,
+      children: (Array.isArray(group?.children) ? group.children : []).filter((id) => getOwnerCode(id) === target),
+    }))
+    .filter((group) => group.children.length > 0);
+}

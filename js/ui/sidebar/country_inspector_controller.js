@@ -399,9 +399,14 @@ export function createCountryInspectorController({
 
     const countryState = resolveSelectedLandInspectorCountryState();
     tab.classList.toggle("is-empty", !countryState);
-    tab.setAttribute("aria-hidden", String(!countryState));
     tab.replaceChildren();
-    if (!countryState) return;
+    if (!countryState) {
+      const hint = document.createElement("p");
+      hint.className = "selected-land-country-quick-empty";
+      hint.textContent = t("Click a country on the map to show it here.", "ui");
+      tab.appendChild(hint);
+      return;
+    }
 
     const header = document.createElement("div");
     header.className = "selected-land-country-quick-header";

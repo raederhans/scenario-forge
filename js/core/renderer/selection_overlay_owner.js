@@ -166,7 +166,7 @@ export function createSelectionOverlayOwner({
       .merge(selection)
       .attr("d", getPath())
       .attr("fill", "none")
-      .attr("stroke", "rgba(0, 47, 167, 0.6)")
+      .attr("stroke", "#1d64f2")
       .attr("stroke-width", 2.4);
 
     selection.exit().remove();
