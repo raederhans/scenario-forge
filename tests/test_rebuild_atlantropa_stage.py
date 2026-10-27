@@ -8,7 +8,7 @@ from shapely.geometry import MultiPolygon, box, mapping, shape
 
 from tools import patch_tno_1962_bundle as b
 from tools.rebuild_atlantropa_stage import (
-    clip_new_atlantropa_land_from_named_water, merge_atlantropa_bathymetry,
+    clip_new_atlantropa_land_from_named_water,
     preserve_identical_atl_helper_assignments, preserve_political_chunks_for_unchanged_source,
     reconcile_feature_map, restore_published_land_welds,
 )
@@ -373,20 +373,6 @@ class AtlantropaStageTests(unittest.TestCase):
         features = [{"properties": {"id": "ATLISL_x_2", "owner_tag": "ITA"}}]
         result = reconcile_feature_map(old, "owners", set(old["owners"]), features, {"ATLISL_x_2": "ATLISL_x_1"})
         self.assertEqual(result["owners"], {"ATLISL_x_2": "ITA"})
-
-    def test_bathymetry_preserves_unrelated_geometry_and_properties(self):
-        old = {"type": "Topology", "objects": {"bathymetry_contours": {"type": "GeometryCollection", "geometries": [
-            {"type": "LineString", "arcs": [0], "properties": {"id": "manual", "region_id": "other"}},
-            {"type": "LineString", "arcs": [1], "properties": {"id": "old", "region_id": "adriatica"}}]}},
-            "arcs": [[[1, 2], [3, 4]], [[0, 0], [1, 1]]]}
-        new = {"type": "Topology", "objects": {"bathymetry_contours": {"type": "GeometryCollection", "geometries": [
-            {"type": "LineString", "arcs": [0], "properties": {"id": "new", "region_id": "adriatica"}}]}},
-            "arcs": [[[5, 6], [7, 8]]]}
-        result = merge_atlantropa_bathymetry(old, new)
-        geometries = result["objects"]["bathymetry_contours"]["geometries"]
-        self.assertEqual(geometries[0], old["objects"]["bathymetry_contours"]["geometries"][0])
-        self.assertEqual(result["arcs"][0], old["arcs"][0])
-        self.assertEqual(geometries[1]["properties"]["id"], "new")
 
     def test_only_stable_land_inherits_old_manual_assignments(self):
         old = {"owners": {"FR-1": "FRA", "ATLPRV_1": "ITA", "ATLWLD_1": "FRA", "ATLWLD_2": "ITA"}}

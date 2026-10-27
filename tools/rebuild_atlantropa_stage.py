@@ -231,40 +231,6 @@ def _mask_frame(name, geometry):
                              "geometry": b.split_full_width_polygonal_parts_for_d3(geometry)}], crs="EPSG:4326")
 
 
-def merge_atlantropa_bathymetry(previous, generated):
-    def unquantized(payload):
-        result = deepcopy(payload)
-        transform = result.pop("transform", None)
-        if transform:
-            sx, sy = transform["scale"]
-            tx, ty = transform["translate"]
-            for index, arc in enumerate(result.get("arcs", [])):
-                x = y = 0
-                decoded = []
-                for dx, dy in arc:
-                    x, y = x + dx, y + dy
-                    decoded.append([x * sx + tx, y * sy + ty])
-                result["arcs"][index] = decoded
-        return result
-    result, incoming = unquantized(previous), unquantized(generated)
-    offset = len(result["arcs"])
-    result["arcs"].extend(incoming["arcs"])
-    remap = {index: index + offset for index in range(len(incoming["arcs"]))}
-    for name, value in incoming["objects"].items():
-        existing = result["objects"].setdefault(name, {"type": "GeometryCollection", "geometries": []})
-        kept = [geom for geom in existing["geometries"]
-                if geom.get("properties", {}).get("region_id") not in b.ATLANTROPA_REGION_CONFIGS]
-        for geometry in value["geometries"]:
-            if geometry.get("properties", {}).get("region_id") not in b.ATLANTROPA_REGION_CONFIGS:
-                continue
-            geometry["arcs"] = b._remap_topology_arc_refs(geometry["arcs"], remap)
-            kept.append(geometry)
-        existing["geometries"] = kept
-    b.compact_topology_arcs(result)
-    result.pop("bbox", None)
-    return result
-
-
 def clip_new_atlantropa_land_from_named_water(topology, water_payload, old_atl, new_atl):
     """Clip only newly reclaimed land from intersecting, supported named water."""
     def land_union(features):
@@ -612,9 +578,6 @@ def rebuild_stage(source_dir: Path, stage_dir: Path, *, overlap_policy="strict",
         relief["features"] = [feature for feature in relief["features"] if not is_atl_relief(feature)] + [
             feature for feature in generated["features"] if is_atl_relief(feature)]
         b.write_json(relief_path, relief)
-    bathymetry, _ = b.build_tno_bathymetry_payload(sea, regions)
-    bathymetry_path = stage_dir / b.CHECKPOINT_BATHYMETRY_FILENAME
-    b.write_json(bathymetry_path, merge_atlantropa_bathymetry(b.load_json(bathymetry_path), bathymetry))
     # Reuse the standard dependency and contract writers. The final baseline
     # comparison must confirm localization and all non-ATL semantics survived.
     b.build_checkpoint_chunk_assets(stage_dir)
