@@ -2403,7 +2403,7 @@
   "runtime_topology_url": "data/scenarios/blank_base/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "blank_base",
-  "snapshot_fingerprint": "a9e96d8c2100292ee3ed8725133e7da9b9de5c74c54ebef6e1c43b64116621a2",
+  "snapshot_fingerprint": "cf4770d599e2c70f855e3ff14abb61d17365a465ae21c44d1b53c6829293971f",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "ownerless_restoration_sources": [
@@ -2442,7 +2442,7 @@
     ],
     "ownerless_topology_source": "data/scenarios/modern_world/runtime_topology.topo.json",
     "ownerless_topology_source_sha256": "917320332f37571d2fa1cca21881e0b5fc2cc9ede4966abe914a1e9259eabf1e",
-    "runtime_topology_sha256": "af18ea74f3e7505a726ba5506228fdb998c2c5380c48cd217790c97374a2e305"
+    "runtime_topology_sha256": "86bcbc757b0ba3d5c1b7ad88c60d810b4a2b6f79b4ba1a63061122c2c69f7f94"
   },
   "special_zone_layers_url": "data/scenarios/blank_base/special_zone_layers.json",
   "style_defaults": {

@@ -1,14 +1,16 @@
 import copy
 import unittest
+from unittest.mock import patch
 
 from shapely.geometry import MultiPolygon, Polygon, box, mapping
-from shapely import STRtree
+from shapely import STRtree, from_wkb, make_valid
 from shapely.affinity import translate
 from shapely.ops import unary_union
 
 from map_builder.regional_geometry import _decode_geometry, _encode_exact_coverage
 from tools.fill_political_coverage_gaps import (
     area_km2, assign_gap, effective_water, fill_topology, merge_assigned_holes, validate_coverage,
+    rewrite_shared_arcs, shared_arc_lengths, validate_shared_arcs,
 )
 
 
@@ -18,6 +20,10 @@ def topology_for(*geometries):
         row["id"] = f"top_level_{i}"
         row["properties"].update(owner=f"owner_{i}", name=f"Name {i}")
     topology["objects"]["political"]["computed_neighbors"] = [[] for _ in geometries]
+    bounds = (min(g.bounds[0] for g in geometries), min(g.bounds[1] for g in geometries),
+              max(g.bounds[2] for g in geometries), max(g.bounds[3] for g in geometries))
+    topology["objects"]["land"] = {"type": "Polygon", "arcs": [[len(topology["arcs"])]]}
+    topology["arcs"].append(list(map(list, box(*bounds).exterior.coords)))
     return topology
 
 
@@ -26,6 +32,55 @@ def decoded(topology):
 
 
 class FillPoliticalCoverageGapsTest(unittest.TestCase):
+    def test_base_water_is_protected_unless_exclusive_or_excluded(self):
+        shell = box(0, 0, 0.02, 0.02)
+        hole = box(0.005, 0.005, 0.015, 0.015)
+        base = [{"type": "Feature", "properties": {"id": "bay", "region_group": "marine"},
+                 "geometry": mapping(hole)}]
+        for manifest, expected in [({}, 0), ({"water_regions_mode": "exclusive"}, 1),
+                                   ({"presentation_features": {"atlantropa_relief": True}}, 1),
+                                   ({"excluded_water_region_ids": ["bay"]}, 1),
+                                   ({"excluded_water_region_groups": [" MARINE "]}, 1)]:
+            topology = topology_for(shell.difference(hole))
+            water = effective_water(topology, {"features": []}, "test", manifest, base)
+            self.assertEqual(fill_topology(topology, water)["hole_count"], expected)
+
+    def test_holes_without_physical_land_basis_are_not_filled(self):
+        shell = box(0, 0, 0.02, 0.02)
+        topology = topology_for(shell.difference(box(0.005, 0.005, 0.015, 0.015)))
+        del topology["objects"]["land"]
+        before = copy.deepcopy(topology)
+        report = fill_topology(topology)
+        self.assertEqual(report["hole_count"], 0)
+        self.assertGreater(report["skipped_no_land_basis"], 0)
+        self.assertEqual(topology, before)
+
+    def test_split_old_arc_is_shared_by_unchanged_neighbor_and_other_objects(self):
+        topology = {"type": "Topology", "arcs": [
+            [[1, 0], [1, 2]], [[1, 2], [0, 2], [0, 0], [1, 0]],
+            [[1, 0], [2, 0], [2, 2], [1, 2]],
+        ], "objects": {"political": {"type": "GeometryCollection", "geometries": [
+            {"type": "Polygon", "properties": {"id": "left"}, "arcs": [[0, 1]]},
+            {"type": "Polygon", "properties": {"id": "right"}, "arcs": [[-1, 2]]},
+        ]}, "coastline": {"type": "LineString", "arcs": [0]}}}
+        before = shared_arc_lengths(topology)
+        encoded = copy.deepcopy(topology)
+        encoded["arcs"][0] = [[1, 0], [1, 1]]
+        encoded["arcs"].append([[1, 1], [1, 2]])
+        encoded["objects"]["political"]["geometries"][0]["arcs"] = [[0, 3, 1]]
+        rewrite_shared_arcs(topology, encoded, {0})
+        self.assertLess(abs(shared_arc_lengths(topology)[("left", "right")] - before[("left", "right")]), 1)
+        self.assertEqual(len(topology["objects"]["coastline"]["arcs"]), 2)
+        self.assertTrue(decoded(topology)[1].equals(box(1, 0, 2, 2)))
+
+    def test_shared_arc_noding_does_not_insert_points_off_the_boundary(self):
+        square = box(0, 0, 1, 1)
+        topology = topology_for(square, box(0.5, 5e-13, 0.75, 0.25))
+        encoded = _encode_exact_coverage(["feature_0", "feature_1"], decoded(topology))
+        rewrite_shared_arcs(topology, encoded, {0})
+        self.assertTrue(decoded(topology)[0].is_valid)
+        self.assertTrue(decoded(topology)[0].equals(square))
+
     def test_snap_does_not_discard_a_narrow_hole_above_area_tolerance(self):
         shell = box(0, 0, 0.02, 0.02)
         hole = box(0.01, 0.005, 0.010000001, 0.015)
@@ -58,17 +113,78 @@ class FillPoliticalCoverageGapsTest(unittest.TestCase):
         self.assertEqual(after[0].intersection(after[1]).area, before[0].intersection(before[1]).area)
         self.assertTrue(unary_union(after).equals(unary_union([*before, hole])))
 
-    def test_shared_inner_hole_is_assigned_only_once(self):
+    def test_shared_inner_hole_boundary_has_bounded_exemption(self):
         hole = box(0.012, 0.005, 0.018, 0.015)
         left = box(0, 0, 0.02, 0.02).difference(hole)
         right = box(0.01, 0, 0.03, 0.02).difference(hole)
         topology = topology_for(left, right)
         report = fill_topology(topology)
-        after = decoded(topology)
+        self.assertEqual(report["shared_arc_validation"]["exemptions"]["filled_hole_boundary"]["pair_count"], 1)
         self.assertEqual(report["hole_count"], 1)
-        self.assertEqual(after[0].intersection(after[1]).area, left.intersection(right).area)
-        self.assertTrue(unary_union(after).equals(box(0, 0, 0.03, 0.02)))
+
+    def test_shared_arc_exemptions_do_not_hide_unrelated_loss(self):
+        pair = ("left", "right")
+        before, after = {pair: 100}, {pair: 20}
+        violation = validate_shared_arcs(before, after, set(), {"left": 78})
+        self.assertFalse(violation["passed"])
+        self.assertEqual(violation["shared_arc_violations"][0]["hole_boundary_m"], 78)
+        report = validate_shared_arcs(before, after, {"left"}, {})
+        self.assertEqual(report["exemptions"]["make_valid"]["pair_count"], 1)
+        report = validate_shared_arcs(before, after, set(), {"left": 40, "right": 39})
+        self.assertEqual(report["exemptions"]["filled_hole_boundary"]["pair_count"], 1)
+
+    def test_shared_arc_violation_skips_target_and_fills_other_features(self):
+        shell = box(0, 0, 0.02, 0.02)
+        geometry = shell.difference(box(0.005, 0.005, 0.015, 0.015))
+        topology = topology_for(geometry, translate(geometry, xoff=1))
+        original = copy.deepcopy(topology)
+        calls = 0
+
+        def check(before, after, repaired, boundaries):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                return {"passed": False, "shared_arc_violations": [{
+                    "feature_ids": ["feature_0", "neighbor"], "decrease_m": 100, "hole_boundary_m": 10,
+                }]}
+            return validate_shared_arcs(before, after, repaired, boundaries)
+
+        with patch("tools.fill_political_coverage_gaps.validate_shared_arcs", side_effect=check):
+            report = fill_topology(topology)
+        self.assertEqual(report["hole_count"], 1)
+        self.assertEqual(len(report["shared_arc_violations"]), 1)
+        self.assertEqual(report["skipped_shared_arc_features"], ["feature_0"])
+        self.assertTrue(decoded(topology)[0].equals(decoded(original)[0]))
+        self.assertTrue(decoded(topology)[1].equals(translate(shell, xoff=1)))
+
+    def test_discarded_outer_part_does_not_create_inner_ring_candidates(self):
+        shell = box(0, 0, 0.02, 0.02)
+        tiny = box(1, 0, 1.01, 1e-13)
+        part = Polygon(tiny.exterior, [[(1.001, 0), (1.002, 0), (1.003, 0), (1.001, 0)]])
+        topology = topology_for(MultiPolygon([shell, part]))
+        before = copy.deepcopy(topology)
+        report = fill_topology(topology)
+        self.assertEqual(report["discarded_degenerate_parts"]["count"], 1)
+        self.assertEqual(report["hole_count"], 0)
+        self.assertEqual(topology, before)
+
+    def test_tiny_outer_part_is_discarded_and_reported(self):
+        shell = box(0, 0, 0.02, 0.02)
+        hole = box(0.005, 0.005, 0.015, 0.015)
+        tiny = box(1, 0, 1.01, 1e-13)
+        topology = topology_for(MultiPolygon([shell.difference(hole), tiny]))
+        report = fill_topology(topology)
+        self.assertEqual(report["discarded_degenerate_parts"]["count"], 1)
+        self.assertEqual(report["discarded_degenerate_parts"]["feature_count"], 1)
+        self.assertTrue(decoded(topology)[0].equals(shell))
         self.assertEqual(fill_topology(topology)["hole_count"], 0)
+
+    def test_political_only_topology_uses_primary_land_basis(self):
+        shell = box(0, 0, 0.02, 0.02)
+        topology = topology_for(shell.difference(box(0.005, 0.005, 0.015, 0.015)))
+        del topology["objects"]["land"]
+        self.assertEqual(fill_topology(topology, fallback_land=[shell])["hole_count"], 1)
+        self.assertTrue(decoded(topology)[0].equals(shell))
 
     def test_filling_preserves_unrelated_polygon_parts(self):
         shell = box(0, 0, 0.02, 0.02)
@@ -235,7 +351,7 @@ class FillPoliticalCoverageGapsTest(unittest.TestCase):
                 after = decoded(topology)
                 self.assertTrue(after[1].equals(other_shell))
                 if water:
-                    self.assertEqual(after[0].wkb, before)
+                    self.assertTrue(make_valid(after[0]).equals(make_valid(from_wkb(before))))
                 else:
                     self.assertTrue(after[0].is_valid)
                     self.assertTrue(after[0].equals(shell))

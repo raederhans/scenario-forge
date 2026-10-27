@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import argparse
 from collections import defaultdict
+from copy import deepcopy
+from itertools import combinations
 import json
 from pathlib import Path
 from statistics import median
@@ -17,7 +19,7 @@ if str(ROOT) not in sys.path:
 
 from pyproj import Geod
 from shapely import STRtree, make_valid, set_precision
-from shapely.geometry import MultiPolygon, Polygon, shape
+from shapely.geometry import LineString, MultiPolygon, Point, Polygon, shape
 from shapely.ops import snap, unary_union
 
 from map_builder.json_source import read_json_source, write_runtime_topology_source
@@ -82,9 +84,7 @@ def decode_political(topology, row):
         shell_valid = False
         for index, refs in enumerate(rings):
             coordinates = ring_coordinates(topology, refs)
-            if len(coordinates) < 4 or Polygon(coordinates).area == 0 or (
-                index > 0 and Polygon(coordinates).area < AREA_TOLERANCE
-            ):
+            if len(coordinates) < 4 or Polygon(coordinates).area < AREA_TOLERANCE:
                 skipped += 1
                 continue
             if index == 0:
@@ -98,13 +98,19 @@ def decode_political(topology, row):
     return geometry, skipped
 
 
-def effective_water(topology, lakes, scenario_id="", manifest=None):
+def effective_water(topology, lakes, scenario_id="", manifest=None, base_features=()):
     manifest = manifest or {}
     result = {}
     rows = list(topology["objects"].get("scenario_water", {}).get("geometries", []))
     rows.extend(row for row in topology["objects"].get("scenario_atlantropa", {}).get("geometries", [])
                 if row.get("properties", {}).get("atl_render_layer") == "water")
-    for row in rows:
+    mode = str(manifest.get("water_regions_mode", "")).strip().lower()
+    exclusive = mode == "exclusive" if mode else manifest.get("presentation_features", {}).get("atlantropa_relief") is True
+    entries = [] if exclusive else [(row, shape(row["geometry"])) for row in base_features]
+    entries.extend((row, _decode_geometry(topology, row)) for row in rows)
+    excluded_ids = {str(value).strip() for value in manifest.get("excluded_water_region_ids", [])}
+    excluded_groups = {str(value).strip().lower() for value in manifest.get("excluded_water_region_groups", [])}
+    for row, geometry in entries:
         props = row.get("properties") or {}
         identifier = props.get("id") or row.get("id")
         if not identifier or (props.get("scenario_id") and props["scenario_id"] != scenario_id):
@@ -112,16 +118,32 @@ def effective_water(topology, lakes, scenario_id="", manifest=None):
         if identifier == "congo_lake" and scenario_id != "tno_1962":
             continue
         if not props.get("scenario_id") and (
-            identifier in manifest.get("excluded_water_region_ids", [])
-            or props.get("region_group") in manifest.get("excluded_water_region_groups", [])
+            str(identifier).strip() in excluded_ids
+            or str(props.get("region_group", "")).strip().lower() in excluded_groups
         ):
             continue
-        result[identifier] = _decode_geometry(topology, row)
+        result[identifier] = geometry
     for feature in lakes["features"]:
         props = feature["properties"]
         if props["id"] != "congo_lake" and not props.get("scenario_id"):
             result[props["id"]] = shape(feature["geometry"])
     return [polygon for geometry in result.values() for polygon in polygons(geometry)]
+
+
+def physical_land(topology, scenario):
+    names = ("land_mask", "context_land_mask", "scenario_coastline") if scenario else ("land",)
+    for name in names:
+        if name in topology["objects"]:
+            return list(polygons(polygonal(_decode_geometry(topology, topology["objects"][name]))))
+    return []
+
+
+def has_land_basis(hole, land, land_tree, water, water_tree):
+    dry = uncovered(hole, water, water_tree)
+    area = area_km2(dry)
+    if not land or area <= 0:
+        return False
+    return area_km2(uncovered(dry, land, land_tree)) <= area * 0.01
 
 
 def water_overlap(hole, water, water_tree):
@@ -138,14 +160,19 @@ def uncovered(hole, geometries, tree):
     return polygonal(remaining)
 
 
-def own_inner_rings(topology, rows, geometries, water, max_hole_km2):
+def own_inner_rings(topology, rows, geometries, water, max_hole_km2, land):
     tree = STRtree(geometries)
     water_tree = STRtree(water)
     additions = defaultdict(list)
     rings = []
+    skipped = []
+    land_tree = STRtree(land)
     for i, row in enumerate(rows):
         parts = [row["arcs"]] if row["type"] == "Polygon" else row["arcs"]
         for part in parts:
+            shell = ring_coordinates(topology, part[0])
+            if len(shell) < 4 or Polygon(shell).area < AREA_TOLERANCE:
+                continue
             for refs in part[1:]:
                 coordinates = ring_coordinates(topology, refs)
                 degenerate = len(coordinates) < 4 or Polygon(coordinates).area < AREA_TOLERANCE
@@ -155,6 +182,9 @@ def own_inner_rings(topology, rows, geometries, water, max_hole_km2):
                     continue
                 missing = uncovered(hole, geometries, tree)
                 if not degenerate and missing.area < AREA_TOLERANCE:
+                    continue
+                if area >= 0.01 and not has_land_basis(missing, land, land_tree, water, water_tree):
+                    skipped.append(missing)
                     continue
                 rings.append((i, missing, area_km2(missing)))
     ring_tree = STRtree([hole for _, hole, _ in rings])
@@ -168,7 +198,7 @@ def own_inner_rings(topology, rows, geometries, water, max_hole_km2):
             continue
         additions[target].append(remaining)
         assigned.append((target, remaining, area_km2(remaining)))
-    return additions, assigned
+    return additions, assigned, skipped
 
 
 def assign_gap(hole, geometries, tree, buffers):
@@ -192,7 +222,20 @@ def add_coverage(geometry, additions):
             ))
             combined = unary_union([patch, *(parts[i] for i in sorted(nearby))])
             parts = [part for i, part in enumerate(parts) if i not in nearby] + list(polygons(polygonal(combined)))
-    return polygonal(parts[0] if len(parts) == 1 else MultiPolygon(parts))
+    tree = STRtree(parts)
+    pending = set(range(len(parts)))
+    merged = []
+    while pending:
+        group = {pending.pop()}
+        frontier = list(group)
+        while frontier:
+            index = frontier.pop()
+            adjacent = set(map(int, tree.query(parts[index], predicate="intersects"))) & pending
+            pending.difference_update(adjacent)
+            group.update(adjacent)
+            frontier.extend(adjacent)
+        merged.extend(polygons(unary_union([parts[i] for i in sorted(group)])))
+    return polygonal(merged[0] if len(merged) == 1 else MultiPolygon(merged))
 
 
 def merge_assigned_holes(geometry, holes, coverage, tree):
@@ -200,7 +243,7 @@ def merge_assigned_holes(geometry, holes, coverage, tree):
     return add_coverage(geometry, [*aligned, *holes])
 
 
-def find_gaps(geometries, water, max_hole_km2):
+def find_gaps(geometries, water, max_hole_km2, land):
     original = unary_union(geometries)
     parts = list(polygons(original))
     part_tree = STRtree(parts)
@@ -209,6 +252,8 @@ def find_gaps(geometries, water, max_hole_km2):
     buffers = {}
     gaps = []
     unassigned = []
+    skipped = []
+    land_tree = STRtree(land)
     for part_index, part in enumerate(parts):
         for ring in part.interiors:
             enclosure = Polygon(ring)
@@ -223,12 +268,15 @@ def find_gaps(geometries, water, max_hole_km2):
                 continue
             if water_overlap(hole, water, water_tree) > area * 0.01:
                 continue
+            if not has_land_basis(hole, land, land_tree, water, water_tree):
+                skipped.append(hole)
+                continue
             target = assign_gap(hole, geometries, feature_tree, buffers)
             if target is None:
                 unassigned.append({"area_km2": area, "bounds": list(hole.bounds)})
                 continue
             gaps.append((target, hole, area))
-    return original, gaps, unassigned
+    return original, gaps, unassigned, skipped
 
 
 def gap_report(rows, gaps, owners):
@@ -307,22 +355,173 @@ def validate_coverage(rows, sources, updated, changed, baseline_overlaps):
     return neighbors
 
 
-def fill_topology(topology, water=(), *, max_hole_km2=100.0, owners=None, dry_run=False):
+def arc_refs(value):
+    if isinstance(value, int):
+        yield value if value >= 0 else ~value
+    else:
+        for child in value:
+            yield from arc_refs(child)
+
+
+def shared_arc_lengths(topology):
+    owners = defaultdict(set)
+    for row in topology["objects"]["political"]["geometries"]:
+        for ref in set(arc_refs(row["arcs"])):
+            owners[ref].add(feature_id(row))
+    lengths = defaultdict(float)
+    for ref, identifiers in owners.items():
+        if len(identifiers) < 2:
+            continue
+        arc = topology["arcs"][ref]
+        length = GEOD.line_length(*zip(*arc)) if len(arc) >= 2 else 0.0
+        for pair in combinations(sorted(identifiers), 2):
+            lengths[pair] += length
+    return dict(lengths)
+
+
+def rewrite_shared_arcs(topology, encoded, changed):
+    replacements = encoded["objects"]["political"]["geometries"]
+    used_new = {ref for i in changed for ref in arc_refs(replacements[i]["arcs"])}
+    changed_arcs = [encoded["arcs"][i] for i in sorted(used_new)]
+    endpoints = {tuple(point) for arcs in (topology["arcs"], changed_arcs)
+                 for arc in arcs for point in (arc[0], arc[-1])}
+    new_vertices = {tuple(point) for arc in changed_arcs for point in arc}
+    vertices = new_vertices | {tuple(point) for arc in topology["arcs"] for point in arc}
+    points = [Point(point) for point in sorted(vertices)]
+    new_points = [Point(point) for point in sorted(new_vertices)]
+    arcs = []
+    indices = {}
+
+    def node(arcs_in, points, selected=None):
+        point_tree = STRtree(points)
+        result = []
+        for index, arc in enumerate(arcs_in):
+            coordinates = tuple(map(tuple, arc))
+            if selected is not None and index not in selected:
+                result.append(coordinates)
+                continue
+            existing = set(coordinates)
+            extra = [points[int(i)] for i in point_tree.query(LineString(coordinates), predicate="intersects")
+                     if tuple(points[int(i)].coords[0]) not in existing]
+            if extra:
+                noded = [coordinates[0]]
+                for a, b in zip(coordinates, coordinates[1:]):
+                    segment = LineString([a, b])
+                    interior = sorted((point for point in extra if segment.distance(point) == 0
+                                       and 0 < segment.project(point) < segment.length), key=segment.project)
+                    noded.extend(tuple(point.coords[0]) for point in interior)
+                    endpoints.update(tuple(point.coords[0]) for point in interior)
+                    noded.append(b)
+                coordinates = tuple(noded)
+            result.append(coordinates)
+        return result
+
+    old_arcs = node(topology["arcs"], new_points)
+    new_arcs = node(encoded["arcs"], points, used_new)
+
+    def encode(arcs_in):
+        mappings = []
+        for coordinates in arcs_in:
+            refs = []
+            start = 0
+            for end in range(1, len(coordinates)):
+                if end != len(coordinates) - 1 and coordinates[end] not in endpoints:
+                    continue
+                segment = coordinates[start:end + 1]
+                canonical = min(segment, segment[::-1])
+                if canonical not in indices:
+                    indices[canonical] = len(arcs)
+                    arcs.append([list(point) for point in canonical])
+                index = indices[canonical]
+                refs.append(index if segment == canonical else ~index)
+                start = end
+            mappings.append(refs)
+        return mappings
+
+    old_map = encode(old_arcs)
+    new_map = encode(new_arcs)
+
+    def remap(value, mapping):
+        if value and isinstance(value[0], int):
+            return [ref for item in value for ref in (
+                mapping[item] if item >= 0 else [~ref for ref in reversed(mapping[~item])]
+            )]
+        return [remap(item, mapping) for item in value]
+
+    def rewrite(obj):
+        if "arcs" in obj:
+            obj["arcs"] = remap(obj["arcs"], old_map)
+        for child in obj.get("geometries", []):
+            rewrite(child)
+
+    for obj in topology["objects"].values():
+        rewrite(obj)
+    rows = topology["objects"]["political"]["geometries"]
+    replacements = encoded["objects"]["political"]["geometries"]
+    for index in changed:
+        rows[index]["type"] = replacements[index]["type"]
+        rows[index]["arcs"] = remap(replacements[index]["arcs"], new_map)
+    topology["arcs"] = arcs
+
+
+def validate_shared_arcs(before, after, repaired_ids, hole_boundaries):
+    exemptions = {"make_valid": [], "filled_hole_boundary": []}
+    lost = []
+    for pair, length in before.items():
+        decrease = length - after.get(pair, 0.0)
+        if decrease <= 1.0:
+            continue
+        sample = {"feature_ids": list(pair), "decrease_m": decrease}
+        if any(identifier in repaired_ids for identifier in pair):
+            exemptions["make_valid"].append(sample)
+        else:
+            allowance = sum(hole_boundaries.get(identifier, 0.0) for identifier in pair)
+            if decrease <= allowance + 1.0:
+                exemptions["filled_hole_boundary"].append({**sample, "hole_boundary_m": allowance})
+            else:
+                lost.append({**sample, "hole_boundary_m": allowance})
+    return {"checked_pairs": len(before), "passed": not lost, "shared_arc_violations": lost,
+            "exemptions": {kind: {"pair_count": len(samples), "samples_first_20": samples[:20]}
+                           for kind, samples in exemptions.items()}}
+
+
+def _fill_topology_pass(topology, water=(), *, max_hole_km2=100.0, owners=None, dry_run=False, scenario=False,
+                  fallback_land=(), _excluded_targets=frozenset()):
     absolute = _absolute_topology(topology) if "transform" in topology else topology
     political = absolute["objects"]["political"]
     rows = political["geometries"]
     decoded = [decode_political(absolute, row) for row in rows]
     geometries = []
     repaired_ids = []
-    for row, (geometry, _) in zip(rows, decoded):
-        if not geometry.is_valid:
+    degenerate_parts = {}
+    for row, (geometry, skipped) in zip(rows, decoded):
+        parts = [row["arcs"]] if row["type"] == "Polygon" else row["arcs"]
+        discarded = sum(len(ring_coordinates(absolute, part[0])) < 4 or
+                        Polygon(ring_coordinates(absolute, part[0])).area < AREA_TOLERANCE for part in parts)
+        if discarded:
+            degenerate_parts[feature_id(row)] = discarded
+        short_ring = skipped and any(len(ring_coordinates(absolute, refs)) < 4 for part in parts for refs in part)
+        original = geometry if not skipped or short_ring else _decode_geometry(absolute, row)
+        if short_ring or not original.is_valid:
             repaired_ids.append(feature_id(row))
         geometries.append(polygonal(geometry))
-    additions, own_rings = own_inner_rings(absolute, rows, geometries, water, max_hole_km2)
+    land = physical_land(absolute, scenario)
+    if set(absolute["objects"]) == {"political"}:
+        land = list(fallback_land)
+    additions, own_rings, skipped_own = own_inner_rings(absolute, rows, geometries, water, max_hole_km2, land)
+    additions = {i: holes for i, holes in additions.items() if feature_id(rows[i]) not in _excluded_targets}
+    own_rings = [item for item in own_rings if feature_id(rows[item[0]]) not in _excluded_targets]
     own_updated = [add_coverage(geometry, additions[i]) if i in additions else geometry
                    for i, geometry in enumerate(geometries)]
-    original, gaps, unassigned = find_gaps(own_updated, water, max_hole_km2)
+    original, gaps, unassigned, skipped_cross = find_gaps(own_updated, water, max_hole_km2, land)
+    gaps = [item for item in gaps if feature_id(rows[item[0]]) not in _excluded_targets]
     report = gap_report(rows, own_rings + gaps, owners or {})
+    report["shared_arc_violations"] = []
+    report["skipped_shared_arc_features"] = sorted(_excluded_targets)
+    report["discarded_degenerate_parts"] = {
+        "count": sum(degenerate_parts.values()), "feature_count": len(degenerate_parts),
+        "feature_ids_first_20": list(degenerate_parts)[:20],
+    }
     own_counts = defaultdict(int)
     for target, _, _ in own_rings:
         own_counts[target] += 1
@@ -333,6 +532,7 @@ def fill_topology(topology, water=(), *, max_hole_km2=100.0, owners=None, dry_ru
     }
     report["cross_feature_gaps"] = gap_report(rows, gaps, owners or {})
     report["unassigned"] = unassigned
+    report["skipped_no_land_basis"] = len({hole.wkb for hole in skipped_own + skipped_cross})
     report["skipped_degenerate_rings"] = {
         "count": sum(count for _, count in decoded),
         "features": [{"feature_id": feature_id(row), "count": count}
@@ -343,7 +543,13 @@ def fill_topology(topology, water=(), *, max_hole_km2=100.0, owners=None, dry_ru
     report["changed_feature_count"] = len(changed)
     baseline_overlaps = existing_overlaps(geometries, changed)
     report["existing_overlap_pair_count"] = len(baseline_overlaps)
-    if dry_run or not (gaps or own_rings):
+    report["_own_gaps"] = own_rings
+    report["_cross_gaps"] = gaps
+    report["_changed"] = changed
+    report["_geometries"] = geometries
+    report["_shared_repaired"] = set(repaired_ids) | set(degenerate_parts)
+    report["_hole_boundaries"] = {}
+    if not (gaps or own_rings):
         return report
 
     cross_additions = defaultdict(list)
@@ -365,48 +571,50 @@ def fill_topology(topology, water=(), *, max_hole_km2=100.0, owners=None, dry_ru
     for row, geometry in zip(encoded_rows, updated):
         if _decode_geometry(encoded, row).symmetric_difference(geometry).area >= AREA_TOLERANCE:
             raise ValueError(f"{feature_id(row)}: encoding changed filled geometry")
-    preserved = set(range(len(rows))) - additions.keys() - cross_additions.keys()
-    existing_arcs = {}
-    endpoints = set()
-    for i in preserved:
-        parts = [rows[i]["arcs"]] if rows[i]["type"] == "Polygon" else rows[i]["arcs"]
-        for rings in parts:
-            for refs in rings:
-                for ref in refs:
-                    index = ref if ref >= 0 else ~ref
-                    coordinates = tuple(map(tuple, absolute["arcs"][index]))
-                    existing_arcs[coordinates] = index
-                    existing_arcs[coordinates[::-1]] = ~index
-                    endpoints.update((coordinates[0], coordinates[-1]))
-    arc_map = []
-    for arc in encoded["arcs"]:
-        coordinates = tuple(map(tuple, arc))
-        refs = []
-        start = 0
-        for end in range(1, len(coordinates)):
-            if end != len(coordinates) - 1 and coordinates[end] not in endpoints:
-                continue
-            segment = coordinates[start:end + 1]
-            if segment in existing_arcs:
-                refs.append(existing_arcs[segment])
-            else:
-                refs.append(len(absolute["arcs"]))
-                absolute["arcs"].append([list(point) for point in segment])
-            start = end
-        arc_map.append(refs)
-
-    def remap(value):
-        if value and isinstance(value[0], int):
-            return [ref for item in value for ref in (
-                arc_map[item] if item >= 0 else [~ref for ref in reversed(arc_map[~item])]
-            )]
-        return [remap(item) for item in value]
-
-    for i, (row, replacement) in enumerate(zip(rows, encoded_rows)):
-        if i in preserved:
-            continue
-        row["type"] = replacement["type"]
-        row["arcs"] = remap(replacement["arcs"])
+    shared_before = shared_arc_lengths(absolute)
+    hole_boundaries = defaultdict(float)
+    for target, hole, _ in own_rings + gaps:
+        hole_boundaries[feature_id(rows[target])] += boundary_length(hole.boundary)
+    for target in own_counts:
+        row = rows[target]
+        parts = [row["arcs"]] if row["type"] == "Polygon" else row["arcs"]
+        for part in parts:
+            for refs in part[1:]:
+                coordinates = ring_coordinates(absolute, refs)
+                if len(coordinates) >= 2 and (len(coordinates) < 4 or Polygon(coordinates).area < AREA_TOLERANCE):
+                    hole_boundaries[feature_id(row)] += boundary_length(LineString(coordinates))
+    report["_hole_boundaries"] = hole_boundaries
+    trial = deepcopy(absolute)
+    rewrite_shared_arcs(trial, encoded, changed)
+    roundtrip = [polygonal(decode_political(trial, row)[0])
+                 for row in trial["objects"]["political"]["geometries"]]
+    for index in range(len(rows)):
+        if area_outside(roundtrip[index], [updated[index]]) + area_outside(updated[index], [roundtrip[index]]) >= AREA_TOLERANCE:
+            raise ValueError(f"{feature_id(rows[index])}: shared arc encoding changed filled geometry")
+    neighbors = validate_coverage(rows, sources, roundtrip, changed, baseline_overlaps)
+    shared_after = shared_arc_lengths(trial)
+    validation = validate_shared_arcs(shared_before, shared_after, set(repaired_ids) | set(degenerate_parts), hole_boundaries)
+    violations = validation["shared_arc_violations"]
+    if violations:
+        rejected = {identifier for item in violations for identifier in item["feature_ids"]}
+        targets = {feature_id(rows[i]) for i in changed}
+        rejected &= targets
+        if not rejected:
+            rejected = targets
+        result = _fill_topology_pass(topology, water, max_hole_km2=max_hole_km2, owners=owners,
+                               dry_run=dry_run, scenario=scenario, fallback_land=fallback_land,
+                               _excluded_targets=_excluded_targets | rejected)
+        result["shared_arc_violations"] = violations + result["shared_arc_violations"]
+        return result
+    report["shared_arc_validation"] = validation
+    if dry_run:
+        return report
+    for row, replacement in zip(rows, trial["objects"]["political"]["geometries"]):
+        row.update(replacement)
+    for name, obj in trial["objects"].items():
+        if name != "political":
+            absolute["objects"][name] = obj
+    absolute["arcs"] = trial["arcs"]
     if "computed_neighbors" in political:
         political["computed_neighbors"] = [sorted(adjacent) for adjacent in neighbors]
     _compact_arcs(absolute)
@@ -416,6 +624,77 @@ def fill_topology(topology, water=(), *, max_hole_km2=100.0, owners=None, dry_ru
     return report
 
 
+def fill_topology(topology, water=(), *, max_hole_km2=100.0, owners=None, dry_run=False, scenario=False,
+                  fallback_land=(), _excluded_targets=frozenset()):
+    working = deepcopy(topology)
+    original = _absolute_topology(topology) if "transform" in topology else topology
+    rows = original["objects"]["political"]["geometries"]
+    own_gaps, cross_gaps, violations = [], [], []
+    changed = set()
+    boundaries = defaultdict(float)
+    report = None
+    while True:
+        entry = _fill_topology_pass(working, water, max_hole_km2=max_hole_km2, owners=owners,
+                                   scenario=scenario, fallback_land=fallback_land,
+                                   _excluded_targets=_excluded_targets)
+        if report is None:
+            report = entry
+        violations.extend(entry["shared_arc_violations"])
+        _excluded_targets = _excluded_targets | set(entry["skipped_shared_arc_features"])
+        if not entry["hole_count"]:
+            break
+        own_gaps.extend(entry["_own_gaps"])
+        cross_gaps.extend(entry["_cross_gaps"])
+        changed.update(entry["_changed"])
+        for identifier, length in entry["_hole_boundaries"].items():
+            boundaries[identifier] += length
+    if changed:
+        validation = validate_shared_arcs(shared_arc_lengths(original), shared_arc_lengths(working),
+                                          report["_shared_repaired"], boundaries)
+        if validation["shared_arc_violations"]:
+            rejected = {identifier for item in validation["shared_arc_violations"] for identifier in item["feature_ids"]}
+            targets = {feature_id(rows[i]) for i in changed}
+            rejected = rejected & targets or targets
+            result = fill_topology(topology, water, max_hole_km2=max_hole_km2, owners=owners,
+                                   dry_run=dry_run, scenario=scenario, fallback_land=fallback_land,
+                                   _excluded_targets=_excluded_targets | rejected)
+            result["shared_arc_violations"] = violations + validation["shared_arc_violations"] + result["shared_arc_violations"]
+            return result
+        geometries = report["_geometries"]
+        additions = defaultdict(list)
+        for target, hole, _ in own_gaps + cross_gaps:
+            additions[target].append(hole)
+        sources = [[geometry, *additions[i]] for i, geometry in enumerate(geometries)]
+        updated = [polygonal(decode_political(working, row)[0])
+                   for row in working["objects"]["political"]["geometries"]]
+        baseline = existing_overlaps(geometries, changed)
+        validate_coverage(rows, sources, updated, changed, baseline)
+        report["existing_overlap_pair_count"] = len(baseline)
+        report["shared_arc_validation"] = validation
+        report.update(gap_report(rows, own_gaps + cross_gaps, owners or {}))
+        report["cross_feature_gaps"] = gap_report(rows, cross_gaps, owners or {})
+        counts = defaultdict(int)
+        for target, _, _ in own_gaps:
+            counts[target] += 1
+        report["own_inner_rings"] = {
+            "feature_count": len(counts), "ring_count": len(own_gaps),
+            "area_km2": sum(area for _, _, area in own_gaps),
+            "features": [{"feature_id": feature_id(rows[i]), "ring_count": count} for i, count in counts.items()],
+        }
+        report["changed_feature_count"] = len(changed)
+        if not dry_run:
+            original_rows = topology["objects"]["political"]["geometries"]
+            for row, replacement in zip(original_rows, working["objects"]["political"]["geometries"]):
+                row.update(replacement)
+            topology.clear()
+            topology.update(working)
+            topology["objects"]["political"]["geometries"] = original_rows
+    report["shared_arc_violations"] = violations
+    report["skipped_no_land_basis"] = entry["skipped_no_land_basis"]
+    report["skipped_shared_arc_features"] = sorted(set(report["skipped_shared_arc_features"]) | set(entry["skipped_shared_arc_features"]))
+    return {key: value for key, value in report.items() if not key.startswith("_")}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--scenario", action="append", choices=SCENARIOS)
@@ -423,6 +702,10 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     lakes = read_json_source(DATA / "global_lakes.geojson")
+    base_features = read_json_source(DATA / "water_regions.geojson")["features"]
+    primary = read_json_source(DATA / "europe_topology.json")
+    primary = _absolute_topology(primary) if "transform" in primary else primary
+    fallback_land = physical_land(primary, False)
     report = {"dry_run": args.dry_run, "max_hole_km2": args.max_hole_km2, "topologies": {}}
     targets = [(DATA / name, None) for name in BASE_TOPOLOGIES]
     targets.extend((DATA / "scenarios" / scenario / "runtime_topology.topo.json", scenario)
@@ -432,9 +715,9 @@ def main():
         absolute = _absolute_topology(topology) if "transform" in topology else topology
         manifest = read_json_source(path.parent / "manifest.json") if scenario else {}
         owners = read_json_source(path.parent / "owners.by_feature.json")["owners"] if scenario else {}
-        water = effective_water(absolute, lakes, scenario or "", manifest)
+        water = effective_water(absolute, lakes, scenario or "", manifest, base_features)
         entry = fill_topology(topology, water, max_hole_km2=args.max_hole_km2,
-                              owners=owners, dry_run=args.dry_run)
+                              owners=owners, dry_run=args.dry_run, scenario=bool(scenario), fallback_land=fallback_land)
         report["topologies"][path.relative_to(ROOT).as_posix()] = entry
         if args.dry_run or not entry["hole_count"]:
             continue
@@ -449,7 +732,9 @@ def main():
             write_compact(path, topology)
         print(json.dumps({"written_topology": path.relative_to(ROOT).as_posix(),
                           "hole_count": entry["hole_count"],
-                          "changed_feature_count": entry["changed_feature_count"]}), flush=True)
+                          "changed_feature_count": entry["changed_feature_count"],
+                          "skipped_no_land_basis": entry["skipped_no_land_basis"],
+                          "shared_arc_validation": entry["shared_arc_validation"]}), flush=True)
     output = ROOT / ".runtime/reports/generated/fill_political_coverage_gaps.json"
     output.parent.mkdir(parents=True, exist_ok=True)
     rendered = json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False)

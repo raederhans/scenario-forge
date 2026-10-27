@@ -2409,12 +2409,12 @@
   "runtime_topology_url": "data/scenarios/modern_world/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "4ed781698e9e1b9849cad7e0488adcbb834fa9ed4fe1fe85345afbea582954b5",
+  "snapshot_fingerprint": "9ab90862edfe0ac90a7a6675ca14e1f9f9dd1455cfdec3da8ce66902ccc32154",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
-    "runtime_topology_sha256": "33252d07dbc89c226eafeac32a6d1bf65643ced4eb41b8ea2f1baa63fa75bc76",
+    "runtime_topology_sha256": "3e07018b9b97b9a06b378be8034dc992a4b0742ae799896d276bea45a2baf213",
     "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a"
   },
   "special_zone_layers_url": "data/scenarios/modern_world/special_zone_layers.json",
