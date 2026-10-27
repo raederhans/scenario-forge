@@ -1,4 +1,7 @@
 {
+  "Backend": "渲染后端",
+  "Loaded tiles": "已加载瓦片",
+  "Bathymetry is unavailable for this projection": "当前投影不支持测深",
   "Mode": "模式",
   "Country": "国家",
   "Population heatmap could not be loaded. Retry.": "人口热力加载失败，请重试。",

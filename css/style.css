@@ -3307,6 +3307,11 @@ details.card[open] > summary::after {
   box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.08);
 }
 
+/* A light halo keeps the inspector outline readable on dark fills and dark ocean alike. */
+#mapContainer .inspector-highlight-layer {
+  filter: drop-shadow(0 0 0.75px rgba(255, 255, 255, 0.7));
+}
+
 #map-canvas,
 #colorCanvas {
   box-shadow: none;
@@ -11066,7 +11071,17 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 }
 
 .selected-land-country-quick-tab.is-empty {
-  visibility: hidden;
+  align-content: center;
+  border-style: dashed;
+  background: transparent;
+}
+
+.selected-land-country-quick-empty {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .selected-land-country-quick-card :is(.country-select-title, .country-select-meta) {

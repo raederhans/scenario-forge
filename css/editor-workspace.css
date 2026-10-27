@@ -26,6 +26,9 @@
 .editor-project-bar #workspaceGithubLink { width: auto; min-height: 34px; padding: 6px 14px; font-size: var(--editor-control-size); white-space: nowrap; text-decoration: none; }
 .editor-project-bar #inspectorSidebarTabProject { flex: 0 0 auto; width: auto; padding: 6px 14px; }
 .editor-project-bar #inspectorSidebarTabProject[aria-pressed="true"] { color: #185f8b; background: #e0eef8; }
+/* The right-panel toggle is a panel switch like Project, not bare text. */
+.editor-project-bar #editorInspectorToggleBtn { flex: 0 0 auto; width: auto; padding: 6px 14px; border: 1px solid rgba(15, 23, 42, 0.1); border-radius: 12px; background: rgba(255, 255, 255, 0.9); font-weight: 700; }
+.editor-project-bar #editorInspectorToggleBtn[aria-expanded="true"] { color: #185f8b; background: #e0eef8; border-color: transparent; }
 .editor-workspace .editor-retired-shell { display: none !important; }
 .editor-empty-hint { color: var(--text-secondary); font-size: 13px; line-height: 1.7; margin: 8px 0; }
 .editor-selected-name { color: var(--text-primary); font-size: 15px; margin: 0 0 12px; line-height: 1.5; }
@@ -153,6 +156,13 @@
 .editor-property-panel .city-points-toggle-card { border: 0; background: none; padding: 0 0 12px; }
 /* The property column already scrolls; inner capped lists would nest a second scrollbar. */
 .editor-workspace .editor-property-panel :is(.inspector-action-list, .inspector-action-list-natural, .inspector-family-list) { max-height: none; overflow: visible; }
+/* Country actions were capped three times (card, body, visual adjustments) inside that column. */
+.editor-workspace .editor-property-panel :is(#selectedCountryActionsSection[open], #selectedCountryActionsSection > .inspector-panel-body, .scenario-visual-adjustments-body) { max-height: none; overflow: visible; scrollbar-gutter: auto; padding-right: 0; }
+/* One card level: the property column is the container, sections are separated by rules. */
+.editor-workspace .editor-property-panel > #selectedCountryActionsSection { border: 0; border-radius: 0; background: none; box-shadow: none; padding: 0; }
+.editor-workspace .editor-property-panel :is(.scenario-visual-adjustments, .inspector-color-sync-row) { border: 0; border-top: 1px solid var(--border-subtle); border-radius: 0; background: none; padding-inline: 0; }
+.editor-workspace .editor-property-panel .scenario-visual-adjustments > summary { padding-inline: 0; }
+.editor-workspace .editor-property-panel .scenario-visual-adjustments-body { padding-inline: 0; }
 .editor-workspace [data-status-tone="off"] { color: var(--text-tertiary); background: transparent; border-color: var(--border-subtle); }
 .editor-workspace .range-row { align-items: baseline; gap: 12px; }
 .editor-workspace .range-label { min-width: 0; white-space: normal; overflow-wrap: break-word; }

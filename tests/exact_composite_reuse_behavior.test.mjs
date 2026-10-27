@@ -124,6 +124,7 @@ test("actual export remains a separate pass composition after exact buffer reuse
   h.render(names); h.render(names);
   let prepared = 0;
   const exportGlobals = {
+    assertBathymetryDetailReadyForExport: () => {},
     isThematicWgiActive, isPopulationActive,
     exportRenderInProgress: false, politicalPassUsesDirectScene: false,
     filterCurrentEnabledRenderPasses: filterEnabledRenderPassNames,
@@ -146,6 +147,7 @@ test("export restores its prior rendering mode when pass preparation throws", ()
   for (const previous of [false, true]) {
     const h = harness();
     const globals = { runtimeState: h.state, exportRenderInProgress: previous, politicalPassUsesDirectScene: false,
+      assertBathymetryDetailReadyForExport: () => {},
       isThematicWgiActive, isPopulationActive,
       filterCurrentEnabledRenderPasses: filterEnabledRenderPassNames,
       getRenderPipelinePassesOwner: () => ({ ensureIdleRenderPasses() {

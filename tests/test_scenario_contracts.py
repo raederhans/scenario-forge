@@ -1300,12 +1300,14 @@ class ScenarioContractTest(unittest.TestCase):
             _write_json(scenario_dir / "special_zone_layers.json", {"version": 1, "layers": [], "activeLayerId": "", "topologyFingerprint": "", "diagnostics": []})
             _write_json(scenario_dir / "relief_overlays.geojson", {"type": "FeatureCollection", "features": []})
             _write_json(scenario_dir / "bathymetry.topo.json", {"type": "Topology", "objects": {}, "arcs": []})
+            _write_json(scenario_dir / "bathymetry_texture/manifest.json", {"kind": "bathymetry_depth_overlay"})
             _write_json(scenario_dir / "city_overrides.json", {"type": "city_overrides", "featureCollection": {"features": []}})
             manifest = json.loads((scenario_dir / "manifest.json").read_text(encoding="utf-8"))
             manifest["special_regions_url"] = "data/scenarios/snapshot_layers/special_regions.geojson"
             manifest["special_zone_layers_url"] = "data/scenarios/snapshot_layers/special_zone_layers.json"
             manifest["relief_overlays_url"] = "data/scenarios/snapshot_layers/relief_overlays.geojson"
             manifest["bathymetry_topology_url"] = "data/scenarios/snapshot_layers/bathymetry.topo.json"
+            manifest["bathymetry_texture_url"] = "data/scenarios/snapshot_layers/bathymetry_texture/manifest.json"
             manifest["city_overrides_url"] = "data/scenarios/snapshot_layers/city_overrides.json"
 
             try:
@@ -1317,6 +1319,7 @@ class ScenarioContractTest(unittest.TestCase):
             self.assertIn("special_zone_layers.json", input_sha)
             self.assertIn("relief_overlays.geojson", input_sha)
             self.assertIn("bathymetry.topo.json", input_sha)
+            self.assertIn("bathymetry_texture/manifest.json", input_sha)
             self.assertIn("city_overrides.json", input_sha)
             self.assertIn("capital_hints.json", input_sha)
 

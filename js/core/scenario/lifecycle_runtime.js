@@ -42,6 +42,10 @@ function createScenarioLifecycleRuntime({
     const normalized = String(countryCode || "").trim().toUpperCase();
     runtimeState.selectedInspectorCountryCode = normalized;
     runtimeState.inspectorHighlightCountryCode = normalized;
+    // 上一个剧本的显式地块 ID 不属于新剧本，留着会压住国家高亮。
+    runtimeState.inspectorHighlightFeatureIds = [];
+    runtimeState.inspectorHighlightGroupMode = false;
+    runtimeState.inspectorHighlightLabel = "";
     runtimeState.inspectorExpansionInitialized = false;
     if (runtimeState.expandedInspectorContinents instanceof Set) {
       runtimeState.expandedInspectorContinents.clear();
@@ -173,6 +177,9 @@ function createScenarioLifecycleRuntime({
         : "";
     runtimeState.selectedInspectorCountryCode = restoredInspectorCode;
     runtimeState.inspectorHighlightCountryCode = restoredInspectorCode;
+    runtimeState.inspectorHighlightFeatureIds = [];
+    runtimeState.inspectorHighlightGroupMode = false;
+    runtimeState.inspectorHighlightLabel = "";
     runtimeState.expandedInspectorContinents = previousExpandedInspectorContinents;
     runtimeState.expandedInspectorReleaseParents = previousExpandedInspectorReleaseParents;
     runtimeState.inspectorExpansionInitialized =

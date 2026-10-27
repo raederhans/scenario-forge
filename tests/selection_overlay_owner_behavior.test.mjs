@@ -26,6 +26,7 @@ function harness() {
     ids: ["a", "b"], features: [feature("a"), feature("b")],
     inspector: { featureIds: ["a"], countryCode: "", groupMode: false, label: "Alpha" },
     topology: { objects: { political: { geometries: [{ id: "a" }, { id: "b" }] } } },
+    members: { AA: ["a", "b"] },
     merged: [], devGroup: new Group(), inspectorGroup: new Group(), path: () => "path",
     projection: "projection-1", revision: 1, devDirty: true, inspectorDirty: true, clean: [0, 0],
   };
@@ -45,7 +46,7 @@ function harness() {
     getTopojson: () => h.topojson,
     getFeatureId: (value) => value.id,
     getEntityFeatureId: (value) => value.id,
-    getFeatureCountryCodeNormalized: (value) => value.properties.code,
+    getCountryFeatureIds: (code) => h.members[code] || [],
     getDevGroup: () => h.devGroup,
     getInspectorGroup: () => h.inspectorGroup,
     getPath: () => h.path,
@@ -171,6 +172,17 @@ test("inspector group, individual, country and empty selection retain overlay be
   h.owner.renderInspectorHighlightOverlay();
   assert.deepEqual(h.inspectorGroup.rows, []);
   assert.equal(h.inspectorGroup.attrs["aria-hidden"], "true");
+});
+
+test("inspector country highlight follows scenario membership, not geometry country code", () => {
+  const h = harness();
+  h.features = [feature("moscow", "RU"), feature("tver", "RU"), feature("kyiv", "UA"), feature("rkm-baked", "RKM")];
+  h.index = new Map(h.features.map((value) => [value.id, value]));
+  h.members = { RKM: ["moscow", "tver", "not-loaded"] };
+  h.inspector = { featureIds: [], countryCode: "rkm" };
+  h.owner.renderInspectorHighlightOverlay();
+  assert.deepEqual(h.inspectorGroup.rows.map((value) => value.id), ["moscow", "tver"]);
+  assert.equal(h.inspectorGroup.attrs["aria-hidden"], "false");
 });
 
 test("IDs containing delimiters cannot collide in either overlay signature", () => {

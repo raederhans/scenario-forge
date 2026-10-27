@@ -38,6 +38,13 @@ export function createRendererAssetUrlPolicyOwner({
     );
   }
 
+  function getScenarioBathymetryTextureUrl() {
+    return normalizeBathymetryTopologyUrl(
+      state.activeScenarioManifest?.bathymetry_texture_url,
+      "scenario bathymetry texture"
+    );
+  }
+
   function getDesiredBathymetryTopologyUrl(slot) {
     if (slot === "scenario") {
       return getScenarioBathymetryTopologyUrl();
@@ -60,6 +67,7 @@ export function createRendererAssetUrlPolicyOwner({
     getDesiredBathymetryTopologyUrl,
     getRequestedBathymetryUrls,
     getScenarioBathymetryTopologyUrl,
+    getScenarioBathymetryTextureUrl,
     isDesiredBathymetryUrl,
   };
 }

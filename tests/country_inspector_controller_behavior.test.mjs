@@ -483,8 +483,8 @@ test("selected land country quick tab keeps one slot before the list and fills i
     assert.equal(harness.host.children[harness.host.children.indexOf(harness.list) - 1], slot);
     assert.equal(slot.classList.contains("is-empty"), true);
     assert.equal(slot.classList.contains("hidden"), false);
-    assert.equal(slot.getAttribute("aria-hidden"), "true");
-    assert.equal(textOf(slot), "");
+    assert.equal(slot.getAttribute("aria-hidden"), null);
+    assert.match(textOf(slot), /Click a country on the map/);
 
     selectedLandCode = "ABK";
     harness.runtimeState.selectedInspectorCountryCode = "ABK";
@@ -493,7 +493,7 @@ test("selected land country quick tab keeps one slot before the list and fills i
     let tab = harness.host.querySelector("[data-selected-land-country-quick-tab]");
     assert.equal(tab, slot);
     assert.equal(tab.classList.contains("is-empty"), false);
-    assert.equal(tab.getAttribute("aria-hidden"), "false");
+    assert.equal(tab.getAttribute("aria-hidden"), null);
     assert.match(textOf(tab), /Selected map country/);
     assert.match(textOf(tab), /Scenario Abkhazia/);
     assert.match(textOf(tab), /ABK/);
@@ -518,8 +518,9 @@ test("selected land country quick tab keeps one slot before the list and fills i
     assert.equal(harness.host.children[harness.host.children.indexOf(harness.list) - 1], slot);
     assert.equal(tab.classList.contains("is-empty"), true);
     assert.equal(tab.classList.contains("hidden"), false);
-    assert.equal(tab.getAttribute("aria-hidden"), "true");
-    assert.equal(textOf(tab), "");
+    assert.equal(tab.getAttribute("aria-hidden"), null);
+    assert.match(textOf(tab), /Click a country on the map/);
+    assert.doesNotMatch(textOf(tab), /United States/);
   } finally {
     globalThis.document = previousDocument;
   }

@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  expandScenarioFeatureIds, getEffectiveScenarioHierarchy, getEffectiveScenarioHierarchyFromInputs, projectScenarioFeatureIds,
+  clipHierarchyGroupsToOwner, expandScenarioFeatureIds, getEffectiveScenarioHierarchy, getEffectiveScenarioHierarchyFromInputs,
+  projectScenarioFeatureIds,
 } from "../js/core/scenario_hierarchy.js";
 import { createQuickFillHierarchyResolver } from "../js/core/quick_fill_hierarchy.js";
 import { createParentBorderGroupingPolicy } from "../js/core/renderer/parent_border_grouping_policy.js";
@@ -156,4 +157,16 @@ test("scenario feature merges replace their members in groups and quick-fill lev
   for (const feature_merges of [{ CN_M: ["CN_A"] }, { CN_M: ["CN_A", "CN_B"], CN_N: ["CN_B", "CN_C"] }]) {
     assert.equal(getEffectiveScenarioHierarchyFromInputs(base, { feature_merges }), base);
   }
+});
+
+test("a scenario country lists only hierarchy groups it owns, cut to its own parcels", () => {
+  const owners = { msk_1: "RKM", msk_2: "RKM", msk_3: "WRS", altai_1: "SIB", altai_2: "SIB" };
+  const groups = [
+    { id: "RU_moscow", label: "Moscow", children: ["msk_1", "msk_2", "msk_3"] },
+    { id: "RU_altai", label: "Altai", children: ["altai_1", "altai_2"] },
+  ];
+  const clipped = clipHierarchyGroupsToOwner(groups, "RKM", (id) => owners[id] || "");
+  assert.deepEqual(clipped, [{ id: "RU_moscow", label: "Moscow", children: ["msk_1", "msk_2"] }]);
+  assert.deepEqual(groups[0].children, ["msk_1", "msk_2", "msk_3"], "the shared hierarchy is not mutated");
+  assert.equal(clipHierarchyGroupsToOwner(groups, "", () => "RKM"), groups);
 });

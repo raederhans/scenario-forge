@@ -282,8 +282,6 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
   const oceanStyle = state.styleConfig?.ocean || {};
   const enabled = oceanStyle.experimentalAdvancedStyles === true;
   const preset = String(oceanStyle.preset || "flat").trim() || "flat";
-  const bandsCount = getFeatureCollectionCount(state.activeBathymetryBandsData) ?? 0;
-  const contoursCount = getFeatureCollectionCount(state.activeBathymetryContoursData) ?? 0;
   const source = String(state.activeBathymetrySource || "none").trim() || "none";
   const visibility = state.renderPerfMetrics?.bathymetryVisibility || {};
   const load = state.renderPerfMetrics?.bathymetryLoad || {};
@@ -311,7 +309,10 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
   } else if (visibility.status === "hidden") {
     summary = translateUi(translate, "Bathymetry opacity is zero");
     severity = STATUS_SEVERITY.MUTED;
-  } else if (load.status === "error") {
+  } else if (visibility.status === "unsupported") {
+    summary = translateUi(translate, "Bathymetry is unavailable for this projection");
+    severity = STATUS_SEVERITY.WARNING;
+  } else if (load.status === "error" || visibility.status === "error") {
     summary = joinStatusParts(
       translateUi(translate, "Bathymetry data failed to load"),
       failedSources.join(", "),
@@ -339,15 +340,12 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
       load.status === "partial" ? failedSources.join(", ") : "",
     );
     severity = load.status === "partial" ? STATUS_SEVERITY.WARNING : STATUS_SEVERITY.ACTIVE;
-  } else if (bandsCount > 0 || contoursCount > 0) {
+  } else if (load.status === "ready") {
     summary = joinStatusParts(
       translateUi(translate, "Bathymetry available"),
       `${translateUi(translate, "source")} ${source}`,
-      formatCount(bandsCount, "bands", translate),
-      formatCount(contoursCount, "contours", translate),
-      load.status === "partial" ? translateUi(translate, "Some bathymetry sources failed to load") : "",
     );
-    severity = load.status === "partial" ? STATUS_SEVERITY.WARNING : STATUS_SEVERITY.ACTIVE;
+    severity = STATUS_SEVERITY.ACTIVE;
   } else if (load.status === "partial") {
     summary = joinStatusParts(
       translateUi(translate, "Some bathymetry sources failed to load"),
@@ -362,7 +360,7 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
     id: "bathymetry",
     label: contract?.label || "Bathymetry",
     enabled,
-    loadedCount: bandsCount + contoursCount,
+    loadedCount: normalizeFiniteCount(load.loadedTileCount ?? visibility.loadedTileCount) ?? 0,
     visibleCount,
     severity,
     summary: sanitizeLayerStatusText(summary),
