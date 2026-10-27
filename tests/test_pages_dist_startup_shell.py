@@ -1856,7 +1856,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/global_contours.major.topo.json",
             "app/data/global_contours.minor.topo.json",
             "app/data/global_rivers.geojson",
-            "app/data/global_bathymetry.topo.json",
             "app/data/bathymetry/global/manifest.json",
             "app/data/bathymetry/global/overview.png",
             "app/data/bathymetry/global/tiles/0_0.png",
@@ -1865,6 +1864,9 @@ class PagesDistStartupShellTest(unittest.TestCase):
         ):
             with self.subTest(expected_path=expected_path):
                 self.assertIn(expected_path, paths)
+
+        # The vector bathymetry topology only feeds the landing generator now.
+        self.assertNotIn("app/data/global_bathymetry.topo.json", paths)
 
         city_lights_entries_path = "app/data/city_lights/historical_1930_entries.json"
         self.assertEqual(

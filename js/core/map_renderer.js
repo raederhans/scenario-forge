@@ -17,8 +17,6 @@ import { createRiverInternalContourOwner } from "./river_paint/internal_contour_
 import { createRiverContourRenderOwner } from "./river_paint/contour_render_owner.js";
 import { resolveTopVisibleRiverCandidate } from "./river_paint/visibility.js";
 import { createRiverPaintEditorOwner } from "./river_paint/editor_owner.js";
-import { decodeBathymetryTopology } from "./renderer/bathymetry_decode.js";
-import { createBathymetryWorkerClient } from "./bathymetry_worker_client.js";
 import { createBathymetryTextureRuntime } from "./renderer/bathymetry_texture_runtime.js";
 import { loadBathymetryImageBitmap } from "./renderer/bathymetry_texture_source.js";
 import { createOceanSurfacePattern } from "./renderer/ocean_surface_pattern.js";
@@ -609,7 +607,6 @@ const OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean";
 const OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land";
 const OCEAN_MASK_MODE_BATHYMETRY = "bathymetry_features";
 const OCEAN_MASK_MIN_QUALITY = 0.35;
-const GLOBAL_BATHYMETRY_TOPOLOGY_URL = resolveDataAssetUrl("bathymetry:global_topology");
 
 const CONTEXT_LAYER_MIN_SCORE = 0.08;
 const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
@@ -654,10 +651,6 @@ const STRATEGIC_COUNTER_ATTACHMENT_KIND = "operational-line";
 const TEXTURE_LABEL_SERIF_STACK = "\"Libre Baskerville\", \"Palatino Linotype\", Georgia, serif";
 const CITY_MARKER_THEME_GRAPHITE = "classic_graphite";
 const CITY_REVEAL_PROFILE_HYBRID = "hybrid_country_budget";
-const bathymetryTopologyCacheByUrl = new Map();
-const bathymetryLoadPromiseByUrl = new Map();
-const bathymetryLoadFailureByUrl = new Map();
-const BATHYMETRY_LOAD_RETRY_COOLDOWN_MS = 10_000;
 const PAPER_TEXTURE_ASSET_URLS = {
   paper_vintage_01: new URL("../../vendor/textures/paper_vintage_01.svg", import.meta.url).href,
 };
@@ -833,7 +826,6 @@ let bathymetryStylePolicy = null;
 function getBathymetryStylePolicy() {
   if (!bathymetryStylePolicy) {
     bathymetryStylePolicy = createBathymetryStylePolicy(runtimeState, {
-      buildBathymetryFeatureCollection,
       clamp,
       getBathymetryPresetProfile,
       getFeatureProjectedDensity,
@@ -1873,12 +1865,7 @@ function getRendererAssetUrlPolicyOwner() {
   if (rendererAssetUrlPolicyOwner) {
     return rendererAssetUrlPolicyOwner;
   }
-  rendererAssetUrlPolicyOwner = createRendererAssetUrlPolicyOwner({
-    state,
-    constants: {
-      globalBathymetryTopologyUrl: GLOBAL_BATHYMETRY_TOPOLOGY_URL,
-    },
-  });
+  rendererAssetUrlPolicyOwner = createRendererAssetUrlPolicyOwner({ state });
   return rendererAssetUrlPolicyOwner;
 }
 
@@ -2026,19 +2013,10 @@ function getOceanRenderOwner() {
       isExportRendering: () => exportRenderInProgress,
     },
     helpers: {
-      applyBathymetryCoverageExclusionMask,
       applyOceanClipMask,
       getPhysicalLandMaskInfo,
       clamp,
-      clipOutAtlantropaAccentRegions,
       doesOceanStyleRequireBathymetry,
-      getBathymetryBandFillStyle,
-      getBathymetryBandVisibilityConfig,
-      getBathymetryCollectionBySource,
-      getBathymetryContourStrokeStyle,
-      getBathymetryContourVisibilityConfig,
-      getBathymetryFeatureCollections,
-      getBathymetryFeatureDepthMax,
       getBathymetryPresetProfile,
       getCoastlineCollectionForZoom,
       publishBathymetryVisibility: (summary) => publishBathymetryDiagnostic("bathymetryVisibility", summary),
@@ -2060,7 +2038,6 @@ function getOceanRenderOwner() {
       pathBoundsInScreen,
       resolveCoastlineTopologySource,
       resolveOceanMask,
-      sortBathymetryFeaturesForFill,
     },
   });
   return oceanRenderOwner;
@@ -4658,8 +4635,6 @@ function collectCountryCoverageStats(...args) { return getPoliticalCollectionOwn
 function buildInteractiveLandData(...args) { return getPoliticalCollectionOwner().buildInteractiveLandData(...args); }
 function getLayerFeatureCollection(...args) { return getContextLayerResolverOwner().getLayerFeatureCollection(...args); }
 function ensureLayerDataFromTopology(...args) { return getContextLayerResolverOwner().ensureLayerDataFromTopology(...args); }
-function getScenarioBathymetryTopologyUrl(...args) { return getRendererAssetUrlPolicyOwner().getScenarioBathymetryTopologyUrl(...args); }
-function getDesiredBathymetryTopologyUrl(...args) { return getRendererAssetUrlPolicyOwner().getDesiredBathymetryTopologyUrl(...args); }
 function buildFacilityTooltipText(...args) { return getFacilitySurfaceOwner().buildFacilityTooltipText(...args); }
 
 function buildCountryParentBorderMeshes(...args) { return getBorderMeshOwner().buildCountryParentBorderMeshes(...args); }
@@ -5717,7 +5692,6 @@ function getScenarioWaterVisualRevisionToken({ effectiveWaterFeatureCount = null
     `lake-fill:${getLakeBaseFillColor()}`,
     `lake-style:${stableJson(getLakeStyleConfig())}`,
     `ocean-surface:${stableJson(runtimeState.styleConfig?.ocean || {})}`,
-    `bathymetry:${runtimeState.activeBathymetryTopologyUrl || ""}`,
     `ocean-depth:${runtimeState.intensityFields?.channels?.oceanDepth?.revision || 0}`,
   ].join("|");
 }
@@ -6265,19 +6239,6 @@ function getScenarioCoastalAccentOverlayFeatures() {
     const kind = getReliefOverlayKind(feature);
     return kind === "new_shoreline" || kind === "lake_shoreline";
   });
-}
-
-function getAtlantropaAccentSuppressionFeatures() {
-  if (!isScenarioCoastalAccentEnabled()) return [];
-  return Array.isArray(runtimeState.activeBathymetryBandsData?.features)
-    ? runtimeState.activeBathymetryBandsData.features.filter((feature) => {
-      if (String(feature?.properties?._bathymetrySource || "").trim().toLowerCase() !== "scenario") {
-        return false;
-      }
-      if (!isAtlantropaBathymetryFeature(feature)) return false;
-      return pathBoundsInScreen(feature);
-    })
-    : [];
 }
 
 function drawScenarioReliefOverlaysLayer(k, {
@@ -11228,129 +11189,6 @@ function doesOceanStyleRequireBathymetry(oceanStyle = getOceanStyleConfig()) {
   );
 }
 
-function clearBathymetryStateSlot(slot) {
-  if (slot === "scenario") {
-    runtimeState.scenarioBathymetryTopologyData = null;
-    runtimeState.scenarioBathymetryBandsData = null;
-    runtimeState.scenarioBathymetryContoursData = null;
-    runtimeState.scenarioBathymetryTopologyUrl = "";
-    return;
-  }
-  runtimeState.globalBathymetryTopologyData = null;
-  runtimeState.globalBathymetryBandsData = null;
-  runtimeState.globalBathymetryContoursData = null;
-  runtimeState.globalBathymetryTopologyUrl = "";
-}
-
-function disableActiveBathymetryState() {
-  activeBathymetryInputs = null;
-  runtimeState.activeBathymetryBandsData = null;
-  runtimeState.activeBathymetryContoursData = null;
-  runtimeState.activeBathymetrySource = "none";
-  runtimeState.activeBathymetryTopologyUrl = "";
-}
-
-function setBathymetryStateSlot(slot, url, entry) {
-  if (slot === "scenario") {
-    runtimeState.scenarioBathymetryTopologyData = entry?.topology || null;
-    runtimeState.scenarioBathymetryBandsData = entry?.bands || null;
-    runtimeState.scenarioBathymetryContoursData = entry?.contours || null;
-    runtimeState.scenarioBathymetryTopologyUrl = String(url || "");
-    return;
-  }
-  runtimeState.globalBathymetryTopologyData = entry?.topology || null;
-  runtimeState.globalBathymetryBandsData = entry?.bands || null;
-  runtimeState.globalBathymetryContoursData = entry?.contours || null;
-  runtimeState.globalBathymetryTopologyUrl = String(url || "");
-}
-
-function cloneBathymetryFeatureWithSource(feature, source) {
-  if (!feature || typeof feature !== "object") return null;
-  return {
-    ...feature,
-    properties: {
-      ...(feature.properties || {}),
-      _bathymetrySource: source,
-    },
-  };
-}
-
-function buildBathymetryFeatureCollection(features) {
-  const nextFeatures = Array.isArray(features) ? features.filter(Boolean) : [];
-  if (!nextFeatures.length) return null;
-  return {
-    type: "FeatureCollection",
-    features: nextFeatures,
-  };
-}
-
-function mergeBathymetryFeatureCollections(scenarioCollection, globalCollection) {
-  const scenarioFeatures = Array.isArray(scenarioCollection?.features)
-    ? scenarioCollection.features.map((feature) => cloneBathymetryFeatureWithSource(feature, "scenario"))
-    : [];
-  const globalFeatures = Array.isArray(globalCollection?.features)
-    ? globalCollection.features.map((feature) => cloneBathymetryFeatureWithSource(feature, "global"))
-    : [];
-  return buildBathymetryFeatureCollection([...scenarioFeatures, ...globalFeatures]);
-}
-
-function syncActiveBathymetryState() {
-  const scenarioUrl = getScenarioBathymetryTopologyUrl();
-  const globalUrl = getDesiredBathymetryTopologyUrl("global");
-  const scenarioReady =
-    !!runtimeState.activeScenarioId &&
-    !!scenarioUrl &&
-    runtimeState.scenarioBathymetryTopologyUrl === scenarioUrl &&
-    (!!runtimeState.scenarioBathymetryBandsData || !!runtimeState.scenarioBathymetryContoursData);
-  const globalReady =
-    !!globalUrl &&
-    runtimeState.globalBathymetryTopologyUrl === globalUrl &&
-    (!!runtimeState.globalBathymetryBandsData || !!runtimeState.globalBathymetryContoursData);
-
-  // Retain feature identities so the projected path cache survives redraws.
-  const inputs = [
-    scenarioReady ? scenarioUrl : "", globalReady ? globalUrl : "",
-    scenarioReady ? runtimeState.scenarioBathymetryBandsData : null,
-    scenarioReady ? runtimeState.scenarioBathymetryContoursData : null,
-    globalReady ? runtimeState.globalBathymetryBandsData : null,
-    globalReady ? runtimeState.globalBathymetryContoursData : null,
-  ];
-  if (activeBathymetryInputs && inputs.every((value, index) => value === activeBathymetryInputs[index])) return;
-  activeBathymetryInputs = inputs;
-
-  if (scenarioReady && globalReady) {
-    runtimeState.activeBathymetryBandsData = mergeBathymetryFeatureCollections(
-      runtimeState.scenarioBathymetryBandsData,
-      runtimeState.globalBathymetryBandsData
-    );
-    runtimeState.activeBathymetryContoursData = mergeBathymetryFeatureCollections(
-      runtimeState.scenarioBathymetryContoursData,
-      runtimeState.globalBathymetryContoursData
-    );
-    runtimeState.activeBathymetrySource = "merged";
-    runtimeState.activeBathymetryTopologyUrl = `${scenarioUrl}|${globalUrl}`;
-    return;
-  }
-  if (scenarioReady) {
-    runtimeState.activeBathymetryBandsData = mergeBathymetryFeatureCollections(runtimeState.scenarioBathymetryBandsData, null);
-    runtimeState.activeBathymetryContoursData = mergeBathymetryFeatureCollections(runtimeState.scenarioBathymetryContoursData, null);
-    runtimeState.activeBathymetrySource = "scenario";
-    runtimeState.activeBathymetryTopologyUrl = scenarioUrl;
-    return;
-  }
-  if (globalReady) {
-    runtimeState.activeBathymetryBandsData = mergeBathymetryFeatureCollections(null, runtimeState.globalBathymetryBandsData);
-    runtimeState.activeBathymetryContoursData = mergeBathymetryFeatureCollections(null, runtimeState.globalBathymetryContoursData);
-    runtimeState.activeBathymetrySource = "global";
-    runtimeState.activeBathymetryTopologyUrl = globalUrl;
-    return;
-  }
-  runtimeState.activeBathymetryBandsData = null;
-  runtimeState.activeBathymetryContoursData = null;
-  runtimeState.activeBathymetrySource = "none";
-  runtimeState.activeBathymetryTopologyUrl = "";
-}
-
 function publishBathymetryDiagnostic(name, summary) {
   const previous = runtimeState.renderPerfMetrics?.[name];
   if (previous && Object.keys(summary).every((key) => stableJson(previous[key]) === stableJson(summary[key]))) return;
@@ -11363,194 +11201,7 @@ function publishBathymetryDiagnostic(name, summary) {
   });
 }
 
-function publishBathymetryLoadStatus() {
-  const sources = [["global", getDesiredBathymetryTopologyUrl("global")], ["scenario", getScenarioBathymetryTopologyUrl()]]
-    .filter(([, url]) => !!url);
-  const failedSources = sources.filter(([, url]) => bathymetryLoadFailureByUrl.has(url) && !getCachedBathymetryEntry(url))
-    .map(([source]) => source);
-  const loadedCount = sources.filter(([, url]) => !!getCachedBathymetryEntry(url)).length;
-  const status = failedSources.length ? (loadedCount ? "partial" : "error")
-    : loadedCount === sources.length && loadedCount > 0 ? "ready" : "loading";
-  publishBathymetryDiagnostic("bathymetryLoad", { status, failedSources });
-}
-
-const bathymetryWorkerClient = createBathymetryWorkerClient();
-
-const bathymetryOverviewByEntry = new WeakMap();
-
-let activeBathymetryInputs = null;
-
 let bathymetryUiRefreshPending = false;
-
-function getCachedBathymetryEntry(url) {
-  if (!url) return null;
-  const entry = bathymetryTopologyCacheByUrl.get(url);
-  return entry && typeof entry === "object" ? entry : null;
-}
-
-function normalizeBathymetryTopologyEntry(url, topology) {
-  return decodeBathymetryTopology(url, topology);
-}
-
-function warnBathymetryLoadFailureOnce(url, error) {
-  if (!url) return;
-  const previousFailureAt = Number(bathymetryLoadFailureByUrl.get(url) || 0);
-  const now = Date.now();
-  bathymetryLoadFailureByUrl.set(url, now);
-  if (previousFailureAt && now - previousFailureAt < BATHYMETRY_LOAD_RETRY_COOLDOWN_MS) return;
-  const message = error instanceof Error ? error.message : String(error || "Unknown error");
-  console.warn(`[bathymetry] Failed to load ${url}: ${message}`);
-}
-
-function applyResolvedBathymetryEntry(slot, url, entry) {
-  if (!url || getDesiredBathymetryTopologyUrl(slot) !== url) {
-    return false;
-  }
-  setBathymetryStateSlot(slot, url, entry);
-  syncActiveBathymetryState();
-  return true;
-}
-
-async function loadBathymetryTopology(url, { slot = "global" } = {}) {
-  const normalizedUrl = String(url || "").trim();
-  if (!normalizedUrl || !getRendererAssetUrlPolicyOwner().isDesiredBathymetryUrl(slot, normalizedUrl)) {
-    return null;
-  }
-  const startedAt = nowMs();
-  let entry = await bathymetryWorkerClient.load(normalizedUrl);
-  const execution = entry ? "worker" : "main";
-  if (!entry) {
-    const response = await fetch(normalizedUrl, { cache: "default" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    entry = normalizeBathymetryTopologyEntry(normalizedUrl, await response.json());
-  }
-  recordRenderPerfMetric("bathymetryDecode", nowMs() - startedAt, {
-    url: normalizedUrl, execution, ...entry.timings,
-  });
-  recordRenderPerfMetric("bathymetryGeometryNormalization", entry.timings?.normalizationDetailMs || 0, {
-    url: normalizedUrl, execution, ...entry.geometryDiagnostics,
-  });
-  if (entry.bandsOverview) recordRenderPerfMetric("bathymetryOverviewNormalization", entry.timings?.normalizationOverviewMs || 0, {
-    url: normalizedUrl, execution, ...entry.overviewGeometryDiagnostics,
-  });
-  bathymetryTopologyCacheByUrl.set(normalizedUrl, entry);
-  bathymetryLoadFailureByUrl.delete(normalizedUrl);
-  const applied = applyResolvedBathymetryEntry(slot, normalizedUrl, entry);
-  publishBathymetryLoadStatus();
-  if (applied) {
-    invalidateOceanVisualState(`bathymetry-loaded:${slot}`);
-    if (rendererSurfaceHost.getContext()) render();
-  }
-  return entry;
-}
-
-function scheduleBathymetryTopologyLoad(url, { slot = "global" } = {}) {
-  if (!url) {
-    clearBathymetryStateSlot(slot);
-    syncActiveBathymetryState();
-    return;
-  }
-  const cached = getCachedBathymetryEntry(url);
-  if (cached) {
-    applyResolvedBathymetryEntry(slot, url, cached);
-    return;
-  }
-  const previousFailureAt = Number(bathymetryLoadFailureByUrl.get(url) || 0);
-  if (
-    bathymetryLoadPromiseByUrl.has(url)
-    || (previousFailureAt && Date.now() - previousFailureAt < BATHYMETRY_LOAD_RETRY_COOLDOWN_MS)
-  ) {
-    return;
-  }
-  const loadPromise = loadBathymetryTopology(url, { slot })
-    .catch((error) => {
-      warnBathymetryLoadFailureOnce(url, error);
-      if (getDesiredBathymetryTopologyUrl(slot) === url) {
-        clearBathymetryStateSlot(slot);
-        syncActiveBathymetryState();
-      }
-      publishBathymetryLoadStatus();
-      return null;
-    })
-    .finally(() => {
-      bathymetryLoadPromiseByUrl.delete(url);
-    });
-  bathymetryLoadPromiseByUrl.set(url, loadPromise);
-}
-
-function ensureBathymetryDataAvailability({ required = doesOceanStyleRequireBathymetry() } = {}) {
-  if (!required) {
-    disableActiveBathymetryState();
-    return false;
-  }
-  const globalUrl = getDesiredBathymetryTopologyUrl("global");
-  if (globalUrl) {
-    scheduleBathymetryTopologyLoad(globalUrl, { slot: "global" });
-  } else {
-    clearBathymetryStateSlot("global");
-  }
-  const scenarioUrl = getScenarioBathymetryTopologyUrl();
-  if (runtimeState.activeScenarioId && scenarioUrl) {
-    scheduleBathymetryTopologyLoad(scenarioUrl, { slot: "scenario" });
-  } else {
-    clearBathymetryStateSlot("scenario");
-  }
-  syncActiveBathymetryState();
-  publishBathymetryLoadStatus();
-  return true;
-}
-
-function getBathymetryFeatureCollections() {
-  const globalUrl = getDesiredBathymetryTopologyUrl("global");
-  const entry = runtimeState.globalBathymetryTopologyUrl === globalUrl ? getCachedBathymetryEntry(globalUrl) : null;
-  let overview = entry && bathymetryOverviewByEntry.get(entry);
-  if (entry && !overview) {
-    overview = {
-      bands: mergeBathymetryFeatureCollections(null, entry.bandsOverview),
-      contours: mergeBathymetryFeatureCollections(null, entry.contoursOverview),
-    };
-    bathymetryOverviewByEntry.set(entry, overview);
-  }
-  return {
-    globalOverviewBands: overview?.bands || null,
-    globalOverviewContours: overview?.contours || null,
-    bands: Array.isArray(runtimeState.activeBathymetryBandsData?.features) ? runtimeState.activeBathymetryBandsData : null,
-    contours: Array.isArray(runtimeState.activeBathymetryContoursData?.features) ? runtimeState.activeBathymetryContoursData : null,
-    scenarioCoverage: Array.isArray(runtimeState.scenarioBathymetryBandsData?.features) ? runtimeState.scenarioBathymetryBandsData : null,
-  };
-}
-
-function getBathymetryFeatureDepthMax(feature) {
-  return getBathymetryStylePolicy().getBathymetryFeatureDepthMax(feature);
-}
-
-function isAtlantropaBathymetryFeature(feature) {
-  return getBathymetryStylePolicy().isAtlantropaBathymetryFeature(feature);
-}
-
-function getBathymetryBandFillStyle(feature, oceanStyle) {
-  return getBathymetryStylePolicy().getBathymetryBandFillStyle(feature, oceanStyle);
-}
-
-function getBathymetryContourStrokeStyle(feature, oceanStyle) {
-  return getBathymetryStylePolicy().getBathymetryContourStrokeStyle(feature, oceanStyle);
-}
-
-function sortBathymetryFeaturesForFill(collection) {
-  return getBathymetryStylePolicy().sortBathymetryFeaturesForFill(collection);
-}
-
-function getBathymetryBandVisibilityConfig(feature, k) {
-  return getBathymetryStylePolicy().getBathymetryBandVisibilityConfig(feature, k);
-}
-
-function getBathymetryContourVisibilityConfig(feature, k) {
-  return getBathymetryStylePolicy().getBathymetryContourVisibilityConfig(feature, k);
-}
-
-function getBathymetryCollectionBySource(collection, source) {
-  return getBathymetryStylePolicy().getBathymetryCollectionBySource(collection, source);
-}
 
 function ensureCoastlineMeshes() {
   getBorderMeshOwner().ensureCoastlineMeshes({
@@ -11596,26 +11247,6 @@ function getFeatureProjectedDensity(feature) {
 
 function getScenarioCoastalAccentOverlayVisualConfig(feature, k, options2) {
   return getBathymetryStylePolicy().getScenarioCoastalAccentOverlayVisualConfig(feature, k, options2);
-}
-
-function clipOutAtlantropaAccentRegions() {
-  const suppressionFeatures = getAtlantropaAccentSuppressionFeatures();
-  if (!suppressionFeatures.length || !rendererSurfaceHost.getContext()) return false;
-  const canvasWidth = Number(runtimeState.width) || rendererSurfaceHost.getContext().canvas?.width || 0;
-  const canvasHeight = Number(runtimeState.height) || rendererSurfaceHost.getContext().canvas?.height || 0;
-  if (!(canvasWidth > 0) || !(canvasHeight > 0)) return false;
-  rendererSurfaceHost.getContext().beginPath();
-  rendererSurfaceHost.getContext().rect(0, 0, canvasWidth, canvasHeight);
-  suppressionFeatures.forEach((feature) => {
-    if (!feature?.geometry) return;
-    rendererSurfaceHost.getPathCanvas()(feature);
-  });
-  try {
-    rendererSurfaceHost.getContext().clip("evenodd");
-    return true;
-  } catch (_) {
-    return false;
-  }
 }
 
 function drawScenarioCoastalAccentLayer(k, { interactive = false } = {}) {
@@ -11730,23 +11361,6 @@ function applyOceanClipMask(maskMode) {
     maskFeatureCount: 0,
     maskArcRefEstimate: null,
   });
-}
-
-function applyBathymetryCoverageExclusionMask(coverageCollection) {
-  if (!Array.isArray(coverageCollection?.features) || !coverageCollection.features.length) return;
-  const exclusionPath = getOceanExclusionPath(coverageCollection);
-  if (exclusionPath) {
-    rendererSurfaceHost.getContext().clip(exclusionPath, "evenodd");
-    return;
-  }
-  rendererSurfaceHost.getContext().beginPath();
-  rendererSurfaceHost.getPathCanvas()({ type: "Sphere" });
-  rendererSurfaceHost.getPathCanvas()(coverageCollection);
-  try {
-    rendererSurfaceHost.getContext().clip("evenodd");
-  } catch (error) {
-    rendererSurfaceHost.getContext().clip();
-  }
 }
 
 function drawOceanStyle() {
