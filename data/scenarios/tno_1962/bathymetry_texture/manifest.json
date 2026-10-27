@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "kind": "bathymetry_depth_overlay",
+  "bounds": [
+    -6.366666666666666,
+    27.3,
+    36.68333333333333,
+    46.266666666666666
+  ],
+  "registration": "area",
+  "encoding": {
+    "type": "sqrt",
+    "max_depth_m": 11000,
+    "land_value": 0,
+    "min_ocean_value": 1,
+    "max_value": 255
+  },
+  "overlay": {
+    "url": "data/scenarios/tno_1962/bathymetry_texture/overlay.png",
+    "width": 2583,
+    "height": 1138
+  },
+  "coverage_value_semantics": "0 = fall back to global; 1..255 = scenario depth (exposed land encoded as 1)",
+  "basins": {
+    "west": {
+      "drop_m": 100,
+      "split_lon": 11.0
+    },
+    "east": {
+      "drop_m": 200
+    }
+  },
+  "constraints": {
+    "correction": {
+      "type": "screened_poisson",
+      "length_km": 15,
+      "coast_depth_m": 5
+    },
+    "floor": {
+      "base_m": 4,
+      "per_km": 1.2,
+      "max_m": 60,
+      "smooth_sigma_px": 4
+    },
+    "smooth_sigma_px": 1
+  },
+  "source": {
+    "geometry": "data/scenarios/tno_1962/scenario_atlantropa.topo.json#scenario_atlantropa",
+    "relief": "data/ETOPO_2022_v1_60s_N90W180_surface.tif"
+  },
+  "stats": {
+    "water_px": 767428,
+    "components": 202,
+    "west_px": 274181,
+    "east_px": 493247,
+    "floor_limited_ratio": 0.1346015521977306,
+    "mean_abs_correction_m": 96.74257969299464,
+    "corrected_ratio": 0.3570784490532011,
+    "max_depth_m": 4773.965032538428
+  }
+}

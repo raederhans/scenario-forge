@@ -19,7 +19,8 @@ import { resolveTopVisibleRiverCandidate } from "./river_paint/visibility.js";
 import { createRiverPaintEditorOwner } from "./river_paint/editor_owner.js";
 import { decodeBathymetryTopology } from "./renderer/bathymetry_decode.js";
 import { createBathymetryWorkerClient } from "./bathymetry_worker_client.js";
-import { createBathymetryCoverageCompositor } from "./renderer/bathymetry_coverage_compositor.js";
+import { createBathymetryTextureRuntime } from "./renderer/bathymetry_texture_runtime.js";
+import { loadBathymetryImageBitmap } from "./renderer/bathymetry_texture_source.js";
 import { createOceanSurfacePattern } from "./renderer/ocean_surface_pattern.js";
 import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
@@ -1858,7 +1859,7 @@ function getContextLayerResolverOwner() {
     },
     helpers: {
       clamp,
-      ensureBathymetryDataAvailability,
+      ensureBathymetryDataAvailability: syncBathymetryTextureScenario,
       getContextLayerStableSourceToken,
       getUrbanFeatureOwnerId,
       getUrbanFeatureStableId,
@@ -1951,18 +1952,60 @@ function getOceanExclusionPath(collection) {
   return path;
 }
 
+let bathymetryTextureRuntime = null;
+
+function publishBathymetryTextureState(snapshot) {
+  runtimeState.activeBathymetrySource = snapshot.activeBathymetrySource;
+  publishBathymetryDiagnostic("bathymetryLoad", snapshot.load);
+}
+
+function getBathymetryTextureRuntime() {
+  bathymetryTextureRuntime ||= createBathymetryTextureRuntime({
+    globalManifestUrl: resolveDataAssetUrl("bathymetry:global_texture"),
+    fetchJson: (url) => globalThis.d3.json(url),
+    loadImageBitmap: loadBathymetryImageBitmap,
+    createCanvas: (width, height) => Object.assign(document.createElement("canvas"), { width, height }),
+    getProjection: () => rendererSurfaceHost.getProjection(),
+    getProjectionGeneration: () => getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
+    onAssetsChanged: (reason) => {
+      publishBathymetryTextureState(bathymetryTextureRuntime.getState());
+      // Tiles only refine the ocean surface; scenario water samples it from the background pass.
+      if (reason === "bathymetry-tile") invalidateRenderPasses(["background", "contextScenario"], reason);
+      else invalidateOceanVisualState(reason);
+      if (rendererSurfaceHost.getContext()) render();
+    },
+  });
+  return bathymetryTextureRuntime;
+}
+
+// Only records the scenario overlay URL; loading waits for a bathymetry draw.
+function syncBathymetryTextureScenario() {
+  const runtime = getBathymetryTextureRuntime();
+  runtime.setScenarioOverlayUrl(getRendererAssetUrlPolicyOwner().getScenarioBathymetryTextureUrl() || null);
+  publishBathymetryTextureState(runtime.getState());
+  return runtime;
+}
+
+function isWaterPatternSourceReady() {
+  if (!doesOceanStyleRequireBathymetry() && !runtimeState.intensityFields?.channels?.oceanDepth?.enabled) return false;
+  return !!getRenderPassCacheState().canvases?.background && !!getPassReferenceTransform("background");
+}
+
+function drawBathymetryTexture(oceanStyle) {
+  const result = syncBathymetryTextureScenario().draw(rendererSurfaceHost.getContext(), {
+    oceanStyle,
+    baseRgb: globalThis.d3.rgb(getOceanBaseFillColor()),
+    preset: oceanStyle.preset,
+    isExport: exportRenderInProgress,
+  });
+  publishBathymetryTextureState(result);
+  return result;
+}
+
 function getOceanRenderOwner() {
   if (oceanRenderOwner) {
     return oceanRenderOwner;
   }
-  const paintRegionalBathymetry = createBathymetryCoverageCompositor({
-    getContext: () => rendererSurfaceHost.getContext(),
-    withRenderTarget,
-    traceGeometry: (geometry, targetContext) => globalThis.d3.geoPath(
-      rendererSurfaceHost.getProjection(), targetContext
-    )(geometry),
-    getFeatherWidth: () => 6 * Math.PI / 180 * rendererSurfaceHost.getProjection().scale(),
-  });
   oceanRenderOwner = createOceanRenderOwner({
     state,
     constants: {
@@ -1989,7 +2032,6 @@ function getOceanRenderOwner() {
       clamp,
       clipOutAtlantropaAccentRegions,
       doesOceanStyleRequireBathymetry,
-      ensureBathymetryDataAvailability,
       getBathymetryBandFillStyle,
       getBathymetryBandVisibilityConfig,
       getBathymetryCollectionBySource,
@@ -2000,14 +2042,7 @@ function getOceanRenderOwner() {
       getBathymetryPresetProfile,
       getCoastlineCollectionForZoom,
       publishBathymetryVisibility: (summary) => publishBathymetryDiagnostic("bathymetryVisibility", summary),
-      paintGlobalBathymetry: (draw) => {
-        const startedAt = nowMs();
-        const result = paintRegionalBathymetry.paint(
-          state.globalBathymetryTopologyData?.bbox, draw, state.globalBathymetryTopologyData?.bathymetry_clip_edges
-        );
-        collectContextMetric("paintGlobalBathymetry", nowMs() - startedAt);
-        return result;
-      },
+      drawBathymetryTexture,
       getOceanStyleConfig,
       getProjectedGeographicPath,
       collectContextMetric,
@@ -13365,7 +13400,8 @@ function getScenarioRegionOverlayRenderOwner() {
       // Existing visual invalidation owns in-place style/paint changes. These
       // scalar revisions and source identities keep every continuation O(1).
       getWaterPreparationRevision: () => [
-        waterPreparationInvalidationEpoch, runtimeState.activeScenarioId,
+        // Water prepared before the background pass exists must be redone once the ocean pattern appears.
+        waterPreparationInvalidationEpoch, isWaterPatternSourceReady(), runtimeState.activeScenarioId,
         runtimeState.scenarioDataGeneration, runtimeState.topologyRevision, runtimeState.contextLayerRevision,
         runtimeState.scenarioShellOverlayRevision, runtimeState.scenarioReliefOverlayRevision,
         getObjectIdentityToken(runtimeState.scenarioWaterRegionsData),
@@ -13389,10 +13425,9 @@ function getScenarioRegionOverlayRenderOwner() {
         return options;
       },
       getWaterPatternSource: () => {
-        if (!doesOceanStyleRequireBathymetry() && !runtimeState.intensityFields?.channels?.oceanDepth?.enabled) return null;
+        if (!isWaterPatternSourceReady()) return null;
         const canvas = getRenderPassCacheState().canvases?.background;
         const referenceTransform = getPassReferenceTransform("background");
-        if (!canvas || !referenceTransform) return null;
         return { canvas, referenceTransform: { ...referenceTransform }, layout: { ...getRenderPassLayout("background") },
           revision: `${waterPreparationInvalidationEpoch}:${getObjectIdentityToken(canvas)}:${referenceTransform.x}:${referenceTransform.y}:${referenceTransform.k}` };
       },
@@ -14278,6 +14313,7 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   exportContext.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
   if (!redrawAtTargetResolution) {
     composeRenderPassesToTarget(exportContext, passNames, runtimeState.zoomTransform || globalThis.d3.zoomIdentity);
+    assertBathymetryDetailReadyForExport(passNames);
     return exportCanvas;
   }
 
@@ -14313,7 +14349,17 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
     exportRenderInProgress = previousExportState;
     riverContourRenderOwner?.dispose();
   }
+  assertBathymetryDetailReadyForExport(passNames);
   return exportCanvas;
+}
+
+// The background pass drew overview depth where detail tiles were still loading.
+function assertBathymetryDetailReadyForExport(passNames) {
+  if (!passNames.includes("background") || !bathymetryTextureRuntime?.hasPendingDetail()) return;
+  // An inactive style skips the texture runtime, so its pending flag can be stale.
+  const oceanStyle = getOceanStyleConfig();
+  if (!doesOceanStyleRequireBathymetry(oceanStyle) || !(oceanStyle.opacity > 0)) return;
+  throw new Error("Bathymetry detail is still loading; wait a moment before exporting.");
 }
 
 function composeTransformedFrameToBuffer(

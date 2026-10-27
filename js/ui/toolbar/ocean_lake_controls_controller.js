@@ -306,10 +306,11 @@ export function createOceanLakeControlsController({
       oceanBathymetrySourceValue.textContent = bathymetrySourceLabel || t("None", "ui");
     }
     if (oceanBathymetryBandsValue) {
-      oceanBathymetryBandsValue.textContent = String(state.activeBathymetryBandsData?.features?.length || 0);
+      oceanBathymetryBandsValue.textContent = state.renderPerfMetrics?.bathymetryVisibility?.backend || t("None", "ui");
     }
     if (oceanBathymetryContoursValue) {
-      oceanBathymetryContoursValue.textContent = String(state.activeBathymetryContoursData?.features?.length || 0);
+      oceanBathymetryContoursValue.textContent = String(state.renderPerfMetrics?.bathymetryLoad?.loadedTileCount
+        ?? state.renderPerfMetrics?.bathymetryVisibility?.loadedTileCount ?? 0);
     }
     requestLayerStatusRefresh();
   };

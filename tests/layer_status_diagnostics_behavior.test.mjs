@@ -247,10 +247,8 @@ test("bathymetry diagnostic separates loaded data from current view and reports 
       ...createDefaultStyleConfig(),
       ocean: { ...createDefaultStyleConfig().ocean, experimentalAdvancedStyles: true, preset: "bathymetry_soft" },
     },
-    activeBathymetryBandsData: { features: [{}, {}] },
-    activeBathymetryContoursData: { features: [{}] },
     renderPerfMetrics: {
-      bathymetryLoad: { status: "ready", failedSources: [] },
+      bathymetryLoad: { status: "ready", failedSources: [], loadedTileCount: 3 },
       bathymetryVisibility: { status: "ready", globalVisibleCount: 0, scenarioVisibleCount: 0, visibleCount: 0 },
     },
   });
@@ -269,8 +267,6 @@ test("bathymetry diagnostic separates loaded data from current view and reports 
 
   state.renderPerfMetrics.bathymetryLoad = { status: "error", failedSources: ["regional source"] };
   assert.equal(diagnostic().summary, "Bathymetry data failed to load · regional source");
-  state.activeBathymetryBandsData = { features: [] };
-  state.activeBathymetryContoursData = { features: [] };
   state.renderPerfMetrics.bathymetryLoad = { status: "partial", failedSources: ["regional source"] };
   state.renderPerfMetrics.bathymetryVisibility = { status: "off" };
   assert.equal(diagnostic().summary, "Some bathymetry sources failed to load · regional source");
@@ -380,4 +376,21 @@ test("layer diagnostics keep text clean and do not mutate default state", () => 
     assert.equal(String(entry.summary).includes("NaN"), false);
   });
   assert.equal(sanitizeLayerStatusText("Visible · undefined · NaN"), "Visible");
+});
+
+test("bathymetry diagnostic uses texture loading and projection status without vector data", () => {
+  const state = createState({ styleConfig: { ocean: { experimentalAdvancedStyles: true, preset: "bathymetry_soft" } },
+    activeBathymetrySource: "global", activeBathymetryBandsData: { features: [{}] },
+    renderPerfMetrics: { bathymetryLoad: { status: "loading" } } });
+  const diagnostic = () => buildBathymetryDiagnostic(state);
+  assert.equal(diagnostic().summary, "Bathymetry loading");
+  assert.equal(diagnostic().loadedCount, 0);
+  state.renderPerfMetrics.bathymetryLoad = { status: "ready", loadedTileCount: 4 };
+  assert.equal(diagnostic().summary, "Bathymetry available · source global");
+  assert.equal(diagnostic().loadedCount, 4);
+  state.renderPerfMetrics.bathymetryVisibility = { status: "unsupported" };
+  assert.equal(diagnostic().summary, "Bathymetry is unavailable for this projection");
+  assert.equal(diagnostic().severity, "warning");
+  state.renderPerfMetrics.bathymetryVisibility = { status: "error" };
+  assert.equal(diagnostic().summary, "Bathymetry data failed to load");
 });

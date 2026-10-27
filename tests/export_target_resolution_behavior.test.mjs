@@ -69,6 +69,7 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
     politicalPassUsesDirectScene: directScene,
     getRenderCacheOwner: () => renderCacheOwner,
     assertPopulationHeatmapReadyForExport: () => ({ ready: true, status: "disabled" }),
+    bathymetryTextureRuntime: null,
     filterCurrentEnabledRenderPasses: (names) => filterEnabledRenderPassNames(names),
     getRiverPaintRuntime,
     isThematicWgiActive, isPopulationActive,

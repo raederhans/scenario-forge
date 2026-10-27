@@ -53,6 +53,37 @@ def import_landing_builder(module_name: str):
 
 
 class PagesDistStartupShellTest(unittest.TestCase):
+    def test_runtime_copy_publishes_global_and_scenario_depth_textures(self):
+        from unittest.mock import patch
+        runtime = REPO_ROOT / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            root = Path(temporary)
+            app = root / "output/app"
+            files = {
+                "data/scenarios/index.json": b'{"scenarios":[]}',
+                "data/bathymetry/global/manifest.json": b'{"kind":"bathymetry_depth_texture"}',
+                "data/bathymetry/global/overview.png": b'overview',
+                "data/bathymetry/global/tiles/0_0.png": b'tile',
+                "data/scenarios/tno_1962/manifest.json": b'{"bathymetry_texture_url":"data/scenarios/tno_1962/bathymetry_texture/manifest.json"}',
+                "data/scenarios/tno_1962/bathymetry_texture/manifest.json": b'{"kind":"bathymetry_depth_overlay"}',
+                "data/scenarios/tno_1962/bathymetry_texture/overlay.png": b'overlay',
+            }
+            for relative, payload in files.items():
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(payload)
+            with patch.object(build_pages_dist, "ROOT", root), patch.object(build_pages_dist, "APP_DIST_ROOT", app):
+                build_pages_dist.copy_runtime_data()
+            for relative, payload in files.items():
+                with self.subTest(path=relative):
+                    copied = app / relative
+                    self.assertTrue(copied.is_file())
+                    if copied.suffix == ".png":
+                        self.assertEqual(copied.read_bytes(), payload)
+            self.assertEqual(json.loads((app / "data/scenarios/tno_1962/manifest.json").read_text())["bathymetry_texture_url"],
+                             "data/scenarios/tno_1962/bathymetry_texture/manifest.json")
+
     def test_scenario_copy_skips_stale_chunks_with_identical_packed_artifact(self):
         from unittest.mock import patch
         from tools.runtime_json_packing import pack_published_runtime_data
@@ -1826,6 +1857,11 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/global_contours.minor.topo.json",
             "app/data/global_rivers.geojson",
             "app/data/global_bathymetry.topo.json",
+            "app/data/bathymetry/global/manifest.json",
+            "app/data/bathymetry/global/overview.png",
+            "app/data/bathymetry/global/tiles/0_0.png",
+            "app/data/scenarios/tno_1962/bathymetry_texture/manifest.json",
+            "app/data/scenarios/tno_1962/bathymetry_texture/overlay.png",
         ):
             with self.subTest(expected_path=expected_path):
                 self.assertIn(expected_path, paths)
