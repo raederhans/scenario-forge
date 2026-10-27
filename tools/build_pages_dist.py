@@ -156,6 +156,7 @@ DATA_RUNTIME_FILES = (
 # 这两组 allowlist 定义的是 Pages 运行时公开面，不是仓库 data 目录的全量镜像。
 # 新增浏览器直接读取的 runtime import 或 manifest URL 时，要同步把文件放进这里。
 DATA_RUNTIME_DIRS = (
+    "bathymetry",
     "feature-migrations",
     "palette-maps",
     "palettes",
