@@ -2,8 +2,9 @@
   "version": 1,
   "generated_at": "2026-10-01T02:49:46.447775+00:00",
   "counts": {
-    "entries": 1371,
+    "entries": 1372,
     "by_role": {
+      "bathymetry_texture_manifest": 1,
       "bathymetry_topology": 1,
       "build_manifest": 1,
       "city_aliases": 1,
@@ -75,15 +76,28 @@
     "by_format": {
       "geojson": 152,
       "javascript": 2,
-      "json": 1044,
+      "json": 1045,
       "topojson": 173
     },
     "by_read_mode": {
-      "json": 1369,
+      "json": 1370,
       "module": 2
     }
   },
   "entries": [
+    {
+      "key": "bathymetry:global_texture",
+      "url": "data/bathymetry/global/manifest.json",
+      "role": "bathymetry_texture_manifest",
+      "format": "json",
+      "schemaRef": "schema://json/object/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.bathymetry:global_texture",
+      "cachePolicy": "no-cache",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
     {
       "key": "source:gb_chn_adm2",
       "url": "data/china_adm2.geojson",

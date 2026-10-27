@@ -2,12 +2,13 @@
 
 - generated_at: 2026-10-01T02:49:46.447775+00:00
 - version: 1
-- entries: 1371
+- entries: 1372
 
 ## Counts by role
 
 | role | count |
 | --- | ---: |
+| bathymetry_texture_manifest | 1 |
 | bathymetry_topology | 1 |
 | build_manifest | 1 |
 | city_aliases | 1 |
@@ -80,6 +81,7 @@
 
 | key | url | role | format | readMode | schemaRef | hashRef | cachePolicy | owner | sourceId |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| bathymetry:global_texture | data/bathymetry/global/manifest.json | bathymetry_texture_manifest | json | json | schema://json/object/v1 |  | no-cache | runtime_asset_registry.assets.bathymetry:global_texture |  |
 | source:gb_chn_adm2 | data/china_adm2.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::gb_chn_adm2::current_local_sha256 | default | source_ledger | gb_chn_adm2 |
 | city_aliases | data/city_aliases.json | city_aliases | json | json | schema://json/object/v1 | data/manifest.json::outputs::city_aliases.json::sha256 | default | init_map_data.world_cities |  |
 | city_lights:historical_1930:entries | data/city_lights/historical_1930_entries.json | city_lights_entries | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.city_lights:historical_1930:entries |  |
