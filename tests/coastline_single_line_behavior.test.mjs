@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createBorderDrawOwner } from "../js/core/renderer/border_draw_owner.js";
 import { createOceanRenderOwner } from "../js/core/renderer/ocean_render_owner.js";
-import { createBathymetryStylePolicy } from "../js/core/renderer/bathymetry_style_policy.js";
+import { createBathymetryStylePolicy, COASTLINE_LOD_LOW_ZOOM_MAX, COASTLINE_LOD_MID_ZOOM_MAX } from "../js/core/renderer/bathymetry_style_policy.js";
 import { createScenarioReliefOverlayRenderOwner } from "../js/core/renderer/scenario_relief_overlay_render_owner.js";
 
 function fixture({ source = "scenario", enabled = true, coastlines = {} } = {}) {
@@ -112,5 +112,35 @@ test("legacy disabled accent leaves supplementary shorelines to relief only", ()
       assert.equal(matches.length, 1);
       assert.equal(matches[0].width * k, index === 0 ? 1.35 : 1.4);
     }
+  }
+});
+
+test("interactive coastline selects the zoom LOD without viewport decluttering", () => {
+  const low = { type: "MultiLineString", coordinates: [[[0, 0], [100, 0]]] };
+  const mid = { type: "MultiLineString", coordinates: [[[0, 10], [50, 10], [100, 10]]] };
+  const high = { type: "MultiLineString", coordinates: [[[0, 20], [0.1, 20], [50, 20], [100, 20]]] };
+  const paths = [], zooms = [];
+  const owner = createBorderDrawOwner({
+    state: { cachedCoastlinesLow: [low], cachedCoastlinesMid: [mid], cachedCoastlinesHigh: [high] },
+    constants: { coastlineLodLowZoomMax: COASTLINE_LOD_LOW_ZOOM_MAX, coastlineLodMidZoomMax: COASTLINE_LOD_MID_ZOOM_MAX },
+    getters: {
+      getContext: () => ({ beginPath() {}, stroke() {} }),
+      getProjection: () => point => point,
+      getPathCanvas: () => geometry => paths.push(geometry),
+    },
+    helpers: {
+      isUsableMesh: value => !!value?.coordinates?.length,
+      getCoastlineCollectionForZoom: k => {
+        zooms.push(k);
+        return k < COASTLINE_LOD_LOW_ZOOM_MAX ? [low] : k < COASTLINE_LOD_MID_ZOOM_MAX ? [mid] : [high];
+      },
+    },
+  });
+  for (const k of [COASTLINE_LOD_MID_ZOOM_MAX, 5, 8]) {
+    paths.length = 0;
+    owner.drawHierarchicalBorders(k, { interactive: true });
+    assert.equal(zooms.at(-1), k);
+    assert.deepEqual(paths, [high]);
+    assert.equal(paths[0], high);
   }
 });

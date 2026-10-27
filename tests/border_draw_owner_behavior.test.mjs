@@ -188,8 +188,8 @@ test("boundary length, span, and area filters use zoom-scaled screen thresholds"
       [[0, 0], [3, 0]],
     ],
   };
-  const localAt3 = owner.getBoundaryMeshTransform("internal-local", 3);
-  const localAt32 = owner.getBoundaryMeshTransform("internal-local", 3.2);
+  const localAt3 = mesh => owner.buildRenderableBoundaryMesh(mesh, { minLengthPx: 4, k: 3 });
+  const localAt32 = mesh => owner.buildRenderableBoundaryMesh(mesh, { minLengthPx: 4, k: 3.2 });
   const boundaryAt3 = localAt3(boundary);
   const boundaryAt32 = localAt32(boundary);
   assert.deepEqual(boundaryAt3.coordinates, [[[0, 0], [3, 0]]]);
@@ -357,7 +357,8 @@ test('classified internal borders use effective country buckets and suppress leg
   h.state.parentBorderEnabledByCountry.BBB = true;
   h.state.cachedDetailAdmBorders = [mesh];
   h.owner.drawHierarchicalBorders(5);
-  assert.deepEqual(h.context.strokes.map(stroke => stroke.strokeStyle), ['#abcdef', '#abcdef', '#444444']);
+  assert.deepEqual(h.context.strokes.map(stroke => stroke.strokeStyle), ['#444444', '#abcdef', '#abcdef']);
+  assert.deepEqual(h.context.strokes.map(stroke => stroke.path[0].coordinates[0][0][0]), [30, 20, 10]);
   assert.equal(reconciles + builds + schedules, 0);
   h.context.strokes.length = 0;
   h.state.parentBorderEnabledByCountry.BBB = false;
@@ -905,4 +906,33 @@ test("packed worker lines retain native LOD and interruptible preparation withou
   h.owner.drawHierarchicalBorders(2.5);
   assert.deepEqual(h.context.strokes, baseline.context.strokes);
   assert.ok(yields > 10, "packed long line conversion and LOD remain cooperative");
+});
+
+test("internal transforms retain short chains at every zoom tier while other kinds still filter", () => {
+  const projection = point => point;
+  const owner = createBorderDrawOwner({ state: {}, getters: { getProjection: () => projection },
+    helpers: { isUsableMesh: value => !!value?.coordinates?.length } });
+  const short = { type: "MultiLineString", coordinates: [[[0, 0], [0.1, 0]]] };
+  for (const kind of ["internal-local", "internal-province"]) {
+    for (const k of [1, 1.3, 2, 3.2, 5, 8]) {
+      const transform = owner.getBoundaryMeshTransform(kind, k);
+      const result = transform(short);
+      assert.deepEqual(result, short, `${kind} at ${k}`);
+      assert.equal(transform(short), result);
+    }
+  }
+  for (const kind of ["empire", "coastline"]) {
+    for (const k of [1.3, 2]) assert.equal(owner.getBoundaryMeshTransform(kind, k)(short), null);
+  }
+});
+
+test("parent borders keep their default gray and cap opacity at 0.75", () => {
+  const h = createOwner();
+  h.state.parentBorderSupportedCountries = ["AAA"];
+  h.state.parentBorderEnabledByCountry.AAA = true;
+  h.state.cachedParentBordersByCountry.set("AAA", [mesh]);
+  h.state.styleConfig.parentBorders = { opacity: 1 };
+  h.owner.drawHierarchicalBorders(8);
+  assert.equal(h.context.strokes[0].strokeStyle, "#4b5563");
+  assert.equal(h.context.strokes[0].alpha, 0.75);
 });
