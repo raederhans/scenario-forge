@@ -9,7 +9,7 @@ export function createSelectionOverlayOwner({
   getTopojson,
   getFeatureId,
   getEntityFeatureId,
-  getFeatureCountryCodeNormalized,
+  getCountryFeatureIds,
   getDevGroup,
   getInspectorGroup,
   getPath,
@@ -140,7 +140,10 @@ export function createSelectionOverlayOwner({
       ? featureIds
         .map((featureId) => featureLookup.get(featureId))
         .filter(Boolean)
-      : landFeatures.filter((feature) => getFeatureCountryCodeNormalized(feature) === code);
+      // 国家高亮按当前剧本归属取成员，地块的几何原始国家码只在无剧本时等价。
+      : Array.from(getCountryFeatureIds(code) || [])
+        .map((featureId) => featureLookup.get(String(featureId || "").trim()))
+        .filter(Boolean);
     const renderAsGroup = featureIds.length > 0 && selectionState.groupMode === true;
     const overlayData = renderAsGroup && data.length
       ? [{

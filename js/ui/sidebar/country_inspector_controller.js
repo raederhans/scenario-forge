@@ -502,6 +502,10 @@ export function createCountryInspectorController({
     }
     runtimeState.selectedInspectorCountryCode = normalized;
     runtimeState.inspectorHighlightCountryCode = normalized;
+    // 层级分组预览留下的显式地块会优先于国家高亮，换国家时一并清掉。
+    runtimeState.inspectorHighlightFeatureIds = [];
+    runtimeState.inspectorHighlightGroupMode = false;
+    runtimeState.inspectorHighlightLabel = "";
     if (selectedCountryActionsSection) {
       selectedCountryActionsSection.open = true;
     }
