@@ -358,14 +358,20 @@ for (const pixelRatio of [null, 2]) {
   });
 }
 
-test("export budget reserves a target-sized texture output and bounded GL canvas only with a background pass", () => {
+test("export budget reserves a padded background texture output and bounded GL canvas only with a background pass", () => {
   const input = { width: 100, height: 80, pixelRatio: 2, passNames: ["background"] };
+  // The background pass is a transformed pass with 15% overscan on each side.
+  const padded = (size) => Math.floor((size + 2 * Math.ceil(size * 0.15)) * 2);
   for (const [width, height] of [[100, 80], [3000, 1000], [3000, 2500]]) {
     const target = { ...input, width, height };
+    const [passWidth, passHeight] = [padded(width), padded(height)];
     assert.equal(estimateExportRenderBytes({ ...target, bathymetryCoverage: true })
       - estimateExportRenderBytes(target),
-    (width * height * 4 + Math.min(4096, width * 2) * Math.min(4096, height * 2)) * 4);
+    (passWidth * passHeight + Math.min(4096, passWidth) * Math.min(4096, passHeight)) * 4);
   }
+  const nearLimit = { width: 5800, height: 3000, pixelRatio: 1, passNames: ["background", "political", "borders"] };
+  assert.ok(estimateExportRenderBytes(nearLimit) < EXPORT_RENDER_BUDGET_BYTES);
+  assert.ok(estimateExportRenderBytes({ ...nearLimit, bathymetryCoverage: true }) > EXPORT_RENDER_BUDGET_BYTES);
   const withoutBackground = { ...input, passNames: ["labels"] };
   assert.equal(estimateExportRenderBytes({ ...withoutBackground, bathymetryCoverage: true }),
     estimateExportRenderBytes(withoutBackground));

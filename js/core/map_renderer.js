@@ -18,6 +18,7 @@ import { createRiverContourRenderOwner } from "./river_paint/contour_render_owne
 import { resolveTopVisibleRiverCandidate } from "./river_paint/visibility.js";
 import { createRiverPaintEditorOwner } from "./river_paint/editor_owner.js";
 import { createBathymetryTextureRuntime } from "./renderer/bathymetry_texture_runtime.js";
+import { calculateRenderPassSurfaceLayout } from "./renderer/render_cache_surface_resources.js";
 import { loadBathymetryImageBitmap } from "./renderer/bathymetry_texture_source.js";
 import { createOceanSurfacePattern } from "./renderer/ocean_surface_pattern.js";
 import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
@@ -13827,17 +13828,25 @@ let exportRenderInProgress = false;
 
 async function ensureBathymetryReadyForExport(passNames, pixelRatio = null) {
   if (!passNames.includes("background")) return;
-  const dpr = Number(pixelRatio ?? runtimeState.dpr ?? 1);
   const { k = 1, x = 0, y = 0 } = runtimeState.zoomTransform || {};
-  // The background pass paints a padded surface; its logical overscan does not depend on DPR.
-  const layout = getRenderPassCacheState().layouts?.background;
-  const offsetX = Number(layout?.offsetX || 0), offsetY = Number(layout?.offsetY || 0);
-  await syncBathymetryTextureScenario().prepareForSurface({
-    width: Math.max(1, Math.floor(Number(layout?.paddedWidth || runtimeState.width || 0) * dpr)),
-    height: Math.max(1, Math.floor(Number(layout?.paddedHeight || runtimeState.height || 0) * dpr)),
-    transform: { a: k * dpr, b: 0, c: 0, d: k * dpr, e: (x + offsetX) * dpr, f: (y + offsetY) * dpr },
-    oceanStyle: getOceanStyleConfig(),
-  });
+  const targetDpr = Number(pixelRatio ?? runtimeState.dpr ?? 1);
+  // Exports either reuse the visible background pass or redraw it with export overscan;
+  // which one depends on the final pass set, so prepare both padded surfaces.
+  const surfaces = [
+    getRenderPassCacheState().layouts?.background,
+    calculateRenderPassSurfaceLayout({
+      width: runtimeState.width, height: runtimeState.height, dpr: targetDpr, paintOverscanPx: 0,
+      overscanRatio: TRANSFORM_REUSED_RENDER_PASS_NAMES.has("background") ? RENDER_PASS_OVERSCAN_RATIO_PER_SIDE : 0,
+    }),
+  ].filter(Boolean);
+  const runtime = syncBathymetryTextureScenario();
+  for (const { offsetX, offsetY, pixelWidth, pixelHeight, dpr } of surfaces) {
+    await runtime.prepareForSurface({
+      width: pixelWidth, height: pixelHeight,
+      transform: { a: k * dpr, b: 0, c: 0, d: k * dpr, e: (x + offsetX) * dpr, f: (y + offsetY) * dpr },
+      oceanStyle: getOceanStyleConfig(),
+    });
+  }
 }
 
 async function ensureCountryLabelsReadyForExport(passNames) {
