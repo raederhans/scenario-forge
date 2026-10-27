@@ -116,7 +116,7 @@ test("scenario style defaults merge in place and reject invalid patches", async 
   const ocean = {
     fillColor: "#000000",
     opacity: 0.8,
-    scenarioShallowContourFadeEndZoom: 3.1,
+    contourStrength: 0.3,
   };
   const styleConfig = {
     ocean,
@@ -131,7 +131,7 @@ test("scenario style defaults merge in place and reject invalid patches", async 
       ocean: {
         fillColor: "#123456",
         preset: "scenario",
-        scenarioShallowContourFadeEndZoom: 2.9,
+        contourStrength: 0.5,
       },
       coastlines: { width: 2 },
     }),
@@ -143,7 +143,7 @@ test("scenario style defaults merge in place and reject invalid patches", async 
     fillColor: "#123456",
     opacity: 0.8,
     preset: "scenario",
-    scenarioShallowContourFadeEndZoom: 2.9,
+    contourStrength: 0.5,
   });
   assert.deepEqual(target.styleConfig.coastlines, { width: 2 });
   assert.throws(

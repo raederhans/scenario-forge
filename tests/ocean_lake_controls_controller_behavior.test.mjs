@@ -183,8 +183,8 @@ test("new ocean styles and partial project and appearance snapshots use Soft def
   }
 });
 
-test("scenario ocean defaults fill missing fields and restore explicit user choices", () => {
-  const target = { styleConfig: { ocean: { fillColor: "#123456" } } };
+test("scenario ocean defaults merge their keys and restore explicit user choices", () => {
+  const target = { styleConfig: { ocean: { ...createDefaultStyleConfig().ocean, fillColor: "#123456" } } };
   mergeScenarioStyleDefaultsState(target, { ocean: { fillColor: "#abcdef" } });
   assert.deepEqual(target.styleConfig.ocean, { ...createDefaultStyleConfig().ocean, fillColor: "#abcdef" });
   target.styleConfig.ocean.experimentalAdvancedStyles = false;

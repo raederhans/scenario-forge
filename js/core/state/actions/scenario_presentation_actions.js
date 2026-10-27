@@ -1,4 +1,3 @@
-import { createDefaultStyleConfig } from "../ui_state.js";
 import { normalizePaintMode } from "../../map_editing_policy.js";
 import { normalizeQuickFillScope } from "../../quick_fill_hierarchy.js";
 // Canonical scenario presentation state authority.
@@ -272,9 +271,7 @@ export function mergeScenarioStyleDefaultsState(target, styleOverride) {
     patchAppearanceStyleGroupState(
       target,
       group,
-      group === "ocean"
-        ? { ...createDefaultStyleConfig().ocean, ...target.styleConfig?.ocean, ...patch }
-        : { ...patch },
+      { ...patch },
       { preserveGroupIdentity: true },
     );
   }

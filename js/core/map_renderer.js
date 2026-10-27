@@ -494,25 +494,11 @@ const BATHYMETRY_PRESET_PROFILES = Object.freeze({
     defaultOpacity: 0.9,
     defaultScale: 1.25,
     defaultContourStrength: 0,
-    bandAlphaBase: 0.76,
-    contourAlphaBase: 0.6,
-    contourLineWidthBase: 0.4,
-    contourLineWidthScale: 0.25,
-    paletteMode: "soft",
-    majorContourDepths: Object.freeze([200, 1000, 4000]),
-    skipAlternateContourDepths: true,
   }),
   bathymetry_contours: Object.freeze({
     defaultOpacity: 0.9,
     defaultScale: 1.15,
     defaultContourStrength: 0.85,
-    bandAlphaBase: 0.75,
-    contourAlphaBase: 0.85,
-    contourLineWidthBase: 0.55,
-    contourLineWidthScale: 0.3,
-    paletteMode: "discrete",
-    majorContourDepths: Object.freeze([200, 1000, 4000]),
-    skipAlternateContourDepths: false,
   }),
 });
 const RENDER_PHASE_IDLE = "idle";
@@ -11115,14 +11101,13 @@ function getOceanStyleConfig() {
   const preset = normalizeOceanPreset(ocean.preset);
   return {
     preset,
-    opacity: clamp(Number.isFinite(Number(ocean.opacity)) ? Number(ocean.opacity) : 0.82, 0, 1),
-    scale: clamp(Number.isFinite(Number(ocean.scale)) ? Number(ocean.scale) : 1.14, 0.6, 2.4),
+    opacity: clamp(Number.isFinite(Number(ocean.opacity)) ? Number(ocean.opacity) : 0.9, 0, 1),
+    scale: clamp(Number.isFinite(Number(ocean.scale)) ? Number(ocean.scale) : 1.25, 0.6, 2.4),
     contourStrength: clamp(
-      Number.isFinite(Number(ocean.contourStrength)) ? Number(ocean.contourStrength) : 0.34,
+      Number.isFinite(Number(ocean.contourStrength)) ? Number(ocean.contourStrength) : 0,
       0,
       1
     ),
-    bathymetryProfile: getBathymetryPresetProfile(preset),
     experimentalAdvancedStyles: ocean.experimentalAdvancedStyles === true,
     coastalAccentEnabled: isScenarioCoastalAccentEnabled(),
   };
