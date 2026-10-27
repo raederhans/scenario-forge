@@ -29,7 +29,7 @@ export function createOceanRenderOwner({
     clamp = (value, min, max) => Math.max(min, Math.min(max, value)),
     clipOutAtlantropaAccentRegions = () => false,
     doesOceanStyleRequireBathymetry = () => false,
-    ensureBathymetryDataAvailability = () => {},
+    drawBathymetryTexture = () => ({ status: "off" }),
     getBathymetryBandFillStyle = () => "rgba(0, 0, 0, 0)",
     getBathymetryBandVisibilityConfig = () => ({ alpha: 1 }),
     getBathymetryCollectionBySource = () => null,
@@ -232,77 +232,39 @@ export function createOceanRenderOwner({
     const pathCanvas = getPathCanvas();
     if (!context || !pathCanvas) return;
     const oceanStyle = getOceanStyleConfig();
-    const bathymetryRequired = doesOceanStyleRequireBathymetry(oceanStyle);
-    ensureBathymetryDataAvailability({
-      required: bathymetryRequired,
-    });
-    const visibility = { status: "off", lod: "detail", globalVisibleCount: 0, scenarioVisibleCount: 0, visibleCount: 0 };
-    if (!oceanStyle.experimentalAdvancedStyles) {
-      runtimeState.oceanMaskMode = OCEAN_MASK_MODE_TOPOLOGY;
-      runtimeState.oceanMaskQuality = 0;
+    const visibility = { status: "off", lod: "overview", backend: null, missingTileCount: 0,
+      loadedTileCount: 0, globalVisibleCount: 0, scenarioVisibleCount: 0, visibleCount: 0 };
+    runtimeState.oceanMaskMode = OCEAN_MASK_MODE_TOPOLOGY;
+    runtimeState.oceanMaskQuality = 0;
+    if (!oceanStyle.experimentalAdvancedStyles || oceanStyle.preset === "flat") {
       publishBathymetryVisibility(visibility);
       return;
     }
-    if (oceanStyle.preset === "flat") {
-      runtimeState.oceanMaskMode = OCEAN_MASK_MODE_TOPOLOGY;
-      runtimeState.oceanMaskQuality = 0;
-      publishBathymetryVisibility(visibility);
-      return;
-    }
-    const bathymetryData = getBathymetryFeatureCollections();
-    const hasBands = Array.isArray(bathymetryData.bands?.features) && bathymetryData.bands.features.length > 0;
-    const hasContours =
-      Array.isArray(bathymetryData.contours?.features) && bathymetryData.contours.features.length > 0;
-    if (!hasBands && !hasContours) {
-      runtimeState.oceanMaskMode = OCEAN_MASK_MODE_TOPOLOGY;
-      runtimeState.oceanMaskQuality = 0;
-      publishBathymetryVisibility({ ...visibility, status: "loading" });
-      return;
-    }
-    if (oceanStyle.opacity === 0) {
+    if (oceanStyle.opacity <= 0) {
       publishBathymetryVisibility({ ...visibility, status: "hidden" });
       return;
     }
-
     const { mode: clipMaskMode } = resolveOceanMask();
-    const useOverview = (Number(runtimeState.zoomTransform?.k) || 1) < 2
-      && !isExportRendering()
-      && !!bathymetryData.globalOverviewBands?.features?.length
-      && !!bathymetryData.globalOverviewContours?.features?.length;
-    visibility.lod = useOverview ? "overview" : "detail";
-    const globalBands = useOverview
-      ? bathymetryData.globalOverviewBands
-      : getBathymetryCollectionBySource(bathymetryData.bands, "global");
-    const scenarioBands = getBathymetryCollectionBySource(bathymetryData.bands, "scenario");
-    const globalContours = useOverview
-      ? bathymetryData.globalOverviewContours
-      : getBathymetryCollectionBySource(bathymetryData.contours, "global");
-    const scenarioContours = getBathymetryCollectionBySource(bathymetryData.contours, "scenario");
-    const scenarioCoverage = bathymetryData.scenarioCoverage;
-
     context.save();
     applyOceanClipMask(clipMaskMode);
-    if (globalBands?.features?.length || globalContours?.features?.length) {
-      context.save();
-      applyBathymetryCoverageExclusionMask(scenarioCoverage);
-      paintGlobalBathymetry(() => {
-        visibility.globalVisibleCount += drawBathymetryBands(globalBands, oceanStyle);
-        visibility.globalVisibleCount += drawBathymetryContours(globalContours, oceanStyle);
-      });
-      context.restore();
-    }
-    if (Array.isArray(scenarioBands?.features) && scenarioBands.features.length) {
-      visibility.scenarioVisibleCount += drawBathymetryBands(scenarioBands, oceanStyle);
-    }
-    if (Array.isArray(scenarioContours?.features) && scenarioContours.features.length) {
-      visibility.scenarioVisibleCount += drawBathymetryContours(scenarioContours, oceanStyle);
-    }
+    const result = drawBathymetryTexture(oceanStyle);
     context.restore();
-    runtimeState.oceanMaskMode = OCEAN_MASK_MODE_BATHYMETRY;
-    runtimeState.oceanMaskQuality = 1;
-    visibility.status = "ready";
-    visibility.visibleCount = visibility.globalVisibleCount + visibility.scenarioVisibleCount;
-    publishBathymetryVisibility(visibility);
+    const ready = result.status === "ready";
+    if (ready) {
+      runtimeState.oceanMaskMode = OCEAN_MASK_MODE_BATHYMETRY;
+      runtimeState.oceanMaskQuality = 1;
+    }
+    publishBathymetryVisibility({
+      ...visibility,
+      status: result.status === "unsupported-projection" ? "unsupported" : result.status,
+      lod: result.detail ? "detail" : "overview",
+      backend: result.backend ?? null,
+      missingTileCount: result.missingTileCount ?? 0,
+      loadedTileCount: result.loadedTileCount ?? 0,
+      visibleCount: ready ? 1 : 0,
+      globalVisibleCount: ready ? result.globalVisibleCount ?? 1 : 0,
+      scenarioVisibleCount: ready ? result.scenarioVisibleCount ?? 0 : 0,
+    });
   }
 
   return {

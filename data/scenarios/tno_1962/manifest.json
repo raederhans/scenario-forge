@@ -2,6 +2,7 @@
   "audit_url": "data/scenarios/tno_1962/audit.json",
   "baseline_hash": "2e88c5fbe6a39f9f97cb569892f99e44ee39eed2f04f3cfd440fa84bcd46ddc2",
   "bathymetry_topology_url": "data/scenarios/tno_1962/bathymetry.topo.json",
+  "bathymetry_texture_url": "data/scenarios/tno_1962/bathymetry_texture/manifest.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
   "bookmark_name": "TNO_1962_NAME",
@@ -2997,7 +2998,7 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "8354afd8f66f56ee03d5ab8d66fca3c14fda804585b8f9a51522090fad9c17d7",
+  "snapshot_fingerprint": "081770a159bb3b431f69e8bc8adb55d111fc0dbcb123e375c8444c730e88f7fd",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "bebef4199598aeb02cae406473458b8da7b5ad044ce66b632b73bbb87fdb55d9",

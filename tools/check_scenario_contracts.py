@@ -515,6 +515,7 @@ def _collect_snapshot_inputs(
         "special_zone_layers_url": "special_zone_layers.json",
         "relief_overlays_url": "relief_overlays.geojson",
         "bathymetry_topology_url": "bathymetry.topo.json",
+        "bathymetry_texture_url": "bathymetry_texture/manifest.json",
         "city_overrides_url": "city_overrides.json",
         "capital_hints_url": "capital_hints.json",
         "strategic_values_url": SCENARIO_STRATEGIC_VALUES_FILENAME,

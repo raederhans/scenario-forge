@@ -13699,6 +13699,7 @@ def build_runtime_topology_state(
     manifest_payload["water_regions_mode"] = "exclusive"
     manifest_payload["relief_overlays_url"] = "data/scenarios/tno_1962/relief_overlays.geojson"
     manifest_payload["bathymetry_topology_url"] = "data/scenarios/tno_1962/bathymetry.topo.json"
+    manifest_payload["bathymetry_texture_url"] = "data/scenarios/tno_1962/bathymetry_texture/manifest.json"
     manifest_payload["presentation_features"] = {
         "atlantropa_relief": True,
         "coastal_accent": True,

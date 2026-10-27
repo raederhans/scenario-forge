@@ -16,6 +16,8 @@ test.setTimeout(120000);
 const SCENARIO_ID = 'tno_1962';
 const BATHYMETRY_URL_SEGMENTS = [
   '/data/global_bathymetry.topo.json',
+  '/data/bathymetry/',
+  '/bathymetry_texture/',
   '/data/scenarios/tno_1962/bathymetry.topo.json',
 ];
 

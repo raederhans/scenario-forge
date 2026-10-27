@@ -219,7 +219,7 @@ test('GPU uses bounded inverse work, direct bitmap uploads, stable allocation an
   await source.load();
   await source.requestTiles(['8_4', '9_4']);
   const renderer = createBathymetryTextureRenderer({
-    createCanvas: (width, height) => ({ width, height, getContext: () => ({ drawImage() {} }) }),
+    createCanvas: (width, height) => ({ width, height, getContext: () => ({ drawImage() {}, clearRect() {} }) }),
     getWebGL2Context: () => gl,
   });
   const projection = d3.geoEqualEarth().fitSize([8000, 30], { type: 'Sphere' }).translate([4096, 16]);
@@ -257,4 +257,24 @@ test('GPU uses bounded inverse work, direct bitmap uploads, stable allocation an
   assert.equal(calls.texSubImage3D[2].at(-1), source.getLoadedTiles().get('10_4'));
   assert.equal(calls.texImage2D.length, uploads + 1);
   assert.equal(calls.texImage2D.at(-1)[2], gl.R8UI);
+});
+
+test('renderer reuses its output canvas and resizes it without allocating another output', () => {
+  let allocations = 0;
+  const renderer = createBathymetryTextureRenderer({
+    createCanvas: (width, height) => { allocations++; return createCanvas(width, height); },
+  });
+  const projection = d3.geoEqualEarth().scale(1).translate([.5, .5]);
+  const options = { width: 1, height: 1, transform: identity,
+    projectionParams: createProjectionInverseParams(projection), source: sourceOf(), ramp, detail: false };
+  const first = renderer.render(options);
+  const count = allocations;
+  assert.equal(renderer.render(options).canvas, first.canvas);
+  assert.equal(allocations, count);
+  const resized = renderer.render({ ...options, width: 2, height: 3 });
+  assert.equal(resized.canvas, first.canvas);
+  assert.equal(resized.canvas.width, 2);
+  assert.equal(resized.canvas.height, 3);
+  assert.equal(resized.canvas.image.data.length, 24);
+  assert.equal(allocations, count);
 });

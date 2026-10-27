@@ -156,7 +156,7 @@ void main() {
     float dx=(sqrt(depthAt(pixel+vec2(1,0),depth))-sqrt(depthAt(pixel-vec2(1,0),depth)))*.5;
     float dy=(sqrt(depthAt(pixel+vec2(0,1),depth))-sqrt(depthAt(pixel-vec2(0,1),depth)))*.5;
     float light=dot(normalize(vec3(-dx*hillshadeExaggeration,-dy*hillshadeExaggeration,1.)),vec3(-.5,-.5,.7071067811865476));
-    float brightness=1.+clamp((light-.7071067811865476)*hillshadeStrength,-hillshadeStrength,hillshadeStrength);
+    float brightness=1.+clamp(light-.7071067811865476,-hillshadeStrength,hillshadeStrength);
     ivec2 q=ivec2(floor(pixel));
     float dither=((float(bayer[(q.y%4)*4+q.x%4])+.5)/16.-.5)/255.;
     rgb=rgb*brightness+dither;
@@ -171,7 +171,7 @@ void main() {
 }`;
 
 export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context = (canvas) => canvas.getContext('webgl2', { premultipliedAlpha: false }) }) {
-  let pixels = new WeakMap(), gpu = null, unavailable = false;
+  let pixels = new WeakMap(), gpu = null, unavailable = false, outputCanvas = null;
   function read(image) {
     if (pixels.has(image)) return pixels.get(image);
     let result;
@@ -327,6 +327,7 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
     const viewport = gl.getParameter(gl.MAX_VIEWPORT_DIMS);
     const limitX = Math.min(4096, maxTexture, viewport[0]), limitY = Math.min(4096, maxTexture, viewport[1]);
     const ctx = output.getContext('2d');
+    ctx.clearRect(0, 0, width, height);
     for (let y = 0; y < height; y += limitY) for (let x = 0; x < width; x += limitX) {
       const w = Math.min(limitX, width - x), h = Math.min(limitY, height - y);
       canvas.width = w; canvas.height = h;
@@ -342,7 +343,9 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
     if (!gpu && !unavailable) {
       try { gpu = initialize(); unavailable = !gpu; } catch { unavailable = true; }
     }
-    const canvas = createCanvas(width, height); canvas.width = width; canvas.height = height;
+    const canvas = outputCanvas ||= createCanvas(width, height);
+    if (canvas.width !== width) canvas.width = width;
+    if (canvas.height !== height) canvas.height = height;
     const determinant = transform.a * transform.d - transform.b * transform.c;
     const inverse = { a: transform.d / determinant, b: -transform.b / determinant,
       c: -transform.c / determinant, d: transform.a / determinant,
@@ -413,7 +416,7 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
           const dx = (Math.sqrt(right) - Math.sqrt(left)) * .5 * hillshadeExaggeration;
           const dy = (Math.sqrt(bottom) - Math.sqrt(top)) * .5 * hillshadeExaggeration;
           const light = (.5 * dx + .5 * dy + Math.SQRT1_2) / Math.hypot(dx, dy, 1);
-          const brightness = 1 + Math.max(-hillshadeStrength, Math.min(hillshadeStrength, (light - Math.SQRT1_2) * hillshadeStrength));
+          const brightness = 1 + Math.max(-hillshadeStrength, Math.min(hillshadeStrength, light - Math.SQRT1_2));
           const dither = (BAYER[(y % 4) * 4 + x % 4] + .5) / 16 - .5;
           for (let c = 0; c < 3; c++) rgb[c] = rgb[c] * brightness + dither;
         } else {
@@ -432,5 +435,5 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
     ctx.putImageData(image, 0, 0);
     return { canvas, backend: 'cpu', coveredBounds, missingTileKeys: [...missing] };
   }
-  return { render, dispose() { release(); pixels = new WeakMap(); unavailable = false; } };
+  return { render, dispose() { release(); pixels = new WeakMap(); unavailable = false; outputCanvas = null; } };
 }
