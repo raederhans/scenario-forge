@@ -42,6 +42,7 @@ import {
   assertPopulationHeatmapReadyForExport,
   ensurePopulationHeatmapReadyForExport,
   ensurePaintContoursReady,
+  ensureBathymetryReadyForExport,
   ensureCountryLabelsReadyForExport,
   setMapData,
 } from "../core/map_renderer/public.js";
@@ -2507,6 +2508,7 @@ function initToolbar({ render } = {}) {
     } else {
       if (bakePassNames.length) {
         await ensureCountryLabelsReadyForExport(bakePassNames);
+        await ensureBathymetryReadyForExport(bakePassNames);
         const passCanvas = renderExportPassesToCanvas(bakePassNames);
         if (passCanvas) {
           bakeCtx.drawImage(passCanvas, 0, 0);
@@ -2587,6 +2589,7 @@ function initToolbar({ render } = {}) {
     await ensureThematicWgiReadyForExport(passNames);
     await ensurePaintContoursReady();
     await ensureCountryLabelsReadyForExport(passNames);
+    await ensureBathymetryReadyForExport(passNames, dimensions?.pixelRatio ?? null);
     const compositeCanvas = renderExportPassesToCanvas(passNames, dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
     if (!compositeCanvas) {
       throw createExportError("invalid-params", "Composite export canvas unavailable.");
@@ -2623,6 +2626,7 @@ function initToolbar({ render } = {}) {
       await ensureThematicWgiReadyForExport(passNames);
       await ensurePaintContoursReady();
       await ensureCountryLabelsReadyForExport(passNames);
+      await ensureBathymetryReadyForExport(passNames, dimensions?.pixelRatio ?? null);
       const canvas = renderExportPassesToCanvas(passNames, dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
       if (!canvas) {
         throw createExportError("invalid-params", `Layer export canvas unavailable for ${normalizedSourceId}.`);

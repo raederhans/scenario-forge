@@ -174,7 +174,8 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
     const firstVisibleAt = await page.evaluate(async () => {
       const { state } = await import('/js/core/state.js');
       const recordedAt = state.renderPerfMetrics?.firstVisibleFramePainted?.recordedAt;
-      return Number.isFinite(recordedAt) ? performance.timeOrigin + recordedAt : null;
+      // recordedAt is already wall-clock milliseconds, like Playwright's request startTime.
+      return Number.isFinite(recordedAt) ? recordedAt : null;
     });
     if (firstVisibleAt !== null) {
       for (const response of bathymetryResponses) {

@@ -1965,7 +1965,10 @@ function isWaterPatternSourceReady() {
 }
 
 function drawBathymetryTexture(oceanStyle) {
-  const result = syncBathymetryTextureScenario().draw(rendererSurfaceHost.getContext(), {
+  const runtime = syncBathymetryTextureScenario();
+  // Depth textures must not compete with startup payloads; loading starts after the first visible frame.
+  if (!runtimeState.firstVisibleFramePainted && runtime.getState().status !== "ready") return runtime.getState();
+  const result = runtime.draw(rendererSurfaceHost.getContext(), {
     oceanStyle,
     baseRgb: globalThis.d3.rgb(getOceanBaseFillColor()),
     preset: oceanStyle.preset,
@@ -5326,7 +5329,11 @@ function noteFirstVisibleFrameBlocked(reason = "visible-frame", blockReason = "u
 }
 
 function markFirstVisibleFramePainted(reason = "visible-frame") {
+  const wasPainted = !!runtimeState.firstVisibleFramePainted;
   getVisibleFrameDiagnosticsOwner().markFirstVisibleFramePainted(reason);
+  if (!wasPainted && runtimeState.firstVisibleFramePainted && doesOceanStyleRequireBathymetry()) {
+    syncBathymetryTextureScenario().ensure();
+  }
 }
 
 function resetFirstVisibleFramePainted(reason = "visible-frame-reset") {
@@ -13818,6 +13825,21 @@ function composeRenderPassesToTarget(
 
 let exportRenderInProgress = false;
 
+async function ensureBathymetryReadyForExport(passNames, pixelRatio = null) {
+  if (!passNames.includes("background")) return;
+  const dpr = Number(pixelRatio ?? runtimeState.dpr ?? 1);
+  const { k = 1, x = 0, y = 0 } = runtimeState.zoomTransform || {};
+  // The background pass paints a padded surface; its logical overscan does not depend on DPR.
+  const layout = getRenderPassCacheState().layouts?.background;
+  const offsetX = Number(layout?.offsetX || 0), offsetY = Number(layout?.offsetY || 0);
+  await syncBathymetryTextureScenario().prepareForSurface({
+    width: Math.max(1, Math.floor(Number(layout?.paddedWidth || runtimeState.width || 0) * dpr)),
+    height: Math.max(1, Math.floor(Number(layout?.paddedHeight || runtimeState.height || 0) * dpr)),
+    transform: { a: k * dpr, b: 0, c: 0, d: k * dpr, e: (x + offsetX) * dpr, f: (y + offsetY) * dpr },
+    oceanStyle: getOceanStyleConfig(),
+  });
+}
+
 async function ensureCountryLabelsReadyForExport(passNames) {
   if (!passNames.includes("labels")) return;
   await waitForCountryLabelsForExport({
@@ -16524,6 +16546,7 @@ export {
   getPaintContourDiagnostics,
   getPoliticalBorderDiagnostics,
   ensurePaintContoursReady,
+  ensureBathymetryReadyForExport,
   ensureCountryLabelsReadyForExport,
   // Core render lifecycle facade.
   initMap,
