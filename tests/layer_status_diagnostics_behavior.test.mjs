@@ -221,7 +221,7 @@ test("transport family diagnostics expose workbench-only disabled reasons", () =
 });
 
 test("bathymetry diagnostic explains disabled and pending data states", () => {
-  const disabled = buildBathymetryDiagnostic(createState(), { translate: (key) => key });
+  const disabled = buildBathymetryDiagnostic(createState({ styleConfig: { ocean: { experimentalAdvancedStyles: false, preset: "flat" } } }), { translate: (key) => key });
   assert.equal(disabled.summary, "Off");
   assert.equal(disabled.severity, "muted");
   assert.equal(resolveLayerStatusTone(disabled), "off");
@@ -380,7 +380,7 @@ test("layer diagnostics keep text clean and do not mutate default state", () => 
 
 test("bathymetry diagnostic uses texture loading and projection status without vector data", () => {
   const state = createState({ styleConfig: { ocean: { experimentalAdvancedStyles: true, preset: "bathymetry_soft" } },
-    activeBathymetrySource: "global", activeBathymetryBandsData: { features: [{}] },
+    activeBathymetrySource: "global",
     renderPerfMetrics: { bathymetryLoad: { status: "loading" } } });
   const diagnostic = () => buildBathymetryDiagnostic(state);
   assert.equal(diagnostic().summary, "Bathymetry loading");

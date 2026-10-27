@@ -2,10 +2,9 @@
   "version": 1,
   "generated_at": "2026-10-01T02:49:46.447775+00:00",
   "counts": {
-    "entries": 1372,
+    "entries": 1371,
     "by_role": {
       "bathymetry_texture_manifest": 1,
-      "bathymetry_topology": 1,
       "build_manifest": 1,
       "city_aliases": 1,
       "city_lights_entries": 1,
@@ -77,10 +76,10 @@
       "geojson": 152,
       "javascript": 2,
       "json": 1045,
-      "topojson": 173
+      "topojson": 172
     },
     "by_read_mode": {
-      "json": 1370,
+      "json": 1369,
       "module": 2
     }
   },
@@ -302,19 +301,6 @@
       "aliases": [
         "manifest_output:geo_aliases.json"
       ]
-    },
-    {
-      "key": "bathymetry:global_topology",
-      "url": "data/global_bathymetry.topo.json",
-      "role": "bathymetry_topology",
-      "format": "topojson",
-      "schemaRef": "schema://topojson/topology/v1",
-      "hashRef": "",
-      "owner": "runtime_asset_registry.assets.bathymetry:global_topology",
-      "cachePolicy": "default",
-      "sourceId": "",
-      "readMode": "json",
-      "aliases": []
     },
     {
       "key": "context_layer:physical_contours_low_major",

@@ -149,7 +149,6 @@ DATA_RUNTIME_FILES = (
     "global_contours.mid.major.topo.json",
     "global_contours.mid.minor.topo.json",
     "global_contours.lod.provenance.json",
-    "global_bathymetry.topo.json",
     "historical_city_lights_1930_exclusions.json",
     "city_lights/historical_1930_entries.json",
 )

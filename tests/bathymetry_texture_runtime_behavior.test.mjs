@@ -270,3 +270,26 @@ test('views needing more tiles than the cache holds stay on the overview', async
   assert.equal(h.runtime.hasPendingDetail(), false);
   h.runtime.dispose();
 });
+
+test('export preparation loads the detail tiles a target surface needs and repaints once', async () => {
+  const h = harness();
+  const surface = { width: 2, height: 2, transform: { a: 12, b: 0, c: 0, d: 12, e: -11, f: -11 },
+    oceanStyle: h.options.oceanStyle };
+  await h.runtime.prepareForSurface(surface);
+  assert.deepEqual(h.requests.filter(url => url.startsWith('tiles/')).sort(), ['tiles/8_4', 'tiles/9_4']);
+  assert.equal(h.changes.filter(reason => reason === 'bathymetry-tile').length, 1);
+  await h.runtime.prepareForSurface(surface);
+  assert.equal(h.requests.filter(url => url.startsWith('tiles/')).length, 2);
+  h.runtime.dispose();
+});
+
+test('export preparation requests nothing while bathymetry is inactive', async () => {
+  const h = harness();
+  for (const oceanStyle of [{ ...h.options.oceanStyle, preset: 'flat' },
+    { ...h.options.oceanStyle, opacity: 0 }, { ...h.options.oceanStyle, experimentalAdvancedStyles: false }]) {
+    await h.runtime.prepareForSurface({ width: 2, height: 2,
+      transform: { a: 12, b: 0, c: 0, d: 12, e: -11, f: -11 }, oceanStyle });
+  }
+  assert.deepEqual(h.requests, []);
+  h.runtime.dispose();
+});

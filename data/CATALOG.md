@@ -2,14 +2,13 @@
 
 - generated_at: 2026-10-01T02:49:46.447775+00:00
 - version: 1
-- entries: 1372
+- entries: 1371
 
 ## Counts by role
 
 | role | count |
 | --- | ---: |
 | bathymetry_texture_manifest | 1 |
-| bathymetry_topology | 1 |
 | build_manifest | 1 |
 | city_aliases | 1 |
 | city_lights_entries | 1 |
@@ -97,7 +96,6 @@
 | feature_migrations:political_feature_merges | data/feature-migrations/political_feature_merges.v1.json | feature_migration_table | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.feature_migrations:political_feature_merges |  |
 | source:fr_arr | data/france_arrondissements.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::fr_arr::current_local_sha256 | default | source_ledger | fr_arr |
 | geo_aliases | data/geo_aliases.json | geo_aliases | json | json | schema://json/object/v1 | data/manifest.json::outputs::geo_aliases.json::sha256 | default | init_map_data.hierarchy_locales |  |
-| bathymetry:global_topology | data/global_bathymetry.topo.json | bathymetry_topology | topojson | json | schema://topojson/topology/v1 |  | default | runtime_asset_registry.assets.bathymetry:global_topology |  |
 | context_layer:physical_contours_low_major | data/global_contours.low.major.topo.json | context_layer | topojson | json | schema://topojson/topology/v1 |  | default | runtime_asset_registry.assets.context_layer:physical_contours_low_major |  |
 | manifest_output:global_contours.major.topo.json | data/global_contours.major.topo.json | terrain_contours_major_topology | topojson | json | schema://topology/terrain_contours_major_v1 | data/manifest.json::outputs::global_contours.major.topo.json::sha256 | default | init_map_data.primary_topology_bundle |  |
 | context_layer:physical_contours_mid_major | data/global_contours.mid.major.topo.json | context_layer | topojson | json | schema://topojson/topology/v1 |  | default | runtime_asset_registry.assets.context_layer:physical_contours_mid_major |  |

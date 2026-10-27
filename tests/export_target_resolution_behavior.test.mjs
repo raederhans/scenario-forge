@@ -331,6 +331,7 @@ for (const pixelRatio of [null, 2]) {
       ensureScenarioPoliticalDetailForExport: async () => events.push("detail-ready"),
       ensurePaintContoursReady: async () => events.push("contours-ready"),
       ensureCountryLabelsReadyForExport: async () => events.push("labels-ready"),
+      ensureBathymetryReadyForExport: async () => events.push("bathymetry-ready"),
       resolveExportPassSequence: () => ["background", "labels"],
       RENDER_PASS_NAMES: ["background", "labels"],
       SVG_ANNOTATION_VIEWPORT_SELECTOR: ".annotation-layer",
@@ -347,7 +348,7 @@ for (const pixelRatio of [null, 2]) {
     assert.equal(h.allocatedCanvases(), 1);
     assert.equal(result.width, pixelRatio === null ? 100 : 200);
     assert.deepEqual(result.overlays, [".annotation-layer", ".special-zones-layer"]);
-    assert.deepEqual(events, ["detail-ready", "contours-ready", "labels-ready"]);
+    assert.deepEqual(events, ["detail-ready", "contours-ready", "labels-ready", "bathymetry-ready"]);
     assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
     assert.equal(h.visibleCache.canvases.background.overlays, undefined);
     const rasterOnly = await context.buildComposite({ textVisibility: {} }, dimensions);
@@ -357,10 +358,20 @@ for (const pixelRatio of [null, 2]) {
   });
 }
 
-test("export budget reserves both regional bathymetry mask surfaces only with a background pass", () => {
+test("export budget reserves a padded background texture output and bounded GL canvas only with a background pass", () => {
   const input = { width: 100, height: 80, pixelRatio: 2, passNames: ["background"] };
-  assert.ok(estimateExportRenderBytes({ ...input, bathymetryCoverage: true })
-    >= estimateExportRenderBytes(input) + 100 * 80 * 4 * 8);
+  // The background pass is a transformed pass with 15% overscan on each side.
+  const padded = (size) => Math.floor((size + 2 * Math.ceil(size * 0.15)) * 2);
+  for (const [width, height] of [[100, 80], [3000, 1000], [3000, 2500]]) {
+    const target = { ...input, width, height };
+    const [passWidth, passHeight] = [padded(width), padded(height)];
+    assert.equal(estimateExportRenderBytes({ ...target, bathymetryCoverage: true })
+      - estimateExportRenderBytes(target),
+    (passWidth * passHeight + Math.min(4096, passWidth) * Math.min(4096, passHeight)) * 4);
+  }
+  const nearLimit = { width: 5800, height: 3000, pixelRatio: 1, passNames: ["background", "political", "borders"] };
+  assert.ok(estimateExportRenderBytes(nearLimit) < EXPORT_RENDER_BUDGET_BYTES);
+  assert.ok(estimateExportRenderBytes({ ...nearLimit, bathymetryCoverage: true }) > EXPORT_RENDER_BUDGET_BYTES);
   const withoutBackground = { ...input, passNames: ["labels"] };
   assert.equal(estimateExportRenderBytes({ ...withoutBackground, bathymetryCoverage: true }),
     estimateExportRenderBytes(withoutBackground));
@@ -395,6 +406,7 @@ function thematicExportHarness({ status = "ready", language = "en", waitForData 
     ensureScenarioPoliticalDetailForExport: async () => events.push("detail"),
     ensurePaintContoursReady: async () => events.push("contours"),
     ensureCountryLabelsReadyForExport: async () => events.push("labels-ready"),
+    ensureBathymetryReadyForExport: async () => events.push("bathymetry-ready"),
     isThematicWgiRequested, isThematicWgiActive, getThematicWgiSignature,
     getPopulationViewModel, isPopulationActive, getPopulationSignature, drawPopulationExportLegend,
     ensureThematicWgiData: async () => {

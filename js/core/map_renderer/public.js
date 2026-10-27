@@ -74,6 +74,7 @@ export {
   rebuildStaticMeshes,
   renderExportPassesToCanvas,
   ensurePaintContoursReady,
+  ensureBathymetryReadyForExport,
   ensureCountryLabelsReadyForExport,
   renderLegend,
   RENDER_PASS_NAMES,

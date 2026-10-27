@@ -118307,10 +118307,10 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "081770a159bb3b431f69e8bc8adb55d111fc0dbcb123e375c8444c730e88f7fd",
+  "snapshot_fingerprint": "9bee85b19fe09d61481d3c39ca92a2ae9da85fcfcbfecab70601915c935d417b",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "fc75bb2bf7afbe7fc67a02332d3e9a991e354b42b0e7b0307998275a984130ee",
+    "build_snapshot_sha256": "752a9e4305399589785e22dc6b1fcd9e46c9c272ae911394a521dcae6721f69f",
     "detail_chunk_manifest_sha256": "bebef4199598aeb02cae406473458b8da7b5ad044ce66b632b73bbb87fdb55d9",
     "runtime_bootstrap_topology_sha256": "778d8bf0739545699e84b5a5b99decbec670752d1f36ef142ac8399e4e923119",
     "runtime_topology_sha256": "439d91326b79d95db7face889ffe750698529bf31f578edb4105715be7153230"
@@ -118353,8 +118353,6 @@
     },
     "synthetic_count": 492,
     "synthetic_owner_feature_count": 492,
-    "tno_bathymetry_band_count": 94,
-    "tno_bathymetry_contour_count": 77,
     "tno_named_marginal_water_count": 249,
     "tno_reichskommissariat_count": 8,
     "tno_relief_overlay_count": 25,

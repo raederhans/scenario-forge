@@ -6,144 +6,29 @@ export function createOceanRenderOwner({
 } = {}) {
   const runtimeState = state;
   const {
-    COASTLINE_ACCENT_DENSITY_ALPHA_LOW = 0.68,
-    COASTLINE_ACCENT_DENSITY_ALPHA_MID = 0.82,
-    COASTLINE_ACCENT_DENSITY_THRESHOLD_LOW = 0.0016,
-    COASTLINE_ACCENT_DENSITY_THRESHOLD_MID = 0.0022,
-    COASTLINE_ACCENT_DENSITY_WIDTH_SCALE = 0.9,
-    COASTLINE_LOD_LOW_ZOOM_MAX = 1.8,
-    COASTLINE_LOD_MID_ZOOM_MAX = 3.2,
     OCEAN_MASK_MODE_BATHYMETRY = "bathymetry_features",
-    OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land",
     OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean",
     TNO_COASTAL_ACCENT_COLOR = "rgba(214, 232, 244, 0.88)",
   } = constants;
   const {
     getContext = () => null,
     getPathCanvas = () => null,
-    isExportRendering = () => false,
   } = getters;
   const {
-    applyBathymetryCoverageExclusionMask = () => {},
     applyOceanClipMask = () => {},
     clamp = (value, min, max) => Math.max(min, Math.min(max, value)),
     clipOutAtlantropaAccentRegions = () => false,
-    doesOceanStyleRequireBathymetry = () => false,
     drawBathymetryTexture = () => ({ status: "off" }),
-    getBathymetryBandFillStyle = () => "rgba(0, 0, 0, 0)",
-    getBathymetryBandVisibilityConfig = () => ({ alpha: 1 }),
-    getBathymetryCollectionBySource = () => null,
-    getBathymetryContourStrokeStyle = () => "rgba(0, 0, 0, 0)",
-    getBathymetryContourVisibilityConfig = () => ({ alpha: 1 }),
-    getBathymetryFeatureCollections = () => ({}),
-    getBathymetryFeatureDepthMax = () => 0,
-    getBathymetryPresetProfile = () => ({}),
-    getCoastlineCollectionForZoom = () => [],
     getOceanStyleConfig = () => ({}),
-    getPhysicalLandMaskInfo = () => ({ collection: null }),
     publishBathymetryVisibility = () => {},
-    paintGlobalBathymetry = (draw) => draw(),
-    getProjectedGeographicPath = () => null,
-    collectContextMetric = () => {},
-    nowMs = () => Date.now(),
-    getProjectedLineDensityStats = () => ({ density: 0 }),
     getSafeCanvasColor = (value, fallback) => value || fallback,
-    getScenarioCoastalAccentLineWidth = () => 1,
     getScenarioCoastalAccentOverlayFeatures = () => [],
     getScenarioCoastalAccentOverlayVisualConfig = () => ({ alpha: 0, lineWidth: 0 }),
-    getViewportAwareCoastlineCollection = (collection) => collection || [],
     isScenarioCoastalAccentEnabled = () => false,
-    isUsableMesh = () => false,
     pathBoundsInScreen = () => true,
     resolveCoastlineTopologySource = () => null,
     resolveOceanMask = () => ({ mode: OCEAN_MASK_MODE_TOPOLOGY, quality: 0 }),
-    sortBathymetryFeaturesForFill = (collection) => Array.isArray(collection?.features) ? collection.features : [],
   } = helpers;
-
-  function drawBathymetryBands(collection, oceanStyle) {
-    const context = getContext();
-    const pathCanvas = getPathCanvas();
-    if (!context || !pathCanvas || oceanStyle.opacity === 0) return 0;
-    const zoomK = Number(runtimeState.zoomTransform?.k) || 1;
-    const features = sortBathymetryFeaturesForFill(collection);
-    const startedAt = nowMs();
-    let renderedCount = 0;
-    features.forEach((feature) => {
-      const visibilityConfig = getBathymetryBandVisibilityConfig(feature, zoomK);
-      if (visibilityConfig.alpha <= 0) return;
-      if (!pathBoundsInScreen(feature)) return;
-      context.save();
-      context.globalAlpha *= visibilityConfig.alpha;
-      context.fillStyle = getBathymetryBandFillStyle(feature, oceanStyle);
-      const path = getProjectedGeographicPath(feature);
-      if (path) {
-        context.fill(path);
-      } else {
-        context.beginPath();
-        pathCanvas(feature);
-        context.fill();
-      }
-      context.restore();
-      renderedCount += 1;
-    });
-    collectContextMetric("drawBathymetryBands", nowMs() - startedAt, { featureCount: features.length, renderedCount });
-    return renderedCount;
-  }
-
-  function buildVisibleBathymetryContourDepthSet(collection, oceanStyle) {
-    const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
-    if ((Number(runtimeState.zoomTransform?.k) || 1) < 2 && Array.isArray(profile?.majorContourDepths)
-      && collection?.features?.every((feature) => feature.properties?._bathymetrySource === "global")) {
-      return new Set(profile.majorContourDepths);
-    }
-    if (!profile?.skipAlternateContourDepths || !Array.isArray(collection?.features)) {
-      return null;
-    }
-    const uniqueDepths = [...new Set(collection.features.map((feature) => getBathymetryFeatureDepthMax(feature)))]
-      .filter((depth) => depth > 0)
-      .sort((a, b) => a - b);
-    if (!uniqueDepths.length) return null;
-    return new Set(uniqueDepths.filter((_, index) => index % 2 === 0));
-  }
-
-  function drawBathymetryContours(collection, oceanStyle) {
-    const context = getContext();
-    const pathCanvas = getPathCanvas();
-    if (!context || !pathCanvas || !Array.isArray(collection?.features) || !collection.features.length
-      || oceanStyle.opacity === 0 || oceanStyle.contourStrength === 0) return 0;
-    const zoomK = Number(runtimeState.zoomTransform?.k) || 1;
-    const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
-    const lineWidthBase = (profile?.contourLineWidthBase ?? 0.45)
-      + oceanStyle.contourStrength * (profile?.contourLineWidthScale ?? 0.75);
-    const visibleDepths = buildVisibleBathymetryContourDepthSet(collection, oceanStyle);
-    const startedAt = nowMs();
-    let renderedCount = 0;
-    collection.features.forEach((feature) => {
-      if (visibleDepths && !visibleDepths.has(getBathymetryFeatureDepthMax(feature))) {
-        return;
-      }
-      const visibilityConfig = getBathymetryContourVisibilityConfig(feature, zoomK);
-      if (visibilityConfig.alpha <= 0) return;
-      if (!pathBoundsInScreen(feature)) return;
-      context.save();
-      context.globalAlpha *= visibilityConfig.alpha;
-      context.strokeStyle = getBathymetryContourStrokeStyle(feature, oceanStyle);
-      // A map zoom changes the geometry, not the cartographic stroke weight.
-      context.lineWidth = lineWidthBase / Math.max(0.0001, zoomK);
-      const path = getProjectedGeographicPath(feature);
-      if (path) {
-        context.stroke(path);
-      } else {
-        context.beginPath();
-        pathCanvas(feature);
-        context.stroke();
-      }
-      context.restore();
-      renderedCount += 1;
-    });
-    collectContextMetric("drawBathymetryContours", nowMs() - startedAt, { featureCount: collection.features.length, renderedCount });
-    return renderedCount;
-  }
 
   function buildCoastalAccentStrokeBuckets(entries) {
     const buckets = new Map();
@@ -269,9 +154,6 @@ export function createOceanRenderOwner({
 
   return {
     buildCoastalAccentStrokeBuckets,
-    buildVisibleBathymetryContourDepthSet,
-    drawBathymetryBands,
-    drawBathymetryContours,
     drawCoastalAccentStrokeBuckets,
     drawOceanStyle,
     drawScenarioCoastalAccentLayer,

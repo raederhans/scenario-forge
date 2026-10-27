@@ -71,7 +71,6 @@ from map_builder.scenario_rebuild_planner import (
     resolve_tno_rebuild_plan,
 )
 from map_builder.contracts import (
-    SCENARIO_CHECKPOINT_BATHYMETRY_FILENAME as CONTRACT_CHECKPOINT_BATHYMETRY_FILENAME,
     SCENARIO_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME as CONTRACT_CHECKPOINT_CONTEXT_LAND_MASK_FILENAME,
     SCENARIO_CHECKPOINT_GEO_LOCALE_EN_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_EN_FILENAME,
     SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME as CONTRACT_CHECKPOINT_GEO_LOCALE_FILENAME,
@@ -2735,29 +2734,6 @@ DONOR_CAUSEWAY_NAME_HINTS = (
 )
 
 MEDITERRANEAN_WATER_REGION_GROUP = "mediterranean"
-BATHYMETRY_GLOBAL_DEPTH_BANDS = (
-    (0, -50),
-    (-50, -100),
-    (-100, -200),
-    (-200, -500),
-    (-500, -1000),
-    (-1000, -2000),
-    (-2000, -4000),
-    (-4000, -6000),
-)
-BATHYMETRY_GLOBAL_CONTOURS = (-100, -200, -500, -1000, -2000, -4000)
-BATHYMETRY_ATL_SYNTHETIC_PROFILE_DEFAULT = (
-    (0, -50),
-    (-50, -150),
-    (-150, -300),
-    (-300, -500),
-)
-BATHYMETRY_ATL_SYNTHETIC_PROFILE_SHALLOW = (
-    (0, -25),
-    (-25, -75),
-    (-75, -150),
-    (-150, -200),
-)
 TNO_RETIRED_ZERO_FEATURE_TAGS = {"AEF", "ALG", "BEL", "EST", "LAT", "LIT", "LUX", "NOR", "POL", "POR", "SSH", "TAI"}
 TNO_FEATURED_TAG_REPLACEMENTS = {"RKB": "BRG"}
 TNO_CONTROLLER_ONLY_COUNTRY_META = {
@@ -6856,7 +6832,6 @@ CHECKPOINT_SCENARIO_POLITICAL_FILENAME = CONTRACT_CHECKPOINT_POLITICAL_FILENAME
 CHECKPOINT_SCENARIO_WATER_SEED_FILENAME = CONTRACT_CHECKPOINT_WATER_SEED_FILENAME
 CHECKPOINT_WATER_FILENAME = CONTRACT_CHECKPOINT_WATER_FILENAME
 CHECKPOINT_RELIEF_FILENAME = CONTRACT_CHECKPOINT_RELIEF_FILENAME
-CHECKPOINT_BATHYMETRY_FILENAME = CONTRACT_CHECKPOINT_BATHYMETRY_FILENAME
 CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME = CONTRACT_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME
 CHECKPOINT_RUNTIME_BOOTSTRAP_TOPOLOGY_FILENAME = CONTRACT_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME
 CHECKPOINT_GEO_LOCALE_FILENAME = CONTRACT_CHECKPOINT_GEO_LOCALE_FILENAME
@@ -8021,8 +7996,8 @@ def patch_tno_palette_defaults(countries_payload: dict, manifest_payload: dict) 
     if not isinstance(ocean_defaults, dict):
         ocean_defaults = {}
     ocean_defaults["fillColor"] = load_tno_ocean_fill_color()
-    ocean_defaults["preset"] = "flat"
-    ocean_defaults["experimentalAdvancedStyles"] = False
+    ocean_defaults["preset"] = "bathymetry_soft"
+    ocean_defaults["experimentalAdvancedStyles"] = True
     style_defaults["ocean"] = ocean_defaults
     atlantropa_sea_defaults = style_defaults.get("atlantropa_sea")
     if not isinstance(atlantropa_sea_defaults, dict):
@@ -12527,181 +12502,6 @@ def build_relief_overlays(atlantropa_region_unions: dict[str, object], lake_geom
     return feature_collection_from_features(features)
 
 
-def _atl_synthetic_depth_profile_for_region(region_id: str) -> tuple[tuple[int, int], ...]:
-    if str(region_id or "").strip().lower() == "libya_suez_and_qattara":
-        return BATHYMETRY_ATL_SYNTHETIC_PROFILE_SHALLOW
-    return BATHYMETRY_ATL_SYNTHETIC_PROFILE_DEFAULT
-
-
-def _estimate_bathymetry_step(geom, level_count: int) -> float:
-    minx, miny, maxx, maxy = geom.bounds
-    min_span = max(min(maxx - minx, maxy - miny), 0.12)
-    return max(min_span / max(level_count * 2.4, 1), 0.02)
-
-
-def _build_bathymetry_ring_rows(
-    geom,
-    *,
-    region_id: str,
-    region_group: str,
-    bathymetry_mode: str,
-    band_defs: tuple[tuple[int, int], ...],
-) -> tuple[list[dict], list[dict]]:
-    current = normalize_polygonal(geom)
-    if current is None:
-        return [], []
-    band_rows: list[dict] = []
-    contour_rows: list[dict] = []
-    step = _estimate_bathymetry_step(current, len(band_defs))
-    for index, (depth_min_m, depth_max_m) in enumerate(band_defs):
-        next_geom = None
-        if index < len(band_defs) - 1:
-            next_geom = normalize_polygonal(current.buffer(-step))
-        band_geom = current
-        if next_geom is not None:
-            band_geom = normalize_polygonal(current.difference(next_geom))
-        if band_geom is not None:
-            band_rows.append({
-                "id": f"bath_{region_id}_{bathymetry_mode}_{abs(int(depth_max_m))}_{index}",
-                "region_id": region_id,
-                "region_group": region_group,
-                "bathymetry_mode": bathymetry_mode,
-                "depth_min_m": int(depth_min_m),
-                "depth_max_m": int(depth_max_m),
-                "geometry": band_geom,
-            })
-        if next_geom is not None:
-            contour_geom = next_geom.boundary
-            if contour_geom is not None and not contour_geom.is_empty:
-                contour_rows.append({
-                    "id": f"bath_contour_{region_id}_{bathymetry_mode}_{abs(int(depth_max_m))}_{index}",
-                    "region_id": region_id,
-                    "region_group": region_group,
-                    "bathymetry_mode": bathymetry_mode,
-                    "depth_m": int(depth_max_m),
-                    "geometry": contour_geom,
-                })
-        if next_geom is None:
-            break
-        current = next_geom
-    return band_rows, contour_rows
-
-
-def _dissolve_bathymetry_rows(rows: list[dict], *, geometry_key: str = "geometry") -> gpd.GeoDataFrame:
-    if not rows:
-        return gpd.GeoDataFrame({geometry_key: gpd.GeoSeries([], crs="EPSG:4326")}, geometry=geometry_key, crs="EPSG:4326")
-    grouped: dict[tuple, list[object]] = {}
-    props_by_key: dict[tuple, dict[str, object]] = {}
-    for row in rows:
-        props = {key: value for key, value in row.items() if key != geometry_key}
-        key = tuple(sorted(props.items(), key=lambda item: item[0]))
-        grouped.setdefault(key, []).append(row[geometry_key])
-        props_by_key[key] = props
-    dissolved_rows: list[dict[str, object]] = []
-    for key, geometries in grouped.items():
-        sample_geom = next((geom for geom in geometries if geom is not None and not geom.is_empty), None)
-        if sample_geom is None:
-            continue
-        if sample_geom.geom_type in {"LineString", "MultiLineString", "LinearRing"}:
-            geom = unary_union(geometries)
-        else:
-            geom = safe_unary_union(geometries)
-        if geom is not None and geom.geom_type in {"Polygon", "MultiPolygon", "GeometryCollection"}:
-            geom = normalize_polygonal(geom)
-        if geom is None or geom.is_empty:
-            continue
-        dissolved_rows.append({
-            **props_by_key[key],
-            geometry_key: geom,
-        })
-    if not dissolved_rows:
-        return gpd.GeoDataFrame({geometry_key: gpd.GeoSeries([], crs="EPSG:4326")}, geometry=geometry_key, crs="EPSG:4326")
-    return gpd.GeoDataFrame(dissolved_rows, geometry=geometry_key, crs="EPSG:4326")
-
-
-def build_tno_bathymetry_payload(
-    atl_sea_collection: list[dict],
-    atlantropa_region_unions: dict[str, object],
-) -> tuple[dict, dict]:
-    band_rows: list[dict] = []
-    contour_rows: list[dict] = []
-    dry_union = safe_unary_union(list(atlantropa_region_unions.values()))
-    dry_union = normalize_polygonal(dry_union)
-    atl_counts = {
-        "observed_region_ids": set(),
-        "synthetic_region_ids": set(),
-        "excluded_region_ids": set(atlantropa_region_unions.keys()),
-    }
-
-    for feature in atl_sea_collection:
-        props = feature.get("properties", {}) if isinstance(feature, dict) else {}
-        region_id = str(props.get("region_id") or "").strip()
-        if not region_id:
-            continue
-        geometry = shape(feature.get("geometry")) if isinstance(feature, dict) and feature.get("geometry") else None
-        geometry = normalize_polygonal(geometry)
-        if geometry is None:
-            continue
-        if dry_union is not None:
-            geometry = normalize_polygonal(geometry.difference(dry_union.buffer(0.0002)))
-        if geometry is None:
-            continue
-        geometry_role = str(props.get("atl_geometry_role") or "").strip().lower()
-        bathymetry_mode = "observed" if geometry_role == ATL_GEOMETRY_ROLE_DONOR_SEA else "synthetic"
-        if bathymetry_mode == "observed":
-            band_defs = BATHYMETRY_GLOBAL_DEPTH_BANDS
-            atl_counts["observed_region_ids"].add(region_id)
-        else:
-            band_defs = _atl_synthetic_depth_profile_for_region(region_id)
-            atl_counts["synthetic_region_ids"].add(region_id)
-        atl_counts["excluded_region_ids"].discard(region_id)
-        region_group = str(props.get("region_group") or f"{region_id}_sea").strip() or f"{region_id}_sea"
-        band_part_rows, contour_part_rows = _build_bathymetry_ring_rows(
-            geometry,
-            region_id=region_id,
-            region_group=region_group,
-            bathymetry_mode=bathymetry_mode,
-            band_defs=band_defs,
-        )
-        band_rows.extend(band_part_rows)
-        contour_rows.extend(contour_part_rows)
-
-    band_gdf = _dissolve_bathymetry_rows(band_rows)
-    contour_gdf = _dissolve_bathymetry_rows(contour_rows)
-    topo = Topology(
-        [band_gdf, contour_gdf],
-        object_name=["bathymetry_bands", "bathymetry_contours"],
-        topology=True,
-        prequantize=1_000_000,
-        topoquantize=False,
-        presimplify=False,
-        toposimplify=False,
-        shared_coords=False,
-    )
-    topo_payload = topo.to_dict()
-    compact_topology_properties(topo_payload, "bathymetry_bands")
-    compact_topology_properties(topo_payload, "bathymetry_contours")
-    diagnostics = {
-        "band_feature_count": int(len(band_gdf)),
-        "contour_feature_count": int(len(contour_gdf)),
-        "observed_region_ids": sorted(atl_counts["observed_region_ids"]),
-        "synthetic_region_ids": sorted(atl_counts["synthetic_region_ids"]),
-        "excluded_region_ids": sorted(atl_counts["excluded_region_ids"]),
-    }
-    return topo_payload, diagnostics
-
-
-def build_empty_bathymetry_payload() -> dict:
-    return {
-        "type": "Topology",
-        "objects": {
-            "bathymetry_bands": {"type": "GeometryCollection", "geometries": []},
-            "bathymetry_contours": {"type": "GeometryCollection", "geometries": []},
-        },
-        "arcs": [],
-    }
-
-
 def derive_controller_payload_from_owners(owners_payload: dict) -> dict:
     owners = owners_payload.get("owners", {}) if isinstance(owners_payload, dict) else {}
     return {"controllers": dict(owners) if isinstance(owners, dict) else {}}
@@ -13527,10 +13327,6 @@ def build_water_stage_state_from_countries_state(
         "geometry": context_land_mask_geom,
     }], geometry="geometry", crs="EPSG:4326")
     relief_overlays_payload = build_relief_overlays(atlantropa_region_unions, lake_geom)
-    bathymetry_payload, bathymetry_diagnostics = build_tno_bathymetry_payload(
-        atl_sea_collection,
-        atlantropa_region_unions,
-    )
     water_stage_metadata = {
         "generated_at": generated_at,
         "source_root": str(tno_root),
@@ -13540,7 +13336,6 @@ def build_water_stage_state_from_countries_state(
         "med_water_diagnostics": med_water_diagnostics,
         "atl_feature_ids": sorted(atl_feature_ids),
         "atl_sea_feature_ids": sorted(atl_sea_feature_ids),
-        "bathymetry_diagnostics": bathymetry_diagnostics,
         "named_water_diagnostics": named_water_diagnostics,
         "named_water_snapshot_path": f"data/scenarios/{SCENARIO_ID}/{MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME}",
         "water_regions_provenance_path": f"data/scenarios/{SCENARIO_ID}/{TNO_WATER_REGIONS_PROVENANCE_FILENAME}",
@@ -13559,7 +13354,6 @@ def build_water_stage_state_from_countries_state(
         "land_mask_gdf": land_mask_gdf,
         "context_land_mask_gdf": context_land_mask_gdf,
         "relief_overlays_payload": relief_overlays_payload,
-        "bathymetry_payload": bathymetry_payload,
         "named_water_snapshot_payload": named_water_snapshot_payload,
         "water_regions_provenance_payload": water_regions_provenance_payload,
     }
@@ -13592,7 +13386,6 @@ def build_runtime_topology_state(
     land_mask_gdf = water_state["land_mask_gdf"]
     context_land_mask_gdf = water_state["context_land_mask_gdf"]
     relief_overlays_payload = water_state["relief_overlays_payload"]
-    bathymetry_payload = water_state.get("bathymetry_payload") or build_empty_bathymetry_payload()
     named_water_snapshot_payload = clamp_geojson_longitudes(
         water_state.get("named_water_snapshot_payload") or feature_collection_from_features([])
     )
@@ -13698,7 +13491,7 @@ def build_runtime_topology_state(
     manifest_payload["water_regions_url"] = "data/scenarios/tno_1962/water_regions.geojson"
     manifest_payload["water_regions_mode"] = "exclusive"
     manifest_payload["relief_overlays_url"] = "data/scenarios/tno_1962/relief_overlays.geojson"
-    manifest_payload["bathymetry_topology_url"] = "data/scenarios/tno_1962/bathymetry.topo.json"
+    manifest_payload.pop("bathymetry_topology_url", None)
     manifest_payload["bathymetry_texture_url"] = "data/scenarios/tno_1962/bathymetry_texture/manifest.json"
     manifest_payload["presentation_features"] = {
         "atlantropa_relief": True,
@@ -13771,12 +13564,8 @@ def build_runtime_topology_state(
         summary["tno_water_region_count"] = len(runtime_water_regions.get("features", []))
         summary["tno_named_marginal_water_count"] = len(named_marginal_water_ids)
         summary["tno_relief_overlay_count"] = len(relief_overlays_payload["features"])
-        summary["tno_bathymetry_band_count"] = len(
-            bathymetry_payload.get("objects", {}).get("bathymetry_bands", {}).get("geometries", [])
-        )
-        summary["tno_bathymetry_contour_count"] = len(
-            bathymetry_payload.get("objects", {}).get("bathymetry_contours", {}).get("geometries", [])
-        )
+        summary.pop("tno_bathymetry_band_count", None)
+        summary.pop("tno_bathymetry_contour_count", None)
         summary["scenario_runtime_topology_object_count"] = len(runtime_topology_payload.get("objects", {}))
         summary["scenario_atlantropa_feature_count"] = int(
             scenario_atlantropa_metadata_payload.get("feature_count") or 0
@@ -13794,6 +13583,7 @@ def build_runtime_topology_state(
     atlantropa_diagnostics = stage_metadata["atlantropa_diagnostics"]
     med_water_diagnostics = stage_metadata["med_water_diagnostics"]
     diagnostics = audit_payload.setdefault("diagnostics", {})
+    diagnostics.pop("bathymetry_stats", None)
     sea_coverage_hole_count_by_cluster = {
         region_id: int((med_water_diagnostics.get(region_id) or {}).get("remaining_hole_count") or 0)
         for region_id in ATLANTROPA_REGION_CONFIGS
@@ -13858,7 +13648,6 @@ def build_runtime_topology_state(
         "atlantropa_island_replacement_stats": stage_metadata["island_replacement_diagnostics"],
         "mediterranean_water_region_stats": med_water_diagnostics,
         "named_water_source_diagnostics": stage_metadata.get("named_water_diagnostics", {}),
-        "bathymetry_stats": stage_metadata.get("bathymetry_diagnostics", {}),
         "sea_coverage_hole_count_by_cluster": sea_coverage_hole_count_by_cluster,
         "fallback_ocean_hit_count_by_cluster": fallback_ocean_hit_count_by_cluster,
         "pixel_fragment_count_by_cluster": pixel_fragment_count_by_cluster,
@@ -13896,7 +13685,6 @@ def build_runtime_topology_state(
         "runtime_special_regions": runtime_special_regions,
         "special_zone_layers_payload": special_zone_layers_payload,
         "runtime_water_regions": runtime_water_regions,
-        "bathymetry_payload": bathymetry_payload,
         "named_water_snapshot_payload": named_water_snapshot_payload,
         "water_regions_provenance_payload": water_regions_provenance_payload,
         "owner_baseline_hash": owner_baseline_hash,
@@ -13912,7 +13700,6 @@ def build_runtime_topology_state_from_countries_state(state: dict[str, object]) 
         "land_mask_gdf": state["land_mask_gdf"],
         "context_land_mask_gdf": state["context_land_mask_gdf"],
         "relief_overlays_payload": state.get("relief_overlays_payload"),
-        "bathymetry_payload": state.get("bathymetry_payload"),
         "named_water_snapshot_payload": state.get("named_water_snapshot_payload"),
         "water_regions_provenance_payload": state.get("water_regions_provenance_payload"),
         "water_stage_metadata": dict(state.get("stage_metadata") or {}),

@@ -1,7 +1,6 @@
 {
   "audit_url": "data/scenarios/tno_1962/audit.json",
   "baseline_hash": "2e88c5fbe6a39f9f97cb569892f99e44ee39eed2f04f3cfd440fa84bcd46ddc2",
-  "bathymetry_topology_url": "data/scenarios/tno_1962/bathymetry.topo.json",
   "bathymetry_texture_url": "data/scenarios/tno_1962/bathymetry_texture/manifest.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
@@ -2998,7 +2997,7 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "081770a159bb3b431f69e8bc8adb55d111fc0dbcb123e375c8444c730e88f7fd",
+  "snapshot_fingerprint": "9bee85b19fe09d61481d3c39ca92a2ae9da85fcfcbfecab70601915c935d417b",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "bebef4199598aeb02cae406473458b8da7b5ad044ce66b632b73bbb87fdb55d9",
@@ -3022,9 +3021,9 @@
       "fillColor": "#3a5d70"
     },
     "ocean": {
-      "experimentalAdvancedStyles": false,
+      "experimentalAdvancedStyles": true,
       "fillColor": "#2d4769",
-      "preset": "flat"
+      "preset": "bathymetry_soft"
     }
   },
   "summary": {
@@ -3065,8 +3064,6 @@
     },
     "synthetic_count": 492,
     "synthetic_owner_feature_count": 492,
-    "tno_bathymetry_band_count": 94,
-    "tno_bathymetry_contour_count": 77,
     "tno_named_marginal_water_count": 249,
     "tno_reichskommissariat_count": 8,
     "tno_relief_overlay_count": 25,

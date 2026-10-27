@@ -8016,11 +8016,6 @@
         "role": "transport_workbench_carrier",
         "family_id": "japan_corridor"
       },
-      "bathymetry:global_topology": {
-        "url": "data/global_bathymetry.topo.json",
-        "role": "bathymetry_topology",
-        "family_id": "global"
-      },
       "feature_migrations:by_hybrid_v1": {
         "url": "data/feature-migrations/by_hybrid_v1.json",
         "role": "feature_migration_table",
