@@ -1,7 +1,7 @@
 import { applyFeaturePaintState } from "../core/state/color_state.js";
 import { initEditorWorkspace } from "./editor_workspace.js";
 import { getMapDataBoundary } from "../core/map_data_boundary.js";
-import { getEffectiveScenarioHierarchy } from "../core/scenario_hierarchy.js";
+import { clipHierarchyGroupsToOwner, getEffectiveScenarioHierarchy } from "../core/scenario_hierarchy.js";
 // Sidebar UI (Phase 13)
 import {
   state as runtimeState,
@@ -370,6 +370,14 @@ export function getHierarchyGroupsForCode(code) {
   });
   groups.sort((a, b) => a.label.localeCompare(b.label));
   return groups;
+}
+
+// 剧本国家的层级分组按地理国家码查到（RKM → RU），再裁到该国实际拥有的地块。
+function getOwnedHierarchyGroups(groupingCode, ownerCode) {
+  const groups = getHierarchyGroupsForCode(groupingCode);
+  if (!runtimeState.activeScenarioId || runtimeState.mapSemanticMode === "blank") return groups;
+  const reference = getMapDataBoundary(runtimeState).reference;
+  return clipHierarchyGroupsToOwner(groups, ownerCode, (id) => reference.getScenarioGroupCode(id));
 }
 
 function applyVisualOverridesToFeatureIds(
@@ -2671,7 +2679,7 @@ function initSidebar({ render } = {}) {
       presetLookupCode,
       groupingCode: groupLookupCode,
       presets: runtimeState.presetsState[presetLookupCode] || [],
-      hierarchyGroups: scenarioMeta.releasable ? [] : getHierarchyGroupsForCode(groupLookupCode),
+      hierarchyGroups: scenarioMeta.releasable ? [] : getOwnedHierarchyGroups(groupLookupCode, normalizedEntryCode),
       continentId,
       continentLabel,
       continentDisplayLabel: getDirectGeoLabel(continentLabel) || continentLabel,

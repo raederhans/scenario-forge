@@ -319,6 +319,7 @@ export const UI_COPY_CATALOG = Object.freeze({
   Retry: { zh: "\u91cd\u8bd5", en: "Retry" },
   "Scenario names": { zh: "\u5267\u672c\u540d\u79f0", en: "Scenario names" },
   "Selected map country": { zh: "\u9009\u4e2d\u5730\u5757\u56fd\u5bb6", en: "Selected map country" },
+  "Click a country on the map to show it here.": { zh: "\u5728\u5730\u56fe\u4e0a\u70b9\u51fb\u4e00\u4e2a\u56fd\u5bb6\uff0c\u5b83\u4f1a\u663e\u793a\u5728\u8fd9\u91cc\u3002", en: "Click a country on the map to show it here." },
   "Preview metadata pending": { zh: "\u9884\u89c8\u5143\u6570\u636e\u5f85\u52a0\u8f7d", en: "Preview metadata pending" },
   "Show more info": { zh: "\u663e\u793a\u66f4\u591a\u4fe1\u606f", en: "Show more info" },
   "Show suggested aliases": { zh: "\u663e\u793a\u5efa\u8bae\u522b\u540d", en: "Show suggested aliases" },
