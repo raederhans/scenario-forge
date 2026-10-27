@@ -14313,6 +14313,7 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   exportContext.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
   if (!redrawAtTargetResolution) {
     composeRenderPassesToTarget(exportContext, passNames, runtimeState.zoomTransform || globalThis.d3.zoomIdentity);
+    assertBathymetryDetailReadyForExport(passNames);
     return exportCanvas;
   }
 
@@ -14348,7 +14349,15 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
     exportRenderInProgress = previousExportState;
     riverContourRenderOwner?.dispose();
   }
+  assertBathymetryDetailReadyForExport(passNames);
   return exportCanvas;
+}
+
+// The background pass drew overview depth where detail tiles were still loading.
+function assertBathymetryDetailReadyForExport(passNames) {
+  if (passNames.includes("background") && bathymetryTextureRuntime?.hasPendingDetail()) {
+    throw new Error("Bathymetry detail is still loading; wait a moment before exporting.");
+  }
 }
 
 function composeTransformedFrameToBuffer(

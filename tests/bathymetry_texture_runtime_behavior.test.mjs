@@ -131,7 +131,9 @@ test('missing tiles load once and the whole batch notifies a single repaint', as
   }), dispose() {} }) });
   await h.runtime.ensure();
   h.changes.length = 0;
+  h.context.transform.a = 12;
   assert.equal(h.draw().missingTileCount, 2);
+  assert.equal(h.runtime.hasPendingDetail(), true);
   h.draw();
   await settle();
   assert.deepEqual(h.requests, ['global', 'overview', 'tiles/8_4', 'tiles/9_4']);
@@ -139,6 +141,7 @@ test('missing tiles load once and the whole batch notifies a single repaint', as
   const result = h.draw();
   assert.equal(result.missingTileCount, 0);
   assert.equal(result.loadedTileCount, 2);
+  assert.equal(h.runtime.hasPendingDetail(), false);
   h.runtime.dispose();
   assert.ok(h.images.every(image => image.closes === 1));
 });
@@ -229,4 +232,41 @@ test('asset URL policy reads the texture manifest independently from the legacy 
   assert.equal(owner.getScenarioBathymetryTextureUrl(), state.activeScenarioManifest.bathymetry_texture_url);
   state.activeScenarioManifest = null;
   assert.equal(owner.getScenarioBathymetryTextureUrl(), '');
+});
+
+const missingTileRenderer = () => ({ render: ({ source, detail }) => ({ canvas: {}, backend: 'webgl2',
+  coveredBounds: [-20, -10, 20, 10],
+  missingTileKeys: detail ? manifest.tiles.present.filter(key => !source.getLoadedTiles().has(key)) : [],
+}), dispose() {} });
+
+test('tiles in failure cooldown do not trigger repaints that request them again', async () => {
+  const h = harness({ createRenderer: missingTileRenderer, loadImageBitmap: async url => {
+    if (url.startsWith('tiles/')) throw new Error('tile failed');
+    return bitmap(url);
+  } });
+  await h.runtime.ensure();
+  h.changes.length = 0;
+  h.context.transform.a = 12;
+  h.draw();
+  await settle(); await settle();
+  assert.deepEqual(h.changes, []);
+  h.draw(); h.draw();
+  await settle(); await settle();
+  assert.deepEqual(h.changes, []);
+  assert.equal(h.runtime.hasPendingDetail(), true);
+  h.runtime.dispose();
+});
+
+test('views needing more tiles than the cache holds stay on the overview', async () => {
+  const h = harness({ createRenderer: missingTileRenderer, maxCachedTiles: 1 });
+  await h.runtime.ensure();
+  // Centre the 2x2 view on the prime meridian so it straddles tiles 8_4 and 9_4.
+  Object.assign(h.context.transform, { a: 12, d: 12, e: -11, f: -11 });
+  const result = h.draw();
+  assert.equal(result.detail, false);
+  assert.equal(result.missingTileCount, 0);
+  await settle();
+  assert.equal(h.requests.filter(url => url.startsWith('tiles/')).length, 0);
+  assert.equal(h.runtime.hasPendingDetail(), false);
+  h.runtime.dispose();
 });

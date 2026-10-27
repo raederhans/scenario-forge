@@ -1,20 +1,20 @@
-import { createProjectionInverseParams } from './bathymetry_texture_math.js';
+import { createProjectionInverseParams, invertProjectedPoint } from './bathymetry_texture_math.js';
 import { buildBathymetryColorRamp } from './bathymetry_texture_palette.js';
 import { createBathymetryTextureSource } from './bathymetry_texture_source.js';
-import { createBathymetryTextureRenderer } from './bathymetry_texture_renderer.js';
+import { createBathymetryTextureRenderer, estimateGeographicBounds } from './bathymetry_texture_renderer.js';
 
 const LOAD_RETRY_COOLDOWN_MS = 10_000;
 
 export function createBathymetryTextureRuntime({
   globalManifestUrl, fetchJson, loadImageBitmap, createCanvas,
   getProjection, getProjectionGeneration, onAssetsChanged = () => {}, now = Date.now,
-  createRenderer = createBathymetryTextureRenderer,
+  createRenderer = createBathymetryTextureRenderer, maxCachedTiles = 64,
 }) {
   const slot = () => ({ value: null, pending: null, error: null, retryAt: 0 });
   const global = slot();
   let scenario = slot(), scenarioUrl = null, renderer = null, disposed = false;
   let status = 'off', projectionGeneration, projectionParams, rampKey, ramp;
-  let tileBatch = null;
+  let tileBatch = null, detailPending = false;
 
   function getState() {
     const failedSources = [global.error && 'global', scenario.error && 'scenario'].filter(Boolean);
@@ -68,7 +68,7 @@ export function createBathymetryTextureRuntime({
     if (disposed) return Promise.resolve(getState());
     load(global, async () => {
       const source = createBathymetryTextureSource({
-        manifestUrl: globalManifestUrl, fetchJson, now,
+        manifestUrl: globalManifestUrl, fetchJson, now, maxCachedTiles,
         loadImageBitmap: async (url) => {
           if (disposed) throw new Error('Bathymetry runtime disposed');
           const bitmap = await loadImageBitmap(url);
@@ -127,7 +127,14 @@ export function createBathymetryTextureRuntime({
     renderer ||= createRenderer({ createCanvas });
     const transform = context.getTransform();
     // The 5-arcminute overview holds 12 texels per degree; tiles pay off once it is magnified.
-    const detail = transform.a * projection.scale() * Math.PI / 180 > 18;
+    let detail = transform.a * projection.scale() * Math.PI / 180 > 18;
+    if (detail) {
+      // A view needing more tiles than the cache holds would evict visible tiles and refetch forever.
+      const { a, b, c, d, e, f } = transform, det = a * d - b * c;
+      const bounds = estimateGeographicBounds(context.canvas.width, context.canvas.height, (x, y) =>
+        invertProjectedPoint(projectionParams, (d * (x - e) - c * (y - f)) / det, (a * (y - f) - b * (x - e)) / det));
+      detail = !!bounds && global.value.getTileKeysForBounds(bounds).length <= global.value.getCapacity();
+    }
     const output = renderer.render({
       width: context.canvas.width, height: context.canvas.height, transform,
       projectionParams, source: global.value, ramp, preset, detail,
@@ -141,10 +148,13 @@ export function createBathymetryTextureRuntime({
     context.drawImage(output.canvas, 0, 0);
     context.restore();
     // One repaint per batch: every arriving tile would otherwise rebuild the background pass.
-    if (output.missingTileKeys.length && !tileBatch) {
-      tileBatch = global.value.requestTiles(output.missingTileKeys).then(() => {
+    detailPending = detail && output.missingTileKeys.length > 0;
+    if (detailPending && !tileBatch) {
+      const source = global.value, revision = source.getRevision();
+      tileBatch = source.requestTiles(output.missingTileKeys).then(() => {
         tileBatch = null;
-        if (!disposed) onAssetsChanged('bathymetry-tile');
+        // Tiles in failure cooldown settle without loading; repainting then would request them again at once.
+        if (!disposed && source.getRevision() !== revision) onAssetsChanged('bathymetry-tile');
       });
     }
     return { ...getState(), backend: output.backend, detail,
@@ -161,5 +171,5 @@ export function createBathymetryTextureRuntime({
     status = 'off';
   }
 
-  return { ensure, draw, setScenarioOverlayUrl, getState, dispose };
+  return { ensure, draw, setScenarioOverlayUrl, getState, dispose, hasPendingDetail: () => detailPending };
 }
