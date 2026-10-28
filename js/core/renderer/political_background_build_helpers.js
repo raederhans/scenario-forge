@@ -304,7 +304,7 @@ export function createPoliticalBackgroundPathAccounting(resourceBudget, politica
   }
   const politicalBackgroundPathResourceOwner = Symbol("political-background-merged-paths");
   let retainedPoliticalBackgroundOriginalPaths = new Map();
-  function update(cache, pendingState) {
+  function update(cache, pendingState, carriedPathIndex = null) {
     const groups = [
       ...(Array.isArray(cache.fullPassGroups)
         ? cache.fullPassGroups : []),
@@ -321,6 +321,13 @@ export function createPoliticalBackgroundPathAccounting(resourceBudget, politica
     };
     groups.forEach((group) => (Array.isArray(group?.entries) ? group.entries : []).forEach(addOriginalPath));
     (Array.isArray(pendingState?.resolvedEntries) ? pendingState.resolvedEntries : []).forEach(addOriginalPath);
+    // Paths carried across a cancelled deferred build stay referenced until the
+    // next build publishes or drops them, so they stay in the shared estimate.
+    if (carriedPathIndex instanceof Map) {
+      for (const candidates of carriedPathIndex.values()) {
+        (Array.isArray(candidates) ? candidates : [candidates]).forEach(addOriginalPath);
+      }
+    }
     groups.forEach((group) => {
       const path = group?.mergedPath;
       if (!path || originalPaths.has(path) || mergedPaths.has(path)) return;

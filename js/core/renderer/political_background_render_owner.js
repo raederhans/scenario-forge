@@ -150,7 +150,11 @@ export function createPoliticalBackgroundRenderOwner({
 
   const updatePathAccounting = createPoliticalBackgroundPathAccounting(resourceBudget, politicalPathResourceAccounting);
   function updatePoliticalBackgroundPathResourceAccounting() {
-    return updatePathAccounting(scenarioPoliticalBackgroundCache, scenarioPoliticalBackgroundDeferredFullCacheState);
+    return updatePathAccounting(
+      scenarioPoliticalBackgroundCache,
+      scenarioPoliticalBackgroundDeferredFullCacheState,
+      carriedDeferredPathIndex?.index || scenarioPoliticalBackgroundDeferredFullCacheState?.carriedPathIndex || null,
+    );
   }
 
   function cancelScenarioPoliticalBackgroundDeferredFullCache(reason = "unspecified", { force = false } = {}) {
@@ -1104,6 +1108,9 @@ export function createPoliticalBackgroundRenderOwner({
         recoveryQuality: politicalRecoveryQuality,
       });
       if (cachedFullPass.cacheHit) {
+        // A published full pass supersedes paths carried from a cancelled build.
+        carriedDeferredPathIndex = null;
+        updatePoliticalBackgroundPathResourceAccounting();
         const groupCount = drawPoliticalBackgroundFillsFromGroups(cachedFullPass.groups);
         return returnSummary
           ? {
@@ -1164,6 +1171,12 @@ export function createPoliticalBackgroundRenderOwner({
           coarseUnderlay: "scenario-features",
         }
         : underlaySummary.groupCount;
+    }
+    // An exact frame will not schedule a deferred build, so nothing can reuse
+    // paths carried from a cancelled one; drop them instead of holding Path2Ds.
+    if (carriedDeferredPathIndex) {
+      carriedDeferredPathIndex = null;
+      updatePoliticalBackgroundPathResourceAccounting();
     }
     return drawPoliticalBackgroundFillsForEntries(visibleEntries, {
       transform,

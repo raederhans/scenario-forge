@@ -813,8 +813,11 @@ test("deferred merge admission shares the budget and cancellation releases pendi
   assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 1280,
     "pending accounting includes unique original paths and an in-progress merged copy");
   fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("test-cancel");
-  assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0);
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 1024,
+    "a cancelled build carries its original paths for the next build and drops the merged copy");
   assert.equal(fixture.cancelled.length, 1);
+  fixture.owner.releaseScenarioPoliticalBackgroundCache();
+  assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0, "release drops carried paths");
 
   const completed = createFixture({ progressiveLimit: 1, mergedPathBudgetBytes: 256 });
   completed.state.landData.features = [
@@ -895,6 +898,9 @@ test("deferred recolor releases discarded merged paths before another idle slice
     "waiting for idle does not retain the discarded merge in accounting");
   assert.equal(fixture.calls.includes("repaint"), false);
   fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("test-cleanup");
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 512,
+    "a cancelled build keeps its carried original paths accounted");
+  fixture.owner.releaseScenarioPoliticalBackgroundCache();
   assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0);
 });
 
@@ -1267,3 +1273,46 @@ for (const [label, change] of [
     assert.equal(FakePath2D.addPathCallCount, 2);
   });
 }
+
+test("paths carried across a signature reschedule stay in the shared resource estimate until published", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
+  fixture.state.topologyRevision = 0;
+  drawDeferredFeatures(fixture);
+  fixture.pending.shift().callback();
+  const firstBuildCount = fixture.calls.filter(call => call.startsWith("build:")).length;
+  const carriedBytes = fixture.resourceBudget.snapshot().categories.projectedPaths;
+  assert.ok(firstBuildCount > 1 && carriedBytes > 0);
+  fixture.state.topologyRevision += 1;
+  fixture.pending.shift().callback();
+  assert.equal(fixture.metrics.findLast(metric => (
+    metric.name === "scenarioPoliticalBackgroundDeferredFullCacheCancel"
+  )).reason, "path-signature-changed");
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, carriedBytes,
+    "cancelled build keeps its carried paths in the estimate");
+  drawDeferredFeatures(fixture);
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, carriedBytes,
+    "rescheduled build still accounts for the carried paths");
+  completeDeferred(fixture);
+  assert.ok(fixture.resourceBudget.snapshot().categories.projectedPaths >= carriedBytes / firstBuildCount * 100,
+    "published build accounts for every original path once");
+  fixture.owner.releaseScenarioPoliticalBackgroundCache();
+  assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0);
+});
+
+test("an exact background frame drops paths carried from a cancelled deferred build", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: Array.from({ length: 20 }, (_, i) => feature(`region-${i}`)) };
+  drawDeferredFeatures(fixture);
+  fixture.pending.shift().callback();
+  fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("test-cancel");
+  const carriedBytes = fixture.resourceBudget.snapshot().categories.projectedPaths;
+  assert.ok(carriedBytes > 256, "cancelled build carries its paths");
+  fixture.state.landData = { features: [feature("only")] };
+  const exact = drawDeferredFeatures(fixture);
+  assert.equal(exact.progressive, false);
+  assert.equal(fixture.cancelled.at(-1), fixture.pending.shift(), "only the cancelled slice remains queued");
+  assert.equal(fixture.pending.length, 0, "an exact frame schedules no deferred build");
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 256,
+    "only the exact frame's own path stays accounted; the carried paths are released");
+});
