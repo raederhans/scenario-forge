@@ -98,6 +98,12 @@ export function createProjectedGeographicPathCache({
     if (inFlight && inFlight.generation === startGeneration) return inFlight.promise;
     const preparation = { generation: startGeneration, promise: null };
     preparation.promise = (async () => {
+      // Leave the caller's task first: a single ocean polygon with thousands of
+      // island holes streams in one piece, which must not extend bootstrap.
+      await yieldControl();
+      if (generation !== startGeneration) return null;
+      const current = getProjection?.();
+      if (!current || getProjectionGeometryGeneration(current) !== startGeneration) return null;
       const combined = new Path2DClass();
       let sliceStartedAt = nowMs();
       // d3 streams each polygon of a MultiPolygon independently, so the ocean's
