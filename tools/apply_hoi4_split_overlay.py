@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import argparse
-from collections import Counter
+from collections import Counter, defaultdict
 from copy import deepcopy
 import json
 from pathlib import Path
@@ -105,9 +105,52 @@ def update_country(country, entry):
         country["rule_sources"].append(entry["id"])
 
 
+def land_neighbors(topology):
+    from tools.apply_hoi4_geometry_splits import arc_ids
+
+    by_arc = defaultdict(set)
+    neighbors = {}
+    for geometry in topology["objects"]["political"]["geometries"]:
+        fid = geometry["properties"]["id"]
+        neighbors[fid] = set()
+        for arc in arc_ids(geometry.get("arcs", [])):
+            by_arc[arc].add(fid)
+    for members in by_arc.values():
+        for fid in members:
+            neighbors[fid].update(members - {fid})
+    return neighbors
+
+
+def smooth_enclaves(owners, topology, tags, max_area_km2):
+    from map_builder.regional_geometry import _absolute_topology, _decode_geometry
+    from tools.apply_hoi4_geometry_splits import area_km2
+
+    neighbors = land_neighbors(topology)
+    absolute = _absolute_topology(topology)
+    areas = {g["properties"]["id"]: area_km2(_decode_geometry(absolute, g))
+             for g in absolute["objects"]["political"]["geometries"]
+             if owners[g["properties"]["id"]] in tags}
+    changed = set()
+    while True:
+        moved = False
+        for fid in sorted(areas):
+            if areas[fid] > max_area_km2:
+                continue
+            adjacent_tags = {owners[n] for n in neighbors[fid]}
+            if len(adjacent_tags) == 1:
+                target = next(iter(adjacent_tags))
+                if target in tags and target != owners[fid]:
+                    owners[fid] = target
+                    changed.add(fid)
+                    moved = True
+        if not moved:
+            return len(changed)
+
+
 def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
                   default_country, hierarchy_groups, country_meta, prefectures,
-                  bucket_by_feature, plans, unresolved=(), point_for_feature=None):
+                  bucket_by_feature, plans, unresolved=(), point_for_feature=None, feature_splits=None,
+                  topology=None):
     if overlay.get("version") != 1:
         raise ValueError("overlay version must be 1")
     ids = set()
@@ -116,17 +159,31 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
         if not eid or eid in ids:
             raise ValueError(f"entry {eid}: missing or duplicate id")
         ids.add(eid)
-        if not re.fullmatch(r"[A-Z0-9]{2,4}", entry.get("tag", "")):
-            raise ValueError(f"entry {eid}: invalid tag")
         if not entry.get("scenarios") or not set(entry["scenarios"]) <= set(SCENARIOS):
             raise ValueError(f"entry {eid}: invalid scenarios")
+        if "smooth_enclaves" in entry:
+            continue
+        if not re.fullmatch(r"[A-Z0-9]{2,4}", entry.get("tag", "")):
+            raise ValueError(f"entry {eid}: invalid tag")
         if "select" not in entry:
             raise ValueError(f"entry {eid}: missing select")
     entries = [e for e in overlay["entries"] if scenario in e["scenarios"]]
-    declared = set(countries) | {e["tag"] for e in entries}
+    declared = set(countries) | {e["tag"] for e in entries if "tag" in e}
     result_countries = deepcopy(countries)
     result_owners, result_cores = dict(owners), deepcopy(cores)
     expanded = expand_merge_plans(plans, scenario)
+    split_leaves, split_expanded = {}, {}
+    for parent, children in (feature_splits or {}).items():
+        source_leaves = expanded.get(parent, {parent})
+        for leaf in source_leaves:
+            split_leaves[leaf] = {(child, leaf) for child in children}
+        for child in children:
+            split_expanded[child] = {(child, leaf) for leaf in source_leaves}
+        split_expanded[parent] = set().union(*(split_expanded[child] for child in children))
+    expanded = {fid: set().union(*(split_leaves.get(leaf, {leaf}) for leaf in leaves))
+                for fid, leaves in expanded.items()}
+    expanded.update(split_leaves)
+    expanded.update(split_expanded)
     leaves = {fid: expanded.get(fid, {fid}) for fid in features}
     known_ids = set(features) | set(expanded) | set().union(*expanded.values())
     filled = 0
@@ -189,6 +246,10 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
         return direct
 
     for entry in entries:
+        if "smooth_enclaves" in entry:
+            changed = smooth_enclaves(result_owners, topology, **entry["smooth_enclaves"])
+            report["entries"].append({"entry_id": entry["id"], "changed_count": changed})
+            continue
         eid, tag = entry["id"], entry["tag"]
         selected = select(entry["select"], eid, "select")
         if "exclude" in entry:
@@ -259,6 +320,7 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
     assignments = {fid: {"parent_id": fid, "owner": result_owners[fid],
                          "controller": result_owners[fid], "cores": result_cores[fid]}
                    for fid in features if owners[fid] != result_owners[fid] or cores[fid] != result_cores[fid]}
+    report["changed_count"] = len(assignments)
     return result_countries, assignments, report
 
 
@@ -269,6 +331,7 @@ def run_scenario(overlay, scenario_dir, *, data_dir=ROOT / "data", dry_run=False
     scenario_dir = Path(scenario_dir)
     topology = read(scenario_dir / "runtime_topology.topo.json")
     payload = read(scenario_dir / "countries.json")
+    manifest = read(scenario_dir / "manifest.json")
     groups, meta = load_hierarchy(data_dir / "hierarchy.json")
     crosswalk = read(data_dir / "quick_fill/china_prefecture_crosswalk.v1.json")
     countries, assignments, report = apply_overlay(
@@ -277,7 +340,9 @@ def run_scenario(overlay, scenario_dir, *, data_dir=ROOT / "data", dry_run=False
         owners=read(scenario_dir / "owners.by_feature.json")["owners"],
         cores=read(scenario_dir / "cores.by_feature.json")["cores"],
         countries=payload["countries"],
-        default_country=read(scenario_dir / "manifest.json")["default_country"],
+        default_country=manifest["default_country"],
+        feature_splits=manifest.get("hierarchy_overrides", {}).get("feature_splits", {}),
+        topology=topology,
         hierarchy_groups=groups, country_meta=meta,
         prefectures=crosswalk["groups"], unresolved=crosswalk.get("unresolved", []),
         point_for_feature=point_lookup_factory(topology),

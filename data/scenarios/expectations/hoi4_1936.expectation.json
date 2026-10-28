@@ -45,11 +45,6 @@
       "equals": "莫尔多维亚自治共和国"
     },
     {
-      "tag": "UPV",
-      "field": "subject_kind",
-      "equals": "administrative_region"
-    },
-    {
       "tag": "KOM",
       "field": "subject_kind",
       "equals": "autonomous_oblast"
@@ -77,9 +72,9 @@
   ],
   "summary_equals": {
     "blocker_count": 0,
-    "owner_count": 303,
-    "controller_count": 303,
-    "feature_count": 21066
+    "owner_count": 235,
+    "controller_count": 235,
+    "feature_count": 21078
   },
   "summary_min": {
     "feature_count": 10000,
@@ -107,7 +102,7 @@
       "name": "kwantung_luda_only",
       "expected_owner_tag": "KWT",
       "feature_ids": [
-        "CN_CITY_17275852B83272093468807"
+        "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG"
       ]
     },
     {
@@ -290,6 +285,68 @@
         "CN_CITY_17275852B73469440437176",
         "CN_CITY_17275852B92501194129581",
         "CN_CITY_17275852B5895567339665"
+      ]
+    },
+    {
+      "name": "geometry_karafuto",
+      "expected_owner_tag": "JAP",
+      "feature_ids": [
+        "RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO"
+      ]
+    },
+    {
+      "name": "geometry_kwantung",
+      "expected_owner_tag": "KWT",
+      "feature_ids": [
+        "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG"
+      ]
+    },
+    {
+      "name": "geometry_danzig",
+      "expected_owner_tag": "DNZ",
+      "feature_ids": [
+        "PL_MRG_727dd6268093__SPLIT_DANZIG",
+        "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
+        "PL_POW_2209__SPLIT_DANZIG",
+        "PL_POW_2210__SPLIT_DANZIG"
+      ]
+    },
+    {
+      "name": "geometry_tangier",
+      "expected_owner_tag": "TGR",
+      "feature_ids": [
+        "MAR-1445__SPLIT_TANGIER"
+      ]
+    },
+    {
+      "name": "geometry_ifni",
+      "expected_owner_tag": "IFN",
+      "feature_ids": [
+        "MAR-1455__SPLIT_IFNI",
+        "MAR-3457__SPLIT_IFNI"
+      ]
+    },
+    {
+      "name": "geometry_guangzhouwan",
+      "expected_owner_tag": "KWW",
+      "feature_ids": [
+        "CN_CITY_17275852B86000242921086__SPLIT_GUANGZHOUWAN",
+        "CN_CITY_17275852B89468905887192__SPLIT_GUANGZHOUWAN",
+        "CN_CITY_17275852B90470795224142__SPLIT_GUANGZHOUWAN"
+      ]
+    },
+    {
+      "name": "sakhalin_north_retained",
+      "expected_owner_tag": "SOV",
+      "feature_ids": [
+        "RU_MRG_eefc121c2bf0__SPLIT_REST"
+      ]
+    },
+    {
+      "name": "kwantung_mainland_returned",
+      "expected_owner_tag": "MAN",
+      "feature_ids": [
+        "CN_CITY_17275852B83272093468807__SPLIT_REST"
       ]
     }
   ]
