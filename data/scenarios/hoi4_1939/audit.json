@@ -1,6 +1,6 @@
 {
   "artifact_counts": {
-    "chunk_count": 233,
+    "chunk_count": 319,
     "feature_count": 21066,
     "water_count": 0
   },
@@ -201007,10 +201007,10 @@
     "AOI": {
       "base_iso2": "ET",
       "continent_label": "Africa",
-      "controller_feature_count": 30,
+      "controller_feature_count": 11,
       "display_name": "Italian East Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 30,
+      "feature_count": 11,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201071,10 +201071,10 @@
     "AST": {
       "base_iso2": "PG",
       "continent_label": "Oceania",
-      "controller_feature_count": 33,
+      "controller_feature_count": 5,
       "display_name": "Australia",
       "entry_kind": "scenario_subject",
-      "feature_count": 33,
+      "feature_count": 5,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201388,10 +201388,10 @@
     "CAN": {
       "base_iso2": "CA",
       "continent_label": "North America",
-      "controller_feature_count": 273,
+      "controller_feature_count": 4,
       "display_name": "Canada",
       "entry_kind": "",
-      "feature_count": 273,
+      "feature_count": 4,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201452,10 +201452,10 @@
     "CHI": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 725,
+      "controller_feature_count": 1156,
       "display_name": "China",
       "entry_kind": "",
-      "feature_count": 725,
+      "feature_count": 1156,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201763,10 +201763,10 @@
     "ENG": {
       "base_iso2": "GB",
       "continent_label": "Europe",
-      "controller_feature_count": 509,
+      "controller_feature_count": 508,
       "display_name": "Britain",
       "entry_kind": "",
-      "feature_count": 509,
+      "feature_count": 508,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201894,10 +201894,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 672,
+      "controller_feature_count": 673,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 672,
+      "feature_count": 673,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202114,10 +202114,10 @@
     "GXC": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 59,
+      "controller_feature_count": 56,
       "display_name": "Guangxi Clique",
       "entry_kind": "",
-      "feature_count": 59,
+      "feature_count": 56,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202240,10 +202240,10 @@
     "HUN": {
       "base_iso2": "HU",
       "continent_label": "Europe",
-      "controller_feature_count": 43,
+      "controller_feature_count": 47,
       "display_name": "Hungary",
       "entry_kind": "",
-      "feature_count": 43,
+      "feature_count": 47,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202304,10 +202304,10 @@
     "INS": {
       "base_iso2": "ID",
       "continent_label": "Asia",
-      "controller_feature_count": 34,
+      "controller_feature_count": 6,
       "display_name": "Dutch East Indies",
       "entry_kind": "scenario_subject",
-      "feature_count": 34,
+      "feature_count": 6,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202819,10 +202819,10 @@
     "MAN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 226,
+      "controller_feature_count": 234,
       "display_name": "Manchukuo",
       "entry_kind": "",
-      "feature_count": 226,
+      "feature_count": 234,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202851,10 +202851,10 @@
     "MEN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 33,
+      "controller_feature_count": 19,
       "display_name": "Mengjiang",
       "entry_kind": "",
-      "feature_count": 33,
+      "feature_count": 19,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203704,10 +203704,10 @@
     "SAF": {
       "base_iso2": "NA",
       "continent_label": "Africa",
-      "controller_feature_count": 22,
+      "controller_feature_count": 9,
       "display_name": "South Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 22,
+      "feature_count": 9,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203803,10 +203803,10 @@
     "SHX": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 42,
+      "controller_feature_count": 76,
       "display_name": "Shanxi",
       "entry_kind": "",
-      "feature_count": 42,
+      "feature_count": 76,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203866,10 +203866,10 @@
     "SIC": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 28,
+      "controller_feature_count": 32,
       "display_name": "Xikang Clique",
       "entry_kind": "",
-      "feature_count": 28,
+      "feature_count": 32,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
@@ -203930,10 +203930,10 @@
     "SLO": {
       "base_iso2": "SK",
       "continent_label": "Europe",
-      "controller_feature_count": 58,
+      "controller_feature_count": 54,
       "display_name": "Slovakia",
       "entry_kind": "",
-      "feature_count": 58,
+      "feature_count": 54,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204423,10 +204423,10 @@
     "USA": {
       "base_iso2": "US",
       "continent_label": "North America",
-      "controller_feature_count": 817,
+      "controller_feature_count": 1,
       "display_name": "America",
       "entry_kind": "",
-      "feature_count": 817,
+      "feature_count": 1,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -205662,11 +205662,11 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1939",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "bad95a40625a66d2c3c1fb62f1025b5c8fad9dcf72e122955c84def0e43c2186",
+  "snapshot_fingerprint": "cfbc8d781dc001a63aba005c8c680ca6f9478d6b508c0d764a0f55be61b83fe4",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "de1f91c7d1860241fba7c9b772369e22161d4383a0cde6f48628970f4d16aec9",
-    "detail_chunk_manifest_sha256": "995656b7cec79640603011737040ae9183c4214dbe9dbd1b34a5fb99cd3bc093",
+    "build_snapshot_sha256": "ba23c453e26cb0657678f155c382c1854ea0e95af181c2488dbe7c2d8857fe69",
+    "detail_chunk_manifest_sha256": "6602386074874cf155aa236c570952f189c2058cfa094e64e5b5a3a8c5157cbe",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
     "runtime_topology_sha256": "d73cbe2088d826b1e28728a9ccb7f2ddf6e30c15313dbc0c7af66469c02b462d"
   },
@@ -205675,7 +205675,7 @@
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
     "changed_feature_count": 15410,
-    "controller_count": 225,
+    "controller_count": 311,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
@@ -205685,7 +205685,7 @@
     "manual_reviewed_feature_count": 14963,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 225,
+    "owner_count": 311,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5744,

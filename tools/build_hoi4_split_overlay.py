@@ -276,8 +276,10 @@ add("east_hebei", Y36, "EHC", "East Hebei Autonomous Council", "冀东防共自�
 add("hebei_chahar", Y36, "HBC", "Hebei-Chahar Political Council", "冀察政务委员会", HG("CN_Hebei", "CN_Beijing", "CN_Tianjin"),
     color="#5d6fb3", only=["CHI"])
 add("hunan_clique", Y36, "HNN", "Hunan Clique", "湘系（何键）", HG("CN_Hunan"), color="#8a6fb0", only=["CHI"])
-add("xikang_clique", B, "SIC", "Xikang Clique", "西康军阀（刘文辉）", PF("甘孜藏族自治州", "雅安市"), color="#006080",
-    only=["CHU", "CHI", "SIC"])
+add("xikang_clique", Y36, "SIC", "Xikang Administration", "西康军政区（刘文辉）", PF("甘孜藏族自治州"),
+    color="#006080", only=["CHU", "CHI", "SIC"])
+add("xikang_clique_1939", Y39, "SIC", "Xikang Administration", "西康军政区（刘文辉）", PF("甘孜藏族自治州", "雅安市"),
+    color="#006080", only=["CHU", "CHI", "SIC"], exclude={"feature_ids": ["CN_CITY_17275852B99222209572409"]})
 add("khotan_ma", Y36, "KHM", "Khotan Emirate", "和阗马虎山政权", PF("和田地区", "喀什地区"), color="#9c7a3c", only=["SIK"])
 
 # ---------- 中国 1939：战线（owner = 实际控制者，cores 保留法理归属） ----------
@@ -305,6 +307,199 @@ add("japanese_south_china", Y39, "JSC", "Japanese-Occupied South China", "日军
     {"hierarchy_groups": ["CN_Hainan"],
      "prefectures": ["广州市", "佛山市", "东莞市", "深圳市", "惠州市", "汕头市", "潮州市", "厦门市"]},
     only=["CHI"], color="#e8907a", cores="keep", parent="JAP", kind="military_administration")
+
+
+def FI(*ids):
+    return {"feature_ids": list(ids)}
+
+
+def CN(numbers):
+    return ["CN_CITY_17275852B" + n for n in numbers.split()]
+
+
+def narrow(entry_id, selection, restore_tag, *, cores="owner", shanxi=False):
+    entry = next(e for e in E if e["id"] == entry_id)
+    returns = []
+    if shanxi:
+        returns.append({"id": entry_id + "_shanxi_return", "scenarios": entry["scenarios"],
+                        "tag": "SHX", "select": HG("CN_Shanxi"), "exclude": selection,
+                        "only_from_owners": [entry["tag"]], "cores": cores})
+    returns.append({"id": entry_id + "_return", "scenarios": entry["scenarios"], "tag": restore_tag,
+                    "select": entry["select"], "exclude": selection,
+                    "only_from_owners": [entry["tag"]], "cores": cores})
+    index = E.index(entry)
+    E[index:index] = returns
+    entry["select"] = selection
+    entry["only_from_owners"] = list(dict.fromkeys(entry.get("only_from_owners", []) + [entry["tag"]]))
+
+
+narrow("kwantung", FI(*CN("83272093468807")), "MAN")
+narrow("khotan_ma", {"prefectures": ["和田地区"], "feature_ids": CN("17844458275319")}, "SIK")
+next(e for e in E if e["id"] == "khotan_ma").update(name_en="Khotan Military Administration", name_zh="和阗军政区")
+next(e for e in E if e["id"] == "mordovian_assr")["name_zh"] = "莫尔多维亚自治共和国"
+next(e for e in E if e["id"] == "mauritius")["select"] = CC("MU", "IO")
+next(e for e in E if e["id"] == "upper_volta").update(
+    name_en="Upper Volta Debug Region", name_zh="上沃尔特地区（调试分区）", subject_kind="administrative_region",
+    notes="Upper Volta was abolished in 1932–1947; retained solely as a debug subdivision.")
+next(e for e in E if e["id"] == "bohemia_moravia")["exclude"]["feature_ids"].append("CZ_ADM2_57006924B3568693077695")
+add("liberec_return", Y39, "GER", None, None, FI("CZ_ADM2_57006924B3568693077695"))
+add("kosice_return", Y39, "HUN", None, None, FI(*["SK_ADM2_56367889B" + n for n in
+    ("16879144707830", "46930466225258", "7741755639355", "57985107422825")]))
+for scenarios, parent in [(Y36, "RAJ"), (Y39, "ENG")]:
+    year = scenarios[0][-4:]
+    add("aden_" + year, scenarios, "ADN", "Aden", "亚丁", FI("YEM-3510"), parent=parent, kind="colony", color="#b38493")
+    add("burma_parent_" + year, scenarios, "BRM", None, None, CC("MM"), parent=parent, kind="colony", cores="keep")
+add("karakalpak_parent_1939", Y39, "KKP", None, None, FI("UZB-356"), parent="UZB", cores="keep")
+for tag, en, zh in [("KOM", "Komi", "科米"), ("MRE", "Mari", "马里"),
+                     ("KBA", "Kabardino-Balkar", "卡巴尔达-巴尔卡尔"),
+                     ("NOS", "North Ossetian", "北奥塞梯"), ("CHE", "Chechen-Ingush", "车臣-印古什")]:
+    add(tag.lower() + "_autonomous_oblast_1936", Y36, tag, en + " Autonomous Oblast", zh + "自治州",
+        {"owners": [tag]}, parent="SOV", kind="autonomous_oblast", cores="keep")
+add("seychelles_return", B, "SEY", "Seychelles", "塞舌尔", CC("SC"), parent="ENG", kind="colony", color="#bd809b")
+add("south_west_africa", B, "SWA", "South West Africa", "西南非洲", CC("NA"), parent="SAF", kind="mandate",
+    color="#bd586b", notes="Modern Namibia proxy; Walvis Bay requires a later geometry split.")
+for tag, en, zh, groups, kind, color in [
+    ("PAP", "Territory of Papua", "巴布亚领地", ("Gulf", "Southern_Highlands", "Western", "Central", "Milne_Bay", "Port_Moresby", "Oro"), "territory", "#b45073"),
+    ("NGN", "Territory of New Guinea", "新几内亚委任统治地", ("Enga", "East_Sepik", "Madang", "Sandaun", "Chimbu", "Eastern_Highlands", "of_Bougainville", "Western_Highlands", "East_New_Britain", "Manus", "Morobe", "New_Ireland", "West_New_Britain"), "mandate", "#e5a6b9")]:
+    add(tag.lower() + "_territory", B, tag, en, zh, HG(*("PG_" + g for g in groups)), parent="AST", kind=kind,
+        color=color, notes="Modern province proxies; highland boundaries require later geometry splits.")
+for tag, en, zh, groups, color in [
+    ("SUM", "Sumatra Debug Region", "苏门答腊调试大区", ("Aceh", "North_Sumatra", "West_Sumatra", "Riau", "Riau_Islands", "Jambi", "Bengkulu", "South_Sumatra", "Bangka_Belitung_Islands", "Lampung"), "#b86d4c"),
+    ("BOR", "Dutch Borneo Debug Region", "荷属婆罗洲调试大区", ("West_Kalimantan", "Central_Kalimantan", "South_Kalimantan", "East_Kalimantan", "North_Kalimantan"), "#cb8e6b"),
+    ("CEL", "Celebes Debug Region", "西里伯斯调试大区", ("North_Sulawesi", "Gorontalo", "Central_Sulawesi", "West_Sulawesi", "South_Sulawesi", "Southeast_Sulawesi"), "#994d47"),
+    ("LSI", "Lesser Sunda Debug Region", "小巽他调试大区", ("Bali", "West_Nusa_Tenggara", "East_Nusa_Tenggara"), "#d49b8a"),
+    ("MLK", "Moluccas Debug Region", "马鲁古调试大区", ("Maluku", "North_Maluku"), "#a15555"),
+    ("WNG", "Dutch New Guinea Debug Region", "荷属新几内亚调试大区", ("Papua", "West_Papua"), "#c27a64")]:
+    add(tag.lower() + "_region", B, tag, en, zh, HG(*("ID_" + g for g in groups)), parent="INS",
+        kind="administrative_region", color=color, cores=["INS"])
+for tag, en, zh, cc, color in [("ERI", "Eritrea Governorate", "厄立特里亚总督区", "ER", "#6eaa83"),
+                               ("SOM", "Somalia Governorate", "索马里总督区", "SO", "#9dbb87")]:
+    add(tag.lower() + "_governorate_1939", Y39, tag, en, zh, CC(cc), parent="AOI", kind="administrative_region",
+        only=["AOI", tag], color=color, cores=["AOI"], notes="Modern-country regional proxy, not the precise historical governorate boundary.")
+
+NCP_POSTS = CN("40522342172572 53166682632414 35191117841364 70843634097749 19397285057030 9046707294983 22707504793071 41032470199188 96614928239344 14553820792876 97923044022234 4963111392108 57880389938199 76829643653933 19618376010244 16732896761360 78988614189372 30734228092100 83167737560066 45390451107599 83100874373445 18968160632662 36539700725824 27087882119733 85544446441725 10208475755367 60524829078673 67411780639584 21492950184785 91447424097989 53877556564875 62040954239455 45020271947314 67315226354305 61994504860165 27963337647177 67438977719884 82739268949282 44584253435303 21670105101896 72971629177091 8527290020627 84296108244083") + ["CN_MRG_380671e40a1c", "CN_MRG_ed13ca65f52b", "CN_MRG_08f0b7755ac2", "CN_MRG_31ba4a677ea0", "CN_MRG_9b9b2d2aa43a", "CN_MRG_005ada82e050"] + CN("32842590404417 89036303488164 20799087712877 453440967624 99191317899548 506119010576 43163945505607")
+CNZ_POSTS = CN("66003162693266 41187046911697 21512782047125 53922912898325")
+JBZ_POSTS = CN("90378533110631 35516654467080 62103868434319") + ["CN_MRG_3ff67345ed78"]
+MEN_POSTS = CN("58561192252896 83584927302596 42573248116242 56850756381420 74586174185496 76051276542746 97242903030707 71745014009476 38329795368035")
+RGC_POSTS = CN("45149819427590 19859477737164 46074982775581 47635697455490 82708605205805 78816749784203 71370953459893 92006637325800 13333769593378 46393920630539 36737936197596 69259623848725 77980777243348 68627257397845 39263965325493 91286509256855 60218719915669 43191682084250 77400672470843 94592901594717 42065564755438 85263946797397")
+JCC_POSTS = CN("52250123531455 90271468854707 56190437260016 36551936006551 44768888593389 82067370611519 78567156775151 74817202637370 50043505500678 83812560805647 59929886266985 42183204213930 64934349609422 47701832659247 68532057450373") + ["CN_MRG_398970fc50e7"]
+JSC_POSTS = CN("38988280096574 25965384817686 33382458843189 31711539663260 92305935351425 58186217435722 75995678778305 35691129963558 2295538790743 80309702523612 34195804181253 50490784073671 71635948673445")
+for eid, posts, restore, shanxi in [
+    ("provisional_government", NCP_POSTS, "CHI", True), ("south_chahar", CNZ_POSTS, "CHI", False),
+    ("north_shanxi", JBZ_POSTS, "SHX", False), ("mengjiang_1939", MEN_POSTS, "SHX", False),
+    ("reformed_government", RGC_POSTS, "CHI", False), ("japanese_central_china", JCC_POSTS, "CHI", False),
+    ("japanese_south_china", JSC_POSTS, "CHI", False)]:
+    narrow(eid, FI(*posts), restore, cores="keep", shanxi=shanxi)
+for eid in ("south_chahar", "north_shanxi"):
+    next(e for e in E if e["id"] == eid)["parent_owner_tag"] = "MEN"
+next(e for e in E if e["id"] == "south_chahar").update(name_en="South Chahar Administration", name_zh="察南政厅")
+next(e for e in E if e["id"] == "north_shanxi").update(name_en="North Shanxi Administration", name_zh="晋北政厅")
+men = next(e for e in E if e["id"] == "mengjiang_1939")
+men.update(name_en="Mongolian United Autonomous Government", name_zh="蒙古联合自治政府",
+           notes="China uses late-1939 occupation; CNZ and JBZ remain subordinate debug administrations after the September merger.")
+men["only_from_owners"] += ["MAN", "CNZ"]
+next(e for e in E if e["id"] == "provisional_government")["only_from_owners"] += ["LUQ", "RGC"]
+next(e for e in E if e["id"] == "japanese_south_china")["only_from_owners"] += ["GXC"]
+
+add("qinglong_return", B, "MAN", None, None, FI(*CN("43165756519885")))
+add("east_hebei_counties_1936", Y36, "EHC", None, None,
+    FI(*CN("72792517073116 24643771294108 7080321063595 95574356023337 72922623961147 75890737929332 60414806889849 38375506939997")))
+add("hainan_qinlian_return_1936", Y36, "YUE", None, None,
+    {"hierarchy_groups": ["CN_Hainan"], "feature_ids": CN("19868960828514 30975390905787 50490784073671 71635948673445") + ["CN_MRG_54a435d63591"]})
+add("suiyuan_return_1936", Y36, "SHX", None, None, FI(*CN("56850756381420 4230864536687")))
+HEXI = {"prefectures": ["武威市", "金昌市", "张掖市", "酒泉市"], "feature_ids": CN("58588105655352")}
+add("gansu_return_1936", Y36, "CHI", None, None, HG("CN_Gansu"), only=["GMA"], exclude=HEXI, cores=["CHI"])
+add("hexi_ma_1936", Y36, "GMA", "Hexi Ma Clique", "河西马家军", HEXI)
+add("southern_ningxia_return_1936", Y36, "CHI", None, None, {"prefectures": ["固原市"], "feature_ids": CN("3472329779353")}, cores=["CHI"])
+add("yanan_return_1936", Y36, "CHI", None, None, FI(*CN("97849821920285")), cores=["CHI"])
+add("northern_shaanxi_return_1936", Y36, "CHI", None, None, FI(*CN("71560826208449 92543718728466")), cores=["CHI"])
+add("huachi_soviet_1936", Y36, "PRC", None, None, FI(*CN("7825306449652")))
+add("wayaobao_soviet_1936", Y36, "PRC", None, None, FI(*CN("74624363636090")))
+add("yaan_return_1936", Y36, "CHU", None, None, PF("雅安市"), only=["SIC"], cores=["CHU"])
+add("mingshan_return_1939", Y39, "CHI", None, None, FI(*CN("99222209572409")), cores=["CHI"])
+add("xikang_ning_1939", Y39, "SIC", None, None, FI(*CN("18343080596072 78456779133513 90257281612339 77966044233531 22487922789088")))
+add("red_fourth_army_1936", Y36, "PRC", None, None, FI(*CN("67382669517001 17632126042959 26108585816208")))
+add("mongol_banners_1936", Y36, "MEN", "Chahar Mongol Banner Administrations", "察哈尔蒙古旗政区", {"owners": ["MEN"]}, cores="keep")
+for tag, en, zh, color, nums, parent in [
+    ("DMC", "Mongol Local Autonomy Political Council", "蒙古地方自治政务委员会", "#8fa96a", "79222988236433", "CHI"),
+    ("CDE", "East Chahar Garrison", "察东警备区（李守信）", "#a7bd79", "97242903030707 76051276542746 39600332445203 74586174185496", "JAP"),
+    ("NEA", "Northeastern Army in Shaanxi-Gansu", "东北军陕甘驻防区", "#637caf", "58292310857107 99561505558549 62674804488136", "CHI"),
+    ("GSG", "Gansu Provincial Government", "甘肃省政府（于学忠）", "#596aa1", "84192730453130 75830625621181", "CHI"),
+    ("CDX", "Deng Xihou Clique", "川军邓锡侯部", "#2a8299", "39008212883754 55258020624391 91329777295844", "CHI"),
+    ("CSZ", "Sun Zhen Clique", "川军孙震部", "#3c7791", "38426922086125 9326266766926 30341791442731 91773014733924", "CHI"),
+    ("CYS", "Yang Sen Clique", "川军杨森部", "#527f89", "34390587465306 8936190947302 73469440437176 92501194129581 5895567339665", "CHI")]:
+    add(tag.lower() + "_debug_1936", Y36, tag, en, zh, FI(*CN(nums)), parent=parent,
+        kind="military_administration", color=color, cores="keep",
+        notes="Whole-parcel faction proxy based on T5 and HGO political divisions, not exclusive historical county control.")
+add("northwestern_army_1936", Y36, "NWA", "Northwestern Army Administration", "西北军（杨虎城）",
+    PF("西安市", "咸阳市", "渭南市", "汉中市"), parent="CHI", kind="military_administration", color="#435ba0",
+    only=["CHI", "NWA"], cores="keep", notes="Guanzhong-Hanzhong faction proxy; overlapping garrisons are not separate sovereign territories.")
+for tag, en, zh, color, fids in [
+    ("JCJ", "Jin-Cha-Ji Border Region", "晋察冀边区", "#9f2836", CN("46736465172107 69993211466305")),
+    ("THG", "Taihang Resistance Area", "太行抗日根据地", "#b32032", ["CN_MRG_093183003948"]),
+    ("JZH", "Central Hebei Resistance Area", "冀中抗日根据地", "#d44442", CN("86070890642714 52385226353354")),
+    ("JNA", "Southern Hebei Resistance Area", "冀南抗日根据地", "#e36a5c", ["CN_MRG_51c0b9bbbb0a"]),
+    ("LZG", "Central Shandong Resistance Area", "鲁中抗日根据地", "#c83747", CN("77679479199341")),
+    ("JDG", "Jiaodong Resistance Area", "胶东抗日根据地", "#ef8a78", CN("99355884213700")),
+    ("BHA", "Southeastern Shandong Guerrilla Area", "鲁东南抗日游击区", "#a84956", CN("41312334217118")),
+    ("YWS", "Henan-Anhui-Jiangsu Guerrilla Area", "豫皖苏游击区", "#ad4a39", CN("89166552502762")),
+    ("MSN", "New Fourth Army Southern Jiangsu Area", "新四军苏南游击区", "#d85c69", CN("59245154361238 11407259911678")),
+    ("WNA", "New Fourth Army Southern Anhui Area", "新四军皖南驻区", "#7f344a", CN("59735937562693"))]:
+    add(tag.lower() + "_debug_1939", Y39, tag, en, zh, FI(*fids), parent="PRC", kind="military_administration",
+        color=color, cores="keep", notes="Whole-parcel resistance-area debug proxy; county seats and rural control were mixed.")
+
+FEDERAL_SUBDIVISIONS = [
+    ("CAN", "CA", "CAAB", "Alberta", "阿尔伯塔省", "Edmonton"),
+    ("CAN", "CA", "CABC", "British_Columbia", "不列颠哥伦比亚省", "Victoria"),
+    ("CAN", "CA", "CAMB", "Manitoba", "马尼托巴省", "Winnipeg"),
+    ("CAN", "CA", "CANB", "New_Brunswick", "新不伦瑞克省", "Fredericton"),
+    ("CAN", "CA", "CANS", "Nova_Scotia", "新斯科舍省", "Halifax"),
+    ("CAN", "CA", "CAON", "Ontario", "安大略省", "Toronto"),
+    ("CAN", "CA", "CAPE", "Prince_Edward_Island", "爱德华王子岛省", "Charlottetown"),
+    ("CAN", "CA", "CAQC", "Quebec", "魁北克省", "Quebec City"),
+    ("CAN", "CA", "CASK", "Saskatchewan", "萨斯卡彻温省", "Regina"),
+    ("AST", "AU", "AUNS", "New_South_Wales", "新南威尔士州", "Sydney"),
+    ("AST", "AU", "AUQL", "Queensland", "昆士兰州", "Brisbane"),
+    ("AST", "AU", "AUSA", "South_Australia", "南澳大利亚州", "Adelaide"),
+    ("AST", "AU", "AUTS", "Tasmania", "塔斯马尼亚州", "Hobart"),
+    ("AST", "AU", "AUVI", "Victoria", "维多利亚州", "Melbourne"),
+    ("AST", "AU", "AUWA", "Western_Australia", "西澳大利亚州", "Perth"),
+]
+US_STATES = [
+    ("AL", "Alabama", "亚拉巴马州", "Montgomery"), ("AZ", "Arizona", "亚利桑那州", "Phoenix"),
+    ("AR", "Arkansas", "阿肯色州", "Little Rock"), ("CA", "California", "加利福尼亚州", "Sacramento"),
+    ("CO", "Colorado", "科罗拉多州", "Denver"), ("CT", "Connecticut", "康涅狄格州", "Hartford"),
+    ("DE", "Delaware", "特拉华州", "Dover"), ("FL", "Florida", "佛罗里达州", "Tallahassee"),
+    ("GA", "Georgia", "佐治亚州", "Atlanta"), ("ID", "Idaho", "爱达荷州", "Boise"),
+    ("IL", "Illinois", "伊利诺伊州", "Springfield"), ("IN", "Indiana", "印第安纳州", "Indianapolis"),
+    ("IA", "Iowa", "艾奥瓦州", "Des Moines"), ("KS", "Kansas", "堪萨斯州", "Topeka"),
+    ("KY", "Kentucky", "肯塔基州", "Frankfort"), ("LA", "Louisiana", "路易斯安那州", "Baton Rouge"),
+    ("ME", "Maine", "缅因州", "Augusta"), ("MD", "Maryland", "马里兰州", "Annapolis"),
+    ("MA", "Massachusetts", "马萨诸塞州", "Boston"), ("MI", "Michigan", "密歇根州", "Lansing"),
+    ("MN", "Minnesota", "明尼苏达州", "Saint Paul"), ("MS", "Mississippi", "密西西比州", "Jackson"),
+    ("MO", "Missouri", "密苏里州", "Jefferson City"), ("MT", "Montana", "蒙大拿州", "Helena"),
+    ("NE", "Nebraska", "内布拉斯加州", "Lincoln"), ("NV", "Nevada", "内华达州", "Carson City"),
+    ("NH", "New_Hampshire", "新罕布什尔州", "Concord"), ("NJ", "New_Jersey", "新泽西州", "Trenton"),
+    ("NM", "New_Mexico", "新墨西哥州", "Santa Fe"), ("NY", "New_York", "纽约州", "Albany"),
+    ("NC", "North_Carolina", "北卡罗来纳州", "Raleigh"), ("ND", "North_Dakota", "北达科他州", "Bismarck"),
+    ("OH", "Ohio", "俄亥俄州", "Columbus"), ("OK", "Oklahoma", "俄克拉何马州", "Oklahoma City"),
+    ("OR", "Oregon", "俄勒冈州", "Salem"), ("PA", "Pennsylvania", "宾夕法尼亚州", "Harrisburg"),
+    ("RI", "Rhode_Island", "罗得岛州", "Providence"), ("SC", "South_Carolina", "南卡罗来纳州", "Columbia"),
+    ("SD", "South_Dakota", "南达科他州", "Pierre"), ("TN", "Tennessee", "田纳西州", "Nashville"),
+    ("TX", "Texas", "得克萨斯州", "Austin"), ("UT", "Utah", "犹他州", "Salt Lake City"),
+    ("VT", "Vermont", "佛蒙特州", "Montpelier"), ("VA", "Virginia", "弗吉尼亚州", "Richmond"),
+    ("WA", "Washington", "华盛顿州", "Olympia"), ("WV", "West_Virginia", "西弗吉尼亚州", "Charleston"),
+    ("WI", "Wisconsin", "威斯康星州", "Madison"), ("WY", "Wyoming", "怀俄明州", "Cheyenne"),
+]
+FEDERAL_SUBDIVISIONS += [("USA", "US", "US" + abbr, name, zh, capital) for abbr, name, zh, capital in US_STATES]
+for i, (parent, cc, tag, name, zh, capital) in enumerate(FEDERAL_SUBDIVISIONS):
+    h, l, sat = colorsys.rgb_to_hls(*(int(PARENT_COLOR[parent][k:k + 2], 16) / 255 for k in (1, 3, 5)))
+    rgb = colorsys.hls_to_rgb((h + ((i * 7) % 17 - 8) * .006) % 1, .34 + (i % 8) * .055, .35 + (i % 3) * .12)
+    color = "#%02x%02x%02x" % tuple(round(c * 255) for c in rgb)
+    add(tag.lower() + "_administration", B, tag, name.replace("_", " "), zh, HG(cc + "_" + name),
+        parent=parent, kind="province" if cc == "CA" else "state", color=color, cores=[parent],
+        exclude=FI("CA_FED_35079") if tag == "CAON" else None,
+        notes="Ottawa parcel retained as the federal seat in this debug subdivision." if tag == "CAON" else None)
 
 ids = [e["id"] for e in E]
 assert len(ids) == len(set(ids)), "duplicate ids"

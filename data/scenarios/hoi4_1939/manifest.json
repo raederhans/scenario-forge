@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1939/audit.json",
-  "baseline_hash": "ed150ab2611c6df0225323c4cf42485662a2bbf26bafbef1b9e8da31d12d451d",
+  "baseline_hash": "991f99610cf34abb38f4ce238ad60c4fab82aae7175e097618140ab0f4a229af",
   "bookmark_date": "1939.8.14.12",
   "bookmark_description": "BLITZKRIEG_DESC",
   "bookmark_name": "BLITZKRIEG_NAME",
@@ -2462,10 +2462,10 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "bad95a40625a66d2c3c1fb62f1025b5c8fad9dcf72e122955c84def0e43c2186",
+  "snapshot_fingerprint": "cfbc8d781dc001a63aba005c8c680ca6f9478d6b508c0d764a0f55be61b83fe4",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "995656b7cec79640603011737040ae9183c4214dbe9dbd1b34a5fb99cd3bc093",
+    "detail_chunk_manifest_sha256": "6602386074874cf155aa236c570952f189c2058cfa094e64e5b5a3a8c5157cbe",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
     "runtime_topology_sha256": "d73cbe2088d826b1e28728a9ccb7f2ddf6e30c15313dbc0c7af66469c02b462d"
   },
@@ -2486,7 +2486,7 @@
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
     "changed_feature_count": 15410,
-    "controller_count": 225,
+    "controller_count": 311,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
@@ -2496,7 +2496,7 @@
     "manual_reviewed_feature_count": 14963,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 225,
+    "owner_count": 311,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5744,

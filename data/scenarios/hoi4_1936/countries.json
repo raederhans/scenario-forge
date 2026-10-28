@@ -1,5 +1,46 @@
 {
   "countries": {
+    "ADN": {
+      "base_iso2": "YE",
+      "capital_state_id": null,
+      "color_hex": "#b38493",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Aden",
+      "display_name_en": "Aden",
+      "display_name_zh": "亚丁",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "YE",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "aden_1936",
+      "provenance_iso2": "YE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "aden_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "ADN"
+    },
     "AEF": {
       "base_iso2": "TD",
       "capital_state_id": null,
@@ -402,12 +443,12 @@
       "color_hex": "#d97993",
       "continent_id": "continent_oceania",
       "continent_label": "Oceania",
-      "controller_feature_count": 33,
+      "controller_feature_count": 5,
       "display_name": "Commonwealth of Australia",
       "display_name_en": "Commonwealth of Australia",
       "display_name_zh": "澳大利亚联邦",
       "entry_kind": "scenario_subject",
-      "feature_count": 33,
+      "feature_count": 5,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -436,6 +477,88 @@
       "subregion_label": "Melanesia",
       "synthetic_owner": false,
       "tag": "AST"
+    },
+    "AUNS": {
+      "base_iso2": "AU",
+      "capital_state_id": null,
+      "color_hex": "#88414a",
+      "continent_id": "continent_oceania",
+      "continent_label": "Oceania",
+      "controller_feature_count": 2,
+      "display_name": "New South Wales",
+      "display_name_en": "New South Wales",
+      "display_name_zh": "新南威尔士州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AU",
+      "notes": "",
+      "parent_owner_tag": "AST",
+      "parent_owner_tags": [
+        "AST"
+      ],
+      "primary_rule_source": "auns_administration",
+      "provenance_iso2": "AU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "auns_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_australia_and_new_zealand",
+      "subregion_label": "Australia and New Zealand",
+      "synthetic_owner": false,
+      "tag": "AUNS"
+    },
+    "AUQL": {
+      "base_iso2": "AU",
+      "capital_state_id": null,
+      "color_hex": "#a93d71",
+      "continent_id": "continent_oceania",
+      "continent_label": "Oceania",
+      "controller_feature_count": 1,
+      "display_name": "Queensland",
+      "display_name_en": "Queensland",
+      "display_name_zh": "昆士兰州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AU",
+      "notes": "",
+      "parent_owner_tag": "AST",
+      "parent_owner_tags": [
+        "AST"
+      ],
+      "primary_rule_source": "auql_administration",
+      "provenance_iso2": "AU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "auql_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_australia_and_new_zealand",
+      "subregion_label": "Australia and New Zealand",
+      "synthetic_owner": false,
+      "tag": "AUQL"
     },
     "AUS": {
       "base_iso2": "AT",
@@ -473,6 +596,170 @@
       "subregion_label": "Western Europe",
       "synthetic_owner": false,
       "tag": "AUS"
+    },
+    "AUSA": {
+      "base_iso2": "AU",
+      "capital_state_id": null,
+      "color_hex": "#cb3659",
+      "continent_id": "continent_oceania",
+      "continent_label": "Oceania",
+      "controller_feature_count": 1,
+      "display_name": "South Australia",
+      "display_name_en": "South Australia",
+      "display_name_zh": "南澳大利亚州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AU",
+      "notes": "",
+      "parent_owner_tag": "AST",
+      "parent_owner_tags": [
+        "AST"
+      ],
+      "primary_rule_source": "ausa_administration",
+      "provenance_iso2": "AU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ausa_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_australia_and_new_zealand",
+      "subregion_label": "Australia and New Zealand",
+      "synthetic_owner": false,
+      "tag": "AUSA"
+    },
+    "AUTS": {
+      "base_iso2": "AU",
+      "capital_state_id": null,
+      "color_hex": "#b66968",
+      "continent_id": "continent_oceania",
+      "continent_label": "Oceania",
+      "controller_feature_count": 1,
+      "display_name": "Tasmania",
+      "display_name_en": "Tasmania",
+      "display_name_zh": "塔斯马尼亚州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AU",
+      "notes": "",
+      "parent_owner_tag": "AST",
+      "parent_owner_tags": [
+        "AST"
+      ],
+      "primary_rule_source": "auts_administration",
+      "provenance_iso2": "AU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "auts_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_australia_and_new_zealand",
+      "subregion_label": "Australia and New Zealand",
+      "synthetic_owner": false,
+      "tag": "AUTS"
+    },
+    "AUVI": {
+      "base_iso2": "AU",
+      "capital_state_id": null,
+      "color_hex": "#cb6f8e",
+      "continent_id": "continent_oceania",
+      "continent_label": "Oceania",
+      "controller_feature_count": 1,
+      "display_name": "Victoria",
+      "display_name_en": "Victoria",
+      "display_name_zh": "维多利亚州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AU",
+      "notes": "",
+      "parent_owner_tag": "AST",
+      "parent_owner_tags": [
+        "AST"
+      ],
+      "primary_rule_source": "auvi_administration",
+      "provenance_iso2": "AU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "auvi_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_australia_and_new_zealand",
+      "subregion_label": "Australia and New Zealand",
+      "synthetic_owner": false,
+      "tag": "AUVI"
+    },
+    "AUWA": {
+      "base_iso2": "AU",
+      "capital_state_id": null,
+      "color_hex": "#dc7982",
+      "continent_id": "continent_oceania",
+      "continent_label": "Oceania",
+      "controller_feature_count": 2,
+      "display_name": "Western Australia",
+      "display_name_en": "Western Australia",
+      "display_name_zh": "西澳大利亚州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AU",
+      "notes": "",
+      "parent_owner_tag": "AST",
+      "parent_owner_tags": [
+        "AST"
+      ],
+      "primary_rule_source": "auwa_administration",
+      "provenance_iso2": "AU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "auwa_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_australia_and_new_zealand",
+      "subregion_label": "Australia and New Zealand",
+      "synthetic_owner": false,
+      "tag": "AUWA"
     },
     "BAH": {
       "base_iso2": "BH",
@@ -873,6 +1160,47 @@
       "synthetic_owner": false,
       "tag": "BOL"
     },
+    "BOR": {
+      "base_iso2": "ID",
+      "capital_state_id": null,
+      "color_hex": "#cb8e6b",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 5,
+      "display_name": "Dutch Borneo Debug Region",
+      "display_name_en": "Dutch Borneo Debug Region",
+      "display_name_zh": "荷属婆罗洲调试大区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ID",
+      "notes": "",
+      "parent_owner_tag": "INS",
+      "parent_owner_tags": [
+        "INS"
+      ],
+      "primary_rule_source": "bor_region",
+      "provenance_iso2": "ID",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "bor_region"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "BOR"
+    },
     "BOT": {
       "base_iso2": "BW",
       "capital_state_id": 542,
@@ -970,15 +1298,16 @@
       ],
       "lookup_iso2": "MM",
       "notes": "Burma separation from British Raj at runtime-country level.",
-      "parent_owner_tag": "ENG",
+      "parent_owner_tag": "RAJ",
       "parent_owner_tags": [
-        "ENG"
+        "RAJ"
       ],
       "primary_rule_source": "burma",
       "provenance_iso2": "MM",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "burma"
+        "burma",
+        "burma_parent_1936"
       ],
       "scenario_only": false,
       "source": "manual_rule",
@@ -1194,6 +1523,88 @@
       "synthetic_owner": false,
       "tag": "BYA"
     },
+    "CAAB": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#75384a",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 28,
+      "display_name": "Alberta",
+      "display_name_en": "Alberta",
+      "display_name_zh": "阿尔伯塔省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 28,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "caab_administration",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "caab_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "CAAB"
+    },
+    "CABC": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#943539",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 38,
+      "display_name": "British Columbia",
+      "display_name_en": "British Columbia",
+      "display_name_zh": "不列颠哥伦比亚省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 38,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "cabc_administration",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cabc_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "CABC"
+    },
     "CAM": {
       "base_iso2": "KH",
       "capital_state_id": null,
@@ -1235,18 +1646,59 @@
       "synthetic_owner": false,
       "tag": "CAM"
     },
+    "CAMB": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#b64c2f",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 9,
+      "display_name": "Manitoba",
+      "display_name_en": "Manitoba",
+      "display_name_zh": "马尼托巴省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 9,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "camb_administration",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "camb_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "CAMB"
+    },
     "CAN": {
       "base_iso2": "CA",
       "capital_state_id": 276,
       "color_hex": "#e93b3b",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
-      "controller_feature_count": 273,
+      "controller_feature_count": 4,
       "display_name": "Dominion of Canada",
       "display_name_en": "Dominion of Canada",
       "display_name_zh": "加拿大自治领",
       "entry_kind": "",
-      "feature_count": 273,
+      "feature_count": 4,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -1271,6 +1723,375 @@
       "subregion_label": "Northern America",
       "synthetic_owner": false,
       "tag": "CAN"
+    },
+    "CANB": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#ad5561",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 8,
+      "display_name": "New Brunswick",
+      "display_name_en": "New Brunswick",
+      "display_name_zh": "新不伦瑞克省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 8,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "canb_administration",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "canb_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "CANB"
+    },
+    "CANS": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#c4655a",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 10,
+      "display_name": "Nova Scotia",
+      "display_name_en": "Nova Scotia",
+      "display_name_zh": "新斯科舍省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 10,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "cans_administration",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cans_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "CANS"
+    },
+    "CAON": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#d76380",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 97,
+      "display_name": "Ontario",
+      "display_name_en": "Ontario",
+      "display_name_zh": "安大略省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 97,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "Ottawa parcel retained as the federal seat in this debug subdivision.",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "caon_administration",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "caon_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "CAON"
+    },
+    "CAPE": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#c88d8d",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 4,
+      "display_name": "Prince Edward Island",
+      "display_name_en": "Prince Edward Island",
+      "display_name_zh": "爱德华王子岛省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "cape_administration",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cape_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "CAPE"
+    },
+    "CAQC": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#daa998",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 62,
+      "display_name": "Quebec",
+      "display_name_en": "Quebec",
+      "display_name_zh": "魁北克省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 62,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "caqc_administration",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "caqc_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "CAQC"
+    },
+    "CASK": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#8a242f",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 13,
+      "display_name": "Saskatchewan",
+      "display_name_en": "Saskatchewan",
+      "display_name_zh": "萨斯卡彻温省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 13,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "cask_administration",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cask_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "CASK"
+    },
+    "CDE": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#a7bd79",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 4,
+      "display_name": "East Chahar Garrison",
+      "display_name_en": "East Chahar Garrison",
+      "display_name_zh": "察东警备区（李守信）",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Whole-parcel faction proxy based on T5 and HGO political divisions, not exclusive historical county control.",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "cde_debug_1936",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cde_debug_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "military_administration",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "CDE"
+    },
+    "CDX": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#2a8299",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Deng Xihou Clique",
+      "display_name_en": "Deng Xihou Clique",
+      "display_name_zh": "川军邓锡侯部",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Whole-parcel faction proxy based on T5 and HGO political divisions, not exclusive historical county control.",
+      "parent_owner_tag": "CHI",
+      "parent_owner_tags": [
+        "CHI"
+      ],
+      "primary_rule_source": "cdx_debug_1936",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cdx_debug_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "military_administration",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "CDX"
+    },
+    "CEL": {
+      "base_iso2": "ID",
+      "capital_state_id": null,
+      "color_hex": "#994d47",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 6,
+      "display_name": "Celebes Debug Region",
+      "display_name_en": "Celebes Debug Region",
+      "display_name_zh": "西里伯斯调试大区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ID",
+      "notes": "",
+      "parent_owner_tag": "INS",
+      "parent_owner_tags": [
+        "INS"
+      ],
+      "primary_rule_source": "cel_region",
+      "provenance_iso2": "ID",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cel_region"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "CEL"
     },
     "CEY": {
       "base_iso2": "LK",
@@ -1361,9 +2182,9 @@
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 14,
-      "display_name": "Chechen-Ingush ASSR",
-      "display_name_en": "Chechen-Ingush ASSR",
-      "display_name_zh": "车臣-印古什自治共和国",
+      "display_name": "Chechen-Ingush Autonomous Oblast",
+      "display_name_en": "Chechen-Ingush Autonomous Oblast",
+      "display_name_zh": "车臣-印古什自治州",
       "entry_kind": "scenario_subject",
       "feature_count": 14,
       "featured": false,
@@ -1381,7 +2202,8 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "chechen_ingush_assr"
+        "chechen_ingush_assr",
+        "che_autonomous_oblast_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -1389,7 +2211,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "autonomous_republic",
+      "subject_kind": "autonomous_oblast",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
@@ -1401,12 +2223,12 @@
       "color_hex": "#28288c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 691,
+      "controller_feature_count": 710,
       "display_name": "Republic of China",
       "display_name_en": "Republic of China",
       "display_name_zh": "中华民国",
       "entry_kind": "",
-      "feature_count": 691,
+      "feature_count": 710,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -1419,7 +2241,12 @@
       "primary_rule_source": "",
       "provenance_iso2": "CN",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "gansu_return_1936",
+        "southern_ningxia_return_1936",
+        "yanan_return_1936",
+        "northern_shaanxi_return_1936"
+      ],
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -1475,12 +2302,12 @@
       "color_hex": "#006080",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 165,
+      "controller_feature_count": 158,
       "display_name": "Sichuan Clique",
       "display_name_en": "Sichuan Clique",
       "display_name_zh": "四川军阀",
       "entry_kind": "",
-      "feature_count": 165,
+      "feature_count": 158,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -1494,7 +2321,8 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "chu_sichuan_clique"
+        "chu_sichuan_clique",
+        "yaan_return_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -1705,6 +2533,47 @@
       "synthetic_owner": false,
       "tag": "CRM"
     },
+    "CSZ": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#3c7791",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 4,
+      "display_name": "Sun Zhen Clique",
+      "display_name_en": "Sun Zhen Clique",
+      "display_name_zh": "川军孙震部",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Whole-parcel faction proxy based on T5 and HGO political divisions, not exclusive historical county control.",
+      "parent_owner_tag": "CHI",
+      "parent_owner_tags": [
+        "CHI"
+      ],
+      "primary_rule_source": "csz_debug_1936",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "csz_debug_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "military_administration",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "CSZ"
+    },
     "CUB": {
       "base_iso2": "CU",
       "capital_state_id": 315,
@@ -1823,6 +2692,47 @@
       "subregion_label": "Western Asia",
       "synthetic_owner": false,
       "tag": "CYP"
+    },
+    "CYS": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#527f89",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 5,
+      "display_name": "Yang Sen Clique",
+      "display_name_en": "Yang Sen Clique",
+      "display_name_zh": "川军杨森部",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Whole-parcel faction proxy based on T5 and HGO political divisions, not exclusive historical county control.",
+      "parent_owner_tag": "CHI",
+      "parent_owner_tags": [
+        "CHI"
+      ],
+      "primary_rule_source": "cys_debug_1936",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cys_debug_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "military_administration",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "CYS"
     },
     "CZE": {
       "base_iso2": "CZ",
@@ -2023,6 +2933,47 @@
       "subregion_label": "Eastern Africa",
       "synthetic_owner": false,
       "tag": "DJI"
+    },
+    "DMC": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#8fa96a",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Mongol Local Autonomy Political Council",
+      "display_name_en": "Mongol Local Autonomy Political Council",
+      "display_name_zh": "蒙古地方自治政务委员会",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Whole-parcel faction proxy based on T5 and HGO political divisions, not exclusive historical county control.",
+      "parent_owner_tag": "CHI",
+      "parent_owner_tags": [
+        "CHI"
+      ],
+      "primary_rule_source": "dmc_debug_1936",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "dmc_debug_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "military_administration",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "DMC"
     },
     "DNZ": {
       "base_iso2": "PL",
@@ -2225,12 +3176,12 @@
       "color_hex": "#f7b08f",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 18,
+      "controller_feature_count": 26,
       "display_name": "East Hebei Autonomous Council",
       "display_name_en": "East Hebei Autonomous Council",
       "display_name_zh": "冀东防共自治政府",
       "entry_kind": "scenario_subject",
-      "feature_count": 18,
+      "feature_count": 26,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -2246,7 +3197,8 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "east_hebei"
+        "east_hebei",
+        "east_hebei_counties_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -2945,12 +3897,12 @@
       "color_hex": "#a16a39",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 83,
-      "display_name": "Gansu Ma Clique",
-      "display_name_en": "Gansu Ma Clique",
-      "display_name_zh": "甘肃马家军",
+      "controller_feature_count": 23,
+      "display_name": "Hexi Ma Clique",
+      "display_name_en": "Hexi Ma Clique",
+      "display_name_zh": "河西马家军",
       "entry_kind": "",
-      "feature_count": 83,
+      "feature_count": 23,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -2964,7 +3916,8 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "gansu_ma_clique"
+        "gansu_ma_clique",
+        "hexi_ma_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3138,6 +4091,47 @@
       "synthetic_owner": true,
       "tag": "GRN"
     },
+    "GSG": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#596aa1",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 2,
+      "display_name": "Gansu Provincial Government",
+      "display_name_en": "Gansu Provincial Government",
+      "display_name_zh": "甘肃省政府（于学忠）",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Whole-parcel faction proxy based on T5 and HGO political divisions, not exclusive historical county control.",
+      "parent_owner_tag": "CHI",
+      "parent_owner_tags": [
+        "CHI"
+      ],
+      "primary_rule_source": "gsg_debug_1936",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "gsg_debug_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "military_administration",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "GSG"
+    },
     "GUA": {
       "base_iso2": "GT",
       "capital_state_id": 313,
@@ -3181,12 +4175,12 @@
       "color_hex": "#477161",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 59,
+      "controller_feature_count": 54,
       "display_name": "New Guangxi Clique",
       "display_name_en": "New Guangxi Clique",
       "display_name_zh": "新桂系",
       "entry_kind": "",
-      "feature_count": 59,
+      "feature_count": 54,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -3298,12 +4292,12 @@
       "color_hex": "#5d6fb3",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 113,
+      "controller_feature_count": 103,
       "display_name": "Hebei-Chahar Political Council",
       "display_name_en": "Hebei-Chahar Political Council",
       "display_name_zh": "冀察政务委员会",
       "entry_kind": "",
-      "feature_count": 113,
+      "feature_count": 103,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -3608,12 +4602,12 @@
       "color_hex": "#b05a46",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 34,
+      "controller_feature_count": 6,
       "display_name": "Dutch East Indies",
       "display_name_en": "Dutch East Indies",
       "display_name_zh": "荷属东印度",
       "entry_kind": "scenario_subject",
-      "feature_count": 34,
+      "feature_count": 6,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -3959,7 +4953,7 @@
     "KAZ": {
       "base_iso2": "KZ",
       "capital_state_id": null,
-      "color_hex": "#ab5912",
+      "color_hex": "#d91745",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 16,
@@ -4004,9 +4998,9 @@
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 3,
-      "display_name": "Kabardino-Balkar ASSR",
-      "display_name_en": "Kabardino-Balkar ASSR",
-      "display_name_zh": "卡巴尔达-巴尔卡尔自治共和国",
+      "display_name": "Kabardino-Balkar Autonomous Oblast",
+      "display_name_en": "Kabardino-Balkar Autonomous Oblast",
+      "display_name_zh": "卡巴尔达-巴尔卡尔自治州",
       "entry_kind": "scenario_subject",
       "feature_count": 3,
       "featured": false,
@@ -4024,7 +5018,8 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "kabardino_balkar_assr"
+        "kabardino_balkar_assr",
+        "kba_autonomous_oblast_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -4032,7 +5027,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "autonomous_republic",
+      "subject_kind": "autonomous_oblast",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
@@ -4044,12 +5039,12 @@
       "color_hex": "#9c7a3c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 21,
-      "display_name": "Khotan Emirate",
-      "display_name_en": "Khotan Emirate",
-      "display_name_zh": "和阗马虎山政权",
+      "controller_feature_count": 9,
+      "display_name": "Khotan Military Administration",
+      "display_name_en": "Khotan Military Administration",
+      "display_name_zh": "和阗军政区",
       "entry_kind": "",
-      "feature_count": 21,
+      "feature_count": 9,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -4125,9 +5120,9 @@
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 19,
-      "display_name": "Komi ASSR",
-      "display_name_en": "Komi ASSR",
-      "display_name_zh": "科米自治共和国",
+      "display_name": "Komi Autonomous Oblast",
+      "display_name_en": "Komi Autonomous Oblast",
+      "display_name_zh": "科米自治州",
       "entry_kind": "scenario_subject",
       "feature_count": 19,
       "featured": false,
@@ -4145,7 +5140,8 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "komi_assr"
+        "komi_assr",
+        "kom_autonomous_oblast_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -4153,7 +5149,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "autonomous_republic",
+      "subject_kind": "autonomous_oblast",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
@@ -4329,12 +5325,12 @@
       "color_hex": "#fcab9c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 9,
+      "controller_feature_count": 1,
       "display_name": "Kwantung Leased Territory",
       "display_name_en": "Kwantung Leased Territory",
       "display_name_zh": "关东州",
       "entry_kind": "scenario_subject",
-      "feature_count": 9,
+      "feature_count": 1,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -4367,7 +5363,7 @@
     "KYR": {
       "base_iso2": "KG",
       "capital_state_id": null,
-      "color_hex": "#8f0f76",
+      "color_hex": "#86130e",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 8,
@@ -4680,6 +5676,47 @@
       "synthetic_owner": false,
       "tag": "LIT"
     },
+    "LSI": {
+      "base_iso2": "ID",
+      "capital_state_id": null,
+      "color_hex": "#d49b8a",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Lesser Sunda Debug Region",
+      "display_name_en": "Lesser Sunda Debug Region",
+      "display_name_zh": "小巽他调试大区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ID",
+      "notes": "",
+      "parent_owner_tag": "INS",
+      "parent_owner_tags": [
+        "INS"
+      ],
+      "primary_rule_source": "lsi_region",
+      "provenance_iso2": "ID",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "lsi_region"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "LSI"
+    },
     "LUQ": {
       "base_iso2": "CN",
       "capital_state_id": null,
@@ -4845,12 +5882,12 @@
       "color_hex": "#ff7847",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 226,
+      "controller_feature_count": 234,
       "display_name": "Empire of Manchukuo",
       "display_name_en": "Empire of Manchukuo",
       "display_name_zh": "满洲帝国",
       "entry_kind": "scenario_subject",
-      "feature_count": 226,
+      "feature_count": 234,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -4867,7 +5904,9 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "manchukuo",
-        "manchukuo_parent"
+        "manchukuo_parent",
+        "kwantung_return",
+        "qinglong_return"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -5008,12 +6047,12 @@
       "color_hex": "#b9ff98",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 23,
-      "display_name": "Mongol United Autonomous Government",
-      "display_name_en": "Mongol United Autonomous Government",
-      "display_name_zh": "蒙古联合自治政府",
+      "controller_feature_count": 19,
+      "display_name": "Chahar Mongol Banner Administrations",
+      "display_name_en": "Chahar Mongol Banner Administrations",
+      "display_name_zh": "察哈尔蒙古旗政区",
       "entry_kind": "",
-      "feature_count": 23,
+      "feature_count": 19,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -5027,7 +6066,8 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "mengjiang"
+        "mengjiang",
+        "mongol_banners_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -5114,6 +6154,47 @@
       "subregion_label": "Southern Asia",
       "synthetic_owner": true,
       "tag": "MLD"
+    },
+    "MLK": {
+      "base_iso2": "ID",
+      "capital_state_id": null,
+      "color_hex": "#a15555",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 2,
+      "display_name": "Moluccas Debug Region",
+      "display_name_en": "Moluccas Debug Region",
+      "display_name_zh": "马鲁古调试大区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ID",
+      "notes": "",
+      "parent_owner_tag": "INS",
+      "parent_owner_tags": [
+        "INS"
+      ],
+      "primary_rule_source": "mlk_region",
+      "provenance_iso2": "ID",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mlk_region"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "MLK"
     },
     "MLT": {
       "base_iso2": "MT",
@@ -5284,7 +6365,7 @@
       "controller_feature_count": 9,
       "display_name": "Mordovian ASSR",
       "display_name_en": "Mordovian ASSR",
-      "display_name_zh": "莫尔多瓦自治共和国",
+      "display_name_zh": "莫尔多维亚自治共和国",
       "entry_kind": "scenario_subject",
       "feature_count": 9,
       "featured": false,
@@ -5323,9 +6404,9 @@
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 9,
-      "display_name": "Mari ASSR",
-      "display_name_en": "Mari ASSR",
-      "display_name_zh": "马里自治共和国",
+      "display_name": "Mari Autonomous Oblast",
+      "display_name_en": "Mari Autonomous Oblast",
+      "display_name_zh": "马里自治州",
       "entry_kind": "scenario_subject",
       "feature_count": 9,
       "featured": false,
@@ -5343,7 +6424,8 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "mari_assr"
+        "mari_assr",
+        "mre_autonomous_oblast_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -5351,7 +6433,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "autonomous_republic",
+      "subject_kind": "autonomous_oblast",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
@@ -5363,12 +6445,12 @@
       "color_hex": "#da78c8",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 3,
+      "controller_feature_count": 2,
       "display_name": "Mauritius",
       "display_name_en": "Mauritius",
       "display_name_zh": "毛里求斯",
       "entry_kind": "scenario_subject",
-      "feature_count": 3,
+      "feature_count": 2,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -5521,6 +6603,47 @@
       "synthetic_owner": false,
       "tag": "NBO"
     },
+    "NEA": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#637caf",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Northeastern Army in Shaanxi-Gansu",
+      "display_name_en": "Northeastern Army in Shaanxi-Gansu",
+      "display_name_zh": "东北军陕甘驻防区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Whole-parcel faction proxy based on T5 and HGO political divisions, not exclusive historical county control.",
+      "parent_owner_tag": "CHI",
+      "parent_owner_tags": [
+        "CHI"
+      ],
+      "primary_rule_source": "nea_debug_1936",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "nea_debug_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "military_administration",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "NEA"
+    },
     "NEP": {
       "base_iso2": "NP",
       "capital_state_id": 323,
@@ -5598,6 +6721,47 @@
       "subregion_label": "Northern America",
       "synthetic_owner": false,
       "tag": "NFL"
+    },
+    "NGN": {
+      "base_iso2": "PG",
+      "capital_state_id": null,
+      "color_hex": "#e5a6b9",
+      "continent_id": "continent_oceania",
+      "continent_label": "Oceania",
+      "controller_feature_count": 13,
+      "display_name": "Territory of New Guinea",
+      "display_name_en": "Territory of New Guinea",
+      "display_name_zh": "新几内亚委任统治地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 13,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PG",
+      "notes": "Modern province proxies; highland boundaries require later geometry splits.",
+      "parent_owner_tag": "AST",
+      "parent_owner_tags": [
+        "AST"
+      ],
+      "primary_rule_source": "ngn_territory",
+      "provenance_iso2": "PG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ngn_territory"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "mandate",
+      "subregion_id": "subregion_melanesia",
+      "subregion_label": "Melanesia",
+      "synthetic_owner": false,
+      "tag": "NGN"
     },
     "NGR": {
       "base_iso2": "NE",
@@ -5721,9 +6885,9 @@
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 8,
-      "display_name": "North Ossetian ASSR",
-      "display_name_en": "North Ossetian ASSR",
-      "display_name_zh": "北奥塞梯自治共和国",
+      "display_name": "North Ossetian Autonomous Oblast",
+      "display_name_en": "North Ossetian Autonomous Oblast",
+      "display_name_zh": "北奥塞梯自治州",
       "entry_kind": "scenario_subject",
       "feature_count": 8,
       "featured": false,
@@ -5741,7 +6905,8 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "north_ossetian_assr"
+        "north_ossetian_assr",
+        "nos_autonomous_oblast_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -5749,7 +6914,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "autonomous_republic",
+      "subject_kind": "autonomous_oblast",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
@@ -5795,6 +6960,47 @@
       "subregion_label": "Eastern Africa",
       "synthetic_owner": false,
       "tag": "NRH"
+    },
+    "NWA": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#435ba0",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 25,
+      "display_name": "Northwestern Army Administration",
+      "display_name_en": "Northwestern Army Administration",
+      "display_name_zh": "西北军（杨虎城）",
+      "entry_kind": "scenario_subject",
+      "feature_count": 25,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Guanzhong-Hanzhong faction proxy; overlapping garrisons are not separate sovereign territories.",
+      "parent_owner_tag": "CHI",
+      "parent_owner_tags": [
+        "CHI"
+      ],
+      "primary_rule_source": "northwestern_army_1936",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "northwestern_army_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "military_administration",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "NWA"
     },
     "NYS": {
       "base_iso2": "MW",
@@ -5988,6 +7194,47 @@
       "subregion_label": "Central America",
       "synthetic_owner": false,
       "tag": "PAN"
+    },
+    "PAP": {
+      "base_iso2": "PG",
+      "capital_state_id": null,
+      "color_hex": "#b45073",
+      "continent_id": "continent_oceania",
+      "continent_label": "Oceania",
+      "controller_feature_count": 7,
+      "display_name": "Territory of Papua",
+      "display_name_en": "Territory of Papua",
+      "display_name_zh": "巴布亚领地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 7,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PG",
+      "notes": "Modern province proxies; highland boundaries require later geometry splits.",
+      "parent_owner_tag": "AST",
+      "parent_owner_tags": [
+        "AST"
+      ],
+      "primary_rule_source": "pap_territory",
+      "provenance_iso2": "PG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "pap_territory"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "territory",
+      "subregion_id": "subregion_melanesia",
+      "subregion_label": "Melanesia",
+      "synthetic_owner": false,
+      "tag": "PAP"
     },
     "PAR": {
       "base_iso2": "PY",
@@ -6229,12 +7476,12 @@
       "color_hex": "#f50c37",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 17,
+      "controller_feature_count": 18,
       "display_name": "Chinese Soviet Republic",
       "display_name_en": "Chinese Soviet Republic",
       "display_name_zh": "中华苏维埃共和国",
       "entry_kind": "",
-      "feature_count": 17,
+      "feature_count": 18,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -6248,7 +7495,10 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "communist_china_shaanbei"
+        "communist_china_shaanbei",
+        "huachi_soviet_1936",
+        "wayaobao_soviet_1936",
+        "red_fourth_army_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -6670,12 +7920,12 @@
       "color_hex": "#d7697d",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 22,
+      "controller_feature_count": 9,
       "display_name": "Union of South Africa",
       "display_name_en": "Union of South Africa",
       "display_name_zh": "南非联邦",
       "entry_kind": "scenario_subject",
-      "feature_count": 22,
+      "feature_count": 9,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -6742,6 +7992,47 @@
       "synthetic_owner": false,
       "tag": "SAU"
     },
+    "SEY": {
+      "base_iso2": "SC",
+      "capital_state_id": null,
+      "color_hex": "#bd809b",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Seychelles",
+      "display_name_en": "Seychelles",
+      "display_name_zh": "塞舌尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SC",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "seychelles_return",
+      "provenance_iso2": "SC",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "seychelles_return"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "SEY"
+    },
     "SGN": {
       "base_iso2": "GQ",
       "capital_state_id": null,
@@ -6789,12 +8080,12 @@
       "color_hex": "#52020f",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 97,
+      "controller_feature_count": 99,
       "display_name": "Shanxi Clique",
       "display_name_en": "Shanxi Clique",
       "display_name_zh": "山西军阀",
       "entry_kind": "",
-      "feature_count": 97,
+      "feature_count": 99,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -6808,7 +8099,8 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "shanxi_warlord"
+        "shanxi_warlord",
+        "suiyuan_return_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -6865,12 +8157,12 @@
       "color_hex": "#006080",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 26,
-      "display_name": "Xikang Clique",
-      "display_name_en": "Xikang Clique",
-      "display_name_zh": "西康军阀（刘文辉）",
+      "controller_feature_count": 18,
+      "display_name": "Xikang Administration",
+      "display_name_en": "Xikang Administration",
+      "display_name_zh": "西康军政区（刘文辉）",
       "entry_kind": "",
-      "feature_count": 26,
+      "feature_count": 18,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -6945,12 +8237,12 @@
       "color_hex": "#47be98",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 66,
+      "controller_feature_count": 78,
       "display_name": "Xinjiang Provincial Government",
       "display_name_en": "Xinjiang Provincial Government",
       "display_name_zh": "新疆省政府",
       "entry_kind": "",
-      "feature_count": 66,
+      "feature_count": 78,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -6964,7 +8256,8 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "sinkiang"
+        "sinkiang",
+        "khotan_ma_return"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -7465,6 +8758,47 @@
       "synthetic_owner": false,
       "tag": "SUD"
     },
+    "SUM": {
+      "base_iso2": "ID",
+      "capital_state_id": null,
+      "color_hex": "#b86d4c",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 10,
+      "display_name": "Sumatra Debug Region",
+      "display_name_en": "Sumatra Debug Region",
+      "display_name_zh": "苏门答腊调试大区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 10,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ID",
+      "notes": "",
+      "parent_owner_tag": "INS",
+      "parent_owner_tags": [
+        "INS"
+      ],
+      "primary_rule_source": "sum_region",
+      "provenance_iso2": "ID",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "sum_region"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "SUM"
+    },
     "SUR": {
       "base_iso2": "SR",
       "capital_state_id": null,
@@ -7505,6 +8839,47 @@
       "subregion_label": "South America",
       "synthetic_owner": false,
       "tag": "SUR"
+    },
+    "SWA": {
+      "base_iso2": "NA",
+      "capital_state_id": null,
+      "color_hex": "#bd586b",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 13,
+      "display_name": "South West Africa",
+      "display_name_en": "South West Africa",
+      "display_name_zh": "西南非洲",
+      "entry_kind": "scenario_subject",
+      "feature_count": 13,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "NA",
+      "notes": "Modern Namibia proxy; Walvis Bay requires a later geometry split.",
+      "parent_owner_tag": "SAF",
+      "parent_owner_tags": [
+        "SAF"
+      ],
+      "primary_rule_source": "south_west_africa",
+      "provenance_iso2": "NA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "south_west_africa"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "mandate",
+      "subregion_id": "subregion_southern_africa",
+      "subregion_label": "Southern Africa",
+      "synthetic_owner": false,
+      "tag": "SWA"
     },
     "SWE": {
       "base_iso2": "SE",
@@ -8484,9 +9859,9 @@
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 13,
-      "display_name": "Upper Volta",
-      "display_name_en": "Upper Volta",
-      "display_name_zh": "上沃尔特",
+      "display_name": "Upper Volta Debug Region",
+      "display_name_en": "Upper Volta Debug Region",
+      "display_name_zh": "上沃尔特地区（调试分区）",
       "entry_kind": "scenario_subject",
       "feature_count": 13,
       "featured": false,
@@ -8495,7 +9870,7 @@
         "extended"
       ],
       "lookup_iso2": "BF",
-      "notes": "",
+      "notes": "Upper Volta was abolished in 1932–1947; retained solely as a debug subdivision.",
       "parent_owner_tag": "FRA",
       "parent_owner_tags": [
         "FRA"
@@ -8512,7 +9887,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "colony",
+      "subject_kind": "administrative_region",
       "subregion_id": "subregion_western_africa",
       "subregion_label": "Western Africa",
       "synthetic_owner": false,
@@ -8561,12 +9936,12 @@
       "color_hex": "#1485ed",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
-      "controller_feature_count": 817,
+      "controller_feature_count": 1,
       "display_name": "United States of America",
       "display_name_en": "United States of America",
       "display_name_zh": "美利坚合众国",
       "entry_kind": "",
-      "feature_count": 817,
+      "feature_count": 1,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -8591,6 +9966,1974 @@
       "subregion_label": "Northern America",
       "synthetic_owner": false,
       "tag": "USA"
+    },
+    "USAL": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#a0c3d1",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 11,
+      "display_name": "Alabama",
+      "display_name_en": "Alabama",
+      "display_name_zh": "亚拉巴马州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 11,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usal_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usal_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USAL"
+    },
+    "USAR": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#2989a0",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 6,
+      "display_name": "Arkansas",
+      "display_name_en": "Arkansas",
+      "display_name_zh": "阿肯色州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usar_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usar_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USAR"
+    },
+    "USAZ": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#2e537f",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 15,
+      "display_name": "Arizona",
+      "display_name_en": "Arizona",
+      "display_name_zh": "亚利桑那州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 15,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usaz_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usaz_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USAZ"
+    },
+    "USCA": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#4b779b",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 58,
+      "display_name": "California",
+      "display_name_en": "California",
+      "display_name_zh": "加利福尼亚州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 58,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usca_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usca_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USCA"
+    },
+    "USCO": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#456abc",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 14,
+      "display_name": "Colorado",
+      "display_name_en": "Colorado",
+      "display_name_zh": "科罗拉多州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 14,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usco_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usco_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USCO"
+    },
+    "USCT": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#4da5d1",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 9,
+      "display_name": "Connecticut",
+      "display_name_en": "Connecticut",
+      "display_name_zh": "康涅狄格州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 9,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usct_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usct_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USCT"
+    },
+    "USDE": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#7a97bf",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 3,
+      "display_name": "Delaware",
+      "display_name_en": "Delaware",
+      "display_name_zh": "特拉华州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usde_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usde_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USDE"
+    },
+    "USFL": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#83c0d2",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 67,
+      "display_name": "Florida",
+      "display_name_en": "Florida",
+      "display_name_zh": "佛罗里达州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 67,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usfl_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usfl_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USFL"
+    },
+    "USGA": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#90bbe2",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 19,
+      "display_name": "Georgia",
+      "display_name_en": "Georgia",
+      "display_name_zh": "佐治亚州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 19,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usga_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usga_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USGA"
+    },
+    "USIA": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#5596ad",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 7,
+      "display_name": "Iowa",
+      "display_name_en": "Iowa",
+      "display_name_zh": "艾奥瓦州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 7,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usia_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usia_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USIA"
+    },
+    "USID": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#384975",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 9,
+      "display_name": "Idaho",
+      "display_name_en": "Idaho",
+      "display_name_zh": "爱达荷州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 9,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usid_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usid_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USID"
+    },
+    "USIL": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#357194",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 22,
+      "display_name": "Illinois",
+      "display_name_en": "Illinois",
+      "display_name_zh": "伊利诺伊州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 22,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usil_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usil_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USIL"
+    },
+    "USIN": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#2f62b6",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 13,
+      "display_name": "Indiana",
+      "display_name_en": "Indiana",
+      "display_name_zh": "印第安纳州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 13,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usin_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usin_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USIN"
+    },
+    "USKS": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#5a8dc4",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 6,
+      "display_name": "Kansas",
+      "display_name_en": "Kansas",
+      "display_name_zh": "堪萨斯州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usks_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usks_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USKS"
+    },
+    "USKY": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#637ed7",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 12,
+      "display_name": "Kentucky",
+      "display_name_en": "Kentucky",
+      "display_name_zh": "肯塔基州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 12,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usky_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usky_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USKY"
+    },
+    "USLA": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#8db0c8",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 13,
+      "display_name": "Louisiana",
+      "display_name_en": "Louisiana",
+      "display_name_zh": "路易斯安那州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 13,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usla_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usla_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USLA"
+    },
+    "USMA": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#416188",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 14,
+      "display_name": "Massachusetts",
+      "display_name_en": "Massachusetts",
+      "display_name_zh": "马萨诸塞州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 14,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usma_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usma_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USMA"
+    },
+    "USMD": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#246b8a",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 14,
+      "display_name": "Maryland",
+      "display_name_en": "Maryland",
+      "display_name_zh": "马里兰州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 14,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usmd_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usmd_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USMD"
+    },
+    "USME": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#98aeda",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 6,
+      "display_name": "Maine",
+      "display_name_en": "Maine",
+      "display_name_zh": "缅因州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usme_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usme_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USME"
+    },
+    "USMI": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#3d94a9",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 22,
+      "display_name": "Michigan",
+      "display_name_en": "Michigan",
+      "display_name_zh": "密歇根州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 22,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usmi_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usmi_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USMI"
+    },
+    "USMN": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#3689cb",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 16,
+      "display_name": "Minnesota",
+      "display_name_en": "Minnesota",
+      "display_name_zh": "明尼苏达州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 16,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usmn_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usmn_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USMN"
+    },
+    "USMO": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#6faccb",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 13,
+      "display_name": "Missouri",
+      "display_name_en": "Missouri",
+      "display_name_zh": "密苏里州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 13,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usmo_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usmo_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USMO"
+    },
+    "USMS": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#687fb6",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 8,
+      "display_name": "Mississippi",
+      "display_name_en": "Mississippi",
+      "display_name_zh": "密西西比州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 8,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usms_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usms_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USMS"
+    },
+    "USMT": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#79a2dc",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 5,
+      "display_name": "Montana",
+      "display_name_en": "Montana",
+      "display_name_zh": "蒙大拿州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usmt_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usmt_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USMT"
+    },
+    "USNC": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#7a9cbf",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 19,
+      "display_name": "North Carolina",
+      "display_name_en": "North Carolina",
+      "display_name_zh": "北卡罗来纳州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 19,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usnc_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usnc_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USNC"
+    },
+    "USND": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#8396d2",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 4,
+      "display_name": "North Dakota",
+      "display_name_en": "North Dakota",
+      "display_name_zh": "北达科他州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usnd_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usnd_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USND"
+    },
+    "USNE": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#a0c6d1",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 6,
+      "display_name": "Nebraska",
+      "display_name_en": "Nebraska",
+      "display_name_zh": "内布拉斯加州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usne_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usne_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USNE"
+    },
+    "USNH": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#2949a0",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 6,
+      "display_name": "New Hampshire",
+      "display_name_en": "New Hampshire",
+      "display_name_zh": "新罕布什尔州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usnh_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usnh_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USNH"
+    },
+    "USNJ": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#4b7d9b",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 17,
+      "display_name": "New Jersey",
+      "display_name_en": "New Jersey",
+      "display_name_zh": "新泽西州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 17,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usnj_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usnj_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USNJ"
+    },
+    "USNM": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#4572bc",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 7,
+      "display_name": "New Mexico",
+      "display_name_en": "New Mexico",
+      "display_name_zh": "新墨西哥州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 7,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usnm_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usnm_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USNM"
+    },
+    "USNV": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#2e587f",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 10,
+      "display_name": "Nevada",
+      "display_name_en": "Nevada",
+      "display_name_zh": "内华达州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 10,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usnv_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usnv_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USNV"
+    },
+    "USNY": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#4daed1",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 25,
+      "display_name": "New York",
+      "display_name_en": "New York",
+      "display_name_zh": "纽约州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 25,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usny_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usny_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USNY"
+    },
+    "USOH": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#90c1e2",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 21,
+      "display_name": "Ohio",
+      "display_name_en": "Ohio",
+      "display_name_zh": "俄亥俄州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 21,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usoh_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usoh_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USOH"
+    },
+    "USOK": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#384d75",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 8,
+      "display_name": "Oklahoma",
+      "display_name_en": "Oklahoma",
+      "display_name_zh": "俄克拉何马州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 8,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usok_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usok_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USOK"
+    },
+    "USOR": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#357894",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 13,
+      "display_name": "Oregon",
+      "display_name_en": "Oregon",
+      "display_name_zh": "俄勒冈州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 13,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usor_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usor_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USOR"
+    },
+    "USPA": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#2f6cb6",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 20,
+      "display_name": "Pennsylvania",
+      "display_name_en": "Pennsylvania",
+      "display_name_zh": "宾夕法尼亚州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 20,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "uspa_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "uspa_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USPA"
+    },
+    "USRI": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#559cad",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 5,
+      "display_name": "Rhode Island",
+      "display_name_en": "Rhode Island",
+      "display_name_zh": "罗得岛州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usri_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usri_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USRI"
+    },
+    "USSC": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#5a95c4",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 10,
+      "display_name": "South Carolina",
+      "display_name_en": "South Carolina",
+      "display_name_zh": "南卡罗来纳州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 10,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "ussc_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ussc_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USSC"
+    },
+    "USSD": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#6386d7",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 4,
+      "display_name": "South Dakota",
+      "display_name_en": "South Dakota",
+      "display_name_zh": "南达科他州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "ussd_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ussd_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USSD"
+    },
+    "USTN": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#8db5c8",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 14,
+      "display_name": "Tennessee",
+      "display_name_en": "Tennessee",
+      "display_name_zh": "田纳西州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 14,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "ustn_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ustn_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USTN"
+    },
+    "USTX": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#98b3da",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 168,
+      "display_name": "Texas",
+      "display_name_en": "Texas",
+      "display_name_zh": "得克萨斯州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 168,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "ustx_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ustx_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USTX"
+    },
+    "USUT": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#24738a",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 6,
+      "display_name": "Utah",
+      "display_name_en": "Utah",
+      "display_name_zh": "犹他州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usut_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usut_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USUT"
+    },
+    "USVA": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#3d5aa9",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 26,
+      "display_name": "Virginia",
+      "display_name_en": "Virginia",
+      "display_name_zh": "弗吉尼亚州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 26,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usva_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usva_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USVA"
+    },
+    "USVT": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#416688",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 3,
+      "display_name": "Vermont",
+      "display_name_en": "Vermont",
+      "display_name_zh": "佛蒙特州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "usvt_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "usvt_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USVT"
+    },
+    "USWA": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#3694cb",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 17,
+      "display_name": "Washington",
+      "display_name_en": "Washington",
+      "display_name_zh": "华盛顿州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 17,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "uswa_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "uswa_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USWA"
+    },
+    "USWI": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#6fb3cb",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 16,
+      "display_name": "Wisconsin",
+      "display_name_en": "Wisconsin",
+      "display_name_zh": "威斯康星州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 16,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "uswi_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "uswi_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USWI"
+    },
+    "USWV": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#6885b6",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 6,
+      "display_name": "West Virginia",
+      "display_name_en": "West Virginia",
+      "display_name_zh": "西弗吉尼亚州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "uswv_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "uswv_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USWV"
+    },
+    "USWY": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#79a9dc",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 3,
+      "display_name": "Wyoming",
+      "display_name_en": "Wyoming",
+      "display_name_zh": "怀俄明州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "uswy_administration",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "uswy_administration"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "state",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "USWY"
     },
     "UZB": {
       "base_iso2": "UZ",
@@ -8712,18 +12055,59 @@
       "synthetic_owner": false,
       "tag": "VIN"
     },
+    "WNG": {
+      "base_iso2": "ID",
+      "capital_state_id": null,
+      "color_hex": "#c27a64",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 2,
+      "display_name": "Dutch New Guinea Debug Region",
+      "display_name_en": "Dutch New Guinea Debug Region",
+      "display_name_zh": "荷属新几内亚调试大区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ID",
+      "notes": "",
+      "parent_owner_tag": "INS",
+      "parent_owner_tags": [
+        "INS"
+      ],
+      "primary_rule_source": "wng_region",
+      "provenance_iso2": "ID",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "wng_region"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "WNG"
+    },
     "XSM": {
       "base_iso2": "CN",
       "capital_state_id": 754,
       "color_hex": "#695a84",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 24,
+      "controller_feature_count": 18,
       "display_name": "Northwestern Ma Clique",
       "display_name_en": "Northwestern Ma Clique",
       "display_name_zh": "西北马家军",
       "entry_kind": "",
-      "feature_count": 24,
+      "feature_count": 18,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -8798,12 +12182,12 @@
       "color_hex": "#9b656b",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 21,
+      "controller_feature_count": 20,
       "display_name": "Mutawakkilite Kingdom of Yemen",
       "display_name_en": "Mutawakkilite Kingdom of Yemen",
       "display_name_zh": "也门穆塔瓦基利亚王国",
       "entry_kind": "",
-      "feature_count": 21,
+      "feature_count": 20,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -8876,12 +12260,12 @@
       "color_hex": "#3f9a63",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 95,
+      "controller_feature_count": 118,
       "display_name": "Guangdong Clique",
       "display_name_en": "Guangdong Clique",
       "display_name_zh": "广东军阀",
       "entry_kind": "",
-      "feature_count": 95,
+      "feature_count": 118,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -8895,7 +12279,8 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "yue_guangdong_clique"
+        "yue_guangdong_clique",
+        "hainan_qinlian_return_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
