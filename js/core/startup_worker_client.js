@@ -31,11 +31,11 @@ const createStartupWorkerTaskClient = () => createWorkerTaskClient({
   createWorker: () => new Worker(STARTUP_WORKER_URL),
   createTaskId: (type) => `${type}:${Date.now()}:${++taskCounter}`,
   resolveTimeoutMs: resolveTaskTimeoutMs,
-  resolveMessage: (message) => {
+  resolveMessage: async (message) => {
     if (!message.geometryTransport) return message;
     const startedAt = performance.now();
     const { field, payload } = message.geometryTransport;
-    const value = globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(payload);
+    const value = await globalThis.__scenarioForgeGeometryTransferCodecShared.unpackAsync(payload);
     return { ...message, ...(field === "message" ? value : { [field]: value }), geometryTransport: undefined,
       metrics: { ...message.metrics, geometryUnpackingMs: performance.now() - startedAt } };
   },

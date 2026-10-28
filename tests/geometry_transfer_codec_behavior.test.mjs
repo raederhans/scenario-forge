@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { MessageChannel } from "node:worker_threads";
 import "../js/core/geometry_transfer_codec_shared.js";
-const { pack, unpack } = globalThis.__scenarioForgeGeometryTransferCodecShared;
+const { pack, unpack, unpackAsync } = globalThis.__scenarioForgeGeometryTransferCodecShared;
 
 const shapes = { type: "FeatureCollection", bbox: [-180, -90, 180, 90], features: [{
   type: "Feature", id: "a", properties: { coordinates: ["opaque"], type: "Point", label: "地块" },
@@ -25,7 +25,9 @@ test("real MessageChannel transfer preserves dimensions, holes, foreign members 
     const received = new Promise((resolve) => port2.once("message", resolve));
     port1.postMessage(encoded.payload, encoded.transferables);
     assert.ok(encoded.transferables.every((buffer) => buffer.byteLength === 0));
-    assert.deepEqual(unpack(await received), before);
+    const payload = await received;
+    assert.deepEqual(unpack(payload), before);
+    assert.deepEqual(await unpackAsync(payload), unpack(payload));
     assert.deepEqual(shapes, before);
     assert.ok(Array.isArray(shapes.features[0].geometry.geometries[0].coordinates));
   } finally { port1.close(); port2.close(); }
@@ -68,7 +70,9 @@ test("startup v2 transfers topology arcs and nested points while preserving opaq
     const received = new Promise((resolve) => port2.once("message", resolve));
     port1.postMessage(encoded.payload, encoded.transferables);
     assert.ok(encoded.transferables.every((buffer) => buffer.byteLength === 0));
-    assert.deepEqual(unpack(await received), before);
+    const payload = await received;
+    assert.deepEqual(unpack(payload), before);
+    assert.deepEqual(await unpackAsync(payload), unpack(payload));
     assert.deepEqual(envelope, before);
   } finally { port1.close(); port2.close(); }
 });
@@ -83,5 +87,42 @@ test("v1 keeps topology arcs opaque and invalid v2 coordinates retain the ordina
     const result = pack(value, { includeTopologyArcs: true });
     assert.equal(result.payload, value);
     assert.deepEqual(result.transferables, []);
+  }
+});
+
+for (const includeTopologyArcs of [false, true]) {
+  test(`async v${includeTopologyArcs ? 2 : 1} unpack yields and preserves opaque references`, async () => {
+    const topology = { type: "Topology", arcs: [[], [[1, 2], [3, 4]]], objects: {} };
+    const { payload } = pack({ topology, decoded: shapes }, { minCoordinateCount: 0, includeTopologyArcs });
+    let clock = 0, yields = 0;
+    const result = await unpackAsync(payload, {
+      nowMs: () => { clock += 4; return clock; },
+      yieldControl: async () => { yields += 1; },
+    });
+    assert.deepEqual(result, unpack(payload));
+    assert.ok(yields > 0);
+    assert.equal(result.decoded.features[0].properties, payload.value.decoded.features[0].properties);
+    assert.equal(result.decoded.features[0].geometry.bbox === payload.value.decoded.features[0].geometry.bbox, false);
+    if (!includeTopologyArcs) assert.equal(result.topology.arcs, payload.value.topology.arcs);
+  });
+}
+
+test("async unpack slices a single topology's arcs by line", async () => {
+  const topology = { type: "Topology", arcs: Array.from({ length: 100 }, (_, i) => [[i, -i], [i + 1, 2]]), objects: {} };
+  const { payload } = pack(topology, { minCoordinateCount: 0, includeTopologyArcs: true });
+  let clock = 0, yields = 0;
+  const result = await unpackAsync(payload, {
+    nowMs: () => { clock += 4; return clock; },
+    yieldControl: async () => { yields += 1; },
+  });
+  assert.deepEqual(result, unpack(payload));
+  assert.equal(yields, 50);
+});
+
+test("async unpack rejects unsupported encodings with the synchronous error", async () => {
+  for (const payload of [null, { encoding: "geo-f64-v3" }]) {
+    let expected;
+    try { unpack(payload); } catch (error) { expected = error; }
+    await assert.rejects(unpackAsync(payload), { name: expected.name, message: expected.message });
   }
 });

@@ -271,6 +271,41 @@ if (!isMainThread) {
     });
   }
 
+  test("startup client awaits sliced unpack and includes yield time in unpack metrics", async () => {
+    const codec = globalThis.__scenarioForgeGeometryTransferCodecShared;
+    let releaseUnpack, reachedYield, startedAt, settled = false;
+    const paused = new Promise((resolve) => { reachedYield = resolve; });
+    const resume = new Promise((resolve) => { releaseUnpack = resolve; });
+    globalThis.__scenarioForgeGeometryTransferCodecShared = {
+      ...codec,
+      unpackAsync(payload) {
+        startedAt = performance.now();
+        let clock = 0;
+        return codec.unpackAsync(payload, {
+          nowMs: () => { clock += 4; return clock; },
+          yieldControl: () => { reachedYield(); return resume; },
+        });
+      },
+    };
+    try {
+      const resources = makeResources();
+      await withWorker(resources, async (adapter) => {
+        const pending = readyCases[0].load().then((value) => { settled = true; return value; });
+        await paused;
+        assert.equal(settled, false);
+        const elapsedBeforeResume = performance.now() - startedAt;
+        releaseUnpack();
+        const result = await pending;
+        readyCases[0].check(result, resources);
+        assert.ok(result.metrics.geometryUnpackingMs >= elapsedBeforeResume);
+        await assertTransport(adapter(), result, { ...readyCases[0], field: "message", encoding: "geo-f64-v2" });
+      });
+    } finally {
+      releaseUnpack();
+      globalThis.__scenarioForgeGeometryTransferCodecShared = codec;
+    }
+  });
+
   test("v6 encoded base topology is restored before decoding and full-envelope transfer", async () => {
     const resources = makeResources();
     // Fixed wire bytes cover nonzero cross-arc origins, a reverse arc reference,
