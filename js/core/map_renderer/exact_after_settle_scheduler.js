@@ -216,8 +216,9 @@ function createExactAfterSettleScheduler({
     }
     const transform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
     const allDefinitions = getRenderPipelinePassesOwner().getIdleRenderPassDefinitions();
+    const activePassNames = new Set(getActiveRenderPassNames());
     const definitions = filterExactAfterSettleIdleRenderPassDefinitions(
-      allDefinitions,
+      allDefinitions.filter(([passName]) => activePassNames.has(passName)),
       plan.exactTargetPasses,
     );
     const timings = {};
@@ -237,7 +238,6 @@ function createExactAfterSettleScheduler({
       ...(preparationPlan.exactTargetPasses || []),
       ...(preparationPlan.deferredExactTargetPasses || []),
     ]);
-    const activePassNames = getActiveRenderPassNames();
     const canPreparePass = (passName) => {
       if (!isExactAfterSettleGenerationCurrent(generation, "applying")) return false;
       if (runtimeState.renderPhase !== renderPhaseIdle) {
@@ -256,17 +256,20 @@ function createExactAfterSettleScheduler({
     if (preflightPrivateRenderPasses(allDefinitions, {
       prepareRenderPassAsync,
       shouldPrepare: passName => preparationTargets.has(passName)
-        && (!Array.isArray(activePassNames) || activePassNames.includes(passName)),
+        && getActiveRenderPassNames().includes(passName),
       beforePrepare: canPreparePass,
       onPrepareError,
     }) === null) return false;
 
     prepareExactRenderPassesInSlices({
-      definitions, generation, enqueueFrameTask, prepareRenderPassAsync, canPreparePass, nowMs,
+      definitions, generation, enqueueFrameTask, canPreparePass, nowMs,
+      prepareRenderPassAsync: passName => getActiveRenderPassNames().includes(passName)
+        ? prepareRenderPassAsync(passName) : null,
       isGenerationCurrent: () => isExactAfterSettleGenerationCurrent(generation, "applying"),
       onPrepareError,
       onComplete: () => completeScheduledExactAfterSettleRefreshPlan(generation, preparationPlan, passStartedAt),
       onPassReady: (passName, drawFn, index, passStart) => {
+        if (!getActiveRenderPassNames().includes(passName)) return;
         getRenderPipelinePassesOwner().prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache);
         recordRenderPerfMetric("settleExactRefreshPass", Math.max(0, nowMs() - passStart), {
           activeScenarioId: String(runtimeState.activeScenarioId || ""),
@@ -308,7 +311,7 @@ function createExactAfterSettleScheduler({
   function applyExactAfterSettleRefreshPlan(plan) {
     const reuseDecision = plan.reuseDecision || {};
     updateDprStage("idle", { force: true });
-    const exactAfterSettleDprPasses = getExactAfterSettleDprRestorePasses(renderPassNames);
+    const exactAfterSettleDprPasses = getExactAfterSettleDprRestorePasses(getActiveRenderPassNames());
     setCanvasSize({
       reason: "exact-after-settle-dpr-restore",
       targetPassesOnDprChange: exactAfterSettleDprPasses,
@@ -363,13 +366,15 @@ function createExactAfterSettleScheduler({
     const signatureTransform = typeof getRenderPassSignature === "function" && runtimeState.zoomTransform != null
       ? cloneRenderZoomTransform(runtimeState.zoomTransform)
       : runtimeState.zoomTransform === undefined ? undefined : null;
+    const activeRenderPassNames = getActiveRenderPassNames();
     const targetPassPlan = resolveExactAfterSettleTargetPasses({
       renderPassNames,
+      activeRenderPassNames,
       idleRenderPassNames,
       // Camera changes can invalidate a signature without setting its dirty bit.
       // Include those passes now so the final paint cannot discover unplanned
       // synchronous geometry work after the cancellable slices have completed.
-      dirtyPassNames: getActiveRenderPassNames().filter((passName) => cache.dirty[passName]
+      dirtyPassNames: activeRenderPassNames.filter((passName) => cache.dirty[passName]
         || (typeof getRenderPassSignature === "function"
           && cache.signatures?.[passName] !== getRenderPassSignature(passName, signatureTransform))),
       physicalExactRefreshPasses: getPhysicalExactRefreshPasses(),
@@ -544,9 +549,11 @@ function createExactAfterSettleScheduler({
 
   function getDeferredExactContextTargetPasses(plan = {}) {
     const cache = getRenderPassCacheState();
+    const activeRenderPassNames = getActiveRenderPassNames();
     return resolveDeferredExactContextTargetPasses({
       plan,
-      dirtyPassNames: renderPassNames.filter((passName) => cache.dirty?.[passName]),
+      activeRenderPassNames,
+      dirtyPassNames: activeRenderPassNames.filter((passName) => cache.dirty?.[passName]),
       idleRenderPassNames: getRenderPipelinePassesOwner().getIdleRenderPassDefinitions()
         .map(([passName]) => passName),
     });
@@ -560,7 +567,9 @@ function createExactAfterSettleScheduler({
   }
 
   function prepareDeferredExactContextPassesInSlices(passNames, plan = {}, refreshVersion = deferredExactContextRefreshVersion) {
-    const targetPasses = Array.isArray(passNames) ? passNames.filter(Boolean) : [];
+    const activeRenderPassNames = getActiveRenderPassNames();
+    const targetPasses = Array.isArray(passNames)
+      ? passNames.filter((passName) => activeRenderPassNames.includes(passName)) : [];
     if (!targetPasses.length) return false;
     if (!isDeferredExactContextRefreshCurrent(refreshVersion, plan)) return false;
     const transform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
@@ -599,6 +608,10 @@ function createExactAfterSettleScheduler({
           if (isDeferredExactContextRefreshCurrent(refreshVersion, plan)) {
             scheduleDeferredExactContextRefresh(plan);
           }
+          return;
+        }
+        if (!getActiveRenderPassNames().includes(passName)) {
+          enqueueNextPass(index + 1);
           return;
         }
         getRenderPipelinePassesOwner().prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache);
