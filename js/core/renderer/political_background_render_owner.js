@@ -8,6 +8,7 @@ import {
   createDeferredPoliticalBackgroundBuildState,
   createPoliticalBackgroundCacheState,
   createPoliticalBackgroundPathAccounting,
+  createRetainedPoliticalPathLookup,
   finalizePoliticalBackgroundGroups,
   getRetainedPoliticalPathHandle,
   refreshDeferredPoliticalBackgroundGroups,
@@ -140,6 +141,7 @@ export function createPoliticalBackgroundRenderOwner({
   let scenarioPoliticalBackgroundCache = createScenarioPoliticalBackgroundCacheState();
   let scenarioPoliticalBackgroundDeferredFullCacheHandle = null;
   let scenarioPoliticalBackgroundDeferredFullCacheState = null;
+  let carriedDeferredPathIndex = null;
   const suspiciousScenarioBackgroundMergeWarnings = new Set();
 
   function createScenarioPoliticalBackgroundCacheState(overrides = {}) {
@@ -148,7 +150,11 @@ export function createPoliticalBackgroundRenderOwner({
 
   const updatePathAccounting = createPoliticalBackgroundPathAccounting(resourceBudget, politicalPathResourceAccounting);
   function updatePoliticalBackgroundPathResourceAccounting() {
-    return updatePathAccounting(scenarioPoliticalBackgroundCache, scenarioPoliticalBackgroundDeferredFullCacheState);
+    return updatePathAccounting(
+      scenarioPoliticalBackgroundCache,
+      scenarioPoliticalBackgroundDeferredFullCacheState,
+      carriedDeferredPathIndex?.index || scenarioPoliticalBackgroundDeferredFullCacheState?.carriedPathIndex || null,
+    );
   }
 
   function cancelScenarioPoliticalBackgroundDeferredFullCache(reason = "unspecified", { force = false } = {}) {
@@ -160,6 +166,15 @@ export function createPoliticalBackgroundRenderOwner({
       && isScenarioPoliticalBackgroundDeferredFullCacheStateCurrent(pending)
       && pending.pathCacheSignature === getPoliticalPathCacheSignature(pending.transform)
       && pending.resolvedEntries.every(entry => entry.feature.geometry === entry.geometryRef)) return false;
+    if (force) carriedDeferredPathIndex = null;
+    else if (pending?.pathIndex.size) {
+      carriedDeferredPathIndex = {
+        index: pending.pathIndex,
+        scenarioId: pending.scenarioId,
+        sceneGeneration: pending.sceneGeneration,
+        projectionSignature: pending.projectionSignature,
+      };
+    }
     if (scenarioPoliticalBackgroundDeferredFullCacheHandle) {
       cancelDeferredWork(scenarioPoliticalBackgroundDeferredFullCacheHandle);
     }
@@ -700,8 +715,14 @@ export function createPoliticalBackgroundRenderOwner({
     // LRU. Chunk promotion changes membership/data generation, but paths with
     // the same projection signature and geometry ref remain usable. Only this
     // per-feature reuse crosses data generations; task/publication fences don't.
-    const retainedPathHandle = deferredState.stage === "paths"
+    const previousPathHandle = deferredState.stage === "paths"
       ? getRetainedPoliticalBackgroundPathHandle(transform, { allowDataGenerationReuse: true }) : null;
+    const carriedPathHandle = deferredState.stage === "paths" && deferredState.carriedPathIndex
+      ? createRetainedPoliticalPathLookup(deferredState.carriedPathIndex) : null;
+    const retainedPathHandle = previousPathHandle || carriedPathHandle ? {
+      getPath: (feature, id) => previousPathHandle?.getPath(feature, id)
+        || carriedPathHandle?.getPath(feature, id) || null,
+    } : null;
     const result = advanceDeferredPoliticalBackgroundBuild(deferredState, {
       transform, pathCacheHandle, retainedPathHandle, getFeatureId, isPoliticalFeaturePathEntryCurrent,
       getPoliticalFeaturePathEntry, addRetainedPoliticalPath,
@@ -806,6 +827,7 @@ export function createPoliticalBackgroundRenderOwner({
       activeScenarioId: String(getRuntimeState().activeScenarioId || ""),
     });
     scenarioPoliticalBackgroundDeferredFullCacheState = null;
+    carriedDeferredPathIndex = null;
     updatePoliticalBackgroundPathResourceAccounting();
     invalidateRenderPasses("political", "progressive-political-full-cache-ready");
     recordProgressivePoliticalFullCacheReadyDiagnostics(getRuntimeState(), {
@@ -847,12 +869,20 @@ export function createPoliticalBackgroundRenderOwner({
       return true;
     }
     cancelScenarioPoliticalBackgroundDeferredFullCache("reschedule");
+    const projectionSignature = getProjectionRenderSignature();
     scenarioPoliticalBackgroundDeferredFullCacheState = {
       ...createDeferredPoliticalBackgroundBuildState(
         identity, cloneZoomTransform(transform), normalizedEntries, nowMs(),
         String(reason || "progressive-recovery"),
       ),
+      projectionSignature,
+      carriedPathIndex: carriedDeferredPathIndex
+        && carriedDeferredPathIndex.scenarioId === identity.scenarioId
+        && carriedDeferredPathIndex.sceneGeneration === identity.sceneGeneration
+        && carriedDeferredPathIndex.projectionSignature === projectionSignature
+        ? carriedDeferredPathIndex.index : null,
     };
+    carriedDeferredPathIndex = null;
     updatePoliticalBackgroundPathResourceAccounting();
     scheduleNextDeferredFullCacheSlice();
     recordRenderPerfMetric("scenarioPoliticalBackgroundDeferredFullCacheScheduled", 0, {
@@ -1078,6 +1108,9 @@ export function createPoliticalBackgroundRenderOwner({
         recoveryQuality: politicalRecoveryQuality,
       });
       if (cachedFullPass.cacheHit) {
+        // A published full pass supersedes paths carried from a cancelled build.
+        carriedDeferredPathIndex = null;
+        updatePoliticalBackgroundPathResourceAccounting();
         const groupCount = drawPoliticalBackgroundFillsFromGroups(cachedFullPass.groups);
         return returnSummary
           ? {
@@ -1138,6 +1171,12 @@ export function createPoliticalBackgroundRenderOwner({
           coarseUnderlay: "scenario-features",
         }
         : underlaySummary.groupCount;
+    }
+    // An exact frame will not schedule a deferred build, so nothing can reuse
+    // paths carried from a cancelled one; drop them instead of holding Path2Ds.
+    if (carriedDeferredPathIndex) {
+      carriedDeferredPathIndex = null;
+      updatePoliticalBackgroundPathResourceAccounting();
     }
     return drawPoliticalBackgroundFillsForEntries(visibleEntries, {
       transform,
