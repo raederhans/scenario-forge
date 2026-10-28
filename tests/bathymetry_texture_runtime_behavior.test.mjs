@@ -42,7 +42,7 @@ function harness(overrides = {}) {
     now: () => time, onAssetsChanged: reason => changes.push(reason),
     createRenderer: ({ createCanvas }) => {
       renderers++;
-      return { render: args => {
+      return { prewarm() {}, render: args => {
         renders.push(args);
         return { canvas: createCanvas(), backend: 'cpu', coveredBounds: [-20, -10, 20, 10], missingTileKeys: [] };
       }, dispose: () => { disposals++; } };
@@ -81,6 +81,63 @@ test('runtime loads lazily, draws only when ready, and preserves caller transfor
   h.runtime.dispose();
   assert.equal(h.images[0].closes, 1);
   assert.equal(h.disposals(), 1);
+});
+
+test('runtime prewarms during loading and polls once until GPU readiness requests one repaint', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const loading = deferred();
+  let prewarms = 0, checks = 0, ready = false;
+  const h = harness({ fetchJson: () => loading.promise, createRenderer: () => ({
+    prewarm() { prewarms++; },
+    isReady() { checks++; return ready; },
+    render: () => ({ canvas: ready ? {} : null, backend: ready ? 'webgl2' : 'pending',
+      coveredBounds: null, missingTileKeys: [] }),
+    dispose() {},
+  }) });
+  t.after(() => h.runtime.dispose());
+  const ensured = h.runtime.ensure();
+  assert.equal(prewarms, 1);
+  assert.equal(h.runtime.getState().status, 'loading');
+  loading.resolve(manifest);
+  await ensured;
+  h.changes.length = 0;
+  for (let i = 0; i < 3; i++) {
+    const state = h.draw();
+    assert.equal(state.status, 'ready');
+    assert.equal(state.backend, 'pending');
+  }
+  assert.equal(prewarms, 1);
+  assert.deepEqual(h.draws, []);
+  t.mock.timers.tick(50);
+  assert.equal(checks, 1);
+  assert.deepEqual(h.changes, []);
+  ready = true;
+  t.mock.timers.tick(50);
+  assert.equal(checks, 2);
+  assert.deepEqual(h.changes, ['bathymetry-gpu-ready']);
+  assert.equal(h.draw().backend, 'webgl2');
+  assert.equal(h.draws.filter(call => call[0] === 'image').length, 1);
+  t.mock.timers.tick(500);
+  assert.equal(checks, 2);
+  assert.deepEqual(h.changes, ['bathymetry-gpu-ready']);
+});
+
+test('disposing runtime cancels the pending GPU readiness check', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let checks = 0;
+  const h = harness({ createRenderer: () => ({
+    prewarm() {},
+    isReady() { checks++; return true; },
+    render: () => ({ canvas: null, backend: 'pending', coveredBounds: null, missingTileKeys: [] }),
+    dispose() {},
+  }) });
+  await h.runtime.ensure();
+  h.changes.length = 0;
+  h.draw();
+  h.runtime.dispose();
+  t.mock.timers.tick(500);
+  assert.equal(checks, 0);
+  assert.deepEqual(h.changes, []);
 });
 
 test('inactive styles never load and unsupported projections never draw', async () => {
@@ -125,7 +182,7 @@ test('projection parameters and ramps are cached by geometry generation and styl
 });
 
 test('missing tiles load once and the whole batch notifies a single repaint', async () => {
-  const h = harness({ createRenderer: () => ({ render: ({ source }) => ({ canvas: {}, backend: 'webgl2',
+  const h = harness({ createRenderer: () => ({ prewarm() {}, render: ({ source }) => ({ canvas: {}, backend: 'webgl2',
     coveredBounds: [-20, -10, 20, 10],
     missingTileKeys: manifest.tiles.present.filter(key => !source.getLoadedTiles().has(key)),
   }), dispose() {} }) });
@@ -234,7 +291,7 @@ test('asset URL policy reads the texture manifest independently from the legacy 
   assert.equal(owner.getScenarioBathymetryTextureUrl(), '');
 });
 
-const missingTileRenderer = () => ({ render: ({ source, detail }) => ({ canvas: {}, backend: 'webgl2',
+const missingTileRenderer = () => ({ prewarm() {}, render: ({ source, detail }) => ({ canvas: {}, backend: 'webgl2',
   coveredBounds: [-20, -10, 20, 10],
   missingTileKeys: detail ? manifest.tiles.present.filter(key => !source.getLoadedTiles().has(key)) : [],
 }), dispose() {} });

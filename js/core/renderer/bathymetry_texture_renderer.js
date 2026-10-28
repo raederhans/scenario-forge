@@ -205,25 +205,26 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
     gl.deleteProgram(program);
     gpu = null;
   }
-  function initialize() {
+  function initialize(prewarm = false) {
     const canvas = createCanvas(1, 1);
     const gl = getWebGL2Context(canvas);
     if (!gl) return null;
+    const pending = prewarm ? gl.getExtension('KHR_parallel_shader_compile') : null;
     const program = gl.createProgram();
     for (const [type, code] of [[gl.VERTEX_SHADER, VERTEX_SHADER], [gl.FRAGMENT_SHADER, BATHYMETRY_FRAGMENT_SHADER]]) {
       const shader = gl.createShader(type);
       gl.shaderSource(shader, code); gl.compileShader(shader);
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      if (!pending && !gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         const message = gl.getShaderInfoLog(shader);
         gl.deleteShader(shader); gl.deleteProgram(program); throw new Error(message);
       }
       gl.attachShader(program, shader); gl.deleteShader(shader);
     }
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    if (!pending && !gl.getProgramParameter(program, gl.LINK_STATUS)) {
       const message = gl.getProgramInfoLog(program); gl.deleteProgram(program); throw new Error(message);
     }
-    const state = { gl, canvas, program, textures: Array.from({ length: 5 }, () => gl.createTexture()),
+    const state = { gl, canvas, program, pending, textures: Array.from({ length: 5 }, () => gl.createTexture()),
       source: null, overview: null, overlay: undefined, ramp: null, capacity: 0,
       layers: new Map(), tileImages: new Map(), index: null };
     canvas.addEventListener?.('webglcontextlost', (event) => {
@@ -231,6 +232,21 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
       if (gpu === state) { gpu = null; unavailable = false; }
     });
     return state;
+  }
+  function prewarm() {
+    if (gpu || unavailable) return;
+    try { gpu = initialize(true); unavailable = !gpu; } catch { unavailable = true; }
+  }
+  function isReady() {
+    if (gpu?.pending) {
+      const { gl, program, pending } = gpu;
+      try {
+        if (!gl.getProgramParameter(program, pending.COMPLETION_STATUS_KHR)) return false;
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+        gpu.pending = null;
+      } catch { release(); unavailable = true; }
+    }
+    return !!gpu || unavailable;
   }
   function drawGpu(options, inverse, tiles, tileSize, overlayImage, output) {
     const { gl, canvas, program, textures } = gpu;
@@ -343,6 +359,7 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
     if (!gpu && !unavailable) {
       try { gpu = initialize(); unavailable = !gpu; } catch { unavailable = true; }
     }
+    if (!isReady()) return { canvas: null, backend: 'pending', coveredBounds: null, missingTileKeys: [] };
     const canvas = outputCanvas ||= createCanvas(width, height);
     if (canvas.width !== width) canvas.width = width;
     if (canvas.height !== height) canvas.height = height;
@@ -435,5 +452,5 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
     ctx.putImageData(image, 0, 0);
     return { canvas, backend: 'cpu', coveredBounds, missingTileKeys: [...missing] };
   }
-  return { render, dispose() { release(); pixels = new WeakMap(); unavailable = false; outputCanvas = null; } };
+  return { prewarm, isReady, render, dispose() { release(); pixels = new WeakMap(); unavailable = false; outputCanvas = null; } };
 }

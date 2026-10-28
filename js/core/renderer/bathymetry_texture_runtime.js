@@ -15,6 +15,7 @@ export function createBathymetryTextureRuntime({
   let scenario = slot(), scenarioUrl = null, renderer = null, disposed = false;
   let status = 'off', projectionGeneration, projectionParams, rampKey, ramp;
   let tileBatch = null, detailPending = false;
+  let gpuReadyTimer = null;
 
   function getState() {
     const failedSources = [global.error && 'global', scenario.error && 'scenario'].filter(Boolean);
@@ -66,6 +67,10 @@ export function createBathymetryTextureRuntime({
 
   function ensure() {
     if (disposed) return Promise.resolve(getState());
+    if (!renderer) {
+      renderer = createRenderer({ createCanvas });
+      renderer.prewarm();
+    }
     load(global, async () => {
       const source = createBathymetryTextureSource({
         manifestUrl: globalManifestUrl, fetchJson, now, maxCachedTiles,
@@ -156,7 +161,6 @@ export function createBathymetryTextureRuntime({
       ramp = buildBathymetryColorRamp({ baseRgb, preset, scale: oceanStyle.scale });
       rampKey = key;
     }
-    renderer ||= createRenderer({ createCanvas });
     const transform = context.getTransform();
     const detail = !!resolveDetailTileKeys(context.canvas.width, context.canvas.height, transform);
     const output = renderer.render({
@@ -166,6 +170,10 @@ export function createBathymetryTextureRuntime({
       hillshadeStrength: oceanStyle.hillshadeStrength,
       hillshadeExaggeration: oceanStyle.hillshadeExaggeration,
     });
+    if (output.backend === 'pending') {
+      if (gpuReadyTimer === null) gpuReadyTimer = setTimeout(checkGpuReady, 50);
+      return { ...getState(), backend: 'pending' };
+    }
     context.save();
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.globalAlpha = Math.max(0, Math.min(1, oceanStyle.opacity));
@@ -185,8 +193,16 @@ export function createBathymetryTextureRuntime({
       missingTileCount: output.missingTileKeys.length, coveredBounds: output.coveredBounds };
   }
 
+  function checkGpuReady() {
+    gpuReadyTimer = null;
+    if (renderer.isReady()) onAssetsChanged('bathymetry-gpu-ready');
+    else gpuReadyTimer = setTimeout(checkGpuReady, 50);
+  }
+
   function dispose() {
     disposed = true;
+    clearTimeout(gpuReadyTimer);
+    gpuReadyTimer = null;
     if (global.value) releaseSource(global.value);
     scenario.value?.bitmap.close?.();
     global.value = null;

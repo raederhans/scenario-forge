@@ -189,12 +189,14 @@ test('WebGL creation failure selects CPU and disposal permits subsequent renderi
   const projection = d3.geoEqualEarth().scale(1).translate([.5, .5]);
   const options = { width: 1, height: 1, transform: identity, projectionParams: createProjectionInverseParams(projection),
     source: sourceOf(), ramp, detail: false };
+  renderer.prewarm();
+  assert.equal(renderer.isReady(), true);
   assert.equal(renderer.render(options).backend, 'cpu');
   renderer.dispose();
   assert.deepEqual(rgba(renderer.render(options)), colorOf(128));
 });
 
-test('GPU uses bounded inverse work, direct bitmap uploads, stable allocation and incremental layer reuse', async () => {
+for (const parallel of [null, false, true]) test(`GPU uses bounded inverse work, direct bitmap uploads, stable allocation and incremental layer reuse (parallel=${parallel})`, async () => {
   const calls = { texImage2D: [], texImage3D: [], texSubImage3D: [], pixelStorei: [], uniform1f: [], drawArrays: [] };
   const gl = Object.fromEntries(['VERTEX_SHADER', 'FRAGMENT_SHADER', 'COMPILE_STATUS', 'LINK_STATUS',
     'MAX_TEXTURE_SIZE', 'MAX_ARRAY_TEXTURE_LAYERS', 'MAX_VIEWPORT_DIMS', 'UNPACK_ALIGNMENT',
@@ -207,7 +209,18 @@ test('GPU uses bounded inverse work, direct bitmap uploads, stable allocation an
     'useProgram', 'activeTexture', 'bindTexture', 'texParameteri', 'uniform1i', 'uniformMatrix3fv',
     'uniform4f', 'uniform4fv', 'uniform2f', 'viewport']) gl[name] = () => {};
   for (const name of ['createProgram', 'createShader', 'createTexture']) gl[name] = () => ({});
-  gl.getShaderParameter = gl.getProgramParameter = () => true;
+  let complete = false;
+  const extension = { COMPLETION_STATUS_KHR: 1000 };
+  gl.getExtension = (name) => {
+    assert.equal(name, 'KHR_parallel_shader_compile');
+    return parallel ? extension : null;
+  };
+  gl.getShaderParameter = () => { assert.ok(!parallel || complete); return true; };
+  gl.getProgramParameter = (_, name) => {
+    if (name === extension.COMPLETION_STATUS_KHR) return complete;
+    assert.ok(!parallel || complete);
+    return true;
+  };
   gl.getUniformLocation = (_, name) => name;
   gl.getParameter = (name) => name === gl.MAX_VIEWPORT_DIMS ? [8192, 8192]
     : name === gl.MAX_ARRAY_TEXTURE_LAYERS ? 256 : 8192;
@@ -228,6 +241,22 @@ test('GPU uses bounded inverse work, direct bitmap uploads, stable allocation an
   Object.defineProperty(params, 'scale', { get() { scaleReads++; return scale; } });
   const options = { width: 8192, height: 32, transform: identity, projectionParams: params, source, ramp,
     preset: 'bathymetry_soft', hillshadeStrength: .2, hillshadeExaggeration: 3 };
+  assert.equal(renderer.isReady(), false);
+  if (parallel !== null) {
+    renderer.prewarm();
+    renderer.prewarm();
+  }
+  if (parallel) {
+    assert.equal(renderer.isReady(), false);
+    assert.deepEqual(renderer.render(options), {
+      canvas: null, backend: 'pending', coveredBounds: null, missingTileKeys: [],
+    });
+    assert.equal(scaleReads, 0);
+    assert.equal(calls.drawArrays.length, 0);
+    assert.equal(calls.texImage2D.length, 0);
+    complete = true;
+  }
+  assert.equal(renderer.isReady(), parallel !== null);
   const first = renderer.render(options);
   assert.equal(first.backend, 'webgl2');
   assert.equal(scaleReads, 33 * 33 * 2 + 1);
