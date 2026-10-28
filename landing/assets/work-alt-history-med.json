@@ -39,8 +39,8 @@
     "data/scenarios/tno_1962/chunks/political.detail.country.mc.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.mnt.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.pal.json",
-    "data/scenarios/tno_1962/chunks/political.detail.country.rkk.part.0.json",
-    "data/scenarios/tno_1962/chunks/political.detail.country.rkm.part.5.json",
+    "data/scenarios/tno_1962/chunks/political.detail.country.rkk.json",
+    "data/scenarios/tno_1962/chunks/political.detail.country.rkm.part.1.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.rkp.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.rku.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.rom.json",
@@ -57,7 +57,7 @@
     "data/europe_land_bg.geojson"
   ],
   "counts": {
-    "political_source_features": 1114,
+    "political_source_features": 1060,
     "dissolved_country_owners": 28,
     "political_detail_chunks": 37,
     "source_atlantropa_features": 725,

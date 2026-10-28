@@ -2711,6 +2711,7 @@ function getBorderDrawOwner() {
       isUsableMesh,
       getPaintContourMeshes: () => getPaintContourRuntimeOwner().getMeshes(),
       getClassifiedBorderMeshes,
+      getPaintContourCoastMesh: () => getPaintContourRuntimeOwner().getCoastMesh(),
       drawRiverInternalContours: options => getRiverContourRenderOwner().draw(options),
       getPoliticalBorderMeshes: () => {
         const classification = getClassifiedBorderMeshes();

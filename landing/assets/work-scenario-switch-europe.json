@@ -22,8 +22,8 @@
     "data/europe_land_bg.geojson"
   ],
   "counts": {
-    "hoi4_1936_political_features": 2524,
-    "hoi4_1939_political_features": 2524
+    "hoi4_1936_political_features": 2229,
+    "hoi4_1939_political_features": 2229
   },
   "selection_policy": {
     "note": "Same Central/Eastern Europe bbox rendered from 1936 and 1939 scenario ownership; source land geometry underlays any unassigned topology gaps without inventing ownership.",

@@ -1,3 +1,4 @@
+import { createPackedLineMesh } from './packed_line_mesh.js';
 import { getContourCoordinatePrecision } from '../paint_contour_source.js';
 import { createPaintContourWorkerClient } from '../paint_contour_worker_client.js';
 import { createPaintContourMesh } from './paint_contour_mesh.js';
@@ -58,7 +59,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   let waterRevision = [], registeredWaterRevision = null;
   let topologyRevision = -1, geometryEpoch = 0, registeredEpoch = -1;
   let featuresById = new Map(), precisionById = new Map(), registered = null, registeredPrecision = null, view = null;
-  let acknowledgedGraph = null;
+  let acknowledgedGraph = null, coastMesh = null, lastCoastMesh = null;
   let inFlight = null, scheduled = false, revision = 0, paintRevision = -1;
   let boundaryRevision = null, bordersSeparated = false;
   // A geometry rebuild within one scene keeps the last paint-aware borders;
@@ -72,7 +73,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   const sceneIdentity = () => [state.activeScenarioId || '', state.sceneGeneration || 0, nearSeamsEnabled()].join('|');
   function clear() {
     generation += 1; client.dispose(); registered = null; registeredPrecision = null; view = null; inFlight = null;
-    acknowledgedGraph = null; lastClassification = null;
+    acknowledgedGraph = null; lastClassification = null; coastMesh = null; lastCoastMesh = null;
     registeredWaterRevision = null;
     status = 'idle'; error = ''; graphDiagnostics = null; revision += 1;
   }
@@ -151,6 +152,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     if (changed && (classified || modeChanged)) onChange('paint-contours-colors');
   }
   function createView() {
+    coastMesh = acknowledgedGraph.coast ? createPackedLineMesh(acknowledgedGraph.coast) : null;
     classified = shouldClassify();
     view = classified
       ? createBorderClassification(acknowledgedGraph, id => {
@@ -262,7 +264,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
         if (!owned()) return;
         if (!dispatched && failure?.name === 'AbortError' && !current()) return;
         // A failed/stale geometry result must never revive reference borders.
-        view = null; acknowledgedGraph = null; registered = null; registeredPrecision = null; lastClassification = null;
+        view = null; acknowledgedGraph = null; registered = null; registeredPrecision = null; lastClassification = null; coastMesh = null; lastCoastMesh = null;
         status = 'error'; error = failure?.message || String(failure);
         client.dispose(); revision += 1; onChange('paint-contours-error');
       } finally {
@@ -292,8 +294,12 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     getMeshes() { syncSource(); syncPaint(); return view?.getActiveArcCount() ? [view.getMesh()] : EMPTY; },
     getClassification() {
       syncSource(); syncPaint();
-      if (classified && view) lastClassification = view.getMeshes();
+      if (classified && view) { lastClassification = view.getMeshes(); lastCoastMesh = coastMesh; }
       return shouldClassify() ? lastClassification : null;
+    },
+    getCoastMesh() {
+      syncSource(); syncPaint();
+      return shouldClassify() ? (classified && view ? coastMesh : lastCoastMesh) : null;
     },
     getRevision() { syncSource(); syncPaint(); return revision; },
     // Call immediately after the publisher's topology bump, before other reads.

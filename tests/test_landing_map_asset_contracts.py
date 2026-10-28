@@ -328,7 +328,7 @@ class WorkMapProjectionTests(unittest.TestCase):
             self.assertNotIn(f'data-owner="{modern_tag}"', svg)
         self.assertNotIn('data-owner="RU"', svg)
         metadata = read_json(ASSETS / "work-alt-history-med.json")
-        self.assertEqual(metadata["counts"]["political_source_features"], 1114)
+        self.assertEqual(metadata["counts"]["political_source_features"], 1060)
         for path in work_maps.tno_political_detail_chunk_paths(output["bbox"]):
             if path.name != "political.detail.country.ger.part.1.json":
                 continue
