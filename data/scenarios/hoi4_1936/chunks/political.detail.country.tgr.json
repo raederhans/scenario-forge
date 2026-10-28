@@ -13,12 +13,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Tanger - Tétouan · Tangier International Zone",
-        "name_zh": "丹吉尔 - 得土安 · 坦吉尔国际区",
         "aliases": [
           "Tanger - Tétouan",
           "丹吉尔 - 得土安"
-        ]
+        ],
+        "name_en": "Tanger - Tétouan · Tangier International Zone",
+        "name_zh": "丹吉尔 - 得土安 · 坦吉尔国际区"
       },
       "geometry": {
         "type": "Polygon",

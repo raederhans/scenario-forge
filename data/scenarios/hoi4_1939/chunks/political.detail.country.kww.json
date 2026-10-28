@@ -13,12 +13,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Zhanjianghsi · Guangzhouwan",
-        "name_zh": "湛江市 · 广州湾",
         "aliases": [
           "Zhanjianghsi",
           "湛江市"
-        ]
+        ],
+        "name_en": "Zhanjianghsi · Guangzhouwan",
+        "name_zh": "湛江市 · 广州湾"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -166,9 +166,11 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
+        "aliases": [
+          "Suixixian"
+        ],
         "name_en": "Suixixian · Guangzhouwan",
-        "name_zh": "Suixixian · 广州湾",
-        "aliases": []
+        "name_zh": "Suixixian · 广州湾"
       },
       "geometry": {
         "type": "Polygon",
@@ -226,12 +228,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Wuchuan · Guangzhouwan",
-        "name_zh": "吴川 · 广州湾",
         "aliases": [
           "Wuchuan",
           "吴川"
-        ]
+        ],
+        "name_en": "Wuchuan · Guangzhouwan",
+        "name_zh": "吴川 · 广州湾"
       },
       "geometry": {
         "type": "Polygon",

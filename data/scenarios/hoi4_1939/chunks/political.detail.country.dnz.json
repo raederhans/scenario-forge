@@ -279,12 +279,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Pomeranian · North · Free City rural district",
-        "name_zh": "滨海省·北部 · 但泽自由市乡村区",
         "aliases": [
           "Pomeranian · North",
           "滨海省·北部"
-        ]
+        ],
+        "name_en": "Pomeranian · North · Free City rural district",
+        "name_zh": "滨海省·北部 · 但泽自由市乡村区"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -516,12 +516,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Pomeranian · South · Free City rural district",
-        "name_zh": "滨海省·南部 · 但泽自由市乡村区",
         "aliases": [
           "Pomeranian · South",
           "滨海省·南部"
-        ]
+        ],
+        "name_en": "Pomeranian · South · Free City rural district",
+        "name_zh": "滨海省·南部 · 但泽自由市乡村区"
       },
       "geometry": {
         "type": "Polygon",
@@ -627,12 +627,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "malborski · Free City rural district",
-        "name_zh": "马尔堡 · 但泽自由市乡村区",
         "aliases": [
           "malborski",
           "马尔堡"
-        ]
+        ],
+        "name_en": "malborski · Free City rural district",
+        "name_zh": "马尔堡 · 但泽自由市乡村区"
       },
       "geometry": {
         "type": "Polygon",
@@ -758,9 +758,11 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
+        "aliases": [
+          "nowodworski"
+        ],
         "name_en": "nowodworski · Free City rural district",
-        "name_zh": "nowodworski · 但泽自由市乡村区",
-        "aliases": []
+        "name_zh": "nowodworski · 但泽自由市乡村区"
       },
       "geometry": {
         "type": "Polygon",

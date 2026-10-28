@@ -45,11 +45,6 @@
       "equals": "莫尔多维亚自治共和国"
     },
     {
-      "tag": "UPV",
-      "field": "subject_kind",
-      "equals": "administrative_region"
-    },
-    {
       "tag": "KOM",
       "field": "subject_kind",
       "equals": "autonomous_oblast"
@@ -77,8 +72,8 @@
   ],
   "summary_equals": {
     "blocker_count": 0,
-    "owner_count": 306,
-    "controller_count": 306,
+    "owner_count": 235,
+    "controller_count": 235,
     "feature_count": 21078
   },
   "summary_min": {

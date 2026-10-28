@@ -55,8 +55,6 @@ def add(id, scen, tag, en, zh, select, parent=None, kind=None, color=None, only=
         e["subject_kind"] = kind
     if color:
         e["color_hex"] = color
-    elif parent and tag not in C36 and tag not in C39:
-        e["color_hex"] = shade(parent)
     e["select"] = select
     if exclude:
         e["exclude"] = exclude
@@ -156,35 +154,19 @@ for t in ["BOT", "KUW"]:
     add(f"{t.lower()}_parent", B, t, None, None, {"owners": [t]}, parent="ENG", kind="protectorate", only=[t])
 
 # ---------- 法国 ----------
-add("aof_senegal", B, "AOF", "Senegal", "塞内加尔", CC("SN"), only=["AOF"])
-for id, tag, en, zh, cc, kind in [("mauritania", "MAU", "Mauritania", "毛里塔尼亚", "MR", "colony"),
-                                  ("french_sudan", "FSU", "French Sudan", "法属苏丹", "ML", "colony"),
-                                  ("french_guinea", "FGU", "French Guinea", "法属几内亚", "GN", "colony"),
-                                  ("ivory_coast", "IVC", "Ivory Coast", "科特迪瓦", "CI", "colony"),
-                                  ("dahomey", "DAH", "Dahomey", "达荷美", "BJ", "colony"),
-                                  ("niger_colony", "NGR", "Niger", "尼日尔", "NE", "colony"),
-                                  ("french_togo", "TOG", "French Togoland", "法属多哥", "TG", "mandate"),
-                                  ("upper_volta", "UPV", "Upper Volta", "上沃尔特", "BF", "colony")]:
-    add(id, B, tag, en, zh, CC(cc), parent="FRA", kind=kind, only=["AOF"])
-add("aef_middle_congo", B, "AEF", "Middle Congo", "中央刚果", CC("CG"), only=["AEF"])
-for id, tag, en, zh, cc in [("chad", "CHD", "Chad", "乍得", "TD"),
-                            ("ubangi_shari", "UBA", "Ubangi-Shari", "乌班吉沙里", "CF"),
-                            ("gabon", "GAB", "Gabon", "加蓬", "GA")]:
-    add(id, B, tag, en, zh, CC(cc), parent="FRA", kind="colony", only=["AEF"])
+add("french_west_africa", B, "AOF", "French West Africa", "法属西非联邦",
+    CC("SN", "MR", "ML", "GN", "CI", "BJ", "NE", "BF"), parent="FRA", kind="federation", only=["AOF"])
+add("french_togo", B, "TOG", "French Togoland", "法属多哥", CC("TG"), parent="FRA", kind="mandate", only=["AOF"])
+add("french_equatorial_africa", B, "AEF", "French Equatorial Africa", "法属赤道非洲联邦",
+    CC("TD", "CF", "CG", "GA"), parent="FRA", kind="federation", only=["AEF"])
 add("french_cameroon", B, "FCM", "French Cameroun", "法属喀麦隆", CC("CM"), parent="FRA", kind="mandate",
     only=["AEF", "FRA", "AOF"], exclude=HG("CM_Northwest", "CM_Southwest"))
 add("djibouti", B, "DJI", "French Somaliland", "法属索马里", CC("DJ"), parent="FRA", kind="colony", only=["FRA"])
 add("madagascar_dependencies", B, "MAD", None, None, CC("KM", "TF"), only=["FRA"])
 for t in ["GF", "GP", "MQ", "RE", "YT"]:
     add(f"{t.lower()}_parent", B, t, None, None, {"owners": [t]}, parent="FRA", kind="colony", only=[t])
-add("tonkin", B, "TNK", "Tonkin", "东京（北圻）", {"country_codes": ["VN"], "bbox": [100, 19.75, 110, 24]},
-    parent="FRA", kind="protectorate", only=["VIN"])
-add("cochinchina", B, "COC", "Cochinchina", "交趾支那（南圻）", {"country_codes": ["VN"], "bbox": [100, 8, 110, 11.55]},
-    parent="FRA", kind="colony", only=["VIN"])
-add("cambodia", B, "CAM", "Cambodia", "柬埔寨", CC("KH"), parent="FRA", kind="protectorate", only=["VIN"])
-add("laos", B, "LAO", "Laos", "老挝", CC("LA"), parent="FRA", kind="protectorate", only=["VIN"])
-add("vin_annam", B, "VIN", "Annam", "安南（中圻）", {"owners": ["VIN"]}, only=["VIN"],
-    notes="Remaining French Indochina core represented as Annam.")
+add("french_indochina", B, "VIN", "French Indochina", "法属印度支那联邦",
+    CC("VN", "KH", "LA"), parent="FRA", kind="federation", only=["VIN"])
 
 # ---------- 其他宗主国 ----------
 for id, tag, en, zh, cc in [("cape_verde", "CPV", "Cape Verde", "佛得角", "CV"),
@@ -288,7 +270,7 @@ OCC = dict(cores="keep", parent="JAP", kind="puppet")
 add("provisional_government", Y39, "NCP", "Provisional Government of the Republic of China", "中华民国临时政府",
     {"hierarchy_groups": ["CN_Beijing", "CN_Tianjin", "CN_Hebei", "CN_Shandong"],
      "prefectures": ["安阳市", "鹤壁市", "新乡市", "焦作市", "濮阳市", "开封市", "商丘市",
-                     "太原市", "阳泉市", "晋中市", "长治市", "晋城市", "运城市"]},
+                     "太原市", "阳泉市", "晋中市", "长治市", "晋城市", "运城市", "临汾市", "忻州市"]},
     exclude=PF("张家口市", "承德市"), only=["CHI", "SHX", "PRC"], color="#b0874a", **OCC)
 add("south_chahar", Y39, "CNZ", "South Chahar Autonomous Government", "察南自治政府", PF("张家口市"),
     only=["CHI", "SHX", "MEN"], color="#c6e8a4", **OCC)
@@ -299,14 +281,14 @@ add("mengjiang_1939", Y39, "MEN", "Mongol United Autonomous Government", "蒙古
 add("reformed_government", Y39, "RGC", "Reformed Government of the Republic of China", "中华民国维新政府",
     {"hierarchy_groups": ["CN_Shanghai", "CN_Jiangsu"],
      "prefectures": ["杭州市", "嘉兴市", "湖州市", "舟山市", "合肥市", "芜湖市", "蚌埠市", "淮南市", "马鞍山市",
-                     "淮北市", "铜陵市", "安庆市", "滁州市", "宿州市", "亳州市"]},
+                     "淮北市", "铜陵市", "安庆市", "滁州市", "宿州市", "亳州市", "阜阳市"]},
     only=["CHI"], color="#e3c15a", **OCC)
 add("japanese_central_china", Y39, "JCC", "Japanese-Occupied Central China", "日军华中占领区",
-    PF("武汉市", "孝感市", "鄂州市", "黄石市", "黄冈市", "咸宁市", "岳阳市", "九江市", "南昌市", "信阳市"),
+    PF("武汉市", "孝感市", "鄂州市", "黄石市", "黄冈市", "咸宁市", "岳阳市", "九江市", "南昌市", "信阳市", "荆门市", "随州市"),
     only=["CHI"], color="#f2a98c", cores="keep", parent="JAP", kind="military_administration")
 add("japanese_south_china", Y39, "JSC", "Japanese-Occupied South China", "日军华南占领区",
     {"hierarchy_groups": ["CN_Hainan"],
-     "prefectures": ["广州市", "佛山市", "东莞市", "深圳市", "惠州市", "汕头市", "潮州市", "厦门市"]},
+     "prefectures": ["广州市", "佛山市", "东莞市", "深圳市", "惠州市", "汕头市", "潮州市", "厦门市", "中山市", "江门市", "南宁市", "钦州市", "防城港市"]},
     only=["CHI"], color="#e8907a", cores="keep", parent="JAP", kind="military_administration")
 
 
@@ -339,9 +321,6 @@ narrow("khotan_ma", {"prefectures": ["和田地区"], "feature_ids": CN("1784445
 next(e for e in E if e["id"] == "khotan_ma").update(name_en="Khotan Military Administration", name_zh="和阗军政区")
 next(e for e in E if e["id"] == "mordovian_assr")["name_zh"] = "莫尔多维亚自治共和国"
 next(e for e in E if e["id"] == "mauritius")["select"] = CC("MU", "IO")
-next(e for e in E if e["id"] == "upper_volta").update(
-    name_en="Upper Volta Debug Region", name_zh="上沃尔特地区（调试分区）", subject_kind="administrative_region",
-    notes="Upper Volta was abolished in 1932–1947; retained solely as a debug subdivision.")
 next(e for e in E if e["id"] == "bohemia_moravia")["exclude"]["feature_ids"].append("CZ_ADM2_57006924B3568693077695")
 add("liberec_return", Y39, "GER", None, None, FI("CZ_ADM2_57006924B3568693077695"))
 add("kosice_return", Y39, "HUN", None, None, FI(*["SK_ADM2_56367889B" + n for n in
@@ -378,31 +357,16 @@ for tag, en, zh, cc, color in [("ERI", "Eritrea Governorate", "厄立特里亚�
     add(tag.lower() + "_governorate_1939", Y39, tag, en, zh, CC(cc), parent="AOI", kind="administrative_region",
         only=["AOI", tag], color=color, cores=["AOI"], notes="Modern-country regional proxy, not the precise historical governorate boundary.")
 
-NCP_POSTS = CN("40522342172572 53166682632414 35191117841364 70843634097749 19397285057030 9046707294983 22707504793071 41032470199188 96614928239344 14553820792876 97923044022234 4963111392108 57880389938199 76829643653933 19618376010244 16732896761360 78988614189372 30734228092100 83167737560066 45390451107599 83100874373445 18968160632662 36539700725824 27087882119733 85544446441725 10208475755367 60524829078673 67411780639584 21492950184785 91447424097989 53877556564875 62040954239455 45020271947314 67315226354305 61994504860165 27963337647177 67438977719884 82739268949282 44584253435303 21670105101896 72971629177091 8527290020627 84296108244083") + ["CN_MRG_380671e40a1c", "CN_MRG_ed13ca65f52b", "CN_MRG_08f0b7755ac2", "CN_MRG_31ba4a677ea0", "CN_MRG_9b9b2d2aa43a", "CN_MRG_005ada82e050"] + CN("32842590404417 89036303488164 20799087712877 453440967624 99191317899548 506119010576 43163945505607")
-CNZ_POSTS = CN("66003162693266 41187046911697 21512782047125 53922912898325")
-JBZ_POSTS = CN("90378533110631 35516654467080 62103868434319") + ["CN_MRG_3ff67345ed78"]
-MEN_POSTS = CN("58561192252896 83584927302596 42573248116242 56850756381420 74586174185496 76051276542746 97242903030707 71745014009476 38329795368035")
-RGC_POSTS = CN("45149819427590 19859477737164 46074982775581 47635697455490 82708605205805 78816749784203 71370953459893 92006637325800 13333769593378 46393920630539 36737936197596 69259623848725 77980777243348 68627257397845 39263965325493 91286509256855 60218719915669 43191682084250 77400672470843 94592901594717 42065564755438 85263946797397")
-JCC_POSTS = CN("52250123531455 90271468854707 56190437260016 36551936006551 44768888593389 82067370611519 78567156775151 74817202637370 50043505500678 83812560805647 59929886266985 42183204213930 64934349609422 47701832659247 68532057450373") + ["CN_MRG_398970fc50e7"]
-JSC_POSTS = CN("38988280096574 25965384817686 33382458843189 31711539663260 92305935351425 58186217435722 75995678778305 35691129963558 2295538790743 80309702523612 34195804181253 50490784073671 71635948673445")
-for eid, posts, restore, shanxi in [
-    ("provisional_government", NCP_POSTS, "CHI", True), ("south_chahar", CNZ_POSTS, "CHI", False),
-    ("north_shanxi", JBZ_POSTS, "SHX", False), ("mengjiang_1939", MEN_POSTS, "SHX", False),
-    ("reformed_government", RGC_POSTS, "CHI", False), ("japanese_central_china", JCC_POSTS, "CHI", False),
-    ("japanese_south_china", JSC_POSTS, "CHI", False)]:
-    narrow(eid, FI(*posts), restore, cores="keep", shanxi=shanxi)
-for eid in ("south_chahar", "north_shanxi"):
-    next(e for e in E if e["id"] == eid)["parent_owner_tag"] = "MEN"
 next(e for e in E if e["id"] == "south_chahar").update(name_en="South Chahar Administration", name_zh="察南政厅")
 next(e for e in E if e["id"] == "north_shanxi").update(name_en="North Shanxi Administration", name_zh="晋北政厅")
 men = next(e for e in E if e["id"] == "mengjiang_1939")
 men.update(name_en="Mongolian United Autonomous Government", name_zh="蒙古联合自治政府",
            notes="China uses late-1939 occupation; CNZ and JBZ remain subordinate debug administrations after the September merger.")
 men["only_from_owners"] += ["MAN", "CNZ"]
-next(e for e in E if e["id"] == "provisional_government")["only_from_owners"] += ["LUQ", "RGC"]
+next(e for e in E if e["id"] == "provisional_government")["only_from_owners"] += ["LUQ", "RGC", "MAN"]
 next(e for e in E if e["id"] == "japanese_south_china")["only_from_owners"] += ["GXC"]
 
-add("qinglong_return", B, "MAN", None, None, FI(*CN("43165756519885")))
+add("qinglong_return", Y36, "MAN", None, None, FI(*CN("43165756519885")))
 add("east_hebei_counties_1936", Y36, "EHC", None, None,
     FI(*CN("72792517073116 24643771294108 7080321063595 95574356023337 72922623961147 75890737929332 60414806889849 38375506939997")))
 add("hainan_qinlian_return_1936", Y36, "YUE", None, None,
@@ -436,71 +400,16 @@ add("northwestern_army_1936", Y36, "NWA", "Northwestern Army Administration", "�
     PF("西安市", "咸阳市", "渭南市", "汉中市"), parent="CHI", kind="military_administration", color="#435ba0",
     only=["CHI", "NWA"], cores="keep", notes="Guanzhong-Hanzhong faction proxy; overlapping garrisons are not separate sovereign territories.")
 for tag, en, zh, color, fids in [
-    ("JCJ", "Jin-Cha-Ji Border Region", "晋察冀边区", "#9f2836", CN("46736465172107 69993211466305")),
-    ("THG", "Taihang Resistance Area", "太行抗日根据地", "#b32032", ["CN_MRG_093183003948"]),
-    ("JZH", "Central Hebei Resistance Area", "冀中抗日根据地", "#d44442", CN("86070890642714 52385226353354")),
-    ("JNA", "Southern Hebei Resistance Area", "冀南抗日根据地", "#e36a5c", ["CN_MRG_51c0b9bbbb0a"]),
-    ("LZG", "Central Shandong Resistance Area", "鲁中抗日根据地", "#c83747", CN("77679479199341")),
-    ("JDG", "Jiaodong Resistance Area", "胶东抗日根据地", "#ef8a78", CN("99355884213700")),
-    ("BHA", "Southeastern Shandong Guerrilla Area", "鲁东南抗日游击区", "#a84956", CN("41312334217118")),
-    ("YWS", "Henan-Anhui-Jiangsu Guerrilla Area", "豫皖苏游击区", "#ad4a39", CN("89166552502762")),
-    ("MSN", "New Fourth Army Southern Jiangsu Area", "新四军苏南游击区", "#d85c69", CN("59245154361238 11407259911678")),
-    ("WNA", "New Fourth Army Southern Anhui Area", "新四军皖南驻区", "#7f344a", CN("59735937562693"))]:
+    ("JCJ", "Jin-Cha-Ji Border Region", "晋察冀边区", "#9f2836",
+     CN("46736465172107 69993211466305 48796108703718 59002516276853 8665149309175")
+     + ["CN_MRG_51650d15c050", "CN_MRG_9b9b2d2aa43a"]),
+    ("THG", "Taihang Resistance Area", "太行抗日根据地", "#b32032",
+     ["CN_MRG_093183003948", "CN_MRG_27a184e8ab38"] + CN("61726350757100"))]:
     add(tag.lower() + "_debug_1939", Y39, tag, en, zh, FI(*fids), parent="PRC", kind="military_administration",
         color=color, cores="keep", notes="Whole-parcel resistance-area debug proxy; county seats and rural control were mixed.")
 
-FEDERAL_SUBDIVISIONS = [
-    ("CAN", "CA", "CAAB", "Alberta", "阿尔伯塔省", "Edmonton"),
-    ("CAN", "CA", "CABC", "British_Columbia", "不列颠哥伦比亚省", "Victoria"),
-    ("CAN", "CA", "CAMB", "Manitoba", "马尼托巴省", "Winnipeg"),
-    ("CAN", "CA", "CANB", "New_Brunswick", "新不伦瑞克省", "Fredericton"),
-    ("CAN", "CA", "CANS", "Nova_Scotia", "新斯科舍省", "Halifax"),
-    ("CAN", "CA", "CAON", "Ontario", "安大略省", "Toronto"),
-    ("CAN", "CA", "CAPE", "Prince_Edward_Island", "爱德华王子岛省", "Charlottetown"),
-    ("CAN", "CA", "CAQC", "Quebec", "魁北克省", "Quebec City"),
-    ("CAN", "CA", "CASK", "Saskatchewan", "萨斯卡彻温省", "Regina"),
-    # Australia stays whole: the golden flows probe interior Western Australia and need it free of
-    # a state label (tests/e2e/golden/golden-support.js PROBE_LON_LAT).
-]
-US_STATES = [
-    ("AL", "Alabama", "亚拉巴马州", "Montgomery"), ("AZ", "Arizona", "亚利桑那州", "Phoenix"),
-    ("AR", "Arkansas", "阿肯色州", "Little Rock"), ("CA", "California", "加利福尼亚州", "Sacramento"),
-    ("CO", "Colorado", "科罗拉多州", "Denver"), ("CT", "Connecticut", "康涅狄格州", "Hartford"),
-    ("DE", "Delaware", "特拉华州", "Dover"), ("FL", "Florida", "佛罗里达州", "Tallahassee"),
-    ("GA", "Georgia", "佐治亚州", "Atlanta"), ("ID", "Idaho", "爱达荷州", "Boise"),
-    ("IL", "Illinois", "伊利诺伊州", "Springfield"), ("IN", "Indiana", "印第安纳州", "Indianapolis"),
-    ("IA", "Iowa", "艾奥瓦州", "Des Moines"), ("KS", "Kansas", "堪萨斯州", "Topeka"),
-    ("KY", "Kentucky", "肯塔基州", "Frankfort"), ("LA", "Louisiana", "路易斯安那州", "Baton Rouge"),
-    ("ME", "Maine", "缅因州", "Augusta"), ("MD", "Maryland", "马里兰州", "Annapolis"),
-    ("MA", "Massachusetts", "马萨诸塞州", "Boston"), ("MI", "Michigan", "密歇根州", "Lansing"),
-    ("MN", "Minnesota", "明尼苏达州", "Saint Paul"), ("MS", "Mississippi", "密西西比州", "Jackson"),
-    ("MO", "Missouri", "密苏里州", "Jefferson City"), ("MT", "Montana", "蒙大拿州", "Helena"),
-    ("NE", "Nebraska", "内布拉斯加州", "Lincoln"), ("NV", "Nevada", "内华达州", "Carson City"),
-    ("NH", "New_Hampshire", "新罕布什尔州", "Concord"), ("NJ", "New_Jersey", "新泽西州", "Trenton"),
-    ("NM", "New_Mexico", "新墨西哥州", "Santa Fe"), ("NY", "New_York", "纽约州", "Albany"),
-    ("NC", "North_Carolina", "北卡罗来纳州", "Raleigh"), ("ND", "North_Dakota", "北达科他州", "Bismarck"),
-    ("OH", "Ohio", "俄亥俄州", "Columbus"), ("OK", "Oklahoma", "俄克拉何马州", "Oklahoma City"),
-    ("OR", "Oregon", "俄勒冈州", "Salem"), ("PA", "Pennsylvania", "宾夕法尼亚州", "Harrisburg"),
-    ("RI", "Rhode_Island", "罗得岛州", "Providence"), ("SC", "South_Carolina", "南卡罗来纳州", "Columbia"),
-    ("SD", "South_Dakota", "南达科他州", "Pierre"), ("TN", "Tennessee", "田纳西州", "Nashville"),
-    ("TX", "Texas", "得克萨斯州", "Austin"), ("UT", "Utah", "犹他州", "Salt Lake City"),
-    ("VT", "Vermont", "佛蒙特州", "Montpelier"), ("VA", "Virginia", "弗吉尼亚州", "Richmond"),
-    ("WA", "Washington", "华盛顿州", "Olympia"), ("WV", "West_Virginia", "西弗吉尼亚州", "Charleston"),
-    ("WI", "Wisconsin", "威斯康星州", "Madison"), ("WY", "Wyoming", "怀俄明州", "Cheyenne"),
-]
-FEDERAL_SUBDIVISIONS += [("USA", "US", "US" + abbr, name, zh, capital) for abbr, name, zh, capital in US_STATES]
-for i, (parent, cc, tag, name, zh, capital) in enumerate(FEDERAL_SUBDIVISIONS):
-    h, l, sat = colorsys.rgb_to_hls(*(int(PARENT_COLOR[parent][k:k + 2], 16) / 255 for k in (1, 3, 5)))
-    rgb = colorsys.hls_to_rgb((h + ((i * 7) % 17 - 8) * .006) % 1, .34 + (i % 8) * .055, .35 + (i % 3) * .12)
-    color = "#%02x%02x%02x" % tuple(round(c * 255) for c in rgb)
-    add(tag.lower() + "_administration", B, tag, name.replace("_", " "), zh, HG(cc + "_" + name),
-        parent=parent, kind="province" if cc == "CA" else "state", color=color, cores=[parent],
-        exclude=FI("CA_FED_35079") if tag == "CAON" else None,
-        notes="Ottawa parcel retained as the federal seat in this debug subdivision." if tag == "CAON" else None)
-
-
 # ---------- 同色系配色 ----------
-# Subjects keep their parent's hue (±10° in OKLCH) and vary lightness/chroma; colours are picked
+# Subjects keep their parent's hue (±5° in OKLCH) and vary lightness/chroma; colours are picked
 # greedily from a low-discrepancy pool so siblings and the parent stay perceptually apart.
 def _srgb_to_linear(c):
     return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
@@ -540,18 +449,18 @@ def _halton(index, base):
     return result
 
 
-def family_palette(parent_hex, count, hue_span=10.0):
+def family_palette(parent_hex, count, hue_span=5.0):
     L0, a0, b0 = hex_to_oklab(parent_hex)
     C0, h0 = math.hypot(a0, b0), math.degrees(math.atan2(b0, a0))
-    # A 0.32-wide lightness window around the parent, shifted inward at the 0.30/0.90 limits,
+    # A 0.16-wide lightness window around the parent, shifted inward at the 0.30/0.90 limits,
     # so very light (JAP) or dark (SOV) parents still give their subjects enough range.
-    lo = min(max(0.30, L0 - 0.16), 0.90 - 0.32)
-    hi = lo + 0.32
+    lo = min(max(0.30, L0 - 0.08), 0.90 - 0.16)
+    hi = lo + 0.16
     pool = []
     for i in range(1, 900):
         L = lo + (hi - lo) * _halton(i, 2)
         # Near-grey parents (GER) keep greyscale subjects: their hue angle is meaningless.
-        C = C0 + 0.01 * _halton(i, 3) if C0 < 0.03 else max(0.02, C0 * (0.55 + 0.6 * _halton(i, 3)))
+        C = C0 * (0.85 + 0.20 * _halton(i, 3))
         h = math.radians(h0 + hue_span * (2 * _halton(i, 5) - 1))
         while True:  # pull chroma back into the sRGB gamut
             lab = (L, C * math.cos(h), C * math.sin(h))
@@ -560,7 +469,8 @@ def family_palette(parent_hex, count, hue_span=10.0):
                 break
             C *= 0.92
         if all(0 <= c <= 1 for c in rgb):
-            pool.append(lab)
+            if math.dist(lab, (L0, a0, b0)) <= 0.119:
+                pool.append(lab)
     chosen, anchors = [], [(L0, a0, b0)]
     for _ in range(count):
         best = max(pool, key=lambda p: min(math.dist(p, q) for q in anchors))
@@ -571,40 +481,45 @@ def family_palette(parent_hex, count, hue_span=10.0):
 
 
 def harmonize_family_colors(entries):
-    parent_of, scenarios_of = {}, {}
+    colors_by_scenario = {}
     for scenario, countries in (("hoi4_1936", C36), ("hoi4_1939", C39)):
-        for tag, country in countries.items():
-            if country.get("parent_owner_tag"):
-                parent_of.setdefault(tag, country["parent_owner_tag"])
-            scenarios_of.setdefault(tag, []).append(scenario)
-    for e in entries:
-        if e.get("parent_owner_tag"):
-            parent_of[e["tag"]] = e["parent_owner_tag"]
-        for scenario in e["scenarios"]:
-            if scenario not in scenarios_of.setdefault(e["tag"], []):
-                scenarios_of[e["tag"]].append(scenario)
-    colour = dict(PARENT_COLOR)
-    for e in entries:
-        if e.get("color_hex") and e["tag"] not in parent_of:
-            colour[e["tag"]] = e["color_hex"]
-    families = {}
-    for child, parent in sorted(parent_of.items()):
-        families.setdefault(parent, []).append(child)
+        parent_of = {tag: country["parent_owner_tag"] for tag, country in countries.items()
+                     if country.get("parent_owner_tag")}
+        applicable = [e for e in entries if scenario in e["scenarios"]]
+        for e in applicable:
+            if e.get("parent_owner_tag"):
+                parent_of[e["tag"]] = e["parent_owner_tag"]
+        colour = {tag: country["color_hex"] for tag, country in countries.items()}
+        for e in applicable:
+            if e.get("color_hex") and e["tag"] not in parent_of:
+                colour[e["tag"]] = e["color_hex"]
+        families = {}
+        for child, parent in sorted(parent_of.items()):
+            families.setdefault(parent, []).append(child)
 
-    def depth(tag, seen=()):
-        return 0 if tag not in parent_of or tag in seen else 1 + depth(parent_of[tag], seen + (tag,))
+        def depth(tag, seen=()):
+            return 0 if tag not in parent_of or tag in seen else 1 + depth(parent_of[tag], seen + (tag,))
 
-    for parent in sorted(families, key=lambda t: (depth(t), t)):
-        children = families[parent]
-        for child, hex_color in zip(children, family_palette(colour[parent], len(children))):
-            colour[child] = hex_color
-    entry_tags = {e["tag"] for e in entries}
+        for parent in sorted(families, key=lambda t: (depth(t), t)):
+            for child, hex_color in zip(families[parent], family_palette(colour[parent], len(families[parent]))):
+                colour[child] = hex_color
+        colors_by_scenario[scenario] = {tag: colour[tag] for tag in parent_of}
+        entry_tags = {e["tag"] for e in applicable}
+        for tag in sorted(set(parent_of) - entry_tags):
+            entries.append({"id": f"{tag.lower()}_family_colour_{scenario}", "scenarios": [scenario], "tag": tag,
+                            "select": {"owners": [tag]}, "only_from_owners": [tag]})
+    colored_entries = []
     for e in entries:
-        if e["tag"] in parent_of:
-            e["color_hex"] = colour[e["tag"]]
-    for tag in sorted(set(parent_of) - entry_tags):  # subjects from the manual rules: colour-only entries
-        entries.append({"id": f"{tag.lower()}_family_colour", "scenarios": sorted(scenarios_of[tag]), "tag": tag,
-                        "color_hex": colour[tag], "select": {"owners": [tag]}, "only_from_owners": [tag]})
+        colors = {scenario: colors_by_scenario[scenario].get(e["tag"], e.get("color_hex"))
+                  for scenario in e["scenarios"]}
+        if len(set(colors.values())) == 1:
+            if next(iter(colors.values())):
+                e["color_hex"] = next(iter(colors.values()))
+            colored_entries.append(e)
+        else:
+            for scenario, color in colors.items():
+                colored_entries.append({**e, "id": f"{e['id']}_{scenario}", "scenarios": [scenario], "color_hex": color})
+    entries[:] = colored_entries
 
 
 geometry_rules = json.loads((W / "data/scenario-rules/hoi4_geometry_splits.json").read_text(encoding="utf-8"))
@@ -628,6 +543,9 @@ add("guangzhouwan", B, "KWW", "Guangzhouwan Leased Territory", "广州湾租借�
     parent="FRA", kind="colony", notes=geometry_by_id["guangzhouwan"]["notes"])
 
 harmonize_family_colors(E)
+E.append({"id": "china_enclaves_1939", "scenarios": Y39,
+          "smooth_enclaves": {"tags": ["CHI", "SHX", "PRC", "NCP", "CNZ", "JBZ", "MEN", "RGC", "JCC", "JSC", "JCJ", "THG"],
+                              "max_area_km2": 3000}})
 
 ids = [e["id"] for e in E]
 assert len(ids) == len(set(ids)), "duplicate ids"

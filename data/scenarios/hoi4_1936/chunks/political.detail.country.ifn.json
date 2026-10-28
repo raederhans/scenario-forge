@@ -13,12 +13,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Souss - Massa - Draâ · Ifni",
-        "name_zh": "苏斯 - 马萨 - 德拉阿 · 伊夫尼",
         "aliases": [
           "Souss - Massa - Draâ",
           "苏斯 - 马萨 - 德拉阿"
-        ]
+        ],
+        "name_en": "Souss - Massa - Draâ · Ifni",
+        "name_zh": "苏斯 - 马萨 - 德拉阿 · 伊夫尼"
       },
       "geometry": {
         "type": "Polygon",
@@ -88,12 +88,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Guelmim - Es-Semara · Ifni",
-        "name_zh": "盖勒敏 - 埃斯-塞马拉 · 伊夫尼",
         "aliases": [
           "Guelmim - Es-Semara",
           "盖勒敏 - 埃斯-塞马拉"
-        ]
+        ],
+        "name_en": "Guelmim - Es-Semara · Ifni",
+        "name_zh": "盖勒敏 - 埃斯-塞马拉 · 伊夫尼"
       },
       "geometry": {
         "type": "Polygon",

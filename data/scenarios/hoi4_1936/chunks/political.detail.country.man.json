@@ -46209,12 +46209,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Dalian · Remainder",
-        "name_zh": "大连 · 余部",
         "aliases": [
           "Dalian",
           "大连"
-        ]
+        ],
+        "name_en": "Dalian · Remainder",
+        "name_zh": "大连 · 余部"
       },
       "geometry": {
         "type": "Polygon",

@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1939/audit.json",
-  "baseline_hash": "03cc47b56fe95e84e7bca9ee399432111321612829da0673e66ce011d0843071",
+  "baseline_hash": "f872c0a3fa1e6f3f5e4169f289bc4c0c4f69fb4b193df572454933884617b9dc",
   "bookmark_date": "1939.8.14.12",
   "bookmark_description": "BLITZKRIEG_DESC",
   "bookmark_name": "BLITZKRIEG_NAME",
@@ -2512,12 +2512,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "6d34df6f9cae53a37188147d312b785ee0902ac5a78b46dc55fff73f9814f248",
+  "snapshot_fingerprint": "745256722f7d48b4ebfa2269322afa7499b35f351cad12127bc250687f8babb8",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "42aaba3b38437e8d99ce8c881d47123cd188d8a3cd224bfbf4abe3d3be6edba3",
+    "detail_chunk_manifest_sha256": "d0b867c1f264df827eb9b5f31e029e2a55855671b4a4f8e60c547b59a3bb8303",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "runtime_topology_sha256": "1433a50aa7639799732380a5939e353c8af243e97fbcde536674a34fb7babdc3"
+    "runtime_topology_sha256": "6cf7c31ded456515351a77de093e71e930beba360a88bdcaac8572766a6fdbe5"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1939/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -2536,7 +2536,7 @@
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
     "changed_feature_count": 15403,
-    "controller_count": 308,
+    "controller_count": 229,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
@@ -2546,7 +2546,7 @@
     "manual_reviewed_feature_count": 14956,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 308,
+    "owner_count": 229,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5744,

@@ -17136,12 +17136,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Zhanjianghsi · Remainder",
-        "name_zh": "湛江市 · 余部",
         "aliases": [
           "Zhanjianghsi",
           "湛江市"
-        ]
+        ],
+        "name_en": "Zhanjianghsi · Remainder",
+        "name_zh": "湛江市 · 余部"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -17225,9 +17225,11 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
+        "aliases": [
+          "Suixixian"
+        ],
         "name_en": "Suixixian · Remainder",
-        "name_zh": "Suixixian · 余部",
-        "aliases": []
+        "name_zh": "Suixixian · 余部"
       },
       "geometry": {
         "type": "Polygon",
@@ -17397,12 +17399,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Wuchuan · Remainder",
-        "name_zh": "吴川 · 余部",
         "aliases": [
           "Wuchuan",
           "吴川"
-        ]
+        ],
+        "name_en": "Wuchuan · Remainder",
+        "name_zh": "吴川 · 余部"
       },
       "geometry": {
         "type": "Polygon",

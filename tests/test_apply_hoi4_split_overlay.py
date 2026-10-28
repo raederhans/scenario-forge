@@ -9,6 +9,63 @@ from scenario_builder.hoi4.crosswalk import _derive_subject_color_hex
 
 
 @pytest.fixture
+def enclave_inputs(inputs):
+    arcs, registry, geometries = [], {}, []
+    for x in range(3):
+        for y in range(3):
+            points = [(x / 10, y / 10), ((x + 1) / 10, y / 10),
+                      ((x + 1) / 10, (y + 1) / 10), (x / 10, (y + 1) / 10)]
+            ring = []
+            for a, b in zip(points, points[1:] + points[:1]):
+                key = tuple(sorted((a, b)))
+                if key not in registry:
+                    registry[key] = len(arcs)
+                    arcs.append([list(p) for p in key])
+                index = registry[key]
+                ring.append(index if (a, b) == key else ~index)
+            geometries.append({"type": "Polygon", "arcs": [ring],
+                               "properties": {"id": f"{x}{y}", "cntr_code": "CN"}})
+    inputs["topology"] = {"type": "Topology", "arcs": arcs,
+                          "objects": {"political": {"type": "GeometryCollection", "geometries": geometries}}}
+    inputs["features"] = {g["properties"]["id"]: g["properties"] for g in geometries}
+    inputs["owners"] = {fid: "CAN" if fid == "11" else "ENG" for fid in inputs["features"]}
+    inputs["cores"] = {fid: ["CHI"] for fid in inputs["features"]}
+    return inputs
+
+
+def smoothing_rule(**kwargs):
+    return {"id": "smooth", "scenarios": ["hoi4_1939"],
+            "smooth_enclaves": {"tags": ["CAN", "ENG"], "max_area_km2": 3000, **kwargs}}
+
+
+def test_smooth_shared_arcs_preserves_cores_and_is_stable(enclave_inputs):
+    assert apply(enclave_inputs, smoothing_rule(), scenario="hoi4_1936")[1] == {}
+    countries, assignments, report = apply(enclave_inputs, smoothing_rule(), scenario="hoi4_1939")
+    assert assignments == {"11": {"parent_id": "11", "owner": "ENG", "controller": "ENG", "cores": ["CHI"]}}
+    assert report["changed_count"] == 1
+    enclave_inputs["owners"]["11"] = "ENG"
+    enclave_inputs["countries"] = countries
+    assert apply(enclave_inputs, smoothing_rule(), scenario="hoi4_1939")[1] == {}
+
+
+@pytest.mark.parametrize("case", ["large", "mixed", "outside_tags", "island"])
+def test_smoothing_leaves_non_enclaves(enclave_inputs, case):
+    rule = smoothing_rule(max_area_km2=1) if case == "large" else smoothing_rule()
+    if case == "mixed":
+        enclave_inputs["owners"]["12"] = "CHI"
+    elif case == "outside_tags":
+        rule = smoothing_rule(tags=["CHI", "CAN"])
+    elif case == "island":
+        topology = enclave_inputs["topology"]
+        center = topology["objects"]["political"]["geometries"][4]
+        start = len(topology["arcs"])
+        topology["arcs"].extend([[[1, 1], [1.1, 1]], [[1.1, 1], [1.1, 1.1]],
+                                 [[1.1, 1.1], [1, 1.1]], [[1, 1.1], [1, 1]]])
+        center["arcs"] = [list(range(start, start + 4))]
+    assert apply(enclave_inputs, rule, scenario="hoi4_1939")[1] == {}
+
+
+@pytest.fixture
 def inputs():
     return dict(
         features={fid: {"id": fid, "cntr_code": code} for fid, code in

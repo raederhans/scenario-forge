@@ -121736,12 +121736,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Sakhalin · Central · North of 50°N",
-        "name_zh": "萨哈林州·中部 · 北纬50°以北",
         "aliases": [
           "Sakhalin · Central",
           "萨哈林州·中部"
-        ]
+        ],
+        "name_en": "Sakhalin · Central · North of 50°N",
+        "name_zh": "萨哈林州·中部 · 北纬50°以北"
       },
       "geometry": {
         "type": "Polygon",

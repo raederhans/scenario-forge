@@ -22588,12 +22588,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Sakhalin · Central · South of 50°N",
-        "name_zh": "萨哈林州·中部 · 北纬50°以南",
         "aliases": [
           "Sakhalin · Central",
           "萨哈林州·中部"
-        ]
+        ],
+        "name_en": "Sakhalin · Central · South of 50°N",
+        "name_zh": "萨哈林州·中部 · 北纬50°以南"
       },
       "geometry": {
         "type": "MultiPolygon",

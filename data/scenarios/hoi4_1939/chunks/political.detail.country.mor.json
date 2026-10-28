@@ -1975,12 +1975,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Souss - Massa - Draâ · Remainder",
-        "name_zh": "苏斯 - 马萨 - 德拉阿 · 余部",
         "aliases": [
           "Souss - Massa - Draâ",
           "苏斯 - 马萨 - 德拉阿"
-        ]
+        ],
+        "name_en": "Souss - Massa - Draâ · Remainder",
+        "name_zh": "苏斯 - 马萨 - 德拉阿 · 余部"
       },
       "geometry": {
         "type": "Polygon",

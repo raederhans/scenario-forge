@@ -60353,12 +60353,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Pomeranian · North · Remainder",
-        "name_zh": "滨海省·北部 · 余部",
         "aliases": [
           "Pomeranian · North",
           "滨海省·北部"
-        ]
+        ],
+        "name_en": "Pomeranian · North · Remainder",
+        "name_zh": "滨海省·北部 · 余部"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -60842,12 +60842,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Pomeranian · South · Remainder",
-        "name_zh": "滨海省·南部 · 余部",
         "aliases": [
           "Pomeranian · South",
           "滨海省·南部"
-        ]
+        ],
+        "name_en": "Pomeranian · South · Remainder",
+        "name_zh": "滨海省·南部 · 余部"
       },
       "geometry": {
         "type": "Polygon",
@@ -61325,12 +61325,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "malborski · Remainder",
-        "name_zh": "马尔堡 · 余部",
         "aliases": [
           "malborski",
           "马尔堡"
-        ]
+        ],
+        "name_en": "malborski · Remainder",
+        "name_zh": "马尔堡 · 余部"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -61494,9 +61494,11 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
+        "aliases": [
+          "nowodworski"
+        ],
         "name_en": "nowodworski · Remainder",
-        "name_zh": "nowodworski · 余部",
-        "aliases": []
+        "name_zh": "nowodworski · 余部"
       },
       "geometry": {
         "type": "MultiPolygon",

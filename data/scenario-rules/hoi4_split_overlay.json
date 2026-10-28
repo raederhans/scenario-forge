@@ -22,7 +22,7 @@
         "ENG"
       ],
       "notes": "Faroe Islands stay under Denmark until the 1940 British occupation.",
-      "color_hex": "#604b3c"
+      "color_hex": "#825c45"
     },
     {
       "id": "greenland_parent",
@@ -41,7 +41,7 @@
       "only_from_owners": [
         "GRN"
       ],
-      "color_hex": "#c3a79b"
+      "color_hex": "#b08c7a"
     },
     {
       "id": "hatay_1936",
@@ -58,12 +58,31 @@
         "TUR"
       ],
       "notes": "Sanjak of Alexandretta remains in the French Syrian mandate in 1936.",
-      "color_hex": "#5369c8"
+      "color_hex": "#3375d4"
     },
     {
-      "id": "dodecanese",
+      "id": "dodecanese_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "DOD",
+      "name_en": "Italian Aegean Islands",
+      "name_zh": "意属爱琴海群岛",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "colony",
+      "select": {
+        "feature_ids": [
+          "EL421"
+        ]
+      },
+      "only_from_owners": [
+        "GRE"
+      ],
+      "color_hex": "#679457"
+    },
+    {
+      "id": "dodecanese_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "DOD",
@@ -79,12 +98,36 @@
       "only_from_owners": [
         "GRE"
       ],
-      "color_hex": "#2e6407"
+      "color_hex": "#478d51"
     },
     {
-      "id": "british_somaliland",
+      "id": "british_somaliland_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "SML",
+      "name_en": "British Somaliland",
+      "name_zh": "英属索马里兰",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "SO_Awdal",
+          "SO_Woqooyi_Galbeed",
+          "SO_Sanaag",
+          "SO_Sool",
+          "SO_Togdheer"
+        ]
+      },
+      "only_from_owners": [
+        "SOM",
+        "AOI"
+      ],
+      "color_hex": "#d35975"
+    },
+    {
+      "id": "british_somaliland_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "SML",
@@ -105,12 +148,32 @@
         "SOM",
         "AOI"
       ],
-      "color_hex": "#e77991"
+      "color_hex": "#c93265"
     },
     {
-      "id": "newfoundland",
+      "id": "newfoundland_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "NFL",
+      "name_en": "Dominion of Newfoundland",
+      "name_zh": "纽芬兰自治领",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "dominion",
+      "select": {
+        "hierarchy_groups": [
+          "CA_Newfoundland_and_Labrador"
+        ]
+      },
+      "only_from_owners": [
+        "CAN"
+      ],
+      "notes": "Newfoundland under Commission of Government (1934-1949), separate from Canada.",
+      "color_hex": "#b6314c"
+    },
+    {
+      "id": "newfoundland_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "NFL",
@@ -127,7 +190,7 @@
         "CAN"
       ],
       "notes": "Newfoundland under Commission of Government (1934-1949), separate from Canada.",
-      "color_hex": "#c74b53"
+      "color_hex": "#c0345f"
     },
     {
       "id": "portuguese_india",
@@ -149,7 +212,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#145a21"
+      "color_hex": "#2a8254"
     },
     {
       "id": "monaco",
@@ -253,9 +316,28 @@
       "notes": "Simplified rural outline using Danziger Hoehe/Niederung and Grosses Werder extent; Nogat and western land frontier generalized. Gdansk/Sopot retained separately; Gdynia, Elblag and PL_POW_1414 excluded explicitly by source IDs. This is a debug approximation, not a precise historical survey."
     },
     {
-      "id": "southern_rhodesia",
+      "id": "southern_rhodesia_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "RHO",
+      "name_en": "Southern Rhodesia",
+      "name_zh": "南罗得西亚",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "ZW"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#dd506c"
+    },
+    {
+      "id": "southern_rhodesia_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "RHO",
@@ -271,12 +353,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d23273"
+      "color_hex": "#ca4057"
     },
     {
-      "id": "northern_rhodesia",
+      "id": "northern_rhodesia_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "NRH",
+      "name_en": "Northern Rhodesia",
+      "name_zh": "北罗得西亚",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "ZM"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#c6466b"
+    },
+    {
+      "id": "northern_rhodesia_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "NRH",
@@ -292,12 +393,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#aa5270"
+      "color_hex": "#dc4574"
     },
     {
-      "id": "nyasaland",
+      "id": "nyasaland_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "NYS",
+      "name_en": "Nyasaland",
+      "name_zh": "尼亚萨兰",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "MW"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#c0345f"
+    },
+    {
+      "id": "nyasaland_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "NYS",
@@ -313,12 +433,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#a23054"
+      "color_hex": "#d34869"
     },
     {
-      "id": "basutoland",
+      "id": "basutoland_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BAS",
+      "name_en": "Basutoland",
+      "name_zh": "巴苏陀兰",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "LS"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#bc2045"
+    },
+    {
+      "id": "basutoland_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BAS",
@@ -334,12 +473,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#a60251"
+      "color_hex": "#de4563"
     },
     {
-      "id": "swaziland",
+      "id": "swaziland_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "SWZ",
+      "name_en": "Swaziland",
+      "name_zh": "斯威士兰",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "SZ"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#cf3e62"
+    },
+    {
+      "id": "swaziland_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "SWZ",
@@ -355,12 +513,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#cf7f8f"
+      "color_hex": "#ca3351"
     },
     {
-      "id": "hong_kong",
+      "id": "hong_kong_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "HKG",
+      "name_en": "Hong Kong",
+      "name_zh": "香港",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "HK"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#e3576b"
+    },
+    {
+      "id": "hong_kong_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "HKG",
@@ -376,12 +553,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#c25571"
+      "color_hex": "#d4405a"
     },
     {
-      "id": "british_honduras",
+      "id": "british_honduras_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BHO",
+      "name_en": "British Honduras",
+      "name_zh": "英属洪都拉斯",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "BZ"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#b11051"
+    },
+    {
+      "id": "british_honduras_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BHO",
@@ -397,12 +593,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d75a63"
+      "color_hex": "#bc3a50"
     },
     {
-      "id": "british_guiana",
+      "id": "british_guiana_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BGU",
+      "name_en": "British Guiana",
+      "name_zh": "英属圭亚那",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "GY"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#b1395e"
+    },
+    {
+      "id": "british_guiana_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BGU",
@@ -418,12 +633,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#954c62"
+      "color_hex": "#ca5070"
     },
     {
-      "id": "bahrain",
+      "id": "bahrain_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BAH",
+      "name_en": "Bahrain",
+      "name_zh": "巴林",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "BH"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#a32c50"
+    },
+    {
+      "id": "bahrain_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BAH",
@@ -439,12 +673,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#f9507a"
+      "color_hex": "#bc2045"
     },
     {
-      "id": "qatar",
+      "id": "qatar_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "QAT",
+      "name_en": "Qatar",
+      "name_zh": "卡塔尔",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "QA"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#d34869"
+    },
+    {
+      "id": "qatar_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "QAT",
@@ -460,12 +713,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#fb7278"
+      "color_hex": "#dd506c"
     },
     {
-      "id": "trucial_states",
+      "id": "trucial_states_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "TRU",
+      "name_en": "Trucial States",
+      "name_zh": "特鲁西尔诸国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "AE"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#b53c57"
+    },
+    {
+      "id": "trucial_states_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "TRU",
@@ -481,12 +753,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d64c6f"
+      "color_hex": "#b62359"
     },
     {
-      "id": "malta",
+      "id": "malta_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "MLT",
+      "name_en": "Malta",
+      "name_zh": "马耳他",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "MT"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#b22750"
+    },
+    {
+      "id": "malta_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "MLT",
@@ -502,12 +793,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#a80532"
+      "color_hex": "#ab2644"
     },
     {
-      "id": "cyprus",
+      "id": "cyprus_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "CYP",
+      "name_en": "Cyprus",
+      "name_zh": "塞浦路斯",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "CY"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#d33f6e"
+    },
+    {
+      "id": "cyprus_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "CYP",
@@ -523,12 +833,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#8d0329"
+      "color_hex": "#ac3448"
     },
     {
-      "id": "jamaica",
+      "id": "jamaica_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "JAM",
+      "name_en": "Jamaica",
+      "name_zh": "牙买加",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "JM"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#d75176"
+    },
+    {
+      "id": "jamaica_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "JAM",
@@ -544,12 +873,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ca7475"
+      "color_hex": "#c52b4d"
     },
     {
-      "id": "trinidad",
+      "id": "trinidad_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "TRI",
+      "name_en": "Trinidad and Tobago",
+      "name_zh": "特立尼达和多巴哥",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "TT"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#ca3351"
+    },
+    {
+      "id": "trinidad_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "TRI",
@@ -565,12 +913,31 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#c51e4d"
+      "color_hex": "#e74d66"
     },
     {
-      "id": "bahamas",
+      "id": "bahamas_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BHM",
+      "name_en": "Bahamas",
+      "name_zh": "巴哈马",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "BS"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#ca5070"
+    },
+    {
+      "id": "bahamas_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BHM",
@@ -586,12 +953,32 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#973139"
+      "color_hex": "#b11051"
     },
     {
-      "id": "mauritius",
+      "id": "mauritius_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "MUR",
+      "name_en": "Mauritius",
+      "name_zh": "毛里求斯",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "MU",
+          "IO"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#cf4f62"
+    },
+    {
+      "id": "mauritius_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "MUR",
@@ -608,12 +995,32 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ef4d5b"
+      "color_hex": "#b6314c"
     },
     {
-      "id": "falklands",
+      "id": "falklands_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "FLK",
+      "name_en": "Falkland Islands",
+      "name_zh": "福克兰群岛",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "FK",
+          "GS"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#ac3448"
+    },
+    {
+      "id": "falklands_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "FLK",
@@ -630,12 +1037,37 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#e96a73"
+      "color_hex": "#ba4364"
     },
     {
-      "id": "bwa_nigeria",
+      "id": "bwa_nigeria_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BWA",
+      "name_en": "Nigeria",
+      "name_zh": "尼日利亚",
+      "select": {
+        "country_codes": [
+          "NG"
+        ],
+        "hierarchy_groups": [
+          "CM_Northwest",
+          "CM_Southwest"
+        ]
+      },
+      "only_from_owners": [
+        "BWA",
+        "FRA",
+        "AEF",
+        "ENG"
+      ],
+      "notes": "Nigeria plus the British Cameroons mandate.",
+      "color_hex": "#be265c"
+    },
+    {
+      "id": "bwa_nigeria_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BWA",
@@ -657,12 +1089,31 @@
         "ENG"
       ],
       "notes": "Nigeria plus the British Cameroons mandate.",
-      "color_hex": "#ae585b"
+      "color_hex": "#d33f6e"
     },
     {
-      "id": "gold_coast",
+      "id": "gold_coast_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "GLD",
+      "name_en": "Gold Coast",
+      "name_zh": "黄金海岸",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "GH"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "color_hex": "#ba4364"
+    },
+    {
+      "id": "gold_coast_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "GLD",
@@ -678,12 +1129,31 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#e13a59"
+      "color_hex": "#d75176"
     },
     {
-      "id": "sierra_leone",
+      "id": "sierra_leone_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "SIE",
+      "name_en": "Sierra Leone",
+      "name_zh": "塞拉利昂",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "SL"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "color_hex": "#ab204d"
+    },
+    {
+      "id": "sierra_leone_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "SIE",
@@ -699,12 +1169,31 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#843b3e"
+      "color_hex": "#b61547"
     },
     {
-      "id": "gambia",
+      "id": "gambia_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "GAM",
+      "name_en": "Gambia",
+      "name_zh": "冈比亚",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "GM"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "color_hex": "#b2113c"
+    },
+    {
+      "id": "gambia_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "GAM",
@@ -720,12 +1209,29 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#ad3f58"
+      "color_hex": "#e3576b"
     },
     {
-      "id": "bea_kenya",
+      "id": "bea_kenya_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BEA",
+      "name_en": "Kenya",
+      "name_zh": "肯尼亚",
+      "select": {
+        "country_codes": [
+          "KE"
+        ]
+      },
+      "only_from_owners": [
+        "BEA"
+      ],
+      "color_hex": "#de4563"
+    },
+    {
+      "id": "bea_kenya_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BEA",
@@ -739,12 +1245,31 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#b76b82"
+      "color_hex": "#b1395e"
     },
     {
-      "id": "uganda",
+      "id": "uganda_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "UGA",
+      "name_en": "Uganda",
+      "name_zh": "乌干达",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "UG"
+        ]
+      },
+      "only_from_owners": [
+        "BEA"
+      ],
+      "color_hex": "#e74d66"
+    },
+    {
+      "id": "uganda_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "UGA",
@@ -760,12 +1285,40 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#c3758d"
+      "color_hex": "#be2b52"
     },
     {
-      "id": "tanganyika",
+      "id": "tanganyika_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "TGN",
+      "name_en": "Tanganyika",
+      "name_zh": "坦噶尼喀",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "mandate",
+      "select": {
+        "country_codes": [
+          "TZ"
+        ]
+      },
+      "exclude": {
+        "hierarchy_groups": [
+          "TZ_Unguja_South",
+          "TZ_Unguja_North",
+          "TZ_Mjini_Magharibi",
+          "TZ_North_Pemba",
+          "TZ_South_Pemba"
+        ]
+      },
+      "only_from_owners": [
+        "BEA"
+      ],
+      "color_hex": "#de547c"
+    },
+    {
+      "id": "tanganyika_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "TGN",
@@ -790,12 +1343,35 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#a7343e"
+      "color_hex": "#b53c57"
     },
     {
-      "id": "zanzibar",
+      "id": "zanzibar_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "ZAN",
+      "name_en": "Zanzibar",
+      "name_zh": "桑给巴尔",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "TZ_Unguja_South",
+          "TZ_Unguja_North",
+          "TZ_Mjini_Magharibi",
+          "TZ_North_Pemba",
+          "TZ_South_Pemba"
+        ]
+      },
+      "only_from_owners": [
+        "BEA"
+      ],
+      "color_hex": "#b62359"
+    },
+    {
+      "id": "zanzibar_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "ZAN",
@@ -815,12 +1391,32 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#812330"
+      "color_hex": "#b73158"
     },
     {
-      "id": "hyderabad",
+      "id": "hyderabad_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "HYD",
+      "name_en": "Hyderabad",
+      "name_zh": "海得拉巴",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Telangana"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "notes": "Princely state approximated by the modern state; not a historical boundary.",
+      "color_hex": "#b04a5b"
+    },
+    {
+      "id": "hyderabad_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "HYD",
@@ -837,12 +1433,33 @@
         "RAJ"
       ],
       "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#631430"
+      "color_hex": "#ed7e95"
     },
     {
-      "id": "kashmir",
+      "id": "kashmir_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "KSH",
+      "name_en": "Jammu and Kashmir",
+      "name_zh": "查谟和克什米尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Jammu_and_Kashmir",
+          "IN_Ladakh"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "notes": "Princely state approximated by the modern state; not a historical boundary.",
+      "color_hex": "#9e1e3f"
+    },
+    {
+      "id": "kashmir_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "KSH",
@@ -860,12 +1477,32 @@
         "RAJ"
       ],
       "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#cf6f75"
+      "color_hex": "#b64f64"
     },
     {
-      "id": "mysore",
+      "id": "mysore_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "MYR",
+      "name_en": "Mysore",
+      "name_zh": "迈索尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Karnataka"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "notes": "Princely state approximated by the modern state; not a historical boundary.",
+      "color_hex": "#bd4069"
+    },
+    {
+      "id": "mysore_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "MYR",
@@ -882,12 +1519,32 @@
         "RAJ"
       ],
       "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#ec327c"
+      "color_hex": "#ce4d5c"
     },
     {
-      "id": "travancore",
+      "id": "travancore_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "TRV",
+      "name_en": "Travancore",
+      "name_zh": "特拉凡哥尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Kerala"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "notes": "Princely state approximated by the modern state; not a historical boundary.",
+      "color_hex": "#c8475f"
+    },
+    {
+      "id": "travancore_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "TRV",
@@ -904,12 +1561,32 @@
         "RAJ"
       ],
       "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#81354e"
+      "color_hex": "#ee6b89"
     },
     {
-      "id": "sikkim",
+      "id": "sikkim_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "SKM",
+      "name_en": "Sikkim",
+      "name_zh": "锡金",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Sikkim"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "notes": "Princely state approximated by the modern state; not a historical boundary.",
+      "color_hex": "#983655"
+    },
+    {
+      "id": "sikkim_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "SKM",
@@ -926,12 +1603,36 @@
         "RAJ"
       ],
       "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#a3536d"
+      "color_hex": "#df737c"
     },
     {
-      "id": "straits_settlements",
+      "id": "straits_settlements_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "STR",
+      "name_en": "Straits Settlements",
+      "name_zh": "海峡殖民地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "SG"
+        ],
+        "feature_ids": [
+          "MYS-1139",
+          "MYS-1145",
+          "MYS-4833"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "color_hex": "#c93265"
+    },
+    {
+      "id": "straits_settlements_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "STR",
@@ -952,12 +1653,31 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#f3638d"
+      "color_hex": "#cf3e62"
     },
     {
-      "id": "sarawak",
+      "id": "sarawak_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "SRW",
+      "name_en": "Sarawak",
+      "name_zh": "沙捞越",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1187"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "color_hex": "#b61547"
+    },
+    {
+      "id": "sarawak_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "SRW",
@@ -973,12 +1693,31 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#a14e51"
+      "color_hex": "#c03e5a"
     },
     {
-      "id": "north_borneo",
+      "id": "north_borneo_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "NBO",
+      "name_en": "North Borneo",
+      "name_zh": "北婆罗洲",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1186"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "color_hex": "#ab2644"
+    },
+    {
+      "id": "north_borneo_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "NBO",
@@ -994,12 +1733,31 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#df5b86"
+      "color_hex": "#c6466b"
     },
     {
-      "id": "brunei",
+      "id": "brunei_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BRU",
+      "name_en": "Brunei",
+      "name_zh": "文莱",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "BN"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "color_hex": "#e54d76"
+    },
+    {
+      "id": "brunei_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BRU",
@@ -1015,12 +1773,29 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#de437f"
+      "color_hex": "#d55768"
     },
     {
-      "id": "bot_parent",
+      "id": "bot_parent_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BOT",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "owners": [
+          "BOT"
+        ]
+      },
+      "only_from_owners": [
+        "BOT"
+      ],
+      "color_hex": "#bc3a50"
+    },
+    {
+      "id": "bot_parent_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BOT",
@@ -1034,12 +1809,29 @@
       "only_from_owners": [
         "BOT"
       ],
-      "color_hex": "#b72137"
+      "color_hex": "#e54d76"
     },
     {
-      "id": "kuw_parent",
+      "id": "kuw_parent_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "KUW",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "owners": [
+          "KUW"
+        ]
+      },
+      "only_from_owners": [
+        "KUW"
+      ],
+      "color_hex": "#d4405a"
+    },
+    {
+      "id": "kuw_parent_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "KUW",
@@ -1053,152 +1845,35 @@
       "only_from_owners": [
         "KUW"
       ],
-      "color_hex": "#900749"
+      "color_hex": "#b22750"
     },
     {
-      "id": "aof_senegal",
+      "id": "french_west_africa",
       "scenarios": [
         "hoi4_1936",
         "hoi4_1939"
       ],
       "tag": "AOF",
-      "name_en": "Senegal",
-      "name_zh": "塞内加尔",
-      "select": {
-        "country_codes": [
-          "SN"
-        ]
-      },
-      "only_from_owners": [
-        "AOF"
-      ],
-      "color_hex": "#2e44ce"
-    },
-    {
-      "id": "mauritania",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "MAU",
-      "name_en": "Mauritania",
-      "name_zh": "毛里塔尼亚",
+      "name_en": "French West Africa",
+      "name_zh": "法属西非联邦",
       "parent_owner_tag": "FRA",
-      "subject_kind": "colony",
+      "subject_kind": "federation",
       "select": {
         "country_codes": [
-          "MR"
+          "SN",
+          "MR",
+          "ML",
+          "GN",
+          "CI",
+          "BJ",
+          "NE",
+          "BF"
         ]
       },
       "only_from_owners": [
         "AOF"
       ],
-      "color_hex": "#7f96f8"
-    },
-    {
-      "id": "french_sudan",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "FSU",
-      "name_en": "French Sudan",
-      "name_zh": "法属苏丹",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "colony",
-      "select": {
-        "country_codes": [
-          "ML"
-        ]
-      },
-      "only_from_owners": [
-        "AOF"
-      ],
-      "color_hex": "#6073bc"
-    },
-    {
-      "id": "french_guinea",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "FGU",
-      "name_en": "French Guinea",
-      "name_zh": "法属几内亚",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "colony",
-      "select": {
-        "country_codes": [
-          "GN"
-        ]
-      },
-      "only_from_owners": [
-        "AOF"
-      ],
-      "color_hex": "#273fa8"
-    },
-    {
-      "id": "ivory_coast",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "IVC",
-      "name_en": "Ivory Coast",
-      "name_zh": "科特迪瓦",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "colony",
-      "select": {
-        "country_codes": [
-          "CI"
-        ]
-      },
-      "only_from_owners": [
-        "AOF"
-      ],
-      "color_hex": "#136ac4"
-    },
-    {
-      "id": "dahomey",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "DAH",
-      "name_en": "Dahomey",
-      "name_zh": "达荷美",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "colony",
-      "select": {
-        "country_codes": [
-          "BJ"
-        ]
-      },
-      "only_from_owners": [
-        "AOF"
-      ],
-      "color_hex": "#0458ae"
-    },
-    {
-      "id": "niger_colony",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "NGR",
-      "name_en": "Niger",
-      "name_zh": "尼日尔",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "colony",
-      "select": {
-        "country_codes": [
-          "NE"
-        ]
-      },
-      "only_from_owners": [
-        "AOF"
-      ],
-      "color_hex": "#4c60b0"
+      "color_hex": "#395ed8"
     },
     {
       "id": "french_togo",
@@ -1219,111 +1894,31 @@
       "only_from_owners": [
         "AOF"
       ],
-      "color_hex": "#3b78bb"
+      "color_hex": "#5887fd"
     },
     {
-      "id": "upper_volta",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "UPV",
-      "name_en": "Upper Volta Debug Region",
-      "name_zh": "上沃尔特地区（调试分区）",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "administrative_region",
-      "select": {
-        "country_codes": [
-          "BF"
-        ]
-      },
-      "only_from_owners": [
-        "AOF"
-      ],
-      "notes": "Upper Volta was abolished in 1932–1947; retained solely as a debug subdivision.",
-      "color_hex": "#3496fb"
-    },
-    {
-      "id": "aef_middle_congo",
+      "id": "french_equatorial_africa",
       "scenarios": [
         "hoi4_1936",
         "hoi4_1939"
       ],
       "tag": "AEF",
-      "name_en": "Middle Congo",
-      "name_zh": "中央刚果",
-      "select": {
-        "country_codes": [
-          "CG"
-        ]
-      },
-      "only_from_owners": [
-        "AEF"
-      ],
-      "color_hex": "#224c85"
-    },
-    {
-      "id": "chad",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CHD",
-      "name_en": "Chad",
-      "name_zh": "乍得",
+      "name_en": "French Equatorial Africa",
+      "name_zh": "法属赤道非洲联邦",
       "parent_owner_tag": "FRA",
-      "subject_kind": "colony",
+      "subject_kind": "federation",
       "select": {
         "country_codes": [
-          "TD"
-        ]
-      },
-      "only_from_owners": [
-        "AEF"
-      ],
-      "color_hex": "#5a8bc5"
-    },
-    {
-      "id": "ubangi_shari",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "UBA",
-      "name_en": "Ubangi-Shari",
-      "name_zh": "乌班吉沙里",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "colony",
-      "select": {
-        "country_codes": [
-          "CF"
-        ]
-      },
-      "only_from_owners": [
-        "AEF"
-      ],
-      "color_hex": "#68abf9"
-    },
-    {
-      "id": "gabon",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "GAB",
-      "name_en": "Gabon",
-      "name_zh": "加蓬",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "colony",
-      "select": {
-        "country_codes": [
+          "TD",
+          "CF",
+          "CG",
           "GA"
         ]
       },
       "only_from_owners": [
         "AEF"
       ],
-      "color_hex": "#1b89f4"
+      "color_hex": "#4c8ff2"
     },
     {
       "id": "french_cameroon",
@@ -1352,7 +1947,7 @@
         "FRA",
         "AOF"
       ],
-      "color_hex": "#53a0fb"
+      "color_hex": "#336bca"
     },
     {
       "id": "djibouti",
@@ -1373,7 +1968,7 @@
       "only_from_owners": [
         "FRA"
       ],
-      "color_hex": "#465bc8"
+      "color_hex": "#4f7df9"
     },
     {
       "id": "madagascar_dependencies",
@@ -1391,7 +1986,7 @@
       "only_from_owners": [
         "FRA"
       ],
-      "color_hex": "#3e4db4"
+      "color_hex": "#297cef"
     },
     {
       "id": "gf_parent",
@@ -1410,7 +2005,7 @@
       "only_from_owners": [
         "GF"
       ],
-      "color_hex": "#7e91d7"
+      "color_hex": "#4380e1"
     },
     {
       "id": "gp_parent",
@@ -1429,7 +2024,7 @@
       "only_from_owners": [
         "GP"
       ],
-      "color_hex": "#405698"
+      "color_hex": "#1e57cd"
     },
     {
       "id": "mq_parent",
@@ -1448,7 +2043,7 @@
       "only_from_owners": [
         "MQ"
       ],
-      "color_hex": "#578de3"
+      "color_hex": "#405fc1"
     },
     {
       "id": "re_parent",
@@ -1467,7 +2062,7 @@
       "only_from_owners": [
         "RE"
       ],
-      "color_hex": "#4f60e4"
+      "color_hex": "#3887fb"
     },
     {
       "id": "yt_parent",
@@ -1486,123 +2081,30 @@
       "only_from_owners": [
         "YT"
       ],
-      "color_hex": "#0d4dbd"
+      "color_hex": "#4e75ee"
     },
     {
-      "id": "tonkin",
+      "id": "french_indochina",
       "scenarios": [
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "TNK",
-      "name_en": "Tonkin",
-      "name_zh": "东京（北圻）",
+      "tag": "VIN",
+      "name_en": "French Indochina",
+      "name_zh": "法属印度支那联邦",
       "parent_owner_tag": "FRA",
-      "subject_kind": "protectorate",
+      "subject_kind": "federation",
       "select": {
         "country_codes": [
-          "VN"
-        ],
-        "bbox": [
-          100,
-          19.75,
-          110,
-          24
-        ]
-      },
-      "only_from_owners": [
-        "VIN"
-      ],
-      "color_hex": "#6fa0dd"
-    },
-    {
-      "id": "cochinchina",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "COC",
-      "name_en": "Cochinchina",
-      "name_zh": "交趾支那（南圻）",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "colony",
-      "select": {
-        "country_codes": [
-          "VN"
-        ],
-        "bbox": [
-          100,
-          8,
-          110,
-          11.55
-        ]
-      },
-      "only_from_owners": [
-        "VIN"
-      ],
-      "color_hex": "#6c87fe"
-    },
-    {
-      "id": "cambodia",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CAM",
-      "name_en": "Cambodia",
-      "name_zh": "柬埔寨",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "protectorate",
-      "select": {
-        "country_codes": [
-          "KH"
-        ]
-      },
-      "only_from_owners": [
-        "VIN"
-      ],
-      "color_hex": "#3d6ba3"
-    },
-    {
-      "id": "laos",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "LAO",
-      "name_en": "Laos",
-      "name_zh": "老挝",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "protectorate",
-      "select": {
-        "country_codes": [
+          "VN",
+          "KH",
           "LA"
         ]
       },
       "only_from_owners": [
         "VIN"
       ],
-      "color_hex": "#5077ff"
-    },
-    {
-      "id": "vin_annam",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "VIN",
-      "name_en": "Annam",
-      "name_zh": "安南（中圻）",
-      "select": {
-        "owners": [
-          "VIN"
-        ]
-      },
-      "only_from_owners": [
-        "VIN"
-      ],
-      "notes": "Remaining French Indochina core represented as Annam.",
-      "color_hex": "#1d5bc3"
+      "color_hex": "#476bd5"
     },
     {
       "id": "cape_verde",
@@ -1623,7 +2125,7 @@
       "only_from_owners": [
         "POR"
       ],
-      "color_hex": "#204126"
+      "color_hex": "#135c37"
     },
     {
       "id": "portuguese_guinea",
@@ -1644,7 +2146,7 @@
       "only_from_owners": [
         "POR"
       ],
-      "color_hex": "#3f5f42"
+      "color_hex": "#2c6c46"
     },
     {
       "id": "sao_tome",
@@ -1665,7 +2167,7 @@
       "only_from_owners": [
         "POR"
       ],
-      "color_hex": "#38a377"
+      "color_hex": "#468259"
     },
     {
       "id": "portuguese_timor",
@@ -1686,7 +2188,7 @@
       "only_from_owners": [
         "POR"
       ],
-      "color_hex": "#305035"
+      "color_hex": "#328b5f"
     },
     {
       "id": "macau",
@@ -1707,7 +2209,7 @@
       "only_from_owners": [
         "POR"
       ],
-      "color_hex": "#2e9068"
+      "color_hex": "#246736"
     },
     {
       "id": "suriname",
@@ -1728,7 +2230,7 @@
       "only_from_owners": [
         "HOL"
       ],
-      "color_hex": "#886245"
+      "color_hex": "#ab753c"
     },
     {
       "id": "ruanda_urundi",
@@ -1750,7 +2252,7 @@
       "only_from_owners": [
         "RCG"
       ],
-      "color_hex": "#e3e299"
+      "color_hex": "#dec252"
     },
     {
       "id": "alaska",
@@ -1777,7 +2279,7 @@
       "only_from_owners": [
         "USA"
       ],
-      "color_hex": "#1c5b8e"
+      "color_hex": "#1772b8"
     },
     {
       "id": "hawaii",
@@ -1804,7 +2306,7 @@
       "only_from_owners": [
         "USA"
       ],
-      "color_hex": "#7bbbf9"
+      "color_hex": "#50a0f8"
     },
     {
       "id": "puerto_rico_parent",
@@ -1823,7 +2325,7 @@
       "only_from_owners": [
         "PUE"
       ],
-      "color_hex": "#3c7aab"
+      "color_hex": "#0f96fe"
     },
     {
       "id": "karafuto_kurils",
@@ -1862,9 +2364,30 @@
       }
     },
     {
-      "id": "kwantung_return",
+      "id": "kwantung_return_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "MAN",
+      "select": {
+        "prefectures": [
+          "大连市"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG"
+        ]
+      },
+      "only_from_owners": [
+        "KWT"
+      ],
+      "cores": "owner",
+      "color_hex": "#fdd3c5"
+    },
+    {
+      "id": "kwantung_return_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "MAN",
@@ -1882,12 +2405,33 @@
         "KWT"
       ],
       "cores": "owner",
-      "color_hex": "#f3b6a1"
+      "color_hex": "#f2c6af"
     },
     {
-      "id": "kwantung",
+      "id": "kwantung_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "KWT",
+      "name_en": "Kwantung Leased Territory",
+      "name_zh": "关东州",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "colony",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG"
+        ]
+      },
+      "only_from_owners": [
+        "MAN",
+        "KWT"
+      ],
+      "notes": "Simplified approximation of the leased peninsula around Port Arthur, Dairen and Kinchow; northern lease line sketched, not a surveyed cadastral trace. Only the Dalian parent is cut; Wafangdian, Zhuanghe and Changhai remain MAN.",
+      "color_hex": "#e3ac94"
+    },
+    {
+      "id": "kwantung_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "KWT",
@@ -1905,12 +2449,29 @@
         "KWT"
       ],
       "notes": "Simplified approximation of the leased peninsula around Port Arthur, Dairen and Kinchow; northern lease line sketched, not a surveyed cadastral trace. Only the Dalian parent is cut; Wafangdian, Zhuanghe and Changhai remain MAN.",
-      "color_hex": "#e3a78f"
+      "color_hex": "#d8aa99"
     },
     {
-      "id": "manchukuo_parent",
+      "id": "manchukuo_parent_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "MAN",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "puppet",
+      "select": {
+        "owners": [
+          "MAN"
+        ]
+      },
+      "only_from_owners": [
+        "MAN"
+      ],
+      "color_hex": "#fdd3c5"
+    },
+    {
+      "id": "manchukuo_parent_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "MAN",
@@ -1924,12 +2485,42 @@
       "only_from_owners": [
         "MAN"
       ],
-      "color_hex": "#f3b6a1"
+      "color_hex": "#f2c6af"
     },
     {
-      "id": "ukrainian_ssr",
+      "id": "ukrainian_ssr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "UKR",
+      "name_en": "Ukrainian SSR",
+      "name_zh": "乌克兰苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "UA"
+        ]
+      },
+      "exclude": {
+        "country_codes": [
+          "UA"
+        ],
+        "bbox": [
+          32.4,
+          44.0,
+          36.8,
+          46.12
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "color_hex": "#972c31"
+    },
+    {
+      "id": "ukrainian_ssr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "UKR",
@@ -1956,12 +2547,37 @@
       "only_from_owners": [
         "SOV"
       ],
-      "color_hex": "#a94c53"
+      "color_hex": "#79001c"
     },
     {
-      "id": "crimean_assr",
+      "id": "crimean_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "CRM",
+      "name_en": "Crimean ASSR",
+      "name_zh": "克里米亚自治苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "country_codes": [
+          "UA"
+        ],
+        "bbox": [
+          32.4,
+          44.0,
+          36.8,
+          46.12
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "color_hex": "#7e252d"
+    },
+    {
+      "id": "crimean_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "CRM",
@@ -1983,12 +2599,31 @@
       "only_from_owners": [
         "SOV"
       ],
-      "color_hex": "#98240d"
+      "color_hex": "#881124"
     },
     {
-      "id": "byelorussian_ssr",
+      "id": "byelorussian_ssr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BLR",
+      "name_en": "Byelorussian SSR",
+      "name_zh": "白俄罗斯苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "BY"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "color_hex": "#5a0614"
+    },
+    {
+      "id": "byelorussian_ssr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BLR",
@@ -2004,7 +2639,7 @@
       "only_from_owners": [
         "SOV"
       ],
-      "color_hex": "#7f463f"
+      "color_hex": "#8d1f1a"
     },
     {
       "id": "transcaucasian_sfsr",
@@ -2026,7 +2661,7 @@
       "only_from_owners": [
         "SOV"
       ],
-      "color_hex": "#7e2c21"
+      "color_hex": "#6c0017"
     },
     {
       "id": "georgian_ssr",
@@ -2046,7 +2681,7 @@
       "only_from_owners": [
         "SOV"
       ],
-      "color_hex": "#ac4a35"
+      "color_hex": "#932330"
     },
     {
       "id": "armenian_ssr",
@@ -2066,7 +2701,7 @@
       "only_from_owners": [
         "SOV"
       ],
-      "color_hex": "#b66e74"
+      "color_hex": "#5a0614"
     },
     {
       "id": "azerbaijan_ssr",
@@ -2086,7 +2721,7 @@
       "only_from_owners": [
         "SOV"
       ],
-      "color_hex": "#b02f44"
+      "color_hex": "#91343b"
     },
     {
       "id": "kazakh_1936",
@@ -2098,7 +2733,7 @@
       "name_zh": "哈萨克自治苏维埃社会主义共和国",
       "parent_owner_tag": "SOV",
       "subject_kind": "autonomous_republic",
-      "color_hex": "#882e3a",
+      "color_hex": "#720c1d",
       "select": {
         "country_codes": [
           "KZ"
@@ -2118,7 +2753,7 @@
       "name_zh": "哈萨克苏维埃社会主义共和国",
       "parent_owner_tag": "SOV",
       "subject_kind": "union_republic",
-      "color_hex": "#882e3a",
+      "color_hex": "#7a201a",
       "select": {
         "country_codes": [
           "KZ"
@@ -2138,7 +2773,7 @@
       "name_zh": "吉尔吉斯自治苏维埃社会主义共和国",
       "parent_owner_tag": "SOV",
       "subject_kind": "autonomous_republic",
-      "color_hex": "#d15667",
+      "color_hex": "#750305",
       "select": {
         "country_codes": [
           "KG"
@@ -2158,7 +2793,7 @@
       "name_zh": "吉尔吉斯苏维埃社会主义共和国",
       "parent_owner_tag": "SOV",
       "subject_kind": "union_republic",
-      "color_hex": "#d15667",
+      "color_hex": "#841916",
       "select": {
         "country_codes": [
           "KG"
@@ -2169,9 +2804,33 @@
       ]
     },
     {
-      "id": "uzbek_ssr",
+      "id": "uzbek_ssr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "UZB",
+      "name_en": "Uzbek SSR",
+      "name_zh": "乌兹别克苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "UZ"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "UZB-356"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "color_hex": "#79001c"
+    },
+    {
+      "id": "uzbek_ssr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "UZB",
@@ -2192,12 +2851,31 @@
       "only_from_owners": [
         "SOV"
       ],
-      "color_hex": "#c24840"
+      "color_hex": "#65070b"
     },
     {
-      "id": "karakalpak_assr",
+      "id": "karakalpak_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "KKP",
+      "name_en": "Karakalpak ASSR",
+      "name_zh": "卡拉卡尔帕克自治苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "feature_ids": [
+          "UZB-356"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "color_hex": "#640719"
+    },
+    {
+      "id": "karakalpak_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "KKP",
@@ -2213,12 +2891,31 @@
       "only_from_owners": [
         "SOV"
       ],
-      "color_hex": "#743334"
+      "color_hex": "#8b3030"
     },
     {
-      "id": "turkmen_ssr",
+      "id": "turkmen_ssr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "TMS",
+      "name_en": "Turkmen SSR",
+      "name_zh": "土库曼苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "TM"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "color_hex": "#8f3229"
+    },
+    {
+      "id": "turkmen_ssr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "TMS",
@@ -2234,12 +2931,31 @@
       "only_from_owners": [
         "SOV"
       ],
-      "color_hex": "#903a31"
+      "color_hex": "#8f2927"
     },
     {
-      "id": "tajik_ssr",
+      "id": "tajik_ssr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "TAJ",
+      "name_en": "Tajik SSR",
+      "name_zh": "塔吉克苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "TJ"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "color_hex": "#8a202c"
+    },
+    {
+      "id": "tajik_ssr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "TAJ",
@@ -2255,12 +2971,32 @@
       "only_from_owners": [
         "SOV"
       ],
-      "color_hex": "#a12032"
+      "color_hex": "#8f3229"
     },
     {
-      "id": "tatar_assr",
+      "id": "tatar_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "TAT",
+      "name_en": "Tatar ASSR",
+      "name_zh": "鞑靼自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Tatarstan"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#832721"
+    },
+    {
+      "id": "tatar_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "TAT",
@@ -2277,12 +3013,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#a46666"
+      "color_hex": "#6c0017"
     },
     {
-      "id": "bashkir_assr",
+      "id": "bashkir_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BSH",
+      "name_en": "Bashkir ASSR",
+      "name_zh": "巴什基尔自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Bashkortostan"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#91343b"
+    },
+    {
+      "id": "bashkir_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BSH",
@@ -2299,12 +3055,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#50191e"
+      "color_hex": "#6b0b08"
     },
     {
-      "id": "chuvash_assr",
+      "id": "chuvash_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "CVS",
+      "name_en": "Chuvash ASSR",
+      "name_zh": "楚瓦什自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Chuvash_Republic"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#972923"
+    },
+    {
+      "id": "chuvash_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "CVS",
@@ -2321,12 +3097,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#6a3429"
+      "color_hex": "#872d30"
     },
     {
-      "id": "mari_assr",
+      "id": "mari_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "MRE",
+      "name_en": "Mari ASSR",
+      "name_zh": "马里自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Mari_El_Republic"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#841916"
+    },
+    {
+      "id": "mari_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "MRE",
@@ -2343,12 +3139,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#a73320"
+      "color_hex": "#8a202c"
     },
     {
-      "id": "udmurt_assr",
+      "id": "udmurt_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "UDM",
+      "name_en": "Udmurt ASSR",
+      "name_zh": "乌德穆尔特自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Udmurt_Republic"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#8f2927"
+    },
+    {
+      "id": "udmurt_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "UDM",
@@ -2365,12 +3181,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#5c0014"
+      "color_hex": "#972c31"
     },
     {
-      "id": "mordovian_assr",
+      "id": "mordovian_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "MRD",
+      "name_en": "Mordovian ASSR",
+      "name_zh": "莫尔多维亚自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Mordovia"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#721a17"
+    },
+    {
+      "id": "mordovian_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "MRD",
@@ -2387,12 +3223,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#91052c"
+      "color_hex": "#781d28"
     },
     {
-      "id": "komi_assr",
+      "id": "komi_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "KOM",
+      "name_en": "Komi ASSR",
+      "name_zh": "科米自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Komi_Republic"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#7a201a"
+    },
+    {
+      "id": "komi_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "KOM",
@@ -2409,12 +3265,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#99444e"
+      "color_hex": "#750305"
     },
     {
-      "id": "yakut_assr",
+      "id": "yakut_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "YAK",
+      "name_en": "Yakut ASSR",
+      "name_zh": "雅库特自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Sakha_Republic"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#65070b"
+    },
+    {
+      "id": "yakut_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "YAK",
@@ -2431,12 +3307,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#6d0220"
+      "color_hex": "#801724"
     },
     {
-      "id": "buryat_assr",
+      "id": "buryat_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "BYA",
+      "name_en": "Buryat-Mongol ASSR",
+      "name_zh": "布里亚特-蒙古自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Buryatia"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#8d1f1a"
+    },
+    {
+      "id": "buryat_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "BYA",
@@ -2453,12 +3349,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#d0543d"
+      "color_hex": "#7e252d"
     },
     {
-      "id": "karelian_assr",
+      "id": "karelian_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "KRL",
+      "name_en": "Karelian ASSR",
+      "name_zh": "卡累利阿自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Karelia"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#610101"
+    },
+    {
+      "id": "karelian_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "KRL",
@@ -2475,12 +3391,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#62222a"
+      "color_hex": "#721a17"
     },
     {
-      "id": "dagestan_assr",
+      "id": "dagestan_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "DAG",
+      "name_en": "Dagestan ASSR",
+      "name_zh": "达吉斯坦自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Dagestan"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#881124"
+    },
+    {
+      "id": "dagestan_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "DAG",
@@ -2497,12 +3433,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#bb4d5d"
+      "color_hex": "#720c1d"
     },
     {
-      "id": "kalmyk_assr",
+      "id": "kalmyk_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "KAL",
+      "name_en": "Kalmyk ASSR",
+      "name_zh": "卡尔梅克自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Kalmykia"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#872d30"
+    },
+    {
+      "id": "kalmyk_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "KAL",
@@ -2519,12 +3475,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#670600"
+      "color_hex": "#640719"
     },
     {
-      "id": "kabardino_balkar_assr",
+      "id": "kabardino_balkar_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "KBA",
+      "name_en": "Kabardino-Balkar ASSR",
+      "name_zh": "卡巴尔达-巴尔卡尔自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Kabardino_Balkaria"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#932330"
+    },
+    {
+      "id": "kabardino_balkar_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "KBA",
@@ -2541,12 +3517,32 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#b4604e"
+      "color_hex": "#610101"
     },
     {
-      "id": "north_ossetian_assr",
+      "id": "north_ossetian_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "NOS",
+      "name_en": "North Ossetian ASSR",
+      "name_zh": "北奥塞梯自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_North_Ossetia_Alania"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#781d28"
+    },
+    {
+      "id": "north_ossetian_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "NOS",
@@ -2563,12 +3559,33 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#8e5245"
+      "color_hex": "#832721"
     },
     {
-      "id": "chechen_ingush_assr",
+      "id": "chechen_ingush_assr_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1936"
+      ],
+      "tag": "CHE",
+      "name_en": "Chechen-Ingush ASSR",
+      "name_zh": "车臣-印古什自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Chechen_Republic",
+          "RU_Republic_of_Ingushetia"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation.",
+      "color_hex": "#6b0b08"
+    },
+    {
+      "id": "chechen_ingush_assr_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "CHE",
@@ -2586,7 +3603,7 @@
         "SOV"
       ],
       "notes": "Modern republic boundary used as an approximation.",
-      "color_hex": "#995a5e"
+      "color_hex": "#972923"
     },
     {
       "id": "finnish_karelia",
@@ -2667,7 +3684,7 @@
       "only_from_owners": [
         "GER"
       ],
-      "color_hex": "#888682"
+      "color_hex": "#585858"
     },
     {
       "id": "slovakia_parent",
@@ -2685,7 +3702,7 @@
       "only_from_owners": [
         "SLO"
       ],
-      "color_hex": "#62605a"
+      "color_hex": "#2e2e2e"
     },
     {
       "id": "albania_1939",
@@ -2697,7 +3714,7 @@
       "name_zh": "阿尔巴尼亚王国",
       "parent_owner_tag": "ITA",
       "subject_kind": "puppet",
-      "color_hex": "#324b27",
+      "color_hex": "#679457",
       "select": {
         "country_codes": [
           "AL"
@@ -2717,7 +3734,7 @@
       "name_zh": "冀东防共自治政府",
       "parent_owner_tag": "JAP",
       "subject_kind": "puppet",
-      "color_hex": "#cf9980",
+      "color_hex": "#e6b8a5",
       "select": {
         "country_codes": [
           "CN"
@@ -2859,87 +3876,16 @@
       ]
     },
     {
-      "id": "provisional_government_shanxi_return",
+      "id": "provisional_government",
       "scenarios": [
         "hoi4_1939"
       ],
-      "tag": "SHX",
-      "select": {
-        "hierarchy_groups": [
-          "CN_Shanxi"
-        ]
-      },
-      "exclude": {
-        "feature_ids": [
-          "CN_CITY_17275852B40522342172572",
-          "CN_CITY_17275852B53166682632414",
-          "CN_CITY_17275852B35191117841364",
-          "CN_CITY_17275852B70843634097749",
-          "CN_CITY_17275852B19397285057030",
-          "CN_CITY_17275852B9046707294983",
-          "CN_CITY_17275852B22707504793071",
-          "CN_CITY_17275852B41032470199188",
-          "CN_CITY_17275852B96614928239344",
-          "CN_CITY_17275852B14553820792876",
-          "CN_CITY_17275852B97923044022234",
-          "CN_CITY_17275852B4963111392108",
-          "CN_CITY_17275852B57880389938199",
-          "CN_CITY_17275852B76829643653933",
-          "CN_CITY_17275852B19618376010244",
-          "CN_CITY_17275852B16732896761360",
-          "CN_CITY_17275852B78988614189372",
-          "CN_CITY_17275852B30734228092100",
-          "CN_CITY_17275852B83167737560066",
-          "CN_CITY_17275852B45390451107599",
-          "CN_CITY_17275852B83100874373445",
-          "CN_CITY_17275852B18968160632662",
-          "CN_CITY_17275852B36539700725824",
-          "CN_CITY_17275852B27087882119733",
-          "CN_CITY_17275852B85544446441725",
-          "CN_CITY_17275852B10208475755367",
-          "CN_CITY_17275852B60524829078673",
-          "CN_CITY_17275852B67411780639584",
-          "CN_CITY_17275852B21492950184785",
-          "CN_CITY_17275852B91447424097989",
-          "CN_CITY_17275852B53877556564875",
-          "CN_CITY_17275852B62040954239455",
-          "CN_CITY_17275852B45020271947314",
-          "CN_CITY_17275852B67315226354305",
-          "CN_CITY_17275852B61994504860165",
-          "CN_CITY_17275852B27963337647177",
-          "CN_CITY_17275852B67438977719884",
-          "CN_CITY_17275852B82739268949282",
-          "CN_CITY_17275852B44584253435303",
-          "CN_CITY_17275852B21670105101896",
-          "CN_CITY_17275852B72971629177091",
-          "CN_CITY_17275852B8527290020627",
-          "CN_CITY_17275852B84296108244083",
-          "CN_MRG_380671e40a1c",
-          "CN_MRG_ed13ca65f52b",
-          "CN_MRG_08f0b7755ac2",
-          "CN_MRG_31ba4a677ea0",
-          "CN_MRG_9b9b2d2aa43a",
-          "CN_MRG_005ada82e050",
-          "CN_CITY_17275852B32842590404417",
-          "CN_CITY_17275852B89036303488164",
-          "CN_CITY_17275852B20799087712877",
-          "CN_CITY_17275852B453440967624",
-          "CN_CITY_17275852B99191317899548",
-          "CN_CITY_17275852B506119010576",
-          "CN_CITY_17275852B43163945505607"
-        ]
-      },
-      "only_from_owners": [
-        "NCP"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "provisional_government_return",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "CHI",
+      "tag": "NCP",
+      "name_en": "Provisional Government of the Republic of China",
+      "name_zh": "中华民国临时政府",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "puppet",
+      "color_hex": "#e8b298",
       "select": {
         "hierarchy_groups": [
           "CN_Beijing",
@@ -2960,143 +3906,9 @@
           "晋中市",
           "长治市",
           "晋城市",
-          "运城市"
-        ]
-      },
-      "exclude": {
-        "feature_ids": [
-          "CN_CITY_17275852B40522342172572",
-          "CN_CITY_17275852B53166682632414",
-          "CN_CITY_17275852B35191117841364",
-          "CN_CITY_17275852B70843634097749",
-          "CN_CITY_17275852B19397285057030",
-          "CN_CITY_17275852B9046707294983",
-          "CN_CITY_17275852B22707504793071",
-          "CN_CITY_17275852B41032470199188",
-          "CN_CITY_17275852B96614928239344",
-          "CN_CITY_17275852B14553820792876",
-          "CN_CITY_17275852B97923044022234",
-          "CN_CITY_17275852B4963111392108",
-          "CN_CITY_17275852B57880389938199",
-          "CN_CITY_17275852B76829643653933",
-          "CN_CITY_17275852B19618376010244",
-          "CN_CITY_17275852B16732896761360",
-          "CN_CITY_17275852B78988614189372",
-          "CN_CITY_17275852B30734228092100",
-          "CN_CITY_17275852B83167737560066",
-          "CN_CITY_17275852B45390451107599",
-          "CN_CITY_17275852B83100874373445",
-          "CN_CITY_17275852B18968160632662",
-          "CN_CITY_17275852B36539700725824",
-          "CN_CITY_17275852B27087882119733",
-          "CN_CITY_17275852B85544446441725",
-          "CN_CITY_17275852B10208475755367",
-          "CN_CITY_17275852B60524829078673",
-          "CN_CITY_17275852B67411780639584",
-          "CN_CITY_17275852B21492950184785",
-          "CN_CITY_17275852B91447424097989",
-          "CN_CITY_17275852B53877556564875",
-          "CN_CITY_17275852B62040954239455",
-          "CN_CITY_17275852B45020271947314",
-          "CN_CITY_17275852B67315226354305",
-          "CN_CITY_17275852B61994504860165",
-          "CN_CITY_17275852B27963337647177",
-          "CN_CITY_17275852B67438977719884",
-          "CN_CITY_17275852B82739268949282",
-          "CN_CITY_17275852B44584253435303",
-          "CN_CITY_17275852B21670105101896",
-          "CN_CITY_17275852B72971629177091",
-          "CN_CITY_17275852B8527290020627",
-          "CN_CITY_17275852B84296108244083",
-          "CN_MRG_380671e40a1c",
-          "CN_MRG_ed13ca65f52b",
-          "CN_MRG_08f0b7755ac2",
-          "CN_MRG_31ba4a677ea0",
-          "CN_MRG_9b9b2d2aa43a",
-          "CN_MRG_005ada82e050",
-          "CN_CITY_17275852B32842590404417",
-          "CN_CITY_17275852B89036303488164",
-          "CN_CITY_17275852B20799087712877",
-          "CN_CITY_17275852B453440967624",
-          "CN_CITY_17275852B99191317899548",
-          "CN_CITY_17275852B506119010576",
-          "CN_CITY_17275852B43163945505607"
-        ]
-      },
-      "only_from_owners": [
-        "NCP"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "provisional_government",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "NCP",
-      "name_en": "Provisional Government of the Republic of China",
-      "name_zh": "中华民国临时政府",
-      "parent_owner_tag": "JAP",
-      "subject_kind": "puppet",
-      "color_hex": "#c7aa98",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B40522342172572",
-          "CN_CITY_17275852B53166682632414",
-          "CN_CITY_17275852B35191117841364",
-          "CN_CITY_17275852B70843634097749",
-          "CN_CITY_17275852B19397285057030",
-          "CN_CITY_17275852B9046707294983",
-          "CN_CITY_17275852B22707504793071",
-          "CN_CITY_17275852B41032470199188",
-          "CN_CITY_17275852B96614928239344",
-          "CN_CITY_17275852B14553820792876",
-          "CN_CITY_17275852B97923044022234",
-          "CN_CITY_17275852B4963111392108",
-          "CN_CITY_17275852B57880389938199",
-          "CN_CITY_17275852B76829643653933",
-          "CN_CITY_17275852B19618376010244",
-          "CN_CITY_17275852B16732896761360",
-          "CN_CITY_17275852B78988614189372",
-          "CN_CITY_17275852B30734228092100",
-          "CN_CITY_17275852B83167737560066",
-          "CN_CITY_17275852B45390451107599",
-          "CN_CITY_17275852B83100874373445",
-          "CN_CITY_17275852B18968160632662",
-          "CN_CITY_17275852B36539700725824",
-          "CN_CITY_17275852B27087882119733",
-          "CN_CITY_17275852B85544446441725",
-          "CN_CITY_17275852B10208475755367",
-          "CN_CITY_17275852B60524829078673",
-          "CN_CITY_17275852B67411780639584",
-          "CN_CITY_17275852B21492950184785",
-          "CN_CITY_17275852B91447424097989",
-          "CN_CITY_17275852B53877556564875",
-          "CN_CITY_17275852B62040954239455",
-          "CN_CITY_17275852B45020271947314",
-          "CN_CITY_17275852B67315226354305",
-          "CN_CITY_17275852B61994504860165",
-          "CN_CITY_17275852B27963337647177",
-          "CN_CITY_17275852B67438977719884",
-          "CN_CITY_17275852B82739268949282",
-          "CN_CITY_17275852B44584253435303",
-          "CN_CITY_17275852B21670105101896",
-          "CN_CITY_17275852B72971629177091",
-          "CN_CITY_17275852B8527290020627",
-          "CN_CITY_17275852B84296108244083",
-          "CN_MRG_380671e40a1c",
-          "CN_MRG_ed13ca65f52b",
-          "CN_MRG_08f0b7755ac2",
-          "CN_MRG_31ba4a677ea0",
-          "CN_MRG_9b9b2d2aa43a",
-          "CN_MRG_005ada82e050",
-          "CN_CITY_17275852B32842590404417",
-          "CN_CITY_17275852B89036303488164",
-          "CN_CITY_17275852B20799087712877",
-          "CN_CITY_17275852B453440967624",
-          "CN_CITY_17275852B99191317899548",
-          "CN_CITY_17275852B506119010576",
-          "CN_CITY_17275852B43163945505607"
+          "运城市",
+          "临汾市",
+          "忻州市"
         ]
       },
       "exclude": {
@@ -3109,33 +3921,9 @@
         "CHI",
         "SHX",
         "PRC",
-        "NCP",
         "LUQ",
-        "RGC"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "south_chahar_return",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "CHI",
-      "select": {
-        "prefectures": [
-          "张家口市"
-        ]
-      },
-      "exclude": {
-        "feature_ids": [
-          "CN_CITY_17275852B66003162693266",
-          "CN_CITY_17275852B41187046911697",
-          "CN_CITY_17275852B21512782047125",
-          "CN_CITY_17275852B53922912898325"
-        ]
-      },
-      "only_from_owners": [
-        "CNZ"
+        "RGC",
+        "MAN"
       ],
       "cores": "keep"
     },
@@ -3147,47 +3935,18 @@
       "tag": "CNZ",
       "name_en": "South Chahar Administration",
       "name_zh": "察南政厅",
-      "parent_owner_tag": "MEN",
+      "parent_owner_tag": "JAP",
       "subject_kind": "puppet",
-      "color_hex": "#e9bfb4",
+      "color_hex": "#d7a38e",
       "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B66003162693266",
-          "CN_CITY_17275852B41187046911697",
-          "CN_CITY_17275852B21512782047125",
-          "CN_CITY_17275852B53922912898325"
+        "prefectures": [
+          "张家口市"
         ]
       },
       "only_from_owners": [
         "CHI",
         "SHX",
-        "MEN",
-        "CNZ"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "north_shanxi_return",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "SHX",
-      "select": {
-        "prefectures": [
-          "大同市",
-          "朔州市"
-        ]
-      },
-      "exclude": {
-        "feature_ids": [
-          "CN_CITY_17275852B90378533110631",
-          "CN_CITY_17275852B35516654467080",
-          "CN_CITY_17275852B62103868434319",
-          "CN_MRG_3ff67345ed78"
-        ]
-      },
-      "only_from_owners": [
-        "JBZ"
+        "MEN"
       ],
       "cores": "keep"
     },
@@ -3199,53 +3958,19 @@
       "tag": "JBZ",
       "name_en": "North Shanxi Administration",
       "name_zh": "晋北政厅",
-      "parent_owner_tag": "MEN",
+      "parent_owner_tag": "JAP",
       "subject_kind": "puppet",
-      "color_hex": "#82614f",
+      "color_hex": "#e6b8a5",
       "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B90378533110631",
-          "CN_CITY_17275852B35516654467080",
-          "CN_CITY_17275852B62103868434319",
-          "CN_MRG_3ff67345ed78"
+        "prefectures": [
+          "大同市",
+          "朔州市"
         ]
       },
       "only_from_owners": [
         "CHI",
         "SHX",
-        "PRC",
-        "JBZ"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "mengjiang_1939_return",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "SHX",
-      "select": {
-        "prefectures": [
-          "呼和浩特市",
-          "包头市",
-          "乌兰察布市"
-        ]
-      },
-      "exclude": {
-        "feature_ids": [
-          "CN_CITY_17275852B58561192252896",
-          "CN_CITY_17275852B83584927302596",
-          "CN_CITY_17275852B42573248116242",
-          "CN_CITY_17275852B56850756381420",
-          "CN_CITY_17275852B74586174185496",
-          "CN_CITY_17275852B76051276542746",
-          "CN_CITY_17275852B97242903030707",
-          "CN_CITY_17275852B71745014009476",
-          "CN_CITY_17275852B38329795368035"
-        ]
-      },
-      "only_from_owners": [
-        "MEN"
+        "PRC"
       ],
       "cores": "keep"
     },
@@ -3260,16 +3985,10 @@
       "parent_owner_tag": "JAP",
       "subject_kind": "puppet",
       "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B58561192252896",
-          "CN_CITY_17275852B83584927302596",
-          "CN_CITY_17275852B42573248116242",
-          "CN_CITY_17275852B56850756381420",
-          "CN_CITY_17275852B74586174185496",
-          "CN_CITY_17275852B76051276542746",
-          "CN_CITY_17275852B97242903030707",
-          "CN_CITY_17275852B71745014009476",
-          "CN_CITY_17275852B38329795368035"
+        "prefectures": [
+          "呼和浩特市",
+          "包头市",
+          "乌兰察布市"
         ]
       },
       "only_from_owners": [
@@ -3281,14 +4000,19 @@
       ],
       "cores": "keep",
       "notes": "China uses late-1939 occupation; CNZ and JBZ remain subordinate debug administrations after the September merger.",
-      "color_hex": "#c2896f"
+      "color_hex": "#ebbfa9"
     },
     {
-      "id": "reformed_government_return",
+      "id": "reformed_government",
       "scenarios": [
         "hoi4_1939"
       ],
-      "tag": "CHI",
+      "tag": "RGC",
+      "name_en": "Reformed Government of the Republic of China",
+      "name_zh": "中华民国维新政府",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "puppet",
+      "color_hex": "#f1b8a3",
       "select": {
         "hierarchy_groups": [
           "CN_Shanghai",
@@ -3309,125 +4033,12 @@
           "安庆市",
           "滁州市",
           "宿州市",
-          "亳州市"
-        ]
-      },
-      "exclude": {
-        "feature_ids": [
-          "CN_CITY_17275852B45149819427590",
-          "CN_CITY_17275852B19859477737164",
-          "CN_CITY_17275852B46074982775581",
-          "CN_CITY_17275852B47635697455490",
-          "CN_CITY_17275852B82708605205805",
-          "CN_CITY_17275852B78816749784203",
-          "CN_CITY_17275852B71370953459893",
-          "CN_CITY_17275852B92006637325800",
-          "CN_CITY_17275852B13333769593378",
-          "CN_CITY_17275852B46393920630539",
-          "CN_CITY_17275852B36737936197596",
-          "CN_CITY_17275852B69259623848725",
-          "CN_CITY_17275852B77980777243348",
-          "CN_CITY_17275852B68627257397845",
-          "CN_CITY_17275852B39263965325493",
-          "CN_CITY_17275852B91286509256855",
-          "CN_CITY_17275852B60218719915669",
-          "CN_CITY_17275852B43191682084250",
-          "CN_CITY_17275852B77400672470843",
-          "CN_CITY_17275852B94592901594717",
-          "CN_CITY_17275852B42065564755438",
-          "CN_CITY_17275852B85263946797397"
+          "亳州市",
+          "阜阳市"
         ]
       },
       "only_from_owners": [
-        "RGC"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "reformed_government",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "RGC",
-      "name_en": "Reformed Government of the Republic of China",
-      "name_zh": "中华民国维新政府",
-      "parent_owner_tag": "JAP",
-      "subject_kind": "puppet",
-      "color_hex": "#b49887",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B45149819427590",
-          "CN_CITY_17275852B19859477737164",
-          "CN_CITY_17275852B46074982775581",
-          "CN_CITY_17275852B47635697455490",
-          "CN_CITY_17275852B82708605205805",
-          "CN_CITY_17275852B78816749784203",
-          "CN_CITY_17275852B71370953459893",
-          "CN_CITY_17275852B92006637325800",
-          "CN_CITY_17275852B13333769593378",
-          "CN_CITY_17275852B46393920630539",
-          "CN_CITY_17275852B36737936197596",
-          "CN_CITY_17275852B69259623848725",
-          "CN_CITY_17275852B77980777243348",
-          "CN_CITY_17275852B68627257397845",
-          "CN_CITY_17275852B39263965325493",
-          "CN_CITY_17275852B91286509256855",
-          "CN_CITY_17275852B60218719915669",
-          "CN_CITY_17275852B43191682084250",
-          "CN_CITY_17275852B77400672470843",
-          "CN_CITY_17275852B94592901594717",
-          "CN_CITY_17275852B42065564755438",
-          "CN_CITY_17275852B85263946797397"
-        ]
-      },
-      "only_from_owners": [
-        "CHI",
-        "RGC"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "japanese_central_china_return",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "CHI",
-      "select": {
-        "prefectures": [
-          "武汉市",
-          "孝感市",
-          "鄂州市",
-          "黄石市",
-          "黄冈市",
-          "咸宁市",
-          "岳阳市",
-          "九江市",
-          "南昌市",
-          "信阳市"
-        ]
-      },
-      "exclude": {
-        "feature_ids": [
-          "CN_CITY_17275852B52250123531455",
-          "CN_CITY_17275852B90271468854707",
-          "CN_CITY_17275852B56190437260016",
-          "CN_CITY_17275852B36551936006551",
-          "CN_CITY_17275852B44768888593389",
-          "CN_CITY_17275852B82067370611519",
-          "CN_CITY_17275852B78567156775151",
-          "CN_CITY_17275852B74817202637370",
-          "CN_CITY_17275852B50043505500678",
-          "CN_CITY_17275852B83812560805647",
-          "CN_CITY_17275852B59929886266985",
-          "CN_CITY_17275852B42183204213930",
-          "CN_CITY_17275852B64934349609422",
-          "CN_CITY_17275852B47701832659247",
-          "CN_CITY_17275852B68532057450373",
-          "CN_MRG_398970fc50e7"
-        ]
-      },
-      "only_from_owners": [
-        "JCC"
+        "CHI"
       ],
       "cores": "keep"
     },
@@ -3441,73 +4052,25 @@
       "name_zh": "日军华中占领区",
       "parent_owner_tag": "JAP",
       "subject_kind": "military_administration",
-      "color_hex": "#d5b8a9",
+      "color_hex": "#f7beaa",
       "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B52250123531455",
-          "CN_CITY_17275852B90271468854707",
-          "CN_CITY_17275852B56190437260016",
-          "CN_CITY_17275852B36551936006551",
-          "CN_CITY_17275852B44768888593389",
-          "CN_CITY_17275852B82067370611519",
-          "CN_CITY_17275852B78567156775151",
-          "CN_CITY_17275852B74817202637370",
-          "CN_CITY_17275852B50043505500678",
-          "CN_CITY_17275852B83812560805647",
-          "CN_CITY_17275852B59929886266985",
-          "CN_CITY_17275852B42183204213930",
-          "CN_CITY_17275852B64934349609422",
-          "CN_CITY_17275852B47701832659247",
-          "CN_CITY_17275852B68532057450373",
-          "CN_MRG_398970fc50e7"
-        ]
-      },
-      "only_from_owners": [
-        "CHI",
-        "JCC"
-      ],
-      "cores": "keep"
-    },
-    {
-      "id": "japanese_south_china_return",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "CHI",
-      "select": {
-        "hierarchy_groups": [
-          "CN_Hainan"
-        ],
         "prefectures": [
-          "广州市",
-          "佛山市",
-          "东莞市",
-          "深圳市",
-          "惠州市",
-          "汕头市",
-          "潮州市",
-          "厦门市"
-        ]
-      },
-      "exclude": {
-        "feature_ids": [
-          "CN_CITY_17275852B38988280096574",
-          "CN_CITY_17275852B25965384817686",
-          "CN_CITY_17275852B33382458843189",
-          "CN_CITY_17275852B31711539663260",
-          "CN_CITY_17275852B92305935351425",
-          "CN_CITY_17275852B58186217435722",
-          "CN_CITY_17275852B75995678778305",
-          "CN_CITY_17275852B35691129963558",
-          "CN_CITY_17275852B2295538790743",
-          "CN_CITY_17275852B80309702523612",
-          "CN_CITY_17275852B34195804181253",
-          "CN_CITY_17275852B50490784073671",
-          "CN_CITY_17275852B71635948673445"
+          "武汉市",
+          "孝感市",
+          "鄂州市",
+          "黄石市",
+          "黄冈市",
+          "咸宁市",
+          "岳阳市",
+          "九江市",
+          "南昌市",
+          "信阳市",
+          "荆门市",
+          "随州市"
         ]
       },
       "only_from_owners": [
-        "JSC"
+        "CHI"
       ],
       "cores": "keep"
     },
@@ -3521,27 +4084,29 @@
       "name_zh": "日军华南占领区",
       "parent_owner_tag": "JAP",
       "subject_kind": "military_administration",
-      "color_hex": "#a88a7f",
+      "color_hex": "#e3ac94",
       "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B38988280096574",
-          "CN_CITY_17275852B25965384817686",
-          "CN_CITY_17275852B33382458843189",
-          "CN_CITY_17275852B31711539663260",
-          "CN_CITY_17275852B92305935351425",
-          "CN_CITY_17275852B58186217435722",
-          "CN_CITY_17275852B75995678778305",
-          "CN_CITY_17275852B35691129963558",
-          "CN_CITY_17275852B2295538790743",
-          "CN_CITY_17275852B80309702523612",
-          "CN_CITY_17275852B34195804181253",
-          "CN_CITY_17275852B50490784073671",
-          "CN_CITY_17275852B71635948673445"
+        "hierarchy_groups": [
+          "CN_Hainan"
+        ],
+        "prefectures": [
+          "广州市",
+          "佛山市",
+          "东莞市",
+          "深圳市",
+          "惠州市",
+          "汕头市",
+          "潮州市",
+          "厦门市",
+          "中山市",
+          "江门市",
+          "南宁市",
+          "钦州市",
+          "防城港市"
         ]
       },
       "only_from_owners": [
         "CHI",
-        "JSC",
         "GXC"
       ],
       "cores": "keep"
@@ -3583,7 +4148,7 @@
       "name_zh": "亚丁",
       "parent_owner_tag": "RAJ",
       "subject_kind": "colony",
-      "color_hex": "#772d43",
+      "color_hex": "#bd5574",
       "select": {
         "feature_ids": [
           "YEM-3510"
@@ -3604,7 +4169,7 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#fb7396"
+      "color_hex": "#882645"
     },
     {
       "id": "aden_1939",
@@ -3616,7 +4181,7 @@
       "name_zh": "亚丁",
       "parent_owner_tag": "ENG",
       "subject_kind": "colony",
-      "color_hex": "#772d43",
+      "color_hex": "#db5d80",
       "select": {
         "feature_ids": [
           "YEM-3510"
@@ -3637,7 +4202,7 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#fb7396"
+      "color_hex": "#be265c"
     },
     {
       "id": "karakalpak_parent_1939",
@@ -3652,7 +4217,7 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#743334"
+      "color_hex": "#8b3030"
     },
     {
       "id": "kom_autonomous_oblast_1936",
@@ -3670,7 +4235,7 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#99444e"
+      "color_hex": "#7a201a"
     },
     {
       "id": "mre_autonomous_oblast_1936",
@@ -3688,7 +4253,7 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#a73320"
+      "color_hex": "#841916"
     },
     {
       "id": "kba_autonomous_oblast_1936",
@@ -3706,7 +4271,7 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#b4604e"
+      "color_hex": "#932330"
     },
     {
       "id": "nos_autonomous_oblast_1936",
@@ -3724,7 +4289,7 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#8e5245"
+      "color_hex": "#781d28"
     },
     {
       "id": "che_autonomous_oblast_1936",
@@ -3742,20 +4307,19 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#995a5e"
+      "color_hex": "#6b0b08"
     },
     {
-      "id": "seychelles_return",
+      "id": "seychelles_return_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "SEY",
       "name_en": "Seychelles",
       "name_zh": "塞舌尔",
       "parent_owner_tag": "ENG",
       "subject_kind": "colony",
-      "color_hex": "#922852",
+      "color_hex": "#ca4057",
       "select": {
         "country_codes": [
           "SC"
@@ -3763,17 +4327,33 @@
       }
     },
     {
-      "id": "south_west_africa",
+      "id": "seychelles_return_hoi4_1939",
       "scenarios": [
-        "hoi4_1936",
         "hoi4_1939"
+      ],
+      "tag": "SEY",
+      "name_en": "Seychelles",
+      "name_zh": "塞舌尔",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "color_hex": "#d35975",
+      "select": {
+        "country_codes": [
+          "SC"
+        ]
+      }
+    },
+    {
+      "id": "south_west_africa_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
       ],
       "tag": "SWA",
       "name_en": "South West Africa",
       "name_zh": "西南非洲",
       "parent_owner_tag": "SAF",
       "subject_kind": "mandate",
-      "color_hex": "#774348",
+      "color_hex": "#ed7e95",
       "select": {
         "country_codes": [
           "NA"
@@ -3782,17 +4362,34 @@
       "notes": "Modern Namibia proxy; Walvis Bay requires a later geometry split."
     },
     {
-      "id": "pap_territory",
+      "id": "south_west_africa_hoi4_1939",
       "scenarios": [
-        "hoi4_1936",
         "hoi4_1939"
+      ],
+      "tag": "SWA",
+      "name_en": "South West Africa",
+      "name_zh": "西南非洲",
+      "parent_owner_tag": "SAF",
+      "subject_kind": "mandate",
+      "color_hex": "#87123e",
+      "select": {
+        "country_codes": [
+          "NA"
+        ]
+      },
+      "notes": "Modern Namibia proxy; Walvis Bay requires a later geometry split."
+    },
+    {
+      "id": "pap_territory_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
       ],
       "tag": "PAP",
       "name_en": "Territory of Papua",
       "name_zh": "巴布亚领地",
       "parent_owner_tag": "AST",
       "subject_kind": "territory",
-      "color_hex": "#98676c",
+      "color_hex": "#b64e6f",
       "select": {
         "hierarchy_groups": [
           "PG_Gulf",
@@ -3807,9 +4404,62 @@
       "notes": "Modern province proxies; highland boundaries require later geometry splits."
     },
     {
-      "id": "ngn_territory",
+      "id": "pap_territory_hoi4_1939",
       "scenarios": [
-        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "PAP",
+      "name_en": "Territory of Papua",
+      "name_zh": "巴布亚领地",
+      "parent_owner_tag": "AST",
+      "subject_kind": "territory",
+      "color_hex": "#801f41",
+      "select": {
+        "hierarchy_groups": [
+          "PG_Gulf",
+          "PG_Southern_Highlands",
+          "PG_Western",
+          "PG_Central",
+          "PG_Milne_Bay",
+          "PG_Port_Moresby",
+          "PG_Oro"
+        ]
+      },
+      "notes": "Modern province proxies; highland boundaries require later geometry splits."
+    },
+    {
+      "id": "ngn_territory_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "NGN",
+      "name_en": "Territory of New Guinea",
+      "name_zh": "新几内亚委任统治地",
+      "parent_owner_tag": "AST",
+      "subject_kind": "mandate",
+      "color_hex": "#ed7ea1",
+      "select": {
+        "hierarchy_groups": [
+          "PG_Enga",
+          "PG_East_Sepik",
+          "PG_Madang",
+          "PG_Sandaun",
+          "PG_Chimbu",
+          "PG_Eastern_Highlands",
+          "PG_of_Bougainville",
+          "PG_Western_Highlands",
+          "PG_East_New_Britain",
+          "PG_Manus",
+          "PG_Morobe",
+          "PG_New_Ireland",
+          "PG_West_New_Britain"
+        ]
+      },
+      "notes": "Modern province proxies; highland boundaries require later geometry splits."
+    },
+    {
+      "id": "ngn_territory_hoi4_1939",
+      "scenarios": [
         "hoi4_1939"
       ],
       "tag": "NGN",
@@ -3817,7 +4467,7 @@
       "name_zh": "新几内亚委任统治地",
       "parent_owner_tag": "AST",
       "subject_kind": "mandate",
-      "color_hex": "#fccace",
+      "color_hex": "#b54e6f",
       "select": {
         "hierarchy_groups": [
           "PG_Enga",
@@ -3848,7 +4498,7 @@
       "name_zh": "苏门答腊调试大区",
       "parent_owner_tag": "INS",
       "subject_kind": "administrative_region",
-      "color_hex": "#f9d5c5",
+      "color_hex": "#e6ad87",
       "select": {
         "hierarchy_groups": [
           "ID_Aceh",
@@ -3878,7 +4528,7 @@
       "name_zh": "荷属婆罗洲调试大区",
       "parent_owner_tag": "INS",
       "subject_kind": "administrative_region",
-      "color_hex": "#90745f",
+      "color_hex": "#f9bd95",
       "select": {
         "hierarchy_groups": [
           "ID_West_Kalimantan",
@@ -3903,7 +4553,7 @@
       "name_zh": "西里伯斯调试大区",
       "parent_owner_tag": "INS",
       "subject_kind": "administrative_region",
-      "color_hex": "#c89572",
+      "color_hex": "#c28d60",
       "select": {
         "hierarchy_groups": [
           "ID_North_Sulawesi",
@@ -3929,7 +4579,7 @@
       "name_zh": "小巽他调试大区",
       "parent_owner_tag": "INS",
       "subject_kind": "administrative_region",
-      "color_hex": "#c9b09d",
+      "color_hex": "#f1b078",
       "select": {
         "hierarchy_groups": [
           "ID_Bali",
@@ -3952,7 +4602,7 @@
       "name_zh": "马鲁古调试大区",
       "parent_owner_tag": "INS",
       "subject_kind": "administrative_region",
-      "color_hex": "#a5887a",
+      "color_hex": "#d69569",
       "select": {
         "hierarchy_groups": [
           "ID_Maluku",
@@ -3974,7 +4624,7 @@
       "name_zh": "荷属新几内亚调试大区",
       "parent_owner_tag": "INS",
       "subject_kind": "administrative_region",
-      "color_hex": "#ad765c",
+      "color_hex": "#d49f75",
       "select": {
         "hierarchy_groups": [
           "ID_Papua",
@@ -3995,7 +4645,7 @@
       "name_zh": "厄立特里亚总督区",
       "parent_owner_tag": "AOI",
       "subject_kind": "administrative_region",
-      "color_hex": "#61755a",
+      "color_hex": "#517b49",
       "select": {
         "country_codes": [
           "ER"
@@ -4020,7 +4670,7 @@
       "name_zh": "索马里总督区",
       "parent_owner_tag": "AOI",
       "subject_kind": "administrative_region",
-      "color_hex": "#c9d6b4",
+      "color_hex": "#1b4e24",
       "select": {
         "country_codes": [
           "SO"
@@ -4038,8 +4688,7 @@
     {
       "id": "qinglong_return",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "MAN",
       "select": {
@@ -4047,7 +4696,7 @@
           "CN_CITY_17275852B43165756519885"
         ]
       },
-      "color_hex": "#f3b6a1"
+      "color_hex": "#fdd3c5"
     },
     {
       "id": "east_hebei_counties_1936",
@@ -4067,7 +4716,7 @@
           "CN_CITY_17275852B38375506939997"
         ]
       },
-      "color_hex": "#cf9980"
+      "color_hex": "#e6b8a5"
     },
     {
       "id": "hainan_qinlian_return_1936",
@@ -4299,8 +4948,7 @@
           "MEN"
         ]
       },
-      "cores": "keep",
-      "color_hex": "#c2896f"
+      "cores": "keep"
     },
     {
       "id": "dmc_debug_1936",
@@ -4312,7 +4960,7 @@
       "name_zh": "蒙古地方自治政务委员会",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#776ce8",
+      "color_hex": "#2d398b",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B79222988236433"
@@ -4331,7 +4979,7 @@
       "name_zh": "察东警备区（李守信）",
       "parent_owner_tag": "JAP",
       "subject_kind": "military_administration",
-      "color_hex": "#917364",
+      "color_hex": "#d7a38e",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B97242903030707",
@@ -4353,7 +5001,7 @@
       "name_zh": "东北军陕甘驻防区",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#1c2a5c",
+      "color_hex": "#4743af",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B58292310857107",
@@ -4374,7 +5022,7 @@
       "name_zh": "甘肃省政府（于学忠）",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#6165a7",
+      "color_hex": "#314598",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B84192730453130",
@@ -4394,7 +5042,7 @@
       "name_zh": "川军邓锡侯部",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#6884c4",
+      "color_hex": "#3a4fa5",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B39008212883754",
@@ -4415,7 +5063,7 @@
       "name_zh": "川军孙震部",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#4452c8",
+      "color_hex": "#3c36a1",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B38426922086125",
@@ -4437,7 +5085,7 @@
       "name_zh": "川军杨森部",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#3d5084",
+      "color_hex": "#1a2071",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B34390587465306",
@@ -4460,7 +5108,7 @@
       "name_zh": "西北军（杨虎城）",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#473aa3",
+      "color_hex": "#231884",
       "select": {
         "prefectures": [
           "西安市",
@@ -4486,11 +5134,16 @@
       "name_zh": "晋察冀边区",
       "parent_owner_tag": "PRC",
       "subject_kind": "military_administration",
-      "color_hex": "#962b3a",
+      "color_hex": "#f96471",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B46736465172107",
-          "CN_CITY_17275852B69993211466305"
+          "CN_CITY_17275852B69993211466305",
+          "CN_CITY_17275852B48796108703718",
+          "CN_CITY_17275852B59002516276853",
+          "CN_CITY_17275852B8665149309175",
+          "CN_MRG_51650d15c050",
+          "CN_MRG_9b9b2d2aa43a"
         ]
       },
       "cores": "keep",
@@ -4506,1371 +5159,16 @@
       "name_zh": "太行抗日根据地",
       "parent_owner_tag": "PRC",
       "subject_kind": "military_administration",
-      "color_hex": "#da4b62",
+      "color_hex": "#c61f32",
       "select": {
         "feature_ids": [
-          "CN_MRG_093183003948"
+          "CN_MRG_093183003948",
+          "CN_MRG_27a184e8ab38",
+          "CN_CITY_17275852B61726350757100"
         ]
       },
       "cores": "keep",
       "notes": "Whole-parcel resistance-area debug proxy; county seats and rural control were mixed."
-    },
-    {
-      "id": "jzh_debug_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "JZH",
-      "name_en": "Central Hebei Resistance Area",
-      "name_zh": "冀中抗日根据地",
-      "parent_owner_tag": "PRC",
-      "subject_kind": "military_administration",
-      "color_hex": "#fe5673",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B86070890642714",
-          "CN_CITY_17275852B52385226353354"
-        ]
-      },
-      "cores": "keep",
-      "notes": "Whole-parcel resistance-area debug proxy; county seats and rural control were mixed."
-    },
-    {
-      "id": "jna_debug_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "JNA",
-      "name_en": "Southern Hebei Resistance Area",
-      "name_zh": "冀南抗日根据地",
-      "parent_owner_tag": "PRC",
-      "subject_kind": "military_administration",
-      "color_hex": "#c13f2d",
-      "select": {
-        "feature_ids": [
-          "CN_MRG_51c0b9bbbb0a"
-        ]
-      },
-      "cores": "keep",
-      "notes": "Whole-parcel resistance-area debug proxy; county seats and rural control were mixed."
-    },
-    {
-      "id": "lzg_debug_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "LZG",
-      "name_en": "Central Shandong Resistance Area",
-      "name_zh": "鲁中抗日根据地",
-      "parent_owner_tag": "PRC",
-      "subject_kind": "military_administration",
-      "color_hex": "#bb003b",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B77679479199341"
-        ]
-      },
-      "cores": "keep",
-      "notes": "Whole-parcel resistance-area debug proxy; county seats and rural control were mixed."
-    },
-    {
-      "id": "jdg_debug_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "JDG",
-      "name_en": "Jiaodong Resistance Area",
-      "name_zh": "胶东抗日根据地",
-      "parent_owner_tag": "PRC",
-      "subject_kind": "military_administration",
-      "color_hex": "#d46c5d",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B99355884213700"
-        ]
-      },
-      "cores": "keep",
-      "notes": "Whole-parcel resistance-area debug proxy; county seats and rural control were mixed."
-    },
-    {
-      "id": "bha_debug_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "BHA",
-      "name_en": "Southeastern Shandong Guerrilla Area",
-      "name_zh": "鲁东南抗日游击区",
-      "parent_owner_tag": "PRC",
-      "subject_kind": "military_administration",
-      "color_hex": "#fa9590",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B41312334217118"
-        ]
-      },
-      "cores": "keep",
-      "notes": "Whole-parcel resistance-area debug proxy; county seats and rural control were mixed."
-    },
-    {
-      "id": "yws_debug_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "YWS",
-      "name_en": "Henan-Anhui-Jiangsu Guerrilla Area",
-      "name_zh": "豫皖苏游击区",
-      "parent_owner_tag": "PRC",
-      "subject_kind": "military_administration",
-      "color_hex": "#e77886",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B89166552502762"
-        ]
-      },
-      "cores": "keep",
-      "notes": "Whole-parcel resistance-area debug proxy; county seats and rural control were mixed."
-    },
-    {
-      "id": "msn_debug_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "MSN",
-      "name_en": "New Fourth Army Southern Jiangsu Area",
-      "name_zh": "新四军苏南游击区",
-      "parent_owner_tag": "PRC",
-      "subject_kind": "military_administration",
-      "color_hex": "#fc765d",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B59245154361238",
-          "CN_CITY_17275852B11407259911678"
-        ]
-      },
-      "cores": "keep",
-      "notes": "Whole-parcel resistance-area debug proxy; county seats and rural control were mixed."
-    },
-    {
-      "id": "wna_debug_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "WNA",
-      "name_en": "New Fourth Army Southern Anhui Area",
-      "name_zh": "新四军皖南驻区",
-      "parent_owner_tag": "PRC",
-      "subject_kind": "military_administration",
-      "color_hex": "#fe4c2f",
-      "select": {
-        "feature_ids": [
-          "CN_CITY_17275852B59735937562693"
-        ]
-      },
-      "cores": "keep",
-      "notes": "Whole-parcel resistance-area debug proxy; county seats and rural control were mixed."
-    },
-    {
-      "id": "caab_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CAAB",
-      "name_en": "Alberta",
-      "name_zh": "阿尔伯塔省",
-      "parent_owner_tag": "CAN",
-      "subject_kind": "province",
-      "color_hex": "#fb949a",
-      "select": {
-        "hierarchy_groups": [
-          "CA_Alberta"
-        ]
-      },
-      "cores": [
-        "CAN"
-      ]
-    },
-    {
-      "id": "cabc_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CABC",
-      "name_en": "British Columbia",
-      "name_zh": "不列颠哥伦比亚省",
-      "parent_owner_tag": "CAN",
-      "subject_kind": "province",
-      "color_hex": "#90363a",
-      "select": {
-        "hierarchy_groups": [
-          "CA_British_Columbia"
-        ]
-      },
-      "cores": [
-        "CAN"
-      ]
-    },
-    {
-      "id": "camb_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CAMB",
-      "name_en": "Manitoba",
-      "name_zh": "马尼托巴省",
-      "parent_owner_tag": "CAN",
-      "subject_kind": "province",
-      "color_hex": "#d3767b",
-      "select": {
-        "hierarchy_groups": [
-          "CA_Manitoba"
-        ]
-      },
-      "cores": [
-        "CAN"
-      ]
-    },
-    {
-      "id": "canb_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CANB",
-      "name_en": "New Brunswick",
-      "name_zh": "新不伦瑞克省",
-      "parent_owner_tag": "CAN",
-      "subject_kind": "province",
-      "color_hex": "#c20605",
-      "select": {
-        "hierarchy_groups": [
-          "CA_New_Brunswick"
-        ]
-      },
-      "cores": [
-        "CAN"
-      ]
-    },
-    {
-      "id": "cans_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CANS",
-      "name_en": "Nova Scotia",
-      "name_zh": "新斯科舍省",
-      "parent_owner_tag": "CAN",
-      "subject_kind": "province",
-      "color_hex": "#af565b",
-      "select": {
-        "hierarchy_groups": [
-          "CA_Nova_Scotia"
-        ]
-      },
-      "cores": [
-        "CAN"
-      ]
-    },
-    {
-      "id": "caon_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CAON",
-      "name_en": "Ontario",
-      "name_zh": "安大略省",
-      "parent_owner_tag": "CAN",
-      "subject_kind": "province",
-      "color_hex": "#fe744f",
-      "select": {
-        "hierarchy_groups": [
-          "CA_Ontario"
-        ]
-      },
-      "exclude": {
-        "feature_ids": [
-          "CA_FED_35079"
-        ]
-      },
-      "cores": [
-        "CAN"
-      ],
-      "notes": "Ottawa parcel retained as the federal seat in this debug subdivision."
-    },
-    {
-      "id": "cape_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CAPE",
-      "name_en": "Prince Edward Island",
-      "name_zh": "爱德华王子岛省",
-      "parent_owner_tag": "CAN",
-      "subject_kind": "province",
-      "color_hex": "#f85a6c",
-      "select": {
-        "hierarchy_groups": [
-          "CA_Prince_Edward_Island"
-        ]
-      },
-      "cores": [
-        "CAN"
-      ]
-    },
-    {
-      "id": "caqc_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CAQC",
-      "name_en": "Quebec",
-      "name_zh": "魁北克省",
-      "parent_owner_tag": "CAN",
-      "subject_kind": "province",
-      "color_hex": "#c44725",
-      "select": {
-        "hierarchy_groups": [
-          "CA_Quebec"
-        ]
-      },
-      "cores": [
-        "CAN"
-      ]
-    },
-    {
-      "id": "cask_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "CASK",
-      "name_en": "Saskatchewan",
-      "name_zh": "萨斯卡彻温省",
-      "parent_owner_tag": "CAN",
-      "subject_kind": "province",
-      "color_hex": "#cf264a",
-      "select": {
-        "hierarchy_groups": [
-          "CA_Saskatchewan"
-        ]
-      },
-      "cores": [
-        "CAN"
-      ]
-    },
-    {
-      "id": "usal_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USAL",
-      "name_en": "Alabama",
-      "name_zh": "亚拉巴马州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#5a9bce",
-      "select": {
-        "hierarchy_groups": [
-          "US_Alabama"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usaz_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USAZ",
-      "name_en": "Arizona",
-      "name_zh": "亚利桑那州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#3aaffc",
-      "select": {
-        "hierarchy_groups": [
-          "US_Arizona"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usar_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USAR",
-      "name_en": "Arkansas",
-      "name_zh": "阿肯色州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#6095ff",
-      "select": {
-        "hierarchy_groups": [
-          "US_Arkansas"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usca_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USCA",
-      "name_en": "California",
-      "name_zh": "加利福尼亚州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#1d71cf",
-      "select": {
-        "hierarchy_groups": [
-          "US_California"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usco_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USCO",
-      "name_en": "Colorado",
-      "name_zh": "科罗拉多州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#5d84c8",
-      "select": {
-        "hierarchy_groups": [
-          "US_Colorado"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usct_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USCT",
-      "name_en": "Connecticut",
-      "name_zh": "康涅狄格州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#7ea5e5",
-      "select": {
-        "hierarchy_groups": [
-          "US_Connecticut"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usde_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USDE",
-      "name_en": "Delaware",
-      "name_zh": "特拉华州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#096bab",
-      "select": {
-        "hierarchy_groups": [
-          "US_Delaware"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usfl_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USFL",
-      "name_en": "Florida",
-      "name_zh": "佛罗里达州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#129aec",
-      "select": {
-        "hierarchy_groups": [
-          "US_Florida"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usga_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USGA",
-      "name_en": "Georgia",
-      "name_zh": "佐治亚州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#2352ab",
-      "select": {
-        "hierarchy_groups": [
-          "US_Georgia"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usid_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USID",
-      "name_en": "Idaho",
-      "name_zh": "爱达荷州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#1f71f0",
-      "select": {
-        "hierarchy_groups": [
-          "US_Idaho"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usil_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USIL",
-      "name_en": "Illinois",
-      "name_zh": "伊利诺伊州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#43619c",
-      "select": {
-        "hierarchy_groups": [
-          "US_Illinois"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usin_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USIN",
-      "name_en": "Indiana",
-      "name_zh": "印第安纳州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#6490e1",
-      "select": {
-        "hierarchy_groups": [
-          "US_Indiana"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usia_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USIA",
-      "name_en": "Iowa",
-      "name_zh": "艾奥瓦州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#1384cc",
-      "select": {
-        "hierarchy_groups": [
-          "US_Iowa"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usks_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USKS",
-      "name_en": "Kansas",
-      "name_zh": "堪萨斯州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#4c74c4",
-      "select": {
-        "hierarchy_groups": [
-          "US_Kansas"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usky_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USKY",
-      "name_en": "Kentucky",
-      "name_zh": "肯塔基州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#4a8afb",
-      "select": {
-        "hierarchy_groups": [
-          "US_Kentucky"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usla_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USLA",
-      "name_en": "Louisiana",
-      "name_zh": "路易斯安那州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#59a2ea",
-      "select": {
-        "hierarchy_groups": [
-          "US_Louisiana"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usme_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USME",
-      "name_en": "Maine",
-      "name_zh": "缅因州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#3c8fd1",
-      "select": {
-        "hierarchy_groups": [
-          "US_Maine"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usmd_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USMD",
-      "name_en": "Maryland",
-      "name_zh": "马里兰州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#2362bc",
-      "select": {
-        "hierarchy_groups": [
-          "US_Maryland"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usma_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USMA",
-      "name_en": "Massachusetts",
-      "name_zh": "马萨诸塞州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#4d7fdd",
-      "select": {
-        "hierarchy_groups": [
-          "US_Massachusetts"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usmi_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USMI",
-      "name_en": "Michigan",
-      "name_zh": "密歇根州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#71aefe",
-      "select": {
-        "hierarchy_groups": [
-          "US_Michigan"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usmn_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USMN",
-      "name_en": "Minnesota",
-      "name_zh": "明尼苏达州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#456bb0",
-      "select": {
-        "hierarchy_groups": [
-          "US_Minnesota"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usms_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USMS",
-      "name_en": "Mississippi",
-      "name_zh": "密西西比州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#3e7dfe",
-      "select": {
-        "hierarchy_groups": [
-          "US_Mississippi"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usmo_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USMO",
-      "name_en": "Missouri",
-      "name_zh": "密苏里州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#1b64dd",
-      "select": {
-        "hierarchy_groups": [
-          "US_Missouri"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usmt_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USMT",
-      "name_en": "Montana",
-      "name_zh": "蒙大拿州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#1a77bc",
-      "select": {
-        "hierarchy_groups": [
-          "US_Montana"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usne_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USNE",
-      "name_en": "Nebraska",
-      "name_zh": "内布拉斯加州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#114bc6",
-      "select": {
-        "hierarchy_groups": [
-          "US_Nebraska"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usnv_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USNV",
-      "name_en": "Nevada",
-      "name_zh": "内华达州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#6a90cc",
-      "select": {
-        "hierarchy_groups": [
-          "US_Nevada"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usnh_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USNH",
-      "name_en": "New Hampshire",
-      "name_zh": "新罕布什尔州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#6fb1e6",
-      "select": {
-        "hierarchy_groups": [
-          "US_New_Hampshire"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usnj_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USNJ",
-      "name_en": "New Jersey",
-      "name_zh": "新泽西州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#33a3fd",
-      "select": {
-        "hierarchy_groups": [
-          "US_New_Jersey"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usnm_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USNM",
-      "name_en": "New Mexico",
-      "name_zh": "新墨西哥州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#0360a6",
-      "select": {
-        "hierarchy_groups": [
-          "US_New_Mexico"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usny_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USNY",
-      "name_en": "New York",
-      "name_zh": "纽约州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#448de8",
-      "select": {
-        "hierarchy_groups": [
-          "US_New_York"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usnc_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USNC",
-      "name_en": "North Carolina",
-      "name_zh": "北卡罗来纳州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#4784b8",
-      "select": {
-        "hierarchy_groups": [
-          "US_North_Carolina"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usnd_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USND",
-      "name_en": "North Dakota",
-      "name_zh": "北达科他州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#73a1fa",
-      "select": {
-        "hierarchy_groups": [
-          "US_North_Dakota"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usoh_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USOH",
-      "name_en": "Ohio",
-      "name_zh": "俄亥俄州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#59b8fd",
-      "select": {
-        "hierarchy_groups": [
-          "US_Ohio"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usok_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USOK",
-      "name_en": "Oklahoma",
-      "name_zh": "俄克拉何马州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#63a6da",
-      "select": {
-        "hierarchy_groups": [
-          "US_Oklahoma"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usor_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USOR",
-      "name_en": "Oregon",
-      "name_zh": "俄勒冈州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#2478e0",
-      "select": {
-        "hierarchy_groups": [
-          "US_Oregon"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "uspa_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USPA",
-      "name_en": "Pennsylvania",
-      "name_zh": "宾夕法尼亚州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#088cdf",
-      "select": {
-        "hierarchy_groups": [
-          "US_Pennsylvania"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usri_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USRI",
-      "name_en": "Rhode Island",
-      "name_zh": "罗得岛州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#306fa2",
-      "select": {
-        "hierarchy_groups": [
-          "US_Rhode_Island"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "ussc_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USSC",
-      "name_en": "South Carolina",
-      "name_zh": "南卡罗来纳州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#3998fb",
-      "select": {
-        "hierarchy_groups": [
-          "US_South_Carolina"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "ussd_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USSD",
-      "name_en": "South Dakota",
-      "name_zh": "南达科他州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#38599c",
-      "select": {
-        "hierarchy_groups": [
-          "US_South_Dakota"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "ustn_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USTN",
-      "name_en": "Tennessee",
-      "name_zh": "田纳西州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#156498",
-      "select": {
-        "hierarchy_groups": [
-          "US_Tennessee"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "ustx_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USTX",
-      "name_en": "Texas",
-      "name_zh": "得克萨斯州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#3566cb",
-      "select": {
-        "hierarchy_groups": [
-          "US_Texas"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usut_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USUT",
-      "name_en": "Utah",
-      "name_zh": "犹他州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#346cdd",
-      "select": {
-        "hierarchy_groups": [
-          "US_Utah"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usvt_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USVT",
-      "name_en": "Vermont",
-      "name_zh": "佛蒙特州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#88b1f9",
-      "select": {
-        "hierarchy_groups": [
-          "US_Vermont"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "usva_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USVA",
-      "name_en": "Virginia",
-      "name_zh": "弗吉尼亚州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#527ab8",
-      "select": {
-        "hierarchy_groups": [
-          "US_Virginia"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "uswa_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USWA",
-      "name_en": "Washington",
-      "name_zh": "华盛顿州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#779cdb",
-      "select": {
-        "hierarchy_groups": [
-          "US_Washington"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "uswv_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USWV",
-      "name_en": "West Virginia",
-      "name_zh": "西弗吉尼亚州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#558dc2",
-      "select": {
-        "hierarchy_groups": [
-          "US_West_Virginia"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "uswi_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USWI",
-      "name_en": "Wisconsin",
-      "name_zh": "威斯康星州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#015abd",
-      "select": {
-        "hierarchy_groups": [
-          "US_Wisconsin"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
-    },
-    {
-      "id": "uswy_administration",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "USWY",
-      "name_en": "Wyoming",
-      "name_zh": "怀俄明州",
-      "parent_owner_tag": "USA",
-      "subject_kind": "state",
-      "color_hex": "#198cff",
-      "select": {
-        "hierarchy_groups": [
-          "US_Wyoming"
-        ]
-      },
-      "cores": [
-        "USA"
-      ]
     },
     {
       "id": "karafuto_south",
@@ -5927,14 +5225,14 @@
       "name_zh": "西属伊夫尼",
       "parent_owner_tag": "SPR",
       "subject_kind": "colony",
-      "color_hex": "#8b7a39",
       "select": {
         "feature_ids": [
           "MAR-1455__SPLIT_IFNI",
           "MAR-3457__SPLIT_IFNI"
         ]
       },
-      "notes": "Simplified pre-1957 enclave extent around Sidi Ifni, using the historical map extent; not the reduced postwar city perimeter. Inland line approximate and coast inherited; intersect both modern source regions."
+      "notes": "Simplified pre-1957 enclave extent around Sidi Ifni, using the historical map extent; not the reduced postwar city perimeter. Inland line approximate and coast inherited; intersect both modern source regions.",
+      "color_hex": "#c4aa41"
     },
     {
       "id": "guangzhouwan",
@@ -5947,7 +5245,6 @@
       "name_zh": "广州湾租借地",
       "parent_owner_tag": "FRA",
       "subject_kind": "colony",
-      "color_hex": "#5f7adc",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B86000242921086__SPLIT_GUANGZHOUWAN",
@@ -5955,16 +5252,15 @@
           "CN_CITY_17275852B90470795224142__SPLIT_GUANGZHOUWAN"
         ]
       },
-      "notes": "Simplified bay-side lease outline around Fort Bayard and Chikan with Donghai/Naozhou island sector. Rural frontier approximate, clipped to runtime land; does not assign the entire modern Zhanjiang prefecture."
+      "notes": "Simplified bay-side lease outline around Fort Bayard and Chikan with Donghai/Naozhou island sector. Rural frontier approximate, clipped to runtime land; does not assign the entire modern Zhanjiang prefecture.",
+      "color_hex": "#0f68db"
     },
     {
-      "id": "alg_family_colour",
+      "id": "alg_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "ALG",
-      "color_hex": "#8da5f0",
       "select": {
         "owners": [
           "ALG"
@@ -5972,16 +5268,15 @@
       },
       "only_from_owners": [
         "ALG"
-      ]
+      ],
+      "color_hex": "#245dbb"
     },
     {
-      "id": "ang_family_colour",
+      "id": "ang_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "ANG",
-      "color_hex": "#789d78",
       "select": {
         "owners": [
           "ANG"
@@ -5989,32 +5284,15 @@
       },
       "only_from_owners": [
         "ANG"
-      ]
-    },
-    {
-      "id": "aoi_family_colour",
-      "scenarios": [
-        "hoi4_1939"
       ],
-      "tag": "AOI",
-      "color_hex": "#8ca879",
-      "select": {
-        "owners": [
-          "AOI"
-        ]
-      },
-      "only_from_owners": [
-        "AOI"
-      ]
+      "color_hex": "#50895b"
     },
     {
-      "id": "ast_family_colour",
+      "id": "ast_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "AST",
-      "color_hex": "#e3888c",
       "select": {
         "owners": [
           "AST"
@@ -6022,16 +5300,15 @@
       },
       "only_from_owners": [
         "AST"
-      ]
+      ],
+      "color_hex": "#db5d80"
     },
     {
-      "id": "cey_family_colour",
+      "id": "cey_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "CEY",
-      "color_hex": "#d67190",
       "select": {
         "owners": [
           "CEY"
@@ -6039,16 +5316,15 @@
       },
       "only_from_owners": [
         "CEY"
-      ]
+      ],
+      "color_hex": "#d55768"
     },
     {
-      "id": "egy_family_colour",
+      "id": "egy_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "EGY",
-      "color_hex": "#c1095f",
       "select": {
         "owners": [
           "EGY"
@@ -6056,16 +5332,31 @@
       },
       "only_from_owners": [
         "EGY"
-      ]
+      ],
+      "color_hex": "#c34a5d"
     },
     {
-      "id": "ins_family_colour",
+      "id": "eri_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
+      ],
+      "tag": "ERI",
+      "select": {
+        "owners": [
+          "ERI"
+        ]
+      },
+      "only_from_owners": [
+        "ERI"
+      ],
+      "color_hex": "#2f6632"
+    },
+    {
+      "id": "ins_family_colour_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
       ],
       "tag": "INS",
-      "color_hex": "#f2c0a0",
       "select": {
         "owners": [
           "INS"
@@ -6073,16 +5364,15 @@
       },
       "only_from_owners": [
         "INS"
-      ]
+      ],
+      "color_hex": "#e2a371"
     },
     {
-      "id": "kor_family_colour",
+      "id": "kor_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "KOR",
-      "color_hex": "#af7666",
       "select": {
         "owners": [
           "KOR"
@@ -6090,16 +5380,15 @@
       },
       "only_from_owners": [
         "KOR"
-      ]
+      ],
+      "color_hex": "#f7beaa"
     },
     {
-      "id": "lba_family_colour",
+      "id": "lba_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "LBA",
-      "color_hex": "#5e9a4c",
       "select": {
         "owners": [
           "LBA"
@@ -6107,16 +5396,15 @@
       },
       "only_from_owners": [
         "LBA"
-      ]
+      ],
+      "color_hex": "#478d51"
     },
     {
-      "id": "leb_family_colour",
+      "id": "leb_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "LEB",
-      "color_hex": "#1160dd",
       "select": {
         "owners": [
           "LEB"
@@ -6124,16 +5412,15 @@
       },
       "only_from_owners": [
         "LEB"
-      ]
+      ],
+      "color_hex": "#5d82eb"
     },
     {
-      "id": "mal_family_colour",
+      "id": "mal_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "MAL",
-      "color_hex": "#883b55",
       "select": {
         "owners": [
           "MAL"
@@ -6141,16 +5428,15 @@
       },
       "only_from_owners": [
         "MAL"
-      ]
+      ],
+      "color_hex": "#c52b4d"
     },
     {
-      "id": "mor_family_colour",
+      "id": "mor_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "MOR",
-      "color_hex": "#2b80d6",
       "select": {
         "owners": [
           "MOR"
@@ -6158,16 +5444,15 @@
       },
       "only_from_owners": [
         "MOR"
-      ]
+      ],
+      "color_hex": "#5174da"
     },
     {
-      "id": "mzb_family_colour",
+      "id": "mzb_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "MZB",
-      "color_hex": "#5d7b5d",
       "select": {
         "owners": [
           "MZB"
@@ -6175,16 +5460,15 @@
       },
       "only_from_owners": [
         "MZB"
-      ]
+      ],
+      "color_hex": "#42794d"
     },
     {
-      "id": "pal_family_colour",
+      "id": "pal_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "PAL",
-      "color_hex": "#d52b42",
       "select": {
         "owners": [
           "PAL"
@@ -6192,16 +5476,15 @@
       },
       "only_from_owners": [
         "PAL"
-      ]
+      ],
+      "color_hex": "#dc4574"
     },
     {
-      "id": "phi_family_colour",
+      "id": "phi_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "PHI",
-      "color_hex": "#1558cf",
       "select": {
         "owners": [
           "PHI"
@@ -6209,16 +5492,15 @@
       },
       "only_from_owners": [
         "PHI"
-      ]
+      ],
+      "color_hex": "#146fdd"
     },
     {
-      "id": "raj_family_colour",
+      "id": "raj_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "RAJ",
-      "color_hex": "#b50448",
       "select": {
         "owners": [
           "RAJ"
@@ -6226,16 +5508,15 @@
       },
       "only_from_owners": [
         "RAJ"
-      ]
+      ],
+      "color_hex": "#ab3354"
     },
     {
-      "id": "rcg_family_colour",
+      "id": "rcg_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "RCG",
-      "color_hex": "#8b7a39",
       "select": {
         "owners": [
           "RCG"
@@ -6243,16 +5524,15 @@
       },
       "only_from_owners": [
         "RCG"
-      ]
+      ],
+      "color_hex": "#a3931e"
     },
     {
-      "id": "saf_family_colour",
+      "id": "saf_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "SAF",
-      "color_hex": "#c16062",
       "select": {
         "owners": [
           "SAF"
@@ -6260,16 +5540,15 @@
       },
       "only_from_owners": [
         "SAF"
-      ]
+      ],
+      "color_hex": "#db5e73"
     },
     {
-      "id": "sgn_family_colour",
+      "id": "sgn_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "SGN",
-      "color_hex": "#c89c14",
       "select": {
         "owners": [
           "SGN"
@@ -6277,16 +5556,15 @@
       },
       "only_from_owners": [
         "SGN"
-      ]
+      ],
+      "color_hex": "#e3b750"
     },
     {
-      "id": "smr_family_colour",
+      "id": "smr_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "SMR",
-      "color_hex": "#cbb780",
       "select": {
         "owners": [
           "SMR"
@@ -6294,16 +5572,31 @@
       },
       "only_from_owners": [
         "SMR"
-      ]
+      ],
+      "color_hex": "#fed987"
     },
     {
-      "id": "ssh_family_colour",
+      "id": "som_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
+      ],
+      "tag": "SOM",
+      "select": {
+        "owners": [
+          "SOM"
+        ]
+      },
+      "only_from_owners": [
+        "SOM"
+      ],
+      "color_hex": "#39722c"
+    },
+    {
+      "id": "ssh_family_colour_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
       ],
       "tag": "SSH",
-      "color_hex": "#a6935d",
       "select": {
         "owners": [
           "SSH"
@@ -6311,16 +5604,15 @@
       },
       "only_from_owners": [
         "SSH"
-      ]
+      ],
+      "color_hex": "#dec769"
     },
     {
-      "id": "sud_family_colour",
+      "id": "sud_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "SUD",
-      "color_hex": "#d0637d",
       "select": {
         "owners": [
           "SUD"
@@ -6328,16 +5620,15 @@
       },
       "only_from_owners": [
         "SUD"
-      ]
+      ],
+      "color_hex": "#c03e5a"
     },
     {
-      "id": "tai_family_colour",
+      "id": "tai_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "TAI",
-      "color_hex": "#e5c5b9",
       "select": {
         "owners": [
           "TAI"
@@ -6345,16 +5636,15 @@
       },
       "only_from_owners": [
         "TAI"
-      ]
+      ],
+      "color_hex": "#d8aa99"
     },
     {
-      "id": "tun_family_colour",
+      "id": "tun_family_colour_hoi4_1936",
       "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
+        "hoi4_1936"
       ],
       "tag": "TUN",
-      "color_hex": "#0c4b9c",
       "select": {
         "owners": [
           "TUN"
@@ -6362,7 +5652,431 @@
       },
       "only_from_owners": [
         "TUN"
-      ]
+      ],
+      "color_hex": "#1964c9"
+    },
+    {
+      "id": "alg_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "ALG",
+      "select": {
+        "owners": [
+          "ALG"
+        ]
+      },
+      "only_from_owners": [
+        "ALG"
+      ],
+      "color_hex": "#245dbb"
+    },
+    {
+      "id": "ang_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "ANG",
+      "select": {
+        "owners": [
+          "ANG"
+        ]
+      },
+      "only_from_owners": [
+        "ANG"
+      ],
+      "color_hex": "#50895b"
+    },
+    {
+      "id": "aoi_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "AOI",
+      "select": {
+        "owners": [
+          "AOI"
+        ]
+      },
+      "only_from_owners": [
+        "AOI"
+      ],
+      "color_hex": "#2f6632"
+    },
+    {
+      "id": "ast_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "AST",
+      "select": {
+        "owners": [
+          "AST"
+        ]
+      },
+      "only_from_owners": [
+        "AST"
+      ],
+      "color_hex": "#a32c50"
+    },
+    {
+      "id": "cey_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "CEY",
+      "select": {
+        "owners": [
+          "CEY"
+        ]
+      },
+      "only_from_owners": [
+        "CEY"
+      ],
+      "color_hex": "#c34a5d"
+    },
+    {
+      "id": "egy_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "EGY",
+      "select": {
+        "owners": [
+          "EGY"
+        ]
+      },
+      "only_from_owners": [
+        "EGY"
+      ],
+      "color_hex": "#b2113c"
+    },
+    {
+      "id": "ins_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "INS",
+      "select": {
+        "owners": [
+          "INS"
+        ]
+      },
+      "only_from_owners": [
+        "INS"
+      ],
+      "color_hex": "#e2a371"
+    },
+    {
+      "id": "kor_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KOR",
+      "select": {
+        "owners": [
+          "KOR"
+        ]
+      },
+      "only_from_owners": [
+        "KOR"
+      ],
+      "color_hex": "#fdd3c5"
+    },
+    {
+      "id": "lba_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "LBA",
+      "select": {
+        "owners": [
+          "LBA"
+        ]
+      },
+      "only_from_owners": [
+        "LBA"
+      ],
+      "color_hex": "#39722c"
+    },
+    {
+      "id": "leb_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "LEB",
+      "select": {
+        "owners": [
+          "LEB"
+        ]
+      },
+      "only_from_owners": [
+        "LEB"
+      ],
+      "color_hex": "#5d82eb"
+    },
+    {
+      "id": "mal_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "MAL",
+      "select": {
+        "owners": [
+          "MAL"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "color_hex": "#cf4f62"
+    },
+    {
+      "id": "mor_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "MOR",
+      "select": {
+        "owners": [
+          "MOR"
+        ]
+      },
+      "only_from_owners": [
+        "MOR"
+      ],
+      "color_hex": "#5174da"
+    },
+    {
+      "id": "mzb_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "MZB",
+      "select": {
+        "owners": [
+          "MZB"
+        ]
+      },
+      "only_from_owners": [
+        "MZB"
+      ],
+      "color_hex": "#42794d"
+    },
+    {
+      "id": "pal_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "PAL",
+      "select": {
+        "owners": [
+          "PAL"
+        ]
+      },
+      "only_from_owners": [
+        "PAL"
+      ],
+      "color_hex": "#ab3354"
+    },
+    {
+      "id": "phi_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "PHI",
+      "select": {
+        "owners": [
+          "PHI"
+        ]
+      },
+      "only_from_owners": [
+        "PHI"
+      ],
+      "color_hex": "#146fdd"
+    },
+    {
+      "id": "raj_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "RAJ",
+      "select": {
+        "owners": [
+          "RAJ"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#db5e73"
+    },
+    {
+      "id": "rcg_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "RCG",
+      "select": {
+        "owners": [
+          "RCG"
+        ]
+      },
+      "only_from_owners": [
+        "RCG"
+      ],
+      "color_hex": "#a3931e"
+    },
+    {
+      "id": "saf_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SAF",
+      "select": {
+        "owners": [
+          "SAF"
+        ]
+      },
+      "only_from_owners": [
+        "SAF"
+      ],
+      "color_hex": "#ab204d"
+    },
+    {
+      "id": "sgn_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SGN",
+      "select": {
+        "owners": [
+          "SGN"
+        ]
+      },
+      "only_from_owners": [
+        "SGN"
+      ],
+      "color_hex": "#e3b750"
+    },
+    {
+      "id": "smr_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SMR",
+      "select": {
+        "owners": [
+          "SMR"
+        ]
+      },
+      "only_from_owners": [
+        "SMR"
+      ],
+      "color_hex": "#fed987"
+    },
+    {
+      "id": "ssh_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SSH",
+      "select": {
+        "owners": [
+          "SSH"
+        ]
+      },
+      "only_from_owners": [
+        "SSH"
+      ],
+      "color_hex": "#dec769"
+    },
+    {
+      "id": "sud_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SUD",
+      "select": {
+        "owners": [
+          "SUD"
+        ]
+      },
+      "only_from_owners": [
+        "SUD"
+      ],
+      "color_hex": "#de547c"
+    },
+    {
+      "id": "syr_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SYR",
+      "select": {
+        "owners": [
+          "SYR"
+        ]
+      },
+      "only_from_owners": [
+        "SYR"
+      ],
+      "color_hex": "#3375d4"
+    },
+    {
+      "id": "tai_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "TAI",
+      "select": {
+        "owners": [
+          "TAI"
+        ]
+      },
+      "only_from_owners": [
+        "TAI"
+      ],
+      "color_hex": "#fed0b8"
+    },
+    {
+      "id": "tun_family_colour_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "TUN",
+      "select": {
+        "owners": [
+          "TUN"
+        ]
+      },
+      "only_from_owners": [
+        "TUN"
+      ],
+      "color_hex": "#1964c9"
+    },
+    {
+      "id": "china_enclaves_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "smooth_enclaves": {
+        "tags": [
+          "CHI",
+          "SHX",
+          "PRC",
+          "NCP",
+          "CNZ",
+          "JBZ",
+          "MEN",
+          "RGC",
+          "JCC",
+          "JSC",
+          "JCJ",
+          "THG"
+        ],
+        "max_area_km2": 3000
+      }
     }
   ]
 }

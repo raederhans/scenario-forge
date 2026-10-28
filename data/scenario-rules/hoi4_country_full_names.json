@@ -7,8 +7,8 @@
       "zh": "亚丁"
     },
     "AEF": {
-      "en": "Middle Congo",
-      "zh": "中央刚果"
+      "en": "French Equatorial Africa",
+      "zh": "法属赤道非洲联邦"
     },
     "AFA": {
       "en": "Sultanate of Aussa",
@@ -39,8 +39,8 @@
       "zh": "葡属安哥拉殖民地"
     },
     "AOF": {
-      "en": "Senegal",
-      "zh": "塞内加尔"
+      "en": "French West Africa",
+      "zh": "法属西非联邦"
     },
     "AOI": {
       "en": "Italian East Africa",
@@ -58,33 +58,9 @@
       "en": "Commonwealth of Australia",
       "zh": "澳大利亚联邦"
     },
-    "AUNS": {
-      "en": "New South Wales",
-      "zh": "新南威尔士州"
-    },
-    "AUQL": {
-      "en": "Queensland",
-      "zh": "昆士兰州"
-    },
     "AUS": {
       "en": "Federal State of Austria",
       "zh": "奥地利联邦国"
-    },
-    "AUSA": {
-      "en": "South Australia",
-      "zh": "南澳大利亚州"
-    },
-    "AUTS": {
-      "en": "Tasmania",
-      "zh": "塔斯马尼亚州"
-    },
-    "AUVI": {
-      "en": "Victoria",
-      "zh": "维多利亚州"
-    },
-    "AUWA": {
-      "en": "Western Australia",
-      "zh": "西澳大利亚州"
     },
     "AZR": {
       "en": "Azerbaijan SSR",
@@ -109,10 +85,6 @@
     "BGU": {
       "en": "British Guiana",
       "zh": "英属圭亚那"
-    },
-    "BHA": {
-      "en": "Southeastern Shandong Guerrilla Area",
-      "zh": "鲁东南抗日游击区"
     },
     "BHM": {
       "en": "Bahamas",
@@ -174,49 +146,9 @@
       "en": "Buryat-Mongol ASSR",
       "zh": "布里亚特-蒙古自治共和国"
     },
-    "CAAB": {
-      "en": "Alberta",
-      "zh": "阿尔伯塔省"
-    },
-    "CABC": {
-      "en": "British Columbia",
-      "zh": "不列颠哥伦比亚省"
-    },
-    "CAM": {
-      "en": "Cambodia",
-      "zh": "柬埔寨"
-    },
-    "CAMB": {
-      "en": "Manitoba",
-      "zh": "马尼托巴省"
-    },
     "CAN": {
       "en": "Dominion of Canada",
       "zh": "加拿大自治领"
-    },
-    "CANB": {
-      "en": "New Brunswick",
-      "zh": "新不伦瑞克省"
-    },
-    "CANS": {
-      "en": "Nova Scotia",
-      "zh": "新斯科舍省"
-    },
-    "CAON": {
-      "en": "Ontario",
-      "zh": "安大略省"
-    },
-    "CAPE": {
-      "en": "Prince Edward Island",
-      "zh": "爱德华王子岛省"
-    },
-    "CAQC": {
-      "en": "Quebec",
-      "zh": "魁北克省"
-    },
-    "CASK": {
-      "en": "Saskatchewan",
-      "zh": "萨斯卡彻温省"
     },
     "CDE": {
       "en": "East Chahar Garrison",
@@ -233,10 +165,6 @@
     "CEY": {
       "en": "British Ceylon",
       "zh": "英属锡兰"
-    },
-    "CHD": {
-      "en": "Chad",
-      "zh": "乍得"
     },
     "CHE": {
       "en": "Chechen-Ingush Autonomous Oblast",
@@ -257,10 +185,6 @@
     "CNZ": {
       "en": "South Chahar Administration",
       "zh": "察南政厅"
-    },
-    "COC": {
-      "en": "Cochinchina",
-      "zh": "交趾支那（南圻）"
     },
     "COL": {
       "en": "Republic of Colombia",
@@ -305,10 +229,6 @@
     "DAG": {
       "en": "Dagestan ASSR",
       "zh": "达吉斯坦自治共和国"
-    },
-    "DAH": {
-      "en": "Dahomey",
-      "zh": "达荷美"
     },
     "DEN": {
       "en": "Kingdom of Denmark",
@@ -370,10 +290,6 @@
       "en": "French Cameroun",
       "zh": "法属喀麦隆"
     },
-    "FGU": {
-      "en": "French Guinea",
-      "zh": "法属几内亚"
-    },
     "FIN": {
       "en": "Republic of Finland",
       "zh": "芬兰共和国"
@@ -389,14 +305,6 @@
     "FRO": {
       "en": "Faroe Islands",
       "zh": "法罗群岛"
-    },
-    "FSU": {
-      "en": "French Sudan",
-      "zh": "法属苏丹"
-    },
-    "GAB": {
-      "en": "Gabon",
-      "zh": "加蓬"
     },
     "GAM": {
       "en": "Gambia",
@@ -510,10 +418,6 @@
       "en": "Kingdom of Italy",
       "zh": "意大利王国"
     },
-    "IVC": {
-      "en": "Ivory Coast",
-      "zh": "科特迪瓦"
-    },
     "JAM": {
       "en": "Jamaica",
       "zh": "牙买加"
@@ -534,14 +438,6 @@
       "en": "Jin-Cha-Ji Border Region",
       "zh": "晋察冀边区"
     },
-    "JDG": {
-      "en": "Jiaodong Resistance Area",
-      "zh": "胶东抗日根据地"
-    },
-    "JNA": {
-      "en": "Southern Hebei Resistance Area",
-      "zh": "冀南抗日根据地"
-    },
     "JOR": {
       "en": "Emirate of Transjordan",
       "zh": "外约旦酋长国"
@@ -549,10 +445,6 @@
     "JSC": {
       "en": "Japanese-Occupied South China",
       "zh": "日军华南占领区"
-    },
-    "JZH": {
-      "en": "Central Hebei Resistance Area",
-      "zh": "冀中抗日根据地"
     },
     "KAL": {
       "en": "Kalmyk ASSR",
@@ -606,10 +498,6 @@
       "en": "Kirghiz ASSR",
       "zh": "吉尔吉斯自治苏维埃社会主义共和国"
     },
-    "LAO": {
-      "en": "Laos",
-      "zh": "老挝"
-    },
     "LAT": {
       "en": "Republic of Latvia",
       "zh": "拉脱维亚共和国"
@@ -646,10 +534,6 @@
       "en": "Grand Duchy of Luxembourg",
       "zh": "卢森堡大公国"
     },
-    "LZG": {
-      "en": "Central Shandong Resistance Area",
-      "zh": "鲁中抗日根据地"
-    },
     "MAD": {
       "en": "Colony of Madagascar and Dependencies",
       "zh": "马达加斯加及附属地殖民地"
@@ -661,10 +545,6 @@
     "MAN": {
       "en": "Empire of Manchukuo",
       "zh": "满洲帝国"
-    },
-    "MAU": {
-      "en": "Mauritania",
-      "zh": "毛里塔尼亚"
     },
     "MCO": {
       "en": "Monaco",
@@ -714,10 +594,6 @@
       "en": "Mari Autonomous Oblast",
       "zh": "马里自治州"
     },
-    "MSN": {
-      "en": "New Fourth Army Southern Jiangsu Area",
-      "zh": "新四军苏南游击区"
-    },
     "MUR": {
       "en": "Mauritius",
       "zh": "毛里求斯"
@@ -753,10 +629,6 @@
     "NGN": {
       "en": "Territory of New Guinea",
       "zh": "新几内亚委任统治地"
-    },
-    "NGR": {
-      "en": "Niger",
-      "zh": "尼日尔"
     },
     "NIC": {
       "en": "Republic of Nicaragua",
@@ -1030,10 +902,6 @@
       "en": "Turkmen SSR",
       "zh": "土库曼苏维埃社会主义共和国"
     },
-    "TNK": {
-      "en": "Tonkin",
-      "zh": "东京（北圻）"
-    },
     "TOG": {
       "en": "French Togoland",
       "zh": "法属多哥"
@@ -1062,10 +930,6 @@
       "en": "Republic of Turkey",
       "zh": "土耳其共和国"
     },
-    "UBA": {
-      "en": "Ubangi-Shari",
-      "zh": "乌班吉沙里"
-    },
     "UDM": {
       "en": "Udmurt ASSR",
       "zh": "乌德穆尔特自治共和国"
@@ -1078,10 +942,6 @@
       "en": "Ukrainian SSR",
       "zh": "乌克兰苏维埃社会主义共和国"
     },
-    "UPV": {
-      "en": "Upper Volta Debug Region",
-      "zh": "上沃尔特地区（调试分区）"
-    },
     "URG": {
       "en": "Oriental Republic of Uruguay",
       "zh": "乌拉圭东岸共和国"
@@ -1089,198 +949,6 @@
     "USA": {
       "en": "United States of America",
       "zh": "美利坚合众国"
-    },
-    "USAL": {
-      "en": "Alabama",
-      "zh": "亚拉巴马州"
-    },
-    "USAR": {
-      "en": "Arkansas",
-      "zh": "阿肯色州"
-    },
-    "USAZ": {
-      "en": "Arizona",
-      "zh": "亚利桑那州"
-    },
-    "USCA": {
-      "en": "California",
-      "zh": "加利福尼亚州"
-    },
-    "USCO": {
-      "en": "Colorado",
-      "zh": "科罗拉多州"
-    },
-    "USCT": {
-      "en": "Connecticut",
-      "zh": "康涅狄格州"
-    },
-    "USDE": {
-      "en": "Delaware",
-      "zh": "特拉华州"
-    },
-    "USFL": {
-      "en": "Florida",
-      "zh": "佛罗里达州"
-    },
-    "USGA": {
-      "en": "Georgia",
-      "zh": "佐治亚州"
-    },
-    "USIA": {
-      "en": "Iowa",
-      "zh": "艾奥瓦州"
-    },
-    "USID": {
-      "en": "Idaho",
-      "zh": "爱达荷州"
-    },
-    "USIL": {
-      "en": "Illinois",
-      "zh": "伊利诺伊州"
-    },
-    "USIN": {
-      "en": "Indiana",
-      "zh": "印第安纳州"
-    },
-    "USKS": {
-      "en": "Kansas",
-      "zh": "堪萨斯州"
-    },
-    "USKY": {
-      "en": "Kentucky",
-      "zh": "肯塔基州"
-    },
-    "USLA": {
-      "en": "Louisiana",
-      "zh": "路易斯安那州"
-    },
-    "USMA": {
-      "en": "Massachusetts",
-      "zh": "马萨诸塞州"
-    },
-    "USMD": {
-      "en": "Maryland",
-      "zh": "马里兰州"
-    },
-    "USME": {
-      "en": "Maine",
-      "zh": "缅因州"
-    },
-    "USMI": {
-      "en": "Michigan",
-      "zh": "密歇根州"
-    },
-    "USMN": {
-      "en": "Minnesota",
-      "zh": "明尼苏达州"
-    },
-    "USMO": {
-      "en": "Missouri",
-      "zh": "密苏里州"
-    },
-    "USMS": {
-      "en": "Mississippi",
-      "zh": "密西西比州"
-    },
-    "USMT": {
-      "en": "Montana",
-      "zh": "蒙大拿州"
-    },
-    "USNC": {
-      "en": "North Carolina",
-      "zh": "北卡罗来纳州"
-    },
-    "USND": {
-      "en": "North Dakota",
-      "zh": "北达科他州"
-    },
-    "USNE": {
-      "en": "Nebraska",
-      "zh": "内布拉斯加州"
-    },
-    "USNH": {
-      "en": "New Hampshire",
-      "zh": "新罕布什尔州"
-    },
-    "USNJ": {
-      "en": "New Jersey",
-      "zh": "新泽西州"
-    },
-    "USNM": {
-      "en": "New Mexico",
-      "zh": "新墨西哥州"
-    },
-    "USNV": {
-      "en": "Nevada",
-      "zh": "内华达州"
-    },
-    "USNY": {
-      "en": "New York",
-      "zh": "纽约州"
-    },
-    "USOH": {
-      "en": "Ohio",
-      "zh": "俄亥俄州"
-    },
-    "USOK": {
-      "en": "Oklahoma",
-      "zh": "俄克拉何马州"
-    },
-    "USOR": {
-      "en": "Oregon",
-      "zh": "俄勒冈州"
-    },
-    "USPA": {
-      "en": "Pennsylvania",
-      "zh": "宾夕法尼亚州"
-    },
-    "USRI": {
-      "en": "Rhode Island",
-      "zh": "罗得岛州"
-    },
-    "USSC": {
-      "en": "South Carolina",
-      "zh": "南卡罗来纳州"
-    },
-    "USSD": {
-      "en": "South Dakota",
-      "zh": "南达科他州"
-    },
-    "USTN": {
-      "en": "Tennessee",
-      "zh": "田纳西州"
-    },
-    "USTX": {
-      "en": "Texas",
-      "zh": "得克萨斯州"
-    },
-    "USUT": {
-      "en": "Utah",
-      "zh": "犹他州"
-    },
-    "USVA": {
-      "en": "Virginia",
-      "zh": "弗吉尼亚州"
-    },
-    "USVT": {
-      "en": "Vermont",
-      "zh": "佛蒙特州"
-    },
-    "USWA": {
-      "en": "Washington",
-      "zh": "华盛顿州"
-    },
-    "USWI": {
-      "en": "Wisconsin",
-      "zh": "威斯康星州"
-    },
-    "USWV": {
-      "en": "West Virginia",
-      "zh": "西弗吉尼亚州"
-    },
-    "USWY": {
-      "en": "Wyoming",
-      "zh": "怀俄明州"
     },
     "UZB": {
       "en": "Uzbek SSR",
@@ -1291,12 +959,8 @@
       "zh": "委内瑞拉合众国"
     },
     "VIN": {
-      "en": "Annam",
-      "zh": "安南（中圻）"
-    },
-    "WNA": {
-      "en": "New Fourth Army Southern Anhui Area",
-      "zh": "新四军皖南驻区"
+      "en": "French Indochina",
+      "zh": "法属印度支那联邦"
     },
     "WNG": {
       "en": "Dutch New Guinea Debug Region",
@@ -1330,54 +994,17 @@
       "en": "Yunnan Clique",
       "zh": "云南军阀"
     },
-    "YWS": {
-      "en": "Henan-Anhui-Jiangsu Guerrilla Area",
-      "zh": "豫皖苏游击区"
-    },
     "ZAN": {
       "en": "Zanzibar",
       "zh": "桑给巴尔"
     }
   },
   "scenarios": {
-    "hoi4_1936": {
-      "IRE": {
-        "en": "Irish Free State",
-        "zh": "爱尔兰自由邦"
-      },
-      "PRC": {
-        "en": "Chinese Soviet Republic",
-        "zh": "中华苏维埃共和国"
-      },
-      "SPR": {
-        "en": "Spanish Republic",
-        "zh": "西班牙共和国"
-      }
-    },
+    "hoi4_1936": {},
     "hoi4_1939": {
-      "PRC": {
-        "en": "Shaan-Gan-Ning Border Region",
-        "zh": "陕甘宁边区"
-      },
-      "SPR": {
-        "en": "Spanish State",
-        "zh": "西班牙国"
-      },
       "ALB": {
         "en": "Albanian Kingdom",
         "zh": "阿尔巴尼亚王国"
-      },
-      "KAZ": {
-        "en": "Kazakh SSR",
-        "zh": "哈萨克苏维埃社会主义共和国"
-      },
-      "KYR": {
-        "en": "Kirghiz SSR",
-        "zh": "吉尔吉斯苏维埃社会主义共和国"
-      },
-      "MEN": {
-        "en": "Mongolian United Autonomous Government",
-        "zh": "蒙古联合自治政府"
       },
       "CHE": {
         "en": "Chechen-Ingush ASSR",
@@ -1395,6 +1022,10 @@
         "en": "Ireland",
         "zh": "爱尔兰"
       },
+      "KAZ": {
+        "en": "Kazakh SSR",
+        "zh": "哈萨克苏维埃社会主义共和国"
+      },
       "KBA": {
         "en": "Kabardino-Balkar ASSR",
         "zh": "卡巴尔达-巴尔卡尔自治共和国"
@@ -1402,6 +1033,14 @@
       "KOM": {
         "en": "Komi ASSR",
         "zh": "科米自治共和国"
+      },
+      "KYR": {
+        "en": "Kirghiz SSR",
+        "zh": "吉尔吉斯苏维埃社会主义共和国"
+      },
+      "MEN": {
+        "en": "Mongolian United Autonomous Government",
+        "zh": "蒙古联合自治政府"
       },
       "MRE": {
         "en": "Mari ASSR",
@@ -1411,9 +1050,17 @@
         "en": "North Ossetian ASSR",
         "zh": "北奥塞梯自治共和国"
       },
+      "PRC": {
+        "en": "Shaan-Gan-Ning Border Region",
+        "zh": "陕甘宁边区"
+      },
       "SOM": {
         "en": "Somalia Governorate",
         "zh": "索马里总督区"
+      },
+      "SPR": {
+        "en": "Spanish State",
+        "zh": "西班牙国"
       }
     }
   }

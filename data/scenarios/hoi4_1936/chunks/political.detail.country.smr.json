@@ -250,12 +250,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Tanger - Tétouan · Remainder",
-        "name_zh": "丹吉尔 - 得土安 · 余部",
         "aliases": [
           "Tanger - Tétouan",
           "丹吉尔 - 得土安"
-        ]
+        ],
+        "name_en": "Tanger - Tétouan · Remainder",
+        "name_zh": "丹吉尔 - 得土安 · 余部"
       },
       "geometry": {
         "type": "Polygon",
@@ -393,12 +393,12 @@
         "anchor_county_name": "",
         "detail_tier": "",
         "__source": "detail",
-        "name_en": "Guelmim - Es-Semara · Remainder",
-        "name_zh": "盖勒敏 - 埃斯-塞马拉 · 余部",
         "aliases": [
           "Guelmim - Es-Semara",
           "盖勒敏 - 埃斯-塞马拉"
-        ]
+        ],
+        "name_en": "Guelmim - Es-Semara · Remainder",
+        "name_zh": "盖勒敏 - 埃斯-塞马拉 · 余部"
       },
       "geometry": {
         "type": "MultiPolygon",
