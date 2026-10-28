@@ -8,6 +8,9 @@ import { isMainThread, parentPort, Worker as ThreadWorker, workerData } from "no
 const workerUrl = new URL("../js/workers/startup_boot.worker.js", import.meta.url);
 const require = createRequire(import.meta.url);
 const topojson = require("../vendor/topojson-client.min.js");
+const d3 = require("../vendor/d3.v7.min.js");
+// Expectations reuse the worker's own political ring orientation helper.
+await import("../js/core/scenario_chunk_format_shared.js");
 
 // Run classic scripts in the worker's own realm: a separate VM context would
 // make plain fixture objects fail the codec's Object.prototype check.
@@ -180,8 +183,18 @@ if (!isMainThread) {
       waterRegionsData: "water_regions", oceanData: "ocean", landBgData: "land",
       urbanData: "urban", physicalData: "physical",
     };
+    // The worker orients political rings and attaches each feature's spherical
+    // area (feature.sphericalArea) while decoding; expectations mirror that.
+    const decode = (objectName) => {
+      const collection = topojson.feature(topology, topology.objects[objectName]);
+      if (objectName === "political") {
+        return globalThis.__scenarioForgeScenarioChunkFormatShared.orientPoliticalFeatureCollection(collection, d3.geoArea);
+      }
+      for (const feature of collection.type === "Feature" ? [collection] : collection.features) feature.sphericalArea = d3.geoArea(feature);
+      return collection;
+    };
     return Object.fromEntries(Object.entries(names).map(([field, objectName]) => [
-      field, topology.objects[objectName] ? topojson.feature(topology, topology.objects[objectName]) : null,
+      field, topology.objects[objectName] ? decode(objectName) : null,
     ]));
   }
 

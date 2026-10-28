@@ -18,7 +18,10 @@ var SCENARIO_FORGE_SCENARIO_CHUNK_FORMAT_SHARED = globalThis.__scenarioForgeScen
       return hasDesiredWinding ? closedRing : [...closedRing].reverse();
     }
 
-    for (const feature of collection.features) {
+    // topojson.feature returns a single Feature for a bare geometry object.
+    const features = Array.isArray(collection?.features) ? collection.features
+      : collection?.type === "Feature" ? [collection] : [];
+    for (const feature of features) {
       try {
         let geometry = feature.geometry;
         if (geometry?.type === "Polygon") {
