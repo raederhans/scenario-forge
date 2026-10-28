@@ -9306,6 +9306,22 @@ function drawScheduledHitCanvasWithMetric(details = {}) {
     activeScenarioId = String(runtimeState.activeScenarioId || ""),
     ...metricDetails
   } = details || {};
+  // The geometry worker only takes hit builds once startup read-only ends, and
+  // the read-only collection is replaced by the detail promotion anyway. A full
+  // main-thread build here (about 0.7 s on TNO) would be thrown away; point
+  // probes cover hover until the worker builds the canvas after unlock.
+  if (geometryWorkerEnabled && (runtimeState.startupReadonly || runtimeState.startupReadonlyUnlockInFlight)) {
+    recordRenderPerfMetric("buildHitCanvas", 0, {
+      ...metricDetails,
+      built: false,
+      skipped: true,
+      mode: "deferred",
+      reason,
+      skipReason: "startup-readonly",
+      activeScenarioId,
+    });
+    return false;
+  }
   return drawHitCanvasWithMetric({
     ...metricDetails,
     mode: "deferred",
