@@ -1,6 +1,6 @@
 {
   "artifact_counts": {
-    "chunk_count": 318,
+    "chunk_count": 312,
     "feature_count": 21066,
     "water_count": 0
   },
@@ -200057,10 +200057,10 @@
     "AST": {
       "base_iso2": "PG",
       "continent_label": "Oceania",
-      "controller_feature_count": 5,
+      "controller_feature_count": 13,
       "display_name": "Australia",
       "entry_kind": "scenario_subject",
-      "feature_count": 5,
+      "feature_count": 13,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204808,11 +204808,11 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "3e0e5a803eeaf249cd100387ad4f7b82b4e9f6e28c518c01679af6b3ccfb5c26",
+  "snapshot_fingerprint": "3367771d5fa8a02711a16f25bc34777145fab5ac13bf422108b5cf8ecbe38334",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "f29734ab5e3ecdb56d32edb1f4403e794b09780684c93379a9aa145d0b4bfb76",
-    "detail_chunk_manifest_sha256": "ca6e22649ffcba892442ca148cd3f08de3c374c0eefe7d64d5c114a971e7afff",
+    "build_snapshot_sha256": "5f529136e05c42fd27686a191f7cc3982c70de3ea7f6270962248fad53812c69",
+    "detail_chunk_manifest_sha256": "da8f318e85ad645aa0554b6051836847aa76d568136bff542876eb74c81bb9b6",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
     "runtime_topology_sha256": "d73cbe2088d826b1e28728a9ccb7f2ddf6e30c15313dbc0c7af66469c02b462d"
   },
@@ -204821,7 +204821,7 @@
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
     "changed_feature_count": 15333,
-    "controller_count": 309,
+    "controller_count": 303,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
@@ -204831,7 +204831,7 @@
     "manual_reviewed_feature_count": 14886,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 309,
+    "owner_count": 303,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5821,

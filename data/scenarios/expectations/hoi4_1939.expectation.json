@@ -197,8 +197,8 @@
   "summary_equals": {
     "blocker_count": 0,
     "feature_count": 21066,
-    "owner_count": 311,
-    "controller_count": 311,
+    "owner_count": 305,
+    "controller_count": 305,
     "synthetic_owner_feature_count": 23,
     "owner_controller_split_feature_count": 0,
     "controller_rule_count": 0

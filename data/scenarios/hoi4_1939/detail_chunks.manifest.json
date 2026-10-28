@@ -128896,18 +128896,18 @@
       "max_zoom": 99.0,
       "bounds": [
         73.24813248132483,
-        -53.19314183241833,
-        150.77130771307714,
-        -10.430763873638739
+        -54.7501888398884,
+        158.96138961389613,
+        -10.052351111511115
       ],
       "priority": 95,
-      "feature_count": 5,
-      "byte_size": 65761,
-      "sha256": "6d378e7200190448dbda476b07e37b106dbaf0ab7713d47b7955b3fba9052ab1",
-      "decoded_byte_size": 65761,
-      "coord_count": 598,
-      "part_count": 23,
-      "estimated_path_cost": 797,
+      "feature_count": 13,
+      "byte_size": 1239000,
+      "sha256": "599ffd0fbf8e1df0ee22eb51c36f99c1f63c248dc64b555b2dba6b9ca306bae5",
+      "decoded_byte_size": 1239000,
+      "coord_count": 11706,
+      "part_count": 240,
+      "estimated_path_cost": 13665,
       "data_format": "geojson",
       "global_coverage": false,
       "owner_code": "AST",
@@ -128922,10 +128922,46 @@
           -10.967137926379266
         ],
         [
+          112.92052920529204,
+          -35.13695122851229,
+          129.0018900189002,
+          -13.723649239492403
+        ],
+        [
           148.76968769687699,
           -35.9180784897849,
           150.77130771307714,
           -35.12306452164522
+        ],
+        [
+          141.00081000810007,
+          -37.509842264422645,
+          153.62973629736297,
+          -28.148465997659976
+        ],
+        [
+          129.0018900189002,
+          -38.067046377463775,
+          141.00081000810007,
+          -26.001233948339483
+        ],
+        [
+          140.96840968409686,
+          -39.14500199801998,
+          149.97209972099722,
+          -33.98609039690397
+        ],
+        [
+          137.99837998379985,
+          -29.17087479074791,
+          153.55053550535507,
+          -10.052351111511115
+        ],
+        [
+          143.83763837638378,
+          -54.7501888398884,
+          158.96138961389613,
+          -39.57548991089911
         ],
         [
           123.5766357663577,
@@ -128940,238 +128976,22 @@
           -10.430763873638739
         ],
         [
-          73.24813248132483,
-          -53.19314183241833,
-          73.82413824138243,
-          -52.96748284582846
-        ]
-      ]
-    },
-    {
-      "id": "political.detail.country.auns",
-      "layer": "political",
-      "lod": "detail",
-      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.auns.json",
-      "min_zoom": 1.35,
-      "max_zoom": 99.0,
-      "bounds": [
-        141.00081000810007,
-        -37.509842264422645,
-        153.62973629736297,
-        -28.148465997659976
-      ],
-      "priority": 95,
-      "feature_count": 2,
-      "byte_size": 647700,
-      "sha256": "827fb13fac6f76497dfe892a64aacf468b3f90a308fbaa4cba2adc83a6bf5381",
-      "decoded_byte_size": 647700,
-      "coord_count": 6145,
-      "part_count": 119,
-      "estimated_path_cost": 7103,
-      "data_format": "geojson",
-      "global_coverage": false,
-      "owner_code": "AUNS",
-      "country_codes": [
-        "AUNS"
-      ],
-      "feature_bounds": [
-        [
-          141.00081000810007,
-          -37.509842264422645,
-          153.62973629736297,
-          -28.148465997659976
-        ],
-        [
           150.260102601026,
           -34.173560939609395,
           151.34011340113403,
           -33.36466026460265
-        ]
-      ]
-    },
-    {
-      "id": "political.detail.country.auql",
-      "layer": "political",
-      "lod": "detail",
-      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.auql.json",
-      "min_zoom": 1.35,
-      "max_zoom": 99.0,
-      "bounds": [
-        137.99837998379985,
-        -29.17087479074791,
-        153.55053550535507,
-        -10.052351111511115
-      ],
-      "priority": 95,
-      "feature_count": 1,
-      "byte_size": 58259,
-      "sha256": "e77b7a3d4cab3abad735443a46ca585e0be8feb4fa96f65337211a7c045f529c",
-      "decoded_byte_size": 58259,
-      "coord_count": 545,
-      "part_count": 17,
-      "estimated_path_cost": 684,
-      "data_format": "geojson",
-      "global_coverage": false,
-      "owner_code": "AUQL",
-      "country_codes": [
-        "AUQL"
-      ],
-      "feature_bounds": [
-        [
-          137.99837998379985,
-          -29.17087479074791,
-          153.55053550535507,
-          -10.052351111511115
-        ]
-      ]
-    },
-    {
-      "id": "political.detail.country.ausa",
-      "layer": "political",
-      "lod": "detail",
-      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.ausa.json",
-      "min_zoom": 1.35,
-      "max_zoom": 99.0,
-      "bounds": [
-        129.0018900189002,
-        -38.067046377463775,
-        141.00081000810007,
-        -26.001233948339483
-      ],
-      "priority": 95,
-      "feature_count": 1,
-      "byte_size": 29184,
-      "sha256": "0526a4533b324b64864934e7a562c60833d3e02f9aa5bb1a2bc3f2027789571d",
-      "decoded_byte_size": 29184,
-      "coord_count": 275,
-      "part_count": 2,
-      "estimated_path_cost": 294,
-      "data_format": "geojson",
-      "global_coverage": false,
-      "owner_code": "AUSA",
-      "country_codes": [
-        "AUSA"
-      ],
-      "feature_bounds": [
-        [
-          129.0018900189002,
-          -38.067046377463775,
-          141.00081000810007,
-          -26.001233948339483
-        ]
-      ]
-    },
-    {
-      "id": "political.detail.country.auts",
-      "layer": "political",
-      "lod": "detail",
-      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.auts.json",
-      "min_zoom": 1.35,
-      "max_zoom": 99.0,
-      "bounds": [
-        143.83763837638378,
-        -54.7501888398884,
-        158.96138961389613,
-        -39.57548991089911
-      ],
-      "priority": 95,
-      "feature_count": 1,
-      "byte_size": 36051,
-      "sha256": "4a30cb95ade9953e1bb2a124da5b410846768566471cee78be99066ebaf3b472",
-      "decoded_byte_size": 36051,
-      "coord_count": 336,
-      "part_count": 12,
-      "estimated_path_cost": 435,
-      "data_format": "geojson",
-      "global_coverage": false,
-      "owner_code": "AUTS",
-      "country_codes": [
-        "AUTS"
-      ],
-      "feature_bounds": [
-        [
-          143.83763837638378,
-          -54.7501888398884,
-          158.96138961389613,
-          -39.57548991089911
-        ]
-      ]
-    },
-    {
-      "id": "political.detail.country.auvi",
-      "layer": "political",
-      "lod": "detail",
-      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.auvi.json",
-      "min_zoom": 1.35,
-      "max_zoom": 99.0,
-      "bounds": [
-        140.96840968409686,
-        -39.14500199801998,
-        149.97209972099722,
-        -33.98609039690397
-      ],
-      "priority": 95,
-      "feature_count": 1,
-      "byte_size": 22493,
-      "sha256": "8bd1aa58d66c9d99b2ed2e22b8dfb4e83e0a9f09c1be2ee742235c99ec9c8e70",
-      "decoded_byte_size": 22493,
-      "coord_count": 210,
-      "part_count": 3,
-      "estimated_path_cost": 237,
-      "data_format": "geojson",
-      "global_coverage": false,
-      "owner_code": "AUVI",
-      "country_codes": [
-        "AUVI"
-      ],
-      "feature_bounds": [
-        [
-          140.96840968409686,
-          -39.14500199801998,
-          149.97209972099722,
-          -33.98609039690397
-        ]
-      ]
-    },
-    {
-      "id": "political.detail.country.auwa",
-      "layer": "political",
-      "lod": "detail",
-      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.auwa.json",
-      "min_zoom": 1.35,
-      "max_zoom": 99.0,
-      "bounds": [
-        112.92052920529204,
-        -35.13695122851229,
-        129.0018900189002,
-        -13.723649239492403
-      ],
-      "priority": 95,
-      "feature_count": 2,
-      "byte_size": 379876,
-      "sha256": "6135d049cc6eb5ce7965ef12baca612e9f8cabeb7efcc4c8b54b6da3d88d8619",
-      "decoded_byte_size": 379876,
-      "coord_count": 3597,
-      "part_count": 64,
-      "estimated_path_cost": 4115,
-      "data_format": "geojson",
-      "global_coverage": false,
-      "owner_code": "AUWA",
-      "country_codes": [
-        "AUWA"
-      ],
-      "feature_bounds": [
-        [
-          112.92052920529204,
-          -35.13695122851229,
-          129.0018900189002,
-          -13.723649239492403
         ],
         [
           115.56295562955631,
           -32.80051279812798,
           116.290162901629,
           -31.45523807038071
+        ],
+        [
+          73.24813248132483,
+          -53.19314183241833,
+          73.82413824138243,
+          -52.96748284582846
         ]
       ]
     },

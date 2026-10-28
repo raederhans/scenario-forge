@@ -5,6 +5,7 @@ Entries are applied in order; later entries may filter on owners set by earlier 
 """
 import colorsys
 import json
+import math
 from pathlib import Path
 
 W = Path(__file__).resolve().parents[1]
@@ -458,12 +459,8 @@ FEDERAL_SUBDIVISIONS = [
     ("CAN", "CA", "CAPE", "Prince_Edward_Island", "爱德华王子岛省", "Charlottetown"),
     ("CAN", "CA", "CAQC", "Quebec", "魁北克省", "Quebec City"),
     ("CAN", "CA", "CASK", "Saskatchewan", "萨斯卡彻温省", "Regina"),
-    ("AST", "AU", "AUNS", "New_South_Wales", "新南威尔士州", "Sydney"),
-    ("AST", "AU", "AUQL", "Queensland", "昆士兰州", "Brisbane"),
-    ("AST", "AU", "AUSA", "South_Australia", "南澳大利亚州", "Adelaide"),
-    ("AST", "AU", "AUTS", "Tasmania", "塔斯马尼亚州", "Hobart"),
-    ("AST", "AU", "AUVI", "Victoria", "维多利亚州", "Melbourne"),
-    ("AST", "AU", "AUWA", "Western_Australia", "西澳大利亚州", "Perth"),
+    # Australia stays whole: the golden flows probe interior Western Australia and need it free of
+    # a state label (tests/e2e/golden/golden-support.js PROBE_LON_LAT).
 ]
 US_STATES = [
     ("AL", "Alabama", "亚拉巴马州", "Montgomery"), ("AZ", "Arizona", "亚利桑那州", "Phoenix"),
@@ -500,6 +497,117 @@ for i, (parent, cc, tag, name, zh, capital) in enumerate(FEDERAL_SUBDIVISIONS):
         parent=parent, kind="province" if cc == "CA" else "state", color=color, cores=[parent],
         exclude=FI("CA_FED_35079") if tag == "CAON" else None,
         notes="Ottawa parcel retained as the federal seat in this debug subdivision." if tag == "CAON" else None)
+
+
+# ---------- 同色系配色 ----------
+# Subjects keep their parent's hue (±10° in OKLCH) and vary lightness/chroma; colours are picked
+# greedily from a low-discrepancy pool so siblings and the parent stay perceptually apart.
+def _srgb_to_linear(c):
+    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+
+def _linear_to_srgb(c):
+    return 12.92 * c if c <= 0.0031308 else 1.055 * c ** (1 / 2.4) - 0.055
+
+
+def hex_to_oklab(hex_color):
+    r, g, b = (_srgb_to_linear(int(hex_color[k:k + 2], 16) / 255) for k in (1, 3, 5))
+    l = (0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b) ** (1 / 3)
+    m = (0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b) ** (1 / 3)
+    s = (0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b) ** (1 / 3)
+    return (0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+            1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+            0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s)
+
+
+def oklab_to_rgb(lab):
+    L, a, b = lab
+    l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3
+    m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3
+    s = (L - 0.0894841775 * a - 1.2914855480 * b) ** 3
+    return tuple(_linear_to_srgb(max(0.0, c)) if c >= 0 else -1.0 for c in (
+        4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+        -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+        -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s))
+
+
+def _halton(index, base):
+    result, f = 0.0, 1.0
+    while index:
+        f /= base
+        result += f * (index % base)
+        index //= base
+    return result
+
+
+def family_palette(parent_hex, count, hue_span=10.0):
+    L0, a0, b0 = hex_to_oklab(parent_hex)
+    C0, h0 = math.hypot(a0, b0), math.degrees(math.atan2(b0, a0))
+    # A 0.32-wide lightness window around the parent, shifted inward at the 0.30/0.90 limits,
+    # so very light (JAP) or dark (SOV) parents still give their subjects enough range.
+    lo = min(max(0.30, L0 - 0.16), 0.90 - 0.32)
+    hi = lo + 0.32
+    pool = []
+    for i in range(1, 900):
+        L = lo + (hi - lo) * _halton(i, 2)
+        # Near-grey parents (GER) keep greyscale subjects: their hue angle is meaningless.
+        C = C0 + 0.01 * _halton(i, 3) if C0 < 0.03 else max(0.02, C0 * (0.55 + 0.6 * _halton(i, 3)))
+        h = math.radians(h0 + hue_span * (2 * _halton(i, 5) - 1))
+        while True:  # pull chroma back into the sRGB gamut
+            lab = (L, C * math.cos(h), C * math.sin(h))
+            rgb = oklab_to_rgb(lab)
+            if all(0 <= c <= 1 for c in rgb) or C <= 0.01:
+                break
+            C *= 0.92
+        if all(0 <= c <= 1 for c in rgb):
+            pool.append(lab)
+    chosen, anchors = [], [(L0, a0, b0)]
+    for _ in range(count):
+        best = max(pool, key=lambda p: min(math.dist(p, q) for q in anchors))
+        chosen.append(best)
+        anchors.append(best)
+        pool.remove(best)
+    return ["#%02x%02x%02x" % tuple(round(min(1, max(0, c)) * 255) for c in oklab_to_rgb(lab)) for lab in chosen]
+
+
+def harmonize_family_colors(entries):
+    parent_of, scenarios_of = {}, {}
+    for scenario, countries in (("hoi4_1936", C36), ("hoi4_1939", C39)):
+        for tag, country in countries.items():
+            if country.get("parent_owner_tag"):
+                parent_of.setdefault(tag, country["parent_owner_tag"])
+            scenarios_of.setdefault(tag, []).append(scenario)
+    for e in entries:
+        if e.get("parent_owner_tag"):
+            parent_of[e["tag"]] = e["parent_owner_tag"]
+        for scenario in e["scenarios"]:
+            if scenario not in scenarios_of.setdefault(e["tag"], []):
+                scenarios_of[e["tag"]].append(scenario)
+    colour = dict(PARENT_COLOR)
+    for e in entries:
+        if e.get("color_hex") and e["tag"] not in parent_of:
+            colour[e["tag"]] = e["color_hex"]
+    families = {}
+    for child, parent in sorted(parent_of.items()):
+        families.setdefault(parent, []).append(child)
+
+    def depth(tag, seen=()):
+        return 0 if tag not in parent_of or tag in seen else 1 + depth(parent_of[tag], seen + (tag,))
+
+    for parent in sorted(families, key=lambda t: (depth(t), t)):
+        children = families[parent]
+        for child, hex_color in zip(children, family_palette(colour[parent], len(children))):
+            colour[child] = hex_color
+    entry_tags = {e["tag"] for e in entries}
+    for e in entries:
+        if e["tag"] in parent_of:
+            e["color_hex"] = colour[e["tag"]]
+    for tag in sorted(set(parent_of) - entry_tags):  # subjects from the manual rules: colour-only entries
+        entries.append({"id": f"{tag.lower()}_family_colour", "scenarios": sorted(scenarios_of[tag]), "tag": tag,
+                        "color_hex": colour[tag], "select": {"owners": [tag]}, "only_from_owners": [tag]})
+
+
+harmonize_family_colors(E)
 
 ids = [e["id"] for e in E]
 assert len(ids) == len(set(ids)), "duplicate ids"

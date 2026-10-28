@@ -144,12 +144,6 @@
     "CAPE": "CITY::ne::1159151075",
     "CAQC": "CITY::ne::1159151065",
     "CASK": "CITY::ne::1159151029",
-    "AUNS": "CITY::ne::1159151623",
-    "AUQL": "CITY::ne::1159151169",
-    "AUSA": "CITY::ne::1159151165",
-    "AUTS": "CITY::ne::1159151171",
-    "AUVI": "CITY::ne::1159151565",
-    "AUWA": "CITY::ne::1159151475",
     "USAL": "CITY::ne::1159149275",
     "USAZ": "CITY::ne::1159151225",
     "USAR": "CITY::ne::1159146223",
@@ -5681,149 +5675,6 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    "AUNS": {
-      "country_code": "AU",
-      "host_feature_id": "AU_CITY_SYDNEY",
-      "urban_match_id": "",
-      "lon": 151.20732,
-      "lat": -33.86785,
-      "population": 5557233,
-      "base_tier": "major",
-      "source": "merged",
-      "tag": "AUNS",
-      "city_id": "CITY::ne::1159151623",
-      "stable_key": "id::CITY::ne::1159151623",
-      "city_name": "Sydney",
-      "name_ascii": "Sydney",
-      "display_name": "New South Wales",
-      "lookup_iso2": "AU",
-      "base_iso2": "AU",
-      "capital_state_id": null,
-      "capital_kind": "country_capital",
-      "resolution_method": "reviewed_capital",
-      "confidence": "high",
-      "candidate_count": 1
-    },
-    "AUQL": {
-      "country_code": "AU",
-      "host_feature_id": "AU_ADM1_AUS-2657",
-      "urban_match_id": "",
-      "lon": 153.02809,
-      "lat": -27.46794,
-      "population": 2780063,
-      "base_tier": "major",
-      "source": "merged",
-      "tag": "AUQL",
-      "city_id": "CITY::ne::1159151169",
-      "stable_key": "id::CITY::ne::1159151169",
-      "city_name": "Brisbane",
-      "name_ascii": "Brisbane",
-      "display_name": "Queensland",
-      "lookup_iso2": "AU",
-      "base_iso2": "AU",
-      "capital_state_id": null,
-      "capital_kind": "country_capital",
-      "resolution_method": "reviewed_capital",
-      "confidence": "high",
-      "candidate_count": 1
-    },
-    "AUSA": {
-      "country_code": "AU",
-      "host_feature_id": "AU_ADM1_AUS-2655",
-      "urban_match_id": "",
-      "lon": 138.59863,
-      "lat": -34.92866,
-      "population": 1469163,
-      "base_tier": "major",
-      "source": "merged",
-      "tag": "AUSA",
-      "city_id": "CITY::ne::1159151165",
-      "stable_key": "id::CITY::ne::1159151165",
-      "city_name": "Adelaide",
-      "name_ascii": "Adelaide",
-      "display_name": "South Australia",
-      "lookup_iso2": "AU",
-      "base_iso2": "AU",
-      "capital_state_id": null,
-      "capital_kind": "country_capital",
-      "resolution_method": "reviewed_capital",
-      "confidence": "high",
-      "candidate_count": 1
-    },
-    "AUTS": {
-      "country_code": "AU",
-      "host_feature_id": "AU_ADM1_AUS-2660",
-      "urban_match_id": "",
-      "lon": 147.32664751725767,
-      "lat": -42.881343199013195,
-      "population": 252639,
-      "base_tier": "regional",
-      "source": "merged",
-      "tag": "AUTS",
-      "city_id": "CITY::ne::1159151171",
-      "stable_key": "id::CITY::ne::1159151171",
-      "city_name": "Hobart",
-      "name_ascii": "Hobart",
-      "display_name": "Tasmania",
-      "lookup_iso2": "AU",
-      "base_iso2": "AU",
-      "capital_state_id": null,
-      "capital_kind": "country_capital",
-      "resolution_method": "reviewed_capital",
-      "confidence": "high",
-      "candidate_count": 1,
-      "source_coordinates": [
-        147.32941,
-        -42.87936
-      ],
-      "coordinate_adjustment": "simplified_coastline"
-    },
-    "AUVI": {
-      "country_code": "AU",
-      "host_feature_id": "AU_ADM1_AUS-2656",
-      "urban_match_id": "",
-      "lon": 144.96332,
-      "lat": -37.814,
-      "population": 5350705,
-      "base_tier": "major",
-      "source": "merged",
-      "tag": "AUVI",
-      "city_id": "CITY::ne::1159151565",
-      "stable_key": "id::CITY::ne::1159151565",
-      "city_name": "Melbourne",
-      "name_ascii": "Melbourne",
-      "display_name": "Victoria",
-      "lookup_iso2": "AU",
-      "base_iso2": "AU",
-      "capital_state_id": null,
-      "capital_kind": "country_capital",
-      "resolution_method": "reviewed_capital",
-      "confidence": "high",
-      "candidate_count": 1
-    },
-    "AUWA": {
-      "country_code": "AU",
-      "host_feature_id": "AU_CITY_PERTH",
-      "urban_match_id": "",
-      "lon": 115.8614,
-      "lat": -31.95224,
-      "population": 2309338,
-      "base_tier": "major",
-      "source": "merged",
-      "tag": "AUWA",
-      "city_id": "CITY::ne::1159151475",
-      "stable_key": "id::CITY::ne::1159151475",
-      "city_name": "Perth",
-      "name_ascii": "Perth",
-      "display_name": "Western Australia",
-      "lookup_iso2": "AU",
-      "base_iso2": "AU",
-      "capital_state_id": null,
-      "capital_kind": "country_capital",
-      "resolution_method": "reviewed_capital",
-      "confidence": "high",
-      "candidate_count": 1
-    },
     "USAL": {
       "country_code": "US",
       "host_feature_id": "US_ZN_01_007__R",
@@ -7352,8 +7203,13 @@
       "confidence": "high",
       "candidate_count": 1
     },
-    "JCJ": {
-      "tag": "JCJ",
+    "YWS": {
+      "tag": "YWS",
+      "city_id": "",
+      "resolution_method": "no_capital"
+    },
+    "WNA": {
+      "tag": "WNA",
       "city_id": "",
       "resolution_method": "no_capital"
     },
@@ -7362,13 +7218,8 @@
       "city_id": "",
       "resolution_method": "no_capital"
     },
-    "YWS": {
-      "tag": "YWS",
-      "city_id": "",
-      "resolution_method": "no_capital"
-    },
-    "WNA": {
-      "tag": "WNA",
+    "JCJ": {
+      "tag": "JCJ",
       "city_id": "",
       "resolution_method": "no_capital"
     },
@@ -9121,62 +8972,6 @@
       },
       "host_feature_id": "CA_FED_47008"
     },
-    "CITY::ne::1159151623": {
-      "city_id": "CITY::ne::1159151623",
-      "stable_key": "id::CITY::ne::1159151623",
-      "display_name": {
-        "en": "Sydney",
-        "zh": "悉尼"
-      },
-      "host_feature_id": "AU_CITY_SYDNEY"
-    },
-    "CITY::ne::1159151169": {
-      "city_id": "CITY::ne::1159151169",
-      "stable_key": "id::CITY::ne::1159151169",
-      "display_name": {
-        "en": "Brisbane",
-        "zh": "布里斯班"
-      },
-      "host_feature_id": "AU_ADM1_AUS-2657"
-    },
-    "CITY::ne::1159151165": {
-      "city_id": "CITY::ne::1159151165",
-      "stable_key": "id::CITY::ne::1159151165",
-      "display_name": {
-        "en": "Adelaide",
-        "zh": "阿德莱德"
-      },
-      "host_feature_id": "AU_ADM1_AUS-2655"
-    },
-    "CITY::ne::1159151171": {
-      "city_id": "CITY::ne::1159151171",
-      "stable_key": "id::CITY::ne::1159151171",
-      "display_name": {
-        "en": "Hobart",
-        "zh": "霍巴特"
-      },
-      "host_feature_id": "AU_ADM1_AUS-2660",
-      "lon": 147.32664751725767,
-      "lat": -42.881343199013195
-    },
-    "CITY::ne::1159151565": {
-      "city_id": "CITY::ne::1159151565",
-      "stable_key": "id::CITY::ne::1159151565",
-      "display_name": {
-        "en": "Melbourne",
-        "zh": "墨尔本"
-      },
-      "host_feature_id": "AU_ADM1_AUS-2656"
-    },
-    "CITY::ne::1159151475": {
-      "city_id": "CITY::ne::1159151475",
-      "stable_key": "id::CITY::ne::1159151475",
-      "display_name": {
-        "en": "Perth",
-        "zh": "珀斯"
-      },
-      "host_feature_id": "AU_CITY_PERTH"
-    },
     "CITY::ne::1159149275": {
       "city_id": "CITY::ne::1159149275",
       "stable_key": "id::CITY::ne::1159149275",
@@ -9819,8 +9614,8 @@
     }
   },
   "audit": {
-    "manual_capital_count": 214,
-    "capital_hint_count": 311,
+    "manual_capital_count": 208,
+    "capital_hint_count": 305,
     "renamed_city_count": 4,
     "name_conflict_count": 4,
     "unresolved_capital_count": 0,
