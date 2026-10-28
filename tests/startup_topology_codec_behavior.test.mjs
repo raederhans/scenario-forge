@@ -7,6 +7,7 @@ import "../js/core/json_resource_decoder_shared.js";
 
 const require = createRequire(import.meta.url);
 const codec = require("../js/core/startup_topology_codec_shared.js");
+const topojson = require("../vendor/topojson-client.min.js");
 const v7Fixture = JSON.parse(readFileSync(new URL("./fixtures/startup_topology_v7.json", import.meta.url), "utf8"));
 
 const fixture = {
@@ -86,6 +87,46 @@ test("startup topology codec passes legacy TopoJSON through unchanged", () => {
   const legacy = { type: "Topology", arcs: [[[0, 0], [1, -1]]], objects: {} };
   assert.equal(codec.decodeTopology(legacy), legacy);
   assert.equal(codec.decodeTopology(null), null);
+});
+
+test("dequantization preserves features, resets arc origins and shares decoded points without mutating input", () => {
+  const topology = codec.decodeTopology(cloneFixture());
+  topology.arcs[0][0].push(7);
+  topology.objects.points = {
+    type: "GeometryCollection", id: "points", properties: { label: "点" }, geometries: [
+      { type: "Point", id: "single", coordinates: [12, -5, 9], properties: { label: "单点" } },
+      { type: "GeometryCollection", geometries: [
+        { type: "MultiPoint", coordinates: [[15, -7], [0, 1], [-2, 3]] },
+        { type: null },
+      ] },
+    ],
+  };
+  topology.objects.line = { type: "LineString", arcs: [0, -2] };
+  const before = structuredClone(topology);
+  const decoded = codec.dequantizeTopology(topology, topojson);
+  const transform = topojson.transform(topology.transform);
+  assert.deepEqual(decoded.arcs, topology.arcs.map((arc) => arc.map(transform)));
+  assert.equal(Object.hasOwn(decoded, "transform"), false);
+  assert.deepEqual(decoded.bbox, topology.bbox);
+  for (const name of Object.keys(topology.objects)) {
+    assert.deepEqual(
+      topojson.feature(decoded, decoded.objects[name]),
+      topojson.feature(topology, topology.objects[name])
+    );
+  }
+  assert.equal(decoded.objects.line, topology.objects.line);
+  assert.equal(decoded.objects.water_regions.geometries[0], topology.objects.water_regions.geometries[0]);
+  assert.notEqual(decoded.objects.points.geometries[0], topology.objects.points.geometries[0]);
+  assert.notEqual(decoded.objects.points.geometries[1].geometries[0], topology.objects.points.geometries[1].geometries[0]);
+  const line = topojson.feature(decoded, decoded.objects.line);
+  assert.equal(line.geometry.coordinates[0], decoded.arcs[0][0]);
+  assert.deepEqual(topology, before);
+});
+
+test("dequantization returns unquantized topology unchanged", () => {
+  const topology = { type: "Topology", arcs: [[[0, 0], [1, -1]]], objects: {} };
+  assert.equal(codec.dequantizeTopology(topology, topojson), topology);
+  assert.equal(codec.dequantizeTopology(null, topojson), null);
 });
 
 test("startup topology codec rejects unknown, contradictory, and count-mismatched descriptors", () => {

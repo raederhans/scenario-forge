@@ -198,6 +198,25 @@ if (!isMainThread) {
     ]));
   }
 
+  function expectedTopology(topology) {
+    if (!topology.transform) return topology;
+    const transform = topojson.transform(topology.transform);
+    // Fixture objects share geometry references; build new objects from the
+    // quantized source so a shared point is never transformed twice.
+    const convert = (geometry) => geometry.type === "GeometryCollection"
+      ? { ...geometry, geometries: geometry.geometries.map(convert) }
+      : geometry.type === "Point" || geometry.type === "MultiPoint"
+        ? { ...geometry, coordinates: topojson.feature(topology, geometry).geometry.coordinates }
+        : geometry;
+    const expected = {
+      ...topology,
+      arcs: topology.arcs.map((arc) => arc.map(transform)),
+      objects: Object.fromEntries(Object.entries(topology.objects).map(([name, geometry]) => [name, convert(geometry)])),
+    };
+    delete expected.transform;
+    return expected;
+  }
+
   const readyCases = [
     {
       type: "BASE_STARTUP_READY", requestType: "LOAD_BASE_STARTUP",
@@ -205,7 +224,7 @@ if (!isMainThread) {
         topologyUrl: "/topology.json", localesUrl: "/locales.json", geoAliasesUrl: "/aliases.json",
       }),
       check(result, resources) {
-        assert.deepEqual(result.topologyPrimary, resources["/topology.json"]);
+        assert.deepEqual(result.topologyPrimary, expectedTopology(resources["/topology.json"]));
         assert.deepEqual(result.locales, resources["/locales.json"]);
         assert.deepEqual(result.geoAliases, resources["/aliases.json"]);
         assert.deepEqual(result.decodedCollections, expectedCollections(resources["/topology.json"]));
@@ -215,7 +234,10 @@ if (!isMainThread) {
       type: "STARTUP_BUNDLE_READY", requestType: "LOAD_STARTUP_BUNDLE",
       load: () => client.loadStartupBundleViaWorker({ startupBundleUrl: "/bundle.json", scenarioId: "transfer-fixture", language: "zh" }),
       check(result, resources) {
-        assert.deepEqual(result.payload, resources["/bundle.json"]);
+        const expectedBundle = structuredClone(resources["/bundle.json"]);
+        expectedBundle.base.topology_primary = expectedTopology(expectedBundle.base.topology_primary);
+        expectedBundle.scenario.runtime_topology_bootstrap = expectedTopology(expectedBundle.scenario.runtime_topology_bootstrap);
+        assert.deepEqual(result.payload, expectedBundle);
         assert.deepEqual(result.baseDecodedCollections, expectedCollections(resources["/topology.json"]));
         assert.deepEqual(result.runtimeDecodedCollections, expectedCollections(resources["/topology.json"], true));
         assert.deepEqual(result.runtimePoliticalMeta.canonicalCountryByFeatureId, { "fixture-land": "GB" });
@@ -226,7 +248,7 @@ if (!isMainThread) {
       type: "SCENARIO_RUNTIME_BOOTSTRAP_READY", requestType: "LOAD_SCENARIO_RUNTIME_BOOTSTRAP",
       load: () => client.loadScenarioRuntimeBootstrapViaWorker({ runtimeTopologyUrl: "/topology.json" }),
       check(result, resources) {
-        assert.deepEqual(result.runtimePoliticalTopology, resources["/topology.json"]);
+        assert.deepEqual(result.runtimePoliticalTopology, expectedTopology(resources["/topology.json"]));
         assert.deepEqual(result.decodedCollections, expectedCollections(resources["/topology.json"], true));
         assert.deepEqual(result.runtimePoliticalMeta, {
           featureIds: ["fixture-land"], featureIndexById: { "fixture-land": 0 },
@@ -279,10 +301,48 @@ if (!isMainThread) {
         const result = await ready.load();
         ready.check(result, resources);
         await assertTransport(adapter(), result, { ...ready, field: "message", encoding: "geo-f64-v3" });
+        const pairs = ready.type === "STARTUP_BUNDLE_READY"
+          ? [
+            [result.payload.base.topology_primary, result.baseDecodedCollections.landData],
+            [result.payload.scenario.runtime_topology_bootstrap, result.runtimeDecodedCollections.politicalData],
+          ]
+          : [[result.topologyPrimary || result.runtimePoliticalTopology,
+            result.decodedCollections.landData || result.decodedCollections.politicalData]];
+        for (const [topology, collection] of pairs) {
+          assert.equal(Object.hasOwn(topology, "transform"), false);
+          assert.ok(collection.features[0].geometry.coordinates[0].includes(topology.arcs[0][4096]));
+          for (const name of Object.keys(topology.objects)) {
+            assert.deepEqual(
+              topojson.feature(topology, topology.objects[name]),
+              topojson.feature(resources["/topology.json"], resources["/topology.json"].objects[name])
+            );
+          }
+        }
         assert.deepEqual(resources, before);
       });
     });
   }
+
+  test("cached quantized base topology returns dequantized arcs shared with decoded features", async () => {
+    const resources = makeResources();
+    const cachedTopologyPrimary = resources["/topology.json"];
+    const before = structuredClone(cachedTopologyPrimary);
+    delete resources["/topology.json"];
+    await withWorker(resources, async (adapter) => {
+      const result = await client.loadBaseStartupViaWorker({
+        needTopologyPrimary: false, needLocales: false, needGeoAliases: false, cachedTopologyPrimary,
+      });
+      assert.deepEqual(result.topologyPrimary, expectedTopology(cachedTopologyPrimary));
+      assert.deepEqual(result.decodedCollections, expectedCollections(cachedTopologyPrimary));
+      assert.ok(result.decodedCollections.landData.features[0].geometry.coordinates[0].includes(
+        result.topologyPrimary.arcs[0][4096]
+      ));
+      await assertTransport(adapter(), result, {
+        ...readyCases[0], field: "message", encoding: "geo-f64-v3",
+      });
+      assert.deepEqual(cachedTopologyPrimary, before);
+    });
+  });
 
   test("BASE_STARTUP_READY v3 preserves shared unquantized boundary points through the real worker", async () => {
     const resources = makeResources();
@@ -378,12 +438,13 @@ if (!isMainThread) {
     resources["/bundle.json"].base.topology_primary = encodedTopology;
     const before = structuredClone(resources);
     const expectedBundle = structuredClone(resources["/bundle.json"]);
-    expectedBundle.base.topology_primary = baseTopology;
+    expectedBundle.base.topology_primary = expectedTopology(baseTopology);
+    expectedBundle.scenario.runtime_topology_bootstrap = expectedTopology(expectedBundle.scenario.runtime_topology_bootstrap);
     await withWorker(resources, async (adapter) => {
       const result = await readyCases[1].load();
       assert.deepEqual(result.payload, expectedBundle);
       assert.equal(Object.hasOwn(result.payload.base.topology_primary, "arcs_encoding"), false);
-      assert.deepEqual(result.payload.base.topology_primary.arcs, arcs);
+      assert.deepEqual(result.payload.base.topology_primary.arcs, expectedBundle.base.topology_primary.arcs);
       assert.deepEqual(result.baseDecodedCollections, expectedCollections(baseTopology));
       assert.deepEqual(result.runtimeDecodedCollections, expectedCollections(resources["/topology.json"], true));
       await assertTransport(adapter(), result, {
@@ -402,8 +463,8 @@ if (!isMainThread) {
       resources["/bundle.json"].scenario.runtime_topology_bootstrap = structuredClone(fixture.encoded);
       const before = structuredClone(resources);
       const expectedBundle = structuredClone(resources["/bundle.json"]);
-      expectedBundle.base.topology_primary = fixture.source;
-      expectedBundle.scenario.runtime_topology_bootstrap = fixture.source;
+      expectedBundle.base.topology_primary = expectedTopology(fixture.source);
+      expectedBundle.scenario.runtime_topology_bootstrap = expectedTopology(fixture.source);
       await withWorker(resources, async (adapter) => {
         const result = await readyCases[1].load();
         assert.deepEqual(result.payload, expectedBundle);
@@ -460,7 +521,7 @@ if (!isMainThread) {
         });
         const field = chunkType === "runtime-topology" ? "decodedCollections" : "chunkPayload";
         if (chunkType === "runtime-topology") {
-          assert.deepEqual(result.runtimePoliticalTopology, resources["/topology.json"]);
+          assert.deepEqual(result.runtimePoliticalTopology, expectedTopology(resources["/topology.json"]));
           assert.deepEqual(result.decodedCollections, expectedCollections(resources["/topology.json"], true));
           assert.equal(result.chunkPayload, null);
         } else {
