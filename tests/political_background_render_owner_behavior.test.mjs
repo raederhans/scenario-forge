@@ -232,6 +232,22 @@ test("expired idle callbacks advance within the existing CPU budget without wait
   assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
 });
 
+test("an ordinary idle callback with idle time left extends a slice past the CPU budget up to the idle cap", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: Array.from({ length: 200 }, (_, i) => feature(`region-${i}`)) };
+  drawDeferredFeatures(fixture);
+  fixture.pending.shift().callback({ didTimeout: false, timeRemaining: () => 50 });
+  const idleSlice = fixture.metrics.findLast(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheSlice");
+  assert.ok(idleSlice.processedCount > 10, "a quiet idle period is not limited to the bounded CPU slice");
+  assert.ok(idleSlice.processedCount <= 40, "the idle extension stays under the idle cap");
+  let remaining = 5;
+  fixture.pending.shift().callback({ didTimeout: false, timeRemaining: () => remaining-- });
+  const shortSlice = fixture.metrics.findLast(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheSlice");
+  assert.ok(shortSlice.processedCount <= 6, "the browser deadline still ends a slice before the idle cap");
+  completeDeferred(fixture, { deadline: { didTimeout: true, timeRemaining: () => 0 } });
+  assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
+});
+
 for (const reason of ["rebuild-colors", "deferred-detail-scoped-refresh", "detail-topology-promoted",
   "political-id-raster-ready", "political-id-raster-refine"]) {
   test(`startup ${reason} preserves partial geometry and publishes the latest palette`, () => {
