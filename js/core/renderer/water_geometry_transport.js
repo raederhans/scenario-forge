@@ -7,30 +7,50 @@ export async function packWaterGeometry(updates, {
   signal, yieldTask = yieldWaterTask, scalarBatchSize = 65536,
 } = {}) {
   const batchSize = Math.max(1, Math.floor(scalarBatchSize));
-  const checkInterval = Math.min(batchSize, 256);
+  const checkInterval = Math.min(batchSize, 4096);
   let operations = 0;
   let deadline = performance.now() + 4;
   function shouldYield() {
-    operations++;
-    return operations % checkInterval === 0
-      && (operations % batchSize === 0 || performance.now() >= deadline);
+    return operations >= batchSize || performance.now() >= deadline;
   }
   async function checkpoint() {
     signal?.throwIfAborted();
     await yieldTask();
     signal?.throwIfAborted();
+    operations = 0;
     deadline = performance.now() + 4;
   }
-  function* walk(value, depth) {
+  let coordinateCount = 0, lengthCount = 0;
+  let coordinates, lengths;
+  let c = 0, l = 0;
+  function* walk(value, depth, write = false) {
     if (!Array.isArray(value)) throw new TypeError("Invalid water coordinates.");
-    yield [0, value.length];
-    for (const child of value) {
-      if (depth > 1) yield* walk(child, depth - 1);
-      else {
-        if (!Number.isFinite(child)) throw new TypeError("Nonfinite water coordinate.");
-        yield [1, child];
+    if (write) lengths[l++] = value.length; else lengthCount++;
+    operations++;
+    if (depth > 2) {
+      for (const child of value) yield* walk(child, depth - 1, write);
+    } else {
+      for (let index = 0; index < value.length; index++) {
+        if (depth === 2) {
+          const point = value[index];
+          if (!Array.isArray(point)) throw new TypeError("Invalid water coordinates.");
+          if (write) lengths[l++] = point.length; else lengthCount++;
+          operations++;
+          for (const number of point) {
+            if (!Number.isFinite(number)) throw new TypeError("Nonfinite water coordinate.");
+            if (write) coordinates[c++] = number; else coordinateCount++;
+            operations++;
+          }
+        } else {
+          const number = value[index];
+          if (!Number.isFinite(number)) throw new TypeError("Nonfinite water coordinate.");
+          if (write) coordinates[c++] = number; else coordinateCount++;
+          operations++;
+        }
+        if ((index + 1) % checkInterval === 0) yield;
       }
     }
+    yield;
   }
   const sources = [];
   function* describe(geometry) {
@@ -55,23 +75,21 @@ export async function packWaterGeometry(updates, {
     let result;
     do {
       result = iterator.next();
+      operations++;
       if (shouldYield()) await checkpoint();
     } while (!result.done);
     value.push({ id: update.id, feature: result.value });
   }
-  let coordinateCount = 0, lengthCount = 0;
   for (const { source, depth } of sources) {
-    for (const [kind] of walk(source, depth)) {
-      if (kind) coordinateCount++; else lengthCount++;
+    for (const step of walk(source, depth)) {
       if (shouldYield()) await checkpoint();
     }
   }
-  const coordinates = new Float64Array(coordinateCount), lengths = new Uint32Array(lengthCount);
-  let c = 0, l = 0;
+  coordinates = new Float64Array(coordinateCount);
+  lengths = new Uint32Array(lengthCount);
   for (const { source, depth, result } of sources) {
     result.coordinates = [c, l];
-    for (const [kind, number] of walk(source, depth)) {
-      if (kind) coordinates[c++] = number; else lengths[l++] = number;
+    for (const step of walk(source, depth, true)) {
       if (shouldYield()) await checkpoint();
     }
   }
