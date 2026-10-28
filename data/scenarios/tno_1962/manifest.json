@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/tno_1962/audit.json",
-  "baseline_hash": "72e92ee508ec5bd3b6972d13cd5381bd5d5611933da30239f849c06bd84e2068",
+  "baseline_hash": "71007200b0b5df8b1e51e1a79493870a91cf9043c834ba4be2f7e6e20e0d3209",
   "bathymetry_texture_url": "data/scenarios/tno_1962/bathymetry_texture/manifest.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
@@ -8,7 +8,6 @@
   "city_overrides_url": "data/scenarios/tno_1962/city_overrides.json",
   "context_lod_manifest": "data/scenarios/tno_1962/context_lod.manifest.json",
   "cores_url": "data/scenarios/tno_1962/cores.by_feature.json",
-  "corrections_version": 1,
   "countries_url": "data/scenarios/tno_1962/countries.json",
   "default_country": "GER",
   "detail_chunk_manifest_url": "data/scenarios/tno_1962/detail_chunks.manifest.json",
@@ -2998,10 +2997,10 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "5976d846c23d24ba8e298edfe5d7f0b983d0f4b30fd43cda529a2a69805aaa45",
+  "snapshot_fingerprint": "f7d74d8910eca06e2a409dfb18dee5001bf7089dea8e77188ef74b232bf49ee4",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "1e51c13c558f34dc6e316951880c4e31bc9438c5d8d6ff1e56b531bfb5c7dbdb",
+    "detail_chunk_manifest_sha256": "e8cf1f175823def75242c34abfb29196a2a415cd386ab38c55668ea937af9991",
     "runtime_bootstrap_topology_sha256": "338d98c608bd7bed9ecfc46441d5d051734d8926dfc5b4c8851166f120a31902",
     "runtime_topology_sha256": "2260a1fb35ec521421456f374ad4da2e143875abf05d3cf7628c35f6e7ad46e1"
   },
@@ -3075,5 +3074,6 @@
   "tag_migration_version": 1,
   "version": 2,
   "water_regions_mode": "exclusive",
-  "water_regions_url": "data/scenarios/tno_1962/water_regions.geojson"
+  "water_regions_url": "data/scenarios/tno_1962/water_regions.geojson",
+  "corrections_version": 1
 }

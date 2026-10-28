@@ -149,6 +149,8 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
         "RU_RAY_50074027B18536602285327": ("RUR", "RU_RAY_50074027B240190989633"),
         "RU_RAY_50074027B23063195205268": ("KRS", "RU_RAY_50074027B3826534840215"),
     }
+    # The 1962 owner corrections moved these Gorky faces, with their districts, to TAT after the source rules.
+    CORRECTED_OWNERS = {"RU_RAY_50074027B5573235052647": "TAT", "RU_RAY_50074027B91746933948416": "TAT"}
 
     def test_reviewed_city_faces_match_the_preserved_district_owners(self) -> None:
         owners = json.loads((SCENARIO_DIR / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
@@ -157,6 +159,7 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
         mutations = json.loads((SCENARIO_DIR / "scenario_mutations.json").read_text(encoding="utf-8"))["assignments_by_feature_id"]
         # A city face or its reference district may since have been merged; the merged feature keeps the owner.
         for city_id, (owner, district_id) in self.CITY_DISTRICT_PAIRS.items():
+            owner = self.CORRECTED_OWNERS.get(city_id, owner)
             with self.subTest(city_id=city_id):
                 face = tno_feature(city_id)
                 self.assertEqual(owners[tno_feature(district_id)], owner)
@@ -183,7 +186,7 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
             {"assignments": {fid: manual["assignments"][tno_feature(fid)] for fid in self.CITY_DISTRICT_PAIRS}}, {},
         )
         for fid, (tag, _) in self.CITY_DISTRICT_PAIRS.items():
-            self.assertEqual(owners["owners"][fid], tag)
+            self.assertEqual(owners["owners"][fid], self.CORRECTED_OWNERS.get(fid, tag))
         for fid, tag in preserved.items():
             self.assertEqual(owners["owners"][fid], tag)
             self.assertEqual(cores["cores"][fid], [tag])
@@ -204,7 +207,7 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
             with self.subTest(feature_id=fid):
                 self.assertEqual(owners["owners"][fid], tag)
                 self.assertEqual(cores["cores"][fid], [tag])
-                self.assertEqual(published[tno_feature(fid)], tag)
+                self.assertEqual(published[tno_feature(fid)], self.CORRECTED_OWNERS.get(fid, tag))
 
     def test_russian_rules_do_not_reintroduce_conflicting_city_assignments(self) -> None:
         rules = json.loads((SCENARIO_DIR.parents[1] / "scenario-rules" /

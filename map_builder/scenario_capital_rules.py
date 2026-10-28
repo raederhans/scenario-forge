@@ -263,8 +263,8 @@ HOI4_SPLIT_CAPITALS = {
 
 TNO_CAPITALS = {
     "ALT": ("1159146581", "Oyrot-Tura", "奥伊罗特-图拉"),
-    "AMR": ("1159146671", "Zeya", "结雅"),
-    "BKR": ("1159146525", "Sterlitamak", "斯捷尔利塔马克"),
+    "AMR": ("1159146681", "Tynda", "滕达"),
+    "BKR": ("1159128763", "Oktyabrsky", "十月城"),
     "BOP": ("1159137605", "Ivdel", "伊夫杰利"),
     "BRY": ("1159149623", "Ulan-Ude", "乌兰乌德"),
     "BZ": ("1159144449", "Belize City", "伯利兹城"),

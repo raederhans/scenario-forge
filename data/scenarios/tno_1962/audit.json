@@ -112487,10 +112487,10 @@
     "BKR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 8,
+      "controller_feature_count": 7,
       "display_name": "Bashkir",
       "entry_kind": "scenario_country",
-      "feature_count": 8,
+      "feature_count": 7,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115458,10 +115458,10 @@
     "OMS": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 16,
+      "controller_feature_count": 18,
       "display_name": "Omsk",
       "entry_kind": "scenario_country",
-      "feature_count": 16,
+      "feature_count": 18,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115555,10 +115555,10 @@
     "ORN": {
       "base_iso2": "ORN",
       "continent_label": "Europe",
-      "controller_feature_count": 14,
+      "controller_feature_count": 13,
       "display_name": "Orenburg",
       "entry_kind": "scenario_country",
-      "feature_count": 14,
+      "feature_count": 13,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116145,10 +116145,10 @@
     "RFA": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 3,
+      "controller_feature_count": 4,
       "display_name": "Russian Anarchy",
       "entry_kind": "scenario_country",
-      "feature_count": 3,
+      "feature_count": 4,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116491,10 +116491,10 @@
     "RUR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 8,
+      "controller_feature_count": 9,
       "display_name": "Rurik Kingdom",
       "entry_kind": "scenario_country",
-      "feature_count": 8,
+      "feature_count": 9,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116590,10 +116590,10 @@
     "SAM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 21,
+      "controller_feature_count": 22,
       "display_name": "Russian Liberation Army",
       "entry_kind": "scenario_country",
-      "feature_count": 21,
+      "feature_count": 22,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117092,10 +117092,10 @@
     "TAT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 15,
+      "controller_feature_count": 16,
       "display_name": "Tatar Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 15,
+      "feature_count": 16,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117226,10 +117226,10 @@
     "TOM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 26,
+      "controller_feature_count": 24,
       "display_name": "Tomsk",
       "entry_kind": "scenario_country",
-      "feature_count": 26,
+      "feature_count": 24,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -118180,11 +118180,11 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "5976d846c23d24ba8e298edfe5d7f0b983d0f4b30fd43cda529a2a69805aaa45",
+  "snapshot_fingerprint": "f7d74d8910eca06e2a409dfb18dee5001bf7089dea8e77188ef74b232bf49ee4",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "78e4c09f8a70f5c09703bb99065a1d94728619de04e566d57990d5a65eba4f57",
-    "detail_chunk_manifest_sha256": "1e51c13c558f34dc6e316951880c4e31bc9438c5d8d6ff1e56b531bfb5c7dbdb",
+    "build_snapshot_sha256": "6ac5c66cb1ce917e0527c0dfd279e8574d7017f5128b2fba81ff7ac78e47f00a",
+    "detail_chunk_manifest_sha256": "e8cf1f175823def75242c34abfb29196a2a415cd386ab38c55668ea937af9991",
     "runtime_bootstrap_topology_sha256": "338d98c608bd7bed9ecfc46441d5d051734d8926dfc5b4c8851166f120a31902",
     "runtime_topology_sha256": "2260a1fb35ec521421456f374ad4da2e143875abf05d3cf7628c35f6e7ad46e1"
   },

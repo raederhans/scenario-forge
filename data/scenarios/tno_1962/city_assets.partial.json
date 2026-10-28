@@ -33516,7 +33516,12 @@
     },
     "CITY::ne::1159146681": {
       "city_id": "CITY::ne::1159146681",
-      "host_feature_id": "RU_RAY_50074027B86870758219567"
+      "host_feature_id": "RU_RAY_50074027B86870758219567",
+      "stable_key": "id::CITY::ne::1159146681",
+      "display_name": {
+        "en": "Tynda",
+        "zh": "滕达"
+      }
     },
     "CITY::ne::1159146695": {
       "display_name": {
@@ -36800,14 +36805,14 @@
       "source": "reviewed_settlement",
       "stable_key": "id::CITY::scenario::cherdyn"
     },
-    "CITY::ne::1159146671": {
-      "city_id": "CITY::ne::1159146671",
-      "stable_key": "id::CITY::ne::1159146671",
+    "CITY::ne::1159128763": {
+      "city_id": "CITY::ne::1159128763",
+      "stable_key": "id::CITY::ne::1159128763",
       "display_name": {
-        "en": "Zeya",
-        "zh": "结雅"
+        "en": "Oktyabrsky",
+        "zh": "十月城"
       },
-      "host_feature_id": "RU_RAY_50074027B59835640460134"
+      "host_feature_id": "RU_MRG_e9b55eb4987e"
     },
     "CITY::ne::1159122401": {
       "city_id": "CITY::ne::1159122401",

@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from map_builder.json_source import read_json_source
 from map_builder.scenario_context import write_json_transaction
 from map_builder.scenario_political_materialization_support import build_country_entry_from_mutation
 from tools.apply_tno_1962_identity_migrations import SCENARIO_DIR, IDENTITY_PATH, read_json
@@ -65,6 +66,61 @@ def select_corrections(candidates, approved, manual_review, identity):
     return selected
 
 
+def political_neighbors(topology):
+    """Runtime feature ID -> IDs that share at least one arc with it."""
+    by_arc = defaultdict(set)
+    geometries = topology['objects']['political']['geometries']
+
+    def arcs_of(geometry):
+        rings = geometry.get('arcs') or []
+        if geometry.get('type') == 'Polygon':
+            rings = [rings]
+        return (arc if arc >= 0 else ~arc for polygon in rings for ring in polygon for arc in ring)
+
+    for geometry in geometries:
+        fid = geometry.get('properties', {}).get('id')
+        for arc in arcs_of(geometry):
+            by_arc[arc].add(fid)
+    neighbors = defaultdict(set)
+    for fids in by_arc.values():
+        for fid in fids:
+            neighbors[fid] |= fids - {fid}
+    return neighbors
+
+
+def projected_modes(candidates, identity, represented):
+    """Feature ID -> owner its TPS sample votes for, whether or not it passed the gates."""
+    modes = {}
+    for row in candidates['rows']:
+        if row['current_owner'] and row['status'] == 'sampled':
+            scheme = row['schemes']['tps']
+            modes[row['fid']] = project_votes(scheme['votes'], scheme['valid_land_samples'],
+                                              row, identity, represented)['project_mode']
+    return modes
+
+
+def drop_small_enclaves(selected, owners, neighbors, projected=None, max_area_km2=2000.0):
+    """Keep a small parcel with its surroundings when its correction would leave it as an enclave.
+
+    Sampling can flip a city face to the original owner while the district around it stays,
+    which only makes a speck. When a neighbor also votes for the new owner, the neighbor is the
+    one that missed the gates (Perm, Kirov), so the change stays. Dropping one change can isolate
+    another, so repeat until stable.
+    """
+    projected = projected or {}
+    kept = dict(selected)
+    while True:
+        final = {**owners, **{fid: row['project_owner'] for fid, row in kept.items()}}
+        dropped = [fid for fid, row in kept.items()
+                   if row['area_km2'] < max_area_km2 and neighbors.get(fid)
+                   and all(final.get(other) != row['project_owner']
+                           and projected.get(other) != row['project_owner'] for other in neighbors[fid])]
+        if not dropped:
+            return kept, sorted(set(selected) - set(kept))
+        for fid in dropped:
+            del kept[fid]
+
+
 def change_matrix(rows):
     matrix = defaultdict(lambda: dict(count=0, area_km2=0.0))
     for row in rows:
@@ -81,6 +137,9 @@ def apply_corrections(input_dir=INPUT_DIR, scenario_dir=SCENARIO_DIR):
     review = read_json(input_dir / 'tno_1962_manual_review.json')
     selected = select_corrections(candidates, approved, review, identity)
     owners = read_json(scenario_dir / 'owners.by_feature.json')['owners']
+    neighbors = political_neighbors(read_json_source(scenario_dir / 'runtime_topology.topo.json'))
+    projected = projected_modes(candidates, identity, represented_originals(candidates, identity))
+    selected, dropped_enclaves = drop_small_enclaves(selected, owners, neighbors, projected)
     cores = read_json(scenario_dir / 'cores.by_feature.json')['cores']
     mutations = read_json(scenario_dir / 'scenario_mutations.json')
     city_path = scenario_dir / 'city_overrides.json'
@@ -139,6 +198,7 @@ def apply_corrections(input_dir=INPUT_DIR, scenario_dir=SCENARIO_DIR):
     report = dict(approved_count=len(approved['approved']), manual_review_count=len(review['rows']),
                   best_effort_count=sum(row['method'] == 'best_effort' for row in selected.values()),
                   selected_count=len(selected), changed_count=len(changed), new_tags=new_tags,
+                  dropped_enclaves=dropped_enclaves,
                   change_matrix=change_matrix(selected.values()), regions=regions,
                   zero_territory_tags=sorted(tag for tag, country in countries.items() if not country['feature_count']),
                   retirement_policy='保留零领土国家条目；不自动新增可释放目录或领土预设。旧 PRC/ANG 身份由迁移工具退役。',

@@ -7,7 +7,9 @@ from uuid import uuid4
 import pytest
 
 from tools.apply_tno_1962_identity_migrations import apply_identity_migrations, IDENTITY_PATH, read_json
-from tools.apply_tno_1962_corrections import best_effort_owner, select_corrections
+from tools.apply_tno_1962_corrections import (
+    best_effort_owner, drop_small_enclaves, political_neighbors, select_corrections,
+)
 
 
 @pytest.fixture
@@ -93,3 +95,35 @@ def test_selection_keeps_approved_and_marks_best_effort(candidate):
     assert result['approved']['method'] == 'approved'
     assert result['RU_TEST']['project_owner'] == 'RUR'
     assert result['RU_TEST']['method'] == 'best_effort'
+
+
+def test_political_neighbors_follow_shared_arcs():
+    topology = {'objects': {'political': {'geometries': [
+        {'type': 'Polygon', 'arcs': [[0, 1]], 'properties': {'id': 'a'}},
+        {'type': 'MultiPolygon', 'arcs': [[[~1, 2]]], 'properties': {'id': 'b'}},
+        {'type': 'Polygon', 'arcs': [[3]], 'properties': {'id': 'c'}},
+    ]}}}
+    neighbors = political_neighbors(topology)
+    assert neighbors['a'] == {'b'} and neighbors['b'] == {'a'} and not neighbors['c']
+
+
+def test_small_enclave_changes_are_dropped_until_stable():
+    owners = {'city': 'SAM', 'district': 'SAM', 'ring': 'SAM', 'big': 'SAM', 'east': 'ORE'}
+    neighbors = {'city': {'district'}, 'district': {'city', 'ring'}, 'ring': {'district', 'east'},
+                 'big': {'district', 'east'}, 'east': {'ring', 'big'}}
+    row = lambda owner, area: {'project_owner': owner, 'area_km2': area}
+    selected = {'city': row('ORE', 60), 'ring': row('ORE', 100), 'big': row('ORE', 9000)}
+    kept, dropped = drop_small_enclaves(selected, owners, neighbors)
+    # The ring touches ORE land and the large parcel is never dropped; the city face would be a speck.
+    assert dropped == ['city']
+    assert set(kept) == {'ring', 'big'}
+
+
+def test_enclave_change_stays_when_a_neighbor_votes_for_the_same_owner():
+    owners = {'perm': 'BKR', 'krai': 'BKR', 'kemerovo': 'RUR', 'south': 'RUR'}
+    neighbors = {'perm': {'krai'}, 'krai': {'perm'}, 'kemerovo': {'south'}, 'south': {'kemerovo'}}
+    row = lambda owner: {'project_owner': owner, 'area_km2': 700}
+    selected = {'perm': row('PRM'), 'kemerovo': row('NOV')}
+    # The surrounding krai votes PRM but missed the gates; Kemerovo's surroundings vote for someone else.
+    kept, dropped = drop_small_enclaves(selected, owners, neighbors, {'krai': 'PRM', 'south': 'KEM'})
+    assert dropped == ['kemerovo'] and set(kept) == {'perm'}

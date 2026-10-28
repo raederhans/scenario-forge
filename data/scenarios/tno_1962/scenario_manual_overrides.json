@@ -4946,11 +4946,11 @@
       "owner": "BKR"
     },
     "RU_MRG_b63c46baafca": {
-      "controller": "NOV",
+      "controller": "RUR",
       "cores": [
-        "NOV"
+        "RUR"
       ],
-      "owner": "NOV"
+      "owner": "RUR"
     },
     "RU_MRG_b706be984552": {
       "controller": "RUR",
@@ -5638,13 +5638,6 @@
       ],
       "owner": "RKO"
     },
-    "RU_RAY_50074027B118068330623": {
-      "controller": "BKR",
-      "cores": [
-        "BKR"
-      ],
-      "owner": "BKR"
-    },
     "RU_RAY_50074027B12942583135720": {
       "controller": "RKU",
       "cores": [
@@ -5785,13 +5778,6 @@
       ],
       "owner": "TOM"
     },
-    "RU_RAY_50074027B19670057495733": {
-      "controller": "TOM",
-      "cores": [
-        "TOM"
-      ],
-      "owner": "TOM"
-    },
     "RU_RAY_50074027B21050205315965": {
       "controller": "VOK",
       "cores": [
@@ -5846,13 +5832,6 @@
         "NRL"
       ],
       "owner": "NRL"
-    },
-    "RU_RAY_50074027B23262720042196": {
-      "controller": "FAV",
-      "cores": [
-        "FAV"
-      ],
-      "owner": "FAV"
     },
     "RU_RAY_50074027B23799547406598": {
       "controller": "TOM",
@@ -5978,13 +5957,6 @@
         "SVR"
       ],
       "owner": "BOP"
-    },
-    "RU_RAY_50074027B28971786615675": {
-      "controller": "FAV",
-      "cores": [
-        "FAV"
-      ],
-      "owner": "FAV"
     },
     "RU_RAY_50074027B29205817441204": {
       "controller": "YAK",
@@ -6176,11 +6148,10 @@
       "owner": "RKO"
     },
     "RU_RAY_50074027B40536112899816": {
-      "controller": "ORN",
       "cores": [
-        "ORN"
+        "SAM"
       ],
-      "owner": "ORN"
+      "owner": "SAM"
     },
     "RU_RAY_50074027B40753977825415": {
       "controller": "MAG",
@@ -6550,13 +6521,6 @@
         "ORS"
       ],
       "owner": "ORS"
-    },
-    "RU_RAY_50074027B61219657375498": {
-      "controller": "TOM",
-      "cores": [
-        "TOM"
-      ],
-      "owner": "TOM"
     },
     "RU_RAY_50074027B61486865886735": {
       "controller": "OMO",
