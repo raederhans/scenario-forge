@@ -11991,7 +11991,10 @@ function shouldForceExactContextBaseRefresh(reuseDecision = null) {
     return false;
   }
   const cache = getRenderPassCacheState();
-  if (cache.dirty?.physicalBase || cache.dirty?.contextBase) {
+  // A disabled physicalBase (contours_only) stays dirty after release; only
+  // active passes may force the exact context refresh.
+  const activePassNames = new Set(getActiveRenderPassNames());
+  if (["physicalBase", "contextBase"].some((passName) => activePassNames.has(passName) && cache.dirty?.[passName])) {
     return true;
   }
   const resolvedReuseDecision =
@@ -12005,7 +12008,8 @@ function getPhysicalExactRefreshPasses() {
   const passes = runtimeState.showPhysical
     ? ["physicalBase", "political", "contextBase", "borders"]
     : ["political", "contextBase", "borders"];
-  return passes;
+  const activePassNames = new Set(getActiveRenderPassNames());
+  return passes.filter((passName) => activePassNames.has(passName));
 }
 
 function composeUrbanAdaptivePaintModel() {
