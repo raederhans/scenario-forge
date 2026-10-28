@@ -397,6 +397,9 @@ function postWorkerMessage(type, payload, { signal = null } = {}) {
     try {
       const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(startupReady ? payload : payload[field], {
         includeTopologyArcs: startupReady,
+        // Startup envelopes carry topology arcs and the collections decoded from
+        // them; sharing keeps one copy of every point on the main thread.
+        shareReferences: true,
       });
       throwIfAborted(signal);
       if (transport.transferables.length) {

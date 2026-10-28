@@ -65,7 +65,7 @@ test("startup v3 transfers topology arcs and nested points while preserving opaq
   const envelope = { taskId: "startup", payload: { base: { topology_primary: topology } },
     baseDecodedCollections: { waterRegionsData: shapes }, metrics: { decodeMs: 7 } };
   const before = structuredClone(envelope);
-  const encoded = pack(envelope, { minCoordinateCount: 0, includeTopologyArcs: true });
+  const encoded = pack(envelope, { shareReferences: true, minCoordinateCount: 0, includeTopologyArcs: true });
   assert.equal(encoded.payload.encoding, "geo-f64-v3");
   const { port1, port2 } = new MessageChannel();
   try {
@@ -81,12 +81,12 @@ test("startup v3 transfers topology arcs and nested points while preserving opaq
 
 test("v3 keeps topology arcs opt-in and invalid coordinates retain the ordinary path", () => {
   const topology = { type: "Topology", arcs: [[[1, 2], [3, 4]]], objects: {} };
-  const old = pack({ topology, decoded: shapes }, { minCoordinateCount: 0 });
+  const old = pack({ topology, decoded: shapes }, { minCoordinateCount: 0, shareReferences: true });
   assert.equal(old.payload.encoding, "geo-f64-v3");
   assert.deepEqual(old.payload.value.topology.arcs, topology.arcs);
   assert.deepEqual(unpack(structuredClone(old.payload)), { topology, decoded: shapes });
   for (const value of [topology, { ...topology, arcs: [[[1, "2"]]] }]) {
-    const result = pack(value, { includeTopologyArcs: true });
+    const result = pack(value, { shareReferences: true, includeTopologyArcs: true });
     assert.equal(result.payload, value);
     assert.deepEqual(result.transferables, []);
   }
@@ -95,7 +95,7 @@ test("v3 keeps topology arcs opt-in and invalid coordinates retain the ordinary 
 for (const includeTopologyArcs of [false, true]) {
   test(`async v3 unpack yields and preserves opaque references with topology arcs ${includeTopologyArcs}`, async () => {
     const topology = { type: "Topology", arcs: [[], [[1, 2], [3, 4]]], objects: {} };
-    const { payload } = pack({ topology, decoded: shapes }, { minCoordinateCount: 0, includeTopologyArcs });
+    const { payload } = pack({ topology, decoded: shapes }, { minCoordinateCount: 0, includeTopologyArcs, shareReferences: true });
     let clock = 0, yields = 0;
     const result = await unpackAsync(payload, {
       nowMs: () => { clock += 4; return clock; },
@@ -111,7 +111,7 @@ for (const includeTopologyArcs of [false, true]) {
 
 test("async unpack slices a single topology's arcs by line", async () => {
   const topology = { type: "Topology", arcs: Array.from({ length: 100 }, (_, i) => [[i, -i], [i + 1, 2]]), objects: {} };
-  const { payload } = pack(topology, { minCoordinateCount: 0, includeTopologyArcs: true });
+  const { payload } = pack(topology, { shareReferences: true, minCoordinateCount: 0, includeTopologyArcs: true });
   let clock = 0, yields = 0;
   const result = await unpackAsync(payload, {
     nowMs: () => { clock += 4; return clock; },
@@ -175,7 +175,7 @@ for (const topologyFirst of [true, false]) {
       assert.equal(left[1], result.topology.arcs[0][1]);
     };
     assertShared(input);
-    const encoded = pack(input, { minCoordinateCount: 0, includeTopologyArcs: true });
+    const encoded = pack(input, { shareReferences: true, minCoordinateCount: 0, includeTopologyArcs: true });
     assert.equal(encoded.payload.encoding, "geo-f64-v3");
     assert.equal(encoded.payload.coordinates.length, 22);
     assertShared(unpack(encoded.payload));
@@ -204,7 +204,7 @@ test("v3 preserves shared rings, lines and geometry roots without merging equal 
     line: { type: "LineString", coordinates: line },
     point: { type: "Point", coordinates: line[0] },
   };
-  const { payload } = pack(input, { minCoordinateCount: 0, includeTopologyArcs: true });
+  const { payload } = pack(input, { shareReferences: true, minCoordinateCount: 0, includeTopologyArcs: true });
   assert.equal(payload.encoding, "geo-f64-v3");
   assert.equal(payload.coordinates.length, 6);
   for (const result of [unpack(payload), await unpackAsync(payload)]) {
@@ -221,10 +221,10 @@ test("v3 preserves shared rings, lines and geometry roots without merging equal 
 test("v3 applies minCoordinateCount to unique coordinate scalars", () => {
   const point = [1, 2];
   const input = { type: "MultiPoint", coordinates: [point, point, point] };
-  const ordinary = pack(input, { minCoordinateCount: 3 });
+  const ordinary = pack(input, { shareReferences: true, minCoordinateCount: 3 });
   assert.equal(ordinary.payload, input);
   assert.deepEqual(ordinary.transferables, []);
-  const encoded = pack(input, { minCoordinateCount: 2 });
+  const encoded = pack(input, { shareReferences: true, minCoordinateCount: 2 });
   assert.equal(encoded.payload.encoding, "geo-f64-v3");
   assert.equal(encoded.payload.coordinates.length, 2);
   assert.deepEqual(unpack(encoded.payload), input);

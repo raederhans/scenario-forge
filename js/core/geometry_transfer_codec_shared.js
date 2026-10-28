@@ -19,15 +19,19 @@ var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGe
     }
     return result;
   }
-  function pack(value, { minCoordinateCount = 16_384, includeTopologyArcs = false } = {}) {
+  // shareReferences keeps arrays that several geometries share (TopoJSON arcs
+  // and the collections decoded from them) as one copy: v3 writes a reference
+  // record instead of repeating the points. Consumers that scan the v1 layout
+  // directly (packed raster updates) keep receiving v1/v2 by default.
+  function pack(value, { minCoordinateCount = 16_384, includeTopologyArcs = false, shareReferences = false } = {}) {
     let coordinateCount = 0, lengthCount = 0, valid = true;
     const counted = new Map();
     function count(array, depth, record = true) {
       if (!Array.isArray(array)) { valid = false; return; }
-      const previousDepths = counted.get(array) || 0;
+      const previousDepths = shareReferences ? (counted.get(array) || 0) : 0;
       if (record) lengthCount += previousDepths ? 2 : 1;
       if (previousDepths & (1 << depth)) return;
-      counted.set(array, previousDepths | (1 << depth));
+      if (shareReferences) counted.set(array, previousDepths | (1 << depth));
       const firstWrite = record && !previousDepths;
       for (let index = 0; index < array.length; index += 1) {
         if (depth > 1) count(array[index], depth - 1, firstWrite);
@@ -46,12 +50,12 @@ var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGe
     const written = new Map();
     let coordinateOffset = 0, lengthOffset = 0;
     function write(array, depth) {
-      if (written.has(array)) {
+      if (shareReferences && written.has(array)) {
         lengths[lengthOffset++] = referenceLength;
         lengths[lengthOffset++] = written.get(array);
         return;
       }
-      written.set(array, lengthOffset);
+      if (shareReferences) written.set(array, lengthOffset);
       lengths[lengthOffset++] = array.length;
       if (depth === 1) {
         for (let i = 0; i < array.length; i += 1) coordinates[coordinateOffset++] = array[i];
@@ -63,7 +67,9 @@ var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGe
       return { ...geometry, coordinates: offset };
     }, includeTopologyArcs);
     return {
-      payload: { encoding: "geo-f64-v3", includeTopologyArcs, value: packed, coordinates, lengths },
+      payload: shareReferences
+        ? { encoding: "geo-f64-v3", includeTopologyArcs, value: packed, coordinates, lengths }
+        : { encoding: includeTopologyArcs ? "geo-f64-v2" : "geo-f64-v1", value: packed, coordinates, lengths },
       transferables: [coordinates.buffer, lengths.buffer],
     };
   }

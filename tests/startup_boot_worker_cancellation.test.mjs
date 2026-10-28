@@ -262,7 +262,7 @@ test("large base and startup-bundle geometry use whole-message transfers without
   assert.equal(baseReply.taskId, "large-base-transfer");
   assert.equal(baseWire.decodedCollections, undefined);
   assert.equal(baseReply.geometryTransport.field, "message");
-  assert.equal(baseReply.geometryTransport.payload.encoding, "geo-f64-v2");
+  assert.equal(baseReply.geometryTransport.payload.encoding, "geo-f64-v3");
   assert.equal(transferLists[0].length, 2);
   assert.equal(transferLists[0][0], baseReply.geometryTransport.payload.coordinates.buffer);
   assert.equal(transferLists[0][1], baseReply.geometryTransport.payload.lengths.buffer);
@@ -286,7 +286,7 @@ test("large base and startup-bundle geometry use whole-message transfers without
   assert.equal(bundleReply.taskId, "large-bundle-transfer");
   assert.equal(bundleWire.baseDecodedCollections, undefined);
   assert.equal(bundleReply.geometryTransport.field, "message");
-  assert.equal(bundleReply.geometryTransport.payload.encoding, "geo-f64-v2");
+  assert.equal(bundleReply.geometryTransport.payload.encoding, "geo-f64-v3");
   assert.equal(transferLists[1].length, 2);
   assert.equal(transferLists[1][0], bundleReply.geometryTransport.payload.coordinates.buffer);
   assert.equal(typeof bundleReply.metrics.geometryPackingMs, "number");
@@ -416,7 +416,7 @@ test("large worker replies cross a real structured transfer and restore through 
     });
     assert.equal(workerHarness.posted[1].geometryTransport.field, "message");
     assert.equal(workerHarness.transferLists[1].length, 2, "all startup geometries and arcs share one transport");
-    assert.equal(workerHarness.posted[1].geometryTransport.payload.encoding, "geo-f64-v2");
+    assert.equal(workerHarness.posted[1].geometryTransport.payload.encoding, "geo-f64-v3");
     assert.deepEqual(bundleResult.baseDecodedCollections.landData, decodeFixtureFeatureCollection(baseTopology, baseTopology.objects.political));
     assert.equal(bundleResult.baseDecodedCollections.landData.features[0].geometry.coordinates[0].length, 10_000);
     assert.equal(bundleResult.baseDecodedCollections.landData.features[0].geometry.coordinates[0][1][0], 1.123456789012345);
@@ -432,7 +432,7 @@ test("large worker replies cross a real structured transfer and restore through 
       topologyUrl: "/base-only.json", needLocales: false, needGeoAliases: false,
     });
     const topologyResult = await loadTopologyOnly();
-    assert.equal(workerHarness.posted[2].geometryTransport.payload.encoding, "geo-f64-v2");
+    assert.equal(workerHarness.posted[2].geometryTransport.payload.encoding, "geo-f64-v3");
     assert.equal(workerHarness.transferLists[2].length, 2);
     assert.deepEqual(topologyResult.topologyPrimary, topologyOnly);
     assert.equal(typeof topologyResult.metrics.geometryUnpackingMs, "number");
@@ -536,7 +536,7 @@ test("startup bundle transfers raw arcs and decoded coordinates through the main
   assert.equal(reply.type, "STARTUP_BUNDLE_READY");
   assert.equal(reply.startupTransport, undefined);
   assert.equal(reply.geometryTransport.field, "message");
-  assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v2");
+  assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v3");
   assert.equal(reply.payload, undefined, "raw topologies only occur in the packed whole-message payload");
   assert.equal(reply.baseDecodedCollections, undefined);
   assert.equal(reply.runtimeDecodedCollections, undefined);
@@ -601,10 +601,10 @@ test("runtime bootstrap retains mainline whole-message transfer and runtime chun
     assert.deepEqual(restored.decodedCollections.politicalData, decodeArcFeatureCollection(topology, topology.objects.political));
     if (reply.type === "SCENARIO_RUNTIME_BOOTSTRAP_READY") {
       assert.equal(reply.geometryTransport.field, "message");
-      assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v2");
+      assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v3");
     } else {
       assert.equal(reply.geometryTransport.field, "decodedCollections");
-      assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v1");
+      assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v3");
       assert.equal(reply.decodedCollections, null);
       assert.deepEqual(reply.runtimePoliticalTopology, topology, "raw runtime chunk topology retains its ordinary clone path");
     }
@@ -692,7 +692,7 @@ test("gzip-only startup bundle loads its explicit resource and retains Float64 t
   assert.deepEqual(urls, ["https://example.test/startup.bundle.json.gz"]);
   assert.equal(posted.length, 1);
   assert.equal(posted[0].type, "STARTUP_BUNDLE_READY");
-  assert.equal(posted[0].geometryTransport.payload.encoding, "geo-f64-v2");
+  assert.equal(posted[0].geometryTransport.payload.encoding, "geo-f64-v3");
   assert.equal(transferLists[0].length, 2);
   assert.deepEqual(restoreWorkerResponse(posted[0]).payload, payload);
 });
@@ -748,7 +748,7 @@ test("detail topology parses in its own worker, transfers its arcs and ends that
     const result = await startupWorkerClient.loadDetailTopologyViaWorker({ topologyUrl: "/detail.json" });
     const wire = workerHarness.posted[0];
     assert.equal(wire.type, "DETAIL_TOPOLOGY_READY");
-    assert.equal(wire.geometryTransport.payload.encoding, "geo-f64-v2", "the arcs travel as Float64 buffers");
+    assert.equal(wire.geometryTransport.payload.encoding, "geo-f64-v3", "the arcs travel as Float64 buffers");
     assert.equal(workerHarness.transferLists[0].length, 2);
     assert.deepEqual(result.topology, detail);
     assert.equal(result.topology.arcs[0][1][0], 1.123456789012345);
