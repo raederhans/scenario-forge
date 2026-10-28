@@ -101,6 +101,41 @@
       ],
       "owner": "BRG"
     },
+    "BY_INT_BREST": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "BY_RAY_67162791B11584975294724": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "BY_RAY_67162791B14569635979911": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "BY_RAY_67162791B17030122378697": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "BY_RAY_67162791B58533541453403": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
     "CA_MRG_02a592f4a083": {
       "controller": "CAN",
       "cores": [
@@ -524,7 +559,7 @@
     "CN_CITY_17275852B43185565483198": {
       "controller": "XIK",
       "cores": [
-        "SIC"
+        "XIK"
       ],
       "owner": "XIK"
     },
@@ -580,21 +615,21 @@
     "CN_CITY_17275852B74822957782790": {
       "controller": "XIK",
       "cores": [
-        "SIC"
+        "XIK"
       ],
       "owner": "XIK"
     },
     "CN_CITY_17275852B77624704817132": {
       "controller": "XIK",
       "cores": [
-        "SIC"
+        "XIK"
       ],
       "owner": "XIK"
     },
     "CN_CITY_17275852B93800386737284": {
       "controller": "XIK",
       "cores": [
-        "SIC"
+        "XIK"
       ],
       "owner": "XIK"
     },
@@ -636,16 +671,16 @@
     "CN_MRG_03e48d4d8cb7": {
       "controller": "SHX",
       "cores": [
-        "PRC"
+        "CHI"
       ],
       "owner": "SHX"
     },
     "CN_MRG_05adc3fc83ec": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_08f0b7755ac2": {
       "controller": "SHX",
@@ -767,11 +802,11 @@
       "owner": "SHX"
     },
     "CN_MRG_28be4724b847": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_293f7b8a3ba2": {
       "controller": "SHX",
@@ -781,11 +816,11 @@
       "owner": "SHX"
     },
     "CN_MRG_2b668454dc72": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_2e32a6a2bcdc": {
       "controller": "CHI",
@@ -872,11 +907,11 @@
       "owner": "NCP"
     },
     "CN_MRG_3c1607582833": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_3cb8ad8288ff": {
       "controller": "SHX",
@@ -935,11 +970,11 @@
       "owner": "CHI"
     },
     "CN_MRG_4508995da9a6": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_47f5cbedadef": {
       "controller": "CHI",
@@ -963,11 +998,11 @@
       "owner": "CHI"
     },
     "CN_MRG_4ed89cf1f6b1": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_5062affbdbed": {
       "controller": "GXC",
@@ -1068,11 +1103,11 @@
       "owner": "SHX"
     },
     "CN_MRG_5fbd1e9aa77f": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_62b5e8747ba5": {
       "controller": "SHX",
@@ -1082,11 +1117,11 @@
       "owner": "SHX"
     },
     "CN_MRG_6a93b7948d7c": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_6afd9e47518e": {
       "controller": "GXC",
@@ -1119,7 +1154,7 @@
     "CN_MRG_6cfe5096a6ab": {
       "controller": "SHX",
       "cores": [
-        "PRC"
+        "CHI"
       ],
       "owner": "SHX"
     },
@@ -1166,18 +1201,18 @@
       "owner": "CHI"
     },
     "CN_MRG_811ae32de700": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_84ae8cea2227": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_855b56adb95d": {
       "controller": "CHI",
@@ -1208,11 +1243,11 @@
       "owner": "GXC"
     },
     "CN_MRG_8e007746d816": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_9305fada0549": {
       "controller": "CHI",
@@ -1243,18 +1278,18 @@
       "owner": "GXC"
     },
     "CN_MRG_987772a55e2a": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_9a5f1e882f00": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_9b9b2d2aa43a": {
       "controller": "SHX",
@@ -1355,11 +1390,11 @@
       "owner": "CHI"
     },
     "CN_MRG_b960732fa4b5": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_bbc31f7c4dea": {
       "controller": "SHX",
@@ -1460,16 +1495,16 @@
       "owner": "CHI"
     },
     "CN_MRG_e27f5cb03fed": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_e2dc46a8c2b2": {
       "controller": "SHX",
       "cores": [
-        "PRC"
+        "CHI"
       ],
       "owner": "SHX"
     },
@@ -1544,11 +1579,11 @@
       "owner": "SHX"
     },
     "CN_MRG_f548e602acc9": {
-      "controller": "GUI",
+      "controller": "GUZ",
       "cores": [
         "CHI"
       ],
-      "owner": "GUI"
+      "owner": "GUZ"
     },
     "CN_MRG_f5f659cc505e": {
       "controller": "NCP",
@@ -1570,6 +1605,13 @@
         "CHI"
       ],
       "owner": "CHI"
+    },
+    "CO_ADM1_COL-1422": {
+      "controller": "CLL",
+      "cores": [
+        "CLL"
+      ],
+      "owner": "CLL"
     },
     "CZ_MRG_16303fe61c1d": {
       "controller": "GER",
@@ -2117,6 +2159,111 @@
       ],
       "owner": "GY"
     },
+    "IN_ADM2_76128533B15567489974292": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B18931932305748": {
+      "controller": "AZH",
+      "cores": [
+        "AZH"
+      ],
+      "owner": "AZH"
+    },
+    "IN_ADM2_76128533B20504715877560": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B24861976740713": {
+      "controller": "AZH",
+      "cores": [
+        "AZH"
+      ],
+      "owner": "AZH"
+    },
+    "IN_ADM2_76128533B32249045995424": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B32998994032811": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B3371867518692": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B37825396764028": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B41744580856133": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B45655211862788": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B50784044604286": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B6393836306469": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B74958462315105": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B87327155385261": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "IN_ADM2_76128533B88214376170788": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
     "IN_MRG_0002559134aa": {
       "controller": "RAJ",
       "cores": [
@@ -2125,11 +2272,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_0156878691b5": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_03a3f2ee1465": {
       "controller": "RAJ",
@@ -2146,11 +2293,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_0872aaddca5c": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_09081ee1d22c": {
       "controller": "RAJ",
@@ -2237,11 +2384,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_21b7f1089cf4": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_28701b62eace": {
       "controller": "RAJ",
@@ -2272,18 +2419,18 @@
       "owner": "RAJ"
     },
     "IN_MRG_384a85847c3e": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
-        "FRI"
+        "AZH"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_3938fc2b4f6a": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_39e1573b0992": {
       "controller": "RAJ",
@@ -2349,11 +2496,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_4f750131bc07": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_5002491fef3c": {
       "controller": "RAJ",
@@ -2363,11 +2510,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_50e2da4682da": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_556898e710b4": {
       "controller": "RAJ",
@@ -2405,11 +2552,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_5df0a61bbde6": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_5f8577d839fb": {
       "controller": "RAJ",
@@ -2419,11 +2566,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_61856fc517ff": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
-        "FRI"
+        "AZH"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_63ee40e30267": {
       "controller": "RAJ",
@@ -2433,11 +2580,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_65081ed5bb9a": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_65d1ff50f969": {
       "controller": "RAJ",
@@ -2461,18 +2608,18 @@
       "owner": "RAJ"
     },
     "IN_MRG_6c3faeb50bb6": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
-        "FRI"
+        "AZH"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_6cb5e15ba7ae": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_708a258c7bc8": {
       "controller": "RAJ",
@@ -2489,11 +2636,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_73b8798a7214": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_76ffa0bf6d57": {
       "controller": "RAJ",
@@ -2552,11 +2699,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_7e018f926260": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_8835ef71e194": {
       "controller": "RAJ",
@@ -2566,11 +2713,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_883b10e5d00a": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_886776fba38b": {
       "controller": "RAJ",
@@ -2678,11 +2825,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_c5914ea1f4cc": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_cba921b13656": {
       "controller": "RAJ",
@@ -2706,11 +2853,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_d2159d107015": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_d5c4dbfe1bc8": {
       "controller": "RAJ",
@@ -2727,11 +2874,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_daa0ed708975": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_dc594d605425": {
       "controller": "RAJ",
@@ -2741,11 +2888,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_dfae0079ed8c": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
-        "FRI"
+        "AZH"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_e361a0c62816": {
       "controller": "RAJ",
@@ -2776,11 +2923,11 @@
       "owner": "RAJ"
     },
     "IN_MRG_f1db88056d17": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
     },
     "IN_MRG_f73955d59e52": {
       "controller": "RAJ",
@@ -2797,16 +2944,170 @@
       "owner": "RAJ"
     },
     "IN_MRG_fbe0a94c6ca5": {
-      "controller": "FRI",
+      "controller": "AZH",
       "cores": [
         "RAJ"
       ],
-      "owner": "FRI"
+      "owner": "AZH"
+    },
+    "LBY-2964": {
+      "controller": "ITA",
+      "cores": [
+        "ITA"
+      ],
+      "owner": "ITA"
+    },
+    "LBY-2965": {
+      "controller": "ITA",
+      "cores": [
+        "ITA"
+      ],
+      "owner": "ITA"
+    },
+    "LBY-2967": {
+      "controller": "ITA",
+      "cores": [
+        "ITA"
+      ],
+      "owner": "ITA"
+    },
+    "LBY-2969": {
+      "controller": "ITA",
+      "cores": [
+        "ITA"
+      ],
+      "owner": "ITA"
+    },
+    "LBY-2971": {
+      "controller": "ITA",
+      "cores": [
+        "ITA"
+      ],
+      "owner": "ITA"
+    },
+    "LBY-2976": {
+      "controller": "ITA",
+      "cores": [
+        "ITA"
+      ],
+      "owner": "ITA"
+    },
+    "LBY-2983": {
+      "controller": "ITA",
+      "cores": [
+        "ITA"
+      ],
+      "owner": "ITA"
+    },
+    "LBY-5488": {
+      "controller": "ITA",
+      "cores": [
+        "ITA"
+      ],
+      "owner": "ITA"
+    },
+    "MNG-3208": {
+      "controller": "XIN",
+      "cores": [
+        "XIN"
+      ],
+      "owner": "XIN"
+    },
+    "MNG-3315": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3316": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3318": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3320": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3321": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3322": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3323": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3324": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3325": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3326": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3327": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3328": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
+    },
+    "MNG-3329": {
+      "controller": "MEN",
+      "cores": [
+        "MEN"
+      ],
+      "owner": "MEN"
     },
     "NL_MRG_19568adfd807": {
       "controller": "RKN",
       "cores": [
-        "HOL",
+        "SUR",
         "RKN"
       ],
       "owner": "RKN"
@@ -2814,7 +3115,7 @@
     "NL_MRG_39ca088797c0": {
       "controller": "RKN",
       "cores": [
-        "HOL",
+        "SUR",
         "RKN"
       ],
       "owner": "RKN"
@@ -2822,7 +3123,7 @@
     "NL_MRG_45a7250c2862": {
       "controller": "RKN",
       "cores": [
-        "HOL",
+        "SUR",
         "RKN"
       ],
       "owner": "RKN"
@@ -2830,7 +3131,7 @@
     "NL_MRG_7e9ad361b25e": {
       "controller": "RKN",
       "cores": [
-        "HOL",
+        "SUR",
         "RKN"
       ],
       "owner": "RKN"
@@ -2838,7 +3139,7 @@
     "NL_MRG_99b7c61b066f": {
       "controller": "RKN",
       "cores": [
-        "HOL",
+        "SUR",
         "RKN"
       ],
       "owner": "RKN"
@@ -2846,7 +3147,7 @@
     "NL_MRG_b67b46af8948": {
       "controller": "RKN",
       "cores": [
-        "HOL",
+        "SUR",
         "RKN"
       ],
       "owner": "RKN"
@@ -2854,7 +3155,7 @@
     "NL_MRG_c127cb50cada": {
       "controller": "RKN",
       "cores": [
-        "HOL",
+        "SUR",
         "RKN"
       ],
       "owner": "RKN"
@@ -2862,7 +3163,7 @@
     "NL_MRG_cfd8aead1a35": {
       "controller": "RKN",
       "cores": [
-        "HOL",
+        "SUR",
         "RKN"
       ],
       "owner": "RKN"
@@ -2870,7 +3171,7 @@
     "NL_MRG_dfb52b5927e9": {
       "controller": "RKN",
       "cores": [
-        "HOL",
+        "SUR",
         "RKN"
       ],
       "owner": "RKN"
@@ -2937,6 +3238,20 @@
         "RKNO"
       ],
       "owner": "RKNO"
+    },
+    "PAK-1113": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
+    },
+    "PAK-1114": {
+      "controller": "RAJ",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "RAJ"
     },
     "PL_MRG_05f1ad6eedaa": {
       "controller": "RKP",
@@ -3168,11 +3483,11 @@
       "owner": "RKM"
     },
     "RU_MRG_0693730687b9": {
-      "controller": "WRS",
+      "controller": "KOM",
       "cores": [
-        "WRS"
+        "KOM"
       ],
-      "owner": "WRS"
+      "owner": "KOM"
     },
     "RU_MRG_070e676051d2": {
       "controller": "NOV",
@@ -3224,11 +3539,11 @@
       "owner": "TOM"
     },
     "RU_MRG_0d726a437af0": {
-      "controller": "ZLT",
+      "controller": "PRM",
       "cores": [
-        "ZLT"
+        "PRM"
       ],
-      "owner": "ZLT"
+      "owner": "PRM"
     },
     "RU_MRG_0e93885d5cdc": {
       "controller": "OUR",
@@ -3252,18 +3567,18 @@
       "owner": "VYT"
     },
     "RU_MRG_10f0f86a91af": {
-      "controller": "SBA",
+      "controller": "IRK",
       "cores": [
-        "SBA"
+        "IRK"
       ],
-      "owner": "SBA"
+      "owner": "IRK"
     },
     "RU_MRG_12b2bddafaa1": {
-      "controller": "SVR",
+      "controller": "TYM",
       "cores": [
-        "SVR"
+        "TYM"
       ],
-      "owner": "SVR"
+      "owner": "TYM"
     },
     "RU_MRG_13fef5f74a14": {
       "controller": "RKM",
@@ -3294,11 +3609,11 @@
       "owner": "RKM"
     },
     "RU_MRG_194bb325d1de": {
-      "controller": "RKM",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "RKM"
+      "owner": "VOL"
     },
     "RU_MRG_1976f6232412": {
       "controller": "RKK",
@@ -3322,11 +3637,11 @@
       "owner": "RKM"
     },
     "RU_MRG_1dafa9ab0c1a": {
-      "controller": "VYT",
+      "controller": "BKR",
       "cores": [
-        "VYT"
+        "BKR"
       ],
-      "owner": "VYT"
+      "owner": "BKR"
     },
     "RU_MRG_1ff20bc12a63": {
       "controller": "MAN",
@@ -3343,11 +3658,11 @@
       "owner": "RKK"
     },
     "RU_MRG_21258bfc1110": {
-      "controller": "RKM",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "RKM"
+      "owner": "VOL"
     },
     "RU_MRG_21f622bb3b2b": {
       "controller": "RKM",
@@ -3364,11 +3679,11 @@
       "owner": "NOV"
     },
     "RU_MRG_25fe3261ce8f": {
-      "controller": "ALT",
+      "controller": "KRS",
       "cores": [
-        "ALT"
+        "KRS"
       ],
-      "owner": "ALT"
+      "owner": "KRS"
     },
     "RU_MRG_2722edc6e6c6": {
       "controller": "RUR",
@@ -3392,25 +3707,25 @@
       "owner": "KOM"
     },
     "RU_MRG_2944a9264c44": {
-      "controller": "MAG",
+      "controller": "URL",
       "cores": [
-        "OUR"
+        "URL"
       ],
-      "owner": "MAG"
+      "owner": "URL"
     },
     "RU_MRG_29478c5fffa6": {
-      "controller": "RUR",
+      "controller": "KRS",
       "cores": [
-        "RUR"
+        "KRS"
       ],
-      "owner": "RUR"
+      "owner": "KRS"
     },
     "RU_MRG_2953c850d23a": {
-      "controller": "NOV",
+      "controller": "ALT",
       "cores": [
-        "NOV"
+        "ALT"
       ],
-      "owner": "NOV"
+      "owner": "ALT"
     },
     "RU_MRG_2abe6bddb595": {
       "controller": "CHT",
@@ -3420,11 +3735,11 @@
       "owner": "CHT"
     },
     "RU_MRG_2b95a26406ca": {
-      "controller": "SVR",
+      "controller": "ZLT",
       "cores": [
-        "SVR"
+        "ZLT"
       ],
-      "owner": "SVR"
+      "owner": "ZLT"
     },
     "RU_MRG_2cfe9a40e9b7": {
       "controller": "RKM",
@@ -3462,11 +3777,11 @@
       "owner": "MAN"
     },
     "RU_MRG_3051f8fc54f7": {
-      "controller": "SAM",
+      "controller": "ORN",
       "cores": [
-        "SAM"
+        "ORN"
       ],
-      "owner": "SAM"
+      "owner": "ORN"
     },
     "RU_MRG_317bc293c6ec": {
       "controller": "OMS",
@@ -3476,18 +3791,18 @@
       "owner": "OMS"
     },
     "RU_MRG_32d32da1ff70": {
-      "controller": "ALT",
+      "controller": "SBA",
       "cores": [
-        "ALT"
+        "SBA"
       ],
-      "owner": "ALT"
+      "owner": "SBA"
     },
     "RU_MRG_333dbd033786": {
-      "controller": "BKR",
+      "controller": "GAY",
       "cores": [
-        "BKR"
+        "GAY"
       ],
-      "owner": "BKR"
+      "owner": "GAY"
     },
     "RU_MRG_352ca37aab63": {
       "controller": "RKM",
@@ -3525,18 +3840,18 @@
       "owner": "RKM"
     },
     "RU_MRG_392ec3a802cd": {
-      "controller": "MAG",
+      "controller": "MGN",
       "cores": [
         "OUR"
       ],
-      "owner": "MAG"
+      "owner": "MGN"
     },
     "RU_MRG_3937e6a0a228": {
-      "controller": "VYT",
+      "controller": "PRM",
       "cores": [
-        "VYT"
+        "PRM"
       ],
-      "owner": "VYT"
+      "owner": "PRM"
     },
     "RU_MRG_39c0ca250c57": {
       "controller": "IRK",
@@ -3560,11 +3875,11 @@
       "owner": "RKM"
     },
     "RU_MRG_3ca144c1d18a": {
-      "controller": "TAT",
+      "controller": "VYT",
       "cores": [
-        "TAT"
+        "VYT"
       ],
-      "owner": "TAT"
+      "owner": "VYT"
     },
     "RU_MRG_3d5ebfb76db3": {
       "controller": "RKK",
@@ -3581,11 +3896,11 @@
       "owner": "RKM"
     },
     "RU_MRG_3f321dca003c": {
-      "controller": "ZLT",
+      "controller": "PRM",
       "cores": [
-        "ZLT"
+        "PRM"
       ],
-      "owner": "ZLT"
+      "owner": "PRM"
     },
     "RU_MRG_4177d5ccfc4d": {
       "controller": "FIN",
@@ -3595,18 +3910,18 @@
       "owner": "FIN"
     },
     "RU_MRG_421f6b2285d7": {
-      "controller": "RKU",
+      "controller": "RKM",
       "cores": [
-        "RKU"
+        "RKM"
       ],
-      "owner": "RKU"
+      "owner": "RKM"
     },
     "RU_MRG_427102c526cb": {
-      "controller": "ZLT",
+      "controller": "PRM",
       "cores": [
-        "ZLT"
+        "PRM"
       ],
-      "owner": "ZLT"
+      "owner": "PRM"
     },
     "RU_MRG_43641c4798c6": {
       "controller": "SVR",
@@ -3707,18 +4022,18 @@
       "owner": "SBA"
     },
     "RU_MRG_4a2de1a12369": {
-      "controller": "GOR",
+      "controller": "TAT",
       "cores": [
-        "RKM"
+        "TAT"
       ],
-      "owner": "GOR"
+      "owner": "TAT"
     },
     "RU_MRG_4b5d89b2801b": {
-      "controller": "GOR",
+      "controller": "TAT",
       "cores": [
-        "RKM"
+        "TAT"
       ],
-      "owner": "GOR"
+      "owner": "TAT"
     },
     "RU_MRG_4b9b280cad80": {
       "controller": "TOM",
@@ -3749,25 +4064,25 @@
       "owner": "FIN"
     },
     "RU_MRG_510edc918f57": {
+      "controller": "KOM",
+      "cores": [
+        "KOM"
+      ],
+      "owner": "KOM"
+    },
+    "RU_MRG_5152587ee975": {
       "controller": "VOL",
       "cores": [
         "VOL"
       ],
       "owner": "VOL"
     },
-    "RU_MRG_5152587ee975": {
-      "controller": "RKM",
-      "cores": [
-        "RKM"
-      ],
-      "owner": "RKM"
-    },
     "RU_MRG_52b3b8d7dc12": {
-      "controller": "TAN",
+      "controller": "PRC",
       "cores": [
-        "TAN"
+        "PRC"
       ],
-      "owner": "TAN"
+      "owner": "PRC"
     },
     "RU_MRG_54883923bf50": {
       "controller": "SVR",
@@ -3777,11 +4092,11 @@
       "owner": "SVR"
     },
     "RU_MRG_54d291c64dfc": {
-      "controller": "ZLT",
+      "controller": "GAY",
       "cores": [
-        "ZLT"
+        "GAY"
       ],
-      "owner": "ZLT"
+      "owner": "GAY"
     },
     "RU_MRG_54f19a93b9db": {
       "controller": "MAN",
@@ -3819,18 +4134,18 @@
       "owner": "RKM"
     },
     "RU_MRG_56d7f2c40815": {
-      "controller": "RKM",
+      "controller": "RKO",
       "cores": [
-        "RKM"
+        "RKO"
       ],
-      "owner": "RKM"
+      "owner": "RKO"
     },
     "RU_MRG_56ed27ec6e18": {
-      "controller": "SAM",
+      "controller": "BKR",
       "cores": [
-        "SAM"
+        "BKR"
       ],
-      "owner": "SAM"
+      "owner": "BKR"
     },
     "RU_MRG_57d8687f784e": {
       "controller": "RKM",
@@ -3917,11 +4232,11 @@
       "owner": "RKK"
     },
     "RU_MRG_60a416f16ad5": {
-      "controller": "RKM",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "RKM"
+      "owner": "VOL"
     },
     "RU_MRG_62d43bf78311": {
       "controller": "RKK",
@@ -4029,11 +4344,11 @@
       "owner": "CHT"
     },
     "RU_MRG_6dc9d50b794a": {
-      "controller": "RKM",
+      "controller": "RKO",
       "cores": [
         "RKO"
       ],
-      "owner": "RKM"
+      "owner": "RKO"
     },
     "RU_MRG_6df85226925c": {
       "controller": "RKK",
@@ -4043,11 +4358,11 @@
       "owner": "RKK"
     },
     "RU_MRG_6f87652d4746": {
-      "controller": "RKM",
+      "controller": "RKO",
       "cores": [
-        "RKM"
+        "RKO"
       ],
-      "owner": "RKM"
+      "owner": "RKO"
     },
     "RU_MRG_6fb6a80f7b8a": {
       "controller": "RKM",
@@ -4113,46 +4428,46 @@
       "owner": "IRK"
     },
     "RU_MRG_7425ae2cbd84": {
-      "controller": "RKM",
+      "controller": "SAM",
       "cores": [
-        "RKM"
+        "SAM"
       ],
-      "owner": "RKM"
+      "owner": "SAM"
     },
     "RU_MRG_7451af4e8c07": {
-      "controller": "TAT",
+      "controller": "VYT",
       "cores": [
-        "TAT"
+        "VYT"
       ],
-      "owner": "TAT"
+      "owner": "VYT"
     },
     "RU_MRG_75d0b3503bfa": {
-      "controller": "KOM",
+      "controller": "VYT",
       "cores": [
-        "KOM"
+        "VYT"
       ],
-      "owner": "KOM"
+      "owner": "VYT"
     },
     "RU_MRG_75e8b19921bc": {
-      "controller": "OUR",
+      "controller": "URL",
       "cores": [
-        "OUR"
+        "URL"
       ],
-      "owner": "OUR"
+      "owner": "URL"
     },
     "RU_MRG_76bad646959e": {
-      "controller": "SBA",
+      "controller": "IRK",
       "cores": [
-        "SBA"
+        "IRK"
       ],
-      "owner": "SBA"
+      "owner": "IRK"
     },
     "RU_MRG_7750087e40dd": {
-      "controller": "SVR",
+      "controller": "ZLT",
       "cores": [
-        "SVR"
+        "ZLT"
       ],
-      "owner": "SVR"
+      "owner": "ZLT"
     },
     "RU_MRG_7820c72ce322": {
       "controller": "RKK",
@@ -4267,11 +4582,11 @@
       "owner": "RKM"
     },
     "RU_MRG_82b17e00b64e": {
-      "controller": "RUR",
+      "controller": "IRK",
       "cores": [
-        "RUR"
+        "IRK"
       ],
-      "owner": "RUR"
+      "owner": "IRK"
     },
     "RU_MRG_83744c263574": {
       "controller": "FIN",
@@ -4316,25 +4631,25 @@
       "owner": "TOM"
     },
     "RU_MRG_8833cbf157a6": {
-      "controller": "RKM",
+      "controller": "SAM",
       "cores": [
-        "RKM"
+        "SAM"
       ],
-      "owner": "RKM"
+      "owner": "SAM"
     },
     "RU_MRG_884ab2e1b411": {
-      "controller": "KOM",
+      "controller": "VYT",
       "cores": [
-        "KOM"
+        "VYT"
       ],
-      "owner": "KOM"
+      "owner": "VYT"
     },
     "RU_MRG_8a04555b8e14": {
-      "controller": "TAT",
+      "controller": "VYT",
       "cores": [
-        "TAT"
+        "VYT"
       ],
-      "owner": "TAT"
+      "owner": "VYT"
     },
     "RU_MRG_8a665b108348": {
       "controller": "SAM",
@@ -4344,11 +4659,11 @@
       "owner": "SAM"
     },
     "RU_MRG_8ab72609576c": {
-      "controller": "SVR",
+      "controller": "TYM",
       "cores": [
-        "SVR"
+        "TYM"
       ],
-      "owner": "SVR"
+      "owner": "TYM"
     },
     "RU_MRG_8b55818839ef": {
       "controller": "RKM",
@@ -4393,11 +4708,11 @@
       "owner": "RUR"
     },
     "RU_MRG_91f1efdf8bc5": {
-      "controller": "GOR",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "GOR"
+      "owner": "VOL"
     },
     "RU_MRG_9444b3a17676": {
       "controller": "VYT",
@@ -4428,11 +4743,11 @@
       "owner": "RKM"
     },
     "RU_MRG_9630c25ee3c6": {
-      "controller": "RKM",
+      "controller": "RKO",
       "cores": [
-        "RKM"
+        "RKO"
       ],
-      "owner": "RKM"
+      "owner": "RKO"
     },
     "RU_MRG_96394847a7bb": {
       "controller": "RKK",
@@ -4456,25 +4771,25 @@
       "owner": "RKM"
     },
     "RU_MRG_977d68d87d87": {
-      "controller": "BKR",
+      "controller": "VYT",
       "cores": [
-        "BKR"
+        "VYT"
       ],
-      "owner": "BKR"
+      "owner": "VYT"
     },
     "RU_MRG_984ceffa7ee6": {
-      "controller": "OUR",
+      "controller": "ORN",
       "cores": [
-        "OUR"
+        "ORN"
       ],
-      "owner": "OUR"
+      "owner": "ORN"
     },
     "RU_MRG_99718fc516b9": {
-      "controller": "NOV",
+      "controller": "TOM",
       "cores": [
-        "NOV"
+        "TOM"
       ],
-      "owner": "NOV"
+      "owner": "TOM"
     },
     "RU_MRG_9a1edb58046a": {
       "controller": "RKM",
@@ -4547,11 +4862,11 @@
       "owner": "RKM"
     },
     "RU_MRG_a87b79d2be5d": {
-      "controller": "GOR",
+      "controller": "TAT",
       "cores": [
-        "GOR"
+        "TAT"
       ],
-      "owner": "GOR"
+      "owner": "TAT"
     },
     "RU_MRG_a94cbc9022fc": {
       "controller": "RKM",
@@ -4561,11 +4876,11 @@
       "owner": "RKM"
     },
     "RU_MRG_ab56c6057a73": {
-      "controller": "VOL",
+      "controller": "KOM",
       "cores": [
-        "VOL"
+        "KOM"
       ],
-      "owner": "VOL"
+      "owner": "KOM"
     },
     "RU_MRG_ab652814dff4": {
       "controller": "RKM",
@@ -4596,11 +4911,11 @@
       "owner": "RKM"
     },
     "RU_MRG_aedb5f9ed3b1": {
-      "controller": "RKM",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "RKM"
+      "owner": "VOL"
     },
     "RU_MRG_af4de1ed4f9c": {
       "controller": "OMS",
@@ -4617,32 +4932,32 @@
       "owner": "RKM"
     },
     "RU_MRG_b2d1407cd933": {
-      "controller": "OUR",
+      "controller": "ORN",
       "cores": [
-        "OUR"
+        "ORN"
       ],
-      "owner": "OUR"
+      "owner": "ORN"
     },
     "RU_MRG_b5cd1e7d4be4": {
-      "controller": "VYT",
+      "controller": "BKR",
       "cores": [
-        "VYT"
+        "BKR"
       ],
-      "owner": "VYT"
+      "owner": "BKR"
     },
     "RU_MRG_b63c46baafca": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_MRG_b706be984552": {
       "controller": "RUR",
       "cores": [
         "RUR"
       ],
       "owner": "RUR"
-    },
-    "RU_MRG_b706be984552": {
-      "controller": "ALT",
-      "cores": [
-        "ALT"
-      ],
-      "owner": "ALT"
     },
     "RU_MRG_b74b6298db8e": {
       "controller": "RKK",
@@ -4687,11 +5002,11 @@
       "owner": "CHT"
     },
     "RU_MRG_baef030e052d": {
-      "controller": "RKM",
+      "controller": "RKO",
       "cores": [
-        "RKM"
+        "RKO"
       ],
-      "owner": "RKM"
+      "owner": "RKO"
     },
     "RU_MRG_bb701cc86b7c": {
       "controller": "SVR",
@@ -4764,11 +5079,11 @@
       "owner": "MAN"
     },
     "RU_MRG_bfc2cf574a56": {
-      "controller": "RKM",
+      "controller": "SAM",
       "cores": [
-        "RKM"
+        "SAM"
       ],
-      "owner": "RKM"
+      "owner": "SAM"
     },
     "RU_MRG_c3b410784a1f": {
       "controller": "RKM",
@@ -4792,11 +5107,11 @@
       "owner": "RKK"
     },
     "RU_MRG_c49d8cb805dc": {
-      "controller": "BKR",
+      "controller": "VYT",
       "cores": [
-        "BKR"
+        "VYT"
       ],
-      "owner": "BKR"
+      "owner": "VYT"
     },
     "RU_MRG_c60bafc0ae96": {
       "controller": "RKM",
@@ -4806,11 +5121,11 @@
       "owner": "RKM"
     },
     "RU_MRG_c663e09bf172": {
-      "controller": "RKM",
+      "controller": "SAM",
       "cores": [
-        "RKM"
+        "SAM"
       ],
-      "owner": "RKM"
+      "owner": "SAM"
     },
     "RU_MRG_c68b90a156ce": {
       "controller": "RKM",
@@ -4855,11 +5170,11 @@
       "owner": "NOV"
     },
     "RU_MRG_cabe21f75eb0": {
-      "controller": "RKM",
+      "controller": "SAM",
       "cores": [
-        "RKM"
+        "SAM"
       ],
-      "owner": "RKM"
+      "owner": "SAM"
     },
     "RU_MRG_cb687e18e225": {
       "controller": "OMS",
@@ -4869,18 +5184,18 @@
       "owner": "OMS"
     },
     "RU_MRG_cb7ab64b43b7": {
-      "controller": "RKM",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "RKM"
+      "owner": "VOL"
     },
     "RU_MRG_cd478b5a76eb": {
-      "controller": "RKM",
+      "controller": "RKO",
       "cores": [
         "RKO"
       ],
-      "owner": "RKM"
+      "owner": "RKO"
     },
     "RU_MRG_d12c5659178e": {
       "controller": "OMS",
@@ -4911,11 +5226,11 @@
       "owner": "RKM"
     },
     "RU_MRG_d5519e91a94b": {
-      "controller": "OMS",
+      "controller": "TYM",
       "cores": [
-        "OMS"
+        "TYM"
       ],
-      "owner": "OMS"
+      "owner": "TYM"
     },
     "RU_MRG_d665fd9ba683": {
       "controller": "RKM",
@@ -4932,11 +5247,11 @@
       "owner": "ORN"
     },
     "RU_MRG_d6b32b8b244a": {
-      "controller": "KRS",
+      "controller": "SBA",
       "cores": [
-        "KRS"
+        "SBA"
       ],
-      "owner": "KRS"
+      "owner": "SBA"
     },
     "RU_MRG_d6e7399b8ed9": {
       "controller": "RKM",
@@ -4946,18 +5261,18 @@
       "owner": "RKM"
     },
     "RU_MRG_d7ef4389d36f": {
-      "controller": "SVR",
+      "controller": "TYM",
       "cores": [
-        "SVR"
+        "TYM"
       ],
-      "owner": "SVR"
+      "owner": "TYM"
     },
     "RU_MRG_d7f648c07bd4": {
-      "controller": "RKM",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "RKM"
+      "owner": "VOL"
     },
     "RU_MRG_d860090dc575": {
       "controller": "YAK",
@@ -4988,11 +5303,11 @@
       "owner": "ORN"
     },
     "RU_MRG_dafab256f046": {
-      "controller": "SVR",
+      "controller": "ZLT",
       "cores": [
-        "SVR"
+        "ZLT"
       ],
-      "owner": "SVR"
+      "owner": "ZLT"
     },
     "RU_MRG_dafefaea8cbc": {
       "controller": "SVR",
@@ -5030,11 +5345,11 @@
       "owner": "RKK"
     },
     "RU_MRG_dfc881d403c4": {
-      "controller": "SVR",
+      "controller": "TYM",
       "cores": [
-        "SVR"
+        "TYM"
       ],
-      "owner": "SVR"
+      "owner": "TYM"
     },
     "RU_MRG_dfe6c1e5f415": {
       "controller": "RKM",
@@ -5044,32 +5359,32 @@
       "owner": "RKM"
     },
     "RU_MRG_e00f867dd81d": {
-      "controller": "RKM",
+      "controller": "SAM",
       "cores": [
-        "RKM"
+        "SAM"
       ],
-      "owner": "RKM"
+      "owner": "SAM"
     },
     "RU_MRG_e03e6af00269": {
-      "controller": "RUR",
+      "controller": "KRS",
       "cores": [
-        "RUR"
+        "KRS"
       ],
-      "owner": "RUR"
+      "owner": "KRS"
     },
     "RU_MRG_e0a377c11b7b": {
-      "controller": "VOL",
+      "controller": "KOM",
       "cores": [
-        "VOL"
+        "KOM"
       ],
-      "owner": "VOL"
+      "owner": "KOM"
     },
     "RU_MRG_e0ee40fde9b4": {
-      "controller": "RUR",
+      "controller": "IRK",
       "cores": [
-        "RUR"
+        "IRK"
       ],
-      "owner": "RUR"
+      "owner": "IRK"
     },
     "RU_MRG_e275078969d8": {
       "controller": "TYM",
@@ -5079,11 +5394,11 @@
       "owner": "TYM"
     },
     "RU_MRG_e472f12334cb": {
-      "controller": "VYT",
+      "controller": "PRM",
       "cores": [
-        "VYT"
+        "PRM"
       ],
-      "owner": "VYT"
+      "owner": "PRM"
     },
     "RU_MRG_e5e9822050ff": {
       "controller": "RKM",
@@ -5107,11 +5422,11 @@
       "owner": "RKM"
     },
     "RU_MRG_e85ce6b2cbb5": {
-      "controller": "RKM",
+      "controller": "RKO",
       "cores": [
-        "RKM"
+        "RKO"
       ],
-      "owner": "RKM"
+      "owner": "RKO"
     },
     "RU_MRG_e9567e283174": {
       "controller": "RKM",
@@ -5121,18 +5436,18 @@
       "owner": "RKM"
     },
     "RU_MRG_e9b55eb4987e": {
-      "controller": "SAM",
+      "controller": "BKR",
       "cores": [
-        "SAM"
+        "BKR"
       ],
-      "owner": "SAM"
+      "owner": "BKR"
     },
     "RU_MRG_eb6edd92ee8d": {
-      "controller": "FIC",
+      "controller": "MAN",
       "cores": [
-        "FIC"
+        "MAN"
       ],
-      "owner": "FIC"
+      "owner": "MAN"
     },
     "RU_MRG_ebc5961355f4": {
       "controller": "SBA",
@@ -5177,18 +5492,18 @@
       "owner": "RKK"
     },
     "RU_MRG_f27518461032": {
-      "controller": "OMS",
+      "controller": "TYM",
       "cores": [
-        "OMS"
+        "TYM"
       ],
-      "owner": "OMS"
+      "owner": "TYM"
     },
     "RU_MRG_f38bf2291525": {
-      "controller": "CHT",
+      "controller": "BRY",
       "cores": [
-        "CHT"
+        "BRY"
       ],
-      "owner": "CHT"
+      "owner": "BRY"
     },
     "RU_MRG_f3d2b13e0b30": {
       "controller": "BKR",
@@ -5205,18 +5520,18 @@
       "owner": "RKM"
     },
     "RU_MRG_f47338e16e14": {
-      "controller": "ZLT",
+      "controller": "PRM",
       "cores": [
-        "ZLT"
+        "PRM"
       ],
-      "owner": "ZLT"
+      "owner": "PRM"
     },
     "RU_MRG_f5d0364a5d76": {
-      "controller": "GOR",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "GOR"
+      "owner": "VOL"
     },
     "RU_MRG_f6312a148f5b": {
       "controller": "BRY",
@@ -5240,11 +5555,11 @@
       "owner": "RKK"
     },
     "RU_MRG_f7a972994e86": {
-      "controller": "GOR",
+      "controller": "TAT",
       "cores": [
-        "GOR"
+        "TAT"
       ],
-      "owner": "GOR"
+      "owner": "TAT"
     },
     "RU_MRG_f84bc369d8b3": {
       "controller": "RKU",
@@ -5261,11 +5576,11 @@
       "owner": "RKK"
     },
     "RU_MRG_fc10904ad88d": {
-      "controller": "SVR",
+      "controller": "URL",
       "cores": [
-        "SVR"
+        "URL"
       ],
-      "owner": "SVR"
+      "owner": "URL"
     },
     "RU_MRG_fdf63a493917": {
       "controller": "RKM",
@@ -5275,11 +5590,18 @@
       "owner": "RKM"
     },
     "RU_MRG_fec102300fdc": {
-      "controller": "RKM",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "RKM"
+      "owner": "VOL"
+    },
+    "RU_RAY_50074027B10379539839705": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
     },
     "RU_RAY_50074027B10379539839705__tno1962_1": {
       "controller": "TOM",
@@ -5288,19 +5610,131 @@
       ],
       "owner": "TOM"
     },
+    "RU_RAY_50074027B10637268431448": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_RAY_50074027B11359862812061": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
     "RU_RAY_50074027B11628373622146": {
-      "controller": "MAG",
+      "controller": "MGN",
       "cores": [
         "OUR"
       ],
-      "owner": "MAG"
+      "owner": "MGN"
+    },
+    "RU_RAY_50074027B11673707761487": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B118068330623": {
+      "controller": "BKR",
+      "cores": [
+        "BKR"
+      ],
+      "owner": "BKR"
+    },
+    "RU_RAY_50074027B12942583135720": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "RU_RAY_50074027B13114681801765": {
+      "controller": "AMR",
+      "cores": [
+        "AMR"
+      ],
+      "owner": "AMR"
+    },
+    "RU_RAY_50074027B13440984713855": {
+      "controller": "IRK",
+      "cores": [
+        "IRK"
+      ],
+      "owner": "IRK"
     },
     "RU_RAY_50074027B1349259071180": {
-      "controller": "ORS",
+      "controller": "URL",
       "cores": [
-        "OUR"
+        "URL"
       ],
-      "owner": "ORS"
+      "owner": "URL"
+    },
+    "RU_RAY_50074027B14701566742636": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_RAY_50074027B1492213945391": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_RAY_50074027B15396054994341": {
+      "controller": "KAZ",
+      "cores": [
+        "KAZ"
+      ],
+      "owner": "KAZ"
+    },
+    "RU_RAY_50074027B15397659710293": {
+      "controller": "ORN",
+      "cores": [
+        "ORN"
+      ],
+      "owner": "ORN"
+    },
+    "RU_RAY_50074027B15858077100993": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B15861675069153": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B15872482411826": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B1644674550414": {
+      "controller": "BOP",
+      "cores": [
+        "BOP"
+      ],
+      "owner": "BOP"
+    },
+    "RU_RAY_50074027B16848587825379": {
+      "controller": "YAK",
+      "cores": [
+        "YAK"
+      ],
+      "owner": "YAK"
     },
     "RU_RAY_50074027B16928982325503": {
       "controller": "ORS",
@@ -5309,19 +5743,89 @@
       ],
       "owner": "ORS"
     },
+    "RU_RAY_50074027B17337160846160": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_RAY_50074027B17917543280875": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B18276413342266": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B18690673383913": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B18749905524628": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_RAY_50074027B18760987875066": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_RAY_50074027B19670057495733": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_RAY_50074027B21050205315965": {
+      "controller": "VOK",
+      "cores": [
+        "VOK"
+      ],
+      "owner": "VOK"
+    },
+    "RU_RAY_50074027B21335467742043": {
+      "controller": "FAV",
+      "cores": [
+        "FAV"
+      ],
+      "owner": "FAV"
+    },
     "RU_RAY_50074027B21488641063420": {
-      "controller": "MAG",
+      "controller": "MGN",
       "cores": [
         "OUR"
       ],
-      "owner": "MAG"
+      "owner": "MGN"
+    },
+    "RU_RAY_50074027B21560944858055": {
+      "controller": "TYM",
+      "cores": [
+        "TYM"
+      ],
+      "owner": "TYM"
     },
     "RU_RAY_50074027B22575347101555": {
-      "controller": "MAG",
+      "controller": "MGN",
       "cores": [
         "OUR"
       ],
-      "owner": "MAG"
+      "owner": "MGN"
     },
     "RU_RAY_50074027B23063195205268": {
       "cores": [
@@ -5329,12 +5833,40 @@
       ],
       "owner": "KRS"
     },
-    "RU_RAY_50074027B2401368915177": {
-      "controller": "PFC",
+    "RU_RAY_50074027B23127585958078": {
+      "controller": "RUR",
       "cores": [
-        "PFC"
+        "RUR"
       ],
-      "owner": "PFC"
+      "owner": "RUR"
+    },
+    "RU_RAY_50074027B2325947694706": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B23262720042196": {
+      "controller": "FAV",
+      "cores": [
+        "FAV"
+      ],
+      "owner": "FAV"
+    },
+    "RU_RAY_50074027B23799547406598": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_RAY_50074027B2401368915177": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
     },
     "RU_RAY_50074027B24150612748554": {
       "controller": "ORN",
@@ -5343,11 +5875,95 @@
       ],
       "owner": "ORN"
     },
+    "RU_RAY_50074027B24324052900188": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B24884281398381": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B2598774008896": {
+      "controller": "KRS",
+      "cores": [
+        "KRS"
+      ],
+      "owner": "KRS"
+    },
+    "RU_RAY_50074027B26230494769673": {
+      "controller": "BRY",
+      "cores": [
+        "BRY"
+      ],
+      "owner": "BRY"
+    },
     "RU_RAY_50074027B26247941998925": {
       "cores": [
         "WRS"
       ],
       "owner": "WRS"
+    },
+    "RU_RAY_50074027B27046027245969": {
+      "controller": "IRK",
+      "cores": [
+        "IRK"
+      ],
+      "owner": "IRK"
+    },
+    "RU_RAY_50074027B27094742199405": {
+      "controller": "VOK",
+      "cores": [
+        "VOK"
+      ],
+      "owner": "VOK"
+    },
+    "RU_RAY_50074027B27198107294682": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B27229100203359": {
+      "controller": "KRS",
+      "cores": [
+        "KRS"
+      ],
+      "owner": "KRS"
+    },
+    "RU_RAY_50074027B27848812268076": {
+      "controller": "KRS",
+      "cores": [
+        "KRS"
+      ],
+      "owner": "KRS"
+    },
+    "RU_RAY_50074027B27944222822029": {
+      "controller": "KRS",
+      "cores": [
+        "KRS"
+      ],
+      "owner": "KRS"
+    },
+    "RU_RAY_50074027B28372878802412": {
+      "controller": "NOV",
+      "cores": [
+        "NOV"
+      ],
+      "owner": "NOV"
+    },
+    "RU_RAY_50074027B28435030643524": {
+      "controller": "SBA",
+      "cores": [
+        "SBA"
+      ],
+      "owner": "SBA"
     },
     "RU_RAY_50074027B28606060123578": {
       "controller": "SVR",
@@ -5363,6 +5979,27 @@
       ],
       "owner": "BOP"
     },
+    "RU_RAY_50074027B28971786615675": {
+      "controller": "FAV",
+      "cores": [
+        "FAV"
+      ],
+      "owner": "FAV"
+    },
+    "RU_RAY_50074027B29205817441204": {
+      "controller": "YAK",
+      "cores": [
+        "YAK"
+      ],
+      "owner": "YAK"
+    },
+    "RU_RAY_50074027B29535697880201": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
     "RU_RAY_50074027B30219941944137": {
       "controller": "BOP",
       "cores": [
@@ -5371,11 +6008,11 @@
       "owner": "BOP"
     },
     "RU_RAY_50074027B3022028163112": {
-      "controller": "PFC",
+      "controller": "OMO",
       "cores": [
-        "PFC"
+        "OMO"
       ],
-      "owner": "PFC"
+      "owner": "OMO"
     },
     "RU_RAY_50074027B3033714852105": {
       "controller": "ORS",
@@ -5391,12 +6028,26 @@
       ],
       "owner": "RKK"
     },
+    "RU_RAY_50074027B30864735873510": {
+      "controller": "FAV",
+      "cores": [
+        "FAV"
+      ],
+      "owner": "FAV"
+    },
     "RU_RAY_50074027B31496942337081": {
       "controller": "SVR",
       "cores": [
         "SVR"
       ],
       "owner": "BOP"
+    },
+    "RU_RAY_50074027B31853797856912": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
     },
     "RU_RAY_50074027B32234523409019": {
       "controller": "ORN",
@@ -5405,12 +6056,82 @@
       ],
       "owner": "ORN"
     },
+    "RU_RAY_50074027B32599021943629": {
+      "controller": "TYM",
+      "cores": [
+        "TYM"
+      ],
+      "owner": "TYM"
+    },
+    "RU_RAY_50074027B32782787425978": {
+      "controller": "WRS",
+      "cores": [
+        "WRS"
+      ],
+      "owner": "WRS"
+    },
+    "RU_RAY_50074027B33321279608248": {
+      "controller": "YAK",
+      "cores": [
+        "YAK"
+      ],
+      "owner": "YAK"
+    },
+    "RU_RAY_50074027B33340525070478": {
+      "controller": "MAG",
+      "cores": [
+        "MAG"
+      ],
+      "owner": "MAG"
+    },
+    "RU_RAY_50074027B33581045729564": {
+      "controller": "IRK",
+      "cores": [
+        "IRK"
+      ],
+      "owner": "IRK"
+    },
+    "RU_RAY_50074027B34679445513717": {
+      "controller": "BKR",
+      "cores": [
+        "BKR"
+      ],
+      "owner": "BKR"
+    },
     "RU_RAY_50074027B34738491600615": {
       "controller": "BOP",
       "cores": [
         "OUR"
       ],
       "owner": "BOP"
+    },
+    "RU_RAY_50074027B35283992627642": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_RAY_50074027B3624981658238": {
+      "controller": "AMR",
+      "cores": [
+        "AMR"
+      ],
+      "owner": "AMR"
+    },
+    "RU_RAY_50074027B36737161681879": {
+      "controller": "ALT",
+      "cores": [
+        "ALT"
+      ],
+      "owner": "ALT"
+    },
+    "RU_RAY_50074027B36818181528757": {
+      "controller": "TYM",
+      "cores": [
+        "TYM"
+      ],
+      "owner": "TYM"
     },
     "RU_RAY_50074027B36993675567197": {
       "controller": "ORS",
@@ -5420,31 +6141,88 @@
       "owner": "ORS"
     },
     "RU_RAY_50074027B39041476138502": {
-      "controller": "ONG",
-      "cores": [
-        "RKM"
-      ],
-      "owner": "ONG"
-    },
-    "RU_RAY_50074027B40271227634983": {
-      "controller": "MAG",
-      "cores": [
-        "OUR"
-      ],
-      "owner": "MAG"
-    },
-    "RU_RAY_50074027B40536112899816": {
-      "cores": [
-        "SAM"
-      ],
-      "owner": "SAM"
-    },
-    "RU_RAY_50074027B41643930675404": {
-      "controller": "ONG",
+      "controller": "WRS",
       "cores": [
         "WRS"
       ],
-      "owner": "ONG"
+      "owner": "WRS"
+    },
+    "RU_RAY_50074027B39292814865227": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B40112285502062": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B40271227634983": {
+      "controller": "MGN",
+      "cores": [
+        "OUR"
+      ],
+      "owner": "MGN"
+    },
+    "RU_RAY_50074027B40310096212326": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B40536112899816": {
+      "controller": "ORN",
+      "cores": [
+        "ORN"
+      ],
+      "owner": "ORN"
+    },
+    "RU_RAY_50074027B40753977825415": {
+      "controller": "MAG",
+      "cores": [
+        "MAG"
+      ],
+      "owner": "MAG"
+    },
+    "RU_RAY_50074027B41432383086059": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B41643930675404": {
+      "controller": "WRS",
+      "cores": [
+        "WRS"
+      ],
+      "owner": "WRS"
+    },
+    "RU_RAY_50074027B41842513634160": {
+      "controller": "PRM",
+      "cores": [
+        "PRM"
+      ],
+      "owner": "PRM"
+    },
+    "RU_RAY_50074027B42449829895110": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "RU_RAY_50074027B42619686972132": {
+      "controller": "SBA",
+      "cores": [
+        "SBA"
+      ],
+      "owner": "SBA"
     },
     "RU_RAY_50074027B42720608112791": {
       "cores": [
@@ -5452,12 +6230,26 @@
       ],
       "owner": "VOL"
     },
+    "RU_RAY_50074027B42772585169334": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
     "RU_RAY_50074027B42894474720971": {
       "controller": "ORS",
       "cores": [
         "OUR"
       ],
       "owner": "ORS"
+    },
+    "RU_RAY_50074027B44152060141244": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
     },
     "RU_RAY_50074027B44738927608854": {
       "controller": "SVR",
@@ -5473,12 +6265,47 @@
       ],
       "owner": "ORS"
     },
+    "RU_RAY_50074027B45070384031046": {
+      "controller": "YAK",
+      "cores": [
+        "YAK"
+      ],
+      "owner": "YAK"
+    },
     "RU_RAY_50074027B45493241507504": {
       "controller": "ONG",
       "cores": [
         "RKM"
       ],
       "owner": "ONG"
+    },
+    "RU_RAY_50074027B45607076105456": {
+      "controller": "TAT",
+      "cores": [
+        "TAT"
+      ],
+      "owner": "TAT"
+    },
+    "RU_RAY_50074027B46415378872622": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "RU_RAY_50074027B47797242403348": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B49278461872326": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
     },
     "RU_RAY_50074027B49390035135032": {
       "controller": "ONG",
@@ -5487,6 +6314,13 @@
       ],
       "owner": "ONG"
     },
+    "RU_RAY_50074027B50212076410442": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
     "RU_RAY_50074027B51176471238152": {
       "controller": "ONG",
       "cores": [
@@ -5494,18 +6328,68 @@
       ],
       "owner": "ONG"
     },
+    "RU_RAY_50074027B5223158268211": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B5244237471572": {
+      "controller": "BKR",
+      "cores": [
+        "BKR"
+      ],
+      "owner": "BKR"
+    },
+    "RU_RAY_50074027B52585131638206": {
+      "controller": "AMR",
+      "cores": [
+        "AMR"
+      ],
+      "owner": "AMR"
+    },
     "RU_RAY_50074027B5291843877359": {
-      "controller": "ONG",
+      "controller": "WRS",
       "cores": [
         "WRS"
       ],
-      "owner": "ONG"
+      "owner": "WRS"
+    },
+    "RU_RAY_50074027B53092921168880": {
+      "controller": "IRK",
+      "cores": [
+        "IRK"
+      ],
+      "owner": "IRK"
+    },
+    "RU_RAY_50074027B5428684796200": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B54524544237793": {
+      "controller": "FAV",
+      "cores": [
+        "FAV"
+      ],
+      "owner": "FAV"
+    },
+    "RU_RAY_50074027B55367485598669": {
+      "controller": "URL",
+      "cores": [
+        "URL"
+      ],
+      "owner": "URL"
     },
     "RU_RAY_50074027B5573235052647": {
+      "controller": "TAT",
       "cores": [
-        "GOR"
+        "TAT"
       ],
-      "owner": "GOR"
+      "owner": "TAT"
     },
     "RU_RAY_50074027B55874149600418": {
       "controller": "ORS",
@@ -5528,18 +6412,179 @@
       ],
       "owner": "ORS"
     },
+    "RU_RAY_50074027B56311400642429": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B5631740772865": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B56678877765671": {
+      "controller": "WRS",
+      "cores": [
+        "WRS"
+      ],
+      "owner": "WRS"
+    },
+    "RU_RAY_50074027B56747088904047": {
+      "controller": "VYT",
+      "cores": [
+        "VYT"
+      ],
+      "owner": "VYT"
+    },
+    "RU_RAY_50074027B57067541625780": {
+      "controller": "TAT",
+      "cores": [
+        "TAT"
+      ],
+      "owner": "TAT"
+    },
+    "RU_RAY_50074027B57393083089327": {
+      "controller": "KRS",
+      "cores": [
+        "KRS"
+      ],
+      "owner": "KRS"
+    },
+    "RU_RAY_50074027B57421544908828": {
+      "controller": "BOP",
+      "cores": [
+        "BOP"
+      ],
+      "owner": "BOP"
+    },
+    "RU_RAY_50074027B57985783040710": {
+      "controller": "MAG",
+      "cores": [
+        "MAG"
+      ],
+      "owner": "MAG"
+    },
+    "RU_RAY_50074027B58076034090645": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B58285687326194": {
+      "controller": "BOP",
+      "cores": [
+        "BOP"
+      ],
+      "owner": "BOP"
+    },
+    "RU_RAY_50074027B58575735972897": {
+      "controller": "YAK",
+      "cores": [
+        "YAK"
+      ],
+      "owner": "YAK"
+    },
     "RU_RAY_50074027B58613203253678": {
       "cores": [
         "RKK"
       ],
       "owner": "RKK"
     },
-    "RU_RAY_50074027B60413300894613": {
-      "controller": "MAG",
+    "RU_RAY_50074027B59094736613024": {
+      "controller": "BRY",
       "cores": [
-        "MAG"
+        "BRY"
       ],
-      "owner": "MAG"
+      "owner": "BRY"
+    },
+    "RU_RAY_50074027B59412945992369": {
+      "controller": "KOM",
+      "cores": [
+        "KOM"
+      ],
+      "owner": "KOM"
+    },
+    "RU_RAY_50074027B59423174958471": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B59835640460134": {
+      "controller": "AMR",
+      "cores": [
+        "AMR"
+      ],
+      "owner": "AMR"
+    },
+    "RU_RAY_50074027B60091493242386": {
+      "controller": "PRM",
+      "cores": [
+        "PRM"
+      ],
+      "owner": "PRM"
+    },
+    "RU_RAY_50074027B60413300894613": {
+      "controller": "URL",
+      "cores": [
+        "URL"
+      ],
+      "owner": "URL"
+    },
+    "RU_RAY_50074027B60606739466906": {
+      "controller": "ONG",
+      "cores": [
+        "ONG"
+      ],
+      "owner": "ONG"
+    },
+    "RU_RAY_50074027B61183763679661": {
+      "controller": "ORS",
+      "cores": [
+        "ORS"
+      ],
+      "owner": "ORS"
+    },
+    "RU_RAY_50074027B61219657375498": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_RAY_50074027B61486865886735": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B61732353469918": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B62478008051708": {
+      "controller": "PRC",
+      "cores": [
+        "PRC"
+      ],
+      "owner": "PRC"
+    },
+    "RU_RAY_50074027B62501748698742": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
     },
     "RU_RAY_50074027B62555187301125": {
       "controller": "ORS",
@@ -5548,12 +6593,96 @@
       ],
       "owner": "ORS"
     },
+    "RU_RAY_50074027B62612106128387": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_RAY_50074027B62743108472351": {
+      "controller": "AMR",
+      "cores": [
+        "AMR"
+      ],
+      "owner": "AMR"
+    },
+    "RU_RAY_50074027B64035112017093": {
+      "controller": "IRK",
+      "cores": [
+        "IRK"
+      ],
+      "owner": "IRK"
+    },
+    "RU_RAY_50074027B64055482679717": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B64075323117418": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_RAY_50074027B64298708996780": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
+    "RU_RAY_50074027B64424707524567": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B65009722286705": {
+      "controller": "KOM",
+      "cores": [
+        "KOM"
+      ],
+      "owner": "KOM"
+    },
+    "RU_RAY_50074027B65236051616648": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B65892523893476": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B66038221919497": {
+      "controller": "MAG",
+      "cores": [
+        "MAG"
+      ],
+      "owner": "MAG"
+    },
     "RU_RAY_50074027B66770935409727": {
-      "controller": "ONG",
+      "controller": "WRS",
       "cores": [
         "WRS"
       ],
-      "owner": "ONG"
+      "owner": "WRS"
+    },
+    "RU_RAY_50074027B66849950652275": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
     },
     "RU_RAY_50074027B66849950652275__tno1962_1": {
       "controller": "TOM",
@@ -5576,12 +6705,145 @@
       ],
       "owner": "RKM"
     },
+    "RU_RAY_50074027B66970562543464": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B67807179286813": {
+      "controller": "KRS",
+      "cores": [
+        "KRS"
+      ],
+      "owner": "KRS"
+    },
+    "RU_RAY_50074027B67860704242461": {
+      "controller": "SAM",
+      "cores": [
+        "SAM"
+      ],
+      "owner": "SAM"
+    },
+    "RU_RAY_50074027B679557218720": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B67988371503022": {
+      "controller": "GAY",
+      "cores": [
+        "GAY"
+      ],
+      "owner": "GAY"
+    },
     "RU_RAY_50074027B68145102947423": {
       "controller": "ORS",
       "cores": [
         "SVR"
       ],
       "owner": "ORS"
+    },
+    "RU_RAY_50074027B68450782776786": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B69239078282053": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B69764357402848": {
+      "controller": "SBA",
+      "cores": [
+        "SBA"
+      ],
+      "owner": "SBA"
+    },
+    "RU_RAY_50074027B71157437388348": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B71368048698898": {
+      "controller": "SBA",
+      "cores": [
+        "SBA"
+      ],
+      "owner": "SBA"
+    },
+    "RU_RAY_50074027B71461018269487": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_RAY_50074027B72993481609927": {
+      "controller": "FAV",
+      "cores": [
+        "FAV"
+      ],
+      "owner": "FAV"
+    },
+    "RU_RAY_50074027B7427793780569": {
+      "controller": "KRS",
+      "cores": [
+        "KRS"
+      ],
+      "owner": "KRS"
+    },
+    "RU_RAY_50074027B74375992228315": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B74877493637193": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B75775802654148": {
+      "controller": "ORN",
+      "cores": [
+        "ORN"
+      ],
+      "owner": "ORN"
+    },
+    "RU_RAY_50074027B75983799969403": {
+      "controller": "SVR",
+      "cores": [
+        "SVR"
+      ],
+      "owner": "SVR"
+    },
+    "RU_RAY_50074027B76012718832492": {
+      "controller": "KRS",
+      "cores": [
+        "KRS"
+      ],
+      "owner": "KRS"
+    },
+    "RU_RAY_50074027B76144209526439": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
     },
     "RU_RAY_50074027B76424633116960": {
       "controller": "ORN",
@@ -5590,6 +6852,13 @@
       ],
       "owner": "ORN"
     },
+    "RU_RAY_50074027B77582248025356": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
     "RU_RAY_50074027B78297177563949": {
       "controller": "VOK",
       "cores": [
@@ -5597,12 +6866,26 @@
       ],
       "owner": "VOK"
     },
+    "RU_RAY_50074027B78945113117211": {
+      "controller": "VYT",
+      "cores": [
+        "VYT"
+      ],
+      "owner": "VYT"
+    },
+    "RU_RAY_50074027B80044850298489": {
+      "controller": "PFC",
+      "cores": [
+        "PFC"
+      ],
+      "owner": "PFC"
+    },
     "RU_RAY_50074027B80768671311936": {
-      "controller": "MAG",
+      "controller": "MGN",
       "cores": [
         "OUR"
       ],
-      "owner": "MAG"
+      "owner": "MGN"
     },
     "RU_RAY_50074027B80784778261580": {
       "controller": "ORN",
@@ -5611,12 +6894,61 @@
       ],
       "owner": "ORN"
     },
+    "RU_RAY_50074027B81144067595181": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B82590027772677": {
+      "controller": "VOK",
+      "cores": [
+        "VOK"
+      ],
+      "owner": "VOK"
+    },
+    "RU_RAY_50074027B83598019874707": {
+      "controller": "YAK",
+      "cores": [
+        "YAK"
+      ],
+      "owner": "YAK"
+    },
+    "RU_RAY_50074027B84010004825464": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
     "RU_RAY_50074027B84484580118953": {
-      "controller": "MAG",
+      "controller": "MGN",
       "cores": [
         "OUR"
       ],
+      "owner": "MGN"
+    },
+    "RU_RAY_50074027B85685002230937": {
+      "controller": "RUR",
+      "cores": [
+        "RUR"
+      ],
+      "owner": "RUR"
+    },
+    "RU_RAY_50074027B85754260597476": {
+      "controller": "MAG",
+      "cores": [
+        "MAG"
+      ],
       "owner": "MAG"
+    },
+    "RU_RAY_50074027B8579713719118": {
+      "controller": "BRY",
+      "cores": [
+        "BRY"
+      ],
+      "owner": "BRY"
     },
     "RU_RAY_50074027B86150609365879": {
       "controller": "ORS",
@@ -5625,18 +6957,110 @@
       ],
       "owner": "ORS"
     },
-    "RU_RAY_50074027B90298108562486": {
-      "controller": "ORS",
+    "RU_RAY_50074027B86196657571295": {
+      "controller": "BRY",
       "cores": [
-        "OUR"
+        "BRY"
       ],
-      "owner": "ORS"
+      "owner": "BRY"
+    },
+    "RU_RAY_50074027B86870758219567": {
+      "controller": "AMR",
+      "cores": [
+        "AMR"
+      ],
+      "owner": "AMR"
+    },
+    "RU_RAY_50074027B8751485821395": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B87627181065564": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B87731900886085": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B87884382763880": {
+      "controller": "WRS",
+      "cores": [
+        "WRS"
+      ],
+      "owner": "WRS"
+    },
+    "RU_RAY_50074027B88724749460683": {
+      "controller": "MAN",
+      "cores": [
+        "MAN"
+      ],
+      "owner": "MAN"
+    },
+    "RU_RAY_50074027B90279098260480": {
+      "controller": "AMR",
+      "cores": [
+        "AMR"
+      ],
+      "owner": "AMR"
+    },
+    "RU_RAY_50074027B90298108562486": {
+      "controller": "ORN",
+      "cores": [
+        "ORN"
+      ],
+      "owner": "ORN"
+    },
+    "RU_RAY_50074027B9105763704567": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "RU_RAY_50074027B91265302364221": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B91375405563028": {
+      "controller": "PFC",
+      "cores": [
+        "PFC"
+      ],
+      "owner": "PFC"
+    },
+    "RU_RAY_50074027B91439993213773": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B91680290875095": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
     },
     "RU_RAY_50074027B91746933948416": {
+      "controller": "TAT",
       "cores": [
-        "GOR"
+        "TAT"
       ],
-      "owner": "GOR"
+      "owner": "TAT"
     },
     "RU_RAY_50074027B92092388399011": {
       "controller": "BOP",
@@ -5644,6 +7068,111 @@
         "SVR"
       ],
       "owner": "BOP"
+    },
+    "RU_RAY_50074027B9240580019103": {
+      "controller": "IRK",
+      "cores": [
+        "IRK"
+      ],
+      "owner": "IRK"
+    },
+    "RU_RAY_50074027B93522804484377": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B93581086999271": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B94464987655513": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B94992557454451": {
+      "controller": "RUR",
+      "cores": [
+        "RUR"
+      ],
+      "owner": "RUR"
+    },
+    "RU_RAY_50074027B95202300265125": {
+      "controller": "TOM",
+      "cores": [
+        "TOM"
+      ],
+      "owner": "TOM"
+    },
+    "RU_RAY_50074027B96444957835233": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "RU_RAY_50074027B97275470142422": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B97359709446069": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B9814729903160": {
+      "controller": "RKU",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "RKU"
+    },
+    "RU_RAY_50074027B98725284766499": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B98963269942164": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "RU_RAY_50074027B99227036451137": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "RU_RAY_50074027B99340686489203": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
+    },
+    "RU_RAY_50074027B99894122533642": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
     },
     "SK_MRG_351edc5a6c69": {
       "controller": "SLO",
@@ -5833,11 +7362,11 @@
       "owner": "RKU"
     },
     "UA_MRG_2b67cdceafd7": {
-      "controller": "ROM",
+      "controller": "TNS",
       "cores": [
-        "ROM"
+        "TNS"
       ],
-      "owner": "ROM"
+      "owner": "TNS"
     },
     "UA_MRG_2d1c37bdd071": {
       "controller": "RKU",
@@ -6197,11 +7726,11 @@
       "owner": "RKU"
     },
     "UA_MRG_b828b24bbda1": {
-      "controller": "RKU",
+      "controller": "TNS",
       "cores": [
-        "RKU"
+        "TNS"
       ],
-      "owner": "RKU"
+      "owner": "TNS"
     },
     "UA_MRG_ba89d2e82c09": {
       "controller": "RKU",
@@ -6246,11 +7775,11 @@
       "owner": "RKU"
     },
     "UA_MRG_ce31c0ac496b": {
-      "controller": "RKU",
+      "controller": "TNS",
       "cores": [
-        "RKU"
+        "TNS"
       ],
-      "owner": "RKU"
+      "owner": "TNS"
     },
     "UA_MRG_d4f151f823ef": {
       "controller": "RKP",
@@ -6309,11 +7838,11 @@
       "owner": "RKU"
     },
     "UA_MRG_ec2bf97653b5": {
-      "controller": "RKU",
+      "controller": "TNS",
       "cores": [
-        "RKU"
+        "TNS"
       ],
-      "owner": "RKU"
+      "owner": "TNS"
     },
     "UA_MRG_f49493422ebe": {
       "controller": "RKU",
@@ -6342,6 +7871,90 @@
         "RKU"
       ],
       "owner": "RKU"
+    },
+    "UA_RAY_74538382B19464931464269": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "UA_RAY_74538382B24000649598641": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "UA_RAY_74538382B34306237745090": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "UA_RAY_74538382B34820599431847": {
+      "controller": "ROM",
+      "cores": [
+        "ROM"
+      ],
+      "owner": "ROM"
+    },
+    "UA_RAY_74538382B36709578446445": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "UA_RAY_74538382B45881397075814": {
+      "controller": "RKM",
+      "cores": [
+        "RKM"
+      ],
+      "owner": "RKM"
+    },
+    "UA_RAY_74538382B49727252906057": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "UA_RAY_74538382B56756126132930": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "UA_RAY_74538382B72647920433352": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "UA_RAY_74538382B90572707310825": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "UA_RAY_74538382B94391556881320": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
+    },
+    "UA_RAY_74538382B99156650022607": {
+      "controller": "TNS",
+      "cores": [
+        "TNS"
+      ],
+      "owner": "TNS"
     },
     "UKN06": {
       "controller": "NIE",
@@ -6931,6 +8544,13 @@
       ],
       "owner": "USA"
     },
+    "UZB-363": {
+      "controller": "KGZ",
+      "cores": [
+        "KGZ"
+      ],
+      "owner": "KGZ"
+    },
     "XK_ADM1_KOS-5909": {
       "cores": [
         "SER"
@@ -6957,6 +8577,55 @@
       "inspector_group_label": "Russia Region",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "AMR": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#ba9e9e",
+      "color_policy": "palette",
+      "controller_feature_count": 0,
+      "display_name": "Amur",
+      "display_name_en": "Amur",
+      "display_name_zh": "阿穆尔",
+      "entry_kind": "scenario_country",
+      "feature_count": 0,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_anchor_id": "continent_europe",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "dev_manual_tag_create",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "synthetic_owner": false,
+      "tag": "AMR"
+    },
+    "ANG": {
+      "color_hex": "#71755c",
+      "color_policy": "locked",
+      "display_name": "German Southwest Africa",
+      "display_name_en": "German Southwest Africa",
+      "display_name_zh": "西南非专员辖区",
+      "mode": "override",
+      "parent_owner_tag": "GER"
     },
     "AOF": {
       "display_name": "French West Africa",
@@ -6988,6 +8657,15 @@
       "display_name_zh": "澳大利亚联邦",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "AZH": {
+      "color_hex": "#388a33",
+      "color_policy": "locked",
+      "display_name": "Azad Hind",
+      "display_name_en": "Azad Hind",
+      "display_name_zh": "自由印度政府",
+      "mode": "override",
+      "parent_owner_tag": "JAP"
     },
     "BHU": {
       "display_name": "Bhutan",
@@ -7047,15 +8725,6 @@
       "color_policy": "locked",
       "mode": "override"
     },
-    "BRM": {
-      "color_hex": "#a05361",
-      "color_policy": "locked",
-      "display_name": "Burma",
-      "display_name_en": "Burma",
-      "display_name_zh": "缅甸联邦",
-      "mode": "override",
-      "parent_owner_tag": "JAP"
-    },
     "BRY": {
       "display_name": "Buryat Soviet Socialist Republic",
       "display_name_en": "Buryat Soviet Socialist Republic",
@@ -7072,6 +8741,15 @@
       "display_name_zh": "保加利亚沙皇国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "BUR": {
+      "color_hex": "#a05361",
+      "color_policy": "locked",
+      "display_name": "Burma",
+      "display_name_en": "Burma",
+      "display_name_zh": "缅甸联邦",
+      "mode": "override",
+      "parent_owner_tag": "JAP"
     },
     "BWA": {
       "display_name": "British West Africa",
@@ -7121,6 +8799,43 @@
       "display_name_zh": "智利共和国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "CLL": {
+      "base_iso2": "CO",
+      "capital_state_id": null,
+      "color_hex": "#bf0000",
+      "color_policy": "palette",
+      "controller_feature_count": 0,
+      "display_name": "Colombian Revolutionary Union",
+      "display_name_en": "Colombian Revolutionary Union",
+      "display_name_zh": "哥伦比亚革命联盟",
+      "entry_kind": "scenario_country",
+      "feature_count": 0,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CO",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "dev_manual_tag_create",
+      "provenance_iso2": "CO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "synthetic_owner": false,
+      "tag": "CLL"
     },
     "COL": {
       "color_hex": "#af9d72",
@@ -7180,19 +8895,50 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "FAV": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#b86378",
+      "color_policy": "palette",
+      "controller_feature_count": 0,
+      "display_name": "Free Aviators",
+      "display_name_en": "Free Aviators",
+      "display_name_zh": "自由飞行员",
+      "entry_kind": "scenario_country",
+      "feature_count": 0,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_anchor_id": "continent_europe",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "dev_manual_tag_create",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "synthetic_owner": false,
+      "tag": "FAV"
+    },
     "FRA": {
       "color_hex": "#5a6e8c",
       "color_policy": "locked",
       "mode": "override"
-    },
-    "FRI": {
-      "color_hex": "#388a33",
-      "color_policy": "locked",
-      "display_name": "Azad Hind",
-      "display_name_en": "Azad Hind",
-      "display_name_zh": "自由印度政府",
-      "mode": "override",
-      "parent_owner_tag": "JAP"
     },
     "GAY": {
       "base_iso2": "GAY",
@@ -7266,15 +9012,6 @@
       "mode": "override",
       "parent_owner_tag": "JAP"
     },
-    "GSW": {
-      "color_hex": "#71755c",
-      "color_policy": "locked",
-      "display_name": "German Southwest Africa",
-      "display_name_en": "German Southwest Africa",
-      "display_name_zh": "西南非专员辖区",
-      "mode": "override",
-      "parent_owner_tag": "GER"
-    },
     "GUA": {
       "color_hex": "#9c92a6",
       "color_policy": "locked",
@@ -7284,7 +9021,7 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
-    "GUI": {
+    "GUZ": {
       "color_hex": "#96637a",
       "color_policy": "locked",
       "mode": "override"
@@ -7402,34 +9139,6 @@
       "mode": "override",
       "parent_owner_tag": "FRA"
     },
-    "MAG": {
-      "base_iso2": "MAG",
-      "capital_state_id": null,
-      "color_hex": "#3c4551",
-      "color_policy": "locked",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "display_name": "Magnitogorsk",
-      "display_name_en": "Magnitogorsk",
-      "display_name_zh": "马格尼托哥尔斯克",
-      "entry_kind": "scenario_country",
-      "featured": false,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "inspector_group_anchor_id": "continent_europe",
-      "inspector_group_id": "scenario_group_russia_region",
-      "inspector_group_label": "Russia Region",
-      "lookup_iso2": "MAG",
-      "mode": "create",
-      "notes": "",
-      "parent_owner_tag": "",
-      "provenance_iso2": "MAG",
-      "scenario_only": true,
-      "source_type": "scenario_extension",
-      "subject_kind": "",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe"
-    },
     "MAL": {
       "display_name": "Malaya",
       "display_name_en": "Malaya",
@@ -7467,6 +9176,34 @@
       "display_name_zh": "墨西哥合众国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "MGN": {
+      "base_iso2": "MGN",
+      "capital_state_id": null,
+      "color_hex": "#3c4551",
+      "color_policy": "locked",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "display_name": "Magnitogorsk",
+      "display_name_en": "Magnitogorsk",
+      "display_name_zh": "马格尼托哥尔斯克",
+      "entry_kind": "scenario_country",
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "inspector_group_anchor_id": "continent_europe",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "lookup_iso2": "MGN",
+      "mode": "create",
+      "notes": "",
+      "parent_owner_tag": "",
+      "provenance_iso2": "MGN",
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "subject_kind": "",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe"
     },
     "NCP": {
       "color_hex": "#9f2349",
@@ -7521,12 +9258,92 @@
       "subregion_id": "",
       "subregion_label": ""
     },
+    "NRL": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#d2d5db",
+      "color_policy": "palette",
+      "controller_feature_count": 0,
+      "display_name": "Norilsk",
+      "display_name_en": "Norilsk",
+      "display_name_zh": "诺里尔斯克",
+      "entry_kind": "scenario_country",
+      "feature_count": 0,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_anchor_id": "continent_europe",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "dev_manual_tag_create",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "synthetic_owner": false,
+      "tag": "NRL"
+    },
     "NZL": {
       "display_name": "New Zealand",
       "display_name_en": "New Zealand",
       "display_name_zh": "新西兰",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "OMO": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#d2d5db",
+      "color_policy": "palette",
+      "controller_feature_count": 0,
+      "display_name": "Omolon",
+      "display_name_en": "Omolon",
+      "display_name_zh": "奥莫隆",
+      "entry_kind": "scenario_country",
+      "feature_count": 0,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_anchor_id": "continent_europe",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "dev_manual_tag_create",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "synthetic_owner": false,
+      "tag": "OMO"
     },
     "ONG": {
       "base_iso2": "ONG",
@@ -7630,6 +9447,16 @@
       "mode": "override",
       "parent_owner_tag": "JAP"
     },
+    "PRC": {
+      "display_name": "People's Revolutionary Council",
+      "display_name_en": "People's Revolutionary Council",
+      "display_name_zh": "人民革命委员会",
+      "inspector_group_anchor_id": "continent_europe",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "mode": "override",
+      "parent_owner_tag": ""
+    },
     "PRM": {
       "display_name": "Perm",
       "display_name_en": "Perm",
@@ -7732,11 +9559,6 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
-    "SIC": {
-      "color_hex": "#6873a0",
-      "color_policy": "locked",
-      "mode": "override"
-    },
     "SPR": {
       "base_iso2": "ES",
       "capital_state_id": 41,
@@ -7779,16 +9601,6 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
-    "TAN": {
-      "display_name": "People's Revolutionary Council",
-      "display_name_en": "People's Revolutionary Council",
-      "display_name_zh": "人民革命委员会",
-      "inspector_group_anchor_id": "continent_europe",
-      "inspector_group_id": "scenario_group_russia_region",
-      "inspector_group_label": "Russia Region",
-      "mode": "override",
-      "parent_owner_tag": ""
-    },
     "TAT": {
       "color_hex": "#96cdd9",
       "color_policy": "locked",
@@ -7807,6 +9619,43 @@
       "color_hex": "#8e2c23",
       "color_policy": "locked",
       "mode": "override"
+    },
+    "TNS": {
+      "base_iso2": "MD",
+      "capital_state_id": null,
+      "color_hex": "#dfbe67",
+      "color_policy": "palette",
+      "controller_feature_count": 0,
+      "display_name": "Transnistria Governorate",
+      "display_name_en": "Transnistria Governorate",
+      "display_name_zh": "德涅斯特河沿岸总督区",
+      "entry_kind": "scenario_country",
+      "feature_count": 0,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MD",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "dev_manual_tag_create",
+      "provenance_iso2": "MD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "synthetic_owner": false,
+      "tag": "TNS"
     },
     "TUN": {
       "color_hex": "#70825d",

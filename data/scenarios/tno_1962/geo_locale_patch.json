@@ -3430,7 +3430,7 @@
           "CN_MRG_33a2768f5b98",
           "CN_CITY_17275852B87805726740652"
         ],
-        "owner_tag": "BRM",
+        "owner_tag": "BUR",
         "raw_name": "Luxixian",
         "reason": "non_unique_raw_name"
       },
@@ -3446,7 +3446,7 @@
           "CN_CITY_17275852B42238111310042",
           "CN_CITY_17275852B66801672405752"
         ],
-        "owner_tag": "BRM",
+        "owner_tag": "BUR",
         "raw_name": "Longchuanxian",
         "reason": "non_unique_raw_name"
       },
@@ -3462,7 +3462,7 @@
           "IN_ADM2_76128533B23611090346849",
           "MMR-3270"
         ],
-        "owner_tag": "BRM",
+        "owner_tag": "BUR",
         "raw_name": "Mon",
         "reason": "non_unique_raw_name"
       },
@@ -5668,7 +5668,7 @@
           "IN_MRG_4f750131bc07",
           "IN_ADM2_76128533B39329594544563"
         ],
-        "owner_tag": "FRI",
+        "owner_tag": "AZH",
         "raw_name": "Aurangabad",
         "reason": "non_unique_raw_name"
       },
@@ -5684,7 +5684,7 @@
           "IN_ADM2_76128533B23611090346849",
           "MMR-3270"
         ],
-        "owner_tag": "FRI",
+        "owner_tag": "AZH",
         "raw_name": "Mon",
         "reason": "non_unique_raw_name"
       },
@@ -5700,7 +5700,7 @@
           "BTN-2481",
           "IN_ADM2_76128533B56012535339305"
         ],
-        "owner_tag": "FRI",
+        "owner_tag": "AZH",
         "raw_name": "Chirang",
         "reason": "non_unique_raw_name"
       },
@@ -5716,7 +5716,7 @@
           "HK_ADM1_HKG-5168",
           "IN_ADM2_76128533B65820903826030"
         ],
-        "owner_tag": "FRI",
+        "owner_tag": "AZH",
         "raw_name": "North District",
         "reason": "non_unique_raw_name"
       },
@@ -5732,7 +5732,7 @@
           "IN_MRG_21b7f1089cf4",
           "NPL-1134"
         ],
-        "owner_tag": "FRI",
+        "owner_tag": "AZH",
         "raw_name": "Bhojpur",
         "reason": "non_unique_raw_name"
       },
@@ -6990,7 +6990,7 @@
           "CN_MRG_28be4724b847",
           "CN_CITY_17275852B47327640156509"
         ],
-        "owner_tag": "GUI",
+        "owner_tag": "GUZ",
         "raw_name": "Zhenyuanxian",
         "reason": "non_unique_raw_name"
       },
@@ -7006,7 +7006,7 @@
           "CN_CITY_17275852B31900972836749",
           "CN_CITY_17275852B62521251525242"
         ],
-        "owner_tag": "GUI",
+        "owner_tag": "GUZ",
         "raw_name": "Qianxixian",
         "reason": "non_unique_raw_name"
       },
@@ -7022,7 +7022,7 @@
           "CN_MRG_e27f5cb03fed",
           "CN_CITY_17275852B96835160268267"
         ],
-        "owner_tag": "GUI",
+        "owner_tag": "GUZ",
         "raw_name": "Xishuixian",
         "reason": "non_unique_raw_name"
       },
@@ -7038,7 +7038,7 @@
           "CN_CITY_17275852B24496920463132",
           "CN_CITY_17275852B71298849166543"
         ],
-        "owner_tag": "GUI",
+        "owner_tag": "GUZ",
         "raw_name": "Xifengxian",
         "reason": "non_unique_raw_name"
       },
@@ -7054,7 +7054,7 @@
           "CN_CITY_17275852B40485497211548",
           "CN_MRG_8e007746d816"
         ],
-        "owner_tag": "GUI",
+        "owner_tag": "GUZ",
         "raw_name": "Zhijinxian",
         "reason": "non_unique_raw_name"
       },
@@ -20383,7 +20383,7 @@
           "CN_MRG_33a2768f5b98",
           "CN_CITY_17275852B87805726740652"
         ],
-        "owner_tag": "BRM",
+        "owner_tag": "BUR",
         "raw_name": "Luxixian",
         "reason": "non_unique_raw_name"
       },
@@ -20399,7 +20399,7 @@
           "CN_CITY_17275852B42238111310042",
           "CN_CITY_17275852B66801672405752"
         ],
-        "owner_tag": "BRM",
+        "owner_tag": "BUR",
         "raw_name": "Longchuanxian",
         "reason": "non_unique_raw_name"
       },
@@ -20415,7 +20415,7 @@
           "IN_ADM2_76128533B23611090346849",
           "MMR-3270"
         ],
-        "owner_tag": "BRM",
+        "owner_tag": "BUR",
         "raw_name": "Mon",
         "reason": "non_unique_raw_name"
       },
@@ -22621,7 +22621,7 @@
           "IN_MRG_4f750131bc07",
           "IN_ADM2_76128533B39329594544563"
         ],
-        "owner_tag": "FRI",
+        "owner_tag": "AZH",
         "raw_name": "Aurangabad",
         "reason": "non_unique_raw_name"
       },
@@ -22637,7 +22637,7 @@
           "IN_ADM2_76128533B23611090346849",
           "MMR-3270"
         ],
-        "owner_tag": "FRI",
+        "owner_tag": "AZH",
         "raw_name": "Mon",
         "reason": "non_unique_raw_name"
       },
@@ -22653,7 +22653,7 @@
           "BTN-2481",
           "IN_ADM2_76128533B56012535339305"
         ],
-        "owner_tag": "FRI",
+        "owner_tag": "AZH",
         "raw_name": "Chirang",
         "reason": "non_unique_raw_name"
       },
@@ -22669,7 +22669,7 @@
           "HK_ADM1_HKG-5168",
           "IN_ADM2_76128533B65820903826030"
         ],
-        "owner_tag": "FRI",
+        "owner_tag": "AZH",
         "raw_name": "North District",
         "reason": "non_unique_raw_name"
       },
@@ -22685,7 +22685,7 @@
           "IN_MRG_21b7f1089cf4",
           "NPL-1134"
         ],
-        "owner_tag": "FRI",
+        "owner_tag": "AZH",
         "raw_name": "Bhojpur",
         "reason": "non_unique_raw_name"
       },

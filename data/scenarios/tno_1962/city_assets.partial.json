@@ -1,3400 +1,7 @@
 {
-  "audit": {
-    "name_conflict_count": 242,
-    "name_conflicts": [
-      {
-        "base_name": {
-          "en": "Mocimboa",
-          "zh": "濱海莫辛布瓦區"
-        },
-        "city_id": "CITY::gn::1024699",
-        "host_feature_id": "MZ_ADM1_MOZ-1198",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Mocímboa da Praia",
-          "zh": "濱海莫辛布瓦區"
-        },
-        "stable_key": "id::CITY::gn::1024699"
-      },
-      {
-        "base_name": {
-          "en": "Manhiça",
-          "zh": "曼希萨"
-        },
-        "city_id": "CITY::gn::1040989",
-        "host_feature_id": "MZ_ADM1_MOZ-1927",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Manhica",
-          "zh": "曼希萨"
-        },
-        "stable_key": "id::CITY::gn::1040989"
-      },
-      {
-        "base_name": {
-          "en": "Gurúè",
-          "zh": "古鲁埃"
-        },
-        "city_id": "CITY::gn::1045512",
-        "host_feature_id": "MZ_ADM1_MOZ-1906",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Gurue",
-          "zh": "古鲁埃"
-        },
-        "stable_key": "id::CITY::gn::1045512"
-      },
-      {
-        "base_name": {
-          "en": "Chokwé",
-          "zh": "绍克韦"
-        },
-        "city_id": "CITY::gn::1048364",
-        "host_feature_id": "MZ_ADM1_MOZ-1207",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Vila Trigo de Morais",
-          "zh": "维拉·特里戈·德·莫赖斯"
-        },
-        "stable_key": "id::CITY::gn::1048364"
-      },
-      {
-        "base_name": {
-          "en": "Osiedle Kosmonautów",
-          "zh": "Osiedle Kosmonautow"
-        },
-        "city_id": "CITY::gn::12047617",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Osiedle Kosmonautow",
-          "zh": "Osiedle Kosmonautow"
-        },
-        "stable_key": "id::CITY::gn::12047617"
-      },
-      {
-        "base_name": {
-          "en": "Kozanów",
-          "zh": "Kozanow"
-        },
-        "city_id": "CITY::gn::12047636",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kozanow",
-          "zh": "Kozanow"
-        },
-        "stable_key": "id::CITY::gn::12047636"
-      },
-      {
-        "base_name": {
-          "en": "Rejon placu Świętego Macieja",
-          "zh": "Rejon placu Swietego Macieja"
-        },
-        "city_id": "CITY::gn::12047644",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Rejon placu Swietego Macieja",
-          "zh": "Rejon placu Swietego Macieja"
-        },
-        "stable_key": "id::CITY::gn::12047644"
-      },
-      {
-        "base_name": {
-          "en": "Różanka-Polanka",
-          "zh": "Rozanka-Polanka"
-        },
-        "city_id": "CITY::gn::12047651",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Rozanka-Polanka",
-          "zh": "Rozanka-Polanka"
-        },
-        "stable_key": "id::CITY::gn::12047651"
-      },
-      {
-        "base_name": {
-          "en": "Orunia Górna-Gdańsk Południe",
-          "zh": "Orunia Gorna-Gdansk Poludnie"
-        },
-        "city_id": "CITY::gn::13100477",
-        "host_feature_id": "PL_POW_2261",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Orunia Gorna-Gdansk Poludnie",
-          "zh": "Orunia Gorna-Gdansk Poludnie"
-        },
-        "stable_key": "id::CITY::gn::13100477"
-      },
-      {
-        "base_name": {
-          "en": "Śródmieście",
-          "zh": "Srodmiescie"
-        },
-        "city_id": "CITY::gn::13562332",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Srodmiescie",
-          "zh": "Srodmiescie"
-        },
-        "stable_key": "id::CITY::gn::13562332"
-      },
-      {
-        "base_name": {
-          "en": "Kousséri",
-          "zh": "库塞里"
-        },
-        "city_id": "CITY::gn::2229798",
-        "host_feature_id": "CM_ADM1_CMR-1462",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kousseri",
-          "zh": "库塞里"
-        },
-        "stable_key": "id::CITY::gn::2229798"
-      },
-      {
-        "base_name": {
-          "en": "Bégoua",
-          "zh": "贝古阿"
-        },
-        "city_id": "CITY::gn::2389422",
-        "host_feature_id": "CF_ADM1_CAF-4856",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Begoua",
-          "zh": "贝古阿"
-        },
-        "stable_key": "id::CITY::gn::2389422"
-      },
-      {
-        "base_name": {
-          "en": "Visé",
-          "zh": "维塞"
-        },
-        "city_id": "CITY::gn::2784548",
-        "host_feature_id": "BE332",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Vise",
-          "zh": "维塞"
-        },
-        "stable_key": "id::CITY::gn::2784548"
-      },
-      {
-        "base_name": {
-          "en": "Verviers",
-          "zh": "维尔维耶"
-        },
-        "city_id": "CITY::gn::2784821",
-        "host_feature_id": "BE_MRG_49096f4ef44b",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Velwisch",
-          "zh": "费尔维施"
-        },
-        "stable_key": "id::CITY::gn::2784821"
-      },
-      {
-        "base_name": {
-          "en": "Tournai",
-          "zh": "图尔奈"
-        },
-        "city_id": "CITY::gn::2785341",
-        "host_feature_id": "BE_MRG_15f4aef6c612",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Dornick",
-          "zh": "多尔尼克"
-        },
-        "stable_key": "id::CITY::gn::2785341"
-      },
-      {
-        "base_name": {
-          "en": "Tongeren",
-          "zh": "通厄伦"
-        },
-        "city_id": "CITY::gn::2785389",
-        "host_feature_id": "BE_MRG_a29e92a10668",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Tongern",
-          "zh": "通厄恩"
-        },
-        "stable_key": "id::CITY::gn::2785389"
-      },
-      {
-        "base_name": {
-          "en": "Tielt",
-          "zh": "蒂尔特"
-        },
-        "city_id": "CITY::gn::2785476",
-        "host_feature_id": "BE_MRG_24ed7b411331",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Thielt",
-          "zh": "蒂尔特"
-        },
-        "stable_key": "id::CITY::gn::2785476"
-      },
-      {
-        "base_name": {
-          "en": "Soignies",
-          "zh": "苏瓦尼"
-        },
-        "city_id": "CITY::gn::2786420",
-        "host_feature_id": "BE_MRG_f7a8cd5ecd9e",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Zinnik",
-          "zh": "济尼克"
-        },
-        "stable_key": "id::CITY::gn::2786420"
-      },
-      {
-        "base_name": {
-          "en": "Sint-Niklaas",
-          "zh": "圣尼克拉斯"
-        },
-        "city_id": "CITY::gn::2786578",
-        "host_feature_id": "BE236",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Sankt Nikolaus",
-          "zh": "圣尼古劳斯"
-        },
-        "stable_key": "id::CITY::gn::2786578"
-      },
-      {
-        "base_name": {
-          "en": "Roeselare",
-          "zh": "鲁瑟拉勒"
-        },
-        "city_id": "CITY::gn::2787889",
-        "host_feature_id": "BE_MRG_24ed7b411331",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Russelaere",
-          "zh": "吕瑟拉勒"
-        },
-        "stable_key": "id::CITY::gn::2787889"
-      },
-      {
-        "base_name": {
-          "en": "Pont-à-Celles",
-          "zh": "蓬塔塞勒"
-        },
-        "city_id": "CITY::gn::2788765",
-        "host_feature_id": "BE32B",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Pont-a-Celles",
-          "zh": "蓬塔塞勒"
-        },
-        "stable_key": "id::CITY::gn::2788765"
-      },
-      {
-        "base_name": {
-          "en": "Péruwelz",
-          "zh": "佩吕韦尔"
-        },
-        "city_id": "CITY::gn::2789162",
-        "host_feature_id": "BE_MRG_15f4aef6c612",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Peruwelz",
-          "zh": "佩吕韦尔"
-        },
-        "stable_key": "id::CITY::gn::2789162"
-      },
-      {
-        "base_name": {
-          "en": "Mechelen",
-          "zh": "梅赫伦"
-        },
-        "city_id": "CITY::gn::2791537",
-        "host_feature_id": "BE_MRG_38ea003ab243",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Mecheln",
-          "zh": "梅赫伦"
-        },
-        "stable_key": "id::CITY::gn::2791537"
-      },
-      {
-        "base_name": {
-          "en": "Leuven",
-          "zh": "鲁汶"
-        },
-        "city_id": "CITY::gn::2792482",
-        "host_feature_id": "BE242",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Löwen",
-          "zh": "勒汶"
-        },
-        "stable_key": "id::CITY::gn::2792482"
-      },
-      {
-        "base_name": {
-          "en": "La Louvière",
-          "zh": "拉卢维耶尔"
-        },
-        "city_id": "CITY::gn::2793508",
-        "host_feature_id": "BE_MRG_f7a8cd5ecd9e",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "La Louviere",
-          "zh": "拉卢维耶尔"
-        },
-        "stable_key": "id::CITY::gn::2793508"
-      },
-      {
-        "base_name": {
-          "en": "Kortrijk",
-          "zh": "科特赖克"
-        },
-        "city_id": "CITY::gn::2794055",
-        "host_feature_id": "BE_MRG_24ed7b411331",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kortreik",
-          "zh": "科特赖克"
-        },
-        "stable_key": "id::CITY::gn::2794055"
-      },
-      {
-        "base_name": {
-          "en": "Ieper",
-          "zh": "伊珀尔"
-        },
-        "city_id": "CITY::gn::2795100",
-        "host_feature_id": "BE_MRG_7dbe84a470bd",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Ypern",
-          "zh": "伊珀恩"
-        },
-        "stable_key": "id::CITY::gn::2795100"
-      },
-      {
-        "base_name": {
-          "en": "Huy",
-          "zh": "于伊"
-        },
-        "city_id": "CITY::gn::2795113",
-        "host_feature_id": "BE_MRG_49096f4ef44b",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Hoei",
-          "zh": "胡伊"
-        },
-        "stable_key": "id::CITY::gn::2795113"
-      },
-      {
-        "base_name": {
-          "en": "Grivegnée",
-          "zh": "格里弗涅"
-        },
-        "city_id": "CITY::gn::2797096",
-        "host_feature_id": "BE332",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Grivegnee",
-          "zh": "格里弗涅"
-        },
-        "stable_key": "id::CITY::gn::2797096"
-      },
-      {
-        "base_name": {
-          "en": "Fléron",
-          "zh": "弗莱龙"
-        },
-        "city_id": "CITY::gn::2798301",
-        "host_feature_id": "BE332",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Fleron",
-          "zh": "弗莱龙"
-        },
-        "stable_key": "id::CITY::gn::2798301"
-      },
-      {
-        "base_name": {
-          "en": "Flémalle-Haute",
-          "zh": "上弗莱马勒"
-        },
-        "city_id": "CITY::gn::2798307",
-        "host_feature_id": "BE332",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Flemalle-Haute",
-          "zh": "上弗莱马勒"
-        },
-        "stable_key": "id::CITY::gn::2798307"
-      },
-      {
-        "base_name": {
-          "en": "Dendermonde",
-          "zh": "登德尔蒙德"
-        },
-        "city_id": "CITY::gn::2799645",
-        "host_feature_id": "BE_MRG_81cfb513b60d",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Dendermünde",
-          "zh": "登德明德"
-        },
-        "stable_key": "id::CITY::gn::2799645"
-      },
-      {
-        "base_name": {
-          "en": "Châtelineau",
-          "zh": "沙泰利诺"
-        },
-        "city_id": "CITY::gn::2800445",
-        "host_feature_id": "BE32B",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Chatelineau",
-          "zh": "沙泰利诺"
-        },
-        "stable_key": "id::CITY::gn::2800445"
-      },
-      {
-        "base_name": {
-          "en": "Châtelet",
-          "zh": "沙特莱"
-        },
-        "city_id": "CITY::gn::2800448",
-        "host_feature_id": "BE32B",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Chatelet",
-          "zh": "沙特莱"
-        },
-        "stable_key": "id::CITY::gn::2800448"
-      },
-      {
-        "base_name": {
-          "en": "Ath",
-          "zh": "阿特"
-        },
-        "city_id": "CITY::gn::2803010",
-        "host_feature_id": "BE_MRG_15f4aef6c612",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Aat",
-          "zh": "阿特"
-        },
-        "stable_key": "id::CITY::gn::2803010"
-      },
-      {
-        "base_name": {
-          "en": "Vitry-le-François",
-          "zh": "维特里勒弗朗索瓦"
-        },
-        "city_id": "CITY::gn::2967856",
-        "host_feature_id": "FR_ARR_51004",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Vitry-le-Francois",
-          "zh": "维特里勒弗朗索瓦"
-        },
-        "stable_key": "id::CITY::gn::2967856"
-      },
-      {
-        "base_name": {
-          "en": "Villers-lès-Nancy",
-          "zh": "维莱莱南锡"
-        },
-        "city_id": "CITY::gn::2968368",
-        "host_feature_id": "FR_ARR_54003",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Villers-les-Nancy",
-          "zh": "维莱莱南锡"
-        },
-        "stable_key": "id::CITY::gn::2968368"
-      },
-      {
-        "base_name": {
-          "en": "Verdun",
-          "zh": "凡尔登"
-        },
-        "city_id": "CITY::gn::2969958",
-        "host_feature_id": "FR_ARR_55003",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Verden an der Maas",
-          "zh": "马斯河畔韦尔登"
-        },
-        "stable_key": "id::CITY::gn::2969958"
-      },
-      {
-        "base_name": {
-          "en": "Vandœuvre-lès-Nancy",
-          "zh": "旺德夫尔莱南锡"
-        },
-        "city_id": "CITY::gn::2970797",
-        "host_feature_id": "FR_ARR_54003",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Vandoeuvre-les-Nancy",
-          "zh": "旺德夫尔莱南锡"
-        },
-        "stable_key": "id::CITY::gn::2970797"
-      },
-      {
-        "base_name": {
-          "en": "Valenciennes",
-          "zh": "瓦朗谢讷"
-        },
-        "city_id": "CITY::gn::2971041",
-        "host_feature_id": "FR_ARR_59006",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Schwanenthal",
-          "zh": "施瓦嫩塔尔"
-        },
-        "stable_key": "id::CITY::gn::2971041"
-      },
-      {
-        "base_name": {
-          "en": "Toul",
-          "zh": "图勒"
-        },
-        "city_id": "CITY::gn::2972350",
-        "host_feature_id": "FR_ARR_54004",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Tull",
-          "zh": "图尔"
-        },
-        "stable_key": "id::CITY::gn::2972350"
-      },
-      {
-        "base_name": {
-          "en": "Saint-Omer",
-          "zh": "圣奥梅尔"
-        },
-        "city_id": "CITY::gn::2977845",
-        "host_feature_id": "FR_MRG_7c681aa2032e",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Sint-Omaars",
-          "zh": "圣奥马尔斯"
-        },
-        "stable_key": "id::CITY::gn::2977845"
-      },
-      {
-        "base_name": {
-          "en": "Saint-Dié-des-Vosges",
-          "zh": "孚日圣迪耶"
-        },
-        "city_id": "CITY::gn::2980827",
-        "host_feature_id": "FR_ARR_88003",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Saint-Die-des-Vosges",
-          "zh": "孚日圣迪耶"
-        },
-        "stable_key": "id::CITY::gn::2980827"
-      },
-      {
-        "base_name": {
-          "en": "Pont-à-Mousson",
-          "zh": "蓬塔穆松"
-        },
-        "city_id": "CITY::gn::2986306",
-        "host_feature_id": "FR_ARR_54003",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Pont-a-Mousson",
-          "zh": "蓬塔穆松"
-        },
-        "stable_key": "id::CITY::gn::2986306"
-      },
-      {
-        "base_name": {
-          "en": "Montbéliard",
-          "zh": "蒙贝利亚尔"
-        },
-        "city_id": "CITY::gn::2992938",
-        "host_feature_id": "FR_ARR_25002",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Mömpelgard",
-          "zh": "蒙佩尔加德"
-        },
-        "stable_key": "id::CITY::gn::2992938"
-      },
-      {
-        "base_name": {
-          "en": "Mons-en-Barœul",
-          "zh": "蒙桑巴勒"
-        },
-        "city_id": "CITY::gn::2993207",
-        "host_feature_id": "FR_ARR_59005",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Mons-en-Baroeul",
-          "zh": "蒙桑巴勒"
-        },
-        "stable_key": "id::CITY::gn::2993207"
-      },
-      {
-        "base_name": {
-          "en": "Marcq-en-Barœul",
-          "zh": "马克昂巴勒尔"
-        },
-        "city_id": "CITY::gn::2995908",
-        "host_feature_id": "FR_ARR_59005",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Marcq-en-Baroeul",
-          "zh": "马克昂巴勒尔"
-        },
-        "stable_key": "id::CITY::gn::2995908"
-      },
-      {
-        "base_name": {
-          "en": "Lunéville",
-          "zh": "吕内维尔"
-        },
-        "city_id": "CITY::gn::2997110",
-        "host_feature_id": "FR_ARR_54002",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Luneville",
-          "zh": "吕内维尔"
-        },
-        "stable_key": "id::CITY::gn::2997110"
-      },
-      {
-        "base_name": {
-          "en": "Liévin",
-          "zh": "列万"
-        },
-        "city_id": "CITY::gn::2998431",
-        "host_feature_id": "FR_ARR_62007",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Lievin",
-          "zh": "列万"
-        },
-        "stable_key": "id::CITY::gn::2998431"
-      },
-      {
-        "base_name": {
-          "en": "Hénin-Beaumont",
-          "zh": "埃南-博蒙"
-        },
-        "city_id": "CITY::gn::3013525",
-        "host_feature_id": "FR_ARR_62007",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Henin-Beaumont",
-          "zh": "埃南-博蒙"
-        },
-        "stable_key": "id::CITY::gn::3013525"
-      },
-      {
-        "base_name": {
-          "en": "Épinal",
-          "zh": "埃皮纳勒"
-        },
-        "city_id": "CITY::gn::3020035",
-        "host_feature_id": "FR_ARR_88001",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Spinneln",
-          "zh": "施平嫩"
-        },
-        "stable_key": "id::CITY::gn::3020035"
-      },
-      {
-        "base_name": {
-          "en": "Dunkerque",
-          "zh": "敦刻尔克"
-        },
-        "city_id": "CITY::gn::3020686",
-        "host_feature_id": "FR_ARR_59004",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Dünkirchen",
-          "zh": "敦基兴"
-        },
-        "stable_key": "id::CITY::gn::3020686"
-      },
-      {
-        "base_name": {
-          "en": "Douai",
-          "zh": "杜埃"
-        },
-        "city_id": "CITY::gn::3021000",
-        "host_feature_id": "FR_ARR_59003",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Dowaai",
-          "zh": "多瓦伊"
-        },
-        "stable_key": "id::CITY::gn::3021000"
-      },
-      {
-        "base_name": {
-          "en": "Charleville-Mézières",
-          "zh": "沙勒维尔-梅济耶尔"
-        },
-        "city_id": "CITY::gn::3026613",
-        "host_feature_id": "FR_ARR_08001",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Charleville-Mezieres",
-          "zh": "沙勒维尔-梅济耶尔"
-        },
-        "stable_key": "id::CITY::gn::3026613"
-      },
-      {
-        "base_name": {
-          "en": "Châlons-en-Champagne",
-          "zh": "香槟沙隆"
-        },
-        "city_id": "CITY::gn::3027487",
-        "host_feature_id": "FR_ARR_51001",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Chalons-en-Champagne",
-          "zh": "香槟沙隆"
-        },
-        "stable_key": "id::CITY::gn::3027487"
-      },
-      {
-        "base_name": {
-          "en": "Cambrai",
-          "zh": "康布雷"
-        },
-        "city_id": "CITY::gn::3029030",
-        "host_feature_id": "FR_ARR_59002",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kamerich",
-          "zh": "卡默里希"
-        },
-        "stable_key": "id::CITY::gn::3029030"
-      },
-      {
-        "base_name": {
-          "en": "Bruay-la-Buissière",
-          "zh": "布吕埃拉比西耶尔"
-        },
-        "city_id": "CITY::gn::3029825",
-        "host_feature_id": "FR_ARR_62002",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Bruay-la-Buissiere",
-          "zh": "布吕埃拉比西耶尔"
-        },
-        "stable_key": "id::CITY::gn::3029825"
-      },
-      {
-        "base_name": {
-          "en": "Boulogne-sur-Mer",
-          "zh": "滨海布洛涅"
-        },
-        "city_id": "CITY::gn::3031133",
-        "host_feature_id": "FR_MRG_7c681aa2032e",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Bonen",
-          "zh": "博嫩"
-        },
-        "stable_key": "id::CITY::gn::3031133"
-      },
-      {
-        "base_name": {
-          "en": "Béthune",
-          "zh": "贝蒂讷"
-        },
-        "city_id": "CITY::gn::3033002",
-        "host_feature_id": "FR_ARR_62002",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Betun",
-          "zh": "贝蒂讷"
-        },
-        "stable_key": "id::CITY::gn::3033002"
-      },
-      {
-        "base_name": {
-          "en": "Bar-le-Duc",
-          "zh": "巴勒迪克"
-        },
-        "city_id": "CITY::gn::3034911",
-        "host_feature_id": "FR_ARR_55001",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Herzogenbar",
-          "zh": "黑尔措根巴尔"
-        },
-        "stable_key": "id::CITY::gn::3034911"
-      },
-      {
-        "base_name": {
-          "en": "Armentières",
-          "zh": "阿尔芒蒂耶尔"
-        },
-        "city_id": "CITY::gn::3036903",
-        "host_feature_id": "FR_ARR_59005",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Armentieres",
-          "zh": "阿尔芒蒂耶尔"
-        },
-        "stable_key": "id::CITY::gn::3036903"
-      },
-      {
-        "base_name": {
-          "en": "Toruń",
-          "zh": "托伦"
-        },
-        "city_id": "CITY::gn::3083271",
-        "host_feature_id": "PL_POW_0463",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Thorn",
-          "zh": "托恩"
-        },
-        "stable_key": "id::CITY::gn::3083271"
-      },
-      {
-        "base_name": {
-          "en": "Sosnowiec",
-          "zh": "索斯诺维茨"
-        },
-        "city_id": "CITY::gn::3085128",
-        "host_feature_id": "PL_POW_2475",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Sosnowitz",
-          "zh": "索斯诺维茨"
-        },
-        "stable_key": "id::CITY::gn::3085128"
-      },
-      {
-        "base_name": {
-          "en": "Grzegórzki",
-          "zh": "Grzegorzki"
-        },
-        "city_id": "CITY::gn::3098171",
-        "host_feature_id": "PL_POW_1261",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Grzegorzki",
-          "zh": "Grzegorzki"
-        },
-        "stable_key": "id::CITY::gn::3098171"
-      },
-      {
-        "base_name": {
-          "en": "Częstochowa",
-          "zh": "琴斯托霍瓦"
-        },
-        "city_id": "CITY::gn::3100946",
-        "host_feature_id": "PL_POW_2464",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Tschenstochau",
-          "zh": "琴斯托霍瓦"
-        },
-        "stable_key": "id::CITY::gn::3100946"
-      },
-      {
-        "base_name": {
-          "en": "Bielsko-Biala",
-          "zh": "别尔斯科-比亚瓦"
-        },
-        "city_id": "CITY::gn::3103402",
-        "host_feature_id": "PL_POW_2461",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Bielitz",
-          "zh": "比利茨"
-        },
-        "stable_key": "id::CITY::gn::3103402"
-      },
-      {
-        "base_name": {
-          "en": "Caála",
-          "zh": "卡阿拉"
-        },
-        "city_id": "CITY::gn::3351500",
-        "host_feature_id": "AO_ADM1_AGO-1890",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Caala",
-          "zh": "卡阿拉"
-        },
-        "stable_key": "id::CITY::gn::3351500"
-      },
-      {
-        "base_name": {
-          "en": "Valmiera",
-          "zh": "瓦尔米耶拉"
-        },
-        "city_id": "CITY::gn::453754",
-        "host_feature_id": "LV008",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Wolmar",
-          "zh": "沃尔马尔"
-        },
-        "stable_key": "id::CITY::gn::453754"
-      },
-      {
-        "base_name": {
-          "en": "Liepāja",
-          "zh": "利耶帕亚"
-        },
-        "city_id": "CITY::gn::457954",
-        "host_feature_id": "LV003",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Libau",
-          "zh": "利包"
-        },
-        "stable_key": "id::CITY::gn::457954"
-      },
-      {
-        "base_name": {
-          "en": "Jūrmala",
-          "zh": "尤尔马拉"
-        },
-        "city_id": "CITY::gn::459201",
-        "host_feature_id": "LV007",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Jurmala",
-          "zh": "尤尔马拉"
-        },
-        "stable_key": "id::CITY::gn::459201"
-      },
-      {
-        "base_name": {
-          "en": "Jēkabpils",
-          "zh": "叶卡布皮尔斯"
-        },
-        "city_id": "CITY::gn::459283",
-        "host_feature_id": "LV009",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Jakobstadt",
-          "zh": "雅各布施塔特"
-        },
-        "stable_key": "id::CITY::gn::459283"
-      },
-      {
-        "base_name": {
-          "en": "Cēsis",
-          "zh": "采西斯"
-        },
-        "city_id": "CITY::gn::460570",
-        "host_feature_id": "LV008",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Cesis",
-          "zh": "采西斯"
-        },
-        "stable_key": "id::CITY::gn::460570"
-      },
-      {
-        "base_name": {
-          "en": "Sumqayıt",
-          "zh": "苏姆盖特"
-        },
-        "city_id": "CITY::gn::584923",
-        "host_feature_id": "AZE-1717",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Sumqayit",
-          "zh": "苏姆盖特"
-        },
-        "stable_key": "id::CITY::gn::584923"
-      },
-      {
-        "base_name": {
-          "en": "Nõmme",
-          "zh": "诺梅"
-        },
-        "city_id": "CITY::gn::589947",
-        "host_feature_id": "EE001",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Nomme",
-          "zh": "诺梅"
-        },
-        "stable_key": "id::CITY::gn::589947"
-      },
-      {
-        "base_name": {
-          "en": "Marijampolė",
-          "zh": "马里扬波莱"
-        },
-        "city_id": "CITY::gn::597231",
-        "host_feature_id": "LT024",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Marijampole",
-          "zh": "马里扬波莱"
-        },
-        "stable_key": "id::CITY::gn::597231"
-      },
-      {
-        "base_name": {
-          "en": "Kėdainiai",
-          "zh": "凯代尼艾"
-        },
-        "city_id": "CITY::gn::598272",
-        "host_feature_id": "LT022",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kedainiai",
-          "zh": "凯代尼艾"
-        },
-        "stable_key": "id::CITY::gn::598272"
-      },
-      {
-        "base_name": {
-          "en": "Rechytsa",
-          "zh": "雷奇察"
-        },
-        "city_id": "CITY::gn::622794",
-        "host_feature_id": "BY_INT_GOMEL",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Retschiza",
-          "zh": "雷奇察"
-        },
-        "stable_key": "id::CITY::gn::622794"
-      },
-      {
-        "base_name": {
-          "en": "Ursynów",
-          "zh": "Ursynow"
-        },
-        "city_id": "CITY::gn::6545326",
-        "host_feature_id": "PL_POW_1465",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Ursynow",
-          "zh": "Ursynow"
-        },
-        "stable_key": "id::CITY::gn::6545326"
-      },
-      {
-        "base_name": {
-          "en": "Praga Północ",
-          "zh": "Praga Polnoc"
-        },
-        "city_id": "CITY::gn::6545347",
-        "host_feature_id": "PL_POW_1465",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Praga Polnoc",
-          "zh": "Praga Polnoc"
-        },
-        "stable_key": "id::CITY::gn::6545347"
-      },
-      {
-        "base_name": {
-          "en": "Praga Południe",
-          "zh": "Praga Poludnie"
-        },
-        "city_id": "CITY::gn::6545348",
-        "host_feature_id": "PL_POW_1465",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Praga Poludnie",
-          "zh": "Praga Poludnie"
-        },
-        "stable_key": "id::CITY::gn::6545348"
-      },
-      {
-        "base_name": {
-          "en": "Simferopol",
-          "zh": "辛菲罗波尔"
-        },
-        "city_id": "CITY::gn::693805",
-        "host_feature_id": "UA_RAY_74538382B84040377374615",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Gotenburg",
-          "zh": "哥滕堡"
-        },
-        "stable_key": "id::CITY::gn::693805"
-      },
-      {
-        "base_name": {
-          "en": "Sevastopol",
-          "zh": "塞瓦斯托波尔"
-        },
-        "city_id": "CITY::gn::694423",
-        "host_feature_id": "UA_RAY_74538382B3276437105714",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Theoderichshafen",
-          "zh": "狄奥多里希港"
-        },
-        "stable_key": "id::CITY::gn::694423"
-      },
-      {
-        "base_name": {
-          "en": "Żoliborz",
-          "zh": "Zoliborz"
-        },
-        "city_id": "CITY::gn::753142",
-        "host_feature_id": "PL_POW_1465",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Zoliborz",
-          "zh": "Zoliborz"
-        },
-        "stable_key": "id::CITY::gn::753142"
-      },
-      {
-        "base_name": {
-          "en": "Włochy",
-          "zh": "Wlochy"
-        },
-        "city_id": "CITY::gn::755475",
-        "host_feature_id": "PL_POW_1465",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Wlochy",
-          "zh": "Wlochy"
-        },
-        "stable_key": "id::CITY::gn::755475"
-      },
-      {
-        "base_name": {
-          "en": "Targówek",
-          "zh": "Targowek"
-        },
-        "city_id": "CITY::gn::757065",
-        "host_feature_id": "PL_POW_1465",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Targowek",
-          "zh": "Targowek"
-        },
-        "stable_key": "id::CITY::gn::757065"
-      },
-      {
-        "base_name": {
-          "en": "Śródmieście",
-          "zh": "Srodmiescie"
-        },
-        "city_id": "CITY::gn::758470",
-        "host_feature_id": "PL_POW_1465",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Srodmiescie",
-          "zh": "Srodmiescie"
-        },
-        "stable_key": "id::CITY::gn::758470"
-      },
-      {
-        "base_name": {
-          "en": "Rembertów",
-          "zh": "Rembertow"
-        },
-        "city_id": "CITY::gn::760503",
-        "host_feature_id": "PL_POW_1465",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Rembertow",
-          "zh": "Rembertow"
-        },
-        "stable_key": "id::CITY::gn::760503"
-      },
-      {
-        "base_name": {
-          "en": "Mokotów",
-          "zh": "Mokotow"
-        },
-        "city_id": "CITY::gn::764484",
-        "host_feature_id": "PL_POW_1465",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Mokotow",
-          "zh": "Mokotow"
-        },
-        "stable_key": "id::CITY::gn::764484"
-      },
-      {
-        "base_name": {
-          "en": "Bieńczyce",
-          "zh": "Bienczyce"
-        },
-        "city_id": "CITY::gn::775984",
-        "host_feature_id": "PL_POW_1261",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Bienczyce",
-          "zh": "Bienczyce"
-        },
-        "stable_key": "id::CITY::gn::775984"
-      },
-      {
-        "base_name": {
-          "en": "Białołeka",
-          "zh": "Bialoleka"
-        },
-        "city_id": "CITY::gn::776103",
-        "host_feature_id": "PL_POW_1465",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Bialoleka",
-          "zh": "Bialoleka"
-        },
-        "stable_key": "id::CITY::gn::776103"
-      },
-      {
-        "base_name": {
-          "en": "Gądów-Popowice Południowe",
-          "zh": "Gadow-Popowice Poludniowe"
-        },
-        "city_id": "CITY::gn::8425959",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Gadow-Popowice Poludniowe",
-          "zh": "Gadow-Popowice Poludniowe"
-        },
-        "stable_key": "id::CITY::gn::8425959"
-      },
-      {
-        "base_name": {
-          "en": "Pilczyce-Kozanów-Popowice Północne",
-          "zh": "Pilczyce-Kozanow-Popowice Polnocne"
-        },
-        "city_id": "CITY::gn::8425966",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Pilczyce-Kozanow-Popowice Polnocne",
-          "zh": "Pilczyce-Kozanow-Popowice Polnocne"
-        },
-        "stable_key": "id::CITY::gn::8425966"
-      },
-      {
-        "base_name": {
-          "en": "Osiedle Powstańców Śląskich",
-          "zh": "Osiedle Powstancow Slaskich"
-        },
-        "city_id": "CITY::gn::8425974",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Osiedle Powstancow Slaskich",
-          "zh": "Osiedle Powstancow Slaskich"
-        },
-        "stable_key": "id::CITY::gn::8425974"
-      },
-      {
-        "base_name": {
-          "en": "Przedmieście Oławskie",
-          "zh": "Przedmiescie Olawskie"
-        },
-        "city_id": "CITY::gn::8425975",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Przedmiescie Olawskie",
-          "zh": "Przedmiescie Olawskie"
-        },
-        "stable_key": "id::CITY::gn::8425975"
-      },
-      {
-        "base_name": {
-          "en": "Karłowice-Różanka",
-          "zh": "Karlowice-Rozanka"
-        },
-        "city_id": "CITY::gn::8425978",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Karlowice-Rozanka",
-          "zh": "Karlowice-Rozanka"
-        },
-        "stable_key": "id::CITY::gn::8425978"
-      },
-      {
-        "base_name": {
-          "en": "Biskupin-Sępolno-Dąbie-Bartoszowice",
-          "zh": "Biskupin-Sepolno-Dabie-Bartoszowice"
-        },
-        "city_id": "CITY::gn::8425987",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Biskupin-Sepolno-Dabie-Bartoszowice",
-          "zh": "Biskupin-Sepolno-Dabie-Bartoszowice"
-        },
-        "stable_key": "id::CITY::gn::8425987"
-      },
-      {
-        "base_name": {
-          "en": "Ołbin",
-          "zh": "Olbin"
-        },
-        "city_id": "CITY::gn::8425989",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Olbin",
-          "zh": "Olbin"
-        },
-        "stable_key": "id::CITY::gn::8425989"
-      },
-      {
-        "base_name": {
-          "en": "Chełm",
-          "zh": "Chelm"
-        },
-        "city_id": "CITY::gn::8426032",
-        "host_feature_id": "PL_POW_2261",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Chelm",
-          "zh": "Chelm"
-        },
-        "stable_key": "id::CITY::gn::8426032"
-      },
-      {
-        "base_name": {
-          "en": "Środmieście",
-          "zh": "Srodmiescie"
-        },
-        "city_id": "CITY::gn::8426045",
-        "host_feature_id": "PL_POW_2261",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Srodmiescie",
-          "zh": "Srodmiescie"
-        },
-        "stable_key": "id::CITY::gn::8426045"
-      },
-      {
-        "base_name": {
-          "en": "Ujeścisko-Łostowice",
-          "zh": "Ujescisko-Lostowice"
-        },
-        "city_id": "CITY::gn::8426046",
-        "host_feature_id": "PL_POW_2261",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Ujescisko-Lostowice",
-          "zh": "Ujescisko-Lostowice"
-        },
-        "stable_key": "id::CITY::gn::8426046"
-      },
-      {
-        "base_name": {
-          "en": "Wrzeszcz Górny",
-          "zh": "Wrzeszcz Gorny"
-        },
-        "city_id": "CITY::gn::8426050",
-        "host_feature_id": "PL_POW_2261",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Wrzeszcz Gorny",
-          "zh": "Wrzeszcz Gorny"
-        },
-        "stable_key": "id::CITY::gn::8426050"
-      },
-      {
-        "base_name": {
-          "en": "Świerczewo",
-          "zh": "Swierczewo"
-        },
-        "city_id": "CITY::gn::8426094",
-        "host_feature_id": "PL_POW_3262",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Swierczewo",
-          "zh": "Swierczewo"
-        },
-        "stable_key": "id::CITY::gn::8426094"
-      },
-      {
-        "base_name": {
-          "en": "Kumi",
-          "zh": "库米"
-        },
-        "city_id": "CITY::ne::1159113727",
-        "host_feature_id": "UG_ADM1_17295835B57878138064711",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kumi Town",
-          "zh": "库米"
-        },
-        "stable_key": "id::CITY::ne::1159113727"
-      },
-      {
-        "base_name": {
-          "en": "Kibale",
-          "zh": "基巴莱"
-        },
-        "city_id": "CITY::ne::1159113985",
-        "host_feature_id": "UG_ADM1_17295835B91329899113986",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kibaale",
-          "zh": "基巴莱"
-        },
-        "stable_key": "id::CITY::ne::1159113985"
-      },
-      {
-        "base_name": {
-          "en": "Mons",
-          "zh": "蒙斯"
-        },
-        "city_id": "CITY::ne::1159120321",
-        "host_feature_id": "BE_MRG_f7a8cd5ecd9e",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Bergen",
-          "zh": "贝亨"
-        },
-        "stable_key": "id::CITY::ne::1159120321"
-      },
-      {
-        "base_name": {
-          "en": "Arlon",
-          "zh": "阿尔隆"
-        },
-        "city_id": "CITY::ne::1159121119",
-        "host_feature_id": "BE_MRG_d49081148862",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Arel",
-          "zh": "阿雷尔"
-        },
-        "stable_key": "id::CITY::ne::1159121119"
-      },
-      {
-        "base_name": {
-          "en": "Karusi",
-          "zh": "卡鲁齐"
-        },
-        "city_id": "CITY::ne::1159121251",
-        "host_feature_id": "BI_ADM1_BDI-2633",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Karuzi",
-          "zh": "卡鲁齐"
-        },
-        "stable_key": "id::CITY::ne::1159121251"
-      },
-      {
-        "base_name": {
-          "en": "Mobaye",
-          "zh": "莫巴伊"
-        },
-        "city_id": "CITY::ne::1159122685",
-        "host_feature_id": "CF_ADM1_CAF-794",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Gustavstadt",
-          "zh": "古斯塔夫城"
-        },
-        "stable_key": "id::CITY::ne::1159122685"
-      },
-      {
-        "base_name": {
-          "en": "Mykolayiv",
-          "zh": "尼古拉耶夫"
-        },
-        "city_id": "CITY::ne::1159126699",
-        "host_feature_id": "UA_RAY_74538382B2161330582129",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Nikolajew",
-          "zh": "尼古拉耶夫"
-        },
-        "stable_key": "id::CITY::ne::1159126699"
-      },
-      {
-        "base_name": {
-          "en": "Chernihiv",
-          "zh": "切尔尼戈夫"
-        },
-        "city_id": "CITY::ne::1159126717",
-        "host_feature_id": "UA_RAY_74538382B44220139144156",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Tschernigow",
-          "zh": "切尔尼戈夫"
-        },
-        "stable_key": "id::CITY::ne::1159126717"
-      },
-      {
-        "base_name": {
-          "en": "Khmelnytskyy",
-          "zh": "赫梅利尼茨基"
-        },
-        "city_id": "CITY::ne::1159126729",
-        "host_feature_id": "UA_RAY_74538382B37791268598116",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Proskurow",
-          "zh": "普罗斯库罗夫"
-        },
-        "stable_key": "id::CITY::ne::1159126729"
-      },
-      {
-        "base_name": {
-          "en": "Brovary",
-          "zh": "布罗瓦里"
-        },
-        "city_id": "CITY::ne::1159126797",
-        "host_feature_id": "UA_RAY_74538382B60890943260132",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Browary",
-          "zh": "布罗瓦雷"
-        },
-        "stable_key": "id::CITY::ne::1159126797"
-      },
-      {
-        "base_name": {
-          "en": "Kryvyy Rih",
-          "zh": "克里沃罗格"
-        },
-        "city_id": "CITY::ne::1159126851",
-        "host_feature_id": "UA_RAY_74538382B55212312657182",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kriwoi Rog",
-          "zh": "克里沃罗格"
-        },
-        "stable_key": "id::CITY::ne::1159126851"
-      },
-      {
-        "base_name": {
-          "en": "Šiauliai",
-          "zh": "希奥利艾"
-        },
-        "city_id": "CITY::ne::1159128255",
-        "host_feature_id": "LT026",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Schaulen",
-          "zh": "绍伦"
-        },
-        "stable_key": "id::CITY::ne::1159128255"
-      },
-      {
-        "base_name": {
-          "en": "Arras",
-          "zh": "阿拉斯"
-        },
-        "city_id": "CITY::ne::1159130525",
-        "host_feature_id": "FR_ARR_62001",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Atrecht",
-          "zh": "阿特雷赫特"
-        },
-        "stable_key": "id::CITY::ne::1159130525"
-      },
-      {
-        "base_name": {
-          "en": "Besançon",
-          "zh": "贝桑松"
-        },
-        "city_id": "CITY::ne::1159130531",
-        "host_feature_id": "FR_ARR_25001",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Bisanz",
-          "zh": "比桑茨"
-        },
-        "stable_key": "id::CITY::ne::1159130531"
-      },
-      {
-        "base_name": {
-          "en": "Kutaisi",
-          "zh": "库塔伊西"
-        },
-        "city_id": "CITY::ne::1159130705",
-        "host_feature_id": "GEO-3030",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kutaissi",
-          "zh": "库塔伊西"
-        },
-        "stable_key": "id::CITY::ne::1159130705"
-      },
-      {
-        "base_name": {
-          "en": "Ganca",
-          "zh": "甘贾"
-        },
-        "city_id": "CITY::ne::1159132163",
-        "host_feature_id": "AZE-1679",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Gandscha",
-          "zh": "甘贾"
-        },
-        "stable_key": "id::CITY::ne::1159132163"
-      },
-      {
-        "base_name": {
-          "en": "Polatsk",
-          "zh": "波洛茨克"
-        },
-        "city_id": "CITY::ne::1159132305",
-        "host_feature_id": "BY_RAY_67162791B45929653886900",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Polazk",
-          "zh": "波洛茨克"
-        },
-        "stable_key": "id::CITY::ne::1159132305"
-      },
-      {
-        "base_name": {
-          "en": "Liège",
-          "zh": "列日"
-        },
-        "city_id": "CITY::ne::1159132333",
-        "host_feature_id": "BE332",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Lüttich",
-          "zh": "吕蒂希"
-        },
-        "stable_key": "id::CITY::ne::1159132333"
-      },
-      {
-        "base_name": {
-          "en": "Kerch",
-          "zh": "刻赤"
-        },
-        "city_id": "CITY::ne::1159134151",
-        "host_feature_id": "UA_RAY_74538382B91806639169097",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kertsch",
-          "zh": "刻赤"
-        },
-        "stable_key": "id::CITY::ne::1159134151"
-      },
-      {
-        "base_name": {
-          "en": "Simferopol",
-          "zh": "辛菲罗波尔"
-        },
-        "city_id": "CITY::ne::1159134155",
-        "host_feature_id": "UA_RAY_74538382B84040377374615",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Gotenburg",
-          "zh": "哥滕堡"
-        },
-        "stable_key": "id::CITY::ne::1159134155"
-      },
-      {
-        "base_name": {
-          "en": "Kherson",
-          "zh": "赫尔松"
-        },
-        "city_id": "CITY::ne::1159134159",
-        "host_feature_id": "UA_RAY_74538382B72369548204787",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Cherson",
-          "zh": "赫尔松"
-        },
-        "stable_key": "id::CITY::ne::1159134159"
-      },
-      {
-        "base_name": {
-          "en": "Rivne",
-          "zh": "罗夫诺"
-        },
-        "city_id": "CITY::ne::1159134173",
-        "host_feature_id": "UA_RAY_74538382B36980255523800",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Rowno",
-          "zh": "罗夫诺"
-        },
-        "stable_key": "id::CITY::ne::1159134173"
-      },
-      {
-        "base_name": {
-          "en": "Ivano-Frankivsk",
-          "zh": "伊万诺-弗兰科夫斯克"
-        },
-        "city_id": "CITY::ne::1159134181",
-        "host_feature_id": "UA_RAY_74538382B41206945038645",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Stanislau",
-          "zh": "斯坦尼斯劳"
-        },
-        "stable_key": "id::CITY::ne::1159134181"
-      },
-      {
-        "base_name": {
-          "en": "Ternopil",
-          "zh": "捷尔诺波尔"
-        },
-        "city_id": "CITY::ne::1159134187",
-        "host_feature_id": "UA_RAY_74538382B88282912225835",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Tarnopol",
-          "zh": "塔尔诺波尔"
-        },
-        "stable_key": "id::CITY::ne::1159134187"
-      },
-      {
-        "base_name": {
-          "en": "Kirovohrad",
-          "zh": "基洛沃格勒"
-        },
-        "city_id": "CITY::ne::1159134205",
-        "host_feature_id": "UA_RAY_74538382B33094259068281",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Eichhornburg",
-          "zh": "艾希霍恩堡"
-        },
-        "stable_key": "id::CITY::ne::1159134205"
-      },
-      {
-        "base_name": {
-          "en": "Vinnytsya",
-          "zh": "文尼察"
-        },
-        "city_id": "CITY::ne::1159134213",
-        "host_feature_id": "UA_RAY_74538382B89307192182420",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Winnizia",
-          "zh": "文尼察"
-        },
-        "stable_key": "id::CITY::ne::1159134213"
-      },
-      {
-        "base_name": {
-          "en": "Luhansk",
-          "zh": "卢甘斯克"
-        },
-        "city_id": "CITY::ne::1159134241",
-        "host_feature_id": "UA_RAY_74538382B91393089585676",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Lugansk",
-          "zh": "卢甘斯克"
-        },
-        "stable_key": "id::CITY::ne::1159134241"
-      },
-      {
-        "base_name": {
-          "en": "Poltava",
-          "zh": "波尔塔瓦"
-        },
-        "city_id": "CITY::ne::1159134245",
-        "host_feature_id": "UA_RAY_74538382B39784518508744",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Poltawa",
-          "zh": "波尔塔瓦"
-        },
-        "stable_key": "id::CITY::ne::1159134245"
-      },
-      {
-        "base_name": {
-          "en": "Melitopol",
-          "zh": "梅利托波尔"
-        },
-        "city_id": "CITY::ne::1159134253",
-        "host_feature_id": "UA_RAY_74538382B95492559683598",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Ost-Germania",
-          "zh": "东日耳曼尼亚"
-        },
-        "stable_key": "id::CITY::ne::1159134253"
-      },
-      {
-        "base_name": {
-          "en": "Zvishavane",
-          "zh": "兹维沙瓦内"
-        },
-        "city_id": "CITY::ne::1159134807",
-        "host_feature_id": "ZW_ADM1_ZWE-527",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Shabani",
-          "zh": "沙巴尼"
-        },
-        "stable_key": "id::CITY::ne::1159134807"
-      },
-      {
-        "base_name": {
-          "en": "Masvingo",
-          "zh": "馬斯溫戈"
-        },
-        "city_id": "CITY::ne::1159134835",
-        "host_feature_id": "ZW_ADM1_ZWE-532",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Fort Victoria",
-          "zh": "维多利亚堡"
-        },
-        "stable_key": "id::CITY::ne::1159134835"
-      },
-      {
-        "base_name": {
-          "en": "Chinhoyi",
-          "zh": "奇諾伊"
-        },
-        "city_id": "CITY::ne::1159134845",
-        "host_feature_id": "ZW_ADM1_ZWE-533",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Sinoia",
-          "zh": "锡诺亚"
-        },
-        "stable_key": "id::CITY::ne::1159134845"
-      },
-      {
-        "base_name": {
-          "en": "Entebbe",
-          "zh": "恩德培"
-        },
-        "city_id": "CITY::ne::1159135399",
-        "host_feature_id": "UG_ADM1_17295835B48340970483027",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Böhmstadt",
-          "zh": "贝姆城"
-        },
-        "stable_key": "id::CITY::ne::1159135399"
-      },
-      {
-        "base_name": {
-          "en": "Masindi-Port",
-          "zh": "马辛迪港"
-        },
-        "city_id": "CITY::ne::1159135421",
-        "host_feature_id": "UG_ADM1_17295835B91329899113986",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Masindi Port",
-          "zh": "马辛迪港"
-        },
-        "stable_key": "id::CITY::ne::1159135421"
-      },
-      {
-        "base_name": {
-          "en": "Chake Chake",
-          "zh": "查凱查凱"
-        },
-        "city_id": "CITY::ne::1159135601",
-        "host_feature_id": "TZ_ADM1_TZA-3381",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Chake-Chake",
-          "zh": "查凱查凱"
-        },
-        "stable_key": "id::CITY::ne::1159135601"
-      },
-      {
-        "base_name": {
-          "en": "Njombe",
-          "zh": "恩琼贝"
-        },
-        "city_id": "CITY::ne::1159135625",
-        "host_feature_id": "TZ_ADM1_TZA-5587",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Njombe Mjini",
-          "zh": "恩琼贝"
-        },
-        "stable_key": "id::CITY::ne::1159135625"
-      },
-      {
-        "base_name": {
-          "en": "Ventspils",
-          "zh": "文茨皮尔斯"
-        },
-        "city_id": "CITY::ne::1159136347",
-        "host_feature_id": "LV003",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Windau",
-          "zh": "温道"
-        },
-        "stable_key": "id::CITY::ne::1159136347"
-      },
-      {
-        "base_name": {
-          "en": "Klaipėda",
-          "zh": "克莱佩达"
-        },
-        "city_id": "CITY::ne::1159136351",
-        "host_feature_id": "LT023",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Memel",
-          "zh": "梅梅尔"
-        },
-        "stable_key": "id::CITY::ne::1159136351"
-      },
-      {
-        "base_name": {
-          "en": "Kaunas",
-          "zh": "考纳斯"
-        },
-        "city_id": "CITY::ne::1159136375",
-        "host_feature_id": "LT022",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kauen",
-          "zh": "考恩"
-        },
-        "stable_key": "id::CITY::ne::1159136375"
-      },
-      {
-        "base_name": {
-          "en": "Jelgava",
-          "zh": "叶尔加瓦"
-        },
-        "city_id": "CITY::ne::1159136381",
-        "host_feature_id": "LV009",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Mitau",
-          "zh": "米陶"
-        },
-        "stable_key": "id::CITY::ne::1159136381"
-      },
-      {
-        "base_name": {
-          "en": "Montepuez",
-          "zh": "蒙特普埃茲"
-        },
-        "city_id": "CITY::ne::1159136663",
-        "host_feature_id": "MZ_ADM1_MOZ-1198",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Neu-Baden",
-          "zh": "新巴登"
-        },
-        "stable_key": "id::CITY::ne::1159136663"
-      },
-      {
-        "base_name": {
-          "en": "Mocimboa",
-          "zh": "濱海莫辛布瓦區"
-        },
-        "city_id": "CITY::ne::1159136669",
-        "host_feature_id": "MZ_ADM1_MOZ-1198",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Mocímboa da Praia",
-          "zh": "濱海莫辛布瓦區"
-        },
-        "stable_key": "id::CITY::ne::1159136669"
-      },
-      {
-        "base_name": {
-          "en": "Cuamba",
-          "zh": "誇姆巴"
-        },
-        "city_id": "CITY::ne::1159136677",
-        "host_feature_id": "MZ_ADM1_MOZ-1199",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Neue Esche",
-          "zh": "新白蜡树"
-        },
-        "stable_key": "id::CITY::ne::1159136677"
-      },
-      {
-        "base_name": {
-          "en": "Mangochi",
-          "zh": "曼戈切"
-        },
-        "city_id": "CITY::ne::1159136977",
-        "host_feature_id": "MW_ADM1_82672581B71595037145626",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Fort Johnston",
-          "zh": "约翰斯顿堡"
-        },
-        "stable_key": "id::CITY::ne::1159136977"
-      },
-      {
-        "base_name": {
-          "en": "Quissico",
-          "zh": "薩瓦拉"
-        },
-        "city_id": "CITY::ne::1159136995",
-        "host_feature_id": "MZ_ADM1_MOZ-1925",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Zavala",
-          "zh": "薩瓦拉"
-        },
-        "stable_key": "id::CITY::ne::1159136995"
-      },
-      {
-        "base_name": {
-          "en": "Vilanculos",
-          "zh": "维兰库洛"
-        },
-        "city_id": "CITY::ne::1159136999",
-        "host_feature_id": "MZ_ADM1_MOZ-1925",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Vilankulo",
-          "zh": "维兰库洛"
-        },
-        "stable_key": "id::CITY::ne::1159136999"
-      },
-      {
-        "base_name": {
-          "en": "Wrocław",
-          "zh": "弗罗茨瓦夫"
-        },
-        "city_id": "CITY::ne::1159139051",
-        "host_feature_id": "PL_POW_0264",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Breslau",
-          "zh": "布雷斯劳"
-        },
-        "stable_key": "id::CITY::ne::1159139051"
-      },
-      {
-        "base_name": {
-          "en": "Szczecin",
-          "zh": "什切青"
-        },
-        "city_id": "CITY::ne::1159139055",
-        "host_feature_id": "PL_POW_3262",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Stettin",
-          "zh": "斯德丁"
-        },
-        "stable_key": "id::CITY::ne::1159139055"
-      },
-      {
-        "base_name": {
-          "en": "Poznań",
-          "zh": "波茲南"
-        },
-        "city_id": "CITY::ne::1159139065",
-        "host_feature_id": "PL_POW_3064",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Posen",
-          "zh": "波森"
-        },
-        "stable_key": "id::CITY::ne::1159139065"
-      },
-      {
-        "base_name": {
-          "en": "Kielce",
-          "zh": "凯尔采"
-        },
-        "city_id": "CITY::ne::1159139087",
-        "host_feature_id": "PL_POW_2661",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kieltz",
-          "zh": "凯尔采"
-        },
-        "stable_key": "id::CITY::ne::1159139087"
-      },
-      {
-        "base_name": {
-          "en": "Rzeszów",
-          "zh": "热舒夫"
-        },
-        "city_id": "CITY::ne::1159139101",
-        "host_feature_id": "PL_POW_1863",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Reichshof",
-          "zh": "赖希斯霍夫"
-        },
-        "stable_key": "id::CITY::ne::1159139101"
-      },
-      {
-        "base_name": {
-          "en": "Opuwo",
-          "zh": "奥普沃"
-        },
-        "city_id": "CITY::ne::1159139245",
-        "host_feature_id": "NA_ADM1_NAM-3347",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Ohopoho",
-          "zh": "奥霍波霍"
-        },
-        "stable_key": "id::CITY::ne::1159139245"
-      },
-      {
-        "base_name": {
-          "en": "Kaga Bandoro",
-          "zh": "卡加班多罗"
-        },
-        "city_id": "CITY::ne::1159139443",
-        "host_feature_id": "CF_ADM1_CAF-807",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kaga-Bandoro",
-          "zh": "卡加班多罗"
-        },
-        "stable_key": "id::CITY::ne::1159139443"
-      },
-      {
-        "base_name": {
-          "en": "Kelo",
-          "zh": "凯洛"
-        },
-        "city_id": "CITY::ne::1159140353",
-        "host_feature_id": "TD_ADM1_TCD-1487",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kélo",
-          "zh": "凯洛"
-        },
-        "stable_key": "id::CITY::ne::1159140353"
-      },
-      {
-        "base_name": {
-          "en": "Wamba",
-          "zh": "万巴"
-        },
-        "city_id": "CITY::ne::1159140511",
-        "host_feature_id": "CD_ADM1_COD-1559",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Wamba Territory",
-          "zh": "万巴"
-        },
-        "stable_key": "id::CITY::ne::1159140511"
-      },
-      {
-        "base_name": {
-          "en": "Mbanza-Ngungu",
-          "zh": "姆班扎恩古恩古"
-        },
-        "city_id": "CITY::ne::1159141423",
-        "host_feature_id": "CD_ADM1_COD-1883",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Nkamba",
-          "zh": "姆班扎恩古恩古"
-        },
-        "stable_key": "id::CITY::ne::1159141423"
-      },
-      {
-        "base_name": {
-          "en": "Beni",
-          "zh": "贝尼"
-        },
-        "city_id": "CITY::ne::1159141523",
-        "host_feature_id": "CD_ADM1_COD-1898",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Erichsdorf",
-          "zh": "埃里希斯多夫"
-        },
-        "stable_key": "id::CITY::ne::1159141523"
-      },
-      {
-        "base_name": {
-          "en": "Mitzik",
-          "zh": "米齐克"
-        },
-        "city_id": "CITY::ne::1159141681",
-        "host_feature_id": "GA_ADM1_GAB-2187",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Mitzic",
-          "zh": "米齐克"
-        },
-        "stable_key": "id::CITY::ne::1159141681"
-      },
-      {
-        "base_name": {
-          "en": "Bifoum",
-          "zh": "比丰"
-        },
-        "city_id": "CITY::ne::1159141895",
-        "host_feature_id": "GA_ADM1_GAB-2621",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Bifoun",
-          "zh": "比丰"
-        },
-        "stable_key": "id::CITY::ne::1159141895"
-      },
-      {
-        "base_name": {
-          "en": "Ndende",
-          "zh": "恩代恩代"
-        },
-        "city_id": "CITY::ne::1159141899",
-        "host_feature_id": "GA_ADM1_GAB-2622",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Ndendé",
-          "zh": "恩代恩代"
-        },
-        "stable_key": "id::CITY::ne::1159141899"
-      },
-      {
-        "base_name": {
-          "en": "Okandja",
-          "zh": "奥孔贾"
-        },
-        "city_id": "CITY::ne::1159141917",
-        "host_feature_id": "GA_ADM1_GAB-2627",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Okondja",
-          "zh": "奥孔贾"
-        },
-        "stable_key": "id::CITY::ne::1159141917"
-      },
-      {
-        "base_name": {
-          "en": "Calais",
-          "zh": "加来"
-        },
-        "city_id": "CITY::ne::1159142047",
-        "host_feature_id": "FR_MRG_7c681aa2032e",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kalen",
-          "zh": "卡伦"
-        },
-        "stable_key": "id::CITY::ne::1159142047"
-      },
-      {
-        "base_name": {
-          "en": "Nancy",
-          "zh": "南锡"
-        },
-        "city_id": "CITY::ne::1159142061",
-        "host_feature_id": "FR_ARR_54003",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Nanzig",
-          "zh": "南齐希"
-        },
-        "stable_key": "id::CITY::ne::1159142061"
-      },
-      {
-        "base_name": {
-          "en": "Sembe",
-          "zh": "森贝"
-        },
-        "city_id": "CITY::ne::1159142169",
-        "host_feature_id": "CG_ADM1_COG-2880",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Sembé",
-          "zh": "森贝"
-        },
-        "stable_key": "id::CITY::ne::1159142169"
-      },
-      {
-        "base_name": {
-          "en": "Loubomo",
-          "zh": "多利西"
-        },
-        "city_id": "CITY::ne::1159143017",
-        "host_feature_id": "CG_ADM1_COG-3345",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Dolisie",
-          "zh": "多利西"
-        },
-        "stable_key": "id::CITY::ne::1159143017"
-      },
-      {
-        "base_name": {
-          "en": "Eyumojok",
-          "zh": "埃尤莫乔克"
-        },
-        "city_id": "CITY::ne::1159144009",
-        "host_feature_id": "CM_ADM1_CMR-799",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Eyumodjock",
-          "zh": "埃尤莫乔克"
-        },
-        "stable_key": "id::CITY::ne::1159144009"
-      },
-      {
-        "base_name": {
-          "en": "Nola",
-          "zh": "諾拉"
-        },
-        "city_id": "CITY::ne::1159144019",
-        "host_feature_id": "CF_ADM1_CAF-802",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Beutlersstadt",
-          "zh": "博伊特勒城"
-        },
-        "stable_key": "id::CITY::ne::1159144019"
-      },
-      {
-        "base_name": {
-          "en": "Brugge",
-          "zh": "布鲁日"
-        },
-        "city_id": "CITY::ne::1159144553",
-        "host_feature_id": "BE_MRG_923fe66661e2",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Brügge",
-          "zh": "布吕格"
-        },
-        "stable_key": "id::CITY::ne::1159144553"
-      },
-      {
-        "base_name": {
-          "en": "Namur",
-          "zh": "那慕尔"
-        },
-        "city_id": "CITY::ne::1159144557",
-        "host_feature_id": "BE_MRG_6a92ca76474d",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Namen",
-          "zh": "纳门"
-        },
-        "stable_key": "id::CITY::ne::1159144557"
-      },
-      {
-        "base_name": {
-          "en": "Charleroi",
-          "zh": "沙勒罗瓦"
-        },
-        "city_id": "CITY::ne::1159144561",
-        "host_feature_id": "BE32B",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Karolingen",
-          "zh": "卡罗林根"
-        },
-        "stable_key": "id::CITY::ne::1159144561"
-      },
-      {
-        "base_name": {
-          "en": "Camabatela",
-          "zh": "安巴卡"
-        },
-        "city_id": "CITY::ne::1159144699",
-        "host_feature_id": "AO_ADM1_AGO-1878",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Ambaca",
-          "zh": "安巴卡"
-        },
-        "stable_key": "id::CITY::ne::1159144699"
-      },
-      {
-        "base_name": {
-          "en": "Ndalatando",
-          "zh": "恩达拉坦多"
-        },
-        "city_id": "CITY::ne::1159144701",
-        "host_feature_id": "AO_ADM1_AGO-1878",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "N'dalatando",
-          "zh": "恩达拉坦多"
-        },
-        "stable_key": "id::CITY::ne::1159144701"
-      },
-      {
-        "base_name": {
-          "en": "Waku Kungo",
-          "zh": "瓦庫昆戈"
-        },
-        "city_id": "CITY::ne::1159144707",
-        "host_feature_id": "AO_ADM1_AGO-1879",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Waku-Kungo",
-          "zh": "瓦庫昆戈"
-        },
-        "stable_key": "id::CITY::ne::1159144707"
-      },
-      {
-        "base_name": {
-          "en": "Mbanza-Congo",
-          "zh": "姆班扎刚果"
-        },
-        "city_id": "CITY::ne::1159144711",
-        "host_feature_id": "AO_ADM1_AGO-1882",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Sankt Salvador",
-          "zh": "圣萨尔瓦多"
-        },
-        "stable_key": "id::CITY::ne::1159144711"
-      },
-      {
-        "base_name": {
-          "en": "Nzeto",
-          "zh": "恩泽托"
-        },
-        "city_id": "CITY::ne::1159144715",
-        "host_feature_id": "AO_ADM1_AGO-1882",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "N'zeto",
-          "zh": "恩泽托"
-        },
-        "stable_key": "id::CITY::ne::1159144715"
-      },
-      {
-        "base_name": {
-          "en": "Cuito Caunavale",
-          "zh": "奎托誇納瓦萊"
-        },
-        "city_id": "CITY::ne::1159144745",
-        "host_feature_id": "AO_ADM1_AGO-1888",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Cuito Cuanavale",
-          "zh": "奎托誇納瓦萊"
-        },
-        "stable_key": "id::CITY::ne::1159144745"
-      },
-      {
-        "base_name": {
-          "en": "Cangamba",
-          "zh": "坎甘巴"
-        },
-        "city_id": "CITY::ne::1159144781",
-        "host_feature_id": "AO_ADM1_AGO-1892",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Cangombe",
-          "zh": "坎甘巴"
-        },
-        "stable_key": "id::CITY::ne::1159144781"
-      },
-      {
-        "base_name": {
-          "en": "Lumbala Nguimbo",
-          "zh": "隆巴拉"
-        },
-        "city_id": "CITY::ne::1159144789",
-        "host_feature_id": "AO_ADM1_AGO-1892",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Lumbala-Ngimbo",
-          "zh": "隆巴拉"
-        },
-        "stable_key": "id::CITY::ne::1159144789"
-      },
-      {
-        "base_name": {
-          "en": "Orsha",
-          "zh": "奥尔沙"
-        },
-        "city_id": "CITY::ne::1159145129",
-        "host_feature_id": "BY_INT_VITEBSK",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Orscha",
-          "zh": "奥尔沙"
-        },
-        "stable_key": "id::CITY::ne::1159145129"
-      },
-      {
-        "base_name": {
-          "en": "Hrodna",
-          "zh": "格罗德诺"
-        },
-        "city_id": "CITY::ne::1159145137",
-        "host_feature_id": "BY_RAY_67162791B13547290723272",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Garten",
-          "zh": "加滕"
-        },
-        "stable_key": "id::CITY::ne::1159145137"
-      },
-      {
-        "base_name": {
-          "en": "Zaporizhzhya",
-          "zh": "扎波罗热"
-        },
-        "city_id": "CITY::ne::1159146313",
-        "host_feature_id": "UA_RAY_74538382B86672078093677",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Saparoshje",
-          "zh": "扎波罗热"
-        },
-        "stable_key": "id::CITY::ne::1159146313"
-      },
-      {
-        "base_name": {
-          "en": "Liepaga",
-          "zh": "利耶帕亚"
-        },
-        "city_id": "CITY::ne::1159146449",
-        "host_feature_id": "LV003",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Libau",
-          "zh": "利包"
-        },
-        "stable_key": "id::CITY::ne::1159146449"
-      },
-      {
-        "base_name": {
-          "en": "Lille",
-          "zh": "里尔"
-        },
-        "city_id": "CITY::ne::1159147227",
-        "host_feature_id": "FR_ARR_59005",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Ryssel",
-          "zh": "赖瑟尔"
-        },
-        "stable_key": "id::CITY::ne::1159147227"
-      },
-      {
-        "base_name": {
-          "en": "Batumi",
-          "zh": "巴统"
-        },
-        "city_id": "CITY::ne::1159147265",
-        "host_feature_id": "GEO-3027",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Batum",
-          "zh": "巴统"
-        },
-        "stable_key": "id::CITY::ne::1159147265"
-      },
-      {
-        "base_name": {
-          "en": "Mansa",
-          "zh": "曼萨"
-        },
-        "city_id": "CITY::ne::1159147555",
-        "host_feature_id": "ZM_ADM1_ZMB-514",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Fort Rosebery",
-          "zh": "罗斯贝里堡"
-        },
-        "stable_key": "id::CITY::ne::1159147555"
-      },
-      {
-        "base_name": {
-          "en": "Hwange",
-          "zh": "万基"
-        },
-        "city_id": "CITY::ne::1159147573",
-        "host_feature_id": "ZW_ADM1_ZWE-526",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Wankie",
-          "zh": "万基"
-        },
-        "stable_key": "id::CITY::ne::1159147573"
-      },
-      {
-        "base_name": {
-          "en": "Gweru",
-          "zh": "圭洛"
-        },
-        "city_id": "CITY::ne::1159147577",
-        "host_feature_id": "ZW_ADM1_ZWE-527",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Gwelo",
-          "zh": "圭洛"
-        },
-        "stable_key": "id::CITY::ne::1159147577"
-      },
-      {
-        "base_name": {
-          "en": "Mutare",
-          "zh": "穆塔雷"
-        },
-        "city_id": "CITY::ne::1159147579",
-        "host_feature_id": "ZW_ADM1_ZWE-529",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Umtali",
-          "zh": "乌姆塔利"
-        },
-        "stable_key": "id::CITY::ne::1159147579"
-      },
-      {
-        "base_name": {
-          "en": "Kadoma",
-          "zh": "卡多马"
-        },
-        "city_id": "CITY::ne::1159147581",
-        "host_feature_id": "ZW_ADM1_ZWE-533",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Gatooma",
-          "zh": "加图马"
-        },
-        "stable_key": "id::CITY::ne::1159147581"
-      },
-      {
-        "base_name": {
-          "en": "Homyel",
-          "zh": "戈梅利"
-        },
-        "city_id": "CITY::ne::1159147723",
-        "host_feature_id": "BY_INT_GOMEL",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Homel",
-          "zh": "戈梅利"
-        },
-        "stable_key": "id::CITY::ne::1159147723"
-      },
-      {
-        "base_name": {
-          "en": "Chimoio",
-          "zh": "希莫尤"
-        },
-        "city_id": "CITY::ne::1159148021",
-        "host_feature_id": "MZ_ADM1_MOZ-1192",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Peryberg",
-          "zh": "佩里贝格"
-        },
-        "stable_key": "id::CITY::ne::1159148021"
-      },
-      {
-        "base_name": {
-          "en": "Lichinga",
-          "zh": "利欣加"
-        },
-        "city_id": "CITY::ne::1159148023",
-        "host_feature_id": "MZ_ADM1_MOZ-1199",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kabraldorf",
-          "zh": "卡布拉尔多夫"
-        },
-        "stable_key": "id::CITY::ne::1159148023"
-      },
-      {
-        "base_name": {
-          "en": "Mocambique",
-          "zh": "莫桑比克岛"
-        },
-        "city_id": "CITY::ne::1159148029",
-        "host_feature_id": "MZ_ADM1_MOZ-1200",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Island of Mozambique",
-          "zh": "莫桑比克岛"
-        },
-        "stable_key": "id::CITY::ne::1159148029"
-      },
-      {
-        "base_name": {
-          "en": "Łódź",
-          "zh": "罗兹"
-        },
-        "city_id": "CITY::ne::1159148225",
-        "host_feature_id": "PL_POW_1061",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Litzmannstadt",
-          "zh": "利茨曼施塔特"
-        },
-        "stable_key": "id::CITY::ne::1159148225"
-      },
-      {
-        "base_name": {
-          "en": "Daugavpils",
-          "zh": "陶格夫匹尔斯"
-        },
-        "city_id": "CITY::ne::1159148307",
-        "host_feature_id": "LV005",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Dünaburg",
-          "zh": "杜纳堡"
-        },
-        "stable_key": "id::CITY::ne::1159148307"
-      },
-      {
-        "base_name": {
-          "en": "Isiro",
-          "zh": "伊西罗"
-        },
-        "city_id": "CITY::ne::1159148447",
-        "host_feature_id": "CD_ADM1_COD-1559",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Dintersburg",
-          "zh": "丁特斯堡"
-        },
-        "stable_key": "id::CITY::ne::1159148447"
-      },
-      {
-        "base_name": {
-          "en": "Tartu",
-          "zh": "塔尔图"
-        },
-        "city_id": "CITY::ne::1159148453",
-        "host_feature_id": "EE008",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Dorpat",
-          "zh": "多尔帕特"
-        },
-        "stable_key": "id::CITY::ne::1159148453"
-      },
-      {
-        "base_name": {
-          "en": "Bukavu",
-          "zh": "布卡武"
-        },
-        "city_id": "CITY::ne::1159148481",
-        "host_feature_id": "CD_ADM1_COD-1894",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Costermansstadt",
-          "zh": "科斯特曼斯城"
-        },
-        "stable_key": "id::CITY::ne::1159148481"
-      },
-      {
-        "base_name": {
-          "en": "Uvira",
-          "zh": "乌维拉"
-        },
-        "city_id": "CITY::ne::1159148483",
-        "host_feature_id": "CD_ADM1_COD-1894",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kurtsdorf",
-          "zh": "库尔茨多夫"
-        },
-        "stable_key": "id::CITY::ne::1159148483"
-      },
-      {
-        "base_name": {
-          "en": "Kindu",
-          "zh": "金杜"
-        },
-        "city_id": "CITY::ne::1159148485",
-        "host_feature_id": "CD_ADM1_COD-1895",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Empainhafen",
-          "zh": "恩潘港"
-        },
-        "stable_key": "id::CITY::ne::1159148485"
-      },
-      {
-        "base_name": {
-          "en": "Pärnu",
-          "zh": "派尔努"
-        },
-        "city_id": "CITY::ne::1159148515",
-        "host_feature_id": "EE004",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Pernau",
-          "zh": "佩尔瑙"
-        },
-        "stable_key": "id::CITY::ne::1159148515"
-      },
-      {
-        "base_name": {
-          "en": "Tômbua",
-          "zh": "通布阿"
-        },
-        "city_id": "CITY::ne::1159149011",
-        "host_feature_id": "AO_ADM1_AGO-1893",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Tômbwa",
-          "zh": "通布阿"
-        },
-        "stable_key": "id::CITY::ne::1159149011"
-      },
-      {
-        "base_name": {
-          "en": "Lviv",
-          "zh": "利沃夫"
-        },
-        "city_id": "CITY::ne::1159149323",
-        "host_feature_id": "UA_RAY_74538382B46853229377150",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Lemberg",
-          "zh": "伦贝格"
-        },
-        "stable_key": "id::CITY::ne::1159149323"
-      },
-      {
-        "base_name": {
-          "en": "Zhytomyr",
-          "zh": "日托米尔"
-        },
-        "city_id": "CITY::ne::1159149327",
-        "host_feature_id": "UA_RAY_74538382B57692221763967",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Shitomir",
-          "zh": "日托米尔"
-        },
-        "stable_key": "id::CITY::ne::1159149327"
-      },
-      {
-        "base_name": {
-          "en": "Dnipro",
-          "zh": "第聂伯罗"
-        },
-        "city_id": "CITY::ne::1159149329",
-        "host_feature_id": "UA_RAY_74538382B23045356862491",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Reichenaustadt",
-          "zh": "赖歇瑙施塔特"
-        },
-        "stable_key": "id::CITY::ne::1159149329"
-      },
-      {
-        "base_name": {
-          "en": "Donetsk",
-          "zh": "顿涅茨克"
-        },
-        "city_id": "CITY::ne::1159149331",
-        "host_feature_id": "UA_RAY_74538382B54113761495064",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Hughesdorf",
-          "zh": "休斯多夫"
-        },
-        "stable_key": "id::CITY::ne::1159149331"
-      },
-      {
-        "base_name": {
-          "en": "Kharkiv",
-          "zh": "哈尔科夫"
-        },
-        "city_id": "CITY::ne::1159149333",
-        "host_feature_id": "UA_RAY_74538382B36501884751905",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Charkow",
-          "zh": "哈尔科夫"
-        },
-        "stable_key": "id::CITY::ne::1159149333"
-      },
-      {
-        "base_name": {
-          "en": "Kigali",
-          "zh": "基加利"
-        },
-        "city_id": "CITY::ne::1159149385",
-        "host_feature_id": "RW_ADM1_RWA-3495",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Barthstadt",
-          "zh": "巴特城"
-        },
-        "stable_key": "id::CITY::ne::1159149385"
-      },
-      {
-        "base_name": {
-          "en": "Pemba",
-          "zh": "彭巴"
-        },
-        "city_id": "CITY::ne::1159149487",
-        "host_feature_id": "MZ_ADM1_MOZ-1198",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Ameliahafen",
-          "zh": "阿梅莉亚港"
-        },
-        "stable_key": "id::CITY::ne::1159149487"
-      },
-      {
-        "base_name": {
-          "en": "Xai-Xai",
-          "zh": "赛赛"
-        },
-        "city_id": "CITY::ne::1159149493",
-        "host_feature_id": "MZ_ADM1_MOZ-1207",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Vila de João Belo",
-          "zh": "维拉·若昂·贝洛"
-        },
-        "stable_key": "id::CITY::ne::1159149493"
-      },
-      {
-        "base_name": {
-          "en": "Quelimane",
-          "zh": "克利马内"
-        },
-        "city_id": "CITY::ne::1159149513",
-        "host_feature_id": "MZ_ADM1_MOZ-1906",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Bouhlerstadt",
-          "zh": "布勒城"
-        },
-        "stable_key": "id::CITY::ne::1159149513"
-      },
-      {
-        "base_name": {
-          "en": "Gdańsk",
-          "zh": "格但斯克"
-        },
-        "city_id": "CITY::ne::1159149707",
-        "host_feature_id": "PL_POW_2261",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Danzig",
-          "zh": "但泽"
-        },
-        "stable_key": "id::CITY::ne::1159149707"
-      },
-      {
-        "base_name": {
-          "en": "Kraków",
-          "zh": "克拉科夫"
-        },
-        "city_id": "CITY::ne::1159149709",
-        "host_feature_id": "PL_POW_1261",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Krakau",
-          "zh": "克拉考"
-        },
-        "stable_key": "id::CITY::ne::1159149709"
-      },
-      {
-        "base_name": {
-          "en": "Walvis Bay",
-          "zh": "鲸湾港"
-        },
-        "city_id": "CITY::ne::1159149725",
-        "host_feature_id": "NA_ADM1_NAM-3348",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Walfischbai",
-          "zh": "鲸湾港"
-        },
-        "stable_key": "id::CITY::ne::1159149725"
-      },
-      {
-        "base_name": {
-          "en": "Arusha",
-          "zh": "阿鲁沙"
-        },
-        "city_id": "CITY::ne::1159149733",
-        "host_feature_id": "TZ_ADM1_TZA-3391",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Löweburg",
-          "zh": "勒韦堡"
-        },
-        "stable_key": "id::CITY::ne::1159149733"
-      },
-      {
-        "base_name": {
-          "en": "Kisangani",
-          "zh": "基桑加尼"
-        },
-        "city_id": "CITY::ne::1159149865",
-        "host_feature_id": "CD_ADM1_COD-1559",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Stanleystadt",
-          "zh": "斯坦利城"
-        },
-        "stable_key": "id::CITY::ne::1159149865"
-      },
-      {
-        "base_name": {
-          "en": "Kananga",
-          "zh": "卡南加"
-        },
-        "city_id": "CITY::ne::1159149977",
-        "host_feature_id": "CD_ADM1_COD-1872",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Luluaburg",
-          "zh": "卢卢阿堡"
-        },
-        "stable_key": "id::CITY::ne::1159149977"
-      },
-      {
-        "base_name": {
-          "en": "Kalemie",
-          "zh": "卡莱米"
-        },
-        "city_id": "CITY::ne::1159149983",
-        "host_feature_id": "CD_ADM1_COD-1897",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Albertstadt",
-          "zh": "阿尔贝特城"
-        },
-        "stable_key": "id::CITY::ne::1159149983"
-      },
-      {
-        "base_name": {
-          "en": "Pointe-Noire",
-          "zh": "黑角"
-        },
-        "city_id": "CITY::ne::1159150171",
-        "host_feature_id": "CG_ADM1_COG-5855",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Schwarze-Spitze",
-          "zh": "黑角"
-        },
-        "stable_key": "id::CITY::ne::1159150171"
-      },
-      {
-        "base_name": {
-          "en": "Brest",
-          "zh": "布列斯特"
-        },
-        "city_id": "CITY::ne::1159150351",
-        "host_feature_id": "BY_RAY_67162791B30498032594927",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Brest-Litowsk",
-          "zh": "布列斯特-立托夫斯克"
-        },
-        "stable_key": "id::CITY::ne::1159150351"
-      },
-      {
-        "base_name": {
-          "en": "Bujumbura",
-          "zh": "布琼布拉"
-        },
-        "city_id": "CITY::ne::1159150427",
-        "host_feature_id": "BI_ADM1_BDI-3364",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Usumbura",
-          "zh": "乌松布拉"
-        },
-        "stable_key": "id::CITY::ne::1159150427"
-      },
-      {
-        "base_name": {
-          "en": "Sevastopol",
-          "zh": "塞瓦斯托波尔"
-        },
-        "city_id": "CITY::ne::1159150561",
-        "host_feature_id": "RU_ARCTIC_FB_043",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Theoderichshafen",
-          "zh": "狄奥多里希港"
-        },
-        "stable_key": "id::CITY::ne::1159150561"
-      },
-      {
-        "base_name": {
-          "en": "Harare",
-          "zh": "哈拉雷"
-        },
-        "city_id": "CITY::ne::1159150573",
-        "host_feature_id": "ZW_ADM1_ZWE-525",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Salisbury",
-          "zh": "索尔兹伯里"
-        },
-        "stable_key": "id::CITY::ne::1159150573"
-      },
-      {
-        "base_name": {
-          "en": "Maputo",
-          "zh": "马普托"
-        },
-        "city_id": "CITY::ne::1159150683",
-        "host_feature_id": "MZ_ADM1_MOZ-5854",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Lourenço Marques",
-          "zh": "洛伦索·马贵斯"
-        },
-        "stable_key": "id::CITY::ne::1159150683"
-      },
-      {
-        "base_name": {
-          "en": "Windhoek",
-          "zh": "温得和克"
-        },
-        "city_id": "CITY::ne::1159150785",
-        "host_feature_id": "NA_ADM1_NAM-3340",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Windhuk",
-          "zh": "温得和克"
-        },
-        "stable_key": "id::CITY::ne::1159150785"
-      },
-      {
-        "base_name": {
-          "en": "Zanzibar",
-          "zh": "桑给巴尔"
-        },
-        "city_id": "CITY::ne::1159150789",
-        "host_feature_id": "TZ_ADM1_TZA-3384",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Sansibar",
-          "zh": "桑给巴尔"
-        },
-        "stable_key": "id::CITY::ne::1159150789"
-      },
-      {
-        "base_name": {
-          "en": "Vilnius",
-          "zh": "维尔纽斯"
-        },
-        "city_id": "CITY::ne::1159150809",
-        "host_feature_id": "LT011",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Wilna",
-          "zh": "维尔纳"
-        },
-        "stable_key": "id::CITY::ne::1159150809"
-      },
-      {
-        "base_name": {
-          "en": "Tallinn",
-          "zh": "塔林"
-        },
-        "city_id": "CITY::ne::1159150877",
-        "host_feature_id": "EE001",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Reval",
-          "zh": "雷瓦尔"
-        },
-        "stable_key": "id::CITY::ne::1159150877"
-      },
-      {
-        "base_name": {
-          "en": "Lubumbashi",
-          "zh": "卢本巴希"
-        },
-        "city_id": "CITY::ne::1159150903",
-        "host_feature_id": "CD_ADM1_COD-1897",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Elisabethstadt",
-          "zh": "伊丽莎白城"
-        },
-        "stable_key": "id::CITY::ne::1159150903"
-      },
-      {
-        "base_name": {
-          "en": "Libreville",
-          "zh": "利伯维尔"
-        },
-        "city_id": "CITY::ne::1159150913",
-        "host_feature_id": "GA_ADM1_GAB-2168",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Freistadt",
-          "zh": "自由城"
-        },
-        "stable_key": "id::CITY::ne::1159150913"
-      },
-      {
-        "base_name": {
-          "en": "Port-Gentil",
-          "zh": "让蒂尔港"
-        },
-        "city_id": "CITY::ne::1159150919",
-        "host_feature_id": "GA_ADM1_GAB-2624",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Gentilhafen",
-          "zh": "让蒂尔港"
-        },
-        "stable_key": "id::CITY::ne::1159150919"
-      },
-      {
-        "base_name": {
-          "en": "Tbilisi",
-          "zh": "第比利斯"
-        },
-        "city_id": "CITY::ne::1159150961",
-        "host_feature_id": "GEO-3036",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Tiflis",
-          "zh": "第比利斯"
-        },
-        "stable_key": "id::CITY::ne::1159150961"
-      },
-      {
-        "base_name": {
-          "en": "Brazzaville",
-          "zh": "布拉柴维尔"
-        },
-        "city_id": "CITY::ne::1159150993",
-        "host_feature_id": "CG_ADM1_COG-4855",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Brazzastadt",
-          "zh": "布拉柴城"
-        },
-        "stable_key": "id::CITY::ne::1159150993"
-      },
-      {
-        "base_name": {
-          "en": "Yaoundé",
-          "zh": "雅温得"
-        },
-        "city_id": "CITY::ne::1159151115",
-        "host_feature_id": "CM_ADM1_CMR-1480",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Jaunde",
-          "zh": "雅恩德"
-        },
-        "stable_key": "id::CITY::ne::1159151115"
-      },
-      {
-        "base_name": {
-          "en": "Huambo",
-          "zh": "万博"
-        },
-        "city_id": "CITY::ne::1159151131",
-        "host_feature_id": "AO_ADM1_AGO-1890",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Neu Lissabon",
-          "zh": "新里斯本"
-        },
-        "stable_key": "id::CITY::ne::1159151131"
-      },
-      {
-        "base_name": {
-          "en": "Warsaw",
-          "zh": "华沙"
-        },
-        "city_id": "CITY::ne::1159151299",
-        "host_feature_id": "PL_POW_1465",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Warschau",
-          "zh": "华沙"
-        },
-        "stable_key": "id::CITY::ne::1159151299"
-      },
-      {
-        "base_name": {
-          "en": "Dar es Salaam",
-          "zh": "达累斯萨拉姆"
-        },
-        "city_id": "CITY::ne::1159151305",
-        "host_feature_id": "TZ_ADM1_TZA-3378",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Daressalam",
-          "zh": "达累斯萨拉姆"
-        },
-        "stable_key": "id::CITY::ne::1159151305"
-      },
-      {
-        "base_name": {
-          "en": "Brussels",
-          "zh": "布鲁塞尔"
-        },
-        "city_id": "CITY::ne::1159151465",
-        "host_feature_id": "BE100",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Brüssel",
-          "zh": "布鲁塞尔"
-        },
-        "stable_key": "id::CITY::ne::1159151465"
-      },
-      {
-        "base_name": {
-          "en": "Kyiv",
-          "zh": "基辅"
-        },
-        "city_id": "CITY::ne::1159151495",
-        "host_feature_id": "UA_RAY_74538382B60890943260132",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Kiew",
-          "zh": "基辅"
-        },
-        "stable_key": "id::CITY::ne::1159151495"
-      },
-      {
-        "base_name": {
-          "en": "Kinshasa",
-          "zh": "金沙萨"
-        },
-        "city_id": "CITY::ne::1159151539",
-        "host_feature_id": "CD_ADM1_COD-1884",
-        "resolution": "scenario_city_override",
-        "scenario_name": {
-          "en": "Leopoldstadt",
-          "zh": "利奥波德城"
-        },
-        "stable_key": "id::CITY::ne::1159151539"
-      }
-    ],
-    "renamed_city_count": 4427,
-    "unresolved_city_rename_count": 0,
-    "unresolved_city_renames": []
-  },
+  "version": 1,
+  "scenario_id": "tno_1962",
+  "generated_at": "2026-03-17T04:10:44.164493+00:00",
   "cities": {
     "CITY::gn::1024694": {
       "aliases": [
@@ -27237,7 +23844,9 @@
         "en": "Lyskovo",
         "zh": "雷斯科沃"
       },
-      "stable_key": "id::CITY::gn::532715"
+      "stable_key": "id::CITY::gn::532715",
+      "city_id": "CITY::gn::532715",
+      "host_feature_id": "RU_RAY_50074027B99457892446306"
     },
     "CITY::gn::5336899": {
       "display_name": {
@@ -27762,7 +24371,9 @@
         "en": "Ishimbay",
         "zh": "伊希姆拜"
       },
-      "stable_key": "id::CITY::gn::555980"
+      "stable_key": "id::CITY::gn::555980",
+      "city_id": "CITY::gn::555980",
+      "host_feature_id": "RU_MRG_c8a0780621bb"
     },
     "CITY::gn::5572400": {
       "display_name": {
@@ -27944,7 +24555,9 @@
         "en": "Beloretsk",
         "zh": "别洛列茨克"
       },
-      "stable_key": "id::CITY::gn::577881"
+      "stable_key": "id::CITY::gn::577881",
+      "city_id": "CITY::gn::577881",
+      "host_feature_id": "RU_MRG_75e8b19921bc"
     },
     "CITY::gn::5783695": {
       "display_name": {
@@ -36776,7 +33389,9 @@
         "en": "Omolon",
         "zh": "奥莫隆"
       },
-      "stable_key": "id::CITY::ne::1159146493"
+      "stable_key": "id::CITY::ne::1159146493",
+      "city_id": "CITY::ne::1159146493",
+      "host_feature_id": "RU_RAY_50074027B8751485821395"
     },
     "CITY::ne::1159146507": {
       "display_name": {
@@ -36858,7 +33473,9 @@
         "en": "Oyrot-Tura",
         "zh": "奥伊罗特-图拉"
       },
-      "stable_key": "id::CITY::ne::1159146581"
+      "stable_key": "id::CITY::ne::1159146581",
+      "city_id": "CITY::ne::1159146581",
+      "host_feature_id": "RU_MRG_2953c850d23a"
     },
     "CITY::ne::1159146637": {
       "city_id": "CITY::ne::1159146637",
@@ -38484,7 +35101,9 @@
         "en": "Vyatka",
         "zh": "维亚特卡"
       },
-      "stable_key": "id::CITY::ne::1159149565"
+      "stable_key": "id::CITY::ne::1159149565",
+      "city_id": "CITY::ne::1159149565",
+      "host_feature_id": "RU_RAY_50074027B56747088904047"
     },
     "CITY::ne::1159149571": {
       "city_id": "CITY::ne::1159149571",
@@ -39272,7 +35891,12 @@
     },
     "CITY::ne::1159150749": {
       "city_id": "CITY::ne::1159150749",
-      "host_feature_id": "RU_RAY_50074027B87273501478717"
+      "host_feature_id": "RU_RAY_50074027B87273501478717",
+      "stable_key": "id::CITY::ne::1159150749",
+      "display_name": {
+        "en": "Magadan",
+        "zh": "马加丹"
+      }
     },
     "CITY::ne::1159150775": {
       "city_id": "CITY::ne::1159150775",
@@ -40175,9 +36799,3492 @@
       "population": 0,
       "source": "reviewed_settlement",
       "stable_key": "id::CITY::scenario::cherdyn"
+    },
+    "CITY::ne::1159146671": {
+      "city_id": "CITY::ne::1159146671",
+      "stable_key": "id::CITY::ne::1159146671",
+      "display_name": {
+        "en": "Zeya",
+        "zh": "结雅"
+      },
+      "host_feature_id": "RU_RAY_50074027B59835640460134"
+    },
+    "CITY::ne::1159122401": {
+      "city_id": "CITY::ne::1159122401",
+      "stable_key": "id::CITY::ne::1159122401",
+      "display_name": {
+        "en": "Yopal",
+        "zh": "约帕尔"
+      },
+      "host_feature_id": "CO_ADM1_COL-1422"
+    },
+    "CITY::ne::1159150709": {
+      "city_id": "CITY::ne::1159150709",
+      "stable_key": "id::CITY::ne::1159150709",
+      "display_name": {
+        "en": "Surgut",
+        "zh": "苏尔古特"
+      },
+      "host_feature_id": "RU_RAY_50074027B54524544237793"
+    },
+    "CITY::ne::1159149617": {
+      "city_id": "CITY::ne::1159149617",
+      "stable_key": "id::CITY::ne::1159149617",
+      "display_name": {
+        "en": "Norilsk",
+        "zh": "诺里尔斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B15872482411826"
+    },
+    "CITY::ne::1159150685": {
+      "city_id": "CITY::ne::1159150685",
+      "stable_key": "id::CITY::ne::1159150685",
+      "display_name": {
+        "en": "Tomsk",
+        "zh": "托木斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B18760987875066"
+    },
+    "CITY::gn::712886": {
+      "city_id": "CITY::gn::712886",
+      "stable_key": "id::CITY::gn::712886",
+      "display_name": {
+        "en": "Balta",
+        "zh": "巴尔塔"
+      },
+      "host_feature_id": "UA_RAY_74538382B90572707310825"
+    },
+    "CITY::ne::1159137725": {
+      "city_id": "CITY::ne::1159137725",
+      "stable_key": "id::CITY::ne::1159137725",
+      "display_name": {
+        "en": "Peregrebnoye",
+        "zh": "佩列格列布诺耶"
+      },
+      "host_feature_id": "RU_RAY_50074027B18123411923849"
+    },
+    "CITY::ne::1159149541": {
+      "city_id": "CITY::ne::1159149541",
+      "stable_key": "id::CITY::ne::1159149541",
+      "display_name": {
+        "en": "Vologda",
+        "zh": "沃洛格达"
+      },
+      "host_feature_id": "RU_MRG_aedb5f9ed3b1"
+    },
+    "CITY::ne::1159150693": {
+      "city_id": "CITY::ne::1159150693",
+      "stable_key": "id::CITY::ne::1159150693",
+      "display_name": {
+        "en": "Arkhangelsk",
+        "zh": "阿尔汉格尔斯克"
+      },
+      "host_feature_id": "RU_CITY_ARKHANGELSK"
+    },
+    "CITY::ne::1159149567": {
+      "city_id": "CITY::ne::1159149567",
+      "stable_key": "id::CITY::ne::1159149567",
+      "display_name": {
+        "en": "Nizhny Tagil",
+        "zh": "下塔吉尔"
+      },
+      "host_feature_id": "RU_MRG_2b95a26406ca"
     }
   },
-  "generated_at": "2026-03-17T04:10:44.164493+00:00",
-  "scenario_id": "tno_1962",
-  "version": 1
+  "audit": {
+    "name_conflict_count": 242,
+    "name_conflicts": [
+      {
+        "base_name": {
+          "en": "Mocimboa",
+          "zh": "濱海莫辛布瓦區"
+        },
+        "city_id": "CITY::gn::1024699",
+        "host_feature_id": "MZ_ADM1_MOZ-1198",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Mocímboa da Praia",
+          "zh": "濱海莫辛布瓦區"
+        },
+        "stable_key": "id::CITY::gn::1024699"
+      },
+      {
+        "base_name": {
+          "en": "Manhiça",
+          "zh": "曼希萨"
+        },
+        "city_id": "CITY::gn::1040989",
+        "host_feature_id": "MZ_ADM1_MOZ-1927",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Manhica",
+          "zh": "曼希萨"
+        },
+        "stable_key": "id::CITY::gn::1040989"
+      },
+      {
+        "base_name": {
+          "en": "Gurúè",
+          "zh": "古鲁埃"
+        },
+        "city_id": "CITY::gn::1045512",
+        "host_feature_id": "MZ_ADM1_MOZ-1906",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Gurue",
+          "zh": "古鲁埃"
+        },
+        "stable_key": "id::CITY::gn::1045512"
+      },
+      {
+        "base_name": {
+          "en": "Chokwé",
+          "zh": "绍克韦"
+        },
+        "city_id": "CITY::gn::1048364",
+        "host_feature_id": "MZ_ADM1_MOZ-1207",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Vila Trigo de Morais",
+          "zh": "维拉·特里戈·德·莫赖斯"
+        },
+        "stable_key": "id::CITY::gn::1048364"
+      },
+      {
+        "base_name": {
+          "en": "Osiedle Kosmonautów",
+          "zh": "Osiedle Kosmonautow"
+        },
+        "city_id": "CITY::gn::12047617",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Osiedle Kosmonautow",
+          "zh": "Osiedle Kosmonautow"
+        },
+        "stable_key": "id::CITY::gn::12047617"
+      },
+      {
+        "base_name": {
+          "en": "Kozanów",
+          "zh": "Kozanow"
+        },
+        "city_id": "CITY::gn::12047636",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kozanow",
+          "zh": "Kozanow"
+        },
+        "stable_key": "id::CITY::gn::12047636"
+      },
+      {
+        "base_name": {
+          "en": "Rejon placu Świętego Macieja",
+          "zh": "Rejon placu Swietego Macieja"
+        },
+        "city_id": "CITY::gn::12047644",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Rejon placu Swietego Macieja",
+          "zh": "Rejon placu Swietego Macieja"
+        },
+        "stable_key": "id::CITY::gn::12047644"
+      },
+      {
+        "base_name": {
+          "en": "Różanka-Polanka",
+          "zh": "Rozanka-Polanka"
+        },
+        "city_id": "CITY::gn::12047651",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Rozanka-Polanka",
+          "zh": "Rozanka-Polanka"
+        },
+        "stable_key": "id::CITY::gn::12047651"
+      },
+      {
+        "base_name": {
+          "en": "Orunia Górna-Gdańsk Południe",
+          "zh": "Orunia Gorna-Gdansk Poludnie"
+        },
+        "city_id": "CITY::gn::13100477",
+        "host_feature_id": "PL_POW_2261",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Orunia Gorna-Gdansk Poludnie",
+          "zh": "Orunia Gorna-Gdansk Poludnie"
+        },
+        "stable_key": "id::CITY::gn::13100477"
+      },
+      {
+        "base_name": {
+          "en": "Śródmieście",
+          "zh": "Srodmiescie"
+        },
+        "city_id": "CITY::gn::13562332",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Srodmiescie",
+          "zh": "Srodmiescie"
+        },
+        "stable_key": "id::CITY::gn::13562332"
+      },
+      {
+        "base_name": {
+          "en": "Kousséri",
+          "zh": "库塞里"
+        },
+        "city_id": "CITY::gn::2229798",
+        "host_feature_id": "CM_ADM1_CMR-1462",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kousseri",
+          "zh": "库塞里"
+        },
+        "stable_key": "id::CITY::gn::2229798"
+      },
+      {
+        "base_name": {
+          "en": "Bégoua",
+          "zh": "贝古阿"
+        },
+        "city_id": "CITY::gn::2389422",
+        "host_feature_id": "CF_ADM1_CAF-4856",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Begoua",
+          "zh": "贝古阿"
+        },
+        "stable_key": "id::CITY::gn::2389422"
+      },
+      {
+        "base_name": {
+          "en": "Visé",
+          "zh": "维塞"
+        },
+        "city_id": "CITY::gn::2784548",
+        "host_feature_id": "BE332",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Vise",
+          "zh": "维塞"
+        },
+        "stable_key": "id::CITY::gn::2784548"
+      },
+      {
+        "base_name": {
+          "en": "Verviers",
+          "zh": "维尔维耶"
+        },
+        "city_id": "CITY::gn::2784821",
+        "host_feature_id": "BE_MRG_49096f4ef44b",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Velwisch",
+          "zh": "费尔维施"
+        },
+        "stable_key": "id::CITY::gn::2784821"
+      },
+      {
+        "base_name": {
+          "en": "Tournai",
+          "zh": "图尔奈"
+        },
+        "city_id": "CITY::gn::2785341",
+        "host_feature_id": "BE_MRG_15f4aef6c612",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Dornick",
+          "zh": "多尔尼克"
+        },
+        "stable_key": "id::CITY::gn::2785341"
+      },
+      {
+        "base_name": {
+          "en": "Tongeren",
+          "zh": "通厄伦"
+        },
+        "city_id": "CITY::gn::2785389",
+        "host_feature_id": "BE_MRG_a29e92a10668",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Tongern",
+          "zh": "通厄恩"
+        },
+        "stable_key": "id::CITY::gn::2785389"
+      },
+      {
+        "base_name": {
+          "en": "Tielt",
+          "zh": "蒂尔特"
+        },
+        "city_id": "CITY::gn::2785476",
+        "host_feature_id": "BE_MRG_24ed7b411331",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Thielt",
+          "zh": "蒂尔特"
+        },
+        "stable_key": "id::CITY::gn::2785476"
+      },
+      {
+        "base_name": {
+          "en": "Soignies",
+          "zh": "苏瓦尼"
+        },
+        "city_id": "CITY::gn::2786420",
+        "host_feature_id": "BE_MRG_f7a8cd5ecd9e",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Zinnik",
+          "zh": "济尼克"
+        },
+        "stable_key": "id::CITY::gn::2786420"
+      },
+      {
+        "base_name": {
+          "en": "Sint-Niklaas",
+          "zh": "圣尼克拉斯"
+        },
+        "city_id": "CITY::gn::2786578",
+        "host_feature_id": "BE236",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Sankt Nikolaus",
+          "zh": "圣尼古劳斯"
+        },
+        "stable_key": "id::CITY::gn::2786578"
+      },
+      {
+        "base_name": {
+          "en": "Roeselare",
+          "zh": "鲁瑟拉勒"
+        },
+        "city_id": "CITY::gn::2787889",
+        "host_feature_id": "BE_MRG_24ed7b411331",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Russelaere",
+          "zh": "吕瑟拉勒"
+        },
+        "stable_key": "id::CITY::gn::2787889"
+      },
+      {
+        "base_name": {
+          "en": "Pont-à-Celles",
+          "zh": "蓬塔塞勒"
+        },
+        "city_id": "CITY::gn::2788765",
+        "host_feature_id": "BE32B",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Pont-a-Celles",
+          "zh": "蓬塔塞勒"
+        },
+        "stable_key": "id::CITY::gn::2788765"
+      },
+      {
+        "base_name": {
+          "en": "Péruwelz",
+          "zh": "佩吕韦尔"
+        },
+        "city_id": "CITY::gn::2789162",
+        "host_feature_id": "BE_MRG_15f4aef6c612",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Peruwelz",
+          "zh": "佩吕韦尔"
+        },
+        "stable_key": "id::CITY::gn::2789162"
+      },
+      {
+        "base_name": {
+          "en": "Mechelen",
+          "zh": "梅赫伦"
+        },
+        "city_id": "CITY::gn::2791537",
+        "host_feature_id": "BE_MRG_38ea003ab243",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Mecheln",
+          "zh": "梅赫伦"
+        },
+        "stable_key": "id::CITY::gn::2791537"
+      },
+      {
+        "base_name": {
+          "en": "Leuven",
+          "zh": "鲁汶"
+        },
+        "city_id": "CITY::gn::2792482",
+        "host_feature_id": "BE242",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Löwen",
+          "zh": "勒汶"
+        },
+        "stable_key": "id::CITY::gn::2792482"
+      },
+      {
+        "base_name": {
+          "en": "La Louvière",
+          "zh": "拉卢维耶尔"
+        },
+        "city_id": "CITY::gn::2793508",
+        "host_feature_id": "BE_MRG_f7a8cd5ecd9e",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "La Louviere",
+          "zh": "拉卢维耶尔"
+        },
+        "stable_key": "id::CITY::gn::2793508"
+      },
+      {
+        "base_name": {
+          "en": "Kortrijk",
+          "zh": "科特赖克"
+        },
+        "city_id": "CITY::gn::2794055",
+        "host_feature_id": "BE_MRG_24ed7b411331",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kortreik",
+          "zh": "科特赖克"
+        },
+        "stable_key": "id::CITY::gn::2794055"
+      },
+      {
+        "base_name": {
+          "en": "Ieper",
+          "zh": "伊珀尔"
+        },
+        "city_id": "CITY::gn::2795100",
+        "host_feature_id": "BE_MRG_7dbe84a470bd",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Ypern",
+          "zh": "伊珀恩"
+        },
+        "stable_key": "id::CITY::gn::2795100"
+      },
+      {
+        "base_name": {
+          "en": "Huy",
+          "zh": "于伊"
+        },
+        "city_id": "CITY::gn::2795113",
+        "host_feature_id": "BE_MRG_49096f4ef44b",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Hoei",
+          "zh": "胡伊"
+        },
+        "stable_key": "id::CITY::gn::2795113"
+      },
+      {
+        "base_name": {
+          "en": "Grivegnée",
+          "zh": "格里弗涅"
+        },
+        "city_id": "CITY::gn::2797096",
+        "host_feature_id": "BE332",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Grivegnee",
+          "zh": "格里弗涅"
+        },
+        "stable_key": "id::CITY::gn::2797096"
+      },
+      {
+        "base_name": {
+          "en": "Fléron",
+          "zh": "弗莱龙"
+        },
+        "city_id": "CITY::gn::2798301",
+        "host_feature_id": "BE332",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Fleron",
+          "zh": "弗莱龙"
+        },
+        "stable_key": "id::CITY::gn::2798301"
+      },
+      {
+        "base_name": {
+          "en": "Flémalle-Haute",
+          "zh": "上弗莱马勒"
+        },
+        "city_id": "CITY::gn::2798307",
+        "host_feature_id": "BE332",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Flemalle-Haute",
+          "zh": "上弗莱马勒"
+        },
+        "stable_key": "id::CITY::gn::2798307"
+      },
+      {
+        "base_name": {
+          "en": "Dendermonde",
+          "zh": "登德尔蒙德"
+        },
+        "city_id": "CITY::gn::2799645",
+        "host_feature_id": "BE_MRG_81cfb513b60d",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Dendermünde",
+          "zh": "登德明德"
+        },
+        "stable_key": "id::CITY::gn::2799645"
+      },
+      {
+        "base_name": {
+          "en": "Châtelineau",
+          "zh": "沙泰利诺"
+        },
+        "city_id": "CITY::gn::2800445",
+        "host_feature_id": "BE32B",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Chatelineau",
+          "zh": "沙泰利诺"
+        },
+        "stable_key": "id::CITY::gn::2800445"
+      },
+      {
+        "base_name": {
+          "en": "Châtelet",
+          "zh": "沙特莱"
+        },
+        "city_id": "CITY::gn::2800448",
+        "host_feature_id": "BE32B",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Chatelet",
+          "zh": "沙特莱"
+        },
+        "stable_key": "id::CITY::gn::2800448"
+      },
+      {
+        "base_name": {
+          "en": "Ath",
+          "zh": "阿特"
+        },
+        "city_id": "CITY::gn::2803010",
+        "host_feature_id": "BE_MRG_15f4aef6c612",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Aat",
+          "zh": "阿特"
+        },
+        "stable_key": "id::CITY::gn::2803010"
+      },
+      {
+        "base_name": {
+          "en": "Vitry-le-François",
+          "zh": "维特里勒弗朗索瓦"
+        },
+        "city_id": "CITY::gn::2967856",
+        "host_feature_id": "FR_ARR_51004",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Vitry-le-Francois",
+          "zh": "维特里勒弗朗索瓦"
+        },
+        "stable_key": "id::CITY::gn::2967856"
+      },
+      {
+        "base_name": {
+          "en": "Villers-lès-Nancy",
+          "zh": "维莱莱南锡"
+        },
+        "city_id": "CITY::gn::2968368",
+        "host_feature_id": "FR_ARR_54003",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Villers-les-Nancy",
+          "zh": "维莱莱南锡"
+        },
+        "stable_key": "id::CITY::gn::2968368"
+      },
+      {
+        "base_name": {
+          "en": "Verdun",
+          "zh": "凡尔登"
+        },
+        "city_id": "CITY::gn::2969958",
+        "host_feature_id": "FR_ARR_55003",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Verden an der Maas",
+          "zh": "马斯河畔韦尔登"
+        },
+        "stable_key": "id::CITY::gn::2969958"
+      },
+      {
+        "base_name": {
+          "en": "Vandœuvre-lès-Nancy",
+          "zh": "旺德夫尔莱南锡"
+        },
+        "city_id": "CITY::gn::2970797",
+        "host_feature_id": "FR_ARR_54003",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Vandoeuvre-les-Nancy",
+          "zh": "旺德夫尔莱南锡"
+        },
+        "stable_key": "id::CITY::gn::2970797"
+      },
+      {
+        "base_name": {
+          "en": "Valenciennes",
+          "zh": "瓦朗谢讷"
+        },
+        "city_id": "CITY::gn::2971041",
+        "host_feature_id": "FR_ARR_59006",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Schwanenthal",
+          "zh": "施瓦嫩塔尔"
+        },
+        "stable_key": "id::CITY::gn::2971041"
+      },
+      {
+        "base_name": {
+          "en": "Toul",
+          "zh": "图勒"
+        },
+        "city_id": "CITY::gn::2972350",
+        "host_feature_id": "FR_ARR_54004",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Tull",
+          "zh": "图尔"
+        },
+        "stable_key": "id::CITY::gn::2972350"
+      },
+      {
+        "base_name": {
+          "en": "Saint-Omer",
+          "zh": "圣奥梅尔"
+        },
+        "city_id": "CITY::gn::2977845",
+        "host_feature_id": "FR_MRG_7c681aa2032e",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Sint-Omaars",
+          "zh": "圣奥马尔斯"
+        },
+        "stable_key": "id::CITY::gn::2977845"
+      },
+      {
+        "base_name": {
+          "en": "Saint-Dié-des-Vosges",
+          "zh": "孚日圣迪耶"
+        },
+        "city_id": "CITY::gn::2980827",
+        "host_feature_id": "FR_ARR_88003",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Saint-Die-des-Vosges",
+          "zh": "孚日圣迪耶"
+        },
+        "stable_key": "id::CITY::gn::2980827"
+      },
+      {
+        "base_name": {
+          "en": "Pont-à-Mousson",
+          "zh": "蓬塔穆松"
+        },
+        "city_id": "CITY::gn::2986306",
+        "host_feature_id": "FR_ARR_54003",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Pont-a-Mousson",
+          "zh": "蓬塔穆松"
+        },
+        "stable_key": "id::CITY::gn::2986306"
+      },
+      {
+        "base_name": {
+          "en": "Montbéliard",
+          "zh": "蒙贝利亚尔"
+        },
+        "city_id": "CITY::gn::2992938",
+        "host_feature_id": "FR_ARR_25002",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Mömpelgard",
+          "zh": "蒙佩尔加德"
+        },
+        "stable_key": "id::CITY::gn::2992938"
+      },
+      {
+        "base_name": {
+          "en": "Mons-en-Barœul",
+          "zh": "蒙桑巴勒"
+        },
+        "city_id": "CITY::gn::2993207",
+        "host_feature_id": "FR_ARR_59005",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Mons-en-Baroeul",
+          "zh": "蒙桑巴勒"
+        },
+        "stable_key": "id::CITY::gn::2993207"
+      },
+      {
+        "base_name": {
+          "en": "Marcq-en-Barœul",
+          "zh": "马克昂巴勒尔"
+        },
+        "city_id": "CITY::gn::2995908",
+        "host_feature_id": "FR_ARR_59005",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Marcq-en-Baroeul",
+          "zh": "马克昂巴勒尔"
+        },
+        "stable_key": "id::CITY::gn::2995908"
+      },
+      {
+        "base_name": {
+          "en": "Lunéville",
+          "zh": "吕内维尔"
+        },
+        "city_id": "CITY::gn::2997110",
+        "host_feature_id": "FR_ARR_54002",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Luneville",
+          "zh": "吕内维尔"
+        },
+        "stable_key": "id::CITY::gn::2997110"
+      },
+      {
+        "base_name": {
+          "en": "Liévin",
+          "zh": "列万"
+        },
+        "city_id": "CITY::gn::2998431",
+        "host_feature_id": "FR_ARR_62007",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Lievin",
+          "zh": "列万"
+        },
+        "stable_key": "id::CITY::gn::2998431"
+      },
+      {
+        "base_name": {
+          "en": "Hénin-Beaumont",
+          "zh": "埃南-博蒙"
+        },
+        "city_id": "CITY::gn::3013525",
+        "host_feature_id": "FR_ARR_62007",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Henin-Beaumont",
+          "zh": "埃南-博蒙"
+        },
+        "stable_key": "id::CITY::gn::3013525"
+      },
+      {
+        "base_name": {
+          "en": "Épinal",
+          "zh": "埃皮纳勒"
+        },
+        "city_id": "CITY::gn::3020035",
+        "host_feature_id": "FR_ARR_88001",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Spinneln",
+          "zh": "施平嫩"
+        },
+        "stable_key": "id::CITY::gn::3020035"
+      },
+      {
+        "base_name": {
+          "en": "Dunkerque",
+          "zh": "敦刻尔克"
+        },
+        "city_id": "CITY::gn::3020686",
+        "host_feature_id": "FR_ARR_59004",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Dünkirchen",
+          "zh": "敦基兴"
+        },
+        "stable_key": "id::CITY::gn::3020686"
+      },
+      {
+        "base_name": {
+          "en": "Douai",
+          "zh": "杜埃"
+        },
+        "city_id": "CITY::gn::3021000",
+        "host_feature_id": "FR_ARR_59003",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Dowaai",
+          "zh": "多瓦伊"
+        },
+        "stable_key": "id::CITY::gn::3021000"
+      },
+      {
+        "base_name": {
+          "en": "Charleville-Mézières",
+          "zh": "沙勒维尔-梅济耶尔"
+        },
+        "city_id": "CITY::gn::3026613",
+        "host_feature_id": "FR_ARR_08001",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Charleville-Mezieres",
+          "zh": "沙勒维尔-梅济耶尔"
+        },
+        "stable_key": "id::CITY::gn::3026613"
+      },
+      {
+        "base_name": {
+          "en": "Châlons-en-Champagne",
+          "zh": "香槟沙隆"
+        },
+        "city_id": "CITY::gn::3027487",
+        "host_feature_id": "FR_ARR_51001",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Chalons-en-Champagne",
+          "zh": "香槟沙隆"
+        },
+        "stable_key": "id::CITY::gn::3027487"
+      },
+      {
+        "base_name": {
+          "en": "Cambrai",
+          "zh": "康布雷"
+        },
+        "city_id": "CITY::gn::3029030",
+        "host_feature_id": "FR_ARR_59002",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kamerich",
+          "zh": "卡默里希"
+        },
+        "stable_key": "id::CITY::gn::3029030"
+      },
+      {
+        "base_name": {
+          "en": "Bruay-la-Buissière",
+          "zh": "布吕埃拉比西耶尔"
+        },
+        "city_id": "CITY::gn::3029825",
+        "host_feature_id": "FR_ARR_62002",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Bruay-la-Buissiere",
+          "zh": "布吕埃拉比西耶尔"
+        },
+        "stable_key": "id::CITY::gn::3029825"
+      },
+      {
+        "base_name": {
+          "en": "Boulogne-sur-Mer",
+          "zh": "滨海布洛涅"
+        },
+        "city_id": "CITY::gn::3031133",
+        "host_feature_id": "FR_MRG_7c681aa2032e",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Bonen",
+          "zh": "博嫩"
+        },
+        "stable_key": "id::CITY::gn::3031133"
+      },
+      {
+        "base_name": {
+          "en": "Béthune",
+          "zh": "贝蒂讷"
+        },
+        "city_id": "CITY::gn::3033002",
+        "host_feature_id": "FR_ARR_62002",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Betun",
+          "zh": "贝蒂讷"
+        },
+        "stable_key": "id::CITY::gn::3033002"
+      },
+      {
+        "base_name": {
+          "en": "Bar-le-Duc",
+          "zh": "巴勒迪克"
+        },
+        "city_id": "CITY::gn::3034911",
+        "host_feature_id": "FR_ARR_55001",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Herzogenbar",
+          "zh": "黑尔措根巴尔"
+        },
+        "stable_key": "id::CITY::gn::3034911"
+      },
+      {
+        "base_name": {
+          "en": "Armentières",
+          "zh": "阿尔芒蒂耶尔"
+        },
+        "city_id": "CITY::gn::3036903",
+        "host_feature_id": "FR_ARR_59005",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Armentieres",
+          "zh": "阿尔芒蒂耶尔"
+        },
+        "stable_key": "id::CITY::gn::3036903"
+      },
+      {
+        "base_name": {
+          "en": "Toruń",
+          "zh": "托伦"
+        },
+        "city_id": "CITY::gn::3083271",
+        "host_feature_id": "PL_POW_0463",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Thorn",
+          "zh": "托恩"
+        },
+        "stable_key": "id::CITY::gn::3083271"
+      },
+      {
+        "base_name": {
+          "en": "Sosnowiec",
+          "zh": "索斯诺维茨"
+        },
+        "city_id": "CITY::gn::3085128",
+        "host_feature_id": "PL_POW_2475",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Sosnowitz",
+          "zh": "索斯诺维茨"
+        },
+        "stable_key": "id::CITY::gn::3085128"
+      },
+      {
+        "base_name": {
+          "en": "Grzegórzki",
+          "zh": "Grzegorzki"
+        },
+        "city_id": "CITY::gn::3098171",
+        "host_feature_id": "PL_POW_1261",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Grzegorzki",
+          "zh": "Grzegorzki"
+        },
+        "stable_key": "id::CITY::gn::3098171"
+      },
+      {
+        "base_name": {
+          "en": "Częstochowa",
+          "zh": "琴斯托霍瓦"
+        },
+        "city_id": "CITY::gn::3100946",
+        "host_feature_id": "PL_POW_2464",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Tschenstochau",
+          "zh": "琴斯托霍瓦"
+        },
+        "stable_key": "id::CITY::gn::3100946"
+      },
+      {
+        "base_name": {
+          "en": "Bielsko-Biala",
+          "zh": "别尔斯科-比亚瓦"
+        },
+        "city_id": "CITY::gn::3103402",
+        "host_feature_id": "PL_POW_2461",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Bielitz",
+          "zh": "比利茨"
+        },
+        "stable_key": "id::CITY::gn::3103402"
+      },
+      {
+        "base_name": {
+          "en": "Caála",
+          "zh": "卡阿拉"
+        },
+        "city_id": "CITY::gn::3351500",
+        "host_feature_id": "AO_ADM1_AGO-1890",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Caala",
+          "zh": "卡阿拉"
+        },
+        "stable_key": "id::CITY::gn::3351500"
+      },
+      {
+        "base_name": {
+          "en": "Valmiera",
+          "zh": "瓦尔米耶拉"
+        },
+        "city_id": "CITY::gn::453754",
+        "host_feature_id": "LV008",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Wolmar",
+          "zh": "沃尔马尔"
+        },
+        "stable_key": "id::CITY::gn::453754"
+      },
+      {
+        "base_name": {
+          "en": "Liepāja",
+          "zh": "利耶帕亚"
+        },
+        "city_id": "CITY::gn::457954",
+        "host_feature_id": "LV003",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Libau",
+          "zh": "利包"
+        },
+        "stable_key": "id::CITY::gn::457954"
+      },
+      {
+        "base_name": {
+          "en": "Jūrmala",
+          "zh": "尤尔马拉"
+        },
+        "city_id": "CITY::gn::459201",
+        "host_feature_id": "LV007",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Jurmala",
+          "zh": "尤尔马拉"
+        },
+        "stable_key": "id::CITY::gn::459201"
+      },
+      {
+        "base_name": {
+          "en": "Jēkabpils",
+          "zh": "叶卡布皮尔斯"
+        },
+        "city_id": "CITY::gn::459283",
+        "host_feature_id": "LV009",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Jakobstadt",
+          "zh": "雅各布施塔特"
+        },
+        "stable_key": "id::CITY::gn::459283"
+      },
+      {
+        "base_name": {
+          "en": "Cēsis",
+          "zh": "采西斯"
+        },
+        "city_id": "CITY::gn::460570",
+        "host_feature_id": "LV008",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Cesis",
+          "zh": "采西斯"
+        },
+        "stable_key": "id::CITY::gn::460570"
+      },
+      {
+        "base_name": {
+          "en": "Sumqayıt",
+          "zh": "苏姆盖特"
+        },
+        "city_id": "CITY::gn::584923",
+        "host_feature_id": "AZE-1717",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Sumqayit",
+          "zh": "苏姆盖特"
+        },
+        "stable_key": "id::CITY::gn::584923"
+      },
+      {
+        "base_name": {
+          "en": "Nõmme",
+          "zh": "诺梅"
+        },
+        "city_id": "CITY::gn::589947",
+        "host_feature_id": "EE001",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Nomme",
+          "zh": "诺梅"
+        },
+        "stable_key": "id::CITY::gn::589947"
+      },
+      {
+        "base_name": {
+          "en": "Marijampolė",
+          "zh": "马里扬波莱"
+        },
+        "city_id": "CITY::gn::597231",
+        "host_feature_id": "LT024",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Marijampole",
+          "zh": "马里扬波莱"
+        },
+        "stable_key": "id::CITY::gn::597231"
+      },
+      {
+        "base_name": {
+          "en": "Kėdainiai",
+          "zh": "凯代尼艾"
+        },
+        "city_id": "CITY::gn::598272",
+        "host_feature_id": "LT022",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kedainiai",
+          "zh": "凯代尼艾"
+        },
+        "stable_key": "id::CITY::gn::598272"
+      },
+      {
+        "base_name": {
+          "en": "Rechytsa",
+          "zh": "雷奇察"
+        },
+        "city_id": "CITY::gn::622794",
+        "host_feature_id": "BY_INT_GOMEL",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Retschiza",
+          "zh": "雷奇察"
+        },
+        "stable_key": "id::CITY::gn::622794"
+      },
+      {
+        "base_name": {
+          "en": "Ursynów",
+          "zh": "Ursynow"
+        },
+        "city_id": "CITY::gn::6545326",
+        "host_feature_id": "PL_POW_1465",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Ursynow",
+          "zh": "Ursynow"
+        },
+        "stable_key": "id::CITY::gn::6545326"
+      },
+      {
+        "base_name": {
+          "en": "Praga Północ",
+          "zh": "Praga Polnoc"
+        },
+        "city_id": "CITY::gn::6545347",
+        "host_feature_id": "PL_POW_1465",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Praga Polnoc",
+          "zh": "Praga Polnoc"
+        },
+        "stable_key": "id::CITY::gn::6545347"
+      },
+      {
+        "base_name": {
+          "en": "Praga Południe",
+          "zh": "Praga Poludnie"
+        },
+        "city_id": "CITY::gn::6545348",
+        "host_feature_id": "PL_POW_1465",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Praga Poludnie",
+          "zh": "Praga Poludnie"
+        },
+        "stable_key": "id::CITY::gn::6545348"
+      },
+      {
+        "base_name": {
+          "en": "Simferopol",
+          "zh": "辛菲罗波尔"
+        },
+        "city_id": "CITY::gn::693805",
+        "host_feature_id": "UA_RAY_74538382B84040377374615",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Gotenburg",
+          "zh": "哥滕堡"
+        },
+        "stable_key": "id::CITY::gn::693805"
+      },
+      {
+        "base_name": {
+          "en": "Sevastopol",
+          "zh": "塞瓦斯托波尔"
+        },
+        "city_id": "CITY::gn::694423",
+        "host_feature_id": "UA_RAY_74538382B3276437105714",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Theoderichshafen",
+          "zh": "狄奥多里希港"
+        },
+        "stable_key": "id::CITY::gn::694423"
+      },
+      {
+        "base_name": {
+          "en": "Żoliborz",
+          "zh": "Zoliborz"
+        },
+        "city_id": "CITY::gn::753142",
+        "host_feature_id": "PL_POW_1465",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Zoliborz",
+          "zh": "Zoliborz"
+        },
+        "stable_key": "id::CITY::gn::753142"
+      },
+      {
+        "base_name": {
+          "en": "Włochy",
+          "zh": "Wlochy"
+        },
+        "city_id": "CITY::gn::755475",
+        "host_feature_id": "PL_POW_1465",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Wlochy",
+          "zh": "Wlochy"
+        },
+        "stable_key": "id::CITY::gn::755475"
+      },
+      {
+        "base_name": {
+          "en": "Targówek",
+          "zh": "Targowek"
+        },
+        "city_id": "CITY::gn::757065",
+        "host_feature_id": "PL_POW_1465",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Targowek",
+          "zh": "Targowek"
+        },
+        "stable_key": "id::CITY::gn::757065"
+      },
+      {
+        "base_name": {
+          "en": "Śródmieście",
+          "zh": "Srodmiescie"
+        },
+        "city_id": "CITY::gn::758470",
+        "host_feature_id": "PL_POW_1465",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Srodmiescie",
+          "zh": "Srodmiescie"
+        },
+        "stable_key": "id::CITY::gn::758470"
+      },
+      {
+        "base_name": {
+          "en": "Rembertów",
+          "zh": "Rembertow"
+        },
+        "city_id": "CITY::gn::760503",
+        "host_feature_id": "PL_POW_1465",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Rembertow",
+          "zh": "Rembertow"
+        },
+        "stable_key": "id::CITY::gn::760503"
+      },
+      {
+        "base_name": {
+          "en": "Mokotów",
+          "zh": "Mokotow"
+        },
+        "city_id": "CITY::gn::764484",
+        "host_feature_id": "PL_POW_1465",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Mokotow",
+          "zh": "Mokotow"
+        },
+        "stable_key": "id::CITY::gn::764484"
+      },
+      {
+        "base_name": {
+          "en": "Bieńczyce",
+          "zh": "Bienczyce"
+        },
+        "city_id": "CITY::gn::775984",
+        "host_feature_id": "PL_POW_1261",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Bienczyce",
+          "zh": "Bienczyce"
+        },
+        "stable_key": "id::CITY::gn::775984"
+      },
+      {
+        "base_name": {
+          "en": "Białołeka",
+          "zh": "Bialoleka"
+        },
+        "city_id": "CITY::gn::776103",
+        "host_feature_id": "PL_POW_1465",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Bialoleka",
+          "zh": "Bialoleka"
+        },
+        "stable_key": "id::CITY::gn::776103"
+      },
+      {
+        "base_name": {
+          "en": "Gądów-Popowice Południowe",
+          "zh": "Gadow-Popowice Poludniowe"
+        },
+        "city_id": "CITY::gn::8425959",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Gadow-Popowice Poludniowe",
+          "zh": "Gadow-Popowice Poludniowe"
+        },
+        "stable_key": "id::CITY::gn::8425959"
+      },
+      {
+        "base_name": {
+          "en": "Pilczyce-Kozanów-Popowice Północne",
+          "zh": "Pilczyce-Kozanow-Popowice Polnocne"
+        },
+        "city_id": "CITY::gn::8425966",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Pilczyce-Kozanow-Popowice Polnocne",
+          "zh": "Pilczyce-Kozanow-Popowice Polnocne"
+        },
+        "stable_key": "id::CITY::gn::8425966"
+      },
+      {
+        "base_name": {
+          "en": "Osiedle Powstańców Śląskich",
+          "zh": "Osiedle Powstancow Slaskich"
+        },
+        "city_id": "CITY::gn::8425974",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Osiedle Powstancow Slaskich",
+          "zh": "Osiedle Powstancow Slaskich"
+        },
+        "stable_key": "id::CITY::gn::8425974"
+      },
+      {
+        "base_name": {
+          "en": "Przedmieście Oławskie",
+          "zh": "Przedmiescie Olawskie"
+        },
+        "city_id": "CITY::gn::8425975",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Przedmiescie Olawskie",
+          "zh": "Przedmiescie Olawskie"
+        },
+        "stable_key": "id::CITY::gn::8425975"
+      },
+      {
+        "base_name": {
+          "en": "Karłowice-Różanka",
+          "zh": "Karlowice-Rozanka"
+        },
+        "city_id": "CITY::gn::8425978",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Karlowice-Rozanka",
+          "zh": "Karlowice-Rozanka"
+        },
+        "stable_key": "id::CITY::gn::8425978"
+      },
+      {
+        "base_name": {
+          "en": "Biskupin-Sępolno-Dąbie-Bartoszowice",
+          "zh": "Biskupin-Sepolno-Dabie-Bartoszowice"
+        },
+        "city_id": "CITY::gn::8425987",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Biskupin-Sepolno-Dabie-Bartoszowice",
+          "zh": "Biskupin-Sepolno-Dabie-Bartoszowice"
+        },
+        "stable_key": "id::CITY::gn::8425987"
+      },
+      {
+        "base_name": {
+          "en": "Ołbin",
+          "zh": "Olbin"
+        },
+        "city_id": "CITY::gn::8425989",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Olbin",
+          "zh": "Olbin"
+        },
+        "stable_key": "id::CITY::gn::8425989"
+      },
+      {
+        "base_name": {
+          "en": "Chełm",
+          "zh": "Chelm"
+        },
+        "city_id": "CITY::gn::8426032",
+        "host_feature_id": "PL_POW_2261",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Chelm",
+          "zh": "Chelm"
+        },
+        "stable_key": "id::CITY::gn::8426032"
+      },
+      {
+        "base_name": {
+          "en": "Środmieście",
+          "zh": "Srodmiescie"
+        },
+        "city_id": "CITY::gn::8426045",
+        "host_feature_id": "PL_POW_2261",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Srodmiescie",
+          "zh": "Srodmiescie"
+        },
+        "stable_key": "id::CITY::gn::8426045"
+      },
+      {
+        "base_name": {
+          "en": "Ujeścisko-Łostowice",
+          "zh": "Ujescisko-Lostowice"
+        },
+        "city_id": "CITY::gn::8426046",
+        "host_feature_id": "PL_POW_2261",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Ujescisko-Lostowice",
+          "zh": "Ujescisko-Lostowice"
+        },
+        "stable_key": "id::CITY::gn::8426046"
+      },
+      {
+        "base_name": {
+          "en": "Wrzeszcz Górny",
+          "zh": "Wrzeszcz Gorny"
+        },
+        "city_id": "CITY::gn::8426050",
+        "host_feature_id": "PL_POW_2261",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Wrzeszcz Gorny",
+          "zh": "Wrzeszcz Gorny"
+        },
+        "stable_key": "id::CITY::gn::8426050"
+      },
+      {
+        "base_name": {
+          "en": "Świerczewo",
+          "zh": "Swierczewo"
+        },
+        "city_id": "CITY::gn::8426094",
+        "host_feature_id": "PL_POW_3262",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Swierczewo",
+          "zh": "Swierczewo"
+        },
+        "stable_key": "id::CITY::gn::8426094"
+      },
+      {
+        "base_name": {
+          "en": "Kumi",
+          "zh": "库米"
+        },
+        "city_id": "CITY::ne::1159113727",
+        "host_feature_id": "UG_ADM1_17295835B57878138064711",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kumi Town",
+          "zh": "库米"
+        },
+        "stable_key": "id::CITY::ne::1159113727"
+      },
+      {
+        "base_name": {
+          "en": "Kibale",
+          "zh": "基巴莱"
+        },
+        "city_id": "CITY::ne::1159113985",
+        "host_feature_id": "UG_ADM1_17295835B91329899113986",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kibaale",
+          "zh": "基巴莱"
+        },
+        "stable_key": "id::CITY::ne::1159113985"
+      },
+      {
+        "base_name": {
+          "en": "Mons",
+          "zh": "蒙斯"
+        },
+        "city_id": "CITY::ne::1159120321",
+        "host_feature_id": "BE_MRG_f7a8cd5ecd9e",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Bergen",
+          "zh": "贝亨"
+        },
+        "stable_key": "id::CITY::ne::1159120321"
+      },
+      {
+        "base_name": {
+          "en": "Arlon",
+          "zh": "阿尔隆"
+        },
+        "city_id": "CITY::ne::1159121119",
+        "host_feature_id": "BE_MRG_d49081148862",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Arel",
+          "zh": "阿雷尔"
+        },
+        "stable_key": "id::CITY::ne::1159121119"
+      },
+      {
+        "base_name": {
+          "en": "Karusi",
+          "zh": "卡鲁齐"
+        },
+        "city_id": "CITY::ne::1159121251",
+        "host_feature_id": "BI_ADM1_BDI-2633",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Karuzi",
+          "zh": "卡鲁齐"
+        },
+        "stable_key": "id::CITY::ne::1159121251"
+      },
+      {
+        "base_name": {
+          "en": "Mobaye",
+          "zh": "莫巴伊"
+        },
+        "city_id": "CITY::ne::1159122685",
+        "host_feature_id": "CF_ADM1_CAF-794",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Gustavstadt",
+          "zh": "古斯塔夫城"
+        },
+        "stable_key": "id::CITY::ne::1159122685"
+      },
+      {
+        "base_name": {
+          "en": "Mykolayiv",
+          "zh": "尼古拉耶夫"
+        },
+        "city_id": "CITY::ne::1159126699",
+        "host_feature_id": "UA_RAY_74538382B2161330582129",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Nikolajew",
+          "zh": "尼古拉耶夫"
+        },
+        "stable_key": "id::CITY::ne::1159126699"
+      },
+      {
+        "base_name": {
+          "en": "Chernihiv",
+          "zh": "切尔尼戈夫"
+        },
+        "city_id": "CITY::ne::1159126717",
+        "host_feature_id": "UA_RAY_74538382B44220139144156",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Tschernigow",
+          "zh": "切尔尼戈夫"
+        },
+        "stable_key": "id::CITY::ne::1159126717"
+      },
+      {
+        "base_name": {
+          "en": "Khmelnytskyy",
+          "zh": "赫梅利尼茨基"
+        },
+        "city_id": "CITY::ne::1159126729",
+        "host_feature_id": "UA_RAY_74538382B37791268598116",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Proskurow",
+          "zh": "普罗斯库罗夫"
+        },
+        "stable_key": "id::CITY::ne::1159126729"
+      },
+      {
+        "base_name": {
+          "en": "Brovary",
+          "zh": "布罗瓦里"
+        },
+        "city_id": "CITY::ne::1159126797",
+        "host_feature_id": "UA_RAY_74538382B60890943260132",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Browary",
+          "zh": "布罗瓦雷"
+        },
+        "stable_key": "id::CITY::ne::1159126797"
+      },
+      {
+        "base_name": {
+          "en": "Kryvyy Rih",
+          "zh": "克里沃罗格"
+        },
+        "city_id": "CITY::ne::1159126851",
+        "host_feature_id": "UA_RAY_74538382B55212312657182",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kriwoi Rog",
+          "zh": "克里沃罗格"
+        },
+        "stable_key": "id::CITY::ne::1159126851"
+      },
+      {
+        "base_name": {
+          "en": "Šiauliai",
+          "zh": "希奥利艾"
+        },
+        "city_id": "CITY::ne::1159128255",
+        "host_feature_id": "LT026",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Schaulen",
+          "zh": "绍伦"
+        },
+        "stable_key": "id::CITY::ne::1159128255"
+      },
+      {
+        "base_name": {
+          "en": "Arras",
+          "zh": "阿拉斯"
+        },
+        "city_id": "CITY::ne::1159130525",
+        "host_feature_id": "FR_ARR_62001",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Atrecht",
+          "zh": "阿特雷赫特"
+        },
+        "stable_key": "id::CITY::ne::1159130525"
+      },
+      {
+        "base_name": {
+          "en": "Besançon",
+          "zh": "贝桑松"
+        },
+        "city_id": "CITY::ne::1159130531",
+        "host_feature_id": "FR_ARR_25001",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Bisanz",
+          "zh": "比桑茨"
+        },
+        "stable_key": "id::CITY::ne::1159130531"
+      },
+      {
+        "base_name": {
+          "en": "Kutaisi",
+          "zh": "库塔伊西"
+        },
+        "city_id": "CITY::ne::1159130705",
+        "host_feature_id": "GEO-3030",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kutaissi",
+          "zh": "库塔伊西"
+        },
+        "stable_key": "id::CITY::ne::1159130705"
+      },
+      {
+        "base_name": {
+          "en": "Ganca",
+          "zh": "甘贾"
+        },
+        "city_id": "CITY::ne::1159132163",
+        "host_feature_id": "AZE-1679",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Gandscha",
+          "zh": "甘贾"
+        },
+        "stable_key": "id::CITY::ne::1159132163"
+      },
+      {
+        "base_name": {
+          "en": "Polatsk",
+          "zh": "波洛茨克"
+        },
+        "city_id": "CITY::ne::1159132305",
+        "host_feature_id": "BY_RAY_67162791B45929653886900",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Polazk",
+          "zh": "波洛茨克"
+        },
+        "stable_key": "id::CITY::ne::1159132305"
+      },
+      {
+        "base_name": {
+          "en": "Liège",
+          "zh": "列日"
+        },
+        "city_id": "CITY::ne::1159132333",
+        "host_feature_id": "BE332",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Lüttich",
+          "zh": "吕蒂希"
+        },
+        "stable_key": "id::CITY::ne::1159132333"
+      },
+      {
+        "base_name": {
+          "en": "Kerch",
+          "zh": "刻赤"
+        },
+        "city_id": "CITY::ne::1159134151",
+        "host_feature_id": "UA_RAY_74538382B91806639169097",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kertsch",
+          "zh": "刻赤"
+        },
+        "stable_key": "id::CITY::ne::1159134151"
+      },
+      {
+        "base_name": {
+          "en": "Simferopol",
+          "zh": "辛菲罗波尔"
+        },
+        "city_id": "CITY::ne::1159134155",
+        "host_feature_id": "UA_RAY_74538382B84040377374615",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Gotenburg",
+          "zh": "哥滕堡"
+        },
+        "stable_key": "id::CITY::ne::1159134155"
+      },
+      {
+        "base_name": {
+          "en": "Kherson",
+          "zh": "赫尔松"
+        },
+        "city_id": "CITY::ne::1159134159",
+        "host_feature_id": "UA_RAY_74538382B72369548204787",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Cherson",
+          "zh": "赫尔松"
+        },
+        "stable_key": "id::CITY::ne::1159134159"
+      },
+      {
+        "base_name": {
+          "en": "Rivne",
+          "zh": "罗夫诺"
+        },
+        "city_id": "CITY::ne::1159134173",
+        "host_feature_id": "UA_RAY_74538382B36980255523800",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Rowno",
+          "zh": "罗夫诺"
+        },
+        "stable_key": "id::CITY::ne::1159134173"
+      },
+      {
+        "base_name": {
+          "en": "Ivano-Frankivsk",
+          "zh": "伊万诺-弗兰科夫斯克"
+        },
+        "city_id": "CITY::ne::1159134181",
+        "host_feature_id": "UA_RAY_74538382B41206945038645",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Stanislau",
+          "zh": "斯坦尼斯劳"
+        },
+        "stable_key": "id::CITY::ne::1159134181"
+      },
+      {
+        "base_name": {
+          "en": "Ternopil",
+          "zh": "捷尔诺波尔"
+        },
+        "city_id": "CITY::ne::1159134187",
+        "host_feature_id": "UA_RAY_74538382B88282912225835",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Tarnopol",
+          "zh": "塔尔诺波尔"
+        },
+        "stable_key": "id::CITY::ne::1159134187"
+      },
+      {
+        "base_name": {
+          "en": "Kirovohrad",
+          "zh": "基洛沃格勒"
+        },
+        "city_id": "CITY::ne::1159134205",
+        "host_feature_id": "UA_RAY_74538382B33094259068281",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Eichhornburg",
+          "zh": "艾希霍恩堡"
+        },
+        "stable_key": "id::CITY::ne::1159134205"
+      },
+      {
+        "base_name": {
+          "en": "Vinnytsya",
+          "zh": "文尼察"
+        },
+        "city_id": "CITY::ne::1159134213",
+        "host_feature_id": "UA_RAY_74538382B89307192182420",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Winnizia",
+          "zh": "文尼察"
+        },
+        "stable_key": "id::CITY::ne::1159134213"
+      },
+      {
+        "base_name": {
+          "en": "Luhansk",
+          "zh": "卢甘斯克"
+        },
+        "city_id": "CITY::ne::1159134241",
+        "host_feature_id": "UA_RAY_74538382B91393089585676",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Lugansk",
+          "zh": "卢甘斯克"
+        },
+        "stable_key": "id::CITY::ne::1159134241"
+      },
+      {
+        "base_name": {
+          "en": "Poltava",
+          "zh": "波尔塔瓦"
+        },
+        "city_id": "CITY::ne::1159134245",
+        "host_feature_id": "UA_RAY_74538382B39784518508744",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Poltawa",
+          "zh": "波尔塔瓦"
+        },
+        "stable_key": "id::CITY::ne::1159134245"
+      },
+      {
+        "base_name": {
+          "en": "Melitopol",
+          "zh": "梅利托波尔"
+        },
+        "city_id": "CITY::ne::1159134253",
+        "host_feature_id": "UA_RAY_74538382B95492559683598",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Ost-Germania",
+          "zh": "东日耳曼尼亚"
+        },
+        "stable_key": "id::CITY::ne::1159134253"
+      },
+      {
+        "base_name": {
+          "en": "Zvishavane",
+          "zh": "兹维沙瓦内"
+        },
+        "city_id": "CITY::ne::1159134807",
+        "host_feature_id": "ZW_ADM1_ZWE-527",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Shabani",
+          "zh": "沙巴尼"
+        },
+        "stable_key": "id::CITY::ne::1159134807"
+      },
+      {
+        "base_name": {
+          "en": "Masvingo",
+          "zh": "馬斯溫戈"
+        },
+        "city_id": "CITY::ne::1159134835",
+        "host_feature_id": "ZW_ADM1_ZWE-532",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Fort Victoria",
+          "zh": "维多利亚堡"
+        },
+        "stable_key": "id::CITY::ne::1159134835"
+      },
+      {
+        "base_name": {
+          "en": "Chinhoyi",
+          "zh": "奇諾伊"
+        },
+        "city_id": "CITY::ne::1159134845",
+        "host_feature_id": "ZW_ADM1_ZWE-533",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Sinoia",
+          "zh": "锡诺亚"
+        },
+        "stable_key": "id::CITY::ne::1159134845"
+      },
+      {
+        "base_name": {
+          "en": "Entebbe",
+          "zh": "恩德培"
+        },
+        "city_id": "CITY::ne::1159135399",
+        "host_feature_id": "UG_ADM1_17295835B48340970483027",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Böhmstadt",
+          "zh": "贝姆城"
+        },
+        "stable_key": "id::CITY::ne::1159135399"
+      },
+      {
+        "base_name": {
+          "en": "Masindi-Port",
+          "zh": "马辛迪港"
+        },
+        "city_id": "CITY::ne::1159135421",
+        "host_feature_id": "UG_ADM1_17295835B91329899113986",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Masindi Port",
+          "zh": "马辛迪港"
+        },
+        "stable_key": "id::CITY::ne::1159135421"
+      },
+      {
+        "base_name": {
+          "en": "Chake Chake",
+          "zh": "查凱查凱"
+        },
+        "city_id": "CITY::ne::1159135601",
+        "host_feature_id": "TZ_ADM1_TZA-3381",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Chake-Chake",
+          "zh": "查凱查凱"
+        },
+        "stable_key": "id::CITY::ne::1159135601"
+      },
+      {
+        "base_name": {
+          "en": "Njombe",
+          "zh": "恩琼贝"
+        },
+        "city_id": "CITY::ne::1159135625",
+        "host_feature_id": "TZ_ADM1_TZA-5587",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Njombe Mjini",
+          "zh": "恩琼贝"
+        },
+        "stable_key": "id::CITY::ne::1159135625"
+      },
+      {
+        "base_name": {
+          "en": "Ventspils",
+          "zh": "文茨皮尔斯"
+        },
+        "city_id": "CITY::ne::1159136347",
+        "host_feature_id": "LV003",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Windau",
+          "zh": "温道"
+        },
+        "stable_key": "id::CITY::ne::1159136347"
+      },
+      {
+        "base_name": {
+          "en": "Klaipėda",
+          "zh": "克莱佩达"
+        },
+        "city_id": "CITY::ne::1159136351",
+        "host_feature_id": "LT023",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Memel",
+          "zh": "梅梅尔"
+        },
+        "stable_key": "id::CITY::ne::1159136351"
+      },
+      {
+        "base_name": {
+          "en": "Kaunas",
+          "zh": "考纳斯"
+        },
+        "city_id": "CITY::ne::1159136375",
+        "host_feature_id": "LT022",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kauen",
+          "zh": "考恩"
+        },
+        "stable_key": "id::CITY::ne::1159136375"
+      },
+      {
+        "base_name": {
+          "en": "Jelgava",
+          "zh": "叶尔加瓦"
+        },
+        "city_id": "CITY::ne::1159136381",
+        "host_feature_id": "LV009",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Mitau",
+          "zh": "米陶"
+        },
+        "stable_key": "id::CITY::ne::1159136381"
+      },
+      {
+        "base_name": {
+          "en": "Montepuez",
+          "zh": "蒙特普埃茲"
+        },
+        "city_id": "CITY::ne::1159136663",
+        "host_feature_id": "MZ_ADM1_MOZ-1198",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Neu-Baden",
+          "zh": "新巴登"
+        },
+        "stable_key": "id::CITY::ne::1159136663"
+      },
+      {
+        "base_name": {
+          "en": "Mocimboa",
+          "zh": "濱海莫辛布瓦區"
+        },
+        "city_id": "CITY::ne::1159136669",
+        "host_feature_id": "MZ_ADM1_MOZ-1198",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Mocímboa da Praia",
+          "zh": "濱海莫辛布瓦區"
+        },
+        "stable_key": "id::CITY::ne::1159136669"
+      },
+      {
+        "base_name": {
+          "en": "Cuamba",
+          "zh": "誇姆巴"
+        },
+        "city_id": "CITY::ne::1159136677",
+        "host_feature_id": "MZ_ADM1_MOZ-1199",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Neue Esche",
+          "zh": "新白蜡树"
+        },
+        "stable_key": "id::CITY::ne::1159136677"
+      },
+      {
+        "base_name": {
+          "en": "Mangochi",
+          "zh": "曼戈切"
+        },
+        "city_id": "CITY::ne::1159136977",
+        "host_feature_id": "MW_ADM1_82672581B71595037145626",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Fort Johnston",
+          "zh": "约翰斯顿堡"
+        },
+        "stable_key": "id::CITY::ne::1159136977"
+      },
+      {
+        "base_name": {
+          "en": "Quissico",
+          "zh": "薩瓦拉"
+        },
+        "city_id": "CITY::ne::1159136995",
+        "host_feature_id": "MZ_ADM1_MOZ-1925",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Zavala",
+          "zh": "薩瓦拉"
+        },
+        "stable_key": "id::CITY::ne::1159136995"
+      },
+      {
+        "base_name": {
+          "en": "Vilanculos",
+          "zh": "维兰库洛"
+        },
+        "city_id": "CITY::ne::1159136999",
+        "host_feature_id": "MZ_ADM1_MOZ-1925",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Vilankulo",
+          "zh": "维兰库洛"
+        },
+        "stable_key": "id::CITY::ne::1159136999"
+      },
+      {
+        "base_name": {
+          "en": "Wrocław",
+          "zh": "弗罗茨瓦夫"
+        },
+        "city_id": "CITY::ne::1159139051",
+        "host_feature_id": "PL_POW_0264",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Breslau",
+          "zh": "布雷斯劳"
+        },
+        "stable_key": "id::CITY::ne::1159139051"
+      },
+      {
+        "base_name": {
+          "en": "Szczecin",
+          "zh": "什切青"
+        },
+        "city_id": "CITY::ne::1159139055",
+        "host_feature_id": "PL_POW_3262",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Stettin",
+          "zh": "斯德丁"
+        },
+        "stable_key": "id::CITY::ne::1159139055"
+      },
+      {
+        "base_name": {
+          "en": "Poznań",
+          "zh": "波茲南"
+        },
+        "city_id": "CITY::ne::1159139065",
+        "host_feature_id": "PL_POW_3064",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Posen",
+          "zh": "波森"
+        },
+        "stable_key": "id::CITY::ne::1159139065"
+      },
+      {
+        "base_name": {
+          "en": "Kielce",
+          "zh": "凯尔采"
+        },
+        "city_id": "CITY::ne::1159139087",
+        "host_feature_id": "PL_POW_2661",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kieltz",
+          "zh": "凯尔采"
+        },
+        "stable_key": "id::CITY::ne::1159139087"
+      },
+      {
+        "base_name": {
+          "en": "Rzeszów",
+          "zh": "热舒夫"
+        },
+        "city_id": "CITY::ne::1159139101",
+        "host_feature_id": "PL_POW_1863",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Reichshof",
+          "zh": "赖希斯霍夫"
+        },
+        "stable_key": "id::CITY::ne::1159139101"
+      },
+      {
+        "base_name": {
+          "en": "Opuwo",
+          "zh": "奥普沃"
+        },
+        "city_id": "CITY::ne::1159139245",
+        "host_feature_id": "NA_ADM1_NAM-3347",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Ohopoho",
+          "zh": "奥霍波霍"
+        },
+        "stable_key": "id::CITY::ne::1159139245"
+      },
+      {
+        "base_name": {
+          "en": "Kaga Bandoro",
+          "zh": "卡加班多罗"
+        },
+        "city_id": "CITY::ne::1159139443",
+        "host_feature_id": "CF_ADM1_CAF-807",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kaga-Bandoro",
+          "zh": "卡加班多罗"
+        },
+        "stable_key": "id::CITY::ne::1159139443"
+      },
+      {
+        "base_name": {
+          "en": "Kelo",
+          "zh": "凯洛"
+        },
+        "city_id": "CITY::ne::1159140353",
+        "host_feature_id": "TD_ADM1_TCD-1487",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kélo",
+          "zh": "凯洛"
+        },
+        "stable_key": "id::CITY::ne::1159140353"
+      },
+      {
+        "base_name": {
+          "en": "Wamba",
+          "zh": "万巴"
+        },
+        "city_id": "CITY::ne::1159140511",
+        "host_feature_id": "CD_ADM1_COD-1559",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Wamba Territory",
+          "zh": "万巴"
+        },
+        "stable_key": "id::CITY::ne::1159140511"
+      },
+      {
+        "base_name": {
+          "en": "Mbanza-Ngungu",
+          "zh": "姆班扎恩古恩古"
+        },
+        "city_id": "CITY::ne::1159141423",
+        "host_feature_id": "CD_ADM1_COD-1883",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Nkamba",
+          "zh": "姆班扎恩古恩古"
+        },
+        "stable_key": "id::CITY::ne::1159141423"
+      },
+      {
+        "base_name": {
+          "en": "Beni",
+          "zh": "贝尼"
+        },
+        "city_id": "CITY::ne::1159141523",
+        "host_feature_id": "CD_ADM1_COD-1898",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Erichsdorf",
+          "zh": "埃里希斯多夫"
+        },
+        "stable_key": "id::CITY::ne::1159141523"
+      },
+      {
+        "base_name": {
+          "en": "Mitzik",
+          "zh": "米齐克"
+        },
+        "city_id": "CITY::ne::1159141681",
+        "host_feature_id": "GA_ADM1_GAB-2187",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Mitzic",
+          "zh": "米齐克"
+        },
+        "stable_key": "id::CITY::ne::1159141681"
+      },
+      {
+        "base_name": {
+          "en": "Bifoum",
+          "zh": "比丰"
+        },
+        "city_id": "CITY::ne::1159141895",
+        "host_feature_id": "GA_ADM1_GAB-2621",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Bifoun",
+          "zh": "比丰"
+        },
+        "stable_key": "id::CITY::ne::1159141895"
+      },
+      {
+        "base_name": {
+          "en": "Ndende",
+          "zh": "恩代恩代"
+        },
+        "city_id": "CITY::ne::1159141899",
+        "host_feature_id": "GA_ADM1_GAB-2622",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Ndendé",
+          "zh": "恩代恩代"
+        },
+        "stable_key": "id::CITY::ne::1159141899"
+      },
+      {
+        "base_name": {
+          "en": "Okandja",
+          "zh": "奥孔贾"
+        },
+        "city_id": "CITY::ne::1159141917",
+        "host_feature_id": "GA_ADM1_GAB-2627",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Okondja",
+          "zh": "奥孔贾"
+        },
+        "stable_key": "id::CITY::ne::1159141917"
+      },
+      {
+        "base_name": {
+          "en": "Calais",
+          "zh": "加来"
+        },
+        "city_id": "CITY::ne::1159142047",
+        "host_feature_id": "FR_MRG_7c681aa2032e",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kalen",
+          "zh": "卡伦"
+        },
+        "stable_key": "id::CITY::ne::1159142047"
+      },
+      {
+        "base_name": {
+          "en": "Nancy",
+          "zh": "南锡"
+        },
+        "city_id": "CITY::ne::1159142061",
+        "host_feature_id": "FR_ARR_54003",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Nanzig",
+          "zh": "南齐希"
+        },
+        "stable_key": "id::CITY::ne::1159142061"
+      },
+      {
+        "base_name": {
+          "en": "Sembe",
+          "zh": "森贝"
+        },
+        "city_id": "CITY::ne::1159142169",
+        "host_feature_id": "CG_ADM1_COG-2880",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Sembé",
+          "zh": "森贝"
+        },
+        "stable_key": "id::CITY::ne::1159142169"
+      },
+      {
+        "base_name": {
+          "en": "Loubomo",
+          "zh": "多利西"
+        },
+        "city_id": "CITY::ne::1159143017",
+        "host_feature_id": "CG_ADM1_COG-3345",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Dolisie",
+          "zh": "多利西"
+        },
+        "stable_key": "id::CITY::ne::1159143017"
+      },
+      {
+        "base_name": {
+          "en": "Eyumojok",
+          "zh": "埃尤莫乔克"
+        },
+        "city_id": "CITY::ne::1159144009",
+        "host_feature_id": "CM_ADM1_CMR-799",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Eyumodjock",
+          "zh": "埃尤莫乔克"
+        },
+        "stable_key": "id::CITY::ne::1159144009"
+      },
+      {
+        "base_name": {
+          "en": "Nola",
+          "zh": "諾拉"
+        },
+        "city_id": "CITY::ne::1159144019",
+        "host_feature_id": "CF_ADM1_CAF-802",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Beutlersstadt",
+          "zh": "博伊特勒城"
+        },
+        "stable_key": "id::CITY::ne::1159144019"
+      },
+      {
+        "base_name": {
+          "en": "Brugge",
+          "zh": "布鲁日"
+        },
+        "city_id": "CITY::ne::1159144553",
+        "host_feature_id": "BE_MRG_923fe66661e2",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Brügge",
+          "zh": "布吕格"
+        },
+        "stable_key": "id::CITY::ne::1159144553"
+      },
+      {
+        "base_name": {
+          "en": "Namur",
+          "zh": "那慕尔"
+        },
+        "city_id": "CITY::ne::1159144557",
+        "host_feature_id": "BE_MRG_6a92ca76474d",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Namen",
+          "zh": "纳门"
+        },
+        "stable_key": "id::CITY::ne::1159144557"
+      },
+      {
+        "base_name": {
+          "en": "Charleroi",
+          "zh": "沙勒罗瓦"
+        },
+        "city_id": "CITY::ne::1159144561",
+        "host_feature_id": "BE32B",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Karolingen",
+          "zh": "卡罗林根"
+        },
+        "stable_key": "id::CITY::ne::1159144561"
+      },
+      {
+        "base_name": {
+          "en": "Camabatela",
+          "zh": "安巴卡"
+        },
+        "city_id": "CITY::ne::1159144699",
+        "host_feature_id": "AO_ADM1_AGO-1878",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Ambaca",
+          "zh": "安巴卡"
+        },
+        "stable_key": "id::CITY::ne::1159144699"
+      },
+      {
+        "base_name": {
+          "en": "Ndalatando",
+          "zh": "恩达拉坦多"
+        },
+        "city_id": "CITY::ne::1159144701",
+        "host_feature_id": "AO_ADM1_AGO-1878",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "N'dalatando",
+          "zh": "恩达拉坦多"
+        },
+        "stable_key": "id::CITY::ne::1159144701"
+      },
+      {
+        "base_name": {
+          "en": "Waku Kungo",
+          "zh": "瓦庫昆戈"
+        },
+        "city_id": "CITY::ne::1159144707",
+        "host_feature_id": "AO_ADM1_AGO-1879",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Waku-Kungo",
+          "zh": "瓦庫昆戈"
+        },
+        "stable_key": "id::CITY::ne::1159144707"
+      },
+      {
+        "base_name": {
+          "en": "Mbanza-Congo",
+          "zh": "姆班扎刚果"
+        },
+        "city_id": "CITY::ne::1159144711",
+        "host_feature_id": "AO_ADM1_AGO-1882",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Sankt Salvador",
+          "zh": "圣萨尔瓦多"
+        },
+        "stable_key": "id::CITY::ne::1159144711"
+      },
+      {
+        "base_name": {
+          "en": "Nzeto",
+          "zh": "恩泽托"
+        },
+        "city_id": "CITY::ne::1159144715",
+        "host_feature_id": "AO_ADM1_AGO-1882",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "N'zeto",
+          "zh": "恩泽托"
+        },
+        "stable_key": "id::CITY::ne::1159144715"
+      },
+      {
+        "base_name": {
+          "en": "Cuito Caunavale",
+          "zh": "奎托誇納瓦萊"
+        },
+        "city_id": "CITY::ne::1159144745",
+        "host_feature_id": "AO_ADM1_AGO-1888",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Cuito Cuanavale",
+          "zh": "奎托誇納瓦萊"
+        },
+        "stable_key": "id::CITY::ne::1159144745"
+      },
+      {
+        "base_name": {
+          "en": "Cangamba",
+          "zh": "坎甘巴"
+        },
+        "city_id": "CITY::ne::1159144781",
+        "host_feature_id": "AO_ADM1_AGO-1892",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Cangombe",
+          "zh": "坎甘巴"
+        },
+        "stable_key": "id::CITY::ne::1159144781"
+      },
+      {
+        "base_name": {
+          "en": "Lumbala Nguimbo",
+          "zh": "隆巴拉"
+        },
+        "city_id": "CITY::ne::1159144789",
+        "host_feature_id": "AO_ADM1_AGO-1892",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Lumbala-Ngimbo",
+          "zh": "隆巴拉"
+        },
+        "stable_key": "id::CITY::ne::1159144789"
+      },
+      {
+        "base_name": {
+          "en": "Orsha",
+          "zh": "奥尔沙"
+        },
+        "city_id": "CITY::ne::1159145129",
+        "host_feature_id": "BY_INT_VITEBSK",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Orscha",
+          "zh": "奥尔沙"
+        },
+        "stable_key": "id::CITY::ne::1159145129"
+      },
+      {
+        "base_name": {
+          "en": "Hrodna",
+          "zh": "格罗德诺"
+        },
+        "city_id": "CITY::ne::1159145137",
+        "host_feature_id": "BY_RAY_67162791B13547290723272",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Garten",
+          "zh": "加滕"
+        },
+        "stable_key": "id::CITY::ne::1159145137"
+      },
+      {
+        "base_name": {
+          "en": "Zaporizhzhya",
+          "zh": "扎波罗热"
+        },
+        "city_id": "CITY::ne::1159146313",
+        "host_feature_id": "UA_RAY_74538382B86672078093677",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Saparoshje",
+          "zh": "扎波罗热"
+        },
+        "stable_key": "id::CITY::ne::1159146313"
+      },
+      {
+        "base_name": {
+          "en": "Liepaga",
+          "zh": "利耶帕亚"
+        },
+        "city_id": "CITY::ne::1159146449",
+        "host_feature_id": "LV003",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Libau",
+          "zh": "利包"
+        },
+        "stable_key": "id::CITY::ne::1159146449"
+      },
+      {
+        "base_name": {
+          "en": "Lille",
+          "zh": "里尔"
+        },
+        "city_id": "CITY::ne::1159147227",
+        "host_feature_id": "FR_ARR_59005",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Ryssel",
+          "zh": "赖瑟尔"
+        },
+        "stable_key": "id::CITY::ne::1159147227"
+      },
+      {
+        "base_name": {
+          "en": "Batumi",
+          "zh": "巴统"
+        },
+        "city_id": "CITY::ne::1159147265",
+        "host_feature_id": "GEO-3027",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Batum",
+          "zh": "巴统"
+        },
+        "stable_key": "id::CITY::ne::1159147265"
+      },
+      {
+        "base_name": {
+          "en": "Mansa",
+          "zh": "曼萨"
+        },
+        "city_id": "CITY::ne::1159147555",
+        "host_feature_id": "ZM_ADM1_ZMB-514",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Fort Rosebery",
+          "zh": "罗斯贝里堡"
+        },
+        "stable_key": "id::CITY::ne::1159147555"
+      },
+      {
+        "base_name": {
+          "en": "Hwange",
+          "zh": "万基"
+        },
+        "city_id": "CITY::ne::1159147573",
+        "host_feature_id": "ZW_ADM1_ZWE-526",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Wankie",
+          "zh": "万基"
+        },
+        "stable_key": "id::CITY::ne::1159147573"
+      },
+      {
+        "base_name": {
+          "en": "Gweru",
+          "zh": "圭洛"
+        },
+        "city_id": "CITY::ne::1159147577",
+        "host_feature_id": "ZW_ADM1_ZWE-527",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Gwelo",
+          "zh": "圭洛"
+        },
+        "stable_key": "id::CITY::ne::1159147577"
+      },
+      {
+        "base_name": {
+          "en": "Mutare",
+          "zh": "穆塔雷"
+        },
+        "city_id": "CITY::ne::1159147579",
+        "host_feature_id": "ZW_ADM1_ZWE-529",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Umtali",
+          "zh": "乌姆塔利"
+        },
+        "stable_key": "id::CITY::ne::1159147579"
+      },
+      {
+        "base_name": {
+          "en": "Kadoma",
+          "zh": "卡多马"
+        },
+        "city_id": "CITY::ne::1159147581",
+        "host_feature_id": "ZW_ADM1_ZWE-533",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Gatooma",
+          "zh": "加图马"
+        },
+        "stable_key": "id::CITY::ne::1159147581"
+      },
+      {
+        "base_name": {
+          "en": "Homyel",
+          "zh": "戈梅利"
+        },
+        "city_id": "CITY::ne::1159147723",
+        "host_feature_id": "BY_INT_GOMEL",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Homel",
+          "zh": "戈梅利"
+        },
+        "stable_key": "id::CITY::ne::1159147723"
+      },
+      {
+        "base_name": {
+          "en": "Chimoio",
+          "zh": "希莫尤"
+        },
+        "city_id": "CITY::ne::1159148021",
+        "host_feature_id": "MZ_ADM1_MOZ-1192",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Peryberg",
+          "zh": "佩里贝格"
+        },
+        "stable_key": "id::CITY::ne::1159148021"
+      },
+      {
+        "base_name": {
+          "en": "Lichinga",
+          "zh": "利欣加"
+        },
+        "city_id": "CITY::ne::1159148023",
+        "host_feature_id": "MZ_ADM1_MOZ-1199",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kabraldorf",
+          "zh": "卡布拉尔多夫"
+        },
+        "stable_key": "id::CITY::ne::1159148023"
+      },
+      {
+        "base_name": {
+          "en": "Mocambique",
+          "zh": "莫桑比克岛"
+        },
+        "city_id": "CITY::ne::1159148029",
+        "host_feature_id": "MZ_ADM1_MOZ-1200",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Island of Mozambique",
+          "zh": "莫桑比克岛"
+        },
+        "stable_key": "id::CITY::ne::1159148029"
+      },
+      {
+        "base_name": {
+          "en": "Łódź",
+          "zh": "罗兹"
+        },
+        "city_id": "CITY::ne::1159148225",
+        "host_feature_id": "PL_POW_1061",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Litzmannstadt",
+          "zh": "利茨曼施塔特"
+        },
+        "stable_key": "id::CITY::ne::1159148225"
+      },
+      {
+        "base_name": {
+          "en": "Daugavpils",
+          "zh": "陶格夫匹尔斯"
+        },
+        "city_id": "CITY::ne::1159148307",
+        "host_feature_id": "LV005",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Dünaburg",
+          "zh": "杜纳堡"
+        },
+        "stable_key": "id::CITY::ne::1159148307"
+      },
+      {
+        "base_name": {
+          "en": "Isiro",
+          "zh": "伊西罗"
+        },
+        "city_id": "CITY::ne::1159148447",
+        "host_feature_id": "CD_ADM1_COD-1559",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Dintersburg",
+          "zh": "丁特斯堡"
+        },
+        "stable_key": "id::CITY::ne::1159148447"
+      },
+      {
+        "base_name": {
+          "en": "Tartu",
+          "zh": "塔尔图"
+        },
+        "city_id": "CITY::ne::1159148453",
+        "host_feature_id": "EE008",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Dorpat",
+          "zh": "多尔帕特"
+        },
+        "stable_key": "id::CITY::ne::1159148453"
+      },
+      {
+        "base_name": {
+          "en": "Bukavu",
+          "zh": "布卡武"
+        },
+        "city_id": "CITY::ne::1159148481",
+        "host_feature_id": "CD_ADM1_COD-1894",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Costermansstadt",
+          "zh": "科斯特曼斯城"
+        },
+        "stable_key": "id::CITY::ne::1159148481"
+      },
+      {
+        "base_name": {
+          "en": "Uvira",
+          "zh": "乌维拉"
+        },
+        "city_id": "CITY::ne::1159148483",
+        "host_feature_id": "CD_ADM1_COD-1894",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kurtsdorf",
+          "zh": "库尔茨多夫"
+        },
+        "stable_key": "id::CITY::ne::1159148483"
+      },
+      {
+        "base_name": {
+          "en": "Kindu",
+          "zh": "金杜"
+        },
+        "city_id": "CITY::ne::1159148485",
+        "host_feature_id": "CD_ADM1_COD-1895",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Empainhafen",
+          "zh": "恩潘港"
+        },
+        "stable_key": "id::CITY::ne::1159148485"
+      },
+      {
+        "base_name": {
+          "en": "Pärnu",
+          "zh": "派尔努"
+        },
+        "city_id": "CITY::ne::1159148515",
+        "host_feature_id": "EE004",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Pernau",
+          "zh": "佩尔瑙"
+        },
+        "stable_key": "id::CITY::ne::1159148515"
+      },
+      {
+        "base_name": {
+          "en": "Tômbua",
+          "zh": "通布阿"
+        },
+        "city_id": "CITY::ne::1159149011",
+        "host_feature_id": "AO_ADM1_AGO-1893",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Tômbwa",
+          "zh": "通布阿"
+        },
+        "stable_key": "id::CITY::ne::1159149011"
+      },
+      {
+        "base_name": {
+          "en": "Lviv",
+          "zh": "利沃夫"
+        },
+        "city_id": "CITY::ne::1159149323",
+        "host_feature_id": "UA_RAY_74538382B46853229377150",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Lemberg",
+          "zh": "伦贝格"
+        },
+        "stable_key": "id::CITY::ne::1159149323"
+      },
+      {
+        "base_name": {
+          "en": "Zhytomyr",
+          "zh": "日托米尔"
+        },
+        "city_id": "CITY::ne::1159149327",
+        "host_feature_id": "UA_RAY_74538382B57692221763967",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Shitomir",
+          "zh": "日托米尔"
+        },
+        "stable_key": "id::CITY::ne::1159149327"
+      },
+      {
+        "base_name": {
+          "en": "Dnipro",
+          "zh": "第聂伯罗"
+        },
+        "city_id": "CITY::ne::1159149329",
+        "host_feature_id": "UA_RAY_74538382B23045356862491",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Reichenaustadt",
+          "zh": "赖歇瑙施塔特"
+        },
+        "stable_key": "id::CITY::ne::1159149329"
+      },
+      {
+        "base_name": {
+          "en": "Donetsk",
+          "zh": "顿涅茨克"
+        },
+        "city_id": "CITY::ne::1159149331",
+        "host_feature_id": "UA_RAY_74538382B54113761495064",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Hughesdorf",
+          "zh": "休斯多夫"
+        },
+        "stable_key": "id::CITY::ne::1159149331"
+      },
+      {
+        "base_name": {
+          "en": "Kharkiv",
+          "zh": "哈尔科夫"
+        },
+        "city_id": "CITY::ne::1159149333",
+        "host_feature_id": "UA_RAY_74538382B36501884751905",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Charkow",
+          "zh": "哈尔科夫"
+        },
+        "stable_key": "id::CITY::ne::1159149333"
+      },
+      {
+        "base_name": {
+          "en": "Kigali",
+          "zh": "基加利"
+        },
+        "city_id": "CITY::ne::1159149385",
+        "host_feature_id": "RW_ADM1_RWA-3495",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Barthstadt",
+          "zh": "巴特城"
+        },
+        "stable_key": "id::CITY::ne::1159149385"
+      },
+      {
+        "base_name": {
+          "en": "Pemba",
+          "zh": "彭巴"
+        },
+        "city_id": "CITY::ne::1159149487",
+        "host_feature_id": "MZ_ADM1_MOZ-1198",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Ameliahafen",
+          "zh": "阿梅莉亚港"
+        },
+        "stable_key": "id::CITY::ne::1159149487"
+      },
+      {
+        "base_name": {
+          "en": "Xai-Xai",
+          "zh": "赛赛"
+        },
+        "city_id": "CITY::ne::1159149493",
+        "host_feature_id": "MZ_ADM1_MOZ-1207",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Vila de João Belo",
+          "zh": "维拉·若昂·贝洛"
+        },
+        "stable_key": "id::CITY::ne::1159149493"
+      },
+      {
+        "base_name": {
+          "en": "Quelimane",
+          "zh": "克利马内"
+        },
+        "city_id": "CITY::ne::1159149513",
+        "host_feature_id": "MZ_ADM1_MOZ-1906",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Bouhlerstadt",
+          "zh": "布勒城"
+        },
+        "stable_key": "id::CITY::ne::1159149513"
+      },
+      {
+        "base_name": {
+          "en": "Gdańsk",
+          "zh": "格但斯克"
+        },
+        "city_id": "CITY::ne::1159149707",
+        "host_feature_id": "PL_POW_2261",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Danzig",
+          "zh": "但泽"
+        },
+        "stable_key": "id::CITY::ne::1159149707"
+      },
+      {
+        "base_name": {
+          "en": "Kraków",
+          "zh": "克拉科夫"
+        },
+        "city_id": "CITY::ne::1159149709",
+        "host_feature_id": "PL_POW_1261",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Krakau",
+          "zh": "克拉考"
+        },
+        "stable_key": "id::CITY::ne::1159149709"
+      },
+      {
+        "base_name": {
+          "en": "Walvis Bay",
+          "zh": "鲸湾港"
+        },
+        "city_id": "CITY::ne::1159149725",
+        "host_feature_id": "NA_ADM1_NAM-3348",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Walfischbai",
+          "zh": "鲸湾港"
+        },
+        "stable_key": "id::CITY::ne::1159149725"
+      },
+      {
+        "base_name": {
+          "en": "Arusha",
+          "zh": "阿鲁沙"
+        },
+        "city_id": "CITY::ne::1159149733",
+        "host_feature_id": "TZ_ADM1_TZA-3391",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Löweburg",
+          "zh": "勒韦堡"
+        },
+        "stable_key": "id::CITY::ne::1159149733"
+      },
+      {
+        "base_name": {
+          "en": "Kisangani",
+          "zh": "基桑加尼"
+        },
+        "city_id": "CITY::ne::1159149865",
+        "host_feature_id": "CD_ADM1_COD-1559",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Stanleystadt",
+          "zh": "斯坦利城"
+        },
+        "stable_key": "id::CITY::ne::1159149865"
+      },
+      {
+        "base_name": {
+          "en": "Kananga",
+          "zh": "卡南加"
+        },
+        "city_id": "CITY::ne::1159149977",
+        "host_feature_id": "CD_ADM1_COD-1872",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Luluaburg",
+          "zh": "卢卢阿堡"
+        },
+        "stable_key": "id::CITY::ne::1159149977"
+      },
+      {
+        "base_name": {
+          "en": "Kalemie",
+          "zh": "卡莱米"
+        },
+        "city_id": "CITY::ne::1159149983",
+        "host_feature_id": "CD_ADM1_COD-1897",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Albertstadt",
+          "zh": "阿尔贝特城"
+        },
+        "stable_key": "id::CITY::ne::1159149983"
+      },
+      {
+        "base_name": {
+          "en": "Pointe-Noire",
+          "zh": "黑角"
+        },
+        "city_id": "CITY::ne::1159150171",
+        "host_feature_id": "CG_ADM1_COG-5855",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Schwarze-Spitze",
+          "zh": "黑角"
+        },
+        "stable_key": "id::CITY::ne::1159150171"
+      },
+      {
+        "base_name": {
+          "en": "Brest",
+          "zh": "布列斯特"
+        },
+        "city_id": "CITY::ne::1159150351",
+        "host_feature_id": "BY_RAY_67162791B30498032594927",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Brest-Litowsk",
+          "zh": "布列斯特-立托夫斯克"
+        },
+        "stable_key": "id::CITY::ne::1159150351"
+      },
+      {
+        "base_name": {
+          "en": "Bujumbura",
+          "zh": "布琼布拉"
+        },
+        "city_id": "CITY::ne::1159150427",
+        "host_feature_id": "BI_ADM1_BDI-3364",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Usumbura",
+          "zh": "乌松布拉"
+        },
+        "stable_key": "id::CITY::ne::1159150427"
+      },
+      {
+        "base_name": {
+          "en": "Sevastopol",
+          "zh": "塞瓦斯托波尔"
+        },
+        "city_id": "CITY::ne::1159150561",
+        "host_feature_id": "RU_ARCTIC_FB_043",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Theoderichshafen",
+          "zh": "狄奥多里希港"
+        },
+        "stable_key": "id::CITY::ne::1159150561"
+      },
+      {
+        "base_name": {
+          "en": "Harare",
+          "zh": "哈拉雷"
+        },
+        "city_id": "CITY::ne::1159150573",
+        "host_feature_id": "ZW_ADM1_ZWE-525",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Salisbury",
+          "zh": "索尔兹伯里"
+        },
+        "stable_key": "id::CITY::ne::1159150573"
+      },
+      {
+        "base_name": {
+          "en": "Maputo",
+          "zh": "马普托"
+        },
+        "city_id": "CITY::ne::1159150683",
+        "host_feature_id": "MZ_ADM1_MOZ-5854",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Lourenço Marques",
+          "zh": "洛伦索·马贵斯"
+        },
+        "stable_key": "id::CITY::ne::1159150683"
+      },
+      {
+        "base_name": {
+          "en": "Windhoek",
+          "zh": "温得和克"
+        },
+        "city_id": "CITY::ne::1159150785",
+        "host_feature_id": "NA_ADM1_NAM-3340",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Windhuk",
+          "zh": "温得和克"
+        },
+        "stable_key": "id::CITY::ne::1159150785"
+      },
+      {
+        "base_name": {
+          "en": "Zanzibar",
+          "zh": "桑给巴尔"
+        },
+        "city_id": "CITY::ne::1159150789",
+        "host_feature_id": "TZ_ADM1_TZA-3384",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Sansibar",
+          "zh": "桑给巴尔"
+        },
+        "stable_key": "id::CITY::ne::1159150789"
+      },
+      {
+        "base_name": {
+          "en": "Vilnius",
+          "zh": "维尔纽斯"
+        },
+        "city_id": "CITY::ne::1159150809",
+        "host_feature_id": "LT011",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Wilna",
+          "zh": "维尔纳"
+        },
+        "stable_key": "id::CITY::ne::1159150809"
+      },
+      {
+        "base_name": {
+          "en": "Tallinn",
+          "zh": "塔林"
+        },
+        "city_id": "CITY::ne::1159150877",
+        "host_feature_id": "EE001",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Reval",
+          "zh": "雷瓦尔"
+        },
+        "stable_key": "id::CITY::ne::1159150877"
+      },
+      {
+        "base_name": {
+          "en": "Lubumbashi",
+          "zh": "卢本巴希"
+        },
+        "city_id": "CITY::ne::1159150903",
+        "host_feature_id": "CD_ADM1_COD-1897",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Elisabethstadt",
+          "zh": "伊丽莎白城"
+        },
+        "stable_key": "id::CITY::ne::1159150903"
+      },
+      {
+        "base_name": {
+          "en": "Libreville",
+          "zh": "利伯维尔"
+        },
+        "city_id": "CITY::ne::1159150913",
+        "host_feature_id": "GA_ADM1_GAB-2168",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Freistadt",
+          "zh": "自由城"
+        },
+        "stable_key": "id::CITY::ne::1159150913"
+      },
+      {
+        "base_name": {
+          "en": "Port-Gentil",
+          "zh": "让蒂尔港"
+        },
+        "city_id": "CITY::ne::1159150919",
+        "host_feature_id": "GA_ADM1_GAB-2624",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Gentilhafen",
+          "zh": "让蒂尔港"
+        },
+        "stable_key": "id::CITY::ne::1159150919"
+      },
+      {
+        "base_name": {
+          "en": "Tbilisi",
+          "zh": "第比利斯"
+        },
+        "city_id": "CITY::ne::1159150961",
+        "host_feature_id": "GEO-3036",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Tiflis",
+          "zh": "第比利斯"
+        },
+        "stable_key": "id::CITY::ne::1159150961"
+      },
+      {
+        "base_name": {
+          "en": "Brazzaville",
+          "zh": "布拉柴维尔"
+        },
+        "city_id": "CITY::ne::1159150993",
+        "host_feature_id": "CG_ADM1_COG-4855",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Brazzastadt",
+          "zh": "布拉柴城"
+        },
+        "stable_key": "id::CITY::ne::1159150993"
+      },
+      {
+        "base_name": {
+          "en": "Yaoundé",
+          "zh": "雅温得"
+        },
+        "city_id": "CITY::ne::1159151115",
+        "host_feature_id": "CM_ADM1_CMR-1480",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Jaunde",
+          "zh": "雅恩德"
+        },
+        "stable_key": "id::CITY::ne::1159151115"
+      },
+      {
+        "base_name": {
+          "en": "Huambo",
+          "zh": "万博"
+        },
+        "city_id": "CITY::ne::1159151131",
+        "host_feature_id": "AO_ADM1_AGO-1890",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Neu Lissabon",
+          "zh": "新里斯本"
+        },
+        "stable_key": "id::CITY::ne::1159151131"
+      },
+      {
+        "base_name": {
+          "en": "Warsaw",
+          "zh": "华沙"
+        },
+        "city_id": "CITY::ne::1159151299",
+        "host_feature_id": "PL_POW_1465",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Warschau",
+          "zh": "华沙"
+        },
+        "stable_key": "id::CITY::ne::1159151299"
+      },
+      {
+        "base_name": {
+          "en": "Dar es Salaam",
+          "zh": "达累斯萨拉姆"
+        },
+        "city_id": "CITY::ne::1159151305",
+        "host_feature_id": "TZ_ADM1_TZA-3378",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Daressalam",
+          "zh": "达累斯萨拉姆"
+        },
+        "stable_key": "id::CITY::ne::1159151305"
+      },
+      {
+        "base_name": {
+          "en": "Brussels",
+          "zh": "布鲁塞尔"
+        },
+        "city_id": "CITY::ne::1159151465",
+        "host_feature_id": "BE100",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Brüssel",
+          "zh": "布鲁塞尔"
+        },
+        "stable_key": "id::CITY::ne::1159151465"
+      },
+      {
+        "base_name": {
+          "en": "Kyiv",
+          "zh": "基辅"
+        },
+        "city_id": "CITY::ne::1159151495",
+        "host_feature_id": "UA_RAY_74538382B60890943260132",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Kiew",
+          "zh": "基辅"
+        },
+        "stable_key": "id::CITY::ne::1159151495"
+      },
+      {
+        "base_name": {
+          "en": "Kinshasa",
+          "zh": "金沙萨"
+        },
+        "city_id": "CITY::ne::1159151539",
+        "host_feature_id": "CD_ADM1_COD-1884",
+        "resolution": "scenario_city_override",
+        "scenario_name": {
+          "en": "Leopoldstadt",
+          "zh": "利奥波德城"
+        },
+        "stable_key": "id::CITY::ne::1159151539"
+      }
+    ],
+    "renamed_city_count": 4427,
+    "unresolved_city_rename_count": 0,
+    "unresolved_city_renames": []
+  }
 }

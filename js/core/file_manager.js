@@ -1,4 +1,5 @@
 import { normalizeRiverPaintState } from "./river_paint/partition_model.js";
+import { TNO_TAG_MIGRATION_VERSION } from "./country_code_aliases.js";
 import { verifyApprovedRiverPack } from "./river_paint/pilot_loader.js";
 import { normalizePaintMode } from "./map_editing_policy.js";
 import { normalizeRenderingStyleConfig } from "./renderer/display_quality_policy.js";
@@ -559,6 +560,7 @@ class FileManager {
         ? {
           id: appState.activeScenarioId,
           version: appState.activeScenarioManifest?.version || 1,
+          ...(appState.activeScenarioId === "tno_1962" ? { tagMigrationVersion: TNO_TAG_MIGRATION_VERSION } : {}),
           baselineHash: appState.scenarioBaselineHash || "",
           importAudit: normalizeScenarioImportAudit(appState.scenarioImportAudit, {
             scenarioId: appState.activeScenarioId,
@@ -772,6 +774,8 @@ class FileManager {
       data.scenario = {
         id: String(data.scenario.id || "").trim(),
         version: Number(data.scenario.version || 1) || 1,
+        ...(data.scenario.id === "tno_1962"
+          ? { tagMigrationVersion: data.scenario.tagMigrationVersion } : {}),
         baselineHash: String(data.scenario.baselineHash || "").trim(),
         viewMode: String(data.scenario.viewMode || "ownership").trim().toLowerCase() === "frontline"
           ? "frontline"
