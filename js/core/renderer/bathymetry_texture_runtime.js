@@ -16,6 +16,21 @@ export function createBathymetryTextureRuntime({
   let status = 'off', projectionGeneration, projectionParams, rampKey, ramp;
   let tileBatch = null, detailPending = false;
   let gpuReadyTimer = null;
+  let lastOutput = null;
+
+  const matrixOf = (transform) => ({ a: transform.a, b: transform.b, c: transform.c, d: transform.d, e: transform.e, f: transform.f });
+  // now · last⁻¹: maps pixels of the previous output onto the current canvas transform.
+  function deltaTransform(now, last) {
+    const det = last.a * last.d - last.b * last.c;
+    if (!det) return null;
+    const inv = { a: last.d / det, b: -last.b / det, c: -last.c / det, d: last.a / det,
+      e: (last.c * last.f - last.d * last.e) / det, f: (last.b * last.e - last.a * last.f) / det };
+    return {
+      a: now.a * inv.a + now.c * inv.b, b: now.b * inv.a + now.d * inv.b,
+      c: now.a * inv.c + now.c * inv.d, d: now.b * inv.c + now.d * inv.d,
+      e: now.a * inv.e + now.c * inv.f + now.e, f: now.b * inv.e + now.d * inv.f + now.f,
+    };
+  }
 
   function getState() {
     const failedSources = [global.error && 'global', scenario.error && 'scenario'].filter(Boolean);
@@ -145,7 +160,7 @@ export function createBathymetryTextureRuntime({
     if (!disposed && source.getRevision() !== revision) onAssetsChanged('bathymetry-tile');
   }
 
-  function draw(context, { oceanStyle, baseRgb, preset = oceanStyle.preset, isExport = false }) {
+  function draw(context, { oceanStyle, baseRgb, preset = oceanStyle.preset, isExport = false, reuseLastOutput = false }) {
     if (!isStyleActive(oceanStyle, preset)) {
       status = 'off';
       return getState();
@@ -162,6 +177,24 @@ export function createBathymetryTextureRuntime({
       rampKey = key;
     }
     const transform = context.getTransform();
+    // During a zoom or pan gesture the previous frame's depth image is moved
+    // with the camera instead of re-shading every frame; the idle render that
+    // follows the gesture produces the exact image again.
+    if (reuseLastOutput && !isExport && lastOutput
+      && lastOutput.width === context.canvas.width && lastOutput.height === context.canvas.height
+      && lastOutput.projectionGeneration === projectionGeneration && lastOutput.rampKey === key
+      && lastOutput.overlay === scenario.value && lastOutput.source === global.value) {
+      const delta = deltaTransform(matrixOf(transform), lastOutput.transform);
+      if (delta) {
+        context.save();
+        context.setTransform(delta.a, delta.b, delta.c, delta.d, delta.e, delta.f);
+        context.globalAlpha = Math.max(0, Math.min(1, oceanStyle.opacity));
+        context.drawImage(lastOutput.canvas, 0, 0);
+        context.restore();
+        return { ...getState(), backend: lastOutput.backend, detail: lastOutput.detail, reused: true,
+          missingTileCount: lastOutput.missingTileCount, coveredBounds: lastOutput.coveredBounds };
+      }
+    }
     const detail = !!resolveDetailTileKeys(context.canvas.width, context.canvas.height, transform);
     const output = renderer.render({
       width: context.canvas.width, height: context.canvas.height, transform,
@@ -179,6 +212,9 @@ export function createBathymetryTextureRuntime({
     context.globalAlpha = Math.max(0, Math.min(1, oceanStyle.opacity));
     context.drawImage(output.canvas, 0, 0);
     context.restore();
+    lastOutput = { canvas: output.canvas, transform: matrixOf(transform), width: context.canvas.width,
+      height: context.canvas.height, projectionGeneration, rampKey: key, overlay: scenario.value, source: global.value,
+      backend: output.backend, detail, missingTileCount: output.missingTileKeys.length, coveredBounds: output.coveredBounds };
     // One repaint per batch: every arriving tile would otherwise rebuild the background pass.
     detailPending = detail && output.missingTileKeys.length > 0;
     if (detailPending && !tileBatch) {
@@ -201,6 +237,7 @@ export function createBathymetryTextureRuntime({
 
   function dispose() {
     disposed = true;
+    lastOutput = null;
     clearTimeout(gpuReadyTimer);
     gpuReadyTimer = null;
     if (global.value) releaseSource(global.value);

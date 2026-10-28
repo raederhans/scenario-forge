@@ -1987,6 +1987,8 @@ function drawBathymetryTexture(oceanStyle) {
     baseRgb: globalThis.d3.rgb(getOceanBaseFillColor()),
     preset: oceanStyle.preset,
     isExport: exportRenderInProgress,
+    // Gesture frames move the last depth image; the idle frame re-shades exactly.
+    reuseLastOutput: !exportRenderInProgress && runtimeState.renderPhase !== RENDER_PHASE_IDLE,
   });
   publishBathymetryTextureState(result);
   return result;

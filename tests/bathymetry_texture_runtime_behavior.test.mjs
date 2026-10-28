@@ -350,3 +350,25 @@ test('export preparation requests nothing while bathymetry is inactive', async (
   assert.deepEqual(h.requests, []);
   h.runtime.dispose();
 });
+
+test('gesture frames reuse the previous depth image under the camera delta and the idle frame re-shades', async () => {
+  const h = harness();
+  await h.runtime.ensure();
+  h.draw();
+  assert.equal(h.renders.length, 1);
+  // Pan by 10 px, scale by 2: the cached image must be drawn with now·last⁻¹.
+  h.context.transform = { a: 2, b: 0, c: 0, d: 2, e: 10, f: 0 };
+  const reused = h.runtime.draw(h.context, { ...h.options, reuseLastOutput: true });
+  assert.equal(reused.reused, true);
+  assert.equal(reused.status, 'ready');
+  assert.equal(h.renders.length, 1, 'no new shading during the gesture');
+  assert.deepEqual(h.draws.at(-3), ['transform', 2, 0, 0, 2, 10, 0]);
+  assert.equal(h.draws.at(-2)[0], 'image');
+  const exact = h.runtime.draw(h.context, { ...h.options, reuseLastOutput: false });
+  assert.equal(exact.reused, undefined);
+  assert.equal(h.renders.length, 2, 'the idle frame renders again');
+  // A resized canvas cannot reuse the old image.
+  h.context.canvas = { width: 4, height: 4 };
+  h.runtime.draw(h.context, { ...h.options, reuseLastOutput: true });
+  assert.equal(h.renders.length, 3);
+});
