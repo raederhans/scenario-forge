@@ -127,6 +127,14 @@ export function createPoliticalBackgroundRenderOwner({
   const POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS = Number(
     constants.deferredFullCacheTimeoutMs,
   ) || 60;
+  // A quiet page hands an idle callback up to ~50 ms, and work posted during an
+  // idle period only runs in the next one. Stopping at the bounded CPU slice
+  // would waste most of each idle period, so a real idle deadline may extend a
+  // slice up to this cap while the browser still reports idle time.
+  const POLITICAL_DEFERRED_FULL_CACHE_IDLE_SLICE_MAX_MS = Math.max(
+    POLITICAL_DEFERRED_FULL_CACHE_CPU_BUDGET_MS,
+    Number(constants.deferredFullCacheIdleSliceMaxMs) || 40,
+  );
   const configuredMergedPathBudget = Number(constants.politicalBackgroundMergedPathBudgetBytes);
   const POLITICAL_BACKGROUND_MERGED_PATH_BUDGET_BYTES = Number.isSafeInteger(configuredMergedPathBudget)
     ? Math.max(0, configuredMergedPathBudget)
@@ -728,12 +736,17 @@ export function createPoliticalBackgroundRenderOwner({
       getPoliticalFeaturePathEntry, addRetainedPoliticalPath,
       resolvePoliticalBackgroundEntryMeta, Path2D: platform.Path2D,
       mergedPathBudgetBytes: POLITICAL_BACKGROUND_MERGED_PATH_BUDGET_BYTES,
-      withinBudget: (processedCount) => processedCount === 0 || (
-        nowMs() - startedAt < POLITICAL_DEFERRED_FULL_CACHE_CPU_BUDGET_MS
+      withinBudget: (processedCount) => {
+        if (processedCount === 0) return true;
+        const elapsedMs = nowMs() - startedAt;
         // Expired idle callbacks report zero idle time. Use the same bounded
         // CPU slice so a busy frame cannot reduce a large rebuild to one entry.
-        && (!deadline || deadline.didTimeout || typeof deadline.timeRemaining !== "function" || deadline.timeRemaining() > 0)
-      ),
+        if (!deadline || deadline.didTimeout || typeof deadline.timeRemaining !== "function") {
+          return elapsedMs < POLITICAL_DEFERRED_FULL_CACHE_CPU_BUDGET_MS;
+        }
+        if (!(deadline.timeRemaining() > 0)) return false;
+        return elapsedMs < POLITICAL_DEFERRED_FULL_CACHE_IDLE_SLICE_MAX_MS;
+      },
     });
     if (result.geometryChanged) {
       cancelScenarioPoliticalBackgroundDeferredFullCache("geometry-changed");
