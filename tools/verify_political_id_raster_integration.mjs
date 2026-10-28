@@ -270,6 +270,15 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
   async function prepareNativeReferences() {
     assert.equal(await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().requested), false);
     assert.equal(session.network.length, 0, "explicit native reference must not download raster assets");
+    // Deferred detail promotion lands after startup and replaces the drawn
+    // topology (single -> composite). A reference captured before it would
+    // never match the frames compared later, however exact both are.
+    const detailWaitStartedAt = performance.now();
+    await page.waitForFunction(() => {
+      const s = window.__rasterTask.state;
+      return !s.detailDeferred && !s.detailPromotionInFlight;
+    }, null, { timeout: 60000 });
+    report.timings.detailPromotionWaitMs = performance.now() - detailWaitStartedAt;
     await toggle(page, false);
     await settled(page);
     if (expectNativeBudgetFallback) {
