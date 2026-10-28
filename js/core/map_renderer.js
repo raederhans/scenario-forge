@@ -12005,11 +12005,11 @@ function shouldForceExactContextBaseRefresh(reuseDecision = null) {
 }
 
 function getPhysicalExactRefreshPasses() {
-  const passes = runtimeState.showPhysical
-    ? ["physicalBase", "political", "contextBase", "borders"]
-    : ["political", "contextBase", "borders"];
   const activePassNames = new Set(getActiveRenderPassNames());
-  return passes.filter((passName) => activePassNames.has(passName));
+  const passes = (runtimeState.showPhysical
+    ? ["physicalBase", "political", "contextBase", "borders"]
+    : ["political", "contextBase", "borders"]).filter((passName) => activePassNames.has(passName));
+  return passes;
 }
 
 function composeUrbanAdaptivePaintModel() {

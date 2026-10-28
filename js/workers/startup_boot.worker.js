@@ -32,7 +32,11 @@ const COUNTRY_CODE_ALIASES = Object.freeze({
   EL: "GR",
 });
 const FEATURE_IDENTITY = globalThis.__scenarioForgeFeatureIdentityShared;
-const { dequantizeTopology } = globalThis.__scenarioForgeStartupTopologyCodecShared;
+// Resolved lazily: some harnesses load this worker without the startup codec.
+function dequantizeTopology(topology, topojsonClient) {
+  const codec = globalThis.__scenarioForgeStartupTopologyCodecShared;
+  return typeof codec?.dequantizeTopology === "function" ? codec.dequantizeTopology(topology, topojsonClient) : topology;
+}
 
 if (!FEATURE_IDENTITY) {
   throw new Error("[startup_worker] Feature identity shared helper failed to initialize.");
