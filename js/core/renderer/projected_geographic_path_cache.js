@@ -19,6 +19,7 @@ export function createProjectedGeographicPathCache({
   });
   let generation = -1;
   let stream = null;
+  const pendingPreparations = new Map();
   let hits = 0;
   let builds = 0;
 
@@ -93,28 +94,50 @@ export function createProjectedGeographicPathCache({
       hits += 1;
       return existing.path;
     }
-    const combined = new Path2DClass();
-    let sliceStartedAt = nowMs();
-    for (const feature of object.features) {
-      if (nowMs() - sliceStartedAt >= sliceBudgetMs) {
-        await yieldControl();
-        const current = getProjection?.();
-        if (!current || generation !== startGeneration || getProjectionGeometryGeneration(current) !== startGeneration) return null;
-        sliceStartedAt = nowMs();
+    const inFlight = pendingPreparations.get(object);
+    if (inFlight && inFlight.generation === startGeneration) return inFlight.promise;
+    const preparation = { generation: startGeneration, promise: null };
+    preparation.promise = (async () => {
+      const combined = new Path2DClass();
+      let sliceStartedAt = nowMs();
+      // d3 streams each polygon of a MultiPolygon independently, so the ocean's
+      // few huge features split into many slices without changing the path.
+      for (const unit of iteratePathUnits(object)) {
+        if (nowMs() - sliceStartedAt >= sliceBudgetMs) {
+          await yieldControl();
+          const current = getProjection?.();
+          if (!current || generation !== startGeneration || getProjectionGeometryGeneration(current) !== startGeneration) return null;
+          sliceStartedAt = nowMs();
+        }
+        const part = new Path2DClass();
+        stream.context(part)(unit);
+        combined.addPath(part);
       }
-      const part = new Path2DClass();
-      stream.context(part)(feature);
-      combined.addPath(part);
-    }
-    const built = entries.get(object);
-    if (built) return built.path;
-    entries.set(object, {
-      path: combined,
-      estimatedBytes: getGeometryRetentionWeights(object).path,
+      const built = entries.get(object);
+      if (built) return built.path;
+      entries.set(object, {
+        path: combined,
+        estimatedBytes: getGeometryRetentionWeights(object).path,
+      });
+      builds += 1;
+      updateResourceAccounting();
+      return combined;
+    })().finally(() => {
+      if (pendingPreparations.get(object) === preparation) pendingPreparations.delete(object);
     });
-    builds += 1;
-    updateResourceAccounting();
-    return combined;
+    pendingPreparations.set(object, preparation);
+    return preparation.promise;
+  }
+
+  function* iteratePathUnits(collection) {
+    for (const feature of collection.features) {
+      const geometry = feature?.type === "Feature" ? feature.geometry : feature;
+      if (geometry?.type === "MultiPolygon" && Array.isArray(geometry.coordinates) && geometry.coordinates.length > 1) {
+        for (const polygon of geometry.coordinates) yield { type: "Polygon", coordinates: polygon };
+      } else {
+        yield feature;
+      }
+    }
   }
 
   return Object.freeze({

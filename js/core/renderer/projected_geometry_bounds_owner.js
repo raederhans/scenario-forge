@@ -224,6 +224,17 @@ export function createProjectedGeometryBoundsOwner({
     return diagnostics;
   }
 
+  function sumFeatureCollectionArea(geoObject) {
+    if (geoObject?.type !== "FeatureCollection" || !Array.isArray(geoObject.features)) return null;
+    let total = 0;
+    for (const feature of geoObject.features) {
+      const diagnostics = getSphericalGeometryDiagnostics(feature);
+      if (!diagnostics || !Number.isFinite(diagnostics.area)) return null;
+      total += diagnostics.area;
+    }
+    return total;
+  }
+
   function seedSphericalGeometryArea(geoObject, area) {
     if (!Number.isFinite(area)) return;
     const normalizedGeoObject = normalizeGeoObjectForSphericalDiagnostics(geoObject);
@@ -246,7 +257,10 @@ export function createProjectedGeometryBoundsOwner({
     const cached = sphericalGeometryDiagnosticsByGeometry.get(geometry);
     if (cached) return cached;
     try {
-      const area = Number(d3.geoArea(normalizedGeoObject));
+      // d3.geoArea adds polygon areas, so a collection's area is the sum of its
+      // features' cached areas: a mask rebuilt from already-seen features (or
+      // normalized features that recorded their area) needs no second walk.
+      const area = Number(sumFeatureCollectionArea(normalizedGeoObject) ?? d3.geoArea(normalizedGeoObject));
       const diagnostics = buildSphericalGeometryDiagnostics(normalizedGeoObject, area, d3);
       sphericalGeometryDiagnosticsByGeometry.set(geometry, diagnostics);
       return diagnostics;

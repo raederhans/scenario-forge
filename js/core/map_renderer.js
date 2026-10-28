@@ -1816,6 +1816,9 @@ function getPoliticalCollectionOwner() {
       getFeatureId,
       isPoliticalInteractionRenderableFeature,
       isRenderDiagEnabled: () => renderDiag.enabled,
+      // Normalization already paid for geoArea; the spatial index diagnostics
+      // read the same number instead of walking every ring a second time.
+      recordSphericalArea: (geometry, area) => getProjectedGeometryBoundsOwner().seedSphericalGeometryArea(geometry, area),
     },
   });
   return politicalCollectionOwner;
@@ -16013,7 +16016,11 @@ function enforceZoomConstraints(options) {
 }
 
 function fitProjection({ skipSpatialIndex = false } = {}) {
-  return getRendererFitProjectionOwner().fitProjection({ skipSpatialIndex });
+  const result = getRendererFitProjectionOwner().fitProjection({ skipSpatialIndex });
+  // Every fit changes the projection generation and drops cached paths, so the
+  // ocean clip prewarm follows the fit rather than initMap alone.
+  prewarmOceanClipPath();
+  return result;
 }
 
 function getResizeReason(reason, fallback = "resize") {
@@ -16195,7 +16202,6 @@ function initMap({
   fitProjection({ skipSpatialIndex: shouldDeferInteractionInfrastructure });
   initZoom();
   bindEvents();
-  prewarmOceanClipPath();
   runtimeState.getViewportGeoBoundsFn = getViewportGeoBounds;
   if (!shouldDeferInteractionInfrastructure) {
     setInteractionInfrastructureState("ready", {
