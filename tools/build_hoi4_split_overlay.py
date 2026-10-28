@@ -449,13 +449,18 @@ def _halton(index, base):
     return result
 
 
-def family_palette(parent_hex, count, hue_span=5.0):
+# Families whose subjects border each other on the map need a wider lightness range to stay
+# distinguishable; the Japanese puppets tile occupied China, and JAP itself is very light.
+WIDE_FAMILIES = {"JAP": dict(hue_span=10.0, lightness_width=0.45, max_distance=0.30)}
+
+
+def family_palette(parent_hex, count, hue_span=5.0, lightness_width=0.16, max_distance=0.119):
     L0, a0, b0 = hex_to_oklab(parent_hex)
     C0, h0 = math.hypot(a0, b0), math.degrees(math.atan2(b0, a0))
-    # A 0.16-wide lightness window around the parent, shifted inward at the 0.30/0.90 limits,
+    # A lightness window around the parent, shifted inward at the 0.30/0.90 limits,
     # so very light (JAP) or dark (SOV) parents still give their subjects enough range.
-    lo = min(max(0.30, L0 - 0.08), 0.90 - 0.16)
-    hi = lo + 0.16
+    lo = min(max(0.30, L0 - lightness_width / 2), 0.90 - lightness_width)
+    hi = lo + lightness_width
     pool = []
     for i in range(1, 900):
         L = lo + (hi - lo) * _halton(i, 2)
@@ -469,7 +474,7 @@ def family_palette(parent_hex, count, hue_span=5.0):
                 break
             C *= 0.92
         if all(0 <= c <= 1 for c in rgb):
-            if math.dist(lab, (L0, a0, b0)) <= 0.119:
+            if math.dist(lab, (L0, a0, b0)) <= max_distance:
                 pool.append(lab)
     chosen, anchors = [], [(L0, a0, b0)]
     for _ in range(count):
@@ -501,7 +506,9 @@ def harmonize_family_colors(entries):
             return 0 if tag not in parent_of or tag in seen else 1 + depth(parent_of[tag], seen + (tag,))
 
         for parent in sorted(families, key=lambda t: (depth(t), t)):
-            for child, hex_color in zip(families[parent], family_palette(colour[parent], len(families[parent]))):
+            children = families[parent]
+            palette = family_palette(colour[parent], len(children), **WIDE_FAMILIES.get(parent, {}))
+            for child, hex_color in zip(children, palette):
                 colour[child] = hex_color
         colors_by_scenario[scenario] = {tag: colour[tag] for tag in parent_of}
         entry_tags = {e["tag"] for e in applicable}

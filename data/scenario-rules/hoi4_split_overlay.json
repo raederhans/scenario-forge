@@ -2383,7 +2383,7 @@
         "KWT"
       ],
       "cores": "owner",
-      "color_hex": "#fdd3c5"
+      "color_hex": "#ecc0a4"
     },
     {
       "id": "kwantung_return_hoi4_1939",
@@ -2405,7 +2405,7 @@
         "KWT"
       ],
       "cores": "owner",
-      "color_hex": "#f2c6af"
+      "color_hex": "#d5a992"
     },
     {
       "id": "kwantung_hoi4_1936",
@@ -2427,7 +2427,7 @@
         "KWT"
       ],
       "notes": "Simplified approximation of the leased peninsula around Port Arthur, Dairen and Kinchow; northern lease line sketched, not a surveyed cadastral trace. Only the Dalian parent is cut; Wafangdian, Zhuanghe and Changhai remain MAN.",
-      "color_hex": "#e3ac94"
+      "color_hex": "#b08572"
     },
     {
       "id": "kwantung_hoi4_1939",
@@ -2449,7 +2449,7 @@
         "KWT"
       ],
       "notes": "Simplified approximation of the leased peninsula around Port Arthur, Dairen and Kinchow; northern lease line sketched, not a surveyed cadastral trace. Only the Dalian parent is cut; Wafangdian, Zhuanghe and Changhai remain MAN.",
-      "color_hex": "#d8aa99"
+      "color_hex": "#c28d7e"
     },
     {
       "id": "manchukuo_parent_hoi4_1936",
@@ -2467,7 +2467,7 @@
       "only_from_owners": [
         "MAN"
       ],
-      "color_hex": "#fdd3c5"
+      "color_hex": "#ecc0a4"
     },
     {
       "id": "manchukuo_parent_hoi4_1939",
@@ -2485,7 +2485,7 @@
       "only_from_owners": [
         "MAN"
       ],
-      "color_hex": "#f2c6af"
+      "color_hex": "#d5a992"
     },
     {
       "id": "ukrainian_ssr_hoi4_1936",
@@ -3734,7 +3734,7 @@
       "name_zh": "冀东防共自治政府",
       "parent_owner_tag": "JAP",
       "subject_kind": "puppet",
-      "color_hex": "#e6b8a5",
+      "color_hex": "#c89c86",
       "select": {
         "country_codes": [
           "CN"
@@ -3885,7 +3885,7 @@
       "name_zh": "中华民国临时政府",
       "parent_owner_tag": "JAP",
       "subject_kind": "puppet",
-      "color_hex": "#e8b298",
+      "color_hex": "#fed2c7",
       "select": {
         "hierarchy_groups": [
           "CN_Beijing",
@@ -3937,7 +3937,7 @@
       "name_zh": "察南政厅",
       "parent_owner_tag": "JAP",
       "subject_kind": "puppet",
-      "color_hex": "#d7a38e",
+      "color_hex": "#9d6c5a",
       "select": {
         "prefectures": [
           "张家口市"
@@ -3960,7 +3960,7 @@
       "name_zh": "晋北政厅",
       "parent_owner_tag": "JAP",
       "subject_kind": "puppet",
-      "color_hex": "#e6b8a5",
+      "color_hex": "#c89c86",
       "select": {
         "prefectures": [
           "大同市",
@@ -4000,7 +4000,7 @@
       ],
       "cores": "keep",
       "notes": "China uses late-1939 occupation; CNZ and JBZ remain subordinate debug administrations after the September merger.",
-      "color_hex": "#ebbfa9"
+      "color_hex": "#ac7666"
     },
     {
       "id": "reformed_government",
@@ -4012,7 +4012,7 @@
       "name_zh": "中华民国维新政府",
       "parent_owner_tag": "JAP",
       "subject_kind": "puppet",
-      "color_hex": "#f1b8a3",
+      "color_hex": "#a0775c",
       "select": {
         "hierarchy_groups": [
           "CN_Shanghai",
@@ -4052,7 +4052,7 @@
       "name_zh": "日军华中占领区",
       "parent_owner_tag": "JAP",
       "subject_kind": "military_administration",
-      "color_hex": "#f7beaa",
+      "color_hex": "#e8afa1",
       "select": {
         "prefectures": [
           "武汉市",
@@ -4084,7 +4084,7 @@
       "name_zh": "日军华南占领区",
       "parent_owner_tag": "JAP",
       "subject_kind": "military_administration",
-      "color_hex": "#e3ac94",
+      "color_hex": "#b08572",
       "select": {
         "hierarchy_groups": [
           "CN_Hainan"
@@ -4696,7 +4696,7 @@
           "CN_CITY_17275852B43165756519885"
         ]
       },
-      "color_hex": "#fdd3c5"
+      "color_hex": "#ecc0a4"
     },
     {
       "id": "east_hebei_counties_1936",
@@ -4716,7 +4716,7 @@
           "CN_CITY_17275852B38375506939997"
         ]
       },
-      "color_hex": "#e6b8a5"
+      "color_hex": "#c89c86"
     },
     {
       "id": "hainan_qinlian_return_1936",
@@ -4979,7 +4979,7 @@
       "name_zh": "察东警备区（李守信）",
       "parent_owner_tag": "JAP",
       "subject_kind": "military_administration",
-      "color_hex": "#d7a38e",
+      "color_hex": "#9d6c5a",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B97242903030707",
@@ -5381,7 +5381,7 @@
       "only_from_owners": [
         "KOR"
       ],
-      "color_hex": "#f7beaa"
+      "color_hex": "#e8afa1"
     },
     {
       "id": "lba_family_colour_hoi4_1936",
@@ -5637,7 +5637,7 @@
       "only_from_owners": [
         "TAI"
       ],
-      "color_hex": "#d8aa99"
+      "color_hex": "#c28d7e"
     },
     {
       "id": "tun_family_colour_hoi4_1936",
@@ -5781,7 +5781,7 @@
       "only_from_owners": [
         "KOR"
       ],
-      "color_hex": "#fdd3c5"
+      "color_hex": "#ecc0a4"
     },
     {
       "id": "lba_family_colour_hoi4_1939",
@@ -6037,7 +6037,7 @@
       "only_from_owners": [
         "TAI"
       ],
-      "color_hex": "#fed0b8"
+      "color_hex": "#e0af90"
     },
     {
       "id": "tun_family_colour_hoi4_1939",

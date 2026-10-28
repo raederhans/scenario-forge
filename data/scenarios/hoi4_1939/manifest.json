@@ -2512,7 +2512,7 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "745256722f7d48b4ebfa2269322afa7499b35f351cad12127bc250687f8babb8",
+  "snapshot_fingerprint": "6b48289ff83680441d51085eee926ed44933ae4ba991193da0d8ea87818feaa8",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "d0b867c1f264df827eb9b5f31e029e2a55855671b4a4f8e60c547b59a3bb8303",

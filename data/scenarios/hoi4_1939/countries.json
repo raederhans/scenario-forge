@@ -1616,7 +1616,7 @@
     "CNZ": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#d7a38e",
+      "color_hex": "#9d6c5a",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 14,
@@ -3684,7 +3684,7 @@
     "JBZ": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#e6b8a5",
+      "color_hex": "#c89c86",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 7,
@@ -3725,7 +3725,7 @@
     "JCC": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#f7beaa",
+      "color_hex": "#e8afa1",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 60,
@@ -3844,7 +3844,7 @@
     "JSC": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#e3ac94",
+      "color_hex": "#b08572",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 63,
@@ -4091,7 +4091,7 @@
     "KOR": {
       "base_iso2": "KR",
       "capital_state_id": 525,
-      "color_hex": "#fdd3c5",
+      "color_hex": "#ecc0a4",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 28,
@@ -4256,7 +4256,7 @@
     "KWT": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#d8aa99",
+      "color_hex": "#c28d7e",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -4777,7 +4777,7 @@
     "MAN": {
       "base_iso2": "CN",
       "capital_state_id": 328,
-      "color_hex": "#f2c6af",
+      "color_hex": "#d5a992",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 234,
@@ -4900,7 +4900,7 @@
     "MEN": {
       "base_iso2": "CN",
       "capital_state_id": 1043,
-      "color_hex": "#ebbfa9",
+      "color_hex": "#ac7666",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 34,
@@ -5465,7 +5465,7 @@
     "NCP": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#e8b298",
+      "color_hex": "#fed2c7",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 318,
@@ -6576,7 +6576,7 @@
     "RGC": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#f1b8a3",
+      "color_hex": "#a0775c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 159,
@@ -7913,7 +7913,7 @@
     "TAI": {
       "base_iso2": "TW",
       "capital_state_id": null,
-      "color_hex": "#fed0b8",
+      "color_hex": "#e0af90",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 21,

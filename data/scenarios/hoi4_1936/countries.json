@@ -1318,7 +1318,7 @@
     "CDE": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#d7a38e",
+      "color_hex": "#9d6c5a",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 4,
@@ -2397,7 +2397,7 @@
     "EHC": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#e6b8a5",
+      "color_hex": "#c89c86",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 26,
@@ -4262,7 +4262,7 @@
     "KOR": {
       "base_iso2": "KR",
       "capital_state_id": 525,
-      "color_hex": "#f7beaa",
+      "color_hex": "#e8afa1",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 28,
@@ -4427,7 +4427,7 @@
     "KWT": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#e3ac94",
+      "color_hex": "#b08572",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -4987,7 +4987,7 @@
     "MAN": {
       "base_iso2": "CN",
       "capital_state_id": 328,
-      "color_hex": "#fdd3c5",
+      "color_hex": "#ecc0a4",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 235,
@@ -8082,7 +8082,7 @@
     "TAI": {
       "base_iso2": "TW",
       "capital_state_id": null,
-      "color_hex": "#d8aa99",
+      "color_hex": "#c28d7e",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 21,
