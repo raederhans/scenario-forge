@@ -205,25 +205,33 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
     gl.deleteProgram(program);
     gpu = null;
   }
-  function initialize() {
+  function initialize(prewarm = false) {
     const canvas = createCanvas(1, 1);
     const gl = getWebGL2Context(canvas);
     if (!gl) return null;
+    const pending = prewarm ? gl.getExtension('KHR_parallel_shader_compile') : null;
     const program = gl.createProgram();
     for (const [type, code] of [[gl.VERTEX_SHADER, VERTEX_SHADER], [gl.FRAGMENT_SHADER, BATHYMETRY_FRAGMENT_SHADER]]) {
       const shader = gl.createShader(type);
       gl.shaderSource(shader, code); gl.compileShader(shader);
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      if (!pending && !gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         const message = gl.getShaderInfoLog(shader);
         gl.deleteShader(shader); gl.deleteProgram(program); throw new Error(message);
       }
       gl.attachShader(program, shader); gl.deleteShader(shader);
     }
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    if (!pending && !gl.getProgramParameter(program, gl.LINK_STATUS)) {
       const message = gl.getProgramInfoLog(program); gl.deleteProgram(program); throw new Error(message);
     }
-    const state = { gl, canvas, program, textures: Array.from({ length: 5 }, () => gl.createTexture()),
+    // getParameter forces a round trip that waits for every queued GPU command;
+    // read these constants once instead of stalling each frame behind raster work.
+    const limits = {
+      maxTexture: gl.getParameter(gl.MAX_TEXTURE_SIZE),
+      maxLayers: gl.getParameter(gl.MAX_ARRAY_TEXTURE_LAYERS),
+      viewport: gl.getParameter(gl.MAX_VIEWPORT_DIMS),
+    };
+    const state = { gl, canvas, program, pending, limits, textures: Array.from({ length: 5 }, () => gl.createTexture()),
       source: null, overview: null, overlay: undefined, ramp: null, capacity: 0,
       layers: new Map(), tileImages: new Map(), index: null };
     canvas.addEventListener?.('webglcontextlost', (event) => {
@@ -231,6 +239,23 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
       if (gpu === state) { gpu = null; unavailable = false; }
     });
     return state;
+  }
+  function prewarm() {
+    if (gpu || unavailable) return;
+    try { gpu = initialize(true); unavailable = !gpu; } catch { unavailable = true; }
+  }
+  // wait=true blocks on LINK_STATUS so an export never completes without the
+  // depth texture; frames keep polling COMPLETION_STATUS_KHR instead.
+  function isReady({ wait = false } = {}) {
+    if (gpu?.pending) {
+      const { gl, program, pending } = gpu;
+      try {
+        if (!wait && !gl.getProgramParameter(program, pending.COMPLETION_STATUS_KHR)) return false;
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+        gpu.pending = null;
+      } catch { release(); unavailable = true; }
+    }
+    return !!gpu || unavailable;
   }
   function drawGpu(options, inverse, tiles, tileSize, overlayImage, output) {
     const { gl, canvas, program, textures } = gpu;
@@ -251,7 +276,7 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
       if (image.data) gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, image.width, image.height, 0, gl.RED, gl.UNSIGNED_BYTE, read(image).data);
       else gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, gl.RED, gl.UNSIGNED_BYTE, image);
     }
-    const maxTexture = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+    const maxTexture = gpu.limits.maxTexture;
     if (gpu.overview !== source.getOverview()) {
       let image = source.getOverview();
       if (image.width > maxTexture) image = read(image);
@@ -264,7 +289,7 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
       uploadImage(image);
       gpu.overview = source.getOverview();
     }
-    const capacity = Math.min(254, gl.getParameter(gl.MAX_ARRAY_TEXTURE_LAYERS), source.getCapacity());
+    const capacity = Math.min(254, gpu.limits.maxLayers, source.getCapacity());
     bind(1, gl.TEXTURE_2D_ARRAY); parameters(gl.TEXTURE_2D_ARRAY);
     if (gpu.capacity !== capacity || gpu.tileSize !== tileSize) {
       gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.R8, tileSize, tileSize, capacity, 0, gl.RED, gl.UNSIGNED_BYTE, null);
@@ -324,7 +349,7 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
     gl.uniform1f(uniform('hillshadeExaggeration'), hillshadeExaggeration);
     gl.uniform1i(uniform('detail'), detail ? 1 : 0); gl.uniform1i(uniform('hasOverlay'), overlay ? 1 : 0);
     gl.uniform1i(uniform('preset'), preset === 'bathymetry_soft' ? 1 : preset === 'bathymetry_contours' ? 2 : 0);
-    const viewport = gl.getParameter(gl.MAX_VIEWPORT_DIMS);
+    const viewport = gpu.limits.viewport;
     const limitX = Math.min(4096, maxTexture, viewport[0]), limitY = Math.min(4096, maxTexture, viewport[1]);
     const ctx = output.getContext('2d');
     ctx.clearRect(0, 0, width, height);
@@ -339,10 +364,12 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
   }
 
   function render({ width, height, transform, projectionParams, source, ramp, preset,
-    contourStrength = 0, overlay = null, detail = true, hillshadeStrength = .12, hillshadeExaggeration = 4 }) {
+    contourStrength = 0, overlay = null, detail = true, hillshadeStrength = .12, hillshadeExaggeration = 4,
+    waitForGpu = false }) {
     if (!gpu && !unavailable) {
       try { gpu = initialize(); unavailable = !gpu; } catch { unavailable = true; }
     }
+    if (!isReady({ wait: waitForGpu })) return { canvas: null, backend: 'pending', coveredBounds: null, missingTileKeys: [] };
     const canvas = outputCanvas ||= createCanvas(width, height);
     if (canvas.width !== width) canvas.width = width;
     if (canvas.height !== height) canvas.height = height;
@@ -354,7 +381,7 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
     const geographic = (x, y) => invertProjectedPoint(projectionParams,
       inverse.a * x + inverse.c * y + inverse.e, inverse.b * x + inverse.d * y + inverse.f);
     const manifest = source.getManifest(), present = new Set(manifest.tiles.present);
-    const layerLimit = gpu ? Math.min(254, gpu.gl.getParameter(gpu.gl.MAX_ARRAY_TEXTURE_LAYERS), source.getCapacity()) : Infinity;
+    const layerLimit = gpu ? Math.min(254, gpu.limits.maxLayers, source.getCapacity()) : Infinity;
     const tiles = new Map([...source.getLoadedTiles()].slice(-layerLimit));
     const tileSize = tiles.values().next().value?.width ?? manifest.tiles.tile_size ?? 600;
     const coveredBounds = estimateGeographicBounds(width, height, geographic);
@@ -435,5 +462,5 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
     ctx.putImageData(image, 0, 0);
     return { canvas, backend: 'cpu', coveredBounds, missingTileKeys: [...missing] };
   }
-  return { render, dispose() { release(); pixels = new WeakMap(); unavailable = false; outputCanvas = null; } };
+  return { prewarm, isReady, render, dispose() { release(); pixels = new WeakMap(); unavailable = false; outputCanvas = null; } };
 }

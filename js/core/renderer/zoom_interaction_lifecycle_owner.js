@@ -221,7 +221,10 @@ export function createZoomInteractionLifecycleOwner({
     zoomTarget.call(zoomBehavior);
     zoomTarget.on("dblclick.zoom", null);
     effects.resetZoomToFit?.();
-    effects.enforceZoomConstraints?.();
+    // Align D3 with the fitted transform without emitting a zoom gesture: the
+    // first frame has not been painted yet, so a gesture here would only run a
+    // full interaction render (and border snapshot capture) nobody can see.
+    effects.enforceZoomConstraints?.({ suppressRender: true });
     return getZoomBehavior();
   }
 

@@ -50,7 +50,7 @@ function fixture(t, options = {}) {
       h.timers.set(handle, { callback, options });
       return handle;
     }),
-    incrementPerfCounter: (name) => { h.counters[name] = (h.counters[name] || 0) + 1; },
+    incrementPerfCounter: (name, count = 1) => { h.counters[name] = (h.counters[name] || 0) + count; },
     recordRenderPerfMetric: (...args) => h.metrics.push(args),
     areZoomTransformsEquivalent: (left, right) => !!left && left.k === right.k && left.x === right.x && left.y === right.y,
     cloneZoomTransform: (value) => ({ ...value }),
@@ -184,7 +184,7 @@ test("cache mismatch reads are non-destructive; preparation preserves map identi
   assert.equal(h.owner.getPoliticalPathCacheHandle().valid, false);
 });
 
-test("entries build lazily, reuse cached paths, read live surfaces, and tolerate unavailable path generation", (t) => {
+test("entries build lazily, reuse cached paths, read live surfaces, and tolerate unavailable path generation", async (t) => {
   const h = fixture(t), value = item("a").feature;
   assert.equal(h.owner.getPoliticalFeaturePathEntry(value, { countMiss: true }), null);
   assert.equal(h.counters.politicalPartialPathCacheMisses, 1);
@@ -201,7 +201,73 @@ test("entries build lazily, reuse cached paths, read live surfaces, and tolerate
   assert.equal(h.path.context(), previousContext);
   h.path = null;
   assert.equal(h.owner.getPoliticalFeaturePathEntry(item("c").feature, { allowBuild: true }), null);
+  await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(h.counters.politicalPathCacheBuild, 1);
+});
+
+test("unvalidated builds reuse handles and batch build counters across 1000 calls", async (t) => {
+  let clones = 0;
+  const counts = [];
+  const metrics = [];
+  const h = fixture(t, {
+    cloneZoomTransform: (transform) => { clones += 1; return { ...transform }; },
+    incrementPerfCounter: (name, count = 1) => { if (name === "politicalPathCacheBuild") counts.push(count); },
+    recordRenderPerfMetric: (...args) => metrics.push(args),
+  });
+  const handle = h.owner.getPoliticalPathCacheHandle(undefined, { resetIfMismatch: true });
+  for (let index = 0; index < 1000; index += 1) {
+    assert.ok(h.owner.getPoliticalFeaturePathEntry(item(String(index)).feature, {
+      allowBuild: true, countBuild: true,
+    })?.path);
+    assert.equal(h.owner.getPoliticalPathCacheHandle(), handle);
+  }
+  assert.equal(clones, 1);
+  assert.deepEqual(counts, [256, 256, 256]);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.deepEqual(counts, [256, 256, 256, 232]);
+  assert.equal(counts.reduce((sum, count) => sum + count, 0), h.builds.length);
+  // Growing entries is not budget pressure: one metric for the first build, none per build.
+  assert.equal(metrics.filter(([name]) => name === "politicalPathCacheBudget").length, 1);
+});
+
+test("budget metrics report changed statistics and skip equal-size replacements", (t) => {
+  const h = fixture(t, { pathCacheBudget: 256 });
+  const build = (id) => h.owner.getPoliticalFeaturePathEntry(item(id).feature, { allowBuild: true });
+  const budgetMetrics = () => h.metrics.filter(([name]) => name === "politicalPathCacheBudget");
+  build("a");
+  build("a");
+  assert.equal(budgetMetrics().length, 1);
+  build("b");
+  assert.equal(budgetMetrics().length, 2);
+  assert.equal(budgetMetrics()[1][2].evictions, 1);
+  h.owner.getPoliticalFeaturePathEntry({ id: "giant", geometry: {
+    type: "LineString", coordinates: Array.from({ length: 100 }, (_, i) => [i, 0]),
+  } }, { allowBuild: true });
+  assert.equal(budgetMetrics().length, 3);
+  assert.equal(budgetMetrics()[2][2].oversizedSkips, 1);
+});
+
+test("memoized handles recheck transform values, shared maps and signatures", (t) => {
+  const h = fixture(t);
+  const prepare = () => h.owner.getPoliticalPathCacheHandle(undefined, { resetIfMismatch: true });
+  let handle = prepare();
+  for (const key of ["k", "x", "y"]) {
+    h.state.zoomTransform[key] += 1;
+    const next = prepare();
+    assert.notEqual(next, handle);
+    assert.equal(next.map, handle.map);
+    assert.equal(prepare(), next);
+    handle = next;
+  }
+  h.cache.politicalPathCache = new Map([["old", { path: true }]]);
+  const read = h.owner.getPoliticalPathCacheHandle();
+  assert.equal(read.valid, false);
+  assert.equal(read.map.size, 1);
+  assert.equal(h.owner.getPoliticalPathCacheHandle(), read);
+  assert.equal(prepare().valid, true);
+  h.cache.politicalPathCacheSignature = "external-change";
+  assert.equal(h.owner.getPoliticalPathCacheHandle().valid, false);
+  assert.equal(prepare().valid, true);
 });
 
 test("validated handle avoids repeated cache normalization within one synchronous slice", (t) => {
@@ -222,7 +288,7 @@ test("validated handle avoids repeated cache normalization within one synchronou
   assert.ok(cacheReads > readsBefore);
 });
 
-test("deferred warmup scopes counted path builds to one synchronous slice", (t) => {
+test("deferred warmup scopes counted path builds to one synchronous slice", async (t) => {
   const rendererSource = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
   const factoryStart = rendererSource.indexOf("function getPoliticalBackgroundRenderOwner() {");
   const factoryEnd = rendererSource.indexOf("\nfunction ", factoryStart + 1);
@@ -254,10 +320,10 @@ test("deferred warmup scopes counted path builds to one synchronous slice", (t) 
   });
   h = fixture(t, {
     getRenderPassCacheState: () => cacheOwner.getRenderPassCacheState(),
-    incrementPerfCounter: (name) => {
+    incrementPerfCounter: (name, count = 1) => {
       const cache = cacheOwner.getRenderPassCacheState();
       cache.perfCounters ||= {};
-      cache.perfCounters[name] = (cache.perfCounters[name] || 0) + 1;
+      cache.perfCounters[name] = (cache.perfCounters[name] || 0) + count;
     },
     scheduleDeferredWork,
   });
@@ -267,6 +333,7 @@ test("deferred warmup scopes counted path builds to one synchronous slice", (t) 
   validations = 0;
   h.tick();
   assert.equal(validations, 1, "all counted builds in a slice share one cache validation");
+  await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(h.cache.perfCounters.politicalPathCacheBuild, 24);
   assert.equal(h.cache.perfCounters.politicalPathWarmupBuild, 24);
   assert.equal(h.cache.perfCounters.politicalPathWarmupSlices, 1);
@@ -274,6 +341,7 @@ test("deferred warmup scopes counted path builds to one synchronous slice", (t) 
   validations = 0;
   h.tick();
   assert.equal(validations, 1, "the next deferred slice validates its cache again");
+  await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(h.cache.perfCounters.politicalPathCacheBuild, 25);
   assert.equal(h.cache.perfCounters.politicalPathWarmupBuild, 25);
   assert.equal(h.cache.perfCounters.politicalPathWarmupSlices, 2);

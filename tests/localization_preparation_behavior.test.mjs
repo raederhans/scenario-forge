@@ -18,14 +18,14 @@ import { applyScenarioChunkCityExternalEffectState } from "../js/core/state/acti
 
 const read = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8"));
 
-function localizationFixture(runtimeState) {
+function localizationFixture(runtimeState, mapConstructor = Map) {
   const source = readFileSync(new URL("../js/core/scenario_localization_state.js", import.meta.url), "utf8")
     .replace(/^import[\s\S]*?;\r?\n/gm, "").replace(/^export /gm, "");
-  return vm.runInNewContext(`${source}\n({ syncScenarioLocalizationState, syncScenarioLocalizationStateAsync })`, {
+  return vm.runInNewContext(`${source}\n({ syncScenarioLocalizationState, syncScenarioLocalizationStateAsync, prepareScenarioLocalizationState })`, {
     runtimeState, buildCityLocalizationPatch, normalizeCityText,
     applyScenarioChunkCityExternalEffectState, copyLocalizationEntries, prepareLocalizationCandidate,
     isCityRevisionFromLocalizationPublication,
-    console: { info() {} }, globalThis,
+    console: { info() {} }, globalThis, Map: mapConstructor,
   });
 }
 
@@ -101,7 +101,7 @@ test("city overrides preserve missing-language fallback, explicit patch priority
 });
 
 test("cancellation at a dictionary slice discards the private candidate", async () => {
-  const geoLocales = Object.fromEntries(Array.from({ length: 2000 }, (_, i) => [i, { en: `Name ${i}` }]));
+  const geoLocales = Object.fromEntries(Array.from({ length: 4096 }, (_, i) => [i, { en: `Name ${i}` }]));
   let current = true;
   let yields = 0;
   let clock = 0;
@@ -111,7 +111,7 @@ test("cancellation at a dictionary slice discards the private candidate", async 
   });
   assert.equal(result, null);
   assert.equal(yields, 2);
-  assert.equal(Object.keys(geoLocales).length, 2000);
+  assert.equal(Object.keys(geoLocales).length, 4096);
 });
 
 function optionalCityFixture() {
@@ -287,4 +287,54 @@ test("scenario-scoped merges point member aliases at the merged feature only in 
     { baseGeoLocales: {}, baseAliasMap }, options);
   assert.deepEqual(hoi4.aliasToStableKey, baseAliasMap);
   assert.equal(baseAliasMap.Zmeinogorsky, "id::RU_D");
+});
+
+test("large scenario alias remaps yield with bounded synchronous work and match synchronous output", async () => {
+  const stableKeys = ["id::RU_D", "id::RU_E", "id::RU_OLD", "id::RU_KEEP", "plain-alias"];
+  const baseAliasMap = Object.fromEntries(Array.from({ length: 50_000 }, (_, index) =>
+    [`alias-${index}`, stableKeys[index % stableKeys.length]]));
+  const snapshot = {
+    activeScenarioId: "tno_1962",
+    activeScenarioManifest: { hierarchy_overrides: {
+      feature_merges: { RU_MERGED: ["RU_D", "RU_E"] },
+      feature_redirects: { RU_OLD: "RU_MERGED", RU_D: "RU_FINAL" },
+    } },
+    baseGeoLocales: {}, baseGeoAliasToStableKey: baseAliasMap,
+    locales: { ui: {}, geo: {} },
+  };
+  const synchronous = { ...snapshot, locales: { ...snapshot.locales } };
+  syncFixture(synchronous)();
+
+  let steps = 0;
+  let previousSteps = 0;
+  let remapYields = 0;
+  let clock = 0;
+  class CountingMap extends Map {
+    has(key) {
+      steps++;
+      return super.has(key);
+    }
+  }
+  const api = localizationFixture(snapshot, CountingMap);
+  const result = await api.prepareScenarioLocalizationState(snapshot, undefined, {
+    nowMs: () => ++clock,
+    sliceBudgetMs: 1,
+    yieldControl: async () => {
+      const synchronousSteps = steps - previousSteps;
+      assert.ok(synchronousSteps <= 512, `processed ${synchronousSteps} aliases without yielding`);
+      if (synchronousSteps > 0) remapYields++;
+      previousSteps = steps;
+    },
+  });
+  assert.equal(steps, 50_000);
+  assert.ok(remapYields > 1, "remapping itself must span multiple tasks");
+  assert.ok(steps - previousSteps <= 512, "the final partial slice must also be bounded");
+  assert.deepEqual({ ...result.aliasToStableKey }, { ...synchronous.geoAliasToStableKey });
+  assert.deepEqual({ ...result.geo }, { ...synchronous.locales.geo });
+  assert.equal(result.aliasToStableKey["alias-0"], "id::RU_FINAL");
+  assert.equal(result.aliasToStableKey["alias-1"], "id::RU_MERGED");
+  assert.equal(result.aliasToStableKey["alias-2"], "id::RU_MERGED");
+  assert.equal(result.aliasToStableKey["alias-3"], "id::RU_KEEP");
+  assert.equal(result.aliasToStableKey["alias-4"], "plain-alias");
+  assert.equal(baseAliasMap["alias-0"], "id::RU_D");
 });

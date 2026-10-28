@@ -137,6 +137,100 @@ function createD3Diagnostics() {
   };
 }
 
+test("feature areas preserve spherical diagnostics and collection sums without geoArea calls", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner } = createHarness({ d3: diagnostics.d3 });
+  const baseline = createHarness({ d3: diagnostics.d3 }).owner;
+  const features = [10, 500, 999].map((lon) => createFeature(String(lon), createPolygon([lon, 0])));
+  const expected = features.map((feature) => baseline.getSphericalGeometryDiagnostics(feature));
+  const before = diagnostics.calls.geoArea;
+  features.forEach((feature, index) => {
+    feature.sphericalArea = expected[index].area;
+    const actual = owner.getSphericalGeometryDiagnostics(feature);
+    assert.deepEqual(actual, expected[index]);
+    assert.equal(owner.getSphericalGeometryDiagnostics({ ...feature, sphericalArea: 100 }), actual);
+  });
+  assert.equal(diagnostics.calls.geoArea, before);
+  const collection = { type: "FeatureCollection", features };
+  const freshOwner = createHarness({ d3: diagnostics.d3 }).owner;
+  assert.equal(freshOwner.getSphericalGeometryDiagnostics(collection).area, expected.reduce((sum, item) => sum + item.area, 0));
+  assert.equal(diagnostics.calls.geoArea, before);
+  for (const sphericalArea of [undefined, NaN, Infinity]) {
+    assert.equal(owner.getSphericalGeometryDiagnostics({ ...createFeature("fallback", createPolygon([10, 0])), sphericalArea }).area, 1);
+  }
+  assert.equal(diagnostics.calls.geoArea, before + 3);
+});
+
+test("seeded spherical diagnostics match computed diagnostics without another area calculation", () => {
+  for (const asFeature of [false, true]) {
+    const diagnostics = createD3Diagnostics();
+    const { owner } = createHarness({ d3: diagnostics.d3 });
+    const baseline = createHarness({ d3: diagnostics.d3 }).owner;
+    const geometry = createPolygon([10, 10]);
+    const feature = createFeature("seeded", geometry);
+    const expected = baseline.getSphericalGeometryDiagnostics(geometry);
+    assert.equal(diagnostics.calls.geoArea, 1);
+
+    owner.seedSphericalGeometryArea(asFeature ? feature : geometry, expected.area);
+    const actual = owner.getSphericalGeometryDiagnostics(asFeature ? geometry : feature);
+
+    assert.deepEqual(actual, expected);
+    assert.equal(actual.bounds, null);
+    assert.equal(diagnostics.calls.geoArea, 1);
+    assert.equal(diagnostics.calls.geoBounds, 0);
+    owner.seedSphericalGeometryArea(geometry, Math.PI * 3);
+    assert.equal(owner.getSphericalGeometryDiagnostics(feature), actual);
+    assert.equal(diagnostics.calls.geoBounds, 0, "seeding does not replace an existing diagnostic");
+  }
+});
+
+test("seeding excessive spherical area computes bounds even for a compact polygon", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner } = createHarness({ d3: diagnostics.d3 });
+  const geometry = createPolygon([10, 10]);
+
+  owner.seedSphericalGeometryArea(geometry, Math.PI * 3);
+  assert.equal(diagnostics.calls.geoBounds, 1);
+  const actual = owner.getSphericalGeometryDiagnostics(geometry);
+
+  assert.deepEqual(actual, {
+    area: Math.PI * 3,
+    bounds: [[10, 20], [20, 30]],
+    isWorldBounds: false,
+    hasExcessiveSphereArea: true,
+    invalid: true,
+  });
+  assert.equal(diagnostics.calls.geoArea, 0);
+  assert.equal(diagnostics.calls.geoBounds, 1);
+});
+
+test("seeded noncompact geometry retains the world-bounds verdict", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner } = createHarness({ d3: diagnostics.d3 });
+  const geometry = createPolygon([999, 0]);
+  const expected = createHarness({ d3: diagnostics.d3 }).owner.getSphericalGeometryDiagnostics(geometry);
+
+  owner.seedSphericalGeometryArea(geometry, expected.area);
+  const actual = owner.getSphericalGeometryDiagnostics(geometry);
+
+  assert.deepEqual(actual, expected);
+  assert.equal(actual.hasExcessiveSphereArea, false);
+  assert.equal(actual.isWorldBounds, true);
+  assert.equal(actual.invalid, true);
+  assert.equal(diagnostics.calls.geoArea, 1);
+  assert.equal(diagnostics.calls.geoBounds, 2);
+});
+
+test("nonfinite seeded areas leave diagnostics uncached", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner } = createHarness({ d3: diagnostics.d3 });
+  const geometry = createPolygon([10, 10]);
+
+  for (const area of [NaN, Infinity, -Infinity]) owner.seedSphericalGeometryArea(geometry, area);
+  assert.equal(owner.getSphericalGeometryDiagnostics(geometry).area, 1);
+  assert.equal(diagnostics.calls.geoArea, 1);
+});
+
 test("computeProjectedCoordinateBounds handles features raw geometry and missing projection", () => {
   const { owner } = createHarness();
   const geometry = createPolygon([1, 2]);

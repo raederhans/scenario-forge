@@ -712,11 +712,14 @@ function holdCityPreparation(t) {
   const started = new Promise((resolve) => { entered = resolve; });
   let released = false;
   const waiting = [];
-  globalThis.scheduler = { yield: () => new Promise((resolve) => {
+  const hold = () => new Promise((resolve) => {
     entered();
     if (released) setImmediate(resolve);
     else waiting.push(resolve);
-  }) };
+  });
+  // Preparation yields through scheduler.postTask (background priority); keep
+  // scheduler.yield held too for any remaining direct callers.
+  globalThis.scheduler = { yield: hold, postTask: (callback) => hold().then(() => callback?.()) };
   t.after(() => { globalThis.scheduler = previousScheduler; });
   return { started, release() {
     released = true;

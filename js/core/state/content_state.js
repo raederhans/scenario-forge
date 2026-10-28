@@ -7,6 +7,7 @@ import { setDefaultRuntimePoliticalTopologyState } from "./actions/scenario_chun
 import { createDefaultThematicWgiRuntimeState } from "./actions/thematic_wgi_actions.js";
 import { createDefaultPopulationRuntimeState } from "./actions/population_spatial_actions.js";
 import { recordContextLayerPublication, recordStartupContextCollection } from "./context_layer_revision.js";
+import { yieldToBackground } from "../background_yield.js";
 
 // Content/data state defaults.
 // 这里收口 localization、topology、context layer 和底图数据默认 shape，
@@ -327,23 +328,21 @@ export function setBaseLocalizationDataPromise(target, promise = null) {
 // spreads at the commit boundary: full geo dictionaries can contain 100k keys.
 export function* copyLocalizationEntries(target, source) {
   if (!source || typeof source !== "object") return;
-  let copied = 0;
-  for (const key in source) {
-    if (!Object.hasOwn(source, key)) continue;
+  const keys = Object.keys(source);
+  for (let index = 0; index < keys.length; index += 1) {
+    const key = keys[index];
     if (key === "__proto__") {
       Object.defineProperty(target, key, { value: source[key], enumerable: true, writable: true, configurable: true });
     } else {
       target[key] = source[key];
     }
-    if (++copied % 128 === 0) yield;
+    if ((index + 1) % 2048 === 0) yield;
   }
 }
 
 export async function prepareLocalizationCandidate(iterator, {
   isCurrent = () => true,
-  yieldControl = () => globalThis.scheduler?.yield
-    ? globalThis.scheduler.yield()
-    : new Promise((resolve) => setTimeout(resolve, 0)),
+  yieldControl = yieldToBackground,
   nowMs = () => globalThis.performance?.now?.() ?? Date.now(),
   sliceBudgetMs = 6,
 } = {}) {

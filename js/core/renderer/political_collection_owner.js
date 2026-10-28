@@ -20,6 +20,7 @@ export function createPoliticalCollectionOwner({
     getFeatureId,
     isPoliticalInteractionRenderableFeature,
     isRenderDiagEnabled = () => false,
+    recordSphericalArea,
   } = helpers;
 
   const politicalFeatureCollectionCache = new WeakMap();
@@ -269,13 +270,14 @@ export function createPoliticalCollectionOwner({
 
     let area = null;
     try {
-      area = globalThis.d3.geoArea(feature);
+      area = Number.isFinite(feature.sphericalArea) ? feature.sphericalArea : globalThis.d3.geoArea(feature);
     } catch (_error) {
       // Do not cache: geoArea may succeed after d3 is initialised correctly.
       return feature;
     }
     if (!Number.isFinite(area)) return feature;
     if (area <= Math.PI * 2) {
+      recordSphericalArea?.(geometry, area);
       // Preserve the fast path for already-small geometries. Spherical ring
       // normalization is needed when geoArea signals reversed winding.
       normalizedGeometryByGeometry.set(geometry, GEOM_UNCHANGED);
@@ -293,6 +295,7 @@ export function createPoliticalCollectionOwner({
 
     try {
       const rewoundArea = globalThis.d3.geoArea(rewoundFeature);
+      recordSphericalArea?.(rewoundGeometry, rewoundArea);
       if (!Number.isFinite(rewoundArea)) return feature;
       if (rewoundArea < area) {
         const featureId = getFeatureId(feature) || "(unknown)";

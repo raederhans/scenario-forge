@@ -127,6 +127,7 @@ test("startup defers only duplicate border derivation until the following setMap
       fitProjection: record("fitProjection"),
       initZoom: record("initZoom"),
       bindEvents: record("bindEvents"),
+      prewarmOceanClipPath: record("prewarmOceanClipPath"),
       getViewportGeoBounds() {},
       render: record("render"),
     };

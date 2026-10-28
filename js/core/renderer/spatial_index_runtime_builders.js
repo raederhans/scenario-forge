@@ -129,11 +129,13 @@ export function* iterateWaterSpatialItems({
       const hitGeometry = hitGeometries[partIndex];
       if (shouldExcludeWaterHitGeometry(hitGeometry, feature, id)) continue;
       let bounds = computeProjectedGeoBounds(hitGeometry);
+      yield;
       if (!bounds) {
         // Several parts can require the same whole-feature fallback. Keep this
         // result (including null) local so the next rebuild sees new geometry.
         if (!featureBoundsComputed) {
           featureBounds = computeProjectedGeoBounds(feature);
+          yield;
           featureBoundsComputed = true;
         }
         bounds = featureBounds;

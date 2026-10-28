@@ -1,6 +1,9 @@
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import { getCountryCode as getSharedFeatureCountryCode } from "./feature_identity.js";
 
+const normalizedPayloadCache = new WeakMap();
+const groupingIndexCache = new WeakMap();
+
 function normalizeGeoCountryCode(rawValue) {
   const normalized = normalizeCountryCodeAlias(rawValue);
   return /^[A-Z]{2,3}$/.test(normalized) ? normalized : "";
@@ -78,6 +81,14 @@ function createEmptyScenarioDistrictGroupsPayload(scenarioId = "") {
 }
 
 function normalizeScenarioDistrictGroupsPayload(payload, scenarioId = "") {
+  const cached = normalizedPayloadCache.get(payload);
+  if (cached) {
+    const resolvedScenarioId = String(payload.scenario_id || scenarioId || "").trim();
+    if (cached.scenario_id === resolvedScenarioId) return cached;
+    const normalized = { ...cached, scenario_id: resolvedScenarioId };
+    normalizedPayloadCache.set(payload, normalized);
+    return normalized;
+  }
   const normalized = createEmptyScenarioDistrictGroupsPayload(
     payload?.scenario_id || scenarioId || ""
   );
@@ -102,6 +113,7 @@ function normalizeScenarioDistrictGroupsPayload(payload, scenarioId = "") {
       normalized.legacy_countries[record.country_code] = record;
     });
   normalized.has_legacy_geo_countries = Object.keys(normalized.legacy_countries).length > 0;
+  normalizedPayloadCache.set(payload, normalized);
   return normalized;
 }
 
@@ -139,41 +151,62 @@ export {
   resolveFeatureGeoCountryCode,
 };
 
+function getScenarioDistrictGroupingIndex(normalized) {
+  const cached = groupingIndexCache.get(normalized);
+  if (cached) return cached;
+  const byFeatureId = new Map();
+  const legacyByCountry = new Map();
+  let order = 0;
+  const indexDistricts = (districts, target, tag = "") => {
+    for (const [districtId, district] of Object.entries(districts)) {
+      for (const id of district.feature_ids) {
+        const candidates = target.get(id) || [];
+        candidates.push({ id, tag, key: tag ? `${tag}::${districtId}` : districtId, order: order++ });
+        target.set(id, candidates);
+      }
+    }
+  };
+  for (const [tag, record] of Object.entries(normalized.tags)) {
+    indexDistricts(record.districts, byFeatureId, tag);
+  }
+  for (const [country, record] of Object.entries(normalized.legacy_countries)) {
+    const byId = new Map();
+    indexDistricts(record.districts, byId);
+    legacyByCountry.set(country, byId);
+  }
+  const index = { byFeatureId, legacyByCountry };
+  groupingIndexCache.set(normalized, index);
+  return index;
+}
+
 // Shared normalized adapter for border presentation. Paint uses the same records,
 // but does not inherit the border renderer's coverage/display acceptance thresholds.
 export function getScenarioDistrictCountryGrouping(payload, countryCode, featureEntries, owners = {}) {
   if (!payload || typeof payload !== "object") return null;
   const normalized = normalizeScenarioDistrictGroupsPayload(payload);
   const country = normalizeGeoCountryCode(countryCode);
-  const ids = new Set(featureEntries.map((entry) => entry.id));
+  const index = getScenarioDistrictGroupingIndex(normalized);
+  const legacy = index.legacyByCountry.get(country);
   const groups = new Map();
   const conflicts = new Set();
-  let declared = false;
-  const add = (id, key) => {
-    if (groups.has(id) && groups.get(id) !== key) conflicts.add(id);
-    else groups.set(id, key);
-  };
-  for (const [tag, record] of Object.entries(normalized.tags)) {
-    if (featureEntries.some(({ id }) => String(owners[id] || "").trim().toUpperCase() === tag)) declared = true;
-    for (const [districtId, district] of Object.entries(record.districts)) {
-      for (const id of district.feature_ids) {
-        if (!ids.has(id)) continue;
-        const currentOwner = String(owners[id] || "").trim().toUpperCase();
-        if (currentOwner && currentOwner !== tag) continue;
-        declared = true;
-        add(id, `${tag}::${districtId}`);
-      }
+  const matches = [];
+  let declared = !!legacy;
+  for (const id of new Set(featureEntries.map((entry) => entry.id))) {
+    const currentOwner = String(owners[id] || "").trim().toUpperCase();
+    if (Object.hasOwn(normalized.tags, currentOwner)) declared = true;
+    for (const candidate of index.byFeatureId.get(id) || []) {
+      if (currentOwner && currentOwner !== candidate.tag) continue;
+      declared = true;
+      matches.push(candidate);
+    }
+    if (legacy && !normalized.tags[currentOwner]) {
+      matches.push(...(legacy.get(id) || []));
     }
   }
-  const legacy = normalized.legacy_countries[country];
-  if (legacy) {
-    declared = true;
-    for (const [districtId, district] of Object.entries(legacy.districts)) {
-      for (const id of district.feature_ids) {
-        const currentOwner = String(owners[id] || "").trim().toUpperCase();
-        if (ids.has(id) && !normalized.tags[currentOwner]) add(id, districtId);
-      }
-    }
+  matches.sort((left, right) => left.order - right.order);
+  for (const { id, key } of matches) {
+    if (groups.has(id) && groups.get(id) !== key) conflicts.add(id);
+    else groups.set(id, key);
   }
   for (const id of conflicts) groups.delete(id);
   return declared ? groups : null;

@@ -69,15 +69,37 @@ export function createPoliticalPathCacheOwner(runtimeState, {
 
   let warmupTransform = null;
   let warmupViewportSignature = "";
+  let signatureInputs = null;
+  let lastSignature = "";
+  let lastHandle = null;
+  let lastHandleInputs = null;
+  let lastBudgetStats = null;
+  let pendingBuilds = 0;
+  let buildFlushTimer = null;
+
+  function flushBuilds() {
+    if (buildFlushTimer !== null) clearTimeout(buildFlushTimer);
+    buildFlushTimer = null;
+    if (!pendingBuilds) return;
+    const count = pendingBuilds;
+    pendingBuilds = 0;
+    incrementPerfCounter("politicalPathCacheBuild", count);
+  }
+
   function getPoliticalPathCacheSignature() {
-    return [
+    const inputs = [
       getProjectionGeometryGeneration(rendererSurfaceHost.getProjection?.()),
       String(runtimeState.activeScenarioId || ""),
       Number(runtimeState.sceneGeneration || 0),
       getProjectionGeometryGeneration(runtimeState.topologyPrimary || runtimeState.topology),
       getProjectionGeometryGeneration(runtimeState.topologyDetail),
       getProjectionGeometryGeneration(runtimeState.scenarioRuntimeTopologyData || runtimeState.runtimePoliticalTopology),
-    ].join("::");
+    ];
+    if (!signatureInputs || inputs.some((value, index) => value !== signatureInputs[index])) {
+      signatureInputs = inputs;
+      lastSignature = inputs.join("::");
+    }
+    return lastSignature;
   }
 
   function cancelPoliticalPathWarmup(reason = "unspecified") {
@@ -130,17 +152,37 @@ export function createPoliticalPathCacheOwner(runtimeState, {
   ) {
     const cache = getRenderPassCacheState();
     const signature = getPoliticalPathCacheSignature(transform);
+    if (lastHandleInputs
+      && lastHandleInputs.k === transform?.k
+      && lastHandleInputs.x === transform?.x
+      && lastHandleInputs.y === transform?.y
+      && lastHandle.cache === cache
+      && lastHandleInputs.map === cache.politicalPathCache
+      && lastHandleInputs.signature === cache.politicalPathCacheSignature
+      && lastHandle.signature === signature
+      && (lastHandle.valid || !resetIfMismatch)) {
+      return lastHandle;
+    }
+    function rememberHandle(handle) {
+      lastHandleInputs = {
+        k: transform?.k, x: transform?.x, y: transform?.y,
+        map: cache.politicalPathCache,
+        signature: cache.politicalPathCacheSignature,
+      };
+      lastHandle = handle;
+      return handle;
+    }
     const valid =
       cache.politicalPathCache instanceof AccountedPoliticalPathMap
       && cache.politicalPathCacheSignature === signature;
     if (valid) {
-      return {
+      return rememberHandle({
         cache,
         signature,
         valid: true,
         map: cache.politicalPathCache,
         resetSummary: null,
-      };
+      });
     }
     let resetSummary = null;
     if (resetIfMismatch) {
@@ -174,13 +216,13 @@ export function createPoliticalPathCacheOwner(runtimeState, {
         ...resetSummary,
       });
     }
-    return {
+    return rememberHandle({
       cache,
       signature,
       valid: resetIfMismatch,
       map: cache.politicalPathCache instanceof Map ? cache.politicalPathCache : new Map(),
       resetSummary,
-    };
+    });
   }
 
   function buildPoliticalFeaturePathEntry(feature) {
@@ -239,9 +281,23 @@ export function createPoliticalPathCacheOwner(runtimeState, {
     }
     handle.map.set(resolvedId, builtEntry);
     if (handle.map instanceof GeometryBudgetMap) {
-      recordRenderPerfMetric("politicalPathCacheBudget", 0, handle.map.getStats());
+      const stats = handle.map.getStats();
+      // entries/estimatedBytes move on every build; only budget pressure
+      // (evictions, overflow, oversized skips) is worth a metric commit.
+      if (!lastBudgetStats
+        || stats.budgetBytes !== lastBudgetStats.budgetBytes
+        || stats.overBudgetBytes !== lastBudgetStats.overBudgetBytes
+        || stats.evictions !== lastBudgetStats.evictions
+        || stats.oversizedSkips !== lastBudgetStats.oversizedSkips) {
+        lastBudgetStats = stats;
+        recordRenderPerfMetric("politicalPathCacheBudget", 0, stats);
+      }
     }
-    if (countBuild) incrementPerfCounter("politicalPathCacheBuild");
+    if (countBuild) {
+      pendingBuilds += 1;
+      if (pendingBuilds === 256) flushBuilds();
+      else if (buildFlushTimer === null) buildFlushTimer = setTimeout(flushBuilds, 0);
+    }
     return builtEntry;
   }
 

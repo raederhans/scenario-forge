@@ -209,6 +209,43 @@ export function createProjectedGeometryBoundsOwner({
     return null;
   }
 
+  function buildSphericalGeometryDiagnostics(normalizedGeoObject, area, d3) {
+    const hasExcessiveSphereArea = Number.isFinite(area) && area > sphericalGeometryMaxArea;
+    // Bounds only label rejected geometry; skip them when they cannot matter.
+    const bounds = hasExcessiveSphereArea || !isCompactLonLatGeometry(normalizedGeoObject, sphericalGeometryMaxArea)
+      ? d3.geoBounds(normalizedGeoObject) : null;
+    const diagnostics = {
+      area,
+      bounds,
+      isWorldBounds: isWorldBounds(bounds),
+      hasExcessiveSphereArea,
+    };
+    diagnostics.invalid = diagnostics.isWorldBounds || diagnostics.hasExcessiveSphereArea;
+    return diagnostics;
+  }
+
+  function sumFeatureCollectionArea(geoObject) {
+    if (geoObject?.type !== "FeatureCollection" || !Array.isArray(geoObject.features)) return null;
+    let total = 0;
+    for (const feature of geoObject.features) {
+      const diagnostics = getSphericalGeometryDiagnostics(feature);
+      if (!diagnostics || !Number.isFinite(diagnostics.area)) return null;
+      total += diagnostics.area;
+    }
+    return total;
+  }
+
+  function seedSphericalGeometryArea(geoObject, area) {
+    if (!Number.isFinite(area)) return;
+    const normalizedGeoObject = normalizeGeoObjectForSphericalDiagnostics(geoObject);
+    const d3 = getD3();
+    if (!normalizedGeoObject || !d3?.geoArea || !d3?.geoBounds) return;
+    const geometry = geoObject.type === "Feature" && geoObject.geometry
+      ? geoObject.geometry : geoObject;
+    if (sphericalGeometryDiagnosticsByGeometry.has(geometry)) return;
+    sphericalGeometryDiagnosticsByGeometry.set(geometry, buildSphericalGeometryDiagnostics(normalizedGeoObject, area, d3));
+  }
+
   function getSphericalGeometryDiagnostics(geoObject) {
     const normalizedGeoObject = normalizeGeoObjectForSphericalDiagnostics(geoObject);
     const d3 = getD3();
@@ -220,18 +257,13 @@ export function createProjectedGeometryBoundsOwner({
     const cached = sphericalGeometryDiagnosticsByGeometry.get(geometry);
     if (cached) return cached;
     try {
-      const area = Number(d3.geoArea(normalizedGeoObject));
-      const hasExcessiveSphereArea = Number.isFinite(area) && area > sphericalGeometryMaxArea;
-      // Bounds only label rejected geometry; skip them when they cannot matter.
-      const bounds = hasExcessiveSphereArea || !isCompactLonLatGeometry(normalizedGeoObject, sphericalGeometryMaxArea)
-        ? d3.geoBounds(normalizedGeoObject) : null;
-      const diagnostics = {
-        area,
-        bounds,
-        isWorldBounds: isWorldBounds(bounds),
-        hasExcessiveSphereArea,
-      };
-      diagnostics.invalid = diagnostics.isWorldBounds || diagnostics.hasExcessiveSphereArea;
+      // d3.geoArea adds polygon areas, so a collection's area is the sum of its
+      // features' cached areas: a mask rebuilt from already-seen features (or
+      // normalized features that recorded their area) needs no second walk.
+      const area = geoObject.type === "Feature" && Number.isFinite(geoObject.sphericalArea)
+        ? geoObject.sphericalArea
+        : Number(sumFeatureCollectionArea(normalizedGeoObject) ?? d3.geoArea(normalizedGeoObject));
+      const diagnostics = buildSphericalGeometryDiagnostics(normalizedGeoObject, area, d3);
       sphericalGeometryDiagnosticsByGeometry.set(geometry, diagnostics);
       return diagnostics;
     } catch (_error) {
@@ -366,6 +398,7 @@ export function createProjectedGeometryBoundsOwner({
     recordProjectedBoundsDiagnostic,
     mergeProjectedBounds,
     normalizeGeoObjectForSphericalDiagnostics,
+    seedSphericalGeometryArea,
     getSphericalGeometryDiagnostics,
     isSphericalGeometryUnsafe,
     collectPolygonalGeometryParts,

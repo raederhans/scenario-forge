@@ -1,3 +1,5 @@
+import { yieldToBackground } from "../background_yield.js";
+
 // Bump this identity/coverage version whenever the mask or edge encoding changes.
 const IDENTITY_PREFIX = "political-id-raster:v1:";
 const COVERAGE_VERSION = "d3-full-stream-white-mask-source-over-round-stroke-gutter-crop:v1";
@@ -87,7 +89,12 @@ function normalizeGeometry(geometry, ancestors = new Set()) {
  * First-use serialization and UTF-8 encoding are O(geometry bytes) on the caller
  * thread; subsequent tiles reuse the digest without traversing coordinates.
  */
-export function createPoliticalIdRasterIdentityBuilder({ crypto = globalThis.crypto } = {}) {
+export function createPoliticalIdRasterIdentityBuilder({
+  crypto = globalThis.crypto,
+  yieldControl = yieldToBackground,
+  nowMs = () => performance.now(),
+  sliceBudgetMs = 6,
+} = {}) {
   let geometryCache = new WeakMap();
   const stats = { geometryHashes: 0, identityHashes: 0, cacheHits: 0 };
   const encoder = new TextEncoder();
@@ -112,7 +119,7 @@ export function createPoliticalIdRasterIdentityBuilder({ crypto = globalThis.cry
     const previous = geometryCache.get(geometry);
     if (previous && Object.is(previous.version, entry.geometryVersion)) {
       stats.cacheHits++;
-      return previous.promise;
+      return { promise: previous.promise, cacheHit: true };
     }
     const serialized = JSON.stringify(normalizeGeometry(geometry));
     const promise = digest(serialized).then((hash) => { stats.geometryHashes++; return hash; });
@@ -120,7 +127,7 @@ export function createPoliticalIdRasterIdentityBuilder({ crypto = globalThis.cry
     const cache = geometryCache;
     cache.set(geometry, cached);
     promise.catch(() => { if (cache.get(geometry) === cached) cache.delete(geometry); });
-    return promise;
+    return { promise, cacheHit: false };
   }
 
   async function identify({ sceneKey, descriptor, projectionOptions, entries, strokeWidth, gutter = 0 } = {}) {
@@ -145,8 +152,16 @@ export function createPoliticalIdRasterIdentityBuilder({ crypto = globalThis.cry
       }
     }
     const orderedEntries = [];
+    let sliceStart = nowMs();
     // Hash one geometry at a time to bound temporary UTF-8/digest input storage.
-    for (const entry of entries) orderedEntries.push([entry.id, await geometryHash(entry), entry.strokeCode !== 0]);
+    for (const entry of entries) {
+      const { promise, cacheHit } = geometryHash(entry);
+      orderedEntries.push([entry.id, await promise, entry.strokeCode !== 0]);
+      if (!cacheHit && nowMs() - sliceStart > sliceBudgetMs) {
+        await yieldControl();
+        sliceStart = nowMs();
+      }
+    }
     const hash = await digest(JSON.stringify([COVERAGE_VERSION, sceneKey, shape, projection, strokeWidth, gutter, orderedEntries]));
     stats.identityHashes++;
     return IDENTITY_PREFIX + hash;

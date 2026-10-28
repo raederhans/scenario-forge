@@ -71,7 +71,8 @@ test("100k city aliases prepare completely in private slices with legacy merge p
   const candidate = await prepareFullLocalizationData({
     uiLocales: locales.ui, geoLocales: locales.geo, aliasToStableKey: geoAliases.alias_to_stable_key, cityPatch: patch,
   }, options);
-  assert.ok(yields > 1000, "alias normalization and complete copies must cross many deterministic slices");
+  // Dictionary copies now move 2048 keys per step; 100k aliases still cross dozens of slices.
+  assert.ok(yields > 50, "alias normalization and complete copies must cross many deterministic slices");
   assert.deepEqual(candidate.baseGeoLocales, expected.locales.geo);
   assert.deepEqual(candidate.baseGeoAliasToStableKey, expected.geoAliases.alias_to_stable_key);
   assert.equal(candidate.baseGeoAliasToStableKey["alias-99999"], "key-99999");
