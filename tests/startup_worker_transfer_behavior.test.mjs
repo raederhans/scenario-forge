@@ -272,17 +272,46 @@ if (!isMainThread) {
   }
 
   for (const ready of readyCases) {
-    test(`${ready.type} transfers the full v2 envelope through the real worker and client`, async () => {
+    test(`${ready.type} transfers the full v3 envelope through the real worker and client`, async () => {
       const resources = makeResources();
       const before = structuredClone(resources);
       await withWorker(resources, async (adapter) => {
         const result = await ready.load();
         ready.check(result, resources);
-        await assertTransport(adapter(), result, { ...ready, field: "message", encoding: "geo-f64-v2" });
+        await assertTransport(adapter(), result, { ...ready, field: "message", encoding: "geo-f64-v3" });
         assert.deepEqual(resources, before);
       });
     });
   }
+
+  test("BASE_STARTUP_READY v3 preserves shared unquantized boundary points through the real worker", async () => {
+    const resources = makeResources();
+    const topology = {
+      type: "Topology",
+      arcs: [
+        Array.from({ length: 8192 }, (_, index) => [1, index / 8191]),
+        [[1, 1], [0, 1], [0, 0], [1, 0]],
+        [[1, 0], [2, 0], [2, 1], [1, 1]],
+      ],
+      objects: { political: { type: "GeometryCollection", geometries: [
+        { type: "Polygon", id: "left", arcs: [[0, 1]], properties: { iso_a2: "GB" } },
+        { type: "Polygon", id: "right", arcs: [[-1, 2]], properties: { iso_a2: "GB" } },
+      ] } },
+    };
+    resources["/topology.json"] = topology;
+    await withWorker(resources, async (adapter) => {
+      const result = await readyCases[0].load();
+      readyCases[0].check(result, resources);
+      await assertTransport(adapter(), result, {
+        ...readyCases[0], field: "message", encoding: "geo-f64-v3",
+      });
+      const sharedPoint = result.topologyPrimary.arcs[0][4096];
+      for (const feature of result.decodedCollections.landData.features) {
+        assert.ok(feature.geometry.coordinates[0].includes(sharedPoint));
+      }
+      assert.equal(adapter().responses.at(-1).geometryTransport.payload.coordinates.length, (8192 + 8) * 2);
+    });
+  });
 
   test("startup client awaits sliced unpack and includes yield time in unpack metrics", async () => {
     const codec = globalThis.__scenarioForgeGeometryTransferCodecShared;
@@ -311,7 +340,7 @@ if (!isMainThread) {
         const result = await pending;
         readyCases[0].check(result, resources);
         assert.ok(result.metrics.geometryUnpackingMs >= elapsedBeforeResume);
-        await assertTransport(adapter(), result, { ...readyCases[0], field: "message", encoding: "geo-f64-v2" });
+        await assertTransport(adapter(), result, { ...readyCases[0], field: "message", encoding: "geo-f64-v3" });
       });
     } finally {
       releaseUnpack();
@@ -358,7 +387,7 @@ if (!isMainThread) {
       assert.deepEqual(result.baseDecodedCollections, expectedCollections(baseTopology));
       assert.deepEqual(result.runtimeDecodedCollections, expectedCollections(resources["/topology.json"], true));
       await assertTransport(adapter(), result, {
-        type: "STARTUP_BUNDLE_READY", requestType: "LOAD_STARTUP_BUNDLE", field: "message", encoding: "geo-f64-v2",
+        type: "STARTUP_BUNDLE_READY", requestType: "LOAD_STARTUP_BUNDLE", field: "message", encoding: "geo-f64-v3",
       });
       assert.deepEqual(resources, before);
     });
@@ -423,7 +452,7 @@ if (!isMainThread) {
   });
 
   for (const chunkType of ["runtime-topology", "water-regions"]) {
-    test(`RUNTIME_CHUNK_READY retains v1 ${chunkType === "runtime-topology" ? "decodedCollections" : "chunkPayload"} transfer compatibility`, async () => {
+    test(`RUNTIME_CHUNK_READY uses v3 ${chunkType === "runtime-topology" ? "decodedCollections" : "chunkPayload"} transfer compatibility`, async () => {
       const resources = makeResources();
       await withWorker(resources, async (adapter) => {
         const result = await client.decodeRuntimeChunkViaWorker({
@@ -440,7 +469,7 @@ if (!isMainThread) {
           assert.equal(result.decodedCollections, null);
         }
         await assertTransport(adapter(), result, {
-          type: "RUNTIME_CHUNK_READY", requestType: "DECODE_RUNTIME_CHUNK", field, encoding: "geo-f64-v1",
+          type: "RUNTIME_CHUNK_READY", requestType: "DECODE_RUNTIME_CHUNK", field, encoding: "geo-f64-v3",
         });
       });
     });
