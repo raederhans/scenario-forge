@@ -1,6 +1,7 @@
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import { pageResourceBudget } from "../runtime_resource_budget.js";
 import { GeometryBudgetMap, getGeometryRetentionWeights, PROJECTED_PATH_CACHE_BUDGET } from "./geometry_cache_budget.js";
+import { yieldToBackground } from "../background_yield.js";
 
 // Projected coordinates do not include the canvas camera or DPR transform.
 // Stream directly into Path2D to preserve the precision of the Canvas path.
@@ -65,8 +66,60 @@ export function createProjectedGeographicPathCache({
     return path;
   }
 
+  // Build a collection's path over several background slices so a large mask
+  // (the TNO ocean is about 0.4 s of geoPath streaming) is ready before the
+  // frame that needs it. getPath() still builds synchronously when asked first.
+  async function prepare(object, {
+    yieldControl = yieldToBackground,
+    nowMs = () => globalThis.performance?.now?.() ?? Date.now(),
+    sliceBudgetMs = 6,
+  } = {}) {
+    if (!object || typeof object !== "object" || typeof Path2DClass !== "function" || typeof geoPath !== "function") return null;
+    if (object.type !== "FeatureCollection" || !Array.isArray(object.features)
+      || typeof Path2DClass.prototype?.addPath !== "function") {
+      return getPath(object);
+    }
+    const projection = getProjection?.();
+    if (!projection) return null;
+    const startGeneration = getProjectionGeometryGeneration(projection);
+    if (generation !== startGeneration) {
+      entries.clear();
+      generation = startGeneration;
+      stream = geoPath(projection);
+      updateResourceAccounting();
+    }
+    const existing = entries.get(object);
+    if (existing) {
+      hits += 1;
+      return existing.path;
+    }
+    const combined = new Path2DClass();
+    let sliceStartedAt = nowMs();
+    for (const feature of object.features) {
+      if (nowMs() - sliceStartedAt >= sliceBudgetMs) {
+        await yieldControl();
+        const current = getProjection?.();
+        if (!current || generation !== startGeneration || getProjectionGeometryGeneration(current) !== startGeneration) return null;
+        sliceStartedAt = nowMs();
+      }
+      const part = new Path2DClass();
+      stream.context(part)(feature);
+      combined.addPath(part);
+    }
+    const built = entries.get(object);
+    if (built) return built.path;
+    entries.set(object, {
+      path: combined,
+      estimatedBytes: getGeometryRetentionWeights(object).path,
+    });
+    builds += 1;
+    updateResourceAccounting();
+    return combined;
+  }
+
   return Object.freeze({
     getPath,
+    prepare,
     reset,
     getStats: () => ({ hits, builds, generation, ...entries.getStats() }),
   });

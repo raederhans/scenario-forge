@@ -89,3 +89,28 @@ test("projected path retention is LRU bounded, reports bytes, and skips oversize
   cache.reset();
   assert.equal(resourceBudget.snapshot().ownerCount, 0);
 });
+
+test("prepare builds a collection path in slices that getPath then reuses, and drops a stale projection", async () => {
+  class AddablePath extends RecordingPath {
+    addPath(other) { this.commands.push(...other.commands); }
+  }
+  let projection = d3.geoMercator();
+  const cache = createProjectedGeographicPathCache({ getProjection: () => projection, geoPath: d3.geoPath, Path2DClass: AddablePath });
+  const collection = { type: "FeatureCollection", features: Array.from({ length: 6 }, (_, index) => ({
+    type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: [[index, 0], [index + 1, 2]] },
+  })) };
+  let clock = 0;
+  let yields = 0;
+  const prepared = await cache.prepare(collection, { nowMs: () => (clock += 4), sliceBudgetMs: 6, yieldControl: async () => { yields += 1; } });
+  const direct = new RecordingPath();
+  d3.geoPath(projection).context(direct)(collection);
+  assert.deepEqual(prepared.commands, direct.commands);
+  assert.ok(yields > 0);
+  assert.equal(cache.getPath(collection), prepared);
+  assert.equal(cache.getStats().builds, 1);
+
+  const other = { type: "FeatureCollection", features: collection.features.slice(0, 2) };
+  const stale = cache.prepare(other, { nowMs: () => (clock += 4), sliceBudgetMs: 6, yieldControl: async () => { projection = d3.geoMercator().scale(80); } });
+  assert.equal(await stale, null);
+  assert.equal(cache.getPath(other) instanceof AddablePath, true);
+});

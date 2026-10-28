@@ -1911,6 +1911,16 @@ function getProjectedGeographicPath(object) {
   return getProjectedGeographicPathCache().getPath(object);
 }
 
+// The ocean clip path is the most expensive single step of the first frame
+// (about 0.4 s on TNO). Build it in background slices while startup still
+// waits for chunk data; the frame falls back to the synchronous build if it
+// arrives first.
+function prewarmOceanClipPath() {
+  const ocean = runtimeState.oceanData;
+  if (!Array.isArray(ocean?.features) || !ocean.features.length) return;
+  void getProjectedGeographicPathCache().prepare(ocean).catch(() => {});
+}
+
 function getOceanExclusionPath(collection) {
   if (!collection || typeof globalThis.Path2D?.prototype?.addPath !== "function") return null;
   const generation = getProjectionGeometryGeneration(rendererSurfaceHost.getProjection());
@@ -16185,6 +16195,7 @@ function initMap({
   fitProjection({ skipSpatialIndex: shouldDeferInteractionInfrastructure });
   initZoom();
   bindEvents();
+  prewarmOceanClipPath();
   runtimeState.getViewportGeoBoundsFn = getViewportGeoBounds;
   if (!shouldDeferInteractionInfrastructure) {
     setInteractionInfrastructureState("ready", {
