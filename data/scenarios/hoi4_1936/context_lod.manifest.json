@@ -897,6 +897,14 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.ifn"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.ins"
         ]
       },
@@ -1042,6 +1050,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.kwt"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.kww"
         ]
       },
       {
@@ -1874,6 +1890,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.tgn"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.tgr"
         ]
       },
       {

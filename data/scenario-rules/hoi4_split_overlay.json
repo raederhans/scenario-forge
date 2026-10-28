@@ -58,7 +58,7 @@
         "TUR"
       ],
       "notes": "Sanjak of Alexandretta remains in the French Syrian mandate in 1936.",
-      "color_hex": "#4f60e4"
+      "color_hex": "#5369c8"
     },
     {
       "id": "dodecanese",
@@ -240,13 +240,17 @@
       "select": {
         "feature_ids": [
           "PL_POW_2261",
-          "PL_POW_2264"
+          "PL_POW_2264",
+          "PL_MRG_727dd6268093__SPLIT_DANZIG",
+          "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
+          "PL_POW_2209__SPLIT_DANZIG",
+          "PL_POW_2210__SPLIT_DANZIG"
         ]
       },
       "only_from_owners": [
         "POL"
       ],
-      "notes": "City parcels only; the Free City's rural districts are not split out yet."
+      "notes": "Simplified rural outline using Danziger Hoehe/Niederung and Grosses Werder extent; Nogat and western land frontier generalized. Gdansk/Sopot retained separately; Gdynia, Elblag and PL_POW_1414 excluded explicitly by source IDs. This is a debug approximation, not a precise historical survey."
     },
     {
       "id": "southern_rhodesia",
@@ -1089,7 +1093,7 @@
       "only_from_owners": [
         "AOF"
       ],
-      "color_hex": "#3e4db4"
+      "color_hex": "#7f96f8"
     },
     {
       "id": "french_sudan",
@@ -1194,7 +1198,7 @@
       "only_from_owners": [
         "AOF"
       ],
-      "color_hex": "#578de3"
+      "color_hex": "#4c60b0"
     },
     {
       "id": "french_togo",
@@ -1215,7 +1219,7 @@
       "only_from_owners": [
         "AOF"
       ],
-      "color_hex": "#6fa0dd"
+      "color_hex": "#3b78bb"
     },
     {
       "id": "upper_volta",
@@ -1237,7 +1241,7 @@
         "AOF"
       ],
       "notes": "Upper Volta was abolished in 1932–1947; retained solely as a debug subdivision.",
-      "color_hex": "#68abf9"
+      "color_hex": "#3496fb"
     },
     {
       "id": "aef_middle_congo",
@@ -1298,7 +1302,7 @@
       "only_from_owners": [
         "AEF"
       ],
-      "color_hex": "#0c4b9c"
+      "color_hex": "#68abf9"
     },
     {
       "id": "gabon",
@@ -1387,7 +1391,7 @@
       "only_from_owners": [
         "FRA"
       ],
-      "color_hex": "#1160dd"
+      "color_hex": "#3e4db4"
     },
     {
       "id": "gf_parent",
@@ -1444,7 +1448,7 @@
       "only_from_owners": [
         "MQ"
       ],
-      "color_hex": "#2b80d6"
+      "color_hex": "#578de3"
     },
     {
       "id": "re_parent",
@@ -1463,7 +1467,7 @@
       "only_from_owners": [
         "RE"
       ],
-      "color_hex": "#4c60b0"
+      "color_hex": "#4f60e4"
     },
     {
       "id": "yt_parent",
@@ -1482,7 +1486,7 @@
       "only_from_owners": [
         "YT"
       ],
-      "color_hex": "#1d5bc3"
+      "color_hex": "#0d4dbd"
     },
     {
       "id": "tonkin",
@@ -1509,7 +1513,7 @@
       "only_from_owners": [
         "VIN"
       ],
-      "color_hex": "#5369c8"
+      "color_hex": "#6fa0dd"
     },
     {
       "id": "cochinchina",
@@ -1578,7 +1582,7 @@
       "only_from_owners": [
         "VIN"
       ],
-      "color_hex": "#5f7adc"
+      "color_hex": "#5077ff"
     },
     {
       "id": "vin_annam",
@@ -1598,7 +1602,7 @@
         "VIN"
       ],
       "notes": "Remaining French Indochina core represented as Annam.",
-      "color_hex": "#3496fb"
+      "color_hex": "#1d5bc3"
     },
     {
       "id": "cape_verde",
@@ -1850,7 +1854,12 @@
       "only_from_owners": [
         "SOV"
       ],
-      "notes": "Karafuto (south of 50N) and the Kuril Islands, approximated by parcel centroid."
+      "notes": "Karafuto (south of 50N) and the Kuril Islands, approximated by parcel centroid.",
+      "exclude": {
+        "feature_ids": [
+          "RU_MRG_eefc121c2bf0__SPLIT_REST"
+        ]
+      }
     },
     {
       "id": "kwantung_return",
@@ -1866,7 +1875,7 @@
       },
       "exclude": {
         "feature_ids": [
-          "CN_CITY_17275852B83272093468807"
+          "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG"
         ]
       },
       "only_from_owners": [
@@ -1888,13 +1897,14 @@
       "subject_kind": "colony",
       "select": {
         "feature_ids": [
-          "CN_CITY_17275852B83272093468807"
+          "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG"
         ]
       },
       "only_from_owners": [
         "MAN",
         "KWT"
       ],
+      "notes": "Simplified approximation of the leased peninsula around Port Arthur, Dairen and Kinchow; northern lease line sketched, not a surveyed cadastral trace. Only the Dalian parent is cut; Wafangdian, Zhuanghe and Changhai remain MAN.",
       "color_hex": "#e3a78f"
     },
     {
@@ -5863,6 +5873,91 @@
       ]
     },
     {
+      "id": "karafuto_south",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "JAP",
+      "select": {
+        "feature_ids": [
+          "RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO"
+        ]
+      }
+    },
+    {
+      "id": "sakhalin_north",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SOV",
+      "select": {
+        "feature_ids": [
+          "RU_MRG_eefc121c2bf0__SPLIT_REST"
+        ]
+      }
+    },
+    {
+      "id": "tangier_international_zone",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TGR",
+      "name_en": "Tangier International Zone",
+      "name_zh": "坦吉尔国际区",
+      "subject_kind": "international_zone",
+      "color_hex": "#c9b67d",
+      "select": {
+        "feature_ids": [
+          "MAR-1445__SPLIT_TANGIER"
+        ]
+      },
+      "notes": "Approximate outer zone around Tangier and Cape Spartel, guided by the 1923 statute map; southern/eastern rural line generalized. Historical nominal area about 373 square kilometres; runtime coast is retained. Tetouan excluded."
+    },
+    {
+      "id": "ifni",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "IFN",
+      "name_en": "Spanish Ifni",
+      "name_zh": "西属伊夫尼",
+      "parent_owner_tag": "SPR",
+      "subject_kind": "colony",
+      "color_hex": "#8b7a39",
+      "select": {
+        "feature_ids": [
+          "MAR-1455__SPLIT_IFNI",
+          "MAR-3457__SPLIT_IFNI"
+        ]
+      },
+      "notes": "Simplified pre-1957 enclave extent around Sidi Ifni, using the historical map extent; not the reduced postwar city perimeter. Inland line approximate and coast inherited; intersect both modern source regions."
+    },
+    {
+      "id": "guangzhouwan",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KWW",
+      "name_en": "Guangzhouwan Leased Territory",
+      "name_zh": "广州湾租借地",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "color_hex": "#5f7adc",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B86000242921086__SPLIT_GUANGZHOUWAN",
+          "CN_CITY_17275852B89468905887192__SPLIT_GUANGZHOUWAN",
+          "CN_CITY_17275852B90470795224142__SPLIT_GUANGZHOUWAN"
+        ]
+      },
+      "notes": "Simplified bay-side lease outline around Fort Bayard and Chikan with Donghai/Naozhou island sector. Rural frontier approximate, clipped to runtime land; does not assign the entire modern Zhanjiang prefecture."
+    },
+    {
       "id": "alg_family_colour",
       "scenarios": [
         "hoi4_1936",
@@ -6021,7 +6116,7 @@
         "hoi4_1939"
       ],
       "tag": "LEB",
-      "color_hex": "#5077ff",
+      "color_hex": "#1160dd",
       "select": {
         "owners": [
           "LEB"
@@ -6055,7 +6150,7 @@
         "hoi4_1939"
       ],
       "tag": "MOR",
-      "color_hex": "#7f96f8",
+      "color_hex": "#2b80d6",
       "select": {
         "owners": [
           "MOR"
@@ -6174,7 +6269,7 @@
         "hoi4_1939"
       ],
       "tag": "SGN",
-      "color_hex": "#8b7a39",
+      "color_hex": "#c89c14",
       "select": {
         "owners": [
           "SGN"
@@ -6191,7 +6286,7 @@
         "hoi4_1939"
       ],
       "tag": "SMR",
-      "color_hex": "#c89c14",
+      "color_hex": "#cbb780",
       "select": {
         "owners": [
           "SMR"
@@ -6208,7 +6303,7 @@
         "hoi4_1939"
       ],
       "tag": "SSH",
-      "color_hex": "#cbb780",
+      "color_hex": "#a6935d",
       "select": {
         "owners": [
           "SSH"
@@ -6259,7 +6354,7 @@
         "hoi4_1939"
       ],
       "tag": "TUN",
-      "color_hex": "#3b78bb",
+      "color_hex": "#0c4b9c",
       "select": {
         "owners": [
           "TUN"

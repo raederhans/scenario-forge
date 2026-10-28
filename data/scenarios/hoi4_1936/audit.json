@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
-    "chunk_count": 312,
-    "feature_count": 21066,
+    "chunk_count": 315,
+    "feature_count": 21078,
     "water_count": 0
   },
   "controller_changes": [],
@@ -14545,19 +14545,6 @@
     {
       "country_code": "CN",
       "critical": true,
-      "feature_id": "CN_CITY_17275852B83272093468807",
-      "feature_name": "Dalian",
-      "from_tag": "CHI",
-      "notes": "Manchukuo using northeastern China groupings plus the eastern Inner Mongolian and Jehol/Rehe frontier that belonged to MAN in HOI4 1936.",
-      "quality": "manual_reviewed",
-      "rule_id": "manchukuo",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "MAN"
-    },
-    {
-      "country_code": "CN",
-      "critical": true,
       "feature_id": "CN_CITY_17275852B83380661850476",
       "feature_name": "Hangjinqi",
       "from_tag": "CHI",
@@ -15204,19 +15191,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "CHU"
-    },
-    {
-      "country_code": "CN",
-      "critical": false,
-      "feature_id": "CN_CITY_17275852B86000242921086",
-      "feature_name": "Zhanjianghsi",
-      "from_tag": "CHI",
-      "notes": "Scenario extension: Yue clique in Guangdong.",
-      "quality": "manual_reviewed",
-      "rule_id": "yue_guangdong_clique",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUE"
     },
     {
       "country_code": "CN",
@@ -15974,19 +15948,6 @@
     },
     {
       "country_code": "CN",
-      "critical": false,
-      "feature_id": "CN_CITY_17275852B89468905887192",
-      "feature_name": "Suixixian",
-      "from_tag": "CHI",
-      "notes": "Scenario extension: Yue clique in Guangdong.",
-      "quality": "manual_reviewed",
-      "rule_id": "yue_guangdong_clique",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUE"
-    },
-    {
-      "country_code": "CN",
       "critical": true,
       "feature_id": "CN_CITY_17275852B89508881164731",
       "feature_name": "Lufengxian",
@@ -16166,19 +16127,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "SHX"
-    },
-    {
-      "country_code": "CN",
-      "critical": false,
-      "feature_id": "CN_CITY_17275852B90470795224142",
-      "feature_name": "Wuchuan",
-      "from_tag": "CHI",
-      "notes": "Scenario extension: Yue clique in Guangdong.",
-      "quality": "manual_reviewed",
-      "rule_id": "yue_guangdong_clique",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUE"
     },
     {
       "country_code": "CN",
@@ -25088,19 +25036,6 @@
     {
       "country_code": "MA",
       "critical": false,
-      "feature_id": "MAR-1445",
-      "feature_name": "Tanger - Tétouan",
-      "from_tag": "MOR",
-      "notes": "Spanish Morocco represented using the current northern Morocco approximation, with Ifni folded into the same protectorate block.",
-      "quality": "manual_reviewed",
-      "rule_id": "spanish_morocco",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SMR"
-    },
-    {
-      "country_code": "MA",
-      "critical": false,
       "feature_id": "MAR-1446",
       "feature_name": "Fès - Boulemane",
       "from_tag": "MOR",
@@ -25218,19 +25153,6 @@
     {
       "country_code": "MA",
       "critical": false,
-      "feature_id": "MAR-1455",
-      "feature_name": "Souss - Massa - Draâ",
-      "from_tag": "MOR",
-      "notes": "French Morocco represented as the remaining protectorate area after Spanish Morocco and Spanish Sahara are split out.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_morocco",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "MOR"
-    },
-    {
-      "country_code": "MA",
-      "critical": false,
       "feature_id": "MAR-1456",
       "feature_name": "Marrakech - Tensift - Al Haouz",
       "from_tag": "MOR",
@@ -25266,19 +25188,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "SSH"
-    },
-    {
-      "country_code": "MA",
-      "critical": false,
-      "feature_id": "MAR-3457",
-      "feature_name": "Guelmim - Es-Semara",
-      "from_tag": "MOR",
-      "notes": "Spanish Morocco represented using the current northern Morocco approximation, with Ifni folded into the same protectorate block.",
-      "quality": "manual_reviewed",
-      "rule_id": "spanish_morocco",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SMR"
     },
     {
       "country_code": "MA",
@@ -201977,10 +201886,10 @@
     "MAN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 234,
+      "controller_feature_count": 235,
       "display_name": "Manchukuo",
       "entry_kind": "",
-      "feature_count": 234,
+      "feature_count": 235,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203120,10 +203029,10 @@
     "SOV": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 10921,
+      "controller_feature_count": 10922,
       "display_name": "Soviet Union",
       "entry_kind": "",
-      "feature_count": 10921,
+      "feature_count": 10922,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204808,41 +204717,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "3367771d5fa8a02711a16f25bc34777145fab5ac13bf422108b5cf8ecbe38334",
+  "snapshot_fingerprint": "37e428d52f526cb6a5283511ba6b7d7c5af177d17456d6f05d59b5f2eecc463d",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "5f529136e05c42fd27686a191f7cc3982c70de3ea7f6270962248fad53812c69",
-    "detail_chunk_manifest_sha256": "da8f318e85ad645aa0554b6051836847aa76d568136bff542876eb74c81bb9b6",
+    "build_snapshot_sha256": "b86a16e12a1bcbc6079d2706fca37f081a1bf9cbcdb9e9a0eddd2ec513eb54be",
+    "detail_chunk_manifest_sha256": "d05dd0a90d1db93d6a922cd7b3922afc7a66f6ddd2adb8791571d015e657c2c6",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "runtime_topology_sha256": "d73cbe2088d826b1e28728a9ccb7f2ddf6e30c15313dbc0c7af66469c02b462d"
+    "runtime_topology_sha256": "1433a50aa7639799732380a5939e353c8af243e97fbcde536674a34fb7babdc3"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15333,
-    "controller_count": 303,
+    "changed_feature_count": 15326,
+    "controller_count": 306,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 21066,
+    "feature_count": 21078,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14886,
+    "manual_reviewed_feature_count": 14879,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 303,
+    "owner_count": 306,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5821,
-      "manual_reviewed": 14886
+      "manual_reviewed": 14879
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5821,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 15310
+      "manual_rule": 15303
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

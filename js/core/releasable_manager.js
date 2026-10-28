@@ -159,8 +159,10 @@ function projectSharedFeatureIds(ids, details = {}) {
 
 function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
   const ids = resolveMemberFeatureIdsFromPresetSource(presetSource, entry);
+  const excluded = new Set(normalizePresetSource(presetSource).exclude_feature_ids);
   return ids.length
     ? projectSharedFeatureIds(ids, { tag: normalizeCountryCode(entry.tag), sourceType: String(presetSource?.type || "").trim() })
+      .filter((id) => !excluded.has(id))
     : ids;
 }
 
@@ -609,7 +611,7 @@ function buildScenarioRegionalPresetOverlays() {
 
 // Historical display presets are shared by every scenario and name member IDs.
 function projectStaticPresets() {
-  if (!getActiveFeatureMergeOverride()?.feature_merges) return countryPresets;
+  if (!getActiveFeatureMergeOverride()?.feature_merges && !getActiveFeatureMergeOverride()?.feature_splits) return countryPresets;
   return Object.fromEntries(Object.entries(countryPresets || {}).map(([code, presets]) => [
     code,
     (Array.isArray(presets) ? presets : []).map((preset) => ({

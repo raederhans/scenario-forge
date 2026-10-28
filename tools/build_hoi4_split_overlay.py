@@ -334,7 +334,7 @@ def narrow(entry_id, selection, restore_tag, *, cores="owner", shanxi=False):
     entry["only_from_owners"] = list(dict.fromkeys(entry.get("only_from_owners", []) + [entry["tag"]]))
 
 
-narrow("kwantung", FI(*CN("83272093468807")), "MAN")
+narrow("kwantung", FI("CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG"), "MAN")
 narrow("khotan_ma", {"prefectures": ["和田地区"], "feature_ids": CN("17844458275319")}, "SIK")
 next(e for e in E if e["id"] == "khotan_ma").update(name_en="Khotan Military Administration", name_zh="和阗军政区")
 next(e for e in E if e["id"] == "mordovian_assr")["name_zh"] = "莫尔多维亚自治共和国"
@@ -606,6 +606,26 @@ def harmonize_family_colors(entries):
         entries.append({"id": f"{tag.lower()}_family_colour", "scenarios": sorted(scenarios_of[tag]), "tag": tag,
                         "color_hex": colour[tag], "select": {"owners": [tag]}, "only_from_owners": [tag]})
 
+
+geometry_rules = json.loads((W / "data/scenario-rules/hoi4_geometry_splits.json").read_text(encoding="utf-8"))
+geometry_by_id = {entry["id"]: entry for entry in geometry_rules["entries"]}
+
+def split_ids(name, side="inside"):
+    rule = geometry_by_id[name]
+    return [fid + "__SPLIT_" + rule[side]["suffix"] for fid in rule["feature_ids"]]
+
+next(e for e in E if e["id"] == "danzig")["select"]["feature_ids"].extend(split_ids("danzig"))
+next(e for e in E if e["id"] == "danzig")["notes"] = geometry_by_id["danzig"]["notes"]
+next(e for e in E if e["id"] == "kwantung")["notes"] = geometry_by_id["kwantung"]["notes"]
+next(e for e in E if e["id"] == "karafuto_kurils")["exclude"] = FI(*split_ids("karafuto", "outside"))
+add("karafuto_south", B, "JAP", None, None, FI(*split_ids("karafuto")))
+add("sakhalin_north", B, "SOV", None, None, FI(*split_ids("karafuto", "outside")))
+add("tangier_international_zone", B, "TGR", "Tangier International Zone", "坦吉尔国际区",
+    FI(*split_ids("tangier")), kind="international_zone", color="#c9b67d", notes=geometry_by_id["tangier"]["notes"])
+add("ifni", B, "IFN", "Spanish Ifni", "西属伊夫尼", FI(*split_ids("ifni")),
+    parent="SPR", kind="colony", notes=geometry_by_id["ifni"]["notes"])
+add("guangzhouwan", B, "KWW", "Guangzhouwan Leased Territory", "广州湾租借地", FI(*split_ids("guangzhouwan")),
+    parent="FRA", kind="colony", notes=geometry_by_id["guangzhouwan"]["notes"])
 
 harmonize_family_colors(E)
 

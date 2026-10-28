@@ -107,7 +107,7 @@ def update_country(country, entry):
 
 def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
                   default_country, hierarchy_groups, country_meta, prefectures,
-                  bucket_by_feature, plans, unresolved=(), point_for_feature=None):
+                  bucket_by_feature, plans, unresolved=(), point_for_feature=None, feature_splits=None):
     if overlay.get("version") != 1:
         raise ValueError("overlay version must be 1")
     ids = set()
@@ -127,6 +127,18 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
     result_countries = deepcopy(countries)
     result_owners, result_cores = dict(owners), deepcopy(cores)
     expanded = expand_merge_plans(plans, scenario)
+    split_leaves, split_expanded = {}, {}
+    for parent, children in (feature_splits or {}).items():
+        source_leaves = expanded.get(parent, {parent})
+        for leaf in source_leaves:
+            split_leaves[leaf] = {(child, leaf) for child in children}
+        for child in children:
+            split_expanded[child] = {(child, leaf) for leaf in source_leaves}
+        split_expanded[parent] = set().union(*(split_expanded[child] for child in children))
+    expanded = {fid: set().union(*(split_leaves.get(leaf, {leaf}) for leaf in leaves))
+                for fid, leaves in expanded.items()}
+    expanded.update(split_leaves)
+    expanded.update(split_expanded)
     leaves = {fid: expanded.get(fid, {fid}) for fid in features}
     known_ids = set(features) | set(expanded) | set().union(*expanded.values())
     filled = 0
@@ -269,6 +281,7 @@ def run_scenario(overlay, scenario_dir, *, data_dir=ROOT / "data", dry_run=False
     scenario_dir = Path(scenario_dir)
     topology = read(scenario_dir / "runtime_topology.topo.json")
     payload = read(scenario_dir / "countries.json")
+    manifest = read(scenario_dir / "manifest.json")
     groups, meta = load_hierarchy(data_dir / "hierarchy.json")
     crosswalk = read(data_dir / "quick_fill/china_prefecture_crosswalk.v1.json")
     countries, assignments, report = apply_overlay(
@@ -277,7 +290,8 @@ def run_scenario(overlay, scenario_dir, *, data_dir=ROOT / "data", dry_run=False
         owners=read(scenario_dir / "owners.by_feature.json")["owners"],
         cores=read(scenario_dir / "cores.by_feature.json")["cores"],
         countries=payload["countries"],
-        default_country=read(scenario_dir / "manifest.json")["default_country"],
+        default_country=manifest["default_country"],
+        feature_splits=manifest.get("hierarchy_overrides", {}).get("feature_splits", {}),
         hierarchy_groups=groups, country_meta=meta,
         prefectures=crosswalk["groups"], unresolved=crosswalk.get("unresolved", []),
         point_for_feature=point_lookup_factory(topology),

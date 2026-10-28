@@ -5,7 +5,7 @@
 
 const isRecord = (value) => !!value && typeof value === "object" && !Array.isArray(value);
 
-export function resolveFeatureMergeLineage(lineage, scenarioId = "") {
+export function resolveFeatureMergeLineage(lineage, scenarioId = "", splits = {}) {
   const next = new Map();
   const leaves = new Map();
   for (const plan of Array.isArray(lineage?.plans) ? lineage.plans : []) {
@@ -21,7 +21,7 @@ export function resolveFeatureMergeLineage(lineage, scenarioId = "") {
     while (next.has(current)) current = next.get(current);
     return current;
   };
-  return { isMerged: (id) => next.has(id), resolve, leavesOf: (id) => leaves.get(id) || new Set([id]) };
+  return { isMerged: (id) => next.has(id), resolve, leavesOf: (id) => leaves.get(id) || new Set([id]), splits };
 }
 
 // A merged feature takes a saved value only when the saved IDs cover all of its
@@ -30,14 +30,14 @@ export function resolveFeatureMergeLineage(lineage, scenarioId = "") {
 // A member stays valid in the shared base topology after a scenario-scoped
 // merge, so membership in this scenario's lineage decides, not ID validity.
 export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) {
-  const { isMerged, resolve, leavesOf } = lineage;
+  const { isMerged, resolve, leavesOf, splits = {} } = lineage;
   const counts = () => ({ migratedEntries: 0, droppedEntries: 0 });
   const summary = { visualOverrides: { ...counts(), createdEntries: 0 }, auxiliary: counts() };
   const { visualOverrides: visual, auxiliary } = summary;
   const targetOf = (id) => {
     if (typeof id !== "string" || !isMerged(id)) return null;
     const target = resolve(id);
-    return validFeatureIds.has(target) ? target : null;
+    return validFeatureIds.has(target) || splits[target]?.every((child) => validFeatureIds.has(child)) ? target : null;
   };
   const covers = (sources, target) => {
     const found = new Set(sources.flatMap((source) => [...leavesOf(source)]));
@@ -57,15 +57,32 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) 
     const groups = groupByTarget(Object.keys(entries));
     const moved = new Set([...groups.values()].flat());
     const result = Object.fromEntries(Object.entries(entries).filter(([id]) => !moved.has(id)));
+    const created = new Set();
     for (const [target, sources] of groups) {
       const value = JSON.stringify(entries[sources[0]]);
       if (!Object.hasOwn(result, target) && covers(sources, target)
         && sources.every((source) => JSON.stringify(entries[source]) === value)) {
         result[target] = entries[sources[0]];
+        created.add(target);
         visual.migratedEntries += sources.length;
         visual.createdEntries += 1;
       } else {
         visual.droppedEntries += sources.length;
+      }
+    }
+    for (const [source, children] of Object.entries(splits)) {
+      if (!Object.hasOwn(result, source)) continue;
+      for (const child of children) {
+        if (validFeatureIds.has(child) && !Object.hasOwn(result, child)) {
+          result[child] = result[source];
+          visual.createdEntries += 1;
+        }
+      }
+      delete result[source];
+      visual.migratedEntries += 1;
+      if (created.has(source)) {
+        visual.migratedEntries -= 1;
+        visual.createdEntries -= 1;
       }
     }
     return result;
@@ -75,6 +92,7 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) 
     const groups = groupByTarget(ids);
     const moved = new Set([...groups.values()].flat());
     const result = ids.filter((id) => !moved.has(id));
+    const saved = new Set(result);
     for (const [target, sources] of groups) {
       if (covers(sources, target)) {
         result.push(target);
@@ -83,11 +101,19 @@ export function migrateMergedFeatureProjectData(data, lineage, validFeatureIds) 
         auxiliary.droppedEntries += sources.length;
       }
     }
-    return [...new Set(result)];
+    return [...new Set(result.flatMap((id) => {
+      if (!splits[id]) return [id];
+      if (saved.delete(id)) auxiliary.migratedEntries += 1;
+      return splits[id].filter((child) => validFeatureIds.has(child));
+    }))];
   }
   // A point anchor inside a member stays inside the merged feature.
   function remapAnchor(id) {
     const target = targetOf(id);
+    if (splits[target || id]) {
+      auxiliary.droppedEntries += 1;
+      return "";
+    }
     if (!target) return id;
     auxiliary.migratedEntries += 1;
     return target;

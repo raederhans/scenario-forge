@@ -1,0 +1,135 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": 21068,
+      "type": "Feature",
+      "properties": {
+        "id": "MAR-1455__SPLIT_IFNI",
+        "name": "Souss - Massa - Draâ · Ifni",
+        "cntr_code": "MA",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail",
+        "name_en": "Souss - Massa - Draâ · Ifni",
+        "name_zh": "苏斯 - 马萨 - 德拉阿 · 伊夫尼",
+        "aliases": [
+          "Souss - Massa - Draâ",
+          "苏斯 - 马萨 - 德拉阿"
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -10.387903879038788,
+              29.155029889298888
+            ],
+            [
+              -10.177069990941703,
+              29.102930009058294
+            ],
+            [
+              -10.12,
+              29.16
+            ],
+            [
+              -10.06,
+              29.25
+            ],
+            [
+              -10.02,
+              29.34
+            ],
+            [
+              -9.98,
+              29.43
+            ],
+            [
+              -9.98,
+              29.51
+            ],
+            [
+              -10.04,
+              29.59
+            ],
+            [
+              -10.065304137390283,
+              29.594217356231713
+            ],
+            [
+              -10.099900999009975,
+              29.509140914409144
+            ],
+            [
+              -10.243902439024396,
+              29.295632796327965
+            ],
+            [
+              -10.387903879038788,
+              29.155029889298888
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 21070,
+      "type": "Feature",
+      "properties": {
+        "id": "MAR-3457__SPLIT_IFNI",
+        "name": "Guelmim - Es-Semara · Ifni",
+        "cntr_code": "MA",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail",
+        "name_en": "Guelmim - Es-Semara · Ifni",
+        "name_zh": "盖勒敏 - 埃斯-塞马拉 · 伊夫尼",
+        "aliases": [
+          "Guelmim - Es-Semara",
+          "盖勒敏 - 埃斯-塞马拉"
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -10.387903879038788,
+              29.155029889298888
+            ],
+            [
+              -10.477269046792706,
+              29.074021767763096
+            ],
+            [
+              -10.43,
+              29.02
+            ],
+            [
+              -10.32,
+              29.03
+            ],
+            [
+              -10.2,
+              29.08
+            ],
+            [
+              -10.177069990941703,
+              29.102930009058294
+            ],
+            [
+              -10.387903879038788,
+              29.155029889298888
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

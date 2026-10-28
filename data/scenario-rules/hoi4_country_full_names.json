@@ -490,6 +490,10 @@
       "en": "Kingdom of Iceland",
       "zh": "冰岛王国"
     },
+    "IFN": {
+      "en": "Spanish Ifni",
+      "zh": "西属伊夫尼"
+    },
     "INS": {
       "en": "Dutch East Indies",
       "zh": "荷属东印度"
@@ -593,6 +597,10 @@
     "KWT": {
       "en": "Kwantung Leased Territory",
       "zh": "关东州"
+    },
+    "KWW": {
+      "en": "Guangzhouwan Leased Territory",
+      "zh": "广州湾租借地"
     },
     "KYR": {
       "en": "Kirghiz ASSR",
@@ -1001,6 +1009,10 @@
     "TGN": {
       "en": "Tanganyika",
       "zh": "坦噶尼喀"
+    },
+    "TGR": {
+      "en": "Tangier International Zone",
+      "zh": "坦吉尔国际区"
     },
     "THG": {
       "en": "Taihang Resistance Area",

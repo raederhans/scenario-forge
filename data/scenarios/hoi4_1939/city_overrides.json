@@ -210,7 +210,11 @@
     "MSN": "CITY::gn::1802788",
     "LZG": "CITY::gn::1800675",
     "BHA": "CITY::gn::1794825",
-    "GXC": "CITY::ne::1159150821"
+    "GXC": "CITY::ne::1159150821",
+    "TGR": "CITY::ne::1159148063",
+    "SMR": "CITY::gn::2528910",
+    "IFN": "CITY::gn::2534515",
+    "KWW": "CITY::ne::1159149797"
   },
   "capital_city_hints": {
     "AEF": {
@@ -2447,27 +2451,27 @@
       "candidate_count": 51
     },
     "SMR": {
+      "country_code": "MA",
+      "host_feature_id": "MAR-1445__SPLIT_REST",
+      "urban_match_id": "UA_34D0A4AD8DF9",
+      "lon": -5.36837,
+      "lat": 35.57845,
+      "population": 415810,
+      "base_tier": "regional",
+      "source": "geonames",
       "tag": "SMR",
-      "display_name": "Spanish Morocco",
+      "city_id": "CITY::gn::2528910",
+      "stable_key": "id::CITY::gn::2528910",
+      "city_name": "Tétouan",
+      "name_ascii": "Tetouan",
+      "display_name": "Spanish Protectorate in Morocco",
       "lookup_iso2": "MA",
       "base_iso2": "MA",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159148063",
-      "stable_key": "id::CITY::ne::1159148063",
-      "city_name": "Tangier",
-      "name_ascii": "Tangier",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 1035141,
-      "country_code": "MA",
-      "host_feature_id": "MAR-1445",
-      "urban_match_id": "UA_8FD07277A205",
-      "lon": -5.79975,
-      "lat": 35.76727,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 23
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "SOV": {
       "tag": "SOV",
@@ -4678,7 +4682,7 @@
     },
     "KWT": {
       "country_code": "CN",
-      "host_feature_id": "CN_CITY_17275852B83272093468807",
+      "host_feature_id": "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG",
       "urban_match_id": "",
       "lon": 121.60222,
       "lat": 38.91222,
@@ -7227,6 +7231,75 @@
       "tag": "JZH",
       "city_id": "",
       "resolution_method": "no_capital"
+    },
+    "TGR": {
+      "country_code": "MA",
+      "host_feature_id": "MAR-1445__SPLIT_TANGIER",
+      "urban_match_id": "UA_8FD07277A205",
+      "lon": -5.79975,
+      "lat": 35.76727,
+      "population": 1035141,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "TGR",
+      "city_id": "CITY::ne::1159148063",
+      "stable_key": "id::CITY::ne::1159148063",
+      "city_name": "Tangier",
+      "name_ascii": "Tangier",
+      "display_name": "Tangier International Zone",
+      "lookup_iso2": "MA",
+      "base_iso2": "MA",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "IFN": {
+      "country_code": "MA",
+      "host_feature_id": "MAR-1455__SPLIT_IFNI",
+      "urban_match_id": "",
+      "lon": -10.17299,
+      "lat": 29.37975,
+      "population": 23606,
+      "base_tier": "regional",
+      "source": "geonames",
+      "tag": "IFN",
+      "city_id": "CITY::gn::2534515",
+      "stable_key": "id::CITY::gn::2534515",
+      "city_name": "Sidi Ifni",
+      "name_ascii": "Sidi Ifni",
+      "display_name": "Spanish Ifni",
+      "lookup_iso2": "MA",
+      "base_iso2": "MA",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "KWW": {
+      "country_code": "CN",
+      "host_feature_id": "CN_CITY_17275852B86000242921086__SPLIT_GUANGZHOUWAN",
+      "urban_match_id": "",
+      "lon": 110.38749,
+      "lat": 21.23391,
+      "population": 1590000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "KWW",
+      "city_id": "CITY::ne::1159149797",
+      "stable_key": "id::CITY::ne::1159149797",
+      "city_name": "Fort Bayard",
+      "name_ascii": "Zhanjiang",
+      "display_name": "Guangzhouwan Leased Territory",
+      "lookup_iso2": "CN",
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     }
   },
   "cities": {
@@ -7836,7 +7909,12 @@
     },
     "CITY::ne::1159148063": {
       "city_id": "CITY::ne::1159148063",
-      "host_feature_id": "MAR-1445"
+      "host_feature_id": "MAR-1445__SPLIT_TANGIER",
+      "stable_key": "id::CITY::ne::1159148063",
+      "display_name": {
+        "en": "Tangier",
+        "zh": "坦吉尔"
+      }
     },
     "CITY::ne::1159151585": {
       "city_id": "CITY::ne::1159151585",
@@ -8579,7 +8657,7 @@
         "en": "Dalian",
         "zh": "大连"
       },
-      "host_feature_id": "CN_CITY_17275852B83272093468807"
+      "host_feature_id": "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG"
     },
     "CITY::ne::1159151495": {
       "city_id": "CITY::ne::1159151495",
@@ -9611,11 +9689,38 @@
         "zh": "桂林"
       },
       "host_feature_id": "CN_CITY_17275852B75703126958771"
+    },
+    "CITY::gn::2528910": {
+      "city_id": "CITY::gn::2528910",
+      "stable_key": "id::CITY::gn::2528910",
+      "display_name": {
+        "en": "Tétouan",
+        "zh": "得土安"
+      },
+      "host_feature_id": "MAR-1445__SPLIT_REST"
+    },
+    "CITY::gn::2534515": {
+      "city_id": "CITY::gn::2534515",
+      "stable_key": "id::CITY::gn::2534515",
+      "display_name": {
+        "en": "Sidi Ifni",
+        "zh": "西迪伊夫尼"
+      },
+      "host_feature_id": "MAR-1455__SPLIT_IFNI"
+    },
+    "CITY::ne::1159149797": {
+      "city_id": "CITY::ne::1159149797",
+      "stable_key": "id::CITY::ne::1159149797",
+      "display_name": {
+        "en": "Fort Bayard",
+        "zh": "广州湾"
+      },
+      "host_feature_id": "CN_CITY_17275852B86000242921086__SPLIT_GUANGZHOUWAN"
     }
   },
   "audit": {
-    "manual_capital_count": 208,
-    "capital_hint_count": 305,
+    "manual_capital_count": 212,
+    "capital_hint_count": 308,
     "renamed_city_count": 4,
     "name_conflict_count": 4,
     "unresolved_capital_count": 0,

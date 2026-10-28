@@ -2739,19 +2739,19 @@
       "color_hex": "#c9a227",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 2,
+      "controller_feature_count": 6,
       "display_name": "Free City of Danzig",
       "display_name_en": "Free City of Danzig",
       "display_name_zh": "但泽自由市",
       "entry_kind": "",
-      "feature_count": 2,
+      "feature_count": 6,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
       "lookup_iso2": "PL",
-      "notes": "City parcels only; the Free City's rural districts are not split out yet.",
+      "notes": "Simplified rural outline using Danziger Hoehe/Niederung and Grosses Werder extent; Nogat and western land frontier generalized. Gdansk/Sopot retained separately; Gdynia, Elblag and PL_POW_1414 excluded explicitly by source IDs. This is a debug approximation, not a precise historical survey.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "danzig",
@@ -4355,6 +4355,47 @@
       "synthetic_owner": false,
       "tag": "ICE"
     },
+    "IFN": {
+      "base_iso2": "MA",
+      "capital_state_id": null,
+      "color_hex": "#8b7a39",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 2,
+      "display_name": "Spanish Ifni",
+      "display_name_en": "Spanish Ifni",
+      "display_name_zh": "西属伊夫尼",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MA",
+      "notes": "Simplified pre-1957 enclave extent around Sidi Ifni, using the historical map extent; not the reduced postwar city perimeter. Inland line approximate and coast inherited; intersect both modern source regions.",
+      "parent_owner_tag": "SPR",
+      "parent_owner_tags": [
+        "SPR"
+      ],
+      "primary_rule_source": "ifni",
+      "provenance_iso2": "MA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ifni"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "synthetic_owner": false,
+      "tag": "IFN"
+    },
     "INS": {
       "base_iso2": "ID",
       "capital_state_id": 1058,
@@ -4618,7 +4659,8 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "jidong_japanese_occupation",
-        "karafuto_kurils"
+        "karafuto_kurils",
+        "karafuto_south"
       ],
       "scenario_only": false,
       "source": "direct_active_owner",
@@ -5098,7 +5140,7 @@
         "extended"
       ],
       "lookup_iso2": "CN",
-      "notes": "",
+      "notes": "Simplified approximation of the leased peninsula around Port Arthur, Dairen and Kinchow; northern lease line sketched, not a surveyed cadastral trace. Only the Dalian parent is cut; Wafangdian, Zhuanghe and Changhai remain MAN.",
       "parent_owner_tag": "JAP",
       "parent_owner_tags": [
         "JAP"
@@ -5120,6 +5162,47 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
       "tag": "KWT"
+    },
+    "KWW": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#5f7adc",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Guangzhouwan Leased Territory",
+      "display_name_en": "Guangzhouwan Leased Territory",
+      "display_name_zh": "广州湾租借地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "Simplified bay-side lease outline around Fort Bayard and Chikan with Donghai/Naozhou island sector. Rural frontier approximate, clipped to runtime land; does not assign the entire modern Zhanjiang prefecture.",
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "primary_rule_source": "guangzhouwan",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "guangzhouwan"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "KWW"
     },
     "KYR": {
       "base_iso2": "KG",
@@ -5165,7 +5248,7 @@
     "LAO": {
       "base_iso2": "LA",
       "capital_state_id": null,
-      "color_hex": "#5f7adc",
+      "color_hex": "#5077ff",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 17,
@@ -5285,7 +5368,7 @@
     "LEB": {
       "base_iso2": "LB",
       "capital_state_id": 553,
-      "color_hex": "#5077ff",
+      "color_hex": "#1160dd",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 6,
@@ -5559,7 +5642,7 @@
     "MAD": {
       "base_iso2": "MG",
       "capital_state_id": 543,
-      "color_hex": "#1160dd",
+      "color_hex": "#3e4db4",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 26,
@@ -5646,12 +5729,12 @@
       "color_hex": "#f3b6a1",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 234,
+      "controller_feature_count": 235,
       "display_name": "Empire of Manchukuo",
       "display_name_en": "Empire of Manchukuo",
       "display_name_zh": "满洲帝国",
       "entry_kind": "scenario_subject",
-      "feature_count": 234,
+      "feature_count": 235,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -5687,7 +5770,7 @@
     "MAU": {
       "base_iso2": "MR",
       "capital_state_id": null,
-      "color_hex": "#3e4db4",
+      "color_hex": "#7f96f8",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 13,
@@ -6041,7 +6124,7 @@
     "MOR": {
       "base_iso2": "MA",
       "capital_state_id": 461,
-      "color_hex": "#7f96f8",
+      "color_hex": "#2b80d6",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 11,
@@ -6083,7 +6166,7 @@
     "MQ": {
       "base_iso2": "MQ",
       "capital_state_id": null,
-      "color_hex": "#2b80d6",
+      "color_hex": "#578de3",
       "continent_id": "",
       "continent_label": "",
       "controller_feature_count": 1,
@@ -6532,7 +6615,7 @@
     "NGR": {
       "base_iso2": "NE",
       "capital_state_id": null,
-      "color_hex": "#578de3",
+      "color_hex": "#4c60b0",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 8,
@@ -7525,7 +7608,7 @@
     "RE": {
       "base_iso2": "RE",
       "capital_state_id": null,
-      "color_hex": "#4c60b0",
+      "color_hex": "#4f60e4",
       "continent_id": "",
       "continent_label": "",
       "controller_feature_count": 1,
@@ -7807,7 +7890,7 @@
     "SGN": {
       "base_iso2": "GQ",
       "capital_state_id": null,
-      "color_hex": "#8b7a39",
+      "color_hex": "#c89c14",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 7,
@@ -8167,7 +8250,7 @@
     "SMR": {
       "base_iso2": "MA",
       "capital_state_id": null,
-      "color_hex": "#c89c14",
+      "color_hex": "#cbb780",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 3,
@@ -8253,12 +8336,12 @@
       "color_hex": "#7d0d18",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 10921,
+      "controller_feature_count": 10922,
       "display_name": "Union of Soviet Socialist Republics",
       "display_name_en": "Union of Soviet Socialist Republics",
       "display_name_zh": "苏维埃社会主义共和国联盟",
       "entry_kind": "",
-      "feature_count": 10921,
+      "feature_count": 10922,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -8272,7 +8355,8 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "soviet_union"
+        "soviet_union",
+        "sakhalin_north"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -8369,7 +8453,7 @@
     "SSH": {
       "base_iso2": "EH",
       "capital_state_id": null,
-      "color_hex": "#cbb780",
+      "color_hex": "#a6935d",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 3,
@@ -8776,7 +8860,7 @@
     "SYR": {
       "base_iso2": "SY",
       "capital_state_id": 554,
-      "color_hex": "#4f60e4",
+      "color_hex": "#5369c8",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 16,
@@ -9019,6 +9103,45 @@
       "synthetic_owner": false,
       "tag": "TGN"
     },
+    "TGR": {
+      "base_iso2": "MA",
+      "capital_state_id": null,
+      "color_hex": "#c9b67d",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Tangier International Zone",
+      "display_name_en": "Tangier International Zone",
+      "display_name_zh": "坦吉尔国际区",
+      "entry_kind": "",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MA",
+      "notes": "Approximate outer zone around Tangier and Cape Spartel, guided by the 1923 statute map; southern/eastern rural line generalized. Historical nominal area about 373 square kilometres; runtime coast is retained. Tetouan excluded.",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tangier_international_zone",
+      "provenance_iso2": "MA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tangier_international_zone"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "international_zone",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "synthetic_owner": false,
+      "tag": "TGR"
+    },
     "TIB": {
       "base_iso2": "CN",
       "capital_state_id": 757,
@@ -9143,7 +9266,7 @@
     "TNK": {
       "base_iso2": "VN",
       "capital_state_id": null,
-      "color_hex": "#5369c8",
+      "color_hex": "#6fa0dd",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 26,
@@ -9184,7 +9307,7 @@
     "TOG": {
       "base_iso2": "TG",
       "capital_state_id": null,
-      "color_hex": "#6fa0dd",
+      "color_hex": "#3b78bb",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 5,
@@ -9389,7 +9512,7 @@
     "TUN": {
       "base_iso2": "TN",
       "capital_state_id": 458,
-      "color_hex": "#3b78bb",
+      "color_hex": "#0c4b9c",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 23,
@@ -9468,7 +9591,7 @@
     "UBA": {
       "base_iso2": "CF",
       "capital_state_id": null,
-      "color_hex": "#0c4b9c",
+      "color_hex": "#68abf9",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 17,
@@ -9632,7 +9755,7 @@
     "UPV": {
       "base_iso2": "BF",
       "capital_state_id": null,
-      "color_hex": "#68abf9",
+      "color_hex": "#3496fb",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 13,
@@ -11793,7 +11916,7 @@
     "VIN": {
       "base_iso2": "VN",
       "capital_state_id": 671,
-      "color_hex": "#3496fb",
+      "color_hex": "#1d5bc3",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 18,
@@ -11993,7 +12116,7 @@
     "YT": {
       "base_iso2": "YT",
       "capital_state_id": null,
-      "color_hex": "#1d5bc3",
+      "color_hex": "#0d4dbd",
       "continent_id": "",
       "continent_label": "",
       "controller_feature_count": 1,

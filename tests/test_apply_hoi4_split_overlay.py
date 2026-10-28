@@ -57,6 +57,48 @@ def test_selectors(inputs, selector, expected):
                for fid, value in assignments.items())
 
 
+@pytest.mark.parametrize("selector", [{"feature_ids": ["cn"]}, {"hierarchy_groups": ["CN_Province"]},
+                                      {"prefectures": ["武汉市"]}])
+def test_split_selectors(inputs, selector):
+    inputs["hierarchy_groups"]["CN_Province"] = ["cn"]
+    inputs["feature_splits"] = {"cn": ["cn_south", "cn_north"]}
+    for key in ("features", "owners", "cores", "bucket_by_feature"):
+        value = inputs[key].pop("cn")
+        inputs[key].update({child: deepcopy(value) for child in inputs["feature_splits"]["cn"]})
+    _, assignments, _ = apply(inputs, entry(selector))
+    assert set(assignments) == {"cn_south", "cn_north"}
+    assert set(apply(inputs, entry({"feature_ids": ["cn_south"]}))[1]) == {"cn_south"}
+
+
+def test_split_unresolved_prefecture_hole(inputs):
+    inputs["prefectures"]["CN_PREF_4201"]["province_id"] = "CN_Province"
+    inputs["feature_splits"] = {"hole": ["hole_south", "hole_north"]}
+    inputs["unresolved"] = [{"feature_id": "hole", "province_id": "CN_Province"}]
+    for child in inputs["feature_splits"]["hole"]:
+        inputs["features"][child] = {"id": child, "cntr_code": "CN"}
+        inputs["owners"][child] = "CHI"
+        inputs["cores"][child] = ["CHI"]
+    inputs["point_for_feature"] = lambda fid: (0, 0)
+    _, assignments, report = apply(inputs, entry({"prefectures": ["武汉市"]}))
+    assert set(assignments) == {"cn", "hole_south", "hole_north"}
+    assert report["filled_prefecture_leaf_count"] == 2
+
+
+def test_split_merged_parent_preserves_member_selection_threshold(inputs):
+    parent = "CA_MRG_2"
+    inputs["feature_splits"] = {parent: ["CA_south", "CA_north"]}
+    for key in ("features", "owners", "cores", "bucket_by_feature"):
+        value = inputs[key].pop(parent)
+        inputs[key].update({child: deepcopy(value) for child in inputs["feature_splits"][parent]})
+    assert set(apply(inputs, entry({"feature_ids": [parent]}))[1]) == {"CA_south", "CA_north"}
+    assert set(apply(inputs, entry({"feature_ids": ["CA_south"]}))[1]) == {"CA_south"}
+    _, assignments, report = apply(inputs, entry({"feature_ids": ["a", "ca"]}))
+    assert set(assignments) == {"ca"}
+    assert len(report["partial_merged"]) == 2
+    assert all(row["ratio"] == .25 for row in report["partial_merged"])
+    assert set(apply(inputs, entry({"hierarchy_groups": ["CA_Group"]}))[1]) == {"CA_south", "CA_north"}
+
+
 def test_exclude_and_sequential_owner_filter(inputs):
     _, assignments, report = apply(
         inputs, entry({"country_codes": ["CA"]}, exclude={"feature_ids": ["ca"]}),

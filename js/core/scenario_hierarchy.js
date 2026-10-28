@@ -55,12 +55,11 @@ function featureMergeTargets(merges) {
 export function projectScenarioFeatureIds(ids, override) {
   const list = Array.isArray(ids) ? ids : [];
   const target = featureMergeTargets(override?.feature_merges);
-  if (!target) return { ids: [...new Set(list)], partial: [] };
   const present = new Set(list);
   const projected = new Set();
   const partial = new Map();
   for (const id of list) {
-    const mergedId = target.get(id);
+    const mergedId = target?.get(id);
     if (!mergedId) {
       projected.add(id);
     } else if (override.feature_merges[mergedId].every((member) => present.has(member))) {
@@ -69,23 +68,33 @@ export function projectScenarioFeatureIds(ids, override) {
       partial.set(mergedId, override.feature_merges[mergedId].filter((member) => !present.has(member)));
     }
   }
-  return { ids: [...projected], partial: [...partial].map(([mergedId, missing]) => ({ mergedId, missing })) };
+  return { ids: [...new Set([...projected].flatMap((id) => override?.feature_splits?.[id] || [id]))],
+    partial: [...partial].map(([mergedId, missing]) => ({ mergedId, missing })) };
 }
 
 // The inverse for set arithmetic in member IDs: merged IDs of the projected
 // hierarchy become their members again.
 export function expandScenarioFeatureIds(ids, override) {
   const merges = featureMergeTargets(override?.feature_merges) ? override.feature_merges : {};
-  return (Array.isArray(ids) ? ids : []).flatMap((id) => Object.hasOwn(merges, id) ? merges[id] : [id]);
+  const present = new Set(Array.isArray(ids) ? ids : []);
+  const parents = new Map(Object.entries(override?.feature_splits || {}).flatMap(([parent, children]) =>
+    children.every((child) => present.has(child)) ? children.map((child) => [child, parent]) : []));
+  return [...new Set((Array.isArray(ids) ? ids : []).flatMap((id) => {
+    const parent = parents.get(id) || id;
+    return Object.hasOwn(merges, parent) ? merges[parent] : [parent];
+  }))];
 }
 
 // Scenario-scoped political feature merges ({mergedId: memberIds}) replace their
 // members in every group and quick-fill level. The shared hierarchy keeps the
 // members for scenarios where they stay separate.
-function projectFeatureMerges(base, merges) {
+function projectFeatureMerges(base, merges, splits) {
   const target = featureMergeTargets(merges);
-  if (!target) return base;
-  const project = (ids) => Array.isArray(ids) ? [...new Set(ids.map((id) => target.get(id) ?? id))] : ids;
+  if (!target && !splits) return base;
+  const project = (ids) => Array.isArray(ids) ? [...new Set(ids.flatMap((id) => {
+    const merged = target?.get(id) ?? id;
+    return splits?.[merged] || [merged];
+  }))] : ids;
   const mapValues = (record, fn) => Object.fromEntries(Object.entries(record).map(([key, value]) => [key, fn(value)]));
   const projectLevel = (level) => !isRecord(level) ? level : {
     ...level,
@@ -104,7 +113,7 @@ function projectFeatureMerges(base, merges) {
 
 function applyOverride(base, override) {
   // A country snapshot that is absent or invalid leaves the projected hierarchy as is.
-  return mergeHierarchy(isRecord(override.feature_merges) ? projectFeatureMerges(base, override.feature_merges) : base, override);
+  return projectFeatureMerges(mergeHierarchy(base, override), override.feature_merges, override.feature_splits);
 }
 
 export function getEffectiveScenarioHierarchy(runtimeState) {
