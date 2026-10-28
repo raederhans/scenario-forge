@@ -8,6 +8,7 @@ import {
   createDeferredPoliticalBackgroundBuildState,
   createPoliticalBackgroundCacheState,
   createPoliticalBackgroundPathAccounting,
+  createRetainedPoliticalPathLookup,
   finalizePoliticalBackgroundGroups,
   getRetainedPoliticalPathHandle,
   refreshDeferredPoliticalBackgroundGroups,
@@ -140,6 +141,7 @@ export function createPoliticalBackgroundRenderOwner({
   let scenarioPoliticalBackgroundCache = createScenarioPoliticalBackgroundCacheState();
   let scenarioPoliticalBackgroundDeferredFullCacheHandle = null;
   let scenarioPoliticalBackgroundDeferredFullCacheState = null;
+  let carriedDeferredPathIndex = null;
   const suspiciousScenarioBackgroundMergeWarnings = new Set();
 
   function createScenarioPoliticalBackgroundCacheState(overrides = {}) {
@@ -160,6 +162,15 @@ export function createPoliticalBackgroundRenderOwner({
       && isScenarioPoliticalBackgroundDeferredFullCacheStateCurrent(pending)
       && pending.pathCacheSignature === getPoliticalPathCacheSignature(pending.transform)
       && pending.resolvedEntries.every(entry => entry.feature.geometry === entry.geometryRef)) return false;
+    if (force) carriedDeferredPathIndex = null;
+    else if (pending?.pathIndex.size) {
+      carriedDeferredPathIndex = {
+        index: pending.pathIndex,
+        scenarioId: pending.scenarioId,
+        sceneGeneration: pending.sceneGeneration,
+        projectionSignature: pending.projectionSignature,
+      };
+    }
     if (scenarioPoliticalBackgroundDeferredFullCacheHandle) {
       cancelDeferredWork(scenarioPoliticalBackgroundDeferredFullCacheHandle);
     }
@@ -700,8 +711,14 @@ export function createPoliticalBackgroundRenderOwner({
     // LRU. Chunk promotion changes membership/data generation, but paths with
     // the same projection signature and geometry ref remain usable. Only this
     // per-feature reuse crosses data generations; task/publication fences don't.
-    const retainedPathHandle = deferredState.stage === "paths"
+    const previousPathHandle = deferredState.stage === "paths"
       ? getRetainedPoliticalBackgroundPathHandle(transform, { allowDataGenerationReuse: true }) : null;
+    const carriedPathHandle = deferredState.stage === "paths" && deferredState.carriedPathIndex
+      ? createRetainedPoliticalPathLookup(deferredState.carriedPathIndex) : null;
+    const retainedPathHandle = previousPathHandle || carriedPathHandle ? {
+      getPath: (feature, id) => previousPathHandle?.getPath(feature, id)
+        || carriedPathHandle?.getPath(feature, id) || null,
+    } : null;
     const result = advanceDeferredPoliticalBackgroundBuild(deferredState, {
       transform, pathCacheHandle, retainedPathHandle, getFeatureId, isPoliticalFeaturePathEntryCurrent,
       getPoliticalFeaturePathEntry, addRetainedPoliticalPath,
@@ -806,6 +823,7 @@ export function createPoliticalBackgroundRenderOwner({
       activeScenarioId: String(getRuntimeState().activeScenarioId || ""),
     });
     scenarioPoliticalBackgroundDeferredFullCacheState = null;
+    carriedDeferredPathIndex = null;
     updatePoliticalBackgroundPathResourceAccounting();
     invalidateRenderPasses("political", "progressive-political-full-cache-ready");
     recordProgressivePoliticalFullCacheReadyDiagnostics(getRuntimeState(), {
@@ -847,12 +865,20 @@ export function createPoliticalBackgroundRenderOwner({
       return true;
     }
     cancelScenarioPoliticalBackgroundDeferredFullCache("reschedule");
+    const projectionSignature = getProjectionRenderSignature();
     scenarioPoliticalBackgroundDeferredFullCacheState = {
       ...createDeferredPoliticalBackgroundBuildState(
         identity, cloneZoomTransform(transform), normalizedEntries, nowMs(),
         String(reason || "progressive-recovery"),
       ),
+      projectionSignature,
+      carriedPathIndex: carriedDeferredPathIndex
+        && carriedDeferredPathIndex.scenarioId === identity.scenarioId
+        && carriedDeferredPathIndex.sceneGeneration === identity.sceneGeneration
+        && carriedDeferredPathIndex.projectionSignature === projectionSignature
+        ? carriedDeferredPathIndex.index : null,
     };
+    carriedDeferredPathIndex = null;
     updatePoliticalBackgroundPathResourceAccounting();
     scheduleNextDeferredFullCacheSlice();
     recordRenderPerfMetric("scenarioPoliticalBackgroundDeferredFullCacheScheduled", 0, {

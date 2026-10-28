@@ -107,7 +107,7 @@ function createFixture({
     isPoliticalFeaturePathEntryCurrent,
     getTransformSignature: (transform) => `transform:${transform.k}:${transform.x}:${transform.y}`,
     // Production path identity tracks projection/topology roots, not chunk membership.
-    getPoliticalPathCacheSignature: () => `path:${state.activeScenarioId}:${state.sceneGeneration}:${state.projectionRevision || 0}`,
+    getPoliticalPathCacheSignature: () => `path:${state.activeScenarioId}:${state.sceneGeneration}:${state.projectionRevision || 0}:${state.topologyRevision || 0}`,
     getVisibleFrameIdentity: () => ({
       scenarioId: state.activeScenarioId,
       sceneGeneration: state.sceneGeneration,
@@ -133,7 +133,7 @@ function createFixture({
     getAdmin0BackgroundFillColor: (code) => `color:${code}`,
     normalizeIntensityFieldsState: (value) => ({ ...value, normalized: true }),
     getRenderPassLayout: () => ({ pixelWidth: 800, pixelHeight: 400, dpr: 1 }),
-    getProjectionRenderSignature: () => "projection-a",
+    getProjectionRenderSignature: () => `projection-${state.projectionRevision || 0}`,
     getOceanBaseFillColor: () => "#001122",
   };
   const effects = {
@@ -896,6 +896,64 @@ test("deferred recolor releases discarded merged paths before another idle slice
   assert.equal(fixture.calls.includes("repaint"), false);
   fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("test-cleanup");
   assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0);
+});
+
+test("deferred signature rescheduling carries paths with matching geometry", () => {
+  for (const replaceGeometry of [false, true]) {
+    const fixture = createFixture({ progressiveLimit: 1 });
+    fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
+    fixture.state.topologyRevision = 0;
+    drawDeferredFeatures(fixture);
+    fixture.pending.shift().callback();
+    const firstBuildCount = fixture.calls.filter(call => call.startsWith("build:")).length;
+    assert.ok(firstBuildCount > 1 && firstBuildCount < 100);
+    if (replaceGeometry) fixture.state.landData.features[0].geometry = { type: "Polygon" };
+    fixture.state.topologyRevision += 1;
+    fixture.pending.shift().callback();
+    assert.equal(fixture.metrics.findLast(metric => (
+      metric.name === "scenarioPoliticalBackgroundDeferredFullCacheCancel"
+    )).reason, "path-signature-changed");
+    fixture.pathCache.clear();
+    drawDeferredFeatures(fixture);
+    completeDeferred(fixture);
+    const completed = fixture.metrics.findLast(metric => (
+      metric.name === "scenarioPoliticalBackgroundDeferredFullCacheComplete"
+    ));
+    assert.equal(fixture.calls.filter(call => call.startsWith("build:")).length, 100 + Number(replaceGeometry));
+    assert.equal(completed.reusedPreviousPathCount, firstBuildCount - Number(replaceGeometry));
+    assert.equal(fixture.calls.filter(call => call === "build:region-0").length, replaceGeometry ? 2 : 1);
+    assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
+  }
+});
+
+test("deferred detail cancellation carries paths only while the projection matches", () => {
+  for (const changeProjection of [false, true]) {
+    const fixture = createFixture({ progressiveLimit: 1 });
+    fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
+    fixture.state.topologyRevision = 0;
+    fixture.state.projectionRevision = 0;
+    drawDeferredFeatures(fixture);
+    fixture.pending.shift().callback();
+    const firstBuildCount = fixture.calls.filter(call => call.startsWith("build:")).length;
+    assert.ok(firstBuildCount > 1 && firstBuildCount < 100);
+    fixture.state.topologyRevision += 1;
+    if (changeProjection) fixture.state.projectionRevision += 1;
+    fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("deferred-detail-scoped-refresh");
+    assert.equal(fixture.metrics.findLast(metric => (
+      metric.name === "scenarioPoliticalBackgroundDeferredFullCacheCancel"
+    )).reason, "deferred-detail-scoped-refresh");
+    assert.equal(fixture.cancelled.at(-1), fixture.pending.shift());
+    fixture.pathCache.clear();
+    drawDeferredFeatures(fixture);
+    completeDeferred(fixture);
+    const completed = fixture.metrics.findLast(metric => (
+      metric.name === "scenarioPoliticalBackgroundDeferredFullCacheComplete"
+    ));
+    assert.equal(fixture.calls.filter(call => call.startsWith("build:")).length,
+      changeProjection ? firstBuildCount + 100 : 100);
+    assert.equal(completed.reusedPreviousPathCount, changeProjection ? 0 : firstBuildCount);
+    assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
+  }
 });
 
 test("current deferred work requests a fresh pass when its path signature changes", () => {

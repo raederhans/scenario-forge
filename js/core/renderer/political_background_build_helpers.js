@@ -243,6 +243,10 @@ export function getRetainedPoliticalPathHandle(cache, identity, pathCacheSignatu
     || (!allowDataGenerationReuse
       && cache.fullPassScenarioDataGeneration !== identity.scenarioDataGeneration)) return null;
   // Geometry identity is checked on each lookup, including duplicate IDs.
+  return createRetainedPoliticalPathLookup(index);
+}
+
+export function createRetainedPoliticalPathLookup(index) {
   return {
     getPath(feature, id) {
       if (!feature?.geometry || !id) return null;
