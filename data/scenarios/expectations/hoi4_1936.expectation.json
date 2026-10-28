@@ -23,10 +23,63 @@
       "tag": "ENG",
       "field": "lookup_iso2",
       "equals": "GB"
+    },
+    {
+      "tag": "ADN",
+      "field": "parent_owner_tag",
+      "equals": "RAJ"
+    },
+    {
+      "tag": "BRM",
+      "field": "parent_owner_tag",
+      "equals": "RAJ"
+    },
+    {
+      "tag": "SEY",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "MRD",
+      "field": "display_name_zh",
+      "equals": "莫尔多维亚自治共和国"
+    },
+    {
+      "tag": "UPV",
+      "field": "subject_kind",
+      "equals": "administrative_region"
+    },
+    {
+      "tag": "KOM",
+      "field": "subject_kind",
+      "equals": "autonomous_oblast"
+    },
+    {
+      "tag": "MRE",
+      "field": "subject_kind",
+      "equals": "autonomous_oblast"
+    },
+    {
+      "tag": "KBA",
+      "field": "subject_kind",
+      "equals": "autonomous_oblast"
+    },
+    {
+      "tag": "NOS",
+      "field": "subject_kind",
+      "equals": "autonomous_oblast"
+    },
+    {
+      "tag": "CHE",
+      "field": "subject_kind",
+      "equals": "autonomous_oblast"
     }
   ],
   "summary_equals": {
-    "blocker_count": 0
+    "blocker_count": 0,
+    "owner_count": 303,
+    "controller_count": 303,
+    "feature_count": 21066
   },
   "summary_min": {
     "feature_count": 10000,
@@ -41,5 +94,203 @@
     "vp_matched": 50,
     "states_anchored": 50,
     "resource_point_count": 50
-  }
+  },
+  "owner_set_assertions": [
+    {
+      "name": "aden_separate_administration",
+      "expected_owner_tag": "ADN",
+      "feature_ids": [
+        "YEM-3510"
+      ]
+    },
+    {
+      "name": "kwantung_luda_only",
+      "expected_owner_tag": "KWT",
+      "feature_ids": [
+        "CN_CITY_17275852B83272093468807"
+      ]
+    },
+    {
+      "name": "kwantung_outer_parcels_returned",
+      "expected_owner_tag": "MAN",
+      "feature_ids": [
+        "CN_CITY_17275852B49602881017994",
+        "CN_CITY_17275852B24476472807157",
+        "CN_CITY_17275852B66176667563352"
+      ]
+    },
+    {
+      "name": "qinglong_manchukuo",
+      "expected_owner_tag": "MAN",
+      "feature_ids": [
+        "CN_CITY_17275852B43165756519885"
+      ]
+    },
+    {
+      "name": "east_hebei_eastern_beijing_counties",
+      "expected_owner_tag": "EHC",
+      "feature_ids": [
+        "CN_CITY_17275852B72792517073116",
+        "CN_CITY_17275852B24643771294108",
+        "CN_CITY_17275852B7080321063595",
+        "CN_CITY_17275852B95574356023337",
+        "CN_CITY_17275852B72922623961147",
+        "CN_CITY_17275852B75890737929332",
+        "CN_CITY_17275852B60414806889849",
+        "CN_CITY_17275852B38375506939997"
+      ]
+    },
+    {
+      "name": "hainan_qinlian_yue",
+      "expected_owner_tag": "YUE",
+      "feature_ids": [
+        "CN_CITY_17275852B2295538790743",
+        "CN_CITY_17275852B86431238150342",
+        "CN_CITY_17275852B19868960828514",
+        "CN_CITY_17275852B30975390905787",
+        "CN_CITY_17275852B50490784073671",
+        "CN_CITY_17275852B71635948673445",
+        "CN_MRG_54a435d63591"
+      ]
+    },
+    {
+      "name": "yanan_city_not_yet_red",
+      "expected_owner_tag": "CHI",
+      "feature_ids": [
+        "CN_CITY_17275852B97849821920285"
+      ]
+    },
+    {
+      "name": "wayaobao_huachi_red_core",
+      "expected_owner_tag": "PRC",
+      "feature_ids": [
+        "CN_CITY_17275852B74624363636090",
+        "CN_CITY_17275852B7825306449652"
+      ]
+    },
+    {
+      "name": "northern_shaanxi_garrisons",
+      "expected_owner_tag": "CHI",
+      "feature_ids": [
+        "CN_CITY_17275852B71560826208449",
+        "CN_CITY_17275852B92543718728466"
+      ]
+    },
+    {
+      "name": "zhuozi_wuyuan_shanxi",
+      "expected_owner_tag": "SHX",
+      "feature_ids": [
+        "CN_CITY_17275852B56850756381420",
+        "CN_CITY_17275852B4230864536687"
+      ]
+    },
+    {
+      "name": "khotan_hotan_yecheng",
+      "expected_owner_tag": "KHM",
+      "feature_ids": [
+        "CN_CITY_17275852B89261337278661",
+        "CN_CITY_17275852B17844458275319"
+      ]
+    },
+    {
+      "name": "kashgar_returned_to_xinjiang",
+      "expected_owner_tag": "SIK",
+      "feature_ids": [
+        "CN_CITY_17275852B98393646664938",
+        "CN_CITY_17275852B85415819267910",
+        "CN_CITY_17275852B5317010680928",
+        "CN_CITY_17275852B99352197075157"
+      ]
+    },
+    {
+      "name": "hexi_ma_core",
+      "expected_owner_tag": "GMA",
+      "feature_ids": [
+        "CN_CITY_17275852B61353957265606",
+        "CN_CITY_17275852B7169802156044",
+        "CN_CITY_17275852B58588105655352"
+      ]
+    },
+    {
+      "name": "gansu_provincial_seats",
+      "expected_owner_tag": "GSG",
+      "feature_ids": [
+        "CN_CITY_17275852B84192730453130",
+        "CN_CITY_17275852B75830625621181"
+      ]
+    },
+    {
+      "name": "northeastern_garrisons",
+      "expected_owner_tag": "NEA",
+      "feature_ids": [
+        "CN_CITY_17275852B58292310857107",
+        "CN_CITY_17275852B99561505558549",
+        "CN_CITY_17275852B62674804488136"
+      ]
+    },
+    {
+      "name": "southern_ningxia_not_xsm",
+      "expected_owner_tag": "CHI",
+      "feature_ids": [
+        "CN_CITY_17275852B79652855638720",
+        "CN_CITY_17275852B3472329779353"
+      ]
+    },
+    {
+      "name": "red_fourth_army_western_sichuan",
+      "expected_owner_tag": "PRC",
+      "feature_ids": [
+        "CN_CITY_17275852B67382669517001",
+        "CN_CITY_17275852B17632126042959",
+        "CN_CITY_17275852B26108585816208"
+      ]
+    },
+    {
+      "name": "mongol_political_council",
+      "expected_owner_tag": "DMC",
+      "feature_ids": [
+        "CN_CITY_17275852B79222988236433"
+      ]
+    },
+    {
+      "name": "east_chahar_garrison",
+      "expected_owner_tag": "CDE",
+      "feature_ids": [
+        "CN_CITY_17275852B97242903030707",
+        "CN_CITY_17275852B76051276542746",
+        "CN_CITY_17275852B39600332445203",
+        "CN_CITY_17275852B74586174185496"
+      ]
+    },
+    {
+      "name": "deng_xihou_faction",
+      "expected_owner_tag": "CDX",
+      "feature_ids": [
+        "CN_CITY_17275852B39008212883754",
+        "CN_CITY_17275852B55258020624391",
+        "CN_CITY_17275852B91329777295844"
+      ]
+    },
+    {
+      "name": "sun_zhen_faction",
+      "expected_owner_tag": "CSZ",
+      "feature_ids": [
+        "CN_CITY_17275852B38426922086125",
+        "CN_CITY_17275852B9326266766926",
+        "CN_CITY_17275852B30341791442731",
+        "CN_CITY_17275852B91773014733924"
+      ]
+    },
+    {
+      "name": "yang_sen_faction",
+      "expected_owner_tag": "CYS",
+      "feature_ids": [
+        "CN_CITY_17275852B34390587465306",
+        "CN_CITY_17275852B8936190947302",
+        "CN_CITY_17275852B73469440437176",
+        "CN_CITY_17275852B92501194129581",
+        "CN_CITY_17275852B5895567339665"
+      ]
+    }
+  ]
 }

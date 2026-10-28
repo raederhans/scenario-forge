@@ -31,12 +31,12 @@
     {
       "tag": "CHI",
       "field": "feature_count",
-      "equals": 725
+      "equals": 1156
     },
     {
       "tag": "GXC",
       "field": "feature_count",
-      "equals": 59
+      "equals": 56
     },
     {
       "tag": "YUN",
@@ -46,7 +46,7 @@
     {
       "tag": "SHX",
       "field": "feature_count",
-      "equals": 42
+      "equals": 76
     },
     {
       "tag": "QMA",
@@ -71,14 +71,134 @@
     {
       "tag": "SIC",
       "field": "feature_count",
-      "equals": 28
+      "equals": 32
+    },
+    {
+      "tag": "ADN",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "BRM",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "SEY",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "MRD",
+      "field": "display_name_zh",
+      "equals": "莫尔多维亚自治共和国"
+    },
+    {
+      "tag": "UPV",
+      "field": "subject_kind",
+      "equals": "administrative_region"
+    },
+    {
+      "tag": "KOM",
+      "field": "subject_kind",
+      "equals": "autonomous_republic"
+    },
+    {
+      "tag": "MRE",
+      "field": "subject_kind",
+      "equals": "autonomous_republic"
+    },
+    {
+      "tag": "KBA",
+      "field": "subject_kind",
+      "equals": "autonomous_republic"
+    },
+    {
+      "tag": "NOS",
+      "field": "subject_kind",
+      "equals": "autonomous_republic"
+    },
+    {
+      "tag": "CHE",
+      "field": "subject_kind",
+      "equals": "autonomous_republic"
+    },
+    {
+      "tag": "JCJ",
+      "field": "parent_owner_tag",
+      "equals": "PRC"
+    },
+    {
+      "tag": "THG",
+      "field": "parent_owner_tag",
+      "equals": "PRC"
+    },
+    {
+      "tag": "JZH",
+      "field": "parent_owner_tag",
+      "equals": "PRC"
+    },
+    {
+      "tag": "JNA",
+      "field": "parent_owner_tag",
+      "equals": "PRC"
+    },
+    {
+      "tag": "LZG",
+      "field": "parent_owner_tag",
+      "equals": "PRC"
+    },
+    {
+      "tag": "JDG",
+      "field": "parent_owner_tag",
+      "equals": "PRC"
+    },
+    {
+      "tag": "BHA",
+      "field": "parent_owner_tag",
+      "equals": "PRC"
+    },
+    {
+      "tag": "YWS",
+      "field": "parent_owner_tag",
+      "equals": "PRC"
+    },
+    {
+      "tag": "MSN",
+      "field": "parent_owner_tag",
+      "equals": "PRC"
+    },
+    {
+      "tag": "WNA",
+      "field": "parent_owner_tag",
+      "equals": "PRC"
+    },
+    {
+      "tag": "KKP",
+      "field": "parent_owner_tag",
+      "equals": "UZB"
+    },
+    {
+      "tag": "CNZ",
+      "field": "parent_owner_tag",
+      "equals": "MEN"
+    },
+    {
+      "tag": "JBZ",
+      "field": "parent_owner_tag",
+      "equals": "MEN"
+    },
+    {
+      "tag": "MEN",
+      "field": "display_name_en",
+      "equals": "Mongolian United Autonomous Government"
     }
   ],
   "summary_equals": {
     "blocker_count": 0,
     "feature_count": 21066,
-    "owner_count": 225,
-    "controller_count": 225,
+    "owner_count": 305,
+    "controller_count": 305,
     "synthetic_owner_feature_count": 23,
     "owner_controller_split_feature_count": 0,
     "controller_rule_count": 0
@@ -99,8 +219,8 @@
   },
   "controller_set_assertions": [
     {
-      "name": "china_hebei_chahar_sample_controller_cnz",
-      "expected_controller_tag": "CNZ",
+      "name": "china_zhangbei_controller_men",
+      "expected_controller_tag": "MEN",
       "feature_ids": [
         "CN_CITY_17275852B74586174185496"
       ]
@@ -149,7 +269,8 @@
         "CZ_ADM2_57006924B5960993849333",
         "CZ_ADM2_57006924B26083217891381",
         "CZ_ADM2_57006924B73132069516203",
-        "CZ_ADM2_57006924B21154438881940"
+        "CZ_ADM2_57006924B21154438881940",
+        "CZ_ADM2_57006924B3568693077695"
       ]
     },
     {
@@ -167,7 +288,11 @@
         "SK_ADM2_56367889B15205076567490",
         "SK_ADM2_56367889B50490339994693",
         "SK_ADM2_56367889B65708067786299",
-        "SK_ADM2_56367889B96980961358907"
+        "SK_ADM2_56367889B96980961358907",
+        "SK_ADM2_56367889B16879144707830",
+        "SK_ADM2_56367889B46930466225258",
+        "SK_ADM2_56367889B7741755639355",
+        "SK_ADM2_56367889B57985107422825"
       ]
     },
     {
@@ -195,7 +320,8 @@
         "CZ_ADM2_57006924B26083217891381",
         "CZ_ADM2_57006924B73132069516203",
         "CZ_ADM2_57006924B21154438881940",
-        "CZ_ADM2_57006924B63031935780571"
+        "CZ_ADM2_57006924B63031935780571",
+        "CZ_ADM2_57006924B3568693077695"
       ]
     },
     {
@@ -223,7 +349,11 @@
         "SK_ADM2_56367889B15205076567490",
         "SK_ADM2_56367889B50490339994693",
         "SK_ADM2_56367889B65708067786299",
-        "SK_ADM2_56367889B96980961358907"
+        "SK_ADM2_56367889B96980961358907",
+        "SK_ADM2_56367889B16879144707830",
+        "SK_ADM2_56367889B46930466225258",
+        "SK_ADM2_56367889B7741755639355",
+        "SK_ADM2_56367889B57985107422825"
       ]
     },
     {
@@ -321,7 +451,7 @@
       "name": "china_wuhan_owner_jcc",
       "expected_owner_tag": "JCC",
       "feature_ids": [
-        "CN_CITY_17275852B42041968712265"
+        "CN_CITY_17275852B52250123531455"
       ]
     },
     {
@@ -343,6 +473,181 @@
       "expected_owner_tag": "FRO",
       "feature_ids": [
         "FO"
+      ]
+    },
+    {
+      "name": "aden_separate_administration",
+      "expected_owner_tag": "ADN",
+      "feature_ids": [
+        "YEM-3510"
+      ]
+    },
+    {
+      "name": "kwantung_luda_only",
+      "expected_owner_tag": "KWT",
+      "feature_ids": [
+        "CN_CITY_17275852B83272093468807"
+      ]
+    },
+    {
+      "name": "kwantung_outer_parcels_returned",
+      "expected_owner_tag": "MAN",
+      "feature_ids": [
+        "CN_CITY_17275852B49602881017994",
+        "CN_CITY_17275852B24476472807157",
+        "CN_CITY_17275852B66176667563352"
+      ]
+    },
+    {
+      "name": "qinglong_manchukuo",
+      "expected_owner_tag": "MAN",
+      "feature_ids": [
+        "CN_CITY_17275852B43165756519885"
+      ]
+    },
+    {
+      "name": "linfen_occupied_post",
+      "expected_owner_tag": "NCP",
+      "feature_ids": [
+        "CN_CITY_17275852B91447424097989"
+      ]
+    },
+    {
+      "name": "nonoccupied_chinese_cities",
+      "expected_owner_tag": "CHI",
+      "feature_ids": [
+        "CN_CITY_17275852B36456254412660",
+        "CN_CITY_17275852B15408627611583",
+        "CN_CITY_17275852B10675763964956",
+        "CN_CITY_17275852B58586989106809",
+        "CN_CITY_17275852B69068872724558",
+        "CN_CITY_17275852B28001364673929",
+        "CN_CITY_17275852B14866353147502",
+        "CN_CITY_17275852B68183819260445",
+        "CN_CITY_17275852B17052950603257",
+        "CN_CITY_17275852B42882991072386",
+        "CN_MRG_5af65ef24d47"
+      ]
+    },
+    {
+      "name": "central_china_northwest_posts",
+      "expected_owner_tag": "JCC",
+      "feature_ids": [
+        "CN_CITY_17275852B59929886266985",
+        "CN_CITY_17275852B50043505500678",
+        "CN_CITY_17275852B83812560805647"
+      ]
+    },
+    {
+      "name": "south_china_year_end_posts",
+      "expected_owner_tag": "JSC",
+      "feature_ids": [
+        "CN_CITY_17275852B92305935351425",
+        "CN_CITY_17275852B31711539663260",
+        "CN_CITY_17275852B58186217435722",
+        "CN_CITY_17275852B75995678778305",
+        "CN_CITY_17275852B34195804181253",
+        "CN_CITY_17275852B50490784073671",
+        "CN_CITY_17275852B71635948673445"
+      ]
+    },
+    {
+      "name": "mengjiang_merged_administration",
+      "expected_owner_tag": "MEN",
+      "feature_ids": [
+        "CN_CITY_17275852B56850756381420",
+        "CN_CITY_17275852B74586174185496"
+      ]
+    },
+    {
+      "name": "mingshan_sichuan",
+      "expected_owner_tag": "CHI",
+      "feature_ids": [
+        "CN_CITY_17275852B99222209572409"
+      ]
+    },
+    {
+      "name": "ning_counties_xikang",
+      "expected_owner_tag": "SIC",
+      "feature_ids": [
+        "CN_CITY_17275852B18343080596072",
+        "CN_CITY_17275852B78456779133513",
+        "CN_CITY_17275852B90257281612339",
+        "CN_CITY_17275852B77966044233531",
+        "CN_CITY_17275852B22487922789088"
+      ]
+    },
+    {
+      "name": "jcj_debug_proxy",
+      "expected_owner_tag": "JCJ",
+      "feature_ids": [
+        "CN_CITY_17275852B46736465172107",
+        "CN_CITY_17275852B69993211466305"
+      ]
+    },
+    {
+      "name": "thg_debug_proxy",
+      "expected_owner_tag": "THG",
+      "feature_ids": [
+        "CN_MRG_093183003948"
+      ]
+    },
+    {
+      "name": "jzh_debug_proxy",
+      "expected_owner_tag": "JZH",
+      "feature_ids": [
+        "CN_CITY_17275852B86070890642714",
+        "CN_CITY_17275852B52385226353354"
+      ]
+    },
+    {
+      "name": "jna_debug_proxy",
+      "expected_owner_tag": "JNA",
+      "feature_ids": [
+        "CN_MRG_51c0b9bbbb0a"
+      ]
+    },
+    {
+      "name": "lzg_debug_proxy",
+      "expected_owner_tag": "LZG",
+      "feature_ids": [
+        "CN_CITY_17275852B77679479199341"
+      ]
+    },
+    {
+      "name": "jdg_debug_proxy",
+      "expected_owner_tag": "JDG",
+      "feature_ids": [
+        "CN_CITY_17275852B99355884213700"
+      ]
+    },
+    {
+      "name": "bha_debug_proxy",
+      "expected_owner_tag": "BHA",
+      "feature_ids": [
+        "CN_CITY_17275852B41312334217118"
+      ]
+    },
+    {
+      "name": "yws_debug_proxy",
+      "expected_owner_tag": "YWS",
+      "feature_ids": [
+        "CN_CITY_17275852B89166552502762"
+      ]
+    },
+    {
+      "name": "msn_debug_proxy",
+      "expected_owner_tag": "MSN",
+      "feature_ids": [
+        "CN_CITY_17275852B59245154361238",
+        "CN_CITY_17275852B11407259911678"
+      ]
+    },
+    {
+      "name": "wna_debug_proxy",
+      "expected_owner_tag": "WNA",
+      "feature_ids": [
+        "CN_CITY_17275852B59735937562693"
       ]
     }
   ]
