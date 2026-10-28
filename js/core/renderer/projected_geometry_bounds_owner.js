@@ -260,7 +260,9 @@ export function createProjectedGeometryBoundsOwner({
       // d3.geoArea adds polygon areas, so a collection's area is the sum of its
       // features' cached areas: a mask rebuilt from already-seen features (or
       // normalized features that recorded their area) needs no second walk.
-      const area = Number(sumFeatureCollectionArea(normalizedGeoObject) ?? d3.geoArea(normalizedGeoObject));
+      const area = geoObject.type === "Feature" && Number.isFinite(geoObject.sphericalArea)
+        ? geoObject.sphericalArea
+        : Number(sumFeatureCollectionArea(normalizedGeoObject) ?? d3.geoArea(normalizedGeoObject));
       const diagnostics = buildSphericalGeometryDiagnostics(normalizedGeoObject, area, d3);
       sphericalGeometryDiagnosticsByGeometry.set(geometry, diagnostics);
       return diagnostics;

@@ -137,6 +137,30 @@ function createD3Diagnostics() {
   };
 }
 
+test("feature areas preserve spherical diagnostics and collection sums without geoArea calls", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner } = createHarness({ d3: diagnostics.d3 });
+  const baseline = createHarness({ d3: diagnostics.d3 }).owner;
+  const features = [10, 500, 999].map((lon) => createFeature(String(lon), createPolygon([lon, 0])));
+  const expected = features.map((feature) => baseline.getSphericalGeometryDiagnostics(feature));
+  const before = diagnostics.calls.geoArea;
+  features.forEach((feature, index) => {
+    feature.sphericalArea = expected[index].area;
+    const actual = owner.getSphericalGeometryDiagnostics(feature);
+    assert.deepEqual(actual, expected[index]);
+    assert.equal(owner.getSphericalGeometryDiagnostics({ ...feature, sphericalArea: 100 }), actual);
+  });
+  assert.equal(diagnostics.calls.geoArea, before);
+  const collection = { type: "FeatureCollection", features };
+  const freshOwner = createHarness({ d3: diagnostics.d3 }).owner;
+  assert.equal(freshOwner.getSphericalGeometryDiagnostics(collection).area, expected.reduce((sum, item) => sum + item.area, 0));
+  assert.equal(diagnostics.calls.geoArea, before);
+  for (const sphericalArea of [undefined, NaN, Infinity]) {
+    assert.equal(owner.getSphericalGeometryDiagnostics({ ...createFeature("fallback", createPolygon([10, 0])), sphericalArea }).area, 1);
+  }
+  assert.equal(diagnostics.calls.geoArea, before + 3);
+});
+
 test("seeded spherical diagnostics match computed diagnostics without another area calculation", () => {
   for (const asFeature of [false, true]) {
     const diagnostics = createD3Diagnostics();

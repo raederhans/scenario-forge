@@ -270,7 +270,7 @@ export function createPoliticalCollectionOwner({
 
     let area = null;
     try {
-      area = globalThis.d3.geoArea(feature);
+      area = Number.isFinite(feature.sphericalArea) ? feature.sphericalArea : globalThis.d3.geoArea(feature);
     } catch (_error) {
       // Do not cache: geoArea may succeed after d3 is initialised correctly.
       return feature;

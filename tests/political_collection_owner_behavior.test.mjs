@@ -5,6 +5,30 @@ import vm from "node:vm";
 
 import { createPoliticalCollectionOwner } from "../js/core/renderer/political_collection_owner.js";
 
+test("normalizeFeatureGeometry reuses a finite feature area and records it without calling geoArea", (t) => {
+  const previousD3 = globalThis.d3;
+  let calls = 0;
+  globalThis.d3 = { geoArea: () => { calls += 1; return 0.5; } };
+  t.after(() => {
+    if (previousD3 === undefined) delete globalThis.d3;
+    else globalThis.d3 = previousD3;
+  });
+  const records = [];
+  const owner = createPoliticalCollectionOwner({ state: {}, helpers: {
+    recordSphericalArea: (geometry, area) => records.push({ geometry, area }),
+  } });
+  for (const area of [0, 0.25, Math.PI * 2, undefined, NaN, Infinity]) {
+    const feature = { type: "Feature", geometry: { type: "Polygon", coordinates: [] } };
+    if (area !== undefined) feature.sphericalArea = area;
+    const before = calls;
+    assert.equal(owner.normalizeFeatureGeometry(feature), feature);
+    assert.equal(calls - before, Number.isFinite(area) ? 0 : 1);
+    assert.deepEqual(records.at(-1), { geometry: feature.geometry, area: Number.isFinite(area) ? area : 0.5 });
+    assert.equal(owner.normalizeFeatureGeometry(feature), feature);
+    assert.equal(calls - before, Number.isFinite(area) ? 0 : 1);
+  }
+});
+
 for (const rewind of [false, true]) {
   test(`normalizeFeatureGeometry records area once for ${rewind ? "rewound" : "unchanged"} geometry`, (t) => {
     const sandbox = {};
