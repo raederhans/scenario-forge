@@ -216,11 +216,6 @@
       "role": "transport_workbench_carrier",
       "family_id": "japan_corridor"
     },
-    "bathymetry:global_topology": {
-      "url": "data/global_bathymetry.topo.json",
-      "role": "bathymetry_topology",
-      "family_id": "global"
-    },
     "bathymetry:global_texture": {
       "url": "data/bathymetry/global/manifest.json",
       "role": "bathymetry_texture_manifest",

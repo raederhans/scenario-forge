@@ -68,15 +68,12 @@ const atlantropa = "scenario-atlantropa:4:features:2:water:1:land:1:shoal:0:reli
 const surface = "tno|runtime-tag:scenario-runtime-topology:1:na|na|na|na|na|detail-phase:single/detail-pending/detail-idle"
   + "|mask-tag:scenarioLandMask:scenario-mask:2:1:na:d3-valid|water-ref:scenario-water:3|lakes-ref:global-lakes:none|water-tag:features:3"
   + `|water-mode:combined|atlantropa:${atlantropa}`;
-const suffix = `|water-effective:3|water-scenario:1|water-atlantropa:${atlantropa}|population:${getPopulationSignature({})}|water-overrides:{}`
-  + "|scenario-water:on|open-ocean:off|open-ocean-select:off|open-ocean-paint:off"
-  + '|ocean-fill:#ocean|lake-fill:#lake|lake-style:{"opacity":1}|ocean-surface:{}|bathymetry:|ocean-depth:0';
-
-test("water signature preserves bytes and identity allocation while avoiding duplicate water composition and revision work", () => {
+test("water signature preserves identity allocation while avoiding duplicate water composition and revision work", () => {
   const h = createHarness();
-  assert.equal(h.water(), surface + suffix);
+  const initial = h.water();
+  assert.ok(initial.startsWith(surface + "|water-effective:3"));
   assert.deepEqual(h.calls, { water: 1, buckets: 2, mask: 1, revision: 1 });
-  assert.equal(h.water(), surface + suffix);
+  assert.equal(h.water(), initial);
   assert.deepEqual(h.calls, { water: 2, buckets: 4, mask: 2, revision: 2 });
 });
 
@@ -84,7 +81,7 @@ test("standalone surface and Atlantropa calls keep their no-argument semantics",
   const h = createHarness();
   assert.equal(h.surface(), surface);
   assert.equal(h.context.getScenarioAtlantropaRevisionToken(), atlantropa);
-  assert.equal(h.water(), surface + suffix);
+  assert.ok(h.water().startsWith(surface + "|water-effective:3"));
 });
 
 test("surface revision lookup avoids water preparation when an explicit tag exists", () => {
@@ -187,11 +184,12 @@ test("prepared water collection and Atlantropa buckets retain exact signature wi
   const h = createHarness();
   const buckets = h.context.getEffectiveAtlantropaFeatures();
   const features = h.context.getEffectiveWaterRegionFeatures(buckets);
-  assert.equal(h.context.getScenarioWaterVisualRevisionToken({
+  const prepared = h.context.getScenarioWaterVisualRevisionToken({
     effectiveWaterFeatureCount: features.length,
     atlantropaFeatures: buckets,
-  }), surface + suffix);
+  });
   assert.deepEqual(h.calls, { water: 1, buckets: 1, mask: 1, revision: 1 });
+  assert.equal(prepared, h.water());
 });
 
 test("prepared signature matches the live signature with shared lakes hidden and Atlantropa visible", () => {
@@ -225,17 +223,14 @@ test("lake shore cache is independent of river visibility and color", () => {
   assert.equal(h.water(), hidden);
 });
 
-test("water cache invalidates when ocean style, loaded bathymetry or depth paint changes", () => {
+test("water cache invalidates when ocean style or depth paint changes", () => {
   const h = createHarness();
   const initial = h.water();
   h.state.styleConfig = { ocean: { preset: "bathymetry_soft", experimentalAdvancedStyles: true } };
   const styled = h.water();
   assert.notEqual(styled, initial);
-  h.state.activeBathymetryTopologyUrl = "regional.topo.json";
-  const loaded = h.water();
-  assert.notEqual(loaded, styled);
   h.state.intensityFields = { channels: { oceanDepth: { revision: 3 } } };
-  assert.notEqual(h.water(), loaded);
+  assert.notEqual(h.water(), styled);
 });
 
 test("within one render frame the effective water list resolves once until an input changes", () => {

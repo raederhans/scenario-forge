@@ -1,73 +1,13 @@
-export function createRendererAssetUrlPolicyOwner({
-  state,
-  constants = {},
-} = {}) {
-  const {
-    globalBathymetryTopologyUrl = "",
-  } = constants;
-
-  const invalidBathymetryUrlWarnings = new Set();
-
-  function warnInvalidBathymetryUrlOnce(label, rawValue) {
-    const key = `${label}:${String(rawValue || "")}`;
-    if (invalidBathymetryUrlWarnings.has(key)) {
-      return;
-    }
-    invalidBathymetryUrlWarnings.add(key);
-    console.warn(`[bathymetry] Ignored invalid ${label} URL: ${String(rawValue || "").trim()}`);
-  }
-
-  function normalizeBathymetryTopologyUrl(rawValue, label = "bathymetry") {
-    const value = String(rawValue || "").trim();
+export function createRendererAssetUrlPolicyOwner({ state } = {}) {
+  function getScenarioBathymetryTextureUrl() {
+    const value = String(state.activeScenarioManifest?.bathymetry_texture_url || "").trim();
     if (!value) return "";
     if (/^[a-zA-Z][a-zA-Z\d+.-]*:/.test(value) || value.startsWith("//") || value.startsWith("/")) {
-      warnInvalidBathymetryUrlOnce(label, value);
       return "";
     }
-    if (!value.startsWith("data/")) {
-      warnInvalidBathymetryUrlOnce(label, value);
-      return "";
-    }
+    if (!value.startsWith("data/")) return "";
     return value;
   }
 
-  function getScenarioBathymetryTopologyUrl() {
-    return normalizeBathymetryTopologyUrl(
-      state.activeScenarioManifest?.bathymetry_topology_url,
-      "scenario bathymetry"
-    );
-  }
-
-  function getScenarioBathymetryTextureUrl() {
-    return normalizeBathymetryTopologyUrl(
-      state.activeScenarioManifest?.bathymetry_texture_url,
-      "scenario bathymetry texture"
-    );
-  }
-
-  function getDesiredBathymetryTopologyUrl(slot) {
-    if (slot === "scenario") {
-      return getScenarioBathymetryTopologyUrl();
-    }
-    return normalizeBathymetryTopologyUrl(globalBathymetryTopologyUrl, "global bathymetry");
-  }
-
-  function isDesiredBathymetryUrl(slot, url) {
-    return getDesiredBathymetryTopologyUrl(slot) === String(url || "").trim();
-  }
-
-  function getRequestedBathymetryUrls() {
-    return {
-      globalUrl: getDesiredBathymetryTopologyUrl("global"),
-      scenarioUrl: getDesiredBathymetryTopologyUrl("scenario"),
-    };
-  }
-
-  return {
-    getDesiredBathymetryTopologyUrl,
-    getRequestedBathymetryUrls,
-    getScenarioBathymetryTopologyUrl,
-    getScenarioBathymetryTextureUrl,
-    isDesiredBathymetryUrl,
-  };
+  return { getScenarioBathymetryTextureUrl };
 }

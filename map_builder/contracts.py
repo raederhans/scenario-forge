@@ -709,7 +709,6 @@ SCENARIO_CHECKPOINT_POLITICAL_FILENAME = "scenario_political.geojson"
 SCENARIO_CHECKPOINT_WATER_SEED_FILENAME = "scenario_water_seed.geojson"
 SCENARIO_CHECKPOINT_WATER_FILENAME = "water_regions.geojson"
 SCENARIO_CHECKPOINT_RELIEF_FILENAME = "relief_overlays.geojson"
-SCENARIO_CHECKPOINT_BATHYMETRY_FILENAME = "bathymetry.topo.json"
 SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME = "runtime_topology.bootstrap.topo.json"
 SCENARIO_CHECKPOINT_ATLANTROPA_TOPOLOGY_FILENAME = "scenario_atlantropa.topo.json"
 SCENARIO_CHECKPOINT_ATLANTROPA_METADATA_FILENAME = "scenario_atlantropa_metadata.json"
@@ -759,7 +758,6 @@ SCENARIO_WATER_STAGE_ARTIFACTS: tuple[ScenarioCheckpointArtifact, ...] = (
     ScenarioCheckpointArtifact("water_stage_metadata", SCENARIO_CHECKPOINT_WATER_STAGE_METADATA_FILENAME),
     ScenarioCheckpointArtifact("water_gdf", SCENARIO_CHECKPOINT_WATER_SEED_FILENAME, payload_kind="gdf"),
     ScenarioCheckpointArtifact("relief_overlays_payload", SCENARIO_CHECKPOINT_RELIEF_FILENAME),
-    ScenarioCheckpointArtifact("bathymetry_payload", SCENARIO_CHECKPOINT_BATHYMETRY_FILENAME),
     ScenarioCheckpointArtifact("named_water_snapshot_payload", SCENARIO_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME),
     ScenarioCheckpointArtifact("water_regions_provenance_payload", SCENARIO_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME),
     ScenarioCheckpointArtifact("land_mask_gdf", SCENARIO_CHECKPOINT_LAND_MASK_FILENAME, payload_kind="gdf"),
@@ -829,7 +827,6 @@ SCENARIO_PUBLISH_FILENAMES_BY_SCOPE = {
         SCENARIO_STRATEGIC_VALUES_FILENAME,
         SCENARIO_CHECKPOINT_WATER_FILENAME,
         SCENARIO_CHECKPOINT_RELIEF_FILENAME,
-        SCENARIO_CHECKPOINT_BATHYMETRY_FILENAME,
         SCENARIO_CHECKPOINT_NAMED_WATER_SNAPSHOT_FILENAME,
         SCENARIO_CHECKPOINT_WATER_REGIONS_PROVENANCE_FILENAME,
         SCENARIO_CHECKPOINT_ATLANTROPA_TOPOLOGY_FILENAME,

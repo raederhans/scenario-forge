@@ -66,7 +66,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
   page.on('response', (res) => {
     const url = res.url();
     if (isBathymetryRequest(url)) {
-      bathymetryResponses.push({ url, status: res.status() });
+      bathymetryResponses.push({ url, status: res.status(), requestStartedAt: res.request().timing().startTime });
     }
     if (res.status() >= 400) {
       networkFailures.push({ url, status: res.status() });
@@ -168,7 +168,20 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
     expect(geoLocaleRuntime.hasScenarioGeoLocalePatch).toBeTruthy();
     expect(geoLocaleRuntime.geoLocaleEntryCount).toBeGreaterThan(0);
     expect(geoLocalePatchRequests.some((url) => url.includes('/geo_locale_patch.zh.json'))).toBeFalsy();
-    expect(bathymetryRequests).toEqual([]);
+    expect(bathymetryRequests.filter((url) =>
+      url.includes('/data/global_bathymetry.topo.json')
+      || url.includes('/data/scenarios/tno_1962/bathymetry.topo.json'))).toEqual([]);
+    const firstVisibleAt = await page.evaluate(async () => {
+      const { state } = await import('/js/core/state.js');
+      const recordedAt = state.renderPerfMetrics?.firstVisibleFramePainted?.recordedAt;
+      // recordedAt is already wall-clock milliseconds, like Playwright's request startTime.
+      return Number.isFinite(recordedAt) ? recordedAt : null;
+    });
+    if (firstVisibleAt !== null) {
+      for (const response of bathymetryResponses) {
+        expect(response.requestStartedAt, response.url).toBeGreaterThanOrEqual(firstVisibleAt);
+      }
+    }
 
     await page.evaluate(async () => {
       const { state } = await import('/js/core/state.js');

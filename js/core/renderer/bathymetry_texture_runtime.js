@@ -103,17 +103,49 @@ export function createBathymetryTextureRuntime({
     status = 'off';
   }
 
+  const isStyleActive = (oceanStyle, preset = oceanStyle.preset) =>
+    !disposed && oceanStyle.experimentalAdvancedStyles && preset !== 'flat' && oceanStyle.opacity > 0;
+
+  function syncProjectionParams() {
+    const generation = getProjectionGeneration();
+    if (projectionParams === undefined || generation !== projectionGeneration) {
+      projectionParams = createProjectionInverseParams(getProjection());
+      projectionGeneration = generation;
+    }
+    return projectionParams;
+  }
+
+  // Detail tiles for a target surface, or null when the overview should be used.
+  function resolveDetailTileKeys(width, height, transform) {
+    // The 5-arcminute overview holds 12 texels per degree; tiles pay off once it is magnified.
+    if (!(transform.a * getProjection().scale() * Math.PI / 180 > 18)) return null;
+    const { a, b, c, d, e, f } = transform, det = a * d - b * c;
+    const bounds = estimateGeographicBounds(width, height, (x, y) =>
+      invertProjectedPoint(projectionParams, (d * (x - e) - c * (y - f)) / det, (a * (y - f) - b * (x - e)) / det));
+    if (!bounds) return null;
+    const keys = global.value.getTileKeysForBounds(bounds);
+    // A view needing more tiles than the cache holds would evict visible tiles and refetch forever.
+    return keys.length <= global.value.getCapacity() ? keys : null;
+  }
+
+  // Loads what a draw at this surface would need, so exports never fall back to the overview.
+  async function prepareForSurface({ width, height, transform, oceanStyle }) {
+    if (!isStyleActive(oceanStyle) || !syncProjectionParams()) return;
+    await ensure();
+    if (disposed || !global.value) return;
+    const keys = resolveDetailTileKeys(width, height, transform);
+    if (!keys?.length) return;
+    const source = global.value, revision = source.getRevision();
+    await source.requestTiles(keys);
+    if (!disposed && source.getRevision() !== revision) onAssetsChanged('bathymetry-tile');
+  }
+
   function draw(context, { oceanStyle, baseRgb, preset = oceanStyle.preset, isExport = false }) {
-    if (disposed || !oceanStyle.experimentalAdvancedStyles || preset === 'flat' || oceanStyle.opacity <= 0) {
+    if (!isStyleActive(oceanStyle, preset)) {
       status = 'off';
       return getState();
     }
-    const projection = getProjection(), generation = getProjectionGeneration();
-    if (projectionParams === undefined || generation !== projectionGeneration) {
-      projectionParams = createProjectionInverseParams(projection);
-      projectionGeneration = generation;
-    }
-    if (!projectionParams) {
+    if (!syncProjectionParams()) {
       status = 'unsupported-projection';
       return getState();
     }
@@ -126,15 +158,7 @@ export function createBathymetryTextureRuntime({
     }
     renderer ||= createRenderer({ createCanvas });
     const transform = context.getTransform();
-    // The 5-arcminute overview holds 12 texels per degree; tiles pay off once it is magnified.
-    let detail = transform.a * projection.scale() * Math.PI / 180 > 18;
-    if (detail) {
-      // A view needing more tiles than the cache holds would evict visible tiles and refetch forever.
-      const { a, b, c, d, e, f } = transform, det = a * d - b * c;
-      const bounds = estimateGeographicBounds(context.canvas.width, context.canvas.height, (x, y) =>
-        invertProjectedPoint(projectionParams, (d * (x - e) - c * (y - f)) / det, (a * (y - f) - b * (x - e)) / det));
-      detail = !!bounds && global.value.getTileKeysForBounds(bounds).length <= global.value.getCapacity();
-    }
+    const detail = !!resolveDetailTileKeys(context.canvas.width, context.canvas.height, transform);
     const output = renderer.render({
       width: context.canvas.width, height: context.canvas.height, transform,
       projectionParams, source: global.value, ramp, preset, detail,
@@ -171,5 +195,6 @@ export function createBathymetryTextureRuntime({
     status = 'off';
   }
 
-  return { ensure, draw, setScenarioOverlayUrl, getState, dispose, hasPendingDetail: () => detailPending };
+  return { ensure, draw, prepareForSurface, setScenarioOverlayUrl, getState, dispose,
+    hasPendingDetail: () => detailPending };
 }

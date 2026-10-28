@@ -1318,7 +1318,7 @@ class ScenarioContractTest(unittest.TestCase):
             self.assertIn("special_regions.geojson", input_sha)
             self.assertIn("special_zone_layers.json", input_sha)
             self.assertIn("relief_overlays.geojson", input_sha)
-            self.assertIn("bathymetry.topo.json", input_sha)
+            self.assertNotIn("bathymetry.topo.json", input_sha)
             self.assertIn("bathymetry_texture/manifest.json", input_sha)
             self.assertIn("city_overrides.json", input_sha)
             self.assertIn("capital_hints.json", input_sha)

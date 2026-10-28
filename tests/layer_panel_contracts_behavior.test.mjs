@@ -209,7 +209,7 @@ test("diagnostics continue to expose clean summaries through contract-backed def
   listBaseLayerPanelContracts().forEach((contract) => {
     assert.equal(diagnosticsById.has(contract.id), true, `${contract.id} diagnostic missing`);
   });
-  assert.equal(diagnosticsById.get("bathymetry").summary, "Off");
+  assert.equal(diagnosticsById.get("bathymetry").summary, "Bathymetry data pending for selected style");
   assert.equal(diagnosticsById.get("transport").summary, "No overview family selected");
   assert.equal(diagnosticsById.get("transport-mineral_resources").summary, WORKBENCH_ONLY_REASON);
 

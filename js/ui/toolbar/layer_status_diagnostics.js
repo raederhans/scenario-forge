@@ -304,7 +304,7 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
       || translateUi(translate, "Off");
     severity = STATUS_SEVERITY.MUTED;
   } else if (preset === "flat") {
-    summary = translateUi(translate, "Experimental Bathymetry enabled · flat style selected");
+    summary = translateUi(translate, "Bathymetry enabled · flat style selected");
     severity = STATUS_SEVERITY.MUTED;
   } else if (visibility.status === "hidden") {
     summary = translateUi(translate, "Bathymetry opacity is zero");

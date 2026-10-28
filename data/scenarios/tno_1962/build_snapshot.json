@@ -7,7 +7,6 @@
   "feature_count": 9949,
   "generated_at": "2026-05-31T23:17:04Z",
   "input_sha": {
-    "bathymetry.topo.json": "541f1686bc7ace0ff303fb733d73d825d08212df97b2ef41b5fb06fa7cb872b0",
     "bathymetry_texture/manifest.json": "437f6c74231367468f58bf3cfeddefb03b5926643d563c55e08459cb185db701",
     "city_overrides.json": "76897e1f8191205076629caca73840030ee9165dfb2f5ed2450f5ea75e528312",
     "cores.by_feature.json": "d120055a2154230802826b8f12bdbcf2a952de69495bd1c68373dd8f2edf2b54",
@@ -34,14 +33,14 @@
     "runtime_topology.bootstrap.topo.json": "338d98c608bd7bed9ecfc46441d5d051734d8926dfc5b4c8851166f120a31902",
     "scenario_atlantropa.topo.json": "e817246e3cf343e2ae8c0c81e79b3bf3b4ae87b3c0135433160258b930bf77a1",
     "scenario_atlantropa_metadata.json": "d55d477590f7a10248c6f0f6ef6dd40d95d79b2b31ae3e457709ae7c2ea893a0",
-    "startup.bundle.en.json": "be47d0c3e43f74bf4897d5aefd6ad750098875b659fe6c363738cdfde1aeb784",
-    "startup.bundle.en.json.gz": "a006d9244cac0b1dc6e0e241c6612d36332e8336b5ed3a7b0ec3dea4120c82f2",
-    "startup.bundle.zh.json": "fde2afe08c930b592f4fd520719fad5a05747bac1035c4abb06c834217055a5c",
-    "startup.bundle.zh.json.gz": "8cda67ea5ba8af52080ad1f92d7dbb93a3f96db1924652fbcf517bf865257aff"
+    "startup.bundle.en.json": "5f735787339585e9d9e7878f9677f89ad9c35afcce4a5e6b73e4254d2a5e73af",
+    "startup.bundle.en.json.gz": "3e90d42b86d2e346bb6ed504275e972e863af4ffb3203910f530034479bb358f",
+    "startup.bundle.zh.json": "9a389e6aa808f52a97da7d92d5fd9181419c5b4de776f52903cbb038491dc077",
+    "startup.bundle.zh.json.gz": "1b491b5976f10d4d5aa11f61f62a78d3729cdadec2bad805cb95ac2327899db7"
   },
   "profile": "tno_full",
   "report_paths": {},
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "57b7f0ebb7b2230a12a4fe8466a06eb5b1506976fc80b5d81d62a2fd0c7253db",
+  "snapshot_fingerprint": "71bce3f7f0215d0bc796a3383fa60012202dd24e94e505c836274009b96a0ff9",
   "water_count": 285
 }

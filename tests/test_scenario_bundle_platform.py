@@ -161,7 +161,6 @@ class ScenarioBundlePlatformTest(unittest.TestCase):
             _write_json(checkpoint_dir / "owners.by_feature.json", {"owners": {"F-1": "AAA"}})
             _write_json(checkpoint_dir / "controllers.by_feature.json", {"controllers": {"F-1": "AAA"}})
             _write_json(checkpoint_dir / "cores.by_feature.json", {"cores": {"F-1": ["AAA"]}})
-            _write_json(checkpoint_dir / "bathymetry.topo.json", {"type": "Topology"})
 
             scenario_bundle_platform.publish_checkpoint_bundle(
                 scenario_dir,
@@ -210,7 +209,6 @@ class ScenarioBundlePlatformTest(unittest.TestCase):
             )
             _write_json(checkpoint_dir / "water_regions.geojson", {"type": "FeatureCollection", "features": []})
             _write_json(checkpoint_dir / "relief_overlays.geojson", {"type": "FeatureCollection", "features": []})
-            _write_json(checkpoint_dir / "bathymetry.topo.json", {"type": "Topology"})
             _write_json(checkpoint_dir / "scenario_atlantropa.topo.json", {"type": "Topology"})
             _write_json(checkpoint_dir / "scenario_atlantropa_metadata.json", {"feature_count": 0})
             _write_json(checkpoint_dir / "runtime_topology.bootstrap.topo.json", {"type": "Topology"})
