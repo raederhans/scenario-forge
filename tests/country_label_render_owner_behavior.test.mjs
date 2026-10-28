@@ -1073,6 +1073,9 @@ test("deferred preparation bounds the worker queue, coalesces progress repaints 
   worker.onmessage({ data: { requestId: messages[0].requestId, fit: null } });
   const trailingTimer = [...timers.keys()].at(-1);
   for (const message of messages.slice(1, 4)) worker.onmessage({ data: { requestId: message.requestId, fit: null } });
+  assert.equal(messages.length, 8, "replies never project or post synchronously");
+  assert.equal(callbacks.length, 1, "replies share one idle-priority continuation");
+  callbacks.shift()();
   assert.equal(messages.length, 12, "pending worker requests are not queued again");
   assert.equal(owner.getDiagnostics().pendingWorkerFits, 8, "released slots are refilled without exceeding the queue cap");
   assert.equal(invalidations, 1, "same-time replies refill the queue without repainting");
@@ -1087,6 +1090,7 @@ test("deferred preparation bounds the worker queue, coalesces progress repaints 
   owner.drawCountryLabels(1);
   assert.equal(callbacks.length, 0);
   worker.onmessage({ data: { requestId: messages[4].requestId, fit: null } });
+  callbacks.shift()();
   assert.equal(invalidations, 2, "a stale text response refills the released slot without repainting");
   assert.equal(messages.length, 13, "the current text generation resumes within the queue cap");
   assert.equal(owner.getDiagnostics().pendingWorkerFits, 8);
@@ -1094,6 +1098,7 @@ test("deferred preparation bounds the worker queue, coalesces progress repaints 
   for (let index = 5; index < messages.length; index++) {
     assert.equal(invalidations, 2, "progress remains coalesced until the final result");
     worker.onmessage({ data: { requestId: messages[index].requestId, fit: null } });
+    while (callbacks.length) callbacks.shift()();
   }
   assert.equal(owner.getDiagnostics().pendingWorkerFits, 0);
   assert.equal(owner.getDiagnostics().pendingFits, 0);
@@ -1101,7 +1106,7 @@ test("deferred preparation bounds the worker queue, coalesces progress repaints 
   assert.equal(timers.size, 0, "completion cancels the trailing repaint");
 });
 
-test("deferred worker replies refill eight slots without another draw or invalidation", () => {
+test("deferred worker replies refill eight slots through one idle continuation without another draw or invalidation", () => {
   const callbacks = [], messages = [];
   let worker, invalidations = 0;
   const { owner } = createHarness({ names: Array.from({ length: 12 }, (_, i) => `C${i}`), viewportWidth: 2400,
@@ -1115,11 +1120,35 @@ test("deferred worker replies refill eight slots without another draw or invalid
   assert.equal(invalidations, 1);
   for (const message of messages.slice(0, 4)) {
     worker.onmessage({ data: { requestId: message.requestId, fit: null } });
-    assert.equal(owner.getDiagnostics().pendingWorkerFits, 8);
     assert.equal(invalidations, 1);
   }
+  assert.equal(owner.getDiagnostics().pendingWorkerFits, 4);
+  assert.equal(callbacks.length, 1, "replies coalesce into one idle continuation");
+  callbacks.shift()();
+  assert.equal(owner.getDiagnostics().pendingWorkerFits, 8);
   assert.equal(messages.length, 12);
-  assert.equal(callbacks.length, 0, "worker replies replenish directly without another host continuation");
+  assert.equal(invalidations, 1);
+  assert.equal(callbacks.length, 0, "a full queue schedules nothing further");
+});
+
+test("deferred worker replies during a gesture wait for the settled frame to queue more fits", () => {
+  const callbacks = [], messages = [];
+  let worker;
+  const { owner, state } = createHarness({ names: Array.from({ length: 12 }, (_, i) => `C${i}`), viewportWidth: 2400,
+    helperOptions: {
+      nowMs: () => 0, scheduleWork: callback => callbacks.push(callback), onInvalidate() {},
+      createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+    } });
+  owner.drawCountryLabels(1);
+  callbacks.shift()();
+  assert.equal(messages.length, 8);
+  state.isInteracting = true;
+  worker.onmessage({ data: { requestId: messages[0].requestId, fit: null } });
+  assert.equal(messages.length, 8, "a gesture-time reply does not project or post another country");
+  state.isInteracting = false;
+  owner.drawCountryLabels(1);
+  callbacks.shift()();
+  assert.equal(messages.length, 9, "the settled frame resumes preparation");
 });
 
 test("deferred progress coalesces replies within 400 ms and supports a zero repaint interval", () => {
