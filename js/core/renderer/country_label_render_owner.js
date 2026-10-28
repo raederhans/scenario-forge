@@ -245,6 +245,9 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
   let geometryCache = null;
   let scheduledContinuation = null;
   let privatePreparation = null;
+  let deferredPreparation = null;
+  let progressRepaintTimeout = null;
+  let lastProgressRepaint = -Infinity;
   let layoutWorkers = [];
   const maxLayoutWorkers = Math.max(1, Math.min(4, Math.floor(helpers.maxLayoutWorkers || 4)));
   const maxPendingPerWorker = Math.max(1, Math.min(MAX_PENDING_WORKER_FITS, Math.floor(helpers.maxPendingPerWorker || 2)));
@@ -256,6 +259,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
   const setRequestTimeout = helpers.setTimeout || globalThis.setTimeout;
   const clearRequestTimeout = helpers.clearTimeout || globalThis.clearTimeout;
   const nowMs = helpers.nowMs || (() => globalThis.performance?.now?.() ?? Date.now());
+  const progressRepaintIntervalMs = helpers.progressRepaintIntervalMs ?? 400;
   const scheduleWork = helpers.scheduleWork || ((callback) => {
     if (typeof globalThis.requestIdleCallback === "function") globalThis.requestIdleCallback(callback, { timeout: 200 });
     else globalThis.setTimeout(callback, 0);
@@ -487,6 +491,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       && geometryCache.revision === source.revision && geometryCache.projection === projection
       && geometryCache.identity === identity) return geometryCache;
     cancelPrivatePreparation();
+    deferredPreparation = null;
     const entries = (source.countries || []).map((record, index) => {
       const shape = record.geometry || record.feature?.geometry;
       const inputPolygons = shape?.type === "MultiPolygon" ? shape.coordinates
@@ -633,9 +638,49 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     });
   }
 
+  function requestProgressRepaint(complete = false) {
+    const now = nowMs();
+    const remaining = progressRepaintIntervalMs - (now - lastProgressRepaint);
+    if (complete || remaining <= 0) {
+      if (progressRepaintTimeout !== null) clearRequestTimeout(progressRepaintTimeout);
+      progressRepaintTimeout = null;
+      lastProgressRepaint = now;
+      helpers.onInvalidate?.();
+    } else if (progressRepaintTimeout === null) {
+      progressRepaintTimeout = setRequestTimeout(() => {
+        progressRepaintTimeout = null;
+        lastProgressRepaint = nowMs();
+        helpers.onInvalidate?.();
+      }, remaining);
+    }
+  }
+
+  function getCurrentDeferredPreparation() {
+    const job = deferredPreparation;
+    if (!job) return null;
+    const { geometry, projection } = job.fitView;
+    const source = getCountryLabelSource();
+    if (geometryCache !== geometry || getProjection() !== projection
+      || getProjectionIdentity() !== geometry.identity
+      || state.styleConfig?.countryLabels?.enabled === false
+      || source?.sourceToken !== geometry.sourceToken || source.revision !== geometry.revision) {
+      deferredPreparation = null;
+      return null;
+    }
+    return job;
+  }
+
+  function advanceDeferredPreparation() {
+    const job = getCurrentDeferredPreparation();
+    if (job && !workerFailed) preparePendingFits(job.pending, job.fitView);
+    const complete = workerFailed || (job && job.pending.every(({ entry, key }) => entry.fits.has(key)));
+    if (complete) deferredPreparation = null;
+    requestProgressRepaint(complete);
+  }
+
   function notifyPreparationProgress(request = null) {
     if (privatePreparation) advancePrivatePreparation();
-    else if (!request?.preparation) helpers.onInvalidate?.();
+    else if (!request?.preparation) advanceDeferredPreparation();
   }
 
   function prepareCurrentView(k) {
@@ -808,6 +853,7 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       context.restore();
     }
     diagnostics.pendingFits = pending.length;
+    if (deferred && !privatePreparation) deferredPreparation = { pending, fitView };
     const nextPreparation = pending.find(({ entry, key }) => !entry.workerPending.has(key)
       && entry.workerPending.size < MAX_CACHED_FITS && canQueueEntry(entry));
     if (privatePreparation) advancePrivatePreparation();
@@ -817,13 +863,8 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       scheduleWork(() => {
         if (scheduledContinuation !== continuation) return;
         scheduledContinuation = null;
-        if (geometryCache !== geometry || getProjection() !== projection
-          || getProjectionIdentity() !== geometry.identity
-          || state.styleConfig?.countryLabels?.enabled === false) return;
-        const latestSource = getCountryLabelSource();
-        if (latestSource?.sourceToken !== geometry.sourceToken || latestSource.revision !== geometry.revision) return;
-        preparePendingFits(pending, fitView);
-        helpers.onInvalidate?.();
+        if (!getCurrentDeferredPreparation()) return;
+        advanceDeferredPreparation();
       });
     }
     return diagnostics.drawn;
@@ -858,8 +899,12 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
   return {
     drawCountryLabels,
     prepareCurrentView,
-    cancelPreparation: () => cancelPrivatePreparation(),
+    cancelPreparation() {
+      deferredPreparation = null;
+      cancelPrivatePreparation();
+    },
     clearTextCache() {
+      deferredPreparation = null;
       cancelPrivatePreparation();
       textGeneration += 1;
       glyphMetrics.clear();
