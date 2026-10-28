@@ -1,0 +1,2883 @@
+{
+  "version": 1,
+  "description": "Post-build ownership overlay for HOI4 1936/1939, applied after the political feature merges. Debug-oriented split; approximations are noted per entry.",
+  "entries": [
+    {
+      "id": "faroe_islands",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "FRO",
+      "name_en": "Faroe Islands",
+      "name_zh": "法罗群岛",
+      "parent_owner_tag": "DEN",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "FO"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "notes": "Faroe Islands stay under Denmark until the 1940 British occupation."
+    },
+    {
+      "id": "greenland_parent",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GRN",
+      "parent_owner_tag": "DEN",
+      "subject_kind": "colony",
+      "select": {
+        "owners": [
+          "GRN"
+        ]
+      },
+      "only_from_owners": [
+        "GRN"
+      ]
+    },
+    {
+      "id": "hatay_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "SYR",
+      "select": {
+        "feature_ids": [
+          "TR631"
+        ]
+      },
+      "only_from_owners": [
+        "TUR"
+      ],
+      "notes": "Sanjak of Alexandretta remains in the French Syrian mandate in 1936."
+    },
+    {
+      "id": "dodecanese",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "DOD",
+      "name_en": "Italian Aegean Islands",
+      "name_zh": "意属爱琴海群岛",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "colony",
+      "select": {
+        "feature_ids": [
+          "EL421"
+        ]
+      },
+      "only_from_owners": [
+        "GRE"
+      ]
+    },
+    {
+      "id": "british_somaliland",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SML",
+      "name_en": "British Somaliland",
+      "name_zh": "英属索马里兰",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "SO_Awdal",
+          "SO_Woqooyi_Galbeed",
+          "SO_Sanaag",
+          "SO_Sool",
+          "SO_Togdheer"
+        ]
+      },
+      "only_from_owners": [
+        "SOM",
+        "AOI"
+      ]
+    },
+    {
+      "id": "newfoundland",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "NFL",
+      "name_en": "Dominion of Newfoundland",
+      "name_zh": "纽芬兰自治领",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "dominion",
+      "select": {
+        "hierarchy_groups": [
+          "CA_Newfoundland_and_Labrador"
+        ]
+      },
+      "only_from_owners": [
+        "CAN"
+      ],
+      "notes": "Newfoundland under Commission of Government (1934-1949), separate from Canada."
+    },
+    {
+      "id": "portuguese_india",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GOA",
+      "name_en": "Portuguese India",
+      "name_zh": "葡属印度",
+      "parent_owner_tag": "POR",
+      "subject_kind": "colony",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Goa",
+          "IN_Dadra_and_Nagar_Haveli_and_Daman_and_Diu"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ]
+    },
+    {
+      "id": "monaco",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MCO",
+      "name_en": "Monaco",
+      "name_zh": "摩纳哥公国",
+      "color_hex": "#d8434e",
+      "select": {
+        "country_codes": [
+          "MC"
+        ]
+      },
+      "only_from_owners": [
+        "FRA"
+      ]
+    },
+    {
+      "id": "andorra",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "AND",
+      "name_en": "Andorra",
+      "name_zh": "安道尔",
+      "color_hex": "#2a4fa8",
+      "select": {
+        "country_codes": [
+          "AD"
+        ]
+      },
+      "only_from_owners": [
+        "SPR"
+      ]
+    },
+    {
+      "id": "liechtenstein",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "LIE",
+      "name_en": "Liechtenstein",
+      "name_zh": "列支敦士登",
+      "color_hex": "#3a5fcd",
+      "select": {
+        "country_codes": [
+          "LI"
+        ]
+      },
+      "only_from_owners": [
+        "SWI"
+      ]
+    },
+    {
+      "id": "san_marino",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SMN",
+      "name_en": "San Marino",
+      "name_zh": "圣马力诺",
+      "color_hex": "#6fb3d9",
+      "select": {
+        "country_codes": [
+          "SM"
+        ]
+      },
+      "only_from_owners": [
+        "ITA"
+      ]
+    },
+    {
+      "id": "danzig",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "DNZ",
+      "name_en": "Free City of Danzig",
+      "name_zh": "但泽自由市",
+      "color_hex": "#c9a227",
+      "select": {
+        "feature_ids": [
+          "PL_POW_2261",
+          "PL_POW_2264"
+        ]
+      },
+      "only_from_owners": [
+        "POL"
+      ],
+      "notes": "City parcels only; the Free City's rural districts are not split out yet."
+    },
+    {
+      "id": "southern_rhodesia",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "RHO",
+      "name_en": "Southern Rhodesia",
+      "name_zh": "南罗得西亚",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "ZW"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "northern_rhodesia",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "NRH",
+      "name_en": "Northern Rhodesia",
+      "name_zh": "北罗得西亚",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "ZM"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "nyasaland",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "NYS",
+      "name_en": "Nyasaland",
+      "name_zh": "尼亚萨兰",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "MW"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "basutoland",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BAS",
+      "name_en": "Basutoland",
+      "name_zh": "巴苏陀兰",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "LS"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "swaziland",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SWZ",
+      "name_en": "Swaziland",
+      "name_zh": "斯威士兰",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "SZ"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "hong_kong",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "HKG",
+      "name_en": "Hong Kong",
+      "name_zh": "香港",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "HK"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "british_honduras",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BHO",
+      "name_en": "British Honduras",
+      "name_zh": "英属洪都拉斯",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "BZ"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "british_guiana",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BGU",
+      "name_en": "British Guiana",
+      "name_zh": "英属圭亚那",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "GY"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "bahrain",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BAH",
+      "name_en": "Bahrain",
+      "name_zh": "巴林",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "BH"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "qatar",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "QAT",
+      "name_en": "Qatar",
+      "name_zh": "卡塔尔",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "QA"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "trucial_states",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TRU",
+      "name_en": "Trucial States",
+      "name_zh": "特鲁西尔诸国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "AE"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "malta",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MLT",
+      "name_en": "Malta",
+      "name_zh": "马耳他",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "MT"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "cyprus",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "CYP",
+      "name_en": "Cyprus",
+      "name_zh": "塞浦路斯",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "CY"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "jamaica",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "JAM",
+      "name_en": "Jamaica",
+      "name_zh": "牙买加",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "JM"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "trinidad",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TRI",
+      "name_en": "Trinidad and Tobago",
+      "name_zh": "特立尼达和多巴哥",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "TT"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "bahamas",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BHM",
+      "name_en": "Bahamas",
+      "name_zh": "巴哈马",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "BS"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "mauritius",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MUR",
+      "name_en": "Mauritius",
+      "name_zh": "毛里求斯",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "MU",
+          "SC",
+          "IO"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "falklands",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "FLK",
+      "name_en": "Falkland Islands",
+      "name_zh": "福克兰群岛",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "FK",
+          "GS"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ]
+    },
+    {
+      "id": "bwa_nigeria",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BWA",
+      "name_en": "Nigeria",
+      "name_zh": "尼日利亚",
+      "select": {
+        "country_codes": [
+          "NG"
+        ],
+        "hierarchy_groups": [
+          "CM_Northwest",
+          "CM_Southwest"
+        ]
+      },
+      "only_from_owners": [
+        "BWA",
+        "FRA",
+        "AEF",
+        "ENG"
+      ],
+      "notes": "Nigeria plus the British Cameroons mandate."
+    },
+    {
+      "id": "gold_coast",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GLD",
+      "name_en": "Gold Coast",
+      "name_zh": "黄金海岸",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "GH"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ]
+    },
+    {
+      "id": "sierra_leone",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SIE",
+      "name_en": "Sierra Leone",
+      "name_zh": "塞拉利昂",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "SL"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ]
+    },
+    {
+      "id": "gambia",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GAM",
+      "name_en": "Gambia",
+      "name_zh": "冈比亚",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "GM"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ]
+    },
+    {
+      "id": "bea_kenya",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BEA",
+      "name_en": "Kenya",
+      "name_zh": "肯尼亚",
+      "select": {
+        "country_codes": [
+          "KE"
+        ]
+      },
+      "only_from_owners": [
+        "BEA"
+      ]
+    },
+    {
+      "id": "uganda",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "UGA",
+      "name_en": "Uganda",
+      "name_zh": "乌干达",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "UG"
+        ]
+      },
+      "only_from_owners": [
+        "BEA"
+      ]
+    },
+    {
+      "id": "tanganyika",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TGN",
+      "name_en": "Tanganyika",
+      "name_zh": "坦噶尼喀",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "mandate",
+      "select": {
+        "country_codes": [
+          "TZ"
+        ]
+      },
+      "exclude": {
+        "hierarchy_groups": [
+          "TZ_Unguja_South",
+          "TZ_Unguja_North",
+          "TZ_Mjini_Magharibi",
+          "TZ_North_Pemba",
+          "TZ_South_Pemba"
+        ]
+      },
+      "only_from_owners": [
+        "BEA"
+      ]
+    },
+    {
+      "id": "zanzibar",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ZAN",
+      "name_en": "Zanzibar",
+      "name_zh": "桑给巴尔",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "TZ_Unguja_South",
+          "TZ_Unguja_North",
+          "TZ_Mjini_Magharibi",
+          "TZ_North_Pemba",
+          "TZ_South_Pemba"
+        ]
+      },
+      "only_from_owners": [
+        "BEA"
+      ]
+    },
+    {
+      "id": "hyderabad",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "HYD",
+      "name_en": "Hyderabad",
+      "name_zh": "海得拉巴",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Telangana"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "notes": "Princely state approximated by the modern state; not a historical boundary."
+    },
+    {
+      "id": "kashmir",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KSH",
+      "name_en": "Jammu and Kashmir",
+      "name_zh": "查谟和克什米尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Jammu_and_Kashmir",
+          "IN_Ladakh"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "notes": "Princely state approximated by the modern state; not a historical boundary."
+    },
+    {
+      "id": "mysore",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MYR",
+      "name_en": "Mysore",
+      "name_zh": "迈索尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Karnataka"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "notes": "Princely state approximated by the modern state; not a historical boundary."
+    },
+    {
+      "id": "travancore",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TRV",
+      "name_en": "Travancore",
+      "name_zh": "特拉凡哥尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Kerala"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "notes": "Princely state approximated by the modern state; not a historical boundary."
+    },
+    {
+      "id": "sikkim",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SKM",
+      "name_en": "Sikkim",
+      "name_zh": "锡金",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Sikkim"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "notes": "Princely state approximated by the modern state; not a historical boundary."
+    },
+    {
+      "id": "straits_settlements",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "STR",
+      "name_en": "Straits Settlements",
+      "name_zh": "海峡殖民地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "SG"
+        ],
+        "feature_ids": [
+          "MYS-1139",
+          "MYS-1145",
+          "MYS-4833"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ]
+    },
+    {
+      "id": "sarawak",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SRW",
+      "name_en": "Sarawak",
+      "name_zh": "沙捞越",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1187"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ]
+    },
+    {
+      "id": "north_borneo",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "NBO",
+      "name_en": "North Borneo",
+      "name_zh": "北婆罗洲",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1186"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ]
+    },
+    {
+      "id": "brunei",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BRU",
+      "name_en": "Brunei",
+      "name_zh": "文莱",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "BN"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ]
+    },
+    {
+      "id": "bot_parent",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BOT",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "owners": [
+          "BOT"
+        ]
+      },
+      "only_from_owners": [
+        "BOT"
+      ]
+    },
+    {
+      "id": "kuw_parent",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KUW",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "owners": [
+          "KUW"
+        ]
+      },
+      "only_from_owners": [
+        "KUW"
+      ]
+    },
+    {
+      "id": "aof_senegal",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "AOF",
+      "name_en": "Senegal",
+      "name_zh": "塞内加尔",
+      "select": {
+        "country_codes": [
+          "SN"
+        ]
+      },
+      "only_from_owners": [
+        "AOF"
+      ]
+    },
+    {
+      "id": "mauritania",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MAU",
+      "name_en": "Mauritania",
+      "name_zh": "毛里塔尼亚",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "MR"
+        ]
+      },
+      "only_from_owners": [
+        "AOF"
+      ]
+    },
+    {
+      "id": "french_sudan",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "FSU",
+      "name_en": "French Sudan",
+      "name_zh": "法属苏丹",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "ML"
+        ]
+      },
+      "only_from_owners": [
+        "AOF"
+      ]
+    },
+    {
+      "id": "french_guinea",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "FGU",
+      "name_en": "French Guinea",
+      "name_zh": "法属几内亚",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "GN"
+        ]
+      },
+      "only_from_owners": [
+        "AOF"
+      ]
+    },
+    {
+      "id": "ivory_coast",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "IVC",
+      "name_en": "Ivory Coast",
+      "name_zh": "科特迪瓦",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "CI"
+        ]
+      },
+      "only_from_owners": [
+        "AOF"
+      ]
+    },
+    {
+      "id": "dahomey",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "DAH",
+      "name_en": "Dahomey",
+      "name_zh": "达荷美",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "BJ"
+        ]
+      },
+      "only_from_owners": [
+        "AOF"
+      ]
+    },
+    {
+      "id": "niger_colony",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "NGR",
+      "name_en": "Niger",
+      "name_zh": "尼日尔",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "NE"
+        ]
+      },
+      "only_from_owners": [
+        "AOF"
+      ]
+    },
+    {
+      "id": "french_togo",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TOG",
+      "name_en": "French Togoland",
+      "name_zh": "法属多哥",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "mandate",
+      "select": {
+        "country_codes": [
+          "TG"
+        ]
+      },
+      "only_from_owners": [
+        "AOF"
+      ]
+    },
+    {
+      "id": "upper_volta",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "UPV",
+      "name_en": "Upper Volta",
+      "name_zh": "上沃尔特",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "BF"
+        ]
+      },
+      "only_from_owners": [
+        "AOF"
+      ]
+    },
+    {
+      "id": "aef_middle_congo",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "AEF",
+      "name_en": "Middle Congo",
+      "name_zh": "中央刚果",
+      "select": {
+        "country_codes": [
+          "CG"
+        ]
+      },
+      "only_from_owners": [
+        "AEF"
+      ]
+    },
+    {
+      "id": "chad",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "CHD",
+      "name_en": "Chad",
+      "name_zh": "乍得",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "TD"
+        ]
+      },
+      "only_from_owners": [
+        "AEF"
+      ]
+    },
+    {
+      "id": "ubangi_shari",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "UBA",
+      "name_en": "Ubangi-Shari",
+      "name_zh": "乌班吉沙里",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "CF"
+        ]
+      },
+      "only_from_owners": [
+        "AEF"
+      ]
+    },
+    {
+      "id": "gabon",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GAB",
+      "name_en": "Gabon",
+      "name_zh": "加蓬",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "GA"
+        ]
+      },
+      "only_from_owners": [
+        "AEF"
+      ]
+    },
+    {
+      "id": "french_cameroon",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "FCM",
+      "name_en": "French Cameroun",
+      "name_zh": "法属喀麦隆",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "mandate",
+      "select": {
+        "country_codes": [
+          "CM"
+        ]
+      },
+      "exclude": {
+        "hierarchy_groups": [
+          "CM_Northwest",
+          "CM_Southwest"
+        ]
+      },
+      "only_from_owners": [
+        "AEF",
+        "FRA",
+        "AOF"
+      ]
+    },
+    {
+      "id": "djibouti",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "DJI",
+      "name_en": "French Somaliland",
+      "name_zh": "法属索马里",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "DJ"
+        ]
+      },
+      "only_from_owners": [
+        "FRA"
+      ]
+    },
+    {
+      "id": "madagascar_dependencies",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MAD",
+      "select": {
+        "country_codes": [
+          "KM",
+          "TF"
+        ]
+      },
+      "only_from_owners": [
+        "FRA"
+      ]
+    },
+    {
+      "id": "gf_parent",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GF",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "owners": [
+          "GF"
+        ]
+      },
+      "only_from_owners": [
+        "GF"
+      ]
+    },
+    {
+      "id": "gp_parent",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "GP",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "owners": [
+          "GP"
+        ]
+      },
+      "only_from_owners": [
+        "GP"
+      ]
+    },
+    {
+      "id": "mq_parent",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MQ",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "owners": [
+          "MQ"
+        ]
+      },
+      "only_from_owners": [
+        "MQ"
+      ]
+    },
+    {
+      "id": "re_parent",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "RE",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "owners": [
+          "RE"
+        ]
+      },
+      "only_from_owners": [
+        "RE"
+      ]
+    },
+    {
+      "id": "yt_parent",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "YT",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "owners": [
+          "YT"
+        ]
+      },
+      "only_from_owners": [
+        "YT"
+      ]
+    },
+    {
+      "id": "tonkin",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TNK",
+      "name_en": "Tonkin",
+      "name_zh": "东京（北圻）",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "VN"
+        ],
+        "bbox": [
+          100,
+          19.75,
+          110,
+          24
+        ]
+      },
+      "only_from_owners": [
+        "VIN"
+      ]
+    },
+    {
+      "id": "cochinchina",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "COC",
+      "name_en": "Cochinchina",
+      "name_zh": "交趾支那（南圻）",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "VN"
+        ],
+        "bbox": [
+          100,
+          8,
+          110,
+          11.55
+        ]
+      },
+      "only_from_owners": [
+        "VIN"
+      ]
+    },
+    {
+      "id": "cambodia",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "CAM",
+      "name_en": "Cambodia",
+      "name_zh": "柬埔寨",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "KH"
+        ]
+      },
+      "only_from_owners": [
+        "VIN"
+      ]
+    },
+    {
+      "id": "laos",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "LAO",
+      "name_en": "Laos",
+      "name_zh": "老挝",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "LA"
+        ]
+      },
+      "only_from_owners": [
+        "VIN"
+      ]
+    },
+    {
+      "id": "vin_annam",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "VIN",
+      "name_en": "Annam",
+      "name_zh": "安南（中圻）",
+      "select": {
+        "owners": [
+          "VIN"
+        ]
+      },
+      "only_from_owners": [
+        "VIN"
+      ],
+      "notes": "Remaining French Indochina core represented as Annam."
+    },
+    {
+      "id": "cape_verde",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "CPV",
+      "name_en": "Cape Verde",
+      "name_zh": "佛得角",
+      "parent_owner_tag": "POR",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "CV"
+        ]
+      },
+      "only_from_owners": [
+        "POR"
+      ]
+    },
+    {
+      "id": "portuguese_guinea",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "PGU",
+      "name_en": "Portuguese Guinea",
+      "name_zh": "葡属几内亚",
+      "parent_owner_tag": "POR",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "GW"
+        ]
+      },
+      "only_from_owners": [
+        "POR"
+      ]
+    },
+    {
+      "id": "sao_tome",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "STP",
+      "name_en": "São Tomé and Príncipe",
+      "name_zh": "圣多美和普林西比",
+      "parent_owner_tag": "POR",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "ST"
+        ]
+      },
+      "only_from_owners": [
+        "POR"
+      ]
+    },
+    {
+      "id": "portuguese_timor",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TMR",
+      "name_en": "Portuguese Timor",
+      "name_zh": "葡属帝汶",
+      "parent_owner_tag": "POR",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "TL"
+        ]
+      },
+      "only_from_owners": [
+        "POR"
+      ]
+    },
+    {
+      "id": "macau",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MCU",
+      "name_en": "Macau",
+      "name_zh": "澳门",
+      "parent_owner_tag": "POR",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "MO"
+        ]
+      },
+      "only_from_owners": [
+        "POR"
+      ]
+    },
+    {
+      "id": "suriname",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SUR",
+      "name_en": "Suriname",
+      "name_zh": "苏里南",
+      "parent_owner_tag": "HOL",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "SR"
+        ]
+      },
+      "only_from_owners": [
+        "HOL"
+      ]
+    },
+    {
+      "id": "ruanda_urundi",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "RUA",
+      "name_en": "Ruanda-Urundi",
+      "name_zh": "卢安达-乌隆迪",
+      "parent_owner_tag": "BEL",
+      "subject_kind": "mandate",
+      "select": {
+        "country_codes": [
+          "RW",
+          "BI"
+        ]
+      },
+      "only_from_owners": [
+        "RCG"
+      ]
+    },
+    {
+      "id": "alaska",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ALK",
+      "name_en": "Territory of Alaska",
+      "name_zh": "阿拉斯加领地",
+      "parent_owner_tag": "USA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "US"
+        ],
+        "bbox": [
+          -180,
+          51,
+          -129.9,
+          72
+        ]
+      },
+      "only_from_owners": [
+        "USA"
+      ]
+    },
+    {
+      "id": "hawaii",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "HAW",
+      "name_en": "Territory of Hawaii",
+      "name_zh": "夏威夷领地",
+      "parent_owner_tag": "USA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "US"
+        ],
+        "bbox": [
+          -161,
+          18,
+          -154,
+          23
+        ]
+      },
+      "only_from_owners": [
+        "USA"
+      ]
+    },
+    {
+      "id": "puerto_rico_parent",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "PUE",
+      "parent_owner_tag": "USA",
+      "subject_kind": "colony",
+      "select": {
+        "owners": [
+          "PUE"
+        ]
+      },
+      "only_from_owners": [
+        "PUE"
+      ]
+    },
+    {
+      "id": "karafuto_kurils",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "JAP",
+      "select": {
+        "country_codes": [
+          "RU"
+        ],
+        "bboxes": [
+          [
+            141.0,
+            43.0,
+            145.2,
+            49.6
+          ],
+          [
+            145.2,
+            43.3,
+            157.5,
+            51.5
+          ]
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Karafuto (south of 50N) and the Kuril Islands, approximated by parcel centroid."
+    },
+    {
+      "id": "kwantung",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KWT",
+      "name_en": "Kwantung Leased Territory",
+      "name_zh": "关东州",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "colony",
+      "select": {
+        "prefectures": [
+          "大连市"
+        ]
+      },
+      "only_from_owners": [
+        "MAN"
+      ]
+    },
+    {
+      "id": "manchukuo_parent",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MAN",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "puppet",
+      "select": {
+        "owners": [
+          "MAN"
+        ]
+      },
+      "only_from_owners": [
+        "MAN"
+      ]
+    },
+    {
+      "id": "ukrainian_ssr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "UKR",
+      "name_en": "Ukrainian SSR",
+      "name_zh": "乌克兰苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "UA"
+        ]
+      },
+      "exclude": {
+        "country_codes": [
+          "UA"
+        ],
+        "bbox": [
+          32.4,
+          44.0,
+          36.8,
+          46.12
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "crimean_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "CRM",
+      "name_en": "Crimean ASSR",
+      "name_zh": "克里米亚自治苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "country_codes": [
+          "UA"
+        ],
+        "bbox": [
+          32.4,
+          44.0,
+          36.8,
+          46.12
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "byelorussian_ssr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BLR",
+      "name_en": "Byelorussian SSR",
+      "name_zh": "白俄罗斯苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "BY"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "transcaucasian_sfsr",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "TSC",
+      "name_en": "Transcaucasian SFSR",
+      "name_zh": "外高加索社会主义联邦苏维埃共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "GE",
+          "AM",
+          "AZ"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "georgian_ssr",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "GEO",
+      "name_en": "Georgian SSR",
+      "name_zh": "格鲁吉亚苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "GE"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "armenian_ssr",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "ARM",
+      "name_en": "Armenian SSR",
+      "name_zh": "亚美尼亚苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "AM"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "azerbaijan_ssr",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "AZR",
+      "name_en": "Azerbaijan SSR",
+      "name_zh": "阿塞拜疆苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "AZ"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "kazakh_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KAZ",
+      "name_en": "Kazakh ASSR",
+      "name_zh": "哈萨克自治苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "color_hex": "#d91745",
+      "select": {
+        "country_codes": [
+          "KZ"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "kazakh_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KAZ",
+      "name_en": "Kazakh SSR",
+      "name_zh": "哈萨克苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "color_hex": "#d91745",
+      "select": {
+        "country_codes": [
+          "KZ"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "kirghiz_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KYR",
+      "name_en": "Kirghiz ASSR",
+      "name_zh": "吉尔吉斯自治苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "color_hex": "#86130e",
+      "select": {
+        "country_codes": [
+          "KG"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "kirghiz_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KYR",
+      "name_en": "Kirghiz SSR",
+      "name_zh": "吉尔吉斯苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "color_hex": "#86130e",
+      "select": {
+        "country_codes": [
+          "KG"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "uzbek_ssr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "UZB",
+      "name_en": "Uzbek SSR",
+      "name_zh": "乌兹别克苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "UZ"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "UZB-356"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "karakalpak_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KKP",
+      "name_en": "Karakalpak ASSR",
+      "name_zh": "卡拉卡尔帕克自治苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "feature_ids": [
+          "UZB-356"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "turkmen_ssr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TMS",
+      "name_en": "Turkmen SSR",
+      "name_zh": "土库曼苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "TM"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "tajik_ssr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TAJ",
+      "name_en": "Tajik SSR",
+      "name_zh": "塔吉克苏维埃社会主义共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "union_republic",
+      "select": {
+        "country_codes": [
+          "TJ"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ]
+    },
+    {
+      "id": "tatar_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "TAT",
+      "name_en": "Tatar ASSR",
+      "name_zh": "鞑靼自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Tatarstan"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "bashkir_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BSH",
+      "name_en": "Bashkir ASSR",
+      "name_zh": "巴什基尔自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Bashkortostan"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "chuvash_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "CVS",
+      "name_en": "Chuvash ASSR",
+      "name_zh": "楚瓦什自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Chuvash_Republic"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "mari_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MRE",
+      "name_en": "Mari ASSR",
+      "name_zh": "马里自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Mari_El_Republic"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "udmurt_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "UDM",
+      "name_en": "Udmurt ASSR",
+      "name_zh": "乌德穆尔特自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Udmurt_Republic"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "mordovian_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MRD",
+      "name_en": "Mordovian ASSR",
+      "name_zh": "莫尔多瓦自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Mordovia"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "komi_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KOM",
+      "name_en": "Komi ASSR",
+      "name_zh": "科米自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Komi_Republic"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "yakut_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "YAK",
+      "name_en": "Yakut ASSR",
+      "name_zh": "雅库特自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Sakha_Republic"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "buryat_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "BYA",
+      "name_en": "Buryat-Mongol ASSR",
+      "name_zh": "布里亚特-蒙古自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Buryatia"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "karelian_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KRL",
+      "name_en": "Karelian ASSR",
+      "name_zh": "卡累利阿自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Karelia"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "dagestan_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "DAG",
+      "name_en": "Dagestan ASSR",
+      "name_zh": "达吉斯坦自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Dagestan"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "kalmyk_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KAL",
+      "name_en": "Kalmyk ASSR",
+      "name_zh": "卡尔梅克自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Kalmykia"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "kabardino_balkar_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KBA",
+      "name_en": "Kabardino-Balkar ASSR",
+      "name_zh": "卡巴尔达-巴尔卡尔自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Kabardino_Balkaria"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "north_ossetian_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "NOS",
+      "name_en": "North Ossetian ASSR",
+      "name_zh": "北奥塞梯自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_North_Ossetia_Alania"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "chechen_ingush_assr",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "CHE",
+      "name_en": "Chechen-Ingush ASSR",
+      "name_zh": "车臣-印古什自治共和国",
+      "parent_owner_tag": "SOV",
+      "subject_kind": "autonomous_republic",
+      "select": {
+        "hierarchy_groups": [
+          "RU_Chechen_Republic",
+          "RU_Republic_of_Ingushetia"
+        ]
+      },
+      "only_from_owners": [
+        "SOV"
+      ],
+      "notes": "Modern republic boundary used as an approximation."
+    },
+    {
+      "id": "finnish_karelia",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "FIN",
+      "select": {
+        "country_codes": [
+          "RU"
+        ],
+        "bboxes": [
+          [
+            27.5,
+            60.3,
+            32.6,
+            62.7
+          ],
+          [
+            28.5,
+            69.0,
+            31.7,
+            70.3
+          ]
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "RU_RAY_50074027B20331318716688"
+        ]
+      },
+      "only_from_owners": [
+        "SOV",
+        "KRL"
+      ],
+      "notes": "Pre-Winter War Finnish Karelian Isthmus, Ladoga Karelia and Petsamo, approximated by parcel centroid."
+    },
+    {
+      "id": "bohemia_moravia",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "BOM",
+      "name_en": "Protectorate of Bohemia and Moravia",
+      "name_zh": "波希米亚和摩拉维亚保护国",
+      "parent_owner_tag": "GER",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "CZ"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "CZ_ADM2_57006924B56764577868008",
+          "CZ_ADM2_57006924B74936445485800",
+          "CZ_ADM2_57006924B32669310027153",
+          "CZ_ADM2_57006924B92931687173289",
+          "CZ_ADM2_57006924B57972685793284",
+          "CZ_ADM2_57006924B67285149942805",
+          "CZ_ADM2_57006924B50757157558324",
+          "CZ_ADM2_57006924B72008682408189",
+          "CZ_ADM2_57006924B71753966872420",
+          "CZ_ADM2_57006924B34464963037986",
+          "CZ_ADM2_57006924B20358302460191",
+          "CZ_ADM2_57006924B55732331485961",
+          "CZ_ADM2_57006924B6655388448820",
+          "CZ_ADM2_57006924B95695201424764",
+          "CZ_ADM2_57006924B5960993849333",
+          "CZ_ADM2_57006924B26083217891381",
+          "CZ_ADM2_57006924B73132069516203",
+          "CZ_ADM2_57006924B21154438881940",
+          "CZ_ADM2_57006924B63031935780571"
+        ]
+      },
+      "only_from_owners": [
+        "GER"
+      ]
+    },
+    {
+      "id": "slovakia_parent",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SLO",
+      "parent_owner_tag": "GER",
+      "subject_kind": "puppet",
+      "select": {
+        "owners": [
+          "SLO"
+        ]
+      },
+      "only_from_owners": [
+        "SLO"
+      ]
+    },
+    {
+      "id": "albania_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "ALB",
+      "name_en": "Albanian Kingdom",
+      "name_zh": "阿尔巴尼亚王国",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "puppet",
+      "color_hex": "#952d66",
+      "select": {
+        "country_codes": [
+          "AL"
+        ]
+      },
+      "only_from_owners": [
+        "ITA"
+      ]
+    },
+    {
+      "id": "east_hebei",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "EHC",
+      "name_en": "East Hebei Autonomous Council",
+      "name_zh": "冀东防共自治政府",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "puppet",
+      "color_hex": "#f7b08f",
+      "select": {
+        "country_codes": [
+          "CN"
+        ]
+      },
+      "only_from_owners": [
+        "JAP"
+      ]
+    },
+    {
+      "id": "hebei_chahar",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "HBC",
+      "name_en": "Hebei-Chahar Political Council",
+      "name_zh": "冀察政务委员会",
+      "color_hex": "#5d6fb3",
+      "select": {
+        "hierarchy_groups": [
+          "CN_Hebei",
+          "CN_Beijing",
+          "CN_Tianjin"
+        ]
+      },
+      "only_from_owners": [
+        "CHI"
+      ]
+    },
+    {
+      "id": "hunan_clique",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "HNN",
+      "name_en": "Hunan Clique",
+      "name_zh": "湘系（何键）",
+      "color_hex": "#8a6fb0",
+      "select": {
+        "hierarchy_groups": [
+          "CN_Hunan"
+        ]
+      },
+      "only_from_owners": [
+        "CHI"
+      ]
+    },
+    {
+      "id": "xikang_clique",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SIC",
+      "name_en": "Xikang Clique",
+      "name_zh": "西康军阀（刘文辉）",
+      "color_hex": "#006080",
+      "select": {
+        "prefectures": [
+          "甘孜藏族自治州",
+          "雅安市"
+        ]
+      },
+      "only_from_owners": [
+        "CHU",
+        "CHI",
+        "SIC"
+      ]
+    },
+    {
+      "id": "khotan_ma",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KHM",
+      "name_en": "Khotan Emirate",
+      "name_zh": "和阗马虎山政权",
+      "color_hex": "#9c7a3c",
+      "select": {
+        "prefectures": [
+          "和田地区",
+          "喀什地区"
+        ]
+      },
+      "only_from_owners": [
+        "SIK"
+      ]
+    },
+    {
+      "id": "provisional_government",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "NCP",
+      "name_en": "Provisional Government of the Republic of China",
+      "name_zh": "中华民国临时政府",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "puppet",
+      "color_hex": "#b0874a",
+      "select": {
+        "hierarchy_groups": [
+          "CN_Beijing",
+          "CN_Tianjin",
+          "CN_Hebei",
+          "CN_Shandong"
+        ],
+        "prefectures": [
+          "安阳市",
+          "鹤壁市",
+          "新乡市",
+          "焦作市",
+          "濮阳市",
+          "开封市",
+          "商丘市",
+          "太原市",
+          "阳泉市",
+          "晋中市",
+          "长治市",
+          "晋城市",
+          "运城市"
+        ]
+      },
+      "exclude": {
+        "prefectures": [
+          "张家口市",
+          "承德市"
+        ]
+      },
+      "only_from_owners": [
+        "CHI",
+        "SHX",
+        "PRC"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "south_chahar",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "CNZ",
+      "name_en": "South Chahar Autonomous Government",
+      "name_zh": "察南自治政府",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "puppet",
+      "color_hex": "#c6e8a4",
+      "select": {
+        "prefectures": [
+          "张家口市"
+        ]
+      },
+      "only_from_owners": [
+        "CHI",
+        "SHX",
+        "MEN"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "north_shanxi",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "JBZ",
+      "name_en": "North Shanxi Autonomous Government",
+      "name_zh": "晋北自治政府",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "puppet",
+      "color_hex": "#9fd27a",
+      "select": {
+        "prefectures": [
+          "大同市",
+          "朔州市"
+        ]
+      },
+      "only_from_owners": [
+        "CHI",
+        "SHX",
+        "PRC"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "mengjiang_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "MEN",
+      "name_en": "Mongol United Autonomous Government",
+      "name_zh": "蒙古联盟自治政府",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "puppet",
+      "select": {
+        "prefectures": [
+          "呼和浩特市",
+          "包头市",
+          "乌兰察布市"
+        ]
+      },
+      "only_from_owners": [
+        "CHI",
+        "SHX",
+        "MEN"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "reformed_government",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "RGC",
+      "name_en": "Reformed Government of the Republic of China",
+      "name_zh": "中华民国维新政府",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "puppet",
+      "color_hex": "#e3c15a",
+      "select": {
+        "hierarchy_groups": [
+          "CN_Shanghai",
+          "CN_Jiangsu"
+        ],
+        "prefectures": [
+          "杭州市",
+          "嘉兴市",
+          "湖州市",
+          "舟山市",
+          "合肥市",
+          "芜湖市",
+          "蚌埠市",
+          "淮南市",
+          "马鞍山市",
+          "淮北市",
+          "铜陵市",
+          "安庆市",
+          "滁州市",
+          "宿州市",
+          "亳州市"
+        ]
+      },
+      "only_from_owners": [
+        "CHI"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "japanese_central_china",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "JCC",
+      "name_en": "Japanese-Occupied Central China",
+      "name_zh": "日军华中占领区",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "military_administration",
+      "color_hex": "#f2a98c",
+      "select": {
+        "prefectures": [
+          "武汉市",
+          "孝感市",
+          "鄂州市",
+          "黄石市",
+          "黄冈市",
+          "咸宁市",
+          "岳阳市",
+          "九江市",
+          "南昌市",
+          "信阳市"
+        ]
+      },
+      "only_from_owners": [
+        "CHI"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "japanese_south_china",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "JSC",
+      "name_en": "Japanese-Occupied South China",
+      "name_zh": "日军华南占领区",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "military_administration",
+      "color_hex": "#e8907a",
+      "select": {
+        "hierarchy_groups": [
+          "CN_Hainan"
+        ],
+        "prefectures": [
+          "广州市",
+          "佛山市",
+          "东莞市",
+          "深圳市",
+          "惠州市",
+          "汕头市",
+          "潮州市",
+          "厦门市"
+        ]
+      },
+      "only_from_owners": [
+        "CHI"
+      ],
+      "cores": "keep"
+    }
+  ]
+}

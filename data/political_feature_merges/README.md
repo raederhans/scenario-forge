@@ -271,3 +271,10 @@ parcels. Run the apply tool for every plan in `apply_order.json` order, then
 the downstream script above.
 `tests/political_feature_merges_contract.test.mjs` fails while any runtime asset
 still contains a merged-away ID.
+
+A rebuild of HOI4 1936/1939 (`tools/build_hoi4_scenario.py`) also drops the
+post-build ownership overlay `data/scenario-rules/hoi4_split_overlay.json`
+(colonial, Soviet and Chinese splits plus the 1939 Sino-Japanese front). After
+the merge plans are replayed, run `python tools/apply_hoi4_split_overlay.py`
+and then the downstream script for both HOI4 scenarios. The overlay resolves
+its selectors against the merged runtime parcels and is idempotent.

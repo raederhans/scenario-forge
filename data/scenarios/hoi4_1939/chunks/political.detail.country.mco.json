@@ -1,0 +1,46 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "MC_ADMIN0_PASSTHROUGH",
+      "type": "Feature",
+      "properties": {
+        "id": "MC_ADMIN0_PASSTHROUGH",
+        "name": "Monaco",
+        "cntr_code": "MC",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "admin0_passthrough",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              7.363873638736408,
+              43.73780793807937
+            ],
+            [
+              7.435874358743604,
+              43.755166321663225
+            ],
+            [
+              7.3998739987399915,
+              43.77078886688868
+            ],
+            [
+              7.363873638736408,
+              43.755166321663225
+            ],
+            [
+              7.363873638736408,
+              43.73780793807937
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
