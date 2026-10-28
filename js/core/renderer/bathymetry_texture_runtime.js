@@ -202,6 +202,8 @@ export function createBathymetryTextureRuntime({
       contourStrength: oceanStyle.contourStrength, overlay: scenario.value,
       hillshadeStrength: oceanStyle.hillshadeStrength,
       hillshadeExaggeration: oceanStyle.hillshadeExaggeration,
+      // An export must not finish without the depth texture: block on the link.
+      waitForGpu: isExport,
     });
     if (output.backend === 'pending') {
       if (gpuReadyTimer === null) gpuReadyTimer = setTimeout(checkGpuReady, 50);

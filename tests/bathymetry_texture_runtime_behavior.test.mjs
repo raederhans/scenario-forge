@@ -372,3 +372,19 @@ test('gesture frames reuse the previous depth image under the camera delta and t
   h.runtime.draw(h.context, { ...h.options, reuseLastOutput: true });
   assert.equal(h.renders.length, 3);
 });
+
+test('an export waits for the GPU program instead of skipping the depth texture', async () => {
+  let waited = 0;
+  const h = harness({ createRenderer: () => ({ prewarm() {}, isReady: () => true, dispose() {},
+    render: (args) => { if (args.waitForGpu) waited += 1; return args.waitForGpu
+      ? { canvas: {}, backend: 'webgl2', coveredBounds: null, missingTileKeys: [] }
+      : { canvas: null, backend: 'pending', coveredBounds: null, missingTileKeys: [] }; } }) });
+  await h.runtime.ensure();
+  const frame = h.draw();
+  assert.equal(frame.backend, 'pending');
+  const exported = h.runtime.draw(h.context, { ...h.options, isExport: true });
+  assert.equal(exported.backend, 'webgl2');
+  assert.equal(waited, 1);
+  assert.equal(h.draws.filter((call) => call[0] === 'image').length, 1, 'only the export frame drew the texture');
+  h.runtime.dispose();
+});

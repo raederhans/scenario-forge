@@ -244,11 +244,13 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
     if (gpu || unavailable) return;
     try { gpu = initialize(true); unavailable = !gpu; } catch { unavailable = true; }
   }
-  function isReady() {
+  // wait=true blocks on LINK_STATUS so an export never completes without the
+  // depth texture; frames keep polling COMPLETION_STATUS_KHR instead.
+  function isReady({ wait = false } = {}) {
     if (gpu?.pending) {
       const { gl, program, pending } = gpu;
       try {
-        if (!gl.getProgramParameter(program, pending.COMPLETION_STATUS_KHR)) return false;
+        if (!wait && !gl.getProgramParameter(program, pending.COMPLETION_STATUS_KHR)) return false;
         if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
         gpu.pending = null;
       } catch { release(); unavailable = true; }
@@ -362,11 +364,12 @@ export function createBathymetryTextureRenderer({ createCanvas, getWebGL2Context
   }
 
   function render({ width, height, transform, projectionParams, source, ramp, preset,
-    contourStrength = 0, overlay = null, detail = true, hillshadeStrength = .12, hillshadeExaggeration = 4 }) {
+    contourStrength = 0, overlay = null, detail = true, hillshadeStrength = .12, hillshadeExaggeration = 4,
+    waitForGpu = false }) {
     if (!gpu && !unavailable) {
       try { gpu = initialize(); unavailable = !gpu; } catch { unavailable = true; }
     }
-    if (!isReady()) return { canvas: null, backend: 'pending', coveredBounds: null, missingTileKeys: [] };
+    if (!isReady({ wait: waitForGpu })) return { canvas: null, backend: 'pending', coveredBounds: null, missingTileKeys: [] };
     const canvas = outputCanvas ||= createCanvas(width, height);
     if (canvas.width !== width) canvas.width = width;
     if (canvas.height !== height) canvas.height = height;
