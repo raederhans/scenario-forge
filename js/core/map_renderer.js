@@ -1816,6 +1816,9 @@ function getPoliticalCollectionOwner() {
       getFeatureId,
       isPoliticalInteractionRenderableFeature,
       isRenderDiagEnabled: () => renderDiag.enabled,
+      // Normalization already paid for geoArea; the spatial index diagnostics
+      // read the same number instead of walking every ring a second time.
+      recordSphericalArea: (geometry, area) => getProjectedGeometryBoundsOwner().seedSphericalGeometryArea(geometry, area),
     },
   });
   return politicalCollectionOwner;
@@ -1911,6 +1914,16 @@ function getProjectedGeographicPath(object) {
   return getProjectedGeographicPathCache().getPath(object);
 }
 
+// The ocean clip path is the most expensive single step of the first frame
+// (about 0.4 s on TNO). Build it in background slices while startup still
+// waits for chunk data; the frame falls back to the synchronous build if it
+// arrives first.
+function prewarmOceanClipPath() {
+  const ocean = runtimeState.oceanData;
+  if (!Array.isArray(ocean?.features) || !ocean.features.length) return;
+  void getProjectedGeographicPathCache().prepare(ocean).catch(() => {});
+}
+
 function getOceanExclusionPath(collection) {
   if (!collection || typeof globalThis.Path2D?.prototype?.addPath !== "function") return null;
   const generation = getProjectionGeometryGeneration(rendererSurfaceHost.getProjection());
@@ -1974,6 +1987,8 @@ function drawBathymetryTexture(oceanStyle) {
     baseRgb: globalThis.d3.rgb(getOceanBaseFillColor()),
     preset: oceanStyle.preset,
     isExport: exportRenderInProgress,
+    // Gesture frames move the last depth image; the idle frame re-shades exactly.
+    reuseLastOutput: !exportRenderInProgress && runtimeState.renderPhase !== RENDER_PHASE_IDLE,
   });
   publishBathymetryTextureState(result);
   return result;
@@ -9306,6 +9321,22 @@ function drawScheduledHitCanvasWithMetric(details = {}) {
     activeScenarioId = String(runtimeState.activeScenarioId || ""),
     ...metricDetails
   } = details || {};
+  // The geometry worker only takes hit builds once startup read-only ends, and
+  // the read-only collection is replaced by the detail promotion anyway. A full
+  // main-thread build here (about 0.7 s on TNO) would be thrown away; point
+  // probes cover hover until the worker builds the canvas after unlock.
+  if (geometryWorkerEnabled && (runtimeState.startupReadonly || runtimeState.startupReadonlyUnlockInFlight)) {
+    recordRenderPerfMetric("buildHitCanvas", 0, {
+      ...metricDetails,
+      built: false,
+      skipped: true,
+      mode: "deferred",
+      reason,
+      skipReason: "startup-readonly",
+      activeScenarioId,
+    });
+    return false;
+  }
   return drawHitCanvasWithMetric({
     ...metricDetails,
     mode: "deferred",
@@ -15987,7 +16018,11 @@ function enforceZoomConstraints(options) {
 }
 
 function fitProjection({ skipSpatialIndex = false } = {}) {
-  return getRendererFitProjectionOwner().fitProjection({ skipSpatialIndex });
+  const result = getRendererFitProjectionOwner().fitProjection({ skipSpatialIndex });
+  // Every fit changes the projection generation and drops cached paths, so the
+  // ocean clip prewarm follows the fit rather than initMap alone.
+  prewarmOceanClipPath();
+  return result;
 }
 
 function getResizeReason(reason, fallback = "resize") {

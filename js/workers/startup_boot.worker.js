@@ -6,6 +6,7 @@ importScripts(
   new URL("../core/scenario_chunk_format_shared.js", self.location.href).href,
   new URL("../core/startup_topology_codec_shared.js", self.location.href).href,
   new URL("../core/geometry_transfer_codec_shared.js", self.location.href).href,
+  new URL("../../vendor/d3.v7.min.js", self.location.href).href,
   new URL("../../vendor/topojson-client.min.js", self.location.href).href
 );
 
@@ -288,6 +289,22 @@ function decodeTopologyObject(topology, objectName) {
     const collection = self.topojson.feature(topology, object);
     if (!collection || typeof collection !== "object") {
       return null;
+    }
+    const geoArea = globalThis.d3?.geoArea;
+    if (typeof geoArea === "function") {
+      if (objectName === "political") {
+        globalThis.__scenarioForgeScenarioChunkFormatShared.orientPoliticalFeatureCollection(collection, geoArea);
+      } else {
+        const features = collection.type === "Feature" ? [collection] : collection.features;
+        for (const feature of features) {
+          try {
+            const area = geoArea(feature);
+            if (Number.isFinite(area)) feature.sphericalArea = area;
+          } catch (_error) {
+            continue;
+          }
+        }
+      }
     }
     return collection;
   } catch (_error) {

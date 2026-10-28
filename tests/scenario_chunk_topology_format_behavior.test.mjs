@@ -14,12 +14,14 @@ const importedScripts = new Map([
   ["scenario_chunk_format_shared.js", source("../js/core/scenario_chunk_format_shared.js")],
   ["startup_topology_codec_shared.js", source("../js/core/startup_topology_codec_shared.js")],
   ["geometry_transfer_codec_shared.js", source("../js/core/geometry_transfer_codec_shared.js")],
+  ["d3.v7.min.js", source("../vendor/d3.v7.min.js")],
   ["topojson-client.min.js", source("../vendor/topojson-client.min.js")],
 ]);
 const vendorContext = vm.createContext({});
 vm.runInContext(importedScripts.get("topojson-client.min.js"), vendorContext);
+vm.runInContext(importedScripts.get("d3.v7.min.js"), vendorContext);
 const topojson = vendorContext.topojson;
-const { decodeScenarioChunkPayload } = globalThis.__scenarioForgeScenarioChunkFormatShared;
+const { decodeScenarioChunkPayload, orientPoliticalFeatureCollection } = globalThis.__scenarioForgeScenarioChunkFormatShared;
 
 // Absolute arcs include a shared border, reversed arcs, closed rings, a hole,
 // multiple polygon components, and decimals that must survive without rounding.
@@ -61,6 +63,9 @@ const expected = {
   ],
 };
 const normalObject = (value) => structuredClone(value);
+// The worker realm has d3, so its decode also orients political rings and
+// attaches feature.sphericalArea; the main-thread decode without d3 does not.
+const expectedWorker = orientPoliticalFeatureCollection(structuredClone(expected), vendorContext.d3.geoArea);
 const jsonResponse = (payload, compressed = false) => new Response(
   compressed ? gzipSync(JSON.stringify(payload)) : JSON.stringify(payload),
 );
@@ -179,7 +184,7 @@ for (const compressed of [false, true]) {
     const result = await loadScenarioChunkFile(`https://example.test/political.json${compressed ? ".gz" : ""}`, { useWorker: true });
     assert.equal(request.chunkType, "scenario-chunk");
     assert.equal(result.reason, "worker");
-    assert.deepEqual(result.payload, expected);
+    assert.deepEqual(result.payload, expectedWorker);
     assert.equal(result.metrics.compressed, compressed);
   });
 }
@@ -214,6 +219,6 @@ test("full runtime topology keeps its raw topology and separate decoded collecti
   const reply = await workerReply(harness, { chunkType: "runtime-topology", runtimeTopologyUrl: "/runtime.topo.json" });
   assert.equal(reply.type, "RUNTIME_CHUNK_READY");
   assert.deepEqual(reply.runtimePoliticalTopology, topology);
-  assert.deepEqual(reply.decodedCollections.politicalData, expected);
+  assert.deepEqual(reply.decodedCollections.politicalData, expectedWorker);
   assert.equal("chunkPayload" in reply, false);
 });

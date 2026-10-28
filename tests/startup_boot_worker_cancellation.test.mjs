@@ -10,7 +10,7 @@ const codecSource = await readFile(new URL("../js/core/geometry_transfer_codec_s
 const chunkFormatSource = await readFile(new URL("../js/core/scenario_chunk_format_shared.js", import.meta.url), "utf8");
 const topologyCodecSource = await readFile(new URL("../js/core/startup_topology_codec_shared.js", import.meta.url), "utf8");
 
-function createWorkerHarness({ feature = () => null, fetchResource = null, onPostMessage = null, failTransfer = false, structuredTransfer = false, geometryCodec = null } = {}) {
+function createWorkerHarness({ feature = () => null, fetchResource = null, onPostMessage = null, failTransfer = false, structuredTransfer = false, geometryCodec = null, d3 = null } = {}) {
   const posted = [];
   const transferLists = [];
   const pendingFetches = new Map();
@@ -42,6 +42,7 @@ function createWorkerHarness({ feature = () => null, fetchResource = null, onPos
     String,
     URL,
     console,
+    d3,
     performance: { now: () => 1 },
     self,
     globalThis: null,
@@ -471,6 +472,53 @@ function restoreWorkerResponse(message) {
   const value = globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(payload);
   return { ...message, ...(field === "message" ? value : { [field]: value }) };
 }
+
+test("worker orients political geometry and transfers areas while retaining nonpolitical winding", async () => {
+  const sandbox = vm.createContext({});
+  for (const path of ["../vendor/d3.v7.min.js", "../vendor/topojson-client.min.js"]) {
+    vm.runInContext(await readFile(new URL(path, import.meta.url), "utf8"), sandbox);
+  }
+  const topology = {
+    type: "Topology",
+    arcs: [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]],
+    objects: {
+      political: { type: "GeometryCollection", geometries: [{ type: "Polygon", id: "A", arcs: [[0]] }] },
+      ocean: { type: "GeometryCollection", geometries: [{ type: "Polygon", id: "ocean", arcs: [[0]] }] },
+      rivers: { type: "GeometryCollection", geometries: [{ type: "LineString", id: "river", arcs: [0] }] },
+    },
+  };
+  const original = structuredClone(topology);
+  const { posted, self, transferLists } = createWorkerHarness({
+    d3: sandbox.d3,
+    feature: sandbox.topojson.feature,
+    structuredTransfer: true,
+    geometryCodec: (codec) => ({ ...codec, pack: (value, options) => codec.pack(value, { ...options, minCoordinateCount: 0 }) }),
+    fetchResource: async () => ({ ok: true, text: async () => JSON.stringify(topology) }),
+  });
+  self.onmessage({ data: { type: "LOAD_BASE_STARTUP", taskId: "areas", cachedTopologyPrimary: topology,
+    needTopologyPrimary: false, needLocales: false, needGeoAliases: false } });
+  await flushWorker();
+  assert.equal(posted[0].type, "BASE_STARTUP_READY");
+  assert.ok(transferLists[0].length > 0);
+  const { landData, oceanData, riversData } = restoreWorkerResponse(posted[0]).decodedCollections;
+  const political = landData.features[0];
+  assert.ok(political.sphericalArea < Math.PI * 2);
+  assert.deepEqual(political.geometry.coordinates[0], topology.arcs[0].slice().reverse());
+  const ocean = oceanData.features[0];
+  assert.ok(ocean.sphericalArea > Math.PI * 2);
+  assert.deepEqual(ocean.geometry.coordinates[0], topology.arcs[0]);
+  for (const feature of [political, ocean, riversData.features[0]]) {
+    assert.equal(feature.sphericalArea, sandbox.d3.geoArea(feature));
+    assert.equal(Object.getOwnPropertyDescriptor(feature, "sphericalArea").enumerable, true);
+  }
+  assert.equal(riversData.features[0].sphericalArea, 0);
+  self.onmessage({ data: { type: "DECODE_RUNTIME_CHUNK", taskId: "areas-chunk", chunkType: "scenario-chunk", chunkUrl: "/chunk.json" } });
+  await flushWorker();
+  assert.equal(posted[1].type, "RUNTIME_CHUNK_READY");
+  assert.ok(transferLists[1].length > 0);
+  assert.deepEqual(restoreWorkerResponse(posted[1]).chunkPayload.features[0], political);
+  assert.deepEqual(topology, original);
+});
 
 test("startup bundle transfers raw arcs and decoded coordinates through the mainline whole-message protocol", async () => {
   const topology = largeArcTopology();

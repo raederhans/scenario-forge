@@ -63,6 +63,48 @@ var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGe
     }
     return mapGeometry(payload.value, (geometry, depth) => ({ ...geometry, coordinates: read(depth, [...geometry.coordinates]) }), payload.encoding === "geo-f64-v2");
   }
-  return Object.freeze({ pack, unpack });
+  function yieldToBackground() {
+    if (typeof globalThis.scheduler?.postTask === "function") {
+      return globalThis.scheduler.postTask(() => {}, { priority: "background" });
+    }
+    return new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  async function unpackAsync(payload, { yieldControl = yieldToBackground, nowMs = () => performance.now(), sliceBudgetMs = 6 } = {}) {
+    if (payload?.encoding !== "geo-f64-v1" && payload?.encoding !== "geo-f64-v2") throw new Error("Unsupported geometry transport encoding.");
+    const { coordinates, lengths } = payload;
+    const tasks = [];
+    let sliceStartedAt = nowMs();
+    const result = mapGeometry(payload.value, (geometry, depth) => {
+      const decoded = { ...geometry, coordinates: [] };
+      tasks.push({ decoded, depth, cursor: [...geometry.coordinates] });
+      return decoded;
+    }, payload.encoding === "geo-f64-v2");
+    function read(depth, cursor) {
+      const array = new Array(lengths[cursor[1]++]);
+      for (let i = 0; i < array.length; i += 1) array[i] = depth === 1 ? coordinates[cursor[0]++] : read(depth - 1, cursor);
+      return array;
+    }
+    for (const { decoded, depth, cursor } of tasks) {
+      if (decoded.type === "MultiLineString") {
+        const lines = decoded.coordinates;
+        lines.length = lengths[cursor[1]++];
+        for (let i = 0; i < lines.length; i += 1) {
+          lines[i] = read(depth - 1, cursor);
+          if (nowMs() - sliceStartedAt >= sliceBudgetMs) {
+            await yieldControl();
+            sliceStartedAt = nowMs();
+          }
+        }
+      } else {
+        decoded.coordinates = read(depth, cursor);
+      }
+      if (nowMs() - sliceStartedAt >= sliceBudgetMs) {
+        await yieldControl();
+        sliceStartedAt = nowMs();
+      }
+    }
+    return result;
+  }
+  return Object.freeze({ pack, unpack, unpackAsync });
 })();
 globalThis.__scenarioForgeGeometryTransferCodecShared = SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED;

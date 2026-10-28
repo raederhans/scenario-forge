@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { buildWaterSpatialItems } from "../js/core/renderer/spatial_index_runtime_builders.js";
+import { buildWaterSpatialItems, iterateWaterSpatialItems } from "../js/core/renderer/spatial_index_runtime_builders.js";
 
 function bounds(seed) {
   return {
@@ -12,6 +12,34 @@ function bounds(seed) {
     area: seed + 4,
   };
 }
+
+test("water iterator yields between every bounds calculation including feature fallback", () => {
+  const feature = { id: "water" };
+  const parts = [{ id: "a" }, { id: "b" }, { id: "c" }];
+  const calls = [];
+  const iterator = iterateWaterSpatialItems({
+    features: [feature],
+    getFeatureId: (candidate) => candidate.id,
+    collectFeatureHitGeometries: () => parts,
+    computeProjectedGeoBounds(candidate) {
+      calls.push(candidate);
+      return candidate === parts[0] ? null : bounds(10);
+    },
+  });
+  let step;
+  do {
+    const before = calls.length;
+    step = iterator.next();
+    assert.ok(calls.length - before <= 1);
+    if (calls.length > before) assert.equal(step.done, false);
+  } while (!step.done);
+  assert.deepEqual(calls, [parts[0], feature, parts[1], parts[2]]);
+  assert.deepEqual(step.value.map(({ id, drawOrder }) => ({ id, drawOrder })), [
+    { id: "water::part:0", drawOrder: 0 },
+    { id: "water::part:1", drawOrder: 1 },
+    { id: "water::part:2", drawOrder: 2 },
+  ]);
+});
 
 test("water builder lazily computes one feature fallback while preserving part priority and order", () => {
   const feature = { id: "water-a", properties: { __source: "scenario" } };

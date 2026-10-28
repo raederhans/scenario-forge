@@ -74,7 +74,7 @@ test("district definitions take precedence, including empty districts, and TNO d
   const empty = policy.resolveCountryParentGroupingCandidate("FR", entries);
   assert.equal(empty.forcedRule, "scenario_district");
   assert.equal(empty.accepted, false);
-  state.scenarioDistrictGroupsData.countries.FR.districts = { A: { feature_ids: ["1", "2"] }, B: { feature_ids: ["2", "3", "4"] } };
+  state.scenarioDistrictGroupsData = { countries: { FR: { districts: { A: { feature_ids: ["1", "2"] }, B: { feature_ids: ["2", "3", "4"] } } } } };
   const result = policy.resolveCountryParentGroupingCandidate("FR", entries);
   assert.equal(result.accepted, false);
   assert.equal(result.featureToGroup.has("2"), false, "conflicting assignments must not be guessed");

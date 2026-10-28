@@ -8,6 +8,9 @@ import { isMainThread, parentPort, Worker as ThreadWorker, workerData } from "no
 const workerUrl = new URL("../js/workers/startup_boot.worker.js", import.meta.url);
 const require = createRequire(import.meta.url);
 const topojson = require("../vendor/topojson-client.min.js");
+const d3 = require("../vendor/d3.v7.min.js");
+// Expectations reuse the worker's own political ring orientation helper.
+await import("../js/core/scenario_chunk_format_shared.js");
 
 // Run classic scripts in the worker's own realm: a separate VM context would
 // make plain fixture objects fail the codec's Object.prototype check.
@@ -180,8 +183,18 @@ if (!isMainThread) {
       waterRegionsData: "water_regions", oceanData: "ocean", landBgData: "land",
       urbanData: "urban", physicalData: "physical",
     };
+    // The worker orients political rings and attaches each feature's spherical
+    // area (feature.sphericalArea) while decoding; expectations mirror that.
+    const decode = (objectName) => {
+      const collection = topojson.feature(topology, topology.objects[objectName]);
+      if (objectName === "political") {
+        return globalThis.__scenarioForgeScenarioChunkFormatShared.orientPoliticalFeatureCollection(collection, d3.geoArea);
+      }
+      for (const feature of collection.type === "Feature" ? [collection] : collection.features) feature.sphericalArea = d3.geoArea(feature);
+      return collection;
+    };
     return Object.fromEntries(Object.entries(names).map(([field, objectName]) => [
-      field, topology.objects[objectName] ? topojson.feature(topology, topology.objects[objectName]) : null,
+      field, topology.objects[objectName] ? decode(objectName) : null,
     ]));
   }
 
@@ -270,6 +283,41 @@ if (!isMainThread) {
       });
     });
   }
+
+  test("startup client awaits sliced unpack and includes yield time in unpack metrics", async () => {
+    const codec = globalThis.__scenarioForgeGeometryTransferCodecShared;
+    let releaseUnpack, reachedYield, startedAt, settled = false;
+    const paused = new Promise((resolve) => { reachedYield = resolve; });
+    const resume = new Promise((resolve) => { releaseUnpack = resolve; });
+    globalThis.__scenarioForgeGeometryTransferCodecShared = {
+      ...codec,
+      unpackAsync(payload) {
+        startedAt = performance.now();
+        let clock = 0;
+        return codec.unpackAsync(payload, {
+          nowMs: () => { clock += 4; return clock; },
+          yieldControl: () => { reachedYield(); return resume; },
+        });
+      },
+    };
+    try {
+      const resources = makeResources();
+      await withWorker(resources, async (adapter) => {
+        const pending = readyCases[0].load().then((value) => { settled = true; return value; });
+        await paused;
+        assert.equal(settled, false);
+        const elapsedBeforeResume = performance.now() - startedAt;
+        releaseUnpack();
+        const result = await pending;
+        readyCases[0].check(result, resources);
+        assert.ok(result.metrics.geometryUnpackingMs >= elapsedBeforeResume);
+        await assertTransport(adapter(), result, { ...readyCases[0], field: "message", encoding: "geo-f64-v2" });
+      });
+    } finally {
+      releaseUnpack();
+      globalThis.__scenarioForgeGeometryTransferCodecShared = codec;
+    }
+  });
 
   test("v6 encoded base topology is restored before decoding and full-envelope transfer", async () => {
     const resources = makeResources();

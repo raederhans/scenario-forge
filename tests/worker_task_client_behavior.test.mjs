@@ -66,6 +66,55 @@ test("worker task client resolves matching task replies and clears timeouts", as
   }
 });
 
+for (const rejectResolution of [false, true]) {
+  test(`worker task client adopts async ${rejectResolution ? "rejection" : "resolution"} after cleanup`, async () => {
+    const originalSetTimeout = globalThis.setTimeout;
+    const originalClearTimeout = globalThis.clearTimeout;
+    let timeoutCallback, finishResolution;
+    const clearedTimeouts = [];
+    const postedMessages = [];
+    const controller = new AbortController();
+    const worker = {
+      postMessage: (message) => postedMessages.push(message),
+      terminate() { this.terminated = true; },
+    };
+    const failure = new Error("async unpack failed");
+    try {
+      globalThis.setTimeout = (callback) => {
+        timeoutCallback = callback;
+        return "async-timeout";
+      };
+      globalThis.clearTimeout = (id) => clearedTimeouts.push(id);
+      const client = createWorkerTaskClient({
+        createWorker: () => worker,
+        createTaskId: () => "async-task",
+        resolveMessage: (message) => {
+          assert.equal(client.getPendingTaskCount(), 0);
+          assert.deepEqual(clearedTimeouts, ["async-timeout"]);
+          return new Promise((resolve, reject) => {
+            finishResolution = () => rejectResolution ? reject(failure) : resolve(message.value);
+          });
+        },
+      });
+      await client.ensureWorker();
+      const result = client.dispatchTask("LOAD", {}, { signal: controller.signal });
+      await Promise.resolve();
+      worker.onmessage({ data: { taskId: "async-task", value: 42 } });
+      timeoutCallback();
+      controller.abort();
+      assert.equal(worker.terminated, undefined);
+      assert.equal(postedMessages.length, 1);
+      client.terminate(new Error("worker recycled during unpack"));
+      finishResolution();
+      if (rejectResolution) await assert.rejects(result, (error) => error === failure);
+      else assert.equal(await result, 42);
+    } finally {
+      globalThis.setTimeout = originalSetTimeout;
+      globalThis.clearTimeout = originalClearTimeout;
+    }
+  });
+}
+
 test("worker task client recycles worker and rejects pending work on timeout", async () => {
   const originalSetTimeout = globalThis.setTimeout;
   const originalClearTimeout = globalThis.clearTimeout;

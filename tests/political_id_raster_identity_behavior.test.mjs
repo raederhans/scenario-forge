@@ -175,3 +175,32 @@ test("concurrent requests share pending geometry digests without sharing identit
   assert.equal(first, second);
   assert.deepEqual(identity.getStats(), { geometryHashes: 2, identityHashes: 2, cacheHits: 2 });
 });
+
+test("identity yields between entries without changing content identity and skips cache hits", async () => {
+  const value = input();
+  value.entries = Array.from({ length: 200 }, (_, index) => ({
+    id: `entry-${index}`, code: index + 1,
+    feature: { type: "Point", coordinates: [index, index] },
+  }));
+  function timedBuilder(sliceBudgetMs) {
+    let elapsed = 0, yields = 0;
+    const identity = createPoliticalIdRasterIdentityBuilder({
+      crypto: { subtle: { digest: (...args) => {
+        elapsed += 4;
+        return webcrypto.subtle.digest(...args);
+      } } },
+      nowMs: () => elapsed,
+      yieldControl: async () => { yields++; },
+      sliceBudgetMs,
+    });
+    return { identity, yieldCount: () => yields };
+  }
+  const sliced = timedBuilder(undefined), unsliced = timedBuilder(Infinity);
+  const expected = await unsliced.identity.identify(value);
+  assert.equal(await sliced.identity.identify(value), expected);
+  assert.ok(sliced.yieldCount() > 0);
+  assert.equal(unsliced.yieldCount(), 0);
+  const yields = sliced.yieldCount();
+  assert.equal(await sliced.identity.identify(value), expected);
+  assert.equal(sliced.yieldCount(), yields);
+});

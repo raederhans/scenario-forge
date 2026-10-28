@@ -1,6 +1,7 @@
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import { pageResourceBudget } from "../runtime_resource_budget.js";
 import { GeometryBudgetMap, getGeometryRetentionWeights, PROJECTED_PATH_CACHE_BUDGET } from "./geometry_cache_budget.js";
+import { yieldToBackground } from "../background_yield.js";
 
 // Projected coordinates do not include the canvas camera or DPR transform.
 // Stream directly into Path2D to preserve the precision of the Canvas path.
@@ -18,6 +19,7 @@ export function createProjectedGeographicPathCache({
   });
   let generation = -1;
   let stream = null;
+  const pendingPreparations = new Map();
   let hits = 0;
   let builds = 0;
 
@@ -65,8 +67,88 @@ export function createProjectedGeographicPathCache({
     return path;
   }
 
+  // Build a collection's path over several background slices so a large mask
+  // (the TNO ocean is about 0.4 s of geoPath streaming) is ready before the
+  // frame that needs it. getPath() still builds synchronously when asked first.
+  async function prepare(object, {
+    yieldControl = yieldToBackground,
+    nowMs = () => globalThis.performance?.now?.() ?? Date.now(),
+    sliceBudgetMs = 6,
+  } = {}) {
+    if (!object || typeof object !== "object" || typeof Path2DClass !== "function" || typeof geoPath !== "function") return null;
+    if (object.type !== "FeatureCollection" || !Array.isArray(object.features)
+      || typeof Path2DClass.prototype?.addPath !== "function") {
+      return getPath(object);
+    }
+    const projection = getProjection?.();
+    if (!projection) return null;
+    const startGeneration = getProjectionGeometryGeneration(projection);
+    if (generation !== startGeneration) {
+      entries.clear();
+      generation = startGeneration;
+      stream = geoPath(projection);
+      updateResourceAccounting();
+    }
+    const existing = entries.get(object);
+    if (existing) {
+      hits += 1;
+      return existing.path;
+    }
+    const inFlight = pendingPreparations.get(object);
+    if (inFlight && inFlight.generation === startGeneration) return inFlight.promise;
+    const preparation = { generation: startGeneration, promise: null };
+    preparation.promise = (async () => {
+      // Leave the caller's task first: a single ocean polygon with thousands of
+      // island holes streams in one piece, which must not extend bootstrap.
+      await yieldControl();
+      if (generation !== startGeneration) return null;
+      const current = getProjection?.();
+      if (!current || getProjectionGeometryGeneration(current) !== startGeneration) return null;
+      const combined = new Path2DClass();
+      let sliceStartedAt = nowMs();
+      // d3 streams each polygon of a MultiPolygon independently, so the ocean's
+      // few huge features split into many slices without changing the path.
+      for (const unit of iteratePathUnits(object)) {
+        if (nowMs() - sliceStartedAt >= sliceBudgetMs) {
+          await yieldControl();
+          const current = getProjection?.();
+          if (!current || generation !== startGeneration || getProjectionGeometryGeneration(current) !== startGeneration) return null;
+          sliceStartedAt = nowMs();
+        }
+        const part = new Path2DClass();
+        stream.context(part)(unit);
+        combined.addPath(part);
+      }
+      const built = entries.get(object);
+      if (built) return built.path;
+      entries.set(object, {
+        path: combined,
+        estimatedBytes: getGeometryRetentionWeights(object).path,
+      });
+      builds += 1;
+      updateResourceAccounting();
+      return combined;
+    })().finally(() => {
+      if (pendingPreparations.get(object) === preparation) pendingPreparations.delete(object);
+    });
+    pendingPreparations.set(object, preparation);
+    return preparation.promise;
+  }
+
+  function* iteratePathUnits(collection) {
+    for (const feature of collection.features) {
+      const geometry = feature?.type === "Feature" ? feature.geometry : feature;
+      if (geometry?.type === "MultiPolygon" && Array.isArray(geometry.coordinates) && geometry.coordinates.length > 1) {
+        for (const polygon of geometry.coordinates) yield { type: "Polygon", coordinates: polygon };
+      } else {
+        yield feature;
+      }
+    }
+  }
+
   return Object.freeze({
     getPath,
+    prepare,
     reset,
     getStats: () => ({ hits, builds, generation, ...entries.getStats() }),
   });
