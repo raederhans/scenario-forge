@@ -23,8 +23,8 @@ function bindConsumers(path, names, runtime) {
     return source.slice(node.start, node.end);
   }).join("\n");
   return new Function("runtimeState", "getEffectiveScenarioHierarchy", "normalizeCountryCode",
-    "expandScenarioFeatureIds", "projectScenarioFeatureIds", `${declarations}\nreturn { ${names.join(", ")} };`)(
-    runtime, getEffectiveScenarioHierarchy, normalizeCountryCodeAlias, expandScenarioFeatureIds, projectScenarioFeatureIds);
+    "expandScenarioFeatureIds", "projectScenarioFeatureIds", "hierarchyGroupsCache", `${declarations}\nreturn { ${names.join(", ")} };`)(
+    runtime, getEffectiveScenarioHierarchy, normalizeCountryCodeAlias, expandScenarioFeatureIds, projectScenarioFeatureIds, new WeakMap());
 }
 
 function fixture() {
@@ -135,6 +135,42 @@ test("quick-fill and border consumers plus source-bound sidebar and releasable c
   }
   runtime.activeScenarioManifest = null;
   assert.equal(getHierarchyGroupsForCode("US")[0].id, "US_old");
+});
+
+test("sidebar indexes scenario hierarchy once across country queries and refreshes replaced inputs", () => {
+  const runtime = fixture();
+  const hierarchy = getEffectiveScenarioHierarchy(runtime);
+  const originalGroups = hierarchy.groups;
+  const expected = (code) => Object.entries(hierarchy.groups)
+    .filter(([id]) => id.startsWith(`${code}_`))
+    .map(([id, children]) => ({
+      id,
+      label: hierarchy.labels[id] || id.replace(`${code}_`, "").replace(/_/g, " "),
+      children,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+  const expectedUS = expected("US");
+  const expectedIN = expected("IN");
+  let enumerations = 0;
+  hierarchy.groups = new Proxy(originalGroups, {
+    ownKeys(target) {
+      enumerations += 1;
+      return Reflect.ownKeys(target);
+    },
+  });
+  const { getHierarchyGroupsForCode } = bindConsumers("../js/ui/sidebar.js", ["getHierarchyGroupsForCode"], runtime);
+  const us = getHierarchyGroupsForCode("us");
+  assert.deepEqual(us, expectedUS);
+  assert.deepEqual(getHierarchyGroupsForCode("IN"), expectedIN);
+  assert.deepEqual(getHierarchyGroupsForCode("ZZ"), []);
+  assert.equal(enumerations, 1);
+  for (const group of us) assert.equal(group.children, originalGroups[group.id]);
+
+  hierarchy.labels = { ...hierarchy.labels, US_State_0: "AAA" };
+  assert.equal(getHierarchyGroupsForCode("US")[0].label, "AAA");
+  assert.equal(enumerations, 2);
+  hierarchy.groups = { ...originalGroups, US_EXTRA_North: ["extra"] };
+  assert.deepEqual(getHierarchyGroupsForCode("US"), expected("US"));
 });
 
 test("scenario feature merges replace their members in groups and quick-fill levels", () => {

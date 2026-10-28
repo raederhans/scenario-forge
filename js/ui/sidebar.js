@@ -349,6 +349,8 @@ function ensureCountryPaletteColor(code, fallbackIndex = 0) {
   return generated;
 }
 
+const hierarchyGroupsCache = new WeakMap();
+
 export function getHierarchyGroupsForCode(code) {
   const normalizedCode = normalizeCountryCode(code);
   if (!normalizedCode) return [];
@@ -357,6 +359,28 @@ export function getHierarchyGroupsForCode(code) {
     return runtimeState.hierarchyGroupsByCode.get(normalizedCode) || [];
   }
   if (!hierarchy?.groups) return [];
+  if (!normalizedCode.includes("_")) {
+    let cached = hierarchyGroupsCache.get(hierarchy);
+    if (!cached || cached.groups !== hierarchy.groups || cached.labels !== hierarchy.labels) {
+      const byCode = new Map();
+      const labels = hierarchy.labels || {};
+      Object.entries(hierarchy.groups).forEach(([groupId, children]) => {
+        const separator = groupId.indexOf("_");
+        if (separator < 0) return;
+        const groupCode = groupId.slice(0, separator);
+        if (!byCode.has(groupCode)) byCode.set(groupCode, []);
+        byCode.get(groupCode).push({
+          id: groupId,
+          label: labels[groupId] || groupId.slice(separator + 1).replace(/_/g, " "),
+          children: Array.isArray(children) ? children : [],
+        });
+      });
+      byCode.forEach((groups) => groups.sort((a, b) => a.label.localeCompare(b.label)));
+      cached = { groups: hierarchy.groups, labels: hierarchy.labels, byCode };
+      hierarchyGroupsCache.set(hierarchy, cached);
+    }
+    return cached.byCode.get(normalizedCode) || [];
+  }
   const labels = hierarchy.labels || {};
   const groups = [];
   Object.entries(hierarchy.groups).forEach(([groupId, children]) => {
