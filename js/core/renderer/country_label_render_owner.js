@@ -670,12 +670,35 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     return job;
   }
 
-  function advanceDeferredPreparation() {
-    const job = getCurrentDeferredPreparation();
-    if (job && !workerFailed) preparePendingFits(job.pending, job.fitView);
+  function publishDeferredProgress(job) {
     const complete = workerFailed || (job && job.pending.every(({ entry, key }) => entry.fits.has(key)));
     if (complete) deferredPreparation = null;
     requestProgressRepaint(complete);
+  }
+
+  function scheduleDeferredPreparation() {
+    if (workerFailed || scheduledContinuation || workerRequests.size >= MAX_PENDING_WORKER_FITS) return;
+    const job = getCurrentDeferredPreparation();
+    if (!job?.pending.some(({ entry, key }) => !entry.fits.has(key) && !entry.workerPending.has(key)
+      && entry.workerPending.size < MAX_CACHED_FITS && canQueueEntry(entry))) return;
+    const continuation = {};
+    scheduledContinuation = continuation;
+    // Projection and posting stay at idle priority so a stream of worker
+    // replies never outranks startup work; replies only coalesce repaints.
+    scheduleWork(() => {
+      if (scheduledContinuation !== continuation) return;
+      scheduledContinuation = null;
+      const current = getCurrentDeferredPreparation();
+      // A gesture frame owns the main thread; the settled frame queues again.
+      if (!current || workerFailed || state.isInteracting) return;
+      preparePendingFits(current.pending, current.fitView);
+      publishDeferredProgress(current);
+    });
+  }
+
+  function advanceDeferredPreparation() {
+    publishDeferredProgress(getCurrentDeferredPreparation());
+    scheduleDeferredPreparation();
   }
 
   function notifyPreparationProgress(request = null) {
@@ -854,19 +877,8 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
     }
     diagnostics.pendingFits = pending.length;
     if (deferred && !privatePreparation) deferredPreparation = { pending, fitView };
-    const nextPreparation = pending.find(({ entry, key }) => !entry.workerPending.has(key)
-      && entry.workerPending.size < MAX_CACHED_FITS && canQueueEntry(entry));
     if (privatePreparation) advancePrivatePreparation();
-    else if (!workerFailed && nextPreparation && !scheduledContinuation && workerRequests.size < MAX_PENDING_WORKER_FITS) {
-      const continuation = {};
-      scheduledContinuation = continuation;
-      scheduleWork(() => {
-        if (scheduledContinuation !== continuation) return;
-        scheduledContinuation = null;
-        if (!getCurrentDeferredPreparation()) return;
-        advanceDeferredPreparation();
-      });
-    }
+    else scheduleDeferredPreparation();
     return diagnostics.drawn;
   }
 
