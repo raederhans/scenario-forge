@@ -31,12 +31,12 @@
     {
       "tag": "CHI",
       "field": "feature_count",
-      "equals": 1445
+      "equals": 725
     },
     {
       "tag": "GXC",
       "field": "feature_count",
-      "equals": 87
+      "equals": 59
     },
     {
       "tag": "YUN",
@@ -46,7 +46,7 @@
     {
       "tag": "SHX",
       "field": "feature_count",
-      "equals": 136
+      "equals": 42
     },
     {
       "tag": "QMA",
@@ -66,19 +66,19 @@
     {
       "tag": "PRC",
       "field": "feature_count",
-      "equals": 25
+      "equals": 17
     },
     {
       "tag": "SIC",
       "field": "feature_count",
-      "equals": 8
+      "equals": 28
     }
   ],
   "summary_equals": {
     "blocker_count": 0,
-    "feature_count": 23426,
-    "owner_count": 120,
-    "controller_count": 120,
+    "feature_count": 21066,
+    "owner_count": 225,
+    "controller_count": 225,
     "synthetic_owner_feature_count": 23,
     "owner_controller_split_feature_count": 0,
     "controller_rule_count": 0
@@ -99,8 +99,8 @@
   },
   "controller_set_assertions": [
     {
-      "name": "china_hebei_chahar_sample_controller_men",
-      "expected_controller_tag": "MEN",
+      "name": "china_hebei_chahar_sample_controller_cnz",
+      "expected_controller_tag": "CNZ",
       "feature_ids": [
         "CN_CITY_17275852B74586174185496"
       ]
@@ -120,8 +120,8 @@
       ]
     },
     {
-      "name": "china_hainan_sample_controller_jap",
-      "expected_controller_tag": "JAP",
+      "name": "china_hainan_sample_controller_jsc",
+      "expected_controller_tag": "JSC",
       "feature_ids": [
         "CN_CITY_17275852B2295538790743"
       ]
@@ -171,8 +171,8 @@
       ]
     },
     {
-      "name": "bohemia_moravia_remainder_owner_ger",
-      "expected_owner_tag": "GER",
+      "name": "bohemia_moravia_remainder_owner_bom",
+      "expected_owner_tag": "BOM",
       "feature_id_prefixes": [
         "CZ_ADM2_"
       ],
@@ -227,15 +227,15 @@
       ]
     },
     {
-      "name": "jidong_sample_owner_chi",
-      "expected_owner_tag": "CHI",
+      "name": "jidong_sample_owner_ncp",
+      "expected_owner_tag": "NCP",
       "feature_ids": [
         "CN_CITY_17275852B84296108244083"
       ]
     },
     {
-      "name": "china_shandong_owner_chi",
-      "expected_owner_tag": "CHI",
+      "name": "china_shandong_owner_ncp",
+      "expected_owner_tag": "NCP",
       "feature_ids": [
         "CN_CITY_17275852B85544446441725"
       ]
@@ -258,7 +258,7 @@
       "name": "china_guangxi_owner_gxc",
       "expected_owner_tag": "GXC",
       "feature_ids": [
-        "CN_CITY_17275852B77313722911095"
+        "CN_CITY_17275852B11515718016488"
       ]
     },
     {
@@ -315,6 +315,34 @@
       "expected_owner_tag": "TIB",
       "feature_ids": [
         "CN_CITY_17275852B88896253540800"
+      ]
+    },
+    {
+      "name": "china_wuhan_owner_jcc",
+      "expected_owner_tag": "JCC",
+      "feature_ids": [
+        "CN_CITY_17275852B42041968712265"
+      ]
+    },
+    {
+      "name": "china_shanghai_owner_rgc",
+      "expected_owner_tag": "RGC",
+      "feature_ids": [
+        "CN_CITY_17275852B82708605205805"
+      ]
+    },
+    {
+      "name": "crimea_owner_crm",
+      "expected_owner_tag": "CRM",
+      "feature_ids": [
+        "UA_RAY_74538382B84040377374615"
+      ]
+    },
+    {
+      "name": "faroe_owner_fro",
+      "expected_owner_tag": "FRO",
+      "feature_ids": [
+        "FO"
       ]
     }
   ]

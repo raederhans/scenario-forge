@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1936/audit.json",
-  "baseline_hash": "24d8340c9335a1f0a57df484434d33054cdbdd582783311d79931b7af5819c86",
+  "baseline_hash": "f5a96ae7a7639fcbd9d7f9a8fc51c59be6ef37f8868bd1447a79f8e2ce37137e",
   "bookmark_date": "1936.1.1.12",
   "bookmark_description": "GATHERING_STORM_DESC",
   "bookmark_name": "GATHERING_STORM_NAME",
@@ -2466,10 +2466,10 @@
   "runtime_topology_url": "data/scenarios/hoi4_1936/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "41abaa51c8653b4dcd274a6359d1a933d2c4195bd64a062ba489c95d76f7a3f4",
+  "snapshot_fingerprint": "6c75b454877d4f4e55506f84834e003c7750b90c6ed3344098f6c7f6ba433bf4",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "6fe52eba9358211775a1cb758d3f1119ce946bef97f9dcf1c0fe816c8ba8f140",
+    "detail_chunk_manifest_sha256": "b35d0f42d4fd313ccf712359f25cc7e6c93ca0c2cf56cb1987e375045955fb1a",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
     "runtime_topology_sha256": "d73cbe2088d826b1e28728a9ccb7f2ddf6e30c15313dbc0c7af66469c02b462d"
   },
@@ -2490,7 +2490,7 @@
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
     "changed_feature_count": 15333,
-    "controller_count": 127,
+    "controller_count": 227,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
@@ -2500,7 +2500,7 @@
     "manual_reviewed_feature_count": 14886,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 127,
+    "owner_count": 227,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5821,

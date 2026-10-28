@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "sakhalin",
+      "scenarios": ["hoi4_1936", "hoi4_1939"],
+      "tag": "JAP",
+      "select": {"country_codes": ["RU"], "bbox": [141.0, 43.0, 145.2, 49.6]},
+      "only_from_owners": ["SOV"]
+    },
+    {
+      "id": "japanese_cores",
+      "scenarios": ["hoi4_1936", "hoi4_1939"],
+      "tag": "JAP",
+      "select": {"owners": ["JAP"]},
+      "cores": "keep"
+    },
+    {
+      "id": "newfoundland",
+      "scenarios": ["hoi4_1936", "hoi4_1939"],
+      "tag": "NFL",
+      "name_en": "Dominion of Newfoundland",
+      "name_zh": "纽芬兰自治领",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "dominion",
+      "select": {"hierarchy_groups": ["CA_Newfoundland_and_Labrador"]}
+    },
+    {
+      "id": "wuhan",
+      "scenarios": ["hoi4_1939"],
+      "tag": "WHN",
+      "name_en": "Wuhan",
+      "name_zh": "武汉",
+      "color_hex": "#888888",
+      "select": {"prefectures": ["武汉市"]},
+      "cores": ["CHI"]
+    }
+  ]
+}
