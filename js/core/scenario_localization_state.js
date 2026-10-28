@@ -212,7 +212,7 @@ function* buildScenarioGeoLocalization(target, { baseGeoLocales = target.baseGeo
     yield* copyLocalizationEntries(geo, source);
   }
   yield* copyLocalizationEntries(aliasToStableKey, baseAliasMap);
-  remapScenarioMergedAliases(aliasToStableKey, target.activeScenarioManifest?.hierarchy_overrides);
+  yield* remapScenarioMergedAliases(aliasToStableKey, target.activeScenarioManifest?.hierarchy_overrides);
   yield* copyLocalizationEntries(aliasToStableKey, patch.aliasToStableKey);
   return { geo, aliasToStableKey, synchronizedNamePatch };
 }
@@ -220,7 +220,7 @@ function* buildScenarioGeoLocalization(target, { baseGeoLocales = target.baseGeo
 // Scenario-scoped merges keep their members in the shared alias map; in this
 // scenario those aliases, and those of an earlier scoped merge merged again,
 // name the final merged feature. The shared map itself stays unprojected.
-function remapScenarioMergedAliases(aliasToStableKey, overrides) {
+function* remapScenarioMergedAliases(aliasToStableKey, overrides) {
   const featureMerges = overrides?.feature_merges;
   if (!featureMerges || typeof featureMerges !== "object") return;
   const merged = new Map();
@@ -230,8 +230,12 @@ function remapScenarioMergedAliases(aliasToStableKey, overrides) {
   Object.entries(overrides.feature_redirects || {}).forEach(([source, mergedId]) => {
     if (typeof mergedId === "string") merged.set(`id::${source}`, `id::${mergedId}`);
   });
-  for (const [alias, stableKey] of Object.entries(aliasToStableKey)) {
+  const aliases = Object.keys(aliasToStableKey);
+  for (let index = 0; index < aliases.length; index += 1) {
+    const alias = aliases[index];
+    const stableKey = aliasToStableKey[alias];
     if (merged.has(stableKey)) aliasToStableKey[alias] = merged.get(stableKey);
+    if ((index + 1) % 512 === 0) yield;
   }
 }
 
