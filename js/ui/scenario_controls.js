@@ -35,6 +35,7 @@ export function initScenarioControls() {
   };
   disposeActiveScenarioControls = dispose;
   const scenarioSelect = document.getElementById("scenarioSelect");
+  if (scenarioSelect) scenarioSelect.hidden = true;
   const scenarioSelectButton = document.getElementById("scenarioSelectButton");
   const scenarioSelectButtonText = document.getElementById("scenarioSelectButtonText");
   const scenarioSelectMenu = document.getElementById("scenarioSelectMenu");
@@ -45,6 +46,8 @@ export function initScenarioControls() {
   const toggleBlankFeatureLabels = document.getElementById("toggleBlankFeatureLabels");
   const scenarioStatus = document.getElementById("scenarioStatus");
   const scenarioAuditHint = document.getElementById("scenarioAuditHint");
+  const hgoEditorLink = document.getElementById("hgoEditorLink");
+  hgoEditorLink?.parentElement.append(hgoEditorLink);
   let pendingScenarioId = "";
 
   const closeScenarioSelectMenu = ({ restoreFocus = false } = {}) => {

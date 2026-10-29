@@ -59,6 +59,11 @@ class TestElement {
   }
 
   appendChild(child) {
+    if (child.parentElement) {
+      const siblings = child.parentElement.children;
+      siblings.splice(siblings.indexOf(child), 1);
+    }
+    child.parentElement = this;
     this.children.push(child);
   }
 
@@ -77,6 +82,8 @@ class TestElement {
   getBoundingClientRect() {
     return this.rect;
   }
+
+  removeAttribute(name) { this.attributes.delete(name); }
 
   setAttribute(name, value) {
     this.attributes.set(name, String(value));
@@ -97,6 +104,14 @@ function createHarness({ collapsed = false, selectionLabel = "Berlin" } = {}) {
     mapContainer: new TestElement({ rect: { left: 0, right: 800, top: 0, bottom: 400, width: 800, height: 400 } }),
     zoomControls: new TestElement({ rect: { left: 460, right: 540, top: 0, bottom: 40, width: 80, height: 40 } }),
   };
+  for (const name of ["Scenario", "Mode", "Active"]) {
+    const item = new TestElement();
+    item.appendChild(nodes[`scenarioContext${name}Text`]);
+    nodes.scenarioContextBar.appendChild(item);
+  }
+  nodes.scenarioContextSelectionItem.appendChild(nodes.scenarioContextSelectionText);
+  nodes.scenarioContextBar.appendChild(nodes.scenarioContextCollapseBtn);
+  nodes.scenarioContextBar.appendChild(nodes.scenarioContextSelectionItem);
   nodes.scenarioGuidePopover.classList.add("hidden");
   nodes.scenarioTransportWorkbenchBtn.dataset.transportEntryLabel = "Transport";
   const guideSyncCalls = [];
@@ -151,12 +166,22 @@ test("scenario context bar refresh owns labels, selection chip, and safe width",
 
   controller.refreshScenarioContextBar();
 
+  assert.deepEqual(nodes.scenarioContextBar.children, [
+    nodes.scenarioContextScenarioText.parentElement,
+    nodes.scenarioContextActiveText.parentElement,
+    nodes.scenarioContextSelectionItem,
+    nodes.scenarioContextModeText.parentElement,
+    nodes.scenarioContextCollapseBtn,
+  ]);
   assert.equal(nodes.scenarioContextScenarioText.textContent, "HGO 1936");
   assert.equal(nodes.scenarioContextModeText.textContent, "Visual Color");
   assert.equal(nodes.scenarioContextModeText.attributes.get("title"), "Mode: Visual Color");
   assert.equal(nodes.scenarioContextActiveText.textContent, "Alpha (ABC)");
   assert.equal(nodes.scenarioContextSelectionItem.classList.contains("hidden"), false);
   assert.equal(nodes.scenarioContextSelectionText.textContent, "Berlin");
+  assert.equal(nodes.scenarioContextSelectionText.attributes.get("aria-current"), "location");
+  assert.equal(nodes.scenarioContextActiveText.classList.contains("is-current"), false);
+  assert.equal(nodes.scenarioContextModeText.classList.contains("is-current"), false);
   assert.equal(nodes.scenarioContextCollapseBtn.dataset.uiIcon, "chevron-up");
   assert.equal(nodes.scenarioTransportWorkbenchBtn.textContent, "Transport");
   assert.equal(nodes.scenarioTransportWorkbenchBtn.attributes.get("title"), "Open transport workbench");
@@ -175,6 +200,7 @@ test("scenario context bar hides empty selection chip", () => {
 
   assert.equal(nodes.scenarioContextSelectionItem.classList.contains("hidden"), true);
   assert.equal(nodes.scenarioContextSelectionText.textContent, "No selection");
+  assert.equal(nodes.scenarioContextActiveText.attributes.get("aria-current"), "location");
 });
 
 test("scenario context collapse event toggles state and rerenders affordance", () => {

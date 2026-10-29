@@ -35,6 +35,15 @@ function createScenarioContextBarController({
   if (!runtimeState.ui || typeof runtimeState.ui !== "object") {
     runtimeState.ui = {};
   }
+  for (const item of [
+    scenarioContextScenarioText?.parentElement,
+    scenarioContextActiveText?.parentElement,
+    scenarioContextSelectionItem,
+    scenarioContextModeText?.parentElement,
+    scenarioContextCollapseBtn,
+  ]) {
+    if (item) scenarioContextBar?.appendChild(item);
+  }
   let scenarioGuideTimerId = null;
   const translateUi = (label) => translate(label, "ui");
   const translateGeo = (label) => translate(label, "geo") || label;
@@ -44,6 +53,17 @@ function createScenarioContextBarController({
     const hasSelection = selectionLabel !== translateUi("No selection");
     if (scenarioContextSelectionItem) {
       scenarioContextSelectionItem.classList.toggle("hidden", !hasSelection);
+    }
+    for (const [node, current] of [
+      [scenarioContextScenarioText, false],
+      [scenarioContextActiveText, !hasSelection],
+      [scenarioContextSelectionText, hasSelection],
+    ]) {
+      if (node) {
+        node.classList.toggle("is-current", current);
+        if (current) node.setAttribute("aria-current", "location");
+        else node.removeAttribute("aria-current");
+      }
     }
     if (scenarioContextSelectionText) {
       scenarioContextSelectionText.textContent = selectionLabel;

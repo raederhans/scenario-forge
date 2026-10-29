@@ -2163,15 +2163,6 @@ function initToolbar({ render } = {}) {
     button.dataset.bound = "true";
   });
 
-  if (dockReferenceBtn && !dockReferenceBtn.dataset.bound) {
-    dockReferenceBtn.setAttribute("aria-haspopup", "dialog");
-    dockReferenceBtn.setAttribute("aria-controls", "dockReferencePopover");
-    dockReferenceBtn.addEventListener("click", () => {
-      openDockPopover("reference");
-    });
-    dockReferenceBtn.dataset.bound = "true";
-  }
-
   if (dockExportBtn && !dockExportBtn.dataset.bound) {
     dockExportBtn.setAttribute("aria-haspopup", "dialog");
     dockExportBtn.setAttribute("aria-controls", "exportWorkbenchOverlay");
@@ -2986,9 +2977,6 @@ function initToolbar({ render } = {}) {
   closeDockPopover({ syncUrl: false });
   closeSpecialZonePopover();
   closeScenarioGuidePopover({ syncUrl: false });
-  if (dockReferencePopover) {
-    dockReferencePopover.setAttribute("aria-hidden", "true");
-  }
   if (exportWorkbenchOverlay) {
     exportWorkbenchOverlay.setAttribute("aria-hidden", "true");
   }

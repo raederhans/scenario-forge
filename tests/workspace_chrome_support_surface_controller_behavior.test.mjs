@@ -272,3 +272,30 @@ test("a newly forbidden Quick Fill closes only its own active popup", context =>
   assert.equal(h.state.activeDockPopover, "edit");
   assert.equal(h.nodes.dockEditPopover.classList.contains("hidden"), false);
 });
+
+
+test("closing dock surfaces leaves reference layer settings visible", context => {
+  const h = createHarness(context);
+  h.nodes.dockReferencePopover.setAttribute("aria-hidden", "false");
+  h.controller.closeDockPopover();
+  assert.equal(h.nodes.dockReferencePopover.classList.contains("hidden"), false);
+  assert.equal(h.nodes.dockReferencePopover.getAttribute("aria-hidden"), "false");
+  h.controller.openDockPopover("edit");
+  h.doc.dispatch("click", { target: new Button("outside") });
+  assert.equal(h.nodes.dockReferencePopover.classList.contains("hidden"), false);
+});
+
+test("reference URL restores the layer entry without opening a dock popover", context => {
+  const h = createHarness(context);
+  const entry = new Button("editorLayer-reference");
+  let selected = 0;
+  entry.addEventListener("click", () => selected++);
+  h.doc.getElementById = id => id === entry.id ? entry : null;
+  const controller = createWorkspaceChromeSupportSurfaceController({
+    state: h.state, getSupportSurfaceViewFromUrl: () => "reference",
+  });
+  controller.restoreSupportSurfaceFromUrl();
+  assert.equal(selected, 1);
+  assert.equal(h.state.activeDockPopover, "");
+  assert.equal(h.state.ui.restoredSupportSurfaceViewFromUrl, "reference");
+});

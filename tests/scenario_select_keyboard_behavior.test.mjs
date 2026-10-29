@@ -119,9 +119,13 @@ test("scenario picker shares navigation, selection, focus return and native chan
   const originalDocument = globalThis.document;
   const saved = Object.fromEntries(["scenarioRegistry", "activeScenarioId", "bootBlocking", "startupReadonly", "scenarioApplyInFlight"].map((key) => [key, state[key]]));
   const document = { activeElement: null, addEventListener() {}, createElement(tag) { return makeNode(document, tag); } };
-  const nodes = Object.fromEntries(["scenarioSelect", "scenarioSelectButton", "scenarioSelectButtonText", "scenarioSelectMenu", "applyScenarioBtn"]
+  const nodes = Object.fromEntries(["scenarioSelect", "scenarioSelectButton", "scenarioSelectButtonText", "scenarioSelectMenu", "applyScenarioBtn", "hgoEditorLink"]
     .map((id) => [id, makeNode(document, id === "scenarioSelect" ? "select" : "button")]));
   document.getElementById = (id) => nodes[id] || null;
+  const body = makeNode(document);
+  const actions = makeNode(document);
+  actions.append(nodes.applyScenarioBtn);
+  body.append(nodes.hgoEditorLink, nodes.scenarioSelect, nodes.scenarioSelectButton, actions);
   const select = nodes.scenarioSelect;
   const button = nodes.scenarioSelectButton;
   const menu = nodes.scenarioSelectMenu;
@@ -136,6 +140,11 @@ test("scenario picker shares navigation, selection, focus return and native chan
   try {
     dispose = initScenarioControls();
     await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(select.hidden, true);
+    assert.equal(button.hidden, false);
+    assert.equal([select, button].filter((node) => !node.hidden).length, 1);
+    assert.equal(body.children.at(-1), nodes.hgoEditorLink);
+    assert.ok(body.children.indexOf(actions) < body.children.indexOf(nodes.hgoEditorLink));
     const events = [];
     const dispatch = select.dispatchEvent.bind(select);
     select.dispatchEvent = (event) => { events.push(event.type); return dispatch(event); };
