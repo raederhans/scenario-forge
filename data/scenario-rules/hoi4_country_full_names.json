@@ -74,9 +74,17 @@
       "en": "Basutoland",
       "zh": "巴苏陀兰"
     },
+    "BDA": {
+      "en": "Baroda",
+      "zh": "巴罗达"
+    },
     "BEA": {
       "en": "Kenya",
       "zh": "肯尼亚"
+    },
+    "BEI": {
+      "en": "Sultanate of Brunei",
+      "zh": "文莱苏丹国"
     },
     "BEL": {
       "en": "Kingdom of Belgium",
@@ -98,6 +106,10 @@
       "en": "Kingdom of Bhutan",
       "zh": "不丹王国"
     },
+    "BHW": {
+      "en": "Bahawalpur",
+      "zh": "巴哈瓦尔布尔"
+    },
     "BLR": {
       "en": "Byelorussian SSR",
       "zh": "白俄罗斯苏维埃社会主义共和国"
@@ -118,6 +130,10 @@
       "en": "Bechuanaland Protectorate",
       "zh": "贝专纳保护国"
     },
+    "BPL": {
+      "en": "Bhopal",
+      "zh": "博帕尔"
+    },
     "BRA": {
       "en": "United States of Brazil",
       "zh": "巴西合众国"
@@ -125,10 +141,6 @@
     "BRM": {
       "en": "British Burma",
       "zh": "英属缅甸"
-    },
-    "BRU": {
-      "en": "Brunei",
-      "zh": "文莱"
     },
     "BSH": {
       "en": "Bashkir ASSR",
@@ -166,6 +178,10 @@
       "en": "British Ceylon",
       "zh": "英属锡兰"
     },
+    "CHB": {
+      "en": "Cooch Behar",
+      "zh": "科奇比哈尔"
+    },
     "CHE": {
       "en": "Chechen-Ingush Autonomous Oblast",
       "zh": "车臣-印古什自治州"
@@ -185,6 +201,10 @@
     "CNZ": {
       "en": "South Chahar Administration",
       "zh": "察南政厅"
+    },
+    "COC": {
+      "en": "Cochin",
+      "zh": "科钦"
     },
     "COL": {
       "en": "Republic of Colombia",
@@ -298,6 +318,10 @@
       "en": "Falkland Islands",
       "zh": "福克兰群岛"
     },
+    "FND": {
+      "en": "French India",
+      "zh": "法属印度"
+    },
     "FRA": {
       "en": "French Republic",
       "zh": "法兰西共和国"
@@ -354,6 +378,10 @@
       "en": "Republic of Guatemala",
       "zh": "危地马拉共和国"
     },
+    "GWA": {
+      "en": "Gwalior",
+      "zh": "瓜廖尔"
+    },
     "GXC": {
       "en": "New Guangxi Clique",
       "zh": "新桂系"
@@ -394,17 +422,53 @@
       "en": "Hyderabad",
       "zh": "海得拉巴"
     },
+    "ICA": {
+      "en": "Central India States",
+      "zh": "中央印度诸邦"
+    },
     "ICE": {
       "en": "Kingdom of Iceland",
       "zh": "冰岛王国"
+    },
+    "IDA": {
+      "en": "Deccan States",
+      "zh": "德干诸邦"
+    },
+    "IEA": {
+      "en": "Eastern States",
+      "zh": "东部诸邦"
+    },
+    "IFA": {
+      "en": "North-West Frontier States",
+      "zh": "西北边疆诸邦"
     },
     "IFN": {
       "en": "Spanish Ifni",
       "zh": "西属伊夫尼"
     },
+    "IHA": {
+      "en": "Punjab Hill States",
+      "zh": "旁遮普山邦"
+    },
+    "IKA": {
+      "en": "Khasi States",
+      "zh": "卡西诸邦"
+    },
+    "INR": {
+      "en": "Indore",
+      "zh": "印多尔"
+    },
     "INS": {
       "en": "Dutch East Indies",
       "zh": "荷属东印度"
+    },
+    "IPA": {
+      "en": "Punjab States",
+      "zh": "旁遮普诸邦"
+    },
+    "IRA": {
+      "en": "Rajputana States",
+      "zh": "拉杰普塔纳诸邦"
     },
     "IRE": {
       "en": "Irish Free State",
@@ -417,6 +481,10 @@
     "ITA": {
       "en": "Kingdom of Italy",
       "zh": "意大利王国"
+    },
+    "IWA": {
+      "en": "Western India States",
+      "zh": "西印度诸邦"
     },
     "JAM": {
       "en": "Jamaica",
@@ -438,6 +506,10 @@
       "en": "Jin-Cha-Ji Border Region",
       "zh": "晋察冀边区"
     },
+    "JOH": {
+      "en": "Sultanate of Johor",
+      "zh": "柔佛苏丹国"
+    },
     "JOR": {
       "en": "Emirate of Transjordan",
       "zh": "外约旦酋长国"
@@ -450,6 +522,10 @@
       "en": "Kalmyk ASSR",
       "zh": "卡尔梅克自治共和国"
     },
+    "KAS": {
+      "en": "Jammu and Kashmir",
+      "zh": "查谟和克什米尔"
+    },
     "KAZ": {
       "en": "Kazakh ASSR",
       "zh": "哈萨克自治苏维埃社会主义共和国"
@@ -458,13 +534,29 @@
       "en": "Kabardino-Balkar Autonomous Oblast",
       "zh": "卡巴尔达-巴尔卡尔自治州"
     },
+    "KED": {
+      "en": "Sultanate of Kedah",
+      "zh": "吉打苏丹国"
+    },
+    "KEL": {
+      "en": "Sultanate of Kelantan",
+      "zh": "吉兰丹苏丹国"
+    },
     "KHM": {
       "en": "Khotan Military Administration",
       "zh": "和阗军政区"
     },
+    "KHP": {
+      "en": "Kolhapur",
+      "zh": "戈尔哈布尔"
+    },
     "KKP": {
       "en": "Karakalpak ASSR",
       "zh": "卡拉卡尔帕克自治苏维埃社会主义共和国"
+    },
+    "KLA": {
+      "en": "Kalat and Baluchistan States",
+      "zh": "卡拉特与俾路支诸邦"
     },
     "KOM": {
       "en": "Komi Autonomous Oblast",
@@ -474,13 +566,21 @@
       "en": "Government-General of Korea",
       "zh": "朝鲜总督府"
     },
+    "KPU": {
+      "en": "Khairpur",
+      "zh": "海尔布尔"
+    },
     "KRL": {
       "en": "Karelian ASSR",
       "zh": "卡累利阿自治共和国"
     },
-    "KSH": {
-      "en": "Jammu and Kashmir",
-      "zh": "查谟和克什米尔"
+    "KRN": {
+      "en": "Karenni States",
+      "zh": "克伦尼诸邦"
+    },
+    "KUT": {
+      "en": "Cutch",
+      "zh": "卡奇"
     },
     "KUW": {
       "en": "Sheikhdom of Kuwait",
@@ -539,8 +639,8 @@
       "zh": "马达加斯加及附属地殖民地"
     },
     "MAL": {
-      "en": "British Malaya",
-      "zh": "英属马来亚"
+      "en": "Federated Malay States",
+      "zh": "马来联邦"
     },
     "MAN": {
       "en": "Empire of Manchukuo",
@@ -574,6 +674,10 @@
       "en": "Malta",
       "zh": "马耳他"
     },
+    "MNP": {
+      "en": "Manipur",
+      "zh": "曼尼普尔"
+    },
     "MON": {
       "en": "Mongolian People's Republic",
       "zh": "蒙古人民共和国"
@@ -598,7 +702,7 @@
       "en": "Mauritius",
       "zh": "毛里求斯"
     },
-    "MYR": {
+    "MYS": {
       "en": "Mysore",
       "zh": "迈索尔"
     },
@@ -607,8 +711,8 @@
       "zh": "葡属莫桑比克殖民地"
     },
     "NBO": {
-      "en": "North Borneo",
-      "zh": "北婆罗洲"
+      "en": "British North Borneo",
+      "zh": "英属北婆罗洲"
     },
     "NCP": {
       "en": "Provisional Government of the Republic of China",
@@ -690,6 +794,10 @@
       "en": "Commonwealth of the Philippines",
       "zh": "菲律宾自治领"
     },
+    "PLS": {
+      "en": "Perlis",
+      "zh": "玻璃市"
+    },
     "POL": {
       "en": "Republic of Poland",
       "zh": "波兰共和国"
@@ -738,6 +846,10 @@
       "en": "Southern Rhodesia",
       "zh": "南罗得西亚"
     },
+    "RMP": {
+      "en": "Rampur",
+      "zh": "兰普尔"
+    },
     "ROM": {
       "en": "Kingdom of Romania",
       "zh": "罗马尼亚王国"
@@ -761,6 +873,10 @@
     "SGN": {
       "en": "Spanish Territories of the Gulf of Guinea",
       "zh": "西属几内亚湾领地"
+    },
+    "SHA": {
+      "en": "Federated Shan States",
+      "zh": "掸邦联邦"
     },
     "SHX": {
       "en": "Shanxi Clique",
@@ -815,8 +931,8 @@
       "zh": "西班牙共和国"
     },
     "SRW": {
-      "en": "Sarawak",
-      "zh": "沙捞越"
+      "en": "Kingdom of Sarawak",
+      "zh": "沙捞越王国"
     },
     "SSH": {
       "en": "Spanish Sahara",
@@ -878,6 +994,10 @@
       "en": "Tatar ASSR",
       "zh": "鞑靼自治共和国"
     },
+    "TGA": {
+      "en": "Sultanate of Terengganu",
+      "zh": "登嘉楼苏丹国"
+    },
     "TGN": {
       "en": "Tanganyika",
       "zh": "坦噶尼喀"
@@ -906,6 +1026,10 @@
       "en": "French Togoland",
       "zh": "法属多哥"
     },
+    "TPA": {
+      "en": "Tripura",
+      "zh": "特里普拉"
+    },
     "TRI": {
       "en": "Trinidad and Tobago",
       "zh": "特立尼达和多巴哥"
@@ -913,10 +1037,6 @@
     "TRU": {
       "en": "Trucial States",
       "zh": "特鲁西尔诸国"
-    },
-    "TRV": {
-      "en": "Travancore",
-      "zh": "特拉凡哥尔"
     },
     "TSC": {
       "en": "Transcaucasian SFSR",
@@ -929,6 +1049,10 @@
     "TUR": {
       "en": "Republic of Turkey",
       "zh": "土耳其共和国"
+    },
+    "TVC": {
+      "en": "Travancore",
+      "zh": "特拉凡哥尔"
     },
     "UDM": {
       "en": "Udmurt ASSR",
@@ -977,6 +1101,10 @@
     "YEM": {
       "en": "Mutawakkilite Kingdom of Yemen",
       "zh": "也门穆塔瓦基利亚王国"
+    },
+    "YOG": {
+      "en": "Sultanate of Yogyakarta",
+      "zh": "日惹苏丹国"
     },
     "YT": {
       "en": "Colony of Mayotte",
@@ -1061,6 +1189,10 @@
       "SPR": {
         "en": "Spanish State",
         "zh": "西班牙国"
+      },
+      "SIA": {
+        "en": "Kingdom of Thailand",
+        "zh": "泰王国"
       }
     }
   }

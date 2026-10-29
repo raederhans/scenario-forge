@@ -496,6 +496,795 @@
         "http://belleindochine.free.fr/KwangTcheouWan.htm"
       ],
       "notes": "Simplified bay-side lease outline around Fort Bayard and Chikan with Donghai/Naozhou island sector. Rural frontier approximate, clipped to runtime land; does not assign the entire modern Zhanjiang prefecture."
+    },
+    {
+      "id": "hassan",
+      "feature_ids": [
+        "IN_MRG_20e0c11ac976"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              75.3,
+              12.75
+            ],
+            [
+              75.7,
+              12.7
+            ],
+            [
+              76.2,
+              12.6
+            ],
+            [
+              76.7,
+              12.6
+            ],
+            [
+              76.7,
+              13.6
+            ],
+            [
+              75.3,
+              13.6
+            ],
+            [
+              75.3,
+              12.75
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "HASSAN",
+        "name_en": "Hassan",
+        "name_zh": "哈桑",
+        "owner": "MYS"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "jalna",
+      "feature_ids": [
+        "IN_MRG_58d0077e7cf9"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              75.5,
+              19.2
+            ],
+            [
+              76.85,
+              19.2
+            ],
+            [
+              76.5,
+              20.25
+            ],
+            [
+              75.7,
+              20.55
+            ],
+            [
+              75.5,
+              20.2
+            ],
+            [
+              75.5,
+              19.2
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "JALNA",
+        "name_en": "Jalna",
+        "name_zh": "贾尔纳",
+        "owner": "HYD"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "parbhani",
+      "feature_ids": [
+        "IN_MRG_16da719e5c4e"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              76.1,
+              18.6
+            ],
+            [
+              77.4,
+              18.6
+            ],
+            [
+              77.4,
+              19.85
+            ],
+            [
+              77.05,
+              20.0
+            ],
+            [
+              76.4,
+              19.95
+            ],
+            [
+              76.1,
+              18.6
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "PARBHANI",
+        "name_en": "Parbhani and Hingoli",
+        "name_zh": "帕尔巴尼与欣戈利",
+        "owner": "HYD"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "raichur",
+      "feature_ids": [
+        "IN_MRG_5e70f0363dee"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              75.8,
+              14.8
+            ],
+            [
+              77.7,
+              14.8
+            ],
+            [
+              77.7,
+              17.6
+            ],
+            [
+              76.4,
+              17.6
+            ],
+            [
+              76.3,
+              16.4
+            ],
+            [
+              76.0,
+              16.0
+            ],
+            [
+              75.8,
+              14.8
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "RAICHUR",
+        "name_en": "Raichur and Yadgir",
+        "name_zh": "赖丘尔与亚德吉尔",
+        "owner": "HYD"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "bhadrachalam",
+      "feature_ids": [
+        "IN_MRG_0de8d89a2f89"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              80.75,
+              16.6
+            ],
+            [
+              82,
+              16.6
+            ],
+            [
+              82,
+              19
+            ],
+            [
+              80.55,
+              19
+            ],
+            [
+              80.6,
+              18.0
+            ],
+            [
+              80.85,
+              17.75
+            ],
+            [
+              80.8,
+              17.5
+            ],
+            [
+              80.75,
+              16.6
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "BHADRACHALAM",
+        "name_en": "Bhadrachalam tract",
+        "name_zh": "巴德拉恰拉姆地区",
+        "owner": "RAJ"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "cochin",
+      "feature_ids": [
+        "IN_MRG_886776fba38b"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              75.8,
+              10.1
+            ],
+            [
+              76.8,
+              10.1
+            ],
+            [
+              76.85,
+              10.55
+            ],
+            [
+              76.6,
+              10.7
+            ],
+            [
+              76.25,
+              10.8
+            ],
+            [
+              75.8,
+              10.7
+            ],
+            [
+              75.8,
+              10.1
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "COCHIN",
+        "name_en": "Cochin state",
+        "name_zh": "科钦土邦",
+        "owner": "COC"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "bahawalpur",
+      "feature_ids": [
+        "PAK-1113"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              69.3,
+              27.5
+            ],
+            [
+              75.5,
+              27.5
+            ],
+            [
+              75.5,
+              29.9
+            ],
+            [
+              73.9,
+              30.25
+            ],
+            [
+              73.25,
+              29.8
+            ],
+            [
+              72.5,
+              29.6
+            ],
+            [
+              71.6,
+              29.5
+            ],
+            [
+              70.7,
+              28.7
+            ],
+            [
+              69.8,
+              28.2
+            ],
+            [
+              69.3,
+              27.5
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "BAHAWALPUR",
+        "name_en": "Bahawalpur state",
+        "name_zh": "巴哈瓦尔布尔土邦",
+        "owner": "BHW"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "khairpur",
+      "feature_ids": [
+        "PAK-1114"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              68.4,
+              26.8
+            ],
+            [
+              69.8,
+              26.3
+            ],
+            [
+              70.3,
+              26.9
+            ],
+            [
+              70.1,
+              27.7
+            ],
+            [
+              68.75,
+              27.85
+            ],
+            [
+              68.4,
+              27.5
+            ],
+            [
+              68.4,
+              26.8
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "KHAIRPUR",
+        "name_en": "Khairpur state",
+        "name_zh": "海尔布尔土邦",
+        "owner": "KPU"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "baluchistan_states",
+      "feature_ids": [
+        "PAK-1108"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              60,
+              24
+            ],
+            [
+              71,
+              24
+            ],
+            [
+              71,
+              28
+            ],
+            [
+              69.3,
+              28.5
+            ],
+            [
+              68.1,
+              28.9
+            ],
+            [
+              67.5,
+              29.3
+            ],
+            [
+              66.4,
+              29.3
+            ],
+            [
+              65.3,
+              29.6
+            ],
+            [
+              63.5,
+              28.9
+            ],
+            [
+              60,
+              29.0
+            ],
+            [
+              60,
+              24
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "BALUCHISTAN_STATES",
+        "name_en": "Kalat and associated states",
+        "name_zh": "卡拉特及相关土邦",
+        "owner": "KLA"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "frontier_states",
+      "feature_ids": [
+        "PAK-1123"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              71.3,
+              34.45
+            ],
+            [
+              71.85,
+              34.3
+            ],
+            [
+              72.3,
+              34.3
+            ],
+            [
+              72.8,
+              34.6
+            ],
+            [
+              73.0,
+              35
+            ],
+            [
+              73.2,
+              35.45
+            ],
+            [
+              74.3,
+              35.9
+            ],
+            [
+              74.3,
+              37
+            ],
+            [
+              70,
+              37
+            ],
+            [
+              70,
+              35.5
+            ],
+            [
+              71.3,
+              34.45
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "FRONTIER_STATES",
+        "name_en": "Frontier states",
+        "name_zh": "边疆诸邦",
+        "owner": "IFA"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "deccan_states",
+      "feature_ids": [
+        "IN_ADM2_76128533B9892158671522"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              74.45,
+              16.7
+            ],
+            [
+              74.8,
+              16.7
+            ],
+            [
+              75.55,
+              16.8
+            ],
+            [
+              75.7,
+              17.5
+            ],
+            [
+              75.2,
+              17.55
+            ],
+            [
+              74.65,
+              17.2
+            ],
+            [
+              74.45,
+              16.7
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "DECCAN_STATES",
+        "name_en": "Deccan states",
+        "name_zh": "德干诸邦",
+        "owner": "IDA"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "mandi",
+      "feature_ids": [
+        "IN_MRG_51471f01d80d"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              76.45,
+              30.6
+            ],
+            [
+              77.5,
+              30.6
+            ],
+            [
+              77.5,
+              32.2
+            ],
+            [
+              76.75,
+              32.2
+            ],
+            [
+              76.6,
+              31.7
+            ],
+            [
+              76.65,
+              31.2
+            ],
+            [
+              76.45,
+              30.6
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "MANDI",
+        "name_en": "Hill states",
+        "name_zh": "山地诸邦",
+        "owner": "IHA"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "odisha_states",
+      "feature_ids": [
+        "IN_MRG_4151783f27ba"
+      ],
+      "polygon": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              84.0,
+              21.2
+            ],
+            [
+              84.6,
+              20.7
+            ],
+            [
+              85.3,
+              20.55
+            ],
+            [
+              85.7,
+              21
+            ],
+            [
+              86.4,
+              21.4
+            ],
+            [
+              87.3,
+              21.55
+            ],
+            [
+              87.3,
+              22.7
+            ],
+            [
+              84,
+              22.7
+            ],
+            [
+              84.0,
+              21.2
+            ]
+          ]
+        ]
+      },
+      "inside": {
+        "suffix": "ODISHA_STATES",
+        "name_en": "Eastern princely states",
+        "name_zh": "东部土邦",
+        "owner": "IEA"
+      },
+      "outside": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "余部"
+      },
+      "sources": [
+        "data/political_feature_merges/india_wave5_rest.v1.json",
+        "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
+      ],
+      "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
     }
   ],
   "omitted": [

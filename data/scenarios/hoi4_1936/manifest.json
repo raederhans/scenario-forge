@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1936/audit.json",
-  "baseline_hash": "fb4e2598b9c08f20f767d7306e73aff76af6561dbe49960c106448757553fead",
+  "baseline_hash": "194d9f743512b1aa06dccfc05b04ced4cb1386ee6fedb229fd7f8fe01c0884a5",
   "bookmark_date": "1936.1.1.12",
   "bookmark_description": "GATHERING_STORM_DESC",
   "bookmark_name": "GATHERING_STORM_NAME",
@@ -2461,6 +2461,42 @@
         "CN_CITY_17275852B90470795224142__SPLIT_GUANGZHOUWAN",
         "CN_CITY_17275852B90470795224142__SPLIT_REST"
       ],
+      "IN_ADM2_76128533B9892158671522": [
+        "IN_ADM2_76128533B9892158671522__SPLIT_DECCAN_STATES",
+        "IN_ADM2_76128533B9892158671522__SPLIT_REST"
+      ],
+      "IN_MRG_0de8d89a2f89": [
+        "IN_MRG_0de8d89a2f89__SPLIT_BHADRACHALAM",
+        "IN_MRG_0de8d89a2f89__SPLIT_REST"
+      ],
+      "IN_MRG_16da719e5c4e": [
+        "IN_MRG_16da719e5c4e__SPLIT_PARBHANI",
+        "IN_MRG_16da719e5c4e__SPLIT_REST"
+      ],
+      "IN_MRG_20e0c11ac976": [
+        "IN_MRG_20e0c11ac976__SPLIT_HASSAN",
+        "IN_MRG_20e0c11ac976__SPLIT_REST"
+      ],
+      "IN_MRG_4151783f27ba": [
+        "IN_MRG_4151783f27ba__SPLIT_ODISHA_STATES",
+        "IN_MRG_4151783f27ba__SPLIT_REST"
+      ],
+      "IN_MRG_51471f01d80d": [
+        "IN_MRG_51471f01d80d__SPLIT_MANDI",
+        "IN_MRG_51471f01d80d__SPLIT_REST"
+      ],
+      "IN_MRG_58d0077e7cf9": [
+        "IN_MRG_58d0077e7cf9__SPLIT_JALNA",
+        "IN_MRG_58d0077e7cf9__SPLIT_REST"
+      ],
+      "IN_MRG_5e70f0363dee": [
+        "IN_MRG_5e70f0363dee__SPLIT_RAICHUR",
+        "IN_MRG_5e70f0363dee__SPLIT_REST"
+      ],
+      "IN_MRG_886776fba38b": [
+        "IN_MRG_886776fba38b__SPLIT_COCHIN",
+        "IN_MRG_886776fba38b__SPLIT_REST"
+      ],
       "MAR-1445": [
         "MAR-1445__SPLIT_TANGIER",
         "MAR-1445__SPLIT_REST"
@@ -2472,6 +2508,22 @@
       "MAR-3457": [
         "MAR-3457__SPLIT_IFNI",
         "MAR-3457__SPLIT_REST"
+      ],
+      "PAK-1108": [
+        "PAK-1108__SPLIT_BALUCHISTAN_STATES",
+        "PAK-1108__SPLIT_REST"
+      ],
+      "PAK-1113": [
+        "PAK-1113__SPLIT_BAHAWALPUR",
+        "PAK-1113__SPLIT_REST"
+      ],
+      "PAK-1114": [
+        "PAK-1114__SPLIT_KHAIRPUR",
+        "PAK-1114__SPLIT_REST"
+      ],
+      "PAK-1123": [
+        "PAK-1123__SPLIT_FRONTIER_STATES",
+        "PAK-1123__SPLIT_REST"
       ],
       "PL_MRG_727dd6268093": [
         "PL_MRG_727dd6268093__SPLIT_DANZIG",
@@ -2516,12 +2568,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1936/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "8ab0b5a5f3c701a1e129410cacaddc46d6998bca7d07166537f68e382b4aa50f",
+  "snapshot_fingerprint": "dbdaa3cca92e541633f96d6c565441229088600b808f60e6c86fbeb832cfc56f",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "f819fc99b3888c1c769a51b3f6805f27de1577cfd399e7be9059f5887a230359",
+    "detail_chunk_manifest_sha256": "8f84f2b24bd04f78dc0565ea9729e31550da83ed33474727a8947777c2bb0ad9",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "runtime_topology_sha256": "6cf7c31ded456515351a77de093e71e930beba360a88bdcaac8572766a6fdbe5"
+    "runtime_topology_sha256": "b3d64210598b384af748e14688174ec4a93643206a6a9becc4bb7dd760bc6343"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1936/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -2539,29 +2591,29 @@
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15326,
-    "controller_count": 235,
+    "changed_feature_count": 15321,
+    "controller_count": 266,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 21078,
+    "feature_count": 21091,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14879,
+    "manual_reviewed_feature_count": 14874,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 235,
+    "owner_count": 266,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5821,
-      "manual_reviewed": 14879
+      "manual_reviewed": 14874
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5821,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 15303
+      "manual_rule": 15298
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,
