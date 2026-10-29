@@ -60,7 +60,8 @@ test('hoi4 1939 owner-sync smoke', async ({ page }, testInfo) => {
         details.open = true;
       }
     });
-    await expect(page.locator('#scenarioSelect')).toBeVisible();
+    // 原生 select 只承担值与 change 事件，界面上可见的剧本选择器是 #scenarioSelectButton（避免菜单里重复出现两行剧本名）。
+    await expect(page.locator('#scenarioSelectButton')).toBeVisible();
     await expect.poll(() => page.locator('#scenarioSelect').inputValue(), { timeout: 20000 }).toBe('hoi4_1939');
 
     const selectedScenarioId = await page.locator('#scenarioSelect').inputValue();
