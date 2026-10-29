@@ -17,7 +17,8 @@ async function waitForScenarioUiReady(page) {
       details.open = true;
     }
   });
-  await expect(page.locator('#scenarioSelect')).toBeVisible();
+  // 原生 select 只承担值与 change 事件，界面上可见的剧本选择器是 #scenarioSelectButton（避免菜单里重复出现两行剧本名）。
+  await expect(page.locator('#scenarioSelectButton')).toBeVisible();
 }
 
 async function waitForScenarioManagerIdle(page) {

@@ -1,6 +1,8 @@
 // Transport workbench right-deck owner.
 // Owns the control tabs, section DOM, and control event wiring for the workbench right deck.
 
+import { t } from "../i18n.js";
+
 import {
   getTransportWorkbenchFamilyPreviewSnapshot,
   selectTransportWorkbenchFamilyPreviewFeature,
@@ -273,18 +275,30 @@ export function createTransportWorkbenchRightDeckOwner({
     card.appendChild(title);
     const form = document.createElement("div");
     form.className = "transport-workbench-edit-overlay-form";
+    const nameLabel = document.createElement("label");
+    nameLabel.textContent = t("Name", "ui");
+    nameLabel.htmlFor = `transport-${family.id}-name`;
     const nameInput = document.createElement("input");
+    nameInput.id = nameLabel.htmlFor;
     nameInput.className = "text-input transport-workbench-edit-overlay-input";
     nameInput.type = "text";
     nameInput.placeholder = translate("Name");
     nameInput.value = selected?.name || "";
+    const lonLabel = document.createElement("label");
+    lonLabel.textContent = t("Longitude", "ui");
+    lonLabel.htmlFor = `transport-${family.id}-lon`;
     const lonInput = document.createElement("input");
+    lonInput.id = lonLabel.htmlFor;
     lonInput.className = "text-input transport-workbench-edit-overlay-input";
     lonInput.type = "number";
     lonInput.step = "0.0001";
     lonInput.placeholder = translate("Longitude");
     lonInput.value = Number.isFinite(Number(selected?.lon)) ? String(selected.lon) : "";
+    const latLabel = document.createElement("label");
+    latLabel.textContent = t("Latitude", "ui");
+    latLabel.htmlFor = `transport-${family.id}-lat`;
     const latInput = document.createElement("input");
+    latInput.id = latLabel.htmlFor;
     latInput.className = "text-input transport-workbench-edit-overlay-input";
     latInput.type = "number";
     latInput.step = "0.0001";
@@ -321,7 +335,7 @@ export function createTransportWorkbenchRightDeckOwner({
     deleteButton.addEventListener("click", () => {
       deleteEditOverlayPoint(family.id, selected.id);
     });
-    form.append(nameInput, lonInput, latInput, addButton, updateButton, deleteButton);
+    form.append(nameLabel, nameInput, lonLabel, lonInput, latLabel, latInput, addButton, updateButton, deleteButton);
     card.appendChild(form);
     const list = document.createElement("div");
     list.className = "transport-workbench-edit-overlay-list";
