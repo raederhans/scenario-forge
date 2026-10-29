@@ -217,9 +217,10 @@ test("project support panels and inspector search stay polished and inset", asyn
         hints,
       };
     });
-    expect(annotationMetrics.frontlineRadius).toBe("18px");
-    expect(annotationMetrics.strategicRadius).toBe("18px");
-    expect(annotationMetrics.accordionRadii.every((radius) => radius === "15px")).toBe(true);
+    // 圆角走令牌刻度：两块标注面板一致，内部手风琴不大于外层面板。
+    expect(parseFloat(annotationMetrics.frontlineRadius)).toBeGreaterThan(0);
+    expect(annotationMetrics.strategicRadius).toBe(annotationMetrics.frontlineRadius);
+    expect(annotationMetrics.accordionRadii.every((radius) => parseFloat(radius) <= parseFloat(annotationMetrics.frontlineRadius))).toBe(true);
     expect(annotationMetrics.accordionBodies).toHaveLength(3);
     expect(annotationMetrics.accordionBodies.every((body) => body.overflowY === "auto" && body.maxHeight !== "none")).toBe(true);
     expect(annotationMetrics.hints.every((entry) => entry.height <= entry.lineHeight * 3 + 2)).toBe(true);

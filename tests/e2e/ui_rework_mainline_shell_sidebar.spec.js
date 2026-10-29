@@ -273,8 +273,9 @@ test("top scenario and utility bars align and tool switching stays inline", asyn
   expect(Math.abs(metrics.scenario.bottom - metrics.zoom.bottom)).toBeLessThanOrEqual(1);
   expect(metrics.scenario.right).toBeLessThan(metrics.zoom.left);
   expect(metrics.scenarioRadius).toBe(metrics.zoomRadius);
-  expect(metrics.scenarioShadow).toContain("rgba");
-  expect(metrics.zoomShadow).toContain("rgba");
+  // 阴影来自令牌（color-mix 计算为 color(srgb …)），只要求两条浮动栏都有阴影且一致。
+  expect(metrics.scenarioShadow).not.toBe("none");
+  expect(metrics.zoomShadow).toBe(metrics.scenarioShadow);
   expect(metrics.toolHudVisible).toBe(false);
   expect(metrics.toolHud.width).toBe(0);
 });
