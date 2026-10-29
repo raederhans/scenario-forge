@@ -238,6 +238,7 @@ export function createPoliticalPassOrchestratorOwner({
     recordRenderPerfMetric("drawPoliticalFeatureFillLoop", Number(featureMetrics.fillMs || 0), {
       renderedCount: Number(featureMetrics.renderedCount || 0),
       visibleItemCount: viewport.visibleItemCount,
+      source: "vector",
     });
     recordRenderPerfMetric("drawPoliticalFeatureStrokeLoop", Number(featureMetrics.strokeMs || 0), {
       renderedCount: Number(featureMetrics.renderedCount || 0),

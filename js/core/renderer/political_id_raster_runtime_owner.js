@@ -1369,7 +1369,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       stagedPending: !!stagedFrame, stagedRejectionReason, stagedRejections,
       publishedFrame: directFrame ? { state: directFrame.presentationState, epoch: directFrame.epoch, sourceVersion: directFrame.sourceVersion } : null,
       presentationCache: displayCache?.getStats() || null, lastTiming: lastTiming && { ...lastTiming },
-      firstRasterReadyMs, lastDrawTotalMs, nativeRefinements, refinementPending: refinementTimer !== null,
+      firstRasterReadyMs, lastDrawTotalMs, nativeRefinements, refinementPending: refinementTimer !== null || forceNativeRefinement,
       sceneKey: snapshot?.sceneKey || "", level: plan?.level ?? null,
       view: committedPlan ? { ...committedPlan.transform, dpr: committedPlan.dpr } : null,
       paletteRevision: snapshot?.paletteRevision ?? 0, geometryRevision: snapshot?.geometryRevision ?? 0,

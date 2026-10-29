@@ -446,6 +446,7 @@ test("fine loop preserves metric, pending-clear, Set identity, and result order"
   assert.deepEqual(events[fineStart + 1], ["metric", "drawPoliticalFeatureFillLoop", 5, {
     renderedCount: 2,
     visibleItemCount: 4,
+    source: "vector",
   }]);
   assert.deepEqual(events[fineStart + 2], ["metric", "drawPoliticalFeatureStrokeLoop", 7, {
     renderedCount: 2,
