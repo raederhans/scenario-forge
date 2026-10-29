@@ -254,7 +254,8 @@
   .editor-brand { max-width: 160px; white-space: normal; }
   .editor-project-actions { gap: 4px; flex-basis: 100%; min-width: 0; justify-content: flex-end; }
   .editor-project-bar button { font-size: var(--fs-sm); padding: 6px; }
-  .editor-project-bar #scenarioGuideBtn { display: none; }
+  /* 手机上 Guide 是唯一的指南入口（素材标签已移除），保留为紧凑按钮。 */
+  .editor-project-bar #scenarioGuideBtn { padding: 6px 8px; }
   .editor-project-bar #workspaceGithubLink { padding: 6px 8px; }
   .editor-project-bar #workspaceGithubLink span { display: none; }
   .editor-project-bar #workspaceGithubLink { display: none; }
@@ -394,6 +395,8 @@
 }
 
 @media (pointer: coarse) {
+  /* 色块放大到 44px 后网格轨道必须同步放大，否则相邻命中区重叠。 */
+  .editor-workspace #paletteGrid { grid-template-columns: repeat(3, 44px); }
   .editor-workspace :is(button, summary, .app-select-button, .btn),
   .editor-workspace #bottomDock .dock-tool-btn,
   .editor-workspace #leftSidebar .editor-layer-list > button,
