@@ -85,6 +85,7 @@ function summarizeSample(sample, index) {
     recordedAt: finiteNumberOrNull(sample.recordedAt),
     activeScenarioId: primitiveText(sample.activeScenarioId),
     phase: primitiveText(sample.phase),
+    politicalSource: primitiveText(sample.politicalSource),
     politicalBgProgressive: sample.politicalBgProgressive === true,
     contextScenarioMs: finiteNumberOrNull(sample.contextScenarioMs),
   });
@@ -115,9 +116,9 @@ function isCanonicalCandidate(sample, scenarioId, promotionRecordedAt) {
   return (
     sample?.activeScenarioId === scenarioId
     && sample?.phase === "idle"
-    && sample?.politicalBgProgressive === true
-    && sample?.contextScenarioMs !== null
-    && sample.contextScenarioMs > 0
+    && (sample.politicalSource !== "" || sample.politicalBgProgressive === true)
+    && ((sample.politicalSource !== "" && sample.politicalSource !== "vector")
+      || (sample.contextScenarioMs !== null && sample.contextScenarioMs > 0))
     && sample?.recordedAt !== null
     && promotionRecordedAt !== null
     && sample.recordedAt >= promotionRecordedAt

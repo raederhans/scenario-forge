@@ -95,6 +95,33 @@ function bindInitialEvidence(snapshot) {
 }
 const analyze = (snapshot) => analyzeRenderSampleRole({ scenarioId, snapshot, runProfileId: profile });
 
+for (const [name, fields, matched] of [
+  ["raster with cached context", { politicalSource: "political-id-raster", politicalBgProgressive: false, contextScenarioMs: 0 }, true],
+  ["legacy progressive evidence", { politicalBgProgressive: true, contextScenarioMs: 100 }, true],
+  ["no political submission", { politicalSource: "", politicalBgProgressive: false, contextScenarioMs: 100 }, false],
+  ["vector with context", { politicalSource: "vector", politicalBgProgressive: false, contextScenarioMs: 100 }, true],
+  ["vector without context", { politicalSource: "vector", politicalBgProgressive: true, contextScenarioMs: 0 }, false],
+  ["legacy progressive without context", { politicalBgProgressive: true, contextScenarioMs: 0 }, false],
+]) test(`settled anchor handles ${name}`, async () => {
+  const snapshot = fixture();
+  Object.assign(snapshot.renderSamples.samples[0], fields);
+  delete snapshot.standardPerfSettlement;
+  let time = 0;
+  const result = await waitForStandardPerfSettlement(async () => ({
+    snapshot, status: readyStatus(), observedAt: 300 + time,
+  }), scenarioId, { now: () => time, pause: async (ms) => { time += ms; } });
+  const analysis = analyze(result);
+  assert.equal(analysis.roleMatched, matched);
+  assert.equal(result.standardPerfSettlement.initialFrameSequence, matched ? 1 : null);
+  if (matched) {
+    assert.equal(analysis.canonicalSample.politicalSource, fields.politicalSource ?? "");
+    assert.equal(analysis.canonicalRenderSampleMs, 1050);
+  } else {
+    assert.equal(analysis.status, "role-mismatch");
+    assert.ok(analysis.roleMismatches.includes("initial-frame-anchor"));
+  }
+});
+
 test("settled standard profile charges the unique full frame and every subsequent idle submission", () => {
   const snapshot = fixture();
   const original = structuredClone(snapshot);
