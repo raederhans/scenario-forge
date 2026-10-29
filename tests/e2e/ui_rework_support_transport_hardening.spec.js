@@ -19,6 +19,11 @@ async function activateSupportTrigger(page, selector) {
 async function openTransportWorkbenchFromProject(page) {
   if (await page.locator("body.editor-workspace").count()) {
     if (await page.locator("#leftSidebar").evaluate((node) => node.inert)) {
+      if (await page.locator("#sidebarDrawerBackdrop").isVisible()) {
+        await page.keyboard.press("Escape");
+        await expect(page.locator("#sidebarDrawerBackdrop")).toBeHidden();
+        await expect(page.locator("body")).not.toHaveClass(/right-drawer-open/);
+      }
       await page.locator("#leftPanelToggle").click();
     }
     await page.locator("#editorTaskLayersBtn").click();
@@ -204,7 +209,7 @@ test("project support panels and inspector search stay polished and inset", asyn
     await page.locator("#editorLayer-reference").click();
     await expect(page.locator("#editorProperty-reference #referenceOpacity")).toBeVisible();
     const referenceInset = await page.evaluate(() => {
-      const section = document.querySelector("#editorProperty-reference")?.getBoundingClientRect();
+      const section = document.querySelector("#editorPropertiesBody")?.getBoundingClientRect();
       const control = document.querySelector("#referenceOpacity")?.getBoundingClientRect();
       return section && control ? { left: control.left - section.left, right: section.right - control.right } : null;
     });
@@ -656,7 +661,7 @@ test("phase 03 support surfaces restore the requested view from URL", async ({ p
 
   if (await page.locator("body.editor-workspace").count()) {
     await expect(page.locator("#editorProjectBar #inspectorSidebarTabProject")).toBeVisible();
-    await expect(page.locator("#editorTaskLayersBtn")).toHaveAttribute("aria-selected", "true");
+    await expect(page.locator("#editorTaskLayersBtn")).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator("#editorProperty-reference #dockReferencePopover")).toBeVisible();
     await expect(page.locator("#editorProperty-reference #referenceOpacity")).toBeVisible();
     await page.locator("#editorLayer-legend").click();
@@ -996,6 +1001,9 @@ test("adaptive support, transport, and palette surfaces stay contained", async (
   expect(supportMetrics.bodyScrollWidth).toBeLessThanOrEqual(supportMetrics.viewportWidth + 1);
 
   if (isWorkspace) {
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#sidebarDrawerBackdrop")).toBeHidden();
+    await expect(page.locator("body")).not.toHaveClass(/right-drawer-open/);
     await page.locator("#leftPanelToggle").click();
     await page.locator("#editorLayer-legend").click();
     await expect(page.locator("#editorProperty-reference")).toBeHidden();

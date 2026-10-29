@@ -43,12 +43,12 @@ test("workspace geometry is stable before and after deferred controls mount", as
   expect(finalBounds).toEqual(initialBounds);
 });
 
-test("default workspace keeps four tasks, project header, and the bottom dock", async ({ page }) => {
+test("default workspace keeps three tasks, project header, and the bottom dock", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWorkspace(page);
   const taskButtons = page.locator("#editorTaskNav .editor-nav-button");
-  await expect(taskButtons).toHaveCount(4);
-  for (const id of ["Objects", "Layers", "Palette", "Assets"]) {
+  await expect(taskButtons).toHaveCount(3);
+  for (const id of ["Objects", "Layers", "Palette"]) {
     await expect(page.locator(`#editorTask${id}Btn`)).toBeVisible();
   }
   await expect(page.locator("#editorTaskObjectsBtn")).toHaveAttribute("aria-pressed", "true");
