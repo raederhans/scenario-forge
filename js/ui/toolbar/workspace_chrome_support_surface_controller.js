@@ -123,44 +123,32 @@ export function createWorkspaceChromeSupportSurfaceController({
   };
 
   const getDockPopoverByKind = (kind) => {
-    if (kind === "reference") return dockReferencePopover;
     if (kind === "edit") return dockEditPopover;
     if (kind === "quickfill") return dockQuickFillRow;
     return null;
   };
 
   const getDockPopoverTrigger = (kind) => {
-    if (kind === "reference") return dockReferenceBtn;
     if (kind === "edit") return dockEditPopoverBtn;
     if (kind === "quickfill") return dockQuickFillBtn;
     return null;
   };
-
-  const supportDockPopoverKinds = new Set(["reference"]);
-  const isSupportDockPopoverKind = (kind) => supportDockPopoverKinds.has(String(kind || ""));
 
   const closeDockPopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
     const activeKind = String(state.activeDockPopover || "");
     const activePopover = getDockPopoverByKind(activeKind);
     const activeTrigger = getDockPopoverTrigger(activeKind);
     setActiveDockPopoverState(state, "");
-    dockReferencePopover?.classList.add("hidden");
     dockEditPopover?.classList.add("hidden");
     dockQuickFillRow?.classList.add("hidden");
-    dockReferencePopover?.setAttribute("aria-hidden", "true");
     dockEditPopover?.setAttribute("aria-hidden", "true");
     dockQuickFillRow?.setAttribute("aria-hidden", "true");
-    dockReferenceBtn?.classList.remove("is-active");
     dockEditPopoverBtn?.classList.remove("is-active");
     dockQuickFillBtn?.classList.remove("is-active");
-    dockReferenceBtn?.setAttribute("aria-expanded", "false");
     dockEditPopoverBtn?.setAttribute("aria-expanded", "false");
     dockQuickFillBtn?.setAttribute("aria-expanded", "false");
     if (restoreFocus && activePopover) {
       restoreOverlayTriggerFocus?.(activePopover, activeTrigger);
-    }
-    if (syncUrl && isSupportDockPopoverKind(activeKind)) {
-      syncSupportSurfaceUrlState("");
     }
   };
 
@@ -185,9 +173,6 @@ export function createWorkspaceChromeSupportSurfaceController({
     const nextKind = state.activeDockPopover === kind ? "" : kind;
     closeDockPopover();
     if (!nextKind) return;
-    if (isSupportDockPopoverKind(nextKind) && scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
-      closeScenarioGuidePopover({ restoreFocus: false, syncUrl: false });
-    }
     closeExportWorkbench?.({ restoreFocus: false });
     setActiveDockPopoverState(state, nextKind);
     rememberOverlayTrigger?.(target, trigger);
@@ -195,9 +180,6 @@ export function createWorkspaceChromeSupportSurfaceController({
     target.setAttribute("aria-hidden", "false");
     trigger?.classList.add("is-active");
     trigger?.setAttribute("aria-expanded", "true");
-    if (isSupportDockPopoverKind(nextKind)) {
-      syncSupportSurfaceUrlState(nextKind);
-    }
     focusOverlaySurface?.(target);
   };
 
@@ -324,13 +306,9 @@ export function createWorkspaceChromeSupportSurfaceController({
       setRestoredSupportSurfaceViewState(state, view);
       return;
     }
-    ensureProjectSupportSurface("utilities");
-    const targetPopover = getDockPopoverByKind(view);
-    if (state.activeDockPopover === view && targetPopover && !targetPopover.classList.contains("hidden")) {
-      setRestoredSupportSurfaceViewState(state, view);
-      return;
-    }
-    openDockPopover(view);
+    const referenceEntry = document.getElementById("editorLayer-reference");
+    if (!referenceEntry) return;
+    referenceEntry.click();
     setRestoredSupportSurfaceViewState(state, view);
   };
 
@@ -355,7 +333,7 @@ export function createWorkspaceChromeSupportSurfaceController({
       const target = event.target;
       if (!(target instanceof Element)) return;
       const insideDockPopover = target.closest(
-        "#dockReferencePopover, #dockEditPopover, #dockQuickFillRow, #dockReferenceBtn, #dockEditPopoverBtn, #dockQuickFillBtn"
+        "#dockEditPopover, #dockQuickFillRow, #dockEditPopoverBtn, #dockQuickFillBtn"
       );
       if (state.activeDockPopover && !insideDockPopover) {
         closeDockPopover();

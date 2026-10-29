@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/map-label-fonts.css" />
     <link rel="stylesheet" href="css/editor-workspace.css" />
+    <link rel="stylesheet" href="css/editor-shell.css" />
     <link rel="stylesheet" href="css/editor-tool-guidance.css" />
     <link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />
     <link rel="modulepreload" href="js/main.js" />
@@ -64,9 +65,8 @@
             <div class="sidebar-details-body">
               <div id="scenarioStatus" class="body-text visually-hidden">No scenario active</div>
               <div id="scenarioAuditHint" class="body-text visually-hidden hidden">Coverage report unavailable</div>
-              <a id="hgoEditorLink" class="btn-secondary" href="apps/hgo/index.html" data-i18n="Open HGO editor">Open HGO editor</a>
               <label id="lblScenarioSelect" class="visually-hidden" for="scenarioSelect" data-i18n="Scenario">Scenario</label>
-              <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input scenario-select-native" aria-hidden="true" tabindex="-1">
+              <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input scenario-select-native" hidden aria-hidden="true" tabindex="-1">
                 <option id="optScenarioNone" value="" data-i18n="None">None</option>
               </select>
               <div class="scenario-select-shell">
@@ -92,6 +92,7 @@
                 <input id="toggleBlankFeatureLabels" type="checkbox" class="checkbox-input" />
                 <span id="lblBlankFeatureLabels" data-i18n="Parcel Names">Parcel Names</span>
               </label>
+              <a id="hgoEditorLink" class="editor-scenario-link" href="apps/hgo/index.html"><span data-i18n="Open HGO editor">Open HGO editor</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-external-link"><path d="M14 5h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 5l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M17 13v6H5V7h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
             </div>
           </details>
 
@@ -2311,23 +2312,24 @@
             Click to inspect a region or country. Press F to switch to fill before painting.
           </div>
           <div id="scenarioContextBar" class="scenario-context-bar">
-            <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context" data-i18n-aria-label="Collapse scenario context"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-up"><path d="m6 15 6-6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
             <div id="scenarioContextScenarioItem" class="scenario-context-item">
               <span class="scenario-context-label" data-i18n="Scenario">Scenario</span>
               <span id="scenarioContextScenarioText" class="u-truncate">Scenario: None</span>
+            </div>
+            <div id="scenarioContextActiveItem" class="scenario-context-item">
+              <span class="scenario-context-separator" aria-hidden="true">›</span>
+              <span class="scenario-context-label" data-i18n="Country">Country</span>
+              <span id="scenarioContextActiveText" class="u-truncate">Active: None</span>
+            </div>
+            <div id="scenarioContextSelectionItem" class="scenario-context-item hidden">
+              <span class="scenario-context-separator" aria-hidden="true">›</span>
+              <span id="scenarioContextSelectionText" class="u-truncate" data-i18n="No selection">No selection</span>
             </div>
             <div id="scenarioContextModeItem" class="scenario-context-item">
               <span class="scenario-context-label" data-i18n="Mode">Mode</span>
               <span id="scenarioContextModeText" class="u-truncate">Mode: Visual Color</span>
             </div>
-            <div id="scenarioContextActiveItem" class="scenario-context-item">
-              <span class="scenario-context-label" data-i18n="Country">Country</span>
-              <span id="scenarioContextActiveText" class="u-truncate">Active: None</span>
-            </div>
-            <div id="scenarioContextSelectionItem" class="scenario-context-item hidden">
-              <span class="scenario-context-icon" aria-hidden="true">#</span>
-              <span id="scenarioContextSelectionText" class="u-truncate" data-i18n="No selection">No selection</span>
-            </div>
+            <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context" data-i18n-aria-label="Collapse scenario context"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-up"><path d="m6 15 6-6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
             <button id="scenarioGuideBtn" type="button" class="scenario-context-action-btn" aria-label="Show scenario guide" data-i18n-aria-label="Show scenario guide" data-i18n="Guide">Guide</button>
           </div>
 
@@ -3002,7 +3004,7 @@
                 <div class="inspector-utilities-shell sidebar-tool-panel">
                   <div class="inspector-utility-stack">
                     <div class="inspector-utility-actions sidebar-support-actions" role="group" aria-label="Utilities" data-i18n-aria-label="Utilities">
-                      <button id="utilitiesGuideBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Guide">Guide</button>
+                      <button id="utilitiesGuideBtn" hidden class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Guide">Guide</button>
                       <button id="dockReferenceBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Reference">Reference</button>
                     </div>
 

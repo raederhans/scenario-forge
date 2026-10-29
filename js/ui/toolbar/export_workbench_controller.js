@@ -689,7 +689,7 @@ function createExportWorkbenchController({
     return exportUiState;
   };
 
-  const renderExportWorkbenchUi = (isOpen) => {
+  const renderExportWorkbenchContents = (isOpen) => {
     if (!exportWorkbenchOverlay) return;
     const exportUi = syncExportWorkbenchControlsFromState();
     exportWorkbenchOverlay.classList.toggle("hidden", !isOpen);
@@ -728,6 +728,24 @@ function createExportWorkbenchController({
       return;
     }
     void renderExportWorkbenchPreview();
+  };
+
+  let openRenderToken = 0;
+  const renderExportWorkbenchUi = (isOpen) => {
+    if (!exportWorkbenchOverlay) return;
+    const token = ++openRenderToken;
+    exportWorkbenchOverlay.classList.toggle("hidden", !isOpen);
+    exportWorkbenchOverlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    dockExportBtn?.classList.toggle("is-active", isOpen);
+    dockExportBtn?.setAttribute("aria-expanded", String(isOpen));
+    if (!isOpen) {
+      renderExportWorkbenchContents(false);
+      return;
+    }
+    exportWorkbenchPreviewState.textContent = t("Preparing preview…", "ui");
+    requestPreviewFrame(() => requestPreviewFrame(() => {
+      if (token === openRenderToken) renderExportWorkbenchContents(true);
+    }));
   };
 
   const handleExportAction = async () => {

@@ -1,0 +1,64 @@
+.editor-task-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.editor-project-bar { gap: var(--space-3); }
+.editor-project-actions { gap: var(--space-2); }
+.editor-project-divider {
+  width: 1px;
+  height: var(--space-6);
+  margin-inline: var(--space-2);
+  background: var(--line-2);
+  flex-shrink: 0;
+}
+.editor-project-bar #editorInspectorToggleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-compact);
+  min-height: var(--control-compact);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.editor-scenario-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line-1);
+  color: var(--info);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+}
+.editor-scenario-link:hover { text-decoration: underline; }
+.editor-scenario-link:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 2px; }
+#scenarioSelect[hidden] { display: none; }
+#scenarioContextBar .scenario-context-label { display: none; }
+#scenarioContextBar .scenario-context-item {
+  display: inline-flex;
+  gap: var(--space-2);
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  color: var(--ink-500);
+  font-weight: 400;
+}
+#scenarioContextBar .scenario-context-item.hidden { display: none; }
+#scenarioContextBar .is-current { color: var(--ink-900); font-weight: 600; }
+#scenarioContextBar .scenario-context-separator { color: var(--ink-500); flex-shrink: 0; }
+#scenarioContextBar #scenarioContextModeItem {
+  margin-left: auto;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-xs);
+  background: var(--surface-sunken);
+  font-size: var(--fs-xs);
+}
+#scenarioContextBar.is-collapsed .scenario-context-item { display: none; }
+#editorProperty-reference #dockReferencePopover {
+  position: static;
+  width: auto;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: none;
+}

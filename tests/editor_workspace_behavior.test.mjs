@@ -33,6 +33,8 @@ class Element {
       this.children.push(node);
     }
   }
+  appendChild(node) { this.append(node); return node; }
+  replaceChildren(...nodes) { this.children = []; this.append(...nodes); }
   prepend(...nodes) {
     this.append(...nodes);
     this.children = [...nodes, ...this.children.filter((node) => !nodes.includes(node))];
@@ -74,6 +76,7 @@ function mount(context, initialSearch = "", { countrySelected = true } = {}) {
     node.ownerDocument = documentRef;
     return node;
   };
+  documentRef.createElementNS = (_, tag) => documentRef.createElement(tag);
   documentRef.getElementById = (id) => documentRef.querySelector(`#${id}`);
   const add = (id, parent = documentRef.body, tag = "div") => {
     const node = new Element(tag);
@@ -109,6 +112,14 @@ function mount(context, initialSearch = "", { countrySelected = true } = {}) {
   }
   add("projectSidebarPanel", right);
   add("frontlineProjectSection", right, "details");
+  const utilities = add("inspectorUtilitiesSection", right);
+  add("utilitiesGuideBtn", utilities, "button");
+  add("dockReferenceBtn", utilities, "button");
+  const reference = add("dockReferencePopover", utilities);
+  reference.classList.add("hidden");
+  reference.setAttribute("role", "dialog");
+  reference.setAttribute("aria-hidden", "true");
+  add("referenceOpacity", reference, "input");
   add("strategicCommandBar");
   add("inspectorSidebarTabProject", left, "button");
   const previous = { matchMedia: globalThis.matchMedia, MutationObserver: globalThis.MutationObserver };
@@ -289,4 +300,30 @@ test("Back restores the previous segment, focus and scroll, then hides when hist
   assert.equal(h.right.scrollTop, 120);
   assert.equal(h.documentRef.activeElement, title);
   assert.equal(back.hidden, true);
+});
+
+
+test("Layers owns persistent reference settings and removes Assets", (context) => {
+  const h = mount(context);
+  assert.equal(h.get("editorTaskAssetsBtn"), null);
+  const entry = h.get("editorLayer-reference");
+  assert.equal(h.get("editorTask-layers").contains(entry), true);
+  const input = h.get("referenceOpacity");
+  entry.click();
+  expectProperty(h, "reference", "Layers");
+  assert.equal(h.get("leftSidebarContent").dataset.editorTask, "layers");
+  assert.equal(h.get("dockReferencePopover").classList.contains("hidden"), false);
+  assert.equal(h.get("dockReferencePopover").getAttribute("role"), null);
+  assert.equal(h.get("editorProperty-reference").contains(input), true);
+  assert.equal(h.get("utilitiesGuideBtn").hidden, true);
+  h.workspace.selectObject("countries");
+  h.get("dockReferenceBtn").click();
+  expectProperty(h, "reference", "Layers");
+});
+
+test("reference deep link selects Layers and reference settings", (context) => {
+  const h = mount(context, "?view=reference");
+  expectProperty(h, "reference", "Layers");
+  assert.equal(h.get("leftSidebarContent").dataset.editorTask, "layers");
+  assert.equal(h.get("editorLayer-reference").getAttribute("aria-pressed"), "true");
 });
