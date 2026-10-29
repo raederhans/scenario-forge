@@ -114,7 +114,8 @@ for (const [name, fields, matched] of [
   assert.equal(analysis.roleMatched, matched);
   assert.equal(result.standardPerfSettlement.initialFrameSequence, matched ? 1 : null);
   if (matched) {
-    assert.equal(analysis.canonicalSample.politicalSource, fields.politicalSource ?? "");
+    // Legacy evidence has no politicalSource field; the summary must not invent one.
+    assert.equal(analysis.canonicalSample.politicalSource, fields.politicalSource);
     assert.equal(analysis.canonicalRenderSampleMs, 1050);
   } else {
     assert.equal(analysis.status, "role-mismatch");
