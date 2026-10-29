@@ -2,9 +2,13 @@
   "version": 1,
   "description": "Bilingual full country names for checked-in HOI4 1936 and 1939 scenario country tags.",
   "tags": {
+    "ABD": {
+      "en": "Sheikhdom of Abu Dhabi",
+      "zh": "阿布扎比酋长国"
+    },
     "ADN": {
-      "en": "Aden",
-      "zh": "亚丁"
+      "en": "Aden Colony",
+      "zh": "亚丁殖民地"
     },
     "AEF": {
       "en": "French Equatorial Africa",
@@ -18,17 +22,25 @@
       "en": "Kingdom of Afghanistan",
       "zh": "阿富汗王国"
     },
+    "AJM": {
+      "en": "Sheikhdom of Ajman",
+      "zh": "阿治曼酋长国"
+    },
     "ALB": {
       "en": "Kingdom of Albania",
       "zh": "阿尔巴尼亚王国"
     },
     "ALG": {
-      "en": "French Algeria",
-      "zh": "法属阿尔及利亚"
+      "en": "Southern Territories of Algeria",
+      "zh": "阿尔及利亚南部领地"
     },
     "ALK": {
       "en": "Territory of Alaska",
       "zh": "阿拉斯加领地"
+    },
+    "ALW": {
+      "en": "Autonomous Government of Latakia",
+      "zh": "拉塔基亚自治政府"
     },
     "AND": {
       "en": "Andorra",
@@ -195,8 +207,8 @@
       "zh": "智利共和国"
     },
     "CHU": {
-      "en": "Sichuan Clique",
-      "zh": "四川军阀"
+      "en": "Sichuan Administration - Liu Xiang Faction",
+      "zh": "四川军政区（刘湘系）"
     },
     "CNZ": {
       "en": "South Chahar Administration",
@@ -274,9 +286,17 @@
       "en": "Dominican Republic",
       "zh": "多米尼加共和国"
     },
+    "DUB": {
+      "en": "Sheikhdom of Dubai",
+      "zh": "迪拜酋长国"
+    },
     "ECU": {
       "en": "Republic of Ecuador",
       "zh": "厄瓜多尔共和国"
+    },
+    "EDN": {
+      "en": "Eastern Aden Protectorate Debug Region",
+      "zh": "东亚丁保护地调试分区"
     },
     "EGY": {
       "en": "Kingdom of Egypt",
@@ -329,6 +349,10 @@
     "FRO": {
       "en": "Faroe Islands",
       "zh": "法罗群岛"
+    },
+    "FUJ": {
+      "en": "Sheikhdom of Fujairah",
+      "zh": "富查伊拉酋长国"
     },
     "GAM": {
       "en": "Gambia",
@@ -414,6 +438,10 @@
       "en": "Republic of Honduras",
       "zh": "洪都拉斯共和国"
     },
+    "HTY": {
+      "en": "Alexandretta Autonomous Sanjak Debug Region",
+      "zh": "亚历山大勒塔自治专区调试分区"
+    },
     "HUN": {
       "en": "Kingdom of Hungary",
       "zh": "匈牙利王国"
@@ -453,6 +481,10 @@
     "IKA": {
       "en": "Khasi States",
       "zh": "卡西诸邦"
+    },
+    "IMO": {
+      "en": "Imamate of Oman",
+      "zh": "阿曼伊玛目国"
     },
     "INR": {
       "en": "Indore",
@@ -494,6 +526,10 @@
       "en": "Empire of Japan",
       "zh": "大日本帝国"
     },
+    "JAZ": {
+      "en": "Upper Jazira Administration",
+      "zh": "上杰济拉行政区"
+    },
     "JBZ": {
       "en": "North Shanxi Administration",
       "zh": "晋北政厅"
@@ -506,6 +542,10 @@
       "en": "Jin-Cha-Ji Border Region",
       "zh": "晋察冀边区"
     },
+    "JEB": {
+      "en": "Autonomous Government of Jabal Druze",
+      "zh": "德鲁兹山自治政府"
+    },
     "JOH": {
       "en": "Sultanate of Johor",
       "zh": "柔佛苏丹国"
@@ -513,6 +553,10 @@
     "JOR": {
       "en": "Emirate of Transjordan",
       "zh": "外约旦酋长国"
+    },
+    "JRG": {
+      "en": "Gyalrong Four Chiefdoms Debug Region",
+      "zh": "嘉绒四土调试分区"
     },
     "JSC": {
       "en": "Japanese-Occupied South China",
@@ -570,6 +614,10 @@
       "en": "Khairpur",
       "zh": "海尔布尔"
     },
+    "KRF": {
+      "en": "Karafuto Prefecture",
+      "zh": "桦太厅"
+    },
     "KRL": {
       "en": "Karelian ASSR",
       "zh": "卡累利阿自治共和国"
@@ -621,6 +669,10 @@
     "LIT": {
       "en": "Republic of Lithuania",
       "zh": "立陶宛共和国"
+    },
+    "LOL": {
+      "en": "Liangshan Yi Clan Debug Region",
+      "zh": "凉山彝族家支调试分区"
     },
     "LSI": {
       "en": "Lesser Sunda Debug Region",
@@ -698,6 +750,10 @@
       "en": "Mari Autonomous Oblast",
       "zh": "马里自治州"
     },
+    "MUL": {
+      "en": "Muli Chiefdom",
+      "zh": "木里土司"
+    },
     "MUR": {
       "en": "Mauritius",
       "zh": "毛里求斯"
@@ -764,7 +820,7 @@
     },
     "OMA": {
       "en": "Sultanate of Muscat and Oman",
-      "zh": "马斯喀特和阿曼苏丹国"
+      "zh": "马斯喀特与阿曼苏丹国"
     },
     "PAL": {
       "en": "Mandatory Palestine",
@@ -830,6 +886,10 @@
       "en": "British Indian Empire",
       "zh": "英属印度帝国"
     },
+    "RAK": {
+      "en": "Sheikhdom of Ras al-Khaimah",
+      "zh": "拉斯海马酋长国"
+    },
     "RCG": {
       "en": "Belgian Congo",
       "zh": "比属刚果"
@@ -878,6 +938,10 @@
       "en": "Federated Shan States",
       "zh": "掸邦联邦"
     },
+    "SHJ": {
+      "en": "Sheikhdom of Sharjah",
+      "zh": "沙迦酋长国"
+    },
     "SHX": {
       "en": "Shanxi Clique",
       "zh": "山西军阀"
@@ -887,8 +951,8 @@
       "zh": "暹罗王国"
     },
     "SIC": {
-      "en": "Xikang Administration",
-      "zh": "西康军政区（刘文辉）"
+      "en": "Xikang Provincial Preparatory Committee",
+      "zh": "西康建省委员会"
     },
     "SIE": {
       "en": "Sierra Leone",
@@ -926,6 +990,10 @@
       "en": "Union of Soviet Socialist Republics",
       "zh": "苏维埃社会主义共和国联盟"
     },
+    "SPM": {
+      "en": "Saint Pierre and Miquelon",
+      "zh": "圣皮埃尔和密克隆"
+    },
     "SPR": {
       "en": "Spanish Republic",
       "zh": "西班牙共和国"
@@ -937,6 +1005,10 @@
     "SSH": {
       "en": "Spanish Sahara",
       "zh": "西属撒哈拉"
+    },
+    "STH": {
+      "en": "Saint Helena Colony",
+      "zh": "圣赫勒拿殖民地"
     },
     "STP": {
       "en": "São Tomé and Príncipe",
@@ -1054,6 +1126,10 @@
       "en": "Travancore",
       "zh": "特拉凡哥尔"
     },
+    "UAQ": {
+      "en": "Sheikhdom of Umm al-Quwain",
+      "zh": "乌姆盖万酋长国"
+    },
     "UDM": {
       "en": "Udmurt ASSR",
       "zh": "乌德穆尔特自治共和国"
@@ -1085,6 +1161,10 @@
     "VIN": {
       "en": "French Indochina",
       "zh": "法属印度支那联邦"
+    },
+    "WDN": {
+      "en": "Western Aden Protectorate Debug Region",
+      "zh": "西亚丁保护地调试分区"
     },
     "WNG": {
       "en": "Dutch New Guinea Debug Region",
@@ -1119,8 +1199,8 @@
       "zh": "南斯拉夫王国"
     },
     "YUN": {
-      "en": "Yunnan Clique",
-      "zh": "云南军阀"
+      "en": "Yunnan Provincial Government - Long Yun",
+      "zh": "云南省政府（龙云）"
     },
     "ZAN": {
       "en": "Zanzibar",
@@ -1128,7 +1208,12 @@
     }
   },
   "scenarios": {
-    "hoi4_1936": {},
+    "hoi4_1936": {
+      "SIC": {
+        "en": "Xikang Provincial Preparatory Committee",
+        "zh": "西康建省委员会"
+      }
+    },
     "hoi4_1939": {
       "ALB": {
         "en": "Albanian Kingdom",
@@ -1193,6 +1278,10 @@
       "SIA": {
         "en": "Kingdom of Thailand",
         "zh": "泰王国"
+      },
+      "SIC": {
+        "en": "Xikang Provincial Government",
+        "zh": "西康省政府"
       }
     }
   }

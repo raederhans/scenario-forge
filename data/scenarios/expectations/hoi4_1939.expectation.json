@@ -31,7 +31,7 @@
     {
       "tag": "CHI",
       "field": "feature_count",
-      "equals": 697
+      "equals": 693
     },
     {
       "tag": "GXC",
@@ -71,7 +71,7 @@
     {
       "tag": "SIC",
       "field": "feature_count",
-      "equals": 32
+      "equals": 31
     },
     {
       "tag": "ADN",
@@ -247,13 +247,58 @@
       "tag": "YOG",
       "field": "subject_kind",
       "equals": "princely_state"
+    },
+    {
+      "tag": "DUB",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "IMO",
+      "field": "parent_owner_tag",
+      "equals": "OMA"
+    },
+    {
+      "tag": "ALW",
+      "field": "parent_owner_tag",
+      "equals": "FRA"
+    },
+    {
+      "tag": "JEB",
+      "field": "parent_owner_tag",
+      "equals": "FRA"
+    },
+    {
+      "tag": "WDN",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "EDN",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "LOL",
+      "field": "parent_owner_tag",
+      "equals": "SIC"
+    },
+    {
+      "tag": "MUL",
+      "field": "parent_owner_tag",
+      "equals": "SIC"
+    },
+    {
+      "tag": "KRF",
+      "field": "parent_owner_tag",
+      "equals": "JAP"
     }
   ],
   "summary_equals": {
     "blocker_count": 0,
     "feature_count": 21091,
-    "owner_count": 261,
-    "controller_count": 261,
+    "owner_count": 279,
+    "controller_count": 279,
     "synthetic_owner_feature_count": 23,
     "owner_controller_split_feature_count": 0,
     "controller_rule_count": 0
@@ -617,7 +662,7 @@
     },
     {
       "name": "geometry_karafuto",
-      "expected_owner_tag": "JAP",
+      "expected_owner_tag": "KRF",
       "feature_ids": [
         "RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO"
       ]
@@ -1088,6 +1133,153 @@
       "expected_owner_tag": "STR",
       "feature_ids": [
         "AU_REMOTE_INDIAN_OCEAN_TERRITORIES"
+      ]
+    },
+    {
+      "name": "city_Algiers",
+      "expected_owner_tag": "FRA",
+      "feature_ids": [
+        "DZA-2195"
+      ]
+    },
+    {
+      "name": "city_Tamanrasset",
+      "expected_owner_tag": "ALG",
+      "feature_ids": [
+        "DZA-2189"
+      ]
+    },
+    {
+      "name": "city_Tripoli",
+      "expected_owner_tag": "ITA",
+      "feature_ids": [
+        "LBY-2978"
+      ]
+    },
+    {
+      "name": "city_Kufra",
+      "expected_owner_tag": "LBA",
+      "feature_ids": [
+        "LBY-2965"
+      ]
+    },
+    {
+      "name": "city_Muscat",
+      "expected_owner_tag": "OMA",
+      "feature_ids": [
+        "OMN-2426"
+      ]
+    },
+    {
+      "name": "city_Nizwa",
+      "expected_owner_tag": "IMO",
+      "feature_ids": [
+        "OMN-2404"
+      ]
+    },
+    {
+      "name": "city_Dubai",
+      "expected_owner_tag": "DUB",
+      "feature_ids": [
+        "ARE-350"
+      ]
+    },
+    {
+      "name": "city_Kuwait",
+      "expected_owner_tag": "KUW",
+      "feature_ids": [
+        "KWT-1663"
+      ]
+    },
+    {
+      "name": "city_Aden",
+      "expected_owner_tag": "ADN",
+      "feature_ids": [
+        "YEM-3510"
+      ]
+    },
+    {
+      "name": "city_Xichang",
+      "expected_owner_tag": "SIC",
+      "feature_ids": [
+        "CN_CITY_17275852B35342422356290"
+      ]
+    },
+    {
+      "name": "city_Huili",
+      "expected_owner_tag": "SIC",
+      "feature_ids": [
+        "CN_CITY_17275852B90257281612339"
+      ]
+    },
+    {
+      "name": "city_Muli",
+      "expected_owner_tag": "MUL",
+      "feature_ids": [
+        "CN_CITY_17275852B80219081988604"
+      ]
+    },
+    {
+      "name": "city_Meigu",
+      "expected_owner_tag": "LOL",
+      "feature_ids": [
+        "CN_CITY_17275852B23024603415445"
+      ]
+    },
+    {
+      "name": "city_Barkam",
+      "expected_owner_tag": "JRG",
+      "feature_ids": [
+        "CN_CITY_17275852B24790182027849"
+      ]
+    },
+    {
+      "name": "city_Lahij",
+      "expected_owner_tag": "WDN",
+      "feature_ids": [
+        "YEM-157"
+      ]
+    },
+    {
+      "name": "city_Mukalla",
+      "expected_owner_tag": "EDN",
+      "feature_ids": [
+        "YEM-3497"
+      ]
+    },
+    {
+      "name": "city_Latakia",
+      "expected_owner_tag": "ALW",
+      "feature_ids": [
+        "SYR-134"
+      ]
+    },
+    {
+      "name": "city_Suwayda",
+      "expected_owner_tag": "JEB",
+      "feature_ids": [
+        "SYR-143"
+      ]
+    },
+    {
+      "name": "city_Hasakah",
+      "expected_owner_tag": "JAZ",
+      "feature_ids": [
+        "SYR-141"
+      ]
+    },
+    {
+      "name": "city_Antakya",
+      "expected_owner_tag": "TUR",
+      "feature_ids": [
+        "TR631"
+      ]
+    },
+    {
+      "name": "city_Benghazi",
+      "expected_owner_tag": "ITA",
+      "feature_ids": [
+        "LBY-2984"
       ]
     }
   ],
