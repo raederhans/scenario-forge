@@ -108,7 +108,11 @@ export function createRenderPipelinePassesOwner({
     if (passName !== "borders" || !cache.canvases?.[passName]) return false;
     if (getPassReferenceTransform(passName)) return true;
     const committed = lastCommitted[passName];
-    if (!committed || committed.canvas !== cache.canvases[passName]) return false;
+    const canvas = cache.canvases[passName];
+    // A resize keeps the canvas object but clears its pixels: never restore a
+    // reference for a surface whose dimensions changed since it was committed.
+    if (!committed || committed.canvas !== canvas
+      || committed.width !== canvas.width || committed.height !== canvas.height) return false;
     // Invalidation cleared the reference but the surface still holds the
     // borders committed at that transform: restore it so the composite can
     // scale the stale surface exactly like the interaction frame did.
@@ -233,8 +237,11 @@ export function createRenderPipelinePassesOwner({
       return;
     }
     renderPassToCache(passName, drawFn, transform, timings);
+    const committedCanvas = cache.canvases?.[passName] || null;
     lastCommitted[passName] = {
-      canvas: cache.canvases?.[passName] || null,
+      canvas: committedCanvas,
+      width: committedCanvas?.width,
+      height: committedCanvas?.height,
       transform: { x: transform.x, y: transform.y, k: transform.k },
     };
   }

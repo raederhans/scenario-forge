@@ -4,7 +4,7 @@ import test from "node:test";
 import { createRenderPipelinePassesOwner } from "../js/core/renderer/render_pipeline_passes.js";
 
 function createHarness({ passName = "borders", canvas = true, reference = true, dirty = true, withSetter = true } = {}) {
-  const oldCanvas = { pixels: "previous" };
+  const oldCanvas = { pixels: "previous", width: 640, height: 480 };
   const transform = { x: 10, y: 20, k: 2 };
   let referenceTransform = reference ? { x: 0, y: 0, k: 1 } : null;
   const restoredReferences = [];
@@ -153,6 +153,22 @@ test("committed borders restores its reference and reuses its canvas after inval
 test("committed borders blocks after reference invalidation when its canvas was replaced", () => {
   const { owner, cache, transform, painted, metrics, restoredReferences } = commitThenInvalidateReference();
   cache.canvases.borders = { pixels: "replacement" };
+  const timings = {};
+  assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), false);
+  assert.equal(owner.prepareIdleRenderPassDefinition("borders", () => {}, transform, timings), false);
+  assert.equal(cache.dirty.borders, true);
+  assert.deepEqual(painted, []);
+  assert.deepEqual(restoredReferences, []);
+  assert.deepEqual(timings, {});
+  assert.deepEqual(metrics, [["idleRenderPassPreflightPending", 0, {
+    passNames: "borders", activeScenarioId: "tno_1962",
+  }]]);
+});
+
+test("committed borders blocks after reference invalidation when the surface was resized", () => {
+  const { owner, cache, oldCanvas, transform, painted, metrics, restoredReferences } = commitThenInvalidateReference();
+  // setCanvasSize() keeps the canvas object but clears its pixels.
+  oldCanvas.width = 1280;
   const timings = {};
   assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), false);
   assert.equal(owner.prepareIdleRenderPassDefinition("borders", () => {}, transform, timings), false);
