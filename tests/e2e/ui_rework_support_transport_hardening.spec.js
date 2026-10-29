@@ -86,40 +86,63 @@ test("phase 03 support and transport surfaces stay unified", async ({ page }) =>
   await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
 
-  if (await page.locator("body.editor-workspace").count()) {
-    await page.locator("#editorTaskAssetsBtn").click();
+  const isWorkspace = await page.locator("body.editor-workspace").count();
+  const guideTrigger = isWorkspace ? "#scenarioGuideBtn" : "#utilitiesGuideBtn";
+  if (isWorkspace) {
+    await expect(page.locator("#inspectorUtilitiesSection")).toBeHidden();
+    await expect(page.locator("#utilitiesGuideBtn")).toBeHidden();
+    await expect(page.locator("#dockReferenceBtn")).toBeHidden();
   } else {
     await page.locator("#inspectorSidebarTabProject").click();
-  }
-  await expect(page.locator("#inspectorUtilitiesSection")).toBeVisible();
-  await page.evaluate(() => {
-    const utilities = document.querySelector("#inspectorUtilitiesSection");
-    const diagnostics = document.querySelector("#diagnosticsSection");
-    if (utilities instanceof HTMLDetailsElement) utilities.open = true;
-    if (diagnostics instanceof HTMLDetailsElement) diagnostics.open = true;
-  });
-  await expect(page.locator("#inspectorUtilitiesSection")).toHaveJSProperty("open", true);
+    await expect(page.locator("#inspectorUtilitiesSection")).toBeVisible();
+    await page.evaluate(() => {
+      const utilities = document.querySelector("#inspectorUtilitiesSection");
+      const diagnostics = document.querySelector("#diagnosticsSection");
+      if (utilities instanceof HTMLDetailsElement) utilities.open = true;
+      if (diagnostics instanceof HTMLDetailsElement) diagnostics.open = true;
+    });
+    await expect(page.locator("#inspectorUtilitiesSection")).toHaveJSProperty("open", true);
 
-  await expect(page.locator("#utilitiesGuideBtn")).toHaveText("Guide");
-  await expect(page.locator("#dockReferenceBtn")).toHaveText("Reference");
+    await expect(page.locator("#utilitiesGuideBtn")).toHaveText("Guide");
+    await expect(page.locator("#dockReferenceBtn")).toHaveText("Reference");
+  }
+  await expect(page.locator(guideTrigger)).toHaveText("Guide");
   await expect(page.locator("#dockExportBtn")).toHaveText("Open workbench");
 
-  await activateSupportTrigger(page, "#utilitiesGuideBtn");
+  await activateSupportTrigger(page, guideTrigger);
   await expectSupportPopoverVisibility(page, { guide: true, reference: false, export: false });
   await expect(page.locator("#scenarioGuideTitle")).not.toHaveText("");
   await expect(page.locator("body")).toHaveClass(/scenario-guide-open/);
 
   await page.keyboard.press("Escape");
   await expectSupportPopoverVisibility(page, { guide: false, reference: false, export: false });
-  await expect(page.locator("#utilitiesGuideBtn")).toBeFocused();
+  await expect(page.locator(guideTrigger)).toBeFocused();
 
-  await page.locator("#dockReferenceBtn").focus();
-  await page.keyboard.press("Enter");
-  await expectSupportPopoverVisibility(page, { guide: false, reference: true, export: false });
-  await expect(page.locator("#lblReferenceImage")).not.toHaveText("");
-  await page.keyboard.press("Escape");
-  await expectSupportPopoverVisibility(page, { guide: false, reference: false, export: false });
-  await expect(page.locator("#dockReferenceBtn")).toBeFocused();
+  if (isWorkspace) {
+    await page.locator("#editorTaskLayersBtn").click();
+    await activateSupportTrigger(page, "#editorLayer-reference");
+    const reference = page.locator("#editorProperty-reference");
+    await expect(reference).toBeVisible();
+    await expect(reference.locator("#lblReferenceImage")).not.toHaveText("");
+    await expect(reference.locator("#referenceOpacity")).toBeVisible();
+    await reference.locator("#referenceOpacity").focus();
+    await page.keyboard.press("Home");
+    await page.keyboard.press("ArrowRight");
+    await expect(reference.locator("#referenceOpacityValue")).toHaveText("1%");
+    await page.locator("#editorTaskLayersBtn").click();
+    await expect(reference).toBeVisible();
+    await page.locator("#editorLayer-legend").click();
+    await expect(reference).toBeHidden();
+    await expect(page.locator("#editorProperty-legend")).toBeVisible();
+  } else {
+    await page.locator("#dockReferenceBtn").focus();
+    await page.keyboard.press("Enter");
+    await expectSupportPopoverVisibility(page, { guide: false, reference: true, export: false });
+    await expect(page.locator("#lblReferenceImage")).not.toHaveText("");
+    await page.keyboard.press("Escape");
+    await expectSupportPopoverVisibility(page, { guide: false, reference: false, export: false });
+    await expect(page.locator("#dockReferenceBtn")).toBeFocused();
+  }
   if (await page.locator("body.editor-workspace").count()) {
     await page.locator("#inspectorSidebarTabProject").click();
     await expect(page.locator("#editorProperty-project")).toBeVisible();
@@ -138,13 +161,12 @@ test("phase 03 support and transport surfaces stay unified", async ({ page }) =>
   await page.locator("#exportWorkbenchCloseBtn").click();
   await expectSupportPopoverVisibility(page, { guide: false, reference: false, export: false });
   await expect(page.locator("#dockExportBtn")).toBeFocused();
-  if (await page.locator("body.editor-workspace").count()) await page.locator("#editorTaskAssetsBtn").click();
-  await activateSupportTrigger(page, "#utilitiesGuideBtn");
+  await activateSupportTrigger(page, guideTrigger);
   await expectSupportPopoverVisibility(page, { guide: true, reference: false, export: false });
 
   await page.keyboard.press("Escape");
   await expectSupportPopoverVisibility(page, { guide: false, reference: false, export: false });
-  await expect(page.locator("#utilitiesGuideBtn")).toBeFocused();
+  await expect(page.locator(guideTrigger)).toBeFocused();
 
   await openTransportWorkbenchFromProject(page);
   await expect(page.locator("#transportWorkbenchOverlay")).toBeVisible();
@@ -177,24 +199,18 @@ test("project support panels and inspector search stay polished and inset", asyn
     expect(projectInset.left).toBeGreaterThan(12);
     expect(projectInset.right).toBeGreaterThan(12);
 
-    await page.locator("#editorTaskAssetsBtn").click();
-    await expect(page.locator("#editorTask-assets #inspectorUtilitiesSection")).toBeVisible();
-    await expect(page.locator("#inspectorUtilitiesSection > .inspector-panel-body > .inspector-utilities-shell > .sidebar-help-copy")).toHaveCount(0);
-    const utilityMetrics = await page.evaluate(() => {
-      const section = document.querySelector("#inspectorUtilitiesSection")?.getBoundingClientRect();
-      const guide = document.querySelector("#utilitiesGuideBtn")?.getBoundingClientRect();
-      const reference = document.querySelector("#dockReferenceBtn")?.getBoundingClientRect();
-      return {
-        guideInset: section && guide ? guide.left - section.left : 0,
-        referenceInset: section && reference ? section.right - reference.right : 0,
-        actionsDisplay: getComputedStyle(document.querySelector("#inspectorUtilitiesSection .inspector-utility-actions")).display,
-      };
-    });
-    expect(utilityMetrics.guideInset).toBeGreaterThan(12);
-    expect(utilityMetrics.referenceInset).toBeGreaterThan(12);
-    expect(utilityMetrics.actionsDisplay).toBe("grid");
-
+    await expect(page.locator("#scenarioGuideBtn")).toBeVisible();
     await page.locator("#editorTaskLayersBtn").click();
+    await page.locator("#editorLayer-reference").click();
+    await expect(page.locator("#editorProperty-reference #referenceOpacity")).toBeVisible();
+    const referenceInset = await page.evaluate(() => {
+      const section = document.querySelector("#editorProperty-reference")?.getBoundingClientRect();
+      const control = document.querySelector("#referenceOpacity")?.getBoundingClientRect();
+      return section && control ? { left: control.left - section.left, right: section.right - control.right } : null;
+    });
+    expect(referenceInset.left).toBeGreaterThan(12);
+    expect(referenceInset.right).toBeGreaterThan(12);
+
     await page.locator("#editorLayer-annotations").click();
     await expect(page.locator("#editorProperty-annotations #frontlineProjectSection")).toBeVisible();
     const annotationMetrics = await page.evaluate(() => {
@@ -639,23 +655,24 @@ test("phase 03 support surfaces restore the requested view from URL", async ({ p
 
   if (await page.locator("body.editor-workspace").count()) {
     await expect(page.locator("#editorProjectBar #inspectorSidebarTabProject")).toBeVisible();
-    await expect(page.locator("#editorTask-assets #inspectorUtilitiesSection")).toBeVisible();
-  } else {
-    await expect(page.locator("#inspectorSidebarTabProject")).toHaveAttribute("aria-selected", "true");
-  }
-  await expect(page.locator("#inspectorUtilitiesSection")).toHaveJSProperty("open", true);
-  await expect(page.locator("#dockReferencePopover")).toBeVisible();
-  await expect(page.locator("#dockReferenceBtn")).toHaveAttribute("aria-expanded", "true");
-
-  if (await page.locator("body.editor-workspace").count()) {
+    await expect(page.locator("#editorTaskLayersBtn")).toHaveAttribute("aria-selected", "true");
+    await expect(page.locator("#editorProperty-reference #dockReferencePopover")).toBeVisible();
+    await expect(page.locator("#editorProperty-reference #referenceOpacity")).toBeVisible();
+    await page.locator("#editorLayer-legend").click();
+    await expect(page.locator("#editorProperty-reference")).toBeHidden();
+    await expect(page.locator("#editorProperty-legend")).toBeVisible();
     await page.locator("#editorTaskObjectsBtn").click();
     await page.locator("#editorObjects-countries").click();
   } else {
+    await expect(page.locator("#inspectorSidebarTabProject")).toHaveAttribute("aria-selected", "true");
+    await expect(page.locator("#inspectorUtilitiesSection")).toHaveJSProperty("open", true);
+    await expect(page.locator("#dockReferencePopover")).toBeVisible();
+    await expect(page.locator("#dockReferenceBtn")).toHaveAttribute("aria-expanded", "true");
     await page.locator("#inspectorSidebarTabInspector").focus();
     await page.keyboard.press("Enter");
+    await expect(page.locator("#dockReferenceBtn")).toHaveAttribute("aria-expanded", "false");
   }
   await expect(page.locator("#dockReferencePopover")).toBeHidden();
-  await expect(page.locator("#dockReferenceBtn")).toHaveAttribute("aria-expanded", "false");
   await expect(page).toHaveURL(/scope=current-object/);
   await expect(page).not.toHaveURL(/view=/);
 });
@@ -945,19 +962,21 @@ test("adaptive support, transport, and palette surfaces stay contained", async (
   await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
 
-  await page.evaluate(() => {
-    if (document.body.classList.contains("editor-workspace")) {
-      document.querySelector("#leftPanelToggle")?.click();
-      document.querySelector("#editorTaskAssetsBtn")?.click();
-    } else {
+  const isWorkspace = await page.locator("body.editor-workspace").count();
+  if (isWorkspace) {
+    await page.locator("#leftPanelToggle").click();
+    await page.locator("#editorTaskLayersBtn").click();
+    await page.locator("#editorLayer-reference").click();
+    await expect(page.locator("#editorProperty-reference #referenceOpacity")).toBeVisible();
+  } else {
+    await page.evaluate(() => {
       document.querySelector("#rightPanelToggle")?.click();
       document.querySelector("#inspectorSidebarTabProject")?.click();
-    }
-    const utilities = document.querySelector("#inspectorUtilitiesSection");
-    if (utilities instanceof HTMLDetailsElement) utilities.open = true;
-  });
-
-  await page.locator("#dockReferenceBtn").click();
+      const utilities = document.querySelector("#inspectorUtilitiesSection");
+      if (utilities instanceof HTMLDetailsElement) utilities.open = true;
+    });
+    await page.locator("#dockReferenceBtn").click();
+  }
   await expect(page.locator("#dockReferencePopover")).toBeVisible();
 
   const supportMetrics = await page.evaluate(() => {
@@ -975,7 +994,14 @@ test("adaptive support, transport, and palette surfaces stay contained", async (
   expect(supportMetrics.popover.bottom).toBeLessThanOrEqual(supportMetrics.viewportHeight);
   expect(supportMetrics.bodyScrollWidth).toBeLessThanOrEqual(supportMetrics.viewportWidth + 1);
 
-  await page.keyboard.press("Escape");
+  if (isWorkspace) {
+    await page.locator("#leftPanelToggle").click();
+    await page.locator("#editorLayer-legend").click();
+    await expect(page.locator("#editorProperty-reference")).toBeHidden();
+    await expect(page.locator("#editorProperty-legend")).toBeVisible();
+  } else {
+    await page.keyboard.press("Escape");
+  }
   await openTransportWorkbenchFromProject(page);
   await expect(page.locator("#transportWorkbenchOverlay")).toBeVisible();
   await page.locator("#transportWorkbenchInfoBtn").click();
