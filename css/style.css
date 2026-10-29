@@ -52,6 +52,8 @@
   --z-toast: 120;
   --dur-fast: 160ms;
   --dur-base: 260ms;
+  /* 面板切换淡入比菜单下拉（--dur-fast）略快，两者节奏有意区分。 */
+  --dur-enter: 140ms;
   --ease: cubic-bezier(.2, 0, 0, 1);
   --fs-2xl: 1.375rem;
 

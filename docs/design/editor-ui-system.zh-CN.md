@@ -66,7 +66,7 @@
 
 - 阴影三档：`--shadow-1`（悬浮控件）、`--shadow-2`（菜单、弹层）、`--shadow-3`（对话框）。侧栏不加阴影，用 `--line-1` 分隔。
 - 层级：`--z-map-overlay 10 / --z-dock 20 / --z-sidebar 30 / --z-popover 60 / --z-overlay 100 / --z-dialog 110 / --z-toast 120`。
-- 动效：`--dur-fast 160ms / --dur-base 260ms`（沿用现有值），缓动 `--ease: cubic-bezier(.2, 0, 0, 1)`。
+- 动效：`--dur-enter 140ms`（面板切换淡入）/ `--dur-fast 160ms`（菜单下拉、悬停）/ `--dur-base 260ms`（栏宽折叠），缓动 `--ease: cubic-bezier(.2, 0, 0, 1)`。面板淡入比菜单略快是有意的节奏差，不要合并。
 - 状态色用"浅底 + 深字"：toast、提示条、徽标不再用亮色实底配白字。`prefers-reduced-motion: reduce` 下全部过渡降为 0。
 
 ## 3. 组件

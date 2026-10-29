@@ -578,17 +578,19 @@ test("legend URL reload restores its layer task and property without entering an
   const modeTrigger = generator.locator(".app-select-button").first();
   const continentTrigger = generator.locator(".app-select-button").nth(1);
   await expect(modeTrigger).toBeVisible();
-  await expect(modeTrigger).toHaveAccessibleName("Generation Mode");
+  // 增强选择器的名称是"字段名 + 当前值"，读屏能同时听到字段和选中项。
+  await expect(modeTrigger).toHaveAccessibleName(/^Generation Mode /);
   await modeTrigger.click();
   await generator.getByRole("option", { name: "Continent Focus", exact: true }).click();
   await expect(modeTrigger.locator(".app-select-text")).toHaveText("Continent Focus");
+  await expect(modeTrigger).toHaveAccessibleName("Generation Mode Continent Focus");
   await expect(continentTrigger).toBeVisible();
-  await expect(continentTrigger).toHaveAccessibleName("Continent");
+  await expect(continentTrigger).toHaveAccessibleName(/^Continent /);
   await page.locator("#btnToggleLang").click();
   await expect.poll(() => readState(page, "currentLanguage")).toBe("zh");
-  await expect(modeTrigger).toHaveAccessibleName("生成模式");
+  await expect(modeTrigger).toHaveAccessibleName(/^生成模式/);
   await expect(continentTrigger).toBeVisible();
-  await expect(continentTrigger).toHaveAccessibleName("大洲");
+  await expect(continentTrigger).toHaveAccessibleName(/^大洲/);
 });
 
 test("workspace widths and mobile drawer have no horizontal page overflow", async ({ page }) => {

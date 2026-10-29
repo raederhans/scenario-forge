@@ -221,7 +221,7 @@
 @media (prefers-reduced-motion: no-preference) {
   /* Keep fixed-position controls anchored to the viewport inside each panel. */
   .editor-task-panel:not([hidden]), .editor-property-panel:not([hidden]) {
-    animation: editor-context-enter var(--dur-fast) var(--ease);
+    animation: editor-context-enter var(--dur-enter) var(--ease);
   }
   .editor-scenario-menu[open] > .sidebar-details-body {
     animation: editor-menu-enter var(--dur-fast) var(--ease);
