@@ -120,7 +120,7 @@ body {
   width: 100%;
   height: 100%;
   background:
-    radial-gradient(circle at top left, var(--surface-raised), var(--surface-raised) 32%),
+    radial-gradient(circle at top left, color-mix(in srgb, var(--surface-raised) 50%, transparent), transparent 32%),
     linear-gradient(180deg, var(--surface-panel) 0%, var(--bg-app) 52%, var(--surface-app) 100%);
   font-family: var(--font-body);
   color: var(--text-primary);
@@ -191,7 +191,7 @@ textarea {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: linear-gradient(180deg, var(--surface-raised), var(--surface-raised));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-raised) 28%, transparent), transparent);
 }
 
 body.app-booting #appShell {
@@ -235,8 +235,8 @@ body.transport-workbench-open.right-drawer-open::after {
   justify-content: center;
   padding: 24px;
   background:
-    radial-gradient(circle at top, var(--surface-raised), var(--surface-raised) 44%),
-    var(--surface-panel);
+    radial-gradient(circle at top, color-mix(in srgb, var(--surface-raised) 72%, transparent), transparent 44%),
+    color-mix(in srgb, var(--surface-app) 84%, transparent);
   backdrop-filter: blur(10px);
   pointer-events: auto;
   opacity: 1;
@@ -253,8 +253,8 @@ body.transport-workbench-open.right-drawer-open::after {
 
 .boot-overlay.is-peek {
   background:
-    radial-gradient(circle at top, var(--surface-raised), var(--surface-raised) 40%),
-    var(--surface-panel);
+    radial-gradient(circle at top, color-mix(in srgb, var(--surface-raised) 58%, transparent), transparent 40%),
+    color-mix(in srgb, var(--surface-app) 68%, transparent);
   backdrop-filter: blur(8px);
 }
 
@@ -263,12 +263,12 @@ body.transport-workbench-open.right-drawer-open::after {
   padding: 28px 30px 24px;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-md);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
   box-shadow: var(--shadow-1);
 }
 
 .boot-overlay.is-peek .boot-overlay__panel {
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 88%, transparent);
   box-shadow: var(--shadow-1);
 }
 
@@ -368,7 +368,7 @@ body.transport-workbench-open.right-drawer-open::after {
   padding: 12px 16px;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
   box-shadow: var(--shadow-1);
   pointer-events: none;
   backdrop-filter: blur(8px);
@@ -482,7 +482,7 @@ body.transport-workbench-open.right-drawer-open::after {
   padding: 0;
   border: 1px solid var(--line-2);
   border-radius: var(--radius-pill);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 96%, transparent);
   color: var(--text-primary);
   cursor: pointer;
   box-shadow: var(--shadow-1);
@@ -561,7 +561,7 @@ body.transport-workbench-open.right-drawer-open::after {
     flex-basis: 0;
     width: 0;
     border-right-color: transparent;
-    background: var(--surface-panel);
+    background: transparent;
   }
 
   body.left-sidebar-collapsed .sidebar-left > .sidebar-sections {
@@ -583,7 +583,7 @@ body.transport-workbench-open.right-drawer-open::after {
     flex-basis: 0;
     width: 0;
     border-left-color: transparent;
-    background: var(--surface-panel);
+    background: transparent;
   }
 
   body.right-sidebar-collapsed .sidebar-right > .sidebar-sections {
@@ -783,7 +783,7 @@ body.transport-workbench-open.right-drawer-open::after {
   padding: 16px;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-md);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 98%, transparent);
   box-shadow: var(--shadow-2);
   z-index: calc(var(--z-map-overlay) - 4);
 }
@@ -2557,7 +2557,7 @@ details.appearance-subsection > *:not(summary),
   padding-top: 12px;
   border-top: 1px solid var(--line-1);
   background:
-    linear-gradient(180deg, var(--surface-raised), var(--surface-raised));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-raised) 34%, transparent), transparent);
 }
 
 .appearance-prop-group {
@@ -3358,7 +3358,7 @@ details.card[open] > summary::after {
 
 /* A light halo keeps the inspector outline readable on dark fills and dark ocean alike. */
 #mapContainer .inspector-highlight-layer {
-  filter: drop-shadow(0 0 0.75px var(--surface-raised));
+  filter: drop-shadow(0 0 0.75px color-mix(in srgb, var(--surface-raised) 70%, transparent));
 }
 
 #map-canvas,
@@ -3396,7 +3396,7 @@ details.card[open] > summary::after {
   overflow: hidden;
   border: 1px solid var(--line-2);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 90%, transparent);
   box-shadow: var(--shadow-1);
   color: var(--ink-900);
   pointer-events: auto;
@@ -3452,7 +3452,7 @@ details.card[open] > summary::after {
   height: 22px;
   border: 1px solid var(--line-2);
   border-radius: var(--radius-sm);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 72%, transparent);
   color: var(--ink-700);
   font-size: 0.78rem;
   font-weight: 700;
@@ -3463,7 +3463,7 @@ details.card[open] > summary::after {
 .map-legend-control-btn:hover,
 .map-legend-control-btn:focus-visible {
   border-color: color-mix(in srgb, var(--accent) 48%, transparent);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 94%, transparent);
   color: var(--accent);
 }
 
@@ -3567,7 +3567,7 @@ details.card[open] > summary::after {
   padding: 5px 7px;
   border: 1px solid var(--line-2);
   border-radius: var(--radius-md);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 82%, transparent);
   box-shadow: var(--shadow-1);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
@@ -3679,7 +3679,7 @@ details.card[open] > summary::after {
   padding: 14px 14px 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--line-2);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 96%, transparent);
   color: var(--ink-900);
   box-shadow: var(--shadow-1);
   backdrop-filter: blur(16px) saturate(1.08);
@@ -3709,7 +3709,7 @@ details.card[open] > summary::after {
 .facility-info-card-close-btn {
   appearance: none;
   border: 1px solid var(--line-2);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 68%, transparent);
   color: var(--ink-500);
   width: 32px;
   height: 32px;
@@ -3723,7 +3723,7 @@ details.card[open] > summary::after {
 .facility-info-card-close-btn:focus-visible {
   color: var(--accent);
   border-color: var(--accent-ring);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 94%, transparent);
 }
 
 .facility-info-card-body {
@@ -4128,7 +4128,7 @@ body:not(.developer-mode) .dev-only {
 }
 
 .strategic-accordion-header:hover {
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 96%, transparent);
   box-shadow: var(--shadow-1);
 }
 
@@ -4186,7 +4186,7 @@ body:not(.developer-mode) .dev-only {
   z-index: calc(var(--z-sidebar) + 14);
   pointer-events: none;
   background:
-    radial-gradient(circle at top, var(--surface-raised), var(--surface-raised)),
+    radial-gradient(circle at top, color-mix(in srgb, var(--surface-raised) 18%, transparent), transparent),
     var(--line-2);
   backdrop-filter: blur(6px) saturate(0.96);
   -webkit-backdrop-filter: blur(6px) saturate(0.96);
@@ -4322,7 +4322,7 @@ body:not(.developer-mode) .dev-only {
   padding: 10px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--line-1);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 94%, transparent);
   box-shadow: var(--shadow-1);
   backdrop-filter: blur(10px);
 }
@@ -4345,7 +4345,7 @@ body.frontline-mode-active #devWorkspaceToggleBtn {
   padding: 0 14px;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
-  background: linear-gradient(180deg, var(--surface-raised), rgba(235, 229, 216, 0.94));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-raised) 90%, transparent), rgba(235, 229, 216, 0.94));
   color: var(--ink-700);
   font-size: var(--fs-xs);
   font-weight: 700;
@@ -5494,7 +5494,7 @@ body.counter-editor-modal-open {
   align-items: center;
   justify-content: center;
   padding: 28px;
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 42%, transparent);
   backdrop-filter: blur(10px);
 }
 
@@ -5557,7 +5557,7 @@ body.counter-editor-modal-open {
 .transport-workbench-close-btn:hover,
 .transport-workbench-icon-btn[aria-expanded="true"] {
   border-color: rgba(120, 84, 71, 0.24);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 96%, transparent);
   color: #6b4134;
 }
 
@@ -5647,7 +5647,7 @@ body.counter-editor-modal-open {
 
 .transport-workbench-info-item.is-focus-target {
   border-color: rgba(120, 84, 71, 0.22);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 92%, transparent);
 }
 
 .transport-workbench-info-text,
@@ -5861,7 +5861,7 @@ body.counter-editor-modal-open {
 
 .transport-workbench-inspector-tab:hover {
   border-color: var(--line-2);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 96%, transparent);
   color: var(--ink-900);
 }
 
@@ -6056,7 +6056,7 @@ body.counter-editor-modal-open {
 }
 
 .transport-workbench-data-table tr.is-selected td {
-  background: var(--accent-soft);
+  background: color-mix(in srgb, var(--accent-soft) 42%, transparent);
 }
 
 .transport-workbench-data-row-button {
@@ -6137,7 +6137,7 @@ body.counter-editor-modal-open {
 
 .transport-workbench-data-action-button-subtle:hover,
 .transport-workbench-data-action-button-subtle:focus-visible {
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 96%, transparent);
   color: var(--ink-900);
 }
 
@@ -6485,7 +6485,7 @@ body.counter-editor-modal-open {
 }
 
 .transport-workbench-inspector-row.is-selected {
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 96%, transparent);
   border-color: var(--line-1);
 }
 
@@ -6732,7 +6732,7 @@ body.counter-editor-modal-open {
 
 .transport-workbench-layer-order-item.is-dragging {
   border-color: rgba(120, 84, 71, 0.24);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 98%, transparent);
   box-shadow: var(--shadow-1);
 }
 
@@ -6882,7 +6882,7 @@ body.counter-editor-modal-open {
   align-items: center;
   justify-content: center;
   padding: 28px;
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 42%, transparent);
   backdrop-filter: blur(10px);
 }
 
@@ -6958,7 +6958,7 @@ body.counter-editor-modal-open {
 
 .export-workbench-close-btn:hover {
   border-color: rgba(120, 84, 71, 0.24);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 96%, transparent);
   color: #6b4134;
 }
 
@@ -7226,7 +7226,7 @@ body.counter-editor-modal-open {
 
 .export-workbench-layer-item.is-selected {
   border-color: rgba(120, 84, 71, 0.24);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 96%, transparent);
 }
 
 .export-workbench-layer-order {
@@ -7798,8 +7798,8 @@ body.counter-editor-modal-open {
   border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
   background:
-    linear-gradient(180deg, var(--surface-panel), var(--surface-panel)),
-    var(--surface-raised);
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, transparent), color-mix(in srgb, var(--surface-panel) 88%, transparent)),
+    color-mix(in srgb, var(--surface-raised) 92%, transparent);
   box-shadow: var(--shadow-1);
 }
 
@@ -7810,8 +7810,8 @@ body.counter-editor-modal-open {
 .sample-project-banner[data-sample-project-banner-tone="error"] {
   border-color: rgba(176, 65, 55, 0.28);
   background:
-    linear-gradient(180deg, var(--surface-panel), var(--surface-panel)),
-    var(--surface-raised);
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, transparent), color-mix(in srgb, var(--surface-panel) 90%, transparent)),
+    color-mix(in srgb, var(--surface-raised) 92%, transparent);
 }
 
 .sample-project-banner__copy {
@@ -7860,7 +7860,7 @@ body.counter-editor-modal-open {
   border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 82%, transparent);
   font-size: var(--fs-lg);
   line-height: 1;
   cursor: pointer;
@@ -7868,7 +7868,7 @@ body.counter-editor-modal-open {
 
 .sample-project-banner__dismiss:hover {
   color: var(--text-heading);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 96%, transparent);
 }
 
 .sample-project-banner__dismiss:focus-visible {
@@ -8505,7 +8505,7 @@ body.counter-editor-modal-open {
   flex-direction: column;
   gap: 12px;
   padding: 14px 16px 12px;
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 92%, transparent);
   border: 1px solid var(--line-1);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-1);
@@ -8551,7 +8551,7 @@ body.counter-editor-modal-open {
 .dock-collapse-btn {
   border: 1px solid var(--line-1);
   border-radius: var(--radius-pill);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
   color: var(--text-secondary);
   font-size: var(--fs-xs);
   font-weight: 600;
@@ -8653,7 +8653,7 @@ body.counter-editor-modal-open {
   padding: 6px 9px;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 94%, transparent);
   color: var(--text-secondary);
   font-size: var(--fs-xs);
   line-height: 1.3;
@@ -8675,7 +8675,7 @@ body.counter-editor-modal-open {
   min-height: 34px;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-md);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
   color: var(--text-primary);
   cursor: pointer;
   transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
@@ -8712,7 +8712,7 @@ body.counter-editor-modal-open {
   min-width: 0;
   min-height: 34px;
   padding: 6px 28px 6px 10px;
-  background: var(--bg-surface);
+  background: color-mix(in srgb, var(--bg-surface) 96%, transparent);
   font-size: var(--fs-xs);
 }
 
@@ -8837,7 +8837,7 @@ body.counter-editor-modal-open {
   padding: 16px;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-md);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 98%, transparent);
   box-shadow: var(--shadow-2);
 }
 
@@ -8901,7 +8901,7 @@ body.counter-editor-modal-open {
   padding: 3px;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
 }
 
 .dock-segment-btn {
@@ -9023,7 +9023,7 @@ body.counter-editor-modal-open {
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--line-2);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-panel) 94%, transparent);
   box-shadow: var(--shadow-1);
 }
 
@@ -9105,7 +9105,7 @@ body.counter-editor-modal-open {
 
 .scenario-context-icon-btn {
   border: 1px solid var(--line-1);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 96%, transparent);
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
   width: 26px;
@@ -9125,7 +9125,7 @@ body.counter-editor-modal-open {
   padding: 0 12px;
   border: 1px solid rgba(120, 84, 71, 0.16);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 98%, transparent);
   color: #6b4134;
   font-size: var(--fs-xs);
   font-weight: 700;
@@ -9651,7 +9651,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   padding: 7px 8px;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
-  background: var(--bg-surface);
+  background: color-mix(in srgb, var(--bg-surface) 96%, transparent);
   text-align: center;
   font-size: 0.82rem;
 }
@@ -9675,7 +9675,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   gap: 10px;
   padding: 13px 14px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--surface-raised);
+  border: 1px solid color-mix(in srgb, var(--surface-raised) 12%, transparent);
   background: color-mix(in srgb, var(--ink-900) 92%, transparent);
   color: var(--surface-raised);
   box-shadow: var(--shadow-1);
@@ -9759,7 +9759,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 .toast-action:focus-visible,
 .toast-dismiss:focus-visible,
 .app-dialog-btn:focus-visible {
-  outline: 2px solid var(--surface-raised);
+  outline: 2px solid color-mix(in srgb, var(--surface-raised) 88%, transparent);
   outline-offset: 2px;
 }
 
@@ -9917,7 +9917,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   top: 24px;
   z-index: calc(var(--z-dock) + 6);
   padding: 0 12px;
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 94%, transparent);
 }
 
 .panel-toggle-left {
@@ -9936,7 +9936,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   padding: 8px 12px;
   border: 1px solid var(--line-2);
   border-radius: var(--radius-sm);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 94%, transparent);
   color: var(--text-primary);
   font-size: var(--fs-xs);
   font-weight: 700;
@@ -9965,7 +9965,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   padding: 12px 16px;
   border: 1px solid var(--line-2);
   border-radius: var(--radius-sm);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
   color: var(--text-primary);
   text-align: center;
   font-size: var(--fs-sm);
@@ -10028,7 +10028,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   padding: 0 12px;
   border: 1px solid color-mix(in srgb, var(--accent) 16%, transparent);
   border-radius: var(--radius-sm);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 94%, transparent);
   color: var(--text-primary);
   font-size: var(--fs-xs);
   font-weight: 700;
@@ -10053,7 +10053,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   padding: 0 14px;
   border-color: var(--line-1);
   color: var(--text-secondary);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 94%, transparent);
 }
 
 .dev-workspace-dock-toggle:hover {
@@ -10096,7 +10096,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   margin-left: 0;
   border-radius: var(--radius-sm);
   border-color: var(--line-1);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-panel) 96%, transparent);
   box-shadow: var(--shadow-1);
   z-index: calc(var(--z-map-overlay) - 8);
 }
@@ -10199,7 +10199,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   padding: 8px 10px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 96%, transparent);
   overflow: hidden;
 }
 
@@ -10221,7 +10221,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   padding: 6px 8px;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 90%, transparent);
 }
 
 .dev-quick-label {
@@ -10349,7 +10349,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   padding: 9px 10px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 94%, transparent);
   min-width: 0;
 }
 
@@ -10605,7 +10605,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--dev-tag-color, #5D7CBA), var(--surface-raised));
+  background: linear-gradient(135deg, var(--dev-tag-color, #5D7CBA), color-mix(in srgb, var(--surface-raised) 92%, transparent));
   color: var(--ink-900);
   font: 700 0.76rem/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
@@ -10634,7 +10634,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   padding: 10px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 98%, transparent);
   box-shadow: var(--shadow-2);
   z-index: calc(var(--z-map-overlay) + 2);
 }
@@ -10704,7 +10704,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   padding: 8px 10px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 92%, transparent);
   color: var(--text-primary);
   font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   resize: vertical;
@@ -10917,7 +10917,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 
 .country-select-row:hover {
   background:
-    linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-raised) 98%, transparent), color-mix(in srgb, var(--surface-panel) 88%, transparent));
   border-color: var(--line-2);
   box-shadow: var(--shadow-1);
   transform: none;
@@ -10933,7 +10933,7 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 .country-select-row.is-selected {
   border-color: color-mix(in srgb, var(--accent) 26%, transparent);
   background:
-    linear-gradient(180deg, var(--surface-panel), var(--accent-soft));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, transparent), color-mix(in srgb, var(--accent-soft) 84%, transparent));
   box-shadow: var(--shadow-1);
 }
 
@@ -11614,7 +11614,7 @@ button.scenario-action-card {
 button.scenario-action-card:hover {
   border-color: color-mix(in srgb, var(--accent) 20%, transparent);
   background:
-    linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-raised) 98%, transparent), color-mix(in srgb, var(--surface-panel) 88%, transparent));
   box-shadow: var(--shadow-1);
 }
 
@@ -11700,7 +11700,7 @@ button.scenario-action-card:hover {
 
 .inspector-accordion-btn:hover,
 .inspector-item-btn:hover {
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 90%, transparent);
   border-color: color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
@@ -12405,8 +12405,8 @@ button.scenario-action-card:hover {
   border-radius: var(--radius-sm);
   border: 1px solid var(--line-1);
   background:
-    linear-gradient(180deg, var(--surface-raised), var(--surface-panel)),
-    var(--surface-raised);
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, transparent), color-mix(in srgb, var(--surface-panel) 90%, transparent)),
+    color-mix(in srgb, var(--surface-panel) 94%, transparent);
   box-shadow: var(--shadow-1);
   backdrop-filter: blur(14px);
 }
@@ -12432,7 +12432,7 @@ button.scenario-action-card:hover {
 .scenario-context-item {
   padding: 6px 10px;
   background:
-    linear-gradient(180deg, var(--surface-panel), var(--surface-panel)),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 94%, transparent), color-mix(in srgb, var(--surface-panel) 82%, transparent)),
     var(--line-1);
   border: 1px solid var(--line-1);
 }
@@ -12445,8 +12445,8 @@ button.scenario-action-card:hover {
 .scenario-context-action-btn,
 .zoom-controls .zoom-btn {
   background:
-    linear-gradient(180deg, var(--surface-raised), var(--surface-panel)),
-    var(--surface-raised);
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, transparent), color-mix(in srgb, var(--surface-panel) 86%, transparent)),
+    color-mix(in srgb, var(--surface-panel) 92%, transparent);
   border-color: var(--line-1);
   box-shadow: var(--shadow-1);
 }
@@ -12499,7 +12499,7 @@ button.scenario-action-card:hover {
 }
 
 .zoom-controls .zoom-pill-btn {
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-panel) 92%, transparent);
   box-shadow: none;
 }
 
@@ -12533,8 +12533,8 @@ button.scenario-action-card:hover {
   padding: 14px;
   border-radius: var(--radius-lg);
   background:
-    linear-gradient(180deg, var(--surface-raised), var(--surface-panel)),
-    var(--surface-panel);
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, transparent), color-mix(in srgb, var(--surface-panel) 92%, transparent)),
+    color-mix(in srgb, var(--surface-panel) 94%, transparent);
   border-color: var(--line-1);
   box-shadow: var(--shadow-1);
   backdrop-filter: blur(14px);
@@ -12563,7 +12563,7 @@ button.scenario-action-card:hover {
   justify-content: center;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 90%, transparent);
   color: var(--text-secondary);
   box-shadow: none;
   cursor: pointer;
@@ -12573,7 +12573,7 @@ button.scenario-action-card:hover {
 .dock-handle-btn:hover {
   color: var(--text-primary);
   border-color: color-mix(in srgb, var(--accent) 22%, transparent);
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--surface-raised) 98%, transparent);
 }
 
 .dock-handle-chevron {
@@ -12774,7 +12774,7 @@ button.scenario-action-card:hover {
   justify-content: center;
   border: 1px solid var(--line-1);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background: color-mix(in srgb, var(--surface-panel) 92%, transparent);
   color: var(--text-primary);
   font-size: var(--fs-xs);
   font-weight: 700;

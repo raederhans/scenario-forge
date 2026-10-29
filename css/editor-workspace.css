@@ -184,7 +184,7 @@
 .editor-workspace .dock-group-mode { width: auto; min-width: 0; }
 .editor-workspace .dock-group-mode .dock-segmented-control { width: auto; min-width: 0; grid-template-columns: auto; }
 .editor-workspace .dock-group-mode { position: static; }
-.editor-workspace #riverPaintNavigation { position: absolute; bottom: calc(100% + 16px); left: 50%; transform: translateX(-50%); width: min(320px, calc(100vw - 32px)); box-sizing: border-box; padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; max-height: min(560px, calc(100dvh - 240px)); overflow-y: auto; background: var(--surface-raised); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: var(--shadow-1); }
+.editor-workspace #riverPaintNavigation { position: absolute; bottom: calc(100% + 16px); left: 50%; transform: translateX(-50%); width: min(320px, calc(100vw - 32px)); box-sizing: border-box; padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; max-height: min(560px, calc(100dvh - 240px)); overflow-y: auto; background: color-mix(in srgb, var(--surface-raised) 96%, transparent); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: var(--shadow-1); }
 .editor-workspace #riverPaintSearchInput { min-width: 0; width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--surface-raised); color: var(--text-primary); font-size: var(--fs-xs); }
 .editor-workspace :is(#riverPaintRiverSelect, #riverPaintLocationSelect) { width: 100%; min-width: 0; max-width: 100%; background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; }
 .editor-workspace :is(.river-paint-location-row, #riverPaintLocationResults, #riverCellPicker) { grid-column: 1 / -1; }
@@ -288,6 +288,11 @@
   box-shadow: none;
   backdrop-filter: none;
   border-color: var(--line-1);
+}
+
+.editor-workspace.left-sidebar-collapsed #leftSidebar,
+.editor-workspace.right-sidebar-collapsed #rightSidebar {
+  background: transparent;
 }
 
 .editor-workspace .scenario-context-bar,
