@@ -30,6 +30,10 @@ test("shell layout keeps the map wide across compact and wide widths", async ({ 
       await expect.poll(() => page.evaluate(() => globalThis.__scenarioForgeTestApi.selection().selectedInspectorCountryCode)).not.toBe("");
       await expect(page.locator("body")).not.toHaveClass(/right-sidebar-collapsed/);
       await expect(page.locator("#editorSegmentInspector")).toHaveAttribute("aria-selected", "true");
+      await expect(page.locator("#leftSidebarCollapseBtn")).toHaveAttribute("aria-expanded", "false");
+      await page.locator("#leftSidebarCollapseBtn").click();
+      await expect(page.locator("#leftSidebarCollapseBtn")).toHaveAttribute("aria-expanded", "true");
+      await expect(page.locator("#rightSidebarCollapseBtn")).toHaveAttribute("aria-expanded", "false");
       await page.locator("#editorTaskLayersBtn").click();
       await page.locator("#appearanceTabBorders").click();
       await expect(page.locator("#editorSegmentLayers")).toHaveAttribute("aria-selected", "true");
@@ -368,6 +372,12 @@ test("country inspector submenus keep hierarchy and compact adaptive heights", a
       const actionsTitle = document.querySelector("#selectedCountryActionsSection .sidebar-section-title");
       const firstGroup = document.querySelector("#countryList > .country-explorer-group:not(.country-select-card)");
       const firstRow = document.querySelector("#countryList .country-select-row");
+      const selectedRow = document.querySelector("#countryList .country-select-row.is-selected");
+      const accentProbe = document.createElement("div");
+      accentProbe.style.backgroundColor = "var(--accent-soft)";
+      list.appendChild(accentProbe);
+      const accentSoft = getComputedStyle(accentProbe).backgroundColor;
+      accentProbe.remove();
       return {
         taskOverflowY: getComputedStyle(taskBody).overflowY,
         taskClientHeight: taskBody.clientHeight,
@@ -378,6 +388,14 @@ test("country inspector submenus keep hierarchy and compact adaptive heights", a
         countryTitleSize: Number.parseFloat(getComputedStyle(title).fontSize),
         firstGroupBackground: firstGroup ? getComputedStyle(firstGroup).backgroundImage : "",
         firstRowBackground: firstRow ? getComputedStyle(firstRow).backgroundImage : "",
+        firstGroupBorder: getComputedStyle(firstGroup).borderWidth,
+        firstGroupRadius: getComputedStyle(firstGroup).borderRadius,
+        firstRowBorders: ["borderTopWidth", "borderRightWidth", "borderLeftWidth"].map((property) => getComputedStyle(firstRow)[property]),
+        firstRowDividerWidth: getComputedStyle(firstRow).borderBottomWidth,
+        firstRowDividerStyle: getComputedStyle(firstRow).borderBottomStyle,
+        firstRowRadius: getComputedStyle(firstRow).borderRadius,
+        selectedRowBackground: getComputedStyle(selectedRow).backgroundColor,
+        accentSoft,
         firstRowTransition: firstRow ? getComputedStyle(firstRow).transitionProperty : "",
         presetText: document.querySelector("#presetTree")?.textContent || "",
         presetSummaries: [...document.querySelectorAll("#presetTree summary")].map((summary) => summary.textContent.trim()),
@@ -388,8 +406,15 @@ test("country inspector submenus keep hierarchy and compact adaptive heights", a
     expect(["visible", "clip"]).toContain(hierarchy.listOverflowY);
     expect(hierarchy.listMaxHeight).toBe("none");
     expect(hierarchy.actionTitleSize).toBeGreaterThan(hierarchy.countryTitleSize);
-    expect(hierarchy.firstGroupBackground).toContain("linear-gradient");
-    expect(hierarchy.firstRowBackground).toContain("linear-gradient");
+    expect(hierarchy.firstGroupBackground).toBe("none");
+    expect(hierarchy.firstRowBackground).toBe("none");
+    expect(hierarchy.firstGroupBorder).toBe("0px");
+    expect(hierarchy.firstGroupRadius).toBe("0px");
+    expect(hierarchy.firstRowBorders).toEqual(["0px", "0px", "0px"]);
+    expect(hierarchy.firstRowDividerWidth).toBe("1px");
+    expect(hierarchy.firstRowDividerStyle).toBe("solid");
+    expect(hierarchy.firstRowRadius).toBe("0px");
+    expect(hierarchy.selectedRowBackground).toBe(hierarchy.accentSoft);
     expect(hierarchy.firstRowTransition).not.toContain("transform");
     expect(hierarchy.presetText).not.toContain("Notes");
     expect(hierarchy.presetSummaries).not.toContain("Navigation");

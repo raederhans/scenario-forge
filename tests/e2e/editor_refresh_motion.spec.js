@@ -86,7 +86,7 @@ test("desktop sidebar content keeps its width throughout collapse and restores a
   await openWorkspace(page);
   for (const width of [1440, 1024]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const side of ["left", "right"]) {
+    for (const side of width === 1024 ? ["left"] : ["left", "right"]) {
       const sidebar = page.locator(`#${side}Sidebar`);
       const content = page.locator(`#${side}SidebarContent`);
       const collapse = page.locator(`#${side}SidebarCollapseBtn`);
@@ -160,6 +160,17 @@ test("desktop sidebar content keeps its width throughout collapse and restores a
       await expect(content).toHaveAttribute("aria-hidden", "false");
       await expect.poll(() => sidebar.evaluate((element) => element.getBoundingClientRect().width)).toBeCloseTo(baseline.shell, 1);
       await expect(content).toBeVisible();
+    }
+    if (width === 1024) {
+      await expect(page.locator("#rightSidebarCollapseBtn")).toHaveAttribute("aria-expanded", "false");
+      await page.locator("#rightSidebarCollapseBtn").click();
+      await expect(page.locator("#rightSidebarCollapseBtn")).toHaveAttribute("aria-expanded", "true");
+      await expect(page.locator("#leftSidebarCollapseBtn")).toHaveAttribute("aria-expanded", "false");
+      await expect(page.locator("#leftSidebarContent")).toHaveJSProperty("inert", true);
+      await page.locator("#leftSidebarCollapseBtn").click();
+      await expect(page.locator("#leftSidebarCollapseBtn")).toHaveAttribute("aria-expanded", "true");
+      await expect(page.locator("#rightSidebarCollapseBtn")).toHaveAttribute("aria-expanded", "false");
+      await expect(page.locator("#rightSidebarContent")).toHaveJSProperty("inert", true);
     }
   }
 });

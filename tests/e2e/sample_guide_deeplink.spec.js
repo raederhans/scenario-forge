@@ -277,6 +277,11 @@ async function expectStackingAboveGuide(page, overlaySelector) {
 
 async function ensureGuideVisible(page) {
   if (await page.locator("#scenarioGuidePopover").isHidden()) {
+    if (await page.locator("#sidebarDrawerBackdrop").isVisible()) {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("#sidebarDrawerBackdrop")).toBeHidden();
+      await expect(page.locator("body")).not.toHaveClass(/(?:left|right)-drawer-open/);
+    }
     await page.locator("#scenarioGuideBtn").click();
   }
   await expect(page.locator("#scenarioGuidePopover")).toBeVisible({ timeout: 30000 });
