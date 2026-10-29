@@ -18,6 +18,10 @@ export function readSettledRasterFrame({ zoom, captureReference = false, precise
     && !c.pendingPromotion && !c.pendingInfraPromotion && !c.promotionCommitInFlight;
   if (!ready) return false;
   if (settleOnly) return true;
+  // The deferred detail promotion later swaps the scene geometry (single ->
+  // composite) after an otherwise idle frame. Pixels are only read from the
+  // final geometry, so a reference and its comparison describe the same scene.
+  if (s.detailDeferred || s.detailPromotionInFlight) return false;
   const state = s;
   // Readiness and pixels must describe one synchronous browser frame.
   // Return a mismatching comparison immediately; never poll until pixels agree.
@@ -252,6 +256,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
             selected: !!raster.selected, idle: !raster.pending, committed: raster.commits > 0,
             noFailure: !raster.failed, hasView: !!raster.view,
             matchingView: !!raster.view && !!s.zoomTransform && ['x', 'y', 'k'].every(key => Math.abs(raster.view[key] - s.zoomTransform[key]) < 1e-7) },
+          detail: { deferred: s.detailDeferred, inFlight: s.detailPromotionInFlight, bundleMode: s.topologyBundleMode },
           phase: s.renderPhase, scenario: s.activeScenarioId, isInteracting: s.isInteracting,
           dirty: s.renderPassCache?.dirty, background: s.renderPerfMetrics?.drawPoliticalBackgroundFillsPass,
           deferExactAfterSettle: s.deferExactAfterSettle, exactAfterSettleHandle: s.exactAfterSettleHandle,
