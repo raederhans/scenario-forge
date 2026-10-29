@@ -17,6 +17,10 @@
   padding: var(--space-2);
   border-radius: var(--radius-sm);
 }
+/* 手机宽度由浮动的"检查器"按钮负责开右栏，顶栏图标按钮让位，避免两个入口同时出现。 */
+@media (max-width: 767px) {
+  .editor-project-bar #editorInspectorToggleBtn { display: none; }
+}
 .editor-scenario-link {
   display: flex;
   align-items: center;
