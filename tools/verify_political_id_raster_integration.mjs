@@ -340,8 +340,19 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     assert.deepEqual(report.preference, { saved: true, forcedOff: false });
     if (dpr === 1) await page.screenshot({ path: path.join(output, `${scenarioId}.png`) });
     await page.evaluate(() => {
+      // Which producer drew each side of the edited comparison; reported with any mismatch.
+      window.__readEditedFrameState = () => {
+        const { renderer, state: s } = window.__rasterTask, d = renderer.getPoliticalIdRasterDiagnostics();
+        const { reusedPathCount, builtPathCount, progressive, deferredFullCacheReady, recoveryQuality, sequence } = s.renderPerfMetrics?.drawPoliticalBackgroundFillsPass || {};
+        return { displayState: d.displayState, reason: d.reason, refinementPending: d.refinementPending,
+          politicalReason: s.renderPassCache?.reasons?.political, signature: s.renderPassCache?.signatures?.political,
+          detail: { deferred: s.detailDeferred, inFlight: s.detailPromotionInFlight, bundleMode: s.topologyBundleMode },
+          background: { reusedPathCount, builtPathCount, progressive, deferredFullCacheReady, recoveryQuality, sequence },
+          partialRepaint: s.renderPerfMetrics?.politicalPartialRepaint };
+      };
       const canvas = window.__rasterTask.state.renderPassCache.canvases.political;
       window.__editedRasterPixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+      window.__editedRasterState = window.__readEditedFrameState();
     });
     await toggle(page, false); await settled(page);
     report.editedPixels = await page.evaluate(() => {
@@ -349,11 +360,18 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       const before = window.__editedRasterPixels;
       if (before.width !== canvas.width || before.height !== canvas.height) throw Error('Edited view dimensions changed');
       const after = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
-      let changed = 0;
+      let changed = 0, minX = Infinity, minY = Infinity, maxX = -1, maxY = -1;
+      const samples = [];
       for (let i = 0; i < after.data.length; i += 4) {
-        if ([0, 1, 2, 3].some(channel => before.data[i + channel] !== after.data[i + channel])) changed++;
+        if (![0, 1, 2, 3].some(channel => before.data[i + channel] !== after.data[i + channel])) continue;
+        changed++;
+        const x = (i / 4) % canvas.width, y = Math.floor(i / 4 / canvas.width);
+        minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+        if (samples.length < 8) samples.push({ x, y, edited: [...before.data.slice(i, i + 4)], native: [...after.data.slice(i, i + 4)] });
       }
-      return { changed, pixels: canvas.width * canvas.height };
+      return { changed, pixels: canvas.width * canvas.height,
+        ...(changed ? { bounds: { minX, minY, maxX, maxY }, samples, edited: window.__editedRasterState,
+          native: window.__readEditedFrameState() } : {}) };
     });
     assert.equal(report.editedPixels.changed, 0, 'paint and brush must retain exact native pixels');
     assert.deepEqual(session.errors, []);
