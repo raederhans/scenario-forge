@@ -11,10 +11,10 @@ const ICON_PATHS = Object.freeze({
   close: ["M6 6l12 12", "M18 6 6 18"],
 });
 
-function createUiIcon(name, { size = 16, className = "ui-icon" } = {}) {
+function createUiIcon(name, { size = 16, className = "ui-icon", doc = globalThis.document } = {}) {
   const paths = ICON_PATHS[name];
   if (!paths) throw new Error(`Unknown UI icon: ${name}`);
-  const svg = document.createElementNS(SVG_NS, "svg");
+  const svg = doc.createElementNS(SVG_NS, "svg");
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("width", String(size));
   svg.setAttribute("height", String(size));
@@ -23,7 +23,7 @@ function createUiIcon(name, { size = 16, className = "ui-icon" } = {}) {
   svg.setAttribute("focusable", "false");
   svg.setAttribute("class", `${className} ui-icon-${name}`);
   for (const d of paths) {
-    const path = document.createElementNS(SVG_NS, "path");
+    const path = doc.createElementNS(SVG_NS, "path");
     path.setAttribute("d", d);
     path.setAttribute("stroke", "currentColor");
     path.setAttribute("stroke-width", "1.6");
@@ -38,7 +38,7 @@ function createUiIcon(name, { size = 16, className = "ui-icon" } = {}) {
 function setUiIcon(element, name, options) {
   if (!element) return;
   if (element.dataset.uiIcon === name && element.firstElementChild) return;
-  element.replaceChildren(createUiIcon(name, options));
+  element.replaceChildren(createUiIcon(name, { doc: element.ownerDocument || globalThis.document, ...options }));
   element.dataset.uiIcon = name;
 }
 

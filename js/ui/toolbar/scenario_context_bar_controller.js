@@ -1,3 +1,4 @@
+import { setUiIcon } from "../ui_icons.js";
 import { patchUiChromeState } from "../../core/state/actions/ui_chrome_actions.js";
 
 const SCENARIO_BAR_LEFT_OFFSET = 24;
@@ -109,7 +110,7 @@ function createScenarioContextBarController({
       scenarioContextActiveText.setAttribute("title", `${translateUi("Country")}: ${activeValue}`);
     }
     if (scenarioContextCollapseBtn) {
-      scenarioContextCollapseBtn.textContent = runtimeState.ui.scenarioBarCollapsed ? "+" : "-";
+      setUiIcon(scenarioContextCollapseBtn, runtimeState.ui.scenarioBarCollapsed ? "chevron-down" : "chevron-up");
       scenarioContextCollapseBtn.setAttribute("aria-label", runtimeState.ui.scenarioBarCollapsed
         ? translateUi("Expand")
         : translateUi("Collapse"));

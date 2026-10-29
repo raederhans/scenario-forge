@@ -477,7 +477,6 @@ function updateUIText() {
     ["scenarioContextScenarioText", "Scenario: None"],
     ["scenarioContextModeText", "Mode: Visual Color"],
     ["scenarioContextActiveText", "Active: None"],
-    ["scenarioContextCollapseBtn", "Collapse"],
     ["scenarioGuideTitle", "Scenario Quick Start"],
     ["scenarioGuideCloseBtn", "Close"],
     ["transportWorkbenchInfoTitle", "Transport guide"],
@@ -492,6 +491,7 @@ function updateUIText() {
   });
 
   const uiAttributeMap = [
+    ["scenarioContextCollapseBtn", "aria-label", state.ui.scenarioBarCollapsed ? "Expand" : "Collapse"],
     ["zoomUtilityViewportGroup", "aria-label", "Viewport controls"],
     ["zoomUtilitySystemGroup", "aria-label", "System status"],
     ["zoomUtilityWorkspaceGroup", "aria-label", "Workspace entry"],
