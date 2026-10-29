@@ -1054,11 +1054,11 @@ test("geometry and fitting run in bounded deferred tasks while repaint stays fre
   assert.equal(owner.getDiagnostics().pendingFits, 0);
 });
 
-test("deferred preparation batches countries and bounds the serial worker queue", () => {
+test("deferred preparation bounds the worker queue, coalesces progress repaints and repaints completion immediately", () => {
   const callbacks = [], messages = [];
   let invalidations = 0;
   let worker;
-  const { owner } = createHarness({ names: Array.from({ length: 12 }, (_, i) => `C${i}`), viewportWidth: 2400, helperOptions: {
+  const { owner, timers } = createHarness({ names: Array.from({ length: 12 }, (_, i) => `C${i}`), viewportWidth: 2400, helperOptions: {
     nowMs: () => 0,
     scheduleWork: (callback) => callbacks.push(callback),
     onInvalidate: () => { invalidations += 1; },
@@ -1070,22 +1070,124 @@ test("deferred preparation batches countries and bounds the serial worker queue"
   assert.equal(invalidations, 1, "preparation shares one repaint across the batch");
   owner.drawCountryLabels(1);
   assert.equal(callbacks.length, 0, "a full queue waits for completion instead of flooding the worker");
-  for (const message of messages.slice(0, 4)) worker.onmessage({ data: { requestId: message.requestId, fit: null } });
-  assert.equal(owner.getDiagnostics().pendingWorkerFits, 4);
-  owner.drawCountryLabels(1);
+  worker.onmessage({ data: { requestId: messages[0].requestId, fit: null } });
+  const trailingTimer = [...timers.keys()].at(-1);
+  for (const message of messages.slice(1, 4)) worker.onmessage({ data: { requestId: message.requestId, fit: null } });
+  assert.equal(messages.length, 8, "replies never project or post synchronously");
+  assert.equal(callbacks.length, 1, "replies share one idle-priority continuation");
   callbacks.shift()();
   assert.equal(messages.length, 12, "pending worker requests are not queued again");
   assert.equal(owner.getDiagnostics().pendingWorkerFits, 8, "released slots are refilled without exceeding the queue cap");
-  assert.equal(invalidations, 6);
+  assert.equal(invalidations, 1, "same-time replies refill the queue without repainting");
+  assert.equal(timers.size, 9, "eight worker deadlines share exactly one trailing repaint timer");
+  assert.ok(timers.has(trailingTimer), "subsequent replies retain the same trailing timer");
+  const repaint = timers.get(trailingTimer);
+  timers.delete(trailingTimer);
+  repaint();
+  assert.equal(invalidations, 2);
+  assert.equal(timers.size, 8);
   owner.clearTextCache();
   owner.drawCountryLabels(1);
   assert.equal(callbacks.length, 0);
   worker.onmessage({ data: { requestId: messages[4].requestId, fit: null } });
-  assert.equal(invalidations, 7, "a stale text response still wakes preparation after releasing a slot");
-  owner.drawCountryLabels(1);
   callbacks.shift()();
+  assert.equal(invalidations, 2, "a stale text response refills the released slot without repainting");
   assert.equal(messages.length, 13, "the current text generation resumes within the queue cap");
   assert.equal(owner.getDiagnostics().pendingWorkerFits, 8);
+  assert.equal(timers.size, 9);
+  for (let index = 5; index < messages.length; index++) {
+    assert.equal(invalidations, 2, "progress remains coalesced until the final result");
+    worker.onmessage({ data: { requestId: messages[index].requestId, fit: null } });
+    while (callbacks.length) callbacks.shift()();
+  }
+  assert.equal(owner.getDiagnostics().pendingWorkerFits, 0);
+  assert.equal(owner.getDiagnostics().pendingFits, 0);
+  assert.equal(invalidations, 3, "completion repaints immediately even with a fixed clock");
+  assert.equal(timers.size, 0, "completion cancels the trailing repaint");
+});
+
+test("deferred worker replies refill eight slots through one idle continuation without another draw or invalidation", () => {
+  const callbacks = [], messages = [];
+  let worker, invalidations = 0;
+  const { owner } = createHarness({ names: Array.from({ length: 12 }, (_, i) => `C${i}`), viewportWidth: 2400,
+    helperOptions: {
+      nowMs: () => 0, scheduleWork: callback => callbacks.push(callback), onInvalidate: () => invalidations++,
+      createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+    } });
+  owner.drawCountryLabels(1);
+  callbacks.shift()();
+  assert.equal(messages.length, 8);
+  assert.equal(invalidations, 1);
+  for (const message of messages.slice(0, 4)) {
+    worker.onmessage({ data: { requestId: message.requestId, fit: null } });
+    assert.equal(invalidations, 1);
+  }
+  assert.equal(owner.getDiagnostics().pendingWorkerFits, 4);
+  assert.equal(callbacks.length, 1, "replies coalesce into one idle continuation");
+  callbacks.shift()();
+  assert.equal(owner.getDiagnostics().pendingWorkerFits, 8);
+  assert.equal(messages.length, 12);
+  assert.equal(invalidations, 1);
+  assert.equal(callbacks.length, 0, "a full queue schedules nothing further");
+});
+
+test("deferred worker replies during a gesture wait for the settled frame to queue more fits", () => {
+  const callbacks = [], messages = [];
+  let worker;
+  const { owner, state } = createHarness({ names: Array.from({ length: 12 }, (_, i) => `C${i}`), viewportWidth: 2400,
+    helperOptions: {
+      nowMs: () => 0, scheduleWork: callback => callbacks.push(callback), onInvalidate() {},
+      createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+    } });
+  owner.drawCountryLabels(1);
+  callbacks.shift()();
+  assert.equal(messages.length, 8);
+  state.isInteracting = true;
+  worker.onmessage({ data: { requestId: messages[0].requestId, fit: null } });
+  assert.equal(messages.length, 8, "a gesture-time reply does not project or post another country");
+  state.isInteracting = false;
+  owner.drawCountryLabels(1);
+  callbacks.shift()();
+  assert.equal(messages.length, 9, "the settled frame resumes preparation");
+});
+
+test("deferred progress coalesces replies within 400 ms and supports a zero repaint interval", () => {
+  for (const interval of [undefined, 100, 0]) {
+    const callbacks = [], messages = [], timers = new Map();
+    let now = 0, clockStep = 0, timerId = 0, worker, invalidations = 0;
+    const { owner } = createHarness({ names: Array.from({ length: 8 }, (_, i) => `C${i}`), viewportWidth: 1600,
+      helperOptions: {
+        nowMs: () => (now += clockStep), progressRepaintIntervalMs: interval,
+        scheduleWork: callback => callbacks.push(callback), onInvalidate: () => invalidations++,
+        setTimeout(callback, delay) { timers.set(++timerId, { callback, delay }); return timerId; },
+        clearTimeout(id) { timers.delete(id); },
+        createWorker: () => (worker = { postMessage: message => messages.push(message), terminate() {} }),
+      } });
+    owner.drawCountryLabels(1);
+    callbacks.shift()();
+    assert.equal(messages.length, 8);
+    assert.equal(invalidations, 1);
+    clockStep = 7;
+    worker.onmessage({ data: { requestId: messages[0].requestId, fit: null } });
+    const trailingTimer = [...timers.keys()].at(-1);
+    if (interval !== 0) assert.equal(timers.get(trailingTimer).delay, (interval ?? 400) - now);
+    for (const message of messages.slice(1, 4)) worker.onmessage({ data: { requestId: message.requestId, fit: null } });
+    assert.ok(now < (interval || 400));
+    if (interval === 0) {
+      assert.equal(invalidations, 5, "zero interval repaints on every reply");
+      assert.equal(timers.size, 4, "only worker deadlines remain");
+    } else {
+      assert.equal(invalidations, 1);
+      assert.equal(timers.size, 5, "four worker deadlines and one trailing repaint");
+      const timer = timers.get(trailingTimer);
+      assert.ok(timer, "multiple replies keep the original timer");
+      now = interval ?? 400;
+      timers.delete(trailingTimer);
+      timer.callback();
+      assert.equal(invalidations, 2, "the interval publishes one trailing repaint");
+      assert.equal(timers.size, 4);
+    }
+  }
 });
 
 test("actual layout can render a complete projected country using measured glyph bounds", () => {

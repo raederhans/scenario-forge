@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
-    "chunk_count": 137,
-    "feature_count": 21066,
+    "chunk_count": 244,
+    "feature_count": 21078,
     "water_count": 0
   },
   "controller_changes": [],
@@ -14545,19 +14545,6 @@
     {
       "country_code": "CN",
       "critical": true,
-      "feature_id": "CN_CITY_17275852B83272093468807",
-      "feature_name": "Dalian",
-      "from_tag": "CHI",
-      "notes": "Manchukuo using northeastern China groupings plus the eastern Inner Mongolian and Jehol/Rehe frontier that belonged to MAN in HOI4 1936.",
-      "quality": "manual_reviewed",
-      "rule_id": "manchukuo",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "MAN"
-    },
-    {
-      "country_code": "CN",
-      "critical": true,
       "feature_id": "CN_CITY_17275852B83380661850476",
       "feature_name": "Hangjinqi",
       "from_tag": "CHI",
@@ -15204,19 +15191,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "CHU"
-    },
-    {
-      "country_code": "CN",
-      "critical": false,
-      "feature_id": "CN_CITY_17275852B86000242921086",
-      "feature_name": "Zhanjianghsi",
-      "from_tag": "CHI",
-      "notes": "Scenario extension: Yue clique in Guangdong.",
-      "quality": "manual_reviewed",
-      "rule_id": "yue_guangdong_clique",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUE"
     },
     {
       "country_code": "CN",
@@ -15974,19 +15948,6 @@
     },
     {
       "country_code": "CN",
-      "critical": false,
-      "feature_id": "CN_CITY_17275852B89468905887192",
-      "feature_name": "Suixixian",
-      "from_tag": "CHI",
-      "notes": "Scenario extension: Yue clique in Guangdong.",
-      "quality": "manual_reviewed",
-      "rule_id": "yue_guangdong_clique",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUE"
-    },
-    {
-      "country_code": "CN",
       "critical": true,
       "feature_id": "CN_CITY_17275852B89508881164731",
       "feature_name": "Lufengxian",
@@ -16166,19 +16127,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "SHX"
-    },
-    {
-      "country_code": "CN",
-      "critical": false,
-      "feature_id": "CN_CITY_17275852B90470795224142",
-      "feature_name": "Wuchuan",
-      "from_tag": "CHI",
-      "notes": "Scenario extension: Yue clique in Guangdong.",
-      "quality": "manual_reviewed",
-      "rule_id": "yue_guangdong_clique",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "YUE"
     },
     {
       "country_code": "CN",
@@ -25088,19 +25036,6 @@
     {
       "country_code": "MA",
       "critical": false,
-      "feature_id": "MAR-1445",
-      "feature_name": "Tanger - Tétouan",
-      "from_tag": "MOR",
-      "notes": "Spanish Morocco represented using the current northern Morocco approximation, with Ifni folded into the same protectorate block.",
-      "quality": "manual_reviewed",
-      "rule_id": "spanish_morocco",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SMR"
-    },
-    {
-      "country_code": "MA",
-      "critical": false,
       "feature_id": "MAR-1446",
       "feature_name": "Fès - Boulemane",
       "from_tag": "MOR",
@@ -25218,19 +25153,6 @@
     {
       "country_code": "MA",
       "critical": false,
-      "feature_id": "MAR-1455",
-      "feature_name": "Souss - Massa - Draâ",
-      "from_tag": "MOR",
-      "notes": "French Morocco represented as the remaining protectorate area after Spanish Morocco and Spanish Sahara are split out.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_morocco",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "MOR"
-    },
-    {
-      "country_code": "MA",
-      "critical": false,
       "feature_id": "MAR-1456",
       "feature_name": "Marrakech - Tensift - Al Haouz",
       "from_tag": "MOR",
@@ -25266,19 +25188,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "SSH"
-    },
-    {
-      "country_code": "MA",
-      "critical": false,
-      "feature_id": "MAR-3457",
-      "feature_name": "Guelmim - Es-Semara",
-      "from_tag": "MOR",
-      "notes": "Spanish Morocco represented using the current northern Morocco approximation, with Ifni folded into the same protectorate block.",
-      "quality": "manual_reviewed",
-      "rule_id": "spanish_morocco",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SMR"
     },
     {
       "country_code": "MA",
@@ -199799,10 +199708,10 @@
     "AEF": {
       "base_iso2": "TD",
       "continent_label": "Africa",
-      "controller_feature_count": 70,
+      "controller_feature_count": 60,
       "display_name": "French Equatorial Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 70,
+      "feature_count": 60,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199993,10 +199902,10 @@
     "AOF": {
       "base_iso2": "SN",
       "continent_label": "Africa",
-      "controller_feature_count": 96,
+      "controller_feature_count": 91,
       "display_name": "French West Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 96,
+      "feature_count": 91,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200057,10 +199966,10 @@
     "AST": {
       "base_iso2": "PG",
       "continent_label": "Oceania",
-      "controller_feature_count": 33,
+      "controller_feature_count": 13,
       "display_name": "Australia",
       "entry_kind": "scenario_subject",
-      "feature_count": 33,
+      "feature_count": 13,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200122,10 +200031,10 @@
     "BEA": {
       "base_iso2": "KE",
       "continent_label": "Africa",
-      "controller_feature_count": 42,
+      "controller_feature_count": 8,
       "display_name": "British East Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 42,
+      "feature_count": 8,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200370,10 +200279,10 @@
     "BWA": {
       "base_iso2": "NG",
       "continent_label": "Africa",
-      "controller_feature_count": 57,
+      "controller_feature_count": 39,
       "display_name": "British West Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 57,
+      "feature_count": 39,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200404,10 +200313,10 @@
     "CAN": {
       "base_iso2": "CA",
       "continent_label": "North America",
-      "controller_feature_count": 280,
+      "controller_feature_count": 273,
       "display_name": "Canada",
       "entry_kind": "",
-      "feature_count": 280,
+      "feature_count": 273,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200468,10 +200377,10 @@
     "CHI": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 873,
+      "controller_feature_count": 710,
       "display_name": "China",
       "entry_kind": "",
-      "feature_count": 873,
+      "feature_count": 710,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200528,10 +200437,10 @@
     "CHU": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 191,
+      "controller_feature_count": 158,
       "display_name": "Chuan Clique",
       "entry_kind": "",
-      "feature_count": 191,
+      "feature_count": 158,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
@@ -200837,10 +200746,10 @@
     "ENG": {
       "base_iso2": "GB",
       "continent_label": "Europe",
-      "controller_feature_count": 612,
+      "controller_feature_count": 508,
       "display_name": "Britain",
       "entry_kind": "",
-      "feature_count": 612,
+      "feature_count": 508,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200965,10 +200874,10 @@
     "FIN": {
       "base_iso2": "FI",
       "continent_label": "Europe",
-      "controller_feature_count": 20,
+      "controller_feature_count": 61,
       "display_name": "Finland",
       "entry_kind": "",
-      "feature_count": 20,
+      "feature_count": 61,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200998,10 +200907,10 @@
     "FRA": {
       "base_iso2": "FR",
       "continent_label": "Europe",
-      "controller_feature_count": 298,
+      "controller_feature_count": 287,
       "display_name": "France",
       "entry_kind": "",
-      "feature_count": 298,
+      "feature_count": 287,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201094,10 +201003,10 @@
     "GMA": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 83,
+      "controller_feature_count": 23,
       "display_name": "Gansu Ma Clique",
       "entry_kind": "",
-      "feature_count": 83,
+      "feature_count": 23,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
@@ -201156,10 +201065,10 @@
     "GRE": {
       "base_iso2": "GR",
       "continent_label": "Europe",
-      "controller_feature_count": 66,
+      "controller_feature_count": 65,
       "display_name": "Greece",
       "entry_kind": "",
-      "feature_count": 66,
+      "feature_count": 65,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201246,10 +201155,10 @@
     "GXC": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 59,
+      "controller_feature_count": 54,
       "display_name": "Guangxi Clique",
       "entry_kind": "",
-      "feature_count": 59,
+      "feature_count": 54,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201308,10 +201217,10 @@
     "HOL": {
       "base_iso2": "NL",
       "continent_label": "Europe",
-      "controller_feature_count": 39,
+      "controller_feature_count": 29,
       "display_name": "Netherlands",
       "entry_kind": "",
-      "feature_count": 39,
+      "feature_count": 29,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201431,10 +201340,10 @@
     "INS": {
       "base_iso2": "ID",
       "continent_label": "Asia",
-      "controller_feature_count": 34,
+      "controller_feature_count": 6,
       "display_name": "Dutch East Indies",
       "entry_kind": "scenario_subject",
-      "feature_count": 34,
+      "feature_count": 6,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201525,10 +201434,10 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 116,
+      "controller_feature_count": 107,
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 116,
+      "feature_count": 107,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201558,10 +201467,10 @@
     "JAP": {
       "base_iso2": "JP",
       "continent_label": "Asia",
-      "controller_feature_count": 65,
+      "controller_feature_count": 228,
       "display_name": "Japan",
       "entry_kind": "",
-      "feature_count": 65,
+      "feature_count": 228,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201908,10 +201817,10 @@
     "MAD": {
       "base_iso2": "MG",
       "continent_label": "Africa",
-      "controller_feature_count": 22,
+      "controller_feature_count": 26,
       "display_name": "Madagascar",
       "entry_kind": "scenario_subject",
-      "feature_count": 22,
+      "feature_count": 26,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201942,10 +201851,10 @@
     "MAL": {
       "base_iso2": "MY",
       "continent_label": "Asia",
-      "controller_feature_count": 25,
+      "controller_feature_count": 11,
       "display_name": "Malaysia",
       "entry_kind": "scenario_subject",
-      "feature_count": 25,
+      "feature_count": 11,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202009,10 +201918,10 @@
     "MEN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 23,
+      "controller_feature_count": 19,
       "display_name": "Mengjiang",
       "entry_kind": "",
-      "feature_count": 23,
+      "feature_count": 19,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202538,10 +202447,10 @@
     "POL": {
       "base_iso2": "PL",
       "continent_label": "Europe",
-      "controller_feature_count": 256,
+      "controller_feature_count": 254,
       "display_name": "Poland",
       "entry_kind": "",
-      "feature_count": 256,
+      "feature_count": 254,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202571,10 +202480,10 @@
     "POR": {
       "base_iso2": "PT",
       "continent_label": "Europe",
-      "controller_feature_count": 70,
+      "controller_feature_count": 23,
       "display_name": "Portugal",
       "entry_kind": "",
-      "feature_count": 70,
+      "feature_count": 23,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202604,10 +202513,10 @@
     "PRC": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 17,
+      "controller_feature_count": 18,
       "display_name": "Communist China",
       "entry_kind": "",
-      "feature_count": 17,
+      "feature_count": 18,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202728,10 +202637,10 @@
     "RAJ": {
       "base_iso2": "IN",
       "continent_label": "Asia",
-      "controller_feature_count": 396,
+      "controller_feature_count": 334,
       "display_name": "British Raj",
       "entry_kind": "scenario_subject",
-      "feature_count": 396,
+      "feature_count": 334,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202762,10 +202671,10 @@
     "RCG": {
       "base_iso2": "CD",
       "continent_label": "Africa",
-      "controller_feature_count": 33,
+      "controller_feature_count": 11,
       "display_name": "Belgian Congo",
       "entry_kind": "scenario_subject",
-      "feature_count": 33,
+      "feature_count": 11,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202859,10 +202768,10 @@
     "SAF": {
       "base_iso2": "NA",
       "continent_label": "Africa",
-      "controller_feature_count": 22,
+      "controller_feature_count": 9,
       "display_name": "South Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 22,
+      "feature_count": 9,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202958,10 +202867,10 @@
     "SHX": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 97,
+      "controller_feature_count": 99,
       "display_name": "Shanxi",
       "entry_kind": "",
-      "feature_count": 97,
+      "feature_count": 99,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203020,10 +202929,10 @@
     "SIK": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 87,
+      "controller_feature_count": 78,
       "display_name": "Sinkiang",
       "entry_kind": "",
-      "feature_count": 87,
+      "feature_count": 78,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203086,10 +202995,10 @@
     "SOM": {
       "base_iso2": "SO",
       "continent_label": "Africa",
-      "controller_feature_count": 18,
+      "controller_feature_count": 13,
       "display_name": "Italian Somaliland",
       "entry_kind": "scenario_subject",
-      "feature_count": 18,
+      "feature_count": 13,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203120,10 +203029,10 @@
     "SOV": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 12409,
+      "controller_feature_count": 10922,
       "display_name": "Soviet Union",
       "entry_kind": "",
-      "feature_count": 12409,
+      "feature_count": 10922,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203152,10 +203061,10 @@
     "SPR": {
       "base_iso2": "ES",
       "continent_label": "Europe",
-      "controller_feature_count": 59,
+      "controller_feature_count": 52,
       "display_name": "Spain",
       "entry_kind": "",
-      "feature_count": 59,
+      "feature_count": 52,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203284,10 +203193,10 @@
     "SWI": {
       "base_iso2": "CH",
       "continent_label": "Europe",
-      "controller_feature_count": 37,
+      "controller_feature_count": 26,
       "display_name": "Switzerland",
       "entry_kind": "",
-      "feature_count": 37,
+      "feature_count": 26,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203317,10 +203226,10 @@
     "SYR": {
       "base_iso2": "SY",
       "continent_label": "Asia",
-      "controller_feature_count": 15,
+      "controller_feature_count": 16,
       "display_name": "French Mandate for Syria",
       "entry_kind": "scenario_subject",
-      "feature_count": 15,
+      "feature_count": 16,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203483,10 +203392,10 @@
     "TUR": {
       "base_iso2": "TR",
       "continent_label": "Asia",
-      "controller_feature_count": 81,
+      "controller_feature_count": 80,
       "display_name": "Turkey",
       "entry_kind": "",
-      "feature_count": 81,
+      "feature_count": 80,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203543,10 +203452,10 @@
     "USA": {
       "base_iso2": "US",
       "continent_label": "North America",
-      "controller_feature_count": 828,
+      "controller_feature_count": 817,
       "display_name": "America",
       "entry_kind": "",
-      "feature_count": 828,
+      "feature_count": 817,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203637,10 +203546,10 @@
     "XSM": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 24,
+      "controller_feature_count": 18,
       "display_name": "Xibei San Ma",
       "entry_kind": "",
-      "feature_count": 24,
+      "feature_count": 18,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203669,10 +203578,10 @@
     "YEM": {
       "base_iso2": "YE",
       "continent_label": "Asia",
-      "controller_feature_count": 21,
+      "controller_feature_count": 20,
       "display_name": "Yemen",
       "entry_kind": "",
-      "feature_count": 21,
+      "feature_count": 20,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203729,10 +203638,10 @@
     "YUE": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 95,
+      "controller_feature_count": 118,
       "display_name": "Yue Clique",
       "entry_kind": "",
-      "feature_count": 95,
+      "feature_count": 118,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
@@ -204808,41 +204717,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "41abaa51c8653b4dcd274a6359d1a933d2c4195bd64a062ba489c95d76f7a3f4",
+  "snapshot_fingerprint": "8ab0b5a5f3c701a1e129410cacaddc46d6998bca7d07166537f68e382b4aa50f",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "8bfaec982f4025f135fce66ec0d8f39dfd5ff87b8a29a6a3ab75809a53c92b55",
-    "detail_chunk_manifest_sha256": "6fe52eba9358211775a1cb758d3f1119ce946bef97f9dcf1c0fe816c8ba8f140",
+    "build_snapshot_sha256": "495a4812e98128cbcd5253cf0be2fda4ee23b67be24c20b47a824578f2eddca1",
+    "detail_chunk_manifest_sha256": "f819fc99b3888c1c769a51b3f6805f27de1577cfd399e7be9059f5887a230359",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "runtime_topology_sha256": "d73cbe2088d826b1e28728a9ccb7f2ddf6e30c15313dbc0c7af66469c02b462d"
+    "runtime_topology_sha256": "6cf7c31ded456515351a77de093e71e930beba360a88bdcaac8572766a6fdbe5"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15333,
-    "controller_count": 127,
+    "changed_feature_count": 15326,
+    "controller_count": 235,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 21066,
+    "feature_count": 21078,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14886,
+    "manual_reviewed_feature_count": 14879,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 127,
+    "owner_count": 235,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5821,
-      "manual_reviewed": 14886
+      "manual_reviewed": 14879
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5821,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 15310
+      "manual_rule": 15303
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

@@ -8,6 +8,7 @@ import {
   createDeferredPoliticalBackgroundBuildState,
   createPoliticalBackgroundCacheState,
   createPoliticalBackgroundPathAccounting,
+  createRetainedPoliticalPathLookup,
   finalizePoliticalBackgroundGroups,
   getRetainedPoliticalPathHandle,
   refreshDeferredPoliticalBackgroundGroups,
@@ -126,6 +127,14 @@ export function createPoliticalBackgroundRenderOwner({
   const POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS = Number(
     constants.deferredFullCacheTimeoutMs,
   ) || 60;
+  // A quiet page hands an idle callback up to ~50 ms, and work posted during an
+  // idle period only runs in the next one. Stopping at the bounded CPU slice
+  // would waste most of each idle period, so a real idle deadline may extend a
+  // slice up to this cap while the browser still reports idle time.
+  const POLITICAL_DEFERRED_FULL_CACHE_IDLE_SLICE_MAX_MS = Math.max(
+    POLITICAL_DEFERRED_FULL_CACHE_CPU_BUDGET_MS,
+    Number(constants.deferredFullCacheIdleSliceMaxMs) || 40,
+  );
   const configuredMergedPathBudget = Number(constants.politicalBackgroundMergedPathBudgetBytes);
   const POLITICAL_BACKGROUND_MERGED_PATH_BUDGET_BYTES = Number.isSafeInteger(configuredMergedPathBudget)
     ? Math.max(0, configuredMergedPathBudget)
@@ -140,6 +149,7 @@ export function createPoliticalBackgroundRenderOwner({
   let scenarioPoliticalBackgroundCache = createScenarioPoliticalBackgroundCacheState();
   let scenarioPoliticalBackgroundDeferredFullCacheHandle = null;
   let scenarioPoliticalBackgroundDeferredFullCacheState = null;
+  let carriedDeferredPathIndex = null;
   const suspiciousScenarioBackgroundMergeWarnings = new Set();
 
   function createScenarioPoliticalBackgroundCacheState(overrides = {}) {
@@ -148,7 +158,11 @@ export function createPoliticalBackgroundRenderOwner({
 
   const updatePathAccounting = createPoliticalBackgroundPathAccounting(resourceBudget, politicalPathResourceAccounting);
   function updatePoliticalBackgroundPathResourceAccounting() {
-    return updatePathAccounting(scenarioPoliticalBackgroundCache, scenarioPoliticalBackgroundDeferredFullCacheState);
+    return updatePathAccounting(
+      scenarioPoliticalBackgroundCache,
+      scenarioPoliticalBackgroundDeferredFullCacheState,
+      carriedDeferredPathIndex?.index || scenarioPoliticalBackgroundDeferredFullCacheState?.carriedPathIndex || null,
+    );
   }
 
   function cancelScenarioPoliticalBackgroundDeferredFullCache(reason = "unspecified", { force = false } = {}) {
@@ -160,6 +174,15 @@ export function createPoliticalBackgroundRenderOwner({
       && isScenarioPoliticalBackgroundDeferredFullCacheStateCurrent(pending)
       && pending.pathCacheSignature === getPoliticalPathCacheSignature(pending.transform)
       && pending.resolvedEntries.every(entry => entry.feature.geometry === entry.geometryRef)) return false;
+    if (force) carriedDeferredPathIndex = null;
+    else if (pending?.pathIndex.size) {
+      carriedDeferredPathIndex = {
+        index: pending.pathIndex,
+        scenarioId: pending.scenarioId,
+        sceneGeneration: pending.sceneGeneration,
+        projectionSignature: pending.projectionSignature,
+      };
+    }
     if (scenarioPoliticalBackgroundDeferredFullCacheHandle) {
       cancelDeferredWork(scenarioPoliticalBackgroundDeferredFullCacheHandle);
     }
@@ -700,19 +723,30 @@ export function createPoliticalBackgroundRenderOwner({
     // LRU. Chunk promotion changes membership/data generation, but paths with
     // the same projection signature and geometry ref remain usable. Only this
     // per-feature reuse crosses data generations; task/publication fences don't.
-    const retainedPathHandle = deferredState.stage === "paths"
+    const previousPathHandle = deferredState.stage === "paths"
       ? getRetainedPoliticalBackgroundPathHandle(transform, { allowDataGenerationReuse: true }) : null;
+    const carriedPathHandle = deferredState.stage === "paths" && deferredState.carriedPathIndex
+      ? createRetainedPoliticalPathLookup(deferredState.carriedPathIndex) : null;
+    const retainedPathHandle = previousPathHandle || carriedPathHandle ? {
+      getPath: (feature, id) => previousPathHandle?.getPath(feature, id)
+        || carriedPathHandle?.getPath(feature, id) || null,
+    } : null;
     const result = advanceDeferredPoliticalBackgroundBuild(deferredState, {
       transform, pathCacheHandle, retainedPathHandle, getFeatureId, isPoliticalFeaturePathEntryCurrent,
       getPoliticalFeaturePathEntry, addRetainedPoliticalPath,
       resolvePoliticalBackgroundEntryMeta, Path2D: platform.Path2D,
       mergedPathBudgetBytes: POLITICAL_BACKGROUND_MERGED_PATH_BUDGET_BYTES,
-      withinBudget: (processedCount) => processedCount === 0 || (
-        nowMs() - startedAt < POLITICAL_DEFERRED_FULL_CACHE_CPU_BUDGET_MS
+      withinBudget: (processedCount) => {
+        if (processedCount === 0) return true;
+        const elapsedMs = nowMs() - startedAt;
         // Expired idle callbacks report zero idle time. Use the same bounded
         // CPU slice so a busy frame cannot reduce a large rebuild to one entry.
-        && (!deadline || deadline.didTimeout || typeof deadline.timeRemaining !== "function" || deadline.timeRemaining() > 0)
-      ),
+        if (!deadline || deadline.didTimeout || typeof deadline.timeRemaining !== "function") {
+          return elapsedMs < POLITICAL_DEFERRED_FULL_CACHE_CPU_BUDGET_MS;
+        }
+        if (!(deadline.timeRemaining() > 0)) return false;
+        return elapsedMs < POLITICAL_DEFERRED_FULL_CACHE_IDLE_SLICE_MAX_MS;
+      },
     });
     if (result.geometryChanged) {
       cancelScenarioPoliticalBackgroundDeferredFullCache("geometry-changed");
@@ -806,6 +840,7 @@ export function createPoliticalBackgroundRenderOwner({
       activeScenarioId: String(getRuntimeState().activeScenarioId || ""),
     });
     scenarioPoliticalBackgroundDeferredFullCacheState = null;
+    carriedDeferredPathIndex = null;
     updatePoliticalBackgroundPathResourceAccounting();
     invalidateRenderPasses("political", "progressive-political-full-cache-ready");
     recordProgressivePoliticalFullCacheReadyDiagnostics(getRuntimeState(), {
@@ -847,12 +882,20 @@ export function createPoliticalBackgroundRenderOwner({
       return true;
     }
     cancelScenarioPoliticalBackgroundDeferredFullCache("reschedule");
+    const projectionSignature = getProjectionRenderSignature();
     scenarioPoliticalBackgroundDeferredFullCacheState = {
       ...createDeferredPoliticalBackgroundBuildState(
         identity, cloneZoomTransform(transform), normalizedEntries, nowMs(),
         String(reason || "progressive-recovery"),
       ),
+      projectionSignature,
+      carriedPathIndex: carriedDeferredPathIndex
+        && carriedDeferredPathIndex.scenarioId === identity.scenarioId
+        && carriedDeferredPathIndex.sceneGeneration === identity.sceneGeneration
+        && carriedDeferredPathIndex.projectionSignature === projectionSignature
+        ? carriedDeferredPathIndex.index : null,
     };
+    carriedDeferredPathIndex = null;
     updatePoliticalBackgroundPathResourceAccounting();
     scheduleNextDeferredFullCacheSlice();
     recordRenderPerfMetric("scenarioPoliticalBackgroundDeferredFullCacheScheduled", 0, {
@@ -1078,6 +1121,9 @@ export function createPoliticalBackgroundRenderOwner({
         recoveryQuality: politicalRecoveryQuality,
       });
       if (cachedFullPass.cacheHit) {
+        // A published full pass supersedes paths carried from a cancelled build.
+        carriedDeferredPathIndex = null;
+        updatePoliticalBackgroundPathResourceAccounting();
         const groupCount = drawPoliticalBackgroundFillsFromGroups(cachedFullPass.groups);
         return returnSummary
           ? {
@@ -1138,6 +1184,12 @@ export function createPoliticalBackgroundRenderOwner({
           coarseUnderlay: "scenario-features",
         }
         : underlaySummary.groupCount;
+    }
+    // An exact frame will not schedule a deferred build, so nothing can reuse
+    // paths carried from a cancelled one; drop them instead of holding Path2Ds.
+    if (carriedDeferredPathIndex) {
+      carriedDeferredPathIndex = null;
+      updatePoliticalBackgroundPathResourceAccounting();
     }
     return drawPoliticalBackgroundFillsForEntries(visibleEntries, {
       transform,

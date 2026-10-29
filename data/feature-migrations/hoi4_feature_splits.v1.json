@@ -1,0 +1,58 @@
+{
+  "feature_splits": {
+    "CN_CITY_17275852B83272093468807": [
+      "CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG",
+      "CN_CITY_17275852B83272093468807__SPLIT_REST"
+    ],
+    "CN_CITY_17275852B86000242921086": [
+      "CN_CITY_17275852B86000242921086__SPLIT_GUANGZHOUWAN",
+      "CN_CITY_17275852B86000242921086__SPLIT_REST"
+    ],
+    "CN_CITY_17275852B89468905887192": [
+      "CN_CITY_17275852B89468905887192__SPLIT_GUANGZHOUWAN",
+      "CN_CITY_17275852B89468905887192__SPLIT_REST"
+    ],
+    "CN_CITY_17275852B90470795224142": [
+      "CN_CITY_17275852B90470795224142__SPLIT_GUANGZHOUWAN",
+      "CN_CITY_17275852B90470795224142__SPLIT_REST"
+    ],
+    "MAR-1445": [
+      "MAR-1445__SPLIT_TANGIER",
+      "MAR-1445__SPLIT_REST"
+    ],
+    "MAR-1455": [
+      "MAR-1455__SPLIT_IFNI",
+      "MAR-1455__SPLIT_REST"
+    ],
+    "MAR-3457": [
+      "MAR-3457__SPLIT_IFNI",
+      "MAR-3457__SPLIT_REST"
+    ],
+    "PL_MRG_727dd6268093": [
+      "PL_MRG_727dd6268093__SPLIT_DANZIG",
+      "PL_MRG_727dd6268093__SPLIT_REST"
+    ],
+    "PL_MRG_9e4e875a7bcd": [
+      "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
+      "PL_MRG_9e4e875a7bcd__SPLIT_REST"
+    ],
+    "PL_POW_2209": [
+      "PL_POW_2209__SPLIT_DANZIG",
+      "PL_POW_2209__SPLIT_REST"
+    ],
+    "PL_POW_2210": [
+      "PL_POW_2210__SPLIT_DANZIG",
+      "PL_POW_2210__SPLIT_REST"
+    ],
+    "RU_MRG_eefc121c2bf0": [
+      "RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO",
+      "RU_MRG_eefc121c2bf0__SPLIT_REST"
+    ]
+  },
+  "scenarios": [
+    "hoi4_1936",
+    "hoi4_1939"
+  ],
+  "semantics": "Copy parent paint and list membership to all children; explicit child paint wins. Runtime authority: scenario manifest hierarchy_overrides.feature_splits.",
+  "version": 1
+}

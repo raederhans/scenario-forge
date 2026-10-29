@@ -1,0 +1,3624 @@
+{
+  "schema_version": 1,
+  "scenario": "tno_1962",
+  "source_version": "TNO 1.10.0b",
+  "as_of": "1962.1.1.1",
+  "britain_rule": "BRITAIN_OLD",
+  "evidence": {
+    "T1": ".runtime/research/report-t1_tno_russia_fix.md",
+    "T2": ".runtime/research/report-t2_tno_tags_global.md"
+  },
+  "original_to_project": {
+    "AAA": {
+      "project_tags": [
+        "AAA"
+      ],
+      "default_project_tag": "AAA",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AAA - Argentina Antarctica.txt"
+      ]
+    },
+    "AAB": {
+      "project_tags": [
+        "AAB"
+      ],
+      "default_project_tag": "AAB",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AAB - Burgundian Antarctica.txt"
+      ]
+    },
+    "AAC": {
+      "project_tags": [
+        "AAC"
+      ],
+      "default_project_tag": "AAC",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AAC - Chilean Antarctica.txt"
+      ]
+    },
+    "AAF": {
+      "project_tags": [
+        "AAF"
+      ],
+      "default_project_tag": "AAF",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AAF - French Antartica.txt"
+      ]
+    },
+    "AAG": {
+      "project_tags": [
+        "AAG"
+      ],
+      "default_project_tag": "AAG",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AAG - German Antarctica.txt"
+      ]
+    },
+    "AAJ": {
+      "project_tags": [
+        "AAJ"
+      ],
+      "default_project_tag": "AAJ",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AAJ - Japanese Antarctica.txt"
+      ]
+    },
+    "AAN": {
+      "project_tags": [
+        "AAN"
+      ],
+      "default_project_tag": "AAN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AAN - Antarctic Anarchy.txt"
+      ]
+    },
+    "AAO": {
+      "project_tags": [
+        "AAO"
+      ],
+      "default_project_tag": "AAO",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AAO - OFN Antarctica.txt"
+      ]
+    },
+    "ADN": {
+      "project_tags": [
+        "ADN"
+      ],
+      "default_project_tag": "ADN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ADN - Andean Pact.txt"
+      ]
+    },
+    "AFG": {
+      "project_tags": [
+        "AFG"
+      ],
+      "default_project_tag": "AFG",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AFG - Afghanistan.txt"
+      ]
+    },
+    "ALB": {
+      "project_tags": [
+        "ALB"
+      ],
+      "default_project_tag": "ALB",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ALB - Albania.txt"
+      ]
+    },
+    "ALT": {
+      "project_tags": [
+        "ALT"
+      ],
+      "default_project_tag": "ALT",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ALT - Altai.txt"
+      ]
+    },
+    "AMR": {
+      "project_tags": [
+        "AMR"
+      ],
+      "default_project_tag": "AMR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AMR - Amur.txt"
+      ]
+    },
+    "ANG": {
+      "project_tags": [
+        "ANG"
+      ],
+      "default_project_tag": "ANG",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ANG - Angola.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "ARG": {
+      "project_tags": [
+        "ARG"
+      ],
+      "default_project_tag": "ARG",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ARG - Argentina.txt"
+      ]
+    },
+    "ARM": {
+      "project_tags": [
+        "ARM"
+      ],
+      "default_project_tag": "ARM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ARM - Armenia.txt"
+      ]
+    },
+    "AST": {
+      "project_tags": [
+        "AST"
+      ],
+      "default_project_tag": "AST",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AST - Australia.txt"
+      ]
+    },
+    "AYR": {
+      "project_tags": [
+        "AYR"
+      ],
+      "default_project_tag": "AYR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AYR - Kel Ayr.txt"
+      ]
+    },
+    "AZH": {
+      "project_tags": [
+        "AZH"
+      ],
+      "default_project_tag": "AZH",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AZH - Azad Hind.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "AZW": {
+      "project_tags": [
+        "AZW"
+      ],
+      "default_project_tag": "AZW",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/AZW - Azawad.txt"
+      ]
+    },
+    "BAH": {
+      "project_tags": [
+        "BAH"
+      ],
+      "default_project_tag": "BAH",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BAH - Bahamas.txt"
+      ]
+    },
+    "BHU": {
+      "project_tags": [
+        "BHU"
+      ],
+      "default_project_tag": "BHU",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BHU - Bhutan.txt"
+      ]
+    },
+    "BKF": {
+      "project_tags": [
+        "BKF"
+      ],
+      "default_project_tag": "BKF",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BKF - Mossiland.txt"
+      ]
+    },
+    "BKR": {
+      "project_tags": [
+        "BKR"
+      ],
+      "default_project_tag": "BKR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BKR - Bashkir.txt"
+      ]
+    },
+    "BKU": {
+      "project_tags": [
+        "BKU"
+      ],
+      "default_project_tag": "BKU",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BKU - Mosul and Kerkuk.txt"
+      ]
+    },
+    "BLZ": {
+      "project_tags": [
+        "BZ"
+      ],
+      "default_project_tag": "BZ",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/BLZ - Belize.txt"
+      ]
+    },
+    "BOL": {
+      "project_tags": [
+        "BOL"
+      ],
+      "default_project_tag": "BOL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BOL - Bolivia.txt"
+      ]
+    },
+    "BRA": {
+      "project_tags": [
+        "BRA"
+      ],
+      "default_project_tag": "BRA",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BRA - Brazil.txt"
+      ]
+    },
+    "BRB": {
+      "project_tags": [
+        "BRB"
+      ],
+      "default_project_tag": "BRB",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BRB - Barbados.txt"
+      ]
+    },
+    "BRG": {
+      "project_tags": [
+        "BRG"
+      ],
+      "default_project_tag": "BRG",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BRG - Burgundy.txt"
+      ]
+    },
+    "BRM": {
+      "project_tags": [
+        "BRM"
+      ],
+      "default_project_tag": "BRM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BRM - Bermuda.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "BRY": {
+      "project_tags": [
+        "BRY"
+      ],
+      "default_project_tag": "BRY",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BRY - Buryatia.txt"
+      ]
+    },
+    "BUL": {
+      "project_tags": [
+        "BUL"
+      ],
+      "default_project_tag": "BUL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BUL - Bulgaria.txt"
+      ]
+    },
+    "BUR": {
+      "project_tags": [
+        "BUR"
+      ],
+      "default_project_tag": "BUR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/BUR - Burma.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "CAM": {
+      "project_tags": [
+        "CAM"
+      ],
+      "default_project_tag": "CAM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/CAM - Cambodia.txt"
+      ]
+    },
+    "CAN": {
+      "project_tags": [
+        "CAN"
+      ],
+      "default_project_tag": "CAN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/CAN - Canada.txt"
+      ]
+    },
+    "CAO": {
+      "project_tags": [
+        "CAO"
+      ],
+      "default_project_tag": "CAO",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/CAO - Cameroon.txt"
+      ]
+    },
+    "CAU": {
+      "project_tags": [
+        "RKK"
+      ],
+      "default_project_tag": "RKK",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/CAU - Caucasia.txt"
+      ]
+    },
+    "CHD": {
+      "project_tags": [
+        "CHD"
+      ],
+      "default_project_tag": "CHD",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/CHD - Chad.txt"
+      ]
+    },
+    "CHI": {
+      "project_tags": [
+        "CHI",
+        "NCP",
+        "RGC"
+      ],
+      "default_project_tag": "CHI",
+      "policy": "preserve_custom",
+      "display_name_policy": "保留已有军阀显示名；贵州 GUI 消歧为 GUZ；新增原版政权用原版名",
+      "basis": [
+        "用户：中国保留现有军阀 tag，在其基础上补拆原版有而项目没有的政权；同 tag 异义必须清理",
+        "T2 第三节中国、第四节 NCP/RGC/GMA/QMA/GUI；仅在对应原版身份范围内保留当前自定义 owner"
+      ]
+    },
+    "CHL": {
+      "project_tags": [
+        "CHL"
+      ],
+      "default_project_tag": "CHL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/CHL - Chile.txt"
+      ]
+    },
+    "CHT": {
+      "project_tags": [
+        "CHT"
+      ],
+      "default_project_tag": "CHT",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/CHT - Chita.txt"
+      ]
+    },
+    "CLC": {
+      "project_tags": [
+        "CLC"
+      ],
+      "default_project_tag": "CLC",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/CLC - Colombian Conservatives.txt"
+      ]
+    },
+    "CLL": {
+      "project_tags": [
+        "CLL"
+      ],
+      "default_project_tag": "CLL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/CLL - Colombian Liberals.txt"
+      ]
+    },
+    "CME": {
+      "project_tags": [
+        "CME"
+      ],
+      "default_project_tag": "CME",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/CME - COMECON.txt"
+      ]
+    },
+    "COG": {
+      "project_tags": [
+        "GCO"
+      ],
+      "default_project_tag": "GCO",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/COG - Congo.txt"
+      ]
+    },
+    "COL": {
+      "project_tags": [
+        "COL"
+      ],
+      "default_project_tag": "COL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/COL - Colombia.txt"
+      ]
+    },
+    "COS": {
+      "project_tags": [
+        "COS"
+      ],
+      "default_project_tag": "COS",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/COS - Costa Rica.txt"
+      ]
+    },
+    "CRN": {
+      "project_tags": [
+        "GCE"
+      ],
+      "default_project_tag": "GCE",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/CRN - Cornwall.txt"
+      ]
+    },
+    "CRO": {
+      "project_tags": [
+        "CRO"
+      ],
+      "default_project_tag": "CRO",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/CRO - Croatia.txt"
+      ]
+    },
+    "CUB": {
+      "project_tags": [
+        "CUB"
+      ],
+      "default_project_tag": "CUB",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/CUB - Cuba.txt"
+      ]
+    },
+    "CYL": {
+      "project_tags": [
+        "CEY"
+      ],
+      "default_project_tag": "CEY",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/CYL - Ceylon.txt"
+      ]
+    },
+    "DAH": {
+      "project_tags": [
+        "DAH"
+      ],
+      "default_project_tag": "DAH",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/DAH - Dahomey.txt"
+      ]
+    },
+    "DEN": {
+      "project_tags": [
+        "DEN"
+      ],
+      "default_project_tag": "DEN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/DEN - Denmark.txt"
+      ]
+    },
+    "DOM": {
+      "project_tags": [
+        "DOM"
+      ],
+      "default_project_tag": "DOM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/DOM - Dominican Republic.txt"
+      ]
+    },
+    "DRL": {
+      "project_tags": [
+        "ORS"
+      ],
+      "default_project_tag": "ORS",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/DRL - Dirlewanger Brigade.txt"
+      ]
+    },
+    "ECU": {
+      "project_tags": [
+        "ECU"
+      ],
+      "default_project_tag": "ECU",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ECU - Ecuador.txt"
+      ]
+    },
+    "EGY": {
+      "project_tags": [
+        "EGY"
+      ],
+      "default_project_tag": "EGY",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/EGY - Egypt.txt"
+      ]
+    },
+    "ELS": {
+      "project_tags": [
+        "ELS"
+      ],
+      "default_project_tag": "ELS",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ELS - El Salvador.txt"
+      ]
+    },
+    "ENG": {
+      "project_tags": [
+        "ENG"
+      ],
+      "default_project_tag": "ENG",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ENG - England.txt"
+      ]
+    },
+    "FAR": {
+      "project_tags": [
+        "FAR"
+      ],
+      "default_project_tag": "FAR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/FAR - Faroe Islands.txt"
+      ]
+    },
+    "FAV": {
+      "project_tags": [
+        "FAV"
+      ],
+      "default_project_tag": "FAV",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/FAV - Free Aviators.txt"
+      ]
+    },
+    "FFR": {
+      "project_tags": [
+        "FFR"
+      ],
+      "default_project_tag": "FFR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/FFR - Free France.txt"
+      ]
+    },
+    "FIJ": {
+      "project_tags": [
+        "FIJ"
+      ],
+      "default_project_tag": "FIJ",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/FIJ - Fiji.txt"
+      ]
+    },
+    "FIN": {
+      "project_tags": [
+        "FIN"
+      ],
+      "default_project_tag": "FIN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/FIN - Finland.txt"
+      ]
+    },
+    "FRI": {
+      "project_tags": [
+        "FRI"
+      ],
+      "default_project_tag": "FRI",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/FRI - Free Indonesia.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "FRS": {
+      "project_tags": [
+        "FRA"
+      ],
+      "default_project_tag": "FRA",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/FRS - France.txt"
+      ]
+    },
+    "FWI": {
+      "project_tags": [
+        "FWI"
+      ],
+      "default_project_tag": "FWI",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/FWI - French West Indies.txt"
+      ]
+    },
+    "GAN": {
+      "project_tags": [
+        "GAN",
+        "GMA"
+      ],
+      "default_project_tag": "GAN",
+      "policy": "preserve_custom",
+      "display_name_policy": "保留已有军阀显示名；贵州 GUI 消歧为 GUZ；新增原版政权用原版名",
+      "basis": [
+        "用户：中国保留现有军阀 tag，在其基础上补拆原版有而项目没有的政权；同 tag 异义必须清理",
+        "T2 第三节中国、第四节 NCP/RGC/GMA/QMA/GUI；仅在对应原版身份范围内保留当前自定义 owner"
+      ]
+    },
+    "GAY": {
+      "project_tags": [
+        "GAY"
+      ],
+      "default_project_tag": "GAY",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/GAY - Gayny.txt"
+      ]
+    },
+    "GER": {
+      "project_tags": [
+        "GER"
+      ],
+      "default_project_tag": "GER",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/GER - Germany.txt"
+      ]
+    },
+    "GGN": {
+      "project_tags": [
+        "RKP"
+      ],
+      "default_project_tag": "RKP",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/GGN - General Gouvernment.txt"
+      ]
+    },
+    "GHA": {
+      "project_tags": [
+        "GHA"
+      ],
+      "default_project_tag": "GHA",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/GHA - Ghana.txt"
+      ]
+    },
+    "GNG": {
+      "project_tags": [
+        "GNG"
+      ],
+      "default_project_tag": "GNG",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/GNG - Guangdong.txt"
+      ]
+    },
+    "GOR": {
+      "project_tags": [
+        "GOR"
+      ],
+      "default_project_tag": "GOR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/GOR - Gorky.txt"
+      ]
+    },
+    "GRE": {
+      "project_tags": [
+        "GRE"
+      ],
+      "default_project_tag": "GRE",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/GRE - Greece.txt"
+      ]
+    },
+    "GRO": {
+      "project_tags": [
+        "GEA"
+      ],
+      "default_project_tag": "GEA",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/GRO - Ostafrika.txt"
+      ]
+    },
+    "GUA": {
+      "project_tags": [
+        "GUA"
+      ],
+      "default_project_tag": "GUA",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/GUA - Guatemala.txt"
+      ]
+    },
+    "GUC": {
+      "project_tags": [
+        "GUC"
+      ],
+      "default_project_tag": "GUC",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/GUC - Guiana-Cayenne.txt"
+      ]
+    },
+    "GUI": {
+      "project_tags": [
+        "GUI"
+      ],
+      "default_project_tag": "GUI",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/GUI - Guinea.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "GUL": {
+      "project_tags": [
+        "GUL"
+      ],
+      "default_project_tag": "GUL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/GUL - Gulf Governate.txt"
+      ]
+    },
+    "GUX": {
+      "project_tags": [
+        "GXC"
+      ],
+      "default_project_tag": "GXC",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/GUX - Guangxi.txt"
+      ]
+    },
+    "GUY": {
+      "project_tags": [
+        "GUY"
+      ],
+      "default_project_tag": "GUY",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/GUY - Guyana.txt"
+      ]
+    },
+    "GUZ": {
+      "project_tags": [
+        "GUZ"
+      ],
+      "default_project_tag": "GUZ",
+      "policy": "preserve_custom",
+      "display_name_policy": "保留已有军阀显示名；贵州 GUI 消歧为 GUZ；新增原版政权用原版名",
+      "basis": [
+        "用户：中国保留现有军阀 tag，在其基础上补拆原版有而项目没有的政权；同 tag 异义必须清理",
+        "T2 第三节中国、第四节 NCP/RGC/GMA/QMA/GUI；仅在对应原版身份范围内保留当前自定义 owner",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "HAI": {
+      "project_tags": [
+        "HAI"
+      ],
+      "default_project_tag": "HAI",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/HAI - Haiti.txt"
+      ]
+    },
+    "HAU": {
+      "project_tags": [
+        "HAU"
+      ],
+      "default_project_tag": "HAU",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/HAU - Sokoto.txt"
+      ]
+    },
+    "HOL": {
+      "project_tags": [
+        "RKN"
+      ],
+      "default_project_tag": "RKN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/HOL - Holland.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "HON": {
+      "project_tags": [
+        "HON"
+      ],
+      "default_project_tag": "HON",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/HON - Honduras.txt"
+      ]
+    },
+    "HUN": {
+      "project_tags": [
+        "HUN"
+      ],
+      "default_project_tag": "HUN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/HUN - Hungary.txt"
+      ]
+    },
+    "IBR": {
+      "project_tags": [
+        "IBR"
+      ],
+      "default_project_tag": "IBR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/IBR - Iberia.txt"
+      ]
+    },
+    "ICE": {
+      "project_tags": [
+        "ICE"
+      ],
+      "default_project_tag": "ICE",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ICE - Iceland.txt"
+      ]
+    },
+    "IEA": {
+      "project_tags": [
+        "AOI"
+      ],
+      "default_project_tag": "AOI",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/IEA - Italian East Africa.txt"
+      ]
+    },
+    "ILG": {
+      "project_tags": [
+        "IAL"
+      ],
+      "default_project_tag": "IAL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/ILG - Italian Algeria.txt"
+      ]
+    },
+    "IME": {
+      "project_tags": [
+        "IME"
+      ],
+      "default_project_tag": "IME",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/IME - Italian Middle East.txt"
+      ]
+    },
+    "IND": {
+      "project_tags": [
+        "RAJ"
+      ],
+      "default_project_tag": "RAJ",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 RAJ tag，身份与显示名称为印度共和国",
+      "basis": [
+        "用户最新明确口径：项目 RAJ 在 TNO 1962 就是印度共和国，与原版 IND 为同一身份；此口径覆盖 T2 对 British Raj 的旧解释",
+        "T2 南亚：IND 与 AZH、PAK 为不同开局实体；身份合并不取消边界修正"
+      ]
+    },
+    "INS": {
+      "project_tags": [
+        "INS"
+      ],
+      "default_project_tag": "INS",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/INS - Indonesia.txt"
+      ]
+    },
+    "IRE": {
+      "project_tags": [
+        "IRE"
+      ],
+      "default_project_tag": "IRE",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/IRE - Republic of Ireland.txt"
+      ]
+    },
+    "IRK": {
+      "project_tags": [
+        "IRK"
+      ],
+      "default_project_tag": "IRK",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/IRK - Irkutsk.txt",
+        "用户：IRK 保留名称；SBA 保持 SBA；T1 2.2、3.2，禁止以重叠别名 SBA→IRK"
+      ]
+    },
+    "IRQ": {
+      "project_tags": [
+        "IRQ"
+      ],
+      "default_project_tag": "IRQ",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/IRQ - Iraq.txt"
+      ]
+    },
+    "ITA": {
+      "project_tags": [
+        "ITA"
+      ],
+      "default_project_tag": "ITA",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ITA - Italy.txt"
+      ]
+    },
+    "JAM": {
+      "project_tags": [
+        "JAM"
+      ],
+      "default_project_tag": "JAM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/JAM - Jamaica.txt"
+      ]
+    },
+    "JAP": {
+      "project_tags": [
+        "JAP"
+      ],
+      "default_project_tag": "JAP",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/JAP - Japan.txt"
+      ]
+    },
+    "JOR": {
+      "project_tags": [
+        "JOR"
+      ],
+      "default_project_tag": "JOR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/JOR - Jordan.txt"
+      ]
+    },
+    "KAZ": {
+      "project_tags": [
+        "KAZ"
+      ],
+      "default_project_tag": "KAZ",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/KAZ - Kazakhstan.txt"
+      ]
+    },
+    "KEM": {
+      "project_tags": [
+        "RUR"
+      ],
+      "default_project_tag": "RUR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/KEM - Kemerovo.txt"
+      ]
+    },
+    "KLT": {
+      "project_tags": [
+        "KLT"
+      ],
+      "default_project_tag": "KLT",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/KLT - Kalat and Makran.txt"
+      ]
+    },
+    "KMC": {
+      "project_tags": [
+        "PFC"
+      ],
+      "default_project_tag": "PFC",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/KMC - Kamchatka.txt"
+      ]
+    },
+    "KOM": {
+      "project_tags": [
+        "KOM"
+      ],
+      "default_project_tag": "KOM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/KOM - Komi.txt"
+      ]
+    },
+    "KRK": {
+      "project_tags": [
+        "KRK"
+      ],
+      "default_project_tag": "KRK",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/KRK - Karakalpakstan.txt"
+      ]
+    },
+    "KRS": {
+      "project_tags": [
+        "KRS"
+      ],
+      "default_project_tag": "KRS",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/KRS - Krasnoyarsk.txt"
+      ]
+    },
+    "KYR": {
+      "project_tags": [
+        "KGZ"
+      ],
+      "default_project_tag": "KGZ",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/KYR - Kyrgyzstan.txt"
+      ]
+    },
+    "LAO": {
+      "project_tags": [
+        "LAO"
+      ],
+      "default_project_tag": "LAO",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/LAO - Laos.txt"
+      ]
+    },
+    "LEB": {
+      "project_tags": [
+        "LEB"
+      ],
+      "default_project_tag": "LEB",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/LEB - Lebanon.txt"
+      ]
+    },
+    "LIB": {
+      "project_tags": [
+        "LIB"
+      ],
+      "default_project_tag": "LIB",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/LIB - Liberia.txt"
+      ]
+    },
+    "MAD": {
+      "project_tags": [
+        "MAD"
+      ],
+      "default_project_tag": "MAD",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/MAD - Madagascar.txt"
+      ]
+    },
+    "MAG": {
+      "project_tags": [
+        "MAG"
+      ],
+      "default_project_tag": "MAG",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/MAG - Magadan.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "MAN": {
+      "project_tags": [
+        "MAN"
+      ],
+      "default_project_tag": "MAN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/MAN - Manchukuo.txt"
+      ]
+    },
+    "MAU": {
+      "project_tags": [
+        "MAU"
+      ],
+      "default_project_tag": "MAU",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/MAU - Mauritania.txt"
+      ]
+    },
+    "MCW": {
+      "project_tags": [
+        "RKM"
+      ],
+      "default_project_tag": "RKM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/MCW - Moskowien.txt"
+      ]
+    },
+    "MEN": {
+      "project_tags": [
+        "MEN"
+      ],
+      "default_project_tag": "MEN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/MEN - Mengjiang.txt"
+      ]
+    },
+    "MEX": {
+      "project_tags": [
+        "MEX"
+      ],
+      "default_project_tag": "MEX",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/MEX - Mexico.txt"
+      ]
+    },
+    "MGN": {
+      "project_tags": [
+        "MGN"
+      ],
+      "default_project_tag": "MGN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/MGN - Magnitogorsk.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "MLI": {
+      "project_tags": [
+        "MLI"
+      ],
+      "default_project_tag": "MLI",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/MLI - Mali.txt"
+      ]
+    },
+    "MLY": {
+      "project_tags": [
+        "MLY"
+      ],
+      "default_project_tag": "MLY",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/MLY - Malaya.txt"
+      ]
+    },
+    "MNT": {
+      "project_tags": [
+        "MNT"
+      ],
+      "default_project_tag": "MNT",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/MNT - Montenegro.txt"
+      ]
+    },
+    "MOC": {
+      "project_tags": [
+        "MC"
+      ],
+      "default_project_tag": "MC",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/MOC - Monaco.txt"
+      ]
+    },
+    "MOR": {
+      "project_tags": [
+        "MOR"
+      ],
+      "default_project_tag": "MOR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/MOR - Morocco.txt"
+      ]
+    },
+    "NEP": {
+      "project_tags": [
+        "NEP"
+      ],
+      "default_project_tag": "NEP",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/NEP - Nepal.txt"
+      ]
+    },
+    "NIC": {
+      "project_tags": [
+        "NIC"
+      ],
+      "default_project_tag": "NIC",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/NIC - Nicaragua.txt"
+      ]
+    },
+    "NOR": {
+      "project_tags": [
+        "RKNO"
+      ],
+      "default_project_tag": "RKNO",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/NOR - Norway.txt"
+      ]
+    },
+    "NOV": {
+      "project_tags": [
+        "NOV"
+      ],
+      "default_project_tag": "NOV",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/NOV - Novosibirsk.txt"
+      ]
+    },
+    "NRB": {
+      "project_tags": [
+        "NRB"
+      ],
+      "default_project_tag": "NRB",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/NRB - North Borneo.txt"
+      ]
+    },
+    "NRL": {
+      "project_tags": [
+        "NRL"
+      ],
+      "default_project_tag": "NRL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/NRL - Norlisk.txt"
+      ]
+    },
+    "NZL": {
+      "project_tags": [
+        "NZL"
+      ],
+      "default_project_tag": "NZL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/NZL - New Zealand.txt"
+      ]
+    },
+    "OMA": {
+      "project_tags": [
+        "OMA"
+      ],
+      "default_project_tag": "OMA",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/OMA - Oman.txt"
+      ]
+    },
+    "OMO": {
+      "project_tags": [
+        "OMO"
+      ],
+      "default_project_tag": "OMO",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/OMO - Omolon.txt"
+      ]
+    },
+    "OMS": {
+      "project_tags": [
+        "OMS"
+      ],
+      "default_project_tag": "OMS",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/OMS - Omsk.txt"
+      ]
+    },
+    "ONG": {
+      "project_tags": [
+        "ONG"
+      ],
+      "default_project_tag": "ONG",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ONG - Onega.txt"
+      ]
+    },
+    "ORE": {
+      "project_tags": [
+        "ORN"
+      ],
+      "default_project_tag": "ORN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/ORE - Orenburg.txt"
+      ]
+    },
+    "OST": {
+      "project_tags": [
+        "RKO"
+      ],
+      "default_project_tag": "RKO",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/OST - Ostland.txt"
+      ]
+    },
+    "PAD": {
+      "project_tags": [
+        "PAD"
+      ],
+      "default_project_tag": "PAD",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/PAD - Andorra.txt"
+      ]
+    },
+    "PAK": {
+      "project_tags": [
+        "PAK"
+      ],
+      "default_project_tag": "PAK",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/PAK - Pakistan.txt"
+      ]
+    },
+    "PAN": {
+      "project_tags": [
+        "PAN"
+      ],
+      "default_project_tag": "PAN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/PAN - Panama.txt"
+      ]
+    },
+    "PAR": {
+      "project_tags": [
+        "PAR"
+      ],
+      "default_project_tag": "PAR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/PAR - Paraguay.txt"
+      ]
+    },
+    "PER": {
+      "project_tags": [
+        "PER"
+      ],
+      "default_project_tag": "PER",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/PER - Persia.txt"
+      ]
+    },
+    "PHI": {
+      "project_tags": [
+        "PHI"
+      ],
+      "default_project_tag": "PHI",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/PHI - Philippines.txt"
+      ]
+    },
+    "PKT": {
+      "project_tags": [
+        "PKT"
+      ],
+      "default_project_tag": "PKT",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/PKT - Zollverein.txt"
+      ]
+    },
+    "PRC": {
+      "project_tags": [
+        "PRC"
+      ],
+      "default_project_tag": "PRC",
+      "policy": "one_to_one",
+      "display_name_policy": "采用人民革命委员会；继承项目 TAN 的实体名称，不继承旧 PRC 中国占位名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/PRC - People's Revolutionary Command.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行",
+        "T2 第五节：项目 TAN 与原版 PRC 为同一人民革命委员会；用户要求排除纯身份迁移产生的归属假变更"
+      ]
+    },
+    "PRM": {
+      "project_tags": [
+        "PRM"
+      ],
+      "default_project_tag": "PRM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/PRM - Perm.txt"
+      ]
+    },
+    "PRU": {
+      "project_tags": [
+        "PRU"
+      ],
+      "default_project_tag": "PRU",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/PRU - Peru.txt"
+      ]
+    },
+    "QIN": {
+      "project_tags": [
+        "QIN",
+        "QMA",
+        "GMA"
+      ],
+      "default_project_tag": "QIN",
+      "policy": "preserve_custom",
+      "display_name_policy": "保留已有军阀显示名；贵州 GUI 消歧为 GUZ；新增原版政权用原版名",
+      "basis": [
+        "用户：中国保留现有军阀 tag，在其基础上补拆原版有而项目没有的政权；同 tag 异义必须清理",
+        "T2 第三节中国、第四节 NCP/RGC/GMA/QMA/GUI；仅在对应原版身份范围内保留当前自定义 owner"
+      ]
+    },
+    "ROM": {
+      "project_tags": [
+        "ROM"
+      ],
+      "default_project_tag": "ROM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ROM - Romania.txt"
+      ]
+    },
+    "SAF": {
+      "project_tags": [
+        "SAF"
+      ],
+      "default_project_tag": "SAF",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SAF - South Africa.txt"
+      ]
+    },
+    "SAM": {
+      "project_tags": [
+        "SAM"
+      ],
+      "default_project_tag": "SAM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SAM - Samara.txt"
+      ]
+    },
+    "SAU": {
+      "project_tags": [
+        "SAU"
+      ],
+      "default_project_tag": "SAU",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SAU - Saudi Arabia.txt"
+      ]
+    },
+    "SBA": {
+      "project_tags": [
+        "SBA"
+      ],
+      "default_project_tag": "SBA",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SBA - Siberian Black Army.txt",
+        "用户：IRK 保留名称；SBA 保持 SBA；T1 2.2、3.2，禁止以重叠别名 SBA→IRK"
+      ]
+    },
+    "SCO": {
+      "project_tags": [
+        "SCO"
+      ],
+      "default_project_tag": "SCO",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SCO - Scotland.txt"
+      ]
+    },
+    "SEN": {
+      "project_tags": [
+        "SEN"
+      ],
+      "default_project_tag": "SEN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SEN - Senegal.txt"
+      ]
+    },
+    "SER": {
+      "project_tags": [
+        "SER"
+      ],
+      "default_project_tag": "SER",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SER - Serbia.txt"
+      ]
+    },
+    "SHO": {
+      "project_tags": [
+        "SHO"
+      ],
+      "default_project_tag": "SHO",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SHO - Shonan.txt"
+      ]
+    },
+    "SHX": {
+      "project_tags": [
+        "SHX"
+      ],
+      "default_project_tag": "SHX",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SHX - Shanxi.txt"
+      ]
+    },
+    "SIC": {
+      "project_tags": [
+        "SIC"
+      ],
+      "default_project_tag": "SIC",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SIC - Sichuan.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "SIE": {
+      "project_tags": [
+        "SIE"
+      ],
+      "default_project_tag": "SIE",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SIE - Sierra Leone.txt"
+      ]
+    },
+    "SIK": {
+      "project_tags": [
+        "SIK"
+      ],
+      "default_project_tag": "SIK",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SIK - Sikkim.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "SKN": {
+      "project_tags": [
+        "SKN"
+      ],
+      "default_project_tag": "SKN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SKN - Leeward Islands - St. Kitts and Nevis.txt"
+      ]
+    },
+    "SLG": {
+      "project_tags": [
+        "SLG"
+      ],
+      "default_project_tag": "SLG",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SLG - Iberian Algeria.txt"
+      ]
+    },
+    "SLO": {
+      "project_tags": [
+        "SLO"
+      ],
+      "default_project_tag": "SLO",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SLO - Slovakia.txt"
+      ]
+    },
+    "SNM": {
+      "project_tags": [
+        "SNM"
+      ],
+      "default_project_tag": "SNM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SNM - San Marino.txt"
+      ]
+    },
+    "SNS": {
+      "project_tags": [
+        "SNS"
+      ],
+      "default_project_tag": "SNS",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SNS - Syrian_National_State.txt"
+      ]
+    },
+    "SPH": {
+      "project_tags": [
+        "SPH"
+      ],
+      "default_project_tag": "SPH",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SPH - Socialist Philippines.txt"
+      ]
+    },
+    "STC": {
+      "project_tags": [
+        "STC"
+      ],
+      "default_project_tag": "STC",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/STC - Santa Cruz.txt"
+      ]
+    },
+    "SUR": {
+      "project_tags": [
+        "SUR"
+      ],
+      "default_project_tag": "SUR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SUR - Suriname.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "SVI": {
+      "project_tags": [
+        "SVI"
+      ],
+      "default_project_tag": "SVI",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SVI - Windward Islands - Saint Vincent.txt"
+      ]
+    },
+    "SVR": {
+      "project_tags": [
+        "SVR"
+      ],
+      "default_project_tag": "SVR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SVR - Sverdlovsk.txt"
+      ]
+    },
+    "SWE": {
+      "project_tags": [
+        "SWE"
+      ],
+      "default_project_tag": "SWE",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SWE - Sweden.txt"
+      ]
+    },
+    "SWI": {
+      "project_tags": [
+        "SWI"
+      ],
+      "default_project_tag": "SWI",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/SWI - Switzerland.txt"
+      ]
+    },
+    "TAJ": {
+      "project_tags": [
+        "TJK"
+      ],
+      "default_project_tag": "TJK",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/TAJ - Tajikistan.txt"
+      ]
+    },
+    "TAN": {
+      "project_tags": [
+        "TAN"
+      ],
+      "default_project_tag": "TAN",
+      "policy": "one_to_one",
+      "display_name_policy": "原版可释放图瓦实体；不得继承项目旧 TAN 的人民革命委员会名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/TAN - Tannu Tuva.txt",
+        "用户：冲突 tag 清理优先于保留项目别名；T2 第四节（二）、第五节；迁移仅登记，本 PR 不执行"
+      ]
+    },
+    "TAR": {
+      "project_tags": [
+        "TAT"
+      ],
+      "default_project_tag": "TAT",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/TAR - Tatarstan.txt"
+      ]
+    },
+    "THA": {
+      "project_tags": [
+        "SIA"
+      ],
+      "default_project_tag": "SIA",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/THA - Thailand.txt"
+      ]
+    },
+    "TIB": {
+      "project_tags": [
+        "TIB"
+      ],
+      "default_project_tag": "TIB",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/TIB - Tibet.txt"
+      ]
+    },
+    "TNS": {
+      "project_tags": [
+        "TNS"
+      ],
+      "default_project_tag": "TNS",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/TNS - Transnistria.txt"
+      ]
+    },
+    "TOM": {
+      "project_tags": [
+        "TOM"
+      ],
+      "default_project_tag": "TOM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/TOM - Tomsk.txt"
+      ]
+    },
+    "TRI": {
+      "project_tags": [
+        "TRI"
+      ],
+      "default_project_tag": "TRI",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/TRI - Trinidad and Tobago.txt"
+      ]
+    },
+    "TRK": {
+      "project_tags": [
+        "TKM"
+      ],
+      "default_project_tag": "TKM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/TRK - Turkmenistan.txt"
+      ]
+    },
+    "TUN": {
+      "project_tags": [
+        "TUN"
+      ],
+      "default_project_tag": "TUN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/TUN - Tunisia.txt"
+      ]
+    },
+    "TUR": {
+      "project_tags": [
+        "TUR"
+      ],
+      "default_project_tag": "TUR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/TUR - Turkey.txt"
+      ]
+    },
+    "TYM": {
+      "project_tags": [
+        "TYM"
+      ],
+      "default_project_tag": "TYM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/TYM - Tyumen.txt"
+      ]
+    },
+    "UKR": {
+      "project_tags": [
+        "RKU"
+      ],
+      "default_project_tag": "RKU",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/UKR - Ukraine.txt"
+      ]
+    },
+    "ULS": {
+      "project_tags": [
+        "ULS"
+      ],
+      "default_project_tag": "ULS",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ULS - NCSZ.txt"
+      ]
+    },
+    "UPH": {
+      "project_tags": [
+        "UPH"
+      ],
+      "default_project_tag": "UPH",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/UPH - Free Philippine Republic.txt"
+      ]
+    },
+    "URG": {
+      "project_tags": [
+        "URG"
+      ],
+      "default_project_tag": "URG",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/URG - Uruguay.txt"
+      ]
+    },
+    "URL": {
+      "project_tags": [
+        "URL"
+      ],
+      "default_project_tag": "URL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/URL - Ural.txt"
+      ]
+    },
+    "USA": {
+      "project_tags": [
+        "USA"
+      ],
+      "default_project_tag": "USA",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/USA - United States of America.txt"
+      ]
+    },
+    "UTL": {
+      "project_tags": [
+        "UTL"
+      ],
+      "default_project_tag": "UTL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/UTL - Turkestan Legion.txt"
+      ]
+    },
+    "UZB": {
+      "project_tags": [
+        "UZB"
+      ],
+      "default_project_tag": "UZB",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/UZB - Uzbekistan.txt"
+      ]
+    },
+    "VAC": {
+      "project_tags": [
+        "VAC"
+      ],
+      "default_project_tag": "VAC",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/VAC - Vatican City.txt"
+      ]
+    },
+    "VEN": {
+      "project_tags": [
+        "VEN"
+      ],
+      "default_project_tag": "VEN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/VEN - Venezuela.txt"
+      ]
+    },
+    "VIC": {
+      "project_tags": [
+        "VMT"
+      ],
+      "default_project_tag": "VMT",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/VIC - Communist Vietnam.txt"
+      ]
+    },
+    "VIN": {
+      "project_tags": [
+        "VIN"
+      ],
+      "default_project_tag": "VIN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/VIN - Vietnam.txt"
+      ]
+    },
+    "VOL": {
+      "project_tags": [
+        "VOL"
+      ],
+      "default_project_tag": "VOL",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/VOL - Vologda.txt"
+      ]
+    },
+    "VOR": {
+      "project_tags": [
+        "VOK"
+      ],
+      "default_project_tag": "VOK",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/VOR - Vorkuta.txt"
+      ]
+    },
+    "VYT": {
+      "project_tags": [
+        "VYT"
+      ],
+      "default_project_tag": "VYT",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/VYT - Vyatka.txt"
+      ]
+    },
+    "WAL": {
+      "project_tags": [
+        "WLS"
+      ],
+      "default_project_tag": "WLS",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/WAL - Wales.txt"
+      ]
+    },
+    "WRS": {
+      "project_tags": [
+        "WRS"
+      ],
+      "default_project_tag": "WRS",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/WRS - West Russia.txt"
+      ]
+    },
+    "XIK": {
+      "project_tags": [
+        "XIK"
+      ],
+      "default_project_tag": "XIK",
+      "policy": "preserve_custom",
+      "display_name_policy": "保留已有军阀显示名；贵州 GUI 消歧为 GUZ；新增原版政权用原版名",
+      "basis": [
+        "用户：中国保留现有军阀 tag，在其基础上补拆原版有而项目没有的政权；同 tag 异义必须清理",
+        "T2 第三节中国、第四节 NCP/RGC/GMA/QMA/GUI；仅在对应原版身份范围内保留当前自定义 owner"
+      ]
+    },
+    "XIN": {
+      "project_tags": [
+        "XIN"
+      ],
+      "default_project_tag": "XIN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/XIN - Xinjiang.txt"
+      ]
+    },
+    "YAK": {
+      "project_tags": [
+        "YAK"
+      ],
+      "default_project_tag": "YAK",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/YAK - Yakutsk.txt"
+      ]
+    },
+    "YEM": {
+      "project_tags": [
+        "YEM"
+      ],
+      "default_project_tag": "YEM",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/YEM - Yemen.txt"
+      ]
+    },
+    "YGR": {
+      "project_tags": [
+        "BOP"
+      ],
+      "default_project_tag": "BOP",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "basis": [
+        "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
+        "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/YGR - Yugra.txt"
+      ]
+    },
+    "YOR": {
+      "project_tags": [
+        "YOR"
+      ],
+      "default_project_tag": "YOR",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/YOR - Yorubaland.txt"
+      ]
+    },
+    "YUN": {
+      "project_tags": [
+        "YUN"
+      ],
+      "default_project_tag": "YUN",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/YUN - Yunnan.txt"
+      ]
+    },
+    "ZLT": {
+      "project_tags": [
+        "ZLT"
+      ],
+      "default_project_tag": "ZLT",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ZLT - Zlatoust.txt"
+      ]
+    },
+    "ZZZ": {
+      "project_tags": [
+        "ZZZ"
+      ],
+      "default_project_tag": "ZZZ",
+      "policy": "one_to_one",
+      "display_name_policy": "保留项目现有名称；新增实体采用原版名称",
+      "basis": [
+        "用户：不冲突的 tag 保留；目标为 1.10 原版开局",
+        "T2 第四节身份核对；history/countries/ZZZ - anarchy.txt"
+      ]
+    }
+  },
+  "conflict_migrations": {
+    "MAG": {
+      "new_tag": "MGN",
+      "action": "atomic_identity_migration",
+      "basis": [
+        "用户：同 tag 异义冲突必须清理",
+        "T2 第四节（二）、第五节",
+        "马格尼托哥尔斯克迁出 MAG，原版 MAG 为马加丹"
+      ]
+    },
+    "RSF": {
+      "new_tag": "MAG",
+      "action": "atomic_identity_migration",
+      "basis": [
+        "用户：同 tag 异义冲突必须清理",
+        "T2 第四节（二）、第五节",
+        "马加丹恢复原版身份"
+      ]
+    },
+    "GUI": {
+      "new_tag": "GUZ",
+      "action": "atomic_identity_migration",
+      "basis": [
+        "用户：同 tag 异义冲突必须清理",
+        "T2 第四节（二）、第五节",
+        "贵州迁出 GUI，原版 GUI 为西非几内亚"
+      ]
+    },
+    "BRM": {
+      "new_tag": "BUR",
+      "action": "atomic_identity_migration",
+      "basis": [
+        "用户：同 tag 异义冲突必须清理",
+        "T2 第四节（二）、第五节",
+        "缅甸迁出 BRM，原版 BRM 为百慕大"
+      ]
+    },
+    "FRI": {
+      "new_tag": "AZH",
+      "action": "atomic_identity_migration",
+      "basis": [
+        "用户：同 tag 异义冲突必须清理",
+        "T2 第四节（二）、第五节",
+        "自由印度迁出 FRI，原版 FRI 为自由印度尼西亚"
+      ]
+    },
+    "SIC": {
+      "new_tag": "XIK",
+      "action": "atomic_identity_migration",
+      "basis": [
+        "用户：同 tag 异义冲突必须清理",
+        "T2 第四节（二）、第五节",
+        "旧西康占位迁出 SIC，原版 SIC 为四川"
+      ]
+    },
+    "SIK": {
+      "new_tag": "XIN",
+      "action": "atomic_identity_migration",
+      "basis": [
+        "用户：同 tag 异义冲突必须清理",
+        "T2 第四节（二）、第五节",
+        "旧新疆占位迁出 SIK，原版 SIK 为锡金"
+      ]
+    },
+    "HOL": {
+      "new_tag": "SUR",
+      "action": "atomic_identity_migration",
+      "basis": [
+        "用户：同 tag 异义冲突必须清理",
+        "T2 第四节（二）、第五节",
+        "现荷属苏里南迁出 HOL；原版荷兰仍对应不冲突的 RKN"
+      ]
+    },
+    "GSW": {
+      "new_tag": "ANG",
+      "action": "atomic_identity_migration",
+      "basis": [
+        "用户：同 tag 异义冲突必须清理",
+        "T2 第四节（二）、第五节",
+        "德国西南非对应原版 ANG 开局殖民政权"
+      ]
+    },
+    "ANG": {
+      "new_tag": "ANG",
+      "action": "atomic_identity_migration",
+      "basis": [
+        "用户：同 tag 异义冲突必须清理",
+        "T2 第四节（二）、第五节",
+        "旧零领土安哥拉释放项需与殖民开局身份原子重定义，不能无说明复用"
+      ]
+    },
+    "PRC": {
+      "new_tag": null,
+      "action": "retire_old_china_placeholder_before_reusing_tag",
+      "split_targets": [
+        "CHI"
+      ],
+      "basis": [
+        "用户：清理 PRC/TAN 冲突",
+        "T2 第四节（二）：旧 PRC 中国占位没有 owner/controller；新 PRC 是图瓦委员会"
+      ]
+    },
+    "TAN": {
+      "new_tag": "PRC",
+      "action": "split_by_approved_feature",
+      "split_targets": [
+        "PRC",
+        "MEN"
+      ],
+      "basis": [
+        "T2 第五节 TAN：项目名称已为人民革命委员会，对应原版 PRC；原版 TAN 是 Tuva，不能将 TAN→PRC 的身份迁移算作领土变化",
+        "用户：清理 PRC/TAN 冲突；系统排除同一实体不同 tag 的假变更；蒙古部分仍按 MEN 修正"
+      ]
+    }
+  },
+  "split_project_entities": {
+    "RFA": {
+      "original_targets": [
+        "NRL",
+        "OMO",
+        "YAK",
+        "MAG",
+        "SBA",
+        "YGR",
+        "FAV",
+        "KMC"
+      ],
+      "project_targets": [
+        "NRL",
+        "OMO",
+        "YAK",
+        "MAG",
+        "SBA",
+        "BOP",
+        "FAV",
+        "PFC"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "OUR": {
+      "original_targets": [
+        "URL",
+        "ORE",
+        "BKR",
+        "YGR"
+      ],
+      "project_targets": [
+        "URL",
+        "ORN",
+        "BKR",
+        "BOP"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "FIC": {
+      "original_targets": [
+        "AMR",
+        "MAN"
+      ],
+      "project_targets": [
+        "AMR",
+        "MAN"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "URA": {
+      "original_targets": [
+        "FAV",
+        "SVR",
+        "YGR",
+        "TOM"
+      ],
+      "project_targets": [
+        "FAV",
+        "SVR",
+        "BOP",
+        "TOM"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "GY": {
+      "original_targets": [
+        "GUY",
+        "GUC"
+      ],
+      "project_targets": [
+        "GUY",
+        "GUC"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "UZB": {
+      "original_targets": [
+        "UZB",
+        "KRK",
+        "UTL"
+      ],
+      "project_targets": [
+        "UZB",
+        "KRK",
+        "UTL"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "MON": {
+      "original_targets": [
+        "MEN"
+      ],
+      "project_targets": [
+        "MEN"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "KOR": {
+      "original_targets": [
+        "JAP"
+      ],
+      "project_targets": [
+        "JAP"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "PUE": {
+      "original_targets": [
+        "USA"
+      ],
+      "project_targets": [
+        "USA"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "RAJ": {
+      "original_targets": [
+        "IND",
+        "AZH"
+      ],
+      "project_targets": [
+        "RAJ",
+        "AZH"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户最新口径：RAJ 与 IND 为同一身份；仅东缘与 AZH 的边界仍需按原版校正",
+        "T2 南亚 RAJ→AZH 候选"
+      ]
+    },
+    "AOF": {
+      "original_targets": [
+        "DAH",
+        "SEN",
+        "GUI"
+      ],
+      "project_targets": [
+        "DAH",
+        "SEN",
+        "GUI"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "BWA": {
+      "original_targets": [
+        "GHA",
+        "YOR",
+        "SIE",
+        "CAO"
+      ],
+      "project_targets": [
+        "GHA",
+        "YOR",
+        "SIE",
+        "CAO"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "GCO": {
+      "original_targets": [
+        "COG",
+        "CAO"
+      ],
+      "project_targets": [
+        "GCO",
+        "CAO"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "AQ": {
+      "original_targets": [
+        "AAN",
+        "AAO",
+        "AAG"
+      ],
+      "project_targets": [
+        "AAN",
+        "AAO",
+        "AAG"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
+        "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    }
+  },
+  "preserved_custom": {
+    "AFA": {
+      "policy": "excluded",
+      "basis": "用户：非洲 AFA 不处理"
+    },
+    "GRN": {
+      "policy": "excluded",
+      "basis": "用户：格陵兰不处理"
+    },
+    "NCP": {
+      "original_targets": [
+        "CHI"
+      ],
+      "basis": "用户：中国现有军阀保留"
+    },
+    "RGC": {
+      "original_targets": [
+        "CHI"
+      ],
+      "basis": "用户：中国现有军阀保留；原版 XIK/GUZ 等需补拆"
+    },
+    "GMA": {
+      "original_targets": [
+        "GAN",
+        "QIN"
+      ],
+      "basis": "用户：中国现有军阀保留；T2 第四节"
+    },
+    "QMA": {
+      "original_targets": [
+        "QIN"
+      ],
+      "basis": "用户：中国现有军阀保留；T2 第四节"
+    }
+  },
+  "china_policy": {
+    "country_codes": [
+      "CN",
+      "NCP"
+    ],
+    "feature_id_prefixes": [
+      "CN_"
+    ],
+    "mode": "preserve_current_except_missing_original_entities",
+    "presence": "原版身份对应的任一项目 tag 当前持有地块即视为已存在；冲突 tag 先按迁移表消歧",
+    "basis": "用户最新口径：中国保留项目军阀 tag，只在原版存在而我方没有的政权处补拆"
+  },
+  "scope": {
+    "excluded_owners": [
+      "AFA",
+      "GRN",
+      "ATL"
+    ],
+    "country_codes": [
+      "AFG",
+      "ENG",
+      "GCE",
+      "KUR",
+      "MAN",
+      "MEN",
+      "MON",
+      "PAK",
+      "PER",
+      "SIA",
+      "TAN",
+      "TUR",
+      "VMT",
+      "RU",
+      "BY",
+      "UA",
+      "EE",
+      "LV",
+      "LT",
+      "GE",
+      "AM",
+      "AZ",
+      "KZ",
+      "UZ",
+      "KG",
+      "TJ",
+      "TM",
+      "CN",
+      "MN",
+      "KP",
+      "KR",
+      "IN",
+      "PK",
+      "BD",
+      "LK",
+      "NP",
+      "BT",
+      "MV",
+      "MM",
+      "TH",
+      "LA",
+      "KH",
+      "VN",
+      "MY",
+      "SG",
+      "ID",
+      "PH",
+      "TL",
+      "BN",
+      "US",
+      "CA",
+      "MX",
+      "BZ",
+      "GT",
+      "HN",
+      "SV",
+      "NI",
+      "CR",
+      "PA",
+      "CU",
+      "HT",
+      "DO",
+      "JM",
+      "TT",
+      "BS",
+      "BB",
+      "GD",
+      "AG",
+      "DM",
+      "LC",
+      "VC",
+      "KN",
+      "PR",
+      "BM",
+      "CO",
+      "VE",
+      "EC",
+      "PE",
+      "BO",
+      "BR",
+      "PY",
+      "UY",
+      "AR",
+      "CL",
+      "GY",
+      "SR",
+      "GF",
+      "FK",
+      "GB",
+      "IE",
+      "SY",
+      "IQ",
+      "IL",
+      "PS",
+      "AE",
+      "QA",
+      "BH",
+      "KW",
+      "LY",
+      "GQ",
+      "AO"
+    ],
+    "feature_id_prefixes": [
+      "CN_",
+      "US_"
+    ],
+    "project_owners": [
+      "WRS",
+      "ONG",
+      "VOL",
+      "GOR",
+      "KOM",
+      "VYT",
+      "PRM",
+      "SAM",
+      "BKR",
+      "URL",
+      "ORE",
+      "ORN",
+      "ORS",
+      "ZLT",
+      "GAY",
+      "VOR",
+      "VOK",
+      "OMS",
+      "SVR",
+      "TYM",
+      "ALT",
+      "KEM",
+      "KRS",
+      "NOV",
+      "TOM",
+      "SBA",
+      "IRK",
+      "BRY",
+      "CHT",
+      "AMR",
+      "YAK",
+      "MGN",
+      "NRL",
+      "OMO",
+      "KMC",
+      "FAV",
+      "YGR",
+      "TAR",
+      "NCP",
+      "RKM",
+      "RKK",
+      "RKU",
+      "RKO",
+      "RFA",
+      "OUR",
+      "FIC",
+      "URA",
+      "PFC",
+      "BOP",
+      "RUR",
+      "TAT",
+      "RSF",
+      "MAG",
+      "BRM",
+      "FRI",
+      "HOL",
+      "GSW",
+      "KOR"
+    ],
+    "basis": "俄罗斯全部军阀及 RK 接壤；T2 南亚/东南亚/美洲/中国补拆/朝鲜及明确身份冲突；旧英国用于真值核验；AFA、格陵兰排除。运行时 cntr_code 有时为项目 owner tag，country_codes 同时列入这些既定范围内地块的实际代码，俄罗斯另按完整 owner 集合纳入。"
+  },
+  "transition_identity_review": {
+    "RAJ->IND": {
+      "same_entity": true,
+      "decision": "同一实体：原版印度共和国 IND 对应项目 RAJ，消除假变更",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "LBA->ITA": {
+      "same_entity": false,
+      "decision": "保留：用户确认殖民拆分回归原版意大利 owner",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RFA->OMO": {
+      "same_entity": false,
+      "decision": "保留：RFA 合并块拆回奥莫隆",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RFA->NRL": {
+      "same_entity": false,
+      "decision": "保留：RFA 合并块拆回诺里尔斯克",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "PAK->IND": {
+      "same_entity": false,
+      "decision": "保留：巴基斯坦与印度共和国不同；目标 tag 改为 RAJ",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "MON->MEN": {
+      "same_entity": false,
+      "decision": "保留：用户要求按原版 MEN 归属",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RFA->YAK": {
+      "same_entity": false,
+      "decision": "保留：RFA 拆回雅库特",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "YAK->AMR": {
+      "same_entity": false,
+      "decision": "保留：雅库特与阿穆尔不同实体",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "FIC->AMR": {
+      "same_entity": false,
+      "decision": "保留：FIC 合并块拆回阿穆尔",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "SBA->IRK": {
+      "same_entity": false,
+      "decision": "保留：西伯利亚黑军与伊尔库茨克不同实体",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "COL->CLL": {
+      "same_entity": false,
+      "decision": "保留：哥伦比亚与哥伦比亚自由派为不同内战势力；原版 history/countries/CLL - Colombian Liberals.txt 与 COL - Colombia.txt 分立，T2 美洲 S/1652-Vichada.txt",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RKM->RKO": {
+      "same_entity": false,
+      "decision": "保留：RKM 对应 MCW，RKO 对应 OST，莫斯科与奥斯特兰不同实体；T2 欧洲",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RFA->MAG": {
+      "same_entity": false,
+      "decision": "保留：RFA 拆回原版马加丹，不能与旧项目 MAG（马格尼托哥尔斯克）混淆",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RKM->VOL": {
+      "same_entity": false,
+      "decision": "保留：莫斯科辖区与沃洛格达不同实体",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "FIC->MAN": {
+      "same_entity": false,
+      "decision": "保留：FIC 合并块拆回满洲",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RAJ->AZH": {
+      "same_entity": false,
+      "decision": "保留：印度共和国与自由印度不同实体",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RKM->SAM": {
+      "same_entity": false,
+      "decision": "保留：莫斯科辖区与萨马拉不同实体",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "UZB->KGZ": {
+      "same_entity": false,
+      "decision": "保留：乌兹别克斯坦与吉尔吉斯斯坦不同；原版 KYR 对应项目 KGZ",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "ROM->TNS": {
+      "same_entity": false,
+      "decision": "保留：罗马尼亚与德涅斯特河沿岸不同实体；原版 history/countries/ROM - Romania.txt 与 TNS - Transnistria.txt 分立，T2 欧洲列为漏拆候选",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "NOV->TOM": {
+      "same_entity": false,
+      "decision": "保留：新西伯利亚与托木斯克不同实体",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RUR->IRK": {
+      "same_entity": false,
+      "decision": "保留：项目 RUR 对应原版 KEM（克麦罗沃），与 IRK 不同",
+      "evidence": [
+        "用户最新口径",
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份对照",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "PAK->RAJ": {
+      "same_entity": false,
+      "decision": "保留：PAK（原版 PAK）与 RAJ（原版 IND）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "PFC->OMO": {
+      "same_entity": false,
+      "decision": "PFC 对应原版 KMC 太平洋舰队，与奥莫隆 OMO 不同；T2 自定义 PFC 明确要求收回 OMO 等超出部分",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "TAN->MEN": {
+      "same_entity": false,
+      "decision": "人民革命委员会与蒙疆不同；T2 蒙古部分应回归 MEN",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RFA->FAV": {
+      "same_entity": false,
+      "decision": "保留：RFA（原版 RFA）与 FAV（原版 FAV）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "TAN->PRC": {
+      "same_entity": true,
+      "decision": "同一实体：项目 TAN 已为人民革命委员会，对应原版 PRC；按冲突迁移规范化，不产生领土 assignment",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "TOM->NRL": {
+      "same_entity": false,
+      "decision": "保留：TOM（原版 TOM）与 NRL（原版 NRL）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RUR->NRL": {
+      "same_entity": false,
+      "decision": "保留：RUR（原版 KEM）与 NRL（原版 NRL）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "IRK->NRL": {
+      "same_entity": false,
+      "decision": "保留：IRK（原版 IRK）与 NRL（原版 NRL）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "WRS->VOK": {
+      "same_entity": false,
+      "decision": "西俄罗斯革命阵线与沃尔库塔不同；项目 VOK 对应原版 VOR",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "KOM->VYT": {
+      "same_entity": false,
+      "decision": "保留：KOM（原版 KOM）与 VYT（原版 VYT）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "VOL->KOM": {
+      "same_entity": false,
+      "decision": "保留：VOL（原版 VOL）与 KOM（原版 KOM）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "TAT->VYT": {
+      "same_entity": false,
+      "decision": "保留：TAT（原版 TAR）与 VYT（原版 VYT）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "OMS->TYM": {
+      "same_entity": false,
+      "decision": "保留：OMS（原版 OMS）与 TYM（原版 TYM）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "PRM->GAY": {
+      "same_entity": false,
+      "decision": "保留：PRM（原版 PRM）与 GAY（原版 GAY）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "VOL->WRS": {
+      "same_entity": false,
+      "decision": "保留：VOL（原版 VOL）与 WRS（原版 WRS）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "GOR->TAT": {
+      "same_entity": false,
+      "decision": "保留：GOR（原版 GOR）与 TAT（原版 TAR）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "MAG->URL": {
+      "same_entity": false,
+      "decision": "旧项目 MAG 对应原版 MGN 马格尼托哥尔斯克，与 URL 乌拉尔联盟不同",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "SAM->ORN": {
+      "same_entity": false,
+      "decision": "萨马拉与奥伦堡不同；项目 ORN 对应原版 ORE",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "VYT->PRM": {
+      "same_entity": false,
+      "decision": "保留：VYT（原版 VYT）与 PRM（原版 PRM）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "SVR->TYM": {
+      "same_entity": false,
+      "decision": "保留：SVR（原版 SVR）与 TYM（原版 TYM）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "ALT->SBA": {
+      "same_entity": false,
+      "decision": "保留：ALT（原版 ALT）与 SBA（原版 SBA）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RKU->RKM": {
+      "same_entity": false,
+      "decision": "项目 RKU 对应原版 UKR，RKM 对应 MCW，两个不同辖区",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "GOR->VOL": {
+      "same_entity": false,
+      "decision": "保留：GOR（原版 GOR）与 VOL（原版 VOL）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "ONG->WRS": {
+      "same_entity": false,
+      "decision": "保留：ONG（原版 ONG）与 WRS（原版 WRS）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "OUR->ORN": {
+      "same_entity": false,
+      "decision": "自定义 OUR 是 URL/ORE/BKR 等合并表达，拆出 ORE（项目 ORN）",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "ZLT->PRM": {
+      "same_entity": false,
+      "decision": "保留：ZLT（原版 ZLT）与 PRM（原版 PRM）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "BKR->VYT": {
+      "same_entity": false,
+      "decision": "保留：BKR（原版 BKR）与 VYT（原版 VYT）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RKU->TNS": {
+      "same_entity": false,
+      "decision": "乌克兰辖区与德涅斯特河沿岸不同",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RKM->RKU": {
+      "same_entity": false,
+      "decision": "莫斯科辖区与乌克兰辖区不同",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "OUR->BOP": {
+      "same_entity": false,
+      "decision": "自定义 OUR 混合边界回归原版 YGR（项目 BOP），无一对一身份",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "ALT->KRS": {
+      "same_entity": false,
+      "decision": "保留：ALT（原版 ALT）与 KRS（原版 KRS）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    },
+    "RUR->KRS": {
+      "same_entity": false,
+      "decision": "保留：RUR（原版 KEM）与 KRS（原版 KRS）为不同实体，按边界或合并块拆分处理",
+      "evidence": [
+        "T1 俄罗斯身份与拆分；T2 分区差异及身份冲突表",
+        "original_to_project 对应条目的 history/countries 证据"
+      ]
+    }
+  }
+}

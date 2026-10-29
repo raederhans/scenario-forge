@@ -1,0 +1,9 @@
+{
+  "groups": {
+    "PREF_A": {"label": "甲市", "province_id": "province", "feature_ids": ["a"]},
+    "PREF_B": {"label": "乙市", "province_id": "province", "feature_ids": ["b", "c"]},
+    "PREF_OTHER": {"label": "外省市", "province_id": "other", "feature_ids": ["other"]}
+  },
+  "unresolved": [{"feature_id": "hole", "province_id": "province"}],
+  "points": {"a": [0, 0], "b": [10, 0], "c": [12, 0], "hole": [1, 0], "other": [1.1, 0]}
+}

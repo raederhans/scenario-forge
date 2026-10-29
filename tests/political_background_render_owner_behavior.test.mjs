@@ -107,7 +107,7 @@ function createFixture({
     isPoliticalFeaturePathEntryCurrent,
     getTransformSignature: (transform) => `transform:${transform.k}:${transform.x}:${transform.y}`,
     // Production path identity tracks projection/topology roots, not chunk membership.
-    getPoliticalPathCacheSignature: () => `path:${state.activeScenarioId}:${state.sceneGeneration}:${state.projectionRevision || 0}`,
+    getPoliticalPathCacheSignature: () => `path:${state.activeScenarioId}:${state.sceneGeneration}:${state.projectionRevision || 0}:${state.topologyRevision || 0}`,
     getVisibleFrameIdentity: () => ({
       scenarioId: state.activeScenarioId,
       sceneGeneration: state.sceneGeneration,
@@ -133,7 +133,7 @@ function createFixture({
     getAdmin0BackgroundFillColor: (code) => `color:${code}`,
     normalizeIntensityFieldsState: (value) => ({ ...value, normalized: true }),
     getRenderPassLayout: () => ({ pixelWidth: 800, pixelHeight: 400, dpr: 1 }),
-    getProjectionRenderSignature: () => "projection-a",
+    getProjectionRenderSignature: () => `projection-${state.projectionRevision || 0}`,
     getOceanBaseFillColor: () => "#001122",
   };
   const effects = {
@@ -229,6 +229,22 @@ test("expired idle callbacks advance within the existing CPU budget without wait
   const completed = fixture.metrics.findLast(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheComplete");
   assert.equal(completed.entryCount, 100);
   assert.equal(completed.pathlessEntryCount, 0);
+  assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
+});
+
+test("an ordinary idle callback with idle time left extends a slice past the CPU budget up to the idle cap", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: Array.from({ length: 200 }, (_, i) => feature(`region-${i}`)) };
+  drawDeferredFeatures(fixture);
+  fixture.pending.shift().callback({ didTimeout: false, timeRemaining: () => 50 });
+  const idleSlice = fixture.metrics.findLast(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheSlice");
+  assert.ok(idleSlice.processedCount > 10, "a quiet idle period is not limited to the bounded CPU slice");
+  assert.ok(idleSlice.processedCount <= 40, "the idle extension stays under the idle cap");
+  let remaining = 5;
+  fixture.pending.shift().callback({ didTimeout: false, timeRemaining: () => remaining-- });
+  const shortSlice = fixture.metrics.findLast(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheSlice");
+  assert.ok(shortSlice.processedCount <= 6, "the browser deadline still ends a slice before the idle cap");
+  completeDeferred(fixture, { deadline: { didTimeout: true, timeRemaining: () => 0 } });
   assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
 });
 
@@ -813,8 +829,11 @@ test("deferred merge admission shares the budget and cancellation releases pendi
   assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 1280,
     "pending accounting includes unique original paths and an in-progress merged copy");
   fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("test-cancel");
-  assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0);
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 1024,
+    "a cancelled build carries its original paths for the next build and drops the merged copy");
   assert.equal(fixture.cancelled.length, 1);
+  fixture.owner.releaseScenarioPoliticalBackgroundCache();
+  assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0, "release drops carried paths");
 
   const completed = createFixture({ progressiveLimit: 1, mergedPathBudgetBytes: 256 });
   completed.state.landData.features = [
@@ -895,7 +914,68 @@ test("deferred recolor releases discarded merged paths before another idle slice
     "waiting for idle does not retain the discarded merge in accounting");
   assert.equal(fixture.calls.includes("repaint"), false);
   fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("test-cleanup");
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 512,
+    "a cancelled build keeps its carried original paths accounted");
+  fixture.owner.releaseScenarioPoliticalBackgroundCache();
   assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0);
+});
+
+test("deferred signature rescheduling carries paths with matching geometry", () => {
+  for (const replaceGeometry of [false, true]) {
+    const fixture = createFixture({ progressiveLimit: 1 });
+    fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
+    fixture.state.topologyRevision = 0;
+    drawDeferredFeatures(fixture);
+    fixture.pending.shift().callback();
+    const firstBuildCount = fixture.calls.filter(call => call.startsWith("build:")).length;
+    assert.ok(firstBuildCount > 1 && firstBuildCount < 100);
+    if (replaceGeometry) fixture.state.landData.features[0].geometry = { type: "Polygon" };
+    fixture.state.topologyRevision += 1;
+    fixture.pending.shift().callback();
+    assert.equal(fixture.metrics.findLast(metric => (
+      metric.name === "scenarioPoliticalBackgroundDeferredFullCacheCancel"
+    )).reason, "path-signature-changed");
+    fixture.pathCache.clear();
+    drawDeferredFeatures(fixture);
+    completeDeferred(fixture);
+    const completed = fixture.metrics.findLast(metric => (
+      metric.name === "scenarioPoliticalBackgroundDeferredFullCacheComplete"
+    ));
+    assert.equal(fixture.calls.filter(call => call.startsWith("build:")).length, 100 + Number(replaceGeometry));
+    assert.equal(completed.reusedPreviousPathCount, firstBuildCount - Number(replaceGeometry));
+    assert.equal(fixture.calls.filter(call => call === "build:region-0").length, replaceGeometry ? 2 : 1);
+    assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
+  }
+});
+
+test("deferred detail cancellation carries paths only while the projection matches", () => {
+  for (const changeProjection of [false, true]) {
+    const fixture = createFixture({ progressiveLimit: 1 });
+    fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
+    fixture.state.topologyRevision = 0;
+    fixture.state.projectionRevision = 0;
+    drawDeferredFeatures(fixture);
+    fixture.pending.shift().callback();
+    const firstBuildCount = fixture.calls.filter(call => call.startsWith("build:")).length;
+    assert.ok(firstBuildCount > 1 && firstBuildCount < 100);
+    fixture.state.topologyRevision += 1;
+    if (changeProjection) fixture.state.projectionRevision += 1;
+    fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("deferred-detail-scoped-refresh");
+    assert.equal(fixture.metrics.findLast(metric => (
+      metric.name === "scenarioPoliticalBackgroundDeferredFullCacheCancel"
+    )).reason, "deferred-detail-scoped-refresh");
+    assert.equal(fixture.cancelled.at(-1), fixture.pending.shift());
+    fixture.pathCache.clear();
+    drawDeferredFeatures(fixture);
+    completeDeferred(fixture);
+    const completed = fixture.metrics.findLast(metric => (
+      metric.name === "scenarioPoliticalBackgroundDeferredFullCacheComplete"
+    ));
+    assert.equal(fixture.calls.filter(call => call.startsWith("build:")).length,
+      changeProjection ? firstBuildCount + 100 : 100);
+    assert.equal(completed.reusedPreviousPathCount, changeProjection ? 0 : firstBuildCount);
+    assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
+  }
 });
 
 test("current deferred work requests a fresh pass when its path signature changes", () => {
@@ -1209,3 +1289,46 @@ for (const [label, change] of [
     assert.equal(FakePath2D.addPathCallCount, 2);
   });
 }
+
+test("paths carried across a signature reschedule stay in the shared resource estimate until published", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
+  fixture.state.topologyRevision = 0;
+  drawDeferredFeatures(fixture);
+  fixture.pending.shift().callback();
+  const firstBuildCount = fixture.calls.filter(call => call.startsWith("build:")).length;
+  const carriedBytes = fixture.resourceBudget.snapshot().categories.projectedPaths;
+  assert.ok(firstBuildCount > 1 && carriedBytes > 0);
+  fixture.state.topologyRevision += 1;
+  fixture.pending.shift().callback();
+  assert.equal(fixture.metrics.findLast(metric => (
+    metric.name === "scenarioPoliticalBackgroundDeferredFullCacheCancel"
+  )).reason, "path-signature-changed");
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, carriedBytes,
+    "cancelled build keeps its carried paths in the estimate");
+  drawDeferredFeatures(fixture);
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, carriedBytes,
+    "rescheduled build still accounts for the carried paths");
+  completeDeferred(fixture);
+  assert.ok(fixture.resourceBudget.snapshot().categories.projectedPaths >= carriedBytes / firstBuildCount * 100,
+    "published build accounts for every original path once");
+  fixture.owner.releaseScenarioPoliticalBackgroundCache();
+  assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0);
+});
+
+test("an exact background frame drops paths carried from a cancelled deferred build", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: Array.from({ length: 20 }, (_, i) => feature(`region-${i}`)) };
+  drawDeferredFeatures(fixture);
+  fixture.pending.shift().callback();
+  fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("test-cancel");
+  const carriedBytes = fixture.resourceBudget.snapshot().categories.projectedPaths;
+  assert.ok(carriedBytes > 256, "cancelled build carries its paths");
+  fixture.state.landData = { features: [feature("only")] };
+  const exact = drawDeferredFeatures(fixture);
+  assert.equal(exact.progressive, false);
+  assert.equal(fixture.cancelled.at(-1), fixture.pending.shift(), "only the cancelled slice remains queued");
+  assert.equal(fixture.pending.length, 0, "an exact frame schedules no deferred build");
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 256,
+    "only the exact frame's own path stays accounted; the carried paths are released");
+});

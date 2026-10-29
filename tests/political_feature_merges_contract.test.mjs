@@ -125,8 +125,18 @@ test("every scenario topology carries each surviving merged feature exactly once
     const ids = JSON.parse(readText(file)).objects.political.geometries.map(row => String(row.properties?.id ?? row.id));
     const applied = scenarioGroups(id);
     const consumed = new Set(applied.flatMap(group => group.member_ids));
+    const splits = JSON.parse(readText(path.join(dir, "manifest.json"))).hierarchy_overrides?.feature_splits || {};
     for (const group of applied.filter(entry => !consumed.has(entry.id))) {
-      assert.equal(ids.filter(value => value === group.id).length, 1, `${id}: ${group.id}`);
+      if (Object.hasOwn(splits, group.id)) {
+        assert.ok(splits[group.id].length >= 2);
+        assert.equal(new Set(splits[group.id]).size, splits[group.id].length);
+        assert.equal(ids.filter(value => value === group.id).length, 0, `${id}: ${group.id}`);
+        for (const child of splits[group.id]) {
+          assert.equal(ids.filter(value => value === child).length, 1, `${id}: ${child}`);
+        }
+      } else {
+        assert.equal(ids.filter(value => value === group.id).length, 1, `${id}: ${group.id}`);
+      }
     }
   }
 });

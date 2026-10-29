@@ -31,6 +31,12 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
   try {
     const context = await browser.newContext({ viewport, deviceScaleFactor: dpr, reducedMotion: "reduce" });
     const page = await context.newPage();
+    // Reproduce a slow CI runner locally: SCENARIO_FORGE_RASTER_CPU_THROTTLE=3 slows the page's CPU 3x.
+    const cpuThrottleRate = Number(process.env.SCENARIO_FORGE_RASTER_CPU_THROTTLE || 0);
+    if (cpuThrottleRate > 1) {
+      const cdpSession = await context.newCDPSession(page);
+      await cdpSession.send("Emulation.setCPUThrottlingRate", { rate: cpuThrottleRate });
+    }
     await page.addInitScript(({ savedPreference, language, holdRasterAssets }) => {
       if (savedPreference !== null) localStorage.setItem("scenario-forge-political-id-raster", savedPreference ? "1" : "0");
       if (language) localStorage.setItem("map_lang", language);

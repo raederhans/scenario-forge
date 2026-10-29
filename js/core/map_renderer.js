@@ -4223,6 +4223,7 @@ function getPoliticalBackgroundRenderOwner() {
       politicalRecoveryQualityProgressive: POLITICAL_RECOVERY_QUALITY_PROGRESSIVE,
       progressiveBackgroundExactEntryLimit: 2400,
       deferredFullCacheCpuBudgetMs: 10,
+      deferredFullCacheIdleSliceMaxMs: 40,
       deferredFullCacheTimeoutMs: 60,
       scenarioBackgroundMergeMaxArea: Math.PI * 2,
       oceanDepthMaskBlendMode: "soft-light",
