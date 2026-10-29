@@ -1,7 +1,6 @@
 import { appendIntensityFieldPointState } from "../state/actions/intensity_field_actions.js";
 
 // Channels returned by getPhysicalIntensityChannel are live: brush/point edits mutate them.
-// Pointer cancel and lost capture use the same commit route as pointerup.
 export function createPhysicalIntensityInteractionOwner({
   runtimeState,
   rendererSurfaceHost,
@@ -55,10 +54,7 @@ export function createPhysicalIntensityInteractionOwner({
     };
   }
 
-  function commitPhysicalIntensitySession(reason = "physical-intensity-field") {
-    const current = physicalIntensityDragSession;
-    physicalIntensityDragSession = null;
-    if (!current) return false;
+  function releaseSessionPointer(current) {
     if (rendererSurfaceHost.getInteractionRect()?.node && current.pointerId !== undefined) {
       try {
         rendererSurfaceHost.getInteractionRect().node().releasePointerCapture(current.pointerId);
@@ -66,6 +62,13 @@ export function createPhysicalIntensityInteractionOwner({
         // Pointer capture may already be released by the browser.
       }
     }
+  }
+
+  function commitPhysicalIntensitySession(reason = "physical-intensity-field") {
+    const current = physicalIntensityDragSession;
+    physicalIntensityDragSession = null;
+    if (!current) return false;
+    releaseSessionPointer(current);
     if (!current.changed) return false;
     const channel = getPhysicalIntensityChannel(current.channelId);
     if (current.subMode === "points") {
@@ -84,6 +87,19 @@ export function createPhysicalIntensityInteractionOwner({
     });
     suppressNextClick();
     schedulePhysicalIntensityRender(current.channelId, reason);
+    refreshPhysicalIntensityUi();
+    return true;
+  }
+
+  function cancelPhysicalIntensitySession() {
+    const current = physicalIntensityDragSession;
+    if (!current) return false;
+    physicalIntensityDragSession = null;
+    runtimeState.intensityFields.channels[current.channelId] = current.rollbackChannel;
+    if (current.subMode === "points") setIntensityFieldTool({ selectedPointId: current.selectedPointId });
+    releaseSessionPointer(current);
+    suppressNextClick();
+    schedulePhysicalIntensityRender(current.channelId, "physical-intensity-cancel");
     refreshPhysicalIntensityUi();
     return true;
   }
@@ -161,8 +177,10 @@ export function createPhysicalIntensityInteractionOwner({
       brushRadiusDeg: tool.brushRadiusDeg,
       brushStrength: tool.brushStrength,
       before: captureHistoryState({ intensityFieldChannels: [tool.channelId] }),
+      rollbackChannel: structuredClone(channel),
       changed: false,
       pointId: "",
+      selectedPointId: tool.selectedPointId,
       pointDragMode: "move",
     };
     if (tool.subMode === "points") {
@@ -188,6 +206,7 @@ export function createPhysicalIntensityInteractionOwner({
   }
 
   function handlePhysicalIntensityPointerMove(event) {
+    if (physicalIntensityDragSession && physicalIntensityDragSession.pointerId !== event.pointerId) return true;
     updatePhysicalIntensityBrushPreviewFromEvent(event);
     if (!physicalIntensityDragSession) return false;
     if ((event.buttons & 1) !== 1) {
@@ -203,6 +222,8 @@ export function createPhysicalIntensityInteractionOwner({
 
   function handlePhysicalIntensityPointerEnd(event) {
     if (!physicalIntensityDragSession) return false;
+    if (physicalIntensityDragSession.pointerId !== event.pointerId) return false;
+    if (event.type === "pointercancel") return cancelPhysicalIntensitySession();
     if (event?.preventDefault) event.preventDefault();
     updatePhysicalIntensityBrushPreviewFromEvent(event);
     commitPhysicalIntensitySession("physical-intensity-field-commit");
@@ -210,6 +231,7 @@ export function createPhysicalIntensityInteractionOwner({
   }
 
   return Object.freeze({
+    cancelPhysicalIntensitySession,
     handlePhysicalIntensityPointerDown,
     handlePhysicalIntensityPointerMove,
     handlePhysicalIntensityPointerEnd,

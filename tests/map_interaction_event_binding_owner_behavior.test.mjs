@@ -131,8 +131,6 @@ test("bindEvents wires interaction rect handlers directly to the injected click 
   assert.equal(owner.bindEvents(), true);
 
   assert.equal(interactionRect.handlers.get("mousemove"), handlers.handleMouseMove);
-  assert.equal(interactionRect.handlers.get("pointerdown.fieldTool"), handlers.handlePhysicalIntensityPointerDown);
-  assert.equal(interactionRect.handlers.get("pointermove.fieldTool"), handlers.handlePhysicalIntensityPointerMove);
   assert.equal(interactionRect.handlers.get("mousedown.brush"), handlers.handleBrushPointerDown);
   assert.equal(interactionRect.handlers.get("mousemove.brush"), handlers.handleBrushPointerMove);
   assert.equal(interactionRect.handlers.get("mouseleave"), handlers.handleMouseLeave);
@@ -146,16 +144,26 @@ test("bindEvents wires interaction rect handlers directly to the injected click 
     calls.handlers.map((entry) => entry.name),
     ["handleMouseLeave", "mapClick", "mapDoubleClick"],
   );
+  const event = { pointerId: 1, pointerType: "mouse", buttons: 1 };
+  interactionRect.dispatch("pointerdown.fieldTool", event);
+  interactionRect.dispatch("pointermove.fieldTool", event);
+  assert.deepEqual(calls.handlers.slice(-2), [
+    { name: "handlePhysicalIntensityPointerDown", args: [event] },
+    { name: "handlePhysicalIntensityPointerMove", args: [event] },
+  ]);
 });
 
 test("bindEvents wires window and native node listeners", () => {
-  const { fakeWindow, handlers, node, owner } = createHarness();
+  const { calls, fakeWindow, handlers, node, owner } = createHarness();
 
   owner.bindEvents();
 
   assert.equal(fakeWindow.listenerCount("mouseup"), 1);
-  assert.equal(fakeWindow.listeners.get("pointerup")[0], handlers.handlePhysicalIntensityPointerEnd);
-  assert.equal(fakeWindow.listeners.get("pointercancel")[0], handlers.handlePhysicalIntensityPointerEnd);
+  for (const type of ["pointerup", "pointercancel"]) {
+    const event = { type, pointerType: "mouse", pointerId: 1 };
+    fakeWindow.dispatch(type, event);
+    assert.deepEqual(calls.handlers.at(-1), { name: "handlePhysicalIntensityPointerEnd", args: [event] });
+  }
   assert.equal(fakeWindow.listeners.get("resize")[0], handlers.handleResize);
   assert.equal(fakeWindow.listeners.get("mapcreator:sidebar-layout-start")[0], handlers.handleSidebarLayoutStart);
   assert.equal(fakeWindow.listenerCount("mapcreator:sidebar-layout-refresh"), 1);
