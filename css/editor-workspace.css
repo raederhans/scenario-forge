@@ -57,8 +57,8 @@
 .editor-nav-button, .editor-task-nav button { border: 0; border-radius: var(--radius-sm); padding: 8px; background: transparent; color: var(--text-secondary); cursor: pointer; font: inherit; font-size: var(--fs-sm); line-height: 1.5; }
 .editor-nav-button:hover, .editor-task-nav button:hover { background: var(--surface-sunken); }
 .editor-nav-button[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
-.editor-workspace button:focus-visible, .editor-workspace summary:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 2px; }
-.editor-workspace :is(input, select, textarea):focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 2px; }
+.editor-workspace button:focus-visible, .editor-workspace summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.editor-workspace :is(input, select, textarea):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .editor-workspace :is(.editor-nav-button, .appearance-tab-btn, .map-content-tab-btn) { transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease); }
 .editor-workspace :is(.editor-nav-button, .appearance-tab-btn, .map-content-tab-btn):active:not(:disabled) { background-color: var(--accent-soft); }
 .editor-task-body { min-height: 0; flex: 1; overflow-y: auto; padding: 12px; }
@@ -126,7 +126,7 @@
 .editor-workspace .editor-property-segments .editor-nav-button { flex: 0 0 auto; width: auto; }
 .editor-workspace .editor-property-segments .editor-nav-button[aria-selected="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
 .editor-properties-title { font-size: var(--fs-md); line-height: 1.5; margin: 0; font-weight: 600; }
-.editor-properties-title:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 4px; border-radius: var(--radius-sm); }
+.editor-properties-title:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: var(--radius-sm); }
 .editor-properties-body { padding: 16px; }
 .editor-group-heading { font-size: var(--fs-xs); font-weight: 600; color: var(--text-tertiary); margin: 12px 8px 6px; letter-spacing: 0; text-transform: none; }
 .editor-layer-list { display: flex; flex-direction: column; gap: 3px; }

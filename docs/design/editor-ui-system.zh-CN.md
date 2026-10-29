@@ -33,7 +33,7 @@
 | `--accent` | `#9c5524` | 主按钮底、选中文字、焦点环（白底上 5.6:1） |
 | `--accent-hover` | `#83461c` | 主按钮悬停 |
 | `--accent-soft` | `#f4e5d6` | 选中项底色、当前标签底色 |
-| `--accent-ring` | `rgba(156, 85, 36, 0.38)` | `:focus-visible` 外环 |
+| `--accent-ring` | `rgba(156, 85, 36, 0.38)` | 聚焦时输入框的 box-shadow 光晕（只作辅助，不单独承担焦点指示） |
 | `--info` | `#2f5f8a` | 信息提示、链接 |
 | `--success` | `#2f7d57` | 成功状态 |
 | `--warning` | `#a66a12` | 警告状态 |
@@ -87,7 +87,7 @@
 | 提示 | `toast` | info / success / warning / danger | 左侧状态色条，不用整块彩色底 |
 | 空状态 | `.empty-state` | — | 一句说明 + 一个可选操作，不用虚线框 |
 
-状态：所有可交互元素必须有 hover、`:focus-visible`（2 px `--accent-ring` 外环，不得 `outline: none` 而无替代）、disabled（`--ink-400`、不可点）、selected（`--accent-soft` + `--accent` 文字）。
+状态：所有可交互元素必须有 hover、`:focus-visible`（2 px 实色 `--accent` outline，对纸面底 ≥ 3:1；不得 `outline: none` 而无替代，半透明色不能作为唯一焦点指示）、disabled（`--ink-400`、不可点）、selected（`--accent-soft` + `--accent` 文字）。
 
 ## 4. 壳层排版
 

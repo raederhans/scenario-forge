@@ -29,7 +29,7 @@
   text-decoration: none;
 }
 .editor-scenario-link:hover { text-decoration: underline; }
-.editor-scenario-link:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 2px; }
+.editor-scenario-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 #scenarioSelect[hidden] { display: none; }
 #scenarioContextBar .scenario-context-label { display: none; }
 #scenarioContextBar .scenario-context-item {
