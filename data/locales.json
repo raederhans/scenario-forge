@@ -294087,28 +294087,28 @@
       "zh": "显示海域名称"
     },
     "Capital": {
-      "zh": "首都",
-      "en": "Capital"
+      "en": "Capital",
+      "zh": "首都"
     },
     "Loaded": {
-      "zh": "已加载",
-      "en": "Loaded"
+      "en": "Loaded",
+      "zh": "已加载"
     },
     "visible": {
-      "zh": "个可见",
-      "en": "visible"
+      "en": "visible",
+      "zh": "个可见"
     },
     "Enabled · waiting for data": {
-      "zh": "已启用 · 等待数据",
-      "en": "Enabled · waiting for data"
+      "en": "Enabled · waiting for data",
+      "zh": "已启用 · 等待数据"
     },
     "Find source region": {
-      "zh": "查找来源区域",
-      "en": "Find source region"
+      "en": "Find source region",
+      "zh": "查找来源区域"
     },
     "Experimental layer catalog": {
-      "zh": "实验图层目录",
-      "en": "Experimental layer catalog"
+      "en": "Experimental layer catalog",
+      "zh": "实验图层目录"
     },
     "City hierarchy": {
       "en": "City hierarchy",
@@ -294292,7 +294292,7 @@
     },
     "Add dev selection": {
       "en": "Add dev selection",
-      "zh": "添加开发选择"
+      "zh": "添加当前开发选择"
     },
     "Add imported ids": {
       "en": "Add imported ids",
@@ -294492,7 +294492,7 @@
     },
     "Apply Scenario": {
       "en": "Apply Scenario",
-      "zh": "应用剧本"
+      "zh": "应用场景"
     },
     "Apply Scope": {
       "en": "Apply Scope",
@@ -296088,7 +296088,7 @@
     },
     "EQP": {
       "en": "EQP",
-      "zh": "EQP"
+      "zh": "装备"
     },
     "Each entry now shows nation, unit preset, echelon, and renderer at a glance.": {
       "en": "Each entry now shows nation, unit preset, echelon, and renderer at a glance.",
@@ -296136,7 +296136,7 @@
     },
     "Empire Borders": {
       "en": "Empire Borders",
-      "zh": "国家边界"
+      "zh": "帝国边界"
     },
     "Enable All": {
       "en": "Enable All",
@@ -296552,7 +296552,7 @@
     },
     "Future draw stack": {
       "en": "Future draw stack",
-      "zh": "未来的绘制堆栈"
+      "zh": "未来绘制层叠"
     },
     "Future family mapping": {
       "en": "Future family mapping",
@@ -297220,7 +297220,7 @@
     },
     "Layer-based special zones": {
       "en": "Layer-based special zones",
-      "zh": "图层式特殊区域"
+      "zh": "分层特殊区域"
     },
     "Layer-based special zones are the canonical editor. Use the workbench above to edit memberships.": {
       "en": "Layer-based special zones are the canonical editor. Use the workbench above to edit memberships.",
@@ -297880,7 +297880,7 @@
     },
     "No controls in this tab": {
       "en": "No controls in this tab",
-      "zh": "此选项卡中没有控件"
+      "zh": "这个 tab 暂时没有单独控件"
     },
     "No core territory defined": {
       "en": "No core territory defined",
@@ -298036,7 +298036,7 @@
     },
     "No special regions available": {
       "en": "No special regions available",
-      "zh": "当前没有特殊区域"
+      "zh": "暂无可选特殊区域"
     },
     "No special zone layers yet.": {
       "en": "No special zone layers yet.",
@@ -298320,7 +298320,7 @@
     },
     "Owner": {
       "en": "Owner",
-      "zh": "所属方"
+      "zh": "所有方"
     },
     "Owner Tag": {
       "en": "Owner Tag",
@@ -298336,7 +298336,7 @@
     },
     "Ownership": {
       "en": "Ownership",
-      "zh": "所有权"
+      "zh": "归属"
     },
     "Ownership baseline active.": {
       "en": "Ownership baseline active.",
@@ -298644,7 +298644,7 @@
     },
     "Preview controls": {
       "en": "Preview controls",
-      "zh": "预览控件"
+      "zh": "预览控制"
     },
     "Preview layers, format, and resolution before export.": {
       "en": "Preview layers, format, and resolution before export.",
@@ -298964,7 +298964,7 @@
     },
     "Read-only scenario asset": {
       "en": "Read-only scenario asset",
-      "zh": "只读剧本资产"
+      "zh": "只读场景资产"
     },
     "Read-only startup": {
       "en": "Read-only startup",
@@ -299020,7 +299020,7 @@
     },
     "Reference": {
       "en": "Reference",
-      "zh": "参考图"
+      "zh": "参考"
     },
     "Reference Image": {
       "en": "Reference Image",
@@ -299208,7 +299208,7 @@
     },
     "Review focus": {
       "en": "Review focus",
-      "zh": "复习重点"
+      "zh": "审核重点"
     },
     "Review imported Hearts of Iron IV counter icons. This library is read-only for now.": {
       "en": "Review imported Hearts of Iron IV counter icons. This library is read-only for now.",
@@ -299452,7 +299452,7 @@
     },
     "Scenario Forge": {
       "en": "Scenario Forge",
-      "zh": "场景锻造"
+      "zh": "Scenario Forge"
     },
     "Scenario Locale Editor": {
       "en": "Scenario Locale Editor",
@@ -299464,7 +299464,7 @@
     },
     "Scenario Quick Start": {
       "en": "Scenario Quick Start",
-      "zh": "剧本快速上手"
+      "zh": "场景快速开始"
     },
     "Scenario Tag": {
       "en": "Scenario Tag",
@@ -299500,7 +299500,7 @@
     },
     "Scenario layer asset save is available only in the local dev server.": {
       "en": "Scenario layer asset save is available only in the local dev server.",
-      "zh": "剧本图层资产保存仅在本地开发服务器可用。"
+      "zh": "场景图层资产保存只在本地开发服务器可用。"
     },
     "Scenario loaded": {
       "en": "Scenario loaded",
@@ -299684,7 +299684,7 @@
     },
     "Select a country in Inspector": {
       "en": "Select a country in Inspector",
-      "zh": "在国家检查器中选择国家"
+      "zh": "在 Inspector 中选择国家"
     },
     "Select a country to edit": {
       "en": "Select a country to edit",
@@ -299832,7 +299832,7 @@
     },
     "Set Active for sovereignty actions": {
       "en": "Use an active owner for political actions",
-      "zh": "进行政治操作时使用激活所属"
+      "zh": "使用当前激活归属执行政治操作"
     },
     "Set Candidate": {
       "en": "Set Candidate",
@@ -300064,7 +300064,7 @@
     },
     "Solid": {
       "en": "Solid",
-      "zh": "实线"
+      "zh": "纯色"
     },
     "Solid dot": {
       "en": "Solid dot",
@@ -300516,7 +300516,7 @@
     },
     "This family has not exposed extra manifest or audit cards in the current shell.": {
       "en": "This family has not exposed extra manifest or audit cards in the current shell.",
-      "zh": "该系列尚未在当前 shell 中公开额外的清单或审核卡。"
+      "zh": "这个 family 目前还没有在这个 shell 里暴露额外的 manifest 或 audit 卡片。"
     },
     "This family stays live in the workbench, and its main-map bridge follows its current capability.": {
       "en": "This family stays live in the workbench, and its main-map bridge follows its current capability.",
@@ -300828,7 +300828,7 @@
     },
     "Use an active owner for political actions": {
       "en": "Use an active owner for political actions",
-      "zh": "进行政治操作时使用激活所属"
+      "zh": "使用当前激活归属执行政治操作"
     },
     "Use as Active Owner": {
       "en": "Use as Active Owner",
@@ -300880,7 +300880,7 @@
     },
     "Use this panel to adjust the current family without changing the lens column context.": {
       "en": "Use this panel to adjust the current family without changing the lens column context.",
-      "zh": "用这个面板调整当前类别，同时保持视图列上下文不变。"
+      "zh": "用此面板调整当前类别，保持视图列的上下文不变。"
     },
     "Username": {
       "en": "Username",
@@ -300916,11 +300916,11 @@
     },
     "Viewport controls": {
       "en": "Viewport controls",
-      "zh": "视口控件"
+      "zh": "视口控制"
     },
     "Visibility": {
       "en": "Visibility",
-      "zh": "显示"
+      "zh": "可见性"
     },
     "Visible": {
       "en": "Visible",
@@ -301452,7 +301452,7 @@
     },
     "5. Edit, style, then save": {
       "en": "5. Edit, style, then save",
-      "zh": "5. 编辑、调外观，然后保存"
+      "zh": "5. 编辑、调整样式并保存"
     },
     "Use Activate or Scenario Actions for map edits, tune Appearance and Transport for readability, then save a project JSON before export.": {
       "en": "Use Activate or Scenario Actions for map edits, tune Appearance and Transport for readability, then save a project JSON before export.",
@@ -302109,6 +302109,1546 @@
     "Water Hierarchy": {
       "en": "Water Hierarchy",
       "zh": "海域层级"
+    },
+    "1 region affected": {
+      "en": "1 region affected",
+      "zh": "影响 1 个区域"
+    },
+    "1. Apply Scenario": {
+      "en": "1. Apply Scenario",
+      "zh": "1. 应用场景"
+    },
+    "2. Select the target country in Inspector": {
+      "en": "2. Select the target country in Inspector",
+      "zh": "2. 在检查器里选中目标国家"
+    },
+    "2023 reference mapping, not a measurement for the scenario year.": {
+      "en": "2023 reference mapping, not a measurement for the scenario year.",
+      "zh": "2023 参考映射，非剧本年代测量值。"
+    },
+    "2024 reference mapping, not a measurement for the scenario year.": {
+      "en": "2024 reference mapping, not a measurement for the scenario year.",
+      "zh": "2024 参考映射，非剧本年代测量值。"
+    },
+    "3. Set the active owner": {
+      "en": "3. Set the active owner",
+      "zh": "3. 设置当前归属方"
+    },
+    "4. Edit, style, then save": {
+      "en": "4. Edit, style, then save",
+      "zh": "4. 编辑、调整样式并保存"
+    },
+    "A dedicated workspace for HGO maps.": {
+      "en": "A dedicated workspace for HGO maps.",
+      "zh": "专为 HGO 地图提供的编辑空间。"
+    },
+    "Account": {
+      "en": "Account",
+      "zh": "账号"
+    },
+    "Account and Cloud Saves": {
+      "en": "Account and Cloud Saves",
+      "zh": "账号与云保存"
+    },
+    "Action failed. Please try again.": {
+      "en": "Action failed. Please try again.",
+      "zh": "操作失败，请重试。"
+    },
+    "Adaptive Tint": {
+      "en": "Adaptive Tint",
+      "zh": "自适应色彩倾向"
+    },
+    "Advanced settings": {
+      "en": "Advanced settings",
+      "zh": "高级设置"
+    },
+    "Africa": {
+      "en": "Africa",
+      "zh": "非洲"
+    },
+    "After import, confirm scenario baseline, current owner, strategic annotations, and export settings before continuing.": {
+      "en": "After import, confirm scenario baseline, current owner, strategic annotations, and export settings before continuing.",
+      "zh": "导入后先确认场景基线、当前归属、战略标注和导出设置，再继续操作。"
+    },
+    "After loading a project, check the Inspector again. Confirm the target country and active owner, then review frontlines, reference image alignment, and export settings. When these match your plan, continue with Activate, Scenario Actions, or Export.": {
+      "en": "After loading a project, check the Inspector again. Confirm the target country and active owner, then review frontlines, reference image alignment, and export settings. When these match your plan, continue with Activate, Scenario Actions, or Export.",
+      "zh": "加载项目后，再回到检查器。确认目标国家和当前归属，然后检查前线、参考图对齐和导出设置。全部符合计划后，再使用 Activate、Scenario Actions 或 Export。"
+    },
+    "Agencies": {
+      "en": "Agencies",
+      "zh": "机构"
+    },
+    "Airport type": {
+      "en": "Airport type",
+      "zh": "机场类型"
+    },
+    "Align an external map or sketch.": {
+      "en": "Align an external map or sketch.",
+      "zh": "对齐外部地图或草图。"
+    },
+    "Aluminium": {
+      "en": "Aluminium",
+      "zh": "铝"
+    },
+    "An export is already in progress. Wait for it to finish before starting another export.": {
+      "en": "An export is already in progress. Wait for it to finish before starting another export.",
+      "zh": "导出任务正在进行中。请等待当前任务完成后再发起新的导出。"
+    },
+    "Antarctica": {
+      "en": "Antarctica",
+      "zh": "南极洲"
+    },
+    "Apply a scenario first so ownership, controller, support tools, and project surfaces share the same baseline.": {
+      "en": "Apply a scenario first so ownership, controller, support tools, and project surfaces share the same baseline.",
+      "zh": "先应用场景，让归属、控制方、支持工具和项目界面使用同一套基线。"
+    },
+    "Apply current tool": {
+      "en": "Apply current tool",
+      "zh": "应用当前工具"
+    },
+    "Asia": {
+      "en": "Asia",
+      "zh": "亚洲"
+    },
+    "Atlas": {
+      "en": "Atlas",
+      "zh": "图集"
+    },
+    "Available in Transport Workbench only": {
+      "en": "Available in Transport Workbench only",
+      "zh": "仅可在 Transport Workbench 中使用"
+    },
+    "Available when Bathymetry is enabled.": {
+      "en": "Available when Bathymetry is enabled.",
+      "zh": "启用“测深”后可用。"
+    },
+    "Back": {
+      "en": "Back",
+      "zh": "返回"
+    },
+    "Backend": {
+      "en": "Backend",
+      "zh": "渲染后端"
+    },
+    "Bake cache cleared": {
+      "en": "Bake cache cleared",
+      "zh": "烘焙缓存已清空"
+    },
+    "Bake current pack": {
+      "en": "Bake current pack",
+      "zh": "烘焙当前导出包"
+    },
+    "Bake outputs": {
+      "en": "Bake outputs",
+      "zh": "烘焙输出"
+    },
+    "Bake outputs updated.": {
+      "en": "Bake outputs updated.",
+      "zh": "烘焙输出已更新。"
+    },
+    "Bake pack (v1.1)": {
+      "en": "Bake pack (v1.1)",
+      "zh": "烘焙包（v1.1）"
+    },
+    "Bake pack exported": {
+      "en": "Bake pack exported",
+      "zh": "烘焙包已导出"
+    },
+    "Bake package downloaded.": {
+      "en": "Bake package downloaded.",
+      "zh": "烘焙包已下载。"
+    },
+    "Bake ready": {
+      "en": "Bake ready",
+      "zh": "烘焙已就绪"
+    },
+    "Balanced quality": {
+      "en": "Balanced quality",
+      "zh": "均衡"
+    },
+    "Baseline preview": {
+      "en": "Baseline preview",
+      "zh": "基线预览中"
+    },
+    "Baseline unavailable": {
+      "en": "Baseline unavailable",
+      "zh": "基线不可用"
+    },
+    "Baseline unavailable for this family": {
+      "en": "Baseline unavailable for this family",
+      "zh": "这个家族没有可用基线"
+    },
+    "Bathymetry": {
+      "en": "Bathymetry",
+      "zh": "测深"
+    },
+    "Bathymetry enabled · flat style selected": {
+      "en": "Bathymetry enabled · flat style selected",
+      "zh": "已启用测深 · 已选择纯色样式"
+    },
+    "Bathymetry is unavailable for this projection": {
+      "en": "Bathymetry is unavailable for this projection",
+      "zh": "当前投影不支持测深"
+    },
+    "Before a large edit or before loading another project, save a backup: open Project Management and download the current project JSON. Loading a project replaces the current map, notes, and export settings.": {
+      "en": "Before a large edit or before loading another project, save a backup: open Project Management and download the current project JSON. Loading a project replaces the current map, notes, and export settings.",
+      "zh": "做大范围修改或加载其他项目之前，先备份：打开“项目管理”，下载当前项目 JSON。加载项目会替换当前地图、备注和导出设置。"
+    },
+    "Before editing, look at the chips at the top of the map. Mode shows the active tool, View shows the map state you are seeing, and Split shows how many countries have split ownership. If any chip looks wrong, switch to the correct scenario or project first.": {
+      "en": "Before editing, look at the chips at the top of the map. Mode shows the active tool, View shows the map state you are seeing, and Split shows how many countries have split ownership. If any chip looks wrong, switch to the correct scenario or project first.",
+      "zh": "编辑前，先看地图顶部的状态标签。Mode 表示当前工具，View 表示正在看的地图状态，Split 表示当前场景里有多少分裂归属。任何一项不符合预期时，先切到正确的场景或项目。"
+    },
+    "Before export, make sure Strategic annotations are enabled and no line, label, or counter hides the country you want to show.": {
+      "en": "Before export, make sure Strategic annotations are enabled and no line, label, or counter hides the country you want to show.",
+      "zh": "导出前确认战略标注已开启，并且线条、标签或计数器没有遮住要展示的国家。"
+    },
+    "Before sending files out, keep one editable project JSON and one exported output from the same reviewed state. This keeps later fixes traceable.": {
+      "en": "Before sending files out, keep one editable project JSON and one exported output from the same reviewed state. This keeps later fixes traceable.",
+      "zh": "发送文件前，保留一份可编辑项目 JSON 和一份来自同一已复查状态的导出产物。这样后续修正有迹可循。"
+    },
+    "Before you edit": {
+      "en": "Before you edit",
+      "zh": "开始前"
+    },
+    "Build the publishable strategic layer.": {
+      "en": "Build the publishable strategic layer.",
+      "zh": "制作可发布的战略标注层。"
+    },
+    "Cached": {
+      "en": "Cached",
+      "zh": "已缓存"
+    },
+    "Can't import appearance preset: invalid JSON.": {
+      "en": "Can't import appearance preset: invalid JSON.",
+      "zh": "无法导入外观预设：JSON 无效。"
+    },
+    "Can't import appearance preset: invalid format.": {
+      "en": "Can't import appearance preset: invalid format.",
+      "zh": "无法导入外观预设：格式无效。"
+    },
+    "Can't undo the reset because newer edits exist.": {
+      "en": "Can't undo the reset because newer edits exist.",
+      "zh": "已有新的编辑，无法撤销此次重置。"
+    },
+    "Check": {
+      "en": "Check",
+      "zh": "复查"
+    },
+    "Checking pack source before apply": {
+      "en": "Checking pack source before apply",
+      "zh": "正在检查交通包来源，完成后才能应用。"
+    },
+    "Checks": {
+      "en": "Checks",
+      "zh": "检查"
+    },
+    "Choose Objects → Countries on the left, select a country, then review its properties on the right.": {
+      "en": "Choose Objects → Countries on the left, select a country, then review its properties on the right.",
+      "zh": "在左侧“对象 → 国家”选择国家，再在右侧查看它的属性。"
+    },
+    "Choose target and resolution, check the preview, confirm layer order, then run the export.": {
+      "en": "Choose target and resolution, check the preview, confirm layer order, then run the export.",
+      "zh": "选择目标和分辨率，检查预览，确认图层顺序，然后执行导出。"
+    },
+    "Chromium": {
+      "en": "Chromium",
+      "zh": "铬"
+    },
+    "Civilian Factories": {
+      "en": "Civilian Factories",
+      "zh": "民用工厂"
+    },
+    "Class": {
+      "en": "Class",
+      "zh": "等级"
+    },
+    "Clear Channel": {
+      "en": "Clear Channel",
+      "zh": "清空通道"
+    },
+    "Clear Reference Region Color Edits": {
+      "en": "Clear Reference Region Color Edits",
+      "zh": "清除参考区域的着色修改"
+    },
+    "Clear baked cache": {
+      "en": "Clear baked cache",
+      "zh": "清空烘焙缓存"
+    },
+    "Cleared baked cache.": {
+      "en": "Cleared baked cache.",
+      "zh": "已清空烘焙缓存。"
+    },
+    "Click a country on the map to show it here.": {
+      "en": "Click a country on the map to show it here.",
+      "zh": "在地图上点击一个国家，它会显示在这里。"
+    },
+    "Clock Mode": {
+      "en": "Clock Mode",
+      "zh": "时钟模式"
+    },
+    "Close panels": {
+      "en": "Close panels",
+      "zh": "关闭面板"
+    },
+    "Coal": {
+      "en": "Coal",
+      "zh": "煤炭"
+    },
+    "Composite image": {
+      "en": "Composite image",
+      "zh": "主图合成"
+    },
+    "Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers.": {
+      "en": "Composite image is for final viewing; per-layer PNG is for later editing; bake pack is for a bundled delivery with expected layers.",
+      "zh": "合成图片用于最终查看；分层 PNG 用于后续编辑；bake pack 用于带预期图层的打包交付。"
+    },
+    "Contains Download Project, Load Project, selected file status, and import safety checks.": {
+      "en": "Contains Download Project, Load Project, selected file status, and import safety checks.",
+      "zh": "包含下载项目、加载项目、当前文件状态和导入安全检查。"
+    },
+    "Contains derived frontlines, operational lines, operation graphics, and unit counters. These are project-local strategic annotations for export and handoff.": {
+      "en": "Contains derived frontlines, operational lines, operation graphics, and unit counters. These are project-local strategic annotations for export and handoff.",
+      "zh": "包含推导前线、作战线、作战图形和单位计数器。这些都是用于导出和交接的项目本地战略标注。"
+    },
+    "Contains local image upload, opacity, scale, horizontal offset, and vertical offset controls. The project stores alignment values, while the image file must be uploaded again after reload.": {
+      "en": "Contains local image upload, opacity, scale, horizontal offset, and vertical offset controls. The project stores alignment values, while the image file must be uploaded again after reload.",
+      "zh": "包含本地图像上传、透明度、缩放、水平偏移和垂直偏移。项目会保存对齐参数，重新加载后仍需要再次上传图像文件。"
+    },
+    "Contains target selection, format, export resolution, preview, layer order, text stacks, and image adjustments. Final export is capped at 8K.": {
+      "en": "Contains target selection, format, export resolution, preview, layer order, text stacks, and image adjustments. Final export is capped at 8K.",
+      "zh": "包含目标选择、格式、导出分辨率、预览、图层顺序、文字堆栈和图像调整。最终导出上限为 8K。"
+    },
+    "Continents": {
+      "en": "Continents",
+      "zh": "大洲"
+    },
+    "Continuous Cycle": {
+      "en": "Continuous Cycle",
+      "zh": "连续循环"
+    },
+    "Contour": {
+      "en": "Contour",
+      "zh": "等高线"
+    },
+    "Control of corruption": {
+      "en": "Control of corruption",
+      "zh": "腐败控制"
+    },
+    "Country indicators": {
+      "en": "Country indicators",
+      "zh": "国家统计专题"
+    },
+    "Country indicators are not supported on the current basemap.": {
+      "en": "Country indicators are not supported on the current basemap.",
+      "zh": "当前底图不支持国家统计专题。"
+    },
+    "Country indicators · Scenario reference": {
+      "en": "Country indicators · Scenario reference",
+      "zh": "国家统计专题 · 剧本参考"
+    },
+    "Current preview (1×)": {
+      "en": "Current preview (1×)",
+      "zh": "当前预览（1×）"
+    },
+    "Cycle Speed": {
+      "en": "Cycle Speed",
+      "zh": "循环速度"
+    },
+    "Data source, rendering backend and loaded tiles.": {
+      "en": "Data source, rendering backend and loaded tiles.",
+      "zh": "数据来源、渲染后端与已加载瓦片。"
+    },
+    "Default": {
+      "en": "Default",
+      "zh": "常规"
+    },
+    "Delete": {
+      "en": "Delete",
+      "zh": "删除"
+    },
+    "Depth Field": {
+      "en": "Depth Field",
+      "zh": "深度场"
+    },
+    "Derived Frontlines": {
+      "en": "Derived Frontlines",
+      "zh": "推导前线"
+    },
+    "Designation": {
+      "en": "Designation",
+      "zh": "指定类别"
+    },
+    "Display & style": {
+      "en": "Display & style",
+      "zh": "显示与样式"
+    },
+    "Display quality": {
+      "en": "Display quality",
+      "zh": "显示画质"
+    },
+    "Download Bake Pack": {
+      "en": "Download Bake Pack",
+      "zh": "下载烘焙包"
+    },
+    "Download Layers": {
+      "en": "Download Layers",
+      "zh": "下载图层"
+    },
+    "Download a project JSON first, load another file only after confirming the current state can be replaced, then re-check the top status chips.": {
+      "en": "Download a project JSON first, load another file only after confirming the current state can be replaced, then re-check the top status chips.",
+      "zh": "先下载项目 JSON；确认当前状态可以被替换后再加载其他文件；加载后复查顶部状态条。"
+    },
+    "Download the JSON, reload it once with Load Project, then confirm the same scenario, annotations, labels, and export settings return.": {
+      "en": "Download the JSON, reload it once with Load Project, then confirm the same scenario, annotations, labels, and export settings return.",
+      "zh": "下载 JSON 后，用“加载项目”重新打开一次，并确认同一场景、标注、标签和导出设置都能恢复。"
+    },
+    "Drag to reorder exported layer groups. Visibility only applies to this export session.": {
+      "en": "Drag to reorder exported layer groups. Visibility only applies to this export session.",
+      "zh": "拖动以重排导出图层组。可见性设置仅影响当前导出会话。"
+    },
+    "Edit HGO maps in the separate editor, or review HGO names and flags in the Inspector.": {
+      "en": "Edit HGO maps in the separate editor, or review HGO names and flags in the Inspector.",
+      "zh": "在独立编辑器中编辑 HGO 地图，或在检查器中查看 HGO 名称与旗帜。"
+    },
+    "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.": {
+      "en": "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.",
+      "zh": "根据剧本参考分组编辑地图颜色。参考边界保持不变。"
+    },
+    "Edit the small project legend list for the current working map.": {
+      "en": "Edit the small project legend list for the current working map.",
+      "zh": "编辑当前工作地图的小型图例列表。"
+    },
+    "Enable Bathymetry to use depth presets.": {
+      "en": "Enable Bathymetry to use depth presets.",
+      "zh": "启用“测深”以使用深度预设。"
+    },
+    "Enable Channel": {
+      "en": "Enable Channel",
+      "zh": "启用通道"
+    },
+    "Enable Glow Field": {
+      "en": "Enable Glow Field",
+      "zh": "启用辉光场"
+    },
+    "Enable depth-based bathymetry presets.": {
+      "en": "Enable depth-based bathymetry presets.",
+      "zh": "启用基于深度数据的测深预设。"
+    },
+    "Enter Tool": {
+      "en": "Enter Tool",
+      "zh": "进入工具"
+    },
+    "Entries": {
+      "en": "Entries",
+      "zh": "条目"
+    },
+    "Erase": {
+      "en": "Erase",
+      "zh": "擦除"
+    },
+    "Established": {
+      "en": "Established",
+      "zh": "设立时间"
+    },
+    "Exit Tool": {
+      "en": "Exit Tool",
+      "zh": "退出工具"
+    },
+    "Expected years of schooling": {
+      "en": "Expected years of schooling",
+      "zh": "预期受教育年限"
+    },
+    "Export Resolution": {
+      "en": "Export Resolution",
+      "zh": "导出分辨率"
+    },
+    "Export actions": {
+      "en": "Export actions",
+      "zh": "导出操作"
+    },
+    "Export as Strategic annotations": {
+      "en": "Export as Strategic annotations",
+      "zh": "作为战略标注导出"
+    },
+    "Export image": {
+      "en": "Export image",
+      "zh": "导出图片"
+    },
+    "Export preview ready": {
+      "en": "Export preview ready",
+      "zh": "导出预览已就绪"
+    },
+    "Export queue is full": {
+      "en": "Export queue is full",
+      "zh": "导出队列已满"
+    },
+    "Export summary": {
+      "en": "Export summary",
+      "zh": "导出摘要"
+    },
+    "Export target": {
+      "en": "Export target",
+      "zh": "导出目标"
+    },
+    "Export workflow": {
+      "en": "Export workflow",
+      "zh": "导出工作流"
+    },
+    "Exporting project file with appearance and transport settings.": {
+      "en": "Exporting project file with appearance and transport settings.",
+      "zh": "正在导出包含外观和交通设置的项目文件。"
+    },
+    "Failed to import project.": {
+      "en": "Failed to import project.",
+      "zh": "项目导入失败。"
+    },
+    "Ferry": {
+      "en": "Ferry",
+      "zh": "渡轮"
+    },
+    "Ferry service": {
+      "en": "Ferry service",
+      "zh": "渡轮服务"
+    },
+    "Final handoff check": {
+      "en": "Final handoff check",
+      "zh": "最终交付检查"
+    },
+    "Frontlines & Annotations": {
+      "en": "Frontlines & Annotations",
+      "zh": "前线与战略标注"
+    },
+    "Frontlines and strategic annotations workspace.": {
+      "en": "Frontlines and strategic annotations workspace.",
+      "zh": "前线与战略标注工作区。"
+    },
+    "GNI per capita": {
+      "en": "GNI per capita",
+      "zh": "人均国民总收入"
+    },
+    "Generated": {
+      "en": "Generated",
+      "zh": "生成时间"
+    },
+    "Glow Field": {
+      "en": "Glow Field",
+      "zh": "辉光场"
+    },
+    "Go": {
+      "en": "Go",
+      "zh": "前往"
+    },
+    "Go to country list": {
+      "en": "Go to country list",
+      "zh": "前往国家列表"
+    },
+    "Government effectiveness": {
+      "en": "Government effectiveness",
+      "zh": "政府效能"
+    },
+    "Government effectiveness · 2024": {
+      "en": "Government effectiveness · 2024",
+      "zh": "政府效能 · 2024"
+    },
+    "Government effectiveness · Modern World": {
+      "en": "Government effectiveness · Modern World",
+      "zh": "政府效能 · 现代世界"
+    },
+    "Guide sections": {
+      "en": "Guide sections",
+      "zh": "指南分段"
+    },
+    "HGO Preview": {
+      "en": "HGO Preview",
+      "zh": "HGO 预览"
+    },
+    "HGO editor": {
+      "en": "HGO editor",
+      "zh": "HGO 编辑器"
+    },
+    "HGO projects open in the HGO editor. Save the current workspace before switching editors.": {
+      "en": "HGO projects open in the HGO editor. Save the current workspace before switching editors.",
+      "zh": "HGO 项目在 HGO 编辑器中打开。切换编辑器前，请先保存当前工作。"
+    },
+    "Hide or lower the reference before final export unless you intentionally want it visible in the composition.": {
+      "en": "Hide or lower the reference before final export unless you intentionally want it visible in the composition.",
+      "zh": "最终导出前隐藏或降低参考图，除非你明确希望它出现在构图里。"
+    },
+    "High (1.5×)": {
+      "en": "High (1.5×)",
+      "zh": "高（1.5×）"
+    },
+    "High clarity": {
+      "en": "High clarity",
+      "zh": "高清"
+    },
+    "Hours": {
+      "en": "Hours",
+      "zh": "运营时间"
+    },
+    "Hover a region to inspect its country indicator. This is not a local measurement.": {
+      "en": "Hover a region to inspect its country indicator. This is not a local measurement.",
+      "zh": "悬停区域可查看所属国家的指标值；该值并非地区级测量。"
+    },
+    "Human Development Index": {
+      "en": "Human Development Index",
+      "zh": "人类发展指数"
+    },
+    "ID": {
+      "en": "ID",
+      "zh": "编号"
+    },
+    "If the exported result looks wrong, reopen the saved project JSON, fix the editable state, then export again from that corrected state.": {
+      "en": "If the exported result looks wrong, reopen the saved project JSON, fix the editable state, then export again from that corrected state.",
+      "zh": "如果导出结果看起来不对，重新打开已保存的项目 JSON，修正可编辑状态，再从修正后的状态重新导出。"
+    },
+    "Import": {
+      "en": "Import",
+      "zh": "导入"
+    },
+    "Indicator": {
+      "en": "Indicator",
+      "zh": "指标"
+    },
+    "Indicator data could not be loaded. Retry.": {
+      "en": "Indicator data could not be loaded. Retry.",
+      "zh": "指标数据加载失败，请重试。"
+    },
+    "Indicator data is ready to load.": {
+      "en": "Indicator data is ready to load.",
+      "zh": "指标数据待加载。"
+    },
+    "Indicator data loaded.": {
+      "en": "Indicator data loaded.",
+      "zh": "指标数据已加载。"
+    },
+    "Infrastructure": {
+      "en": "Infrastructure",
+      "zh": "基础设施"
+    },
+    "Intensity Field": {
+      "en": "Intensity Field",
+      "zh": "强度场"
+    },
+    "Keep Strategic annotations enabled when frontlines, operational graphics, or unit counters must appear in the final output.": {
+      "en": "Keep Strategic annotations enabled when frontlines, operational graphics, or unit counters must appear in the final output.",
+      "zh": "最终输出需要前线、作战图形或单位计数器时，保持战略标注开启。"
+    },
+    "Lake interaction settings": {
+      "en": "Lake interaction settings",
+      "zh": "查看湖泊交互设置"
+    },
+    "Landings/day": {
+      "en": "Landings/day",
+      "zh": "日均起降"
+    },
+    "Latitude": {
+      "en": "Latitude",
+      "zh": "纬度"
+    },
+    "Layer order stays inside this workbench": {
+      "en": "Layer order stays inside this workbench",
+      "zh": "图层顺序保留在当前工作台内。"
+    },
+    "Layer package downloaded.": {
+      "en": "Layer package downloaded.",
+      "zh": "图层包已下载。"
+    },
+    "Layer package exported": {
+      "en": "Layer package exported",
+      "zh": "图层包已导出"
+    },
+    "Legend": {
+      "en": "Legend",
+      "zh": "图例"
+    },
+    "Life expectancy": {
+      "en": "Life expectancy",
+      "zh": "预期寿命"
+    },
+    "Live Computer UTC": {
+      "en": "Live Computer UTC",
+      "zh": "本机 UTC 实时同步"
+    },
+    "Live working state": {
+      "en": "Live working state",
+      "zh": "当前工作状态"
+    },
+    "Load Package": {
+      "en": "Load Package",
+      "zh": "加载包"
+    },
+    "Load Project Package": {
+      "en": "Load Project Package",
+      "zh": "加载项目包"
+    },
+    "Loaded tiles": {
+      "en": "Loaded tiles",
+      "zh": "已加载瓦片"
+    },
+    "Loading WGI data…": {
+      "en": "Loading WGI data…",
+      "zh": "正在加载 WGI 数据…"
+    },
+    "Loading indicator data…": {
+      "en": "Loading indicator data…",
+      "zh": "正在加载指标数据…"
+    },
+    "Locate and zoom": {
+      "en": "Locate and zoom",
+      "zh": "定位并放大"
+    },
+    "Longitude": {
+      "en": "Longitude",
+      "zh": "经度"
+    },
+    "Main Layers": {
+      "en": "Main Layers",
+      "zh": "主图层"
+    },
+    "Main image preview ready": {
+      "en": "Main image preview ready",
+      "zh": "主图预览已就绪"
+    },
+    "Mainline + Regional": {
+      "en": "Mainline + Regional",
+      "zh": "主干线 + 区域线"
+    },
+    "Mainline Only": {
+      "en": "Mainline Only",
+      "zh": "仅主干线"
+    },
+    "Manage project files, loading choices, and account-backed saves.": {
+      "en": "Manage project files, loading choices, and account-backed saves.",
+      "zh": "管理项目文件、加载选择和账号保存。"
+    },
+    "Manager": {
+      "en": "Manager",
+      "zh": "管理方"
+    },
+    "Manager / Agencies": {
+      "en": "Manager / Agencies",
+      "zh": "管理方 / 机构"
+    },
+    "Manpower": {
+      "en": "Manpower",
+      "zh": "人力"
+    },
+    "Manual UTC": {
+      "en": "Manual UTC",
+      "zh": "手动 UTC"
+    },
+    "Mapped": {
+      "en": "Mapped",
+      "zh": "已匹配"
+    },
+    "Markers": {
+      "en": "Markers",
+      "zh": "标记"
+    },
+    "Maximum detail (4×)": {
+      "en": "Maximum detail (4×)",
+      "zh": "最高细节（4×）"
+    },
+    "Mean years of schooling": {
+      "en": "Mean years of schooling",
+      "zh": "平均受教育年限"
+    },
+    "Middle East": {
+      "en": "Middle East",
+      "zh": "中东"
+    },
+    "Military Factories": {
+      "en": "Military Factories",
+      "zh": "军用工厂"
+    },
+    "Mooring": {
+      "en": "Mooring",
+      "zh": "泊位"
+    },
+    "More fields": {
+      "en": "More fields",
+      "zh": "更多字段"
+    },
+    "Motorway + Trunk": {
+      "en": "Motorway + Trunk",
+      "zh": "高速公路 + 主干道"
+    },
+    "Motorway Only": {
+      "en": "Motorway Only",
+      "zh": "仅高速公路"
+    },
+    "Multiple countries are selected. Narrow the map selection to one country or choose a country in the inspector.": {
+      "en": "Multiple countries are selected. Narrow the map selection to one country or choose a country in the inspector.",
+      "zh": "当前选择包含多个国家。请把地图选择缩小到单一国家，或在检查器中直接选择一个国家。"
+    },
+    "National population density": {
+      "en": "National population density",
+      "zh": "国家平均人口密度"
+    },
+    "Next page": {
+      "en": "Next page",
+      "zh": "下一页"
+    },
+    "No appearance presets saved": {
+      "en": "No appearance presets saved",
+      "zh": "暂无外观预设"
+    },
+    "No facility details available yet.": {
+      "en": "No facility details available yet.",
+      "zh": "暂时没有可用的 facility 详情。"
+    },
+    "No reference regions were recolored.": {
+      "en": "No reference regions were recolored.",
+      "zh": "没有参考区域被重新着色。"
+    },
+    "No strategic annotations currently visible": {
+      "en": "No strategic annotations currently visible",
+      "zh": "当前没有可见战略标注"
+    },
+    "North America": {
+      "en": "North America",
+      "zh": "北美"
+    },
+    "Not baked yet": {
+      "en": "Not baked yet",
+      "zh": "尚未烘焙"
+    },
+    "Not saved yet": {
+      "en": "Not saved yet",
+      "zh": "尚未保存"
+    },
+    "Oceania": {
+      "en": "Oceania",
+      "zh": "大洋洲"
+    },
+    "Oil": {
+      "en": "Oil",
+      "zh": "石油"
+    },
+    "Open HGO editor": {
+      "en": "Open HGO editor",
+      "zh": "打开 HGO 独立编辑器"
+    },
+    "Open the editor, select a state on the map or through search, then edit its color or label.": {
+      "en": "Open the editor, select a state on the map or through search, then edit its color or label.",
+      "zh": "打开编辑器，在地图上选择或搜索州，再修改颜色或标签。"
+    },
+    "Open the export workbench for preview, layer order, image adjustments, target selection, and final resolution.": {
+      "en": "Open the export workbench for preview, layer order, image adjustments, target selection, and final resolution.",
+      "zh": "打开导出工作台，查看预览，调整图层顺序、画面参数、导出目标和最终分辨率。"
+    },
+    "Open workbench": {
+      "en": "Open workbench",
+      "zh": "打开工作台"
+    },
+    "Order": {
+      "en": "Order",
+      "zh": "操作顺序"
+    },
+    "Outer facility": {
+      "en": "Outer facility",
+      "zh": "外部设施"
+    },
+    "Override": {
+      "en": "Override",
+      "zh": "覆盖"
+    },
+    "Owner / Manager": {
+      "en": "Owner / Manager",
+      "zh": "所有方 / 运营方"
+    },
+    "Package": {
+      "en": "Package",
+      "zh": "包"
+    },
+    "Paint": {
+      "en": "Paint",
+      "zh": "绘制"
+    },
+    "Paint Reference Regions With Country Color": {
+      "en": "Paint Reference Regions With Country Color",
+      "zh": "用国家颜色填充参考区域"
+    },
+    "Paint mode color": {
+      "en": "Paint mode color",
+      "zh": "着色"
+    },
+    "Palette grouping": {
+      "en": "Palette grouping",
+      "zh": "色板分组"
+    },
+    "Parcel Names": {
+      "en": "Parcel Names",
+      "zh": "地块名"
+    },
+    "Passengers/day": {
+      "en": "Passengers/day",
+      "zh": "日均旅客"
+    },
+    "Per-layer PNG": {
+      "en": "Per-layer PNG",
+      "zh": "单层 PNG"
+    },
+    "Performance priority": {
+      "en": "Performance priority",
+      "zh": "性能优先"
+    },
+    "Pick the target, set resolution, inspect preview, confirm layer order and strategic annotation visibility, then run export.": {
+      "en": "Pick the target, set resolution, inspect preview, confirm layer order and strategic annotation visibility, then run export.",
+      "zh": "选择目标，设置分辨率，检查预览，确认图层顺序和战略标注可见性，然后执行导出。"
+    },
+    "Point": {
+      "en": "Point",
+      "zh": "点"
+    },
+    "Points": {
+      "en": "Points",
+      "zh": "点"
+    },
+    "Political actions read the current Active Owner. Check the Active chip in the top bar before you commit any change.": {
+      "en": "Political actions read the current Active Owner. Check the Active chip in the top bar before you commit any change.",
+      "zh": "政治类操作会读取当前归属方。真正落笔前，先确认顶部状态条里的当前归属方正确。"
+    },
+    "Political stability and absence of violence": {
+      "en": "Political stability and absence of violence",
+      "zh": "政治稳定与免于暴力"
+    },
+    "Population aged 65 and above": {
+      "en": "Population aged 65 and above",
+      "zh": "65岁及以上人口占比"
+    },
+    "Prepare reusable export layers": {
+      "en": "Prepare reusable export layers",
+      "zh": "预先生成可复用的导出图层"
+    },
+    "Preparing preview…": {
+      "en": "Preparing preview…",
+      "zh": "正在准备预览…"
+    },
+    "Presets": {
+      "en": "Presets",
+      "zh": "预设"
+    },
+    "Preview layers, resolution, and final output.": {
+      "en": "Preview layers, resolution, and final output.",
+      "zh": "预览图层、分辨率和最终输出。"
+    },
+    "Preview metadata available": {
+      "en": "Preview metadata available",
+      "zh": "预览元数据可用"
+    },
+    "Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).": {
+      "en": "Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).",
+      "zh": "预览渲染与最终导出分辨率相互独立。最终导出上限为 8K（7680 × 4320）。"
+    },
+    "Preview source": {
+      "en": "Preview source",
+      "zh": "预览来源"
+    },
+    "Preview unavailable. Export settings remain editable.": {
+      "en": "Preview unavailable. Export settings remain editable.",
+      "zh": "预览暂不可用，但仍可继续调整导出设置。"
+    },
+    "Previous page": {
+      "en": "Previous page",
+      "zh": "上一页"
+    },
+    "Primary Color": {
+      "en": "Primary Color",
+      "zh": "主色"
+    },
+    "Project JSON save": {
+      "en": "Project JSON save",
+      "zh": "项目 JSON 保存"
+    },
+    "Project downloaded": {
+      "en": "Project downloaded",
+      "zh": "项目已下载"
+    },
+    "Project export cancelled.": {
+      "en": "Project export cancelled.",
+      "zh": "项目导出已取消。"
+    },
+    "Project export includes appearance and transport settings.": {
+      "en": "Project export includes appearance and transport settings.",
+      "zh": "项目导出会包含外观和交通设置。"
+    },
+    "Project export saves Strategic annotations.": {
+      "en": "Project export saves Strategic annotations.",
+      "zh": "项目导出会保存战略标注。"
+    },
+    "Project import cancelled.": {
+      "en": "Project import cancelled.",
+      "zh": "项目导入已取消。"
+    },
+    "Project import failed": {
+      "en": "Project import failed",
+      "zh": "项目导入失败"
+    },
+    "Project import failed before completion. Review the current map state.": {
+      "en": "Project import failed before completion. Review the current map state.",
+      "zh": "项目导入未完成。请复核当前地图状态。"
+    },
+    "Project import is already in progress.": {
+      "en": "Project import is already in progress.",
+      "zh": "项目正在导入，请稍候。"
+    },
+    "Project import started. Appearance and transport settings will be restored from the file.": {
+      "en": "Project import started. Appearance and transport settings will be restored from the file.",
+      "zh": "项目导入已开始。外观和交通设置会从文件恢复。"
+    },
+    "Project imported. Appearance and transport settings were restored from the JSON file.": {
+      "en": "Project imported. Appearance and transport settings were restored from the JSON file.",
+      "zh": "项目已导入。外观和交通设置已从 JSON 文件恢复。"
+    },
+    "Project ready. Loading optional layers…": {
+      "en": "Project ready. Loading optional layers…",
+      "zh": "项目已就绪，正在加载可选图层…"
+    },
+    "Project save failed": {
+      "en": "Project save failed",
+      "zh": "项目保存失败"
+    },
+    "Project tools": {
+      "en": "Project tools",
+      "zh": "项目工具"
+    },
+    "Project-local lines, graphics, and unit counters for export.": {
+      "en": "Project-local lines, graphics, and unit counters for export.",
+      "zh": "用于导出的项目本地作战线、作战图形和单位计数器。"
+    },
+    "Publishable map tools": {
+      "en": "Publishable map tools",
+      "zh": "发布级地图工具"
+    },
+    "Quick path": {
+      "en": "Quick path",
+      "zh": "快速路径"
+    },
+    "Radius": {
+      "en": "Radius",
+      "zh": "半径"
+    },
+    "Rail labels currently use line names only.": {
+      "en": "Rail labels currently use line names only.",
+      "zh": "当前铁路标签只使用线路名称。"
+    },
+    "Ready to export": {
+      "en": "Ready to export",
+      "zh": "可直接导出"
+    },
+    "Real source not ingested": {
+      "en": "Real source not ingested",
+      "zh": "真实来源尚未摄取"
+    },
+    "Real-source derived metadata": {
+      "en": "Real-source derived metadata",
+      "zh": "真实来源派生元数据"
+    },
+    "Reference country": {
+      "en": "Reference country",
+      "zh": "参考国"
+    },
+    "Regulatory quality": {
+      "en": "Regulatory quality",
+      "zh": "监管质量"
+    },
+    "Render-pass labels and SVG annotations": {
+      "en": "Render-pass labels and SVG annotations",
+      "zh": "渲染 pass 标签与 SVG 标注"
+    },
+    "Rendering export preview…": {
+      "en": "Rendering export preview…",
+      "zh": "正在渲染导出预览…"
+    },
+    "Restored": {
+      "en": "Restored",
+      "zh": "已恢复"
+    },
+    "Restoring project": {
+      "en": "Restoring project",
+      "zh": "正在恢复项目"
+    },
+    "Restoring the map before editing can continue…": {
+      "en": "Restoring the map before editing can continue…",
+      "zh": "正在恢复地图，完成后即可继续编辑…"
+    },
+    "Review derived frontlines and project-local strategic annotations for publishable maps.": {
+      "en": "Review derived frontlines and project-local strategic annotations for publishable maps.",
+      "zh": "检查推导前线和项目本地战略标注，用于发布级地图。"
+    },
+    "Review labels, borders, strategic annotations, reference visibility, and export target before the final click.": {
+      "en": "Review labels, borders, strategic annotations, reference visibility, and export target before the final click.",
+      "zh": "最终点击前检查标签、边界、战略标注、参考图可见性和导出目标。"
+    },
+    "Rubber": {
+      "en": "Rubber",
+      "zh": "橡胶"
+    },
+    "Rule of law": {
+      "en": "Rule of law",
+      "zh": "法治"
+    },
+    "Runtime rendering disabled": {
+      "en": "Runtime rendering disabled",
+      "zh": "运行时渲染已禁用"
+    },
+    "Runway": {
+      "en": "Runway",
+      "zh": "跑道"
+    },
+    "Save and restore the complete working state.": {
+      "en": "Save and restore the complete working state.",
+      "zh": "保存和恢复完整工作状态。"
+    },
+    "Save project": {
+      "en": "Save project",
+      "zh": "保存项目"
+    },
+    "Saved WGI data version is unavailable.": {
+      "en": "Saved WGI data version is unavailable.",
+      "zh": "此项目保存的 WGI 数据版本不可用。"
+    },
+    "Saved WGI metric is unavailable. Choose a supported metric.": {
+      "en": "Saved WGI metric is unavailable. Choose a supported metric.",
+      "zh": "此项目保存的 WGI 指标不可用，请选择受支持的指标。"
+    },
+    "Saved indicator data version is unavailable.": {
+      "en": "Saved indicator data version is unavailable.",
+      "zh": "已保存的指标数据版本不可用。"
+    },
+    "Saved indicator is unavailable. Choose a supported indicator.": {
+      "en": "Saved indicator is unavailable. Choose a supported indicator.",
+      "zh": "已保存的指标不可用，请选择受支持的指标。"
+    },
+    "Scenario countries mapped": {
+      "en": "Scenario countries mapped",
+      "zh": "场景国家已匹配"
+    },
+    "Schema": {
+      "en": "Schema",
+      "zh": "架构"
+    },
+    "Select a land or sea state to change its color or label. Undo changes, save your HGO project, or export a PNG.": {
+      "en": "Select a land or sea state to change its color or label. Undo changes, save your HGO project, or export a PNG.",
+      "zh": "选择陆地或海洋州，修改颜色或标签；支持撤销、保存 HGO 项目和导出 PNG。"
+    },
+    "Select a transport pack before applying to the main map": {
+      "en": "Select a transport pack before applying to the main map",
+      "zh": "先选择交通包，再应用到主地图。"
+    },
+    "Selected": {
+      "en": "Selected",
+      "zh": "已选"
+    },
+    "Selected map country": {
+      "en": "Selected map country",
+      "zh": "选中地块国家"
+    },
+    "Selected transport pack is unavailable": {
+      "en": "Selected transport pack is unavailable",
+      "zh": "当前选择的交通包不可用。"
+    },
+    "Shift / Space + drag to pan": {
+      "en": "Shift / Space + drag to pan",
+      "zh": "Shift / 空格 + 拖动平移"
+    },
+    "Show Rail": {
+      "en": "Show Rail",
+      "zh": "显示铁路"
+    },
+    "Show Rail Labels": {
+      "en": "Show Rail Labels",
+      "zh": "显示铁路标签"
+    },
+    "Show Resource Markers": {
+      "en": "Show Resource Markers",
+      "zh": "显示资源标记"
+    },
+    "Show Road": {
+      "en": "Show Road",
+      "zh": "显示道路"
+    },
+    "Show WGI shading": {
+      "en": "Show WGI shading",
+      "zh": "显示 WGI 统计着色"
+    },
+    "Show country names": {
+      "en": "Show country names",
+      "zh": "显示国家名称"
+    },
+    "Show political borders": {
+      "en": "Show political borders",
+      "zh": "显示政治国界"
+    },
+    "Show thematic shading": {
+      "en": "Show thematic shading",
+      "zh": "显示专题着色"
+    },
+    "Single layer preview ready": {
+      "en": "Single layer preview ready",
+      "zh": "单层预览已就绪"
+    },
+    "Sort · Visibility": {
+      "en": "Sort · Visibility",
+      "zh": "排序 · 可见性"
+    },
+    "Source missing": {
+      "en": "Source missing",
+      "zh": "来源缺失"
+    },
+    "South America": {
+      "en": "South America",
+      "zh": "南美"
+    },
+    "Star Scenario Forge on GitHub": {
+      "en": "Star Scenario Forge on GitHub",
+      "zh": "在 GitHub 为 Scenario Forge 点 Star"
+    },
+    "Star on GitHub": {
+      "en": "Star on GitHub",
+      "zh": "在 GitHub 点 Star"
+    },
+    "Status": {
+      "en": "Status",
+      "zh": "状态"
+    },
+    "Steel": {
+      "en": "Steel",
+      "zh": "钢铁"
+    },
+    "Stop loading": {
+      "en": "Stop loading",
+      "zh": "停止加载"
+    },
+    "Strategic Annotations": {
+      "en": "Strategic Annotations",
+      "zh": "战略标注"
+    },
+    "Strategic Heat Metric": {
+      "en": "Strategic Heat Metric",
+      "zh": "战略热力指标"
+    },
+    "Strategic Values": {
+      "en": "Strategic Values",
+      "zh": "战略数值"
+    },
+    "Strength": {
+      "en": "Strength",
+      "zh": "强度"
+    },
+    "Success checks": {
+      "en": "Success checks",
+      "zh": "成功信号与常见漏项"
+    },
+    "Sync Computer UTC Time": {
+      "en": "Sync Computer UTC Time",
+      "zh": "同步电脑 UTC 时间"
+    },
+    "Target:": {
+      "en": "Target:",
+      "zh": "目标："
+    },
+    "Technical details": {
+      "en": "Technical details",
+      "zh": "技术详情"
+    },
+    "Territories &amp; Presets": {
+      "en": "Territories &amp; Presets",
+      "zh": "Territories &amp; Presets"
+    },
+    "The complete reference group must be loaded before filling it.": {
+      "en": "The complete reference group must be loaded before filling it.",
+      "zh": "请先加载完整参考分组，再进行填色。"
+    },
+    "The editable handoff file.": {
+      "en": "The editable handoff file.",
+      "zh": "可继续编辑的交接文件。"
+    },
+    "The image file used by Reference Image is not embedded; upload it again after loading, then verify the stored alignment values still fit.": {
+      "en": "The image file used by Reference Image is not embedded; upload it again after loading, then verify the stored alignment values still fit.",
+      "zh": "参考图像文件不会嵌入项目；加载后需要再次上传，再检查已保存的对齐参数是否仍然贴合。"
+    },
+    "The last pass before sending files out.": {
+      "en": "The last pass before sending files out.",
+      "zh": "发送文件前的最后一轮检查。"
+    },
+    "The map is ready for a composite image, per-layer PNG set, or bake pack handoff.": {
+      "en": "The map is ready for a composite image, per-layer PNG set, or bake pack handoff.",
+      "zh": "地图已经准备好输出为合成图片、分层 PNG 或 bake pack 交接包时使用。"
+    },
+    "The map is ready for publishing, screenshot handoff, layered editing, or bake-pack delivery.": {
+      "en": "The map is ready for publishing, screenshot handoff, layered editing, or bake-pack delivery.",
+      "zh": "地图已经准备好用于发布、截图交接、分层编辑或 bake pack 交付时使用。"
+    },
+    "The political map needs readable conflict edges, arrows, planned operations, or visible unit counts.": {
+      "en": "The political map needs readable conflict edges, arrows, planned operations, or visible unit counts.",
+      "zh": "政治地图需要清晰的冲突边界、箭头、行动计划或单位数量时使用。"
+    },
+    "The project was imported, but editing is paused until map recovery succeeds.": {
+      "en": "The project was imported, but editing is paused until map recovery succeeds.",
+      "zh": "项目已导入，地图恢复成功后才能继续编辑。"
+    },
+    "The publishable output step.": {
+      "en": "The publishable output step.",
+      "zh": "生成可发布产物的步骤。"
+    },
+    "Thematic catalog unavailable": {
+      "en": "Thematic catalog unavailable",
+      "zh": "专题图层目录不可用"
+    },
+    "Thematic layer is off.": {
+      "en": "Thematic layer is off.",
+      "zh": "专题图层已关闭。"
+    },
+    "This ZIP contains an editable project. Review the package summary before loading.": {
+      "en": "This ZIP contains an editable project. Review the package summary before loading.",
+      "zh": "这个 ZIP 包含一个可编辑项目。加载前请先查看包摘要。"
+    },
+    "This removes current paint overrides. You can undo the clear from history.": {
+      "en": "This removes current paint overrides. You can undo the clear from history.",
+      "zh": "这会清除当前着色修改。你可以通过历史记录撤销。"
+    },
+    "Tier": {
+      "en": "Tier",
+      "zh": "级别"
+    },
+    "Tint Color": {
+      "en": "Tint Color",
+      "zh": "倾向颜色"
+    },
+    "Tint Strength": {
+      "en": "Tint Strength",
+      "zh": "倾向强度"
+    },
+    "Total Factories": {
+      "en": "Total Factories",
+      "zh": "工厂总数"
+    },
+    "Total fertility rate": {
+      "en": "Total fertility rate",
+      "zh": "总和生育率"
+    },
+    "Total population": {
+      "en": "Total population",
+      "zh": "总人口"
+    },
+    "Treat saving and exporting as two separate handoff steps: save the editable project first, then export the publishable image or layer package.": {
+      "en": "Treat saving and exporting as two separate handoff steps: save the editable project first, then export the publishable image or layer package.",
+      "zh": "把保存和导出当成两个独立交接步骤：先保存可继续编辑的项目，再导出可发布的图片或图层包。"
+    },
+    "Tungsten": {
+      "en": "Tungsten",
+      "zh": "钨"
+    },
+    "Turn on derived frontlines first, then add operational lines and graphics, then place counters near the final composition.": {
+      "en": "Turn on derived frontlines first, then add operational lines and graphics, then place counters near the final composition.",
+      "zh": "先开启推导前线，再添加作战线和图形，最后按最终构图摆放单位计数器。"
+    },
+    "UNDP human development · Scenario reference": {
+      "en": "UNDP human development · Scenario reference",
+      "zh": "UNDP 人类发展 · 剧本参考"
+    },
+    "Ultra (2×)": {
+      "en": "Ultra (2×)",
+      "zh": "超清（2×）"
+    },
+    "Unable to exit scenario.": {
+      "en": "Unable to exit scenario.",
+      "zh": "无法退出剧本。"
+    },
+    "Unavailable saved metric": {
+      "en": "Unavailable saved metric",
+      "zh": "已保存的指标不可用"
+    },
+    "Unknown error": {
+      "en": "Unknown error",
+      "zh": "未知错误"
+    },
+    "Unmatched": {
+      "en": "Unmatched",
+      "zh": "未匹配"
+    },
+    "Unnamed facility": {
+      "en": "Unnamed facility",
+      "zh": "未命名设施"
+    },
+    "Unsaved changes": {
+      "en": "Unsaved changes",
+      "zh": "有未保存的修改"
+    },
+    "Unsaved project changes.": {
+      "en": "Unsaved project changes.",
+      "zh": "项目有未保存改动。"
+    },
+    "Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.": {
+      "en": "Upload a local image, align it with opacity / scale / offsets, then keep those alignment values in the project. The image file itself needs to be uploaded again when you restore the project.",
+      "zh": "上传一张本地图像，再用 opacity / scale / offsets 完成对位。项目会保存这些对位参数，但图像文件本身在重新打开项目时需要再次上传。"
+    },
+    "Upload the image, set opacity for readability, adjust scale, then fine-tune horizontal and vertical offsets.": {
+      "en": "Upload the image, set opacity for readability, adjust scale, then fine-tune horizontal and vertical offsets.",
+      "zh": "上传图像，先调透明度保证可读，再调缩放，最后微调水平和垂直偏移。"
+    },
+    "Urban population share": {
+      "en": "Urban population share",
+      "zh": "城镇人口占比"
+    },
+    "Use Download Project to save the current editable state: scenario choice, ownership edits, appearance, transport, strategic annotations, reference alignment values, and export settings.": {
+      "en": "Use Download Project to save the current editable state: scenario choice, ownership edits, appearance, transport, strategic annotations, reference alignment values, and export settings.",
+      "zh": "使用“下载项目”保存当前可编辑状态：场景选择、归属修改、外观、交通、战略标注、参考图对齐参数和导出设置。"
+    },
+    "Use Open workbench to choose the output target, format, resolution, layer order, text stacks, and image adjustments. Export creates the final image, per-layer PNG set, or bake pack; it does not replace the editable project JSON.": {
+      "en": "Use Open workbench to choose the output target, format, resolution, layer order, text stacks, and image adjustments. Export creates the final image, per-layer PNG set, or bake pack; it does not replace the editable project JSON.",
+      "zh": "使用“打开工作台”选择输出目标、格式、分辨率、图层顺序、文字堆栈和图像调整。导出会生成最终图片、分层 PNG 或 bake pack；它不会替代可编辑的项目 JSON。"
+    },
+    "Use Project tools as a publish checklist: save the project, add strategic context, align references, then export.": {
+      "en": "Use Project tools as a publish checklist: save the project, add strategic context, align references, then export.",
+      "zh": "把项目工具当成发布检查清单：先保存项目，再补战略信息、对齐参考图，最后导出。"
+    },
+    "Use the center frame to drag families into the order you want future transport layers to draw.": {
+      "en": "Use the center frame to drag families into the order you want future transport layers to draw.",
+      "zh": "使用中间框架拖动 families，设置未来 transport layers 的绘制顺序。"
+    },
+    "Use this checklist when you want the shortest safe editing path.": {
+      "en": "Use this checklist when you want the shortest safe editing path.",
+      "zh": "需要最短、最稳的编辑路径时，先按下面的顺序操作。"
+    },
+    "Use when": {
+      "en": "Use when",
+      "zh": "使用场景"
+    },
+    "Voice and accountability": {
+      "en": "Voice and accountability",
+      "zh": "发声与问责"
+    },
+    "WDI population · Scenario reference": {
+      "en": "WDI population · Scenario reference",
+      "zh": "WDI 人口 · 剧本参考"
+    },
+    "WGI data could not be loaded. Retry.": {
+      "en": "WGI data could not be loaded. Retry.",
+      "zh": "WGI 数据加载失败，请重试。"
+    },
+    "WGI data is ready to load.": {
+      "en": "WGI data is ready to load.",
+      "zh": "WGI 数据待加载。"
+    },
+    "WGI data loaded.": {
+      "en": "WGI data loaded.",
+      "zh": "WGI 数据已加载。"
+    },
+    "WGI governance · 2024": {
+      "en": "WGI governance · 2024",
+      "zh": "WGI 治理指标 · 2024"
+    },
+    "WGI governance · Modern World": {
+      "en": "WGI governance · Modern World",
+      "zh": "WGI 治理指标 · 现代世界"
+    },
+    "WGI governance · Scenario reference": {
+      "en": "WGI governance · Scenario reference",
+      "zh": "WGI 治理指标 · 剧本参考"
+    },
+    "WGI is available only in Modern World.": {
+      "en": "WGI is available only in Modern World.",
+      "zh": "WGI 图层仅支持现代世界底图。"
+    },
+    "WGI is not supported on the current basemap.": {
+      "en": "WGI is not supported on the current basemap.",
+      "zh": "当前底图不支持 WGI。"
+    },
+    "WGI metric": {
+      "en": "WGI metric",
+      "zh": "WGI 指标"
+    },
+    "WGI thematic layer is off.": {
+      "en": "WGI thematic layer is off.",
+      "zh": "WGI 图层已关闭。"
+    },
+    "Waiting for the active industrial land pack manifest": {
+      "en": "Waiting for the active industrial land pack manifest",
+      "zh": "等待当前工业用地包清单"
+    },
+    "You are about to make broad ownership, frontline, transport, or overlay changes.": {
+      "en": "You are about to make broad ownership, frontline, transport, or overlay changes.",
+      "zh": "准备大范围修改归属、前线、交通或叠加层时使用。"
+    },
+    "You are preparing a final image, sharing the scenario with another editor, or archiving a stable milestone.": {
+      "en": "You are preparing a final image, sharing the scenario with another editor, or archiving a stable milestone.",
+      "zh": "准备最终图片、把场景交给其他编辑者，或归档稳定阶段时使用。"
+    },
+    "You need a recovery point, a handoff file, or a before-and-after checkpoint before a broad edit.": {
+      "en": "You need a recovery point, a handoff file, or a before-and-after checkpoint before a broad edit.",
+      "zh": "需要恢复点、交接文件，或在大改前保留前后对照时使用。"
+    },
+    "You need to trace historical borders, compare a source map, or keep a visual planning layer beside the scenario.": {
+      "en": "You need to trace historical borders, compare a source map, or keep a visual planning layer beside the scenario.",
+      "zh": "需要描摹历史边界、对照来源地图，或在场景旁保留视觉规划层时使用。"
+    },
+    "counters": {
+      "en": "counters",
+      "zh": "个计数器"
+    },
+    "graphics": {
+      "en": "graphics",
+      "zh": "个图形"
+    },
+    "lines": {
+      "en": "lines",
+      "zh": "条作战线"
+    },
+    "nodes": {
+      "en": "nodes",
+      "zh": "节点"
+    },
+    "{count} regions affected": {
+      "en": "{count} regions affected",
+      "zh": "影响 {count} 个区域"
+    },
+    "{seconds}s / day": {
+      "en": "{seconds}s / day",
+      "zh": "{seconds} 秒 / 天"
+    },
+    "≈ {km} km": {
+      "en": "≈ {km} km",
+      "zh": "约 {km} 公里"
+    },
+    "先生成或填充地图颜色，再在这里修改图例名称。": {
+      "en": "先生成或填充地图颜色，再在这里修改图例名称。",
+      "zh": "先生成或填充地图颜色，再在这里修改图例名称。"
+    },
+    "加权随机": {
+      "en": "加权随机",
+      "zh": "加权随机"
+    },
+    "大洲": {
+      "en": "大洲",
+      "zh": "大洲"
+    },
+    "大洲聚焦": {
+      "en": "大洲聚焦",
+      "zh": "大洲聚焦"
+    },
+    "按宗主面积": {
+      "en": "按宗主面积",
+      "zh": "按宗主面积"
+    },
+    "按实控面积": {
+      "en": "按实控面积",
+      "zh": "按实控面积"
+    },
+    "生成图例": {
+      "en": "生成图例",
+      "zh": "生成图例"
+    },
+    "生成模式": {
+      "en": "生成模式",
+      "zh": "生成模式"
+    },
+    "面积模式优先现代大国排序": {
+      "en": "面积模式优先现代大国排序",
+      "zh": "面积模式优先现代大国排序"
     }
   }
 }

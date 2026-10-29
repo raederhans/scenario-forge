@@ -1,3 +1,5 @@
+import { setUiIcon } from "./ui_icons.js";
+
 // The workspace moves existing controls so their business owners keep their
 // element references, event handlers, and native form contracts.
 export function initEditorWorkspace({ documentRef = document, initialSearch = globalThis.location?.search || "", t, setSidebarTab, setStrategicMode, toggleInspector, revealProperties = () => {}, onNavigate = () => {} } = {}) {
@@ -72,6 +74,20 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     });
     btn.setAttribute("role", "tab");
     btn.setAttribute("aria-selected", "false");
+    btn.setAttribute("tabindex", key === "inspector" ? "0" : "-1");
+    btn.addEventListener("keydown", (event) => {
+      const buttons = [...segmentButtons.values()];
+      const index = buttons.indexOf(btn);
+      let next;
+      if (event.key === "ArrowRight") next = (index + 1) % buttons.length;
+      else if (event.key === "ArrowLeft") next = (index - 1 + buttons.length) % buttons.length;
+      else if (event.key === "Home") next = 0;
+      else if (event.key === "End") next = buttons.length - 1;
+      else return;
+      event.preventDefault();
+      buttons[next].click();
+      buttons[next].focus();
+    });
     segments.append(btn);
     segmentButtons.set(key, btn);
   }
@@ -99,9 +115,13 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     host.dataset.i18nAriaLabel = label;
     for (const node of nodes.filter(Boolean)) host.append(node);
     properties.append(host);
-    const segment = task === "layers" ? "layers" : "inspector";
+    const segment = key === "project" ? null : task === "layers" ? "layers" : "inspector";
     propertyEntries.set(key, { host, label, task, segment });
-    if (!segmentProperties.has(segment)) {
+    if (segment) {
+      host.setAttribute("role", "tabpanel");
+      host.setAttribute("aria-labelledby", segmentButtons.get(segment).id);
+    }
+    if (segment && !segmentProperties.has(segment)) {
       segmentProperties.set(segment, key);
       segmentButtons.get(segment).setAttribute("aria-controls", host.id);
     }
@@ -113,10 +133,13 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     const changed = currentProperty !== key;
     if (changed && workspaceReady && !navigatingBack) propertyHistory.push(currentProperty);
     currentProperty = key;
-    segmentProperties.set(entry.segment, key);
-    setAttribute(segmentButtons.get(entry.segment), "aria-controls", entry.host.id);
+    if (entry.segment) {
+      segmentProperties.set(entry.segment, key);
+      setAttribute(segmentButtons.get(entry.segment), "aria-controls", entry.host.id);
+    }
     for (const [segment, btn] of segmentButtons) {
       setAttribute(btn, "aria-selected", segment === entry.segment);
+      if (entry.segment) setAttribute(btn, "tabindex", segment === entry.segment ? 0 : -1);
     }
     if (entry.task) taskProperties.set(entry.task, key);
     if (syncTab) setSidebarTab(key === "project" ? "project" : "inspector");
@@ -183,7 +206,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
       restoringTaskProperty = false;
     }
   };
-  for (const [key, label] of [["objects", "Objects"], ["layers", "Layers"], ["palette", "Palette"], ["assets", "Assets"]]) {
+  for (const [key, label] of [["objects", "Objects"], ["layers", "Layers"], ["palette", "Palette"]]) {
     const host = make("section", "editor-task-panel", "", `editorTask-${key}`);
     const btn = button(label, `editorTask${key[0].toUpperCase()}${key.slice(1)}Btn`, () => selectTask(key, { restoreProperty: true }));
     btn.setAttribute("aria-controls", host.id);
@@ -204,17 +227,22 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     }
     showProperty(key, { syncTab, reveal });
   };
-  for (const [key, label, sectionId, detailId] of [
-    ["countries", "Countries", "countryInspectorSection", "countryInspectorDetail"],
-    ["water", "Water Regions", "waterInspectorSection", "waterInspectorDetail"],
-    ["special", "Special Regions", "specialRegionInspectorSection", "specialRegionInspectorDetail"],
+  // 筛选分段用短名才能在最窄侧栏里单行放下；右栏属性标题仍用完整名称。
+  for (const [key, label, navLabel, sectionId, detailId] of [
+    ["countries", "Countries", "Countries", "countryInspectorSection", "countryInspectorDetail"],
+    ["water", "Water Regions", "Water", "waterInspectorSection", "waterInspectorDetail"],
+    ["special", "Special Regions", "Special", "specialRegionInspectorSection", "specialRegionInspectorDetail"],
   ]) {
     const section = get(sectionId);
     if (!section) continue;
     section.open = true;
     section.classList.add("editor-object-section");
     objectHost.append(section);
-    const btn = button(label, `editorObjects-${key}`, () => selectObject(key));
+    const btn = button(navLabel, `editorObjects-${key}`, () => selectObject(key));
+    if (navLabel !== label) {
+      btn.setAttribute("aria-label", label);
+      btn.dataset.i18nAriaLabel = label;
+    }
     objectNav.append(btn);
     objectEntries.push({ key, section, button: btn });
     const detail = get(detailId);
@@ -315,10 +343,16 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     ["special-zones", "Special Zones", "specialZonePopover"],
     ["legend", "Legend", "legendProjectSection"],
     ["annotations", "Frontlines & Annotations", "frontlineProjectSection"],
+    ["reference", "Reference image", "dockReferencePopover"],
   ]) {
     const node = get(id);
     if (!node) continue;
     addProperty(key, label, [node], "layers");
+    if (key === "reference") {
+      node.classList.remove("hidden", "sidebar-tool-popover");
+      node.removeAttribute("role");
+      node.removeAttribute("aria-hidden");
+    }
     const btn = button(label, `editorLayer-${key}`, () => {
       selectTask("layers");
       if (key === "special-zones") get("appearanceSpecialZoneBtn")?.click();
@@ -333,8 +367,10 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
   }
   const palette = left.querySelector(".color-library-card");
   if (palette) { palette.open = true; tasks.get("palette").host.append(palette); }
-  const utilities = move("inspectorUtilitiesSection", tasks.get("assets").host);
-  if (utilities) utilities.open = true;
+  for (const id of ["inspectorUtilitiesSection", "utilitiesGuideBtn", "dockReferenceBtn"]) {
+    if (get(id)) get(id).hidden = true;
+  }
+  get("dockReferenceBtn")?.addEventListener("click", () => get("editorLayer-reference")?.click());
   const transportEntry = move("transportProjectSection", layerHost);
   if (transportEntry) transportEntry.open = true;
 
@@ -397,8 +433,16 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
       ? documentRef.body.classList.contains("right-drawer-open")
       : !documentRef.body.classList.contains("right-sidebar-collapsed")
   ));
-  topActions.append(inspectorToggle);
-  for (const id of ["workspaceSaveBtn", "workspaceExportBtn", "scenarioGuideBtn", "workspaceGithubLink", "btnToggleLang", "rightSidebarAccountShelf"]) move(id, topActions);
+  inspectorToggle.removeAttribute("data-i18n");
+  delete inspectorToggle.dataset.i18n;
+  inspectorToggle.setAttribute("aria-label", t("Inspector", "ui"));
+  inspectorToggle.dataset.i18nAriaLabel = "Inspector";
+  setUiIcon(inspectorToggle, "panel-right");
+  for (const id of ["workspaceExportBtn", "workspaceSaveBtn"]) move(id, topActions);
+  const divider = make("span", "editor-project-divider");
+  divider.setAttribute("aria-hidden", "true");
+  topActions.append(divider, inspectorToggle);
+  for (const id of ["scenarioGuideBtn", "workspaceGithubLink", "btnToggleLang", "rightSidebarAccountShelf"]) move(id, topActions);
   const strategyBtn = button("Edit annotations", "editorStrategicModeBtn", () => {
     const active = !documentRef.body.classList.contains("frontline-mode-active");
     setStrategicMode(active);
@@ -453,7 +497,7 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
       else showProperty(key);
     }
   }
-  if (requestedView === "reference") selectTask("assets");
+  if (requestedView === "reference") get("editorLayer-reference")?.click();
   workspaceReady = true;
   // Support entry owners can still request Project using the retained button.
   documentRef.addEventListener("editor-sidebar-tab", (event) => {

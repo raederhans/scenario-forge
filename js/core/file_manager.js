@@ -1,4 +1,5 @@
 import { normalizeRiverPaintState } from "./river_paint/partition_model.js";
+import { TNO_TAG_MIGRATION_VERSION } from "./country_code_aliases.js";
 import { verifyApprovedRiverPack } from "./river_paint/pilot_loader.js";
 import { normalizePaintMode } from "./map_editing_policy.js";
 import { normalizeRenderingStyleConfig } from "./renderer/display_quality_policy.js";
@@ -8,6 +9,7 @@ import { normalizePopulationStyle } from "./population_spatial_view_model.js";
 import { normalizeQuickFillScope } from "./quick_fill_hierarchy.js";
 // Project file manager (Phase 13)
 import {
+  state as runtimeState,
   normalizeAnnotationView,
   normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
@@ -559,6 +561,7 @@ class FileManager {
         ? {
           id: appState.activeScenarioId,
           version: appState.activeScenarioManifest?.version || 1,
+          ...(appState.activeScenarioId === "tno_1962" ? { tagMigrationVersion: TNO_TAG_MIGRATION_VERSION } : {}),
           baselineHash: appState.scenarioBaselineHash || "",
           importAudit: normalizeScenarioImportAudit(appState.scenarioImportAudit, {
             scenarioId: appState.activeScenarioId,
@@ -650,6 +653,7 @@ class FileManager {
   }
 
   static async exportProject(appState, options = {}) {
+    const savedRevision = Number(appState?.dirtyRevision || 0);
     const payload = FileManager.buildProjectPayload(appState);
     if (!payload) return;
 
@@ -663,7 +667,11 @@ class FileManager {
       title: t("Project saved", "ui"),
       tone: "success",
     });
-    clearDirty("project-export");
+    // A completed write only saves the revision captured before async packaging
+    // and file I/O. Exporting a detached snapshot cannot save the active project.
+    if (appState === runtimeState && Number(runtimeState.dirtyRevision || 0) === savedRevision) {
+      clearDirty("project-export");
+    }
     return true;
   }
 
@@ -772,6 +780,8 @@ class FileManager {
       data.scenario = {
         id: String(data.scenario.id || "").trim(),
         version: Number(data.scenario.version || 1) || 1,
+        ...(data.scenario.id === "tno_1962"
+          ? { tagMigrationVersion: data.scenario.tagMigrationVersion } : {}),
         baselineHash: String(data.scenario.baselineHash || "").trim(),
         viewMode: String(data.scenario.viewMode || "ownership").trim().toLowerCase() === "frontline"
           ? "frontline"

@@ -736,15 +736,15 @@ UI_COPY_CATALOG_RE = re.compile(
 )
 UI_COPY_CATALOG_ENTRY_RE = re.compile(
     r"""
-    (?P<key>"(?:\\.|[^"])+"|[A-Za-z_][A-Za-z0-9_ ]*)
+    ^[ \t]*(?P<key>"(?:\\.|[^"\\\r\n])+"|[A-Za-z_][A-Za-z0-9_]*)
     \s*:\s*
     \{
-      \s*zh:\s*"(?P<zh>(?:\\.|[^"])*)"
-      \s*,\s*en:\s*"(?P<en>(?:\\.|[^"])*)"
-      \s*
+      \s*"?zh"?:\s*"(?P<zh>(?:\\.|[^"\\])*)"
+      \s*,\s*"?en"?:\s*"(?P<en>(?:\\.|[^"\\])*)"
+      \s*,?\s*
     \}
     """,
-    re.DOTALL | re.VERBOSE,
+    re.MULTILINE | re.VERBOSE,
 )
 
 
@@ -1903,6 +1903,11 @@ def sync_palette_geo_translations(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Sync UI/GEO translation dictionary.")
     parser.add_argument(
+        "--ui-only",
+        action="store_true",
+        help="Sync UI translations from manual/catalog/source keys without changing geo data or using the network.",
+    )
+    parser.add_argument(
         "--topology",
         type=Path,
         help="Path to topology file.",
@@ -2225,6 +2230,25 @@ def sync_translations(
     }
 
 
+def sync_ui_translations(output_path: Path, repo_root: Path = BASE_DIR) -> dict:
+    """Regenerate the UI section without rebuilding unrelated geographic data."""
+    current = json.loads(output_path.read_text(encoding="utf-8")) if output_path.exists() else {}
+    ui, _sources = merge_ui(
+        current.get("ui", {}),
+        {},
+        collect_ui_keys(repo_root),
+        load_ui_copy_catalog_translations(repo_root),
+        MachineTranslator(enabled=False),
+    )
+    # Retain existing entry order so a UI-only sync does not move the large
+    # geographic section or shuffle already reviewed UI translations.
+    ordered_ui = {key: ui[key] for key in current.get("ui", {})}
+    ordered_ui.update({key: value for key, value in ui.items() if key not in ordered_ui})
+    payload = {**current, "ui": ordered_ui}
+    write_json_atomic(output_path, payload)
+    return {"ui_keys": len(ui), "output_path": path_to_report_string(output_path)}
+
+
 def main() -> None:
     args = parse_args()
     base_dir = BASE_DIR
@@ -2234,6 +2258,11 @@ def main() -> None:
     topo_path = args.topology or default_topology
     runtime_topology_path = args.runtime_topology or default_runtime_topology
     output_path = args.locales or (base_dir / "data" / "locales.json")
+    if args.ui_only:
+        result = sync_ui_translations(output_path, base_dir)
+        print(f"OK: synced UI translations. ui_keys={result['ui_keys']}")
+        print(f"Saved locales to: {result['output_path']}")
+        return
     geo_aliases_path = args.geo_aliases or (base_dir / "data" / "geo_aliases.json")
     hierarchy_path = args.hierarchy or (base_dir / "data" / "hierarchy.json")
     scenarios_root = args.scenarios_root or (base_dir / "data" / "scenarios")

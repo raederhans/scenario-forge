@@ -3650,6 +3650,7 @@ function getMapInteractionEventBindingOwner() {
       getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
       getWindow: () => window,
       getInteractionRectNode: () => rendererSurfaceHost.getInteractionRect()?.node?.(),
+      isTouchBrushEnabled: () => runtimeState.brushModeEnabled || getIntensityFieldTool().active,
     },
     handlers: {
       mapClick: handleClick,
@@ -3658,8 +3659,11 @@ function getMapInteractionEventBindingOwner() {
       handlePhysicalIntensityPointerDown,
       handlePhysicalIntensityPointerMove,
       handlePhysicalIntensityPointerEnd,
+      cancelPhysicalIntensitySession,
       handleBrushPointerDown,
       handleBrushPointerMove,
+      handleBrushPointerEnd,
+      cancelBrushSession,
       handleMouseLeave: handleMapMouseLeave,
       handleSidebarLayoutStart,
       handleResize,
@@ -14269,7 +14273,7 @@ function getSpecialZoneStyle(feature) {
     return {
       fill: getSafeCanvasColor(layerStyle.fill, "#8b5cf6"),
       stroke: getSafeCanvasColor(layerStyle.stroke, "#6d28d9"),
-      fillOpacity: clamp(Number(layerStyle.fillOpacity) || 0.32, 0, 1),
+      fillOpacity: clamp(layerStyle.fillOpacity !== null && layerStyle.fillOpacity !== "" && Number.isFinite(Number(layerStyle.fillOpacity)) ? Number(layerStyle.fillOpacity) : 0.32, 0, 1),
       strokeWidth: clamp(Number(layerStyle.strokeWidth) || 1.3, 0.4, 8),
       dash: getDashPattern(layerStyle.pattern === "outlineOnly" ? "solid" : "dashed", Number(layerStyle.strokeWidth) || 1.3),
       pattern: String(layerStyle.pattern || "solid"),
@@ -14345,7 +14349,7 @@ function ensureOperationGraphicsEditorState() {
   }
   runtimeState.operationGraphicsEditor.stroke = String(runtimeState.operationGraphicsEditor.stroke || "").trim();
   runtimeState.operationGraphicsEditor.width = Math.max(0, Math.min(16, Number(runtimeState.operationGraphicsEditor.width) || 0));
-  runtimeState.operationGraphicsEditor.opacity = Math.max(0, Math.min(1, Number(runtimeState.operationGraphicsEditor.opacity) || 1));
+  runtimeState.operationGraphicsEditor.opacity = normalizeOperationGraphicOpacity(runtimeState.operationGraphicsEditor.opacity);
   runtimeState.operationGraphicsEditor.selectedVertexIndex = Math.max(-1, Number(runtimeState.operationGraphicsEditor.selectedVertexIndex) || -1);
 }
 
@@ -14364,7 +14368,7 @@ function ensureOperationalLineEditorState() {
   }
   runtimeState.operationalLineEditor.stroke = String(runtimeState.operationalLineEditor.stroke || "").trim();
   runtimeState.operationalLineEditor.width = Math.max(0, Math.min(16, Number(runtimeState.operationalLineEditor.width) || 0));
-  runtimeState.operationalLineEditor.opacity = Math.max(0, Math.min(1, Number(runtimeState.operationalLineEditor.opacity) || 1));
+  runtimeState.operationalLineEditor.opacity = normalizeOperationGraphicOpacity(runtimeState.operationalLineEditor.opacity);
   runtimeState.operationalLineEditor.selectedVertexIndex = Math.max(-1, Number(runtimeState.operationalLineEditor.selectedVertexIndex) || -1);
 }
 
@@ -14997,6 +15001,7 @@ const {
   handlePhysicalIntensityPointerDown,
   handlePhysicalIntensityPointerMove,
   handlePhysicalIntensityPointerEnd,
+  cancelPhysicalIntensitySession,
 } = composePhysicalIntensityInteractionOwner();
 
 function updateSpecialZoneEditorUI() {
@@ -15676,7 +15681,7 @@ function isBrushNavigationModifier(event) {
 function shouldAllowZoomEvent(event) {
   const type = String(event?.type || "").toLowerCase();
   if (type === "wheel") return true;
-  if (type.startsWith("touch")) return true;
+  if (type.startsWith("touch")) return getMapInteractionEventBindingOwner().shouldAllowTouchNavigation();
   if (event?.ctrlKey) return false;
   if (typeof event?.button === "number" && event.button !== 0) return false;
   if (runtimeState.specialZoneEditor?.active) return false;
@@ -15822,6 +15827,8 @@ function composeBrushInteractionSessionOwner() {
     refreshSidebarAfterPaint,
     requestRendererRender,
     flushBrushPatchPreview: flushScheduledBrushPatchPreview,
+    cancelBrushPatchPreview: cancelScheduledBrushPatchPreview,
+    refreshColorState,
     noteRenderAction,
     getHitFromEvent,
     getStrategicOverlayRuntimeOwner,
@@ -15839,6 +15846,8 @@ function composeBrushInteractionSessionOwner() {
 
 const {
   flushBrushSession,
+  cancelBrushSession,
+  handleBrushPointerEnd,
   flushSpecialZoneMembershipDragSession,
   handleBrushPointerDown,
   handleBrushPointerMove,

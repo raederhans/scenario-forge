@@ -49,7 +49,7 @@ import {
   ensurePaletteAssetsLoaded,
 } from "../core/palette_manager.js";
 import { FileManager } from "../core/file_manager.js";
-import { canUndoHistory, captureHistoryState, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
+import { captureHistoryState, getLatestHistoryEntry, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
 import {
   ensureActiveScenarioOptionalLayerLoaded,
@@ -58,6 +58,7 @@ import {
 } from "../core/scenario_resources.js";
 import { getDirectGeoLabel, getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
+import { setUiIcon } from "./ui_icons.js";
 import { showAppDialog } from "./app_dialog.js";
 import { initDevWorkspace } from "./dev_workspace.js";
 import { UI_URL_STATE_KEYS } from "./ui_contract.js";
@@ -96,6 +97,60 @@ import {
 } from "../core/unit_counter_presets.js";
 
 const state = runtimeState;
+export function createResponsiveSidebarCollapseController({ left, right, applyLeft, applyRight, getWidth }) {
+  const desktop = { left, right };
+  let current = { ...desktop };
+  let compact = false;
+  const isCompact = () => getWidth() >= 1024 && getWidth() < 1280;
+  const render = (persist = false) => {
+    applyLeft(current.left, { persist });
+    applyRight(current.right, { persist });
+  };
+  return {
+    sync() {
+      const nextCompact = isCompact();
+      if (nextCompact !== compact) {
+        current = { ...desktop };
+        if (nextCompact && !current.left && !current.right) current.right = true;
+      }
+      compact = nextCompact;
+      render();
+    },
+    set(side, collapsed) {
+      compact = isCompact();
+      current[side] = !!collapsed;
+      if (compact && !collapsed) current[side === "left" ? "right" : "left"] = true;
+      if (!compact) Object.assign(desktop, current);
+      render(!compact);
+    },
+  };
+}
+
+export function resetCountryColorsWithFeedback(afterReset, afterUndo) {
+  const previousEntry = getLatestHistoryEntry();
+  resetCountryColors();
+  const resetEntry = getLatestHistoryEntry();
+  const hasResetEntry = resetEntry && resetEntry !== previousEntry;
+  afterReset();
+  return showToast(t("Country colors were reset.", "ui"), {
+    title: t("Colors reset", "ui"),
+    tone: "warning",
+    duration: 7200,
+    actionLabel: hasResetEntry ? t("Undo", "ui") : "",
+    onAction: hasResetEntry ? () => {
+      if (getLatestHistoryEntry() !== resetEntry) {
+        showToast(t("Can't undo the reset because newer edits exist.", "ui"), { tone: "warning" });
+        return;
+      }
+      if (!undoHistory()) return;
+      afterUndo();
+      showToast(t("Country colors were restored.", "ui"), {
+        title: t("Undo applied", "ui"),
+        tone: "success",
+      });
+    } : null,
+  });
+}
 const translateCountryGeoLabel = (label, type = "ui") => (
   type === "geo" ? getDirectGeoLabel(label) : t(label, type)
 );
@@ -1936,6 +1991,9 @@ function initSidebar({ render } = {}) {
     .filter((details) => details.open && !details.hidden && !details.closest(".editor-property-panel[hidden]"))
     .map((details) => details.id)
     .join(",");
+  // 当前右栏属性面板（editor workspace 的 onNavigate 回报）。参考底图已从弹层改为图层属性，
+  // 它不是 details，靠这个标记把 view=reference 写进 URL，刷新/分享链接才能恢复。
+  let activeEditorPropertyKey = "";
   const syncRightSidebarUrlState = () => {
     // 右侧栏 URL 状态只记录“当前标签页 + 展开的 section + support view”，
     // 不记录更细的局部表单状态，避免刷新链接过长也避免 restore 语义失真。
@@ -1948,7 +2006,9 @@ function initSidebar({ render } = {}) {
       } else {
         params.delete(UI_URL_STATE_KEYS.section);
       }
-      if (scopeValue !== "current-project") {
+      if (activeEditorPropertyKey === "reference") {
+        params.set(UI_URL_STATE_KEYS.view, "reference");
+      } else if (scopeValue !== "current-project") {
         params.delete(UI_URL_STATE_KEYS.view);
       }
     });
@@ -2334,6 +2394,10 @@ function initSidebar({ render } = {}) {
   const rightSidebarCollapseMedia = typeof globalThis.matchMedia === "function"
     ? globalThis.matchMedia("(min-width: 1024px)")
     : null;
+  const compactSidebarMedia = typeof globalThis.matchMedia === "function"
+    ? globalThis.matchMedia("(min-width: 1024px) and (max-width: 1279px)")
+    : null;
+  let responsiveSidebarCollapse = null;
   const SIDEBAR_LAYOUT_START_EVENT = "mapcreator:sidebar-layout-start";
   const SIDEBAR_LAYOUT_REFRESH_EVENT = "mapcreator:sidebar-layout-refresh";
   const SIDEBAR_LAYOUT_REFRESH_DELAY_MS = 280;
@@ -2381,7 +2445,11 @@ function initSidebar({ render } = {}) {
     }, SIDEBAR_LAYOUT_REFRESH_DELAY_MS);
   };
 
-  const setLeftSidebarCollapsed = (collapsed, { persist = true, refreshLayout = true } = {}) => {
+  const setLeftSidebarCollapsed = (collapsed, { persist = true, refreshLayout = true, linked = true } = {}) => {
+    if (responsiveSidebarCollapse && linked) {
+      responsiveSidebarCollapse.set("left", collapsed);
+      return;
+    }
     leftSidebarCollapsePreference = !!collapsed;
     const effectiveCollapsed = leftSidebarCollapsePreference && canCollapseLeftSidebar();
     document.body.classList.toggle("left-sidebar-collapsed", effectiveCollapsed);
@@ -2393,7 +2461,7 @@ function initSidebar({ render } = {}) {
     leftSidebarCollapseBtn?.setAttribute("data-i18n-aria-label", nextSidebarLabel);
     leftSidebarCollapseBtn?.setAttribute("aria-label", t(nextSidebarLabel, "ui"));
     if (leftSidebarCollapseIcon) {
-      leftSidebarCollapseIcon.textContent = effectiveCollapsed ? ">" : "<";
+      setUiIcon(leftSidebarCollapseIcon, effectiveCollapsed ? "chevron-right" : "chevron-left");
     }
     if (persist) {
       try {
@@ -2408,7 +2476,11 @@ function initSidebar({ render } = {}) {
     }
   };
 
-  const setRightSidebarCollapsed = (collapsed, { persist = true, refreshLayout = true } = {}) => {
+  const setRightSidebarCollapsed = (collapsed, { persist = true, refreshLayout = true, linked = true } = {}) => {
+    if (responsiveSidebarCollapse && linked) {
+      responsiveSidebarCollapse.set("right", collapsed);
+      return;
+    }
     rightSidebarCollapsePreference = !!collapsed;
     const effectiveCollapsed = rightSidebarCollapsePreference && canCollapseRightSidebar();
     document.body.classList.toggle("right-sidebar-collapsed", effectiveCollapsed);
@@ -2423,7 +2495,7 @@ function initSidebar({ render } = {}) {
     rightSidebarCollapseBtn?.setAttribute("data-i18n-aria-label", nextSidebarLabel);
     rightSidebarCollapseBtn?.setAttribute("aria-label", t(nextSidebarLabel, "ui"));
     if (rightSidebarCollapseIcon) {
-      rightSidebarCollapseIcon.textContent = effectiveCollapsed ? "<" : ">";
+      setUiIcon(rightSidebarCollapseIcon, effectiveCollapsed ? "chevron-left" : "chevron-right");
     }
     if (persist) {
       try {
@@ -2448,7 +2520,7 @@ function initSidebar({ render } = {}) {
   };
 
   const restoreRightSidebarCollapsedState = () => {
-    rightSidebarCollapsePreference = globalThis.matchMedia("(min-width:1024px) and (max-width:1279px)").matches;
+    rightSidebarCollapsePreference = false;
     try {
       const saved = globalThis.localStorage?.getItem(RIGHT_SIDEBAR_COLLAPSED_KEY);
       if (saved !== null && saved !== undefined) rightSidebarCollapsePreference = saved === "true";
@@ -2458,11 +2530,11 @@ function initSidebar({ render } = {}) {
   };
 
   const syncLeftSidebarCollapsedMedia = () => {
-    setLeftSidebarCollapsed(leftSidebarCollapsePreference, { persist: false });
+    responsiveSidebarCollapse.sync();
   };
 
   const syncRightSidebarCollapsedMedia = () => {
-    setRightSidebarCollapsed(rightSidebarCollapsePreference, { persist: false });
+    responsiveSidebarCollapse.sync();
   };
 
 
@@ -3872,6 +3944,15 @@ function initSidebar({ render } = {}) {
   refreshStrategicOverlayUI();
   restoreLeftSidebarCollapsedState();
   restoreRightSidebarCollapsedState();
+  responsiveSidebarCollapse = createResponsiveSidebarCollapseController({
+    left: leftSidebarCollapsePreference,
+    right: rightSidebarCollapsePreference,
+    applyLeft: (collapsed, options) => setLeftSidebarCollapsed(collapsed, { ...options, linked: false }),
+    applyRight: (collapsed, options) => setRightSidebarCollapsed(collapsed, { ...options, linked: false }),
+    getWidth: () => globalThis.innerWidth,
+  });
+  responsiveSidebarCollapse.sync();
+  compactSidebarMedia?.addEventListener?.("change", () => responsiveSidebarCollapse.sync());
 
   if (leftSidebarCollapseBtn && !leftSidebarCollapseBtn.dataset.bound) {
     leftSidebarCollapseBtn.addEventListener("click", () => {
@@ -3960,27 +4041,12 @@ function initSidebar({ render } = {}) {
         tone: "warning",
       });
       if (!confirmed) return;
-      resetCountryColors();
-      markDirty("reset-country-colors");
-      callRuntimeHook(state, "renderCountryListFn");
-      flushSidebarRender("sidebar-reset-country-colors");
-      scheduleAdaptiveInspectorHeights();
-      showToast(t("Country colors were reset.", "ui"), {
-        title: t("Colors reset", "ui"),
-        tone: "warning",
-        duration: 7200,
-        actionLabel: canUndoHistory() ? t("Undo", "ui") : "",
-        onAction: canUndoHistory()
-          ? async () => {
-            if (!undoHistory()) return;
-            scheduleAdaptiveInspectorHeights();
-            showToast(t("Country colors were restored.", "ui"), {
-              title: t("Undo applied", "ui"),
-              tone: "success",
-            });
-          }
-          : null,
-      });
+      resetCountryColorsWithFeedback(() => {
+        markDirty("reset-country-colors");
+        callRuntimeHook(state, "renderCountryListFn");
+        flushSidebarRender("sidebar-reset-country-colors");
+        scheduleAdaptiveInspectorHeights();
+      }, scheduleAdaptiveInspectorHeights);
     });
     resetBtn.dataset.bound = "true";
   }
@@ -4006,7 +4072,8 @@ function initSidebar({ render } = {}) {
       }
     },
     t,
-    onNavigate: () => {
+    onNavigate: (key) => {
+      activeEditorPropertyKey = String(key || "");
       // Manual context navigation consumes the current selection snapshot so a
       // delayed list refresh cannot take the inspector back to an older choice.
       for (const [kind, field] of Object.entries(selectionFields)) {

@@ -8,12 +8,57 @@ from pathlib import Path
 
 from tools.i18n_audit import build_localization_ownership_audit, collect_code_strings
 from tools.pages_artifact_root import resolve_pages_artifact_root
+from tools.translate_manager import load_ui_copy_catalog_translations, sync_ui_translations
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PAGES_DIST_ROOT = resolve_pages_artifact_root(repo_root=REPO_ROOT)
 
 
 class I18nAuditTest(unittest.TestCase):
+    def test_catalog_reader_accepts_quoted_fields_and_multiline_trailing_commas(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            self._write_repo_file(root, "js/core/i18n_catalog.js", '''
+export const UI_COPY_CATALOG = Object.freeze({
+  "Quoted": {"zh": "引号字段", "en": "Quoted"},
+  "Multiline": {
+    zh: "多行字段",
+    en: "Multiline",
+  },
+  "Escaped": { zh: "带引号\\\"的字段", en: "Escaped" },
+});
+''')
+            translations = load_ui_copy_catalog_translations(root)
+            self.assertEqual(translations["Quoted"], "引号字段")
+            self.assertEqual(translations["Multiline"], "多行字段")
+            self.assertEqual(translations["Escaped"], '带引号"的字段')
+
+    def test_ui_only_sync_preserves_geo_and_metadata_and_is_repeatable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            self._write_repo_file(root, "js/core/i18n_catalog.js", '''
+export const UI_COPY_CATALOG = Object.freeze({
+  "Fixture UI": {"zh": "界面测试词条", "en": "Fixture UI"},
+});
+''')
+            self._write_repo_file(root, "index.html", '<span data-i18n="Fixture UI"></span>')
+            path = root / "data/locales.json"
+            self._write_repo_json(root, "data/locales.json", {
+                "metadata": {"preserved": True},
+                "geo": {"Place": {"en": "Place", "zh": "地点"}},
+                "ui": {"Existing": {"en": "Existing", "zh": "已有词条"}},
+            })
+            sync_ui_translations(path, root)
+            first = path.read_text(encoding="utf-8")
+            payload = json.loads(first)
+            self.assertEqual(payload["geo"], {"Place": {"en": "Place", "zh": "地点"}})
+            self.assertEqual(payload["metadata"], {"preserved": True})
+            self.assertEqual(payload["ui"]["Fixture UI"]["zh"], "界面测试词条")
+            self.assertEqual(payload["ui"]["Existing"]["zh"], "已有词条")
+            self.assertEqual(payload["ui"]["Backend"]["zh"], "渲染后端")
+            sync_ui_translations(path, root)
+            self.assertEqual(path.read_text(encoding="utf-8"), first)
+
     def _write_repo_file(self, repo_root: Path, relative_path: str, content: str) -> None:
         path = repo_root / relative_path
         path.parent.mkdir(parents=True, exist_ok=True)

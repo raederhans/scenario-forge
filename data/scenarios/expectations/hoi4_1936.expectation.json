@@ -25,16 +25,6 @@
       "equals": "GB"
     },
     {
-      "tag": "ADN",
-      "field": "parent_owner_tag",
-      "equals": "RAJ"
-    },
-    {
-      "tag": "BRM",
-      "field": "parent_owner_tag",
-      "equals": "RAJ"
-    },
-    {
       "tag": "SEY",
       "field": "parent_owner_tag",
       "equals": "ENG"
@@ -68,13 +58,158 @@
       "tag": "CHE",
       "field": "subject_kind",
       "equals": "autonomous_oblast"
+    },
+    {
+      "tag": "SHA",
+      "field": "parent_owner_tag",
+      "equals": "RAJ"
+    },
+    {
+      "tag": "SHA",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "KRN",
+      "field": "parent_owner_tag",
+      "equals": "RAJ"
+    },
+    {
+      "tag": "KRN",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "BEI",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "BEI",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "STR",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "STR",
+      "field": "subject_kind",
+      "equals": "colony"
+    },
+    {
+      "tag": "MAL",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "MAL",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "BHU",
+      "field": "parent_owner_tag",
+      "equals": "RAJ"
+    },
+    {
+      "tag": "BHU",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "FND",
+      "field": "parent_owner_tag",
+      "equals": "FRA"
+    },
+    {
+      "tag": "FND",
+      "field": "subject_kind",
+      "equals": "colony"
+    },
+    {
+      "tag": "GOA",
+      "field": "parent_owner_tag",
+      "equals": "POR"
+    },
+    {
+      "tag": "GOA",
+      "field": "subject_kind",
+      "equals": "colony"
+    },
+    {
+      "tag": "CEY",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "CEY",
+      "field": "subject_kind",
+      "equals": "colony"
+    },
+    {
+      "tag": "YOG",
+      "field": "parent_owner_tag",
+      "equals": "HOL"
+    },
+    {
+      "tag": "YOG",
+      "field": "subject_kind",
+      "equals": "princely_state"
+    },
+    {
+      "tag": "DUB",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "IMO",
+      "field": "parent_owner_tag",
+      "equals": "OMA"
+    },
+    {
+      "tag": "ALW",
+      "field": "parent_owner_tag",
+      "equals": "FRA"
+    },
+    {
+      "tag": "JEB",
+      "field": "parent_owner_tag",
+      "equals": "FRA"
+    },
+    {
+      "tag": "WDN",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "EDN",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "LOL",
+      "field": "parent_owner_tag",
+      "equals": "CHU"
+    },
+    {
+      "tag": "MUL",
+      "field": "parent_owner_tag",
+      "equals": "CHU"
+    },
+    {
+      "tag": "KRF",
+      "field": "parent_owner_tag",
+      "equals": "JAP"
     }
   ],
   "summary_equals": {
     "blocker_count": 0,
-    "owner_count": 235,
-    "controller_count": 235,
-    "feature_count": 21078
+    "owner_count": 282,
+    "controller_count": 282,
+    "feature_count": 21091
   },
   "summary_min": {
     "feature_count": 10000,
@@ -93,7 +228,7 @@
   "owner_set_assertions": [
     {
       "name": "aden_separate_administration",
-      "expected_owner_tag": "ADN",
+      "expected_owner_tag": "RAJ",
       "feature_ids": [
         "YEM-3510"
       ]
@@ -289,7 +424,7 @@
     },
     {
       "name": "geometry_karafuto",
-      "expected_owner_tag": "JAP",
+      "expected_owner_tag": "KRF",
       "feature_ids": [
         "RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO"
       ]
@@ -348,6 +483,335 @@
       "feature_ids": [
         "CN_CITY_17275852B83272093468807__SPLIT_REST"
       ]
+    },
+    {
+      "name": "city_Hyderabad",
+      "expected_owner_tag": "HYD",
+      "feature_ids": [
+        "IN_ADM2_76128533B84676164211579"
+      ]
+    },
+    {
+      "name": "city_Mysore",
+      "expected_owner_tag": "MYS",
+      "feature_ids": [
+        "IN_ADM2_76128533B95879808095476"
+      ]
+    },
+    {
+      "name": "city_Travancore",
+      "expected_owner_tag": "TVC",
+      "feature_ids": [
+        "IN_ADM2_76128533B33162455176756"
+      ]
+    },
+    {
+      "name": "city_Srinagar",
+      "expected_owner_tag": "KAS",
+      "feature_ids": [
+        "IN_ADM2_76128533B32249045995424"
+      ]
+    },
+    {
+      "name": "city_Singapore",
+      "expected_owner_tag": "STR",
+      "feature_ids": [
+        "SGP-4871"
+      ]
+    },
+    {
+      "name": "city_Kuala_Lumpur",
+      "expected_owner_tag": "MAL",
+      "feature_ids": [
+        "MYS-4831"
+      ]
+    },
+    {
+      "name": "city_Yangon",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "MMR-3269"
+      ]
+    },
+    {
+      "name": "city_Taunggyi",
+      "expected_owner_tag": "SHA",
+      "feature_ids": [
+        "MMR-3277"
+      ]
+    },
+    {
+      "name": "city_Loikaw",
+      "expected_owner_tag": "KRN",
+      "feature_ids": [
+        "MMR-2473"
+      ]
+    },
+    {
+      "name": "city_Jaipur",
+      "expected_owner_tag": "IRA",
+      "feature_ids": [
+        "IN_ADM2_76128533B28755611410447"
+      ]
+    },
+    {
+      "name": "city_Vadodara",
+      "expected_owner_tag": "BDA",
+      "feature_ids": [
+        "IN_ADM2_76128533B33151011563565"
+      ]
+    },
+    {
+      "name": "city_Bhopal",
+      "expected_owner_tag": "BPL",
+      "feature_ids": [
+        "IN_ADM2_76128533B22439249004073"
+      ]
+    },
+    {
+      "name": "city_Gwalior",
+      "expected_owner_tag": "GWA",
+      "feature_ids": [
+        "IN_ADM2_76128533B90551733723251"
+      ]
+    },
+    {
+      "name": "city_Indore",
+      "expected_owner_tag": "INR",
+      "feature_ids": [
+        "IN_ADM2_76128533B60360721573267"
+      ]
+    },
+    {
+      "name": "city_Mumbai",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "IN_ADM2_76128533B67326016655833"
+      ]
+    },
+    {
+      "name": "city_Nagpur",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "IN_ADM2_76128533B3026318797185"
+      ]
+    },
+    {
+      "name": "city_New_Delhi",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "IN_ADM2_76128533B58262202014972"
+      ]
+    },
+    {
+      "name": "city_Madikeri",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "IN_MRG_20e0c11ac976__SPLIT_REST"
+      ]
+    },
+    {
+      "name": "city_Bahawalpur",
+      "expected_owner_tag": "BHW",
+      "feature_ids": [
+        "PAK-1113__SPLIT_BAHAWALPUR"
+      ]
+    },
+    {
+      "name": "city_Khairpur",
+      "expected_owner_tag": "KPU",
+      "feature_ids": [
+        "PAK-1114__SPLIT_KHAIRPUR"
+      ]
+    },
+    {
+      "name": "city_Quetta",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "PAK-1108__SPLIT_REST"
+      ]
+    },
+    {
+      "name": "city_Peshawar",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "PAK-1123__SPLIT_REST"
+      ]
+    },
+    {
+      "name": "city_Yogyakarta",
+      "expected_owner_tag": "YOG",
+      "feature_ids": [
+        "ID_ADM1_65028918B6070530336190"
+      ]
+    },
+    {
+      "name": "city_Olongapo",
+      "expected_owner_tag": "USA",
+      "feature_ids": [
+        "PHL-5540"
+      ]
+    },
+    {
+      "name": "straits_indian_ocean_dependencies",
+      "expected_owner_tag": "STR",
+      "feature_ids": [
+        "AU_REMOTE_INDIAN_OCEAN_TERRITORIES"
+      ]
+    },
+    {
+      "name": "city_Algiers",
+      "expected_owner_tag": "FRA",
+      "feature_ids": [
+        "DZA-2195"
+      ]
+    },
+    {
+      "name": "city_Tamanrasset",
+      "expected_owner_tag": "ALG",
+      "feature_ids": [
+        "DZA-2189"
+      ]
+    },
+    {
+      "name": "city_Tripoli",
+      "expected_owner_tag": "LBA",
+      "feature_ids": [
+        "LBY-2978"
+      ]
+    },
+    {
+      "name": "city_Kufra",
+      "expected_owner_tag": "LBA",
+      "feature_ids": [
+        "LBY-2965"
+      ]
+    },
+    {
+      "name": "city_Muscat",
+      "expected_owner_tag": "OMA",
+      "feature_ids": [
+        "OMN-2426"
+      ]
+    },
+    {
+      "name": "city_Nizwa",
+      "expected_owner_tag": "IMO",
+      "feature_ids": [
+        "OMN-2404"
+      ]
+    },
+    {
+      "name": "city_Dubai",
+      "expected_owner_tag": "DUB",
+      "feature_ids": [
+        "ARE-350"
+      ]
+    },
+    {
+      "name": "city_Kuwait",
+      "expected_owner_tag": "KUW",
+      "feature_ids": [
+        "KWT-1663"
+      ]
+    },
+    {
+      "name": "city_Aden",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "YEM-3510"
+      ]
+    },
+    {
+      "name": "city_Xichang",
+      "expected_owner_tag": "CHU",
+      "feature_ids": [
+        "CN_CITY_17275852B35342422356290"
+      ]
+    },
+    {
+      "name": "city_Huili",
+      "expected_owner_tag": "CHU",
+      "feature_ids": [
+        "CN_CITY_17275852B90257281612339"
+      ]
+    },
+    {
+      "name": "city_Muli",
+      "expected_owner_tag": "MUL",
+      "feature_ids": [
+        "CN_CITY_17275852B80219081988604"
+      ]
+    },
+    {
+      "name": "city_Meigu",
+      "expected_owner_tag": "LOL",
+      "feature_ids": [
+        "CN_CITY_17275852B23024603415445"
+      ]
+    },
+    {
+      "name": "city_Barkam",
+      "expected_owner_tag": "CHU",
+      "feature_ids": [
+        "CN_CITY_17275852B24790182027849"
+      ]
+    },
+    {
+      "name": "city_Lahij",
+      "expected_owner_tag": "WDN",
+      "feature_ids": [
+        "YEM-157"
+      ]
+    },
+    {
+      "name": "city_Mukalla",
+      "expected_owner_tag": "EDN",
+      "feature_ids": [
+        "YEM-3497"
+      ]
+    },
+    {
+      "name": "city_Latakia",
+      "expected_owner_tag": "ALW",
+      "feature_ids": [
+        "SYR-134"
+      ]
+    },
+    {
+      "name": "city_Suwayda",
+      "expected_owner_tag": "JEB",
+      "feature_ids": [
+        "SYR-143"
+      ]
+    },
+    {
+      "name": "city_Hasakah",
+      "expected_owner_tag": "SYR",
+      "feature_ids": [
+        "SYR-141"
+      ]
+    },
+    {
+      "name": "city_Antakya",
+      "expected_owner_tag": "HTY",
+      "feature_ids": [
+        "TR631"
+      ]
+    },
+    {
+      "name": "city_Benghazi",
+      "expected_owner_tag": "LBA",
+      "feature_ids": [
+        "LBY-2984"
+      ]
     }
+  ],
+  "forbidden_country_tags": [
+    "KSH",
+    "MYR",
+    "TRV",
+    "BRU",
+    "BRM"
   ]
 }

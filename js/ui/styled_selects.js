@@ -150,8 +150,7 @@ function closeActiveSurface(nextSurface = null) {
   }
 }
 
-function focusSelectedOption(surface) {
-  const options = getVisibleOptions(surface);
+export function focusSelectedSelectOption(options) {
   const selected = options.find((option) => option.classList.contains("is-selected"));
   const first = options[0];
   (selected || first)?.focus();
@@ -193,7 +192,7 @@ function openSurface(surface) {
   surface.button.setAttribute("aria-expanded", "true");
   activeSurface = surface;
   if (!surface.search.hidden) surface.search.focus();
-  else focusSelectedOption(surface);
+  else focusSelectedSelectOption(getVisibleOptions(surface));
 }
 
 function toggleSurface(surface) {
@@ -206,14 +205,49 @@ function toggleSurface(surface) {
   openSurface(surface);
 }
 
-function moveOptionFocus(surface, direction) {
-  const options = getVisibleOptions(surface);
-  if (!options.length) return;
-  const currentIndex = options.indexOf(document.activeElement);
-  const nextIndex = currentIndex < 0
-    ? (direction > 0 ? 0 : options.length - 1)
-    : (currentIndex + direction + options.length) % options.length;
-  options[nextIndex]?.focus();
+export function bindSelectKeyboard({ button, menu, getOptions, open, close, search, onSearch }, eventOptions) {
+  button.addEventListener("keydown", (event) => {
+    if (button.disabled) return;
+    if (["Enter", " ", "ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+      event.preventDefault();
+      open();
+      if (event.key === "Home") getOptions()[0]?.focus();
+      if (event.key === "End") getOptions().at(-1)?.focus();
+    } else if (event.key === "Escape" && !menu.hidden && !menu.classList.contains("hidden")) {
+      event.preventDefault();
+      close({ restoreFocus: true });
+    }
+  }, eventOptions);
+  menu.addEventListener("keydown", (event) => {
+    const options = getOptions();
+    if (event.key === "Escape") {
+      event.preventDefault();
+      close({ restoreFocus: true });
+    } else if (event.key === "Enter" || (event.key === " " && event.target !== search)) {
+      event.preventDefault();
+      const option = event.target === search ? options[0] : options.find((item) => item === event.target);
+      option?.click();
+    } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const direction = event.key === "ArrowDown" ? 1 : -1;
+      const currentIndex = options.indexOf(button.ownerDocument.activeElement);
+      const nextIndex = currentIndex < 0
+        ? (direction > 0 ? 0 : options.length - 1)
+        : (currentIndex + direction + options.length) % options.length;
+      options[nextIndex]?.focus();
+    } else if (event.key === "Home" || event.key === "End") {
+      event.preventDefault();
+      (event.key === "Home" ? options[0] : options.at(-1))?.focus();
+    } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey
+      && search && !search.hidden && event.target !== search) {
+      event.preventDefault();
+      search.value += event.key;
+      onSearch();
+      search.focus();
+    } else if (event.key === "Tab") {
+      close({ restoreFocus: true });
+    }
+  }, eventOptions);
 }
 
 function selectOption(surface, value) {
@@ -247,6 +281,7 @@ function syncSurface(select) {
   const labelKey = getSelectLabelTranslationKey(select);
   setAttributeIfChanged(surface.button, "data-i18n-aria-label", labelKey || null);
   setAttributeIfChanged(surface.button, "aria-label", labelKey ? t(labelKey, "ui") : getSelectLabel(select));
+  setPropertyIfChanged(surface.fieldName, "textContent", surface.button.getAttribute("aria-label"));
   const options = Array.from(select.options || []);
   setPropertyIfChanged(surface.search, "hidden", options.filter((option) => !option.disabled && !option.parentElement?.disabled).length < SEARCH_OPTION_THRESHOLD);
   const searchLabel = t("Search options", "ui");
@@ -336,6 +371,11 @@ function enhanceSelect(select) {
   button.setAttribute("aria-expanded", "false");
   const text = document.createElement("span");
   text.className = "app-select-text u-truncate";
+  text.id = `${idBase}Value`;
+  const fieldName = document.createElement("span");
+  fieldName.id = `${idBase}Label`;
+  fieldName.hidden = true;
+  button.setAttribute("aria-labelledby", `${fieldName.id} ${text.id}`);
   const chevron = document.createElement("span");
   chevron.className = "app-select-chevron";
   chevron.setAttribute("aria-hidden", "true");
@@ -355,6 +395,7 @@ function enhanceSelect(select) {
   list.id = `${idBase}List`;
   list.className = "app-select-list";
   list.setAttribute("role", "listbox");
+  list.setAttribute("aria-labelledby", fieldName.id);
   const noMatches = document.createElement("div");
   noMatches.className = "app-select-no-matches";
   noMatches.setAttribute("role", "status");
@@ -363,60 +404,24 @@ function enhanceSelect(select) {
   button.setAttribute("aria-controls", list.id);
 
   select.parentNode.insertBefore(shell, select);
-  shell.append(select, button, menu);
+  shell.append(select, button, menu, fieldName);
   select.dataset.appSelectEnhanced = "true";
   select.classList.add("app-select-native");
   // 原生 select 留在 DOM 内负责表单值和事件合同，视觉和键盘入口交给 app-select-button。
   select.setAttribute("aria-hidden", "true");
   select.tabIndex = -1;
 
-  const surface = { idBase, select, shell, button, text, menu, search, list, noMatches };
+  const surface = { idBase, select, shell, button, text, fieldName, menu, search, list, noMatches };
   surfaces.set(select, surface);
 
   button.addEventListener("click", () => toggleSurface(surface));
   search.addEventListener("input", () => filterSurfaceOptions(surface));
-  button.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " " || event.key === "ArrowDown") {
-      event.preventDefault();
-      openSurface(surface);
-    } else if (event.key === "ArrowUp") {
-      event.preventDefault();
-      openSurface(surface);
-      moveOptionFocus(surface, -1);
-    } else if (event.key === "Escape") {
-      closeSurface(surface);
-    }
-  });
-  menu.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeSurface(surface, { restoreFocus: true });
-    } else if (event.key === "Enter" && event.target === surface.search) {
-      event.preventDefault();
-      const first = getVisibleOptions(surface)[0];
-      if (first) selectOption(surface, first.dataset.value);
-    } else if (event.key === "ArrowDown") {
-      event.preventDefault();
-      moveOptionFocus(surface, 1);
-    } else if (event.key === "ArrowUp") {
-      event.preventDefault();
-      moveOptionFocus(surface, -1);
-    } else if (event.key === "Home") {
-      event.preventDefault();
-      getVisibleOptions(surface)[0]?.focus();
-    } else if (event.key === "End") {
-      event.preventDefault();
-      const options = getVisibleOptions(surface);
-      options[options.length - 1]?.focus();
-    } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey
-      && !surface.search.hidden && event.target !== surface.search) {
-      event.preventDefault();
-      surface.search.value += event.key;
-      filterSurfaceOptions(surface);
-      surface.search.focus();
-    } else if (event.key === "Tab") {
-      closeSurface(surface);
-    }
+  bindSelectKeyboard({
+    button, menu, search,
+    getOptions: () => getVisibleOptions(surface),
+    open: () => openSurface(surface),
+    close: (options) => closeSurface(surface, options),
+    onSearch: () => filterSurfaceOptions(surface),
   });
   select.addEventListener("change", () => syncSurface(select));
 

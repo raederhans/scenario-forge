@@ -3,7 +3,7 @@ import { callRuntimeHook } from "./state/index.js";
 import { clearDirtyState, markDirtyState } from "./state/actions/ui_dirty_actions.js";
 
 function updateDirtyIndicator() {
-  const indicator = document.getElementById("appDirtyIndicator");
+  const indicator = globalThis.document?.getElementById?.("appDirtyIndicator");
   if (indicator) {
     indicator.classList.toggle("hidden", !runtimeState.isDirty);
     indicator.setAttribute("aria-hidden", runtimeState.isDirty ? "false" : "true");

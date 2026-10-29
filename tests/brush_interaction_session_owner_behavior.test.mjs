@@ -28,7 +28,7 @@ function harness({ flushBrushPatchPreview = null } = {}) {
     blockStartupReadonlyInteraction: record("readonly"),
     handlePhysicalIntensityPointerDown: () => { calls.push(["physical-down"]); return modes.physical; },
     handlePhysicalIntensityPointerMove: () => { calls.push(["physical-move"]); return modes.physical; },
-    isBrushNavigationModifier: (event) => !!event.ctrlKey,
+    isBrushNavigationModifier: (event) => !!event.shiftKey,
     applyBrushHit: (hit) => {
       calls.push(["apply", hit]);
       if (modes.changed) { session.changed = true; session.affectedFeatureIds.add(hit.id); session.before = { colors: { a: "old" } }; }
@@ -138,7 +138,18 @@ test("brush guards navigation, disabled state, eyedropper and special editor", (
     const h = harness(); Object.assign(h.state, setting);
     h.owner.handleBrushPointerDown(h.event()); assert.equal(h.getSession(), null);
   }
-  const h = harness(); h.owner.handleBrushPointerDown({ ...h.event(), ctrlKey: true });
+  const h = harness(); h.owner.handleBrushPointerDown({ ...h.event(), shiftKey: true });
   assert.equal(h.getSession(), null);
   h.owner.handleBrushPointerDown(h.event(0, 0)); assert.equal(h.getSession(), null);
+});
+
+test("mouse Shift-drag and middle/right buttons do not start brush strokes", () => {
+  for (const eventPatch of [{ shiftKey: true }, { buttons: 2 }, { buttons: 4 }]) {
+    const h = harness();
+    h.owner.handleBrushPointerDown({ ...h.event(), ...eventPatch });
+    h.owner.handleBrushPointerMove({ ...h.event(20), ...eventPatch });
+    h.owner.flushBrushSession();
+    assert.equal(h.getSession(), null);
+    assert.equal(h.calls.filter(([name]) => name === "apply" || name === "history").length, 0);
+  }
 });

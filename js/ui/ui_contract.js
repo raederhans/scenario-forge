@@ -148,14 +148,54 @@ const UI_DENSITY_CONTRACT = Object.freeze({
   tight: Object.freeze(["local-list", "local-tool-group", "micro-control", "pro-workspace-core"]),
 });
 
+function isSurfaceVisible(element) {
+  for (let node = element; node; node = node.parentElement) {
+    if (node.hidden || node.inert || node.hasAttribute("inert") || node.getAttribute("aria-hidden") === "true") return false;
+    const style = globalThis.getComputedStyle?.(node);
+    if (style?.display === "none" || style?.visibility === "hidden") return false;
+    if (node.tagName === "DETAILS" && !node.open && node !== element) {
+      const summary = Array.from(node.children).find((child) => child.tagName === "SUMMARY");
+      if (!summary?.contains(element)) return false;
+    }
+  }
+  return true;
+}
+
+function getSurfaceLayer(element) {
+  let layer = 0;
+  for (let node = element; node; node = node.parentElement) {
+    layer = Math.max(layer, Number.parseInt(globalThis.getComputedStyle?.(node)?.zIndex, 10) || 0);
+  }
+  return layer;
+}
+
+function getActiveModal(doc = document) {
+  return Array.from(doc.querySelectorAll('[aria-modal="true"]'))
+    .filter(isSurfaceVisible)
+    .sort((a, b) => getSurfaceLayer(a) - getSurfaceLayer(b))
+    .at(-1) || null;
+}
+
+function trapSurfaceTab(event, container) {
+  if (event.key !== "Tab") return;
+  const focusables = getFocusableElements(container);
+  const active = container.ownerDocument.activeElement;
+  if (!focusables.length) {
+    event.preventDefault();
+    focusSurface(container);
+  } else if (!focusables.includes(active) || (event.shiftKey ? active === focusables[0] : active === focusables.at(-1))) {
+    event.preventDefault();
+    (event.shiftKey ? focusables.at(-1) : focusables[0]).focus({ preventScroll: true });
+  }
+}
+
 function getFocusableElements(container) {
   if (!(container instanceof HTMLElement)) return [];
   return Array.from(container.querySelectorAll(
-    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])'
   )).filter((element) => (
     element instanceof HTMLElement
-    && !element.hidden
-    && element.getAttribute("aria-hidden") !== "true"
+    && isSurfaceVisible(element)
     && element.tabIndex >= 0
   ));
 }
@@ -178,11 +218,17 @@ function captureFocusOrigin(doc = document) {
   return doc?.activeElement instanceof HTMLElement ? doc.activeElement : null;
 }
 
-function restoreFocusOrigin(element) {
-  if (element instanceof HTMLElement && document.contains(element)) {
-    element.focus({ preventScroll: true });
-  }
-  return element instanceof HTMLElement ? element : null;
+function isUsableFocusTarget(element) {
+  return element instanceof HTMLElement
+    && element.ownerDocument.contains(element)
+    && !element.disabled
+    && isSurfaceVisible(element);
+}
+
+function restoreFocusOrigin(element, fallback = null) {
+  const target = isUsableFocusTarget(element) ? element : (isUsableFocusTarget(fallback) ? fallback : null);
+  target?.focus({ preventScroll: true });
+  return target;
 }
 
 function applyDialogContract(
@@ -230,14 +276,11 @@ function rememberSurfaceTrigger(registry, surface, trigger) {
   registry.set(surface, trigger);
 }
 
-function restoreSurfaceTriggerFocus(registry, surface, explicitTrigger = null) {
+function restoreSurfaceTriggerFocus(registry, surface, explicitTrigger = null, fallback = null) {
   const target = explicitTrigger instanceof HTMLElement
     ? explicitTrigger
     : (registry instanceof WeakMap && surface instanceof HTMLElement ? registry.get(surface) : null);
-  if (target && typeof target.focus === "function") {
-    target.focus({ preventScroll: true });
-  }
-  return target || null;
+  return restoreFocusOrigin(target, fallback);
 }
 
 function getUiContractSnapshot() {
@@ -308,6 +351,8 @@ export {
   createFocusReturnRegistry,
   focusSurface,
   getFocusableElements,
+  getActiveModal,
+  trapSurfaceTab,
   getUiContractSnapshot,
   rememberSurfaceTrigger,
   restoreFocusOrigin,

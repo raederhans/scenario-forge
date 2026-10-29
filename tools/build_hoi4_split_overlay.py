@@ -137,19 +137,14 @@ add("uganda", B, "UGA", "Uganda", "乌干达", CC("UG"), parent="ENG", kind="pro
 add("tanganyika", B, "TGN", "Tanganyika", "坦噶尼喀", CC("TZ"), parent="ENG", kind="mandate", only=["BEA"],
     exclude=HG(*ZANZIBAR))
 add("zanzibar", B, "ZAN", "Zanzibar", "桑给巴尔", HG(*ZANZIBAR), parent="ENG", kind="protectorate", only=["BEA"])
-for id, tag, en, zh, groups in [("hyderabad", "HYD", "Hyderabad", "海得拉巴", ["IN_Telangana"]),
-                                ("kashmir", "KSH", "Jammu and Kashmir", "查谟和克什米尔", ["IN_Jammu_and_Kashmir", "IN_Ladakh"]),
-                                ("mysore", "MYR", "Mysore", "迈索尔", ["IN_Karnataka"]),
-                                ("travancore", "TRV", "Travancore", "特拉凡哥尔", ["IN_Kerala"]),
-                                ("sikkim", "SKM", "Sikkim", "锡金", ["IN_Sikkim"])]:
-    add(id, B, tag, en, zh, HG(*groups), parent="RAJ", kind="protectorate", only=["RAJ"],
-        notes="Princely state approximated by the modern state; not a historical boundary.")
+add("sikkim", B, "SKM", "Sikkim", "锡金", HG("IN_Sikkim"),
+    parent="RAJ", kind="protectorate", only=["RAJ"])
 add("straits_settlements", B, "STR", "Straits Settlements", "海峡殖民地",
-    {"country_codes": ["SG"], "feature_ids": ["MYS-1139", "MYS-1145", "MYS-4833"]},
-    parent="ENG", kind="colony", only=["MAL"])
-add("sarawak", B, "SRW", "Sarawak", "沙捞越", {"feature_ids": ["MYS-1187"]}, parent="ENG", kind="protectorate", only=["MAL"])
-add("north_borneo", B, "NBO", "North Borneo", "北婆罗洲", {"feature_ids": ["MYS-1186"]}, parent="ENG", kind="protectorate", only=["MAL"])
-add("brunei", B, "BRU", "Brunei", "文莱", CC("BN"), parent="ENG", kind="protectorate", only=["MAL"])
+    {"country_codes": ["SG"], "feature_ids": ["MYS-1139", "MYS-1145", "MYS-4833", "AU_REMOTE_INDIAN_OCEAN_TERRITORIES"]},
+    parent="ENG", kind="colony", only=["MAL", "AST"])
+add("sarawak", B, "SRW", "Kingdom of Sarawak", "沙捞越王国", {"feature_ids": ["MYS-1187"]}, parent="ENG", kind="protectorate", only=["MAL"])
+add("north_borneo", B, "NBO", "British North Borneo", "英属北婆罗洲", {"feature_ids": ["MYS-1186"]}, parent="ENG", kind="protectorate", only=["MAL"])
+add("brunei", B, "BEI", "Sultanate of Brunei", "文莱苏丹国", CC("BN"), parent="ENG", kind="protectorate", only=["MAL"])
 for t in ["BOT", "KUW"]:
     add(f"{t.lower()}_parent", B, t, None, None, {"owners": [t]}, parent="ENG", kind="protectorate", only=[t])
 
@@ -163,7 +158,7 @@ add("french_cameroon", B, "FCM", "French Cameroun", "法属喀麦隆", CC("CM"),
     only=["AEF", "FRA", "AOF"], exclude=HG("CM_Northwest", "CM_Southwest"))
 add("djibouti", B, "DJI", "French Somaliland", "法属索马里", CC("DJ"), parent="FRA", kind="colony", only=["FRA"])
 add("madagascar_dependencies", B, "MAD", None, None, CC("KM", "TF"), only=["FRA"])
-for t in ["GF", "GP", "MQ", "RE", "YT"]:
+for t in ["GF", "GP", "MQ", "RE"]:
     add(f"{t.lower()}_parent", B, t, None, None, {"owners": [t]}, parent="FRA", kind="colony", only=[t])
 add("french_indochina", B, "VIN", "French Indochina", "法属印度支那联邦",
     CC("VN", "KH", "LA"), parent="FRA", kind="federation", only=["VIN"])
@@ -327,8 +322,15 @@ add("kosice_return", Y39, "HUN", None, None, FI(*["SK_ADM2_56367889B" + n for n 
     ("16879144707830", "46930466225258", "7741755639355", "57985107422825")]))
 for scenarios, parent in [(Y36, "RAJ"), (Y39, "ENG")]:
     year = scenarios[0][-4:]
-    add("aden_" + year, scenarios, "ADN", "Aden", "亚丁", FI("YEM-3510"), parent=parent, kind="colony", color="#b38493")
-    add("burma_parent_" + year, scenarios, "BRM", None, None, CC("MM"), parent=parent, kind="colony", cores="keep")
+    if scenarios == Y36:
+        add("aden_" + year, scenarios, "RAJ", None, None, FI("YEM-3510"))
+    else:
+        add("aden_" + year, scenarios, "ADN", "Aden Colony", "亚丁殖民地", FI("YEM-3510"), parent=parent, kind="colony")
+    if scenarios == Y36:
+        add("burma_direct_1936", scenarios, "RAJ", None, None, CC("MM"), only=["BRM"])
+    else:
+        add("burma_parent_1939", scenarios, "BRM", "British Burma", "英属缅甸", CC("MM"),
+            parent="ENG", kind="colony", only=["BRM"], cores="keep")
 add("karakalpak_parent_1939", Y39, "KKP", None, None, FI("UZB-356"), parent="UZB", cores="keep")
 for tag, en, zh in [("KOM", "Komi", "科米"), ("MRE", "Mari", "马里"),
                      ("KBA", "Kabardino-Balkar", "卡巴尔达-巴尔卡尔"),
@@ -548,6 +550,150 @@ add("ifni", B, "IFN", "Spanish Ifni", "西属伊夫尼", FI(*split_ids("ifni")),
     parent="SPR", kind="colony", notes=geometry_by_id["ifni"]["notes"])
 add("guangzhouwan", B, "KWW", "Guangzhouwan Leased Territory", "广州湾租借地", FI(*split_ids("guangzhouwan")),
     parent="FRA", kind="colony", notes=geometry_by_id["guangzhouwan"]["notes"])
+
+
+def IN(*numbers):
+    return ["IN_ADM2_76128533B" + number for number in numbers]
+
+
+add("hyderabad", B, "HYD", "Hyderabad", "海得拉巴",
+    {"hierarchy_groups": ["IN_Telangana"], "feature_ids": IN("39329594544563", "63783580004876", "1083016608278", "9794868259401") + ["IN_MRG_ffed35f9503d"]},
+    parent="RAJ", kind="princely_state", only=["RAJ"], exclude=FI(*split_ids("bhadrachalam")))
+add("kashmir", B, "KAS", "Jammu and Kashmir", "查谟和克什米尔",
+    {"hierarchy_groups": ["IN_Jammu_and_Kashmir", "IN_Ladakh"], "feature_ids": ["PAK-1109"]},
+    parent="RAJ", kind="princely_state", only=["RAJ"], exclude=FI(*IN("2782141712775")))
+add("mysore", B, "MYS", "Mysore", "迈索尔",
+    FI(*IN("15550697205080", "85389886560116", "95879808095476", "76927648517269", "49597693387243"), "IN_MRG_c2a8b7b28b23"),
+    parent="RAJ", kind="princely_state", only=["RAJ"])
+add("travancore", B, "TVC", "Travancore", "特拉凡哥尔",
+    FI(*IN("33162455176756", "53796141759805"), "IN_MRG_a3f42a5bb822", *IN("75519739609062")),
+    parent="RAJ", kind="princely_state", only=["RAJ"])
+add("rajputana_states", B, "IRA", "Rajputana States", "拉杰普塔纳诸邦", HG("IN_Rajasthan"),
+    parent="RAJ", kind="princely_state", only=["RAJ"], exclude=FI(*IN("60180372390230")))
+for tag, en, zh, numbers, merged in [
+    ("BDA", "Baroda", "巴罗达", ["33151011563565"], []),
+    ("GWA", "Gwalior", "瓜廖尔", ["90551733723251", "89286042589317"], ["ad1b1cb9dc7d"]),
+    ("INR", "Indore", "印多尔", ["60360721573267"], []),
+    ("BPL", "Bhopal", "博帕尔", ["22439249004073"], []),
+    ("ICA", "Central India States", "中央印度诸邦", ["38767180038480", "50014751336341"], ["f73955d59e52", "f050f1c4b3c9", "8c423602963b", "cf5f1caa9d83", "90a8716fe1b8"]),
+    ("KUT", "Cutch", "卡奇", ["91881382098572"], []),
+    ("IWA", "Western India States", "西印度诸邦", ["35205406647638", "74381554567803", "93450974047240", "74992405432705"], ["dfe0e83efbc8"]),
+    ("KHP", "Kolhapur", "戈尔哈布尔", ["66719908763317"], []),
+    ("IPA", "Punjab States", "旁遮普诸邦", ["39368211148513"], ["862fe17f65b9"]),
+    ("IHA", "Punjab Hill States", "旁遮普山邦", ["58537895532859", "11802210119774", "50011981829203", "77537928419507"], []),
+    ("IEA", "Eastern States", "东部诸邦", ["6128685860104"], ["d5c4dbfe1bc8", "87a650d2ea07", "5a8caf67d623"]),
+    ("RMP", "Rampur", "兰普尔", ["46682008877369"], []),
+    ("CHB", "Cooch Behar", "科奇比哈尔", ["64156747739715"], []),
+    ("IKA", "Khasi States", "卡西诸邦", ["27102120636500"], []),
+]:
+    add(tag.lower() + "_states", B, tag, en, zh,
+        FI(*IN(*numbers), *("IN_MRG_" + suffix for suffix in merged)),
+        parent="RAJ", kind="princely_state", only=["RAJ"])
+for tag, en, zh, group in [("TPA", "Tripura", "特里普拉", "IN_Tripura"),
+                            ("MNP", "Manipur", "曼尼普尔", "IN_Manipur")]:
+    add(tag.lower() + "_state", B, tag, en, zh, HG(group), parent="RAJ", kind="princely_state", only=["RAJ"])
+add("bhutan_protectorate", B, "BHU", None, None, CC("BT"), parent="RAJ", kind="protectorate", cores="keep")
+add("french_india", B, "FND", "French India", "法属印度",
+    FI(*IN("29873478326363", "62624361588317", "41246169049488", "83105693975079")), parent="FRA", kind="colony", only=["RAJ"])
+for name, tag, en, zh in [
+    ("hassan", "MYS", "Mysore", "迈索尔"),
+    ("jalna", "HYD", "Hyderabad", "海得拉巴"),
+    ("parbhani", "HYD", "Hyderabad", "海得拉巴"),
+    ("raichur", "HYD", "Hyderabad", "海得拉巴"),
+    ("cochin", "COC", "Cochin", "科钦"),
+    ("bahawalpur", "BHW", "Bahawalpur", "巴哈瓦尔布尔"),
+    ("khairpur", "KPU", "Khairpur", "海尔布尔"),
+    ("baluchistan_states", "KLA", "Kalat and Baluchistan States", "卡拉特与俾路支诸邦"),
+    ("frontier_states", "IFA", "North-West Frontier States", "西北边疆诸邦"),
+    ("deccan_states", "IDA", "Deccan States", "德干诸邦"),
+    ("mandi", "IHA", "Punjab Hill States", "旁遮普山邦"),
+    ("odisha_states", "IEA", "Eastern States", "东部诸邦"),
+]:
+    add(name + "_split", B, tag, en, zh, FI(*split_ids(name)), parent="RAJ", kind="princely_state", only=["RAJ"])
+for scenarios, parent in [(Y36, "RAJ"), (Y39, "BRM")]:
+    for tag, en, zh, fid in [("SHA", "Federated Shan States", "掸邦联邦", "MMR-3277"),
+                              ("KRN", "Karenni States", "克伦尼诸邦", "MMR-2473")]:
+        add(tag.lower() + "_" + scenarios[0], scenarios, tag, en, zh, FI(fid),
+            parent=parent, kind="protectorate", only=[parent])
+add("malaya_federated_states", B, "MAL", "Federated Malay States", "马来联邦",
+    FI("MYS-1137", "MYS-1146", "MYS-1147", "MYS-1148", "MYS-4831", "MYS-4832"),
+    parent="ENG", kind="protectorate", cores="keep")
+for tag, en, zh, fid in [
+    ("JOH", "Sultanate of Johor", "柔佛苏丹国", "MYS-1143"),
+    ("KED", "Sultanate of Kedah", "吉打苏丹国", "MYS-1140"),
+    ("PLS", "Perlis", "玻璃市", "MYS-1141"),
+    ("KEL", "Sultanate of Kelantan", "吉兰丹苏丹国", "MYS-1144"),
+    ("TGA", "Sultanate of Terengganu", "登嘉楼苏丹国", "MYS-1149"),
+]:
+    add(tag.lower() + "_protectorate", B, tag, en, zh, FI(fid), parent="ENG", kind="protectorate", only=["MAL"], cores="keep")
+add("yogyakarta", B, "YOG", "Sultanate of Yogyakarta", "日惹苏丹国", HG("ID_Special_Region_of_Yogyakarta"),
+    parent="HOL", kind="princely_state", only=["INS"], cores="keep")
+add("olongapo_reservation", B, "USA", None, None, FI("PHL-5540"), only=["PHI"], cores="keep")
+add("thailand_name_1939", Y39, "SIA", "Kingdom of Thailand", "泰王国", CC("TH"), cores="keep")
+# 1936 Burma is ruled directly by RAJ; drop the retired BRM so the palette pass adds no colour-only entry for it.
+C36.pop("BRM", None)
+C36.pop("ADN", None)
+
+for tag, en, zh, fid in [
+    ("ABD", "Sheikhdom of Abu Dhabi", "阿布扎比酋长国", "ARE-349"),
+    ("DUB", "Sheikhdom of Dubai", "迪拜酋长国", "ARE-350"),
+    ("SHJ", "Sheikhdom of Sharjah", "沙迦酋长国", "ARE-348"),
+    ("RAK", "Sheikhdom of Ras al-Khaimah", "拉斯海马酋长国", "ARE-338"),
+    ("AJM", "Sheikhdom of Ajman", "阿治曼酋长国", "ARE-346"),
+    ("UAQ", "Sheikhdom of Umm al-Quwain", "乌姆盖万酋长国", "ARE-339"),
+]:
+    add(tag.lower() + "_sheikhdom", B, tag, en, zh, FI(fid), parent="ENG", kind="protectorate", only=["TRU", "ENG"])
+add("fujairah", B, "FUJ", "Sheikhdom of Fujairah", "富查伊拉酋长国", FI("ARE-341"),
+    color=shade("ENG"), only=["TRU", "ENG"])
+add("muscat_name", B, "OMA", "Sultanate of Muscat and Oman", "马斯喀特与阿曼苏丹国", CC("OM"), only=["OMA"], cores="keep")
+add("oman_imamate", B, "IMO", "Imamate of Oman", "阿曼伊玛目国", FI("OMN-2404", "OMN-2414"),
+    parent="OMA", kind="autonomous_region", only=["OMA"])
+add("alawite_government", B, "ALW", "Autonomous Government of Latakia", "拉塔基亚自治政府",
+    FI("SYR-134", "SYR-135"), parent="FRA", kind="autonomous_region", only=["SYR"])
+add("jabal_druze", B, "JEB", "Autonomous Government of Jabal Druze", "德鲁兹山自治政府",
+    FI("SYR-143"), parent="FRA", kind="autonomous_region", only=["SYR"])
+add("alexandretta_1936", Y36, "HTY", "Alexandretta Autonomous Sanjak Debug Region", "亚历山大勒塔自治专区调试分区",
+    FI("TR631"), parent="FRA", kind="autonomous_region", only=["SYR"])
+add("jazira_administration_1939", Y39, "JAZ", "Upper Jazira Administration", "上杰济拉行政区",
+    FI("SYR-141"), parent="FRA", kind="administrative_region", only=["SYR"])
+add("transjordan_mandate", B, "JOR", "Emirate of Transjordan", "外约旦酋长国", CC("JO"),
+    parent="ENG", kind="mandate", only=["JOR"], cores="keep")
+add("aden_western_states", B, "WDN", "Western Aden Protectorate Debug Region", "西亚丁保护地调试分区",
+    FI("YEM-157", "YEM-3511", "YEM-336"), parent="ENG", kind="protectorate", only=["YEM"])
+add("aden_eastern_states", B, "EDN", "Eastern Aden Protectorate Debug Region", "东亚丁保护地调试分区",
+    FI("YEM-3497", "YEM-332"), parent="ENG", kind="protectorate", only=["YEM"])
+
+add("sichuan_faction_metadata_1936", Y36, "CHU", "Sichuan Administration - Liu Xiang Faction", "四川军政区（刘湘系）",
+    {"owners": ["CHU"]}, parent="CHI", kind="military_administration", cores="keep")
+for scenarios, en, zh in [(Y36, "Xikang Provincial Preparatory Committee", "西康建省委员会"),
+                           (Y39, "Xikang Provincial Government", "西康省政府")]:
+    add("xikang_metadata_" + scenarios[0], scenarios, "SIC", en, zh, {"owners": ["SIC"]},
+        parent="CHI", kind="military_administration", cores="keep")
+add("yunnan_metadata", B, "YUN", "Yunnan Provincial Government - Long Yun", "云南省政府（龙云）",
+    {"owners": ["YUN"]}, parent="CHI", kind="military_administration", cores="keep")
+for scenarios, parent, owners in [(Y36, "CHU", ["CHU"]), (Y39, "SIC", ["CHI", "SIC"])]:
+    add("liangshan_clans_" + scenarios[0], scenarios, "LOL", "Liangshan Yi Clan Debug Region", "凉山彝族家支调试分区",
+        FI(*CN("23024603415445 52132557540167 17138311811008")), parent=parent,
+        kind="autonomous_region", only=owners, cores="keep")
+    add("muli_chiefdom_" + scenarios[0], scenarios, "MUL", "Muli Chiefdom", "木里土司",
+        FI(*CN("80219081988604")), parent=parent, kind="tusi", only=["SIC"], cores="keep")
+add("gyalrong_four_1939", Y39, "JRG", "Gyalrong Four Chiefdoms Debug Region", "嘉绒四土调试分区",
+    FI(*CN("24790182027849")), parent="CHI", kind="tusi", only=["CHI"], cores="keep")
+
+DZ_SOUTH = FI(*["DZA-" + number for number in
+    "2143 2148 2149 2150 2188 2189 2190 2191 2192 2193 2194 2211 2212".split()])
+add("algeria_northern_departments", B, "FRA", None, None, CC("DZ"), exclude=DZ_SOUTH, only=["ALG"])
+add("algeria_southern_territories", B, "ALG", "Southern Territories of Algeria", "阿尔及利亚南部领地",
+    DZ_SOUTH, parent="FRA", kind="military_administration", only=["ALG"], cores="keep")
+add("libyan_coastal_provinces_1939", Y39, "ITA", None, None,
+    {"country_codes": ["LY"], "bbox": [-180, 29, 180, 90]}, only=["LBA"])
+add("karafuto_administration", B, "KRF", "Karafuto Prefecture", "桦太厅",
+    {"country_codes": ["RU"], "bbox": [140, 45, 145, 50]}, parent="JAP", kind="colony", only=["JAP"])
+add("saint_helena_colony", B, "STH", "Saint Helena Colony", "圣赫勒拿殖民地", CC("SH"), parent="ENG", kind="colony", only=["ENG"])
+add("saint_pierre_miquelon", B, "SPM", "Saint Pierre and Miquelon", "圣皮埃尔和密克隆", CC("PM"), parent="FRA", kind="colony", only=["FRA"])
+add("mayotte_madagascar_dependency", B, "MAD", None, None, CC("YT"), only=["YT"])
+add("puerto_rico_territory_metadata", B, "PUE", None, None, CC("PR"), parent="USA", kind="territory", only=["PUE"], cores="keep")
+add("guangzhouwan_indochina_parent", B, "KWW", None, None, {"owners": ["KWW"]}, parent="VIN", kind="colony", cores="keep")
 
 harmonize_family_colors(E)
 E.append({"id": "china_enclaves_1939", "scenarios": Y39,

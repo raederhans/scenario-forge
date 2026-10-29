@@ -58,7 +58,7 @@
         "TUR"
       ],
       "notes": "Sanjak of Alexandretta remains in the French Syrian mandate in 1936.",
-      "color_hex": "#3375d4"
+      "color_hex": "#4e75ee"
     },
     {
       "id": "dodecanese_hoi4_1936",
@@ -123,7 +123,7 @@
         "SOM",
         "AOI"
       ],
-      "color_hex": "#d35975"
+      "color_hex": "#b73158"
     },
     {
       "id": "british_somaliland_hoi4_1939",
@@ -148,7 +148,7 @@
         "SOM",
         "AOI"
       ],
-      "color_hex": "#c93265"
+      "color_hex": "#ba214f"
     },
     {
       "id": "newfoundland_hoi4_1936",
@@ -169,7 +169,7 @@
         "CAN"
       ],
       "notes": "Newfoundland under Commission of Government (1934-1949), separate from Canada.",
-      "color_hex": "#b6314c"
+      "color_hex": "#ca4057"
     },
     {
       "id": "newfoundland_hoi4_1939",
@@ -190,7 +190,7 @@
         "CAN"
       ],
       "notes": "Newfoundland under Commission of Government (1934-1949), separate from Canada.",
-      "color_hex": "#c0345f"
+      "color_hex": "#d35975"
     },
     {
       "id": "portuguese_india",
@@ -333,7 +333,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#dd506c"
+      "color_hex": "#ca3351"
     },
     {
       "id": "southern_rhodesia_hoi4_1939",
@@ -353,7 +353,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ca4057"
+      "color_hex": "#e74d66"
     },
     {
       "id": "northern_rhodesia_hoi4_1936",
@@ -373,7 +373,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#c6466b"
+      "color_hex": "#ab204d"
     },
     {
       "id": "northern_rhodesia_hoi4_1939",
@@ -393,7 +393,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#dc4574"
+      "color_hex": "#b61547"
     },
     {
       "id": "nyasaland_hoi4_1936",
@@ -413,7 +413,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#c0345f"
+      "color_hex": "#d35975"
     },
     {
       "id": "nyasaland_hoi4_1939",
@@ -433,7 +433,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d34869"
+      "color_hex": "#c93265"
     },
     {
       "id": "basutoland_hoi4_1936",
@@ -453,7 +453,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#bc2045"
+      "color_hex": "#b1395e"
     },
     {
       "id": "basutoland_hoi4_1939",
@@ -473,7 +473,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#de4563"
+      "color_hex": "#ca5070"
     },
     {
       "id": "swaziland_hoi4_1936",
@@ -493,7 +493,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#cf3e62"
+      "color_hex": "#e2486c"
     },
     {
       "id": "swaziland_hoi4_1939",
@@ -513,7 +513,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ca3351"
+      "color_hex": "#af3851"
     },
     {
       "id": "hong_kong_hoi4_1936",
@@ -533,7 +533,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#e3576b"
+      "color_hex": "#b22750"
     },
     {
       "id": "hong_kong_hoi4_1939",
@@ -553,7 +553,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d4405a"
+      "color_hex": "#ab2644"
     },
     {
       "id": "british_honduras_hoi4_1936",
@@ -573,7 +573,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b11051"
+      "color_hex": "#be265c"
     },
     {
       "id": "british_honduras_hoi4_1939",
@@ -593,7 +593,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#bc3a50"
+      "color_hex": "#d55768"
     },
     {
       "id": "british_guiana_hoi4_1936",
@@ -613,7 +613,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b1395e"
+      "color_hex": "#bc3a50"
     },
     {
       "id": "british_guiana_hoi4_1939",
@@ -633,7 +633,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ca5070"
+      "color_hex": "#e54d76"
     },
     {
       "id": "bahrain_hoi4_1936",
@@ -653,7 +653,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#a32c50"
+      "color_hex": "#de4563"
     },
     {
       "id": "bahrain_hoi4_1939",
@@ -673,7 +673,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#bc2045"
+      "color_hex": "#b1395e"
     },
     {
       "id": "qatar_hoi4_1936",
@@ -693,7 +693,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d34869"
+      "color_hex": "#c03e5a"
     },
     {
       "id": "qatar_hoi4_1939",
@@ -713,7 +713,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#dd506c"
+      "color_hex": "#de547c"
     },
     {
       "id": "trucial_states_hoi4_1936",
@@ -733,7 +733,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b53c57"
+      "color_hex": "#c64d67"
     },
     {
       "id": "trucial_states_hoi4_1939",
@@ -753,7 +753,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b62359"
+      "color_hex": "#d1526c"
     },
     {
       "id": "malta_hoi4_1936",
@@ -773,7 +773,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b22750"
+      "color_hex": "#ab3354"
     },
     {
       "id": "malta_hoi4_1939",
@@ -793,7 +793,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ab2644"
+      "color_hex": "#db5e73"
     },
     {
       "id": "cyprus_hoi4_1936",
@@ -813,7 +813,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d33f6e"
+      "color_hex": "#ac3448"
     },
     {
       "id": "cyprus_hoi4_1939",
@@ -833,7 +833,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ac3448"
+      "color_hex": "#ba4364"
     },
     {
       "id": "jamaica_hoi4_1936",
@@ -853,7 +853,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d75176"
+      "color_hex": "#cf4f62"
     },
     {
       "id": "jamaica_hoi4_1939",
@@ -873,7 +873,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#c52b4d"
+      "color_hex": "#b6314c"
     },
     {
       "id": "trinidad_hoi4_1936",
@@ -893,7 +893,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ca3351"
+      "color_hex": "#cc3d6b"
     },
     {
       "id": "trinidad_hoi4_1939",
@@ -913,7 +913,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#e74d66"
+      "color_hex": "#d84f62"
     },
     {
       "id": "bahamas_hoi4_1936",
@@ -933,7 +933,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ca5070"
+      "color_hex": "#e54d76"
     },
     {
       "id": "bahamas_hoi4_1939",
@@ -953,7 +953,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b11051"
+      "color_hex": "#be265c"
     },
     {
       "id": "mauritius_hoi4_1936",
@@ -974,7 +974,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#cf4f62"
+      "color_hex": "#dd506c"
     },
     {
       "id": "mauritius_hoi4_1939",
@@ -995,7 +995,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b6314c"
+      "color_hex": "#ca4057"
     },
     {
       "id": "falklands_hoi4_1936",
@@ -1016,7 +1016,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ac3448"
+      "color_hex": "#d75176"
     },
     {
       "id": "falklands_hoi4_1939",
@@ -1037,7 +1037,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ba4364"
+      "color_hex": "#c52b4d"
     },
     {
       "id": "bwa_nigeria_hoi4_1936",
@@ -1063,7 +1063,7 @@
         "ENG"
       ],
       "notes": "Nigeria plus the British Cameroons mandate.",
-      "color_hex": "#be265c"
+      "color_hex": "#d33f6e"
     },
     {
       "id": "bwa_nigeria_hoi4_1939",
@@ -1089,7 +1089,7 @@
         "ENG"
       ],
       "notes": "Nigeria plus the British Cameroons mandate.",
-      "color_hex": "#d33f6e"
+      "color_hex": "#ac3448"
     },
     {
       "id": "gold_coast_hoi4_1936",
@@ -1109,7 +1109,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#ba4364"
+      "color_hex": "#c52b4d"
     },
     {
       "id": "gold_coast_hoi4_1939",
@@ -1129,7 +1129,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#d75176"
+      "color_hex": "#cf4f62"
     },
     {
       "id": "sierra_leone_hoi4_1936",
@@ -1149,7 +1149,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#ab204d"
+      "color_hex": "#be2b52"
     },
     {
       "id": "sierra_leone_hoi4_1939",
@@ -1169,7 +1169,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#b61547"
+      "color_hex": "#b00b46"
     },
     {
       "id": "gambia_hoi4_1936",
@@ -1189,7 +1189,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#b2113c"
+      "color_hex": "#d4405a"
     },
     {
       "id": "gambia_hoi4_1939",
@@ -1209,7 +1209,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#e3576b"
+      "color_hex": "#b22750"
     },
     {
       "id": "bea_kenya_hoi4_1936",
@@ -1227,7 +1227,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#de4563"
+      "color_hex": "#ca5070"
     },
     {
       "id": "bea_kenya_hoi4_1939",
@@ -1245,7 +1245,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#b1395e"
+      "color_hex": "#b11051"
     },
     {
       "id": "uganda_hoi4_1936",
@@ -1265,7 +1265,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#e74d66"
+      "color_hex": "#d1526c"
     },
     {
       "id": "uganda_hoi4_1939",
@@ -1285,7 +1285,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#be2b52"
+      "color_hex": "#c04967"
     },
     {
       "id": "tanganyika_hoi4_1936",
@@ -1314,7 +1314,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#de547c"
+      "color_hex": "#af3851"
     },
     {
       "id": "tanganyika_hoi4_1939",
@@ -1343,7 +1343,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#b53c57"
+      "color_hex": "#c64d67"
     },
     {
       "id": "zanzibar_hoi4_1936",
@@ -1367,7 +1367,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#b62359"
+      "color_hex": "#c04967"
     },
     {
       "id": "zanzibar_hoi4_1939",
@@ -1391,177 +1391,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#b73158"
-    },
-    {
-      "id": "hyderabad_hoi4_1936",
-      "scenarios": [
-        "hoi4_1936"
-      ],
-      "tag": "HYD",
-      "name_en": "Hyderabad",
-      "name_zh": "海得拉巴",
-      "parent_owner_tag": "RAJ",
-      "subject_kind": "protectorate",
-      "select": {
-        "hierarchy_groups": [
-          "IN_Telangana"
-        ]
-      },
-      "only_from_owners": [
-        "RAJ"
-      ],
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#b04a5b"
-    },
-    {
-      "id": "hyderabad_hoi4_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "HYD",
-      "name_en": "Hyderabad",
-      "name_zh": "海得拉巴",
-      "parent_owner_tag": "RAJ",
-      "subject_kind": "protectorate",
-      "select": {
-        "hierarchy_groups": [
-          "IN_Telangana"
-        ]
-      },
-      "only_from_owners": [
-        "RAJ"
-      ],
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#ed7e95"
-    },
-    {
-      "id": "kashmir_hoi4_1936",
-      "scenarios": [
-        "hoi4_1936"
-      ],
-      "tag": "KSH",
-      "name_en": "Jammu and Kashmir",
-      "name_zh": "查谟和克什米尔",
-      "parent_owner_tag": "RAJ",
-      "subject_kind": "protectorate",
-      "select": {
-        "hierarchy_groups": [
-          "IN_Jammu_and_Kashmir",
-          "IN_Ladakh"
-        ]
-      },
-      "only_from_owners": [
-        "RAJ"
-      ],
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#9e1e3f"
-    },
-    {
-      "id": "kashmir_hoi4_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "KSH",
-      "name_en": "Jammu and Kashmir",
-      "name_zh": "查谟和克什米尔",
-      "parent_owner_tag": "RAJ",
-      "subject_kind": "protectorate",
-      "select": {
-        "hierarchy_groups": [
-          "IN_Jammu_and_Kashmir",
-          "IN_Ladakh"
-        ]
-      },
-      "only_from_owners": [
-        "RAJ"
-      ],
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#b64f64"
-    },
-    {
-      "id": "mysore_hoi4_1936",
-      "scenarios": [
-        "hoi4_1936"
-      ],
-      "tag": "MYR",
-      "name_en": "Mysore",
-      "name_zh": "迈索尔",
-      "parent_owner_tag": "RAJ",
-      "subject_kind": "protectorate",
-      "select": {
-        "hierarchy_groups": [
-          "IN_Karnataka"
-        ]
-      },
-      "only_from_owners": [
-        "RAJ"
-      ],
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#bd4069"
-    },
-    {
-      "id": "mysore_hoi4_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "MYR",
-      "name_en": "Mysore",
-      "name_zh": "迈索尔",
-      "parent_owner_tag": "RAJ",
-      "subject_kind": "protectorate",
-      "select": {
-        "hierarchy_groups": [
-          "IN_Karnataka"
-        ]
-      },
-      "only_from_owners": [
-        "RAJ"
-      ],
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#ce4d5c"
-    },
-    {
-      "id": "travancore_hoi4_1936",
-      "scenarios": [
-        "hoi4_1936"
-      ],
-      "tag": "TRV",
-      "name_en": "Travancore",
-      "name_zh": "特拉凡哥尔",
-      "parent_owner_tag": "RAJ",
-      "subject_kind": "protectorate",
-      "select": {
-        "hierarchy_groups": [
-          "IN_Kerala"
-        ]
-      },
-      "only_from_owners": [
-        "RAJ"
-      ],
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#c8475f"
-    },
-    {
-      "id": "travancore_hoi4_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "TRV",
-      "name_en": "Travancore",
-      "name_zh": "特拉凡哥尔",
-      "parent_owner_tag": "RAJ",
-      "subject_kind": "protectorate",
-      "select": {
-        "hierarchy_groups": [
-          "IN_Kerala"
-        ]
-      },
-      "only_from_owners": [
-        "RAJ"
-      ],
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#ee6b89"
+      "color_hex": "#b0315a"
     },
     {
       "id": "sikkim_hoi4_1936",
@@ -1581,8 +1411,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#983655"
+      "color_hex": "#b13959"
     },
     {
       "id": "sikkim_hoi4_1939",
@@ -1602,8 +1431,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "color_hex": "#df737c"
+      "color_hex": "#b50933"
     },
     {
       "id": "straits_settlements_hoi4_1936",
@@ -1622,13 +1450,15 @@
         "feature_ids": [
           "MYS-1139",
           "MYS-1145",
-          "MYS-4833"
+          "MYS-4833",
+          "AU_REMOTE_INDIAN_OCEAN_TERRITORIES"
         ]
       },
       "only_from_owners": [
-        "MAL"
+        "MAL",
+        "AST"
       ],
-      "color_hex": "#c93265"
+      "color_hex": "#d73f66"
     },
     {
       "id": "straits_settlements_hoi4_1939",
@@ -1647,13 +1477,15 @@
         "feature_ids": [
           "MYS-1139",
           "MYS-1145",
-          "MYS-4833"
+          "MYS-4833",
+          "AU_REMOTE_INDIAN_OCEAN_TERRITORIES"
         ]
       },
       "only_from_owners": [
-        "MAL"
+        "MAL",
+        "AST"
       ],
-      "color_hex": "#cf3e62"
+      "color_hex": "#e2486c"
     },
     {
       "id": "sarawak_hoi4_1936",
@@ -1661,8 +1493,8 @@
         "hoi4_1936"
       ],
       "tag": "SRW",
-      "name_en": "Sarawak",
-      "name_zh": "沙捞越",
+      "name_en": "Kingdom of Sarawak",
+      "name_zh": "沙捞越王国",
       "parent_owner_tag": "ENG",
       "subject_kind": "protectorate",
       "select": {
@@ -1673,7 +1505,7 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#b61547"
+      "color_hex": "#b00b46"
     },
     {
       "id": "sarawak_hoi4_1939",
@@ -1681,8 +1513,8 @@
         "hoi4_1939"
       ],
       "tag": "SRW",
-      "name_en": "Sarawak",
-      "name_zh": "沙捞越",
+      "name_en": "Kingdom of Sarawak",
+      "name_zh": "沙捞越王国",
       "parent_owner_tag": "ENG",
       "subject_kind": "protectorate",
       "select": {
@@ -1693,7 +1525,7 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#c03e5a"
+      "color_hex": "#d73f66"
     },
     {
       "id": "north_borneo_hoi4_1936",
@@ -1701,8 +1533,8 @@
         "hoi4_1936"
       ],
       "tag": "NBO",
-      "name_en": "North Borneo",
-      "name_zh": "北婆罗洲",
+      "name_en": "British North Borneo",
+      "name_zh": "英属北婆罗洲",
       "parent_owner_tag": "ENG",
       "subject_kind": "protectorate",
       "select": {
@@ -1713,7 +1545,7 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#ab2644"
+      "color_hex": "#db5e73"
     },
     {
       "id": "north_borneo_hoi4_1939",
@@ -1721,8 +1553,8 @@
         "hoi4_1939"
       ],
       "tag": "NBO",
-      "name_en": "North Borneo",
-      "name_zh": "北婆罗洲",
+      "name_en": "British North Borneo",
+      "name_zh": "英属北婆罗洲",
       "parent_owner_tag": "ENG",
       "subject_kind": "protectorate",
       "select": {
@@ -1733,16 +1565,16 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#c6466b"
+      "color_hex": "#ab204d"
     },
     {
       "id": "brunei_hoi4_1936",
       "scenarios": [
         "hoi4_1936"
       ],
-      "tag": "BRU",
-      "name_en": "Brunei",
-      "name_zh": "文莱",
+      "tag": "BEI",
+      "name_en": "Sultanate of Brunei",
+      "name_zh": "文莱苏丹国",
       "parent_owner_tag": "ENG",
       "subject_kind": "protectorate",
       "select": {
@@ -1753,16 +1585,16 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#e54d76"
+      "color_hex": "#b11051"
     },
     {
       "id": "brunei_hoi4_1939",
       "scenarios": [
         "hoi4_1939"
       ],
-      "tag": "BRU",
-      "name_en": "Brunei",
-      "name_zh": "文莱",
+      "tag": "BEI",
+      "name_en": "Sultanate of Brunei",
+      "name_zh": "文莱苏丹国",
       "parent_owner_tag": "ENG",
       "subject_kind": "protectorate",
       "select": {
@@ -1773,7 +1605,7 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#d55768"
+      "color_hex": "#bc3a50"
     },
     {
       "id": "bot_parent_hoi4_1936",
@@ -1791,7 +1623,7 @@
       "only_from_owners": [
         "BOT"
       ],
-      "color_hex": "#bc3a50"
+      "color_hex": "#d55768"
     },
     {
       "id": "bot_parent_hoi4_1939",
@@ -1809,7 +1641,7 @@
       "only_from_owners": [
         "BOT"
       ],
-      "color_hex": "#e54d76"
+      "color_hex": "#d33f6e"
     },
     {
       "id": "kuw_parent_hoi4_1936",
@@ -1827,7 +1659,7 @@
       "only_from_owners": [
         "KUW"
       ],
-      "color_hex": "#d4405a"
+      "color_hex": "#dc4574"
     },
     {
       "id": "kuw_parent_hoi4_1939",
@@ -1845,7 +1677,7 @@
       "only_from_owners": [
         "KUW"
       ],
-      "color_hex": "#b22750"
+      "color_hex": "#ab3354"
     },
     {
       "id": "french_west_africa",
@@ -1873,7 +1705,7 @@
       "only_from_owners": [
         "AOF"
       ],
-      "color_hex": "#395ed8"
+      "color_hex": "#4f7df9"
     },
     {
       "id": "french_togo",
@@ -1894,7 +1726,7 @@
       "only_from_owners": [
         "AOF"
       ],
-      "color_hex": "#5887fd"
+      "color_hex": "#3f66e1"
     },
     {
       "id": "french_equatorial_africa",
@@ -1947,7 +1779,7 @@
         "FRA",
         "AOF"
       ],
-      "color_hex": "#336bca"
+      "color_hex": "#4380e1"
     },
     {
       "id": "djibouti",
@@ -1968,7 +1800,7 @@
       "only_from_owners": [
         "FRA"
       ],
-      "color_hex": "#4f7df9"
+      "color_hex": "#336bca"
     },
     {
       "id": "madagascar_dependencies",
@@ -1986,7 +1818,7 @@
       "only_from_owners": [
         "FRA"
       ],
-      "color_hex": "#297cef"
+      "color_hex": "#3887fb"
     },
     {
       "id": "gf_parent",
@@ -2005,7 +1837,7 @@
       "only_from_owners": [
         "GF"
       ],
-      "color_hex": "#4380e1"
+      "color_hex": "#0f68db"
     },
     {
       "id": "gp_parent",
@@ -2024,7 +1856,7 @@
       "only_from_owners": [
         "GP"
       ],
-      "color_hex": "#1e57cd"
+      "color_hex": "#5d82eb"
     },
     {
       "id": "mq_parent",
@@ -2043,7 +1875,7 @@
       "only_from_owners": [
         "MQ"
       ],
-      "color_hex": "#405fc1"
+      "color_hex": "#5887fd"
     },
     {
       "id": "re_parent",
@@ -2062,26 +1894,7 @@
       "only_from_owners": [
         "RE"
       ],
-      "color_hex": "#3887fb"
-    },
-    {
-      "id": "yt_parent",
-      "scenarios": [
-        "hoi4_1936",
-        "hoi4_1939"
-      ],
-      "tag": "YT",
-      "parent_owner_tag": "FRA",
-      "subject_kind": "colony",
-      "select": {
-        "owners": [
-          "YT"
-        ]
-      },
-      "only_from_owners": [
-        "YT"
-      ],
-      "color_hex": "#4e75ee"
+      "color_hex": "#1964c9"
     },
     {
       "id": "french_indochina",
@@ -2104,7 +1917,7 @@
       "only_from_owners": [
         "VIN"
       ],
-      "color_hex": "#476bd5"
+      "color_hex": "#1a5fd4"
     },
     {
       "id": "cape_verde",
@@ -2383,7 +2196,7 @@
         "KWT"
       ],
       "cores": "owner",
-      "color_hex": "#ecc0a4"
+      "color_hex": "#c28d7e"
     },
     {
       "id": "kwantung_return_hoi4_1939",
@@ -2405,7 +2218,7 @@
         "KWT"
       ],
       "cores": "owner",
-      "color_hex": "#d5a992"
+      "color_hex": "#ac7666"
     },
     {
       "id": "kwantung_hoi4_1936",
@@ -2427,7 +2240,7 @@
         "KWT"
       ],
       "notes": "Simplified approximation of the leased peninsula around Port Arthur, Dairen and Kinchow; northern lease line sketched, not a surveyed cadastral trace. Only the Dalian parent is cut; Wafangdian, Zhuanghe and Changhai remain MAN.",
-      "color_hex": "#b08572"
+      "color_hex": "#ecc0a4"
     },
     {
       "id": "kwantung_hoi4_1939",
@@ -2449,7 +2262,7 @@
         "KWT"
       ],
       "notes": "Simplified approximation of the leased peninsula around Port Arthur, Dairen and Kinchow; northern lease line sketched, not a surveyed cadastral trace. Only the Dalian parent is cut; Wafangdian, Zhuanghe and Changhai remain MAN.",
-      "color_hex": "#c28d7e"
+      "color_hex": "#d5a992"
     },
     {
       "id": "manchukuo_parent_hoi4_1936",
@@ -2467,7 +2280,7 @@
       "only_from_owners": [
         "MAN"
       ],
-      "color_hex": "#ecc0a4"
+      "color_hex": "#c28d7e"
     },
     {
       "id": "manchukuo_parent_hoi4_1939",
@@ -2485,7 +2298,7 @@
       "only_from_owners": [
         "MAN"
       ],
-      "color_hex": "#d5a992"
+      "color_hex": "#ac7666"
     },
     {
       "id": "ukrainian_ssr_hoi4_1936",
@@ -3790,7 +3603,7 @@
       "tag": "SIC",
       "name_en": "Xikang Administration",
       "name_zh": "西康军政区（刘文辉）",
-      "color_hex": "#006080",
+      "color_hex": "#2f42a9",
       "select": {
         "prefectures": [
           "甘孜藏族自治州"
@@ -3810,7 +3623,7 @@
       "tag": "SIC",
       "name_en": "Xikang Administration",
       "name_zh": "西康军政区（刘文辉）",
-      "color_hex": "#006080",
+      "color_hex": "#3c36a1",
       "select": {
         "prefectures": [
           "甘孜藏族自治州",
@@ -3885,7 +3698,7 @@
       "name_zh": "中华民国临时政府",
       "parent_owner_tag": "JAP",
       "subject_kind": "puppet",
-      "color_hex": "#fed2c7",
+      "color_hex": "#a0775c",
       "select": {
         "hierarchy_groups": [
           "CN_Beijing",
@@ -4000,7 +3813,7 @@
       ],
       "cores": "keep",
       "notes": "China uses late-1939 occupation; CNZ and JBZ remain subordinate debug administrations after the September merger.",
-      "color_hex": "#ac7666"
+      "color_hex": "#fed2c7"
     },
     {
       "id": "reformed_government",
@@ -4012,7 +3825,7 @@
       "name_zh": "中华民国维新政府",
       "parent_owner_tag": "JAP",
       "subject_kind": "puppet",
-      "color_hex": "#a0775c",
+      "color_hex": "#e0af90",
       "select": {
         "hierarchy_groups": [
           "CN_Shanghai",
@@ -4143,33 +3956,29 @@
       "scenarios": [
         "hoi4_1936"
       ],
-      "tag": "ADN",
-      "name_en": "Aden",
-      "name_zh": "亚丁",
-      "parent_owner_tag": "RAJ",
-      "subject_kind": "colony",
-      "color_hex": "#bd5574",
+      "tag": "RAJ",
       "select": {
         "feature_ids": [
           "YEM-3510"
         ]
-      }
+      },
+      "color_hex": "#cf3e62"
     },
     {
-      "id": "burma_parent_1936",
+      "id": "burma_direct_1936",
       "scenarios": [
         "hoi4_1936"
       ],
-      "tag": "BRM",
-      "parent_owner_tag": "RAJ",
-      "subject_kind": "colony",
+      "tag": "RAJ",
       "select": {
         "country_codes": [
           "MM"
         ]
       },
-      "cores": "keep",
-      "color_hex": "#882645"
+      "only_from_owners": [
+        "BRM"
+      ],
+      "color_hex": "#cf3e62"
     },
     {
       "id": "aden_1939",
@@ -4177,16 +3986,16 @@
         "hoi4_1939"
       ],
       "tag": "ADN",
-      "name_en": "Aden",
-      "name_zh": "亚丁",
+      "name_en": "Aden Colony",
+      "name_zh": "亚丁殖民地",
       "parent_owner_tag": "ENG",
       "subject_kind": "colony",
-      "color_hex": "#db5d80",
       "select": {
         "feature_ids": [
           "YEM-3510"
         ]
-      }
+      },
+      "color_hex": "#a32c50"
     },
     {
       "id": "burma_parent_1939",
@@ -4194,6 +4003,8 @@
         "hoi4_1939"
       ],
       "tag": "BRM",
+      "name_en": "British Burma",
+      "name_zh": "英属缅甸",
       "parent_owner_tag": "ENG",
       "subject_kind": "colony",
       "select": {
@@ -4201,8 +4012,11 @@
           "MM"
         ]
       },
+      "only_from_owners": [
+        "BRM"
+      ],
       "cores": "keep",
-      "color_hex": "#be265c"
+      "color_hex": "#c34a5d"
     },
     {
       "id": "karakalpak_parent_1939",
@@ -4319,7 +4133,7 @@
       "name_zh": "塞舌尔",
       "parent_owner_tag": "ENG",
       "subject_kind": "colony",
-      "color_hex": "#ca4057",
+      "color_hex": "#e74d66",
       "select": {
         "country_codes": [
           "SC"
@@ -4336,7 +4150,7 @@
       "name_zh": "塞舌尔",
       "parent_owner_tag": "ENG",
       "subject_kind": "colony",
-      "color_hex": "#d35975",
+      "color_hex": "#be2b52",
       "select": {
         "country_codes": [
           "SC"
@@ -4353,7 +4167,7 @@
       "name_zh": "西南非洲",
       "parent_owner_tag": "SAF",
       "subject_kind": "mandate",
-      "color_hex": "#ed7e95",
+      "color_hex": "#c75d78",
       "select": {
         "country_codes": [
           "NA"
@@ -4371,7 +4185,7 @@
       "name_zh": "西南非洲",
       "parent_owner_tag": "SAF",
       "subject_kind": "mandate",
-      "color_hex": "#87123e",
+      "color_hex": "#c84d7a",
       "select": {
         "country_codes": [
           "NA"
@@ -4389,7 +4203,7 @@
       "name_zh": "巴布亚领地",
       "parent_owner_tag": "AST",
       "subject_kind": "territory",
-      "color_hex": "#b64e6f",
+      "color_hex": "#ce4c69",
       "select": {
         "hierarchy_groups": [
           "PG_Gulf",
@@ -4413,7 +4227,7 @@
       "name_zh": "巴布亚领地",
       "parent_owner_tag": "AST",
       "subject_kind": "territory",
-      "color_hex": "#801f41",
+      "color_hex": "#b73957",
       "select": {
         "hierarchy_groups": [
           "PG_Gulf",
@@ -4437,7 +4251,7 @@
       "name_zh": "新几内亚委任统治地",
       "parent_owner_tag": "AST",
       "subject_kind": "mandate",
-      "color_hex": "#ed7ea1",
+      "color_hex": "#96143c",
       "select": {
         "hierarchy_groups": [
           "PG_Enga",
@@ -4467,7 +4281,7 @@
       "name_zh": "新几内亚委任统治地",
       "parent_owner_tag": "AST",
       "subject_kind": "mandate",
-      "color_hex": "#b54e6f",
+      "color_hex": "#f06a88",
       "select": {
         "hierarchy_groups": [
           "PG_Enga",
@@ -4696,7 +4510,7 @@
           "CN_CITY_17275852B43165756519885"
         ]
       },
-      "color_hex": "#ecc0a4"
+      "color_hex": "#c28d7e"
     },
     {
       "id": "east_hebei_counties_1936",
@@ -4888,7 +4702,8 @@
       ],
       "cores": [
         "CHU"
-      ]
+      ],
+      "color_hex": "#3c36a1"
     },
     {
       "id": "mingshan_return_1939",
@@ -4919,7 +4734,8 @@
           "CN_CITY_17275852B77966044233531",
           "CN_CITY_17275852B22487922789088"
         ]
-      }
+      },
+      "color_hex": "#3c36a1"
     },
     {
       "id": "red_fourth_army_1936",
@@ -4960,7 +4776,7 @@
       "name_zh": "蒙古地方自治政务委员会",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#2d398b",
+      "color_hex": "#314598",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B79222988236433"
@@ -5001,7 +4817,7 @@
       "name_zh": "东北军陕甘驻防区",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#4743af",
+      "color_hex": "#231884",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B58292310857107",
@@ -5022,7 +4838,7 @@
       "name_zh": "甘肃省政府（于学忠）",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#314598",
+      "color_hex": "#4743af",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B84192730453130",
@@ -5063,7 +4879,7 @@
       "name_zh": "川军孙震部",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#3c36a1",
+      "color_hex": "#1a2071",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B38426922086125",
@@ -5085,7 +4901,7 @@
       "name_zh": "川军杨森部",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#1a2071",
+      "color_hex": "#2d398b",
       "select": {
         "feature_ids": [
           "CN_CITY_17275852B34390587465306",
@@ -5108,7 +4924,7 @@
       "name_zh": "西北军（杨虎城）",
       "parent_owner_tag": "CHI",
       "subject_kind": "military_administration",
-      "color_hex": "#231884",
+      "color_hex": "#2a319a",
       "select": {
         "prefectures": [
           "西安市",
@@ -5253,23 +5069,2838 @@
         ]
       },
       "notes": "Simplified bay-side lease outline around Fort Bayard and Chikan with Donghai/Naozhou island sector. Rural frontier approximate, clipped to runtime land; does not assign the entire modern Zhanjiang prefecture.",
-      "color_hex": "#0f68db"
+      "color_hex": "#08509f"
     },
     {
-      "id": "alg_family_colour_hoi4_1936",
+      "id": "hyderabad_hoi4_1936",
       "scenarios": [
         "hoi4_1936"
       ],
-      "tag": "ALG",
+      "tag": "HYD",
+      "name_en": "Hyderabad",
+      "name_zh": "海得拉巴",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Telangana"
+        ],
+        "feature_ids": [
+          "IN_ADM2_76128533B39329594544563",
+          "IN_ADM2_76128533B63783580004876",
+          "IN_ADM2_76128533B1083016608278",
+          "IN_ADM2_76128533B9794868259401",
+          "IN_MRG_ffed35f9503d"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "IN_MRG_0de8d89a2f89__SPLIT_BHADRACHALAM"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c24054"
+    },
+    {
+      "id": "hyderabad_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "HYD",
+      "name_en": "Hyderabad",
+      "name_zh": "海得拉巴",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Telangana"
+        ],
+        "feature_ids": [
+          "IN_ADM2_76128533B39329594544563",
+          "IN_ADM2_76128533B63783580004876",
+          "IN_ADM2_76128533B1083016608278",
+          "IN_ADM2_76128533B9794868259401",
+          "IN_MRG_ffed35f9503d"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "IN_MRG_0de8d89a2f89__SPLIT_BHADRACHALAM"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#bf1e50"
+    },
+    {
+      "id": "kashmir_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KAS",
+      "name_en": "Jammu and Kashmir",
+      "name_zh": "查谟和克什米尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Jammu_and_Kashmir",
+          "IN_Ladakh"
+        ],
+        "feature_ids": [
+          "PAK-1109"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "IN_ADM2_76128533B2782141712775"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#da465f"
+    },
+    {
+      "id": "kashmir_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KAS",
+      "name_en": "Jammu and Kashmir",
+      "name_zh": "查谟和克什米尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Jammu_and_Kashmir",
+          "IN_Ladakh"
+        ],
+        "feature_ids": [
+          "PAK-1109"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "IN_ADM2_76128533B2782141712775"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#d84c6b"
+    },
+    {
+      "id": "mysore_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "MYS",
+      "name_en": "Mysore",
+      "name_zh": "迈索尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B15550697205080",
+          "IN_ADM2_76128533B85389886560116",
+          "IN_ADM2_76128533B95879808095476",
+          "IN_ADM2_76128533B76927648517269",
+          "IN_ADM2_76128533B49597693387243",
+          "IN_MRG_c2a8b7b28b23"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c53a64"
+    },
+    {
+      "id": "mysore_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "MYS",
+      "name_en": "Mysore",
+      "name_zh": "迈索尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B15550697205080",
+          "IN_ADM2_76128533B85389886560116",
+          "IN_ADM2_76128533B95879808095476",
+          "IN_ADM2_76128533B76927648517269",
+          "IN_ADM2_76128533B49597693387243",
+          "IN_MRG_c2a8b7b28b23"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#cd405a"
+    },
+    {
+      "id": "travancore_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "TVC",
+      "name_en": "Travancore",
+      "name_zh": "特拉凡哥尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B33162455176756",
+          "IN_ADM2_76128533B53796141759805",
+          "IN_MRG_a3f42a5bb822",
+          "IN_ADM2_76128533B75519739609062"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#e16478"
+    },
+    {
+      "id": "travancore_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "TVC",
+      "name_en": "Travancore",
+      "name_zh": "特拉凡哥尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B33162455176756",
+          "IN_ADM2_76128533B53796141759805",
+          "IN_MRG_a3f42a5bb822",
+          "IN_ADM2_76128533B75519739609062"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#dc5b69"
+    },
+    {
+      "id": "rajputana_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "IRA",
+      "name_en": "Rajputana States",
+      "name_zh": "拉杰普塔纳诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Rajasthan"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "IN_ADM2_76128533B60180372390230"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#e95c70"
+    },
+    {
+      "id": "rajputana_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "IRA",
+      "name_en": "Rajputana States",
+      "name_zh": "拉杰普塔纳诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Rajasthan"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "IN_ADM2_76128533B60180372390230"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#ac1c34"
+    },
+    {
+      "id": "bda_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "BDA",
+      "name_en": "Baroda",
+      "name_zh": "巴罗达",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B33151011563565"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#e16385"
+    },
+    {
+      "id": "bda_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "BDA",
+      "name_en": "Baroda",
+      "name_zh": "巴罗达",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B33151011563565"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#dc5a75"
+    },
+    {
+      "id": "gwa_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "GWA",
+      "name_en": "Gwalior",
+      "name_zh": "瓜廖尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B90551733723251",
+          "IN_ADM2_76128533B89286042589317",
+          "IN_MRG_ad1b1cb9dc7d"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#b71a56"
+    },
+    {
+      "id": "gwa_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "GWA",
+      "name_en": "Gwalior",
+      "name_zh": "瓜廖尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B90551733723251",
+          "IN_ADM2_76128533B89286042589317",
+          "IN_MRG_ad1b1cb9dc7d"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#b10541"
+    },
+    {
+      "id": "inr_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "INR",
+      "name_en": "Indore",
+      "name_zh": "印多尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B60360721573267"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#b81b41"
+    },
+    {
+      "id": "inr_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "INR",
+      "name_en": "Indore",
+      "name_zh": "印多尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B60360721573267"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#b0264e"
+    },
+    {
+      "id": "bpl_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "BPL",
+      "name_en": "Bhopal",
+      "name_zh": "博帕尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B22439249004073"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#e44b68"
+    },
+    {
+      "id": "bpl_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "BPL",
+      "name_en": "Bhopal",
+      "name_zh": "博帕尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B22439249004073"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#df4156"
+    },
+    {
+      "id": "ica_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "ICA",
+      "name_en": "Central India States",
+      "name_zh": "中央印度诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B38767180038480",
+          "IN_ADM2_76128533B50014751336341",
+          "IN_MRG_f73955d59e52",
+          "IN_MRG_f050f1c4b3c9",
+          "IN_MRG_8c423602963b",
+          "IN_MRG_cf5f1caa9d83",
+          "IN_MRG_90a8716fe1b8"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#ec537b"
+    },
+    {
+      "id": "ica_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "ICA",
+      "name_en": "Central India States",
+      "name_zh": "中央印度诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B38767180038480",
+          "IN_ADM2_76128533B50014751336341",
+          "IN_MRG_f73955d59e52",
+          "IN_MRG_f050f1c4b3c9",
+          "IN_MRG_8c423602963b",
+          "IN_MRG_cf5f1caa9d83",
+          "IN_MRG_90a8716fe1b8"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#e7486a"
+    },
+    {
+      "id": "kut_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KUT",
+      "name_en": "Cutch",
+      "name_zh": "卡奇",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B91881382098572"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#bc3751"
+    },
+    {
+      "id": "kut_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KUT",
+      "name_en": "Cutch",
+      "name_zh": "卡奇",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B91881382098572"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#cf4c57"
+    },
+    {
+      "id": "iwa_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "IWA",
+      "name_en": "Western India States",
+      "name_zh": "西印度诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B35205406647638",
+          "IN_ADM2_76128533B74381554567803",
+          "IN_ADM2_76128533B93450974047240",
+          "IN_ADM2_76128533B74992405432705",
+          "IN_MRG_dfe0e83efbc8"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#dd567b"
+    },
+    {
+      "id": "iwa_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "IWA",
+      "name_en": "Western India States",
+      "name_zh": "西印度诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B35205406647638",
+          "IN_ADM2_76128533B74381554567803",
+          "IN_ADM2_76128533B93450974047240",
+          "IN_ADM2_76128533B74992405432705",
+          "IN_MRG_dfe0e83efbc8"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#e3535f"
+    },
+    {
+      "id": "khp_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KHP",
+      "name_en": "Kolhapur",
+      "name_zh": "戈尔哈布尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B66719908763317"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#cb3152"
+    },
+    {
+      "id": "khp_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KHP",
+      "name_en": "Kolhapur",
+      "name_zh": "戈尔哈布尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B66719908763317"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#d43b4d"
+    },
+    {
+      "id": "ipa_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "IPA",
+      "name_en": "Punjab States",
+      "name_zh": "旁遮普诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B39368211148513",
+          "IN_MRG_862fe17f65b9"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c04969"
+    },
+    {
+      "id": "ipa_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "IPA",
+      "name_en": "Punjab States",
+      "name_zh": "旁遮普诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B39368211148513",
+          "IN_MRG_862fe17f65b9"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#be3847"
+    },
+    {
+      "id": "iha_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "IHA",
+      "name_en": "Punjab Hill States",
+      "name_zh": "旁遮普山邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B58537895532859",
+          "IN_ADM2_76128533B11802210119774",
+          "IN_ADM2_76128533B50011981829203",
+          "IN_ADM2_76128533B77537928419507"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c94f62"
+    },
+    {
+      "id": "iha_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "IHA",
+      "name_en": "Punjab Hill States",
+      "name_zh": "旁遮普山邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B58537895532859",
+          "IN_ADM2_76128533B11802210119774",
+          "IN_ADM2_76128533B50011981829203",
+          "IN_ADM2_76128533B77537928419507"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#ac313d"
+    },
+    {
+      "id": "iea_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "IEA",
+      "name_en": "Eastern States",
+      "name_zh": "东部诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B6128685860104",
+          "IN_MRG_d5c4dbfe1bc8",
+          "IN_MRG_87a650d2ea07",
+          "IN_MRG_5a8caf67d623"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#db5c6d"
+    },
+    {
+      "id": "iea_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "IEA",
+      "name_en": "Eastern States",
+      "name_zh": "东部诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B6128685860104",
+          "IN_MRG_d5c4dbfe1bc8",
+          "IN_MRG_87a650d2ea07",
+          "IN_MRG_5a8caf67d623"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#d43962"
+    },
+    {
+      "id": "rmp_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "RMP",
+      "name_en": "Rampur",
+      "name_zh": "兰普尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B46682008877369"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#e24b79"
+    },
+    {
+      "id": "rmp_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "RMP",
+      "name_en": "Rampur",
+      "name_zh": "兰普尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B46682008877369"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#dd4068"
+    },
+    {
+      "id": "chb_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "CHB",
+      "name_en": "Cooch Behar",
+      "name_zh": "科奇比哈尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B64156747739715"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#b73f63"
+    },
+    {
+      "id": "chb_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "CHB",
+      "name_en": "Cooch Behar",
+      "name_zh": "科奇比哈尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B64156747739715"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#b43752"
+    },
+    {
+      "id": "ika_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "IKA",
+      "name_en": "Khasi States",
+      "name_zh": "卡西诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B27102120636500"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#b13a4d"
+    },
+    {
+      "id": "ika_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "IKA",
+      "name_en": "Khasi States",
+      "name_zh": "卡西诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B27102120636500"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#be3f5d"
+    },
+    {
+      "id": "tpa_state_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "TPA",
+      "name_en": "Tripura",
+      "name_zh": "特里普拉",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Tripura"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#e35671"
+    },
+    {
+      "id": "tpa_state_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "TPA",
+      "name_en": "Tripura",
+      "name_zh": "特里普拉",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Tripura"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#ba1745"
+    },
+    {
+      "id": "mnp_state_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "MNP",
+      "name_en": "Manipur",
+      "name_zh": "曼尼普尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Manipur"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#cc4b70"
+    },
+    {
+      "id": "mnp_state_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "MNP",
+      "name_en": "Manipur",
+      "name_zh": "曼尼普尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "hierarchy_groups": [
+          "IN_Manipur"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c12f54"
+    },
+    {
+      "id": "bhutan_protectorate_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "BHU",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "BT"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#a93254"
+    },
+    {
+      "id": "bhutan_protectorate_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "BHU",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "BT"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#a42846"
+    },
+    {
+      "id": "french_india",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "FND",
+      "name_en": "French India",
+      "name_zh": "法属印度",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B29873478326363",
+          "IN_ADM2_76128533B62624361588317",
+          "IN_ADM2_76128533B41246169049488",
+          "IN_ADM2_76128533B83105693975079"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#1e57cd"
+    },
+    {
+      "id": "hassan_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "MYS",
+      "name_en": "Mysore",
+      "name_zh": "迈索尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_20e0c11ac976__SPLIT_HASSAN"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c53a64"
+    },
+    {
+      "id": "hassan_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "MYS",
+      "name_en": "Mysore",
+      "name_zh": "迈索尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_20e0c11ac976__SPLIT_HASSAN"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#cd405a"
+    },
+    {
+      "id": "jalna_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "HYD",
+      "name_en": "Hyderabad",
+      "name_zh": "海得拉巴",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_58d0077e7cf9__SPLIT_JALNA"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c24054"
+    },
+    {
+      "id": "jalna_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "HYD",
+      "name_en": "Hyderabad",
+      "name_zh": "海得拉巴",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_58d0077e7cf9__SPLIT_JALNA"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#bf1e50"
+    },
+    {
+      "id": "parbhani_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "HYD",
+      "name_en": "Hyderabad",
+      "name_zh": "海得拉巴",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_16da719e5c4e__SPLIT_PARBHANI"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c24054"
+    },
+    {
+      "id": "parbhani_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "HYD",
+      "name_en": "Hyderabad",
+      "name_zh": "海得拉巴",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_16da719e5c4e__SPLIT_PARBHANI"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#bf1e50"
+    },
+    {
+      "id": "raichur_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "HYD",
+      "name_en": "Hyderabad",
+      "name_zh": "海得拉巴",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_5e70f0363dee__SPLIT_RAICHUR"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c24054"
+    },
+    {
+      "id": "raichur_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "HYD",
+      "name_en": "Hyderabad",
+      "name_zh": "海得拉巴",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_5e70f0363dee__SPLIT_RAICHUR"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#bf1e50"
+    },
+    {
+      "id": "cochin_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "COC",
+      "name_en": "Cochin",
+      "name_zh": "科钦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_886776fba38b__SPLIT_COCHIN"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#d05575"
+    },
+    {
+      "id": "cochin_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "COC",
+      "name_en": "Cochin",
+      "name_zh": "科钦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_886776fba38b__SPLIT_COCHIN"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#cb4c66"
+    },
+    {
+      "id": "bahawalpur_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "BHW",
+      "name_en": "Bahawalpur",
+      "name_zh": "巴哈瓦尔布尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "PAK-1113__SPLIT_BAHAWALPUR"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c2274a"
+    },
+    {
+      "id": "bahawalpur_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "BHW",
+      "name_en": "Bahawalpur",
+      "name_zh": "巴哈瓦尔布尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "PAK-1113__SPLIT_BAHAWALPUR"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#bd1838"
+    },
+    {
+      "id": "khairpur_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KPU",
+      "name_en": "Khairpur",
+      "name_zh": "海尔布尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "PAK-1114__SPLIT_KHAIRPUR"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#d55567"
+    },
+    {
+      "id": "khairpur_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KPU",
+      "name_en": "Khairpur",
+      "name_zh": "海尔布尔",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "PAK-1114__SPLIT_KHAIRPUR"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#b72f41"
+    },
+    {
+      "id": "baluchistan_states_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KLA",
+      "name_en": "Kalat and Baluchistan States",
+      "name_zh": "卡拉特与俾路支诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "PAK-1108__SPLIT_BALUCHISTAN_STATES"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#b82d55"
+    },
+    {
+      "id": "baluchistan_states_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KLA",
+      "name_en": "Kalat and Baluchistan States",
+      "name_zh": "卡拉特与俾路支诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "PAK-1108__SPLIT_BALUCHISTAN_STATES"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c6253f"
+    },
+    {
+      "id": "frontier_states_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "IFA",
+      "name_en": "North-West Frontier States",
+      "name_zh": "西北边疆诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "PAK-1123__SPLIT_FRONTIER_STATES"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#d94573"
+    },
+    {
+      "id": "frontier_states_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "IFA",
+      "name_en": "North-West Frontier States",
+      "name_zh": "西北边疆诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "PAK-1123__SPLIT_FRONTIER_STATES"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c44550"
+    },
+    {
+      "id": "deccan_states_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "IDA",
+      "name_en": "Deccan States",
+      "name_zh": "德干诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B9892158671522__SPLIT_DECCAN_STATES"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c42d61"
+    },
+    {
+      "id": "deccan_states_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "IDA",
+      "name_en": "Deccan States",
+      "name_zh": "德干诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B9892158671522__SPLIT_DECCAN_STATES"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#d6545d"
+    },
+    {
+      "id": "mandi_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "IHA",
+      "name_en": "Punjab Hill States",
+      "name_zh": "旁遮普山邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_51471f01d80d__SPLIT_MANDI"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#c94f62"
+    },
+    {
+      "id": "mandi_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "IHA",
+      "name_en": "Punjab Hill States",
+      "name_zh": "旁遮普山邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_51471f01d80d__SPLIT_MANDI"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#ac313d"
+    },
+    {
+      "id": "odisha_states_split_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "IEA",
+      "name_en": "Eastern States",
+      "name_zh": "东部诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_4151783f27ba__SPLIT_ODISHA_STATES"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#db5c6d"
+    },
+    {
+      "id": "odisha_states_split_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "IEA",
+      "name_en": "Eastern States",
+      "name_zh": "东部诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "princely_state",
+      "select": {
+        "feature_ids": [
+          "IN_MRG_4151783f27ba__SPLIT_ODISHA_STATES"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#d43962"
+    },
+    {
+      "id": "sha_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "SHA",
+      "name_en": "Federated Shan States",
+      "name_zh": "掸邦联邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MMR-3277"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#d94e6e"
+    },
+    {
+      "id": "krn_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KRN",
+      "name_en": "Karenni States",
+      "name_zh": "克伦尼诸邦",
+      "parent_owner_tag": "RAJ",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MMR-2473"
+        ]
+      },
+      "only_from_owners": [
+        "RAJ"
+      ],
+      "color_hex": "#b02d48"
+    },
+    {
+      "id": "sha_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SHA",
+      "name_en": "Federated Shan States",
+      "name_zh": "掸邦联邦",
+      "parent_owner_tag": "BRM",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MMR-3277"
+        ]
+      },
+      "only_from_owners": [
+        "BRM"
+      ],
+      "color_hex": "#9f3b4f"
+    },
+    {
+      "id": "krn_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KRN",
+      "name_en": "Karenni States",
+      "name_zh": "克伦尼诸邦",
+      "parent_owner_tag": "BRM",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MMR-2473"
+        ]
+      },
+      "only_from_owners": [
+        "BRM"
+      ],
+      "color_hex": "#d66a7f"
+    },
+    {
+      "id": "malaya_federated_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "MAL",
+      "name_en": "Federated Malay States",
+      "name_zh": "马来联邦",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1137",
+          "MYS-1146",
+          "MYS-1147",
+          "MYS-1148",
+          "MYS-4831",
+          "MYS-4832"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#d34869"
+    },
+    {
+      "id": "malaya_federated_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "MAL",
+      "name_en": "Federated Malay States",
+      "name_zh": "马来联邦",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1137",
+          "MYS-1146",
+          "MYS-1147",
+          "MYS-1148",
+          "MYS-4831",
+          "MYS-4832"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#dd506c"
+    },
+    {
+      "id": "joh_protectorate_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "JOH",
+      "name_en": "Sultanate of Johor",
+      "name_zh": "柔佛苏丹国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1143"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "cores": "keep",
+      "color_hex": "#ab2644"
+    },
+    {
+      "id": "joh_protectorate_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "JOH",
+      "name_en": "Sultanate of Johor",
+      "name_zh": "柔佛苏丹国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1143"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "cores": "keep",
+      "color_hex": "#c6466b"
+    },
+    {
+      "id": "ked_protectorate_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KED",
+      "name_en": "Sultanate of Kedah",
+      "name_zh": "吉打苏丹国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1140"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "cores": "keep",
+      "color_hex": "#c6466b"
+    },
+    {
+      "id": "ked_protectorate_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KED",
+      "name_en": "Sultanate of Kedah",
+      "name_zh": "吉打苏丹国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1140"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "cores": "keep",
+      "color_hex": "#dc4574"
+    },
+    {
+      "id": "pls_protectorate_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "PLS",
+      "name_en": "Perlis",
+      "name_zh": "玻璃市",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1141"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "cores": "keep",
+      "color_hex": "#c93265"
+    },
+    {
+      "id": "pls_protectorate_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "PLS",
+      "name_en": "Perlis",
+      "name_zh": "玻璃市",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1141"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "cores": "keep",
+      "color_hex": "#cf3e62"
+    },
+    {
+      "id": "kel_protectorate_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KEL",
+      "name_en": "Sultanate of Kelantan",
+      "name_zh": "吉兰丹苏丹国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1144"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "cores": "keep",
+      "color_hex": "#c0345f"
+    },
+    {
+      "id": "kel_protectorate_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KEL",
+      "name_en": "Sultanate of Kelantan",
+      "name_zh": "吉兰丹苏丹国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1144"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "cores": "keep",
+      "color_hex": "#d34869"
+    },
+    {
+      "id": "tga_protectorate_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "TGA",
+      "name_en": "Sultanate of Terengganu",
+      "name_zh": "登嘉楼苏丹国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1149"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "cores": "keep",
+      "color_hex": "#c24065"
+    },
+    {
+      "id": "tga_protectorate_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "TGA",
+      "name_en": "Sultanate of Terengganu",
+      "name_zh": "登嘉楼苏丹国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "MYS-1149"
+        ]
+      },
+      "only_from_owners": [
+        "MAL"
+      ],
+      "cores": "keep",
+      "color_hex": "#cc3d6b"
+    },
+    {
+      "id": "yogyakarta",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "YOG",
+      "name_en": "Sultanate of Yogyakarta",
+      "name_zh": "日惹苏丹国",
+      "parent_owner_tag": "HOL",
+      "subject_kind": "princely_state",
+      "select": {
+        "hierarchy_groups": [
+          "ID_Special_Region_of_Yogyakarta"
+        ]
+      },
+      "only_from_owners": [
+        "INS"
+      ],
+      "cores": "keep",
+      "color_hex": "#d79953"
+    },
+    {
+      "id": "olongapo_reservation",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "USA",
+      "select": {
+        "feature_ids": [
+          "PHL-5540"
+        ]
+      },
+      "only_from_owners": [
+        "PHI"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "thailand_name_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SIA",
+      "name_en": "Kingdom of Thailand",
+      "name_zh": "泰王国",
+      "select": {
+        "country_codes": [
+          "TH"
+        ]
+      },
+      "cores": "keep"
+    },
+    {
+      "id": "abd_sheikhdom",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ABD",
+      "name_en": "Sheikhdom of Abu Dhabi",
+      "name_zh": "阿布扎比酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "ARE-349"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ],
+      "color_hex": "#db5d80"
+    },
+    {
+      "id": "dub_sheikhdom_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "DUB",
+      "name_en": "Sheikhdom of Dubai",
+      "name_zh": "迪拜酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "ARE-350"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ],
+      "color_hex": "#b2113c"
+    },
+    {
+      "id": "dub_sheikhdom_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "DUB",
+      "name_en": "Sheikhdom of Dubai",
+      "name_zh": "迪拜酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "ARE-350"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ],
+      "color_hex": "#e3576b"
+    },
+    {
+      "id": "shj_sheikhdom_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "SHJ",
+      "name_en": "Sheikhdom of Sharjah",
+      "name_zh": "沙迦酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "ARE-348"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ],
+      "color_hex": "#b62359"
+    },
+    {
+      "id": "shj_sheikhdom_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SHJ",
+      "name_en": "Sheikhdom of Sharjah",
+      "name_zh": "沙迦酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "ARE-348"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ],
+      "color_hex": "#b73158"
+    },
+    {
+      "id": "rak_sheikhdom_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "RAK",
+      "name_en": "Sheikhdom of Ras al-Khaimah",
+      "name_zh": "拉斯海马酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "ARE-338"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ],
+      "color_hex": "#de547c"
+    },
+    {
+      "id": "rak_sheikhdom_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "RAK",
+      "name_en": "Sheikhdom of Ras al-Khaimah",
+      "name_zh": "拉斯海马酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "ARE-338"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ],
+      "color_hex": "#b53c57"
+    },
+    {
+      "id": "ajm_sheikhdom_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "AJM",
+      "name_en": "Sheikhdom of Ajman",
+      "name_zh": "阿治曼酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "ARE-346"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ],
+      "color_hex": "#a32c50"
+    },
+    {
+      "id": "ajm_sheikhdom_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "AJM",
+      "name_en": "Sheikhdom of Ajman",
+      "name_zh": "阿治曼酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "ARE-346"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ],
+      "color_hex": "#bc2045"
+    },
+    {
+      "id": "uaq_sheikhdom_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "UAQ",
+      "name_en": "Sheikhdom of Umm al-Quwain",
+      "name_zh": "乌姆盖万酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "ARE-339"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ],
+      "color_hex": "#d84f62"
+    },
+    {
+      "id": "uaq_sheikhdom_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "UAQ",
+      "name_en": "Sheikhdom of Umm al-Quwain",
+      "name_zh": "乌姆盖万酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "ARE-339"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ],
+      "color_hex": "#e05977"
+    },
+    {
+      "id": "fujairah",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "FUJ",
+      "name_en": "Sheikhdom of Fujairah",
+      "name_zh": "富查伊拉酋长国",
+      "color_hex": "#d4608e",
+      "select": {
+        "feature_ids": [
+          "ARE-341"
+        ]
+      },
+      "only_from_owners": [
+        "TRU",
+        "ENG"
+      ]
+    },
+    {
+      "id": "muscat_name",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "OMA",
+      "name_en": "Sultanate of Muscat and Oman",
+      "name_zh": "马斯喀特与阿曼苏丹国",
+      "select": {
+        "country_codes": [
+          "OM"
+        ]
+      },
+      "only_from_owners": [
+        "OMA"
+      ],
+      "cores": "keep"
+    },
+    {
+      "id": "oman_imamate",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "IMO",
+      "name_en": "Imamate of Oman",
+      "name_zh": "阿曼伊玛目国",
+      "parent_owner_tag": "OMA",
+      "subject_kind": "autonomous_region",
+      "select": {
+        "feature_ids": [
+          "OMN-2404",
+          "OMN-2414"
+        ]
+      },
+      "only_from_owners": [
+        "OMA"
+      ],
+      "color_hex": "#7f5154"
+    },
+    {
+      "id": "alawite_government",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ALW",
+      "name_en": "Autonomous Government of Latakia",
+      "name_zh": "拉塔基亚自治政府",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "autonomous_region",
+      "select": {
+        "feature_ids": [
+          "SYR-134",
+          "SYR-135"
+        ]
+      },
+      "only_from_owners": [
+        "SYR"
+      ],
+      "color_hex": "#395ed8"
+    },
+    {
+      "id": "jabal_druze",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "JEB",
+      "name_en": "Autonomous Government of Jabal Druze",
+      "name_zh": "德鲁兹山自治政府",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "autonomous_region",
+      "select": {
+        "feature_ids": [
+          "SYR-143"
+        ]
+      },
+      "only_from_owners": [
+        "SYR"
+      ],
+      "color_hex": "#5174da"
+    },
+    {
+      "id": "alexandretta_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "HTY",
+      "name_en": "Alexandretta Autonomous Sanjak Debug Region",
+      "name_zh": "亚历山大勒塔自治专区调试分区",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "autonomous_region",
+      "select": {
+        "feature_ids": [
+          "TR631"
+        ]
+      },
+      "only_from_owners": [
+        "SYR"
+      ],
+      "color_hex": "#297cef"
+    },
+    {
+      "id": "jazira_administration_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "JAZ",
+      "name_en": "Upper Jazira Administration",
+      "name_zh": "上杰济拉行政区",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "administrative_region",
+      "select": {
+        "feature_ids": [
+          "SYR-141"
+        ]
+      },
+      "only_from_owners": [
+        "SYR"
+      ],
+      "color_hex": "#297cef"
+    },
+    {
+      "id": "transjordan_mandate_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "JOR",
+      "name_en": "Emirate of Transjordan",
+      "name_zh": "外约旦酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "mandate",
+      "select": {
+        "country_codes": [
+          "JO"
+        ]
+      },
+      "only_from_owners": [
+        "JOR"
+      ],
+      "cores": "keep",
+      "color_hex": "#b6314c"
+    },
+    {
+      "id": "transjordan_mandate_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "JOR",
+      "name_en": "Emirate of Transjordan",
+      "name_zh": "外约旦酋长国",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "mandate",
+      "select": {
+        "country_codes": [
+          "JO"
+        ]
+      },
+      "only_from_owners": [
+        "JOR"
+      ],
+      "cores": "keep",
+      "color_hex": "#c0345f"
+    },
+    {
+      "id": "aden_western_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "WDN",
+      "name_en": "Western Aden Protectorate Debug Region",
+      "name_zh": "西亚丁保护地调试分区",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "YEM-157",
+          "YEM-3511",
+          "YEM-336"
+        ]
+      },
+      "only_from_owners": [
+        "YEM"
+      ],
+      "color_hex": "#e05977"
+    },
+    {
+      "id": "aden_western_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "WDN",
+      "name_en": "Western Aden Protectorate Debug Region",
+      "name_zh": "西亚丁保护地调试分区",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "YEM-157",
+          "YEM-3511",
+          "YEM-336"
+        ]
+      },
+      "only_from_owners": [
+        "YEM"
+      ],
+      "color_hex": "#b12746"
+    },
+    {
+      "id": "aden_eastern_states_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "EDN",
+      "name_en": "Eastern Aden Protectorate Debug Region",
+      "name_zh": "东亚丁保护地调试分区",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "YEM-3497",
+          "YEM-332"
+        ]
+      },
+      "only_from_owners": [
+        "YEM"
+      ],
+      "color_hex": "#ba4364"
+    },
+    {
+      "id": "aden_eastern_states_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "EDN",
+      "name_en": "Eastern Aden Protectorate Debug Region",
+      "name_zh": "东亚丁保护地调试分区",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "feature_ids": [
+          "YEM-3497",
+          "YEM-332"
+        ]
+      },
+      "only_from_owners": [
+        "YEM"
+      ],
+      "color_hex": "#d75176"
+    },
+    {
+      "id": "sichuan_faction_metadata_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "CHU",
+      "name_en": "Sichuan Administration - Liu Xiang Faction",
+      "name_zh": "四川军政区（刘湘系）",
+      "parent_owner_tag": "CHI",
+      "subject_kind": "military_administration",
       "select": {
         "owners": [
-          "ALG"
+          "CHU"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#3c36a1"
+    },
+    {
+      "id": "xikang_metadata_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "SIC",
+      "name_en": "Xikang Provincial Preparatory Committee",
+      "name_zh": "西康建省委员会",
+      "parent_owner_tag": "CHI",
+      "subject_kind": "military_administration",
+      "select": {
+        "owners": [
+          "SIC"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#2f42a9"
+    },
+    {
+      "id": "xikang_metadata_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SIC",
+      "name_en": "Xikang Provincial Government",
+      "name_zh": "西康省政府",
+      "parent_owner_tag": "CHI",
+      "subject_kind": "military_administration",
+      "select": {
+        "owners": [
+          "SIC"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#3c36a1"
+    },
+    {
+      "id": "yunnan_metadata_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "YUN",
+      "name_en": "Yunnan Provincial Government - Long Yun",
+      "name_zh": "云南省政府（龙云）",
+      "parent_owner_tag": "CHI",
+      "subject_kind": "military_administration",
+      "select": {
+        "owners": [
+          "YUN"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#2a267a"
+    },
+    {
+      "id": "yunnan_metadata_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "YUN",
+      "name_en": "Yunnan Provincial Government - Long Yun",
+      "name_zh": "云南省政府（龙云）",
+      "parent_owner_tag": "CHI",
+      "subject_kind": "military_administration",
+      "select": {
+        "owners": [
+          "YUN"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#1a2071"
+    },
+    {
+      "id": "liangshan_clans_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "LOL",
+      "name_en": "Liangshan Yi Clan Debug Region",
+      "name_zh": "凉山彝族家支调试分区",
+      "parent_owner_tag": "CHU",
+      "subject_kind": "autonomous_region",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B23024603415445",
+          "CN_CITY_17275852B52132557540167",
+          "CN_CITY_17275852B17138311811008"
+        ]
+      },
+      "only_from_owners": [
+        "CHU"
+      ],
+      "cores": "keep",
+      "color_hex": "#4955b2"
+    },
+    {
+      "id": "muli_chiefdom_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "MUL",
+      "name_en": "Muli Chiefdom",
+      "name_zh": "木里土司",
+      "parent_owner_tag": "CHU",
+      "subject_kind": "tusi",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B80219081988604"
+        ]
+      },
+      "only_from_owners": [
+        "SIC"
+      ],
+      "cores": "keep",
+      "color_hex": "#27257d"
+    },
+    {
+      "id": "liangshan_clans_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "LOL",
+      "name_en": "Liangshan Yi Clan Debug Region",
+      "name_zh": "凉山彝族家支调试分区",
+      "parent_owner_tag": "SIC",
+      "subject_kind": "autonomous_region",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B23024603415445",
+          "CN_CITY_17275852B52132557540167",
+          "CN_CITY_17275852B17138311811008"
+        ]
+      },
+      "only_from_owners": [
+        "CHI",
+        "SIC"
+      ],
+      "cores": "keep",
+      "color_hex": "#4955b2"
+    },
+    {
+      "id": "muli_chiefdom_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "MUL",
+      "name_en": "Muli Chiefdom",
+      "name_zh": "木里土司",
+      "parent_owner_tag": "SIC",
+      "subject_kind": "tusi",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B80219081988604"
+        ]
+      },
+      "only_from_owners": [
+        "SIC"
+      ],
+      "cores": "keep",
+      "color_hex": "#27257d"
+    },
+    {
+      "id": "gyalrong_four_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "JRG",
+      "name_en": "Gyalrong Four Chiefdoms Debug Region",
+      "name_zh": "嘉绒四土调试分区",
+      "parent_owner_tag": "CHI",
+      "subject_kind": "tusi",
+      "select": {
+        "feature_ids": [
+          "CN_CITY_17275852B24790182027849"
+        ]
+      },
+      "only_from_owners": [
+        "CHI"
+      ],
+      "cores": "keep",
+      "color_hex": "#3a4fa5"
+    },
+    {
+      "id": "algeria_northern_departments",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "FRA",
+      "select": {
+        "country_codes": [
+          "DZ"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "DZA-2143",
+          "DZA-2148",
+          "DZA-2149",
+          "DZA-2150",
+          "DZA-2188",
+          "DZA-2189",
+          "DZA-2190",
+          "DZA-2191",
+          "DZA-2192",
+          "DZA-2193",
+          "DZA-2194",
+          "DZA-2211",
+          "DZA-2212"
+        ]
+      },
+      "only_from_owners": [
+        "ALG"
+      ]
+    },
+    {
+      "id": "algeria_southern_territories",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ALG",
+      "name_en": "Southern Territories of Algeria",
+      "name_zh": "阿尔及利亚南部领地",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "military_administration",
+      "select": {
+        "feature_ids": [
+          "DZA-2143",
+          "DZA-2148",
+          "DZA-2149",
+          "DZA-2150",
+          "DZA-2188",
+          "DZA-2189",
+          "DZA-2190",
+          "DZA-2191",
+          "DZA-2192",
+          "DZA-2193",
+          "DZA-2194",
+          "DZA-2211",
+          "DZA-2212"
         ]
       },
       "only_from_owners": [
         "ALG"
       ],
+      "cores": "keep",
       "color_hex": "#245dbb"
+    },
+    {
+      "id": "libyan_coastal_provinces_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "ITA",
+      "select": {
+        "country_codes": [
+          "LY"
+        ],
+        "bbox": [
+          -180,
+          29,
+          180,
+          90
+        ]
+      },
+      "only_from_owners": [
+        "LBA"
+      ]
+    },
+    {
+      "id": "karafuto_administration_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "KRF",
+      "name_en": "Karafuto Prefecture",
+      "name_zh": "桦太厅",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "RU"
+        ],
+        "bbox": [
+          140,
+          45,
+          145,
+          50
+        ]
+      },
+      "only_from_owners": [
+        "JAP"
+      ],
+      "color_hex": "#b08572"
+    },
+    {
+      "id": "karafuto_administration_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "KRF",
+      "name_en": "Karafuto Prefecture",
+      "name_zh": "桦太厅",
+      "parent_owner_tag": "JAP",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "RU"
+        ],
+        "bbox": [
+          140,
+          45,
+          145,
+          50
+        ]
+      },
+      "only_from_owners": [
+        "JAP"
+      ],
+      "color_hex": "#c28d7e"
+    },
+    {
+      "id": "saint_helena_colony_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "STH",
+      "name_en": "Saint Helena Colony",
+      "name_zh": "圣赫勒拿殖民地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "SH"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#ba214f"
+    },
+    {
+      "id": "saint_helena_colony_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "STH",
+      "name_en": "Saint Helena Colony",
+      "name_zh": "圣赫勒拿殖民地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "SH"
+        ]
+      },
+      "only_from_owners": [
+        "ENG"
+      ],
+      "color_hex": "#cd4761"
+    },
+    {
+      "id": "saint_pierre_miquelon",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SPM",
+      "name_en": "Saint Pierre and Miquelon",
+      "name_zh": "圣皮埃尔和密克隆",
+      "parent_owner_tag": "FRA",
+      "subject_kind": "colony",
+      "select": {
+        "country_codes": [
+          "PM"
+        ]
+      },
+      "only_from_owners": [
+        "FRA"
+      ],
+      "color_hex": "#476bd5"
+    },
+    {
+      "id": "mayotte_madagascar_dependency",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "MAD",
+      "select": {
+        "country_codes": [
+          "YT"
+        ]
+      },
+      "only_from_owners": [
+        "YT"
+      ],
+      "color_hex": "#3887fb"
+    },
+    {
+      "id": "puerto_rico_territory_metadata",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "PUE",
+      "parent_owner_tag": "USA",
+      "subject_kind": "territory",
+      "select": {
+        "country_codes": [
+          "PR"
+        ]
+      },
+      "only_from_owners": [
+        "PUE"
+      ],
+      "cores": "keep",
+      "color_hex": "#0f96fe"
+    },
+    {
+      "id": "guangzhouwan_indochina_parent",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KWW",
+      "parent_owner_tag": "VIN",
+      "subject_kind": "colony",
+      "select": {
+        "owners": [
+          "KWW"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#08509f"
     },
     {
       "id": "ang_family_colour_hoi4_1936",
@@ -5301,7 +7932,7 @@
       "only_from_owners": [
         "AST"
       ],
-      "color_hex": "#db5d80"
+      "color_hex": "#bc2045"
     },
     {
       "id": "cey_family_colour_hoi4_1936",
@@ -5317,7 +7948,7 @@
       "only_from_owners": [
         "CEY"
       ],
-      "color_hex": "#d55768"
+      "color_hex": "#c34a5d"
     },
     {
       "id": "egy_family_colour_hoi4_1936",
@@ -5333,7 +7964,7 @@
       "only_from_owners": [
         "EGY"
       ],
-      "color_hex": "#c34a5d"
+      "color_hex": "#e3576b"
     },
     {
       "id": "eri_family_colour_hoi4_1936",
@@ -5413,23 +8044,7 @@
       "only_from_owners": [
         "LEB"
       ],
-      "color_hex": "#5d82eb"
-    },
-    {
-      "id": "mal_family_colour_hoi4_1936",
-      "scenarios": [
-        "hoi4_1936"
-      ],
-      "tag": "MAL",
-      "select": {
-        "owners": [
-          "MAL"
-        ]
-      },
-      "only_from_owners": [
-        "MAL"
-      ],
-      "color_hex": "#c52b4d"
+      "color_hex": "#405fc1"
     },
     {
       "id": "mor_family_colour_hoi4_1936",
@@ -5445,7 +8060,7 @@
       "only_from_owners": [
         "MOR"
       ],
-      "color_hex": "#5174da"
+      "color_hex": "#3375d4"
     },
     {
       "id": "mzb_family_colour_hoi4_1936",
@@ -5477,7 +8092,7 @@
       "only_from_owners": [
         "PAL"
       ],
-      "color_hex": "#dc4574"
+      "color_hex": "#b61547"
     },
     {
       "id": "phi_family_colour_hoi4_1936",
@@ -5494,22 +8109,6 @@
         "PHI"
       ],
       "color_hex": "#146fdd"
-    },
-    {
-      "id": "raj_family_colour_hoi4_1936",
-      "scenarios": [
-        "hoi4_1936"
-      ],
-      "tag": "RAJ",
-      "select": {
-        "owners": [
-          "RAJ"
-        ]
-      },
-      "only_from_owners": [
-        "RAJ"
-      ],
-      "color_hex": "#ab3354"
     },
     {
       "id": "rcg_family_colour_hoi4_1936",
@@ -5541,7 +8140,7 @@
       "only_from_owners": [
         "SAF"
       ],
-      "color_hex": "#db5e73"
+      "color_hex": "#b53c57"
     },
     {
       "id": "sgn_family_colour_hoi4_1936",
@@ -5621,7 +8220,7 @@
       "only_from_owners": [
         "SUD"
       ],
-      "color_hex": "#c03e5a"
+      "color_hex": "#cd4761"
     },
     {
       "id": "tai_family_colour_hoi4_1936",
@@ -5637,7 +8236,7 @@
       "only_from_owners": [
         "TAI"
       ],
-      "color_hex": "#c28d7e"
+      "color_hex": "#d5a992"
     },
     {
       "id": "tun_family_colour_hoi4_1936",
@@ -5653,23 +8252,7 @@
       "only_from_owners": [
         "TUN"
       ],
-      "color_hex": "#1964c9"
-    },
-    {
-      "id": "alg_family_colour_hoi4_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "ALG",
-      "select": {
-        "owners": [
-          "ALG"
-        ]
-      },
-      "only_from_owners": [
-        "ALG"
-      ],
-      "color_hex": "#245dbb"
+      "color_hex": "#3657c4"
     },
     {
       "id": "ang_family_colour_hoi4_1939",
@@ -5717,7 +8300,7 @@
       "only_from_owners": [
         "AST"
       ],
-      "color_hex": "#a32c50"
+      "color_hex": "#de4563"
     },
     {
       "id": "cey_family_colour_hoi4_1939",
@@ -5733,7 +8316,7 @@
       "only_from_owners": [
         "CEY"
       ],
-      "color_hex": "#c34a5d"
+      "color_hex": "#b2113c"
     },
     {
       "id": "egy_family_colour_hoi4_1939",
@@ -5749,7 +8332,7 @@
       "only_from_owners": [
         "EGY"
       ],
-      "color_hex": "#b2113c"
+      "color_hex": "#d4405a"
     },
     {
       "id": "ins_family_colour_hoi4_1939",
@@ -5813,23 +8396,7 @@
       "only_from_owners": [
         "LEB"
       ],
-      "color_hex": "#5d82eb"
-    },
-    {
-      "id": "mal_family_colour_hoi4_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "MAL",
-      "select": {
-        "owners": [
-          "MAL"
-        ]
-      },
-      "only_from_owners": [
-        "MAL"
-      ],
-      "color_hex": "#cf4f62"
+      "color_hex": "#405fc1"
     },
     {
       "id": "mor_family_colour_hoi4_1939",
@@ -5845,7 +8412,7 @@
       "only_from_owners": [
         "MOR"
       ],
-      "color_hex": "#5174da"
+      "color_hex": "#3375d4"
     },
     {
       "id": "mzb_family_colour_hoi4_1939",
@@ -5877,7 +8444,7 @@
       "only_from_owners": [
         "PAL"
       ],
-      "color_hex": "#ab3354"
+      "color_hex": "#c03e5a"
     },
     {
       "id": "phi_family_colour_hoi4_1939",
@@ -5909,7 +8476,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#db5e73"
+      "color_hex": "#ca3351"
     },
     {
       "id": "rcg_family_colour_hoi4_1939",
@@ -5941,7 +8508,7 @@
       "only_from_owners": [
         "SAF"
       ],
-      "color_hex": "#ab204d"
+      "color_hex": "#b62359"
     },
     {
       "id": "sgn_family_colour_hoi4_1939",
@@ -6005,7 +8572,7 @@
       "only_from_owners": [
         "SUD"
       ],
-      "color_hex": "#de547c"
+      "color_hex": "#c24065"
     },
     {
       "id": "syr_family_colour_hoi4_1939",
@@ -6021,7 +8588,7 @@
       "only_from_owners": [
         "SYR"
       ],
-      "color_hex": "#3375d4"
+      "color_hex": "#4e75ee"
     },
     {
       "id": "tai_family_colour_hoi4_1939",
@@ -6037,7 +8604,7 @@
       "only_from_owners": [
         "TAI"
       ],
-      "color_hex": "#e0af90"
+      "color_hex": "#f0b7a9"
     },
     {
       "id": "tun_family_colour_hoi4_1939",
@@ -6053,7 +8620,7 @@
       "only_from_owners": [
         "TUN"
       ],
-      "color_hex": "#1964c9"
+      "color_hex": "#3657c4"
     },
     {
       "id": "china_enclaves_1939",

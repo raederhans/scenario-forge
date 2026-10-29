@@ -14,6 +14,31 @@ import {
 } from "../js/core/state.js";
 import { applyAppearancePresetState } from "../js/core/state/actions/appearance_preset_actions.js";
 
+test("appearance import rejects unsupported formats with categorized errors", () => {
+  for (const payload of [null, {}, 42, true, "{}", "null", "42"]) {
+    assert.throws(() => mergeAppearancePresetImportPayload(null, payload), { code: "invalid-format" });
+  }
+  assert.throws(() => mergeAppearancePresetImportPayload(null, "{"), { code: "invalid-json" });
+});
+
+test("appearance import retains supported containers and accepts their JSON representation", () => {
+  const preset = { id: "imported", name: "Imported", snapshot: { styleConfig: {} } };
+  for (const payload of [
+    { kind: "appearance-preset", preset }, { preset }, { presets: [preset] },
+    [preset], { byId: { imported: preset }, order: ["imported"] }, preset,
+  ]) {
+    for (const input of [payload, JSON.stringify(payload)]) {
+      const result = mergeAppearancePresetImportPayload(null, input);
+      assert.deepEqual(result.order, ["imported"]);
+      assert.equal(result.byId.imported.name, "Imported");
+      assert.equal(result.selectedPresetId, "imported");
+    }
+  }
+  for (const payload of [[], { presets: [] }, { byId: {}, order: [] }]) {
+    assert.deepEqual(mergeAppearancePresetImportPayload(null, payload), createDefaultAppearancePresetsState());
+  }
+});
+
 function createRuntimeAppearanceState({
   pointLon = 139.7,
   pointLat = 35.7,

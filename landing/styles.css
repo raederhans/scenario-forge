@@ -1,15 +1,31 @@
 /* Scenario Forge landing — one map stage, chapters scrolling over it. */
 :root {
-  --ink: #0b100f;
-  --ink-2: #111816;
-  --ink-3: #18211e;
-  --paper: #efe7d6;
-  --paper-dim: #b9b19f;
-  --paper-faint: #7f7a6c;
-  --copper: #e0a66a;
-  --copper-hi: #f3c690;
-  --line: rgba(239, 231, 214, 0.14);
-  --font-display: "Instrument Serif", "Noto Serif SC", "Songti SC", Georgia, serif;
+  /* Shared editor semantics: ink-900 is primary text, light paper on this dark showcase. */
+  --surface-app: #0b100f;
+  --surface-panel: #111816;
+  --surface-raised: #18211e;
+  --surface-canvas: #101513;
+  --ink-900: #efe7d6;
+  --ink-700: #b9b19f;
+  --ink-500: #999181;
+  --accent: #e0a66a;
+  --accent-hover: #f3c690;
+  --accent-ring: #e0a66a;
+  --line-1: rgba(239, 231, 214, 0.14);
+  --line-2: rgba(239, 231, 214, 0.32);
+  --radius-sm: 8px;
+  --radius-pill: 999px;
+  --ink: var(--surface-app);
+  --ink-2: var(--surface-panel);
+  --ink-3: var(--surface-raised);
+  --paper: var(--ink-900);
+  --paper-dim: var(--ink-700);
+  --paper-faint: var(--ink-500);
+  --copper: var(--accent);
+  --copper-hi: var(--accent-hover);
+  --line: var(--line-1);
+  --font-brand: "Instrument Serif", "Noto Serif SC", "Songti SC", Georgia, serif;
+  --font-display: var(--font-brand);
   --font-body: "Geist", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
   --gutter: clamp(16px, 4vw, 56px);
@@ -20,19 +36,19 @@ html { background: var(--ink); color: var(--paper); scroll-behavior: smooth; }
 body { margin: 0; font-family: var(--font-body); line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: clip; background: var(--ink); }
 a { color: inherit; }
 h1, h2 { font-weight: 400; }
-:focus-visible { outline: 2px solid var(--copper); outline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 3px; }
 .skip-link { position: absolute; left: 16px; top: -60px; z-index: 50; padding: 10px 14px; background: var(--copper); color: var(--ink); border-radius: 8px; }
 .skip-link:focus { top: 12px; }
 
 /* Controls */
 .btn {
-  display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: 999px;
+  display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: var(--radius-pill);
   font: 500 .92rem var(--font-body); text-decoration: none; transition: transform .2s, background .2s, border-color .2s;
 }
 .btn:hover { transform: translateY(-1px); }
-.btn--copper { background: var(--copper); color: var(--ink); }
-.btn--copper:hover { background: var(--copper-hi); }
-.btn--ghost { border: 1px solid rgba(239, 231, 214, .32); color: var(--paper); backdrop-filter: blur(6px); }
+.btn--copper { background: var(--accent); color: var(--surface-app); }
+.btn--copper:hover { background: var(--accent-hover); }
+.btn--ghost { border: 1px solid var(--line-2); color: var(--paper); background: var(--surface-panel); }
 .btn--ghost:hover { border-color: var(--paper); }
 .btn--small { min-height: 36px; padding: 0 16px; font-size: .82rem; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -49,7 +65,7 @@ h1, h2 { font-weight: 400; }
   background: linear-gradient(to bottom, rgba(11, 16, 15, .8), rgba(11, 16, 15, 0)); transition: background .3s;
 }
 .nav.is-scrolled { background: rgba(11, 16, 15, .94); border-bottom: 1px solid var(--line); }
-.nav__brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 1.4rem; text-decoration: none; }
+.nav__brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-brand); font-size: 1.4rem; text-decoration: none; }
 .nav__brand img { border-radius: 5px; }
 .nav__products { display: flex; gap: 4px; margin-right: auto; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: rgba(11, 16, 15, .55); }
 .nav__products a { padding: 6px 14px; border-radius: 999px; font-size: .82rem; text-decoration: none; color: var(--paper-dim); }
@@ -139,7 +155,7 @@ h1, h2 { font-weight: 400; }
   width: 0; height: 0; border-left: 12px solid var(--paper); border-right: 0;
   border-top: 7px solid transparent; border-bottom: 7px solid transparent; margin-left: 4px;
 }
-.scrubber__track { position: relative; flex: 1; height: 58px; cursor: grab; touch-action: none; outline: none; }
+.scrubber__track { position: relative; flex: 1; height: 58px; cursor: grab; touch-action: none; border-radius: var(--radius-sm); }
 .scrubber__track:focus-visible .scrubber__thumb { box-shadow: 0 0 0 6px rgba(224, 166, 106, .35); }
 .scrubber__rail { position: absolute; left: 0; right: 0; top: 14px; height: 2px; background: rgba(239, 231, 214, .22); }
 .scrubber__fill { height: 100%; width: 0; background: var(--copper); }
@@ -197,7 +213,7 @@ h1, h2 { font-weight: 400; }
 .world { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; transition: background .3s; }
 .world.is-active { background: rgba(224, 166, 106, .12); }
 .world__pick { all: unset; cursor: pointer; display: grid; grid-template-columns: 26px 1fr; column-gap: 8px; }
-.world__pick:focus-visible { outline: 2px solid var(--copper); outline-offset: 4px; border-radius: 4px; }
+.world__pick:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 4px; border-radius: 4px; }
 .world__index { grid-row: span 2; font: 500 .68rem var(--font-mono); color: var(--copper); padding-top: 4px; }
 .world__pick b { font: 400 1.25rem/1.15 var(--font-display); }
 .world__pick small { font-size: .78rem; color: var(--paper-dim); }
@@ -267,13 +283,28 @@ h1, h2 { font-weight: 400; }
   display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; padding: 28px var(--gutter);
   border-top: 1px solid var(--line); font: 400 .74rem var(--font-mono); letter-spacing: .08em; color: var(--paper-faint);
 }
-.footer span:first-child { color: var(--paper); font-family: var(--font-display); font-size: 1.15rem; letter-spacing: 0; }
+.footer span:first-child { color: var(--paper); font-family: var(--font-brand); font-size: 1.15rem; letter-spacing: 0; }
 .footer nav { display: flex; gap: 18px; margin-left: auto; }
 .footer a { text-decoration: none; }
 .footer a:hover { color: var(--paper); }
 
 html.js [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s ease; }
 html.js [data-reveal].is-in { opacity: 1; transform: none; }
+
+/* Prefer installed CJK faces; do not add another external font request. */
+html:lang(zh) {
+  --font-display: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei UI", system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Noto Sans SC", "Microsoft YaHei UI", monospace;
+}
+html:lang(zh) body { line-height: 1.6; }
+:lang(zh) :is(.nav, .caption, .scrubber, .hgo__copy, .hgo__readout, .hgo__counters, .closing, .footer),
+:lang(zh) :is(.nav, .caption, .scrubber, .hgo__copy, .hgo__readout, .hgo__counters, .closing, .footer) * {
+  letter-spacing: 0;
+}
+:lang(zh) :is(.caption p, .caption__index, .caption__note, .world__pick small, .world__links, .hgo__step p, .closing__faq p, .footer) { line-height: 1.6; }
+:lang(zh) :is(.caption--hero h1, .caption h2, .world__pick b, .hgo__step h2, .closing h2, .closing__faq h3) { line-height: 1.2; }
+:lang(zh) .caption--hero h1 em { font-style: normal; }
 
 @media (max-width: 760px) {
   .nav { gap: 10px; }
@@ -301,6 +332,7 @@ html.js [data-reveal].is-in { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   html.js [data-reveal] { opacity: 1; transform: none; transition: none; }
-  .stage__lens, .stage__layer, .hgo__step, .hgo__detail, .btn { transition: none; }
+  .btn:hover { transform: none; }
 }

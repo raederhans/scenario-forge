@@ -79,22 +79,68 @@ function showToast(
   content.appendChild(messageEl);
 
   const normalizedActionLabel = String(actionLabel || "").trim();
+  let remaining = resolveToastDuration(duration, normalizedTone);
+  let timer = null;
+  let startedAt = 0;
+  let hovered = false;
+  let focused = false;
+  let running = false;
+  let failed = false;
+  const pauseTimer = () => {
+    if (timer === null) return;
+    globalThis.clearTimeout(timer);
+    timer = null;
+    remaining = Math.max(0, remaining - (Date.now() - startedAt));
+  };
+  const resumeTimer = () => {
+    if (remaining === null || timer !== null || hovered || focused || running || failed
+      || toast.dataset.removing === "true") return;
+    startedAt = Date.now();
+    timer = globalThis.setTimeout(() => {
+      timer = null;
+      dismissToast(toast);
+    }, remaining);
+  };
   if (normalizedActionLabel && typeof onAction === "function") {
+    toast.addEventListener("mouseenter", () => {
+      hovered = true;
+      pauseTimer();
+    });
+    toast.addEventListener("mouseleave", () => {
+      hovered = false;
+      resumeTimer();
+    });
+    toast.addEventListener("focusin", () => {
+      focused = true;
+      pauseTimer();
+    });
+    toast.addEventListener("focusout", (event) => {
+      focused = toast.contains(event.relatedTarget);
+      resumeTimer();
+    });
     const actionButton = document.createElement("button");
     actionButton.type = "button";
     actionButton.className = "toast-action";
     actionButton.textContent = normalizedActionLabel;
     actionButton.addEventListener("click", async () => {
       actionButton.disabled = true;
+      running = true;
+      pauseTimer();
       try {
         await onAction();
+        if (dismissOnAction) {
+          dismissToast(toast);
+        }
       } catch (error) {
         console.error("Toast action failed:", error);
+        failed = true;
+        toast.className = "toast toast-error";
+        toast.setAttribute("role", "alert");
+        messageEl.textContent = t("Action failed. Please try again.", "ui");
       } finally {
         actionButton.disabled = false;
-      }
-      if (dismissOnAction) {
-        dismissToast(toast);
+        running = false;
+        resumeTimer();
       }
     });
     content.appendChild(actionButton);
@@ -112,12 +158,7 @@ function showToast(
   toast.appendChild(dismissButton);
   toastViewport.appendChild(toast);
 
-  const normalizedDuration = resolveToastDuration(duration, normalizedTone);
-  if (normalizedDuration !== null) {
-    globalThis.setTimeout(() => {
-      dismissToast(toast);
-    }, normalizedDuration);
-  }
+  resumeTimer();
 
   toast.dismiss = () => dismissToast(toast);
 

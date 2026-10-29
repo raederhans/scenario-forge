@@ -43,12 +43,12 @@ test("workspace geometry is stable before and after deferred controls mount", as
   expect(finalBounds).toEqual(initialBounds);
 });
 
-test("default workspace keeps four tasks, project header, and the bottom dock", async ({ page }) => {
+test("default workspace keeps three tasks, project header, and the bottom dock", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWorkspace(page);
   const taskButtons = page.locator("#editorTaskNav .editor-nav-button");
-  await expect(taskButtons).toHaveCount(4);
-  for (const id of ["Objects", "Layers", "Palette", "Assets"]) {
+  await expect(taskButtons).toHaveCount(3);
+  for (const id of ["Objects", "Layers", "Palette"]) {
     await expect(page.locator(`#editorTask${id}Btn`)).toBeVisible();
   }
   await expect(page.locator("#editorTaskObjectsBtn")).toHaveAttribute("aria-pressed", "true");
@@ -71,7 +71,6 @@ test("saved Chinese language renders the new workspace labels on first load", as
     ["editorTaskObjectsBtn", "对象"],
     ["editorTaskLayersBtn", "图层"],
     ["editorTaskPaletteBtn", "调色板"],
-    ["editorTaskAssetsBtn", "素材"],
     ["editorCountryDisplayOptions", "名称与显示"],
   ]) {
     const item = page.locator(`#${id}${id === "editorCountryDisplayOptions" ? " summary" : ""}`);
@@ -500,11 +499,11 @@ test("scenario summary resets its select and Tab departure closes the disclosure
   await expect(selectMenu).toBeHidden();
   await expect(selectButton).toHaveAttribute("aria-expanded", "false");
 
-  const lastControl = disclosure.locator('button:visible:enabled:not([tabindex="-1"]), input:visible:enabled:not([tabindex="-1"])').last();
+  const lastControl = disclosure.locator('button:visible:enabled:not([tabindex="-1"]), input:visible:enabled:not([tabindex="-1"]), a[href]:visible:not([tabindex="-1"])').last();
   await lastControl.focus();
   await expect(lastControl).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(page.locator("#workspaceSaveBtn")).toBeFocused();
+  await expect(page.locator("#workspaceExportBtn")).toBeFocused();
   await expect(disclosure).toHaveJSProperty("open", false);
   await expect(selectButton).toHaveAttribute("aria-expanded", "false");
 });
@@ -578,17 +577,19 @@ test("legend URL reload restores its layer task and property without entering an
   const modeTrigger = generator.locator(".app-select-button").first();
   const continentTrigger = generator.locator(".app-select-button").nth(1);
   await expect(modeTrigger).toBeVisible();
-  await expect(modeTrigger).toHaveAccessibleName("Generation Mode");
+  // 增强选择器的名称是"字段名 + 当前值"，读屏能同时听到字段和选中项。
+  await expect(modeTrigger).toHaveAccessibleName(/^Generation Mode /);
   await modeTrigger.click();
   await generator.getByRole("option", { name: "Continent Focus", exact: true }).click();
   await expect(modeTrigger.locator(".app-select-text")).toHaveText("Continent Focus");
+  await expect(modeTrigger).toHaveAccessibleName("Generation Mode Continent Focus");
   await expect(continentTrigger).toBeVisible();
-  await expect(continentTrigger).toHaveAccessibleName("Continent");
+  await expect(continentTrigger).toHaveAccessibleName(/^Continent /);
   await page.locator("#btnToggleLang").click();
   await expect.poll(() => readState(page, "currentLanguage")).toBe("zh");
-  await expect(modeTrigger).toHaveAccessibleName("生成模式");
+  await expect(modeTrigger).toHaveAccessibleName(/^生成模式/);
   await expect(continentTrigger).toBeVisible();
-  await expect(continentTrigger).toHaveAccessibleName("大洲");
+  await expect(continentTrigger).toHaveAccessibleName(/^大洲/);
 });
 
 test("workspace widths and mobile drawer have no horizontal page overflow", async ({ page }) => {

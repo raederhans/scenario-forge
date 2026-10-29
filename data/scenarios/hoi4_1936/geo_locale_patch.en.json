@@ -33,6 +33,78 @@
       "en": "Wuchuan · Remainder",
       "zh": "吴川 · 余部"
     },
+    "id::IN_ADM2_76128533B9892158671522__SPLIT_DECCAN_STATES": {
+      "en": "Sangli · Deccan states",
+      "zh": "桑里 · 德干诸邦"
+    },
+    "id::IN_ADM2_76128533B9892158671522__SPLIT_REST": {
+      "en": "Sangli · Remainder",
+      "zh": "桑里 · 余部"
+    },
+    "id::IN_MRG_0de8d89a2f89__SPLIT_BHADRACHALAM": {
+      "en": "Telangana · East · Bhadrachalam tract",
+      "zh": "特伦甘纳邦·东部 · 巴德拉恰拉姆地区"
+    },
+    "id::IN_MRG_0de8d89a2f89__SPLIT_REST": {
+      "en": "Telangana · East · Remainder",
+      "zh": "特伦甘纳邦·东部 · 余部"
+    },
+    "id::IN_MRG_16da719e5c4e__SPLIT_PARBHANI": {
+      "en": "Maharashtra · East 1 · Parbhani and Hingoli",
+      "zh": "马哈拉施特拉邦·东部1 · 帕尔巴尼与欣戈利"
+    },
+    "id::IN_MRG_16da719e5c4e__SPLIT_REST": {
+      "en": "Maharashtra · East 1 · Remainder",
+      "zh": "马哈拉施特拉邦·东部1 · 余部"
+    },
+    "id::IN_MRG_20e0c11ac976__SPLIT_HASSAN": {
+      "en": "Karnataka · South · Hassan",
+      "zh": "卡纳塔克邦·南部 · 哈桑"
+    },
+    "id::IN_MRG_20e0c11ac976__SPLIT_REST": {
+      "en": "Karnataka · South · Remainder",
+      "zh": "卡纳塔克邦·南部 · 余部"
+    },
+    "id::IN_MRG_4151783f27ba__SPLIT_ODISHA_STATES": {
+      "en": "Odisha · Northeast · Eastern princely states",
+      "zh": "奥里萨邦·东北部 · 东部土邦"
+    },
+    "id::IN_MRG_4151783f27ba__SPLIT_REST": {
+      "en": "Odisha · Northeast · Remainder",
+      "zh": "奥里萨邦·东北部 · 余部"
+    },
+    "id::IN_MRG_51471f01d80d__SPLIT_MANDI": {
+      "en": "Himachal Pradesh · Southwest · Hill states",
+      "zh": "喜马偕尔邦·西南部 · 山地诸邦"
+    },
+    "id::IN_MRG_51471f01d80d__SPLIT_REST": {
+      "en": "Himachal Pradesh · Southwest · Remainder",
+      "zh": "喜马偕尔邦·西南部 · 余部"
+    },
+    "id::IN_MRG_58d0077e7cf9__SPLIT_JALNA": {
+      "en": "Maharashtra · Northwest · Jalna",
+      "zh": "马哈拉施特拉邦·西北部 · 贾尔纳"
+    },
+    "id::IN_MRG_58d0077e7cf9__SPLIT_REST": {
+      "en": "Maharashtra · Northwest · Remainder",
+      "zh": "马哈拉施特拉邦·西北部 · 余部"
+    },
+    "id::IN_MRG_5e70f0363dee__SPLIT_RAICHUR": {
+      "en": "Karnataka · North · Raichur and Yadgir",
+      "zh": "卡纳塔克邦·北部 · 赖丘尔与亚德吉尔"
+    },
+    "id::IN_MRG_5e70f0363dee__SPLIT_REST": {
+      "en": "Karnataka · North · Remainder",
+      "zh": "卡纳塔克邦·北部 · 余部"
+    },
+    "id::IN_MRG_886776fba38b__SPLIT_COCHIN": {
+      "en": "Kerala · Central · Cochin state",
+      "zh": "喀拉拉邦·中部 · 科钦土邦"
+    },
+    "id::IN_MRG_886776fba38b__SPLIT_REST": {
+      "en": "Kerala · Central · Remainder",
+      "zh": "喀拉拉邦·中部 · 余部"
+    },
     "id::MAR-1445__SPLIT_REST": {
       "en": "Tanger - Tétouan · Remainder",
       "zh": "丹吉尔 - 得土安 · 余部"
@@ -56,6 +128,38 @@
     "id::MAR-3457__SPLIT_REST": {
       "en": "Guelmim - Es-Semara · Remainder",
       "zh": "盖勒敏 - 埃斯-塞马拉 · 余部"
+    },
+    "id::PAK-1108__SPLIT_BALUCHISTAN_STATES": {
+      "en": "Baluchistan · Kalat and associated states",
+      "zh": "俾路支省 · 卡拉特及相关土邦"
+    },
+    "id::PAK-1108__SPLIT_REST": {
+      "en": "Baluchistan · Remainder",
+      "zh": "俾路支省 · 余部"
+    },
+    "id::PAK-1113__SPLIT_BAHAWALPUR": {
+      "en": "Punjab · Bahawalpur state",
+      "zh": "旁遮普省 · 巴哈瓦尔布尔土邦"
+    },
+    "id::PAK-1113__SPLIT_REST": {
+      "en": "Punjab · Remainder",
+      "zh": "旁遮普省 · 余部"
+    },
+    "id::PAK-1114__SPLIT_KHAIRPUR": {
+      "en": "Sind · Khairpur state",
+      "zh": "信德 · 海尔布尔土邦"
+    },
+    "id::PAK-1114__SPLIT_REST": {
+      "en": "Sind · Remainder",
+      "zh": "信德 · 余部"
+    },
+    "id::PAK-1123__SPLIT_FRONTIER_STATES": {
+      "en": "K.P. · Frontier states",
+      "zh": "开伯尔-普什图赫瓦 · 边疆诸邦"
+    },
+    "id::PAK-1123__SPLIT_REST": {
+      "en": "K.P. · Remainder",
+      "zh": "开伯尔-普什图赫瓦 · 余部"
     },
     "id::PL_MRG_727dd6268093__SPLIT_DANZIG": {
       "en": "Pomeranian · North · Free City rural district",

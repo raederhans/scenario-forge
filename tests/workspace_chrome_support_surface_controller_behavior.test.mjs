@@ -24,6 +24,8 @@ class Button {
     this.attributes = new Map();
     this.listeners = new Map();
     this.disabled = false;
+    this.tabIndex = 0;
+    this.isConnected = true;
     this.classes = new Set();
     this.classList = {
       add: name => this.classes.add(name),
@@ -38,19 +40,37 @@ class Button {
   }
   appendChild(child) { this.children.push(child); child.parent = this; return child; }
   replaceChildren(...children) { this.children = children; for (const child of children) child.parent = this; }
+  get parentElement() { return this.parent || null; }
+  hasAttribute(name) { return this.attributes.has(name); }
+  querySelectorAll(selector) {
+    return this.children.flatMap(child => [
+      ...(selector === '[aria-modal="true"]' && child.getAttribute("aria-modal") === "true" ? [child] : []),
+      ...child.querySelectorAll(selector),
+    ]);
+  }
+  getBoundingClientRect() { return { left: 10, top: 10, right: 110, bottom: 42, width: 100, height: 32 }; }
+  removeAttribute(name) { this.attributes.delete(name); }
   setAttribute(name, value) { this.attributes.set(name, String(value)); }
   getAttribute(name) { return this.attributes.get(name) ?? null; }
   addEventListener(name, handler) {
     if (!this.listeners.has(name)) this.listeners.set(name, []);
     this.listeners.get(name).push(handler);
   }
-  dispatch(name, event = {}) { for (const handler of this.listeners.get(name) || []) handler(event); }
+  dispatch(name, event = {}) {
+    event.defaultPrevented ??= false;
+    const preventDefault = event.preventDefault;
+    event.preventDefault = function () { this.defaultPrevented = true; preventDefault?.call(this); };
+    for (const handler of this.listeners.get(name) || []) handler(event);
+  }
   click() {
     if (this.disabled) return;
     this.focus();
     this.dispatch("click", { target: this });
   }
   closest(selector) {
+    if (selector === "[hidden], [inert], [aria-hidden='true']") {
+      return this.hidden || this.inert || this.getAttribute("aria-hidden") === "true" ? this : this.parent?.closest(selector) || null;
+    }
     return selector.split(",").some(value => value.trim() === "#" + this.id) ? this : this.parent?.closest(selector) || null;
   }
   focus() { document.activeElement = this; }
@@ -58,20 +78,23 @@ class Button {
 
 function createHarness(context, initial = {}) {
   const oldDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
+  const oldHTMLElement = Object.getOwnPropertyDescriptor(globalThis, "HTMLElement");
   const oldElement = Object.getOwnPropertyDescriptor(globalThis, "Element");
   const doc = new Button("document");
   doc.createElement = tagName => { const element = new Button(); element.tagName = String(tagName).toUpperCase(); element.ownerDocument = doc; return element; };
   Object.defineProperty(globalThis, "document", { value: doc, configurable: true });
+  Object.defineProperty(globalThis, "HTMLElement", { value: Button, configurable: true });
   Object.defineProperty(globalThis, "Element", { value: Button, configurable: true });
   context.after(() => {
     if (oldDocument) Object.defineProperty(globalThis, "document", oldDocument); else delete globalThis.document;
+    if (oldHTMLElement) Object.defineProperty(globalThis, "HTMLElement", oldHTMLElement); else delete globalThis.HTMLElement;
     if (oldElement) Object.defineProperty(globalThis, "Element", oldElement); else delete globalThis.Element;
   });
   const nodes = Object.fromEntries([
     "dockQuickFillBtn", "dockQuickFillRow", "quickFillParentBtn", "quickFillCountryBtn", "dockQuickFillHint",
     "dockReferenceBtn", "dockReferencePopover", "dockEditPopoverBtn", "dockEditPopover",
   ].map(id => [id, new Button(id)]));
-  for (const node of Object.values(nodes)) node.ownerDocument = doc;
+  for (const node of Object.values(nodes)) { node.ownerDocument = doc; doc.appendChild(node); }
   nodes.quickFillParentBtn.parent = nodes.dockQuickFillRow;
   nodes.quickFillCountryBtn.parent = nodes.dockQuickFillRow;
   const state = { activeDockPopover: "", batchFillScope: "parent", paintMode: "visual", interactionGranularity: "subdivision", ...initial };
@@ -255,4 +278,128 @@ test("a newly forbidden Quick Fill closes only its own active popup", context =>
   h.controller.openDockPopover("quickfill");
   assert.equal(h.state.activeDockPopover, "edit");
   assert.equal(h.nodes.dockEditPopover.classList.contains("hidden"), false);
+});
+
+
+test("closing dock surfaces leaves reference layer settings visible", context => {
+  const h = createHarness(context);
+  h.nodes.dockReferencePopover.setAttribute("aria-hidden", "false");
+  h.controller.closeDockPopover();
+  assert.equal(h.nodes.dockReferencePopover.classList.contains("hidden"), false);
+  assert.equal(h.nodes.dockReferencePopover.getAttribute("aria-hidden"), "false");
+  h.controller.openDockPopover("edit");
+  h.doc.dispatch("click", { target: new Button("outside") });
+  assert.equal(h.nodes.dockReferencePopover.classList.contains("hidden"), false);
+});
+
+test("reference URL restores the layer entry without opening a dock popover", context => {
+  const h = createHarness(context);
+  const entry = new Button("editorLayer-reference");
+  let selected = 0;
+  entry.addEventListener("click", () => selected++);
+  h.doc.getElementById = id => id === entry.id ? entry : null;
+  const controller = createWorkspaceChromeSupportSurfaceController({
+    state: h.state, getSupportSurfaceViewFromUrl: () => "reference",
+  });
+  controller.restoreSupportSurfaceFromUrl();
+  assert.equal(selected, 1);
+  assert.equal(h.state.activeDockPopover, "");
+  assert.equal(h.state.ui.restoredSupportSurfaceViewFromUrl, "reference");
+});
+
+function createGuideHarness(context) {
+  const h = createHarness(context);
+  for (const [key, value] of Object.entries({
+    getComputedStyle: () => ({ display: "block", visibility: "visible" }),
+    innerWidth: 1440,
+    innerHeight: 900,
+  })) {
+    const original = Object.getOwnPropertyDescriptor(globalThis, key);
+    Object.defineProperty(globalThis, key, { value, configurable: true });
+    context.after(() => {
+      if (original) Object.defineProperty(globalThis, key, original); else delete globalThis[key];
+    });
+  }
+  const trigger = new Button("utilitiesGuideBtn");
+  const topbar = new Button("scenarioGuideBtn");
+  const surface = new Button("scenarioGuidePopover");
+  surface.classList.add("hidden");
+  const remembered = new Map();
+  const controller = createWorkspaceChromeSupportSurfaceController({
+    state: h.state,
+    scenarioGuideBtn: topbar,
+    utilitiesGuideBtn: trigger,
+    scenarioGuidePopover: surface,
+    getSupportSurfaceViewFromUrl: () => "guide",
+    rememberOverlayTrigger: (element, button) => remembered.set(element, button),
+    restoreOverlayTriggerFocus: element => remembered.get(element)?.focus(),
+    openScenarioGuideSurface: () => { surface.classList.remove("hidden"); surface.focus(); },
+    closeScenarioGuideSurface: ({ restoreFocus, restoreOverlayTriggerFocus }) => {
+      surface.classList.add("hidden");
+      if (restoreFocus) restoreOverlayTriggerFocus(surface);
+    },
+  });
+  controller.bindDockPopoverDismiss();
+  return { ...h, controller, trigger, topbar, surface };
+}
+
+test("Guide preserves a visible trigger and reselects the topbar after the trigger becomes unavailable", context => {
+  const h = createGuideHarness(context);
+  h.controller.toggleScenarioGuidePopover(h.trigger);
+  h.controller.closeScenarioGuidePopover({ restoreFocus: true });
+  assert.equal(h.doc.activeElement, h.trigger);
+  for (const property of ["hidden", "disabled", "inert"]) {
+    h.controller.toggleScenarioGuidePopover(h.trigger);
+    h.trigger[property] = true;
+    h.doc.dispatch("keydown", { key: "Escape" });
+    assert.equal(h.surface.classList.contains("hidden"), true);
+    assert.equal(h.doc.activeElement, h.topbar);
+    h.trigger[property] = false;
+  }
+  h.controller.toggleScenarioGuidePopover(h.trigger);
+  h.trigger.isConnected = false;
+  h.controller.closeScenarioGuidePopover({ restoreFocus: true });
+  assert.equal(h.doc.activeElement, h.topbar);
+});
+
+test("Guide URL restoration records the topbar even while Utilities is visible", context => {
+  const h = createGuideHarness(context);
+  h.controller.restoreSupportSurfaceFromUrl();
+  assert.equal(h.doc.activeElement, h.surface);
+  h.controller.closeScenarioGuidePopover({ restoreFocus: true });
+  assert.equal(h.doc.activeElement, h.topbar);
+});
+
+test("Project support fallback writes state according to each control role and removes the other attribute", context => {
+  const h = createHarness(context);
+  const original = Object.getOwnPropertyDescriptor(globalThis, "HTMLDetailsElement");
+  Object.defineProperty(globalThis, "HTMLDetailsElement", { value: Button, configurable: true });
+  context.after(() => {
+    if (original) Object.defineProperty(globalThis, "HTMLDetailsElement", original); else delete globalThis.HTMLDetailsElement;
+  });
+  for (const projectRole of ["tab", "button"]) {
+    const project = new Button("inspectorSidebarTabProject");
+    const inspector = new Button("inspectorSidebarTabInspector");
+    const projectPanel = new Button("projectSidebarPanel");
+    const inspectorPanel = new Button("inspectorSidebarPanel");
+    projectPanel.hidden = true;
+    project.setAttribute("role", projectRole);
+    inspector.setAttribute("role", projectRole === "tab" ? "button" : "tab");
+    for (const element of [project, inspector]) {
+      element.setAttribute("aria-selected", "false");
+      element.setAttribute("aria-pressed", "false");
+    }
+    h.doc.getElementById = id => [project, inspector, projectPanel, inspectorPanel].find(node => node.id === id);
+    const controller = createWorkspaceChromeSupportSurfaceController({
+      state: {}, inspectorSidebarTabProject: project, getSupportSurfaceViewFromUrl: () => "export",
+    });
+    controller.restoreSupportSurfaceFromUrl();
+    for (const [element, active] of [[project, "true"], [inspector, "false"]]) {
+      const attribute = element.getAttribute("role") === "tab" ? "aria-selected" : "aria-pressed";
+      assert.equal(element.getAttribute(attribute), active);
+      assert.equal(element.hasAttribute(attribute === "aria-selected" ? "aria-pressed" : "aria-selected"), false);
+    }
+    assert.equal(projectPanel.hidden, false);
+    assert.equal(inspectorPanel.hidden, true);
+  }
 });

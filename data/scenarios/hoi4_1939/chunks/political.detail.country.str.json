@@ -462,6 +462,59 @@
           ]
         ]
       }
+    },
+    {
+      "id": "AU_REMOTE_INDIAN_OCEAN_TERRITORIES",
+      "type": "Feature",
+      "properties": {
+        "id": "AU_REMOTE_INDIAN_OCEAN_TERRITORIES",
+        "name": "Indian Ocean Territories",
+        "cntr_code": "AU",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "admin0_passthrough",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              105.65205652056522,
+              -10.519291629916296
+            ],
+            [
+              105.68805688056881,
+              -10.56963094230943
+            ],
+            [
+              105.72405724057239,
+              -10.500197407974085
+            ],
+            [
+              105.68805688056881,
+              -10.430763873638739
+            ],
+            [
+              105.65205652056522,
+              -10.448122257222579
+            ],
+            [
+              105.580055800558,
+              -10.46721647916479
+            ],
+            [
+              105.580055800558,
+              -10.519291629916296
+            ],
+            [
+              105.65205652056522,
+              -10.519291629916296
+            ]
+          ]
+        ]
+      }
     }
   ]
 }
