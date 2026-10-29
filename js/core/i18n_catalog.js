@@ -1247,4 +1247,7 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Technical details": {"zh": "技术详情", "en": "Technical details"},
   "Unknown error": {"zh": "未知错误", "en": "Unknown error"},
   "Scenario Forge": {"zh": "Scenario Forge", "en": "Scenario Forge"},
+  // 对象筛选分段的短名（按钮由 editor_workspace.js 动态生成，静态扫描覆盖不到）。
+  "Water": {"zh": "水域", "en": "Water"},
+  "Special": {"zh": "特殊", "en": "Special"},
 });
