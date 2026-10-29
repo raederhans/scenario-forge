@@ -1,5 +1,36 @@
 // Landing copy. index.html carries the English text as its default; every
 // data-i18n / data-i18n-aria-label / data-i18n-alt / data-i18n-list key must exist in both tables.
+// The shared key is authoritative; the two legacy keys are migration fallbacks.
+// Keep this small storage contract aligned with editor bootstrap and toggleLanguage.
+const LANGUAGE_STORAGE_KEYS = ["scenario_forge_language", "map_lang", "scenario_forge_landing_lang"];
+
+function normalizeLanguage(value) {
+  const language = String(value || "").trim().toLowerCase();
+  if (/^zh(?:[-_]|$)/.test(language)) return "zh";
+  if (/^en(?:[-_]|$)/.test(language)) return "en";
+  return null;
+}
+
+export function readLanguagePreference() {
+  const explicit = normalizeLanguage(new URLSearchParams(globalThis.location?.search || "").get("lang"));
+  if (explicit) return explicit;
+  try {
+    for (const key of LANGUAGE_STORAGE_KEYS) {
+      const stored = normalizeLanguage(globalThis.localStorage?.getItem(key));
+      if (stored) return stored;
+    }
+  } catch { /* Storage can be blocked; browser language still works. */ }
+  return normalizeLanguage(globalThis.navigator?.language) || "en";
+}
+
+export function persistLanguagePreference(language) {
+  const normalized = normalizeLanguage(language);
+  if (!normalized) return;
+  for (const key of LANGUAGE_STORAGE_KEYS) {
+    try { globalThis.localStorage?.setItem(key, normalized); } catch { /* Choice remains usable for this page. */ }
+  }
+}
+
 export const COPY = {
   en: {
     metaTitle: "Scenario Forge — Political map studio for alternate history",
