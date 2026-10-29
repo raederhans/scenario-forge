@@ -499,11 +499,11 @@ test("scenario summary resets its select and Tab departure closes the disclosure
   await expect(selectMenu).toBeHidden();
   await expect(selectButton).toHaveAttribute("aria-expanded", "false");
 
-  const lastControl = disclosure.locator('button:visible:enabled:not([tabindex="-1"]), input:visible:enabled:not([tabindex="-1"])').last();
+  const lastControl = disclosure.locator('button:visible:enabled:not([tabindex="-1"]), input:visible:enabled:not([tabindex="-1"]), a[href]:visible:not([tabindex="-1"])').last();
   await lastControl.focus();
   await expect(lastControl).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(page.locator("#workspaceSaveBtn")).toBeFocused();
+  await expect(page.locator("#workspaceExportBtn")).toBeFocused();
   await expect(disclosure).toHaveJSProperty("open", false);
   await expect(selectButton).toHaveAttribute("aria-expanded", "false");
 });

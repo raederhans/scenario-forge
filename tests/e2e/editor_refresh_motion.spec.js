@@ -95,11 +95,18 @@ test("desktop sidebar content keeps its width throughout collapse and restores a
       await sidebar.evaluate(async (element) => {
         await Promise.all(element.getAnimations().map((animation) => animation.finished));
       });
-      const baseline = await sidebar.evaluate((element, name) => ({
-        shell: element.getBoundingClientRect().width,
-        content: document.getElementById(`${name}SidebarContent`).getBoundingClientRect().width,
-        declared: parseFloat(getComputedStyle(document.body).getPropertyValue(`--editor-${name}-width`)),
-      }), side);
+      const baseline = await sidebar.evaluate((element, name) => {
+        const probe = document.createElement("div");
+        probe.style.cssText = `position: absolute; width: var(--editor-${name}-width);`;
+        document.body.appendChild(probe);
+        const declared = probe.getBoundingClientRect().width;
+        probe.remove();
+        return {
+          shell: element.getBoundingClientRect().width,
+          content: document.getElementById(`${name}SidebarContent`).getBoundingClientRect().width,
+          declared,
+        };
+      }, side);
       expect(baseline.shell).toBeCloseTo(baseline.declared, 1);
       expect(baseline.content).toBeCloseTo(baseline.declared - 1, 1);
 

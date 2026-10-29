@@ -58,6 +58,7 @@ export function createWorkspaceChromeSupportSurfaceController({
   closeExportWorkbench = () => {},
 } = {}) {
   let dockPopoverCloseBound = false;
+  let scenarioGuideTrigger = null;
   const quickFillLevels = createQuickFillLevelControls({
     state, container: dockQuickFillRow,
     onChange: (scope) => {
@@ -68,7 +69,8 @@ export function createWorkspaceChromeSupportSurfaceController({
 
   const isFocusableGuideTriggerVisible = (element) => {
     if (!(element instanceof HTMLElement)) return false;
-    if (element.hidden || element.getAttribute("aria-hidden") === "true") return false;
+    if (!element.isConnected || element.disabled || element.tabIndex < 0) return false;
+    if (element.closest("[hidden], [inert], [aria-hidden='true']")) return false;
     const style = globalThis.getComputedStyle?.(element);
     if (!style || style.display === "none" || style.visibility === "hidden") return false;
     const rect = element.getBoundingClientRect();
@@ -82,16 +84,21 @@ export function createWorkspaceChromeSupportSurfaceController({
 
   const getGuideFocusReturnTrigger = (preferredTrigger = null) => {
     if (isFocusableGuideTriggerVisible(preferredTrigger)) return preferredTrigger;
-    if (isFocusableGuideTriggerVisible(utilitiesGuideBtn)) return utilitiesGuideBtn;
     if (isFocusableGuideTriggerVisible(scenarioGuideBtn)) return scenarioGuideBtn;
-    return preferredTrigger || utilitiesGuideBtn || scenarioGuideBtn || null;
+    return null;
   };
 
   const closeScenarioGuidePopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
     if (!scenarioGuidePopover) return;
     closeScenarioGuideSurface?.({
       restoreFocus,
-      restoreOverlayTriggerFocus,
+      restoreOverlayTriggerFocus: (surface) => {
+        const trigger = getGuideFocusReturnTrigger(scenarioGuideTrigger);
+        if (trigger) {
+          rememberOverlayTrigger?.(surface, trigger);
+          restoreOverlayTriggerFocus?.(surface, trigger);
+        }
+      },
     });
     if (syncUrl) {
       syncSupportSurfaceUrlState("");
@@ -101,14 +108,20 @@ export function createWorkspaceChromeSupportSurfaceController({
   const ensureProjectSupportSurface = (sectionKind = "utilities") => {
     ensureRightPanelVisible?.();
     inspectorSidebarTabProject?.click();
-    if (inspectorSidebarTabProject && inspectorSidebarTabProject.getAttribute("aria-selected") !== "true") {
+    const projectStateAttribute = inspectorSidebarTabProject?.getAttribute("role") === "tab" ? "aria-selected" : "aria-pressed";
+    if (inspectorSidebarTabProject && inspectorSidebarTabProject.getAttribute(projectStateAttribute) !== "true") {
       const inspectorSidebarPanel = document.getElementById("inspectorSidebarPanel");
       const projectSidebarPanel = document.getElementById("projectSidebarPanel");
       const inspectorSidebarTabInspector = document.getElementById("inspectorSidebarTabInspector");
       inspectorSidebarTabProject.classList.add("is-active");
-      inspectorSidebarTabProject.setAttribute("aria-selected", "true");
+      inspectorSidebarTabProject.setAttribute(projectStateAttribute, "true");
+      inspectorSidebarTabProject.removeAttribute(projectStateAttribute === "aria-selected" ? "aria-pressed" : "aria-selected");
       inspectorSidebarTabInspector?.classList.remove("is-active");
-      inspectorSidebarTabInspector?.setAttribute("aria-selected", "false");
+      if (inspectorSidebarTabInspector) {
+        const inspectorStateAttribute = inspectorSidebarTabInspector.getAttribute("role") === "tab" ? "aria-selected" : "aria-pressed";
+        inspectorSidebarTabInspector.setAttribute(inspectorStateAttribute, "false");
+        inspectorSidebarTabInspector.removeAttribute(inspectorStateAttribute === "aria-selected" ? "aria-pressed" : "aria-selected");
+      }
       projectSidebarPanel?.classList.add("is-active");
       if (projectSidebarPanel instanceof HTMLElement) projectSidebarPanel.hidden = false;
       inspectorSidebarPanel?.classList.remove("is-active");
@@ -295,7 +308,7 @@ export function createWorkspaceChromeSupportSurfaceController({
         setRestoredSupportSurfaceViewState(state, view);
         return;
       }
-      toggleScenarioGuidePopover(getGuideFocusReturnTrigger(utilitiesGuideBtn));
+      toggleScenarioGuidePopover(scenarioGuideBtn);
       setRestoredSupportSurfaceViewState(state, view);
       return;
     }
@@ -322,6 +335,7 @@ export function createWorkspaceChromeSupportSurfaceController({
     closeDockPopover({ restoreFocus: false, syncUrl: true });
     closeExportWorkbench?.({ restoreFocus: false });
     closeSpecialZonePopover?.();
+    scenarioGuideTrigger = trigger;
     rememberOverlayTrigger?.(scenarioGuidePopover, trigger);
     openScenarioGuideSurface?.({ focusOverlaySurface });
     syncSupportSurfaceUrlState("guide");
