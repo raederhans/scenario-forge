@@ -64,6 +64,8 @@ test("bound adjustment sliders preserve zero and normalize values in state and c
       input.dispatchEvent(new Event("input"));
 
       assert.equal(state.exportWorkbenchUi.adjustments[key], expected, `${key} state for ${raw}`);
+      // 拖动时数值标签立即跟随，不必等整体刷新。
+      assert.equal(labels[key].textContent, `${expected}%`, `${key} live label for ${raw}`);
 
       controller.syncExportWorkbenchControlsFromState();
       assert.equal(input.value, String(expected), `${key} control for ${raw}`);
