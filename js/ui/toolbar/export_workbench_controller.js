@@ -874,8 +874,11 @@ function createExportWorkbenchController({
     ].forEach(([input, key]) => {
       if (!(input instanceof HTMLInputElement) || input.dataset.bound === "true") return;
       input.addEventListener("input", () => {
+        const adjustment = Number(input.value);
         setExportAdjustmentsState(state, {
-          [key]: Math.max(0, Math.min(200, Math.round(Number(input.value) || 100))),
+          [key]: Number.isFinite(adjustment)
+            ? Math.max(0, Math.min(200, Math.round(adjustment)))
+            : 100,
         });
         renderExportWorkbenchUi(true);
       });
