@@ -18,6 +18,7 @@ import {
 } from "../core/scenario_recovery.js";
 import { loadScenarioRegistry } from "../core/scenario_resources.js";
 import { t } from "./i18n.js";
+import { bindSelectKeyboard, focusSelectedSelectOption } from "./styled_selects.js";
 import { showToast } from "./toast.js";
 const state = runtimeState;
 let disposeActiveScenarioControls = null;
@@ -46,10 +47,11 @@ export function initScenarioControls() {
   const scenarioAuditHint = document.getElementById("scenarioAuditHint");
   let pendingScenarioId = "";
 
-  const closeScenarioSelectMenu = () => {
+  const closeScenarioSelectMenu = ({ restoreFocus = false } = {}) => {
     if (!scenarioSelectMenu || !scenarioSelectButton) return;
     scenarioSelectMenu.classList.add("hidden");
     scenarioSelectButton.setAttribute("aria-expanded", "false");
+    if (restoreFocus) scenarioSelectButton.focus();
   };
 
   const syncScenarioSelectSurface = ({ optionPayloads, currentValue, disabled }) => {
@@ -168,27 +170,34 @@ export function initScenarioControls() {
     }, eventOptions);
   }
 
+  const getScenarioOptions = () => Array.from(scenarioSelectMenu.querySelectorAll(".scenario-select-option"))
+    .filter((option) => !option.hidden && !option.disabled);
+  const openScenarioSelectMenu = () => {
+    if (!scenarioSelectMenu || scenarioSelectButton.disabled) return;
+    scenarioSelectMenu.classList.remove("hidden");
+    scenarioSelectButton.setAttribute("aria-expanded", "true");
+    focusSelectedSelectOption(getScenarioOptions());
+  };
+
   if (scenarioSelectButton) {
     scenarioSelectButton.addEventListener("click", () => {
       if (!scenarioSelectMenu || scenarioSelectButton.disabled) return;
-      const isOpen = !scenarioSelectMenu.classList.contains("hidden");
-      scenarioSelectMenu.classList.toggle("hidden", isOpen);
-      scenarioSelectButton.setAttribute("aria-expanded", isOpen ? "false" : "true");
+      if (scenarioSelectMenu.classList.contains("hidden")) openScenarioSelectMenu();
+      else closeScenarioSelectMenu();
     }, eventOptions);
-    scenarioSelectButton.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        closeScenarioSelectMenu();
-      }
+  }
+
+  if (scenarioSelectButton && scenarioSelectMenu) {
+    bindSelectKeyboard({
+      button: scenarioSelectButton,
+      menu: scenarioSelectMenu,
+      getOptions: getScenarioOptions,
+      open: openScenarioSelectMenu,
+      close: closeScenarioSelectMenu,
     }, eventOptions);
   }
 
   if (scenarioSelectMenu) {
-    scenarioSelectMenu.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        closeScenarioSelectMenu();
-        scenarioSelectButton?.focus();
-      }
-    }, eventOptions);
     document.addEventListener("click", (event) => {
       if (!scenarioSelectMenu || !scenarioSelectButton) return;
       if (scenarioSelectMenu.contains(event.target) || scenarioSelectButton.contains(event.target)) return;
