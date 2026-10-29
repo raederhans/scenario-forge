@@ -4356,6 +4356,7 @@ function getRenderPipelinePassesOwner() {
       getContextScenarioReuseDecision,
       getExactAfterSettleControllerState,
       getPassReferenceTransform,
+      setPassReferenceTransform,
       getPassCoverage: (passName, transform) => getCachedPassCompositorOwner().getPassCoverage(passName, transform),
       prepareRenderPassAsync: (passName) => {
         if (passName === "political") {

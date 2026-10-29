@@ -82,6 +82,7 @@ export function createRenderPipelinePassesOwner({
     getContextScenarioReuseDecision = () => ({ enabled: false }),
     getExactAfterSettleControllerState = () => null,
     getPassReferenceTransform = () => null,
+    setPassReferenceTransform = null,
     getPassCoverage = () => null,
     getRenderPassCacheState = () => ({ signatures: {}, dirty: {}, reasons: {}, canvases: {}, counters: {} }),
     getRenderPassSignature = () => "",
@@ -107,9 +108,13 @@ export function createRenderPipelinePassesOwner({
     if (passName !== "borders" || !cache.canvases[passName]) return false;
     if (getPassReferenceTransform(passName)) return true;
     const committed = lastCommitted[passName];
-    return !!committed
-      && committed.canvas === cache.canvases[passName]
-      && ["x", "y", "k"].every(key => Math.abs(committed.transform[key] - state.zoomTransform[key]) <= 1e-6);
+    if (!committed || committed.canvas !== cache.canvases[passName]) return false;
+    // Invalidation cleared the reference but the surface still holds the
+    // borders committed at that transform: restore it so the composite can
+    // scale the stale surface exactly like the interaction frame did.
+    if (typeof setPassReferenceTransform !== "function") return false;
+    setPassReferenceTransform(passName, committed.transform);
+    return !!getPassReferenceTransform(passName);
   }
 
   function getIdleRenderPassDefinitions() {

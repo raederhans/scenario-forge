@@ -3,9 +3,11 @@ import test from "node:test";
 
 import { createRenderPipelinePassesOwner } from "../js/core/renderer/render_pipeline_passes.js";
 
-function createHarness({ passName = "borders", canvas = true, reference = true, dirty = true } = {}) {
+function createHarness({ passName = "borders", canvas = true, reference = true, dirty = true, withSetter = true } = {}) {
   const oldCanvas = { pixels: "previous" };
   const transform = { x: 10, y: 20, k: 2 };
+  let referenceTransform = reference ? { x: 0, y: 0, k: 1 } : null;
+  const restoredReferences = [];
   const cache = {
     canvases: canvas ? { [passName]: oldCanvas } : {},
     signatures: { [passName]: "previous" },
@@ -20,7 +22,11 @@ function createHarness({ passName = "borders", canvas = true, reference = true, 
     drawPasses: { drawBordersPass: (k) => drawn.push(k) },
     helpers: {
       getRenderPassCacheState: () => cache,
-      getPassReferenceTransform: () => reference ? { x: 0, y: 0, k: 1 } : null,
+      getPassReferenceTransform: () => referenceTransform,
+      ...(withSetter ? { setPassReferenceTransform: (name, value) => {
+        restoredReferences.push([name, { ...value }]);
+        referenceTransform = { ...value };
+      } } : {}),
       getRenderPassSignature: () => "next",
       prepareRenderPassAsync: (name) => { prepared.push(name); return pending; },
       renderPassToCache: (name, drawFn, currentTransform, timings) => {
@@ -34,8 +40,9 @@ function createHarness({ passName = "borders", canvas = true, reference = true, 
       recordRenderPerfMetric: (...args) => metrics.push(args),
     },
   });
-  return { owner, cache, oldCanvas, transform, prepared, painted, drawn, metrics,
-    clearReference: () => { reference = false; },
+  return { owner, cache, oldCanvas, transform, prepared, painted, drawn, metrics, restoredReferences,
+    getReference: () => referenceTransform,
+    clearReference: () => { referenceTransform = null; },
     startPreparation: () => { pending = true; cache.dirty[passName] = true; },
     finishPreparation: () => { pending = false; } };
 }
@@ -124,51 +131,68 @@ function commitThenInvalidateReference() {
   return harness;
 }
 
-for (const delta of [0, 0.5e-6]) {
-  test(`committed borders reuses its canvas after reference invalidation with transform delta ${delta}`, () => {
-    const { owner, cache, oldCanvas, transform, painted, drawn, metrics } = commitThenInvalidateReference();
-    for (const key of ["x", "y", "k"]) transform[key] += delta;
-    const timings = {};
-    assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), true);
-    assert.equal(cache.canvases.borders, oldCanvas);
-    assert.equal(cache.dirty.borders, true);
-    assert.deepEqual(painted, []);
-    assert.deepEqual(drawn, []);
-    assert.equal(timings.usedDirtyFastFramePasses, "borders");
-    assert.deepEqual(metrics, [["idleRenderPassDeferredForPreparation", 0, {
-      passName: "borders", reason: "preparation-pending-reuse-surface", activeScenarioId: "tno_1962",
-    }]]);
-  });
-}
+test("committed borders restores its reference and reuses its canvas after invalidation, even at a new transform", () => {
+  const { owner, cache, oldCanvas, transform, painted, drawn, metrics, restoredReferences, getReference } = commitThenInvalidateReference();
+  // The gesture moved on; the surface still holds borders committed at the old transform.
+  transform.x += 300; transform.y -= 120; transform.k *= 3;
+  const timings = {};
+  assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), true);
+  assert.equal(cache.canvases.borders, oldCanvas);
+  assert.equal(cache.dirty.borders, true);
+  assert.deepEqual(painted, []);
+  assert.deepEqual(drawn, []);
+  assert.equal(timings.usedDirtyFastFramePasses, "borders");
+  // The restored reference is the committed transform, so the composite scales the stale surface correctly.
+  assert.deepEqual(restoredReferences, [["borders", { x: 10, y: 20, k: 2 }]]);
+  assert.deepEqual(getReference(), { x: 10, y: 20, k: 2 });
+  assert.deepEqual(metrics, [["idleRenderPassDeferredForPreparation", 0, {
+    passName: "borders", reason: "preparation-pending-reuse-surface", activeScenarioId: "tno_1962",
+  }]]);
+});
 
-for (const changed of ["x", "y", "k", "canvas"]) {
-  test(`committed borders blocks after reference invalidation when ${changed} changes`, () => {
-    const { owner, cache, transform, painted, metrics } = commitThenInvalidateReference();
-    if (changed === "canvas") cache.canvases.borders = { pixels: "replacement" };
-    else transform[changed] += 2e-6;
-    const timings = {};
-    assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), false);
-    assert.equal(owner.prepareIdleRenderPassDefinition("borders", () => {}, transform, timings), false);
-    assert.equal(cache.dirty.borders, true);
-    assert.deepEqual(painted, []);
-    assert.deepEqual(timings, {});
-    assert.deepEqual(metrics, [["idleRenderPassPreflightPending", 0, {
-      passNames: "borders", activeScenarioId: "tno_1962",
-    }]]);
-  });
-}
+test("committed borders blocks after reference invalidation when its canvas was replaced", () => {
+  const { owner, cache, transform, painted, metrics, restoredReferences } = commitThenInvalidateReference();
+  cache.canvases.borders = { pixels: "replacement" };
+  const timings = {};
+  assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), false);
+  assert.equal(owner.prepareIdleRenderPassDefinition("borders", () => {}, transform, timings), false);
+  assert.equal(cache.dirty.borders, true);
+  assert.deepEqual(painted, []);
+  assert.deepEqual(restoredReferences, []);
+  assert.deepEqual(timings, {});
+  assert.deepEqual(metrics, [["idleRenderPassPreflightPending", 0, {
+    passNames: "borders", activeScenarioId: "tno_1962",
+  }]]);
+});
+
+test("committed borders blocks after reference invalidation when the host cannot restore references", () => {
+  const harness = createHarness({ withSetter: false });
+  harness.finishPreparation();
+  assert.equal(harness.owner.ensureIdleRenderPasses({}, ["borders"]), true);
+  harness.clearReference();
+  harness.startPreparation();
+  harness.metrics.length = 0;
+  const timings = {};
+  assert.equal(harness.owner.ensureIdleRenderPasses(timings, ["borders"]), false);
+  assert.deepEqual(timings, {});
+  assert.deepEqual(harness.metrics, [["idleRenderPassPreflightPending", 0, {
+    passNames: "borders", activeScenarioId: "tno_1962",
+  }]]);
+});
 
 test("a later successful borders draw replaces the committed transform snapshot", () => {
-  const { owner, transform, painted, startPreparation, finishPreparation } = commitThenInvalidateReference();
+  const { owner, transform, painted, startPreparation, finishPreparation, clearReference, restoredReferences } = commitThenInvalidateReference();
   transform.x += 5;
   finishPreparation();
   assert.equal(owner.ensureIdleRenderPasses({}, ["borders"]), true);
   assert.deepEqual(painted, ["borders"]);
+  clearReference();
   startPreparation();
   const timings = {};
   assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), true);
   assert.deepEqual(painted, ["borders"]);
   assert.equal(timings.usedDirtyFastFramePasses, "borders");
+  assert.deepEqual(restoredReferences.at(-1), ["borders", { x: 15, y: 20, k: 2 }]);
 });
 
 test("blocking preflight records all pending passes once in catalog order", () => {
