@@ -43,11 +43,12 @@ function createExactAfterSettleRefreshPlan({
 function filterExactAfterSettleIdleRenderPassDefinitions(definitions = [], targetPasses = []) {
   const targetPassSet = new Set(normalizeStringList(targetPasses));
   return (Array.isArray(definitions) ? definitions : [])
-    .filter(([passName]) => !targetPassSet.size || targetPassSet.has(String(passName || "").trim()));
+    .filter(([passName]) => targetPassSet.has(String(passName || "").trim()));
 }
 
 function resolveExactAfterSettleTargetPasses({
   renderPassNames = [],
+  activeRenderPassNames = [],
   idleRenderPassNames = [],
   dirtyPassNames = [],
   physicalExactRefreshPasses = [],
@@ -60,6 +61,7 @@ function resolveExactAfterSettleTargetPasses({
     ? normalizedIdleRenderPassNames
     : normalizeStringList(renderPassNames);
   const validRenderPasses = new Set(normalizeStringList(renderPassNames));
+  const activePasses = new Set(normalizeStringList(activeRenderPassNames));
   const deferredPasses = new Set(normalizeStringList(deferredPassNames));
   const targetPassNames = new Set(EXACT_AFTER_SETTLE_ALWAYS_TARGET_PASSES);
 
@@ -77,26 +79,29 @@ function resolveExactAfterSettleTargetPasses({
 
   return {
     deferredExactTargetPasses: orderedIdlePassNames
-      .filter((passName) => targetPassNames.has(passName) && deferredPasses.has(passName)),
+      .filter((passName) => activePasses.has(passName) && targetPassNames.has(passName) && deferredPasses.has(passName)),
     exactTargetPasses: orderedIdlePassNames
-      .filter((passName) => targetPassNames.has(passName) && !deferredPasses.has(passName)),
+      .filter((passName) => activePasses.has(passName) && targetPassNames.has(passName) && !deferredPasses.has(passName)),
   };
 }
 
 function resolveDeferredExactContextTargetPasses({
   plan = {},
+  activeRenderPassNames = [],
   dirtyPassNames = [],
   deferredPassNames = EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES,
   idleRenderPassNames = [],
 } = {}) {
   const deferredPasses = new Set(normalizeStringList(deferredPassNames));
+  const activePasses = new Set(normalizeStringList(activeRenderPassNames));
   const targetPasses = new Set(normalizeStringList(plan?.deferredExactTargetPasses));
   normalizeStringList(dirtyPassNames).forEach((passName) => {
     if (deferredPasses.has(passName)) {
       targetPasses.add(passName);
     }
   });
-  return normalizeStringList(idleRenderPassNames).filter((passName) => targetPasses.has(passName));
+  return normalizeStringList(idleRenderPassNames)
+    .filter((passName) => activePasses.has(passName) && targetPasses.has(passName));
 }
 
 export {

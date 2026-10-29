@@ -2,6 +2,7 @@
 // Only newly allocated buffers are transferred; source GeoJSON remains usable.
 var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGeometryTransferCodecShared || (() => {
   const depths = { Point: 1, MultiPoint: 2, LineString: 2, MultiLineString: 3, Polygon: 3, MultiPolygon: 4 };
+  const referenceLength = 0xFFFFFFFF;
   function mapGeometry(value, transform, includeTopologyArcs = false) {
     if (!value || typeof value !== "object") return value;
     if (Object.hasOwn(depths, value.type) && Array.isArray(value.coordinates)) return transform(value, depths[value.type]);
@@ -18,14 +19,23 @@ var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGe
     }
     return result;
   }
-  function pack(value, { minCoordinateCount = 16_384, includeTopologyArcs = false } = {}) {
+  // shareReferences keeps arrays that several geometries share (TopoJSON arcs
+  // and the collections decoded from them) as one copy: v3 writes a reference
+  // record instead of repeating the points. Consumers that scan the v1 layout
+  // directly (packed raster updates) keep receiving v1/v2 by default.
+  function pack(value, { minCoordinateCount = 16_384, includeTopologyArcs = false, shareReferences = false } = {}) {
     let coordinateCount = 0, lengthCount = 0, valid = true;
-    function count(array, depth) {
+    const counted = new Map();
+    function count(array, depth, record = true) {
       if (!Array.isArray(array)) { valid = false; return; }
-      lengthCount += 1;
+      const previousDepths = shareReferences ? (counted.get(array) || 0) : 0;
+      if (record) lengthCount += previousDepths ? 2 : 1;
+      if (previousDepths & (1 << depth)) return;
+      if (shareReferences) counted.set(array, previousDepths | (1 << depth));
+      const firstWrite = record && !previousDepths;
       for (let index = 0; index < array.length; index += 1) {
-        if (depth > 1) count(array[index], depth - 1);
-        else if (typeof array[index] === "number") coordinateCount += 1;
+        if (depth > 1) count(array[index], depth - 1, firstWrite);
+        else if (typeof array[index] === "number") { if (firstWrite) coordinateCount += 1; }
         else valid = false;
       }
     }
@@ -36,8 +46,16 @@ var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGe
     if (!valid || !coordinateCount || coordinateCount < minCoordinateCount) return { payload: value, transferables: [] };
     const coordinates = new Float64Array(coordinateCount);
     const lengths = new Uint32Array(lengthCount);
+    counted.clear();
+    const written = new Map();
     let coordinateOffset = 0, lengthOffset = 0;
     function write(array, depth) {
+      if (shareReferences && written.has(array)) {
+        lengths[lengthOffset++] = referenceLength;
+        lengths[lengthOffset++] = written.get(array);
+        return;
+      }
+      if (shareReferences) written.set(array, lengthOffset);
       lengths[lengthOffset++] = array.length;
       if (depth === 1) {
         for (let i = 0; i < array.length; i += 1) coordinates[coordinateOffset++] = array[i];
@@ -49,19 +67,27 @@ var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGe
       return { ...geometry, coordinates: offset };
     }, includeTopologyArcs);
     return {
-      payload: { encoding: includeTopologyArcs ? "geo-f64-v2" : "geo-f64-v1", value: packed, coordinates, lengths },
+      payload: shareReferences
+        ? { encoding: "geo-f64-v3", includeTopologyArcs, value: packed, coordinates, lengths }
+        : { encoding: includeTopologyArcs ? "geo-f64-v2" : "geo-f64-v1", value: packed, coordinates, lengths },
       transferables: [coordinates.buffer, lengths.buffer],
     };
   }
   function unpack(payload) {
-    if (payload?.encoding !== "geo-f64-v1" && payload?.encoding !== "geo-f64-v2") throw new Error("Unsupported geometry transport encoding.");
+    if (payload?.encoding !== "geo-f64-v1" && payload?.encoding !== "geo-f64-v2" && payload?.encoding !== "geo-f64-v3") throw new Error("Unsupported geometry transport encoding.");
     const { coordinates, lengths } = payload;
+    const shared = payload.encoding === "geo-f64-v3";
+    const arrays = new Map();
     function read(depth, cursor) {
-      const array = new Array(lengths[cursor[1]++]);
+      const offset = cursor[1];
+      const length = lengths[cursor[1]++];
+      if (shared && length === referenceLength) return arrays.get(lengths[cursor[1]++]);
+      const array = new Array(length);
+      if (shared) arrays.set(offset, array);
       for (let i = 0; i < array.length; i += 1) array[i] = depth === 1 ? coordinates[cursor[0]++] : read(depth - 1, cursor);
       return array;
     }
-    return mapGeometry(payload.value, (geometry, depth) => ({ ...geometry, coordinates: read(depth, [...geometry.coordinates]) }), payload.encoding === "geo-f64-v2");
+    return mapGeometry(payload.value, (geometry, depth) => ({ ...geometry, coordinates: read(depth, [...geometry.coordinates]) }), shared ? payload.includeTopologyArcs : payload.encoding === "geo-f64-v2");
   }
   function yieldToBackground() {
     if (typeof globalThis.scheduler?.postTask === "function") {
@@ -70,26 +96,42 @@ var SCENARIO_FORGE_GEOMETRY_TRANSFER_CODEC_SHARED = globalThis.__scenarioForgeGe
     return new Promise((resolve) => setTimeout(resolve, 0));
   }
   async function unpackAsync(payload, { yieldControl = yieldToBackground, nowMs = () => performance.now(), sliceBudgetMs = 6 } = {}) {
-    if (payload?.encoding !== "geo-f64-v1" && payload?.encoding !== "geo-f64-v2") throw new Error("Unsupported geometry transport encoding.");
+    if (payload?.encoding !== "geo-f64-v1" && payload?.encoding !== "geo-f64-v2" && payload?.encoding !== "geo-f64-v3") throw new Error("Unsupported geometry transport encoding.");
     const { coordinates, lengths } = payload;
+    const shared = payload.encoding === "geo-f64-v3";
+    const arrays = new Map();
     const tasks = [];
     let sliceStartedAt = nowMs();
     const result = mapGeometry(payload.value, (geometry, depth) => {
       const decoded = { ...geometry, coordinates: [] };
+      if (shared) {
+        const start = geometry.coordinates[1];
+        const offset = lengths[start] === referenceLength ? lengths[start + 1] : start;
+        if (!arrays.has(offset)) arrays.set(offset, decoded.coordinates);
+        decoded.coordinates = arrays.get(offset);
+      }
       tasks.push({ decoded, depth, cursor: [...geometry.coordinates] });
       return decoded;
-    }, payload.encoding === "geo-f64-v2");
+    }, shared ? payload.includeTopologyArcs : payload.encoding === "geo-f64-v2");
     function read(depth, cursor) {
-      const array = new Array(lengths[cursor[1]++]);
+      const offset = cursor[1];
+      const length = lengths[cursor[1]++];
+      if (shared && length === referenceLength) return arrays.get(lengths[cursor[1]++]);
+      const array = (shared && arrays.get(offset)) || new Array(length);
+      array.length = length;
+      if (shared) arrays.set(offset, array);
       for (let i = 0; i < array.length; i += 1) array[i] = depth === 1 ? coordinates[cursor[0]++] : read(depth - 1, cursor);
       return array;
     }
     for (const { decoded, depth, cursor } of tasks) {
       if (decoded.type === "MultiLineString") {
         const lines = decoded.coordinates;
-        lines.length = lengths[cursor[1]++];
+        const length = lengths[cursor[1]++];
+        const reference = shared && length === referenceLength;
+        if (reference) cursor[1] += 1;
+        else lines.length = length;
         for (let i = 0; i < lines.length; i += 1) {
-          lines[i] = read(depth - 1, cursor);
+          if (!reference) lines[i] = read(depth - 1, cursor);
           if (nowMs() - sliceStartedAt >= sliceBudgetMs) {
             await yieldControl();
             sliceStartedAt = nowMs();

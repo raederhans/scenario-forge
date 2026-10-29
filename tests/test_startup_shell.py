@@ -130,7 +130,7 @@ class StartupShellTest(unittest.TestCase):
         self.assertIn('needTopologyPrimary: !topologyPrimary,', data_loader_js)
         self.assertIn('needLocales: !locales,', data_loader_js)
         self.assertIn('needGeoAliases: !geoAliases,', data_loader_js)
-        self.assertIn('topologyPrimary = topologyPrimary || workerResult.topologyPrimary || null;', data_loader_js)
+        self.assertIn('topologyPrimary = workerResult.topologyPrimary || topologyPrimary || null;', data_loader_js)
         self.assertIn('startupWorkerUsed,', data_loader_js)
         self.assertIn('requestedBundleLevel === "bootstrap"', scenario_bundle_runtime_js)
         self.assertIn(

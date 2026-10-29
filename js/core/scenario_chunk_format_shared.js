@@ -23,6 +23,16 @@ var SCENARIO_FORGE_SCENARIO_CHUNK_FORMAT_SHARED = globalThis.__scenarioForgeScen
       : collection?.type === "Feature" ? [collection] : [];
     for (const feature of features) {
       try {
+        // Same rule as the renderer's normalizeFeatureGeometry: keep geometry
+        // whose area already fits a hemisphere, and keep a rewind only when it
+        // shrinks the area. Rewinding every ring unconditionally turns a sliver
+        // "hole" larger than its shell into a whole-sphere fill over the ocean.
+        const sourceArea = Number(geoArea(feature));
+        if (!Number.isFinite(sourceArea)) continue;
+        if (sourceArea <= Math.PI * 2) {
+          feature.sphericalArea = sourceArea;
+          continue;
+        }
         let geometry = feature.geometry;
         if (geometry?.type === "Polygon") {
           const coordinates = geometry.coordinates.map((ring, index) => orientRing(ring, index === 0));
@@ -36,10 +46,14 @@ var SCENARIO_FORGE_SCENARIO_CHUNK_FORMAT_SHARED = globalThis.__scenarioForgeScen
             && polygon.some((ring) => ring === null))) continue;
           geometry = { ...geometry, coordinates };
         }
-        const area = geoArea({ ...feature, geometry });
+        const area = Number(geoArea({ ...feature, geometry }));
         if (!Number.isFinite(area)) continue;
-        feature.geometry = geometry;
-        feature.sphericalArea = area;
+        if (area < sourceArea) {
+          feature.geometry = geometry;
+          feature.sphericalArea = area;
+        } else {
+          feature.sphericalArea = sourceArea;
+        }
       } catch (_error) {
         continue;
       }
