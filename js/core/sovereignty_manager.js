@@ -6,7 +6,7 @@ import {
   normalizeTextureMode,
   state as runtimeState,
 } from "./state.js";
-import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
+import { normalizeCountryCodeAlias, migrateTnoProjectTags } from "./country_code_aliases.js";
 import {
   getCountryCode as getSharedFeatureCountryCode,
   getFeatureId as getSharedFeatureId,
@@ -154,7 +154,7 @@ function getFeatureIdsForOwner(ownerCode) {
 }
 
 function migrateImportedProjectData(data) {
-  const payload = data && typeof data === "object" ? { ...data } : {};
+  const payload = data && typeof data === "object" ? migrateTnoProjectTags({ ...data }) : {};
   delete payload.scenarioControllersByFeatureId;
   // Legacy names are accepted only at the project input boundary. An explicit
   // canonical empty map must win over stale legacy paint.

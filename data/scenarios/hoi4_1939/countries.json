@@ -1,15 +1,56 @@
 {
   "countries": {
-    "ADN": {
-      "base_iso2": "YE",
+    "ABD": {
+      "base_iso2": "AE",
       "capital_state_id": null,
       "color_hex": "#db5d80",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
-      "display_name": "Aden",
-      "display_name_en": "Aden",
-      "display_name_zh": "亚丁",
+      "display_name": "Sheikhdom of Abu Dhabi",
+      "display_name_en": "Sheikhdom of Abu Dhabi",
+      "display_name_zh": "阿布扎比酋长国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AE",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "abd_sheikhdom",
+      "provenance_iso2": "AE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "abd_sheikhdom"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "ABD"
+    },
+    "ADN": {
+      "base_iso2": "YE",
+      "capital_state_id": null,
+      "color_hex": "#a32c50",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Aden Colony",
+      "display_name_en": "Aden Colony",
+      "display_name_zh": "亚丁殖民地",
       "entry_kind": "scenario_subject",
       "feature_count": 1,
       "featured": false,
@@ -119,6 +160,47 @@
       "synthetic_owner": false,
       "tag": "AFG"
     },
+    "AJM": {
+      "base_iso2": "AE",
+      "capital_state_id": null,
+      "color_hex": "#bc2045",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Sheikhdom of Ajman",
+      "display_name_en": "Sheikhdom of Ajman",
+      "display_name_zh": "阿治曼酋长国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AE",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "ajm_sheikhdom_hoi4_1939",
+      "provenance_iso2": "AE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ajm_sheikhdom_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "AJM"
+    },
     "ALB": {
       "base_iso2": "AL",
       "capital_state_id": null,
@@ -166,12 +248,12 @@
       "color_hex": "#245dbb",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 48,
-      "display_name": "French Algeria",
-      "display_name_en": "French Algeria",
-      "display_name_zh": "法属阿尔及利亚",
+      "controller_feature_count": 13,
+      "display_name": "Southern Territories of Algeria",
+      "display_name_en": "Southern Territories of Algeria",
+      "display_name_zh": "阿尔及利亚南部领地",
       "entry_kind": "scenario_subject",
-      "feature_count": 48,
+      "feature_count": 13,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -188,7 +270,7 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "french_algeria",
-        "alg_family_colour_hoi4_1939"
+        "algeria_southern_territories"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -196,7 +278,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "colony",
+      "subject_kind": "military_administration",
       "subregion_id": "subregion_northern_africa",
       "subregion_label": "Northern Africa",
       "synthetic_owner": false,
@@ -242,6 +324,47 @@
       "subregion_label": "Northern America",
       "synthetic_owner": false,
       "tag": "ALK"
+    },
+    "ALW": {
+      "base_iso2": "SY",
+      "capital_state_id": null,
+      "color_hex": "#395ed8",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 2,
+      "display_name": "Autonomous Government of Latakia",
+      "display_name_en": "Autonomous Government of Latakia",
+      "display_name_zh": "拉塔基亚自治政府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SY",
+      "notes": "",
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "primary_rule_source": "alawite_government",
+      "provenance_iso2": "SY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "alawite_government"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "ALW"
     },
     "AND": {
       "base_iso2": "AD",
@@ -327,7 +450,7 @@
     "AOF": {
       "base_iso2": "SN",
       "capital_state_id": null,
-      "color_hex": "#395ed8",
+      "color_hex": "#4f7df9",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 91,
@@ -488,15 +611,15 @@
     "AST": {
       "base_iso2": "PG",
       "capital_state_id": 285,
-      "color_hex": "#a32c50",
+      "color_hex": "#de4563",
       "continent_id": "continent_oceania",
       "continent_label": "Oceania",
-      "controller_feature_count": 13,
+      "controller_feature_count": 12,
       "display_name": "Commonwealth of Australia",
       "display_name_en": "Commonwealth of Australia",
       "display_name_zh": "澳大利亚联邦",
       "entry_kind": "scenario_subject",
-      "feature_count": 13,
+      "feature_count": 12,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -571,7 +694,7 @@
     "BAH": {
       "base_iso2": "BH",
       "capital_state_id": null,
-      "color_hex": "#bc2045",
+      "color_hex": "#b1395e",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 5,
@@ -612,7 +735,7 @@
     "BAS": {
       "base_iso2": "LS",
       "capital_state_id": null,
-      "color_hex": "#de4563",
+      "color_hex": "#ca5070",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 10,
@@ -650,10 +773,51 @@
       "synthetic_owner": false,
       "tag": "BAS"
     },
+    "BDA": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#dc5a75",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Baroda",
+      "display_name_en": "Baroda",
+      "display_name_zh": "巴罗达",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "bda_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "bda_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "BDA"
+    },
     "BEA": {
       "base_iso2": "KE",
       "capital_state_id": null,
-      "color_hex": "#b1395e",
+      "color_hex": "#b11051",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 8,
@@ -691,6 +855,47 @@
       "subregion_label": "Eastern Africa",
       "synthetic_owner": false,
       "tag": "BEA"
+    },
+    "BEI": {
+      "base_iso2": "BN",
+      "capital_state_id": null,
+      "color_hex": "#bc3a50",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 4,
+      "display_name": "Sultanate of Brunei",
+      "display_name_en": "Sultanate of Brunei",
+      "display_name_zh": "文莱苏丹国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BN",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "brunei_hoi4_1939",
+      "provenance_iso2": "BN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "brunei_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "BEI"
     },
     "BEL": {
       "base_iso2": "BE",
@@ -732,7 +937,7 @@
     "BGU": {
       "base_iso2": "GY",
       "capital_state_id": null,
-      "color_hex": "#ca5070",
+      "color_hex": "#e54d76",
       "continent_id": "continent_south_america",
       "continent_label": "South America",
       "controller_feature_count": 10,
@@ -773,7 +978,7 @@
     "BHM": {
       "base_iso2": "BS",
       "capital_state_id": null,
-      "color_hex": "#b11051",
+      "color_hex": "#be265c",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "controller_feature_count": 1,
@@ -814,7 +1019,7 @@
     "BHO": {
       "base_iso2": "BZ",
       "capital_state_id": null,
-      "color_hex": "#bc3a50",
+      "color_hex": "#d55768",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "controller_feature_count": 6,
@@ -855,14 +1060,14 @@
     "BHU": {
       "base_iso2": "BT",
       "capital_state_id": 324,
-      "color_hex": "#ac7a58",
+      "color_hex": "#a42846",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 20,
       "display_name": "Kingdom of Bhutan",
       "display_name_en": "Kingdom of Bhutan",
       "display_name_zh": "不丹王国",
-      "entry_kind": "",
+      "entry_kind": "scenario_subject",
       "feature_count": 20,
       "featured": false,
       "historical_fidelity": "vanilla",
@@ -871,23 +1076,68 @@
       ],
       "lookup_iso2": "BT",
       "notes": "",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
       "primary_rule_source": "",
       "provenance_iso2": "BT",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "bhutan_protectorate_hoi4_1939"
+      ],
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
       "source_types": [
         "hoi4_owner"
       ],
-      "subject_kind": "",
+      "subject_kind": "protectorate",
       "subregion_id": "subregion_southern_asia",
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
       "tag": "BHU"
+    },
+    "BHW": {
+      "base_iso2": "PK",
+      "capital_state_id": null,
+      "color_hex": "#bd1838",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Bahawalpur",
+      "display_name_en": "Bahawalpur",
+      "display_name_zh": "巴哈瓦尔布尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PK",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "bahawalpur_split_hoi4_1939",
+      "provenance_iso2": "PK",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "bahawalpur_split_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "BHW"
     },
     "BLR": {
       "base_iso2": "BY",
@@ -1052,7 +1302,7 @@
     "BOT": {
       "base_iso2": "BW",
       "capital_state_id": 542,
-      "color_hex": "#e54d76",
+      "color_hex": "#d33f6e",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 15,
@@ -1089,6 +1339,47 @@
       "subregion_label": "Southern Africa",
       "synthetic_owner": true,
       "tag": "BOT"
+    },
+    "BPL": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#df4156",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Bhopal",
+      "display_name_en": "Bhopal",
+      "display_name_zh": "博帕尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "bpl_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "bpl_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "BPL"
     },
     "BRA": {
       "base_iso2": "BR",
@@ -1130,15 +1421,15 @@
     "BRM": {
       "base_iso2": "MM",
       "capital_state_id": 995,
-      "color_hex": "#be265c",
+      "color_hex": "#c34a5d",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 14,
+      "controller_feature_count": 12,
       "display_name": "British Burma",
       "display_name_en": "British Burma",
       "display_name_zh": "英属缅甸",
       "entry_kind": "scenario_subject",
-      "feature_count": 14,
+      "feature_count": 12,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -1168,47 +1459,6 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "BRM"
-    },
-    "BRU": {
-      "base_iso2": "BN",
-      "capital_state_id": null,
-      "color_hex": "#d55768",
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "controller_feature_count": 4,
-      "display_name": "Brunei",
-      "display_name_en": "Brunei",
-      "display_name_zh": "文莱",
-      "entry_kind": "scenario_subject",
-      "feature_count": 4,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "BN",
-      "notes": "",
-      "parent_owner_tag": "ENG",
-      "parent_owner_tags": [
-        "ENG"
-      ],
-      "primary_rule_source": "brunei_hoi4_1939",
-      "provenance_iso2": "BN",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "brunei_hoi4_1939"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "protectorate",
-      "subregion_id": "subregion_south_eastern_asia",
-      "subregion_label": "South-Eastern Asia",
-      "synthetic_owner": false,
-      "tag": "BRU"
     },
     "BSH": {
       "base_iso2": "RU",
@@ -1291,7 +1541,7 @@
     "BWA": {
       "base_iso2": "NG",
       "capital_state_id": null,
-      "color_hex": "#d33f6e",
+      "color_hex": "#ac3448",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 39,
@@ -1452,7 +1702,7 @@
     "CEY": {
       "base_iso2": "LK",
       "capital_state_id": null,
-      "color_hex": "#c34a5d",
+      "color_hex": "#b2113c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 25,
@@ -1490,6 +1740,47 @@
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
       "tag": "CEY"
+    },
+    "CHB": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#b43752",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Cooch Behar",
+      "display_name_en": "Cooch Behar",
+      "display_name_zh": "科奇比哈尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "chb_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "chb_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "CHB"
     },
     "CHE": {
       "base_iso2": "RU",
@@ -1538,12 +1829,12 @@
       "color_hex": "#28288c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 697,
+      "controller_feature_count": 693,
       "display_name": "Republic of China",
       "display_name_en": "Republic of China",
       "display_name_zh": "中华民国",
       "entry_kind": "",
-      "feature_count": 697,
+      "feature_count": 693,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -1653,6 +1944,47 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
       "tag": "CNZ"
+    },
+    "COC": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#cb4c66",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Cochin",
+      "display_name_en": "Cochin",
+      "display_name_zh": "科钦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "cochin_split_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cochin_split_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "COC"
     },
     "COL": {
       "base_iso2": "CO",
@@ -1891,7 +2223,7 @@
     "CYP": {
       "base_iso2": "CY",
       "capital_state_id": null,
-      "color_hex": "#ac3448",
+      "color_hex": "#ba4364",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -2010,7 +2342,7 @@
     "DJI": {
       "base_iso2": "DJ",
       "capital_state_id": null,
-      "color_hex": "#4f7df9",
+      "color_hex": "#336bca",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 6,
@@ -2165,6 +2497,47 @@
       "synthetic_owner": false,
       "tag": "DOM"
     },
+    "DUB": {
+      "base_iso2": "AE",
+      "capital_state_id": null,
+      "color_hex": "#e3576b",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Sheikhdom of Dubai",
+      "display_name_en": "Sheikhdom of Dubai",
+      "display_name_zh": "迪拜酋长国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AE",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "dub_sheikhdom_hoi4_1939",
+      "provenance_iso2": "AE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "dub_sheikhdom_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "DUB"
+    },
     "ECU": {
       "base_iso2": "EC",
       "capital_state_id": 305,
@@ -2202,10 +2575,51 @@
       "synthetic_owner": false,
       "tag": "ECU"
     },
+    "EDN": {
+      "base_iso2": "YE",
+      "capital_state_id": null,
+      "color_hex": "#d75176",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 2,
+      "display_name": "Eastern Aden Protectorate Debug Region",
+      "display_name_en": "Eastern Aden Protectorate Debug Region",
+      "display_name_zh": "东亚丁保护地调试分区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "YE",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "aden_eastern_states_hoi4_1939",
+      "provenance_iso2": "YE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "aden_eastern_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "EDN"
+    },
     "EGY": {
       "base_iso2": "EG",
       "capital_state_id": 907,
-      "color_hex": "#b2113c",
+      "color_hex": "#d4405a",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 26,
@@ -2287,12 +2701,12 @@
       "color_hex": "#c9385d",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 508,
+      "controller_feature_count": 507,
       "display_name": "United Kingdom of Great Britain and Northern Ireland",
       "display_name_en": "United Kingdom of Great Britain and Northern Ireland",
       "display_name_zh": "大不列颠及北爱尔兰联合王国",
       "entry_kind": "",
-      "feature_count": 508,
+      "feature_count": 507,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -2403,7 +2817,7 @@
     "FCM": {
       "base_iso2": "CM",
       "capital_state_id": null,
-      "color_hex": "#336bca",
+      "color_hex": "#4380e1",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 8,
@@ -2484,7 +2898,7 @@
     "FLK": {
       "base_iso2": "FK",
       "capital_state_id": null,
-      "color_hex": "#ba4364",
+      "color_hex": "#c52b4d",
       "continent_id": "continent_south_america",
       "continent_label": "South America",
       "controller_feature_count": 2,
@@ -2522,18 +2936,59 @@
       "synthetic_owner": false,
       "tag": "FLK"
     },
+    "FND": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#1e57cd",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 4,
+      "display_name": "French India",
+      "display_name_en": "French India",
+      "display_name_zh": "法属印度",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "primary_rule_source": "french_india",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "french_india"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "FND"
+    },
     "FRA": {
       "base_iso2": "FR",
       "capital_state_id": 16,
       "color_hex": "#3971e4",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 287,
+      "controller_feature_count": 321,
       "display_name": "French Republic",
       "display_name_en": "French Republic",
       "display_name_zh": "法兰西共和国",
       "entry_kind": "",
-      "feature_count": 287,
+      "feature_count": 321,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -2547,7 +3002,8 @@
       "provenance_iso2": "FR",
       "quality": "approx_existing_geometry",
       "rule_sources": [
-        "french_colonies"
+        "french_colonies",
+        "algeria_northern_departments"
       ],
       "scenario_only": false,
       "source": "direct_active_owner",
@@ -2602,10 +3058,49 @@
       "synthetic_owner": false,
       "tag": "FRO"
     },
+    "FUJ": {
+      "base_iso2": "AE",
+      "capital_state_id": null,
+      "color_hex": "#d4608e",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Sheikhdom of Fujairah",
+      "display_name_en": "Sheikhdom of Fujairah",
+      "display_name_zh": "富查伊拉酋长国",
+      "entry_kind": "",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AE",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "fujairah",
+      "provenance_iso2": "AE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "fujairah"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "FUJ"
+    },
     "GAM": {
       "base_iso2": "GM",
       "capital_state_id": null,
-      "color_hex": "#e3576b",
+      "color_hex": "#b22750",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 6,
@@ -2731,7 +3226,7 @@
     "GF": {
       "base_iso2": "GF",
       "capital_state_id": null,
-      "color_hex": "#4380e1",
+      "color_hex": "#0f68db",
       "continent_id": "",
       "continent_label": "",
       "controller_feature_count": 1,
@@ -2772,7 +3267,7 @@
     "GLD": {
       "base_iso2": "GH",
       "capital_state_id": null,
-      "color_hex": "#d75176",
+      "color_hex": "#cf4f62",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 10,
@@ -2894,7 +3389,7 @@
     "GP": {
       "base_iso2": "GP",
       "capital_state_id": null,
-      "color_hex": "#1e57cd",
+      "color_hex": "#5d82eb",
       "continent_id": "",
       "continent_label": "",
       "controller_feature_count": 1,
@@ -3047,6 +3542,47 @@
       "synthetic_owner": false,
       "tag": "GUA"
     },
+    "GWA": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#b10541",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Gwalior",
+      "display_name_en": "Gwalior",
+      "display_name_zh": "瓜廖尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "gwa_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "gwa_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "GWA"
+    },
     "GXC": {
       "base_iso2": "CN",
       "capital_state_id": 594,
@@ -3168,7 +3704,7 @@
     "HKG": {
       "base_iso2": "HK",
       "capital_state_id": null,
-      "color_hex": "#d4405a",
+      "color_hex": "#ab2644",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 18,
@@ -3326,22 +3862,22 @@
     "HYD": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#ed7e95",
+      "color_hex": "#bf1e50",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 7,
+      "controller_feature_count": 15,
       "display_name": "Hyderabad",
       "display_name_en": "Hyderabad",
       "display_name_zh": "海得拉巴",
       "entry_kind": "scenario_subject",
-      "feature_count": 7,
+      "feature_count": 15,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
       "lookup_iso2": "IN",
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
+      "notes": "",
       "parent_owner_tag": "RAJ",
       "parent_owner_tags": [
         "RAJ"
@@ -3350,7 +3886,10 @@
       "provenance_iso2": "IN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "hyderabad_hoi4_1939"
+        "hyderabad_hoi4_1939",
+        "jalna_split_hoi4_1939",
+        "parbhani_split_hoi4_1939",
+        "raichur_split_hoi4_1939"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3358,11 +3897,52 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "protectorate",
+      "subject_kind": "princely_state",
       "subregion_id": "subregion_southern_asia",
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
       "tag": "HYD"
+    },
+    "ICA": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#e7486a",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 7,
+      "display_name": "Central India States",
+      "display_name_en": "Central India States",
+      "display_name_zh": "中央印度诸邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 7,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "ica_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ica_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "ICA"
     },
     "ICE": {
       "base_iso2": "IS",
@@ -3400,6 +3980,130 @@
       "subregion_label": "Northern Europe",
       "synthetic_owner": false,
       "tag": "ICE"
+    },
+    "IDA": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#d6545d",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Deccan States",
+      "display_name_en": "Deccan States",
+      "display_name_zh": "德干诸邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "deccan_states_split_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "deccan_states_split_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "IDA"
+    },
+    "IEA": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#d43962",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 5,
+      "display_name": "Eastern States",
+      "display_name_en": "Eastern States",
+      "display_name_zh": "东部诸邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "iea_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "iea_states_hoi4_1939",
+        "odisha_states_split_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "IEA"
+    },
+    "IFA": {
+      "base_iso2": "PK",
+      "capital_state_id": null,
+      "color_hex": "#c44550",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "North-West Frontier States",
+      "display_name_en": "North-West Frontier States",
+      "display_name_zh": "西北边疆诸邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PK",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "frontier_states_split_hoi4_1939",
+      "provenance_iso2": "PK",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "frontier_states_split_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "IFA"
     },
     "IFN": {
       "base_iso2": "MA",
@@ -3442,18 +4146,183 @@
       "synthetic_owner": false,
       "tag": "IFN"
     },
+    "IHA": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#ac313d",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 5,
+      "display_name": "Punjab Hill States",
+      "display_name_en": "Punjab Hill States",
+      "display_name_zh": "旁遮普山邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "iha_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "iha_states_hoi4_1939",
+        "mandi_split_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "IHA"
+    },
+    "IKA": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#be3f5d",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Khasi States",
+      "display_name_en": "Khasi States",
+      "display_name_zh": "卡西诸邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "ika_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ika_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "IKA"
+    },
+    "IMO": {
+      "base_iso2": "OM",
+      "capital_state_id": null,
+      "color_hex": "#7f5154",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 2,
+      "display_name": "Imamate of Oman",
+      "display_name_en": "Imamate of Oman",
+      "display_name_zh": "阿曼伊玛目国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "OM",
+      "notes": "",
+      "parent_owner_tag": "OMA",
+      "parent_owner_tags": [
+        "OMA"
+      ],
+      "primary_rule_source": "oman_imamate",
+      "provenance_iso2": "OM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "oman_imamate"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "IMO"
+    },
+    "INR": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#b0264e",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Indore",
+      "display_name_en": "Indore",
+      "display_name_zh": "印多尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "inr_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "inr_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "INR"
+    },
     "INS": {
       "base_iso2": "ID",
       "capital_state_id": 1058,
       "color_hex": "#e2a371",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 6,
+      "controller_feature_count": 5,
       "display_name": "Dutch East Indies",
       "display_name_en": "Dutch East Indies",
       "display_name_zh": "荷属东印度",
       "entry_kind": "scenario_subject",
-      "feature_count": 6,
+      "feature_count": 5,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -3483,6 +4352,88 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "INS"
+    },
+    "IPA": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#be3847",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 2,
+      "display_name": "Punjab States",
+      "display_name_en": "Punjab States",
+      "display_name_zh": "旁遮普诸邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "ipa_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ipa_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "IPA"
+    },
+    "IRA": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#ac1c34",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 16,
+      "display_name": "Rajputana States",
+      "display_name_en": "Rajputana States",
+      "display_name_zh": "拉杰普塔纳诸邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 16,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "rajputana_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "rajputana_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "IRA"
     },
     "IRE": {
       "base_iso2": "IE",
@@ -3564,12 +4515,12 @@
       "color_hex": "#437f3f",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 107,
+      "controller_feature_count": 121,
       "display_name": "Kingdom of Italy",
       "display_name_en": "Kingdom of Italy",
       "display_name_zh": "意大利王国",
       "entry_kind": "",
-      "feature_count": 107,
+      "feature_count": 121,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -3585,7 +4536,8 @@
       "rule_sources": [
         "italy_absorbs_san_marino_1936",
         "1939_italy_albania",
-        "1939_italy_absorbs_san_marino"
+        "1939_italy_absorbs_san_marino",
+        "libyan_coastal_provinces_1939"
       ],
       "scenario_only": false,
       "source": "direct_active_owner",
@@ -3599,10 +4551,51 @@
       "synthetic_owner": false,
       "tag": "ITA"
     },
+    "IWA": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#e3535f",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 5,
+      "display_name": "Western India States",
+      "display_name_en": "Western India States",
+      "display_name_zh": "西印度诸邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "iwa_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "iwa_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "IWA"
+    },
     "JAM": {
       "base_iso2": "JM",
       "capital_state_id": null,
-      "color_hex": "#c52b4d",
+      "color_hex": "#b6314c",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "controller_feature_count": 1,
@@ -3646,12 +4639,12 @@
       "color_hex": "#ffc9b2",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 228,
+      "controller_feature_count": 149,
       "display_name": "Empire of Japan",
       "display_name_en": "Empire of Japan",
       "display_name_zh": "大日本帝国",
       "entry_kind": "",
-      "feature_count": 228,
+      "feature_count": 149,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -3680,6 +4673,47 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
       "tag": "JAP"
+    },
+    "JAZ": {
+      "base_iso2": "SY",
+      "capital_state_id": null,
+      "color_hex": "#297cef",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Upper Jazira Administration",
+      "display_name_en": "Upper Jazira Administration",
+      "display_name_zh": "上杰济拉行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SY",
+      "notes": "",
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "primary_rule_source": "jazira_administration_1939",
+      "provenance_iso2": "SY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "jazira_administration_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "JAZ"
     },
     "JBZ": {
       "base_iso2": "CN",
@@ -3804,17 +4838,99 @@
       "synthetic_owner": false,
       "tag": "JCJ"
     },
+    "JEB": {
+      "base_iso2": "SY",
+      "capital_state_id": null,
+      "color_hex": "#5174da",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Autonomous Government of Jabal Druze",
+      "display_name_en": "Autonomous Government of Jabal Druze",
+      "display_name_zh": "德鲁兹山自治政府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SY",
+      "notes": "",
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "primary_rule_source": "jabal_druze",
+      "provenance_iso2": "SY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "jabal_druze"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "JEB"
+    },
+    "JOH": {
+      "base_iso2": "MY",
+      "capital_state_id": null,
+      "color_hex": "#c6466b",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Sultanate of Johor",
+      "display_name_en": "Sultanate of Johor",
+      "display_name_zh": "柔佛苏丹国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MY",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "joh_protectorate_hoi4_1939",
+      "provenance_iso2": "MY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "joh_protectorate_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "JOH"
+    },
     "JOR": {
       "base_iso2": "JO",
       "capital_state_id": 455,
-      "color_hex": "#6f374e",
+      "color_hex": "#c0345f",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 12,
       "display_name": "Emirate of Transjordan",
       "display_name_en": "Emirate of Transjordan",
       "display_name_zh": "外约旦酋长国",
-      "entry_kind": "",
+      "entry_kind": "scenario_subject",
       "feature_count": 12,
       "featured": false,
       "historical_fidelity": "vanilla",
@@ -3823,23 +4939,68 @@
       ],
       "lookup_iso2": "JO",
       "notes": "",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
       "primary_rule_source": "",
       "provenance_iso2": "JO",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "transjordan_mandate_hoi4_1939"
+      ],
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
       "source_types": [
         "hoi4_owner"
       ],
-      "subject_kind": "",
+      "subject_kind": "mandate",
       "subregion_id": "subregion_western_asia",
       "subregion_label": "Western Asia",
       "synthetic_owner": false,
       "tag": "JOR"
+    },
+    "JRG": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#3a4fa5",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Gyalrong Four Chiefdoms Debug Region",
+      "display_name_en": "Gyalrong Four Chiefdoms Debug Region",
+      "display_name_zh": "嘉绒四土调试分区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "",
+      "parent_owner_tag": "CHI",
+      "parent_owner_tags": [
+        "CHI"
+      ],
+      "primary_rule_source": "gyalrong_four_1939",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "gyalrong_four_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "tusi",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "JRG"
     },
     "JSC": {
       "base_iso2": "CN",
@@ -3923,6 +5084,47 @@
       "synthetic_owner": false,
       "tag": "KAL"
     },
+    "KAS": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#d84c6b",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 23,
+      "display_name": "Jammu and Kashmir",
+      "display_name_en": "Jammu and Kashmir",
+      "display_name_zh": "查谟和克什米尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 23,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "kashmir_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "kashmir_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "KAS"
+    },
     "KAZ": {
       "base_iso2": "KZ",
       "capital_state_id": null,
@@ -4005,6 +5207,129 @@
       "synthetic_owner": false,
       "tag": "KBA"
     },
+    "KED": {
+      "base_iso2": "MY",
+      "capital_state_id": null,
+      "color_hex": "#dc4574",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Sultanate of Kedah",
+      "display_name_en": "Sultanate of Kedah",
+      "display_name_zh": "吉打苏丹国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MY",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "ked_protectorate_hoi4_1939",
+      "provenance_iso2": "MY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ked_protectorate_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "KED"
+    },
+    "KEL": {
+      "base_iso2": "MY",
+      "capital_state_id": null,
+      "color_hex": "#d34869",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Sultanate of Kelantan",
+      "display_name_en": "Sultanate of Kelantan",
+      "display_name_zh": "吉兰丹苏丹国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MY",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "kel_protectorate_hoi4_1939",
+      "provenance_iso2": "MY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "kel_protectorate_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "KEL"
+    },
+    "KHP": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#d43b4d",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Kolhapur",
+      "display_name_en": "Kolhapur",
+      "display_name_zh": "戈尔哈布尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "khp_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "khp_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "KHP"
+    },
     "KKP": {
       "base_iso2": "UZ",
       "capital_state_id": null,
@@ -4046,6 +5371,47 @@
       "subregion_label": "Central Asia",
       "synthetic_owner": false,
       "tag": "KKP"
+    },
+    "KLA": {
+      "base_iso2": "PK",
+      "capital_state_id": null,
+      "color_hex": "#c6253f",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Kalat and Baluchistan States",
+      "display_name_en": "Kalat and Baluchistan States",
+      "display_name_zh": "卡拉特与俾路支诸邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PK",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "baluchistan_states_split_hoi4_1939",
+      "provenance_iso2": "PK",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "baluchistan_states_split_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "KLA"
     },
     "KOM": {
       "base_iso2": "RU",
@@ -4130,6 +5496,88 @@
       "synthetic_owner": false,
       "tag": "KOR"
     },
+    "KPU": {
+      "base_iso2": "PK",
+      "capital_state_id": null,
+      "color_hex": "#b72f41",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Khairpur",
+      "display_name_en": "Khairpur",
+      "display_name_zh": "海尔布尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PK",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "khairpur_split_hoi4_1939",
+      "provenance_iso2": "PK",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "khairpur_split_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "KPU"
+    },
+    "KRF": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#c28d7e",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 79,
+      "display_name": "Karafuto Prefecture",
+      "display_name_en": "Karafuto Prefecture",
+      "display_name_zh": "桦太厅",
+      "entry_kind": "scenario_subject",
+      "feature_count": 79,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "karafuto_administration_hoi4_1939",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "karafuto_administration_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "KRF"
+    },
     "KRL": {
       "base_iso2": "RU",
       "capital_state_id": null,
@@ -4171,34 +5619,34 @@
       "synthetic_owner": false,
       "tag": "KRL"
     },
-    "KSH": {
-      "base_iso2": "IN",
+    "KRN": {
+      "base_iso2": "MM",
       "capital_state_id": null,
-      "color_hex": "#b64f64",
+      "color_hex": "#d66a7f",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 23,
-      "display_name": "Jammu and Kashmir",
-      "display_name_en": "Jammu and Kashmir",
-      "display_name_zh": "查谟和克什米尔",
+      "controller_feature_count": 1,
+      "display_name": "Karenni States",
+      "display_name_en": "Karenni States",
+      "display_name_zh": "克伦尼诸邦",
       "entry_kind": "scenario_subject",
-      "feature_count": 23,
+      "feature_count": 1,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
-      "lookup_iso2": "IN",
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "parent_owner_tag": "RAJ",
+      "lookup_iso2": "MM",
+      "notes": "",
+      "parent_owner_tag": "BRM",
       "parent_owner_tags": [
-        "RAJ"
+        "BRM"
       ],
-      "primary_rule_source": "kashmir_hoi4_1939",
-      "provenance_iso2": "IN",
+      "primary_rule_source": "krn_hoi4_1939",
+      "provenance_iso2": "MM",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "kashmir_hoi4_1939"
+        "krn_hoi4_1939"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -4207,15 +5655,56 @@
         "scenario_extension"
       ],
       "subject_kind": "protectorate",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "KRN"
+    },
+    "KUT": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#cf4c57",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Cutch",
+      "display_name_en": "Cutch",
+      "display_name_zh": "卡奇",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "kut_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "kut_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
       "subregion_id": "subregion_southern_asia",
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
-      "tag": "KSH"
+      "tag": "KUT"
     },
     "KUW": {
       "base_iso2": "KW",
       "capital_state_id": 656,
-      "color_hex": "#b22750",
+      "color_hex": "#ab3354",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 6,
@@ -4256,7 +5745,7 @@
     "KWT": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#c28d7e",
+      "color_hex": "#d5a992",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -4297,7 +5786,7 @@
     "KWW": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#0f68db",
+      "color_hex": "#08509f",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 3,
@@ -4313,15 +5802,16 @@
       ],
       "lookup_iso2": "CN",
       "notes": "Simplified bay-side lease outline around Fort Bayard and Chikan with Donghai/Naozhou island sector. Rural frontier approximate, clipped to runtime land; does not assign the entire modern Zhanjiang prefecture.",
-      "parent_owner_tag": "FRA",
+      "parent_owner_tag": "VIN",
       "parent_owner_tags": [
-        "FRA"
+        "VIN"
       ],
       "primary_rule_source": "guangzhouwan",
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "guangzhouwan"
+        "guangzhouwan",
+        "guangzhouwan_indochina_parent"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -4419,12 +5909,12 @@
       "color_hex": "#39722c",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 22,
+      "controller_feature_count": 8,
       "display_name": "Italian Libya",
       "display_name_en": "Italian Libya",
       "display_name_zh": "意属利比亚",
       "entry_kind": "scenario_subject",
-      "feature_count": 22,
+      "feature_count": 8,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -4458,7 +5948,7 @@
     "LEB": {
       "base_iso2": "LB",
       "capital_state_id": 553,
-      "color_hex": "#5d82eb",
+      "color_hex": "#405fc1",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 6,
@@ -4612,6 +6102,47 @@
       "synthetic_owner": false,
       "tag": "LIT"
     },
+    "LOL": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#4955b2",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Liangshan Yi Clan Debug Region",
+      "display_name_en": "Liangshan Yi Clan Debug Region",
+      "display_name_zh": "凉山彝族家支调试分区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "",
+      "parent_owner_tag": "SIC",
+      "parent_owner_tags": [
+        "SIC"
+      ],
+      "primary_rule_source": "liangshan_clans_hoi4_1939",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "liangshan_clans_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "LOL"
+    },
     "LSI": {
       "base_iso2": "ID",
       "capital_state_id": null,
@@ -4693,15 +6224,15 @@
     "MAD": {
       "base_iso2": "MG",
       "capital_state_id": 543,
-      "color_hex": "#297cef",
+      "color_hex": "#3887fb",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 26,
+      "controller_feature_count": 27,
       "display_name": "Colony of Madagascar and Dependencies",
       "display_name_en": "Colony of Madagascar and Dependencies",
       "display_name_zh": "马达加斯加及附属地殖民地",
       "entry_kind": "scenario_subject",
-      "feature_count": 26,
+      "feature_count": 27,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -4718,7 +6249,8 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "madagascar_colony",
-        "madagascar_dependencies"
+        "madagascar_dependencies",
+        "mayotte_madagascar_dependency"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -4735,15 +6267,15 @@
     "MAL": {
       "base_iso2": "MY",
       "capital_state_id": 336,
-      "color_hex": "#cf4f62",
+      "color_hex": "#dd506c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 11,
-      "display_name": "British Malaya",
-      "display_name_en": "British Malaya",
-      "display_name_zh": "英属马来亚",
+      "controller_feature_count": 6,
+      "display_name": "Federated Malay States",
+      "display_name_en": "Federated Malay States",
+      "display_name_zh": "马来联邦",
       "entry_kind": "scenario_subject",
-      "feature_count": 11,
+      "feature_count": 6,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -4760,7 +6292,7 @@
       "quality": "approx_existing_geometry",
       "rule_sources": [
         "malaya_singapore_brunei",
-        "mal_family_colour_hoi4_1939"
+        "malaya_federated_states_hoi4_1939"
       ],
       "scenario_only": false,
       "source": "direct_active_owner",
@@ -4768,7 +6300,7 @@
       "source_types": [
         "hoi4_owner"
       ],
-      "subject_kind": "colony",
+      "subject_kind": "protectorate",
       "subregion_id": "subregion_south_eastern_asia",
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
@@ -4777,7 +6309,7 @@
     "MAN": {
       "base_iso2": "CN",
       "capital_state_id": 328,
-      "color_hex": "#d5a992",
+      "color_hex": "#ac7666",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 234,
@@ -4900,7 +6432,7 @@
     "MEN": {
       "base_iso2": "CN",
       "capital_state_id": 1043,
-      "color_hex": "#ac7666",
+      "color_hex": "#fed2c7",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 34,
@@ -5057,7 +6589,7 @@
     "MLT": {
       "base_iso2": "MT",
       "capital_state_id": null,
-      "color_hex": "#ab2644",
+      "color_hex": "#db5e73",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 2,
@@ -5094,6 +6626,47 @@
       "subregion_label": "Southern Europe",
       "synthetic_owner": false,
       "tag": "MLT"
+    },
+    "MNP": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#c12f54",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 8,
+      "display_name": "Manipur",
+      "display_name_en": "Manipur",
+      "display_name_zh": "曼尼普尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 8,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "mnp_state_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mnp_state_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "MNP"
     },
     "MON": {
       "base_iso2": "MN",
@@ -5135,7 +6708,7 @@
     "MOR": {
       "base_iso2": "MA",
       "capital_state_id": 461,
-      "color_hex": "#5174da",
+      "color_hex": "#3375d4",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 11,
@@ -5177,7 +6750,7 @@
     "MQ": {
       "base_iso2": "MQ",
       "capital_state_id": null,
-      "color_hex": "#405fc1",
+      "color_hex": "#5887fd",
       "continent_id": "",
       "continent_label": "",
       "controller_feature_count": 1,
@@ -5297,10 +6870,51 @@
       "synthetic_owner": false,
       "tag": "MRE"
     },
+    "MUL": {
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "color_hex": "#27257d",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Muli Chiefdom",
+      "display_name_en": "Muli Chiefdom",
+      "display_name_zh": "木里土司",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CN",
+      "notes": "",
+      "parent_owner_tag": "SIC",
+      "parent_owner_tags": [
+        "SIC"
+      ],
+      "primary_rule_source": "muli_chiefdom_hoi4_1939",
+      "provenance_iso2": "CN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "muli_chiefdom_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "tusi",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "MUL"
+    },
     "MUR": {
       "base_iso2": "IO",
       "capital_state_id": null,
-      "color_hex": "#b6314c",
+      "color_hex": "#ca4057",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 2,
@@ -5338,25 +6952,25 @@
       "synthetic_owner": false,
       "tag": "MUR"
     },
-    "MYR": {
+    "MYS": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#ce4d5c",
+      "color_hex": "#cd405a",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 16,
+      "controller_feature_count": 7,
       "display_name": "Mysore",
       "display_name_en": "Mysore",
       "display_name_zh": "迈索尔",
       "entry_kind": "scenario_subject",
-      "feature_count": 16,
+      "feature_count": 7,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
       "lookup_iso2": "IN",
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
+      "notes": "",
       "parent_owner_tag": "RAJ",
       "parent_owner_tags": [
         "RAJ"
@@ -5365,7 +6979,8 @@
       "provenance_iso2": "IN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "mysore_hoi4_1939"
+        "mysore_hoi4_1939",
+        "hassan_split_hoi4_1939"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -5373,11 +6988,11 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "protectorate",
+      "subject_kind": "princely_state",
       "subregion_id": "subregion_southern_asia",
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
-      "tag": "MYR"
+      "tag": "MYS"
     },
     "MZB": {
       "base_iso2": "MZ",
@@ -5424,13 +7039,13 @@
     "NBO": {
       "base_iso2": "MY",
       "capital_state_id": null,
-      "color_hex": "#c6466b",
+      "color_hex": "#ab204d",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
-      "display_name": "North Borneo",
-      "display_name_en": "North Borneo",
-      "display_name_zh": "北婆罗洲",
+      "display_name": "British North Borneo",
+      "display_name_en": "British North Borneo",
+      "display_name_zh": "英属北婆罗洲",
       "entry_kind": "scenario_subject",
       "feature_count": 1,
       "featured": false,
@@ -5465,7 +7080,7 @@
     "NCP": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#fed2c7",
+      "color_hex": "#a0775c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 318,
@@ -5543,7 +7158,7 @@
     "NFL": {
       "base_iso2": "CA",
       "capital_state_id": null,
-      "color_hex": "#c0345f",
+      "color_hex": "#d35975",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "controller_feature_count": 7,
@@ -5584,7 +7199,7 @@
     "NGN": {
       "base_iso2": "PG",
       "capital_state_id": null,
-      "color_hex": "#b54e6f",
+      "color_hex": "#f06a88",
       "continent_id": "continent_oceania",
       "continent_label": "Oceania",
       "controller_feature_count": 13,
@@ -5740,7 +7355,7 @@
     "NRH": {
       "base_iso2": "ZM",
       "capital_state_id": null,
-      "color_hex": "#dc4574",
+      "color_hex": "#b61547",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 10,
@@ -5781,7 +7396,7 @@
     "NYS": {
       "base_iso2": "MW",
       "capital_state_id": null,
-      "color_hex": "#d34869",
+      "color_hex": "#c93265",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 3,
@@ -5862,12 +7477,12 @@
       "color_hex": "#9b656b",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 11,
+      "controller_feature_count": 9,
       "display_name": "Sultanate of Muscat and Oman",
       "display_name_en": "Sultanate of Muscat and Oman",
-      "display_name_zh": "马斯喀特和阿曼苏丹国",
+      "display_name_zh": "马斯喀特与阿曼苏丹国",
       "entry_kind": "",
-      "feature_count": 11,
+      "feature_count": 9,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -5880,7 +7495,9 @@
       "primary_rule_source": "",
       "provenance_iso2": "OM",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "muscat_name"
+      ],
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -5896,7 +7513,7 @@
     "PAL": {
       "base_iso2": "IL",
       "capital_state_id": 454,
-      "color_hex": "#ab3354",
+      "color_hex": "#c03e5a",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 8,
@@ -5975,7 +7592,7 @@
     "PAP": {
       "base_iso2": "PG",
       "capital_state_id": null,
-      "color_hex": "#801f41",
+      "color_hex": "#b73957",
       "continent_id": "continent_oceania",
       "continent_label": "Oceania",
       "controller_feature_count": 7,
@@ -6134,12 +7751,12 @@
       "color_hex": "#146fdd",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 117,
+      "controller_feature_count": 116,
       "display_name": "Commonwealth of the Philippines",
       "display_name_en": "Commonwealth of the Philippines",
       "display_name_zh": "菲律宾自治领",
       "entry_kind": "scenario_subject",
-      "feature_count": 117,
+      "feature_count": 116,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -6169,6 +7786,47 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "PHI"
+    },
+    "PLS": {
+      "base_iso2": "MY",
+      "capital_state_id": null,
+      "color_hex": "#cf3e62",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Perlis",
+      "display_name_en": "Perlis",
+      "display_name_zh": "玻璃市",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MY",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "pls_protectorate_hoi4_1939",
+      "provenance_iso2": "MY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "pls_protectorate_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "PLS"
     },
     "POL": {
       "base_iso2": "PL",
@@ -6353,7 +8011,8 @@
       "provenance_iso2": "PR",
       "quality": "approx_existing_geometry",
       "rule_sources": [
-        "puerto_rico_parent"
+        "puerto_rico_parent",
+        "puerto_rico_territory_metadata"
       ],
       "scenario_only": true,
       "source": "fallback_mapped_tag",
@@ -6361,7 +8020,7 @@
       "source_types": [
         "synthetic_fallback"
       ],
-      "subject_kind": "colony",
+      "subject_kind": "territory",
       "subregion_id": "subregion_caribbean",
       "subregion_label": "Caribbean",
       "synthetic_owner": true,
@@ -6370,7 +8029,7 @@
     "QAT": {
       "base_iso2": "QA",
       "capital_state_id": null,
-      "color_hex": "#dd506c",
+      "color_hex": "#de547c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 7,
@@ -6451,15 +8110,15 @@
     "RAJ": {
       "base_iso2": "IN",
       "capital_state_id": 439,
-      "color_hex": "#db5e73",
+      "color_hex": "#ca3351",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 334,
+      "controller_feature_count": 274,
       "display_name": "British Indian Empire",
       "display_name_en": "British Indian Empire",
       "display_name_zh": "英属印度帝国",
       "entry_kind": "scenario_subject",
-      "feature_count": 334,
+      "feature_count": 274,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -6489,6 +8148,47 @@
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
       "tag": "RAJ"
+    },
+    "RAK": {
+      "base_iso2": "AE",
+      "capital_state_id": null,
+      "color_hex": "#b53c57",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Sheikhdom of Ras al-Khaimah",
+      "display_name_en": "Sheikhdom of Ras al-Khaimah",
+      "display_name_zh": "拉斯海马酋长国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AE",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "rak_sheikhdom_hoi4_1939",
+      "provenance_iso2": "AE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "rak_sheikhdom_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "RAK"
     },
     "RCG": {
       "base_iso2": "CD",
@@ -6535,7 +8235,7 @@
     "RE": {
       "base_iso2": "RE",
       "capital_state_id": null,
-      "color_hex": "#3887fb",
+      "color_hex": "#1964c9",
       "continent_id": "",
       "continent_label": "",
       "controller_feature_count": 1,
@@ -6576,7 +8276,7 @@
     "RGC": {
       "base_iso2": "CN",
       "capital_state_id": null,
-      "color_hex": "#a0775c",
+      "color_hex": "#e0af90",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 159,
@@ -6617,7 +8317,7 @@
     "RHO": {
       "base_iso2": "ZW",
       "capital_state_id": null,
-      "color_hex": "#ca4057",
+      "color_hex": "#e74d66",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 10,
@@ -6654,6 +8354,47 @@
       "subregion_label": "Eastern Africa",
       "synthetic_owner": false,
       "tag": "RHO"
+    },
+    "RMP": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#dd4068",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Rampur",
+      "display_name_en": "Rampur",
+      "display_name_zh": "兰普尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "rmp_states_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "rmp_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "RMP"
     },
     "ROM": {
       "base_iso2": "RO",
@@ -6738,7 +8479,7 @@
     "SAF": {
       "base_iso2": "NA",
       "capital_state_id": 275,
-      "color_hex": "#ab204d",
+      "color_hex": "#b62359",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 9,
@@ -6817,7 +8558,7 @@
     "SEY": {
       "base_iso2": "SC",
       "capital_state_id": null,
-      "color_hex": "#d35975",
+      "color_hex": "#be2b52",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 1,
@@ -6897,6 +8638,88 @@
       "synthetic_owner": false,
       "tag": "SGN"
     },
+    "SHA": {
+      "base_iso2": "MM",
+      "capital_state_id": null,
+      "color_hex": "#9f3b4f",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Federated Shan States",
+      "display_name_en": "Federated Shan States",
+      "display_name_zh": "掸邦联邦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MM",
+      "notes": "",
+      "parent_owner_tag": "BRM",
+      "parent_owner_tags": [
+        "BRM"
+      ],
+      "primary_rule_source": "sha_hoi4_1939",
+      "provenance_iso2": "MM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "sha_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "SHA"
+    },
+    "SHJ": {
+      "base_iso2": "AE",
+      "capital_state_id": null,
+      "color_hex": "#b73158",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Sheikhdom of Sharjah",
+      "display_name_en": "Sheikhdom of Sharjah",
+      "display_name_zh": "沙迦酋长国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AE",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "shj_sheikhdom_hoi4_1939",
+      "provenance_iso2": "AE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "shj_sheikhdom_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "SHJ"
+    },
     "SHX": {
       "base_iso2": "CN",
       "capital_state_id": 615,
@@ -6944,9 +8767,9 @@
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 77,
-      "display_name": "Kingdom of Siam",
-      "display_name_en": "Kingdom of Siam",
-      "display_name_zh": "暹罗王国",
+      "display_name": "Kingdom of Thailand",
+      "display_name_en": "Kingdom of Thailand",
+      "display_name_zh": "泰王国",
       "entry_kind": "",
       "feature_count": 77,
       "featured": true,
@@ -6961,7 +8784,9 @@
       "primary_rule_source": "",
       "provenance_iso2": "TH",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "thailand_name_1939"
+      ],
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -6977,15 +8802,15 @@
     "SIC": {
       "base_iso2": "CN",
       "capital_state_id": 1037,
-      "color_hex": "#006080",
+      "color_hex": "#3c36a1",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 32,
-      "display_name": "Xikang Administration",
-      "display_name_en": "Xikang Administration",
-      "display_name_zh": "西康军政区（刘文辉）",
-      "entry_kind": "",
-      "feature_count": 32,
+      "controller_feature_count": 31,
+      "display_name": "Xikang Provincial Government",
+      "display_name_en": "Xikang Provincial Government",
+      "display_name_zh": "西康省政府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 31,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -6993,15 +8818,18 @@
       ],
       "lookup_iso2": "CN",
       "notes": "Project extension: 1939 Xikang clique owner layer limited to Liu Wenhui's eastern Kham and western Sichuan base without absorbing Chamdo.",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
+      "parent_owner_tag": "CHI",
+      "parent_owner_tags": [
+        "CHI"
+      ],
       "primary_rule_source": "1939_xikang_clique_owner_sic",
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
         "1939_xikang_clique_owner_sic",
         "xikang_clique_1939",
-        "xikang_ning_1939"
+        "xikang_ning_1939",
+        "xikang_metadata_hoi4_1939"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -7009,7 +8837,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "",
+      "subject_kind": "military_administration",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
@@ -7018,7 +8846,7 @@
     "SIE": {
       "base_iso2": "SL",
       "capital_state_id": null,
-      "color_hex": "#b61547",
+      "color_hex": "#b00b46",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 4,
@@ -7098,7 +8926,7 @@
     "SKM": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#df737c",
+      "color_hex": "#b50933",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 4,
@@ -7113,7 +8941,7 @@
         "extended"
       ],
       "lookup_iso2": "IN",
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
+      "notes": "",
       "parent_owner_tag": "RAJ",
       "parent_owner_tags": [
         "RAJ"
@@ -7181,7 +9009,7 @@
     "SML": {
       "base_iso2": "SO",
       "capital_state_id": null,
-      "color_hex": "#c93265",
+      "color_hex": "#ba214f",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 5,
@@ -7381,6 +9209,47 @@
       "synthetic_owner": false,
       "tag": "SOV"
     },
+    "SPM": {
+      "base_iso2": "PM",
+      "capital_state_id": null,
+      "color_hex": "#476bd5",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 1,
+      "display_name": "Saint Pierre and Miquelon",
+      "display_name_en": "Saint Pierre and Miquelon",
+      "display_name_zh": "圣皮埃尔和密克隆",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PM",
+      "notes": "",
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "primary_rule_source": "saint_pierre_miquelon",
+      "provenance_iso2": "PM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "saint_pierre_miquelon"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "SPM"
+    },
     "SPR": {
       "base_iso2": "ES",
       "capital_state_id": 41,
@@ -7423,13 +9292,13 @@
     "SRW": {
       "base_iso2": "MY",
       "capital_state_id": null,
-      "color_hex": "#c03e5a",
+      "color_hex": "#d73f66",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
-      "display_name": "Sarawak",
-      "display_name_en": "Sarawak",
-      "display_name_zh": "沙捞越",
+      "display_name": "Kingdom of Sarawak",
+      "display_name_en": "Kingdom of Sarawak",
+      "display_name_zh": "沙捞越王国",
       "entry_kind": "scenario_subject",
       "feature_count": 1,
       "featured": false,
@@ -7503,6 +9372,47 @@
       "synthetic_owner": false,
       "tag": "SSH"
     },
+    "STH": {
+      "base_iso2": "SH",
+      "capital_state_id": null,
+      "color_hex": "#cd4761",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Saint Helena Colony",
+      "display_name_en": "Saint Helena Colony",
+      "display_name_zh": "圣赫勒拿殖民地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SH",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "saint_helena_colony_hoi4_1939",
+      "provenance_iso2": "SH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "saint_helena_colony_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "STH"
+    },
     "STP": {
       "base_iso2": "ST",
       "capital_state_id": null,
@@ -7547,15 +9457,15 @@
     "STR": {
       "base_iso2": "SG",
       "capital_state_id": null,
-      "color_hex": "#cf3e62",
+      "color_hex": "#e2486c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 8,
+      "controller_feature_count": 9,
       "display_name": "Straits Settlements",
       "display_name_en": "Straits Settlements",
       "display_name_zh": "海峡殖民地",
       "entry_kind": "scenario_subject",
-      "feature_count": 8,
+      "feature_count": 9,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -7588,7 +9498,7 @@
     "SUD": {
       "base_iso2": "SD",
       "capital_state_id": 551,
-      "color_hex": "#de547c",
+      "color_hex": "#c24065",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 27,
@@ -7713,7 +9623,7 @@
     "SWA": {
       "base_iso2": "NA",
       "capital_state_id": null,
-      "color_hex": "#87123e",
+      "color_hex": "#c84d7a",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 13,
@@ -7830,7 +9740,7 @@
     "SWZ": {
       "base_iso2": "SZ",
       "capital_state_id": null,
-      "color_hex": "#ca3351",
+      "color_hex": "#af3851",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 4,
@@ -7871,15 +9781,15 @@
     "SYR": {
       "base_iso2": "SY",
       "capital_state_id": 554,
-      "color_hex": "#3375d4",
+      "color_hex": "#4e75ee",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 15,
+      "controller_feature_count": 11,
       "display_name": "French Mandate for Syria",
       "display_name_en": "French Mandate for Syria",
       "display_name_zh": "法属叙利亚托管地",
       "entry_kind": "scenario_subject",
-      "feature_count": 15,
+      "feature_count": 11,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -7913,7 +9823,7 @@
     "TAI": {
       "base_iso2": "TW",
       "capital_state_id": null,
-      "color_hex": "#e0af90",
+      "color_hex": "#f0b7a9",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 21,
@@ -8073,10 +9983,51 @@
       "synthetic_owner": false,
       "tag": "TAT"
     },
+    "TGA": {
+      "base_iso2": "MY",
+      "capital_state_id": null,
+      "color_hex": "#cc3d6b",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Sultanate of Terengganu",
+      "display_name_en": "Sultanate of Terengganu",
+      "display_name_zh": "登嘉楼苏丹国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MY",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "tga_protectorate_hoi4_1939",
+      "provenance_iso2": "MY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tga_protectorate_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "TGA"
+    },
     "TGN": {
       "base_iso2": "TZ",
       "capital_state_id": null,
-      "color_hex": "#b53c57",
+      "color_hex": "#c64d67",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 25,
@@ -8319,7 +10270,7 @@
     "TOG": {
       "base_iso2": "TG",
       "capital_state_id": null,
-      "color_hex": "#5887fd",
+      "color_hex": "#3f66e1",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 5,
@@ -8357,10 +10308,51 @@
       "synthetic_owner": false,
       "tag": "TOG"
     },
+    "TPA": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#ba1745",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 8,
+      "display_name": "Tripura",
+      "display_name_en": "Tripura",
+      "display_name_zh": "特里普拉",
+      "entry_kind": "scenario_subject",
+      "feature_count": 8,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "tpa_state_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tpa_state_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "TPA"
+    },
     "TRI": {
       "base_iso2": "TT",
       "capital_state_id": null,
-      "color_hex": "#e74d66",
+      "color_hex": "#d84f62",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "controller_feature_count": 1,
@@ -8401,15 +10393,15 @@
     "TRU": {
       "base_iso2": "AE",
       "capital_state_id": null,
-      "color_hex": "#b62359",
+      "color_hex": "#d1526c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 9,
+      "controller_feature_count": 2,
       "display_name": "Trucial States",
       "display_name_en": "Trucial States",
       "display_name_zh": "特鲁西尔诸国",
       "entry_kind": "scenario_subject",
-      "feature_count": 9,
+      "feature_count": 2,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -8439,51 +10431,10 @@
       "synthetic_owner": false,
       "tag": "TRU"
     },
-    "TRV": {
-      "base_iso2": "IN",
-      "capital_state_id": null,
-      "color_hex": "#ee6b89",
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "controller_feature_count": 7,
-      "display_name": "Travancore",
-      "display_name_en": "Travancore",
-      "display_name_zh": "特拉凡哥尔",
-      "entry_kind": "scenario_subject",
-      "feature_count": 7,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "IN",
-      "notes": "Princely state approximated by the modern state; not a historical boundary.",
-      "parent_owner_tag": "RAJ",
-      "parent_owner_tags": [
-        "RAJ"
-      ],
-      "primary_rule_source": "travancore_hoi4_1939",
-      "provenance_iso2": "IN",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "travancore_hoi4_1939"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "protectorate",
-      "subregion_id": "subregion_southern_asia",
-      "subregion_label": "Southern Asia",
-      "synthetic_owner": false,
-      "tag": "TRV"
-    },
     "TUN": {
       "base_iso2": "TN",
       "capital_state_id": 458,
-      "color_hex": "#1964c9",
+      "color_hex": "#3657c4",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 23,
@@ -8561,6 +10512,88 @@
       "synthetic_owner": false,
       "tag": "TUR"
     },
+    "TVC": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#dc5b69",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 4,
+      "display_name": "Travancore",
+      "display_name_en": "Travancore",
+      "display_name_zh": "特拉凡哥尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "",
+      "parent_owner_tag": "RAJ",
+      "parent_owner_tags": [
+        "RAJ"
+      ],
+      "primary_rule_source": "travancore_hoi4_1939",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "travancore_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "TVC"
+    },
+    "UAQ": {
+      "base_iso2": "AE",
+      "capital_state_id": null,
+      "color_hex": "#e05977",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Sheikhdom of Umm al-Quwain",
+      "display_name_en": "Sheikhdom of Umm al-Quwain",
+      "display_name_zh": "乌姆盖万酋长国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AE",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "uaq_sheikhdom_hoi4_1939",
+      "provenance_iso2": "AE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "uaq_sheikhdom_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "UAQ"
+    },
     "UDM": {
       "base_iso2": "RU",
       "capital_state_id": null,
@@ -8605,7 +10638,7 @@
     "UGA": {
       "base_iso2": "UG",
       "capital_state_id": null,
-      "color_hex": "#be2b52",
+      "color_hex": "#c04967",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 4,
@@ -8727,12 +10760,12 @@
       "color_hex": "#1485ed",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
-      "controller_feature_count": 817,
+      "controller_feature_count": 818,
       "display_name": "United States of America",
       "display_name_en": "United States of America",
       "display_name_zh": "美利坚合众国",
       "entry_kind": "",
-      "feature_count": 817,
+      "feature_count": 818,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -8745,7 +10778,9 @@
       "primary_rule_source": "",
       "provenance_iso2": "US",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "olongapo_reservation"
+      ],
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "hoi4_owner",
@@ -8839,7 +10874,7 @@
     "VIN": {
       "base_iso2": "VN",
       "capital_state_id": 671,
-      "color_hex": "#476bd5",
+      "color_hex": "#1a5fd4",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 104,
@@ -8876,6 +10911,47 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "VIN"
+    },
+    "WDN": {
+      "base_iso2": "YE",
+      "capital_state_id": null,
+      "color_hex": "#b12746",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Western Aden Protectorate Debug Region",
+      "display_name_en": "Western Aden Protectorate Debug Region",
+      "display_name_zh": "西亚丁保护地调试分区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "YE",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "aden_western_states_hoi4_1939",
+      "provenance_iso2": "YE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "aden_western_states_hoi4_1939"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "WDN"
     },
     "WNG": {
       "base_iso2": "ID",
@@ -9005,12 +11081,12 @@
       "color_hex": "#9b656b",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 20,
+      "controller_feature_count": 15,
       "display_name": "Mutawakkilite Kingdom of Yemen",
       "display_name_en": "Mutawakkilite Kingdom of Yemen",
       "display_name_zh": "也门穆塔瓦基利亚王国",
       "entry_kind": "",
-      "feature_count": 20,
+      "feature_count": 15,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -9036,46 +11112,46 @@
       "synthetic_owner": false,
       "tag": "YEM"
     },
-    "YT": {
-      "base_iso2": "YT",
+    "YOG": {
+      "base_iso2": "ID",
       "capital_state_id": null,
-      "color_hex": "#4e75ee",
-      "continent_id": "",
-      "continent_label": "",
+      "color_hex": "#d79953",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
       "controller_feature_count": 1,
-      "display_name": "Colony of Mayotte",
-      "display_name_en": "Colony of Mayotte",
-      "display_name_zh": "马约特殖民地",
+      "display_name": "Sultanate of Yogyakarta",
+      "display_name_en": "Sultanate of Yogyakarta",
+      "display_name_zh": "日惹苏丹国",
       "entry_kind": "scenario_subject",
       "feature_count": 1,
       "featured": false,
-      "historical_fidelity": "vanilla",
+      "historical_fidelity": "extended",
       "historical_fidelity_summary": [
-        "vanilla"
+        "extended"
       ],
-      "lookup_iso2": "YT",
+      "lookup_iso2": "ID",
       "notes": "",
-      "parent_owner_tag": "FRA",
+      "parent_owner_tag": "HOL",
       "parent_owner_tags": [
-        "FRA"
+        "HOL"
       ],
-      "primary_rule_source": "",
-      "provenance_iso2": "YT",
-      "quality": "approx_existing_geometry",
+      "primary_rule_source": "yogyakarta",
+      "provenance_iso2": "ID",
+      "quality": "manual_reviewed",
       "rule_sources": [
-        "yt_parent"
+        "yogyakarta"
       ],
       "scenario_only": true,
-      "source": "fallback_current_code",
-      "source_type": "synthetic_fallback",
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
       "source_types": [
-        "synthetic_fallback"
+        "scenario_extension"
       ],
-      "subject_kind": "colony",
-      "subregion_id": "",
-      "subregion_label": "",
-      "synthetic_owner": true,
-      "tag": "YT"
+      "subject_kind": "princely_state",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "YOG"
     },
     "YUG": {
       "base_iso2": "RS",
@@ -9119,14 +11195,14 @@
     "YUN": {
       "base_iso2": "CN",
       "capital_state_id": 325,
-      "color_hex": "#729450",
+      "color_hex": "#1a2071",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 126,
-      "display_name": "Yunnan Clique",
-      "display_name_en": "Yunnan Clique",
-      "display_name_zh": "云南军阀",
-      "entry_kind": "",
+      "display_name": "Yunnan Provincial Government - Long Yun",
+      "display_name_en": "Yunnan Provincial Government - Long Yun",
+      "display_name_zh": "云南省政府（龙云）",
+      "entry_kind": "scenario_subject",
       "feature_count": 126,
       "featured": true,
       "historical_fidelity": "vanilla",
@@ -9135,14 +11211,17 @@
       ],
       "lookup_iso2": "CN",
       "notes": "Yunnan clique override.",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
+      "parent_owner_tag": "CHI",
+      "parent_owner_tags": [
+        "CHI"
+      ],
       "primary_rule_source": "yunnan_warlord",
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "rule_sources": [
         "yunnan_warlord",
-        "1939_yunnan_warlord"
+        "1939_yunnan_warlord",
+        "yunnan_metadata_hoi4_1939"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -9150,7 +11229,7 @@
       "source_types": [
         "hoi4_owner"
       ],
-      "subject_kind": "",
+      "subject_kind": "military_administration",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
@@ -9159,7 +11238,7 @@
     "ZAN": {
       "base_iso2": "TZ",
       "capital_state_id": null,
-      "color_hex": "#b73158",
+      "color_hex": "#b0315a",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 5,

@@ -272,7 +272,9 @@ export function normalizeOperationGraphicWidth(value) {
 }
 
 export function normalizeOperationGraphicOpacity(value) {
-  return Math.max(0, Math.min(1, Number(value) || 1));
+  // null / 空串表示未设置（Number 会把它们变成 0），只有显式的有限数才保留，包括合法的 0。
+  const opacity = value === null || value === "" ? NaN : Number(value);
+  return Number.isFinite(opacity) ? Math.max(0, Math.min(1, opacity)) : 1;
 }
 
 export function getOperationGraphicEditorMidpoints(points = [], { closed = false } = {}) {

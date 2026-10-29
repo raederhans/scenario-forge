@@ -3,6 +3,47 @@ export function createMapInteractionEventBindingOwner({
   handlers = {},
   effects = {},
 } = {}) {
+  const activeTouchPointers = new Set();
+  let touchNavigation = false;
+
+  function isTouchPointer(event) {
+    return event.pointerType === "touch" || event.pointerType === "pen";
+  }
+
+  function shouldAllowTouchNavigation() {
+    return !getters.isTouchBrushEnabled() || touchNavigation || activeTouchPointers.size > 1;
+  }
+
+  function handlePointerDown(event) {
+    if (!isTouchPointer(event)) return handlers.handlePhysicalIntensityPointerDown(event);
+    activeTouchPointers.add(event.pointerId);
+    if (activeTouchPointers.size > 1) {
+      touchNavigation = true;
+      handlers.cancelBrushSession();
+      handlers.cancelPhysicalIntensitySession();
+    }
+    if (shouldAllowTouchNavigation() || !event.isPrimary) return;
+    handlers.handleBrushPointerDown(event);
+  }
+
+  function handlePointerMove(event) {
+    if (!isTouchPointer(event)) return handlers.handlePhysicalIntensityPointerMove(event);
+  }
+
+  function handleWindowPointerMove(event) {
+    if (!isTouchPointer(event) || !activeTouchPointers.has(event.pointerId) || shouldAllowTouchNavigation()) return;
+    handlers.handleBrushPointerMove(event);
+  }
+
+  function handlePointerEnd(event) {
+    if (!isTouchPointer(event)) return handlers.handlePhysicalIntensityPointerEnd(event);
+    if (!activeTouchPointers.has(event.pointerId)) return;
+    handlers.handleBrushPointerEnd(event);
+    handlers.handlePhysicalIntensityPointerEnd(event);
+    activeTouchPointers.delete(event.pointerId);
+    if (!activeTouchPointers.size) touchNavigation = false;
+  }
+
   function getInteractionRect() {
     return typeof getters.getInteractionRect === "function" ? getters.getInteractionRect() : null;
   }
@@ -27,6 +68,7 @@ export function createMapInteractionEventBindingOwner({
   }
 
   function bindWindowMouseUp() {
+    if (activeTouchPointers.size) return;
     requireFunction(handlers, "flushSpecialZoneMembershipDragSession")();
     requireFunction(handlers, "flushBrushSession")();
   }
@@ -48,8 +90,8 @@ export function createMapInteractionEventBindingOwner({
     }
 
     interactionRect.on("mousemove", requireFunction(handlers, "handleMouseMove"));
-    interactionRect.on("pointerdown.fieldTool", requireFunction(handlers, "handlePhysicalIntensityPointerDown"));
-    interactionRect.on("pointermove.fieldTool", requireFunction(handlers, "handlePhysicalIntensityPointerMove"));
+    interactionRect.on("pointerdown.fieldTool", handlePointerDown);
+    interactionRect.on("pointermove.fieldTool", handlePointerMove);
     interactionRect.on("mousedown.brush", requireFunction(handlers, "handleBrushPointerDown"));
     interactionRect.on("mousemove.brush", requireFunction(handlers, "handleBrushPointerMove"));
     interactionRect.on("mouseleave", requireFunction(handlers, "handleMouseLeave"));
@@ -57,8 +99,9 @@ export function createMapInteractionEventBindingOwner({
     interactionRect.on("dblclick", requireFunction(handlers, "mapDoubleClick"));
 
     targetWindow.addEventListener("mouseup", bindWindowMouseUp);
-    targetWindow.addEventListener("pointerup", requireFunction(handlers, "handlePhysicalIntensityPointerEnd"));
-    targetWindow.addEventListener("pointercancel", requireFunction(handlers, "handlePhysicalIntensityPointerEnd"));
+    targetWindow.addEventListener("pointermove", handleWindowPointerMove);
+    targetWindow.addEventListener("pointerup", handlePointerEnd);
+    targetWindow.addEventListener("pointercancel", handlePointerEnd);
     getInteractionRectNode(interactionRect)?.addEventListener?.(
       "lostpointercapture",
       requireFunction(handlers, "handlePhysicalIntensityPointerEnd"),
@@ -68,10 +111,13 @@ export function createMapInteractionEventBindingOwner({
     targetWindow.addEventListener("mapcreator:sidebar-layout-refresh", bindSidebarLayoutRefresh);
     effects.bindMapContainerResizeObserver?.();
     effects.bindBrowserZoomObservers?.();
+    const node = getInteractionRectNode(interactionRect);
+    if (node?.style) node.style.touchAction = "none";
     return true;
   }
 
   return Object.freeze({
     bindEvents,
+    shouldAllowTouchNavigation,
   });
 }

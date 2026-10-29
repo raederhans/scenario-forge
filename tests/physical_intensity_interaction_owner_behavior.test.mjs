@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createPhysicalIntensityInteractionOwner } from "../js/core/renderer/physical_intensity_interaction_owner.js";
+import { createMapInteractionEventBindingOwner } from "../js/core/renderer/map_interaction_event_binding_owner.js";
 
 function harness() {
   const calls = [], frames = [];
@@ -64,8 +65,10 @@ test("unchanged stamp still enables channel but end records no history or suppre
   assert.equal(h.frames.length, 0);
 });
 
-test("point creation then pointercancel uses normal bake and commit, without rollback", () => {
+test("point creation then pointercancel restores points and selection without history", () => {
   const h = harness(); h.tool.subMode = "points"; h.tool.brushStrength = 0; h.tool.brushRadiusDeg = 0;
+  h.tool.selectedPointId = "previous";
+  const before = structuredClone(h.channel());
   h.owner.handlePhysicalIntensityPointerDown(h.event([190,-95]));
   const point = h.channel().points[0];
   assert.deepEqual({ ...point, id: "id" }, { id: "id", lon: 180, lat: -90, strength: 0, radiusDeg: 3, falloff: "smooth" });
@@ -73,9 +76,10 @@ test("point creation then pointercancel uses normal bake and commit, without rol
   assert.equal(h.tool.selectedPointId, point.id);
   h.calls.length = 0;
   assert.equal(h.owner.handlePhysicalIntensityPointerEnd({ ...h.event(), type: "pointercancel" }), true);
-  assert.deepEqual(h.calls.map(([n]) => n), ["prevent", "preview-event", "release-pointer", "bake", "history-capture", "history", "suppress", "invalidate", "ui"]);
-  assert.equal(h.channel().points.length, 1);
-  assert.equal(h.channel().revision, 1);
+  assert.deepEqual(h.channel(), before);
+  assert.equal(h.tool.selectedPointId, "previous");
+  assert.equal(h.calls.filter(([n]) => n === "history").length, 0);
+  assert.equal(h.owner.handlePhysicalIntensityPointerEnd(h.event()), false);
 });
 
 test("existing point selection is unchanged until drag, including wrapped radius and move clamping", () => {
@@ -107,3 +111,66 @@ test("inactive, readonly, nonprimary and invalid coordinates keep original retur
   assert.equal(h.owner.handlePhysicalIntensityPointerMove(h.event()), false);
   assert.equal(h.calls.filter(([n]) => n === "history-capture").length, 0);
 });
+
+test("another pointer cannot move, release or cancel the active stroke", () => {
+  const h = harness();
+  h.owner.handlePhysicalIntensityPointerDown(h.event());
+  const before = structuredClone(h.channel());
+  h.calls.length = 0;
+  const other = { ...h.event([20, 30]), pointerId: 8 };
+  h.owner.handlePhysicalIntensityPointerMove(other);
+  h.owner.handlePhysicalIntensityPointerEnd({ ...other, type: "pointerup" });
+  h.owner.handlePhysicalIntensityPointerEnd({ ...other, type: "pointercancel" });
+  assert.deepEqual(h.channel(), before);
+  assert.equal(h.calls.filter(([name]) => name === "stamp").length, 0);
+  assert.equal(h.calls.filter(([name]) => name === "history").length, 0);
+  assert.equal(h.owner.handlePhysicalIntensityPointerEnd(h.event()), true);
+  assert.equal(h.calls.filter(([name]) => name === "history").length, 1);
+});
+
+for (const subMode of ["paint", "points"]) {
+  test(`${subMode}: second touch rolls back data and leaves navigation active`, () => {
+    const h = harness(); h.tool.subMode = subMode;
+    h.channel().grid = { base: new Float32Array([0.12345]), composite: new Float32Array([0.67891]) };
+    h.tool.selectedPointId = "selected-before";
+    const before = structuredClone(h.channel());
+    const listeners = new Map(), windowListeners = new Map();
+    const noop = () => {};
+    const node = { style: {}, addEventListener: noop };
+    const rect = { node: () => node, on: (type, fn) => { listeners.set(type, fn); return rect; } };
+    const binding = createMapInteractionEventBindingOwner({
+      getters: { getInteractionRect: () => rect, isTouchBrushEnabled: () => h.tool.active,
+        getWindow: () => ({ addEventListener: (type, fn) => windowListeners.set(type, fn) }) },
+      handlers: { ...h.owner, handleBrushPointerDown: h.owner.handlePhysicalIntensityPointerDown,
+        handleBrushPointerMove: h.owner.handlePhysicalIntensityPointerMove,
+        handleBrushPointerEnd: noop, cancelBrushSession: noop, flushBrushSession: noop,
+        flushSpecialZoneMembershipDragSession: noop, handleMouseMove: noop, handleMouseLeave: noop,
+        mapClick: noop, mapDoubleClick: noop, handleResize: noop, handleSidebarLayoutStart: noop },
+    });
+    binding.bindEvents();
+    const first = { ...h.event(), pointerType: "touch", isPrimary: true };
+    const second = { ...first, pointerId: 8, isPrimary: false };
+    listeners.get("pointerdown.fieldTool")(first);
+    assert.equal(binding.shouldAllowTouchNavigation(), false);
+    h.channel().grid.base[0] = 2;
+    h.channel().grid.composite[0] = 2;
+    listeners.get("pointerdown.fieldTool")(second);
+    assert.deepEqual(h.channel(), before);
+    assert.equal(binding.shouldAllowTouchNavigation(), true);
+    const stamps = h.calls.filter(([name]) => name === "stamp").length;
+    windowListeners.get("pointermove")({ ...first, lonLat: [50, 50] });
+    windowListeners.get("pointerup")({ ...second, type: "pointerup" });
+    windowListeners.get("pointermove")({ ...first, lonLat: [60, 60] });
+    windowListeners.get("pointerup")({ ...first, type: "pointerup" });
+    assert.deepEqual(h.channel(), before);
+    assert.equal(h.calls.filter(([name]) => name === "stamp").length, stamps);
+    assert.equal(h.calls.filter(([name]) => name === "history").length, 0);
+    assert.equal(h.tool.selectedPointId, "selected-before");
+    assert.equal(h.owner.handlePhysicalIntensityPointerEnd(first), false);
+    listeners.get("pointerdown.fieldTool")(first);
+    assert.equal(binding.shouldAllowTouchNavigation(), false);
+    windowListeners.get("pointercancel")({ ...first, type: "pointercancel" });
+    assert.deepEqual(h.channel(), before);
+    assert.equal(h.owner.handlePhysicalIntensityPointerEnd(first), false);
+  });
+}

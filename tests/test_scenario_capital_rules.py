@@ -17,6 +17,46 @@ TNO_CITY_ROWS = {f"CITY::ne::{ne_id}": {"id": f"CITY::ne::{ne_id}"}
 
 
 class ScenarioCapitalRulesTest(unittest.TestCase):
+    def test_hoi4_miquelon_seat_is_available_without_a_world_city(self):
+        for scenario in ("hoi4_1936", "hoi4_1939"):
+            result = apply_reviewed_capitals({}, {"SPM": {}}, {}, scenario_id=scenario)
+            city_id = result["capitals_by_tag"]["SPM"]
+            self.assertEqual(city_id, "CITY::scenario::miquelon")
+            self.assertEqual(result["capital_city_hints"]["SPM"]["city_name"], "Miquelon")
+            self.assertEqual(result["cities"][city_id]["country_code"], "PM")
+            self.assertTrue(result["cities"][city_id]["add_city"])
+
+    def test_southwest_debug_seats_and_remaining_trucial_neutral_areas(self):
+        countries = {tag: {} for tag in ("LOL", "MUL", "JRG", "TRU")}
+        result = apply_reviewed_capitals({}, countries, {}, scenario_id="hoi4_1939")
+        for tag, city_id in (("LOL", "CITY::scenario::meigu"),
+                             ("MUL", "CITY::scenario::qiaowa"),
+                             ("JRG", "CITY::scenario::barkam")):
+            self.assertEqual(result["capitals_by_tag"][tag], city_id)
+            self.assertTrue(result["cities"][city_id]["add_city"])
+            self.assertEqual(result["capital_city_hints"][tag]["country_code"], "CN")
+        self.assertNotIn("TRU", result["capitals_by_tag"])
+        self.assertEqual(result["capital_city_hints"]["TRU"]["resolution_method"], "no_capital")
+        self.assertEqual(apply_reviewed_capitals(result, countries, {}, scenario_id="hoi4_1939"), result)
+
+    def test_hoi4_split_seats_include_small_towns_and_brunei_identity(self):
+        cities = {
+            "CITY::ne::1159151083": {"id": "CITY::ne::1159151083", "lon": 114.94, "lat": 4.94},
+        }
+        countries = {tag: {} for tag in ("BEI", "IPA", "IHA", "CHB", "IKA")}
+        for scenario in ("hoi4_1936", "hoi4_1939"):
+            result = apply_reviewed_capitals({}, countries, cities, scenario_id=scenario)
+            self.assertEqual(set(result["capitals_by_tag"]), set(countries))
+            self.assertEqual(result["capitals_by_tag"]["BEI"], "CITY::ne::1159151083")
+            for tag, name in (("IPA", "Nabha"), ("IHA", "Mandi"), ("CHB", "Koch Bihar"), ("IKA", "Mawkyrwat")):
+                hint = result["capital_city_hints"][tag]
+                self.assertEqual(hint["city_name"], name)
+                self.assertEqual(hint["country_code"], "IN")
+                self.assertIsInstance(hint["lon"], float)
+                self.assertIsInstance(hint["lat"], float)
+                self.assertTrue(result["cities"][hint["city_id"]]["add_city"])
+            self.assertEqual(apply_reviewed_capitals(result, countries, cities, scenario_id=scenario), result)
+
     def test_capital_geometry_reader_accepts_gzip_only_topology(self):
         ring = [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]
         topology = {"type": "Topology", "arcs": [ring], "objects": {
@@ -176,9 +216,9 @@ class ScenarioCapitalRulesTest(unittest.TestCase):
 
     def test_identity_is_scenario_specific_not_a_tag_match_to_the_mod(self):
         cities = {**TNO_CITY_ROWS, "CITY::ne::1159149559": {"id": "CITY::ne::1159149559"}}
-        result = apply_reviewed_capitals({}, {"MAG": {}}, cities, scenario_id="tno_1962", strict=True)
-        self.assertEqual(result["capital_city_hints"]["MAG"]["city_name"], "Magnitogorsk")
-        self.assertEqual(apply_reviewed_capitals({}, {"MAG": {}}, cities, scenario_id="hgo_1936")["capitals_by_tag"], {})
+        result = apply_reviewed_capitals({}, {"MGN": {}}, cities, scenario_id="tno_1962", strict=True)
+        self.assertEqual(result["capital_city_hints"]["MGN"]["city_name"], "Magnitogorsk")
+        self.assertEqual(apply_reviewed_capitals({}, {"MGN": {}}, cities, scenario_id="hgo_1936")["capitals_by_tag"], {})
 
     def test_no_capital_survives_composition_and_does_not_invent_a_city(self):
         result = apply_reviewed_capitals({"capitals_by_tag": {"AFA": "niamey"}}, {"AFA": {}}, {}, scenario_id="tno_1962")

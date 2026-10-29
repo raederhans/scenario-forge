@@ -1,3 +1,5 @@
+import { getActiveModal, restoreFocusOrigin } from "../../ui/ui_contract.js";
+
 export function shouldBlockUnderlyingMapSelectionForFacility(entry, allowUnderlyingMapSelection = false) {
   const familyId = String(entry?.familyId || "").trim().toLowerCase();
   return (familyId === "airport" || familyId === "port") && !allowUnderlyingMapSelection;
@@ -234,7 +236,16 @@ export function createFacilitySurfaceOwner({
     if (!facilityInfoCard || !facilityInfoCardTitle || !facilityInfoCardBody || !facilityInfoCardZoomBtn || !facilityInfoCardMoreBtn) {
       return { anchor: previousAnchor, visible: false, hasExtraRows: false };
     }
+    if (!facilityInfoCard.dataset.escapeBound) {
+      facilityInfoCard.addEventListener("keydown", (event) => {
+        if (event.defaultPrevented || event.key !== "Escape" || getActiveModal()) return;
+        event.preventDefault();
+        facilityInfoCard.querySelector("#facilityInfoCardCloseBtn").click();
+      });
+      facilityInfoCard.dataset.escapeBound = "true";
+    }
     if (!entry) {
+      const hadFocus = facilityInfoCard.contains(document.activeElement);
       facilityInfoCard.classList.add("hidden");
       facilityInfoCard.setAttribute("aria-hidden", "true");
       facilityInfoCardTitle.textContent = "";
@@ -243,6 +254,7 @@ export function createFacilitySurfaceOwner({
       facilityInfoCardZoomBtn.dataset.familyKey = "";
       facilityInfoCardMoreBtn.classList.add("hidden");
       facilityInfoCardMoreBtn.textContent = t("More fields", "ui");
+      if (hadFocus) restoreFocusOrigin(document.getElementById("mapContainer"));
       return { anchor: null, visible: false, hasExtraRows: false };
     }
     const nextAnchor = anchor && Number.isFinite(Number(anchor?.x)) && Number.isFinite(Number(anchor?.y))

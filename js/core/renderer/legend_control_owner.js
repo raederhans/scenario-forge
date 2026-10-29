@@ -365,7 +365,15 @@ export function createLegendControlOwner({
     });
     element.append(header, body, opacityPanel, ...resizeHandles);
     element.addEventListener("click", (event) => event.stopPropagation());
-    element.addEventListener("pointerleave", hideLegendOpacityPanel);
+    element.addEventListener("pointerleave", () => {
+      if (!opacityPanel.contains(document.activeElement)) hideLegendOpacityPanel();
+    });
+    opacityPanel.addEventListener("keydown", (event) => {
+      if (event.defaultPrevented || event.key !== "Escape") return;
+      event.preventDefault();
+      resizeHandles[0].focus({ preventScroll: true });
+      hideLegendOpacityPanel();
+    });
     getMapContainer().appendChild(element);
 
     legendControlElement = element;

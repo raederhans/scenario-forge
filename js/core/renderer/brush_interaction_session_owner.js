@@ -1,3 +1,6 @@
+import { applyFeaturePaintState } from "../state/color_state.js";
+import { restoreRiverPaintOverridesState } from "../state/actions/river_paint_actions.js";
+
 export function createBrushInteractionSessionOwner(runtimeState, {
   getBrushSession,
   setBrushSession,
@@ -11,6 +14,8 @@ export function createBrushInteractionSessionOwner(runtimeState, {
   refreshSidebarAfterPaint,
   requestRendererRender,
   flushBrushPatchPreview,
+  cancelBrushPatchPreview,
+  refreshColorState,
   noteRenderAction,
   getHitFromEvent,
   getStrategicOverlayRuntimeOwner,
@@ -28,6 +33,7 @@ export function createBrushInteractionSessionOwner(runtimeState, {
     if (brushSession) return brushSession;
     brushSession = {
       active: true,
+      pointerId: event.pointerId,
       dragging: false,
       startX: Number(event?.clientX || 0),
       startY: Number(event?.clientY || 0),
@@ -45,6 +51,32 @@ export function createBrushInteractionSessionOwner(runtimeState, {
     };
     setBrushSession(brushSession);
     return brushSession;
+  }
+
+  function cancelBrushSession() {
+    const current = getBrushSession();
+    if (!current) return;
+    cancelBrushPatchPreview();
+    setBrushSession(null);
+    suppressNextClick();
+    if (!current.changed) return;
+    for (const [id, color] of Object.entries(current.before.visualOverrides || {})) {
+      applyFeaturePaintState(runtimeState, [id], color, { remove: color === null });
+    }
+    restoreRiverPaintOverridesState(runtimeState, current.before.riverPaintOverrides);
+    for (const [id, color] of Object.entries(current.before.waterRegionOverrides || {})) {
+      if (color === null) delete runtimeState.waterRegionOverrides[id];
+      else runtimeState.waterRegionOverrides[id] = color;
+    }
+    refreshColorState({ renderNow: false });
+    requestRendererRender("brush-cancel", { flush: true });
+  }
+
+  function handleBrushPointerEnd(event) {
+    const current = getBrushSession();
+    if (!current || current.pointerId !== event.pointerId) return;
+    if (event.type === "pointercancel" || event.type === "lostpointercapture") cancelBrushSession();
+    else flushBrushSession();
   }
 
   function flushBrushSession() {
@@ -127,13 +159,19 @@ export function createBrushInteractionSessionOwner(runtimeState, {
     if (isBrushNavigationModifier(event)) return;
     if ((event.buttons & 1) !== 1) return;
     if (event?.preventDefault) event.preventDefault();
-    ensureBrushSession(event);
+    const current = ensureBrushSession(event);
+    if (event.pointerType === "touch" || event.pointerType === "pen") {
+      current.dragging = true;
+      handleBrushPointerMove(event);
+    }
   }
 
   function handleBrushPointerMove(event) {
     if (runtimeState.startupReadonly) {
       return;
     }
+    const current = getBrushSession();
+    if (current && current.pointerId !== event.pointerId) return;
     if (handlePhysicalIntensityPointerMove(event)) return;
     if (getStrategicOverlayRuntimeOwner().hasSpecialZoneMembershipDragSession()) {
       if ((event.buttons & 1) !== 1) {
@@ -169,6 +207,8 @@ export function createBrushInteractionSessionOwner(runtimeState, {
   }
 
   return Object.freeze({
+    cancelBrushSession,
+    handleBrushPointerEnd,
     flushBrushSession,
     flushSpecialZoneMembershipDragSession,
     handleBrushPointerDown,

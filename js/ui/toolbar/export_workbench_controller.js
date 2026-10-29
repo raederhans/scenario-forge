@@ -867,16 +867,20 @@ function createExportWorkbenchController({
     }
 
     [
-      [exportWorkbenchBrightness, "brightness"],
-      [exportWorkbenchContrast, "contrast"],
-      [exportWorkbenchSaturation, "saturation"],
-      [exportWorkbenchClarity, "clarity"],
-    ].forEach(([input, key]) => {
+      [exportWorkbenchBrightness, "brightness", exportWorkbenchBrightnessValue],
+      [exportWorkbenchContrast, "contrast", exportWorkbenchContrastValue],
+      [exportWorkbenchSaturation, "saturation", exportWorkbenchSaturationValue],
+      [exportWorkbenchClarity, "clarity", exportWorkbenchClarityValue],
+    ].forEach(([input, key, valueLabel]) => {
       if (!(input instanceof HTMLInputElement) || input.dataset.bound === "true") return;
       input.addEventListener("input", () => {
-        setExportAdjustmentsState(state, {
-          [key]: Math.max(0, Math.min(200, Math.round(Number(input.value) || 100))),
-        });
+        const adjustment = Number(input.value);
+        const nextValue = Number.isFinite(adjustment)
+          ? Math.max(0, Math.min(200, Math.round(adjustment)))
+          : 100;
+        setExportAdjustmentsState(state, { [key]: nextValue });
+        // 整体刷新推迟两帧且连续拖动时会被下一次输入取消；数值标签在这里立即跟随。
+        if (valueLabel) valueLabel.textContent = `${nextValue}%`;
         renderExportWorkbenchUi(true);
       });
       input.dataset.bound = "true";

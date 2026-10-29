@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
-    "chunk_count": 244,
-    "feature_count": 21078,
+    "chunk_count": 291,
+    "feature_count": 21091,
     "water_count": 0
   },
   "controller_changes": [],
@@ -23112,19 +23112,6 @@
     {
       "country_code": "IN",
       "critical": true,
-      "feature_id": "IN_ADM2_76128533B9892158671522",
-      "feature_name": "Sangli",
-      "from_tag": "",
-      "notes": "British Raj baseline override for India, Pakistan, and Bangladesh.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_raj",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "RAJ"
-    },
-    {
-      "country_code": "IN",
-      "critical": true,
       "feature_id": "IN_ADM2_76128533B99037046327658",
       "feature_name": "Nabarangapur",
       "from_tag": "",
@@ -26037,19 +26024,6 @@
     {
       "country_code": "PK",
       "critical": true,
-      "feature_id": "PAK-1108",
-      "feature_name": "Baluchistan",
-      "from_tag": "PAK",
-      "notes": "British Raj baseline override for India, Pakistan, and Bangladesh.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_raj",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "RAJ"
-    },
-    {
-      "country_code": "PK",
-      "critical": true,
       "feature_id": "PAK-1109",
       "feature_name": "Azad Kashmir",
       "from_tag": "PAK",
@@ -26091,45 +26065,6 @@
       "critical": true,
       "feature_id": "PAK-1112",
       "feature_name": "F.A.T.A.",
-      "from_tag": "PAK",
-      "notes": "British Raj baseline override for India, Pakistan, and Bangladesh.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_raj",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "RAJ"
-    },
-    {
-      "country_code": "PK",
-      "critical": true,
-      "feature_id": "PAK-1113",
-      "feature_name": "Punjab",
-      "from_tag": "PAK",
-      "notes": "British Raj baseline override for India, Pakistan, and Bangladesh.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_raj",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "RAJ"
-    },
-    {
-      "country_code": "PK",
-      "critical": true,
-      "feature_id": "PAK-1114",
-      "feature_name": "Sind",
-      "from_tag": "PAK",
-      "notes": "British Raj baseline override for India, Pakistan, and Bangladesh.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_raj",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "RAJ"
-    },
-    {
-      "country_code": "PK",
-      "critical": true,
-      "feature_id": "PAK-1123",
-      "feature_name": "K.P.",
       "from_tag": "PAK",
       "notes": "British Raj baseline override for India, Pakistan, and Bangladesh.",
       "quality": "manual_reviewed",
@@ -199834,10 +199769,10 @@
     "ALG": {
       "base_iso2": "DZ",
       "continent_label": "Africa",
-      "controller_feature_count": 48,
+      "controller_feature_count": 13,
       "display_name": "French Algeria",
       "entry_kind": "scenario_subject",
-      "feature_count": 48,
+      "feature_count": 13,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -199966,10 +199901,10 @@
     "AST": {
       "base_iso2": "PG",
       "continent_label": "Oceania",
-      "controller_feature_count": 13,
+      "controller_feature_count": 12,
       "display_name": "Australia",
       "entry_kind": "scenario_subject",
-      "feature_count": 13,
+      "feature_count": 12,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200437,10 +200372,10 @@
     "CHU": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 158,
+      "controller_feature_count": 155,
       "display_name": "Chuan Clique",
       "entry_kind": "",
-      "feature_count": 158,
+      "feature_count": 155,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
@@ -200746,10 +200681,10 @@
     "ENG": {
       "base_iso2": "GB",
       "continent_label": "Europe",
-      "controller_feature_count": 508,
+      "controller_feature_count": 507,
       "display_name": "Britain",
       "entry_kind": "",
-      "feature_count": 508,
+      "feature_count": 507,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200907,10 +200842,10 @@
     "FRA": {
       "base_iso2": "FR",
       "continent_label": "Europe",
-      "controller_feature_count": 287,
+      "controller_feature_count": 321,
       "display_name": "France",
       "entry_kind": "",
-      "feature_count": 287,
+      "feature_count": 321,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201340,10 +201275,10 @@
     "INS": {
       "base_iso2": "ID",
       "continent_label": "Asia",
-      "controller_feature_count": 6,
+      "controller_feature_count": 5,
       "display_name": "Dutch East Indies",
       "entry_kind": "scenario_subject",
-      "feature_count": 6,
+      "feature_count": 5,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201467,10 +201402,10 @@
     "JAP": {
       "base_iso2": "JP",
       "continent_label": "Asia",
-      "controller_feature_count": 228,
+      "controller_feature_count": 149,
       "display_name": "Japan",
       "entry_kind": "",
-      "feature_count": 228,
+      "feature_count": 149,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201817,10 +201752,10 @@
     "MAD": {
       "base_iso2": "MG",
       "continent_label": "Africa",
-      "controller_feature_count": 26,
+      "controller_feature_count": 27,
       "display_name": "Madagascar",
       "entry_kind": "scenario_subject",
-      "feature_count": 26,
+      "feature_count": 27,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201851,10 +201786,10 @@
     "MAL": {
       "base_iso2": "MY",
       "continent_label": "Asia",
-      "controller_feature_count": 11,
+      "controller_feature_count": 6,
       "display_name": "Malaysia",
       "entry_kind": "scenario_subject",
-      "feature_count": 11,
+      "feature_count": 6,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202258,10 +202193,10 @@
     "OMA": {
       "base_iso2": "OM",
       "continent_label": "Asia",
-      "controller_feature_count": 11,
+      "controller_feature_count": 9,
       "display_name": "Oman",
       "entry_kind": "",
-      "feature_count": 11,
+      "feature_count": 9,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202413,10 +202348,10 @@
     "PHI": {
       "base_iso2": "PH",
       "continent_label": "Asia",
-      "controller_feature_count": 117,
+      "controller_feature_count": 116,
       "display_name": "Philippines",
       "entry_kind": "scenario_subject",
-      "feature_count": 117,
+      "feature_count": 116,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202637,10 +202572,10 @@
     "RAJ": {
       "base_iso2": "IN",
       "continent_label": "Asia",
-      "controller_feature_count": 334,
+      "controller_feature_count": 287,
       "display_name": "British Raj",
       "entry_kind": "scenario_subject",
-      "feature_count": 334,
+      "feature_count": 287,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203226,10 +203161,10 @@
     "SYR": {
       "base_iso2": "SY",
       "continent_label": "Asia",
-      "controller_feature_count": 16,
+      "controller_feature_count": 12,
       "display_name": "French Mandate for Syria",
       "entry_kind": "scenario_subject",
-      "feature_count": 16,
+      "feature_count": 12,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203452,10 +203387,10 @@
     "USA": {
       "base_iso2": "US",
       "continent_label": "North America",
-      "controller_feature_count": 817,
+      "controller_feature_count": 818,
       "display_name": "America",
       "entry_kind": "",
-      "feature_count": 817,
+      "feature_count": 818,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203578,10 +203513,10 @@
     "YEM": {
       "base_iso2": "YE",
       "continent_label": "Asia",
-      "controller_feature_count": 20,
+      "controller_feature_count": 15,
       "display_name": "Yemen",
       "entry_kind": "",
-      "feature_count": 20,
+      "feature_count": 15,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204717,41 +204652,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "8ab0b5a5f3c701a1e129410cacaddc46d6998bca7d07166537f68e382b4aa50f",
+  "snapshot_fingerprint": "9eaa0f47299e7670564cea34ff5c3c7502c9ae83b0a1b2d9b196a94f82c6164f",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "495a4812e98128cbcd5253cf0be2fda4ee23b67be24c20b47a824578f2eddca1",
-    "detail_chunk_manifest_sha256": "f819fc99b3888c1c769a51b3f6805f27de1577cfd399e7be9059f5887a230359",
+    "build_snapshot_sha256": "e6c60fede52dcc226707171bcca5d489c000d22b178b3b516afedde0e68c34a4",
+    "detail_chunk_manifest_sha256": "fe2a1b6c236ef4628ae6e4913e323cb374ee9d350b47f5df080e756c01b375cd",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "runtime_topology_sha256": "6cf7c31ded456515351a77de093e71e930beba360a88bdcaac8572766a6fdbe5"
+    "runtime_topology_sha256": "b3d64210598b384af748e14688174ec4a93643206a6a9becc4bb7dd760bc6343"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15326,
-    "controller_count": 235,
+    "changed_feature_count": 15321,
+    "controller_count": 282,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 21078,
+    "feature_count": 21091,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14879,
+    "manual_reviewed_feature_count": 14874,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 235,
+    "owner_count": 282,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5821,
-      "manual_reviewed": 14879
+      "manual_reviewed": 14874
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5821,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 15303
+      "manual_rule": 15298
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { createScenarioCoreArrayNormalizer } from "../js/core/scenario/core_value_normalizer.js";
+import { CORE_TAG_CACHE_LIMIT, createScenarioCoreArrayNormalizer } from "../js/core/scenario/core_value_normalizer.js";
 import { normalizeScenarioCoreMap, normalizeScenarioCoreValue } from "../js/core/scenario/shared.js";
 
 const normalizeTag = (value) => String(value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -27,9 +27,9 @@ test("bounded FIFO evicts old contents and does not retain oversized or mutable 
   let calls = 0;
   const normalize = createScenarioCoreArrayNormalizer((value) => { calls += 1; return normalizeTag(value); });
   normalize(["old"]);
-  for (let index = 0; index < 512; index += 1) normalize([`tag${index}`]);
+  for (let index = 0; index < CORE_TAG_CACHE_LIMIT; index += 1) normalize([`tag${index}`]);
   const before = calls;
-  normalize(["tag511"]);
+  normalize([`tag${CORE_TAG_CACHE_LIMIT - 1}`]);
   assert.equal(calls, before);
   normalize(["old"]);
   assert.equal(calls, before + 1);
