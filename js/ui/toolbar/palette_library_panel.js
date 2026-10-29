@@ -15,6 +15,7 @@ import {
   setActivePaletteSource,
 } from "../../core/palette_manager.js";
 import { t } from "../i18n.js";
+import { restoreFocusOrigin } from "../ui_contract.js";
 import { createDeferredPanelRender } from "../../core/deferred_panel_render.js";
 const state = runtimeState;
 
@@ -707,6 +708,7 @@ function createPaletteLibraryPanelController({
     const activeSourceId = String(runtimeState.activePaletteId || runtimeState.currentPaletteTheme || "legacy").trim() || "legacy";
     const sectionState = ensurePaletteLibrarySectionState(`${activeSourceId}:${groupingMode}`);
 
+    const focusedRowKey = getPaletteLibraryRows().find((row) => row === document.activeElement)?.dataset.paletteRowKey;
     paletteLibraryList.replaceChildren();
     paletteLibraryList.dataset.groupingMode = groupingMode;
     if (paletteLibrarySummary) {
@@ -766,6 +768,9 @@ function createPaletteLibraryPanelController({
     scheduleAdaptivePaletteLibraryHeight();
     syncPaletteLibraryToggleUi();
     syncPaletteLibraryRowFocus();
+    if (focusedRowKey) {
+      getPaletteLibraryRows().find((row) => row.dataset.paletteRowKey === focusedRowKey)?.focus({ preventScroll: true });
+    }
   }
 
   const bindEvents = () => {
@@ -825,6 +830,7 @@ function createPaletteLibraryPanelController({
           event.preventDefault();
           runtimeState.paletteLibraryOpen = false;
           syncPanelVisibility();
+          restoreFocusOrigin(paletteLibraryToggle);
         }
       });
       paletteLibraryList.dataset.bound = "true";

@@ -32,6 +32,11 @@ const COUNTRY_CODE_ALIASES = Object.freeze({
   EL: "GR",
 });
 const FEATURE_IDENTITY = globalThis.__scenarioForgeFeatureIdentityShared;
+// Resolved lazily: some harnesses load this worker without the startup codec.
+function dequantizeTopology(topology, topojsonClient) {
+  const codec = globalThis.__scenarioForgeStartupTopologyCodecShared;
+  return typeof codec?.dequantizeTopology === "function" ? codec.dequantizeTopology(topology, topojsonClient) : topology;
+}
 
 if (!FEATURE_IDENTITY) {
   throw new Error("[startup_worker] Feature identity shared helper failed to initialize.");
@@ -397,6 +402,9 @@ function postWorkerMessage(type, payload, { signal = null } = {}) {
     try {
       const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(startupReady ? payload : payload[field], {
         includeTopologyArcs: startupReady,
+        // Startup envelopes carry topology arcs and the collections decoded from
+        // them; sharing keeps one copy of every point on the main thread.
+        shareReferences: true,
       });
       throwIfAborted(signal);
       if (transport.transferables.length) {
@@ -446,10 +454,12 @@ async function handleLoadBaseStartup(message) {
       : Promise.resolve({ payload: null, metrics: null }),
   ]);
 
-  const topologyForDecode = topologyResult.payload || message?.cachedTopologyPrimary || null;
+  const topologyForDecode = dequantizeTopology(
+    topologyResult.payload || message?.cachedTopologyPrimary || null, self.topojson
+  );
   postWorkerMessage(MESSAGE_TYPES.BASE_STARTUP_READY, {
     taskId,
-    topologyPrimary: topologyResult.payload,
+    topologyPrimary: topologyForDecode,
     locales: needLocales ? (localesResult.payload || { ui: {}, geo: {} }) : null,
     geoAliases: needGeoAliases ? (geoAliasesResult.payload || { alias_to_stable_key: {} }) : null,
     decodedCollections: topologyForDecode
@@ -485,7 +495,7 @@ async function handleLoadDetailTopology(message) {
   const topologyResult = await fetchJsonResource(String(message?.topologyUrl || "").trim(), "topologyDetail");
   postWorkerMessage(MESSAGE_TYPES.DETAIL_TOPOLOGY_READY, {
     taskId,
-    topology: topologyResult.payload,
+    topology: dequantizeTopology(topologyResult.payload, self.topojson),
     metrics: { ...(topologyResult.metrics || {}), featureCount: getPoliticalGeometryCount(topologyResult.payload) },
   });
 }
@@ -516,8 +526,12 @@ async function handleLoadStartupBundle(message) {
   if (typeof startupTopologyCodec?.decodeStartupTopology !== "function") {
     throw new Error("[startup_worker] Startup topology codec failed to initialize.");
   }
-  const topologyPrimary = await startupTopologyCodec.decodeStartupTopology(payload.base?.topology_primary || null);
-  const runtimeTopology = await startupTopologyCodec.decodeStartupTopology(payload.scenario?.runtime_topology_bootstrap || null);
+  const topologyPrimary = dequantizeTopology(
+    await startupTopologyCodec.decodeStartupTopology(payload.base?.topology_primary || null), self.topojson
+  );
+  const runtimeTopology = dequantizeTopology(
+    await startupTopologyCodec.decodeStartupTopology(payload.scenario?.runtime_topology_bootstrap || null), self.topojson
+  );
   if (payload.base) payload.base.topology_primary = topologyPrimary;
   if (payload.scenario) payload.scenario.runtime_topology_bootstrap = runtimeTopology;
   const runtimePoliticalMetaPayload = normalizeRuntimePoliticalMetaPayload(payload?.scenario?.runtime_political_meta || null);
@@ -629,6 +643,7 @@ async function handleLoadScenarioRuntimeBootstrap(message) {
   const runtimeTopologyUrl = String(message?.runtimeTopologyUrl || "").trim();
   const startedAt = nowMs();
   const runtimeTopologyResult = await fetchJsonResource(runtimeTopologyUrl, "runtimePoliticalTopology");
+  runtimeTopologyResult.payload = dequantizeTopology(runtimeTopologyResult.payload, self.topojson);
   const metaStartedAt = nowMs();
   const runtimePoliticalMeta = buildRuntimePoliticalMeta(runtimeTopologyResult.payload);
   const metaCompletedAt = nowMs();
@@ -673,7 +688,9 @@ async function handleDecodeRuntimeChunk(message, { signal = null } = {}) {
     const chunkResult = await fetchJsonResource(chunkUrl, chunkType || "scenarioChunk", { signal });
     throwIfAborted(signal);
     const chunkPayload = chunkType === "scenario-chunk" && chunkResult.payload?.type === "Topology"
-      ? globalThis.__scenarioForgeScenarioChunkFormatShared.decodeScenarioChunkPayload(chunkResult.payload, self.topojson)
+      ? globalThis.__scenarioForgeScenarioChunkFormatShared.decodeScenarioChunkPayload(
+        dequantizeTopology(chunkResult.payload, self.topojson), self.topojson
+      )
       : chunkResult.payload;
     throwIfAborted(signal);
     postWorkerMessage(MESSAGE_TYPES.RUNTIME_CHUNK_READY, {
@@ -687,6 +704,7 @@ async function handleDecodeRuntimeChunk(message, { signal = null } = {}) {
     return;
   }
   const runtimeTopologyResult = await fetchJsonResource(runtimeTopologyUrl, "runtimePoliticalTopology", { signal });
+  runtimeTopologyResult.payload = dequantizeTopology(runtimeTopologyResult.payload, self.topojson);
   const metaStartedAt = nowMs();
   const runtimePoliticalMeta = buildRuntimePoliticalMeta(runtimeTopologyResult.payload);
   const metaCompletedAt = nowMs();

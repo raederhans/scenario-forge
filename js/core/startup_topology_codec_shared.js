@@ -251,7 +251,33 @@ var SCENARIO_FORGE_STARTUP_TOPOLOGY_CODEC_SHARED = globalThis.__scenarioForgeSta
     return decoded;
   }
 
-  return Object.freeze({ decodeTopology, decodeStartupTopology, encoding: ENCODING });
+  function dequantizeTopology(topology, topojsonClient) {
+    if (!topology?.transform) return topology;
+    const transform = topojsonClient.transform(topology.transform);
+    function dequantizeGeometry(geometry) {
+      switch (geometry.type) {
+        case "Point":
+          return { ...geometry, coordinates: transform(geometry.coordinates) };
+        case "MultiPoint":
+          return { ...geometry, coordinates: geometry.coordinates.map((point) => transform(point)) };
+        case "GeometryCollection":
+          return { ...geometry, geometries: geometry.geometries.map(dequantizeGeometry) };
+        default:
+          return geometry;
+      }
+    }
+    const decoded = {
+      ...topology,
+      arcs: topology.arcs.map((arc) => arc.map(transform)),
+      objects: Object.fromEntries(Object.entries(topology.objects).map(([name, geometry]) => [
+        name, dequantizeGeometry(geometry),
+      ])),
+    };
+    delete decoded.transform;
+    return decoded;
+  }
+
+  return Object.freeze({ decodeTopology, decodeStartupTopology, dequantizeTopology, encoding: ENCODING });
 })();
 
 globalThis.__scenarioForgeStartupTopologyCodecShared = SCENARIO_FORGE_STARTUP_TOPOLOGY_CODEC_SHARED;

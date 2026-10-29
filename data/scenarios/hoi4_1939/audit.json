@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
-    "chunk_count": 313,
-    "feature_count": 21066,
+    "chunk_count": 237,
+    "feature_count": 21078,
     "water_count": 0
   },
   "controller_changes": [],
@@ -15353,19 +15353,6 @@
     {
       "country_code": "CN",
       "critical": true,
-      "feature_id": "CN_CITY_17275852B83272093468807",
-      "feature_name": "Dalian",
-      "from_tag": "CHI",
-      "notes": "Manchukuo using northeastern China groupings plus the eastern Inner Mongolian and Jehol/Rehe frontier that belonged to MAN in HOI4 1936.",
-      "quality": "manual_reviewed",
-      "rule_id": "manchukuo",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "MAN"
-    },
-    {
-      "country_code": "CN",
-      "critical": true,
       "feature_id": "CN_CITY_17275852B83380661850476",
       "feature_name": "Hangjinqi",
       "from_tag": "CHI",
@@ -16022,19 +16009,6 @@
       "notes": "Sichuan and Chongqing are folded back into Nationalist Chinese legal ownership for the wartime 1939 setup.",
       "quality": "manual_reviewed",
       "rule_id": "1939_sichuan_chongqing_owner_chi",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "CHI"
-    },
-    {
-      "country_code": "CN",
-      "critical": false,
-      "feature_id": "CN_CITY_17275852B86000242921086",
-      "feature_name": "Zhanjianghsi",
-      "from_tag": "CHI",
-      "notes": "Hainan and Guangdong baseline moved back under Nationalist Chinese ownership.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_china_hainan_reintegration",
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "CHI"
@@ -16834,19 +16808,6 @@
     },
     {
       "country_code": "CN",
-      "critical": false,
-      "feature_id": "CN_CITY_17275852B89468905887192",
-      "feature_name": "Suixixian",
-      "from_tag": "CHI",
-      "notes": "Hainan and Guangdong baseline moved back under Nationalist Chinese ownership.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_china_hainan_reintegration",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "CHI"
-    },
-    {
-      "country_code": "CN",
       "critical": true,
       "feature_id": "CN_CITY_17275852B89508881164731",
       "feature_name": "Lufengxian",
@@ -17026,19 +16987,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "SHX"
-    },
-    {
-      "country_code": "CN",
-      "critical": false,
-      "feature_id": "CN_CITY_17275852B90470795224142",
-      "feature_name": "Wuchuan",
-      "from_tag": "CHI",
-      "notes": "Hainan and Guangdong baseline moved back under Nationalist Chinese ownership.",
-      "quality": "manual_reviewed",
-      "rule_id": "1939_china_hainan_reintegration",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -25987,19 +25935,6 @@
     {
       "country_code": "MA",
       "critical": false,
-      "feature_id": "MAR-1445",
-      "feature_name": "Tanger - Tétouan",
-      "from_tag": "MOR",
-      "notes": "Spanish Morocco represented using the current northern Morocco approximation, with Ifni folded into the same protectorate block.",
-      "quality": "manual_reviewed",
-      "rule_id": "spanish_morocco",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SMR"
-    },
-    {
-      "country_code": "MA",
-      "critical": false,
       "feature_id": "MAR-1446",
       "feature_name": "Fès - Boulemane",
       "from_tag": "MOR",
@@ -26117,19 +26052,6 @@
     {
       "country_code": "MA",
       "critical": false,
-      "feature_id": "MAR-1455",
-      "feature_name": "Souss - Massa - Draâ",
-      "from_tag": "MOR",
-      "notes": "French Morocco represented as the remaining protectorate area after Spanish Morocco and Spanish Sahara are split out.",
-      "quality": "manual_reviewed",
-      "rule_id": "french_morocco",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "MOR"
-    },
-    {
-      "country_code": "MA",
-      "critical": false,
       "feature_id": "MAR-1456",
       "feature_name": "Marrakech - Tensift - Al Haouz",
       "from_tag": "MOR",
@@ -26165,19 +26087,6 @@
       "source": "manual_rule",
       "synthetic_owner": false,
       "to_tag": "SSH"
-    },
-    {
-      "country_code": "MA",
-      "critical": false,
-      "feature_id": "MAR-3457",
-      "feature_name": "Guelmim - Es-Semara",
-      "from_tag": "MOR",
-      "notes": "Spanish Morocco represented using the current northern Morocco approximation, with Ifni folded into the same protectorate block.",
-      "quality": "manual_reviewed",
-      "rule_id": "spanish_morocco",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SMR"
     },
     {
       "country_code": "MA",
@@ -200841,10 +200750,10 @@
     "AEF": {
       "base_iso2": "TD",
       "continent_label": "Africa",
-      "controller_feature_count": 12,
+      "controller_feature_count": 60,
       "display_name": "French Equatorial Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 12,
+      "feature_count": 60,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200973,10 +200882,10 @@
     "AOF": {
       "base_iso2": "SN",
       "continent_label": "Africa",
-      "controller_feature_count": 14,
+      "controller_feature_count": 91,
       "display_name": "French West Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 14,
+      "feature_count": 91,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201388,10 +201297,10 @@
     "CAN": {
       "base_iso2": "CA",
       "continent_label": "North America",
-      "controller_feature_count": 4,
+      "controller_feature_count": 273,
       "display_name": "Canada",
       "entry_kind": "",
-      "feature_count": 4,
+      "feature_count": 273,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201452,10 +201361,10 @@
     "CHI": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 1156,
+      "controller_feature_count": 697,
       "display_name": "China",
       "entry_kind": "",
-      "feature_count": 1156,
+      "feature_count": 697,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202114,10 +202023,10 @@
     "GXC": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 56,
+      "controller_feature_count": 50,
       "display_name": "Guangxi Clique",
       "entry_kind": "",
-      "feature_count": 56,
+      "feature_count": 50,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202851,10 +202760,10 @@
     "MEN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 19,
+      "controller_feature_count": 34,
       "display_name": "Mengjiang",
       "entry_kind": "",
-      "feature_count": 19,
+      "feature_count": 34,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203803,10 +203712,10 @@
     "SHX": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 76,
+      "controller_feature_count": 24,
       "display_name": "Shanxi",
       "entry_kind": "",
-      "feature_count": 76,
+      "feature_count": 24,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203996,10 +203905,10 @@
     "SOV": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 10921,
+      "controller_feature_count": 10922,
       "display_name": "Soviet Union",
       "entry_kind": "",
-      "feature_count": 10921,
+      "feature_count": 10922,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204423,10 +204332,10 @@
     "USA": {
       "base_iso2": "US",
       "continent_label": "North America",
-      "controller_feature_count": 1,
+      "controller_feature_count": 817,
       "display_name": "America",
       "entry_kind": "",
-      "feature_count": 1,
+      "feature_count": 817,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204483,10 +204392,10 @@
     "VIN": {
       "base_iso2": "VN",
       "continent_label": "Asia",
-      "controller_feature_count": 18,
+      "controller_feature_count": 104,
       "display_name": "French Indochina",
       "entry_kind": "scenario_subject",
-      "feature_count": 18,
+      "feature_count": 104,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -205662,41 +205571,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1939",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "71e0f9a9f81840f5477b326bdb37d986bcf20ef3ca49683d18ff37d8cc0e3c15",
+  "snapshot_fingerprint": "6b48289ff83680441d51085eee926ed44933ae4ba991193da0d8ea87818feaa8",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "b027eeb223a72c5d0851a9e34df573e7e1693143416b0a5d30b2ef88102e41ab",
-    "detail_chunk_manifest_sha256": "4e2cdacdfb308c14bb42f02388b365643e5262137e4da6dd3380289dd11f09f5",
+    "build_snapshot_sha256": "d68fce80fe271059a86b465c4b2a7dfea397daccc8fb676aa90028d8ca15ef09",
+    "detail_chunk_manifest_sha256": "d0b867c1f264df827eb9b5f31e029e2a55855671b4a4f8e60c547b59a3bb8303",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "runtime_topology_sha256": "d73cbe2088d826b1e28728a9ccb7f2ddf6e30c15313dbc0c7af66469c02b462d"
+    "runtime_topology_sha256": "6cf7c31ded456515351a77de093e71e930beba360a88bdcaac8572766a6fdbe5"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15410,
-    "controller_count": 305,
+    "changed_feature_count": 15403,
+    "controller_count": 229,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 21066,
+    "feature_count": 21078,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14963,
+    "manual_reviewed_feature_count": 14956,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 305,
+    "owner_count": 229,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5744,
-      "manual_reviewed": 14963
+      "manual_reviewed": 14956
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5744,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 15387
+      "manual_rule": 15380
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

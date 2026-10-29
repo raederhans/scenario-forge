@@ -234,32 +234,15 @@ async function expectExportWorkbenchLayoutReachable(page) {
   }
 }
 
-async function isSelectorInViewport(page, selector) {
-  return page.evaluate((targetSelector) => {
-    const element = document.querySelector(targetSelector);
-    if (!(element instanceof HTMLElement)) return false;
-    const rect = element.getBoundingClientRect();
-    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-    return rect.width > 0
-      && rect.height > 0
-      && rect.right > 0
-      && rect.bottom > 0
-      && rect.left < viewportWidth
-      && rect.top < viewportHeight;
-  }, selector);
-}
-
 async function ensureProjectPanelVisible(page) {
-  if (!await isSelectorInViewport(page, "#inspectorSidebarTabProject")) {
-    await page.locator("#rightPanelToggle").click();
-    await expect.poll(() => isSelectorInViewport(page, "#inspectorSidebarTabProject"), { timeout: 30000 }).toBe(true);
-  }
   const projectTab = page.locator("#inspectorSidebarTabProject");
-  if (await projectTab.getAttribute("aria-selected") !== "true") {
-    await projectTab.click();
-  }
-  await expect(projectTab).toHaveAttribute("aria-selected", "true", { timeout: 30000 });
+  await projectTab.click();
+  await expect(projectTab).toHaveAttribute("aria-pressed", "true", { timeout: 30000 });
+  await expect(page.locator("#editorProperty-project")).toBeVisible();
+  await expect(page.locator("#rightSidebar")).toHaveJSProperty("inert", false);
+  await page.locator("#rightSidebar").evaluate(async (sidebar) => {
+    await Promise.all(sidebar.getAnimations().map((animation) => animation.finished));
+  });
 }
 
 async function expectStackingAboveGuide(page, overlaySelector) {
@@ -276,6 +259,11 @@ async function expectStackingAboveGuide(page, overlaySelector) {
 
 async function ensureGuideVisible(page) {
   if (await page.locator("#scenarioGuidePopover").isHidden()) {
+    if (await page.locator("#sidebarDrawerBackdrop").isVisible()) {
+      await page.keyboard.press("Escape");
+      await expect(page.locator("#sidebarDrawerBackdrop")).toBeHidden();
+      await expect(page.locator("body")).not.toHaveClass(/(?:left|right)-drawer-open/);
+    }
     await page.locator("#scenarioGuideBtn").click();
   }
   await expect(page.locator("#scenarioGuidePopover")).toBeVisible({ timeout: 30000 });
@@ -453,7 +441,9 @@ test("@golden-demo sample guide card opens export from the TNO sample deeplink",
     });
     await page.locator("#exportWorkbenchCloseBtn").click();
     await expect(page.locator("#exportWorkbenchOverlay")).toBeHidden({ timeout: 30000 });
-    await expectActiveElement(page, { id: /^(scenarioGuideBtn|utilitiesGuideBtn)$/ });
+    await expectActiveElement(page, {
+      id: await page.locator("body.editor-workspace").count() ? "scenarioGuideBtn" : /^(scenarioGuideBtn|utilitiesGuideBtn)$/,
+    });
     await ensureGuideVisible(page);
 
     await page.locator("[data-sample-guide-choice='modern-world-japan-corridor']").click();
@@ -516,7 +506,9 @@ test("@golden-demo sample guide card opens export from the TNO sample deeplink",
 
     await page.keyboard.press("Escape");
     await expect(page.locator("#scenarioGuidePopover")).toBeHidden({ timeout: 30000 });
-    await expectActiveElement(page, { id: /^(scenarioGuideBtn|utilitiesGuideBtn)$/ });
+    await expectActiveElement(page, {
+      id: await page.locator("body.editor-workspace").count() ? "scenarioGuideBtn" : /^(scenarioGuideBtn|utilitiesGuideBtn)$/,
+    });
     expect(runtimeIssues.unexpectedIssues).toEqual([]);
   } catch (error) {
     await writeSampleGuideFailureArtifact(page, testInfo);

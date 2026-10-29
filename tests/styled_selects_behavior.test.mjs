@@ -93,6 +93,7 @@ function makeNode(document, tagName = "div") {
       }
       return null;
     },
+    click() { if (!this.disabled) this.fire("click"); },
     focus() { document.activeElement = this; },
     getBoundingClientRect() { return { left: 20, top: 20, bottom: 58, width: 180 }; },
     contains(target) {
@@ -128,7 +129,10 @@ test("long styled select searches groups and keeps native value and keyboard con
     documentElement: { clientWidth: 800, clientHeight: 600 },
     activeElement: null,
     createElement(tagName) { return makeNode(document, tagName); },
-    getElementById: () => null,
+    getElementById(id) {
+      const find = (node) => node.id === id ? node : node.children.map(find).find(Boolean);
+      return find(this.body) || null;
+    },
     addEventListener() {},
   };
   document.body = makeNode(document, "body");
@@ -200,6 +204,10 @@ test("long styled select searches groups and keeps native value and keyboard con
     const button = shell.children[1];
     const menu = shell.children[2];
     const [search, list, noMatches] = menu.children;
+    const accessibleName = (node) => node.getAttribute("aria-labelledby").split(" ")
+      .map((id) => document.getElementById(id).textContent).join(" ");
+    assert.equal(accessibleName(button), "Field name Item 0");
+    assert.equal(accessibleName(list), "Field name");
     assert.equal(button.getAttribute("aria-label"), "Field name", "nested labels exclude the enhanced menu's text");
     assert.equal(button.getAttribute("data-i18n-aria-label"), null, "the no-matches translation key cannot name the field");
     const initialOptions = list.querySelectorAll(".app-select-option");
@@ -219,6 +227,7 @@ test("long styled select searches groups and keeps native value and keyboard con
     select.value = "item-1";
     syncStyledSelect(select);
     assert.equal(button.children[0].textContent, "Item 1", "programmatic preset changes refresh the visible label");
+    assert.equal(accessibleName(button), "Field name Item 1");
     assert.deepEqual(events, [], "refresh does not dispatch a change or reapply the preset");
     assert.deepEqual(list.querySelectorAll(".app-select-option"), initialOptions, "selection-only updates retain option nodes");
     assert.equal(initialOptions.find((option) => option.dataset.value === "item-1").getAttribute("aria-selected"), "true");
@@ -251,13 +260,15 @@ test("long styled select searches groups and keeps native value and keyboard con
     assert.equal(document.activeElement.dataset.value, "item-0");
     document.activeElement.fire("keydown", { key: "ArrowUp" });
     assert.equal(document.activeElement.dataset.value, "alpha");
-    list.children[0].children[1].fire("click");
+    document.activeElement.fire("keydown", { key: " " });
     assert.equal(select.value, "alpha");
     assert.deepEqual(events, ["input", "input", "change"]);
     assert.equal(document.activeElement, button);
     button.fire("click");
     assert.equal(search.value, "");
-    search.fire("keydown", { key: "Tab" });
+    const tab = search.fire("keydown", { key: "Tab" });
+    assert.ok(document.activeElement === button, "Tab restores the selector anchor before native traversal");
+    assert.ok(!tab.defaultPrevented);
     assert.equal(menu.classList.contains("hidden"), true);
     button.fire("click");
     search.value = "Item 2";
@@ -402,6 +413,8 @@ test("long styled select searches groups and keeps native value and keyboard con
       select.value = "updated-alpha";
       syncStyledSelect(select);
       assert.equal(button.children[0].textContent, "翻译后的 Alpha");
+      assert.equal(accessibleName(button), "字段 翻译后的 Alpha");
+      assert.equal(accessibleName(list), "字段");
       assert.equal(list.children[0].children[1].textContent, "翻译后的 Alpha", "translated option text reaches the menu");
 
       const dynamicSelect = makeDynamicSelect();

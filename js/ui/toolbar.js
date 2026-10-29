@@ -46,7 +46,7 @@ import {
   ensureCountryLabelsReadyForExport,
   setMapData,
 } from "../core/map_renderer/public.js";
-import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
+import { captureHistoryState, canRedoHistory, canUndoHistory, getLatestHistoryEntry, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
 import { setExportBakeState } from "../core/state/actions/export_workbench_actions.js";
 import {
@@ -68,6 +68,8 @@ import {
   createFocusReturnRegistry,
   focusSurface,
   getFocusableElements,
+  getActiveModal,
+  restoreFocusOrigin,
   rememberSurfaceTrigger,
   restoreSurfaceTriggerFocus,
   UI_URL_STATE_KEYS,
@@ -583,8 +585,8 @@ function initToolbar({ render } = {}) {
 
   const focusOverlaySurface = (container) => focusSurface(container);
   const rememberOverlayTrigger = (overlay, trigger) => rememberSurfaceTrigger(overlayFocusReturnTargets, overlay, trigger);
-  const restoreOverlayTriggerFocus = (overlay, explicitTrigger = null) => (
-    restoreSurfaceTriggerFocus(overlayFocusReturnTargets, overlay, explicitTrigger)
+  const restoreOverlayTriggerFocus = (overlay, explicitTrigger = null, fallback = null) => (
+    restoreSurfaceTriggerFocus(overlayFocusReturnTargets, overlay, explicitTrigger, fallback)
   );
   const isVisibleFocusTarget = (element) => {
     if (!(element instanceof HTMLElement)) return false;
@@ -775,7 +777,19 @@ function initToolbar({ render } = {}) {
     if (open) getDrawerFocusTargets(side)[0]?.focus({ preventScroll: true });
     else if (sidebar?.contains(document.activeElement)) toggle?.focus({ preventScroll: true });
   };
-  drawerMedia.addEventListener("change", syncPanelToggleButtons);
+  drawerMedia.addEventListener("change", () => {
+    const active = document.activeElement;
+    if (!drawerMedia.matches) {
+      document.body.classList.remove("left-drawer-open", "right-drawer-open");
+    }
+    syncPanelToggleButtons();
+    for (const side of ["left", "right"]) {
+      const sidebar = document.getElementById(`${side}Sidebar`);
+      if (sidebar?.inert && sidebar.contains(active)) {
+        restoreFocusOrigin(side === "left" ? leftPanelToggle : rightPanelToggle);
+      }
+    }
+  });
 
   const toggleLeftPanel = (force) => {
     // transport workbench 打开时，左右抽屉继续展开会和 workbench 抢同一块侧边布局。
@@ -894,7 +908,7 @@ function initToolbar({ render } = {}) {
     renderExportWorkbenchUi(false);
     syncSupportSurfaceUrlState("");
     if (restoreFocus) {
-      restoreOverlayTriggerFocus(exportWorkbenchOverlay);
+      restoreOverlayTriggerFocus(exportWorkbenchOverlay, null, document.getElementById("workspaceExportBtn"));
     }
   };
 
@@ -1925,7 +1939,11 @@ function initToolbar({ render } = {}) {
       dismissOnboardingHint();
     }
     emitTransientFeedback(t(
-      runtimeState.brushModeEnabled ? "Brush On · Shift+Drag to pan" : "Brush Off",
+      runtimeState.brushModeEnabled
+        ? globalThis.matchMedia?.("(pointer: coarse)")?.matches
+          ? "Brush On · Drag to paint · Use two fingers or Shift+Drag to pan"
+          : "Brush On · Shift+Drag to pan"
+        : "Brush Off",
       "ui"
     ));
   };
@@ -2092,9 +2110,10 @@ function initToolbar({ render } = {}) {
     button.addEventListener("click", closeDrawers);
   });
   document.addEventListener("keydown", (event) => {
+    if (event.defaultPrevented) return;
     if (!drawerMedia.matches || drawerBackdrop?.classList.contains("hidden")) return;
     // An open dialog owns Escape and focus until it closes.
-    if (document.activeElement?.closest('[role="dialog"], dialog')) return;
+    if (getActiveModal()) return;
     if (event.key === "Escape") {
       event.preventDefault();
       closeDrawers();
@@ -2162,15 +2181,6 @@ function initToolbar({ render } = {}) {
     });
     button.dataset.bound = "true";
   });
-
-  if (dockReferenceBtn && !dockReferenceBtn.dataset.bound) {
-    dockReferenceBtn.setAttribute("aria-haspopup", "dialog");
-    dockReferenceBtn.setAttribute("aria-controls", "dockReferencePopover");
-    dockReferenceBtn.addEventListener("click", () => {
-      openDockPopover("reference");
-    });
-    dockReferenceBtn.dataset.bound = "true";
-  }
 
   if (dockExportBtn && !dockExportBtn.dataset.bound) {
     dockExportBtn.setAttribute("aria-haspopup", "dialog");
@@ -2922,19 +2932,23 @@ function initToolbar({ render } = {}) {
       refreshActiveSovereignLabel();
       refreshDynamicBorderStatus();
       markDirty("clear-map");
-      pushHistoryEntry({
+      const clearEntry = pushHistoryEntry({
         kind: "clear-map",
         before,
         after: captureHistoryState({
           featureIds,
           ownerCodes,
         }),
-      });
+      }) ? getLatestHistoryEntry() : null;
       showToast(t("Map cleared. Undo is available from history.", "ui"), {
         title: t("Clear Map", "ui"),
         tone: "warning",
-        actionLabel: t("Undo", "ui"),
-        onAction: () => {
+        actionLabel: clearEntry ? t("Undo", "ui") : "",
+        onAction: !clearEntry ? null : () => {
+          if (getLatestHistoryEntry() !== clearEntry) {
+            showToast(t("Can't undo the clear because newer edits exist.", "ui"), { tone: "warning" });
+            return;
+          }
           if (typeof runtimeState.runHistoryActionFn === "function") {
             callRuntimeHook(state, "runHistoryActionFn", "undo");
             return;
@@ -2986,9 +3000,6 @@ function initToolbar({ render } = {}) {
   closeDockPopover({ syncUrl: false });
   closeSpecialZonePopover();
   closeScenarioGuidePopover({ syncUrl: false });
-  if (dockReferencePopover) {
-    dockReferencePopover.setAttribute("aria-hidden", "true");
-  }
   if (exportWorkbenchOverlay) {
     exportWorkbenchOverlay.setAttribute("aria-hidden", "true");
   }

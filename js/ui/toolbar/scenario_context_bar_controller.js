@@ -1,3 +1,4 @@
+import { setUiIcon } from "../ui_icons.js";
 import { patchUiChromeState } from "../../core/state/actions/ui_chrome_actions.js";
 
 const SCENARIO_BAR_LEFT_OFFSET = 24;
@@ -34,6 +35,15 @@ function createScenarioContextBarController({
   if (!runtimeState.ui || typeof runtimeState.ui !== "object") {
     runtimeState.ui = {};
   }
+  for (const item of [
+    scenarioContextScenarioText?.parentElement,
+    scenarioContextActiveText?.parentElement,
+    scenarioContextSelectionItem,
+    scenarioContextModeText?.parentElement,
+    scenarioContextCollapseBtn,
+  ]) {
+    if (item) scenarioContextBar?.appendChild(item);
+  }
   let scenarioGuideTimerId = null;
   const translateUi = (label) => translate(label, "ui");
   const translateGeo = (label) => translate(label, "geo") || label;
@@ -43,6 +53,17 @@ function createScenarioContextBarController({
     const hasSelection = selectionLabel !== translateUi("No selection");
     if (scenarioContextSelectionItem) {
       scenarioContextSelectionItem.classList.toggle("hidden", !hasSelection);
+    }
+    for (const [node, current] of [
+      [scenarioContextScenarioText, false],
+      [scenarioContextActiveText, !hasSelection],
+      [scenarioContextSelectionText, hasSelection],
+    ]) {
+      if (node) {
+        node.classList.toggle("is-current", current);
+        if (current) node.setAttribute("aria-current", "location");
+        else node.removeAttribute("aria-current");
+      }
     }
     if (scenarioContextSelectionText) {
       scenarioContextSelectionText.textContent = selectionLabel;
@@ -109,7 +130,7 @@ function createScenarioContextBarController({
       scenarioContextActiveText.setAttribute("title", `${translateUi("Country")}: ${activeValue}`);
     }
     if (scenarioContextCollapseBtn) {
-      scenarioContextCollapseBtn.textContent = runtimeState.ui.scenarioBarCollapsed ? "+" : "-";
+      setUiIcon(scenarioContextCollapseBtn, runtimeState.ui.scenarioBarCollapsed ? "chevron-down" : "chevron-up");
       scenarioContextCollapseBtn.setAttribute("aria-label", runtimeState.ui.scenarioBarCollapsed
         ? translateUi("Expand")
         : translateUi("Collapse"));

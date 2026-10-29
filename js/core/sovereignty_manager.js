@@ -224,7 +224,7 @@ async function loadFeatureMigrationMap({ fetchImpl = globalThis.fetch } = {}) {
   return featureMigrationMapPromise;
 }
 
-async function migrateAcrossFeatureMerges(data, validFeatureIds, { fetchImpl = globalThis.fetch, scenarioId = "" } = {}) {
+async function migrateAcrossFeatureMerges(data, validFeatureIds, { fetchImpl = globalThis.fetch, scenarioId = "", featureSplits = {} } = {}) {
   if (!featureMergeLineagePromise) {
     featureMergeLineagePromise = (async () => {
       if (typeof fetchImpl !== "function") return null;
@@ -244,9 +244,9 @@ async function migrateAcrossFeatureMerges(data, validFeatureIds, { fetchImpl = g
   const lineage = await featureMergeLineagePromise;
   if (!Array.isArray(lineage?.plans)) {
     featureMergeLineagePromise = null;
-    return null;
+    return migrateMergedFeatureProjectData(data, resolveFeatureMergeLineage(null, scenarioId, featureSplits), validFeatureIds);
   }
-  return migrateMergedFeatureProjectData(data, resolveFeatureMergeLineage(lineage, scenarioId), validFeatureIds);
+  return migrateMergedFeatureProjectData(data, resolveFeatureMergeLineage(lineage, scenarioId, featureSplits), validFeatureIds);
 }
 
 function remapFeatureScopedEntries(entries, validFeatureIds, migrationMap) {
@@ -351,9 +351,11 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
   // Members of this scenario's scoped merges stay valid in the shared base topology.
   const scopedMembers = new Set(Object.values(scenarioManifest?.hierarchy_overrides?.feature_merges || {})
     .flatMap((members) => (Array.isArray(members) ? members : [])));
+  Object.keys(scenarioManifest?.hierarchy_overrides?.feature_splits || {}).forEach((id) => scopedMembers.add(id));
   const mergeMigration = collectProjectFeatureIds(payload).some((id) => !normalizedValidFeatureIds.has(id) || scopedMembers.has(id))
     ? await migrateAcrossFeatureMerges(payload, normalizedValidFeatureIds, {
       fetchImpl, scenarioId: String(payload.scenario?.id || scenarioManifest?.scenario_id || "").trim(),
+      featureSplits: scenarioManifest?.hierarchy_overrides?.feature_splits || {},
     })
     : null;
   if (mergeMigration) payload = mergeMigration.data;

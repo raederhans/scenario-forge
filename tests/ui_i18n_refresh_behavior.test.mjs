@@ -102,6 +102,17 @@ test("translation updates the semantic title without replacing neighboring contr
   assert.equal(input.value, "retained");
 });
 
+test("brand text and page title keep the product name with an older startup locale", (t) => {
+  mount(t);
+  applyBaseLocalizationSnapshot(state, { uiLocales: { "Scenario Forge": { en: "Scenario Forge", zh: "场景锻造" } } });
+  const brand = new TranslationElement({ "data-i18n": "Scenario Forge" });
+  const title = new TranslationElement({ "data-i18n": "Scenario Forge" });
+  applyDeclarativeTranslations(brand);
+  applyDeclarativeTranslations(title);
+  assert.equal(brand.textContent, "Scenario Forge");
+  assert.equal(title.textContent, "Scenario Forge");
+});
+
 test("full UI refresh honors a declarative key instead of overwriting it with a legacy label", (t) => {
   const node = new TranslationElement({ "data-i18n": "Borders" });
   const legacyNode = new TranslationElement();
@@ -157,7 +168,11 @@ test("language toggle refreshes each directly scheduled UI hook once and retains
   await toggleLanguage();
   for (const name of hookNames) assert.equal(calls.get(name), 1, `${name} in toggleLanguage`);
   assert.equal(state.currentLanguage, "en");
-  assert.deepEqual(persisted, [["map_lang", "en"]]);
+  assert.deepEqual(persisted, [
+    ["scenario_forge_language", "en"],
+    ["map_lang", "en"],
+    ["scenario_forge_landing_lang", "en"],
+  ]);
   assert.equal(search.value, "typed search");
   assert.equal(fileName.textContent, "my-map.json");
 });

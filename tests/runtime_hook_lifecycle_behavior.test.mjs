@@ -125,6 +125,7 @@ function createControlsFixture() {
     formatScenarioStatusText: () => { renders++; return "ready"; },
     formatScenarioAuditText: () => "",
     t: value => value, showToast: (...args) => toasts.push(args), resetZoomToFit() {},
+    bindSelectKeyboard() {}, focusSelectedSelectOption() {},
     clearActiveScenarioCommand() { cleared++; state.activeScenarioId = ""; }, resetScenarioToBaselineCommand() {},
     applyScenarioByIdCommand: async id => { applied.push(id); state.activeScenarioId = id; },
     loadScenarioRegistry: () => new Promise(resolve => pending.push(resolve)),

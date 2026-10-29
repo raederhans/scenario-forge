@@ -5,6 +5,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { createCountryInspectorController } from "../js/ui/sidebar/country_inspector_controller.js";
+import { createPaletteLibraryPanelController } from "../js/ui/toolbar/palette_library_panel.js";
+import { state } from "../js/core/state.js";
 import { UI_COPY_CATALOG } from "../js/core/i18n_catalog.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -188,6 +190,11 @@ class TestElement {
 function createTestDocument() {
   const document = {
     createElement: (tagName) => new TestElement(tagName),
+    createElementNS: (namespace, tagName) => {
+      const element = new TestElement(tagName);
+      element.namespaceURI = namespace;
+      return element;
+    },
     createDocumentFragment: () => new TestElement("#fragment"),
   };
   document.body = new TestElement("body");
@@ -227,6 +234,7 @@ function datasetKeyFromSelector(selector) {
 
 function matchesSelector(node, selector) {
   if (!selector) return false;
+  if (selector.includes(",")) return selector.split(",").some(part => matchesSelector(node, part.trim()));
   if (selector.includes(" ")) {
     const parts = selector.split(/\s+/);
     const last = parts.pop();
@@ -653,6 +661,7 @@ test("intentional explorer and related-country toggles restore focus and preserv
     harness.controller.renderList();
 
     const oldHeader = harness.host.querySelector(".country-explorer-header");
+    assertExpansionIcon(oldHeader, false);
     oldHeader.rectTop = 48;
     oldHeader.focus();
     oldHeader.click();
@@ -663,12 +672,15 @@ test("intentional explorer and related-country toggles restore focus and preserv
     assert.equal(harness.host.scrollTop, 52);
     assert.equal(nextHeader.getAttribute("aria-expanded"), "true");
 
+    assertExpansionIcon(nextHeader, true);
     const oldToggle = harness.host.querySelector(".country-children-toggle");
+    assertExpansionIcon(oldToggle, false);
     oldToggle.rectTop = 31;
     oldToggle.focus();
     oldToggle.click();
 
     const nextToggle = harness.host.querySelector(".country-children-toggle");
+    assertExpansionIcon(nextToggle, true);
     assert.equal(globalThis.document.activeElement, nextToggle);
     assert.deepEqual(nextToggle.focusOptions, { preventScroll: true });
     assert.equal(harness.host.scrollTop, 21);
@@ -678,6 +690,11 @@ test("intentional explorer and related-country toggles restore focus and preserv
     const refreshedToggle = harness.host.querySelector(".country-children-toggle");
     assert.equal(globalThis.document.activeElement, refreshedToggle);
     assert.deepEqual(refreshedToggle.focusOptions, { preventScroll: true });
+
+    refreshedToggle.click();
+    assertExpansionIcon(harness.host.querySelector(".country-children-toggle"), false);
+    harness.host.querySelector(".country-explorer-header").click();
+    assertExpansionIcon(harness.host.querySelector(".country-explorer-header"), false);
 
     globalThis.document.activeElement = globalThis.document.body;
     harness.controller.renderList();
@@ -845,4 +862,61 @@ test("HGO identity ideology labels are present in the startup UI translation cat
   });
 
   assert.deepEqual(missingLabels, []);
+});
+
+function assertExpansionIcon(button, expanded) {
+  assert.equal(button.getAttribute("aria-expanded"), String(expanded));
+  const svg = button.querySelector("svg");
+  assert.ok(svg);
+  assert.equal(svg.namespaceURI, "http://www.w3.org/2000/svg");
+  assert.equal(svg.getAttribute("aria-hidden"), "true");
+  assert.equal(svg.getAttribute("class"), `ui-icon ui-icon-chevron-${expanded ? "down" : "right"}`);
+  assert.equal(svg.querySelector("path").getAttribute("d"), expanded ? "m6 9 6 6 6-6" : "m9 6 6 6-6 6");
+}
+
+test("palette rebuild restores the same row after reorder without stealing external focus", context => {
+  const previousDocument = globalThis.document;
+  const previousRaf = globalThis.requestAnimationFrame;
+  const previousCancel = globalThis.cancelAnimationFrame;
+  const previousState = Object.fromEntries([
+    "activePalettePack", "currentPaletteTheme", "recentColors", "paletteLibrarySearch",
+    "paletteLibraryGroupingMode", "ui",
+  ].map(key => [key, state[key]]));
+  context.after(() => {
+    globalThis.document = previousDocument;
+    globalThis.requestAnimationFrame = previousRaf;
+    globalThis.cancelAnimationFrame = previousCancel;
+    Object.assign(state, previousState);
+  });
+  globalThis.document = createTestDocument();
+  globalThis.requestAnimationFrame = () => 1;
+  globalThis.cancelAnimationFrame = () => {};
+  Object.assign(state, {
+    activePalettePack: null, currentPaletteTheme: "test-empty-theme",
+    recentColors: ["#112233", "#445566"], paletteLibrarySearch: "",
+    paletteLibraryGroupingMode: "default", ui: { ...state.ui, paletteLibrarySections: {} },
+  });
+  const list = new TestElement("div");
+  const controller = createPaletteLibraryPanelController({ paletteLibraryList: list });
+  controller.renderPaletteLibrary();
+  const oldRow = list.querySelectorAll(".palette-library-row")[1];
+  assert.equal(oldRow.dataset.paletteRowKey, "recent-#445566");
+  oldRow.focus();
+  state.recentColors.reverse();
+  controller.renderPaletteLibrary();
+  const newRow = list.querySelectorAll(".palette-library-row")[0];
+  assert.notEqual(newRow, oldRow);
+  assert.equal(newRow.dataset.paletteRowKey, oldRow.dataset.paletteRowKey);
+  assert.equal(document.activeElement, newRow);
+  assert.deepEqual(newRow.focusOptions, { preventScroll: true });
+
+  const search = new TestElement("input");
+  search.focus();
+  controller.renderPaletteLibrary();
+  assert.equal(document.activeElement, search);
+
+  list.querySelectorAll(".palette-library-row")[0].focus();
+  state.recentColors = ["#112233"];
+  controller.renderPaletteLibrary();
+  assert.equal(document.activeElement, document.body);
 });

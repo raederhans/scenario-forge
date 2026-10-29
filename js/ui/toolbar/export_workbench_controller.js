@@ -689,7 +689,7 @@ function createExportWorkbenchController({
     return exportUiState;
   };
 
-  const renderExportWorkbenchUi = (isOpen) => {
+  const renderExportWorkbenchContents = (isOpen) => {
     if (!exportWorkbenchOverlay) return;
     const exportUi = syncExportWorkbenchControlsFromState();
     exportWorkbenchOverlay.classList.toggle("hidden", !isOpen);
@@ -728,6 +728,24 @@ function createExportWorkbenchController({
       return;
     }
     void renderExportWorkbenchPreview();
+  };
+
+  let openRenderToken = 0;
+  const renderExportWorkbenchUi = (isOpen) => {
+    if (!exportWorkbenchOverlay) return;
+    const token = ++openRenderToken;
+    exportWorkbenchOverlay.classList.toggle("hidden", !isOpen);
+    exportWorkbenchOverlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    dockExportBtn?.classList.toggle("is-active", isOpen);
+    dockExportBtn?.setAttribute("aria-expanded", String(isOpen));
+    if (!isOpen) {
+      renderExportWorkbenchContents(false);
+      return;
+    }
+    exportWorkbenchPreviewState.textContent = t("Preparing preview…", "ui");
+    requestPreviewFrame(() => requestPreviewFrame(() => {
+      if (token === openRenderToken) renderExportWorkbenchContents(true);
+    }));
   };
 
   const handleExportAction = async () => {
@@ -849,16 +867,20 @@ function createExportWorkbenchController({
     }
 
     [
-      [exportWorkbenchBrightness, "brightness"],
-      [exportWorkbenchContrast, "contrast"],
-      [exportWorkbenchSaturation, "saturation"],
-      [exportWorkbenchClarity, "clarity"],
-    ].forEach(([input, key]) => {
+      [exportWorkbenchBrightness, "brightness", exportWorkbenchBrightnessValue],
+      [exportWorkbenchContrast, "contrast", exportWorkbenchContrastValue],
+      [exportWorkbenchSaturation, "saturation", exportWorkbenchSaturationValue],
+      [exportWorkbenchClarity, "clarity", exportWorkbenchClarityValue],
+    ].forEach(([input, key, valueLabel]) => {
       if (!(input instanceof HTMLInputElement) || input.dataset.bound === "true") return;
       input.addEventListener("input", () => {
-        setExportAdjustmentsState(state, {
-          [key]: Math.max(0, Math.min(200, Math.round(Number(input.value) || 100))),
-        });
+        const adjustment = Number(input.value);
+        const nextValue = Number.isFinite(adjustment)
+          ? Math.max(0, Math.min(200, Math.round(adjustment)))
+          : 100;
+        setExportAdjustmentsState(state, { [key]: nextValue });
+        // 整体刷新推迟两帧且连续拖动时会被下一次输入取消；数值标签在这里立即跟随。
+        if (valueLabel) valueLabel.textContent = `${nextValue}%`;
         renderExportWorkbenchUi(true);
       });
       input.dataset.bound = "true";

@@ -9,6 +9,7 @@ import { normalizePopulationStyle } from "./population_spatial_view_model.js";
 import { normalizeQuickFillScope } from "./quick_fill_hierarchy.js";
 // Project file manager (Phase 13)
 import {
+  state as runtimeState,
   normalizeAnnotationView,
   normalizeCityLayerStyleConfig,
   normalizeDayNightStyleConfig,
@@ -652,6 +653,7 @@ class FileManager {
   }
 
   static async exportProject(appState, options = {}) {
+    const savedRevision = Number(appState?.dirtyRevision || 0);
     const payload = FileManager.buildProjectPayload(appState);
     if (!payload) return;
 
@@ -665,7 +667,11 @@ class FileManager {
       title: t("Project saved", "ui"),
       tone: "success",
     });
-    clearDirty("project-export");
+    // A completed write only saves the revision captured before async packaging
+    // and file I/O. Exporting a detached snapshot cannot save the active project.
+    if (appState === runtimeState && Number(runtimeState.dirtyRevision || 0) === savedRevision) {
+      clearDirty("project-export");
+    }
     return true;
   }
 

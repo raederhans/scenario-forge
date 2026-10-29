@@ -124,14 +124,27 @@ export function processHierarchyData(data) {
 }
 
 export function hydrateLanguage() {
+  const normalizeLanguage = (value) => {
+    const language = String(value || "").trim().toLowerCase();
+    if (/^zh(?:[-_]|$)/.test(language)) return "zh";
+    if (/^en(?:[-_]|$)/.test(language)) return "en";
+    return null;
+  };
+  // Same preference contract as landing/i18n.js: explicit URL, shared/legacy
+  // saved choice, then browser language. Ignore unsupported saved values.
+  const explicit = normalizeLanguage(new URLSearchParams(globalThis.location?.search || "").get("lang"));
+  let language = explicit;
   try {
-    const storedLang = localStorage.getItem("map_lang");
-    if (storedLang) {
-      setCurrentLanguage(state, storedLang);
+    if (!language) {
+      for (const key of ["scenario_forge_language", "map_lang", "scenario_forge_landing_lang"]) {
+        language = normalizeLanguage(globalThis.localStorage?.getItem(key));
+        if (language) break;
+      }
     }
   } catch (error) {
     console.warn("Language preference not available:", error);
   }
+  setCurrentLanguage(state, language || normalizeLanguage(globalThis.navigator?.language) || "en");
 }
 
 export function hydrateViewSettings() {

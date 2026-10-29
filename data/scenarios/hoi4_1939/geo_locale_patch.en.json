@@ -1,6 +1,103 @@
 {
   "generated_at": "2026-06-13T22:56:20.686233+00:00",
-  "geo": {},
+  "geo": {
+    "id::CN_CITY_17275852B83272093468807__SPLIT_KWANTUNG": {
+      "en": "Dalian · Kwantung",
+      "zh": "大连 · 关东州"
+    },
+    "id::CN_CITY_17275852B83272093468807__SPLIT_REST": {
+      "en": "Dalian · Remainder",
+      "zh": "大连 · 余部"
+    },
+    "id::CN_CITY_17275852B86000242921086__SPLIT_GUANGZHOUWAN": {
+      "en": "Zhanjianghsi · Guangzhouwan",
+      "zh": "湛江市 · 广州湾"
+    },
+    "id::CN_CITY_17275852B86000242921086__SPLIT_REST": {
+      "en": "Zhanjianghsi · Remainder",
+      "zh": "湛江市 · 余部"
+    },
+    "id::CN_CITY_17275852B89468905887192__SPLIT_GUANGZHOUWAN": {
+      "en": "Suixixian · Guangzhouwan",
+      "zh": "Suixixian · 广州湾"
+    },
+    "id::CN_CITY_17275852B89468905887192__SPLIT_REST": {
+      "en": "Suixixian · Remainder",
+      "zh": "Suixixian · 余部"
+    },
+    "id::CN_CITY_17275852B90470795224142__SPLIT_GUANGZHOUWAN": {
+      "en": "Wuchuan · Guangzhouwan",
+      "zh": "吴川 · 广州湾"
+    },
+    "id::CN_CITY_17275852B90470795224142__SPLIT_REST": {
+      "en": "Wuchuan · Remainder",
+      "zh": "吴川 · 余部"
+    },
+    "id::MAR-1445__SPLIT_REST": {
+      "en": "Tanger - Tétouan · Remainder",
+      "zh": "丹吉尔 - 得土安 · 余部"
+    },
+    "id::MAR-1445__SPLIT_TANGIER": {
+      "en": "Tanger - Tétouan · Tangier International Zone",
+      "zh": "丹吉尔 - 得土安 · 坦吉尔国际区"
+    },
+    "id::MAR-1455__SPLIT_IFNI": {
+      "en": "Souss - Massa - Draâ · Ifni",
+      "zh": "苏斯 - 马萨 - 德拉阿 · 伊夫尼"
+    },
+    "id::MAR-1455__SPLIT_REST": {
+      "en": "Souss - Massa - Draâ · Remainder",
+      "zh": "苏斯 - 马萨 - 德拉阿 · 余部"
+    },
+    "id::MAR-3457__SPLIT_IFNI": {
+      "en": "Guelmim - Es-Semara · Ifni",
+      "zh": "盖勒敏 - 埃斯-塞马拉 · 伊夫尼"
+    },
+    "id::MAR-3457__SPLIT_REST": {
+      "en": "Guelmim - Es-Semara · Remainder",
+      "zh": "盖勒敏 - 埃斯-塞马拉 · 余部"
+    },
+    "id::PL_MRG_727dd6268093__SPLIT_DANZIG": {
+      "en": "Pomeranian · North · Free City rural district",
+      "zh": "滨海省·北部 · 但泽自由市乡村区"
+    },
+    "id::PL_MRG_727dd6268093__SPLIT_REST": {
+      "en": "Pomeranian · North · Remainder",
+      "zh": "滨海省·北部 · 余部"
+    },
+    "id::PL_MRG_9e4e875a7bcd__SPLIT_DANZIG": {
+      "en": "Pomeranian · South · Free City rural district",
+      "zh": "滨海省·南部 · 但泽自由市乡村区"
+    },
+    "id::PL_MRG_9e4e875a7bcd__SPLIT_REST": {
+      "en": "Pomeranian · South · Remainder",
+      "zh": "滨海省·南部 · 余部"
+    },
+    "id::PL_POW_2209__SPLIT_DANZIG": {
+      "en": "malborski · Free City rural district",
+      "zh": "马尔堡 · 但泽自由市乡村区"
+    },
+    "id::PL_POW_2209__SPLIT_REST": {
+      "en": "malborski · Remainder",
+      "zh": "马尔堡 · 余部"
+    },
+    "id::PL_POW_2210__SPLIT_DANZIG": {
+      "en": "nowodworski · Free City rural district",
+      "zh": "nowodworski · 但泽自由市乡村区"
+    },
+    "id::PL_POW_2210__SPLIT_REST": {
+      "en": "nowodworski · Remainder",
+      "zh": "nowodworski · 余部"
+    },
+    "id::RU_MRG_eefc121c2bf0__SPLIT_KARAFUTO": {
+      "en": "Sakhalin · Central · South of 50°N",
+      "zh": "萨哈林州·中部 · 北纬50°以南"
+    },
+    "id::RU_MRG_eefc121c2bf0__SPLIT_REST": {
+      "en": "Sakhalin · Central · North of 50°N",
+      "zh": "萨哈林州·中部 · 北纬50°以北"
+    }
+  },
   "language": "en",
   "scenario_id": "hoi4_1939",
   "version": 1

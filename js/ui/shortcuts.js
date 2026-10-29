@@ -9,6 +9,7 @@ import { FileManager } from "../core/file_manager.js";
 import { redoHistory, undoHistory } from "../core/history_manager.js";
 import { flushRenderBoundary } from "../core/render_boundary.js";
 import { t } from "./i18n.js";
+import { getActiveModal } from "./ui_contract.js";
 import {
   cancelActiveStrategicInteractionModes,
   cancelSpecialZoneDraw,
@@ -109,12 +110,19 @@ function initShortcuts() {
   if (document.body?.dataset.shortcutsBound === "true") return;
 
   window.addEventListener("keydown", (event) => {
+    if (event.defaultPrevented || getActiveModal()) return;
     const key = String(event.key || "");
     const lower = key.toLowerCase();
     const modifier = event.metaKey || event.ctrlKey;
     const editableTarget = isEditableTarget(event.target);
 
     if (editableTarget) {
+      return;
+    }
+    if (!modifier && !event.altKey && /^[a-z0-9]$/i.test(key)
+      && event.target instanceof Element
+      // 只在带输入联想的列表里让出字母键；普通按钮被点击后仍保持焦点，快捷键必须照常可用。
+      && event.target.closest('[role="option"], [role="listbox"]')) {
       return;
     }
 
@@ -310,6 +318,7 @@ function initShortcuts() {
   });
 
   window.addEventListener("keyup", (event) => {
+    if (event.defaultPrevented || getActiveModal()) return;
     if (runtimeState.bootBlocking) return;
     if (event.key !== "Shift" && event.key !== " ") return;
     setBrushPanModifier(false);

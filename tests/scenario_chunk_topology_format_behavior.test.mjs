@@ -222,3 +222,31 @@ test("full runtime topology keeps its raw topology and separate decoded collecti
   assert.deepEqual(reply.decodedCollections.politicalData, expectedWorker);
   assert.equal("chunkPayload" in reply, false);
 });
+
+test("quantized scenario chunks and runtime topology preserve decoded coordinates", async () => {
+  const quantized = {
+    type: "Topology",
+    transform: { scale: [0.1, 0.2], translate: [10, -20] },
+    arcs: [[[2, 3], [10, 0], [0, 10], [-10, 0], [0, -10]]],
+    objects: { political: { type: "GeometryCollection", geometries: [
+      { type: "Polygon", id: "quantized", arcs: [[0]], properties: {} },
+    ] } },
+  };
+  const expected = normalObject(orientPoliticalFeatureCollection(
+    topojson.feature(quantized, quantized.objects.political), vendorContext.d3.geoArea
+  ));
+  for (const chunkType of ["scenario-chunk", "runtime-topology"]) {
+    const harness = createWorkerHarness({ fetchResource: async () => jsonResponse(quantized) });
+    const reply = await workerReply(harness, {
+      chunkType, chunkUrl: "/chunk.topo.json", runtimeTopologyUrl: "/runtime.topo.json",
+    });
+    assert.equal(reply.type, "RUNTIME_CHUNK_READY");
+    if (chunkType === "scenario-chunk") assert.deepEqual(reply.chunkPayload, expected);
+    else {
+      assert.deepEqual(reply.decodedCollections.politicalData, expected);
+      assert.equal(Object.hasOwn(reply.runtimePoliticalTopology, "transform"), false);
+      const transform = topojson.transform(quantized.transform);
+      assert.deepEqual(reply.runtimePoliticalTopology.arcs, normalObject(quantized.arcs.map((arc) => arc.map(transform))));
+    }
+  }
+});

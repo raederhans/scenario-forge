@@ -1,3 +1,4 @@
+import { getActiveModal } from "../ui_contract.js";
 import { createQuickFillLevelControls, getQuickFillUiCountry } from "./quick_fill_level_controls.js";
 // Workspace chrome support-surface controller.
 // 这个模块负责 guide / dock support surface / URL restore / 全局 dismiss 这一层的 UI 外壳协调。
@@ -57,6 +58,7 @@ export function createWorkspaceChromeSupportSurfaceController({
   closeExportWorkbench = () => {},
 } = {}) {
   let dockPopoverCloseBound = false;
+  let scenarioGuideTrigger = null;
   const quickFillLevels = createQuickFillLevelControls({
     state, container: dockQuickFillRow,
     onChange: (scope) => {
@@ -67,7 +69,8 @@ export function createWorkspaceChromeSupportSurfaceController({
 
   const isFocusableGuideTriggerVisible = (element) => {
     if (!(element instanceof HTMLElement)) return false;
-    if (element.hidden || element.getAttribute("aria-hidden") === "true") return false;
+    if (!element.isConnected || element.disabled || element.tabIndex < 0) return false;
+    if (element.closest("[hidden], [inert], [aria-hidden='true']")) return false;
     const style = globalThis.getComputedStyle?.(element);
     if (!style || style.display === "none" || style.visibility === "hidden") return false;
     const rect = element.getBoundingClientRect();
@@ -81,16 +84,21 @@ export function createWorkspaceChromeSupportSurfaceController({
 
   const getGuideFocusReturnTrigger = (preferredTrigger = null) => {
     if (isFocusableGuideTriggerVisible(preferredTrigger)) return preferredTrigger;
-    if (isFocusableGuideTriggerVisible(utilitiesGuideBtn)) return utilitiesGuideBtn;
     if (isFocusableGuideTriggerVisible(scenarioGuideBtn)) return scenarioGuideBtn;
-    return preferredTrigger || utilitiesGuideBtn || scenarioGuideBtn || null;
+    return null;
   };
 
   const closeScenarioGuidePopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
     if (!scenarioGuidePopover) return;
     closeScenarioGuideSurface?.({
       restoreFocus,
-      restoreOverlayTriggerFocus,
+      restoreOverlayTriggerFocus: (surface) => {
+        const trigger = getGuideFocusReturnTrigger(scenarioGuideTrigger);
+        if (trigger) {
+          rememberOverlayTrigger?.(surface, trigger);
+          restoreOverlayTriggerFocus?.(surface, trigger);
+        }
+      },
     });
     if (syncUrl) {
       syncSupportSurfaceUrlState("");
@@ -100,14 +108,20 @@ export function createWorkspaceChromeSupportSurfaceController({
   const ensureProjectSupportSurface = (sectionKind = "utilities") => {
     ensureRightPanelVisible?.();
     inspectorSidebarTabProject?.click();
-    if (inspectorSidebarTabProject && inspectorSidebarTabProject.getAttribute("aria-selected") !== "true") {
+    const projectStateAttribute = inspectorSidebarTabProject?.getAttribute("role") === "tab" ? "aria-selected" : "aria-pressed";
+    if (inspectorSidebarTabProject && inspectorSidebarTabProject.getAttribute(projectStateAttribute) !== "true") {
       const inspectorSidebarPanel = document.getElementById("inspectorSidebarPanel");
       const projectSidebarPanel = document.getElementById("projectSidebarPanel");
       const inspectorSidebarTabInspector = document.getElementById("inspectorSidebarTabInspector");
       inspectorSidebarTabProject.classList.add("is-active");
-      inspectorSidebarTabProject.setAttribute("aria-selected", "true");
+      inspectorSidebarTabProject.setAttribute(projectStateAttribute, "true");
+      inspectorSidebarTabProject.removeAttribute(projectStateAttribute === "aria-selected" ? "aria-pressed" : "aria-selected");
       inspectorSidebarTabInspector?.classList.remove("is-active");
-      inspectorSidebarTabInspector?.setAttribute("aria-selected", "false");
+      if (inspectorSidebarTabInspector) {
+        const inspectorStateAttribute = inspectorSidebarTabInspector.getAttribute("role") === "tab" ? "aria-selected" : "aria-pressed";
+        inspectorSidebarTabInspector.setAttribute(inspectorStateAttribute, "false");
+        inspectorSidebarTabInspector.removeAttribute(inspectorStateAttribute === "aria-selected" ? "aria-pressed" : "aria-selected");
+      }
       projectSidebarPanel?.classList.add("is-active");
       if (projectSidebarPanel instanceof HTMLElement) projectSidebarPanel.hidden = false;
       inspectorSidebarPanel?.classList.remove("is-active");
@@ -122,44 +136,32 @@ export function createWorkspaceChromeSupportSurfaceController({
   };
 
   const getDockPopoverByKind = (kind) => {
-    if (kind === "reference") return dockReferencePopover;
     if (kind === "edit") return dockEditPopover;
     if (kind === "quickfill") return dockQuickFillRow;
     return null;
   };
 
   const getDockPopoverTrigger = (kind) => {
-    if (kind === "reference") return dockReferenceBtn;
     if (kind === "edit") return dockEditPopoverBtn;
     if (kind === "quickfill") return dockQuickFillBtn;
     return null;
   };
-
-  const supportDockPopoverKinds = new Set(["reference"]);
-  const isSupportDockPopoverKind = (kind) => supportDockPopoverKinds.has(String(kind || ""));
 
   const closeDockPopover = ({ restoreFocus = false, syncUrl = true } = {}) => {
     const activeKind = String(state.activeDockPopover || "");
     const activePopover = getDockPopoverByKind(activeKind);
     const activeTrigger = getDockPopoverTrigger(activeKind);
     setActiveDockPopoverState(state, "");
-    dockReferencePopover?.classList.add("hidden");
     dockEditPopover?.classList.add("hidden");
     dockQuickFillRow?.classList.add("hidden");
-    dockReferencePopover?.setAttribute("aria-hidden", "true");
     dockEditPopover?.setAttribute("aria-hidden", "true");
     dockQuickFillRow?.setAttribute("aria-hidden", "true");
-    dockReferenceBtn?.classList.remove("is-active");
     dockEditPopoverBtn?.classList.remove("is-active");
     dockQuickFillBtn?.classList.remove("is-active");
-    dockReferenceBtn?.setAttribute("aria-expanded", "false");
     dockEditPopoverBtn?.setAttribute("aria-expanded", "false");
     dockQuickFillBtn?.setAttribute("aria-expanded", "false");
     if (restoreFocus && activePopover) {
       restoreOverlayTriggerFocus?.(activePopover, activeTrigger);
-    }
-    if (syncUrl && isSupportDockPopoverKind(activeKind)) {
-      syncSupportSurfaceUrlState("");
     }
   };
 
@@ -184,9 +186,6 @@ export function createWorkspaceChromeSupportSurfaceController({
     const nextKind = state.activeDockPopover === kind ? "" : kind;
     closeDockPopover();
     if (!nextKind) return;
-    if (isSupportDockPopoverKind(nextKind) && scenarioGuidePopover && !scenarioGuidePopover.classList.contains("hidden")) {
-      closeScenarioGuidePopover({ restoreFocus: false, syncUrl: false });
-    }
     closeExportWorkbench?.({ restoreFocus: false });
     setActiveDockPopoverState(state, nextKind);
     rememberOverlayTrigger?.(target, trigger);
@@ -194,9 +193,6 @@ export function createWorkspaceChromeSupportSurfaceController({
     target.setAttribute("aria-hidden", "false");
     trigger?.classList.add("is-active");
     trigger?.setAttribute("aria-expanded", "true");
-    if (isSupportDockPopoverKind(nextKind)) {
-      syncSupportSurfaceUrlState(nextKind);
-    }
     focusOverlaySurface?.(target);
   };
 
@@ -312,7 +308,7 @@ export function createWorkspaceChromeSupportSurfaceController({
         setRestoredSupportSurfaceViewState(state, view);
         return;
       }
-      toggleScenarioGuidePopover(getGuideFocusReturnTrigger(utilitiesGuideBtn));
+      toggleScenarioGuidePopover(scenarioGuideBtn);
       setRestoredSupportSurfaceViewState(state, view);
       return;
     }
@@ -323,13 +319,9 @@ export function createWorkspaceChromeSupportSurfaceController({
       setRestoredSupportSurfaceViewState(state, view);
       return;
     }
-    ensureProjectSupportSurface("utilities");
-    const targetPopover = getDockPopoverByKind(view);
-    if (state.activeDockPopover === view && targetPopover && !targetPopover.classList.contains("hidden")) {
-      setRestoredSupportSurfaceViewState(state, view);
-      return;
-    }
-    openDockPopover(view);
+    const referenceEntry = document.getElementById("editorLayer-reference");
+    if (!referenceEntry) return;
+    referenceEntry.click();
     setRestoredSupportSurfaceViewState(state, view);
   };
 
@@ -343,6 +335,7 @@ export function createWorkspaceChromeSupportSurfaceController({
     closeDockPopover({ restoreFocus: false, syncUrl: true });
     closeExportWorkbench?.({ restoreFocus: false });
     closeSpecialZonePopover?.();
+    scenarioGuideTrigger = trigger;
     rememberOverlayTrigger?.(scenarioGuidePopover, trigger);
     openScenarioGuideSurface?.({ focusOverlaySurface });
     syncSupportSurfaceUrlState("guide");
@@ -354,7 +347,7 @@ export function createWorkspaceChromeSupportSurfaceController({
       const target = event.target;
       if (!(target instanceof Element)) return;
       const insideDockPopover = target.closest(
-        "#dockReferencePopover, #dockEditPopover, #dockQuickFillRow, #dockReferenceBtn, #dockEditPopoverBtn, #dockQuickFillBtn"
+        "#dockEditPopover, #dockQuickFillRow, #dockEditPopoverBtn, #dockQuickFillBtn"
       );
       if (state.activeDockPopover && !insideDockPopover) {
         closeDockPopover();
@@ -386,6 +379,9 @@ export function createWorkspaceChromeSupportSurfaceController({
     });
 
     document.addEventListener("keydown", (event) => {
+      if (event.defaultPrevented) return;
+      const modal = getActiveModal();
+      if (modal && modal !== scenarioGuidePopover && modal !== exportWorkbenchPanel) return;
       if (exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden") && event.key === "Tab") {
         const focusables = getFocusableElements?.(exportWorkbenchPanel) || [];
         if (!focusables.length) {
@@ -396,12 +392,12 @@ export function createWorkspaceChromeSupportSurfaceController({
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
         const active = document.activeElement;
-        if (event.shiftKey && active === first) {
+        if (event.shiftKey && (active === first || !focusables.includes(active))) {
           event.preventDefault();
           last.focus({ preventScroll: true });
           return;
         }
-        if (!event.shiftKey && active === last) {
+        if (!event.shiftKey && (active === last || !focusables.includes(active))) {
           event.preventDefault();
           first.focus({ preventScroll: true });
           return;
@@ -417,12 +413,12 @@ export function createWorkspaceChromeSupportSurfaceController({
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
         const active = document.activeElement;
-        if (event.shiftKey && active === first) {
+        if (event.shiftKey && (active === first || !focusables.includes(active))) {
           event.preventDefault();
           last.focus({ preventScroll: true });
           return;
         }
-        if (!event.shiftKey && active === last) {
+        if (!event.shiftKey && (active === last || !focusables.includes(active))) {
           event.preventDefault();
           first.focus({ preventScroll: true });
           return;

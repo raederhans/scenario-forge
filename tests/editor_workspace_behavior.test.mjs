@@ -33,6 +33,8 @@ class Element {
       this.children.push(node);
     }
   }
+  appendChild(node) { this.append(node); return node; }
+  replaceChildren(...nodes) { this.children = []; this.append(...nodes); }
   prepend(...nodes) {
     this.append(...nodes);
     this.children = [...nodes, ...this.children.filter((node) => !nodes.includes(node))];
@@ -65,7 +67,7 @@ class Element {
   contains(node) { return node === this || this.children.some((child) => child.contains(node)); }
 }
 
-function mount(context, initialSearch = "") {
+function mount(context, initialSearch = "", { countrySelected = true } = {}) {
   const documentRef = new Element("document");
   documentRef.body = new Element("body");
   documentRef.append(documentRef.body);
@@ -74,6 +76,7 @@ function mount(context, initialSearch = "") {
     node.ownerDocument = documentRef;
     return node;
   };
+  documentRef.createElementNS = (_, tag) => documentRef.createElement(tag);
   documentRef.getElementById = (id) => documentRef.querySelector(`#${id}`);
   const add = (id, parent = documentRef.body, tag = "div") => {
     const node = new Element(tag);
@@ -90,7 +93,8 @@ function mount(context, initialSearch = "") {
     ["specialRegionInspectorSection", "specialRegionInspectorDetail"],
   ]) {
     const section = add(sectionId, left, "details");
-    add(detailId, section);
+    const detail = add(detailId, section);
+    if (detailId === "countryInspectorDetail" && !countrySelected) detail.classList.add("hidden");
     if (sectionId === "countryInspectorSection") add("countryList", section);
   }
   const panels = [];
@@ -108,6 +112,14 @@ function mount(context, initialSearch = "") {
   }
   add("projectSidebarPanel", right);
   add("frontlineProjectSection", right, "details");
+  const utilities = add("inspectorUtilitiesSection", right);
+  add("utilitiesGuideBtn", utilities, "button");
+  add("dockReferenceBtn", utilities, "button");
+  const reference = add("dockReferencePopover", utilities);
+  reference.classList.add("hidden");
+  reference.setAttribute("role", "dialog");
+  reference.setAttribute("aria-hidden", "true");
+  add("referenceOpacity", reference, "input");
   add("strategicCommandBar");
   add("inspectorSidebarTabProject", left, "button");
   const previous = { matchMedia: globalThis.matchMedia, MutationObserver: globalThis.MutationObserver };
@@ -131,7 +143,14 @@ function expectProperty(h, key, segment) {
   for (const name of ["Inspector", "Layers"]) {
     assert.equal(h.get(`editorSegment${name}`).getAttribute("aria-selected"), String(name === segment));
   }
-  assert.equal(h.get(`editorSegment${segment}`).getAttribute("aria-controls"), `editorProperty-${key}`);
+  if (segment) {
+    const tab = h.get(`editorSegment${segment}`);
+    const panel = h.get(tab.getAttribute("aria-controls"));
+    assert.equal(panel.id, `editorProperty-${key}`);
+    assert.equal(panel.getAttribute("role"), "tabpanel");
+    assert.equal(panel.getAttribute("aria-labelledby"), tab.id);
+    assert.equal(tab.getAttribute("tabindex"), "0");
+  }
   assert.equal(h.navigations.at(-1), key);
 }
 
@@ -151,8 +170,60 @@ test("showProperty selects the owning segment and keeps only its property visibl
   expectProperty(h, "countries", "Inspector");
   assert.equal(h.get("editorProperty-data-appearance-panel-borders").hidden, true);
   h.workspace.showProperty("project");
-  expectProperty(h, "project", "Inspector");
+  expectProperty(h, "project", null);
   assert.equal(h.sidebarTabs.at(-1), "project");
+});
+
+test("Project preserves the last object inspector and its panel association", (context) => {
+  const h = mount(context);
+  for (const key of ["countries", "water", "special"]) {
+    h.workspace.selectObject(key);
+    const detail = h.get(`editorProperty-${key}`).children[0];
+    h.get("inspectorSidebarTabProject").click();
+    expectProperty(h, "project", null);
+    assert.equal(h.get("editorSegmentInspector").getAttribute("aria-controls"), `editorProperty-${key}`);
+    assert.equal(h.get("editorSegmentInspector").getAttribute("tabindex"), "0");
+    h.get("editorSegmentInspector").click();
+    expectProperty(h, key, "Inspector");
+    assert.equal(h.get(`editorProperty-${key}`).children[0], detail);
+  }
+});
+
+test("Inspector returns to its existing empty state when no country is selected", (context) => {
+  const h = mount(context, "", { countrySelected: false });
+  h.get("inspectorSidebarTabProject").click();
+  h.get("editorSegmentInspector").click();
+  expectProperty(h, "countries", "Inspector");
+  assert.equal(h.get("countryInspectorDetail").classList.contains("hidden"), true);
+  const hint = h.get("editorProperty-countries").querySelector(".editor-empty-hint");
+  assert.equal(hint.hidden, false);
+  assert.equal(hint.textContent, "Select a country to view its properties.");
+});
+
+test("property tabs switch with arrows and Home/End, moving focus and the tab stop", (context) => {
+  const h = mount(context);
+  const inspector = h.get("editorSegmentInspector");
+  const layers = h.get("editorSegmentLayers");
+  const press = (tab, key, target, property, segment) => {
+    let prevented = false;
+    for (const callback of tab.listeners.get("keydown")) {
+      callback({ key, preventDefault: () => { prevented = true; } });
+    }
+    assert.equal(prevented, true);
+    assert.equal(h.documentRef.activeElement, target);
+    expectProperty(h, property, segment);
+    for (const button of [inspector, layers]) {
+      assert.equal(button.getAttribute("tabindex"), button === target ? "0" : "-1");
+    }
+  };
+  assert.equal(inspector.getAttribute("tabindex"), "0");
+  assert.equal(layers.getAttribute("tabindex"), "-1");
+  press(inspector, "ArrowRight", layers, "data-appearance-panel-borders", "Layers");
+  press(layers, "ArrowRight", inspector, "countries", "Inspector");
+  press(inspector, "ArrowLeft", layers, "data-appearance-panel-borders", "Layers");
+  press(layers, "ArrowLeft", inspector, "countries", "Inspector");
+  press(inspector, "End", layers, "data-appearance-panel-borders", "Layers");
+  press(layers, "Home", inspector, "countries", "Inspector");
 });
 
 test("property segments occupy a separate header row from the title and annotation controls", (context) => {
@@ -185,14 +256,14 @@ test("segment clicks start at the first property and restore each segment's last
   h.workspace.showProperty("project");
   h.get("editorSegmentLayers").click();
   h.get("editorSegmentInspector").click();
-  expectProperty(h, "project", "Inspector");
+  expectProperty(h, "water", "Inspector");
 });
 
 for (const [section, key, segment] of [
   ["countries", "countries", "Inspector"],
   ["data-appearance-panel-cities", "data-appearance-panel-cities", "Layers"],
   ["panel-cities", "data-appearance-panel-cities", "Layers"],
-  ["project", "project", "Inspector"],
+  ["project", "project", null],
 ]) {
   test(`section deep link ${section} opens the matching property and segment`, (context) => {
     const h = mount(context, `?section=${section}`);
@@ -229,4 +300,30 @@ test("Back restores the previous segment, focus and scroll, then hides when hist
   assert.equal(h.right.scrollTop, 120);
   assert.equal(h.documentRef.activeElement, title);
   assert.equal(back.hidden, true);
+});
+
+
+test("Layers owns persistent reference settings and removes Assets", (context) => {
+  const h = mount(context);
+  assert.equal(h.get("editorTaskAssetsBtn"), null);
+  const entry = h.get("editorLayer-reference");
+  assert.equal(h.get("editorTask-layers").contains(entry), true);
+  const input = h.get("referenceOpacity");
+  entry.click();
+  expectProperty(h, "reference", "Layers");
+  assert.equal(h.get("leftSidebarContent").dataset.editorTask, "layers");
+  assert.equal(h.get("dockReferencePopover").classList.contains("hidden"), false);
+  assert.equal(h.get("dockReferencePopover").getAttribute("role"), null);
+  assert.equal(h.get("editorProperty-reference").contains(input), true);
+  assert.equal(h.get("utilitiesGuideBtn").hidden, true);
+  h.workspace.selectObject("countries");
+  h.get("dockReferenceBtn").click();
+  expectProperty(h, "reference", "Layers");
+});
+
+test("reference deep link selects Layers and reference settings", (context) => {
+  const h = mount(context, "?view=reference");
+  expectProperty(h, "reference", "Layers");
+  assert.equal(h.get("leftSidebarContent").dataset.editorTask, "layers");
+  assert.equal(h.get("editorLayer-reference").getAttribute("aria-pressed"), "true");
 });

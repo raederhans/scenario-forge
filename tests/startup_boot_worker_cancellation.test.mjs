@@ -1,9 +1,20 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import test from "node:test";
 import vm from "node:vm";
 import { gzipSync } from "node:zlib";
 import "../js/core/geometry_transfer_codec_shared.js";
+
+const topojson = createRequire(import.meta.url)("../vendor/topojson-client.min.js");
+
+function expectedTopology(topology) {
+  const expected = structuredClone(topology);
+  const transform = topojson.transform(topology.transform);
+  expected.arcs = topology.arcs.map((arc) => arc.map(transform));
+  delete expected.transform;
+  return expected;
+}
 
 const workerSource = await readFile(new URL("../js/workers/startup_boot.worker.js", import.meta.url), "utf8");
 const codecSource = await readFile(new URL("../js/core/geometry_transfer_codec_shared.js", import.meta.url), "utf8");
@@ -65,6 +76,7 @@ function createWorkerHarness({ feature = () => null, fetchResource = null, onPos
         getCountryCode: () => "",
       };
       self.topojson = {
+        transform: topojson.transform,
         feature(input, object) {
           context.__startupTestFeatureResult = feature(input, object);
           return vm.runInContext("JSON.parse(JSON.stringify(__startupTestFeatureResult))", context);
@@ -137,7 +149,7 @@ test("startup worker cancels only its matching decode task and passes its signal
   );
 });
 
-test("cached base topology decodes in the worker without fetching or returning the raw topology again", async () => {
+test("cached base topology decodes in the worker and returns the topology without fetching", async () => {
   const decodeCalls = [];
   const topology = { type: "Topology", objects: {
     political: { type: "GeometryCollection", geometries: [{ id: "A" }] },
@@ -159,7 +171,7 @@ test("cached base topology decodes in the worker without fetching or returning t
   assert.equal(posted.length, 1);
   const reply = posted[0];
   assert.equal(reply.type, "BASE_STARTUP_READY");
-  assert.equal(reply.topologyPrimary, null, "the caller already holds the raw topology");
+  assert.equal(reply.topologyPrimary, topology);
   assert.equal(reply.locales, null);
   assert.equal(reply.geoAliases, null);
   assert.equal(reply.decodedCollections.landData.features[0].id, "A");
@@ -262,7 +274,7 @@ test("large base and startup-bundle geometry use whole-message transfers without
   assert.equal(baseReply.taskId, "large-base-transfer");
   assert.equal(baseWire.decodedCollections, undefined);
   assert.equal(baseReply.geometryTransport.field, "message");
-  assert.equal(baseReply.geometryTransport.payload.encoding, "geo-f64-v2");
+  assert.equal(baseReply.geometryTransport.payload.encoding, "geo-f64-v3");
   assert.equal(transferLists[0].length, 2);
   assert.equal(transferLists[0][0], baseReply.geometryTransport.payload.coordinates.buffer);
   assert.equal(transferLists[0][1], baseReply.geometryTransport.payload.lengths.buffer);
@@ -286,7 +298,7 @@ test("large base and startup-bundle geometry use whole-message transfers without
   assert.equal(bundleReply.taskId, "large-bundle-transfer");
   assert.equal(bundleWire.baseDecodedCollections, undefined);
   assert.equal(bundleReply.geometryTransport.field, "message");
-  assert.equal(bundleReply.geometryTransport.payload.encoding, "geo-f64-v2");
+  assert.equal(bundleReply.geometryTransport.payload.encoding, "geo-f64-v3");
   assert.equal(transferLists[1].length, 2);
   assert.equal(transferLists[1][0], bundleReply.geometryTransport.payload.coordinates.buffer);
   assert.equal(typeof bundleReply.metrics.geometryPackingMs, "number");
@@ -403,7 +415,8 @@ test("large worker replies cross a real structured transfer and restore through 
       needGeoAliases: false,
     });
     assert.equal(workerHarness.posted[0].geometryTransport.field, "message");
-    assert.equal(workerHarness.posted[0].topologyTransport, undefined, "cached raw topology must not be retransmitted");
+    assert.equal(workerHarness.posted[0].topologyTransport, undefined);
+    assert.deepEqual(baseResult.topologyPrimary, expectedTopology(baseTopology));
     assert.deepEqual(baseResult.decodedCollections.landData, decodeFixtureFeatureCollection(baseTopology, baseTopology.objects.political));
     assert.equal(baseResult.decodedCollections.landData.features[0].geometry.coordinates[0].length, 10_000);
     assert.equal(baseResult.decodedCollections.landData.features[0].geometry.coordinates[0][1][0], 1.123456789012345);
@@ -416,7 +429,7 @@ test("large worker replies cross a real structured transfer and restore through 
     });
     assert.equal(workerHarness.posted[1].geometryTransport.field, "message");
     assert.equal(workerHarness.transferLists[1].length, 2, "all startup geometries and arcs share one transport");
-    assert.equal(workerHarness.posted[1].geometryTransport.payload.encoding, "geo-f64-v2");
+    assert.equal(workerHarness.posted[1].geometryTransport.payload.encoding, "geo-f64-v3");
     assert.deepEqual(bundleResult.baseDecodedCollections.landData, decodeFixtureFeatureCollection(baseTopology, baseTopology.objects.political));
     assert.equal(bundleResult.baseDecodedCollections.landData.features[0].geometry.coordinates[0].length, 10_000);
     assert.equal(bundleResult.baseDecodedCollections.landData.features[0].geometry.coordinates[0][1][0], 1.123456789012345);
@@ -425,21 +438,21 @@ test("large worker replies cross a real structured transfer and restore through 
     assert.equal(typeof bundleResult.metrics.geometryUnpackingMs, "number");
     assert.equal(bundleResult.payload.base.topology_primary.objects.political.geometries[0].coordinates[0].length, 10_000);
     assert.equal(bundleResult.payload.scenario.runtime_topology_bootstrap.objects.political.geometries[0].coordinates[0].length, 9_000);
-    assert.deepEqual(bundleResult.payload.base.topology_primary, sourceSnapshot);
+    assert.deepEqual(bundleResult.payload.base.topology_primary, expectedTopology(baseTopology));
     assert.equal(typeof bundleResult.metrics.geometryPackingMs, "number");
 
     const loadTopologyOnly = () => startupWorkerClient.loadBaseStartupViaWorker({
       topologyUrl: "/base-only.json", needLocales: false, needGeoAliases: false,
     });
     const topologyResult = await loadTopologyOnly();
-    assert.equal(workerHarness.posted[2].geometryTransport.payload.encoding, "geo-f64-v2");
+    assert.equal(workerHarness.posted[2].geometryTransport.payload.encoding, "geo-f64-v3");
     assert.equal(workerHarness.transferLists[2].length, 2);
-    assert.deepEqual(topologyResult.topologyPrimary, topologyOnly);
+    assert.deepEqual(topologyResult.topologyPrimary, expectedTopology(topologyOnly));
     assert.equal(typeof topologyResult.metrics.geometryUnpackingMs, "number");
 
     corruptNextTopology = true;
     await assert.rejects(loadTopologyOnly(), /Unsupported geometry transport encoding/);
-    assert.deepEqual((await loadTopologyOnly()).topologyPrimary, topologyOnly, "a failed response must not poison later tasks");
+    assert.deepEqual((await loadTopologyOnly()).topologyPrimary, expectedTopology(topologyOnly), "a failed response must not poison later tasks");
     assert.deepEqual(baseTopology, sourceSnapshot, "transfer must only detach newly allocated buffers");
   } finally {
     startupWorkerClient?.terminateStartupWorker();
@@ -520,7 +533,7 @@ test("worker orients political geometry and transfers areas while retaining nonp
   assert.deepEqual(topology, original);
 });
 
-test("startup bundle transfers raw arcs and decoded coordinates through the mainline whole-message protocol", async () => {
+test("startup bundle transfers dequantized arcs and decoded coordinates through the mainline whole-message protocol", async () => {
   const topology = largeArcTopology();
   const sourceSnapshot = structuredClone(topology);
   const payload = { scenario_id: "fixture", base: { topology_primary: topology },
@@ -536,7 +549,7 @@ test("startup bundle transfers raw arcs and decoded coordinates through the main
   assert.equal(reply.type, "STARTUP_BUNDLE_READY");
   assert.equal(reply.startupTransport, undefined);
   assert.equal(reply.geometryTransport.field, "message");
-  assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v2");
+  assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v3");
   assert.equal(reply.payload, undefined, "raw topologies only occur in the packed whole-message payload");
   assert.equal(reply.baseDecodedCollections, undefined);
   assert.equal(reply.runtimeDecodedCollections, undefined);
@@ -544,9 +557,12 @@ test("startup bundle transfers raw arcs and decoded coordinates through the main
   assert.equal(transferLists[0].length, 2);
   assert.ok(transferLists[0].every((buffer) => buffer.byteLength === 0));
   const restored = restoreWorkerResponse(reply);
-  assert.deepEqual(restored.payload, payload);
-  assert.deepEqual(restored.baseDecodedCollections.landData, decodeArcFeatureCollection(topology, topology.objects.political));
-  assert.deepEqual(restored.runtimeDecodedCollections.politicalData, decodeArcFeatureCollection(topology, topology.objects.political));
+  const expected = expectedTopology(topology);
+  assert.deepEqual(restored.payload, {
+    ...payload, base: { topology_primary: expected }, scenario: { ...payload.scenario, runtime_topology_bootstrap: expected },
+  });
+  assert.deepEqual(restored.baseDecodedCollections.landData, decodeArcFeatureCollection(expected, expected.objects.political));
+  assert.deepEqual(restored.runtimeDecodedCollections.politicalData, decodeArcFeatureCollection(expected, expected.objects.political));
   assert.deepEqual(restored.runtimePoliticalMeta.featureIds, ["A"]);
   assert.deepEqual(topology, sourceSnapshot, "only newly allocated buffers may be detached");
 });
@@ -570,9 +586,10 @@ for (const type of ["LOAD_BASE_STARTUP", "LOAD_STARTUP_BUNDLE"]) {
       assert.equal(posted[0].type, type === "LOAD_BASE_STARTUP" ? "BASE_STARTUP_READY" : "STARTUP_BUNDLE_READY");
       assert.equal(posted[0].geometryTransport, undefined);
       assert.equal(posted[0].startupTransport, undefined);
-      assert.deepEqual(type === "LOAD_BASE_STARTUP" ? posted[0].topologyPrimary : posted[0].payload.base.topology_primary, topology);
+      const expected = expectedTopology(topology);
+      assert.deepEqual(type === "LOAD_BASE_STARTUP" ? posted[0].topologyPrimary : posted[0].payload.base.topology_primary, expected);
       const collections = type === "LOAD_BASE_STARTUP" ? posted[0].decodedCollections : posted[0].baseDecodedCollections;
-      assert.deepEqual(collections.landData, decodeArcFeatureCollection(topology, topology.objects.political));
+      assert.deepEqual(collections.landData, decodeArcFeatureCollection(expected, expected.objects.political));
       assert.equal(transferLists[0].length, 0);
     });
   }
@@ -597,16 +614,17 @@ test("runtime bootstrap retains mainline whole-message transfer and runtime chun
     assert.ok(transferLists[index].every((buffer) => buffer.byteLength === 0));
     assert.ok(Number.isFinite(reply.metrics.geometryPackingMs));
     const restored = restoreWorkerResponse(reply);
-    assert.deepEqual(restored.runtimePoliticalTopology, topology);
-    assert.deepEqual(restored.decodedCollections.politicalData, decodeArcFeatureCollection(topology, topology.objects.political));
+    const expected = expectedTopology(topology);
+    assert.deepEqual(restored.runtimePoliticalTopology, expected);
+    assert.deepEqual(restored.decodedCollections.politicalData, decodeArcFeatureCollection(expected, expected.objects.political));
     if (reply.type === "SCENARIO_RUNTIME_BOOTSTRAP_READY") {
       assert.equal(reply.geometryTransport.field, "message");
-      assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v2");
+      assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v3");
     } else {
       assert.equal(reply.geometryTransport.field, "decodedCollections");
-      assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v1");
+      assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v3");
       assert.equal(reply.decodedCollections, null);
-      assert.deepEqual(reply.runtimePoliticalTopology, topology, "raw runtime chunk topology retains its ordinary clone path");
+      assert.deepEqual(reply.runtimePoliticalTopology, expected, "dequantized runtime chunk topology retains its ordinary clone path");
     }
   }
 });
@@ -692,9 +710,11 @@ test("gzip-only startup bundle loads its explicit resource and retains Float64 t
   assert.deepEqual(urls, ["https://example.test/startup.bundle.json.gz"]);
   assert.equal(posted.length, 1);
   assert.equal(posted[0].type, "STARTUP_BUNDLE_READY");
-  assert.equal(posted[0].geometryTransport.payload.encoding, "geo-f64-v2");
+  assert.equal(posted[0].geometryTransport.payload.encoding, "geo-f64-v3");
   assert.equal(transferLists[0].length, 2);
-  assert.deepEqual(restoreWorkerResponse(posted[0]).payload, payload);
+  assert.deepEqual(restoreWorkerResponse(posted[0]).payload, {
+    ...payload, base: { topology_primary: expectedTopology(topology) },
+  });
 });
 
 test("scenario topology chunks still decode to GeoJSON before geometry transfer", async () => {
@@ -708,7 +728,8 @@ test("scenario topology chunks still decode to GeoJSON before geometry transfer"
   assert.equal(posted.length, 1);
   assert.equal(posted[0].type, "RUNTIME_CHUNK_READY");
   assert.equal(posted[0].geometryTransport.field, "chunkPayload");
-  assert.deepEqual(restoreWorkerResponse(posted[0]).chunkPayload, decodeArcFeatureCollection(topology, topology.objects.political));
+  const expected = expectedTopology(topology);
+  assert.deepEqual(restoreWorkerResponse(posted[0]).chunkPayload, decodeArcFeatureCollection(expected, expected.objects.political));
 });
 
 test("detail topology parses in its own worker, transfers its arcs and ends that worker", async () => {
@@ -748,7 +769,7 @@ test("detail topology parses in its own worker, transfers its arcs and ends that
     const result = await startupWorkerClient.loadDetailTopologyViaWorker({ topologyUrl: "/detail.json" });
     const wire = workerHarness.posted[0];
     assert.equal(wire.type, "DETAIL_TOPOLOGY_READY");
-    assert.equal(wire.geometryTransport.payload.encoding, "geo-f64-v2", "the arcs travel as Float64 buffers");
+    assert.equal(wire.geometryTransport.payload.encoding, "geo-f64-v3", "the arcs travel as Float64 buffers");
     assert.equal(workerHarness.transferLists[0].length, 2);
     assert.deepEqual(result.topology, detail);
     assert.equal(result.topology.arcs[0][1][0], 1.123456789012345);
