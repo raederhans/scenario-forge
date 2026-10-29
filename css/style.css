@@ -13912,7 +13912,8 @@ button.scenario-action-card:hover {
   color: inherit;
 }
 
-button:has(.ui-icon) {
+/* 特异性为 0：只给图标按钮补居中，不得盖过组件自己的 display（如窄屏才显示的抽屉关闭按钮）。 */
+:where(button:has(.ui-icon)) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
