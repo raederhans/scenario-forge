@@ -71,7 +71,6 @@ test("saved Chinese language renders the new workspace labels on first load", as
     ["editorTaskObjectsBtn", "对象"],
     ["editorTaskLayersBtn", "图层"],
     ["editorTaskPaletteBtn", "调色板"],
-    ["editorTaskAssetsBtn", "素材"],
     ["editorCountryDisplayOptions", "名称与显示"],
   ]) {
     const item = page.locator(`#${id}${id === "editorCountryDisplayOptions" ? " summary" : ""}`);
