@@ -72,6 +72,20 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     });
     btn.setAttribute("role", "tab");
     btn.setAttribute("aria-selected", "false");
+    btn.setAttribute("tabindex", key === "inspector" ? "0" : "-1");
+    btn.addEventListener("keydown", (event) => {
+      const buttons = [...segmentButtons.values()];
+      const index = buttons.indexOf(btn);
+      let next;
+      if (event.key === "ArrowRight") next = (index + 1) % buttons.length;
+      else if (event.key === "ArrowLeft") next = (index - 1 + buttons.length) % buttons.length;
+      else if (event.key === "Home") next = 0;
+      else if (event.key === "End") next = buttons.length - 1;
+      else return;
+      event.preventDefault();
+      buttons[next].click();
+      buttons[next].focus();
+    });
     segments.append(btn);
     segmentButtons.set(key, btn);
   }
@@ -99,9 +113,13 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     host.dataset.i18nAriaLabel = label;
     for (const node of nodes.filter(Boolean)) host.append(node);
     properties.append(host);
-    const segment = task === "layers" ? "layers" : "inspector";
+    const segment = key === "project" ? null : task === "layers" ? "layers" : "inspector";
     propertyEntries.set(key, { host, label, task, segment });
-    if (!segmentProperties.has(segment)) {
+    if (segment) {
+      host.setAttribute("role", "tabpanel");
+      host.setAttribute("aria-labelledby", segmentButtons.get(segment).id);
+    }
+    if (segment && !segmentProperties.has(segment)) {
       segmentProperties.set(segment, key);
       segmentButtons.get(segment).setAttribute("aria-controls", host.id);
     }
@@ -113,10 +131,13 @@ export function initEditorWorkspace({ documentRef = document, initialSearch = gl
     const changed = currentProperty !== key;
     if (changed && workspaceReady && !navigatingBack) propertyHistory.push(currentProperty);
     currentProperty = key;
-    segmentProperties.set(entry.segment, key);
-    setAttribute(segmentButtons.get(entry.segment), "aria-controls", entry.host.id);
+    if (entry.segment) {
+      segmentProperties.set(entry.segment, key);
+      setAttribute(segmentButtons.get(entry.segment), "aria-controls", entry.host.id);
+    }
     for (const [segment, btn] of segmentButtons) {
       setAttribute(btn, "aria-selected", segment === entry.segment);
+      if (entry.segment) setAttribute(btn, "tabindex", segment === entry.segment ? 0 : -1);
     }
     if (entry.task) taskProperties.set(entry.task, key);
     if (syncTab) setSidebarTab(key === "project" ? "project" : "inspector");
