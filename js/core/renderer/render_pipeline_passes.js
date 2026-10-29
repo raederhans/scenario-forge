@@ -8,6 +8,7 @@ export function preflightPrivateRenderPasses(definitions, {
   prepareRenderPassAsync,
   shouldPrepare = () => true,
   beforePrepare = () => true,
+  canReusePendingPass = () => false,
   onPrepareError,
 }) {
   let preparationPending = false;
@@ -18,7 +19,7 @@ export function preflightPrivateRenderPasses(definitions, {
     try {
       const preparation = prepareRenderPassAsync(passName);
       if (preparation) {
-        preparationPending = true;
+        if (!canReusePendingPass(passName)) preparationPending = true;
         if (onPrepareError) Promise.resolve(preparation).catch(error => onPrepareError(passName, error));
       }
     } catch (error) {
@@ -100,6 +101,12 @@ export function createRenderPipelinePassesOwner({
   } = helpers;
 
   const noopDrawPass = () => {};
+
+  function canReusePendingPass(passName, cache = getRenderPassCacheState()) {
+    return passName === "borders"
+      && !!cache.canvases[passName]
+      && !!getPassReferenceTransform(passName);
+  }
 
   function getIdleRenderPassDefinitions() {
     return IDLE_RENDER_PASS_DEFINITIONS.map(({ passName, drawKey }) => {
@@ -206,7 +213,16 @@ export function createRenderPipelinePassesOwner({
       return;
     }
     if ((passName === "physicalBase" || passName === "contextScenario" || passName === "contextMarkers" || passName === "borders" || passName === "labels")
-      && prepareRenderPassAsync(passName)) return false;
+      && prepareRenderPassAsync(passName)) {
+      if (!canReusePendingPass(passName, cache)) return false;
+      timings.usedDirtyFastFramePasses = [timings.usedDirtyFastFramePasses, passName].filter(Boolean).join(",");
+      recordRenderPerfMetric("idleRenderPassDeferredForPreparation", 0, {
+        passName,
+        reason: "preparation-pending-reuse-surface",
+        activeScenarioId: String(state.activeScenarioId || ""),
+      });
+      return;
+    }
     renderPassToCache(passName, drawFn, transform, timings);
   }
 
@@ -231,6 +247,7 @@ export function createRenderPipelinePassesOwner({
     // canvas is cleared or published by this preflight.
     const preparationPending = preflightPrivateRenderPasses(definitions, {
       prepareRenderPassAsync,
+      canReusePendingPass,
       shouldPrepare: passName => cache.dirty[passName]
         || cache.signatures[passName] !== getRenderPassSignature(passName, transform),
     });
