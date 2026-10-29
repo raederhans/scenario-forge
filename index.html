@@ -25,10 +25,11 @@
   </head>
   <body class="app-booting editor-workspace">
     <header id="editorProjectBar" class="editor-project-bar" aria-label="Project" data-i18n-aria-label="Project"></header>
+    <h1 class="visually-hidden">Scenario Forge</h1>
     <div id="appShell" class="app-layout">
       <a class="skip-link" href="#mapContainer" data-i18n="Skip to map workspace">Skip to map workspace</a>
       <aside id="leftSidebar" class="sidebar sidebar-left">
-        <button type="button" class="sidebar-drawer-close" data-close-drawer="left" aria-label="Close panels" data-i18n-aria-label="Close panels">×</button>
+        <button type="button" class="sidebar-drawer-close" data-close-drawer="left" aria-label="Close panels" data-i18n-aria-label="Close panels"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-close"><path d="M6 6l12 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
         <button
           id="leftSidebarCollapseBtn"
           class="left-sidebar-collapse-btn"
@@ -38,36 +39,35 @@
           aria-label="Collapse left sidebar"
           data-i18n-aria-label="Collapse left sidebar"
         >
-          <span id="leftSidebarCollapseIcon" aria-hidden="true">&lsaquo;</span>
+          <span id="leftSidebarCollapseIcon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-left"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
         </button>
         <div id="leftSidebarContent" class="sidebar-sections">
           <div class="sidebar-header-block">
             <div class="sidebar-shell-heading" data-i18n="Workspace">Workspace</div>
             <div class="sidebar-brand-row">
               <div class="app-title-row app-title-row-compact">
-                <h1 class="app-title" data-i18n="Scenario Forge">Scenario Forge</h1>
+                <div class="app-title" data-i18n="Scenario Forge">Scenario Forge</div>
               </div>
             </div>
             <div class="workspace-file-actions">
               <button id="workspaceSaveBtn" type="button" class="btn-primary" data-i18n="Save project">Save project</button>
               <button id="workspaceExportBtn" type="button" class="btn-secondary" data-i18n="Export image">Export image</button>
-              <a id="workspaceGithubLink" class="btn-secondary" href="https://github.com/raederhans/scenario-forge" target="_blank" rel="noreferrer" aria-label="Star Scenario Forge on GitHub" data-i18n-aria-label="Star Scenario Forge on GitHub">
+              <a id="workspaceGithubLink" class="btn-secondary" href="https://github.com/raederhans/scenario-forge" target="_blank" rel="noreferrer" aria-label="Star Scenario Forge on GitHub" data-i18n-aria-label="Star Scenario Forge on GitHub" title="Star Scenario Forge on GitHub" data-i18n-title="Star Scenario Forge on GitHub">
                 <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
-                <span data-i18n="Star on GitHub">Star on GitHub</span>
               </a>
             </div>
             <p id="workspaceSaveStatus" class="workspace-save-status" role="status" aria-live="polite" data-i18n="Not saved yet">Not saved yet</p>
           </div>
 
           <details class="card sidebar-details-card" aria-labelledby="lblScenario">
-            <summary id="lblScenario" class="section-header">Scenario</summary>
+            <summary id="lblScenario" class="section-header" data-i18n="Scenario">Scenario</summary>
             <div class="sidebar-details-body">
               <div id="scenarioStatus" class="body-text visually-hidden">No scenario active</div>
               <div id="scenarioAuditHint" class="body-text visually-hidden hidden">Coverage report unavailable</div>
               <a id="hgoEditorLink" class="btn-secondary" href="apps/hgo/index.html" data-i18n="Open HGO editor">Open HGO editor</a>
-              <label id="lblScenarioSelect" class="visually-hidden" for="scenarioSelect">Scenario</label>
+              <label id="lblScenarioSelect" class="visually-hidden" for="scenarioSelect" data-i18n="Scenario">Scenario</label>
               <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input scenario-select-native" aria-hidden="true" tabindex="-1">
-                <option id="optScenarioNone" value="">None</option>
+                <option id="optScenarioNone" value="" data-i18n="None">None</option>
               </select>
               <div class="scenario-select-shell">
                 <button
@@ -79,14 +79,14 @@
                   aria-labelledby="lblScenarioSelect scenarioSelectButtonText"
                 >
                   <span id="scenarioSelectButtonText" class="u-truncate">None</span>
-                  <span class="scenario-select-chevron" aria-hidden="true">▾</span>
+                  <span class="scenario-select-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-down"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
                 </button>
                 <div id="scenarioSelectMenu" class="scenario-select-menu hidden" role="listbox" aria-labelledby="lblScenarioSelect"></div>
               </div>
               <div class="sidebar-equal-actions mt-3">
-                <button id="applyScenarioBtn" type="button" class="btn-secondary">Apply</button>
-                <button id="resetScenarioBtn" type="button" class="btn-secondary hidden" disabled>Reset</button>
-                <button id="clearScenarioBtn" type="button" class="btn-secondary hidden" disabled>Exit Scenario</button>
+                <button id="applyScenarioBtn" type="button" class="btn-secondary" data-i18n="Apply">Apply</button>
+                <button id="resetScenarioBtn" type="button" class="btn-secondary hidden" disabled data-i18n="Reset Changes To Baseline">Reset</button>
+                <button id="clearScenarioBtn" type="button" class="btn-secondary hidden" disabled data-i18n="Exit Scenario">Exit Scenario</button>
               </div>
               <label id="blankFeatureLabelsToggleRow" class="toggle-label mt-3 hidden">
                 <input id="toggleBlankFeatureLabels" type="checkbox" class="checkbox-input" />
@@ -95,9 +95,9 @@
             </div>
           </details>
 
-          <h2 id="appearanceSectionHeading" class="visually-hidden">Appearance</h2>
+          <h2 id="appearanceSectionHeading" class="visually-hidden" data-i18n="Appearance">Appearance</h2>
           <details class="card appearance-card" aria-labelledby="appearanceSectionHeading labelMapStyle">
-            <summary id="labelMapStyle" class="section-header">Appearance</summary>
+            <summary id="labelMapStyle" class="section-header" data-i18n="Appearance">Appearance</summary>
             <div class="appearance-toolbar mt-3">
               <div class="appearance-tab-row" role="tablist" aria-label="Appearance sections" data-i18n-aria-label="Appearance sections">
                 <button
@@ -186,13 +186,13 @@
                 class="card-flat appearance-subsection map-content-panel"
                 aria-labelledby="lblOcean"
               >
-                <h2 id="lblOcean" class="section-header">Ocean</h2>
+                <h2 id="lblOcean" class="section-header" data-i18n="Ocean">Ocean</h2>
                 <div class="appearance-ocean-grid mt-3">
                   <section class="appearance-control-card" aria-labelledby="lblOceanSurfaceCard">
                     <h3 id="lblOceanSurfaceCard" class="appearance-control-card-title" data-i18n="Surface Colors">Surface Colors</h3>
                     <div class="appearance-control-card-stack">
                       <div class="flex items-center justify-between gap-3">
-                        <label id="lblOceanFillColor" class="range-label" for="oceanFillColor">Fill Color</label>
+                        <label id="lblOceanFillColor" class="range-label" for="oceanFillColor" data-i18n="Fill Color">Fill Color</label>
                         <input id="oceanFillColor" type="color" value="#aadaff" class="color-input" />
                       </div>
                       <label class="toggle-label">
@@ -214,7 +214,7 @@
                       <div id="oceanCoastalAccentRow" class="space-y-2 hidden">
                         <label class="toggle-label">
                           <input id="oceanCoastalAccentToggle" type="checkbox" class="checkbox-input" checked />
-                          <span id="lblOceanCoastalAccent">Coastal Accent</span>
+                          <span id="lblOceanCoastalAccent" data-i18n="Coastal Accent">Coastal Accent</span>
                         </label>
                       </div>
                     </div>
@@ -225,16 +225,16 @@
                     <div class="appearance-control-card-stack">
                       <label class="toggle-label">
                         <input id="oceanAdvancedStylesToggle" type="checkbox" checked class="checkbox-input" />
-                        <span id="lblOceanAdvancedStylesToggle">Bathymetry</span>
+                        <span id="lblOceanAdvancedStylesToggle" data-i18n="Bathymetry">Bathymetry</span>
                       </label>
                       <div>
                         <div class="range-row">
-                          <label id="lblOceanStyle" class="range-label" for="oceanStyleSelect">Style</label>
+                          <label id="lblOceanStyle" class="range-label" for="oceanStyleSelect" data-i18n="Style">Style</label>
                         </div>
                         <select id="oceanStyleSelect" class="select-input mt-2">
-                          <option id="optOceanFlat" value="flat" selected>Flat Blue</option>
-                          <option id="optOceanBathymetrySoft" value="bathymetry_soft" selected disabled>Bathymetry Soft</option>
-                          <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled>Bathymetry Contours</option>
+                          <option id="optOceanFlat" value="flat" selected data-i18n="Flat Blue">Flat Blue</option>
+                          <option id="optOceanBathymetrySoft" value="bathymetry_soft" selected disabled data-i18n="Bathymetry Soft">Bathymetry Soft</option>
+                          <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled data-i18n="Bathymetry Contours">Bathymetry Contours</option>
                         </select>
                       </div>
                       <p class="sidebar-tool-hint" data-i18n="Global oceans · raster-derived bathymetry">Global oceans · raster-derived bathymetry</p>
@@ -261,21 +261,21 @@
                     <div class="appearance-control-card-stack">
                       <div>
                         <div class="range-row">
-                          <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity">Bathymetry opacity</label>
+                          <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity" data-i18n="Bathymetry opacity">Bathymetry opacity</label>
                           <span id="oceanTextureOpacityValue" class="range-value">90%</span>
                         </div>
                         <input id="oceanTextureOpacity" type="range" min="0" max="100" value="90" class="range-input" />
                       </div>
                       <div>
                         <div class="range-row">
-                          <label id="lblOceanScale" class="range-label" for="oceanTextureScale">Depth contrast</label>
+                          <label id="lblOceanScale" class="range-label" for="oceanTextureScale" data-i18n="Depth contrast">Depth contrast</label>
                           <span id="oceanTextureScaleValue" class="range-value">1.25x</span>
                         </div>
                         <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="125" class="range-input" />
                       </div>
                       <div>
                         <div class="range-row">
-                          <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength">Bathymetry contour strength</label>
+                          <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength" data-i18n="Bathymetry contour strength">Bathymetry contour strength</label>
                           <span id="oceanContourStrengthValue" class="range-value">0%</span>
                         </div>
                         <input id="oceanContourStrength" type="range" min="0" max="100" value="0" class="range-input" />
@@ -321,14 +321,14 @@
                     </div>
                   </section>
                   <details id="oceanBathymetryDebugDetails" class="appearance-mini-section dev-only">
-                    <summary id="lblOceanBathymetryDebug" class="section-header">Bathymetry Debug</summary>
+                    <summary id="lblOceanBathymetryDebug" class="section-header" data-i18n="Bathymetry Debug">Bathymetry Debug</summary>
                     <div class="space-y-3 mt-3">
                       <p id="oceanBathymetryDebugHint" class="sidebar-tool-hint">
                         Data source, rendering backend and loaded tiles.
                       </p>
                       <div>
                         <div class="range-row">
-                          <span id="lblOceanBathymetrySource" class="range-label">Data Source</span>
+                          <span id="lblOceanBathymetrySource" class="range-label" data-i18n="Data Source">Data Source</span>
                           <span id="oceanBathymetrySourceValue" class="range-value">None</span>
                         </div>
                         <div class="range-row mt-2">
@@ -352,7 +352,7 @@
                 role="tabpanel"
                 aria-labelledby="appearanceTabBorders"
               >
-                <h2 id="lblBordersPanel" class="section-header">Borders</h2>
+                <h2 id="lblBordersPanel" class="section-header" data-i18n="Borders">Borders</h2>
                 <div class="mt-3">
                   <label class="toggle-label">
                     <input id="toggleCountryLabels" type="checkbox" class="checkbox-input" checked />
@@ -386,7 +386,7 @@
                 </details>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section">
-                    <summary id="lblInternalBorders" class="section-header">Internal Borders</summary>
+                    <summary id="lblInternalBorders" class="section-header" data-i18n="Internal Borders">Internal Borders</summary>
                     <div class="border-control-body mt-3">
                       <label class="toggle-label">
                         <input id="internalBorderAutoColor" type="checkbox" class="checkbox-input" checked />
@@ -414,7 +414,7 @@
                   </details>
 
                   <details class="appearance-mini-section">
-                    <summary id="lblEmpireBorders" class="section-header">Country Borders</summary>
+                    <summary id="lblEmpireBorders" class="section-header" data-i18n="Country Borders">Country Borders</summary>
                     <div class="border-control-body mt-3">
                       <label class="toggle-label">
                         <input id="politicalBorderToggle" type="checkbox" class="checkbox-input" />
@@ -442,7 +442,7 @@
                   </details>
 
                   <details class="appearance-mini-section">
-                    <summary id="lblCoastlines" class="section-header">Coastlines</summary>
+                    <summary id="lblCoastlines" class="section-header" data-i18n="Coastlines">Coastlines</summary>
                     <div class="border-control-body mt-3">
                       <div class="border-control-row">
                         <label class="range-label" for="coastlineColor" data-i18n="Color">Color</label>
@@ -466,40 +466,40 @@
                   </details>
 
                   <details class="appearance-mini-section">
-                    <summary id="lblParentBorders" class="section-header">Parent Unit Borders</summary>
+                    <summary id="lblParentBorders" class="section-header" data-i18n="Parent Unit Borders">Parent Unit Borders</summary>
                     <div class="border-control-body mt-3">
                       <label class="toggle-label">
                         <input id="parentBordersVisible" type="checkbox" class="checkbox-input" checked />
                         <span data-i18n="Show Parent Unit Borders">Show Parent Unit Borders</span>
                       </label>
                       <div class="border-control-row">
-                        <label id="lblParentBorderColor" class="range-label" for="parentBorderColor">Color</label>
+                        <label id="lblParentBorderColor" class="range-label" for="parentBorderColor" data-i18n="Color">Color</label>
                         <input id="parentBorderColor" type="color" value="#4b5563" class="color-input" />
                       </div>
                       <div>
                         <div class="range-row">
-                          <label id="lblParentBorderOpacity" class="range-label" for="parentBorderOpacity">Opacity</label>
+                          <label id="lblParentBorderOpacity" class="range-label" for="parentBorderOpacity" data-i18n="Opacity">Opacity</label>
                           <span id="parentBorderOpacityValue" class="range-value">85%</span>
                         </div>
                         <input id="parentBorderOpacity" type="range" min="0" max="100" value="85" class="range-input" />
                       </div>
                       <div>
                         <div class="range-row">
-                          <label id="lblParentBorderWidth" class="range-label" for="parentBorderWidth">Width</label>
+                          <label id="lblParentBorderWidth" class="range-label" for="parentBorderWidth" data-i18n="Width">Width</label>
                           <span id="parentBorderWidthValue" class="range-value">1.10</span>
                         </div>
                         <input id="parentBorderWidth" type="range" min="0.2" max="4.0" step="0.05" value="1.10" class="range-input" />
                       </div>
-                      <div id="lblParentBorderCountries" class="range-label mt-2">Show Parent Borders By Country</div>
+                      <div id="lblParentBorderCountries" class="range-label mt-2" data-i18n="Show Parent Borders By Country">Show Parent Borders By Country</div>
                       <div class="parent-border-actions mt-2">
-                        <button id="parentBorderEnableAll" type="button" class="btn-secondary">Enable All</button>
-                        <button id="parentBorderDisableAll" type="button" class="btn-secondary">Clear All</button>
+                        <button id="parentBorderEnableAll" type="button" class="btn-secondary" data-i18n="Enable All">Enable All</button>
+                        <button id="parentBorderDisableAll" type="button" class="btn-secondary" data-i18n="Clear All">Clear All</button>
                       </div>
                       <div id="parentBorderEmpty" class="parent-border-empty mt-2 hidden">
                         No supported countries in current dataset.
                       </div>
                       <div id="parentBorderCountryList" class="parent-border-country-list mt-2"></div>
-                      <button id="recalculateBordersBtn" class="btn-secondary mt-3" type="button">Recalculate Borders</button>
+                      <button id="recalculateBordersBtn" class="btn-secondary mt-3" type="button" data-i18n="Recalculate Borders">Recalculate Borders</button>
                       <div id="dynamicBorderStatus" class="body-text mt-2">Borders up to date</div>
                     </div>
                   </details>
@@ -514,11 +514,11 @@
               >
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="physical regions terrain atlas terrain contours">
-                  <summary id="lblPhysicalPanel" class="section-header">Physical Regions</summary>
+                  <summary id="lblPhysicalPanel" class="section-header" data-i18n="Physical Regions">Physical Regions</summary>
                   <div class="physical-panel-body">
                   <label class="toggle-label mt-2">
                   <input id="togglePhysical" type="checkbox" class="checkbox-input" />
-                  <span id="lblPhysicalLayer">Physical Regions</span>
+                  <span id="lblPhysicalLayer" data-i18n="Physical Regions">Physical Regions</span>
                   </label>
                   <div class="physical-basic-controls">
                   <div class="flex items-center justify-between gap-3">
@@ -530,16 +530,16 @@
                   </select>
                   </div>
                   <div class="flex items-center justify-between gap-3">
-                  <label id="lblPhysicalMode" class="range-label" for="physicalMode">Mode</label>
+                  <label id="lblPhysicalMode" class="range-label" for="physicalMode" data-i18n="Mode">Mode</label>
                   <select id="physicalMode" class="select-input">
-                  <option id="optPhysicalModeAtlasContours" value="atlas_and_contours" selected>Atlas + Contours</option>
-                  <option id="optPhysicalModeAtlasOnly" value="atlas_only">Atlas Only</option>
-                  <option id="optPhysicalModeContoursOnly" value="contours_only">Contours Only</option>
+                  <option id="optPhysicalModeAtlasContours" value="atlas_and_contours" selected data-i18n="Atlas + Contours">Atlas + Contours</option>
+                  <option id="optPhysicalModeAtlasOnly" value="atlas_only" data-i18n="Atlas Only">Atlas Only</option>
+                  <option id="optPhysicalModeContoursOnly" value="contours_only" data-i18n="Contours Only">Contours Only</option>
                   </select>
                   </div>
                   <div>
                   <div class="range-row">
-                  <label id="lblPhysicalOpacity" class="range-label" for="physicalOpacity">Opacity</label>
+                  <label id="lblPhysicalOpacity" class="range-label" for="physicalOpacity" data-i18n="Opacity">Opacity</label>
                   <span id="physicalOpacityValue" class="range-value">50%</span>
                   </div>
                   <input id="physicalOpacity" type="range" min="0" max="100" value="50" class="range-input" />
@@ -576,7 +576,7 @@
                   </div>
                   <div>
                   <div class="range-row">
-                  <label id="lblPhysicalRainforestEmphasis" class="range-label" for="physicalRainforestEmphasis">Rainforest Emphasis</label>
+                  <label id="lblPhysicalRainforestEmphasis" class="range-label" for="physicalRainforestEmphasis" data-i18n="Rainforest Emphasis">Rainforest Emphasis</label>
                   <span id="physicalRainforestEmphasisValue" class="range-value">72%</span>
                   </div>
                   <input id="physicalRainforestEmphasis" type="range" min="0" max="100" value="72" class="range-input" />
@@ -639,46 +639,46 @@
                   <div class="physical-section-body">
                   <div>
                   <div class="range-row">
-                  <label id="lblPhysicalContourOpacity" class="range-label" for="physicalContourOpacity">Contour Opacity</label>
+                  <label id="lblPhysicalContourOpacity" class="range-label" for="physicalContourOpacity" data-i18n="Contour Opacity">Contour Opacity</label>
                   <span id="physicalContourOpacityValue" class="range-value">34%</span>
                   </div>
                   <input id="physicalContourOpacity" type="range" min="0" max="100" value="34" class="range-input" />
                   </div>
                   <div>
                   <div class="range-row">
-                  <label id="lblPhysicalContourMajorInterval" class="range-label" for="physicalContourMajorInterval">Major Interval (m)</label>
+                  <label id="lblPhysicalContourMajorInterval" class="range-label" for="physicalContourMajorInterval" data-i18n="Major Interval (m)">Major Interval (m)</label>
                   <span id="physicalContourMajorIntervalValue" class="range-value">500</span>
                   </div>
                   <input id="physicalContourMajorInterval" type="range" min="500" max="2000" step="500" value="500" class="range-input" />
                   </div>
                   <label class="toggle-label mt-1">
                   <input id="physicalMinorContours" type="checkbox" class="checkbox-input" checked />
-                  <span id="lblPhysicalMinorContours">Show Minor Contours</span>
+                  <span id="lblPhysicalMinorContours" data-i18n="Show Minor Contours">Show Minor Contours</span>
                   </label>
                   <details id="physicalContourAdvanced" class="physical-disclosure" >
                   <summary id="lblPhysicalContourAdvanced" data-i18n="Advanced contour settings">Advanced contour settings</summary>
                   <div class="physical-section-body">
                   <div class="flex items-center justify-between gap-3">
-                  <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor">Contour Color</label>
+                  <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor" data-i18n="Contour Color">Contour Color</label>
                   <input id="physicalContourColor" type="color" value="#6b5947" class="color-input" />
                   </div>
                   <div>
                   <div class="range-row">
-                  <label id="lblPhysicalContourMajorWidth" class="range-label" for="physicalContourMajorWidth">Major Width</label>
+                  <label id="lblPhysicalContourMajorWidth" class="range-label" for="physicalContourMajorWidth" data-i18n="Major Width">Major Width</label>
                   <span id="physicalContourMajorWidthValue" class="range-value">0.80</span>
                   </div>
                   <input id="physicalContourMajorWidth" type="range" min="0.2" max="3.0" step="0.01" value="0.80" class="range-input" />
                   </div>
                   <div>
                   <div class="range-row">
-                  <label id="lblPhysicalContourMinorWidth" class="range-label" for="physicalContourMinorWidth">Minor Width</label>
+                  <label id="lblPhysicalContourMinorWidth" class="range-label" for="physicalContourMinorWidth" data-i18n="Minor Width">Minor Width</label>
                   <span id="physicalContourMinorWidthValue" class="range-value">0.45</span>
                   </div>
                   <input id="physicalContourMinorWidth" type="range" min="0.1" max="2.0" step="0.01" value="0.45" class="range-input" />
                   </div>
                   <div>
                   <div class="range-row">
-                  <label id="lblPhysicalContourMinorInterval" class="range-label" for="physicalContourMinorInterval">Minor Interval (m)</label>
+                  <label id="lblPhysicalContourMinorInterval" class="range-label" for="physicalContourMinorInterval" data-i18n="Minor Interval (m)">Minor Interval (m)</label>
                   <span id="physicalContourMinorIntervalValue" class="range-value">100</span>
                   </div>
                   <input id="physicalContourMinorInterval" type="range" min="100" max="1000" step="100" value="100" class="range-input" />
@@ -759,18 +759,18 @@
                   <summary id="lblPhysicalAdvanced" data-i18n="Advanced settings">Advanced settings</summary>
                   <div class="physical-section-body">
                   <div>
-                  <div class="range-row"><label id="lblPhysicalAtlasIntensity" class="range-label" for="physicalAtlasIntensity">Atlas Intensity</label><span id="physicalAtlasIntensityValue" class="range-value">96%</span></div>
+                  <div class="range-row"><label id="lblPhysicalAtlasIntensity" class="range-label" for="physicalAtlasIntensity" data-i18n="Atlas Intensity">Atlas Intensity</label><span id="physicalAtlasIntensityValue" class="range-value">96%</span></div>
                   <input id="physicalAtlasIntensity" type="range" min="20" max="140" value="96" class="range-input" />
                   </div>
                   <div>
                   <div class="range-row">
-                  <label id="lblPhysicalBlendMode" class="range-label" for="physicalBlendMode">Blend Mode</label>
+                  <label id="lblPhysicalBlendMode" class="range-label" for="physicalBlendMode" data-i18n="Blend Mode">Blend Mode</label>
                   </div>
                   <select id="physicalBlendMode" class="select-input mt-2">
-                  <option id="optPhysicalBlendMultiply" value="multiply">Multiply</option>
-                  <option id="optPhysicalBlendSoftLight" value="soft-light">Soft Light</option>
-                  <option id="optPhysicalBlendOverlay" value="overlay">Overlay</option>
-                  <option id="optPhysicalBlendNormal" value="source-over" selected>Normal</option>
+                  <option id="optPhysicalBlendMultiply" value="multiply" data-i18n="Multiply">Multiply</option>
+                  <option id="optPhysicalBlendSoftLight" value="soft-light" data-i18n="Soft Light">Soft Light</option>
+                  <option id="optPhysicalBlendOverlay" value="overlay" data-i18n="Overlay">Overlay</option>
+                  <option id="optPhysicalBlendNormal" value="source-over" selected data-i18n="Normal">Normal</option>
                   </select>
                   </div>
                   </div>
@@ -779,16 +779,16 @@
                   </details>
 
                   <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="urban areas">
-                    <summary id="lblUrbanPanel" class="section-header">Urban Areas</summary>
+                    <summary id="lblUrbanPanel" class="section-header" data-i18n="Urban Areas">Urban Areas</summary>
                     <div class="mt-3">
                       <label class="toggle-label mt-2">
                         <input id="toggleUrban" type="checkbox" class="checkbox-input" />
-                        <span id="lblUrbanLayer">Urban Areas</span>
+                        <span id="lblUrbanLayer" data-i18n="Urban Areas">Urban Areas</span>
                       </label>
                       <div class="ml-5 space-y-2">
                         <div>
                           <div class="range-row">
-                            <label class="range-label" for="urbanMode">Mode</label>
+                            <label class="range-label" for="urbanMode" data-i18n="Mode">Mode</label>
                           </div>
                           <select id="urbanMode" class="select-input mt-2">
                             <option value="adaptive" selected data-i18n="Adaptive">Adaptive</option>
@@ -841,17 +841,17 @@
                         </div>
                         <div id="urbanManualControls" class="space-y-2 hidden">
                           <div class="flex items-center justify-between gap-3">
-                            <label id="lblUrbanColor" class="range-label" for="urbanColor">Color</label>
+                            <label id="lblUrbanColor" class="range-label" for="urbanColor" data-i18n="Color">Color</label>
                             <input id="urbanColor" type="color" value="#4b5563" class="color-input" />
                           </div>
                           <div>
                             <div class="range-row">
-                              <label id="lblUrbanBlendMode" class="range-label" for="urbanBlendMode">Blend Mode</label>
+                              <label id="lblUrbanBlendMode" class="range-label" for="urbanBlendMode" data-i18n="Blend Mode">Blend Mode</label>
                             </div>
                             <select id="urbanBlendMode" class="select-input mt-2">
-                              <option id="optUrbanBlendMultiply" value="multiply" selected>Multiply</option>
-                              <option id="optUrbanBlendNormal" value="source-over">Normal</option>
-                              <option id="optUrbanBlendOverlay" value="overlay">Overlay</option>
+                              <option id="optUrbanBlendMultiply" value="multiply" selected data-i18n="Multiply">Multiply</option>
+                              <option id="optUrbanBlendNormal" value="source-over" data-i18n="Normal">Normal</option>
+                              <option id="optUrbanBlendOverlay" value="overlay" data-i18n="Overlay">Overlay</option>
                             </select>
                           </div>
                         </div>
@@ -864,7 +864,7 @@
                         </div>
                         <div>
                           <div class="range-row">
-                            <label id="lblUrbanMinArea" class="range-label" for="urbanMinArea">Min Area (px)</label>
+                            <label id="lblUrbanMinArea" class="range-label" for="urbanMinArea" data-i18n="Min Area (px)">Min Area (px)</label>
                             <span id="urbanMinAreaValue" class="range-value">1</span>
                           </div>
                           <input id="urbanMinArea" type="range" min="1" max="80" value="1" class="range-input" />
@@ -911,13 +911,13 @@
                   </details>
 
                   <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="city points capitals labels">
-                    <summary id="lblCityPointsPanel" class="section-header">City Points</summary>
+                    <summary id="lblCityPointsPanel" class="section-header" data-i18n="City Points">City Points</summary>
                     <div class="mt-3 city-points-panel">
                       <div class="city-points-panel-body ml-5">
                         <div class="city-points-toggle-card">
                           <label class="toggle-label">
                             <input id="toggleCityPoints" type="checkbox" class="checkbox-input" checked />
-                            <span id="lblCityPointsLayer">City Points</span>
+                            <span id="lblCityPointsLayer" data-i18n="City Points">City Points</span>
                           </label>
                           <span class="summary-info-trigger city-points-help-trigger" tabindex="0" role="button" aria-label="City points help" data-i18n-aria-label="City points help">
                             <svg class="summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -929,15 +929,15 @@
                         </div>
                         <div class="city-points-panel-stack">
                           <section class="appearance-control-card city-hierarchy-card" aria-labelledby="cityHierarchyTitle">
-                            <h4 id="cityHierarchyTitle" class="appearance-control-card-title" data-i18n="Display & style">Display &amp; style</h4>
+                            <h3 id="cityHierarchyTitle" class="appearance-control-card-title" data-i18n="Display & style">Display &amp; style</h3>
                             <div class="appearance-control-card-stack">
                               <label class="range-label" for="cityPointsTheme" data-i18n="Style">Style</label>
                               <select id="cityPointsTheme" class="select-input">
-                                <option id="optCityPointsThemeClassicGraphite" value="classic_graphite" selected>Graphite Signal</option>
-                                <option id="optCityPointsThemeAtlasInk" value="atlas_ink">Cyan Beacon</option>
-                                <option id="optCityPointsThemeParchmentSepia" value="parchment_sepia">Vermilion Ledger</option>
-                                <option id="optCityPointsThemeSlateBlue" value="slate_blue">Royal Violet</option>
-                                <option id="optCityPointsThemeIvoryOutline" value="ivory_outline">Ivory Night</option>
+                                <option id="optCityPointsThemeClassicGraphite" value="classic_graphite" selected data-i18n="Graphite Signal">Graphite Signal</option>
+                                <option id="optCityPointsThemeAtlasInk" value="atlas_ink" data-i18n="Cyan Beacon">Cyan Beacon</option>
+                                <option id="optCityPointsThemeParchmentSepia" value="parchment_sepia" data-i18n="Vermilion Ledger">Vermilion Ledger</option>
+                                <option id="optCityPointsThemeSlateBlue" value="slate_blue" data-i18n="Royal Violet">Royal Violet</option>
+                                <option id="optCityPointsThemeIvoryOutline" value="ivory_outline" data-i18n="Ivory Night">Ivory Night</option>
                               </select>
                               <label class="range-label" for="cityPointsDensityPreset" data-i18n="Map detail">Map detail</label>
                               <select id="cityPointsDensityPreset" class="select-input">
@@ -963,11 +963,11 @@
                           </section>
 
                           <section class="appearance-control-card city-points-style-card" aria-labelledby="lblCityPointsStyleGroup">
-                            <h4 id="lblCityPointsStyleGroup" class="appearance-control-card-title" data-i18n="Markers">Markers</h4>
+                            <h3 id="lblCityPointsStyleGroup" class="appearance-control-card-title" data-i18n="Markers">Markers</h3>
                             <div class="appearance-control-card-stack">
                               <div>
                                 <div class="range-row">
-                                  <label id="lblCityPointsMarkerScale" class="range-label" for="cityPointsMarkerScale">Marker Scale</label>
+                                  <label id="lblCityPointsMarkerScale" class="range-label" for="cityPointsMarkerScale" data-i18n="Marker Scale">Marker Scale</label>
                                   <span id="cityPointsMarkerScaleValue" class="range-value">1.00x</span>
                                 </div>
                                 <input id="cityPointsMarkerScale" type="range" min="0.75" max="2.50" step="0.05" value="1.00" class="range-input" />
@@ -975,7 +975,7 @@
 
                               <div>
                                 <div class="range-row">
-                                  <label id="lblCityPointsOpacity" class="range-label" for="cityPointsOpacity">Point Opacity</label>
+                                  <label id="lblCityPointsOpacity" class="range-label" for="cityPointsOpacity" data-i18n="Point Opacity">Point Opacity</label>
                                   <span id="cityPointsOpacityValue" class="range-value">96%</span>
                                 </div>
                                 <input id="cityPointsOpacity" type="range" min="0" max="100" value="96" class="range-input" />
@@ -984,24 +984,24 @@
                           </section>
 
                           <section class="appearance-control-card city-points-label-card" aria-labelledby="lblCityPointsLabelGroup">
-                            <h4 id="lblCityPointsLabelGroup" class="appearance-control-card-title" data-i18n="Labels">Labels</h4>
+                            <h3 id="lblCityPointsLabelGroup" class="appearance-control-card-title" data-i18n="Labels">Labels</h3>
                             <div class="appearance-control-card-stack">
 
                               <div class="city-points-toggle-stack">
                                 <label class="toggle-label">
                                   <input id="cityPointLabelsEnabled" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblCityPointLabelsEnabled">Show City Labels</span>
+                                  <span id="lblCityPointLabelsEnabled" data-i18n="Show City Labels">Show City Labels</span>
                                 </label>
                                 <label class="toggle-label">
                                   <input id="cityCapitalOverlayEnabled" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblCityCapitalOverlayEnabled">Highlight Capitals</span>
+                                  <span id="lblCityCapitalOverlayEnabled" data-i18n="Highlight Capitals">Highlight Capitals</span>
                                 </label>
                               </div>
                             </div>
                           </section>
 
                           <details class="appearance-mini-section appearance-mini-section-subtle city-points-advanced">
-                            <summary id="lblCityPointsAdvanced" class="section-header">Advanced</summary>
+                            <summary id="lblCityPointsAdvanced" class="section-header" data-i18n="Advanced">Advanced</summary>
                             <div class="space-y-3 mt-3">
                               <div>
                                 <div class="range-row">
@@ -1012,25 +1012,25 @@
                               </div>
                               <div>
                                 <div class="range-row">
-                                  <label id="lblCityPointsLabelDensity" class="range-label" for="cityPointsLabelDensity">Label Density</label>
+                                  <label id="lblCityPointsLabelDensity" class="range-label" for="cityPointsLabelDensity" data-i18n="Label Density">Label Density</label>
                                 </div>
                                 <select id="cityPointsLabelDensity" class="select-input mt-2">
-                                  <option id="optCityLabelDensitySparse" value="sparse">Sparse</option>
-                                  <option id="optCityLabelDensityBalanced" value="balanced" selected>Balanced</option>
-                                  <option id="optCityLabelDensityDense" value="dense">Dense</option>
+                                  <option id="optCityLabelDensitySparse" value="sparse" data-i18n="Sparse">Sparse</option>
+                                  <option id="optCityLabelDensityBalanced" value="balanced" selected data-i18n="Balanced">Balanced</option>
+                                  <option id="optCityLabelDensityDense" value="dense" data-i18n="Dense">Dense</option>
                                 </select>
                               </div>
                               <div class="flex items-center justify-between gap-3">
-                                <label id="lblCityPointsColor" class="range-label" for="cityPointsColor">Point Color</label>
+                                <label id="lblCityPointsColor" class="range-label" for="cityPointsColor" data-i18n="Point Color">Point Color</label>
                                 <input id="cityPointsColor" type="color" value="#20262e" class="color-input" />
                               </div>
                               <div class="flex items-center justify-between gap-3">
-                                <label id="lblCityPointsCapitalColor" class="range-label" for="cityPointsCapitalColor">Capital Highlight Color</label>
+                                <label id="lblCityPointsCapitalColor" class="range-label" for="cityPointsCapitalColor" data-i18n="Capital Highlight Color">Capital Highlight Color</label>
                                 <input id="cityPointsCapitalColor" type="color" value="#f0b84f" class="color-input" />
                               </div>
                               <div>
                                 <div class="range-row">
-                                  <label id="lblCityPointsLabelSize" class="range-label" for="cityPointsLabelSize">Label Size</label>
+                                  <label id="lblCityPointsLabelSize" class="range-label" for="cityPointsLabelSize" data-i18n="Label Size">Label Size</label>
                                   <span id="cityPointsLabelSizeValue" class="range-value">11px</span>
                                 </div>
                                 <input id="cityPointsLabelSize" type="range" min="8" max="24" step="1" value="11" class="range-input" />
@@ -1043,37 +1043,37 @@
                   </details>
 
                   <details id="mapContentPanelRivers" class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="rivers waterways">
-                    <summary id="lblRiversPanel" class="section-header">Rivers</summary>
+                    <summary id="lblRiversPanel" class="section-header" data-i18n="Rivers">Rivers</summary>
                     <div class="mt-3 rivers-panel">
                       <div class="rivers-panel-body ml-5">
                         <div class="rivers-panel-stack">
                           <section class="appearance-control-card rivers-visibility-card" aria-labelledby="lblRiversVisibilityGroup">
-                            <h4 id="lblRiversVisibilityGroup" class="appearance-control-card-title" data-i18n="Visibility">Visibility</h4>
+                            <h3 id="lblRiversVisibilityGroup" class="appearance-control-card-title" data-i18n="Visibility">Visibility</h3>
                             <div class="appearance-control-card-stack">
                               <label class="toggle-label rivers-toggle-card">
                                 <input id="toggleRivers" type="checkbox" class="checkbox-input" checked />
-                                <span id="lblRiversLayer">Rivers</span>
+                                <span id="lblRiversLayer" data-i18n="Rivers">Rivers</span>
                               </label>
                             </div>
                           </section>
 
                           <section class="appearance-control-card rivers-stroke-card" aria-labelledby="lblRiversStrokeGroup">
-                            <h4 id="lblRiversStrokeGroup" class="appearance-control-card-title" data-i18n="River Stroke">River Stroke</h4>
+                            <h3 id="lblRiversStrokeGroup" class="appearance-control-card-title" data-i18n="River Stroke">River Stroke</h3>
                             <div class="appearance-control-card-stack">
                               <div class="flex items-center justify-between gap-3">
-                                <label id="lblRiversColor" class="range-label" for="riversColor">Color</label>
+                                <label id="lblRiversColor" class="range-label" for="riversColor" data-i18n="Color">Color</label>
                                 <input id="riversColor" type="color" value="#3b82f6" class="color-input" />
                               </div>
                               <div>
                                 <div class="range-row">
-                                  <label id="lblRiversOpacity" class="range-label" for="riversOpacity">Opacity</label>
+                                  <label id="lblRiversOpacity" class="range-label" for="riversOpacity" data-i18n="Opacity">Opacity</label>
                                   <span id="riversOpacityValue" class="range-value">88%</span>
                                 </div>
                                 <input id="riversOpacity" type="range" min="0" max="100" value="88" class="range-input" />
                               </div>
                               <div>
                                 <div class="range-row">
-                                  <label id="lblRiversWidth" class="range-label" for="riversWidth">Width</label>
+                                  <label id="lblRiversWidth" class="range-label" for="riversWidth" data-i18n="Width">Width</label>
                                   <span id="riversWidthValue" class="range-value">0.50</span>
                                 </div>
                                 <input id="riversWidth" type="range" min="0.2" max="4.0" step="0.05" value="0.50" class="range-input" />
@@ -1082,27 +1082,27 @@
                           </section>
 
                           <section class="appearance-control-card rivers-outline-card" aria-labelledby="lblRiversOutlineGroup">
-                            <h4 id="lblRiversOutlineGroup" class="appearance-control-card-title" data-i18n="Outline & Dash">Outline &amp; Dash</h4>
+                            <h3 id="lblRiversOutlineGroup" class="appearance-control-card-title" data-i18n="Outline & Dash">Outline &amp; Dash</h3>
                             <div class="appearance-control-card-stack">
                               <div class="flex items-center justify-between gap-3">
-                                <label id="lblRiversOutlineColor" class="range-label" for="riversOutlineColor">Outline Color</label>
+                                <label id="lblRiversOutlineColor" class="range-label" for="riversOutlineColor" data-i18n="Outline Color">Outline Color</label>
                                 <input id="riversOutlineColor" type="color" value="#e2efff" class="color-input" />
                               </div>
                               <div>
                                 <div class="range-row">
-                                  <label id="lblRiversOutlineWidth" class="range-label" for="riversOutlineWidth">Outline Width</label>
+                                  <label id="lblRiversOutlineWidth" class="range-label" for="riversOutlineWidth" data-i18n="Outline Width">Outline Width</label>
                                   <span id="riversOutlineWidthValue" class="range-value">0.25</span>
                                 </div>
                                 <input id="riversOutlineWidth" type="range" min="0.0" max="3.0" step="0.05" value="0.25" class="range-input" />
                               </div>
                               <div>
                                 <div class="range-row">
-                                  <label id="lblRiversDashStyle" class="range-label" for="riversDashStyle">Dash</label>
+                                  <label id="lblRiversDashStyle" class="range-label" for="riversDashStyle" data-i18n="Dash">Dash</label>
                                 </div>
                                 <select id="riversDashStyle" class="select-input mt-2">
-                                  <option id="optRiversDashSolid" value="solid" selected>Solid</option>
-                                  <option id="optRiversDashDashed" value="dashed">Dashed</option>
-                                  <option id="optRiversDashDotted" value="dotted">Dotted</option>
+                                  <option id="optRiversDashSolid" value="solid" selected data-i18n="Solid">Solid</option>
+                                  <option id="optRiversDashDashed" value="dashed" data-i18n="Dashed">Dashed</option>
+                                  <option id="optRiversDashDotted" value="dotted" data-i18n="Dotted">Dotted</option>
                                 </select>
                               </div>
                             </div>
@@ -1120,25 +1120,25 @@
                 class="card-flat appearance-subsection map-content-panel"
                 aria-labelledby="lblDayNightPanel"
               >
-                <h2 id="lblDayNightPanel" class="section-header">Day / Night</h2>
+                <h2 id="lblDayNightPanel" class="section-header" data-i18n="Day / Night">Day / Night</h2>
                 <div class="appearance-day-night-stack mt-3">
                   <label class="toggle-label appearance-day-night-card">
                     <input id="dayNightEnabled" type="checkbox" class="checkbox-input" />
-                    <span id="lblDayNightEnabled">Enable Day / Night Cycle</span>
+                    <span id="lblDayNightEnabled" data-i18n="Enable Day / Night Cycle">Enable Day / Night Cycle</span>
                   </label>
 
                   <div class="appearance-day-night-card">
-                    <label id="lblDayNightMode" class="section-header-block" for="dayNightMode">Clock Mode</label>
+                    <label id="lblDayNightMode" class="section-header-block" for="dayNightMode" data-i18n="Clock Mode">Clock Mode</label>
                     <select id="dayNightMode" class="select-input mt-2">
-                      <option id="optDayNightModeManual" value="manual" selected>Manual UTC</option>
-                      <option id="optDayNightModeUtc" value="utc">Live Computer UTC</option>
-                      <option id="optDayNightModeCycle" value="cycle">Continuous Cycle</option>
+                      <option id="optDayNightModeManual" value="manual" selected data-i18n="Manual UTC">Manual UTC</option>
+                      <option id="optDayNightModeUtc" value="utc" data-i18n="Live Computer UTC">Live Computer UTC</option>
+                      <option id="optDayNightModeCycle" value="cycle" data-i18n="Continuous Cycle">Continuous Cycle</option>
                     </select>
                   </div>
 
                   <div id="dayNightManualControls" class="appearance-day-night-card">
                     <div class="range-row">
-                      <label id="lblDayNightTime" class="range-label" for="dayNightManualTime">UTC Time</label>
+                      <label id="lblDayNightTime" class="range-label" for="dayNightManualTime" data-i18n="UTC Time">UTC Time</label>
                       <span id="dayNightManualTimeValue" class="range-value">12:00 UTC</span>
                     </div>
                     <input
@@ -1161,7 +1161,7 @@
 
                   <div id="dayNightCycleControls" class="appearance-day-night-card hidden">
                     <div class="range-row">
-                      <label id="lblDayNightCycleSpeed" class="range-label" for="dayNightCycleSpeed">Cycle Speed</label>
+                      <label id="lblDayNightCycleSpeed" class="range-label" for="dayNightCycleSpeed" data-i18n="Cycle Speed">Cycle Speed</label>
                       <span id="dayNightCycleSpeedValue" class="range-value"></span>
                     </div>
                     <input
@@ -1178,15 +1178,15 @@
                   <div class="appearance-day-night-card">
                     <label class="toggle-label">
                       <input id="dayNightCityLightsEnabled" type="checkbox" class="checkbox-input" checked />
-                      <span id="lblDayNightCityLights">City Lights</span>
+                      <span id="lblDayNightCityLights" data-i18n="City Lights">City Lights</span>
                     </label>
                     <div class="ml-5 space-y-2">
                       <div>
                         <div class="range-row">
-                          <label id="lblDayNightCityLightsStyle" class="range-label" for="dayNightCityLightsStyle">Style</label>
+                          <label id="lblDayNightCityLightsStyle" class="range-label" for="dayNightCityLightsStyle" data-i18n="Style">Style</label>
                         </div>
                         <select id="dayNightCityLightsStyle" class="select-input mt-2">
-                          <option id="optDayNightCityLightsModern" value="modern" selected>Modern</option>
+                          <option id="optDayNightCityLightsModern" value="modern" selected data-i18n="Modern">Modern</option>
                           <option id="optDayNightCityLightsHistorical1930s" value="historical_1930s">
                             1930s Electrification Proxy
                           </option>
@@ -1194,7 +1194,7 @@
                       </div>
                       <div>
                         <div class="range-row">
-                          <label id="lblDayNightCityLightsIntensity" class="range-label" for="dayNightCityLightsIntensity">Intensity</label>
+                          <label id="lblDayNightCityLightsIntensity" class="range-label" for="dayNightCityLightsIntensity" data-i18n="Intensity">Intensity</label>
                           <span id="dayNightCityLightsIntensityValue" class="range-value">115%</span>
                         </div>
                         <input id="dayNightCityLightsIntensity" type="range" min="0" max="180" value="115" class="range-input" />
@@ -1203,7 +1203,7 @@
                   </div>
 
                   <details class="appearance-mini-section appearance-day-night-advanced">
-                    <summary id="lblDayNightAdvanced" class="section-header">Advanced</summary>
+                    <summary id="lblDayNightAdvanced" class="section-header" data-i18n="Advanced">Advanced</summary>
                     <div class="space-y-2 mt-3">
                       <div>
                         <div class="range-row">
@@ -1211,7 +1211,7 @@
                             id="lblDayNightTextureOpacity"
                             class="range-label"
                             for="dayNightCityLightsTextureOpacity"
-                          >
+                           data-i18n="Texture Opacity (Modern only)">
                             Background Light Opacity (Modern only)
                           </label>
                           <span id="dayNightCityLightsTextureOpacityValue" class="range-value">74%</span>
@@ -1231,7 +1231,7 @@
                             id="lblDayNightCorridorStrength"
                             class="range-label"
                             for="dayNightCityLightsCorridorStrength"
-                          >
+                           data-i18n="Corridor Strength (Modern only)">
                             Corridor Strength (Modern only)
                           </label>
                           <span id="dayNightCityLightsCorridorStrengthValue" class="range-value">42%</span>
@@ -1251,7 +1251,7 @@
                             id="lblDayNightCoreSharpness"
                             class="range-label"
                             for="dayNightCityLightsCoreSharpness"
-                          >
+                           data-i18n="Core Sharpness (Modern only)">
                             Core Sharpness (Modern only)
                           </label>
                           <span id="dayNightCityLightsCoreSharpnessValue" class="range-value">62%</span>
@@ -1291,14 +1291,14 @@
                           class="range-input"
                         />
                       </div>
-                      <div id="lblDayNightHistoricalOnly" class="section-header-block mt-3">Historical only</div>
+                      <div id="lblDayNightHistoricalOnly" class="section-header-block mt-3" data-i18n="Historical only">Historical only</div>
                       <div>
                         <div class="range-row">
                           <label
                             id="lblDayNightHistoricalCityLightsDensity"
                             class="range-label"
                             for="dayNightHistoricalCityLightsDensity"
-                          >
+                           data-i18n="Historical Light Density">
                             Historical Light Density
                           </label>
                           <span id="dayNightHistoricalCityLightsDensityValue" class="range-value">112%</span>
@@ -1318,7 +1318,7 @@
                             id="lblDayNightHistoricalCityLightsSecondaryRetention"
                             class="range-label"
                             for="dayNightHistoricalCityLightsSecondaryRetention"
-                          >
+                           data-i18n="Secondary City Retention">
                             Secondary City Retention
                           </label>
                           <span id="dayNightHistoricalCityLightsSecondaryRetentionValue" class="range-value">46%</span>
@@ -1334,14 +1334,14 @@
                       </div>
                       <div>
                         <div class="range-row">
-                          <label id="lblDayNightShadowOpacity" class="range-label" for="dayNightShadowOpacity">Shadow Opacity</label>
+                          <label id="lblDayNightShadowOpacity" class="range-label" for="dayNightShadowOpacity" data-i18n="Shadow Opacity">Shadow Opacity</label>
                           <span id="dayNightShadowOpacityValue" class="range-value">38%</span>
                         </div>
                         <input id="dayNightShadowOpacity" type="range" min="0" max="85" value="38" class="range-input" />
                       </div>
                       <div>
                         <div class="range-row">
-                          <label id="lblDayNightTwilightWidth" class="range-label" for="dayNightTwilightWidth">Twilight Width</label>
+                          <label id="lblDayNightTwilightWidth" class="range-label" for="dayNightTwilightWidth" data-i18n="Twilight Width">Twilight Width</label>
                           <span id="dayNightTwilightWidthValue" class="range-value">10°</span>
                         </div>
                         <input id="dayNightTwilightWidth" type="range" min="2" max="28" value="10" class="range-input" />
@@ -1356,18 +1356,18 @@
                 class="card-flat appearance-subsection map-content-panel"
                 aria-labelledby="lblTexture"
               >
-                <h2 id="lblTexture" class="section-header">Texture</h2>
+                <h2 id="lblTexture" class="section-header" data-i18n="Texture">Texture</h2>
                 <div class="space-y-3 mt-3">
-                  <label id="lblOverlay" class="section-header-block" for="textureSelect">Overlay</label>
+                  <label id="lblOverlay" class="section-header-block" for="textureSelect" data-i18n="Overlay">Overlay</label>
                   <select id="textureSelect" class="select-input mt-2">
-                    <option id="optTextureNone" value="none" selected>Clean</option>
-                    <option id="optTexturePaper" value="paper">Old Paper</option>
-                    <option id="optTextureDraftGrid" value="draft_grid">Draft Grid</option>
-                    <option id="optTextureGraticule" value="graticule">Graticule</option>
+                    <option id="optTextureNone" value="none" selected data-i18n="Clean">Clean</option>
+                    <option id="optTexturePaper" value="paper" data-i18n="Old Paper">Old Paper</option>
+                    <option id="optTextureDraftGrid" value="draft_grid" data-i18n="Draft Grid">Draft Grid</option>
+                    <option id="optTextureGraticule" value="graticule" data-i18n="Graticule">Graticule</option>
                   </select>
                   <div>
                     <div class="range-row">
-                      <label id="lblTextureOpacity" class="range-label" for="textureOpacity">Opacity</label>
+                      <label id="lblTextureOpacity" class="range-label" for="textureOpacity" data-i18n="Opacity">Opacity</label>
                       <span id="textureOpacityValue" class="range-value">88%</span>
                     </div>
                     <input id="textureOpacity" type="range" min="0" max="100" value="88" class="range-input" />
@@ -1375,28 +1375,28 @@
                   <div id="texturePaperControls" class="space-y-2 hidden">
                     <div>
                       <div class="range-row">
-                        <label id="lblTexturePaperScale" class="range-label" for="texturePaperScale">Paper Scale</label>
+                        <label id="lblTexturePaperScale" class="range-label" for="texturePaperScale" data-i18n="Paper Scale">Paper Scale</label>
                         <span id="texturePaperScaleValue" class="range-value">1.00x</span>
                       </div>
                       <input id="texturePaperScale" type="range" min="55" max="240" step="1" value="100" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTexturePaperWarmth" class="range-label" for="texturePaperWarmth">Warmth</label>
+                        <label id="lblTexturePaperWarmth" class="range-label" for="texturePaperWarmth" data-i18n="Warmth">Warmth</label>
                         <span id="texturePaperWarmthValue" class="range-value">62%</span>
                       </div>
                       <input id="texturePaperWarmth" type="range" min="0" max="100" value="62" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTexturePaperGrain" class="range-label" for="texturePaperGrain">Grain</label>
+                        <label id="lblTexturePaperGrain" class="range-label" for="texturePaperGrain" data-i18n="Grain">Grain</label>
                         <span id="texturePaperGrainValue" class="range-value">34%</span>
                       </div>
                       <input id="texturePaperGrain" type="range" min="0" max="100" value="34" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTexturePaperWear" class="range-label" for="texturePaperWear">Wear</label>
+                        <label id="lblTexturePaperWear" class="range-label" for="texturePaperWear" data-i18n="Wear">Wear</label>
                         <span id="texturePaperWearValue" class="range-value">26%</span>
                       </div>
                       <input id="texturePaperWear" type="range" min="0" max="100" value="26" class="range-input" />
@@ -1405,64 +1405,64 @@
                   <div id="textureGraticuleControls" class="space-y-2 hidden">
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureGraticuleMajorStep" class="range-label" for="textureGraticuleMajorStep">Major Step</label>
+                        <label id="lblTextureGraticuleMajorStep" class="range-label" for="textureGraticuleMajorStep" data-i18n="Major Step">Major Step</label>
                         <span id="textureGraticuleMajorStepValue" class="range-value">30°</span>
                       </div>
                       <input id="textureGraticuleMajorStep" type="range" min="10" max="90" step="5" value="30" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureGraticuleMinorStep" class="range-label" for="textureGraticuleMinorStep">Minor Step</label>
+                        <label id="lblTextureGraticuleMinorStep" class="range-label" for="textureGraticuleMinorStep" data-i18n="Minor Step">Minor Step</label>
                         <span id="textureGraticuleMinorStepValue" class="range-value">15°</span>
                       </div>
                       <input id="textureGraticuleMinorStep" type="range" min="1" max="45" step="1" value="15" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureGraticuleLabelStep" class="range-label" for="textureGraticuleLabelStep">Label Step</label>
+                        <label id="lblTextureGraticuleLabelStep" class="range-label" for="textureGraticuleLabelStep" data-i18n="Label Step">Label Step</label>
                         <span id="textureGraticuleLabelStepValue" class="range-value">60°</span>
                       </div>
                       <input id="textureGraticuleLabelStep" type="range" min="10" max="180" step="5" value="60" class="range-input" />
                     </div>
                     <div class="flex items-center justify-between gap-3">
-                      <label id="lblTextureGraticuleColor" class="range-label" for="textureGraticuleColor">Line Color</label>
+                      <label id="lblTextureGraticuleColor" class="range-label" for="textureGraticuleColor" data-i18n="Line Color">Line Color</label>
                       <input id="textureGraticuleColor" type="color" value="#475569" class="color-input" />
                     </div>
                     <div class="flex items-center justify-between gap-3">
-                      <label id="lblTextureGraticuleLabelColor" class="range-label" for="textureGraticuleLabelColor">Label Color</label>
+                      <label id="lblTextureGraticuleLabelColor" class="range-label" for="textureGraticuleLabelColor" data-i18n="Label Color">Label Color</label>
                       <input id="textureGraticuleLabelColor" type="color" value="#334155" class="color-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureGraticuleLabelSize" class="range-label" for="textureGraticuleLabelSize">Label Size</label>
+                        <label id="lblTextureGraticuleLabelSize" class="range-label" for="textureGraticuleLabelSize" data-i18n="Label Size">Label Size</label>
                         <span id="textureGraticuleLabelSizeValue" class="range-value">12px</span>
                       </div>
                       <input id="textureGraticuleLabelSize" type="range" min="9" max="24" step="1" value="12" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureGraticuleMajorWidth" class="range-label" for="textureGraticuleMajorWidth">Major Width</label>
+                        <label id="lblTextureGraticuleMajorWidth" class="range-label" for="textureGraticuleMajorWidth" data-i18n="Major Width">Major Width</label>
                         <span id="textureGraticuleMajorWidthValue" class="range-value">1.20</span>
                       </div>
                       <input id="textureGraticuleMajorWidth" type="range" min="0.2" max="4" step="0.05" value="1.2" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureGraticuleMinorWidth" class="range-label" for="textureGraticuleMinorWidth">Minor Width</label>
+                        <label id="lblTextureGraticuleMinorWidth" class="range-label" for="textureGraticuleMinorWidth" data-i18n="Minor Width">Minor Width</label>
                         <span id="textureGraticuleMinorWidthValue" class="range-value">0.70</span>
                       </div>
                       <input id="textureGraticuleMinorWidth" type="range" min="0.1" max="3" step="0.05" value="0.7" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureGraticuleMajorOpacity" class="range-label" for="textureGraticuleMajorOpacity">Major Opacity</label>
+                        <label id="lblTextureGraticuleMajorOpacity" class="range-label" for="textureGraticuleMajorOpacity" data-i18n="Major Opacity">Major Opacity</label>
                         <span id="textureGraticuleMajorOpacityValue" class="range-value">34%</span>
                       </div>
                       <input id="textureGraticuleMajorOpacity" type="range" min="0" max="100" step="1" value="34" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureGraticuleMinorOpacity" class="range-label" for="textureGraticuleMinorOpacity">Minor Opacity</label>
+                        <label id="lblTextureGraticuleMinorOpacity" class="range-label" for="textureGraticuleMinorOpacity" data-i18n="Minor Opacity">Minor Opacity</label>
                         <span id="textureGraticuleMinorOpacityValue" class="range-value">14%</span>
                       </div>
                       <input id="textureGraticuleMinorOpacity" type="range" min="0" max="100" step="1" value="14" class="range-input" />
@@ -1471,70 +1471,70 @@
                   <div id="textureDraftGridControls" class="space-y-2 hidden">
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureDraftMajorStep" class="range-label" for="textureDraftMajorStep">Major Step</label>
+                        <label id="lblTextureDraftMajorStep" class="range-label" for="textureDraftMajorStep" data-i18n="Major Step">Major Step</label>
                         <span id="textureDraftMajorStepValue" class="range-value">24°</span>
                       </div>
                       <input id="textureDraftMajorStep" type="range" min="12" max="90" step="2" value="24" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureDraftMinorStep" class="range-label" for="textureDraftMinorStep">Minor Step</label>
+                        <label id="lblTextureDraftMinorStep" class="range-label" for="textureDraftMinorStep" data-i18n="Minor Step">Minor Step</label>
                         <span id="textureDraftMinorStepValue" class="range-value">12°</span>
                       </div>
                       <input id="textureDraftMinorStep" type="range" min="4" max="45" step="1" value="12" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureDraftLonOffset" class="range-label" for="textureDraftLonOffset">Longitude Offset</label>
+                        <label id="lblTextureDraftLonOffset" class="range-label" for="textureDraftLonOffset" data-i18n="Longitude Offset">Longitude Offset</label>
                         <span id="textureDraftLonOffsetValue" class="range-value">0°</span>
                       </div>
                       <input id="textureDraftLonOffset" type="range" min="-180" max="180" step="1" value="0" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureDraftLatOffset" class="range-label" for="textureDraftLatOffset">Latitude Tilt</label>
+                        <label id="lblTextureDraftLatOffset" class="range-label" for="textureDraftLatOffset" data-i18n="Latitude Tilt">Latitude Tilt</label>
                         <span id="textureDraftLatOffsetValue" class="range-value">12°</span>
                       </div>
                       <input id="textureDraftLatOffset" type="range" min="-80" max="80" step="1" value="12" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureDraftRoll" class="range-label" for="textureDraftRoll">Roll</label>
+                        <label id="lblTextureDraftRoll" class="range-label" for="textureDraftRoll" data-i18n="Roll">Roll</label>
                         <span id="textureDraftRollValue" class="range-value">-18°</span>
                       </div>
                       <input id="textureDraftRoll" type="range" min="-180" max="180" step="1" value="-18" class="range-input" />
                     </div>
                     <div class="flex items-center justify-between gap-3">
-                      <label id="lblTextureDraftColor" class="range-label" for="textureDraftColor">Line Color</label>
+                      <label id="lblTextureDraftColor" class="range-label" for="textureDraftColor" data-i18n="Line Color">Line Color</label>
                       <input id="textureDraftColor" type="color" value="#475569" class="color-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureDraftWidth" class="range-label" for="textureDraftWidth">Line Width</label>
+                        <label id="lblTextureDraftWidth" class="range-label" for="textureDraftWidth" data-i18n="Line Width">Line Width</label>
                         <span id="textureDraftWidthValue" class="range-value">1.10</span>
                       </div>
                       <input id="textureDraftWidth" type="range" min="0.2" max="4" step="0.05" value="1.1" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureDraftMajorOpacity" class="range-label" for="textureDraftMajorOpacity">Major Opacity</label>
+                        <label id="lblTextureDraftMajorOpacity" class="range-label" for="textureDraftMajorOpacity" data-i18n="Major Opacity">Major Opacity</label>
                         <span id="textureDraftMajorOpacityValue" class="range-value">28%</span>
                       </div>
                       <input id="textureDraftMajorOpacity" type="range" min="0" max="100" step="1" value="28" class="range-input" />
                     </div>
                     <div>
                       <div class="range-row">
-                        <label id="lblTextureDraftMinorOpacity" class="range-label" for="textureDraftMinorOpacity">Minor Opacity</label>
+                        <label id="lblTextureDraftMinorOpacity" class="range-label" for="textureDraftMinorOpacity" data-i18n="Minor Opacity">Minor Opacity</label>
                         <span id="textureDraftMinorOpacityValue" class="range-value">14%</span>
                       </div>
                       <input id="textureDraftMinorOpacity" type="range" min="0" max="100" step="1" value="14" class="range-input" />
                     </div>
                     <div class="flex items-center justify-between gap-3">
-                      <label id="lblTextureDraftDash" class="range-label" for="textureDraftDash">Dash Style</label>
+                      <label id="lblTextureDraftDash" class="range-label" for="textureDraftDash" data-i18n="Dash Style">Dash Style</label>
                       <select id="textureDraftDash" class="select-input">
-                        <option id="optTextureDraftDashDashed" value="dashed" selected>Dashed</option>
-                        <option id="optTextureDraftDashDotted" value="dotted">Dotted</option>
-                        <option id="optTextureDraftDashSolid" value="solid">Solid</option>
+                        <option id="optTextureDraftDashDashed" value="dashed" selected data-i18n="Dashed">Dashed</option>
+                        <option id="optTextureDraftDashDotted" value="dotted" data-i18n="Dotted">Dotted</option>
+                        <option id="optTextureDraftDashSolid" value="solid" data-i18n="Solid">Solid</option>
                       </select>
                     </div>
                   </div>
@@ -1549,7 +1549,7 @@
                 aria-labelledby="appearanceTabPhysical"
                 hidden
               >
-                <h2 id="lblPhysicalTabPanel" class="section-header">Physical Regions</h2>
+                <h2 id="lblPhysicalTabPanel" class="section-header" data-i18n="Physical Regions">Physical Regions</h2>
                 <div id="appearancePhysicalStack" class="appearance-subsection-stack mt-3"></div>
               </section>
 
@@ -1561,7 +1561,7 @@
                 aria-labelledby="appearanceTabUrban"
                 hidden
               >
-                <h2 id="lblUrbanTabPanel" class="section-header">Urban Areas</h2>
+                <h2 id="lblUrbanTabPanel" class="section-header" data-i18n="Urban Areas">Urban Areas</h2>
                 <div id="appearanceUrbanStack" class="appearance-subsection-stack mt-3"></div>
               </section>
 
@@ -1573,7 +1573,7 @@
                 aria-labelledby="appearanceTabCityPoints"
                 hidden
               >
-                <h2 id="lblCityPointsTabPanel" class="section-header">City Points</h2>
+                <h2 id="lblCityPointsTabPanel" class="section-header" data-i18n="City Points">City Points</h2>
                 <div id="appearanceCityPointsStack" class="appearance-subsection-stack mt-3"></div>
               </section>
 
@@ -1614,13 +1614,13 @@
                     <details id="transportAirportCard" class="appearance-mini-section transport-family-section">
                       <summary class="section-header transport-family-summary">
                         <span class="transport-family-summary-main">
-                          <span id="lblTransportAirportFamily" class="transport-family-summary-title">Airport</span>
+                          <span id="lblTransportAirportFamily" class="transport-family-summary-title" data-i18n="Airport">Airport</span>
                           <span id="transportAirportSummaryMeta" class="transport-family-summary-meta" data-i18n="Off">Off</span>
                         </span>
                       </summary>
                       <div id="transportAirportControls" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-3">
-                          <h4 id="lblTransportAirportVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
+                          <h3 id="lblTransportAirportVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h3>
                           <label class="toggle-label">
                             <input id="toggleAirports" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportAirportToggle" data-i18n="Show Airports">Show Airports</span>
@@ -1646,7 +1646,7 @@
                         </section>
 
                         <section class="space-y-3">
-                          <h4 id="lblTransportAirportLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h4>
+                          <h3 id="lblTransportAirportLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h3>
                           <label class="toggle-label">
                             <input id="airportLabelsEnabled" type="checkbox" class="checkbox-input" checked />
                             <span id="lblAirportLabelsEnabled" data-i18n="Show Airport Labels">Show Airport Labels</span>
@@ -1685,7 +1685,7 @@
                         </section>
 
                         <section class="space-y-3">
-                          <h4 id="lblTransportAirportScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
+                          <h3 id="lblTransportAirportScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
                           <div>
                             <div class="range-row">
                               <label id="lblAirportCoverageReach" class="range-label" for="airportCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
@@ -1728,13 +1728,13 @@
                     <details id="transportPortCard" class="appearance-mini-section transport-family-section">
                       <summary class="section-header transport-family-summary">
                         <span class="transport-family-summary-main">
-                          <span id="lblTransportPortFamily" class="transport-family-summary-title">Port</span>
+                          <span id="lblTransportPortFamily" class="transport-family-summary-title" data-i18n="Port">Port</span>
                           <span id="transportPortSummaryMeta" class="transport-family-summary-meta" data-i18n="Off">Off</span>
                         </span>
                       </summary>
                       <div id="transportPortControls" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-3">
-                          <h4 id="lblTransportPortVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
+                          <h3 id="lblTransportPortVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h3>
                           <label class="toggle-label">
                             <input id="togglePorts" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportPortToggle" data-i18n="Show Ports">Show Ports</span>
@@ -1760,7 +1760,7 @@
                         </section>
 
                         <section class="space-y-3">
-                          <h4 id="lblTransportPortLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h4>
+                          <h3 id="lblTransportPortLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h3>
                           <label class="toggle-label">
                             <input id="portLabelsEnabled" type="checkbox" class="checkbox-input" checked />
                             <span id="lblPortLabelsEnabled" data-i18n="Show Port Labels">Show Port Labels</span>
@@ -1799,7 +1799,7 @@
                         </section>
 
                         <section class="space-y-3">
-                          <h4 id="lblTransportPortScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
+                          <h3 id="lblTransportPortScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
                           <div>
                             <div class="range-row">
                               <label id="lblPortCoverageReach" class="range-label" for="portCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
@@ -1842,13 +1842,13 @@
                     <details id="transportRailCard" class="appearance-mini-section transport-family-section">
                       <summary class="section-header transport-family-summary">
                         <span class="transport-family-summary-main">
-                          <span id="lblTransportRailFamily" class="transport-family-summary-title">Rail</span>
+                          <span id="lblTransportRailFamily" class="transport-family-summary-title" data-i18n="Rail">Rail</span>
                           <span id="transportRailSummaryMeta" class="transport-family-summary-meta" data-i18n="Off">Off</span>
                         </span>
                       </summary>
                       <div id="transportRailControls" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-3">
-                          <h4 id="lblTransportRailVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
+                          <h3 id="lblTransportRailVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h3>
                           <label class="toggle-label">
                             <input id="toggleRail" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportRailToggle" data-i18n="Show Rail">Show Rail</span>
@@ -1874,7 +1874,7 @@
                         </section>
 
                         <section class="space-y-3">
-                          <h4 id="lblTransportRailLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h4>
+                          <h3 id="lblTransportRailLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h3>
                           <label class="toggle-label">
                             <input id="railLabelsEnabled" type="checkbox" class="checkbox-input" />
                             <span id="lblRailLabelsEnabled" data-i18n="Show Rail Labels">Show Rail Labels</span>
@@ -1891,7 +1891,7 @@
                         </section>
 
                         <section class="space-y-3">
-                          <h4 id="lblTransportRailScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
+                          <h3 id="lblTransportRailScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
                           <div>
                             <div class="range-row">
                               <label id="lblRailCoverageReach" class="range-label" for="railCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
@@ -1933,13 +1933,13 @@
                     <details id="transportRoadCard" class="appearance-mini-section transport-family-section">
                       <summary class="section-header transport-family-summary">
                         <span class="transport-family-summary-main">
-                          <span id="lblTransportRoadFamily" class="transport-family-summary-title">Road</span>
+                          <span id="lblTransportRoadFamily" class="transport-family-summary-title" data-i18n="Road">Road</span>
                           <span id="transportRoadSummaryMeta" class="transport-family-summary-meta" data-i18n="Off">Off</span>
                         </span>
                       </summary>
                       <div id="transportRoadControls" class="transport-family-body space-y-4 mt-3">
                         <section class="space-y-3">
-                          <h4 id="lblTransportRoadVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h4>
+                          <h3 id="lblTransportRoadVisibilityGroup" class="appearance-prop-heading" data-i18n="Visibility">Visibility</h3>
                           <label class="toggle-label">
                             <input id="toggleRoad" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportRoadToggle" data-i18n="Show Road">Show Road</span>
@@ -1964,7 +1964,7 @@
                           </div>
                         </section>
                         <section class="space-y-2">
-                          <h4 id="lblTransportRoadLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h4>
+                          <h3 id="lblTransportRoadLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h3>
                           <label class="toggle-label">
                             <input id="roadLabelsEnabled" type="checkbox" class="checkbox-input" />
                             <span id="lblRoadLabelsEnabled" data-i18n="Show Road Labels">Show Road Labels</span>
@@ -1980,7 +1980,7 @@
                           <p class="panel-hint" data-i18n="Road labels use segment ref/name when present.">Road labels use segment ref/name when present.</p>
                         </section>
                         <section class="space-y-3">
-                          <h4 id="lblTransportRoadScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h4>
+                          <h3 id="lblTransportRoadScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
                           <div>
                             <div class="range-row">
                               <label id="lblRoadCoverageReach" class="range-label" for="roadCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
@@ -2074,7 +2074,7 @@
             </div>
           </details>
 
-          <h2 id="mapContentSectionHeading" class="visually-hidden">Map Content</h2>
+          <h2 id="mapContentSectionHeading" class="visually-hidden" data-i18n="Map Content">Map Content</h2>
           <details class="card appearance-card map-content-card" aria-labelledby="mapContentSectionHeading labelMapContent">
             <summary id="labelMapContent" class="section-header" data-i18n="Map Content">Map Content</summary>
             <div class="appearance-toolbar mt-3">
@@ -2254,7 +2254,7 @@
 
           <div class="card color-library-card sidebar-secondary-card">
             <div class="palette-library-header-row">
-              <h2 id="lblColorLibrary" class="section-header">Color Library</h2>
+              <h2 id="lblColorLibrary" class="section-header" data-i18n="Color Library">Color Library</h2>
               <button
                 id="paletteLibraryToggle"
                 class="palette-library-toggle-btn"
@@ -2264,7 +2264,7 @@
                 aria-label="Hide Color Library"
                 title="Hide Color Library"
               >
-                <span class="palette-library-toggle-glyph" aria-hidden="true">▸</span>
+                <span class="palette-library-toggle-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-right"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
                 <span id="paletteLibraryToggleLabel" class="visually-hidden">Hide Color Library</span>
               </button>
             </div>
@@ -2276,10 +2276,10 @@
                 </select>
                 <div id="paletteLibrarySources" class="palette-library-sources hidden" hidden role="tablist" aria-label="Palette Source" data-i18n-aria-label="Palette Source"></div>
               </div>
-              <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch">Search Colors</label>
+              <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch" data-i18n="Search Colors">Search Colors</label>
               <div class="palette-library-search-row mt-2">
                 <input id="paletteLibrarySearch" type="text" name="palette-library-search" autocomplete="off" spellcheck="false" placeholder="Search country, ISO-2, or source tag..." class="input palette-library-search-input" />
-                <button id="paletteLibrarySearchClear" type="button" class="palette-library-search-clear hidden" data-i18n-aria-label="Clear color search" aria-label="Clear color search">×</button>
+                <button id="paletteLibrarySearchClear" type="button" class="palette-library-search-clear hidden" data-i18n-aria-label="Clear color search" aria-label="Clear color search"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-close"><path d="M6 6l12 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
               </div>
               <div id="paletteLibrarySummary" class="body-text mt-2 hidden" hidden data-i18n="0 colors">0 colors</div>
               <div id="paletteLibraryList" class="palette-library-list mt-3 u-scroll-y"></div>
@@ -2311,7 +2311,7 @@
             Click to inspect a region or country. Press F to switch to fill before painting.
           </div>
           <div id="scenarioContextBar" class="scenario-context-bar">
-            <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context" data-i18n-aria-label="Collapse scenario context">-</button>
+            <button id="scenarioContextCollapseBtn" type="button" class="scenario-context-icon-btn" aria-label="Collapse scenario context" data-i18n-aria-label="Collapse scenario context"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-up"><path d="m6 15 6-6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
             <div id="scenarioContextScenarioItem" class="scenario-context-item">
               <span class="scenario-context-label" data-i18n="Scenario">Scenario</span>
               <span id="scenarioContextScenarioText" class="u-truncate">Scenario: None</span>
@@ -2335,9 +2335,9 @@
 
           <div id="zoomControls" class="zoom-controls" role="group" aria-label="Map zoom controls" data-i18n-aria-label="Map zoom controls">
             <div id="zoomUtilityViewportGroup" class="shell-utility-group shell-utility-group-viewport" role="group" aria-label="Viewport controls" data-i18n-aria-label="Viewport controls">
-              <button id="zoomOutBtn" type="button" class="zoom-btn" aria-label="Zoom out" title="Zoom out">-</button>
+              <button id="zoomOutBtn" type="button" class="zoom-btn" aria-label="Zoom out" title="Zoom out"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-minus"><path d="M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
               <input id="zoomPercentInput" type="text" name="zoom-percent" autocomplete="off" spellcheck="false" inputmode="numeric" class="input dock-zoom-input" aria-label="Zoom percentage" value="100%" />
-              <button id="zoomInBtn" type="button" class="zoom-btn" aria-label="Zoom in" title="Zoom in">+</button>
+              <button id="zoomInBtn" type="button" class="zoom-btn" aria-label="Zoom in" title="Zoom in"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-plus"><path d="M12 5v14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
             </div>
             <div id="zoomUtilitySystemGroup" class="shell-utility-group shell-utility-group-system" role="group" aria-label="System status" data-i18n-aria-label="System status">
               <button id="btnToggleLang" class="zoom-btn zoom-pill-btn zoom-language-btn shell-utility-status-btn" type="button" aria-label="Language" data-i18n-aria-label="Language" title="Language" data-i18n-title="Language">
@@ -2376,7 +2376,7 @@
             <h2 id="bottomDockHeading" class="visually-hidden" data-i18n="Quick edit dock">Quick edit dock</h2>
             <div class="bottom-dock-primary">
               <div class="dock-group dock-group-tools" role="group" aria-label="Tools" data-i18n-aria-label="Tools" title="Tools" data-i18n-title="Tools">
-                <span id="lblCurrentTool" class="visually-hidden">Tools</span>
+                <span id="lblCurrentTool" class="visually-hidden" data-i18n="Tools">Tools</span>
                 <div class="dock-button-row dock-button-row-tools" role="toolbar" data-i18n-aria-label="Current tool">
                   <button id="toolSelectBtn" class="btn-tool dock-tool-btn" data-tool="select" type="button" aria-label="Select tool" title="Select tool" data-i18n-aria-label="Select tool" data-i18n-title="Select tool">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -2427,7 +2427,7 @@
                     <select id="riverPaintRiverSelect" class="dock-select" aria-label="Filter by river" aria-controls="riverPaintLocationSelect" hidden disabled></select>
                     <div class="river-paint-location-row">
                       <select id="riverPaintLocationSelect" class="dock-select" aria-label="Go to river location" aria-describedby="riverPaintLocationResults" hidden disabled></select>
-                      <button id="riverPaintLocationGoBtn" type="button" class="dock-segment-btn" aria-label="Go to selected location" hidden disabled>Go</button>
+                      <button id="riverPaintLocationGoBtn" type="button" class="dock-segment-btn" aria-label="Go to selected location" hidden disabled data-i18n="Go">Go</button>
                     </div>
                     <small id="riverPaintLocationResults" role="status" aria-live="polite" aria-atomic="true"></small>
                     <section id="riverCellPicker" hidden aria-labelledby="riverCellPickerTitle">
@@ -2435,8 +2435,8 @@
                       <select id="riverCellSelect" class="dock-select" aria-label="Choose river cell"></select>
                       <svg id="riverCellPreview" viewBox="0 0 240 104" role="img"></svg>
                       <small id="riverCellPreviewCaption"></small>
-                      <button id="riverCellApplyBtn" type="button" class="dock-segment-btn">Apply current tool</button>
-                      <button id="riverCellCloseBtn" type="button" class="dock-segment-btn">Close</button>
+                      <button id="riverCellApplyBtn" type="button" class="dock-segment-btn" data-i18n="Apply current tool">Apply current tool</button>
+                      <button id="riverCellCloseBtn" type="button" class="dock-segment-btn" data-i18n="Close">Close</button>
                     </section>
                   </div>
                 </div>
@@ -2475,7 +2475,7 @@
                 </div>
 
               <div class="dock-group dock-group-history-colors" role="group" aria-label="History and Color" data-i18n-aria-label="History and Color" title="History and Color" data-i18n-title="History and Color">
-                <span id="lblHistory" class="visually-hidden">History</span>
+                <span id="lblHistory" class="visually-hidden" data-i18n="History">History</span>
                 <div class="dock-inline-cluster dock-inline-cluster-history">
                   <div class="dock-icon-row">
                     <button id="undoBtn" class="dock-icon-btn" type="button" aria-label="Undo" title="Undo" data-i18n-aria-label="Undo" data-i18n-title="Undo">
@@ -2510,7 +2510,7 @@
               </div>
             </div>
             <button id="dockCollapseBtn" type="button" class="dock-handle-btn" aria-label="Collapse quick dock" data-i18n-aria-label="Collapse quick dock" title="Collapse" data-i18n-title="Collapse">
-              <span id="dockHandleChevron" class="dock-handle-chevron" aria-hidden="true">▾</span>
+              <span id="dockHandleChevron" class="dock-handle-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-down"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
               <span id="dockHandleLabel" class="visually-hidden" data-i18n="Collapse">Collapse</span>
             </button>
           </section>
@@ -2518,7 +2518,7 @@
       </main>
 
       <aside id="rightSidebar" class="sidebar-right">
-        <button type="button" class="sidebar-drawer-close" data-close-drawer="right" aria-label="Close panels" data-i18n-aria-label="Close panels">×</button>
+        <button type="button" class="sidebar-drawer-close" data-close-drawer="right" aria-label="Close panels" data-i18n-aria-label="Close panels"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-close"><path d="M6 6l12 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
         <button
           id="rightSidebarCollapseBtn"
           class="right-sidebar-collapse-btn"
@@ -2528,7 +2528,7 @@
           aria-label="Collapse right sidebar"
           data-i18n-aria-label="Collapse right sidebar"
         >
-          <span id="rightSidebarCollapseIcon" aria-hidden="true">&rsaquo;</span>
+          <span id="rightSidebarCollapseIcon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-chevron-right"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
         </button>
         <div id="rightSidebarContent" class="sidebar-sections inspector-sidebar-sections">
           <div class="inspector-sidebar-tab-row" role="tablist" aria-label="Inspector panels" data-i18n-aria-label="Inspector panels">
@@ -2567,14 +2567,14 @@
           <h2 id="countryInspectorHeading" class="visually-hidden" data-i18n="Country Inspector">Country Inspector</h2>
           <details id="countryInspectorSection" class="card inspector-section sidebar-section-shell" aria-labelledby="countryInspectorHeading lblCountryInspector">
             <summary id="lblCountryInspector" class="sidebar-section-head">
-              <span class="sidebar-section-title">Country Inspector</span>
+              <span class="sidebar-section-title" data-i18n="Country Inspector">Country Inspector</span>
 
             </summary>
               <p class="sidebar-section-description" data-i18n="Inspect countries, active owners, and direct color overrides.">Inspect countries, active owners, and direct color overrides.</p>
             <div class="inspector-panel-body">
               <div class="inspector-search-shell">
                 <div class="card-flat inspector-search-block">
-                  <label id="lblCountrySearch" class="visually-hidden" for="countrySearch">Search Countries</label>
+                  <label id="lblCountrySearch" class="visually-hidden" for="countrySearch" data-i18n="Search Countries">Search Countries</label>
                   <div class="inspector-search-input-row">
                     <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
@@ -2608,14 +2608,14 @@
                   </div>
                 </div>
               </div>
-              <button id="resetCountryColors" class="sidebar-action-secondary is-section-tail mt-3">Reset Country Colors</button>
+              <button id="resetCountryColors" class="sidebar-action-secondary is-section-tail mt-3" data-i18n="Reset Country Colors">Reset Country Colors</button>
             </div>
           </details>
 
           <h2 id="selectedCountryActionsHeading" class="visually-hidden" data-i18n="Territories & Presets">Territories & Presets</h2>
           <details id="selectedCountryActionsSection" class="card inspector-section sidebar-section-shell" aria-labelledby="selectedCountryActionsHeading lblPresetsHierarchy">
             <summary id="lblPresetsHierarchy" class="sidebar-section-head">
-              <span class="sidebar-section-title">Territories &amp; Presets</span>
+              <span class="sidebar-section-title" data-i18n="Territories &amp; Presets">Territories &amp; Presets</span>
 
             </summary>
               <p class="sidebar-section-description" data-i18n="Inspect territories, presets, releasables, and scenario ownership actions for the selected country.">Inspect territories, presets, releasables, and scenario ownership actions for the selected country.</p>
@@ -2627,30 +2627,30 @@
           <h2 id="specialRegionInspectorHeading" class="visually-hidden" data-i18n="Special Regions">Special Regions</h2>
           <details id="specialRegionInspectorSection" class="card inspector-section hidden sidebar-section-shell is-conditional" aria-labelledby="specialRegionInspectorHeading lblSpecialRegionInspector">
             <summary id="lblSpecialRegionInspector" class="sidebar-section-head">
-              <span class="sidebar-section-title is-conditional">Special Regions</span>
+              <span class="sidebar-section-title is-conditional" data-i18n="Special Regions">Special Regions</span>
 
             </summary>
               <p class="sidebar-section-description" data-i18n="Inspect scenario-only basins and exposure zones. Use Special Zones layers for editable narrative regions.">Inspect scenario-only basins and exposure zones. Use Special Zones layers for editable narrative regions.</p>
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
-                <h3 id="lblScenarioSpecialRegionVisibility" class="sidebar-group-label">Visibility</h3>
+                <h3 id="lblScenarioSpecialRegionVisibility" class="sidebar-group-label" data-i18n="Visibility">Visibility</h3>
                 <label class="toggle-label mt-2" title="Toggle scenario-only special regions." data-i18n-title="Toggle scenario-only special regions.">
                   <input id="scenarioSpecialRegionVisibilityToggle" type="checkbox" class="checkbox-input" checked />
-                  <span id="lblScenarioSpecialRegionVisibilityToggle">Show Scenario Special Regions</span>
+                  <span id="lblScenarioSpecialRegionVisibilityToggle" data-i18n="Show Scenario Special Regions">Show Scenario Special Regions</span>
                 </label>
                 <p id="scenarioSpecialRegionVisibilityHint" class="sidebar-tool-hint mt-2 hidden" data-i18n="Toggle Atlantropa-style scenario regions without affecting the base map.">
                   Toggle Atlantropa-style scenario regions without affecting the base map.
                 </p>
                 <label class="toggle-label mt-3" title="Toggle shoreline, basin contour, and texture overlays for the active scenario.">
                   <input id="scenarioReliefOverlayVisibilityToggle" type="checkbox" class="checkbox-input" checked />
-                  <span id="lblScenarioReliefOverlayVisibilityToggle">Show Scenario Relief Overlays</span>
+                  <span id="lblScenarioReliefOverlayVisibilityToggle" data-i18n="Show Scenario Relief Overlays">Show Scenario Relief Overlays</span>
                 </label>
                 <p id="scenarioReliefOverlayVisibilityHint" class="sidebar-tool-hint mt-2 hidden" data-i18n="Toggle shoreline, basin contour, and texture overlays for the active scenario.">
                   Toggle shoreline, basin contour, and texture overlays for the active scenario.
                 </p>
               </div>
               <div class="card-flat inspector-search-block">
-                <label id="lblSpecialRegionSearch" class="visually-hidden" for="specialRegionSearch">Search Special Regions</label>
+                <label id="lblSpecialRegionSearch" class="visually-hidden" for="specialRegionSearch" data-i18n="Search Special Regions">Search Special Regions</label>
                 <div class="inspector-search-input-row">
                   <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
@@ -2670,7 +2670,7 @@
               <div id="specialRegionList" class="country-list inspector-scroll mt-3"></div>
               <div id="specialRegionInspectorDetail" class="inspector-detail-card mt-3">
                 <div id="specialRegionInspectorEmpty" class="inspector-empty-state sidebar-empty-state">
-                  <h3 id="specialRegionInspectorEmptyTitle" class="sidebar-empty-copy is-title">Select a special region to inspect</h3>
+                  <h3 id="specialRegionInspectorEmptyTitle" class="sidebar-empty-copy is-title" data-i18n="Select a special region to inspect">Select a special region to inspect</h3>
                   <p id="specialRegionInspectorEmptyHint" class="sidebar-tool-hint">
                     Click a drained basin or exposure zone on the map, or choose one from the list.
                   </p>
@@ -2706,13 +2706,13 @@
           <h2 id="waterInspectorHeading" class="visually-hidden" data-i18n="Water Regions">Water Regions</h2>
           <details id="waterInspectorSection" class="card inspector-section sidebar-section-shell" aria-labelledby="waterInspectorHeading lblWaterInspector">
             <summary id="lblWaterInspector" class="sidebar-section-head">
-              <span class="sidebar-section-title">Water Regions</span>
+              <span class="sidebar-section-title" data-i18n="Water Regions">Water Regions</span>
 
             </summary>
               <p class="sidebar-section-description" data-i18n="Inspect seas, lakes, straits, and direct water color overrides.">Inspect seas, lakes, straits, and direct water color overrides.</p>
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
-                <h3 id="lblWaterInteraction" class="sidebar-group-label">Interaction</h3>
+                <h3 id="lblWaterInteraction" class="sidebar-group-label" data-i18n="Interaction">Interaction</h3>
                 <label class="toggle-label mt-2">
                   <input id="waterInspectorLakeInteractionToggle" type="checkbox" class="checkbox-input" />
                   <span data-i18n="Allow Lake Selection and Paint">Allow Lake Selection and Paint</span>
@@ -2743,7 +2743,7 @@
                     <span id="lblWaterInspectorOverridesOnlyToggle" data-i18n="Overrides Only">Overrides Only</span>
                   </label>
                   <div class="water-filter-field">
-                    <label id="lblWaterFilterType" class="sidebar-field-label" for="waterInspectorTypeFilter">Type</label>
+                    <label id="lblWaterFilterType" class="sidebar-field-label" for="waterInspectorTypeFilter" data-i18n="Type">Type</label>
                     <select id="waterInspectorTypeFilter" class="select-input">
                       <option value="" data-i18n="All Types">All Types</option>
                     </select>
@@ -2761,7 +2761,7 @@
                     </select>
                   </div>
                   <div class="water-filter-field">
-                    <label id="lblWaterSort" class="sidebar-field-label" for="waterInspectorSortSelect">Sort</label>
+                    <label id="lblWaterSort" class="sidebar-field-label" for="waterInspectorSortSelect" data-i18n="Sort">Sort</label>
                     <select id="waterInspectorSortSelect" class="select-input">
                       <option value="name" data-i18n="Name">Name</option>
                       <option value="type" data-i18n="Type">Type</option>
@@ -2772,7 +2772,7 @@
                 </div>
               </div>
               <div class="card-flat inspector-search-block">
-                <label id="lblWaterSearch" class="visually-hidden" for="waterRegionSearch">Search Water Regions</label>
+                <label id="lblWaterSearch" class="visually-hidden" for="waterRegionSearch" data-i18n="Search Water Regions">Search Water Regions</label>
                 <div class="inspector-search-input-row">
                   <svg class="inspector-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
@@ -2792,7 +2792,7 @@
               <div id="waterRegionList" class="country-list inspector-scroll mt-3"></div>
               <div id="waterInspectorDetail" class="inspector-detail-card mt-3">
                 <div id="waterInspectorEmpty" class="inspector-empty-state sidebar-empty-state">
-                  <h3 id="waterInspectorEmptyTitle" class="sidebar-empty-copy is-title">Select a water region to inspect</h3>
+                  <h3 id="waterInspectorEmptyTitle" class="sidebar-empty-copy is-title" data-i18n="Select a water region to inspect">Select a water region to inspect</h3>
                   <p id="waterInspectorEmptyHint" class="sidebar-tool-hint">
                     Click a sea, lake, or strait on the map, or choose one from the list.
                   </p>
@@ -2806,13 +2806,13 @@
                     <div id="waterInspectorMetaList" class="inspector-meta-list mt-2"></div>
                   </div>
                   <div id="waterInspectorHierarchySection" class="inspector-detail-section mt-3 hidden">
-                    <h3 id="lblWaterInspectorHierarchy" class="sidebar-group-label">Family</h3>
+                    <h3 id="lblWaterInspectorHierarchy" class="sidebar-group-label" data-i18n="Family">Family</h3>
                     <nav id="waterInspectorBreadcrumb" class="sidebar-tool-hint mt-2" aria-label="Water hierarchy"></nav>
                     <button id="waterInspectorJumpToParentBtn" type="button" class="sidebar-action-secondary mt-2 hidden" data-i18n="Jump To Parent">Jump To Parent</button>
                     <div id="waterInspectorChildrenList" class="inspector-scroll mt-3 hidden"></div>
                   </div>
                   <div id="waterInspectorColorRow" class="inspector-color-row mt-3 hidden">
-                    <h3 id="waterInspectorColorLabel" class="sidebar-field-label">Water Color</h3>
+                    <h3 id="waterInspectorColorLabel" class="sidebar-field-label" data-i18n="Water Color">Water Color</h3>
                     <div class="inspector-color-row-main mt-2">
                       <button
                         id="waterInspectorColorSwatch"
@@ -2850,7 +2850,7 @@
                 </div>
               </div>
               <div class="inspector-detail-section mt-3 sidebar-detail-group">
-                <h3 id="lblWaterLegend" class="sidebar-group-label">Water Overrides</h3>
+                <h3 id="lblWaterLegend" class="sidebar-group-label" data-i18n="Water Overrides">Water Overrides</h3>
                 <div id="waterLegendList" class="inspector-scroll mt-3"></div>
               </div>
             </div>
@@ -2911,9 +2911,7 @@
                   class="sample-project-banner__dismiss"
                   aria-label="Dismiss sample message"
                   data-i18n-aria-label="Dismiss sample message"
-                >
-                  ×
-                </button>
+                ><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-close"><path d="M6 6l12 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
               </div>
             </section>
 
@@ -2998,12 +2996,12 @@
             <h2 id="inspectorUtilitiesHeading" class="visually-hidden" data-i18n="Utilities">Utilities</h2>
             <details id="inspectorUtilitiesSection" class="card inspector-section sidebar-support-block" aria-labelledby="inspectorUtilitiesHeading lblInspectorUtilities">
               <summary id="lblInspectorUtilities" class="sidebar-support-head" data-i18n="Utilities">
-                <span class="sidebar-support-title">Utilities</span>
+                <span class="sidebar-support-title" data-i18n="Utilities">Utilities</span>
               </summary>
               <div class="inspector-panel-body">
                 <div class="inspector-utilities-shell sidebar-tool-panel">
                   <div class="inspector-utility-stack">
-                    <div class="inspector-utility-actions sidebar-support-actions" role="group" aria-label="Utilities">
+                    <div class="inspector-utility-actions sidebar-support-actions" role="group" aria-label="Utilities" data-i18n-aria-label="Utilities">
                       <button id="utilitiesGuideBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Guide">Guide</button>
                       <button id="dockReferenceBtn" class="btn-secondary sidebar-support-entry-btn" type="button" data-i18n="Reference">Reference</button>
                     </div>
@@ -3015,28 +3013,28 @@
                       <div class="space-y-3 mt-4">
                         <div>
                           <div class="range-row">
-                            <label id="lblReferenceOpacity" class="range-label" for="referenceOpacity">Opacity</label>
+                            <label id="lblReferenceOpacity" class="range-label" for="referenceOpacity" data-i18n="Opacity">Opacity</label>
                             <span id="referenceOpacityValue" class="range-value">60%</span>
                           </div>
                           <input id="referenceOpacity" type="range" min="0" max="100" value="60" class="range-input" />
                         </div>
                         <div>
                           <div class="range-row">
-                            <label id="lblReferenceScale" class="range-label" for="referenceScale">Scale</label>
+                            <label id="lblReferenceScale" class="range-label" for="referenceScale" data-i18n="Scale">Scale</label>
                             <span id="referenceScaleValue" class="range-value">1.00×</span>
                           </div>
                           <input id="referenceScale" type="range" min="0.2" max="3.0" step="0.01" value="1.00" class="range-input" />
                         </div>
                         <div>
                           <div class="range-row">
-                            <label id="lblReferenceOffsetX" class="range-label" for="referenceOffsetX">Offset X</label>
+                            <label id="lblReferenceOffsetX" class="range-label" for="referenceOffsetX" data-i18n="Offset X">Offset X</label>
                             <span id="referenceOffsetXValue" class="range-value">0px</span>
                           </div>
                           <input id="referenceOffsetX" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
                         </div>
                         <div>
                           <div class="range-row">
-                            <label id="lblReferenceOffsetY" class="range-label" for="referenceOffsetY">Offset Y</label>
+                            <label id="lblReferenceOffsetY" class="range-label" for="referenceOffsetY" data-i18n="Offset Y">Offset Y</label>
                             <span id="referenceOffsetYValue" class="range-value">0px</span>
                           </div>
                           <input id="referenceOffsetY" type="range" min="-1000" max="1000" step="1" value="0" class="range-input" />
@@ -3051,7 +3049,7 @@
             <h2 id="diagnosticsHeading" class="visually-hidden" data-i18n="Diagnostics">Diagnostics</h2>
             <details id="diagnosticsSection" class="card inspector-section dev-only sidebar-appendix-shell" aria-labelledby="diagnosticsHeading lblDiagnostics">
               <summary id="lblDiagnostics" class="sidebar-appendix-head">
-                <span class="sidebar-appendix-title">Diagnostics</span>
+                <span class="sidebar-appendix-title" data-i18n="Diagnostics">Diagnostics</span>
               </summary>
               <div id="diagnosticStack" class="inspector-panel-body inspector-stack"></div>
             </details>
@@ -3132,7 +3130,7 @@
                   <div id="transportWorkbenchPreviewCanvas" class="transport-workbench-preview-canvas" aria-hidden="true">
                     <div id="transportWorkbenchPreviewControls" class="transport-workbench-preview-controls" role="group" aria-label="Preview controls" data-i18n-aria-label="Preview controls">
                       <button id="transportWorkbenchZoomOutBtn" type="button" class="transport-workbench-preview-control-btn" aria-label="Zoom out" data-i18n-aria-label="Zoom out" title="Zoom out">&minus;</button>
-                      <button id="transportWorkbenchZoomInBtn" type="button" class="transport-workbench-preview-control-btn" aria-label="Zoom in" data-i18n-aria-label="Zoom in" title="Zoom in">+</button>
+                      <button id="transportWorkbenchZoomInBtn" type="button" class="transport-workbench-preview-control-btn" aria-label="Zoom in" data-i18n-aria-label="Zoom in" title="Zoom in"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-plus"><path d="M12 5v14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
                       <button id="transportWorkbenchRotateBtn" type="button" class="transport-workbench-preview-control-btn transport-workbench-preview-control-btn-rotate" aria-label="Rotate preview 90 degrees" data-i18n-aria-label="Rotate preview 90 degrees" title="Rotate preview 90 degrees">90&deg;</button>
                     </div>
                     <div id="transportWorkbenchCarrierMount" class="transport-workbench-carrier-mount"></div>
@@ -3368,7 +3366,7 @@
     <div id="facilityInfoCard" class="facility-info-card hidden" aria-hidden="true" role="dialog" aria-labelledby="facilityInfoCardTitle">
       <div class="facility-info-card-header">
         <h3 id="facilityInfoCardTitle" class="facility-info-card-title"></h3>
-        <button id="facilityInfoCardCloseBtn" type="button" class="facility-info-card-close-btn" aria-label="Close facility details" data-i18n-aria-label="Close facility details">×</button>
+        <button id="facilityInfoCardCloseBtn" type="button" class="facility-info-card-close-btn" aria-label="Close facility details" data-i18n-aria-label="Close facility details"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true" focusable="false" class="ui-icon ui-icon-close"><path d="M6 6l12 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
       </div>
       <div id="facilityInfoCardBody" class="facility-info-card-body"></div>
       <div class="facility-info-card-actions">
@@ -3753,7 +3751,7 @@
         <h2 id="bootOverlayTitle" class="boot-overlay__title" data-i18n="Preparing default scenario">Preparing default scenario</h2>
         <p id="bootOverlayMessage" class="boot-overlay__message" data-i18n="Loading the base map and TNO 1962 assets before interaction unlocks.">Loading the base map and TNO 1962 assets before interaction unlocks.</p>
         <details id="bootOverlayErrorDetails" class="boot-overlay__error-details hidden" hidden>
-          <summary id="bootOverlayErrorSummary">Technical details</summary>
+          <summary id="bootOverlayErrorSummary" data-i18n="Technical details">Technical details</summary>
           <pre id="bootOverlayErrorText"></pre>
         </details>
         <div

@@ -28,6 +28,11 @@ class TestClassList {
   }
 }
 
+// 图标模块从元素所属文档创建 SVG；这里只需要能挂属性和子节点的最小节点。
+const testDocument = {
+  createElementNS: () => ({ setAttribute() {}, appendChild() {} }),
+};
+
 class TestElement {
   constructor({ rect = null } = {}) {
     this.attributes = new Map();
@@ -41,6 +46,20 @@ class TestElement {
       setProperty: (name, value) => this.style.values.set(name, value),
     };
     this.textContent = "";
+    this.children = [];
+    this.ownerDocument = testDocument;
+  }
+
+  get firstElementChild() {
+    return this.children[0] || null;
+  }
+
+  replaceChildren(...children) {
+    this.children = children;
+  }
+
+  appendChild(child) {
+    this.children.push(child);
   }
 
   addEventListener(name, handler) {
@@ -138,7 +157,7 @@ test("scenario context bar refresh owns labels, selection chip, and safe width",
   assert.equal(nodes.scenarioContextActiveText.textContent, "Alpha (ABC)");
   assert.equal(nodes.scenarioContextSelectionItem.classList.contains("hidden"), false);
   assert.equal(nodes.scenarioContextSelectionText.textContent, "Berlin");
-  assert.equal(nodes.scenarioContextCollapseBtn.textContent, "-");
+  assert.equal(nodes.scenarioContextCollapseBtn.dataset.uiIcon, "chevron-up");
   assert.equal(nodes.scenarioTransportWorkbenchBtn.textContent, "Transport");
   assert.equal(nodes.scenarioTransportWorkbenchBtn.attributes.get("title"), "Open transport workbench");
   assert.equal(nodes.scenarioContextBar.style.values.get("--scenario-bar-safe-max-width"), "420px");
@@ -167,7 +186,7 @@ test("scenario context collapse event toggles state and rerenders affordance", (
   assert.equal(nodes.scenarioContextCollapseBtn.dataset.bound, "true");
   assert.equal(runtimeState.ui.scenarioBarCollapsed, true);
   assert.equal(nodes.scenarioContextBar.classList.contains("is-collapsed"), true);
-  assert.equal(nodes.scenarioContextCollapseBtn.textContent, "+");
+  assert.equal(nodes.scenarioContextCollapseBtn.dataset.uiIcon, "chevron-down");
   assert.equal(nodes.scenarioContextCollapseBtn.attributes.get("aria-label"), "Expand");
 });
 
