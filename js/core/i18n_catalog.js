@@ -1237,6 +1237,7 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Can't import appearance preset: invalid JSON.": {"zh": "无法导入外观预设：JSON 无效。", "en": "Can't import appearance preset: invalid JSON."},
   "Can't import appearance preset: invalid format.": {"zh": "无法导入外观预设：格式无效。", "en": "Can't import appearance preset: invalid format."},
   "Can't undo the reset because newer edits exist.": {"zh": "已有新的编辑，无法撤销此次重置。", "en": "Can't undo the reset because newer edits exist."},
+  "Can't undo the clear because newer edits exist.": {"zh": "已有新的编辑，无法撤销此次清空。", "en": "Can't undo the clear because newer edits exist."},
   "EQP": {"zh": "装备", "en": "EQP"},
   "Go": {"zh": "前往", "en": "Go"},
   "ID": {"zh": "编号", "en": "ID"},

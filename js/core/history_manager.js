@@ -220,6 +220,11 @@ function pushHistoryEntry(entry) {
   return true;
 }
 
+// 提示里的"撤销"只撤销它对应的那一次操作：入栈时记下栈顶条目，点击时栈顶已换就不再撤销。
+function getLatestHistoryEntry() {
+  return Array.isArray(runtimeState.historyPast) ? runtimeState.historyPast.at(-1) || null : null;
+}
+
 function getFeatureColorHistoryIds(entry) {
   if (entry?.meta?.affectsSovereignty) return null;
   const ids = new Set();
@@ -415,6 +420,7 @@ export {
   clearHistory,
   canRedoHistory,
   canUndoHistory,
+  getLatestHistoryEntry,
   hasHistoryDelta,
   pushHistoryEntry,
   redoHistory,

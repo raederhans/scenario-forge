@@ -46,7 +46,7 @@ import {
   ensureCountryLabelsReadyForExport,
   setMapData,
 } from "../core/map_renderer/public.js";
-import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
+import { captureHistoryState, canRedoHistory, canUndoHistory, getLatestHistoryEntry, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
 import { setExportBakeState } from "../core/state/actions/export_workbench_actions.js";
 import {
@@ -2925,19 +2925,23 @@ function initToolbar({ render } = {}) {
       refreshActiveSovereignLabel();
       refreshDynamicBorderStatus();
       markDirty("clear-map");
-      pushHistoryEntry({
+      const clearEntry = pushHistoryEntry({
         kind: "clear-map",
         before,
         after: captureHistoryState({
           featureIds,
           ownerCodes,
         }),
-      });
+      }) ? getLatestHistoryEntry() : null;
       showToast(t("Map cleared. Undo is available from history.", "ui"), {
         title: t("Clear Map", "ui"),
         tone: "warning",
-        actionLabel: t("Undo", "ui"),
-        onAction: () => {
+        actionLabel: clearEntry ? t("Undo", "ui") : "",
+        onAction: !clearEntry ? null : () => {
+          if (getLatestHistoryEntry() !== clearEntry) {
+            showToast(t("Can't undo the clear because newer edits exist.", "ui"), { tone: "warning" });
+            return;
+          }
           if (typeof runtimeState.runHistoryActionFn === "function") {
             callRuntimeHook(state, "runHistoryActionFn", "undo");
             return;

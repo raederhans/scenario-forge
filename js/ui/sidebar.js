@@ -49,7 +49,7 @@ import {
   ensurePaletteAssetsLoaded,
 } from "../core/palette_manager.js";
 import { FileManager } from "../core/file_manager.js";
-import { captureHistoryState, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
+import { captureHistoryState, getLatestHistoryEntry, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
 import {
   ensureActiveScenarioOptionalLayerLoaded,
@@ -127,9 +127,9 @@ export function createResponsiveSidebarCollapseController({ left, right, applyLe
 }
 
 export function resetCountryColorsWithFeedback(afterReset, afterUndo) {
-  const previousEntry = state.historyPast?.at(-1);
+  const previousEntry = getLatestHistoryEntry();
   resetCountryColors();
-  const resetEntry = state.historyPast?.at(-1);
+  const resetEntry = getLatestHistoryEntry();
   const hasResetEntry = resetEntry && resetEntry !== previousEntry;
   afterReset();
   return showToast(t("Country colors were reset.", "ui"), {
@@ -138,7 +138,7 @@ export function resetCountryColorsWithFeedback(afterReset, afterUndo) {
     duration: 7200,
     actionLabel: hasResetEntry ? t("Undo", "ui") : "",
     onAction: hasResetEntry ? () => {
-      if (state.historyPast?.at(-1) !== resetEntry) {
+      if (getLatestHistoryEntry() !== resetEntry) {
         showToast(t("Can't undo the reset because newer edits exist.", "ui"), { tone: "warning" });
         return;
       }
