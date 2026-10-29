@@ -35,6 +35,8 @@ function createHarness({ passName = "borders", canvas = true, reference = true, 
     },
   });
   return { owner, cache, oldCanvas, transform, prepared, painted, drawn, metrics,
+    clearReference: () => { reference = false; },
+    startPreparation: () => { pending = true; cache.dirty[passName] = true; },
     finishPreparation: () => { pending = false; } };
 }
 
@@ -67,7 +69,9 @@ for (const missing of ["canvas", "reference"]) {
     assert.equal(owner.prepareIdleRenderPassDefinition("borders", () => {}, transform, timings), false);
     assert.equal(cache.dirty.borders, true);
     assert.deepEqual(painted, []);
-    assert.deepEqual(metrics, []);
+    assert.deepEqual(metrics, [["idleRenderPassPreflightPending", 0, {
+      passNames: "borders", activeScenarioId: "tno_1962",
+    }]]);
     assert.deepEqual(timings, {});
   });
 }
@@ -79,7 +83,9 @@ for (const passName of ["political", "physicalBase", "contextScenario", "context
     assert.equal(owner.ensureIdleRenderPasses(timings, [passName]), false);
     assert.equal(cache.dirty[passName], true);
     assert.deepEqual(painted, []);
-    assert.deepEqual(metrics, []);
+    assert.deepEqual(metrics, [["idleRenderPassPreflightPending", 0, {
+      passNames: passName, activeScenarioId: "tno_1962",
+    }]]);
     assert.deepEqual(timings, {});
   });
 }
@@ -104,4 +110,72 @@ test("deferring borders preserves other dirty pass timing markers", () => {
   const timings = { usedDirtyFastFramePasses: "political,labels" };
   assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), true);
   assert.equal(timings.usedDirtyFastFramePasses, "political,labels,borders");
+});
+
+function commitThenInvalidateReference() {
+  const harness = createHarness();
+  harness.finishPreparation();
+  assert.equal(harness.owner.ensureIdleRenderPasses({}, ["borders"]), true);
+  harness.clearReference();
+  harness.startPreparation();
+  harness.painted.length = 0;
+  harness.drawn.length = 0;
+  harness.metrics.length = 0;
+  return harness;
+}
+
+for (const delta of [0, 0.5e-6]) {
+  test(`committed borders reuses its canvas after reference invalidation with transform delta ${delta}`, () => {
+    const { owner, cache, oldCanvas, transform, painted, drawn, metrics } = commitThenInvalidateReference();
+    for (const key of ["x", "y", "k"]) transform[key] += delta;
+    const timings = {};
+    assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), true);
+    assert.equal(cache.canvases.borders, oldCanvas);
+    assert.equal(cache.dirty.borders, true);
+    assert.deepEqual(painted, []);
+    assert.deepEqual(drawn, []);
+    assert.equal(timings.usedDirtyFastFramePasses, "borders");
+    assert.deepEqual(metrics, [["idleRenderPassDeferredForPreparation", 0, {
+      passName: "borders", reason: "preparation-pending-reuse-surface", activeScenarioId: "tno_1962",
+    }]]);
+  });
+}
+
+for (const changed of ["x", "y", "k", "canvas"]) {
+  test(`committed borders blocks after reference invalidation when ${changed} changes`, () => {
+    const { owner, cache, transform, painted, metrics } = commitThenInvalidateReference();
+    if (changed === "canvas") cache.canvases.borders = { pixels: "replacement" };
+    else transform[changed] += 2e-6;
+    const timings = {};
+    assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), false);
+    assert.equal(owner.prepareIdleRenderPassDefinition("borders", () => {}, transform, timings), false);
+    assert.equal(cache.dirty.borders, true);
+    assert.deepEqual(painted, []);
+    assert.deepEqual(timings, {});
+    assert.deepEqual(metrics, [["idleRenderPassPreflightPending", 0, {
+      passNames: "borders", activeScenarioId: "tno_1962",
+    }]]);
+  });
+}
+
+test("a later successful borders draw replaces the committed transform snapshot", () => {
+  const { owner, transform, painted, startPreparation, finishPreparation } = commitThenInvalidateReference();
+  transform.x += 5;
+  finishPreparation();
+  assert.equal(owner.ensureIdleRenderPasses({}, ["borders"]), true);
+  assert.deepEqual(painted, ["borders"]);
+  startPreparation();
+  const timings = {};
+  assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), true);
+  assert.deepEqual(painted, ["borders"]);
+  assert.equal(timings.usedDirtyFastFramePasses, "borders");
+});
+
+test("blocking preflight records all pending passes once in catalog order", () => {
+  const { owner, metrics, prepared } = createHarness();
+  assert.equal(owner.ensureIdleRenderPasses({}, ["labels", "borders", "political"]), false);
+  assert.deepEqual(prepared, ["political", "borders", "labels"]);
+  assert.deepEqual(metrics, [["idleRenderPassPreflightPending", 0, {
+    passNames: "political,borders,labels", activeScenarioId: "tno_1962",
+  }]]);
 });

@@ -101,11 +101,15 @@ export function createRenderPipelinePassesOwner({
   } = helpers;
 
   const noopDrawPass = () => {};
+  const lastCommitted = {};
 
   function canReusePendingPass(passName, cache = getRenderPassCacheState()) {
-    return passName === "borders"
-      && !!cache.canvases[passName]
-      && !!getPassReferenceTransform(passName);
+    if (passName !== "borders" || !cache.canvases[passName]) return false;
+    if (getPassReferenceTransform(passName)) return true;
+    const committed = lastCommitted[passName];
+    return !!committed
+      && committed.canvas === cache.canvases[passName]
+      && ["x", "y", "k"].every(key => Math.abs(committed.transform[key] - state.zoomTransform[key]) <= 1e-6);
   }
 
   function getIdleRenderPassDefinitions() {
@@ -224,6 +228,10 @@ export function createRenderPipelinePassesOwner({
       return;
     }
     renderPassToCache(passName, drawFn, transform, timings);
+    lastCommitted[passName] = {
+      canvas: cache.canvases[passName],
+      transform: { x: transform.x, y: transform.y, k: transform.k },
+    };
   }
 
   function ensureIdleRenderPasses(timings, passNames = null) {
@@ -245,13 +253,24 @@ export function createRenderPipelinePassesOwner({
     // These producers own private candidates and independent cancellation
     // fences. Start all of them before waiting for any one of them; no pass
     // canvas is cleared or published by this preflight.
+    const pendingPassNames = [];
     const preparationPending = preflightPrivateRenderPasses(definitions, {
-      prepareRenderPassAsync,
+      prepareRenderPassAsync: (passName) => {
+        const preparation = prepareRenderPassAsync(passName);
+        if (preparation) pendingPassNames.push(passName);
+        return preparation;
+      },
       canReusePendingPass,
       shouldPrepare: passName => cache.dirty[passName]
         || cache.signatures[passName] !== getRenderPassSignature(passName, transform),
     });
-    if (preparationPending) return false;
+    if (preparationPending) {
+      recordRenderPerfMetric("idleRenderPassPreflightPending", 0, {
+        passNames: pendingPassNames.join(","),
+        activeScenarioId: String(state.activeScenarioId || ""),
+      });
+      return false;
+    }
     const startedAt = nowMs();
     for (let index = 0; index < definitions.length; index += 1) {
       const [passName, drawFn] = definitions[index];
