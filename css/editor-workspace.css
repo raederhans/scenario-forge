@@ -235,6 +235,7 @@
   .editor-workspace .bottom-dock-primary { gap: 4px; }
 }
 @media (min-width: 1024px) {
+  .editor-workspace .dock-group-mode .dock-segmented-control { grid-template-columns: repeat(2, max-content); }
   .editor-workspace #leftSidebar, .editor-workspace #rightSidebar { transition-property: background, border-color; }
   .editor-workspace #rightSidebar { max-width: var(--editor-right-width); }
   /* Collapse the shell without squeezing and rewrapping its controls each frame. */

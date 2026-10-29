@@ -256,10 +256,11 @@ async function ensureProjectPanelVisible(page) {
     await expect.poll(() => isSelectorInViewport(page, "#inspectorSidebarTabProject"), { timeout: 30000 }).toBe(true);
   }
   const projectTab = page.locator("#inspectorSidebarTabProject");
-  if (await projectTab.getAttribute("aria-selected") !== "true") {
+  if (await projectTab.getAttribute("aria-pressed") !== "true") {
     await projectTab.click();
   }
-  await expect(projectTab).toHaveAttribute("aria-selected", "true", { timeout: 30000 });
+  await expect(projectTab).toHaveAttribute("aria-pressed", "true", { timeout: 30000 });
+  await expect(page.locator("#editorProperty-project")).toBeVisible();
 }
 
 async function expectStackingAboveGuide(page, overlaySelector) {
@@ -453,7 +454,9 @@ test("@golden-demo sample guide card opens export from the TNO sample deeplink",
     });
     await page.locator("#exportWorkbenchCloseBtn").click();
     await expect(page.locator("#exportWorkbenchOverlay")).toBeHidden({ timeout: 30000 });
-    await expectActiveElement(page, { id: /^(scenarioGuideBtn|utilitiesGuideBtn)$/ });
+    await expectActiveElement(page, {
+      id: await page.locator("body.editor-workspace").count() ? "scenarioGuideBtn" : /^(scenarioGuideBtn|utilitiesGuideBtn)$/,
+    });
     await ensureGuideVisible(page);
 
     await page.locator("[data-sample-guide-choice='modern-world-japan-corridor']").click();
@@ -516,7 +519,9 @@ test("@golden-demo sample guide card opens export from the TNO sample deeplink",
 
     await page.keyboard.press("Escape");
     await expect(page.locator("#scenarioGuidePopover")).toBeHidden({ timeout: 30000 });
-    await expectActiveElement(page, { id: /^(scenarioGuideBtn|utilitiesGuideBtn)$/ });
+    await expectActiveElement(page, {
+      id: await page.locator("body.editor-workspace").count() ? "scenarioGuideBtn" : /^(scenarioGuideBtn|utilitiesGuideBtn)$/,
+    });
     expect(runtimeIssues.unexpectedIssues).toEqual([]);
   } catch (error) {
     await writeSampleGuideFailureArtifact(page, testInfo);

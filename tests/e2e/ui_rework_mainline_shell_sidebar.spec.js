@@ -171,7 +171,12 @@ test("phase 02 shell and sidebar mainline stays on the new rails", async ({ page
   await expect(page.locator("#dockEditPopoverBtn")).toHaveCount(0);
   await expect(page.locator("#presetClear")).toHaveCount(0);
 
-  await expect(page.locator("#dockReferenceBtn")).toHaveText("Reference");
+  if (await page.locator("body.editor-workspace").count()) {
+    await page.locator("#editorLayer-reference").click();
+    await expect(page.locator("#editorProperty-reference")).toBeVisible();
+  } else {
+    await expect(page.locator("#dockReferenceBtn")).toHaveText("Reference");
+  }
   await expect(page.locator("#dockExportBtn")).toHaveText("Open workbench");
 
   await page.locator("#scenarioGuideBtn").click();

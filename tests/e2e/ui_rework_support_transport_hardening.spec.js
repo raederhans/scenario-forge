@@ -245,12 +245,13 @@ test("project support panels and inspector search stay polished and inset", asyn
     await page.locator("#editorObjects-countries").click();
     await expect(page.locator("#countryInspectorSection")).toBeVisible();
     const searchMetrics = await page.evaluate(() => {
-      const section = document.querySelector("#countryInspectorSection")?.getBoundingClientRect();
+      const container = document.querySelector("#countryInspectorSection").closest(".editor-task-body");
+      const section = container.getBoundingClientRect();
       const search = document.querySelector("#countryInspectorSection .inspector-search-block")?.getBoundingClientRect();
       const style = getComputedStyle(document.querySelector("#countrySearch"));
       return {
-        left: search.left - section.left,
-        right: section.right - search.right,
+        left: search.left - section.left - container.clientLeft,
+        right: section.left + container.clientLeft + container.clientWidth - search.right,
         paddingLeft: Number.parseFloat(style.paddingLeft),
         paddingRight: Number.parseFloat(style.paddingRight),
         borderLeft: style.borderLeftWidth,
