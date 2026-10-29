@@ -105,7 +105,7 @@ export function createRenderPipelinePassesOwner({
   const lastCommitted = {};
 
   function canReusePendingPass(passName, cache = getRenderPassCacheState()) {
-    if (passName !== "borders" || !cache.canvases[passName]) return false;
+    if (passName !== "borders" || !cache.canvases?.[passName]) return false;
     if (getPassReferenceTransform(passName)) return true;
     const committed = lastCommitted[passName];
     if (!committed || committed.canvas !== cache.canvases[passName]) return false;
@@ -234,7 +234,7 @@ export function createRenderPipelinePassesOwner({
     }
     renderPassToCache(passName, drawFn, transform, timings);
     lastCommitted[passName] = {
-      canvas: cache.canvases[passName],
+      canvas: cache.canvases?.[passName] || null,
       transform: { x: transform.x, y: transform.y, k: transform.k },
     };
   }
