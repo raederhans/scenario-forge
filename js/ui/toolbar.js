@@ -779,6 +779,9 @@ function initToolbar({ render } = {}) {
   };
   drawerMedia.addEventListener("change", () => {
     const active = document.activeElement;
+    if (!drawerMedia.matches) {
+      document.body.classList.remove("left-drawer-open", "right-drawer-open");
+    }
     syncPanelToggleButtons();
     for (const side of ["left", "right"]) {
       const sidebar = document.getElementById(`${side}Sidebar`);
@@ -1936,7 +1939,11 @@ function initToolbar({ render } = {}) {
       dismissOnboardingHint();
     }
     emitTransientFeedback(t(
-      runtimeState.brushModeEnabled ? "Brush On · Shift+Drag to pan" : "Brush Off",
+      runtimeState.brushModeEnabled
+        ? globalThis.matchMedia?.("(pointer: coarse)")?.matches
+          ? "Brush On · Drag to paint · Use two fingers or Shift+Drag to pan"
+          : "Brush On · Shift+Drag to pan"
+        : "Brush Off",
       "ui"
     ));
   };

@@ -174,6 +174,7 @@
 .editor-workspace .editor-task-panel > .color-library-card { padding: 0; border: 0; background: none; }
 .editor-workspace .editor-task-panel .palette-grid { max-height: none; overflow: visible; }
 .editor-workspace #bottomDock { bottom: 16px; border-radius: var(--radius-lg); gap: 8px; padding: 8px; width: min(820px, calc(100% - 24px)); max-width: calc(100% - 24px); }
+.editor-workspace #bottomDock.is-collapsed { width: 54px; height: 54px; padding: 4px; }
 .editor-workspace #bottomDock:has(#riverPaintNavigation:not([hidden])) { overflow: visible; }
 .editor-workspace .scenario-context-bar { left: 24px; max-width: calc(100% - 48px); }
 .editor-workspace .scenario-context-label { flex-shrink: 0; color: var(--text-primary); font-weight: 600; }
@@ -395,6 +396,16 @@
 }
 
 @media (pointer: coarse) {
+  .editor-workspace input[type="color"].color-input:not(#bottomDock input):not([hidden]):not(.hidden),
+  .editor-workspace .palette-country-color-row input[type="color"],
+  .editor-workspace :is(.transport-workbench-data-column-toggle, .transport-workbench-toggle, .transport-workbench-option-pill, .water-filter-toggle, .toggle-label, .export-workbench-layer-toggle, .legend-generator-check) {
+    min-height: 44px;
+  }
+  .editor-workspace input[type="range"],
+  .editor-workspace input[type="range"].range-input {
+    min-height: 44px;
+    padding-block: var(--space-2);
+  }
   /* 色块放大到 44px 后网格轨道必须同步放大，否则相邻命中区重叠。 */
   .editor-workspace #paletteGrid { grid-template-columns: repeat(3, 44px); }
   .editor-workspace :is(button, summary, .app-select-button, .btn),
