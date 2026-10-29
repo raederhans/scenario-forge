@@ -21,7 +21,7 @@ jobs:
     # parallel instead of ~20 minutes in series. Each raster profile is a serial
     # describe and stays whole; "rest" is a grep-invert so new profiles land there.
     name: release-checks (${{ matrix.slice }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: verify
     timeout-minutes: 45
     permissions:
@@ -125,7 +125,7 @@ jobs:
 
   admission:
     # Admit the artifact only after every release-check slice passed.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: release-checks
     timeout-minutes: 10
     permissions:
@@ -159,7 +159,7 @@ jobs:
           if-no-files-found: error
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: admission
     permissions:
       contents: read
@@ -204,7 +204,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     env:
       PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
@@ -350,7 +350,7 @@ jobs:
     name: Deployment timing summary
     needs: [verify, release-checks, admission, build, deploy]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 3
     # Diagnostics only: never change the result or dependencies of release gates.
     continue-on-error: true
