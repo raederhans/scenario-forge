@@ -14798,6 +14798,9 @@ function render() {
       politicalBgDeferredFullCacheEntryCount: readRenderPerfMetricNumber("scenarioPoliticalBackgroundDeferredFullCacheBuild", "entryCount", metricSequenceStartedAt),
       politicalBgDeferredFullCacheBuiltPathCount: readRenderPerfMetricNumber("scenarioPoliticalBackgroundDeferredFullCacheBuild", "builtPathCount", metricSequenceStartedAt),
       politicalFeatureFillMs: readRenderPerfMetricDuration("drawPoliticalFeatureFillLoop", metricSequenceStartedAt),
+      // Which producer committed political pixels in this frame: "vector",
+      // "political-id-raster", or "" when the frame reused cached passes.
+      politicalSource: readRenderPerfMetricString("drawPoliticalFeatureFillLoop", "source", metricSequenceStartedAt),
       contextScenarioMs: readRenderPerfMetricDuration("drawContextScenarioPass", metricSequenceStartedAt),
       hitCanvasMs: readRenderPerfMetricDuration("buildHitCanvas", metricSequenceStartedAt),
     });
