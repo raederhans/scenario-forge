@@ -49,7 +49,7 @@ import {
   ensurePaletteAssetsLoaded,
 } from "../core/palette_manager.js";
 import { FileManager } from "../core/file_manager.js";
-import { canUndoHistory, captureHistoryState, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
+import { captureHistoryState, pushHistoryEntry, undoHistory } from "../core/history_manager.js";
 import { LegendManager } from "../core/legend_manager.js";
 import {
   ensureActiveScenarioOptionalLayerLoaded,
@@ -58,6 +58,7 @@ import {
 } from "../core/scenario_resources.js";
 import { getDirectGeoLabel, getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
+import { setUiIcon } from "./ui_icons.js";
 import { showAppDialog } from "./app_dialog.js";
 import { initDevWorkspace } from "./dev_workspace.js";
 import { UI_URL_STATE_KEYS } from "./ui_contract.js";
@@ -96,6 +97,31 @@ import {
 } from "../core/unit_counter_presets.js";
 
 const state = runtimeState;
+export function resetCountryColorsWithFeedback(afterReset, afterUndo) {
+  const previousEntry = state.historyPast?.at(-1);
+  resetCountryColors();
+  const resetEntry = state.historyPast?.at(-1);
+  const hasResetEntry = resetEntry && resetEntry !== previousEntry;
+  afterReset();
+  return showToast(t("Country colors were reset.", "ui"), {
+    title: t("Colors reset", "ui"),
+    tone: "warning",
+    duration: 7200,
+    actionLabel: hasResetEntry ? t("Undo", "ui") : "",
+    onAction: hasResetEntry ? () => {
+      if (state.historyPast?.at(-1) !== resetEntry) {
+        showToast(t("Can't undo the reset because newer edits exist.", "ui"), { tone: "warning" });
+        return;
+      }
+      if (!undoHistory()) return;
+      afterUndo();
+      showToast(t("Country colors were restored.", "ui"), {
+        title: t("Undo applied", "ui"),
+        tone: "success",
+      });
+    } : null,
+  });
+}
 const translateCountryGeoLabel = (label, type = "ui") => (
   type === "geo" ? getDirectGeoLabel(label) : t(label, type)
 );
@@ -2393,7 +2419,7 @@ function initSidebar({ render } = {}) {
     leftSidebarCollapseBtn?.setAttribute("data-i18n-aria-label", nextSidebarLabel);
     leftSidebarCollapseBtn?.setAttribute("aria-label", t(nextSidebarLabel, "ui"));
     if (leftSidebarCollapseIcon) {
-      leftSidebarCollapseIcon.textContent = effectiveCollapsed ? ">" : "<";
+      setUiIcon(leftSidebarCollapseIcon, effectiveCollapsed ? "chevron-right" : "chevron-left");
     }
     if (persist) {
       try {
@@ -2423,7 +2449,7 @@ function initSidebar({ render } = {}) {
     rightSidebarCollapseBtn?.setAttribute("data-i18n-aria-label", nextSidebarLabel);
     rightSidebarCollapseBtn?.setAttribute("aria-label", t(nextSidebarLabel, "ui"));
     if (rightSidebarCollapseIcon) {
-      rightSidebarCollapseIcon.textContent = effectiveCollapsed ? "<" : ">";
+      setUiIcon(rightSidebarCollapseIcon, effectiveCollapsed ? "chevron-left" : "chevron-right");
     }
     if (persist) {
       try {
@@ -3960,27 +3986,12 @@ function initSidebar({ render } = {}) {
         tone: "warning",
       });
       if (!confirmed) return;
-      resetCountryColors();
-      markDirty("reset-country-colors");
-      callRuntimeHook(state, "renderCountryListFn");
-      flushSidebarRender("sidebar-reset-country-colors");
-      scheduleAdaptiveInspectorHeights();
-      showToast(t("Country colors were reset.", "ui"), {
-        title: t("Colors reset", "ui"),
-        tone: "warning",
-        duration: 7200,
-        actionLabel: canUndoHistory() ? t("Undo", "ui") : "",
-        onAction: canUndoHistory()
-          ? async () => {
-            if (!undoHistory()) return;
-            scheduleAdaptiveInspectorHeights();
-            showToast(t("Country colors were restored.", "ui"), {
-              title: t("Undo applied", "ui"),
-              tone: "success",
-            });
-          }
-          : null,
-      });
+      resetCountryColorsWithFeedback(() => {
+        markDirty("reset-country-colors");
+        callRuntimeHook(state, "renderCountryListFn");
+        flushSidebarRender("sidebar-reset-country-colors");
+        scheduleAdaptiveInspectorHeights();
+      }, scheduleAdaptiveInspectorHeights);
     });
     resetBtn.dataset.bound = "true";
   }

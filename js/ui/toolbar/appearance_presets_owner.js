@@ -11,6 +11,7 @@ import {
   selectAppearancePresetState,
   upsertAppearancePresetState,
 } from "../../core/state/actions/appearance_preset_actions.js";
+import { showToast } from "../toast.js";
 
 function getPresetCountLabel(count, t) {
   const label = count === 1 ? "preset" : "presets";
@@ -248,9 +249,14 @@ export function createAppearancePresetsOwner({
         if (!file) return;
         try {
           const text = await file.text();
-          importAppearancePresetPayload(JSON.parse(text));
+          importAppearancePresetPayload(text);
         } catch (error) {
           console.error("[appearance-presets] Failed to import preset:", error);
+          showToast(error.code === "invalid-json"
+            ? t("Can't import appearance preset: invalid JSON.", "ui")
+            : t("Can't import appearance preset: invalid format.", "ui"), {
+            tone: "error",
+          });
         } finally {
           event.target.value = "";
         }
