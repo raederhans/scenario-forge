@@ -1,4 +1,6 @@
-const CORE_TAG_CACHE_LIMIT = 512;
+// Holds every distinct core tag across the bundled scenarios (515 after the HOI4 splits) so a
+// scenario switch back never re-normalizes; keep headroom for further splits.
+export const CORE_TAG_CACHE_LIMIT = 2048;
 const CORE_TAG_CACHE_MAX_LENGTH = 512;
 
 // Cache only immutable scalar normalization, not the mutable assignment lists.
