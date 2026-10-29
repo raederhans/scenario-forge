@@ -9,6 +9,7 @@ import { FileManager } from "../core/file_manager.js";
 import { redoHistory, undoHistory } from "../core/history_manager.js";
 import { flushRenderBoundary } from "../core/render_boundary.js";
 import { t } from "./i18n.js";
+import { getActiveModal } from "./ui_contract.js";
 import {
   cancelActiveStrategicInteractionModes,
   cancelSpecialZoneDraw,
@@ -109,6 +110,7 @@ function initShortcuts() {
   if (document.body?.dataset.shortcutsBound === "true") return;
 
   window.addEventListener("keydown", (event) => {
+    if (event.defaultPrevented || getActiveModal()) return;
     const key = String(event.key || "");
     const lower = key.toLowerCase();
     const modifier = event.metaKey || event.ctrlKey;
@@ -310,6 +312,7 @@ function initShortcuts() {
   });
 
   window.addEventListener("keyup", (event) => {
+    if (event.defaultPrevented || getActiveModal()) return;
     if (runtimeState.bootBlocking) return;
     if (event.key !== "Shift" && event.key !== " ") return;
     setBrushPanModifier(false);

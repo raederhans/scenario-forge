@@ -1,3 +1,4 @@
+import { getActiveModal } from "../ui_contract.js";
 import { createQuickFillLevelControls, getQuickFillUiCountry } from "./quick_fill_level_controls.js";
 // Workspace chrome support-surface controller.
 // 这个模块负责 guide / dock support surface / URL restore / 全局 dismiss 这一层的 UI 外壳协调。
@@ -386,6 +387,9 @@ export function createWorkspaceChromeSupportSurfaceController({
     });
 
     document.addEventListener("keydown", (event) => {
+      if (event.defaultPrevented) return;
+      const modal = getActiveModal();
+      if (modal && modal !== scenarioGuidePopover && modal !== exportWorkbenchPanel) return;
       if (exportWorkbenchOverlay && !exportWorkbenchOverlay.classList.contains("hidden") && event.key === "Tab") {
         const focusables = getFocusableElements?.(exportWorkbenchPanel) || [];
         if (!focusables.length) {
@@ -396,12 +400,12 @@ export function createWorkspaceChromeSupportSurfaceController({
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
         const active = document.activeElement;
-        if (event.shiftKey && active === first) {
+        if (event.shiftKey && (active === first || !focusables.includes(active))) {
           event.preventDefault();
           last.focus({ preventScroll: true });
           return;
         }
-        if (!event.shiftKey && active === last) {
+        if (!event.shiftKey && (active === last || !focusables.includes(active))) {
           event.preventDefault();
           first.focus({ preventScroll: true });
           return;
@@ -417,12 +421,12 @@ export function createWorkspaceChromeSupportSurfaceController({
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
         const active = document.activeElement;
-        if (event.shiftKey && active === first) {
+        if (event.shiftKey && (active === first || !focusables.includes(active))) {
           event.preventDefault();
           last.focus({ preventScroll: true });
           return;
         }
-        if (!event.shiftKey && active === last) {
+        if (!event.shiftKey && (active === last || !focusables.includes(active))) {
           event.preventDefault();
           first.focus({ preventScroll: true });
           return;

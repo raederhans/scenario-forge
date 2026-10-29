@@ -1,4 +1,4 @@
-import test from "node:test";
+import test, { beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 
 import { state } from "../js/core/state.js";
@@ -6,6 +6,45 @@ import { registerRuntimeHook } from "../js/core/state/index.js";
 import { markDirty, clearDirty } from "../js/core/dirty_state.js";
 import { createProjectSupportDiagnosticsController } from "../js/ui/sidebar/project_support_diagnostics_controller.js";
 import { strToU8, zipSync } from "../vendor/fflate.browser.js";
+
+class FakeHTMLElement {
+  get ownerDocument() { return this.documentRef || globalThis.document; }
+  set ownerDocument(value) { Object.defineProperty(this, "documentRef", { value, writable: true, configurable: true }); }
+  get parentElement() { return this.parentNode || null; }
+  get tabIndex() {
+    if (this.hasAttribute("tabindex")) return Number(this.getAttribute("tabindex"));
+    return ["button", "input", "select", "textarea", "summary"].includes(this.tagName) || this.hasAttribute("href") ? 0 : -1;
+  }
+  set tabIndex(value) { this.setAttribute("tabindex", value); }
+  hasAttribute(name) { return Object.hasOwn(this.attributes || {}, name); }
+  contains(node) { return node === this || (this.children || []).some(child => child.contains?.(node)); }
+  querySelectorAll(selector) {
+    return (this.children || []).flatMap(child => collectNodes(child, node => {
+      if (selector === '[aria-modal="true"]') return node.getAttribute?.("aria-modal") === "true";
+      return (!node.disabled && ["button", "input", "select", "textarea"].includes(node.tagName))
+        || node.hasAttribute?.("href") || (selector.includes("summary") && node.tagName === "summary")
+        || (node.hasAttribute?.("tabindex") && node.getAttribute("tabindex") !== "-1");
+    }));
+  }
+  focus() { this.ownerDocument.activeElement = this; }
+}
+
+let domGlobals;
+beforeEach(() => {
+  domGlobals = Object.fromEntries(["HTMLElement", "getComputedStyle"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  globalThis.HTMLElement = FakeHTMLElement;
+  globalThis.getComputedStyle = node => ({
+    display: node.classList?.contains("hidden") ? "none" : node.style?.display || "block",
+    visibility: node.style?.visibility || "visible",
+    zIndex: node.style?.zIndex || "auto",
+  });
+});
+afterEach(() => {
+  for (const [key, descriptor] of Object.entries(domGlobals)) {
+    if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+    else delete globalThis[key];
+  }
+});
 
 function createStatusNode() {
   const node = {
@@ -53,7 +92,7 @@ function createAccountPopoverControls() {
     },
     focus() {},
   };
-  const backendAccountPopover = {
+  const backendAccountPopover = Object.assign(createElementNode(), {
     dataset: {},
     hiddenClass: true,
     classList: {
@@ -62,7 +101,8 @@ function createAccountPopoverControls() {
         backendAccountPopover.hiddenClass = hidden;
       },
     },
-  };
+  });
+  backendAccountPopover.setAttribute("aria-modal", "true");
   return { backendAccountToggleBtn, backendAccountPopover };
 }
 
@@ -93,7 +133,8 @@ function createElementNode(tagName = "div") {
       return this.values.get(name) || "";
     },
   };
-  return {
+  return Object.assign(new FakeHTMLElement(), {
+    ownerDocument: globalThis.document,
     tagName,
     children: [],
     className: "",
@@ -134,7 +175,7 @@ function createElementNode(tagName = "div") {
     closest() {
       return null;
     },
-  };
+  });
 }
 
 function findNode(root, predicate) {
@@ -182,6 +223,7 @@ function createController(projectSaveStatus, overrides = {}) {
     hosts: overrides.hosts,
     documentRef: overrides.documentRef || {
       getElementById: (id) => nodesById.get(id) || null,
+      querySelectorAll: selector => [...nodesById.values()].filter(node => node?.getAttribute?.("aria-modal") === "true" && selector === '[aria-modal="true"]'),
       createElement: (...args) => globalThis.document.createElement(...args),
       addEventListener: (...args) => globalThis.document.addEventListener(...args),
       get body() { return globalThis.document.body; },
@@ -213,11 +255,16 @@ function createController(projectSaveStatus, overrides = {}) {
 function createMountDocument() {
   const documentRef = { activeElement: null, listeners: {}, listenerCounts: {} };
   documentRef.addEventListener = (type, handler) => {
-    documentRef.listeners[type] = handler;
+    documentRef.listeners[type] = event => {
+      event.defaultPrevented ??= false;
+      event.preventDefault ??= function () { this.defaultPrevented = true; };
+      handler(event);
+    };
     documentRef.listenerCounts[type] = (documentRef.listenerCounts[type] || 0) + 1;
   };
   documentRef.createElement = (tagName) => {
     const node = createElementNode(tagName);
+    node.ownerDocument = documentRef;
     node.listenerCounts = {};
     const addEventListener = node.addEventListener;
     node.addEventListener = function (type, handler) {
@@ -246,6 +293,7 @@ function createMountDocument() {
     return node;
   };
   documentRef.body = documentRef.createElement("body");
+  documentRef.querySelectorAll = selector => documentRef.body.querySelectorAll(selector);
   documentRef.getElementById = (id) => findNode(documentRef.body, (node) => node.id === id);
   const hosts = Object.fromEntries([
     "projectManagementStack", "legendEditorStack", "diagnosticStack", "rightSidebarContent",
@@ -362,7 +410,10 @@ test("mounted project account binds once and preserves close focus and ARIA beha
       trigger.listeners.click();
       assert.equal(popover.classList.contains("hidden"), false);
       assert.equal(trigger.getAttribute("aria-expanded"), "true");
-      assert.equal(fixture.documentRef.activeElement, get("backendCloudUsername"));
+      // 会话探测期间用户名被禁用，焦点退回账号面板内第一个可聚焦元素；只要求焦点留在面板内。
+      let focused = fixture.documentRef.activeElement;
+      while (focused && focused !== popover) focused = focused.parentNode;
+      assert.equal(focused, popover);
       close();
       assert.equal(popover.classList.contains("hidden"), true);
       assert.equal(get("backendAccountBackdrop").classList.contains("hidden"), true);
@@ -1076,7 +1127,7 @@ test("community load source opens account popover and refreshes community saves"
       this.listeners[type] = handler;
     },
   };
-  const backendAccountPopover = {
+  const backendAccountPopover = Object.assign(createElementNode(), {
     dataset: {},
     hiddenClass: true,
     classList: {
@@ -1085,7 +1136,8 @@ test("community load source opens account popover and refreshes community saves"
         backendAccountPopover.hiddenClass = hidden;
       },
     },
-  };
+  });
+  backendAccountPopover.setAttribute("aria-modal", "true");
   const backendCommunityList = createListNode();
 
   globalThis.document = {

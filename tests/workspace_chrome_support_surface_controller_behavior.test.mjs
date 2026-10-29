@@ -38,13 +38,26 @@ class Button {
   }
   appendChild(child) { this.children.push(child); child.parent = this; return child; }
   replaceChildren(...children) { this.children = children; for (const child of children) child.parent = this; }
+  get parentElement() { return this.parent || null; }
+  hasAttribute(name) { return this.attributes.has(name); }
+  querySelectorAll(selector) {
+    return this.children.flatMap(child => [
+      ...(selector === '[aria-modal="true"]' && child.getAttribute("aria-modal") === "true" ? [child] : []),
+      ...child.querySelectorAll(selector),
+    ]);
+  }
   setAttribute(name, value) { this.attributes.set(name, String(value)); }
   getAttribute(name) { return this.attributes.get(name) ?? null; }
   addEventListener(name, handler) {
     if (!this.listeners.has(name)) this.listeners.set(name, []);
     this.listeners.get(name).push(handler);
   }
-  dispatch(name, event = {}) { for (const handler of this.listeners.get(name) || []) handler(event); }
+  dispatch(name, event = {}) {
+    event.defaultPrevented ??= false;
+    const preventDefault = event.preventDefault;
+    event.preventDefault = function () { this.defaultPrevented = true; preventDefault?.call(this); };
+    for (const handler of this.listeners.get(name) || []) handler(event);
+  }
   click() {
     if (this.disabled) return;
     this.focus();
@@ -58,20 +71,23 @@ class Button {
 
 function createHarness(context, initial = {}) {
   const oldDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
+  const oldHTMLElement = Object.getOwnPropertyDescriptor(globalThis, "HTMLElement");
   const oldElement = Object.getOwnPropertyDescriptor(globalThis, "Element");
   const doc = new Button("document");
   doc.createElement = tagName => { const element = new Button(); element.tagName = String(tagName).toUpperCase(); element.ownerDocument = doc; return element; };
   Object.defineProperty(globalThis, "document", { value: doc, configurable: true });
+  Object.defineProperty(globalThis, "HTMLElement", { value: Button, configurable: true });
   Object.defineProperty(globalThis, "Element", { value: Button, configurable: true });
   context.after(() => {
     if (oldDocument) Object.defineProperty(globalThis, "document", oldDocument); else delete globalThis.document;
+    if (oldHTMLElement) Object.defineProperty(globalThis, "HTMLElement", oldHTMLElement); else delete globalThis.HTMLElement;
     if (oldElement) Object.defineProperty(globalThis, "Element", oldElement); else delete globalThis.Element;
   });
   const nodes = Object.fromEntries([
     "dockQuickFillBtn", "dockQuickFillRow", "quickFillParentBtn", "quickFillCountryBtn", "dockQuickFillHint",
     "dockReferenceBtn", "dockReferencePopover", "dockEditPopoverBtn", "dockEditPopover",
   ].map(id => [id, new Button(id)]));
-  for (const node of Object.values(nodes)) node.ownerDocument = doc;
+  for (const node of Object.values(nodes)) { node.ownerDocument = doc; doc.appendChild(node); }
   nodes.quickFillParentBtn.parent = nodes.dockQuickFillRow;
   nodes.quickFillCountryBtn.parent = nodes.dockQuickFillRow;
   const state = { activeDockPopover: "", batchFillScope: "parent", paintMode: "visual", interactionGranularity: "subdivision", ...initial };

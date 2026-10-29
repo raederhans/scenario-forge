@@ -3,7 +3,8 @@ import {
   applyDialogContract,
   captureFocusOrigin,
   focusSurface,
-  getFocusableElements,
+  getActiveModal,
+  trapSurfaceTab,
   restoreFocusOrigin,
 } from "./ui_contract.js";
 
@@ -116,28 +117,13 @@ function showAppDialog({
     };
 
     const handleKeydown = (event) => {
+      if (event.defaultPrevented || getActiveModal() !== dialog) return;
       if (event.key === "Escape") {
         event.preventDefault();
         cleanup(false);
         return;
       }
-      if (event.key !== "Tab") return;
-      const focusables = getFocusableElements(dialog);
-      if (!focusables.length) {
-        event.preventDefault();
-        focusSurface(dialog);
-        return;
-      }
-      const currentIndex = focusables.indexOf(document.activeElement);
-      if (currentIndex === -1) {
-        event.preventDefault();
-        focusables[0].focus({ preventScroll: true });
-        return;
-      }
-      event.preventDefault();
-      const delta = event.shiftKey ? -1 : 1;
-      const nextIndex = (currentIndex + delta + focusables.length) % focusables.length;
-      focusables[nextIndex].focus({ preventScroll: true });
+      trapSurfaceTab(event, dialog);
     };
 
     const handleOverlayClick = (event) => {
