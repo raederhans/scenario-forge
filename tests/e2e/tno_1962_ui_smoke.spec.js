@@ -135,8 +135,11 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
     const missingFeaturedTags = (payload.manifest.featured_tags || []).filter(
       (tag) => !payload.countries[tag] && !catalogTags.has(tag)
     );
-    const retiredCountryTags = ['BEL', 'EST', 'LAT', 'LIT', 'LUX', 'NOR', 'POL', 'SOV'];
-    const requiredControllerOnlyTags = ['POR', 'PRC', 'SIC', 'SIK', 'XSM'];
+    // The 1.10 identity migration (data/scenario-rules/tno_1962.identity_map.json) retires the
+    // old project tags; PRC now names Tannu Tuva and holds land.
+    const retiredCountryTags = ['BEL', 'EST', 'LAT', 'LIT', 'LUX', 'NOR', 'POL', 'SOV',
+      'SIC', 'SIK', 'TAN', 'GUI', 'FRI', 'HOL', 'GSW', 'RSF', 'BRM'];
+    const requiredControllerOnlyTags = ['POR', 'XSM'];
     const lingeringHoi4Owners = Object.values(payload.countries)
       .filter((entry) => entry && entry.source_type === 'hoi4_owner')
       .map((entry) => entry.tag);
@@ -158,7 +161,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
     expect(payload.manifest.featured_tags || []).not.toContain('SOV');
     expect(payload.countries.WRS?.inspector_group_id).toBe('scenario_group_russia_region');
     expect(payload.countries.CHI?.inspector_group_id).toBe('scenario_group_china_region');
-    expect(payload.countries.PRC?.inspector_group_id).toBe('scenario_group_china_region');
+    expect(payload.countries.PRC?.inspector_group_id).toBe('scenario_group_russia_region');
     expect(payload.countries.MEN?.inspector_group_id).toBe('scenario_group_china_region');
     expect(payload.countries.AQ?.display_name).toBe('Antarctica');
     expect(payload.countries.RKM?.inspector_group_id).toBeFalsy();

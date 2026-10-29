@@ -241,7 +241,8 @@ def _refresh_summary_metadata(
         audit = load_json(audit_path)
         marker = audit.setdefault("diagnostics", {}).setdefault("polar_materialization", {})
         classified = set(marker.get("classified_feature_ids", []))
-        new_ids = set(assignments) - classified
+        new_ids = {fid for fid, assignment in assignments.items()
+                   if assignment.get("parent_id") != fid} - classified
         for feature_id in sorted(new_ids):
             country = countries[str(assignments[feature_id]["owner"])]
             quality = str(country["quality"])

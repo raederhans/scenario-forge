@@ -1,6 +1,6 @@
 {
   "artifact_counts": {
-    "chunk_count": 201,
+    "chunk_count": 211,
     "feature_count": 9949,
     "water_count": 285
   },
@@ -4309,7 +4309,7 @@
     "override_tags": [
       "BOP",
       "GAY",
-      "MAG",
+      "MGN",
       "NIE",
       "ONG",
       "ORN",
@@ -13481,7 +13481,7 @@
       "GNG",
       "JAP",
       "YUN",
-      "GUI",
+      "GUZ",
       "GXC",
       "SHX",
       "GMA",
@@ -13491,7 +13491,7 @@
       "PHI",
       "INS",
       "MAL",
-      "BRM",
+      "BUR",
       "VIN",
       "LAO",
       "CAM",
@@ -13586,14 +13586,19 @@
           "RU_RAY_50074027B82296582296323",
           "RU_RAY_50074027B98895209347227"
         ],
-        "BRM": [
-          "CN_CITY_17275852B14658621666192",
-          "CN_CITY_17275852B20068359050292",
-          "CN_CITY_17275852B45889256371362",
-          "CN_CITY_17275852B50071782197016",
-          "CN_CITY_17275852B59976310203554",
-          "CN_CITY_17275852B66801672405752",
-          "CN_CITY_17275852B85492016083287"
+        "AZH": [
+          "IN_ADM2_76128533B10270619600482",
+          "IN_ADM2_76128533B23858286755005",
+          "IN_ADM2_76128533B25835998628545",
+          "IN_ADM2_76128533B27432148084533",
+          "IN_ADM2_76128533B30151252629779",
+          "IN_ADM2_76128533B32499449492865",
+          "IN_ADM2_76128533B40226077866964",
+          "IN_ADM2_76128533B65773363805797",
+          "IN_ADM2_76128533B67639510673366",
+          "IN_ADM2_76128533B78458325839103",
+          "IN_ADM2_76128533B88623139855224",
+          "IN_ADM2_76128533B91480770176940"
         ],
         "BRY": [
           "RU_RAY_50074027B10017540039169",
@@ -13633,6 +13638,15 @@
           "EL514",
           "EL515",
           "EL526"
+        ],
+        "BUR": [
+          "CN_CITY_17275852B14658621666192",
+          "CN_CITY_17275852B20068359050292",
+          "CN_CITY_17275852B45889256371362",
+          "CN_CITY_17275852B50071782197016",
+          "CN_CITY_17275852B59976310203554",
+          "CN_CITY_17275852B66801672405752",
+          "CN_CITY_17275852B85492016083287"
         ],
         "CHT": [
           "RU_RAY_50074027B10681845453352",
@@ -13693,20 +13707,6 @@
           "DZA-2196",
           "DZA-2198",
           "DZA-2209"
-        ],
-        "FRI": [
-          "IN_ADM2_76128533B10270619600482",
-          "IN_ADM2_76128533B23858286755005",
-          "IN_ADM2_76128533B25835998628545",
-          "IN_ADM2_76128533B27432148084533",
-          "IN_ADM2_76128533B30151252629779",
-          "IN_ADM2_76128533B32499449492865",
-          "IN_ADM2_76128533B40226077866964",
-          "IN_ADM2_76128533B65773363805797",
-          "IN_ADM2_76128533B67639510673366",
-          "IN_ADM2_76128533B78458325839103",
-          "IN_ADM2_76128533B88623139855224",
-          "IN_ADM2_76128533B91480770176940"
         ],
         "GCE": [
           "UKK30"
@@ -13966,6 +13966,11 @@
           "IRQ-3052",
           "IRQ-3242",
           "IRQ-3243"
+        ],
+        "MAG": [
+          "RU_RAY_50074027B28144113624552",
+          "RU_RAY_50074027B77123826131271",
+          "RU_RAY_50074027B8247596248333"
         ],
         "MAN": [
           "CN_CITY_17275852B26763632681669",
@@ -14228,6 +14233,13 @@
           "RU_RAY_50074027B74375992228315",
           "RU_RAY_50074027B76144209526439"
         ],
+        "PRC": [
+          "MNG-3208",
+          "MNG-3318",
+          "MNG-3320",
+          "MNG-3321",
+          "MNG-3322"
+        ],
         "RFA": [
           "RU_RAY_50074027B10379539839705",
           "RU_RAY_50074027B15858077100993",
@@ -14349,11 +14361,6 @@
           "RU_RAY_50074027B96632027100715",
           "RU_RAY_50074027B97793723887224",
           "RU_RAY_50074027B98963269942164"
-        ],
-        "RSF": [
-          "RU_RAY_50074027B28144113624552",
-          "RU_RAY_50074027B77123826131271",
-          "RU_RAY_50074027B8247596248333"
         ],
         "RUR": [
           "RU_RAY_50074027B11956854664950",
@@ -14594,13 +14601,6 @@
           "RU_RAY_50074027B99014675112578",
           "RU_RAY_50074027B99074376232586",
           "RU_RAY_50074027B9981749344230"
-        ],
-        "TAN": [
-          "MNG-3208",
-          "MNG-3318",
-          "MNG-3320",
-          "MNG-3321",
-          "MNG-3322"
         ],
         "TAT": [
           "RU_RAY_50074027B11385532042564",
@@ -23249,7 +23249,7 @@
         "GNG",
         "JAP",
         "YUN",
-        "GUI",
+        "GUZ",
         "GXC",
         "SHX",
         "GMA",
@@ -23259,7 +23259,7 @@
         "PHI",
         "INS",
         "MAL",
-        "BRM",
+        "BUR",
         "VIN",
         "LAO",
         "CAM",
@@ -23280,7 +23280,7 @@
         "RUR"
       ],
       "south_asia": [
-        "FRI"
+        "AZH"
       ]
     },
     "romania_transnistria_applied": true,
@@ -23309,7 +23309,7 @@
     },
     "source_root": "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\394360\\3583339918",
     "south_asia_owner_layer_tags": [
-      "FRI"
+      "AZH"
     ],
     "special_region_source": "runtime_topology_scenario_atlantropa_features",
     "state_count": 1046,
@@ -23376,8 +23376,8 @@
       "BHU": 1,
       "BOL": 2,
       "BRA": 31,
-      "BRM": 9,
       "BUL": 4,
+      "BUR": 9,
       "CAN": 23,
       "CHI": 34,
       "CHL": 8,
@@ -23397,7 +23397,6 @@
       "GUA": 1,
       "GXC": 2,
       "HAI": 1,
-      "HOL": 5,
       "HON": 1,
       "HUN": 7,
       "ICE": 1,
@@ -23430,26 +23429,26 @@
       "PHI": 10,
       "POL": 19,
       "POR": 20,
-      "PRC": 6,
+      "PRC": 1,
       "PRU": 5,
       "RAJ": 35,
       "ROM": 12,
       "SAF": 7,
       "SAU": 9,
       "SIA": 4,
-      "SIK": 7,
       "SLO": 2,
       "SOV": 152,
       "SPR": 26,
+      "SUR": 5,
       "SWE": 13,
       "SWI": 5,
       "SYR": 3,
-      "TAN": 1,
       "TIB": 4,
       "TUR": 22,
       "URG": 3,
       "USA": 53,
       "VEN": 3,
+      "XIN": 7,
       "XSM": 8,
       "YEM": 1,
       "YUG": 15,
@@ -29871,7 +29870,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -29910,7 +29909,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -29936,7 +29935,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -30014,7 +30013,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -30040,7 +30039,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -30287,7 +30286,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -30547,7 +30546,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -30573,7 +30572,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -30612,7 +30611,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -30963,7 +30962,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -30976,7 +30975,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -30989,7 +30988,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -31067,7 +31066,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -31613,7 +31612,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -31639,7 +31638,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -31678,7 +31677,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -31847,7 +31846,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -31964,7 +31963,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -32211,7 +32210,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -32562,7 +32561,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -32575,7 +32574,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -33030,7 +33029,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -33069,7 +33068,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -33160,7 +33159,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -33199,7 +33198,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -33264,7 +33263,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -33407,7 +33406,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -33537,7 +33536,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -33901,7 +33900,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -34031,7 +34030,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -34109,7 +34108,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -34395,7 +34394,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -34486,7 +34485,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -34512,7 +34511,7 @@
       "rule_id": "1939_xikang_clique_owner_sic",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIC"
+      "to_tag": "XIK"
     },
     {
       "country_code": "CN",
@@ -34603,7 +34602,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -34993,7 +34992,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -35019,7 +35018,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -35110,7 +35109,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -35422,7 +35421,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -35838,7 +35837,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -36046,7 +36045,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -36072,7 +36071,7 @@
       "rule_id": "1939_xikang_clique_owner_sic",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIC"
+      "to_tag": "XIK"
     },
     {
       "country_code": "CN",
@@ -36228,7 +36227,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -36852,7 +36851,7 @@
       "rule_id": "1939_xikang_clique_owner_sic",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIC"
+      "to_tag": "XIK"
     },
     {
       "country_code": "CN",
@@ -37125,7 +37124,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -37138,7 +37137,7 @@
       "rule_id": "1939_xikang_clique_owner_sic",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIC"
+      "to_tag": "XIK"
     },
     {
       "country_code": "CN",
@@ -37268,7 +37267,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -37593,7 +37592,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -37697,7 +37696,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -37749,7 +37748,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -37762,7 +37761,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -37840,7 +37839,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -38009,7 +38008,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -38061,7 +38060,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -38139,7 +38138,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -38152,7 +38151,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -38217,7 +38216,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -38295,7 +38294,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -38529,7 +38528,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -38789,7 +38788,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -39179,7 +39178,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -39361,7 +39360,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -39569,7 +39568,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -39712,7 +39711,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -39725,7 +39724,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -40154,7 +40153,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -40219,7 +40218,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -40258,7 +40257,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -40414,7 +40413,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -40479,7 +40478,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -40622,7 +40621,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -40791,7 +40790,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -41038,7 +41037,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -41064,7 +41063,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -41129,7 +41128,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -41155,7 +41154,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -41194,7 +41193,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -41415,7 +41414,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -41584,7 +41583,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -41766,7 +41765,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -41844,7 +41843,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -41987,7 +41986,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -42026,7 +42025,7 @@
       "rule_id": "1939_xikang_clique_owner_sic",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIC"
+      "to_tag": "XIK"
     },
     {
       "country_code": "CN",
@@ -42208,7 +42207,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -42286,7 +42285,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -42520,7 +42519,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -42559,7 +42558,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -42598,7 +42597,7 @@
       "rule_id": "1939_xikang_clique_owner_sic",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIC"
+      "to_tag": "XIK"
     },
     {
       "country_code": "CN",
@@ -42767,7 +42766,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -42923,7 +42922,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -43547,7 +43546,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -43599,7 +43598,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -44145,7 +44144,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -44184,7 +44183,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -44249,7 +44248,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -44873,7 +44872,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -45198,7 +45197,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -45276,7 +45275,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -45354,7 +45353,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -45380,7 +45379,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -45471,7 +45470,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -45640,7 +45639,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -45705,7 +45704,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -45796,7 +45795,7 @@
       "rule_id": "1939_xikang_clique_owner_sic",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIC"
+      "to_tag": "XIK"
     },
     {
       "country_code": "CN",
@@ -45913,7 +45912,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -46121,7 +46120,7 @@
       "rule_id": "1939_xikang_clique_owner_sic",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIC"
+      "to_tag": "XIK"
     },
     {
       "country_code": "CN",
@@ -46173,7 +46172,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -46225,7 +46224,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -46329,7 +46328,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -46381,7 +46380,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -46524,7 +46523,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -46680,7 +46679,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -46797,7 +46796,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -46849,7 +46848,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -46940,7 +46939,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -47031,7 +47030,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -47070,7 +47069,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CN",
@@ -47213,7 +47212,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -47447,7 +47446,7 @@
       "rule_id": "sinkiang",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SIK"
+      "to_tag": "XIN"
     },
     {
       "country_code": "CN",
@@ -47577,7 +47576,7 @@
       "rule_id": "communist_china_shaanbei",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "PRC"
+      "to_tag": "CHI"
     },
     {
       "country_code": "CY",
@@ -61000,182 +60999,182 @@
       "critical": true,
       "feature_id": "MMR-2473",
       "feature_name": "Kayah",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3266",
       "feature_name": "Kayin",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3267",
       "feature_name": "Mandalay",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3268",
       "feature_name": "Bago",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3269",
       "feature_name": "Yangon",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3270",
       "feature_name": "Mon",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3273",
       "feature_name": "Rakhine",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3274",
       "feature_name": "Chin",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3275",
       "feature_name": "Ayeyarwady",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3276",
       "feature_name": "Magway",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3277",
       "feature_name": "Shan",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3279",
       "feature_name": "Tanintharyi",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3296",
       "feature_name": "Kachin",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MM",
       "critical": true,
       "feature_id": "MMR-3302",
       "feature_name": "Sagaing",
-      "from_tag": "BRM",
+      "from_tag": "BUR",
       "notes": "Burma separation from British Raj at runtime-country level.",
       "quality": "manual_reviewed",
       "rule_id": "burma",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "BRM"
+      "to_tag": "BUR"
     },
     {
       "country_code": "MT",
@@ -64893,7 +64892,7 @@
       "rule_id": "tannu_tuva",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "TAN"
+      "to_tag": "PRC"
     },
     {
       "country_code": "RU",
@@ -102333,7 +102332,7 @@
       "rule_id": "dutch_colonies",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "HOL"
+      "to_tag": "SUR"
     },
     {
       "country_code": "SR",
@@ -102346,7 +102345,7 @@
       "rule_id": "dutch_colonies",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "HOL"
+      "to_tag": "SUR"
     },
     {
       "country_code": "SR",
@@ -102359,7 +102358,7 @@
       "rule_id": "dutch_colonies",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "HOL"
+      "to_tag": "SUR"
     },
     {
       "country_code": "SR",
@@ -102372,7 +102371,7 @@
       "rule_id": "dutch_colonies",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "HOL"
+      "to_tag": "SUR"
     },
     {
       "country_code": "SR",
@@ -102385,7 +102384,7 @@
       "rule_id": "dutch_colonies",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "HOL"
+      "to_tag": "SUR"
     },
     {
       "country_code": "SR",
@@ -102398,7 +102397,7 @@
       "rule_id": "dutch_colonies",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "HOL"
+      "to_tag": "SUR"
     },
     {
       "country_code": "SR",
@@ -102411,7 +102410,7 @@
       "rule_id": "dutch_colonies",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "HOL"
+      "to_tag": "SUR"
     },
     {
       "country_code": "SR",
@@ -102424,7 +102423,7 @@
       "rule_id": "dutch_colonies",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "HOL"
+      "to_tag": "SUR"
     },
     {
       "country_code": "SR",
@@ -102437,7 +102436,7 @@
       "rule_id": "dutch_colonies",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "HOL"
+      "to_tag": "SUR"
     },
     {
       "country_code": "SR",
@@ -102450,7 +102449,7 @@
       "rule_id": "dutch_colonies",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "HOL"
+      "to_tag": "SUR"
     },
     {
       "country_code": "TL",
@@ -112022,10 +112021,10 @@
     "ALT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 15,
+      "controller_feature_count": 4,
       "display_name": "Oirotia",
       "entry_kind": "scenario_country",
-      "feature_count": 15,
+      "feature_count": 4,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -112053,26 +112052,28 @@
       "synthetic_owner": false
     },
     "ANG": {
-      "base_iso2": "AO",
+      "base_iso2": "NA",
       "continent_label": "Africa",
-      "controller_feature_count": 0,
-      "display_name": "Angola",
+      "controller_feature_count": 31,
+      "display_name": "German Southwest Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 0,
+      "feature_count": 31,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
-      "lookup_iso2": "AO",
-      "parent_owner_tag": "GSW",
+      "lookup_iso2": "NA",
+      "parent_owner_tag": "GER",
       "parent_owner_tags": [
-        "GSW"
+        "GER"
       ],
       "primary_rule_source": "tno_1962_german_southwest_africa",
-      "provenance_iso2": "AO",
+      "provenance_iso2": "NA",
       "quality": "manual_reviewed",
-      "quality_breakdown": {},
+      "quality_breakdown": {
+        "manual_reviewed": 31
+      },
       "rule_sources": [
         "tno_1962_german_southwest_africa"
       ],
@@ -112081,8 +112082,8 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "colony",
-      "subregion_label": "Middle Africa",
+      "subject_kind": "colonial_government",
+      "subregion_label": "Southern Africa",
       "synthetic_owner": false
     },
     "AOF": {
@@ -112351,6 +112352,41 @@
       "subregion_label": "Atlantropa",
       "synthetic_owner": true
     },
+    "AZH": {
+      "base_iso2": "IN",
+      "continent_label": "Asia",
+      "controller_feature_count": 126,
+      "display_name": "Azad Hind",
+      "entry_kind": "scenario_subject",
+      "feature_count": 126,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "japan_azad_hind_client_1962",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "quality_breakdown": {
+        "manual_reviewed": 233
+      },
+      "rule_sources": [
+        "japan_azad_hind_client_1962"
+      ],
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "client_state",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false
+    },
     "BDI": {
       "base_iso2": "BI",
       "continent_label": "Africa",
@@ -112451,10 +112487,10 @@
     "BKR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 5,
+      "controller_feature_count": 7,
       "display_name": "Bashkir",
       "entry_kind": "scenario_country",
-      "feature_count": 5,
+      "feature_count": 7,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -112515,10 +112551,10 @@
     "BOP": {
       "base_iso2": "BOP",
       "continent_label": "Europe",
-      "controller_feature_count": 8,
+      "controller_feature_count": 11,
       "display_name": "вор в законе",
       "entry_kind": "scenario_country",
-      "feature_count": 8,
+      "feature_count": 11,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112640,48 +112676,13 @@
       "subregion_label": "Western Europe",
       "synthetic_owner": false
     },
-    "BRM": {
-      "base_iso2": "MM",
-      "continent_label": "Asia",
-      "controller_feature_count": 20,
-      "display_name": "Burma",
-      "entry_kind": "scenario_subject",
-      "feature_count": 20,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "MM",
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "JAP"
-      ],
-      "primary_rule_source": "japan_burma_client_1962",
-      "provenance_iso2": "MM",
-      "quality": "manual_reviewed",
-      "quality_breakdown": {
-        "manual_reviewed": 20
-      },
-      "rule_sources": [
-        "japan_burma_client_1962"
-      ],
-      "scenario_only": false,
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "client_state",
-      "subregion_label": "South-Eastern Asia",
-      "synthetic_owner": false
-    },
     "BRY": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 19,
+      "controller_feature_count": 21,
       "display_name": "Buryat Soviet Socialist Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 19,
+      "feature_count": 21,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112737,6 +112738,41 @@
       ],
       "subject_kind": "",
       "subregion_label": "Eastern Europe",
+      "synthetic_owner": false
+    },
+    "BUR": {
+      "base_iso2": "MM",
+      "continent_label": "Asia",
+      "controller_feature_count": 20,
+      "display_name": "Burma",
+      "entry_kind": "scenario_subject",
+      "feature_count": 20,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MM",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "japan_burma_client_1962",
+      "provenance_iso2": "MM",
+      "quality": "manual_reviewed",
+      "quality_breakdown": {
+        "manual_reviewed": 20
+      },
+      "rule_sources": [
+        "japan_burma_client_1962"
+      ],
+      "scenario_only": false,
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "client_state",
+      "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false
     },
     "BWA": {
@@ -112973,10 +113009,10 @@
     "CHT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 23,
+      "controller_feature_count": 19,
       "display_name": "Far Eastern Tsardom",
       "entry_kind": "scenario_country",
-      "feature_count": 23,
+      "feature_count": 19,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113006,10 +113042,10 @@
     "COL": {
       "base_iso2": "CO",
       "continent_label": "South America",
-      "controller_feature_count": 34,
+      "controller_feature_count": 33,
       "display_name": "Colombia",
       "entry_kind": "",
-      "feature_count": 34,
+      "feature_count": 33,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -113361,10 +113397,10 @@
     "FIC": {
       "base_iso2": "RU",
       "continent_label": "Asia",
-      "controller_feature_count": 9,
+      "controller_feature_count": 1,
       "display_name": "Far Eastern Intervention Committee",
       "entry_kind": "scenario_country",
-      "feature_count": 9,
+      "feature_count": 1,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113457,48 +113493,13 @@
       "subregion_label": "Western Europe",
       "synthetic_owner": false
     },
-    "FRI": {
-      "base_iso2": "IN",
-      "continent_label": "Asia",
-      "controller_feature_count": 124,
-      "display_name": "Azad Hind",
-      "entry_kind": "scenario_subject",
-      "feature_count": 124,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "IN",
-      "parent_owner_tag": "JAP",
-      "parent_owner_tags": [
-        "JAP"
-      ],
-      "primary_rule_source": "japan_azad_hind_client_1962",
-      "provenance_iso2": "IN",
-      "quality": "manual_reviewed",
-      "quality_breakdown": {
-        "manual_reviewed": 233
-      },
-      "rule_sources": [
-        "japan_azad_hind_client_1962"
-      ],
-      "scenario_only": true,
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "client_state",
-      "subregion_label": "Southern Asia",
-      "synthetic_owner": false
-    },
     "GAY": {
       "base_iso2": "GAY",
       "continent_label": "Europe",
-      "controller_feature_count": 0,
+      "controller_feature_count": 3,
       "display_name": "Gayny",
       "entry_kind": "scenario_country",
-      "feature_count": 0,
+      "feature_count": 3,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113738,10 +113739,10 @@
     "GOR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 17,
+      "controller_feature_count": 8,
       "display_name": "13th Panzer Army - Gorky",
       "entry_kind": "scenario_country",
-      "feature_count": 17,
+      "feature_count": 8,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113834,41 +113835,6 @@
       "subregion_label": "Northern America",
       "synthetic_owner": true
     },
-    "GSW": {
-      "base_iso2": "NA",
-      "continent_label": "Africa",
-      "controller_feature_count": 31,
-      "display_name": "German Southwest Africa",
-      "entry_kind": "scenario_subject",
-      "feature_count": 31,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "NA",
-      "parent_owner_tag": "GER",
-      "parent_owner_tags": [
-        "GER"
-      ],
-      "primary_rule_source": "tno_1962_german_southwest_africa",
-      "provenance_iso2": "NA",
-      "quality": "manual_reviewed",
-      "quality_breakdown": {
-        "manual_reviewed": 31
-      },
-      "rule_sources": [
-        "tno_1962_german_southwest_africa"
-      ],
-      "scenario_only": true,
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_label": "Southern Africa",
-      "synthetic_owner": false
-    },
     "GUA": {
       "base_iso2": "GT",
       "continent_label": "North America",
@@ -113900,7 +113866,7 @@
       "subregion_label": "Central America",
       "synthetic_owner": false
     },
-    "GUI": {
+    "GUZ": {
       "base_iso2": "CN",
       "continent_label": "Asia",
       "controller_feature_count": 52,
@@ -114032,39 +113998,6 @@
       ],
       "subject_kind": "",
       "subregion_label": "Caribbean",
-      "synthetic_owner": false
-    },
-    "HOL": {
-      "base_iso2": "NL",
-      "continent_label": "Europe",
-      "controller_feature_count": 10,
-      "display_name": "Netherlands",
-      "entry_kind": "",
-      "feature_count": 10,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "tno_baseline",
-      "historical_fidelity_summary": [
-        "tno_baseline"
-      ],
-      "lookup_iso2": "NL",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "dutch_colonies",
-      "provenance_iso2": "NL",
-      "quality": "approx_existing_geometry",
-      "quality_breakdown": {
-        "approx_existing_geometry": 10
-      },
-      "rule_sources": [
-        "dutch_colonies"
-      ],
-      "scenario_only": false,
-      "source_type": "tno_baseline",
-      "source_types": [
-        "tno_baseline"
-      ],
-      "subject_kind": "",
-      "subregion_label": "Western Europe",
       "synthetic_owner": false
     },
     "HON": {
@@ -114300,10 +114233,10 @@
     "IRK": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 10,
+      "controller_feature_count": 18,
       "display_name": "Far Eastern Presidium",
       "entry_kind": "scenario_country",
-      "feature_count": 10,
+      "feature_count": 18,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114364,10 +114297,10 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 232,
+      "controller_feature_count": 240,
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 232,
+      "feature_count": 240,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -114397,10 +114330,10 @@
     "JAP": {
       "base_iso2": "JP",
       "continent_label": "Asia",
-      "controller_feature_count": 96,
+      "controller_feature_count": 95,
       "display_name": "Japan",
       "entry_kind": "",
-      "feature_count": 96,
+      "feature_count": 95,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -114465,10 +114398,10 @@
     "KAZ": {
       "base_iso2": "KZ",
       "continent_label": "Asia",
-      "controller_feature_count": 16,
+      "controller_feature_count": 17,
       "display_name": "Kazakhstan",
       "entry_kind": "",
-      "feature_count": 16,
+      "feature_count": 17,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114498,10 +114431,10 @@
     "KGZ": {
       "base_iso2": "KG",
       "continent_label": "Asia",
-      "controller_feature_count": 8,
+      "controller_feature_count": 9,
       "display_name": "Kyrgyzstan",
       "entry_kind": "",
-      "feature_count": 8,
+      "feature_count": 9,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114531,10 +114464,10 @@
     "KOM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 11,
+      "controller_feature_count": 14,
       "display_name": "Komi Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 11,
+      "feature_count": 14,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114599,10 +114532,10 @@
     "KRS": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 5,
+      "controller_feature_count": 15,
       "display_name": "Krasnoyarsk",
       "entry_kind": "scenario_country",
-      "feature_count": 5,
+      "feature_count": 15,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114731,10 +114664,10 @@
     "LBA": {
       "base_iso2": "LY",
       "continent_label": "Africa",
-      "controller_feature_count": 25,
+      "controller_feature_count": 17,
       "display_name": "Libya",
       "entry_kind": "scenario_subject",
-      "feature_count": 25,
+      "feature_count": 17,
       "hidden_from_country_list": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -114865,28 +114798,28 @@
       "synthetic_owner": false
     },
     "MAG": {
-      "base_iso2": "MAG",
-      "continent_label": "Europe",
-      "controller_feature_count": 9,
-      "display_name": "Magnitogorsk",
+      "base_iso2": "RU",
+      "continent_label": "Asia",
+      "controller_feature_count": 11,
+      "display_name": "Russian Salvation Front",
       "entry_kind": "scenario_country",
-      "feature_count": 9,
+      "feature_count": 11,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
-      "lookup_iso2": "MAG",
+      "lookup_iso2": "RU",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
-      "primary_rule_source": "dev_manual_tag_create",
-      "provenance_iso2": "MAG",
+      "primary_rule_source": "tno_1962_rsf_far_east_split",
+      "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 15
+        "manual_reviewed": 6
       },
       "rule_sources": [
-        "dev_manual_tag_create"
+        "tno_1962_rsf_far_east_split"
       ],
       "scenario_only": true,
       "source_type": "scenario_extension",
@@ -114894,7 +114827,7 @@
         "scenario_extension"
       ],
       "subject_kind": "",
-      "subregion_label": "Eastern Europe",
+      "subregion_label": "Eastern Asia",
       "synthetic_owner": false
     },
     "MAL": {
@@ -114935,10 +114868,10 @@
     "MAN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 286,
+      "controller_feature_count": 289,
       "display_name": "Manchukuo",
       "entry_kind": "scenario_subject",
-      "feature_count": 286,
+      "feature_count": 289,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115003,10 +114936,10 @@
     "MEN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 74,
+      "controller_feature_count": 87,
       "display_name": "Mengjiang",
       "entry_kind": "scenario_subject",
-      "feature_count": 74,
+      "feature_count": 87,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115064,6 +114997,39 @@
       ],
       "subject_kind": "",
       "subregion_label": "Central America",
+      "synthetic_owner": false
+    },
+    "MGN": {
+      "base_iso2": "MGN",
+      "continent_label": "Europe",
+      "controller_feature_count": 7,
+      "display_name": "Magnitogorsk",
+      "entry_kind": "scenario_country",
+      "feature_count": 7,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MGN",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "dev_manual_tag_create",
+      "provenance_iso2": "MGN",
+      "quality": "manual_reviewed",
+      "quality_breakdown": {
+        "manual_reviewed": 15
+      },
+      "rule_sources": [
+        "dev_manual_tag_create"
+      ],
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_label": "Eastern Europe",
       "synthetic_owner": false
     },
     "MLD": {
@@ -115135,10 +115101,10 @@
     "MON": {
       "base_iso2": "MN",
       "continent_label": "Asia",
-      "controller_feature_count": 13,
+      "controller_feature_count": 4,
       "display_name": "Mongolia",
       "entry_kind": "",
-      "feature_count": 13,
+      "feature_count": 4,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115397,10 +115363,10 @@
     "NOV": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 39,
+      "controller_feature_count": 33,
       "display_name": "Novosibirsk",
       "entry_kind": "scenario_country",
-      "feature_count": 39,
+      "feature_count": 33,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115492,10 +115458,10 @@
     "OMS": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 25,
+      "controller_feature_count": 18,
       "display_name": "Omsk",
       "entry_kind": "scenario_country",
-      "feature_count": 25,
+      "feature_count": 18,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115525,10 +115491,10 @@
     "ONG": {
       "base_iso2": "ONG",
       "continent_label": "Europe",
-      "controller_feature_count": 7,
+      "controller_feature_count": 4,
       "display_name": "Onega",
       "entry_kind": "scenario_country",
-      "feature_count": 7,
+      "feature_count": 4,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115589,10 +115555,10 @@
     "ORN": {
       "base_iso2": "ORN",
       "continent_label": "Europe",
-      "controller_feature_count": 7,
+      "controller_feature_count": 13,
       "display_name": "Orenburg",
       "entry_kind": "scenario_country",
-      "feature_count": 7,
+      "feature_count": 13,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115622,10 +115588,10 @@
     "ORS": {
       "base_iso2": "ORS",
       "continent_label": "Europe",
-      "controller_feature_count": 12,
+      "controller_feature_count": 11,
       "display_name": "Orsk",
       "entry_kind": "scenario_country",
-      "feature_count": 12,
+      "feature_count": 11,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115655,10 +115621,10 @@
     "OUR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 11,
+      "controller_feature_count": 2,
       "display_name": "Orenburg-Ural Union",
       "entry_kind": "scenario_country",
-      "feature_count": 11,
+      "feature_count": 2,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115688,10 +115654,10 @@
     "PAK": {
       "base_iso2": "PK",
       "continent_label": "Asia",
-      "controller_feature_count": 19,
+      "controller_feature_count": 4,
       "display_name": "Pakistan",
       "entry_kind": "",
-      "feature_count": 19,
+      "feature_count": 4,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115849,10 +115815,10 @@
     "PFC": {
       "base_iso2": "RU",
       "continent_label": "Asia",
-      "controller_feature_count": 18,
+      "controller_feature_count": 15,
       "display_name": "Far Eastern Pacific Fleet Command",
       "entry_kind": "scenario_country",
-      "feature_count": 18,
+      "feature_count": 15,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115948,43 +115914,45 @@
       "synthetic_owner": false
     },
     "PRC": {
-      "base_iso2": "CN",
-      "continent_label": "Asia",
-      "controller_feature_count": 0,
-      "display_name": "Communist China",
-      "entry_kind": "controller_only",
-      "feature_count": 0,
+      "base_iso2": "RU",
+      "continent_label": "Europe",
+      "controller_feature_count": 17,
+      "display_name": "People's Revolutionary Council",
+      "entry_kind": "scenario_country",
+      "feature_count": 17,
       "hidden_from_country_list": false,
-      "historical_fidelity": "tno_baseline",
+      "historical_fidelity": "extended",
       "historical_fidelity_summary": [
-        "tno_baseline"
+        "extended"
       ],
-      "lookup_iso2": "CN",
+      "lookup_iso2": "RU",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
-      "primary_rule_source": "tno_1962_controller_only_prc",
-      "provenance_iso2": "CN",
-      "quality": "manual_reviewed",
-      "quality_breakdown": {},
+      "primary_rule_source": "tno_1962_tan_manual_override",
+      "provenance_iso2": "RU",
+      "quality": "approx_existing_geometry",
+      "quality_breakdown": {
+        "approx_existing_geometry": 26
+      },
       "rule_sources": [
-        "tno_1962_controller_only_prc"
+        "tno_1962_tan_manual_override"
       ],
       "scenario_only": true,
-      "source_type": "controller_overlay",
+      "source_type": "scenario_extension",
       "source_types": [
-        "controller_overlay"
+        "scenario_extension"
       ],
       "subject_kind": "",
-      "subregion_label": "Eastern Asia",
+      "subregion_label": "Eastern Europe",
       "synthetic_owner": false
     },
     "PRM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 3,
+      "controller_feature_count": 9,
       "display_name": "Perm",
       "entry_kind": "scenario_country",
-      "feature_count": 3,
+      "feature_count": 9,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116144,10 +116112,10 @@
     "RAJ": {
       "base_iso2": "IN",
       "continent_label": "Asia",
-      "controller_feature_count": 238,
+      "controller_feature_count": 251,
       "display_name": "British Raj",
       "entry_kind": "scenario_country",
-      "feature_count": 238,
+      "feature_count": 251,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116177,10 +116145,10 @@
     "RFA": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 47,
+      "controller_feature_count": 4,
       "display_name": "Russian Anarchy",
       "entry_kind": "scenario_country",
-      "feature_count": 47,
+      "feature_count": 4,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116280,10 +116248,10 @@
     "RKM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 206,
+      "controller_feature_count": 153,
       "display_name": "Reichskommissariat Moskowien",
       "entry_kind": "scenario_country",
-      "feature_count": 206,
+      "feature_count": 153,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116385,10 +116353,10 @@
     "RKO": {
       "base_iso2": "LT",
       "continent_label": "Europe",
-      "controller_feature_count": 64,
+      "controller_feature_count": 98,
       "display_name": "Reichskommissariat Ostland",
       "entry_kind": "scenario_country",
-      "feature_count": 64,
+      "feature_count": 98,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116455,10 +116423,10 @@
     "RKU": {
       "base_iso2": "UA",
       "continent_label": "Europe",
-      "controller_feature_count": 287,
+      "controller_feature_count": 279,
       "display_name": "Reichskommissariat Ukraine",
       "entry_kind": "scenario_country",
-      "feature_count": 287,
+      "feature_count": 279,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116490,10 +116458,10 @@
     "ROM": {
       "base_iso2": "RO",
       "continent_label": "Europe",
-      "controller_feature_count": 116,
+      "controller_feature_count": 112,
       "display_name": "Romania",
       "entry_kind": "",
-      "feature_count": 116,
+      "feature_count": 112,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116520,46 +116488,13 @@
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false
     },
-    "RSF": {
-      "base_iso2": "RU",
-      "continent_label": "Asia",
-      "controller_feature_count": 6,
-      "display_name": "Russian Salvation Front",
-      "entry_kind": "scenario_country",
-      "feature_count": 6,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "tno_1962_rsf_far_east_split",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "quality_breakdown": {
-        "manual_reviewed": 6
-      },
-      "rule_sources": [
-        "tno_1962_rsf_far_east_split"
-      ],
-      "scenario_only": true,
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "",
-      "subregion_label": "Eastern Asia",
-      "synthetic_owner": false
-    },
     "RUR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 18,
+      "controller_feature_count": 9,
       "display_name": "Rurik Kingdom",
       "entry_kind": "scenario_country",
-      "feature_count": 18,
+      "feature_count": 9,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116655,10 +116590,10 @@
     "SAM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 17,
+      "controller_feature_count": 22,
       "display_name": "Russian Liberation Army",
       "entry_kind": "scenario_country",
-      "feature_count": 17,
+      "feature_count": 22,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116720,10 +116655,10 @@
     "SBA": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 13,
+      "controller_feature_count": 14,
       "display_name": "Siberian Black Army",
       "entry_kind": "scenario_country",
-      "feature_count": 13,
+      "feature_count": 14,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116921,68 +116856,6 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false
     },
-    "SIC": {
-      "base_iso2": "CN",
-      "continent_label": "Asia",
-      "controller_feature_count": 0,
-      "display_name": "Xikang Clique",
-      "entry_kind": "controller_only",
-      "feature_count": 0,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "tno_baseline",
-      "historical_fidelity_summary": [
-        "tno_baseline"
-      ],
-      "lookup_iso2": "CN",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "tno_1962_controller_only_sic",
-      "provenance_iso2": "CN",
-      "quality": "manual_reviewed",
-      "quality_breakdown": {},
-      "rule_sources": [
-        "tno_1962_controller_only_sic"
-      ],
-      "scenario_only": true,
-      "source_type": "controller_overlay",
-      "source_types": [
-        "controller_overlay"
-      ],
-      "subject_kind": "",
-      "subregion_label": "Eastern Asia",
-      "synthetic_owner": false
-    },
-    "SIK": {
-      "base_iso2": "CN",
-      "continent_label": "Asia",
-      "controller_feature_count": 0,
-      "display_name": "Sinkiang",
-      "entry_kind": "controller_only",
-      "feature_count": 0,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "tno_baseline",
-      "historical_fidelity_summary": [
-        "tno_baseline"
-      ],
-      "lookup_iso2": "CN",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "tno_1962_controller_only_sik",
-      "provenance_iso2": "CN",
-      "quality": "manual_reviewed",
-      "quality_breakdown": {},
-      "rule_sources": [
-        "tno_1962_controller_only_sik"
-      ],
-      "scenario_only": true,
-      "source_type": "controller_overlay",
-      "source_types": [
-        "controller_overlay"
-      ],
-      "subject_kind": "",
-      "subregion_label": "Eastern Asia",
-      "synthetic_owner": false
-    },
     "SLO": {
       "base_iso2": "SK",
       "continent_label": "Europe",
@@ -117051,13 +116924,46 @@
       "subregion_label": "Southern Europe",
       "synthetic_owner": false
     },
+    "SUR": {
+      "base_iso2": "NL",
+      "continent_label": "Europe",
+      "controller_feature_count": 10,
+      "display_name": "Netherlands",
+      "entry_kind": "",
+      "feature_count": 10,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "tno_baseline",
+      "historical_fidelity_summary": [
+        "tno_baseline"
+      ],
+      "lookup_iso2": "NL",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "dutch_colonies",
+      "provenance_iso2": "NL",
+      "quality": "approx_existing_geometry",
+      "quality_breakdown": {
+        "approx_existing_geometry": 10
+      },
+      "rule_sources": [
+        "dutch_colonies"
+      ],
+      "scenario_only": false,
+      "source_type": "tno_baseline",
+      "source_types": [
+        "tno_baseline"
+      ],
+      "subject_kind": "",
+      "subregion_label": "Western Europe",
+      "synthetic_owner": false
+    },
     "SVR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 21,
+      "controller_feature_count": 11,
       "display_name": "Ural Military District",
       "entry_kind": "scenario_country",
-      "feature_count": 21,
+      "feature_count": 11,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117183,46 +117089,13 @@
       "subregion_label": "Western Asia",
       "synthetic_owner": false
     },
-    "TAN": {
-      "base_iso2": "RU",
-      "continent_label": "Europe",
-      "controller_feature_count": 21,
-      "display_name": "People's Revolutionary Council",
-      "entry_kind": "scenario_country",
-      "feature_count": 21,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "tno_1962_tan_manual_override",
-      "provenance_iso2": "RU",
-      "quality": "approx_existing_geometry",
-      "quality_breakdown": {
-        "approx_existing_geometry": 26
-      },
-      "rule_sources": [
-        "tno_1962_tan_manual_override"
-      ],
-      "scenario_only": true,
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false
-    },
     "TAT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 12,
+      "controller_feature_count": 16,
       "display_name": "Tatar Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 12,
+      "feature_count": 16,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117353,10 +117226,10 @@
     "TOM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 17,
+      "controller_feature_count": 24,
       "display_name": "Tomsk",
       "entry_kind": "scenario_country",
-      "feature_count": 17,
+      "feature_count": 24,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -117454,10 +117327,10 @@
     "TYM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 14,
+      "controller_feature_count": 23,
       "display_name": "Tyumen",
       "entry_kind": "scenario_country",
-      "feature_count": 14,
+      "feature_count": 23,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117553,10 +117426,10 @@
     "URA": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 7,
+      "controller_feature_count": 2,
       "display_name": "Ural Military District Red Air Force",
       "entry_kind": "scenario_country",
-      "feature_count": 7,
+      "feature_count": 2,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117617,10 +117490,10 @@
     "URL": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 0,
+      "controller_feature_count": 6,
       "display_name": "Ural",
       "entry_kind": "scenario_country",
-      "feature_count": 0,
+      "feature_count": 6,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -117679,10 +117552,10 @@
     "UZB": {
       "base_iso2": "UZ",
       "continent_label": "Asia",
-      "controller_feature_count": 14,
+      "controller_feature_count": 13,
       "display_name": "Uzbekistan",
       "entry_kind": "",
-      "feature_count": 14,
+      "feature_count": 13,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117811,10 +117684,10 @@
     "VOK": {
       "base_iso2": "VOK",
       "continent_label": "Europe",
-      "controller_feature_count": 1,
+      "controller_feature_count": 4,
       "display_name": "Vorkuta",
       "entry_kind": "scenario_country",
-      "feature_count": 1,
+      "feature_count": 4,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117844,10 +117717,10 @@
     "VOL": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 15,
+      "controller_feature_count": 20,
       "display_name": "Vologda Neutral Zone",
       "entry_kind": "scenario_country",
-      "feature_count": 15,
+      "feature_count": 20,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117908,10 +117781,10 @@
     "VYT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 11,
+      "controller_feature_count": 16,
       "display_name": "Vyatka",
       "entry_kind": "scenario_country",
-      "feature_count": 11,
+      "feature_count": 16,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -117974,10 +117847,10 @@
     "WRS": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 27,
+      "controller_feature_count": 28,
       "display_name": "West Russian Revolutionary Front",
       "entry_kind": "scenario_country",
-      "feature_count": 27,
+      "feature_count": 28,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -118040,10 +117913,10 @@
     "XIN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 87,
+      "controller_feature_count": 88,
       "display_name": "Xinjiang",
       "entry_kind": "scenario_subject",
-      "feature_count": 87,
+      "feature_count": 88,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -118106,10 +117979,10 @@
     "YAK": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 11,
+      "controller_feature_count": 15,
       "display_name": "Sakha Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 11,
+      "feature_count": 15,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -118271,10 +118144,10 @@
     "ZLT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 7,
+      "controller_feature_count": 4,
       "display_name": "Zlatoust",
       "entry_kind": "scenario_country",
-      "feature_count": 7,
+      "feature_count": 4,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -118307,11 +118180,11 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "71bce3f7f0215d0bc796a3383fa60012202dd24e94e505c836274009b96a0ff9",
+  "snapshot_fingerprint": "f7d74d8910eca06e2a409dfb18dee5001bf7089dea8e77188ef74b232bf49ee4",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "132907c95848f294fb90c107f932928d8c3f91feda38d9c202a929b7e0d45ea6",
-    "detail_chunk_manifest_sha256": "64cf58dba7d4b4b671796b989c18d14a95855bcaeb046418396a8941b0215e7f",
+    "build_snapshot_sha256": "6ac5c66cb1ce917e0527c0dfd279e8574d7017f5128b2fba81ff7ac78e47f00a",
+    "detail_chunk_manifest_sha256": "e8cf1f175823def75242c34abfb29196a2a415cd386ab38c55668ea937af9991",
     "runtime_bootstrap_topology_sha256": "338d98c608bd7bed9ecfc46441d5d051734d8926dfc5b4c8851166f120a31902",
     "runtime_topology_sha256": "2260a1fb35ec521421456f374ad4da2e143875abf05d3cf7628c35f6e7ad46e1"
   },
@@ -118324,7 +118197,7 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 172,
+    "controller_count": 180,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -118334,7 +118207,7 @@
     "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 172,
+    "owner_count": 180,
     "quality_counts": {
       "approx_existing_geometry": 1033,
       "direct_country_copy": 2698,

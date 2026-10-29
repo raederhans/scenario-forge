@@ -194,9 +194,9 @@ class ScenarioCapitalRulesTest(unittest.TestCase):
 
     def test_identity_is_scenario_specific_not_a_tag_match_to_the_mod(self):
         cities = {**TNO_CITY_ROWS, "CITY::ne::1159149559": {"id": "CITY::ne::1159149559"}}
-        result = apply_reviewed_capitals({}, {"MAG": {}}, cities, scenario_id="tno_1962", strict=True)
-        self.assertEqual(result["capital_city_hints"]["MAG"]["city_name"], "Magnitogorsk")
-        self.assertEqual(apply_reviewed_capitals({}, {"MAG": {}}, cities, scenario_id="hgo_1936")["capitals_by_tag"], {})
+        result = apply_reviewed_capitals({}, {"MGN": {}}, cities, scenario_id="tno_1962", strict=True)
+        self.assertEqual(result["capital_city_hints"]["MGN"]["city_name"], "Magnitogorsk")
+        self.assertEqual(apply_reviewed_capitals({}, {"MGN": {}}, cities, scenario_id="hgo_1936")["capitals_by_tag"], {})
 
     def test_no_capital_survives_composition_and_does_not_invent_a_city(self):
         result = apply_reviewed_capitals({"capitals_by_tag": {"AFA": "niamey"}}, {"AFA": {}}, {}, scenario_id="tno_1962")
