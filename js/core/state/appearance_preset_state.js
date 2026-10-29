@@ -248,8 +248,8 @@ export function createDefaultAppearancePresetsState() {
   };
 }
 
-function getRawPresetEntries(rawState = null) {
-  if (!rawState || typeof rawState !== "object") return [];
+function getRawPresetEntries(rawState = null, unsupported = []) {
+  if (!rawState || typeof rawState !== "object") return unsupported;
   // 导入入口同时接收单个导出文件、旧版数组和当前 byId/order 状态，避免预设文件格式演进时丢用户资产。
   if (rawState.kind === APPEARANCE_PRESET_EXPORT_KIND && rawState.preset) {
     return [rawState.preset];
@@ -280,7 +280,7 @@ function getRawPresetEntries(rawState = null) {
   if (rawState.snapshot && typeof rawState.snapshot === "object") {
     return [rawState];
   }
-  return [];
+  return unsupported;
 }
 
 export function normalizeAppearancePresetsState(rawState = null) {
@@ -338,7 +338,22 @@ export function getSelectedAppearancePreset(rawState = null) {
 }
 
 export function normalizeAppearancePresetImportPayload(payload = null) {
-  return getRawPresetEntries(payload)
+  if (typeof payload === "string") {
+    try {
+      payload = JSON.parse(payload);
+    } catch (cause) {
+      const error = new Error("Invalid appearance preset JSON", { cause });
+      error.code = "invalid-json";
+      throw error;
+    }
+  }
+  const entries = getRawPresetEntries(payload, null);
+  if (entries === null) {
+    const error = new Error("Unsupported appearance preset format");
+    error.code = "invalid-format";
+    throw error;
+  }
+  return entries
     .map((entry, index) => normalizeAppearancePreset(entry, index))
     .filter((preset) => !!preset.id);
 }
