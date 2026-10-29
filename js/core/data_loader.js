@@ -1496,7 +1496,7 @@ export async function loadStartupBootArtifacts({
         needGeoAliases: !geoAliases,
         cachedTopologyPrimary: topologyPrimary,
       });
-      topologyPrimary = topologyPrimary || workerResult.topologyPrimary || null;
+      topologyPrimary = workerResult.topologyPrimary || topologyPrimary || null;
       locales = locales || workerResult.locales || null;
       geoAliases = geoAliases || workerResult.geoAliases || null;
       decodedCollections = workerResult.decodedCollections || null;

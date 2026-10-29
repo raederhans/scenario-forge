@@ -17,6 +17,7 @@ const RENDER_PASSES = [
   "background",
   "physicalBase",
   "political",
+  "populationHeatmap",
   "contextBase",
   "contextScenario",
   "effects",
@@ -58,6 +59,7 @@ test("urban zoom refresh requests only the dirty deferred context pass without p
   assert.equal(plan.forceExactContextBaseRefresh, false);
   assert.equal(plan.exactRefreshApplied, false, "a deferred urban request is not completed refresh work");
   const targets = resolveExactAfterSettleTargetPasses({
+    activeRenderPassNames: RENDER_PASSES,
     renderPassNames: RENDER_PASSES,
     idleRenderPassNames: RENDER_PASSES,
     dirtyPassNames: ["contextBase"],
@@ -65,7 +67,7 @@ test("urban zoom refresh requests only the dirty deferred context pass without p
     forceExactContextBaseRefresh: plan.forceExactContextBaseRefresh,
     exactRefreshApplied: plan.exactRefreshApplied,
   });
-  assert.deepEqual(targets.exactTargetPasses, ["political", "borders"]);
+  assert.deepEqual(targets.exactTargetPasses, ["political", "populationHeatmap", "borders"]);
   assert.deepEqual(targets.deferredExactTargetPasses, ["contextBase", "textureLabels", "labels"]);
 });
 
@@ -85,11 +87,12 @@ test("idle pass definition filter keeps scheduler pass selection in plan helpers
     filterExactAfterSettleIdleRenderPassDefinitions(definitions, [" labels ", "political"]),
     [definitions[0], definitions[2]],
   );
-  assert.deepEqual(filterExactAfterSettleIdleRenderPassDefinitions(definitions, []), definitions);
+  assert.deepEqual(filterExactAfterSettleIdleRenderPassDefinitions(definitions, []), []);
 });
 
 test("target pass policy splits critical political work from deferred context passes", () => {
   const targetPasses = resolveExactAfterSettleTargetPasses({
+    activeRenderPassNames: RENDER_PASSES,
     renderPassNames: RENDER_PASSES,
     idleRenderPassNames: RENDER_PASSES,
     dirtyPassNames: ["contextScenario", "effects"],
@@ -98,12 +101,13 @@ test("target pass policy splits critical political work from deferred context pa
     exactRefreshApplied: true,
   });
 
-  assert.deepEqual(targetPasses.exactTargetPasses, ["physicalBase", "political", "effects", "borders"]);
+  assert.deepEqual(targetPasses.exactTargetPasses, ["physicalBase", "political", "populationHeatmap", "effects", "borders"]);
   assert.deepEqual(targetPasses.deferredExactTargetPasses, ["contextBase", "contextScenario", "textureLabels", "labels"]);
 });
 
 test("deferred context target policy merges plan targets and newly dirty deferred passes", () => {
   const targetPasses = resolveDeferredExactContextTargetPasses({
+    activeRenderPassNames: RENDER_PASSES,
     plan: { deferredExactTargetPasses: ["labels"] },
     dirtyPassNames: ["contextBase", "political", "labels"],
     idleRenderPassNames: RENDER_PASSES,
@@ -122,6 +126,7 @@ test("deferred pass set excludes background and physical base", () => {
 test("target pass policy ignores dirty passes outside the active idle list", () => {
   const activeVectorPasses = RENDER_PASSES.filter((passName) => passName !== "contextBase");
   const targetPasses = resolveExactAfterSettleTargetPasses({
+    activeRenderPassNames: activeVectorPasses,
     renderPassNames: RENDER_PASSES,
     idleRenderPassNames: activeVectorPasses,
     dirtyPassNames: ["contextBase", "political"],
@@ -129,8 +134,47 @@ test("target pass policy ignores dirty passes outside the active idle list", () 
     exactRefreshApplied: true,
   });
 
-  assert.deepEqual(targetPasses.exactTargetPasses, ["political", "borders"]);
+  assert.deepEqual(targetPasses.exactTargetPasses, ["political", "populationHeatmap", "borders"]);
   assert.deepEqual(targetPasses.deferredExactTargetPasses, ["textureLabels", "labels"]);
   assert.equal(targetPasses.exactTargetPasses.includes("contextBase"), false);
   assert.equal(targetPasses.deferredExactTargetPasses.includes("contextBase"), false);
+});
+
+test("active passes constrain always, physical, dirty and deferred plan targets", () => {
+  const activeRenderPassNames = new Set(["political", "contextBase", "borders", "labels"]);
+  const targets = resolveExactAfterSettleTargetPasses({
+    renderPassNames: RENDER_PASSES,
+    idleRenderPassNames: RENDER_PASSES,
+    activeRenderPassNames,
+    dirtyPassNames: RENDER_PASSES,
+    physicalExactRefreshPasses: ["physicalBase", "contextBase"],
+    forceExactContextBaseRefresh: true,
+    exactRefreshApplied: true,
+  });
+  assert.deepEqual(targets.exactTargetPasses, ["political", "borders"]);
+  assert.deepEqual(targets.deferredExactTargetPasses, ["contextBase", "labels"]);
+  assert.deepEqual(resolveDeferredExactContextTargetPasses({
+    plan: { deferredExactTargetPasses: ["contextMarkers", "textureLabels", "labels"] },
+    activeRenderPassNames,
+    dirtyPassNames: RENDER_PASSES,
+    idleRenderPassNames: RENDER_PASSES,
+  }), ["contextBase", "labels"]);
+});
+
+test("empty active passes produce no targets even with forced physical and dirty work", () => {
+  const targets = resolveExactAfterSettleTargetPasses({
+    renderPassNames: RENDER_PASSES,
+    idleRenderPassNames: RENDER_PASSES,
+    activeRenderPassNames: [],
+    dirtyPassNames: RENDER_PASSES,
+    physicalExactRefreshPasses: ["physicalBase", "contextBase"],
+    forceExactContextBaseRefresh: true,
+  });
+  assert.deepEqual(targets, { exactTargetPasses: [], deferredExactTargetPasses: [] });
+  assert.deepEqual(resolveDeferredExactContextTargetPasses({
+    plan: { deferredExactTargetPasses: RENDER_PASSES },
+    activeRenderPassNames: [],
+    dirtyPassNames: RENDER_PASSES,
+    idleRenderPassNames: RENDER_PASSES,
+  }), []);
 });

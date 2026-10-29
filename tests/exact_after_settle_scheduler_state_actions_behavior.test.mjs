@@ -2,9 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createExactAfterSettleScheduler } from "../js/core/map_renderer/exact_after_settle_scheduler.js";
+import { filterEnabledRenderPassNames } from "../js/core/map_renderer/render_pass_visibility_policy.js";
 
-function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync = () => null, includeContextPasses = false, includeWaterPass = false, getRenderPassSignature } = {}) {
+function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync = () => null, includeContextPasses = false, includeWaterPass = false, includeOptionalPasses = false, getActiveRenderPassNames, getRenderPassSignature } = {}) {
   const events = [];
+  const drawCounts = {};
+  const canvasSizeCalls = [];
   const metrics = [];
   const frameTasks = [];
   const deferredTasks = [];
@@ -70,16 +73,21 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
     ...(includeContextPasses ? [["physicalBase", () => {}], ["contextBase", () => {}]] : []),
     ...(includeWaterPass ? [["contextScenario", () => {}]] : []),
     ["political", () => {}],
+    ...(includeOptionalPasses ? ["populationHeatmap", "effects", "lineEffects", "dayNight", "contextMarkers"]
+      .map(passName => [passName, () => {}]) : []),
     ["borders", () => {}],
     ["labels", () => {}],
     ["textureLabels", () => {}],
-  ];
+  ].map(([passName]) => [passName, () => {
+    drawCounts[passName] = (drawCounts[passName] || 0) + 1;
+  }]);
   const pipelineOwner = {
     getIdleRenderPassDefinitions() {
       return definitions;
     },
-    prepareIdleRenderPassDefinition(passName) {
+    prepareIdleRenderPassDefinition(passName, drawFn) {
       events.push(`prepare:${passName}`);
+      drawFn();
     },
   };
 
@@ -87,6 +95,7 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
     prepareRenderPassAsync,
     runtimeState: schedulerRuntime,
     renderPassNames: definitions.map(([passName]) => passName),
+    getActiveRenderPassNames,
     renderPhaseIdle: "idle",
     exactContextRefreshDelayMs: 0,
     getContext: () => ({ canvas: { width: 1200, height: 800 } }),
@@ -96,7 +105,10 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
     getContextBaseReuseDecision: () => reuseDecision,
     shouldForceExactContextBaseRefresh: () => false,
     updateDprStage: () => events.push("update-dpr"),
-    setCanvasSize: () => events.push("set-canvas-size"),
+    setCanvasSize: options => {
+      canvasSizeCalls.push(options);
+      events.push("set-canvas-size");
+    },
     cancelDeferredContextBaseEnhancement: () => events.push("cancel-context-base"),
     setDeferContextBaseEnhancements: (value) => events.push(`defer-context-base:${value}`),
     shouldDeferContextBaseEnhancementsForExactRefresh: () => false,
@@ -198,6 +210,9 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
 
   return {
     cache,
+    canvasSizeCalls,
+    drawCounts,
+    passNames: definitions.map(([passName]) => passName),
     cancelledTimerIds,
     deferredTasks,
     driveToAwaitingPaint,
@@ -220,6 +235,183 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
     timers,
   };
 }
+
+test("disabled passes stay unprepared and undrawn, including physical base in contours-only mode", () => {
+  for (const showPhysical of [false, true]) {
+    const preparations = [];
+    const visibility = { showPhysical, physicalMode: "contours_only" };
+    const h = createHarness({
+      includeContextPasses: true,
+      includeOptionalPasses: true,
+      getActiveRenderPassNames: () => filterEnabledRenderPassNames(h.passNames, visibility),
+      prepareRenderPassAsync: passName => { preparations.push(passName); return null; },
+    });
+    try {
+      h.reuseDecision.enabled = true;
+      h.reuseDecision.shouldExactRefresh = true;
+      h.passNames.forEach(passName => { h.cache.dirty[passName] = true; });
+      h.driveToAwaitingPaint();
+      h.scheduler.finalizePendingExactAfterSettleRefreshAfterPaint();
+      h.deferredTasks[0].callback();
+      while (h.frameTasks.length) h.runNextFrame();
+      const expected = showPhysical
+        ? ["political", "borders", "contextBase", "labels"]
+        : ["political", "borders", "labels"];
+      assert.deepEqual(h.drawCounts, Object.fromEntries(expected.map(passName => [passName, 1])));
+      assert.deepEqual(preparations, ["political", "borders", "labels", "political", "borders"]);
+      assert.equal(h.canvasSizeCalls[0].targetPassesOnDprChange.includes("physicalBase"), false);
+
+      visibility.showPhysical = true;
+      visibility.physicalMode = "atlas_and_contours";
+      visibility.populationHeatmapEnabled = true;
+      visibility.textureMode = "graticule";
+      preparations.length = 0;
+      for (const key of Object.keys(h.drawCounts)) delete h.drawCounts[key];
+      h.runtimeState.deferExactAfterSettle = true;
+      h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+      h.runTimer();
+      while (h.frameTasks.length) h.runNextFrame();
+      h.scheduler.finalizePendingExactAfterSettleRefreshAfterPaint();
+      h.deferredTasks.at(-1).callback();
+      while (h.frameTasks.length) h.runNextFrame();
+      const reenabled = filterEnabledRenderPassNames(h.passNames, visibility);
+      assert.deepEqual(Object.keys(h.drawCounts).sort(), [...reenabled].sort());
+      assert.ok(Object.values(h.drawCounts).every(count => count === 1));
+      assert.ok(preparations.includes("physicalBase"));
+      assert.ok(preparations.every(passName => reenabled.includes(passName)));
+    } finally { h.restore(); }
+  }
+});
+
+test("empty active targets complete without preparing or drawing the full catalog", () => {
+  const preparations = [];
+  const h = createHarness({
+    includeOptionalPasses: true,
+    getActiveRenderPassNames: () => [],
+    prepareRenderPassAsync: passName => { preparations.push(passName); return null; },
+  });
+  try {
+    h.passNames.forEach(passName => { h.cache.dirty[passName] = true; });
+    h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+    h.runTimer(); h.runNextFrame(); h.runNextFrame();
+    assert.equal(h.runtimeState.exactAfterSettleController.phase, "awaiting-paint");
+    assert.equal(h.frameTasks.length, 0);
+    assert.deepEqual(preparations, []);
+    assert.deepEqual(h.drawCounts, {});
+    assert.deepEqual(h.canvasSizeCalls[0].targetPassesOnDprChange, []);
+    h.scheduler.finalizePendingExactAfterSettleRefreshAfterPaint();
+    assert.equal(h.deferredTasks.length, 0);
+  } finally { h.restore(); }
+});
+
+test("an empty immediate stage still completes its active deferred targets", () => {
+  let active = ["labels", "textureLabels"];
+  const h = createHarness({ getActiveRenderPassNames: () => active });
+  try {
+    h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+    h.runTimer(); h.runNextFrame(); h.runNextFrame();
+    assert.equal(h.runtimeState.exactAfterSettleController.phase, "awaiting-paint");
+    assert.deepEqual(h.drawCounts, {});
+    assert.equal(h.frameTasks.length, 0);
+    h.scheduler.finalizePendingExactAfterSettleRefreshAfterPaint();
+    active = ["labels"];
+    h.deferredTasks[0].callback();
+    h.runNextFrame("deferred-exact-context-pass-labels");
+    assert.deepEqual(h.drawCounts, { labels: 1 });
+    assert.equal(h.frameTasks.length, 0);
+  } finally { h.restore(); }
+});
+
+test("passes disabled after planning are skipped without stalling or reordering either queue", () => {
+  let active;
+  const preparations = [];
+  const h = createHarness({
+    includeOptionalPasses: true,
+    getActiveRenderPassNames: () => active,
+    prepareRenderPassAsync: passName => { preparations.push(passName); return null; },
+  });
+  try {
+    active = h.passNames;
+    h.passNames.forEach(passName => { h.cache.dirty[passName] = true; });
+    h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+    h.runTimer(); h.runNextFrame(); h.runNextFrame();
+    active = active.filter(passName => !["populationHeatmap", "effects", "lineEffects", "dayNight"].includes(passName));
+    preparations.length = 0;
+    while (h.frameTasks.length) h.runNextFrame();
+    assert.deepEqual(preparations, ["political", "borders"]);
+    assert.deepEqual(h.drawCounts, { political: 1, borders: 1 });
+    assert.equal(h.runtimeState.exactAfterSettleController.phase, "awaiting-paint");
+    h.scheduler.finalizePendingExactAfterSettleRefreshAfterPaint();
+    h.deferredTasks[0].callback();
+    active = active.filter(passName => !["contextMarkers", "textureLabels"].includes(passName));
+    while (h.frameTasks.length) h.runNextFrame();
+    assert.deepEqual(h.events.filter(event => event.startsWith("prepare:")), ["prepare:political", "prepare:borders", "prepare:labels"]);
+    assert.deepEqual(h.drawCounts, { political: 1, borders: 1, labels: 1 });
+    assert.ok(h.events.includes("request-render:deferred-exact-context-refresh:false"));
+  } finally { h.restore(); }
+});
+
+test("preflight reads current visibility for each producer and async continuation skips a disabled pass", async () => {
+  let active;
+  let resolvePreparation;
+  const preparations = [];
+  const pending = new Promise(resolve => { resolvePreparation = resolve; });
+  const h = createHarness({
+    getActiveRenderPassNames: () => active,
+    prepareRenderPassAsync: passName => {
+      preparations.push(passName);
+      if (passName === "political") {
+        active = active.filter(name => name !== "labels");
+        return pending;
+      }
+      return null;
+    },
+  });
+  try {
+    active = h.passNames;
+    h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+    h.runTimer(); h.runNextFrame(); h.runNextFrame();
+    assert.deepEqual(preparations, ["political", "borders"]);
+    h.runNextFrame("exact-after-settle-pass-political");
+    active = active.filter(passName => passName !== "political");
+    preparations.length = 0;
+    resolvePreparation(); await Promise.resolve();
+    h.runNextFrame("exact-after-settle-pass-political");
+    h.runNextFrame("exact-after-settle-pass-borders");
+    assert.deepEqual(preparations, ["borders"]);
+    assert.deepEqual(h.drawCounts, { borders: 1 });
+    assert.equal(h.runtimeState.exactAfterSettleController.phase, "awaiting-paint");
+  } finally { h.restore(); }
+});
+
+test("cancellation still fences remaining work after an inactive pass is skipped", () => {
+  for (const phase of ["immediate", "deferred"]) {
+    let active;
+    const h = createHarness({ getActiveRenderPassNames: () => active, includeOptionalPasses: true });
+    try {
+      active = h.passNames;
+      h.cache.dirty.contextMarkers = true;
+      h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
+      h.runTimer(); h.runNextFrame(); h.runNextFrame();
+      if (phase === "immediate") {
+        active = active.filter(passName => passName !== "political");
+        h.runNextFrame("exact-after-settle-pass-political");
+      } else {
+        while (h.frameTasks.length) h.runNextFrame();
+        h.scheduler.finalizePendingExactAfterSettleRefreshAfterPaint();
+        h.deferredTasks[0].callback();
+        active = active.filter(passName => passName !== "contextMarkers");
+        h.runNextFrame("deferred-exact-context-pass-contextMarkers");
+      }
+      const drawsBeforeCancel = { ...h.drawCounts };
+      const pendingTasks = [...h.frameTasks];
+      h.scheduler.cancelExactAfterSettleRefresh();
+      pendingTasks.forEach(task => task.callback());
+      assert.deepEqual(h.drawCounts, drawsBeforeCancel);
+      assert.equal(h.runtimeState.exactAfterSettleController.phase, "idle");
+    } finally { h.restore(); }
+  }
+});
 
 test("exact refresh waits only the remainder of the quiet window after settling", () => {
   const harness = createHarness();
