@@ -97,6 +97,35 @@ import {
 } from "../core/unit_counter_presets.js";
 
 const state = runtimeState;
+export function createResponsiveSidebarCollapseController({ left, right, applyLeft, applyRight, getWidth }) {
+  const desktop = { left, right };
+  let current = { ...desktop };
+  let compact = false;
+  const isCompact = () => getWidth() >= 1024 && getWidth() < 1280;
+  const render = (persist = false) => {
+    applyLeft(current.left, { persist });
+    applyRight(current.right, { persist });
+  };
+  return {
+    sync() {
+      const nextCompact = isCompact();
+      if (nextCompact !== compact) {
+        current = { ...desktop };
+        if (nextCompact && !current.left && !current.right) current.right = true;
+      }
+      compact = nextCompact;
+      render();
+    },
+    set(side, collapsed) {
+      compact = isCompact();
+      current[side] = !!collapsed;
+      if (compact && !collapsed) current[side === "left" ? "right" : "left"] = true;
+      if (!compact) Object.assign(desktop, current);
+      render(!compact);
+    },
+  };
+}
+
 export function resetCountryColorsWithFeedback(afterReset, afterUndo) {
   const previousEntry = state.historyPast?.at(-1);
   resetCountryColors();
@@ -2360,6 +2389,10 @@ function initSidebar({ render } = {}) {
   const rightSidebarCollapseMedia = typeof globalThis.matchMedia === "function"
     ? globalThis.matchMedia("(min-width: 1024px)")
     : null;
+  const compactSidebarMedia = typeof globalThis.matchMedia === "function"
+    ? globalThis.matchMedia("(min-width: 1024px) and (max-width: 1279px)")
+    : null;
+  let responsiveSidebarCollapse = null;
   const SIDEBAR_LAYOUT_START_EVENT = "mapcreator:sidebar-layout-start";
   const SIDEBAR_LAYOUT_REFRESH_EVENT = "mapcreator:sidebar-layout-refresh";
   const SIDEBAR_LAYOUT_REFRESH_DELAY_MS = 280;
@@ -2407,7 +2440,11 @@ function initSidebar({ render } = {}) {
     }, SIDEBAR_LAYOUT_REFRESH_DELAY_MS);
   };
 
-  const setLeftSidebarCollapsed = (collapsed, { persist = true, refreshLayout = true } = {}) => {
+  const setLeftSidebarCollapsed = (collapsed, { persist = true, refreshLayout = true, linked = true } = {}) => {
+    if (responsiveSidebarCollapse && linked) {
+      responsiveSidebarCollapse.set("left", collapsed);
+      return;
+    }
     leftSidebarCollapsePreference = !!collapsed;
     const effectiveCollapsed = leftSidebarCollapsePreference && canCollapseLeftSidebar();
     document.body.classList.toggle("left-sidebar-collapsed", effectiveCollapsed);
@@ -2434,7 +2471,11 @@ function initSidebar({ render } = {}) {
     }
   };
 
-  const setRightSidebarCollapsed = (collapsed, { persist = true, refreshLayout = true } = {}) => {
+  const setRightSidebarCollapsed = (collapsed, { persist = true, refreshLayout = true, linked = true } = {}) => {
+    if (responsiveSidebarCollapse && linked) {
+      responsiveSidebarCollapse.set("right", collapsed);
+      return;
+    }
     rightSidebarCollapsePreference = !!collapsed;
     const effectiveCollapsed = rightSidebarCollapsePreference && canCollapseRightSidebar();
     document.body.classList.toggle("right-sidebar-collapsed", effectiveCollapsed);
@@ -2474,7 +2515,7 @@ function initSidebar({ render } = {}) {
   };
 
   const restoreRightSidebarCollapsedState = () => {
-    rightSidebarCollapsePreference = globalThis.matchMedia("(min-width:1024px) and (max-width:1279px)").matches;
+    rightSidebarCollapsePreference = false;
     try {
       const saved = globalThis.localStorage?.getItem(RIGHT_SIDEBAR_COLLAPSED_KEY);
       if (saved !== null && saved !== undefined) rightSidebarCollapsePreference = saved === "true";
@@ -2484,11 +2525,11 @@ function initSidebar({ render } = {}) {
   };
 
   const syncLeftSidebarCollapsedMedia = () => {
-    setLeftSidebarCollapsed(leftSidebarCollapsePreference, { persist: false });
+    responsiveSidebarCollapse.sync();
   };
 
   const syncRightSidebarCollapsedMedia = () => {
-    setRightSidebarCollapsed(rightSidebarCollapsePreference, { persist: false });
+    responsiveSidebarCollapse.sync();
   };
 
 
@@ -3898,6 +3939,15 @@ function initSidebar({ render } = {}) {
   refreshStrategicOverlayUI();
   restoreLeftSidebarCollapsedState();
   restoreRightSidebarCollapsedState();
+  responsiveSidebarCollapse = createResponsiveSidebarCollapseController({
+    left: leftSidebarCollapsePreference,
+    right: rightSidebarCollapsePreference,
+    applyLeft: (collapsed, options) => setLeftSidebarCollapsed(collapsed, { ...options, linked: false }),
+    applyRight: (collapsed, options) => setRightSidebarCollapsed(collapsed, { ...options, linked: false }),
+    getWidth: () => globalThis.innerWidth,
+  });
+  responsiveSidebarCollapse.sync();
+  compactSidebarMedia?.addEventListener?.("change", () => responsiveSidebarCollapse.sync());
 
   if (leftSidebarCollapseBtn && !leftSidebarCollapseBtn.dataset.bound) {
     leftSidebarCollapseBtn.addEventListener("click", () => {

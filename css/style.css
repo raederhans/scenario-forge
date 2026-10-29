@@ -1115,7 +1115,6 @@ input[type="checkbox"].checkbox-input {
   font-family: inherit;
   padding: 12px 24px;
   border: 1px solid var(--line-1);
-  border-radius: var(--radius-btn);
   cursor: pointer;
   box-shadow: var(--shadow-1);
   transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
@@ -1150,16 +1149,13 @@ input[type="checkbox"].checkbox-input {
   font-family: inherit;
   padding: 12px 24px;
   border: 1px solid var(--line-1);
-  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
 }
 
 .sidebar-support-entry-btn {
   min-width: 0;
-  min-height: 42px;
   padding: 10px 14px;
-  border-radius: var(--radius-sm);
   background:
     linear-gradient(180deg, var(--surface-raised), var(--surface-panel)),
     var(--surface-raised);
@@ -1896,9 +1892,7 @@ input[type="checkbox"].checkbox-input {
 
 #leftSidebar .btn-secondary,
 #leftSidebar .btn-primary {
-  min-height: 34px;
   padding: 8px 11px;
-  border-radius: var(--radius-sm);
 }
 
 #leftSidebar .input,
@@ -3127,7 +3121,6 @@ details.card[open] > summary::after {
 
 .parent-border-actions .btn-secondary {
   flex: 1 1 0;
-  min-height: 30px;
   padding: 6px 8px;
   font-size: var(--fs-xs);
 }
@@ -8107,7 +8100,6 @@ body.counter-editor-modal-open {
 
 .project-account-actions .sidebar-support-entry-btn {
   width: 100%;
-  min-height: 42px;
   margin: 0;
 }
 
@@ -9123,10 +9115,8 @@ body.counter-editor-modal-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 30px;
   padding: 0 12px;
   border: 1px solid rgba(120, 84, 71, 0.16);
-  border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--surface-panel) 98%, transparent);
   color: #6b4134;
   font-size: var(--fs-xs);
@@ -9863,7 +9853,6 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 
 .app-dialog-btn {
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
   padding: 11px 16px;
   font: 600 0.95rem var(--font-body);
   cursor: pointer;
@@ -10315,7 +10304,6 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 
 .dev-workspace-quick-actions .btn-secondary,
 .dev-workspace-quick-actions .btn-primary {
-  min-height: 30px;
   padding: 0 8px;
   white-space: normal;
   line-height: 1.1;
@@ -10324,7 +10312,6 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 }
 
 .dev-workspace-quick-owner-controls .btn-secondary {
-  min-height: 30px;
   padding: 0 8px;
   white-space: normal;
   line-height: 1.1;
@@ -10333,7 +10320,6 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 
 .dev-workspace-quick-secondary .btn-secondary,
 .dev-workspace-quick-secondary .btn-primary {
-  min-height: 30px;
   padding: 0 10px;
   font-size: var(--fs-xs);
 }
@@ -10390,7 +10376,6 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 
 #devScenarioTagInspectorPanel .dev-workspace-actions > .btn-secondary,
 #devScenarioTagInspectorPanel .dev-workspace-actions > .btn-primary {
-  min-height: 30px;
   padding-inline: 9px;
 }
 
@@ -10528,7 +10513,6 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 #devScenarioTagCreatorPanel .dev-scenario-tag-creator-actions > .btn-primary {
   flex: 0 1 auto;
   min-width: 92px;
-  min-height: 30px;
   padding-inline: 10px;
 }
 
@@ -10570,7 +10554,6 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 .dev-workspace-actions > .btn-primary {
   flex: 1 1 calc(50% - 6px);
   min-width: 0;
-  min-height: 32px;
   padding: 0 10px;
   font-size: var(--fs-xs);
 }
@@ -10661,7 +10644,6 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 
 .dev-workspace-actions .btn-secondary,
 .dev-workspace-actions .btn-primary {
-  min-height: 34px;
   padding: 0 12px;
 }
 
@@ -11132,13 +11114,13 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 
 .selected-land-country-quick-tab.is-empty {
   align-content: center;
-  border-style: dashed;
+  border: 0;
   background: transparent;
 }
 
 .selected-land-country-quick-empty {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--ink-500);
   font-size: var(--fs-xs);
   line-height: 1.5;
   text-align: center;
@@ -11648,7 +11630,6 @@ button.scenario-action-card:hover {
 .scenario-core-action-row .btn-primary,
 .scenario-core-action-row .btn-secondary {
   flex: 1 1 180px;
-  min-height: 34px;
   min-width: 0;
   justify-content: center;
 }
@@ -13250,12 +13231,10 @@ button.scenario-action-card:hover {
 .special-zone-member-drawer .secondary-btn {
   align-items: center;
   justify-content: center;
-  min-height: 30px;
   min-width: 0;
   width: auto;
   padding: 7px 10px;
   border: 1px solid var(--line-1);
-  border-radius: var(--radius-sm);
   background:
     linear-gradient(180deg, var(--surface-raised), var(--surface-panel)),
     var(--surface-raised);
@@ -13938,4 +13917,116 @@ button.scenario-action-card:hover {
     --dur-fast: 0ms;
     --dur-base: 0ms;
   }
+}
+
+body :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn) {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--control-md);
+  min-height: var(--control-md);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-1);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--ink-900);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 1.2;
+  box-shadow: none;
+  cursor: pointer;
+  transform: none;
+  letter-spacing: 0;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+body :is(#leftSidebar, #rightSidebar) :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn) {
+  height: var(--control-compact);
+  min-height: var(--control-compact);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--ink-900);
+  box-shadow: none;
+  font-weight: 500;
+}
+body :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):hover:not(:disabled) { background: var(--surface-sunken); border-color: var(--line-2); box-shadow: none; }
+body :is(#leftSidebar, #rightSidebar) :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):hover:not(:disabled) { background: var(--surface-sunken); border-color: var(--line-2); }
+body :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):active:not(:disabled) { background: var(--accent-soft); transform: none; box-shadow: none; }
+body :is(#leftSidebar, #rightSidebar) :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):active:not(:disabled) { background: var(--accent-soft); }
+body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn),
+body .app-dialog-btn-primary {
+  background: var(--accent);
+  color: var(--surface-raised);
+  font-weight: 600;
+}
+body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn):hover:not(:disabled),
+body .app-dialog-btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn { background: var(--accent); color: var(--surface-raised); }
+body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:hover:not(:disabled) { background: var(--accent-hover); }
+body :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):is(.danger-btn, .is-danger),
+body :is(#leftSidebar, #rightSidebar) :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):is(.danger-btn, .is-danger) {
+  background: transparent;
+  color: var(--danger);
+  border-color: var(--line-1);
+}
+body :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):is(.danger-btn, .is-danger):hover:not(:disabled),
+body :is(#leftSidebar, #rightSidebar) :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):is(.danger-btn, .is-danger):hover:not(:disabled) { background: var(--danger-soft); }
+body :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 2px; }
+body :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):disabled,
+body :is(#leftSidebar, #rightSidebar) :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn):disabled {
+  background: var(--surface-sunken);
+  color: var(--ink-400);
+  border-color: var(--line-1);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+body.editor-workspace :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput),
+body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput) {
+  box-sizing: border-box;
+  height: var(--control-md);
+  min-height: var(--control-md);
+  border: 1px solid var(--line-1);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-raised);
+  color: var(--ink-900);
+  padding-block: 0;
+}
+body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput) { height: var(--control-compact); min-height: var(--control-compact); }
+body.editor-workspace :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput):focus,
+body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput):focus {
+  border-color: var(--accent);
+  outline: 3px solid var(--accent-ring);
+  outline-offset: 0;
+  box-shadow: none;
+}
+@media (pointer: coarse) {
+  body :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn),
+  body :is(#leftSidebar, #rightSidebar) :is(.btn-primary, .btn-secondary, .secondary-btn, .danger-btn, .app-dialog-btn, .sidebar-action-primary, .sidebar-action-secondary, .sidebar-tool-action-primary, .sidebar-support-entry-btn, .scenario-context-action-btn),
+  body.editor-workspace :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput),
+  body.editor-workspace :is(#leftSidebar, #rightSidebar) :is(.input, .select-input, .app-select-button, .app-select-search, input[type="search"], .transport-workbench-data-search, .special-zone-member-drawer-search input, .special-zone-workbench-field input[type="text"], .special-zone-workbench-field input[type="number"], .transport-workbench-edit-overlay-input, #riverPaintSearchInput) { min-height: 44px; }
+}
+
+body .scenario-context-action-btn:is(.is-active, [aria-expanded="true"]) {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: none;
+}
+body :is(.app-dialog--warning, .app-dialog--error) .app-dialog-btn-primary {
+  background: var(--danger);
+  color: var(--surface-raised);
+  border-color: var(--danger);
+  box-shadow: none;
+}
+body :is(#workspaceSaveBtn, #appearancePresetApplyBtn, #exportWorkbenchSnapshotBtn, #bootRetryBtn, .app-dialog-btn-primary):disabled,
+body :is(#leftSidebar, #rightSidebar) #appearancePresetApplyBtn:disabled {
+  background: var(--surface-sunken);
+  color: var(--ink-400);
+  border-color: var(--line-1);
+  cursor: not-allowed;
 }
