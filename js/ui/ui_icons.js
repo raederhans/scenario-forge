@@ -9,6 +9,9 @@ const ICON_PATHS = Object.freeze({
   plus: ["M12 5v14", "M5 12h14"],
   minus: ["M5 12h14"],
   close: ["M6 6l12 12", "M18 6 6 18"],
+  // 右栏面板开关：外框 + 右侧竖线。
+  "panel-right": ["M5 5h14v14H5z", "M15 5v14"],
+  "external-link": ["M14 5h5v5", "M19 5l-8 8", "M17 13v6H5V7h6"],
 });
 
 function createUiIcon(name, { size = 16, className = "ui-icon", doc = globalThis.document } = {}) {
