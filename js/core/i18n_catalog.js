@@ -1251,4 +1251,5 @@ export const UI_COPY_CATALOG = Object.freeze({
   // 对象筛选分段的短名（按钮由 editor_workspace.js 动态生成，静态扫描覆盖不到）。
   "Water": {"zh": "水域", "en": "Water"},
   "Special": {"zh": "特殊", "en": "Special"},
+  "Brush On · Drag to paint · Use two fingers or Shift+Drag to pan": {"zh": "画笔已开启 · 拖动涂色 · 双指或 Shift+拖动平移", "en": "Brush On · Drag to paint · Use two fingers or Shift+Drag to pan"},
 });
