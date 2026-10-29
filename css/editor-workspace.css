@@ -328,10 +328,17 @@
   border-radius: var(--radius-sm);
   background: var(--surface-sunken);
 }
+/* 三段按文字长度分宽、单行显示，标签用短名（Countries / Water / Special）才能在最窄栏宽 248px 下放下。 */
+.editor-workspace .editor-object-nav {
+  flex-wrap: nowrap;
+}
 .editor-workspace .editor-object-nav button {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   min-height: var(--control-compact);
-  font-size: var(--fs-sm);
+  padding-inline: var(--space-1h);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
 }
 .editor-workspace .editor-object-nav button[aria-pressed="true"] {
   background: var(--surface-raised);
