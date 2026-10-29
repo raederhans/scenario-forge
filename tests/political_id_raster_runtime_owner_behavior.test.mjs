@@ -765,8 +765,11 @@ test('native partial feedback coalesces edits and finishes with a full native fr
   assert.equal(f.owner.getDiagnostics().displayState, 'accelerated');
   await new Promise(resolve => setTimeout(resolve, 15));
   assert.equal(f.renders.filter(reason => reason === 'political-id-raster-partial-refine').length, 1);
+  // The timer only requested the exact pass; until that pass draws, the view is still refining.
+  assert.equal(f.owner.getDiagnostics().refinementPending, true);
   assert.equal(f.owner.draw(), null);
   assert.equal(f.owner.getDiagnostics().displayState, 'precise');
+  assert.equal(f.owner.getDiagnostics().refinementPending, false);
   assert.equal(f.requests.length, builds);
   f.owner.noteNativePartialRepaint(); f.owner.dispose();
   await new Promise(resolve => setTimeout(resolve, 15));
