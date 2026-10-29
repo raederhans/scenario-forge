@@ -1,3 +1,4 @@
+import { focusSurface, getActiveModal, trapSurfaceTab } from "../ui_contract.js";
 import { setScenarioDiagnosticsState } from "../../core/state.js";
 import { markDirty } from "../../core/dirty_state.js";
 import { createRevisionedLegendColorReader } from "../../core/legend_manager.js";
@@ -604,7 +605,15 @@ export function createProjectSupportDiagnosticsController({
     backendAccountToggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
     if (isOpen) {
       void ensureBackendSessionProbed();
-      window.requestAnimationFrame?.(() => backendCloudUsername?.focus?.());
+      window.requestAnimationFrame?.(() => {
+        if (backendAccountPopover.classList.contains("hidden")) return;
+        // 用户名可用时直接聚焦它；会话探测期间禁用，就退回面板内第一个可聚焦元素。
+        if (backendCloudUsername && !backendCloudUsername.disabled && backendAccountPopover.contains(backendCloudUsername)) {
+          backendCloudUsername.focus?.();
+          if (backendAccountPopover.ownerDocument?.activeElement === backendCloudUsername) return;
+        }
+        focusSurface(backendAccountPopover);
+      });
     } else {
       backendAccountToggleBtn.focus?.();
     }
@@ -1695,7 +1704,7 @@ export function createProjectSupportDiagnosticsController({
       projectExportBusy = true;
       const buttons = [downloadProjectBtn, workspaceSaveBtn].filter(Boolean);
       const disabledStates = buttons.map((button) => button.disabled);
-      buttons.forEach((button) => { button.disabled = true; });
+      buttons.forEach((button) => { button.disabled = true; button.ariaBusy = "true"; });
       refreshProjectSaveStatus(t("Exporting project file with appearance and transport settings.", "ui"));
       try {
         const exported = await fileManager.exportProject(state, {
@@ -1706,9 +1715,10 @@ export function createProjectSupportDiagnosticsController({
         refreshProjectSaveStatus(exported === false ? t("Project export cancelled.", "ui") : "");
       } catch (error) {
         refreshProjectSaveStatus(String(error?.message || error || ""));
+        showToast(String(error?.message || error || t("Unknown error", "ui")), { title: t("Project save failed", "ui"), tone: "error" });
       } finally {
         projectExportBusy = false;
-        buttons.forEach((button, index) => { button.disabled = disabledStates[index]; });
+        buttons.forEach((button, index) => { button.disabled = disabledStates[index]; button.ariaBusy = "false"; });
       }
     };
     [downloadProjectBtn, workspaceSaveBtn].forEach((button) => {
@@ -1841,9 +1851,14 @@ export function createProjectSupportDiagnosticsController({
 
     if (backendAccountPopover && !backendAccountPopover.dataset.escapeBound) {
       document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && !backendAccountPopover.classList.contains("hidden")) {
+        if (event.defaultPrevented || backendAccountPopover.classList.contains("hidden")) return;
+        if (getActiveModal(document) !== backendAccountPopover) return;
+        if (event.key === "Escape") {
+          event.preventDefault();
           setBackendAccountPopoverOpen(false);
+          return;
         }
+        trapSurfaceTab(event, backendAccountPopover);
       });
       backendAccountPopover.dataset.escapeBound = "true";
     }
