@@ -111,8 +111,12 @@ export function createRenderPipelinePassesOwner({
     const canvas = cache.canvases[passName];
     // A resize keeps the canvas object but clears its pixels: never restore a
     // reference for a surface whose dimensions changed since it was committed.
+    // Every commit (including coverage refreshes made outside this pipeline)
+    // rewrites the pass signature, so a changed signature means the surface
+    // was repainted since this snapshot and its transform is unknown here.
     if (!committed || committed.canvas !== canvas
-      || committed.width !== canvas.width || committed.height !== canvas.height) return false;
+      || committed.width !== canvas.width || committed.height !== canvas.height
+      || committed.signature !== cache.signatures?.[passName]) return false;
     // Invalidation cleared the reference but the surface still holds the
     // borders committed at that transform: restore it so the composite can
     // scale the stale surface exactly like the interaction frame did.
@@ -242,6 +246,7 @@ export function createRenderPipelinePassesOwner({
       canvas: committedCanvas,
       width: committedCanvas?.width,
       height: committedCanvas?.height,
+      signature: cache.signatures?.[passName],
       transform: { x: transform.x, y: transform.y, k: transform.k },
     };
   }

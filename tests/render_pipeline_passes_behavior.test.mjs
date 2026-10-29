@@ -181,6 +181,23 @@ test("committed borders blocks after reference invalidation when the surface was
   }]]);
 });
 
+test("committed borders blocks after reference invalidation when another commit repainted the surface", () => {
+  const { owner, cache, transform, painted, metrics, restoredReferences } = commitThenInvalidateReference();
+  // A coverage refresh outside this pipeline repaints the same canvas at a new
+  // transform; the commit boundary rewrites the pass signature.
+  cache.signatures.borders = "coverage-refresh";
+  const timings = {};
+  assert.equal(owner.ensureIdleRenderPasses(timings, ["borders"]), false);
+  assert.equal(owner.prepareIdleRenderPassDefinition("borders", () => {}, transform, timings), false);
+  assert.equal(cache.dirty.borders, true);
+  assert.deepEqual(painted, []);
+  assert.deepEqual(restoredReferences, []);
+  assert.deepEqual(timings, {});
+  assert.deepEqual(metrics, [["idleRenderPassPreflightPending", 0, {
+    passNames: "borders", activeScenarioId: "tno_1962",
+  }]]);
+});
+
 test("committed borders blocks after reference invalidation when the host cannot restore references", () => {
   const harness = createHarness({ withSetter: false });
   harness.finishPreparation();
