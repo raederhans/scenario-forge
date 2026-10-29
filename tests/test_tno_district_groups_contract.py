@@ -29,7 +29,7 @@ class TnoDistrictGroupsContractTest(unittest.TestCase):
         self.assertEqual(set(self.payload["tags"]), set(self.spec["tags"]))
         for tag in (
             "GER", "FRA", "ENG", "ITA", "IBR", "RKM", "RKU", "RKO", "RKP", "RKN",
-            "USA", "CHI", "CAN", "MEX", "NCP", "FRI", "TUR", "JAP", "MAN", "RAJ", "KOR",
+            "USA", "CHI", "CAN", "MEX", "NCP", "AZH", "TUR", "JAP", "MAN", "RAJ", "KOR",
         ):
             self.assertIn(tag, self.payload["tags"])
 
