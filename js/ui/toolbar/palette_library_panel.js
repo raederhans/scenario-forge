@@ -15,6 +15,7 @@ import {
   setActivePaletteSource,
 } from "../../core/palette_manager.js";
 import { t } from "../i18n.js";
+import { restoreFocusOrigin } from "../ui_contract.js";
 import { createDeferredPanelRender } from "../../core/deferred_panel_render.js";
 const state = runtimeState;
 
@@ -829,6 +830,7 @@ function createPaletteLibraryPanelController({
           event.preventDefault();
           runtimeState.paletteLibraryOpen = false;
           syncPanelVisibility();
+          restoreFocusOrigin(paletteLibraryToggle);
         }
       });
       paletteLibraryList.dataset.bound = "true";
