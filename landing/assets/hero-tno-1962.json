@@ -37,8 +37,8 @@
     "data/scenarios/tno_1962/scenario_atlantropa.topo.json"
   ],
   "feature_counts": {
-    "territories": 32,
-    "political_features": 2339,
+    "territories": 33,
+    "political_features": 2326,
     "capitals": 7,
     "base_land_features_inspected": 22185,
     "base_land_features_candidates": 5698,
@@ -62,8 +62,8 @@
     "atlantropa_shoal_paths": 61
   },
   "counts": {
-    "territories": 32,
-    "political_features": 2339,
+    "territories": 33,
+    "political_features": 2326,
     "capitals": 7,
     "base_land_features_inspected": 22185,
     "base_land_features_candidates": 5698,
@@ -117,6 +117,7 @@
     "SWE",
     "SWI",
     "TUR",
+    "VOL",
     "WLS",
     "WRS"
   ],

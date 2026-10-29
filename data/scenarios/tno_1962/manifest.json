@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/tno_1962/audit.json",
-  "baseline_hash": "2e88c5fbe6a39f9f97cb569892f99e44ee39eed2f04f3cfd440fa84bcd46ddc2",
+  "baseline_hash": "71007200b0b5df8b1e51e1a79493870a91cf9043c834ba4be2f7e6e20e0d3209",
   "bathymetry_texture_url": "data/scenarios/tno_1962/bathymetry_texture/manifest.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
@@ -105,7 +105,7 @@
     "GXC",
     "YUN",
     "MEX",
-    "HOL",
+    "SUR",
     "IBR",
     "BUL",
     "GRE",
@@ -121,7 +121,7 @@
     "AFG",
     "GEA",
     "GCO",
-    "GSW",
+    "ANG",
     "ARE",
     "BHR",
     "QAT",
@@ -129,7 +129,7 @@
     "IRQ",
     "PER",
     "PHI",
-    "RSF",
+    "MAG",
     "PFC",
     "FIC"
   ],
@@ -2997,10 +2997,10 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "71bce3f7f0215d0bc796a3383fa60012202dd24e94e505c836274009b96a0ff9",
+  "snapshot_fingerprint": "f7d74d8910eca06e2a409dfb18dee5001bf7089dea8e77188ef74b232bf49ee4",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "64cf58dba7d4b4b671796b989c18d14a95855bcaeb046418396a8941b0215e7f",
+    "detail_chunk_manifest_sha256": "e8cf1f175823def75242c34abfb29196a2a415cd386ab38c55668ea937af9991",
     "runtime_bootstrap_topology_sha256": "338d98c608bd7bed9ecfc46441d5d051734d8926dfc5b4c8851166f120a31902",
     "runtime_topology_sha256": "2260a1fb35ec521421456f374ad4da2e143875abf05d3cf7628c35f6e7ad46e1"
   },
@@ -3035,7 +3035,7 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 172,
+    "controller_count": 180,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -3045,7 +3045,7 @@
     "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 172,
+    "owner_count": 180,
     "quality_counts": {
       "approx_existing_geometry": 1033,
       "direct_country_copy": 2698,
@@ -3071,7 +3071,9 @@
     "tno_water_region_count": 285,
     "topology_blocker_count": 0
   },
+  "tag_migration_version": 1,
   "version": 2,
   "water_regions_mode": "exclusive",
-  "water_regions_url": "data/scenarios/tno_1962/water_regions.geojson"
+  "water_regions_url": "data/scenarios/tno_1962/water_regions.geojson",
+  "corrections_version": 1
 }

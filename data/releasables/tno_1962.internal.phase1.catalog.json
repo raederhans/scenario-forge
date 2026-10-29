@@ -1232,9 +1232,9 @@
         "MAN",
         "MEN",
         "POR",
-        "PRC",
+        "CHI",
         "SHX",
-        "SIK",
+        "XIN",
         "TIB",
         "XSM",
         "YUN"
@@ -1757,7 +1757,7 @@
         "hoi4_1939"
       ],
       "scenario_only": true,
-      "tag": "SIC",
+      "tag": "XIK",
       "validation_errors": [],
       "validation_status": "ok"
     },
@@ -2226,7 +2226,7 @@
       "notes": "Japanese victory releasable for Burma.",
       "parent_owner_tag": "JAP",
       "parent_owner_tags": [
-        "BRM"
+        "BUR"
       ],
       "preset_source": {
         "exclude_feature_ids": [],
@@ -2259,7 +2259,7 @@
         "hoi4_1939"
       ],
       "scenario_only": true,
-      "tag": "BRM",
+      "tag": "BUR",
       "validation_errors": [],
       "validation_status": "ok"
     },
