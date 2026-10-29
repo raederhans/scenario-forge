@@ -59,10 +59,15 @@
 #scenarioContextBar.is-collapsed .scenario-context-item { display: none; }
 #editorProperty-reference #dockReferencePopover {
   position: static;
+  box-sizing: border-box;
   width: auto;
-  max-width: none;
+  max-width: 100%;
   padding: 0;
   border: 0;
   box-shadow: none;
   background: none;
+}
+#editorProperty-reference #dockReferencePopover :is(input, select, button) {
+  min-width: 0;
+  max-width: 100%;
 }

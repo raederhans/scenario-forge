@@ -260,6 +260,7 @@ test("project support panels and inspector search stay polished and inset", asyn
         paddingLeft: Number.parseFloat(style.paddingLeft),
         paddingRight: Number.parseFloat(style.paddingRight),
         borderLeft: style.borderLeftWidth,
+        borderLeftStyle: style.borderLeftStyle,
       };
     });
     expect(searchMetrics.left).toBeGreaterThanOrEqual(12);
@@ -267,7 +268,8 @@ test("project support panels and inspector search stay polished and inset", asyn
     expect(Math.abs(searchMetrics.left - searchMetrics.right)).toBeLessThanOrEqual(2);
     expect(searchMetrics.paddingLeft).toBeGreaterThanOrEqual(6);
     expect(searchMetrics.paddingRight).toBeGreaterThanOrEqual(6);
-    expect(searchMetrics.borderLeft).toBe("0px");
+    expect(searchMetrics.borderLeft).toBe("1px");
+    expect(searchMetrics.borderLeftStyle).toBe("solid");
     return;
   }
 
@@ -985,6 +987,9 @@ test("adaptive support, transport, and palette surfaces stay contained", async (
   }
   await expect(page.locator("#dockReferencePopover")).toBeVisible();
 
+  await page.locator("#rightSidebar").evaluate(async (sidebar) => {
+    await Promise.all(sidebar.getAnimations().map((animation) => animation.finished));
+  });
   const supportMetrics = await page.evaluate(() => {
     const rectToObject = (rect) => rect ? { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height } : null;
     const popover = rectToObject(document.querySelector("#dockReferencePopover")?.getBoundingClientRect());
