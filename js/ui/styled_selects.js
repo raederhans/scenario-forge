@@ -213,7 +213,7 @@ export function bindSelectKeyboard({ button, menu, getOptions, open, close, sear
       open();
       if (event.key === "Home") getOptions()[0]?.focus();
       if (event.key === "End") getOptions().at(-1)?.focus();
-    } else if (event.key === "Escape") {
+    } else if (event.key === "Escape" && !menu.hidden && !menu.classList.contains("hidden")) {
       event.preventDefault();
       close({ restoreFocus: true });
     }
@@ -245,7 +245,7 @@ export function bindSelectKeyboard({ button, menu, getOptions, open, close, sear
       onSearch();
       search.focus();
     } else if (event.key === "Tab") {
-      close();
+      close({ restoreFocus: true });
     }
   }, eventOptions);
 }

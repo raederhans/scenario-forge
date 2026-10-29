@@ -82,7 +82,7 @@ export function createSpecialZoneLayersRenderOwner({
       return {
         fill: getSafeCanvasColor(layerStyle.fill, "#8b5cf6"),
         stroke: getSafeCanvasColor(layerStyle.stroke, "#6d28d9"),
-        fillOpacity: clamp(Number(layerStyle.fillOpacity) || 0.32, 0, 1),
+        fillOpacity: clamp(layerStyle.fillOpacity !== null && layerStyle.fillOpacity !== "" && Number.isFinite(Number(layerStyle.fillOpacity)) ? Number(layerStyle.fillOpacity) : 0.32, 0, 1),
         strokeOpacity: clamp(Number(layerStyle.strokeOpacity) || 0.92, 0, 1),
         strokeWidth: clamp(Number(layerStyle.strokeWidth) || 1.3, 0.4, 8),
         dash: getDashPattern(layerStyle.pattern === "outlineOnly" ? "solid" : "dashed", Number(layerStyle.strokeWidth) || 1.3),

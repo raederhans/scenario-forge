@@ -83,7 +83,7 @@ test("style normalization retains fallback choices and existing numeric semantic
   assert.equal(normalizeOperationGraphicStroke("#abc"), "");
   assert.equal(normalizeOperationGraphicWidth(Infinity), 16);
   assert.equal(normalizeOperationGraphicWidth(-3), 0);
-  assert.equal(normalizeOperationGraphicOpacity(0), 1);
+  assert.equal(normalizeOperationGraphicOpacity(0), 0);
   assert.equal(normalizeOperationGraphicOpacity(-1), 0);
 });
 

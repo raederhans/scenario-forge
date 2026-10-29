@@ -119,6 +119,12 @@ function initShortcuts() {
     if (editableTarget) {
       return;
     }
+    if (!modifier && !event.altKey && /^[a-z0-9]$/i.test(key)
+      && event.target instanceof Element
+      // 只在带输入联想的列表里让出字母键；普通按钮被点击后仍保持焦点，快捷键必须照常可用。
+      && event.target.closest('[role="option"], [role="listbox"]')) {
+      return;
+    }
 
     if (runtimeState.bootBlocking) {
       return;

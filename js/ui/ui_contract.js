@@ -218,11 +218,17 @@ function captureFocusOrigin(doc = document) {
   return doc?.activeElement instanceof HTMLElement ? doc.activeElement : null;
 }
 
-function restoreFocusOrigin(element) {
-  if (element instanceof HTMLElement && document.contains(element)) {
-    element.focus({ preventScroll: true });
-  }
-  return element instanceof HTMLElement ? element : null;
+function isUsableFocusTarget(element) {
+  return element instanceof HTMLElement
+    && element.ownerDocument.contains(element)
+    && !element.disabled
+    && isSurfaceVisible(element);
+}
+
+function restoreFocusOrigin(element, fallback = null) {
+  const target = isUsableFocusTarget(element) ? element : (isUsableFocusTarget(fallback) ? fallback : null);
+  target?.focus({ preventScroll: true });
+  return target;
 }
 
 function applyDialogContract(
@@ -270,14 +276,11 @@ function rememberSurfaceTrigger(registry, surface, trigger) {
   registry.set(surface, trigger);
 }
 
-function restoreSurfaceTriggerFocus(registry, surface, explicitTrigger = null) {
+function restoreSurfaceTriggerFocus(registry, surface, explicitTrigger = null, fallback = null) {
   const target = explicitTrigger instanceof HTMLElement
     ? explicitTrigger
     : (registry instanceof WeakMap && surface instanceof HTMLElement ? registry.get(surface) : null);
-  if (target && typeof target.focus === "function") {
-    target.focus({ preventScroll: true });
-  }
-  return target || null;
+  return restoreFocusOrigin(target, fallback);
 }
 
 function getUiContractSnapshot() {

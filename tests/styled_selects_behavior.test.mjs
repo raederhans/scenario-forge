@@ -266,7 +266,9 @@ test("long styled select searches groups and keeps native value and keyboard con
     assert.equal(document.activeElement, button);
     button.fire("click");
     assert.equal(search.value, "");
-    search.fire("keydown", { key: "Tab" });
+    const tab = search.fire("keydown", { key: "Tab" });
+    assert.ok(document.activeElement === button, "Tab restores the selector anchor before native traversal");
+    assert.ok(!tab.defaultPrevented);
     assert.equal(menu.classList.contains("hidden"), true);
     button.fire("click");
     search.value = "Item 2";

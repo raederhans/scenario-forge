@@ -41,13 +41,14 @@ function makeNode(document, tagName = "div") {
     setAttribute: (name, value) => { recordWrite("attribute"); attributes.set(name, String(value)); },
     getAttribute: (name) => attributes.get(name) || null,
     removeAttribute: (name) => { recordWrite("attribute"); attributes.delete(name); },
-    addEventListener(type, handler) { listeners.set(type, handler); },
-    dispatchEvent(event) { listeners.get(event.type)?.(event); return true; },
+    addEventListener(type, handler) { listeners.set(type, [...(listeners.get(type) || []), handler]); },
+    dispatchEvent(event) { for (const handler of listeners.get(event.type) || []) handler(event); return true; },
     fire(type, init = {}) {
-      const event = { type, target: this, preventDefault() { this.defaultPrevented = true; }, ...init };
+      const event = { type, target: this, preventDefault() { this.defaultPrevented = true; }, stopPropagation() { this.cancelBubble = true; }, ...init };
       let current = this;
       while (current) {
-        current._listeners?.get(type)?.(event);
+        for (const handler of current._listeners?.get(type) || []) handler(event);
+        if (event.cancelBubble) break;
         current = current.parentNode;
       }
       return event;
@@ -150,6 +151,10 @@ test("scenario picker shares navigation, selection, focus return and native chan
     select.dispatchEvent = (event) => { events.push(event.type); return dispatch(event); };
     button.fire("click");
     assert.equal(document.activeElement.dataset.value, "alpha");
+    for (const key of ["f", "b", "g", "1"]) {
+      const character = document.activeElement.fire("keydown", { key });
+      assert.equal(character.cancelBubble, true, "scenario options consume character keys");
+    }
     assert.equal(button.getAttribute("aria-expanded"), "true");
     document.activeElement.fire("keydown", { key: "ArrowDown" });
     assert.equal(document.activeElement.dataset.value, "beta");
