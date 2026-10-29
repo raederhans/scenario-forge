@@ -223,6 +223,29 @@ HOI4_SPLIT_CAPITALS = {
     'BRM': ('CITY::ne::1159151477', 'Yangon', '仰光'),
     'CEY': ('CITY::ne::1159150719', 'Colombo', '科伦坡'),
     "IKA": ("CITY::scenario::mawkyrwat", "Mawkyrwat", "毛克尔瓦特"),
+    "ABD": ("1159150565", "Abu Dhabi", "阿布扎比"),
+    "DUB": ("1159151497", "Dubai", "迪拜"),
+    "SHJ": ("1159126943", "Sharjah", "沙迦"),
+    "RAK": ("1159134277", "Ras al-Khaimah", "拉斯海马"),
+    "AJM": ("CITY::gn::292932", "Ajman", "阿治曼"),
+    "UAQ": ("1159126925", "Umm al-Quwain", "乌姆盖万"),
+    "FUJ": ("1159134281", "Fujairah", "富查伊拉"),
+    "OMA": ("1159150717", "Muscat", "马斯喀特"),
+    "IMO": ("1159148149", "Nizwa", "尼兹瓦"),
+    "ALW": ("1159126139", "Latakia", "拉塔基亚"),
+    "JEB": ("1159133919", "Al-Suwayda", "苏韦达"),
+    "HTY": ("1159113499", "Antakya", "安塔基亚"),
+    "JAZ": ("1159126219", "Al-Hasakah", "哈塞克"),
+    "WDN": ("1159133947", "Lahij", "拉赫季"),
+    "EDN": ("1159147531", "Mukalla", "穆卡拉"),
+    "ALG": ("1159151143", "Tamanrasset", "塔曼拉塞特"),
+    "KRF": ("1159149657", "Toyohara", "丰原"),
+    "STH": ("CITY::gn::3370903", "Jamestown", "詹姆斯敦"),
+    # The base geometry omits Saint-Pierre island; use Miquelon as the scenario seat.
+    "SPM": ("CITY::scenario::miquelon", "Miquelon", "密克隆"),
+    "LOL": ("CITY::scenario::meigu", "Meigu", "美姑"),
+    "MUL": ("CITY::scenario::qiaowa", "Qiaowa", "乔瓦"),
+    "JRG": ("CITY::scenario::barkam", "Barkam", "马尔康"),
 }
 
 TNO_CAPITALS = {
@@ -307,12 +330,14 @@ REVIEWED_CAPITALS = {
         "CHI": ("1159151327", "Chongqing", "重庆"),
         "SHX": ("CITY::gn::13512505", "Lishi", "离石"),
         "GXC": ("1159150821", "Guilin", "桂林"),
+        "SIC": ("CITY::gn::1802171", "Kangding", "康定"),
+        "LBA": ("1159150951", "Sabha", "塞卜哈"),
     },
     "tno_1962": TNO_CAPITALS,
 }
 NO_CAPITAL_TAGS = {
-    "hoi4_1936": {"DMC", "CDE"},
-    "hoi4_1939": {"JCJ", "THG"},
+    "hoi4_1936": {"DMC", "CDE", "TRU"},
+    "hoi4_1939": {"JCJ", "THG", "TRU"},
     "tno_1962": {"AFA", "RFA", "ATL", "AQ", "SPR"},
     # Neutral/uninhabited regions or administrations seated outside the mapped
     # territory have no in-territory civilian capital marker.
@@ -343,6 +368,14 @@ REVIEWED_CITY_NAMES = {
 # Small settlements absent from the population-filtered world layer. Coordinates
 # are sourced, not territory centroids; see the evidence document.
 ADDITIONAL_CAPITAL_CITIES = {
+    "CITY::scenario::miquelon": {
+        "id": "CITY::scenario::miquelon", "name": "Miquelon", "name_en": "Miquelon", "name_zh": "密克隆",
+        "lon": -56.3814, "lat": 47.0975, "country_code": "PM", "population": 0,
+        "base_tier": "regional", "capital_kind": "admin_capital", "source": "reviewed_settlement",
+    },
+    'CITY::scenario::meigu': {'id': 'CITY::scenario::meigu', 'name': 'Meigu', 'name_en': 'Meigu', 'name_zh': '美姑', 'lon': 103.132, 'lat': 28.328, 'country_code': 'CN', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::qiaowa': {'id': 'CITY::scenario::qiaowa', 'name': 'Qiaowa', 'name_en': 'Qiaowa', 'name_zh': '乔瓦', 'lon': 101.28, 'lat': 27.928, 'country_code': 'CN', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
+    'CITY::scenario::barkam': {'id': 'CITY::scenario::barkam', 'name': 'Barkam', 'name_en': 'Barkam', 'name_zh': '马尔康', 'lon': 102.206, 'lat': 31.905, 'country_code': 'CN', 'population': 0, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'reviewed_settlement'},
     'CITY::gn::1262319': {'id': 'CITY::gn::1262319', 'name': 'Nabha', 'name_en': 'Nabha', 'name_zh': '纳巴', 'lon': 76.15292, 'lat': 30.37577, 'country_code': 'IN', 'population': 67972, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'geonames'},
     'CITY::gn::1263862': {'id': 'CITY::gn::1263862', 'name': 'Mandi', 'name_en': 'Mandi', 'name_zh': '曼迪', 'lon': 76.93273, 'lat': 31.71194, 'country_code': 'IN', 'population': 28217, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'geonames'},
     'CITY::gn::1266436': {'id': 'CITY::gn::1266436', 'name': 'Koch Bihar', 'name_en': 'Koch Bihar', 'name_zh': '科奇比哈尔', 'lon': 89.44508, 'lat': 26.32539, 'country_code': 'IN', 'population': 78737, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'geonames'},

@@ -1,6 +1,6 @@
 {
   "artifact_counts": {
-    "chunk_count": 269,
+    "chunk_count": 287,
     "feature_count": 21091,
     "water_count": 0
   },
@@ -200749,10 +200749,10 @@
     "ALG": {
       "base_iso2": "DZ",
       "continent_label": "Africa",
-      "controller_feature_count": 48,
+      "controller_feature_count": 13,
       "display_name": "French Algeria",
       "entry_kind": "scenario_subject",
-      "feature_count": 48,
+      "feature_count": 13,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201296,10 +201296,10 @@
     "CHI": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 697,
+      "controller_feature_count": 693,
       "display_name": "China",
       "entry_kind": "",
-      "feature_count": 697,
+      "feature_count": 693,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201607,10 +201607,10 @@
     "ENG": {
       "base_iso2": "GB",
       "continent_label": "Europe",
-      "controller_feature_count": 508,
+      "controller_feature_count": 507,
       "display_name": "Britain",
       "entry_kind": "",
-      "feature_count": 508,
+      "feature_count": 507,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201705,10 +201705,10 @@
     "FRA": {
       "base_iso2": "FR",
       "continent_label": "Europe",
-      "controller_feature_count": 287,
+      "controller_feature_count": 321,
       "display_name": "France",
       "entry_kind": "",
-      "feature_count": 287,
+      "feature_count": 321,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202242,10 +202242,10 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 107,
+      "controller_feature_count": 121,
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 107,
+      "feature_count": 121,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202277,10 +202277,10 @@
     "JAP": {
       "base_iso2": "JP",
       "continent_label": "Asia",
-      "controller_feature_count": 228,
+      "controller_feature_count": 149,
       "display_name": "Japan",
       "entry_kind": "",
-      "feature_count": 228,
+      "feature_count": 149,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202433,10 +202433,10 @@
     "LBA": {
       "base_iso2": "LY",
       "continent_label": "Africa",
-      "controller_feature_count": 22,
+      "controller_feature_count": 8,
       "display_name": "Libya",
       "entry_kind": "scenario_subject",
-      "feature_count": 22,
+      "feature_count": 8,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202594,10 +202594,10 @@
     "MAD": {
       "base_iso2": "MG",
       "continent_label": "Africa",
-      "controller_feature_count": 26,
+      "controller_feature_count": 27,
       "display_name": "Madagascar",
       "entry_kind": "scenario_subject",
-      "feature_count": 26,
+      "feature_count": 27,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203035,10 +203035,10 @@
     "OMA": {
       "base_iso2": "OM",
       "continent_label": "Asia",
-      "controller_feature_count": 11,
+      "controller_feature_count": 9,
       "display_name": "Oman",
       "entry_kind": "",
-      "feature_count": 11,
+      "feature_count": 9,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203710,10 +203710,10 @@
     "SIC": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 32,
+      "controller_feature_count": 31,
       "display_name": "Xikang Clique",
       "entry_kind": "",
-      "feature_count": 32,
+      "feature_count": 31,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
@@ -204037,10 +204037,10 @@
     "SYR": {
       "base_iso2": "SY",
       "continent_label": "Asia",
-      "controller_feature_count": 15,
+      "controller_feature_count": 11,
       "display_name": "French Mandate for Syria",
       "entry_kind": "scenario_subject",
-      "feature_count": 15,
+      "feature_count": 11,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204394,10 +204394,10 @@
     "YEM": {
       "base_iso2": "YE",
       "continent_label": "Asia",
-      "controller_feature_count": 20,
+      "controller_feature_count": 15,
       "display_name": "Yemen",
       "entry_kind": "",
-      "feature_count": 20,
+      "feature_count": 15,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -205506,11 +205506,11 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1939",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "534ababd354f25614294baccd5d74ccb1d9f237c3eb73015fcf8124e2f1e7b47",
+  "snapshot_fingerprint": "acee93ab1bf04e1ea79a871969458a6acb8a47699007a5bb3faabf6adf26f648",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "6e429156cc043cb3ecc946e9e172a6e6a3b3b54bf10772957d80667c28b63447",
-    "detail_chunk_manifest_sha256": "99da53f3369d2537e497a155d7493d96c14c964002df18f1474dda221d0b1a27",
+    "build_snapshot_sha256": "faa9c034bbc9b6ef9eaa42a7e208b4a2152e20876b105a06b896682e04059349",
+    "detail_chunk_manifest_sha256": "e25f21d1bff748f8c885f2bb94a5c2bd63639e758ef10e08cc099283b3a58969",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
     "runtime_topology_sha256": "b3d64210598b384af748e14688174ec4a93643206a6a9becc4bb7dd760bc6343"
   },
@@ -205519,7 +205519,7 @@
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
     "changed_feature_count": 15398,
-    "controller_count": 261,
+    "controller_count": 279,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
@@ -205529,7 +205529,7 @@
     "manual_reviewed_feature_count": 14951,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 261,
+    "owner_count": 279,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5744,

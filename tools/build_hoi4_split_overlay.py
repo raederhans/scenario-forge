@@ -158,7 +158,7 @@ add("french_cameroon", B, "FCM", "French Cameroun", "法属喀麦隆", CC("CM"),
     only=["AEF", "FRA", "AOF"], exclude=HG("CM_Northwest", "CM_Southwest"))
 add("djibouti", B, "DJI", "French Somaliland", "法属索马里", CC("DJ"), parent="FRA", kind="colony", only=["FRA"])
 add("madagascar_dependencies", B, "MAD", None, None, CC("KM", "TF"), only=["FRA"])
-for t in ["GF", "GP", "MQ", "RE", "YT"]:
+for t in ["GF", "GP", "MQ", "RE"]:
     add(f"{t.lower()}_parent", B, t, None, None, {"owners": [t]}, parent="FRA", kind="colony", only=[t])
 add("french_indochina", B, "VIN", "French Indochina", "法属印度支那联邦",
     CC("VN", "KH", "LA"), parent="FRA", kind="federation", only=["VIN"])
@@ -322,7 +322,10 @@ add("kosice_return", Y39, "HUN", None, None, FI(*["SK_ADM2_56367889B" + n for n 
     ("16879144707830", "46930466225258", "7741755639355", "57985107422825")]))
 for scenarios, parent in [(Y36, "RAJ"), (Y39, "ENG")]:
     year = scenarios[0][-4:]
-    add("aden_" + year, scenarios, "ADN", "Aden", "亚丁", FI("YEM-3510"), parent=parent, kind="colony", color="#b38493")
+    if scenarios == Y36:
+        add("aden_" + year, scenarios, "RAJ", None, None, FI("YEM-3510"))
+    else:
+        add("aden_" + year, scenarios, "ADN", "Aden Colony", "亚丁殖民地", FI("YEM-3510"), parent=parent, kind="colony")
     if scenarios == Y36:
         add("burma_direct_1936", scenarios, "RAJ", None, None, CC("MM"), only=["BRM"])
     else:
@@ -629,6 +632,68 @@ add("olongapo_reservation", B, "USA", None, None, FI("PHL-5540"), only=["PHI"], 
 add("thailand_name_1939", Y39, "SIA", "Kingdom of Thailand", "泰王国", CC("TH"), cores="keep")
 # 1936 Burma is ruled directly by RAJ; drop the retired BRM so the palette pass adds no colour-only entry for it.
 C36.pop("BRM", None)
+C36.pop("ADN", None)
+
+for tag, en, zh, fid in [
+    ("ABD", "Sheikhdom of Abu Dhabi", "阿布扎比酋长国", "ARE-349"),
+    ("DUB", "Sheikhdom of Dubai", "迪拜酋长国", "ARE-350"),
+    ("SHJ", "Sheikhdom of Sharjah", "沙迦酋长国", "ARE-348"),
+    ("RAK", "Sheikhdom of Ras al-Khaimah", "拉斯海马酋长国", "ARE-338"),
+    ("AJM", "Sheikhdom of Ajman", "阿治曼酋长国", "ARE-346"),
+    ("UAQ", "Sheikhdom of Umm al-Quwain", "乌姆盖万酋长国", "ARE-339"),
+]:
+    add(tag.lower() + "_sheikhdom", B, tag, en, zh, FI(fid), parent="ENG", kind="protectorate", only=["TRU", "ENG"])
+add("fujairah", B, "FUJ", "Sheikhdom of Fujairah", "富查伊拉酋长国", FI("ARE-341"),
+    color=shade("ENG"), only=["TRU", "ENG"])
+add("muscat_name", B, "OMA", "Sultanate of Muscat and Oman", "马斯喀特与阿曼苏丹国", CC("OM"), only=["OMA"], cores="keep")
+add("oman_imamate", B, "IMO", "Imamate of Oman", "阿曼伊玛目国", FI("OMN-2404", "OMN-2414"),
+    parent="OMA", kind="autonomous_region", only=["OMA"])
+add("alawite_government", B, "ALW", "Autonomous Government of Latakia", "拉塔基亚自治政府",
+    FI("SYR-134", "SYR-135"), parent="FRA", kind="autonomous_region", only=["SYR"])
+add("jabal_druze", B, "JEB", "Autonomous Government of Jabal Druze", "德鲁兹山自治政府",
+    FI("SYR-143"), parent="FRA", kind="autonomous_region", only=["SYR"])
+add("alexandretta_1936", Y36, "HTY", "Alexandretta Autonomous Sanjak Debug Region", "亚历山大勒塔自治专区调试分区",
+    FI("TR631"), parent="FRA", kind="autonomous_region", only=["SYR"])
+add("jazira_administration_1939", Y39, "JAZ", "Upper Jazira Administration", "上杰济拉行政区",
+    FI("SYR-141"), parent="FRA", kind="administrative_region", only=["SYR"])
+add("transjordan_mandate", B, "JOR", "Emirate of Transjordan", "外约旦酋长国", CC("JO"),
+    parent="ENG", kind="mandate", only=["JOR"], cores="keep")
+add("aden_western_states", B, "WDN", "Western Aden Protectorate Debug Region", "西亚丁保护地调试分区",
+    FI("YEM-157", "YEM-3511", "YEM-336"), parent="ENG", kind="protectorate", only=["YEM"])
+add("aden_eastern_states", B, "EDN", "Eastern Aden Protectorate Debug Region", "东亚丁保护地调试分区",
+    FI("YEM-3497", "YEM-332"), parent="ENG", kind="protectorate", only=["YEM"])
+
+add("sichuan_faction_metadata_1936", Y36, "CHU", "Sichuan Administration - Liu Xiang Faction", "四川军政区（刘湘系）",
+    {"owners": ["CHU"]}, parent="CHI", kind="military_administration", cores="keep")
+for scenarios, en, zh in [(Y36, "Xikang Provincial Preparatory Committee", "西康建省委员会"),
+                           (Y39, "Xikang Provincial Government", "西康省政府")]:
+    add("xikang_metadata_" + scenarios[0], scenarios, "SIC", en, zh, {"owners": ["SIC"]},
+        parent="CHI", kind="military_administration", cores="keep")
+add("yunnan_metadata", B, "YUN", "Yunnan Provincial Government - Long Yun", "云南省政府（龙云）",
+    {"owners": ["YUN"]}, parent="CHI", kind="military_administration", cores="keep")
+for scenarios, parent, owners in [(Y36, "CHU", ["CHU"]), (Y39, "SIC", ["CHI", "SIC"])]:
+    add("liangshan_clans_" + scenarios[0], scenarios, "LOL", "Liangshan Yi Clan Debug Region", "凉山彝族家支调试分区",
+        FI(*CN("23024603415445 52132557540167 17138311811008")), parent=parent,
+        kind="autonomous_region", only=owners, cores="keep")
+    add("muli_chiefdom_" + scenarios[0], scenarios, "MUL", "Muli Chiefdom", "木里土司",
+        FI(*CN("80219081988604")), parent=parent, kind="tusi", only=["SIC"], cores="keep")
+add("gyalrong_four_1939", Y39, "JRG", "Gyalrong Four Chiefdoms Debug Region", "嘉绒四土调试分区",
+    FI(*CN("24790182027849")), parent="CHI", kind="tusi", only=["CHI"], cores="keep")
+
+DZ_SOUTH = FI(*["DZA-" + number for number in
+    "2143 2148 2149 2150 2188 2189 2190 2191 2192 2193 2194 2211 2212".split()])
+add("algeria_northern_departments", B, "FRA", None, None, CC("DZ"), exclude=DZ_SOUTH, only=["ALG"])
+add("algeria_southern_territories", B, "ALG", "Southern Territories of Algeria", "阿尔及利亚南部领地",
+    DZ_SOUTH, parent="FRA", kind="military_administration", only=["ALG"], cores="keep")
+add("libyan_coastal_provinces_1939", Y39, "ITA", None, None,
+    {"country_codes": ["LY"], "bbox": [-180, 29, 180, 90]}, only=["LBA"])
+add("karafuto_administration", B, "KRF", "Karafuto Prefecture", "桦太厅",
+    {"country_codes": ["RU"], "bbox": [140, 45, 145, 50]}, parent="JAP", kind="colony", only=["JAP"])
+add("saint_helena_colony", B, "STH", "Saint Helena Colony", "圣赫勒拿殖民地", CC("SH"), parent="ENG", kind="colony", only=["ENG"])
+add("saint_pierre_miquelon", B, "SPM", "Saint Pierre and Miquelon", "圣皮埃尔和密克隆", CC("PM"), parent="FRA", kind="colony", only=["FRA"])
+add("mayotte_madagascar_dependency", B, "MAD", None, None, CC("YT"), only=["YT"])
+add("puerto_rico_territory_metadata", B, "PUE", None, None, CC("PR"), parent="USA", kind="territory", only=["PUE"], cores="keep")
+add("guangzhouwan_indochina_parent", B, "KWW", None, None, {"owners": ["KWW"]}, parent="VIN", kind="colony", cores="keep")
 
 harmonize_family_colors(E)
 E.append({"id": "china_enclaves_1939", "scenarios": Y39,

@@ -17,6 +17,28 @@ TNO_CITY_ROWS = {f"CITY::ne::{ne_id}": {"id": f"CITY::ne::{ne_id}"}
 
 
 class ScenarioCapitalRulesTest(unittest.TestCase):
+    def test_hoi4_miquelon_seat_is_available_without_a_world_city(self):
+        for scenario in ("hoi4_1936", "hoi4_1939"):
+            result = apply_reviewed_capitals({}, {"SPM": {}}, {}, scenario_id=scenario)
+            city_id = result["capitals_by_tag"]["SPM"]
+            self.assertEqual(city_id, "CITY::scenario::miquelon")
+            self.assertEqual(result["capital_city_hints"]["SPM"]["city_name"], "Miquelon")
+            self.assertEqual(result["cities"][city_id]["country_code"], "PM")
+            self.assertTrue(result["cities"][city_id]["add_city"])
+
+    def test_southwest_debug_seats_and_remaining_trucial_neutral_areas(self):
+        countries = {tag: {} for tag in ("LOL", "MUL", "JRG", "TRU")}
+        result = apply_reviewed_capitals({}, countries, {}, scenario_id="hoi4_1939")
+        for tag, city_id in (("LOL", "CITY::scenario::meigu"),
+                             ("MUL", "CITY::scenario::qiaowa"),
+                             ("JRG", "CITY::scenario::barkam")):
+            self.assertEqual(result["capitals_by_tag"][tag], city_id)
+            self.assertTrue(result["cities"][city_id]["add_city"])
+            self.assertEqual(result["capital_city_hints"][tag]["country_code"], "CN")
+        self.assertNotIn("TRU", result["capitals_by_tag"])
+        self.assertEqual(result["capital_city_hints"]["TRU"]["resolution_method"], "no_capital")
+        self.assertEqual(apply_reviewed_capitals(result, countries, {}, scenario_id="hoi4_1939"), result)
+
     def test_hoi4_split_seats_include_small_towns_and_brunei_identity(self):
         cities = {
             "CITY::ne::1159151083": {"id": "CITY::ne::1159151083", "lon": 114.94, "lat": 4.94},
