@@ -205506,10 +205506,10 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1939",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "53b1cef968529e002048bbe5b2bacb3139f30caab1650444f02c5c959ea3e793",
+  "snapshot_fingerprint": "acee93ab1bf04e1ea79a871969458a6acb8a47699007a5bb3faabf6adf26f648",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "b3a10de435c0ba3907e4202848dd34027736eb5dbf6407cbe6ab3d962946ea5a",
+    "build_snapshot_sha256": "faa9c034bbc9b6ef9eaa42a7e208b4a2152e20876b105a06b896682e04059349",
     "detail_chunk_manifest_sha256": "e25f21d1bff748f8c885f2bb94a5c2bd63639e758ef10e08cc099283b3a58969",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
     "runtime_topology_sha256": "b3d64210598b384af748e14688174ec4a93643206a6a9becc4bb7dd760bc6343"
