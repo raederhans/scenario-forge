@@ -234,33 +234,15 @@ async function expectExportWorkbenchLayoutReachable(page) {
   }
 }
 
-async function isSelectorInViewport(page, selector) {
-  return page.evaluate((targetSelector) => {
-    const element = document.querySelector(targetSelector);
-    if (!(element instanceof HTMLElement)) return false;
-    const rect = element.getBoundingClientRect();
-    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-    return rect.width > 0
-      && rect.height > 0
-      && rect.right > 0
-      && rect.bottom > 0
-      && rect.left < viewportWidth
-      && rect.top < viewportHeight;
-  }, selector);
-}
-
 async function ensureProjectPanelVisible(page) {
-  if (!await isSelectorInViewport(page, "#inspectorSidebarTabProject")) {
-    await page.locator("#rightPanelToggle").click();
-    await expect.poll(() => isSelectorInViewport(page, "#inspectorSidebarTabProject"), { timeout: 30000 }).toBe(true);
-  }
   const projectTab = page.locator("#inspectorSidebarTabProject");
-  if (await projectTab.getAttribute("aria-pressed") !== "true") {
-    await projectTab.click();
-  }
+  await projectTab.click();
   await expect(projectTab).toHaveAttribute("aria-pressed", "true", { timeout: 30000 });
   await expect(page.locator("#editorProperty-project")).toBeVisible();
+  await expect(page.locator("#rightSidebar")).toHaveJSProperty("inert", false);
+  await page.locator("#rightSidebar").evaluate(async (sidebar) => {
+    await Promise.all(sidebar.getAnimations().map((animation) => animation.finished));
+  });
 }
 
 async function expectStackingAboveGuide(page, overlaySelector) {
