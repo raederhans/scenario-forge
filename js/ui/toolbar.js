@@ -68,6 +68,8 @@ import {
   createFocusReturnRegistry,
   focusSurface,
   getFocusableElements,
+  getActiveModal,
+  restoreFocusOrigin,
   rememberSurfaceTrigger,
   restoreSurfaceTriggerFocus,
   UI_URL_STATE_KEYS,
@@ -583,8 +585,8 @@ function initToolbar({ render } = {}) {
 
   const focusOverlaySurface = (container) => focusSurface(container);
   const rememberOverlayTrigger = (overlay, trigger) => rememberSurfaceTrigger(overlayFocusReturnTargets, overlay, trigger);
-  const restoreOverlayTriggerFocus = (overlay, explicitTrigger = null) => (
-    restoreSurfaceTriggerFocus(overlayFocusReturnTargets, overlay, explicitTrigger)
+  const restoreOverlayTriggerFocus = (overlay, explicitTrigger = null, fallback = null) => (
+    restoreSurfaceTriggerFocus(overlayFocusReturnTargets, overlay, explicitTrigger, fallback)
   );
   const isVisibleFocusTarget = (element) => {
     if (!(element instanceof HTMLElement)) return false;
@@ -775,7 +777,16 @@ function initToolbar({ render } = {}) {
     if (open) getDrawerFocusTargets(side)[0]?.focus({ preventScroll: true });
     else if (sidebar?.contains(document.activeElement)) toggle?.focus({ preventScroll: true });
   };
-  drawerMedia.addEventListener("change", syncPanelToggleButtons);
+  drawerMedia.addEventListener("change", () => {
+    const active = document.activeElement;
+    syncPanelToggleButtons();
+    for (const side of ["left", "right"]) {
+      const sidebar = document.getElementById(`${side}Sidebar`);
+      if (sidebar?.inert && sidebar.contains(active)) {
+        restoreFocusOrigin(side === "left" ? leftPanelToggle : rightPanelToggle);
+      }
+    }
+  });
 
   const toggleLeftPanel = (force) => {
     // transport workbench 打开时，左右抽屉继续展开会和 workbench 抢同一块侧边布局。
@@ -894,7 +905,7 @@ function initToolbar({ render } = {}) {
     renderExportWorkbenchUi(false);
     syncSupportSurfaceUrlState("");
     if (restoreFocus) {
-      restoreOverlayTriggerFocus(exportWorkbenchOverlay);
+      restoreOverlayTriggerFocus(exportWorkbenchOverlay, null, document.getElementById("workspaceExportBtn"));
     }
   };
 
@@ -2092,9 +2103,10 @@ function initToolbar({ render } = {}) {
     button.addEventListener("click", closeDrawers);
   });
   document.addEventListener("keydown", (event) => {
+    if (event.defaultPrevented) return;
     if (!drawerMedia.matches || drawerBackdrop?.classList.contains("hidden")) return;
     // An open dialog owns Escape and focus until it closes.
-    if (document.activeElement?.closest('[role="dialog"], dialog')) return;
+    if (getActiveModal()) return;
     if (event.key === "Escape") {
       event.preventDefault();
       closeDrawers();

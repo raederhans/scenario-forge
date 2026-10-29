@@ -1,6 +1,8 @@
 // Transport workbench event owner.
 // 这里集中处理 workbench chrome 的事件绑定，controller 继续拥有状态语义和渲染顺序。
 
+import { getActiveModal, trapSurfaceTab } from "../ui_contract.js";
+
 function requireAction(actions, actionName) {
   const action = actions?.[actionName];
   if (typeof action !== "function") {
@@ -185,7 +187,14 @@ export function createTransportWorkbenchEventOwner({
       const handlePopoverEscape = requireAction(actions, "handlePopoverEscape");
       const setOpen = requireAction(actions, "setOpen");
       documentRef.addEventListener("keydown", (event) => {
-        if (event.key !== "Escape" || !isOpen()) return;
+        if (event.defaultPrevented) return;
+        if (!isOpen()) return;
+        if (event.key === "Tab") {
+          const panel = documentRef.getElementById("transportWorkbenchPanel");
+          if (panel && getActiveModal(documentRef) === panel) trapSurfaceTab(event, panel);
+          return;
+        }
+        if (event.key !== "Escape") return;
         if (handlePopoverEscape(event)) return;
         event.preventDefault();
         setOpen(false);

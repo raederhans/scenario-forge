@@ -198,6 +198,11 @@ export function initScenarioControls() {
       open: openScenarioSelectMenu,
       close: closeScenarioSelectMenu,
     }, eventOptions);
+    scenarioSelectMenu.addEventListener("keydown", (event) => {
+      if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        event.stopPropagation();
+      }
+    }, eventOptions);
   }
 
   if (scenarioSelectMenu) {
