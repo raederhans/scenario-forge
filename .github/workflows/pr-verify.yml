@@ -21,7 +21,7 @@ jobs:
 
   pr-tests:
     name: pr-tests (${{ matrix.suite }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -54,7 +54,7 @@ jobs:
     # test; file-level sharding put every editor flow on one shard. The landing
     # flows take seconds and run on their own.
     name: pr-golden (${{ matrix.shard }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -121,7 +121,7 @@ jobs:
     name: PR Verify Required
     if: always()
     needs: ["pr-verify-fast", "pr-tests", "pr-golden", "pr-verify-smoke", "pr-verify-hgo"]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Require every PR verification job to pass
