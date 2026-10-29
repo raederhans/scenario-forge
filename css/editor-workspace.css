@@ -378,13 +378,14 @@
   box-shadow: none;
   color: var(--ink-500);
 }
+/* 中等宽度：放得下就单行，放不下自然折行；不用横向滚动藏控件。
+   历史/颜色组原本 flex-basis 100% 是为了强制换到第二行，这里改为按内容宽度。 */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .editor-workspace .bottom-dock-primary {
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-wrap: wrap;
     min-width: 0;
   }
-  .editor-workspace .bottom-dock-primary > .dock-group { flex-shrink: 0; }
+  .editor-workspace .bottom-dock-primary > .dock-group-history-colors { flex: 0 1 auto; }
 }
 @media (max-width: 767px) {
   .editor-workspace :is(.panel-toggle-left, .panel-toggle-right) { font-size: var(--fs-sm); }
