@@ -35,7 +35,9 @@ function applyDeclarativeTranslationToElement(element) {
   // 这一层只负责把 data-i18n* 属性映射到 DOM，可见文本的业务决策仍留在 t()/catalog/runtime locale。
   const textKey = String(element.getAttribute("data-i18n") || "").trim();
   if (textKey && !element.dataset?.confirmState) {
-    setLocalizedText(element, t(textKey, "ui"));
+    // The product name stays stable even while an older startup locale snapshot
+    // is active, before the complete dictionary has finished loading.
+    setLocalizedText(element, textKey === "Scenario Forge" ? "Scenario Forge" : t(textKey, "ui"));
   }
 
   const placeholderKey = String(element.getAttribute("data-i18n-placeholder") || "").trim();
@@ -642,10 +644,12 @@ function updateUIText() {
 async function toggleLanguage() {
   const nextLang = runtimeState.currentLanguage === "zh" ? "en" : "zh";
   runtimeState.currentLanguage = nextLang;
-  try {
-    localStorage.setItem("map_lang", nextLang);
-  } catch (error) {
-    console.warn("Unable to persist language preference:", error);
+  for (const key of ["scenario_forge_language", "map_lang", "scenario_forge_landing_lang"]) {
+    try {
+      globalThis.localStorage?.setItem(key, nextLang);
+    } catch (error) {
+      console.warn("Unable to persist language preference:", error);
+    }
   }
   try {
     await callRuntimeHook(state, "ensureFullLocalizationDataReadyFn", {

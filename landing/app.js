@@ -1,7 +1,6 @@
-import { COPY } from "./i18n.js";
+import { COPY, readLanguagePreference, persistLanguagePreference } from "./i18n.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
-const STORAGE_KEY = "scenario_forge_landing_lang";
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const clamp01 = (value) => Math.min(1, Math.max(0, value));
@@ -24,12 +23,7 @@ const toBox = (rect, padX, padY) => ({ x: rect.left - padX, y: rect.top - padY, 
 
 /* ---------- Language ---------- */
 
-let language = "en";
-try {
-  language = localStorage.getItem(STORAGE_KEY) === "zh" ? "zh" : "en";
-} catch {
-  // Storage can be unavailable; English stays the default.
-}
+let language = readLanguagePreference();
 const copy = () => COPY[language];
 
 function applyLanguage(next) {
@@ -44,11 +38,7 @@ function applyLanguage(next) {
   }
   document.title = strings.metaTitle;
   document.querySelector('meta[name="description"]')?.setAttribute("content", strings.metaDescription);
-  try {
-    localStorage.setItem(STORAGE_KEY, next);
-  } catch {
-    // Not persisting the choice is fine.
-  }
+  persistLanguagePreference(next);
   document.dispatchEvent(new Event("landing:language"));
 }
 
