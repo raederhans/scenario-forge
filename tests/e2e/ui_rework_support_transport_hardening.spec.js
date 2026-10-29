@@ -666,9 +666,16 @@ test("phase 03 support surfaces restore the requested view from URL", async ({ p
     await expect(page.locator("#editorTaskLayersBtn")).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator("#editorProperty-reference #dockReferencePopover")).toBeVisible();
     await expect(page.locator("#editorProperty-reference #referenceOpacity")).toBeVisible();
+    // 参考底图是图层属性（不是 details），URL 仍要带 view=reference，刷新/分享才能恢复。
+    await expect(page).toHaveURL(/view=reference/);
     await page.locator("#editorLayer-legend").click();
     await expect(page.locator("#editorProperty-reference")).toBeHidden();
     await expect(page.locator("#editorProperty-legend")).toBeVisible();
+    await expect(page).not.toHaveURL(/view=reference/);
+    await page.locator("#editorLayer-reference").click();
+    await expect(page).toHaveURL(/view=reference/);
+    await page.locator("#editorLayer-legend").click();
+    await expect(page).not.toHaveURL(/view=reference/);
     await page.locator("#editorTaskObjectsBtn").click();
     await page.locator("#editorObjects-countries").click();
   } else {

@@ -1991,6 +1991,9 @@ function initSidebar({ render } = {}) {
     .filter((details) => details.open && !details.hidden && !details.closest(".editor-property-panel[hidden]"))
     .map((details) => details.id)
     .join(",");
+  // 当前右栏属性面板（editor workspace 的 onNavigate 回报）。参考底图已从弹层改为图层属性，
+  // 它不是 details，靠这个标记把 view=reference 写进 URL，刷新/分享链接才能恢复。
+  let activeEditorPropertyKey = "";
   const syncRightSidebarUrlState = () => {
     // 右侧栏 URL 状态只记录“当前标签页 + 展开的 section + support view”，
     // 不记录更细的局部表单状态，避免刷新链接过长也避免 restore 语义失真。
@@ -2003,7 +2006,9 @@ function initSidebar({ render } = {}) {
       } else {
         params.delete(UI_URL_STATE_KEYS.section);
       }
-      if (scopeValue !== "current-project") {
+      if (activeEditorPropertyKey === "reference") {
+        params.set(UI_URL_STATE_KEYS.view, "reference");
+      } else if (scopeValue !== "current-project") {
         params.delete(UI_URL_STATE_KEYS.view);
       }
     });
@@ -4067,7 +4072,8 @@ function initSidebar({ render } = {}) {
       }
     },
     t,
-    onNavigate: () => {
+    onNavigate: (key) => {
+      activeEditorPropertyKey = String(key || "");
       // Manual context navigation consumes the current selection snapshot so a
       // delayed list refresh cannot take the inspector back to an older choice.
       for (const [kind, field] of Object.entries(selectionFields)) {
