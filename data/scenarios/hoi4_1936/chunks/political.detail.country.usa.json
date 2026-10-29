@@ -2,6 +2,51 @@
   "type": "FeatureCollection",
   "features": [
     {
+      "id": "PHL-5540",
+      "type": "Feature",
+      "properties": {
+        "id": "PHL-5540",
+        "name": "Olongapo",
+        "cntr_code": "PH",
+        "admin1_group": "",
+        "legacy_name": "",
+        "anchor_county_name": "",
+        "detail_tier": "",
+        "__source": "detail"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              120.30780307803082,
+              14.806590018900181
+            ],
+            [
+              120.41580415804157,
+              14.863872684726843
+            ],
+            [
+              120.45180451804521,
+              14.912476158761592
+            ],
+            [
+              120.27180271802717,
+              14.929834542345418
+            ],
+            [
+              120.19980199802,
+              14.881231068310683
+            ],
+            [
+              120.30780307803082,
+              14.806590018900181
+            ]
+          ]
+        ]
+      }
+    },
+    {
       "id": "US_ZN_01_001__R",
       "type": "Feature",
       "properties": {

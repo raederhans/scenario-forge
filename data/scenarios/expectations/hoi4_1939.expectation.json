@@ -147,13 +147,113 @@
       "tag": "MEN",
       "field": "display_name_en",
       "equals": "Mongolian United Autonomous Government"
+    },
+    {
+      "tag": "SHA",
+      "field": "parent_owner_tag",
+      "equals": "BRM"
+    },
+    {
+      "tag": "SHA",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "KRN",
+      "field": "parent_owner_tag",
+      "equals": "BRM"
+    },
+    {
+      "tag": "KRN",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "BEI",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "BEI",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "STR",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "STR",
+      "field": "subject_kind",
+      "equals": "colony"
+    },
+    {
+      "tag": "MAL",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "MAL",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "BHU",
+      "field": "parent_owner_tag",
+      "equals": "RAJ"
+    },
+    {
+      "tag": "BHU",
+      "field": "subject_kind",
+      "equals": "protectorate"
+    },
+    {
+      "tag": "FND",
+      "field": "parent_owner_tag",
+      "equals": "FRA"
+    },
+    {
+      "tag": "FND",
+      "field": "subject_kind",
+      "equals": "colony"
+    },
+    {
+      "tag": "GOA",
+      "field": "parent_owner_tag",
+      "equals": "POR"
+    },
+    {
+      "tag": "GOA",
+      "field": "subject_kind",
+      "equals": "colony"
+    },
+    {
+      "tag": "CEY",
+      "field": "parent_owner_tag",
+      "equals": "ENG"
+    },
+    {
+      "tag": "CEY",
+      "field": "subject_kind",
+      "equals": "colony"
+    },
+    {
+      "tag": "YOG",
+      "field": "parent_owner_tag",
+      "equals": "HOL"
+    },
+    {
+      "tag": "YOG",
+      "field": "subject_kind",
+      "equals": "princely_state"
     }
   ],
   "summary_equals": {
     "blocker_count": 0,
-    "feature_count": 21078,
-    "owner_count": 229,
-    "controller_count": 229,
+    "feature_count": 21091,
+    "owner_count": 261,
+    "controller_count": 261,
     "synthetic_owner_feature_count": 23,
     "owner_controller_split_feature_count": 0,
     "controller_rule_count": 0
@@ -814,6 +914,187 @@
       "feature_ids": [
         "CN_CITY_17275852B43165756519885"
       ]
+    },
+    {
+      "name": "city_Hyderabad",
+      "expected_owner_tag": "HYD",
+      "feature_ids": [
+        "IN_ADM2_76128533B84676164211579"
+      ]
+    },
+    {
+      "name": "city_Mysore",
+      "expected_owner_tag": "MYS",
+      "feature_ids": [
+        "IN_ADM2_76128533B95879808095476"
+      ]
+    },
+    {
+      "name": "city_Travancore",
+      "expected_owner_tag": "TVC",
+      "feature_ids": [
+        "IN_ADM2_76128533B33162455176756"
+      ]
+    },
+    {
+      "name": "city_Srinagar",
+      "expected_owner_tag": "KAS",
+      "feature_ids": [
+        "IN_ADM2_76128533B32249045995424"
+      ]
+    },
+    {
+      "name": "city_Singapore",
+      "expected_owner_tag": "STR",
+      "feature_ids": [
+        "SGP-4871"
+      ]
+    },
+    {
+      "name": "city_Kuala_Lumpur",
+      "expected_owner_tag": "MAL",
+      "feature_ids": [
+        "MYS-4831"
+      ]
+    },
+    {
+      "name": "city_Yangon",
+      "expected_owner_tag": "BRM",
+      "feature_ids": [
+        "MMR-3269"
+      ]
+    },
+    {
+      "name": "city_Taunggyi",
+      "expected_owner_tag": "SHA",
+      "feature_ids": [
+        "MMR-3277"
+      ]
+    },
+    {
+      "name": "city_Loikaw",
+      "expected_owner_tag": "KRN",
+      "feature_ids": [
+        "MMR-2473"
+      ]
+    },
+    {
+      "name": "city_Jaipur",
+      "expected_owner_tag": "IRA",
+      "feature_ids": [
+        "IN_ADM2_76128533B28755611410447"
+      ]
+    },
+    {
+      "name": "city_Vadodara",
+      "expected_owner_tag": "BDA",
+      "feature_ids": [
+        "IN_ADM2_76128533B33151011563565"
+      ]
+    },
+    {
+      "name": "city_Bhopal",
+      "expected_owner_tag": "BPL",
+      "feature_ids": [
+        "IN_ADM2_76128533B22439249004073"
+      ]
+    },
+    {
+      "name": "city_Gwalior",
+      "expected_owner_tag": "GWA",
+      "feature_ids": [
+        "IN_ADM2_76128533B90551733723251"
+      ]
+    },
+    {
+      "name": "city_Indore",
+      "expected_owner_tag": "INR",
+      "feature_ids": [
+        "IN_ADM2_76128533B60360721573267"
+      ]
+    },
+    {
+      "name": "city_Mumbai",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "IN_ADM2_76128533B67326016655833"
+      ]
+    },
+    {
+      "name": "city_Nagpur",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "IN_ADM2_76128533B3026318797185"
+      ]
+    },
+    {
+      "name": "city_New_Delhi",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "IN_ADM2_76128533B58262202014972"
+      ]
+    },
+    {
+      "name": "city_Madikeri",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "IN_MRG_20e0c11ac976__SPLIT_REST"
+      ]
+    },
+    {
+      "name": "city_Bahawalpur",
+      "expected_owner_tag": "BHW",
+      "feature_ids": [
+        "PAK-1113__SPLIT_BAHAWALPUR"
+      ]
+    },
+    {
+      "name": "city_Khairpur",
+      "expected_owner_tag": "KPU",
+      "feature_ids": [
+        "PAK-1114__SPLIT_KHAIRPUR"
+      ]
+    },
+    {
+      "name": "city_Quetta",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "PAK-1108__SPLIT_REST"
+      ]
+    },
+    {
+      "name": "city_Peshawar",
+      "expected_owner_tag": "RAJ",
+      "feature_ids": [
+        "PAK-1123__SPLIT_REST"
+      ]
+    },
+    {
+      "name": "city_Yogyakarta",
+      "expected_owner_tag": "YOG",
+      "feature_ids": [
+        "ID_ADM1_65028918B6070530336190"
+      ]
+    },
+    {
+      "name": "city_Olongapo",
+      "expected_owner_tag": "USA",
+      "feature_ids": [
+        "PHL-5540"
+      ]
+    },
+    {
+      "name": "straits_indian_ocean_dependencies",
+      "expected_owner_tag": "STR",
+      "feature_ids": [
+        "AU_REMOTE_INDIAN_OCEAN_TERRITORIES"
+      ]
     }
+  ],
+  "forbidden_country_tags": [
+    "KSH",
+    "MYR",
+    "TRV",
+    "BRU"
   ]
 }

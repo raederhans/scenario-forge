@@ -17,6 +17,24 @@ TNO_CITY_ROWS = {f"CITY::ne::{ne_id}": {"id": f"CITY::ne::{ne_id}"}
 
 
 class ScenarioCapitalRulesTest(unittest.TestCase):
+    def test_hoi4_split_seats_include_small_towns_and_brunei_identity(self):
+        cities = {
+            "CITY::ne::1159151083": {"id": "CITY::ne::1159151083", "lon": 114.94, "lat": 4.94},
+        }
+        countries = {tag: {} for tag in ("BEI", "IPA", "IHA", "CHB", "IKA")}
+        for scenario in ("hoi4_1936", "hoi4_1939"):
+            result = apply_reviewed_capitals({}, countries, cities, scenario_id=scenario)
+            self.assertEqual(set(result["capitals_by_tag"]), set(countries))
+            self.assertEqual(result["capitals_by_tag"]["BEI"], "CITY::ne::1159151083")
+            for tag, name in (("IPA", "Nabha"), ("IHA", "Mandi"), ("CHB", "Koch Bihar"), ("IKA", "Mawkyrwat")):
+                hint = result["capital_city_hints"][tag]
+                self.assertEqual(hint["city_name"], name)
+                self.assertEqual(hint["country_code"], "IN")
+                self.assertIsInstance(hint["lon"], float)
+                self.assertIsInstance(hint["lat"], float)
+                self.assertTrue(result["cities"][hint["city_id"]]["add_city"])
+            self.assertEqual(apply_reviewed_capitals(result, countries, cities, scenario_id=scenario), result)
+
     def test_capital_geometry_reader_accepts_gzip_only_topology(self):
         ring = [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]
         topology = {"type": "Topology", "arcs": [ring], "objects": {
