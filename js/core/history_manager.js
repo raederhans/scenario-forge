@@ -320,14 +320,6 @@ function refreshUiAfterHistory(direction, entry) {
 function applyHistorySnapshot(snapshot, direction, entry) {
   if (!snapshot || typeof snapshot !== "object") return false;
   const hasAnnotationView = !!(snapshot.annotationView && typeof snapshot.annotationView === "object");
-  const appliesStrategicOverlay = !!(
-    hasAnnotationView
-    || Array.isArray(snapshot.operationalLines)
-    || Array.isArray(snapshot.operationGraphics)
-    || Array.isArray(snapshot.unitCounters)
-    || (snapshot.specialZoneLayers && typeof snapshot.specialZoneLayers === "object")
-    || typeof snapshot.specialZoneMembershipBrushMode === "string"
-  );
   // runtimeState 上这一批容器必须先补齐，历史快照恢复才可以安全地执行 delete / replace。
 
   runtimeState.visualOverrides = runtimeState.visualOverrides || {};
@@ -358,18 +350,15 @@ function applyHistorySnapshot(snapshot, direction, entry) {
       }
     });
     setIntensityFieldsState(runtimeState, current);
-    markDirty("intensity-field-history");
   }
   if (snapshot.appearancePresets && typeof snapshot.appearancePresets === "object") {
     setAppearancePresetsState(
       runtimeState,
       normalizeAppearancePresetsState(snapshot.appearancePresets),
     );
-    markDirty("appearance-presets-history");
   }
   if (snapshot.appearanceState && typeof snapshot.appearanceState === "object") {
     applyAppearancePresetState(runtimeState, snapshot.appearanceState);
-    markDirty("appearance-state-history");
   }
   if (hasAnnotationView) {
     for (const dirtyKey of [
@@ -381,10 +370,8 @@ function applyHistorySnapshot(snapshot, direction, entry) {
       setStrategicOverlayDirtyState(runtimeState, dirtyKey);
     }
   }
-  if (appliesStrategicOverlay) {
-    markDirty(`history-${direction}`);
-  }
-
+  // Undo/redo changes the saved document in every domain, once per application.
+  markDirty(`history-${direction}`);
   refreshUiAfterHistory(direction, entry);
   return true;
 }
