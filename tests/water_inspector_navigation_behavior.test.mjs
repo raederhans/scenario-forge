@@ -376,7 +376,7 @@ test("one list render reuses visible features and names while filters and scope 
     assert.deepEqual(sortedFeatureSets, ["root", "child"]);
     assert.deepEqual(Object.fromEntries(nameCalls), { root: 1, child: 1 });
     assert.equal(elements.waterInspectorResultCount.textContent, "1 regions · 0 overrides");
-    assert.match(elements.waterInspectorScopePreview.textContent, /^1 regions affected/);
+    assert.match(elements.waterInspectorScopePreview.textContent, /^1 region affected/);
     assert.deepEqual(elements.waterInspectorTypeFilter.children.map((option) => option.value), ["", "lake", "sea"]);
 
     sortedFeatureSets.length = 0;

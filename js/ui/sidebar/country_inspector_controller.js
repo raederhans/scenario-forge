@@ -1,3 +1,4 @@
+import { setUiIcon } from "../ui_icons.js";
 import { createCountryInspectorModel } from "./country_inspector_model.js";
 import {
   ensureInspectorExpansionState,
@@ -618,7 +619,7 @@ export function createCountryInspectorController({
         childrenToggle = document.createElement("button");
         childrenToggle.type = "button";
         childrenToggle.className = "country-action-btn country-children-toggle";
-        childrenToggle.textContent = isExpanded ? "v" : ">";
+        setUiIcon(childrenToggle, isExpanded ? "chevron-down" : "chevron-right");
         childrenToggle.setAttribute("aria-label", `${childCount} ${t("Related Countries", "ui")}`);
         childrenToggle.setAttribute("aria-expanded", String(isExpanded));
         childrenToggle.addEventListener("click", (event) => {
@@ -1066,7 +1067,7 @@ export function createCountryInspectorController({
 
       const chevron = document.createElement("span");
       chevron.className = "inspector-mini-label";
-      chevron.textContent = isOpen ? "v" : ">";
+      setUiIcon(chevron, isOpen ? "chevron-down" : "chevron-right");
 
       heading.appendChild(title);
       header.appendChild(heading);
