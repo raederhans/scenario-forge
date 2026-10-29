@@ -98,7 +98,7 @@ test("water details translate labels, values, subtitle and singular/plural scope
   for (const key of ["ID", "Type", "Group", "Parent", "Source", "Interactive", "Chokepoint", "Base geography", "Default color", "Current color", "Sea", "Yes", "No"]) {
     assert.ok(values.includes(`[${key}]`), key);
   }
-  assert.match(elements.waterInspectorDetailHint.textContent, /\[Sea\] · \[Marine macro\]/);
+  assert.match(elements.waterInspectorDetailHint.textContent, /\[Sea\] · \[Marine Macro\]/);
   assert.match(elements.waterInspectorDetailHint.textContent, /\[Default color\]/);
 });
 

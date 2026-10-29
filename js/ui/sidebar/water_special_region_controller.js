@@ -151,7 +151,7 @@ export function createWaterSpecialRegionController({
     if (!normalized) return fallback;
     return normalized
       .replace(/_/g, " ")
-      .replace(/^\w/, (match) => match.toUpperCase());
+      .replace(/\b\w/g, (match) => match.toUpperCase());
   };
 
   const getWaterFeatureDisplayName = (feature) => {
