@@ -17,6 +17,14 @@ TNO_CITY_ROWS = {f"CITY::ne::{ne_id}": {"id": f"CITY::ne::{ne_id}"}
 
 
 class ScenarioCapitalRulesTest(unittest.TestCase):
+    def test_northern_cameroons_uses_gembu_without_a_world_city(self):
+        for scenario in ("hoi4_1936", "hoi4_1939"):
+            result = apply_reviewed_capitals({}, {"NCM": {}}, {}, scenario_id=scenario)
+            self.assertEqual(result["capitals_by_tag"]["NCM"], "CITY::gn::2341275")
+            hint = result["capital_city_hints"]["NCM"]
+            self.assertEqual((hint["lon"], hint["lat"]), (11.25652, 6.72556))
+            self.assertTrue(result["cities"]["CITY::gn::2341275"]["add_city"])
+
     def test_hoi4_miquelon_seat_is_available_without_a_world_city(self):
         for scenario in ("hoi4_1936", "hoi4_1939"):
             result = apply_reviewed_capitals({}, {"SPM": {}}, {}, scenario_id=scenario)

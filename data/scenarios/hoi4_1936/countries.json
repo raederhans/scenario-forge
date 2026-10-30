@@ -68,7 +68,8 @@
       "provenance_iso2": "TD",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "french_equatorial_africa"
+        "french_equatorial_africa",
+        "aef_colony_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -76,7 +77,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "federation",
+      "subject_kind": "colony",
       "subregion_id": "subregion_middle_africa",
       "subregion_label": "Middle Africa",
       "synthetic_owner": false,
@@ -158,10 +159,51 @@
       "synthetic_owner": false,
       "tag": "AFG"
     },
+    "AHI": {
+      "base_iso2": "GH",
+      "capital_state_id": null,
+      "color_hex": "#a32c50",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 2,
+      "display_name": "Ashanti Colony",
+      "display_name_en": "Ashanti Colony",
+      "display_name_zh": "阿散蒂殖民地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GH",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "ashanti_hoi4_1936",
+      "provenance_iso2": "GH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ashanti_hoi4_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "AHI"
+    },
     "AJM": {
       "base_iso2": "AE",
       "capital_state_id": null,
-      "color_hex": "#a32c50",
+      "color_hex": "#bc2045",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -405,12 +447,12 @@
       "color_hex": "#50895b",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 18,
+      "controller_feature_count": 17,
       "display_name": "Portuguese Colony of Angola",
       "display_name_en": "Portuguese Colony of Angola",
       "display_name_zh": "葡属安哥拉殖民地",
       "entry_kind": "scenario_subject",
-      "feature_count": 18,
+      "feature_count": 17,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -522,7 +564,7 @@
     "AST": {
       "base_iso2": "PG",
       "capital_state_id": 285,
-      "color_hex": "#bc2045",
+      "color_hex": "#de4563",
       "continent_id": "continent_oceania",
       "continent_label": "Oceania",
       "controller_feature_count": 12,
@@ -601,7 +643,7 @@
     "BAH": {
       "base_iso2": "BH",
       "capital_state_id": null,
-      "color_hex": "#de4563",
+      "color_hex": "#b1395e",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 5,
@@ -642,7 +684,7 @@
     "BAS": {
       "base_iso2": "LS",
       "capital_state_id": null,
-      "color_hex": "#b1395e",
+      "color_hex": "#ca5070",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 10,
@@ -683,7 +725,7 @@
     "BDA": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#e16385",
+      "color_hex": "#f9718b",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -724,7 +766,7 @@
     "BEA": {
       "base_iso2": "KE",
       "capital_state_id": null,
-      "color_hex": "#ca5070",
+      "color_hex": "#b11051",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 8,
@@ -766,7 +808,7 @@
     "BEI": {
       "base_iso2": "BN",
       "capital_state_id": null,
-      "color_hex": "#b11051",
+      "color_hex": "#bc3a50",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 4,
@@ -844,7 +886,7 @@
     "BGU": {
       "base_iso2": "GY",
       "capital_state_id": null,
-      "color_hex": "#bc3a50",
+      "color_hex": "#e54d76",
       "continent_id": "continent_south_america",
       "continent_label": "South America",
       "controller_feature_count": 10,
@@ -885,7 +927,7 @@
     "BHM": {
       "base_iso2": "BS",
       "capital_state_id": null,
-      "color_hex": "#e54d76",
+      "color_hex": "#be265c",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "controller_feature_count": 1,
@@ -926,7 +968,7 @@
     "BHO": {
       "base_iso2": "BZ",
       "capital_state_id": null,
-      "color_hex": "#be265c",
+      "color_hex": "#d55768",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "controller_feature_count": 6,
@@ -967,7 +1009,7 @@
     "BHU": {
       "base_iso2": "BT",
       "capital_state_id": 324,
-      "color_hex": "#a93254",
+      "color_hex": "#c0415a",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 20,
@@ -1008,7 +1050,7 @@
     "BHW": {
       "base_iso2": "PK",
       "capital_state_id": null,
-      "color_hex": "#c2274a",
+      "color_hex": "#da384c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -1168,7 +1210,7 @@
     "BOT": {
       "base_iso2": "BW",
       "capital_state_id": 542,
-      "color_hex": "#d55768",
+      "color_hex": "#d33f6e",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 15,
@@ -1209,7 +1251,7 @@
     "BPL": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#e44b68",
+      "color_hex": "#fc5a6b",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -1365,15 +1407,15 @@
     "BWA": {
       "base_iso2": "NG",
       "capital_state_id": null,
-      "color_hex": "#d33f6e",
+      "color_hex": "#c34a5d",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 39,
+      "controller_feature_count": 1,
       "display_name": "Nigeria",
       "display_name_en": "Nigeria",
       "display_name_zh": "尼日利亚",
       "entry_kind": "scenario_subject",
-      "feature_count": 39,
+      "feature_count": 1,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -1444,6 +1486,47 @@
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
       "tag": "BYA"
+    },
+    "CAB": {
+      "base_iso2": "AO",
+      "capital_state_id": null,
+      "color_hex": "#729f72",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Portuguese Cabinda District",
+      "display_name_en": "Portuguese Cabinda District",
+      "display_name_zh": "葡属卡宾达区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AO",
+      "notes": "",
+      "parent_owner_tag": "ANG",
+      "parent_owner_tags": [
+        "ANG"
+      ],
+      "primary_rule_source": "cabinda_district",
+      "provenance_iso2": "AO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cabinda_district"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "CAB"
     },
     "CAN": {
       "base_iso2": "CA",
@@ -1608,7 +1691,7 @@
     "CEY": {
       "base_iso2": "LK",
       "capital_state_id": null,
-      "color_hex": "#c34a5d",
+      "color_hex": "#ac3448",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 25,
@@ -1650,7 +1733,7 @@
     "CHB": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#b73f63",
+      "color_hex": "#d14f67",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -1855,7 +1938,7 @@
     "COC": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#d05575",
+      "color_hex": "#e7647b",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -2007,6 +2090,47 @@
       "subregion_label": "Western Africa",
       "synthetic_owner": false,
       "tag": "CPV"
+    },
+    "CQT": {
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "color_hex": "#8b7a18",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Coquilhatville Province",
+      "display_name_en": "Coquilhatville Province",
+      "display_name_zh": "科基亚维尔省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CD",
+      "notes": "",
+      "parent_owner_tag": "RCG",
+      "parent_owner_tags": [
+        "RCG"
+      ],
+      "primary_rule_source": "cqt_province",
+      "provenance_iso2": "CD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cqt_province"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "CQT"
     },
     "CRM": {
       "base_iso2": "UA",
@@ -2171,7 +2295,7 @@
     "CYP": {
       "base_iso2": "CY",
       "capital_state_id": null,
-      "color_hex": "#ac3448",
+      "color_hex": "#b2113c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -2570,7 +2694,7 @@
     "DUB": {
       "base_iso2": "AE",
       "capital_state_id": null,
-      "color_hex": "#b2113c",
+      "color_hex": "#ba4364",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -2648,7 +2772,7 @@
     "EDN": {
       "base_iso2": "YE",
       "capital_state_id": null,
-      "color_hex": "#ba4364",
+      "color_hex": "#e3576b",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 2,
@@ -2689,7 +2813,7 @@
     "EGY": {
       "base_iso2": "EG",
       "capital_state_id": 907,
-      "color_hex": "#e3576b",
+      "color_hex": "#d75176",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 26,
@@ -2714,7 +2838,7 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "egypt_kingdom",
-        "egy_family_colour_hoi4_1936"
+        "egypt_sovereign_ally_hoi4_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -2722,7 +2846,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "protectorate",
+      "subject_kind": "sovereign_ally",
       "subregion_id": "subregion_northern_africa",
       "subregion_label": "Northern Africa",
       "synthetic_owner": false,
@@ -3047,7 +3171,7 @@
     "FLK": {
       "base_iso2": "FK",
       "capital_state_id": null,
-      "color_hex": "#d75176",
+      "color_hex": "#d4405a",
       "continent_id": "continent_south_america",
       "continent_label": "South America",
       "controller_feature_count": 2,
@@ -3249,15 +3373,15 @@
     "GAM": {
       "base_iso2": "GM",
       "capital_state_id": null,
-      "color_hex": "#d4405a",
+      "color_hex": "#c52b4d",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 6,
-      "display_name": "Gambia",
-      "display_name_en": "Gambia",
-      "display_name_zh": "冈比亚",
+      "controller_feature_count": 1,
+      "display_name": "Gambia Colony",
+      "display_name_en": "Gambia Colony",
+      "display_name_zh": "冈比亚殖民地",
       "entry_kind": "scenario_subject",
-      "feature_count": 6,
+      "feature_count": 1,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -3273,7 +3397,8 @@
       "provenance_iso2": "GM",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "gambia_hoi4_1936"
+        "gambia_hoi4_1936",
+        "gam_colony_metadata_hoi4_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3370,15 +3495,15 @@
     "GLD": {
       "base_iso2": "GH",
       "capital_state_id": null,
-      "color_hex": "#c52b4d",
+      "color_hex": "#b22750",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 10,
-      "display_name": "Gold Coast",
-      "display_name_en": "Gold Coast",
-      "display_name_zh": "黄金海岸",
+      "controller_feature_count": 5,
+      "display_name": "Gold Coast Colony",
+      "display_name_en": "Gold Coast Colony",
+      "display_name_zh": "黄金海岸殖民地",
       "entry_kind": "scenario_subject",
-      "feature_count": 10,
+      "feature_count": 5,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -3394,7 +3519,8 @@
       "provenance_iso2": "GH",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "gold_coast_hoi4_1936"
+        "gold_coast_hoi4_1936",
+        "gld_colony_metadata_hoi4_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3447,6 +3573,88 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
       "tag": "GMA"
+    },
+    "GMP": {
+      "base_iso2": "GM",
+      "capital_state_id": null,
+      "color_hex": "#cf4f62",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 5,
+      "display_name": "Gambia Protectorate",
+      "display_name_en": "Gambia Protectorate",
+      "display_name_zh": "冈比亚保护地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GM",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "gambia_protectorate_hoi4_1936",
+      "provenance_iso2": "GM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "gambia_protectorate_hoi4_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "GMP"
+    },
+    "GNH": {
+      "base_iso2": "GH",
+      "capital_state_id": null,
+      "color_hex": "#ab2644",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 3,
+      "display_name": "Northern Territories of the Gold Coast",
+      "display_name_en": "Northern Territories of the Gold Coast",
+      "display_name_zh": "黄金海岸北领地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GH",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "gold_coast_northern_territories_hoi4_1936",
+      "provenance_iso2": "GH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "gold_coast_northern_territories_hoi4_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "GNH"
     },
     "GOA": {
       "base_iso2": "IN",
@@ -3689,7 +3897,7 @@
     "GWA": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#b71a56",
+      "color_hex": "#cf2b5a",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 3,
@@ -3886,7 +4094,7 @@
     "HKG": {
       "base_iso2": "HK",
       "capital_state_id": null,
-      "color_hex": "#b22750",
+      "color_hex": "#b6314c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 18,
@@ -4039,6 +4247,47 @@
       "synthetic_owner": false,
       "tag": "HON"
     },
+    "HSL": {
+      "base_iso2": "SL",
+      "capital_state_id": null,
+      "color_hex": "#c6466b",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 3,
+      "display_name": "Sierra Leone Protectorate",
+      "display_name_en": "Sierra Leone Protectorate",
+      "display_name_zh": "塞拉利昂保护地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SL",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "sierra_leone_protectorate_hoi4_1936",
+      "provenance_iso2": "SL",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "sierra_leone_protectorate_hoi4_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "HSL"
+    },
     "HTY": {
       "base_iso2": "TR",
       "capital_state_id": null,
@@ -4120,7 +4369,7 @@
     "HYD": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#c24054",
+      "color_hex": "#dc3c65",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 15,
@@ -4164,7 +4413,7 @@
     "ICA": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#ec537b",
+      "color_hex": "#f36b72",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 7,
@@ -4242,7 +4491,7 @@
     "IDA": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#c42d61",
+      "color_hex": "#f25378",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -4283,7 +4532,7 @@
     "IEA": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#db5c6d",
+      "color_hex": "#e15d65",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 5,
@@ -4325,7 +4574,7 @@
     "IFA": {
       "base_iso2": "PK",
       "capital_state_id": null,
-      "color_hex": "#d94573",
+      "color_hex": "#c84952",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -4407,7 +4656,7 @@
     "IHA": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#c94f62",
+      "color_hex": "#fe5f82",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 5,
@@ -4449,7 +4698,7 @@
     "IKA": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#b13a4d",
+      "color_hex": "#cf2e43",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -4531,7 +4780,7 @@
     "INR": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#b81b41",
+      "color_hex": "#da5772",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -4614,7 +4863,7 @@
     "IPA": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#c04969",
+      "color_hex": "#cd4162",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 2,
@@ -4655,7 +4904,7 @@
     "IRA": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#e95c70",
+      "color_hex": "#db515b",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 16,
@@ -4809,7 +5058,7 @@
     "IWA": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#dd567b",
+      "color_hex": "#e34154",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 5,
@@ -4850,7 +5099,7 @@
     "JAM": {
       "base_iso2": "JM",
       "capital_state_id": null,
-      "color_hex": "#cf4f62",
+      "color_hex": "#c0345f",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "controller_feature_count": 1,
@@ -4973,7 +5222,7 @@
     "JOH": {
       "base_iso2": "MY",
       "capital_state_id": null,
-      "color_hex": "#ab2644",
+      "color_hex": "#dc4574",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -5014,7 +5263,7 @@
     "JOR": {
       "base_iso2": "JO",
       "capital_state_id": 455,
-      "color_hex": "#b6314c",
+      "color_hex": "#d34869",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 12,
@@ -5096,7 +5345,7 @@
     "KAS": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#da465f",
+      "color_hex": "#f15562",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 23,
@@ -5220,7 +5469,7 @@
     "KED": {
       "base_iso2": "MY",
       "capital_state_id": null,
-      "color_hex": "#c6466b",
+      "color_hex": "#ab3354",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -5261,7 +5510,7 @@
     "KEL": {
       "base_iso2": "MY",
       "capital_state_id": null,
-      "color_hex": "#c0345f",
+      "color_hex": "#dd506c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -5341,7 +5590,7 @@
     "KHP": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#cb3152",
+      "color_hex": "#d34855",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -5378,6 +5627,47 @@
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
       "tag": "KHP"
+    },
+    "KIV": {
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "color_hex": "#bfaa50",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 3,
+      "display_name": "Costermansville Province",
+      "display_name_en": "Costermansville Province",
+      "display_name_zh": "科斯特曼斯维尔省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CD",
+      "notes": "",
+      "parent_owner_tag": "RCG",
+      "parent_owner_tags": [
+        "RCG"
+      ],
+      "primary_rule_source": "kiv_province",
+      "provenance_iso2": "CD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "kiv_province"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "KIV"
     },
     "KKP": {
       "base_iso2": "UZ",
@@ -5423,7 +5713,7 @@
     "KLA": {
       "base_iso2": "PK",
       "capital_state_id": null,
-      "color_hex": "#b82d55",
+      "color_hex": "#f16982",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -5548,7 +5838,7 @@
     "KPU": {
       "base_iso2": "PK",
       "capital_state_id": null,
-      "color_hex": "#d55567",
+      "color_hex": "#fd6e78",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -5671,7 +5961,7 @@
     "KRN": {
       "base_iso2": "MM",
       "capital_state_id": null,
-      "color_hex": "#b02d48",
+      "color_hex": "#ca3c52",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -5709,10 +5999,51 @@
       "synthetic_owner": false,
       "tag": "KRN"
     },
+    "KTG": {
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "color_hex": "#aba332",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Élisabethville Province",
+      "display_name_en": "Élisabethville Province",
+      "display_name_zh": "伊丽莎白维尔省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CD",
+      "notes": "",
+      "parent_owner_tag": "RCG",
+      "parent_owner_tags": [
+        "RCG"
+      ],
+      "primary_rule_source": "ktg_province",
+      "provenance_iso2": "CD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "ktg_province"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "KTG"
+    },
     "KUT": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#bc3751",
+      "color_hex": "#ec646c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -5753,7 +6084,7 @@
     "KUW": {
       "base_iso2": "KW",
       "capital_state_id": 656,
-      "color_hex": "#dc4574",
+      "color_hex": "#db5e73",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 6,
@@ -6233,6 +6564,47 @@
       "synthetic_owner": false,
       "tag": "LSI"
     },
+    "LSP": {
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "color_hex": "#908917",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 2,
+      "display_name": "Lusambo Province",
+      "display_name_en": "Lusambo Province",
+      "display_name_zh": "卢桑博省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CD",
+      "notes": "",
+      "parent_owner_tag": "RCG",
+      "parent_owner_tags": [
+        "RCG"
+      ],
+      "primary_rule_source": "lsp_province",
+      "provenance_iso2": "CD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "lsp_province"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "LSP"
+    },
     "LUQ": {
       "base_iso2": "CN",
       "capital_state_id": null,
@@ -6355,7 +6727,7 @@
     "MAL": {
       "base_iso2": "MY",
       "capital_state_id": 336,
-      "color_hex": "#d34869",
+      "color_hex": "#ca4057",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 6,
@@ -6676,7 +7048,7 @@
     "MLT": {
       "base_iso2": "MT",
       "capital_state_id": null,
-      "color_hex": "#ab3354",
+      "color_hex": "#ab204d",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 2,
@@ -6717,7 +7089,7 @@
     "MNP": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#cc4b70",
+      "color_hex": "#dd4969",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 8,
@@ -7002,7 +7374,7 @@
     "MUR": {
       "base_iso2": "IO",
       "capital_state_id": null,
-      "color_hex": "#dd506c",
+      "color_hex": "#d35975",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 2,
@@ -7043,7 +7415,7 @@
     "MYS": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#c53a64",
+      "color_hex": "#ea5870",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 7,
@@ -7127,7 +7499,7 @@
     "NBO": {
       "base_iso2": "MY",
       "capital_state_id": null,
-      "color_hex": "#db5e73",
+      "color_hex": "#b61547",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -7164,6 +7536,47 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "NBO"
+    },
+    "NCM": {
+      "base_iso2": "NG",
+      "capital_state_id": null,
+      "color_hex": "#d66a7f",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 3,
+      "display_name": "British Northern Cameroons",
+      "display_name_en": "British Northern Cameroons",
+      "display_name_zh": "英属北喀麦隆",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "NG",
+      "notes": "",
+      "parent_owner_tag": "BWA",
+      "parent_owner_tags": [
+        "BWA"
+      ],
+      "primary_rule_source": "northern_cameroons_hoi4_1936",
+      "provenance_iso2": "NG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "northern_cameroons_hoi4_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "mandate",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "NCM"
     },
     "NEA": {
       "base_iso2": "CN",
@@ -7246,7 +7659,7 @@
     "NFL": {
       "base_iso2": "CA",
       "capital_state_id": null,
-      "color_hex": "#ca4057",
+      "color_hex": "#c93265",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "controller_feature_count": 7,
@@ -7287,7 +7700,7 @@
     "NGN": {
       "base_iso2": "PG",
       "capital_state_id": null,
-      "color_hex": "#96143c",
+      "color_hex": "#f06a88",
       "continent_id": "continent_oceania",
       "continent_label": "Oceania",
       "controller_feature_count": 13,
@@ -7361,6 +7774,47 @@
       "subregion_label": "Central America",
       "synthetic_owner": false,
       "tag": "NIC"
+    },
+    "NNI": {
+      "base_iso2": "NG",
+      "capital_state_id": null,
+      "color_hex": "#9f3b4f",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 20,
+      "display_name": "Northern Provinces of Nigeria",
+      "display_name_en": "Northern Provinces of Nigeria",
+      "display_name_zh": "尼日利亚北部省区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 20,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "NG",
+      "notes": "",
+      "parent_owner_tag": "BWA",
+      "parent_owner_tags": [
+        "BWA"
+      ],
+      "primary_rule_source": "nigeria_northern_provinces_hoi4_1936",
+      "provenance_iso2": "NG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "nigeria_northern_provinces_hoi4_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "NNI"
     },
     "NOR": {
       "base_iso2": "NO",
@@ -7444,7 +7898,7 @@
     "NRH": {
       "base_iso2": "ZM",
       "capital_state_id": null,
-      "color_hex": "#ab204d",
+      "color_hex": "#c03e5a",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 10,
@@ -7526,7 +7980,7 @@
     "NYS": {
       "base_iso2": "MW",
       "capital_state_id": null,
-      "color_hex": "#d35975",
+      "color_hex": "#cf3e62",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 3,
@@ -7643,7 +8097,7 @@
     "PAL": {
       "base_iso2": "IL",
       "capital_state_id": 454,
-      "color_hex": "#b61547",
+      "color_hex": "#de547c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 8,
@@ -7722,7 +8176,7 @@
     "PAP": {
       "base_iso2": "PG",
       "capital_state_id": null,
-      "color_hex": "#ce4c69",
+      "color_hex": "#b73957",
       "continent_id": "continent_oceania",
       "continent_label": "Oceania",
       "controller_feature_count": 7,
@@ -7920,7 +8374,7 @@
     "PLS": {
       "base_iso2": "MY",
       "capital_state_id": null,
-      "color_hex": "#c93265",
+      "color_hex": "#ca3351",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -8160,7 +8614,7 @@
     "QAT": {
       "base_iso2": "QA",
       "capital_state_id": null,
-      "color_hex": "#c03e5a",
+      "color_hex": "#b53c57",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 7,
@@ -8240,7 +8694,7 @@
     "RAJ": {
       "base_iso2": "IN",
       "capital_state_id": 439,
-      "color_hex": "#cf3e62",
+      "color_hex": "#e74d66",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 287,
@@ -8283,7 +8737,7 @@
     "RAK": {
       "base_iso2": "AE",
       "capital_state_id": null,
-      "color_hex": "#de547c",
+      "color_hex": "#b62359",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -8327,12 +8781,12 @@
       "color_hex": "#a3931e",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 11,
+      "controller_feature_count": 3,
       "display_name": "Belgian Congo",
       "display_name_en": "Belgian Congo",
       "display_name_zh": "比属刚果",
       "entry_kind": "scenario_subject",
-      "feature_count": 11,
+      "feature_count": 3,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -8362,6 +8816,47 @@
       "subregion_label": "Middle Africa",
       "synthetic_owner": false,
       "tag": "RCG"
+    },
+    "RDO": {
+      "base_iso2": "EH",
+      "capital_state_id": null,
+      "color_hex": "#e3b750",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Rio de Oro",
+      "display_name_en": "Rio de Oro",
+      "display_name_zh": "里奥德奥罗",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "EH",
+      "notes": "",
+      "parent_owner_tag": "SPR",
+      "parent_owner_tags": [
+        "SPR"
+      ],
+      "primary_rule_source": "rdo_colony",
+      "provenance_iso2": "EH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "rdo_colony"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "synthetic_owner": false,
+      "tag": "RDO"
     },
     "RE": {
       "base_iso2": "RE",
@@ -8407,7 +8902,7 @@
     "RHO": {
       "base_iso2": "ZW",
       "capital_state_id": null,
-      "color_hex": "#ca3351",
+      "color_hex": "#be2b52",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 10,
@@ -8448,7 +8943,7 @@
     "RMP": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#e24b79",
+      "color_hex": "#fa6578",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -8569,7 +9064,7 @@
     "SAF": {
       "base_iso2": "NA",
       "capital_state_id": 275,
-      "color_hex": "#b53c57",
+      "color_hex": "#b73158",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 9,
@@ -8645,10 +9140,51 @@
       "synthetic_owner": false,
       "tag": "SAU"
     },
+    "SCM": {
+      "base_iso2": "CM",
+      "capital_state_id": null,
+      "color_hex": "#c76066",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 2,
+      "display_name": "British Southern Cameroons",
+      "display_name_en": "British Southern Cameroons",
+      "display_name_zh": "英属南喀麦隆",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CM",
+      "notes": "",
+      "parent_owner_tag": "BWA",
+      "parent_owner_tags": [
+        "BWA"
+      ],
+      "primary_rule_source": "southern_cameroons_hoi4_1936",
+      "provenance_iso2": "CM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "southern_cameroons_hoi4_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "mandate",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "SCM"
+    },
     "SEY": {
       "base_iso2": "SC",
       "capital_state_id": null,
-      "color_hex": "#e74d66",
+      "color_hex": "#b00b46",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 1,
@@ -8689,7 +9225,7 @@
     "SGN": {
       "base_iso2": "GQ",
       "capital_state_id": null,
-      "color_hex": "#e3b750",
+      "color_hex": "#fed987",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 7,
@@ -8731,7 +9267,7 @@
     "SHA": {
       "base_iso2": "MM",
       "capital_state_id": null,
-      "color_hex": "#d94e6e",
+      "color_hex": "#d7375a",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -8772,7 +9308,7 @@
     "SHJ": {
       "base_iso2": "AE",
       "capital_state_id": null,
-      "color_hex": "#b62359",
+      "color_hex": "#ba214f",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -8809,6 +9345,47 @@
       "subregion_label": "Western Asia",
       "synthetic_owner": false,
       "tag": "SHJ"
+    },
+    "SHM": {
+      "base_iso2": "EH",
+      "capital_state_id": null,
+      "color_hex": "#dec769",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Saguia el-Hamra",
+      "display_name_en": "Saguia el-Hamra",
+      "display_name_zh": "萨基亚哈姆拉",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "EH",
+      "notes": "",
+      "parent_owner_tag": "SPR",
+      "parent_owner_tags": [
+        "SPR"
+      ],
+      "primary_rule_source": "shm_colony",
+      "provenance_iso2": "EH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "shm_colony"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "synthetic_owner": false,
+      "tag": "SHM"
     },
     "SHX": {
       "base_iso2": "CN",
@@ -8932,15 +9509,15 @@
     "SIE": {
       "base_iso2": "SL",
       "capital_state_id": null,
-      "color_hex": "#be2b52",
+      "color_hex": "#d73f66",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 4,
-      "display_name": "Sierra Leone",
-      "display_name_en": "Sierra Leone",
-      "display_name_zh": "塞拉利昂",
+      "controller_feature_count": 1,
+      "display_name": "Sierra Leone Colony",
+      "display_name_en": "Sierra Leone Colony",
+      "display_name_zh": "塞拉利昂殖民地",
       "entry_kind": "scenario_subject",
-      "feature_count": 4,
+      "feature_count": 1,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -8956,7 +9533,8 @@
       "provenance_iso2": "SL",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "sierra_leone_hoi4_1936"
+        "sierra_leone_hoi4_1936",
+        "sie_colony_metadata_hoi4_1936"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -9013,7 +9591,7 @@
     "SKM": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#b13959",
+      "color_hex": "#f35d73",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 4,
@@ -9054,7 +9632,7 @@
     "SML": {
       "base_iso2": "SO",
       "capital_state_id": null,
-      "color_hex": "#b73158",
+      "color_hex": "#cd4761",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 5,
@@ -9134,7 +9712,7 @@
     "SMR": {
       "base_iso2": "MA",
       "capital_state_id": null,
-      "color_hex": "#fed987",
+      "color_hex": "#fdda64",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 3,
@@ -9172,6 +9750,47 @@
       "subregion_label": "Northern Africa",
       "synthetic_owner": false,
       "tag": "SMR"
+    },
+    "SNI": {
+      "base_iso2": "NG",
+      "capital_state_id": null,
+      "color_hex": "#b63846",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 16,
+      "display_name": "Southern Provinces of Nigeria",
+      "display_name_en": "Southern Provinces of Nigeria",
+      "display_name_zh": "尼日利亚南部省区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 16,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "NG",
+      "notes": "",
+      "parent_owner_tag": "BWA",
+      "parent_owner_tags": [
+        "BWA"
+      ],
+      "primary_rule_source": "sni_provinces",
+      "provenance_iso2": "NG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "sni_provinces"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "SNI"
     },
     "SOM": {
       "base_iso2": "SO",
@@ -9338,7 +9957,7 @@
     "SRW": {
       "base_iso2": "MY",
       "capital_state_id": null,
-      "color_hex": "#b00b46",
+      "color_hex": "#e2486c",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -9379,15 +9998,15 @@
     "SSH": {
       "base_iso2": "EH",
       "capital_state_id": null,
-      "color_hex": "#dec769",
+      "color_hex": "#d1b338",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 3,
+      "controller_feature_count": 2,
       "display_name": "Spanish Sahara",
       "display_name_en": "Spanish Sahara",
       "display_name_zh": "西属撒哈拉",
       "entry_kind": "scenario_subject",
-      "feature_count": 3,
+      "feature_count": 2,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -9421,7 +10040,7 @@
     "STH": {
       "base_iso2": "SH",
       "capital_state_id": null,
-      "color_hex": "#ba214f",
+      "color_hex": "#c24065",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 1,
@@ -9458,6 +10077,47 @@
       "subregion_label": "Western Africa",
       "synthetic_owner": false,
       "tag": "STH"
+    },
+    "STN": {
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "color_hex": "#ad9942",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Stanleyville Province",
+      "display_name_en": "Stanleyville Province",
+      "display_name_zh": "斯坦利维尔省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CD",
+      "notes": "",
+      "parent_owner_tag": "RCG",
+      "parent_owner_tags": [
+        "RCG"
+      ],
+      "primary_rule_source": "stn_province",
+      "provenance_iso2": "CD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "stn_province"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "administrative_region",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "STN"
     },
     "STP": {
       "base_iso2": "ST",
@@ -9503,7 +10163,7 @@
     "STR": {
       "base_iso2": "SG",
       "capital_state_id": null,
-      "color_hex": "#d73f66",
+      "color_hex": "#af3851",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 9,
@@ -9544,7 +10204,7 @@
     "SUD": {
       "base_iso2": "SD",
       "capital_state_id": 551,
-      "color_hex": "#cd4761",
+      "color_hex": "#cc3d6b",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 27,
@@ -9669,7 +10329,7 @@
     "SWA": {
       "base_iso2": "NA",
       "capital_state_id": null,
-      "color_hex": "#c75d78",
+      "color_hex": "#c95579",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 13,
@@ -9786,7 +10446,7 @@
     "SWZ": {
       "base_iso2": "SZ",
       "capital_state_id": null,
-      "color_hex": "#e2486c",
+      "color_hex": "#c64d67",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 4,
@@ -10032,7 +10692,7 @@
     "TGA": {
       "base_iso2": "MY",
       "capital_state_id": null,
-      "color_hex": "#c24065",
+      "color_hex": "#d84f62",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -10073,7 +10733,7 @@
     "TGN": {
       "base_iso2": "TZ",
       "capital_state_id": null,
-      "color_hex": "#af3851",
+      "color_hex": "#d1526c",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 25,
@@ -10315,7 +10975,7 @@
     "TPA": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#e35671",
+      "color_hex": "#e8476e",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 8,
@@ -10356,7 +11016,7 @@
     "TRI": {
       "base_iso2": "TT",
       "capital_state_id": null,
-      "color_hex": "#cc3d6b",
+      "color_hex": "#e05977",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "controller_feature_count": 1,
@@ -10397,7 +11057,7 @@
     "TRU": {
       "base_iso2": "AE",
       "capital_state_id": null,
-      "color_hex": "#c64d67",
+      "color_hex": "#c04967",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 2,
@@ -10558,7 +11218,7 @@
     "TVC": {
       "base_iso2": "IN",
       "capital_state_id": null,
-      "color_hex": "#e16478",
+      "color_hex": "#ec4a59",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 4,
@@ -10599,7 +11259,7 @@
     "UAQ": {
       "base_iso2": "AE",
       "capital_state_id": null,
-      "color_hex": "#d84f62",
+      "color_hex": "#b12746",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 1,
@@ -10681,7 +11341,7 @@
     "UGA": {
       "base_iso2": "UG",
       "capital_state_id": null,
-      "color_hex": "#d1526c",
+      "color_hex": "#b0315a",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 4,
@@ -10958,7 +11618,7 @@
     "WDN": {
       "base_iso2": "YE",
       "capital_state_id": null,
-      "color_hex": "#e05977",
+      "color_hex": "#c42a5e",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "controller_feature_count": 3,
@@ -11036,6 +11696,47 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "WNG"
+    },
+    "WTO": {
+      "base_iso2": "GH",
+      "capital_state_id": null,
+      "color_hex": "#d6475e",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 3,
+      "display_name": "British Togoland",
+      "display_name_en": "British Togoland",
+      "display_name_zh": "英属多哥兰",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GH",
+      "notes": "",
+      "parent_owner_tag": "ENG",
+      "parent_owner_tags": [
+        "ENG"
+      ],
+      "primary_rule_source": "british_togoland_hoi4_1936",
+      "provenance_iso2": "GH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "british_togoland_hoi4_1936"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "mandate",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "WTO"
     },
     "XSM": {
       "base_iso2": "CN",
@@ -11319,7 +12020,7 @@
     "ZAN": {
       "base_iso2": "TZ",
       "capital_state_id": null,
-      "color_hex": "#c04967",
+      "color_hex": "#ac2955",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
       "controller_feature_count": 5,

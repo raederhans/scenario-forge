@@ -49,6 +49,14 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.ahi"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.ajm"
         ]
       },
@@ -82,6 +90,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.alw"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.amh"
         ]
       },
       {
@@ -337,7 +353,23 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.cab"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.can"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.car"
         ]
       },
       {
@@ -354,6 +386,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.cey"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.cha"
         ]
       },
       {
@@ -426,6 +466,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.cpv"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.cqt"
         ]
       },
       {
@@ -633,6 +681,14 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.gab"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.gam"
         ]
       },
@@ -681,6 +737,22 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.gmp"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.gnh"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.goa"
         ]
       },
@@ -706,6 +778,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.grn"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.gsd"
         ]
       },
       {
@@ -770,6 +850,22 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.hon"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.hrr"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.hsl"
         ]
       },
       {
@@ -1073,6 +1169,14 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.kiv"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.kkp"
         ]
       },
@@ -1130,6 +1234,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.krn"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.ktg"
         ]
       },
       {
@@ -1234,6 +1346,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.lsi"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.lsp"
         ]
       },
       {
@@ -1417,7 +1537,23 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.ncm"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.ncp"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.nei"
         ]
       },
       {
@@ -1457,6 +1593,14 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.nni"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.nor"
         ]
       },
@@ -1474,6 +1618,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.nrh"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.nwi"
         ]
       },
       {
@@ -1649,6 +1801,14 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.rdo"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.re"
         ]
       },
@@ -1713,6 +1873,14 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.scm"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.sey"
         ]
       },
@@ -1738,6 +1906,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.shj"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.shm"
         ]
       },
       {
@@ -1930,6 +2106,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.sth"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.stn"
         ]
       },
       {
@@ -2242,6 +2426,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.wng"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.wto"
         ]
       },
       {

@@ -22,6 +22,10 @@
       "en": "Kingdom of Afghanistan",
       "zh": "阿富汗王国"
     },
+    "AHI": {
+      "en": "Ashanti Colony",
+      "zh": "阿散蒂殖民地"
+    },
     "AJM": {
       "en": "Sheikhdom of Ajman",
       "zh": "阿治曼酋长国"
@@ -41,6 +45,10 @@
     "ALW": {
       "en": "Autonomous Government of Latakia",
       "zh": "拉塔基亚自治政府"
+    },
+    "AMH": {
+      "en": "Amhara Governorate",
+      "zh": "阿姆哈拉总督区"
     },
     "AND": {
       "en": "Andorra",
@@ -170,9 +178,17 @@
       "en": "Buryat-Mongol ASSR",
       "zh": "布里亚特-蒙古自治共和国"
     },
+    "CAB": {
+      "en": "Portuguese Cabinda District",
+      "zh": "葡属卡宾达区"
+    },
     "CAN": {
       "en": "Dominion of Canada",
       "zh": "加拿大自治领"
+    },
+    "CAR": {
+      "en": "Territory of Ubangi-Shari",
+      "zh": "乌班吉沙立领地"
     },
     "CDE": {
       "en": "East Chahar Garrison",
@@ -189,6 +205,10 @@
     "CEY": {
       "en": "British Ceylon",
       "zh": "英属锡兰"
+    },
+    "CHA": {
+      "en": "Territory of Chad",
+      "zh": "乍得领地"
     },
     "CHB": {
       "en": "Cooch Behar",
@@ -229,6 +249,10 @@
     "CPV": {
       "en": "Cape Verde",
       "zh": "佛得角"
+    },
+    "CQT": {
+      "en": "Coquilhatville Province",
+      "zh": "科基亚维尔省"
     },
     "CRM": {
       "en": "Crimean ASSR",
@@ -354,9 +378,13 @@
       "en": "Sheikhdom of Fujairah",
       "zh": "富查伊拉酋长国"
     },
+    "GAB": {
+      "en": "Territory of Gabon",
+      "zh": "加蓬领地"
+    },
     "GAM": {
-      "en": "Gambia",
-      "zh": "冈比亚"
+      "en": "Gambia Colony",
+      "zh": "冈比亚殖民地"
     },
     "GEO": {
       "en": "Georgian SSR",
@@ -371,12 +399,20 @@
       "zh": "法属圭亚那殖民地"
     },
     "GLD": {
-      "en": "Gold Coast",
-      "zh": "黄金海岸"
+      "en": "Gold Coast Colony",
+      "zh": "黄金海岸殖民地"
     },
     "GMA": {
       "en": "Hexi Ma Clique",
       "zh": "河西马家军"
+    },
+    "GMP": {
+      "en": "Gambia Protectorate",
+      "zh": "冈比亚保护地"
+    },
+    "GNH": {
+      "en": "Northern Territories of the Gold Coast",
+      "zh": "黄金海岸北领地"
     },
     "GOA": {
       "en": "Portuguese India",
@@ -393,6 +429,10 @@
     "GRN": {
       "en": "Colony of Greenland",
       "zh": "格陵兰殖民地"
+    },
+    "GSD": {
+      "en": "Galla-Sidamo Governorate",
+      "zh": "加拉-西达莫总督区"
     },
     "GSG": {
       "en": "Gansu Provincial Government",
@@ -437,6 +477,14 @@
     "HON": {
       "en": "Republic of Honduras",
       "zh": "洪都拉斯共和国"
+    },
+    "HRR": {
+      "en": "Harar Governorate",
+      "zh": "哈勒尔总督区"
+    },
+    "HSL": {
+      "en": "Sierra Leone Protectorate",
+      "zh": "塞拉利昂保护地"
     },
     "HTY": {
       "en": "Alexandretta Autonomous Sanjak Debug Region",
@@ -594,6 +642,10 @@
       "en": "Kolhapur",
       "zh": "戈尔哈布尔"
     },
+    "KIV": {
+      "en": "Costermansville Province",
+      "zh": "科斯特曼斯维尔省"
+    },
     "KKP": {
       "en": "Karakalpak ASSR",
       "zh": "卡拉卡尔帕克自治苏维埃社会主义共和国"
@@ -625,6 +677,10 @@
     "KRN": {
       "en": "Karenni States",
       "zh": "克伦尼诸邦"
+    },
+    "KTG": {
+      "en": "Élisabethville Province",
+      "zh": "伊丽莎白维尔省"
     },
     "KUT": {
       "en": "Cutch",
@@ -677,6 +733,10 @@
     "LSI": {
       "en": "Lesser Sunda Debug Region",
       "zh": "小巽他调试大区"
+    },
+    "LSP": {
+      "en": "Lusambo Province",
+      "zh": "卢桑博省"
     },
     "LUQ": {
       "en": "Shandong Clique",
@@ -770,6 +830,10 @@
       "en": "British North Borneo",
       "zh": "英属北婆罗洲"
     },
+    "NCM": {
+      "en": "British Northern Cameroons",
+      "zh": "英属北喀麦隆"
+    },
     "NCP": {
       "en": "Provisional Government of the Republic of China",
       "zh": "中华民国临时政府"
@@ -777,6 +841,10 @@
     "NEA": {
       "en": "Northeastern Army in Shaanxi-Gansu",
       "zh": "东北军陕甘驻防区"
+    },
+    "NEI": {
+      "en": "Eastern Provinces of Nigeria",
+      "zh": "尼日利亚东部省区"
     },
     "NEP": {
       "en": "Kingdom of Nepal",
@@ -794,6 +862,10 @@
       "en": "Republic of Nicaragua",
       "zh": "尼加拉瓜共和国"
     },
+    "NNI": {
+      "en": "Northern Provinces of Nigeria",
+      "zh": "尼日利亚北部省区"
+    },
     "NOR": {
       "en": "Kingdom of Norway",
       "zh": "挪威王国"
@@ -809,6 +881,10 @@
     "NWA": {
       "en": "Northwestern Army Administration",
       "zh": "西北军（杨虎城）"
+    },
+    "NWI": {
+      "en": "Western Provinces of Nigeria",
+      "zh": "尼日利亚西部省区"
     },
     "NYS": {
       "en": "Nyasaland",
@@ -894,6 +970,10 @@
       "en": "Belgian Congo",
       "zh": "比属刚果"
     },
+    "RDO": {
+      "en": "Rio de Oro",
+      "zh": "里奥德奥罗"
+    },
     "RE": {
       "en": "Colony of Reunion",
       "zh": "留尼汪殖民地"
@@ -926,6 +1006,10 @@
       "en": "Kingdom of Saudi Arabia",
       "zh": "沙特阿拉伯王国"
     },
+    "SCM": {
+      "en": "British Southern Cameroons",
+      "zh": "英属南喀麦隆"
+    },
     "SEY": {
       "en": "Seychelles",
       "zh": "塞舌尔"
@@ -942,6 +1026,10 @@
       "en": "Sheikhdom of Sharjah",
       "zh": "沙迦酋长国"
     },
+    "SHM": {
+      "en": "Saguia el-Hamra",
+      "zh": "萨基亚哈姆拉"
+    },
     "SHX": {
       "en": "Shanxi Clique",
       "zh": "山西军阀"
@@ -955,8 +1043,8 @@
       "zh": "西康建省委员会"
     },
     "SIE": {
-      "en": "Sierra Leone",
-      "zh": "塞拉利昂"
+      "en": "Sierra Leone Colony",
+      "zh": "塞拉利昂殖民地"
     },
     "SIK": {
       "en": "Xinjiang Provincial Government",
@@ -981,6 +1069,10 @@
     "SMR": {
       "en": "Spanish Protectorate in Morocco",
       "zh": "西属摩洛哥保护国"
+    },
+    "SNI": {
+      "en": "Southern Provinces of Nigeria",
+      "zh": "尼日利亚南部省区"
     },
     "SOM": {
       "en": "Italian Somaliland",
@@ -1009,6 +1101,10 @@
     "STH": {
       "en": "Saint Helena Colony",
       "zh": "圣赫勒拿殖民地"
+    },
+    "STN": {
+      "en": "Stanleyville Province",
+      "zh": "斯坦利维尔省"
     },
     "STP": {
       "en": "São Tomé and Príncipe",
@@ -1169,6 +1265,10 @@
     "WNG": {
       "en": "Dutch New Guinea Debug Region",
       "zh": "荷属新几内亚调试大区"
+    },
+    "WTO": {
+      "en": "British Togoland",
+      "zh": "英属多哥兰"
     },
     "XSM": {
       "en": "Northwestern Ma Clique",
