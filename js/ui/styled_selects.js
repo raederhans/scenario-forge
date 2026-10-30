@@ -1,4 +1,5 @@
 import { t } from "./i18n.js";
+import { getVisibleViewportRect, installVisualViewportCssVars } from "./visual_viewport_sync.js";
 
 const ENHANCED_SELECT_SELECTOR = [
   "select.select-input",
@@ -106,6 +107,8 @@ function closeSurface(surface, { restoreFocus = false } = {}) {
   surface.menu.classList.add("hidden");
   surface.button.setAttribute("aria-expanded", "false");
   if (activeSurface === surface) {
+    window.visualViewport?.removeEventListener("resize", repositionActiveSurface);
+    window.visualViewport?.removeEventListener("scroll", repositionActiveSurface);
     activeSurface = null;
   }
   if (restoreFocus) {
@@ -116,32 +119,38 @@ function closeSurface(surface, { restoreFocus = false } = {}) {
 function positionSurfaceMenu(surface) {
   if (!surface?.button || !surface?.menu) return;
   const rect = surface.button.getBoundingClientRect();
-  const viewportWidth = Math.max(document.documentElement?.clientWidth || 0, window.innerWidth || 0);
-  const viewportHeight = Math.max(document.documentElement?.clientHeight || 0, window.innerHeight || 0);
+  const viewport = getVisibleViewportRect(window);
   const menuWidth = Math.min(
     Math.max(rect.width, MENU_MIN_WIDTH),
-    Math.max(MENU_MIN_WIDTH, viewportWidth - MENU_VIEWPORT_GAP * 2),
+    Math.max(window.visualViewport ? 0 : MENU_MIN_WIDTH, viewport.width - MENU_VIEWPORT_GAP * 2),
   );
-  const spaceBelow = viewportHeight - rect.bottom - MENU_TRIGGER_GAP - MENU_VIEWPORT_GAP;
-  const spaceAbove = rect.top - MENU_TRIGGER_GAP - MENU_VIEWPORT_GAP;
+  const spaceBelow = viewport.bottom - rect.bottom - MENU_TRIGGER_GAP - MENU_VIEWPORT_GAP;
+  const spaceAbove = rect.top - viewport.top - MENU_TRIGGER_GAP - MENU_VIEWPORT_GAP;
   // 菜单固定在 viewport 上，滚动容器裁切问题由这里统一处理。
   const openBelow = spaceBelow >= MENU_MAX_HEIGHT || spaceBelow >= spaceAbove;
-  const maxHeight = Math.max(
+  let maxHeight = Math.max(
     MENU_MIN_HEIGHT,
     Math.min(MENU_MAX_HEIGHT, openBelow ? spaceBelow : spaceAbove),
   );
+  if (window.visualViewport) maxHeight = Math.min(maxHeight, Math.max(0, viewport.height - MENU_VIEWPORT_GAP * 2));
   const left = Math.min(
-    Math.max(MENU_VIEWPORT_GAP, rect.left),
-    Math.max(MENU_VIEWPORT_GAP, viewportWidth - menuWidth - MENU_VIEWPORT_GAP),
+    Math.max(viewport.left + MENU_VIEWPORT_GAP, rect.left),
+    Math.max(viewport.left + MENU_VIEWPORT_GAP, viewport.right - menuWidth - MENU_VIEWPORT_GAP),
   );
-  const top = openBelow
-    ? Math.min(rect.bottom + MENU_TRIGGER_GAP, viewportHeight - maxHeight - MENU_VIEWPORT_GAP)
-    : Math.max(MENU_VIEWPORT_GAP, rect.top - MENU_TRIGGER_GAP - maxHeight);
+  let top = openBelow
+    ? Math.min(rect.bottom + MENU_TRIGGER_GAP, viewport.bottom - maxHeight - MENU_VIEWPORT_GAP)
+    : Math.max(viewport.top + MENU_VIEWPORT_GAP, rect.top - MENU_TRIGGER_GAP - maxHeight);
+  if (window.visualViewport) top = Math.max(viewport.top + MENU_VIEWPORT_GAP,
+    Math.min(top, viewport.bottom - maxHeight - MENU_VIEWPORT_GAP));
 
   surface.menu.style.setProperty("--app-select-menu-left", `${Math.round(left)}px`);
   surface.menu.style.setProperty("--app-select-menu-top", `${Math.round(top)}px`);
   surface.menu.style.setProperty("--app-select-menu-width", `${Math.round(menuWidth)}px`);
   surface.menu.style.setProperty("--app-select-menu-max-height", `${Math.round(maxHeight)}px`);
+}
+
+function repositionActiveSurface() {
+  if (activeSurface) positionSurfaceMenu(activeSurface);
 }
 
 function closeActiveSurface(nextSurface = null) {
@@ -191,6 +200,8 @@ function openSurface(surface) {
   surface.menu.classList.remove("hidden");
   surface.button.setAttribute("aria-expanded", "true");
   activeSurface = surface;
+  window.visualViewport?.addEventListener("resize", repositionActiveSurface);
+  window.visualViewport?.addEventListener("scroll", repositionActiveSurface);
   if (!surface.search.hidden) surface.search.focus();
   else focusSelectedSelectOption(getVisibleOptions(surface));
 }
@@ -455,6 +466,7 @@ function getMutationSelect(mutation) {
 }
 
 export function initStyledSelects(root = document) {
+  installVisualViewportCssVars({ win: window, root: document.documentElement });
   enhanceAll(root);
   if (observer || !document.body) return;
   const pendingRoots = new Set();
@@ -495,9 +507,5 @@ export function initStyledSelects(root = document) {
     closeSurface(activeSurface);
   });
   window.addEventListener("resize", () => closeActiveSurface());
-  document.addEventListener("scroll", () => {
-    if (activeSurface) {
-      positionSurfaceMenu(activeSurface);
-    }
-  }, true);
+  document.addEventListener("scroll", repositionActiveSurface, true);
 }
