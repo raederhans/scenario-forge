@@ -1252,4 +1252,16 @@ export const UI_COPY_CATALOG = Object.freeze({
   "Water": {"zh": "水域", "en": "Water"},
   "Special": {"zh": "特殊", "en": "Special"},
   "Brush On · Drag to paint · Use two fingers or Shift+Drag to pan": {"zh": "画笔已开启 · 拖动涂色 · 双指或 Shift+拖动平移", "en": "Brush On · Drag to paint · Use two fingers or Shift+Drag to pan"},
+  // 启动期就会渲染的动态文案（手机提示、地块搜索），运行时词典加载前也要有中文。
+  "Editing works best on a desktop screen.": {"zh": "编辑功能建议在桌面端使用", "en": "Editing works best on a desktop screen."},
+  "Dismiss": {"zh": "关闭", "en": "Dismiss"},
+  "Find region": {"zh": "查找地块", "en": "Find region"},
+  "Search region name or ID…": {"zh": "搜索地块名称或 ID…", "en": "Search region name or ID…"},
+  "Matching regions": {"zh": "匹配的地块", "en": "Matching regions"},
+  "Showing first {count} matches. Refine the search.": {"zh": "仅显示前 {count} 条结果，请缩小搜索范围。", "en": "Showing first {count} matches. Refine the search."},
+  "Selected {name}": {"zh": "已选择 {name}", "en": "Selected {name}"},
+  "Region is not loaded yet.": {"zh": "该地块尚未加载。", "en": "Region is not loaded yet."},
+  "No matching regions": {"zh": "没有匹配的地块", "en": "No matching regions"},
+  "1 matching region": {"zh": "1 个匹配地块", "en": "1 matching region"},
+  "{count} matching regions": {"zh": "{count} 个匹配地块", "en": "{count} matching regions"},
 });

@@ -15261,6 +15261,34 @@ function syncInspectorCountryToLandSelection(feature, featureId, hit = null) {
   return nextCode !== previousCode;
 }
 
+// Keyboard equivalent of a select-tool land click: same selection state, no paint or history.
+export function selectLandFeatureById(featureId) {
+  const id = String(featureId || "").trim();
+  const feature = id ? runtimeState.landIndex?.get(id) : null;
+  if (!feature) return false;
+  // Mirror the land-click branch: a land selection replaces any water/special selection.
+  const previousWaterRegionId = String(runtimeState.selectedWaterRegionId || "").trim();
+  const previousSpecialRegionId = String(runtimeState.selectedSpecialRegionId || "").trim();
+  if (previousWaterRegionId) {
+    setClickSelectedWaterRegionIdState(runtimeState, "");
+    refreshWaterRegionSidebarRowsNow([previousWaterRegionId]);
+  }
+  if (previousSpecialRegionId) {
+    setClickSelectedSpecialRegionIdState(runtimeState, "");
+    refreshSpecialRegionSidebarRowsNow([previousSpecialRegionId]);
+  }
+  const hit = {
+    targetType: "land",
+    id,
+    countryCode: getFeatureCountryCodeNormalized(feature) || "",
+    hitSource: "keyboard",
+  };
+  updateDevSelectedHit(hit);
+  syncInspectorCountryToLandSelection(feature, id, hit);
+  requestInteractionRender("keyboard-select-land");
+  return true;
+}
+
 export function setInspectorFeatureHighlight(featureIds = [], {
   groupMode = false,
   label = "",
