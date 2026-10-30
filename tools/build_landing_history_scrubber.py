@@ -92,6 +92,12 @@ def load_state(manifest_path):
     paths = hero.scenario_paths(manifest_path)
     countries = hero.read_json(paths["countries"])["countries"]
     owners = hero.read_json(paths["owners"])["owners"]
+    # The stage shows a sphere's members, not their internal districts: a
+    # subject of a subject (a Generalbezirk) is drawn as its Reichskommissariat.
+    def stage_owner(tag):
+        parent = countries.get(tag, {}).get("parent_owner_tag")
+        return parent if countries.get(parent, {}).get("parent_owner_tag") in SPHERES else tag
+    owners = {feature_id: stage_owner(tag) for feature_id, tag in owners.items()}
     return paths, countries, owners
 
 
