@@ -695,6 +695,70 @@ add("mayotte_madagascar_dependency", B, "MAD", None, None, CC("YT"), only=["YT"]
 add("puerto_rico_territory_metadata", B, "PUE", None, None, CC("PR"), parent="USA", kind="territory", only=["PUE"], cores="keep")
 add("guangzhouwan_indochina_parent", B, "KWW", None, None, {"owners": ["KWW"]}, parent="VIN", kind="colony", cores="keep")
 
+NG_NORTH = HG("NG_Borno_State", "NG_Benue_State", "NG_Taraba_State", "NG_Kwara_State", "NG_Niger_State",
+              "NG_Bauchi_State", "NG_Gombe_State", "NG_Kaduna_State", "NG_Kogi_State", "NG_Plateau_State",
+              "NG_Nasarawa_State", "NG_Jigawa_State", "NG_Kano_State", "NG_Katsina_State", "NG_Sokoto_State",
+              "NG_Zamfara_State", "NG_Yobe_State", "NG_Kebbi_State", "NG_Adamawa_State", "NG_Federal_Capital_Territory")
+NG_EAST = HG("NG_Abia_State", "NG_Akwa_Ibom_State", "NG_Imo_State", "NG_Rivers_State", "NG_Bayelsa_State",
+             "NG_Cross_River_State", "NG_Anambra_State", "NG_Enugu_State", "NG_Ebonyi_State")
+NG_WEST = HG("NG_Ogun_State", "NG_Ondo_State", "NG_Ekiti_State", "NG_Osun_State", "NG_Oyo_State", "NG_Delta_State", "NG_Edo_State")
+NCM_IDS = [fid + "__SPLIT_NCM" for fid in geometry_by_id["northern_cameroons"]["feature_ids"]]
+WTO_IDS = [fid + "__SPLIT_WTO" for fid in geometry_by_id["british_togoland"]["feature_ids"]]
+add("nigeria_northern_provinces", B, "NNI", "Northern Provinces of Nigeria", "尼日利亚北部省区", NG_NORTH,
+    parent="BWA", kind="administrative_region", only=["BWA"], exclude=FI(*NCM_IDS), cores="keep")
+for scenarios, tag, en, zh, selector in [
+    (Y36, "SNI", "Southern Provinces of Nigeria", "尼日利亚南部省区", HG(*NG_EAST["hierarchy_groups"], *NG_WEST["hierarchy_groups"])),
+    (Y39, "NWI", "Western Provinces of Nigeria", "尼日利亚西部省区", NG_WEST),
+    (Y39, "NEI", "Eastern Provinces of Nigeria", "尼日利亚东部省区", NG_EAST),
+]:
+    add(tag.lower() + "_provinces", scenarios, tag, en, zh, selector,
+        parent="BWA", kind="administrative_region", only=["BWA"], cores="keep")
+add("northern_cameroons", B, "NCM", "British Northern Cameroons", "英属北喀麦隆", FI(*NCM_IDS),
+    parent="BWA", kind="mandate", only=["BWA"], cores="keep")
+add("southern_cameroons", B, "SCM", "British Southern Cameroons", "英属南喀麦隆", HG("CM_Northwest", "CM_Southwest"),
+    parent="BWA", kind="mandate", only=["BWA"], cores="keep")
+add("ashanti", B, "AHI", "Ashanti Colony", "阿散蒂殖民地", HG("GH_Ashanti", "GH_Brong_Ahafo"),
+    parent="ENG", kind="colony", only=["GLD"], cores="keep")
+add("gold_coast_northern_territories", B, "GNH", "Northern Territories of the Gold Coast", "黄金海岸北领地",
+    HG("GH_Northern", "GH_Upper_East", "GH_Upper_West"), parent="ENG", kind="protectorate", only=["GLD"], exclude=FI(*WTO_IDS), cores="keep")
+add("british_togoland", B, "WTO", "British Togoland", "英属多哥兰", FI(*WTO_IDS), parent="ENG", kind="mandate", only=["GLD"], cores="keep")
+add("sierra_leone_protectorate", B, "HSL", "Sierra Leone Protectorate", "塞拉利昂保护地", HG("SL_Southern", "SL_Northern", "SL_Eastern"),
+    parent="ENG", kind="protectorate", only=["SIE"], cores="keep")
+add("gambia_protectorate", B, "GMP", "Gambia Protectorate", "冈比亚保护地", CC("GM"),
+    parent="ENG", kind="protectorate", only=["GAM"], exclude=HG("GM_Banjul"), cores="keep")
+for tag, en, zh in [("GLD", "Gold Coast Colony", "黄金海岸殖民地"),
+                    ("SIE", "Sierra Leone Colony", "塞拉利昂殖民地"), ("GAM", "Gambia Colony", "冈比亚殖民地")]:
+    add(tag.lower() + "_colony_metadata", B, tag, en, zh, {"owners": [tag]}, cores="keep")
+add("aef_colony_1936", Y36, "AEF", None, None, {"owners": ["AEF"]}, kind="colony", cores="keep")
+for tag, en, zh, selector, excluded in [
+    ("GAB", "Territory of Gabon", "加蓬领地", CC("GA"), HG("GA_Haut_Ogoou")),
+    ("CAR", "Territory of Ubangi-Shari", "乌班吉沙立领地", CC("CF"), HG("CF_Mamb_r_Kad", "CF_Sangha_Mba_r")),
+    ("CHA", "Territory of Chad", "乍得领地", CC("TD"), None),
+]:
+    add(tag.lower() + "_territory_1939", Y39, tag, en, zh, selector,
+        parent="AEF", kind="territory", only=["AEF"], exclude=excluded, cores="keep")
+for tag, en, zh, groups in [
+    ("CQT", "Coquilhatville Province", "科基亚维尔省", ["CD_quateur"]),
+    ("STN", "Stanleyville Province", "斯坦利维尔省", ["CD_Orientale"]),
+    ("KIV", "Costermansville Province", "科斯特曼斯维尔省", ["CD_North_Kivu", "CD_South_Kivu", "CD_Maniema"]),
+    ("KTG", "Élisabethville Province", "伊丽莎白维尔省", ["CD_Katanga"]),
+    ("LSP", "Lusambo Province", "卢桑博省", ["CD_Kasa_Occidental", "CD_Kasa_Oriental"]),
+]:
+    add(tag.lower() + "_province", B, tag, en, zh, HG(*groups), parent="RCG", kind="administrative_region", only=["RCG"], cores="keep")
+add("cabinda_district", B, "CAB", "Portuguese Cabinda District", "葡属卡宾达区", HG("AO_Cabinda"),
+    parent="ANG", kind="administrative_region", only=["ANG"], cores="keep")
+for tag, en, zh, groups in [
+    ("AMH", "Amhara Governorate", "阿姆哈拉总督区", ["ET_Amhara", "ET_Tigray", "ET_Benishangul_Gumuz"]),
+    ("GSD", "Galla-Sidamo Governorate", "加拉-西达莫总督区", ["ET_Southern_Nations", "ET_Gambela", "ET_Oromia"]),
+    ("HRR", "Harar Governorate", "哈勒尔总督区", ["ET_Afar", "ET_Somali", "ET_Dire_Dawa", "ET_Harari"]),
+]:
+    add(tag.lower() + "_governorate_1939", Y39, tag, en, zh, HG(*groups),
+        parent="AOI", kind="administrative_region", only=["AOI"], cores="keep")
+add("egypt_sovereign_ally", B, "EGY", None, None, {"owners": ["EGY"]}, kind="sovereign_ally", cores="keep")
+for tag, en, zh in [("SHM", "Saguia el-Hamra", "萨基亚哈姆拉"), ("RDO", "Rio de Oro", "里奥德奥罗")]:
+    add(tag.lower() + "_colony", B, tag, en, zh, FI("EH_ADMIN0_PASSTHROUGH__SPLIT_" + tag),
+        parent="SPR", kind="colony", only=["SSH"], cores="keep")
+
 harmonize_family_colors(E)
 E.append({"id": "china_enclaves_1939", "scenarios": Y39,
           "smooth_enclaves": {"tags": ["CHI", "SHX", "PRC", "NCP", "CNZ", "JBZ", "MEN", "RGC", "JCC", "JSC", "JCJ", "THG"],

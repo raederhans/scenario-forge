@@ -123,7 +123,7 @@
         "SOM",
         "AOI"
       ],
-      "color_hex": "#b73158"
+      "color_hex": "#cd4761"
     },
     {
       "id": "british_somaliland_hoi4_1939",
@@ -148,7 +148,7 @@
         "SOM",
         "AOI"
       ],
-      "color_hex": "#ba214f"
+      "color_hex": "#c24065"
     },
     {
       "id": "newfoundland_hoi4_1936",
@@ -169,7 +169,7 @@
         "CAN"
       ],
       "notes": "Newfoundland under Commission of Government (1934-1949), separate from Canada.",
-      "color_hex": "#ca4057"
+      "color_hex": "#c93265"
     },
     {
       "id": "newfoundland_hoi4_1939",
@@ -190,7 +190,7 @@
         "CAN"
       ],
       "notes": "Newfoundland under Commission of Government (1934-1949), separate from Canada.",
-      "color_hex": "#d35975"
+      "color_hex": "#cf3e62"
     },
     {
       "id": "portuguese_india",
@@ -333,7 +333,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ca3351"
+      "color_hex": "#be2b52"
     },
     {
       "id": "southern_rhodesia_hoi4_1939",
@@ -353,7 +353,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#e74d66"
+      "color_hex": "#b00b46"
     },
     {
       "id": "northern_rhodesia_hoi4_1936",
@@ -373,7 +373,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ab204d"
+      "color_hex": "#c03e5a"
     },
     {
       "id": "northern_rhodesia_hoi4_1939",
@@ -393,7 +393,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b61547"
+      "color_hex": "#de547c"
     },
     {
       "id": "nyasaland_hoi4_1936",
@@ -413,7 +413,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d35975"
+      "color_hex": "#cf3e62"
     },
     {
       "id": "nyasaland_hoi4_1939",
@@ -433,7 +433,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#c93265"
+      "color_hex": "#ca3351"
     },
     {
       "id": "basutoland_hoi4_1936",
@@ -453,7 +453,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b1395e"
+      "color_hex": "#ca5070"
     },
     {
       "id": "basutoland_hoi4_1939",
@@ -473,7 +473,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ca5070"
+      "color_hex": "#b11051"
     },
     {
       "id": "swaziland_hoi4_1936",
@@ -493,7 +493,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#e2486c"
+      "color_hex": "#c64d67"
     },
     {
       "id": "swaziland_hoi4_1939",
@@ -513,7 +513,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#af3851"
+      "color_hex": "#d1526c"
     },
     {
       "id": "hong_kong_hoi4_1936",
@@ -533,7 +533,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b22750"
+      "color_hex": "#b6314c"
     },
     {
       "id": "hong_kong_hoi4_1939",
@@ -553,7 +553,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ab2644"
+      "color_hex": "#c0345f"
     },
     {
       "id": "british_honduras_hoi4_1936",
@@ -573,7 +573,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#be265c"
+      "color_hex": "#d55768"
     },
     {
       "id": "british_honduras_hoi4_1939",
@@ -593,7 +593,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d55768"
+      "color_hex": "#d33f6e"
     },
     {
       "id": "british_guiana_hoi4_1936",
@@ -613,7 +613,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#bc3a50"
+      "color_hex": "#e54d76"
     },
     {
       "id": "british_guiana_hoi4_1939",
@@ -633,7 +633,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#e54d76"
+      "color_hex": "#be265c"
     },
     {
       "id": "bahrain_hoi4_1936",
@@ -653,7 +653,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#de4563"
+      "color_hex": "#b1395e"
     },
     {
       "id": "bahrain_hoi4_1939",
@@ -673,7 +673,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b1395e"
+      "color_hex": "#ca5070"
     },
     {
       "id": "qatar_hoi4_1936",
@@ -693,7 +693,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#c03e5a"
+      "color_hex": "#b53c57"
     },
     {
       "id": "qatar_hoi4_1939",
@@ -713,7 +713,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#de547c"
+      "color_hex": "#b62359"
     },
     {
       "id": "trucial_states_hoi4_1936",
@@ -733,7 +733,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#c64d67"
+      "color_hex": "#c04967"
     },
     {
       "id": "trucial_states_hoi4_1939",
@@ -753,7 +753,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d1526c"
+      "color_hex": "#b0315a"
     },
     {
       "id": "malta_hoi4_1936",
@@ -773,7 +773,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ab3354"
+      "color_hex": "#ab204d"
     },
     {
       "id": "malta_hoi4_1939",
@@ -793,7 +793,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#db5e73"
+      "color_hex": "#b61547"
     },
     {
       "id": "cyprus_hoi4_1936",
@@ -813,7 +813,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ac3448"
+      "color_hex": "#b2113c"
     },
     {
       "id": "cyprus_hoi4_1939",
@@ -833,7 +833,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ba4364"
+      "color_hex": "#e3576b"
     },
     {
       "id": "jamaica_hoi4_1936",
@@ -853,7 +853,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#cf4f62"
+      "color_hex": "#c0345f"
     },
     {
       "id": "jamaica_hoi4_1939",
@@ -873,7 +873,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#b6314c"
+      "color_hex": "#d34869"
     },
     {
       "id": "trinidad_hoi4_1936",
@@ -893,7 +893,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#cc3d6b"
+      "color_hex": "#e05977"
     },
     {
       "id": "trinidad_hoi4_1939",
@@ -913,7 +913,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d84f62"
+      "color_hex": "#b12746"
     },
     {
       "id": "bahamas_hoi4_1936",
@@ -933,7 +933,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#e54d76"
+      "color_hex": "#be265c"
     },
     {
       "id": "bahamas_hoi4_1939",
@@ -953,7 +953,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#be265c"
+      "color_hex": "#d55768"
     },
     {
       "id": "mauritius_hoi4_1936",
@@ -974,7 +974,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#dd506c"
+      "color_hex": "#d35975"
     },
     {
       "id": "mauritius_hoi4_1939",
@@ -995,7 +995,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ca4057"
+      "color_hex": "#c93265"
     },
     {
       "id": "falklands_hoi4_1936",
@@ -1016,7 +1016,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#d75176"
+      "color_hex": "#d4405a"
     },
     {
       "id": "falklands_hoi4_1939",
@@ -1037,7 +1037,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#c52b4d"
+      "color_hex": "#b22750"
     },
     {
       "id": "bwa_nigeria_hoi4_1936",
@@ -1063,7 +1063,7 @@
         "ENG"
       ],
       "notes": "Nigeria plus the British Cameroons mandate.",
-      "color_hex": "#d33f6e"
+      "color_hex": "#c34a5d"
     },
     {
       "id": "bwa_nigeria_hoi4_1939",
@@ -1089,7 +1089,7 @@
         "ENG"
       ],
       "notes": "Nigeria plus the British Cameroons mandate.",
-      "color_hex": "#ac3448"
+      "color_hex": "#b2113c"
     },
     {
       "id": "gold_coast_hoi4_1936",
@@ -1109,7 +1109,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#c52b4d"
+      "color_hex": "#b22750"
     },
     {
       "id": "gold_coast_hoi4_1939",
@@ -1129,7 +1129,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#cf4f62"
+      "color_hex": "#ab2644"
     },
     {
       "id": "sierra_leone_hoi4_1936",
@@ -1149,7 +1149,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#be2b52"
+      "color_hex": "#d73f66"
     },
     {
       "id": "sierra_leone_hoi4_1939",
@@ -1169,7 +1169,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#b00b46"
+      "color_hex": "#e2486c"
     },
     {
       "id": "gambia_hoi4_1936",
@@ -1189,7 +1189,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#d4405a"
+      "color_hex": "#c52b4d"
     },
     {
       "id": "gambia_hoi4_1939",
@@ -1209,7 +1209,7 @@
       "only_from_owners": [
         "BWA"
       ],
-      "color_hex": "#b22750"
+      "color_hex": "#cf4f62"
     },
     {
       "id": "bea_kenya_hoi4_1936",
@@ -1227,7 +1227,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#ca5070"
+      "color_hex": "#b11051"
     },
     {
       "id": "bea_kenya_hoi4_1939",
@@ -1245,7 +1245,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#b11051"
+      "color_hex": "#bc3a50"
     },
     {
       "id": "uganda_hoi4_1936",
@@ -1265,7 +1265,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#d1526c"
+      "color_hex": "#b0315a"
     },
     {
       "id": "uganda_hoi4_1939",
@@ -1285,7 +1285,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#c04967"
+      "color_hex": "#d6475e"
     },
     {
       "id": "tanganyika_hoi4_1936",
@@ -1314,7 +1314,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#af3851"
+      "color_hex": "#d1526c"
     },
     {
       "id": "tanganyika_hoi4_1939",
@@ -1343,7 +1343,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#c64d67"
+      "color_hex": "#c04967"
     },
     {
       "id": "zanzibar_hoi4_1936",
@@ -1367,7 +1367,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#c04967"
+      "color_hex": "#ac2955"
     },
     {
       "id": "zanzibar_hoi4_1939",
@@ -1391,7 +1391,7 @@
       "only_from_owners": [
         "BEA"
       ],
-      "color_hex": "#b0315a"
+      "color_hex": "#cd476e"
     },
     {
       "id": "sikkim_hoi4_1936",
@@ -1411,7 +1411,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b13959"
+      "color_hex": "#f35d73"
     },
     {
       "id": "sikkim_hoi4_1939",
@@ -1431,7 +1431,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b50933"
+      "color_hex": "#d05468"
     },
     {
       "id": "straits_settlements_hoi4_1936",
@@ -1458,7 +1458,7 @@
         "MAL",
         "AST"
       ],
-      "color_hex": "#d73f66"
+      "color_hex": "#af3851"
     },
     {
       "id": "straits_settlements_hoi4_1939",
@@ -1485,7 +1485,7 @@
         "MAL",
         "AST"
       ],
-      "color_hex": "#e2486c"
+      "color_hex": "#c64d67"
     },
     {
       "id": "sarawak_hoi4_1936",
@@ -1505,7 +1505,7 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#b00b46"
+      "color_hex": "#e2486c"
     },
     {
       "id": "sarawak_hoi4_1939",
@@ -1525,7 +1525,7 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#d73f66"
+      "color_hex": "#af3851"
     },
     {
       "id": "north_borneo_hoi4_1936",
@@ -1545,7 +1545,7 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#db5e73"
+      "color_hex": "#b61547"
     },
     {
       "id": "north_borneo_hoi4_1939",
@@ -1565,7 +1565,7 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#ab204d"
+      "color_hex": "#c03e5a"
     },
     {
       "id": "brunei_hoi4_1936",
@@ -1585,7 +1585,7 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#b11051"
+      "color_hex": "#bc3a50"
     },
     {
       "id": "brunei_hoi4_1939",
@@ -1605,7 +1605,7 @@
       "only_from_owners": [
         "MAL"
       ],
-      "color_hex": "#bc3a50"
+      "color_hex": "#e54d76"
     },
     {
       "id": "bot_parent_hoi4_1936",
@@ -1623,7 +1623,7 @@
       "only_from_owners": [
         "BOT"
       ],
-      "color_hex": "#d55768"
+      "color_hex": "#d33f6e"
     },
     {
       "id": "bot_parent_hoi4_1939",
@@ -1641,7 +1641,7 @@
       "only_from_owners": [
         "BOT"
       ],
-      "color_hex": "#d33f6e"
+      "color_hex": "#c34a5d"
     },
     {
       "id": "kuw_parent_hoi4_1936",
@@ -1659,7 +1659,7 @@
       "only_from_owners": [
         "KUW"
       ],
-      "color_hex": "#dc4574"
+      "color_hex": "#db5e73"
     },
     {
       "id": "kuw_parent_hoi4_1939",
@@ -1677,7 +1677,7 @@
       "only_from_owners": [
         "KUW"
       ],
-      "color_hex": "#ab3354"
+      "color_hex": "#ab204d"
     },
     {
       "id": "french_west_africa",
@@ -3962,7 +3962,7 @@
           "YEM-3510"
         ]
       },
-      "color_hex": "#cf3e62"
+      "color_hex": "#e74d66"
     },
     {
       "id": "burma_direct_1936",
@@ -3978,7 +3978,7 @@
       "only_from_owners": [
         "BRM"
       ],
-      "color_hex": "#cf3e62"
+      "color_hex": "#e74d66"
     },
     {
       "id": "aden_1939",
@@ -4016,7 +4016,7 @@
         "BRM"
       ],
       "cores": "keep",
-      "color_hex": "#c34a5d"
+      "color_hex": "#ac3448"
     },
     {
       "id": "karakalpak_parent_1939",
@@ -4133,7 +4133,7 @@
       "name_zh": "塞舌尔",
       "parent_owner_tag": "ENG",
       "subject_kind": "colony",
-      "color_hex": "#e74d66",
+      "color_hex": "#b00b46",
       "select": {
         "country_codes": [
           "SC"
@@ -4150,7 +4150,7 @@
       "name_zh": "塞舌尔",
       "parent_owner_tag": "ENG",
       "subject_kind": "colony",
-      "color_hex": "#be2b52",
+      "color_hex": "#d73f66",
       "select": {
         "country_codes": [
           "SC"
@@ -4167,7 +4167,7 @@
       "name_zh": "西南非洲",
       "parent_owner_tag": "SAF",
       "subject_kind": "mandate",
-      "color_hex": "#c75d78",
+      "color_hex": "#c95579",
       "select": {
         "country_codes": [
           "NA"
@@ -4185,7 +4185,7 @@
       "name_zh": "西南非洲",
       "parent_owner_tag": "SAF",
       "subject_kind": "mandate",
-      "color_hex": "#c84d7a",
+      "color_hex": "#cc4c71",
       "select": {
         "country_codes": [
           "NA"
@@ -4203,7 +4203,7 @@
       "name_zh": "巴布亚领地",
       "parent_owner_tag": "AST",
       "subject_kind": "territory",
-      "color_hex": "#ce4c69",
+      "color_hex": "#b73957",
       "select": {
         "hierarchy_groups": [
           "PG_Gulf",
@@ -4227,7 +4227,7 @@
       "name_zh": "巴布亚领地",
       "parent_owner_tag": "AST",
       "subject_kind": "territory",
-      "color_hex": "#b73957",
+      "color_hex": "#8e2c4e",
       "select": {
         "hierarchy_groups": [
           "PG_Gulf",
@@ -4251,7 +4251,7 @@
       "name_zh": "新几内亚委任统治地",
       "parent_owner_tag": "AST",
       "subject_kind": "mandate",
-      "color_hex": "#96143c",
+      "color_hex": "#f06a88",
       "select": {
         "hierarchy_groups": [
           "PG_Enga",
@@ -4281,7 +4281,7 @@
       "name_zh": "新几内亚委任统治地",
       "parent_owner_tag": "AST",
       "subject_kind": "mandate",
-      "color_hex": "#f06a88",
+      "color_hex": "#c35a7d",
       "select": {
         "hierarchy_groups": [
           "PG_Enga",
@@ -4459,7 +4459,7 @@
       "name_zh": "厄立特里亚总督区",
       "parent_owner_tag": "AOI",
       "subject_kind": "administrative_region",
-      "color_hex": "#517b49",
+      "color_hex": "#1b4e24",
       "select": {
         "country_codes": [
           "ER"
@@ -4484,7 +4484,7 @@
       "name_zh": "索马里总督区",
       "parent_owner_tag": "AOI",
       "subject_kind": "administrative_region",
-      "color_hex": "#1b4e24",
+      "color_hex": "#436b3b",
       "select": {
         "country_codes": [
           "SO"
@@ -5101,7 +5101,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c24054"
+      "color_hex": "#dc3c65"
     },
     {
       "id": "hyderabad_hoi4_1939",
@@ -5133,7 +5133,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#bf1e50"
+      "color_hex": "#da416b"
     },
     {
       "id": "kashmir_hoi4_1936",
@@ -5162,7 +5162,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#da465f"
+      "color_hex": "#f15562"
     },
     {
       "id": "kashmir_hoi4_1939",
@@ -5191,7 +5191,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#d84c6b"
+      "color_hex": "#c8334e"
     },
     {
       "id": "mysore_hoi4_1936",
@@ -5216,7 +5216,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c53a64"
+      "color_hex": "#ea5870"
     },
     {
       "id": "mysore_hoi4_1939",
@@ -5241,7 +5241,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#cd405a"
+      "color_hex": "#d13869"
     },
     {
       "id": "travancore_hoi4_1936",
@@ -5264,7 +5264,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#e16478"
+      "color_hex": "#ec4a59"
     },
     {
       "id": "travancore_hoi4_1939",
@@ -5287,7 +5287,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#dc5b69"
+      "color_hex": "#ae0a46"
     },
     {
       "id": "rajputana_states_hoi4_1936",
@@ -5312,7 +5312,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#e95c70"
+      "color_hex": "#db515b"
     },
     {
       "id": "rajputana_states_hoi4_1939",
@@ -5337,7 +5337,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#ac1c34"
+      "color_hex": "#d84b60"
     },
     {
       "id": "bda_states_hoi4_1936",
@@ -5357,7 +5357,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#e16385"
+      "color_hex": "#f9718b"
     },
     {
       "id": "bda_states_hoi4_1939",
@@ -5377,7 +5377,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#dc5a75"
+      "color_hex": "#d05374"
     },
     {
       "id": "gwa_states_hoi4_1936",
@@ -5399,7 +5399,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b71a56"
+      "color_hex": "#cf2b5a"
     },
     {
       "id": "gwa_states_hoi4_1939",
@@ -5421,7 +5421,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b10541"
+      "color_hex": "#b12f45"
     },
     {
       "id": "inr_states_hoi4_1936",
@@ -5441,7 +5441,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b81b41"
+      "color_hex": "#da5772"
     },
     {
       "id": "inr_states_hoi4_1939",
@@ -5461,7 +5461,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b0264e"
+      "color_hex": "#a30236"
     },
     {
       "id": "bpl_states_hoi4_1936",
@@ -5481,7 +5481,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#e44b68"
+      "color_hex": "#fc5a6b"
     },
     {
       "id": "bpl_states_hoi4_1939",
@@ -5501,7 +5501,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#df4156"
+      "color_hex": "#d23957"
     },
     {
       "id": "ica_states_hoi4_1936",
@@ -5527,7 +5527,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#ec537b"
+      "color_hex": "#f36b72"
     },
     {
       "id": "ica_states_hoi4_1939",
@@ -5553,7 +5553,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#e7486a"
+      "color_hex": "#b31451"
     },
     {
       "id": "kut_states_hoi4_1936",
@@ -5573,7 +5573,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#bc3751"
+      "color_hex": "#ec646c"
     },
     {
       "id": "kut_states_hoi4_1939",
@@ -5593,7 +5593,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#cf4c57"
+      "color_hex": "#bb3b60"
     },
     {
       "id": "iwa_states_hoi4_1936",
@@ -5617,7 +5617,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#dd567b"
+      "color_hex": "#e34154"
     },
     {
       "id": "iwa_states_hoi4_1939",
@@ -5641,7 +5641,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#e3535f"
+      "color_hex": "#cc456b"
     },
     {
       "id": "khp_states_hoi4_1936",
@@ -5661,7 +5661,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#cb3152"
+      "color_hex": "#d34855"
     },
     {
       "id": "khp_states_hoi4_1939",
@@ -5681,7 +5681,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#d43b4d"
+      "color_hex": "#ba1b42"
     },
     {
       "id": "ipa_states_hoi4_1936",
@@ -5702,7 +5702,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c04969"
+      "color_hex": "#cd4162"
     },
     {
       "id": "ipa_states_hoi4_1939",
@@ -5723,7 +5723,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#be3847"
+      "color_hex": "#b03859"
     },
     {
       "id": "iha_states_hoi4_1936",
@@ -5746,7 +5746,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c94f62"
+      "color_hex": "#fe5f82"
     },
     {
       "id": "iha_states_hoi4_1939",
@@ -5769,7 +5769,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#ac313d"
+      "color_hex": "#b83f53"
     },
     {
       "id": "iea_states_hoi4_1936",
@@ -5792,7 +5792,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#db5c6d"
+      "color_hex": "#e15d65"
     },
     {
       "id": "iea_states_hoi4_1939",
@@ -5815,7 +5815,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#d43962"
+      "color_hex": "#ca4c5d"
     },
     {
       "id": "rmp_states_hoi4_1936",
@@ -5835,7 +5835,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#e24b79"
+      "color_hex": "#fa6578"
     },
     {
       "id": "rmp_states_hoi4_1939",
@@ -5855,7 +5855,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#dd4068"
+      "color_hex": "#c83d5e"
     },
     {
       "id": "chb_states_hoi4_1936",
@@ -5875,7 +5875,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b73f63"
+      "color_hex": "#d14f67"
     },
     {
       "id": "chb_states_hoi4_1939",
@@ -5895,7 +5895,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b43752"
+      "color_hex": "#a72d54"
     },
     {
       "id": "ika_states_hoi4_1936",
@@ -5915,7 +5915,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b13a4d"
+      "color_hex": "#cf2e43"
     },
     {
       "id": "ika_states_hoi4_1939",
@@ -5935,7 +5935,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#be3f5d"
+      "color_hex": "#a1293e"
     },
     {
       "id": "tpa_state_hoi4_1936",
@@ -5955,7 +5955,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#e35671"
+      "color_hex": "#e8476e"
     },
     {
       "id": "tpa_state_hoi4_1939",
@@ -5975,7 +5975,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#ba1745"
+      "color_hex": "#d24561"
     },
     {
       "id": "mnp_state_hoi4_1936",
@@ -5995,7 +5995,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#cc4b70"
+      "color_hex": "#dd4969"
     },
     {
       "id": "mnp_state_hoi4_1939",
@@ -6015,7 +6015,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c12f54"
+      "color_hex": "#b52754"
     },
     {
       "id": "bhutan_protectorate_hoi4_1936",
@@ -6031,7 +6031,7 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#a93254"
+      "color_hex": "#c0415a"
     },
     {
       "id": "bhutan_protectorate_hoi4_1939",
@@ -6047,7 +6047,7 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#a42846"
+      "color_hex": "#992045"
     },
     {
       "id": "french_india",
@@ -6091,7 +6091,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c53a64"
+      "color_hex": "#ea5870"
     },
     {
       "id": "hassan_split_hoi4_1939",
@@ -6111,7 +6111,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#cd405a"
+      "color_hex": "#d13869"
     },
     {
       "id": "jalna_split_hoi4_1936",
@@ -6131,7 +6131,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c24054"
+      "color_hex": "#dc3c65"
     },
     {
       "id": "jalna_split_hoi4_1939",
@@ -6151,7 +6151,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#bf1e50"
+      "color_hex": "#da416b"
     },
     {
       "id": "parbhani_split_hoi4_1936",
@@ -6171,7 +6171,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c24054"
+      "color_hex": "#dc3c65"
     },
     {
       "id": "parbhani_split_hoi4_1939",
@@ -6191,7 +6191,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#bf1e50"
+      "color_hex": "#da416b"
     },
     {
       "id": "raichur_split_hoi4_1936",
@@ -6211,7 +6211,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c24054"
+      "color_hex": "#dc3c65"
     },
     {
       "id": "raichur_split_hoi4_1939",
@@ -6231,7 +6231,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#bf1e50"
+      "color_hex": "#da416b"
     },
     {
       "id": "cochin_split_hoi4_1936",
@@ -6251,7 +6251,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#d05575"
+      "color_hex": "#e7647b"
     },
     {
       "id": "cochin_split_hoi4_1939",
@@ -6271,7 +6271,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#cb4c66"
+      "color_hex": "#bf4565"
     },
     {
       "id": "bahawalpur_split_hoi4_1936",
@@ -6291,7 +6291,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c2274a"
+      "color_hex": "#da384c"
     },
     {
       "id": "bahawalpur_split_hoi4_1939",
@@ -6311,7 +6311,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#bd1838"
+      "color_hex": "#b10b3a"
     },
     {
       "id": "khairpur_split_hoi4_1936",
@@ -6331,7 +6331,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#d55567"
+      "color_hex": "#fd6e78"
     },
     {
       "id": "khairpur_split_hoi4_1939",
@@ -6351,7 +6351,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b72f41"
+      "color_hex": "#c44457"
     },
     {
       "id": "baluchistan_states_split_hoi4_1936",
@@ -6371,7 +6371,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b82d55"
+      "color_hex": "#f16982"
     },
     {
       "id": "baluchistan_states_split_hoi4_1939",
@@ -6391,7 +6391,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c6253f"
+      "color_hex": "#a61e46"
     },
     {
       "id": "frontier_states_split_hoi4_1936",
@@ -6411,7 +6411,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#d94573"
+      "color_hex": "#c84952"
     },
     {
       "id": "frontier_states_split_hoi4_1939",
@@ -6431,7 +6431,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c44550"
+      "color_hex": "#c83263"
     },
     {
       "id": "deccan_states_split_hoi4_1936",
@@ -6451,7 +6451,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c42d61"
+      "color_hex": "#f25378"
     },
     {
       "id": "deccan_states_split_hoi4_1939",
@@ -6471,7 +6471,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#d6545d"
+      "color_hex": "#a60549"
     },
     {
       "id": "mandi_split_hoi4_1936",
@@ -6491,7 +6491,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#c94f62"
+      "color_hex": "#fe5f82"
     },
     {
       "id": "mandi_split_hoi4_1939",
@@ -6511,7 +6511,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#ac313d"
+      "color_hex": "#b83f53"
     },
     {
       "id": "odisha_states_split_hoi4_1936",
@@ -6531,7 +6531,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#db5c6d"
+      "color_hex": "#e15d65"
     },
     {
       "id": "odisha_states_split_hoi4_1939",
@@ -6551,7 +6551,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#d43962"
+      "color_hex": "#ca4c5d"
     },
     {
       "id": "sha_hoi4_1936",
@@ -6571,7 +6571,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#d94e6e"
+      "color_hex": "#d7375a"
     },
     {
       "id": "krn_hoi4_1936",
@@ -6591,7 +6591,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#b02d48"
+      "color_hex": "#ca3c52"
     },
     {
       "id": "sha_hoi4_1939",
@@ -6611,7 +6611,7 @@
       "only_from_owners": [
         "BRM"
       ],
-      "color_hex": "#9f3b4f"
+      "color_hex": "#89263b"
     },
     {
       "id": "krn_hoi4_1939",
@@ -6631,7 +6631,7 @@
       "only_from_owners": [
         "BRM"
       ],
-      "color_hex": "#d66a7f"
+      "color_hex": "#bf5569"
     },
     {
       "id": "malaya_federated_states_hoi4_1936",
@@ -6654,7 +6654,7 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#d34869"
+      "color_hex": "#ca4057"
     },
     {
       "id": "malaya_federated_states_hoi4_1939",
@@ -6677,7 +6677,7 @@
         ]
       },
       "cores": "keep",
-      "color_hex": "#dd506c"
+      "color_hex": "#d35975"
     },
     {
       "id": "joh_protectorate_hoi4_1936",
@@ -6698,7 +6698,7 @@
         "MAL"
       ],
       "cores": "keep",
-      "color_hex": "#ab2644"
+      "color_hex": "#dc4574"
     },
     {
       "id": "joh_protectorate_hoi4_1939",
@@ -6719,7 +6719,7 @@
         "MAL"
       ],
       "cores": "keep",
-      "color_hex": "#c6466b"
+      "color_hex": "#ab3354"
     },
     {
       "id": "ked_protectorate_hoi4_1936",
@@ -6740,7 +6740,7 @@
         "MAL"
       ],
       "cores": "keep",
-      "color_hex": "#c6466b"
+      "color_hex": "#ab3354"
     },
     {
       "id": "ked_protectorate_hoi4_1939",
@@ -6761,7 +6761,7 @@
         "MAL"
       ],
       "cores": "keep",
-      "color_hex": "#dc4574"
+      "color_hex": "#db5e73"
     },
     {
       "id": "pls_protectorate_hoi4_1936",
@@ -6782,7 +6782,7 @@
         "MAL"
       ],
       "cores": "keep",
-      "color_hex": "#c93265"
+      "color_hex": "#ca3351"
     },
     {
       "id": "pls_protectorate_hoi4_1939",
@@ -6803,7 +6803,7 @@
         "MAL"
       ],
       "cores": "keep",
-      "color_hex": "#cf3e62"
+      "color_hex": "#e74d66"
     },
     {
       "id": "kel_protectorate_hoi4_1936",
@@ -6824,7 +6824,7 @@
         "MAL"
       ],
       "cores": "keep",
-      "color_hex": "#c0345f"
+      "color_hex": "#dd506c"
     },
     {
       "id": "kel_protectorate_hoi4_1939",
@@ -6845,7 +6845,7 @@
         "MAL"
       ],
       "cores": "keep",
-      "color_hex": "#d34869"
+      "color_hex": "#ca4057"
     },
     {
       "id": "tga_protectorate_hoi4_1936",
@@ -6866,7 +6866,7 @@
         "MAL"
       ],
       "cores": "keep",
-      "color_hex": "#c24065"
+      "color_hex": "#d84f62"
     },
     {
       "id": "tga_protectorate_hoi4_1939",
@@ -6887,7 +6887,7 @@
         "MAL"
       ],
       "cores": "keep",
-      "color_hex": "#cc3d6b"
+      "color_hex": "#e05977"
     },
     {
       "id": "yogyakarta",
@@ -6984,7 +6984,7 @@
         "TRU",
         "ENG"
       ],
-      "color_hex": "#b2113c"
+      "color_hex": "#ba4364"
     },
     {
       "id": "dub_sheikhdom_hoi4_1939",
@@ -7005,7 +7005,7 @@
         "TRU",
         "ENG"
       ],
-      "color_hex": "#e3576b"
+      "color_hex": "#d75176"
     },
     {
       "id": "shj_sheikhdom_hoi4_1936",
@@ -7026,7 +7026,7 @@
         "TRU",
         "ENG"
       ],
-      "color_hex": "#b62359"
+      "color_hex": "#ba214f"
     },
     {
       "id": "shj_sheikhdom_hoi4_1939",
@@ -7047,7 +7047,7 @@
         "TRU",
         "ENG"
       ],
-      "color_hex": "#b73158"
+      "color_hex": "#cd4761"
     },
     {
       "id": "rak_sheikhdom_hoi4_1936",
@@ -7068,7 +7068,7 @@
         "TRU",
         "ENG"
       ],
-      "color_hex": "#de547c"
+      "color_hex": "#b62359"
     },
     {
       "id": "rak_sheikhdom_hoi4_1939",
@@ -7089,7 +7089,7 @@
         "TRU",
         "ENG"
       ],
-      "color_hex": "#b53c57"
+      "color_hex": "#b73158"
     },
     {
       "id": "ajm_sheikhdom_hoi4_1936",
@@ -7110,7 +7110,7 @@
         "TRU",
         "ENG"
       ],
-      "color_hex": "#a32c50"
+      "color_hex": "#bc2045"
     },
     {
       "id": "ajm_sheikhdom_hoi4_1939",
@@ -7131,7 +7131,7 @@
         "TRU",
         "ENG"
       ],
-      "color_hex": "#bc2045"
+      "color_hex": "#de4563"
     },
     {
       "id": "uaq_sheikhdom_hoi4_1936",
@@ -7152,7 +7152,7 @@
         "TRU",
         "ENG"
       ],
-      "color_hex": "#d84f62"
+      "color_hex": "#b12746"
     },
     {
       "id": "uaq_sheikhdom_hoi4_1939",
@@ -7173,7 +7173,7 @@
         "TRU",
         "ENG"
       ],
-      "color_hex": "#e05977"
+      "color_hex": "#c42a5e"
     },
     {
       "id": "fujairah",
@@ -7338,7 +7338,7 @@
         "JOR"
       ],
       "cores": "keep",
-      "color_hex": "#b6314c"
+      "color_hex": "#d34869"
     },
     {
       "id": "transjordan_mandate_hoi4_1939",
@@ -7359,7 +7359,7 @@
         "JOR"
       ],
       "cores": "keep",
-      "color_hex": "#c0345f"
+      "color_hex": "#dd506c"
     },
     {
       "id": "aden_western_states_hoi4_1936",
@@ -7381,7 +7381,7 @@
       "only_from_owners": [
         "YEM"
       ],
-      "color_hex": "#e05977"
+      "color_hex": "#c42a5e"
     },
     {
       "id": "aden_western_states_hoi4_1939",
@@ -7403,7 +7403,7 @@
       "only_from_owners": [
         "YEM"
       ],
-      "color_hex": "#b12746"
+      "color_hex": "#ac2955"
     },
     {
       "id": "aden_eastern_states_hoi4_1936",
@@ -7424,7 +7424,7 @@
       "only_from_owners": [
         "YEM"
       ],
-      "color_hex": "#ba4364"
+      "color_hex": "#e3576b"
     },
     {
       "id": "aden_eastern_states_hoi4_1939",
@@ -7445,7 +7445,7 @@
       "only_from_owners": [
         "YEM"
       ],
-      "color_hex": "#d75176"
+      "color_hex": "#d4405a"
     },
     {
       "id": "sichuan_faction_metadata_1936",
@@ -7805,7 +7805,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#ba214f"
+      "color_hex": "#c24065"
     },
     {
       "id": "saint_helena_colony_hoi4_1939",
@@ -7825,7 +7825,7 @@
       "only_from_owners": [
         "ENG"
       ],
-      "color_hex": "#cd4761"
+      "color_hex": "#cc3d6b"
     },
     {
       "id": "saint_pierre_miquelon",
@@ -7903,6 +7903,994 @@
       "color_hex": "#08509f"
     },
     {
+      "id": "nigeria_northern_provinces_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "NNI",
+      "name_en": "Northern Provinces of Nigeria",
+      "name_zh": "尼日利亚北部省区",
+      "parent_owner_tag": "BWA",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "NG_Borno_State",
+          "NG_Benue_State",
+          "NG_Taraba_State",
+          "NG_Kwara_State",
+          "NG_Niger_State",
+          "NG_Bauchi_State",
+          "NG_Gombe_State",
+          "NG_Kaduna_State",
+          "NG_Kogi_State",
+          "NG_Plateau_State",
+          "NG_Nasarawa_State",
+          "NG_Jigawa_State",
+          "NG_Kano_State",
+          "NG_Katsina_State",
+          "NG_Sokoto_State",
+          "NG_Zamfara_State",
+          "NG_Yobe_State",
+          "NG_Kebbi_State",
+          "NG_Adamawa_State",
+          "NG_Federal_Capital_Territory"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "NG_ADM1_NGA-2839__SPLIT_NCM",
+          "NG_ADM1_NGA-2881__SPLIT_NCM",
+          "NG_ADM1_NGA-2848__SPLIT_NCM"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "cores": "keep",
+      "color_hex": "#9f3b4f"
+    },
+    {
+      "id": "nigeria_northern_provinces_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "NNI",
+      "name_en": "Northern Provinces of Nigeria",
+      "name_zh": "尼日利亚北部省区",
+      "parent_owner_tag": "BWA",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "NG_Borno_State",
+          "NG_Benue_State",
+          "NG_Taraba_State",
+          "NG_Kwara_State",
+          "NG_Niger_State",
+          "NG_Bauchi_State",
+          "NG_Gombe_State",
+          "NG_Kaduna_State",
+          "NG_Kogi_State",
+          "NG_Plateau_State",
+          "NG_Nasarawa_State",
+          "NG_Jigawa_State",
+          "NG_Kano_State",
+          "NG_Katsina_State",
+          "NG_Sokoto_State",
+          "NG_Zamfara_State",
+          "NG_Yobe_State",
+          "NG_Kebbi_State",
+          "NG_Adamawa_State",
+          "NG_Federal_Capital_Territory"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "NG_ADM1_NGA-2839__SPLIT_NCM",
+          "NG_ADM1_NGA-2881__SPLIT_NCM",
+          "NG_ADM1_NGA-2848__SPLIT_NCM"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "cores": "keep",
+      "color_hex": "#c62440"
+    },
+    {
+      "id": "sni_provinces",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "SNI",
+      "name_en": "Southern Provinces of Nigeria",
+      "name_zh": "尼日利亚南部省区",
+      "parent_owner_tag": "BWA",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "NG_Abia_State",
+          "NG_Akwa_Ibom_State",
+          "NG_Imo_State",
+          "NG_Rivers_State",
+          "NG_Bayelsa_State",
+          "NG_Cross_River_State",
+          "NG_Anambra_State",
+          "NG_Enugu_State",
+          "NG_Ebonyi_State",
+          "NG_Ogun_State",
+          "NG_Ondo_State",
+          "NG_Ekiti_State",
+          "NG_Osun_State",
+          "NG_Oyo_State",
+          "NG_Delta_State",
+          "NG_Edo_State"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "cores": "keep",
+      "color_hex": "#b63846"
+    },
+    {
+      "id": "nwi_provinces",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "NWI",
+      "name_en": "Western Provinces of Nigeria",
+      "name_zh": "尼日利亚西部省区",
+      "parent_owner_tag": "BWA",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "NG_Ogun_State",
+          "NG_Ondo_State",
+          "NG_Ekiti_State",
+          "NG_Osun_State",
+          "NG_Oyo_State",
+          "NG_Delta_State",
+          "NG_Edo_State"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "cores": "keep",
+      "color_hex": "#9b1a40"
+    },
+    {
+      "id": "nei_provinces",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "NEI",
+      "name_en": "Eastern Provinces of Nigeria",
+      "name_zh": "尼日利亚东部省区",
+      "parent_owner_tag": "BWA",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "NG_Abia_State",
+          "NG_Akwa_Ibom_State",
+          "NG_Imo_State",
+          "NG_Rivers_State",
+          "NG_Bayelsa_State",
+          "NG_Cross_River_State",
+          "NG_Anambra_State",
+          "NG_Enugu_State",
+          "NG_Ebonyi_State"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "cores": "keep",
+      "color_hex": "#c44360"
+    },
+    {
+      "id": "northern_cameroons_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "NCM",
+      "name_en": "British Northern Cameroons",
+      "name_zh": "英属北喀麦隆",
+      "parent_owner_tag": "BWA",
+      "subject_kind": "mandate",
+      "select": {
+        "feature_ids": [
+          "NG_ADM1_NGA-2839__SPLIT_NCM",
+          "NG_ADM1_NGA-2881__SPLIT_NCM",
+          "NG_ADM1_NGA-2848__SPLIT_NCM"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "cores": "keep",
+      "color_hex": "#d66a7f"
+    },
+    {
+      "id": "northern_cameroons_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "NCM",
+      "name_en": "British Northern Cameroons",
+      "name_zh": "英属北喀麦隆",
+      "parent_owner_tag": "BWA",
+      "subject_kind": "mandate",
+      "select": {
+        "feature_ids": [
+          "NG_ADM1_NGA-2839__SPLIT_NCM",
+          "NG_ADM1_NGA-2881__SPLIT_NCM",
+          "NG_ADM1_NGA-2848__SPLIT_NCM"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "cores": "keep",
+      "color_hex": "#8b112a"
+    },
+    {
+      "id": "southern_cameroons_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "SCM",
+      "name_en": "British Southern Cameroons",
+      "name_zh": "英属南喀麦隆",
+      "parent_owner_tag": "BWA",
+      "subject_kind": "mandate",
+      "select": {
+        "hierarchy_groups": [
+          "CM_Northwest",
+          "CM_Southwest"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "cores": "keep",
+      "color_hex": "#c76066"
+    },
+    {
+      "id": "southern_cameroons_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SCM",
+      "name_en": "British Southern Cameroons",
+      "name_zh": "英属南喀麦隆",
+      "parent_owner_tag": "BWA",
+      "subject_kind": "mandate",
+      "select": {
+        "hierarchy_groups": [
+          "CM_Northwest",
+          "CM_Southwest"
+        ]
+      },
+      "only_from_owners": [
+        "BWA"
+      ],
+      "cores": "keep",
+      "color_hex": "#b33450"
+    },
+    {
+      "id": "ashanti_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "AHI",
+      "name_en": "Ashanti Colony",
+      "name_zh": "阿散蒂殖民地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "hierarchy_groups": [
+          "GH_Ashanti",
+          "GH_Brong_Ahafo"
+        ]
+      },
+      "only_from_owners": [
+        "GLD"
+      ],
+      "cores": "keep",
+      "color_hex": "#a32c50"
+    },
+    {
+      "id": "ashanti_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "AHI",
+      "name_en": "Ashanti Colony",
+      "name_zh": "阿散蒂殖民地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "colony",
+      "select": {
+        "hierarchy_groups": [
+          "GH_Ashanti",
+          "GH_Brong_Ahafo"
+        ]
+      },
+      "only_from_owners": [
+        "GLD"
+      ],
+      "cores": "keep",
+      "color_hex": "#bc2045"
+    },
+    {
+      "id": "gold_coast_northern_territories_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "GNH",
+      "name_en": "Northern Territories of the Gold Coast",
+      "name_zh": "黄金海岸北领地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "GH_Northern",
+          "GH_Upper_East",
+          "GH_Upper_West"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "GH_ADM1_GHA-2155__SPLIT_WTO",
+          "GH_ADM1_GHA-2156__SPLIT_WTO",
+          "GH_ADM1_GHA-2173__SPLIT_WTO"
+        ]
+      },
+      "only_from_owners": [
+        "GLD"
+      ],
+      "cores": "keep",
+      "color_hex": "#ab2644"
+    },
+    {
+      "id": "gold_coast_northern_territories_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "GNH",
+      "name_en": "Northern Territories of the Gold Coast",
+      "name_zh": "黄金海岸北领地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "GH_Northern",
+          "GH_Upper_East",
+          "GH_Upper_West"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "GH_ADM1_GHA-2155__SPLIT_WTO",
+          "GH_ADM1_GHA-2156__SPLIT_WTO",
+          "GH_ADM1_GHA-2173__SPLIT_WTO"
+        ]
+      },
+      "only_from_owners": [
+        "GLD"
+      ],
+      "cores": "keep",
+      "color_hex": "#c6466b"
+    },
+    {
+      "id": "british_togoland_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "WTO",
+      "name_en": "British Togoland",
+      "name_zh": "英属多哥兰",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "mandate",
+      "select": {
+        "feature_ids": [
+          "GH_ADM1_GHA-2155__SPLIT_WTO",
+          "GH_ADM1_GHA-2156__SPLIT_WTO",
+          "GH_ADM1_GHA-2173__SPLIT_WTO"
+        ]
+      },
+      "only_from_owners": [
+        "GLD"
+      ],
+      "cores": "keep",
+      "color_hex": "#d6475e"
+    },
+    {
+      "id": "british_togoland_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "WTO",
+      "name_en": "British Togoland",
+      "name_zh": "英属多哥兰",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "mandate",
+      "select": {
+        "feature_ids": [
+          "GH_ADM1_GHA-2155__SPLIT_WTO",
+          "GH_ADM1_GHA-2156__SPLIT_WTO",
+          "GH_ADM1_GHA-2173__SPLIT_WTO"
+        ]
+      },
+      "only_from_owners": [
+        "GLD"
+      ],
+      "cores": "keep",
+      "color_hex": "#da496d"
+    },
+    {
+      "id": "sierra_leone_protectorate_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "HSL",
+      "name_en": "Sierra Leone Protectorate",
+      "name_zh": "塞拉利昂保护地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "SL_Southern",
+          "SL_Northern",
+          "SL_Eastern"
+        ]
+      },
+      "only_from_owners": [
+        "SIE"
+      ],
+      "cores": "keep",
+      "color_hex": "#c6466b"
+    },
+    {
+      "id": "sierra_leone_protectorate_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "HSL",
+      "name_en": "Sierra Leone Protectorate",
+      "name_zh": "塞拉利昂保护地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "hierarchy_groups": [
+          "SL_Southern",
+          "SL_Northern",
+          "SL_Eastern"
+        ]
+      },
+      "only_from_owners": [
+        "SIE"
+      ],
+      "cores": "keep",
+      "color_hex": "#dc4574"
+    },
+    {
+      "id": "gambia_protectorate_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "GMP",
+      "name_en": "Gambia Protectorate",
+      "name_zh": "冈比亚保护地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "GM"
+        ]
+      },
+      "exclude": {
+        "hierarchy_groups": [
+          "GM_Banjul"
+        ]
+      },
+      "only_from_owners": [
+        "GAM"
+      ],
+      "cores": "keep",
+      "color_hex": "#cf4f62"
+    },
+    {
+      "id": "gambia_protectorate_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "GMP",
+      "name_en": "Gambia Protectorate",
+      "name_zh": "冈比亚保护地",
+      "parent_owner_tag": "ENG",
+      "subject_kind": "protectorate",
+      "select": {
+        "country_codes": [
+          "GM"
+        ]
+      },
+      "exclude": {
+        "hierarchy_groups": [
+          "GM_Banjul"
+        ]
+      },
+      "only_from_owners": [
+        "GAM"
+      ],
+      "cores": "keep",
+      "color_hex": "#b6314c"
+    },
+    {
+      "id": "gld_colony_metadata_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "GLD",
+      "name_en": "Gold Coast Colony",
+      "name_zh": "黄金海岸殖民地",
+      "select": {
+        "owners": [
+          "GLD"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#b22750"
+    },
+    {
+      "id": "gld_colony_metadata_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "GLD",
+      "name_en": "Gold Coast Colony",
+      "name_zh": "黄金海岸殖民地",
+      "select": {
+        "owners": [
+          "GLD"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#ab2644"
+    },
+    {
+      "id": "sie_colony_metadata_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "SIE",
+      "name_en": "Sierra Leone Colony",
+      "name_zh": "塞拉利昂殖民地",
+      "select": {
+        "owners": [
+          "SIE"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#d73f66"
+    },
+    {
+      "id": "sie_colony_metadata_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "SIE",
+      "name_en": "Sierra Leone Colony",
+      "name_zh": "塞拉利昂殖民地",
+      "select": {
+        "owners": [
+          "SIE"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#e2486c"
+    },
+    {
+      "id": "gam_colony_metadata_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "GAM",
+      "name_en": "Gambia Colony",
+      "name_zh": "冈比亚殖民地",
+      "select": {
+        "owners": [
+          "GAM"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#c52b4d"
+    },
+    {
+      "id": "gam_colony_metadata_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "GAM",
+      "name_en": "Gambia Colony",
+      "name_zh": "冈比亚殖民地",
+      "select": {
+        "owners": [
+          "GAM"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#cf4f62"
+    },
+    {
+      "id": "aef_colony_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "AEF",
+      "subject_kind": "colony",
+      "select": {
+        "owners": [
+          "AEF"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#4c8ff2"
+    },
+    {
+      "id": "gab_territory_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "GAB",
+      "name_en": "Territory of Gabon",
+      "name_zh": "加蓬领地",
+      "parent_owner_tag": "AEF",
+      "subject_kind": "territory",
+      "select": {
+        "country_codes": [
+          "GA"
+        ]
+      },
+      "exclude": {
+        "hierarchy_groups": [
+          "GA_Haut_Ogoou"
+        ]
+      },
+      "only_from_owners": [
+        "AEF"
+      ],
+      "cores": "keep",
+      "color_hex": "#487de6"
+    },
+    {
+      "id": "car_territory_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "CAR",
+      "name_en": "Territory of Ubangi-Shari",
+      "name_zh": "乌班吉沙立领地",
+      "parent_owner_tag": "AEF",
+      "subject_kind": "territory",
+      "select": {
+        "country_codes": [
+          "CF"
+        ]
+      },
+      "exclude": {
+        "hierarchy_groups": [
+          "CF_Mamb_r_Kad",
+          "CF_Sangha_Mba_r"
+        ]
+      },
+      "only_from_owners": [
+        "AEF"
+      ],
+      "cores": "keep",
+      "color_hex": "#77a9f9"
+    },
+    {
+      "id": "cha_territory_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "CHA",
+      "name_en": "Territory of Chad",
+      "name_zh": "乍得领地",
+      "parent_owner_tag": "AEF",
+      "subject_kind": "territory",
+      "select": {
+        "country_codes": [
+          "TD"
+        ]
+      },
+      "only_from_owners": [
+        "AEF"
+      ],
+      "cores": "keep",
+      "color_hex": "#3a79ca"
+    },
+    {
+      "id": "cqt_province",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "CQT",
+      "name_en": "Coquilhatville Province",
+      "name_zh": "科基亚维尔省",
+      "parent_owner_tag": "RCG",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "CD_quateur"
+        ]
+      },
+      "only_from_owners": [
+        "RCG"
+      ],
+      "cores": "keep",
+      "color_hex": "#8b7a18"
+    },
+    {
+      "id": "stn_province",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "STN",
+      "name_en": "Stanleyville Province",
+      "name_zh": "斯坦利维尔省",
+      "parent_owner_tag": "RCG",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "CD_Orientale"
+        ]
+      },
+      "only_from_owners": [
+        "RCG"
+      ],
+      "cores": "keep",
+      "color_hex": "#ad9942"
+    },
+    {
+      "id": "kiv_province",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KIV",
+      "name_en": "Costermansville Province",
+      "name_zh": "科斯特曼斯维尔省",
+      "parent_owner_tag": "RCG",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "CD_North_Kivu",
+          "CD_South_Kivu",
+          "CD_Maniema"
+        ]
+      },
+      "only_from_owners": [
+        "RCG"
+      ],
+      "cores": "keep",
+      "color_hex": "#bfaa50"
+    },
+    {
+      "id": "ktg_province",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "KTG",
+      "name_en": "Élisabethville Province",
+      "name_zh": "伊丽莎白维尔省",
+      "parent_owner_tag": "RCG",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "CD_Katanga"
+        ]
+      },
+      "only_from_owners": [
+        "RCG"
+      ],
+      "cores": "keep",
+      "color_hex": "#aba332"
+    },
+    {
+      "id": "lsp_province",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "LSP",
+      "name_en": "Lusambo Province",
+      "name_zh": "卢桑博省",
+      "parent_owner_tag": "RCG",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "CD_Kasa_Occidental",
+          "CD_Kasa_Oriental"
+        ]
+      },
+      "only_from_owners": [
+        "RCG"
+      ],
+      "cores": "keep",
+      "color_hex": "#908917"
+    },
+    {
+      "id": "cabinda_district",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "CAB",
+      "name_en": "Portuguese Cabinda District",
+      "name_zh": "葡属卡宾达区",
+      "parent_owner_tag": "ANG",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "AO_Cabinda"
+        ]
+      },
+      "only_from_owners": [
+        "ANG"
+      ],
+      "cores": "keep",
+      "color_hex": "#729f72"
+    },
+    {
+      "id": "amh_governorate_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "AMH",
+      "name_en": "Amhara Governorate",
+      "name_zh": "阿姆哈拉总督区",
+      "parent_owner_tag": "AOI",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "ET_Amhara",
+          "ET_Tigray",
+          "ET_Benishangul_Gumuz"
+        ]
+      },
+      "only_from_owners": [
+        "AOI"
+      ],
+      "cores": "keep",
+      "color_hex": "#517b49"
+    },
+    {
+      "id": "gsd_governorate_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "GSD",
+      "name_en": "Galla-Sidamo Governorate",
+      "name_zh": "加拉-西达莫总督区",
+      "parent_owner_tag": "AOI",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "ET_Southern_Nations",
+          "ET_Gambela",
+          "ET_Oromia"
+        ]
+      },
+      "only_from_owners": [
+        "AOI"
+      ],
+      "cores": "keep",
+      "color_hex": "#34733f"
+    },
+    {
+      "id": "hrr_governorate_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "HRR",
+      "name_en": "Harar Governorate",
+      "name_zh": "哈勒尔总督区",
+      "parent_owner_tag": "AOI",
+      "subject_kind": "administrative_region",
+      "select": {
+        "hierarchy_groups": [
+          "ET_Afar",
+          "ET_Somali",
+          "ET_Dire_Dawa",
+          "ET_Harari"
+        ]
+      },
+      "only_from_owners": [
+        "AOI"
+      ],
+      "cores": "keep",
+      "color_hex": "#2b5922"
+    },
+    {
+      "id": "egypt_sovereign_ally_hoi4_1936",
+      "scenarios": [
+        "hoi4_1936"
+      ],
+      "tag": "EGY",
+      "subject_kind": "sovereign_ally",
+      "select": {
+        "owners": [
+          "EGY"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#d75176"
+    },
+    {
+      "id": "egypt_sovereign_ally_hoi4_1939",
+      "scenarios": [
+        "hoi4_1939"
+      ],
+      "tag": "EGY",
+      "subject_kind": "sovereign_ally",
+      "select": {
+        "owners": [
+          "EGY"
+        ]
+      },
+      "cores": "keep",
+      "color_hex": "#c52b4d"
+    },
+    {
+      "id": "shm_colony",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "SHM",
+      "name_en": "Saguia el-Hamra",
+      "name_zh": "萨基亚哈姆拉",
+      "parent_owner_tag": "SPR",
+      "subject_kind": "colony",
+      "select": {
+        "feature_ids": [
+          "EH_ADMIN0_PASSTHROUGH__SPLIT_SHM"
+        ]
+      },
+      "only_from_owners": [
+        "SSH"
+      ],
+      "cores": "keep",
+      "color_hex": "#dec769"
+    },
+    {
+      "id": "rdo_colony",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "RDO",
+      "name_en": "Rio de Oro",
+      "name_zh": "里奥德奥罗",
+      "parent_owner_tag": "SPR",
+      "subject_kind": "colony",
+      "select": {
+        "feature_ids": [
+          "EH_ADMIN0_PASSTHROUGH__SPLIT_RDO"
+        ]
+      },
+      "only_from_owners": [
+        "SSH"
+      ],
+      "cores": "keep",
+      "color_hex": "#e3b750"
+    },
+    {
       "id": "ang_family_colour_hoi4_1936",
       "scenarios": [
         "hoi4_1936"
@@ -7932,7 +8920,7 @@
       "only_from_owners": [
         "AST"
       ],
-      "color_hex": "#bc2045"
+      "color_hex": "#de4563"
     },
     {
       "id": "cey_family_colour_hoi4_1936",
@@ -7948,23 +8936,7 @@
       "only_from_owners": [
         "CEY"
       ],
-      "color_hex": "#c34a5d"
-    },
-    {
-      "id": "egy_family_colour_hoi4_1936",
-      "scenarios": [
-        "hoi4_1936"
-      ],
-      "tag": "EGY",
-      "select": {
-        "owners": [
-          "EGY"
-        ]
-      },
-      "only_from_owners": [
-        "EGY"
-      ],
-      "color_hex": "#e3576b"
+      "color_hex": "#ac3448"
     },
     {
       "id": "eri_family_colour_hoi4_1936",
@@ -8092,7 +9064,7 @@
       "only_from_owners": [
         "PAL"
       ],
-      "color_hex": "#b61547"
+      "color_hex": "#de547c"
     },
     {
       "id": "phi_family_colour_hoi4_1936",
@@ -8140,7 +9112,7 @@
       "only_from_owners": [
         "SAF"
       ],
-      "color_hex": "#b53c57"
+      "color_hex": "#b73158"
     },
     {
       "id": "sgn_family_colour_hoi4_1936",
@@ -8156,7 +9128,7 @@
       "only_from_owners": [
         "SGN"
       ],
-      "color_hex": "#e3b750"
+      "color_hex": "#fed987"
     },
     {
       "id": "smr_family_colour_hoi4_1936",
@@ -8172,7 +9144,7 @@
       "only_from_owners": [
         "SMR"
       ],
-      "color_hex": "#fed987"
+      "color_hex": "#fdda64"
     },
     {
       "id": "som_family_colour_hoi4_1936",
@@ -8204,7 +9176,7 @@
       "only_from_owners": [
         "SSH"
       ],
-      "color_hex": "#dec769"
+      "color_hex": "#d1b338"
     },
     {
       "id": "sud_family_colour_hoi4_1936",
@@ -8220,7 +9192,7 @@
       "only_from_owners": [
         "SUD"
       ],
-      "color_hex": "#cd4761"
+      "color_hex": "#cc3d6b"
     },
     {
       "id": "tai_family_colour_hoi4_1936",
@@ -8300,7 +9272,7 @@
       "only_from_owners": [
         "AST"
       ],
-      "color_hex": "#de4563"
+      "color_hex": "#b1395e"
     },
     {
       "id": "cey_family_colour_hoi4_1939",
@@ -8316,23 +9288,7 @@
       "only_from_owners": [
         "CEY"
       ],
-      "color_hex": "#b2113c"
-    },
-    {
-      "id": "egy_family_colour_hoi4_1939",
-      "scenarios": [
-        "hoi4_1939"
-      ],
-      "tag": "EGY",
-      "select": {
-        "owners": [
-          "EGY"
-        ]
-      },
-      "only_from_owners": [
-        "EGY"
-      ],
-      "color_hex": "#d4405a"
+      "color_hex": "#ba4364"
     },
     {
       "id": "ins_family_colour_hoi4_1939",
@@ -8444,7 +9400,7 @@
       "only_from_owners": [
         "PAL"
       ],
-      "color_hex": "#c03e5a"
+      "color_hex": "#b53c57"
     },
     {
       "id": "phi_family_colour_hoi4_1939",
@@ -8476,7 +9432,7 @@
       "only_from_owners": [
         "RAJ"
       ],
-      "color_hex": "#ca3351"
+      "color_hex": "#be2b52"
     },
     {
       "id": "rcg_family_colour_hoi4_1939",
@@ -8508,7 +9464,7 @@
       "only_from_owners": [
         "SAF"
       ],
-      "color_hex": "#b62359"
+      "color_hex": "#ba214f"
     },
     {
       "id": "sgn_family_colour_hoi4_1939",
@@ -8524,7 +9480,7 @@
       "only_from_owners": [
         "SGN"
       ],
-      "color_hex": "#e3b750"
+      "color_hex": "#fed987"
     },
     {
       "id": "smr_family_colour_hoi4_1939",
@@ -8540,7 +9496,7 @@
       "only_from_owners": [
         "SMR"
       ],
-      "color_hex": "#fed987"
+      "color_hex": "#fdda64"
     },
     {
       "id": "ssh_family_colour_hoi4_1939",
@@ -8556,7 +9512,7 @@
       "only_from_owners": [
         "SSH"
       ],
-      "color_hex": "#dec769"
+      "color_hex": "#d1b338"
     },
     {
       "id": "sud_family_colour_hoi4_1939",
@@ -8572,7 +9528,7 @@
       "only_from_owners": [
         "SUD"
       ],
-      "color_hex": "#c24065"
+      "color_hex": "#d84f62"
     },
     {
       "id": "syr_family_colour_hoi4_1939",

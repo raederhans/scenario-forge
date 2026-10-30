@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
-    "chunk_count": 291,
-    "feature_count": 21091,
+    "chunk_count": 308,
+    "feature_count": 21098,
     "water_count": 0
   },
   "controller_changes": [],
@@ -33731,19 +33731,6 @@
       "to_tag": "INS"
     },
     {
-      "country_code": "EH",
-      "critical": false,
-      "feature_id": "EH_ADMIN0_PASSTHROUGH",
-      "feature_name": "Western Sahara",
-      "from_tag": "WES",
-      "notes": "Spanish Sahara represented using the current Western Sahara approximation blocks.",
-      "quality": "manual_reviewed",
-      "rule_id": "spanish_sahara",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SSH"
-    },
-    {
       "country_code": "MC",
       "critical": false,
       "feature_id": "MC_ADMIN0_PASSTHROUGH",
@@ -53233,32 +53220,6 @@
     {
       "country_code": "GH",
       "critical": false,
-      "feature_id": "GH_ADM1_GHA-2155",
-      "feature_name": "Northern",
-      "from_tag": "GHA",
-      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "BWA"
-    },
-    {
-      "country_code": "GH",
-      "critical": false,
-      "feature_id": "GH_ADM1_GHA-2156",
-      "feature_name": "Upper East",
-      "from_tag": "GHA",
-      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "BWA"
-    },
-    {
-      "country_code": "GH",
-      "critical": false,
       "feature_id": "GH_ADM1_GHA-2157",
       "feature_name": "Upper West",
       "from_tag": "GHA",
@@ -53339,19 +53300,6 @@
       "critical": false,
       "feature_id": "GH_ADM1_GHA-2172",
       "feature_name": "Greater Accra",
-      "from_tag": "GHA",
-      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "BWA"
-    },
-    {
-      "country_code": "GH",
-      "critical": false,
-      "feature_id": "GH_ADM1_GHA-2173",
-      "feature_name": "Volta",
       "from_tag": "GHA",
       "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
       "quality": "manual_reviewed",
@@ -54702,19 +54650,6 @@
     {
       "country_code": "NG",
       "critical": false,
-      "feature_id": "NG_ADM1_NGA-2839",
-      "feature_name": "Borno State",
-      "from_tag": "NGA",
-      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "BWA"
-    },
-    {
-      "country_code": "NG",
-      "critical": false,
       "feature_id": "NG_ADM1_NGA-2841",
       "feature_name": "Abia State",
       "from_tag": "NGA",
@@ -54795,19 +54730,6 @@
       "critical": false,
       "feature_id": "NG_ADM1_NGA-2847",
       "feature_name": "Cross River State",
-      "from_tag": "NGA",
-      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "BWA"
-    },
-    {
-      "country_code": "NG",
-      "critical": false,
-      "feature_id": "NG_ADM1_NGA-2848",
-      "feature_name": "Taraba State",
       "from_tag": "NGA",
       "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
       "quality": "manual_reviewed",
@@ -55146,19 +55068,6 @@
       "critical": false,
       "feature_id": "NG_ADM1_NGA-2879",
       "feature_name": "Kebbi State",
-      "from_tag": "NGA",
-      "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
-      "quality": "manual_reviewed",
-      "rule_id": "british_west_africa",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "BWA"
-    },
-    {
-      "country_code": "NG",
-      "critical": false,
-      "feature_id": "NG_ADM1_NGA-2881",
-      "feature_name": "Adamawa State",
       "from_tag": "NGA",
       "notes": "British West Africa macro government covering Nigeria, the Gold Coast, Sierra Leone, and the Gambia.",
       "quality": "manual_reviewed",
@@ -199803,10 +199712,10 @@
     "ANG": {
       "base_iso2": "AO",
       "continent_label": "Africa",
-      "controller_feature_count": 18,
+      "controller_feature_count": 17,
       "display_name": "Angola",
       "entry_kind": "scenario_subject",
-      "feature_count": 18,
+      "feature_count": 17,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -200214,10 +200123,10 @@
     "BWA": {
       "base_iso2": "NG",
       "continent_label": "Africa",
-      "controller_feature_count": 39,
+      "controller_feature_count": 1,
       "display_name": "British West Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 39,
+      "feature_count": 1,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202606,10 +202515,10 @@
     "RCG": {
       "base_iso2": "CD",
       "continent_label": "Africa",
-      "controller_feature_count": 11,
+      "controller_feature_count": 3,
       "display_name": "Belgian Congo",
       "entry_kind": "scenario_subject",
-      "feature_count": 11,
+      "feature_count": 3,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203029,10 +202938,10 @@
     "SSH": {
       "base_iso2": "EH",
       "continent_label": "Africa",
-      "controller_feature_count": 3,
+      "controller_feature_count": 2,
       "display_name": "Spanish Sahara",
       "entry_kind": "scenario_subject",
-      "feature_count": 3,
+      "feature_count": 2,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204652,41 +204561,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "9eaa0f47299e7670564cea34ff5c3c7502c9ae83b0a1b2d9b196a94f82c6164f",
+  "snapshot_fingerprint": "1994993a139811cad769b99ecb4116be2f4dff776929e0b15867277ccc4e9823",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "e6c60fede52dcc226707171bcca5d489c000d22b178b3b516afedde0e68c34a4",
-    "detail_chunk_manifest_sha256": "fe2a1b6c236ef4628ae6e4913e323cb374ee9d350b47f5df080e756c01b375cd",
+    "build_snapshot_sha256": "23cd5e14b13b21fa4ba4684d3f797fff2f23b79ef37a141860a663df433c7e3b",
+    "detail_chunk_manifest_sha256": "2a17ea160cafd5361254ae0d62024759f9ebfcef5fe757738caf0657a498a3f8",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "runtime_topology_sha256": "b3d64210598b384af748e14688174ec4a93643206a6a9becc4bb7dd760bc6343"
+    "runtime_topology_sha256": "5b80899609f00cf66a23cce005c60e066716bf869a40f7327cd094eff11c46fb"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 15321,
-    "controller_count": 282,
+    "changed_feature_count": 15314,
+    "controller_count": 299,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 21091,
+    "feature_count": 21098,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 14874,
+    "manual_reviewed_feature_count": 14867,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 282,
+    "owner_count": 299,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5821,
-      "manual_reviewed": 14874
+      "manual_reviewed": 14867
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
       "direct_active_owner": 5821,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 15298
+      "manual_rule": 15291
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,
