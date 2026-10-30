@@ -8,7 +8,7 @@
   "generated_at": "2026-05-31T23:17:04Z",
   "input_sha": {
     "bathymetry_texture/manifest.json": "437f6c74231367468f58bf3cfeddefb03b5926643d563c55e08459cb185db701",
-    "city_overrides.json": "751853aa3369c3b467ac06b0a2d4f7a848a7884db6e0c8f2d766d3815c5ba780",
+    "city_overrides.json": "417c0f6ed6ca4008f7f81009ef0a8ad62981b983301e3ae558fa4ea17bf6865e",
     "cores.by_feature.json": "4cb298ad926c463fe0e26005627a8dd3e8a5920449e4b06a3b354062224d6c51",
     "countries.json": "b99cfce3ac612b70ec1ce3af9c8d0f18ce04804131b45d50d84baf5282630d84",
     "geo_locale_patch.json": "19ad7146cbf528f7308426fff069ecd9abecb8c86127e9a6b9829de255158da1",
@@ -33,14 +33,14 @@
     "runtime_topology.bootstrap.topo.json": "338d98c608bd7bed9ecfc46441d5d051734d8926dfc5b4c8851166f120a31902",
     "scenario_atlantropa.topo.json": "e817246e3cf343e2ae8c0c81e79b3bf3b4ae87b3c0135433160258b930bf77a1",
     "scenario_atlantropa_metadata.json": "d55d477590f7a10248c6f0f6ef6dd40d95d79b2b31ae3e457709ae7c2ea893a0",
-    "startup.bundle.en.json": "b4775bfa03581f03c75ba62ad8d784de7bf3eb6d32b63abdf7413d92e43f8864",
-    "startup.bundle.en.json.gz": "88f3853253e97da79de13dd183bf6f099255247794777f5ab46e3b01b09c63f4",
-    "startup.bundle.zh.json": "febd6a8dc4871bc40a84d28631d91a2c10942c76e60cc27af94526debc608bf8",
-    "startup.bundle.zh.json.gz": "12baf745193a320d0fb689a0a26a3dad1bf23d2d0af5e66fb2c0b143f1445e32"
+    "startup.bundle.en.json": "1e9c7e89cdc05a33119ba2294f3750939e204ba8b80b24e64093d6476666365a",
+    "startup.bundle.en.json.gz": "e3a3e7ef89cdc9a97ef2d292f0091bcb52e1b62f225cd7a26cf6372f73bebd42",
+    "startup.bundle.zh.json": "43da04f1373fe65239ab243ee8f70b2e96c3fbe63a68592b381d913c3222711c",
+    "startup.bundle.zh.json.gz": "fc9ddd5e1efe351abfc07c0a9ea21a6bcc4380cf9581f8c1cfde4f417600ea2b"
   },
   "profile": "tno_full",
   "report_paths": {},
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "39447e31b8cb2931ce69fa662f65cc059d8cb487b2d21593daf5a53bbe16ad81",
+  "snapshot_fingerprint": "878a81436c21a7ed523c282425d943e025059698c931662111becc1923d897ec",
   "water_count": 285
 }

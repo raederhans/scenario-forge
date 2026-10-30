@@ -37,7 +37,7 @@
     "data/scenarios/tno_1962/scenario_atlantropa.topo.json"
   ],
   "feature_counts": {
-    "territories": 33,
+    "territories": 34,
     "political_features": 2326,
     "capitals": 7,
     "base_land_features_inspected": 22185,
@@ -62,7 +62,7 @@
     "atlantropa_shoal_paths": 61
   },
   "counts": {
-    "territories": 33,
+    "territories": 34,
     "political_features": 2326,
     "capitals": 7,
     "base_land_features_inspected": 22185,
@@ -89,6 +89,7 @@
   "territory_tags": [
     "BRG",
     "BUL",
+    "CRI",
     "CRO",
     "DEN",
     "ENG",
