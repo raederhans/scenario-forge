@@ -60,11 +60,14 @@ const NORMAL_STARTUP_SETTLE_DEADLINE_MS = 100000;
 const RELEASE_WAIT_TIMEOUT_MS = 60000;
 const RELEASE_PHASE_WATCHDOG_MS = 240000;
 const MAX_CHANGED_PIXEL_RATIO = 0.01;
+// Native/raster zoom frames only differ by antialiasing, so also bound how wrong each pixel may be.
+const MAX_ZOOM_CHANNEL_ERROR = 2;
 
 // Tolerated differences still print their diagnostics so unexplained mismatches stay visible in CI logs.
-function assertPixelsClose(changed, total, message, details) {
+function assertPixelsClose(changed, total, message, details, maximum = 0, maxChannelError = 255) {
   if (changed) console.warn(JSON.stringify({ rasterPixelMismatch: message, changed, total, details }));
-  assert.ok(changed / total <= MAX_CHANGED_PIXEL_RATIO, `${message} (${changed}/${total} pixels changed)`);
+  assert.ok(changed / total <= MAX_CHANGED_PIXEL_RATIO && maximum <= maxChannelError,
+    `${message} (${changed}/${total} pixels changed, max channel error ${maximum})`);
 }
 
 async function settled(page, precise = false, timeout = RELEASE_WAIT_TIMEOUT_MS) {
@@ -331,7 +334,8 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       assert.equal(diagnostics.failed, ""); assert.equal(diagnostics.assetError, "");
       const pixels = await compareSettledPixels(page, zoom, { precise: !expectNativeBudgetFallback });
       report.views.push({ zoom, diagnostics, pixels });
-      assertPixelsClose(pixels.changed, pixels.pixels, "settled political pixels must match native reference", { zoom, ...pixels });
+      assertPixelsClose(pixels.changed, pixels.pixels, "settled political pixels must match native reference", { zoom, ...pixels },
+        pixels.maximum, MAX_ZOOM_CHANNEL_ERROR);
     }
   }
   async function verifyEditing() {
