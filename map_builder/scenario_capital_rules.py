@@ -57,6 +57,34 @@ HOI4_CAPITALS = {
 # Capitals of the post-build HOI4 split overlay (data/scenario-rules/hoi4_split_overlay.json).
 # Debug-oriented seats inside each split's current territory, not historical claims.
 HOI4_SPLIT_CAPITALS = {
+    "SSH": ("1159149741", "El Aaiún", "阿尤恩"),
+    'NNI': ('1159149705', 'Kaduna', '卡杜纳'),
+    'SNI': ('1159150771', 'Enugu', '埃努古'),
+    'NEI': ('1159150771', 'Enugu', '埃努古'),
+    'NWI': ('1159149697', 'Ibadan', '伊巴丹'),
+    'NCM': ('CITY::gn::2341275', 'Gembu', '根布'),
+    'SCM': ('1159119899', 'Buea', '布埃亚'),
+    'AHI': ('1159148507', 'Kumasi', '库马西'),
+    'GNH': ('1159141609', 'Tamale', '塔马利'),
+    'WTO': ('1159141663', 'Ho', '霍'),
+    'HSL': ('1159136189', 'Kenema', '凯内马'),
+    'GMP': ('1159118993', 'Mansa Konko', '曼萨孔科'),
+    'GAB': ('1159150913', 'Libreville', '利伯维尔'),
+    'CAR': ('1159151111', 'Bangui', '班吉'),
+    'CHA': ('1159150863', 'Fort-Lamy', '拉密堡'),
+    'RCG': ('1159151539', 'Léopoldville', '利奥波德维尔'),
+    'CQT': ('1159149849', 'Coquilhatville', '科基亚维尔'),
+    'STN': ('1159149865', 'Stanleyville', '斯坦利维尔'),
+    'KIV': ('1159148481', 'Costermansville', '科斯特曼斯维尔'),
+    'KTG': ('1159150903', 'Élisabethville', '伊丽莎白维尔'),
+    'LSP': ('1159141461', 'Lusambo', '卢桑博'),
+    'CAB': ('1159144723', 'Cabinda', '卡宾达'),
+    'AMH': ('1159150963', 'Gondar', '贡德尔'),
+    'GSD': ('1159148639', 'Jimma', '吉马'),
+    'HRR': ('1159148633', 'Harar', '哈勒尔'),
+    'AOI': ('1159151549', 'Addis Ababa', '亚的斯亚贝巴'),
+    'SHM': ('1159149075', 'Bir Lehlou', '比尔莱赫卢'),
+    'RDO': ('CITY::scenario::agwanit', 'Agwanit', '阿格瓦尼特'),
     "FRO": ("1159146943", "Tórshavn", "托尔斯港"),
     "DOD": ("1159142253", "Rhodes", "罗德岛"),
     "SML": ("CITY::gn::57289", "Hargeysa", "哈尔格萨"),
@@ -371,6 +399,12 @@ REVIEWED_CITY_NAMES = {
 # Small settlements absent from the population-filtered world layer. Coordinates
 # are sourced, not territory centroids; see the evidence document.
 ADDITIONAL_CAPITAL_CITIES = {
+    "CITY::scenario::agwanit": {
+        "id": "CITY::scenario::agwanit", "name": "Agwanit", "name_en": "Agwanit", "name_zh": "阿格瓦尼特",
+        "lon": -13.14, "lat": 22.18, "country_code": "EH", "population": 0,
+        "base_tier": "regional", "capital_kind": "admin_capital", "source": "reviewed_settlement",
+    },
+    "CITY::gn::2341275": {'id': 'CITY::gn::2341275', 'name': 'Gembu', 'name_en': 'Gembu', 'name_zh': '根布', 'lon': 11.25652, 'lat': 6.72556, 'country_code': 'NG', 'population': 19881, 'base_tier': 'regional', 'capital_kind': 'admin_capital', 'source': 'geonames'},
     "CITY::scenario::miquelon": {
         "id": "CITY::scenario::miquelon", "name": "Miquelon", "name_en": "Miquelon", "name_zh": "密克隆",
         "lon": -56.3814, "lat": 47.0975, "country_code": "PM", "population": 0,

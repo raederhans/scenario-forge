@@ -99,6 +99,7 @@ export function createCountryInspectorController({
   getSelectedLandInspectorCountryCode = null,
   onHgoIdentityRetry = null,
   onHgoIdentitySettingsChange = null,
+  onSelectedCountryRendered = null,
 }) {
   const {
     buildInspectorTopLevelCountryEntries,
@@ -1099,6 +1100,7 @@ export function createCountryInspectorController({
 
     const latestCountryStatesByCode = getLatestCountryStatesByCode();
     const selectedCode = ensureSelectedInspectorCountry();
+    onSelectedCountryRendered?.(selectedCode || "");
     const countryState = selectedCode ? latestCountryStatesByCode.get(selectedCode) : null;
     const isEmpty = !countryState;
     renderSelectedLandCountryQuickTab();

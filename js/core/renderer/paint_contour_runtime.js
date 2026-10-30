@@ -6,6 +6,12 @@ import { createBorderClassification } from './border_classification.js';
 import { packContourWaterMaskCooperatively } from './paint_contour_water_mask.js';
 
 const EMPTY = Object.freeze([]);
+// Water sources are compared by identity. A publication can replace an empty
+// collection with another empty one (e.g. hydration of a scenario without a
+// land mask); both pack to the same mask, so they must not force a rebuild.
+const EMPTY_WATER_COLLECTION = Object.freeze({ type: 'FeatureCollection', features: EMPTY });
+const waterRevisionIdentity = value => (value && typeof value === 'object' && Array.isArray(value.features) && value.features.length === 0)
+  ? EMPTY_WATER_COLLECTION : value;
 // Compare only fields sent by contourGeometry, without serialization, hashes or
 // a second resident geometry copy. A flat stack bounds temporary traversal state.
 function* sameCoordinates(left, right) {
@@ -87,7 +93,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     const sameScene = scene === nextScene;
     if (scene !== nextScene) { clear(); scene = nextScene; sourceRef = null; }
     const features = getFeatures() || EMPTY;
-    const nextWaterRevision = getWaterRevision();
+    const nextWaterRevision = getWaterRevision().map(waterRevisionIdentity);
     const waterChanged = nextWaterRevision.length !== waterRevision.length || nextWaterRevision.some((value, index) => value !== waterRevision[index]);
     waterRevision = nextWaterRevision;
     const inputs = [state.scenarioDataGeneration || 0, state.showScenarioAtlantropa, state.showWaterRegions, state.mapSemanticMode, ...waterRevision];

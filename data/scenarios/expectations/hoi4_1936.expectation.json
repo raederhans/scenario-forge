@@ -207,9 +207,9 @@
   ],
   "summary_equals": {
     "blocker_count": 0,
-    "owner_count": 282,
-    "controller_count": 282,
-    "feature_count": 21091
+    "owner_count": 299,
+    "controller_count": 299,
+    "feature_count": 21098
   },
   "summary_min": {
     "feature_count": 10000,
@@ -804,6 +804,125 @@
       "expected_owner_tag": "LBA",
       "feature_ids": [
         "LBY-2984"
+      ]
+    },
+    {
+      "name": "city_Kaduna",
+      "expected_owner_tag": "NNI",
+      "feature_ids": [
+        "NG_ADM1_NGA-2864"
+      ]
+    },
+    {
+      "name": "city_Lagos",
+      "expected_owner_tag": "BWA",
+      "feature_ids": [
+        "NG_ADM1_NGA-2850"
+      ]
+    },
+    {
+      "name": "city_Gembu",
+      "expected_owner_tag": "NCM",
+      "feature_ids": [
+        "NG_ADM1_NGA-2848__SPLIT_NCM"
+      ]
+    },
+    {
+      "name": "city_Buea",
+      "expected_owner_tag": "SCM",
+      "feature_ids": [
+        "CM_ADM1_CMR-799"
+      ]
+    },
+    {
+      "name": "city_Kumasi",
+      "expected_owner_tag": "AHI",
+      "feature_ids": [
+        "GH_ADM1_GHA-2158"
+      ]
+    },
+    {
+      "name": "city_Tamale",
+      "expected_owner_tag": "GNH",
+      "feature_ids": [
+        "GH_ADM1_GHA-2155__SPLIT_REST"
+      ]
+    },
+    {
+      "name": "city_Ho",
+      "expected_owner_tag": "WTO",
+      "feature_ids": [
+        "GH_ADM1_GHA-2173__SPLIT_WTO"
+      ]
+    },
+    {
+      "name": "city_Freetown",
+      "expected_owner_tag": "SIE",
+      "feature_ids": [
+        "SL_ADM1_SLE-761"
+      ]
+    },
+    {
+      "name": "city_Kenema",
+      "expected_owner_tag": "HSL",
+      "feature_ids": [
+        "SL_ADM1_SLE-790"
+      ]
+    },
+    {
+      "name": "city_Banjul",
+      "expected_owner_tag": "GAM",
+      "feature_ids": [
+        "GM_ADM1_GMB-2153"
+      ]
+    },
+    {
+      "name": "city_Kinshasa",
+      "expected_owner_tag": "RCG",
+      "feature_ids": [
+        "CD_ADM1_COD-1884"
+      ]
+    },
+    {
+      "name": "city_Lubumbashi",
+      "expected_owner_tag": "KTG",
+      "feature_ids": [
+        "CD_ADM1_COD-1897"
+      ]
+    },
+    {
+      "name": "city_Bukavu",
+      "expected_owner_tag": "KIV",
+      "feature_ids": [
+        "CD_ADM1_COD-1894"
+      ]
+    },
+    {
+      "name": "city_Brazzaville",
+      "expected_owner_tag": "AEF",
+      "feature_ids": [
+        "CG_ADM1_COG-4855"
+      ]
+    },
+    {
+      "name": "city_Cabinda",
+      "expected_owner_tag": "CAB",
+      "feature_ids": [
+        "AO_ADM1_AGO-1885"
+      ]
+    },
+    {
+      "name": "city_Enugu",
+      "expected_owner_tag": "SNI",
+      "feature_ids": [
+        "NG_ADM1_NGA-2862"
+      ]
+    },
+    {
+      "name": "city_Ibadan",
+      "expected_owner_tag": "SNI",
+      "feature_ids": [
+        "NG_ADM1_NGA-2856"
       ]
     }
   ],
