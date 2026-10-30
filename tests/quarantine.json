@@ -8,7 +8,7 @@
     "tests/test_data_manifest_contract.py::DataManifestContractTest::test_runtime_asset_registry_manifest_hash_matches_source_file": "data/manifest.json:631 记录的 registry 大小/哈希过期。",
     "tests/test_data_manifest_contract.py::DataManifestContractTest::test_runtime_asset_registry_declares_phase1_assets": "data/manifest.json 内嵌 registry 缺少 bathymetry:global_texture；需同步真实 registry。",
     "tests/test_source_ledger_contract.py::SourceLedgerContractTest::test_checked_in_source_ledger_entries_keep_required_checker_fields": "data/source_ledger.json:482 起六个条目缺少 provenance_sidecar；仓库和生成器均无符合 tools/check_source_ledger.py:97-105 哈希契约的 sidecar，不可编造路径。",
-    "tests/test_tno_eastern_precision_sources.py::test_eastern_precision_sources": "tools/prepare_tno_eastern_precision_sources.py:314,330 只接受存在的明文 baseline，而 TNO runtime 已改为 gzip；需由工具负责人改用统一 JSON source reader。",
+    "tests/test_tno_eastern_precision_sources.py::test_eastern_precision_sources": "CI 缺少输入源 data/geoBoundaries-UKR-ADM2.geojson，tools/prepare_tno_eastern_precision_sources.py:314-316 的输入存在性检查抛出 FileNotFoundError；需提供可复现的源数据准备步骤或改用合成输入。",
     "tests/test_perf_gate_contract.py::PerfGateContractTest::test_checked_in_baseline_keeps_report_identity_and_worker_summary_fields": "docs/perf/baseline_2026-07-30.json:60 记录的 packageLockSha256 与当前 package-lock.json 不一致；需核查并重新批准性能基线。",
     "tests/test_tno_bundle_builder.py::TnoBundleBuilderTest::test_checked_in_tno_runtime_topology_has_clean_polar_features": "TNO runtime 北极 shell 保留面积比例为 0.787872，低于 0.90；需数据负责人核查几何丢失并重建。",
     "tests/test_tno_bundle_builder.py::TnoBundleBuilderTest::test_current_tno_explicit_country_colors_are_locked_and_bundled": "data/scenarios/tno_1962/countries.json:166 的 AMR 为显式颜色来源但 color_policy 为 palette；需核查源规则并同步启动 bundle。",

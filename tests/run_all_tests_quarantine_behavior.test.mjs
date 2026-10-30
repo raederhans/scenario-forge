@@ -6,9 +6,20 @@ const quarantine = JSON.parse(readFileSync(new URL("./quarantine.json", import.m
 
 test("every quarantined test exists and states why it is skipped", () => {
   for (const suite of ["node", "python"]) {
-    for (const [file, reason] of Object.entries(quarantine[suite])) {
+    for (const [entry, reason] of Object.entries(quarantine[suite])) {
+      const [file, ...selectors] = entry.split("::");
       assert.ok(existsSync(file), `${file} no longer exists; drop it from tests/quarantine.json`);
-      assert.ok(typeof reason === "string" && reason.length > 10, `${file} needs a reason`);
+      if (selectors.length) {
+        const source = readFileSync(file, "utf8");
+        for (const [index, selector] of selectors.entries()) {
+          assert.ok(selector.length > 0, `${entry} needs a test or class name`);
+          const name = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const declaration = index === selectors.length - 1 ? "(?:async\\s+)?def" : "class";
+          assert.match(source, new RegExp(`^\\s*${declaration}\\s+${name}\\b`, "m"),
+            `${entry} names a missing test or class; drop it from tests/quarantine.json`);
+        }
+      }
+      assert.ok(typeof reason === "string" && reason.trim().length > 10, `${entry} needs a reason`);
     }
   }
 });

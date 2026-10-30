@@ -1380,7 +1380,11 @@ class TnoBundleBuilderTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             scenario_dir = Path(tmp_dir) / "scenario"
             (scenario_dir / "derived").mkdir(parents=True, exist_ok=True)
-            snapshot_payload = {"type": "FeatureCollection", "features": [{"id": "legacy-water"}]}
+            snapshot_payload = {"type": "FeatureCollection", "features": [{
+                "type": "Feature",
+                "properties": {"id": "legacy-water"},
+                "geometry": {"type": "Polygon", "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]},
+            }]}
             provenance_payload = {"generated_at": "derived-pass"}
             (scenario_dir / "marine_regions_named_waters.snapshot.geojson").write_text(
                 json.dumps(snapshot_payload, ensure_ascii=False, indent=2),
@@ -1391,7 +1395,8 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            loaded_snapshot, loaded_provenance = tno_bundle.load_or_refresh_marine_regions_named_water_snapshot(scenario_dir)
+            with patch.object(tno_bundle, "additional_snapshot_features", return_value=[]):
+                loaded_snapshot, loaded_provenance = tno_bundle.load_or_refresh_marine_regions_named_water_snapshot(scenario_dir)
 
             self.assertEqual(loaded_snapshot, snapshot_payload)
             self.assertEqual(loaded_provenance, provenance_payload)
