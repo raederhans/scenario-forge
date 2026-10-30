@@ -11459,11 +11459,11 @@
       }
     },
     {
-      "id": 11978,
+      "id": 11987,
       "type": "Feature",
       "properties": {
-        "id": "RU_ARCTIC_FB_KAZ_012",
-        "name": "Russia Shell Fallback KAZ",
+        "id": "RU_ARCTIC_FB_OMS_021",
+        "name": "Russia Shell Fallback OMS",
         "cntr_code": "RU",
         "detail_tier": "scenario_runtime_shell",
         "__source": "detail",
@@ -11471,9 +11471,9 @@
         "scenario_helper_kind": "shell_fallback",
         "scenario_shell_owner_hint": "KAZ",
         "scenario_shell_controller_hint": "KAZ",
-        "source_fragment_count": 147.0,
-        "source_fragment_area": 0.855346,
-        "retained_fragment_area": 0.034748,
+        "source_fragment_count": 161.0,
+        "source_fragment_area": 0.209988,
+        "retained_fragment_area": 0.01557,
         "interactive": false,
         "render_as_base_geography": false
       },
@@ -11482,72 +11482,243 @@
         "coordinates": [
           [
             [
-              46.78066780667808,
-              48.952266366663665
+              70.99090990909909,
+              54.93743702637026
             ],
             [
-              46.678029743260375,
-              48.76730028868431
+              71.00891008910091,
+              54.9652104401044
             ],
             [
-              46.67844641263766,
-              48.7681383558625
+              70.98010980109802,
+              54.980832985329855
             ],
             [
-              46.67870442961051,
-              48.76865731782166
+              70.99090990909909,
+              55.06762490324904
             ],
             [
-              46.67878592158868,
-              48.768821226560604
+              71.02331023310234,
+              55.081511610116095
             ],
             [
-              46.67890368207759,
-              48.769058083901285
+              70.92610926109262,
+              55.12664340743406
             ],
             [
-              46.679208724086045,
-              48.76967162957848
+              70.92970929709298,
+              55.16309601296014
             ],
             [
-              46.6803931197207,
-              48.77205386153866
+              70.8289082890829,
+              55.274189667896664
             ],
             [
-              46.62226622266223,
-              48.66758887588877
+              70.83610836108363,
+              55.29328388983889
             ],
             [
-              46.49276360139928,
-              48.43342911594785
+              70.72810728107282,
+              55.308906435064344
             ],
             [
-              46.49266492664927,
-              48.43325069750698
+              70.67410674106742,
+              55.29675556655566
             ],
             [
-              46.784267842678446,
-              48.355137971379705
+              70.72810728107282,
+              55.30022724327243
             ],
             [
-              46.679866798668,
-              48.40721312213121
+              70.80010800108002,
+              55.26551047610475
             ],
             [
-              46.607866078660805,
-              48.58079695796958
+              70.90810908109083,
+              55.12664340743406
             ],
             [
-              46.715867158671585,
-              48.80645594455943
+              70.99090990909909,
+              54.93743702637026
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 11989,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_ORN_023",
+        "name": "Russia Shell Fallback ORN",
+        "cntr_code": "RU",
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "KAZ",
+        "scenario_shell_controller_hint": "KAZ",
+        "source_fragment_count": 62.0,
+        "source_fragment_area": 0.082653,
+        "retained_fragment_area": 0.008289,
+        "interactive": false,
+        "render_as_base_geography": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              54.139141391413915,
+              51.05783829538295
             ],
             [
-              46.885068850688526,
-              48.9800397803978
+              54.14634146341464,
+              51.09949841598417
             ],
             [
-              46.78066780667808,
-              48.952266366663665
+              54.05994059940599,
+              51.134215183151824
+            ],
+            [
+              54.0419404194042,
+              51.16198859688596
+            ],
+            [
+              53.879938799388015,
+              51.18802617226173
+            ],
+            [
+              54.05994059940599,
+              51.1151209612096
+            ],
+            [
+              54.1679416794168,
+              51.01617817478176
+            ],
+            [
+              54.20394203942041,
+              51.037008235082354
+            ],
+            [
+              54.139141391413915,
+              51.05783829538295
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 12008,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_TYM_042",
+        "name": "Russia Shell Fallback TYM",
+        "cntr_code": "RU",
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "KAZ",
+        "scenario_shell_controller_hint": "KAZ",
+        "source_fragment_count": 110.0,
+        "source_fragment_area": 0.145688,
+        "retained_fragment_area": 0.008799,
+        "interactive": false,
+        "render_as_base_geography": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              63.06723067230672,
+              54.10597045270454
+            ],
+            [
+              62.85842858428586,
+              54.11812132121322
+            ],
+            [
+              62.59562595625957,
+              54.07472536225363
+            ],
+            [
+              62.58122581225814,
+              54.04521611016109
+            ],
+            [
+              62.628026280262816,
+              54.06778200882009
+            ],
+            [
+              63.06723067230672,
+              54.10597045270454
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 9270,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_KAZ_056",
+        "name": "Russia Shell Fallback NOV",
+        "cntr_code": "RU",
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "KAZ",
+        "scenario_shell_controller_hint": "KAZ",
+        "source_fragment_count": 403.0,
+        "source_fragment_area": 0.704134,
+        "retained_fragment_area": 0.193418,
+        "interactive": false,
+        "render_as_base_geography": false
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                80.05837201229157,
+                50.7575382593826
+              ],
+              [
+                80.06660066600665,
+                50.7575382593826
+              ],
+              [
+                80.06283359342652,
+                50.76255784675213
+              ],
+              [
+                80.05837201229157,
+                50.7575382593826
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                77.71217712177122,
+                53.37344666546666
+              ],
+              [
+                77.68935171869192,
+                53.38479637780998
+              ],
+              [
+                77.81417814178174,
+                53.29967353523512
+              ],
+              [
+                77.71217712177122,
+                53.37344666546666
+              ]
             ]
           ]
         ]

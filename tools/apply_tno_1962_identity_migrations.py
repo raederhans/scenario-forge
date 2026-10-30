@@ -13,6 +13,7 @@ MIGRATION_VERSION = 1
 SCENARIO_DIR = ROOT / 'data/scenarios/tno_1962'
 IDENTITY_PATH = ROOT / 'data/scenario-rules/tno_1962.identity_map.json'
 SOURCE_FILES = (
+    'runtime_topology.topo.json',
     'countries.json', 'owners.by_feature.json', 'cores.by_feature.json',
     'controllers.by_feature.json', 'scenario_mutations.json',
     'scenario_manual_overrides.json', 'city_overrides.json', 'city_assets.partial.json',

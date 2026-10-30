@@ -366,6 +366,8 @@ def build_country_entry_from_mutation(
     entry["color_policy"] = resolved_color_policy or COLOR_POLICY_PALETTE
     entry["parent_owner_tag"] = parent_owner_tag
     entry["parent_owner_tags"] = [parent_owner_tag] if parent_owner_tag else []
+    if "subject_kind" in mutation:
+        entry["subject_kind"] = normalize_text(mutation["subject_kind"])
     if "featured" in mutation:
         entry["featured"] = bool(mutation.get("featured"))
     if "notes" in mutation:

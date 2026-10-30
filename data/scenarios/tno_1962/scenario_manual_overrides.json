@@ -101,40 +101,411 @@
       ],
       "owner": "BRG"
     },
-    "BY_INT_BREST": {
-      "controller": "RKU",
+    "BF_ADM1_92566538B14190085014946": {
+      "controller": "BKF",
       "cores": [
-        "RKU"
+        "BKF"
       ],
-      "owner": "RKU"
+      "owner": "BKF"
+    },
+    "BF_ADM1_92566538B19127906733451": {
+      "controller": "BKF",
+      "cores": [
+        "BKF"
+      ],
+      "owner": "BKF"
+    },
+    "BF_ADM1_92566538B49759193106183": {
+      "controller": "BKF",
+      "cores": [
+        "BKF"
+      ],
+      "owner": "BKF"
+    },
+    "BF_ADM1_92566538B57532963969301": {
+      "controller": "HAU",
+      "cores": [
+        "HAU"
+      ],
+      "owner": "HAU"
+    },
+    "BF_ADM1_92566538B57875752774417": {
+      "controller": "BKF",
+      "cores": [
+        "BKF"
+      ],
+      "owner": "BKF"
+    },
+    "BF_ADM1_92566538B59117792838125": {
+      "controller": "BKF",
+      "cores": [
+        "BKF"
+      ],
+      "owner": "BKF"
+    },
+    "BF_ADM1_92566538B60283727543208": {
+      "controller": "HAU",
+      "cores": [
+        "HAU"
+      ],
+      "owner": "HAU"
+    },
+    "BF_ADM1_92566538B65696039363280": {
+      "controller": "FFR",
+      "cores": [
+        "FFR"
+      ],
+      "owner": "FFR"
+    },
+    "BF_ADM1_92566538B74906977122081": {
+      "controller": "BKF",
+      "cores": [
+        "BKF"
+      ],
+      "owner": "BKF"
+    },
+    "BF_ADM1_92566538B81581720767285": {
+      "controller": "HAU",
+      "cores": [
+        "HAU"
+      ],
+      "owner": "HAU"
+    },
+    "BJ_ADM1_BEN-2169": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BJ_ADM1_BEN-2170": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BJ_ADM1_BEN-2171": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BJ_ADM1_BEN-2174": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BJ_ADM1_BEN-2175": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BJ_ADM1_BEN-2176": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BJ_ADM1_BEN-2177": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BJ_ADM1_BEN-2178": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BJ_ADM1_BEN-2179": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BJ_ADM1_BEN-2180": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BJ_ADM1_BEN-2181": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BJ_ADM1_BEN-2182": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "BN_ADM1_BRN-1181": {
+      "controller": "NRB",
+      "cores": [
+        "NRB"
+      ],
+      "owner": "NRB"
+    },
+    "BY_CITY_MINSK": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_HIST_POL_MINSK_WEST": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_HIST_POL_VITEBSK_WEST": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_INT_BREST": {
+      "controller": "RKO",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "RKO"
+    },
+    "BY_INT_GOMEL": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_INT_GRODNO": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_INT_MINSK": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_INT_MOGILEV": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_INT_VITEBSK": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B10713618148259": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
     },
     "BY_RAY_67162791B11584975294724": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B13547290723272": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
     },
     "BY_RAY_67162791B14569635979911": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
     },
     "BY_RAY_67162791B17030122378697": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
-    "BY_RAY_67162791B58533541453403": {
-      "controller": "RKO",
+    "BY_RAY_67162791B1773631612848": {
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B18102707107362": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B18933715013959": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B19917337499758": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B26710857863794": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B30498032594927": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B30546828632542": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B41761210959552": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B43104058935452": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B45929653886900": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B4778855273895": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B52564132020414": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B54270193950847": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B58533541453403": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B59963656038120": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B65560195088656": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B66420794580046": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B72598168140482": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B82603429459213": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B85815486219336": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
+    },
+    "BY_RAY_67162791B89656925241953": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
     },
     "CA_MRG_02a592f4a083": {
       "controller": "CAN",
@@ -506,6 +877,146 @@
         "CAN"
       ],
       "owner": "CAN"
+    },
+    "CF_ADM1_CAF-805": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "CF_ADM1_CAF-806": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "CF_ADM1_CAF-807": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "CF_ADM1_CAF-810": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "CF_ADM1_CAF-812": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "CI_ADM1_83157122B20352934117266": {
+      "controller": "FFR",
+      "cores": [
+        "FFR"
+      ],
+      "owner": "FFR"
+    },
+    "CI_ADM1_83157122B28791092437733": {
+      "controller": "FFR",
+      "cores": [
+        "FFR"
+      ],
+      "owner": "FFR"
+    },
+    "CI_ADM1_83157122B30232425959699": {
+      "controller": "FFR",
+      "cores": [
+        "FFR"
+      ],
+      "owner": "FFR"
+    },
+    "CI_ADM1_83157122B58892240487392": {
+      "controller": "FFR",
+      "cores": [
+        "FFR"
+      ],
+      "owner": "FFR"
+    },
+    "CI_ADM1_83157122B62906982633778": {
+      "controller": "FFR",
+      "cores": [
+        "FFR"
+      ],
+      "owner": "FFR"
+    },
+    "CI_ADM1_83157122B69310198422077": {
+      "controller": "FFR",
+      "cores": [
+        "FFR"
+      ],
+      "owner": "FFR"
+    },
+    "CI_ADM1_83157122B74959515955757": {
+      "controller": "FFR",
+      "cores": [
+        "FFR"
+      ],
+      "owner": "FFR"
+    },
+    "CI_ADM1_83157122B79983119233374": {
+      "controller": "FFR",
+      "cores": [
+        "FFR"
+      ],
+      "owner": "FFR"
+    },
+    "CM_ADM1_CMR-1462": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "CM_ADM1_CMR-1476": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "CM_ADM1_CMR-1477": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "CM_ADM1_CMR-1482": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "CM_ADM1_CMR-1483": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "CM_ADM1_CMR-798": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "CM_ADM1_CMR-799": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
     },
     "CN_CITY_17275852B11052099771689": {
       "controller": "XIK",
@@ -1970,6 +2481,41 @@
       ],
       "owner": "GER"
     },
+    "EE001": {
+      "controller": "OE01",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE01"
+    },
+    "EE004": {
+      "controller": "OE01",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE01"
+    },
+    "EE008": {
+      "controller": "OE01",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE01"
+    },
+    "EE009": {
+      "controller": "OE01",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE01"
+    },
+    "EE00A": {
+      "controller": "OE01",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE01"
+    },
     "FR_MRG_0a0901a977d5": {
       "controller": "FRA",
       "cores": [
@@ -2158,6 +2704,167 @@
         "GY"
       ],
       "owner": "GY"
+    },
+    "GH_ADM1_GHA-2155": {
+      "controller": "GHA",
+      "cores": [
+        "GHA"
+      ],
+      "owner": "GHA"
+    },
+    "GH_ADM1_GHA-2156": {
+      "controller": "GHA",
+      "cores": [
+        "GHA"
+      ],
+      "owner": "GHA"
+    },
+    "GH_ADM1_GHA-2157": {
+      "controller": "GHA",
+      "cores": [
+        "GHA"
+      ],
+      "owner": "GHA"
+    },
+    "GH_ADM1_GHA-2158": {
+      "controller": "GHA",
+      "cores": [
+        "GHA"
+      ],
+      "owner": "GHA"
+    },
+    "GH_ADM1_GHA-2159": {
+      "controller": "GHA",
+      "cores": [
+        "GHA"
+      ],
+      "owner": "GHA"
+    },
+    "GH_ADM1_GHA-2160": {
+      "controller": "GHA",
+      "cores": [
+        "GHA"
+      ],
+      "owner": "GHA"
+    },
+    "GH_ADM1_GHA-2161": {
+      "controller": "GHA",
+      "cores": [
+        "GHA"
+      ],
+      "owner": "GHA"
+    },
+    "GH_ADM1_GHA-2162": {
+      "controller": "GHA",
+      "cores": [
+        "GHA"
+      ],
+      "owner": "GHA"
+    },
+    "GH_ADM1_GHA-2172": {
+      "controller": "GHA",
+      "cores": [
+        "GHA"
+      ],
+      "owner": "GHA"
+    },
+    "GH_ADM1_GHA-2173": {
+      "controller": "GHA",
+      "cores": [
+        "GHA"
+      ],
+      "owner": "GHA"
+    },
+    "GM_ADM1_GMB-2151": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "GM_ADM1_GMB-2152": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "GM_ADM1_GMB-2153": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "GM_ADM1_GMB-2154": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "GM_ADM1_GMB-5512": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "GM_ADM1_GMB-5513": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "GN_ADM1_385441B21537995001042": {
+      "controller": "GUI",
+      "cores": [
+        "GUI"
+      ],
+      "owner": "GUI"
+    },
+    "GN_ADM1_385441B29247776226513": {
+      "controller": "GUI",
+      "cores": [
+        "GUI"
+      ],
+      "owner": "GUI"
+    },
+    "GN_ADM1_385441B58689174477974": {
+      "controller": "GUI",
+      "cores": [
+        "GUI"
+      ],
+      "owner": "GUI"
+    },
+    "GN_ADM1_385441B61717407014046": {
+      "controller": "GUI",
+      "cores": [
+        "GUI"
+      ],
+      "owner": "GUI"
+    },
+    "GN_ADM1_385441B8345275251802": {
+      "controller": "GUI",
+      "cores": [
+        "GUI"
+      ],
+      "owner": "GUI"
+    },
+    "GN_ADM1_385441B85233176952124": {
+      "controller": "GUI",
+      "cores": [
+        "GUI"
+      ],
+      "owner": "GUI"
+    },
+    "GN_ADM1_385441B97135885584055": {
+      "controller": "GUI",
+      "cores": [
+        "GUI"
+      ],
+      "owner": "GUI"
     },
     "IN_ADM2_76128533B15567489974292": {
       "controller": "RAJ",
@@ -3006,6 +3713,112 @@
       ],
       "owner": "ITA"
     },
+    "LT011": {
+      "controller": "OE02",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE02"
+    },
+    "LT021": {
+      "controller": "OE02",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE02"
+    },
+    "LT022": {
+      "controller": "OE02",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE02"
+    },
+    "LT023": {
+      "controller": "OE02",
+      "cores": [
+        "GER",
+        "RKO"
+      ],
+      "owner": "OE02"
+    },
+    "LT025": {
+      "controller": "OE02",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE02"
+    },
+    "LT026": {
+      "controller": "OE02",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE02"
+    },
+    "LT027": {
+      "controller": "OE02",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE02"
+    },
+    "LT028": {
+      "controller": "OE02",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE02"
+    },
+    "LT029": {
+      "controller": "OE02",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE02"
+    },
+    "ML_ADM1_MLI-2688": {
+      "controller": "AZW",
+      "cores": [
+        "AZW"
+      ],
+      "owner": "AZW"
+    },
+    "ML_ADM1_MLI-2689": {
+      "controller": "AZW",
+      "cores": [
+        "AZW"
+      ],
+      "owner": "AZW"
+    },
+    "ML_ADM1_MLI-2792": {
+      "controller": "MLI",
+      "cores": [
+        "MLI"
+      ],
+      "owner": "MLI"
+    },
+    "ML_ADM1_MLI-2793": {
+      "controller": "MLI",
+      "cores": [
+        "MLI"
+      ],
+      "owner": "MLI"
+    },
+    "ML_ADM1_MLI-2810": {
+      "controller": "MLI",
+      "cores": [
+        "MLI"
+      ],
+      "owner": "MLI"
+    },
+    "ML_ADM1_MLI-4860": {
+      "controller": "MLI",
+      "cores": [
+        "MLI"
+      ],
+      "owner": "MLI"
+    },
     "MNG-3208": {
       "controller": "XIN",
       "cores": [
@@ -3021,53 +3834,53 @@
       "owner": "MEN"
     },
     "MNG-3316": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3318": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3320": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3321": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3322": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3323": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3324": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3325": {
       "controller": "MEN",
@@ -3077,32 +3890,452 @@
       "owner": "MEN"
     },
     "MNG-3326": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3327": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3328": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3329": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
+    },
+    "MR_ADM1_MRT-2784": {
+      "controller": "MAU",
+      "cores": [
+        "MAU"
+      ],
+      "owner": "MAU"
+    },
+    "MR_ADM1_MRT-2786": {
+      "controller": "MAU",
+      "cores": [
+        "MAU"
+      ],
+      "owner": "MAU"
+    },
+    "MR_ADM1_MRT-2787": {
+      "controller": "MAU",
+      "cores": [
+        "MAU"
+      ],
+      "owner": "MAU"
+    },
+    "MR_ADM1_MRT-2788": {
+      "controller": "MAU",
+      "cores": [
+        "MAU"
+      ],
+      "owner": "MAU"
+    },
+    "MR_ADM1_MRT-2789": {
+      "controller": "MAU",
+      "cores": [
+        "MAU"
+      ],
+      "owner": "MAU"
+    },
+    "MR_ADM1_MRT-2790": {
+      "controller": "MAU",
+      "cores": [
+        "MAU"
+      ],
+      "owner": "MAU"
+    },
+    "MR_ADM1_MRT-2791": {
+      "controller": "MAU",
+      "cores": [
+        "MAU"
+      ],
+      "owner": "MAU"
+    },
+    "MR_ADM1_MRT-2798": {
+      "controller": "MAU",
+      "cores": [
+        "MAU"
+      ],
+      "owner": "MAU"
+    },
+    "MYS-1137": {
+      "controller": "MLY",
+      "cores": [
+        "MLY"
+      ],
+      "owner": "MLY"
+    },
+    "MYS-1139": {
+      "controller": "MLY",
+      "cores": [
+        "MLY"
+      ],
+      "owner": "MLY"
+    },
+    "MYS-1143": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
+    },
+    "MYS-1145": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
+    },
+    "MYS-1146": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
+    },
+    "MYS-1147": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
+    },
+    "MYS-1148": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
+    },
+    "MYS-1186": {
+      "controller": "NRB",
+      "cores": [
+        "NRB"
+      ],
+      "owner": "NRB"
+    },
+    "MYS-1187": {
+      "controller": "NRB",
+      "cores": [
+        "NRB"
+      ],
+      "owner": "NRB"
+    },
+    "MYS-4831": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
+    },
+    "MYS-4832": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
+    },
+    "NE_ADM1_NER-4859": {
+      "controller": "HAU",
+      "cores": [
+        "HAU"
+      ],
+      "owner": "HAU"
+    },
+    "NE_ADM1_NER-800": {
+      "controller": "AYR",
+      "cores": [
+        "AYR"
+      ],
+      "owner": "AYR"
+    },
+    "NE_ADM1_NER-92": {
+      "controller": "AYR",
+      "cores": [
+        "AYR"
+      ],
+      "owner": "AYR"
+    },
+    "NE_ADM1_NER-94": {
+      "controller": "HAU",
+      "cores": [
+        "HAU"
+      ],
+      "owner": "HAU"
+    },
+    "NE_ADM1_NER-95": {
+      "controller": "AYR",
+      "cores": [
+        "AYR"
+      ],
+      "owner": "AYR"
+    },
+    "NG_ADM1_NGA-2839": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2841": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2842": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2843": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2844": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2845": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2846": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2847": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2848": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2849": {
+      "controller": "YOR",
+      "cores": [
+        "YOR"
+      ],
+      "owner": "YOR"
+    },
+    "NG_ADM1_NGA-2850": {
+      "controller": "YOR",
+      "cores": [
+        "YOR"
+      ],
+      "owner": "YOR"
+    },
+    "NG_ADM1_NGA-2851": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2853": {
+      "controller": "YOR",
+      "cores": [
+        "YOR"
+      ],
+      "owner": "YOR"
+    },
+    "NG_ADM1_NGA-2854": {
+      "controller": "YOR",
+      "cores": [
+        "YOR"
+      ],
+      "owner": "YOR"
+    },
+    "NG_ADM1_NGA-2855": {
+      "controller": "YOR",
+      "cores": [
+        "YOR"
+      ],
+      "owner": "YOR"
+    },
+    "NG_ADM1_NGA-2856": {
+      "controller": "YOR",
+      "cores": [
+        "YOR"
+      ],
+      "owner": "YOR"
+    },
+    "NG_ADM1_NGA-2857": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2858": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2859": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2860": {
+      "controller": "YOR",
+      "cores": [
+        "YOR"
+      ],
+      "owner": "YOR"
+    },
+    "NG_ADM1_NGA-2861": {
+      "controller": "YOR",
+      "cores": [
+        "YOR"
+      ],
+      "owner": "YOR"
+    },
+    "NG_ADM1_NGA-2862": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2863": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2864": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2865": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2866": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2867": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2868": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2869": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2870": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2871": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2872": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2873": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2879": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2881": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "NG_ADM1_NGA-3470": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
     },
     "NL_MRG_19568adfd807": {
       "controller": "RKN",
@@ -3253,6 +4486,447 @@
       ],
       "owner": "RAJ"
     },
+    "PHL-2511": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2513": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2516": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2518": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2519": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2520": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2521": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2523": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2524": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2536": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2537": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2538": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2539": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2540": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2541": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2542": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-2545": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-2547": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-2548": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-2550": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-2551": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-2552": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-2553": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-2554": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-2559": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-2561": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-2573": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2574": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2576": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2579": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2580": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2581": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2582": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2583": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2584": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2585": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2586": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2587": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2588": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2589": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2591": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2592": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2593": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2594": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2595": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2596": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2597": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2598": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-2599": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-4931": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-4932": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-5524": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-5527": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-5528": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-5529": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-5530": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-5531": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-5532": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-5534": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-5535": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-5536": {
+      "controller": "UPH",
+      "cores": [
+        "UPH"
+      ],
+      "owner": "UPH"
+    },
+    "PHL-5537": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
+    "PHL-5539": {
+      "controller": "SPH",
+      "cores": [
+        "SPH"
+      ],
+      "owner": "SPH"
+    },
     "PL_MRG_05f1ad6eedaa": {
       "controller": "RKP",
       "cores": [
@@ -3261,18 +4935,18 @@
       "owner": "RKP"
     },
     "PL_MRG_328be0e18e73": {
-      "controller": "RKP",
+      "controller": "PG01",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG01"
     },
     "PL_MRG_3692a96e99b1": {
-      "controller": "RKP",
+      "controller": "PG02",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG02"
     },
     "PL_MRG_36976cf4d062": {
       "controller": "GER",
@@ -3289,11 +4963,11 @@
       "owner": "GER"
     },
     "PL_MRG_4762ef33a34f": {
-      "controller": "RKP",
+      "controller": "PG02",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG02"
     },
     "PL_MRG_48e6927d3544": {
       "controller": "GER",
@@ -3303,18 +4977,18 @@
       "owner": "GER"
     },
     "PL_MRG_4a7fdf2f215b": {
-      "controller": "RKP",
+      "controller": "PG01",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG01"
     },
     "PL_MRG_4df6ad2dc703": {
-      "controller": "RKP",
+      "controller": "PG03",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG03"
     },
     "PL_MRG_50494ed51da4": {
       "controller": "GER",
@@ -3345,11 +5019,11 @@
       "owner": "GER"
     },
     "PL_MRG_81a04ac05a78": {
-      "controller": "RKP",
+      "controller": "PG01",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG01"
     },
     "PL_MRG_afde07ef7e52": {
       "controller": "GER",
@@ -3373,11 +5047,11 @@
       "owner": "GER"
     },
     "PL_MRG_c5cfb391c06f": {
-      "controller": "RKP",
+      "controller": "PG03",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG03"
     },
     "PL_MRG_c908eb11c602": {
       "controller": "GER",
@@ -3387,11 +5061,11 @@
       "owner": "GER"
     },
     "PL_MRG_cb41a08029c6": {
-      "controller": "RKP",
+      "controller": "PG03",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG03"
     },
     "PL_MRG_ce21dcd4a2c0": {
       "controller": "GER",
@@ -3436,11 +5110,11 @@
       "owner": "GER"
     },
     "PL_MRG_f3a4768ac693": {
-      "controller": "RKP",
+      "controller": "PG02",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG02"
     },
     "PL_MRG_fe627fbb2f9c": {
       "controller": "GER",
@@ -3448,6 +5122,97 @@
         "GER"
       ],
       "owner": "GER"
+    },
+    "PL_POW_0601": {
+      "controller": "PG03",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG03"
+    },
+    "PL_POW_0603": {
+      "controller": "PG03",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG03"
+    },
+    "PL_POW_0604": {
+      "controller": "PG03",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG03"
+    },
+    "PL_POW_0618": {
+      "controller": "PG03",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG03"
+    },
+    "PL_POW_0619": {
+      "controller": "PG03",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG03"
+    },
+    "PL_POW_0661": {
+      "controller": "PG03",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG03"
+    },
+    "PL_POW_0662": {
+      "controller": "PG03",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG03"
+    },
+    "PL_POW_0663": {
+      "controller": "PG03",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG03"
+    },
+    "PL_POW_1463": {
+      "controller": "PG02",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG02"
+    },
+    "PL_POW_1465": {
+      "controller": "PG01",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG01"
+    },
+    "PL_POW_2001": {
+      "controller": "OE02",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE02"
+    },
+    "PL_POW_2009": {
+      "controller": "OE02",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE02"
+    },
+    "PL_POW_2661": {
+      "controller": "PG02",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG02"
     },
     "RS228": {
       "cores": [
@@ -3861,11 +5626,11 @@
       "owner": "IRK"
     },
     "RU_MRG_3bf1b1438247": {
-      "controller": "VOL",
+      "controller": "KOM",
       "cores": [
-        "VOL"
+        "KOM"
       ],
-      "owner": "VOL"
+      "owner": "KOM"
     },
     "RU_MRG_3c1f8e056188": {
       "controller": "RKM",
@@ -3973,11 +5738,11 @@
       "owner": "NOV"
     },
     "RU_MRG_46291296feb9": {
-      "controller": "RKM",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "RKM"
+      "owner": "VOL"
     },
     "RU_MRG_467ab67728ff": {
       "controller": "RKM",
@@ -4008,11 +5773,11 @@
       "owner": "BRY"
     },
     "RU_MRG_48dc139f3c1a": {
-      "controller": "VOL",
+      "controller": "WRS",
       "cores": [
-        "VOL"
+        "WRS"
       ],
-      "owner": "VOL"
+      "owner": "WRS"
     },
     "RU_MRG_4a1ad9caacda": {
       "controller": "SBA",
@@ -4127,18 +5892,18 @@
       "owner": "TAT"
     },
     "RU_MRG_565e6f7cc145": {
+      "controller": "VOL",
+      "cores": [
+        "VOL"
+      ],
+      "owner": "VOL"
+    },
+    "RU_MRG_56d7f2c40815": {
       "controller": "RKM",
       "cores": [
         "RKM"
       ],
       "owner": "RKM"
-    },
-    "RU_MRG_56d7f2c40815": {
-      "controller": "RKO",
-      "cores": [
-        "RKO"
-      ],
-      "owner": "RKO"
     },
     "RU_MRG_56ed27ec6e18": {
       "controller": "BKR",
@@ -4344,11 +6109,11 @@
       "owner": "CHT"
     },
     "RU_MRG_6dc9d50b794a": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_MRG_6df85226925c": {
       "controller": "RKK",
@@ -4358,11 +6123,11 @@
       "owner": "RKK"
     },
     "RU_MRG_6f87652d4746": {
-      "controller": "RKO",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "RKO"
+      "owner": "RKM"
     },
     "RU_MRG_6fb6a80f7b8a": {
       "controller": "RKM",
@@ -4407,11 +6172,11 @@
       "owner": "RKK"
     },
     "RU_MRG_72b0f3ba03bc": {
-      "controller": "TAT",
+      "controller": "VYT",
       "cores": [
-        "TAT"
+        "VYT"
       ],
-      "owner": "TAT"
+      "owner": "VYT"
     },
     "RU_MRG_72ee4e9306fc": {
       "controller": "RKM",
@@ -4533,11 +6298,11 @@
       "owner": "BRY"
     },
     "RU_MRG_7f673bbbcb21": {
-      "controller": "RKM",
+      "controller": "GOR",
       "cores": [
-        "RKM"
+        "GOR"
       ],
-      "owner": "RKM"
+      "owner": "GOR"
     },
     "RU_MRG_7fb0671d3e3b": {
       "controller": "YAK",
@@ -4554,11 +6319,11 @@
       "owner": "FIN"
     },
     "RU_MRG_7fee908b63f6": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_MRG_807631e65728": {
       "controller": "RKK",
@@ -4743,11 +6508,11 @@
       "owner": "RKM"
     },
     "RU_MRG_9630c25ee3c6": {
-      "controller": "RKO",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "RKO"
+      "owner": "RKM"
     },
     "RU_MRG_96394847a7bb": {
       "controller": "RKK",
@@ -4764,11 +6529,11 @@
       "owner": "RKK"
     },
     "RU_MRG_975a1a106b2a": {
-      "controller": "RKM",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "RKM"
+      "owner": "VOL"
     },
     "RU_MRG_977d68d87d87": {
       "controller": "VYT",
@@ -4883,11 +6648,11 @@
       "owner": "KOM"
     },
     "RU_MRG_ab652814dff4": {
-      "controller": "RKM",
+      "controller": "TAT",
       "cores": [
-        "RKM"
+        "TAT"
       ],
-      "owner": "RKM"
+      "owner": "TAT"
     },
     "RU_MRG_ad1e693ffed2": {
       "controller": "RKK",
@@ -5002,11 +6767,11 @@
       "owner": "CHT"
     },
     "RU_MRG_baef030e052d": {
-      "controller": "RKO",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "RKO"
+      "owner": "RKM"
     },
     "RU_MRG_bb701cc86b7c": {
       "controller": "SVR",
@@ -5191,11 +6956,11 @@
       "owner": "VOL"
     },
     "RU_MRG_cd478b5a76eb": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_MRG_d12c5659178e": {
       "controller": "OMS",
@@ -5261,11 +7026,11 @@
       "owner": "RKM"
     },
     "RU_MRG_d7ef4389d36f": {
-      "controller": "TYM",
+      "controller": "SVR",
       "cores": [
-        "TYM"
+        "SVR"
       ],
-      "owner": "TYM"
+      "owner": "SVR"
     },
     "RU_MRG_d7f648c07bd4": {
       "controller": "VOL",
@@ -5289,11 +7054,11 @@
       "owner": "VYT"
     },
     "RU_MRG_da0982e025af": {
-      "controller": "TAT",
+      "controller": "VYT",
       "cores": [
-        "TAT"
+        "VYT"
       ],
-      "owner": "TAT"
+      "owner": "VYT"
     },
     "RU_MRG_da32271f14c8": {
       "controller": "ORN",
@@ -5317,11 +7082,11 @@
       "owner": "SVR"
     },
     "RU_MRG_dc59f2179593": {
-      "controller": "RKU",
+      "controller": "UK07",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK07"
     },
     "RU_MRG_deee7ff279fc": {
       "controller": "RKM",
@@ -5352,11 +7117,11 @@
       "owner": "TYM"
     },
     "RU_MRG_dfe6c1e5f415": {
-      "controller": "RKM",
+      "controller": "GOR",
       "cores": [
-        "RKM"
+        "GOR"
       ],
-      "owner": "RKM"
+      "owner": "GOR"
     },
     "RU_MRG_e00f867dd81d": {
       "controller": "SAM",
@@ -5422,11 +7187,11 @@
       "owner": "RKM"
     },
     "RU_MRG_e85ce6b2cbb5": {
-      "controller": "RKO",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "RKO"
+      "owner": "RKM"
     },
     "RU_MRG_e9567e283174": {
       "controller": "RKM",
@@ -5443,11 +7208,11 @@
       "owner": "BKR"
     },
     "RU_MRG_eb6edd92ee8d": {
-      "controller": "MAN",
+      "controller": "AMR",
       "cores": [
-        "MAN"
+        "AMR"
       ],
-      "owner": "MAN"
+      "owner": "AMR"
     },
     "RU_MRG_ebc5961355f4": {
       "controller": "SBA",
@@ -5499,18 +7264,18 @@
       "owner": "TYM"
     },
     "RU_MRG_f38bf2291525": {
-      "controller": "BRY",
+      "controller": "CHT",
       "cores": [
-        "BRY"
+        "CHT"
       ],
-      "owner": "BRY"
+      "owner": "CHT"
     },
     "RU_MRG_f3d2b13e0b30": {
-      "controller": "BKR",
+      "controller": "PRM",
       "cores": [
-        "BKR"
+        "PRM"
       ],
-      "owner": "BKR"
+      "owner": "PRM"
     },
     "RU_MRG_f3dfc0448ede": {
       "controller": "RKM",
@@ -5562,11 +7327,11 @@
       "owner": "TAT"
     },
     "RU_MRG_f84bc369d8b3": {
-      "controller": "RKU",
+      "controller": "UK07",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK07"
     },
     "RU_MRG_f99008b0bde7": {
       "controller": "RKK",
@@ -5618,11 +7383,11 @@
       "owner": "TOM"
     },
     "RU_RAY_50074027B11359862812061": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
     },
     "RU_RAY_50074027B11628373622146": {
       "controller": "MGN",
@@ -5632,18 +7397,25 @@
       "owner": "MGN"
     },
     "RU_RAY_50074027B11673707761487": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
+    },
+    "RU_RAY_50074027B12162041502673": {
+      "controller": "OE04",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE04"
     },
     "RU_RAY_50074027B12942583135720": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "RU_RAY_50074027B13114681801765": {
       "controller": "AMR",
@@ -5702,11 +7474,11 @@
       "owner": "OMO"
     },
     "RU_RAY_50074027B15861675069153": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
     },
     "RU_RAY_50074027B15872482411826": {
       "controller": "NRL",
@@ -5758,11 +7530,11 @@
       "owner": "OMO"
     },
     "RU_RAY_50074027B18690673383913": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
     },
     "RU_RAY_50074027B18749905524628": {
       "controller": "MAN",
@@ -5778,6 +7550,27 @@
       ],
       "owner": "TOM"
     },
+    "RU_RAY_50074027B19608634361445": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "RU_RAY_50074027B19621694008878": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "RU_RAY_50074027B19741518738580": {
+      "controller": "OE04",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE04"
+    },
     "RU_RAY_50074027B21050205315965": {
       "controller": "VOK",
       "cores": [
@@ -5791,6 +7584,13 @@
         "FAV"
       ],
       "owner": "FAV"
+    },
+    "RU_RAY_50074027B21430544456221": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
     },
     "RU_RAY_50074027B21488641063420": {
       "controller": "MGN",
@@ -5833,12 +7633,26 @@
       ],
       "owner": "NRL"
     },
-    "RU_RAY_50074027B23799547406598": {
-      "controller": "TOM",
+    "RU_RAY_50074027B23262720042196": {
+      "controller": "FAV",
       "cores": [
-        "TOM"
+        "FAV"
       ],
-      "owner": "TOM"
+      "owner": "FAV"
+    },
+    "RU_RAY_50074027B23655919603928": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "RU_RAY_50074027B23799547406598": {
+      "controller": "FAV",
+      "cores": [
+        "FAV"
+      ],
+      "owner": "FAV"
     },
     "RU_RAY_50074027B2401368915177": {
       "controller": "OMO",
@@ -5862,11 +7676,11 @@
       "owner": "OMO"
     },
     "RU_RAY_50074027B24884281398381": {
-      "controller": "RKO",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "RKO"
+      "owner": "RKM"
     },
     "RU_RAY_50074027B2598774008896": {
       "controller": "KRS",
@@ -5887,6 +7701,13 @@
         "WRS"
       ],
       "owner": "WRS"
+    },
+    "RU_RAY_50074027B26881426661864": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
     },
     "RU_RAY_50074027B27046027245969": {
       "controller": "IRK",
@@ -5986,6 +7807,13 @@
       ],
       "owner": "OMO"
     },
+    "RU_RAY_50074027B30333853270950": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
     "RU_RAY_50074027B3033714852105": {
       "controller": "ORS",
       "cores": [
@@ -6015,11 +7843,11 @@
       "owner": "BOP"
     },
     "RU_RAY_50074027B31853797856912": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "RU_RAY_50074027B32234523409019": {
       "controller": "ORN",
@@ -6029,11 +7857,11 @@
       "owner": "ORN"
     },
     "RU_RAY_50074027B32599021943629": {
-      "controller": "TYM",
+      "controller": "SVR",
       "cores": [
-        "TYM"
+        "SVR"
       ],
-      "owner": "TYM"
+      "owner": "SVR"
     },
     "RU_RAY_50074027B32782787425978": {
       "controller": "WRS",
@@ -6062,6 +7890,13 @@
         "IRK"
       ],
       "owner": "IRK"
+    },
+    "RU_RAY_50074027B34454529298169": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
     },
     "RU_RAY_50074027B34679445513717": {
       "controller": "BKR",
@@ -6112,6 +7947,13 @@
       ],
       "owner": "ORS"
     },
+    "RU_RAY_50074027B37881642500609": {
+      "controller": "OE04",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE04"
+    },
     "RU_RAY_50074027B39041476138502": {
       "controller": "WRS",
       "cores": [
@@ -6141,17 +7983,24 @@
       "owner": "MGN"
     },
     "RU_RAY_50074027B40310096212326": {
-      "controller": "RKO",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "RKO"
+      "owner": "RKM"
     },
     "RU_RAY_50074027B40536112899816": {
       "cores": [
         "SAM"
       ],
       "owner": "SAM"
+    },
+    "RU_RAY_50074027B40672414055189": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
     },
     "RU_RAY_50074027B40753977825415": {
       "controller": "MAG",
@@ -6182,11 +8031,11 @@
       "owner": "PRM"
     },
     "RU_RAY_50074027B42449829895110": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "RU_RAY_50074027B42619686972132": {
       "controller": "SBA",
@@ -6222,6 +8071,20 @@
       ],
       "owner": "TOM"
     },
+    "RU_RAY_50074027B44365109797977": {
+      "controller": "GOR",
+      "cores": [
+        "GOR"
+      ],
+      "owner": "GOR"
+    },
+    "RU_RAY_50074027B44706978372394": {
+      "controller": "WRS",
+      "cores": [
+        "WRS"
+      ],
+      "owner": "WRS"
+    },
     "RU_RAY_50074027B44738927608854": {
       "controller": "SVR",
       "cores": [
@@ -6244,11 +8107,11 @@
       "owner": "YAK"
     },
     "RU_RAY_50074027B45493241507504": {
-      "controller": "ONG",
+      "controller": "WRS",
       "cores": [
         "RKM"
       ],
-      "owner": "ONG"
+      "owner": "WRS"
     },
     "RU_RAY_50074027B45607076105456": {
       "controller": "TAT",
@@ -6258,25 +8121,39 @@
       "owner": "TAT"
     },
     "RU_RAY_50074027B46415378872622": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
+    },
+    "RU_RAY_50074027B464999176845": {
+      "controller": "OE04",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE04"
     },
     "RU_RAY_50074027B47797242403348": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
+    },
+    "RU_RAY_50074027B48200335175308": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
     },
     "RU_RAY_50074027B49278461872326": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_RAY_50074027B49390035135032": {
       "controller": "ONG",
@@ -6300,11 +8177,11 @@
       "owner": "ONG"
     },
     "RU_RAY_50074027B5223158268211": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_RAY_50074027B5244237471572": {
       "controller": "BKR",
@@ -6347,6 +8224,13 @@
         "FAV"
       ],
       "owner": "FAV"
+    },
+    "RU_RAY_50074027B55014623372781": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
     },
     "RU_RAY_50074027B55367485598669": {
       "controller": "URL",
@@ -6391,18 +8275,18 @@
       "owner": "NRL"
     },
     "RU_RAY_50074027B5631740772865": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_RAY_50074027B56678877765671": {
-      "controller": "WRS",
+      "controller": "VOK",
       "cores": [
-        "WRS"
+        "VOK"
       ],
-      "owner": "WRS"
+      "owner": "VOK"
     },
     "RU_RAY_50074027B56747088904047": {
       "controller": "VYT",
@@ -6440,11 +8324,11 @@
       "owner": "MAG"
     },
     "RU_RAY_50074027B58076034090645": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_RAY_50074027B58285687326194": {
       "controller": "BOP",
@@ -6472,6 +8356,13 @@
         "BRY"
       ],
       "owner": "BRY"
+    },
+    "RU_RAY_50074027B59167521890578": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
     },
     "RU_RAY_50074027B59412945992369": {
       "controller": "KOM",
@@ -6509,11 +8400,11 @@
       "owner": "URL"
     },
     "RU_RAY_50074027B60606739466906": {
-      "controller": "ONG",
+      "controller": "RKM",
       "cores": [
-        "ONG"
+        "RKM"
       ],
-      "owner": "ONG"
+      "owner": "RKM"
     },
     "RU_RAY_50074027B61183763679661": {
       "controller": "ORS",
@@ -6535,6 +8426,13 @@
         "NRL"
       ],
       "owner": "NRL"
+    },
+    "RU_RAY_50074027B62324973885793": {
+      "controller": "WRS",
+      "cores": [
+        "WRS"
+      ],
+      "owner": "WRS"
     },
     "RU_RAY_50074027B62478008051708": {
       "controller": "PRC",
@@ -6571,6 +8469,13 @@
       ],
       "owner": "AMR"
     },
+    "RU_RAY_50074027B63935727212307": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
+    },
     "RU_RAY_50074027B64035112017093": {
       "controller": "IRK",
       "cores": [
@@ -6579,11 +8484,11 @@
       "owner": "IRK"
     },
     "RU_RAY_50074027B64055482679717": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_RAY_50074027B64075323117418": {
       "controller": "RKM",
@@ -6600,11 +8505,11 @@
       "owner": "NRL"
     },
     "RU_RAY_50074027B64424707524567": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
     },
     "RU_RAY_50074027B65009722286705": {
       "controller": "KOM",
@@ -6614,11 +8519,11 @@
       "owner": "KOM"
     },
     "RU_RAY_50074027B65236051616648": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
     },
     "RU_RAY_50074027B65892523893476": {
       "controller": "OMO",
@@ -6712,11 +8617,11 @@
       "owner": "ORS"
     },
     "RU_RAY_50074027B68450782776786": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_RAY_50074027B69239078282053": {
       "controller": "OMO",
@@ -6733,11 +8638,11 @@
       "owner": "SBA"
     },
     "RU_RAY_50074027B71157437388348": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_RAY_50074027B71368048698898": {
       "controller": "SBA",
@@ -6753,12 +8658,26 @@
       ],
       "owner": "TOM"
     },
+    "RU_RAY_50074027B72539224473791": {
+      "controller": "KOM",
+      "cores": [
+        "KOM"
+      ],
+      "owner": "KOM"
+    },
     "RU_RAY_50074027B72993481609927": {
       "controller": "FAV",
       "cores": [
         "FAV"
       ],
       "owner": "FAV"
+    },
+    "RU_RAY_50074027B73978553723393": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
     },
     "RU_RAY_50074027B7427793780569": {
       "controller": "KRS",
@@ -6817,11 +8736,11 @@
       "owner": "ORN"
     },
     "RU_RAY_50074027B77582248025356": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
     },
     "RU_RAY_50074027B78297177563949": {
       "controller": "VOK",
@@ -6830,12 +8749,26 @@
       ],
       "owner": "VOK"
     },
+    "RU_RAY_50074027B78718194323542": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
     "RU_RAY_50074027B78945113117211": {
       "controller": "VYT",
       "cores": [
         "VYT"
       ],
       "owner": "VYT"
+    },
+    "RU_RAY_50074027B79024776170444": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
     },
     "RU_RAY_50074027B80044850298489": {
       "controller": "PFC",
@@ -6859,13 +8792,27 @@
       "owner": "ORN"
     },
     "RU_RAY_50074027B81144067595181": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
     },
     "RU_RAY_50074027B82590027772677": {
+      "controller": "WRS",
+      "cores": [
+        "WRS"
+      ],
+      "owner": "WRS"
+    },
+    "RU_RAY_50074027B82795249676876": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "RU_RAY_50074027B83221615215133": {
       "controller": "VOK",
       "cores": [
         "VOK"
@@ -6908,11 +8855,18 @@
       "owner": "MAG"
     },
     "RU_RAY_50074027B8579713719118": {
-      "controller": "BRY",
+      "controller": "CHT",
       "cores": [
-        "BRY"
+        "CHT"
       ],
-      "owner": "BRY"
+      "owner": "CHT"
+    },
+    "RU_RAY_50074027B86147871749672": {
+      "controller": "OE04",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE04"
     },
     "RU_RAY_50074027B86150609365879": {
       "controller": "ORS",
@@ -6927,6 +8881,13 @@
         "BRY"
       ],
       "owner": "BRY"
+    },
+    "RU_RAY_50074027B86681375933080": {
+      "controller": "OE04",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE04"
     },
     "RU_RAY_50074027B86870758219567": {
       "controller": "AMR",
@@ -6943,11 +8904,11 @@
       "owner": "OMO"
     },
     "RU_RAY_50074027B87627181065564": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_RAY_50074027B87731900886085": {
       "controller": "OMO",
@@ -6963,12 +8924,26 @@
       ],
       "owner": "WRS"
     },
-    "RU_RAY_50074027B88724749460683": {
-      "controller": "MAN",
+    "RU_RAY_50074027B88274438285408": {
+      "controller": "OE04",
       "cores": [
-        "MAN"
+        "RKO"
       ],
-      "owner": "MAN"
+      "owner": "OE04"
+    },
+    "RU_RAY_50074027B88724749460683": {
+      "controller": "AMR",
+      "cores": [
+        "AMR"
+      ],
+      "owner": "AMR"
+    },
+    "RU_RAY_50074027B90244452662579": {
+      "controller": "AMR",
+      "cores": [
+        "AMR"
+      ],
+      "owner": "AMR"
     },
     "RU_RAY_50074027B90279098260480": {
       "controller": "AMR",
@@ -6984,19 +8959,26 @@
       ],
       "owner": "ORN"
     },
-    "RU_RAY_50074027B9105763704567": {
-      "controller": "RKU",
-      "cores": [
-        "RKU"
-      ],
-      "owner": "RKU"
-    },
-    "RU_RAY_50074027B91265302364221": {
-      "controller": "RKO",
+    "RU_RAY_50074027B90555869339870": {
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
+    },
+    "RU_RAY_50074027B9105763704567": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "RU_RAY_50074027B91265302364221": {
+      "controller": "OE03",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE03"
     },
     "RU_RAY_50074027B91375405563028": {
       "controller": "PFC",
@@ -7006,11 +8988,11 @@
       "owner": "PFC"
     },
     "RU_RAY_50074027B91439993213773": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_RAY_50074027B91680290875095": {
       "controller": "RKM",
@@ -7040,12 +9022,19 @@
       ],
       "owner": "IRK"
     },
-    "RU_RAY_50074027B93522804484377": {
-      "controller": "RKO",
+    "RU_RAY_50074027B93378157948323": {
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
+    },
+    "RU_RAY_50074027B93522804484377": {
+      "controller": "OE04",
+      "cores": [
+        "RKO"
+      ],
+      "owner": "OE04"
     },
     "RU_RAY_50074027B93581086999271": {
       "controller": "OMO",
@@ -7055,11 +9044,18 @@
       "owner": "OMO"
     },
     "RU_RAY_50074027B94464987655513": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
+    },
+    "RU_RAY_50074027B94648571764089": {
+      "controller": "VOK",
+      "cores": [
+        "VOK"
+      ],
+      "owner": "VOK"
     },
     "RU_RAY_50074027B94992557454451": {
       "controller": "RUR",
@@ -7076,11 +9072,18 @@
       "owner": "TOM"
     },
     "RU_RAY_50074027B96444957835233": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
+    },
+    "RU_RAY_50074027B96632027100715": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
     },
     "RU_RAY_50074027B97275470142422": {
       "controller": "OMO",
@@ -7097,18 +9100,18 @@
       "owner": "OMO"
     },
     "RU_RAY_50074027B9814729903160": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "RU_RAY_50074027B98725284766499": {
-      "controller": "RKO",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE03"
     },
     "RU_RAY_50074027B98963269942164": {
       "controller": "RKM",
@@ -7118,11 +9121,11 @@
       "owner": "RKM"
     },
     "RU_RAY_50074027B99227036451137": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
     },
     "RU_RAY_50074027B99340686489203": {
       "controller": "OMO",
@@ -7132,11 +9135,46 @@
       "owner": "OMO"
     },
     "RU_RAY_50074027B99894122533642": {
-      "controller": "RKO",
+      "controller": "OE04",
       "cores": [
         "RKO"
       ],
-      "owner": "RKO"
+      "owner": "OE04"
+    },
+    "SGP-4871": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
+    },
+    "SGP-4872": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
+    },
+    "SGP-4873": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
+    },
+    "SGP-4874": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
+    },
+    "SGP-4875": {
+      "controller": "SHO",
+      "cores": [
+        "SHO"
+      ],
+      "owner": "SHO"
     },
     "SK_MRG_351edc5a6c69": {
       "controller": "SLO",
@@ -7186,6 +9224,34 @@
         "SLO"
       ],
       "owner": "SLO"
+    },
+    "SL_ADM1_SLE-760": {
+      "controller": "SIE",
+      "cores": [
+        "SIE"
+      ],
+      "owner": "SIE"
+    },
+    "SL_ADM1_SLE-761": {
+      "controller": "SIE",
+      "cores": [
+        "SIE"
+      ],
+      "owner": "SIE"
+    },
+    "SL_ADM1_SLE-762": {
+      "controller": "SIE",
+      "cores": [
+        "SIE"
+      ],
+      "owner": "SIE"
+    },
+    "SL_ADM1_SLE-790": {
+      "controller": "SIE",
+      "cores": [
+        "SIE"
+      ],
+      "owner": "SIE"
     },
     "SM_ADM1_SMR-4883": {
       "cores": [
@@ -7241,12 +9307,404 @@
       ],
       "owner": "ITA"
     },
+    "SN_ADM1_SEN-5514": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-5515": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-5516": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-759": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-763": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-764": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-765": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-766": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-767": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-768": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-774": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-775": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "SN_ADM1_SEN-779": {
+      "controller": "SEN",
+      "cores": [
+        "SEN"
+      ],
+      "owner": "SEN"
+    },
+    "TD_ADM1_TCD-1464": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-1465": {
+      "controller": "CHD",
+      "cores": [
+        "CHD"
+      ],
+      "owner": "CHD"
+    },
+    "TD_ADM1_TCD-1474": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-1475": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-1484": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-1485": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-1486": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-1487": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-1488": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-1489": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-4857": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-4858": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-5577": {
+      "controller": "CHD",
+      "cores": [
+        "CHD"
+      ],
+      "owner": "CHD"
+    },
+    "TD_ADM1_TCD-5578": {
+      "controller": "CHD",
+      "cores": [
+        "CHD"
+      ],
+      "owner": "CHD"
+    },
+    "TD_ADM1_TCD-5579": {
+      "controller": "CHD",
+      "cores": [
+        "CHD"
+      ],
+      "owner": "CHD"
+    },
+    "TD_ADM1_TCD-5580": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-5581": {
+      "controller": "CHD",
+      "cores": [
+        "CHD"
+      ],
+      "owner": "CHD"
+    },
+    "TD_ADM1_TCD-5582": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TD_ADM1_TCD-5583": {
+      "controller": "CAO",
+      "cores": [
+        "CAO"
+      ],
+      "owner": "CAO"
+    },
+    "TG_ADM1_TGO-88": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "TG_ADM1_TGO-89": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "TG_ADM1_TGO-90": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "TWN-1156": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1158": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1160": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1161": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1162": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1163": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1164": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1165": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1166": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1167": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1168": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1169": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1170": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1171": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1172": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1173": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1174": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1176": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1177": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-3414": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-3415": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
     "UA_MRG_01673e94c186": {
-      "controller": "RKU",
+      "controller": "UK05",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK05"
     },
     "UA_MRG_049fbd166854": {
       "controller": "HUN",
@@ -7256,11 +9714,11 @@
       "owner": "HUN"
     },
     "UA_MRG_07e4f868c3fb": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "UA_MRG_08e978d66245": {
       "controller": "ROM",
@@ -7270,25 +9728,25 @@
       "owner": "ROM"
     },
     "UA_MRG_0d6137080058": {
-      "controller": "RKP",
+      "controller": "PG04",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG04"
     },
     "UA_MRG_167b1c61b320": {
-      "controller": "RKU",
+      "controller": "UK07",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK07"
     },
     "UA_MRG_1a8aac8d6778": {
-      "controller": "RKU",
+      "controller": "UK06",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK06"
     },
     "UA_MRG_1d698b91bc32": {
       "controller": "RKU",
@@ -7298,18 +9756,18 @@
       "owner": "RKU"
     },
     "UA_MRG_1e19f7d437d0": {
-      "controller": "RKU",
+      "controller": "UK07",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK07"
     },
     "UA_MRG_1e5ce8367e34": {
-      "controller": "RKU",
+      "controller": "UK04",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK04"
     },
     "UA_MRG_228c317a869c": {
       "controller": "RKU",
@@ -7319,11 +9777,11 @@
       "owner": "RKU"
     },
     "UA_MRG_26d00b8ec232": {
-      "controller": "RKU",
+      "controller": "UK07",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK07"
     },
     "UA_MRG_2b67cdceafd7": {
       "controller": "TNS",
@@ -7333,60 +9791,60 @@
       "owner": "TNS"
     },
     "UA_MRG_2d1c37bdd071": {
-      "controller": "RKU",
+      "controller": "UK05",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK05"
     },
     "UA_MRG_30161412737f": {
-      "controller": "RKU",
+      "controller": "UK08",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK08"
     },
     "UA_MRG_35715f97812f": {
-      "controller": "RKP",
+      "controller": "PG04",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG04"
     },
     "UA_MRG_364aab8578b7": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_39b244f210a7": {
-      "controller": "RKU",
+      "controller": "UK04",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK04"
     },
     "UA_MRG_4224fabffe3b": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "UA_MRG_44d0fd9d6e14": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_456d7658c3df": {
-      "controller": "RKU",
+      "controller": "UK08",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK08"
     },
     "UA_MRG_4a445701c4c6": {
       "controller": "RKU",
@@ -7403,46 +9861,46 @@
       "owner": "RKU"
     },
     "UA_MRG_5041b17a3e61": {
-      "controller": "RKU",
+      "controller": "UK01",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK01"
     },
     "UA_MRG_51ee3e4d0063": {
-      "controller": "RKU",
+      "controller": "UK05",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK05"
     },
     "UA_MRG_570a8d4dd729": {
-      "controller": "RKU",
+      "controller": "UK06",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK06"
     },
     "UA_MRG_57c49cfe4029": {
-      "controller": "RKU",
+      "controller": "UK01",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK01"
     },
     "UA_MRG_5e1a623ff8e3": {
-      "controller": "RKU",
+      "controller": "UK04",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK04"
     },
     "UA_MRG_6057d7f77511": {
-      "controller": "RKU",
+      "controller": "UK04",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK04"
     },
     "UA_MRG_6b24f46af3f8": {
       "controller": "RKU",
@@ -7452,39 +9910,39 @@
       "owner": "RKU"
     },
     "UA_MRG_6e5a94ff967b": {
-      "controller": "RKU",
+      "controller": "UK01",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK01"
     },
     "UA_MRG_70858b70843b": {
-      "controller": "RKU",
+      "controller": "UK07",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK07"
     },
     "UA_MRG_71f8199a8d07": {
-      "controller": "RKU",
+      "controller": "UK01",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK01"
     },
     "UA_MRG_72c94a3ccd70": {
-      "controller": "RKP",
+      "controller": "PG04",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG04"
     },
     "UA_MRG_73aa15b32010": {
-      "controller": "RKU",
+      "controller": "UK05",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK05"
     },
     "UA_MRG_76175923bdd1": {
       "controller": "RKU",
@@ -7494,81 +9952,81 @@
       "owner": "RKU"
     },
     "UA_MRG_76b1b94d5856": {
-      "controller": "RKU",
+      "controller": "UK01",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK01"
     },
     "UA_MRG_797d35ccfd2e": {
-      "controller": "RKU",
+      "controller": "UK05",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK05"
     },
     "UA_MRG_7db72d35cf6c": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "UA_MRG_7e91c55da78e": {
-      "controller": "RKU",
+      "controller": "UK04",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK04"
     },
     "UA_MRG_7f067ceac5cb": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_837595aeea03": {
-      "controller": "RKU",
+      "controller": "UK08",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK08"
     },
     "UA_MRG_873c83173170": {
-      "controller": "RKU",
+      "controller": "UK05",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK05"
     },
     "UA_MRG_87ad72dae9b5": {
-      "controller": "RKU",
+      "controller": "UK06",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK06"
     },
     "UA_MRG_8c4b9e4808b7": {
-      "controller": "RKU",
+      "controller": "UK01",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK01"
     },
     "UA_MRG_8e1ed09f0e12": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_8e995a06a742": {
-      "controller": "RKU",
+      "controller": "UK08",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK08"
     },
     "UA_MRG_8f0f1aca728a": {
       "controller": "RKU",
@@ -7578,67 +10036,67 @@
       "owner": "RKU"
     },
     "UA_MRG_91f1c11e596f": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "UA_MRG_93291f71dff3": {
-      "controller": "RKU",
+      "controller": "UK01",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK01"
     },
     "UA_MRG_95a5c2e0f114": {
-      "controller": "RKU",
+      "controller": "UK04",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK04"
     },
     "UA_MRG_97cb7eda9f1d": {
-      "controller": "RKU",
+      "controller": "UK07",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK07"
     },
     "UA_MRG_98ce0c6febb4": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "UA_MRG_9c6077315d06": {
-      "controller": "RKP",
+      "controller": "PG04",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG04"
     },
     "UA_MRG_9cc4d817d067": {
-      "controller": "RKU",
+      "controller": "UK04",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK04"
     },
     "UA_MRG_9e7d5f1ce841": {
-      "controller": "RKU",
+      "controller": "UK06",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK06"
     },
     "UA_MRG_9fc8b136c3a6": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_a96bf83a0ff4": {
       "controller": "RKU",
@@ -7648,32 +10106,32 @@
       "owner": "RKU"
     },
     "UA_MRG_ab85624a51f5": {
-      "controller": "RKP",
+      "controller": "PG04",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG04"
     },
     "UA_MRG_ae35953e4a30": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_b0fab68c785d": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_b417c43a40cb": {
-      "controller": "RKU",
+      "controller": "UK05",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK05"
     },
     "UA_MRG_b54ca702a003": {
       "controller": "RKU",
@@ -7683,11 +10141,11 @@
       "owner": "RKU"
     },
     "UA_MRG_b75cd2d6110f": {
-      "controller": "RKU",
+      "controller": "UK04",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK04"
     },
     "UA_MRG_b828b24bbda1": {
       "controller": "TNS",
@@ -7697,46 +10155,46 @@
       "owner": "TNS"
     },
     "UA_MRG_ba89d2e82c09": {
-      "controller": "RKU",
+      "controller": "UK05",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK05"
     },
     "UA_MRG_bde664b68d7f": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "UA_MRG_c2b5f29d91e8": {
-      "controller": "RKU",
+      "controller": "UK07",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK07"
     },
     "UA_MRG_c5aa2c8a6048": {
-      "controller": "RKU",
+      "controller": "UK04",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK04"
     },
     "UA_MRG_c74c01b39f8e": {
-      "controller": "RKU",
+      "controller": "UK04",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK04"
     },
     "UA_MRG_c8f134fbd5da": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "UA_MRG_ce31c0ac496b": {
       "controller": "TNS",
@@ -7746,60 +10204,60 @@
       "owner": "TNS"
     },
     "UA_MRG_d4f151f823ef": {
-      "controller": "RKP",
+      "controller": "PG04",
       "cores": [
         "RKP"
       ],
-      "owner": "RKP"
+      "owner": "PG04"
     },
     "UA_MRG_d6223fcd4bc5": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_d727a8cfaa69": {
-      "controller": "RKU",
+      "controller": "UK05",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK05"
     },
     "UA_MRG_dbee0923a48b": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_de7101fe7980": {
-      "controller": "RKU",
+      "controller": "UK06",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK06"
     },
     "UA_MRG_de7e916ec1cb": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_e0dcc6adce13": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_e3c0520ffdd5": {
-      "controller": "RKU",
+      "controller": "UK05",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK05"
     },
     "UA_MRG_ec2bf97653b5": {
       "controller": "TNS",
@@ -7809,11 +10267,11 @@
       "owner": "TNS"
     },
     "UA_MRG_f49493422ebe": {
-      "controller": "RKU",
+      "controller": "UK03",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK03"
     },
     "UA_MRG_fbcb4404788c": {
       "controller": "RKU",
@@ -7823,18 +10281,193 @@
       "owner": "RKU"
     },
     "UA_MRG_fd8e40834959": {
-      "controller": "RKU",
+      "controller": "UK02",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK02"
     },
     "UA_MRG_ff6ac32ac4e3": {
-      "controller": "RKU",
+      "controller": "UK01",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B10043952621964": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B10219511542041": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B10810755627981": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B1113173119948": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B11484774081003": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B1179884845086": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B12626856106214": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B1294553244801": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B13057195168049": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B13559545331448": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B1361262622940": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B13823475744665": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B14499181024319": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B150351319009": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "UA_RAY_74538382B15303326410198": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B15383579018603": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B15723930579981": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B16168555985033": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B16544098233158": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B17328028725822": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B17610954663111": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B17645619358290": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B17839198127311": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B18343308961646": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B19184608500024": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
     },
     "UA_RAY_74538382B19464931464269": {
       "controller": "TNS",
@@ -7843,12 +10476,236 @@
       ],
       "owner": "TNS"
     },
+    "UA_RAY_74538382B19608093506995": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B19676868566368": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B20048272724198": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B20694939957091": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B20988283989287": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B21297633796285": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B2161330582129": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B21914315222818": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B23045356862491": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B23242546961479": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B23313109833663": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B23907235979788": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B23953232699474": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
     "UA_RAY_74538382B24000649598641": {
       "controller": "TNS",
       "cores": [
         "TNS"
       ],
       "owner": "TNS"
+    },
+    "UA_RAY_74538382B24072865224387": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B24236776375789": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B2732576684893": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B27410242056643": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B28831490249541": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B29269701893700": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B29845079622826": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B30351514928450": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B30474831618663": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B3075345491126": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B30799636343123": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B31597126471541": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B32095344223749": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B3276437105714": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B32839428556025": {
+      "controller": "UK02",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK02"
+    },
+    "UA_RAY_74538382B33094259068281": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B3314448443504": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B332128375794": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B33781793273381": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
     },
     "UA_RAY_74538382B34306237745090": {
       "controller": "TNS",
@@ -7857,12 +10714,47 @@
       ],
       "owner": "TNS"
     },
+    "UA_RAY_74538382B34689599554445": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
     "UA_RAY_74538382B34820599431847": {
       "controller": "ROM",
       "cores": [
         "ROM"
       ],
       "owner": "ROM"
+    },
+    "UA_RAY_74538382B35146860339147": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "UA_RAY_74538382B35301744305605": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "UA_RAY_74538382B35313257426644": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B36501884751905": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
     },
     "UA_RAY_74538382B36709578446445": {
       "controller": "RKM",
@@ -7871,12 +10763,250 @@
       ],
       "owner": "RKM"
     },
+    "UA_RAY_74538382B36897928857836": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B36929178896395": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B36952464312213": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B36980255523800": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B37171380171685": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B37223682167383": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B3760492540112": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B37791268598116": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B37973254287789": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B38253727574875": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B3900479393084": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B39784518508744": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B40204431292765": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "UA_RAY_74538382B41206945038645": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B42205538030067": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B42239251891056": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B42406222783177": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B42847215196778": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B43402639614828": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B43795583594371": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B44220139144156": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B44474254323889": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B44501351674000": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B45068545633774": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
     "UA_RAY_74538382B45881397075814": {
       "controller": "RKM",
       "cores": [
         "RKM"
       ],
       "owner": "RKM"
+    },
+    "UA_RAY_74538382B46392233077619": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B46710488362187": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B46794704390703": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B46853229377150": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B47122589681539": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B47758211773177": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B47818615416103": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B48347776111848": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B48774443336138": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B49623999622134": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
     },
     "UA_RAY_74538382B49727252906057": {
       "controller": "TNS",
@@ -7885,12 +11015,397 @@
       ],
       "owner": "TNS"
     },
+    "UA_RAY_74538382B50426750850815": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B51195623672150": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "UA_RAY_74538382B51634820959847": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B51921119694159": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B51989583187875": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B52051409545176": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "UA_RAY_74538382B52096657726601": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B52142389762962": {
+      "controller": "UK02",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK02"
+    },
+    "UA_RAY_74538382B52931084418443": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B52948461958272": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B53011721841283": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B53420808029005": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B54113761495064": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B55212312657182": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B55408999642819": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B55698458190122": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B5599119898653": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B56277130334747": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
     "UA_RAY_74538382B56756126132930": {
       "controller": "TNS",
       "cores": [
         "TNS"
       ],
       "owner": "TNS"
+    },
+    "UA_RAY_74538382B56857399435570": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "UA_RAY_74538382B57022409328323": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B5714887404176": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B57692221763967": {
+      "controller": "UK02",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK02"
+    },
+    "UA_RAY_74538382B57790499946350": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B57991939893011": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B58806562521535": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "UA_RAY_74538382B59316427092609": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B60058274039512": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B60808123109786": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B60964237816069": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B61089393980714": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B61551312903365": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B62014959099240": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B62779126534418": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B63146168478131": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B63824501838973": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B63843280303146": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B64329946545346": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B65177906747126": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B65631972109498": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B66083941235299": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B67308569242211": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B6752863603231": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B68112456325611": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B68255145682197": {
+      "controller": "UK02",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK02"
+    },
+    "UA_RAY_74538382B6869191817667": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "UA_RAY_74538382B68825553908118": {
+      "controller": "UK02",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK02"
+    },
+    "UA_RAY_74538382B69155666487417": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B70043309892570": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B71334227440013": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B71954626153569": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B72123275564902": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B72285239783987": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B72369548204787": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B72519912366476": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B72550121130033": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
     },
     "UA_RAY_74538382B72647920433352": {
       "controller": "TNS",
@@ -7899,12 +11414,355 @@
       ],
       "owner": "TNS"
     },
+    "UA_RAY_74538382B72863696789776": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B73102854459711": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B73193392833506": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B7363516927626": {
+      "controller": "UK02",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK02"
+    },
+    "UA_RAY_74538382B74407255776409": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B77165188287872": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B78037249212092": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B78065593112494": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B7822777781560": {
+      "controller": "UK07",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK07"
+    },
+    "UA_RAY_74538382B79038092338263": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B79592812488535": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B79975421345437": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B80134977422421": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B80427643782366": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B80563569865238": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B81176113996215": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B811800225931": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B83226976460707": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B83290488809947": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B84040377374615": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B84610439401970": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B8481477190191": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B85307919179669": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B85427402456891": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B85739457006484": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B85800934600856": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B86462977342473": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B86672078093677": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B8704633300515": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B87091028068119": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B87705908812983": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B88125912704040": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B88282912225835": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B88368635206807": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B88832969225176": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B89155529549277": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B89307192182420": {
+      "controller": "UK02",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK02"
+    },
+    "UA_RAY_74538382B89403854124425": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
     "UA_RAY_74538382B90572707310825": {
       "controller": "TNS",
       "cores": [
         "TNS"
       ],
       "owner": "TNS"
+    },
+    "UA_RAY_74538382B91393089585676": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B91689640579793": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B9177697938380": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B91806639169097": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B91909296876216": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
+    },
+    "UA_RAY_74538382B92334683682599": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B92549368661816": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B92678915216320": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B927387955127": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
+    },
+    "UA_RAY_74538382B92774727366654": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B92973355473211": {
+      "controller": "UK04",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK04"
     },
     "UA_RAY_74538382B94391556881320": {
       "controller": "TNS",
@@ -7913,12 +11771,89 @@
       ],
       "owner": "TNS"
     },
+    "UA_RAY_74538382B9478118461291": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B95195670192940": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B95492559683598": {
+      "controller": "UK06",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK06"
+    },
+    "UA_RAY_74538382B97249439308301": {
+      "controller": "PG04",
+      "cores": [
+        "RKP"
+      ],
+      "owner": "PG04"
+    },
+    "UA_RAY_74538382B97324557643268": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B9733134987595": {
+      "controller": "UK01",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK01"
+    },
+    "UA_RAY_74538382B97447105405204": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B98557569749448": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
+    "UA_RAY_74538382B98672866452807": {
+      "controller": "UK03",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK03"
+    },
     "UA_RAY_74538382B99156650022607": {
       "controller": "TNS",
       "cores": [
         "TNS"
       ],
       "owner": "TNS"
+    },
+    "UA_RAY_74538382B99860915109561": {
+      "controller": "UK05",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK05"
+    },
+    "UA_RAY_74538382B99908513430661": {
+      "controller": "UK08",
+      "cores": [
+        "RKU"
+      ],
+      "owner": "UK08"
     },
     "UKN06": {
       "controller": "NIE",
@@ -8080,6 +12015,41 @@
         "WLS"
       ],
       "owner": "WLS"
+    },
+    "US_CNTY_15001": {
+      "controller": "JHAW",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JHAW"
+    },
+    "US_CNTY_15003": {
+      "controller": "JHAW",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JHAW"
+    },
+    "US_CNTY_15005": {
+      "controller": "JHAW",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JHAW"
+    },
+    "US_CNTY_15007": {
+      "controller": "JHAW",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JHAW"
+    },
+    "US_CNTY_15009": {
+      "controller": "JHAW",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JHAW"
     },
     "US_MRG_03d789d015aa": {
       "controller": "USA",
@@ -8515,6 +12485,34 @@
       ],
       "owner": "KGZ"
     },
+    "VNM-451": {
+      "controller": "VIC",
+      "cores": [
+        "VIC"
+      ],
+      "owner": "VIC"
+    },
+    "VNM-457": {
+      "controller": "VIC",
+      "cores": [
+        "VIC"
+      ],
+      "owner": "VIC"
+    },
+    "VNM-511": {
+      "controller": "VIC",
+      "cores": [
+        "VIC"
+      ],
+      "owner": "VIC"
+    },
+    "VNM-512": {
+      "controller": "VIC",
+      "cores": [
+        "VIC"
+      ],
+      "owner": "VIC"
+    },
     "XK_ADM1_KOS-5909": {
       "cores": [
         "SER"
@@ -8546,7 +12544,7 @@
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#ba9e9e",
-      "color_policy": "palette",
+      "color_policy": "locked",
       "controller_feature_count": 0,
       "display_name": "Amur",
       "display_name_en": "Amur",
@@ -8622,6 +12620,47 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "AYR": {
+      "base_iso2": "NE",
+      "capital_state_id": null,
+      "color_hex": "#9c8352",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 3,
+      "display_name": "Kel Ayr",
+      "display_name_en": "Kel Ayr",
+      "display_name_zh": "凯尔艾尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "NE",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_ayr",
+      "provenance_iso2": "NE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ayr"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "AYR"
+    },
     "AZH": {
       "color_hex": "#388a33",
       "color_policy": "locked",
@@ -8631,12 +12670,94 @@
       "mode": "override",
       "parent_owner_tag": "JAP"
     },
+    "AZW": {
+      "base_iso2": "ML",
+      "capital_state_id": null,
+      "color_hex": "#856ea3",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 2,
+      "display_name": "Azawad",
+      "display_name_en": "Azawad",
+      "display_name_zh": "阿扎瓦德",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ML",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_azw",
+      "provenance_iso2": "ML",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_azw"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "AZW"
+    },
     "BHU": {
       "display_name": "Bhutan",
       "display_name_en": "Bhutan",
       "display_name_zh": "不丹王国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "BKF": {
+      "base_iso2": "BF",
+      "capital_state_id": null,
+      "color_hex": "#b97091",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 6,
+      "display_name": "Mossiland",
+      "display_name_en": "Mossiland",
+      "display_name_zh": "莫西兰",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BF",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_bkf",
+      "provenance_iso2": "BF",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_bkf"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "BKF"
     },
     "BKR": {
       "display_name": "Bashkir",
@@ -8741,6 +12862,47 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "CAO": {
+      "base_iso2": "NG",
+      "capital_state_id": null,
+      "color_hex": "#a86c3f",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 54,
+      "display_name": "Cameroon",
+      "display_name_en": "Cameroon",
+      "display_name_zh": "喀麦隆",
+      "entry_kind": "scenario_subject",
+      "feature_count": 54,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "NG",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_cao",
+      "provenance_iso2": "NG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_cao"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "CAO"
+    },
     "CEY": {
       "color_hex": "#570825",
       "color_policy": "locked",
@@ -8749,6 +12911,47 @@
       "display_name_zh": "锡兰共和国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "CHD": {
+      "base_iso2": "TD",
+      "capital_state_id": null,
+      "color_hex": "#b19b66",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 5,
+      "display_name": "Chad",
+      "display_name_en": "Chad",
+      "display_name_zh": "乍得",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "TD",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_chd",
+      "provenance_iso2": "TD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_chd"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "CHD"
     },
     "CHI": {
       "color_hex": "#943161",
@@ -8819,12 +13022,94 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "CRI": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#4a4a4a",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 18,
+      "display_name": "Reichsgau Gotenland",
+      "display_name_en": "Reichsgau Gotenland",
+      "display_name_zh": "哥特兰帝国大区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 18,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "GER",
+      "parent_owner_tags": [
+        "GER"
+      ],
+      "primary_rule_source": "tno_cri",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_cri"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "CRI"
+    },
     "CUB": {
       "display_name": "Cuba",
       "display_name_en": "Cuba",
       "display_name_zh": "古巴共和国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "DAH": {
+      "base_iso2": "BJ",
+      "capital_state_id": null,
+      "color_hex": "#8d6c48",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 15,
+      "display_name": "Dahomey",
+      "display_name_en": "Dahomey",
+      "display_name_zh": "达荷美",
+      "entry_kind": "scenario_subject",
+      "feature_count": 15,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BJ",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_dah",
+      "provenance_iso2": "BJ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_dah"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "DAH"
     },
     "DOM": {
       "color_hex": "#ae693f",
@@ -8863,7 +13148,7 @@
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#b86378",
-      "color_policy": "palette",
+      "color_policy": "locked",
       "controller_feature_count": 0,
       "display_name": "Free Aviators",
       "display_name_en": "Free Aviators",
@@ -8898,6 +13183,50 @@
       "subject_kind": "",
       "synthetic_owner": false,
       "tag": "FAV"
+    },
+    "FFR": {
+      "base_iso2": "CI",
+      "capital_state_id": null,
+      "color_hex": "#464678",
+      "color_policy": "locked",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 14,
+      "display_name": "Free France",
+      "display_name_en": "Free France",
+      "display_name_zh": "自由法国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 14,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CI",
+      "notes": "Free France restored in West Africa from the requested Ivory Coast transfer set in TNO 1962.",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_1962_ffr_manual_override",
+      "provenance_iso2": "CI",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_1962_ffr_manual_override",
+        "tno_ffr"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "FFR"
     },
     "FRA": {
       "color_hex": "#5a6e8c",
@@ -8954,6 +13283,47 @@
       "mode": "override",
       "parent_owner_tag": "GER"
     },
+    "GHA": {
+      "base_iso2": "GH",
+      "capital_state_id": null,
+      "color_hex": "#cd934c",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 10,
+      "display_name": "Ghana",
+      "display_name_en": "Ghana",
+      "display_name_zh": "加纳",
+      "entry_kind": "scenario_subject",
+      "feature_count": 10,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GH",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_gha",
+      "provenance_iso2": "GH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_gha"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "GHA"
+    },
     "GMA": {
       "color_hex": "#8e4141",
       "color_policy": "locked",
@@ -8985,6 +13355,47 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "GUI": {
+      "base_iso2": "GN",
+      "capital_state_id": null,
+      "color_hex": "#b35352",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 7,
+      "display_name": "Guinea",
+      "display_name_en": "Guinea",
+      "display_name_zh": "几内亚",
+      "entry_kind": "scenario_subject",
+      "feature_count": 7,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GN",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_gui",
+      "provenance_iso2": "GN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_gui"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "GUI"
+    },
     "GUZ": {
       "color_hex": "#96637a",
       "color_policy": "locked",
@@ -9006,6 +13417,47 @@
       "display_name_zh": "海地共和国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "HAU": {
+      "base_iso2": "BF",
+      "capital_state_id": null,
+      "color_hex": "#647b9a",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 5,
+      "display_name": "Sokoto",
+      "display_name_en": "Sokoto",
+      "display_name_zh": "索科托",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BF",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_hau",
+      "provenance_iso2": "BF",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_hau"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "HAU"
     },
     "HON": {
       "color_hex": "#747a8d",
@@ -9041,6 +13493,88 @@
       "display_name_zh": "大日本帝国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "JHAW": {
+      "base_iso2": "US",
+      "capital_state_id": null,
+      "color_hex": "#cb6c85",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 5,
+      "display_name": "Hawaii Occupation Government",
+      "display_name_en": "Hawaii Occupation Government",
+      "display_name_zh": "夏威夷占领政府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "US",
+      "notes": "",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "tno_jhaw",
+      "provenance_iso2": "US",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_jhaw"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "JHAW"
+    },
+    "JTWN": {
+      "base_iso2": "TW",
+      "capital_state_id": null,
+      "color_hex": "#e66e6d",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 21,
+      "display_name": "Taiwan Government-General",
+      "display_name_en": "Taiwan Government-General",
+      "display_name_zh": "台湾总督府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 21,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "TW",
+      "notes": "",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "tno_jtwn",
+      "provenance_iso2": "TW",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_jtwn"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_eastern_asia",
+      "subregion_label": "Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "JTWN"
     },
     "KAZ": {
       "display_name": "Kazakhstan",
@@ -9117,6 +13651,47 @@
       "mode": "override",
       "parent_owner_tag": "JAP"
     },
+    "MAU": {
+      "base_iso2": "MR",
+      "capital_state_id": null,
+      "color_hex": "#58976c",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 8,
+      "display_name": "Mauritania",
+      "display_name_en": "Mauritania",
+      "display_name_zh": "毛里塔尼亚",
+      "entry_kind": "scenario_subject",
+      "feature_count": 8,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MR",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_mau",
+      "provenance_iso2": "MR",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_mau"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "MAU"
+    },
     "MC": {
       "color_hex": "#ff748c",
       "color_policy": "locked",
@@ -9168,6 +13743,88 @@
       "subject_kind": "",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe"
+    },
+    "MLI": {
+      "base_iso2": "ML",
+      "capital_state_id": null,
+      "color_hex": "#c1b04b",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 4,
+      "display_name": "Mali",
+      "display_name_en": "Mali",
+      "display_name_zh": "马里",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ML",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_mli",
+      "provenance_iso2": "ML",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_mli"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "MLI"
+    },
+    "MLY": {
+      "base_iso2": "MY",
+      "capital_state_id": null,
+      "color_hex": "#bc663f",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 2,
+      "display_name": "United Malayan Anti-Japanese Front",
+      "display_name_en": "United Malayan Anti-Japanese Front",
+      "display_name_zh": "马来亚联合抗日阵线",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MY",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_mly",
+      "provenance_iso2": "MY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_mly"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "MLY"
     },
     "NCP": {
       "color_hex": "#9f2349",
@@ -9222,11 +13879,52 @@
       "subregion_id": "",
       "subregion_label": ""
     },
+    "NRB": {
+      "base_iso2": "MY",
+      "capital_state_id": null,
+      "color_hex": "#590422",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Nanpo Gunseikan",
+      "display_name_en": "Nanpo Gunseikan",
+      "display_name_zh": "南方军政监部",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MY",
+      "notes": "",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "tno_nrb",
+      "provenance_iso2": "MY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_nrb"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "NRB"
+    },
     "NRL": {
       "base_iso2": "RU",
       "capital_state_id": null,
-      "color_hex": "#d2d5db",
-      "color_policy": "palette",
+      "color_hex": "#9aa5b1",
+      "color_policy": "locked",
       "controller_feature_count": 0,
       "display_name": "Norilsk",
       "display_name_en": "Norilsk",
@@ -9269,11 +13967,175 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "OE01": {
+      "base_iso2": "EE",
+      "capital_state_id": null,
+      "color_hex": "#504e40",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 5,
+      "display_name": "Generalbezirk Estland",
+      "display_name_en": "Generalbezirk Estland",
+      "display_name_zh": "东部总区·爱沙尼亚总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "EE",
+      "notes": "",
+      "parent_owner_tag": "RKO",
+      "parent_owner_tags": [
+        "RKO"
+      ],
+      "primary_rule_source": "tno_oe01",
+      "provenance_iso2": "EE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_oe01"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "synthetic_owner": false,
+      "tag": "OE01"
+    },
+    "OE02": {
+      "base_iso2": "LT",
+      "capital_state_id": null,
+      "color_hex": "#7d7b6d",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 11,
+      "display_name": "Generalbezirk Litauen",
+      "display_name_en": "Generalbezirk Litauen",
+      "display_name_zh": "东部总区·立陶宛总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 11,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "LT",
+      "notes": "",
+      "parent_owner_tag": "RKO",
+      "parent_owner_tags": [
+        "RKO"
+      ],
+      "primary_rule_source": "tno_oe02",
+      "provenance_iso2": "LT",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_oe02"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "synthetic_owner": false,
+      "tag": "OE02"
+    },
+    "OE03": {
+      "base_iso2": "BY",
+      "capital_state_id": null,
+      "color_hex": "#716f63",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 44,
+      "display_name": "Generalbezirk Weißruthenien",
+      "display_name_en": "Generalbezirk Weißruthenien",
+      "display_name_zh": "东部总区·白鲁塞尼亚总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 44,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BY",
+      "notes": "",
+      "parent_owner_tag": "RKO",
+      "parent_owner_tags": [
+        "RKO"
+      ],
+      "primary_rule_source": "tno_oe03",
+      "provenance_iso2": "BY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_oe03"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "OE03"
+    },
+    "OE04": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#5a594d",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 25,
+      "display_name": "Generalbezirk Pleskau",
+      "display_name_en": "Generalbezirk Pleskau",
+      "display_name_zh": "东部总区·普斯科夫总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 25,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKO",
+      "parent_owner_tags": [
+        "RKO"
+      ],
+      "primary_rule_source": "tno_oe04",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_oe04"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "OE04"
+    },
     "OMO": {
       "base_iso2": "RU",
       "capital_state_id": null,
-      "color_hex": "#d2d5db",
-      "color_policy": "palette",
+      "color_hex": "#c0b3a1",
+      "color_policy": "locked",
       "controller_feature_count": 0,
       "display_name": "Omolon",
       "display_name_en": "Omolon",
@@ -9392,6 +14254,10 @@
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe"
     },
+    "OUR": {
+      "color_hex": "#8d87bd",
+      "color_policy": "locked"
+    },
     "PAN": {
       "display_name": "Panama",
       "display_name_en": "Panama",
@@ -9403,6 +14269,170 @@
       "color_hex": "#abc2f0",
       "color_policy": "locked",
       "mode": "override"
+    },
+    "PG01": {
+      "base_iso2": "PL",
+      "capital_state_id": null,
+      "color_hex": "#2f2f30",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 4,
+      "display_name": "Generalgouvernement — Distrikt Warschau",
+      "display_name_en": "Generalgouvernement — Distrikt Warschau",
+      "display_name_zh": "波兰总督府·华沙区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PL",
+      "notes": "",
+      "parent_owner_tag": "RKP",
+      "parent_owner_tags": [
+        "RKP"
+      ],
+      "primary_rule_source": "tno_pg01",
+      "provenance_iso2": "PL",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_pg01"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "PG01"
+    },
+    "PG02": {
+      "base_iso2": "PL",
+      "capital_state_id": null,
+      "color_hex": "#5a5a5b",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 5,
+      "display_name": "Generalgouvernement — Distrikt Radom",
+      "display_name_en": "Generalgouvernement — Distrikt Radom",
+      "display_name_zh": "波兰总督府·拉多姆区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PL",
+      "notes": "",
+      "parent_owner_tag": "RKP",
+      "parent_owner_tags": [
+        "RKP"
+      ],
+      "primary_rule_source": "tno_pg02",
+      "provenance_iso2": "PL",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_pg02"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "PG02"
+    },
+    "PG03": {
+      "base_iso2": "PL",
+      "capital_state_id": null,
+      "color_hex": "#39393a",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 11,
+      "display_name": "Generalgouvernement — Distrikt Lublin",
+      "display_name_en": "Generalgouvernement — Distrikt Lublin",
+      "display_name_zh": "波兰总督府·卢布林区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 11,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PL",
+      "notes": "",
+      "parent_owner_tag": "RKP",
+      "parent_owner_tags": [
+        "RKP"
+      ],
+      "primary_rule_source": "tno_pg03",
+      "provenance_iso2": "PL",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_pg03"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "PG03"
+    },
+    "PG04": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#4f4f50",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 42,
+      "display_name": "Generalgouvernement — Distrikt Galizien",
+      "display_name_en": "Generalgouvernement — Distrikt Galizien",
+      "display_name_zh": "波兰总督府·加利西亚区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 42,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "RKP",
+      "parent_owner_tags": [
+        "RKP"
+      ],
+      "primary_rule_source": "tno_pg04",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_pg04"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "PG04"
     },
     "PHI": {
       "display_name": "Philippines",
@@ -9502,6 +14532,88 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "SEN": {
+      "base_iso2": "SN",
+      "capital_state_id": null,
+      "color_hex": "#41968f",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 19,
+      "display_name": "Senegal",
+      "display_name_en": "Senegal",
+      "display_name_zh": "塞内加尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 19,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SN",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_sen",
+      "provenance_iso2": "SN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_sen"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "SEN"
+    },
+    "SHO": {
+      "base_iso2": "MY",
+      "capital_state_id": null,
+      "color_hex": "#bf4d4e",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 12,
+      "display_name": "Shōnan",
+      "display_name_en": "Shōnan",
+      "display_name_zh": "昭南",
+      "entry_kind": "scenario_subject",
+      "feature_count": 12,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MY",
+      "notes": "",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "tno_sho",
+      "provenance_iso2": "MY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_sho"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "SHO"
+    },
     "SHX": {
       "color_hex": "#9f647e",
       "color_policy": "locked",
@@ -9522,6 +14634,88 @@
       "display_name_zh": "暹罗",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "SIE": {
+      "base_iso2": "SL",
+      "capital_state_id": null,
+      "color_hex": "#6693b4",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 4,
+      "display_name": "Sierra Leone",
+      "display_name_en": "Sierra Leone",
+      "display_name_zh": "塞拉利昂",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SL",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_sie",
+      "provenance_iso2": "SL",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_sie"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "SIE"
+    },
+    "SPH": {
+      "base_iso2": "PH",
+      "capital_state_id": null,
+      "color_hex": "#a53e4d",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 14,
+      "display_name": "All-Filipino Revolutionary Socialist Republic",
+      "display_name_en": "All-Filipino Revolutionary Socialist Republic",
+      "display_name_zh": "全菲律宾革命社会主义共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 14,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PH",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_sph",
+      "provenance_iso2": "PH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_sph"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "SPH"
     },
     "SPR": {
       "base_iso2": "ES",
@@ -9626,8 +14820,377 @@
       "color_policy": "locked",
       "mode": "override"
     },
+    "UK01": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#42484f",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 39,
+      "display_name": "Generalbezirk Wolhynien-Podolien",
+      "display_name_en": "Generalbezirk Wolhynien-Podolien",
+      "display_name_zh": "乌克兰·沃里尼亚—波多利亚总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 39,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "RKU",
+      "parent_owner_tags": [
+        "RKU"
+      ],
+      "primary_rule_source": "tno_uk01",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_uk01"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "UK01"
+    },
+    "UK02": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#6e757c",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 19,
+      "display_name": "Generalbezirk Shitomir",
+      "display_name_en": "Generalbezirk Shitomir",
+      "display_name_zh": "乌克兰·日托米尔总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 19,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "RKU",
+      "parent_owner_tags": [
+        "RKU"
+      ],
+      "primary_rule_source": "tno_uk02",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_uk02"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "UK02"
+    },
+    "UK03": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#4d5359",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 39,
+      "display_name": "Generalbezirk Tschernigow",
+      "display_name_en": "Generalbezirk Tschernigow",
+      "display_name_zh": "乌克兰·切尔尼戈夫总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 39,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "RKU",
+      "parent_owner_tags": [
+        "RKU"
+      ],
+      "primary_rule_source": "tno_uk03",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_uk03"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "UK03"
+    },
+    "UK04": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#64696f",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 30,
+      "display_name": "Generalbezirk Dnjepropetrowsk",
+      "display_name_en": "Generalbezirk Dnjepropetrowsk",
+      "display_name_zh": "乌克兰·第聂伯罗彼得罗夫斯克总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 30,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "RKU",
+      "parent_owner_tags": [
+        "RKU"
+      ],
+      "primary_rule_source": "tno_uk04",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_uk04"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "UK04"
+    },
+    "UK05": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#696f76",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 27,
+      "display_name": "Generalbezirk Nikolajew",
+      "display_name_en": "Generalbezirk Nikolajew",
+      "display_name_zh": "乌克兰·尼古拉耶夫总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 27,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "RKU",
+      "parent_owner_tags": [
+        "RKU"
+      ],
+      "primary_rule_source": "tno_uk05",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_uk05"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "UK05"
+    },
+    "UK06": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#494d53",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 29,
+      "display_name": "Generalbezirk Taurien",
+      "display_name_en": "Generalbezirk Taurien",
+      "display_name_zh": "乌克兰·塔夫利达总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 29,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "RKU",
+      "parent_owner_tags": [
+        "RKU"
+      ],
+      "primary_rule_source": "tno_uk06",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_uk06"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "UK06"
+    },
+    "UK07": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#53585e",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 28,
+      "display_name": "Generalbezirk Charkow",
+      "display_name_en": "Generalbezirk Charkow",
+      "display_name_zh": "乌克兰·哈尔科夫总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 28,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "RKU",
+      "parent_owner_tags": [
+        "RKU"
+      ],
+      "primary_rule_source": "tno_uk07",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_uk07"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "UK07"
+    },
+    "UK08": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#5d646a",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 34,
+      "display_name": "Generalbezirk Donez",
+      "display_name_en": "Generalbezirk Donez",
+      "display_name_zh": "乌克兰·顿涅茨总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 34,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "RKU",
+      "parent_owner_tags": [
+        "RKU"
+      ],
+      "primary_rule_source": "tno_uk08",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_uk08"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "UK08"
+    },
+    "UPH": {
+      "base_iso2": "PH",
+      "capital_state_id": null,
+      "color_hex": "#527ba8",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 49,
+      "display_name": "Free Philippine Republic",
+      "display_name_en": "Free Philippine Republic",
+      "display_name_zh": "自由菲律宾共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 49,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PH",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_uph",
+      "provenance_iso2": "PH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_uph"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "UPH"
+    },
     "URA": {
-      "color_hex": "#b86378",
+      "color_hex": "#8f405f",
       "color_policy": "locked",
       "display_name": "Ural Military District Red Air Force",
       "display_name_en": "Ural Military District Red Air Force",
@@ -9645,6 +15208,10 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "URL": {
+      "color_hex": "#b4b3da",
+      "color_policy": "locked"
+    },
     "VEN": {
       "color_hex": "#a55f6d",
       "color_policy": "locked",
@@ -9653,6 +15220,47 @@
       "display_name_zh": "委内瑞拉共和国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "VIC": {
+      "base_iso2": "VN",
+      "capital_state_id": null,
+      "color_hex": "#a97838",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 4,
+      "display_name": "Communist Vietnam",
+      "display_name_en": "Communist Vietnam",
+      "display_name_zh": "越南共产主义政权",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "VN",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_vic",
+      "provenance_iso2": "VN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_vic"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "VIC"
     },
     "VIN": {
       "display_name": "Vietnam",
@@ -9749,6 +15357,47 @@
       "inspector_group_label": "China Region",
       "mode": "override",
       "parent_owner_tag": "JAP"
+    },
+    "YOR": {
+      "base_iso2": "NG",
+      "capital_state_id": null,
+      "color_hex": "#7e9d4e",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 8,
+      "display_name": "Yorubaland",
+      "display_name_en": "Yorubaland",
+      "display_name_zh": "约鲁巴兰",
+      "entry_kind": "scenario_subject",
+      "feature_count": 8,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "NG",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [
+        ""
+      ],
+      "primary_rule_source": "tno_yor",
+      "provenance_iso2": "NG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_yor"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "YOR"
     },
     "YUN": {
       "color_hex": "#803e50",

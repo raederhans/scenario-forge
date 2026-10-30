@@ -20,6 +20,8 @@ from tools.check_scenario_contracts import write_json
 from tools.materialize_polar_scenarios import refresh_scenario
 
 SCENARIOS = ("hoi4_1936", "hoi4_1939")
+# Rules may also target TNO through tools/apply_tno_split_overlay.py; the CLI here stays HOI4-only.
+RULE_SCENARIOS = (*SCENARIOS, "tno_1962")
 SELECTORS = {"country_codes", "prefectures", "hierarchy_groups", "hoi4_states", "feature_ids",
              "owners", "bbox", "bboxes"}
 
@@ -159,7 +161,7 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
         if not eid or eid in ids:
             raise ValueError(f"entry {eid}: missing or duplicate id")
         ids.add(eid)
-        if not entry.get("scenarios") or not set(entry["scenarios"]) <= set(SCENARIOS):
+        if not entry.get("scenarios") or not set(entry["scenarios"]) <= set(RULE_SCENARIOS):
             raise ValueError(f"entry {eid}: invalid scenarios")
         if "smooth_enclaves" in entry:
             continue

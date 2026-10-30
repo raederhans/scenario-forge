@@ -14975,6 +14975,52 @@
       "visual_only": true
     },
     {
+      "area_delta": -0.019953,
+      "controller_hint_present": true,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "startup_bootstrap"
+      ],
+      "feature_id": "RU_ARCTIC_FB_BOP_060",
+      "final_area": 0.003275,
+      "missing_stages": [],
+      "owner_hint_present": true,
+      "prefix": "RU_ARCTIC_FB_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": false,
+        "runtime": true,
+        "startup_bootstrap": true
+      },
+      "source_area": 0.023228,
+      "visual_only": true
+    },
+    {
+      "area_delta": -3.480278,
+      "controller_hint_present": true,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "startup_bootstrap"
+      ],
+      "feature_id": "RU_ARCTIC_FB_BOP_062",
+      "final_area": 125.100313,
+      "missing_stages": [],
+      "owner_hint_present": true,
+      "prefix": "RU_ARCTIC_FB_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": false,
+        "runtime": true,
+        "startup_bootstrap": true
+      },
+      "source_area": 128.580591,
+      "visual_only": true
+    },
+    {
       "area_delta": -0.1891,
       "controller_hint_present": true,
       "drop_reason": "",
@@ -14983,7 +15029,7 @@
         "detail_chunk",
         "startup_bootstrap"
       ],
-      "feature_id": "RU_ARCTIC_FB_BRY_004",
+      "feature_id": "RU_ARCTIC_FB_BRY_052",
       "final_area": 0.032711,
       "missing_stages": [],
       "owner_hint_present": true,
@@ -15075,7 +15121,7 @@
         "detail_chunk",
         "startup_bootstrap"
       ],
-      "feature_id": "RU_ARCTIC_FB_GER_008",
+      "feature_id": "RU_ARCTIC_FB_GER_054",
       "final_area": 3.144406,
       "missing_stages": [],
       "owner_hint_present": true,
@@ -15179,6 +15225,29 @@
         "startup_bootstrap": true
       },
       "source_area": 0.855346,
+      "visual_only": true
+    },
+    {
+      "area_delta": -0.510716,
+      "controller_hint_present": true,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "startup_bootstrap"
+      ],
+      "feature_id": "RU_ARCTIC_FB_KAZ_056",
+      "final_area": 0.193418,
+      "missing_stages": [],
+      "owner_hint_present": true,
+      "prefix": "RU_ARCTIC_FB_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": false,
+        "runtime": true,
+        "startup_bootstrap": true
+      },
+      "source_area": 0.704134,
       "visual_only": true
     },
     {
@@ -15343,6 +15412,29 @@
       "visual_only": true
     },
     {
+      "area_delta": -0.1891,
+      "controller_hint_present": true,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "startup_bootstrap"
+      ],
+      "feature_id": "RU_ARCTIC_FB_MON_053",
+      "final_area": 0.032711,
+      "missing_stages": [],
+      "owner_hint_present": true,
+      "prefix": "RU_ARCTIC_FB_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": false,
+        "runtime": true,
+        "startup_bootstrap": true
+      },
+      "source_area": 0.221811,
+      "visual_only": true
+    },
+    {
       "area_delta": -0.510716,
       "controller_hint_present": true,
       "drop_reason": "",
@@ -15351,7 +15443,7 @@
         "detail_chunk",
         "startup_bootstrap"
       ],
-      "feature_id": "RU_ARCTIC_FB_NOV_020",
+      "feature_id": "RU_ARCTIC_FB_NOV_057",
       "final_area": 0.193418,
       "missing_stages": [],
       "owner_hint_present": true,
@@ -15363,6 +15455,121 @@
         "startup_bootstrap": true
       },
       "source_area": 0.704134,
+      "visual_only": true
+    },
+    {
+      "area_delta": -3.480278,
+      "controller_hint_present": true,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "startup_bootstrap"
+      ],
+      "feature_id": "RU_ARCTIC_FB_NRL_063",
+      "final_area": 125.100313,
+      "missing_stages": [],
+      "owner_hint_present": true,
+      "prefix": "RU_ARCTIC_FB_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": false,
+        "runtime": true,
+        "startup_bootstrap": true
+      },
+      "source_area": 128.580591,
+      "visual_only": true
+    },
+    {
+      "area_delta": -0.531587,
+      "controller_hint_present": true,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "startup_bootstrap"
+      ],
+      "feature_id": "RU_ARCTIC_FB_NRL_066",
+      "final_area": 0.158461,
+      "missing_stages": [],
+      "owner_hint_present": true,
+      "prefix": "RU_ARCTIC_FB_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": false,
+        "runtime": true,
+        "startup_bootstrap": true
+      },
+      "source_area": 0.690048,
+      "visual_only": true
+    },
+    {
+      "area_delta": -23.852523,
+      "controller_hint_present": true,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "startup_bootstrap"
+      ],
+      "feature_id": "RU_ARCTIC_FB_OMO_058",
+      "final_area": 0.21712,
+      "missing_stages": [],
+      "owner_hint_present": true,
+      "prefix": "RU_ARCTIC_FB_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": false,
+        "runtime": true,
+        "startup_bootstrap": true
+      },
+      "source_area": 24.069643,
+      "visual_only": true
+    },
+    {
+      "area_delta": -3.480278,
+      "controller_hint_present": true,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "startup_bootstrap"
+      ],
+      "feature_id": "RU_ARCTIC_FB_OMO_064",
+      "final_area": 125.100313,
+      "missing_stages": [],
+      "owner_hint_present": true,
+      "prefix": "RU_ARCTIC_FB_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": false,
+        "runtime": true,
+        "startup_bootstrap": true
+      },
+      "source_area": 128.580591,
+      "visual_only": true
+    },
+    {
+      "area_delta": -0.067805,
+      "controller_hint_present": true,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "startup_bootstrap"
+      ],
+      "feature_id": "RU_ARCTIC_FB_OMO_068",
+      "final_area": 0.025975,
+      "missing_stages": [],
+      "owner_hint_present": true,
+      "prefix": "RU_ARCTIC_FB_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": false,
+        "runtime": true,
+        "startup_bootstrap": true
+      },
+      "source_area": 0.09378,
       "visual_only": true
     },
     {
@@ -15489,7 +15696,7 @@
         "detail_chunk",
         "startup_bootstrap"
       ],
-      "feature_id": "RU_ARCTIC_FB_PFC_026",
+      "feature_id": "RU_ARCTIC_FB_PFC_059",
       "final_area": 0.21712,
       "missing_stages": [],
       "owner_hint_present": true,
@@ -15504,29 +15711,6 @@
       "visual_only": true
     },
     {
-      "area_delta": -0.019953,
-      "controller_hint_present": true,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "startup_bootstrap"
-      ],
-      "feature_id": "RU_ARCTIC_FB_PRM_027",
-      "final_area": 0.003275,
-      "missing_stages": [],
-      "owner_hint_present": true,
-      "prefix": "RU_ARCTIC_FB_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": false,
-        "runtime": true,
-        "startup_bootstrap": true
-      },
-      "source_area": 0.023228,
-      "visual_only": true
-    },
-    {
       "area_delta": -3.480278,
       "controller_hint_present": true,
       "drop_reason": "",
@@ -15535,7 +15719,7 @@
         "detail_chunk",
         "startup_bootstrap"
       ],
-      "feature_id": "RU_ARCTIC_FB_RFA_028",
+      "feature_id": "RU_ARCTIC_FB_RFA_065",
       "final_area": 125.100313,
       "missing_stages": [],
       "owner_hint_present": true,
@@ -15834,7 +16018,7 @@
         "detail_chunk",
         "startup_bootstrap"
       ],
-      "feature_id": "RU_ARCTIC_FB_TOM_041",
+      "feature_id": "RU_ARCTIC_FB_TOM_067",
       "final_area": 0.158461,
       "missing_stages": [],
       "owner_hint_present": true,
@@ -15872,6 +16056,29 @@
       "visual_only": true
     },
     {
+      "area_delta": -0.112243,
+      "controller_hint_present": true,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "startup_bootstrap"
+      ],
+      "feature_id": "RU_ARCTIC_FB_UK06_055",
+      "final_area": 3.144406,
+      "missing_stages": [],
+      "owner_hint_present": true,
+      "prefix": "RU_ARCTIC_FB_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": false,
+        "runtime": true,
+        "startup_bootstrap": true
+      },
+      "source_area": 3.256649,
+      "visual_only": true
+    },
+    {
       "area_delta": -0.021328,
       "controller_hint_present": true,
       "drop_reason": "",
@@ -15903,7 +16110,7 @@
         "detail_chunk",
         "startup_bootstrap"
       ],
-      "feature_id": "RU_ARCTIC_FB_USA_044",
+      "feature_id": "RU_ARCTIC_FB_USA_069",
       "final_area": 0.025975,
       "missing_stages": [],
       "owner_hint_present": true,
@@ -15938,6 +16145,29 @@
         "startup_bootstrap": true
       },
       "source_area": 0.005065,
+      "visual_only": true
+    },
+    {
+      "area_delta": -0.019953,
+      "controller_hint_present": true,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "startup_bootstrap"
+      ],
+      "feature_id": "RU_ARCTIC_FB_VOK_061",
+      "final_area": 0.003275,
+      "missing_stages": [],
+      "owner_hint_present": true,
+      "prefix": "RU_ARCTIC_FB_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": false,
+        "runtime": true,
+        "startup_bootstrap": true
+      },
+      "source_area": 0.023228,
       "visual_only": true
     },
     {
@@ -16097,7 +16327,7 @@
       "ATLPRV_": 90,
       "ATLSEA_": 116,
       "ATLSEA_FILL_": 370,
-      "RU_ARCTIC_FB_": 51
+      "RU_ARCTIC_FB_": 61
     },
     "owner_core": {
       "AQ": 1,
@@ -16114,17 +16344,17 @@
     },
     "runtime_political": {
       "AQ": 1,
-      "RU_ARCTIC_FB_": 51
+      "RU_ARCTIC_FB_": 61
     },
     "startup_bootstrap": {
-      "RU_ARCTIC_FB_": 51
+      "RU_ARCTIC_FB_": 61
     }
   },
   "summary": {
     "polar_feature_count": 1,
-    "protected_feature_count": 699,
+    "protected_feature_count": 709,
     "protected_prefix_drop_count": 0,
-    "runtime_only_shell_count": 51
+    "runtime_only_shell_count": 61
   },
   "version": 1
 }

@@ -1,6 +1,6 @@
 {
   "artifact_counts": {
-    "chunk_count": 211,
+    "chunk_count": 247,
     "feature_count": 9949,
     "water_count": 285
   },
@@ -111922,10 +111922,10 @@
     "AFA": {
       "base_iso2": "NE",
       "continent_label": "Africa",
-      "controller_feature_count": 117,
+      "controller_feature_count": 20,
       "display_name": "African Anarchy",
       "entry_kind": "scenario_country",
-      "feature_count": 117,
+      "feature_count": 20,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112089,10 +112089,10 @@
     "AOF": {
       "base_iso2": "SN",
       "continent_label": "Africa",
-      "controller_feature_count": 14,
+      "controller_feature_count": 2,
       "display_name": "French West Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 14,
+      "feature_count": 2,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112487,10 +112487,10 @@
     "BKR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 7,
+      "controller_feature_count": 6,
       "display_name": "Bashkir",
       "entry_kind": "scenario_country",
-      "feature_count": 7,
+      "feature_count": 6,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -112679,10 +112679,10 @@
     "BRY": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 21,
+      "controller_feature_count": 19,
       "display_name": "Buryat Soviet Socialist Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 21,
+      "feature_count": 19,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112778,10 +112778,10 @@
     "BWA": {
       "base_iso2": "NG",
       "continent_label": "Africa",
-      "controller_feature_count": 27,
+      "controller_feature_count": 1,
       "display_name": "British West Africa",
       "entry_kind": "scenario_country",
-      "feature_count": 27,
+      "feature_count": 1,
       "hidden_from_country_list": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -113009,10 +113009,10 @@
     "CHT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 19,
+      "controller_feature_count": 21,
       "display_name": "Far Eastern Tsardom",
       "entry_kind": "scenario_country",
-      "feature_count": 19,
+      "feature_count": 21,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113364,10 +113364,10 @@
     "FFR": {
       "base_iso2": "FR",
       "continent_label": "Africa",
-      "controller_feature_count": 5,
+      "controller_feature_count": 14,
       "display_name": "Free France",
       "entry_kind": "scenario_country",
-      "feature_count": 5,
+      "feature_count": 14,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113562,10 +113562,10 @@
     "GCO": {
       "base_iso2": "CD",
       "continent_label": "Africa",
-      "controller_feature_count": 96,
+      "controller_feature_count": 72,
       "display_name": "German Central Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 96,
+      "feature_count": 72,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113632,10 +113632,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 538,
+      "controller_feature_count": 520,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 538,
+      "feature_count": 520,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -113739,10 +113739,10 @@
     "GOR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 8,
+      "controller_feature_count": 11,
       "display_name": "13th Panzer Army - Gorky",
       "entry_kind": "scenario_country",
-      "feature_count": 8,
+      "feature_count": 11,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114330,10 +114330,10 @@
     "JAP": {
       "base_iso2": "JP",
       "continent_label": "Asia",
-      "controller_feature_count": 95,
+      "controller_feature_count": 69,
       "display_name": "Japan",
       "entry_kind": "",
-      "feature_count": 95,
+      "feature_count": 69,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -114464,10 +114464,10 @@
     "KOM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 14,
+      "controller_feature_count": 16,
       "display_name": "Komi Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 14,
+      "feature_count": 16,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114833,10 +114833,10 @@
     "MAL": {
       "base_iso2": "MY",
       "continent_label": "Asia",
-      "controller_feature_count": 20,
+      "controller_feature_count": 4,
       "display_name": "Malaya",
       "entry_kind": "scenario_subject",
-      "feature_count": 20,
+      "feature_count": 4,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114868,10 +114868,10 @@
     "MAN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 289,
+      "controller_feature_count": 287,
       "display_name": "Manchukuo",
       "entry_kind": "scenario_subject",
-      "feature_count": 289,
+      "feature_count": 287,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114936,10 +114936,10 @@
     "MEN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 87,
+      "controller_feature_count": 76,
       "display_name": "Mengjiang",
       "entry_kind": "scenario_subject",
-      "feature_count": 87,
+      "feature_count": 76,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115101,10 +115101,10 @@
     "MON": {
       "base_iso2": "MN",
       "continent_label": "Asia",
-      "controller_feature_count": 4,
+      "controller_feature_count": 15,
       "display_name": "Mongolia",
       "entry_kind": "",
-      "feature_count": 4,
+      "feature_count": 15,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115491,10 +115491,10 @@
     "ONG": {
       "base_iso2": "ONG",
       "continent_label": "Europe",
-      "controller_feature_count": 4,
+      "controller_feature_count": 2,
       "display_name": "Onega",
       "entry_kind": "scenario_country",
-      "feature_count": 4,
+      "feature_count": 2,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115848,10 +115848,10 @@
     "PHI": {
       "base_iso2": "PH",
       "continent_label": "Asia",
-      "controller_feature_count": 117,
+      "controller_feature_count": 54,
       "display_name": "Philippines",
       "entry_kind": "scenario_subject",
-      "feature_count": 117,
+      "feature_count": 54,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116145,10 +116145,10 @@
     "RFA": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 4,
+      "controller_feature_count": 1,
       "display_name": "Russian Anarchy",
       "entry_kind": "scenario_country",
-      "feature_count": 4,
+      "feature_count": 1,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116248,10 +116248,10 @@
     "RKM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 153,
+      "controller_feature_count": 154,
       "display_name": "Reichskommissariat Moskowien",
       "entry_kind": "scenario_country",
-      "feature_count": 153,
+      "feature_count": 154,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116353,10 +116353,10 @@
     "RKO": {
       "base_iso2": "LT",
       "continent_label": "Europe",
-      "controller_feature_count": 98,
+      "controller_feature_count": 7,
       "display_name": "Reichskommissariat Ostland",
       "entry_kind": "scenario_country",
-      "feature_count": 98,
+      "feature_count": 7,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116388,10 +116388,10 @@
     "RKP": {
       "base_iso2": "PL",
       "continent_label": "Europe",
-      "controller_feature_count": 84,
+      "controller_feature_count": 22,
       "display_name": "General Government of Poland",
       "entry_kind": "scenario_country",
-      "feature_count": 84,
+      "feature_count": 22,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116423,10 +116423,10 @@
     "RKU": {
       "base_iso2": "UA",
       "continent_label": "Europe",
-      "controller_feature_count": 279,
+      "controller_feature_count": 33,
       "display_name": "Reichskommissariat Ukraine",
       "entry_kind": "scenario_country",
-      "feature_count": 279,
+      "feature_count": 33,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116826,10 +116826,10 @@
     "SIA": {
       "base_iso2": "TH",
       "continent_label": "Asia",
-      "controller_feature_count": 93,
+      "controller_feature_count": 92,
       "display_name": "Siam",
       "entry_kind": "",
-      "feature_count": 93,
+      "feature_count": 92,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116960,10 +116960,10 @@
     "SVR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 11,
+      "controller_feature_count": 13,
       "display_name": "Ural Military District",
       "entry_kind": "scenario_country",
-      "feature_count": 11,
+      "feature_count": 13,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117092,10 +117092,10 @@
     "TAT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 16,
+      "controller_feature_count": 15,
       "display_name": "Tatar Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 16,
+      "feature_count": 15,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117226,10 +117226,10 @@
     "TOM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 24,
+      "controller_feature_count": 23,
       "display_name": "Tomsk",
       "entry_kind": "scenario_country",
-      "feature_count": 24,
+      "feature_count": 23,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -117327,10 +117327,10 @@
     "TYM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 23,
+      "controller_feature_count": 21,
       "display_name": "Tyumen",
       "entry_kind": "scenario_country",
-      "feature_count": 23,
+      "feature_count": 21,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117616,10 +117616,10 @@
     "VIN": {
       "base_iso2": "VN",
       "continent_label": "Asia",
-      "controller_feature_count": 52,
+      "controller_feature_count": 51,
       "display_name": "Vietnam",
       "entry_kind": "scenario_subject",
-      "feature_count": 52,
+      "feature_count": 51,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117651,10 +117651,10 @@
     "VMT": {
       "base_iso2": "VN",
       "continent_label": "Asia",
-      "controller_feature_count": 11,
+      "controller_feature_count": 8,
       "display_name": "Viet Minh",
       "entry_kind": "scenario_country",
-      "feature_count": 11,
+      "feature_count": 8,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117684,10 +117684,10 @@
     "VOK": {
       "base_iso2": "VOK",
       "continent_label": "Europe",
-      "controller_feature_count": 4,
+      "controller_feature_count": 6,
       "display_name": "Vorkuta",
       "entry_kind": "scenario_country",
-      "feature_count": 4,
+      "feature_count": 6,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117717,10 +117717,10 @@
     "VOL": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 20,
+      "controller_feature_count": 18,
       "display_name": "Vologda Neutral Zone",
       "entry_kind": "scenario_country",
-      "feature_count": 20,
+      "feature_count": 18,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117781,10 +117781,10 @@
     "VYT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 16,
+      "controller_feature_count": 18,
       "display_name": "Vyatka",
       "entry_kind": "scenario_country",
-      "feature_count": 16,
+      "feature_count": 18,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -117847,10 +117847,10 @@
     "WRS": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 28,
+      "controller_feature_count": 31,
       "display_name": "West Russian Revolutionary Front",
       "entry_kind": "scenario_country",
-      "feature_count": 28,
+      "feature_count": 31,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -118180,13 +118180,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "f7d74d8910eca06e2a409dfb18dee5001bf7089dea8e77188ef74b232bf49ee4",
+  "snapshot_fingerprint": "733c1f93a36da4df0a8c4d71065b4058cb65c34c9cedac43b26a56bbdeefb4a1",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "6ac5c66cb1ce917e0527c0dfd279e8574d7017f5128b2fba81ff7ac78e47f00a",
-    "detail_chunk_manifest_sha256": "e8cf1f175823def75242c34abfb29196a2a415cd386ab38c55668ea937af9991",
-    "runtime_bootstrap_topology_sha256": "338d98c608bd7bed9ecfc46441d5d051734d8926dfc5b4c8851166f120a31902",
-    "runtime_topology_sha256": "2260a1fb35ec521421456f374ad4da2e143875abf05d3cf7628c35f6e7ad46e1"
+    "build_snapshot_sha256": "59d397ee866e12015c302ce0333db740f0fdfc7df6496c5dc899faa71b579f0c",
+    "detail_chunk_manifest_sha256": "e3394a72682e742ad709ba11ee189204c65343c2ea33eada215d1e367f556910",
+    "runtime_bootstrap_topology_sha256": "acacf2f0387fdf64932f846fc539dead6299dea4b9c708e7829bac49f8d491bd",
+    "runtime_topology_sha256": "468e1b9961b12c75a4fab85bb1c3201d65e17e231484a5044c53fffe792a9e92"
   },
   "summary": {
     "approximate_count": 973,
@@ -118197,7 +118197,7 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 180,
+    "controller_count": 218,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -118207,7 +118207,7 @@
     "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 180,
+    "owner_count": 218,
     "quality_counts": {
       "approx_existing_geometry": 1033,
       "direct_country_copy": 2698,
