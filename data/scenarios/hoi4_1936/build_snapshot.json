@@ -25,14 +25,14 @@
     "mesh_pack.json": "6e5734f86e52fcd74e3d6645c2a1b211cc9d48a390c0cc688323b9d5277da77b",
     "runtime_meta.json": "fa6d63bb97e5b622dd71ff183490c8ef94a62728390c8246fc4c23ceeaf74c41",
     "runtime_topology.bootstrap.topo.json": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "startup.bundle.en.json": "07da79f4deeb496f0a0bf41bd98d7a45befcd3b8c2a1f9e99279d0c81868912e",
-    "startup.bundle.en.json.gz": "507c0e1fe31a1a0edb3ac3cccd5718b795677857bead54d4920674a652222824",
-    "startup.bundle.zh.json": "d1d33da674a5a0e6b4fe7b9fd8125c9a9238506e2e28454a60fe9d3d98193765",
-    "startup.bundle.zh.json.gz": "e4ac9b96dcb87f9e3ea55edae06003fd26e36826817841a46ec6cf6166a1b1da"
+    "startup.bundle.en.json": "9a3a0c27d8a30762e07c34a1ccfda6ade5265e80c1a34ead30aa22186e15e6bd",
+    "startup.bundle.en.json.gz": "79dc25fae016b9a17d3c1c6957efaa0f41a74a2c0eeeac5dbbeee3921e899af1",
+    "startup.bundle.zh.json": "5af2b582f6a7537bd0fc31dcf4e36be0153dabf11cef003ff012e6c0bbd5ce4c",
+    "startup.bundle.zh.json.gz": "ddd91e0d35d15d64c1c9fac503aeac978b958d50bc1dbbb7e6fe1122529c79a6"
   },
   "profile": "hoi4_chunked",
   "report_paths": {},
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "1994993a139811cad769b99ecb4116be2f4dff776929e0b15867277ccc4e9823",
+  "snapshot_fingerprint": "89bde378f1b5ac1d82824c4ba28438d6fa9c40509527ed5ff849579a78d03f34",
   "water_count": 0
 }
