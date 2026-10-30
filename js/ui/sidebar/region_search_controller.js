@@ -86,9 +86,11 @@ export function createRegionSearchController({
       note.textContent = tr("Showing first {count} matches. Refine the search.").replace("{count}", maxResults);
       results.appendChild(note);
     }
-    status.textContent = count
-      ? tr("{count} matching regions").replace("{count}", count)
-      : tr("No matching regions");
+    status.textContent = count === 1
+      ? tr("1 matching region")
+      : count
+        ? tr("{count} matching regions").replace("{count}", count)
+        : tr("No matching regions");
     if (matches.length) {
       results.classList.remove("hidden");
       input.setAttribute("aria-expanded", "true");
