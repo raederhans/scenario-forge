@@ -149,8 +149,8 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
         "RU_RAY_50074027B18536602285327": ("RUR", "RU_RAY_50074027B240190989633"),
         "RU_RAY_50074027B23063195205268": ("KRS", "RU_RAY_50074027B3826534840215"),
     }
-    # The 1962 owner corrections moved these Gorky faces, with their districts, to TAT after the source rules.
-    CORRECTED_OWNERS = {"RU_RAY_50074027B5573235052647": "TAT", "RU_RAY_50074027B91746933948416": "TAT"}
+    CORRECTED_OWNERS = {"RU_RAY_50074027B5573235052647": "TAT", "RU_RAY_50074027B91746933948416": "TAT",
+                        "RU_RAY_50074027B96019567685522": "PRM"}
 
     def test_reviewed_city_faces_match_the_preserved_district_owners(self) -> None:
         owners = json.loads((SCENARIO_DIR / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]

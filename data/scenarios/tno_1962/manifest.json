@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/tno_1962/audit.json",
-  "baseline_hash": "a33a3eed9ff7f1d4f745734828e7bcd87fe0b40eeb5fdfac83f41ea17c6cb700",
+  "baseline_hash": "fc089d92f0dca2ce62ac5e1e6183a2efaff6c8f70541feef0a8dfc8f49e8c586",
   "bathymetry_texture_url": "data/scenarios/tno_1962/bathymetry_texture/manifest.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
@@ -131,8 +131,7 @@
     "PER",
     "PHI",
     "MAG",
-    "PFC",
-    "FIC"
+    "PFC"
   ],
   "generated_at": "2026-05-31T23:17:04Z",
   "geo_locale_patch_url": "data/scenarios/tno_1962/geo_locale_patch.json",
@@ -2998,12 +2997,12 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "0642157c9859a4e20db83b313ed71c7f789795a187641236570573668a3b0ad4",
+  "snapshot_fingerprint": "601185798b5c179e51b0e27a0fc81325f68248525c5ad1fb652a445cbee03b06",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "2ba5e2a46ca5b4bd876cd0c894c18be84a77522f598e857d5be94dde1fcd776a",
-    "runtime_bootstrap_topology_sha256": "338d98c608bd7bed9ecfc46441d5d051734d8926dfc5b4c8851166f120a31902",
-    "runtime_topology_sha256": "2260a1fb35ec521421456f374ad4da2e143875abf05d3cf7628c35f6e7ad46e1"
+    "detail_chunk_manifest_sha256": "e3394a72682e742ad709ba11ee189204c65343c2ea33eada215d1e367f556910",
+    "runtime_bootstrap_topology_sha256": "acacf2f0387fdf64932f846fc539dead6299dea4b9c708e7829bac49f8d491bd",
+    "runtime_topology_sha256": "468e1b9961b12c75a4fab85bb1c3201d65e17e231484a5044c53fffe792a9e92"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
@@ -3036,7 +3035,7 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 219,
+    "controller_count": 218,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -3046,7 +3045,7 @@
     "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 219,
+    "owner_count": 218,
     "quality_counts": {
       "approx_existing_geometry": 1033,
       "direct_country_copy": 2698,

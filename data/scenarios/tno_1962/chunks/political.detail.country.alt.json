@@ -12681,6 +12681,49 @@
           ]
         ]
       }
+    },
+    {
+      "id": 12015,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_XIN_049",
+        "name": "Russia Shell Fallback XIN",
+        "cntr_code": "RU",
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "ALT",
+        "scenario_shell_controller_hint": "ALT",
+        "source_fragment_count": 2.0,
+        "source_fragment_area": 0.002875,
+        "retained_fragment_area": 0.002706,
+        "interactive": false,
+        "render_as_base_geography": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              87.68427684276844,
+              49.155359454594546
+            ],
+            [
+              87.49347493474937,
+              49.13973690936909
+            ],
+            [
+              87.5006750067501,
+              49.11196349563495
+            ],
+            [
+              87.68427684276844,
+              49.155359454594546
+            ]
+          ]
+        ]
+      }
     }
   ]
 }

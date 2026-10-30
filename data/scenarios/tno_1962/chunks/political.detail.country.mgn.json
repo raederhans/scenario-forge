@@ -6267,6 +6267,61 @@
           ]
         ]
       }
+    },
+    {
+      "id": 11981,
+      "type": "Feature",
+      "properties": {
+        "id": "RU_ARCTIC_FB_MAG_015",
+        "name": "Russia Shell Fallback MAG",
+        "cntr_code": "RU",
+        "detail_tier": "scenario_runtime_shell",
+        "__source": "detail",
+        "scenario_id": "tno_1962",
+        "scenario_helper_kind": "shell_fallback",
+        "scenario_shell_owner_hint": "MGN",
+        "scenario_shell_controller_hint": "MGN",
+        "source_fragment_count": 39.0,
+        "source_fragment_area": 0.067509,
+        "retained_fragment_area": 0.01173,
+        "interactive": false,
+        "render_as_base_geography": false
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              61.7028170281703,
+              52.996769741697406
+            ],
+            [
+              61.663216632166325,
+              52.97420384303844
+            ],
+            [
+              61.98001980019802,
+              52.93948707587076
+            ],
+            [
+              62.05922059220592,
+              52.98114719647195
+            ],
+            [
+              62.00522005220054,
+              52.958581297812984
+            ],
+            [
+              61.85041850418506,
+              53.00371309513095
+            ],
+            [
+              61.7028170281703,
+              52.996769741697406
+            ]
+          ]
+        ]
+      }
     }
   ]
 }

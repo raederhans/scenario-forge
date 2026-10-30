@@ -3450,7 +3450,6 @@
             "RU_MRG_7e1c8281813e",
             "RU_MRG_9ed0f4973e0f",
             "RU_MRG_c84f2ed9c6ef",
-            "RU_MRG_eb6edd92ee8d",
             "RU_RAY_50074027B18749905524628",
             "RU_RAY_50074027B42733914964900",
             "RU_RAY_50074027B46082532996443",
@@ -3458,7 +3457,6 @@
             "RU_RAY_50074027B55786266429174",
             "RU_RAY_50074027B57903229029345",
             "RU_RAY_50074027B77893052282022",
-            "RU_RAY_50074027B88724749460683",
             "RU_RAY_50074027B91760241420643"
           ],
           "name_en": "Hailanpao & Amur Frontier",
@@ -4938,12 +4936,8 @@
             "RU_MRG_13fef5f74a14",
             "RU_MRG_3c1f8e056188",
             "RU_MRG_3f26ea354786",
-            "RU_MRG_7f673bbbcb21",
             "RU_MRG_82288501a613",
-            "RU_MRG_ab652814dff4",
-            "RU_MRG_b963a8bb44cb",
-            "RU_MRG_dfe6c1e5f415",
-            "RU_RAY_50074027B44365109797977"
+            "RU_MRG_b963a8bb44cb"
           ],
           "name_en": "General District Gorky",
           "name_zh": "高尔基总区"
@@ -4956,6 +4950,7 @@
             "RU_MRG_54feb62370de",
             "RU_MRG_57d8687f784e",
             "RU_MRG_59971f82636d",
+            "RU_MRG_6f87652d4746",
             "RU_MRG_94e7015e40d9",
             "RU_MRG_be20933bc7c3",
             "RU_MRG_c68b90a156ce",
@@ -4969,15 +4964,13 @@
           "district_id": "jaroslawl",
           "feature_ids": [
             "RU_MRG_0647b9498b2f",
-            "RU_MRG_46291296feb9",
             "RU_MRG_467ab67728ff",
-            "RU_MRG_565e6f7cc145",
             "RU_MRG_5936db92540a",
-            "RU_MRG_975a1a106b2a",
             "RU_MRG_c3cc17c29955",
             "RU_RAY_50074027B20500956922329",
             "RU_RAY_50074027B55270503343274",
             "RU_RAY_50074027B57358126207690",
+            "RU_RAY_50074027B60606739466906",
             "RU_RAY_50074027B6686274683844__tno1962_2",
             "RU_RAY_50074027B84622469833682"
           ],
@@ -4994,6 +4987,7 @@
             "RU_MRG_19dc7bbc7bcb",
             "RU_MRG_782d749bb689",
             "RU_MRG_8b55818839ef",
+            "RU_MRG_9630c25ee3c6",
             "RU_MRG_c3b410784a1f",
             "RU_MRG_c60bafc0ae96",
             "RU_MRG_c90be9cc4d47",
@@ -5001,6 +4995,7 @@
             "RU_MRG_d6e7399b8ed9",
             "RU_MRG_df33d486fbcc",
             "RU_MRG_ed434db4b357",
+            "RU_RAY_50074027B24884281398381",
             "RU_RAY_50074027B51726500082089",
             "RU_RAY_50074027B77320350284147"
           ],
@@ -5036,11 +5031,15 @@
           "district_id": "smolensk",
           "feature_ids": [
             "RU_MRG_55742c11b5e6",
+            "RU_MRG_56d7f2c40815",
             "RU_MRG_7023cdeaace9",
             "RU_MRG_72ee4e9306fc",
+            "RU_MRG_baef030e052d",
             "RU_MRG_deee7ff279fc",
+            "RU_MRG_e85ce6b2cbb5",
             "RU_RAY_50074027B16069237925080",
             "RU_RAY_50074027B25563950651561",
+            "RU_RAY_50074027B40310096212326",
             "RU_RAY_50074027B50737742198919",
             "RU_RAY_50074027B66126711442497",
             "RU_RAY_50074027B98073914217058"
@@ -5272,6 +5271,7 @@
         "lettland": {
           "district_id": "lettland",
           "feature_ids": [
+            "BY_INT_BREST",
             "LV003",
             "LV005",
             "LV006",

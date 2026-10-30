@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from copy import deepcopy
+import argparse
 import json
 from pathlib import Path
 import sys
@@ -37,7 +38,7 @@ def arc_ids(value):
         yield value if value >= 0 else ~value
 
 
-def share_cut_arcs(topology, cuts):
+def share_cut_arcs(topology, cuts, junction_points=()):
     for index, boundaries in cuts.items():
         boundary = shapely.union_all(boundaries)
         arc = topology["arcs"][index]
@@ -50,6 +51,7 @@ def share_cut_arcs(topology, cuts):
             noded.append(b)
         topology["arcs"][index] = noded
     junctions = {tuple(p) for arc in topology["arcs"] for p in (arc[0], arc[-1])}
+    junctions.update(junction_points)
     arcs, registry, remap = [], {}, {}
     for index, arc in enumerate(topology["arcs"]):
         indices, start = [], 0
@@ -86,6 +88,7 @@ def split_topology(topology, rules):
     by_id = {row["properties"]["id"]: row for row in rows}
     splits, additions, geometries, measurements = {}, [], {}, []
     cuts = defaultdict(list)
+    junction_points = set()
     tolerance = rules["area_tolerance_degrees2"]
     for entry in rules["entries"]:
         polygon = shape(entry["polygon"])
@@ -99,6 +102,10 @@ def split_topology(topology, rules):
                 raise ValueError(f"Missing split parent or children: {parent}")
             row = by_id[parent]
             original = _decode_geometry(result, row)
+            if entry.get("subtract_feature_ids"):
+                original = original.difference(shapely.union_all([
+                    _decode_geometry(result, by_id[fid]) for fid in entry["subtract_feature_ids"]
+                ]))
             parts = [original.intersection(polygon), original.difference(polygon)]
             if any(p.is_empty or not p.is_valid or p.geom_type not in {"Polygon", "MultiPolygon"} for p in parts):
                 raise ValueError(f"Split must produce two valid polygonal parts: {parent}")
@@ -109,6 +116,11 @@ def split_topology(topology, rules):
             splits[parent] = children
             for index in arc_ids(row["arcs"]):
                 cuts[index].append(polygon.boundary)
+            for fid in entry.get("subtract_feature_ids", []):
+                junction_points.update(map(tuple, shapely.get_coordinates(
+                    _decode_geometry(result, by_id[fid]).boundary.intersection(original.boundary))))
+                for index in arc_ids(by_id[fid]["arcs"]):
+                    cuts[index].extend([original.boundary, polygon.boundary])
             for child, part, side in zip(children, parts, ("inside", "outside")):
                 props = deepcopy(row["properties"])
                 original_name = props.get("name_en") or props.get("name") or parent
@@ -129,7 +141,7 @@ def split_topology(topology, rules):
     for row, encoded_row in zip(additions, encoded["objects"]["political"]["geometries"]):
         row["arcs"] = _offset_arcs(encoded_row["arcs"], offset)
     rows[:] = [row for row in rows if row["properties"]["id"] not in splits] + additions
-    share_cut_arcs(result, cuts)
+    share_cut_arcs(result, cuts, junction_points)
     _update_bbox(result)
     for row in additions:
         fid = row["properties"]["id"]
@@ -175,14 +187,20 @@ def run_scenario(scenario_dir, rules):
 
 
 def main():
-    rules = read(ROOT / "data/scenario-rules/hoi4_geometry_splits.json")
-    write_json(ROOT / "data/feature-migrations/hoi4_feature_splits.v1.json", {
-        "version": 1, "scenarios": rules["scenarios"],
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--rules', type=Path, default=ROOT / 'data/scenario-rules/hoi4_geometry_splits.json')
+    parser.add_argument('--scenarios', nargs='+')
+    parser.add_argument('--migration-output', type=Path, default=ROOT / 'data/feature-migrations/hoi4_feature_splits.v1.json')
+    args = parser.parse_args()
+    rules = read(args.rules)
+    scenarios = args.scenarios or rules['scenarios']
+    write_json(args.migration_output, {
+        "version": 1, "scenarios": scenarios,
         "feature_splits": {parent: [parent+"__SPLIT_"+entry[side]["suffix"] for side in ("inside", "outside")]
                            for entry in rules["entries"] for parent in entry["feature_ids"]},
         "semantics": "Copy parent paint and list membership to all children; explicit child paint wins. Runtime authority: scenario manifest hierarchy_overrides.feature_splits.",
     })
-    for scenario in rules["scenarios"]:
+    for scenario in scenarios:
         report = run_scenario(ROOT / "data/scenarios" / scenario, rules)
         if report["changed"]:
             write_json(ROOT / ".runtime/reports/generated" / f"{scenario}.geometry-splits.json", report)

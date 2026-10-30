@@ -170,13 +170,15 @@ def test_batch_two_published_ownership_and_relationships():
     owners = read(directory / "owners.by_feature.json")["owners"]
     cores = read(directory / "cores.by_feature.json")["cores"]
     countries = read(directory / "countries.json")["countries"]
+    user_rules = read(Path(__file__).parent / "fixtures/tno_user_reassign.json")
+    corrected = {fid: row["to"] for fid, row in user_rules.items() if row["from"] != row["to"]}
     for entry in overlay["entries"][3:]:
         tag = entry["tag"]
         country = countries[tag]
         assert country["parent_owner_tag"] == entry["parent_owner_tag"]
         assert country["subject_kind"] == entry["subject_kind"]
         for fid in entry["select"]["feature_ids"]:
-            assert owners[fid] == tag
+            assert owners[fid] == corrected.get(fid, tag)
             if entry["cores"] == "owner":
                 assert cores[fid] == [tag]
     assert owners["MYS-1139"] == "MLY"

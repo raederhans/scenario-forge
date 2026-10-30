@@ -284,11 +284,11 @@
       "owner": "OE03"
     },
     "BY_INT_BREST": {
-      "controller": "UK01",
+      "controller": "RKO",
       "cores": [
-        "RKU"
+        "RKO"
       ],
-      "owner": "UK01"
+      "owner": "RKO"
     },
     "BY_INT_GOMEL": {
       "controller": "OE03",
@@ -3834,53 +3834,53 @@
       "owner": "MEN"
     },
     "MNG-3316": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3318": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3320": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3321": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3322": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3323": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3324": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3325": {
       "controller": "MEN",
@@ -3890,32 +3890,32 @@
       "owner": "MEN"
     },
     "MNG-3326": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3327": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3328": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MNG-3329": {
-      "controller": "MEN",
+      "controller": "MON",
       "cores": [
-        "MEN"
+        "MON"
       ],
-      "owner": "MEN"
+      "owner": "MON"
     },
     "MR_ADM1_MRT-2784": {
       "controller": "MAU",
@@ -5626,11 +5626,11 @@
       "owner": "IRK"
     },
     "RU_MRG_3bf1b1438247": {
-      "controller": "VOL",
+      "controller": "KOM",
       "cores": [
-        "VOL"
+        "KOM"
       ],
-      "owner": "VOL"
+      "owner": "KOM"
     },
     "RU_MRG_3c1f8e056188": {
       "controller": "RKM",
@@ -5738,11 +5738,11 @@
       "owner": "NOV"
     },
     "RU_MRG_46291296feb9": {
-      "controller": "RKM",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "RKM"
+      "owner": "VOL"
     },
     "RU_MRG_467ab67728ff": {
       "controller": "RKM",
@@ -5773,11 +5773,11 @@
       "owner": "BRY"
     },
     "RU_MRG_48dc139f3c1a": {
-      "controller": "VOL",
+      "controller": "WRS",
       "cores": [
-        "VOL"
+        "WRS"
       ],
-      "owner": "VOL"
+      "owner": "WRS"
     },
     "RU_MRG_4a1ad9caacda": {
       "controller": "SBA",
@@ -5892,18 +5892,18 @@
       "owner": "TAT"
     },
     "RU_MRG_565e6f7cc145": {
+      "controller": "VOL",
+      "cores": [
+        "VOL"
+      ],
+      "owner": "VOL"
+    },
+    "RU_MRG_56d7f2c40815": {
       "controller": "RKM",
       "cores": [
         "RKM"
       ],
       "owner": "RKM"
-    },
-    "RU_MRG_56d7f2c40815": {
-      "controller": "OE03",
-      "cores": [
-        "RKO"
-      ],
-      "owner": "OE03"
     },
     "RU_MRG_56ed27ec6e18": {
       "controller": "BKR",
@@ -6123,11 +6123,11 @@
       "owner": "RKK"
     },
     "RU_MRG_6f87652d4746": {
-      "controller": "OE04",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "OE04"
+      "owner": "RKM"
     },
     "RU_MRG_6fb6a80f7b8a": {
       "controller": "RKM",
@@ -6172,11 +6172,11 @@
       "owner": "RKK"
     },
     "RU_MRG_72b0f3ba03bc": {
-      "controller": "TAT",
+      "controller": "VYT",
       "cores": [
-        "TAT"
+        "VYT"
       ],
-      "owner": "TAT"
+      "owner": "VYT"
     },
     "RU_MRG_72ee4e9306fc": {
       "controller": "RKM",
@@ -6298,11 +6298,11 @@
       "owner": "BRY"
     },
     "RU_MRG_7f673bbbcb21": {
-      "controller": "RKM",
+      "controller": "GOR",
       "cores": [
-        "RKM"
+        "GOR"
       ],
-      "owner": "RKM"
+      "owner": "GOR"
     },
     "RU_MRG_7fb0671d3e3b": {
       "controller": "YAK",
@@ -6508,11 +6508,11 @@
       "owner": "RKM"
     },
     "RU_MRG_9630c25ee3c6": {
-      "controller": "OE04",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "OE04"
+      "owner": "RKM"
     },
     "RU_MRG_96394847a7bb": {
       "controller": "RKK",
@@ -6529,11 +6529,11 @@
       "owner": "RKK"
     },
     "RU_MRG_975a1a106b2a": {
-      "controller": "RKM",
+      "controller": "VOL",
       "cores": [
-        "RKM"
+        "VOL"
       ],
-      "owner": "RKM"
+      "owner": "VOL"
     },
     "RU_MRG_977d68d87d87": {
       "controller": "VYT",
@@ -6648,11 +6648,11 @@
       "owner": "KOM"
     },
     "RU_MRG_ab652814dff4": {
-      "controller": "RKM",
+      "controller": "TAT",
       "cores": [
-        "RKM"
+        "TAT"
       ],
-      "owner": "RKM"
+      "owner": "TAT"
     },
     "RU_MRG_ad1e693ffed2": {
       "controller": "RKK",
@@ -6767,11 +6767,11 @@
       "owner": "CHT"
     },
     "RU_MRG_baef030e052d": {
-      "controller": "OE03",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "OE03"
+      "owner": "RKM"
     },
     "RU_MRG_bb701cc86b7c": {
       "controller": "SVR",
@@ -7026,11 +7026,11 @@
       "owner": "RKM"
     },
     "RU_MRG_d7ef4389d36f": {
-      "controller": "TYM",
+      "controller": "SVR",
       "cores": [
-        "TYM"
+        "SVR"
       ],
-      "owner": "TYM"
+      "owner": "SVR"
     },
     "RU_MRG_d7f648c07bd4": {
       "controller": "VOL",
@@ -7054,11 +7054,11 @@
       "owner": "VYT"
     },
     "RU_MRG_da0982e025af": {
-      "controller": "TAT",
+      "controller": "VYT",
       "cores": [
-        "TAT"
+        "VYT"
       ],
-      "owner": "TAT"
+      "owner": "VYT"
     },
     "RU_MRG_da32271f14c8": {
       "controller": "ORN",
@@ -7117,11 +7117,11 @@
       "owner": "TYM"
     },
     "RU_MRG_dfe6c1e5f415": {
-      "controller": "RKM",
+      "controller": "GOR",
       "cores": [
-        "RKM"
+        "GOR"
       ],
-      "owner": "RKM"
+      "owner": "GOR"
     },
     "RU_MRG_e00f867dd81d": {
       "controller": "SAM",
@@ -7187,11 +7187,11 @@
       "owner": "RKM"
     },
     "RU_MRG_e85ce6b2cbb5": {
-      "controller": "OE04",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "OE04"
+      "owner": "RKM"
     },
     "RU_MRG_e9567e283174": {
       "controller": "RKM",
@@ -7208,11 +7208,11 @@
       "owner": "BKR"
     },
     "RU_MRG_eb6edd92ee8d": {
-      "controller": "MAN",
+      "controller": "AMR",
       "cores": [
-        "MAN"
+        "AMR"
       ],
-      "owner": "MAN"
+      "owner": "AMR"
     },
     "RU_MRG_ebc5961355f4": {
       "controller": "SBA",
@@ -7264,18 +7264,18 @@
       "owner": "TYM"
     },
     "RU_MRG_f38bf2291525": {
-      "controller": "BRY",
+      "controller": "CHT",
       "cores": [
-        "BRY"
+        "CHT"
       ],
-      "owner": "BRY"
+      "owner": "CHT"
     },
     "RU_MRG_f3d2b13e0b30": {
-      "controller": "BKR",
+      "controller": "PRM",
       "cores": [
-        "BKR"
+        "PRM"
       ],
-      "owner": "BKR"
+      "owner": "PRM"
     },
     "RU_MRG_f3dfc0448ede": {
       "controller": "RKM",
@@ -7633,6 +7633,13 @@
       ],
       "owner": "NRL"
     },
+    "RU_RAY_50074027B23262720042196": {
+      "controller": "FAV",
+      "cores": [
+        "FAV"
+      ],
+      "owner": "FAV"
+    },
     "RU_RAY_50074027B23655919603928": {
       "controller": "UK07",
       "cores": [
@@ -7641,11 +7648,11 @@
       "owner": "UK07"
     },
     "RU_RAY_50074027B23799547406598": {
-      "controller": "TOM",
+      "controller": "FAV",
       "cores": [
-        "TOM"
+        "FAV"
       ],
-      "owner": "TOM"
+      "owner": "FAV"
     },
     "RU_RAY_50074027B2401368915177": {
       "controller": "OMO",
@@ -7669,11 +7676,11 @@
       "owner": "OMO"
     },
     "RU_RAY_50074027B24884281398381": {
-      "controller": "OE04",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "OE04"
+      "owner": "RKM"
     },
     "RU_RAY_50074027B2598774008896": {
       "controller": "KRS",
@@ -7850,11 +7857,11 @@
       "owner": "ORN"
     },
     "RU_RAY_50074027B32599021943629": {
-      "controller": "TYM",
+      "controller": "SVR",
       "cores": [
-        "TYM"
+        "SVR"
       ],
-      "owner": "TYM"
+      "owner": "SVR"
     },
     "RU_RAY_50074027B32782787425978": {
       "controller": "WRS",
@@ -7883,6 +7890,13 @@
         "IRK"
       ],
       "owner": "IRK"
+    },
+    "RU_RAY_50074027B34454529298169": {
+      "controller": "OMO",
+      "cores": [
+        "OMO"
+      ],
+      "owner": "OMO"
     },
     "RU_RAY_50074027B34679445513717": {
       "controller": "BKR",
@@ -7969,11 +7983,11 @@
       "owner": "MGN"
     },
     "RU_RAY_50074027B40310096212326": {
-      "controller": "OE03",
+      "controller": "RKM",
       "cores": [
-        "RKO"
+        "RKM"
       ],
-      "owner": "OE03"
+      "owner": "RKM"
     },
     "RU_RAY_50074027B40536112899816": {
       "cores": [
@@ -8057,6 +8071,20 @@
       ],
       "owner": "TOM"
     },
+    "RU_RAY_50074027B44365109797977": {
+      "controller": "GOR",
+      "cores": [
+        "GOR"
+      ],
+      "owner": "GOR"
+    },
+    "RU_RAY_50074027B44706978372394": {
+      "controller": "WRS",
+      "cores": [
+        "WRS"
+      ],
+      "owner": "WRS"
+    },
     "RU_RAY_50074027B44738927608854": {
       "controller": "SVR",
       "cores": [
@@ -8079,11 +8107,11 @@
       "owner": "YAK"
     },
     "RU_RAY_50074027B45493241507504": {
-      "controller": "ONG",
+      "controller": "WRS",
       "cores": [
         "RKM"
       ],
-      "owner": "ONG"
+      "owner": "WRS"
     },
     "RU_RAY_50074027B45607076105456": {
       "controller": "TAT",
@@ -8254,11 +8282,11 @@
       "owner": "OE04"
     },
     "RU_RAY_50074027B56678877765671": {
-      "controller": "WRS",
+      "controller": "VOK",
       "cores": [
-        "WRS"
+        "VOK"
       ],
-      "owner": "WRS"
+      "owner": "VOK"
     },
     "RU_RAY_50074027B56747088904047": {
       "controller": "VYT",
@@ -8372,11 +8400,11 @@
       "owner": "URL"
     },
     "RU_RAY_50074027B60606739466906": {
-      "controller": "ONG",
+      "controller": "RKM",
       "cores": [
-        "ONG"
+        "RKM"
       ],
-      "owner": "ONG"
+      "owner": "RKM"
     },
     "RU_RAY_50074027B61183763679661": {
       "controller": "ORS",
@@ -8398,6 +8426,13 @@
         "NRL"
       ],
       "owner": "NRL"
+    },
+    "RU_RAY_50074027B62324973885793": {
+      "controller": "WRS",
+      "cores": [
+        "WRS"
+      ],
+      "owner": "WRS"
     },
     "RU_RAY_50074027B62478008051708": {
       "controller": "PRC",
@@ -8433,6 +8468,13 @@
         "AMR"
       ],
       "owner": "AMR"
+    },
+    "RU_RAY_50074027B63935727212307": {
+      "controller": "NRL",
+      "cores": [
+        "NRL"
+      ],
+      "owner": "NRL"
     },
     "RU_RAY_50074027B64035112017093": {
       "controller": "IRK",
@@ -8616,6 +8658,13 @@
       ],
       "owner": "TOM"
     },
+    "RU_RAY_50074027B72539224473791": {
+      "controller": "KOM",
+      "cores": [
+        "KOM"
+      ],
+      "owner": "KOM"
+    },
     "RU_RAY_50074027B72993481609927": {
       "controller": "FAV",
       "cores": [
@@ -8750,11 +8799,11 @@
       "owner": "OE03"
     },
     "RU_RAY_50074027B82590027772677": {
-      "controller": "VOK",
+      "controller": "WRS",
       "cores": [
-        "VOK"
+        "WRS"
       ],
-      "owner": "VOK"
+      "owner": "WRS"
     },
     "RU_RAY_50074027B82795249676876": {
       "controller": "UK07",
@@ -8762,6 +8811,13 @@
         "RKU"
       ],
       "owner": "UK07"
+    },
+    "RU_RAY_50074027B83221615215133": {
+      "controller": "VOK",
+      "cores": [
+        "VOK"
+      ],
+      "owner": "VOK"
     },
     "RU_RAY_50074027B83598019874707": {
       "controller": "YAK",
@@ -8799,11 +8855,11 @@
       "owner": "MAG"
     },
     "RU_RAY_50074027B8579713719118": {
-      "controller": "BRY",
+      "controller": "CHT",
       "cores": [
-        "BRY"
+        "CHT"
       ],
-      "owner": "BRY"
+      "owner": "CHT"
     },
     "RU_RAY_50074027B86147871749672": {
       "controller": "OE04",
@@ -8876,11 +8932,18 @@
       "owner": "OE04"
     },
     "RU_RAY_50074027B88724749460683": {
-      "controller": "MAN",
+      "controller": "AMR",
       "cores": [
-        "MAN"
+        "AMR"
       ],
-      "owner": "MAN"
+      "owner": "AMR"
+    },
+    "RU_RAY_50074027B90244452662579": {
+      "controller": "AMR",
+      "cores": [
+        "AMR"
+      ],
+      "owner": "AMR"
     },
     "RU_RAY_50074027B90279098260480": {
       "controller": "AMR",
@@ -8986,6 +9049,13 @@
         "RKO"
       ],
       "owner": "OE03"
+    },
+    "RU_RAY_50074027B94648571764089": {
+      "controller": "VOK",
+      "cores": [
+        "VOK"
+      ],
+      "owner": "VOK"
     },
     "RU_RAY_50074027B94992557454451": {
       "controller": "RUR",
@@ -12474,7 +12544,7 @@
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#ba9e9e",
-      "color_policy": "palette",
+      "color_policy": "locked",
       "controller_feature_count": 0,
       "display_name": "Amur",
       "display_name_en": "Amur",
@@ -13078,7 +13148,7 @@
       "base_iso2": "RU",
       "capital_state_id": null,
       "color_hex": "#b86378",
-      "color_policy": "palette",
+      "color_policy": "locked",
       "controller_feature_count": 0,
       "display_name": "Free Aviators",
       "display_name_en": "Free Aviators",
@@ -13853,8 +13923,8 @@
     "NRL": {
       "base_iso2": "RU",
       "capital_state_id": null,
-      "color_hex": "#d2d5db",
-      "color_policy": "palette",
+      "color_hex": "#9aa5b1",
+      "color_policy": "locked",
       "controller_feature_count": 0,
       "display_name": "Norilsk",
       "display_name_en": "Norilsk",
@@ -13985,12 +14055,12 @@
       "color_hex": "#716f63",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 47,
+      "controller_feature_count": 44,
       "display_name": "Generalbezirk Weißruthenien",
       "display_name_en": "Generalbezirk Weißruthenien",
       "display_name_zh": "东部总区·白鲁塞尼亚总区",
       "entry_kind": "scenario_subject",
-      "feature_count": 47,
+      "feature_count": 44,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -14026,12 +14096,12 @@
       "color_hex": "#5a594d",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 29,
+      "controller_feature_count": 25,
       "display_name": "Generalbezirk Pleskau",
       "display_name_en": "Generalbezirk Pleskau",
       "display_name_zh": "东部总区·普斯科夫总区",
       "entry_kind": "scenario_subject",
-      "feature_count": 29,
+      "feature_count": 25,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -14064,8 +14134,8 @@
     "OMO": {
       "base_iso2": "RU",
       "capital_state_id": null,
-      "color_hex": "#d2d5db",
-      "color_policy": "palette",
+      "color_hex": "#c0b3a1",
+      "color_policy": "locked",
       "controller_feature_count": 0,
       "display_name": "Omolon",
       "display_name_en": "Omolon",
@@ -14183,6 +14253,10 @@
       "subject_kind": "",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe"
+    },
+    "OUR": {
+      "color_hex": "#8d87bd",
+      "color_policy": "locked"
     },
     "PAN": {
       "display_name": "Panama",
@@ -14752,12 +14826,12 @@
       "color_hex": "#42484f",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 40,
+      "controller_feature_count": 39,
       "display_name": "Generalbezirk Wolhynien-Podolien",
       "display_name_en": "Generalbezirk Wolhynien-Podolien",
       "display_name_zh": "乌克兰·沃里尼亚—波多利亚总区",
       "entry_kind": "scenario_subject",
-      "feature_count": 40,
+      "feature_count": 39,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -15116,7 +15190,7 @@
       "tag": "UPH"
     },
     "URA": {
-      "color_hex": "#b86378",
+      "color_hex": "#8f405f",
       "color_policy": "locked",
       "display_name": "Ural Military District Red Air Force",
       "display_name_en": "Ural Military District Red Air Force",
@@ -15133,6 +15207,10 @@
       "display_name_zh": "乌拉圭东岸共和国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "URL": {
+      "color_hex": "#b4b3da",
+      "color_policy": "locked"
     },
     "VEN": {
       "color_hex": "#a55f6d",

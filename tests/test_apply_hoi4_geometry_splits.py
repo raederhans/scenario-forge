@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 import shapely
+import sys
 from shapely.geometry import box
 
 from map_builder.regional_geometry import _encode_exact_coverage, _decode_geometry
@@ -49,6 +50,49 @@ def test_incomplete_prior_split_is_rejected():
     topology["objects"]["political"]["geometries"][0]["properties"]["id"] = "original__SPLIT_SOUTH"
     with pytest.raises(ValueError, match="Missing split parent or children"):
         split_topology(topology, rules)
+
+
+def test_tno_overlap_is_removed_before_split():
+    topology, rules = fixture()
+    topology = _encode_exact_coverage(['original', 'neighbor'], [box(0, 0, 2.5, 2), box(2, 0, 3, 2)])
+    rules['scenarios'] = ['tno_1962']
+    rules['entries'][0]['subtract_feature_ids'] = ['neighbor']
+    result, splits, _ = split_topology(topology, rules)
+    rows = {row['properties']['id']: row for row in result['objects']['political']['geometries']}
+    parts = [_decode_geometry(result, rows[fid]) for fid in splits['original']]
+    neighbor = _decode_geometry(result, rows['neighbor'])
+    assert shapely.union_all(parts).equals(box(0, 0, 2, 2))
+    assert all(part.intersection(neighbor).area == 0 for part in parts)
+    assert neighbor.equals(box(2, 0, 3, 2))
+    for child in splits['original']:
+        assert set(arc_ids(rows[child]['arcs'])) & set(arc_ids(rows['neighbor']['arcs']))
+    assert split_topology(result, rules)[1] == {}
+
+
+def test_tno_cli_uses_requested_rules_scenarios_and_migration_path(monkeypatch):
+    topology, rules = fixture()
+    rules['scenarios'] = ['hoi4_1936', 'hoi4_1939']
+    requested = Path('data/scenario-rules/tno_1962.geometry_splits.json')
+    migration = Path('data/feature-migrations/tno_1962_feature_splits.v1.json')
+    monkeypatch.setattr(sys, 'argv', ['apply_hoi4_geometry_splits.py', '--rules', str(requested),
+                                    '--scenarios', 'tno_1962', '--migration-output', str(migration)])
+    reads, writes, scenarios = [], {}, []
+    def read(path):
+        reads.append(path)
+        return rules
+    def run(directory, selected):
+        scenarios.append(directory.name)
+        assert selected == rules
+        result, splits, report = split_topology(topology, selected)
+        assert len(result['objects']['political']['geometries']) == 3
+        return {'changed': len(splits), 'measurements': report}
+    monkeypatch.setattr(geometry_splits, 'read', read)
+    monkeypatch.setattr(geometry_splits, 'write_json', lambda path, payload: writes.update({path: payload}))
+    monkeypatch.setattr(geometry_splits, 'run_scenario', run)
+    geometry_splits.main()
+    assert reads == [requested] and scenarios == ['tno_1962']
+    assert writes[migration]['scenarios'] == ['tno_1962']
+    assert writes[migration]['feature_splits'] == {'original': ['original__SPLIT_SOUTH', 'original__SPLIT_NORTH']}
 
 
 def test_saved_parent_mapping_and_inherited_assignments(monkeypatch):

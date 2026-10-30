@@ -70863,11 +70863,11 @@
       }
     },
     {
-      "id": 11981,
+      "id": 12000,
       "type": "Feature",
       "properties": {
-        "id": "RU_ARCTIC_FB_MAG_015",
-        "name": "Russia Shell Fallback MAG",
+        "id": "RU_ARCTIC_FB_RSF_034",
+        "name": "Russia Shell Fallback RSF",
         "cntr_code": "RU",
         "detail_tier": "scenario_runtime_shell",
         "__source": "detail",
@@ -70875,9 +70875,9 @@
         "scenario_helper_kind": "shell_fallback",
         "scenario_shell_owner_hint": "MAG",
         "scenario_shell_controller_hint": "MAG",
-        "source_fragment_count": 39.0,
-        "source_fragment_area": 0.067509,
-        "retained_fragment_area": 0.01173,
+        "source_fragment_count": 126.0,
+        "source_fragment_area": 0.1485,
+        "retained_fragment_area": 0.005812,
         "interactive": false,
         "render_as_base_geography": false
       },
@@ -70886,32 +70886,36 @@
         "coordinates": [
           [
             [
-              61.7028170281703,
-              52.996769741697406
+              140.6480064800648,
+              58.1903981099811
             ],
             [
-              61.663216632166325,
-              52.97420384303844
+              140.59040590405903,
+              58.05326687966878
             ],
             [
-              61.98001980019802,
-              52.93948707587076
+              140.56160561605617,
+              58.01507843578436
             ],
             [
-              62.05922059220592,
-              52.98114719647195
+              140.54000540005399,
+              58.01681427414273
             ],
             [
-              62.00522005220054,
-              52.958581297812984
+              140.50040500405004,
+              57.867532175321756
             ],
             [
-              61.85041850418506,
-              53.00371309513095
+              140.68400684006843,
+              58.21643568535684
             ],
             [
-              61.7028170281703,
-              52.996769741697406
+              140.75240752407524,
+              58.27371835118352
+            ],
+            [
+              140.6480064800648,
+              58.1903981099811
             ]
           ]
         ]

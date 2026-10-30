@@ -433,14 +433,6 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
-          "political.detail.country.fic"
-        ]
-      },
-      {
-        "lod": "detail",
-        "min_zoom": 1.35,
-        "max_zoom": 99.0,
-        "chunk_ids": [
           "political.detail.country.fin"
         ]
       },
@@ -1065,7 +1057,15 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
-          "political.detail.country.omo"
+          "political.detail.country.omo.part.0"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.omo.part.1"
         ]
       },
       {
@@ -1377,14 +1377,6 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
-          "political.detail.country.rsf"
-        ]
-      },
-      {
-        "lod": "detail",
-        "min_zoom": 1.35,
-        "max_zoom": 99.0,
-        "chunk_ids": [
           "political.detail.country.rur"
         ]
       },
@@ -1538,14 +1530,6 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.syr"
-        ]
-      },
-      {
-        "lod": "detail",
-        "min_zoom": 1.35,
-        "max_zoom": 99.0,
-        "chunk_ids": [
-          "political.detail.country.tan"
         ]
       },
       {
