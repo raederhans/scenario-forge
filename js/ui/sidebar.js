@@ -67,6 +67,8 @@ import { createScenarioTerritoryController } from "./sidebar/scenario_territory_
 import { createScenarioInspectorController } from "./sidebar/scenario_inspector_controller.js";
 import { createRegionalPresetController } from "./sidebar/regional_preset_controller.js";
 import { createCountryInspectorController } from "./sidebar/country_inspector_controller.js";
+import { createRegionSearchController } from "./sidebar/region_search_controller.js";
+import { selectLandFeatureById } from "../core/map_renderer.js";
 import { createStrategicOverlayController } from "./sidebar/strategic_overlay_controller.js";
 import { createWaterSpecialRegionController } from "./sidebar/water_special_region_controller.js";
 import { createProjectSupportDiagnosticsController } from "./sidebar/project_support_diagnostics_controller.js";
@@ -3168,7 +3170,19 @@ function initSidebar({ render } = {}) {
     return button;
   };
 
+  const regionSearchController = createRegionSearchController({
+    documentRef: document,
+    state,
+    t,
+    getFeatureOwnerCode,
+    getFeatureLabel: getGeoFeatureDisplayLabel,
+    selectLandFeatureById,
+  });
+  regionSearchController.mount(countryInspectorDetail);
+  countryInspectorSelected.after(countryInspectorDetail.lastElementChild);
+
   const countryInspectorController = createCountryInspectorController({
+    onSelectedCountryRendered: regionSearchController.setCountry,
     runtimeState: state,
     list,
     searchInput,
