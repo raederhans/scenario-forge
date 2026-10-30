@@ -207,3 +207,19 @@ test("matches the source name when the UI shows a translated label", () => {
   assert.equal(results.children[0].children[1].textContent, "DE300 · Berlin");
   assert.equal(block.children[3].textContent, "1 matching region");
 });
+
+test("ignores Enter, arrows, and Escape while an IME composition is active", () => {
+  const h = setup();
+  h.search("zulu");
+  assert.deepEqual(h.ids(), ["alpha-id"]);
+  for (const key of ["Enter", "ArrowDown", "Escape"]) {
+    const event = new Event("keydown", { cancelable: true, bubbles: true });
+    event.key = key;
+    event.isComposing = true;
+    h.input.dispatchEvent(event);
+    assert.equal(event.defaultPrevented, false);
+  }
+  assert.deepEqual(h.calls, []);
+  assert.equal(h.input.value, "zulu");
+  assert.equal(h.input.getAttribute("aria-expanded"), "true");
+});

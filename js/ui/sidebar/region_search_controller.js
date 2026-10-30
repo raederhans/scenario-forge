@@ -104,6 +104,8 @@ export function createRegionSearchController({
   }
 
   function onKeyDown(event) {
+    // Enter/arrows/Escape belong to the IME while a composition is active.
+    if (event.isComposing || event.keyCode === 229) return;
     const open = input.getAttribute("aria-expanded") === "true";
     if (event.key === "Escape") {
       if (!open && !input.value) return;

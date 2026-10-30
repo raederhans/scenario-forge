@@ -15266,6 +15266,17 @@ export function selectLandFeatureById(featureId) {
   const id = String(featureId || "").trim();
   const feature = id ? runtimeState.landIndex?.get(id) : null;
   if (!feature) return false;
+  // Mirror the land-click branch: a land selection replaces any water/special selection.
+  const previousWaterRegionId = String(runtimeState.selectedWaterRegionId || "").trim();
+  const previousSpecialRegionId = String(runtimeState.selectedSpecialRegionId || "").trim();
+  if (previousWaterRegionId) {
+    setClickSelectedWaterRegionIdState(runtimeState, "");
+    refreshWaterRegionSidebarRowsNow([previousWaterRegionId]);
+  }
+  if (previousSpecialRegionId) {
+    setClickSelectedSpecialRegionIdState(runtimeState, "");
+    refreshSpecialRegionSidebarRowsNow([previousSpecialRegionId]);
+  }
   const hit = {
     targetType: "land",
     id,
