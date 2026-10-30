@@ -421,3 +421,39 @@
     min-height: 44px;
   }
 }
+.region-search-results {
+  max-height: 240px;
+  overflow-y: auto;
+  margin-top: 4px;
+  padding: 0;
+  list-style: none;
+  background: var(--surface-panel);
+  border: 1px solid var(--line-1);
+  border-radius: var(--radius-sm);
+}
+
+.region-search-results [role="option"] {
+  display: flex;
+  flex-direction: column;
+  min-height: 32px;
+  padding: 4px 8px;
+  color: var(--ink-900);
+}
+
+.region-search-results [aria-selected="true"] {
+  background: var(--accent-soft);
+}
+
+.region-search-results .region-search-id {
+  color: var(--ink-500);
+  font-size: 12px;
+}
+
+.region-search-results .region-search-limit {
+  font-style: italic;
+  color: var(--ink-500);
+}
+
+@media (pointer: coarse) {
+  .region-search-results [role="option"] { min-height: 44px; }
+}

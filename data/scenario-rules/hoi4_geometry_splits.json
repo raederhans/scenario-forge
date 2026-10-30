@@ -1285,6 +1285,218 @@
         "https://library.bjp.org/jspui/bitstream/123456789/1900/1/The%20Imperial%20Gazetteer%20of%20India%20The%20India%20Empire%20Vol-4%20%28Administrative%29.pdf"
       ],
       "notes": "Simplified regional proxy following the named historical tract; rural boundary generalized and runtime coastline retained."
+    },
+    {
+      "id": "northern_cameroons",
+      "feature_ids": [
+        "NG_ADM1_NGA-2839",
+        "NG_ADM1_NGA-2881",
+        "NG_ADM1_NGA-2848"
+      ],
+      "parts": [
+        {
+          "suffix": "NCM",
+          "name_en": "British Northern Cameroons",
+          "name_zh": "英属北喀麦隆",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  13.5,
+                  13.8
+                ],
+                [
+                  13.5,
+                  12.4
+                ],
+                [
+                  13.7,
+                  11.5
+                ],
+                [
+                  13.4,
+                  10.7
+                ],
+                [
+                  12.8,
+                  10.1
+                ],
+                [
+                  12.3,
+                  9.3
+                ],
+                [
+                  11.8,
+                  8.7
+                ],
+                [
+                  11.3,
+                  7.8
+                ],
+                [
+                  10.8,
+                  7.2
+                ],
+                [
+                  10.9,
+                  6.4
+                ],
+                [
+                  16,
+                  6.4
+                ],
+                [
+                  16,
+                  13.8
+                ],
+                [
+                  13.5,
+                  13.8
+                ]
+              ]
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "其余部分"
+      },
+      "sources": [
+        "https://www.wasc.org.uk/wasc-Annual-Colonial-Reports.html"
+      ],
+      "notes": "历史边界多边形近似，沿用现有海岸线与一级行政区外界。"
+    },
+    {
+      "id": "british_togoland",
+      "feature_ids": [
+        "GH_ADM1_GHA-2155",
+        "GH_ADM1_GHA-2156",
+        "GH_ADM1_GHA-2173"
+      ],
+      "parts": [
+        {
+          "suffix": "WTO",
+          "name_en": "British Togoland",
+          "name_zh": "英属多哥兰",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -0.2,
+                  11.5
+                ],
+                [
+                  -0.2,
+                  10.7
+                ],
+                [
+                  -0.5,
+                  10
+                ],
+                [
+                  -0.5,
+                  9.3
+                ],
+                [
+                  -0.1,
+                  8.5
+                ],
+                [
+                  0,
+                  7.5
+                ],
+                [
+                  0.2,
+                  6.7
+                ],
+                [
+                  0.3,
+                  6.3
+                ],
+                [
+                  0.7,
+                  6.3
+                ],
+                [
+                  2,
+                  6.3
+                ],
+                [
+                  2,
+                  11.5
+                ],
+                [
+                  -0.2,
+                  11.5
+                ]
+              ]
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Remainder",
+        "name_zh": "其余部分"
+      },
+      "sources": [
+        "https://ugspace.ug.edu.gh/bitstreams/fe5d6a5b-b20a-4ca6-a153-38d95ef27b7d/download",
+        "https://libsysdigi.library.illinois.edu/ilharvest/africana/books2011-05/5530214/5530214_1936_1937/5530214_1936_1937_opt.pdf"
+      ],
+      "notes": "历史边界多边形近似，沿用现有海岸线与一级行政区外界。"
+    },
+    {
+      "id": "spanish_sahara_regions",
+      "feature_ids": [
+        "EH_ADMIN0_PASSTHROUGH"
+      ],
+      "parts": [
+        {
+          "suffix": "SHM",
+          "name_en": "Saguia el-Hamra",
+          "name_zh": "萨基亚哈姆拉",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -18,
+                  26
+                ],
+                [
+                  -8,
+                  26
+                ],
+                [
+                  -8,
+                  29
+                ],
+                [
+                  -18,
+                  29
+                ],
+                [
+                  -18,
+                  26
+                ]
+              ]
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "RDO",
+        "name_en": "Rio de Oro",
+        "name_zh": "里奥德奥罗"
+      },
+      "sources": [
+        "https://en.wikipedia.org/wiki/Saguia_el-Hamra"
+      ],
+      "notes": "按北纬26°划分南北行政区，外界沿用现有西撒哈拉近似地块。"
     }
   ],
   "omitted": [
