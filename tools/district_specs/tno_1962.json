@@ -468,18 +468,6 @@
           ]
         },
         {
-          "id": "gotengau",
-          "name_en": "Gotengau (Crimea)",
-          "name_zh": "哥特大区（克里米亚）",
-          "match": [
-            {
-              "cntr": [
-                "UA"
-              ]
-            }
-          ]
-        },
-        {
           "id": "reich_overseas",
           "name_en": "Reich Overseas Bases",
           "name_zh": "帝国海外据点",
@@ -2821,18 +2809,6 @@
           ]
         },
         {
-          "id": "taiwan",
-          "name_en": "Taiwan Government-General",
-          "name_zh": "台湾总督府",
-          "match": [
-            {
-              "id_prefix": [
-                "TWN-"
-              ]
-            }
-          ]
-        },
-        {
           "id": "kwantung",
           "name_en": "Kwantung Administration",
           "name_zh": "关东州行政区",
@@ -2852,18 +2828,6 @@
             {
               "prov": [
                 "CN_Shandong"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "hawaii",
-          "name_en": "Hawaii Administration",
-          "name_zh": "夏威夷行政区",
-          "match": [
-            {
-              "prov": [
-                "US_Hawaii"
               ]
             }
           ]

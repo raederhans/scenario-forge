@@ -1,0 +1,98 @@
+from __future__ import annotations
+
+from collections import Counter
+import json
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from map_builder.json_source import read_json_source
+from map_builder.political_feature_merge_plans import ordered_plans
+from map_builder.scenario_district_groups_service import build_district_groups_payload_in_context
+from scenario_builder.hoi4.parser import load_hierarchy_groups
+from tools.apply_hoi4_split_overlay import apply_overlay, make_point_lookup
+from tools import build_tno_district_groups as districts_builder
+from tools.check_scenario_contracts import write_json
+from tools.materialize_polar_scenarios import refresh_scenario, synchronize_scenario_snapshot
+
+
+def rebuild_districts(scenario_dir):
+    tags, _ = districts_builder.build_tags(
+        read_json_source(districts_builder.DEFAULT_SPEC), districts_builder.load_features(scenario_dir))
+    mutations_path = scenario_dir / "scenario_mutations.json"
+    mutations = read_json_source(mutations_path)
+    mutations["district_groups"].update(tags)
+    context = {"scenarioId": "tno_1962", "countriesPath": scenario_dir / "countries.json",
+               "ownersPath": scenario_dir / "owners.by_feature.json",
+               "districtGroupsPath": scenario_dir / "district_groups.manual.json"}
+    payload = build_district_groups_payload_in_context(context, mutations)
+    payload["generated_at"] = ""
+    write_json(mutations_path, mutations)
+    write_json(context["districtGroupsPath"], payload)
+
+
+def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
+                 data_dir=ROOT / "data", refresh=refresh_scenario,
+                 rebuild=rebuild_districts, synchronize=synchronize_scenario_snapshot,
+                 load_plans=ordered_plans, load_hierarchy=load_hierarchy_groups):
+    scenario_dir = Path(scenario_dir)
+    topology = read_json_source(scenario_dir / "runtime_topology.topo.json")
+    owners = read_json_source(scenario_dir / "owners.by_feature.json")["owners"]
+    payload = read_json_source(scenario_dir / "countries.json")
+    manifest = read_json_source(scenario_dir / "manifest.json")
+    geometries = [g for name in ("political", "scenario_atlantropa")
+                  for g in topology["objects"][name]["geometries"]
+                  if g["properties"]["id"] in owners]
+    editable_topology = {**topology, "objects": {"political": {
+        "type": "GeometryCollection", "geometries": geometries}}}
+    groups, meta = load_hierarchy(data_dir / "hierarchy.json")
+    countries, assignments, report = apply_overlay(
+        overlay, "tno_1962",
+        features={g["properties"]["id"]: g["properties"] for g in geometries},
+        owners=owners, cores=read_json_source(scenario_dir / "cores.by_feature.json")["cores"],
+        countries=payload["countries"], default_country=manifest["default_country"],
+        hierarchy_groups=groups, country_meta=meta, prefectures={}, bucket_by_feature={},
+        plans=load_plans(data_dir),
+        feature_splits=manifest.get("hierarchy_overrides", {}).get("feature_splits", {}),
+        topology=editable_topology, point_for_feature=make_point_lookup(editable_topology),
+    )
+    counts = Counter({**owners, **{fid: row["owner"] for fid, row in assignments.items()}}.values())
+    for tag, country in countries.items():
+        country["feature_count"] = counts[tag]
+        if "controller_feature_count" in country:
+            country["controller_feature_count"] = counts[tag]
+    manual_path = scenario_dir / "scenario_manual_overrides.json"
+    mutations_path = scenario_dir / "scenario_mutations.json"
+    manual = read_json_source(manual_path)
+    mutations = read_json_source(mutations_path)
+    source_changed = False
+    for entry in overlay["entries"]:
+        tag = entry["tag"]
+        country = countries[tag]
+        mutation = {**mutations["countries"].get(tag, {}), "mode": "create",
+                    **{key: country[key] for key in
+                       ("display_name", "display_name_en", "display_name_zh", "color_hex",
+                        "parent_owner_tag", "subject_kind")}, "color_policy": "locked"}
+        source_changed |= manual["countries"].get(tag) != country or mutations["countries"].get(tag) != mutation
+        manual["countries"][tag] = country
+        mutations["countries"][tag] = mutation
+    if assignments or countries != payload["countries"] or source_changed:
+        write_json(scenario_dir / "countries.json", {**payload, "countries": countries})
+        write_json(manual_path, manual)
+        write_json(mutations_path, mutations)
+        refresh(scenario_dir, assignments, removed_ids=())
+        rebuild(scenario_dir)
+        synchronize(scenario_dir)
+    return report
+
+
+def main():
+    overlay = read_json_source(ROOT / "data/scenario-rules/tno_1962.split_overlay.json")
+    print(json.dumps(run_scenario(overlay), ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()

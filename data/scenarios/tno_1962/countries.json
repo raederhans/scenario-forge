@@ -1782,6 +1782,47 @@
       "synthetic_owner": false,
       "tag": "COS"
     },
+    "CRI": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#4a4a4a",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 18,
+      "display_name": "Reichsgau Gotenland",
+      "display_name_en": "Reichsgau Gotenland",
+      "display_name_zh": "哥特兰帝国大区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 18,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "GER",
+      "parent_owner_tags": [
+        "GER"
+      ],
+      "primary_rule_source": "tno_cri",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_cri"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "CRI"
+    },
     "CRO": {
       "base_iso2": "HR",
       "capital_state_id": 109,
@@ -2470,7 +2511,7 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 538,
+      "controller_feature_count": 520,
       "disabled_regional_preset_names": [
         "Bavaria",
         "Saxony",
@@ -2485,7 +2526,7 @@
       "display_name_en": "Germany",
       "display_name_zh": "大日耳曼国",
       "entry_kind": "",
-      "feature_count": 538,
+      "feature_count": 520,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -3605,12 +3646,12 @@
       "color_policy": "palette",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 95,
+      "controller_feature_count": 69,
       "display_name": "Japan",
       "display_name_en": "Japan",
       "display_name_zh": "大日本帝国",
       "entry_kind": "",
-      "feature_count": 95,
+      "feature_count": 69,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -3637,6 +3678,47 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
       "tag": "JAP"
+    },
+    "JHAW": {
+      "base_iso2": "JAP",
+      "capital_state_id": null,
+      "color_hex": "#cb6c85",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 5,
+      "display_name": "Hawaii Occupation Government",
+      "display_name_en": "Hawaii Occupation Government",
+      "display_name_zh": "夏威夷占领政府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "JAP",
+      "notes": "",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "tno_jhaw",
+      "provenance_iso2": "JAP",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_jhaw"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "JHAW"
     },
     "JOR": {
       "base_iso2": "JO",
@@ -3677,6 +3759,47 @@
       "subregion_label": "Western Asia",
       "synthetic_owner": false,
       "tag": "JOR"
+    },
+    "JTWN": {
+      "base_iso2": "JAP",
+      "capital_state_id": null,
+      "color_hex": "#e66e6d",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 21,
+      "display_name": "Taiwan Government-General",
+      "display_name_en": "Taiwan Government-General",
+      "display_name_zh": "台湾总督府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 21,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "JAP",
+      "notes": "",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "tno_jtwn",
+      "provenance_iso2": "JAP",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_jtwn"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "JTWN"
     },
     "KAZ": {
       "base_iso2": "KZ",
