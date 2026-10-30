@@ -30,6 +30,42 @@ def test_all_shell_hints_resolve_to_existing_countries(scenario):
         assert shell['scenario_shell_controller_hint'] in countries, shell['id']
 
 
+def test_adjacent_administrative_children_have_distinct_family_colors(scenario):
+    countries = scenario['countries.json']['countries']
+    owners = scenario['owners.by_feature.json']['owners']
+    families = {'RKO', 'RKU', 'RKM', 'RKK', 'GEA', 'GCO', 'AOI', 'ITA', 'IBR', 'SAF', 'ANG'}
+    pairs = set()
+    for name in ('political', 'scenario_atlantropa'):
+        obj = scenario['runtime_topology.topo.json']['objects'][name]
+        rows = obj['geometries']
+        for index, neighbors in enumerate(obj.get('computed_neighbors', [])):
+            a = owners.get(rows[index]['properties']['id'])
+            for neighbor in neighbors:
+                b = owners.get(rows[neighbor]['properties']['id'])
+                if a and b and a != b:
+                    parent = countries[a].get('parent_owner_tag')
+                    if parent in families and parent == countries[b].get('parent_owner_tag'):
+                        pairs.add(tuple(sorted((a, b))))
+    assert pairs
+    for a, b in pairs:
+        distance = math.dist(hex_to_oklab(countries[a]['color_hex']), hex_to_oklab(countries[b]['color_hex']))
+        assert distance >= 0.03, (a, b, distance)
+
+
+def test_administrative_containers_and_retired_tags(scenario):
+    countries = scenario['countries.json']['countries']
+    owners = scenario['owners.by_feature.json']['owners']
+    for tag in ('RKO', 'RKU', 'RKM', 'RKK', 'GEA', 'GCO', 'AOI'):
+        assert countries[tag]['entry_kind'] == 'scenario_container'
+        assert countries[tag]['feature_count'] == 0
+        assert tag not in owners.values()
+        assert any(country.get('parent_owner_tag') == tag and country['feature_count'] > 0
+                   for country in countries.values())
+    for tag in ('AFA', 'PG01', 'PG02', 'PG03', 'PG04'):
+        assert tag not in countries
+        assert tag not in owners.values()
+
+
 def test_repaired_adjacent_colors_remain_distinguishable_and_fic_retires(scenario):
     countries = scenario['countries.json']['countries']
     for a, b in [('URL', 'OUR'), ('FAV', 'URA'), ('NRL', 'OMO')]:
@@ -43,7 +79,7 @@ def test_repaired_adjacent_colors_remain_distinguishable_and_fic_retires(scenari
 @pytest.mark.parametrize('feature_id,rule', CHANGED_RULES.items())
 def test_user_reassigned_feature_has_requested_owner(scenario, feature_id, rule):
     assert len(CHANGED_RULES) == 49
-    assert scenario['owners.by_feature.json']['owners'][feature_id] == rule['to']
+    assert scenario['owners.by_feature.json']['owners'][feature_id] == {'RKM': 'MS00', 'RKO': 'OE00', 'RKU': 'UK00', 'RKK': 'KC00'}.get(rule['to'], rule['to'])
 
 
 def test_reassignment_preserves_unrelated_cores_and_unchanged_rows():

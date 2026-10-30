@@ -171,10 +171,6 @@ KAZ 独立，用 Akmola／阿克莫拉；台北城市宿主目前归 CHI，采�
 | UK06 | Melitopol / 梅利托波尔 | `CITY::ne::1159134253` | `UA_RAY_74538382B95492559683598` |
 | UK07 | Charkow / 哈尔科夫 | `CITY::ne::1159149333` | `UA_RAY_74538382B36501884751905` |
 | UK08 | Hughesdorf / 休斯多夫 | `CITY::ne::1159149331` | `UA_RAY_74538382B54113761495064` |
-| PG01 | Warschau / 华沙 | `CITY::ne::1159151299` | `PL_POW_1465` |
-| PG02 | Radom / 拉多姆 | `CITY::gn::760778` | `PL_POW_1463` |
-| PG03 | Lublin / 卢布林 | `CITY::ne::1159139095` | `PL_POW_0663` |
-| PG04 | Lemberg / 伦贝格 | `CITY::ne::1159149323` | `UA_RAY_74538382B46853229377150` |
 | AYR | Agadez / 阿加德兹 | `CITY::ne::1159150627` | `NE_ADM1_NER-800` |
 | AZW | Kidal / 基达尔 | `CITY::gn::2455290` | `ML_ADM1_MLI-2689` |
 | CHD | Moussoro / 穆索罗 | `CITY::gn::2427336` | `TD_ADM1_TCD-5581` |
@@ -198,3 +194,71 @@ KAZ 独立，用 Akmola／阿克莫拉；台北城市宿主目前归 CHI，采�
 | MAL | Brunei Town / 文莱城 | `CITY::ne::1159151083` | `BN_ADM1_BRN-1182` |
 | BWA | Abeokuta / 阿贝奥库塔 | `CITY::ne::1159138799` | `NG_ADM1_NGA-2852` |
 | AOF | Lomé / 洛美 | `CITY::ne::1159150535` | `TG_ADM1_TGO-87` |
+
+## TNO 第三批行政区
+
+新增行政区以当前归属筛选，不改变俄罗斯军阀边界；用户校正到 RKO、RKU、RKM、RKK 的地块随首府区转入对应的 OE00、UK00、MS00、KC00，仍留在原行政体系内。MS06 的五块合并地块包含弗拉基米尔，采用占领期名称 Wladimir；MS02 的斯摩棱斯克点位不在本区，采用境内 Brjansk。莫桑比克作为德属东非的同级行政区 GEAM，首府为 Lourenço Marques。
+
+名称沿用城市覆盖中的占领期名；高加索与莫斯科维恩名称核对本地 TNO 1.10.0b 的 `TNO_victory_points_l_english.yml` 和 `state_names_l_english.yml`，包括 Jekaterinodar、Wladikawkaz、Sankt Petersburg、Platenfurt、Paulusburg、Wladimir、Woronesch 和 Jaroslawl。
+
+| Tag | 地块数 | 首府 | 城市 ID | 点位所在地块 |
+| --- | ---: | --- | --- | --- |
+| ALB | 21 | Tirana / 地拉那 | `CITY::ne::1159151117` | `AL022` |
+| BTS | 15 | Gaborone / 加博罗内 | `CITY::ne::1159151153` | `BW_ADM1_BWA-5501` |
+| CGBC | 16 | Brazzastadt / 布拉柴城 | `CITY::ne::1159150993` | `CG_ADM1_COG-4855` |
+| CGGA | 9 | Freistadt / 自由城 | `CITY::ne::1159150913` | `GA_ADM1_GAB-2168` |
+| CGKT | 1 | Elisabethstadt / 伊丽莎白城 | `CITY::ne::1159150903` | `CD_ADM1_COD-1897` |
+| CGKV | 2 | Costermansstadt / 科斯特曼斯城 | `CITY::ne::1159148481` | `CD_ADM1_COD-1894` |
+| CGUB | 12 | Bangui / 班吉 | `CITY::ne::1159151111` | `CF_ADM1_CAF-1460` |
+| GEAM | 11 | Lourenço Marques / 洛伦索·马贵斯 | `CITY::ne::1159150683` | `MZ_ADM1_MOZ-5854` |
+| GEAB | 17 | Usumbura / 乌松布拉 | `CITY::ne::1159150427` | `BI_ADM1_BDI-3364` |
+| GEAN | 3 | Zomba / 松巴 | `CITY::ne::1159148499` | `MW_ADM1_82672581B71595037145626` |
+| GEAR | 5 | Barthstadt / 巴特城 | `CITY::ne::1159149385` | `RW_ADM1_RWA-3495` |
+| GEAS | 10 | Salisbury / 索尔兹伯里 | `CITY::ne::1159150573` | `ZW_ADM1_ZWE-525` |
+| GEAT | 30 | Daressalam / 达累斯萨拉姆 | `CITY::ne::1159151305` | `TZ_ADM1_TZA-3378` |
+| GEAU | 4 | Kampala / 坎帕拉 | `CITY::ne::1159150593` | `UG_ADM1_17295835B48340970483027` |
+| GEAZ | 10 | Lusaka / 卢萨卡 | `CITY::ne::1159150571` | `ZM_ADM1_ZMB-520` |
+| ICVE | 22 | Praia / 普拉亚 | `CITY::ne::1159151205` | `CV_ADM1_CPV-5053` |
+| IDAL | 40 | Zara / 扎拉 | `CITY::ne::1159140367` | `HR033` |
+| IDJI | 6 | Gibuti / 吉布提 | `CITY::ne::1159149869` | `DJ_ADM1_DJI-1567` |
+| IERI | 6 | Asmára / 阿斯马拉 | `CITY::ne::1159150873` | `ER_ADM1_ERI-1561` |
+| IGUI | 9 | Bissau / 比绍 | `CITY::ne::1159150803` | `GW_ADM1_GNB-769` |
+| IKEN | 8 | Nairobi / 内罗毕 | `CITY::ne::1159151597` | `KE_ADM1_KEN-1196` |
+| ISOM | 18 | Mogadiscio / 摩加迪沙 | `CITY::ne::1159150715` | `SO_ADM1_83879307B32896531038690` |
+| ISTP | 2 | São Tomé / 圣多美 | `CITY::ne::1159151195` | `ST_ADM1_STP-4861` |
+| ISUE | 3 | Ismailia / 伊斯梅利亚 | `CITY::ne::1159140377` | `EGY-1531` |
+| ITIM | 13 | Dili / 帝力 | `CITY::ne::1159150577` | `TL_ADM1_TLS-541` |
+| KC01 | 69 | Baku / 巴库 | `CITY::ne::1159151123` | `AZE-1689` |
+| KC02 | 17 | Jekaterinodar / 叶卡捷琳诺达尔 | `CITY::ne::1159149549` | `RU_RAY_50074027B89252490479976` |
+| KC03 | 20 | Stawropol / 斯塔夫罗波尔 | `CITY::ne::1159149523` | `RU_MRG_f01d51060a16` |
+| KC04 | 37 | Wladikawkaz / 弗拉季高加索 | `CITY::ne::1159137065` | `RU_RAY_50074027B27316284331880` |
+| KC05 | 21 | Elista / 埃利斯塔 | `CITY::ne::1159148145` | `RU_MRG_90d3823663be` |
+| LTH | 10 | Maseru / 马塞卢 | `CITY::ne::1159150831` | `LS_ADM1_LSO-1203` |
+| MS01 | 10 | Sankt Petersburg / 圣彼得堡 | `CITY::ne::1159151291` | `RU_CITY_SAINT_PETERSBURG` |
+| MS02 | 9 | Brjansk / 布良斯克 | `CITY::ne::1159149531` | `RU_RAY_50074027B25563950651561` |
+| MS03 | 21 | Tula / 图拉 | `CITY::ne::1159146521` | `RU_MRG_e770cd31cdb4` |
+| MS04 | 21 | Woronesch / 沃罗涅日 | `CITY::ne::1159149557` | `RU_RAY_50074027B21233041988666` |
+| MS05 | 9 | Jaroslawl / 雅罗斯拉夫尔 | `CITY::ne::1159149543` | `RU_RAY_50074027B57358126207690` |
+| MS06 | 5 | Wladimir / 弗拉基米尔 | `CITY::ne::1159148121` | `RU_MRG_13fef5f74a14` |
+| MS07 | 18 | Platenfurt / 普拉滕富特 | `CITY::ne::1159149575` | `RU_RAY_50074027B39404018386654` |
+| MS08 | 36 | Paulusburg / 保卢斯堡 | `CITY::ne::1159150697` | `RU_CITY_VOLGOGRAD` |
+| SWAO | 18 | Luanda / 罗安达 | `CITY::ne::1159151469` | `AO_ADM1_AGO-1880` |
+| SWZ | 4 | Mbabane / 姆巴巴内 | `CITY::ne::1159149413` | `SZ_ADM1_SWZ-534` |
+
+Zara 的基础城市点距简化海岸约 2.23 公里，首都修复按既有海岸规则吸附至 HR033 内；其余新增首府使用原始城市坐标。第三批首都修复结果 `conflicts=[]`。
+
+## TNO 容器母国与撤回分区
+
+RKO、RKU、RKM、RKK、GEA、GCO、AOI 保留为零领土容器，通过 parent_owner_tag 关联子区，并明确设为无首都。ANG 的剩余领土是德属西南非本体，SAF 的剩余领土是南非本体，仍保留领土与首都。PG01–PG04 的 62 块地块回归 RKP，四个分区及其首都条目退休。
+
+容器子区：RKO → OE00–OE04；RKU → UK00–UK08；RKM → MS00–MS08；RKK → KC00–KC05；GEA → GEAB、GEAM、GEAN、GEAR、GEAS、GEAT、GEAU、GEAZ；GCO → CG00、CGBC、CGGA、CGKT、CGKV、CGUB；AOI → IDJI、IERI、IETH、IKEN、ISOM。
+
+| Tag | 地块数 | 首府 | 城市 ID | 点位所在地块 |
+| --- | ---: | --- | --- | --- |
+| OE00 | 7 | Riga / 里加 | `CITY::ne::1159150811` | `LV006` |
+| UK00 | 33 | Kiew / 基辅 | `CITY::ne::1159151495` | `UA_RAY_74538382B60890943260132` |
+| MS00 | 25 | Moskau / 莫斯科 | `CITY::ne::1159151585` | `RU_CITY_MOSCOW` |
+| KC00 | 9 | Tiflis / 第比利斯 | `CITY::ne::1159150961` | `GEO-3036` |
+| GEAM | 11 | Lourenço Marques / 洛伦索·马贵斯 | `CITY::ne::1159150683` | `MZ_ADM1_MOZ-5854` |
+| CG00 | 32 | Leopoldstadt / 利奥波德城 | `CITY::ne::1159151539` | `CD_ADM1_COD-1884` |
+| IETH | 11 | Addis Abeba / 亚的斯亚贝巴 | `CITY::ne::1159151549` | `ET_ADM1_ETH-3133` |

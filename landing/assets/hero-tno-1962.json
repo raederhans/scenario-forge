@@ -37,8 +37,8 @@
     "data/scenarios/tno_1962/scenario_atlantropa.topo.json"
   ],
   "feature_counts": {
-    "territories": 50,
-    "political_features": 2326,
+    "territories": 54,
+    "political_features": 2321,
     "capitals": 7,
     "base_land_features_inspected": 22185,
     "base_land_features_candidates": 5698,
@@ -62,8 +62,8 @@
     "atlantropa_shoal_paths": 61
   },
   "counts": {
-    "territories": 50,
-    "political_features": 2326,
+    "territories": 54,
+    "political_features": 2321,
     "capitals": 7,
     "base_land_features_inspected": 22185,
     "base_land_features_candidates": 5698,
@@ -87,6 +87,7 @@
     "atlantropa_shoal_paths": 61
   },
   "territory_tags": [
+    "ALB",
     "BRG",
     "BUL",
     "CRI",
@@ -102,23 +103,25 @@
     "IBR",
     "IRE",
     "ITA",
+    "KC02",
     "MC",
     "MNT",
+    "MS00",
+    "MS01",
+    "MS02",
+    "MS03",
+    "MS04",
+    "MS05",
+    "MS06",
+    "OE00",
     "OE01",
     "OE02",
     "OE03",
     "OE04",
     "ONG",
-    "PG01",
-    "PG02",
-    "PG03",
-    "PG04",
-    "RKM",
     "RKN",
     "RKNO",
-    "RKO",
     "RKP",
-    "RKU",
     "ROM",
     "SCO",
     "SER",
@@ -126,6 +129,7 @@
     "SWE",
     "SWI",
     "TUR",
+    "UK00",
     "UK01",
     "UK02",
     "UK03",
@@ -145,7 +149,7 @@
     "GER",
     "IBR",
     "ITA",
-    "RKU"
+    "UK00"
   ],
   "capital_points": [
     {
@@ -179,7 +183,7 @@
       "lat": 40.4165
     },
     {
-      "tag": "RKU",
+      "tag": "UK00",
       "name": "Kyiv",
       "lon": 30.5238,
       "lat": 50.45466
@@ -204,13 +208,14 @@
       "GER",
       "ITA",
       "IBR",
-      "RKU",
+      "UK00",
       "SOV",
       "WRS",
       "BRG"
     ],
     "hero_capital_label_overrides": {
-      "BRG": "Nanzig"
+      "BRG": "Nanzig",
+      "UK00": "Kyiv"
     },
     "hero_capital_point_overrides": {
       "BRG": [

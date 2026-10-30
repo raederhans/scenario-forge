@@ -138,7 +138,8 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
     // The 1.10 identity migration (data/scenario-rules/tno_1962.identity_map.json) retires the
     // old project tags; PRC now names Tannu Tuva and holds land.
     const retiredCountryTags = ['BEL', 'EST', 'LAT', 'LIT', 'LUX', 'NOR', 'POL', 'SOV',
-      'SIC', 'SIK', 'TAN', 'FRI', 'HOL', 'GSW', 'RSF', 'BRM', 'FIC'];
+      'SIC', 'SIK', 'TAN', 'FRI', 'HOL', 'GSW', 'RSF', 'BRM', 'FIC',
+      'AFA', 'PG01', 'PG02', 'PG03', 'PG04'];
     const requiredControllerOnlyTags = ['POR', 'XSM'];
     const lingeringHoi4Owners = Object.values(payload.countries)
       .filter((entry) => entry && entry.source_type === 'hoi4_owner')
@@ -156,6 +157,10 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
     });
     requiredControllerOnlyTags.forEach((tag) => {
       expect(payload.countries[tag]?.entry_kind).toBe('controller_only');
+    });
+    ['RKO', 'RKU', 'RKM', 'RKK', 'GEA', 'GCO', 'AOI'].forEach((tag) => {
+      expect(payload.countries[tag]?.entry_kind).toBe('scenario_container');
+      expect(payload.countries[tag]?.feature_count).toBe(0);
     });
     expect(payload.countries.POR?.hidden_from_country_list).toBeTruthy();
     expect(payload.manifest.featured_tags || []).not.toContain('SOV');

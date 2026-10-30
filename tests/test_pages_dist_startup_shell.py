@@ -483,11 +483,11 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     )
                     self.assertEqual(
                         payload["selection_policy"]["hero_capital_tags"],
-                        ["ENG", "FRA", "GER", "ITA", "IBR", "RKU", "SOV", "WRS", "BRG"],
+                        ["ENG", "FRA", "GER", "ITA", "IBR", "UK00", "SOV", "WRS", "BRG"],
                     )
                     self.assertEqual(
                         payload["selection_policy"]["hero_capital_label_overrides"],
-                        {"BRG": "Nanzig"},
+                        {"BRG": "Nanzig", "UK00": "Kyiv"},
                     )
                     self.assertEqual(
                         payload["selection_policy"]["hero_capital_point_overrides"],

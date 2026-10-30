@@ -3014,10 +3014,10 @@
       "BKF"
     ],
     "BF_ADM1_92566538B26761698110708": [
-      "AFA"
+      "FFR"
     ],
     "BF_ADM1_92566538B37033565003987": [
-      "AFA"
+      "BKF"
     ],
     "BF_ADM1_92566538B49759193106183": [
       "BKF"
@@ -3032,7 +3032,7 @@
       "BKF"
     ],
     "BF_ADM1_92566538B5930876876994": [
-      "AFA"
+      "BKF"
     ],
     "BF_ADM1_92566538B60283727543208": [
       "HAU"
@@ -4822,7 +4822,7 @@
       "SWI"
     ],
     "CI_ADM1_83157122B12160353323799": [
-      "FFR"
+      "GUI"
     ],
     "CI_ADM1_83157122B20352934117266": [
       "FFR"
@@ -14386,7 +14386,7 @@
       "GUI"
     ],
     "GN_ADM1_385441B82784678606818": [
-      "AFA"
+      "GUI"
     ],
     "GN_ADM1_385441B8345275251802": [
       "GUI"
@@ -17680,7 +17680,7 @@
       "AZW"
     ],
     "ML_ADM1_MLI-2690": [
-      "AFA"
+      "AZW"
     ],
     "ML_ADM1_MLI-2792": [
       "MLI"
@@ -17689,10 +17689,10 @@
       "MLI"
     ],
     "ML_ADM1_MLI-2794": [
-      "AFA"
+      "GUI"
     ],
     "ML_ADM1_MLI-2809": [
-      "AFA"
+      "HAU"
     ],
     "ML_ADM1_MLI-2810": [
       "MLI"
@@ -17812,13 +17812,13 @@
       "POR"
     ],
     "MR_ADM1_MRT-2783": [
-      "AFA"
+      "IBR"
     ],
     "MR_ADM1_MRT-2784": [
       "MAU"
     ],
     "MR_ADM1_MRT-2785": [
-      "AOF"
+      "IBR"
     ],
     "MR_ADM1_MRT-2786": [
       "MAU"
@@ -17839,13 +17839,13 @@
       "MAU"
     ],
     "MR_ADM1_MRT-2795": [
-      "AFA"
+      "IBR"
     ],
     "MR_ADM1_MRT-2796": [
-      "AFA"
+      "AZW"
     ],
     "MR_ADM1_MRT-2797": [
-      "AFA"
+      "MAU"
     ],
     "MR_ADM1_MRT-2798": [
       "MAU"
@@ -18903,19 +18903,19 @@
       "HAU"
     ],
     "NE_ADM1_NER-796": [
-      "AFA"
+      "AYR"
     ],
     "NE_ADM1_NER-800": [
       "AYR"
     ],
     "NE_ADM1_NER-91": [
-      "AFA"
+      "AYR"
     ],
     "NE_ADM1_NER-92": [
       "AYR"
     ],
     "NE_ADM1_NER-93": [
-      "AFA"
+      "CAO"
     ],
     "NE_ADM1_NER-94": [
       "HAU"
@@ -24168,7 +24168,7 @@
       "SEN"
     ],
     "SN_ADM1_SEN-5517": [
-      "AOF"
+      "SEN"
     ],
     "SN_ADM1_SEN-759": [
       "SEN"
@@ -24428,13 +24428,13 @@
       "CHD"
     ],
     "TD_ADM1_TCD-1466": [
-      "AFA"
+      "CAO"
     ],
     "TD_ADM1_TCD-1472": [
-      "AFA"
+      "CAO"
     ],
     "TD_ADM1_TCD-1473": [
-      "AFA"
+      "CHD"
     ],
     "TD_ADM1_TCD-1474": [
       "CAO"

@@ -310,6 +310,17 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
 
     before, after = Counter(owners.values()), Counter(result_owners.values())
     retired = {tag for tag in result_countries if before[tag] > 0 and after[tag] == 0}
+    containers = set()
+    while True:
+        parents = {country.get("parent_owner_tag") for tag, country in result_countries.items()
+                   if tag not in retired or tag in containers}
+        added = retired & parents - containers
+        if not added:
+            break
+        containers.update(added)
+    for tag in containers:
+        result_countries[tag]["entry_kind"] = "scenario_container"
+    retired -= containers
     # A tag that still names a parent or a core of any parcel must stay declared.
     protected = ({default_country}
                  | {c.get("parent_owner_tag") for tag, c in result_countries.items() if tag not in retired}

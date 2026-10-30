@@ -10,6 +10,7 @@ import pytest
 from map_builder.scenario_political_materialization_support import build_country_entry_from_mutation
 from map_builder.scenario_family_palette import family_palette, hex_to_oklab
 from tools.apply_tno_split_overlay import run_scenario, update_country_geography
+from tools.apply_hoi4_split_overlay import apply_overlay
 from tools.build_tno_split_overlay import D
 from tools import materialize_polar_scenarios
 from tools import build_tno_split_overlay as builder
@@ -26,6 +27,29 @@ def scenario_dir():
 
 def read(path):
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize("has_child", [True, False])
+def test_zero_land_parent_is_retained_but_core_only_tag_is_rejected(has_child):
+    overlay = {"version": 1, "entries": [{"id": "capital_district", "scenarios": ["tno_1962"],
+        "tag": "NEW", "select": {"feature_ids": ["capital"]}, "cores": "keep"}]}
+    countries = {"ROOT": {"tag": "ROOT"}, "NEW": {"tag": "NEW"}}
+    if has_child:
+        countries["NEW"]["parent_owner_tag"] = "ROOT"
+    kwargs = dict(features={"capital": {"cntr_code": "RU"}}, owners={"capital": "ROOT"},
+        cores={"capital": ["ROOT"]}, countries=countries, default_country="NEW",
+        hierarchy_groups={}, country_meta={}, prefectures={}, bucket_by_feature={}, plans=[])
+    if not has_child:
+        with pytest.raises(ValueError, match="protected.*ROOT"):
+            apply_overlay(overlay, "tno_1962", **kwargs)
+        return
+    result, assignments, report = apply_overlay(overlay, "tno_1962", **kwargs)
+    assert result["ROOT"]["entry_kind"] == "scenario_container"
+    assert assignments["capital"]["owner"] == "NEW"
+    assert assignments["capital"]["cores"] == ["ROOT"]
+    assert report["retired_tags"] == []
+    kwargs.update(countries=result, owners={"capital": "NEW"})
+    assert apply_overlay(overlay, "tno_1962", **kwargs)[2]["changed_count"] == 0
 
 
 def test_two_objects_sources_and_idempotence(scenario_dir, monkeypatch):
@@ -150,7 +174,7 @@ def test_generator_rejects_empty_new_entry(monkeypatch):
                               {"version": 1, "entries": []})
 
 
-@pytest.mark.parametrize("kind", ["colony", "colonial_government"])
+@pytest.mark.parametrize("kind", ["colony", "colonial_government", "protectorate"])
 def test_subject_kind_survives_materialization(kind):
     mutation = dict(mode="create", display_name_en="Taiwan", display_name_zh="台湾",
                     color_hex="#bbccdd", parent_owner_tag="JAP", subject_kind=kind)
@@ -171,12 +195,13 @@ def test_batch_two_published_ownership_and_relationships():
     cores = read(directory / "cores.by_feature.json")["cores"]
     countries = read(directory / "countries.json")["countries"]
     user_rules = read(Path(__file__).parent / "fixtures/tno_user_reassign.json")
-    corrected = {fid: row["to"] for fid, row in user_rules.items() if row["from"] != row["to"]}
+    corrected = {fid: {"RKM": "MS00", "RKO": "OE00", "RKU": "UK00", "RKK": "KC00"}.get(row["to"], row["to"]) for fid, row in user_rules.items() if row["from"] != row["to"]}
     for entry in overlay["entries"][3:]:
         tag = entry["tag"]
         country = countries[tag]
-        assert country["parent_owner_tag"] == entry["parent_owner_tag"]
-        assert country["subject_kind"] == entry["subject_kind"]
+        if "parent_owner_tag" in entry:
+            assert country["parent_owner_tag"] == entry["parent_owner_tag"]
+            assert country["subject_kind"] == entry["subject_kind"]
         for fid in entry["select"]["feature_ids"]:
             assert owners[fid] == corrected.get(fid, tag)
             if entry["cores"] == "owner":
@@ -184,8 +209,8 @@ def test_batch_two_published_ownership_and_relationships():
     assert owners["MYS-1139"] == "MLY"
     assert owners["MYS-4833"] == "MAL"
     assert owners["BN_ADM1_BRN-1184"] == "MAL"
-    assert owners["MR_ADM1_MRT-2796"] == "AFA"
-    assert owners["PL_POW_1463"] == "PG02"
+    assert owners["MR_ADM1_MRT-2796"] == "AZW"
+    assert owners["PL_POW_1463"] == "RKP"
     assert countries["GUI"]["display_name_en"] == "Guinea"
     assert countries["GUZ"]["display_name"] == "Guizhou Clique"
     assert all(owner in countries for owner in owners.values())
@@ -258,3 +283,15 @@ assert.equal(hawaii.children.length, 5);
 console.log('JHAW -> US -> US_Hawaii: 5 owned parcels');
 """
     subprocess.run(["node", "--input-type=module", "-e", script], cwd=builder.ROOT, check=True)
+
+
+def test_explicit_pilot_selection_intersects_current_owner(monkeypatch):
+    monkeypatch.setattr(builder, "PILOTS", (
+        ("CGUB", "Ubangi", "乌班吉", "GCO", "colonial_government", ("a", "foreign")),))
+    monkeypatch.setattr(builder, "DISTRICTS", ())
+    monkeypatch.setattr(builder, "EXPLICIT", ())
+    result = builder.build_overlay({}, {"a": "GCO", "foreign": "CAO"},
+                                   {"GCO": {"color_hex": "#6a725b"}},
+                                   {"version": 1, "entries": []})
+    assert result["entries"][0]["select"] == {"feature_ids": ["a"]}
+    assert result["entries"][0]["cores"] == "keep"

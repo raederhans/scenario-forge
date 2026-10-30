@@ -11,6 +11,15 @@ export function createCountryInspectorModel(runtimeState, t) {
     );
   }
 
+  function getScenarioSubjectChildrenForParent(parentTag, states = []) {
+    const parent = normalizeCountryCode(parentTag);
+    return states.filter((entry) => {
+      if (entry.releasable || !(entry.scenarioSubject || entry.entryKind === "scenario_container")) return false;
+      const parents = entry.parentOwnerTags?.length ? entry.parentOwnerTags : [entry.parentOwnerTag];
+      return parents.includes(parent);
+    });
+  }
+
   function getScenarioCountryMeta(entryOrCode) {
     const rawCode = typeof entryOrCode === "object" && entryOrCode
       ? entryOrCode.code
@@ -96,6 +105,11 @@ export function createCountryInspectorModel(runtimeState, t) {
       || (typeof entryOrCode === "string" ? entryOrCode : "")
     );
     if (!tag) {
+      return explicitEntryGroup;
+    }
+
+    const parentTag = scenarioMeta?.parent_owner_tag || entry?.parentOwnerTag;
+    if (runtimeState.scenarioCountriesByTag?.[parentTag]?.entry_kind === "scenario_container") {
       return explicitEntryGroup;
     }
 
@@ -394,6 +408,7 @@ export function createCountryInspectorModel(runtimeState, t) {
 
   return {
     getScenarioCountryMeta,
+    getScenarioSubjectChildrenForParent,
     resolveScenarioInspectorGroupMeta,
     resolveScenarioLookupCode,
     resolveInspectorDataCode,

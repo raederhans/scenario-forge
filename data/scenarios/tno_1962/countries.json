@@ -1,44 +1,5 @@
 {
   "countries": {
-    "AFA": {
-      "base_iso2": "NE",
-      "capital_state_id": null,
-      "color_hex": "#050505",
-      "color_policy": "locked",
-      "continent_id": "continent_africa",
-      "continent_label": "Africa",
-      "controller_feature_count": 20,
-      "display_name": "African Anarchy",
-      "entry_kind": "scenario_country",
-      "feature_count": 20,
-      "featured": false,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "NE",
-      "notes": "African Anarchy created from the requested Saharan collapse zone in TNO 1962.",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "tno_1962_afa_manual_override",
-      "provenance_iso2": "NE",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_1962_afa_manual_override"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "",
-      "subregion_id": "subregion_western_africa",
-      "subregion_label": "Western Africa",
-      "synthetic_owner": false,
-      "tag": "AFA"
-    },
     "AFG": {
       "base_iso2": "AF",
       "capital_state_id": 267,
@@ -76,6 +37,47 @@
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
       "tag": "AFG"
+    },
+    "ALB": {
+      "base_iso2": "AL",
+      "capital_state_id": null,
+      "color_hex": "#5a7a4a",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 21,
+      "display_name": "Italian Protectorate of Albania",
+      "display_name_en": "Italian Protectorate of Albania",
+      "display_name_zh": "意属阿尔巴尼亚保护国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 21,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AL",
+      "notes": "",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_alb",
+      "provenance_iso2": "AL",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_alb"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "ALB"
     },
     "ALC": {
       "base_iso2": "DZ",
@@ -210,12 +212,12 @@
       "color_policy": "locked",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 31,
+      "controller_feature_count": 13,
       "display_name": "German Southwest Africa",
       "display_name_en": "German Southwest Africa",
       "display_name_zh": "西南非专员辖区",
       "entry_kind": "scenario_subject",
-      "feature_count": 31,
+      "feature_count": 13,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -293,10 +295,12 @@
       "color_policy": "locked",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 49,
+      "controller_feature_count": 0,
       "display_name": "Italian East Africa",
-      "entry_kind": "scenario_subject",
-      "feature_count": 49,
+      "display_name_en": "Italian East Africa",
+      "display_name_zh": "意属东非",
+      "entry_kind": "scenario_container",
+      "feature_count": 0,
       "featured": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -568,12 +572,12 @@
       "color_hex": "#9c8352",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 3,
+      "controller_feature_count": 5,
       "display_name": "Kel Ayr",
       "display_name_en": "Kel Ayr",
       "display_name_zh": "凯尔艾尔",
       "entry_kind": "scenario_subject",
-      "feature_count": 3,
+      "feature_count": 5,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -589,7 +593,8 @@
       "provenance_iso2": "NE",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_ayr"
+        "tno_ayr",
+        "tno_afa_ayr"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -651,12 +656,12 @@
       "color_hex": "#856ea3",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 2,
+      "controller_feature_count": 4,
       "display_name": "Azawad",
       "display_name_en": "Azawad",
       "display_name_zh": "阿扎瓦德",
       "entry_kind": "scenario_subject",
-      "feature_count": 2,
+      "feature_count": 4,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -672,7 +677,8 @@
       "provenance_iso2": "ML",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_azw"
+        "tno_azw",
+        "tno_afa_azw"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -807,12 +813,12 @@
       "color_hex": "#b97091",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 6,
+      "controller_feature_count": 8,
       "display_name": "Mossiland",
       "display_name_en": "Mossiland",
       "display_name_zh": "莫西兰",
       "entry_kind": "scenario_subject",
-      "feature_count": 6,
+      "feature_count": 8,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -828,7 +834,8 @@
       "provenance_iso2": "BF",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_bkf"
+        "tno_bkf",
+        "tno_afa_bkf"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -1388,6 +1395,47 @@
       "synthetic_owner": false,
       "tag": "BRY"
     },
+    "BTS": {
+      "base_iso2": "BW",
+      "capital_state_id": null,
+      "color_hex": "#cf826e",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 15,
+      "display_name": "South African Protectorate of Bechuanaland",
+      "display_name_en": "South African Protectorate of Bechuanaland",
+      "display_name_zh": "南非·贝专纳保护地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 15,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BW",
+      "notes": "",
+      "parent_owner_tag": "SAF",
+      "parent_owner_tags": [
+        "SAF"
+      ],
+      "primary_rule_source": "tno_bts",
+      "provenance_iso2": "BW",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_bts"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_southern_africa",
+      "subregion_label": "Southern Africa",
+      "synthetic_owner": false,
+      "tag": "BTS"
+    },
     "BUL": {
       "base_iso2": "BG",
       "capital_state_id": 48,
@@ -1634,12 +1682,12 @@
       "color_hex": "#a86c3f",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 54,
+      "controller_feature_count": 57,
       "display_name": "Cameroon",
       "display_name_en": "Cameroon",
       "display_name_zh": "喀麦隆",
       "entry_kind": "scenario_subject",
-      "feature_count": 54,
+      "feature_count": 57,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -1655,7 +1703,8 @@
       "provenance_iso2": "NG",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_cao"
+        "tno_cao",
+        "tno_afa_cao"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -1710,18 +1759,264 @@
       "synthetic_owner": false,
       "tag": "CEY"
     },
+    "CG00": {
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "color_hex": "#7b8364",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 32,
+      "display_name": "German Congo — Zentral-Kongo Administration",
+      "display_name_en": "German Congo — Zentral-Kongo Administration",
+      "display_name_zh": "德属刚果·中央刚果行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 32,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CD",
+      "notes": "",
+      "parent_owner_tag": "GCO",
+      "parent_owner_tags": [
+        "GCO"
+      ],
+      "primary_rule_source": "tno_cg00",
+      "provenance_iso2": "CD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_cg00"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "CG00"
+    },
+    "CGBC": {
+      "base_iso2": "GCO",
+      "capital_state_id": null,
+      "color_hex": "#8f9375",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 16,
+      "display_name": "German Congo — Brazzaville Administration",
+      "display_name_en": "German Congo — Brazzaville Administration",
+      "display_name_zh": "德属刚果·布拉柴维尔行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 16,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GCO",
+      "notes": "",
+      "parent_owner_tag": "GCO",
+      "parent_owner_tags": [
+        "GCO"
+      ],
+      "primary_rule_source": "tno_cgbc",
+      "provenance_iso2": "GCO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_cgbc"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "CGBC"
+    },
+    "CGGA": {
+      "base_iso2": "GA",
+      "capital_state_id": null,
+      "color_hex": "#5f6546",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 9,
+      "display_name": "German Congo — Gabon Administration",
+      "display_name_en": "German Congo — Gabon Administration",
+      "display_name_zh": "德属刚果·加蓬行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 9,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GA",
+      "notes": "",
+      "parent_owner_tag": "GCO",
+      "parent_owner_tags": [
+        "GCO"
+      ],
+      "primary_rule_source": "tno_cgga",
+      "provenance_iso2": "GA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_cgga"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "CGGA"
+    },
+    "CGKT": {
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "color_hex": "#888b6c",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "German Congo — Katanga Administration",
+      "display_name_en": "German Congo — Katanga Administration",
+      "display_name_zh": "德属刚果·加丹加行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CD",
+      "notes": "",
+      "parent_owner_tag": "GCO",
+      "parent_owner_tags": [
+        "GCO"
+      ],
+      "primary_rule_source": "tno_cgkt",
+      "provenance_iso2": "CD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_cgkt"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "CGKT"
+    },
+    "CGKV": {
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "color_hex": "#636b4e",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 2,
+      "display_name": "German Congo — Kivu Administration",
+      "display_name_en": "German Congo — Kivu Administration",
+      "display_name_zh": "德属刚果·基伍行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CD",
+      "notes": "",
+      "parent_owner_tag": "GCO",
+      "parent_owner_tags": [
+        "GCO"
+      ],
+      "primary_rule_source": "tno_cgkv",
+      "provenance_iso2": "CD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_cgkv"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "CGKV"
+    },
+    "CGUB": {
+      "base_iso2": "CF",
+      "capital_state_id": null,
+      "color_hex": "#6b7056",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 12,
+      "display_name": "German Congo — Ubangi Administration",
+      "display_name_en": "German Congo — Ubangi Administration",
+      "display_name_zh": "德属刚果·乌班吉行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 12,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CF",
+      "notes": "",
+      "parent_owner_tag": "GCO",
+      "parent_owner_tags": [
+        "GCO"
+      ],
+      "primary_rule_source": "tno_cgub",
+      "provenance_iso2": "CF",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_cgub"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "CGUB"
+    },
     "CHD": {
       "base_iso2": "TD",
       "capital_state_id": null,
       "color_hex": "#b19b66",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 5,
+      "controller_feature_count": 6,
       "display_name": "Chad",
       "display_name_en": "Chad",
       "display_name_zh": "乍得",
       "entry_kind": "scenario_subject",
-      "feature_count": 5,
+      "feature_count": 6,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -1737,7 +2032,8 @@
       "provenance_iso2": "TD",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_chd"
+        "tno_chd",
+        "tno_afa_chd"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -2426,12 +2722,12 @@
       "color_policy": "locked",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 14,
+      "controller_feature_count": 15,
       "display_name": "Free France",
       "display_name_en": "Free France",
       "display_name_zh": "自由法国",
       "entry_kind": "scenario_subject",
-      "feature_count": 14,
+      "feature_count": 15,
       "featured": false,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
@@ -2449,7 +2745,8 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "tno_1962_ffr_manual_override",
-        "tno_ffr"
+        "tno_ffr",
+        "tno_afa_ffr"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -2635,12 +2932,12 @@
       "color_policy": "locked",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 72,
+      "controller_feature_count": 0,
       "display_name": "German Central Africa",
       "display_name_en": "German Central Africa",
       "display_name_zh": "中非专员辖区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 72,
+      "entry_kind": "scenario_container",
+      "feature_count": 0,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -2677,12 +2974,12 @@
       "color_policy": "locked",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 90,
+      "controller_feature_count": 0,
       "display_name": "German East Africa",
       "display_name_en": "German East Africa",
       "display_name_zh": "东非专员辖区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 90,
+      "entry_kind": "scenario_container",
+      "feature_count": 0,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -2711,6 +3008,334 @@
       "subregion_label": "Eastern Africa",
       "synthetic_owner": false,
       "tag": "GEA"
+    },
+    "GEAB": {
+      "base_iso2": "BI",
+      "capital_state_id": null,
+      "color_hex": "#5e6c49",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 17,
+      "display_name": "German East Africa — Urundi Administration",
+      "display_name_en": "German East Africa — Urundi Administration",
+      "display_name_zh": "德属东非·乌隆迪行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 17,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BI",
+      "notes": "",
+      "parent_owner_tag": "GEA",
+      "parent_owner_tags": [
+        "GEA"
+      ],
+      "primary_rule_source": "tno_geab",
+      "provenance_iso2": "BI",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_geab"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "GEAB"
+    },
+    "GEAM": {
+      "base_iso2": "MZ",
+      "capital_state_id": null,
+      "color_hex": "#818f6b",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 11,
+      "display_name": "German East Africa — Mozambique Administration",
+      "display_name_en": "German East Africa — Mozambique Administration",
+      "display_name_zh": "德属东非·莫桑比克行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 11,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MZ",
+      "notes": "",
+      "parent_owner_tag": "GEA",
+      "parent_owner_tags": [
+        "GEA"
+      ],
+      "primary_rule_source": "tno_geam",
+      "provenance_iso2": "MZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_geam"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "GEAM"
+    },
+    "GEAN": {
+      "base_iso2": "MW",
+      "capital_state_id": null,
+      "color_hex": "#5f7253",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 3,
+      "display_name": "German East Africa — Nyasaland Administration",
+      "display_name_en": "German East Africa — Nyasaland Administration",
+      "display_name_zh": "德属东非·尼亚萨兰行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MW",
+      "notes": "",
+      "parent_owner_tag": "GEA",
+      "parent_owner_tags": [
+        "GEA"
+      ],
+      "primary_rule_source": "tno_gean",
+      "provenance_iso2": "MW",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_gean"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "GEAN"
+    },
+    "GEAR": {
+      "base_iso2": "RW",
+      "capital_state_id": null,
+      "color_hex": "#77876b",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 5,
+      "display_name": "German East Africa — Ruanda Administration",
+      "display_name_en": "German East Africa — Ruanda Administration",
+      "display_name_zh": "德属东非·卢旺达行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RW",
+      "notes": "",
+      "parent_owner_tag": "GEA",
+      "parent_owner_tags": [
+        "GEA"
+      ],
+      "primary_rule_source": "tno_gear",
+      "provenance_iso2": "RW",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_gear"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "GEAR"
+    },
+    "GEAS": {
+      "base_iso2": "ZW",
+      "capital_state_id": null,
+      "color_hex": "#788561",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 10,
+      "display_name": "German East Africa — Southern Rhodesia Administration",
+      "display_name_en": "German East Africa — Southern Rhodesia Administration",
+      "display_name_zh": "德属东非·南罗得西亚行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 10,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ZW",
+      "notes": "",
+      "parent_owner_tag": "GEA",
+      "parent_owner_tags": [
+        "GEA"
+      ],
+      "primary_rule_source": "tno_geas",
+      "provenance_iso2": "ZW",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_geas"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "GEAS"
+    },
+    "GEAT": {
+      "base_iso2": "TZ",
+      "capital_state_id": null,
+      "color_hex": "#4c5f3f",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 30,
+      "display_name": "German East Africa — Tanganyika Administration",
+      "display_name_en": "German East Africa — Tanganyika Administration",
+      "display_name_zh": "德属东非·坦噶尼喀行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 30,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "TZ",
+      "notes": "",
+      "parent_owner_tag": "GEA",
+      "parent_owner_tags": [
+        "GEA"
+      ],
+      "primary_rule_source": "tno_geat",
+      "provenance_iso2": "TZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_geat"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "GEAT"
+    },
+    "GEAU": {
+      "base_iso2": "UG",
+      "capital_state_id": null,
+      "color_hex": "#859072",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 4,
+      "display_name": "German East Africa — Uganda Administration",
+      "display_name_en": "German East Africa — Uganda Administration",
+      "display_name_zh": "德属东非·乌干达行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UG",
+      "notes": "",
+      "parent_owner_tag": "GEA",
+      "parent_owner_tags": [
+        "GEA"
+      ],
+      "primary_rule_source": "tno_geau",
+      "provenance_iso2": "UG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_geau"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "GEAU"
+    },
+    "GEAZ": {
+      "base_iso2": "ZM",
+      "capital_state_id": null,
+      "color_hex": "#5a674b",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 10,
+      "display_name": "German East Africa — Northern Rhodesia Administration",
+      "display_name_en": "German East Africa — Northern Rhodesia Administration",
+      "display_name_zh": "德属东非·北罗得西亚行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 10,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ZM",
+      "notes": "",
+      "parent_owner_tag": "GEA",
+      "parent_owner_tags": [
+        "GEA"
+      ],
+      "primary_rule_source": "tno_geaz",
+      "provenance_iso2": "ZM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_geaz"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "GEAZ"
     },
     "GER": {
       "base_iso2": "DE",
@@ -3327,12 +3952,12 @@
       "color_hex": "#b35352",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 7,
+      "controller_feature_count": 10,
       "display_name": "Guinea",
       "display_name_en": "Guinea",
       "display_name_zh": "几内亚",
       "entry_kind": "scenario_subject",
-      "feature_count": 7,
+      "feature_count": 10,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -3348,7 +3973,8 @@
       "provenance_iso2": "GN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_gui"
+        "tno_gui",
+        "tno_afa_gui"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3531,12 +4157,12 @@
       "color_hex": "#647b9a",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 5,
+      "controller_feature_count": 6,
       "display_name": "Sokoto",
       "display_name_en": "Sokoto",
       "display_name_zh": "索科托",
       "entry_kind": "scenario_subject",
-      "feature_count": 5,
+      "feature_count": 6,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -3552,7 +4178,8 @@
       "provenance_iso2": "BF",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_hau"
+        "tno_hau",
+        "tno_afa_hau"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3693,10 +4320,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 155,
+      "controller_feature_count": 112,
       "display_name": "Iberian Union",
+      "display_name_en": "Iberian Union",
+      "display_name_zh": "伊比利亚联盟",
       "entry_kind": "scenario_country",
-      "feature_count": 155,
+      "feature_count": 112,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -3710,7 +4339,8 @@
       "provenance_iso2": "ES",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_1962_iberian_union"
+        "tno_1962_iberian_union",
+        "tno_afa_ibr"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -3759,6 +4389,293 @@
       "subregion_label": "Northern Europe",
       "synthetic_owner": false,
       "tag": "ICE"
+    },
+    "ICVE": {
+      "base_iso2": "CV",
+      "capital_state_id": null,
+      "color_hex": "#b49d72",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 22,
+      "display_name": "Iberian Overseas Province of Cape Verde",
+      "display_name_en": "Iberian Overseas Province of Cape Verde",
+      "display_name_zh": "伊比利亚·佛得角海外省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 22,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CV",
+      "notes": "",
+      "parent_owner_tag": "IBR",
+      "parent_owner_tags": [
+        "IBR"
+      ],
+      "primary_rule_source": "tno_icve",
+      "provenance_iso2": "CV",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_icve"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "ICVE"
+    },
+    "IDAL": {
+      "base_iso2": "ATL",
+      "capital_state_id": null,
+      "color_hex": "#87a677",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 40,
+      "display_name": "Italian Governorate of Dalmatia",
+      "display_name_en": "Italian Governorate of Dalmatia",
+      "display_name_zh": "意属达尔马提亚总督区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 40,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ATL",
+      "notes": "",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_idal",
+      "provenance_iso2": "ATL",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_idal"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "IDAL"
+    },
+    "IDJI": {
+      "base_iso2": "DJ",
+      "capital_state_id": null,
+      "color_hex": "#6b7d55",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 6,
+      "display_name": "Italian East Africa — Djibouti Governorate",
+      "display_name_en": "Italian East Africa — Djibouti Governorate",
+      "display_name_zh": "意属东非·吉布提总督区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "DJ",
+      "notes": "",
+      "parent_owner_tag": "AOI",
+      "parent_owner_tags": [
+        "AOI"
+      ],
+      "primary_rule_source": "tno_idji",
+      "provenance_iso2": "DJ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_idji"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "IDJI"
+    },
+    "IERI": {
+      "base_iso2": "ER",
+      "capital_state_id": null,
+      "color_hex": "#5c7250",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 6,
+      "display_name": "Italian East Africa — Eritrea Governorate",
+      "display_name_en": "Italian East Africa — Eritrea Governorate",
+      "display_name_zh": "意属东非·厄立特里亚总督区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ER",
+      "notes": "",
+      "parent_owner_tag": "AOI",
+      "parent_owner_tags": [
+        "AOI"
+      ],
+      "primary_rule_source": "tno_ieri",
+      "provenance_iso2": "ER",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ieri"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "IERI"
+    },
+    "IETH": {
+      "base_iso2": "ET",
+      "capital_state_id": null,
+      "color_hex": "#7b8f6c",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 11,
+      "display_name": "Italian East Africa — Ethiopia Governorate",
+      "display_name_en": "Italian East Africa — Ethiopia Governorate",
+      "display_name_zh": "意属东非·埃塞俄比亚总督区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 11,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ET",
+      "notes": "",
+      "parent_owner_tag": "AOI",
+      "parent_owner_tags": [
+        "AOI"
+      ],
+      "primary_rule_source": "tno_ieth",
+      "provenance_iso2": "ET",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ieth"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "IETH"
+    },
+    "IGUI": {
+      "base_iso2": "GW",
+      "capital_state_id": null,
+      "color_hex": "#dfc5a1",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 9,
+      "display_name": "Iberian Overseas Province of Portuguese Guinea",
+      "display_name_en": "Iberian Overseas Province of Portuguese Guinea",
+      "display_name_zh": "伊比利亚·葡属几内亚海外省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 9,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GW",
+      "notes": "",
+      "parent_owner_tag": "IBR",
+      "parent_owner_tags": [
+        "IBR"
+      ],
+      "primary_rule_source": "tno_igui",
+      "provenance_iso2": "GW",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_igui"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "synthetic_owner": false,
+      "tag": "IGUI"
+    },
+    "IKEN": {
+      "base_iso2": "KE",
+      "capital_state_id": null,
+      "color_hex": "#7e9a73",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 8,
+      "display_name": "Italian East Africa — Kenya Governorate",
+      "display_name_en": "Italian East Africa — Kenya Governorate",
+      "display_name_zh": "意属东非·肯尼亚总督区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 8,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "KE",
+      "notes": "",
+      "parent_owner_tag": "AOI",
+      "parent_owner_tags": [
+        "AOI"
+      ],
+      "primary_rule_source": "tno_iken",
+      "provenance_iso2": "KE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_iken"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "IKEN"
     },
     "INS": {
       "base_iso2": "ID",
@@ -3920,6 +4837,129 @@
       "synthetic_owner": false,
       "tag": "IRQ"
     },
+    "ISOM": {
+      "base_iso2": "SO",
+      "capital_state_id": null,
+      "color_hex": "#8fa07a",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 18,
+      "display_name": "Italian East Africa — Somalia Governorate",
+      "display_name_en": "Italian East Africa — Somalia Governorate",
+      "display_name_zh": "意属东非·索马里总督区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 18,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SO",
+      "notes": "",
+      "parent_owner_tag": "AOI",
+      "parent_owner_tags": [
+        "AOI"
+      ],
+      "primary_rule_source": "tno_isom",
+      "provenance_iso2": "SO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_isom"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "ISOM"
+    },
+    "ISTP": {
+      "base_iso2": "ST",
+      "capital_state_id": null,
+      "color_hex": "#cfb591",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 2,
+      "display_name": "Iberian Overseas Province of São Tomé and Príncipe",
+      "display_name_en": "Iberian Overseas Province of São Tomé and Príncipe",
+      "display_name_zh": "伊比利亚·圣多美和普林西比海外省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ST",
+      "notes": "",
+      "parent_owner_tag": "IBR",
+      "parent_owner_tags": [
+        "IBR"
+      ],
+      "primary_rule_source": "tno_istp",
+      "provenance_iso2": "ST",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_istp"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "ISTP"
+    },
+    "ISUE": {
+      "base_iso2": "EG",
+      "capital_state_id": null,
+      "color_hex": "#5d8458",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 3,
+      "display_name": "Italian Suez Canal Zone",
+      "display_name_en": "Italian Suez Canal Zone",
+      "display_name_zh": "意属苏伊士运河区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "EG",
+      "notes": "",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_isue",
+      "provenance_iso2": "EG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_isue"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "synthetic_owner": false,
+      "tag": "ISUE"
+    },
     "ITA": {
       "base_iso2": "IT",
       "capital_state_id": 2,
@@ -3927,7 +4967,7 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 240,
+      "controller_feature_count": 176,
       "disabled_regional_preset_names": [
         "Nice + Savoy",
         "Corsica",
@@ -3942,7 +4982,7 @@
       "display_name_en": "Italy",
       "display_name_zh": "意大利帝国",
       "entry_kind": "",
-      "feature_count": 240,
+      "feature_count": 176,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -3969,6 +5009,47 @@
       "subregion_label": "Southern Europe",
       "synthetic_owner": false,
       "tag": "ITA"
+    },
+    "ITIM": {
+      "base_iso2": "TL",
+      "capital_state_id": null,
+      "color_hex": "#ab956b",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 13,
+      "display_name": "Iberian Overseas Province of Portuguese Timor",
+      "display_name_en": "Iberian Overseas Province of Portuguese Timor",
+      "display_name_zh": "伊比利亚·葡属帝汶海外省",
+      "entry_kind": "scenario_subject",
+      "feature_count": 13,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "TL",
+      "notes": "",
+      "parent_owner_tag": "IBR",
+      "parent_owner_tags": [
+        "IBR"
+      ],
+      "primary_rule_source": "tno_itim",
+      "provenance_iso2": "TL",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_itim"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "ITIM"
     },
     "JAP": {
       "base_iso2": "JP",
@@ -4172,6 +5253,252 @@
       "subregion_label": "Central Asia",
       "synthetic_owner": false,
       "tag": "KAZ"
+    },
+    "KC00": {
+      "base_iso2": "GE",
+      "capital_state_id": null,
+      "color_hex": "#6d5e58",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 9,
+      "display_name": "Kaukasien — Generalbezirk Georgien",
+      "display_name_en": "Kaukasien — Generalbezirk Georgien",
+      "display_name_zh": "高加索·格鲁吉亚总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 9,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GE",
+      "notes": "",
+      "parent_owner_tag": "RKK",
+      "parent_owner_tags": [
+        "RKK"
+      ],
+      "primary_rule_source": "tno_kc00",
+      "provenance_iso2": "GE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_kc00"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "KC00"
+    },
+    "KC01": {
+      "base_iso2": "AZ",
+      "capital_state_id": null,
+      "color_hex": "#554641",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 69,
+      "display_name": "Kaukasien — Generalbezirk Aserbaidschan",
+      "display_name_en": "Kaukasien — Generalbezirk Aserbaidschan",
+      "display_name_zh": "高加索·阿塞拜疆总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 69,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AZ",
+      "notes": "",
+      "parent_owner_tag": "RKK",
+      "parent_owner_tags": [
+        "RKK"
+      ],
+      "primary_rule_source": "tno_kc01",
+      "provenance_iso2": "AZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_kc01"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "KC01"
+    },
+    "KC02": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#82736e",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 17,
+      "display_name": "Kaukasien — Generalbezirk Kuban",
+      "display_name_en": "Kaukasien — Generalbezirk Kuban",
+      "display_name_zh": "高加索·库班总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 17,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKK",
+      "parent_owner_tags": [
+        "RKK"
+      ],
+      "primary_rule_source": "tno_kc02",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_kc02"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "KC02"
+    },
+    "KC03": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#756863",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 20,
+      "display_name": "Kaukasien — Generalbezirk Stawropol-Terek",
+      "display_name_en": "Kaukasien — Generalbezirk Stawropol-Terek",
+      "display_name_zh": "高加索·斯塔夫罗波尔—捷列克总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 20,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKK",
+      "parent_owner_tags": [
+        "RKK"
+      ],
+      "primary_rule_source": "tno_kc03",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_kc03"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "KC03"
+    },
+    "KC04": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#5f514c",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 37,
+      "display_name": "Kaukasien — Generalbezirk Bergvölker",
+      "display_name_en": "Kaukasien — Generalbezirk Bergvölker",
+      "display_name_zh": "高加索·山地民族总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 37,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKK",
+      "parent_owner_tags": [
+        "RKK"
+      ],
+      "primary_rule_source": "tno_kc04",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_kc04"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "KC04"
+    },
+    "KC05": {
+      "base_iso2": "RKK",
+      "capital_state_id": null,
+      "color_hex": "#685a57",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 21,
+      "display_name": "Kaukasien — Generalbezirk Kalmückien",
+      "display_name_en": "Kaukasien — Generalbezirk Kalmückien",
+      "display_name_zh": "高加索·卡尔梅克总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 21,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RKK",
+      "notes": "",
+      "parent_owner_tag": "RKK",
+      "parent_owner_tags": [
+        "RKK"
+      ],
+      "primary_rule_source": "tno_kc05",
+      "provenance_iso2": "RKK",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_kc05"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "KC05"
     },
     "KGZ": {
       "base_iso2": "KG",
@@ -4578,6 +5905,47 @@
       "synthetic_owner": false,
       "tag": "LIB"
     },
+    "LTH": {
+      "base_iso2": "LS",
+      "capital_state_id": null,
+      "color_hex": "#9a5438",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 10,
+      "display_name": "South African Protectorate of Basutoland",
+      "display_name_en": "South African Protectorate of Basutoland",
+      "display_name_zh": "南非·巴苏陀兰保护地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 10,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "LS",
+      "notes": "",
+      "parent_owner_tag": "SAF",
+      "parent_owner_tags": [
+        "SAF"
+      ],
+      "primary_rule_source": "tno_lth",
+      "provenance_iso2": "LS",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_lth"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_southern_africa",
+      "subregion_label": "Southern Africa",
+      "synthetic_owner": false,
+      "tag": "LTH"
+    },
     "MAD": {
       "base_iso2": "MG",
       "capital_state_id": 543,
@@ -4753,12 +6121,12 @@
       "color_hex": "#58976c",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 8,
+      "controller_feature_count": 9,
       "display_name": "Mauritania",
       "display_name_en": "Mauritania",
       "display_name_zh": "毛里塔尼亚",
       "entry_kind": "scenario_subject",
-      "feature_count": 8,
+      "feature_count": 9,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -4774,7 +6142,8 @@
       "provenance_iso2": "MR",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_mau"
+        "tno_mau",
+        "tno_afa_mau"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -5187,6 +6556,375 @@
       "synthetic_owner": false,
       "tag": "MOR"
     },
+    "MS00": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#504a44",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 25,
+      "display_name": "Moskowien — Generalbezirk Moskau",
+      "display_name_en": "Moskowien — Generalbezirk Moskau",
+      "display_name_zh": "莫斯科维恩·莫斯科总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 25,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKM",
+      "parent_owner_tags": [
+        "RKM"
+      ],
+      "primary_rule_source": "tno_ms00",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ms00"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "MS00"
+    },
+    "MS01": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#45413b",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 10,
+      "display_name": "Moskowien — Generalbezirk Ingermanland",
+      "display_name_en": "Moskowien — Generalbezirk Ingermanland",
+      "display_name_zh": "莫斯科维恩·英格里亚总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 10,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKM",
+      "parent_owner_tags": [
+        "RKM"
+      ],
+      "primary_rule_source": "tno_ms01",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ms01"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "MS01"
+    },
+    "MS02": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#756e69",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 9,
+      "display_name": "Moskowien — Generalbezirk Smolensk",
+      "display_name_en": "Moskowien — Generalbezirk Smolensk",
+      "display_name_zh": "莫斯科维恩·斯摩棱斯克总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 9,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKM",
+      "parent_owner_tags": [
+        "RKM"
+      ],
+      "primary_rule_source": "tno_ms02",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ms02"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "MS02"
+    },
+    "MS03": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#59544f",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 21,
+      "display_name": "Moskowien — Generalbezirk Tula",
+      "display_name_en": "Moskowien — Generalbezirk Tula",
+      "display_name_zh": "莫斯科维恩·图拉总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 21,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKM",
+      "parent_owner_tags": [
+        "RKM"
+      ],
+      "primary_rule_source": "tno_ms03",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ms03"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "MS03"
+    },
+    "MS04": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#69635d",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 21,
+      "display_name": "Moskowien — Generalbezirk Woronesch",
+      "display_name_en": "Moskowien — Generalbezirk Woronesch",
+      "display_name_zh": "莫斯科维恩·沃罗涅日总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 21,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKM",
+      "parent_owner_tags": [
+        "RKM"
+      ],
+      "primary_rule_source": "tno_ms04",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ms04"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "MS04"
+    },
+    "MS05": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#59524d",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 9,
+      "display_name": "Moskowien — Generalbezirk Jaroslawl",
+      "display_name_en": "Moskowien — Generalbezirk Jaroslawl",
+      "display_name_zh": "莫斯科维恩·雅罗斯拉夫尔总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 9,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKM",
+      "parent_owner_tags": [
+        "RKM"
+      ],
+      "primary_rule_source": "tno_ms05",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ms05"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "MS05"
+    },
+    "MS06": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#645d58",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 5,
+      "display_name": "Moskowien — Generalbezirk Gorki",
+      "display_name_en": "Moskowien — Generalbezirk Gorki",
+      "display_name_zh": "莫斯科维恩·高尔基边区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKM",
+      "parent_owner_tags": [
+        "RKM"
+      ],
+      "primary_rule_source": "tno_ms06",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ms06"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "MS06"
+    },
+    "MS07": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#4d4742",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 18,
+      "display_name": "Moskowien — Generalbezirk Saratow",
+      "display_name_en": "Moskowien — Generalbezirk Saratow",
+      "display_name_zh": "莫斯科维恩·萨拉托夫总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 18,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKM",
+      "parent_owner_tags": [
+        "RKM"
+      ],
+      "primary_rule_source": "tno_ms07",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ms07"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "MS07"
+    },
+    "MS08": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#726c66",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 36,
+      "display_name": "Moskowien — Generalbezirk Don-Wolga",
+      "display_name_en": "Moskowien — Generalbezirk Don-Wolga",
+      "display_name_zh": "莫斯科维恩·顿河—伏尔加总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 36,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "",
+      "parent_owner_tag": "RKM",
+      "parent_owner_tags": [
+        "RKM"
+      ],
+      "primary_rule_source": "tno_ms08",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_ms08"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "MS08"
+    },
     "MWI": {
       "base_iso2": "MW",
       "capital_state_id": null,
@@ -5590,6 +7328,47 @@
       "synthetic_owner": false,
       "tag": "NZL"
     },
+    "OE00": {
+      "base_iso2": "LV",
+      "capital_state_id": null,
+      "color_hex": "#787566",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 7,
+      "display_name": "Generalbezirk Lettland",
+      "display_name_en": "Generalbezirk Lettland",
+      "display_name_zh": "东部总区·拉脱维亚总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 7,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "LV",
+      "notes": "",
+      "parent_owner_tag": "RKO",
+      "parent_owner_tags": [
+        "RKO"
+      ],
+      "primary_rule_source": "tno_oe00",
+      "provenance_iso2": "LV",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_oe00"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "synthetic_owner": false,
+      "tag": "OE00"
+    },
     "OE01": {
       "base_iso2": "EE",
       "capital_state_id": null,
@@ -5634,7 +7413,7 @@
     "OE02": {
       "base_iso2": "LT",
       "capital_state_id": null,
-      "color_hex": "#7d7b6d",
+      "color_hex": "#827f72",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 11,
@@ -5675,7 +7454,7 @@
     "OE03": {
       "base_iso2": "BY",
       "capital_state_id": null,
-      "color_hex": "#716f63",
+      "color_hex": "#6d6c5e",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 44,
@@ -6327,170 +8106,6 @@
       "synthetic_owner": false,
       "tag": "PFC"
     },
-    "PG01": {
-      "base_iso2": "PL",
-      "capital_state_id": null,
-      "color_hex": "#2f2f30",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 4,
-      "display_name": "Generalgouvernement — Distrikt Warschau",
-      "display_name_en": "Generalgouvernement — Distrikt Warschau",
-      "display_name_zh": "波兰总督府·华沙区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 4,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "PL",
-      "notes": "",
-      "parent_owner_tag": "RKP",
-      "parent_owner_tags": [
-        "RKP"
-      ],
-      "primary_rule_source": "tno_pg01",
-      "provenance_iso2": "PL",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_pg01"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "PG01"
-    },
-    "PG02": {
-      "base_iso2": "PL",
-      "capital_state_id": null,
-      "color_hex": "#5a5a5b",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 5,
-      "display_name": "Generalgouvernement — Distrikt Radom",
-      "display_name_en": "Generalgouvernement — Distrikt Radom",
-      "display_name_zh": "波兰总督府·拉多姆区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 5,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "PL",
-      "notes": "",
-      "parent_owner_tag": "RKP",
-      "parent_owner_tags": [
-        "RKP"
-      ],
-      "primary_rule_source": "tno_pg02",
-      "provenance_iso2": "PL",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_pg02"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "PG02"
-    },
-    "PG03": {
-      "base_iso2": "PL",
-      "capital_state_id": null,
-      "color_hex": "#39393a",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 11,
-      "display_name": "Generalgouvernement — Distrikt Lublin",
-      "display_name_en": "Generalgouvernement — Distrikt Lublin",
-      "display_name_zh": "波兰总督府·卢布林区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 11,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "PL",
-      "notes": "",
-      "parent_owner_tag": "RKP",
-      "parent_owner_tags": [
-        "RKP"
-      ],
-      "primary_rule_source": "tno_pg03",
-      "provenance_iso2": "PL",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_pg03"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "PG03"
-    },
-    "PG04": {
-      "base_iso2": "UA",
-      "capital_state_id": null,
-      "color_hex": "#4f4f50",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 42,
-      "display_name": "Generalgouvernement — Distrikt Galizien",
-      "display_name_en": "Generalgouvernement — Distrikt Galizien",
-      "display_name_zh": "波兰总督府·加利西亚区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 42,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "UA",
-      "notes": "",
-      "parent_owner_tag": "RKP",
-      "parent_owner_tags": [
-        "RKP"
-      ],
-      "primary_rule_source": "tno_pg04",
-      "provenance_iso2": "UA",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_pg04"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "PG04"
-    },
     "PHI": {
       "base_iso2": "PH",
       "capital_state_id": 327,
@@ -6951,10 +8566,12 @@
       "color_hex": "#6b5c57",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 173,
+      "controller_feature_count": 0,
       "display_name": "Reichskommissariat Kaukasien",
-      "entry_kind": "scenario_country",
-      "feature_count": 173,
+      "display_name_en": "Reichskommissariat Kaukasien",
+      "display_name_zh": "高加索专员辖区",
+      "entry_kind": "scenario_container",
+      "feature_count": 0,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -6990,12 +8607,12 @@
       "color_policy": "locked",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 154,
+      "controller_feature_count": 0,
       "display_name": "Reichskommissariat Moskowien",
       "display_name_en": "Reichskommissariat Moskowien",
       "display_name_zh": "莫斯科维恩专员辖区",
-      "entry_kind": "scenario_country",
-      "feature_count": 154,
+      "entry_kind": "scenario_container",
+      "feature_count": 0,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -7107,10 +8724,12 @@
       "color_hex": "#666456",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 7,
+      "controller_feature_count": 0,
       "display_name": "Reichskommissariat Ostland",
-      "entry_kind": "scenario_country",
-      "feature_count": 7,
+      "display_name_en": "Reichskommissariat Ostland",
+      "display_name_zh": "东方专员辖区",
+      "entry_kind": "scenario_container",
+      "feature_count": 0,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -7145,12 +8764,12 @@
       "color_hex": "#444445",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 22,
+      "controller_feature_count": 84,
       "display_name": "General Government of Poland",
       "display_name_en": "General Government of Poland",
       "display_name_zh": "波兰总督府",
       "entry_kind": "scenario_country",
-      "feature_count": 22,
+      "feature_count": 84,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -7277,7 +8896,8 @@
         }
       ],
       "rule_sources": [
-        "tno_baseline_rkp"
+        "tno_baseline_rkp",
+        "tno_restore_rkp"
       ],
       "scenario_only": true,
       "source": "tno_reichskommissariat_baseline",
@@ -7296,10 +8916,12 @@
       "color_hex": "#585e65",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 33,
+      "controller_feature_count": 0,
       "display_name": "Reichskommissariat Ukraine",
-      "entry_kind": "scenario_country",
-      "feature_count": 33,
+      "display_name_en": "Reichskommissariat Ukraine",
+      "display_name_zh": "乌克兰专员辖区",
+      "entry_kind": "scenario_container",
+      "feature_count": 0,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -7457,12 +9079,12 @@
       "color_policy": "palette",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 38,
+      "controller_feature_count": 9,
       "display_name": "South Africa",
       "display_name_en": "South Africa",
       "display_name_zh": "南非联邦",
       "entry_kind": "scenario_country",
-      "feature_count": 38,
+      "feature_count": 9,
       "featured": true,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
@@ -7660,12 +9282,12 @@
       "color_hex": "#41968f",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "controller_feature_count": 19,
+      "controller_feature_count": 20,
       "display_name": "Senegal",
       "display_name_en": "Senegal",
       "display_name_zh": "塞内加尔",
       "entry_kind": "scenario_subject",
-      "feature_count": 19,
+      "feature_count": 20,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -7681,7 +9303,8 @@
       "provenance_iso2": "SN",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_sen"
+        "tno_sen",
+        "tno_afa_sen"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -8143,6 +9766,47 @@
       "synthetic_owner": false,
       "tag": "SVR"
     },
+    "SWAO": {
+      "base_iso2": "AO",
+      "capital_state_id": null,
+      "color_hex": "#5a5e45",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 18,
+      "display_name": "German Southwest Africa — Angola Administration",
+      "display_name_en": "German Southwest Africa — Angola Administration",
+      "display_name_zh": "德属西南非洲·安哥拉行政区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 18,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AO",
+      "notes": "",
+      "parent_owner_tag": "ANG",
+      "parent_owner_tags": [
+        "ANG"
+      ],
+      "primary_rule_source": "tno_swao",
+      "provenance_iso2": "AO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_swao"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "SWAO"
+    },
     "SWE": {
       "base_iso2": "SE",
       "capital_state_id": 141,
@@ -8220,6 +9884,47 @@
       "subregion_label": "Western Europe",
       "synthetic_owner": false,
       "tag": "SWI"
+    },
+    "SWZ": {
+      "base_iso2": "SZ",
+      "capital_state_id": null,
+      "color_hex": "#c87550",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 4,
+      "display_name": "South African Protectorate of Swaziland",
+      "display_name_en": "South African Protectorate of Swaziland",
+      "display_name_zh": "南非·斯威士兰保护地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SZ",
+      "notes": "",
+      "parent_owner_tag": "SAF",
+      "parent_owner_tags": [
+        "SAF"
+      ],
+      "primary_rule_source": "tno_swz",
+      "provenance_iso2": "SZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_swz"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "subregion_southern_africa",
+      "subregion_label": "Southern Africa",
+      "synthetic_owner": false,
+      "tag": "SWZ"
     },
     "SYR": {
       "base_iso2": "SY",
@@ -8706,6 +10411,47 @@
       "synthetic_owner": false,
       "tag": "UGA"
     },
+    "UK00": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#555b62",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 33,
+      "display_name": "Generalbezirk Kiew",
+      "display_name_en": "Generalbezirk Kiew",
+      "display_name_zh": "乌克兰·基辅总区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 33,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "RKU",
+      "parent_owner_tags": [
+        "RKU"
+      ],
+      "primary_rule_source": "tno_uk00",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_uk00"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "UK00"
+    },
     "UK01": {
       "base_iso2": "UA",
       "capital_state_id": null,
@@ -8791,7 +10537,7 @@
     "UK03": {
       "base_iso2": "UA",
       "capital_state_id": null,
-      "color_hex": "#4d5359",
+      "color_hex": "#494f55",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 39,
@@ -8832,7 +10578,7 @@
     "UK04": {
       "base_iso2": "UA",
       "capital_state_id": null,
-      "color_hex": "#64696f",
+      "color_hex": "#60666d",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 30,
@@ -8996,7 +10742,7 @@
     "UK08": {
       "base_iso2": "UA",
       "capital_state_id": null,
-      "color_hex": "#5d646a",
+      "color_hex": "#6d737b",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "controller_feature_count": 34,

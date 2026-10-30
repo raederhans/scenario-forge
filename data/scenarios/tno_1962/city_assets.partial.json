@@ -31118,6 +31118,15 @@
       },
       "stable_key": "id::CITY::ne::1159137047"
     },
+    "CITY::ne::1159137065": {
+      "city_id": "CITY::ne::1159137065",
+      "display_name": {
+        "en": "Wladikawkaz",
+        "zh": "弗拉季高加索"
+      },
+      "host_feature_id": "RU_RAY_50074027B27316284331880",
+      "stable_key": "id::CITY::ne::1159137065"
+    },
     "CITY::ne::1159137115": {
       "display_name": {
         "en": "Kolosjoki",
@@ -31914,11 +31923,24 @@
       "stable_key": "id::CITY::ne::1159140363"
     },
     "CITY::ne::1159140367": {
+      "city_id": "CITY::ne::1159140367",
       "display_name": {
         "en": "Zara",
         "zh": "扎拉"
       },
+      "host_feature_id": "HR033",
+      "lat": 44.12868883342048,
+      "lon": 15.246458174352346,
       "stable_key": "id::CITY::ne::1159140367"
+    },
+    "CITY::ne::1159140377": {
+      "city_id": "CITY::ne::1159140377",
+      "display_name": {
+        "en": "Ismailia",
+        "zh": "伊斯梅利亚"
+      },
+      "host_feature_id": "EGY-1531",
+      "stable_key": "id::CITY::ne::1159140377"
     },
     "CITY::ne::1159140381": {
       "display_name": {
@@ -33529,6 +33551,15 @@
       "host_feature_id": "RU_RAY_50074027B51159964054862",
       "stable_key": "id::CITY::ne::1159146517"
     },
+    "CITY::ne::1159146521": {
+      "city_id": "CITY::ne::1159146521",
+      "display_name": {
+        "en": "Tula",
+        "zh": "图拉"
+      },
+      "host_feature_id": "RU_MRG_e770cd31cdb4",
+      "stable_key": "id::CITY::ne::1159146521"
+    },
     "CITY::ne::1159146525": {
       "city_id": "CITY::ne::1159146525",
       "display_name": {
@@ -34162,6 +34193,15 @@
       "host_feature_id": "RU_RAY_50074027B51176471238152",
       "stable_key": "id::CITY::ne::1159148101"
     },
+    "CITY::ne::1159148121": {
+      "city_id": "CITY::ne::1159148121",
+      "display_name": {
+        "en": "Wladimir",
+        "zh": "弗拉基米尔"
+      },
+      "host_feature_id": "RU_MRG_13fef5f74a14",
+      "stable_key": "id::CITY::ne::1159148121"
+    },
     "CITY::ne::1159148141": {
       "city_id": "CITY::ne::1159148141",
       "display_name": {
@@ -34170,6 +34210,15 @@
       },
       "host_feature_id": "RU_RAY_50074027B50420734283306",
       "stable_key": "id::CITY::ne::1159148141"
+    },
+    "CITY::ne::1159148145": {
+      "city_id": "CITY::ne::1159148145",
+      "display_name": {
+        "en": "Elista",
+        "zh": "埃利斯塔"
+      },
+      "host_feature_id": "RU_MRG_90d3823663be",
+      "stable_key": "id::CITY::ne::1159148145"
     },
     "CITY::ne::1159148157": {
       "display_name": {
@@ -34497,11 +34546,13 @@
         "Costermansstadt",
         "Bukavu"
       ],
+      "city_id": "CITY::ne::1159148481",
       "display_name": {
         "en": "Costermansstadt",
         "zh": "科斯特曼斯城"
       },
       "hidden": false,
+      "host_feature_id": "CD_ADM1_COD-1894",
       "stable_key": "id::CITY::ne::1159148481",
       "tier": "regional"
     },
@@ -34583,11 +34634,13 @@
       "aliases": [
         "Zomba"
       ],
+      "city_id": "CITY::ne::1159148499",
       "display_name": {
         "en": "Zomba",
         "zh": "松巴"
       },
       "hidden": false,
+      "host_feature_id": "MW_ADM1_82672581B71595037145626",
       "stable_key": "id::CITY::ne::1159148499",
       "tier": "regional"
     },
@@ -35129,11 +35182,13 @@
         "Barthstadt",
         "Kigali"
       ],
+      "city_id": "CITY::ne::1159149385",
       "display_name": {
         "en": "Barthstadt",
         "zh": "巴特城"
       },
       "hidden": false,
+      "host_feature_id": "RW_ADM1_RWA-3495",
       "stable_key": "id::CITY::ne::1159149385",
       "tier": "major"
     },
@@ -35143,6 +35198,15 @@
         "zh": "松兹瓦尔"
       },
       "stable_key": "id::CITY::ne::1159149401"
+    },
+    "CITY::ne::1159149413": {
+      "city_id": "CITY::ne::1159149413",
+      "display_name": {
+        "en": "Mbabane",
+        "zh": "姆巴巴内"
+      },
+      "host_feature_id": "SZ_ADM1_SWZ-534",
+      "stable_key": "id::CITY::ne::1159149413"
     },
     "CITY::ne::1159149451": {
       "display_name": {
@@ -35217,6 +35281,15 @@
       "stable_key": "id::CITY::ne::1159149513",
       "tier": "regional"
     },
+    "CITY::ne::1159149523": {
+      "city_id": "CITY::ne::1159149523",
+      "display_name": {
+        "en": "Stawropol",
+        "zh": "斯塔夫罗波尔"
+      },
+      "host_feature_id": "RU_MRG_f01d51060a16",
+      "stable_key": "id::CITY::ne::1159149523"
+    },
     "CITY::ne::1159149529": {
       "city_id": "CITY::ne::1159149529",
       "display_name": {
@@ -35225,6 +35298,15 @@
       },
       "host_feature_id": "RU_RAY_50074027B86681375933080",
       "stable_key": "id::CITY::ne::1159149529"
+    },
+    "CITY::ne::1159149531": {
+      "city_id": "CITY::ne::1159149531",
+      "display_name": {
+        "en": "Brjansk",
+        "zh": "布良斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B25563950651561",
+      "stable_key": "id::CITY::ne::1159149531"
     },
     "CITY::ne::1159149535": {
       "display_name": {
@@ -35241,6 +35323,33 @@
       },
       "host_feature_id": "RU_MRG_aedb5f9ed3b1",
       "stable_key": "id::CITY::ne::1159149541"
+    },
+    "CITY::ne::1159149543": {
+      "city_id": "CITY::ne::1159149543",
+      "display_name": {
+        "en": "Jaroslawl",
+        "zh": "雅罗斯拉夫尔"
+      },
+      "host_feature_id": "RU_RAY_50074027B57358126207690",
+      "stable_key": "id::CITY::ne::1159149543"
+    },
+    "CITY::ne::1159149549": {
+      "city_id": "CITY::ne::1159149549",
+      "display_name": {
+        "en": "Jekaterinodar",
+        "zh": "叶卡捷琳诺达尔"
+      },
+      "host_feature_id": "RU_RAY_50074027B89252490479976",
+      "stable_key": "id::CITY::ne::1159149549"
+    },
+    "CITY::ne::1159149557": {
+      "city_id": "CITY::ne::1159149557",
+      "display_name": {
+        "en": "Woronesch",
+        "zh": "沃罗涅日"
+      },
+      "host_feature_id": "RU_RAY_50074027B21233041988666",
+      "stable_key": "id::CITY::ne::1159149557"
     },
     "CITY::ne::1159149559": {
       "city_id": "CITY::ne::1159149559",
@@ -35286,6 +35395,15 @@
       },
       "host_feature_id": "RU_RAY_50074027B32234523409019",
       "stable_key": "id::CITY::ne::1159149571"
+    },
+    "CITY::ne::1159149575": {
+      "city_id": "CITY::ne::1159149575",
+      "display_name": {
+        "en": "Platenfurt",
+        "zh": "普拉滕富特"
+      },
+      "host_feature_id": "RU_RAY_50074027B39404018386654",
+      "stable_key": "id::CITY::ne::1159149575"
     },
     "CITY::ne::1159149579": {
       "city_id": "CITY::ne::1159149579",
@@ -35531,10 +35649,12 @@
       "stable_key": "id::CITY::ne::1159149867"
     },
     "CITY::ne::1159149869": {
+      "city_id": "CITY::ne::1159149869",
       "display_name": {
         "en": "Gibuti",
         "zh": "吉布提"
       },
+      "host_feature_id": "DJ_ADM1_DJI-1567",
       "stable_key": "id::CITY::ne::1159149869"
     },
     "CITY::ne::1159149977": {
@@ -35792,11 +35912,13 @@
         "Usumbura",
         "Bujumbura"
       ],
+      "city_id": "CITY::ne::1159150427",
       "display_name": {
         "en": "Usumbura",
         "zh": "乌松布拉"
       },
       "hidden": false,
+      "host_feature_id": "BI_ADM1_BDI-3364",
       "stable_key": "id::CITY::ne::1159150427",
       "tier": "major"
     },
@@ -35883,18 +36005,38 @@
       "city_id": "CITY::ne::1159150567",
       "host_feature_id": "TKM-352"
     },
+    "CITY::ne::1159150571": {
+      "city_id": "CITY::ne::1159150571",
+      "display_name": {
+        "en": "Lusaka",
+        "zh": "卢萨卡"
+      },
+      "host_feature_id": "ZM_ADM1_ZMB-520",
+      "stable_key": "id::CITY::ne::1159150571"
+    },
     "CITY::ne::1159150573": {
       "aliases": [
         "Salisbury",
         "Harare"
       ],
+      "city_id": "CITY::ne::1159150573",
       "display_name": {
         "en": "Salisbury",
         "zh": "索尔兹伯里"
       },
       "hidden": false,
+      "host_feature_id": "ZW_ADM1_ZWE-525",
       "stable_key": "id::CITY::ne::1159150573",
       "tier": "major"
+    },
+    "CITY::ne::1159150577": {
+      "city_id": "CITY::ne::1159150577",
+      "display_name": {
+        "en": "Dili",
+        "zh": "帝力"
+      },
+      "host_feature_id": "TL_ADM1_TLS-541",
+      "stable_key": "id::CITY::ne::1159150577"
     },
     "CITY::ne::1159150583": {
       "city_id": "CITY::ne::1159150583",
@@ -35916,6 +36058,15 @@
     "CITY::ne::1159150589": {
       "city_id": "CITY::ne::1159150589",
       "host_feature_id": "HT_ADM1_HTI-1388"
+    },
+    "CITY::ne::1159150593": {
+      "city_id": "CITY::ne::1159150593",
+      "display_name": {
+        "en": "Kampala",
+        "zh": "坎帕拉"
+      },
+      "host_feature_id": "UG_ADM1_17295835B48340970483027",
+      "stable_key": "id::CITY::ne::1159150593"
     },
     "CITY::ne::1159150597": {
       "city_id": "CITY::ne::1159150597",
@@ -36026,11 +36177,13 @@
         "Lourenço Marques",
         "Maputo"
       ],
+      "city_id": "CITY::ne::1159150683",
       "display_name": {
         "en": "Lourenço Marques",
         "zh": "洛伦索·马贵斯"
       },
       "hidden": false,
+      "host_feature_id": "MZ_ADM1_MOZ-5854",
       "stable_key": "id::CITY::ne::1159150683",
       "tier": "major"
     },
@@ -36058,6 +36211,15 @@
       },
       "host_feature_id": "RU_CITY_ARKHANGELSK",
       "stable_key": "id::CITY::ne::1159150693"
+    },
+    "CITY::ne::1159150697": {
+      "city_id": "CITY::ne::1159150697",
+      "display_name": {
+        "en": "Paulusburg",
+        "zh": "保卢斯堡"
+      },
+      "host_feature_id": "RU_CITY_VOLGOGRAD",
+      "stable_key": "id::CITY::ne::1159150697"
     },
     "CITY::ne::1159150701": {
       "city_id": "CITY::ne::1159150701",
@@ -36090,10 +36252,12 @@
       "host_feature_id": "RU_RAY_50074027B18253095483754"
     },
     "CITY::ne::1159150715": {
+      "city_id": "CITY::ne::1159150715",
       "display_name": {
         "en": "Mogadiscio",
         "zh": "摩加迪沙"
       },
+      "host_feature_id": "SO_ADM1_83879307B32896531038690",
       "stable_key": "id::CITY::ne::1159150715"
     },
     "CITY::ne::1159150717": {
@@ -36219,6 +36383,15 @@
       "city_id": "CITY::ne::1159150795",
       "host_feature_id": "RU_RAY_50074027B69870482204976"
     },
+    "CITY::ne::1159150803": {
+      "city_id": "CITY::ne::1159150803",
+      "display_name": {
+        "en": "Bissau",
+        "zh": "比绍"
+      },
+      "host_feature_id": "GW_ADM1_GNB-769",
+      "stable_key": "id::CITY::ne::1159150803"
+    },
     "CITY::ne::1159150807": {
       "city_id": "CITY::ne::1159150807",
       "host_feature_id": "JOR-851"
@@ -36253,6 +36426,15 @@
       "city_id": "CITY::ne::1159150819",
       "host_feature_id": "CN_CITY_17275852B10439048942215"
     },
+    "CITY::ne::1159150831": {
+      "city_id": "CITY::ne::1159150831",
+      "display_name": {
+        "en": "Maseru",
+        "zh": "马塞卢"
+      },
+      "host_feature_id": "LS_ADM1_LSO-1203",
+      "stable_key": "id::CITY::ne::1159150831"
+    },
     "CITY::ne::1159150835": {
       "city_id": "CITY::ne::1159150835",
       "host_feature_id": "MG_ADM1_MDG-5862"
@@ -36274,10 +36456,12 @@
       "host_feature_id": "GQ_ADM1_GNQ-1478"
     },
     "CITY::ne::1159150873": {
+      "city_id": "CITY::ne::1159150873",
       "display_name": {
         "en": "Asmára",
         "zh": "阿斯马拉"
       },
+      "host_feature_id": "ER_ADM1_ERI-1561",
       "stable_key": "id::CITY::ne::1159150873"
     },
     "CITY::ne::1159150875": {
@@ -36337,11 +36521,13 @@
         "Elisabethstadt",
         "Lubumbashi"
       ],
+      "city_id": "CITY::ne::1159150903",
       "display_name": {
         "en": "Elisabethstadt",
         "zh": "伊丽莎白城"
       },
       "hidden": false,
+      "host_feature_id": "CD_ADM1_COD-1897",
       "stable_key": "id::CITY::ne::1159150903",
       "tier": "major"
     },
@@ -36354,11 +36540,13 @@
         "Freistadt",
         "Libreville"
       ],
+      "city_id": "CITY::ne::1159150913",
       "display_name": {
         "en": "Freistadt",
         "zh": "自由城"
       },
       "hidden": false,
+      "host_feature_id": "GA_ADM1_GAB-2168",
       "stable_key": "id::CITY::ne::1159150913",
       "tier": "major"
     },
@@ -36424,7 +36612,8 @@
       "hidden": false,
       "host_feature_id": "GEO-3036",
       "stable_key": "id::CITY::ne::1159150961",
-      "tier": "major"
+      "tier": "major",
+      "city_id": "CITY::ne::1159150961"
     },
     "CITY::ne::1159150965": {
       "city_id": "CITY::ne::1159150965",
@@ -36448,11 +36637,13 @@
         "Brazzastadt",
         "Brazzaville"
       ],
+      "city_id": "CITY::ne::1159150993",
       "display_name": {
         "en": "Brazzastadt",
         "zh": "布拉柴城"
       },
       "hidden": false,
+      "host_feature_id": "CG_ADM1_COG-4855",
       "stable_key": "id::CITY::ne::1159150993",
       "tier": "major"
     },
@@ -36507,6 +36698,15 @@
       "host_feature_id": "BN_ADM1_BRN-1182",
       "stable_key": "id::CITY::ne::1159151083"
     },
+    "CITY::ne::1159151111": {
+      "city_id": "CITY::ne::1159151111",
+      "display_name": {
+        "en": "Bangui",
+        "zh": "班吉"
+      },
+      "host_feature_id": "CF_ADM1_CAF-1460",
+      "stable_key": "id::CITY::ne::1159151111"
+    },
     "CITY::ne::1159151113": {
       "aliases": [
         "Maroua"
@@ -36532,6 +36732,15 @@
       "stable_key": "id::CITY::ne::1159151115",
       "tier": "major"
     },
+    "CITY::ne::1159151117": {
+      "city_id": "CITY::ne::1159151117",
+      "display_name": {
+        "en": "Tirana",
+        "zh": "地拉那"
+      },
+      "host_feature_id": "AL022",
+      "stable_key": "id::CITY::ne::1159151117"
+    },
     "CITY::ne::1159151119": {
       "aliases": [
         "Yerevan"
@@ -36549,11 +36758,13 @@
       "aliases": [
         "Baku"
       ],
+      "city_id": "CITY::ne::1159151123",
       "display_name": {
         "en": "Baku",
         "zh": "巴库"
       },
       "hidden": false,
+      "host_feature_id": "AZE-1689",
       "stable_key": "id::CITY::ne::1159151123",
       "tier": "major"
     },
@@ -36623,6 +36834,15 @@
       "city_id": "CITY::ne::1159151151",
       "host_feature_id": "BTN-2439"
     },
+    "CITY::ne::1159151153": {
+      "city_id": "CITY::ne::1159151153",
+      "display_name": {
+        "en": "Gaborone",
+        "zh": "加博罗内"
+      },
+      "host_feature_id": "BW_ADM1_BWA-5501",
+      "stable_key": "id::CITY::ne::1159151153"
+    },
     "CITY::ne::1159151161": {
       "city_id": "CITY::ne::1159151161",
       "host_feature_id": "AU_ADM1_AUS-2653"
@@ -36649,6 +36869,15 @@
       },
       "stable_key": "id::CITY::ne::1159151191"
     },
+    "CITY::ne::1159151195": {
+      "city_id": "CITY::ne::1159151195",
+      "display_name": {
+        "en": "São Tomé",
+        "zh": "圣多美"
+      },
+      "host_feature_id": "ST_ADM1_STP-4861",
+      "stable_key": "id::CITY::ne::1159151195"
+    },
     "CITY::ne::1159151199": {
       "display_name": {
         "en": "La Valletta",
@@ -36668,6 +36897,15 @@
         "zh": "耶路撒冷"
       },
       "stable_key": "id::CITY::ne::1159151203"
+    },
+    "CITY::ne::1159151205": {
+      "city_id": "CITY::ne::1159151205",
+      "display_name": {
+        "en": "Praia",
+        "zh": "普拉亚"
+      },
+      "host_feature_id": "CV_ADM1_CPV-5053",
+      "stable_key": "id::CITY::ne::1159151205"
     },
     "CITY::ne::1159151221": {
       "city_id": "CITY::ne::1159151221",
@@ -36702,6 +36940,15 @@
       "city_id": "CITY::ne::1159151281",
       "host_feature_id": "NO081"
     },
+    "CITY::ne::1159151291": {
+      "city_id": "CITY::ne::1159151291",
+      "display_name": {
+        "en": "Sankt Petersburg",
+        "zh": "圣彼得堡"
+      },
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG",
+      "stable_key": "id::CITY::ne::1159151291"
+    },
     "CITY::ne::1159151299": {
       "aliases": [
         "Warschau",
@@ -36722,6 +36969,7 @@
         "Daressalam",
         "Dar es Salaam"
       ],
+      "city_id": "CITY::ne::1159151305",
       "display_name": {
         "en": "Daressalam",
         "zh": "达累斯萨拉姆"
@@ -36879,6 +37127,15 @@
       "stable_key": "id::CITY::ne::1159151465",
       "tier": "major"
     },
+    "CITY::ne::1159151469": {
+      "city_id": "CITY::ne::1159151469",
+      "display_name": {
+        "en": "Luanda",
+        "zh": "罗安达"
+      },
+      "host_feature_id": "AO_ADM1_AGO-1880",
+      "stable_key": "id::CITY::ne::1159151469"
+    },
     "CITY::ne::1159151477": {
       "city_id": "CITY::ne::1159151477",
       "host_feature_id": "MMR-3269"
@@ -36899,7 +37156,8 @@
       "hidden": false,
       "host_feature_id": "UA_RAY_74538382B60890943260132",
       "stable_key": "id::CITY::ne::1159151495",
-      "tier": "major"
+      "tier": "major",
+      "city_id": "CITY::ne::1159151495"
     },
     "CITY::ne::1159151501": {
       "city_id": "CITY::ne::1159151501",
@@ -36987,7 +37245,8 @@
       "hidden": false,
       "host_feature_id": "CD_ADM1_COD-1884",
       "stable_key": "id::CITY::ne::1159151539",
-      "tier": "major"
+      "tier": "major",
+      "city_id": "CITY::ne::1159151539"
     },
     "CITY::ne::1159151541": {
       "city_id": "CITY::ne::1159151541",
@@ -37007,7 +37266,8 @@
         "zh": "亚的斯亚贝巴"
       },
       "host_feature_id": "ET_ADM1_ETH-3133",
-      "stable_key": "id::CITY::ne::1159151549"
+      "stable_key": "id::CITY::ne::1159151549",
+      "city_id": "CITY::ne::1159151549"
     },
     "CITY::ne::1159151551": {
       "city_id": "CITY::ne::1159151551",
@@ -37044,7 +37304,12 @@
     },
     "CITY::ne::1159151585": {
       "city_id": "CITY::ne::1159151585",
-      "host_feature_id": "RU_CITY_MOSCOW"
+      "host_feature_id": "RU_CITY_MOSCOW",
+      "stable_key": "id::CITY::ne::1159151585",
+      "display_name": {
+        "en": "Moskau",
+        "zh": "莫斯科"
+      }
     },
     "CITY::ne::1159151587": {
       "city_id": "CITY::ne::1159151587",
@@ -37072,6 +37337,15 @@
     "CITY::ne::1159151595": {
       "city_id": "CITY::ne::1159151595",
       "host_feature_id": "CN_CITY_17275852B40522342172572"
+    },
+    "CITY::ne::1159151597": {
+      "city_id": "CITY::ne::1159151597",
+      "display_name": {
+        "en": "Nairobi",
+        "zh": "内罗毕"
+      },
+      "host_feature_id": "KE_ADM1_KEN-1196",
+      "stable_key": "id::CITY::ne::1159151597"
     },
     "CITY::ne::1159151599": {
       "city_id": "CITY::ne::1159151599",
