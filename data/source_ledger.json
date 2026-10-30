@@ -538,6 +538,7 @@
     "source_id": "natural_earth_lakes_10m",
     "local_path": "data/ne_10m_lakes.zip",
     "origin_kind": "download",
+    "rebuild_command": "python tools/build_global_lakes.py",
     "immutable_ref": "Source ZIP sha256:0803a06f9c3cb4671d89b68c48b142aad9366ba40f665245e12a913fbc61722a",
     "current_local_sha256": "0803a06f9c3cb4671d89b68c48b142aad9366ba40f665245e12a913fbc61722a",
     "consumers": [

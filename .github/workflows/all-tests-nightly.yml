@@ -42,6 +42,9 @@ jobs:
           python -m pip install -r requirements-dev.lock.txt
           npm ci
       - name: Run every test
+        # Two workers keep the slow TNO suites inside the 16 GB runner.
+        env:
+          PYTEST_XDIST_AUTO_NUM_WORKERS: "2"
         run: node tools/run_all_tests.mjs ${{ matrix.suite }}
 
   sample-guide-e2e:

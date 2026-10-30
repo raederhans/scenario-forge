@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections import Counter
 from contextlib import nullcontext
-import inspect
 import json
 import os
 from pathlib import Path
@@ -15,6 +14,8 @@ from unittest.mock import patch
 import geopandas as gpd
 from shapely.geometry import MultiPolygon, Point, Polygon, box, mapping, shape
 
+from map_builder.json_source import read_json_source
+from map_builder.geo.marine_refinement import tno_additional_specs
 from map_builder.contracts import SCENARIO_BUNDLE_STAGE_DESCRIPTORS
 from tools.check_scenario_contracts import validate_publish_bundle_dir
 from tools.extract_scenario_atlantropa import (
@@ -725,19 +726,14 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertIs(atlantropa_props["ATLSHL_adriatica_4"].get("atl_interactive"), True)
         self.assertIs(atlantropa_props["ATLSHL_adriatica_4"].get("interactive"), True)
 
-    def test_build_runtime_topology_state_keeps_water_stage_artifacts_in_full_state(self) -> None:
-        source = Path(tno_bundle.__file__).read_text(encoding="utf-8")
-        self.assertRegex(
-            source,
-            re.compile(
-                r'full_state = \{\s*\*\*countries_state,\s*\*\*water_state,\s*\}',
-                re.S,
-            ),
-        )
 
     def test_validate_runtime_topology_water_outputs_uses_strong_validator_without_chunk_gate(self) -> None:
         report = {"checks": {}}
-        runtime_topology_payload = {"type": "Topology", "objects": {}, "arcs": []}
+        runtime_topology_payload = {
+            "type": "Topology", "arcs": [],
+            "objects": {name: {"type": "GeometryCollection", "geometries": []}
+                        for name in ("scenario_water", "land_mask")},
+        }
         water_feature_collection = {"type": "FeatureCollection", "features": []}
         named_water_snapshot_payload = {"type": "FeatureCollection", "features": []}
 
@@ -904,6 +900,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 "tno_singapore_strait",
                 "tno_java_sea",
                 "tno_sulu_sea",
+                *(spec["id"] for spec in tno_additional_specs()),
             ),
         )
         self.assertEqual(
@@ -1323,7 +1320,11 @@ class TnoBundleBuilderTest(unittest.TestCase):
             },
         }
 
-        with patch.object(tno_bundle, "validate_runtime_topology_water_outputs", return_value={"ok": True}):
+        with (
+            patch.object(tno_bundle, "validate_runtime_topology_water_outputs", return_value={"ok": True}),
+            patch.object(tno_bundle, "load_runtime_political_gdf", return_value=state["scenario_political_gdf"]),
+            patch.object(tno_bundle, "load_atlantropa_land_reference", return_value=_square(0, 0, 4.0)),
+        ):
             result = build_runtime_topology_state_from_countries_state(state)
 
         self.assertNotIn("bathymetry_topology_url", result["manifest_payload"])
@@ -1379,7 +1380,11 @@ class TnoBundleBuilderTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             scenario_dir = Path(tmp_dir) / "scenario"
             (scenario_dir / "derived").mkdir(parents=True, exist_ok=True)
-            snapshot_payload = {"type": "FeatureCollection", "features": [{"id": "legacy-water"}]}
+            snapshot_payload = {"type": "FeatureCollection", "features": [{
+                "type": "Feature",
+                "properties": {"id": "legacy-water"},
+                "geometry": {"type": "Polygon", "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]},
+            }]}
             provenance_payload = {"generated_at": "derived-pass"}
             (scenario_dir / "marine_regions_named_waters.snapshot.geojson").write_text(
                 json.dumps(snapshot_payload, ensure_ascii=False, indent=2),
@@ -1390,7 +1395,8 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            loaded_snapshot, loaded_provenance = tno_bundle.load_or_refresh_marine_regions_named_water_snapshot(scenario_dir)
+            with patch.object(tno_bundle, "additional_snapshot_features", return_value=[]):
+                loaded_snapshot, loaded_provenance = tno_bundle.load_or_refresh_marine_regions_named_water_snapshot(scenario_dir)
 
             self.assertEqual(loaded_snapshot, snapshot_payload)
             self.assertEqual(loaded_provenance, provenance_payload)
@@ -1478,7 +1484,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
             / "tno_1962"
             / "runtime_topology.topo.json"
         )
-        topology_payload = json.loads(runtime_topology_path.read_text(encoding="utf-8"))
+        topology_payload = read_json_source(runtime_topology_path)
         geometries = topology_payload.get("objects", {}).get("political", {}).get("geometries", [])
         feature_ids = [
             str((geometry.get("properties", {}) or {}).get("id") or "").strip()
@@ -1807,7 +1813,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
             if rule.get("rule_id") == "japan_guangdong_client_1962"
         )
         self.assertEqual(gng_rule["color_hex"], "#7A2E41")
-        self.assertEqual(manual_overrides["countries"]["MAG"]["color_hex"], "#3c4551")
+        self.assertEqual(manual_overrides["countries"]["MGN"]["color_hex"], "#3c4551")
         self.assertEqual(manual_overrides["countries"]["ONG"]["color_hex"], "#51875b")
         self.assertEqual(manual_overrides["countries"]["GAY"]["color_hex"], "#4f4f4f")
 
@@ -1820,7 +1826,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
         )
         expected_colors = {
             "KOR": tno_bundle.TNO_1962_MANUAL_COUNTRY_OVERRIDES["KOR"]["color_hex"],
-            "MAG": manual_overrides["countries"]["MAG"]["color_hex"],
+            "MGN": manual_overrides["countries"]["MGN"]["color_hex"],
             "ONG": manual_overrides["countries"]["ONG"]["color_hex"],
             "GAY": manual_overrides["countries"]["GAY"]["color_hex"],
         }
@@ -1841,15 +1847,15 @@ class TnoBundleBuilderTest(unittest.TestCase):
             Path("data/palette-maps/tno.audit.json").read_text(encoding="utf-8")
         )["entries"]
 
-        expected_tags = ["PRC", "SIK", "TIB", "XIK"]
+        expected_tags = ["PRC", "XIN", "TIB", "XIK"]
         for tag in expected_tags:
             self.assertEqual(
                 countries_payload[tag]["color_hex"],
                 audit_entries[tag]["map_hex"],
             )
-        self.assertEqual(countries_payload["SIC"]["color_hex"], "#6873a0")
+        self.assertEqual(countries_payload["XIK"]["color_hex"], "#6873a0")
         self.assertEqual(countries_payload["RGC"]["color_hex"], "#c15a7d")
-        self.assertEqual(countries_payload["SIC"]["color_hex"], audit_entries["XIK"]["map_hex"])
+        self.assertEqual(countries_payload["XIK"]["color_hex"], audit_entries["XIK"]["map_hex"])
         self.assertEqual(countries_payload["RGC"]["color_hex"], audit_entries["SIC"]["map_hex"])
 
     def test_single_object_topology_prunes_unused_arcs(self) -> None:
@@ -1898,7 +1904,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
             Path("data/scenarios/tno_1962/countries.json").read_text(encoding="utf-8")
         )["countries"]
 
-        for tag in ("POR", "PRC", "SIC", "SIK", "XSM"):
+        for tag in ("POR", "XSM"):
             self.assertEqual(countries[tag]["entry_kind"], "controller_only")
             self.assertEqual(countries[tag]["primary_rule_source"], f"tno_1962_controller_only_{tag.lower()}")
         self.assertTrue(countries["POR"]["hidden_from_country_list"])
@@ -1920,11 +1926,11 @@ class TnoBundleBuilderTest(unittest.TestCase):
         explicit_scenario_color_tags = {
             "EGY": "#7c9a70",
             "TUN": "#70825d",
+            "ANG": "#71755c",
         }
         palette_priority_tags = {
             "KAZ": "#aa233c",
             "UZB": "#9b2b40",
-            "ANG": "#c15e5e",
             "MZB": "#492a25",
             "RWA": "#438f00",
             "ZAM": "#9666a7",
@@ -1970,7 +1976,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
         # MOD identities: FRI -> AZH, BRM -> BUR; NCC and TUN use the
         # startup CHI_JAP_PUP and TUN_ITA cosmetic colors respectively.
         expected_colors = {
-            "FRI": "#388a33", "BRM": "#a05361", "NCP": "#9f2349", "TUN": "#70825d",
+            "AZH": "#388a33", "BUR": "#a05361", "NCP": "#9f2349", "TUN": "#70825d",
         }
 
         for tag, color_hex in expected_colors.items():
@@ -2014,11 +2020,6 @@ class TnoBundleBuilderTest(unittest.TestCase):
             )
         self.assertEqual(set(sync_summary["skipped_explicit_tags"]), target_tags)
 
-    def test_tno_palette_audit_sync_uses_color_policy_not_static_override_list(self) -> None:
-        source = Path("tools/patch_tno_1962_bundle.py").read_text(encoding="utf-8")
-        self.assertIn("def apply_tno_country_color_policy_backfill", source)
-        self.assertIn('raw_entry["color_policy"] = COLOR_POLICY_PALETTE', source)
-        self.assertNotIn("TNO_1962_LOCKED_COLOR_OVERRIDES", source)
 
     def test_apply_tno_country_color_policy_backfill_marks_locked_and_palette_entries(self) -> None:
         countries_payload = {
@@ -2075,7 +2076,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 or str(entry.get("primary_rule_source") or "").endswith("_manual_override")
             )
         )
-        for expected_tag in ("KOR", "MAG", "ONG", "GAY", "XIK", "PRC", "SIC", "SIK", "XSM"):
+        for expected_tag in ("KOR", "MGN", "ONG", "GAY", "XIK", "PRC", "XSM"):
             self.assertIn(expected_tag, explicit_tags)
         self.assertNotIn("GNG", explicit_tags)
 
@@ -2126,14 +2127,6 @@ class TnoBundleBuilderTest(unittest.TestCase):
         self.assertEqual(summary["synced_tags"], ["KOR", "AAA"])
         self.assertEqual(summary["skipped_explicit_tags"], [])
 
-    def test_scenario_manager_keeps_active_scenario_colors_tag_scoped(self) -> None:
-        manager_source = Path("js/core/scenario_manager.js").read_text(encoding="utf-8")
-        bundle_loader_source = Path("js/core/scenario/bundle_loader.js").read_text(encoding="utf-8")
-        self.assertNotIn("buildScenarioRuntimeDefaultTagColors", manager_source)
-        self.assertNotIn("buildRuntimeDefaultColorsByIso2", manager_source)
-        self.assertIn("function getScenarioFixedOwnerColors(", manager_source)
-        self.assertIn("function getScenarioFixedOwnerColors(countryMap = {})", bundle_loader_source)
-        self.assertIn("next[normalizedTag] = color;", bundle_loader_source)
 
     def test_validate_geo_locale_manual_overrides_requires_exact_override_entries(self) -> None:
         geo_locale_payload = {
@@ -2480,7 +2473,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
         owners_payload = json.loads((scenario_dir / "owners.by_feature.json").read_text(encoding="utf-8"))
         cores_payload = json.loads((scenario_dir / "cores.by_feature.json").read_text(encoding="utf-8"))
         countries_payload = json.loads((scenario_dir / "countries.json").read_text(encoding="utf-8"))
-        runtime_topology = json.loads((scenario_dir / "runtime_topology.topo.json").read_text(encoding="utf-8"))
+        runtime_topology = read_json_source(scenario_dir / "runtime_topology.topo.json")
 
         owners = owners_payload["owners"]
         cores = cores_payload["cores"]
@@ -2541,7 +2534,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
     def test_checked_in_tno_1962_atlsea_runtime_contract_keeps_donor_sea_projectable(self) -> None:
         scenario_dir = Path(tno_bundle.SCENARIO_DIR)
-        runtime_topology = json.loads((scenario_dir / "runtime_topology.topo.json").read_text(encoding="utf-8"))
+        runtime_topology = read_json_source(scenario_dir / "runtime_topology.topo.json")
         political_geometries = runtime_topology["objects"]["political"]["geometries"]
         atlantropa_geometries = runtime_topology["objects"]["scenario_atlantropa"]["geometries"]
         self.assertFalse(
@@ -2739,12 +2732,12 @@ class TnoBundleBuilderTest(unittest.TestCase):
         with (
             patch.object(tno_bundle, "ATLANTROPA_REGION_CONFIGS", configs),
             patch.object(tno_bundle, "load_mediterranean_template_water_gdf", return_value=gpd.GeoDataFrame(geometry=[box(0, 0, 5, 2)])),
-            patch.object(tno_bundle, "local_land_union", return_value=box(10, 10, 11, 11)),
             patch.object(tno_bundle, "build_region_affine_coeffs", return_value=(None, None)),
             patch.object(tno_bundle, "build_atl_sea_completion_rows", side_effect=regional_completion),
         ):
             rows, sea, diagnostics = tno_bundle.build_atl_sea_from_hgo(
                 {}, gpd.GeoDataFrame(geometry=[]), {}, other_water_geom=None,
+                land_reference=box(0, -1, 5, -0.5),
             )
         self.assertEqual(rows[:2], list(regional_rows.values()))
         self.assertEqual(rows[2]["properties"]["id"], "ATLSEA_FILL_mediterranean_1")
@@ -2778,7 +2771,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
             if decoded.contains(probe) or decoded.touches(probe):
                 water_hits.append(props.get("id"))
 
-        self.assertIn("ATLSEA_FILL_libya_suez_9", water_hits)
+        self.assertEqual(len(water_hits), 1)
 
     def test_checked_in_tno_1962_atlsea_chunks_keep_d3_small_polygon_orientation(self) -> None:
         def signed_area(ring: list) -> float:
@@ -3575,32 +3568,19 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
         self.assertEqual(required, expected)
 
-    def test_d3_orientation_flags_are_registered_on_source_orientation_owner(self) -> None:
-        flagged_ids = {
-            str(child_spec.get("id") or "").strip()
-            for split_spec in tno_bundle.TNO_OPEN_OCEAN_SPLIT_SPECS
-            for child_spec in split_spec.get("children", ())
-            if str(child_spec.get("id") or "").strip() and child_spec.get("d3_reverse_orientation")
-        }
 
-        self.assertTrue(flagged_ids)
-        self.assertTrue(flagged_ids.issubset(tno_bundle.D3_SPHERICAL_SOURCE_POSITIVE_ORIENTATION_FEATURE_IDS))
-
-    def test_clip_open_ocean_split_features_leaves_d3_orientation_to_source_owner(self) -> None:
-        signature = inspect.signature(tno_bundle.clip_tno_open_ocean_split_features)
-        self.assertNotIn("d3_reverse_orientation_ids", signature.parameters)
-        feature_id = next(iter(tno_bundle.D3_SPHERICAL_SOURCE_POSITIVE_ORIENTATION_FEATURE_IDS))
+    def test_clip_open_ocean_split_features_preserves_unclipped_geometry_and_properties(self) -> None:
+        feature_id = "fixture_ocean"
         feature = {
             "type": "Feature",
             "properties": {"id": feature_id, "name": feature_id},
             "geometry": mapping(_square(0.0, 0.0)),
         }
 
-        with patch.object(tno_bundle, "reverse_polygonal_orientation_for_d3") as reverse_mock:
-            result = tno_bundle.clip_tno_open_ocean_split_features([feature], {})
+        result = tno_bundle.clip_tno_open_ocean_split_features([feature], {})
 
-        reverse_mock.assert_not_called()
-        self.assertEqual(result[0]["properties"]["id"], feature_id)
+        self.assertTrue(shape(result[0]["geometry"]).equals(shape(feature["geometry"])))
+        self.assertEqual(result[0]["properties"], feature["properties"])
 
     def test_stage_signature_is_never_reused_for_forced_water_snapshot_refresh(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

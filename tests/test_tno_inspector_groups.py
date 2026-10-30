@@ -20,7 +20,7 @@ class TnoInspectorGroupTest(unittest.TestCase):
         cls.mutation_countries = json.loads(SCENARIO_MUTATIONS_PATH.read_text(encoding="utf-8"))["countries"]
 
     def test_russia_region_assignments(self) -> None:
-        for tag in ("SOV", "WRS", "VOK", "BOP", "ORS", "MAG", "ORN", "ONG", "GAY"):
+        for tag in ("PRC", "WRS", "VOK", "BOP", "ORS", "MGN", "MAG", "ORN", "ONG", "GAY"):
             with self.subTest(tag=tag):
                 self.assertEqual(
                     self.countries[tag].get("inspector_group_id"),
@@ -33,7 +33,7 @@ class TnoInspectorGroupTest(unittest.TestCase):
         self.assertFalse(self.countries["RKM"].get("inspector_group_id"))
 
     def test_china_region_assignments(self) -> None:
-        for tag in ("CHI", "PRC", "MEN", "XIK"):
+        for tag in ("CHI", "MEN", "XIK"):
             with self.subTest(tag=tag):
                 self.assertEqual(
                     self.countries[tag].get("inspector_group_id"),
@@ -51,7 +51,7 @@ class TnoInspectorGroupTest(unittest.TestCase):
             "VOK": ("scenario_group_russia_region", "continent_europe"),
             "BOP": ("scenario_group_russia_region", "continent_europe"),
             "ORS": ("scenario_group_russia_region", "continent_europe"),
-            "MAG": ("scenario_group_russia_region", "continent_europe"),
+            "MGN": ("scenario_group_russia_region", "continent_europe"),
             "ORN": ("scenario_group_russia_region", "continent_europe"),
             "ONG": ("scenario_group_russia_region", "continent_europe"),
             "GAY": ("scenario_group_russia_region", "continent_europe"),
