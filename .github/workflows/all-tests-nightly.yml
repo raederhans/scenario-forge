@@ -42,6 +42,10 @@ jobs:
           python -m pip install -r requirements-dev.lock.txt
           npm ci
       - name: Run every test
+        # -n auto on the 4-core runner ran out of memory on the slow TNO suites
+        # (the runner was shut down around 60% every night); two workers fit.
+        env:
+          PYTEST_XDIST_AUTO_NUM_WORKERS: "2"
         run: node tools/run_all_tests.mjs ${{ matrix.suite }}
 
   sample-guide-e2e:
