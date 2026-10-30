@@ -502,90 +502,12 @@
               ]
             }
           ]
-        },
-        {
-          "id": "distrikt_warschau",
-          "name_en": "District of Warsaw",
-          "name_zh": "华沙区",
-          "match": [
-            {
-              "prov": [
-                "PL_Masovian"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "distrikt_radom",
-          "name_en": "District of Radom",
-          "name_zh": "拉多姆区",
-          "match": [
-            {
-              "prov": [
-                "PL_Holy_Cross",
-                "PL_Lodz"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "distrikt_lublin",
-          "name_en": "District of Lublin",
-          "name_zh": "卢布林区",
-          "match": [
-            {
-              "prov": [
-                "PL_Lublin"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "distrikt_galizien",
-          "name_en": "District of Galicia",
-          "name_zh": "加利西亚区",
-          "match": [
-            {
-              "prov": [
-                "UA_Lviv",
-                "UA_Ternopil",
-                "UA_Ivano_Frankivsk"
-              ]
-            }
-          ]
         }
       ]
     },
     "RKU": {
       "source": "乌克兰帝国专员辖区：沿用历史总区（Generalbezirk），并按东扩后的 TNO 疆域补出切尔尼戈夫、哈尔科夫、顿涅茨（斯大林诺-伏罗希洛夫格勒）总区（东部三区为推断）。",
       "districts": [
-        {
-          "id": "wolhynien_podolien",
-          "name_en": "General District Volhynia-Podolia",
-          "name_zh": "沃里尼亚-波多利亚总区",
-          "match": [
-            {
-              "prov": [
-                "UA_Volyn",
-                "UA_Rivne",
-                "UA_Khmelnytskyi"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "shitomir",
-          "name_en": "General District Zhytomyr",
-          "name_zh": "日托米尔总区",
-          "match": [
-            {
-              "prov": [
-                "UA_Zhytomyr",
-                "UA_Vinnytsia"
-              ]
-            }
-          ]
-        },
         {
           "id": "kiew",
           "name_en": "General District Kiev",
@@ -595,86 +517,6 @@
               "prov": [
                 "UA_Kyiv",
                 "UA_Cherkasy"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "tschernigow",
-          "name_en": "General District Chernigov",
-          "name_zh": "切尔尼戈夫总区",
-          "match": [
-            {
-              "prov": [
-                "UA_Chernihiv",
-                "UA_Sumy"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "dnjepropetrowsk",
-          "name_en": "General District Dnepropetrovsk",
-          "name_zh": "第聂伯罗彼得罗夫斯克总区",
-          "match": [
-            {
-              "prov": [
-                "UA_Dnipropetrovsk",
-                "UA_Poltava"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "nikolajew",
-          "name_en": "General District Nikolaev",
-          "name_zh": "尼古拉耶夫总区",
-          "match": [
-            {
-              "prov": [
-                "UA_Mykolaiv",
-                "UA_Kirovohrad"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "taurien",
-          "name_en": "General District Taurida",
-          "name_zh": "塔夫利达总区",
-          "match": [
-            {
-              "prov": [
-                "UA_Kherson",
-                "UA_Zaporizhzhia"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "charkow",
-          "name_en": "General District Kharkov",
-          "name_zh": "哈尔科夫总区",
-          "match": [
-            {
-              "prov": [
-                "UA_Kharkiv",
-                "RU_Belgorod",
-                "RU_Kursk"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "donez",
-          "name_en": "General District Donets",
-          "name_zh": "顿涅茨总区",
-          "match": [
-            {
-              "prov": [
-                "UA_Donetsk",
-                "UA_Luhansk",
-                "RU_Rostov"
               ]
             }
           ]
@@ -824,18 +666,6 @@
       "source": "东方帝国专员辖区：沿用爱沙尼亚、拉脱维亚、立陶宛、白鲁塞尼亚四个总区；普斯科夫一带为 TNO 扩张部分，单列普斯科夫总区（推断）。",
       "districts": [
         {
-          "id": "estland",
-          "name_en": "General District Estonia",
-          "name_zh": "爱沙尼亚总区",
-          "match": [
-            {
-              "cntr": [
-                "EE"
-              ]
-            }
-          ]
-        },
-        {
           "id": "lettland",
           "name_en": "General District Latvia",
           "name_zh": "拉脱维亚总区",
@@ -843,48 +673,6 @@
             {
               "cntr": [
                 "LV"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "litauen",
-          "name_en": "General District Lithuania",
-          "name_zh": "立陶宛总区",
-          "match": [
-            {
-              "cntr": [
-                "LT"
-              ]
-            },
-            {
-              "prov": [
-                "PL_Podlaskie"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "weissruthenien",
-          "name_en": "General District White Ruthenia",
-          "name_zh": "白鲁塞尼亚总区",
-          "match": [
-            {
-              "prov": [
-                "BY_*"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "pleskau",
-          "name_en": "General District Pskov",
-          "name_zh": "普斯科夫总区",
-          "match": [
-            {
-              "prov": [
-                "RU_Pskov",
-                "RU_Leningrad"
               ]
             }
           ]

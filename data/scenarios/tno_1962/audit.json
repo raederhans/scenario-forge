@@ -1,6 +1,6 @@
 {
   "artifact_counts": {
-    "chunk_count": 214,
+    "chunk_count": 249,
     "feature_count": 9949,
     "water_count": 285
   },
@@ -111922,10 +111922,10 @@
     "AFA": {
       "base_iso2": "NE",
       "continent_label": "Africa",
-      "controller_feature_count": 117,
+      "controller_feature_count": 20,
       "display_name": "African Anarchy",
       "entry_kind": "scenario_country",
-      "feature_count": 117,
+      "feature_count": 20,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112089,10 +112089,10 @@
     "AOF": {
       "base_iso2": "SN",
       "continent_label": "Africa",
-      "controller_feature_count": 14,
+      "controller_feature_count": 2,
       "display_name": "French West Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 14,
+      "feature_count": 2,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112778,10 +112778,10 @@
     "BWA": {
       "base_iso2": "NG",
       "continent_label": "Africa",
-      "controller_feature_count": 27,
+      "controller_feature_count": 1,
       "display_name": "British West Africa",
       "entry_kind": "scenario_country",
-      "feature_count": 27,
+      "feature_count": 1,
       "hidden_from_country_list": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -113364,10 +113364,10 @@
     "FFR": {
       "base_iso2": "FR",
       "continent_label": "Africa",
-      "controller_feature_count": 5,
+      "controller_feature_count": 14,
       "display_name": "Free France",
       "entry_kind": "scenario_country",
-      "feature_count": 5,
+      "feature_count": 14,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113562,10 +113562,10 @@
     "GCO": {
       "base_iso2": "CD",
       "continent_label": "Africa",
-      "controller_feature_count": 96,
+      "controller_feature_count": 72,
       "display_name": "German Central Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 96,
+      "feature_count": 72,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114833,10 +114833,10 @@
     "MAL": {
       "base_iso2": "MY",
       "continent_label": "Asia",
-      "controller_feature_count": 20,
+      "controller_feature_count": 4,
       "display_name": "Malaya",
       "entry_kind": "scenario_subject",
-      "feature_count": 20,
+      "feature_count": 4,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -115848,10 +115848,10 @@
     "PHI": {
       "base_iso2": "PH",
       "continent_label": "Asia",
-      "controller_feature_count": 117,
+      "controller_feature_count": 54,
       "display_name": "Philippines",
       "entry_kind": "scenario_subject",
-      "feature_count": 117,
+      "feature_count": 54,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -116353,10 +116353,10 @@
     "RKO": {
       "base_iso2": "LT",
       "continent_label": "Europe",
-      "controller_feature_count": 98,
+      "controller_feature_count": 6,
       "display_name": "Reichskommissariat Ostland",
       "entry_kind": "scenario_country",
-      "feature_count": 98,
+      "feature_count": 6,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116388,10 +116388,10 @@
     "RKP": {
       "base_iso2": "PL",
       "continent_label": "Europe",
-      "controller_feature_count": 84,
+      "controller_feature_count": 22,
       "display_name": "General Government of Poland",
       "entry_kind": "scenario_country",
-      "feature_count": 84,
+      "feature_count": 22,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116423,10 +116423,10 @@
     "RKU": {
       "base_iso2": "UA",
       "continent_label": "Europe",
-      "controller_feature_count": 279,
+      "controller_feature_count": 33,
       "display_name": "Reichskommissariat Ukraine",
       "entry_kind": "scenario_country",
-      "feature_count": 279,
+      "feature_count": 33,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116826,10 +116826,10 @@
     "SIA": {
       "base_iso2": "TH",
       "continent_label": "Asia",
-      "controller_feature_count": 93,
+      "controller_feature_count": 92,
       "display_name": "Siam",
       "entry_kind": "",
-      "feature_count": 93,
+      "feature_count": 92,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117616,10 +117616,10 @@
     "VIN": {
       "base_iso2": "VN",
       "continent_label": "Asia",
-      "controller_feature_count": 52,
+      "controller_feature_count": 51,
       "display_name": "Vietnam",
       "entry_kind": "scenario_subject",
-      "feature_count": 52,
+      "feature_count": 51,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117651,10 +117651,10 @@
     "VMT": {
       "base_iso2": "VN",
       "continent_label": "Asia",
-      "controller_feature_count": 11,
+      "controller_feature_count": 8,
       "display_name": "Viet Minh",
       "entry_kind": "scenario_country",
-      "feature_count": 11,
+      "feature_count": 8,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -118180,11 +118180,11 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "878a81436c21a7ed523c282425d943e025059698c931662111becc1923d897ec",
+  "snapshot_fingerprint": "0642157c9859a4e20db83b313ed71c7f789795a187641236570573668a3b0ad4",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "cd6921c896dcbad5ef4ded17989c5cde8408b62d95d25d9c38a2018830c5fb56",
-    "detail_chunk_manifest_sha256": "24b6ea839190d3293b091628ed818a87e048d18774de45e8c2c004dc2631a9fe",
+    "build_snapshot_sha256": "59883123cfa91d1fa3cfd705cb28e174cc95877c53b0c77efcaa4917b8b15e2f",
+    "detail_chunk_manifest_sha256": "2ba5e2a46ca5b4bd876cd0c894c18be84a77522f598e857d5be94dde1fcd776a",
     "runtime_bootstrap_topology_sha256": "338d98c608bd7bed9ecfc46441d5d051734d8926dfc5b4c8851166f120a31902",
     "runtime_topology_sha256": "2260a1fb35ec521421456f374ad4da2e143875abf05d3cf7628c35f6e7ad46e1"
   },
@@ -118197,7 +118197,7 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 183,
+    "controller_count": 219,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -118207,7 +118207,7 @@
     "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 183,
+    "owner_count": 219,
     "quality_counts": {
       "approx_existing_geometry": 1033,
       "direct_country_copy": 2698,

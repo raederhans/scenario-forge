@@ -103,6 +103,1436 @@
       },
       "subject_kind": "colonial_government",
       "tag": "CRI"
+    },
+    {
+      "color_hex": "#504e40",
+      "cores": "keep",
+      "id": "tno_oe01",
+      "name_en": "Generalbezirk Estland",
+      "name_zh": "东部总区·爱沙尼亚总区",
+      "only_from_owners": [
+        "RKO"
+      ],
+      "parent_owner_tag": "RKO",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "EE001",
+          "EE004",
+          "EE008",
+          "EE009",
+          "EE00A"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "OE01"
+    },
+    {
+      "color_hex": "#7d7b6d",
+      "cores": "keep",
+      "id": "tno_oe02",
+      "name_en": "Generalbezirk Litauen",
+      "name_zh": "东部总区·立陶宛总区",
+      "only_from_owners": [
+        "RKO"
+      ],
+      "parent_owner_tag": "RKO",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "LT011",
+          "LT021",
+          "LT022",
+          "LT023",
+          "LT025",
+          "LT026",
+          "LT027",
+          "LT028",
+          "LT029",
+          "PL_POW_2001",
+          "PL_POW_2009"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "OE02"
+    },
+    {
+      "color_hex": "#716f63",
+      "cores": "keep",
+      "id": "tno_oe03",
+      "name_en": "Generalbezirk Weißruthenien",
+      "name_zh": "东部总区·白鲁塞尼亚总区",
+      "only_from_owners": [
+        "RKO"
+      ],
+      "parent_owner_tag": "RKO",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "BY_CITY_MINSK",
+          "BY_HIST_POL_MINSK_WEST",
+          "BY_HIST_POL_VITEBSK_WEST",
+          "BY_INT_GOMEL",
+          "BY_INT_GRODNO",
+          "BY_INT_MINSK",
+          "BY_INT_MOGILEV",
+          "BY_INT_VITEBSK",
+          "BY_RAY_67162791B10713618148259",
+          "BY_RAY_67162791B11584975294724",
+          "BY_RAY_67162791B13547290723272",
+          "BY_RAY_67162791B14569635979911",
+          "BY_RAY_67162791B1773631612848",
+          "BY_RAY_67162791B18102707107362",
+          "BY_RAY_67162791B18933715013959",
+          "BY_RAY_67162791B19917337499758",
+          "BY_RAY_67162791B26710857863794",
+          "BY_RAY_67162791B30498032594927",
+          "BY_RAY_67162791B30546828632542",
+          "BY_RAY_67162791B41761210959552",
+          "BY_RAY_67162791B43104058935452",
+          "BY_RAY_67162791B45929653886900",
+          "BY_RAY_67162791B4778855273895",
+          "BY_RAY_67162791B52564132020414",
+          "BY_RAY_67162791B54270193950847",
+          "BY_RAY_67162791B58533541453403",
+          "BY_RAY_67162791B59963656038120",
+          "BY_RAY_67162791B65560195088656",
+          "BY_RAY_67162791B66420794580046",
+          "BY_RAY_67162791B72598168140482",
+          "BY_RAY_67162791B82603429459213",
+          "BY_RAY_67162791B85815486219336",
+          "BY_RAY_67162791B89656925241953",
+          "RU_MRG_56d7f2c40815",
+          "RU_MRG_baef030e052d",
+          "RU_RAY_50074027B11359862812061",
+          "RU_RAY_50074027B15861675069153",
+          "RU_RAY_50074027B18690673383913",
+          "RU_RAY_50074027B40310096212326",
+          "RU_RAY_50074027B47797242403348",
+          "RU_RAY_50074027B64424707524567",
+          "RU_RAY_50074027B65236051616648",
+          "RU_RAY_50074027B77582248025356",
+          "RU_RAY_50074027B81144067595181",
+          "RU_RAY_50074027B91265302364221",
+          "RU_RAY_50074027B94464987655513",
+          "RU_RAY_50074027B98725284766499"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "OE03"
+    },
+    {
+      "color_hex": "#5a594d",
+      "cores": "keep",
+      "id": "tno_oe04",
+      "name_en": "Generalbezirk Pleskau",
+      "name_zh": "东部总区·普斯科夫总区",
+      "only_from_owners": [
+        "RKO"
+      ],
+      "parent_owner_tag": "RKO",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_6dc9d50b794a",
+          "RU_MRG_6f87652d4746",
+          "RU_MRG_7fee908b63f6",
+          "RU_MRG_9630c25ee3c6",
+          "RU_MRG_cd478b5a76eb",
+          "RU_MRG_e85ce6b2cbb5",
+          "RU_RAY_50074027B11673707761487",
+          "RU_RAY_50074027B12162041502673",
+          "RU_RAY_50074027B19741518738580",
+          "RU_RAY_50074027B24884281398381",
+          "RU_RAY_50074027B37881642500609",
+          "RU_RAY_50074027B464999176845",
+          "RU_RAY_50074027B49278461872326",
+          "RU_RAY_50074027B5223158268211",
+          "RU_RAY_50074027B5631740772865",
+          "RU_RAY_50074027B58076034090645",
+          "RU_RAY_50074027B64055482679717",
+          "RU_RAY_50074027B68450782776786",
+          "RU_RAY_50074027B71157437388348",
+          "RU_RAY_50074027B86147871749672",
+          "RU_RAY_50074027B86681375933080",
+          "RU_RAY_50074027B87627181065564",
+          "RU_RAY_50074027B88274438285408",
+          "RU_RAY_50074027B90555869339870",
+          "RU_RAY_50074027B91439993213773",
+          "RU_RAY_50074027B93378157948323",
+          "RU_RAY_50074027B93522804484377",
+          "RU_RAY_50074027B99227036451137",
+          "RU_RAY_50074027B99894122533642"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "OE04"
+    },
+    {
+      "color_hex": "#42484f",
+      "cores": "keep",
+      "id": "tno_uk01",
+      "name_en": "Generalbezirk Wolhynien-Podolien",
+      "name_zh": "乌克兰·沃里尼亚—波多利亚总区",
+      "only_from_owners": [
+        "RKU"
+      ],
+      "parent_owner_tag": "RKU",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "BY_INT_BREST",
+          "UA_MRG_5041b17a3e61",
+          "UA_MRG_57c49cfe4029",
+          "UA_MRG_6e5a94ff967b",
+          "UA_MRG_71f8199a8d07",
+          "UA_MRG_76b1b94d5856",
+          "UA_MRG_8c4b9e4808b7",
+          "UA_MRG_93291f71dff3",
+          "UA_MRG_ff6ac32ac4e3",
+          "UA_RAY_74538382B10219511542041",
+          "UA_RAY_74538382B1361262622940",
+          "UA_RAY_74538382B17610954663111",
+          "UA_RAY_74538382B17645619358290",
+          "UA_RAY_74538382B19676868566368",
+          "UA_RAY_74538382B30351514928450",
+          "UA_RAY_74538382B35313257426644",
+          "UA_RAY_74538382B36980255523800",
+          "UA_RAY_74538382B37791268598116",
+          "UA_RAY_74538382B44501351674000",
+          "UA_RAY_74538382B46392233077619",
+          "UA_RAY_74538382B47818615416103",
+          "UA_RAY_74538382B51634820959847",
+          "UA_RAY_74538382B51989583187875",
+          "UA_RAY_74538382B57022409328323",
+          "UA_RAY_74538382B5714887404176",
+          "UA_RAY_74538382B57991939893011",
+          "UA_RAY_74538382B64329946545346",
+          "UA_RAY_74538382B6752863603231",
+          "UA_RAY_74538382B69155666487417",
+          "UA_RAY_74538382B71334227440013",
+          "UA_RAY_74538382B72123275564902",
+          "UA_RAY_74538382B72519912366476",
+          "UA_RAY_74538382B80427643782366",
+          "UA_RAY_74538382B81176113996215",
+          "UA_RAY_74538382B86462977342473",
+          "UA_RAY_74538382B91689640579793",
+          "UA_RAY_74538382B9177697938380",
+          "UA_RAY_74538382B92334683682599",
+          "UA_RAY_74538382B9478118461291",
+          "UA_RAY_74538382B9733134987595"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "UK01"
+    },
+    {
+      "color_hex": "#6e757c",
+      "cores": "keep",
+      "id": "tno_uk02",
+      "name_en": "Generalbezirk Shitomir",
+      "name_zh": "乌克兰·日托米尔总区",
+      "only_from_owners": [
+        "RKU"
+      ],
+      "parent_owner_tag": "RKU",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_MRG_364aab8578b7",
+          "UA_MRG_44d0fd9d6e14",
+          "UA_MRG_7f067ceac5cb",
+          "UA_MRG_8e1ed09f0e12",
+          "UA_MRG_9fc8b136c3a6",
+          "UA_MRG_ae35953e4a30",
+          "UA_MRG_b0fab68c785d",
+          "UA_MRG_d6223fcd4bc5",
+          "UA_MRG_dbee0923a48b",
+          "UA_MRG_de7e916ec1cb",
+          "UA_MRG_e0dcc6adce13",
+          "UA_MRG_fd8e40834959",
+          "UA_RAY_74538382B32839428556025",
+          "UA_RAY_74538382B52142389762962",
+          "UA_RAY_74538382B57692221763967",
+          "UA_RAY_74538382B68255145682197",
+          "UA_RAY_74538382B68825553908118",
+          "UA_RAY_74538382B7363516927626",
+          "UA_RAY_74538382B89307192182420"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "UK02"
+    },
+    {
+      "color_hex": "#4d5359",
+      "cores": "keep",
+      "id": "tno_uk03",
+      "name_en": "Generalbezirk Tschernigow",
+      "name_zh": "乌克兰·切尔尼戈夫总区",
+      "only_from_owners": [
+        "RKU"
+      ],
+      "parent_owner_tag": "RKU",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "BY_RAY_67162791B17030122378697",
+          "RU_RAY_50074027B12942583135720",
+          "RU_RAY_50074027B31853797856912",
+          "RU_RAY_50074027B42449829895110",
+          "RU_RAY_50074027B46415378872622",
+          "RU_RAY_50074027B9105763704567",
+          "RU_RAY_50074027B96444957835233",
+          "RU_RAY_50074027B9814729903160",
+          "UA_MRG_07e4f868c3fb",
+          "UA_MRG_4224fabffe3b",
+          "UA_MRG_7db72d35cf6c",
+          "UA_MRG_91f1c11e596f",
+          "UA_MRG_98ce0c6febb4",
+          "UA_MRG_bde664b68d7f",
+          "UA_MRG_c8f134fbd5da",
+          "UA_MRG_f49493422ebe",
+          "UA_RAY_74538382B13559545331448",
+          "UA_RAY_74538382B14499181024319",
+          "UA_RAY_74538382B16544098233158",
+          "UA_RAY_74538382B23907235979788",
+          "UA_RAY_74538382B2732576684893",
+          "UA_RAY_74538382B29845079622826",
+          "UA_RAY_74538382B34689599554445",
+          "UA_RAY_74538382B36929178896395",
+          "UA_RAY_74538382B37171380171685",
+          "UA_RAY_74538382B3760492540112",
+          "UA_RAY_74538382B44220139144156",
+          "UA_RAY_74538382B45068545633774",
+          "UA_RAY_74538382B46710488362187",
+          "UA_RAY_74538382B51921119694159",
+          "UA_RAY_74538382B53011721841283",
+          "UA_RAY_74538382B66083941235299",
+          "UA_RAY_74538382B72285239783987",
+          "UA_RAY_74538382B73193392833506",
+          "UA_RAY_74538382B77165188287872",
+          "UA_RAY_74538382B79592812488535",
+          "UA_RAY_74538382B88368635206807",
+          "UA_RAY_74538382B98557569749448",
+          "UA_RAY_74538382B98672866452807"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "UK03"
+    },
+    {
+      "color_hex": "#64696f",
+      "cores": "keep",
+      "id": "tno_uk04",
+      "name_en": "Generalbezirk Dnjepropetrowsk",
+      "name_zh": "乌克兰·第聂伯罗彼得罗夫斯克总区",
+      "only_from_owners": [
+        "RKU"
+      ],
+      "parent_owner_tag": "RKU",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_MRG_1e5ce8367e34",
+          "UA_MRG_39b244f210a7",
+          "UA_MRG_5e1a623ff8e3",
+          "UA_MRG_6057d7f77511",
+          "UA_MRG_7e91c55da78e",
+          "UA_MRG_95a5c2e0f114",
+          "UA_MRG_9cc4d817d067",
+          "UA_MRG_b75cd2d6110f",
+          "UA_MRG_c5aa2c8a6048",
+          "UA_MRG_c74c01b39f8e",
+          "UA_RAY_74538382B1179884845086",
+          "UA_RAY_74538382B15303326410198",
+          "UA_RAY_74538382B15383579018603",
+          "UA_RAY_74538382B21914315222818",
+          "UA_RAY_74538382B23045356862491",
+          "UA_RAY_74538382B23313109833663",
+          "UA_RAY_74538382B39784518508744",
+          "UA_RAY_74538382B42847215196778",
+          "UA_RAY_74538382B48774443336138",
+          "UA_RAY_74538382B55212312657182",
+          "UA_RAY_74538382B5599119898653",
+          "UA_RAY_74538382B63843280303146",
+          "UA_RAY_74538382B71954626153569",
+          "UA_RAY_74538382B85307919179669",
+          "UA_RAY_74538382B8704633300515",
+          "UA_RAY_74538382B89155529549277",
+          "UA_RAY_74538382B92549368661816",
+          "UA_RAY_74538382B92678915216320",
+          "UA_RAY_74538382B927387955127",
+          "UA_RAY_74538382B92973355473211"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "UK04"
+    },
+    {
+      "color_hex": "#696f76",
+      "cores": "keep",
+      "id": "tno_uk05",
+      "name_en": "Generalbezirk Nikolajew",
+      "name_zh": "乌克兰·尼古拉耶夫总区",
+      "only_from_owners": [
+        "RKU"
+      ],
+      "parent_owner_tag": "RKU",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_MRG_01673e94c186",
+          "UA_MRG_2d1c37bdd071",
+          "UA_MRG_51ee3e4d0063",
+          "UA_MRG_73aa15b32010",
+          "UA_MRG_797d35ccfd2e",
+          "UA_MRG_873c83173170",
+          "UA_MRG_b417c43a40cb",
+          "UA_MRG_ba89d2e82c09",
+          "UA_MRG_d727a8cfaa69",
+          "UA_MRG_e3c0520ffdd5",
+          "UA_RAY_74538382B1113173119948",
+          "UA_RAY_74538382B15723930579981",
+          "UA_RAY_74538382B16168555985033",
+          "UA_RAY_74538382B2161330582129",
+          "UA_RAY_74538382B23953232699474",
+          "UA_RAY_74538382B28831490249541",
+          "UA_RAY_74538382B33094259068281",
+          "UA_RAY_74538382B332128375794",
+          "UA_RAY_74538382B37223682167383",
+          "UA_RAY_74538382B37973254287789",
+          "UA_RAY_74538382B67308569242211",
+          "UA_RAY_74538382B72550121130033",
+          "UA_RAY_74538382B79975421345437",
+          "UA_RAY_74538382B8481477190191",
+          "UA_RAY_74538382B97324557643268",
+          "UA_RAY_74538382B97447105405204",
+          "UA_RAY_74538382B99860915109561"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "UK05"
+    },
+    {
+      "color_hex": "#494d53",
+      "cores": "keep",
+      "id": "tno_uk06",
+      "name_en": "Generalbezirk Taurien",
+      "name_zh": "乌克兰·塔夫利达总区",
+      "only_from_owners": [
+        "RKU"
+      ],
+      "parent_owner_tag": "RKU",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_MRG_1a8aac8d6778",
+          "UA_MRG_570a8d4dd729",
+          "UA_MRG_87ad72dae9b5",
+          "UA_MRG_9e7d5f1ce841",
+          "UA_MRG_de7101fe7980",
+          "UA_RAY_74538382B19608093506995",
+          "UA_RAY_74538382B20048272724198",
+          "UA_RAY_74538382B21297633796285",
+          "UA_RAY_74538382B32095344223749",
+          "UA_RAY_74538382B3314448443504",
+          "UA_RAY_74538382B33781793273381",
+          "UA_RAY_74538382B36897928857836",
+          "UA_RAY_74538382B42205538030067",
+          "UA_RAY_74538382B42406222783177",
+          "UA_RAY_74538382B43795583594371",
+          "UA_RAY_74538382B44474254323889",
+          "UA_RAY_74538382B57790499946350",
+          "UA_RAY_74538382B60808123109786",
+          "UA_RAY_74538382B61089393980714",
+          "UA_RAY_74538382B62779126534418",
+          "UA_RAY_74538382B65177906747126",
+          "UA_RAY_74538382B72369548204787",
+          "UA_RAY_74538382B83290488809947",
+          "UA_RAY_74538382B85739457006484",
+          "UA_RAY_74538382B86672078093677",
+          "UA_RAY_74538382B87705908812983",
+          "UA_RAY_74538382B88832969225176",
+          "UA_RAY_74538382B92774727366654",
+          "UA_RAY_74538382B95492559683598"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "UK06"
+    },
+    {
+      "color_hex": "#53585e",
+      "cores": "keep",
+      "id": "tno_uk07",
+      "name_en": "Generalbezirk Charkow",
+      "name_zh": "乌克兰·哈尔科夫总区",
+      "only_from_owners": [
+        "RKU"
+      ],
+      "parent_owner_tag": "RKU",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_dc59f2179593",
+          "RU_MRG_f84bc369d8b3",
+          "RU_RAY_50074027B19621694008878",
+          "RU_RAY_50074027B23655919603928",
+          "RU_RAY_50074027B26881426661864",
+          "RU_RAY_50074027B55014623372781",
+          "RU_RAY_50074027B59167521890578",
+          "RU_RAY_50074027B73978553723393",
+          "RU_RAY_50074027B78718194323542",
+          "RU_RAY_50074027B79024776170444",
+          "RU_RAY_50074027B82795249676876",
+          "UA_MRG_167b1c61b320",
+          "UA_MRG_1e19f7d437d0",
+          "UA_MRG_26d00b8ec232",
+          "UA_MRG_70858b70843b",
+          "UA_MRG_97cb7eda9f1d",
+          "UA_MRG_c2b5f29d91e8",
+          "UA_RAY_74538382B150351319009",
+          "UA_RAY_74538382B35146860339147",
+          "UA_RAY_74538382B35301744305605",
+          "UA_RAY_74538382B36501884751905",
+          "UA_RAY_74538382B40204431292765",
+          "UA_RAY_74538382B51195623672150",
+          "UA_RAY_74538382B52051409545176",
+          "UA_RAY_74538382B56857399435570",
+          "UA_RAY_74538382B58806562521535",
+          "UA_RAY_74538382B6869191817667",
+          "UA_RAY_74538382B7822777781560"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "UK07"
+    },
+    {
+      "color_hex": "#5d646a",
+      "cores": "keep",
+      "id": "tno_uk08",
+      "name_en": "Generalbezirk Donez",
+      "name_zh": "乌克兰·顿涅茨总区",
+      "only_from_owners": [
+        "RKU"
+      ],
+      "parent_owner_tag": "RKU",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_RAY_50074027B19608634361445",
+          "RU_RAY_50074027B21430544456221",
+          "RU_RAY_50074027B30333853270950",
+          "RU_RAY_50074027B40672414055189",
+          "RU_RAY_50074027B48200335175308",
+          "RU_RAY_50074027B96632027100715",
+          "UA_MRG_30161412737f",
+          "UA_MRG_456d7658c3df",
+          "UA_MRG_837595aeea03",
+          "UA_MRG_8e995a06a742",
+          "UA_RAY_74538382B13057195168049",
+          "UA_RAY_74538382B13823475744665",
+          "UA_RAY_74538382B17839198127311",
+          "UA_RAY_74538382B24236776375789",
+          "UA_RAY_74538382B38253727574875",
+          "UA_RAY_74538382B42239251891056",
+          "UA_RAY_74538382B52931084418443",
+          "UA_RAY_74538382B53420808029005",
+          "UA_RAY_74538382B54113761495064",
+          "UA_RAY_74538382B55408999642819",
+          "UA_RAY_74538382B55698458190122",
+          "UA_RAY_74538382B59316427092609",
+          "UA_RAY_74538382B60058274039512",
+          "UA_RAY_74538382B60964237816069",
+          "UA_RAY_74538382B61551312903365",
+          "UA_RAY_74538382B63146168478131",
+          "UA_RAY_74538382B68112456325611",
+          "UA_RAY_74538382B72863696789776",
+          "UA_RAY_74538382B811800225931",
+          "UA_RAY_74538382B83226976460707",
+          "UA_RAY_74538382B87091028068119",
+          "UA_RAY_74538382B91393089585676",
+          "UA_RAY_74538382B91909296876216",
+          "UA_RAY_74538382B99908513430661"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "UK08"
+    },
+    {
+      "color_hex": "#2f2f30",
+      "cores": "keep",
+      "id": "tno_pg01",
+      "name_en": "Generalgouvernement — Distrikt Warschau",
+      "name_zh": "波兰总督府·华沙区",
+      "only_from_owners": [
+        "RKP"
+      ],
+      "parent_owner_tag": "RKP",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "PL_MRG_328be0e18e73",
+          "PL_MRG_4a7fdf2f215b",
+          "PL_MRG_81a04ac05a78",
+          "PL_POW_1465"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "PG01"
+    },
+    {
+      "color_hex": "#5a5a5b",
+      "cores": "keep",
+      "id": "tno_pg02",
+      "name_en": "Generalgouvernement — Distrikt Radom",
+      "name_zh": "波兰总督府·拉多姆区",
+      "only_from_owners": [
+        "RKP"
+      ],
+      "parent_owner_tag": "RKP",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "PL_MRG_3692a96e99b1",
+          "PL_MRG_4762ef33a34f",
+          "PL_MRG_f3a4768ac693",
+          "PL_POW_1463",
+          "PL_POW_2661"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "PG02"
+    },
+    {
+      "color_hex": "#39393a",
+      "cores": "keep",
+      "id": "tno_pg03",
+      "name_en": "Generalgouvernement — Distrikt Lublin",
+      "name_zh": "波兰总督府·卢布林区",
+      "only_from_owners": [
+        "RKP"
+      ],
+      "parent_owner_tag": "RKP",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "PL_MRG_4df6ad2dc703",
+          "PL_MRG_c5cfb391c06f",
+          "PL_MRG_cb41a08029c6",
+          "PL_POW_0601",
+          "PL_POW_0603",
+          "PL_POW_0604",
+          "PL_POW_0618",
+          "PL_POW_0619",
+          "PL_POW_0661",
+          "PL_POW_0662",
+          "PL_POW_0663"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "PG03"
+    },
+    {
+      "color_hex": "#4f4f50",
+      "cores": "keep",
+      "id": "tno_pg04",
+      "name_en": "Generalgouvernement — Distrikt Galizien",
+      "name_zh": "波兰总督府·加利西亚区",
+      "only_from_owners": [
+        "RKP"
+      ],
+      "parent_owner_tag": "RKP",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_MRG_0d6137080058",
+          "UA_MRG_35715f97812f",
+          "UA_MRG_72c94a3ccd70",
+          "UA_MRG_9c6077315d06",
+          "UA_MRG_ab85624a51f5",
+          "UA_MRG_d4f151f823ef",
+          "UA_RAY_74538382B10043952621964",
+          "UA_RAY_74538382B11484774081003",
+          "UA_RAY_74538382B1294553244801",
+          "UA_RAY_74538382B19184608500024",
+          "UA_RAY_74538382B20694939957091",
+          "UA_RAY_74538382B20988283989287",
+          "UA_RAY_74538382B23242546961479",
+          "UA_RAY_74538382B27410242056643",
+          "UA_RAY_74538382B29269701893700",
+          "UA_RAY_74538382B30474831618663",
+          "UA_RAY_74538382B3075345491126",
+          "UA_RAY_74538382B36952464312213",
+          "UA_RAY_74538382B3900479393084",
+          "UA_RAY_74538382B41206945038645",
+          "UA_RAY_74538382B43402639614828",
+          "UA_RAY_74538382B46794704390703",
+          "UA_RAY_74538382B46853229377150",
+          "UA_RAY_74538382B47122589681539",
+          "UA_RAY_74538382B48347776111848",
+          "UA_RAY_74538382B49623999622134",
+          "UA_RAY_74538382B50426750850815",
+          "UA_RAY_74538382B52096657726601",
+          "UA_RAY_74538382B56277130334747",
+          "UA_RAY_74538382B63824501838973",
+          "UA_RAY_74538382B65631972109498",
+          "UA_RAY_74538382B70043309892570",
+          "UA_RAY_74538382B74407255776409",
+          "UA_RAY_74538382B78037249212092",
+          "UA_RAY_74538382B79038092338263",
+          "UA_RAY_74538382B80134977422421",
+          "UA_RAY_74538382B85427402456891",
+          "UA_RAY_74538382B88125912704040",
+          "UA_RAY_74538382B88282912225835",
+          "UA_RAY_74538382B89403854124425",
+          "UA_RAY_74538382B95195670192940",
+          "UA_RAY_74538382B97249439308301"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "PG04"
+    },
+    {
+      "color_hex": "#9c8352",
+      "cores": "owner",
+      "id": "tno_ayr",
+      "name_en": "Kel Ayr",
+      "name_zh": "凯尔艾尔",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "NE_ADM1_NER-800",
+          "NE_ADM1_NER-92",
+          "NE_ADM1_NER-95"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "AYR"
+    },
+    {
+      "color_hex": "#856ea3",
+      "cores": "owner",
+      "id": "tno_azw",
+      "name_en": "Azawad",
+      "name_zh": "阿扎瓦德",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "ML_ADM1_MLI-2688",
+          "ML_ADM1_MLI-2689"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "AZW"
+    },
+    {
+      "color_hex": "#b19b66",
+      "cores": "owner",
+      "id": "tno_chd",
+      "name_en": "Chad",
+      "name_zh": "乍得",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "TD_ADM1_TCD-1465",
+          "TD_ADM1_TCD-5577",
+          "TD_ADM1_TCD-5578",
+          "TD_ADM1_TCD-5579",
+          "TD_ADM1_TCD-5581"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "CHD"
+    },
+    {
+      "color_hex": "#58976c",
+      "cores": "owner",
+      "id": "tno_mau",
+      "name_en": "Mauritania",
+      "name_zh": "毛里塔尼亚",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "MR_ADM1_MRT-2784",
+          "MR_ADM1_MRT-2786",
+          "MR_ADM1_MRT-2787",
+          "MR_ADM1_MRT-2788",
+          "MR_ADM1_MRT-2789",
+          "MR_ADM1_MRT-2790",
+          "MR_ADM1_MRT-2791",
+          "MR_ADM1_MRT-2798"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "MAU"
+    },
+    {
+      "color_hex": "#c1b04b",
+      "cores": "owner",
+      "id": "tno_mli",
+      "name_en": "Mali",
+      "name_zh": "马里",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "ML_ADM1_MLI-2792",
+          "ML_ADM1_MLI-2793",
+          "ML_ADM1_MLI-2810",
+          "ML_ADM1_MLI-4860"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "MLI"
+    },
+    {
+      "color_hex": "#b35352",
+      "cores": "owner",
+      "id": "tno_gui",
+      "name_en": "Guinea",
+      "name_zh": "几内亚",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "GN_ADM1_385441B21537995001042",
+          "GN_ADM1_385441B29247776226513",
+          "GN_ADM1_385441B58689174477974",
+          "GN_ADM1_385441B61717407014046",
+          "GN_ADM1_385441B8345275251802",
+          "GN_ADM1_385441B85233176952124",
+          "GN_ADM1_385441B97135885584055"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "GUI"
+    },
+    {
+      "color_hex": "#647b9a",
+      "cores": "owner",
+      "id": "tno_hau",
+      "name_en": "Sokoto",
+      "name_zh": "索科托",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "BF_ADM1_92566538B57532963969301",
+          "BF_ADM1_92566538B60283727543208",
+          "BF_ADM1_92566538B81581720767285",
+          "NE_ADM1_NER-4859",
+          "NE_ADM1_NER-94"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "HAU"
+    },
+    {
+      "color_hex": "#41968f",
+      "cores": "owner",
+      "id": "tno_sen",
+      "name_en": "Senegal",
+      "name_zh": "塞内加尔",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "GM_ADM1_GMB-2151",
+          "GM_ADM1_GMB-2152",
+          "GM_ADM1_GMB-2153",
+          "GM_ADM1_GMB-2154",
+          "GM_ADM1_GMB-5512",
+          "GM_ADM1_GMB-5513",
+          "SN_ADM1_SEN-5514",
+          "SN_ADM1_SEN-5515",
+          "SN_ADM1_SEN-5516",
+          "SN_ADM1_SEN-759",
+          "SN_ADM1_SEN-763",
+          "SN_ADM1_SEN-764",
+          "SN_ADM1_SEN-765",
+          "SN_ADM1_SEN-766",
+          "SN_ADM1_SEN-767",
+          "SN_ADM1_SEN-768",
+          "SN_ADM1_SEN-774",
+          "SN_ADM1_SEN-775",
+          "SN_ADM1_SEN-779"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "SEN"
+    },
+    {
+      "color_hex": "#cd934c",
+      "cores": "owner",
+      "id": "tno_gha",
+      "name_en": "Ghana",
+      "name_zh": "加纳",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "GH_ADM1_GHA-2155",
+          "GH_ADM1_GHA-2156",
+          "GH_ADM1_GHA-2157",
+          "GH_ADM1_GHA-2158",
+          "GH_ADM1_GHA-2159",
+          "GH_ADM1_GHA-2160",
+          "GH_ADM1_GHA-2161",
+          "GH_ADM1_GHA-2162",
+          "GH_ADM1_GHA-2172",
+          "GH_ADM1_GHA-2173"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "GHA"
+    },
+    {
+      "color_hex": "#8d6c48",
+      "cores": "owner",
+      "id": "tno_dah",
+      "name_en": "Dahomey",
+      "name_zh": "达荷美",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "BJ_ADM1_BEN-2169",
+          "BJ_ADM1_BEN-2170",
+          "BJ_ADM1_BEN-2171",
+          "BJ_ADM1_BEN-2174",
+          "BJ_ADM1_BEN-2175",
+          "BJ_ADM1_BEN-2176",
+          "BJ_ADM1_BEN-2177",
+          "BJ_ADM1_BEN-2178",
+          "BJ_ADM1_BEN-2179",
+          "BJ_ADM1_BEN-2180",
+          "BJ_ADM1_BEN-2181",
+          "BJ_ADM1_BEN-2182",
+          "TG_ADM1_TGO-88",
+          "TG_ADM1_TGO-89",
+          "TG_ADM1_TGO-90"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "DAH"
+    },
+    {
+      "color_hex": "#b97091",
+      "cores": "owner",
+      "id": "tno_bkf",
+      "name_en": "Mossiland",
+      "name_zh": "莫西兰",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "BF_ADM1_92566538B14190085014946",
+          "BF_ADM1_92566538B19127906733451",
+          "BF_ADM1_92566538B49759193106183",
+          "BF_ADM1_92566538B57875752774417",
+          "BF_ADM1_92566538B59117792838125",
+          "BF_ADM1_92566538B74906977122081"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "BKF"
+    },
+    {
+      "color_hex": "#7e9d4e",
+      "cores": "owner",
+      "id": "tno_yor",
+      "name_en": "Yorubaland",
+      "name_zh": "约鲁巴兰",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "NG_ADM1_NGA-2849",
+          "NG_ADM1_NGA-2850",
+          "NG_ADM1_NGA-2853",
+          "NG_ADM1_NGA-2854",
+          "NG_ADM1_NGA-2855",
+          "NG_ADM1_NGA-2856",
+          "NG_ADM1_NGA-2860",
+          "NG_ADM1_NGA-2861"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "YOR"
+    },
+    {
+      "color_hex": "#6693b4",
+      "cores": "owner",
+      "id": "tno_sie",
+      "name_en": "Sierra Leone",
+      "name_zh": "塞拉利昂",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "SL_ADM1_SLE-760",
+          "SL_ADM1_SLE-761",
+          "SL_ADM1_SLE-762",
+          "SL_ADM1_SLE-790"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "SIE"
+    },
+    {
+      "color_hex": "#a86c3f",
+      "cores": "owner",
+      "id": "tno_cao",
+      "name_en": "Cameroon",
+      "name_zh": "喀麦隆",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "CF_ADM1_CAF-805",
+          "CF_ADM1_CAF-806",
+          "CF_ADM1_CAF-807",
+          "CF_ADM1_CAF-810",
+          "CF_ADM1_CAF-812",
+          "CM_ADM1_CMR-1462",
+          "CM_ADM1_CMR-1476",
+          "CM_ADM1_CMR-1477",
+          "CM_ADM1_CMR-1482",
+          "CM_ADM1_CMR-1483",
+          "CM_ADM1_CMR-798",
+          "CM_ADM1_CMR-799",
+          "NG_ADM1_NGA-2839",
+          "NG_ADM1_NGA-2841",
+          "NG_ADM1_NGA-2842",
+          "NG_ADM1_NGA-2843",
+          "NG_ADM1_NGA-2844",
+          "NG_ADM1_NGA-2845",
+          "NG_ADM1_NGA-2846",
+          "NG_ADM1_NGA-2847",
+          "NG_ADM1_NGA-2848",
+          "NG_ADM1_NGA-2851",
+          "NG_ADM1_NGA-2857",
+          "NG_ADM1_NGA-2858",
+          "NG_ADM1_NGA-2859",
+          "NG_ADM1_NGA-2862",
+          "NG_ADM1_NGA-2863",
+          "NG_ADM1_NGA-2864",
+          "NG_ADM1_NGA-2865",
+          "NG_ADM1_NGA-2866",
+          "NG_ADM1_NGA-2867",
+          "NG_ADM1_NGA-2868",
+          "NG_ADM1_NGA-2869",
+          "NG_ADM1_NGA-2870",
+          "NG_ADM1_NGA-2871",
+          "NG_ADM1_NGA-2872",
+          "NG_ADM1_NGA-2873",
+          "NG_ADM1_NGA-2879",
+          "NG_ADM1_NGA-2881",
+          "NG_ADM1_NGA-3470",
+          "TD_ADM1_TCD-1464",
+          "TD_ADM1_TCD-1474",
+          "TD_ADM1_TCD-1475",
+          "TD_ADM1_TCD-1484",
+          "TD_ADM1_TCD-1485",
+          "TD_ADM1_TCD-1486",
+          "TD_ADM1_TCD-1487",
+          "TD_ADM1_TCD-1488",
+          "TD_ADM1_TCD-1489",
+          "TD_ADM1_TCD-4857",
+          "TD_ADM1_TCD-4858",
+          "TD_ADM1_TCD-5580",
+          "TD_ADM1_TCD-5582",
+          "TD_ADM1_TCD-5583"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "CAO"
+    },
+    {
+      "color_hex": "#464678",
+      "cores": "owner",
+      "id": "tno_ffr",
+      "name_en": "Free France",
+      "name_zh": "自由法国",
+      "only_from_owners": [
+        "AFA",
+        "AOF",
+        "BWA",
+        "GCO"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "BF_ADM1_92566538B65696039363280",
+          "CI_ADM1_83157122B20352934117266",
+          "CI_ADM1_83157122B28791092437733",
+          "CI_ADM1_83157122B30232425959699",
+          "CI_ADM1_83157122B58892240487392",
+          "CI_ADM1_83157122B62906982633778",
+          "CI_ADM1_83157122B69310198422077",
+          "CI_ADM1_83157122B74959515955757",
+          "CI_ADM1_83157122B79983119233374"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "FFR"
+    },
+    {
+      "color_hex": "#590422",
+      "cores": "owner",
+      "id": "tno_nrb",
+      "name_en": "Nanpo Gunseikan",
+      "name_zh": "南方军政监部",
+      "only_from_owners": [
+        "MAL"
+      ],
+      "parent_owner_tag": "JAP",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "BN_ADM1_BRN-1181",
+          "MYS-1186",
+          "MYS-1187"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "NRB"
+    },
+    {
+      "color_hex": "#bf4d4e",
+      "cores": "owner",
+      "id": "tno_sho",
+      "name_en": "Shōnan",
+      "name_zh": "昭南",
+      "only_from_owners": [
+        "MAL"
+      ],
+      "parent_owner_tag": "JAP",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "MYS-1143",
+          "MYS-1145",
+          "MYS-1146",
+          "MYS-1147",
+          "MYS-1148",
+          "MYS-4831",
+          "MYS-4832",
+          "SGP-4871",
+          "SGP-4872",
+          "SGP-4873",
+          "SGP-4874",
+          "SGP-4875"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "SHO"
+    },
+    {
+      "color_hex": "#bc663f",
+      "cores": "owner",
+      "id": "tno_mly",
+      "name_en": "United Malayan Anti-Japanese Front",
+      "name_zh": "马来亚联合抗日阵线",
+      "only_from_owners": [
+        "MAL",
+        "SIA"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "MYS-1137",
+          "MYS-1139"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "MLY"
+    },
+    {
+      "color_hex": "#527ba8",
+      "cores": "owner",
+      "id": "tno_uph",
+      "name_en": "Free Philippine Republic",
+      "name_zh": "自由菲律宾共和国",
+      "only_from_owners": [
+        "PHI"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "PHL-2511",
+          "PHL-2513",
+          "PHL-2516",
+          "PHL-2518",
+          "PHL-2519",
+          "PHL-2520",
+          "PHL-2521",
+          "PHL-2523",
+          "PHL-2524",
+          "PHL-2536",
+          "PHL-2537",
+          "PHL-2538",
+          "PHL-2539",
+          "PHL-2540",
+          "PHL-2541",
+          "PHL-2573",
+          "PHL-2574",
+          "PHL-2576",
+          "PHL-2579",
+          "PHL-2580",
+          "PHL-2581",
+          "PHL-2582",
+          "PHL-2583",
+          "PHL-2584",
+          "PHL-2585",
+          "PHL-2586",
+          "PHL-2587",
+          "PHL-2588",
+          "PHL-2589",
+          "PHL-2591",
+          "PHL-2592",
+          "PHL-2593",
+          "PHL-2594",
+          "PHL-2595",
+          "PHL-2596",
+          "PHL-2597",
+          "PHL-2598",
+          "PHL-2599",
+          "PHL-4932",
+          "PHL-5524",
+          "PHL-5527",
+          "PHL-5528",
+          "PHL-5529",
+          "PHL-5530",
+          "PHL-5531",
+          "PHL-5532",
+          "PHL-5534",
+          "PHL-5535",
+          "PHL-5536"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "UPH"
+    },
+    {
+      "color_hex": "#a53e4d",
+      "cores": "owner",
+      "id": "tno_sph",
+      "name_en": "All-Filipino Revolutionary Socialist Republic",
+      "name_zh": "全菲律宾革命社会主义共和国",
+      "only_from_owners": [
+        "PHI"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "PHL-2542",
+          "PHL-2545",
+          "PHL-2547",
+          "PHL-2548",
+          "PHL-2550",
+          "PHL-2551",
+          "PHL-2552",
+          "PHL-2553",
+          "PHL-2554",
+          "PHL-2559",
+          "PHL-2561",
+          "PHL-4931",
+          "PHL-5537",
+          "PHL-5539"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "SPH"
+    },
+    {
+      "color_hex": "#a97838",
+      "cores": "owner",
+      "id": "tno_vic",
+      "name_en": "Communist Vietnam",
+      "name_zh": "越南共产主义政权",
+      "only_from_owners": [
+        "VIN",
+        "VMT"
+      ],
+      "parent_owner_tag": "",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "VNM-451",
+          "VNM-457",
+          "VNM-511",
+          "VNM-512"
+        ]
+      },
+      "subject_kind": "",
+      "tag": "VIC"
     }
   ],
   "version": 1
