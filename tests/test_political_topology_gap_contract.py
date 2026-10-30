@@ -11,6 +11,7 @@ from map_builder import config as cfg
 from map_builder.json_source import read_json_source
 from map_builder.processors import africa_admin1
 from tools.build_runtime_political_topology import _compose_political_features
+from tools.scenario_chunk_format import decode_political_chunk
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 TNO_RUNTIME_TOPOLOGY = REPO_ROOT / "data" / "scenarios" / "tno_1962" / "runtime_topology.topo.json"
@@ -120,7 +121,7 @@ class PoliticalTopologyGapContractTests(unittest.TestCase):
         self.assertTrue(all((geometry.get("arcs") or geometry.get("coordinates")) for geometry in by_country["SO"]))
         self.assertTrue(all((geometry.get("arcs") or geometry.get("coordinates")) for geometry in ru_arctic_runtime))
 
-        chunk = json.loads(TNO_COARSE_POLITICAL_CHUNK.read_text(encoding="utf-8"))
+        chunk = decode_political_chunk(json.loads(TNO_COARSE_POLITICAL_CHUNK.read_text(encoding="utf-8")))
         ru_arctic_chunk = [
             feature for feature in chunk["features"]
             if str((feature.get("properties") or {}).get("id") or "").startswith("RU_ARCTIC_FB_")

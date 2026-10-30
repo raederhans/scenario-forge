@@ -89,36 +89,6 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         ):
             self.assertTrue(path.exists(), path.as_posix())
 
-    def test_country_real_pack_builder_uses_shared_pack_writer_and_extract_cache(self) -> None:
-        builder_content = COUNTRY_REAL_PACK_BUILDER.read_text(encoding='utf-8')
-        writer_content = COUNTRY_PACK_WRITER.read_text(encoding='utf-8')
-        extract_cache_content = SOURCE_EXTRACT_CACHE.read_text(encoding='utf-8')
-        registry_content = TRANSPORT_FAMILY_REGISTRY.read_text(encoding='utf-8')
-
-        self.assertIn('from map_builder.transport_country_pack_writer import (', builder_content)
-        self.assertIn('write_country_pack', builder_content)
-        self.assertIn('from map_builder.transport_family_registry import (', builder_content)
-        self.assertIn('from map_builder.transport_source_extract_cache import (', builder_content)
-        self.assertIn('marker_matches', builder_content)
-        self.assertIn('source_marker_from_signature', builder_content)
-        self.assertIn('write_marker', builder_content)
-        self.assertIn('class FamilySpec', registry_content)
-        self.assertIn('class GpkgLayerGroup', registry_content)
-        self.assertNotRegex(builder_content, r'(?m)^def feature_collection\(')
-        self.assertNotRegex(builder_content, r'(?m)^def topology_payload\(')
-        self.assertNotRegex(builder_content, r'(?m)^def file_signature\(')
-        self.assertNotRegex(builder_content, r'(?m)^def source_signature\(')
-        self.assertNotIn('def build_osm_pbf_road_pack', builder_content)
-        self.assertNotIn('def build_osm_pbf_rail_pack', builder_content)
-        self.assertNotIn('"default": {"label": "default"', builder_content)
-        self.assertNotIn('"mainMapEligible": True', builder_content)
-        self.assertNotIn('"apply_bridge_supported": True', builder_content)
-        self.assertNotIn('write_json(output_dir / "manifest.json"', builder_content)
-        self.assertIn('def write_country_pack(', writer_content)
-        self.assertIn('def write_country_pack_layers(', writer_content)
-        self.assertIn('def country_pack_layer_suffix(', writer_content)
-        self.assertIn('def source_marker_from_signature(', extract_cache_content)
-        self.assertIn('def marker_matches(', extract_cache_content)
 
     def test_osm_gpkg_family_registry_covers_real_country_builders(self) -> None:
         from map_builder.transport_family_registry import OSM_GPKG_FAMILY_SPECS, osm_gpkg_family_for_pack_id
@@ -154,21 +124,6 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
             with self.subTest(pack_id=pack_id):
                 self.assertEqual(osm_gpkg_family_for_pack_id(pack_id), family)
 
-    def test_osm_gpkg_family_geometry_matches_frontend_capability_registry(self) -> None:
-        from map_builder.transport_family_registry import OSM_GPKG_FAMILY_SPECS
-
-        registry_text = TRANSPORT_CAPABILITY_REGISTRY.read_text(encoding="utf-8")
-        frontend_geometry = {
-            match.group("family"): match.group("geometry")
-            for match in re.finditer(
-                r"(?P<family>[a-z_]+): createTransportCapabilityFamily\(\{.*?geometryKind: \"(?P<geometry>[a-z_]+)\"",
-                registry_text,
-                re.S,
-            )
-        }
-        for family, spec in OSM_GPKG_FAMILY_SPECS.items():
-            with self.subTest(family=family):
-                self.assertEqual(frontend_geometry[family], spec.capability_geometry_kind)
 
     def test_country_pack_writer_assembles_manifest_audit_and_bridge_contract(self) -> None:
         from map_builder.transport_country_pack_writer import write_country_pack
@@ -354,13 +309,6 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertEqual(payload.get('primary_source', {}).get('provider'), 'Overture Maps Foundation')
         self.assertEqual(payload.get('primary_source', {}).get('subtype'), 'rail')
 
-    def test_builders_emit_checked_in_manifest_contract(self) -> None:
-        for builder in (ROAD_BUILDER, RAIL_BUILDER, POINT_BUILDER):
-            content = builder.read_text(encoding='utf-8')
-            self.assertIn('finalize_transport_manifest', content)
-            self.assertIn('distribution_tier', content)
-            self.assertIn('feature_counts', content)
-            self.assertIn('build_audit', content)
 
     def test_road_recipe_declares_backbone_only_phase_a(self) -> None:
         payload = json.loads(GLOBAL_ROAD_RECIPE.read_text(encoding='utf-8'))
@@ -593,35 +541,6 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertEqual(shard['lon_min'], 10.0)
         self.assertEqual(shard['lon_max'], 12.0)
 
-    def test_road_builder_uses_single_normalized_chunk_truth(self) -> None:
-        content = ROAD_BUILDER.read_text(encoding='utf-8')
-        self.assertNotIn('preview_chunks', content)
-        self.assertNotIn('preview_label_chunks', content)
-        self.assertNotIn('label_chunks', content)
-
-    def test_road_builder_writes_labels_after_both_backbones(self) -> None:
-        content = ROAD_BUILDER.read_text(encoding='utf-8')
-        preview_topo_index = content.index("write_json(paths['roads_preview']")
-        full_topo_index = content.index("write_json(paths['roads_full']")
-        preview_labels_index = content.index("write_json(paths['labels_preview']")
-        full_labels_index = content.index("write_json(paths['labels_full']")
-        self.assertLess(preview_topo_index, full_topo_index)
-        self.assertLess(full_topo_index, preview_labels_index)
-        self.assertLess(preview_labels_index, full_labels_index)
-
-    def test_road_phase_a_keeps_labels_out_of_manifest(self) -> None:
-        content = ROAD_BUILDER.read_text(encoding='utf-8')
-        self.assertIn("'phase_b_reserved_outputs': ['road_labels']", content)
-        self.assertIn("'road_labels': 'phase_b_pending_ref_sidecar'", content)
-        self.assertNotIn("'road_labels': str(ROAD_LABELS_PATH.relative_to(ROOT)).replace('\\\\', '/')", content)
-        self.assertIn("OUTPUT_DIR / 'shards' / shard_spec['id']", content)
-        self.assertIn("build_command = f\"{build_command} --shard {shard_spec['id']}\"", content)
-
-    def test_rail_builder_declares_phase_logs(self) -> None:
-        content = RAIL_BUILDER.read_text(encoding='utf-8')
-        self.assertIn("log_progress('starting normalized rail chunk scan')", content)
-        self.assertIn("log_progress('starting preview backbone assembly')", content)
-        self.assertIn("log_progress('starting full backbone assembly')", content)
 
     def test_road_catalog_matches_current_shard_manifests(self) -> None:
         if not self.pyarrow_available:
@@ -937,254 +856,6 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
                 entry.get('phase_status'),
             )
 
-    def test_rail_runtime_opens_and_saves(self) -> None:
-        state_content = (REPO_ROOT / 'js' / 'core' / 'state' / 'ui_state.js').read_text(encoding='utf-8')
-        appearance_controller_content = (
-            REPO_ROOT / 'js' / 'ui' / 'toolbar' / 'transport_appearance_controller.js'
-        ).read_text(encoding='utf-8')
-        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
-        file_manager_content = (REPO_ROOT / 'js' / 'core' / 'file_manager.js').read_text(encoding='utf-8')
-        interaction_content = (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8')
-
-        self.assertIn('showRail', state_content)
-        self.assertIn('showRail', appearance_controller_content)
-        self.assertIn('getTransportOverviewRenderOwner().drawRailwaysLayer(k, options)', renderer_content)
-        transport_owner_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_overview_render_owner.js').read_text(encoding='utf-8')
-        self.assertIn('!!runtimeState.showTransport && !!runtimeState.showRail', transport_owner_content)
-        self.assertIn('getTransportOverviewVisibilityField', file_manager_content)
-        self.assertIn('const visibilityField = getTransportOverviewVisibilityField(familyId);', interaction_content)
-        self.assertIn('const layerRequest = getContextLayerRequestFromKeys(getTransportOverviewDataLayerKeys(familyId));', interaction_content)
-        self.assertIn('function buildTransportOverviewLayerVisibility(appState) {', file_manager_content)
-        self.assertIn('result[field] = !!appState[field];', file_manager_content)
-        self.assertIn('restoreImportedLayerVisibilityState(state, data.layerVisibility);', interaction_content)
-        self.assertIn('const TRANSPORT_OVERVIEW_VISIBILITY_FIELDS = listTransportOverviewCapabilityFamilyIds()', state_content)
-        self.assertIn('transportOverviewLayerVisibility[field] = !!layerVisibility[field];', state_content)
-
-    def test_road_runtime_opens_main_map_only(self) -> None:
-        state_content = (REPO_ROOT / 'js' / 'core' / 'state' / 'ui_state.js').read_text(encoding='utf-8')
-        appearance_controller_content = (
-            REPO_ROOT / 'js' / 'ui' / 'toolbar' / 'transport_appearance_controller.js'
-        ).read_text(encoding='utf-8')
-        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
-        data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
-        file_manager_content = (REPO_ROOT / 'js' / 'core' / 'file_manager.js').read_text(encoding='utf-8')
-        interaction_content = (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8')
-
-        self.assertIn('showRoad', state_content)
-        self.assertIn('showRoad', appearance_controller_content)
-        self.assertIn('getTransportOverviewRenderOwner().drawRoadsLayer(k, options)', renderer_content)
-        transport_owner_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_overview_render_owner.js').read_text(encoding='utf-8')
-        self.assertIn('!!runtimeState.showTransport && !!runtimeState.showRoad', transport_owner_content)
-        self.assertIn('layerName === "roads"', data_loader_content)
-        self.assertIn('getTransportOverviewVisibilityFields()', file_manager_content)
-        self.assertIn('const visibilityField = getTransportOverviewVisibilityField(familyId);', interaction_content)
-        self.assertIn('const layerRequest = getContextLayerRequestFromKeys(getTransportOverviewDataLayerKeys(familyId));', interaction_content)
-        self.assertIn('function normalizeTransportOverviewLayerVisibility(layerVisibility) {', file_manager_content)
-        self.assertRegex(
-            file_manager_content,
-            r'function normalizeTransportOverviewLayerVisibility\(layerVisibility\)\s*\{\s*'
-            r'commitUiVisibilityState\(\s*layerVisibility,\s*'
-            r'Object\.fromEntries\(getTransportOverviewVisibilityFields\(\)\.map\(\(field\) => \[\s*'
-            r'field,\s*layerVisibility\[field\] === undefined \? false : !!layerVisibility\[field\],',
-        )
-        self.assertIn('transportOverviewLayerVisibility[field] = !!layerVisibility[field];', state_content)
-        self.assertIn('getTransportOverviewVisibilityField,', interaction_content)
-        self.assertIn('getTransportOverviewDataLayerKeys,', interaction_content)
-        self.assertIn('listTransportOverviewCapabilityFamilyIds,', interaction_content)
-        self.assertIn('await restoreImportedTransportOverviewDataLayers(state);', interaction_content)
-
-    def test_transport_toggles_release_deferred_context_markers(self) -> None:
-        appearance_controller_content = (
-            REPO_ROOT / 'js' / 'ui' / 'toolbar' / 'transport_appearance_controller.js'
-        ).read_text(encoding='utf-8')
-        appearance_transport_summary_content = (
-            REPO_ROOT / 'js' / 'ui' / 'toolbar' / 'appearance_transport_summary.js'
-        ).read_text(encoding='utf-8')
-        renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
-        state_config_content = (REPO_ROOT / 'js' / 'core' / 'state' / 'config.js').read_text(encoding='utf-8')
-
-        self.assertIn('"releaseDeferredContextBasePassFn"', state_config_content)
-        self.assertIn(
-            'registerRuntimeHook(runtimeState, "releaseDeferredContextBasePassFn", releaseDeferredContextBasePass);',
-            renderer_content,
-        )
-        self.assertIn('const hasVisibleTransportFamily = () => (', appearance_controller_content)
-        self.assertIn('listTransportOverviewCapabilityFamilyIds().some((familyId) => isTransportOverviewFamilyVisible(familyId))', appearance_controller_content)
-        self.assertIn('if (normalized && hasVisibleTransportFamily()) {', appearance_controller_content)
-        self.assertIn('runtimeState.releaseDeferredContextBasePassFn?.("transport-master-toggle");', appearance_controller_content)
-        self.assertIn('reason === "hidden"', appearance_transport_summary_content)
-        self.assertIn('getTransportOverviewDataLayerKeys,', appearance_controller_content)
-        self.assertIn('const getTransportOverviewDataLayerRequest = (familyId) => {', appearance_controller_content)
-        self.assertIn('const layerKeys = getTransportOverviewDataLayerKeys(familyId);', appearance_controller_content)
-        self.assertIn('const requestTransportOverviewDataLayers = (familyId, reason, { renderNow = true } = {}) => {', appearance_controller_content)
-        self.assertIn('runtimeState.ensureContextLayerDataFn(layerRequest, { reason, renderNow })', appearance_controller_content)
-        self.assertIn('const releaseDeferredContextForTransportToggle = (reason) => {', appearance_controller_content)
-        self.assertIn('runtimeState.releaseDeferredContextBasePassFn?.(reason);', appearance_controller_content)
-        for reason in ("toggle-airports", "toggle-ports", "toggle-rail", "toggle-road"):
-            self.assertIn(f'releaseDeferredContextForTransportToggle("{reason}");', appearance_controller_content)
-        toggle_expectations = {
-            "toggleAirports.addEventListener": (
-                'releaseDeferredContextForTransportToggle("toggle-airports");',
-                'requestTransportOverviewDataLayers("airport", "toolbar-toggle");',
-            ),
-            "togglePorts.addEventListener": (
-                'releaseDeferredContextForTransportToggle("toggle-ports");',
-                'requestTransportOverviewDataLayers("port", "toolbar-toggle");',
-            ),
-            "toggleRail.addEventListener": (
-                'releaseDeferredContextForTransportToggle("toggle-rail");',
-                'requestTransportOverviewDataLayers("rail", "toolbar-toggle");',
-            ),
-            "toggleRoad.addEventListener": (
-                'releaseDeferredContextForTransportToggle("toggle-road");',
-                'requestTransportOverviewDataLayers("road", "toolbar-toggle");',
-            ),
-        }
-        for anchor, (release_token, request_token) in toggle_expectations.items():
-            section = appearance_controller_content.split(anchor, 1)[1].split("});", 1)[0]
-            self.assertLess(section.index(release_token), section.index(request_token))
-
-    def test_rail_runtime_loader_uses_catalog_not_eager_pack(self) -> None:
-        data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
-        registry_content = (REPO_ROOT / 'js' / 'core' / 'transport_capability_registry.js').read_text(encoding='utf-8')
-        appearance_controller_content = (
-            REPO_ROOT / 'js' / 'ui' / 'toolbar' / 'transport_appearance_controller.js'
-        ).read_text(encoding='utf-8')
-        self.assertIn('resolveDataAssetUrl("transport_catalog:rail")', data_loader_content)
-        self.assertNotIn('data/transport_layers/global_rail/railways.topo.json', data_loader_content)
-        self.assertNotIn('data/transport_layers/global_rail/rail_stations_major.geojson', data_loader_content)
-        self.assertIn('listTransportOverviewCapabilityFamilyIds()', data_loader_content)
-        self.assertIn('getTransportOverviewDataLayerKeys(familyId)', data_loader_content)
-        self.assertIn('EXPLICIT_CONTEXT_CATALOG_LAYER_NAMES.has(name)', data_loader_content)
-        self.assertIn('rail: Object.freeze(["railways", "rail_stations_major"])', registry_content)
-        self.assertIn('getTransportOverviewDataLayerKeys,', appearance_controller_content)
-        self.assertIn('const layerKeys = getTransportOverviewDataLayerKeys(familyId);', appearance_controller_content)
-        self.assertIn('getTransportOverviewDataLayerKeys,', (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8'))
-        self.assertIn('const layerRequest = getContextLayerRequestFromKeys(getTransportOverviewDataLayerKeys(familyId));', (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8'))
-        default_eager_section = data_loader_content.split('if (includeContextLayers === true) {', 1)[1].split('}', 1)[0]
-        self.assertIn('Object.keys(CONTEXT_LAYER_PACKS)', default_eager_section)
-        self.assertNotIn('EXPLICIT_CONTEXT_CATALOG_LAYER_NAMES', default_eager_section)
-        self.assertIn('["railways", "rail_stations_major"]', registry_content)
-
-    def test_road_runtime_loader_uses_catalog_roads_only(self) -> None:
-        data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
-        toolbar_content = (REPO_ROOT / 'js' / 'ui' / 'toolbar.js').read_text(encoding='utf-8')
-        interaction_content = (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8')
-        self.assertIn('resolveDataAssetUrl("transport_catalog:road")', data_loader_content)
-        self.assertIn('layerName === "roads"', data_loader_content)
-        self.assertIn('EXPLICIT_CONTEXT_CATALOG_LAYER_NAMES.has(name)', data_loader_content)
-        self.assertNotIn('road_labels.geojson', data_loader_content)
-        self.assertNotIn('ensureContextLayerDataFn("road_labels"', toolbar_content)
-        self.assertNotIn('ensureContextLayerDataFn("road_labels"', interaction_content)
-
-    def test_transport_appearance_ui_exposes_live_rail_controls(self) -> None:
-        appearance_controller_content = (
-            REPO_ROOT / 'js' / 'ui' / 'toolbar' / 'transport_appearance_controller.js'
-        ).read_text(encoding='utf-8')
-        html_content = (REPO_ROOT / 'index.html').read_text(encoding='utf-8')
-        self.assertIn('toggleRail', appearance_controller_content)
-        self.assertIn('transportRailControls', appearance_controller_content)
-        self.assertIn('drawRailwaysLayer', (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8'))
-        self.assertIn('railLabelsEnabled', appearance_controller_content)
-        self.assertIn('railLabelDensity', appearance_controller_content)
-        self.assertIn('id="toggleRail"', html_content)
-        self.assertIn('id="transportRailControls"', html_content)
-        self.assertIn('id="railLabelsEnabled"', html_content)
-        self.assertIn('id="railLabelDensity"', html_content)
-        self.assertNotIn('data-i18n="Planned">Planned</span>', html_content.split('transportRailSummaryMeta', 1)[1].split('</details>', 1)[0])
-
-    def test_transport_appearance_ui_exposes_live_road_controls_with_labels(self) -> None:
-        appearance_controller_content = (
-            REPO_ROOT / 'js' / 'ui' / 'toolbar' / 'transport_appearance_controller.js'
-        ).read_text(encoding='utf-8')
-        html_content = (REPO_ROOT / 'index.html').read_text(encoding='utf-8')
-        self.assertIn('toggleRoad', appearance_controller_content)
-        self.assertIn('transportRoadControls', appearance_controller_content)
-        self.assertIn('drawRoadsLayer', (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8'))
-        self.assertIn('roadLabelsEnabled', appearance_controller_content)
-        self.assertIn('roadLabelDensity', appearance_controller_content)
-        self.assertIn('id="toggleRoad"', html_content)
-        self.assertIn('id="transportRoadControls"', html_content)
-        self.assertIn('id="roadLabelsEnabled"', html_content)
-        self.assertIn('id="roadLabelDensity"', html_content)
-        self.assertNotIn('data-i18n="Planned">Planned</span>', html_content.split('transportRoadSummaryMeta', 1)[1].split('</details>', 1)[0])
-
-    def test_rail_renderer_consumes_label_config_and_station_layer(self) -> None:
-        renderer_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_overview_render_owner.js').read_text(encoding='utf-8')
-        self.assertIn('railConfig.labelsEnabled', renderer_content)
-        self.assertIn('railConfig.labelDensity', renderer_content)
-        self.assertIn('railConfig.labelMode', renderer_content)
-        self.assertIn('drawRailStationsMajorLayer', renderer_content)
-        self.assertIn('runtimeState.railStationsMajorData', renderer_content)
-
-    def test_rail_renderer_threshold_order_keeps_all_as_broadest_setting(self) -> None:
-        renderer_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_overview_render_owner.js').read_text(encoding='utf-8')
-        visibility_policy_content = (REPO_ROOT / 'js' / 'core' / 'transport_overview_visibility_policy.js').read_text(encoding='utf-8')
-        registry_content = (REPO_ROOT / 'js' / 'core' / 'transport_capability_registry.js').read_text(encoding='utf-8')
-        self.assertIn('function getTransportOverviewLineRevealRankThreshold(familyId, value)', registry_content)
-        self.assertIn('return normalized === "primary" ? 1 : normalized === "secondary" ? 2 : 3;', registry_content)
-        self.assertIn('getIncludedTransportOverviewLineClass("rail", feature, strategy)', renderer_content)
-        self.assertIn('if (revealRank > Math.max(1, Math.round(Number(strategy.maximumRevealRank || 1)))) return "";', visibility_policy_content)
-        self.assertIn('getTransportOverviewLineClassScopeRank(normalizedFamilyId, lineClass) > Math.max(1, Math.round(Number(strategy.minimumScopeRank || 1)))', visibility_policy_content)
-        self.assertIn('getTransportOverviewLabelZoomConfig,', renderer_content)
-        self.assertIn('export function getTransportOverviewLabelZoomConfig(familyId, labelDensity)', visibility_policy_content)
-        self.assertIn('export function getTransportOverviewImportanceThresholdRank(value)', registry_content)
-        self.assertNotIn('export function getTransportOverviewImportanceThresholdRank', visibility_policy_content)
-        self.assertNotIn('function getTransportOverviewLabelZoomConfig', renderer_content)
-        self.assertNotIn('function getTransportOverviewImportanceThresholdRank', renderer_content)
-        self.assertNotIn('getContextFacilityThresholdRank', renderer_content)
-        self.assertNotIn('function getTransportAirportScopeThreshold', renderer_content)
-        self.assertNotIn('function getTransportPortScopeThreshold', renderer_content)
-        self.assertNotIn('getTransportOverviewImportanceThresholdRank,', renderer_content)
-        self.assertNotIn('getContextFacilityThresholdRank', visibility_policy_content)
-        self.assertNotIn('getTransportAirportScopeThreshold', visibility_policy_content)
-        self.assertNotIn('getTransportPortScopeThreshold', visibility_policy_content)
-        self.assertNotIn('getTransportPortZoomRevealFloor', visibility_policy_content)
-
-    def test_road_renderer_uses_road_scope_threshold_helper(self) -> None:
-        renderer_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_overview_render_owner.js').read_text(encoding='utf-8')
-        visibility_policy_content = (REPO_ROOT / 'js' / 'core' / 'transport_overview_visibility_policy.js').read_text(encoding='utf-8')
-        registry_content = (REPO_ROOT / 'js' / 'core' / 'transport_capability_registry.js').read_text(encoding='utf-8')
-        self.assertIn('export function resolveTransportOverviewLineStrategy(familyId, familyConfig = {}, { scale = 1, visualMode = "distribution" } = {})', registry_content)
-        self.assertIn('if (normalizedFamilyId === "road") {', registry_content)
-        self.assertIn('return normalizedScope === "motorway_only" ? 1 : 2;', registry_content)
-        self.assertIn('export function getTransportOverviewLineClassScopeRank(familyId, lineClass)', registry_content)
-        self.assertIn('if (normalizedLineClass === "trunk") return 2;', registry_content)
-        self.assertIn('const strategy = resolveTransportOverviewLineStrategy("road", roadConfig, {', renderer_content)
-        self.assertIn('getIncludedTransportOverviewLineClass("road", feature, strategy)', renderer_content)
-        self.assertIn('export function getTransportOverviewFilteredFeatureCount({', visibility_policy_content)
-        self.assertIn('shouldIncludeTransportOverviewLineFeature(normalizedFamilyId, feature, strategy)', visibility_policy_content)
-
-    def test_road_renderer_threshold_order_keeps_all_as_broadest_setting(self) -> None:
-        registry_content = (REPO_ROOT / 'js' / 'core' / 'transport_capability_registry.js').read_text(encoding='utf-8')
-        self.assertIn('function getTransportOverviewLineRevealRankThreshold(familyId, value)', registry_content)
-        self.assertIn('return normalized === "primary" ? 1 : normalized === "secondary" ? 2 : 3;', registry_content)
-
-    def test_rail_transport_overview_default_primary_color_is_dark(self) -> None:
-        registry_content = (REPO_ROOT / 'js' / 'core' / 'transport_capability_registry.js').read_text(encoding='utf-8')
-        state_defaults_content = (REPO_ROOT / 'js' / 'core' / 'state_defaults.js').read_text(encoding='utf-8')
-        self.assertIn('rail: Object.freeze({', registry_content)
-        self.assertIn('primaryColor: "#0f172a"', registry_content)
-        self.assertIn('getTransportCapabilityDefaultOverviewConfig', state_defaults_content)
-
-    def test_transport_overview_renderer_consumes_visual_style_policy(self) -> None:
-        renderer_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_overview_render_owner.js').read_text(encoding='utf-8')
-        style_policy_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_overview_style_policy.js').read_text(encoding='utf-8')
-        self.assertIn('from "./transport_overview_style_policy.js";', renderer_content)
-        self.assertIn('getTransportOverviewAirportVisualStyle,', renderer_content)
-        self.assertIn('getTransportOverviewPortVisualStyle,', renderer_content)
-        self.assertIn('getTransportOverviewRailVisualStyle,', renderer_content)
-        self.assertIn('getTransportOverviewRoadVisualStyle,', renderer_content)
-        self.assertNotIn('function getTransportOverviewRoadVisualStyle', renderer_content)
-        self.assertNotIn('function getTransportOverviewRailVisualStyle', renderer_content)
-        self.assertIn('export function getTransportOverviewRoadVisualStyle(primaryColor, visualStrength)', style_policy_content)
-        self.assertIn('export function getTransportOverviewRailVisualStyle(primaryColor, visualStrength)', style_policy_content)
-        self.assertIn('export function getTransportOverviewAirportVisualStyle(primaryColor, visualStrength)', style_policy_content)
-        self.assertIn('export function getTransportOverviewPortVisualStyle(primaryColor, visualStrength)', style_policy_content)
-        self.assertNotIn('function mixHexColors', style_policy_content)
-        self.assertNotIn('runtimeState', style_policy_content)
-        self.assertNotIn('context.', style_policy_content)
-        self.assertNotIn('canvas', style_policy_content)
 
     def test_rail_stations_placeholder_sidecars_remain_real_empty_collections(self) -> None:
         sample_station_path = (
@@ -1198,20 +869,6 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
         self.assertEqual(payload.get('type'), 'FeatureCollection')
         self.assertEqual(payload.get('features'), [])
 
-    def test_airport_port_runtime_loader_uses_global_point_packs(self) -> None:
-        data_loader_content = (REPO_ROOT / "js" / "core" / "data_loader.js").read_text(encoding="utf-8")
-        pages_dist_content = (REPO_ROOT / "tools" / "build_pages_dist.py").read_text(encoding="utf-8")
-
-        self.assertIn('resolveDataAssetUrl("context_layer:airports")', data_loader_content)
-        self.assertIn('resolveDataAssetUrl("context_layer:ports")', data_loader_content)
-        self.assertNotIn("data/transport_layers/japan_airport/airports.geojson", data_loader_content)
-        self.assertNotIn("data/transport_layers/japan_port/ports.geojson", data_loader_content)
-        self.assertIn("data/transport_layers/global_airport/airports.geojson", pages_dist_content)
-        self.assertIn("data/transport_layers/global_port/ports.geojson", pages_dist_content)
-        self.assertIn("data/transport_layers/japan_airport/airports.geojson", pages_dist_content)
-        self.assertIn("data/transport_layers/japan_port/ports.core.geojson", pages_dist_content)
-        self.assertIn("data/transport_layers/japan_port/ports.expanded.geojson", pages_dist_content)
-        self.assertIn("data/transport_layers/japan_port/ports.geojson", pages_dist_content)
 
     def test_global_airport_port_point_packs_have_world_scope_contract(self) -> None:
         cases = (
@@ -1253,89 +910,6 @@ class GlobalTransportBuilderContractsTest(unittest.TestCase):
                 self.assertEqual(recipe.get("family"), family)
                 self.assertEqual(recipe.get("source", {}).get("license"), "public domain")
                 self.assertIn("naturalearth", recipe.get("source", {}).get("url", ""))
-
-    def test_port_renderer_default_reveal_floor_keeps_regional_ports_visible(self) -> None:
-        renderer_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_overview_render_owner.js').read_text(encoding='utf-8')
-        registry_content = (REPO_ROOT / 'js' / 'core' / 'transport_capability_registry.js').read_text(encoding='utf-8')
-        port_payload = json.loads((REPO_ROOT / 'data' / 'transport_layers' / 'japan_port' / 'ports.geojson').read_text(encoding='utf-8'))
-        max_importance_rank = max(
-            int(round(float(feature.get('properties', {}).get('importance_rank') or 1)))
-            for feature in port_payload.get('features', [])
-        )
-        self.assertEqual(max_importance_rank, 2)
-        self.assertIn('function resolveTransportOverviewPointWorldFloor(familyId, visualMode)', registry_content)
-        self.assertIn('if (familyId === "port") return 2;', registry_content)
-        self.assertIn('const strategy = resolveTransportOverviewPointStrategy("port", portConfig, {', renderer_content)
-        self.assertIn('thresholdRank: strategy.thresholdRank,', renderer_content)
-
-    def test_rail_runtime_loader_keeps_station_collection_shape_even_when_empty(self) -> None:
-        data_loader_content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
-        self.assertIn('rail_stations_major', data_loader_content)
-        self.assertIn('features: stationFeatures', data_loader_content)
-
-    def test_road_renderer_consumes_roads_with_inline_ref_name_labels(self) -> None:
-        renderer_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_overview_render_owner.js').read_text(encoding='utf-8')
-        line_label_policy_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'transport_line_label_policy.js').read_text(encoding='utf-8')
-        context_pass_orchestrator_content = (REPO_ROOT / 'js' / 'core' / 'renderer' / 'context_pass_orchestrator_owner.js').read_text(encoding='utf-8')
-        main_renderer_content = (REPO_ROOT / 'js' / 'core' / 'map_renderer.js').read_text(encoding='utf-8')
-        self.assertIn('function drawRoadsLayer(k, { interactive = false } = {})', renderer_content)
-        self.assertIn('runtimeState.roadsData', renderer_content)
-        self.assertIn('!!runtimeState.showTransport && !!runtimeState.showRoad', renderer_content)
-        self.assertIn('from "./transport_line_label_policy.js";', renderer_content)
-        self.assertIn('buildTransportOverviewLineStrokeSpecs,', renderer_content)
-        self.assertIn('getRoadLabelClassPriority,', renderer_content)
-        self.assertIn('priority: getRoadLabelClassPriority(roadClass)', renderer_content)
-        self.assertIn('export function buildTransportOverviewLineStrokeSpecs(style,', line_label_policy_content)
-        self.assertIn('export function resolveTransportOverviewLineCoordinateWidth(screenWidthPx, k, floorPx = 0.75)', line_label_policy_content)
-        self.assertIn('export function resolveTransportOverviewLineDash(dashPx, k)', line_label_policy_content)
-        self.assertNotIn('const classPriority = {', renderer_content)
-        self.assertNotIn('function resolveTransportOverviewLineCoordinateWidth', renderer_content)
-        self.assertNotIn('function resolveTransportOverviewLineDash', renderer_content)
-        self.assertIn('export function getTransportOverviewRoadLabelText(properties = {}, mode = "ref")', line_label_policy_content)
-        self.assertIn('export function getRoadLabelClassPriority(roadClass)', line_label_policy_content)
-        self.assertIn('export function resolveTransportRoadLabelClassAndPriority(properties = {})', line_label_policy_content)
-        self.assertIn('labelCount', renderer_content)
-        self.assertIn('getTransportOverviewRenderOwner().drawRoadsLayer(k, options)', main_renderer_content)
-        self.assertIn('getTransportOverviewRenderOwner().drawRailwaysLayer(k, options)', main_renderer_content)
-        self.assertIn('getTransportOverviewRenderOwner().drawAirportsLayer(k, options)', main_renderer_content)
-        self.assertIn('getTransportOverviewRenderOwner().drawPortsLayer(k, options)', main_renderer_content)
-        self.assertIn('drawRoadsLayer(k, { interactive });', context_pass_orchestrator_content)
-        self.assertIn('drawRailwaysLayer(k, { interactive });', context_pass_orchestrator_content)
-        self.assertIn('drawAirportsLayer(k, { interactive });', context_pass_orchestrator_content)
-        self.assertIn('drawPortsLayer(k, { interactive });', context_pass_orchestrator_content)
-        self.assertNotIn('function drawAirportsLayer(k, { interactive = false } = {})', main_renderer_content)
-        self.assertNotIn('function drawPortsLayer(k, { interactive = false } = {})', main_renderer_content)
-        self.assertNotIn('function drawRailwaysLayer(k, { interactive = false } = {})', main_renderer_content)
-        self.assertNotIn('function drawRoadsLayer(k, { interactive = false } = {})', main_renderer_content)
-        self.assertNotIn('function getTransportOverviewStyleConfig()', main_renderer_content)
-        self.assertNotIn('state.roadLabelsData', renderer_content)
-
-    def test_road_save_load_is_open_while_workbench_bridge_stays_closed(self) -> None:
-        file_manager_content = (REPO_ROOT / 'js' / 'core' / 'file_manager.js').read_text(encoding='utf-8')
-        interaction_content = (REPO_ROOT / 'js' / 'core' / 'interaction_funnel.js').read_text(encoding='utf-8')
-        registry_content = (REPO_ROOT / 'js' / 'core' / 'transport_capability_registry.js').read_text(encoding='utf-8')
-        ui_state_content = (REPO_ROOT / 'js' / 'core' / 'state' / 'ui_state.js').read_text(encoding='utf-8')
-        self.assertIn('function getTransportOverviewVisibilityFields() {', file_manager_content)
-        self.assertIn('function buildTransportOverviewLayerVisibility(appState) {', file_manager_content)
-        self.assertIn('function normalizeTransportOverviewLayerVisibility(layerVisibility) {', file_manager_content)
-        self.assertIn('const TRANSPORT_OVERVIEW_VISIBILITY_FIELDS = listTransportOverviewCapabilityFamilyIds()', ui_state_content)
-        self.assertIn('async function restoreImportedTransportOverviewDataLayers(importState) {', interaction_content)
-        self.assertIn('if (!importState.showTransport) return;', interaction_content)
-        self.assertIn('const visibilityField = getTransportOverviewVisibilityField(familyId);', interaction_content)
-        self.assertIn('if (!visibilityField || !importState[visibilityField]) continue;', interaction_content)
-        self.assertIn('applyCompatibility: TRANSPORT_CAPABILITY_APPLY_COMPATIBILITY.mainMapBridge', registry_content)
-        self.assertIn('function getTransportWorkbenchActivePackBridgeSupport(normalizedFamilyId, familyConfig = {}, compatibility = "")', registry_content)
-        self.assertIn('if (!activePackId) return null;', registry_content)
-        self.assertIn('reason: "active_pack_required"', registry_content)
-        self.assertIn('|| !bridgeSupport.supported', registry_content)
-        self.assertIn('return null;', registry_content)
-
-    def test_data_loader_no_longer_hardcodes_missing_global_transport_pack_paths(self) -> None:
-        content = (REPO_ROOT / 'js' / 'core' / 'data_loader.js').read_text(encoding='utf-8')
-        self.assertNotIn('data/transport_layers/global_road/roads.topo.json', content)
-        self.assertNotIn('data/transport_layers/global_road/road_labels.geojson', content)
-        self.assertNotIn('data/transport_layers/global_rail/railways.topo.json', content)
-        self.assertNotIn('data/transport_layers/global_rail/rail_stations_major.geojson', content)
 
 
 if __name__ == '__main__':

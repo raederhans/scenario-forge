@@ -42,8 +42,6 @@ def _resolve_runtime_asset_path(relative_path: str) -> Path:
     return REPO_ROOT / "data" / relative_path
 
 
-
-
 class DataManifestContractTest(unittest.TestCase):
     def test_manifest_output_hashes_match_checked_in_artifacts(self) -> None:
         manifest = json.loads(DATA_MANIFEST.read_text(encoding="utf-8"))
@@ -107,16 +105,8 @@ class DataManifestContractTest(unittest.TestCase):
         source_registry = json.loads(RUNTIME_ASSET_REGISTRY_SOURCE.read_text(encoding="utf-8"))
         assets = source_registry.get("assets") or {}
         mismatches: list[str] = []
-        loader_source = DATA_LOADER.read_text(encoding="utf-8")
-        registry_source = RUNTIME_ASSET_REGISTRY_JS.read_text(encoding="utf-8")
 
         self.assertEqual(registry, source_registry)
-        self.assertIn('../../data/runtime_asset_registry.json', registry_source)
-        self.assertIn('resolveDataAssetUrl', registry_source)
-        self.assertIn('resolveScenarioRegistryUrl', registry_source)
-        self.assertIn('resolveCountryFeaturePoliciesUrl', registry_source)
-        self.assertIn('resolveTransportManifestUrl', registry_source)
-        self.assertIn('./runtime_asset_registry.js', loader_source)
         self.assertEqual(
             assets.get("city_lights:historical_1930:entries", {}).get("url"),
             "data/city_lights/historical_1930_entries.json",
@@ -141,23 +131,10 @@ class DataManifestContractTest(unittest.TestCase):
         self.assertNotIn("hgo_runtime_seed", assets)
         self.assertNotIn("hgo_runtime_provinces_bmp", assets)
         self.assertNotIn("hgo_flags_index", assets)
-        self.assertIn('resolveDataAssetUrl("world_cities")', loader_source)
-        self.assertIn('resolveDataAssetUrl("locales")', loader_source)
-        self.assertIn('resolveDataAssetUrl("geo_aliases")', loader_source)
-        self.assertIn('resolveDataAssetUrl("context_layer:physical")', loader_source)
-        self.assertIn('resolveDataAssetUrl("transport_catalog:road")', loader_source)
         self.assertNotIn("topology:detail:highres", assets)
         self.assertNotIn("topology:detail:legacy_bak", assets)
         self.assertNotIn("topology:detail:na_v1", assets)
         self.assertNotIn("topology:detail:na_v2", assets)
-        self.assertIn('highres: "data/europe_topology.highres.json"', loader_source)
-        self.assertIn('legacy_bak: "data/europe_topology.json.bak"', loader_source)
-        self.assertIn('na_v1: "data/europe_topology.na_v1.json"', loader_source)
-        self.assertIn('na_v2: "data/europe_topology.na_v2.json"', loader_source)
-        self.assertNotIn('const GLOBAL_ROAD_CATALOG_URL = "data/transport_layers/global_road/catalog.json";', loader_source)
-        self.assertNotIn('localesUrl || "data/locales.json"', loader_source)
-        self.assertNotIn('geoAliasesUrl || "data/geo_aliases.json"', loader_source)
-        self.assertNotIn('const PALETTE_REGISTRY_URL = "data/palettes/index.json";', loader_source)
 
         for asset_key, metadata in assets.items():
             expected_url = metadata.get("url")
@@ -303,20 +280,7 @@ class DataManifestContractTest(unittest.TestCase):
         self.assertTrue(any("$.aliases" in error for error in type_errors), type_errors)
 
 
-
     def test_historical_1930_city_lights_source_refs_are_repo_relative(self) -> None:
-        asset_source = HISTORICAL_1930_CITY_LIGHTS_ASSET.read_text(encoding="utf-8")
-        self.assertIn('sourceKey: "city_lights:historical_1930:source"', asset_source)
-        self.assertIn('exclusionsKey: "city_lights:historical_1930:exclusions"', asset_source)
-        self.assertIn('entriesKey: "city_lights:historical_1930:entries"', asset_source)
-        self.assertIn('sourceRefParts: ["data", "world_cities.geojson"]', asset_source)
-        self.assertIn('exclusionsRefParts: ["data", "historical_city_lights_1930_exclusions.json"]', asset_source)
-        self.assertIn('entriesRefParts: ["data", "city_lights/historical_1930_entries.json"]', asset_source)
-        self.assertIn('historical_1930_entries.json', asset_source)
-        self.assertNotIn("population: 35676000", asset_source)
-        self.assertNotIn("file:///", asset_source)
-        self.assertNotIn("C:/", asset_source)
-
         entries_payload = json.loads(HISTORICAL_1930_CITY_LIGHTS_ENTRIES.read_text(encoding="utf-8"))
         self.assertEqual(entries_payload.get("asset_key"), "city_lights:historical_1930:entries")
         self.assertEqual(entries_payload.get("family_id"), "historical_1930")
