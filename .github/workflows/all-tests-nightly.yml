@@ -46,7 +46,10 @@ jobs:
         # (the runner was shut down around 60% every night); two workers fit.
         env:
           PYTEST_XDIST_AUTO_NUM_WORKERS: "2"
-        run: node tools/run_all_tests.mjs ${{ matrix.suite }}
+          PYTEST_ADDOPTS: "-v"
+        run: |
+          (while true; do echo "[mon] $(free -m | awk '/Mem/{print "mem used="$3" avail="$7}') $(df -m / | awk 'NR==2{print "disk avail="$4}')"; sleep 15; done) &
+          node tools/run_all_tests.mjs ${{ matrix.suite }}
 
   sample-guide-e2e:
     # PRs run only the @golden-demo slice of this spec (verify-shared.yml, pr-smoke).
