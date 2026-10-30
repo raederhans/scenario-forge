@@ -28,7 +28,7 @@ class TnoDistrictGroupsContractTest(unittest.TestCase):
         self.assertEqual(self.payload["scenario_id"], "tno_1962")
         self.assertEqual(set(self.payload["tags"]), set(self.spec["tags"]))
         for tag in (
-            "GER", "FRA", "ENG", "ITA", "IBR", "RKM", "RKU", "RKO", "RKP", "RKN",
+            "GER", "FRA", "ENG", "ITA", "IBR", "RKP", "RKN",
             "USA", "CHI", "CAN", "MEX", "NCP", "AZH", "TUR", "JAP", "MAN", "RAJ", "KOR",
         ):
             self.assertIn(tag, self.payload["tags"])
@@ -60,7 +60,7 @@ class TnoDistrictGroupsContractTest(unittest.TestCase):
             owned = {feature_id for feature_id, owner in self.owners.items() if owner == tag}
             with self.subTest(tag=tag):
                 self.assertEqual(sorted(owned - assigned), [])
-                self.assertGreaterEqual(len(record["districts"]), 1 if tag in {"RKO", "RKU", "RKP"} else 2)
+                self.assertGreaterEqual(len(record["districts"]), 1 if tag in {"RKO", "RKU", "RKP", "RKK", "RKM"} else 2)
 
     def test_district_records_are_named(self) -> None:
         for tag, record in self.payload["tags"].items():

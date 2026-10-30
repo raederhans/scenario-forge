@@ -1,10 +1,10 @@
 {
   "audit": {
-    "capital_hint_count": 221,
+    "capital_hint_count": 263,
     "capital_territory_conflicts": [],
     "featured_runtime_missing_count": 0,
     "featured_runtime_missing_tags": [],
-    "manual_capital_count": 122,
+    "manual_capital_count": 161,
     "name_conflict_count": 242,
     "name_conflicts": [
       {
@@ -3510,11 +3510,6 @@
     "unresolved_manual_capitals": []
   },
   "capital_city_hints": {
-    "AFA": {
-      "tag": "AFA",
-      "city_id": "",
-      "resolution_method": "no_capital"
-    },
     "AFG": {
       "base_iso2": "AF",
       "base_tier": "major",
@@ -3537,6 +3532,29 @@
       "stable_key": "id::CITY::ne::1159151561",
       "tag": "AFG",
       "urban_match_id": ""
+    },
+    "ALB": {
+      "country_code": "AL",
+      "host_feature_id": "AL022",
+      "urban_match_id": "UA_63BEE91FA6F6",
+      "lon": 19.81866,
+      "lat": 41.32744,
+      "population": 895350,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "ALB",
+      "city_id": "CITY::ne::1159151117",
+      "stable_key": "id::CITY::ne::1159151117",
+      "city_name": "Tirana",
+      "name_ascii": "Tirana",
+      "display_name": "Italian Protectorate of Albania",
+      "lookup_iso2": "AL",
+      "base_iso2": "AL",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "ALC": {
       "base_iso2": "DZ",
@@ -3654,27 +3672,9 @@
       "candidate_count": 1
     },
     "AOI": {
-      "base_iso2": "ET",
-      "base_tier": "major",
-      "candidate_count": 168,
-      "capital_kind": "country_capital",
-      "capital_state_id": 271,
-      "city_id": "CITY::ne::1159151549",
-      "city_name": "Addis Ababa",
-      "confidence": "high",
-      "country_code": "ET",
-      "display_name": "Italian East Africa",
-      "host_feature_id": "ET_ADM1_ETH-3133",
-      "lat": 9.02497,
-      "lon": 38.74689,
-      "lookup_iso2": "ET",
-      "name_ascii": "Addis Ababa",
-      "population": 3860000,
-      "resolution_method": "capital_state_fallback",
-      "source": "merged",
-      "stable_key": "id::CITY::ne::1159151549",
       "tag": "AOI",
-      "urban_match_id": ""
+      "city_id": "",
+      "resolution_method": "no_capital"
     },
     "AQ": {
       "tag": "AQ",
@@ -4048,6 +4048,29 @@
       "confidence": "high",
       "candidate_count": 1
     },
+    "BTS": {
+      "country_code": "BW",
+      "host_feature_id": "BW_ADM1_BWA-5501",
+      "urban_match_id": "",
+      "lon": 25.90859,
+      "lat": -24.65451,
+      "population": 246325,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "BTS",
+      "city_id": "CITY::ne::1159151153",
+      "stable_key": "id::CITY::ne::1159151153",
+      "city_name": "Gaborone",
+      "name_ascii": "Gaborone",
+      "display_name": "South African Protectorate of Bechuanaland",
+      "lookup_iso2": "BW",
+      "base_iso2": "BW",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
     "BUL": {
       "base_iso2": "BG",
       "base_tier": "major",
@@ -4236,6 +4259,121 @@
       "stable_key": "id::CITY::ne::1159150719",
       "tag": "CEY",
       "urban_match_id": ""
+    },
+    "CGBC": {
+      "country_code": "CG",
+      "host_feature_id": "CG_ADM1_COG-4855",
+      "urban_match_id": "",
+      "lon": 15.28318,
+      "lat": -4.26613,
+      "population": 1982000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "CGBC",
+      "city_id": "CITY::ne::1159150993",
+      "stable_key": "id::CITY::ne::1159150993",
+      "city_name": "Brazzastadt",
+      "name_ascii": "Brazzaville",
+      "display_name": "German Congo — Brazzaville Administration",
+      "lookup_iso2": "GCO",
+      "base_iso2": "GCO",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "CGGA": {
+      "country_code": "GA",
+      "host_feature_id": "GA_ADM1_GAB-2168",
+      "urban_match_id": "",
+      "lon": 9.45356,
+      "lat": 0.39241,
+      "population": 846090,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "CGGA",
+      "city_id": "CITY::ne::1159150913",
+      "stable_key": "id::CITY::ne::1159150913",
+      "city_name": "Freistadt",
+      "name_ascii": "Libreville",
+      "display_name": "German Congo — Gabon Administration",
+      "lookup_iso2": "GA",
+      "base_iso2": "GA",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "CGKT": {
+      "country_code": "CD",
+      "host_feature_id": "CD_ADM1_COD-1897",
+      "urban_match_id": "",
+      "lon": 27.47938,
+      "lat": -11.66089,
+      "population": 2221925,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "CGKT",
+      "city_id": "CITY::ne::1159150903",
+      "stable_key": "id::CITY::ne::1159150903",
+      "city_name": "Elisabethstadt",
+      "name_ascii": "Lubumbashi",
+      "display_name": "German Congo — Katanga Administration",
+      "lookup_iso2": "CD",
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "CGKV": {
+      "country_code": "CD",
+      "host_feature_id": "CD_ADM1_COD-1894",
+      "urban_match_id": "",
+      "lon": 28.84281,
+      "lat": -2.49077,
+      "population": 816811,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "CGKV",
+      "city_id": "CITY::ne::1159148481",
+      "stable_key": "id::CITY::ne::1159148481",
+      "city_name": "Costermansstadt",
+      "name_ascii": "Bukavu",
+      "display_name": "German Congo — Kivu Administration",
+      "lookup_iso2": "CD",
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "CGUB": {
+      "country_code": "CF",
+      "host_feature_id": "CF_ADM1_CAF-1460",
+      "urban_match_id": "",
+      "lon": 18.55496,
+      "lat": 4.36122,
+      "population": 831925,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "CGUB",
+      "city_id": "CITY::ne::1159151111",
+      "stable_key": "id::CITY::ne::1159151111",
+      "city_name": "Bangui",
+      "name_ascii": "Bangui",
+      "display_name": "German Congo — Ubangi Administration",
+      "lookup_iso2": "CF",
+      "base_iso2": "CF",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "CHD": {
       "country_code": "TD",
@@ -4766,50 +4904,175 @@
       "candidate_count": 1
     },
     "GCO": {
-      "base_iso2": "CD",
-      "base_tier": "major",
-      "candidate_count": 50,
-      "capital_kind": "country_capital",
-      "capital_state_id": null,
-      "city_id": "CITY::ne::1159151539",
-      "city_name": "Kinshasa",
-      "confidence": "high",
-      "country_code": "CD",
-      "display_name": "German Congo",
-      "host_feature_id": "CD_ADM1_COD-1884",
-      "lat": -4.32758,
-      "lon": 15.31357,
-      "lookup_iso2": "CD",
-      "name_ascii": "Kinshasa",
-      "population": 16000000,
-      "resolution_method": "controlled_city_fallback",
-      "source": "merged",
-      "stable_key": "id::CITY::ne::1159151539",
       "tag": "GCO",
-      "urban_match_id": ""
+      "city_id": "",
+      "resolution_method": "no_capital"
     },
     "GEA": {
-      "base_iso2": "TZ",
-      "base_tier": "major",
-      "candidate_count": 297,
-      "capital_kind": "country_capital",
-      "capital_state_id": null,
-      "city_id": "CITY::ne::1159151305",
-      "city_name": "Dar es Salaam",
-      "confidence": "high",
-      "country_code": "TZ",
-      "display_name": "German East Africa",
-      "host_feature_id": "TZ_ADM1_TZA-3378",
-      "lat": -6.82349,
-      "lon": 39.26951,
-      "lookup_iso2": "TZ",
-      "name_ascii": "Dar es Salaam",
-      "population": 5383728,
-      "resolution_method": "controlled_city_fallback",
-      "source": "merged",
-      "stable_key": "id::CITY::ne::1159151305",
       "tag": "GEA",
-      "urban_match_id": ""
+      "city_id": "",
+      "resolution_method": "no_capital"
+    },
+    "GEAB": {
+      "country_code": "BI",
+      "host_feature_id": "BI_ADM1_BDI-3364",
+      "urban_match_id": "",
+      "lon": 29.36142,
+      "lat": -3.38193,
+      "population": 769317,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "GEAB",
+      "city_id": "CITY::ne::1159150427",
+      "stable_key": "id::CITY::ne::1159150427",
+      "city_name": "Usumbura",
+      "name_ascii": "Bujumbura",
+      "display_name": "German East Africa — Urundi Administration",
+      "lookup_iso2": "BI",
+      "base_iso2": "BI",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "GEAN": {
+      "country_code": "MW",
+      "host_feature_id": "MW_ADM1_82672581B71595037145626",
+      "urban_match_id": "",
+      "lon": 35.3188,
+      "lat": -15.38596,
+      "population": 118440,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "GEAN",
+      "city_id": "CITY::ne::1159148499",
+      "stable_key": "id::CITY::ne::1159148499",
+      "city_name": "Zomba",
+      "name_ascii": "Zomba",
+      "display_name": "German East Africa — Nyasaland Administration",
+      "lookup_iso2": "MW",
+      "base_iso2": "MW",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "GEAR": {
+      "country_code": "RW",
+      "host_feature_id": "RW_ADM1_RWA-3495",
+      "urban_match_id": "",
+      "lon": 30.05885,
+      "lat": -1.94995,
+      "population": 1132686,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "GEAR",
+      "city_id": "CITY::ne::1159149385",
+      "stable_key": "id::CITY::ne::1159149385",
+      "city_name": "Barthstadt",
+      "name_ascii": "Kigali",
+      "display_name": "German East Africa — Ruanda Administration",
+      "lookup_iso2": "RW",
+      "base_iso2": "RW",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "GEAS": {
+      "country_code": "ZW",
+      "host_feature_id": "ZW_ADM1_ZWE-525",
+      "urban_match_id": "",
+      "lon": 31.05337,
+      "lat": -17.82772,
+      "population": 1572000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "GEAS",
+      "city_id": "CITY::ne::1159150573",
+      "stable_key": "id::CITY::ne::1159150573",
+      "city_name": "Salisbury",
+      "name_ascii": "Harare",
+      "display_name": "German East Africa — Southern Rhodesia Administration",
+      "lookup_iso2": "ZW",
+      "base_iso2": "ZW",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "GEAT": {
+      "country_code": "TZ",
+      "host_feature_id": "TZ_ADM1_TZA-3378",
+      "urban_match_id": "",
+      "lon": 39.26951,
+      "lat": -6.82349,
+      "population": 5383728,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "GEAT",
+      "city_id": "CITY::ne::1159151305",
+      "stable_key": "id::CITY::ne::1159151305",
+      "city_name": "Daressalam",
+      "name_ascii": "Dar es Salaam",
+      "display_name": "German East Africa — Tanganyika Administration",
+      "lookup_iso2": "TZ",
+      "base_iso2": "TZ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "GEAU": {
+      "country_code": "UG",
+      "host_feature_id": "UG_ADM1_17295835B48340970483027",
+      "urban_match_id": "",
+      "lon": 32.58219,
+      "lat": 0.31628,
+      "population": 1680600,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "GEAU",
+      "city_id": "CITY::ne::1159150593",
+      "stable_key": "id::CITY::ne::1159150593",
+      "city_name": "Kampala",
+      "name_ascii": "Kampala",
+      "display_name": "German East Africa — Uganda Administration",
+      "lookup_iso2": "UG",
+      "base_iso2": "UG",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "GEAZ": {
+      "country_code": "ZM",
+      "host_feature_id": "ZM_ADM1_ZMB-520",
+      "urban_match_id": "",
+      "lon": 28.28713,
+      "lat": -15.40669,
+      "population": 2212301,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "GEAZ",
+      "city_id": "CITY::ne::1159150571",
+      "stable_key": "id::CITY::ne::1159150571",
+      "city_name": "Lusaka",
+      "name_ascii": "Lusaka",
+      "display_name": "German East Africa — Northern Rhodesia Administration",
+      "lookup_iso2": "ZM",
+      "base_iso2": "ZM",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "GER": {
       "country_code": "DE",
@@ -5253,6 +5516,149 @@
       "tag": "ICE",
       "urban_match_id": "UA_72839E7F0931"
     },
+    "ICVE": {
+      "country_code": "CV",
+      "host_feature_id": "CV_ADM1_CPV-5053",
+      "urban_match_id": "",
+      "lon": -23.51254,
+      "lat": 14.93152,
+      "population": 137868,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "ICVE",
+      "city_id": "CITY::ne::1159151205",
+      "stable_key": "id::CITY::ne::1159151205",
+      "city_name": "Praia",
+      "name_ascii": "Praia",
+      "display_name": "Iberian Overseas Province of Cape Verde",
+      "lookup_iso2": "CV",
+      "base_iso2": "CV",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "IDAL": {
+      "country_code": "HR",
+      "host_feature_id": "HR033",
+      "urban_match_id": "UA_FE878B1F4C33",
+      "lon": 15.246458174352346,
+      "lat": 44.12868883342048,
+      "population": 71258,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "IDAL",
+      "city_id": "CITY::ne::1159140367",
+      "stable_key": "id::CITY::ne::1159140367",
+      "city_name": "Zara",
+      "name_ascii": "Zadar",
+      "display_name": "Italian Governorate of Dalmatia",
+      "lookup_iso2": "ATL",
+      "base_iso2": "ATL",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1,
+      "source_coordinates": [
+        15.22514,
+        44.11578
+      ],
+      "coordinate_adjustment": "simplified_coastline"
+    },
+    "IDJI": {
+      "country_code": "DJ",
+      "host_feature_id": "DJ_ADM1_DJI-1567",
+      "urban_match_id": "",
+      "lon": 43.14503,
+      "lat": 11.58901,
+      "population": 923000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "IDJI",
+      "city_id": "CITY::ne::1159149869",
+      "stable_key": "id::CITY::ne::1159149869",
+      "city_name": "Gibuti",
+      "name_ascii": "Djibouti",
+      "display_name": "Italian East Africa — Djibouti Governorate",
+      "lookup_iso2": "DJ",
+      "base_iso2": "DJ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "IERI": {
+      "country_code": "ER",
+      "host_feature_id": "ER_ADM1_ERI-1561",
+      "urban_match_id": "",
+      "lon": 38.93184,
+      "lat": 15.33805,
+      "population": 620802,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "IERI",
+      "city_id": "CITY::ne::1159150873",
+      "stable_key": "id::CITY::ne::1159150873",
+      "city_name": "Asmára",
+      "name_ascii": "Asmara",
+      "display_name": "Italian East Africa — Eritrea Governorate",
+      "lookup_iso2": "ER",
+      "base_iso2": "ER",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "IGUI": {
+      "country_code": "GW",
+      "host_feature_id": "GW_ADM1_GNB-769",
+      "urban_match_id": "",
+      "lon": -15.59767,
+      "lat": 11.86357,
+      "population": 439704,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "IGUI",
+      "city_id": "CITY::ne::1159150803",
+      "stable_key": "id::CITY::ne::1159150803",
+      "city_name": "Bissau",
+      "name_ascii": "Bissau",
+      "display_name": "Iberian Overseas Province of Portuguese Guinea",
+      "lookup_iso2": "GW",
+      "base_iso2": "GW",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "IKEN": {
+      "country_code": "KE",
+      "host_feature_id": "KE_ADM1_KEN-1196",
+      "urban_match_id": "",
+      "lon": 36.81667,
+      "lat": -1.28333,
+      "population": 4397073,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "IKEN",
+      "city_id": "CITY::ne::1159151597",
+      "stable_key": "id::CITY::ne::1159151597",
+      "city_name": "Nairobi",
+      "name_ascii": "Nairobi",
+      "display_name": "Italian East Africa — Kenya Governorate",
+      "lookup_iso2": "KE",
+      "base_iso2": "KE",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
     "INS": {
       "base_iso2": "ID",
       "base_tier": "major",
@@ -5345,6 +5751,75 @@
       "tag": "IRQ",
       "urban_match_id": ""
     },
+    "ISOM": {
+      "country_code": "SO",
+      "host_feature_id": "SO_ADM1_83879307B32896531038690",
+      "urban_match_id": "",
+      "lon": 45.34375,
+      "lat": 2.03711,
+      "population": 2587183,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "ISOM",
+      "city_id": "CITY::ne::1159150715",
+      "stable_key": "id::CITY::ne::1159150715",
+      "city_name": "Mogadiscio",
+      "name_ascii": "Mogadishu",
+      "display_name": "Italian East Africa — Somalia Governorate",
+      "lookup_iso2": "SO",
+      "base_iso2": "SO",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "ISTP": {
+      "country_code": "ST",
+      "host_feature_id": "ST_ADM1_STP-4861",
+      "urban_match_id": "",
+      "lon": 6.7299,
+      "lat": 0.33756,
+      "population": 88219,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "ISTP",
+      "city_id": "CITY::ne::1159151195",
+      "stable_key": "id::CITY::ne::1159151195",
+      "city_name": "São Tomé",
+      "name_ascii": "Sao Tome",
+      "display_name": "Iberian Overseas Province of São Tomé and Príncipe",
+      "lookup_iso2": "ST",
+      "base_iso2": "ST",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "ISUE": {
+      "country_code": "EG",
+      "host_feature_id": "EGY-1531",
+      "urban_match_id": "",
+      "lon": 32.27225,
+      "lat": 30.60427,
+      "population": 656135,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "ISUE",
+      "city_id": "CITY::ne::1159140377",
+      "stable_key": "id::CITY::ne::1159140377",
+      "city_name": "Ismailia",
+      "name_ascii": "Ismailia",
+      "display_name": "Italian Suez Canal Zone",
+      "lookup_iso2": "EG",
+      "base_iso2": "EG",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
     "ITA": {
       "base_iso2": "IT",
       "base_tier": "major",
@@ -5367,6 +5842,29 @@
       "stable_key": "id::CITY::ne::1159151593",
       "tag": "ITA",
       "urban_match_id": "UA_EBE4280EE27F"
+    },
+    "ITIM": {
+      "country_code": "TL",
+      "host_feature_id": "TL_ADM1_TLS-541",
+      "urban_match_id": "",
+      "lon": 125.57361,
+      "lat": -8.55861,
+      "population": 234331,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "ITIM",
+      "city_id": "CITY::ne::1159150577",
+      "stable_key": "id::CITY::ne::1159150577",
+      "city_name": "Dili",
+      "name_ascii": "Dili",
+      "display_name": "Iberian Overseas Province of Portuguese Timor",
+      "lookup_iso2": "TL",
+      "base_iso2": "TL",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "JAP": {
       "country_code": "JP",
@@ -5475,6 +5973,121 @@
       "display_name": "Kazakhstan",
       "lookup_iso2": "KZ",
       "base_iso2": "KZ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "KC01": {
+      "country_code": "AZ",
+      "host_feature_id": "AZE-1689",
+      "urban_match_id": "",
+      "lon": 49.89201,
+      "lat": 40.37767,
+      "population": 2122300,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "KC01",
+      "city_id": "CITY::ne::1159151123",
+      "stable_key": "id::CITY::ne::1159151123",
+      "city_name": "Baku",
+      "name_ascii": "Baku",
+      "display_name": "Kaukasien — Generalbezirk Aserbaidschan",
+      "lookup_iso2": "AZ",
+      "base_iso2": "AZ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "KC02": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B89252490479976",
+      "urban_match_id": "UA_C9B6E4B416F6",
+      "lon": 38.98178,
+      "lat": 45.04534,
+      "population": 899541,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "KC02",
+      "city_id": "CITY::ne::1159149549",
+      "stable_key": "id::CITY::ne::1159149549",
+      "city_name": "Jekaterinodar",
+      "name_ascii": "Krasnodar",
+      "display_name": "Kaukasien — Generalbezirk Kuban",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "KC03": {
+      "country_code": "RU",
+      "host_feature_id": "RU_MRG_f01d51060a16",
+      "urban_match_id": "UA_EC3F6EB024DC",
+      "lon": 41.9642,
+      "lat": 45.03442,
+      "population": 433931,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "KC03",
+      "city_id": "CITY::ne::1159149523",
+      "stable_key": "id::CITY::ne::1159149523",
+      "city_name": "Stawropol",
+      "name_ascii": "Stavropol'",
+      "display_name": "Kaukasien — Generalbezirk Stawropol-Terek",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "KC04": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B27316284331880",
+      "urban_match_id": "UA_A135F0B35614",
+      "lon": 44.66986,
+      "lat": 43.04101,
+      "population": 364630,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "KC04",
+      "city_id": "CITY::ne::1159137065",
+      "stable_key": "id::CITY::ne::1159137065",
+      "city_name": "Wladikawkaz",
+      "name_ascii": "Vladikavkaz",
+      "display_name": "Kaukasien — Generalbezirk Bergvölker",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "KC05": {
+      "country_code": "RU",
+      "host_feature_id": "RU_MRG_90d3823663be",
+      "urban_match_id": "UA_86987B693600",
+      "lon": 44.25537,
+      "lat": 46.30794,
+      "population": 106971,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "KC05",
+      "city_id": "CITY::ne::1159148145",
+      "stable_key": "id::CITY::ne::1159148145",
+      "city_name": "Elista",
+      "name_ascii": "Elista",
+      "display_name": "Kaukasien — Generalbezirk Kalmückien",
+      "lookup_iso2": "RKK",
+      "base_iso2": "RKK",
       "capital_state_id": null,
       "capital_kind": "country_capital",
       "resolution_method": "reviewed_capital",
@@ -5715,6 +6328,29 @@
       "stable_key": "id::CITY::ne::1159151311",
       "tag": "LIB",
       "urban_match_id": ""
+    },
+    "LTH": {
+      "country_code": "LS",
+      "host_feature_id": "LS_ADM1_LSO-1203",
+      "urban_match_id": "",
+      "lon": 27.48333,
+      "lat": -29.31667,
+      "population": 361324,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "LTH",
+      "city_id": "CITY::ne::1159150831",
+      "stable_key": "id::CITY::ne::1159150831",
+      "city_name": "Maseru",
+      "name_ascii": "Maseru",
+      "display_name": "South African Protectorate of Basutoland",
+      "lookup_iso2": "LS",
+      "base_iso2": "LS",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "MAD": {
       "base_iso2": "MG",
@@ -6047,6 +6683,190 @@
       "stable_key": "id::CITY::ne::1159150781",
       "tag": "MON",
       "urban_match_id": ""
+    },
+    "MS01": {
+      "country_code": "RU",
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG",
+      "urban_match_id": "UA_4B34ED39733E",
+      "lon": 30.31413,
+      "lat": 59.93863,
+      "population": 5351935,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "MS01",
+      "city_id": "CITY::ne::1159151291",
+      "stable_key": "id::CITY::ne::1159151291",
+      "city_name": "Sankt Petersburg",
+      "name_ascii": "Saint Petersburg",
+      "display_name": "Moskowien — Generalbezirk Ingermanland",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MS02": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B25563950651561",
+      "urban_match_id": "UA_5374BA17F828",
+      "lon": 34.32143,
+      "lat": 53.27096,
+      "population": 427236,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "MS02",
+      "city_id": "CITY::ne::1159149531",
+      "stable_key": "id::CITY::ne::1159149531",
+      "city_name": "Brjansk",
+      "name_ascii": "Bryansk",
+      "display_name": "Moskowien — Generalbezirk Smolensk",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MS03": {
+      "country_code": "RU",
+      "host_feature_id": "RU_MRG_e770cd31cdb4",
+      "urban_match_id": "UA_575B3D2333DF",
+      "lon": 37.61822,
+      "lat": 54.19609,
+      "population": 489486,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "MS03",
+      "city_id": "CITY::ne::1159146521",
+      "stable_key": "id::CITY::ne::1159146521",
+      "city_name": "Tula",
+      "name_ascii": "Tula",
+      "display_name": "Moskowien — Generalbezirk Tula",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MS04": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B21233041988666",
+      "urban_match_id": "UA_DCEC7B00C344",
+      "lon": 39.19204,
+      "lat": 51.66833,
+      "population": 1047549,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "MS04",
+      "city_id": "CITY::ne::1159149557",
+      "stable_key": "id::CITY::ne::1159149557",
+      "city_name": "Woronesch",
+      "name_ascii": "Voronezh",
+      "display_name": "Moskowien — Generalbezirk Woronesch",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MS05": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B57358126207690",
+      "urban_match_id": "UA_7BB498B0991D",
+      "lon": 39.87368,
+      "lat": 57.62987,
+      "population": 608722,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "MS05",
+      "city_id": "CITY::ne::1159149543",
+      "stable_key": "id::CITY::ne::1159149543",
+      "city_name": "Jaroslawl",
+      "name_ascii": "Yaroslavl",
+      "display_name": "Moskowien — Generalbezirk Jaroslawl",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MS06": {
+      "country_code": "RU",
+      "host_feature_id": "RU_MRG_13fef5f74a14",
+      "urban_match_id": "UA_F4276CB6AF8D",
+      "lon": 40.39976,
+      "lat": 56.13854,
+      "population": 357024,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "MS06",
+      "city_id": "CITY::ne::1159148121",
+      "stable_key": "id::CITY::ne::1159148121",
+      "city_name": "Wladimir",
+      "name_ascii": "Vladimir",
+      "display_name": "Moskowien — Generalbezirk Gorki",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MS07": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B39404018386654",
+      "urban_match_id": "",
+      "lon": 45.9901,
+      "lat": 51.54048,
+      "population": 844858,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "MS07",
+      "city_id": "CITY::ne::1159149575",
+      "stable_key": "id::CITY::ne::1159149575",
+      "city_name": "Platenfurt",
+      "name_ascii": "Saratov",
+      "display_name": "Moskowien — Generalbezirk Saratow",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MS08": {
+      "country_code": "RU",
+      "host_feature_id": "RU_CITY_VOLGOGRAD",
+      "urban_match_id": "UA_C97D8370A693",
+      "lon": 44.4976,
+      "lat": 48.71378,
+      "population": 1013533,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "MS08",
+      "city_id": "CITY::ne::1159150697",
+      "stable_key": "id::CITY::ne::1159150697",
+      "city_name": "Paulusburg",
+      "name_ascii": "Volgograd",
+      "display_name": "Moskowien — Generalbezirk Don-Wolga",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "NCP": {
       "base_iso2": "CN",
@@ -6590,98 +7410,6 @@
       "stable_key": "id::CITY::ne::1159150795",
       "tag": "PFC"
     },
-    "PG01": {
-      "country_code": "PL",
-      "host_feature_id": "PL_POW_1465",
-      "urban_match_id": "UA_2BE5967FAC8E",
-      "lon": 21.01178,
-      "lat": 52.22977,
-      "population": 1707000,
-      "base_tier": "major",
-      "source": "merged",
-      "tag": "PG01",
-      "city_id": "CITY::ne::1159151299",
-      "stable_key": "id::CITY::ne::1159151299",
-      "city_name": "Warschau",
-      "name_ascii": "Warsaw",
-      "display_name": "Generalgouvernement — Distrikt Warschau",
-      "lookup_iso2": "PL",
-      "base_iso2": "PL",
-      "capital_state_id": null,
-      "capital_kind": "country_capital",
-      "resolution_method": "reviewed_capital",
-      "confidence": "high",
-      "candidate_count": 1
-    },
-    "PG02": {
-      "country_code": "PL",
-      "host_feature_id": "PL_POW_1463",
-      "urban_match_id": "UA_F36B49D6D184",
-      "lon": 21.14714,
-      "lat": 51.40253,
-      "population": 226794,
-      "base_tier": "regional",
-      "source": "geonames",
-      "tag": "PG02",
-      "city_id": "CITY::gn::760778",
-      "stable_key": "id::CITY::gn::760778",
-      "city_name": "Radom",
-      "name_ascii": "Radom",
-      "display_name": "Generalgouvernement — Distrikt Radom",
-      "lookup_iso2": "PL",
-      "base_iso2": "PL",
-      "capital_state_id": null,
-      "capital_kind": "country_capital",
-      "resolution_method": "reviewed_capital",
-      "confidence": "high",
-      "candidate_count": 1
-    },
-    "PG03": {
-      "country_code": "PL",
-      "host_feature_id": "PL_POW_0663",
-      "urban_match_id": "UA_9BDF82C28905",
-      "lon": 22.57009,
-      "lat": 51.25058,
-      "population": 360044,
-      "base_tier": "regional",
-      "source": "merged",
-      "tag": "PG03",
-      "city_id": "CITY::ne::1159139095",
-      "stable_key": "id::CITY::ne::1159139095",
-      "city_name": "Lublin",
-      "name_ascii": "Lublin",
-      "display_name": "Generalgouvernement — Distrikt Lublin",
-      "lookup_iso2": "PL",
-      "base_iso2": "PL",
-      "capital_state_id": null,
-      "capital_kind": "country_capital",
-      "resolution_method": "reviewed_capital",
-      "confidence": "high",
-      "candidate_count": 1
-    },
-    "PG04": {
-      "country_code": "UA",
-      "host_feature_id": "UA_RAY_74538382B46853229377150",
-      "urban_match_id": "UA_8A853598FEB3",
-      "lon": 24.02324,
-      "lat": 49.83826,
-      "population": 803880,
-      "base_tier": "regional",
-      "source": "merged",
-      "tag": "PG04",
-      "city_id": "CITY::ne::1159149323",
-      "stable_key": "id::CITY::ne::1159149323",
-      "city_name": "Lemberg",
-      "name_ascii": "Lviv",
-      "display_name": "Generalgouvernement — Distrikt Galizien",
-      "lookup_iso2": "UA",
-      "base_iso2": "UA",
-      "capital_state_id": null,
-      "capital_kind": "country_capital",
-      "resolution_method": "reviewed_capital",
-      "confidence": "high",
-      "candidate_count": 1
-    },
     "PHI": {
       "country_code": "PH",
       "host_feature_id": "PHL-5543",
@@ -6900,50 +7628,14 @@
       "candidate_count": 1
     },
     "RKK": {
-      "base_iso2": "GE",
-      "base_tier": "major",
-      "candidate_count": 201,
-      "capital_kind": "country_capital",
-      "capital_state_id": 231,
-      "city_id": "CITY::ne::1159150961",
-      "city_name": "Tbilisi",
-      "confidence": "high",
-      "country_code": "GE",
-      "display_name": "Reichskommissariat Kaukasien",
-      "host_feature_id": "GEO-3036",
-      "lat": 41.69143,
-      "lon": 44.83412,
-      "lookup_iso2": "GE",
-      "name_ascii": "Tbilisi",
-      "population": 1100000,
-      "resolution_method": "capital_state_fallback",
-      "source": "merged",
-      "stable_key": "id::CITY::ne::1159150961",
       "tag": "RKK",
-      "urban_match_id": "UA_23F7669817A1"
+      "city_id": "",
+      "resolution_method": "no_capital"
     },
     "RKM": {
-      "base_iso2": "RU",
-      "base_tier": "major",
-      "candidate_count": 488,
-      "capital_kind": "country_capital",
-      "capital_state_id": 219,
-      "city_id": "CITY::ne::1159151585",
-      "city_name": "Moscow",
-      "confidence": "high",
-      "country_code": "RU",
-      "display_name": "Reichskommissariat Moskowien",
-      "host_feature_id": "RU_CITY_MOSCOW",
-      "lat": 55.75204,
-      "lon": 37.61781,
-      "lookup_iso2": "RU",
-      "name_ascii": "Moscow",
-      "population": 10452000,
-      "resolution_method": "capital_state_fallback",
-      "source": "merged",
-      "stable_key": "id::CITY::ne::1159151585",
       "tag": "RKM",
-      "urban_match_id": "UA_AAE840A5DD13"
+      "city_id": "",
+      "resolution_method": "no_capital"
     },
     "RKN": {
       "base_iso2": "NL",
@@ -6992,27 +7684,9 @@
       "urban_match_id": "UA_148D5AA7B53E"
     },
     "RKO": {
-      "country_code": "LV",
-      "host_feature_id": "LV006",
-      "urban_match_id": "UA_8711E708809C",
-      "lon": 24.10589,
-      "lat": 56.946,
-      "population": 742572,
-      "base_tier": "major",
-      "source": "merged",
       "tag": "RKO",
-      "city_id": "CITY::ne::1159150811",
-      "stable_key": "id::CITY::ne::1159150811",
-      "city_name": "Riga",
-      "name_ascii": "Riga",
-      "display_name": "Reichskommissariat Ostland",
-      "lookup_iso2": "LT",
-      "base_iso2": "LT",
-      "capital_state_id": 808,
-      "capital_kind": "country_capital",
-      "resolution_method": "reviewed_capital",
-      "confidence": "high",
-      "candidate_count": 1
+      "city_id": "",
+      "resolution_method": "no_capital"
     },
     "RKP": {
       "country_code": "PL",
@@ -7038,27 +7712,9 @@
       "candidate_count": 1
     },
     "RKU": {
-      "base_iso2": "UA",
-      "base_tier": "major",
-      "candidate_count": 298,
-      "capital_kind": "country_capital",
-      "capital_state_id": 202,
-      "city_id": "CITY::ne::1159151495",
-      "city_name": "Kyiv",
-      "confidence": "high",
-      "country_code": "UA",
-      "display_name": "Reichskommissariat Ukraine",
-      "host_feature_id": "UA_RAY_74538382B60890943260132",
-      "lat": 50.45466,
-      "lon": 30.5238,
-      "lookup_iso2": "UA",
-      "name_ascii": "Kyiv",
-      "population": 2797553,
-      "resolution_method": "capital_state_fallback",
-      "source": "merged",
-      "stable_key": "id::CITY::ne::1159151495",
       "tag": "RKU",
-      "urban_match_id": "UA_2C5033E4841A"
+      "city_id": "",
+      "resolution_method": "no_capital"
     },
     "ROM": {
       "base_iso2": "RO",
@@ -7446,6 +8102,29 @@
       "confidence": "high",
       "candidate_count": 1
     },
+    "SWAO": {
+      "country_code": "AO",
+      "host_feature_id": "AO_ADM1_AGO-1880",
+      "urban_match_id": "",
+      "lon": 13.23432,
+      "lat": -8.83682,
+      "population": 5172900,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "SWAO",
+      "city_id": "CITY::ne::1159151469",
+      "stable_key": "id::CITY::ne::1159151469",
+      "city_name": "Luanda",
+      "name_ascii": "Luanda",
+      "display_name": "German Southwest Africa — Angola Administration",
+      "lookup_iso2": "AO",
+      "base_iso2": "AO",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
     "SWE": {
       "base_iso2": "SE",
       "base_tier": "major",
@@ -7491,6 +8170,29 @@
       "stable_key": "id::CITY::ne::1159149737",
       "tag": "SWI",
       "urban_match_id": "UA_16DBFCD0501A"
+    },
+    "SWZ": {
+      "country_code": "SZ",
+      "host_feature_id": "SZ_ADM1_SWZ-534",
+      "urban_match_id": "",
+      "lon": 31.13333,
+      "lat": -26.31667,
+      "population": 90138,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "SWZ",
+      "city_id": "CITY::ne::1159149413",
+      "stable_key": "id::CITY::ne::1159149413",
+      "city_name": "Mbabane",
+      "name_ascii": "Mbabane",
+      "display_name": "South African Protectorate of Swaziland",
+      "lookup_iso2": "SZ",
+      "base_iso2": "SZ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "SYR": {
       "base_iso2": "SY",
@@ -8451,9 +9153,171 @@
       "resolution_method": "reviewed_capital",
       "confidence": "high",
       "candidate_count": 1
+    },
+    "OE00": {
+      "country_code": "LV",
+      "host_feature_id": "LV006",
+      "urban_match_id": "UA_8711E708809C",
+      "lon": 24.10589,
+      "lat": 56.946,
+      "population": 742572,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "OE00",
+      "city_id": "CITY::ne::1159150811",
+      "stable_key": "id::CITY::ne::1159150811",
+      "city_name": "Riga",
+      "name_ascii": "Riga",
+      "display_name": "Generalbezirk Lettland",
+      "lookup_iso2": "LV",
+      "base_iso2": "LV",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "UK00": {
+      "country_code": "UA",
+      "host_feature_id": "UA_RAY_74538382B60890943260132",
+      "urban_match_id": "UA_2C5033E4841A",
+      "lon": 30.5238,
+      "lat": 50.45466,
+      "population": 2797553,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "UK00",
+      "city_id": "CITY::ne::1159151495",
+      "stable_key": "id::CITY::ne::1159151495",
+      "city_name": "Kiew",
+      "name_ascii": "Kyiv",
+      "display_name": "Generalbezirk Kiew",
+      "lookup_iso2": "UA",
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MS00": {
+      "country_code": "RU",
+      "host_feature_id": "RU_CITY_MOSCOW",
+      "urban_match_id": "UA_AAE840A5DD13",
+      "lon": 37.61781,
+      "lat": 55.75204,
+      "population": 10452000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "MS00",
+      "city_id": "CITY::ne::1159151585",
+      "stable_key": "id::CITY::ne::1159151585",
+      "city_name": "Moskau",
+      "name_ascii": "Moscow",
+      "display_name": "Moskowien — Generalbezirk Moskau",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "KC00": {
+      "country_code": "GE",
+      "host_feature_id": "GEO-3036",
+      "urban_match_id": "UA_23F7669817A1",
+      "lon": 44.83412,
+      "lat": 41.69143,
+      "population": 1100000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "KC00",
+      "city_id": "CITY::ne::1159150961",
+      "stable_key": "id::CITY::ne::1159150961",
+      "city_name": "Tiflis",
+      "name_ascii": "Tbilisi",
+      "display_name": "Kaukasien — Generalbezirk Georgien",
+      "lookup_iso2": "GE",
+      "base_iso2": "GE",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "GEAM": {
+      "country_code": "MZ",
+      "host_feature_id": "MZ_ADM1_MOZ-5854",
+      "urban_match_id": "",
+      "lon": 32.58322,
+      "lat": -25.96553,
+      "population": 1446000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "GEAM",
+      "city_id": "CITY::ne::1159150683",
+      "stable_key": "id::CITY::ne::1159150683",
+      "city_name": "Lourenço Marques",
+      "name_ascii": "Maputo",
+      "display_name": "German East Africa — Mozambique Administration",
+      "lookup_iso2": "MZ",
+      "base_iso2": "MZ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "CG00": {
+      "country_code": "CD",
+      "host_feature_id": "CD_ADM1_COD-1884",
+      "urban_match_id": "",
+      "lon": 15.31357,
+      "lat": -4.32758,
+      "population": 16000000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "CG00",
+      "city_id": "CITY::ne::1159151539",
+      "stable_key": "id::CITY::ne::1159151539",
+      "city_name": "Leopoldstadt",
+      "name_ascii": "Kinshasa",
+      "display_name": "German Congo — Zentral-Kongo Administration",
+      "lookup_iso2": "CD",
+      "base_iso2": "CD",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "IETH": {
+      "country_code": "ET",
+      "host_feature_id": "ET_ADM1_ETH-3133",
+      "urban_match_id": "",
+      "lon": 38.74689,
+      "lat": 9.02497,
+      "population": 3860000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "IETH",
+      "city_id": "CITY::ne::1159151549",
+      "stable_key": "id::CITY::ne::1159151549",
+      "city_name": "Addis Abeba",
+      "name_ascii": "Addis Ababa",
+      "display_name": "Italian East Africa — Ethiopia Governorate",
+      "lookup_iso2": "ET",
+      "base_iso2": "ET",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     }
   },
   "capitals_by_tag": {
+    "ALB": "CITY::ne::1159151117",
     "ALT": "CITY::ne::1159146581",
     "AMR": "CITY::ne::1159146681",
     "ANG": "CITY::ne::1159150785",
@@ -8467,10 +9331,16 @@
     "BKR": "CITY::ne::1159128763",
     "BOP": "CITY::ne::1159137605",
     "BRY": "CITY::ne::1159149623",
+    "BTS": "CITY::ne::1159151153",
     "BWA": "CITY::ne::1159138799",
     "BZ": "CITY::ne::1159144449",
     "CAM": "CITY::ne::1159151127",
     "CAO": "CITY::ne::1159150315",
+    "CGBC": "CITY::ne::1159150993",
+    "CGGA": "CITY::ne::1159150913",
+    "CGKT": "CITY::ne::1159150903",
+    "CGKV": "CITY::ne::1159148481",
+    "CGUB": "CITY::ne::1159151111",
     "CHD": "CITY::gn::2427336",
     "CHI": "CITY::ne::1159151385",
     "CHL": "CITY::ne::1159151615",
@@ -8482,8 +9352,13 @@
     "FFR": "CITY::ne::1159151439",
     "GAY": "CITY::scenario::cherdyn",
     "GCE": "CITY::gn::2635412",
-    "GCO": "CITY::ne::1159151539",
-    "GEA": "CITY::ne::1159151305",
+    "GEAB": "CITY::ne::1159150427",
+    "GEAN": "CITY::ne::1159148499",
+    "GEAR": "CITY::ne::1159149385",
+    "GEAS": "CITY::ne::1159150573",
+    "GEAT": "CITY::ne::1159151305",
+    "GEAU": "CITY::ne::1159150593",
+    "GEAZ": "CITY::ne::1159150571",
     "GER": "CITY::ne::1159151529",
     "GHA": "CITY::ne::1159151403",
     "GNG": "CITY::ne::1159151331",
@@ -8492,14 +9367,30 @@
     "GUZ": "CITY::ne::1159151325",
     "GY": "CITY::ne::1159150585",
     "HAU": "CITY::ne::1159150605",
+    "ICVE": "CITY::ne::1159151205",
+    "IDAL": "CITY::ne::1159140367",
+    "IDJI": "CITY::ne::1159149869",
+    "IERI": "CITY::ne::1159150873",
+    "IGUI": "CITY::ne::1159150803",
+    "IKEN": "CITY::ne::1159151597",
     "IRK": "CITY::ne::1159150731",
+    "ISOM": "CITY::ne::1159150715",
+    "ISTP": "CITY::ne::1159151195",
+    "ISUE": "CITY::ne::1159140377",
+    "ITIM": "CITY::ne::1159150577",
     "JAP": "CITY::ne::1159151609",
     "JHAW": "CITY::ne::1159151221",
     "JTWN": "CITY::ne::1159151567",
     "KAZ": "CITY::ne::1159150969",
+    "KC01": "CITY::ne::1159151123",
+    "KC02": "CITY::ne::1159149549",
+    "KC03": "CITY::ne::1159149523",
+    "KC04": "CITY::ne::1159137065",
+    "KC05": "CITY::ne::1159148145",
     "KOM": "CITY::ne::1159146551",
     "KRS": "CITY::ne::1159150733",
     "LAO": "CITY::ne::1159139147",
+    "LTH": "CITY::ne::1159150831",
     "MAG": "CITY::ne::1159150749",
     "MAL": "CITY::ne::1159151083",
     "MAN": "CITY::ne::1159151393",
@@ -8508,6 +9399,14 @@
     "MGN": "CITY::ne::1159149559",
     "MLI": "CITY::ne::1159150945",
     "MLY": "CITY::ne::1159149765",
+    "MS01": "CITY::ne::1159151291",
+    "MS02": "CITY::ne::1159149531",
+    "MS03": "CITY::ne::1159146521",
+    "MS04": "CITY::ne::1159149557",
+    "MS05": "CITY::ne::1159149543",
+    "MS06": "CITY::ne::1159148121",
+    "MS07": "CITY::ne::1159149575",
+    "MS08": "CITY::ne::1159150697",
     "NIE": "CITY::ne::1159149369",
     "NOV": "CITY::ne::1159150713",
     "NRB": "CITY::ne::1159149803",
@@ -8524,18 +9423,12 @@
     "OUR": "CITY::gn::555980",
     "PAK": "CITY::ne::1159150645",
     "PFC": "CITY::ne::1159150795",
-    "PG01": "CITY::ne::1159151299",
-    "PG02": "CITY::gn::760778",
-    "PG03": "CITY::ne::1159139095",
-    "PG04": "CITY::ne::1159149323",
     "PHI": "CITY::ne::1159151525",
     "PRC": "CITY::ne::1159149621",
     "PRM": "CITY::ne::1159150775",
     "QAT": "CITY::ne::1159149469",
     "RGC": "CITY::ne::1159151533",
-    "RKM": "CITY::ne::1159151585",
     "RKNO": "CITY::ne::1159151281",
-    "RKO": "CITY::ne::1159150811",
     "RKP": "CITY::ne::1159149709",
     "RUR": "CITY::ne::1159149585",
     "SAF": "CITY::ne::1159150661",
@@ -8548,6 +9441,8 @@
     "SPH": "CITY::ne::1159146605",
     "SUR": "CITY::ne::1159150597",
     "SVR": "CITY::ne::1159150701",
+    "SWAO": "CITY::ne::1159151469",
+    "SWZ": "CITY::ne::1159149413",
     "TIB": "CITY::ne::1159150879",
     "TNS": "CITY::gn::712886",
     "TOM": "CITY::ne::1159150685",
@@ -8575,7 +9470,14 @@
     "XIN": "CITY::ne::1159151531",
     "YAK": "CITY::ne::1159150745",
     "YOR": "CITY::ne::1159151591",
-    "ZLT": "CITY::ne::1159149567"
+    "ZLT": "CITY::ne::1159149567",
+    "OE00": "CITY::ne::1159150811",
+    "UK00": "CITY::ne::1159151495",
+    "MS00": "CITY::ne::1159151585",
+    "KC00": "CITY::ne::1159150961",
+    "GEAM": "CITY::ne::1159150683",
+    "CG00": "CITY::ne::1159151539",
+    "IETH": "CITY::ne::1159151549"
   },
   "cities": {
     "CITY::gn::1024694": {
@@ -39693,6 +40595,15 @@
       },
       "stable_key": "id::CITY::ne::1159137047"
     },
+    "CITY::ne::1159137065": {
+      "city_id": "CITY::ne::1159137065",
+      "display_name": {
+        "en": "Wladikawkaz",
+        "zh": "弗拉季高加索"
+      },
+      "host_feature_id": "RU_RAY_50074027B27316284331880",
+      "stable_key": "id::CITY::ne::1159137065"
+    },
     "CITY::ne::1159137115": {
       "display_name": {
         "en": "Kolosjoki",
@@ -40489,11 +41400,24 @@
       "stable_key": "id::CITY::ne::1159140363"
     },
     "CITY::ne::1159140367": {
+      "city_id": "CITY::ne::1159140367",
       "display_name": {
         "en": "Zara",
         "zh": "扎拉"
       },
+      "host_feature_id": "HR033",
+      "lat": 44.12868883342048,
+      "lon": 15.246458174352346,
       "stable_key": "id::CITY::ne::1159140367"
+    },
+    "CITY::ne::1159140377": {
+      "city_id": "CITY::ne::1159140377",
+      "display_name": {
+        "en": "Ismailia",
+        "zh": "伊斯梅利亚"
+      },
+      "host_feature_id": "EGY-1531",
+      "stable_key": "id::CITY::ne::1159140377"
     },
     "CITY::ne::1159140381": {
       "display_name": {
@@ -42104,6 +43028,15 @@
       "host_feature_id": "RU_RAY_50074027B51159964054862",
       "stable_key": "id::CITY::ne::1159146517"
     },
+    "CITY::ne::1159146521": {
+      "city_id": "CITY::ne::1159146521",
+      "display_name": {
+        "en": "Tula",
+        "zh": "图拉"
+      },
+      "host_feature_id": "RU_MRG_e770cd31cdb4",
+      "stable_key": "id::CITY::ne::1159146521"
+    },
     "CITY::ne::1159146525": {
       "city_id": "CITY::ne::1159146525",
       "display_name": {
@@ -42737,6 +43670,15 @@
       "host_feature_id": "RU_RAY_50074027B51176471238152",
       "stable_key": "id::CITY::ne::1159148101"
     },
+    "CITY::ne::1159148121": {
+      "city_id": "CITY::ne::1159148121",
+      "display_name": {
+        "en": "Wladimir",
+        "zh": "弗拉基米尔"
+      },
+      "host_feature_id": "RU_MRG_13fef5f74a14",
+      "stable_key": "id::CITY::ne::1159148121"
+    },
     "CITY::ne::1159148141": {
       "city_id": "CITY::ne::1159148141",
       "display_name": {
@@ -42745,6 +43687,15 @@
       },
       "host_feature_id": "RU_RAY_50074027B50420734283306",
       "stable_key": "id::CITY::ne::1159148141"
+    },
+    "CITY::ne::1159148145": {
+      "city_id": "CITY::ne::1159148145",
+      "display_name": {
+        "en": "Elista",
+        "zh": "埃利斯塔"
+      },
+      "host_feature_id": "RU_MRG_90d3823663be",
+      "stable_key": "id::CITY::ne::1159148145"
     },
     "CITY::ne::1159148157": {
       "display_name": {
@@ -43072,11 +44023,13 @@
         "Costermansstadt",
         "Bukavu"
       ],
+      "city_id": "CITY::ne::1159148481",
       "display_name": {
         "en": "Costermansstadt",
         "zh": "科斯特曼斯城"
       },
       "hidden": false,
+      "host_feature_id": "CD_ADM1_COD-1894",
       "stable_key": "id::CITY::ne::1159148481",
       "tier": "regional"
     },
@@ -43158,11 +44111,13 @@
       "aliases": [
         "Zomba"
       ],
+      "city_id": "CITY::ne::1159148499",
       "display_name": {
         "en": "Zomba",
         "zh": "松巴"
       },
       "hidden": false,
+      "host_feature_id": "MW_ADM1_82672581B71595037145626",
       "stable_key": "id::CITY::ne::1159148499",
       "tier": "regional"
     },
@@ -43704,11 +44659,13 @@
         "Barthstadt",
         "Kigali"
       ],
+      "city_id": "CITY::ne::1159149385",
       "display_name": {
         "en": "Barthstadt",
         "zh": "巴特城"
       },
       "hidden": false,
+      "host_feature_id": "RW_ADM1_RWA-3495",
       "stable_key": "id::CITY::ne::1159149385",
       "tier": "major"
     },
@@ -43718,6 +44675,15 @@
         "zh": "松兹瓦尔"
       },
       "stable_key": "id::CITY::ne::1159149401"
+    },
+    "CITY::ne::1159149413": {
+      "city_id": "CITY::ne::1159149413",
+      "display_name": {
+        "en": "Mbabane",
+        "zh": "姆巴巴内"
+      },
+      "host_feature_id": "SZ_ADM1_SWZ-534",
+      "stable_key": "id::CITY::ne::1159149413"
     },
     "CITY::ne::1159149451": {
       "display_name": {
@@ -43792,6 +44758,15 @@
       "stable_key": "id::CITY::ne::1159149513",
       "tier": "regional"
     },
+    "CITY::ne::1159149523": {
+      "city_id": "CITY::ne::1159149523",
+      "display_name": {
+        "en": "Stawropol",
+        "zh": "斯塔夫罗波尔"
+      },
+      "host_feature_id": "RU_MRG_f01d51060a16",
+      "stable_key": "id::CITY::ne::1159149523"
+    },
     "CITY::ne::1159149529": {
       "city_id": "CITY::ne::1159149529",
       "display_name": {
@@ -43800,6 +44775,15 @@
       },
       "host_feature_id": "RU_RAY_50074027B86681375933080",
       "stable_key": "id::CITY::ne::1159149529"
+    },
+    "CITY::ne::1159149531": {
+      "city_id": "CITY::ne::1159149531",
+      "display_name": {
+        "en": "Brjansk",
+        "zh": "布良斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B25563950651561",
+      "stable_key": "id::CITY::ne::1159149531"
     },
     "CITY::ne::1159149535": {
       "display_name": {
@@ -43816,6 +44800,33 @@
       },
       "host_feature_id": "RU_MRG_aedb5f9ed3b1",
       "stable_key": "id::CITY::ne::1159149541"
+    },
+    "CITY::ne::1159149543": {
+      "city_id": "CITY::ne::1159149543",
+      "display_name": {
+        "en": "Jaroslawl",
+        "zh": "雅罗斯拉夫尔"
+      },
+      "host_feature_id": "RU_RAY_50074027B57358126207690",
+      "stable_key": "id::CITY::ne::1159149543"
+    },
+    "CITY::ne::1159149549": {
+      "city_id": "CITY::ne::1159149549",
+      "display_name": {
+        "en": "Jekaterinodar",
+        "zh": "叶卡捷琳诺达尔"
+      },
+      "host_feature_id": "RU_RAY_50074027B89252490479976",
+      "stable_key": "id::CITY::ne::1159149549"
+    },
+    "CITY::ne::1159149557": {
+      "city_id": "CITY::ne::1159149557",
+      "display_name": {
+        "en": "Woronesch",
+        "zh": "沃罗涅日"
+      },
+      "host_feature_id": "RU_RAY_50074027B21233041988666",
+      "stable_key": "id::CITY::ne::1159149557"
     },
     "CITY::ne::1159149559": {
       "city_id": "CITY::ne::1159149559",
@@ -43861,6 +44872,15 @@
       },
       "host_feature_id": "RU_RAY_50074027B32234523409019",
       "stable_key": "id::CITY::ne::1159149571"
+    },
+    "CITY::ne::1159149575": {
+      "city_id": "CITY::ne::1159149575",
+      "display_name": {
+        "en": "Platenfurt",
+        "zh": "普拉滕富特"
+      },
+      "host_feature_id": "RU_RAY_50074027B39404018386654",
+      "stable_key": "id::CITY::ne::1159149575"
     },
     "CITY::ne::1159149579": {
       "city_id": "CITY::ne::1159149579",
@@ -44106,10 +45126,12 @@
       "stable_key": "id::CITY::ne::1159149867"
     },
     "CITY::ne::1159149869": {
+      "city_id": "CITY::ne::1159149869",
       "display_name": {
         "en": "Gibuti",
         "zh": "吉布提"
       },
+      "host_feature_id": "DJ_ADM1_DJI-1567",
       "stable_key": "id::CITY::ne::1159149869"
     },
     "CITY::ne::1159149977": {
@@ -44367,11 +45389,13 @@
         "Usumbura",
         "Bujumbura"
       ],
+      "city_id": "CITY::ne::1159150427",
       "display_name": {
         "en": "Usumbura",
         "zh": "乌松布拉"
       },
       "hidden": false,
+      "host_feature_id": "BI_ADM1_BDI-3364",
       "stable_key": "id::CITY::ne::1159150427",
       "tier": "major"
     },
@@ -44458,18 +45482,38 @@
       "city_id": "CITY::ne::1159150567",
       "host_feature_id": "TKM-352"
     },
+    "CITY::ne::1159150571": {
+      "city_id": "CITY::ne::1159150571",
+      "display_name": {
+        "en": "Lusaka",
+        "zh": "卢萨卡"
+      },
+      "host_feature_id": "ZM_ADM1_ZMB-520",
+      "stable_key": "id::CITY::ne::1159150571"
+    },
     "CITY::ne::1159150573": {
       "aliases": [
         "Salisbury",
         "Harare"
       ],
+      "city_id": "CITY::ne::1159150573",
       "display_name": {
         "en": "Salisbury",
         "zh": "索尔兹伯里"
       },
       "hidden": false,
+      "host_feature_id": "ZW_ADM1_ZWE-525",
       "stable_key": "id::CITY::ne::1159150573",
       "tier": "major"
+    },
+    "CITY::ne::1159150577": {
+      "city_id": "CITY::ne::1159150577",
+      "display_name": {
+        "en": "Dili",
+        "zh": "帝力"
+      },
+      "host_feature_id": "TL_ADM1_TLS-541",
+      "stable_key": "id::CITY::ne::1159150577"
     },
     "CITY::ne::1159150583": {
       "city_id": "CITY::ne::1159150583",
@@ -44491,6 +45535,15 @@
     "CITY::ne::1159150589": {
       "city_id": "CITY::ne::1159150589",
       "host_feature_id": "HT_ADM1_HTI-1388"
+    },
+    "CITY::ne::1159150593": {
+      "city_id": "CITY::ne::1159150593",
+      "display_name": {
+        "en": "Kampala",
+        "zh": "坎帕拉"
+      },
+      "host_feature_id": "UG_ADM1_17295835B48340970483027",
+      "stable_key": "id::CITY::ne::1159150593"
     },
     "CITY::ne::1159150597": {
       "city_id": "CITY::ne::1159150597",
@@ -44601,11 +45654,13 @@
         "Lourenço Marques",
         "Maputo"
       ],
+      "city_id": "CITY::ne::1159150683",
       "display_name": {
         "en": "Lourenço Marques",
         "zh": "洛伦索·马贵斯"
       },
       "hidden": false,
+      "host_feature_id": "MZ_ADM1_MOZ-5854",
       "stable_key": "id::CITY::ne::1159150683",
       "tier": "major"
     },
@@ -44633,6 +45688,15 @@
       },
       "host_feature_id": "RU_CITY_ARKHANGELSK",
       "stable_key": "id::CITY::ne::1159150693"
+    },
+    "CITY::ne::1159150697": {
+      "city_id": "CITY::ne::1159150697",
+      "display_name": {
+        "en": "Paulusburg",
+        "zh": "保卢斯堡"
+      },
+      "host_feature_id": "RU_CITY_VOLGOGRAD",
+      "stable_key": "id::CITY::ne::1159150697"
     },
     "CITY::ne::1159150701": {
       "city_id": "CITY::ne::1159150701",
@@ -44665,10 +45729,12 @@
       "host_feature_id": "RU_RAY_50074027B18253095483754"
     },
     "CITY::ne::1159150715": {
+      "city_id": "CITY::ne::1159150715",
       "display_name": {
         "en": "Mogadiscio",
         "zh": "摩加迪沙"
       },
+      "host_feature_id": "SO_ADM1_83879307B32896531038690",
       "stable_key": "id::CITY::ne::1159150715"
     },
     "CITY::ne::1159150717": {
@@ -44794,6 +45860,15 @@
       "city_id": "CITY::ne::1159150795",
       "host_feature_id": "RU_RAY_50074027B69870482204976"
     },
+    "CITY::ne::1159150803": {
+      "city_id": "CITY::ne::1159150803",
+      "display_name": {
+        "en": "Bissau",
+        "zh": "比绍"
+      },
+      "host_feature_id": "GW_ADM1_GNB-769",
+      "stable_key": "id::CITY::ne::1159150803"
+    },
     "CITY::ne::1159150807": {
       "city_id": "CITY::ne::1159150807",
       "host_feature_id": "JOR-851"
@@ -44828,6 +45903,15 @@
       "city_id": "CITY::ne::1159150819",
       "host_feature_id": "CN_CITY_17275852B10439048942215"
     },
+    "CITY::ne::1159150831": {
+      "city_id": "CITY::ne::1159150831",
+      "display_name": {
+        "en": "Maseru",
+        "zh": "马塞卢"
+      },
+      "host_feature_id": "LS_ADM1_LSO-1203",
+      "stable_key": "id::CITY::ne::1159150831"
+    },
     "CITY::ne::1159150835": {
       "city_id": "CITY::ne::1159150835",
       "host_feature_id": "MG_ADM1_MDG-5862"
@@ -44849,10 +45933,12 @@
       "host_feature_id": "GQ_ADM1_GNQ-1478"
     },
     "CITY::ne::1159150873": {
+      "city_id": "CITY::ne::1159150873",
       "display_name": {
         "en": "Asmára",
         "zh": "阿斯马拉"
       },
+      "host_feature_id": "ER_ADM1_ERI-1561",
       "stable_key": "id::CITY::ne::1159150873"
     },
     "CITY::ne::1159150875": {
@@ -44912,11 +45998,13 @@
         "Elisabethstadt",
         "Lubumbashi"
       ],
+      "city_id": "CITY::ne::1159150903",
       "display_name": {
         "en": "Elisabethstadt",
         "zh": "伊丽莎白城"
       },
       "hidden": false,
+      "host_feature_id": "CD_ADM1_COD-1897",
       "stable_key": "id::CITY::ne::1159150903",
       "tier": "major"
     },
@@ -44929,11 +46017,13 @@
         "Freistadt",
         "Libreville"
       ],
+      "city_id": "CITY::ne::1159150913",
       "display_name": {
         "en": "Freistadt",
         "zh": "自由城"
       },
       "hidden": false,
+      "host_feature_id": "GA_ADM1_GAB-2168",
       "stable_key": "id::CITY::ne::1159150913",
       "tier": "major"
     },
@@ -44999,7 +46089,8 @@
       "hidden": false,
       "host_feature_id": "GEO-3036",
       "stable_key": "id::CITY::ne::1159150961",
-      "tier": "major"
+      "tier": "major",
+      "city_id": "CITY::ne::1159150961"
     },
     "CITY::ne::1159150965": {
       "city_id": "CITY::ne::1159150965",
@@ -45023,11 +46114,13 @@
         "Brazzastadt",
         "Brazzaville"
       ],
+      "city_id": "CITY::ne::1159150993",
       "display_name": {
         "en": "Brazzastadt",
         "zh": "布拉柴城"
       },
       "hidden": false,
+      "host_feature_id": "CG_ADM1_COG-4855",
       "stable_key": "id::CITY::ne::1159150993",
       "tier": "major"
     },
@@ -45082,6 +46175,15 @@
       "host_feature_id": "BN_ADM1_BRN-1182",
       "stable_key": "id::CITY::ne::1159151083"
     },
+    "CITY::ne::1159151111": {
+      "city_id": "CITY::ne::1159151111",
+      "display_name": {
+        "en": "Bangui",
+        "zh": "班吉"
+      },
+      "host_feature_id": "CF_ADM1_CAF-1460",
+      "stable_key": "id::CITY::ne::1159151111"
+    },
     "CITY::ne::1159151113": {
       "aliases": [
         "Maroua"
@@ -45107,6 +46209,15 @@
       "stable_key": "id::CITY::ne::1159151115",
       "tier": "major"
     },
+    "CITY::ne::1159151117": {
+      "city_id": "CITY::ne::1159151117",
+      "display_name": {
+        "en": "Tirana",
+        "zh": "地拉那"
+      },
+      "host_feature_id": "AL022",
+      "stable_key": "id::CITY::ne::1159151117"
+    },
     "CITY::ne::1159151119": {
       "aliases": [
         "Yerevan"
@@ -45124,11 +46235,13 @@
       "aliases": [
         "Baku"
       ],
+      "city_id": "CITY::ne::1159151123",
       "display_name": {
         "en": "Baku",
         "zh": "巴库"
       },
       "hidden": false,
+      "host_feature_id": "AZE-1689",
       "stable_key": "id::CITY::ne::1159151123",
       "tier": "major"
     },
@@ -45198,6 +46311,15 @@
       "city_id": "CITY::ne::1159151151",
       "host_feature_id": "BTN-2439"
     },
+    "CITY::ne::1159151153": {
+      "city_id": "CITY::ne::1159151153",
+      "display_name": {
+        "en": "Gaborone",
+        "zh": "加博罗内"
+      },
+      "host_feature_id": "BW_ADM1_BWA-5501",
+      "stable_key": "id::CITY::ne::1159151153"
+    },
     "CITY::ne::1159151161": {
       "city_id": "CITY::ne::1159151161",
       "host_feature_id": "AU_ADM1_AUS-2653"
@@ -45224,6 +46346,15 @@
       },
       "stable_key": "id::CITY::ne::1159151191"
     },
+    "CITY::ne::1159151195": {
+      "city_id": "CITY::ne::1159151195",
+      "display_name": {
+        "en": "São Tomé",
+        "zh": "圣多美"
+      },
+      "host_feature_id": "ST_ADM1_STP-4861",
+      "stable_key": "id::CITY::ne::1159151195"
+    },
     "CITY::ne::1159151199": {
       "display_name": {
         "en": "La Valletta",
@@ -45243,6 +46374,15 @@
         "zh": "耶路撒冷"
       },
       "stable_key": "id::CITY::ne::1159151203"
+    },
+    "CITY::ne::1159151205": {
+      "city_id": "CITY::ne::1159151205",
+      "display_name": {
+        "en": "Praia",
+        "zh": "普拉亚"
+      },
+      "host_feature_id": "CV_ADM1_CPV-5053",
+      "stable_key": "id::CITY::ne::1159151205"
     },
     "CITY::ne::1159151221": {
       "city_id": "CITY::ne::1159151221",
@@ -45277,6 +46417,15 @@
       "city_id": "CITY::ne::1159151281",
       "host_feature_id": "NO081"
     },
+    "CITY::ne::1159151291": {
+      "city_id": "CITY::ne::1159151291",
+      "display_name": {
+        "en": "Sankt Petersburg",
+        "zh": "圣彼得堡"
+      },
+      "host_feature_id": "RU_CITY_SAINT_PETERSBURG",
+      "stable_key": "id::CITY::ne::1159151291"
+    },
     "CITY::ne::1159151299": {
       "aliases": [
         "Warschau",
@@ -45297,6 +46446,7 @@
         "Daressalam",
         "Dar es Salaam"
       ],
+      "city_id": "CITY::ne::1159151305",
       "display_name": {
         "en": "Daressalam",
         "zh": "达累斯萨拉姆"
@@ -45454,6 +46604,15 @@
       "stable_key": "id::CITY::ne::1159151465",
       "tier": "major"
     },
+    "CITY::ne::1159151469": {
+      "city_id": "CITY::ne::1159151469",
+      "display_name": {
+        "en": "Luanda",
+        "zh": "罗安达"
+      },
+      "host_feature_id": "AO_ADM1_AGO-1880",
+      "stable_key": "id::CITY::ne::1159151469"
+    },
     "CITY::ne::1159151477": {
       "city_id": "CITY::ne::1159151477",
       "host_feature_id": "MMR-3269"
@@ -45474,7 +46633,8 @@
       "hidden": false,
       "host_feature_id": "UA_RAY_74538382B60890943260132",
       "stable_key": "id::CITY::ne::1159151495",
-      "tier": "major"
+      "tier": "major",
+      "city_id": "CITY::ne::1159151495"
     },
     "CITY::ne::1159151501": {
       "city_id": "CITY::ne::1159151501",
@@ -45562,7 +46722,8 @@
       "hidden": false,
       "host_feature_id": "CD_ADM1_COD-1884",
       "stable_key": "id::CITY::ne::1159151539",
-      "tier": "major"
+      "tier": "major",
+      "city_id": "CITY::ne::1159151539"
     },
     "CITY::ne::1159151541": {
       "city_id": "CITY::ne::1159151541",
@@ -45582,7 +46743,8 @@
         "zh": "亚的斯亚贝巴"
       },
       "host_feature_id": "ET_ADM1_ETH-3133",
-      "stable_key": "id::CITY::ne::1159151549"
+      "stable_key": "id::CITY::ne::1159151549",
+      "city_id": "CITY::ne::1159151549"
     },
     "CITY::ne::1159151551": {
       "city_id": "CITY::ne::1159151551",
@@ -45619,7 +46781,12 @@
     },
     "CITY::ne::1159151585": {
       "city_id": "CITY::ne::1159151585",
-      "host_feature_id": "RU_CITY_MOSCOW"
+      "host_feature_id": "RU_CITY_MOSCOW",
+      "stable_key": "id::CITY::ne::1159151585",
+      "display_name": {
+        "en": "Moskau",
+        "zh": "莫斯科"
+      }
     },
     "CITY::ne::1159151587": {
       "city_id": "CITY::ne::1159151587",
@@ -45647,6 +46814,15 @@
     "CITY::ne::1159151595": {
       "city_id": "CITY::ne::1159151595",
       "host_feature_id": "CN_CITY_17275852B40522342172572"
+    },
+    "CITY::ne::1159151597": {
+      "city_id": "CITY::ne::1159151597",
+      "display_name": {
+        "en": "Nairobi",
+        "zh": "内罗毕"
+      },
+      "host_feature_id": "KE_ADM1_KEN-1196",
+      "stable_key": "id::CITY::ne::1159151597"
     },
     "CITY::ne::1159151599": {
       "city_id": "CITY::ne::1159151599",

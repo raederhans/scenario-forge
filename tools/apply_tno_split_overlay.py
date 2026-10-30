@@ -24,6 +24,10 @@ def rebuild_districts(scenario_dir):
         read_json_source(districts_builder.DEFAULT_SPEC), districts_builder.load_features(scenario_dir))
     mutations_path = scenario_dir / "scenario_mutations.json"
     mutations = read_json_source(mutations_path)
+    countries = read_json_source(scenario_dir / "countries.json")["countries"]
+    for tag in list(mutations["district_groups"]):
+        if tag not in countries or countries[tag].get("entry_kind") == "scenario_container":
+            del mutations["district_groups"][tag]
     mutations["district_groups"].update(tags)
     context = {"scenarioId": "tno_1962", "countriesPath": scenario_dir / "countries.json",
                "ownersPath": scenario_dir / "owners.by_feature.json",
@@ -42,6 +46,8 @@ def update_country_geography(countries, owners, features, base_features, country
             code = base_features.get(fid, features[fid])["cntr_code"]
             counts[tag][code] += 1
     for tag, codes in counts.items():
+        if not codes:
+            continue
         code = codes.most_common(1)[0][0]
         countries[tag].update({key: code for key in ("lookup_iso2", "base_iso2", "provenance_iso2")})
         countries[tag].update({key: country_meta.get(code, {}).get(key, "") for key in
@@ -80,7 +86,7 @@ def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
         {g["properties"]["id"]: g["properties"] for g in geometries},
         {g["properties"]["id"]: g["properties"]
          for g in base_topology["objects"]["political"]["geometries"]},
-        meta, {entry["tag"] for entry in overlay["entries"]},
+        meta, {entry["tag"] for entry in overlay["entries"]} & countries.keys(),
     )
     counts = Counter(result_owners.values())
     for tag, country in countries.items():
@@ -92,17 +98,33 @@ def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
     manual = read_json_source(manual_path)
     mutations = read_json_source(mutations_path)
     source_changed = False
-    for entry in overlay["entries"]:
-        tag = entry["tag"]
+    for tag in report["retired_tags"]:
+        manual["countries"].pop(tag, None)
+        mutations["countries"].pop(tag, None)
+        mutations.get("capitals", {}).pop(tag, None)
+    for tag in sorted({entry["tag"] for entry in overlay["entries"]} | {
+        tag for tag, country in countries.items() if country.get("entry_kind") == "scenario_container"
+    }):
         country = countries[tag]
+        if "display_name_en" not in country or "display_name_zh" not in country:
+            names = read_json_source(scenario_dir / "locales.startup.json")["geo"][country["display_name"]]
+            country.update(display_name_en=names["en"], display_name_zh=names["zh"])
         mutation = {**mutations["countries"].get(tag, {}), "mode": "create",
                     **{key: country[key] for key in
                        ("display_name", "display_name_en", "display_name_zh", "color_hex",
-                        "parent_owner_tag", "subject_kind")}, "color_policy": "locked"}
+                        "parent_owner_tag", "subject_kind", "entry_kind") if key in country}, "color_policy": "locked"}
         source_changed |= manual["countries"].get(tag) != country or mutations["countries"].get(tag) != mutation
         manual["countries"][tag] = country
         mutations["countries"][tag] = mutation
     if assignments or countries != payload["countries"] or source_changed:
+        for name in ("city_overrides.json", "capital_defaults.partial.json"):
+            path = scenario_dir / name
+            if path.exists() and report["retired_tags"]:
+                cities = read_json_source(path)
+                for tag in report["retired_tags"]:
+                    for key in ("capitals_by_tag", "capital_city_hints"):
+                        cities.get(key, {}).pop(tag, None)
+                write_json(path, cities)
         write_json(scenario_dir / "countries.json", {**payload, "countries": countries})
         write_json(manual_path, manual)
         write_json(mutations_path, mutations)

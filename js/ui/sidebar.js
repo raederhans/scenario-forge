@@ -158,6 +158,7 @@ const translateCountryGeoLabel = (label, type = "ui") => (
 );
 const {
   getScenarioCountryMeta,
+  getScenarioSubjectChildrenForParent: selectScenarioSubjectChildren,
   resolveScenarioInspectorGroupMeta,
   resolveScenarioLookupCode,
   resolveInspectorDataCode,
@@ -2874,16 +2875,7 @@ function initSidebar({ render } = {}) {
   };
 
   const getScenarioSubjectChildrenForParent = (parentTag) => {
-    const normalizedParent = normalizeCountryCode(parentTag);
-    if (!normalizedParent) return [];
-    return Array.from(latestCountryStatesByCode.values())
-      .filter((countryState) => {
-        if (!countryState?.scenarioSubject || countryState?.releasable) return false;
-        const parentTags = Array.isArray(countryState.parentOwnerTags) && countryState.parentOwnerTags.length
-          ? countryState.parentOwnerTags
-          : (countryState.parentOwnerTag ? [countryState.parentOwnerTag] : []);
-        return parentTags.includes(normalizedParent);
-      })
+    return selectScenarioSubjectChildren(parentTag, Array.from(latestCountryStatesByCode.values()))
       .sort(compareRelatedCountryStates);
   };
 

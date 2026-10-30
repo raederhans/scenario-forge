@@ -227,9 +227,11 @@ def test_retirement_and_protection(inputs):
     with pytest.raises(ValueError, match="split.*protected.*CAN"):
         apply(inputs, entry({"country_codes": ["CA"]}))
     inputs["default_country"] = "ENG"
+    # A landless parent of a remaining subject stays as a hierarchy container.
     inputs["countries"]["CHI"]["parent_owner_tag"] = "CAN"
-    with pytest.raises(ValueError, match="split.*protected.*CAN"):
-        apply(inputs, entry({"country_codes": ["CA"]}))
+    countries, _, report = apply(inputs, entry({"country_codes": ["CA"]}))
+    assert countries["CAN"]["entry_kind"] == "scenario_container"
+    assert report["retired_tags"] == []
 
 
 def test_retirement_blocked_by_kept_core(inputs):

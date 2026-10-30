@@ -150,7 +150,8 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
         "RU_RAY_50074027B23063195205268": ("KRS", "RU_RAY_50074027B3826534840215"),
     }
     CORRECTED_OWNERS = {"RU_RAY_50074027B5573235052647": "TAT", "RU_RAY_50074027B91746933948416": "TAT",
-                        "RU_RAY_50074027B96019567685522": "PRM"}
+                        "RU_RAY_50074027B96019567685522": "PRM",
+                        "RU_RAY_50074027B58613203253678": "KC02"}
 
     def test_reviewed_city_faces_match_the_preserved_district_owners(self) -> None:
         owners = json.loads((SCENARIO_DIR / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
@@ -160,13 +161,14 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
         # A city face or its reference district may since have been merged; the merged feature keeps the owner.
         for city_id, (owner, district_id) in self.CITY_DISTRICT_PAIRS.items():
             owner = self.CORRECTED_OWNERS.get(city_id, owner)
+            core_owner = "RKK" if owner == "KC02" else owner
             with self.subTest(city_id=city_id):
                 face = tno_feature(city_id)
                 self.assertEqual(owners[tno_feature(district_id)], owner)
                 self.assertEqual(owners[face], owner)
-                self.assertEqual(cores[face], [owner])
+                self.assertEqual(cores[face], [core_owner])
                 # A face merged with its district also carries the district's controller entry.
-                self.assertEqual({key: manual[face][key] for key in ("owner", "cores")}, {"owner": owner, "cores": [owner]})
+                self.assertEqual({key: manual[face][key] for key in ("owner", "cores")}, {"owner": owner, "cores": [core_owner]})
                 self.assertEqual(mutations[face], manual[face])
 
     def test_manual_replay_repairs_city_faces_without_absorbing_legitimate_enclaves(self) -> None:

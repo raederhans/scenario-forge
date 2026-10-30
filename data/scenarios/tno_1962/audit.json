@@ -1,6 +1,6 @@
 {
   "artifact_counts": {
-    "chunk_count": 247,
+    "chunk_count": 277,
     "feature_count": 9949,
     "water_count": 285
   },
@@ -112054,10 +112054,10 @@
     "ANG": {
       "base_iso2": "NA",
       "continent_label": "Africa",
-      "controller_feature_count": 31,
+      "controller_feature_count": 13,
       "display_name": "German Southwest Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 31,
+      "feature_count": 13,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -112124,10 +112124,10 @@
     "AOI": {
       "base_iso2": "ET",
       "continent_label": "Africa",
-      "controller_feature_count": 49,
+      "controller_feature_count": 0,
       "display_name": "Italian East Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 49,
+      "feature_count": 0,
       "hidden_from_country_list": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -113364,10 +113364,10 @@
     "FFR": {
       "base_iso2": "FR",
       "continent_label": "Africa",
-      "controller_feature_count": 14,
+      "controller_feature_count": 15,
       "display_name": "Free France",
       "entry_kind": "scenario_country",
-      "feature_count": 14,
+      "feature_count": 15,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113562,10 +113562,10 @@
     "GCO": {
       "base_iso2": "CD",
       "continent_label": "Africa",
-      "controller_feature_count": 72,
+      "controller_feature_count": 0,
       "display_name": "German Central Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 72,
+      "feature_count": 0,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113597,10 +113597,10 @@
     "GEA": {
       "base_iso2": "TZ",
       "continent_label": "Africa",
-      "controller_feature_count": 90,
+      "controller_feature_count": 0,
       "display_name": "German East Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 90,
+      "feature_count": 0,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114103,10 +114103,10 @@
     "IBR": {
       "base_iso2": "ES",
       "continent_label": "Europe",
-      "controller_feature_count": 155,
+      "controller_feature_count": 112,
       "display_name": "Iberian Union",
       "entry_kind": "scenario_country",
-      "feature_count": 155,
+      "feature_count": 112,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114297,10 +114297,10 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 240,
+      "controller_feature_count": 176,
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 240,
+      "feature_count": 176,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116213,10 +116213,10 @@
     "RKK": {
       "base_iso2": "GE",
       "continent_label": "Asia",
-      "controller_feature_count": 173,
+      "controller_feature_count": 0,
       "display_name": "Reichskommissariat Kaukasien",
       "entry_kind": "scenario_country",
-      "feature_count": 173,
+      "feature_count": 0,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116248,10 +116248,10 @@
     "RKM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 154,
+      "controller_feature_count": 0,
       "display_name": "Reichskommissariat Moskowien",
       "entry_kind": "scenario_country",
-      "feature_count": 154,
+      "feature_count": 0,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116353,10 +116353,10 @@
     "RKO": {
       "base_iso2": "LT",
       "continent_label": "Europe",
-      "controller_feature_count": 7,
+      "controller_feature_count": 0,
       "display_name": "Reichskommissariat Ostland",
       "entry_kind": "scenario_country",
-      "feature_count": 7,
+      "feature_count": 0,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116388,10 +116388,10 @@
     "RKP": {
       "base_iso2": "PL",
       "continent_label": "Europe",
-      "controller_feature_count": 22,
+      "controller_feature_count": 84,
       "display_name": "General Government of Poland",
       "entry_kind": "scenario_country",
-      "feature_count": 22,
+      "feature_count": 84,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116423,10 +116423,10 @@
     "RKU": {
       "base_iso2": "UA",
       "continent_label": "Europe",
-      "controller_feature_count": 33,
+      "controller_feature_count": 0,
       "display_name": "Reichskommissariat Ukraine",
       "entry_kind": "scenario_country",
-      "feature_count": 33,
+      "feature_count": 0,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116557,10 +116557,10 @@
     "SAF": {
       "base_iso2": "NA",
       "continent_label": "Africa",
-      "controller_feature_count": 38,
+      "controller_feature_count": 9,
       "display_name": "South Africa",
       "entry_kind": "scenario_country",
-      "feature_count": 38,
+      "feature_count": 9,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -118180,13 +118180,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "733c1f93a36da4df0a8c4d71065b4058cb65c34c9cedac43b26a56bbdeefb4a1",
+  "snapshot_fingerprint": "931425b12af68ea42d803329fb0a30efb0fff2bbb9e776bb793073ff6603781a",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "59d397ee866e12015c302ce0333db740f0fdfc7df6496c5dc899faa71b579f0c",
-    "detail_chunk_manifest_sha256": "e3394a72682e742ad709ba11ee189204c65343c2ea33eada215d1e367f556910",
-    "runtime_bootstrap_topology_sha256": "acacf2f0387fdf64932f846fc539dead6299dea4b9c708e7829bac49f8d491bd",
-    "runtime_topology_sha256": "468e1b9961b12c75a4fab85bb1c3201d65e17e231484a5044c53fffe792a9e92"
+    "build_snapshot_sha256": "26b6eb05edc46a62804fbeb292f399fc699db4f916c028d544da22b2801f99dd",
+    "detail_chunk_manifest_sha256": "7e4f48de0b34be1c8dddf45b4e59fbb9cc5a991e1d6830cc22efe16888fa856d",
+    "runtime_bootstrap_topology_sha256": "3eff73f6706019d099df82397d60a03985f98fce220f9f9f150506e82a8b51b2",
+    "runtime_topology_sha256": "95956bb121a77cc3a6dd4e63572e2bc0af6b50402e3329038c8d32951f8d0d22"
   },
   "summary": {
     "approximate_count": 973,
@@ -118197,7 +118197,7 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 218,
+    "controller_count": 253,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -118207,7 +118207,7 @@
     "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 218,
+    "owner_count": 253,
     "quality_counts": {
       "approx_existing_geometry": 1033,
       "direct_country_copy": 2698,
