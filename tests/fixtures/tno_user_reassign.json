@@ -1,0 +1,218 @@
+{
+  "BY_INT_GOMEL": {
+    "from": "RKO",
+    "to": "RKO"
+  },
+  "BY_INT_BREST": {
+    "from": "RKU",
+    "to": "RKO"
+  },
+  "RU_MRG_56d7f2c40815": {
+    "from": "RKO",
+    "to": "RKM"
+  },
+  "RU_MRG_e85ce6b2cbb5": {
+    "from": "RKO",
+    "to": "RKM"
+  },
+  "RU_MRG_baef030e052d": {
+    "from": "RKO",
+    "to": "RKM"
+  },
+  "RU_RAY_50074027B40310096212326": {
+    "from": "RKO",
+    "to": "RKM"
+  },
+  "RU_RAY_50074027B24884281398381": {
+    "from": "RKO",
+    "to": "RKM"
+  },
+  "RU_MRG_9630c25ee3c6": {
+    "from": "RKO",
+    "to": "RKM"
+  },
+  "RU_MRG_6f87652d4746": {
+    "from": "RKO",
+    "to": "RKM"
+  },
+  "RU_RAY_50074027B72539224473791": {
+    "from": "VOL",
+    "to": "KOM"
+  },
+  "RU_MRG_3bf1b1438247": {
+    "from": "VOL",
+    "to": "KOM"
+  },
+  "RU_MRG_48dc139f3c1a": {
+    "from": "VOL",
+    "to": "WRS"
+  },
+  "RU_RAY_50074027B62324973885793": {
+    "from": "VOL",
+    "to": "WRS"
+  },
+  "RU_RAY_50074027B44706978372394": {
+    "from": "VOL",
+    "to": "WRS"
+  },
+  "RU_RAY_50074027B45493241507504": {
+    "from": "ONG",
+    "to": "WRS"
+  },
+  "RU_MRG_72b0f3ba03bc": {
+    "from": "TAT",
+    "to": "VYT"
+  },
+  "RU_MRG_da0982e025af": {
+    "from": "TAT",
+    "to": "VYT"
+  },
+  "RU_RAY_50074027B83221615215133": {
+    "from": "PRM",
+    "to": "VOK"
+  },
+  "RU_RAY_50074027B56678877765671": {
+    "from": "WRS",
+    "to": "VOK"
+  },
+  "RU_RAY_50074027B96103137717036": {
+    "from": "WRS",
+    "to": "WRS"
+  },
+  "RU_RAY_50074027B52153292155727": {
+    "from": "WRS",
+    "to": "WRS"
+  },
+  "RU_RAY_50074027B94648571764089": {
+    "from": "WRS",
+    "to": "VOK"
+  },
+  "RU_RAY_50074027B13808999174668": {
+    "from": "WRS",
+    "to": "WRS"
+  },
+  "RU_MRG_f3d2b13e0b30": {
+    "from": "BKR",
+    "to": "PRM"
+  },
+  "RU_MRG_ab652814dff4": {
+    "from": "RKM",
+    "to": "TAT"
+  },
+  "RU_MRG_dfe6c1e5f415": {
+    "from": "RKM",
+    "to": "GOR"
+  },
+  "RU_MRG_7f673bbbcb21": {
+    "from": "RKM",
+    "to": "GOR"
+  },
+  "RU_RAY_50074027B44365109797977": {
+    "from": "RKM",
+    "to": "GOR"
+  },
+  "RU_RAY_50074027B23799547406598": {
+    "from": "TOM",
+    "to": "FAV"
+  },
+  "RU_MRG_d7ef4389d36f": {
+    "from": "TYM",
+    "to": "SVR"
+  },
+  "RU_RAY_50074027B32599021943629": {
+    "from": "TYM",
+    "to": "SVR"
+  },
+  "RU_RAY_50074027B34454529298169": {
+    "from": "RFA",
+    "to": "OMO"
+  },
+  "RU_MRG_565e6f7cc145": {
+    "from": "RKM",
+    "to": "VOL"
+  },
+  "RU_MRG_975a1a106b2a": {
+    "from": "RKM",
+    "to": "VOL"
+  },
+  "RU_MRG_46291296feb9": {
+    "from": "RKM",
+    "to": "VOL"
+  },
+  "RU_RAY_50074027B60606739466906": {
+    "from": "ONG",
+    "to": "RKM"
+  },
+  "RU_RAY_50074027B62612106128387": {
+    "from": "RKM",
+    "to": "RKM"
+  },
+  "RU_RAY_50074027B82590027772677": {
+    "from": "VOK",
+    "to": "WRS"
+  },
+  "MNG-3320": {
+    "from": "MEN",
+    "to": "MON"
+  },
+  "MNG-3318": {
+    "from": "MEN",
+    "to": "MON"
+  },
+  "MNG-3322": {
+    "from": "MEN",
+    "to": "MON"
+  },
+  "MNG-3321": {
+    "from": "MEN",
+    "to": "MON"
+  },
+  "MNG-3316": {
+    "from": "MEN",
+    "to": "MON"
+  },
+  "MNG-3329": {
+    "from": "MEN",
+    "to": "MON"
+  },
+  "MNG-3327": {
+    "from": "MEN",
+    "to": "MON"
+  },
+  "MNG-3323": {
+    "from": "MEN",
+    "to": "MON"
+  },
+  "MNG-3326": {
+    "from": "MEN",
+    "to": "MON"
+  },
+  "MNG-3328": {
+    "from": "MEN",
+    "to": "MON"
+  },
+  "MNG-3324": {
+    "from": "MEN",
+    "to": "MON"
+  },
+  "RU_RAY_50074027B8579713719118": {
+    "from": "BRY",
+    "to": "CHT"
+  },
+  "RU_MRG_f38bf2291525": {
+    "from": "BRY",
+    "to": "CHT"
+  },
+  "RU_RAY_50074027B90244452662579": {
+    "from": "FIC",
+    "to": "AMR"
+  },
+  "RU_RAY_50074027B88724749460683": {
+    "from": "MAN",
+    "to": "AMR"
+  },
+  "RU_MRG_eb6edd92ee8d": {
+    "from": "MAN",
+    "to": "AMR"
+  }
+}

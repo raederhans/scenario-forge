@@ -329,16 +329,14 @@ class WorkMapProjectionTests(unittest.TestCase):
         self.assertNotIn('data-owner="RU"', svg)
         metadata = read_json(ASSETS / "work-alt-history-med.json")
         self.assertEqual(metadata["counts"]["political_source_features"], 1060)
-        for path in work_maps.tno_political_detail_chunk_paths(output["bbox"]):
-            if path.name != "political.detail.country.ger.part.1.json":
-                continue
-            helper = next(feature for feature in work_maps.geojson_features(path)
-                          if (feature.get("properties") or {}).get("id") == "RU_ARCTIC_FB_GER_008")
+        helpers = [feature for path in work_maps.tno_political_detail_chunk_paths(output["bbox"])
+                   for feature in work_maps.geojson_features(path)
+                   if str((feature.get("properties") or {}).get("id", "")).startswith("RU_ARCTIC_FB_")]
+        if not helpers:
+            self.fail("expected TNO shell helper source is missing")
+        for helper in helpers:
             self.assertIs(helper["properties"]["render_as_base_geography"], False)
             self.assertIs(helper["properties"]["interactive"], False)
-            break
-        else:
-            self.fail("expected TNO shell helper source is missing")
         self.assertIn('data-atlantropa-layer="water"', svg)
         self.assertIn(f'fill="{work_maps.PALETTE["sea"]}"', svg)
 

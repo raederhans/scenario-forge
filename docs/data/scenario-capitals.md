@@ -152,3 +152,49 @@ KAZ 独立，用 Akmola／阿克莫拉；台北城市宿主目前归 CHI，采�
 - TNO `SPR` 当前仅拥有三个 `ATLPRV_*` 和一个 `ATLSHL_*` 填海地块，没有可信的境内聚落，标记为不分配首都；不能把马德里移到填海区。
 - 无领土的释放标签不再生成额外首都星标。
 - HGO 已迁至 `apps/hgo/` 独立原生像素编辑器。原始国家首都州信息可以保留，但不能等同于可靠的首都城市坐标；原生地点来自可验证的胜利点引用，不接入共底世界城市转换。旧 `hgo_1936` 开发预览与其构建器已退役。
+
+## TNO 1962 第二批
+
+东部行政区沿用占领期名称。阿扎瓦德原首都内马所在地块的采样份额为 0.57，保留原归属，因此采用境内基达尔；不采用原版属 HAU 的廷巴克图。毛里塔尼亚采用特拉扎州内的罗索，达荷美采用莫诺州内的洛科萨。拉多姆城区从华沙分区校正到拉多姆分区。BWA、AOF、MAL 保留边界或采样不足的地块，其首都随剩余领土调整。
+
+| Tag | 首都 | 城市 ID | 点位地块 |
+|---|---|---|---|
+| OE01 | Reval / 雷瓦尔 | `CITY::ne::1159150877` | `EE001` |
+| OE02 | Kauen / 考恩 | `CITY::ne::1159136375` | `LT022` |
+| OE03 | Minsk / 明斯克 | `CITY::ne::1159151149` | `BY_CITY_MINSK` |
+| OE04 | Pleskau / 普斯科夫 | `CITY::ne::1159149529` | `RU_RAY_50074027B86681375933080` |
+| UK01 | Rowno / 罗夫诺 | `CITY::ne::1159134173` | `UA_RAY_74538382B36980255523800` |
+| UK02 | Shitomir / 日托米尔 | `CITY::ne::1159149327` | `UA_RAY_74538382B57692221763967` |
+| UK03 | Tschernigow / 切尔尼戈夫 | `CITY::ne::1159126717` | `UA_RAY_74538382B44220139144156` |
+| UK04 | Reichenaustadt / 赖歇瑙施塔特 | `CITY::ne::1159149329` | `UA_RAY_74538382B23045356862491` |
+| UK05 | Nikolajew / 尼古拉耶夫 | `CITY::ne::1159126699` | `UA_RAY_74538382B2161330582129` |
+| UK06 | Melitopol / 梅利托波尔 | `CITY::ne::1159134253` | `UA_RAY_74538382B95492559683598` |
+| UK07 | Charkow / 哈尔科夫 | `CITY::ne::1159149333` | `UA_RAY_74538382B36501884751905` |
+| UK08 | Hughesdorf / 休斯多夫 | `CITY::ne::1159149331` | `UA_RAY_74538382B54113761495064` |
+| PG01 | Warschau / 华沙 | `CITY::ne::1159151299` | `PL_POW_1465` |
+| PG02 | Radom / 拉多姆 | `CITY::gn::760778` | `PL_POW_1463` |
+| PG03 | Lublin / 卢布林 | `CITY::ne::1159139095` | `PL_POW_0663` |
+| PG04 | Lemberg / 伦贝格 | `CITY::ne::1159149323` | `UA_RAY_74538382B46853229377150` |
+| AYR | Agadez / 阿加德兹 | `CITY::ne::1159150627` | `NE_ADM1_NER-800` |
+| AZW | Kidal / 基达尔 | `CITY::gn::2455290` | `ML_ADM1_MLI-2689` |
+| CHD | Moussoro / 穆索罗 | `CITY::gn::2427336` | `TD_ADM1_TCD-5581` |
+| MAU | Rosso / 罗索 | `CITY::ne::1159148579` | `MR_ADM1_MRT-2788` |
+| MLI | Bamako / 巴马科 | `CITY::ne::1159150945` | `ML_ADM1_MLI-2792` |
+| GUI | Conakry / 科纳克里 | `CITY::ne::1159150997` | `GN_ADM1_385441B29247776226513` |
+| HAU | Niamey / 尼亚美 | `CITY::ne::1159150605` | `NE_ADM1_NER-94` |
+| SEN | Dakar / 达喀尔 | `CITY::ne::1159151513` | `SN_ADM1_SEN-759` |
+| GHA | Accra / 阿克拉 | `CITY::ne::1159151403` | `GH_ADM1_GHA-2172` |
+| DAH | Lokossa / 洛科萨 | `CITY::ne::1159120959` | `BJ_ADM1_BEN-2180` |
+| BKF | Ouagadougou / 瓦加杜古 | `CITY::ne::1159151173` | `BF_ADM1_92566538B14190085014946` |
+| YOR | Lagos / 拉各斯 | `CITY::ne::1159151591` | `NG_ADM1_NGA-2850` |
+| SIE | Freetown / 弗里敦 | `CITY::ne::1159150625` | `SL_ADM1_SLE-761` |
+| CAO | Bamenda / 巴门达 | `CITY::ne::1159150315` | `CM_ADM1_CMR-1477` |
+| NRB | Kuching / 古晋 | `CITY::ne::1159149803` | `MYS-1187` |
+| SHO | Shōnan / 昭南 | `CITY::ne::1159151627` | `SGP-4871` |
+| MLY | George Town / 乔治市 | `CITY::ne::1159149765` | `MYS-1139` |
+| UPH | Tacloban / 塔克洛班 | `CITY::ne::1159137983` | `PHL-5535` |
+| SPH | Tuguegarao / 土格加劳 | `CITY::ne::1159146605` | `PHL-2545` |
+| VIC | Cao Bằng / 高平 | `CITY::ne::1159113189` | `VNM-511` |
+| MAL | Brunei Town / 文莱城 | `CITY::ne::1159151083` | `BN_ADM1_BRN-1182` |
+| BWA | Abeokuta / 阿贝奥库塔 | `CITY::ne::1159138799` | `NG_ADM1_NGA-2852` |
+| AOF | Lomé / 洛美 | `CITY::ne::1159150535` | `TG_ADM1_TGO-87` |

@@ -34,6 +34,20 @@ def rebuild_districts(scenario_dir):
     write_json(context["districtGroupsPath"], payload)
 
 
+def update_country_geography(countries, owners, features, base_features, country_meta, tags):
+    counts = {tag: Counter() for tag in tags}
+    for fid in sorted(features):
+        tag = owners[fid]
+        if tag in counts:
+            code = base_features.get(fid, features[fid])["cntr_code"]
+            counts[tag][code] += 1
+    for tag, codes in counts.items():
+        code = codes.most_common(1)[0][0]
+        countries[tag].update({key: code for key in ("lookup_iso2", "base_iso2", "provenance_iso2")})
+        countries[tag].update({key: country_meta.get(code, {}).get(key, "") for key in
+                              ("continent_id", "continent_label", "subregion_id", "subregion_label")})
+
+
 def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
                  data_dir=ROOT / "data", refresh=refresh_scenario,
                  rebuild=rebuild_districts, synchronize=synchronize_scenario_snapshot,
@@ -59,7 +73,16 @@ def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
         feature_splits=manifest.get("hierarchy_overrides", {}).get("feature_splits", {}),
         topology=editable_topology, point_for_feature=make_point_lookup(editable_topology),
     )
-    counts = Counter({**owners, **{fid: row["owner"] for fid, row in assignments.items()}}.values())
+    result_owners = {**owners, **{fid: row["owner"] for fid, row in assignments.items()}}
+    base_topology = read_json_source(data_dir / "europe_topology.runtime_political_v1.json")
+    update_country_geography(
+        countries, result_owners,
+        {g["properties"]["id"]: g["properties"] for g in geometries},
+        {g["properties"]["id"]: g["properties"]
+         for g in base_topology["objects"]["political"]["geometries"]},
+        meta, {entry["tag"] for entry in overlay["entries"]},
+    )
+    counts = Counter(result_owners.values())
     for tag, country in countries.items():
         country["feature_count"] = counts[tag]
         if "controller_feature_count" in country:

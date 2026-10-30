@@ -24,6 +24,10 @@ def test_atomic_identity_migration_and_idempotence(migration_directory):
     tmp_path = migration_directory
     payloads = {
         'manifest.json': {'scenario_id': 'tno_1962'},
+        'runtime_topology.topo.json': {'objects': {'political': {'geometries': [
+            {'properties': {'id': 'RU_ARCTIC_FB_RSF_034', 'scenario_shell_owner_hint': 'RSF',
+                            'scenario_shell_controller_hint': 'TAN'}},
+        ]}}},
         'countries.json': {'countries': {tag: {'tag': tag, 'display_name': name} for tag, name in
                                        [('MAG', 'Magnitogorsk'), ('RSF', 'Magadan'), ('TAN', 'Committee'),
                                         ('PRC', 'Old China'), ('GSW', 'Colonial government'), ('ANG', 'Old Angola')]}},
@@ -43,6 +47,9 @@ def test_atomic_identity_migration_and_idempotence(migration_directory):
     assert countries['MAG']['display_name'] == 'Magadan'
     assert countries['PRC']['display_name'] == 'Committee'
     assert countries['ANG']['display_name'] == 'Colonial government'
+    shell = read_json(tmp_path / 'runtime_topology.topo.json')['objects']['political']['geometries'][0]['properties']
+    assert shell == {'id': 'RU_ARCTIC_FB_RSF_034', 'scenario_shell_owner_hint': 'MAG',
+                     'scenario_shell_controller_hint': 'PRC'}
     assert read_json(tmp_path / 'owners.by_feature.json')['owners'] == dict(a='MGN', b='MAG', c='PRC', d='ANG')
     assert read_json(tmp_path / 'cores.by_feature.json')['cores']['a'] == ['MGN', 'CHI']
     assert read_json(tmp_path / 'city_overrides.json')['capitals_by_tag']['PRC'] == 'Kyzyl'

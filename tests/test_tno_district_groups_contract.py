@@ -60,7 +60,7 @@ class TnoDistrictGroupsContractTest(unittest.TestCase):
             owned = {feature_id for feature_id, owner in self.owners.items() if owner == tag}
             with self.subTest(tag=tag):
                 self.assertEqual(sorted(owned - assigned), [])
-                self.assertGreaterEqual(len(record["districts"]), 2)
+                self.assertGreaterEqual(len(record["districts"]), 1 if tag in {"RKO", "RKU", "RKP"} else 2)
 
     def test_district_records_are_named(self) -> None:
         for tag, record in self.payload["tags"].items():
