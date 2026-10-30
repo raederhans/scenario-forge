@@ -125,6 +125,10 @@ test("pixel capture rechecks native completion atomically and returns real misma
   assert.equal(readSettledRasterFrame({ zoom: 100, captureReference: true }), false);
   assert.equal(captures, 0, "a coarse frame must never become the reference after an earlier ready check");
   state.renderPerfMetrics.drawPoliticalBackgroundFillsPass.deferredFullCacheReady = true;
+  Object.assign(state, { detailDeferred: true, detailPromotionInFlight: true });
+  assert.equal(readSettledRasterFrame({ zoom: 100, captureReference: true }), false);
+  assert.equal(captures, 0, "a frame drawn before the deferred detail geometry lands must not become the reference");
+  Object.assign(state, { detailDeferred: false, detailPromotionInFlight: false });
   const reference = readSettledRasterFrame({ zoom: 100, captureReference: true });
   assert.equal(reference.background.deferredFullCacheReady, true);
   color = 2;
