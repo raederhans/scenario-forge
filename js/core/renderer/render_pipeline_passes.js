@@ -8,6 +8,7 @@ export function preflightPrivateRenderPasses(definitions, {
   prepareRenderPassAsync,
   shouldPrepare = () => true,
   beforePrepare = () => true,
+  canReusePendingPass = () => false,
   onPrepareError,
 }) {
   let preparationPending = false;
@@ -18,7 +19,7 @@ export function preflightPrivateRenderPasses(definitions, {
     try {
       const preparation = prepareRenderPassAsync(passName);
       if (preparation) {
-        preparationPending = true;
+        if (!canReusePendingPass(passName)) preparationPending = true;
         if (onPrepareError) Promise.resolve(preparation).catch(error => onPrepareError(passName, error));
       }
     } catch (error) {
@@ -81,6 +82,7 @@ export function createRenderPipelinePassesOwner({
     getContextScenarioReuseDecision = () => ({ enabled: false }),
     getExactAfterSettleControllerState = () => null,
     getPassReferenceTransform = () => null,
+    setPassReferenceTransform = null,
     getPassCoverage = () => null,
     getRenderPassCacheState = () => ({ signatures: {}, dirty: {}, reasons: {}, canvases: {}, counters: {} }),
     getRenderPassSignature = () => "",
@@ -100,6 +102,28 @@ export function createRenderPipelinePassesOwner({
   } = helpers;
 
   const noopDrawPass = () => {};
+  const lastCommitted = {};
+
+  function canReusePendingPass(passName, cache = getRenderPassCacheState()) {
+    if (passName !== "borders" || !cache.canvases?.[passName]) return false;
+    if (getPassReferenceTransform(passName)) return true;
+    const committed = lastCommitted[passName];
+    const canvas = cache.canvases[passName];
+    // A resize keeps the canvas object but clears its pixels: never restore a
+    // reference for a surface whose dimensions changed since it was committed.
+    // Every commit (including coverage refreshes made outside this pipeline)
+    // rewrites the pass signature, so a changed signature means the surface
+    // was repainted since this snapshot and its transform is unknown here.
+    if (!committed || committed.canvas !== canvas
+      || committed.width !== canvas.width || committed.height !== canvas.height
+      || committed.signature !== cache.signatures?.[passName]) return false;
+    // Invalidation cleared the reference but the surface still holds the
+    // borders committed at that transform: restore it so the composite can
+    // scale the stale surface exactly like the interaction frame did.
+    if (typeof setPassReferenceTransform !== "function") return false;
+    setPassReferenceTransform(passName, committed.transform);
+    return !!getPassReferenceTransform(passName);
+  }
 
   function getIdleRenderPassDefinitions() {
     return IDLE_RENDER_PASS_DEFINITIONS.map(({ passName, drawKey }) => {
@@ -206,8 +230,25 @@ export function createRenderPipelinePassesOwner({
       return;
     }
     if ((passName === "physicalBase" || passName === "contextScenario" || passName === "contextMarkers" || passName === "borders" || passName === "labels")
-      && prepareRenderPassAsync(passName)) return false;
+      && prepareRenderPassAsync(passName)) {
+      if (!canReusePendingPass(passName, cache)) return false;
+      timings.usedDirtyFastFramePasses = [timings.usedDirtyFastFramePasses, passName].filter(Boolean).join(",");
+      recordRenderPerfMetric("idleRenderPassDeferredForPreparation", 0, {
+        passName,
+        reason: "preparation-pending-reuse-surface",
+        activeScenarioId: String(state.activeScenarioId || ""),
+      });
+      return;
+    }
     renderPassToCache(passName, drawFn, transform, timings);
+    const committedCanvas = cache.canvases?.[passName] || null;
+    lastCommitted[passName] = {
+      canvas: committedCanvas,
+      width: committedCanvas?.width,
+      height: committedCanvas?.height,
+      signature: cache.signatures?.[passName],
+      transform: { x: transform.x, y: transform.y, k: transform.k },
+    };
   }
 
   function ensureIdleRenderPasses(timings, passNames = null) {
@@ -229,12 +270,24 @@ export function createRenderPipelinePassesOwner({
     // These producers own private candidates and independent cancellation
     // fences. Start all of them before waiting for any one of them; no pass
     // canvas is cleared or published by this preflight.
+    const pendingPassNames = [];
     const preparationPending = preflightPrivateRenderPasses(definitions, {
-      prepareRenderPassAsync,
+      prepareRenderPassAsync: (passName) => {
+        const preparation = prepareRenderPassAsync(passName);
+        if (preparation) pendingPassNames.push(passName);
+        return preparation;
+      },
+      canReusePendingPass,
       shouldPrepare: passName => cache.dirty[passName]
         || cache.signatures[passName] !== getRenderPassSignature(passName, transform),
     });
-    if (preparationPending) return false;
+    if (preparationPending) {
+      recordRenderPerfMetric("idleRenderPassPreflightPending", 0, {
+        passNames: pendingPassNames.join(","),
+        activeScenarioId: String(state.activeScenarioId || ""),
+      });
+      return false;
+    }
     const startedAt = nowMs();
     for (let index = 0; index < definitions.length; index += 1) {
       const [passName, drawFn] = definitions[index];
