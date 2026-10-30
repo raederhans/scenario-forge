@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Local Playwright tooling for Scenario Forge browser inspection and e2e regression tests.",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "scripts": {
     "test": "node tools/run_all_tests.mjs node && node tools/run_all_tests.mjs python",
