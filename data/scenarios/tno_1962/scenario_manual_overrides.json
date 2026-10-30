@@ -7241,6 +7241,153 @@
       ],
       "owner": "ITA"
     },
+    "TWN-1156": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1158": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1160": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1161": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1162": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1163": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1164": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1165": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1166": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1167": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1168": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1169": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1170": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1171": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1172": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1173": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1174": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1176": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-1177": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-3414": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
+    "TWN-3415": {
+      "controller": "JTWN",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JTWN"
+    },
     "UA_MRG_01673e94c186": {
       "controller": "RKU",
       "cores": [
@@ -7836,6 +7983,34 @@
       ],
       "owner": "RKU"
     },
+    "UA_RAY_74538382B10810755627981": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B12626856106214": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B17328028725822": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B18343308961646": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
     "UA_RAY_74538382B19464931464269": {
       "controller": "TNS",
       "cores": [
@@ -7849,6 +8024,34 @@
         "TNS"
       ],
       "owner": "TNS"
+    },
+    "UA_RAY_74538382B24072865224387": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B30799636343123": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B31597126471541": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B3276437105714": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
     },
     "UA_RAY_74538382B34306237745090": {
       "controller": "TNS",
@@ -7878,12 +8081,26 @@
       ],
       "owner": "RKM"
     },
+    "UA_RAY_74538382B47758211773177": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
     "UA_RAY_74538382B49727252906057": {
       "controller": "TNS",
       "cores": [
         "TNS"
       ],
       "owner": "TNS"
+    },
+    "UA_RAY_74538382B52948461958272": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
     },
     "UA_RAY_74538382B56756126132930": {
       "controller": "TNS",
@@ -7892,6 +8109,13 @@
       ],
       "owner": "TNS"
     },
+    "UA_RAY_74538382B62014959099240": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
     "UA_RAY_74538382B72647920433352": {
       "controller": "TNS",
       "cores": [
@@ -7899,12 +8123,61 @@
       ],
       "owner": "TNS"
     },
+    "UA_RAY_74538382B73102854459711": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B78065593112494": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B80563569865238": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B84040377374615": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B84610439401970": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
+    "UA_RAY_74538382B85800934600856": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
+    },
     "UA_RAY_74538382B90572707310825": {
       "controller": "TNS",
       "cores": [
         "TNS"
       ],
       "owner": "TNS"
+    },
+    "UA_RAY_74538382B91806639169097": {
+      "controller": "CRI",
+      "cores": [
+        "GER"
+      ],
+      "owner": "CRI"
     },
     "UA_RAY_74538382B94391556881320": {
       "controller": "TNS",
@@ -8080,6 +8353,41 @@
         "WLS"
       ],
       "owner": "WLS"
+    },
+    "US_CNTY_15001": {
+      "controller": "JHAW",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JHAW"
+    },
+    "US_CNTY_15003": {
+      "controller": "JHAW",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JHAW"
+    },
+    "US_CNTY_15005": {
+      "controller": "JHAW",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JHAW"
+    },
+    "US_CNTY_15007": {
+      "controller": "JHAW",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JHAW"
+    },
+    "US_CNTY_15009": {
+      "controller": "JHAW",
+      "cores": [
+        "JAP"
+      ],
+      "owner": "JHAW"
     },
     "US_MRG_03d789d015aa": {
       "controller": "USA",
@@ -8819,6 +9127,47 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "CRI": {
+      "base_iso2": "UA",
+      "capital_state_id": null,
+      "color_hex": "#4a4a4a",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 18,
+      "display_name": "Reichsgau Gotenland",
+      "display_name_en": "Reichsgau Gotenland",
+      "display_name_zh": "哥特兰帝国大区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 18,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "UA",
+      "notes": "",
+      "parent_owner_tag": "GER",
+      "parent_owner_tags": [
+        "GER"
+      ],
+      "primary_rule_source": "tno_cri",
+      "provenance_iso2": "UA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_cri"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "CRI"
+    },
     "CUB": {
       "display_name": "Cuba",
       "display_name_en": "Cuba",
@@ -9041,6 +9390,88 @@
       "display_name_zh": "大日本帝国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "JHAW": {
+      "base_iso2": "JAP",
+      "capital_state_id": null,
+      "color_hex": "#cb6c85",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 5,
+      "display_name": "Hawaii Occupation Government",
+      "display_name_en": "Hawaii Occupation Government",
+      "display_name_zh": "夏威夷占领政府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "JAP",
+      "notes": "",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "tno_jhaw",
+      "provenance_iso2": "JAP",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_jhaw"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "JHAW"
+    },
+    "JTWN": {
+      "base_iso2": "JAP",
+      "capital_state_id": null,
+      "color_hex": "#e66e6d",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 21,
+      "display_name": "Taiwan Government-General",
+      "display_name_en": "Taiwan Government-General",
+      "display_name_zh": "台湾总督府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 21,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "JAP",
+      "notes": "",
+      "parent_owner_tag": "JAP",
+      "parent_owner_tags": [
+        "JAP"
+      ],
+      "primary_rule_source": "tno_jtwn",
+      "provenance_iso2": "JAP",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_jtwn"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "JTWN"
     },
     "KAZ": {
       "display_name": "Kazakhstan",

@@ -1,6 +1,6 @@
 {
   "artifact_counts": {
-    "chunk_count": 211,
+    "chunk_count": 214,
     "feature_count": 9949,
     "water_count": 285
   },
@@ -113632,10 +113632,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 538,
+      "controller_feature_count": 520,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 538,
+      "feature_count": 520,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -114330,10 +114330,10 @@
     "JAP": {
       "base_iso2": "JP",
       "continent_label": "Asia",
-      "controller_feature_count": 95,
+      "controller_feature_count": 69,
       "display_name": "Japan",
       "entry_kind": "",
-      "feature_count": 95,
+      "feature_count": 69,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -118180,11 +118180,11 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "f7d74d8910eca06e2a409dfb18dee5001bf7089dea8e77188ef74b232bf49ee4",
+  "snapshot_fingerprint": "39447e31b8cb2931ce69fa662f65cc059d8cb487b2d21593daf5a53bbe16ad81",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "6ac5c66cb1ce917e0527c0dfd279e8574d7017f5128b2fba81ff7ac78e47f00a",
-    "detail_chunk_manifest_sha256": "e8cf1f175823def75242c34abfb29196a2a415cd386ab38c55668ea937af9991",
+    "build_snapshot_sha256": "f2498b40a341b105040390f47b6b9b3b435ea24e4b4732a19f8e36d0bee3bf49",
+    "detail_chunk_manifest_sha256": "24b6ea839190d3293b091628ed818a87e048d18774de45e8c2c004dc2631a9fe",
     "runtime_bootstrap_topology_sha256": "338d98c608bd7bed9ecfc46441d5d051734d8926dfc5b4c8851166f120a31902",
     "runtime_topology_sha256": "2260a1fb35ec521421456f374ad4da2e143875abf05d3cf7628c35f6e7ad46e1"
   },
@@ -118197,7 +118197,7 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 180,
+    "controller_count": 183,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -118207,7 +118207,7 @@
     "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 180,
+    "owner_count": 183,
     "quality_counts": {
       "approx_existing_geometry": 1033,
       "direct_country_copy": 2698,

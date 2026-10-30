@@ -1,0 +1,109 @@
+{
+  "entries": [
+    {
+      "color_hex": "#e66e6d",
+      "cores": "keep",
+      "id": "tno_jtwn",
+      "name_en": "Taiwan Government-General",
+      "name_zh": "台湾总督府",
+      "only_from_owners": [
+        "JAP"
+      ],
+      "parent_owner_tag": "JAP",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "TWN-1156",
+          "TWN-1158",
+          "TWN-1160",
+          "TWN-1161",
+          "TWN-1162",
+          "TWN-1163",
+          "TWN-1164",
+          "TWN-1165",
+          "TWN-1166",
+          "TWN-1167",
+          "TWN-1168",
+          "TWN-1169",
+          "TWN-1170",
+          "TWN-1171",
+          "TWN-1172",
+          "TWN-1173",
+          "TWN-1174",
+          "TWN-1176",
+          "TWN-1177",
+          "TWN-3414",
+          "TWN-3415"
+        ]
+      },
+      "subject_kind": "colony",
+      "tag": "JTWN"
+    },
+    {
+      "color_hex": "#cb6c85",
+      "cores": "keep",
+      "id": "tno_jhaw",
+      "name_en": "Hawaii Occupation Government",
+      "name_zh": "夏威夷占领政府",
+      "only_from_owners": [
+        "JAP"
+      ],
+      "parent_owner_tag": "JAP",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "US_CNTY_15001",
+          "US_CNTY_15003",
+          "US_CNTY_15005",
+          "US_CNTY_15007",
+          "US_CNTY_15009"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "JHAW"
+    },
+    {
+      "color_hex": "#4a4a4a",
+      "cores": "keep",
+      "id": "tno_cri",
+      "name_en": "Reichsgau Gotenland",
+      "name_zh": "哥特兰帝国大区",
+      "only_from_owners": [
+        "GER"
+      ],
+      "parent_owner_tag": "GER",
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_RAY_74538382B10810755627981",
+          "UA_RAY_74538382B12626856106214",
+          "UA_RAY_74538382B17328028725822",
+          "UA_RAY_74538382B18343308961646",
+          "UA_RAY_74538382B24072865224387",
+          "UA_RAY_74538382B30799636343123",
+          "UA_RAY_74538382B31597126471541",
+          "UA_RAY_74538382B3276437105714",
+          "UA_RAY_74538382B47758211773177",
+          "UA_RAY_74538382B52948461958272",
+          "UA_RAY_74538382B62014959099240",
+          "UA_RAY_74538382B73102854459711",
+          "UA_RAY_74538382B78065593112494",
+          "UA_RAY_74538382B80563569865238",
+          "UA_RAY_74538382B84040377374615",
+          "UA_RAY_74538382B84610439401970",
+          "UA_RAY_74538382B85800934600856",
+          "UA_RAY_74538382B91806639169097"
+        ]
+      },
+      "subject_kind": "colonial_government",
+      "tag": "CRI"
+    }
+  ],
+  "version": 1
+}
