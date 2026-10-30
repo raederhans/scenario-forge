@@ -37,7 +37,7 @@
     "data/scenarios/tno_1962/scenario_atlantropa.topo.json"
   ],
   "feature_counts": {
-    "territories": 34,
+    "territories": 50,
     "political_features": 2326,
     "capitals": 7,
     "base_land_features_inspected": 22185,
@@ -62,7 +62,7 @@
     "atlantropa_shoal_paths": 61
   },
   "counts": {
-    "territories": 34,
+    "territories": 50,
     "political_features": 2326,
     "capitals": 7,
     "base_land_features_inspected": 22185,
@@ -104,7 +104,15 @@
     "ITA",
     "MC",
     "MNT",
+    "OE01",
+    "OE02",
+    "OE03",
+    "OE04",
     "ONG",
+    "PG01",
+    "PG02",
+    "PG03",
+    "PG04",
     "RKM",
     "RKN",
     "RKNO",
@@ -118,6 +126,14 @@
     "SWE",
     "SWI",
     "TUR",
+    "UK01",
+    "UK02",
+    "UK03",
+    "UK04",
+    "UK05",
+    "UK06",
+    "UK07",
+    "UK08",
     "VOL",
     "WLS",
     "WRS"
