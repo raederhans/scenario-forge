@@ -454,6 +454,24 @@ test('water revisions rebuild without geometry transfers and unchanged sources r
   h.state.sceneGeneration=1;h.runtime.getMeshes();await h.flush();await h.finish();assert.equal(calls,3);
 });
 
+test('an empty water collection replaced by another empty collection does not rebuild the graph', async () => {
+  let landMask = { type: 'FeatureCollection', features: [] }, calls = 0;
+  const h = harness({ getWaterRevision: () => [landMask], getWaterMaskSources: () => { calls++; return { land: landMask }; } });
+  h.runtime.getMeshes(); await h.flush(); await h.finish();
+  assert.equal(h.tasks.length, 1); assert.equal(calls, 1);
+  const version = h.runtime.diagnostics().sourceVersion;
+  landMask = { type: 'FeatureCollection', features: [] };
+  h.runtime.getMeshes(); await h.flush();
+  assert.equal(h.tasks.length, 1, 'another empty collection packs to the same mask');
+  assert.equal(h.runtime.diagnostics().sourceVersion, version); assert.equal(calls, 1);
+  landMask = { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[-1,-1],[4,-1],[4,3],[-1,3],[-1,-1]]] } }] };
+  h.runtime.getMeshes(); await h.flush(); await h.finish();
+  assert.equal(h.tasks.length, 2); assert.equal(h.tasks[1].features.length, 0); assert.equal(h.tasks[1].options.reuse, false); assert.equal(calls, 2);
+  landMask = null;
+  h.runtime.getMeshes(); await h.flush(); await h.finish();
+  assert.equal(h.tasks.length, 3, 'null selects a different source than an empty collection');
+});
+
 test('water masks transfer once and subsequent geometry updates retain water rejection in the real worker', async () => {
   for (const supported of [true,false]) {
     const h = loopbackContourWorker(), client=createPaintContourWorkerClient({createWorker:()=>h.worker,isSupported:()=>supported,yieldToHost:()=>Promise.resolve()});
