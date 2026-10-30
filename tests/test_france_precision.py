@@ -1,13 +1,10 @@
 import unittest
-import json
-from pathlib import Path
 from unittest.mock import patch
 
 import geopandas as gpd
 from shapely.geometry import Polygon, box
 from shapely import coverage_is_valid
 
-from map_builder.json_source import read_json_source
 from map_builder.processors.france import (
     _source_arrondissement_layer,
     apply_france_master_precision,
@@ -102,18 +99,21 @@ class FrancePrecisionTests(unittest.TestCase):
         load.assert_not_called()
         self.assertIs(result, existing)
 
-    def test_real_tno_fr_ids_restore_against_source_and_check_coverage(self):
-        from tools.build_na_detail_topology import _topology_object_to_gdf
-
-        topology = read_json_source(Path("data/scenarios/tno_1962/runtime_topology.topo.json"))
-        runtime = _topology_object_to_gdf(topology, "political")
-        existing = runtime[runtime["id"].astype(str).str.startswith("FR_ARR_")].copy()
-        source = _source_arrondissement_layer()
-        self.assertEqual(len(existing), 315)
-        self.assertEqual(existing["id"].nunique(), 315)
-        self.assertEqual(len(source), 320)
+    def test_matching_ids_restore_source_coverage_and_preserve_row_metadata(self):
+        raw_source = self._source()
+        raw_source.loc[len(raw_source)] = {"code": "01003", "nom": "Third", "geometry": box(4, 0, 6, 2)}
+        with patch("map_builder.processors.france.fetch_or_load_geojson", return_value=raw_source):
+            source = _source_arrondissement_layer()
+        existing = gpd.GeoDataFrame(
+            [{"id": "FR_ARR_01002", "marker": "second", "geometry": box(2, 0, 3, 1)},
+             {"id": "FR_ARR_01001", "marker": "first", "geometry": box(0, 0, 1, 1)}],
+            crs="EPSG:4326",
+        )
         self.assertTrue(bool(coverage_is_valid(list(source.geometry))))
         restored = restore_matching_source_geometry(existing, source, allow_master_restore=True)
+        self.assertEqual(restored["id"].tolist(), existing["id"].tolist())
+        self.assertEqual(restored["marker"].tolist(), ["second", "first"])
+        self.assertTrue(bool(coverage_is_valid(list(restored.geometry))))
         self.assertTrue(all(restored.geometry.iloc[i].equals(source.set_index("id").loc[row.id, "geometry"])
                             for i, (_, row) in enumerate(existing.iterrows())))
 

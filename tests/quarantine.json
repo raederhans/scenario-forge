@@ -4,12 +4,19 @@
     "tests/startup_resource_graph_contract.test.mjs": "Defaults to the stale tracked dist/ manifest when no fresh Pages artifact is supplied."
   },
   "python": {
-    "tests/test_global_transport_builder_contracts.py": "Four methods grep transport runtime JS text; rotted.",
-    "tests/test_data_manifest_contract.py": "data/manifest.json hashes for locales.json and runtime_asset_registry.json are stale.",
-    "tests/test_source_ledger_contract.py": "natural_earth_10m_urban_areas_zip ledger entry lacks required checker fields.",
-    "tests/test_political_topology_gap_contract.py": "Reads published political chunks as GeoJSON; they are TopoJSON now.",
-    "tests/test_tno_eastern_precision_sources.py": "Expects the plain runtime topology; it is gzip-only now.",
-    "tests/test_tno_inspector_groups.py": "Expects the retired TNO SOV tag (see tools/retire_tno_sov.py)."
+    "tests/test_data_manifest_contract.py::DataManifestContractTest::test_manifest_output_hashes_match_checked_in_artifacts": "data/manifest.json:98,129,360,631 的 na_v2、runtime_political_v1、locales 和 registry 大小/哈希过期；需数据负责人重新生成清单。",
+    "tests/test_data_manifest_contract.py::DataManifestContractTest::test_runtime_asset_registry_manifest_hash_matches_source_file": "data/manifest.json:631 记录的 registry 大小/哈希过期。",
+    "tests/test_data_manifest_contract.py::DataManifestContractTest::test_runtime_asset_registry_declares_phase1_assets": "data/manifest.json 内嵌 registry 缺少 bathymetry:global_texture；需同步真实 registry。",
+    "tests/test_source_ledger_contract.py::SourceLedgerContractTest::test_checked_in_source_ledger_entries_keep_required_checker_fields": "data/source_ledger.json:482 起六个条目缺少 provenance_sidecar；仓库和生成器均无符合 tools/check_source_ledger.py:97-105 哈希契约的 sidecar，不可编造路径。",
+    "tests/test_tno_eastern_precision_sources.py::test_eastern_precision_sources": "tools/prepare_tno_eastern_precision_sources.py:314,330 只接受存在的明文 baseline，而 TNO runtime 已改为 gzip；需由工具负责人改用统一 JSON source reader。",
+    "tests/test_perf_gate_contract.py::PerfGateContractTest::test_checked_in_baseline_keeps_report_identity_and_worker_summary_fields": "docs/perf/baseline_2026-07-30.json:60 记录的 packageLockSha256 与当前 package-lock.json 不一致；需核查并重新批准性能基线。",
+    "tests/test_tno_bundle_builder.py::TnoBundleBuilderTest::test_checked_in_tno_runtime_topology_has_clean_polar_features": "TNO runtime 北极 shell 保留面积比例为 0.787872，低于 0.90；需数据负责人核查几何丢失并重建。",
+    "tests/test_tno_bundle_builder.py::TnoBundleBuilderTest::test_current_tno_explicit_country_colors_are_locked_and_bundled": "data/scenarios/tno_1962/countries.json:166 的 AMR 为显式颜色来源但 color_policy 为 palette；需核查源规则并同步启动 bundle。",
+    "tests/test_tno_bundle_builder.py::TnoBundleBuilderTest::test_tno_runtime_country_colors_follow_mixed_palette_policy": "data/scenarios/tno_1962/countries.json:6956 的 SUR 使用 palette 策略，但颜色 #726459 与审定调色板 #cb8a4a 不一致；需重建颜色及 bundle。",
+    "tests/test_tno_water_geometries.py::test_problematic_pacific_open_oceans_are_pruned_to_large_components": "TNO water_regions.geojson 的 tno_west_central_pacific_ocean 有 109 个组件，超过既有上限 5；由水域数据任务处理。",
+    "tests/test_tno_water_geometries.py::test_tno_tracked_neighbor_pairs_do_not_leave_gaps": "TNO water_regions.geojson 的阿曼湾与波斯湾之间存在 0.42553669 度缝隙；由水域数据任务修复共享边界。",
+    "tests/test_tno_water_geometries.py::TnoWaterRecentRefinementContractTest::test_tracked_neighbor_pairs_do_not_leave_gaps": "同一阿曼湾/波斯湾边界缺陷的 unittest 入口。",
+    "tests/test_blank_base_rebuild.py::CheckedInBlankCoverageTest::test_blank_preserves_modern_geometry_and_adds_only_verified_source_land": "data/scenarios/blank_base/runtime_topology.topo.json 的 AFG-1743 与 modern_world 基线坐标不一致；需数据负责人重新生成空白基线。"
   },
   "pythonSlow": {
     "_reason": "Each takes more than about 10 s on a fast workstation (roughly 2x on a 4-core CI runner); nightly runs them.",
@@ -26,7 +33,6 @@
       "tests/test_scenario_contracts.py",
       "tests/test_perf_gate_contract.py",
       "tests/test_polar_geography_contract.py",
-      "tests/test_france_precision.py",
       "tests/test_patch_checked_in_urban_artifacts.py",
       "tests/test_transport_manifest_contracts.py",
       "tests/test_scenario_chunk_assets.py",

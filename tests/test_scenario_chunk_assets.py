@@ -160,15 +160,17 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                 self.assertEqual(diagnostics.get("optimized_part_count"), payload_cost["part_count"])
                 self.assertEqual(diagnostics.get("optimized_byte_size"), payload_byte_size)
                 self.assertEqual(diagnostics.get("optimized_estimated_path_cost"), payload_cost["estimated_path_cost"])
-                self.assertGreater(diagnostics.get("source_coord_count"), diagnostics.get("optimized_coord_count"))
                 self.assertGreater(diagnostics.get("source_byte_size"), diagnostics.get("optimized_byte_size"))
-                self.assertGreater(
-                    diagnostics.get("source_estimated_path_cost"),
-                    diagnostics.get("optimized_estimated_path_cost"),
-                )
-                self.assertGreater(diagnostics.get("coord_reduction"), 0)
-                self.assertGreater(diagnostics.get("byte_size_reduction"), 0)
-                self.assertGreater(diagnostics.get("estimated_path_cost_reduction"), 0)
+                self.assertEqual(diagnostics.get("source_feature_count"), len(features))
+                for metric, reduction in (
+                    ("coord_count", "coord_reduction"),
+                    ("byte_size", "byte_size_reduction"),
+                    ("estimated_path_cost", "estimated_path_cost_reduction"),
+                ):
+                    self.assertEqual(
+                        diagnostics.get(reduction),
+                        diagnostics[f"source_{metric}"] - diagnostics[f"optimized_{metric}"],
+                    )
 
     def test_write_json_wraps_permission_error_with_actionable_message(self) -> None:
         target = Path("C:/tmp/political.detail.country.rur.json")

@@ -69,7 +69,7 @@ if (suite === "node") {
   const ignored = all ? [] : [...Object.keys(quarantine.python), ...quarantine.pythonSlow.files];
   // run_python.mjs picks py -3 / python on Windows and python3 / python elsewhere.
   run(process.execPath, ["tools/run_python.mjs", "-m", "pytest", "tests", "-n", "auto", "-q", "-p", "no:cacheprovider",
-    ...ignored.flatMap(file => ["--ignore", file])]);
+    ...ignored.flatMap(file => [file.includes("::") ? "--deselect" : "--ignore", file])]);
 } else {
   console.error("usage: node tools/run_all_tests.mjs node|python [--shard=i/n] [--all]");
   process.exit(2);

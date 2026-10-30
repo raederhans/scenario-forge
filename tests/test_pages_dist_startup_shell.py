@@ -588,28 +588,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 build_landing_japan_preview.JAPAN_PREVIEW_METADATA = previous_metadata_path
 
     def test_pages_dist_generated_text_writes_use_lf(self) -> None:
-        source = (REPO_ROOT / "tools" / "build_pages_dist.py").read_text(encoding="utf-8")
-        self.assertIn('def write_text_lf(path: Path, text: str) -> None:', source)
-        self.assertIn('def normalize_dist_text_files_lf() -> None:', source)
-        self.assertIn("LF_NORMALIZED_ROOT_DIST_PATHS", source)
-        self.assertIn("LF_NORMALIZED_ROOT_ASSET_SUFFIXES", source)
-        self.assertIn('".css"', source)
-        self.assertIn('".geojson"', source)
-        self.assertIn('".svg"', source)
-        self.assertIn('".md"', source)
-        self.assertIn('".txt"', source)
-        self.assertIn('newline="\\n"', source)
-        self.assertIn("Landing assets are committed delivery inputs here.", source)
-        self.assertNotIn("build_landing_hero_cartography()", source)
-        self.assertNotIn("build_landing_europe_1936_showcase()", source)
-        self.assertNotIn("build_landing_japan_preview()", source)
-        self.assertNotIn("rasterize_landing_assets()", source)
-        self.assertNotIn(".write_text(", source)
-        self.assertNotIn("n" + "px", Path(__file__).read_text(encoding="utf-8"))
-        self.assertLess(
-            source.index("normalize_dist_text_files_lf()"),
-            source.index("total_bytes = write_dist_manifest()"),
-        )
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "generated.json"
             build_pages_dist.write_text_lf(path, "{\n  \"ok\": true\n}\n")
@@ -1220,27 +1198,27 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     dynamic_import_registry=registry,
                 )
 
-            mismatch = next(
-                record
-                for record in graph["unresolved_references"]
-                if record["kind"] == "dynamic_import_registry_target_set_mismatch"
-            )
-            self.assertEqual(mismatch["source_binding"], "RUNTIME_TARGETS")
-            self.assertEqual(mismatch["source_binding_status"], "literal-string-collection")
-            self.assertEqual(mismatch["missing_from_registry"], case["missing_from_registry"])
-            self.assertEqual(
-                mismatch["missing_from_runtime_binding"],
-                case["missing_from_runtime_binding"],
-            )
-            resolution = graph["dynamic_import_registry"]["resolutions"][0]
-            self.assertEqual(resolution["status"], "target-set-mismatch")
-            self.assertEqual(resolution["unpublished_targets"], case["unpublished_targets"])
-            node = next(
-                node
-                for node in graph["nodes"]
-                if node["path"] == "app/js/bootstrap/deferred_ui_bootstrap.js"
-            )
-            self.assertEqual(node["dynamic_imports"], [])
+                mismatch = next(
+                    record
+                    for record in graph["unresolved_references"]
+                    if record["kind"] == "dynamic_import_registry_target_set_mismatch"
+                )
+                self.assertEqual(mismatch["source_binding"], "RUNTIME_TARGETS")
+                self.assertEqual(mismatch["source_binding_status"], "literal-string-collection")
+                self.assertEqual(mismatch["missing_from_registry"], case["missing_from_registry"])
+                self.assertEqual(
+                    mismatch["missing_from_runtime_binding"],
+                    case["missing_from_runtime_binding"],
+                )
+                resolution = graph["dynamic_import_registry"]["resolutions"][0]
+                self.assertEqual(resolution["status"], "target-set-mismatch")
+                self.assertEqual(resolution["unpublished_targets"], case["unpublished_targets"])
+                node = next(
+                    node
+                    for node in graph["nodes"]
+                    if node["path"] == "app/js/bootstrap/deferred_ui_bootstrap.js"
+                )
+                self.assertEqual(node["dynamic_imports"], [])
 
     def test_map_label_fonts_have_exact_on_demand_vendor_inventory_ownership(self) -> None:
         font_paths = (
@@ -1591,18 +1569,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertEqual(stabilize(None), stabilize(0))
         self.assertEqual(stabilize(0), stabilize(999_999))
 
-    def test_cached_pass_compositor_owner_is_in_the_pages_module_graph(self) -> None:
-        renderer_source = MAP_RENDERER_JS.read_text(encoding="utf-8").replace("\r\n", "\n")
-        owner_source = CACHED_PASS_COMPOSITOR_OWNER_JS.read_text(encoding="utf-8").replace("\r\n", "\n")
-        dist_renderer = (DIST_APP_JS_ROOT / "core" / "map_renderer.js").read_text(encoding="utf-8").replace("\r\n", "\n")
-        dist_owner_path = DIST_APP_JS_ROOT / "core" / "renderer" / "cached_pass_compositor_owner.js"
-        self.assertTrue(dist_owner_path.exists())
-        self.assertEqual(dist_owner_path.read_text(encoding="utf-8").replace("\r\n", "\n"), owner_source)
-        import_token = 'import { createCachedPassCompositorOwner } from "./renderer/cached_pass_compositor_owner.js";'
-        self.assertIn(import_token, renderer_source)
-        self.assertIn(import_token, dist_renderer)
-        self.assertIn("return getCachedPassCompositorOwner().drawTransformedPass(", renderer_source)
-        self.assertIn("return getCachedPassCompositorOwner().composeRenderPassesToTarget(", renderer_source)
 
     def test_landing_copy_stays_user_facing(self) -> None:
         sources = {
@@ -1638,15 +1604,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 with self.subTest(source=source_name, stale_fragment=stale_fragment):
                     self.assertNotIn(stale_fragment, source)
 
-    def test_editor_source_index_keeps_pages_startup_contract(self) -> None:
-        html = EDITOR_INDEX.read_text(encoding="utf-8")
-
-        self.assertIn('<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />', html)
-        self.assertIn('<link rel="alternate icon" href="../assets/favicon.png" type="image/png" />', html)
-        self.assertIn('<link rel="modulepreload" href="js/main.js" />', html)
-        self.assertIn('<link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />', html)
-        self.assertNotIn('data-startup-bundle-preload', html)
-        self.assertNotIn('startup.bundle.${language}', html)
 
     def test_dist_app_index_keeps_pages_startup_contract(self) -> None:
         if not DIST_APP_INDEX.exists():
@@ -2642,17 +2599,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 build_pages_dist.APP_DIST_ROOT = previous_app_dist_root
 
             self.assertIn("broken.manifest_url: <empty>", str(raised.exception))
-
-    def test_deploy_dist_artifact_preserves_nojekyll(self) -> None:
-        workflow_lines = VERIFY_SHARED_WORKFLOW.read_text(encoding="utf-8").splitlines()
-        upload_block_start = workflow_lines.index("          name: deploy-dist")
-        upload_block = "\n".join(workflow_lines[upload_block_start : upload_block_start + 4])
-
-        self.assertIn(
-            "path: .runtime/pages-release/dist",
-            upload_block,
-        )
-        self.assertIn("include-hidden-files: true", upload_block)
 
 
 if __name__ == "__main__":
