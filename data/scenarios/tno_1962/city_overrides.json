@@ -7792,7 +7792,7 @@
       "tag": "UK04",
       "city_id": "CITY::ne::1159149329",
       "stable_key": "id::CITY::ne::1159149329",
-      "city_name": "Dnjepropetrowsk",
+      "city_name": "Reichenaustadt",
       "name_ascii": "Dnipro",
       "display_name": "Generalbezirk Dnjepropetrowsk",
       "lookup_iso2": "UA",
@@ -7884,7 +7884,7 @@
       "tag": "UK08",
       "city_id": "CITY::ne::1159149331",
       "stable_key": "id::CITY::ne::1159149331",
-      "city_name": "Yuzivka",
+      "city_name": "Hughesdorf",
       "name_ascii": "Donetsk",
       "display_name": "Generalbezirk Donez",
       "lookup_iso2": "UA",
@@ -43616,8 +43616,8 @@
       ],
       "city_id": "CITY::ne::1159149329",
       "display_name": {
-        "en": "Dnjepropetrowsk",
-        "zh": "第聂伯罗彼得罗夫斯克"
+        "en": "Reichenaustadt",
+        "zh": "赖歇瑙施塔特"
       },
       "hidden": false,
       "host_feature_id": "UA_RAY_74538382B23045356862491",
@@ -43631,8 +43631,8 @@
       ],
       "city_id": "CITY::ne::1159149331",
       "display_name": {
-        "en": "Yuzivka",
-        "zh": "尤济夫卡"
+        "en": "Hughesdorf",
+        "zh": "休斯多夫"
       },
       "hidden": false,
       "host_feature_id": "UA_RAY_74538382B54113761495064",

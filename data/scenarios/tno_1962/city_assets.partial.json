@@ -3100,6 +3100,15 @@
       "stable_key": "id::CITY::gn::2389691",
       "tier": "regional"
     },
+    "CITY::gn::2427336": {
+      "city_id": "CITY::gn::2427336",
+      "display_name": {
+        "en": "Moussoro",
+        "zh": "穆索罗"
+      },
+      "host_feature_id": "TD_ADM1_TCD-5581",
+      "stable_key": "id::CITY::gn::2427336"
+    },
     "CITY::gn::2428228": {
       "aliases": [
         "Massakory"
@@ -3135,6 +3144,15 @@
       "hidden": false,
       "stable_key": "id::CITY::gn::243787",
       "tier": "regional"
+    },
+    "CITY::gn::2455290": {
+      "city_id": "CITY::gn::2455290",
+      "display_name": {
+        "en": "Kidal",
+        "zh": "基达尔"
+      },
+      "host_feature_id": "ML_ADM1_MLI-2689",
+      "stable_key": "id::CITY::gn::2455290"
     },
     "CITY::gn::246013": {
       "display_name": {
@@ -26703,15 +26721,15 @@
       "aliases": [
         "Radom"
       ],
+      "city_id": "CITY::gn::760778",
       "display_name": {
         "en": "Radom",
         "zh": "拉多姆"
       },
       "hidden": false,
+      "host_feature_id": "PL_POW_1463",
       "stable_key": "id::CITY::gn::760778",
-      "tier": "regional",
-      "city_id": "CITY::gn::760778",
-      "host_feature_id": "PL_POW_1463"
+      "tier": "regional"
     },
     "CITY::gn::763442": {
       "aliases": [
@@ -28018,6 +28036,15 @@
       },
       "stable_key": "id::CITY::ne::1159112873"
     },
+    "CITY::ne::1159113189": {
+      "city_id": "CITY::ne::1159113189",
+      "display_name": {
+        "en": "Cao Bằng",
+        "zh": "高平"
+      },
+      "host_feature_id": "VNM-511",
+      "stable_key": "id::CITY::ne::1159113189"
+    },
     "CITY::ne::1159113727": {
       "aliases": [
         "Kumi Town",
@@ -28510,6 +28537,15 @@
       },
       "stable_key": "id::CITY::ne::1159120945"
     },
+    "CITY::ne::1159120959": {
+      "city_id": "CITY::ne::1159120959",
+      "display_name": {
+        "en": "Lokossa",
+        "zh": "洛科萨"
+      },
+      "host_feature_id": "BJ_ADM1_BEN-2180",
+      "stable_key": "id::CITY::ne::1159120959"
+    },
     "CITY::ne::1159120991": {
       "display_name": {
         "en": "Tizi Uzu",
@@ -28844,30 +28880,30 @@
         "Nikolajew",
         "Mykolayiv"
       ],
+      "city_id": "CITY::ne::1159126699",
       "display_name": {
         "en": "Nikolajew",
         "zh": "尼古拉耶夫"
       },
       "hidden": false,
+      "host_feature_id": "UA_RAY_74538382B2161330582129",
       "stable_key": "id::CITY::ne::1159126699",
-      "tier": "regional",
-      "city_id": "CITY::ne::1159126699",
-      "host_feature_id": "UA_RAY_74538382B2161330582129"
+      "tier": "regional"
     },
     "CITY::ne::1159126717": {
       "aliases": [
         "Tschernigow",
         "Chernihiv"
       ],
+      "city_id": "CITY::ne::1159126717",
       "display_name": {
         "en": "Tschernigow",
         "zh": "切尔尼戈夫"
       },
       "hidden": false,
+      "host_feature_id": "UA_RAY_74538382B44220139144156",
       "stable_key": "id::CITY::ne::1159126717",
-      "tier": "regional",
-      "city_id": "CITY::ne::1159126717",
-      "host_feature_id": "UA_RAY_74538382B44220139144156"
+      "tier": "regional"
     },
     "CITY::ne::1159126729": {
       "aliases": [
@@ -29645,15 +29681,15 @@
         "Rowno",
         "Rivne"
       ],
+      "city_id": "CITY::ne::1159134173",
       "display_name": {
         "en": "Rowno",
         "zh": "罗夫诺"
       },
       "hidden": false,
+      "host_feature_id": "UA_RAY_74538382B36980255523800",
       "stable_key": "id::CITY::ne::1159134173",
-      "tier": "regional",
-      "city_id": "CITY::ne::1159134173",
-      "host_feature_id": "UA_RAY_74538382B36980255523800"
+      "tier": "regional"
     },
     "CITY::ne::1159134181": {
       "aliases": [
@@ -29738,15 +29774,15 @@
         "Ost-Germania",
         "Melitopol"
       ],
+      "city_id": "CITY::ne::1159134253",
       "display_name": {
         "en": "Melitopol",
         "zh": "梅利托波尔"
       },
       "hidden": false,
+      "host_feature_id": "UA_RAY_74538382B95492559683598",
       "stable_key": "id::CITY::ne::1159134253",
-      "tier": "regional",
-      "city_id": "CITY::ne::1159134253",
-      "host_feature_id": "UA_RAY_74538382B95492559683598"
+      "tier": "regional"
     },
     "CITY::ne::1159134699": {
       "aliases": [
@@ -30795,15 +30831,15 @@
         "Kauen",
         "Kaunas"
       ],
+      "city_id": "CITY::ne::1159136375",
       "display_name": {
         "en": "Kauen",
         "zh": "考恩"
       },
       "hidden": false,
+      "host_feature_id": "LT022",
       "stable_key": "id::CITY::ne::1159136375",
-      "tier": "regional",
-      "city_id": "CITY::ne::1159136375",
-      "host_feature_id": "LT022"
+      "tier": "regional"
     },
     "CITY::ne::1159136381": {
       "aliases": [
@@ -31205,6 +31241,15 @@
       },
       "stable_key": "id::CITY::ne::1159137895"
     },
+    "CITY::ne::1159137983": {
+      "city_id": "CITY::ne::1159137983",
+      "display_name": {
+        "en": "Tacloban",
+        "zh": "塔克洛班"
+      },
+      "host_feature_id": "PHL-5535",
+      "stable_key": "id::CITY::ne::1159137983"
+    },
     "CITY::ne::1159138025": {
       "display_name": {
         "en": "Vikhorevka",
@@ -31309,6 +31354,15 @@
         "zh": "本斗"
       },
       "stable_key": "id::CITY::ne::1159138249"
+    },
+    "CITY::ne::1159138799": {
+      "city_id": "CITY::ne::1159138799",
+      "display_name": {
+        "en": "Abeokuta",
+        "zh": "阿贝奥库塔"
+      },
+      "host_feature_id": "NG_ADM1_NGA-2852",
+      "stable_key": "id::CITY::ne::1159138799"
     },
     "CITY::ne::1159138965": {
       "display_name": {
@@ -31417,6 +31471,15 @@
       "hidden": false,
       "stable_key": "id::CITY::ne::1159139087",
       "tier": "regional"
+    },
+    "CITY::ne::1159139095": {
+      "city_id": "CITY::ne::1159139095",
+      "display_name": {
+        "en": "Lublin",
+        "zh": "卢布林"
+      },
+      "host_feature_id": "PL_POW_0663",
+      "stable_key": "id::CITY::ne::1159139095"
     },
     "CITY::ne::1159139101": {
       "aliases": [
@@ -33527,6 +33590,15 @@
       "host_feature_id": "RU_MRG_2953c850d23a",
       "stable_key": "id::CITY::ne::1159146581"
     },
+    "CITY::ne::1159146605": {
+      "city_id": "CITY::ne::1159146605",
+      "display_name": {
+        "en": "Tuguegarao",
+        "zh": "土格加劳"
+      },
+      "host_feature_id": "PHL-2545",
+      "stable_key": "id::CITY::ne::1159146605"
+    },
     "CITY::ne::1159146637": {
       "city_id": "CITY::ne::1159146637",
       "display_name": {
@@ -34568,6 +34640,15 @@
       "stable_key": "id::CITY::ne::1159148535",
       "tier": "minor"
     },
+    "CITY::ne::1159148579": {
+      "city_id": "CITY::ne::1159148579",
+      "display_name": {
+        "en": "Rosso",
+        "zh": "罗索"
+      },
+      "host_feature_id": "MR_ADM1_MRT-2788",
+      "stable_key": "id::CITY::ne::1159148579"
+    },
     "CITY::ne::1159148591": {
       "aliases": [
         "Ouésso"
@@ -34928,75 +35009,75 @@
         "Lemberg",
         "Lviv"
       ],
+      "city_id": "CITY::ne::1159149323",
       "display_name": {
         "en": "Lemberg",
         "zh": "伦贝格"
       },
       "hidden": false,
+      "host_feature_id": "UA_RAY_74538382B46853229377150",
       "stable_key": "id::CITY::ne::1159149323",
-      "tier": "regional",
-      "city_id": "CITY::ne::1159149323",
-      "host_feature_id": "UA_RAY_74538382B46853229377150"
+      "tier": "regional"
     },
     "CITY::ne::1159149327": {
       "aliases": [
         "Shitomir",
         "Zhytomyr"
       ],
+      "city_id": "CITY::ne::1159149327",
       "display_name": {
         "en": "Shitomir",
         "zh": "日托米尔"
       },
       "hidden": false,
+      "host_feature_id": "UA_RAY_74538382B57692221763967",
       "stable_key": "id::CITY::ne::1159149327",
-      "tier": "regional",
-      "city_id": "CITY::ne::1159149327",
-      "host_feature_id": "UA_RAY_74538382B57692221763967"
+      "tier": "regional"
     },
     "CITY::ne::1159149329": {
       "aliases": [
         "Reichenaustadt",
         "Dnipro"
       ],
+      "city_id": "CITY::ne::1159149329",
       "display_name": {
-        "en": "Dnjepropetrowsk",
-        "zh": "第聂伯罗彼得罗夫斯克"
+        "en": "Reichenaustadt",
+        "zh": "赖歇瑙施塔特"
       },
       "hidden": false,
+      "host_feature_id": "UA_RAY_74538382B23045356862491",
       "stable_key": "id::CITY::ne::1159149329",
-      "tier": "major",
-      "city_id": "CITY::ne::1159149329",
-      "host_feature_id": "UA_RAY_74538382B23045356862491"
+      "tier": "major"
     },
     "CITY::ne::1159149331": {
       "aliases": [
         "Hughesdorf",
         "Donetsk"
       ],
+      "city_id": "CITY::ne::1159149331",
       "display_name": {
-        "en": "Yuzivka",
-        "zh": "尤济夫卡"
+        "en": "Hughesdorf",
+        "zh": "休斯多夫"
       },
       "hidden": false,
+      "host_feature_id": "UA_RAY_74538382B54113761495064",
       "stable_key": "id::CITY::ne::1159149331",
-      "tier": "major",
-      "city_id": "CITY::ne::1159149331",
-      "host_feature_id": "UA_RAY_74538382B54113761495064"
+      "tier": "major"
     },
     "CITY::ne::1159149333": {
       "aliases": [
         "Charkow",
         "Kharkiv"
       ],
+      "city_id": "CITY::ne::1159149333",
       "display_name": {
         "en": "Charkow",
         "zh": "哈尔科夫"
       },
       "hidden": false,
+      "host_feature_id": "UA_RAY_74538382B36501884751905",
       "stable_key": "id::CITY::ne::1159149333",
-      "tier": "major",
-      "city_id": "CITY::ne::1159149333",
-      "host_feature_id": "UA_RAY_74538382B36501884751905"
+      "tier": "major"
     },
     "CITY::ne::1159149355": {
       "aliases": [
@@ -35135,6 +35216,15 @@
       "hidden": false,
       "stable_key": "id::CITY::ne::1159149513",
       "tier": "regional"
+    },
+    "CITY::ne::1159149529": {
+      "city_id": "CITY::ne::1159149529",
+      "display_name": {
+        "en": "Pleskau",
+        "zh": "普斯科夫"
+      },
+      "host_feature_id": "RU_RAY_50074027B86681375933080",
+      "stable_key": "id::CITY::ne::1159149529"
     },
     "CITY::ne::1159149535": {
       "display_name": {
@@ -35383,6 +35473,24 @@
       },
       "stable_key": "id::CITY::ne::1159149755"
     },
+    "CITY::ne::1159149765": {
+      "city_id": "CITY::ne::1159149765",
+      "display_name": {
+        "en": "George Town",
+        "zh": "乔治市"
+      },
+      "host_feature_id": "MYS-1139",
+      "stable_key": "id::CITY::ne::1159149765"
+    },
+    "CITY::ne::1159149803": {
+      "city_id": "CITY::ne::1159149803",
+      "display_name": {
+        "en": "Kuching",
+        "zh": "古晋"
+      },
+      "host_feature_id": "MYS-1187",
+      "stable_key": "id::CITY::ne::1159149803"
+    },
     "CITY::ne::1159149851": {
       "aliases": [
         "Moundou"
@@ -35604,15 +35712,15 @@
       "aliases": [
         "Bamenda"
       ],
+      "city_id": "CITY::ne::1159150315",
       "display_name": {
         "en": "Bamenda",
         "zh": "巴门达"
       },
       "hidden": false,
+      "host_feature_id": "CM_ADM1_CMR-1477",
       "stable_key": "id::CITY::ne::1159150315",
-      "tier": "regional",
-      "city_id": "CITY::ne::1159150315",
-      "host_feature_id": "CM_ADM1_CMR-1477"
+      "tier": "regional"
     },
     "CITY::ne::1159150327": {
       "aliases": [
@@ -35721,6 +35829,15 @@
       },
       "stable_key": "id::CITY::ne::1159150523"
     },
+    "CITY::ne::1159150535": {
+      "city_id": "CITY::ne::1159150535",
+      "display_name": {
+        "en": "Lomé",
+        "zh": "洛美"
+      },
+      "host_feature_id": "TG_ADM1_TGO-87",
+      "stable_key": "id::CITY::ne::1159150535"
+    },
     "CITY::ne::1159150537": {
       "display_name": {
         "en": "Tunisi",
@@ -35804,6 +35921,15 @@
       "city_id": "CITY::ne::1159150597",
       "host_feature_id": "SR_ADM1_SUR-72"
     },
+    "CITY::ne::1159150605": {
+      "city_id": "CITY::ne::1159150605",
+      "display_name": {
+        "en": "Niamey",
+        "zh": "尼亚美"
+      },
+      "host_feature_id": "NE_ADM1_NER-94",
+      "stable_key": "id::CITY::ne::1159150605"
+    },
     "CITY::ne::1159150609": {
       "city_id": "CITY::ne::1159150609",
       "host_feature_id": "TJK-5491"
@@ -35815,6 +35941,24 @@
     "CITY::ne::1159150623": {
       "city_id": "CITY::ne::1159150623",
       "host_feature_id": "NI_ADM1_NIC-659"
+    },
+    "CITY::ne::1159150625": {
+      "city_id": "CITY::ne::1159150625",
+      "display_name": {
+        "en": "Freetown",
+        "zh": "弗里敦"
+      },
+      "host_feature_id": "SL_ADM1_SLE-761",
+      "stable_key": "id::CITY::ne::1159150625"
+    },
+    "CITY::ne::1159150627": {
+      "city_id": "CITY::ne::1159150627",
+      "display_name": {
+        "en": "Agadez",
+        "zh": "阿加德兹"
+      },
+      "host_feature_id": "NE_ADM1_NER-800",
+      "stable_key": "id::CITY::ne::1159150627"
     },
     "CITY::ne::1159150633": {
       "display_name": {
@@ -36145,15 +36289,15 @@
         "Reval",
         "Tallinn"
       ],
+      "city_id": "CITY::ne::1159150877",
       "display_name": {
         "en": "Reval",
         "zh": "雷瓦尔"
       },
       "hidden": false,
+      "host_feature_id": "EE001",
       "stable_key": "id::CITY::ne::1159150877",
-      "tier": "major",
-      "city_id": "CITY::ne::1159150877",
-      "host_feature_id": "EE001"
+      "tier": "major"
     },
     "CITY::ne::1159150879": {
       "city_id": "CITY::ne::1159150879",
@@ -36237,6 +36381,15 @@
       "lat": 64.206811848944,
       "lon": -51.71990070766818
     },
+    "CITY::ne::1159150945": {
+      "city_id": "CITY::ne::1159150945",
+      "display_name": {
+        "en": "Bamako",
+        "zh": "巴马科"
+      },
+      "host_feature_id": "ML_ADM1_MLI-2792",
+      "stable_key": "id::CITY::ne::1159150945"
+    },
     "CITY::ne::1159150951": {
       "display_name": {
         "en": "Sebha",
@@ -36303,6 +36456,15 @@
       "stable_key": "id::CITY::ne::1159150993",
       "tier": "major"
     },
+    "CITY::ne::1159150997": {
+      "city_id": "CITY::ne::1159150997",
+      "display_name": {
+        "en": "Conakry",
+        "zh": "科纳克里"
+      },
+      "host_feature_id": "GN_ADM1_385441B29247776226513",
+      "stable_key": "id::CITY::ne::1159150997"
+    },
     "CITY::ne::1159151059": {
       "city_id": "CITY::ne::1159151059",
       "host_feature_id": "CA_FED_35079"
@@ -36335,6 +36497,15 @@
       "hidden": false,
       "stable_key": "id::CITY::ne::1159151081",
       "tier": "regional"
+    },
+    "CITY::ne::1159151083": {
+      "city_id": "CITY::ne::1159151083",
+      "display_name": {
+        "en": "Brunei Town",
+        "zh": "文莱城"
+      },
+      "host_feature_id": "BN_ADM1_BRN-1182",
+      "stable_key": "id::CITY::ne::1159151083"
     },
     "CITY::ne::1159151113": {
       "aliases": [
@@ -36439,6 +36610,15 @@
       "city_id": "CITY::ne::1159151147",
       "host_feature_id": "BG411"
     },
+    "CITY::ne::1159151149": {
+      "city_id": "CITY::ne::1159151149",
+      "display_name": {
+        "en": "Minsk",
+        "zh": "明斯克"
+      },
+      "host_feature_id": "BY_CITY_MINSK",
+      "stable_key": "id::CITY::ne::1159151149"
+    },
     "CITY::ne::1159151151": {
       "city_id": "CITY::ne::1159151151",
       "host_feature_id": "BTN-2439"
@@ -36446,6 +36626,15 @@
     "CITY::ne::1159151161": {
       "city_id": "CITY::ne::1159151161",
       "host_feature_id": "AU_ADM1_AUS-2653"
+    },
+    "CITY::ne::1159151173": {
+      "city_id": "CITY::ne::1159151173",
+      "display_name": {
+        "en": "Ouagadougou",
+        "zh": "瓦加杜古"
+      },
+      "host_feature_id": "BF_ADM1_92566538B14190085014946",
+      "stable_key": "id::CITY::ne::1159151173"
     },
     "CITY::ne::1159151181": {
       "city_id": "CITY::ne::1159151181",
@@ -36518,15 +36707,15 @@
         "Warschau",
         "Warsaw"
       ],
+      "city_id": "CITY::ne::1159151299",
       "display_name": {
         "en": "Warschau",
         "zh": "华沙"
       },
       "hidden": false,
+      "host_feature_id": "PL_POW_1465",
       "stable_key": "id::CITY::ne::1159151299",
-      "tier": "major",
-      "city_id": "CITY::ne::1159151299",
-      "host_feature_id": "PL_POW_1465"
+      "tier": "major"
     },
     "CITY::ne::1159151305": {
       "aliases": [
@@ -36634,6 +36823,15 @@
       "city_id": "CITY::ne::1159151401",
       "host_feature_id": "DO_ADM1_DOM-1985"
     },
+    "CITY::ne::1159151403": {
+      "city_id": "CITY::ne::1159151403",
+      "display_name": {
+        "en": "Accra",
+        "zh": "阿克拉"
+      },
+      "host_feature_id": "GH_ADM1_GHA-2172",
+      "stable_key": "id::CITY::ne::1159151403"
+    },
     "CITY::ne::1159151415": {
       "city_id": "CITY::ne::1159151415",
       "host_feature_id": "LBY-2978"
@@ -36725,12 +36923,12 @@
     },
     "CITY::ne::1159151513": {
       "city_id": "CITY::ne::1159151513",
-      "host_feature_id": "SN_ADM1_SEN-759",
-      "stable_key": "id::CITY::ne::1159151513",
       "display_name": {
         "en": "Dakar",
         "zh": "达喀尔"
-      }
+      },
+      "host_feature_id": "SN_ADM1_SEN-759",
+      "stable_key": "id::CITY::ne::1159151513"
     },
     "CITY::ne::1159151523": {
       "city_id": "CITY::ne::1159151523",
@@ -36854,14 +37052,14 @@
     },
     "CITY::ne::1159151591": {
       "city_id": "CITY::ne::1159151591",
-      "host_feature_id": "NG_ADM1_NGA-2850",
-      "lat": 6.448465602583956,
-      "lon": 3.3964715242087253,
-      "stable_key": "id::CITY::ne::1159151591",
       "display_name": {
         "en": "Lagos",
         "zh": "拉各斯"
-      }
+      },
+      "host_feature_id": "NG_ADM1_NGA-2850",
+      "lat": 6.448465602583956,
+      "lon": 3.3964715242087253,
+      "stable_key": "id::CITY::ne::1159151591"
     },
     "CITY::ne::1159151593": {
       "display_name": {
@@ -36913,6 +37111,15 @@
       "city_id": "CITY::ne::1159151617",
       "host_feature_id": "IN_ADM2_76128533B72507508533064"
     },
+    "CITY::ne::1159151627": {
+      "city_id": "CITY::ne::1159151627",
+      "display_name": {
+        "en": "Shōnan",
+        "zh": "昭南"
+      },
+      "host_feature_id": "SGP-4871",
+      "stable_key": "id::CITY::ne::1159151627"
+    },
     "CITY::ne::1159151699": {
       "city_id": "CITY::ne::1159151699",
       "host_feature_id": "NZ_ADM1_NZL-5469"
@@ -36937,213 +37144,6 @@
       "population": 0,
       "source": "reviewed_settlement",
       "stable_key": "id::CITY::scenario::cherdyn"
-    },
-    "CITY::ne::1159151149": {
-      "city_id": "CITY::ne::1159151149",
-      "stable_key": "id::CITY::ne::1159151149",
-      "display_name": {
-        "en": "Minsk",
-        "zh": "明斯克"
-      },
-      "host_feature_id": "BY_CITY_MINSK"
-    },
-    "CITY::ne::1159149529": {
-      "city_id": "CITY::ne::1159149529",
-      "stable_key": "id::CITY::ne::1159149529",
-      "display_name": {
-        "en": "Pleskau",
-        "zh": "普斯科夫"
-      },
-      "host_feature_id": "RU_RAY_50074027B86681375933080"
-    },
-    "CITY::ne::1159139095": {
-      "city_id": "CITY::ne::1159139095",
-      "stable_key": "id::CITY::ne::1159139095",
-      "display_name": {
-        "en": "Lublin",
-        "zh": "卢布林"
-      },
-      "host_feature_id": "PL_POW_0663"
-    },
-    "CITY::ne::1159150627": {
-      "city_id": "CITY::ne::1159150627",
-      "stable_key": "id::CITY::ne::1159150627",
-      "display_name": {
-        "en": "Agadez",
-        "zh": "阿加德兹"
-      },
-      "host_feature_id": "NE_ADM1_NER-800"
-    },
-    "CITY::gn::2455290": {
-      "city_id": "CITY::gn::2455290",
-      "stable_key": "id::CITY::gn::2455290",
-      "display_name": {
-        "en": "Kidal",
-        "zh": "基达尔"
-      },
-      "host_feature_id": "ML_ADM1_MLI-2689"
-    },
-    "CITY::gn::2427336": {
-      "city_id": "CITY::gn::2427336",
-      "stable_key": "id::CITY::gn::2427336",
-      "display_name": {
-        "en": "Moussoro",
-        "zh": "穆索罗"
-      },
-      "host_feature_id": "TD_ADM1_TCD-5581"
-    },
-    "CITY::ne::1159148579": {
-      "city_id": "CITY::ne::1159148579",
-      "stable_key": "id::CITY::ne::1159148579",
-      "display_name": {
-        "en": "Rosso",
-        "zh": "罗索"
-      },
-      "host_feature_id": "MR_ADM1_MRT-2788"
-    },
-    "CITY::ne::1159150945": {
-      "city_id": "CITY::ne::1159150945",
-      "stable_key": "id::CITY::ne::1159150945",
-      "display_name": {
-        "en": "Bamako",
-        "zh": "巴马科"
-      },
-      "host_feature_id": "ML_ADM1_MLI-2792"
-    },
-    "CITY::ne::1159150997": {
-      "city_id": "CITY::ne::1159150997",
-      "stable_key": "id::CITY::ne::1159150997",
-      "display_name": {
-        "en": "Conakry",
-        "zh": "科纳克里"
-      },
-      "host_feature_id": "GN_ADM1_385441B29247776226513"
-    },
-    "CITY::ne::1159150605": {
-      "city_id": "CITY::ne::1159150605",
-      "stable_key": "id::CITY::ne::1159150605",
-      "display_name": {
-        "en": "Niamey",
-        "zh": "尼亚美"
-      },
-      "host_feature_id": "NE_ADM1_NER-94"
-    },
-    "CITY::ne::1159151403": {
-      "city_id": "CITY::ne::1159151403",
-      "stable_key": "id::CITY::ne::1159151403",
-      "display_name": {
-        "en": "Accra",
-        "zh": "阿克拉"
-      },
-      "host_feature_id": "GH_ADM1_GHA-2172"
-    },
-    "CITY::ne::1159120959": {
-      "city_id": "CITY::ne::1159120959",
-      "stable_key": "id::CITY::ne::1159120959",
-      "display_name": {
-        "en": "Lokossa",
-        "zh": "洛科萨"
-      },
-      "host_feature_id": "BJ_ADM1_BEN-2180"
-    },
-    "CITY::ne::1159151173": {
-      "city_id": "CITY::ne::1159151173",
-      "stable_key": "id::CITY::ne::1159151173",
-      "display_name": {
-        "en": "Ouagadougou",
-        "zh": "瓦加杜古"
-      },
-      "host_feature_id": "BF_ADM1_92566538B14190085014946"
-    },
-    "CITY::ne::1159150625": {
-      "city_id": "CITY::ne::1159150625",
-      "stable_key": "id::CITY::ne::1159150625",
-      "display_name": {
-        "en": "Freetown",
-        "zh": "弗里敦"
-      },
-      "host_feature_id": "SL_ADM1_SLE-761"
-    },
-    "CITY::ne::1159149803": {
-      "city_id": "CITY::ne::1159149803",
-      "stable_key": "id::CITY::ne::1159149803",
-      "display_name": {
-        "en": "Kuching",
-        "zh": "古晋"
-      },
-      "host_feature_id": "MYS-1187"
-    },
-    "CITY::ne::1159151627": {
-      "city_id": "CITY::ne::1159151627",
-      "stable_key": "id::CITY::ne::1159151627",
-      "display_name": {
-        "en": "Shōnan",
-        "zh": "昭南"
-      },
-      "host_feature_id": "SGP-4871"
-    },
-    "CITY::ne::1159149765": {
-      "city_id": "CITY::ne::1159149765",
-      "stable_key": "id::CITY::ne::1159149765",
-      "display_name": {
-        "en": "George Town",
-        "zh": "乔治市"
-      },
-      "host_feature_id": "MYS-1139"
-    },
-    "CITY::ne::1159137983": {
-      "city_id": "CITY::ne::1159137983",
-      "stable_key": "id::CITY::ne::1159137983",
-      "display_name": {
-        "en": "Tacloban",
-        "zh": "塔克洛班"
-      },
-      "host_feature_id": "PHL-5535"
-    },
-    "CITY::ne::1159146605": {
-      "city_id": "CITY::ne::1159146605",
-      "stable_key": "id::CITY::ne::1159146605",
-      "display_name": {
-        "en": "Tuguegarao",
-        "zh": "土格加劳"
-      },
-      "host_feature_id": "PHL-2545"
-    },
-    "CITY::ne::1159113189": {
-      "city_id": "CITY::ne::1159113189",
-      "stable_key": "id::CITY::ne::1159113189",
-      "display_name": {
-        "en": "Cao Bằng",
-        "zh": "高平"
-      },
-      "host_feature_id": "VNM-511"
-    },
-    "CITY::ne::1159151083": {
-      "city_id": "CITY::ne::1159151083",
-      "stable_key": "id::CITY::ne::1159151083",
-      "display_name": {
-        "en": "Brunei Town",
-        "zh": "文莱城"
-      },
-      "host_feature_id": "BN_ADM1_BRN-1182"
-    },
-    "CITY::ne::1159138799": {
-      "city_id": "CITY::ne::1159138799",
-      "stable_key": "id::CITY::ne::1159138799",
-      "display_name": {
-        "en": "Abeokuta",
-        "zh": "阿贝奥库塔"
-      },
-      "host_feature_id": "NG_ADM1_NGA-2852"
-    },
-    "CITY::ne::1159150535": {
-      "city_id": "CITY::ne::1159150535",
-      "stable_key": "id::CITY::ne::1159150535",
-      "display_name": {
-        "en": "Lomé",
-        "zh": "洛美"
-      },
-      "host_feature_id": "TG_ADM1_TGO-87"
     }
   },
   "audit": {

@@ -8,7 +8,7 @@
   "generated_at": "2026-05-31T23:17:04Z",
   "input_sha": {
     "bathymetry_texture/manifest.json": "437f6c74231367468f58bf3cfeddefb03b5926643d563c55e08459cb185db701",
-    "city_overrides.json": "506c569425d1ebddf58b8c7afe78d60bcc4cbb1d1aa14469da3bbafd7483564d",
+    "city_overrides.json": "3ff3f7262acd97ad963af27c1ad13674c82e842f581b7f455b1e1ad0eec72eb8",
     "cores.by_feature.json": "4793ba00691f0a2ba4dc4dc8ad990d6f605d860726475505199e1c08b376f0b5",
     "countries.json": "9a3513855f5fff2136ec7f71c527d0ec53e9d5483939407cf85ffb2f9a9ce864",
     "geo_locale_patch.json": "19ad7146cbf528f7308426fff069ecd9abecb8c86127e9a6b9829de255158da1",
@@ -41,6 +41,6 @@
   "profile": "tno_full",
   "report_paths": {},
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "9871ee8618f3aeedb09be629ac550e8e1b19fac8251b7b6e3cc5c25bd24497ee",
+  "snapshot_fingerprint": "733c1f93a36da4df0a8c4d71065b4058cb65c34c9cedac43b26a56bbdeefb4a1",
   "water_count": 285
 }

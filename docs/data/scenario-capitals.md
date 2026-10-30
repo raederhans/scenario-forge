@@ -166,11 +166,11 @@ KAZ 独立，用 Akmola／阿克莫拉；台北城市宿主目前归 CHI，采�
 | UK01 | Rowno / 罗夫诺 | `CITY::ne::1159134173` | `UA_RAY_74538382B36980255523800` |
 | UK02 | Shitomir / 日托米尔 | `CITY::ne::1159149327` | `UA_RAY_74538382B57692221763967` |
 | UK03 | Tschernigow / 切尔尼戈夫 | `CITY::ne::1159126717` | `UA_RAY_74538382B44220139144156` |
-| UK04 | Dnjepropetrowsk / 第聂伯罗彼得罗夫斯克 | `CITY::ne::1159149329` | `UA_RAY_74538382B23045356862491` |
+| UK04 | Reichenaustadt / 赖歇瑙施塔特 | `CITY::ne::1159149329` | `UA_RAY_74538382B23045356862491` |
 | UK05 | Nikolajew / 尼古拉耶夫 | `CITY::ne::1159126699` | `UA_RAY_74538382B2161330582129` |
 | UK06 | Melitopol / 梅利托波尔 | `CITY::ne::1159134253` | `UA_RAY_74538382B95492559683598` |
 | UK07 | Charkow / 哈尔科夫 | `CITY::ne::1159149333` | `UA_RAY_74538382B36501884751905` |
-| UK08 | Yuzivka / 尤济夫卡 | `CITY::ne::1159149331` | `UA_RAY_74538382B54113761495064` |
+| UK08 | Hughesdorf / 休斯多夫 | `CITY::ne::1159149331` | `UA_RAY_74538382B54113761495064` |
 | PG01 | Warschau / 华沙 | `CITY::ne::1159151299` | `PL_POW_1465` |
 | PG02 | Radom / 拉多姆 | `CITY::gn::760778` | `PL_POW_1463` |
 | PG03 | Lublin / 卢布林 | `CITY::ne::1159139095` | `PL_POW_0663` |
