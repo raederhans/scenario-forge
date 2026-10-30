@@ -181,3 +181,29 @@ test("empty query has no results, no matches is announced, and destroy detaches 
   h.search("alpha");
   assert.equal(h.results.children.length, 0);
 });
+
+test("matches the source name when the UI shows a translated label", () => {
+  const document = { createElement: (tag) => new FakeElement(tag, document) };
+  const container = document.createElement("div");
+  const controller = createRegionSearchController({
+    documentRef: document,
+    state: { landIndex: new Map([
+      ["DE300", { label: "柏林", properties: { name: "Berlin" } }],
+      ["DE600", { label: "汉堡", properties: { name: "Hamburg" } }],
+    ]) },
+    t: (key) => key,
+    getFeatureOwnerCode: () => "GER",
+    getFeatureLabel: (feature) => feature.label,
+    selectLandFeatureById: () => true,
+  });
+  controller.mount(container);
+  controller.setCountry("GER");
+  const block = container.children[0];
+  const input = block.children[1].children[0];
+  input.value = "ber";
+  input.dispatchEvent(new Event("input"));
+  const results = block.children[2];
+  assert.deepEqual(results.children.map((node) => node.getAttribute("data-feature-id")), ["DE300"]);
+  assert.equal(results.children[0].children[1].textContent, "DE300 · Berlin");
+  assert.equal(block.children[3].textContent, "1 matching region");
+});

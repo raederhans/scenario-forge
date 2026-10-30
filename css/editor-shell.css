@@ -2,11 +2,11 @@
 .editor-project-bar { gap: var(--space-3); }
 .mobile-editing-hint {
   position: fixed;
-  /* 项目栏没有高度令牌，按 56px 栏高加顶部安全区定位。 */
-  top: calc(env(safe-area-inset-top, 0px) + 56px);
+  /* 顶部紧贴项目栏处是面板、缩放等地图入口；放在折叠工具坞（54px，距底 16px）上方，展开的工具坞会盖在提示之上。 */
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px + 54px + 8px);
   left: 16px;
   right: 16px;
-  z-index: var(--z-popover);
+  z-index: var(--z-map-overlay);
   display: none;
   align-items: center;
   gap: 8px;

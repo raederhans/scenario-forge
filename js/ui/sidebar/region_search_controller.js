@@ -54,16 +54,22 @@ export function createRegionSearchController({
     for (const [id, feature] of state.landIndex) {
       if (normalizeCode(getFeatureOwnerCode(id)) !== country) continue;
       const label = getFeatureLabel(feature, id);
-      const name = label.toLowerCase();
-      const key = id.toLowerCase();
-      if (name.includes(query) || key.includes(query)) {
-        matches.push({ id, label, prefix: name.startsWith(query) || key.startsWith(query) });
+      // The source name stays searchable when the UI shows a translated label.
+      const sourceName = String(feature?.properties?.name || "").trim();
+      const keys = [label, sourceName, id].map((value) => value.toLowerCase());
+      if (keys.some((value) => value.includes(query))) {
+        matches.push({
+          id,
+          label,
+          sourceName: sourceName && sourceName !== label ? sourceName : "",
+          prefix: keys.some((value) => value.startsWith(query)),
+        });
       }
     }
     matches.sort((a, b) => Number(b.prefix) - Number(a.prefix) || a.label.localeCompare(b.label));
     const count = matches.length;
     matches = matches.slice(0, maxResults);
-    matches.forEach(({ id, label }, index) => {
+    matches.forEach(({ id, label, sourceName }, index) => {
       const option = documentRef.createElement("li");
       option.id = `regionSearchOption-${index}`;
       option.setAttribute("role", "option");
@@ -73,7 +79,7 @@ export function createRegionSearchController({
       name.textContent = label;
       const detail = documentRef.createElement("span");
       detail.className = "region-search-id";
-      detail.textContent = id;
+      detail.textContent = sourceName ? `${id} · ${sourceName}` : id;
       option.append(name, detail);
       option.addEventListener("click", () => select(index));
       results.appendChild(option);
