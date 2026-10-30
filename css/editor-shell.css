@@ -1,5 +1,42 @@
 .editor-task-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .editor-project-bar { gap: var(--space-3); }
+.mobile-editing-hint {
+  position: fixed;
+  /* 顶部紧贴项目栏处是面板、缩放等地图入口；放在折叠工具坞（54px，距底 16px）上方，展开的工具坞会盖在提示之上。 */
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px + 54px + 8px);
+  left: 16px;
+  right: 16px;
+  z-index: var(--z-map-overlay);
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 12px;
+  background: var(--surface-panel);
+  color: var(--ink-900);
+  font-size: 13px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+}
+.mobile-editing-hint-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+@media (pointer: coarse) {
+  .mobile-editing-hint-close { width: 44px; height: 44px; }
+}
+@media (max-width: 767px) {
+  .mobile-editing-hint { display: flex; }
+}
 .editor-project-actions { gap: var(--space-2); }
 .editor-project-divider {
   width: 1px;

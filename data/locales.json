@@ -294980,7 +294980,7 @@
     },
     "Choose whether transport emphasizes distribution, network structure, or coverage reach.": {
       "en": "Choose whether transport emphasizes distribution, network structure, or coverage reach.",
-      "zh": "选择 transport 更强调分布、网络骨架还是覆盖范围。"
+      "zh": "选择交通图层更强调分布、网络骨架还是覆盖范围。"
     },
     "Choose which approved local energy subtypes remain visible.": {
       "en": "Choose which approved local energy subtypes remain visible.",
@@ -295184,7 +295184,7 @@
     },
     "Close transport workbench": {
       "en": "Close transport workbench",
-      "zh": "关闭运输工作台"
+      "zh": "关闭交通工作台"
     },
     "Cloud Saves": {
       "en": "Cloud Saves",
@@ -296024,11 +296024,11 @@
     },
     "Drag rows to define the transport layer order. Live transport families stay available here, and the board remains local to the workbench.": {
       "en": "Drag rows to define the transport layer order. Live transport families stay available here, and the board remains local to the workbench.",
-      "zh": "拖动各行来定义 transport 图层顺序。已启用的 transport families 会在这里保持可用，这个排序板仍只作用于工作台。"
+      "zh": "拖动各行设定交通图层顺序。已启用的交通图层族会一直列在这里，排序只在工作台内生效。"
     },
     "Drag rows to define transport layer order. Availability follows the selected family and current runtime data.": {
       "en": "Drag rows to define transport layer order. Availability follows the selected family and current runtime data.",
-      "zh": "拖动各行来定义 transport 图层顺序。当前可用性会跟随所选 family 和运行时数据。"
+      "zh": "拖动各行设定交通图层顺序。可用项随所选图层族和当前运行时数据变化。"
     },
     "Drag white handles to move vertices, click midpoint pips to insert, then remove the selected vertex if needed.": {
       "en": "Drag white handles to move vertices, click midpoint pips to insert, then remove the selected vertex if needed.",
@@ -298052,7 +298052,7 @@
     },
     "No transport schema loaded yet": {
       "en": "No transport schema loaded yet",
-      "zh": "尚未加载运输 schema"
+      "zh": "尚未加载交通数据结构"
     },
     "No unit counters": {
       "en": "No unit counters",
@@ -298204,7 +298204,7 @@
     },
     "Open transport workbench": {
       "en": "Open transport workbench",
-      "zh": "开放式运输工作台"
+      "zh": "打开交通工作台"
     },
     "Operation Graphics": {
       "en": "Operation Graphics",
@@ -299128,11 +299128,11 @@
     },
     "Reorder the 8 transport families in the center board. This order currently stays local to the Transport workbench.": {
       "en": "Reorder the 8 transport families in the center board. This order currently stays local to the Transport workbench.",
-      "zh": "对中心板上的 8 个传输系列进行重新排序。该订单目前保留在运输工作台本地。"
+      "zh": "在中间面板调整 8 个交通图层族的顺序。此顺序目前只保存在交通工作台内。"
     },
     "Reorder transport layers": {
       "en": "Reorder transport layers",
-      "zh": "重新排序传输层"
+      "zh": "调整交通图层顺序"
     },
     "Replace with dev selection": {
       "en": "Replace with dev selection",
@@ -299716,7 +299716,7 @@
     },
     "Select a transport pack": {
       "en": "Select a transport pack",
-      "zh": "选择一个运输包"
+      "zh": "选择交通资源包"
     },
     "Select a water region to inspect": {
       "en": "Select a water region to inspect",
@@ -300628,11 +300628,11 @@
     },
     "Transport": {
       "en": "Transport",
-      "zh": "运输"
+      "zh": "交通"
     },
     "Transport Visual Mode": {
       "en": "Transport Visual Mode",
-      "zh": "运输视觉模式"
+      "zh": "交通显示模式"
     },
     "Transport Workbench": {
       "en": "Transport Workbench",
@@ -300648,19 +300648,19 @@
     },
     "Transport guide": {
       "en": "Transport guide",
-      "zh": "运输指南"
+      "zh": "交通指南"
     },
     "Transport layer order": {
       "en": "Transport layer order",
-      "zh": "传输层顺序"
+      "zh": "交通图层顺序"
     },
     "Transport pack": {
       "en": "Transport pack",
-      "zh": "运输包"
+      "zh": "交通资源包"
     },
     "Transport workbench": {
       "en": "Transport workbench",
-      "zh": "运输工作台"
+      "zh": "交通工作台"
     },
     "Tropical Rainforest": {
       "en": "Tropical Rainforest",
@@ -300868,7 +300868,7 @@
     },
     "Use the center board to reorder the 8 transport families. The left column provides context, and the right column mirrors the current state.": {
       "en": "Use the center board to reorder the 8 transport families. The left column provides context, and the right column mirrors the current state.",
-      "zh": "使用中间排序板调整 8 个 transport families 的绘制顺序。左侧负责上下文，右侧负责状态查看。"
+      "zh": "在中间面板调整 8 个交通图层族的绘制顺序。左栏提供上下文，右栏显示当前状态。"
     },
     "Use the gear button for the full counter editor.": {
       "en": "Use the gear button for the full counter editor.",
@@ -302216,7 +302216,7 @@
     },
     "Available in Transport Workbench only": {
       "en": "Available in Transport Workbench only",
-      "zh": "仅可在 Transport Workbench 中使用"
+      "zh": "仅可在交通工作台中使用"
     },
     "Available when Bathymetry is enabled.": {
       "en": "Available when Bathymetry is enabled.",
@@ -303508,7 +303508,7 @@
     },
     "Use the center frame to drag families into the order you want future transport layers to draw.": {
       "en": "Use the center frame to drag families into the order you want future transport layers to draw.",
-      "zh": "使用中间框架拖动 families，设置未来 transport layers 的绘制顺序。"
+      "zh": "在中间面板拖动图层族，设定交通图层的绘制顺序。"
     },
     "Use this checklist when you want the shortest safe editing path.": {
       "en": "Use this checklist when you want the shortest safe editing path.",
@@ -303649,6 +303649,58 @@
     "面积模式优先现代大国排序": {
       "en": "面积模式优先现代大国排序",
       "zh": "面积模式优先现代大国排序"
+    },
+    "1 matching region": {
+      "en": "1 matching region",
+      "zh": "1 个匹配地块"
+    },
+    "Can't undo the clear because newer edits exist.": {
+      "en": "Can't undo the clear because newer edits exist.",
+      "zh": "已有新的编辑，无法撤销此次清空。"
+    },
+    "Dismiss": {
+      "en": "Dismiss",
+      "zh": "关闭"
+    },
+    "Editing works best on a desktop screen.": {
+      "en": "Editing works best on a desktop screen.",
+      "zh": "编辑功能建议在桌面端使用"
+    },
+    "Find region": {
+      "en": "Find region",
+      "zh": "查找地块"
+    },
+    "Live in Transport Workbench": {
+      "en": "Live in Transport Workbench",
+      "zh": "已在交通工作台中启用"
+    },
+    "Matching regions": {
+      "en": "Matching regions",
+      "zh": "匹配的地块"
+    },
+    "No matching regions": {
+      "en": "No matching regions",
+      "zh": "没有匹配的地块"
+    },
+    "Region is not loaded yet.": {
+      "en": "Region is not loaded yet.",
+      "zh": "该地块尚未加载。"
+    },
+    "Search region name or ID…": {
+      "en": "Search region name or ID…",
+      "zh": "搜索地块名称或 ID…"
+    },
+    "Selected {name}": {
+      "en": "Selected {name}",
+      "zh": "已选择 {name}"
+    },
+    "Showing first {count} matches. Refine the search.": {
+      "en": "Showing first {count} matches. Refine the search.",
+      "zh": "仅显示前 {count} 条结果，请缩小搜索范围。"
+    },
+    "{count} matching regions": {
+      "en": "{count} matching regions",
+      "zh": "{count} 个匹配地块"
     }
   }
 }

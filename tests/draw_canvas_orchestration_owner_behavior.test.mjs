@@ -4,6 +4,7 @@ import test from "node:test";
 import { createDrawCanvasOrchestrationOwner } from "../js/core/map_renderer/draw_canvas_orchestration_owner.js";
 import { createOverviewFrameOwner } from "../js/core/renderer/overview_frame_owner.js";
 import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
+import { createRenderPipelinePassesOwner } from "../js/core/renderer/render_pipeline_passes.js";
 
 const CONSTANTS = Object.freeze({
   renderPhaseIdle: "idle",
@@ -627,6 +628,43 @@ test("private scene publication waits without aborting or finalizing exact refre
   for (const name of ["abortPendingExactAfterSettleRefreshAfterPaint", "finalizePendingExactAfterSettleRefreshAfterPaint", "captureLastGoodFrame"]) {
     assert.equal(names(calls).includes(name), false, name);
   }
+});
+
+test("idle frame composes pending borders but captures only after preparation completes", () => {
+  let pending = true;
+  const cache = { canvases: { borders: {} }, signatures: {}, dirty: { borders: true }, reasons: {}, counters: {} };
+  const pipeline = createRenderPipelinePassesOwner({
+    state: { zoomTransform: { x: 0, y: 0, k: 2 } },
+    helpers: {
+      getRenderPassCacheState: () => cache,
+      getPassReferenceTransform: () => ({ x: 0, y: 0, k: 1 }),
+      getRenderPassSignature: () => "next",
+      prepareRenderPassAsync: () => pending,
+      renderPassToCache: (name) => { cache.dirty[name] = false; cache.signatures[name] = "next"; },
+    },
+  });
+  const { calls, owner } = createHarness({
+    activePassNames: ["borders"], activeScenarioId: "tno_1962",
+    onEnsureIdleTimings: (timings) => assert.equal(pipeline.ensureIdleRenderPasses(timings, ["borders"]), true),
+  });
+  const deferred = owner.drawCanvasFrame(SUMMARY_OPTIONS);
+  assert.equal(deferred.status, "drawn");
+  assert.equal(deferred.frameMode, "exact");
+  assert.equal(deferred.skippedCapture, true);
+  assert.ok(names(calls).includes("composeCachedPasses"));
+  assert.equal(calls.find(([name]) => name === "commitLastFrame")[1].timings.usedDirtyFastFramePasses, "borders");
+  assert.ok(!names(calls).includes("captureLastGoodFrame"));
+  assert.deepEqual(calls.find(([name]) => name === "recordRenderPerfMetric"), [
+    "recordRenderPerfMetric", "lastGoodFrameCaptureSkipped", 0,
+    { reason: "dirty-fast-frame", dirtyPasses: "borders", activeScenarioId: "tno_1962", phase: "idle" },
+  ]);
+  pending = false;
+  calls.length = 0;
+  const ready = owner.drawCanvasFrame(SUMMARY_OPTIONS);
+  assert.equal(ready.frameMode, "exact");
+  assert.equal(ready.skippedCapture, false);
+  assert.ok(names(calls).includes("captureLastGoodFrame"));
+  assert.equal(cache.dirty.borders, false);
 });
 
 test("dirty fast frame skips capture and records exact metadata", () => {

@@ -6,6 +6,7 @@ function makeNode(document, tagName = "div") {
   const classes = new Set();
   const attributes = new Map();
   const listeners = new Map();
+  const styles = new Map();
   const writes = {};
   const recordWrite = (name) => { writes[name] = (writes[name] || 0) + 1; };
   const node = {
@@ -20,7 +21,7 @@ function makeNode(document, tagName = "div") {
     },
     get childNodes() { return this.children; },
     dataset: {},
-    style: { setProperty() {} },
+    style: { setProperty(name, value) { styles.set(name, value); }, getPropertyValue(name) { return styles.get(name) || ""; } },
     hidden: false,
     disabled: false,
     value: "",
@@ -126,7 +127,7 @@ test("long styled select searches groups and keeps native value and keyboard con
   let mutationCallback;
   let observerOptions;
   const document = {
-    documentElement: { clientWidth: 800, clientHeight: 600 },
+    documentElement: { clientWidth: 800, clientHeight: 600, style: { setProperty() {} } },
     activeElement: null,
     createElement(tagName) { return makeNode(document, tagName); },
     getElementById(id) {
@@ -137,7 +138,7 @@ test("long styled select searches groups and keeps native value and keyboard con
   };
   document.body = makeNode(document, "body");
   globalThis.document = document;
-  globalThis.window = { innerWidth: 800, innerHeight: 600, addEventListener() {} };
+  globalThis.window = { document, innerWidth: 800, innerHeight: 600, addEventListener() {} };
   globalThis.MutationObserver = class {
     constructor(callback) { mutationCallback = callback; }
     observe(_target, options) { observerOptions = options; }
@@ -438,5 +439,59 @@ test("long styled select searches groups and keeps native value and keyboard con
     globalThis.document = originalDocument;
     globalThis.window = originalWindow;
     globalThis.MutationObserver = originalObserver;
+  }
+});
+
+ test("styled select stays inside the visual viewport and stops repositioning when closed", async () => {
+  const originals = { document: globalThis.document, window: globalThis.window, MutationObserver: globalThis.MutationObserver };
+  const document = {
+    documentElement: { clientWidth: 800, clientHeight: 600, style: { setProperty() {} } },
+    createElement(tag) { return makeNode(document, tag); },
+    addEventListener() {},
+  };
+  document.body = makeNode(document, "body");
+  const select = makeNode(document, "select");
+  select.classList.add("select-input");
+  const option = makeNode(document, "option");
+  option.value = "one";
+  option.textContent = "One";
+  select.appendChild(option);
+  select.options = [option];
+  select.selectedOptions = [option];
+  document.body.appendChild(select);
+  document.querySelectorAll = () => [select];
+  const vv = Object.assign(new EventTarget(), { offsetTop: 0, offsetLeft: 0, width: 800, height: 600 });
+  globalThis.document = document;
+  globalThis.window = { document, visualViewport: vv, innerWidth: 800, innerHeight: 600, addEventListener() {} };
+  globalThis.MutationObserver = class { observe() {} };
+  try {
+    const { initStyledSelects } = await import("../js/ui/styled_selects.js?visual-viewport-test");
+    initStyledSelects(document);
+    const [, button, menu] = select.parentNode.children;
+    button.getBoundingClientRect = () => ({ left: 700, top: 260, bottom: 298, width: 180 });
+    const value = (name) => Number.parseFloat(menu.style.getPropertyValue(`--app-select-menu-${name}`));
+    button.click();
+    assert.equal(value("top"), 304);
+    vv.height = 340;
+    vv.dispatchEvent(new Event("resize"));
+    assert.ok(value("top") < 260, "keyboard causes upward opening");
+    assert.ok(value("top") + value("max-height") <= 332);
+    vv.offsetTop = 100;
+    vv.offsetLeft = 50;
+    vv.width = 300;
+    vv.height = 180;
+    vv.dispatchEvent(new Event("scroll"));
+    assert.ok(value("top") >= 108);
+    assert.ok(value("top") + value("max-height") <= 272);
+    assert.ok(value("left") >= 58);
+    assert.ok(value("left") + value("width") <= 342);
+    button.click();
+    const closedTop = value("top");
+    vv.offsetTop = 200;
+    vv.dispatchEvent(new Event("scroll"));
+    vv.dispatchEvent(new Event("resize"));
+    assert.equal(value("top"), closedTop);
+  } finally {
+    Object.assign(globalThis, originals);
   }
 });

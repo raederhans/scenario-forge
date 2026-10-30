@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Local Playwright tooling for Scenario Forge browser inspection and e2e regression tests.",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "scripts": {
     "test": "node tools/run_all_tests.mjs node && node tools/run_all_tests.mjs python",
@@ -86,10 +86,10 @@
     "build:editor-bundle": "node tools/build_editor_bundle.mjs --app-root dist/app --sourcemap"
   },
   "devDependencies": {
-    "@playwright/test": "1.58.2",
+    "@playwright/test": "1.64.1",
     "acorn": "8.17.0",
     "acorn-walk": "8.3.5",
     "esbuild": "0.24.2",
-    "playwright": "1.58.2"
+    "playwright": "1.64.1"
   }
 }

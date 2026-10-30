@@ -7999,11 +7999,11 @@ body.counter-editor-modal-open {
 
 .project-account-popover {
   position: fixed;
-  top: 50%;
+  top: calc(var(--visual-viewport-top, 0px) + var(--visual-viewport-height, 100dvh) / 2);
   left: 50%;
   z-index: calc(var(--z-popover) + 25);
   width: min(560px, calc(100vw - 40px));
-  max-height: min(760px, calc(100vh - 56px));
+  max-height: min(760px, calc(var(--visual-viewport-height, 100dvh) - 56px));
   overflow-y: auto;
   padding: 22px;
   border: 1px solid var(--line-2);

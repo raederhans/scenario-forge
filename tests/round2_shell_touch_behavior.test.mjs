@@ -28,6 +28,12 @@ class Node {
   removeAttribute(name) { this.attributes.delete(name); }
   append(...nodes) { nodes.forEach(node => this.appendChild(node)); }
   appendChild(node) { this.children.push(node); node.parentElement = this; return node; }
+  prepend(node) { this.children.unshift(node); node.parentElement = this; }
+  after(node) {
+    const parent = this.parentElement;
+    parent.children.splice(parent.children.indexOf(this) + 1, 0, node);
+    node.parentElement = parent;
+  }
   replaceChildren(...nodes) { this.children.forEach(node => { node.parentElement = null; }); this.children = []; this.append(...nodes); }
   remove() { this.parentElement.children = this.parentElement.children.filter(node => node !== this); this.parentElement = null; }
   contains(node) { return this === node || this.children.some(child => child.contains(node)); }
@@ -75,6 +81,7 @@ function harness(context) {
   const doc = new Node("document"); doc.ownerDocument = doc;
   doc.body = doc.appendChild(new Node("body", doc));
   doc.createElement = tag => new Node(tag, doc);
+  doc.createElementNS = (namespace, tag) => new Node(tag, doc);
   doc.getElementById = id => doc.querySelector(`#${id}`);
   const win = new Node("window", doc);
   for (const [key, value] of Object.entries({ document: doc, window: win, HTMLElement: Node, Element: Node, HTMLDetailsElement: class extends Node {}, HTMLInputElement: class extends Node {}, HTMLSelectElement: class extends Node {},
