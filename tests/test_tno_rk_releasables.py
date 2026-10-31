@@ -37,3 +37,24 @@ def test_rk_capitals_use_the_restored_occupation_names():
                for index in range(count)}
     assert not retired.intersection(payload["capitals_by_tag"])
     assert not retired.intersection(payload["capital_city_hints"])
+
+
+def test_german_african_districts_are_releasable_under_holding_parents():
+    scenario = ROOT / "data/scenarios/tno_1962"
+    countries = json.loads((scenario / "countries.json").read_text(encoding="utf-8"))["countries"]
+    owners = json.loads((scenario / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
+    catalog = json.loads((ROOT / "data/releasables/tno_1962.internal.phase1.catalog.json").read_text(encoding="utf-8"))
+    entries = {entry["tag"]: entry for entry in catalog["entries"]}
+    districts = {"GCO": ("CG00", "CGBC", "CGGA", "CGKT", "CGKV", "CGUB"),
+                 "GEA": ("GEAB", "GEAM", "GEAN", "GEAR", "GEAS", "GEAT", "GEAU", "GEAZ"),
+                 "ANG": ("SWAO",)}
+    for parent, tags in districts.items():
+        assert countries[parent].get("entry_kind") != "scenario_container"
+        assert countries[parent]["feature_count"] > 0
+        for tag in tags:
+            assert tag not in countries
+            entry = entries[tag]
+            assert entry["parent_owner_tag"] == parent
+            assert entry["validation_status"] == "ok"
+            assert entry["preset_source"]["feature_ids"]
+            assert all(owners[fid] == parent for fid in entry["preset_source"]["feature_ids"])

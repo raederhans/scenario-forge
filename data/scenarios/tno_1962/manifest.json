@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/tno_1962/audit.json",
-  "baseline_hash": "1c66edd5366a3d58009dadbefecd1e3116c821a156ca7f03edbfd165d9da8f53",
+  "baseline_hash": "7136b0e45ecb6f83ac32769301fb8803620a13a5f5b1da6fdbd59fde0db880ca",
   "bathymetry_texture_url": "data/scenarios/tno_1962/bathymetry_texture/manifest.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
@@ -3007,12 +3007,12 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "d23a7cb61e56dbe08d02db5ed96665fe80bd20ca3deb8bb9cad96e9cf6972462",
+  "snapshot_fingerprint": "9295295e598033ee1f2d6ed4c8169cda22b80afe8018c753e162320c8cf71589",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "c24670e6a51c9355b2cf037636dde35c72844b172e7216cf33a6e6e1d7e1051b",
-    "runtime_bootstrap_topology_sha256": "7ceb0e81f5abb947e4d6cd9f8e444fcd50114cb7cec10186c45a09bdf9f29170",
-    "runtime_topology_sha256": "741ca730823d4605cd01306b8ad619a83786e91b936c20cf4c9e89d71ec9cc33"
+    "detail_chunk_manifest_sha256": "d59bca03e70a54d2d9eb5143b6b9c1c00d23e97ccebd8d7abe946649902ecaff",
+    "runtime_bootstrap_topology_sha256": "a2863d77e286c75740b339b03c60dbd49a1ab4a4428f255b43f95189a842e7ba",
+    "runtime_topology_sha256": "3d659c2ccbf20bcd0e22b4db08e699407dfa57e5b2c6ecff19a7a63d23bbc144"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
@@ -3045,7 +3045,7 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 240,
+    "controller_count": 223,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -3055,7 +3055,7 @@
     "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 240,
+    "owner_count": 223,
     "quality_counts": {
       "approx_existing_geometry": 1033,
       "direct_country_copy": 2702,

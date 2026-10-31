@@ -280,9 +280,9 @@ class TnoSouthOwnershipTest(unittest.TestCase):
             "RS228": "BUL", "XK_ADM1_KOS-5914": "BUL", "XK_ADM1_KOS-5915": "BUL",
             "ATLISL_levant_cyprus": "GRE", "GR_ADM1_GRC-2992": "GRE",
             "ATLISL_adriatica_corfu": "ITA", "SI041": "ITA", "SI037": "ITA", "SI031": "HUN",
-            "HR031": "ITA", "HR032": "CRO", "HR033": "CRO", "HR034": "ITA",
-            "HR035": "CRO", "HR036": "ITA", "HR037": "CRO",
-            "ME_ADM1_MNE-1496": "MNT", "ME_ADM1_MNE-1499": "MNT",
+            "HR031": "ITA", "HR032": "ITA", "HR033": "ITA", "HR034": "ITA",
+            "HR035": "ITA", "HR036": "ITA", "HR037": "ITA",
+            "ME_ADM1_MNE-1496": "ITA", "ME_ADM1_MNE-1499": "MNT",
             "ME_ADM1_MNE-1497": "ALB", "ME_ADM1_MNE-1506": "ITA",
             "ME_ADM1_MNE-1507": "ITA", "ME_ADM1_MNE-1518": "ITA",
         }.items():

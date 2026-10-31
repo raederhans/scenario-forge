@@ -141,148 +141,148 @@
       "owner": "ALB"
     },
     "AO_ADM1_AGO-1874": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1875": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1876": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1877": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1878": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1879": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1880": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1881": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1882": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1885": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1886": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1887": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1888": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1889": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1890": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1891": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1892": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "AO_ADM1_AGO-1893": {
-      "controller": "SWAO",
+      "controller": "ANG",
       "cores": [
         "ANG",
         "ANG"
       ],
-      "owner": "SWAO"
+      "owner": "ANG"
     },
     "ATLISL_adriatica_CRO_3": {
       "controller": "ITA",
@@ -292,11 +292,11 @@
       "owner": "ITA"
     },
     "ATLISL_adriatica_CRO_9": {
-      "controller": "CRO",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "CRO"
+      "owner": "ITA"
     },
     "ATLISL_adriatica_ITA_1": {
       "controller": "ALB",
@@ -463,6 +463,13 @@
       ],
       "owner": "ALB"
     },
+    "ATLPRV_18252": {
+      "controller": "ITA",
+      "cores": [
+        "ATL"
+      ],
+      "owner": "ITA"
+    },
     "ATLPRV_18254": {
       "controller": "ITA",
       "cores": [
@@ -506,18 +513,18 @@
       "owner": "ITA"
     },
     "ATLPRV_19222": {
-      "controller": "CRO",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "CRO"
+      "owner": "ITA"
     },
     "ATLPRV_20006": {
-      "controller": "CRO",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "CRO"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_10": {
       "controller": "ITA",
@@ -1275,140 +1282,140 @@
       "owner": "HAU"
     },
     "BI_ADM1_BDI-2632": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2633": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2634": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2635": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2636": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2637": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2638": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2639": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2640": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2641": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2642": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2643": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-2644": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-3364": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-3365": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-4854": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BI_ADM1_BDI-5588": {
-      "controller": "GEAB",
+      "controller": "GEA",
       "cores": [
         "BDI",
         "GEA"
       ],
-      "owner": "GEAB"
+      "owner": "GEA"
     },
     "BJ_ADM1_BEN-2169": {
       "controller": "DAH",
@@ -1642,11 +1649,11 @@
       "owner": "OE03"
     },
     "BY_INT_BREST": {
-      "controller": "OE00",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "OE00"
+      "owner": "OE03"
     },
     "BY_INT_GOMEL": {
       "controller": "OE03",
@@ -1698,11 +1705,11 @@
       "owner": "OE03"
     },
     "BY_RAY_67162791B13547290723272": {
-      "controller": "OE03",
+      "controller": "GER",
       "cores": [
         "RKO"
       ],
-      "owner": "OE03"
+      "owner": "GER"
     },
     "BY_RAY_67162791B14569635979911": {
       "controller": "OE03",
@@ -2237,277 +2244,277 @@
       "owner": "CAN"
     },
     "CD_ADM1_COD-1461__tno1962_1": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1461__tno1962_2": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1461__tno1962_3": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1461__tno1962_4": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1461__tno1962_5": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1461__tno1962_6": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1559": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1871__tno1962_1": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1871__tno1962_2": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1871__tno1962_3": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1871__tno1962_4": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1871__tno1962_5": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1871__tno1962_6": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1871__tno1962_7": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1872__tno1962_1": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1872__tno1962_2": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1872__tno1962_3": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1872__tno1962_4": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1872__tno1962_5": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1872__tno1962_6": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1872__tno1962_7": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1872__tno1962_8": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1883": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1884": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1894": {
-      "controller": "CGKV",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGKV"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1895": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1896__tno1962_1": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1896__tno1962_2": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1896__tno1962_3": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1896__tno1962_4": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1897": {
-      "controller": "CGKT",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGKT"
+      "owner": "GCO"
     },
     "CD_ADM1_COD-1898": {
-      "controller": "CGKV",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGKV"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-1460": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-4856": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-794": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-795": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-801": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-802": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-804": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-805": {
       "controller": "CAO",
@@ -2531,18 +2538,18 @@
       "owner": "CAO"
     },
     "CF_ADM1_CAF-808": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-809": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-810": {
       "controller": "CAO",
@@ -2559,137 +2566,137 @@
       "owner": "CAO"
     },
     "CF_ADM1_CAF-866": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-867": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CF_ADM1_CAF-868": {
-      "controller": "CGUB",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGUB"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-2185__tno1962_1": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-2185__tno1962_2": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-2185__tno1962_3": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-2185__tno1962_4": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-2626": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-2880": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-3341__tno1962_1": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-3341__tno1962_2": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-3342": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-3343": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-3344": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-3345": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-3346__tno1962_1": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-3346__tno1962_2": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-4855": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CG_ADM1_COG-5855": {
-      "controller": "CGBC",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGBC"
+      "owner": "GCO"
     },
     "CI_ADM1_83157122B12160353323799": {
       "controller": "GUI",
@@ -2776,18 +2783,18 @@
       "owner": "CAO"
     },
     "CM_ADM1_CMR-1480": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CM_ADM1_CMR-1481": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CM_ADM1_CMR-1482": {
       "controller": "CAO",
@@ -2818,11 +2825,11 @@
       "owner": "CAO"
     },
     "CM_ADM1_CMR-803": {
-      "controller": "CG00",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CG00"
+      "owner": "GCO"
     },
     "CN_CITY_17275852B11052099771689": {
       "controller": "XIK",
@@ -4582,6 +4589,13 @@
       ],
       "owner": "IDJI"
     },
+    "DZA-2143": {
+      "controller": "IAL",
+      "cores": [
+        "ALC"
+      ],
+      "owner": "IAL"
+    },
     "EE001": {
       "controller": "OE01",
       "cores": [
@@ -4947,67 +4961,67 @@
       "owner": "FRA"
     },
     "GA_ADM1_GAB-2168": {
-      "controller": "CGGA",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGGA"
+      "owner": "GCO"
     },
     "GA_ADM1_GAB-2186": {
-      "controller": "CGGA",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGGA"
+      "owner": "GCO"
     },
     "GA_ADM1_GAB-2187": {
-      "controller": "CGGA",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGGA"
+      "owner": "GCO"
     },
     "GA_ADM1_GAB-2621": {
-      "controller": "CGGA",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGGA"
+      "owner": "GCO"
     },
     "GA_ADM1_GAB-2622": {
-      "controller": "CGGA",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGGA"
+      "owner": "GCO"
     },
     "GA_ADM1_GAB-2623": {
-      "controller": "CGGA",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGGA"
+      "owner": "GCO"
     },
     "GA_ADM1_GAB-2624": {
-      "controller": "CGGA",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGGA"
+      "owner": "GCO"
     },
     "GA_ADM1_GAB-2627": {
-      "controller": "CGGA",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGGA"
+      "owner": "GCO"
     },
     "GA_ADM1_GAB-2628": {
-      "controller": "CGGA",
+      "controller": "GCO",
       "cores": [
         "GCO"
       ],
-      "owner": "CGGA"
+      "owner": "GCO"
     },
     "GEO-3015": {
       "controller": "RKK",
@@ -5341,18 +5355,18 @@
       "owner": "ITA"
     },
     "HR032": {
-      "controller": "CRO",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "CRO"
+      "owner": "ITA"
     },
     "HR033": {
-      "controller": "CRO",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "CRO"
+      "owner": "ITA"
     },
     "HR034": {
       "controller": "ITA",
@@ -5362,11 +5376,11 @@
       "owner": "ITA"
     },
     "HR035": {
-      "controller": "CRO",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "CRO"
+      "owner": "ITA"
     },
     "HR036": {
       "controller": "ITA",
@@ -5376,11 +5390,11 @@
       "owner": "ITA"
     },
     "HR037": {
-      "controller": "CRO",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "CRO"
+      "owner": "ITA"
     },
     "HT_ADM1_HTI-1385": {
       "controller": "DOM",
@@ -5390,11 +5404,11 @@
       "owner": "DOM"
     },
     "IN_ADM2_76128533B15567489974292": {
-      "controller": "RAJ",
+      "controller": "PAK",
       "cores": [
         "RAJ"
       ],
-      "owner": "RAJ"
+      "owner": "PAK"
     },
     "IN_ADM2_76128533B18931932305748": {
       "controller": "AZH",
@@ -5417,6 +5431,13 @@
       ],
       "owner": "AZH"
     },
+    "IN_ADM2_76128533B2782141712775": {
+      "controller": "PAK",
+      "cores": [
+        "RAJ"
+      ],
+      "owner": "PAK"
+    },
     "IN_ADM2_76128533B32249045995424": {
       "controller": "RAJ",
       "cores": [
@@ -5425,11 +5446,11 @@
       "owner": "RAJ"
     },
     "IN_ADM2_76128533B32998994032811": {
-      "controller": "RAJ",
+      "controller": "PAK",
       "cores": [
         "RAJ"
       ],
-      "owner": "RAJ"
+      "owner": "PAK"
     },
     "IN_ADM2_76128533B3371867518692": {
       "controller": "RAJ",
@@ -5446,18 +5467,18 @@
       "owner": "RAJ"
     },
     "IN_ADM2_76128533B41744580856133": {
-      "controller": "RAJ",
+      "controller": "PAK",
       "cores": [
         "RAJ"
       ],
-      "owner": "RAJ"
+      "owner": "PAK"
     },
     "IN_ADM2_76128533B45655211862788": {
-      "controller": "RAJ",
+      "controller": "PAK",
       "cores": [
         "RAJ"
       ],
-      "owner": "RAJ"
+      "owner": "PAK"
     },
     "IN_ADM2_76128533B50784044604286": {
       "controller": "RAJ",
@@ -6244,60 +6265,60 @@
       "owner": "IKEN"
     },
     "LBY-2964": {
-      "controller": "ITA",
+      "controller": "LBA",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "LBA"
     },
     "LBY-2965": {
-      "controller": "ISUE",
+      "controller": "LBA",
       "cores": [
         "ITA"
       ],
-      "owner": "ISUE"
+      "owner": "LBA"
     },
     "LBY-2967": {
-      "controller": "ITA",
+      "controller": "LBA",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "LBA"
     },
     "LBY-2969": {
-      "controller": "ITA",
+      "controller": "LBA",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "LBA"
     },
     "LBY-2971": {
-      "controller": "ITA",
+      "controller": "LBA",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "LBA"
     },
     "LBY-2976": {
-      "controller": "ITA",
+      "controller": "LBA",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "LBA"
     },
     "LBY-2983": {
-      "controller": "ITA",
+      "controller": "LBA",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "LBA"
     },
     "LBY-5488": {
-      "controller": "ITA",
+      "controller": "LBA",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "LBA"
     },
     "LS_ADM1_LSO-1202": {
       "controller": "LTH",
@@ -6377,11 +6398,11 @@
       "owner": "OE02"
     },
     "LT021": {
-      "controller": "OE02",
+      "controller": "GER",
       "cores": [
         "RKO"
       ],
-      "owner": "OE02"
+      "owner": "GER"
     },
     "LT022": {
       "controller": "OE02",
@@ -6476,11 +6497,11 @@
       "owner": "OE00"
     },
     "ME_ADM1_MNE-1496": {
-      "controller": "MNT",
+      "controller": "ITA",
       "cores": [
         "MNT"
       ],
-      "owner": "MNT"
+      "owner": "ITA"
     },
     "ME_ADM1_MNE-1497": {
       "controller": "ALB",
@@ -6721,11 +6742,11 @@
       "owner": "IBR"
     },
     "MR_ADM1_MRT-2786": {
-      "controller": "MAU",
+      "controller": "IBR",
       "cores": [
         "MAU"
       ],
-      "owner": "MAU"
+      "owner": "IBR"
     },
     "MR_ADM1_MRT-2787": {
       "controller": "MAU",
@@ -6784,35 +6805,35 @@
       "owner": "MAU"
     },
     "MR_ADM1_MRT-2798": {
-      "controller": "MAU",
+      "controller": "IBR",
       "cores": [
         "MAU"
       ],
-      "owner": "MAU"
+      "owner": "IBR"
     },
     "MW_ADM1_82672581B12520625652479": {
-      "controller": "GEAN",
+      "controller": "GEA",
       "cores": [
         "MWI",
         "GEA"
       ],
-      "owner": "GEAN"
+      "owner": "GEA"
     },
     "MW_ADM1_82672581B33227208107325": {
-      "controller": "GEAN",
+      "controller": "GEA",
       "cores": [
         "MWI",
         "GEA"
       ],
-      "owner": "GEAN"
+      "owner": "GEA"
     },
     "MW_ADM1_82672581B71595037145626": {
-      "controller": "GEAN",
+      "controller": "GEA",
       "cores": [
         "MWI",
         "GEA"
       ],
-      "owner": "GEAN"
+      "owner": "GEA"
     },
     "MYS-1137": {
       "controller": "MLY",
@@ -6892,92 +6913,92 @@
       "owner": "SHO"
     },
     "MZ_ADM1_MOZ-1190": {
-      "controller": "GEAM",
+      "controller": "GEA",
       "cores": [
         "MZB",
         "GEA"
       ],
-      "owner": "GEAM"
+      "owner": "GEA"
     },
     "MZ_ADM1_MOZ-1192": {
-      "controller": "GEAM",
+      "controller": "GEA",
       "cores": [
         "MZB",
         "GEA"
       ],
-      "owner": "GEAM"
+      "owner": "GEA"
     },
     "MZ_ADM1_MOZ-1198": {
-      "controller": "GEAM",
+      "controller": "GEA",
       "cores": [
         "MZB",
         "GEA"
       ],
-      "owner": "GEAM"
+      "owner": "GEA"
     },
     "MZ_ADM1_MOZ-1199": {
-      "controller": "GEAM",
+      "controller": "GEA",
       "cores": [
         "MZB",
         "GEA"
       ],
-      "owner": "GEAM"
+      "owner": "GEA"
     },
     "MZ_ADM1_MOZ-1200": {
-      "controller": "GEAM",
+      "controller": "GEA",
       "cores": [
         "MZB",
         "GEA"
       ],
-      "owner": "GEAM"
+      "owner": "GEA"
     },
     "MZ_ADM1_MOZ-1207": {
-      "controller": "GEAM",
+      "controller": "GEA",
       "cores": [
         "MZB",
         "GEA"
       ],
-      "owner": "GEAM"
+      "owner": "GEA"
     },
     "MZ_ADM1_MOZ-1905": {
-      "controller": "GEAM",
+      "controller": "GEA",
       "cores": [
         "MZB",
         "GEA"
       ],
-      "owner": "GEAM"
+      "owner": "GEA"
     },
     "MZ_ADM1_MOZ-1906": {
-      "controller": "GEAM",
+      "controller": "GEA",
       "cores": [
         "MZB",
         "GEA"
       ],
-      "owner": "GEAM"
+      "owner": "GEA"
     },
     "MZ_ADM1_MOZ-1925": {
-      "controller": "GEAM",
+      "controller": "GEA",
       "cores": [
         "MZB",
         "GEA"
       ],
-      "owner": "GEAM"
+      "owner": "GEA"
     },
     "MZ_ADM1_MOZ-1927": {
-      "controller": "GEAM",
+      "controller": "GEA",
       "cores": [
         "MZB",
         "GEA"
       ],
-      "owner": "GEAM"
+      "owner": "GEA"
     },
     "MZ_ADM1_MOZ-5854": {
-      "controller": "GEAM",
+      "controller": "GEA",
       "cores": [
         "MZB",
         "GEA"
       ],
-      "owner": "GEAM"
+      "owner": "GEA"
     },
     "NE_ADM1_NER-4859": {
       "controller": "HAU",
@@ -7118,6 +7139,13 @@
         "CAO"
       ],
       "owner": "CAO"
+    },
+    "NG_ADM1_NGA-2852": {
+      "controller": "YOR",
+      "cores": [
+        "YOR"
+      ],
+      "owner": "YOR"
     },
     "NG_ADM1_NGA-2853": {
       "controller": "YOR",
@@ -7422,19 +7450,33 @@
       ],
       "owner": "RKNO"
     },
+    "PAK-1108": {
+      "controller": "PAK",
+      "cores": [
+        "AFG"
+      ],
+      "owner": "PAK"
+    },
     "PAK-1113": {
-      "controller": "RAJ",
+      "controller": "PAK",
       "cores": [
         "RAJ"
       ],
-      "owner": "RAJ"
+      "owner": "PAK"
     },
     "PAK-1114": {
-      "controller": "RAJ",
+      "controller": "PAK",
       "cores": [
         "RAJ"
       ],
-      "owner": "RAJ"
+      "owner": "PAK"
+    },
+    "PAK-1123": {
+      "controller": "PAK",
+      "cores": [
+        "AFG"
+      ],
+      "owner": "PAK"
     },
     "PA_ADM1_PAN-1337__SPLIT_PCZ": {
       "controller": "PCZ",
@@ -8172,18 +8214,18 @@
       "owner": "RKP"
     },
     "PL_POW_2001": {
-      "controller": "OE02",
+      "controller": "GER",
       "cores": [
         "RKO"
       ],
-      "owner": "OE02"
+      "owner": "GER"
     },
     "PL_POW_2009": {
-      "controller": "OE02",
+      "controller": "GER",
       "cores": [
         "RKO"
       ],
-      "owner": "OE02"
+      "owner": "GER"
     },
     "PL_POW_2661": {
       "controller": "RKP",
@@ -8675,11 +8717,11 @@
       "owner": "FIN"
     },
     "RU_MRG_421f6b2285d7": {
-      "controller": "RKM",
+      "controller": "RKU",
       "cores": [
         "RKM"
       ],
-      "owner": "RKM"
+      "owner": "RKU"
     },
     "RU_MRG_427102c526cb": {
       "controller": "PRM",
@@ -9109,11 +9151,11 @@
       "owner": "CHT"
     },
     "RU_MRG_6dc9d50b794a": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_MRG_6df85226925c": {
       "controller": "RKK",
@@ -9319,11 +9361,11 @@
       "owner": "FIN"
     },
     "RU_MRG_7fee908b63f6": {
-      "controller": "OE04",
+      "controller": "OE00",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE00"
     },
     "RU_MRG_807631e65728": {
       "controller": "RKK",
@@ -9956,11 +9998,11 @@
       "owner": "VOL"
     },
     "RU_MRG_cd478b5a76eb": {
-      "controller": "OE04",
+      "controller": "OE00",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE00"
     },
     "RU_MRG_d12c5659178e": {
       "controller": "OMS",
@@ -10397,11 +10439,11 @@
       "owner": "MGN"
     },
     "RU_RAY_50074027B11673707761487": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B12014197778868": {
       "controller": "RKM",
@@ -10411,11 +10453,11 @@
       "owner": "RKM"
     },
     "RU_RAY_50074027B12162041502673": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B12942583135720": {
       "controller": "RKU",
@@ -10558,11 +10600,11 @@
       "owner": "ORS"
     },
     "RU_RAY_50074027B17337160846160": {
-      "controller": "RKM",
+      "controller": "RKU",
       "cores": [
         "RKM"
       ],
-      "owner": "RKM"
+      "owner": "RKU"
     },
     "RU_RAY_50074027B17781956857402__tno1962_1": {
       "controller": "RKK",
@@ -10649,11 +10691,11 @@
       "owner": "RKM"
     },
     "RU_RAY_50074027B19741518738580": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B20253526605231": {
       "controller": "RKK",
@@ -11200,11 +11242,11 @@
       "owner": "ORS"
     },
     "RU_RAY_50074027B37881642500609": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B39041476138502": {
       "controller": "WRS",
@@ -11457,11 +11499,11 @@
       "owner": "RKU"
     },
     "RU_RAY_50074027B464999176845": {
-      "controller": "OE04",
+      "controller": "OE00",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE00"
     },
     "RU_RAY_50074027B47797242403348": {
       "controller": "OE03",
@@ -11478,11 +11520,11 @@
       "owner": "RKU"
     },
     "RU_RAY_50074027B49278461872326": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B49390035135032": {
       "controller": "ONG",
@@ -11569,11 +11611,11 @@
       "owner": "RKM"
     },
     "RU_RAY_50074027B5223158268211": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B5244237471572": {
       "controller": "BKR",
@@ -11709,11 +11751,11 @@
       "owner": "NRL"
     },
     "RU_RAY_50074027B5631740772865": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B5636373346867": {
       "controller": "RKM",
@@ -11786,11 +11828,11 @@
       "owner": "MAG"
     },
     "RU_RAY_50074027B58076034090645": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B5810919802918__tno1962_1": {
       "controller": "RKK",
@@ -11982,11 +12024,11 @@
       "owner": "ORS"
     },
     "RU_RAY_50074027B62612106128387": {
-      "controller": "RKM",
+      "controller": "RKU",
       "cores": [
         "RKM"
       ],
-      "owner": "RKM"
+      "owner": "RKU"
     },
     "RU_RAY_50074027B62743108472351": {
       "controller": "AMR",
@@ -12010,18 +12052,18 @@
       "owner": "IRK"
     },
     "RU_RAY_50074027B64055482679717": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B64075323117418": {
-      "controller": "RKM",
+      "controller": "RKU",
       "cores": [
         "RKM"
       ],
-      "owner": "RKM"
+      "owner": "RKU"
     },
     "RU_RAY_50074027B64298708996780": {
       "controller": "NRL",
@@ -12192,11 +12234,11 @@
       "owner": "RKM"
     },
     "RU_RAY_50074027B68450782776786": {
-      "controller": "OE04",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE03"
     },
     "RU_RAY_50074027B69239078282053": {
       "controller": "OMO",
@@ -12220,11 +12262,11 @@
       "owner": "RKK"
     },
     "RU_RAY_50074027B71157437388348": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B71368048698898": {
       "controller": "SBA",
@@ -12605,11 +12647,11 @@
       "owner": "RKK"
     },
     "RU_RAY_50074027B86147871749672": {
-      "controller": "OE04",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE03"
     },
     "RU_RAY_50074027B86150609365879": {
       "controller": "ORS",
@@ -12626,11 +12668,11 @@
       "owner": "BRY"
     },
     "RU_RAY_50074027B86681375933080": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B86870758219567": {
       "controller": "AMR",
@@ -12647,11 +12689,11 @@
       "owner": "OMO"
     },
     "RU_RAY_50074027B87627181065564": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B87731900886085": {
       "controller": "OMO",
@@ -12675,11 +12717,11 @@
       "owner": "RKM"
     },
     "RU_RAY_50074027B88274438285408": {
-      "controller": "OE04",
+      "controller": "OE00",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE00"
     },
     "RU_RAY_50074027B884948676219": {
       "controller": "RKM",
@@ -12724,11 +12766,11 @@
       "owner": "ORN"
     },
     "RU_RAY_50074027B90555869339870": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B9105763704567": {
       "controller": "RKU",
@@ -12759,18 +12801,18 @@
       "owner": "PFC"
     },
     "RU_RAY_50074027B91439993213773": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B91680290875095": {
-      "controller": "RKM",
+      "controller": "RKU",
       "cores": [
         "RKM"
       ],
-      "owner": "RKM"
+      "owner": "RKU"
     },
     "RU_RAY_50074027B91746933948416": {
       "controller": "TAT",
@@ -12794,18 +12836,18 @@
       "owner": "IRK"
     },
     "RU_RAY_50074027B93378157948323": {
-      "controller": "OE04",
+      "controller": "OE00",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE00"
     },
     "RU_RAY_50074027B93522804484377": {
-      "controller": "OE04",
+      "controller": "OE03",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE03"
     },
     "RU_RAY_50074027B93581086999271": {
       "controller": "OMO",
@@ -12927,18 +12969,18 @@
       "owner": "OE03"
     },
     "RU_RAY_50074027B98963269942164": {
-      "controller": "RKM",
+      "controller": "RKU",
       "cores": [
         "RKM"
       ],
-      "owner": "RKM"
+      "owner": "RKU"
     },
     "RU_RAY_50074027B99227036451137": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RU_RAY_50074027B99340686489203": {
       "controller": "OMO",
@@ -12955,51 +12997,51 @@
       "owner": "RKM"
     },
     "RU_RAY_50074027B99894122533642": {
-      "controller": "OE04",
+      "controller": "OE01",
       "cores": [
         "RKO"
       ],
-      "owner": "OE04"
+      "owner": "OE01"
     },
     "RW_ADM1_RWA-3491": {
-      "controller": "GEAR",
+      "controller": "GEA",
       "cores": [
         "RWA",
         "GEA"
       ],
-      "owner": "GEAR"
+      "owner": "GEA"
     },
     "RW_ADM1_RWA-3492": {
-      "controller": "GEAR",
+      "controller": "GEA",
       "cores": [
         "RWA",
         "GEA"
       ],
-      "owner": "GEAR"
+      "owner": "GEA"
     },
     "RW_ADM1_RWA-3493": {
-      "controller": "GEAR",
+      "controller": "GEA",
       "cores": [
         "RWA",
         "GEA"
       ],
-      "owner": "GEAR"
+      "owner": "GEA"
     },
     "RW_ADM1_RWA-3494": {
-      "controller": "GEAR",
+      "controller": "GEA",
       "cores": [
         "RWA",
         "GEA"
       ],
-      "owner": "GEAR"
+      "owner": "GEA"
     },
     "RW_ADM1_RWA-3495": {
-      "controller": "GEAR",
+      "controller": "GEA",
       "cores": [
         "RWA",
         "GEA"
       ],
-      "owner": "GEAR"
+      "owner": "GEA"
     },
     "SGP-4871": {
       "controller": "SHO",
@@ -13619,6 +13661,20 @@
       ],
       "owner": "CAO"
     },
+    "TG_ADM1_TGO-86": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
+    "TG_ADM1_TGO-87": {
+      "controller": "DAH",
+      "cores": [
+        "DAH"
+      ],
+      "owner": "DAH"
+    },
     "TG_ADM1_TGO-88": {
       "controller": "DAH",
       "cores": [
@@ -13899,244 +13955,244 @@
       "owner": "JTWN"
     },
     "TZ_ADM1_TZA-3335": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3336": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3337": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3357": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3358": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3359": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3360": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3363": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3378": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3379": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3380": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3381": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3382": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3383": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3384": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3385": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3386": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3387": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3388": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3389": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3390": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3391": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3392": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3393": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3394": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-3395": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-5584": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-5585": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-5586": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "TZ_ADM1_TZA-5587": {
-      "controller": "GEAT",
+      "controller": "GEA",
       "cores": [
         "TZA",
         "GEA"
       ],
-      "owner": "GEAT"
+      "owner": "GEA"
     },
     "UA_MRG_01673e94c186": {
       "controller": "RKU",
@@ -15882,11 +15938,11 @@
       "owner": "RKU"
     },
     "UA_RAY_74538382B68255145682197": {
-      "controller": "RKU",
+      "controller": "TNS",
       "cores": [
         "RKU"
       ],
-      "owner": "RKU"
+      "owner": "TNS"
     },
     "UA_RAY_74538382B6869191817667": {
       "controller": "RKU",
@@ -16456,36 +16512,36 @@
       "owner": "RKU"
     },
     "UG_ADM1_17295835B48340970483027": {
-      "controller": "GEAU",
+      "controller": "GEA",
       "cores": [
         "UGA",
         "GEA"
       ],
-      "owner": "GEAU"
+      "owner": "GEA"
     },
     "UG_ADM1_17295835B57878138064711": {
-      "controller": "GEAU",
+      "controller": "GEA",
       "cores": [
         "UGA",
         "GEA"
       ],
-      "owner": "GEAU"
+      "owner": "GEA"
     },
     "UG_ADM1_17295835B80141219017784": {
-      "controller": "GEAU",
+      "controller": "GEA",
       "cores": [
         "UGA",
         "GEA"
       ],
-      "owner": "GEAU"
+      "owner": "GEA"
     },
     "UG_ADM1_17295835B91329899113986": {
-      "controller": "GEAU",
+      "controller": "GEA",
       "cores": [
         "UGA",
         "GEA"
       ],
-      "owner": "GEAU"
+      "owner": "GEA"
     },
     "UKN06": {
       "controller": "NIE",
@@ -17118,32 +17174,32 @@
       "owner": "KGZ"
     },
     "VNM-451": {
-      "controller": "VIC",
+      "controller": "VMT",
       "cores": [
-        "VIC"
+        "VMT"
       ],
-      "owner": "VIC"
+      "owner": "VMT"
     },
     "VNM-457": {
-      "controller": "VIC",
+      "controller": "VMT",
       "cores": [
-        "VIC"
+        "VMT"
       ],
-      "owner": "VIC"
+      "owner": "VMT"
     },
     "VNM-511": {
-      "controller": "VIC",
+      "controller": "VMT",
       "cores": [
-        "VIC"
+        "VMT"
       ],
-      "owner": "VIC"
+      "owner": "VMT"
     },
     "VNM-512": {
-      "controller": "VIC",
+      "controller": "VMT",
       "cores": [
-        "VIC"
+        "VMT"
       ],
-      "owner": "VIC"
+      "owner": "VMT"
     },
     "XK_ADM1_KOS-5886": {
       "controller": "ALB",
@@ -17314,164 +17370,164 @@
       "owner": "BUL"
     },
     "ZM_ADM1_ZMB-514": {
-      "controller": "GEAZ",
+      "controller": "GEA",
       "cores": [
         "ZAM",
         "GEA"
       ],
-      "owner": "GEAZ"
+      "owner": "GEA"
     },
     "ZM_ADM1_ZMB-515": {
-      "controller": "GEAZ",
+      "controller": "GEA",
       "cores": [
         "ZAM",
         "GEA"
       ],
-      "owner": "GEAZ"
+      "owner": "GEA"
     },
     "ZM_ADM1_ZMB-516": {
-      "controller": "GEAZ",
+      "controller": "GEA",
       "cores": [
         "ZAM",
         "GEA"
       ],
-      "owner": "GEAZ"
+      "owner": "GEA"
     },
     "ZM_ADM1_ZMB-517": {
-      "controller": "GEAZ",
+      "controller": "GEA",
       "cores": [
         "ZAM",
         "GEA"
       ],
-      "owner": "GEAZ"
+      "owner": "GEA"
     },
     "ZM_ADM1_ZMB-518": {
-      "controller": "GEAZ",
+      "controller": "GEA",
       "cores": [
         "ZAM",
         "GEA"
       ],
-      "owner": "GEAZ"
+      "owner": "GEA"
     },
     "ZM_ADM1_ZMB-520": {
-      "controller": "GEAZ",
+      "controller": "GEA",
       "cores": [
         "ZAM",
         "GEA"
       ],
-      "owner": "GEAZ"
+      "owner": "GEA"
     },
     "ZM_ADM1_ZMB-521": {
-      "controller": "GEAZ",
+      "controller": "GEA",
       "cores": [
         "ZAM",
         "GEA"
       ],
-      "owner": "GEAZ"
+      "owner": "GEA"
     },
     "ZM_ADM1_ZMB-522": {
-      "controller": "GEAZ",
+      "controller": "GEA",
       "cores": [
         "ZAM",
         "GEA"
       ],
-      "owner": "GEAZ"
+      "owner": "GEA"
     },
     "ZM_ADM1_ZMB-523": {
-      "controller": "GEAZ",
+      "controller": "GEA",
       "cores": [
         "ZAM",
         "GEA"
       ],
-      "owner": "GEAZ"
+      "owner": "GEA"
     },
     "ZM_ADM1_ZMB-5511": {
-      "controller": "GEAZ",
+      "controller": "GEA",
       "cores": [
         "ZAM",
         "GEA"
       ],
-      "owner": "GEAZ"
+      "owner": "GEA"
     },
     "ZW_ADM1_ZWE-524": {
-      "controller": "GEAS",
+      "controller": "GEA",
       "cores": [
         "ZIM",
         "GEA"
       ],
-      "owner": "GEAS"
+      "owner": "GEA"
     },
     "ZW_ADM1_ZWE-525": {
-      "controller": "GEAS",
+      "controller": "GEA",
       "cores": [
         "ZIM",
         "GEA"
       ],
-      "owner": "GEAS"
+      "owner": "GEA"
     },
     "ZW_ADM1_ZWE-526": {
-      "controller": "GEAS",
+      "controller": "GEA",
       "cores": [
         "ZIM",
         "GEA"
       ],
-      "owner": "GEAS"
+      "owner": "GEA"
     },
     "ZW_ADM1_ZWE-527": {
-      "controller": "GEAS",
+      "controller": "GEA",
       "cores": [
         "ZIM",
         "GEA"
       ],
-      "owner": "GEAS"
+      "owner": "GEA"
     },
     "ZW_ADM1_ZWE-528": {
-      "controller": "GEAS",
+      "controller": "GEA",
       "cores": [
         "ZIM",
         "GEA"
       ],
-      "owner": "GEAS"
+      "owner": "GEA"
     },
     "ZW_ADM1_ZWE-529": {
-      "controller": "GEAS",
+      "controller": "GEA",
       "cores": [
         "ZIM",
         "GEA"
       ],
-      "owner": "GEAS"
+      "owner": "GEA"
     },
     "ZW_ADM1_ZWE-530": {
-      "controller": "GEAS",
+      "controller": "GEA",
       "cores": [
         "ZIM",
         "GEA"
       ],
-      "owner": "GEAS"
+      "owner": "GEA"
     },
     "ZW_ADM1_ZWE-531": {
-      "controller": "GEAS",
+      "controller": "GEA",
       "cores": [
         "ZIM",
         "GEA"
       ],
-      "owner": "GEAS"
+      "owner": "GEA"
     },
     "ZW_ADM1_ZWE-532": {
-      "controller": "GEAS",
+      "controller": "GEA",
       "cores": [
         "ZIM",
         "GEA"
       ],
-      "owner": "GEAS"
+      "owner": "GEA"
     },
     "ZW_ADM1_ZWE-533": {
-      "controller": "GEAS",
+      "controller": "GEA",
       "cores": [
         "ZIM",
         "GEA"
       ],
-      "owner": "GEAS"
+      "owner": "GEA"
     }
   },
   "capitals": {
@@ -17629,15 +17685,9 @@
       "display_name": "German Southwest Africa",
       "display_name_en": "German Southwest Africa",
       "display_name_zh": "西南非专员辖区",
-      "mode": "override",
-      "parent_owner_tag": "GER"
-    },
-    "AOF": {
-      "display_name": "French West Africa",
-      "display_name_en": "French West Africa",
-      "display_name_zh": "法属西非联邦",
-      "mode": "override",
-      "parent_owner_tag": "FRA"
+      "mode": "create",
+      "parent_owner_tag": "GER",
+      "subject_kind": "colonial_government"
     },
     "AOI": {
       "color_hex": "#728a61",
@@ -17670,7 +17720,7 @@
       "parent_owner_tag": ""
     },
     "AYR": {
-      "color_hex": "#9c8352",
+      "color_hex": "#8c825a",
       "color_policy": "locked",
       "display_name": "Kel Ayr",
       "display_name_en": "Kel Ayr",
@@ -17690,7 +17740,7 @@
       "parent_owner_tag": "JAP"
     },
     "AZW": {
-      "color_hex": "#856ea3",
+      "color_hex": "#64788c",
       "color_policy": "locked",
       "display_name": "Azawad",
       "display_name_en": "Azawad",
@@ -17719,7 +17769,7 @@
       "parent_owner_tag": ""
     },
     "BKF": {
-      "color_hex": "#b97091",
+      "color_hex": "#a05a82",
       "color_policy": "locked",
       "display_name": "Mossiland",
       "display_name_en": "Mossiland",
@@ -17832,13 +17882,6 @@
       "mode": "override",
       "parent_owner_tag": "JAP"
     },
-    "BWA": {
-      "display_name": "British West Africa",
-      "display_name_en": "British West Africa",
-      "display_name_zh": "英属西非领地",
-      "mode": "override",
-      "parent_owner_tag": ""
-    },
     "CAM": {
       "display_name": "Cambodia",
       "display_name_en": "Cambodia",
@@ -17854,7 +17897,7 @@
       "parent_owner_tag": ""
     },
     "CAO": {
-      "color_hex": "#a86c3f",
+      "color_hex": "#1e641e",
       "color_policy": "locked",
       "display_name": "Cameroon",
       "display_name_en": "Cameroon",
@@ -17873,74 +17916,8 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
-    "CG00": {
-      "color_hex": "#7b8364",
-      "color_policy": "locked",
-      "display_name": "German Congo — Zentral-Kongo Administration",
-      "display_name_en": "German Congo — Zentral-Kongo Administration",
-      "display_name_zh": "德属刚果·中央刚果行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GCO",
-      "subject_kind": "colonial_government"
-    },
-    "CGBC": {
-      "color_hex": "#8f9375",
-      "color_policy": "locked",
-      "display_name": "German Congo — Brazzaville Administration",
-      "display_name_en": "German Congo — Brazzaville Administration",
-      "display_name_zh": "德属刚果·布拉柴维尔行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GCO",
-      "subject_kind": "colonial_government"
-    },
-    "CGGA": {
-      "color_hex": "#5f6546",
-      "color_policy": "locked",
-      "display_name": "German Congo — Gabon Administration",
-      "display_name_en": "German Congo — Gabon Administration",
-      "display_name_zh": "德属刚果·加蓬行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GCO",
-      "subject_kind": "colonial_government"
-    },
-    "CGKT": {
-      "color_hex": "#888b6c",
-      "color_policy": "locked",
-      "display_name": "German Congo — Katanga Administration",
-      "display_name_en": "German Congo — Katanga Administration",
-      "display_name_zh": "德属刚果·加丹加行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GCO",
-      "subject_kind": "colonial_government"
-    },
-    "CGKV": {
-      "color_hex": "#636b4e",
-      "color_policy": "locked",
-      "display_name": "German Congo — Kivu Administration",
-      "display_name_en": "German Congo — Kivu Administration",
-      "display_name_zh": "德属刚果·基伍行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GCO",
-      "subject_kind": "colonial_government"
-    },
-    "CGUB": {
-      "color_hex": "#6b7056",
-      "color_policy": "locked",
-      "display_name": "German Congo — Ubangi Administration",
-      "display_name_en": "German Congo — Ubangi Administration",
-      "display_name_zh": "德属刚果·乌班吉行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GCO",
-      "subject_kind": "colonial_government"
-    },
     "CHD": {
-      "color_hex": "#b19b66",
+      "color_hex": "#496346",
       "color_policy": "locked",
       "display_name": "Chad",
       "display_name_en": "Chad",
@@ -18034,7 +18011,7 @@
       "parent_owner_tag": ""
     },
     "DAH": {
-      "color_hex": "#8d6c48",
+      "color_hex": "#968264",
       "color_policy": "locked",
       "display_name": "Dahomey",
       "display_name_en": "Dahomey",
@@ -18121,7 +18098,6 @@
       "display_name": "German Central Africa",
       "display_name_en": "German Central Africa",
       "display_name_zh": "中非专员辖区",
-      "entry_kind": "scenario_container",
       "mode": "create",
       "parent_owner_tag": "GER",
       "subject_kind": "colonial_government"
@@ -18132,101 +18108,23 @@
       "display_name": "German East Africa",
       "display_name_en": "German East Africa",
       "display_name_zh": "东非专员辖区",
-      "entry_kind": "scenario_container",
       "mode": "create",
       "parent_owner_tag": "GER",
       "subject_kind": "colonial_government"
     },
-    "GEAB": {
-      "color_hex": "#5e6c49",
+    "GER": {
+      "color_hex": "#3c3c3c",
       "color_policy": "locked",
-      "display_name": "German East Africa — Urundi Administration",
-      "display_name_en": "German East Africa — Urundi Administration",
-      "display_name_zh": "德属东非·乌隆迪行政区",
-      "entry_kind": "scenario_subject",
+      "display_name": "Germany",
+      "display_name_en": "Germany",
+      "display_name_zh": "大日耳曼国",
+      "entry_kind": "",
       "mode": "create",
-      "parent_owner_tag": "GEA",
-      "subject_kind": "colonial_government"
-    },
-    "GEAM": {
-      "color_hex": "#818f6b",
-      "color_policy": "locked",
-      "display_name": "German East Africa — Mozambique Administration",
-      "display_name_en": "German East Africa — Mozambique Administration",
-      "display_name_zh": "德属东非·莫桑比克行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GEA",
-      "subject_kind": "colonial_government"
-    },
-    "GEAN": {
-      "color_hex": "#5f7253",
-      "color_policy": "locked",
-      "display_name": "German East Africa — Nyasaland Administration",
-      "display_name_en": "German East Africa — Nyasaland Administration",
-      "display_name_zh": "德属东非·尼亚萨兰行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GEA",
-      "subject_kind": "colonial_government"
-    },
-    "GEAR": {
-      "color_hex": "#77876b",
-      "color_policy": "locked",
-      "display_name": "German East Africa — Ruanda Administration",
-      "display_name_en": "German East Africa — Ruanda Administration",
-      "display_name_zh": "德属东非·卢旺达行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GEA",
-      "subject_kind": "colonial_government"
-    },
-    "GEAS": {
-      "color_hex": "#788561",
-      "color_policy": "locked",
-      "display_name": "German East Africa — Southern Rhodesia Administration",
-      "display_name_en": "German East Africa — Southern Rhodesia Administration",
-      "display_name_zh": "德属东非·南罗得西亚行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GEA",
-      "subject_kind": "colonial_government"
-    },
-    "GEAT": {
-      "color_hex": "#4c5f3f",
-      "color_policy": "locked",
-      "display_name": "German East Africa — Tanganyika Administration",
-      "display_name_en": "German East Africa — Tanganyika Administration",
-      "display_name_zh": "德属东非·坦噶尼喀行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GEA",
-      "subject_kind": "colonial_government"
-    },
-    "GEAU": {
-      "color_hex": "#859072",
-      "color_policy": "locked",
-      "display_name": "German East Africa — Uganda Administration",
-      "display_name_en": "German East Africa — Uganda Administration",
-      "display_name_zh": "德属东非·乌干达行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GEA",
-      "subject_kind": "colonial_government"
-    },
-    "GEAZ": {
-      "color_hex": "#5a674b",
-      "color_policy": "locked",
-      "display_name": "German East Africa — Northern Rhodesia Administration",
-      "display_name_en": "German East Africa — Northern Rhodesia Administration",
-      "display_name_zh": "德属东非·北罗得西亚行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "GEA",
-      "subject_kind": "colonial_government"
+      "parent_owner_tag": "",
+      "subject_kind": ""
     },
     "GHA": {
-      "color_hex": "#cd934c",
+      "color_hex": "#6e8c82",
       "color_policy": "locked",
       "display_name": "Ghana",
       "display_name_en": "Ghana",
@@ -18317,7 +18215,7 @@
       "mode": "override"
     },
     "GXC": {
-      "color_hex": "#894a52",
+      "color_hex": "#845955",
       "color_policy": "locked",
       "mode": "override"
     },
@@ -18329,7 +18227,7 @@
       "parent_owner_tag": ""
     },
     "HAU": {
-      "color_hex": "#647b9a",
+      "color_hex": "#64786e",
       "color_policy": "locked",
       "display_name": "Sokoto",
       "display_name_en": "Sokoto",
@@ -18362,7 +18260,13 @@
     "IAL": {
       "color_hex": "#7c9a70",
       "color_policy": "locked",
-      "mode": "override"
+      "display_name": "Italian Algeria",
+      "display_name_en": "Italian Algeria",
+      "display_name_zh": "意属阿尔及利亚",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "ITA",
+      "subject_kind": ""
     },
     "IBR": {
       "color_hex": "#c6ac82",
@@ -18409,7 +18313,7 @@
       "subject_kind": "colonial_government"
     },
     "IETH": {
-      "color_hex": "#7b8f6c",
+      "color_hex": "#7a7b68",
       "color_policy": "locked",
       "display_name": "Italian East Africa — Ethiopia Governorate",
       "display_name_en": "Italian East Africa — Ethiopia Governorate",
@@ -18431,7 +18335,7 @@
       "subject_kind": "colony"
     },
     "IKEN": {
-      "color_hex": "#7e9a73",
+      "color_hex": "#aca278",
       "color_policy": "locked",
       "display_name": "Italian East Africa — Kenya Governorate",
       "display_name_en": "Italian East Africa — Kenya Governorate",
@@ -18456,7 +18360,7 @@
       "parent_owner_tag": ""
     },
     "ISOM": {
-      "color_hex": "#8fa07a",
+      "color_hex": "#919f7e",
       "color_policy": "locked",
       "display_name": "Italian East Africa — Somalia Governorate",
       "display_name_en": "Italian East Africa — Somalia Governorate",
@@ -18478,7 +18382,7 @@
       "subject_kind": "colony"
     },
     "ISUE": {
-      "color_hex": "#5d8458",
+      "color_hex": "#4f8569",
       "color_policy": "locked",
       "display_name": "Italian Suez Canal Zone",
       "display_name_en": "Italian Suez Canal Zone",
@@ -18597,6 +18501,17 @@
       "mode": "override",
       "parent_owner_tag": "JAP"
     },
+    "LBA": {
+      "color_hex": "#bcc2a3",
+      "color_policy": "locked",
+      "display_name": "Libya",
+      "display_name_en": "Libya",
+      "display_name_zh": "意属利比亚总督府",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "colony"
+    },
     "LIB": {
       "display_name": "Liberia",
       "display_name_en": "Liberia",
@@ -18637,7 +18552,7 @@
       "parent_owner_tag": "JAP"
     },
     "MAU": {
-      "color_hex": "#58976c",
+      "color_hex": "#5a6432",
       "color_policy": "locked",
       "display_name": "Mauritania",
       "display_name_en": "Mauritania",
@@ -18700,7 +18615,7 @@
       "subregion_label": "Eastern Europe"
     },
     "MLI": {
-      "color_hex": "#c1b04b",
+      "color_hex": "#96825a",
       "color_policy": "locked",
       "display_name": "Mali",
       "display_name_en": "Mali",
@@ -18711,7 +18626,7 @@
       "subject_kind": ""
     },
     "MLY": {
-      "color_hex": "#bc663f",
+      "color_hex": "#d21f30",
       "color_policy": "locked",
       "display_name": "United Malayan Anti-Japanese Front",
       "display_name_en": "United Malayan Anti-Japanese Front",
@@ -18733,7 +18648,7 @@
       "subject_kind": "client_state"
     },
     "NCP": {
-      "color_hex": "#9f2349",
+      "color_hex": "#bf3568",
       "color_policy": "locked",
       "display_name": "North China Political Council",
       "display_name_en": "North China Political Council",
@@ -18763,7 +18678,7 @@
     "NIE": {
       "base_iso2": "NIE",
       "capital_state_id": null,
-      "color_hex": "#3c5a50",
+      "color_hex": "#4e5653",
       "color_policy": "locked",
       "continent_id": "",
       "continent_label": "",
@@ -18797,7 +18712,7 @@
       "subject_kind": "colonial_government"
     },
     "NRL": {
-      "color_hex": "#9aa5b1",
+      "color_hex": "#9395a1",
       "color_policy": "locked",
       "display_name": "Norilsk",
       "display_name_en": "Norilsk",
@@ -18815,7 +18730,7 @@
       "parent_owner_tag": ""
     },
     "OE00": {
-      "color_hex": "#787566",
+      "color_hex": "#81726a",
       "color_policy": "locked",
       "display_name": "Generalbezirk Lettland",
       "display_name_en": "Generalbezirk Lettland",
@@ -18826,7 +18741,7 @@
       "subject_kind": "colonial_government"
     },
     "OE01": {
-      "color_hex": "#504e40",
+      "color_hex": "#45483c",
       "color_policy": "locked",
       "display_name": "Generalbezirk Estland",
       "display_name_en": "Generalbezirk Estland",
@@ -18837,7 +18752,7 @@
       "subject_kind": "colonial_government"
     },
     "OE02": {
-      "color_hex": "#827f72",
+      "color_hex": "#7d8075",
       "color_policy": "locked",
       "display_name": "Generalbezirk Litauen",
       "display_name_en": "Generalbezirk Litauen",
@@ -18848,7 +18763,7 @@
       "subject_kind": "colonial_government"
     },
     "OE03": {
-      "color_hex": "#6d6c5e",
+      "color_hex": "#646f5a",
       "color_policy": "locked",
       "display_name": "Generalbezirk Weißruthenien",
       "display_name_en": "Generalbezirk Weißruthenien",
@@ -18858,19 +18773,8 @@
       "parent_owner_tag": "RKO",
       "subject_kind": "colonial_government"
     },
-    "OE04": {
-      "color_hex": "#5a594d",
-      "color_policy": "locked",
-      "display_name": "Generalbezirk Pleskau",
-      "display_name_en": "Generalbezirk Pleskau",
-      "display_name_zh": "东部总区·普斯科夫总区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "RKO",
-      "subject_kind": "colonial_government"
-    },
     "OMO": {
-      "color_hex": "#c0b3a1",
+      "color_hex": "#97ada9",
       "color_policy": "locked",
       "display_name": "Omolon",
       "display_name_en": "Omolon",
@@ -18975,6 +18879,17 @@
       "display_name_en": "Andorra",
       "display_name_zh": "安道尔",
       "entry_kind": "scenario_country",
+      "mode": "create",
+      "parent_owner_tag": "",
+      "subject_kind": ""
+    },
+    "PAK": {
+      "color_hex": "#21331e",
+      "color_policy": "locked",
+      "display_name": "Pakistan",
+      "display_name_en": "Pakistan",
+      "display_name_zh": "巴基斯坦共和国",
+      "entry_kind": "",
       "mode": "create",
       "parent_owner_tag": "",
       "subject_kind": ""
@@ -19105,7 +19020,7 @@
       "parent_owner_tag": "GER"
     },
     "RKP": {
-      "color_hex": "#444445",
+      "color_hex": "#33474e",
       "color_policy": "locked",
       "display_name": "General Government of Poland",
       "display_name_en": "General Government of Poland",
@@ -19138,7 +19053,7 @@
       "parent_owner_tag": ""
     },
     "SEN": {
-      "color_hex": "#41968f",
+      "color_hex": "#965a5a",
       "color_policy": "locked",
       "display_name": "Senegal",
       "display_name_en": "Senegal",
@@ -19192,7 +19107,7 @@
       "parent_owner_tag": ""
     },
     "SIE": {
-      "color_hex": "#6693b4",
+      "color_hex": "#6e6e6e",
       "color_policy": "locked",
       "display_name": "Sierra Leone",
       "display_name_en": "Sierra Leone",
@@ -19214,7 +19129,7 @@
       "subject_kind": "client_state"
     },
     "SPH": {
-      "color_hex": "#a53e4d",
+      "color_hex": "#f4303a",
       "color_policy": "locked",
       "display_name": "All-Filipino Revolutionary Socialist Republic",
       "display_name_en": "All-Filipino Revolutionary Socialist Republic",
@@ -19264,7 +19179,7 @@
       "subject_kind": "puppet"
     },
     "SUR": {
-      "color_hex": "#726459",
+      "color_hex": "#cb8a4a",
       "color_policy": "locked",
       "display_name": "Suriname",
       "display_name_en": "Suriname",
@@ -19273,17 +19188,6 @@
       "mode": "create",
       "parent_owner_tag": "",
       "subject_kind": ""
-    },
-    "SWAO": {
-      "color_hex": "#5a5e45",
-      "color_policy": "locked",
-      "display_name": "German Southwest Africa — Angola Administration",
-      "display_name_en": "German Southwest Africa — Angola Administration",
-      "display_name_zh": "德属西南非洲·安哥拉行政区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "ANG",
-      "subject_kind": "colonial_government"
     },
     "SWE": {
       "display_name": "Sweden",
@@ -19331,11 +19235,14 @@
     },
     "TNS": {
       "color_hex": "#dfbe67",
-      "color_policy": "palette",
+      "color_policy": "locked",
       "display_name": "Transnistria Governorate",
       "display_name_en": "Transnistria Governorate",
       "display_name_zh": "德涅斯特河沿岸总督区",
-      "mode": "create"
+      "entry_kind": "scenario_country",
+      "mode": "create",
+      "parent_owner_tag": "",
+      "subject_kind": ""
     },
     "TRI": {
       "color_hex": "#7f3437",
@@ -19397,17 +19304,6 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
-    "VIC": {
-      "color_hex": "#a97838",
-      "color_policy": "locked",
-      "display_name": "Communist Vietnam",
-      "display_name_en": "Communist Vietnam",
-      "display_name_zh": "越南共产主义政权",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "",
-      "subject_kind": ""
-    },
     "VIN": {
       "display_name": "Vietnam",
       "display_name_en": "Vietnam",
@@ -19418,7 +19314,13 @@
     "VMT": {
       "color_hex": "#ca1d1d",
       "color_policy": "locked",
-      "mode": "override"
+      "display_name": "Viet Minh",
+      "display_name_en": "Viet Minh",
+      "display_name_zh": "越盟",
+      "entry_kind": "scenario_country",
+      "mode": "create",
+      "parent_owner_tag": "",
+      "subject_kind": ""
     },
     "VOK": {
       "base_iso2": "VOK",
@@ -19505,7 +19407,7 @@
       "parent_owner_tag": "JAP"
     },
     "YOR": {
-      "color_hex": "#7e9d4e",
+      "color_hex": "#786482",
       "color_policy": "locked",
       "display_name": "Yorubaland",
       "display_name_en": "Yorubaland",
@@ -21692,6 +21594,8 @@
         "ostpreussen": {
           "district_id": "ostpreussen",
           "feature_ids": [
+            "BY_RAY_67162791B13547290723272",
+            "LT021",
             "LT024",
             "PL_MRG_44c900e7cbdd",
             "PL_MRG_c908eb11c602",
@@ -21702,10 +21606,12 @@
             "PL_POW_1422",
             "PL_POW_1437",
             "PL_POW_1461",
+            "PL_POW_2001",
             "PL_POW_2002",
             "PL_POW_2004",
             "PL_POW_2005",
             "PL_POW_2006",
+            "PL_POW_2009",
             "PL_POW_2010",
             "PL_POW_2011",
             "PL_POW_2012",
@@ -22169,7 +22075,9 @@
             "MAR-3469",
             "MR_ADM1_MRT-2783",
             "MR_ADM1_MRT-2785",
-            "MR_ADM1_MRT-2795"
+            "MR_ADM1_MRT-2786",
+            "MR_ADM1_MRT-2795",
+            "MR_ADM1_MRT-2798"
           ],
           "name_en": "Morocco & Sahara",
           "name_zh": "摩洛哥与撒哈拉"
@@ -22280,11 +22188,15 @@
           "district_id": "dalmazia",
           "feature_ids": [
             "ATLISL_adriatica_CRO_3",
+            "ATLISL_adriatica_CRO_9",
             "ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806",
+            "ATLPRV_18252",
             "ATLPRV_18254",
             "ATLPRV_18260",
             "ATLPRV_18263",
             "ATLPRV_18380",
+            "ATLPRV_19222",
+            "ATLPRV_20006",
             "ATLSHL_adriatica_10",
             "ATLSHL_adriatica_13",
             "ATLSHL_adriatica_14",
@@ -22295,8 +22207,13 @@
             "ATLSHL_adriatica_8",
             "ATLSHL_adriatica_9",
             "HR031",
+            "HR032",
+            "HR033",
             "HR034",
+            "HR035",
             "HR036",
+            "HR037",
+            "ME_ADM1_MNE-1496",
             "ME_ADM1_MNE-1506",
             "ME_ADM1_MNE-1507",
             "ME_ADM1_MNE-1518"
@@ -22466,14 +22383,7 @@
             "ATLPRV_18333",
             "ATLPRV_18334",
             "ATLSHL_sicily_tunis_1",
-            "ATLSHL_sicily_tunis_2",
-            "LBY-2964",
-            "LBY-2967",
-            "LBY-2969",
-            "LBY-2971",
-            "LBY-2976",
-            "LBY-2983",
-            "LBY-5488"
+            "ATLSHL_sicily_tunis_2"
           ],
           "name_en": "Sicily",
           "name_zh": "西西里"
@@ -23899,8 +23809,7 @@
             "IN_ADM2_76128533B97372652494648",
             "IN_MRG_0f1924c89ced",
             "IN_MRG_b291003b6f41",
-            "IN_MRG_f0850bb4446c",
-            "PAK-1114"
+            "IN_MRG_f0850bb4446c"
           ],
           "name_en": "Gujarat & Kathiawar States",
           "name_zh": "古吉拉特与卡提阿瓦诸邦"
@@ -23928,17 +23837,12 @@
         "jammu_kashmir": {
           "district_id": "jammu_kashmir",
           "feature_ids": [
-            "IN_ADM2_76128533B15567489974292",
             "IN_ADM2_76128533B20458430922604",
             "IN_ADM2_76128533B20504715877560",
-            "IN_ADM2_76128533B2782141712775",
             "IN_ADM2_76128533B31127900859310",
             "IN_ADM2_76128533B32249045995424",
-            "IN_ADM2_76128533B32998994032811",
             "IN_ADM2_76128533B3371867518692",
             "IN_ADM2_76128533B37825396764028",
-            "IN_ADM2_76128533B41744580856133",
-            "IN_ADM2_76128533B45655211862788",
             "IN_ADM2_76128533B47664895117076",
             "IN_ADM2_76128533B48708628358161",
             "IN_ADM2_76128533B49429513424897",
@@ -24035,8 +23939,7 @@
             "IN_MRG_4d898a5137a3",
             "IN_MRG_5002491fef3c",
             "IN_MRG_7779e13ac7b3",
-            "IN_MRG_7b27a9a03d70",
-            "PAK-1113"
+            "IN_MRG_7b27a9a03d70"
           ],
           "name_en": "Punjab & Hill States",
           "name_zh": "旁遮普与山地土邦"

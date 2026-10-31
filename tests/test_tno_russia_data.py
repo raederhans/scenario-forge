@@ -12,6 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SCENARIO = ROOT / 'data/scenarios/tno_1962'
 USER_RULES = json.loads((ROOT / 'tests/fixtures/tno_user_reassign.json').read_text(encoding='utf-8'))
 CHANGED_RULES = {fid: row for fid, row in USER_RULES.items() if row['from'] != row['to']}
+# The user's later project file (tno_user2_* overlay entries) supersedes earlier choices.
+LATER_OWNERS = {fid: entry['tag'] for entry in json.loads(
+    (ROOT / 'data/scenario-rules/tno_1962.split_overlay.json').read_text(encoding='utf-8'))['entries']
+    if entry['id'].startswith('tno_user2_') for fid in entry['select']['feature_ids']}
 
 
 @pytest.fixture(scope='module')
@@ -55,13 +59,16 @@ def test_adjacent_administrative_children_have_distinct_family_colors(scenario):
 def test_administrative_containers_and_retired_tags(scenario):
     countries = scenario['countries.json']['countries']
     owners = scenario['owners.by_feature.json']['owners']
-    for tag in ('RKO', 'GEA', 'GCO', 'AOI'):
+    for tag in ('RKO', 'AOI'):
         assert countries[tag]['entry_kind'] == 'scenario_container'
         assert countries[tag]['feature_count'] == 0
         assert tag not in owners.values()
         assert any(country.get('parent_owner_tag') == tag and country['feature_count'] > 0
                    for country in countries.values())
-    for tag in ('AFA', 'PG01', 'PG02', 'PG03', 'PG04'):
+    for tag in ('GEA', 'GCO', 'ANG'):
+        assert countries[tag].get('entry_kind') != 'scenario_container'
+        assert countries[tag]['feature_count'] > 0
+    for tag in ('AFA', 'PG01', 'PG02', 'PG03', 'PG04', 'OE04', 'AOF', 'BWA', 'VIC'):
         assert tag not in countries
         assert tag not in owners.values()
 
@@ -100,7 +107,8 @@ def test_south_adjacent_owners_have_distinct_colors(scenario):
 @pytest.mark.parametrize('feature_id,rule', CHANGED_RULES.items())
 def test_user_reassigned_feature_has_requested_owner(scenario, feature_id, rule):
     assert len(CHANGED_RULES) == 49
-    assert scenario['owners.by_feature.json']['owners'][feature_id] == {'RKO': 'OE00'}.get(rule['to'], rule['to'])
+    expected = LATER_OWNERS.get(feature_id, {'RKO': 'OE00'}.get(rule['to'], rule['to']))
+    assert scenario['owners.by_feature.json']['owners'][feature_id] == expected
 
 
 def test_reassignment_preserves_unrelated_cores_and_unchanged_rows():

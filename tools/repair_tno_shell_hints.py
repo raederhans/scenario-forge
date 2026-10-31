@@ -120,13 +120,19 @@ def remove_unreferenced_chunks(scenario_dir):
 def run_scenario(scenario_dir=SCENARIO_DIR):
     topology_path = scenario_dir / 'runtime_topology.topo.json'
     identities = migration_map(read(ROOT / 'data/scenario-rules/tno_1962.identity_map.json'))
+    countries = read(scenario_dir / 'countries.json')['countries']
+    # A retired tag hands its shells to whichever successor took most of its parcels.
+    successors = defaultdict(lambda: defaultdict(int))
     for entry in read(ROOT / 'data/scenario-rules/tno_1962.split_overlay.json')['entries']:
         if entry.get('cores') == 'parent_if_single_child':
             identities[entry['only_from_owners'][0]] = entry['tag']
+        elif len(entry.get('only_from_owners', [])) == 1 and entry['only_from_owners'][0] not in countries:
+            successors[entry['only_from_owners'][0]][entry['tag']] += len(entry['select']['feature_ids'])
+    for source, targets in successors.items():
+        identities.setdefault(source, min(targets, key=lambda tag: (-targets[tag], tag)))
     repaired, report = repair_shells(
         read(topology_path), read(scenario_dir / 'owners.by_feature.json')['owners'],
-        read(scenario_dir / 'countries.json')['countries'],
-        identities,
+        countries, identities,
     )
     if report['changed']:
         write(topology_path, repaired)
