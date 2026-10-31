@@ -222,6 +222,28 @@ class ScenarioCapitalRulesTest(unittest.TestCase):
         self.assertEqual(payload, original)
         self.assertEqual(apply_reviewed_capitals(result, {"JAP": {}}, cities, scenario_id="tno_1962"), result)
 
+    def test_capital_rule_keeps_scenario_city_names(self):
+        capital_id = "CITY::ne::1159151609"
+        retired_id = "CITY::ne::1159134253"
+        renames = {
+            capital_id: {"display_name": {"en": "Tōkyō", "zh": "东京府"}},
+            retired_id: {"display_name": {"en": "Ost-Germania", "zh": "东日耳曼尼亚"}},
+        }
+        # A capital rule of a since-retired tag left its modern name on this city.
+        payload = {"capital_city_hints": {"OLD": {"tag": "OLD", "city_id": retired_id, "city_name": "Melitopol"}},
+                   "cities": {retired_id: {"display_name": {"en": "Melitopol", "zh": "梅利托波尔"}, "tier": "regional"}}}
+        cities = {**TNO_CITY_ROWS, capital_id: {"id": capital_id, "lon": 139.6917, "lat": 35.6895}}
+        result = apply_reviewed_capitals(payload, {"JAP": {}}, cities, scenario_id="tno_1962",
+                                         strict=True, city_names=renames)
+        self.assertEqual(result["capitals_by_tag"]["JAP"], capital_id)
+        self.assertEqual(result["cities"][capital_id]["display_name"], {"en": "Tōkyō", "zh": "东京府"})
+        self.assertEqual(result["capital_city_hints"]["JAP"]["city_name"], "Tōkyō")
+        self.assertEqual(result["cities"][retired_id]["display_name"], {"en": "Ost-Germania", "zh": "东日耳曼尼亚"})
+        self.assertEqual(result["cities"][retired_id]["tier"], "regional")
+        self.assertEqual(result["capital_city_hints"]["OLD"]["city_name"], "Ost-Germania")
+        self.assertEqual(apply_reviewed_capitals(result, {"JAP": {}}, cities, scenario_id="tno_1962",
+                                                 city_names=renames), result)
+
     def test_identity_is_scenario_specific_not_a_tag_match_to_the_mod(self):
         cities = {**TNO_CITY_ROWS, "CITY::ne::1159149559": {"id": "CITY::ne::1159149559"}}
         result = apply_reviewed_capitals({}, {"MGN": {}}, cities, scenario_id="tno_1962", strict=True)

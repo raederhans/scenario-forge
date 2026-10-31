@@ -4521,7 +4521,7 @@ SCENARIO_CITY_RENAMES = {
         "CITY::ne::1159149709": {"display_name": {"en": "Krakau", "zh": "克拉考"}},
         "CITY::ne::1159149723": {"display_name": {"en": "Lüderitz", "zh": "吕德里茨"}},
         "CITY::ne::1159149725": {"display_name": {"en": "Walfischbai", "zh": "鲸湾港"}},
-        "CITY::ne::1159149731": {"display_name": {"en": "Dodoma", "zh": "松巴万加"}},
+        "CITY::ne::1159149731": {"display_name": {"en": "Dodoma", "zh": "多多马"}},
         "CITY::ne::1159149733": {"display_name": {"en": "Löweburg", "zh": "勒韦堡"}},
         "CITY::ne::1159149851": {"display_name": {"en": "Moundou", "zh": "蒙杜"}},
         "CITY::ne::1159149865": {"display_name": {"en": "Stanleystadt", "zh": "斯坦利城"}},
@@ -6157,6 +6157,7 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
             overrides_payload, countries,
             {_clean_text(row.get("id")): row for row in world_cities.to_dict(orient="records")},
             scenario_id=scenario_id,
+            city_names=SCENARIO_CITY_RENAMES.get(scenario_id),
         )
         runtime_topology_path = scenario_dir / "runtime_topology.topo.json"
         resolved_runtime_topology_path = resolve_json_source_path(runtime_topology_path)

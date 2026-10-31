@@ -7,7 +7,7 @@ import { getStrategicFeatureInspection, STRATEGIC_METRIC_NAMES } from "../../js/
 import { UI_COPY_CATALOG } from "../../js/core/i18n_catalog.js";
 import { normalizeCountryCodeAlias } from "../../js/core/country_code_aliases.js";
 import { getCountryCode, getFeatureId } from "../../js/core/feature_identity.js";
-import { getScenarioCountryDisplayName } from "../../js/core/scenario_country_display.js";
+import { getLocalizedScenarioCountryName } from "../../js/core/scenario_country_display.js";
 
 const moduleUrl = new URL("../../js/core/i18n.js", import.meta.url);
 const source = readFileSync(moduleUrl, "utf8")
@@ -23,7 +23,7 @@ export function createTooltipFixture(fixtureState) {
     runtimeState: fixtureState,
     getThematicWgiFeatureInspection, getThematicReferenceNote, getPopulationTooltipLines,
     getThematicIndicator, formatThematicIndicatorValue, getStrategicFeatureInspection, STRATEGIC_METRIC_NAMES,
-    UI_COPY_CATALOG, normalizeCountryCodeAlias, getScenarioCountryDisplayName,
+    UI_COPY_CATALOG, normalizeCountryCodeAlias, getLocalizedScenarioCountryName,
     getSharedFeatureCountryCode: getCountryCode, getSharedFeatureId: getFeatureId,
   });
   vm.runInContext(`${source}\nthis.tooltip = getTooltipText;`, context, { filename: moduleUrl.pathname });
