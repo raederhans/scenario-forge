@@ -163,14 +163,6 @@ KAZ 独立，用 Akmola／阿克莫拉；台北城市宿主目前归 CHI，采�
 | OE02 | Kauen / 考恩 | `CITY::ne::1159136375` | `LT022` |
 | OE03 | Minsk / 明斯克 | `CITY::ne::1159151149` | `BY_CITY_MINSK` |
 | OE04 | Pleskau / 普斯科夫 | `CITY::ne::1159149529` | `RU_RAY_50074027B86681375933080` |
-| UK01 | Rowno / 罗夫诺 | `CITY::ne::1159134173` | `UA_RAY_74538382B36980255523800` |
-| UK02 | Shitomir / 日托米尔 | `CITY::ne::1159149327` | `UA_RAY_74538382B57692221763967` |
-| UK03 | Tschernigow / 切尔尼戈夫 | `CITY::ne::1159126717` | `UA_RAY_74538382B44220139144156` |
-| UK04 | Reichenaustadt / 赖歇瑙施塔特 | `CITY::ne::1159149329` | `UA_RAY_74538382B23045356862491` |
-| UK05 | Nikolajew / 尼古拉耶夫 | `CITY::ne::1159126699` | `UA_RAY_74538382B2161330582129` |
-| UK06 | Melitopol / 梅利托波尔 | `CITY::ne::1159134253` | `UA_RAY_74538382B95492559683598` |
-| UK07 | Charkow / 哈尔科夫 | `CITY::ne::1159149333` | `UA_RAY_74538382B36501884751905` |
-| UK08 | Hughesdorf / 休斯多夫 | `CITY::ne::1159149331` | `UA_RAY_74538382B54113761495064` |
 | AYR | Agadez / 阿加德兹 | `CITY::ne::1159150627` | `NE_ADM1_NER-800` |
 | AZW | Kidal / 基达尔 | `CITY::gn::2455290` | `ML_ADM1_MLI-2689` |
 | CHD | Moussoro / 穆索罗 | `CITY::gn::2427336` | `TD_ADM1_TCD-5581` |
@@ -197,7 +189,7 @@ KAZ 独立，用 Akmola／阿克莫拉；台北城市宿主目前归 CHI，采�
 
 ## TNO 第三批行政区
 
-新增行政区以当前归属筛选，不改变俄罗斯军阀边界；用户校正到 RKO、RKU、RKM、RKK 的地块随首府区转入对应的 OE00、UK00、MS00、KC00，仍留在原行政体系内。MS06 的五块合并地块包含弗拉基米尔，采用占领期名称 Wladimir；MS02 的斯摩棱斯克点位不在本区，采用境内 Brjansk。莫桑比克作为德属东非的同级行政区 GEAM，首府为 Lourenço Marques。
+新增行政区以当前归属筛选，不改变俄罗斯军阀边界；用户校正到 RKO 的地块归 OE00；校正到 RKU、RKM、RKK 的地块由对应专员辖区直接持有。MS06 的五块合并地块包含弗拉基米尔，采用占领期名称 Wladimir；MS02 的斯摩棱斯克点位不在本区，采用境内 Brjansk。莫桑比克作为德属东非的同级行政区 GEAM，首府为 Lourenço Marques。
 
 名称沿用城市覆盖中的占领期名；高加索与莫斯科维恩名称核对本地 TNO 1.10.0b 的 `TNO_victory_points_l_english.yml` 和 `state_names_l_english.yml`，包括 Jekaterinodar、Wladikawkaz、Sankt Petersburg、Platenfurt、Paulusburg、Wladimir、Woronesch 和 Jaroslawl。
 
@@ -228,20 +220,7 @@ KAZ 独立，用 Akmola／阿克莫拉；台北城市宿主目前归 CHI，采�
 | ISTP | 2 | São Tomé / 圣多美 | `CITY::ne::1159151195` | `ST_ADM1_STP-4861` |
 | ISUE | 3 | Ismailia / 伊斯梅利亚 | `CITY::ne::1159140377` | `EGY-1531` |
 | ITIM | 13 | Dili / 帝力 | `CITY::ne::1159150577` | `TL_ADM1_TLS-541` |
-| KC01 | 69 | Baku / 巴库 | `CITY::ne::1159151123` | `AZE-1689` |
-| KC02 | 17 | Jekaterinodar / 叶卡捷琳诺达尔 | `CITY::ne::1159149549` | `RU_RAY_50074027B89252490479976` |
-| KC03 | 20 | Stawropol / 斯塔夫罗波尔 | `CITY::ne::1159149523` | `RU_MRG_f01d51060a16` |
-| KC04 | 37 | Wladikawkaz / 弗拉季高加索 | `CITY::ne::1159137065` | `RU_RAY_50074027B27316284331880` |
-| KC05 | 21 | Elista / 埃利斯塔 | `CITY::ne::1159148145` | `RU_MRG_90d3823663be` |
 | LTH | 10 | Maseru / 马塞卢 | `CITY::ne::1159150831` | `LS_ADM1_LSO-1203` |
-| MS01 | 10 | Sankt Petersburg / 圣彼得堡 | `CITY::ne::1159151291` | `RU_CITY_SAINT_PETERSBURG` |
-| MS02 | 9 | Brjansk / 布良斯克 | `CITY::ne::1159149531` | `RU_RAY_50074027B25563950651561` |
-| MS03 | 21 | Tula / 图拉 | `CITY::ne::1159146521` | `RU_MRG_e770cd31cdb4` |
-| MS04 | 21 | Woronesch / 沃罗涅日 | `CITY::ne::1159149557` | `RU_RAY_50074027B21233041988666` |
-| MS05 | 9 | Jaroslawl / 雅罗斯拉夫尔 | `CITY::ne::1159149543` | `RU_RAY_50074027B57358126207690` |
-| MS06 | 5 | Wladimir / 弗拉基米尔 | `CITY::ne::1159148121` | `RU_MRG_13fef5f74a14` |
-| MS07 | 18 | Platenfurt / 普拉滕富特 | `CITY::ne::1159149575` | `RU_RAY_50074027B39404018386654` |
-| MS08 | 36 | Paulusburg / 保卢斯堡 | `CITY::ne::1159150697` | `RU_CITY_VOLGOGRAD` |
 | SWAO | 18 | Luanda / 罗安达 | `CITY::ne::1159151469` | `AO_ADM1_AGO-1880` |
 | SWZ | 4 | Mbabane / 姆巴巴内 | `CITY::ne::1159149413` | `SZ_ADM1_SWZ-534` |
 
@@ -249,16 +228,23 @@ Zara 的基础城市点距简化海岸约 2.23 公里，首都修复按既有海
 
 ## TNO 容器母国与撤回分区
 
-RKO、RKU、RKM、RKK、GEA、GCO、AOI 保留为零领土容器，通过 parent_owner_tag 关联子区，并明确设为无首都。ANG 的剩余领土是德属西南非本体，SAF 的剩余领土是南非本体，仍保留领土与首都。PG01–PG04 的 62 块地块回归 RKP，四个分区及其首都条目退休。
+RKO、GEA、GCO、AOI 保留为零领土容器，通过 parent_owner_tag 关联子区，并明确设为无首都。ANG 的剩余领土是德属西南非本体，SAF 的剩余领土是南非本体，仍保留领土与首都。PG01–PG04 的 62 块地块回归 RKP，四个分区及其首都条目退休。
 
-容器子区：RKO → OE00–OE04；RKU → UK00–UK08；RKM → MS00–MS08；RKK → KC00–KC05；GEA → GEAB、GEAM、GEAN、GEAR、GEAS、GEAT、GEAU、GEAZ；GCO → CG00、CGBC、CGGA、CGKT、CGKV、CGUB；AOI → IDJI、IERI、IETH、IKEN、ISOM。
+容器子区：RKO → OE00–OE04；GEA → GEAB、GEAM、GEAN、GEAR、GEAS、GEAT、GEAU、GEAZ；GCO → CG00、CGBC、CGGA、CGKT、CGKV、CGUB；AOI → IDJI、IERI、IETH、IKEN、ISOM。
 
 | Tag | 地块数 | 首府 | 城市 ID | 点位所在地块 |
 | --- | ---: | --- | --- | --- |
 | OE00 | 7 | Riga / 里加 | `CITY::ne::1159150811` | `LV006` |
-| UK00 | 33 | Kiew / 基辅 | `CITY::ne::1159151495` | `UA_RAY_74538382B60890943260132` |
-| MS00 | 25 | Moskau / 莫斯科 | `CITY::ne::1159151585` | `RU_CITY_MOSCOW` |
-| KC00 | 9 | Tiflis / 第比利斯 | `CITY::ne::1159150961` | `GEO-3036` |
 | GEAM | 11 | Lourenço Marques / 洛伦索·马贵斯 | `CITY::ne::1159150683` | `MZ_ADM1_MOZ-5854` |
 | CG00 | 32 | Leopoldstadt / 利奥波德城 | `CITY::ne::1159151539` | `CD_ADM1_COD-1884` |
 | IETH | 11 | Addis Abeba / 亚的斯亚贝巴 | `CITY::ne::1159151549` | `ET_ADM1_ETH-3133` |
+
+### 专员辖区默认归属与可释放总区
+
+RKU、RKM、RKK 默认直接持有全部 605 块总区地块。UK00–UK08、MS00–MS08、KC00–KC05 共 24 个标签从默认国家和首都表退休，分级定义及原同族色保留在可释放目录中，编辑器释放后才独立持地；parent_owner_tag 仍指向对应专员辖区。释放条目不要求预设首都。
+
+| 国家 | 首都 | 城市 ID |
+| --- | --- | --- |
+| RKU | Kiew / 基辅 | `CITY::ne::1159151495` |
+| RKM | Moskau / 莫斯科 | `CITY::ne::1159151585` |
+| RKK | Tiflis / 第比利斯 | `CITY::ne::1159150961` |

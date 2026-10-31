@@ -55,7 +55,7 @@ def test_adjacent_administrative_children_have_distinct_family_colors(scenario):
 def test_administrative_containers_and_retired_tags(scenario):
     countries = scenario['countries.json']['countries']
     owners = scenario['owners.by_feature.json']['owners']
-    for tag in ('RKO', 'RKU', 'RKM', 'RKK', 'GEA', 'GCO', 'AOI'):
+    for tag in ('RKO', 'GEA', 'GCO', 'AOI'):
         assert countries[tag]['entry_kind'] == 'scenario_container'
         assert countries[tag]['feature_count'] == 0
         assert tag not in owners.values()
@@ -79,7 +79,7 @@ def test_repaired_adjacent_colors_remain_distinguishable_and_fic_retires(scenari
 @pytest.mark.parametrize('feature_id,rule', CHANGED_RULES.items())
 def test_user_reassigned_feature_has_requested_owner(scenario, feature_id, rule):
     assert len(CHANGED_RULES) == 49
-    assert scenario['owners.by_feature.json']['owners'][feature_id] == {'RKM': 'MS00', 'RKO': 'OE00', 'RKU': 'UK00', 'RKK': 'KC00'}.get(rule['to'], rule['to'])
+    assert scenario['owners.by_feature.json']['owners'][feature_id] == {'RKO': 'OE00'}.get(rule['to'], rule['to'])
 
 
 def test_reassignment_preserves_unrelated_cores_and_unchanged_rows():

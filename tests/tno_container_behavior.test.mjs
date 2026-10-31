@@ -12,15 +12,15 @@ test('zero-territory container groups its two children and produces no map label
     vm.runInNewContext(readFileSync(new URL(`../vendor/${file}`, import.meta.url), 'utf8'), vendors);
   }
   const countries = {
-    RKM: { entry_kind: 'scenario_container', feature_count: 0 },
-    MS00: { entry_kind: 'scenario_subject', parent_owner_tag: 'RKM', base_iso2: 'RU' },
-    MS01: { entry_kind: 'scenario_subject', parent_owner_tag: 'RKM', base_iso2: 'RU' },
+    RKO: { entry_kind: 'scenario_container', feature_count: 0 },
+    OE00: { entry_kind: 'scenario_subject', parent_owner_tag: 'RKO', base_iso2: 'RU' },
+    OE01: { entry_kind: 'scenario_subject', parent_owner_tag: 'RKO', base_iso2: 'RU' },
   };
   const features = ['one', 'two'].map((id, x) => ({ type: 'Feature', id,
     properties: { id, cntr_code: 'RU' }, geometry: { type: 'Polygon',
       coordinates: [[[x, 0], [x, 1], [x + 1, 1], [x + 1, 0], [x, 0]]] } }));
   const state = { activeScenarioId: 'tno_1962', sceneGeneration: 1, currentLanguage: 'en',
-    scenarioCountriesByTag: countries, scenarioBaselineOwnersByFeatureId: { one: 'MS00', two: 'MS01' },
+    scenarioCountriesByTag: countries, scenarioBaselineOwnersByFeatureId: { one: 'OE00', two: 'OE01' },
     scenarioBundleCacheById: { tno_1962: {
       chunkRegistry: { byLayer: { political: [{ id: 'base', globalCoverage: true, lod: 'coarse', sha256: 'world' }] } },
       chunkPayloadCacheById: { base: { payload: { features } } },
@@ -30,15 +30,15 @@ test('zero-territory container groups its two children and produces no map label
     entryKind: country.entry_kind, scenarioSubject: country.entry_kind === 'scenario_subject',
     parentOwnerTag: country.parent_owner_tag,
     inspectorGroupId: model.resolveScenarioInspectorGroupMeta(code).id }));
-  assert.deepEqual(model.buildInspectorTopLevelCountryEntries(entries).map(entry => entry.code), ['RKM']);
-  assert.deepEqual(model.getScenarioSubjectChildrenForParent('RKM', entries).map(entry => entry.code), ['MS00', 'MS01']);
+  assert.deepEqual(model.buildInspectorTopLevelCountryEntries(entries).map(entry => entry.code), ['RKO']);
+  assert.deepEqual(model.getScenarioSubjectChildrenForParent('RKO', entries).map(entry => entry.code), ['OE00', 'OE01']);
   const owner = createCountryLabelSourceOwner({ state, topojson: vendors.topojson,
     geoArea: vendors.d3.geoArea, geoContains: vendors.d3.geoContains, geoBounds: vendors.d3.geoBounds,
     isWorkerSupported: () => false, yieldTask: () => Promise.resolve(), getCountryName: code => code });
   try {
     await owner.prepare();
     assert.equal(owner.peekSource().status, 'ready');
-    assert.deepEqual(owner.peekSource().countries.map(country => country.countryCode).sort(), ['MS00', 'MS01']);
+    assert.deepEqual(owner.peekSource().countries.map(country => country.countryCode).sort(), ['OE00', 'OE01']);
   } finally {
     owner.dispose();
   }

@@ -1,6 +1,6 @@
 {
   "artifact_counts": {
-    "chunk_count": 277,
+    "chunk_count": 261,
     "feature_count": 9949,
     "water_count": 285
   },
@@ -116213,10 +116213,10 @@
     "RKK": {
       "base_iso2": "GE",
       "continent_label": "Asia",
-      "controller_feature_count": 0,
+      "controller_feature_count": 173,
       "display_name": "Reichskommissariat Kaukasien",
       "entry_kind": "scenario_country",
-      "feature_count": 0,
+      "feature_count": 173,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116248,10 +116248,10 @@
     "RKM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 0,
+      "controller_feature_count": 154,
       "display_name": "Reichskommissariat Moskowien",
       "entry_kind": "scenario_country",
-      "feature_count": 0,
+      "feature_count": 154,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -116423,10 +116423,10 @@
     "RKU": {
       "base_iso2": "UA",
       "continent_label": "Europe",
-      "controller_feature_count": 0,
+      "controller_feature_count": 278,
       "display_name": "Reichskommissariat Ukraine",
       "entry_kind": "scenario_country",
-      "feature_count": 0,
+      "feature_count": 278,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -118180,13 +118180,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "a9eb1bd2489fef194fb7f100fb324de213aeae39ed59ab860d2e9d0200e90243",
+  "snapshot_fingerprint": "576c52abc7bb0e0dbba7f66a6a8720fa15c95aa4c365ea727c1b4513e4da9e41",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "29172e018b576f595cf4456cb3775393ef18a5321f18e164e004e75b63c5dac9",
-    "detail_chunk_manifest_sha256": "7e4f48de0b34be1c8dddf45b4e59fbb9cc5a991e1d6830cc22efe16888fa856d",
-    "runtime_bootstrap_topology_sha256": "3eff73f6706019d099df82397d60a03985f98fce220f9f9f150506e82a8b51b2",
-    "runtime_topology_sha256": "95956bb121a77cc3a6dd4e63572e2bc0af6b50402e3329038c8d32951f8d0d22"
+    "build_snapshot_sha256": "aa8fdc823d6b17a051d6b3566ed54360b0be5b1cb16c6ef961d4e311bf87e403",
+    "detail_chunk_manifest_sha256": "534a5db7cabec958706a890aac7185b794289c2cd67d6edbb90a77462d34605b",
+    "runtime_bootstrap_topology_sha256": "41490df67f7d2d1f0165c0b7ada8dffb5e6039ebf57b3dd803c66ac6caeeb3d1",
+    "runtime_topology_sha256": "d2124a4780c903fd12be721ca319700fae3d712906657ad9b8a2a72fc6bab424"
   },
   "summary": {
     "approximate_count": 973,
@@ -118197,7 +118197,7 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 253,
+    "controller_count": 232,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -118207,7 +118207,7 @@
     "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 253,
+    "owner_count": 232,
     "quality_counts": {
       "approx_existing_geometry": 1033,
       "direct_country_copy": 2698,

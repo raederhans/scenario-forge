@@ -119,10 +119,14 @@ def remove_unreferenced_chunks(scenario_dir):
 
 def run_scenario(scenario_dir=SCENARIO_DIR):
     topology_path = scenario_dir / 'runtime_topology.topo.json'
+    identities = migration_map(read(ROOT / 'data/scenario-rules/tno_1962.identity_map.json'))
+    for entry in read(ROOT / 'data/scenario-rules/tno_1962.split_overlay.json')['entries']:
+        if entry.get('cores') == 'parent_if_single_child':
+            identities[entry['only_from_owners'][0]] = entry['tag']
     repaired, report = repair_shells(
         read(topology_path), read(scenario_dir / 'owners.by_feature.json')['owners'],
         read(scenario_dir / 'countries.json')['countries'],
-        migration_map(read(ROOT / 'data/scenario-rules/tno_1962.identity_map.json')),
+        identities,
     )
     if report['changed']:
         write(topology_path, repaired)
