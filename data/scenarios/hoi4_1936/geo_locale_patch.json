@@ -217,6 +217,22 @@
       "en": "K.P. · Remainder",
       "zh": "开伯尔-普什图赫瓦 · 余部"
     },
+    "id::PA_ADM1_PAN-1337__SPLIT_PCZ": {
+      "en": "Colón · Panama Canal Zone",
+      "zh": "冒号 · 巴拿马运河区"
+    },
+    "id::PA_ADM1_PAN-1337__SPLIT_REST": {
+      "en": "Colón · Remainder",
+      "zh": "冒号 · 余部"
+    },
+    "id::PA_ADM1_PAN-1340__SPLIT_PCZ": {
+      "en": "Panamá · Panama Canal Zone",
+      "zh": "巴拿马 · 巴拿马运河区"
+    },
+    "id::PA_ADM1_PAN-1340__SPLIT_REST": {
+      "en": "Panamá · Remainder",
+      "zh": "巴拿马 · 余部"
+    },
     "id::PL_MRG_727dd6268093__SPLIT_DANZIG": {
       "en": "Pomeranian · North · Free City rural district",
       "zh": "滨海省·北部 · 但泽自由市乡村区"

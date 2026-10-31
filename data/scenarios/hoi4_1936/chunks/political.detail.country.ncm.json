@@ -2,7 +2,7 @@
   "type": "FeatureCollection",
   "features": [
     {
-      "id": 21084,
+      "id": 21082,
       "type": "Feature",
       "properties": {
         "id": "NG_ADM1_NGA-2839__SPLIT_NCM",
@@ -175,7 +175,7 @@
       }
     },
     {
-      "id": 21086,
+      "id": 21084,
       "type": "Feature",
       "properties": {
         "id": "NG_ADM1_NGA-2881__SPLIT_NCM",
@@ -426,7 +426,7 @@
       }
     },
     {
-      "id": 21088,
+      "id": 21086,
       "type": "Feature",
       "properties": {
         "id": "NG_ADM1_NGA-2848__SPLIT_NCM",

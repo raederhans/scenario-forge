@@ -329,6 +329,14 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.cay"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.cde"
         ]
       },
@@ -705,7 +713,7 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
-          "political.detail.country.ger"
+          "political.detail.country.gdl"
         ]
       },
       {
@@ -713,7 +721,7 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
-          "political.detail.country.gf"
+          "political.detail.country.ger"
         ]
       },
       {
@@ -754,14 +762,6 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.goa"
-        ]
-      },
-      {
-        "lod": "detail",
-        "min_zoom": 1.35,
-        "max_zoom": 99.0,
-        "chunk_ids": [
-          "political.detail.country.gp"
         ]
       },
       {
@@ -1457,14 +1457,6 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
-          "political.detail.country.mq"
-        ]
-      },
-      {
-        "lod": "detail",
-        "min_zoom": 1.35,
-        "max_zoom": 99.0,
-        "chunk_ids": [
           "political.detail.country.mrd"
         ]
       },
@@ -1474,6 +1466,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.mre"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.mtq"
         ]
       },
       {
@@ -1658,6 +1658,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.par"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.pcz"
         ]
       },
       {

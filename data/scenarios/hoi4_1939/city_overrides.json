@@ -24,6 +24,10 @@
     "YT": "CITY::ne::1159146067",
     "CHI": "CITY::ne::1159151327",
     "SIK": "CITY::ne::1159151531",
+    "CAY": "CITY::ne::1159150911",
+    "GDL": "CITY::ne::1159143181",
+    "MTQ": "CITY::ne::1159140257",
+    "PCZ": "CITY::ne::1159146489",
     "SSH": "CITY::ne::1159149741",
     "NNI": "CITY::ne::1159149705",
     "NEI": "CITY::ne::1159150771",
@@ -1961,7 +1965,7 @@
       "base_tier": "major",
       "population": 1281000,
       "country_code": "PA",
-      "host_feature_id": "PA_ADM1_PAN-1340",
+      "host_feature_id": "PA_ADM1_PAN-1340__SPLIT_REST",
       "urban_match_id": "",
       "lon": -79.51973,
       "lat": 8.9936,
@@ -3063,6 +3067,108 @@
       "source_coordinates": [
         45.25693,
         -12.78339
+      ],
+      "coordinate_adjustment": "simplified_coastline"
+    },
+    "CAY": {
+      "country_code": "GF",
+      "host_feature_id": "GF_PRIMARY",
+      "urban_match_id": "",
+      "lon": -52.33455,
+      "lat": 4.9381,
+      "population": 61550,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "CAY",
+      "city_id": "CITY::ne::1159150911",
+      "stable_key": "id::CITY::ne::1159150911",
+      "city_name": "Cayenne",
+      "name_ascii": "Cayenne",
+      "display_name": "Colony of French Guiana",
+      "lookup_iso2": "GF",
+      "base_iso2": "GF",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "GDL": {
+      "country_code": "GP",
+      "host_feature_id": "GP_PRIMARY",
+      "urban_match_id": "",
+      "lon": -61.705484,
+      "lat": 16.01041,
+      "population": 307,
+      "base_tier": "regional",
+      "source": "natural_earth",
+      "tag": "GDL",
+      "city_id": "CITY::ne::1159143181",
+      "stable_key": "id::CITY::ne::1159143181",
+      "city_name": "Basse-Terre",
+      "name_ascii": "Basse-terre",
+      "display_name": "Colony of Guadeloupe",
+      "lookup_iso2": "GP",
+      "base_iso2": "GP",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MTQ": {
+      "country_code": "MQ",
+      "host_feature_id": "MQ_PRIMARY",
+      "urban_match_id": "",
+      "lon": -61.07253612071108,
+      "lat": 14.613877953412453,
+      "population": 253995,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "MTQ",
+      "city_id": "CITY::ne::1159140257",
+      "stable_key": "id::CITY::ne::1159140257",
+      "city_name": "Fort-de-France",
+      "name_ascii": "Fort-de-France",
+      "display_name": "Colony of Martinique",
+      "lookup_iso2": "MQ",
+      "base_iso2": "MQ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1,
+      "source_coordinates": [
+        -61.07418,
+        14.60365
+      ],
+      "coordinate_adjustment": "simplified_coastline"
+    },
+    "PCZ": {
+      "country_code": "PA",
+      "host_feature_id": "PA_ADM1_PAN-1340__SPLIT_PCZ",
+      "urban_match_id": "",
+      "lon": -79.56761214362476,
+      "lat": 8.950114614175046,
+      "population": 62882,
+      "base_tier": "minor",
+      "source": "natural_earth",
+      "tag": "PCZ",
+      "city_id": "CITY::ne::1159146489",
+      "stable_key": "id::CITY::ne::1159146489",
+      "city_name": "Balboa",
+      "name_ascii": "Balboa",
+      "display_name": "Panama Canal Zone",
+      "lookup_iso2": "PA",
+      "base_iso2": "PA",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1,
+      "source_coordinates": [
+        -79.566653,
+        8.949982
       ],
       "coordinate_adjustment": "simplified_coastline"
     },
@@ -7803,7 +7909,7 @@
     },
     "CITY::ne::1159150667": {
       "city_id": "CITY::ne::1159150667",
-      "host_feature_id": "PA_ADM1_PAN-1340"
+      "host_feature_id": "PA_ADM1_PAN-1340__SPLIT_REST"
     },
     "CITY::ne::1159150621": {
       "city_id": "CITY::ne::1159150621",
@@ -8001,6 +8107,17 @@
         "zh": "北平"
       },
       "host_feature_id": "CN_CITY_17275852B40522342172572"
+    },
+    "CITY::ne::1159146489": {
+      "city_id": "CITY::ne::1159146489",
+      "stable_key": "id::CITY::ne::1159146489",
+      "display_name": {
+        "en": "Balboa",
+        "zh": "巴尔博亚"
+      },
+      "host_feature_id": "PA_ADM1_PAN-1340__SPLIT_PCZ",
+      "lon": -79.56761214362476,
+      "lat": 8.950114614175046
     },
     "CITY::ne::1159149741": {
       "city_id": "CITY::ne::1159149741",
@@ -9823,8 +9940,8 @@
     }
   },
   "audit": {
-    "manual_capital_count": 220,
-    "capital_hint_count": 304,
+    "manual_capital_count": 224,
+    "capital_hint_count": 308,
     "renamed_city_count": 4,
     "name_conflict_count": 4,
     "unresolved_capital_count": 0,

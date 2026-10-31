@@ -245,7 +245,7 @@ add("bohemia_moravia", Y39, "BOM", "Protectorate of Bohemia and Moravia", "波�
     CC(*BOM_RULE["include_country_codes"]), exclude={"feature_ids": BOM_RULE["exclude_feature_ids"]},
     parent="GER", kind="protectorate", only=["GER"])
 add("slovakia_parent", Y39, "SLO", None, None, {"owners": ["SLO"]}, parent="GER", kind="puppet", only=["SLO"])
-add("albania_1939", Y39, "ALB", "Albanian Kingdom", "阿尔巴尼亚王国", CC("AL"), parent="ITA", kind="puppet",
+add("albania_1939", Y39, "ALB", "Albanian Kingdom", "阿尔巴尼亚王国", CC("AL"), parent="ITA", kind="protectorate",
     only=["ITA"], color=PARENT_COLOR.get("ALB") or "#a05a5a")
 
 # ---------- 中国 1936 ----------
@@ -760,6 +760,20 @@ for tag, en, zh in [("SHM", "Saguia el-Hamra", "萨基亚哈姆拉"), ("RDO", "R
         parent="SPR", kind="colony", only=["SSH"], cores="keep")
 
 harmonize_family_colors(E)
+add("julian_march", B, "ITA", None, None, FI("HR036", "SI044", "SI043", "SI038"), only=["YUG"])
+add("southern_dobruja", B, "ROM", None, None, FI("BG332", "BG325"), only=["BUL"])
+add("panama_canal_zone", B, "PCZ", "Panama Canal Zone", "巴拿马运河区",
+    FI(*[fid + "__SPLIT_PCZ" for fid in geometry_by_id["panama_canal_zone"]["feature_ids"]]),
+    parent="USA", kind="territory", only=["PAN"], cores="keep",
+    notes="Colón city is included in the Canal Zone at parcel scale.")
+for old, tag, en, zh in [
+    ("GF", "CAY", "Colony of French Guiana", "法属圭亚那殖民地"),
+    ("GP", "GDL", "Colony of Guadeloupe", "瓜德罗普殖民地"),
+    ("MQ", "MTQ", "Colony of Martinique", "马提尼克殖民地"),
+]:
+    entry = next(e for e in E if e["id"] == old.lower() + "_parent")
+    entry.update(id=tag.lower() + "_colony", tag=tag, name_en=en, name_zh=zh, select=CC(old))
+
 E.append({"id": "china_enclaves_1939", "scenarios": Y39,
           "smooth_enclaves": {"tags": ["CHI", "SHX", "PRC", "NCP", "CNZ", "JBZ", "MEN", "RGC", "JCC", "JSC", "JCJ", "THG"],
                               "max_area_km2": 3000}})

@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
-    "chunk_count": 308,
-    "feature_count": 21098,
+    "chunk_count": 309,
+    "feature_count": 21100,
     "water_count": 0
   },
   "controller_changes": [],
@@ -200093,10 +200093,10 @@
     "BUL": {
       "base_iso2": "BG",
       "continent_label": "Europe",
-      "controller_feature_count": 28,
+      "controller_feature_count": 26,
       "display_name": "Bulgaria",
       "entry_kind": "",
-      "feature_count": 28,
+      "feature_count": 26,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -201278,10 +201278,10 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 107,
+      "controller_feature_count": 111,
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 107,
+      "feature_count": 111,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -202579,10 +202579,10 @@
     "ROM": {
       "base_iso2": "RO",
       "continent_label": "Europe",
-      "controller_feature_count": 101,
+      "controller_feature_count": 103,
       "display_name": "Romania",
       "entry_kind": "",
-      "feature_count": 101,
+      "feature_count": 103,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -203514,10 +203514,10 @@
     "YUG": {
       "base_iso2": "RS",
       "continent_label": "Europe",
-      "controller_feature_count": 120,
+      "controller_feature_count": 116,
       "display_name": "Yugoslavia",
       "entry_kind": "",
-      "feature_count": 120,
+      "feature_count": 116,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -204561,30 +204561,30 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "89bde378f1b5ac1d82824c4ba28438d6fa9c40509527ed5ff849579a78d03f34",
+  "snapshot_fingerprint": "a294d6e4e39fbcea764b0c18cb4c14292f100803b304ff524e403e892f3e09a3",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "9b71da27a254fdd6bd4413ae763c09f47c5c01b0b29d12295d53954fa98315de",
-    "detail_chunk_manifest_sha256": "2a17ea160cafd5361254ae0d62024759f9ebfcef5fe757738caf0657a498a3f8",
+    "build_snapshot_sha256": "b4ab1531c8120b3b794936f6154ae955a58ab7b2f59fbda4d0ffeacb8a15e6f2",
+    "detail_chunk_manifest_sha256": "7580f24cbc68066cc2856ca51622eccbee54e5b41a3164b32a7c3a5b0a0efa6a",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "runtime_topology_sha256": "5b80899609f00cf66a23cce005c60e066716bf869a40f7327cd094eff11c46fb"
+    "runtime_topology_sha256": "cca96bb37013003d6873467ae8fecdcc8a63fd4fd306f7b396de5ea162ad83b5"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
     "changed_feature_count": 15314,
-    "controller_count": 299,
+    "controller_count": 300,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 21098,
+    "feature_count": 21100,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 14867,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 299,
+    "owner_count": 300,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5821,

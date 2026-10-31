@@ -1821,61 +1821,67 @@
       "color_hex": "#3887fb"
     },
     {
-      "id": "gf_parent",
+      "id": "cay_colony",
       "scenarios": [
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "GF",
+      "tag": "CAY",
       "parent_owner_tag": "FRA",
       "subject_kind": "colony",
       "select": {
-        "owners": [
+        "country_codes": [
           "GF"
         ]
       },
       "only_from_owners": [
         "GF"
       ],
-      "color_hex": "#0f68db"
+      "color_hex": "#0f68db",
+      "name_en": "Colony of French Guiana",
+      "name_zh": "法属圭亚那殖民地"
     },
     {
-      "id": "gp_parent",
+      "id": "gdl_colony",
       "scenarios": [
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "GP",
+      "tag": "GDL",
       "parent_owner_tag": "FRA",
       "subject_kind": "colony",
       "select": {
-        "owners": [
+        "country_codes": [
           "GP"
         ]
       },
       "only_from_owners": [
         "GP"
       ],
-      "color_hex": "#5d82eb"
+      "color_hex": "#5d82eb",
+      "name_en": "Colony of Guadeloupe",
+      "name_zh": "瓜德罗普殖民地"
     },
     {
-      "id": "mq_parent",
+      "id": "mtq_colony",
       "scenarios": [
         "hoi4_1936",
         "hoi4_1939"
       ],
-      "tag": "MQ",
+      "tag": "MTQ",
       "parent_owner_tag": "FRA",
       "subject_kind": "colony",
       "select": {
-        "owners": [
+        "country_codes": [
           "MQ"
         ]
       },
       "only_from_owners": [
         "MQ"
       ],
-      "color_hex": "#5887fd"
+      "color_hex": "#5887fd",
+      "name_en": "Colony of Martinique",
+      "name_zh": "马提尼克殖民地"
     },
     {
       "id": "re_parent",
@@ -3526,7 +3532,7 @@
       "name_en": "Albanian Kingdom",
       "name_zh": "阿尔巴尼亚王国",
       "parent_owner_tag": "ITA",
-      "subject_kind": "puppet",
+      "subject_kind": "protectorate",
       "color_hex": "#679457",
       "select": {
         "country_codes": [
@@ -9577,6 +9583,65 @@
         "TUN"
       ],
       "color_hex": "#3657c4"
+    },
+    {
+      "id": "julian_march",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ITA",
+      "select": {
+        "feature_ids": [
+          "HR036",
+          "SI044",
+          "SI043",
+          "SI038"
+        ]
+      },
+      "only_from_owners": [
+        "YUG"
+      ]
+    },
+    {
+      "id": "southern_dobruja",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "ROM",
+      "select": {
+        "feature_ids": [
+          "BG332",
+          "BG325"
+        ]
+      },
+      "only_from_owners": [
+        "BUL"
+      ]
+    },
+    {
+      "id": "panama_canal_zone",
+      "scenarios": [
+        "hoi4_1936",
+        "hoi4_1939"
+      ],
+      "tag": "PCZ",
+      "name_en": "Panama Canal Zone",
+      "name_zh": "巴拿马运河区",
+      "parent_owner_tag": "USA",
+      "subject_kind": "territory",
+      "select": {
+        "feature_ids": [
+          "PA_ADM1_PAN-1337__SPLIT_PCZ",
+          "PA_ADM1_PAN-1340__SPLIT_PCZ"
+        ]
+      },
+      "only_from_owners": [
+        "PAN"
+      ],
+      "cores": "keep",
+      "notes": "Colón city is included in the Canal Zone at parcel scale."
     },
     {
       "id": "china_enclaves_1939",
