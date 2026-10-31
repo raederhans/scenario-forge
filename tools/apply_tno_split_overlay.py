@@ -54,6 +54,22 @@ def update_country_geography(countries, owners, features, base_features, country
                               ("continent_id", "continent_label", "subregion_id", "subregion_label")})
 
 
+def expand_reclamation_entries(overlay, cores):
+    entries = []
+    for entry in overlay["entries"]:
+        if entry.get("cores") != "parent_if_single_child":
+            entries.append(entry)
+            continue
+        child = entry["only_from_owners"][0]
+        for mode in ("owner", "keep"):
+            ids = [fid for fid in entry["select"]["feature_ids"]
+                   if (cores[fid] == [child]) == (mode == "owner")]
+            if ids:
+                entries.append({**entry, "id": f"{entry['id']}_{mode}", "cores": mode,
+                                "select": {"feature_ids": ids}})
+    return {**overlay, "entries": entries}
+
+
 def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
                  data_dir=ROOT / "data", refresh=refresh_scenario,
                  rebuild=rebuild_districts, synchronize=synchronize_scenario_snapshot,
@@ -69,10 +85,11 @@ def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
     editable_topology = {**topology, "objects": {"political": {
         "type": "GeometryCollection", "geometries": geometries}}}
     groups, meta = load_hierarchy(data_dir / "hierarchy.json")
+    cores = read_json_source(scenario_dir / "cores.by_feature.json")["cores"]
     countries, assignments, report = apply_overlay(
-        overlay, "tno_1962",
+        expand_reclamation_entries(overlay, cores), "tno_1962",
         features={g["properties"]["id"]: g["properties"] for g in geometries},
-        owners=owners, cores=read_json_source(scenario_dir / "cores.by_feature.json")["cores"],
+        owners=owners, cores=cores,
         countries=payload["countries"], default_country=manifest["default_country"],
         hierarchy_groups=groups, country_meta=meta, prefectures={}, bucket_by_feature={},
         plans=load_plans(data_dir),
@@ -98,6 +115,10 @@ def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
     manual = read_json_source(manual_path)
     mutations = read_json_source(mutations_path)
     source_changed = False
+    for entry in overlay["entries"]:
+        if entry.get("cores") == "parent_if_single_child":
+            countries[entry["tag"]].pop("entry_kind", None)
+            mutations["countries"].get(entry["tag"], {}).pop("entry_kind", None)
     for tag in report["retired_tags"]:
         manual["countries"].pop(tag, None)
         mutations["countries"].pop(tag, None)

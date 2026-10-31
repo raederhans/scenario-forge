@@ -5254,252 +5254,6 @@
       "synthetic_owner": false,
       "tag": "KAZ"
     },
-    "KC00": {
-      "base_iso2": "GE",
-      "capital_state_id": null,
-      "color_hex": "#6d5e58",
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "controller_feature_count": 9,
-      "display_name": "Kaukasien — Generalbezirk Georgien",
-      "display_name_en": "Kaukasien — Generalbezirk Georgien",
-      "display_name_zh": "高加索·格鲁吉亚总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 9,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "GE",
-      "notes": "",
-      "parent_owner_tag": "RKK",
-      "parent_owner_tags": [
-        "RKK"
-      ],
-      "primary_rule_source": "tno_kc00",
-      "provenance_iso2": "GE",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_kc00"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_western_asia",
-      "subregion_label": "Western Asia",
-      "synthetic_owner": false,
-      "tag": "KC00"
-    },
-    "KC01": {
-      "base_iso2": "AZ",
-      "capital_state_id": null,
-      "color_hex": "#554641",
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "controller_feature_count": 69,
-      "display_name": "Kaukasien — Generalbezirk Aserbaidschan",
-      "display_name_en": "Kaukasien — Generalbezirk Aserbaidschan",
-      "display_name_zh": "高加索·阿塞拜疆总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 69,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "AZ",
-      "notes": "",
-      "parent_owner_tag": "RKK",
-      "parent_owner_tags": [
-        "RKK"
-      ],
-      "primary_rule_source": "tno_kc01",
-      "provenance_iso2": "AZ",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_kc01"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_western_asia",
-      "subregion_label": "Western Asia",
-      "synthetic_owner": false,
-      "tag": "KC01"
-    },
-    "KC02": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#82736e",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 17,
-      "display_name": "Kaukasien — Generalbezirk Kuban",
-      "display_name_en": "Kaukasien — Generalbezirk Kuban",
-      "display_name_zh": "高加索·库班总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 17,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKK",
-      "parent_owner_tags": [
-        "RKK"
-      ],
-      "primary_rule_source": "tno_kc02",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_kc02"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "KC02"
-    },
-    "KC03": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#756863",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 20,
-      "display_name": "Kaukasien — Generalbezirk Stawropol-Terek",
-      "display_name_en": "Kaukasien — Generalbezirk Stawropol-Terek",
-      "display_name_zh": "高加索·斯塔夫罗波尔—捷列克总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 20,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKK",
-      "parent_owner_tags": [
-        "RKK"
-      ],
-      "primary_rule_source": "tno_kc03",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_kc03"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "KC03"
-    },
-    "KC04": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#5f514c",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 37,
-      "display_name": "Kaukasien — Generalbezirk Bergvölker",
-      "display_name_en": "Kaukasien — Generalbezirk Bergvölker",
-      "display_name_zh": "高加索·山地民族总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 37,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKK",
-      "parent_owner_tags": [
-        "RKK"
-      ],
-      "primary_rule_source": "tno_kc04",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_kc04"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "KC04"
-    },
-    "KC05": {
-      "base_iso2": "RKK",
-      "capital_state_id": null,
-      "color_hex": "#685a57",
-      "continent_id": "",
-      "continent_label": "",
-      "controller_feature_count": 21,
-      "display_name": "Kaukasien — Generalbezirk Kalmückien",
-      "display_name_en": "Kaukasien — Generalbezirk Kalmückien",
-      "display_name_zh": "高加索·卡尔梅克总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 21,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RKK",
-      "notes": "",
-      "parent_owner_tag": "RKK",
-      "parent_owner_tags": [
-        "RKK"
-      ],
-      "primary_rule_source": "tno_kc05",
-      "provenance_iso2": "RKK",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_kc05"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "",
-      "subregion_label": "",
-      "synthetic_owner": false,
-      "tag": "KC05"
-    },
     "KGZ": {
       "base_iso2": "KG",
       "capital_state_id": null,
@@ -6555,375 +6309,6 @@
       "subregion_label": "Northern Africa",
       "synthetic_owner": false,
       "tag": "MOR"
-    },
-    "MS00": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#504a44",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 25,
-      "display_name": "Moskowien — Generalbezirk Moskau",
-      "display_name_en": "Moskowien — Generalbezirk Moskau",
-      "display_name_zh": "莫斯科维恩·莫斯科总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 25,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKM",
-      "parent_owner_tags": [
-        "RKM"
-      ],
-      "primary_rule_source": "tno_ms00",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_ms00"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "MS00"
-    },
-    "MS01": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#45413b",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 10,
-      "display_name": "Moskowien — Generalbezirk Ingermanland",
-      "display_name_en": "Moskowien — Generalbezirk Ingermanland",
-      "display_name_zh": "莫斯科维恩·英格里亚总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 10,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKM",
-      "parent_owner_tags": [
-        "RKM"
-      ],
-      "primary_rule_source": "tno_ms01",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_ms01"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "MS01"
-    },
-    "MS02": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#756e69",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 9,
-      "display_name": "Moskowien — Generalbezirk Smolensk",
-      "display_name_en": "Moskowien — Generalbezirk Smolensk",
-      "display_name_zh": "莫斯科维恩·斯摩棱斯克总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 9,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKM",
-      "parent_owner_tags": [
-        "RKM"
-      ],
-      "primary_rule_source": "tno_ms02",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_ms02"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "MS02"
-    },
-    "MS03": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#59544f",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 21,
-      "display_name": "Moskowien — Generalbezirk Tula",
-      "display_name_en": "Moskowien — Generalbezirk Tula",
-      "display_name_zh": "莫斯科维恩·图拉总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 21,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKM",
-      "parent_owner_tags": [
-        "RKM"
-      ],
-      "primary_rule_source": "tno_ms03",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_ms03"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "MS03"
-    },
-    "MS04": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#69635d",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 21,
-      "display_name": "Moskowien — Generalbezirk Woronesch",
-      "display_name_en": "Moskowien — Generalbezirk Woronesch",
-      "display_name_zh": "莫斯科维恩·沃罗涅日总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 21,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKM",
-      "parent_owner_tags": [
-        "RKM"
-      ],
-      "primary_rule_source": "tno_ms04",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_ms04"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "MS04"
-    },
-    "MS05": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#59524d",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 9,
-      "display_name": "Moskowien — Generalbezirk Jaroslawl",
-      "display_name_en": "Moskowien — Generalbezirk Jaroslawl",
-      "display_name_zh": "莫斯科维恩·雅罗斯拉夫尔总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 9,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKM",
-      "parent_owner_tags": [
-        "RKM"
-      ],
-      "primary_rule_source": "tno_ms05",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_ms05"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "MS05"
-    },
-    "MS06": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#645d58",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 5,
-      "display_name": "Moskowien — Generalbezirk Gorki",
-      "display_name_en": "Moskowien — Generalbezirk Gorki",
-      "display_name_zh": "莫斯科维恩·高尔基边区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 5,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKM",
-      "parent_owner_tags": [
-        "RKM"
-      ],
-      "primary_rule_source": "tno_ms06",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_ms06"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "MS06"
-    },
-    "MS07": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#4d4742",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 18,
-      "display_name": "Moskowien — Generalbezirk Saratow",
-      "display_name_en": "Moskowien — Generalbezirk Saratow",
-      "display_name_zh": "莫斯科维恩·萨拉托夫总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 18,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKM",
-      "parent_owner_tags": [
-        "RKM"
-      ],
-      "primary_rule_source": "tno_ms07",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_ms07"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "MS07"
-    },
-    "MS08": {
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "color_hex": "#726c66",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 36,
-      "display_name": "Moskowien — Generalbezirk Don-Wolga",
-      "display_name_en": "Moskowien — Generalbezirk Don-Wolga",
-      "display_name_zh": "莫斯科维恩·顿河—伏尔加总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 36,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "RU",
-      "notes": "",
-      "parent_owner_tag": "RKM",
-      "parent_owner_tags": [
-        "RKM"
-      ],
-      "primary_rule_source": "tno_ms08",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_ms08"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "MS08"
     },
     "MWI": {
       "base_iso2": "MW",
@@ -8561,33 +7946,38 @@
       "tag": "RGC"
     },
     "RKK": {
-      "base_iso2": "GE",
+      "base_iso2": "RU",
       "capital_state_id": 231,
       "color_hex": "#6b5c57",
-      "continent_id": "continent_asia",
-      "continent_label": "Asia",
-      "controller_feature_count": 0,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 173,
       "display_name": "Reichskommissariat Kaukasien",
       "display_name_en": "Reichskommissariat Kaukasien",
       "display_name_zh": "高加索专员辖区",
-      "entry_kind": "scenario_container",
-      "feature_count": 0,
+      "feature_count": 173,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
         "tno_baseline"
       ],
-      "lookup_iso2": "GE",
+      "lookup_iso2": "RU",
       "notes": "Transcaucasia plus the North Caucasus groups represented by GER_is_RKK_state, including Dagestan but excluding Astrakhan and Kalmykia/Elista.",
       "parent_owner_tag": "GER",
       "parent_owner_tags": [
         "GER"
       ],
       "primary_rule_source": "tno_baseline_rkk",
-      "provenance_iso2": "GE",
+      "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_baseline_rkk"
+        "tno_baseline_rkk",
+        "tno_reclaim_kc00_keep",
+        "tno_reclaim_kc01_keep",
+        "tno_reclaim_kc02_keep",
+        "tno_reclaim_kc03_keep",
+        "tno_reclaim_kc04_keep",
+        "tno_reclaim_kc05_keep"
       ],
       "scenario_only": true,
       "source": "tno_reichskommissariat_baseline",
@@ -8595,8 +7985,8 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subregion_id": "subregion_western_asia",
-      "subregion_label": "Western Asia",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
       "tag": "RKK"
     },
@@ -8607,12 +7997,11 @@
       "color_policy": "locked",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 0,
+      "controller_feature_count": 154,
       "display_name": "Reichskommissariat Moskowien",
       "display_name_en": "Reichskommissariat Moskowien",
       "display_name_zh": "莫斯科维恩专员辖区",
-      "entry_kind": "scenario_container",
-      "feature_count": 0,
+      "feature_count": 154,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -8628,7 +8017,16 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_baseline_rkm"
+        "tno_baseline_rkm",
+        "tno_reclaim_ms00_keep",
+        "tno_reclaim_ms01_keep",
+        "tno_reclaim_ms02_keep",
+        "tno_reclaim_ms03_keep",
+        "tno_reclaim_ms04_keep",
+        "tno_reclaim_ms05_keep",
+        "tno_reclaim_ms06_keep",
+        "tno_reclaim_ms07_keep",
+        "tno_reclaim_ms08_keep"
       ],
       "scenario_only": true,
       "source": "tno_reichskommissariat_baseline",
@@ -8916,12 +8314,11 @@
       "color_hex": "#585e65",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 0,
+      "controller_feature_count": 278,
       "display_name": "Reichskommissariat Ukraine",
       "display_name_en": "Reichskommissariat Ukraine",
       "display_name_zh": "乌克兰专员辖区",
-      "entry_kind": "scenario_container",
-      "feature_count": 0,
+      "feature_count": 278,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -8937,7 +8334,16 @@
       "provenance_iso2": "UA",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_baseline_rku"
+        "tno_baseline_rku",
+        "tno_reclaim_uk00_keep",
+        "tno_reclaim_uk01_keep",
+        "tno_reclaim_uk02_keep",
+        "tno_reclaim_uk03_keep",
+        "tno_reclaim_uk04_keep",
+        "tno_reclaim_uk05_keep",
+        "tno_reclaim_uk06_keep",
+        "tno_reclaim_uk07_keep",
+        "tno_reclaim_uk08_keep"
       ],
       "scenario_only": true,
       "source": "tno_reichskommissariat_baseline",
@@ -10410,375 +9816,6 @@
       "subregion_label": "Eastern Africa",
       "synthetic_owner": false,
       "tag": "UGA"
-    },
-    "UK00": {
-      "base_iso2": "UA",
-      "capital_state_id": null,
-      "color_hex": "#555b62",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 33,
-      "display_name": "Generalbezirk Kiew",
-      "display_name_en": "Generalbezirk Kiew",
-      "display_name_zh": "乌克兰·基辅总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 33,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "UA",
-      "notes": "",
-      "parent_owner_tag": "RKU",
-      "parent_owner_tags": [
-        "RKU"
-      ],
-      "primary_rule_source": "tno_uk00",
-      "provenance_iso2": "UA",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_uk00"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "UK00"
-    },
-    "UK01": {
-      "base_iso2": "UA",
-      "capital_state_id": null,
-      "color_hex": "#42484f",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 39,
-      "display_name": "Generalbezirk Wolhynien-Podolien",
-      "display_name_en": "Generalbezirk Wolhynien-Podolien",
-      "display_name_zh": "乌克兰·沃里尼亚—波多利亚总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 39,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "UA",
-      "notes": "",
-      "parent_owner_tag": "RKU",
-      "parent_owner_tags": [
-        "RKU"
-      ],
-      "primary_rule_source": "tno_uk01",
-      "provenance_iso2": "UA",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_uk01"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "UK01"
-    },
-    "UK02": {
-      "base_iso2": "UA",
-      "capital_state_id": null,
-      "color_hex": "#6e757c",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 19,
-      "display_name": "Generalbezirk Shitomir",
-      "display_name_en": "Generalbezirk Shitomir",
-      "display_name_zh": "乌克兰·日托米尔总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 19,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "UA",
-      "notes": "",
-      "parent_owner_tag": "RKU",
-      "parent_owner_tags": [
-        "RKU"
-      ],
-      "primary_rule_source": "tno_uk02",
-      "provenance_iso2": "UA",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_uk02"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "UK02"
-    },
-    "UK03": {
-      "base_iso2": "UA",
-      "capital_state_id": null,
-      "color_hex": "#494f55",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 39,
-      "display_name": "Generalbezirk Tschernigow",
-      "display_name_en": "Generalbezirk Tschernigow",
-      "display_name_zh": "乌克兰·切尔尼戈夫总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 39,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "UA",
-      "notes": "",
-      "parent_owner_tag": "RKU",
-      "parent_owner_tags": [
-        "RKU"
-      ],
-      "primary_rule_source": "tno_uk03",
-      "provenance_iso2": "UA",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_uk03"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "UK03"
-    },
-    "UK04": {
-      "base_iso2": "UA",
-      "capital_state_id": null,
-      "color_hex": "#60666d",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 30,
-      "display_name": "Generalbezirk Dnjepropetrowsk",
-      "display_name_en": "Generalbezirk Dnjepropetrowsk",
-      "display_name_zh": "乌克兰·第聂伯罗彼得罗夫斯克总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 30,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "UA",
-      "notes": "",
-      "parent_owner_tag": "RKU",
-      "parent_owner_tags": [
-        "RKU"
-      ],
-      "primary_rule_source": "tno_uk04",
-      "provenance_iso2": "UA",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_uk04"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "UK04"
-    },
-    "UK05": {
-      "base_iso2": "UA",
-      "capital_state_id": null,
-      "color_hex": "#696f76",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 27,
-      "display_name": "Generalbezirk Nikolajew",
-      "display_name_en": "Generalbezirk Nikolajew",
-      "display_name_zh": "乌克兰·尼古拉耶夫总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 27,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "UA",
-      "notes": "",
-      "parent_owner_tag": "RKU",
-      "parent_owner_tags": [
-        "RKU"
-      ],
-      "primary_rule_source": "tno_uk05",
-      "provenance_iso2": "UA",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_uk05"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "UK05"
-    },
-    "UK06": {
-      "base_iso2": "UA",
-      "capital_state_id": null,
-      "color_hex": "#494d53",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 29,
-      "display_name": "Generalbezirk Taurien",
-      "display_name_en": "Generalbezirk Taurien",
-      "display_name_zh": "乌克兰·塔夫利达总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 29,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "UA",
-      "notes": "",
-      "parent_owner_tag": "RKU",
-      "parent_owner_tags": [
-        "RKU"
-      ],
-      "primary_rule_source": "tno_uk06",
-      "provenance_iso2": "UA",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_uk06"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "UK06"
-    },
-    "UK07": {
-      "base_iso2": "UA",
-      "capital_state_id": null,
-      "color_hex": "#53585e",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 28,
-      "display_name": "Generalbezirk Charkow",
-      "display_name_en": "Generalbezirk Charkow",
-      "display_name_zh": "乌克兰·哈尔科夫总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 28,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "UA",
-      "notes": "",
-      "parent_owner_tag": "RKU",
-      "parent_owner_tags": [
-        "RKU"
-      ],
-      "primary_rule_source": "tno_uk07",
-      "provenance_iso2": "UA",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_uk07"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "UK07"
-    },
-    "UK08": {
-      "base_iso2": "UA",
-      "capital_state_id": null,
-      "color_hex": "#6d737b",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 34,
-      "display_name": "Generalbezirk Donez",
-      "display_name_en": "Generalbezirk Donez",
-      "display_name_zh": "乌克兰·顿涅茨总区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 34,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "UA",
-      "notes": "",
-      "parent_owner_tag": "RKU",
-      "parent_owner_tags": [
-        "RKU"
-      ],
-      "primary_rule_source": "tno_uk08",
-      "provenance_iso2": "UA",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_uk08"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "subregion_eastern_europe",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false,
-      "tag": "UK08"
     },
     "UPH": {
       "base_iso2": "PH",

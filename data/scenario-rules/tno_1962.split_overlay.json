@@ -277,412 +277,6 @@
       "tag": "OE04"
     },
     {
-      "color_hex": "#42484f",
-      "cores": "keep",
-      "id": "tno_uk01",
-      "name_en": "Generalbezirk Wolhynien-Podolien",
-      "name_zh": "乌克兰·沃里尼亚—波多利亚总区",
-      "only_from_owners": [
-        "RKU"
-      ],
-      "parent_owner_tag": "RKU",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "BY_INT_BREST",
-          "UA_MRG_5041b17a3e61",
-          "UA_MRG_57c49cfe4029",
-          "UA_MRG_6e5a94ff967b",
-          "UA_MRG_71f8199a8d07",
-          "UA_MRG_76b1b94d5856",
-          "UA_MRG_8c4b9e4808b7",
-          "UA_MRG_93291f71dff3",
-          "UA_MRG_ff6ac32ac4e3",
-          "UA_RAY_74538382B10219511542041",
-          "UA_RAY_74538382B1361262622940",
-          "UA_RAY_74538382B17610954663111",
-          "UA_RAY_74538382B17645619358290",
-          "UA_RAY_74538382B19676868566368",
-          "UA_RAY_74538382B30351514928450",
-          "UA_RAY_74538382B35313257426644",
-          "UA_RAY_74538382B36980255523800",
-          "UA_RAY_74538382B37791268598116",
-          "UA_RAY_74538382B44501351674000",
-          "UA_RAY_74538382B46392233077619",
-          "UA_RAY_74538382B47818615416103",
-          "UA_RAY_74538382B51634820959847",
-          "UA_RAY_74538382B51989583187875",
-          "UA_RAY_74538382B57022409328323",
-          "UA_RAY_74538382B5714887404176",
-          "UA_RAY_74538382B57991939893011",
-          "UA_RAY_74538382B64329946545346",
-          "UA_RAY_74538382B6752863603231",
-          "UA_RAY_74538382B69155666487417",
-          "UA_RAY_74538382B71334227440013",
-          "UA_RAY_74538382B72123275564902",
-          "UA_RAY_74538382B72519912366476",
-          "UA_RAY_74538382B80427643782366",
-          "UA_RAY_74538382B81176113996215",
-          "UA_RAY_74538382B86462977342473",
-          "UA_RAY_74538382B91689640579793",
-          "UA_RAY_74538382B9177697938380",
-          "UA_RAY_74538382B92334683682599",
-          "UA_RAY_74538382B9478118461291",
-          "UA_RAY_74538382B9733134987595"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "UK01"
-    },
-    {
-      "color_hex": "#6e757c",
-      "cores": "keep",
-      "id": "tno_uk02",
-      "name_en": "Generalbezirk Shitomir",
-      "name_zh": "乌克兰·日托米尔总区",
-      "only_from_owners": [
-        "RKU"
-      ],
-      "parent_owner_tag": "RKU",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "UA_MRG_364aab8578b7",
-          "UA_MRG_44d0fd9d6e14",
-          "UA_MRG_7f067ceac5cb",
-          "UA_MRG_8e1ed09f0e12",
-          "UA_MRG_9fc8b136c3a6",
-          "UA_MRG_ae35953e4a30",
-          "UA_MRG_b0fab68c785d",
-          "UA_MRG_d6223fcd4bc5",
-          "UA_MRG_dbee0923a48b",
-          "UA_MRG_de7e916ec1cb",
-          "UA_MRG_e0dcc6adce13",
-          "UA_MRG_fd8e40834959",
-          "UA_RAY_74538382B32839428556025",
-          "UA_RAY_74538382B52142389762962",
-          "UA_RAY_74538382B57692221763967",
-          "UA_RAY_74538382B68255145682197",
-          "UA_RAY_74538382B68825553908118",
-          "UA_RAY_74538382B7363516927626",
-          "UA_RAY_74538382B89307192182420"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "UK02"
-    },
-    {
-      "color_hex": "#494f55",
-      "cores": "keep",
-      "id": "tno_uk03",
-      "name_en": "Generalbezirk Tschernigow",
-      "name_zh": "乌克兰·切尔尼戈夫总区",
-      "only_from_owners": [
-        "RKU"
-      ],
-      "parent_owner_tag": "RKU",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "BY_RAY_67162791B17030122378697",
-          "RU_RAY_50074027B12942583135720",
-          "RU_RAY_50074027B31853797856912",
-          "RU_RAY_50074027B42449829895110",
-          "RU_RAY_50074027B46415378872622",
-          "RU_RAY_50074027B9105763704567",
-          "RU_RAY_50074027B96444957835233",
-          "RU_RAY_50074027B9814729903160",
-          "UA_MRG_07e4f868c3fb",
-          "UA_MRG_4224fabffe3b",
-          "UA_MRG_7db72d35cf6c",
-          "UA_MRG_91f1c11e596f",
-          "UA_MRG_98ce0c6febb4",
-          "UA_MRG_bde664b68d7f",
-          "UA_MRG_c8f134fbd5da",
-          "UA_MRG_f49493422ebe",
-          "UA_RAY_74538382B13559545331448",
-          "UA_RAY_74538382B14499181024319",
-          "UA_RAY_74538382B16544098233158",
-          "UA_RAY_74538382B23907235979788",
-          "UA_RAY_74538382B2732576684893",
-          "UA_RAY_74538382B29845079622826",
-          "UA_RAY_74538382B34689599554445",
-          "UA_RAY_74538382B36929178896395",
-          "UA_RAY_74538382B37171380171685",
-          "UA_RAY_74538382B3760492540112",
-          "UA_RAY_74538382B44220139144156",
-          "UA_RAY_74538382B45068545633774",
-          "UA_RAY_74538382B46710488362187",
-          "UA_RAY_74538382B51921119694159",
-          "UA_RAY_74538382B53011721841283",
-          "UA_RAY_74538382B66083941235299",
-          "UA_RAY_74538382B72285239783987",
-          "UA_RAY_74538382B73193392833506",
-          "UA_RAY_74538382B77165188287872",
-          "UA_RAY_74538382B79592812488535",
-          "UA_RAY_74538382B88368635206807",
-          "UA_RAY_74538382B98557569749448",
-          "UA_RAY_74538382B98672866452807"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "UK03"
-    },
-    {
-      "color_hex": "#60666d",
-      "cores": "keep",
-      "id": "tno_uk04",
-      "name_en": "Generalbezirk Dnjepropetrowsk",
-      "name_zh": "乌克兰·第聂伯罗彼得罗夫斯克总区",
-      "only_from_owners": [
-        "RKU"
-      ],
-      "parent_owner_tag": "RKU",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "UA_MRG_1e5ce8367e34",
-          "UA_MRG_39b244f210a7",
-          "UA_MRG_5e1a623ff8e3",
-          "UA_MRG_6057d7f77511",
-          "UA_MRG_7e91c55da78e",
-          "UA_MRG_95a5c2e0f114",
-          "UA_MRG_9cc4d817d067",
-          "UA_MRG_b75cd2d6110f",
-          "UA_MRG_c5aa2c8a6048",
-          "UA_MRG_c74c01b39f8e",
-          "UA_RAY_74538382B1179884845086",
-          "UA_RAY_74538382B15303326410198",
-          "UA_RAY_74538382B15383579018603",
-          "UA_RAY_74538382B21914315222818",
-          "UA_RAY_74538382B23045356862491",
-          "UA_RAY_74538382B23313109833663",
-          "UA_RAY_74538382B39784518508744",
-          "UA_RAY_74538382B42847215196778",
-          "UA_RAY_74538382B48774443336138",
-          "UA_RAY_74538382B55212312657182",
-          "UA_RAY_74538382B5599119898653",
-          "UA_RAY_74538382B63843280303146",
-          "UA_RAY_74538382B71954626153569",
-          "UA_RAY_74538382B85307919179669",
-          "UA_RAY_74538382B8704633300515",
-          "UA_RAY_74538382B89155529549277",
-          "UA_RAY_74538382B92549368661816",
-          "UA_RAY_74538382B92678915216320",
-          "UA_RAY_74538382B927387955127",
-          "UA_RAY_74538382B92973355473211"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "UK04"
-    },
-    {
-      "color_hex": "#696f76",
-      "cores": "keep",
-      "id": "tno_uk05",
-      "name_en": "Generalbezirk Nikolajew",
-      "name_zh": "乌克兰·尼古拉耶夫总区",
-      "only_from_owners": [
-        "RKU"
-      ],
-      "parent_owner_tag": "RKU",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "UA_MRG_01673e94c186",
-          "UA_MRG_2d1c37bdd071",
-          "UA_MRG_51ee3e4d0063",
-          "UA_MRG_73aa15b32010",
-          "UA_MRG_797d35ccfd2e",
-          "UA_MRG_873c83173170",
-          "UA_MRG_b417c43a40cb",
-          "UA_MRG_ba89d2e82c09",
-          "UA_MRG_d727a8cfaa69",
-          "UA_MRG_e3c0520ffdd5",
-          "UA_RAY_74538382B1113173119948",
-          "UA_RAY_74538382B15723930579981",
-          "UA_RAY_74538382B16168555985033",
-          "UA_RAY_74538382B2161330582129",
-          "UA_RAY_74538382B23953232699474",
-          "UA_RAY_74538382B28831490249541",
-          "UA_RAY_74538382B33094259068281",
-          "UA_RAY_74538382B332128375794",
-          "UA_RAY_74538382B37223682167383",
-          "UA_RAY_74538382B37973254287789",
-          "UA_RAY_74538382B67308569242211",
-          "UA_RAY_74538382B72550121130033",
-          "UA_RAY_74538382B79975421345437",
-          "UA_RAY_74538382B8481477190191",
-          "UA_RAY_74538382B97324557643268",
-          "UA_RAY_74538382B97447105405204",
-          "UA_RAY_74538382B99860915109561"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "UK05"
-    },
-    {
-      "color_hex": "#494d53",
-      "cores": "keep",
-      "id": "tno_uk06",
-      "name_en": "Generalbezirk Taurien",
-      "name_zh": "乌克兰·塔夫利达总区",
-      "only_from_owners": [
-        "RKU"
-      ],
-      "parent_owner_tag": "RKU",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "UA_MRG_1a8aac8d6778",
-          "UA_MRG_570a8d4dd729",
-          "UA_MRG_87ad72dae9b5",
-          "UA_MRG_9e7d5f1ce841",
-          "UA_MRG_de7101fe7980",
-          "UA_RAY_74538382B19608093506995",
-          "UA_RAY_74538382B20048272724198",
-          "UA_RAY_74538382B21297633796285",
-          "UA_RAY_74538382B32095344223749",
-          "UA_RAY_74538382B3314448443504",
-          "UA_RAY_74538382B33781793273381",
-          "UA_RAY_74538382B36897928857836",
-          "UA_RAY_74538382B42205538030067",
-          "UA_RAY_74538382B42406222783177",
-          "UA_RAY_74538382B43795583594371",
-          "UA_RAY_74538382B44474254323889",
-          "UA_RAY_74538382B57790499946350",
-          "UA_RAY_74538382B60808123109786",
-          "UA_RAY_74538382B61089393980714",
-          "UA_RAY_74538382B62779126534418",
-          "UA_RAY_74538382B65177906747126",
-          "UA_RAY_74538382B72369548204787",
-          "UA_RAY_74538382B83290488809947",
-          "UA_RAY_74538382B85739457006484",
-          "UA_RAY_74538382B86672078093677",
-          "UA_RAY_74538382B87705908812983",
-          "UA_RAY_74538382B88832969225176",
-          "UA_RAY_74538382B92774727366654",
-          "UA_RAY_74538382B95492559683598"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "UK06"
-    },
-    {
-      "color_hex": "#53585e",
-      "cores": "keep",
-      "id": "tno_uk07",
-      "name_en": "Generalbezirk Charkow",
-      "name_zh": "乌克兰·哈尔科夫总区",
-      "only_from_owners": [
-        "RKU"
-      ],
-      "parent_owner_tag": "RKU",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_MRG_dc59f2179593",
-          "RU_MRG_f84bc369d8b3",
-          "RU_RAY_50074027B19621694008878",
-          "RU_RAY_50074027B23655919603928",
-          "RU_RAY_50074027B26881426661864",
-          "RU_RAY_50074027B55014623372781",
-          "RU_RAY_50074027B59167521890578",
-          "RU_RAY_50074027B73978553723393",
-          "RU_RAY_50074027B78718194323542",
-          "RU_RAY_50074027B79024776170444",
-          "RU_RAY_50074027B82795249676876",
-          "UA_MRG_167b1c61b320",
-          "UA_MRG_1e19f7d437d0",
-          "UA_MRG_26d00b8ec232",
-          "UA_MRG_70858b70843b",
-          "UA_MRG_97cb7eda9f1d",
-          "UA_MRG_c2b5f29d91e8",
-          "UA_RAY_74538382B150351319009",
-          "UA_RAY_74538382B35146860339147",
-          "UA_RAY_74538382B35301744305605",
-          "UA_RAY_74538382B36501884751905",
-          "UA_RAY_74538382B40204431292765",
-          "UA_RAY_74538382B51195623672150",
-          "UA_RAY_74538382B52051409545176",
-          "UA_RAY_74538382B56857399435570",
-          "UA_RAY_74538382B58806562521535",
-          "UA_RAY_74538382B6869191817667",
-          "UA_RAY_74538382B7822777781560"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "UK07"
-    },
-    {
-      "color_hex": "#6d737b",
-      "cores": "keep",
-      "id": "tno_uk08",
-      "name_en": "Generalbezirk Donez",
-      "name_zh": "乌克兰·顿涅茨总区",
-      "only_from_owners": [
-        "RKU"
-      ],
-      "parent_owner_tag": "RKU",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_RAY_50074027B19608634361445",
-          "RU_RAY_50074027B21430544456221",
-          "RU_RAY_50074027B30333853270950",
-          "RU_RAY_50074027B40672414055189",
-          "RU_RAY_50074027B48200335175308",
-          "RU_RAY_50074027B96632027100715",
-          "UA_MRG_30161412737f",
-          "UA_MRG_456d7658c3df",
-          "UA_MRG_837595aeea03",
-          "UA_MRG_8e995a06a742",
-          "UA_RAY_74538382B13057195168049",
-          "UA_RAY_74538382B13823475744665",
-          "UA_RAY_74538382B17839198127311",
-          "UA_RAY_74538382B24236776375789",
-          "UA_RAY_74538382B38253727574875",
-          "UA_RAY_74538382B42239251891056",
-          "UA_RAY_74538382B52931084418443",
-          "UA_RAY_74538382B53420808029005",
-          "UA_RAY_74538382B54113761495064",
-          "UA_RAY_74538382B55408999642819",
-          "UA_RAY_74538382B55698458190122",
-          "UA_RAY_74538382B59316427092609",
-          "UA_RAY_74538382B60058274039512",
-          "UA_RAY_74538382B60964237816069",
-          "UA_RAY_74538382B61551312903365",
-          "UA_RAY_74538382B63146168478131",
-          "UA_RAY_74538382B68112456325611",
-          "UA_RAY_74538382B72863696789776",
-          "UA_RAY_74538382B811800225931",
-          "UA_RAY_74538382B83226976460707",
-          "UA_RAY_74538382B87091028068119",
-          "UA_RAY_74538382B91393089585676",
-          "UA_RAY_74538382B91909296876216",
-          "UA_RAY_74538382B99908513430661"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "UK08"
-    },
-    {
       "color_hex": "#9c8352",
       "cores": "owner",
       "id": "tno_ayr",
@@ -1391,534 +985,6 @@
       },
       "subject_kind": "",
       "tag": "VIC"
-    },
-    {
-      "color_hex": "#554641",
-      "cores": "keep",
-      "id": "tno_kc01",
-      "name_en": "Kaukasien — Generalbezirk Aserbaidschan",
-      "name_zh": "高加索·阿塞拜疆总区",
-      "only_from_owners": [
-        "RKK"
-      ],
-      "parent_owner_tag": "RKK",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "AZE-1676",
-          "AZE-1677",
-          "AZE-1678",
-          "AZE-1679",
-          "AZE-1680",
-          "AZE-1681",
-          "AZE-1682",
-          "AZE-1683",
-          "AZE-1684",
-          "AZE-1685",
-          "AZE-1686",
-          "AZE-1687",
-          "AZE-1688",
-          "AZE-1689",
-          "AZE-1690",
-          "AZE-1691",
-          "AZE-1692",
-          "AZE-1693",
-          "AZE-1694",
-          "AZE-1695",
-          "AZE-1696",
-          "AZE-1697",
-          "AZE-1698",
-          "AZE-1699",
-          "AZE-1700",
-          "AZE-1701",
-          "AZE-1702",
-          "AZE-1703",
-          "AZE-1704",
-          "AZE-1705",
-          "AZE-1706",
-          "AZE-1707__tno1962_1",
-          "AZE-1707__tno1962_2",
-          "AZE-1708",
-          "AZE-1709",
-          "AZE-1710",
-          "AZE-1711",
-          "AZE-1712",
-          "AZE-1713",
-          "AZE-1714",
-          "AZE-1715",
-          "AZE-1716",
-          "AZE-1717",
-          "AZE-1718",
-          "AZE-1719",
-          "AZE-1720",
-          "AZE-1721",
-          "AZE-1722",
-          "AZE-1723",
-          "AZE-1724",
-          "AZE-1725",
-          "AZE-1726",
-          "AZE-1727",
-          "AZE-1728",
-          "AZE-1729",
-          "AZE-1730",
-          "AZE-1731",
-          "AZE-1734",
-          "AZE-1735",
-          "AZE-1736",
-          "AZE-1737",
-          "AZE-1738",
-          "AZE-1739",
-          "AZE-1740",
-          "AZE-4838",
-          "AZE-5563",
-          "AZE-5564",
-          "AZE-5565",
-          "AZE-5566"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "KC01"
-    },
-    {
-      "color_hex": "#82736e",
-      "cores": "keep",
-      "id": "tno_kc02",
-      "name_en": "Kaukasien — Generalbezirk Kuban",
-      "name_zh": "高加索·库班总区",
-      "only_from_owners": [
-        "RKK"
-      ],
-      "parent_owner_tag": "RKK",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_MRG_0712bf4c0b09",
-          "RU_MRG_15cb29330a1c",
-          "RU_MRG_3d5ebfb76db3",
-          "RU_MRG_4bf779af7de8",
-          "RU_MRG_728513759ce7",
-          "RU_MRG_807631e65728",
-          "RU_MRG_9f87451cc870",
-          "RU_MRG_c425c5a5ca50",
-          "RU_MRG_f18f0befdc5e",
-          "RU_MRG_f1c57006ab38",
-          "RU_MRG_f703f8a6bf50",
-          "RU_MRG_f74231f65cbd",
-          "RU_MRG_f99008b0bde7",
-          "RU_RAY_50074027B2873749547467",
-          "RU_RAY_50074027B53939252162264",
-          "RU_RAY_50074027B58613203253678",
-          "RU_RAY_50074027B89252490479976"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "KC02"
-    },
-    {
-      "color_hex": "#756863",
-      "cores": "keep",
-      "id": "tno_kc03",
-      "name_en": "Kaukasien — Generalbezirk Stawropol-Terek",
-      "name_zh": "高加索·斯塔夫罗波尔—捷列克总区",
-      "only_from_owners": [
-        "RKK"
-      ],
-      "parent_owner_tag": "RKK",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_MRG_1976f6232412",
-          "RU_MRG_3598dda004bb",
-          "RU_MRG_4421c17551c2",
-          "RU_MRG_62d43bf78311",
-          "RU_MRG_7820c72ce322",
-          "RU_MRG_b74b6298db8e",
-          "RU_MRG_df9a05a775d2",
-          "RU_MRG_f01d51060a16",
-          "RU_RAY_50074027B18583957820151",
-          "RU_RAY_50074027B20253526605231",
-          "RU_RAY_50074027B20844544643532",
-          "RU_RAY_50074027B24393572117028",
-          "RU_RAY_50074027B32007532119787",
-          "RU_RAY_50074027B36619237345993",
-          "RU_RAY_50074027B62060220581137",
-          "RU_RAY_50074027B66614003636713",
-          "RU_RAY_50074027B7036495667103",
-          "RU_RAY_50074027B73484037944339",
-          "RU_RAY_50074027B81534359411759",
-          "RU_RAY_50074027B97915743109256"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "KC03"
-    },
-    {
-      "color_hex": "#5f514c",
-      "cores": "keep",
-      "id": "tno_kc04",
-      "name_en": "Kaukasien — Generalbezirk Bergvölker",
-      "name_zh": "高加索·山地民族总区",
-      "only_from_owners": [
-        "RKK"
-      ],
-      "parent_owner_tag": "RKK",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_MRG_200894813435",
-          "RU_MRG_2e2abc445545",
-          "RU_MRG_6df85226925c",
-          "RU_MRG_79f3aaa40be4",
-          "RU_MRG_9a973c050065",
-          "RU_MRG_9ef1aa17db33",
-          "RU_MRG_ad1e693ffed2",
-          "RU_RAY_50074027B24584151932572",
-          "RU_RAY_50074027B26544936319083",
-          "RU_RAY_50074027B27316284331880",
-          "RU_RAY_50074027B30798664015080",
-          "RU_RAY_50074027B3253134349425",
-          "RU_RAY_50074027B33840805886085",
-          "RU_RAY_50074027B3416716682490",
-          "RU_RAY_50074027B40406912244936",
-          "RU_RAY_50074027B45872163346699",
-          "RU_RAY_50074027B51590812616555__tno1962_1",
-          "RU_RAY_50074027B51590812616555__tno1962_2",
-          "RU_RAY_50074027B51590812616555__tno1962_3",
-          "RU_RAY_50074027B51590812616555__tno1962_4",
-          "RU_RAY_50074027B51590812616555__tno1962_5",
-          "RU_RAY_50074027B53437988780842",
-          "RU_RAY_50074027B57020766667209",
-          "RU_RAY_50074027B58467356693682__tno1962_1",
-          "RU_RAY_50074027B58467356693682__tno1962_2",
-          "RU_RAY_50074027B58467356693682__tno1962_3",
-          "RU_RAY_50074027B58467356693682__tno1962_4",
-          "RU_RAY_50074027B80443359996263__tno1962_1",
-          "RU_RAY_50074027B80443359996263__tno1962_2",
-          "RU_RAY_50074027B80443359996263__tno1962_3",
-          "RU_RAY_50074027B80443359996263__tno1962_4",
-          "RU_RAY_50074027B80443359996263__tno1962_5",
-          "RU_RAY_50074027B80443359996263__tno1962_6",
-          "RU_RAY_50074027B82465357673201",
-          "RU_RAY_50074027B82899893742051",
-          "RU_RAY_50074027B91264381594576",
-          "RU_RAY_50074027B96475461506325"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "KC04"
-    },
-    {
-      "color_hex": "#685a57",
-      "cores": "keep",
-      "id": "tno_kc05",
-      "name_en": "Kaukasien — Generalbezirk Kalmückien",
-      "name_zh": "高加索·卡尔梅克总区",
-      "only_from_owners": [
-        "RKK"
-      ],
-      "parent_owner_tag": "RKK",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_MRG_4c7d723b93b0",
-          "RU_MRG_60904da04ba2",
-          "RU_MRG_90d3823663be",
-          "RU_MRG_96394847a7bb",
-          "RU_MRG_971db00ecf98",
-          "RU_RAY_50074027B16130547537538",
-          "RU_RAY_50074027B17781956857402__tno1962_1",
-          "RU_RAY_50074027B17781956857402__tno1962_2",
-          "RU_RAY_50074027B17781956857402__tno1962_3",
-          "RU_RAY_50074027B39333917624056",
-          "RU_RAY_50074027B44442883085225__tno1962_1",
-          "RU_RAY_50074027B44442883085225__tno1962_2",
-          "RU_RAY_50074027B44442883085225__tno1962_3",
-          "RU_RAY_50074027B44442883085225__tno1962_4",
-          "RU_RAY_50074027B44442883085225__tno1962_5",
-          "RU_RAY_50074027B5102078213757",
-          "RU_RAY_50074027B55774221715414",
-          "RU_RAY_50074027B5810919802918__tno1962_1",
-          "RU_RAY_50074027B5810919802918__tno1962_2",
-          "RU_RAY_50074027B71829249339229",
-          "RU_RAY_50074027B85852796728949"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "KC05"
-    },
-    {
-      "color_hex": "#45413b",
-      "cores": "keep",
-      "id": "tno_ms01",
-      "name_en": "Moskowien — Generalbezirk Ingermanland",
-      "name_zh": "莫斯科维恩·英格里亚总区",
-      "only_from_owners": [
-        "RKM"
-      ],
-      "parent_owner_tag": "RKM",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_CITY_SAINT_PETERSBURG",
-          "RU_MRG_4543c51c6bdd",
-          "RU_MRG_54feb62370de",
-          "RU_MRG_57d8687f784e",
-          "RU_MRG_59971f82636d",
-          "RU_MRG_94e7015e40d9",
-          "RU_MRG_be20933bc7c3",
-          "RU_MRG_c68b90a156ce",
-          "RU_RAY_50074027B24339360174637",
-          "RU_RAY_50074027B64455240716412"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "MS01"
-    },
-    {
-      "color_hex": "#756e69",
-      "cores": "keep",
-      "id": "tno_ms02",
-      "name_en": "Moskowien — Generalbezirk Smolensk",
-      "name_zh": "莫斯科维恩·斯摩棱斯克总区",
-      "only_from_owners": [
-        "RKM"
-      ],
-      "parent_owner_tag": "RKM",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_MRG_55742c11b5e6",
-          "RU_MRG_7023cdeaace9",
-          "RU_MRG_72ee4e9306fc",
-          "RU_MRG_deee7ff279fc",
-          "RU_RAY_50074027B16069237925080",
-          "RU_RAY_50074027B25563950651561",
-          "RU_RAY_50074027B50737742198919",
-          "RU_RAY_50074027B66126711442497",
-          "RU_RAY_50074027B98073914217058"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "MS02"
-    },
-    {
-      "color_hex": "#59544f",
-      "cores": "keep",
-      "id": "tno_ms03",
-      "name_en": "Moskowien — Generalbezirk Tula",
-      "name_zh": "莫斯科维恩·图拉总区",
-      "only_from_owners": [
-        "RKM"
-      ],
-      "parent_owner_tag": "RKM",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_MRG_381a0cc60dd8",
-          "RU_MRG_421f6b2285d7",
-          "RU_MRG_47cb081b29d0",
-          "RU_MRG_58dfbd1fa64b",
-          "RU_MRG_5ca04a85c3f4",
-          "RU_MRG_841bc7215ac5",
-          "RU_MRG_adb14e0f8093",
-          "RU_MRG_b202c10408ff",
-          "RU_MRG_b8675f108fd4",
-          "RU_MRG_c78e9571a541",
-          "RU_MRG_e770cd31cdb4",
-          "RU_RAY_50074027B1573255498527",
-          "RU_RAY_50074027B17337160846160",
-          "RU_RAY_50074027B19694965074272",
-          "RU_RAY_50074027B39707070787955",
-          "RU_RAY_50074027B64075323117418",
-          "RU_RAY_50074027B75388563802215",
-          "RU_RAY_50074027B91680290875095",
-          "RU_RAY_50074027B94286516956529",
-          "RU_RAY_50074027B9527926275896",
-          "RU_RAY_50074027B98963269942164"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "MS03"
-    },
-    {
-      "color_hex": "#69635d",
-      "cores": "keep",
-      "id": "tno_ms04",
-      "name_en": "Moskowien — Generalbezirk Woronesch",
-      "name_zh": "莫斯科维恩·沃罗涅日总区",
-      "only_from_owners": [
-        "RKM"
-      ],
-      "parent_owner_tag": "RKM",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_MRG_352ca37aab63",
-          "RU_MRG_43f873e0c183",
-          "RU_MRG_7845e1b7a36b",
-          "RU_MRG_962b67068c91",
-          "RU_MRG_9a1edb58046a",
-          "RU_MRG_a94cbc9022fc",
-          "RU_MRG_ae8913c1637c",
-          "RU_MRG_b88d938191a1",
-          "RU_MRG_d3f284416aa5",
-          "RU_MRG_e5e9822050ff",
-          "RU_RAY_50074027B13652056311109",
-          "RU_RAY_50074027B21233041988666",
-          "RU_RAY_50074027B2368610201765",
-          "RU_RAY_50074027B65302111599244",
-          "RU_RAY_50074027B6756701720303",
-          "RU_RAY_50074027B72584368770024",
-          "RU_RAY_50074027B72955231273807",
-          "RU_RAY_50074027B73956111205177",
-          "RU_RAY_50074027B81312044369076",
-          "UA_RAY_74538382B36709578446445",
-          "UA_RAY_74538382B45881397075814"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "MS04"
-    },
-    {
-      "color_hex": "#59524d",
-      "cores": "keep",
-      "id": "tno_ms05",
-      "name_en": "Moskowien — Generalbezirk Jaroslawl",
-      "name_zh": "莫斯科维恩·雅罗斯拉夫尔总区",
-      "only_from_owners": [
-        "RKM"
-      ],
-      "parent_owner_tag": "RKM",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_MRG_0647b9498b2f",
-          "RU_MRG_467ab67728ff",
-          "RU_MRG_5936db92540a",
-          "RU_MRG_c3cc17c29955",
-          "RU_RAY_50074027B20500956922329",
-          "RU_RAY_50074027B55270503343274",
-          "RU_RAY_50074027B57358126207690",
-          "RU_RAY_50074027B6686274683844__tno1962_2",
-          "RU_RAY_50074027B84622469833682"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "MS05"
-    },
-    {
-      "color_hex": "#4d4742",
-      "cores": "keep",
-      "id": "tno_ms07",
-      "name_en": "Moskowien — Generalbezirk Saratow",
-      "name_zh": "莫斯科维恩·萨拉托夫总区",
-      "only_from_owners": [
-        "RKM"
-      ],
-      "parent_owner_tag": "RKM",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_MRG_177777beb337",
-          "RU_MRG_21f622bb3b2b",
-          "RU_MRG_5eb4927958c7",
-          "RU_MRG_70ed82134bd7",
-          "RU_MRG_90ed61ead343",
-          "RU_MRG_9fe77f7052b1",
-          "RU_MRG_a610e18b7598",
-          "RU_MRG_bccb1225fada",
-          "RU_MRG_bd67d5dbed08",
-          "RU_MRG_e9567e283174",
-          "RU_RAY_50074027B12014197778868",
-          "RU_RAY_50074027B20858489153060",
-          "RU_RAY_50074027B3226583010199",
-          "RU_RAY_50074027B39404018386654",
-          "RU_RAY_50074027B49435645657248",
-          "RU_RAY_50074027B75699624456558",
-          "RU_RAY_50074027B88070495991427",
-          "RU_RAY_50074027B95256084907759"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "MS07"
-    },
-    {
-      "color_hex": "#726c66",
-      "cores": "keep",
-      "id": "tno_ms08",
-      "name_en": "Moskowien — Generalbezirk Don-Wolga",
-      "name_zh": "莫斯科维恩·顿河—伏尔加总区",
-      "only_from_owners": [
-        "RKM"
-      ],
-      "parent_owner_tag": "RKM",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_CITY_VOLGOGRAD",
-          "RU_MRG_2cfe9a40e9b7",
-          "RU_MRG_2d748058088f",
-          "RU_MRG_451862161429",
-          "RU_MRG_5bb5ee0b1fb6",
-          "RU_MRG_60459cf53f51",
-          "RU_MRG_62e1cda9654b",
-          "RU_MRG_67d918167343",
-          "RU_MRG_6fb6a80f7b8a",
-          "RU_MRG_9d8deba56899",
-          "RU_MRG_b7986b68045a",
-          "RU_MRG_d3e21f6b65d6",
-          "RU_MRG_d665fd9ba683",
-          "RU_MRG_f3dfc0448ede",
-          "RU_MRG_fdf63a493917",
-          "RU_RAY_50074027B13034578172477",
-          "RU_RAY_50074027B15993714165206",
-          "RU_RAY_50074027B30801426940346",
-          "RU_RAY_50074027B33024478162838",
-          "RU_RAY_50074027B34419784992527",
-          "RU_RAY_50074027B34579677769219",
-          "RU_RAY_50074027B36318854676634",
-          "RU_RAY_50074027B44154738908147",
-          "RU_RAY_50074027B54184638100605",
-          "RU_RAY_50074027B54706574675580",
-          "RU_RAY_50074027B5636373346867",
-          "RU_RAY_50074027B577743545764",
-          "RU_RAY_50074027B5850420655248",
-          "RU_RAY_50074027B61241799946425",
-          "RU_RAY_50074027B66955592022274",
-          "RU_RAY_50074027B68317438478241",
-          "RU_RAY_50074027B72027623217592",
-          "RU_RAY_50074027B74235850605725",
-          "RU_RAY_50074027B81882539182238",
-          "RU_RAY_50074027B884948676219",
-          "RU_RAY_50074027B99437248655047"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "MS08"
     },
     {
       "color_hex": "#4c5f3f",
@@ -2775,31 +1841,6 @@
       "tag": "ITIM"
     },
     {
-      "color_hex": "#645d58",
-      "cores": "keep",
-      "id": "tno_ms06",
-      "name_en": "Moskowien — Generalbezirk Gorki",
-      "name_zh": "莫斯科维恩·高尔基边区",
-      "only_from_owners": [
-        "RKM"
-      ],
-      "parent_owner_tag": "RKM",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_MRG_13fef5f74a14",
-          "RU_MRG_3c1f8e056188",
-          "RU_MRG_3f26ea354786",
-          "RU_MRG_82288501a613",
-          "RU_MRG_b963a8bb44cb"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "MS06"
-    },
-    {
       "color_hex": "#787566",
       "cores": "keep",
       "id": "tno_oe00",
@@ -2825,133 +1866,6 @@
       },
       "subject_kind": "colonial_government",
       "tag": "OE00"
-    },
-    {
-      "color_hex": "#555b62",
-      "cores": "keep",
-      "id": "tno_uk00",
-      "name_en": "Generalbezirk Kiew",
-      "name_zh": "乌克兰·基辅总区",
-      "only_from_owners": [
-        "RKU"
-      ],
-      "parent_owner_tag": "RKU",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "UA_MRG_1d698b91bc32",
-          "UA_MRG_228c317a869c",
-          "UA_MRG_4a445701c4c6",
-          "UA_MRG_4f13a104316f",
-          "UA_MRG_6b24f46af3f8",
-          "UA_MRG_76175923bdd1",
-          "UA_MRG_8f0f1aca728a",
-          "UA_MRG_a96bf83a0ff4",
-          "UA_MRG_b54ca702a003",
-          "UA_MRG_fbcb4404788c",
-          "UA_RAY_74538382B10593574397068",
-          "UA_RAY_74538382B11218379347521",
-          "UA_RAY_74538382B16214498015051",
-          "UA_RAY_74538382B17175920641899",
-          "UA_RAY_74538382B17419757649625",
-          "UA_RAY_74538382B23081700474846",
-          "UA_RAY_74538382B23530210512837",
-          "UA_RAY_74538382B27817216475835",
-          "UA_RAY_74538382B28718545705075",
-          "UA_RAY_74538382B32197013600938",
-          "UA_RAY_74538382B40749537195929",
-          "UA_RAY_74538382B4751802602524",
-          "UA_RAY_74538382B47612746607547",
-          "UA_RAY_74538382B56048434461160",
-          "UA_RAY_74538382B60890943260132",
-          "UA_RAY_74538382B60921908613861",
-          "UA_RAY_74538382B62388892645700",
-          "UA_RAY_74538382B7147656565480",
-          "UA_RAY_74538382B73944053970257",
-          "UA_RAY_74538382B83638043560631",
-          "UA_RAY_74538382B88503218872177",
-          "UA_RAY_74538382B91941622572963",
-          "UA_RAY_74538382B9928068726640"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "UK00"
-    },
-    {
-      "color_hex": "#504a44",
-      "cores": "keep",
-      "id": "tno_ms00",
-      "name_en": "Moskowien — Generalbezirk Moskau",
-      "name_zh": "莫斯科维恩·莫斯科总区",
-      "only_from_owners": [
-        "RKM"
-      ],
-      "parent_owner_tag": "RKM",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "RU_CITY_MOSCOW",
-          "RU_MRG_049b9f6aad55",
-          "RU_MRG_0c1434a780d8",
-          "RU_MRG_0c628fcdf9bb",
-          "RU_MRG_19dc7bbc7bcb",
-          "RU_MRG_56d7f2c40815",
-          "RU_MRG_6f87652d4746",
-          "RU_MRG_782d749bb689",
-          "RU_MRG_8b55818839ef",
-          "RU_MRG_9630c25ee3c6",
-          "RU_MRG_baef030e052d",
-          "RU_MRG_c3b410784a1f",
-          "RU_MRG_c60bafc0ae96",
-          "RU_MRG_c90be9cc4d47",
-          "RU_MRG_d3a65ab636f6",
-          "RU_MRG_d6e7399b8ed9",
-          "RU_MRG_df33d486fbcc",
-          "RU_MRG_e85ce6b2cbb5",
-          "RU_MRG_ed434db4b357",
-          "RU_RAY_50074027B24884281398381",
-          "RU_RAY_50074027B40310096212326",
-          "RU_RAY_50074027B51726500082089",
-          "RU_RAY_50074027B60606739466906",
-          "RU_RAY_50074027B62612106128387",
-          "RU_RAY_50074027B77320350284147"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "MS00"
-    },
-    {
-      "color_hex": "#6d5e58",
-      "cores": "keep",
-      "id": "tno_kc00",
-      "name_en": "Kaukasien — Generalbezirk Georgien",
-      "name_zh": "高加索·格鲁吉亚总区",
-      "only_from_owners": [
-        "RKK"
-      ],
-      "parent_owner_tag": "RKK",
-      "scenarios": [
-        "tno_1962"
-      ],
-      "select": {
-        "feature_ids": [
-          "GEO-3015",
-          "GEO-3029",
-          "GEO-3030",
-          "GEO-3033",
-          "GEO-3034",
-          "GEO-3035",
-          "GEO-3036",
-          "GEO-3037",
-          "GEO-3039"
-        ]
-      },
-      "subject_kind": "colonial_government",
-      "tag": "KC00"
     },
     {
       "color_hex": "#818f6b",
@@ -3343,6 +2257,971 @@
         ]
       },
       "tag": "SEN"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_kc00",
+      "only_from_owners": [
+        "KC00"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "GEO-3015",
+          "GEO-3029",
+          "GEO-3030",
+          "GEO-3033",
+          "GEO-3034",
+          "GEO-3035",
+          "GEO-3036",
+          "GEO-3037",
+          "GEO-3039"
+        ]
+      },
+      "tag": "RKK"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_kc01",
+      "only_from_owners": [
+        "KC01"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "AZE-1676",
+          "AZE-1677",
+          "AZE-1678",
+          "AZE-1679",
+          "AZE-1680",
+          "AZE-1681",
+          "AZE-1682",
+          "AZE-1683",
+          "AZE-1684",
+          "AZE-1685",
+          "AZE-1686",
+          "AZE-1687",
+          "AZE-1688",
+          "AZE-1689",
+          "AZE-1690",
+          "AZE-1691",
+          "AZE-1692",
+          "AZE-1693",
+          "AZE-1694",
+          "AZE-1695",
+          "AZE-1696",
+          "AZE-1697",
+          "AZE-1698",
+          "AZE-1699",
+          "AZE-1700",
+          "AZE-1701",
+          "AZE-1702",
+          "AZE-1703",
+          "AZE-1704",
+          "AZE-1705",
+          "AZE-1706",
+          "AZE-1707__tno1962_1",
+          "AZE-1707__tno1962_2",
+          "AZE-1708",
+          "AZE-1709",
+          "AZE-1710",
+          "AZE-1711",
+          "AZE-1712",
+          "AZE-1713",
+          "AZE-1714",
+          "AZE-1715",
+          "AZE-1716",
+          "AZE-1717",
+          "AZE-1718",
+          "AZE-1719",
+          "AZE-1720",
+          "AZE-1721",
+          "AZE-1722",
+          "AZE-1723",
+          "AZE-1724",
+          "AZE-1725",
+          "AZE-1726",
+          "AZE-1727",
+          "AZE-1728",
+          "AZE-1729",
+          "AZE-1730",
+          "AZE-1731",
+          "AZE-1734",
+          "AZE-1735",
+          "AZE-1736",
+          "AZE-1737",
+          "AZE-1738",
+          "AZE-1739",
+          "AZE-1740",
+          "AZE-4838",
+          "AZE-5563",
+          "AZE-5564",
+          "AZE-5565",
+          "AZE-5566"
+        ]
+      },
+      "tag": "RKK"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_kc02",
+      "only_from_owners": [
+        "KC02"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_0712bf4c0b09",
+          "RU_MRG_15cb29330a1c",
+          "RU_MRG_3d5ebfb76db3",
+          "RU_MRG_4bf779af7de8",
+          "RU_MRG_728513759ce7",
+          "RU_MRG_807631e65728",
+          "RU_MRG_9f87451cc870",
+          "RU_MRG_c425c5a5ca50",
+          "RU_MRG_f18f0befdc5e",
+          "RU_MRG_f1c57006ab38",
+          "RU_MRG_f703f8a6bf50",
+          "RU_MRG_f74231f65cbd",
+          "RU_MRG_f99008b0bde7",
+          "RU_RAY_50074027B2873749547467",
+          "RU_RAY_50074027B53939252162264",
+          "RU_RAY_50074027B58613203253678",
+          "RU_RAY_50074027B89252490479976"
+        ]
+      },
+      "tag": "RKK"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_kc03",
+      "only_from_owners": [
+        "KC03"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_1976f6232412",
+          "RU_MRG_3598dda004bb",
+          "RU_MRG_4421c17551c2",
+          "RU_MRG_62d43bf78311",
+          "RU_MRG_7820c72ce322",
+          "RU_MRG_b74b6298db8e",
+          "RU_MRG_df9a05a775d2",
+          "RU_MRG_f01d51060a16",
+          "RU_RAY_50074027B18583957820151",
+          "RU_RAY_50074027B20253526605231",
+          "RU_RAY_50074027B20844544643532",
+          "RU_RAY_50074027B24393572117028",
+          "RU_RAY_50074027B32007532119787",
+          "RU_RAY_50074027B36619237345993",
+          "RU_RAY_50074027B62060220581137",
+          "RU_RAY_50074027B66614003636713",
+          "RU_RAY_50074027B7036495667103",
+          "RU_RAY_50074027B73484037944339",
+          "RU_RAY_50074027B81534359411759",
+          "RU_RAY_50074027B97915743109256"
+        ]
+      },
+      "tag": "RKK"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_kc04",
+      "only_from_owners": [
+        "KC04"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_200894813435",
+          "RU_MRG_2e2abc445545",
+          "RU_MRG_6df85226925c",
+          "RU_MRG_79f3aaa40be4",
+          "RU_MRG_9a973c050065",
+          "RU_MRG_9ef1aa17db33",
+          "RU_MRG_ad1e693ffed2",
+          "RU_RAY_50074027B24584151932572",
+          "RU_RAY_50074027B26544936319083",
+          "RU_RAY_50074027B27316284331880",
+          "RU_RAY_50074027B30798664015080",
+          "RU_RAY_50074027B3253134349425",
+          "RU_RAY_50074027B33840805886085",
+          "RU_RAY_50074027B3416716682490",
+          "RU_RAY_50074027B40406912244936",
+          "RU_RAY_50074027B45872163346699",
+          "RU_RAY_50074027B51590812616555__tno1962_1",
+          "RU_RAY_50074027B51590812616555__tno1962_2",
+          "RU_RAY_50074027B51590812616555__tno1962_3",
+          "RU_RAY_50074027B51590812616555__tno1962_4",
+          "RU_RAY_50074027B51590812616555__tno1962_5",
+          "RU_RAY_50074027B53437988780842",
+          "RU_RAY_50074027B57020766667209",
+          "RU_RAY_50074027B58467356693682__tno1962_1",
+          "RU_RAY_50074027B58467356693682__tno1962_2",
+          "RU_RAY_50074027B58467356693682__tno1962_3",
+          "RU_RAY_50074027B58467356693682__tno1962_4",
+          "RU_RAY_50074027B80443359996263__tno1962_1",
+          "RU_RAY_50074027B80443359996263__tno1962_2",
+          "RU_RAY_50074027B80443359996263__tno1962_3",
+          "RU_RAY_50074027B80443359996263__tno1962_4",
+          "RU_RAY_50074027B80443359996263__tno1962_5",
+          "RU_RAY_50074027B80443359996263__tno1962_6",
+          "RU_RAY_50074027B82465357673201",
+          "RU_RAY_50074027B82899893742051",
+          "RU_RAY_50074027B91264381594576",
+          "RU_RAY_50074027B96475461506325"
+        ]
+      },
+      "tag": "RKK"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_kc05",
+      "only_from_owners": [
+        "KC05"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_4c7d723b93b0",
+          "RU_MRG_60904da04ba2",
+          "RU_MRG_90d3823663be",
+          "RU_MRG_96394847a7bb",
+          "RU_MRG_971db00ecf98",
+          "RU_RAY_50074027B16130547537538",
+          "RU_RAY_50074027B17781956857402__tno1962_1",
+          "RU_RAY_50074027B17781956857402__tno1962_2",
+          "RU_RAY_50074027B17781956857402__tno1962_3",
+          "RU_RAY_50074027B39333917624056",
+          "RU_RAY_50074027B44442883085225__tno1962_1",
+          "RU_RAY_50074027B44442883085225__tno1962_2",
+          "RU_RAY_50074027B44442883085225__tno1962_3",
+          "RU_RAY_50074027B44442883085225__tno1962_4",
+          "RU_RAY_50074027B44442883085225__tno1962_5",
+          "RU_RAY_50074027B5102078213757",
+          "RU_RAY_50074027B55774221715414",
+          "RU_RAY_50074027B5810919802918__tno1962_1",
+          "RU_RAY_50074027B5810919802918__tno1962_2",
+          "RU_RAY_50074027B71829249339229",
+          "RU_RAY_50074027B85852796728949"
+        ]
+      },
+      "tag": "RKK"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_ms00",
+      "only_from_owners": [
+        "MS00"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_CITY_MOSCOW",
+          "RU_MRG_049b9f6aad55",
+          "RU_MRG_0c1434a780d8",
+          "RU_MRG_0c628fcdf9bb",
+          "RU_MRG_19dc7bbc7bcb",
+          "RU_MRG_56d7f2c40815",
+          "RU_MRG_6f87652d4746",
+          "RU_MRG_782d749bb689",
+          "RU_MRG_8b55818839ef",
+          "RU_MRG_9630c25ee3c6",
+          "RU_MRG_baef030e052d",
+          "RU_MRG_c3b410784a1f",
+          "RU_MRG_c60bafc0ae96",
+          "RU_MRG_c90be9cc4d47",
+          "RU_MRG_d3a65ab636f6",
+          "RU_MRG_d6e7399b8ed9",
+          "RU_MRG_df33d486fbcc",
+          "RU_MRG_e85ce6b2cbb5",
+          "RU_MRG_ed434db4b357",
+          "RU_RAY_50074027B24884281398381",
+          "RU_RAY_50074027B40310096212326",
+          "RU_RAY_50074027B51726500082089",
+          "RU_RAY_50074027B60606739466906",
+          "RU_RAY_50074027B62612106128387",
+          "RU_RAY_50074027B77320350284147"
+        ]
+      },
+      "tag": "RKM"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_ms01",
+      "only_from_owners": [
+        "MS01"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_CITY_SAINT_PETERSBURG",
+          "RU_MRG_4543c51c6bdd",
+          "RU_MRG_54feb62370de",
+          "RU_MRG_57d8687f784e",
+          "RU_MRG_59971f82636d",
+          "RU_MRG_94e7015e40d9",
+          "RU_MRG_be20933bc7c3",
+          "RU_MRG_c68b90a156ce",
+          "RU_RAY_50074027B24339360174637",
+          "RU_RAY_50074027B64455240716412"
+        ]
+      },
+      "tag": "RKM"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_ms02",
+      "only_from_owners": [
+        "MS02"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_55742c11b5e6",
+          "RU_MRG_7023cdeaace9",
+          "RU_MRG_72ee4e9306fc",
+          "RU_MRG_deee7ff279fc",
+          "RU_RAY_50074027B16069237925080",
+          "RU_RAY_50074027B25563950651561",
+          "RU_RAY_50074027B50737742198919",
+          "RU_RAY_50074027B66126711442497",
+          "RU_RAY_50074027B98073914217058"
+        ]
+      },
+      "tag": "RKM"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_ms03",
+      "only_from_owners": [
+        "MS03"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_381a0cc60dd8",
+          "RU_MRG_421f6b2285d7",
+          "RU_MRG_47cb081b29d0",
+          "RU_MRG_58dfbd1fa64b",
+          "RU_MRG_5ca04a85c3f4",
+          "RU_MRG_841bc7215ac5",
+          "RU_MRG_adb14e0f8093",
+          "RU_MRG_b202c10408ff",
+          "RU_MRG_b8675f108fd4",
+          "RU_MRG_c78e9571a541",
+          "RU_MRG_e770cd31cdb4",
+          "RU_RAY_50074027B1573255498527",
+          "RU_RAY_50074027B17337160846160",
+          "RU_RAY_50074027B19694965074272",
+          "RU_RAY_50074027B39707070787955",
+          "RU_RAY_50074027B64075323117418",
+          "RU_RAY_50074027B75388563802215",
+          "RU_RAY_50074027B91680290875095",
+          "RU_RAY_50074027B94286516956529",
+          "RU_RAY_50074027B9527926275896",
+          "RU_RAY_50074027B98963269942164"
+        ]
+      },
+      "tag": "RKM"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_ms04",
+      "only_from_owners": [
+        "MS04"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_352ca37aab63",
+          "RU_MRG_43f873e0c183",
+          "RU_MRG_7845e1b7a36b",
+          "RU_MRG_962b67068c91",
+          "RU_MRG_9a1edb58046a",
+          "RU_MRG_a94cbc9022fc",
+          "RU_MRG_ae8913c1637c",
+          "RU_MRG_b88d938191a1",
+          "RU_MRG_d3f284416aa5",
+          "RU_MRG_e5e9822050ff",
+          "RU_RAY_50074027B13652056311109",
+          "RU_RAY_50074027B21233041988666",
+          "RU_RAY_50074027B2368610201765",
+          "RU_RAY_50074027B65302111599244",
+          "RU_RAY_50074027B6756701720303",
+          "RU_RAY_50074027B72584368770024",
+          "RU_RAY_50074027B72955231273807",
+          "RU_RAY_50074027B73956111205177",
+          "RU_RAY_50074027B81312044369076",
+          "UA_RAY_74538382B36709578446445",
+          "UA_RAY_74538382B45881397075814"
+        ]
+      },
+      "tag": "RKM"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_ms05",
+      "only_from_owners": [
+        "MS05"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_0647b9498b2f",
+          "RU_MRG_467ab67728ff",
+          "RU_MRG_5936db92540a",
+          "RU_MRG_c3cc17c29955",
+          "RU_RAY_50074027B20500956922329",
+          "RU_RAY_50074027B55270503343274",
+          "RU_RAY_50074027B57358126207690",
+          "RU_RAY_50074027B6686274683844__tno1962_2",
+          "RU_RAY_50074027B84622469833682"
+        ]
+      },
+      "tag": "RKM"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_ms06",
+      "only_from_owners": [
+        "MS06"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_13fef5f74a14",
+          "RU_MRG_3c1f8e056188",
+          "RU_MRG_3f26ea354786",
+          "RU_MRG_82288501a613",
+          "RU_MRG_b963a8bb44cb"
+        ]
+      },
+      "tag": "RKM"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_ms07",
+      "only_from_owners": [
+        "MS07"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_177777beb337",
+          "RU_MRG_21f622bb3b2b",
+          "RU_MRG_5eb4927958c7",
+          "RU_MRG_70ed82134bd7",
+          "RU_MRG_90ed61ead343",
+          "RU_MRG_9fe77f7052b1",
+          "RU_MRG_a610e18b7598",
+          "RU_MRG_bccb1225fada",
+          "RU_MRG_bd67d5dbed08",
+          "RU_MRG_e9567e283174",
+          "RU_RAY_50074027B12014197778868",
+          "RU_RAY_50074027B20858489153060",
+          "RU_RAY_50074027B3226583010199",
+          "RU_RAY_50074027B39404018386654",
+          "RU_RAY_50074027B49435645657248",
+          "RU_RAY_50074027B75699624456558",
+          "RU_RAY_50074027B88070495991427",
+          "RU_RAY_50074027B95256084907759"
+        ]
+      },
+      "tag": "RKM"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_ms08",
+      "only_from_owners": [
+        "MS08"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_CITY_VOLGOGRAD",
+          "RU_MRG_2cfe9a40e9b7",
+          "RU_MRG_2d748058088f",
+          "RU_MRG_451862161429",
+          "RU_MRG_5bb5ee0b1fb6",
+          "RU_MRG_60459cf53f51",
+          "RU_MRG_62e1cda9654b",
+          "RU_MRG_67d918167343",
+          "RU_MRG_6fb6a80f7b8a",
+          "RU_MRG_9d8deba56899",
+          "RU_MRG_b7986b68045a",
+          "RU_MRG_d3e21f6b65d6",
+          "RU_MRG_d665fd9ba683",
+          "RU_MRG_f3dfc0448ede",
+          "RU_MRG_fdf63a493917",
+          "RU_RAY_50074027B13034578172477",
+          "RU_RAY_50074027B15993714165206",
+          "RU_RAY_50074027B30801426940346",
+          "RU_RAY_50074027B33024478162838",
+          "RU_RAY_50074027B34419784992527",
+          "RU_RAY_50074027B34579677769219",
+          "RU_RAY_50074027B36318854676634",
+          "RU_RAY_50074027B44154738908147",
+          "RU_RAY_50074027B54184638100605",
+          "RU_RAY_50074027B54706574675580",
+          "RU_RAY_50074027B5636373346867",
+          "RU_RAY_50074027B577743545764",
+          "RU_RAY_50074027B5850420655248",
+          "RU_RAY_50074027B61241799946425",
+          "RU_RAY_50074027B66955592022274",
+          "RU_RAY_50074027B68317438478241",
+          "RU_RAY_50074027B72027623217592",
+          "RU_RAY_50074027B74235850605725",
+          "RU_RAY_50074027B81882539182238",
+          "RU_RAY_50074027B884948676219",
+          "RU_RAY_50074027B99437248655047"
+        ]
+      },
+      "tag": "RKM"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_uk00",
+      "only_from_owners": [
+        "UK00"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_MRG_1d698b91bc32",
+          "UA_MRG_228c317a869c",
+          "UA_MRG_4a445701c4c6",
+          "UA_MRG_4f13a104316f",
+          "UA_MRG_6b24f46af3f8",
+          "UA_MRG_76175923bdd1",
+          "UA_MRG_8f0f1aca728a",
+          "UA_MRG_a96bf83a0ff4",
+          "UA_MRG_b54ca702a003",
+          "UA_MRG_fbcb4404788c",
+          "UA_RAY_74538382B10593574397068",
+          "UA_RAY_74538382B11218379347521",
+          "UA_RAY_74538382B16214498015051",
+          "UA_RAY_74538382B17175920641899",
+          "UA_RAY_74538382B17419757649625",
+          "UA_RAY_74538382B23081700474846",
+          "UA_RAY_74538382B23530210512837",
+          "UA_RAY_74538382B27817216475835",
+          "UA_RAY_74538382B28718545705075",
+          "UA_RAY_74538382B32197013600938",
+          "UA_RAY_74538382B40749537195929",
+          "UA_RAY_74538382B4751802602524",
+          "UA_RAY_74538382B47612746607547",
+          "UA_RAY_74538382B56048434461160",
+          "UA_RAY_74538382B60890943260132",
+          "UA_RAY_74538382B60921908613861",
+          "UA_RAY_74538382B62388892645700",
+          "UA_RAY_74538382B7147656565480",
+          "UA_RAY_74538382B73944053970257",
+          "UA_RAY_74538382B83638043560631",
+          "UA_RAY_74538382B88503218872177",
+          "UA_RAY_74538382B91941622572963",
+          "UA_RAY_74538382B9928068726640"
+        ]
+      },
+      "tag": "RKU"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_uk01",
+      "only_from_owners": [
+        "UK01"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_MRG_5041b17a3e61",
+          "UA_MRG_57c49cfe4029",
+          "UA_MRG_6e5a94ff967b",
+          "UA_MRG_71f8199a8d07",
+          "UA_MRG_76b1b94d5856",
+          "UA_MRG_8c4b9e4808b7",
+          "UA_MRG_93291f71dff3",
+          "UA_MRG_ff6ac32ac4e3",
+          "UA_RAY_74538382B10219511542041",
+          "UA_RAY_74538382B1361262622940",
+          "UA_RAY_74538382B17610954663111",
+          "UA_RAY_74538382B17645619358290",
+          "UA_RAY_74538382B19676868566368",
+          "UA_RAY_74538382B30351514928450",
+          "UA_RAY_74538382B35313257426644",
+          "UA_RAY_74538382B36980255523800",
+          "UA_RAY_74538382B37791268598116",
+          "UA_RAY_74538382B44501351674000",
+          "UA_RAY_74538382B46392233077619",
+          "UA_RAY_74538382B47818615416103",
+          "UA_RAY_74538382B51634820959847",
+          "UA_RAY_74538382B51989583187875",
+          "UA_RAY_74538382B57022409328323",
+          "UA_RAY_74538382B5714887404176",
+          "UA_RAY_74538382B57991939893011",
+          "UA_RAY_74538382B64329946545346",
+          "UA_RAY_74538382B6752863603231",
+          "UA_RAY_74538382B69155666487417",
+          "UA_RAY_74538382B71334227440013",
+          "UA_RAY_74538382B72123275564902",
+          "UA_RAY_74538382B72519912366476",
+          "UA_RAY_74538382B80427643782366",
+          "UA_RAY_74538382B81176113996215",
+          "UA_RAY_74538382B86462977342473",
+          "UA_RAY_74538382B91689640579793",
+          "UA_RAY_74538382B9177697938380",
+          "UA_RAY_74538382B92334683682599",
+          "UA_RAY_74538382B9478118461291",
+          "UA_RAY_74538382B9733134987595"
+        ]
+      },
+      "tag": "RKU"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_uk02",
+      "only_from_owners": [
+        "UK02"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_MRG_364aab8578b7",
+          "UA_MRG_44d0fd9d6e14",
+          "UA_MRG_7f067ceac5cb",
+          "UA_MRG_8e1ed09f0e12",
+          "UA_MRG_9fc8b136c3a6",
+          "UA_MRG_ae35953e4a30",
+          "UA_MRG_b0fab68c785d",
+          "UA_MRG_d6223fcd4bc5",
+          "UA_MRG_dbee0923a48b",
+          "UA_MRG_de7e916ec1cb",
+          "UA_MRG_e0dcc6adce13",
+          "UA_MRG_fd8e40834959",
+          "UA_RAY_74538382B32839428556025",
+          "UA_RAY_74538382B52142389762962",
+          "UA_RAY_74538382B57692221763967",
+          "UA_RAY_74538382B68255145682197",
+          "UA_RAY_74538382B68825553908118",
+          "UA_RAY_74538382B7363516927626",
+          "UA_RAY_74538382B89307192182420"
+        ]
+      },
+      "tag": "RKU"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_uk03",
+      "only_from_owners": [
+        "UK03"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "BY_RAY_67162791B17030122378697",
+          "RU_RAY_50074027B12942583135720",
+          "RU_RAY_50074027B31853797856912",
+          "RU_RAY_50074027B42449829895110",
+          "RU_RAY_50074027B46415378872622",
+          "RU_RAY_50074027B9105763704567",
+          "RU_RAY_50074027B96444957835233",
+          "RU_RAY_50074027B9814729903160",
+          "UA_MRG_07e4f868c3fb",
+          "UA_MRG_4224fabffe3b",
+          "UA_MRG_7db72d35cf6c",
+          "UA_MRG_91f1c11e596f",
+          "UA_MRG_98ce0c6febb4",
+          "UA_MRG_bde664b68d7f",
+          "UA_MRG_c8f134fbd5da",
+          "UA_MRG_f49493422ebe",
+          "UA_RAY_74538382B13559545331448",
+          "UA_RAY_74538382B14499181024319",
+          "UA_RAY_74538382B16544098233158",
+          "UA_RAY_74538382B23907235979788",
+          "UA_RAY_74538382B2732576684893",
+          "UA_RAY_74538382B29845079622826",
+          "UA_RAY_74538382B34689599554445",
+          "UA_RAY_74538382B36929178896395",
+          "UA_RAY_74538382B37171380171685",
+          "UA_RAY_74538382B3760492540112",
+          "UA_RAY_74538382B44220139144156",
+          "UA_RAY_74538382B45068545633774",
+          "UA_RAY_74538382B46710488362187",
+          "UA_RAY_74538382B51921119694159",
+          "UA_RAY_74538382B53011721841283",
+          "UA_RAY_74538382B66083941235299",
+          "UA_RAY_74538382B72285239783987",
+          "UA_RAY_74538382B73193392833506",
+          "UA_RAY_74538382B77165188287872",
+          "UA_RAY_74538382B79592812488535",
+          "UA_RAY_74538382B88368635206807",
+          "UA_RAY_74538382B98557569749448",
+          "UA_RAY_74538382B98672866452807"
+        ]
+      },
+      "tag": "RKU"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_uk04",
+      "only_from_owners": [
+        "UK04"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_MRG_1e5ce8367e34",
+          "UA_MRG_39b244f210a7",
+          "UA_MRG_5e1a623ff8e3",
+          "UA_MRG_6057d7f77511",
+          "UA_MRG_7e91c55da78e",
+          "UA_MRG_95a5c2e0f114",
+          "UA_MRG_9cc4d817d067",
+          "UA_MRG_b75cd2d6110f",
+          "UA_MRG_c5aa2c8a6048",
+          "UA_MRG_c74c01b39f8e",
+          "UA_RAY_74538382B1179884845086",
+          "UA_RAY_74538382B15303326410198",
+          "UA_RAY_74538382B15383579018603",
+          "UA_RAY_74538382B21914315222818",
+          "UA_RAY_74538382B23045356862491",
+          "UA_RAY_74538382B23313109833663",
+          "UA_RAY_74538382B39784518508744",
+          "UA_RAY_74538382B42847215196778",
+          "UA_RAY_74538382B48774443336138",
+          "UA_RAY_74538382B55212312657182",
+          "UA_RAY_74538382B5599119898653",
+          "UA_RAY_74538382B63843280303146",
+          "UA_RAY_74538382B71954626153569",
+          "UA_RAY_74538382B85307919179669",
+          "UA_RAY_74538382B8704633300515",
+          "UA_RAY_74538382B89155529549277",
+          "UA_RAY_74538382B92549368661816",
+          "UA_RAY_74538382B92678915216320",
+          "UA_RAY_74538382B927387955127",
+          "UA_RAY_74538382B92973355473211"
+        ]
+      },
+      "tag": "RKU"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_uk05",
+      "only_from_owners": [
+        "UK05"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_MRG_01673e94c186",
+          "UA_MRG_2d1c37bdd071",
+          "UA_MRG_51ee3e4d0063",
+          "UA_MRG_73aa15b32010",
+          "UA_MRG_797d35ccfd2e",
+          "UA_MRG_873c83173170",
+          "UA_MRG_b417c43a40cb",
+          "UA_MRG_ba89d2e82c09",
+          "UA_MRG_d727a8cfaa69",
+          "UA_MRG_e3c0520ffdd5",
+          "UA_RAY_74538382B1113173119948",
+          "UA_RAY_74538382B15723930579981",
+          "UA_RAY_74538382B16168555985033",
+          "UA_RAY_74538382B2161330582129",
+          "UA_RAY_74538382B23953232699474",
+          "UA_RAY_74538382B28831490249541",
+          "UA_RAY_74538382B33094259068281",
+          "UA_RAY_74538382B332128375794",
+          "UA_RAY_74538382B37223682167383",
+          "UA_RAY_74538382B37973254287789",
+          "UA_RAY_74538382B67308569242211",
+          "UA_RAY_74538382B72550121130033",
+          "UA_RAY_74538382B79975421345437",
+          "UA_RAY_74538382B8481477190191",
+          "UA_RAY_74538382B97324557643268",
+          "UA_RAY_74538382B97447105405204",
+          "UA_RAY_74538382B99860915109561"
+        ]
+      },
+      "tag": "RKU"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_uk06",
+      "only_from_owners": [
+        "UK06"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "UA_MRG_1a8aac8d6778",
+          "UA_MRG_570a8d4dd729",
+          "UA_MRG_87ad72dae9b5",
+          "UA_MRG_9e7d5f1ce841",
+          "UA_MRG_de7101fe7980",
+          "UA_RAY_74538382B19608093506995",
+          "UA_RAY_74538382B20048272724198",
+          "UA_RAY_74538382B21297633796285",
+          "UA_RAY_74538382B32095344223749",
+          "UA_RAY_74538382B3314448443504",
+          "UA_RAY_74538382B33781793273381",
+          "UA_RAY_74538382B36897928857836",
+          "UA_RAY_74538382B42205538030067",
+          "UA_RAY_74538382B42406222783177",
+          "UA_RAY_74538382B43795583594371",
+          "UA_RAY_74538382B44474254323889",
+          "UA_RAY_74538382B57790499946350",
+          "UA_RAY_74538382B60808123109786",
+          "UA_RAY_74538382B61089393980714",
+          "UA_RAY_74538382B62779126534418",
+          "UA_RAY_74538382B65177906747126",
+          "UA_RAY_74538382B72369548204787",
+          "UA_RAY_74538382B83290488809947",
+          "UA_RAY_74538382B85739457006484",
+          "UA_RAY_74538382B86672078093677",
+          "UA_RAY_74538382B87705908812983",
+          "UA_RAY_74538382B88832969225176",
+          "UA_RAY_74538382B92774727366654",
+          "UA_RAY_74538382B95492559683598"
+        ]
+      },
+      "tag": "RKU"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_uk07",
+      "only_from_owners": [
+        "UK07"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_MRG_dc59f2179593",
+          "RU_MRG_f84bc369d8b3",
+          "RU_RAY_50074027B19621694008878",
+          "RU_RAY_50074027B23655919603928",
+          "RU_RAY_50074027B26881426661864",
+          "RU_RAY_50074027B55014623372781",
+          "RU_RAY_50074027B59167521890578",
+          "RU_RAY_50074027B73978553723393",
+          "RU_RAY_50074027B78718194323542",
+          "RU_RAY_50074027B79024776170444",
+          "RU_RAY_50074027B82795249676876",
+          "UA_MRG_167b1c61b320",
+          "UA_MRG_1e19f7d437d0",
+          "UA_MRG_26d00b8ec232",
+          "UA_MRG_70858b70843b",
+          "UA_MRG_97cb7eda9f1d",
+          "UA_MRG_c2b5f29d91e8",
+          "UA_RAY_74538382B150351319009",
+          "UA_RAY_74538382B35146860339147",
+          "UA_RAY_74538382B35301744305605",
+          "UA_RAY_74538382B36501884751905",
+          "UA_RAY_74538382B40204431292765",
+          "UA_RAY_74538382B51195623672150",
+          "UA_RAY_74538382B52051409545176",
+          "UA_RAY_74538382B56857399435570",
+          "UA_RAY_74538382B58806562521535",
+          "UA_RAY_74538382B6869191817667",
+          "UA_RAY_74538382B7822777781560"
+        ]
+      },
+      "tag": "RKU"
+    },
+    {
+      "cores": "parent_if_single_child",
+      "id": "tno_reclaim_uk08",
+      "only_from_owners": [
+        "UK08"
+      ],
+      "scenarios": [
+        "tno_1962"
+      ],
+      "select": {
+        "feature_ids": [
+          "RU_RAY_50074027B19608634361445",
+          "RU_RAY_50074027B21430544456221",
+          "RU_RAY_50074027B30333853270950",
+          "RU_RAY_50074027B40672414055189",
+          "RU_RAY_50074027B48200335175308",
+          "RU_RAY_50074027B96632027100715",
+          "UA_MRG_30161412737f",
+          "UA_MRG_456d7658c3df",
+          "UA_MRG_837595aeea03",
+          "UA_MRG_8e995a06a742",
+          "UA_RAY_74538382B13057195168049",
+          "UA_RAY_74538382B13823475744665",
+          "UA_RAY_74538382B17839198127311",
+          "UA_RAY_74538382B24236776375789",
+          "UA_RAY_74538382B38253727574875",
+          "UA_RAY_74538382B42239251891056",
+          "UA_RAY_74538382B52931084418443",
+          "UA_RAY_74538382B53420808029005",
+          "UA_RAY_74538382B54113761495064",
+          "UA_RAY_74538382B55408999642819",
+          "UA_RAY_74538382B55698458190122",
+          "UA_RAY_74538382B59316427092609",
+          "UA_RAY_74538382B60058274039512",
+          "UA_RAY_74538382B60964237816069",
+          "UA_RAY_74538382B61551312903365",
+          "UA_RAY_74538382B63146168478131",
+          "UA_RAY_74538382B68112456325611",
+          "UA_RAY_74538382B72863696789776",
+          "UA_RAY_74538382B811800225931",
+          "UA_RAY_74538382B83226976460707",
+          "UA_RAY_74538382B87091028068119",
+          "UA_RAY_74538382B91393089585676",
+          "UA_RAY_74538382B91909296876216",
+          "UA_RAY_74538382B99908513430661"
+        ]
+      },
+      "tag": "RKU"
     }
   ],
   "version": 1
