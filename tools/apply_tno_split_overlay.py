@@ -46,7 +46,13 @@ def update_country_geography(countries, owners, features, base_features, country
             code = base_features.get(fid, features[fid])["cntr_code"]
             counts[tag][code] += 1
     for tag, codes in counts.items():
+        # Synthetic parcels (Atlantropa "ATL") carry no geographic reference.
+        codes = Counter({code: n for code, n in codes.items() if len(str(code or "")) == 2})
         if not codes:
+            continue
+        # Keep a country's own reference when its parcels still include it, so
+        # gained territory (Cyprus for Greece, Kosovo for Albania) cannot replace it.
+        if countries[tag].get("lookup_iso2") in codes:
             continue
         code = codes.most_common(1)[0][0]
         countries[tag].update({key: code for key in ("lookup_iso2", "base_iso2", "provenance_iso2")})

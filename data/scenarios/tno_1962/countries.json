@@ -39,7 +39,7 @@
       "tag": "AFG"
     },
     "ALB": {
-      "base_iso2": "XK",
+      "base_iso2": "AL",
       "capital_state_id": null,
       "color_hex": "#5a7a4a",
       "continent_id": "continent_europe",
@@ -55,14 +55,14 @@
       "historical_fidelity_summary": [
         "extended"
       ],
-      "lookup_iso2": "XK",
+      "lookup_iso2": "AL",
       "notes": "",
       "parent_owner_tag": "ITA",
       "parent_owner_tags": [
         "ITA"
       ],
       "primary_rule_source": "tno_alb",
-      "provenance_iso2": "XK",
+      "provenance_iso2": "AL",
       "quality": "manual_reviewed",
       "rule_sources": [
         "tno_alb",
@@ -1851,11 +1851,11 @@
       "tag": "CG00"
     },
     "CGBC": {
-      "base_iso2": "GCO",
+      "base_iso2": "CG",
       "capital_state_id": null,
       "color_hex": "#8f9375",
-      "continent_id": "",
-      "continent_label": "",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
       "controller_feature_count": 16,
       "display_name": "German Congo — Brazzaville Administration",
       "display_name_en": "German Congo — Brazzaville Administration",
@@ -1867,14 +1867,14 @@
       "historical_fidelity_summary": [
         "extended"
       ],
-      "lookup_iso2": "GCO",
+      "lookup_iso2": "CG",
       "notes": "",
       "parent_owner_tag": "GCO",
       "parent_owner_tags": [
         "GCO"
       ],
       "primary_rule_source": "tno_cgbc",
-      "provenance_iso2": "GCO",
+      "provenance_iso2": "CG",
       "quality": "manual_reviewed",
       "rule_sources": [
         "tno_cgbc"
@@ -1886,8 +1886,8 @@
         "scenario_extension"
       ],
       "subject_kind": "colonial_government",
-      "subregion_id": "",
-      "subregion_label": "",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
       "synthetic_owner": false,
       "tag": "CGBC"
     },
@@ -3932,12 +3932,12 @@
       "tag": "GOR"
     },
     "GRE": {
-      "base_iso2": "ATL",
+      "base_iso2": "GR",
       "capital_state_id": 47,
       "color_hex": "#799f99",
       "color_policy": "palette",
-      "continent_id": "",
-      "continent_label": "",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
       "controller_feature_count": 96,
       "display_name": "Greek Protectorate",
       "display_name_en": "Greek Protectorate",
@@ -3949,14 +3949,14 @@
       "historical_fidelity_summary": [
         "tno_baseline"
       ],
-      "lookup_iso2": "ATL",
+      "lookup_iso2": "GR",
       "notes": "Italian protectorate baseline for mainland Greece in tno_1962.",
       "parent_owner_tag": "ITA",
       "parent_owner_tags": [
         "ITA"
       ],
       "primary_rule_source": "tno_italy_gre",
-      "provenance_iso2": "ATL",
+      "provenance_iso2": "GR",
       "quality": "direct_country_copy",
       "rule_sources": [
         "tno_italy_gre",
@@ -3969,8 +3969,8 @@
         "tno_baseline"
       ],
       "subject_kind": "protectorate",
-      "subregion_id": "",
-      "subregion_label": "",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
       "synthetic_owner": false,
       "tag": "GRE"
     },
