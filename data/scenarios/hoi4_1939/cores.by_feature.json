@@ -1,5 +1,5 @@
 {
-  "baseline_hash": "243d41b8a7cde5ad9fc790f25d3d8a6026205e1a806abb41dc1e9dc146fe29ba",
+  "baseline_hash": "5f1d97a627153ca7fc97c5346b03745dd6fcdfaf6173c5e4e9e373038a306be3",
   "cores": {
     "AD_ADM1_AND-4876": [
       "AND"
@@ -902,13 +902,13 @@
       "BUL"
     ],
     "BG325": [
-      "BUL"
+      "ROM"
     ],
     "BG331": [
       "BUL"
     ],
     "BG332": [
-      "BUL"
+      "ROM"
     ],
     "BG333": [
       "BUL"
@@ -14162,7 +14162,7 @@
       "GEO"
     ],
     "GF_PRIMARY": [
-      "GF"
+      "CAY"
     ],
     "GG": [
       "ENG"
@@ -14252,7 +14252,7 @@
       "AOF"
     ],
     "GP_PRIMARY": [
-      "GP"
+      "GDL"
     ],
     "GQ_ADM1_GNQ-1467": [
       "SGN"
@@ -14594,7 +14594,7 @@
       "YUG"
     ],
     "HR036": [
-      "YUG"
+      "ITA"
     ],
     "HR037": [
       "YUG"
@@ -17777,7 +17777,7 @@
       "MCU"
     ],
     "MQ_PRIMARY": [
-      "MQ"
+      "MTQ"
     ],
     "MR_ADM1_MRT-2783": [
       "AOF"
@@ -19372,7 +19372,10 @@
     "PA_ADM1_PAN-1336": [
       "PAN"
     ],
-    "PA_ADM1_PAN-1337": [
+    "PA_ADM1_PAN-1337__SPLIT_PCZ": [
+      "PAN"
+    ],
+    "PA_ADM1_PAN-1337__SPLIT_REST": [
       "PAN"
     ],
     "PA_ADM1_PAN-1338": [
@@ -19381,7 +19384,10 @@
     "PA_ADM1_PAN-1339": [
       "PAN"
     ],
-    "PA_ADM1_PAN-1340": [
+    "PA_ADM1_PAN-1340__SPLIT_PCZ": [
+      "PAN"
+    ],
+    "PA_ADM1_PAN-1340__SPLIT_REST": [
       "PAN"
     ],
     "PA_ADM1_PAN-1341": [
@@ -55418,7 +55424,7 @@
       "YUG"
     ],
     "SI038": [
-      "YUG"
+      "ITA"
     ],
     "SI041": [
       "YUG"
@@ -55427,10 +55433,10 @@
       "YUG"
     ],
     "SI043": [
-      "YUG"
+      "ITA"
     ],
     "SI044": [
-      "YUG"
+      "ITA"
     ],
     "SK_ADM2_56367889B13739678014174": [
       "SLO"

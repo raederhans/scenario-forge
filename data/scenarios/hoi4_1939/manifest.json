@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1939/audit.json",
-  "baseline_hash": "243d41b8a7cde5ad9fc790f25d3d8a6026205e1a806abb41dc1e9dc146fe29ba",
+  "baseline_hash": "5f1d97a627153ca7fc97c5346b03745dd6fcdfaf6173c5e4e9e373038a306be3",
   "bookmark_date": "1939.8.14.12",
   "bookmark_description": "BLITZKRIEG_DESC",
   "bookmark_name": "BLITZKRIEG_NAME",
@@ -2549,6 +2549,14 @@
         "PAK-1123__SPLIT_FRONTIER_STATES",
         "PAK-1123__SPLIT_REST"
       ],
+      "PA_ADM1_PAN-1337": [
+        "PA_ADM1_PAN-1337__SPLIT_PCZ",
+        "PA_ADM1_PAN-1337__SPLIT_REST"
+      ],
+      "PA_ADM1_PAN-1340": [
+        "PA_ADM1_PAN-1340__SPLIT_PCZ",
+        "PA_ADM1_PAN-1340__SPLIT_REST"
+      ],
       "PL_MRG_727dd6268093": [
         "PL_MRG_727dd6268093__SPLIT_DANZIG",
         "PL_MRG_727dd6268093__SPLIT_REST"
@@ -2592,12 +2600,12 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "4043f3fa41e8edb53d5fd8054d31da3989fb352b8390bc1066a0f9a1497bfcb2",
+  "snapshot_fingerprint": "7c6a0bd9b078cb2c469f5a500d68bd51bba8cbbda7684d0f81da6ea2c3ccb4be",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "00639469a56e053efa08aceb2b0905026b7437c6c949a46f5f5b9d0905de0e09",
+    "detail_chunk_manifest_sha256": "2b017448f1c34eb59ee85774909dfd7c338390434b225dc9ca59dad5a59d5f0a",
     "runtime_bootstrap_topology_sha256": "bae5b5778503c7e11926051f9b2dc383ee7f3c051d6372ebfeea562b2408de4c",
-    "runtime_topology_sha256": "5b80899609f00cf66a23cce005c60e066716bf869a40f7327cd094eff11c46fb"
+    "runtime_topology_sha256": "cca96bb37013003d6873467ae8fecdcc8a63fd4fd306f7b396de5ea162ad83b5"
   },
   "special_zone_layers_url": "data/scenarios/hoi4_1939/special_zone_layers.json",
   "startup_bootstrap_strategy": "chunked-coarse-first",
@@ -2616,17 +2624,17 @@
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
     "changed_feature_count": 15391,
-    "controller_count": 303,
+    "controller_count": 304,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 4,
-    "feature_count": 21098,
+    "feature_count": 21100,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 14944,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 303,
+    "owner_count": 304,
     "quality_counts": {
       "approx_existing_geometry": 447,
       "direct_country_copy": 5744,

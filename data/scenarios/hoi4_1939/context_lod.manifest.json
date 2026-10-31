@@ -377,6 +377,14 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.cay"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.cel"
         ]
       },
@@ -697,6 +705,14 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
+          "political.detail.country.gdl"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
           "political.detail.country.geo"
         ]
       },
@@ -706,14 +722,6 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.ger"
-        ]
-      },
-      {
-        "lod": "detail",
-        "min_zoom": 1.35,
-        "max_zoom": 99.0,
-        "chunk_ids": [
-          "political.detail.country.gf"
         ]
       },
       {
@@ -754,14 +762,6 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.goa"
-        ]
-      },
-      {
-        "lod": "detail",
-        "min_zoom": 1.35,
-        "max_zoom": 99.0,
-        "chunk_ids": [
-          "political.detail.country.gp"
         ]
       },
       {
@@ -1473,14 +1473,6 @@
         "min_zoom": 1.35,
         "max_zoom": 99.0,
         "chunk_ids": [
-          "political.detail.country.mq"
-        ]
-      },
-      {
-        "lod": "detail",
-        "min_zoom": 1.35,
-        "max_zoom": 99.0,
-        "chunk_ids": [
           "political.detail.country.mrd"
         ]
       },
@@ -1490,6 +1482,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.mre"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.mtq"
         ]
       },
       {
@@ -1682,6 +1682,14 @@
         "max_zoom": 99.0,
         "chunk_ids": [
           "political.detail.country.par"
+        ]
+      },
+      {
+        "lod": "detail",
+        "min_zoom": 1.35,
+        "max_zoom": 99.0,
+        "chunk_ids": [
+          "political.detail.country.pcz"
         ]
       },
       {

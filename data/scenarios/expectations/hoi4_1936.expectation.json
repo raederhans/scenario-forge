@@ -203,13 +203,73 @@
       "tag": "KRF",
       "field": "parent_owner_tag",
       "equals": "JAP"
+    },
+    {
+      "tag": "PCZ",
+      "field": "parent_owner_tag",
+      "equals": "USA"
+    },
+    {
+      "tag": "PCZ",
+      "field": "subject_kind",
+      "equals": "territory"
+    },
+    {
+      "tag": "PCZ",
+      "field": "feature_count",
+      "equals": 2
+    },
+    {
+      "tag": "CAY",
+      "field": "parent_owner_tag",
+      "equals": "FRA"
+    },
+    {
+      "tag": "CAY",
+      "field": "subject_kind",
+      "equals": "colony"
+    },
+    {
+      "tag": "CAY",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "GDL",
+      "field": "parent_owner_tag",
+      "equals": "FRA"
+    },
+    {
+      "tag": "GDL",
+      "field": "subject_kind",
+      "equals": "colony"
+    },
+    {
+      "tag": "GDL",
+      "field": "feature_count",
+      "equals": 1
+    },
+    {
+      "tag": "MTQ",
+      "field": "parent_owner_tag",
+      "equals": "FRA"
+    },
+    {
+      "tag": "MTQ",
+      "field": "subject_kind",
+      "equals": "colony"
+    },
+    {
+      "tag": "MTQ",
+      "field": "feature_count",
+      "equals": 1
     }
   ],
   "summary_equals": {
     "blocker_count": 0,
-    "owner_count": 299,
-    "controller_count": 299,
-    "feature_count": 21098
+    "owner_count": 300,
+    "controller_count": 300,
+    "feature_count": 21100
   },
   "summary_min": {
     "feature_count": 10000,
@@ -924,6 +984,66 @@
       "feature_ids": [
         "NG_ADM1_NGA-2856"
       ]
+    },
+    {
+      "name": "julian_march",
+      "expected_owner_tag": "ITA",
+      "feature_ids": [
+        "HR036",
+        "SI044",
+        "SI043",
+        "SI038"
+      ]
+    },
+    {
+      "name": "southern_dobruja",
+      "expected_owner_tag": "ROM",
+      "feature_ids": [
+        "BG332",
+        "BG325"
+      ]
+    },
+    {
+      "name": "trieste",
+      "expected_owner_tag": "ITA",
+      "feature_ids": [
+        "ITH44"
+      ]
+    },
+    {
+      "name": "pula",
+      "expected_owner_tag": "ITA",
+      "feature_ids": [
+        "HR036"
+      ]
+    },
+    {
+      "name": "silistra",
+      "expected_owner_tag": "ROM",
+      "feature_ids": [
+        "BG325"
+      ]
+    },
+    {
+      "name": "balboa",
+      "expected_owner_tag": "PCZ",
+      "feature_ids": [
+        "PA_ADM1_PAN-1340__SPLIT_PCZ"
+      ]
+    },
+    {
+      "name": "panama_city",
+      "expected_owner_tag": "PAN",
+      "feature_ids": [
+        "PA_ADM1_PAN-1340__SPLIT_REST"
+      ]
+    },
+    {
+      "name": "cayenne",
+      "expected_owner_tag": "CAY",
+      "feature_ids": [
+        "GF_PRIMARY"
+      ]
     }
   ],
   "forbidden_country_tags": [
@@ -931,6 +1051,9 @@
     "MYR",
     "TRV",
     "BRU",
-    "BRM"
+    "BRM",
+    "GF",
+    "GP",
+    "MQ"
   ]
 }
