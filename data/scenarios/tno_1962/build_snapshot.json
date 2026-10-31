@@ -33,14 +33,14 @@
     "runtime_topology.bootstrap.topo.json": "7ceb0e81f5abb947e4d6cd9f8e444fcd50114cb7cec10186c45a09bdf9f29170",
     "scenario_atlantropa.topo.json": "e817246e3cf343e2ae8c0c81e79b3bf3b4ae87b3c0135433160258b930bf77a1",
     "scenario_atlantropa_metadata.json": "d55d477590f7a10248c6f0f6ef6dd40d95d79b2b31ae3e457709ae7c2ea893a0",
-    "startup.bundle.en.json": "3eeeb53b84dd96165785e26ccb668d0d78ae94fe16976a574c16066872be4c8d",
-    "startup.bundle.en.json.gz": "482710335cc41f761d036d5cec706a2c9daa2607f167ab33ed5b2c10068f2052",
-    "startup.bundle.zh.json": "cce71ffd839a6a4f7ff9a23cc5bb52accb26e9ff1dd3c7f3f075d85bbda39fc0",
-    "startup.bundle.zh.json.gz": "5e25f7d235876fed8707c1c7ff76b7b96b1583fa445acfd0adc4aa52f78ac154"
+    "startup.bundle.en.json": "ea9a3d3c835ffb3aeb47bb2aea3c858c0e748d6506750a9dad24cc64e284fce6",
+    "startup.bundle.en.json.gz": "a3cd5cafeb4f64b88736cfc9b1c90dfb8eeeaf3eaea2bc05933da6e6daf95bc8",
+    "startup.bundle.zh.json": "6fe2d14509c4f9cc3954a74d2d562827fa787a2100f40016a6f676a94ddf77ba",
+    "startup.bundle.zh.json.gz": "eacae1b5547d89d75309da357fa66577231da6d17cdda12cda887eacbd91961b"
   },
   "profile": "tno_full",
   "report_paths": {},
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "c02b75f64875e7397d1d9ea42d0b74080c0d9e6106478eee7353d5dbd28e1657",
+  "snapshot_fingerprint": "9b7b7539f41aa5c711b081cf7179197433b62960714d850bead2dbe9a2430792",
   "water_count": 285
 }
