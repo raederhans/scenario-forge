@@ -3007,7 +3007,7 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "47b1f326ab0d6bed1b9f850528f3957522e576a3ab5f8149b75c52a372f34dbd",
+  "snapshot_fingerprint": "ace62243c3044ef220809859f39737e99770cf1b14635f121b618f73391ef7b7",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "d59bca03e70a54d2d9eb5143b6b9c1c00d23e97ccebd8d7abe946649902ecaff",
