@@ -205,9 +205,11 @@ def test_batch_two_published_ownership_and_relationships():
     user_rules = read(Path(__file__).parent / "fixtures/tno_user_reassign.json")
     corrected = {fid: {"RKO": "OE00"}.get(row["to"], row["to"]) for fid, row in user_rules.items() if row["from"] != row["to"]}
     corrected["ATLISL_adriatica_corfu"] = "ITA"
+    corrected.update({fid: entry["tag"] for entry in overlay["entries"] if entry["id"].startswith("tno_user2_")
+                      for fid in entry["select"]["feature_ids"]})
     for entry in overlay["entries"][3:]:
         tag = entry["tag"]
-        if entry["id"] == "tno_idal":
+        if entry["id"] in {"tno_idal", "tno_oe04", "tno_vic"}:
             assert tag not in countries
             continue
         country = countries[tag]
@@ -365,3 +367,17 @@ def test_identity_v2_preserves_current_tags_and_geographic_codes(scenario_dir):
     assert read(scenario_dir / "runtime_topology.topo.json")["properties"] == {
         "cntr_code": "BZ", "owner_tag": "BLZ"}
     assert apply_identity_migrations(scenario_dir, releasable_paths=[]) == []
+
+
+def test_geography_keeps_a_country_reference_its_parcels_still_include():
+    countries = {"GRE": {"lookup_iso2": "GR"}, "ALB": {"lookup_iso2": "AL"}, "SUB": {"lookup_iso2": "JAP"}}
+    features = {"g1": {"cntr_code": "GR"}, "a1": {"cntr_code": "ATL"}, "a2": {"cntr_code": "ATL"},
+                "al": {"cntr_code": "AL"}, "k1": {"cntr_code": "XK"}, "k2": {"cntr_code": "XK"},
+                "u1": {"cntr_code": "US"}}
+    owners = {"g1": "GRE", "a1": "GRE", "a2": "GRE", "al": "ALB", "k1": "ALB", "k2": "ALB", "u1": "SUB"}
+    meta = {"US": {"continent_id": "continent_north_america"}}
+    update_country_geography(countries, owners, features, {}, meta, {"GRE", "ALB", "SUB"})
+    assert countries["GRE"]["lookup_iso2"] == "GR"
+    assert countries["ALB"]["lookup_iso2"] == "AL"
+    assert countries["SUB"]["lookup_iso2"] == "US"
+    assert countries["SUB"]["continent_id"] == "continent_north_america"

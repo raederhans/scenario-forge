@@ -1167,7 +1167,6 @@
           "RU_RAY_50074027B40310096212326",
           "RU_RAY_50074027B51726500082089",
           "RU_RAY_50074027B60606739466906",
-          "RU_RAY_50074027B62612106128387",
           "RU_RAY_50074027B77320350284147"
         ]
       },
@@ -1246,7 +1245,6 @@
         "type": "feature_ids",
         "feature_ids": [
           "RU_MRG_381a0cc60dd8",
-          "RU_MRG_421f6b2285d7",
           "RU_MRG_47cb081b29d0",
           "RU_MRG_58dfbd1fa64b",
           "RU_MRG_5ca04a85c3f4",
@@ -1257,15 +1255,11 @@
           "RU_MRG_c78e9571a541",
           "RU_MRG_e770cd31cdb4",
           "RU_RAY_50074027B1573255498527",
-          "RU_RAY_50074027B17337160846160",
           "RU_RAY_50074027B19694965074272",
           "RU_RAY_50074027B39707070787955",
-          "RU_RAY_50074027B64075323117418",
           "RU_RAY_50074027B75388563802215",
-          "RU_RAY_50074027B91680290875095",
           "RU_RAY_50074027B94286516956529",
-          "RU_RAY_50074027B9527926275896",
-          "RU_RAY_50074027B98963269942164"
+          "RU_RAY_50074027B9527926275896"
         ]
       },
       "color_hex_override": "#59544f",
@@ -1594,7 +1588,6 @@
           "UA_RAY_74538382B32839428556025",
           "UA_RAY_74538382B52142389762962",
           "UA_RAY_74538382B57692221763967",
-          "UA_RAY_74538382B68255145682197",
           "UA_RAY_74538382B68825553908118",
           "UA_RAY_74538382B7363516927626",
           "UA_RAY_74538382B89307192182420"
@@ -1619,12 +1612,16 @@
         "feature_ids": [
           "BY_RAY_67162791B17030122378697",
           "RU_RAY_50074027B12942583135720",
+          "RU_RAY_50074027B17337160846160",
           "RU_RAY_50074027B31853797856912",
           "RU_RAY_50074027B42449829895110",
           "RU_RAY_50074027B46415378872622",
+          "RU_RAY_50074027B64075323117418",
           "RU_RAY_50074027B9105763704567",
+          "RU_RAY_50074027B91680290875095",
           "RU_RAY_50074027B96444957835233",
           "RU_RAY_50074027B9814729903160",
+          "RU_RAY_50074027B98963269942164",
           "UA_MRG_07e4f868c3fb",
           "UA_MRG_4224fabffe3b",
           "UA_MRG_7db72d35cf6c",
@@ -1818,6 +1815,7 @@
       "preset_source": {
         "type": "feature_ids",
         "feature_ids": [
+          "RU_MRG_421f6b2285d7",
           "RU_MRG_dc59f2179593",
           "RU_MRG_f84bc369d8b3",
           "RU_RAY_50074027B19621694008878",
@@ -1825,6 +1823,7 @@
           "RU_RAY_50074027B26881426661864",
           "RU_RAY_50074027B55014623372781",
           "RU_RAY_50074027B59167521890578",
+          "RU_RAY_50074027B62612106128387",
           "RU_RAY_50074027B73978553723393",
           "RU_RAY_50074027B78718194323542",
           "RU_RAY_50074027B79024776170444",
@@ -1948,6 +1947,471 @@
         "tno_1962"
       ],
       "notes": "达尔马提亚默认由意大利直辖，保留分区定义。"
+    },
+    {
+      "tag": "CG00",
+      "display_name_override": "German Congo — Zentral-Kongo Administration",
+      "display_name_en": "German Congo — Zentral-Kongo Administration",
+      "display_name_zh": "德属刚果·中央刚果行政区",
+      "parent_owner_tag": "GCO",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "CD_ADM1_COD-1461__tno1962_1",
+          "CD_ADM1_COD-1461__tno1962_2",
+          "CD_ADM1_COD-1461__tno1962_3",
+          "CD_ADM1_COD-1461__tno1962_4",
+          "CD_ADM1_COD-1461__tno1962_5",
+          "CD_ADM1_COD-1461__tno1962_6",
+          "CD_ADM1_COD-1559",
+          "CD_ADM1_COD-1871__tno1962_1",
+          "CD_ADM1_COD-1871__tno1962_2",
+          "CD_ADM1_COD-1871__tno1962_3",
+          "CD_ADM1_COD-1871__tno1962_4",
+          "CD_ADM1_COD-1871__tno1962_5",
+          "CD_ADM1_COD-1871__tno1962_6",
+          "CD_ADM1_COD-1871__tno1962_7",
+          "CD_ADM1_COD-1872__tno1962_1",
+          "CD_ADM1_COD-1872__tno1962_2",
+          "CD_ADM1_COD-1872__tno1962_3",
+          "CD_ADM1_COD-1872__tno1962_4",
+          "CD_ADM1_COD-1872__tno1962_5",
+          "CD_ADM1_COD-1872__tno1962_6",
+          "CD_ADM1_COD-1872__tno1962_7",
+          "CD_ADM1_COD-1872__tno1962_8",
+          "CD_ADM1_COD-1883",
+          "CD_ADM1_COD-1884",
+          "CD_ADM1_COD-1895",
+          "CD_ADM1_COD-1896__tno1962_1",
+          "CD_ADM1_COD-1896__tno1962_2",
+          "CD_ADM1_COD-1896__tno1962_3",
+          "CD_ADM1_COD-1896__tno1962_4",
+          "CM_ADM1_CMR-1480",
+          "CM_ADM1_CMR-1481",
+          "CM_ADM1_CMR-803"
+        ]
+      },
+      "color_hex_override": "#7b8364",
+      "release_lookup_iso2": "CD",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "CGBC",
+      "display_name_override": "German Congo — Brazzaville Administration",
+      "display_name_en": "German Congo — Brazzaville Administration",
+      "display_name_zh": "德属刚果·布拉柴维尔行政区",
+      "parent_owner_tag": "GCO",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "CG_ADM1_COG-2185__tno1962_1",
+          "CG_ADM1_COG-2185__tno1962_2",
+          "CG_ADM1_COG-2185__tno1962_3",
+          "CG_ADM1_COG-2185__tno1962_4",
+          "CG_ADM1_COG-2626",
+          "CG_ADM1_COG-2880",
+          "CG_ADM1_COG-3341__tno1962_1",
+          "CG_ADM1_COG-3341__tno1962_2",
+          "CG_ADM1_COG-3342",
+          "CG_ADM1_COG-3343",
+          "CG_ADM1_COG-3344",
+          "CG_ADM1_COG-3345",
+          "CG_ADM1_COG-3346__tno1962_1",
+          "CG_ADM1_COG-3346__tno1962_2",
+          "CG_ADM1_COG-4855",
+          "CG_ADM1_COG-5855"
+        ]
+      },
+      "color_hex_override": "#8f9375",
+      "release_lookup_iso2": "GCO",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "CGGA",
+      "display_name_override": "German Congo — Gabon Administration",
+      "display_name_en": "German Congo — Gabon Administration",
+      "display_name_zh": "德属刚果·加蓬行政区",
+      "parent_owner_tag": "GCO",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "GA_ADM1_GAB-2168",
+          "GA_ADM1_GAB-2186",
+          "GA_ADM1_GAB-2187",
+          "GA_ADM1_GAB-2621",
+          "GA_ADM1_GAB-2622",
+          "GA_ADM1_GAB-2623",
+          "GA_ADM1_GAB-2624",
+          "GA_ADM1_GAB-2627",
+          "GA_ADM1_GAB-2628"
+        ]
+      },
+      "color_hex_override": "#5f6546",
+      "release_lookup_iso2": "GA",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "CGKT",
+      "display_name_override": "German Congo — Katanga Administration",
+      "display_name_en": "German Congo — Katanga Administration",
+      "display_name_zh": "德属刚果·加丹加行政区",
+      "parent_owner_tag": "GCO",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "CD_ADM1_COD-1897"
+        ]
+      },
+      "color_hex_override": "#888b6c",
+      "release_lookup_iso2": "CD",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "CGKV",
+      "display_name_override": "German Congo — Kivu Administration",
+      "display_name_en": "German Congo — Kivu Administration",
+      "display_name_zh": "德属刚果·基伍行政区",
+      "parent_owner_tag": "GCO",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "CD_ADM1_COD-1894",
+          "CD_ADM1_COD-1898"
+        ]
+      },
+      "color_hex_override": "#636b4e",
+      "release_lookup_iso2": "CD",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "CGUB",
+      "display_name_override": "German Congo — Ubangi Administration",
+      "display_name_en": "German Congo — Ubangi Administration",
+      "display_name_zh": "德属刚果·乌班吉行政区",
+      "parent_owner_tag": "GCO",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "CF_ADM1_CAF-1460",
+          "CF_ADM1_CAF-4856",
+          "CF_ADM1_CAF-794",
+          "CF_ADM1_CAF-795",
+          "CF_ADM1_CAF-801",
+          "CF_ADM1_CAF-802",
+          "CF_ADM1_CAF-804",
+          "CF_ADM1_CAF-808",
+          "CF_ADM1_CAF-809",
+          "CF_ADM1_CAF-866",
+          "CF_ADM1_CAF-867",
+          "CF_ADM1_CAF-868"
+        ]
+      },
+      "color_hex_override": "#6b7056",
+      "release_lookup_iso2": "CF",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "GEAB",
+      "display_name_override": "German East Africa — Urundi Administration",
+      "display_name_en": "German East Africa — Urundi Administration",
+      "display_name_zh": "德属东非·乌隆迪行政区",
+      "parent_owner_tag": "GEA",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "BI_ADM1_BDI-2632",
+          "BI_ADM1_BDI-2633",
+          "BI_ADM1_BDI-2634",
+          "BI_ADM1_BDI-2635",
+          "BI_ADM1_BDI-2636",
+          "BI_ADM1_BDI-2637",
+          "BI_ADM1_BDI-2638",
+          "BI_ADM1_BDI-2639",
+          "BI_ADM1_BDI-2640",
+          "BI_ADM1_BDI-2641",
+          "BI_ADM1_BDI-2642",
+          "BI_ADM1_BDI-2643",
+          "BI_ADM1_BDI-2644",
+          "BI_ADM1_BDI-3364",
+          "BI_ADM1_BDI-3365",
+          "BI_ADM1_BDI-4854",
+          "BI_ADM1_BDI-5588"
+        ]
+      },
+      "color_hex_override": "#5e6c49",
+      "release_lookup_iso2": "BI",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "GEAM",
+      "display_name_override": "German East Africa — Mozambique Administration",
+      "display_name_en": "German East Africa — Mozambique Administration",
+      "display_name_zh": "德属东非·莫桑比克行政区",
+      "parent_owner_tag": "GEA",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "MZ_ADM1_MOZ-1190",
+          "MZ_ADM1_MOZ-1192",
+          "MZ_ADM1_MOZ-1198",
+          "MZ_ADM1_MOZ-1199",
+          "MZ_ADM1_MOZ-1200",
+          "MZ_ADM1_MOZ-1207",
+          "MZ_ADM1_MOZ-1905",
+          "MZ_ADM1_MOZ-1906",
+          "MZ_ADM1_MOZ-1925",
+          "MZ_ADM1_MOZ-1927",
+          "MZ_ADM1_MOZ-5854"
+        ]
+      },
+      "color_hex_override": "#818f6b",
+      "release_lookup_iso2": "MZ",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "GEAN",
+      "display_name_override": "German East Africa — Nyasaland Administration",
+      "display_name_en": "German East Africa — Nyasaland Administration",
+      "display_name_zh": "德属东非·尼亚萨兰行政区",
+      "parent_owner_tag": "GEA",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "MW_ADM1_82672581B12520625652479",
+          "MW_ADM1_82672581B33227208107325",
+          "MW_ADM1_82672581B71595037145626"
+        ]
+      },
+      "color_hex_override": "#5f7253",
+      "release_lookup_iso2": "MW",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "GEAR",
+      "display_name_override": "German East Africa — Ruanda Administration",
+      "display_name_en": "German East Africa — Ruanda Administration",
+      "display_name_zh": "德属东非·卢旺达行政区",
+      "parent_owner_tag": "GEA",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "RW_ADM1_RWA-3491",
+          "RW_ADM1_RWA-3492",
+          "RW_ADM1_RWA-3493",
+          "RW_ADM1_RWA-3494",
+          "RW_ADM1_RWA-3495"
+        ]
+      },
+      "color_hex_override": "#77876b",
+      "release_lookup_iso2": "RW",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "GEAS",
+      "display_name_override": "German East Africa — Southern Rhodesia Administration",
+      "display_name_en": "German East Africa — Southern Rhodesia Administration",
+      "display_name_zh": "德属东非·南罗得西亚行政区",
+      "parent_owner_tag": "GEA",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "ZW_ADM1_ZWE-524",
+          "ZW_ADM1_ZWE-525",
+          "ZW_ADM1_ZWE-526",
+          "ZW_ADM1_ZWE-527",
+          "ZW_ADM1_ZWE-528",
+          "ZW_ADM1_ZWE-529",
+          "ZW_ADM1_ZWE-530",
+          "ZW_ADM1_ZWE-531",
+          "ZW_ADM1_ZWE-532",
+          "ZW_ADM1_ZWE-533"
+        ]
+      },
+      "color_hex_override": "#788561",
+      "release_lookup_iso2": "ZW",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "GEAT",
+      "display_name_override": "German East Africa — Tanganyika Administration",
+      "display_name_en": "German East Africa — Tanganyika Administration",
+      "display_name_zh": "德属东非·坦噶尼喀行政区",
+      "parent_owner_tag": "GEA",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "TZ_ADM1_TZA-3335",
+          "TZ_ADM1_TZA-3336",
+          "TZ_ADM1_TZA-3337",
+          "TZ_ADM1_TZA-3357",
+          "TZ_ADM1_TZA-3358",
+          "TZ_ADM1_TZA-3359",
+          "TZ_ADM1_TZA-3360",
+          "TZ_ADM1_TZA-3363",
+          "TZ_ADM1_TZA-3378",
+          "TZ_ADM1_TZA-3379",
+          "TZ_ADM1_TZA-3380",
+          "TZ_ADM1_TZA-3381",
+          "TZ_ADM1_TZA-3382",
+          "TZ_ADM1_TZA-3383",
+          "TZ_ADM1_TZA-3384",
+          "TZ_ADM1_TZA-3385",
+          "TZ_ADM1_TZA-3386",
+          "TZ_ADM1_TZA-3387",
+          "TZ_ADM1_TZA-3388",
+          "TZ_ADM1_TZA-3389",
+          "TZ_ADM1_TZA-3390",
+          "TZ_ADM1_TZA-3391",
+          "TZ_ADM1_TZA-3392",
+          "TZ_ADM1_TZA-3393",
+          "TZ_ADM1_TZA-3394",
+          "TZ_ADM1_TZA-3395",
+          "TZ_ADM1_TZA-5584",
+          "TZ_ADM1_TZA-5585",
+          "TZ_ADM1_TZA-5586",
+          "TZ_ADM1_TZA-5587"
+        ]
+      },
+      "color_hex_override": "#4c5f3f",
+      "release_lookup_iso2": "TZ",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "GEAU",
+      "display_name_override": "German East Africa — Uganda Administration",
+      "display_name_en": "German East Africa — Uganda Administration",
+      "display_name_zh": "德属东非·乌干达行政区",
+      "parent_owner_tag": "GEA",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "UG_ADM1_17295835B48340970483027",
+          "UG_ADM1_17295835B57878138064711",
+          "UG_ADM1_17295835B80141219017784",
+          "UG_ADM1_17295835B91329899113986"
+        ]
+      },
+      "color_hex_override": "#859072",
+      "release_lookup_iso2": "UG",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "GEAZ",
+      "display_name_override": "German East Africa — Northern Rhodesia Administration",
+      "display_name_en": "German East Africa — Northern Rhodesia Administration",
+      "display_name_zh": "德属东非·北罗得西亚行政区",
+      "parent_owner_tag": "GEA",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "ZM_ADM1_ZMB-514",
+          "ZM_ADM1_ZMB-515",
+          "ZM_ADM1_ZMB-516",
+          "ZM_ADM1_ZMB-517",
+          "ZM_ADM1_ZMB-518",
+          "ZM_ADM1_ZMB-520",
+          "ZM_ADM1_ZMB-521",
+          "ZM_ADM1_ZMB-522",
+          "ZM_ADM1_ZMB-523",
+          "ZM_ADM1_ZMB-5511"
+        ]
+      },
+      "color_hex_override": "#5a674b",
+      "release_lookup_iso2": "ZM",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "SWAO",
+      "display_name_override": "German Southwest Africa — Angola Administration",
+      "display_name_en": "German Southwest Africa — Angola Administration",
+      "display_name_zh": "德属西南非洲·安哥拉行政区",
+      "parent_owner_tag": "ANG",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "AO_ADM1_AGO-1874",
+          "AO_ADM1_AGO-1875",
+          "AO_ADM1_AGO-1876",
+          "AO_ADM1_AGO-1877",
+          "AO_ADM1_AGO-1878",
+          "AO_ADM1_AGO-1879",
+          "AO_ADM1_AGO-1880",
+          "AO_ADM1_AGO-1881",
+          "AO_ADM1_AGO-1882",
+          "AO_ADM1_AGO-1885",
+          "AO_ADM1_AGO-1886",
+          "AO_ADM1_AGO-1887",
+          "AO_ADM1_AGO-1888",
+          "AO_ADM1_AGO-1889",
+          "AO_ADM1_AGO-1890",
+          "AO_ADM1_AGO-1891",
+          "AO_ADM1_AGO-1892",
+          "AO_ADM1_AGO-1893"
+        ]
+      },
+      "color_hex_override": "#5a5e45",
+      "release_lookup_iso2": "AO",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "行政区默认由专员辖区直接持地，编辑器释放后独立持地。"
     }
   ],
   "excluded": [],

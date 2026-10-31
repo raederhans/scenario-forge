@@ -2172,6 +2172,8 @@
         "ostpreussen": {
           "district_id": "ostpreussen",
           "feature_ids": [
+            "BY_RAY_67162791B13547290723272",
+            "LT021",
             "LT024",
             "PL_MRG_44c900e7cbdd",
             "PL_MRG_c908eb11c602",
@@ -2182,10 +2184,12 @@
             "PL_POW_1422",
             "PL_POW_1437",
             "PL_POW_1461",
+            "PL_POW_2001",
             "PL_POW_2002",
             "PL_POW_2004",
             "PL_POW_2005",
             "PL_POW_2006",
+            "PL_POW_2009",
             "PL_POW_2010",
             "PL_POW_2011",
             "PL_POW_2012",
@@ -2649,7 +2653,9 @@
             "MAR-3469",
             "MR_ADM1_MRT-2783",
             "MR_ADM1_MRT-2785",
-            "MR_ADM1_MRT-2795"
+            "MR_ADM1_MRT-2786",
+            "MR_ADM1_MRT-2795",
+            "MR_ADM1_MRT-2798"
           ],
           "name_en": "Morocco & Sahara",
           "name_zh": "摩洛哥与撒哈拉"
@@ -2760,11 +2766,15 @@
           "district_id": "dalmazia",
           "feature_ids": [
             "ATLISL_adriatica_CRO_3",
+            "ATLISL_adriatica_CRO_9",
             "ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806",
+            "ATLPRV_18252",
             "ATLPRV_18254",
             "ATLPRV_18260",
             "ATLPRV_18263",
             "ATLPRV_18380",
+            "ATLPRV_19222",
+            "ATLPRV_20006",
             "ATLSHL_adriatica_10",
             "ATLSHL_adriatica_13",
             "ATLSHL_adriatica_14",
@@ -2775,8 +2785,13 @@
             "ATLSHL_adriatica_8",
             "ATLSHL_adriatica_9",
             "HR031",
+            "HR032",
+            "HR033",
             "HR034",
+            "HR035",
             "HR036",
+            "HR037",
+            "ME_ADM1_MNE-1496",
             "ME_ADM1_MNE-1506",
             "ME_ADM1_MNE-1507",
             "ME_ADM1_MNE-1518"
@@ -2946,14 +2961,7 @@
             "ATLPRV_18333",
             "ATLPRV_18334",
             "ATLSHL_sicily_tunis_1",
-            "ATLSHL_sicily_tunis_2",
-            "LBY-2964",
-            "LBY-2967",
-            "LBY-2969",
-            "LBY-2971",
-            "LBY-2976",
-            "LBY-2983",
-            "LBY-5488"
+            "ATLSHL_sicily_tunis_2"
           ],
           "name_en": "Sicily",
           "name_zh": "西西里"
@@ -4379,8 +4387,7 @@
             "IN_ADM2_76128533B97372652494648",
             "IN_MRG_0f1924c89ced",
             "IN_MRG_b291003b6f41",
-            "IN_MRG_f0850bb4446c",
-            "PAK-1114"
+            "IN_MRG_f0850bb4446c"
           ],
           "name_en": "Gujarat & Kathiawar States",
           "name_zh": "古吉拉特与卡提阿瓦诸邦"
@@ -4408,17 +4415,12 @@
         "jammu_kashmir": {
           "district_id": "jammu_kashmir",
           "feature_ids": [
-            "IN_ADM2_76128533B15567489974292",
             "IN_ADM2_76128533B20458430922604",
             "IN_ADM2_76128533B20504715877560",
-            "IN_ADM2_76128533B2782141712775",
             "IN_ADM2_76128533B31127900859310",
             "IN_ADM2_76128533B32249045995424",
-            "IN_ADM2_76128533B32998994032811",
             "IN_ADM2_76128533B3371867518692",
             "IN_ADM2_76128533B37825396764028",
-            "IN_ADM2_76128533B41744580856133",
-            "IN_ADM2_76128533B45655211862788",
             "IN_ADM2_76128533B47664895117076",
             "IN_ADM2_76128533B48708628358161",
             "IN_ADM2_76128533B49429513424897",
@@ -4515,8 +4517,7 @@
             "IN_MRG_4d898a5137a3",
             "IN_MRG_5002491fef3c",
             "IN_MRG_7779e13ac7b3",
-            "IN_MRG_7b27a9a03d70",
-            "PAK-1113"
+            "IN_MRG_7b27a9a03d70"
           ],
           "name_en": "Punjab & Hill States",
           "name_zh": "旁遮普与山地土邦"

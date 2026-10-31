@@ -161,11 +161,11 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
     requiredControllerOnlyTags.forEach((tag) => {
       expect(payload.countries[tag]?.entry_kind).toBe('controller_only');
     });
-    ['RKO', 'GEA', 'GCO', 'AOI'].forEach((tag) => {
+    ['RKO', 'AOI'].forEach((tag) => {
       expect(payload.countries[tag]?.entry_kind).toBe('scenario_container');
       expect(payload.countries[tag]?.feature_count).toBe(0);
     });
-    ['RKU', 'RKM', 'RKK'].forEach((tag) => {
+    ['RKU', 'RKM', 'RKK', 'GEA', 'GCO', 'ANG'].forEach((tag) => {
       expect(payload.countries[tag]?.entry_kind).not.toBe('scenario_container');
       expect(payload.countries[tag]?.feature_count).toBeGreaterThan(0);
     });

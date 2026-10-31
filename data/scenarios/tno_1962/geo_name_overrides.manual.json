@@ -90,8 +90,8 @@
       "zh": "亚得里亚盐盆地"
     },
     "ATLISL_adriatica_CRO_3": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Pago Shoals",
+      "zh": "帕戈浅滩"
     },
     "ATLISL_adriatica_CRO_4": {
       "en": "Adriatic Salt Basin",
@@ -114,96 +114,128 @@
       "zh": "亚得里亚盐盆地"
     },
     "ATLISL_adriatica_CRO_9": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Lagosta Shoals",
+      "zh": "拉戈斯塔浅滩"
     },
     "ATLISL_adriatica_ITA_1": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Saseno Shoals",
+      "zh": "萨塞诺浅滩"
     },
     "ATLISL_adriatica_corfu": {
       "en": "Corfù",
       "zh": "科孚岛"
     },
+    "ATLISL_adriatica_source_1af38019baedda5939dd391c62a69c3e4687fd812f5f841ddea7617a27cd5329": {
+      "en": "Metcovico Shoals",
+      "zh": "梅特科维科浅滩"
+    },
+    "ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806": {
+      "en": "Pago Shoals",
+      "zh": "帕戈浅滩"
+    },
+    "ATLISL_adriatica_source_6a9986e29faf7cb22d4301d7445f86e4fa61560d2751849c61dbc37751fb30d9": {
+      "en": "Solta Shoals",
+      "zh": "绍尔塔浅滩"
+    },
+    "ATLISL_adriatica_source_6f08765428359e34bbe6ee4bd2408e4f873f99f1d1af174794864a959e53d944": {
+      "en": "Metcovico Shoals",
+      "zh": "梅特科维科浅滩"
+    },
+    "ATLISL_adriatica_source_7fba784b3f440f9c3fe16eb804d519630d6c42c1c3fe5d3be9b862186315907f": {
+      "en": "Metcovico Shoals",
+      "zh": "梅特科维科浅滩"
+    },
+    "ATLISL_adriatica_source_a0eedb2a11dd70d7457c077c692b02548258e559ccc58cf8ab19b2c7144dc7cf": {
+      "en": "Lagosta Shoals",
+      "zh": "拉戈斯塔浅滩"
+    },
+    "ATLISL_adriatica_source_a282019b69d82d874a525940168b347a2dc3c6b6a7b41a7c5c332b0b8e21d09d": {
+      "en": "Pelagosa Shoals",
+      "zh": "佩拉戈萨浅滩"
+    },
+    "ATLISL_adriatica_source_d902aaac9565fba9dd07ecbcf069a2b6fdfb7a48adb44638f6e13bd6630dc971": {
+      "en": "Metcovico Shoals",
+      "zh": "梅特科维科浅滩"
+    },
     "ATLISL_aegean_GRE_1": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Milos Shoals",
+      "zh": "米洛斯浅滩"
     },
     "ATLISL_aegean_GRE_10": {
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
     },
     "ATLISL_aegean_GRE_11": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
     },
     "ATLISL_aegean_GRE_12": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Eustratios Shoals",
+      "zh": "埃夫斯特拉蒂奥斯浅滩"
     },
     "ATLISL_aegean_GRE_13": {
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
     },
     "ATLISL_aegean_GRE_14": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
     },
     "ATLISL_aegean_GRE_15": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
     },
     "ATLISL_aegean_GRE_16": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
     },
     "ATLISL_aegean_GRE_17": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
     },
     "ATLISL_aegean_GRE_18": {
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
     },
     "ATLISL_aegean_GRE_19": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
     },
     "ATLISL_aegean_GRE_2": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Milos Shoals",
+      "zh": "米洛斯浅滩"
     },
     "ATLISL_aegean_GRE_20": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
     },
     "ATLISL_aegean_GRE_21": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
     },
     "ATLISL_aegean_GRE_22": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
     },
     "ATLISL_aegean_GRE_23": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Astipalea Shoals",
+      "zh": "阿斯蒂帕莱亚浅滩"
     },
     "ATLISL_aegean_GRE_24": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Samothrace Shoals",
+      "zh": "萨莫色雷斯浅滩"
     },
     "ATLISL_aegean_GRE_25": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Astipalea Shoals",
+      "zh": "阿斯蒂帕莱亚浅滩"
     },
     "ATLISL_aegean_GRE_26": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Astipalea Shoals",
+      "zh": "阿斯蒂帕莱亚浅滩"
     },
     "ATLISL_aegean_GRE_27": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Scarpanto Shoals",
+      "zh": "斯卡尔潘托浅滩"
     },
     "ATLISL_aegean_GRE_28": {
       "en": "Aegean Islands and New Coast",
@@ -218,8 +250,8 @@
       "zh": "爱琴海群岛与新岸"
     },
     "ATLISL_aegean_GRE_5": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Skyros",
+      "zh": "斯基罗斯岛"
     },
     "ATLISL_aegean_GRE_6": {
       "en": "Aegean Islands and New Coast",
@@ -234,8 +266,12 @@
       "zh": "爱琴海群岛与新岸"
     },
     "ATLISL_aegean_GRE_9": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
+    },
+    "ATLISL_aegean_chios": {
+      "en": "Chios",
+      "zh": "希俄斯岛"
     },
     "ATLISL_aegean_crete": {
       "en": "Crete",
@@ -245,37 +281,89 @@
       "en": "Euboea",
       "zh": "优卑亚岛"
     },
+    "ATLISL_aegean_ikaria": {
+      "en": "Ikaria",
+      "zh": "伊卡里亚岛"
+    },
+    "ATLISL_aegean_lesvos": {
+      "en": "Lesvos",
+      "zh": "莱斯沃斯岛"
+    },
     "ATLISL_aegean_limnos": {
       "en": "Limnos",
       "zh": "利姆诺斯岛"
     },
+    "ATLISL_aegean_rhodes": {
+      "en": "Rodi",
+      "zh": "罗德岛"
+    },
+    "ATLISL_aegean_samos": {
+      "en": "Samos",
+      "zh": "萨摩斯岛"
+    },
+    "ATLISL_aegean_source_139ccca6887f70a92ce4de3a38f8356a49b67e4fc6d67889011385a45aa9c76b": {
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
+    },
+    "ATLISL_aegean_source_2efc11d76fa75115aa5d752976a1688549d79a4a6e009e59719cc5bcf57abd9f": {
+      "en": "Astipalea Shoals",
+      "zh": "阿斯蒂帕莱亚浅滩"
+    },
+    "ATLISL_aegean_source_3d305c15511d75f8c4c2981e57b4d4f1252e8b56ef737f48c5f4b97a86d30968": {
+      "en": "Scarpanto Shoals",
+      "zh": "斯卡尔潘托浅滩"
+    },
+    "ATLISL_aegean_source_748112bfba8ebbb5f1bcca1e82260b07f95dd163e1e4640e70d55a9531bf0248": {
+      "en": "Thessalian Shoals",
+      "zh": "色萨利浅滩"
+    },
+    "ATLISL_aegean_source_760fd1a6b6168360a5d277f9b5c81226189651a497eb6f8625a63af13278f0fc": {
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
+    },
+    "ATLISL_aegean_source_8719fffd33125dc78a0b635b9b3aea7cc98729c9b908ab4c137b42e3c6d2ca72": {
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
+    },
+    "ATLISL_aegean_source_a91b3ea3d1ce93dee5899d23455ad3aee7fe8dbc8fd703f2d67b0285de3a3db8": {
+      "en": "Scarpanto Shoals",
+      "zh": "斯卡尔潘托浅滩"
+    },
+    "ATLISL_aegean_source_ba49bc29ea1452a88da7cfe76e7750e9de3c6b41f7876dcce6906169382307cb": {
+      "en": "Naxos Shoals",
+      "zh": "纳克索斯浅滩"
+    },
+    "ATLISL_levant_cyprus": {
+      "en": "Cyprus",
+      "zh": "塞浦路斯岛"
+    },
     "ATLISL_sicily_tunis_ITA_1": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Egadi Shoals",
+      "zh": "埃加迪浅滩"
     },
     "ATLISL_sicily_tunis_ITA_2": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Egadi Shoals",
+      "zh": "埃加迪浅滩"
     },
     "ATLISL_sicily_tunis_ITA_3": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Egadi Shoals",
+      "zh": "埃加迪浅滩"
     },
     "ATLISL_sicily_tunis_ITA_4": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Pantelleria Shoals",
+      "zh": "潘泰莱里亚浅滩"
     },
     "ATLISL_sicily_tunis_ITA_5": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Pantelleria Shoals",
+      "zh": "潘泰莱里亚浅滩"
     },
     "ATLISL_sicily_tunis_TUN_1": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Kerkennah Shoals",
+      "zh": "克肯纳浅滩"
     },
     "ATLISL_sicily_tunis_TUN_2": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Kerkennah Shoals",
+      "zh": "克肯纳浅滩"
     },
     "ATLISL_sicily_tunis_malta": {
       "en": "Malta",
@@ -285,9 +373,13 @@
       "en": "Sicilia",
       "zh": "西西里岛"
     },
+    "ATLISL_sicily_tunis_source_9121c5f0c8e4d86db5484c1ea966ad438d2c930bcec2af28c2c28a2fb80d104c": {
+      "en": "Bizerte Shoals",
+      "zh": "比塞大浅滩"
+    },
     "ATLISL_tyrrhenian_ITA_1": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Elba Shoals",
+      "zh": "厄尔巴浅滩"
     },
     "ATLISL_tyrrhenian_corsica": {
       "en": "Corsica",
@@ -297,93 +389,189 @@
       "en": "Sardegna",
       "zh": "撒丁岛"
     },
+    "ATLISL_tyrrhenian_source_452dd59ec13ab609e013c63d3cf684e91e2f8020d71297cd9434453fde98352c": {
+      "en": "Eolie Shoals",
+      "zh": "埃奥利浅滩"
+    },
+    "ATLISL_tyrrhenian_source_47d68e14ebfd9c0bd4e3bd7586ce8b63fb1bdd6d26ad6f25a6aec1441939617d": {
+      "en": "Elba Shoals",
+      "zh": "厄尔巴浅滩"
+    },
+    "ATLISL_tyrrhenian_source_563cb45377b6dc55202afe8dcdc4915ec0a12ec704a0368b1f9d7d6a03982ea5": {
+      "en": "Eolie Shoals",
+      "zh": "埃奥利浅滩"
+    },
+    "ATLISL_tyrrhenian_source_6a8559bccd21710e738866a4c78b1dce15843aa7f268951d8152fc38f43e183b": {
+      "en": "Eolie Shoals",
+      "zh": "埃奥利浅滩"
+    },
+    "ATLISL_tyrrhenian_source_94f4a06c5021a8103287fc93fd5929a51c737789f31113757fd136dfe689cf68": {
+      "en": "Eolie Shoals",
+      "zh": "埃奥利浅滩"
+    },
+    "ATLISL_tyrrhenian_source_9cff0332183bf73893620477e0751c96ce497f75e54c3e00ef8347a07a37c0f1": {
+      "en": "Eolie Shoals",
+      "zh": "埃奥利浅滩"
+    },
+    "ATLISL_tyrrhenian_source_c580264411ccf2977efa07c4c4af19a3fdcc6696002750c751f153ca6676435a": {
+      "en": "Elba Shoals",
+      "zh": "厄尔巴浅滩"
+    },
+    "ATLISL_west_med_ATL_1": {
+      "en": "New Alborán Shoals",
+      "zh": "新阿尔沃兰浅滩"
+    },
+    "ATLISL_west_med_ATL_2": {
+      "en": "Alborán Shoals",
+      "zh": "阿尔沃兰浅滩"
+    },
+    "ATLISL_west_med_balearics": {
+      "en": "Baleares",
+      "zh": "巴利阿里群岛"
+    },
     "ATLPRV_11856": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Otranto Dam",
+      "zh": "奥特朗托大坝"
+    },
+    "ATLPRV_11905": {
+      "en": "Gelibolu Flats",
+      "zh": "盖利博卢盐滩"
     },
     "ATLPRV_18129": {
-      "en": "Libyan-Suez New Coast",
-      "zh": "利比亚—苏伊士新岸"
+      "en": "Bengasi Flats",
+      "zh": "班加西盐滩"
     },
     "ATLPRV_18132": {
-      "en": "Libyan-Suez New Coast",
-      "zh": "利比亚—苏伊士新岸"
+      "en": "Alexandria Flats",
+      "zh": "亚历山大盐滩"
     },
     "ATLPRV_18133": {
-      "en": "Levantine New Coast",
-      "zh": "黎凡特新海岸"
+      "en": "Sinai Flats",
+      "zh": "西奈盐滩"
     },
     "ATLPRV_18136": {
-      "en": "Libyan-Suez New Coast",
-      "zh": "利比亚—苏伊士新岸"
+      "en": "Tripoli Flats",
+      "zh": "的黎波里盐滩"
     },
     "ATLPRV_18137": {
-      "en": "Levantine New Coast",
-      "zh": "黎凡特新海岸"
+      "en": "Gaza Flats",
+      "zh": "加沙盐滩"
     },
     "ATLPRV_18138": {
-      "en": "Libyan-Suez New Coast",
-      "zh": "利比亚—苏伊士新岸"
+      "en": "Sidi Barrani Flats",
+      "zh": "西迪拜拉尼盐滩"
     },
     "ATLPRV_18139": {
-      "en": "Levantine New Coast",
-      "zh": "黎凡特新海岸"
+      "en": "Palestine Flats",
+      "zh": "巴勒斯坦盐滩"
     },
     "ATLPRV_18142": {
-      "en": "Levantine New Coast",
-      "zh": "黎凡特新海岸"
+      "en": "Lebanese Flats",
+      "zh": "黎巴嫩盐滩"
     },
     "ATLPRV_18149": {
-      "en": "Levantine New Coast",
-      "zh": "黎凡特新海岸"
+      "en": "Latakia Flats",
+      "zh": "拉塔基亚盐滩"
+    },
+    "ATLPRV_18153": {
+      "en": "Algerian Flats",
+      "zh": "阿尔及利亚盐滩"
+    },
+    "ATLPRV_18155": {
+      "en": "Melilla Flats",
+      "zh": "梅利利亚盐滩"
+    },
+    "ATLPRV_18160": {
+      "en": "Ceuta Flats",
+      "zh": "休达盐滩"
+    },
+    "ATLPRV_18163": {
+      "en": "Mersin Flats",
+      "zh": "梅尔辛盐滩"
+    },
+    "ATLPRV_18164": {
+      "en": "Gibraltar Dam",
+      "zh": "直布罗陀大坝"
     },
     "ATLPRV_18165": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Kythira Flats",
+      "zh": "基西拉盐滩"
+    },
+    "ATLPRV_18166": {
+      "en": "Hatay Flats",
+      "zh": "哈塔伊盐滩"
+    },
+    "ATLPRV_18167": {
+      "en": "Gibraltar Dam",
+      "zh": "直布罗陀大坝"
+    },
+    "ATLPRV_18169": {
+      "en": "Antalya Flats",
+      "zh": "安塔利亚盐滩"
+    },
+    "ATLPRV_18170": {
+      "en": "Granada Flats",
+      "zh": "格拉纳达盐滩"
+    },
+    "ATLPRV_18171": {
+      "en": "Bodrum Flats",
+      "zh": "博德鲁姆盐滩"
     },
     "ATLPRV_18172": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Morea Flats",
+      "zh": "摩里亚盐滩"
+    },
+    "ATLPRV_18175": {
+      "en": "Murcia Flats",
+      "zh": "穆尔西亚盐滩"
     },
     "ATLPRV_18178": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "East Morea Flats",
+      "zh": "东摩里亚盐滩"
     },
     "ATLPRV_18179": {
-      "en": "Western Mediterranean New Coast",
-      "zh": "西地中海新岸"
+      "en": "East Algerian Flats",
+      "zh": "东阿尔及利亚盐滩"
     },
     "ATLPRV_18180": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Tunis Flats",
+      "zh": "突尼斯盐滩"
+    },
+    "ATLPRV_18181": {
+      "en": "Stampalia Flats",
+      "zh": "斯坦帕利亚盐滩"
     },
     "ATLPRV_18182": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Poros Flats",
+      "zh": "波罗斯盐滩"
     },
     "ATLPRV_18183": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Attica Flats",
+      "zh": "阿提卡盐滩"
     },
     "ATLPRV_18184": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Sicilian Dam",
+      "zh": "西西里大坝"
+    },
+    "ATLPRV_18185": {
+      "en": "Alicante Flats",
+      "zh": "阿利坎特盐滩"
     },
     "ATLPRV_18186": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Ionian Flats",
+      "zh": "爱奥尼亚盐滩"
     },
     "ATLPRV_18187": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Calabria Flats",
+      "zh": "卡拉布里亚盐滩"
     },
     "ATLPRV_18190": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Pyrgos Flats",
+      "zh": "皮尔戈斯盐滩"
     },
     "ATLPRV_18192": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Bari Flats",
+      "zh": "巴里盐滩"
     },
     "ATLPRV_18193": {
       "en": "Aegean Islands and New Coast",
@@ -394,272 +582,2376 @@
       "zh": "第勒尼安新海岸"
     },
     "ATLPRV_18199": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Cosenza Flats",
+      "zh": "科森扎盐滩"
+    },
+    "ATLPRV_18201": {
+      "en": "Valencia Flats",
+      "zh": "巴伦西亚盐滩"
     },
     "ATLPRV_18204": {
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
     },
     "ATLPRV_18205": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Campanian Flats",
+      "zh": "坎帕尼亚盐滩"
     },
     "ATLPRV_18208": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "North Epirus Flats",
+      "zh": "北伊庇鲁斯盐滩"
     },
     "ATLPRV_18211": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Katerini Flats",
+      "zh": "卡特里尼盐滩"
     },
     "ATLPRV_18212": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Chalkidiki Flats",
+      "zh": "哈尔基季基盐滩"
     },
     "ATLPRV_18214": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Napoli Flats",
+      "zh": "那不勒斯盐滩"
+    },
+    "ATLPRV_18216": {
+      "en": "Catalan Flats",
+      "zh": "加泰罗尼亚盐滩"
+    },
+    "ATLPRV_18220": {
+      "en": "Thracian Flats",
+      "zh": "色雷斯盐滩"
+    },
+    "ATLPRV_18223": {
+      "en": "Gelibolu Flats",
+      "zh": "盖利博卢盐滩"
     },
     "ATLPRV_18225": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Puglia Flats",
+      "zh": "普利亚盐滩"
     },
     "ATLPRV_18226": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Sicilian Canal",
+      "zh": "西西里运河"
     },
     "ATLPRV_18227": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Albanian Flats",
+      "zh": "阿尔巴尼亚盐滩"
     },
     "ATLPRV_18230": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Lazio Flats",
+      "zh": "拉齐奥盐滩"
     },
     "ATLPRV_18235": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Montenegrin Flats",
+      "zh": "黑山盐滩"
     },
     "ATLPRV_18238": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Marche Flats",
+      "zh": "马尔凯盐滩"
     },
     "ATLPRV_18240": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Orbetello Flats",
+      "zh": "奥尔贝泰洛盐滩"
+    },
+    "ATLPRV_18246": {
+      "en": "Occitan Flats",
+      "zh": "奥克西塔尼亚盐滩"
+    },
+    "ATLPRV_18247": {
+      "en": "Provence Flats",
+      "zh": "普罗旺斯盐滩"
     },
     "ATLPRV_18249": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Tuscan Flats",
+      "zh": "托斯卡纳盐滩"
+    },
+    "ATLPRV_18252": {
+      "en": "Adriatic Flats",
+      "zh": "亚得里亚盐滩"
+    },
+    "ATLPRV_18253": {
+      "en": "Nice Flats",
+      "zh": "尼斯盐滩"
     },
     "ATLPRV_18254": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Zara Flats",
+      "zh": "扎拉盐滩"
+    },
+    "ATLPRV_18255": {
+      "en": "Monaco Flats",
+      "zh": "摩纳哥盐滩"
     },
     "ATLPRV_18256": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Genoa Flats",
+      "zh": "热那亚盐滩"
     },
     "ATLPRV_18260": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Fiume Flats",
+      "zh": "阜姆盐滩"
     },
     "ATLPRV_18261": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Goro Flats",
+      "zh": "戈罗盐滩"
     },
     "ATLPRV_18263": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Istria Flats",
+      "zh": "伊斯特拉盐滩"
     },
     "ATLPRV_18265": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Venetian Flats",
+      "zh": "威尼斯盐滩"
+    },
+    "ATLPRV_18324": {
+      "en": "Hatay Flats",
+      "zh": "哈塔伊盐滩"
     },
     "ATLPRV_18326": {
-      "en": "Gulf of Gabes New Coast",
-      "zh": "加贝斯湾新岸"
+      "en": "Sharqi Flats",
+      "zh": "谢尔基盐滩"
     },
     "ATLPRV_18328": {
-      "en": "Gulf of Gabes New Coast",
-      "zh": "加贝斯湾新岸"
+      "en": "Sharqi Flats",
+      "zh": "谢尔基盐滩"
     },
     "ATLPRV_18330": {
-      "en": "Gulf of Gabes New Coast",
-      "zh": "加贝斯湾新岸"
+      "en": "Sharqi Flats",
+      "zh": "谢尔基盐滩"
+    },
+    "ATLPRV_18332": {
+      "en": "Constantine Flats",
+      "zh": "君士坦丁盐滩"
     },
     "ATLPRV_18333": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Sicilian Dam West",
+      "zh": "西西里大坝西段"
     },
     "ATLPRV_18334": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Sicilian Dam East",
+      "zh": "西西里大坝东段"
     },
     "ATLPRV_18337": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Bizerte Flats",
+      "zh": "比塞大盐滩"
     },
     "ATLPRV_18339": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Bizerte Flats",
+      "zh": "比塞大盐滩"
     },
     "ATLPRV_18341": {
       "en": "Sicilian-Tunisian Salt Flats",
       "zh": "西西里—突尼斯盐原"
     },
+    "ATLPRV_18345": {
+      "en": "Taranto Flats",
+      "zh": "塔兰托盐滩"
+    },
     "ATLPRV_18347": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "West Otranto Dam",
+      "zh": "西奥特朗托大坝"
     },
     "ATLPRV_18348": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "East Otranto Dam",
+      "zh": "东奥特朗托大坝"
+    },
+    "ATLPRV_18349": {
+      "en": "Marmara Flats",
+      "zh": "马尔马拉盐滩"
     },
     "ATLPRV_18355": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "North Albanian Flats",
+      "zh": "北阿尔巴尼亚盐滩"
     },
     "ATLPRV_18380": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Veglia Flats",
+      "zh": "韦利亚盐滩"
+    },
+    "ATLPRV_18960": {
+      "en": "Alamein Flats",
+      "zh": "阿拉曼盐滩"
+    },
+    "ATLPRV_19158": {
+      "en": "Söke Flats",
+      "zh": "瑟凯盐滩"
+    },
+    "ATLPRV_19190": {
+      "en": "Milas Flats",
+      "zh": "米拉斯盐滩"
+    },
+    "ATLPRV_19191": {
+      "en": "Bodrum Flats",
+      "zh": "博德鲁姆盐滩"
     },
     "ATLPRV_19222": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Zara Flats",
+      "zh": "扎拉盐滩"
     },
     "ATLPRV_19575": {
-      "en": "Gulf of Gabes New Coast",
-      "zh": "加贝斯湾新岸"
+      "en": "West Gabès Flats",
+      "zh": "西加贝斯盐滩"
     },
     "ATLPRV_20006": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Abruzzo Flats",
+      "zh": "阿布鲁佐盐滩"
     },
     "ATLPRV_20008": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Romagna Flats",
+      "zh": "罗马涅盐滩"
     },
     "ATLPRV_20009": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Duino Flats",
+      "zh": "杜伊诺盐滩"
     },
     "ATLPRV_20010": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Trieste Flats",
+      "zh": "的里雅斯特盐滩"
+    },
+    "ATLSEA_FILL_adriatica_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_10": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_11": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_12": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_13": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_14": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_15": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_16": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_17": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_18": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_19": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_20": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_21": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_22": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_23": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_24": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_25": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_26": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_27": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_28": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_29": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_30": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_31": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_32": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_33": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_34": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_35": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_36": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_37": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_38": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_39": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_40": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_41": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_42": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_43": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_44": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_45": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_46": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_47": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_48": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_49": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_50": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_51": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_52": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_53": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_54": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_55": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_56": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_57": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_58": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_59": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_6": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_60": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_61": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_62": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_63": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_64": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_65": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_66": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_67": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_68": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_69": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_7": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_70": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_71": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_72": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_73": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_8": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_adriatica_9": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_10": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_11": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_12": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_13": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_14": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_15": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_16": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_17": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_18": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_19": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_20": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_21": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_22": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_23": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_24": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_25": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_26": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_27": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_28": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_29": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_30": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_31": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_32": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_33": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_34": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_35": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_36": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_37": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_38": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_39": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_40": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_41": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_42": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_43": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_44": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_45": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_46": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_47": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_48": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_49": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_50": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_51": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_52": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_53": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_54": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_55": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_6": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_7": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_8": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_aegean_9": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_gabes_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_gabes_10": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_gabes_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_gabes_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_gabes_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_gabes_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_gabes_6": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_gabes_7": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_gabes_8": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_gabes_9": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_10": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_11": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_12": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_13": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_14": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_15": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_16": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_17": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_6": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_7": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_8": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_levant_9": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_10": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_11": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_12": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_13": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_14": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_15": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_16": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_17": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_18": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_19": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_20": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_21": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_22": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_23": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_24": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_25": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_26": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_27": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_28": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_29": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_30": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_31": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_32": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_33": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_34": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_35": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_36": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_37": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_38": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_39": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_40": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_41": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_42": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_43": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_44": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_45": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_6": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_7": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_8": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_libya_suez_9": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_mediterranean_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_10": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_11": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_12": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_13": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_14": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_15": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_16": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_17": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_18": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_19": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_20": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_21": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_22": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_23": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_6": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_7": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_8": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_sicily_tunis_9": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_10": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_11": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_12": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_13": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_14": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_15": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_16": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_17": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_18": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_19": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_20": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_21": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_22": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_23": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_24": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_25": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_26": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_27": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_28": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_29": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_30": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_31": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_32": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_33": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_34": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_35": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_36": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_37": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_38": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_39": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_40": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_41": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_42": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_43": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_44": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_45": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_46": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_47": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_48": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_49": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_50": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_51": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_52": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_53": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_54": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_6": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_7": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_8": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_tyrrhenian_9": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_10": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_11": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_12": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_13": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_14": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_15": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_16": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_17": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_18": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_19": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_20": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_21": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_22": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_23": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_24": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_25": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_26": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_27": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_28": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_29": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_30": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_31": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_32": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_33": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_34": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_35": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_36": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_37": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_38": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_39": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_40": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_41": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_42": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_43": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_44": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_45": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_46": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_47": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_48": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_49": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_50": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_51": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_52": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_53": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_54": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_55": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_56": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_57": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_58": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_59": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_6": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_60": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_61": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_62": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_63": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_64": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_65": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_66": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_67": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_68": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_69": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_7": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_70": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_71": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_72": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_73": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_74": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_75": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_76": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_77": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_78": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_79": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_8": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_80": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_81": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_82": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_83": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_84": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_85": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_86": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_87": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_88": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_89": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_9": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_90": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_91": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_FILL_west_med_92": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_adriatica_8597_5838_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_adriatica_8601_5913_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_adriatica_8602_5864_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_adriatica_8602_5864_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_adriatica_8602_5864_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_adriatica_8604_5890_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_adriatica_8604_5890_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_adriatica_8604_5890_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_adriatica_8604_5890_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_adriatica_8604_5890_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8608_6608_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8608_6608_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8608_6608_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8610_225_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8610_225_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8610_225_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8619_428_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8619_428_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8619_428_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8619_428_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8620_1008_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8621_18217_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8621_18217_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8621_18217_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_aegean_8622_18221_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_gabes_8598_9013_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_gabes_8598_9013_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_gabes_8598_9013_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_levant_8609_7002_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_levant_8611_609_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_levant_8612_6219_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_levant_8613_803_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_levant_8614_6011_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_libya_suez_8605_9049_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_libya_suez_8614_6011_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_libya_suez_8615_5985_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_libya_suez_8617_5759_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_sicily_tunis_8591_8965_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_sicily_tunis_8592_5605_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_sicily_tunis_8592_5605_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_sicily_tunis_8598_9013_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_sicily_tunis_8600_5733_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_sicily_tunis_8600_5733_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_sicily_tunis_8600_5733_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_sicily_tunis_8600_5733_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_sicily_tunis_8603_5707_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8578_5579_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8579_5555_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8579_5555_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_10": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_11": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_12": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_13": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_14": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_15": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_16": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_17": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_18": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_19": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_6": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_7": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_8": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8588_5681_9": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_10": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_11": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_12": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_6": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_7": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_8": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8589_1452_9": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8590_5656_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8590_5656_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8590_5656_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8590_5656_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8590_5656_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8590_5656_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_tyrrhenian_8593_8895_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8577_5407_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8580_8918_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8580_8918_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8580_8918_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8580_8918_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8580_8918_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8580_8918_5": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8581_5505_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8582_5454_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8582_5454_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8582_5454_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8582_5454_3": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8582_5454_4": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8583_8793_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8583_8793_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8584_5431_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8585_8845_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8586_8871_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8586_8871_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8587_8819_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8594_5479_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8595_5531_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8595_5531_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8596_8941_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8596_8941_1": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_8596_8941_2": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
+    },
+    "ATLSEA_west_med_9040_18325_0": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
     },
     "ATLSHL_adriatica_1": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Goro Flats",
+      "zh": "戈罗盐滩"
     },
     "ATLSHL_adriatica_10": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Veglia Flats",
+      "zh": "韦利亚盐滩"
     },
     "ATLSHL_adriatica_11": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Zara Flats",
+      "zh": "扎拉盐滩"
     },
     "ATLSHL_adriatica_12": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Zara Flats",
+      "zh": "扎拉盐滩"
+    },
+    "ATLSHL_adriatica_13": {
+      "en": "Zara Flats",
+      "zh": "扎拉盐滩"
+    },
+    "ATLSHL_adriatica_14": {
+      "en": "Zara Flats",
+      "zh": "扎拉盐滩"
     },
     "ATLSHL_adriatica_15": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "North Epirus Flats",
+      "zh": "北伊庇鲁斯盐滩"
+    },
+    "ATLSHL_adriatica_16": {
+      "en": "Albanian Flats",
+      "zh": "阿尔巴尼亚盐滩"
     },
     "ATLSHL_adriatica_17": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Marche Flats",
+      "zh": "马尔凯盐滩"
     },
     "ATLSHL_adriatica_18": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Goro Flats",
+      "zh": "戈罗盐滩"
     },
     "ATLSHL_adriatica_19": {
       "en": "Adriatic Salt Basin",
       "zh": "亚得里亚盐盆地"
     },
+    "ATLSHL_adriatica_2": {
+      "en": "Duino Flats",
+      "zh": "杜伊诺盐滩"
+    },
+    "ATLSHL_adriatica_20": {
+      "en": "Adriatic Flats",
+      "zh": "亚得里亚盐滩"
+    },
+    "ATLSHL_adriatica_3": {
+      "en": "Duino Flats",
+      "zh": "杜伊诺盐滩"
+    },
     "ATLSHL_adriatica_4": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Adriatic Flats",
+      "zh": "亚得里亚盐滩"
     },
     "ATLSHL_adriatica_5": {
       "en": "Adriatic Salt Basin",
       "zh": "亚得里亚盐盆地"
     },
+    "ATLSHL_adriatica_6": {
+      "en": "Fiume Flats",
+      "zh": "阜姆盐滩"
+    },
     "ATLSHL_adriatica_7": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Fiume Flats",
+      "zh": "阜姆盐滩"
     },
     "ATLSHL_adriatica_8": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Veglia Flats",
+      "zh": "韦利亚盐滩"
     },
     "ATLSHL_adriatica_9": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Veglia Flats",
+      "zh": "韦利亚盐滩"
+    },
+    "ATLSHL_aegean_1": {
+      "en": "Gelibolu Flats",
+      "zh": "盖利博卢盐滩"
+    },
+    "ATLSHL_aegean_10": {
+      "en": "Chalkidiki Flats",
+      "zh": "哈尔基季基盐滩"
+    },
+    "ATLSHL_aegean_11": {
+      "en": "Chalkidiki Flats",
+      "zh": "哈尔基季基盐滩"
     },
     "ATLSHL_aegean_12": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Thracian Flats",
+      "zh": "色雷斯盐滩"
     },
     "ATLSHL_aegean_13": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Thracian Flats",
+      "zh": "色雷斯盐滩"
     },
     "ATLSHL_aegean_14": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Thracian Flats",
+      "zh": "色雷斯盐滩"
     },
     "ATLSHL_aegean_15": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Poros Flats",
+      "zh": "波罗斯盐滩"
     },
     "ATLSHL_aegean_16": {
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
     },
     "ATLSHL_aegean_17": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Attica Flats",
+      "zh": "阿提卡盐滩"
     },
     "ATLSHL_aegean_18": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Poros Flats",
+      "zh": "波罗斯盐滩"
+    },
+    "ATLSHL_aegean_19": {
+      "en": "Poros Flats",
+      "zh": "波罗斯盐滩"
+    },
+    "ATLSHL_aegean_2": {
+      "en": "Gelibolu Flats",
+      "zh": "盖利博卢盐滩"
     },
     "ATLSHL_aegean_20": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Poros Flats",
+      "zh": "波罗斯盐滩"
+    },
+    "ATLSHL_aegean_21": {
+      "en": "East Morea Flats",
+      "zh": "东摩里亚盐滩"
     },
     "ATLSHL_aegean_22": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "East Morea Flats",
+      "zh": "东摩里亚盐滩"
     },
     "ATLSHL_aegean_23": {
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
     },
     "ATLSHL_aegean_24": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Kythira Flats",
+      "zh": "基西拉盐滩"
     },
     "ATLSHL_aegean_25": {
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
     },
+    "ATLSHL_aegean_27": {
+      "en": "Ionian Flats",
+      "zh": "爱奥尼亚盐滩"
+    },
+    "ATLSHL_aegean_28": {
+      "en": "Ionian Flats",
+      "zh": "爱奥尼亚盐滩"
+    },
+    "ATLSHL_aegean_29": {
+      "en": "Ionian Flats",
+      "zh": "爱奥尼亚盐滩"
+    },
+    "ATLSHL_aegean_3": {
+      "en": "Gelibolu Flats",
+      "zh": "盖利博卢盐滩"
+    },
+    "ATLSHL_aegean_31": {
+      "en": "Kythira Flats",
+      "zh": "基西拉盐滩"
+    },
+    "ATLSHL_aegean_32": {
+      "en": "Poros Flats",
+      "zh": "波罗斯盐滩"
+    },
+    "ATLSHL_aegean_33": {
+      "en": "Bodrum Flats",
+      "zh": "博德鲁姆盐滩"
+    },
+    "ATLSHL_aegean_4": {
+      "en": "Gelibolu Flats",
+      "zh": "盖利博卢盐滩"
+    },
+    "ATLSHL_aegean_5": {
+      "en": "Milas Flats",
+      "zh": "米拉斯盐滩"
+    },
     "ATLSHL_aegean_6": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Bodrum Flats",
+      "zh": "博德鲁姆盐滩"
     },
     "ATLSHL_aegean_7": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Bodrum Flats",
+      "zh": "博德鲁姆盐滩"
+    },
+    "ATLSHL_aegean_8": {
+      "en": "Chalkidiki Flats",
+      "zh": "哈尔基季基盐滩"
     },
     "ATLSHL_gabes_1": {
-      "en": "Gulf of Gabes New Coast",
-      "zh": "加贝斯湾新岸"
+      "en": "West Gabès Flats",
+      "zh": "西加贝斯盐滩"
     },
     "ATLSHL_gabes_3": {
       "en": "Gulf of Gabes New Coast",
@@ -685,17 +2977,41 @@
       "en": "Levantine New Coast",
       "zh": "黎凡特新海岸"
     },
+    "ATLSHL_levant_2": {
+      "en": "Lebanese Flats",
+      "zh": "黎巴嫩盐滩"
+    },
+    "ATLSHL_levant_3": {
+      "en": "Gaza Flats",
+      "zh": "加沙盐滩"
+    },
+    "ATLSHL_levant_4": {
+      "en": "Gaza Flats",
+      "zh": "加沙盐滩"
+    },
     "ATLSHL_levant_5": {
-      "en": "Levantine New Coast",
-      "zh": "黎凡特新海岸"
+      "en": "Sinai Flats",
+      "zh": "西奈盐滩"
+    },
+    "ATLSHL_levant_7": {
+      "en": "Sinai Flats",
+      "zh": "西奈盐滩"
+    },
+    "ATLSHL_levant_8": {
+      "en": "Sinai Flats",
+      "zh": "西奈盐滩"
+    },
+    "ATLSHL_levant_9": {
+      "en": "Sinai Flats",
+      "zh": "西奈盐滩"
     },
     "ATLSHL_libya_suez_1": {
-      "en": "Libyan-Suez New Coast",
-      "zh": "利比亚—苏伊士新岸"
+      "en": "Sidi Barrani Flats",
+      "zh": "西迪拜拉尼盐滩"
     },
     "ATLSHL_libya_suez_2": {
-      "en": "Libyan-Suez New Coast",
-      "zh": "利比亚—苏伊士新岸"
+      "en": "Tripoli Flats",
+      "zh": "的黎波里盐滩"
     },
     "ATLSHL_libya_suez_3": {
       "en": "Libyan-Suez New Coast",
@@ -710,24 +3026,24 @@
       "zh": "利比亚—苏伊士新岸"
     },
     "ATLSHL_sicily_tunis_1": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Sicilian Canal",
+      "zh": "西西里运河"
     },
     "ATLSHL_sicily_tunis_2": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Sicilian Dam West",
+      "zh": "西西里大坝西段"
     },
     "ATLSHL_sicily_tunis_3": {
-      "en": "Sicilian-Tunisian Salt Flats",
-      "zh": "西西里—突尼斯盐原"
+      "en": "Bizerte Flats",
+      "zh": "比塞大盐滩"
     },
     "ATLSHL_sicily_tunis_4": {
       "en": "Sicilian-Tunisian Salt Flats",
       "zh": "西西里—突尼斯盐原"
     },
     "ATLSHL_tyrrhenian_1": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Calabria Flats",
+      "zh": "卡拉布里亚盐滩"
     },
     "ATLSHL_tyrrhenian_10": {
       "en": "Tyrrhenian New Coast",
@@ -770,36 +3086,52 @@
       "zh": "第勒尼安新海岸"
     },
     "ATLSHL_tyrrhenian_3": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Cosenza Flats",
+      "zh": "科森扎盐滩"
     },
     "ATLSHL_tyrrhenian_4": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Campanian Flats",
+      "zh": "坎帕尼亚盐滩"
     },
     "ATLSHL_tyrrhenian_5": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Campanian Flats",
+      "zh": "坎帕尼亚盐滩"
     },
     "ATLSHL_tyrrhenian_6": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Lazio Flats",
+      "zh": "拉齐奥盐滩"
     },
     "ATLSHL_tyrrhenian_7": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Genoa Flats",
+      "zh": "热那亚盐滩"
     },
     "ATLSHL_tyrrhenian_8": {
-      "en": "Tyrrhenian New Coast",
-      "zh": "第勒尼安新海岸"
+      "en": "Monaco Flats",
+      "zh": "摩纳哥盐滩"
     },
     "ATLSHL_tyrrhenian_9": {
       "en": "Tyrrhenian New Coast",
       "zh": "第勒尼安新海岸"
     },
+    "ATLSHL_west_med_2": {
+      "en": "Algerian Flats",
+      "zh": "阿尔及利亚盐滩"
+    },
+    "ATLSHL_west_med_3": {
+      "en": "Algerian Flats",
+      "zh": "阿尔及利亚盐滩"
+    },
     "ATLSHL_west_med_5": {
-      "en": "Western Mediterranean New Coast",
-      "zh": "西地中海新岸"
+      "en": "Catalan Flats",
+      "zh": "加泰罗尼亚盐滩"
+    },
+    "ATLSHL_west_med_6": {
+      "en": "Ceuta Flats",
+      "zh": "休达盐滩"
+    },
+    "ATLSHL_west_med_9": {
+      "en": "Constantine Flats",
+      "zh": "君士坦丁盐滩"
     },
     "ATLWLD_adriatica_10": {
       "en": "Adriatic Salt Basin",
@@ -821,6 +3153,10 @@
       "en": "Adriatic Salt Basin",
       "zh": "亚得里亚盐盆地"
     },
+    "ATLWLD_adriatica_19": {
+      "en": "Istria Flats",
+      "zh": "伊斯特拉盐滩"
+    },
     "ATLWLD_adriatica_190": {
       "en": "Adriatic Salt Basin",
       "zh": "亚得里亚盐盆地"
@@ -830,24 +3166,24 @@
       "zh": "亚得里亚盐盆地"
     },
     "ATLWLD_adriatica_20": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Zara Flats",
+      "zh": "扎拉盐滩"
     },
     "ATLWLD_adriatica_21": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Goro Flats",
+      "zh": "戈罗盐滩"
     },
     "ATLWLD_adriatica_210": {
       "en": "Adriatic Salt Basin",
       "zh": "亚得里亚盐盆地"
     },
     "ATLWLD_adriatica_23": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Goro Flats",
+      "zh": "戈罗盐滩"
     },
     "ATLWLD_adriatica_24": {
-      "en": "Adriatic Salt Basin",
-      "zh": "亚得里亚盐盆地"
+      "en": "Duino Flats",
+      "zh": "杜伊诺盐滩"
     },
     "ATLWLD_adriatica_30": {
       "en": "Adriatic Salt Basin",
@@ -1005,6 +3341,10 @@
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
     },
+    "ATLWLD_aegean_21": {
+      "en": "Kythira Flats",
+      "zh": "基西拉盐滩"
+    },
     "ATLWLD_aegean_28": {
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
@@ -1057,6 +3397,10 @@
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
     },
+    "ATLWLD_aegean_51": {
+      "en": "Thracian Flats",
+      "zh": "色雷斯盐滩"
+    },
     "ATLWLD_aegean_52": {
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
@@ -1102,12 +3446,16 @@
       "zh": "爱琴海群岛与新岸"
     },
     "ATLWLD_aegean_88": {
-      "en": "Aegean Islands and New Coast",
-      "zh": "爱琴海群岛与新岸"
+      "en": "Ionian Flats",
+      "zh": "爱奥尼亚盐滩"
     },
     "ATLWLD_aegean_89": {
       "en": "Aegean Islands and New Coast",
       "zh": "爱琴海群岛与新岸"
+    },
+    "ATLWLD_aegean_90": {
+      "en": "Poros Flats",
+      "zh": "波罗斯盐滩"
     },
     "ATLWLD_aegean_91": {
       "en": "Aegean Islands and New Coast",
