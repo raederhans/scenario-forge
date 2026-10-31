@@ -61083,6 +61083,70 @@
       "en": "Mashonaland West",
       "zh": "西马绍纳兰"
     },
+    "atlantropa_adriatica_salt_basin": {
+      "en": "Adriatic Basin",
+      "zh": "亚得里亚海盆"
+    },
+    "atlantropa_adriatica_salt_basin_sea": {
+      "en": "Adriatic Sea",
+      "zh": "亚得里亚海"
+    },
+    "atlantropa_aegean_and_islands": {
+      "en": "Aegean Basin",
+      "zh": "爱琴海盆"
+    },
+    "atlantropa_aegean_and_islands_sea": {
+      "en": "Aegean Sea",
+      "zh": "爱琴海"
+    },
+    "atlantropa_gulf_of_gabes_exposure": {
+      "en": "Gabès Basin",
+      "zh": "加贝斯海盆"
+    },
+    "atlantropa_gulf_of_gabes_exposure_sea": {
+      "en": "Gulf of Gabès",
+      "zh": "加贝斯湾"
+    },
+    "atlantropa_levantine_retreat_margin": {
+      "en": "Levantine Basin",
+      "zh": "黎凡特海盆"
+    },
+    "atlantropa_levantine_retreat_margin_sea": {
+      "en": "Levantine Sea",
+      "zh": "黎凡特海"
+    },
+    "atlantropa_libya_suez_and_qattara": {
+      "en": "Libyan Basin",
+      "zh": "利比亚海盆"
+    },
+    "atlantropa_libya_suez_and_qattara_sea": {
+      "en": "Libyan Sea",
+      "zh": "利比亚海"
+    },
+    "atlantropa_sicily_tunis_salt_shelf": {
+      "en": "Sicilian Shelf",
+      "zh": "西西里陆架"
+    },
+    "atlantropa_sicily_tunis_salt_shelf_sea": {
+      "en": "Strait of Sicily",
+      "zh": "西西里海峡"
+    },
+    "atlantropa_tyrrhenian_and_west_italy": {
+      "en": "Tyrrhenian Basin",
+      "zh": "第勒尼安海盆"
+    },
+    "atlantropa_tyrrhenian_and_west_italy_sea": {
+      "en": "Tyrrhenian Sea",
+      "zh": "第勒尼安海"
+    },
+    "atlantropa_west_mediterranean_margin": {
+      "en": "Western Basin",
+      "zh": "西地中海盆"
+    },
+    "atlantropa_west_mediterranean_margin_sea": {
+      "en": "Western Mediterranean",
+      "zh": "西地中海"
+    },
     "id::CITY::gn::10294260": {
       "en": "Stella",
       "zh": "斯泰拉"
@@ -75150,6 +75214,10 @@
     "id::PA_ADM1_PAN-1340__SPLIT_REST": {
       "en": "Panamá · Panama",
       "zh": "巴拿马 · 巴拿马"
+    },
+    "mediterranean_sea": {
+      "en": "Mediterranean Sea",
+      "zh": "地中海"
     }
   },
   "scenario_id": "tno_1962",

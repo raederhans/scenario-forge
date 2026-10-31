@@ -8,12 +8,12 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from map_builder.scenario_capital_rules import apply_reviewed_capitals
+from map_builder.scenario_capital_rules import REVIEWED_CITY_NAMES, apply_reviewed_capitals
 from map_builder.scenario_city_overrides_composer import build_capital_overrides_payload_from_capital_hints
 from map_builder.scenario_capital_placement import place_capital_markers, read_political_features
 
 TNO_CITY_ROWS = {f"CITY::ne::{ne_id}": {"id": f"CITY::ne::{ne_id}"}
-                 for ne_id in ("1159151523", "1159150965", "1159151567")}
+                 for ne_id in REVIEWED_CITY_NAMES["tno_1962"]}
 
 
 class ScenarioCapitalRulesTest(unittest.TestCase):
@@ -129,8 +129,8 @@ class ScenarioCapitalRulesTest(unittest.TestCase):
             "1159150969": ("Alma-Ata", "阿拉木图"),
             "1159151523": ("Keijō", "京城"),
         }
-        city_rows = {f"CITY::ne::{ne_id}": {"id": f"CITY::ne::{ne_id}"}
-                     for ne_id in modern_names}
+        city_rows = {**TNO_CITY_ROWS, **{f"CITY::ne::{ne_id}": {"id": f"CITY::ne::{ne_id}"}
+                                         for ne_id in modern_names}}
         payload = {
             "capitals_by_tag": {},
             "capital_city_hints": {"PEK": {

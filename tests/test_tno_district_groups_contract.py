@@ -74,7 +74,7 @@ class TnoDistrictGroupsContractTest(unittest.TestCase):
     def test_south_italian_districts_and_cyprus(self) -> None:
         districts = self.payload["tags"]["ITA"]["districts"]
         for district_id, count in {"egeo": 8, "isole_ionie": 4, "lubiana": 2,
-                                   "dalmazia": 21, "malta": 1}.items():
+                                   "dalmazia": 30, "malta": 1}.items():
             self.assertEqual(len(districts[district_id]["feature_ids"]), count, district_id)
         self.assertEqual(set(districts["lubiana"]["feature_ids"]), {"SI041", "SI037"})
         self.assertNotIn("cyprus", self.payload["tags"]["TUR"]["districts"])
