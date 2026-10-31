@@ -1,5 +1,61 @@
 {
   "assignments": {
+    "AD_ADM1_AND-4876": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4877": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4878": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4879": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4880": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4881": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4882": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
     "AL011": {
       "controller": "ALB",
       "cores": [
@@ -229,18 +285,18 @@
       "owner": "SWAO"
     },
     "ATLISL_adriatica_CRO_3": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLISL_adriatica_CRO_9": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLISL_adriatica_ITA_1": {
       "controller": "ALB",
@@ -250,53 +306,116 @@
       "owner": "ALB"
     },
     "ATLISL_adriatica_corfu": {
-      "controller": "ALB",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "ALB"
+      "owner": "ITA"
     },
     "ATLISL_adriatica_source_1af38019baedda5939dd391c62a69c3e4687fd812f5f841ddea7617a27cd5329": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLISL_adriatica_source_6a9986e29faf7cb22d4301d7445f86e4fa61560d2751849c61dbc37751fb30d9": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLISL_adriatica_source_6f08765428359e34bbe6ee4bd2408e4f873f99f1d1af174794864a959e53d944": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLISL_adriatica_source_7fba784b3f440f9c3fe16eb804d519630d6c42c1c3fe5d3be9b862186315907f": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLISL_adriatica_source_a282019b69d82d874a525940168b347a2dc3c6b6a7b41a7c5c332b0b8e21d09d": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
+    },
+    "ATLISL_aegean_GRE_23": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_GRE_25": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_GRE_26": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_GRE_27": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_rhodes": {
+      "controller": "ITA",
+      "cores": [
+        "TUR"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_source_2efc11d76fa75115aa5d752976a1688549d79a4a6e009e59719cc5bcf57abd9f": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_source_3d305c15511d75f8c4c2981e57b4d4f1252e8b56ef737f48c5f4b97a86d30968": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_source_a91b3ea3d1ce93dee5899d23455ad3aee7fe8dbc8fd703f2d67b0285de3a3db8": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_levant_cyprus": {
+      "controller": "GRE",
+      "cores": [
+        "TUR"
+      ],
+      "owner": "GRE"
     },
     "ATLPRV_11856": {
       "controller": "ALB",
@@ -338,32 +457,32 @@
       "owner": "ALB"
     },
     "ATLPRV_18235": {
-      "controller": "IDAL",
+      "controller": "ALB",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ALB"
     },
     "ATLPRV_18254": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLPRV_18260": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLPRV_18263": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLPRV_18348": {
       "controller": "ALB",
@@ -380,60 +499,60 @@
       "owner": "ALB"
     },
     "ATLPRV_18380": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLPRV_19222": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLPRV_20006": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLSHL_adriatica_10": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_11": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLSHL_adriatica_12": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLSHL_adriatica_13": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_14": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_15": {
       "controller": "ALB",
@@ -450,46 +569,46 @@
       "owner": "ALB"
     },
     "ATLSHL_adriatica_20": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_4": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_6": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_7": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_8": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_9": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_west_med_5": {
       "cores": [
@@ -498,11 +617,11 @@
       "owner": "IBR"
     },
     "ATLWLD_adriatica_20": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "AZE-1676": {
       "controller": "RKK",
@@ -1381,6 +1500,20 @@
         "NRB"
       ],
       "owner": "NRB"
+    },
+    "BO_ADM1_BOL-1940": {
+      "controller": "STC",
+      "cores": [
+        "BOL"
+      ],
+      "owner": "STC"
+    },
+    "BS": {
+      "controller": "BAH",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "BAH"
     },
     "BW_ADM1_BWA-1191": {
       "controller": "BTS",
@@ -3790,10 +3923,87 @@
       ],
       "owner": "CHI"
     },
+    "CO_ADM1_COL-1315": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1400": {
+      "controller": "CLC",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLC"
+    },
+    "CO_ADM1_COL-1404": {
+      "controller": "CLC",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLC"
+    },
+    "CO_ADM1_COL-1406": {
+      "controller": "CLC",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLC"
+    },
+    "CO_ADM1_COL-1408": {
+      "controller": "CLC",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLC"
+    },
+    "CO_ADM1_COL-1420": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
     "CO_ADM1_COL-1422": {
       "controller": "CLL",
       "cores": [
         "CLL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1423": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1424": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1425": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1426": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1427": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
       ],
       "owner": "CLL"
     },
@@ -4421,6 +4631,20 @@
       ],
       "owner": "ISUE"
     },
+    "EL621": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "EL623": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
     "ER_ADM1_ERI-1560": {
       "controller": "IERI",
       "cores": [
@@ -4849,11 +5073,11 @@
       "owner": "RKK"
     },
     "GF_PRIMARY": {
-      "controller": "GY",
+      "controller": "GUC",
       "cores": [
-        "GY"
+        "GUC"
       ],
-      "owner": "GY"
+      "owner": "GUC"
     },
     "GH_ADM1_GHA-2155": {
       "controller": "GHA",
@@ -5023,6 +5247,20 @@
       ],
       "owner": "GUI"
     },
+    "GR_ADM1_GRC-2883": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "GR_ADM1_GRC-2992": {
+      "controller": "GRE",
+      "cores": [
+        "BUL"
+      ],
+      "owner": "GRE"
+    },
     "GW_ADM1_GNB-5500": {
       "controller": "IGUI",
       "cores": [
@@ -5096,53 +5334,60 @@
       "owner": "IGUI"
     },
     "HR031": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "HR032": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "HR033": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "HR034": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "HR035": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "HR036": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "HR037": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
+    },
+    "HT_ADM1_HTI-1385": {
+      "controller": "DOM",
+      "cores": [
+        "HAI"
+      ],
+      "owner": "DOM"
     },
     "IN_ADM2_76128533B15567489974292": {
       "controller": "RAJ",
@@ -5935,6 +6180,13 @@
       ],
       "owner": "AZH"
     },
+    "JM": {
+      "controller": "JAM",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "JAM"
+    },
     "KE_ADM1_KEN-1193": {
       "controller": "IKEN",
       "cores": [
@@ -6224,46 +6476,67 @@
       "owner": "OE00"
     },
     "ME_ADM1_MNE-1496": {
-      "controller": "IDAL",
+      "controller": "MNT",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "MNT"
     },
     "ME_ADM1_MNE-1497": {
-      "controller": "IDAL",
+      "controller": "ALB",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "ALB"
     },
     "ME_ADM1_MNE-1499": {
-      "controller": "IDAL",
+      "controller": "MNT",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "MNT"
+    },
+    "ME_ADM1_MNE-1501": {
+      "controller": "ALB",
+      "cores": [
+        "MNT"
+      ],
+      "owner": "ALB"
+    },
+    "ME_ADM1_MNE-1503": {
+      "controller": "ALB",
+      "cores": [
+        "MNT"
+      ],
+      "owner": "ALB"
     },
     "ME_ADM1_MNE-1506": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ME_ADM1_MNE-1507": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ME_ADM1_MNE-1518": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
+    },
+    "MK006": {
+      "controller": "ALB",
+      "cores": [
+        "BUL"
+      ],
+      "owner": "ALB"
     },
     "ML_ADM1_MLI-2688": {
       "controller": "AZW",
@@ -7163,6 +7436,34 @@
       ],
       "owner": "RAJ"
     },
+    "PA_ADM1_PAN-1337__SPLIT_PCZ": {
+      "controller": "PCZ",
+      "cores": [
+        "PAN"
+      ],
+      "owner": "PCZ"
+    },
+    "PA_ADM1_PAN-1337__SPLIT_REST": {
+      "controller": "PAN",
+      "cores": [
+        "PAN"
+      ],
+      "owner": "PAN"
+    },
+    "PA_ADM1_PAN-1340__SPLIT_PCZ": {
+      "controller": "PCZ",
+      "cores": [
+        "PAN"
+      ],
+      "owner": "PCZ"
+    },
+    "PA_ADM1_PAN-1340__SPLIT_REST": {
+      "controller": "PAN",
+      "cores": [
+        "PAN"
+      ],
+      "owner": "PAN"
+    },
     "PHL-2511": {
       "controller": "UPH",
       "cores": [
@@ -7892,10 +8193,11 @@
       "owner": "RKP"
     },
     "RS228": {
+      "controller": "BUL",
       "cores": [
         "SER"
       ],
-      "owner": "SER"
+      "owner": "BUL"
     },
     "RU_CITY_ARKHANGELSK": {
       "cores": [
@@ -12734,6 +13036,27 @@
       ],
       "owner": "SHO"
     },
+    "SI031": {
+      "controller": "HUN",
+      "cores": [
+        "GER"
+      ],
+      "owner": "HUN"
+    },
+    "SI037": {
+      "controller": "ITA",
+      "cores": [
+        "GER"
+      ],
+      "owner": "ITA"
+    },
+    "SI041": {
+      "controller": "ITA",
+      "cores": [
+        "GER"
+      ],
+      "owner": "ITA"
+    },
     "SK_MRG_351edc5a6c69": {
       "controller": "SLO",
       "cores": [
@@ -12812,58 +13135,67 @@
       "owner": "SIE"
     },
     "SM_ADM1_SMR-4883": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4884": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4885": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4886": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4887": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4888": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4889": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4890": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4891": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SN_ADM1_SEN-5514": {
       "controller": "SEN",
@@ -13411,6 +13743,13 @@
         "IBR"
       ],
       "owner": "ITIM"
+    },
+    "TT": {
+      "controller": "TRI",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "TRI"
     },
     "TWN-1156": {
       "controller": "JTWN",
@@ -16806,11 +17145,173 @@
       ],
       "owner": "VIC"
     },
-    "XK_ADM1_KOS-5909": {
+    "XK_ADM1_KOS-5886": {
+      "controller": "ALB",
       "cores": [
         "SER"
       ],
-      "owner": "SER"
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5887": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5888": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5889": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5890": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5891": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5896": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5897": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5898": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5899": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5902": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5903": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5904": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5905": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5906": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5907": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5908": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5909": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5910": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5911": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5912": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5913": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5914": {
+      "controller": "BUL",
+      "cores": [
+        "SER"
+      ],
+      "owner": "BUL"
+    },
+    "XK_ADM1_KOS-5915": {
+      "controller": "BUL",
+      "cores": [
+        "SER"
+      ],
+      "owner": "BUL"
     },
     "ZM_ADM1_ZMB-514": {
       "controller": "GEAZ",
@@ -16975,33 +17476,35 @@
   },
   "countries": {
     "ALB": {
-      "base_iso2": "AL",
+      "base_iso2": "XK",
       "capital_state_id": null,
       "color_hex": "#5a7a4a",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 21,
+      "controller_feature_count": 47,
       "display_name": "Italian Protectorate of Albania",
       "display_name_en": "Italian Protectorate of Albania",
       "display_name_zh": "意属阿尔巴尼亚保护国",
       "entry_kind": "scenario_subject",
-      "feature_count": 21,
+      "feature_count": 47,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
-      "lookup_iso2": "AL",
+      "lookup_iso2": "XK",
       "notes": "",
       "parent_owner_tag": "ITA",
       "parent_owner_tags": [
         "ITA"
       ],
       "primary_rule_source": "tno_alb",
-      "provenance_iso2": "AL",
+      "provenance_iso2": "XK",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_alb"
+        "tno_alb",
+        "tno_south_albanian_border",
+        "tno_south_idal_to_alb"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -17244,6 +17747,47 @@
       "synthetic_owner": false,
       "tag": "AZW"
     },
+    "BAH": {
+      "base_iso2": "BS",
+      "capital_state_id": null,
+      "color_hex": "#ad5252",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 1,
+      "display_name": "Bahamas",
+      "display_name_en": "Bahamas",
+      "display_name_zh": "巴哈马",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BS",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "tno_south_bah",
+      "provenance_iso2": "BS",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_bah"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "synthetic_owner": false,
+      "tag": "BAH"
+    },
     "BHU": {
       "display_name": "Bhutan",
       "display_name_en": "Bhutan",
@@ -17302,6 +17846,50 @@
       "inspector_group_label": "Russia Region",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "BLZ": {
+      "base_iso2": "BZ",
+      "capital_state_id": null,
+      "color_hex": "#923643",
+      "color_policy": "locked",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 6,
+      "display_name": "Belize",
+      "display_name_en": "Belize",
+      "display_name_zh": "伯利兹",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BZ",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "tno_1962_decolonization_blz",
+      "provenance_iso2": "BZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_1962_decolonization_blz",
+        "tno_south_blz"
+      ],
+      "scenario_only": false,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_central_america",
+      "subregion_label": "Central America",
+      "synthetic_owner": false,
+      "tag": "BLZ"
     },
     "BOL": {
       "color_hex": "#8d705d",
@@ -17396,11 +17984,44 @@
       "tag": "BTS"
     },
     "BUL": {
+      "base_iso2": "BG",
+      "capital_state_id": 48,
+      "color_hex": "#785d5d",
+      "color_policy": "palette",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 49,
       "display_name": "Bulgaria",
       "display_name_en": "Bulgaria",
       "display_name_zh": "保加利亚沙皇国",
-      "mode": "override",
-      "parent_owner_tag": ""
+      "entry_kind": "",
+      "feature_count": 49,
+      "featured": true,
+      "historical_fidelity": "tno_baseline",
+      "historical_fidelity_summary": [
+        "tno_baseline"
+      ],
+      "lookup_iso2": "BG",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "",
+      "provenance_iso2": "BG",
+      "quality": "direct_country_copy",
+      "rule_sources": [
+        "tno_south_bul"
+      ],
+      "scenario_only": false,
+      "source": "direct_active_owner",
+      "source_type": "tno_baseline",
+      "source_types": [
+        "tno_baseline"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "BUL"
     },
     "BUR": {
       "color_hex": "#a05361",
@@ -17417,11 +18038,6 @@
       "display_name_zh": "英属西非领地",
       "mode": "override",
       "parent_owner_tag": ""
-    },
-    "BZ": {
-      "color_hex": "#963f4d",
-      "color_policy": "locked",
-      "mode": "override"
     },
     "CAM": {
       "display_name": "Cambodia",
@@ -17790,17 +18406,58 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "CLC": {
+      "base_iso2": "CO",
+      "capital_state_id": null,
+      "color_hex": "#1967b3",
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "controller_feature_count": 4,
+      "display_name": "New Granada",
+      "display_name_en": "New Granada",
+      "display_name_zh": "新格拉纳达",
+      "entry_kind": "scenario_country",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CO",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_south_clc",
+      "provenance_iso2": "CO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_clc"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "synthetic_owner": false,
+      "tag": "CLC"
+    },
     "CLL": {
       "base_iso2": "CO",
       "capital_state_id": null,
       "color_hex": "#bf0000",
       "color_policy": "palette",
-      "controller_feature_count": 0,
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "controller_feature_count": 8,
       "display_name": "Colombian Revolutionary Union",
       "display_name_en": "Colombian Revolutionary Union",
       "display_name_zh": "哥伦比亚革命联盟",
       "entry_kind": "scenario_country",
-      "feature_count": 0,
+      "feature_count": 8,
       "featured": false,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
@@ -17815,7 +18472,8 @@
       "provenance_iso2": "CO",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "dev_manual_tag_create"
+        "dev_manual_tag_create",
+        "tno_south_cll"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -17824,6 +18482,8 @@
         "scenario_extension"
       ],
       "subject_kind": "",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
       "synthetic_owner": false,
       "tag": "CLL"
     },
@@ -17886,6 +18546,49 @@
       "synthetic_owner": false,
       "tag": "CRI"
     },
+    "CRO": {
+      "base_iso2": "HR",
+      "capital_state_id": 109,
+      "color_hex": "#806977",
+      "color_policy": "palette",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 34,
+      "display_name": "Independent State of Croatia",
+      "display_name_en": "Independent State of Croatia",
+      "display_name_zh": "克罗地亚独立国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 34,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "HR",
+      "notes": "Italy-aligned South Slav client state baseline for tno_1962.",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_italy_cro",
+      "provenance_iso2": "HR",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_italy_cro",
+        "tno_south_idal_to_cro"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "client_state",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "CRO"
+    },
     "CUB": {
       "display_name": "Cuba",
       "display_name_en": "Cuba",
@@ -17935,9 +18638,44 @@
       "tag": "DAH"
     },
     "DOM": {
+      "base_iso2": "DO",
+      "capital_state_id": 319,
       "color_hex": "#ae693f",
       "color_policy": "locked",
-      "mode": "override"
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 33,
+      "display_name": "Dominican Republic",
+      "display_name_en": "Dominican Republic",
+      "display_name_zh": "多米尼加共和国",
+      "entry_kind": "",
+      "feature_count": 33,
+      "featured": false,
+      "historical_fidelity": "tno_baseline",
+      "historical_fidelity_summary": [
+        "tno_baseline"
+      ],
+      "lookup_iso2": "DO",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "",
+      "provenance_iso2": "DO",
+      "quality": "direct_country_copy",
+      "rule_sources": [
+        "tno_south_dom"
+      ],
+      "scenario_only": false,
+      "source": "direct_active_owner",
+      "source_type": "tno_baseline",
+      "source_types": [
+        "tno_baseline"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "synthetic_owner": false,
+      "tag": "DOM"
     },
     "ECU": {
       "color_hex": "#6c8cc3",
@@ -18564,6 +19302,49 @@
       "mode": "override",
       "parent_owner_tag": "JAP"
     },
+    "GRE": {
+      "base_iso2": "ATL",
+      "capital_state_id": 47,
+      "color_hex": "#799f99",
+      "color_policy": "palette",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 96,
+      "display_name": "Greek Protectorate",
+      "display_name_en": "Greek Protectorate",
+      "display_name_zh": "希腊保护国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 96,
+      "featured": false,
+      "historical_fidelity": "tno_baseline",
+      "historical_fidelity_summary": [
+        "tno_baseline"
+      ],
+      "lookup_iso2": "ATL",
+      "notes": "Italian protectorate baseline for mainland Greece in tno_1962.",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_italy_gre",
+      "provenance_iso2": "ATL",
+      "quality": "direct_country_copy",
+      "rule_sources": [
+        "tno_italy_gre",
+        "tno_south_gre"
+      ],
+      "scenario_only": true,
+      "source": "direct_active_owner",
+      "source_type": "tno_baseline",
+      "source_types": [
+        "tno_baseline"
+      ],
+      "subject_kind": "protectorate",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "GRE"
+    },
     "GUA": {
       "color_hex": "#9c92a6",
       "color_policy": "locked",
@@ -18572,6 +19353,47 @@
       "display_name_zh": "危地马拉共和国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "GUC": {
+      "base_iso2": "GF",
+      "capital_state_id": null,
+      "color_hex": "#879f5d",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 1,
+      "display_name": "Guiana-Caiena",
+      "display_name_en": "Guiana-Caiena",
+      "display_name_zh": "圭亚那-卡宴",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GF",
+      "notes": "",
+      "parent_owner_tag": "BRA",
+      "parent_owner_tags": [
+        "BRA"
+      ],
+      "primary_rule_source": "tno_south_guc",
+      "provenance_iso2": "GF",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_guc"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "military_administration",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "GUC"
     },
     "GUI": {
       "base_iso2": "GN",
@@ -18615,6 +19437,50 @@
       "synthetic_owner": false,
       "tag": "GUI"
     },
+    "GUY": {
+      "base_iso2": "GY",
+      "capital_state_id": null,
+      "color_hex": "#9f525c",
+      "color_policy": "locked",
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "controller_feature_count": 10,
+      "display_name": "British Guiana",
+      "display_name_en": "British Guiana",
+      "display_name_zh": "英属圭亚那",
+      "entry_kind": "scenario_subject",
+      "feature_count": 10,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GY",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "tno_1962_decolonization_guy",
+      "provenance_iso2": "GY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_1962_decolonization_guy",
+        "tno_south_guy"
+      ],
+      "scenario_only": false,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "synthetic_owner": false,
+      "tag": "GUY"
+    },
     "GUZ": {
       "color_hex": "#96637a",
       "color_policy": "locked",
@@ -18622,11 +19488,6 @@
     },
     "GXC": {
       "color_hex": "#894a52",
-      "color_policy": "locked",
-      "mode": "override"
-    },
-    "GY": {
-      "color_hex": "#8e2c3d",
       "color_policy": "locked",
       "mode": "override"
     },
@@ -18688,6 +19549,48 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "HUN": {
+      "base_iso2": "HU",
+      "capital_state_id": 43,
+      "color_hex": "#af684f",
+      "color_policy": "palette",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 48,
+      "display_name": "Hungary",
+      "display_name_en": "Hungary",
+      "display_name_zh": "匈牙利王国",
+      "entry_kind": "",
+      "feature_count": 48,
+      "featured": true,
+      "historical_fidelity": "tno_baseline",
+      "historical_fidelity_summary": [
+        "tno_baseline"
+      ],
+      "lookup_iso2": "HU",
+      "notes": "Southern Slovak strip from targeted SK ADM2 split features.",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "hungary_south_slovakia_1939",
+      "provenance_iso2": "HU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "hungary_south_slovakia_1939",
+        "1939_hungary_carpathian_ruthenia",
+        "tno_south_hun"
+      ],
+      "scenario_only": false,
+      "source": "manual_rule",
+      "source_type": "tno_baseline",
+      "source_types": [
+        "tno_baseline"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "HUN"
+    },
     "IAL": {
       "color_hex": "#7c9a70",
       "color_policy": "locked",
@@ -18700,12 +19603,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 112,
+      "controller_feature_count": 105,
       "display_name": "Iberian Union",
       "display_name_en": "Iberian Union",
       "display_name_zh": "伊比利亚联盟",
       "entry_kind": "scenario_country",
-      "feature_count": 112,
+      "feature_count": 105,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -18774,47 +19677,6 @@
       "subregion_label": "Western Africa",
       "synthetic_owner": false,
       "tag": "ICVE"
-    },
-    "IDAL": {
-      "base_iso2": "ATL",
-      "capital_state_id": null,
-      "color_hex": "#87a677",
-      "continent_id": "",
-      "continent_label": "",
-      "controller_feature_count": 40,
-      "display_name": "Italian Governorate of Dalmatia",
-      "display_name_en": "Italian Governorate of Dalmatia",
-      "display_name_zh": "意属达尔马提亚总督区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 40,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "ATL",
-      "notes": "",
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "ITA"
-      ],
-      "primary_rule_source": "tno_idal",
-      "provenance_iso2": "ATL",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_idal"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "",
-      "subregion_label": "",
-      "synthetic_owner": false,
-      "tag": "IDAL"
     },
     "IDJI": {
       "base_iso2": "DJ",
@@ -19158,6 +20020,58 @@
       "synthetic_owner": false,
       "tag": "ISUE"
     },
+    "ITA": {
+      "base_iso2": "IT",
+      "capital_state_id": 2,
+      "color_hex": "#6d8e60",
+      "color_policy": "palette",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 202,
+      "disabled_regional_preset_names": [
+        "Nice + Savoy",
+        "Corsica",
+        "Albania",
+        "Malta",
+        "Cyprus",
+        "Dalmatia + Kotor Bay",
+        "Italian Greek Islands"
+      ],
+      "disabled_regional_preset_reason": "Already applied in scenario baseline",
+      "display_name": "Italy",
+      "display_name_en": "Italy",
+      "display_name_zh": "意大利帝国",
+      "entry_kind": "",
+      "feature_count": 202,
+      "featured": true,
+      "historical_fidelity": "tno_baseline",
+      "historical_fidelity_summary": [
+        "tno_baseline"
+      ],
+      "lookup_iso2": "IT",
+      "notes": "Italian occupation and annexation of Albania by 1939.",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "1939_italy_albania",
+      "provenance_iso2": "IT",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "1939_italy_albania",
+        "tno_south_italian_islands_lubiana",
+        "tno_south_idal_to_ita"
+      ],
+      "scenario_only": false,
+      "source": "direct_active_owner",
+      "source_type": "tno_baseline",
+      "source_types": [
+        "tno_baseline"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "ITA"
+    },
     "ITIM": {
       "base_iso2": "TL",
       "capital_state_id": null,
@@ -19198,6 +20112,47 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "ITIM"
+    },
+    "JAM": {
+      "base_iso2": "JM",
+      "capital_state_id": null,
+      "color_hex": "#b1616b",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 1,
+      "display_name": "Jamaica",
+      "display_name_en": "Jamaica",
+      "display_name_zh": "牙买加",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "JM",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "tno_south_jam",
+      "provenance_iso2": "JM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_jam"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "synthetic_owner": false,
+      "tag": "JAM"
     },
     "JAP": {
       "display_name": "Japan",
@@ -19579,6 +20534,50 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "MLY"
+    },
+    "MNT": {
+      "base_iso2": "ME",
+      "capital_state_id": null,
+      "color_hex": "#704741",
+      "color_policy": "palette",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 15,
+      "display_name": "Montenegro",
+      "display_name_en": "Montenegro",
+      "display_name_zh": "黑山",
+      "entry_kind": "scenario_subject",
+      "feature_count": 15,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ME",
+      "notes": "Montenegro released from the Serbian Administration in tno_1962 while leaving the pre-existing Italian Kotor Bay holdouts in place.",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_1962_balkans_corrections",
+      "provenance_iso2": "ME",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_1962_balkans_corrections",
+        "tno_south_idal_to_mnt"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "client_state",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "MNT"
     },
     "NCP": {
       "color_hex": "#9f2349",
@@ -20053,12 +21052,92 @@
       "color_hex": "#8d87bd",
       "color_policy": "locked"
     },
+    "PAD": {
+      "base_iso2": "AD",
+      "capital_state_id": null,
+      "color_hex": "#ffa500",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 7,
+      "display_name": "Andorra",
+      "display_name_en": "Andorra",
+      "display_name_zh": "安道尔",
+      "entry_kind": "scenario_country",
+      "feature_count": 7,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AD",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_south_pad",
+      "provenance_iso2": "AD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_pad"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "PAD"
+    },
     "PAN": {
       "display_name": "Panama",
       "display_name_en": "Panama",
       "display_name_zh": "巴拿马共和国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "PCZ": {
+      "base_iso2": "PA",
+      "capital_state_id": null,
+      "color_hex": "#54729f",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 2,
+      "display_name": "Panama Canal Zone",
+      "display_name_en": "Panama Canal Zone",
+      "display_name_zh": "巴拿马运河区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PA",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "tno_south_pcz",
+      "provenance_iso2": "PA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_pcz"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "territory",
+      "subregion_id": "subregion_central_america",
+      "subregion_label": "Central America",
+      "synthetic_owner": false,
+      "tag": "PCZ"
     },
     "PFC": {
       "color_hex": "#abc2f0",
@@ -20102,9 +21181,46 @@
       "parent_owner_tag": ""
     },
     "PUE": {
-      "color_hex": "#40839e",
+      "base_iso2": "PR",
+      "capital_state_id": 686,
+      "color_hex": "#7ca4d1",
       "color_policy": "locked",
-      "mode": "override"
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 1,
+      "display_name": "Puerto Rico",
+      "display_name_en": "Puerto Rico",
+      "display_name_zh": "波多黎各",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "vanilla",
+      "historical_fidelity_summary": [
+        "vanilla"
+      ],
+      "lookup_iso2": "PR",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "",
+      "provenance_iso2": "PR",
+      "quality": "approx_existing_geometry",
+      "rule_sources": [
+        "tno_south_pue"
+      ],
+      "scenario_only": true,
+      "source": "fallback_mapped_tag",
+      "source_type": "synthetic_fallback",
+      "source_types": [
+        "synthetic_fallback"
+      ],
+      "subject_kind": "territory",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "synthetic_owner": true,
+      "tag": "PUE"
     },
     "QMA": {
       "display_name": "13th Army of the National Revolutionary Army",
@@ -20523,6 +21639,49 @@
       "synthetic_owner": false,
       "tag": "SEN"
     },
+    "SER": {
+      "base_iso2": "RS",
+      "capital_state_id": 107,
+      "color_hex": "#575757",
+      "color_policy": "palette",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 25,
+      "display_name": "Serbian Administration",
+      "display_name_en": "Serbian Administration",
+      "display_name_zh": "塞尔维亚行政当局",
+      "entry_kind": "scenario_subject",
+      "feature_count": 25,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RS",
+      "notes": "Italy-aligned Serbian client state baseline for tno_1962.",
+      "parent_owner_tag": "GER",
+      "parent_owner_tags": [
+        "GER"
+      ],
+      "primary_rule_source": "tno_italy_ser",
+      "provenance_iso2": "RS",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_italy_ser",
+        "tno_south_ser"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "puppet",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "SER"
+    },
     "SHO": {
       "base_iso2": "MY",
       "capital_state_id": null,
@@ -20626,6 +21785,47 @@
       "synthetic_owner": false,
       "tag": "SIE"
     },
+    "SNM": {
+      "base_iso2": "SM",
+      "capital_state_id": null,
+      "color_hex": "#5b7645",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 9,
+      "display_name": "San Marino",
+      "display_name_en": "San Marino",
+      "display_name_zh": "圣马力诺",
+      "entry_kind": "scenario_subject",
+      "feature_count": 9,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SM",
+      "notes": "",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_south_snm",
+      "provenance_iso2": "SM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_snm"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "client_state",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "SNM"
+    },
     "SPH": {
       "base_iso2": "PH",
       "capital_state_id": null,
@@ -20694,6 +21894,88 @@
       "subject_kind": "",
       "subregion_id": "subregion_southern_europe",
       "subregion_label": "Southern Europe"
+    },
+    "STC": {
+      "base_iso2": "BO",
+      "capital_state_id": null,
+      "color_hex": "#214bb4",
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "controller_feature_count": 1,
+      "display_name": "Santa Cruz",
+      "display_name_en": "Santa Cruz",
+      "display_name_zh": "圣克鲁斯",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BO",
+      "notes": "",
+      "parent_owner_tag": "PAR",
+      "parent_owner_tags": [
+        "PAR"
+      ],
+      "primary_rule_source": "tno_south_stc",
+      "provenance_iso2": "BO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_stc"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "puppet",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "synthetic_owner": false,
+      "tag": "STC"
+    },
+    "SUR": {
+      "base_iso2": "SR",
+      "capital_state_id": 7,
+      "color_hex": "#726459",
+      "color_policy": "palette",
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "controller_feature_count": 10,
+      "display_name": "Suriname",
+      "display_name_en": "Suriname",
+      "display_name_zh": "苏里南",
+      "entry_kind": "",
+      "feature_count": 10,
+      "featured": true,
+      "historical_fidelity": "tno_baseline",
+      "historical_fidelity_summary": [
+        "tno_baseline"
+      ],
+      "lookup_iso2": "SR",
+      "notes": "Dutch Suriname approximation outside the East Indies.",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "dutch_colonies",
+      "provenance_iso2": "SR",
+      "quality": "approx_existing_geometry",
+      "rule_sources": [
+        "dutch_colonies",
+        "tno_south_sur"
+      ],
+      "scenario_only": false,
+      "source": "direct_active_owner",
+      "source_type": "tno_baseline",
+      "source_types": [
+        "tno_baseline"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "synthetic_owner": false,
+      "tag": "SUR"
     },
     "SWAO": {
       "base_iso2": "AO",
@@ -20846,6 +22128,47 @@
       "subject_kind": "",
       "synthetic_owner": false,
       "tag": "TNS"
+    },
+    "TRI": {
+      "base_iso2": "TT",
+      "capital_state_id": null,
+      "color_hex": "#7f3437",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 1,
+      "display_name": "Trinidad and Tobago",
+      "display_name_en": "Trinidad and Tobago",
+      "display_name_zh": "特立尼达和多巴哥",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "TT",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "tno_south_tri",
+      "provenance_iso2": "TT",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_tri"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "synthetic_owner": false,
+      "tag": "TRI"
     },
     "TUN": {
       "color_hex": "#70825d",

@@ -76,6 +76,27 @@ def test_repaired_adjacent_colors_remain_distinguishable_and_fic_retires(scenari
     assert scenario['owners.by_feature.json']['owners']['RU_RAY_50074027B90244452662579'] == 'AMR'
 
 
+def test_south_adjacent_owners_have_distinct_colors(scenario):
+    countries = scenario['countries.json']['countries']
+    owners = scenario['owners.by_feature.json']['owners']
+    south = {'CLL', 'CLC', 'JAM', 'TRI', 'BAH', 'BLZ', 'GUY', 'GUC', 'STC', 'PUE', 'PCZ',
+             'SER', 'ALB', 'SNM', 'PAD', 'ITA', 'CRO', 'MNT', 'BUL', 'GRE', 'HUN', 'DOM'}
+    pairs = set()
+    for name in ('political', 'scenario_atlantropa'):
+        obj = scenario['runtime_topology.topo.json']['objects'][name]
+        rows = obj['geometries']
+        for index, neighbors in enumerate(obj.get('computed_neighbors', [])):
+            a = owners.get(rows[index]['properties']['id'])
+            for neighbor in neighbors:
+                b = owners.get(rows[neighbor]['properties']['id'])
+                if a and b and a != b and {a, b} & south:
+                    pairs.add(tuple(sorted((a, b))))
+    assert pairs
+    for a, b in pairs:
+        distance = math.dist(hex_to_oklab(countries[a]['color_hex']), hex_to_oklab(countries[b]['color_hex']))
+        assert distance >= 0.03, (a, b, distance)
+
+
 @pytest.mark.parametrize('feature_id,rule', CHANGED_RULES.items())
 def test_user_reassigned_feature_has_requested_owner(scenario, feature_id, rule):
     assert len(CHANGED_RULES) == 49

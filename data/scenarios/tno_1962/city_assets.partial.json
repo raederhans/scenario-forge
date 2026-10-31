@@ -36070,7 +36070,12 @@
     },
     "CITY::ne::1159150597": {
       "city_id": "CITY::ne::1159150597",
-      "host_feature_id": "SR_ADM1_SUR-72"
+      "host_feature_id": "SR_ADM1_SUR-72",
+      "stable_key": "id::CITY::ne::1159150597",
+      "display_name": {
+        "en": "Paramaribo",
+        "zh": "帕拉马里博"
+      }
     },
     "CITY::ne::1159150605": {
       "city_id": "CITY::ne::1159150605",
@@ -36158,7 +36163,7 @@
     },
     "CITY::ne::1159150667": {
       "city_id": "CITY::ne::1159150667",
-      "host_feature_id": "PA_ADM1_PAN-1340"
+      "host_feature_id": "PA_ADM1_PAN-1340__SPLIT_REST"
     },
     "CITY::ne::1159150679": {
       "aliases": [
@@ -36605,6 +36610,7 @@
         "Tiflis",
         "Tbilisi"
       ],
+      "city_id": "CITY::ne::1159150961",
       "display_name": {
         "en": "Tiflis",
         "zh": "第比利斯"
@@ -36612,8 +36618,7 @@
       "hidden": false,
       "host_feature_id": "GEO-3036",
       "stable_key": "id::CITY::ne::1159150961",
-      "tier": "major",
-      "city_id": "CITY::ne::1159150961"
+      "tier": "major"
     },
     "CITY::ne::1159150965": {
       "city_id": "CITY::ne::1159150965",
@@ -36860,7 +36865,12 @@
       "city_id": "CITY::ne::1159151181",
       "host_feature_id": "PR",
       "lat": 18.448865650409047,
-      "lon": -66.11835124365471
+      "lon": -66.11835124365471,
+      "stable_key": "id::CITY::ne::1159151181",
+      "display_name": {
+        "en": "San Juan",
+        "zh": "圣胡安"
+      }
     },
     "CITY::ne::1159151191": {
       "display_name": {
@@ -37149,6 +37159,7 @@
         "Kiew",
         "Kyiv"
       ],
+      "city_id": "CITY::ne::1159151495",
       "display_name": {
         "en": "Kiew",
         "zh": "基辅"
@@ -37156,8 +37167,7 @@
       "hidden": false,
       "host_feature_id": "UA_RAY_74538382B60890943260132",
       "stable_key": "id::CITY::ne::1159151495",
-      "tier": "major",
-      "city_id": "CITY::ne::1159151495"
+      "tier": "major"
     },
     "CITY::ne::1159151501": {
       "city_id": "CITY::ne::1159151501",
@@ -37238,6 +37248,7 @@
         "Leopoldstadt",
         "Kinshasa"
       ],
+      "city_id": "CITY::ne::1159151539",
       "display_name": {
         "en": "Leopoldstadt",
         "zh": "利奥波德城"
@@ -37245,8 +37256,7 @@
       "hidden": false,
       "host_feature_id": "CD_ADM1_COD-1884",
       "stable_key": "id::CITY::ne::1159151539",
-      "tier": "major",
-      "city_id": "CITY::ne::1159151539"
+      "tier": "major"
     },
     "CITY::ne::1159151541": {
       "city_id": "CITY::ne::1159151541",
@@ -37261,13 +37271,13 @@
       "host_feature_id": "IRQ-3063"
     },
     "CITY::ne::1159151549": {
+      "city_id": "CITY::ne::1159151549",
       "display_name": {
         "en": "Addis Abeba",
         "zh": "亚的斯亚贝巴"
       },
       "host_feature_id": "ET_ADM1_ETH-3133",
-      "stable_key": "id::CITY::ne::1159151549",
-      "city_id": "CITY::ne::1159151549"
+      "stable_key": "id::CITY::ne::1159151549"
     },
     "CITY::ne::1159151551": {
       "city_id": "CITY::ne::1159151551",
@@ -37304,12 +37314,12 @@
     },
     "CITY::ne::1159151585": {
       "city_id": "CITY::ne::1159151585",
-      "host_feature_id": "RU_CITY_MOSCOW",
-      "stable_key": "id::CITY::ne::1159151585",
       "display_name": {
         "en": "Moskau",
         "zh": "莫斯科"
-      }
+      },
+      "host_feature_id": "RU_CITY_MOSCOW",
+      "stable_key": "id::CITY::ne::1159151585"
     },
     "CITY::ne::1159151587": {
       "city_id": "CITY::ne::1159151587",
@@ -37418,6 +37428,98 @@
       "population": 0,
       "source": "reviewed_settlement",
       "stable_key": "id::CITY::scenario::cherdyn"
+    },
+    "CITY::ne::1159139989": {
+      "city_id": "CITY::ne::1159139989",
+      "stable_key": "id::CITY::ne::1159139989",
+      "display_name": {
+        "en": "Tunja",
+        "zh": "通哈"
+      },
+      "host_feature_id": "CO_ADM1_COL-1315"
+    },
+    "CITY::ne::1159151345": {
+      "city_id": "CITY::ne::1159151345",
+      "stable_key": "id::CITY::ne::1159151345",
+      "display_name": {
+        "en": "Cali",
+        "zh": "卡利"
+      },
+      "host_feature_id": "CO_ADM1_COL-1408"
+    },
+    "CITY::ne::1159150855": {
+      "city_id": "CITY::ne::1159150855",
+      "stable_key": "id::CITY::ne::1159150855",
+      "display_name": {
+        "en": "Kingston",
+        "zh": "金斯敦"
+      },
+      "host_feature_id": "JM"
+    },
+    "CITY::ne::1159149307": {
+      "city_id": "CITY::ne::1159149307",
+      "stable_key": "id::CITY::ne::1159149307",
+      "display_name": {
+        "en": "Port of Spain",
+        "zh": "西班牙港"
+      },
+      "host_feature_id": "TT"
+    },
+    "CITY::ne::1159151207": {
+      "city_id": "CITY::ne::1159151207",
+      "stable_key": "id::CITY::ne::1159151207",
+      "display_name": {
+        "en": "Nassau",
+        "zh": "拿骚"
+      },
+      "host_feature_id": "BS"
+    },
+    "CITY::ne::1159150911": {
+      "city_id": "CITY::ne::1159150911",
+      "stable_key": "id::CITY::ne::1159150911",
+      "display_name": {
+        "en": "Caiena",
+        "zh": "卡宴"
+      },
+      "host_feature_id": "GF_PRIMARY"
+    },
+    "CITY::ne::1159151135": {
+      "city_id": "CITY::ne::1159151135",
+      "stable_key": "id::CITY::ne::1159151135",
+      "display_name": {
+        "en": "Santa Cruz",
+        "zh": "圣克鲁斯"
+      },
+      "host_feature_id": "BO_ADM1_BOL-1940"
+    },
+    "CITY::ne::1159146489": {
+      "city_id": "CITY::ne::1159146489",
+      "stable_key": "id::CITY::ne::1159146489",
+      "display_name": {
+        "en": "Balboa",
+        "zh": "巴尔博亚"
+      },
+      "host_feature_id": "PA_ADM1_PAN-1340__SPLIT_PCZ",
+      "lon": -79.56761214362476,
+      "lat": 8.950114614175046
+    },
+    "CITY::ne::1159146051": {
+      "city_id": "CITY::ne::1159146051",
+      "stable_key": "id::CITY::ne::1159146051",
+      "display_name": {
+        "en": "Città di San Marino",
+        "zh": "圣马力诺城"
+      },
+      "host_feature_id": "SM_ADM1_SMR-4883"
+    },
+    "CITY::ne::1159149089": {
+      "city_id": "CITY::ne::1159149089",
+      "stable_key": "id::CITY::ne::1159149089",
+      "display_name": {
+        "en": "Andorra la Vella",
+        "zh": "安道尔城"
+      },
+      "host_feature_id": "AD_ADM1_AND-4876"
     }
   },
   "audit": {

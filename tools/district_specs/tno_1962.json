@@ -668,6 +668,11 @@
               "cntr": [
                 "ITA"
               ]
+            },
+            {
+              "id": [
+                "ATLWLD_adriatica_19"
+              ]
             }
           ]
         },
@@ -684,6 +689,12 @@
             {
               "cntr": [
                 "SM"
+              ]
+            },
+            {
+              "id": [
+                "ATLPRV_18238",
+                "ATLSHL_adriatica_17"
               ]
             }
           ]
@@ -714,6 +725,17 @@
               "atl": [
                 "sicily_tunis"
               ]
+            },
+            {
+              "id": [
+                "LBY-2964",
+                "LBY-2967",
+                "LBY-2969",
+                "LBY-2971",
+                "LBY-2976",
+                "LBY-2983",
+                "LBY-5488"
+              ]
             }
           ],
           "note": "本剧本中西西里为 Atlantropa 重建岛屿"
@@ -730,6 +752,97 @@
             }
           ],
           "note": "本剧本中撒丁为 Atlantropa 重建岛屿"
+        },
+        {
+          "id": "egeo",
+          "name_en": "Italian Aegean Islands",
+          "name_zh": "意属爱琴群岛",
+          "match": [
+            {
+              "id": [
+                "ATLISL_aegean_GRE_23",
+                "ATLISL_aegean_GRE_25",
+                "ATLISL_aegean_GRE_26",
+                "ATLISL_aegean_GRE_27",
+                "ATLISL_aegean_rhodes",
+                "ATLISL_aegean_source_2efc11d76fa75115aa5d752976a1688549d79a4a6e009e59719cc5bcf57abd9f",
+                "ATLISL_aegean_source_3d305c15511d75f8c4c2981e57b4d4f1252e8b56ef737f48c5f4b97a86d30968",
+                "ATLISL_aegean_source_a91b3ea3d1ce93dee5899d23455ad3aee7fe8dbc8fd703f2d67b0285de3a3db8"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "isole_ionie",
+          "name_en": "Ionian Islands",
+          "name_zh": "爱奥尼亚群岛",
+          "match": [
+            {
+              "id": [
+                "ATLISL_adriatica_corfu",
+                "EL621",
+                "EL623",
+                "GR_ADM1_GRC-2883"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "lubiana",
+          "name_en": "Province of Ljubljana",
+          "name_zh": "卢布尔雅那省",
+          "match": [
+            {
+              "id": [
+                "SI037",
+                "SI041"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dalmazia",
+          "name_en": "Dalmatia and Cattaro",
+          "name_zh": "达尔马提亚与卡塔罗",
+          "match": [
+            {
+              "id": [
+                "ATLISL_adriatica_CRO_3",
+                "ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806",
+                "ATLPRV_18254",
+                "ATLPRV_18260",
+                "ATLPRV_18263",
+                "ATLPRV_18380",
+                "ATLSHL_adriatica_10",
+                "ATLSHL_adriatica_13",
+                "ATLSHL_adriatica_14",
+                "ATLSHL_adriatica_20",
+                "ATLSHL_adriatica_4",
+                "ATLSHL_adriatica_6",
+                "ATLSHL_adriatica_7",
+                "ATLSHL_adriatica_8",
+                "ATLSHL_adriatica_9",
+                "HR031",
+                "HR034",
+                "HR036",
+                "ME_ADM1_MNE-1506",
+                "ME_ADM1_MNE-1507",
+                "ME_ADM1_MNE-1518"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "malta",
+          "name_en": "Malta",
+          "name_zh": "马耳他",
+          "match": [
+            {
+              "id": [
+                "ATLISL_sicily_tunis_malta"
+              ]
+            }
+          ]
         }
       ]
     },
@@ -1556,20 +1669,6 @@
           ]
         },
         {
-          "id": "west_indies",
-          "name_en": "West Indies Administration",
-          "name_zh": "西印度群岛行政区",
-          "match": [
-            {
-              "cntr": [
-                "BS",
-                "JM",
-                "TT"
-              ]
-            }
-          ]
-        },
-        {
           "id": "south_atlantic",
           "name_en": "South Atlantic Dependencies",
           "name_zh": "南大西洋属地",
@@ -2093,18 +2192,6 @@
                 "SYR-140",
                 "SYR-141",
                 "SYR-142"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "cyprus",
-          "name_en": "Cyprus Administration",
-          "name_zh": "塞浦路斯行政区",
-          "match": [
-            {
-              "id": [
-                "ATLISL_levant_cyprus"
               ]
             }
           ]

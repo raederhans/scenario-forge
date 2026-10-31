@@ -79,13 +79,18 @@ def test_two_objects_sources_and_idempotence(scenario_dir, monkeypatch):
     options = dict(data_dir=scenario_dir, rebuild=lambda path: rebuilt.append(path), synchronize=lambda path: None,
                    load_plans=lambda path: [], load_hierarchy=lambda path: ({}, {}))
     overlay = {"version": 1, "entries": [{
+        "id": "withdrawn", "scenarios": ["tno_1962"], "tag": "OLD",
+        "name_en": "Old", "name_zh": "旧政体", "parent_owner_tag": "JAP",
+        "color_hex": "#aabbcc", "select": {"feature_ids": ["home"]}, "cores": "keep",
+    }, {
         "id": "test", "scenarios": ["tno_1962"], "tag": "JTWN", "name_en": "Taiwan",
         "name_zh": "台湾", "parent_owner_tag": "JAP", "subject_kind": "colony",
         "color_hex": "#bbccdd", "select": {"feature_ids": ["p", "a"]},
-        "only_from_owners": ["JAP"], "cores": "keep"}]}
+        "only_from_owners": ["JAP"], "cores": "keep", "supersedes": ["withdrawn"]}]}
     assert run_scenario(overlay, scenario_dir, **options)["changed_count"] == 2
     assert read(scenario_dir / "owners.by_feature.json")["owners"] == dict(p="JTWN", a="JTWN", home="JAP")
     assert read(scenario_dir / "cores.by_feature.json")["cores"] == payloads["cores.by_feature.json"]["cores"]
+    assert "OLD" not in read(scenario_dir / "countries.json")["countries"]
     for name in ("countries.json", "scenario_manual_overrides.json", "scenario_mutations.json"):
         country = read(scenario_dir / name)["countries"]["JTWN"]
         assert country["parent_owner_tag"] == "JAP"
@@ -199,8 +204,12 @@ def test_batch_two_published_ownership_and_relationships():
     countries = read(directory / "countries.json")["countries"]
     user_rules = read(Path(__file__).parent / "fixtures/tno_user_reassign.json")
     corrected = {fid: {"RKO": "OE00"}.get(row["to"], row["to"]) for fid, row in user_rules.items() if row["from"] != row["to"]}
+    corrected["ATLISL_adriatica_corfu"] = "ITA"
     for entry in overlay["entries"][3:]:
         tag = entry["tag"]
+        if entry["id"] == "tno_idal":
+            assert tag not in countries
+            continue
         country = countries[tag]
         if "parent_owner_tag" in entry:
             assert country["parent_owner_tag"] == entry["parent_owner_tag"]
@@ -229,13 +238,18 @@ import { readFileSync } from 'node:fs';
 import { migrateTnoProjectTags, TNO_TAG_MIGRATION_VERSION,
   normalizeCountryCodeAlias } from './js/core/country_code_aliases.js';
 const countries = JSON.parse(readFileSync('./data/scenarios/tno_1962/countries.json', 'utf8')).countries;
-assert.equal(TNO_TAG_MIGRATION_VERSION, 1);
+assert.ok(TNO_TAG_MIGRATION_VERSION >= 1);
 const legacy = migrateTnoProjectTags({scenario: {id: 'tno_1962'},
   activeSovereignCode: 'GUI', countryBaseColors: {GUI: '#123456'}});
 assert.equal(legacy.activeSovereignCode, 'GUZ');
 assert.deepEqual(legacy.countryBaseColors, {GUZ: '#123456'});
-const current = {scenario: {id: 'tno_1962', tagMigrationVersion: 1},
-  activeSovereignCode: 'GUI', countryBaseColors: {GUI: '#abcdef', GUZ: '#123456'}};
+// A project saved after version 1 already means Guinea by GUI.
+const v1 = migrateTnoProjectTags({scenario: {id: 'tno_1962', tagMigrationVersion: 1},
+  activeSovereignCode: 'GUI', countryBaseColors: {GUI: '#abcdef', GUZ: '#123456'}});
+assert.equal(v1.activeSovereignCode, 'GUI');
+assert.deepEqual(v1.countryBaseColors, {GUI: '#abcdef', GUZ: '#123456'});
+const current = {scenario: {id: 'tno_1962', tagMigrationVersion: TNO_TAG_MIGRATION_VERSION},
+  activeSovereignCode: 'GUI', countryBaseColors: {GUI: '#abcdef'}};
 assert.equal(migrateTnoProjectTags(current), current);
 assert.equal(normalizeCountryCodeAlias('GUI'), 'GUI');
 assert.equal(countries.GUI.display_name_en, 'Guinea');
@@ -322,3 +336,32 @@ def test_reclamation_preserves_other_cores_and_is_repeatable():
     kwargs.update(countries=result, owners={fid: row["owner"] for fid, row in assignments.items()},
                   cores={fid: row["cores"] for fid, row in assignments.items()})
     assert apply_overlay(expand_reclamation_entries(overlay, kwargs["cores"]), "tno_1962", **kwargs)[2]["changed_count"] == 0
+
+
+def test_identity_v2_preserves_current_tags_and_geographic_codes(scenario_dir):
+    from tools.apply_tno_1962_identity_migrations import apply_identity_migrations
+
+    payloads = {
+        "manifest.json": {"tag_migration_version": 1},
+        "countries.json": {"countries": {
+            "BZ": {"tag": "BZ", "base_iso2": "BZ", "primary_rule_source": "tno_1962_decolonization_bz"},
+            "GY": {"tag": "GY", "lookup_iso2": "GY", "rule_sources": ["tno_1962_decolonization_gy"]},
+            **{tag: {"tag": tag} for tag in ("MAG", "MGN", "GUI", "GUZ", "PRC", "ANG")},
+        }},
+        "owners.by_feature.json": {"owners": {"belize": "BZ", "guyana": "GY", "magadan": "MAG"}},
+        "runtime_topology.topo.json": {"properties": {"cntr_code": "BZ", "owner_tag": "BZ"}},
+    }
+    for name, payload in payloads.items():
+        (scenario_dir / name).write_text(json.dumps(payload), encoding="utf-8")
+    assert apply_identity_migrations(scenario_dir, releasable_paths=[])
+    countries = read(scenario_dir / "countries.json")["countries"]
+    assert set(countries) == {"BLZ", "GUY", "MAG", "MGN", "GUI", "GUZ", "PRC", "ANG"}
+    assert countries["BLZ"]["base_iso2"] == "BZ"
+    assert countries["GUY"]["lookup_iso2"] == "GY"
+    assert countries["BLZ"]["primary_rule_source"] == "tno_1962_decolonization_blz"
+    assert countries["GUY"]["rule_sources"] == ["tno_1962_decolonization_guy"]
+    assert read(scenario_dir / "owners.by_feature.json")["owners"] == {
+        "belize": "BLZ", "guyana": "GUY", "magadan": "MAG"}
+    assert read(scenario_dir / "runtime_topology.topo.json")["properties"] == {
+        "cntr_code": "BZ", "owner_tag": "BLZ"}
+    assert apply_identity_migrations(scenario_dir, releasable_paths=[]) == []

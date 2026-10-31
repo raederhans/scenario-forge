@@ -3612,7 +3612,7 @@
           "BZ_ADM1_BLZ-1356",
           "ES425"
         ],
-        "owner_tag": "BZ",
+        "owner_tag": "BLZ",
         "raw_name": "Toledo",
         "reason": "non_unique_raw_name"
       },
@@ -7294,7 +7294,7 @@
           "GY_ADM1_GUY-671",
           "GY_ADM1_GUY-679"
         ],
-        "owner_tag": "GY",
+        "owner_tag": "GUY",
         "raw_name": "Mahaica-Berbice",
         "reason": "non_unique_raw_name"
       },
@@ -7310,7 +7310,7 @@
           "GY_ADM1_GUY-671",
           "GY_ADM1_GUY-679"
         ],
-        "owner_tag": "GY",
+        "owner_tag": "GUY",
         "raw_name": "Mahaica-Berbice",
         "reason": "non_unique_raw_name"
       },
@@ -20565,7 +20565,7 @@
           "BZ_ADM1_BLZ-1356",
           "ES425"
         ],
-        "owner_tag": "BZ",
+        "owner_tag": "BLZ",
         "raw_name": "Toledo",
         "reason": "non_unique_raw_name"
       },
@@ -72786,6 +72786,22 @@
     "id::CITY::ne::1159151593": {
       "en": "Roma",
       "zh": "罗马"
+    },
+    "id::PA_ADM1_PAN-1337__SPLIT_PCZ": {
+      "en": "Colón · Panama Canal Zone",
+      "zh": "冒号 · 巴拿马运河区"
+    },
+    "id::PA_ADM1_PAN-1337__SPLIT_REST": {
+      "en": "Colón · Panama",
+      "zh": "冒号 · 巴拿马"
+    },
+    "id::PA_ADM1_PAN-1340__SPLIT_PCZ": {
+      "en": "Panamá · Panama Canal Zone",
+      "zh": "巴拿马 · 巴拿马运河区"
+    },
+    "id::PA_ADM1_PAN-1340__SPLIT_REST": {
+      "en": "Panamá · Panama",
+      "zh": "巴拿马 · 巴拿马"
     }
   },
   "scenario_id": "tno_1962",

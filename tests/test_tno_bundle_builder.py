@@ -2468,6 +2468,11 @@ class TnoBundleBuilderTest(unittest.TestCase):
         for tag in affected_tags:
             # A tag the split overlay retired has no entry and no parcels left.
             self.assertEqual(countries.get(tag, {}).get("feature_count", 0), owner_counts[tag], tag)
+        for tag, count in {"BZ": 0, "GY": 0, "IDAL": 0, "CLL": 8, "CLC": 4,
+                           "JAM": 1, "TRI": 1, "BAH": 1, "BLZ": 6, "GUY": 10,
+                           "GUC": 1, "STC": 1, "PUE": 1, "PCZ": 2, "SNM": 9, "PAD": 7}.items():
+            self.assertEqual(countries.get(tag, {}).get("feature_count", 0), count, tag)
+            self.assertEqual(owner_counts[tag], count, tag)
 
     def test_checked_in_tno_1962_atlisl_runtime_contract_stays_consistent(self) -> None:
         scenario_dir = Path(tno_bundle.SCENARIO_DIR)

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { FileManager } from "../js/core/file_manager.js";
 import { migrateImportedProjectData } from "../js/core/sovereignty_manager.js";
+import { TNO_TAG_MIGRATION_VERSION } from "../js/core/country_code_aliases.js";
 
 test("legacy TNO country edits migrate atomically at the import boundary", () => {
   const original = {
@@ -20,7 +21,7 @@ test("legacy TNO country edits migrate atomically at the import boundary", () =>
   assert.deepEqual(imported.parentBorderEnabledByCountry, { MGN: false, MAG: true });
   assert.deepEqual(imported.releasableBoundaryVariantByTag, { MGN: "historical", MAG: "current" });
   assert.deepEqual(imported.visualOverrides, original.visualOverrides);
-  assert.equal(imported.scenario.tagMigrationVersion, 1);
+  assert.equal(imported.scenario.tagMigrationVersion, TNO_TAG_MIGRATION_VERSION);
   assert.equal(original.scenario.tagMigrationVersion, undefined);
   assert.equal(original.sovereignBaseColors.MAG, "#123456");
   assert.deepEqual(migrateImportedProjectData(imported).sovereignBaseColors, imported.sovereignBaseColors);
@@ -31,7 +32,7 @@ test("new TNO exports keep Magadan on repeated imports", () => {
     activeScenarioId: "tno_1962", activeScenarioManifest: { version: 1 },
     sovereignBaseColors: { MAG: "#abcdef", MGN: "#123456" }, activeSovereignCode: "MAG",
   });
-  assert.equal(saved.scenario.tagMigrationVersion, 1);
+  assert.equal(saved.scenario.tagMigrationVersion, TNO_TAG_MIGRATION_VERSION);
   const imported = FileManager.normalizeImportedProjectData(saved);
   const again = FileManager.normalizeImportedProjectData(imported);
   assert.deepEqual(again.sovereignBaseColors, saved.sovereignBaseColors);

@@ -139,7 +139,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
     // old project tags; PRC now names Tannu Tuva and holds land.
     const retiredCountryTags = ['BEL', 'EST', 'LAT', 'LIT', 'LUX', 'NOR', 'POL', 'SOV',
       'SIC', 'SIK', 'TAN', 'FRI', 'HOL', 'GSW', 'RSF', 'BRM', 'FIC',
-      'AFA', 'PG01', 'PG02', 'PG03', 'PG04',
+      'AFA', 'PG01', 'PG02', 'PG03', 'PG04', 'BZ', 'GY', 'IDAL',
       ...Array.from({ length: 9 }, (_, i) => `UK0${i}`),
       ...Array.from({ length: 9 }, (_, i) => `MS0${i}`),
       ...Array.from({ length: 6 }, (_, i) => `KC0${i}`)];
@@ -169,6 +169,10 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
       expect(payload.countries[tag]?.entry_kind).not.toBe('scenario_container');
       expect(payload.countries[tag]?.feature_count).toBeGreaterThan(0);
     });
+    for (const [tag, count] of Object.entries({ CLL: 8, CLC: 4, JAM: 1, TRI: 1, BAH: 1, BLZ: 6, GUY: 10, GUC: 1, STC: 1, PUE: 1, PCZ: 2, SNM: 9, PAD: 7 })) {
+      expect(payload.countries[tag]?.feature_count).toBe(count);
+    }
+    expect(catalogTags.has('IDAL')).toBeTruthy();
     expect(payload.countries.POR?.hidden_from_country_list).toBeTruthy();
     expect(payload.manifest.featured_tags || []).not.toContain('SOV');
     expect(payload.countries.WRS?.inspector_group_id).toBe('scenario_group_russia_region');

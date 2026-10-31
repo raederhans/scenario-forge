@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT))
 
 from map_builder.scenario_context import write_json_transaction
 
-MIGRATION_VERSION = 1
+MIGRATION_VERSION = 2
 SCENARIO_DIR = ROOT / 'data/scenarios/tno_1962'
 IDENTITY_PATH = ROOT / 'data/scenario-rules/tno_1962.identity_map.json'
 SOURCE_FILES = (
@@ -33,18 +33,20 @@ def migration_map(identity):
             for tag, entry in identity['conflict_migrations'].items()}
 
 
-def migrate_references(value, mapping):
+def migrate_references(value, mapping, retired_tags=frozenset({'PRC', 'ANG'})):
     if isinstance(value, dict) and 'scenario_ids' in value and 'tno_1962' not in value['scenario_ids']:
         return value
     if isinstance(value, str):
         return mapping.get(value, value)
     if isinstance(value, list):
-        return [migrate_references(item, mapping) for item in value
-                if not (isinstance(item, dict) and item.get('tag') in {'PRC', 'ANG'}
+        return [migrate_references(item, mapping, retired_tags) for item in value
+                if not (isinstance(item, dict) and item.get('tag') in retired_tags
                         and ('scenario_ids' not in item or 'tno_1962' in item['scenario_ids']))]
     if isinstance(value, dict):
-        return {mapping.get(key, key): migrate_references(item, mapping)
-                for key, item in value.items() if key not in {'PRC', 'ANG'}}
+        return {mapping.get(key, key): (item if key in {
+                    'base_iso2', 'lookup_iso2', 'provenance_iso2', 'cntr_code', 'country_code'
+                } else migrate_references(item, mapping, retired_tags))
+                for key, item in value.items() if key not in retired_tags}
     return value
 
 
@@ -55,7 +57,19 @@ def apply_identity_migrations(scenario_dir=SCENARIO_DIR, identity_path=IDENTITY_
     manifest = read_json(manifest_path)
     if manifest.get('tag_migration_version', 0) >= MIGRATION_VERSION:
         return []
-    mapping = migration_map(read_json(identity_path))
+    identity = read_json(identity_path)
+    versions = range(manifest.get('tag_migration_version', 0) + 1, MIGRATION_VERSION + 1)
+
+    def migrate(value):
+        for version in versions:
+            entries = {tag: entry for tag, entry in identity['conflict_migrations'].items()
+                       if entry.get('migration_version', 1) == version}
+            mapping = migration_map({'conflict_migrations': entries})
+            mapping.update({f'tno_1962_decolonization_{tag.lower()}':
+                            f'tno_1962_decolonization_{new_tag.lower()}'
+                            for tag, new_tag in list(mapping.items())})
+            value = migrate_references(value, mapping, {'PRC', 'ANG'} if version == 1 else set())
+        return value
     if releasable_paths is None:
         releasable_paths = [ROOT / f'data/releasables/tno_1962.internal.phase1.{kind}.json'
                             for kind in ('catalog', 'source')]
@@ -65,10 +79,10 @@ def apply_identity_migrations(scenario_dir=SCENARIO_DIR, identity_path=IDENTITY_
         if not path.exists():
             continue
         original = read_json(path)
-        migrated = migrate_references(original, mapping)
+        migrated = migrate(original)
         if migrated != original:
             changes.append((path, migrated))
-    migrated_manifest = migrate_references(manifest, mapping)
+    migrated_manifest = migrate(manifest)
     migrated_manifest['tag_migration_version'] = MIGRATION_VERSION
     changes.append((manifest_path, migrated_manifest))
     write_json_transaction(changes)

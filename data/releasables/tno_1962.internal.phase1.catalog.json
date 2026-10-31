@@ -3855,6 +3855,59 @@
       "validation_status": "ok",
       "validation_errors": [],
       "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "IDAL",
+      "display_name": "Governorate of Dalmatia",
+      "color_hex": "#87a677",
+      "capital_state_id": null,
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [],
+      "release_lookup_iso2": "HR",
+      "entry_kind": "releasable",
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "scenario_only": true,
+      "allow_manual_overlay": true,
+      "preset_source": {
+        "type": "feature_ids",
+        "name": "",
+        "group_ids": [],
+        "feature_ids": [
+          "ATLISL_adriatica_CRO_3",
+          "ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806",
+          "ATLPRV_18254",
+          "ATLPRV_18260",
+          "ATLPRV_18263",
+          "ATLPRV_18380",
+          "ATLSHL_adriatica_10",
+          "ATLSHL_adriatica_13",
+          "ATLSHL_adriatica_14",
+          "ATLSHL_adriatica_20",
+          "ATLSHL_adriatica_4",
+          "ATLSHL_adriatica_6",
+          "ATLSHL_adriatica_7",
+          "ATLSHL_adriatica_8",
+          "ATLSHL_adriatica_9",
+          "HR031",
+          "HR034",
+          "HR036",
+          "ME_ADM1_MNE-1506",
+          "ME_ADM1_MNE-1507",
+          "ME_ADM1_MNE-1518"
+        ],
+        "exclude_group_ids": [],
+        "exclude_feature_ids": []
+      },
+      "default_boundary_variant_id": "",
+      "boundary_variants": [],
+      "companion_actions": [],
+      "core_state_ids": [],
+      "resolved_feature_count_hint": 21,
+      "validation_status": "ok",
+      "validation_errors": [],
+      "notes": "达尔马提亚默认由意大利直辖，保留分区定义。"
     }
   ],
   "excluded": [],
@@ -3865,7 +3918,7 @@
     "hoi4_1939"
   ],
   "summary": {
-    "entry_count": 56,
+    "entry_count": 57,
     "excluded_count": 0,
     "validation_error_count": 0
   },

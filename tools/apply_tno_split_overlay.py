@@ -75,6 +75,8 @@ def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
                  rebuild=rebuild_districts, synchronize=synchronize_scenario_snapshot,
                  load_plans=ordered_plans, load_hierarchy=load_hierarchy_groups):
     scenario_dir = Path(scenario_dir)
+    superseded = {entry_id for entry in overlay["entries"] for entry_id in entry.get("supersedes", [])}
+    overlay = {**overlay, "entries": [entry for entry in overlay["entries"] if entry["id"] not in superseded]}
     topology = read_json_source(scenario_dir / "runtime_topology.topo.json")
     owners = read_json_source(scenario_dir / "owners.by_feature.json")["owners"]
     payload = read_json_source(scenario_dir / "countries.json")
@@ -123,7 +125,7 @@ def run_scenario(overlay, scenario_dir=ROOT / "data/scenarios/tno_1962", *,
         manual["countries"].pop(tag, None)
         mutations["countries"].pop(tag, None)
         mutations.get("capitals", {}).pop(tag, None)
-    for tag in sorted({entry["tag"] for entry in overlay["entries"]} | {
+    for tag in sorted(({entry["tag"] for entry in overlay["entries"]} & countries.keys()) | {
         tag for tag, country in countries.items() if country.get("entry_kind") == "scenario_container"
     }):
         country = countries[tag]

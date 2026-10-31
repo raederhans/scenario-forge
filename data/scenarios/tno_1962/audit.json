@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
-    "chunk_count": 261,
-    "feature_count": 9949,
+    "chunk_count": 269,
+    "feature_count": 9951,
     "water_count": 285
   },
   "controller_changes": [
@@ -22418,6 +22418,10 @@
         "NO_PRIMARY_GAP_30",
         "NO_PRIMARY_GAP_31",
         "NO_PRIMARY_GAP_32",
+        "PA_ADM1_PAN-1337__SPLIT_PCZ",
+        "PA_ADM1_PAN-1337__SPLIT_REST",
+        "PA_ADM1_PAN-1340__SPLIT_PCZ",
+        "PA_ADM1_PAN-1340__SPLIT_REST",
         "PL_MRG_05ddd04cc90f",
         "PL_MRG_05f1ad6eedaa",
         "PL_MRG_18fdfa02eca5",
@@ -23234,8 +23238,8 @@
         "GER",
         "USA",
         "MC",
-        "GY",
-        "BZ",
+        "GUY",
+        "BLZ",
         "CAN",
         "GNG"
       ],
@@ -112517,13 +112521,46 @@
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false
     },
+    "BLZ": {
+      "base_iso2": "BZ",
+      "continent_label": "North America",
+      "controller_feature_count": 6,
+      "display_name": "Belize",
+      "entry_kind": "scenario_country",
+      "feature_count": 6,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BZ",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_1962_decolonization_blz",
+      "provenance_iso2": "BZ",
+      "quality": "manual_reviewed",
+      "quality_breakdown": {
+        "manual_reviewed": 6
+      },
+      "rule_sources": [
+        "tno_1962_decolonization_blz"
+      ],
+      "scenario_only": false,
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_label": "Central America",
+      "synthetic_owner": false
+    },
     "BOL": {
       "base_iso2": "BO",
       "continent_label": "South America",
-      "controller_feature_count": 9,
+      "controller_feature_count": 8,
       "display_name": "Bolivia",
       "entry_kind": "",
-      "feature_count": 9,
+      "feature_count": 8,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -112712,10 +112749,10 @@
     "BUL": {
       "base_iso2": "BG",
       "continent_label": "Europe",
-      "controller_feature_count": 48,
+      "controller_feature_count": 49,
       "display_name": "Bulgaria",
       "entry_kind": "",
-      "feature_count": 48,
+      "feature_count": 49,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -112808,39 +112845,6 @@
       "subregion_label": "Western Africa",
       "synthetic_owner": false
     },
-    "BZ": {
-      "base_iso2": "BZ",
-      "continent_label": "North America",
-      "controller_feature_count": 6,
-      "display_name": "Belize",
-      "entry_kind": "scenario_country",
-      "feature_count": 6,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "BZ",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "tno_1962_decolonization_bz",
-      "provenance_iso2": "BZ",
-      "quality": "manual_reviewed",
-      "quality_breakdown": {
-        "manual_reviewed": 6
-      },
-      "rule_sources": [
-        "tno_1962_decolonization_bz"
-      ],
-      "scenario_only": false,
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "",
-      "subregion_label": "Central America",
-      "synthetic_owner": false
-    },
     "CAM": {
       "base_iso2": "KH",
       "continent_label": "Asia",
@@ -112879,10 +112883,10 @@
     "CAN": {
       "base_iso2": "CA",
       "continent_label": "North America",
-      "controller_feature_count": 315,
+      "controller_feature_count": 312,
       "display_name": "Canada",
       "entry_kind": "",
-      "feature_count": 315,
+      "feature_count": 312,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -113042,10 +113046,10 @@
     "COL": {
       "base_iso2": "CO",
       "continent_label": "South America",
-      "controller_feature_count": 33,
+      "controller_feature_count": 22,
       "display_name": "Colombia",
       "entry_kind": "",
-      "feature_count": 33,
+      "feature_count": 22,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -113104,10 +113108,10 @@
     "CRO": {
       "base_iso2": "HR",
       "continent_label": "Europe",
-      "controller_feature_count": 19,
+      "controller_feature_count": 34,
       "display_name": "Independent State of Croatia",
       "entry_kind": "scenario_subject",
-      "feature_count": 19,
+      "feature_count": 34,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -113201,10 +113205,10 @@
     "DOM": {
       "base_iso2": "DO",
       "continent_label": "North America",
-      "controller_feature_count": 32,
+      "controller_feature_count": 33,
       "display_name": "Dominican Republic",
       "entry_kind": "",
-      "feature_count": 32,
+      "feature_count": 33,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -113632,10 +113636,10 @@
     "GER": {
       "base_iso2": "DE",
       "continent_label": "Europe",
-      "controller_feature_count": 520,
+      "controller_feature_count": 517,
       "display_name": "Germany",
       "entry_kind": "",
-      "feature_count": 520,
+      "feature_count": 517,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -113772,10 +113776,10 @@
     "GRE": {
       "base_iso2": "GR",
       "continent_label": "Europe",
-      "controller_feature_count": 104,
+      "controller_feature_count": 96,
       "display_name": "Greek Protectorate",
       "entry_kind": "scenario_subject",
-      "feature_count": 104,
+      "feature_count": 96,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -113866,6 +113870,39 @@
       "subregion_label": "Central America",
       "synthetic_owner": false
     },
+    "GUY": {
+      "base_iso2": "GY",
+      "continent_label": "South America",
+      "controller_feature_count": 10,
+      "display_name": "Guyana",
+      "entry_kind": "scenario_country",
+      "feature_count": 10,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GY",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_1962_decolonization_guy",
+      "provenance_iso2": "GY",
+      "quality": "manual_reviewed",
+      "quality_breakdown": {
+        "manual_reviewed": 11
+      },
+      "rule_sources": [
+        "tno_1962_decolonization_guy"
+      ],
+      "scenario_only": false,
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_label": "South America",
+      "synthetic_owner": false
+    },
     "GUZ": {
       "base_iso2": "CN",
       "continent_label": "Asia",
@@ -113936,46 +113973,13 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false
     },
-    "GY": {
-      "base_iso2": "GY",
-      "continent_label": "South America",
-      "controller_feature_count": 11,
-      "display_name": "Guyana",
-      "entry_kind": "scenario_country",
-      "feature_count": 11,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "GY",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "tno_1962_decolonization_gy",
-      "provenance_iso2": "GY",
-      "quality": "manual_reviewed",
-      "quality_breakdown": {
-        "manual_reviewed": 11
-      },
-      "rule_sources": [
-        "tno_1962_decolonization_gy"
-      ],
-      "scenario_only": false,
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "",
-      "subregion_label": "South America",
-      "synthetic_owner": false
-    },
     "HAI": {
       "base_iso2": "HT",
       "continent_label": "North America",
-      "controller_feature_count": 10,
+      "controller_feature_count": 9,
       "display_name": "Haiti",
       "entry_kind": "",
-      "feature_count": 10,
+      "feature_count": 9,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -114034,10 +114038,10 @@
     "HUN": {
       "base_iso2": "HU",
       "continent_label": "Europe",
-      "controller_feature_count": 47,
+      "controller_feature_count": 48,
       "display_name": "Hungary",
       "entry_kind": "",
-      "feature_count": 47,
+      "feature_count": 48,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -114103,10 +114107,10 @@
     "IBR": {
       "base_iso2": "ES",
       "continent_label": "Europe",
-      "controller_feature_count": 112,
+      "controller_feature_count": 105,
       "display_name": "Iberian Union",
       "entry_kind": "scenario_country",
-      "feature_count": 112,
+      "feature_count": 105,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -114297,10 +114301,10 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 176,
+      "controller_feature_count": 202,
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 176,
+      "feature_count": 202,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -115738,7 +115742,7 @@
       "provenance_iso2": "PA",
       "quality": "direct_country_copy",
       "quality_breakdown": {
-        "direct_country_copy": 12
+        "direct_country_copy": 16
       },
       "rule_sources": [],
       "scenario_only": false,
@@ -116721,10 +116725,10 @@
     "SER": {
       "base_iso2": "RS",
       "continent_label": "Europe",
-      "controller_feature_count": 50,
+      "controller_feature_count": 25,
       "display_name": "Serbian Administration",
       "entry_kind": "scenario_subject",
-      "feature_count": 50,
+      "feature_count": 25,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -117294,10 +117298,10 @@
     "TUR": {
       "base_iso2": "TR",
       "continent_label": "Asia",
-      "controller_feature_count": 118,
+      "controller_feature_count": 116,
       "display_name": "Turkey",
       "entry_kind": "",
-      "feature_count": 118,
+      "feature_count": 116,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -118180,13 +118184,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "576c52abc7bb0e0dbba7f66a6a8720fa15c95aa4c365ea727c1b4513e4da9e41",
+  "snapshot_fingerprint": "9b7b7539f41aa5c711b081cf7179197433b62960714d850bead2dbe9a2430792",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "aa8fdc823d6b17a051d6b3566ed54360b0be5b1cb16c6ef961d4e311bf87e403",
-    "detail_chunk_manifest_sha256": "534a5db7cabec958706a890aac7185b794289c2cd67d6edbb90a77462d34605b",
-    "runtime_bootstrap_topology_sha256": "41490df67f7d2d1f0165c0b7ada8dffb5e6039ebf57b3dd803c66ac6caeeb3d1",
-    "runtime_topology_sha256": "d2124a4780c903fd12be721ca319700fae3d712906657ad9b8a2a72fc6bab424"
+    "build_snapshot_sha256": "318654adbbe0fdc13ae94656cf9f0c02c8f6b4e274a511d9d7e9cb3440a1cad6",
+    "detail_chunk_manifest_sha256": "c24670e6a51c9355b2cf037636dde35c72844b172e7216cf33a6e6e1d7e1051b",
+    "runtime_bootstrap_topology_sha256": "7ceb0e81f5abb947e4d6cd9f8e444fcd50114cb7cec10186c45a09bdf9f29170",
+    "runtime_topology_sha256": "741ca730823d4605cd01306b8ad619a83786e91b936c20cf4c9e89d71ec9cc33"
   },
   "summary": {
     "approximate_count": 973,
@@ -118197,20 +118201,20 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 232,
+    "controller_count": 240,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 9949,
+    "feature_count": 9951,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 232,
+    "owner_count": 240,
     "quality_counts": {
       "approx_existing_geometry": 1033,
-      "direct_country_copy": 2698,
+      "direct_country_copy": 2702,
       "manual_reviewed": 10420
     },
     "scenario_atlantropa_feature_count": 726,
@@ -118218,7 +118222,7 @@
     "scenario_runtime_topology_object_count": 7,
     "source_counts": {
       "controller_rule": 0,
-      "direct_active_owner": 4647,
+      "direct_active_owner": 4651,
       "fallback_mapped_tag": 3,
       "manual_rule": 6803,
       "scenario_generated": 445,

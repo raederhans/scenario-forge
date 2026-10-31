@@ -313,11 +313,11 @@
     },
     "BLZ": {
       "project_tags": [
-        "BZ"
+        "BLZ"
       ],
-      "default_project_tag": "BZ",
+      "default_project_tag": "BLZ",
       "policy": "one_to_one",
-      "display_name_policy": "保留项目 tag 与显示名，按原版对应实体修正边界",
+      "display_name_policy": "原版 BLZ 对应加拿大殖民单位 Belize，旧 BZ 占位标签退休。",
       "basis": [
         "用户：不冲突 tag 保留，PFC/BOP/RUR 等保留名称；旧英国规则",
         "T2 第三、四节；T1 3.1、3.2、6.3；history/countries/BLZ - Belize.txt"
@@ -2714,6 +2714,22 @@
         "T2 第五节 TAN：项目名称已为人民革命委员会，对应原版 PRC；原版 TAN 是 Tuva，不能将 TAN→PRC 的身份迁移算作领土变化",
         "用户：清理 PRC/TAN 冲突；系统排除同一实体不同 tag 的假变更；蒙古部分仍按 MEN 修正"
       ]
+    },
+    "BZ": {
+      "new_tag": "BLZ",
+      "action": "atomic_identity_migration",
+      "migration_version": 2,
+      "basis": [
+        "南美加勒比：占位标签改为原版殖民单位标签，地理 ISO 代码保持不变。"
+      ]
+    },
+    "GY": {
+      "new_tag": "GUY",
+      "action": "atomic_identity_migration",
+      "migration_version": 2,
+      "basis": [
+        "南美加勒比：占位标签改为原版殖民单位标签，地理 ISO 代码保持不变。"
+      ]
     }
   },
   "split_project_entities": {
@@ -2949,6 +2965,24 @@
       "basis": [
         "用户：与原版开局一致，先审核多数归属，局部拆块后续 PR；AFA/格陵兰排除",
         "T1 3.2、6；T2 第三、四节；不能把混合实体整体映射给众数"
+      ]
+    },
+    "IDAL": {
+      "original_targets": [
+        "ITA",
+        "CRO",
+        "MNT",
+        "ALB"
+      ],
+      "project_targets": [
+        "ITA",
+        "CRO",
+        "MNT",
+        "ALB"
+      ],
+      "policy": "split_by_approved_feature",
+      "basis": [
+        "南欧报告 §2.2：按逐块规则拆回相邻海岸；意属部分由 ITA 直辖，IDAL 仅保留目录定义。"
       ]
     }
   },

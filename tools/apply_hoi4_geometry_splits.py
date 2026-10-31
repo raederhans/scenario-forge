@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from copy import deepcopy
 from itertools import combinations
+import argparse
 import json
 from pathlib import Path
 import sys
@@ -198,15 +199,21 @@ def run_scenario(scenario_dir, rules):
     return {"changed": len(splits), "measurements": measurements}
 
 
-def main():
-    rules = read(ROOT / "data/scenario-rules/hoi4_geometry_splits.json")
-    write_json(ROOT / "data/feature-migrations/hoi4_feature_splits.v1.json", {
-        "version": 1, "scenarios": rules["scenarios"],
+def main(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--rules", type=Path, default=ROOT / "data/scenario-rules/hoi4_geometry_splits.json")
+    parser.add_argument("--scenarios", nargs="+")
+    parser.add_argument("--migration-output", type=Path, default=ROOT / "data/feature-migrations/hoi4_feature_splits.v1.json")
+    args = parser.parse_args(argv)
+    rules = read(args.rules)
+    scenarios = args.scenarios or rules["scenarios"]
+    write_json(args.migration_output, {
+        "version": 1, "scenarios": scenarios,
         "feature_splits": {parent: entry_child_ids(entry, parent)
                            for entry in rules["entries"] for parent in entry["feature_ids"]},
         "semantics": "Copy parent paint and list membership to all children; explicit child paint wins. Runtime authority: scenario manifest hierarchy_overrides.feature_splits.",
     })
-    for scenario in rules["scenarios"]:
+    for scenario in scenarios:
         report = run_scenario(ROOT / "data/scenarios" / scenario, rules)
         if report["changed"]:
             write_json(ROOT / ".runtime/reports/generated" / f"{scenario}.geometry-splits.json", report)

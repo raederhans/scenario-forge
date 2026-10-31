@@ -1,5 +1,61 @@
 {
   "assignments_by_feature_id": {
+    "AD_ADM1_AND-4876": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4877": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4878": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4879": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4880": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4881": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
+    "AD_ADM1_AND-4882": {
+      "controller": "PAD",
+      "cores": [
+        "SPR",
+        "IBR"
+      ],
+      "owner": "PAD"
+    },
     "AL011": {
       "controller": "ALB",
       "cores": [
@@ -229,18 +285,18 @@
       "owner": "SWAO"
     },
     "ATLISL_adriatica_CRO_3": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLISL_adriatica_CRO_9": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLISL_adriatica_ITA_1": {
       "controller": "ALB",
@@ -250,53 +306,116 @@
       "owner": "ALB"
     },
     "ATLISL_adriatica_corfu": {
-      "controller": "ALB",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "ALB"
+      "owner": "ITA"
     },
     "ATLISL_adriatica_source_1af38019baedda5939dd391c62a69c3e4687fd812f5f841ddea7617a27cd5329": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLISL_adriatica_source_6a9986e29faf7cb22d4301d7445f86e4fa61560d2751849c61dbc37751fb30d9": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLISL_adriatica_source_6f08765428359e34bbe6ee4bd2408e4f873f99f1d1af174794864a959e53d944": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLISL_adriatica_source_7fba784b3f440f9c3fe16eb804d519630d6c42c1c3fe5d3be9b862186315907f": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLISL_adriatica_source_a282019b69d82d874a525940168b347a2dc3c6b6a7b41a7c5c332b0b8e21d09d": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
+    },
+    "ATLISL_aegean_GRE_23": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_GRE_25": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_GRE_26": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_GRE_27": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_rhodes": {
+      "controller": "ITA",
+      "cores": [
+        "TUR"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_source_2efc11d76fa75115aa5d752976a1688549d79a4a6e009e59719cc5bcf57abd9f": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_source_3d305c15511d75f8c4c2981e57b4d4f1252e8b56ef737f48c5f4b97a86d30968": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_aegean_source_a91b3ea3d1ce93dee5899d23455ad3aee7fe8dbc8fd703f2d67b0285de3a3db8": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "ATLISL_levant_cyprus": {
+      "controller": "GRE",
+      "cores": [
+        "TUR"
+      ],
+      "owner": "GRE"
     },
     "ATLPRV_11856": {
       "controller": "ALB",
@@ -338,32 +457,32 @@
       "owner": "ALB"
     },
     "ATLPRV_18235": {
-      "controller": "IDAL",
+      "controller": "ALB",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ALB"
     },
     "ATLPRV_18254": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLPRV_18260": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLPRV_18263": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLPRV_18348": {
       "controller": "ALB",
@@ -380,60 +499,60 @@
       "owner": "ALB"
     },
     "ATLPRV_18380": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLPRV_19222": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLPRV_20006": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLSHL_adriatica_10": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_11": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLSHL_adriatica_12": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "ATLSHL_adriatica_13": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_14": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_15": {
       "controller": "ALB",
@@ -450,46 +569,46 @@
       "owner": "ALB"
     },
     "ATLSHL_adriatica_20": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_4": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_6": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_7": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_8": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_adriatica_9": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ATLSHL_west_med_5": {
       "cores": [
@@ -498,11 +617,11 @@
       "owner": "IBR"
     },
     "ATLWLD_adriatica_20": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "AZE-1676": {
       "controller": "RKK",
@@ -1381,6 +1500,20 @@
         "NRB"
       ],
       "owner": "NRB"
+    },
+    "BO_ADM1_BOL-1940": {
+      "controller": "STC",
+      "cores": [
+        "BOL"
+      ],
+      "owner": "STC"
+    },
+    "BS": {
+      "controller": "BAH",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "BAH"
     },
     "BW_ADM1_BWA-1191": {
       "controller": "BTS",
@@ -3790,10 +3923,87 @@
       ],
       "owner": "CHI"
     },
+    "CO_ADM1_COL-1315": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1400": {
+      "controller": "CLC",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLC"
+    },
+    "CO_ADM1_COL-1404": {
+      "controller": "CLC",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLC"
+    },
+    "CO_ADM1_COL-1406": {
+      "controller": "CLC",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLC"
+    },
+    "CO_ADM1_COL-1408": {
+      "controller": "CLC",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLC"
+    },
+    "CO_ADM1_COL-1420": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
     "CO_ADM1_COL-1422": {
       "controller": "CLL",
       "cores": [
         "CLL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1423": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1424": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1425": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1426": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
+      ],
+      "owner": "CLL"
+    },
+    "CO_ADM1_COL-1427": {
+      "controller": "CLL",
+      "cores": [
+        "COL"
       ],
       "owner": "CLL"
     },
@@ -4421,6 +4631,20 @@
       ],
       "owner": "ISUE"
     },
+    "EL621": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "EL623": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
     "ER_ADM1_ERI-1560": {
       "controller": "IERI",
       "cores": [
@@ -4849,11 +5073,11 @@
       "owner": "RKK"
     },
     "GF_PRIMARY": {
-      "controller": "GY",
+      "controller": "GUC",
       "cores": [
-        "GY"
+        "GUC"
       ],
-      "owner": "GY"
+      "owner": "GUC"
     },
     "GH_ADM1_GHA-2155": {
       "controller": "GHA",
@@ -5023,6 +5247,20 @@
       ],
       "owner": "GUI"
     },
+    "GR_ADM1_GRC-2883": {
+      "controller": "ITA",
+      "cores": [
+        "GRE"
+      ],
+      "owner": "ITA"
+    },
+    "GR_ADM1_GRC-2992": {
+      "controller": "GRE",
+      "cores": [
+        "BUL"
+      ],
+      "owner": "GRE"
+    },
     "GW_ADM1_GNB-5500": {
       "controller": "IGUI",
       "cores": [
@@ -5096,53 +5334,60 @@
       "owner": "IGUI"
     },
     "HR031": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "HR032": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "HR033": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "HR034": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "HR035": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
     },
     "HR036": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "HR037": {
-      "controller": "IDAL",
+      "controller": "CRO",
       "cores": [
         "ITA"
       ],
-      "owner": "IDAL"
+      "owner": "CRO"
+    },
+    "HT_ADM1_HTI-1385": {
+      "controller": "DOM",
+      "cores": [
+        "HAI"
+      ],
+      "owner": "DOM"
     },
     "IN_ADM2_76128533B15567489974292": {
       "controller": "RAJ",
@@ -5935,6 +6180,13 @@
       ],
       "owner": "AZH"
     },
+    "JM": {
+      "controller": "JAM",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "JAM"
+    },
     "KE_ADM1_KEN-1193": {
       "controller": "IKEN",
       "cores": [
@@ -6224,46 +6476,67 @@
       "owner": "OE00"
     },
     "ME_ADM1_MNE-1496": {
-      "controller": "IDAL",
+      "controller": "MNT",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "MNT"
     },
     "ME_ADM1_MNE-1497": {
-      "controller": "IDAL",
+      "controller": "ALB",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "ALB"
     },
     "ME_ADM1_MNE-1499": {
-      "controller": "IDAL",
+      "controller": "MNT",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "MNT"
+    },
+    "ME_ADM1_MNE-1501": {
+      "controller": "ALB",
+      "cores": [
+        "MNT"
+      ],
+      "owner": "ALB"
+    },
+    "ME_ADM1_MNE-1503": {
+      "controller": "ALB",
+      "cores": [
+        "MNT"
+      ],
+      "owner": "ALB"
     },
     "ME_ADM1_MNE-1506": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ME_ADM1_MNE-1507": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
     },
     "ME_ADM1_MNE-1518": {
-      "controller": "IDAL",
+      "controller": "ITA",
       "cores": [
         "MNT"
       ],
-      "owner": "IDAL"
+      "owner": "ITA"
+    },
+    "MK006": {
+      "controller": "ALB",
+      "cores": [
+        "BUL"
+      ],
+      "owner": "ALB"
     },
     "ML_ADM1_MLI-2688": {
       "controller": "AZW",
@@ -7163,6 +7436,34 @@
       ],
       "owner": "RAJ"
     },
+    "PA_ADM1_PAN-1337__SPLIT_PCZ": {
+      "controller": "PCZ",
+      "cores": [
+        "PAN"
+      ],
+      "owner": "PCZ"
+    },
+    "PA_ADM1_PAN-1337__SPLIT_REST": {
+      "controller": "PAN",
+      "cores": [
+        "PAN"
+      ],
+      "owner": "PAN"
+    },
+    "PA_ADM1_PAN-1340__SPLIT_PCZ": {
+      "controller": "PCZ",
+      "cores": [
+        "PAN"
+      ],
+      "owner": "PCZ"
+    },
+    "PA_ADM1_PAN-1340__SPLIT_REST": {
+      "controller": "PAN",
+      "cores": [
+        "PAN"
+      ],
+      "owner": "PAN"
+    },
     "PHL-2511": {
       "controller": "UPH",
       "cores": [
@@ -7892,10 +8193,11 @@
       "owner": "RKP"
     },
     "RS228": {
+      "controller": "BUL",
       "cores": [
         "SER"
       ],
-      "owner": "SER"
+      "owner": "BUL"
     },
     "RU_CITY_ARKHANGELSK": {
       "cores": [
@@ -12734,6 +13036,27 @@
       ],
       "owner": "SHO"
     },
+    "SI031": {
+      "controller": "HUN",
+      "cores": [
+        "GER"
+      ],
+      "owner": "HUN"
+    },
+    "SI037": {
+      "controller": "ITA",
+      "cores": [
+        "GER"
+      ],
+      "owner": "ITA"
+    },
+    "SI041": {
+      "controller": "ITA",
+      "cores": [
+        "GER"
+      ],
+      "owner": "ITA"
+    },
     "SK_MRG_351edc5a6c69": {
       "controller": "SLO",
       "cores": [
@@ -12812,58 +13135,67 @@
       "owner": "SIE"
     },
     "SM_ADM1_SMR-4883": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4884": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4885": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4886": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4887": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4888": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4889": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4890": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SM_ADM1_SMR-4891": {
+      "controller": "SNM",
       "cores": [
         "ITA"
       ],
-      "owner": "ITA"
+      "owner": "SNM"
     },
     "SN_ADM1_SEN-5514": {
       "controller": "SEN",
@@ -13411,6 +13743,13 @@
         "IBR"
       ],
       "owner": "ITIM"
+    },
+    "TT": {
+      "controller": "TRI",
+      "cores": [
+        "CAN"
+      ],
+      "owner": "TRI"
     },
     "TWN-1156": {
       "controller": "JTWN",
@@ -16806,11 +17145,173 @@
       ],
       "owner": "VIC"
     },
-    "XK_ADM1_KOS-5909": {
+    "XK_ADM1_KOS-5886": {
+      "controller": "ALB",
       "cores": [
         "SER"
       ],
-      "owner": "SER"
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5887": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5888": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5889": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5890": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5891": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5896": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5897": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5898": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5899": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5902": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5903": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5904": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5905": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5906": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5907": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5908": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5909": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5910": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5911": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5912": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5913": {
+      "controller": "ALB",
+      "cores": [
+        "SER"
+      ],
+      "owner": "ALB"
+    },
+    "XK_ADM1_KOS-5914": {
+      "controller": "BUL",
+      "cores": [
+        "SER"
+      ],
+      "owner": "BUL"
+    },
+    "XK_ADM1_KOS-5915": {
+      "controller": "BUL",
+      "cores": [
+        "SER"
+      ],
+      "owner": "BUL"
     },
     "ZM_ADM1_ZMB-514": {
       "controller": "GEAZ",
@@ -17199,6 +17700,17 @@
       "parent_owner_tag": "",
       "subject_kind": ""
     },
+    "BAH": {
+      "color_hex": "#ad5252",
+      "color_policy": "locked",
+      "display_name": "Bahamas",
+      "display_name_en": "Bahamas",
+      "display_name_zh": "巴哈马",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "CAN",
+      "subject_kind": "colonial_government"
+    },
     "BHU": {
       "display_name": "Bhutan",
       "display_name_en": "Bhutan",
@@ -17226,6 +17738,17 @@
       "inspector_group_label": "Russia Region",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "BLZ": {
+      "color_hex": "#923643",
+      "color_policy": "locked",
+      "display_name": "Belize",
+      "display_name_en": "Belize",
+      "display_name_zh": "伯利兹",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "CAN",
+      "subject_kind": "colony"
     },
     "BOL": {
       "color_hex": "#8d705d",
@@ -17290,11 +17813,15 @@
       "subject_kind": "protectorate"
     },
     "BUL": {
+      "color_hex": "#785d5d",
+      "color_policy": "locked",
       "display_name": "Bulgaria",
       "display_name_en": "Bulgaria",
       "display_name_zh": "保加利亚沙皇国",
-      "mode": "override",
-      "parent_owner_tag": ""
+      "entry_kind": "",
+      "mode": "create",
+      "parent_owner_tag": "",
+      "subject_kind": ""
     },
     "BUR": {
       "color_hex": "#a05361",
@@ -17311,11 +17838,6 @@
       "display_name_zh": "英属西非领地",
       "mode": "override",
       "parent_owner_tag": ""
-    },
-    "BZ": {
-      "color_hex": "#963f4d",
-      "color_policy": "locked",
-      "mode": "override"
     },
     "CAM": {
       "display_name": "Cambodia",
@@ -17442,13 +17964,27 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "CLC": {
+      "color_hex": "#1967b3",
+      "color_policy": "locked",
+      "display_name": "New Granada",
+      "display_name_en": "New Granada",
+      "display_name_zh": "新格拉纳达",
+      "entry_kind": "scenario_country",
+      "mode": "create",
+      "parent_owner_tag": "",
+      "subject_kind": ""
+    },
     "CLL": {
       "color_hex": "#bf0000",
-      "color_policy": "palette",
+      "color_policy": "locked",
       "display_name": "Colombian Revolutionary Union",
       "display_name_en": "Colombian Revolutionary Union",
       "display_name_zh": "哥伦比亚革命联盟",
-      "mode": "create"
+      "entry_kind": "scenario_country",
+      "mode": "create",
+      "parent_owner_tag": "",
+      "subject_kind": ""
     },
     "COL": {
       "color_hex": "#af9d72",
@@ -17479,6 +18015,17 @@
       "parent_owner_tag": "GER",
       "subject_kind": "colonial_government"
     },
+    "CRO": {
+      "color_hex": "#806977",
+      "color_policy": "locked",
+      "display_name": "Independent State of Croatia",
+      "display_name_en": "Independent State of Croatia",
+      "display_name_zh": "克罗地亚独立国",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "client_state"
+    },
     "CUB": {
       "display_name": "Cuba",
       "display_name_en": "Cuba",
@@ -17500,7 +18047,13 @@
     "DOM": {
       "color_hex": "#ae693f",
       "color_policy": "locked",
-      "mode": "override"
+      "display_name": "Dominican Republic",
+      "display_name_en": "Dominican Republic",
+      "display_name_zh": "多米尼加共和国",
+      "entry_kind": "",
+      "mode": "create",
+      "parent_owner_tag": "",
+      "subject_kind": ""
     },
     "ECU": {
       "color_hex": "#6c8cc3",
@@ -17705,6 +18258,17 @@
       "mode": "override",
       "parent_owner_tag": "JAP"
     },
+    "GRE": {
+      "color_hex": "#799f99",
+      "color_policy": "locked",
+      "display_name": "Greek Protectorate",
+      "display_name_en": "Greek Protectorate",
+      "display_name_zh": "希腊保护国",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "protectorate"
+    },
     "GUA": {
       "color_hex": "#9c92a6",
       "color_policy": "locked",
@@ -17713,6 +18277,17 @@
       "display_name_zh": "危地马拉共和国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "GUC": {
+      "color_hex": "#879f5d",
+      "color_policy": "locked",
+      "display_name": "Guiana-Caiena",
+      "display_name_en": "Guiana-Caiena",
+      "display_name_zh": "圭亚那-卡宴",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "BRA",
+      "subject_kind": "military_administration"
     },
     "GUI": {
       "color_hex": "#b35352",
@@ -17725,6 +18300,17 @@
       "parent_owner_tag": "",
       "subject_kind": ""
     },
+    "GUY": {
+      "color_hex": "#9f525c",
+      "color_policy": "locked",
+      "display_name": "British Guiana",
+      "display_name_en": "British Guiana",
+      "display_name_zh": "英属圭亚那",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "CAN",
+      "subject_kind": "colony"
+    },
     "GUZ": {
       "color_hex": "#96637a",
       "color_policy": "locked",
@@ -17732,11 +18318,6 @@
     },
     "GXC": {
       "color_hex": "#894a52",
-      "color_policy": "locked",
-      "mode": "override"
-    },
-    "GY": {
-      "color_hex": "#8e2c3d",
       "color_policy": "locked",
       "mode": "override"
     },
@@ -17767,6 +18348,17 @@
       "mode": "override",
       "parent_owner_tag": ""
     },
+    "HUN": {
+      "color_hex": "#af684f",
+      "color_policy": "locked",
+      "display_name": "Hungary",
+      "display_name_en": "Hungary",
+      "display_name_zh": "匈牙利王国",
+      "entry_kind": "",
+      "mode": "create",
+      "parent_owner_tag": "",
+      "subject_kind": ""
+    },
     "IAL": {
       "color_hex": "#7c9a70",
       "color_policy": "locked",
@@ -17793,17 +18385,6 @@
       "mode": "create",
       "parent_owner_tag": "IBR",
       "subject_kind": "colony"
-    },
-    "IDAL": {
-      "color_hex": "#87a677",
-      "color_policy": "locked",
-      "display_name": "Italian Governorate of Dalmatia",
-      "display_name_en": "Italian Governorate of Dalmatia",
-      "display_name_zh": "意属达尔马提亚总督区",
-      "entry_kind": "scenario_subject",
-      "mode": "create",
-      "parent_owner_tag": "ITA",
-      "subject_kind": "colonial_government"
     },
     "IDJI": {
       "color_hex": "#6b7d55",
@@ -17907,6 +18488,17 @@
       "parent_owner_tag": "ITA",
       "subject_kind": "colonial_government"
     },
+    "ITA": {
+      "color_hex": "#6d8e60",
+      "color_policy": "locked",
+      "display_name": "Italy",
+      "display_name_en": "Italy",
+      "display_name_zh": "意大利帝国",
+      "entry_kind": "",
+      "mode": "create",
+      "parent_owner_tag": "",
+      "subject_kind": ""
+    },
     "ITIM": {
       "color_hex": "#ab956b",
       "color_policy": "locked",
@@ -17916,6 +18508,17 @@
       "entry_kind": "scenario_subject",
       "mode": "create",
       "parent_owner_tag": "IBR",
+      "subject_kind": "colony"
+    },
+    "JAM": {
+      "color_hex": "#b1616b",
+      "color_policy": "locked",
+      "display_name": "Jamaica",
+      "display_name_en": "Jamaica",
+      "display_name_zh": "牙买加",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "CAN",
       "subject_kind": "colony"
     },
     "JAP": {
@@ -18117,6 +18720,17 @@
       "mode": "create",
       "parent_owner_tag": "",
       "subject_kind": ""
+    },
+    "MNT": {
+      "color_hex": "#704741",
+      "color_policy": "locked",
+      "display_name": "Montenegro",
+      "display_name_en": "Montenegro",
+      "display_name_zh": "黑山",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "client_state"
     },
     "NCP": {
       "color_hex": "#9f2349",
@@ -18354,12 +18968,34 @@
       "color_policy": "locked",
       "mode": "override"
     },
+    "PAD": {
+      "color_hex": "#ffa500",
+      "color_policy": "locked",
+      "display_name": "Andorra",
+      "display_name_en": "Andorra",
+      "display_name_zh": "安道尔",
+      "entry_kind": "scenario_country",
+      "mode": "create",
+      "parent_owner_tag": "",
+      "subject_kind": ""
+    },
     "PAN": {
       "display_name": "Panama",
       "display_name_en": "Panama",
       "display_name_zh": "巴拿马共和国",
       "mode": "override",
       "parent_owner_tag": ""
+    },
+    "PCZ": {
+      "color_hex": "#54729f",
+      "color_policy": "locked",
+      "display_name": "Panama Canal Zone",
+      "display_name_en": "Panama Canal Zone",
+      "display_name_zh": "巴拿马运河区",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "USA",
+      "subject_kind": "territory"
     },
     "PFC": {
       "color_hex": "#abc2f0",
@@ -18403,9 +19039,15 @@
       "parent_owner_tag": ""
     },
     "PUE": {
-      "color_hex": "#40839e",
+      "color_hex": "#7ca4d1",
       "color_policy": "locked",
-      "mode": "override"
+      "display_name": "Puerto Rico",
+      "display_name_en": "Puerto Rico",
+      "display_name_zh": "波多黎各",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "USA",
+      "subject_kind": "territory"
     },
     "QMA": {
       "display_name": "13th Army of the National Revolutionary Army",
@@ -18506,6 +19148,17 @@
       "parent_owner_tag": "",
       "subject_kind": ""
     },
+    "SER": {
+      "color_hex": "#575757",
+      "color_policy": "locked",
+      "display_name": "Serbian Administration",
+      "display_name_en": "Serbian Administration",
+      "display_name_zh": "塞尔维亚行政当局",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "GER",
+      "subject_kind": "puppet"
+    },
     "SHO": {
       "color_hex": "#bf4d4e",
       "color_policy": "locked",
@@ -18549,6 +19202,17 @@
       "parent_owner_tag": "",
       "subject_kind": ""
     },
+    "SNM": {
+      "color_hex": "#5b7645",
+      "color_policy": "locked",
+      "display_name": "San Marino",
+      "display_name_en": "San Marino",
+      "display_name_zh": "圣马力诺",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "ITA",
+      "subject_kind": "client_state"
+    },
     "SPH": {
       "color_hex": "#a53e4d",
       "color_policy": "locked",
@@ -18587,6 +19251,28 @@
       "subject_kind": "",
       "subregion_id": "subregion_southern_europe",
       "subregion_label": "Southern Europe"
+    },
+    "STC": {
+      "color_hex": "#214bb4",
+      "color_policy": "locked",
+      "display_name": "Santa Cruz",
+      "display_name_en": "Santa Cruz",
+      "display_name_zh": "圣克鲁斯",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "PAR",
+      "subject_kind": "puppet"
+    },
+    "SUR": {
+      "color_hex": "#726459",
+      "color_policy": "locked",
+      "display_name": "Suriname",
+      "display_name_en": "Suriname",
+      "display_name_zh": "苏里南",
+      "entry_kind": "",
+      "mode": "create",
+      "parent_owner_tag": "",
+      "subject_kind": ""
     },
     "SWAO": {
       "color_hex": "#5a5e45",
@@ -18650,6 +19336,17 @@
       "display_name_en": "Transnistria Governorate",
       "display_name_zh": "德涅斯特河沿岸总督区",
       "mode": "create"
+    },
+    "TRI": {
+      "color_hex": "#7f3437",
+      "color_policy": "locked",
+      "display_name": "Trinidad and Tobago",
+      "display_name_en": "Trinidad and Tobago",
+      "display_name_zh": "特立尼达和多巴哥",
+      "entry_kind": "scenario_subject",
+      "mode": "create",
+      "parent_owner_tag": "CAN",
+      "subject_kind": "colony"
     },
     "TUN": {
       "color_hex": "#70825d",
@@ -19408,16 +20105,6 @@
           ],
           "name_en": "South Atlantic Dependencies",
           "name_zh": "南大西洋属地"
-        },
-        "west_indies": {
-          "district_id": "west_indies",
-          "feature_ids": [
-            "BS",
-            "JM",
-            "TT"
-          ],
-          "name_en": "West Indies Administration",
-          "name_zh": "西印度群岛行政区"
         },
         "yukon": {
           "district_id": "yukon",
@@ -20808,8 +21495,6 @@
             "AT212",
             "AT213",
             "SI033",
-            "SI037",
-            "SI041",
             "SI042"
           ],
           "name_en": "Reichsgau Carinthia & Carniola",
@@ -21232,7 +21917,6 @@
             "AT224",
             "AT225",
             "AT226",
-            "SI031",
             "SI032",
             "SI034",
             "SI035",
@@ -21493,13 +22177,6 @@
         "noreste": {
           "district_id": "noreste",
           "feature_ids": [
-            "AD_ADM1_AND-4876",
-            "AD_ADM1_AND-4877",
-            "AD_ADM1_AND-4878",
-            "AD_ADM1_AND-4879",
-            "AD_ADM1_AND-4880",
-            "AD_ADM1_AND-4881",
-            "AD_ADM1_AND-4882",
             "ES211",
             "ES212",
             "ES213",
@@ -21594,19 +22271,81 @@
             "ITI42",
             "ITI43",
             "ITI44",
-            "ITI45",
-            "SM_ADM1_SMR-4883",
-            "SM_ADM1_SMR-4884",
-            "SM_ADM1_SMR-4885",
-            "SM_ADM1_SMR-4886",
-            "SM_ADM1_SMR-4887",
-            "SM_ADM1_SMR-4888",
-            "SM_ADM1_SMR-4889",
-            "SM_ADM1_SMR-4890",
-            "SM_ADM1_SMR-4891"
+            "ITI45"
           ],
           "name_en": "Central Italy",
           "name_zh": "意大利中部"
+        },
+        "dalmazia": {
+          "district_id": "dalmazia",
+          "feature_ids": [
+            "ATLISL_adriatica_CRO_3",
+            "ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806",
+            "ATLPRV_18254",
+            "ATLPRV_18260",
+            "ATLPRV_18263",
+            "ATLPRV_18380",
+            "ATLSHL_adriatica_10",
+            "ATLSHL_adriatica_13",
+            "ATLSHL_adriatica_14",
+            "ATLSHL_adriatica_20",
+            "ATLSHL_adriatica_4",
+            "ATLSHL_adriatica_6",
+            "ATLSHL_adriatica_7",
+            "ATLSHL_adriatica_8",
+            "ATLSHL_adriatica_9",
+            "HR031",
+            "HR034",
+            "HR036",
+            "ME_ADM1_MNE-1506",
+            "ME_ADM1_MNE-1507",
+            "ME_ADM1_MNE-1518"
+          ],
+          "name_en": "Dalmatia and Cattaro",
+          "name_zh": "达尔马提亚与卡塔罗"
+        },
+        "egeo": {
+          "district_id": "egeo",
+          "feature_ids": [
+            "ATLISL_aegean_GRE_23",
+            "ATLISL_aegean_GRE_25",
+            "ATLISL_aegean_GRE_26",
+            "ATLISL_aegean_GRE_27",
+            "ATLISL_aegean_rhodes",
+            "ATLISL_aegean_source_2efc11d76fa75115aa5d752976a1688549d79a4a6e009e59719cc5bcf57abd9f",
+            "ATLISL_aegean_source_3d305c15511d75f8c4c2981e57b4d4f1252e8b56ef737f48c5f4b97a86d30968",
+            "ATLISL_aegean_source_a91b3ea3d1ce93dee5899d23455ad3aee7fe8dbc8fd703f2d67b0285de3a3db8"
+          ],
+          "name_en": "Italian Aegean Islands",
+          "name_zh": "意属爱琴群岛"
+        },
+        "isole_ionie": {
+          "district_id": "isole_ionie",
+          "feature_ids": [
+            "ATLISL_adriatica_corfu",
+            "EL621",
+            "EL623",
+            "GR_ADM1_GRC-2883"
+          ],
+          "name_en": "Ionian Islands",
+          "name_zh": "爱奥尼亚群岛"
+        },
+        "lubiana": {
+          "district_id": "lubiana",
+          "feature_ids": [
+            "SI037",
+            "SI041"
+          ],
+          "name_en": "Province of Ljubljana",
+          "name_zh": "卢布尔雅那省"
+        },
+        "malta": {
+          "district_id": "malta",
+          "feature_ids": [
+            "ATLISL_sicily_tunis_malta"
+          ],
+          "name_en": "Malta",
+          "name_zh": "马耳他"
         },
         "nizza_savoia": {
           "district_id": "nizza_savoia",
@@ -21718,7 +22457,6 @@
             "ATLISL_sicily_tunis_ITA_3",
             "ATLISL_sicily_tunis_ITA_4",
             "ATLISL_sicily_tunis_ITA_5",
-            "ATLISL_sicily_tunis_malta",
             "ATLISL_sicily_tunis_sicily",
             "ATLISL_tyrrhenian_source_563cb45377b6dc55202afe8dcdc4915ec0a12ec704a0368b1f9d7d6a03982ea5",
             "ATLISL_tyrrhenian_source_94f4a06c5021a8103287fc93fd5929a51c737789f31113757fd136dfe689cf68",
@@ -23609,7 +24347,6 @@
             "ATLISL_aegean_chios",
             "ATLISL_aegean_ikaria",
             "ATLISL_aegean_lesvos",
-            "ATLISL_aegean_rhodes",
             "ATLISL_aegean_samos",
             "ATLPRV_18171",
             "ATLPRV_18181",
@@ -23685,14 +24422,6 @@
           ],
           "name_en": "Central Anatolia",
           "name_zh": "中安纳托利亚区"
-        },
-        "cyprus": {
-          "district_id": "cyprus",
-          "feature_ids": [
-            "ATLISL_levant_cyprus"
-          ],
-          "name_en": "Cyprus Administration",
-          "name_zh": "塞浦路斯行政区"
         },
         "eastern_anatolia": {
           "district_id": "eastern_anatolia",
