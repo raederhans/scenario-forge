@@ -126,6 +126,9 @@ def test_geographic_majority_uses_base_parcels_and_preserves_parent():
 
 
 def test_generator_preserves_applied_entries_and_appends_new(scenario_dir, monkeypatch):
+    source_path = scenario_dir / "releasables.json"
+    source_path.write_text(json.dumps({"entries": []}), encoding="utf-8")
+    monkeypatch.setattr(builder, "RELEASABLE_PATH", source_path)
     overlay_path = scenario_dir / "overlay.json"
     colors = family_palette("#3c3c3c", 2)
     existing = {"version": 1, "entries": [
@@ -195,7 +198,7 @@ def test_batch_two_published_ownership_and_relationships():
     cores = read(directory / "cores.by_feature.json")["cores"]
     countries = read(directory / "countries.json")["countries"]
     user_rules = read(Path(__file__).parent / "fixtures/tno_user_reassign.json")
-    corrected = {fid: {"RKM": "MS00", "RKO": "OE00", "RKU": "UK00", "RKK": "KC00"}.get(row["to"], row["to"]) for fid, row in user_rules.items() if row["from"] != row["to"]}
+    corrected = {fid: {"RKO": "OE00"}.get(row["to"], row["to"]) for fid, row in user_rules.items() if row["from"] != row["to"]}
     for entry in overlay["entries"][3:]:
         tag = entry["tag"]
         country = countries[tag]
@@ -295,3 +298,27 @@ def test_explicit_pilot_selection_intersects_current_owner(monkeypatch):
                                    {"version": 1, "entries": []})
     assert result["entries"][0]["select"] == {"feature_ids": ["a"]}
     assert result["entries"][0]["cores"] == "keep"
+
+
+def test_reclamation_preserves_other_cores_and_is_repeatable():
+    from tools.apply_tno_split_overlay import expand_reclamation_entries
+
+    overlay = {"version": 1, "entries": [{"id": "reclaim", "scenarios": ["tno_1962"],
+        "tag": "RKU", "cores": "parent_if_single_child", "only_from_owners": ["UK01"],
+        "select": {"feature_ids": ["single", "parent", "multiple"]}}]}
+    owners = dict.fromkeys(("single", "parent", "multiple"), "UK01")
+    cores = {"single": ["UK01"], "parent": ["RKU"], "multiple": ["RKU", "SOV"]}
+    countries = {tag: {"tag": tag} for tag in ("RKU", "UK01", "SOV")}
+    kwargs = dict(features={fid: {"cntr_code": "UA"} for fid in owners},
+                  owners=owners, cores=cores, countries=countries, default_country="RKU",
+                  hierarchy_groups={}, country_meta={}, prefectures={}, bucket_by_feature={}, plans=[])
+    result, assignments, report = apply_overlay(expand_reclamation_entries(overlay, cores), "tno_1962", **kwargs)
+    assert report["retired_tags"] == ["UK01"]
+    assert report["changed_count"] == 3
+    assert all(row["owner"] == "RKU" for row in assignments.values())
+    assert assignments["single"]["cores"] == ["RKU"]
+    assert assignments["multiple"]["cores"] == cores["multiple"]
+    assert assignments["parent"]["cores"] == cores["parent"]
+    kwargs.update(countries=result, owners={fid: row["owner"] for fid, row in assignments.items()},
+                  cores={fid: row["cores"] for fid, row in assignments.items()})
+    assert apply_overlay(expand_reclamation_entries(overlay, kwargs["cores"]), "tno_1962", **kwargs)[2]["changed_count"] == 0
