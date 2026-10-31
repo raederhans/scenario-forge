@@ -66,7 +66,7 @@ TNO 归属校正后，原版首都位于本国境内的恢复原版选择；其�
 | TNO AMR | 结雅 | 滕达 | 新增阿穆尔身份；结雅城区面经飞地保护留在原归属，采用境内城市 |
 | TNO FAV | 苏尔古特 | 苏尔古特 | 新增自由飞行员身份，首都在境内 |
 | TNO NRL / OMO | 诺里尔斯克 / 奥莫隆 | 诺里尔斯克 / 奥莫隆 | 从 RFA 拆分的地理实体采用对应境内聚落 |
-| TNO CLL | 通哈 | 约帕尔 | 本轮仅取得卡萨纳雷，通哈仍在境外 |
+| TNO CLL | 通哈 | 通哈 | 南方批扩至 8 块，已包含通哈所在地 |
 | TNO TNS | 敖德萨 | 巴尔塔 | 原版首都州为敖德萨；采用本轮获分配的境内城市 |
 | TNO LAO | 万象 | 琅勃拉邦 | 万象属于 SIA，使用境内历史王都 |
 | TNO XIK | 西昌 | 理塘 | 西昌属于 RGC，理塘位于 XIK 境内 |
@@ -211,7 +211,7 @@ KAZ 独立，用 Akmola／阿克莫拉；台北城市宿主目前归 CHI，采�
 | GEAU | 4 | Kampala / 坎帕拉 | `CITY::ne::1159150593` | `UG_ADM1_17295835B48340970483027` |
 | GEAZ | 10 | Lusaka / 卢萨卡 | `CITY::ne::1159150571` | `ZM_ADM1_ZMB-520` |
 | ICVE | 22 | Praia / 普拉亚 | `CITY::ne::1159151205` | `CV_ADM1_CPV-5053` |
-| IDAL | 40 | Zara / 扎拉 | `CITY::ne::1159140367` | `HR033` |
+| IDAL | 0（已退休） | — | — | — |
 | IDJI | 6 | Gibuti / 吉布提 | `CITY::ne::1159149869` | `DJ_ADM1_DJI-1567` |
 | IERI | 6 | Asmára / 阿斯马拉 | `CITY::ne::1159150873` | `ER_ADM1_ERI-1561` |
 | IGUI | 9 | Bissau / 比绍 | `CITY::ne::1159150803` | `GW_ADM1_GNB-769` |
@@ -224,7 +224,7 @@ KAZ 独立，用 Akmola／阿克莫拉；台北城市宿主目前归 CHI，采�
 | SWAO | 18 | Luanda / 罗安达 | `CITY::ne::1159151469` | `AO_ADM1_AGO-1880` |
 | SWZ | 4 | Mbabane / 姆巴巴内 | `CITY::ne::1159149413` | `SZ_ADM1_SWZ-534` |
 
-Zara 的基础城市点距简化海岸约 2.23 公里，首都修复按既有海岸规则吸附至 HR033 内；其余新增首府使用原始城市坐标。第三批首都修复结果 `conflicts=[]`。
+第三批原 IDAL 的 Zara 点位曾按海岸规则吸附至 HR033；南方批退休 IDAL 后移除该首都。其余新增首府使用原始城市坐标。
 
 ## TNO 容器母国与撤回分区
 
@@ -248,3 +248,40 @@ RKU、RKM、RKK 默认直接持有全部 605 块总区地块。UK00–UK08、MS0
 | RKU | Kiew / 基辅 | `CITY::ne::1159151495` |
 | RKM | Moskau / 莫斯科 | `CITY::ne::1159151585` |
 | RKK | Tiflis / 第比利斯 | `CITY::ne::1159150961` |
+
+
+### 南美加勒比与南欧
+
+| Tag | 地块数 | 首都 | 城市 ID |
+| --- | ---: | --- | --- |
+| CLL | 8 | Tunja / 通哈 | `CITY::ne::1159139989` |
+| CLC | 4 | Cali / 卡利 | `CITY::ne::1159151345` |
+| JAM | 1 | Kingston / 金斯敦 | `CITY::ne::1159150855` |
+| TRI | 1 | Port of Spain / 西班牙港 | `CITY::ne::1159149307` |
+| BAH | 1 | Nassau / 拿骚 | `CITY::ne::1159151207` |
+| BLZ | 6 | Belize City / 伯利兹城 | `CITY::ne::1159144449` |
+| GUY | 10 | Georgetown / 乔治敦 | `CITY::ne::1159150585` |
+| GUC | 1 | Caiena / 卡宴 | `CITY::ne::1159150911` |
+| STC | 1 | Santa Cruz / 圣克鲁斯 | `CITY::ne::1159151135` |
+| PUE | 1 | San Juan / 圣胡安 | `CITY::ne::1159151181` |
+| PCZ | 2 | Balboa / 巴尔博亚 | `CITY::ne::1159146489` |
+| SNM | 9 | Città di San Marino / 圣马力诺城 | `CITY::ne::1159146051` |
+| PAD | 7 | Andorra la Vella / 安道尔城 | `CITY::ne::1159149089` |
+| SUR | 10 | Paramaribo / 帕拉马里博 | `CITY::ne::1159150597` |
+
+CLL 扩至 8 块，首都从 Yopal 改为 Tunja。GUC 使用占领期名 Caiena；STC 使用 Santa Cruz；SNM 使用 Città di San Marino。JAM、TRI、BAH、BLZ、GUY 隶属 CAN，GUC 隶属 BRA，STC 隶属 PAR，PUE 与 PCZ 为 USA 属地。SUR 只修复国家元数据，首都保持 Paramaribo。
+
+BZ→BLZ、GY→GUY 使用版本 2 数据身份迁移；版本 1 已完成的身份不再重放，BZ/GY 地理 ISO 代码不变。GF_PRIMARY 单独划归 GUC。IDAL 退休为零领土目录定义，意属部分由 ITA 直辖。意大利 egeo、isole_ionie、lubiana、dalmazia、malta 五个分区仅含名称与成员，不设首府。
+
+运河区从 Colón 与 Panamá 各切出一块，保留 PAN 核心。范围按报告 H1 近似，包含历史上的科隆飞地；余块仍由 PAN 持有。
+
+IDAL 原 40 块的去向如下。基础地块按南欧报告 §2.2，HR033 按多数归 CRO；填海与岛屿按最近海岸，距离相同时取共边较长者。
+
+| 新归属 | 地块数 | 原 IDAL 地块 |
+| --- | ---: | --- |
+| ITA | 21 | `ATLISL_adriatica_CRO_3`, `ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806`, `ATLPRV_18254`, `ATLPRV_18260`, `ATLPRV_18263`, `ATLPRV_18380`, `ATLSHL_adriatica_10`, `ATLSHL_adriatica_13`, `ATLSHL_adriatica_14`, `ATLSHL_adriatica_20`, `ATLSHL_adriatica_4`, `ATLSHL_adriatica_6`, `ATLSHL_adriatica_7`, `ATLSHL_adriatica_8`, `ATLSHL_adriatica_9`, `HR031`, `HR034`, `HR036`, `ME_ADM1_MNE-1506`, `ME_ADM1_MNE-1507`, `ME_ADM1_MNE-1518` |
+| CRO | 15 | `ATLISL_adriatica_CRO_9`, `ATLISL_adriatica_source_1af38019baedda5939dd391c62a69c3e4687fd812f5f841ddea7617a27cd5329`, `ATLISL_adriatica_source_6a9986e29faf7cb22d4301d7445f86e4fa61560d2751849c61dbc37751fb30d9`, `ATLISL_adriatica_source_6f08765428359e34bbe6ee4bd2408e4f873f99f1d1af174794864a959e53d944`, `ATLISL_adriatica_source_7fba784b3f440f9c3fe16eb804d519630d6c42c1c3fe5d3be9b862186315907f`, `ATLISL_adriatica_source_a282019b69d82d874a525940168b347a2dc3c6b6a7b41a7c5c332b0b8e21d09d`, `ATLPRV_19222`, `ATLPRV_20006`, `ATLSHL_adriatica_11`, `ATLSHL_adriatica_12`, `ATLWLD_adriatica_20`, `HR032`, `HR033`, `HR035`, `HR037` |
+| MNT | 2 | `ME_ADM1_MNE-1496`, `ME_ADM1_MNE-1499` |
+| ALB | 2 | `ATLPRV_18235`, `ME_ADM1_MNE-1497` |
+
+十二群岛采用 Rodi、Scarpanto、Astipalea 三组来源的全部 8 块岛屿。Kos、Leros 没有对应独立可转移地块，本批不切割安纳托利亚大陆架。

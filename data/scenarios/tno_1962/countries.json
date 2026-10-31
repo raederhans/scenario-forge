@@ -39,33 +39,35 @@
       "tag": "AFG"
     },
     "ALB": {
-      "base_iso2": "AL",
+      "base_iso2": "XK",
       "capital_state_id": null,
       "color_hex": "#5a7a4a",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 21,
+      "controller_feature_count": 47,
       "display_name": "Italian Protectorate of Albania",
       "display_name_en": "Italian Protectorate of Albania",
       "display_name_zh": "意属阿尔巴尼亚保护国",
       "entry_kind": "scenario_subject",
-      "feature_count": 21,
+      "feature_count": 47,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
         "extended"
       ],
-      "lookup_iso2": "AL",
+      "lookup_iso2": "XK",
       "notes": "",
       "parent_owner_tag": "ITA",
       "parent_owner_tags": [
         "ITA"
       ],
       "primary_rule_source": "tno_alb",
-      "provenance_iso2": "AL",
+      "provenance_iso2": "XK",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_alb"
+        "tno_alb",
+        "tno_south_albanian_border",
+        "tno_south_idal_to_alb"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -692,6 +694,47 @@
       "synthetic_owner": false,
       "tag": "AZW"
     },
+    "BAH": {
+      "base_iso2": "BS",
+      "capital_state_id": null,
+      "color_hex": "#ad5252",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 1,
+      "display_name": "Bahamas",
+      "display_name_en": "Bahamas",
+      "display_name_zh": "巴哈马",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BS",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "tno_south_bah",
+      "provenance_iso2": "BS",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_bah"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colonial_government",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "synthetic_owner": false,
+      "tag": "BAH"
+    },
     "BDI": {
       "base_iso2": "BI",
       "capital_state_id": null,
@@ -892,6 +935,50 @@
       "synthetic_owner": false,
       "tag": "BKR"
     },
+    "BLZ": {
+      "base_iso2": "BZ",
+      "capital_state_id": null,
+      "color_hex": "#923643",
+      "color_policy": "locked",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 6,
+      "display_name": "Belize",
+      "display_name_en": "Belize",
+      "display_name_zh": "伯利兹",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BZ",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "tno_1962_decolonization_blz",
+      "provenance_iso2": "BZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_1962_decolonization_blz",
+        "tno_south_blz"
+      ],
+      "scenario_only": false,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_central_america",
+      "subregion_label": "Central America",
+      "synthetic_owner": false,
+      "tag": "BLZ"
+    },
     "BOL": {
       "base_iso2": "BO",
       "capital_state_id": 302,
@@ -899,12 +986,12 @@
       "color_policy": "locked",
       "continent_id": "continent_south_america",
       "continent_label": "South America",
-      "controller_feature_count": 9,
+      "controller_feature_count": 8,
       "display_name": "Bolivia",
       "display_name_en": "Bolivia",
       "display_name_zh": "玻利维亚共和国",
       "entry_kind": "",
-      "feature_count": 9,
+      "feature_count": 8,
       "featured": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -1443,12 +1530,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 48,
+      "controller_feature_count": 49,
       "display_name": "Bulgaria",
       "display_name_en": "Bulgaria",
       "display_name_zh": "保加利亚沙皇国",
       "entry_kind": "",
-      "feature_count": 48,
+      "feature_count": 49,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -1461,7 +1548,9 @@
       "primary_rule_source": "",
       "provenance_iso2": "BG",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "tno_south_bul"
+      ],
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "tno_baseline",
@@ -1557,45 +1646,6 @@
       "synthetic_owner": false,
       "tag": "BWA"
     },
-    "BZ": {
-      "base_iso2": "BZ",
-      "capital_state_id": null,
-      "color_hex": "#963f4d",
-      "color_policy": "locked",
-      "continent_id": "continent_north_america",
-      "continent_label": "North America",
-      "controller_feature_count": 6,
-      "display_name": "Belize",
-      "entry_kind": "scenario_country",
-      "feature_count": 6,
-      "featured": false,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "BZ",
-      "notes": "Belize split out of residual British ownership as an independent state.",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "tno_1962_decolonization_bz",
-      "provenance_iso2": "BZ",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_1962_decolonization_bz"
-      ],
-      "scenario_only": false,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "",
-      "subregion_id": "subregion_central_america",
-      "subregion_label": "Central America",
-      "synthetic_owner": false,
-      "tag": "BZ"
-    },
     "CAM": {
       "base_iso2": "KH",
       "capital_state_id": null,
@@ -1645,12 +1695,12 @@
       "color_policy": "palette",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
-      "controller_feature_count": 315,
+      "controller_feature_count": 312,
       "display_name": "Canada",
       "display_name_en": "Canada",
       "display_name_zh": "加拿大自治领",
       "entry_kind": "",
-      "feature_count": 315,
+      "feature_count": 312,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -2170,17 +2220,58 @@
       "synthetic_owner": false,
       "tag": "CHT"
     },
+    "CLC": {
+      "base_iso2": "CO",
+      "capital_state_id": null,
+      "color_hex": "#1967b3",
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "controller_feature_count": 4,
+      "display_name": "New Granada",
+      "display_name_en": "New Granada",
+      "display_name_zh": "新格拉纳达",
+      "entry_kind": "scenario_country",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CO",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_south_clc",
+      "provenance_iso2": "CO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_clc"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "synthetic_owner": false,
+      "tag": "CLC"
+    },
     "CLL": {
       "base_iso2": "CO",
       "capital_state_id": null,
       "color_hex": "#bf0000",
       "color_policy": "palette",
-      "controller_feature_count": 1,
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "controller_feature_count": 8,
       "display_name": "Colombian Revolutionary Union",
       "display_name_en": "Colombian Revolutionary Union",
       "display_name_zh": "哥伦比亚革命联盟",
       "entry_kind": "scenario_country",
-      "feature_count": 1,
+      "feature_count": 8,
       "featured": false,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
@@ -2195,7 +2286,8 @@
       "provenance_iso2": "CO",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "dev_manual_tag_create"
+        "dev_manual_tag_create",
+        "tno_south_cll"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -2204,6 +2296,8 @@
         "scenario_extension"
       ],
       "subject_kind": "",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
       "synthetic_owner": false,
       "tag": "CLL"
     },
@@ -2214,12 +2308,12 @@
       "color_policy": "locked",
       "continent_id": "continent_south_america",
       "continent_label": "South America",
-      "controller_feature_count": 33,
+      "controller_feature_count": 22,
       "display_name": "Colombia",
       "display_name_en": "Colombia",
       "display_name_zh": "哥伦比亚共和国",
       "entry_kind": "",
-      "feature_count": 33,
+      "feature_count": 22,
       "featured": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -2331,10 +2425,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 19,
+      "controller_feature_count": 34,
       "display_name": "Independent State of Croatia",
+      "display_name_en": "Independent State of Croatia",
+      "display_name_zh": "克罗地亚独立国",
       "entry_kind": "scenario_subject",
-      "feature_count": 19,
+      "feature_count": 34,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -2350,7 +2446,8 @@
       "provenance_iso2": "HR",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_italy_cro"
+        "tno_italy_cro",
+        "tno_south_idal_to_cro"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -2488,10 +2585,12 @@
       "color_policy": "locked",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
-      "controller_feature_count": 32,
+      "controller_feature_count": 33,
       "display_name": "Dominican Republic",
+      "display_name_en": "Dominican Republic",
+      "display_name_zh": "多米尼加共和国",
       "entry_kind": "",
-      "feature_count": 32,
+      "feature_count": 33,
       "featured": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -2504,7 +2603,9 @@
       "primary_rule_source": "",
       "provenance_iso2": "DO",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "tno_south_dom"
+      ],
       "scenario_only": false,
       "source": "direct_active_owner",
       "source_type": "tno_baseline",
@@ -3344,7 +3445,7 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 520,
+      "controller_feature_count": 517,
       "disabled_regional_preset_names": [
         "Bavaria",
         "Saxony",
@@ -3359,7 +3460,7 @@
       "display_name_en": "Germany",
       "display_name_zh": "大日耳曼国",
       "entry_kind": "",
-      "feature_count": 520,
+      "feature_count": 517,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -3831,32 +3932,35 @@
       "tag": "GOR"
     },
     "GRE": {
-      "base_iso2": "GR",
+      "base_iso2": "ATL",
       "capital_state_id": 47,
       "color_hex": "#799f99",
       "color_policy": "palette",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
-      "controller_feature_count": 104,
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 96,
       "display_name": "Greek Protectorate",
+      "display_name_en": "Greek Protectorate",
+      "display_name_zh": "希腊保护国",
       "entry_kind": "scenario_subject",
-      "feature_count": 104,
+      "feature_count": 96,
       "featured": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
         "tno_baseline"
       ],
-      "lookup_iso2": "GR",
+      "lookup_iso2": "ATL",
       "notes": "Italian protectorate baseline for mainland Greece in tno_1962.",
       "parent_owner_tag": "ITA",
       "parent_owner_tags": [
         "ITA"
       ],
       "primary_rule_source": "tno_italy_gre",
-      "provenance_iso2": "GR",
+      "provenance_iso2": "ATL",
       "quality": "direct_country_copy",
       "rule_sources": [
-        "tno_italy_gre"
+        "tno_italy_gre",
+        "tno_south_gre"
       ],
       "scenario_only": true,
       "source": "direct_active_owner",
@@ -3865,8 +3969,8 @@
         "tno_baseline"
       ],
       "subject_kind": "protectorate",
-      "subregion_id": "subregion_southern_europe",
-      "subregion_label": "Southern Europe",
+      "subregion_id": "",
+      "subregion_label": "",
       "synthetic_owner": false,
       "tag": "GRE"
     },
@@ -3946,6 +4050,47 @@
       "synthetic_owner": false,
       "tag": "GUA"
     },
+    "GUC": {
+      "base_iso2": "GF",
+      "capital_state_id": null,
+      "color_hex": "#879f5d",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 1,
+      "display_name": "Guiana-Caiena",
+      "display_name_en": "Guiana-Caiena",
+      "display_name_zh": "圭亚那-卡宴",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GF",
+      "notes": "",
+      "parent_owner_tag": "BRA",
+      "parent_owner_tags": [
+        "BRA"
+      ],
+      "primary_rule_source": "tno_south_guc",
+      "provenance_iso2": "GF",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_guc"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "military_administration",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "GUC"
+    },
     "GUI": {
       "base_iso2": "GN",
       "capital_state_id": null,
@@ -3987,6 +4132,50 @@
       "subregion_label": "Western Africa",
       "synthetic_owner": false,
       "tag": "GUI"
+    },
+    "GUY": {
+      "base_iso2": "GY",
+      "capital_state_id": null,
+      "color_hex": "#9f525c",
+      "color_policy": "locked",
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "controller_feature_count": 10,
+      "display_name": "British Guiana",
+      "display_name_en": "British Guiana",
+      "display_name_zh": "英属圭亚那",
+      "entry_kind": "scenario_subject",
+      "feature_count": 10,
+      "featured": false,
+      "hidden_from_country_list": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GY",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "tno_1962_decolonization_guy",
+      "provenance_iso2": "GY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_1962_decolonization_guy",
+        "tno_south_guy"
+      ],
+      "scenario_only": false,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "synthetic_owner": false,
+      "tag": "GUY"
     },
     "GUZ": {
       "base_iso2": "CN",
@@ -4074,45 +4263,6 @@
       "synthetic_owner": false,
       "tag": "GXC"
     },
-    "GY": {
-      "base_iso2": "GY",
-      "capital_state_id": null,
-      "color_hex": "#8e2c3d",
-      "color_policy": "locked",
-      "continent_id": "continent_south_america",
-      "continent_label": "South America",
-      "controller_feature_count": 11,
-      "display_name": "Guyana",
-      "entry_kind": "scenario_country",
-      "feature_count": 11,
-      "featured": false,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "GY",
-      "notes": "Guyana split out of residual British ownership as an independent state.",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "tno_1962_decolonization_gy",
-      "provenance_iso2": "GY",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_1962_decolonization_gy"
-      ],
-      "scenario_only": false,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "",
-      "subregion_id": "subregion_south_america",
-      "subregion_label": "South America",
-      "synthetic_owner": false,
-      "tag": "GY"
-    },
     "HAI": {
       "base_iso2": "HT",
       "capital_state_id": 318,
@@ -4120,12 +4270,12 @@
       "color_policy": "palette",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
-      "controller_feature_count": 10,
+      "controller_feature_count": 9,
       "display_name": "Haiti",
       "display_name_en": "Haiti",
       "display_name_zh": "海地共和国",
       "entry_kind": "",
-      "feature_count": 10,
+      "feature_count": 9,
       "featured": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -4238,12 +4388,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 47,
+      "controller_feature_count": 48,
       "display_name": "Hungary",
       "display_name_en": "Hungary",
       "display_name_zh": "匈牙利王国",
       "entry_kind": "",
-      "feature_count": 47,
+      "feature_count": 48,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -4258,7 +4408,8 @@
       "quality": "manual_reviewed",
       "rule_sources": [
         "hungary_south_slovakia_1939",
-        "1939_hungary_carpathian_ruthenia"
+        "1939_hungary_carpathian_ruthenia",
+        "tno_south_hun"
       ],
       "scenario_only": false,
       "source": "manual_rule",
@@ -4320,12 +4471,12 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 112,
+      "controller_feature_count": 105,
       "display_name": "Iberian Union",
       "display_name_en": "Iberian Union",
       "display_name_zh": "伊比利亚联盟",
       "entry_kind": "scenario_country",
-      "feature_count": 112,
+      "feature_count": 105,
       "featured": true,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -4430,47 +4581,6 @@
       "subregion_label": "Western Africa",
       "synthetic_owner": false,
       "tag": "ICVE"
-    },
-    "IDAL": {
-      "base_iso2": "ATL",
-      "capital_state_id": null,
-      "color_hex": "#87a677",
-      "continent_id": "",
-      "continent_label": "",
-      "controller_feature_count": 40,
-      "display_name": "Italian Governorate of Dalmatia",
-      "display_name_en": "Italian Governorate of Dalmatia",
-      "display_name_zh": "意属达尔马提亚总督区",
-      "entry_kind": "scenario_subject",
-      "feature_count": 40,
-      "featured": false,
-      "historical_fidelity": "extended",
-      "historical_fidelity_summary": [
-        "extended"
-      ],
-      "lookup_iso2": "ATL",
-      "notes": "",
-      "parent_owner_tag": "ITA",
-      "parent_owner_tags": [
-        "ITA"
-      ],
-      "primary_rule_source": "tno_idal",
-      "provenance_iso2": "ATL",
-      "quality": "manual_reviewed",
-      "rule_sources": [
-        "tno_idal"
-      ],
-      "scenario_only": true,
-      "source": "manual_rule",
-      "source_type": "scenario_extension",
-      "source_types": [
-        "scenario_extension"
-      ],
-      "subject_kind": "colonial_government",
-      "subregion_id": "",
-      "subregion_label": "",
-      "synthetic_owner": false,
-      "tag": "IDAL"
     },
     "IDJI": {
       "base_iso2": "DJ",
@@ -4967,7 +5077,7 @@
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 176,
+      "controller_feature_count": 202,
       "disabled_regional_preset_names": [
         "Nice + Savoy",
         "Corsica",
@@ -4982,7 +5092,7 @@
       "display_name_en": "Italy",
       "display_name_zh": "意大利帝国",
       "entry_kind": "",
-      "feature_count": 176,
+      "feature_count": 202,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -4996,7 +5106,9 @@
       "provenance_iso2": "IT",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "1939_italy_albania"
+        "1939_italy_albania",
+        "tno_south_italian_islands_lubiana",
+        "tno_south_idal_to_ita"
       ],
       "scenario_only": false,
       "source": "direct_active_owner",
@@ -5050,6 +5162,47 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "ITIM"
+    },
+    "JAM": {
+      "base_iso2": "JM",
+      "capital_state_id": null,
+      "color_hex": "#b1616b",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 1,
+      "display_name": "Jamaica",
+      "display_name_en": "Jamaica",
+      "display_name_zh": "牙买加",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "JM",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "tno_south_jam",
+      "provenance_iso2": "JM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_jam"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "synthetic_owner": false,
+      "tag": "JAM"
     },
     "JAP": {
       "base_iso2": "JP",
@@ -6203,6 +6356,8 @@
       "continent_label": "Europe",
       "controller_feature_count": 15,
       "display_name": "Montenegro",
+      "display_name_en": "Montenegro",
+      "display_name_zh": "黑山",
       "entry_kind": "scenario_subject",
       "feature_count": 15,
       "featured": false,
@@ -6221,7 +6376,8 @@
       "provenance_iso2": "ME",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_1962_balkans_corrections"
+        "tno_1962_balkans_corrections",
+        "tno_south_idal_to_mnt"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -7252,6 +7408,45 @@
       "synthetic_owner": false,
       "tag": "OUR"
     },
+    "PAD": {
+      "base_iso2": "AD",
+      "capital_state_id": null,
+      "color_hex": "#ffa500",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 7,
+      "display_name": "Andorra",
+      "display_name_en": "Andorra",
+      "display_name_zh": "安道尔",
+      "entry_kind": "scenario_country",
+      "feature_count": 7,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AD",
+      "notes": "",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "tno_south_pad",
+      "provenance_iso2": "AD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_pad"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "PAD"
+    },
     "PAK": {
       "base_iso2": "PK",
       "capital_state_id": null,
@@ -7408,6 +7603,47 @@
       "subregion_label": "South America",
       "synthetic_owner": false,
       "tag": "PAR"
+    },
+    "PCZ": {
+      "base_iso2": "PA",
+      "capital_state_id": null,
+      "color_hex": "#54729f",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 2,
+      "display_name": "Panama Canal Zone",
+      "display_name_en": "Panama Canal Zone",
+      "display_name_zh": "巴拿马运河区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PA",
+      "notes": "",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "tno_south_pcz",
+      "provenance_iso2": "PA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_pcz"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "territory",
+      "subregion_id": "subregion_central_america",
+      "subregion_label": "Central America",
+      "synthetic_owner": false,
+      "tag": "PCZ"
     },
     "PER": {
       "base_iso2": "IR",
@@ -7702,13 +7938,15 @@
     "PUE": {
       "base_iso2": "PR",
       "capital_state_id": 686,
-      "color_hex": "#40839e",
+      "color_hex": "#7ca4d1",
       "color_policy": "locked",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "controller_feature_count": 1,
       "display_name": "Puerto Rico",
-      "entry_kind": "",
+      "display_name_en": "Puerto Rico",
+      "display_name_zh": "波多黎各",
+      "entry_kind": "scenario_subject",
       "feature_count": 1,
       "featured": false,
       "historical_fidelity": "vanilla",
@@ -7717,19 +7955,23 @@
       ],
       "lookup_iso2": "PR",
       "notes": "",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
       "primary_rule_source": "",
       "provenance_iso2": "PR",
       "quality": "approx_existing_geometry",
-      "rule_sources": [],
+      "rule_sources": [
+        "tno_south_pue"
+      ],
       "scenario_only": true,
       "source": "fallback_mapped_tag",
       "source_type": "synthetic_fallback",
       "source_types": [
         "synthetic_fallback"
       ],
-      "subject_kind": "",
+      "subject_kind": "territory",
       "subregion_id": "subregion_caribbean",
       "subregion_label": "Caribbean",
       "synthetic_owner": true,
@@ -8727,14 +8969,16 @@
     "SER": {
       "base_iso2": "RS",
       "capital_state_id": 107,
-      "color_hex": "#141e6e",
+      "color_hex": "#575757",
       "color_policy": "palette",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 50,
+      "controller_feature_count": 25,
       "display_name": "Serbian Administration",
+      "display_name_en": "Serbian Administration",
+      "display_name_zh": "塞尔维亚行政当局",
       "entry_kind": "scenario_subject",
-      "feature_count": 50,
+      "feature_count": 25,
       "featured": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -8742,15 +8986,16 @@
       ],
       "lookup_iso2": "RS",
       "notes": "Italy-aligned Serbian client state baseline for tno_1962.",
-      "parent_owner_tag": "ITA",
+      "parent_owner_tag": "GER",
       "parent_owner_tags": [
-        "ITA"
+        "GER"
       ],
       "primary_rule_source": "tno_italy_ser",
       "provenance_iso2": "RS",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "tno_italy_ser"
+        "tno_italy_ser",
+        "tno_south_ser"
       ],
       "scenario_only": true,
       "source": "manual_rule",
@@ -8758,7 +9003,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "client_state",
+      "subject_kind": "puppet",
       "subregion_id": "subregion_southern_europe",
       "subregion_label": "Southern Europe",
       "synthetic_owner": false,
@@ -9010,6 +9255,47 @@
       "synthetic_owner": false,
       "tag": "SLO"
     },
+    "SNM": {
+      "base_iso2": "SM",
+      "capital_state_id": null,
+      "color_hex": "#5b7645",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 9,
+      "display_name": "San Marino",
+      "display_name_en": "San Marino",
+      "display_name_zh": "圣马力诺",
+      "entry_kind": "scenario_subject",
+      "feature_count": 9,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SM",
+      "notes": "",
+      "parent_owner_tag": "ITA",
+      "parent_owner_tags": [
+        "ITA"
+      ],
+      "primary_rule_source": "tno_south_snm",
+      "provenance_iso2": "SM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_snm"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "client_state",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "SNM"
+    },
     "SPH": {
       "base_iso2": "PH",
       "capital_state_id": null,
@@ -9092,15 +9378,58 @@
       "synthetic_owner": false,
       "tag": "SPR"
     },
+    "STC": {
+      "base_iso2": "BO",
+      "capital_state_id": null,
+      "color_hex": "#214bb4",
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "controller_feature_count": 1,
+      "display_name": "Santa Cruz",
+      "display_name_en": "Santa Cruz",
+      "display_name_zh": "圣克鲁斯",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BO",
+      "notes": "",
+      "parent_owner_tag": "PAR",
+      "parent_owner_tags": [
+        "PAR"
+      ],
+      "primary_rule_source": "tno_south_stc",
+      "provenance_iso2": "BO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_stc"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "puppet",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "synthetic_owner": false,
+      "tag": "STC"
+    },
     "SUR": {
-      "base_iso2": "NL",
+      "base_iso2": "SR",
       "capital_state_id": 7,
       "color_hex": "#726459",
       "color_policy": "palette",
-      "continent_id": "continent_europe",
-      "continent_label": "Europe",
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
       "controller_feature_count": 10,
-      "display_name": "Netherlands",
+      "display_name": "Suriname",
+      "display_name_en": "Suriname",
+      "display_name_zh": "苏里南",
       "entry_kind": "",
       "feature_count": 10,
       "featured": true,
@@ -9108,15 +9437,16 @@
       "historical_fidelity_summary": [
         "tno_baseline"
       ],
-      "lookup_iso2": "NL",
+      "lookup_iso2": "SR",
       "notes": "Dutch Suriname approximation outside the East Indies.",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "dutch_colonies",
-      "provenance_iso2": "NL",
+      "provenance_iso2": "SR",
       "quality": "approx_existing_geometry",
       "rule_sources": [
-        "dutch_colonies"
+        "dutch_colonies",
+        "tno_south_sur"
       ],
       "scenario_only": false,
       "source": "direct_active_owner",
@@ -9125,8 +9455,8 @@
         "tno_baseline"
       ],
       "subject_kind": "",
-      "subregion_id": "subregion_western_europe",
-      "subregion_label": "Western Europe",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
       "synthetic_owner": false,
       "tag": "SUR"
     },
@@ -9617,6 +9947,47 @@
       "synthetic_owner": false,
       "tag": "TOM"
     },
+    "TRI": {
+      "base_iso2": "TT",
+      "capital_state_id": null,
+      "color_hex": "#7f3437",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 1,
+      "display_name": "Trinidad and Tobago",
+      "display_name_en": "Trinidad and Tobago",
+      "display_name_zh": "特立尼达和多巴哥",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "TT",
+      "notes": "",
+      "parent_owner_tag": "CAN",
+      "parent_owner_tags": [
+        "CAN"
+      ],
+      "primary_rule_source": "tno_south_tri",
+      "provenance_iso2": "TT",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "tno_south_tri"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "synthetic_owner": false,
+      "tag": "TRI"
+    },
     "TUN": {
       "base_iso2": "TN",
       "capital_state_id": 458,
@@ -9664,12 +10035,12 @@
       "color_policy": "palette",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
-      "controller_feature_count": 118,
+      "controller_feature_count": 116,
       "display_name": "Turkey",
       "display_name_en": "Turkey",
       "display_name_zh": "土耳其共和国",
       "entry_kind": "",
-      "feature_count": 118,
+      "feature_count": 116,
       "featured": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [

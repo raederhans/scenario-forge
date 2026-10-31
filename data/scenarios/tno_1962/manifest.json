@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/tno_1962/audit.json",
-  "baseline_hash": "97ea6d7d5cb78afffa2b5f0b0cc7bc8ac36ac7030feeccf589c918ade0ad8770",
+  "baseline_hash": "1c66edd5366a3d58009dadbefecd1e3116c821a156ca7f03edbfd165d9da8f53",
   "bathymetry_texture_url": "data/scenarios/tno_1962/bathymetry_texture/manifest.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
@@ -2961,6 +2961,16 @@
         "RU_RAY_50074027B50863792176748",
         "RU_RAY_50074027B46350199135430"
       ]
+    },
+    "feature_splits": {
+      "PA_ADM1_PAN-1337": [
+        "PA_ADM1_PAN-1337__SPLIT_PCZ",
+        "PA_ADM1_PAN-1337__SPLIT_REST"
+      ],
+      "PA_ADM1_PAN-1340": [
+        "PA_ADM1_PAN-1340__SPLIT_PCZ",
+        "PA_ADM1_PAN-1340__SPLIT_REST"
+      ]
     }
   },
   "mesh_pack_url": "data/scenarios/tno_1962/mesh_pack.json",
@@ -2997,12 +3007,12 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "576c52abc7bb0e0dbba7f66a6a8720fa15c95aa4c365ea727c1b4513e4da9e41",
+  "snapshot_fingerprint": "c02b75f64875e7397d1d9ea42d0b74080c0d9e6106478eee7353d5dbd28e1657",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "534a5db7cabec958706a890aac7185b794289c2cd67d6edbb90a77462d34605b",
-    "runtime_bootstrap_topology_sha256": "41490df67f7d2d1f0165c0b7ada8dffb5e6039ebf57b3dd803c66ac6caeeb3d1",
-    "runtime_topology_sha256": "d2124a4780c903fd12be721ca319700fae3d712906657ad9b8a2a72fc6bab424"
+    "detail_chunk_manifest_sha256": "c24670e6a51c9355b2cf037636dde35c72844b172e7216cf33a6e6e1d7e1051b",
+    "runtime_bootstrap_topology_sha256": "7ceb0e81f5abb947e4d6cd9f8e444fcd50114cb7cec10186c45a09bdf9f29170",
+    "runtime_topology_sha256": "741ca730823d4605cd01306b8ad619a83786e91b936c20cf4c9e89d71ec9cc33"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
@@ -3035,20 +3045,20 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 232,
+    "controller_count": 240,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 9949,
+    "feature_count": 9951,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 10420,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 232,
+    "owner_count": 240,
     "quality_counts": {
       "approx_existing_geometry": 1033,
-      "direct_country_copy": 2698,
+      "direct_country_copy": 2702,
       "manual_reviewed": 10420
     },
     "scenario_atlantropa_feature_count": 726,
@@ -3056,7 +3066,7 @@
     "scenario_runtime_topology_object_count": 7,
     "source_counts": {
       "controller_rule": 0,
-      "direct_active_owner": 4647,
+      "direct_active_owner": 4651,
       "fallback_mapped_tag": 3,
       "manual_rule": 6803,
       "scenario_generated": 445,
@@ -3071,7 +3081,7 @@
     "tno_water_region_count": 285,
     "topology_blocker_count": 0
   },
-  "tag_migration_version": 1,
+  "tag_migration_version": 2,
   "version": 2,
   "water_regions_mode": "exclusive",
   "water_regions_url": "data/scenarios/tno_1962/water_regions.geojson"

@@ -1908,6 +1908,46 @@
         "tno_1962"
       ],
       "notes": "总区默认由专员辖区直接持地，编辑器释放后独立持地。"
+    },
+    {
+      "tag": "IDAL",
+      "display_name_override": "Governorate of Dalmatia",
+      "display_name_en": "Governorate of Dalmatia",
+      "display_name_zh": "达尔马提亚总督区",
+      "parent_owner_tag": "ITA",
+      "preset_source": {
+        "type": "feature_ids",
+        "feature_ids": [
+          "ATLISL_adriatica_CRO_3",
+          "ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806",
+          "ATLPRV_18254",
+          "ATLPRV_18260",
+          "ATLPRV_18263",
+          "ATLPRV_18380",
+          "ATLSHL_adriatica_10",
+          "ATLSHL_adriatica_13",
+          "ATLSHL_adriatica_14",
+          "ATLSHL_adriatica_20",
+          "ATLSHL_adriatica_4",
+          "ATLSHL_adriatica_6",
+          "ATLSHL_adriatica_7",
+          "ATLSHL_adriatica_8",
+          "ATLSHL_adriatica_9",
+          "HR031",
+          "HR034",
+          "HR036",
+          "ME_ADM1_MNE-1506",
+          "ME_ADM1_MNE-1507",
+          "ME_ADM1_MNE-1518"
+        ]
+      },
+      "color_hex_override": "#87a677",
+      "release_lookup_iso2": "HR",
+      "allow_manual_overlay": true,
+      "scenario_ids": [
+        "tno_1962"
+      ],
+      "notes": "达尔马提亚默认由意大利直辖，保留分区定义。"
     }
   ],
   "excluded": [],

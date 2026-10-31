@@ -3604,22 +3604,22 @@
       "RKO"
     ],
     "BZ_ADM1_BLZ-1323": [
-      "BZ"
+      "BLZ"
     ],
     "BZ_ADM1_BLZ-1324": [
-      "BZ"
+      "BLZ"
     ],
     "BZ_ADM1_BLZ-1325": [
-      "BZ"
+      "BLZ"
     ],
     "BZ_ADM1_BLZ-1326": [
-      "BZ"
+      "BLZ"
     ],
     "BZ_ADM1_BLZ-1355": [
-      "BZ"
+      "BLZ"
     ],
     "BZ_ADM1_BLZ-1356": [
-      "BZ"
+      "BLZ"
     ],
     "CA_FED_10001": [
       "CAN"
@@ -14317,7 +14317,7 @@
       "RKK"
     ],
     "GF_PRIMARY": [
-      "GY"
+      "GUC"
     ],
     "GG": [
       "GER"
@@ -14557,34 +14557,34 @@
       "IBR"
     ],
     "GY_ADM1_GUY-671": [
-      "GY"
+      "GUY"
     ],
     "GY_ADM1_GUY-672": [
-      "GY"
+      "GUY"
     ],
     "GY_ADM1_GUY-673": [
-      "GY"
+      "GUY"
     ],
     "GY_ADM1_GUY-674": [
-      "GY"
+      "GUY"
     ],
     "GY_ADM1_GUY-675": [
-      "GY"
+      "GUY"
     ],
     "GY_ADM1_GUY-676": [
-      "GY"
+      "GUY"
     ],
     "GY_ADM1_GUY-677": [
-      "GY"
+      "GUY"
     ],
     "GY_ADM1_GUY-678": [
-      "GY"
+      "GUY"
     ],
     "GY_ADM1_GUY-679": [
-      "GY"
+      "GUY"
     ],
     "GY_ADM1_GUY-680": [
-      "GY"
+      "GUY"
     ],
     "HK_ADM1_HKG-5153": [
       "GNG"
@@ -19420,7 +19420,10 @@
     "PA_ADM1_PAN-1336": [
       "PAN"
     ],
-    "PA_ADM1_PAN-1337": [
+    "PA_ADM1_PAN-1337__SPLIT_PCZ": [
+      "PAN"
+    ],
+    "PA_ADM1_PAN-1337__SPLIT_REST": [
       "PAN"
     ],
     "PA_ADM1_PAN-1338": [
@@ -19429,7 +19432,10 @@
     "PA_ADM1_PAN-1339": [
       "PAN"
     ],
-    "PA_ADM1_PAN-1340": [
+    "PA_ADM1_PAN-1340__SPLIT_PCZ": [
+      "PAN"
+    ],
+    "PA_ADM1_PAN-1340__SPLIT_REST": [
       "PAN"
     ],
     "PA_ADM1_PAN-1341": [

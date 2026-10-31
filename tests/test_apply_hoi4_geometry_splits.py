@@ -195,6 +195,22 @@ def test_main_writes_ordered_child_ids(monkeypatch, make_fixture, suffixes):
     monkeypatch.setattr(geometry_splits, "read", lambda path: rules)
     writes = []
     monkeypatch.setattr(geometry_splits, "write_json", lambda path, payload: writes.append((path, payload)))
-    geometry_splits.main()
+    geometry_splits.main([])
     assert writes[0][0].name == "hoi4_feature_splits.v1.json"
     assert writes[0][1]["feature_splits"] == {"original": ["original__SPLIT_" + suffix for suffix in suffixes]}
+
+
+def test_main_uses_requested_rules_scenarios_and_migration_output(monkeypatch):
+    _, rules = fixture()
+    rules["scenarios"] = ["hoi4_1936"]
+    reads, writes, runs = [], [], []
+    monkeypatch.setattr(geometry_splits, "read", lambda path: reads.append(path) or rules)
+    monkeypatch.setattr(geometry_splits, "write_json", lambda path, payload: writes.append((path, payload)))
+    monkeypatch.setattr(geometry_splits, "run_scenario", lambda path, payload:
+                        runs.append((path, payload)) or {"changed": 0, "measurements": []})
+    geometry_splits.main(["--rules", "tno.rules.json", "--scenarios", "tno_1962",
+                          "--migration-output", "tno.migration.json"])
+    assert str(reads[0]) == "tno.rules.json"
+    assert str(writes[0][0]) == "tno.migration.json"
+    assert writes[0][1]["scenarios"] == ["tno_1962"]
+    assert [path.name for path, _ in runs] == ["tno_1962"]

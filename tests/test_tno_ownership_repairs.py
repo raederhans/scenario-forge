@@ -205,11 +205,13 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
         cores = {"cores": {fid: [tag] for fid, tag in original.items()}}
         apply_tno_feature_assignment_overrides(owners, {"controllers": dict(original)}, cores)
         published = json.loads((SCENARIO_DIR / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
+        south = {"RS228": "BUL", "XK_ADM1_KOS-5909": "ALB",
+                 **{f"SM_ADM1_SMR-{n}": "SNM" for n in range(4883, 4892)}}
         for fid, tag in expected.items():
             with self.subTest(feature_id=fid):
                 self.assertEqual(owners["owners"][fid], tag)
                 self.assertEqual(cores["cores"][fid], [tag])
-                self.assertEqual(published[tno_feature(fid)], self.CORRECTED_OWNERS.get(fid, tag))
+                self.assertEqual(published[tno_feature(fid)], south.get(fid, self.CORRECTED_OWNERS.get(fid, tag)))
 
     def test_russian_rules_do_not_reintroduce_conflicting_city_assignments(self) -> None:
         rules = json.loads((SCENARIO_DIR.parents[1] / "scenario-rules" /
@@ -233,6 +235,66 @@ class TnoCityOwnershipRepairTest(unittest.TestCase):
             hint = json.loads((SCENARIO_DIR / filename).read_text(encoding="utf-8"))["capital_city_hints"]["KRS"]
             self.assertEqual(hint["city_name"], "Krasnoyarsk")
             self.assertEqual(hint["display_name"], "Krasnoyarsk")
+
+
+class TnoSouthOwnershipTest(unittest.TestCase):
+    def test_south_country_counts_relationships_and_capitals(self):
+        countries = json.loads((SCENARIO_DIR / "countries.json").read_text(encoding="utf-8"))["countries"]
+        owners = json.loads((SCENARIO_DIR / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
+        capitals = json.loads((SCENARIO_DIR / "city_overrides.json").read_text(encoding="utf-8"))["capital_city_hints"]
+        expected = {
+            "CLL": (8, "", "", "Tunja"), "CLC": (4, "", "", "Cali"),
+            "JAM": (1, "CAN", "colony", "Kingston"),
+            "TRI": (1, "CAN", "colony", "Port of Spain"),
+            "BAH": (1, "CAN", "colonial_government", "Nassau"),
+            "BLZ": (6, "CAN", "colony", "Belize City"),
+            "GUY": (10, "CAN", "colony", "Georgetown"),
+            "GUC": (1, "BRA", "military_administration", "Caiena"),
+            "STC": (1, "PAR", "puppet", "Santa Cruz"),
+            "PUE": (1, "USA", "territory", "San Juan"),
+            "PCZ": (2, "USA", "territory", "Balboa"),
+            "SNM": (9, "ITA", "client_state", "Città di San Marino"),
+            "PAD": (7, "", "", "Andorra la Vella"),
+        }
+        for tag, (count, parent, kind, capital) in expected.items():
+            with self.subTest(tag=tag):
+                self.assertEqual(sum(owner == tag for owner in owners.values()), count)
+                self.assertEqual(countries[tag]["feature_count"], count)
+                self.assertEqual(countries[tag]["parent_owner_tag"], parent)
+                self.assertEqual(countries[tag]["subject_kind"], kind)
+                self.assertEqual(capitals[tag]["city_name"], capital)
+        for tag in ("BZ", "GY", "IDAL"):
+            self.assertNotIn(tag, countries)
+            self.assertNotIn(tag, owners.values())
+        self.assertEqual(countries["SER"]["parent_owner_tag"], "GER")
+        self.assertEqual(countries["SER"]["subject_kind"], "puppet")
+        self.assertEqual(countries["SUR"]["display_name"], "Suriname")
+        self.assertEqual(countries["SUR"]["base_iso2"], "SR")
+        self.assertEqual(countries["SUR"]["continent_id"], "continent_south_america")
+
+    def test_south_transfers_and_canal_keep_panamanian_cores(self):
+        owners = json.loads((SCENARIO_DIR / "owners.by_feature.json").read_text(encoding="utf-8"))["owners"]
+        cores = json.loads((SCENARIO_DIR / "cores.by_feature.json").read_text(encoding="utf-8"))["cores"]
+        for fid, tag in {
+            "GF_PRIMARY": "GUC", "BO_ADM1_BOL-1940": "STC", "HT_ADM1_HTI-1385": "DOM",
+            "RS228": "BUL", "XK_ADM1_KOS-5914": "BUL", "XK_ADM1_KOS-5915": "BUL",
+            "ATLISL_levant_cyprus": "GRE", "GR_ADM1_GRC-2992": "GRE",
+            "ATLISL_adriatica_corfu": "ITA", "SI041": "ITA", "SI037": "ITA", "SI031": "HUN",
+            "HR031": "ITA", "HR032": "CRO", "HR033": "CRO", "HR034": "ITA",
+            "HR035": "CRO", "HR036": "ITA", "HR037": "CRO",
+            "ME_ADM1_MNE-1496": "MNT", "ME_ADM1_MNE-1499": "MNT",
+            "ME_ADM1_MNE-1497": "ALB", "ME_ADM1_MNE-1506": "ITA",
+            "ME_ADM1_MNE-1507": "ITA", "ME_ADM1_MNE-1518": "ITA",
+        }.items():
+            self.assertEqual(owners[fid], tag, fid)
+        for number in range(5886, 5914):
+            if number not in (5892, 5893, 5894, 5895, 5900, 5901):
+                self.assertEqual(owners[f"XK_ADM1_KOS-{number}"], "ALB")
+        for parent in ("PA_ADM1_PAN-1337", "PA_ADM1_PAN-1340"):
+            self.assertNotIn(parent, owners)
+            self.assertEqual(owners[parent + "__SPLIT_PCZ"], "PCZ")
+            self.assertEqual(owners[parent + "__SPLIT_REST"], "PAN")
+            self.assertEqual(cores[parent + "__SPLIT_PCZ"], ["PAN"])
 
 
 if __name__ == "__main__":

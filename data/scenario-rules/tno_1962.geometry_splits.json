@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "scenarios": [
+    "tno_1962"
+  ],
+  "area_tolerance_degrees2": 1e-09,
+  "entries": [
+    {
+      "id": "panama_canal_zone",
+      "feature_ids": [
+        "PA_ADM1_PAN-1337",
+        "PA_ADM1_PAN-1340"
+      ],
+      "parts": [
+        {
+          "suffix": "PCZ",
+          "name_en": "Panama Canal Zone",
+          "name_zh": "巴拿马运河区",
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -79.99,
+                  9.4
+                ],
+                [
+                  -79.86,
+                  9.4
+                ],
+                [
+                  -79.84,
+                  9.3
+                ],
+                [
+                  -79.72,
+                  9.22
+                ],
+                [
+                  -79.62,
+                  9.14
+                ],
+                [
+                  -79.575,
+                  9.05
+                ],
+                [
+                  -79.552,
+                  8.99
+                ],
+                [
+                  -79.548,
+                  8.93
+                ],
+                [
+                  -79.6,
+                  8.88
+                ],
+                [
+                  -79.68,
+                  8.92
+                ],
+                [
+                  -79.78,
+                  9.0
+                ],
+                [
+                  -79.95,
+                  9.07
+                ],
+                [
+                  -80.08,
+                  9.18
+                ],
+                [
+                  -80.05,
+                  9.3
+                ],
+                [
+                  -79.99,
+                  9.4
+                ]
+              ]
+            ]
+          }
+        }
+      ],
+      "remainder": {
+        "suffix": "REST",
+        "name_en": "Panama",
+        "name_zh": "巴拿马"
+      },
+      "sources": [
+        "research-south-america.md §3.1 H1"
+      ],
+      "notes": "按地块尺度近似运河区，包含历史上由运河区包围的巴拿马科隆飞地。"
+    }
+  ]
+}

@@ -586,16 +586,6 @@
           "name_en": "South Atlantic Dependencies",
           "name_zh": "南大西洋属地"
         },
-        "west_indies": {
-          "district_id": "west_indies",
-          "feature_ids": [
-            "BS",
-            "JM",
-            "TT"
-          ],
-          "name_en": "West Indies Administration",
-          "name_zh": "西印度群岛行政区"
-        },
         "yukon": {
           "district_id": "yukon",
           "feature_ids": [
@@ -1985,8 +1975,6 @@
             "AT212",
             "AT213",
             "SI033",
-            "SI037",
-            "SI041",
             "SI042"
           ],
           "name_en": "Reichsgau Carinthia & Carniola",
@@ -2409,7 +2397,6 @@
             "AT224",
             "AT225",
             "AT226",
-            "SI031",
             "SI032",
             "SI034",
             "SI035",
@@ -2670,13 +2657,6 @@
         "noreste": {
           "district_id": "noreste",
           "feature_ids": [
-            "AD_ADM1_AND-4876",
-            "AD_ADM1_AND-4877",
-            "AD_ADM1_AND-4878",
-            "AD_ADM1_AND-4879",
-            "AD_ADM1_AND-4880",
-            "AD_ADM1_AND-4881",
-            "AD_ADM1_AND-4882",
             "ES211",
             "ES212",
             "ES213",
@@ -2771,19 +2751,81 @@
             "ITI42",
             "ITI43",
             "ITI44",
-            "ITI45",
-            "SM_ADM1_SMR-4883",
-            "SM_ADM1_SMR-4884",
-            "SM_ADM1_SMR-4885",
-            "SM_ADM1_SMR-4886",
-            "SM_ADM1_SMR-4887",
-            "SM_ADM1_SMR-4888",
-            "SM_ADM1_SMR-4889",
-            "SM_ADM1_SMR-4890",
-            "SM_ADM1_SMR-4891"
+            "ITI45"
           ],
           "name_en": "Central Italy",
           "name_zh": "意大利中部"
+        },
+        "dalmazia": {
+          "district_id": "dalmazia",
+          "feature_ids": [
+            "ATLISL_adriatica_CRO_3",
+            "ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806",
+            "ATLPRV_18254",
+            "ATLPRV_18260",
+            "ATLPRV_18263",
+            "ATLPRV_18380",
+            "ATLSHL_adriatica_10",
+            "ATLSHL_adriatica_13",
+            "ATLSHL_adriatica_14",
+            "ATLSHL_adriatica_20",
+            "ATLSHL_adriatica_4",
+            "ATLSHL_adriatica_6",
+            "ATLSHL_adriatica_7",
+            "ATLSHL_adriatica_8",
+            "ATLSHL_adriatica_9",
+            "HR031",
+            "HR034",
+            "HR036",
+            "ME_ADM1_MNE-1506",
+            "ME_ADM1_MNE-1507",
+            "ME_ADM1_MNE-1518"
+          ],
+          "name_en": "Dalmatia and Cattaro",
+          "name_zh": "达尔马提亚与卡塔罗"
+        },
+        "egeo": {
+          "district_id": "egeo",
+          "feature_ids": [
+            "ATLISL_aegean_GRE_23",
+            "ATLISL_aegean_GRE_25",
+            "ATLISL_aegean_GRE_26",
+            "ATLISL_aegean_GRE_27",
+            "ATLISL_aegean_rhodes",
+            "ATLISL_aegean_source_2efc11d76fa75115aa5d752976a1688549d79a4a6e009e59719cc5bcf57abd9f",
+            "ATLISL_aegean_source_3d305c15511d75f8c4c2981e57b4d4f1252e8b56ef737f48c5f4b97a86d30968",
+            "ATLISL_aegean_source_a91b3ea3d1ce93dee5899d23455ad3aee7fe8dbc8fd703f2d67b0285de3a3db8"
+          ],
+          "name_en": "Italian Aegean Islands",
+          "name_zh": "意属爱琴群岛"
+        },
+        "isole_ionie": {
+          "district_id": "isole_ionie",
+          "feature_ids": [
+            "ATLISL_adriatica_corfu",
+            "EL621",
+            "EL623",
+            "GR_ADM1_GRC-2883"
+          ],
+          "name_en": "Ionian Islands",
+          "name_zh": "爱奥尼亚群岛"
+        },
+        "lubiana": {
+          "district_id": "lubiana",
+          "feature_ids": [
+            "SI037",
+            "SI041"
+          ],
+          "name_en": "Province of Ljubljana",
+          "name_zh": "卢布尔雅那省"
+        },
+        "malta": {
+          "district_id": "malta",
+          "feature_ids": [
+            "ATLISL_sicily_tunis_malta"
+          ],
+          "name_en": "Malta",
+          "name_zh": "马耳他"
         },
         "nizza_savoia": {
           "district_id": "nizza_savoia",
@@ -2895,7 +2937,6 @@
             "ATLISL_sicily_tunis_ITA_3",
             "ATLISL_sicily_tunis_ITA_4",
             "ATLISL_sicily_tunis_ITA_5",
-            "ATLISL_sicily_tunis_malta",
             "ATLISL_sicily_tunis_sicily",
             "ATLISL_tyrrhenian_source_563cb45377b6dc55202afe8dcdc4915ec0a12ec704a0368b1f9d7d6a03982ea5",
             "ATLISL_tyrrhenian_source_94f4a06c5021a8103287fc93fd5929a51c737789f31113757fd136dfe689cf68",
@@ -4786,7 +4827,6 @@
             "ATLISL_aegean_chios",
             "ATLISL_aegean_ikaria",
             "ATLISL_aegean_lesvos",
-            "ATLISL_aegean_rhodes",
             "ATLISL_aegean_samos",
             "ATLPRV_18171",
             "ATLPRV_18181",
@@ -4862,14 +4902,6 @@
           ],
           "name_en": "Central Anatolia",
           "name_zh": "中安纳托利亚区"
-        },
-        "cyprus": {
-          "district_id": "cyprus",
-          "feature_ids": [
-            "ATLISL_levant_cyprus"
-          ],
-          "name_en": "Cyprus Administration",
-          "name_zh": "塞浦路斯行政区"
         },
         "eastern_anatolia": {
           "district_id": "eastern_anatolia",
