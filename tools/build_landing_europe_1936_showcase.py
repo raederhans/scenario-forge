@@ -55,11 +55,10 @@ HERO_BBOX = (-10.0, 34.0, 39.0, 65.0)
 HERO_CANVAS_WIDTH = 980
 HERO_CANVAS_HEIGHT = 680
 HERO_CAPITAL_LIMIT = 8
-# RKU is a landless container in 1962; its Kiev district UK00 carries the capital.
-TNO_1962_HERO_CAPITAL_TAGS = ("ENG", "FRA", "GER", "ITA", "IBR", "UK00", "SOV", "WRS", "BRG")
+TNO_1962_HERO_CAPITAL_TAGS = ("ENG", "FRA", "GER", "ITA", "IBR", "RKU", "SOV", "WRS", "BRG")
 TNO_1962_HERO_CAPITAL_LABELS = {
     "BRG": "Nanzig",
-    "UK00": "Kyiv",
+    "RKU": "Kyiv",
 }
 TNO_1962_HERO_CAPITAL_POINTS = {
     # Nanzig is the TNO-localized Nancy feature (FR_ARR_54003), not Brussels.
