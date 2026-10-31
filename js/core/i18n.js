@@ -10,7 +10,7 @@ import {
   getCountryCode as getSharedFeatureCountryCode,
   getFeatureId as getSharedFeatureId,
 } from "./feature_identity.js";
-import { getScenarioCountryDisplayName } from "./scenario_country_display.js";
+import { getLocalizedScenarioCountryName } from "./scenario_country_display.js";
 const state = runtimeState;
 
 const US_LEGACY_ZONE_LABEL_RE = /(?:\bZone\s+\d+\b|第?\s*\d+\s*[区號号])/i;
@@ -313,11 +313,11 @@ function getTooltipCountryContext(feature) {
     ? normalizeTooltipCountryCode(runtimeState.scenarioBaselineOwnersByFeatureId?.[featureId] || "")
     : "";
   const countryCode = scenarioBaselineCode || getTooltipFeatureCountryCode(feature, { useIdFallback: true });
-  const rawCountryName =
-    getScenarioCountryDisplayName(runtimeState.scenarioCountriesByTag?.[countryCode]) ||
-    runtimeState.countryNames?.[countryCode] ||
-    countryCode;
-  const countryDisplayName = getDirectGeoLabel(rawCountryName) || rawCountryName || countryCode;
+  const countryDisplayName = getLocalizedScenarioCountryName(
+    runtimeState.scenarioCountriesByTag?.[countryCode],
+    runtimeState.countryNames?.[countryCode] || countryCode,
+    getDirectGeoLabel,
+  ) || countryCode;
   return {
     countryCode,
     countryDisplayName,

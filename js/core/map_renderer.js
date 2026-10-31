@@ -253,7 +253,7 @@ import {
 } from "./i18n.js";
 import { markDirty } from "./dirty_state.js";
 import { perfIsEnabled, recordRenderSample } from "./perf_probe.js";
-import { getScenarioCountryDisplayName } from "./scenario_country_display.js";
+import { getLocalizedScenarioCountryName, getScenarioCountryDisplayName } from "./scenario_country_display.js";
 import {
   SCENARIO_PRESENTATION_FEATURES,
   scenarioHasPresentationFeature,
@@ -12320,11 +12320,11 @@ function getCityTooltipText(entry) {
       || props.country_code
       || ""
   ).trim().toUpperCase();
-  const rawCountryName =
-    getScenarioCountryDisplayName(runtimeState.scenarioCountriesByTag?.[countryCode])
-    || runtimeState.countryNames?.[countryCode]
-    || countryCode;
-  const countryDisplayName = rawCountryName ? (t(rawCountryName, "geo") || rawCountryName) : "";
+  const countryDisplayName = getLocalizedScenarioCountryName(
+    runtimeState.scenarioCountriesByTag?.[countryCode],
+    runtimeState.countryNames?.[countryCode] || countryCode,
+    (name) => t(name, "geo"),
+  );
   const lines = [fullLabel];
   const capitalDescriptor = getCityCapitalDescriptor(entry);
   if (capitalDescriptor) {
@@ -13235,11 +13235,11 @@ function getCountryLabelSourceOwner() {
     state: runtimeState,
     topojson: globalThis.topojson,
     ensureSources: (layers) => callRuntimeHook(runtimeState, "ensureScenarioNavigationSourcesFn", { layers }),
-    getCountryName: (code) => {
-      const name = getScenarioCountryDisplayName(runtimeState.scenarioCountriesByTag?.[code])
-        || runtimeState.countryNames?.[code] || code;
-      return t(name, "geo") || name;
-    },
+    getCountryName: (code) => getLocalizedScenarioCountryName(
+      runtimeState.scenarioCountriesByTag?.[code],
+      runtimeState.countryNames?.[code] || code,
+      (name) => t(name, "geo"),
+    ),
     onChange: () => {
       invalidateRenderPasses("labels", "country-label-source");
       requestRendererRender("country-label-source", { flush: false });

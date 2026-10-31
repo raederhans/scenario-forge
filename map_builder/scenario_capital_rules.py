@@ -394,7 +394,7 @@ TNO_CAPITALS = {
     "PHI": MODERN_CAPITALS["PH"],
     "PRM": ("1159150775", "Perm", "彼尔姆"),
     "RGC": ("1159151533", "Chengdu", "成都"),
-    "RKP": ("1159149709", "Krakau", "克拉科夫"),
+    "RKP": ("1159149709", "Krakau", "克拉考"),
     "SBA": ("1159146637", "Kansk", "坎斯克"),
     "SCO": ("1159146365", "Edinburgh", "爱丁堡"),
     "SVR": ("1159150701", "Sverdlovsk", "斯维尔德洛夫斯克"),
@@ -517,31 +517,46 @@ ADDITIONAL_CAPITAL_CITIES = {
 }
 
 
-def apply_reviewed_capitals(payload, countries, city_rows, *, scenario_id, strict=False):
+def apply_reviewed_capitals(payload, countries, city_rows, *, scenario_id, strict=False, city_names=None):
     """Apply only reviewed defaults, preserving unrelated city edits and metadata.
 
     The build can operate on a partial city fixture; the repair CLI uses strict
     mode so a missing real city fails before any artifacts are written.
+
+    ``city_names`` are the scenario's reviewed city renames by stable city ID.
+    They outrank the labels in the capital rules: choosing a capital must not
+    replace a scenario place name, and a city keeps its name after its tag is
+    retired.
     """
     result = copy.deepcopy(payload)
     capitals = result.setdefault("capitals_by_tag", {})
     hints = result.setdefault("capital_city_hints", {})
     cities = result.setdefault("cities", {})
     applied = set()
+    renames = {city_id: dict(entry["display_name"]) for city_id, entry in (city_names or {}).items()
+               if city_id.startswith("CITY::") and entry.get("display_name")}
+
+    def name_city(city_id, en, zh):
+        display_name = renames.get(city_id) or {"en": en, "zh": zh}
+        cities[city_id] = {
+            **cities.get(city_id, {}), "city_id": city_id, "stable_key": f"id::{city_id}",
+            "display_name": dict(display_name),
+        }
+        # Existing hints for regional capitals must agree with their labels.
+        for hint in hints.values():
+            if hint.get("city_id") == city_id:
+                hint["city_name"] = display_name["en"]
+
+    for city_id, display_name in renames.items():
+        if city_id in cities and cities[city_id].get("display_name") != display_name:
+            name_city(city_id, display_name["en"], display_name["zh"])
     for ne_id, (en, zh) in REVIEWED_CITY_NAMES.get(scenario_id, {}).items():
         city_id = f"CITY::ne::{ne_id}"
         if city_id not in city_rows:
             if strict:
                 raise ValueError(f"{scenario_id}: missing reviewed city {city_id}")
             continue
-        cities[city_id] = {
-            **cities.get(city_id, {}), "city_id": city_id, "stable_key": f"id::{city_id}",
-            "display_name": {"en": en, "zh": zh},
-        }
-        # Existing hints for regional capitals must agree with their labels.
-        for hint in hints.values():
-            if hint.get("city_id") == city_id:
-                hint["city_name"] = en
+        name_city(city_id, en, zh)
     for tag, (ne_id, en, zh) in REVIEWED_CAPITALS.get(scenario_id, {}).items():
         if tag not in countries:
             continue
@@ -556,9 +571,10 @@ def apply_reviewed_capitals(payload, countries, city_rows, *, scenario_id, stric
             "country_code", "host_feature_id", "urban_match_id", "lon", "lat",
             "population", "base_tier", "source",
         )}
+        display_name = renames.get(city_id) or {"en": en, "zh": zh}
         hint.update({
             "tag": tag, "city_id": city_id, "stable_key": f"id::{city_id}",
-            "city_name": en, "name_ascii": city.get("name_ascii", en),
+            "city_name": display_name["en"], "name_ascii": city.get("name_ascii", en),
             "display_name": country.get("display_name", tag),
             "lookup_iso2": country.get("lookup_iso2", ""),
             "base_iso2": country.get("base_iso2", ""),
@@ -570,7 +586,7 @@ def apply_reviewed_capitals(payload, countries, city_rows, *, scenario_id, stric
         hints[tag] = hint
         cities[city_id] = {
             **cities.get(city_id, {}), "city_id": city_id, "stable_key": f"id::{city_id}",
-            "display_name": {"en": en, "zh": zh},
+            "display_name": dict(display_name),
         }
         if city_id not in city_rows:
             cities[city_id].update({**city, "city_id": city_id, "add_city": True})

@@ -29776,8 +29776,8 @@
       ],
       "city_id": "CITY::ne::1159134253",
       "display_name": {
-        "en": "Melitopol",
-        "zh": "梅利托波尔"
+        "en": "Ost-Germania",
+        "zh": "东日耳曼尼亚"
       },
       "hidden": false,
       "host_feature_id": "UA_RAY_74538382B95492559683598",
@@ -35516,7 +35516,7 @@
       "city_id": "CITY::ne::1159149709",
       "display_name": {
         "en": "Krakau",
-        "zh": "克拉科夫"
+        "zh": "克拉考"
       },
       "hidden": false,
       "host_feature_id": "PL_POW_1261",
@@ -35554,11 +35554,12 @@
       ],
       "display_name": {
         "en": "Dodoma",
-        "zh": "松巴万加"
+        "zh": "多多马"
       },
       "hidden": false,
       "stable_key": "id::CITY::ne::1159149731",
-      "tier": "major"
+      "tier": "major",
+      "city_id": "CITY::ne::1159149731"
     },
     "CITY::ne::1159149733": {
       "aliases": [
