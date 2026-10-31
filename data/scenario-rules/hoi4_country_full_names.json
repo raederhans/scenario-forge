@@ -190,6 +190,10 @@
       "en": "Territory of Ubangi-Shari",
       "zh": "乌班吉沙立领地"
     },
+    "CAY": {
+      "en": "Colony of French Guiana",
+      "zh": "法属圭亚那殖民地"
+    },
     "CDE": {
       "en": "East Chahar Garrison",
       "zh": "察东警备区（李守信）"
@@ -386,6 +390,10 @@
       "en": "Gambia Colony",
       "zh": "冈比亚殖民地"
     },
+    "GDL": {
+      "en": "Colony of Guadeloupe",
+      "zh": "瓜德罗普殖民地"
+    },
     "GEO": {
       "en": "Georgian SSR",
       "zh": "格鲁吉亚苏维埃社会主义共和国"
@@ -393,10 +401,6 @@
     "GER": {
       "en": "German Reich",
       "zh": "德意志国"
-    },
-    "GF": {
-      "en": "Colony of French Guiana",
-      "zh": "法属圭亚那殖民地"
     },
     "GLD": {
       "en": "Gold Coast Colony",
@@ -417,10 +421,6 @@
     "GOA": {
       "en": "Portuguese India",
       "zh": "葡属印度"
-    },
-    "GP": {
-      "en": "Colony of Guadeloupe",
-      "zh": "瓜德罗普殖民地"
     },
     "GRE": {
       "en": "Kingdom of Greece",
@@ -798,10 +798,6 @@
       "en": "French Protectorate in Morocco",
       "zh": "法属摩洛哥保护国"
     },
-    "MQ": {
-      "en": "Colony of Martinique",
-      "zh": "马提尼克殖民地"
-    },
     "MRD": {
       "en": "Mordovian ASSR",
       "zh": "莫尔多维亚自治共和国"
@@ -809,6 +805,10 @@
     "MRE": {
       "en": "Mari Autonomous Oblast",
       "zh": "马里自治州"
+    },
+    "MTQ": {
+      "en": "Colony of Martinique",
+      "zh": "马提尼克殖民地"
     },
     "MUL": {
       "en": "Muli Chiefdom",
@@ -913,6 +913,10 @@
     "PAR": {
       "en": "Republic of Paraguay",
       "zh": "巴拉圭共和国"
+    },
+    "PCZ": {
+      "en": "Panama Canal Zone",
+      "zh": "巴拿马运河区"
     },
     "PER": {
       "en": "Imperial State of Iran",

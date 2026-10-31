@@ -277,7 +277,7 @@
       "source_types": [
         "scenario_extension"
       ],
-      "subject_kind": "puppet",
+      "subject_kind": "protectorate",
       "subregion_id": "subregion_southern_europe",
       "subregion_label": "Southern Europe",
       "synthetic_owner": false,
@@ -1589,12 +1589,12 @@
       "color_hex": "#339b00",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 28,
+      "controller_feature_count": 26,
       "display_name": "Tsardom of Bulgaria",
       "display_name_en": "Tsardom of Bulgaria",
       "display_name_zh": "保加利亚沙皇国",
       "entry_kind": "",
-      "feature_count": 28,
+      "feature_count": 26,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -1821,6 +1821,47 @@
       "subregion_label": "Middle Africa",
       "synthetic_owner": false,
       "tag": "CAR"
+    },
+    "CAY": {
+      "base_iso2": "GF",
+      "capital_state_id": null,
+      "color_hex": "#0f68db",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 1,
+      "display_name": "Colony of French Guiana",
+      "display_name_en": "Colony of French Guiana",
+      "display_name_zh": "法属圭亚那殖民地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GF",
+      "notes": "",
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "primary_rule_source": "cay_colony",
+      "provenance_iso2": "GF",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "cay_colony"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "CAY"
     },
     "CEL": {
       "base_iso2": "ID",
@@ -3426,6 +3467,47 @@
       "synthetic_owner": false,
       "tag": "GAM"
     },
+    "GDL": {
+      "base_iso2": "GP",
+      "capital_state_id": null,
+      "color_hex": "#5d82eb",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 1,
+      "display_name": "Colony of Guadeloupe",
+      "display_name_en": "Colony of Guadeloupe",
+      "display_name_zh": "瓜德罗普殖民地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "GP",
+      "notes": "",
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "primary_rule_source": "gdl_colony",
+      "provenance_iso2": "GP",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "gdl_colony"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "GDL"
+    },
     "GEO": {
       "base_iso2": "GE",
       "capital_state_id": null,
@@ -3510,47 +3592,6 @@
       "subregion_label": "Western Europe",
       "synthetic_owner": false,
       "tag": "GER"
-    },
-    "GF": {
-      "base_iso2": "GF",
-      "capital_state_id": null,
-      "color_hex": "#0f68db",
-      "continent_id": "",
-      "continent_label": "",
-      "controller_feature_count": 1,
-      "display_name": "Colony of French Guiana",
-      "display_name_en": "Colony of French Guiana",
-      "display_name_zh": "法属圭亚那殖民地",
-      "entry_kind": "scenario_subject",
-      "feature_count": 1,
-      "featured": false,
-      "historical_fidelity": "vanilla",
-      "historical_fidelity_summary": [
-        "vanilla"
-      ],
-      "lookup_iso2": "GF",
-      "notes": "",
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "primary_rule_source": "",
-      "provenance_iso2": "GF",
-      "quality": "approx_existing_geometry",
-      "rule_sources": [
-        "gf_parent"
-      ],
-      "scenario_only": true,
-      "source": "fallback_current_code",
-      "source_type": "synthetic_fallback",
-      "source_types": [
-        "synthetic_fallback"
-      ],
-      "subject_kind": "colony",
-      "subregion_id": "",
-      "subregion_label": "",
-      "synthetic_owner": true,
-      "tag": "GF"
     },
     "GLD": {
       "base_iso2": "GH",
@@ -3756,47 +3797,6 @@
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
       "tag": "GOA"
-    },
-    "GP": {
-      "base_iso2": "GP",
-      "capital_state_id": null,
-      "color_hex": "#5d82eb",
-      "continent_id": "",
-      "continent_label": "",
-      "controller_feature_count": 1,
-      "display_name": "Colony of Guadeloupe",
-      "display_name_en": "Colony of Guadeloupe",
-      "display_name_zh": "瓜德罗普殖民地",
-      "entry_kind": "scenario_subject",
-      "feature_count": 1,
-      "featured": false,
-      "historical_fidelity": "vanilla",
-      "historical_fidelity_summary": [
-        "vanilla"
-      ],
-      "lookup_iso2": "GP",
-      "notes": "",
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "primary_rule_source": "",
-      "provenance_iso2": "GP",
-      "quality": "approx_existing_geometry",
-      "rule_sources": [
-        "gp_parent"
-      ],
-      "scenario_only": true,
-      "source": "fallback_current_code",
-      "source_type": "synthetic_fallback",
-      "source_types": [
-        "synthetic_fallback"
-      ],
-      "subject_kind": "colony",
-      "subregion_id": "",
-      "subregion_label": "",
-      "synthetic_owner": true,
-      "tag": "GP"
     },
     "GRE": {
       "base_iso2": "GR",
@@ -5009,12 +5009,12 @@
       "color_hex": "#437f3f",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 121,
+      "controller_feature_count": 125,
       "display_name": "Kingdom of Italy",
       "display_name_en": "Kingdom of Italy",
       "display_name_zh": "意大利王国",
       "entry_kind": "",
-      "feature_count": 121,
+      "feature_count": 125,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -5031,7 +5031,8 @@
         "italy_absorbs_san_marino_1936",
         "1939_italy_albania",
         "1939_italy_absorbs_san_marino",
-        "libyan_coastal_provinces_1939"
+        "libyan_coastal_provinces_1939",
+        "julian_march"
       ],
       "scenario_only": false,
       "source": "direct_active_owner",
@@ -7364,47 +7365,6 @@
       "synthetic_owner": false,
       "tag": "MOR"
     },
-    "MQ": {
-      "base_iso2": "MQ",
-      "capital_state_id": null,
-      "color_hex": "#5887fd",
-      "continent_id": "",
-      "continent_label": "",
-      "controller_feature_count": 1,
-      "display_name": "Colony of Martinique",
-      "display_name_en": "Colony of Martinique",
-      "display_name_zh": "马提尼克殖民地",
-      "entry_kind": "scenario_subject",
-      "feature_count": 1,
-      "featured": false,
-      "historical_fidelity": "vanilla",
-      "historical_fidelity_summary": [
-        "vanilla"
-      ],
-      "lookup_iso2": "MQ",
-      "notes": "",
-      "parent_owner_tag": "FRA",
-      "parent_owner_tags": [
-        "FRA"
-      ],
-      "primary_rule_source": "",
-      "provenance_iso2": "MQ",
-      "quality": "approx_existing_geometry",
-      "rule_sources": [
-        "mq_parent"
-      ],
-      "scenario_only": true,
-      "source": "fallback_current_code",
-      "source_type": "synthetic_fallback",
-      "source_types": [
-        "synthetic_fallback"
-      ],
-      "subject_kind": "colony",
-      "subregion_id": "",
-      "subregion_label": "",
-      "synthetic_owner": true,
-      "tag": "MQ"
-    },
     "MRD": {
       "base_iso2": "RU",
       "capital_state_id": null,
@@ -7486,6 +7446,47 @@
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
       "tag": "MRE"
+    },
+    "MTQ": {
+      "base_iso2": "MQ",
+      "capital_state_id": null,
+      "color_hex": "#5887fd",
+      "continent_id": "",
+      "continent_label": "",
+      "controller_feature_count": 1,
+      "display_name": "Colony of Martinique",
+      "display_name_en": "Colony of Martinique",
+      "display_name_zh": "马提尼克殖民地",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MQ",
+      "notes": "",
+      "parent_owner_tag": "FRA",
+      "parent_owner_tags": [
+        "FRA"
+      ],
+      "primary_rule_source": "mtq_colony",
+      "provenance_iso2": "MQ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mtq_colony"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "colony",
+      "subregion_id": "",
+      "subregion_label": "",
+      "synthetic_owner": false,
+      "tag": "MTQ"
     },
     "MUL": {
       "base_iso2": "CN",
@@ -8448,6 +8449,47 @@
       "synthetic_owner": false,
       "tag": "PAR"
     },
+    "PCZ": {
+      "base_iso2": "PA",
+      "capital_state_id": null,
+      "color_hex": "#1f75eb",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 2,
+      "display_name": "Panama Canal Zone",
+      "display_name_en": "Panama Canal Zone",
+      "display_name_zh": "巴拿马运河区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PA",
+      "notes": "Colón city is included in the Canal Zone at parcel scale.",
+      "parent_owner_tag": "USA",
+      "parent_owner_tags": [
+        "USA"
+      ],
+      "primary_rule_source": "panama_canal_zone",
+      "provenance_iso2": "PA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "panama_canal_zone"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "territory",
+      "subregion_id": "subregion_central_america",
+      "subregion_label": "Central America",
+      "synthetic_owner": false,
+      "tag": "PCZ"
+    },
     "PER": {
       "base_iso2": "IR",
       "capital_state_id": 266,
@@ -9224,12 +9266,12 @@
       "color_hex": "#d7c448",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 101,
+      "controller_feature_count": 103,
       "display_name": "Kingdom of Romania",
       "display_name_en": "Kingdom of Romania",
       "display_name_zh": "罗马尼亚王国",
       "entry_kind": "",
-      "feature_count": 101,
+      "feature_count": 103,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -9243,7 +9285,8 @@
       "provenance_iso2": "RO",
       "quality": "manual_reviewed",
       "rule_sources": [
-        "romania_bessarabia_1936"
+        "romania_bessarabia_1936",
+        "southern_dobruja"
       ],
       "scenario_only": false,
       "source": "manual_rule",
@@ -12146,12 +12189,12 @@
       "color_hex": "#48497e",
       "continent_id": "continent_europe",
       "continent_label": "Europe",
-      "controller_feature_count": 120,
+      "controller_feature_count": 116,
       "display_name": "Kingdom of Yugoslavia",
       "display_name_en": "Kingdom of Yugoslavia",
       "display_name_zh": "南斯拉夫王国",
       "entry_kind": "",
-      "feature_count": 120,
+      "feature_count": 116,
       "featured": true,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [

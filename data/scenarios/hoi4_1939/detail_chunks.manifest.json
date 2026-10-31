@@ -17,14 +17,14 @@
         90.0
       ],
       "priority": 100,
-      "feature_count": 21098,
-      "byte_size": 28496216,
-      "sha256": "04ddc4eb30c13f1f036557d976f56190ecf0e67aeb481424b6e3940d324035b7",
-      "decoded_byte_size": 28496216,
-      "coord_count": 762191,
-      "part_count": 33484,
-      "estimated_path_cost": 1093357,
-      "cache_byte_size": 33524514,
+      "feature_count": 21100,
+      "byte_size": 28498177,
+      "sha256": "fc7071477493f2cbc618acd2185c26996cc9036b8bb2c3e2e79e6c71437bd4c6",
+      "decoded_byte_size": 28498177,
+      "coord_count": 762236,
+      "part_count": 33489,
+      "estimated_path_cost": 1093448,
+      "cache_byte_size": 33526224,
       "data_format": "topojson",
       "global_coverage": true,
       "country_codes": [
@@ -36952,12 +36952,6 @@
           9.047078345783461
         ],
         [
-          -80.86220862208621,
-          8.599557086782026,
-          -79.07299072990729,
-          9.630320034200338
-        ],
-        [
           -80.9450094500945,
           7.529955620556208,
           -80.37620376203762,
@@ -36968,12 +36962,6 @@
           7.236598937989385,
           -79.99459994599945,
           7.989952785527848
-        ],
-        [
-          -80.16020160201602,
-          8.219083448834482,
-          -78.02687342834341,
-          9.468887066870664
         ],
         [
           -81.8810188101881,
@@ -126818,6 +126806,30 @@
           20.80217570875709,
           -8.695886958869579,
           26.0
+        ],
+        [
+          -80.08,
+          9.079875167220102,
+          -79.6436075484767,
+          9.4
+        ],
+        [
+          -80.86220862208621,
+          8.599557086782026,
+          -79.07299072990729,
+          9.630320034200338
+        ],
+        [
+          -79.96219962199622,
+          8.88,
+          -79.54866678435316,
+          9.191152929529295
+        ],
+        [
+          -80.16020160201602,
+          8.219083448834482,
+          -78.02687342834341,
+          9.468887066870664
         ]
       ],
       "lod_diagnostics": {
@@ -126827,18 +126839,18 @@
         "preserve_topology": true,
         "fr_shared_coverage_tier": "fr-arr-shared-coverage-v1",
         "fr_shared_coverage_applied": false,
-        "source_feature_count": 21098,
-        "optimized_feature_count": 21098,
-        "source_coord_count": 762191,
-        "optimized_coord_count": 762191,
-        "source_part_count": 33484,
-        "optimized_part_count": 33484,
-        "source_byte_size": 35596544,
-        "optimized_byte_size": 28496216,
-        "source_estimated_path_cost": 1093357,
-        "optimized_estimated_path_cost": 1093357,
+        "source_feature_count": 21100,
+        "optimized_feature_count": 21100,
+        "source_coord_count": 762236,
+        "optimized_coord_count": 762236,
+        "source_part_count": 33489,
+        "optimized_part_count": 33489,
+        "source_byte_size": 35598752,
+        "optimized_byte_size": 28498177,
+        "source_estimated_path_cost": 1093448,
+        "optimized_estimated_path_cost": 1093448,
         "coord_reduction": 0,
-        "byte_size_reduction": 7100328,
+        "byte_size_reduction": 7100575,
         "estimated_path_cost_reduction": 0,
         "political_precision_feature_ids": [
           "AFG-1750",
@@ -127036,6 +127048,14 @@
           "PAK-1114__SPLIT_REST",
           "PAK-1123__SPLIT_FRONTIER_STATES",
           "PAK-1123__SPLIT_REST",
+          "PA_ADM1_PAN-1336",
+          "PA_ADM1_PAN-1337__SPLIT_PCZ",
+          "PA_ADM1_PAN-1337__SPLIT_REST",
+          "PA_ADM1_PAN-1340__SPLIT_PCZ",
+          "PA_ADM1_PAN-1340__SPLIT_REST",
+          "PA_ADM1_PAN-1341",
+          "PA_ADM1_PAN-1418",
+          "PA_ADM1_PAN-1419",
           "PL_MRG_727dd6268093__SPLIT_DANZIG",
           "PL_MRG_727dd6268093__SPLIT_REST",
           "PL_MRG_9e4e875a7bcd__SPLIT_DANZIG",
@@ -127781,12 +127801,12 @@
         ],
         "regional_shared_coverage_applied": false,
         "regional_shared_coverage_eligible_count": 0,
-        "regional_shared_coverage_retained_count": 21098,
+        "regional_shared_coverage_retained_count": 21100,
         "global_shard_coverage_applied": false,
         "shared_coverage_eligible_count": 0,
-        "shared_coverage_retained_count": 21098,
-        "expanded_geojson_byte_size": 33524514,
-        "wire_byte_size": 28496216
+        "shared_coverage_retained_count": 21100,
+        "expanded_geojson_byte_size": 33526224,
+        "wire_byte_size": 28498177
       }
     },
     {
@@ -131189,7 +131209,7 @@
       "priority": 95,
       "feature_count": 1,
       "byte_size": 4711,
-      "sha256": "bcd634331471258f36d11370791b2648e1a505fe7d15a102bd0f64636be71f68",
+      "sha256": "b42703d70c7ee95425406e74a5113d964d1dd4bf19d3cd395a7e02276f51935a",
       "decoded_byte_size": 4711,
       "coord_count": 39,
       "part_count": 3,
@@ -132995,17 +133015,17 @@
       "bounds": [
         22.340023400234003,
         41.238200702007006,
-        28.60408604086041,
+        28.064080640806424,
         44.20995597155972
       ],
       "priority": 95,
-      "feature_count": 28,
-      "byte_size": 88845,
-      "sha256": "a0ac450bf3f947d200bd9db88aa559921caa10582280ae1444bc092216b8e1b2",
-      "decoded_byte_size": 88845,
-      "coord_count": 810,
-      "part_count": 28,
-      "estimated_path_cost": 1118,
+      "feature_count": 26,
+      "byte_size": 83254,
+      "sha256": "c899eefd3762455860a90936d845fb0cf81037c9a82c3d3c8879bd02e21de9a9",
+      "decoded_byte_size": 83254,
+      "coord_count": 760,
+      "part_count": 26,
+      "estimated_path_cost": 1046,
       "data_format": "geojson",
       "global_coverage": false,
       "owner_code": "BUL",
@@ -133068,22 +133088,10 @@
           43.947844379443794
         ],
         [
-          26.372063720637215,
-          43.66837440374404,
-          27.668076680766802,
-          44.14399411394113
-        ],
-        [
           27.05607056070562,
           42.83517199171992,
           28.064080640806424,
           43.60414838448385
-        ],
-        [
-          27.200072000720013,
-          43.31773505535055,
-          28.60408604086041,
-          44.00512704527044
         ],
         [
           26.55206552065522,
@@ -135170,6 +135178,42 @@
       ]
     },
     {
+      "id": "political.detail.country.cay",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.cay.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -54.59994599945999,
+        2.1210832958329604,
+        -51.64791647916479,
+        5.783702232022321
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "byte_size": 13454,
+      "sha256": "70924cff26cd13bfc6e49120ee8222826cbac8a9c57cbd3affcc33f890669ad7",
+      "decoded_byte_size": 13454,
+      "coord_count": 123,
+      "part_count": 4,
+      "estimated_path_cost": 158,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "owner_code": "CAY",
+      "country_codes": [
+        "CAY"
+      ],
+      "feature_bounds": [
+        [
+          -54.59994599945999,
+          2.1210832958329604,
+          -51.64791647916479,
+          5.783702232022321
+        ]
+      ]
+    },
+    {
       "id": "political.detail.country.cel",
       "layer": "political",
       "lod": "detail",
@@ -135743,7 +135787,7 @@
       "priority": 95,
       "feature_count": 693,
       "byte_size": 2482348,
-      "sha256": "e92c7573dcdf1a31f411e4ae54b7865eb2625a770e31b0bf7cf1f266dcc0f304",
+      "sha256": "91dd837919dceb9c6ff24c7b64f085f789f7bf14d85d4b4bd3287cc8c1b59c3a",
       "decoded_byte_size": 2482348,
       "coord_count": 22342,
       "part_count": 750,
@@ -140171,7 +140215,7 @@
       "priority": 95,
       "feature_count": 1,
       "byte_size": 2965,
-      "sha256": "aec35433c32b55d674e59e6a6453bfec7992fab06cf43d0775c8dc99b8fc7cd1",
+      "sha256": "40d55b2e70df843bb64acaa40cb43b0ad31b4437ac8c47d81419f9c74503af71",
       "decoded_byte_size": 2965,
       "coord_count": 24,
       "part_count": 1,
@@ -141383,7 +141427,7 @@
       "priority": 95,
       "feature_count": 6,
       "byte_size": 21952,
-      "sha256": "ae267ce380116f47650f4d12d0af69a531f1f1a6fd9aaca38eef143759c46346",
+      "sha256": "0ea899599047f35ab008ebe18a9e113fcfae300fd80c86c4d4bad2436de934c7",
       "decoded_byte_size": 21952,
       "coord_count": 191,
       "part_count": 7,
@@ -148070,6 +148114,42 @@
       ]
     },
     {
+      "id": "political.detail.country.gdl",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gdl.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -61.80001800018,
+        15.889753154531547,
+        -61.18801188011879,
+        16.51465496354963
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "byte_size": 3747,
+      "sha256": "2ccd7f757cd7fb354980ed348e014b762ad9a8c61a07480274b5e581cb0e1a54",
+      "decoded_byte_size": 3747,
+      "coord_count": 30,
+      "part_count": 3,
+      "estimated_path_cost": 57,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "owner_code": "GDL",
+      "country_codes": [
+        "GDL"
+      ],
+      "feature_bounds": [
+        [
+          -61.80001800018,
+          15.889753154531547,
+          -61.18801188011879,
+          16.51465496354963
+        ]
+      ]
+    },
+    {
       "id": "political.detail.country.geo",
       "layer": "political",
       "lod": "detail",
@@ -152168,42 +152248,6 @@
       ]
     },
     {
-      "id": "political.detail.country.gf",
-      "layer": "political",
-      "lod": "detail",
-      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gf.json",
-      "min_zoom": 1.35,
-      "max_zoom": 99.0,
-      "bounds": [
-        -54.59994599945999,
-        2.1210832958329604,
-        -51.64791647916479,
-        5.783702232022321
-      ],
-      "priority": 95,
-      "feature_count": 1,
-      "byte_size": 13454,
-      "sha256": "70924cff26cd13bfc6e49120ee8222826cbac8a9c57cbd3affcc33f890669ad7",
-      "decoded_byte_size": 13454,
-      "coord_count": 123,
-      "part_count": 4,
-      "estimated_path_cost": 158,
-      "data_format": "geojson",
-      "global_coverage": false,
-      "owner_code": "GF",
-      "country_codes": [
-        "GF"
-      ],
-      "feature_bounds": [
-        [
-          -54.59994599945999,
-          2.1210832958329604,
-          -51.64791647916479,
-          5.783702232022321
-        ]
-      ]
-    },
-    {
       "id": "political.detail.country.gld",
       "layer": "political",
       "lod": "detail",
@@ -152219,7 +152263,7 @@
       "priority": 95,
       "feature_count": 5,
       "byte_size": 27199,
-      "sha256": "9d0767d607c3d8543d367f0df4637ad719ba14f48340eb1e7112ab9857ed44d5",
+      "sha256": "bb2d17df449ca991c01026cb2fc9d30a012059e634f91cc10b912d2a25bd7d4d",
       "decoded_byte_size": 27199,
       "coord_count": 246,
       "part_count": 8,
@@ -152867,7 +152911,7 @@
       "priority": 95,
       "feature_count": 3,
       "byte_size": 24890,
-      "sha256": "7ab4bc6e999e514090317726eed33cf4b9db89be079d5c6b6ae632b309df0606",
+      "sha256": "b1d7b63e5fac1b79182997dab29b785bc976bbd5a03bdea0a2fcf8142f3e8869",
       "decoded_byte_size": 24890,
       "coord_count": 224,
       "part_count": 7,
@@ -152956,42 +153000,6 @@
           14.898589451894523,
           74.32814328143283,
           15.495717847178469
-        ]
-      ]
-    },
-    {
-      "id": "political.detail.country.gp",
-      "layer": "political",
-      "lod": "detail",
-      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.gp.json",
-      "min_zoom": 1.35,
-      "max_zoom": 99.0,
-      "bounds": [
-        -61.80001800018,
-        15.889753154531547,
-        -61.18801188011879,
-        16.51465496354963
-      ],
-      "priority": 95,
-      "feature_count": 1,
-      "byte_size": 3747,
-      "sha256": "2ccd7f757cd7fb354980ed348e014b762ad9a8c61a07480274b5e581cb0e1a54",
-      "decoded_byte_size": 3747,
-      "coord_count": 30,
-      "part_count": 3,
-      "estimated_path_cost": 57,
-      "data_format": "geojson",
-      "global_coverage": false,
-      "owner_code": "GP",
-      "country_codes": [
-        "GP"
-      ],
-      "feature_bounds": [
-        [
-          -61.80001800018,
-          15.889753154531547,
-          -61.18801188011879,
-          16.51465496354963
         ]
       ]
     },
@@ -155099,7 +155107,7 @@
       "priority": 95,
       "feature_count": 15,
       "byte_size": 156058,
-      "sha256": "2387e824f163bfd4d73357f64da480d6af0e0a3af9ef0fe3cfa33106b2e2442f",
+      "sha256": "367dcaad935951d8509945337a5540b865f69937ce1669e7dd0860dbd7d65a9e",
       "decoded_byte_size": 156058,
       "coord_count": 1489,
       "part_count": 29,
@@ -155333,7 +155341,7 @@
       "priority": 95,
       "feature_count": 1,
       "byte_size": 7825,
-      "sha256": "9c7c0252fb69f007d7a1767e77a0abec877e90df31222fe31dd3b64bf227e900",
+      "sha256": "03f24054de6ffbe34ee9dce23face44f09f1d3e1548dbc5801c3b8c51764daee",
       "decoded_byte_size": 7825,
       "coord_count": 69,
       "part_count": 2,
@@ -155369,7 +155377,7 @@
       "priority": 95,
       "feature_count": 5,
       "byte_size": 64453,
-      "sha256": "18b75949fc750a2b64c1469cad5ff6c115ca0c555eac1c49d102ccbb6b0d3622",
+      "sha256": "fd387d66573afa26f67cce4b36cdd03216f9dc286d4b1306b0f1e60b80336d1d",
       "decoded_byte_size": 64453,
       "coord_count": 641,
       "part_count": 7,
@@ -155429,7 +155437,7 @@
       "priority": 95,
       "feature_count": 1,
       "byte_size": 8431,
-      "sha256": "4f69d08917215b6599a622336b84308c268a36d56b64a3c14f14c4ba65f4515c",
+      "sha256": "4c92d7e86af50593b5712878cc6038b26dba0d665c57bd8936faf8e776feeece",
       "decoded_byte_size": 8431,
       "coord_count": 76,
       "part_count": 2,
@@ -155465,7 +155473,7 @@
       "priority": 95,
       "feature_count": 2,
       "byte_size": 3020,
-      "sha256": "cf3f9f26bda4f6b0bf22de103ed035298ba443bd78c20f44edba3d35c385df92",
+      "sha256": "719a81d12b282e722b86447b463522c53bd8622cd54748693437cb6cae57c500",
       "decoded_byte_size": 3020,
       "coord_count": 19,
       "part_count": 2,
@@ -155507,7 +155515,7 @@
       "priority": 95,
       "feature_count": 5,
       "byte_size": 33539,
-      "sha256": "7a5fcbda562b1fa5adc35b553c8ffe6f929b70dd429e79f72d2e7dfa6454ac95",
+      "sha256": "a6c60c7f5840194c51ce45fda63c29730ac3c1e644c0667c1f0ee595ae58ed30",
       "decoded_byte_size": 33539,
       "coord_count": 320,
       "part_count": 6,
@@ -156123,13 +156131,13 @@
         47.08276845468454
       ],
       "priority": 95,
-      "feature_count": 121,
-      "byte_size": 354674,
-      "sha256": "80f612df973e9d60cf02d1a7225d444f604ef4466bdeb3311a4818fc65b89ceb",
-      "decoded_byte_size": 354674,
-      "coord_count": 3174,
-      "part_count": 126,
-      "estimated_path_cost": 4545,
+      "feature_count": 125,
+      "byte_size": 364960,
+      "sha256": "f6d9974be32238d1448d8467e0b6eebaa8cbd1ca573a2a6ddeb5ece62677cb1a",
+      "decoded_byte_size": 364960,
+      "coord_count": 3264,
+      "part_count": 130,
+      "estimated_path_cost": 4679,
       "data_format": "geojson",
       "global_coverage": false,
       "owner_code": "ITA",
@@ -156137,6 +156145,12 @@
         "ITA"
       ],
       "feature_bounds": [
+        [
+          13.519935199352005,
+          44.814027720277195,
+          14.203942039420411,
+          45.511834740347396
+        ],
         [
           6.643866438664389,
           44.716820772207726,
@@ -156862,6 +156876,24 @@
           28.092696813968132,
           25.148051480514823,
           32.225727945279445
+        ],
+        [
+          14.023940239402407,
+          45.477117973179745,
+          14.563945639456392,
+          45.89545501755016
+        ],
+        [
+          13.411934119341197,
+          45.76526714067141,
+          14.131941319413187,
+          46.437036585365846
+        ],
+        [
+          13.591935919359202,
+          45.42851449914498,
+          14.131941319413187,
+          45.85379489694897
         ]
       ]
     },
@@ -159695,7 +159727,7 @@
       "priority": 95,
       "feature_count": 1,
       "byte_size": 12883,
-      "sha256": "57958173d573d265903000f94e260c3ea6e85d6d2ddc4bf1d60620a5a5190ddf",
+      "sha256": "2102d38fff25af51a5d9398838b05a314b79ddc594c6750ca98423a0895434da",
       "decoded_byte_size": 12883,
       "coord_count": 130,
       "part_count": 1,
@@ -160073,7 +160105,7 @@
       "priority": 95,
       "feature_count": 1,
       "byte_size": 1991,
-      "sha256": "6db61d710dee3e0ab8dd5923a55dbe0ff7cd89e164069ef0fb457be25b407440",
+      "sha256": "8fb18c4412ee2597383979fa0dc911408bef21a1a727eb319afdcb61b788c549",
       "decoded_byte_size": 1991,
       "coord_count": 15,
       "part_count": 1,
@@ -160109,7 +160141,7 @@
       "priority": 95,
       "feature_count": 79,
       "byte_size": 139540,
-      "sha256": "833f4d388645d0a0b2fe2cca9bbc05a569223f1a6eb3be28f643d936b991ae02",
+      "sha256": "7f5ed22e73780fc6822ae9a6fbd8bf170f0340b4147474427052d4d5f6a4b130",
       "decoded_byte_size": 139540,
       "coord_count": 1030,
       "part_count": 89,
@@ -160889,7 +160921,7 @@
       "priority": 95,
       "feature_count": 1,
       "byte_size": 7231,
-      "sha256": "04f395e7584a7a8c1e797d30fab11db82361838a0ebb50f9e78d713888068269",
+      "sha256": "8ad7dee00b72441382c17464034a996b9602f568a8ec78c9af0056b3f83292b3",
       "decoded_byte_size": 7231,
       "coord_count": 70,
       "part_count": 1,
@@ -160925,7 +160957,7 @@
       "priority": 95,
       "feature_count": 3,
       "byte_size": 7226,
-      "sha256": "0a54d67099e6063943e419d3aa73a1fad97ae04057815973cb272a42ddd0838d",
+      "sha256": "4d7122f814a56a58b24fe3f9766bbd2e3e9d54e13c5811eb5cb37da3634fe68e",
       "decoded_byte_size": 7226,
       "coord_count": 53,
       "part_count": 4,
@@ -162005,7 +162037,7 @@
       "priority": 95,
       "feature_count": 234,
       "byte_size": 1102052,
-      "sha256": "f1f16e0842988993f30e2756e21ba9366bc2f2353246bc564cd66118f21817c6",
+      "sha256": "effc6298b4c887c0aecccd44248229b6530445d759d8c5ac82d80362e576bc56",
       "decoded_byte_size": 1102052,
       "coord_count": 10249,
       "part_count": 266,
@@ -165935,7 +165967,7 @@
       "priority": 95,
       "feature_count": 11,
       "byte_size": 55760,
-      "sha256": "76782211ddf7b7ec589bff8a6efb36df643ad864aa91527e60e543ef649fa712",
+      "sha256": "9780318f07550df048723ad9c23bafefecb3e4761024c72c293958caa9826252",
       "decoded_byte_size": 55760,
       "coord_count": 528,
       "part_count": 12,
@@ -166012,42 +166044,6 @@
           29.08386051660517,
           -4.771847718477176,
           31.972295544955443
-        ]
-      ]
-    },
-    {
-      "id": "political.detail.country.mq",
-      "layer": "political",
-      "lod": "detail",
-      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mq.json",
-      "min_zoom": 1.35,
-      "max_zoom": 99.0,
-      "bounds": [
-        -61.22401224012239,
-        14.429913095130956,
-        -60.8280082800828,
-        14.881231068310683
-      ],
-      "priority": 95,
-      "feature_count": 1,
-      "byte_size": 2415,
-      "sha256": "ce4fb118cd05cfbc90d8bebe5442ca4cfad3c7b315d86ed6dd0147ceb9f74187",
-      "decoded_byte_size": 2415,
-      "coord_count": 20,
-      "part_count": 1,
-      "estimated_path_cost": 31,
-      "data_format": "geojson",
-      "global_coverage": false,
-      "owner_code": "MQ",
-      "country_codes": [
-        "MQ"
-      ],
-      "feature_bounds": [
-        [
-          -61.22401224012239,
-          14.429913095130956,
-          -60.8280082800828,
-          14.881231068310683
         ]
       ]
     },
@@ -166220,6 +166216,42 @@
       ]
     },
     {
+      "id": "political.detail.country.mtq",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.mtq.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -61.22401224012239,
+        14.429913095130956,
+        -60.8280082800828,
+        14.881231068310683
+      ],
+      "priority": 95,
+      "feature_count": 1,
+      "byte_size": 2415,
+      "sha256": "ce4fb118cd05cfbc90d8bebe5442ca4cfad3c7b315d86ed6dd0147ceb9f74187",
+      "decoded_byte_size": 2415,
+      "coord_count": 20,
+      "part_count": 1,
+      "estimated_path_cost": 31,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "owner_code": "MTQ",
+      "country_codes": [
+        "MTQ"
+      ],
+      "feature_bounds": [
+        [
+          -61.22401224012239,
+          14.429913095130956,
+          -60.8280082800828,
+          14.881231068310683
+        ]
+      ]
+    },
+    {
       "id": "political.detail.country.mul",
       "layer": "political",
       "lod": "detail",
@@ -166313,7 +166345,7 @@
       "priority": 95,
       "feature_count": 7,
       "byte_size": 81417,
-      "sha256": "3c85d1de876e149bdd546f3e58018e322df65bf3b64b72ac96390faaddd4c99a",
+      "sha256": "c2018616e3293a283dba6b1652327e172700b2f9aa5d9566e5e62d13f27df63b",
       "decoded_byte_size": 81417,
       "coord_count": 785,
       "part_count": 9,
@@ -166517,7 +166549,7 @@
       "priority": 95,
       "feature_count": 3,
       "byte_size": 14651,
-      "sha256": "bb40145d996d34237241fd0e6e1d8a22a80a1f7542903e450b92563f5f98573f",
+      "sha256": "064b32be87b0c9ae65c6b739a24e941d120c85711cc08e458183a697fcd74c48",
       "decoded_byte_size": 14651,
       "coord_count": 126,
       "part_count": 5,
@@ -169013,7 +169045,7 @@
       "priority": 95,
       "feature_count": 20,
       "byte_size": 139902,
-      "sha256": "3be2d1a748fa80e0e0746ee2db522f96d3b422a55b262044c1cc25ffd0e73628",
+      "sha256": "21d7ee6ac63e9138ae4645cd7d6e0ec5c8818849ebf5f17b8f567d284fc8da63",
       "decoded_byte_size": 139902,
       "coord_count": 1302,
       "part_count": 35,
@@ -169163,7 +169195,7 @@
       "priority": 95,
       "feature_count": 21,
       "byte_size": 232659,
-      "sha256": "6b92e937fb3be7f8f3d3d69fa4bfdaa779b146a557366d1478fee454142cf863",
+      "sha256": "e0aa3c7e15f80bc8f70d7c472467b288f400641b26755e62d7b9a9bd591891c4",
       "decoded_byte_size": 232659,
       "coord_count": 2221,
       "part_count": 48,
@@ -169900,12 +169932,12 @@
       ],
       "priority": 95,
       "feature_count": 12,
-      "byte_size": 78388,
-      "sha256": "8b02d282a20267c7d8c53ec603ab7cdb84be8f8ff1e3c2a3b910aae1094dbdea",
-      "decoded_byte_size": 78388,
-      "coord_count": 703,
-      "part_count": 28,
-      "estimated_path_cost": 963,
+      "byte_size": 79409,
+      "sha256": "7cd7821467b2b93aa1ea5afb098aec034269dd95f4b89de63c54be3c7c1406f7",
+      "decoded_byte_size": 79409,
+      "coord_count": 711,
+      "part_count": 31,
+      "estimated_path_cost": 995,
       "data_format": "geojson",
       "global_coverage": false,
       "owner_code": "PAN",
@@ -169926,12 +169958,6 @@
           9.047078345783461
         ],
         [
-          -80.86220862208621,
-          8.599557086782026,
-          -79.07299072990729,
-          9.630320034200338
-        ],
-        [
           -80.9450094500945,
           7.529955620556208,
           -80.37620376203762,
@@ -169942,12 +169968,6 @@
           7.236598937989385,
           -79.99459994599945,
           7.989952785527848
-        ],
-        [
-          -80.16020160201602,
-          8.219083448834482,
-          -78.02687342834341,
-          9.468887066870664
         ],
         [
           -81.8810188101881,
@@ -169984,6 +170004,18 @@
           7.588974124741242,
           -77.26937269372694,
           8.782247957848336
+        ],
+        [
+          -80.86220862208621,
+          8.599557086782026,
+          -79.07299072990729,
+          9.630320034200338
+        ],
+        [
+          -80.16020160201602,
+          8.219083448834482,
+          -78.02687342834341,
+          9.468887066870664
         ]
       ]
     },
@@ -170194,6 +170226,48 @@
           -27.580846854468547,
           -54.63954639546395,
           -26.04661260303123
+        ]
+      ]
+    },
+    {
+      "id": "political.detail.country.pcz",
+      "layer": "political",
+      "lod": "detail",
+      "url": "data/scenarios/hoi4_1939/chunks/political.detail.country.pcz.json",
+      "min_zoom": 1.35,
+      "max_zoom": 99.0,
+      "bounds": [
+        -80.08,
+        8.88,
+        -79.54866678435316,
+        9.4
+      ],
+      "priority": 95,
+      "feature_count": 2,
+      "byte_size": 4587,
+      "sha256": "8a3953fe6c5113835e4390b49086081c18a76cf9048c34416ce1d63d1241e0b4",
+      "decoded_byte_size": 4587,
+      "coord_count": 37,
+      "part_count": 2,
+      "estimated_path_cost": 59,
+      "data_format": "geojson",
+      "global_coverage": false,
+      "owner_code": "PCZ",
+      "country_codes": [
+        "PCZ"
+      ],
+      "feature_bounds": [
+        [
+          -80.08,
+          9.079875167220102,
+          -79.6436075484767,
+          9.4
+        ],
+        [
+          -79.96219962199622,
+          8.88,
+          -79.54866678435316,
+          9.191152929529295
         ]
       ]
     },
@@ -171275,7 +171349,7 @@
       "priority": 95,
       "feature_count": 255,
       "byte_size": 1487269,
-      "sha256": "d78618fbd2cadd5aafe7b62c4cf2a8fefe5c25c9fb09d6a048131403ec6134a2",
+      "sha256": "7a86764039885fe5e2c8338a067af6b2d59513c1eca7a09523a55caa0e2197b3",
       "decoded_byte_size": 1487269,
       "coord_count": 14049,
       "part_count": 337,
@@ -173705,7 +173779,7 @@
       "priority": 95,
       "feature_count": 274,
       "byte_size": 2216755,
-      "sha256": "6eb9dfb068aacc9820c27b536855181681519222c2605dfadcae31eeb520ae8d",
+      "sha256": "16a79ba0aa3c02f67bf78326c5c8500732bbf92c43b9217dea1fab15eee8cd48",
       "decoded_byte_size": 2216755,
       "coord_count": 21059,
       "part_count": 466,
@@ -175463,7 +175537,7 @@
       "priority": 95,
       "feature_count": 1,
       "byte_size": 10842,
-      "sha256": "00ddfd23d04afbc25c23f899dba439a95645e57e29f3ecf8d82c9339904a9aac",
+      "sha256": "b52a352142f2d4ebe910fb9d6a97ab5ab5c09cd927171f3a98d8645d6cad4f0a",
       "decoded_byte_size": 10842,
       "coord_count": 96,
       "part_count": 3,
@@ -176638,18 +176712,18 @@
       "max_zoom": 99.0,
       "bounds": [
         20.2520025200252,
-        43.619770929709304,
+        43.31773505535055,
         30.461704617046166,
         48.620721240212404
       ],
       "priority": 95,
-      "feature_count": 101,
-      "byte_size": 307912,
-      "sha256": "82c477d9e33782b8bff5345e869008e5e49c9f6dea2caf890f9e535a79ee52f0",
-      "decoded_byte_size": 307912,
-      "coord_count": 2709,
-      "part_count": 125,
-      "estimated_path_cost": 4012,
+      "feature_count": 103,
+      "byte_size": 313503,
+      "sha256": "bfb294d8c28e3670a8703445d3a4ad39e45c0b0e4434108444ea4675a3109f23",
+      "decoded_byte_size": 313503,
+      "coord_count": 2759,
+      "part_count": 127,
+      "estimated_path_cost": 4084,
       "data_format": "geojson",
       "global_coverage": false,
       "owner_code": "ROM",
@@ -176657,6 +176731,18 @@
         "ROM"
       ],
       "feature_bounds": [
+        [
+          26.372063720637215,
+          43.66837440374404,
+          27.668076680766802,
+          44.14399411394113
+        ],
+        [
+          27.200072000720013,
+          43.31773505535055,
+          28.60408604086041,
+          44.00512704527044
+        ],
         [
           26.624066240662415,
           48.122535631356314,
@@ -177857,7 +177943,7 @@
       "priority": 95,
       "feature_count": 1,
       "byte_size": 7139,
-      "sha256": "709b489a07b0c2fec8beeeac16b45f33f4cd28a7b1d99e282d7ef257d7b0972f",
+      "sha256": "0f01b6d670ece5376c20bf320a0bf508d395ef7a1efff0809b9ebc4b70be1a1e",
       "decoded_byte_size": 7139,
       "coord_count": 61,
       "part_count": 2,
@@ -179915,7 +180001,7 @@
       "priority": 95,
       "feature_count": 3,
       "byte_size": 21237,
-      "sha256": "3088c5989864689394f847c330cb0b08160ca48d11ea484907358d5ee486cb0c",
+      "sha256": "50ad6d43610f6bf5e346390a8d8d16f36e33ae8ac9bc21089548a1895860cc92",
       "decoded_byte_size": 21237,
       "coord_count": 195,
       "part_count": 4,
@@ -237557,7 +237643,7 @@
       "priority": 95,
       "feature_count": 1366,
       "byte_size": 2923023,
-      "sha256": "072887ea349fcfb7dacf9e977f91dc632a88b7bcaa3945e03b47fbea6e6a93cc",
+      "sha256": "50737ee170bfc15eb715e9835132102b160738c5af49d56ccd8f304777222976",
       "decoded_byte_size": 2923023,
       "coord_count": 22764,
       "part_count": 1800,
@@ -248057,7 +248143,7 @@
       "priority": 95,
       "feature_count": 1,
       "byte_size": 1921,
-      "sha256": "1d8888ab24faad157159a54bbc0d04c6baf79bae029d6c2e774f15596e0dd1e2",
+      "sha256": "715782ea64da63f6f3db7893cba37e9f6a0bc672a07e11253eb48bf5d7b4faba",
       "decoded_byte_size": 1921,
       "coord_count": 14,
       "part_count": 1,
@@ -261185,7 +261271,7 @@
       "priority": 95,
       "feature_count": 3,
       "byte_size": 16281,
-      "sha256": "d3ecf749de4579c610486f0319a8f69062a5998e0a28996e02863cb06cdbd364",
+      "sha256": "914f0f3e3c0cf97222f4e677eca6dad606d1e34360629aa52e51265ee59bdc4b",
       "decoded_byte_size": 16281,
       "coord_count": 144,
       "part_count": 5,
@@ -261783,19 +261869,19 @@
       "min_zoom": 1.35,
       "max_zoom": 99.0,
       "bounds": [
-        13.411934119341197,
+        13.69993699937001,
         40.85284458644587,
         23.02403024030241,
         46.870996174961746
       ],
       "priority": 95,
-      "feature_count": 120,
-      "byte_size": 349552,
-      "sha256": "4c346b9e86da3e32ec77a9d95bee6abf70f6f0251dc127e99974e0f1725bc067",
-      "decoded_byte_size": 349552,
-      "coord_count": 2973,
-      "part_count": 167,
-      "estimated_path_cost": 4669,
+      "feature_count": 116,
+      "byte_size": 339266,
+      "sha256": "7b8cfe4e9edb6abcbc9fc3502d880637077b67af04a5656074dd5d860c6ae484",
+      "decoded_byte_size": 339266,
+      "coord_count": 2883,
+      "part_count": 163,
+      "estimated_path_cost": 4535,
       "data_format": "geojson",
       "global_coverage": false,
       "owner_code": "YUG",
@@ -261880,12 +261966,6 @@
           43.00701998919989,
           17.44397443974441,
           43.97214611646116
-        ],
-        [
-          13.519935199352005,
-          44.814027720277195,
-          14.203942039420411,
-          45.511834740347396
         ],
         [
           16.651966519665194,
@@ -262170,12 +262250,6 @@
           46.02564289442894
         ],
         [
-          14.023940239402407,
-          45.477117973179745,
-          14.563945639456392,
-          45.89545501755016
-        ],
-        [
           14.095940959409603,
           45.7565879488795,
           14.959949599496014,
@@ -262186,18 +262260,6 @@
           46.003076995769945,
           14.563945639456392,
           46.51688514985149
-        ],
-        [
-          13.411934119341197,
-          45.76526714067141,
-          14.131941319413187,
-          46.437036585365846
-        ],
-        [
-          13.591935919359202,
-          45.42851449914498,
-          14.131941319413187,
-          45.85379489694897
         ],
         [
           18.923589235892365,
