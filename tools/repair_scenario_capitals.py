@@ -15,6 +15,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from map_builder.cities import SCENARIO_CITY_RENAMES
 from map_builder.io.writers import write_json_atomic
 from map_builder.scenario_capital_rules import REVIEWED_CAPITALS, apply_reviewed_capitals
 from map_builder.scenario_capital_placement import place_capital_markers, read_political_features
@@ -29,7 +30,9 @@ def read(path):
 def write_if_changed(path, payload):
     if path.exists() and read(path) == payload:
         return
-    write_json_atomic(path, payload, ensure_ascii=False, indent=2)
+    # Keep each artifact's existing end-of-file style so a rerun only changes data.
+    trailing_newline = path.exists() and path.read_bytes().endswith(b"\n")
+    write_json_atomic(path, payload, ensure_ascii=False, indent=2, trailing_newline=trailing_newline)
     sidecar = Path(str(path) + ".gz")
     if sidecar.exists():
         sidecar.write_bytes(gzip.compress(path.read_bytes(), compresslevel=9, mtime=0))
@@ -40,7 +43,8 @@ def repair_scenario(scenario_id, city_rows, *, geometry_cache=None, dry_run=Fals
     countries = read(directory / "countries.json")["countries"]
     owners = read(directory / "owners.by_feature.json")["owners"]
     original = read(directory / "city_overrides.json")
-    payload = apply_reviewed_capitals(original, countries, city_rows, scenario_id=scenario_id, strict=True)
+    payload = apply_reviewed_capitals(original, countries, city_rows, scenario_id=scenario_id, strict=True,
+                                      city_names=SCENARIO_CITY_RENAMES.get(scenario_id))
     mutations_path = directory / "scenario_mutations.json"
     if mutations_path.exists():
         # Restore explicit edits before validation, so the checked point is the

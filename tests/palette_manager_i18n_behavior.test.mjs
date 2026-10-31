@@ -7,6 +7,7 @@ import { createDefaultColorState } from "../js/core/state/color_state.js";
 import { createDefaultLocalesState } from "../js/core/state/content_state.js";
 import { getTooltipCountryContext, t } from "../js/core/i18n.js";
 import { getDirectGeoLabel } from "../js/ui/i18n.js";
+import { getLocalizedScenarioCountryName } from "../js/core/scenario_country_display.js";
 
 function resetPaletteI18nState() {
   Object.assign(runtimeState, createDefaultColorState());
@@ -125,4 +126,27 @@ test("country names retain exact full locales and explicit scenario bilingual na
 
   assert.equal(getDirectGeoLabel("United States"), "美国");
   assert.equal(getTooltipCountryContext({ id: "feature-2", properties: { country_code: "USA" } }).countryDisplayName, "美利坚合众国");
+});
+
+test("scenario country names in Chinese are not re-translated through place aliases", () => {
+  resetPaletteI18nState();
+  runtimeState.currentLanguage = "zh";
+  // 伯利兹 is also an alias of Belize City, as in the TNO 1962 city layer.
+  runtimeState.locales.geo = {
+    "id::CITY::ne::1159144449": { en: "Belize City", zh: "伯利兹城" },
+    Burundi: { en: "Burundi", zh: "布隆迪" },
+  };
+  runtimeState.geoAliasToStableKey = { 伯利兹: "id::CITY::ne::1159144449" };
+  const belize = { display_name_en: "Belize", display_name_zh: "伯利兹" };
+  const burundi = { display_name_en: "Burundi" };
+  // Map country labels and city tooltips translate through the alias-aware t().
+  const translateGeo = (name) => t(name, "geo");
+
+  assert.equal(translateGeo("伯利兹"), "伯利兹城");
+  assert.equal(getLocalizedScenarioCountryName(belize, "BLZ", translateGeo), "伯利兹");
+  assert.equal(getLocalizedScenarioCountryName(burundi, "BDI", translateGeo), "布隆迪");
+  assert.equal(getLocalizedScenarioCountryName(undefined, "Burundi", translateGeo), "布隆迪");
+
+  runtimeState.currentLanguage = "en";
+  assert.equal(getLocalizedScenarioCountryName(belize, "BLZ", translateGeo), "Belize");
 });

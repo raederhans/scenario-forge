@@ -85,7 +85,11 @@ import {
   resolveFeatureIdsFromPresetSource,
   rebuildPresetState,
 } from "../core/releasable_manager.js";
-import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
+import {
+  getLocalizedScenarioCountryName,
+  getScenarioCountryDisplayName,
+  getScenarioCountryOwnName,
+} from "../core/scenario_country_display.js";
 import { createHgoIdentityResolver } from "../core/hgo_identity_resolver.js";
 import { resolveDataAssetUrl } from "../core/runtime_asset_registry.js";
 import {
@@ -304,7 +308,11 @@ function getDynamicCountryEntries() {
         const code = normalizeCountryCode(rawCode);
         if (!code) return null;
         const name = getScenarioCountryDisplayName(scenarioCountry, runtimeState.countryNames?.[code] || code) || code;
-        const displayName = getDirectGeoLabel(name) || name || code;
+        const displayName = getLocalizedScenarioCountryName(
+          scenarioCountry,
+          runtimeState.countryNames?.[code] || code,
+          getDirectGeoLabel,
+        ) || code;
         const ownerFeatureCount = Number(scenarioCountry?.feature_count || 0) || 0;
         const controllerFeatureCount = Number(scenarioCountry?.controller_feature_count || 0) || 0;
         return {
@@ -956,12 +964,9 @@ function initSidebar({ render } = {}) {
     }
     const scenarioMeta = getScenarioCountryMeta(normalizedTag);
     const fallbackName = runtimeState.countryNames?.[normalizedTag] || countryNames[normalizedTag] || normalizedTag;
-    const scenarioName = scenarioMeta
-      ? getScenarioCountryDisplayName(scenarioMeta, fallbackName) || fallbackName
-      : fallbackName;
     return {
       tag: normalizedTag,
-      displayName: getDirectGeoLabel(scenarioName || normalizedTag) || scenarioName || normalizedTag,
+      displayName: getLocalizedScenarioCountryName(scenarioMeta || {}, fallbackName, getDirectGeoLabel) || normalizedTag,
       color: String(
         scenarioMeta?.color_hex
           || scenarioMeta?.colorHex
@@ -2636,9 +2641,9 @@ function initSidebar({ render } = {}) {
       return inspectorState.displayName;
     }
     const scenarioCountry = runtimeState.scenarioCountriesByTag?.[normalized];
-    const scenarioName = getScenarioCountryDisplayName(scenarioCountry);
+    const scenarioName = getLocalizedScenarioCountryName(scenarioCountry, "", getDirectGeoLabel);
     if (scenarioName) {
-      return getDirectGeoLabel(scenarioName) || scenarioName;
+      return scenarioName;
     }
     const fallbackName = String(runtimeState.countryNames?.[normalized] || countryNames[normalized] || normalized).trim();
     return getDirectGeoLabel(fallbackName) || fallbackName || normalized;
@@ -2727,7 +2732,9 @@ function initSidebar({ render } = {}) {
     const displayNameSource = scenarioDisplayName.toUpperCase() === normalizedEntryCode && fallbackDisplayName
       ? fallbackDisplayName
       : (scenarioDisplayName || fallbackDisplayName || normalizedEntryCode);
-    const displayName = getDirectGeoLabel(displayNameSource) || displayNameSource || normalizedEntryCode;
+    const displayName = displayNameSource === scenarioDisplayName && getScenarioCountryOwnName(scenarioMeta)
+      ? displayNameSource
+      : (getDirectGeoLabel(displayNameSource) || displayNameSource || normalizedEntryCode);
     const name = normalizeCountryDisplayNameCandidate(displayNameSource || entry?.name || normalizedEntryCode) || normalizedEntryCode;
     const lookupIso2 = resolveScenarioLookupCode(entry);
     const inspectorDataCode = resolveInspectorDataCode(entry);
