@@ -40,7 +40,7 @@ import { createPixelRatioPolicy } from "./renderer/pixel_ratio_policy.js";
 import { normalizeDisplayQuality } from "./renderer/display_quality_policy.js";
 import { separatesPoliticalBorders, isPoliticalBorderEnabled } from "./renderer/political_border_policy.js";
 import { createBorderIdentityResolver } from "./renderer/border_identity.js";
-import { getParentMergedParents, resolveParentMergedBorderKeys } from "./renderer/parent_merged_presentation.js";
+import { getParentMergedParents, resolveParentMergedBorderKeys, resolveParentMergedContourColor } from "./renderer/parent_merged_presentation.js";
 import { getScenarioCountryTags } from "./state/actions/scenario_activation_actions.js";
 import { normalizeScenarioDistrictGroupsPayload } from "./scenario_districts.js";
 import { createPoliticalBorderRuntime } from "./renderer/political_border_runtime.js";
@@ -2639,11 +2639,18 @@ function getPaintContourRuntimeOwner() {
         && !isScenarioShellFeature(feature, id)
         && !isColorResolutionOceanFeature(feature, id, { isAtlantropaSeaFeature })
         && (!feature.properties?.atl_color_rule || feature.properties.atl_color_rule === "owner"),
-      resolveColor: (feature, id) => (feature?.properties?.__riverParentId
-        ? getMapDataBoundary(runtimeState).paint.resolveRiverCellColor(id)
-        : getMapDataBoundary(runtimeState).paint.resolveFeatureColor(id, {
-          getBaseGroupCode: () => getMapDataBoundary(runtimeState).reference.getBaseGroupCode(feature),
-        })).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR),
+      resolveColor: (feature, id) => {
+        const color = (feature?.properties?.__riverParentId
+          ? getMapDataBoundary(runtimeState).paint.resolveRiverCellColor(id)
+          : getMapDataBoundary(runtimeState).paint.resolveFeatureColor(id, {
+            getBaseGroupCode: () => getMapDataBoundary(runtimeState).reference.getBaseGroupCode(feature),
+          })).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR);
+        const parents = getParentMergedParents(runtimeState.scenarioCountriesByTag);
+        if (!parents.size) return color;
+        const parent = getRiverPaintRuntime(runtimeState).getParentFeature(feature);
+        const owner = canonicalCountryCode(getDisplayOwnerCode(parent, feature?.properties?.__riverParentId || id));
+        return resolveParentMergedContourColor({ color, owner, parents, baseColors: runtimeState.sovereignBaseColors });
+      },
       onChange: (reason) => {
         invalidateRenderPasses("borders", reason);
         requestRendererRender(reason, { flush: false });

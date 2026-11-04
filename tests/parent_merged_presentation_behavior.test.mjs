@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-import { getParentMergedParents, resolveParentMergedBorderKeys } from '../js/core/renderer/parent_merged_presentation.js';
+import { getParentMergedParents, resolveParentMergedBorderKeys, resolveParentMergedContourColor } from '../js/core/renderer/parent_merged_presentation.js';
 import { uniquifyScenarioDefaultColors } from '../js/core/state/actions/scenario_activation_actions.js';
 import { createCountryLabelSourceOwner } from '../js/core/renderer/country_label_source.js';
 
@@ -91,4 +91,16 @@ test('country label geometry joins children to parents and preserves ordinary su
   } finally {
     owner.dispose();
   }
+});
+
+test('paint contours treat an unedited child default as its parent colour, but keep real edits', () => {
+  const parents = getParentMergedParents(countries());
+  const baseColors = uniquifyScenarioDefaultColors({ ES: '#f2cd5e', CAT: '#f2cd5e' }, {
+    deferred: new Set(parents.keys()),
+  });
+  assert.notEqual(baseColors.CAT, baseColors.ES);
+  assert.equal(resolveParentMergedContourColor({ color: baseColors.CAT, owner: 'CAT', parents, baseColors }), '#f2cd5e');
+  assert.equal(resolveParentMergedContourColor({ color: '#123456', owner: 'CAT', parents, baseColors }), '#123456');
+  assert.equal(resolveParentMergedContourColor({ color: baseColors.ES, owner: 'ES', parents, baseColors }), baseColors.ES);
+  assert.equal(resolveParentMergedContourColor({ color: '#abcdef', owner: 'SUBJECT', parents, baseColors }), '#abcdef');
 });

@@ -646,9 +646,6 @@
         "UA"
       ],
       "select": {
-        "owners": [
-          "UA"
-        ],
         "polygons": [
           [
             [
@@ -700,6 +697,9 @@
               45.9
             ]
           ]
+        ],
+        "country_codes": [
+          "UA"
         ]
       },
       "comment": "克里米亚与塞瓦斯托波尔（俄占）：A 类：2014 年起全境俄控，把握高。多边形覆盖克里米亚半岛到彼列科普地峡、阿拉巴特沙嘴南段；只取 UA 地块。（A 类沿用已有 tag RU，故不写 name/notes/subject_kind/inspector 字段，避免 update_country 覆盖俄罗斯本身的元数据）"
@@ -717,9 +717,6 @@
         "UA"
       ],
       "select": {
-        "owners": [
-          "UA"
-        ],
         "polygons": [
           [
             [
@@ -811,6 +808,9 @@
               48.12
             ]
           ]
+        ],
+        "country_codes": [
+          "UA"
         ]
       },
       "comment": "顿涅茨克（俄占）：A 类：按 2025-12-31 前线粗描，约 75-80% 俄控。Marinka 合并块（含 Pokrovsk/Kurakhove，书签日争夺中偏俄控）、Kostiantynivka 合并块（主体为 Bakhmut/Horlivka/Siversk 一带）划俄控；Sloviansk、Dobropillia、Oleksandrivka（克拉马托尔斯克—斯拉维扬斯克集群）留 UA。地块粗，精度约 ±20 km，把握中。（A 类沿用已有 tag RU，故不写 name/notes/subject_kind/inspector 字段，避免 update_country 覆盖俄罗斯本身的元数据）"
@@ -828,9 +828,6 @@
         "UA"
       ],
       "select": {
-        "owners": [
-          "UA"
-        ],
         "polygons": [
           [
             [
@@ -938,6 +935,9 @@
               45.9
             ]
           ]
+        ],
+        "country_codes": [
+          "UA"
         ]
       },
       "comment": "赫尔松第聂伯河左岸（俄占）：A 类：第聂伯河左岸全部俄控，把握高；右岸 Bilozerka/Beryslav/Velyka Oleksandrivka/Novovorontsovka/Vysokopillia 与赫尔松市留 UA。含金本沙嘴（米科拉伊夫州）。现有旧区地块沿河近似。（A 类沿用已有 tag RU，故不写 name/notes/subject_kind/inspector 字段，避免 update_country 覆盖俄罗斯本身的元数据）"
@@ -955,9 +955,6 @@
         "UA"
       ],
       "select": {
-        "owners": [
-          "UA"
-        ],
         "polygons": [
           [
             [
@@ -1005,6 +1002,9 @@
               50.05
             ]
           ]
+        ],
+        "country_codes": [
+          "UA"
         ]
       },
       "comment": "卢甘斯克（俄占）：A 类：卢甘斯克州几乎全境俄控（>99%），把握中高。多边形西缘沿卢甘斯克—哈尔科夫州界；哈尔科夫州 Oskil 以东零星俄控点（Kupiansk、Dvorichna 争夺中）未画。（A 类沿用已有 tag RU，故不写 name/notes/subject_kind/inspector 字段，避免 update_country 覆盖俄罗斯本身的元数据）"
@@ -1022,9 +1022,6 @@
         "UA"
       ],
       "select": {
-        "owners": [
-          "UA"
-        ],
         "polygons": [
           [
             [
@@ -1108,6 +1105,9 @@
               47.424
             ]
           ]
+        ],
+        "country_codes": [
+          "UA"
         ]
       },
       "comment": "扎波罗热南部（俄占）：A 类：2025 年底前线大致近似。Melitopol/Berdiansk/Tokmak/Vesele/Kamianka-Dniprovska/Prymorsk/Yakymivka/Polohy（含争夺中的 Huliaipole）划俄控；Orikhiv、Vilniansk、Zaporizhzhia 留 UA。把握中。（A 类沿用已有 tag RU，故不写 name/notes/subject_kind/inspector 字段，避免 update_country 覆盖俄罗斯本身的元数据）"

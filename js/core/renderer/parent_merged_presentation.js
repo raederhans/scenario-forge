@@ -23,3 +23,13 @@ export function resolveParentMergedBorderKeys({ borderKey, reference, parentKey,
   }
   return { borderKey, parentKey, homeKey: borderKey };
 }
+
+// Default colours are split by ±1 RGB so border identity stays exact. A child
+// still showing its own default must compare as its parent for paint contours;
+// any other colour is a real user edit and keeps its contour.
+export function resolveParentMergedContourColor({ color, owner, parents, baseColors }) {
+  const parent = parents.get(owner);
+  if (!parent || !color) return color;
+  const normalize = value => String(value || "").trim().toLowerCase();
+  return normalize(color) === normalize(baseColors?.[owner]) ? normalize(baseColors?.[parent]) || color : color;
+}
