@@ -1,6 +1,7 @@
 import { getMapDataBoundary } from '../map_data_boundary.js';
 import { getFeatureId } from '../feature_identity.js';
 import { getObjectIdentityToken } from './object_identity.js';
+import { getParentMergedParents } from './parent_merged_presentation.js';
 import { createWorkerTaskClient } from '../worker_task_client.js';
 import { packGeometryCooperatively } from '../cooperative_geometry_transport.js';
 import { getCountryLabelPolygons as polygons, mergeCountryLabelGroups, unpackCountryLabelTransport } from './country_label_geometry.js';
@@ -58,6 +59,9 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       bases.map(({ id, sha256, url }) => [id, sha256, url]),
       chunked ? '' : getObjectIdentityToken(topology),
       getObjectIdentityToken(state.scenarioBaselineOwnersByFeatureId), state.scenarioBaselineHash || '',
+      // Only the child→parent label grouping matters; other country edits must
+      // not re-dissolve every country outline.
+      [...getParentMergedParents(state.scenarioCountriesByTag)],
       state.mapSemanticMode || '']);
     return { scenarioId, bundle, chunked, bases, topology, identity };
   }
@@ -118,6 +122,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
       await yieldTask();
       if (disposed || context().identity !== c.identity) return;
       const groups = new Map(), seen = new Set();
+      const parents = getParentMergedParents(state.scenarioCountriesByTag);
       const add = (feature, geometry = null) => {
         const id = getFeatureId(feature);
         if (id && seen.has(id)) return;
@@ -125,7 +130,8 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
         if (!eligible(feature) || !isEligible(feature, id)) return;
         // Scenario reference is complete and immutable. Never borrow geographic
         // identity when a historical scenario has not assigned this feature.
-        const code = c.scenarioId ? reference.getScenarioGroupCode(id) : reference.getBaseGroupCode(feature);
+        const ownerCode = c.scenarioId ? reference.getScenarioGroupCode(id) : reference.getBaseGroupCode(feature);
+        const code = parents.get(ownerCode) || ownerCode;
         if (!code) return;
         if (!groups.has(code)) groups.set(code, []);
         groups.get(code).push(geometry || feature);
