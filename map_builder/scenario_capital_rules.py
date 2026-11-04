@@ -31,8 +31,12 @@ MODERN_CAPITALS = {
     "TW": ("1159151567", "Taipei", "台北"),
     "TZ": ("1159149731", "Dodoma", "多多马"),
     "ZA": ("1159150661", "Pretoria", "比勒陀利亚"),
-    # Modern World faction overlay (data/scenario-rules/modern_world.split_overlay.json):
-    # seats inside each faction's own parcels. YE keeps Ma'rib once Sanaa is Houthi-held.
+}
+
+# Modern World faction overlay (data/scenario-rules/modern_world.split_overlay.json):
+# seats inside each faction's own parcels. YE keeps Ma'rib once Sanaa is Houthi-held.
+# Scoped to modern_world only: blank_base shares MODERN_CAPITALS and has no factions.
+MODERN_FACTION_CAPITALS = {
     "ABK": ("CITY::ne::1159148621", "Sukhumi", "苏呼米"),
     "AJK": ("CITY::gn::1169607", "Muzaffarabad", "穆扎法拉巴德"),
     "AMB": ("CITY::ne::1159150315", "Bamenda", "巴门达"),
@@ -450,7 +454,7 @@ TNO_CAPITALS = {
 }
 REVIEWED_CAPITALS = {
     "blank_base": MODERN_CAPITALS,
-    "modern_world": MODERN_CAPITALS,
+    "modern_world": {**MODERN_CAPITALS, **MODERN_FACTION_CAPITALS},
     "hoi4_1936": {
         **HOI4_CAPITALS,
         **HOI4_SPLIT_CAPITALS,
