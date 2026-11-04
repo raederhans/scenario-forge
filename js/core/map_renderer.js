@@ -40,6 +40,7 @@ import { createPixelRatioPolicy } from "./renderer/pixel_ratio_policy.js";
 import { normalizeDisplayQuality } from "./renderer/display_quality_policy.js";
 import { separatesPoliticalBorders, isPoliticalBorderEnabled } from "./renderer/political_border_policy.js";
 import { createBorderIdentityResolver } from "./renderer/border_identity.js";
+import { getParentMergedParents, resolveParentMergedBorderKeys } from "./renderer/parent_merged_presentation.js";
 import { getScenarioCountryTags } from "./state/actions/scenario_activation_actions.js";
 import { normalizeScenarioDistrictGroupsPayload } from "./scenario_districts.js";
 import { createPoliticalBorderRuntime } from "./renderer/political_border_runtime.js";
@@ -2560,11 +2561,15 @@ function resolveClassifiedBorderFeature(feature, id) {
   }
   const parent = getRiverPaintRuntime(runtimeState).getParentFeature(feature);
   const parentId = feature?.properties?.__riverParentId || id;
-  const borderKey = resolveBorderIdentity(id, feature);
+  const identityKey = resolveBorderIdentity(id, feature);
   const reference = canonicalCountryCode(getDisplayOwnerCode(parent, parentId));
-  const districts = borderDistrictGroups.get(borderKey);
-  const parentKey = districts?.get(parentId)
-    || (reference === borderKey ? runtimeState.parentGroupByFeatureId?.get(parentId) : '') || '';
+  const districts = borderDistrictGroups.get(identityKey);
+  const sourceParentKey = districts?.get(parentId)
+    || (reference === identityKey ? runtimeState.parentGroupByFeatureId?.get(parentId) : '') || '';
+  // A same-colour subject (Catalonia in Spain) draws only a regional line
+  // against its parent; it never forms a national border of its own.
+  const { borderKey, parentKey } = resolveParentMergedBorderKeys({ borderKey: identityKey, reference,
+    parentKey: sourceParentKey, parents: getParentMergedParents(runtimeState.scenarioCountriesByTag) });
   // A country with scenario districts uses them as its only subdivision; its
   // source admin1 lines (e.g. the German Länder) would redraw a retired system.
   if (districts) return { borderKey, parentKey, provinceKey: '' };
