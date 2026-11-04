@@ -2409,7 +2409,7 @@
   "runtime_topology_url": "data/scenarios/modern_world/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "99aa4447ae7faed44153d29634d6ba3184a9556e43bdd439447e5f250e481bf5",
+  "snapshot_fingerprint": "cf560e54c902189e257c06930456aefefed0812b20d56fc6c12d17c28bfe585a",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",

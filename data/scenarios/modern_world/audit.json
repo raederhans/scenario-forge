@@ -645,10 +645,10 @@
   "profile": "lightweight_base",
   "reverse_coverage_gap_count": 0,
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "99aa4447ae7faed44153d29634d6ba3184a9556e43bdd439447e5f250e481bf5",
+  "snapshot_fingerprint": "cf560e54c902189e257c06930456aefefed0812b20d56fc6c12d17c28bfe585a",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "build_snapshot_sha256": "03449a9a96a5edbda8c92d208ab0551ca8774d12c693161649120f88a5bb19c8",
+    "build_snapshot_sha256": "e4e6c9e485261b4fcc5a21ef95d66a2807fd910cc3fd0ce949daa74f9de77ae5",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
     "runtime_topology_sha256": "3e07018b9b97b9a06b378be8034dc992a4b0742ae799896d276bea45a2baf213",
