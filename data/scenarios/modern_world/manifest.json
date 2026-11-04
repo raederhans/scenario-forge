@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/modern_world/audit.json",
-  "baseline_hash": "c6be39d33d2d2b799a8920a7178694c42353696cfadd5016ec538acaf67e183f",
+  "baseline_hash": "5f6282e5372e38a6536cecf5a30b93d0f620be09f56556bfc441d57235d002fe",
   "bookmark_date": "2026.1.1.12",
   "bookmark_description": "Modern-world baseline with matched The Fire Rises country colors.",
   "bookmark_name": "Modern World",
@@ -2409,7 +2409,7 @@
   "runtime_topology_url": "data/scenarios/modern_world/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "9ab90862edfe0ac90a7a6675ca14e1f9f9dd1455cfdec3da8ce66902ccc32154",
+  "snapshot_fingerprint": "99aa4447ae7faed44153d29634d6ba3184a9556e43bdd439447e5f250e481bf5",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
@@ -2427,7 +2427,7 @@
     "approximate_count": 0,
     "blocker_count": 0,
     "changed_feature_count": 0,
-    "controller_count": 202,
+    "controller_count": 251,
     "controller_rule_count": 0,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -2437,13 +2437,15 @@
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
-    "owner_count": 202,
+    "owner_count": 251,
     "quality_counts": {
-      "direct_country_copy": 20596
+      "direct_country_copy": 19063,
+      "manual_reviewed": 1533
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "canonical_baseline": 20596
+      "canonical_baseline": 19063,
+      "manual_rule": 1533
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,

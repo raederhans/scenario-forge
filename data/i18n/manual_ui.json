@@ -898,5 +898,14 @@
   "Transport workbench": "交通工作台",
   "Use the center board to reorder the 8 transport families. The left column provides context, and the right column mirrors the current state.": "在中间面板调整 8 个交通图层族的绘制顺序。左栏提供上下文，右栏显示当前状态。",
   "Live in Transport Workbench": "已在交通工作台中启用",
-  "Use the center frame to drag families into the order you want future transport layers to draw.": "在中间面板拖动图层族，设定交通图层的绘制顺序。"
+  "Use the center frame to drag families into the order you want future transport layers to draw.": "在中间面板拖动图层族，设定交通图层的绘制顺序。",
+  "Autonomous Region": "自治区域",
+  "Constituent Country": "构成国",
+  "Federal Subject": "联邦主体",
+  "Federal Member State": "联邦成员州",
+  "Special Territory": "特殊领地",
+  "Province": "省/邦",
+  "Separatist Region": "分离主义地区",
+  "De Facto State": "事实独立国家",
+  "Civil War Faction": "内战势力"
 }

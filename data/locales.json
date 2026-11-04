@@ -303701,6 +303701,42 @@
     "{count} matching regions": {
       "en": "{count} matching regions",
       "zh": "{count} 个匹配地块"
+    },
+    "Autonomous Region": {
+      "en": "Autonomous Region",
+      "zh": "自治区域"
+    },
+    "Constituent Country": {
+      "en": "Constituent Country",
+      "zh": "构成国"
+    },
+    "Federal Subject": {
+      "en": "Federal Subject",
+      "zh": "联邦主体"
+    },
+    "Federal Member State": {
+      "en": "Federal Member State",
+      "zh": "联邦成员州"
+    },
+    "Special Territory": {
+      "en": "Special Territory",
+      "zh": "特殊领地"
+    },
+    "Province": {
+      "en": "Province",
+      "zh": "省/邦"
+    },
+    "Separatist Region": {
+      "en": "Separatist Region",
+      "zh": "分离主义地区"
+    },
+    "De Facto State": {
+      "en": "De Facto State",
+      "zh": "事实独立国家"
+    },
+    "Civil War Faction": {
+      "en": "Civil War Faction",
+      "zh": "内战势力"
     }
   }
 }
