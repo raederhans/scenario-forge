@@ -21,9 +21,9 @@ from tools.materialize_polar_scenarios import refresh_scenario
 
 SCENARIOS = ("hoi4_1936", "hoi4_1939")
 # Rules may also target TNO through tools/apply_tno_split_overlay.py; the CLI here stays HOI4-only.
-RULE_SCENARIOS = (*SCENARIOS, "tno_1962")
+RULE_SCENARIOS = (*SCENARIOS, "tno_1962", "modern_world")
 SELECTORS = {"country_codes", "prefectures", "hierarchy_groups", "hoi4_states", "feature_ids",
-             "owners", "bbox", "bboxes"}
+             "owners", "bbox", "bboxes", "polygons"}
 
 
 def expand_merge_plans(plans, scenario):
@@ -99,6 +99,10 @@ def update_country(country, entry):
         if source in entry:
             for target in targets:
                 country[target] = entry[source]
+    for key in ("presentation", "inspector_group_id", "inspector_group_label",
+                "inspector_group_anchor_id", "display_name_zh"):
+        if key in entry:
+            country[key] = entry[key]
     if "parent_owner_tag" in entry:
         country["parent_owner_tag"] = entry["parent_owner_tag"]
         country["parent_owner_tags"] = [entry["parent_owner_tag"]]
@@ -171,6 +175,12 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
             raise ValueError(f"entry {eid}: missing select")
     entries = [e for e in overlay["entries"] if scenario in e["scenarios"]]
     declared = set(countries) | {e["tag"] for e in entries if "tag" in e}
+    for entry in entries:
+        if "presentation" in entry:
+            if entry["presentation"] != "parent_merged":
+                raise ValueError(f"entry {entry['id']}: invalid presentation")
+            if not entry.get("parent_owner_tag") or entry["parent_owner_tag"] not in declared:
+                raise ValueError(f"entry {entry['id']}: parent_merged requires declared parent_owner_tag")
     result_countries = deepcopy(countries)
     result_owners, result_cores = dict(owners), deepcopy(cores)
     expanded = expand_merge_plans(plans, scenario)
@@ -231,11 +241,14 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
                                                   "ratio": ratio, "selector": field})
             if ratio >= 0.5:
                 direct.add(fid)
+        spatial = {"bbox", "bboxes", "polygons"}
+        if set(selector) & spatial and not set(selector) - spatial:
+            direct = set(features)
         if "bbox" in selector or "bboxes" in selector:
             boxes = list(selector.get("bboxes", []))
             if "bbox" in selector:
                 boxes.append(selector["bbox"])
-            candidates = direct if set(selector) - {"bbox", "bboxes"} else set(features)
+            candidates = direct
             within = set()
             for fid in candidates:
                 x, y = point_for_feature(fid)
@@ -243,6 +256,12 @@ def apply_overlay(overlay, scenario, *, features, owners, cores, countries,
                        for left, bottom, right, top in boxes):
                     within.add(fid)
             direct = within
+        if "polygons" in selector:
+            from shapely.geometry import Point, Polygon
+
+            polygons = [Polygon(ring) for ring in selector["polygons"]]
+            direct = {fid for fid in direct
+                      if any(polygon.covers(Point(point_for_feature(fid))) for polygon in polygons)}
         if not direct and field == "select":
             raise ValueError(f"entry {eid}: empty {field} selection")
         return direct

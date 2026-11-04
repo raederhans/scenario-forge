@@ -1,5 +1,7 @@
 """Small geometry contracts for rebuilding the Modern World political map."""
 
+from contextlib import ExitStack
+from copy import deepcopy
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -50,6 +52,47 @@ def tiny_arctic_geometry():
 
 
 class ModernWorldRebuildTests(unittest.TestCase):
+    def run_rebuild_with_previous_owner(self, previous_owner, previous_cores=None):
+        countries = {"countries": {tag: {"source_type": source} for tag, source in
+                                  (("AA", "canonical_baseline"), ("BB", "canonical_baseline"),
+                                   ("NEW", "scenario_extension"))}}
+        payloads = {"manifest.json": {"summary": {}}, "countries.json": countries,
+                    "owners.by_feature.json": {"owners": {"a": previous_owner, "b": "BB"}},
+                    "cores.by_feature.json": {"cores": {"a": previous_cores or [previous_owner], "b": ["BB"]}},
+                    "capital_hints.json": {}, "city_overrides.json": {}}
+        features = [feature("a", "AA", box(0, 0, 1, 1)), feature("b", "BB", box(1, 0, 2, 1))]
+        written = {}
+        with ExitStack() as stack:
+            stack.enter_context(patch.object(rebuild.sys, "argv", ["build_modern_world_scenario.py"]))
+            stack.enter_context(patch.object(rebuild, "read", side_effect=lambda p: deepcopy(payloads.get(p.name, {}))))
+            stack.enter_context(patch.object(rebuild, "load_country_sources", return_value={}))
+            stack.enter_context(patch.object(rebuild, "rebuild_features", return_value=(features, {})))
+            stack.enter_context(patch.object(rebuild, "encode_features", return_value={}))
+            stack.enter_context(patch.object(rebuild, "update_country_records", side_effect=lambda p, *args: p))
+            stack.enter_context(patch.object(rebuild, "update_capitals", return_value=({}, {})))
+            stack.enter_context(patch.object(rebuild, "sha256_path", return_value="source"))
+            stack.enter_context(patch.object(rebuild, "_build_snapshot_for_scenario",
+                                             return_value={"snapshot_fingerprint": "snapshot"}))
+            stack.enter_context(patch.object(rebuild, "_refresh_audit_payload", return_value={"diagnostics": {}}))
+            stack.enter_context(patch.object(rebuild, "write",
+                                             side_effect=lambda p, value, **kw: written.update({p.name: deepcopy(value)})))
+            rebuild.main()
+        return written
+
+    def test_rebuild_restores_extension_owned_land_to_canonical(self):
+        written = self.run_rebuild_with_previous_owner("NEW")
+        self.assertEqual(written["owners.by_feature.json"]["owners"], {"a": "AA", "b": "BB"})
+        self.assertEqual(written["cores.by_feature.json"]["cores"], {"a": ["AA"], "b": ["BB"]})
+        self.assertEqual(set(written["countries.json"]["countries"]), {"AA", "BB"})
+
+    def test_rebuild_restores_occupied_land_held_by_a_canonical_country(self):
+        written = self.run_rebuild_with_previous_owner("BB", previous_cores=["AA"])
+        self.assertEqual(written["owners.by_feature.json"]["owners"], {"a": "AA", "b": "BB"})
+
+    def test_rebuild_rejects_changed_canonical_ownership(self):
+        with self.assertRaisesRegex(ValueError, "Canonical ownership changed"):
+            self.run_rebuild_with_previous_owner("BB")
+
     def test_reviewed_source_island_preserves_existing_land_ids_and_foreign_land(self):
         mainland, island = box(0, 0, 4, 4), box(10, 0, 11, 1)
         foreign = box(10.99, 0, 12, 1)
