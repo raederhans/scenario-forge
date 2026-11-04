@@ -381,6 +381,26 @@ test('collapsed exterior with quantized holes never becomes a world-sized label 
   for (const feature of source.features) assert.ok(sandbox.d3.geoArea(feature) < 2 * Math.PI);
 });
 
+test('undissolved sliver holes and open rings never turn a merged country into a whole-sphere surface', async () => {
+  // Modern-world GB reproduction: two overlapping slivers each pass the sampled
+  // containment test as holes, and their combined area exceeds the exterior.
+  const exterior = [[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]];
+  const sliverA = [[0.05, 0.05], [0.05, 0.8], [0.9, 0.8], [0.9, 0.05], [0.05, 0.05]];
+  const sliverB = [[0.15, 0.2], [0.15, 0.95], [0.95, 0.95], [0.95, 0.2], [0.15, 0.2]];
+  const openIsland = [[3, 0], [3, 0.5], [3.5, 0.5], [3.5, 0]];
+  const merged = { type: 'MultiPolygon', coordinates: [[exterior, sliverA, sliverB], [openIsland]] };
+  const [record] = await mergeCountryLabelGroups([['GB', [feature('one', 0), feature('two', 1)]]], {
+    topojson: { merge: () => merged }, geoArea: sandbox.d3.geoArea,
+    geoContains: sandbox.d3.geoContains, geoBounds: sandbox.d3.geoBounds,
+  });
+  for (const polygon of record.geometry.coordinates) {
+    assert.ok(sandbox.d3.geoArea({ type: 'Polygon', coordinates: polygon }) < 2 * Math.PI);
+  }
+  const [[west], [east]] = sandbox.d3.geoBounds(record.geometry);
+  assert.ok(west >= -0.001 && east <= 3.501, `bounds ${west}..${east}`);
+  for (const p of [[0.5, 0.97], [3.2, 0.2]]) assert.equal(sandbox.d3.geoContains(record.geometry, p), true);
+});
+
 test('historical missing global bases stays pending and never falls back to modern geometry', () => {
   const { owner, bundle, state } = fixture();
   bundle.chunkPayloadCacheById = {};
