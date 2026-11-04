@@ -1,6 +1,7 @@
 import { normalizeRiverPaintState } from "../../river_paint/partition_model.js";
 import { applyFeaturePaintState } from "../color_state.js";
 import { createReadonlyReferenceAssignments } from "../../map_data_boundary.js";
+import { getParentMergedParents } from "../../renderer/parent_merged_presentation.js";
 // Canonical scenario activation state authority.
 // Rendering, observers, rollback orchestration, and recovery stay outside this module.
 
@@ -18,7 +19,7 @@ export function applyPaletteOwnerColorState(target, ownerCode, color) {
 
 // Only scenario countries take part: ISO aliases (DE for GER) share their
 // country's color on purpose. Preferred (fixed) colors keep their value.
-export function uniquifyScenarioDefaultColors(colors, { tags = null, preferred = [] } = {}) {
+export function uniquifyScenarioDefaultColors(colors, { tags = null, preferred = [], deferred = new Set() } = {}) {
   const result = { ...colors };
   const normalize = color => String(color).trim().toLowerCase();
   const isHex = color => /^#[0-9a-f]{6}$/.test(normalize(color));
@@ -26,7 +27,11 @@ export function uniquifyScenarioDefaultColors(colors, { tags = null, preferred =
   const seen = new Set();
   const eligible = Object.keys(colors).filter(tag => isHex(colors[tag]) && (!tags || tags.has(tag)));
   const first = new Set(preferred);
-  const ordered = [...eligible.filter(tag => first.has(tag)).sort(), ...eligible.filter(tag => !first.has(tag)).sort()];
+  const ordered = [
+    ...eligible.filter(tag => !deferred.has(tag) && first.has(tag)).sort(),
+    ...eligible.filter(tag => !deferred.has(tag) && !first.has(tag)).sort(),
+    ...eligible.filter(tag => deferred.has(tag)).sort(),
+  ];
   for (const tag of ordered) {
     const color = normalize(colors[tag]);
     if (!seen.has(color)) { seen.add(color); continue; }
@@ -589,6 +594,7 @@ export function commitScenarioActivationState(target, patch) {
   const fixedColors = patch.scenarioFixedOwnerColors || {};
   target.sovereignBaseColors = uniquifyScenarioDefaultColors(baseColors, {
     tags: getScenarioCountryTags(patch.scenarioCountriesByTag), preferred: Object.keys(fixedColors),
+    deferred: new Set(getParentMergedParents(patch.scenarioCountriesByTag).keys()),
   });
   target.scenarioFixedOwnerColors = Object.fromEntries(Object.entries(fixedColors).map(([tag, color]) => [tag,
     String(color).trim().toLowerCase() === String(baseColors[tag] ?? "").trim().toLowerCase()
