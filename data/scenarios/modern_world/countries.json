@@ -808,6 +808,47 @@
     "workshop_id": "3350890356"
   },
   "countries": {
+    "ABK": {
+      "base_iso2": "GE",
+      "capital_state_id": null,
+      "color_hex": "#d98f2b",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Republic of Abkhazia",
+      "display_name_en": "Republic of Abkhazia",
+      "display_name_zh": "阿布哈兹共和国",
+      "entry_kind": "",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "post_soviet_frozen_conflicts",
+      "inspector_group_label": "后苏联冻结冲突",
+      "lookup_iso2": "GE",
+      "notes": "C 类：俄承认的分离政权，事实独立，把握高。单一地块 GEO-3015 与控制范围基本一致。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_abkhazia",
+      "provenance_iso2": "GE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_abkhazia"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "de_facto_state",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "ABK"
+    },
     "AD": {
       "base_iso2": "AD",
       "capital_state_id": null,
@@ -910,6 +951,48 @@
       "synthetic_owner": false,
       "tag": "AF"
     },
+    "AJK": {
+      "base_iso2": "PK",
+      "capital_state_id": null,
+      "color_hex": "#278442",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Azad Jammu and Kashmir",
+      "display_name_en": "Azad Jammu and Kashmir",
+      "display_name_zh": "阿扎德查谟-克什米尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PK",
+      "notes": "B 类。巴控克什米尔自治区，有自己的总统与总理，宪法上不是巴基斯坦的省。现成地块 PAK-1109 'Azad Kashmir'。把握高。选中 1 块。",
+      "parent_owner_tag": "PK",
+      "parent_owner_tags": [
+        "PK"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_azad_kashmir",
+      "provenance_iso2": "PK",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_azad_kashmir"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "AJK"
+    },
     "AL": {
       "base_iso2": "AL",
       "capital_state_id": null,
@@ -978,6 +1061,48 @@
       "synthetic_owner": false,
       "tag": "AM"
     },
+    "AMB": {
+      "base_iso2": "CM",
+      "capital_state_id": null,
+      "color_hex": "#c8836f",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 2,
+      "display_name": "Ambazonia (Anglophone Cameroon)",
+      "display_name_en": "Ambazonia (Anglophone Cameroon)",
+      "display_name_zh": "安巴佐尼亚（喀麦隆英语区）",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CM",
+      "notes": "2017 年起的英语区分离主义冲突，取西北、西南两大区（主张范围），不表示实控；城市与主干道由政府军控制。同色挂喀麦隆。把握中（范围按行政区，地位为风味）。选中 2 块。",
+      "parent_owner_tag": "CM",
+      "parent_owner_tags": [
+        "CM"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ambazonia",
+      "provenance_iso2": "CM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ambazonia"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "separatist_region",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "AMB"
+    },
     "AO": {
       "base_iso2": "AO",
       "capital_state_id": null,
@@ -986,7 +1111,7 @@
       "continent_label": "Africa",
       "display_name": "Angola",
       "entry_kind": "",
-      "feature_count": 18,
+      "feature_count": 17,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -1080,6 +1205,47 @@
       "synthetic_owner": false,
       "tag": "AR"
     },
+    "ARK": {
+      "base_iso2": "MM",
+      "capital_state_id": null,
+      "color_hex": "#b8323a",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 2,
+      "display_name": "Arakan Army",
+      "display_name_en": "Arakan Army",
+      "display_name_zh": "若开军",
+      "entry_kind": "",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "myanmar_civil_war",
+      "inspector_group_label": "缅甸内战",
+      "lookup_iso2": "MM",
+      "notes": "D 类。若开邦整块归若开军（AA/ULA）：书签日 AA 控制若开 17 个镇区中的 14 个，军政府只剩实兑、皎漂、曼昂，按多数整块归入；MM_PRIMARY_GAP_10 是实兑以南的补缝碎片（约 92.9–93.0E、19.8–20.1N），一并归入以免留下飞地。把握较高；实兑、皎漂、曼昂被错划给 AA 属已知近似。选中 2 块。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_arakan_army",
+      "provenance_iso2": "MM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_arakan_army"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "civil_war_faction",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "ARK"
+    },
     "AT": {
       "base_iso2": "AT",
       "capital_state_id": null,
@@ -1155,7 +1321,7 @@
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "display_name": "Aland",
-      "entry_kind": "",
+      "entry_kind": "scenario_subject",
       "feature_count": 1,
       "featured": false,
       "historical_fidelity": "modern",
@@ -1163,20 +1329,25 @@
         "modern"
       ],
       "lookup_iso2": "AX",
-      "notes": "",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
+      "notes": "芬兰奥兰自治省，已与 FI 同色；只补元数据，选择结果为空。",
+      "parent_owner_tag": "FI",
+      "parent_owner_tags": [
+        "FI"
+      ],
+      "presentation": "parent_merged",
       "primary_rule_source": "",
       "provenance_iso2": "AX",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "mw_aland_meta"
+      ],
       "scenario_only": false,
       "source": "canonical_baseline",
       "source_type": "canonical_baseline",
       "source_types": [
         "canonical_baseline"
       ],
-      "subject_kind": "",
+      "subject_kind": "autonomous_region",
       "subregion_id": "subregion_northern_europe",
       "subregion_label": "Northern Europe",
       "synthetic_owner": false,
@@ -1224,7 +1395,7 @@
       "continent_label": "Europe",
       "display_name": "Bosnia and Herzegovina",
       "entry_kind": "",
-      "feature_count": 3,
+      "feature_count": 2,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -1249,6 +1420,132 @@
       "subregion_label": "Southern Europe",
       "synthetic_owner": false,
       "tag": "BA"
+    },
+    "BAL": {
+      "base_iso2": "PK",
+      "capital_state_id": null,
+      "color_hex": "#278442",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Balochistan",
+      "display_name_en": "Balochistan",
+      "display_name_zh": "俾路支斯坦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PK",
+      "notes": "B 类。俾路支分离运动（BLA 等）所在省份；分离武装没有稳定实控区，只做同色子势力。地块 PAK-1108 'Baluchistan' 整省。把握高（范围），风味中等。选中 1 块。",
+      "parent_owner_tag": "PK",
+      "parent_owner_tags": [
+        "PK"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_balochistan",
+      "provenance_iso2": "PK",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_balochistan"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "BAL"
+    },
+    "BAR": {
+      "base_iso2": "PH",
+      "capital_state_id": null,
+      "color_hex": "#835dc8",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 5,
+      "display_name": "Bangsamoro Autonomous Region",
+      "display_name_en": "Bangsamoro Autonomous Region",
+      "display_name_zh": "邦萨摩洛穆斯林棉兰老自治区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PH",
+      "notes": "BARMM：巴西兰、南拉瑙、马京达瑙（含 2022 拆分后两省）、塔威塔威、哥打巴托市（PHL-5527）。苏禄按 2024 年最高法院裁决已退出，不纳入；北哥打巴托省内 63 个村组成的特别地理区无法用现有地块表达，略去；巴西兰地块含不属 BARMM 的伊莎贝拉市，近似处理。把握：中高。",
+      "parent_owner_tag": "PH",
+      "parent_owner_tags": [
+        "PH"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_bangsamoro",
+      "provenance_iso2": "PH",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_bangsamoro"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "BAR"
+    },
+    "BAS": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#366138",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 238,
+      "display_name": "Republic of Bashkortostan",
+      "display_name_en": "Republic of Bashkortostan",
+      "display_name_zh": "巴什科尔托斯坦共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 238,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Bashkortostan 选取，另补 217 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "parent_owner_tag": "RU",
+      "parent_owner_tags": [
+        "RU"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ru_bas",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ru_bas"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "federal_subject",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "BAS"
     },
     "BD": {
       "base_iso2": "BD",
@@ -1292,7 +1589,7 @@
       "continent_label": "Europe",
       "display_name": "Belgium",
       "entry_kind": "",
-      "feature_count": 25,
+      "feature_count": 12,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -1385,6 +1682,48 @@
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
       "tag": "BG"
+    },
+    "BGV": {
+      "base_iso2": "PG",
+      "capital_state_id": null,
+      "color_hex": "#7d2d1c",
+      "continent_id": "continent_oceania",
+      "continent_label": "Oceania",
+      "controller_feature_count": 1,
+      "display_name": "Autonomous Region of Bougainville",
+      "display_name_en": "Autonomous Region of Bougainville",
+      "display_name_zh": "布干维尔自治区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PG",
+      "notes": "2019 年独立公投 97.7% 赞成，与 PNG 的独立安排谈判中，书签日仍属 PNG。单块 PG_ADM1_PNG-1245。把握：高。",
+      "parent_owner_tag": "PG",
+      "parent_owner_tags": [
+        "PG"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_bougainville",
+      "provenance_iso2": "PG",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_bougainville"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_melanesia",
+      "subregion_label": "Melanesia",
+      "synthetic_owner": false,
+      "tag": "BGV"
     },
     "BH": {
       "base_iso2": "BH",
@@ -1658,6 +1997,90 @@
       "synthetic_owner": false,
       "tag": "BT"
     },
+    "BTR": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#fea906",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 4,
+      "display_name": "Bodoland Territorial Region",
+      "display_name_en": "Bodoland Territorial Region",
+      "display_name_zh": "博多兰领地区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "B 类。阿萨姆邦博多兰领地区（第六附表自治议会 BTC，2020 年博多和平协议）：Kokrajhar、Chirang、Baksa、Udalguri 四区（2022 年从 Baksa 分出的 Tamulpur 在现有 Baksa 地块内，一并带入）。把握高。选中 4 块。",
+      "parent_owner_tag": "IN",
+      "parent_owner_tags": [
+        "IN"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_bodoland",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_bodoland"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "BTR"
+    },
+    "BUR": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#366138",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 100,
+      "display_name": "Republic of Buryatia",
+      "display_name_en": "Republic of Buryatia",
+      "display_name_zh": "布里亚特共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 100,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Republic_of_Buryatia 选取，另补 84 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "parent_owner_tag": "RU",
+      "parent_owner_tags": [
+        "RU"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ru_bur",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ru_bur"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "federal_subject",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "BUR"
+    },
     "BW": {
       "base_iso2": "BW",
       "capital_state_id": null,
@@ -1768,7 +2191,7 @@
       "continent_label": "North America",
       "display_name": "Canada",
       "entry_kind": "",
-      "feature_count": 280,
+      "feature_count": 218,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -1793,6 +2216,92 @@
       "subregion_label": "Northern America",
       "synthetic_owner": false,
       "tag": "CA"
+    },
+    "CAB": {
+      "base_iso2": "AO",
+      "capital_state_id": null,
+      "color_hex": "#aa1428",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Cabinda",
+      "display_name_en": "Cabinda",
+      "display_name_zh": "卡宾达",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "AO",
+      "notes": "安哥拉飞地省，FLEC 长期低烈度分离运动，政府实控。同色挂安哥拉，仅作数据可区分。把握高（范围），地位为风味。选中 1 块。",
+      "parent_owner_tag": "AO",
+      "parent_owner_tags": [
+        "AO"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_cabinda",
+      "provenance_iso2": "AO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_cabinda"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "separatist_region",
+      "subregion_id": "subregion_middle_africa",
+      "subregion_label": "Middle Africa",
+      "synthetic_owner": false,
+      "tag": "CAB"
+    },
+    "CAT": {
+      "base_iso2": "ES",
+      "capital_state_id": null,
+      "color_hex": "#f2cd5e",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 4,
+      "display_name": "Catalonia",
+      "display_name_en": "Catalonia",
+      "display_name_zh": "加泰罗尼亚",
+      "entry_kind": "scenario_subject",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "spain_autonomous_communities",
+      "inspector_group_label": "西班牙自治区",
+      "lookup_iso2": "ES",
+      "notes": "自治区，2024 年起 PSC 的 Illa 任主席，独立派仍是议会主要力量。四省 ES511-514 正好等于自治区；ES_PRIMARY_GAP_* 都在加那利群岛，不属于加泰罗尼亚。把握：高。",
+      "parent_owner_tag": "ES",
+      "parent_owner_tags": [
+        "ES"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_catalonia",
+      "provenance_iso2": "ES",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_catalonia"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "CAT"
     },
     "CD": {
       "base_iso2": "CD",
@@ -1827,6 +2336,48 @@
       "subregion_label": "Middle Africa",
       "synthetic_owner": false,
       "tag": "CD"
+    },
+    "CEC": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#366138",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 37,
+      "display_name": "Chechen Republic",
+      "display_name_en": "Chechen Republic",
+      "display_name_zh": "车臣共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 37,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Chechen_Republic 选取，另补 29 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "parent_owner_tag": "RU",
+      "parent_owner_tags": [
+        "RU"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ru_cec",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ru_cec"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "federal_subject",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "CEC"
     },
     "CF": {
       "base_iso2": "CF",
@@ -1930,6 +2481,47 @@
       "synthetic_owner": false,
       "tag": "CH"
     },
+    "CHR": {
+      "base_iso2": "MM",
+      "capital_state_id": null,
+      "color_hex": "#5b4fc4",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Chinland Resistance",
+      "display_name_en": "Chinland Resistance",
+      "display_name_zh": "钦族抵抗力量",
+      "entry_kind": "",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "myanmar_civil_war",
+      "inspector_group_label": "缅甸内战",
+      "lookup_iso2": "MM",
+      "notes": "D 类。钦邦整块归钦族抵抗力量（Chin Brotherhood 与钦兰委员会合为一个实体）：9 个镇区中 Mindat、Matupi、Kanpetlet、Tonzang、Thantlang、Falam（2026-01 仍在抵抗方手中，2026-04 才被军方夺回）由抵抗方控制，Paletwa 归 AA，军政府只剩 Hakha、Tedim，按多数整块归入。Paletwa 应属 AA、Hakha/Tedim 应属 MM，属已知近似。把握中等。选中 1 块。（核对修正：颜色 #3f6fb5→#5b4fc4，与其他新势力 RGB 距离不足 40）",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_chin_resistance",
+      "provenance_iso2": "MM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_chin_resistance"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "civil_war_faction",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "CHR"
+    },
     "CI": {
       "base_iso2": "CI",
       "capital_state_id": null,
@@ -2006,7 +2598,7 @@
       "continent_label": "Africa",
       "display_name": "Cameroon",
       "entry_kind": "",
-      "feature_count": 10,
+      "feature_count": 8,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -2099,6 +2691,48 @@
       "subregion_label": "South America",
       "synthetic_owner": false,
       "tag": "CO"
+    },
+    "COR": {
+      "base_iso2": "FR",
+      "capital_state_id": null,
+      "color_hex": "#3b508c",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 5,
+      "display_name": "Corsica",
+      "display_name_en": "Corsica",
+      "display_name_zh": "科西嘉",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "FR",
+      "notes": "科西嘉单一领土集体，自治修宪进程中。FR_Corse 5 个区。把握：高。",
+      "parent_owner_tag": "FR",
+      "parent_owner_tags": [
+        "FR"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_corsica",
+      "provenance_iso2": "FR",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_corsica"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_western_europe",
+      "subregion_label": "Western Europe",
+      "synthetic_owner": false,
+      "tag": "COR"
     },
     "CR": {
       "base_iso2": "CR",
@@ -2269,6 +2903,48 @@
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false,
       "tag": "CZ"
+    },
+    "DAG": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#366138",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 122,
+      "display_name": "Republic of Dagestan",
+      "display_name_en": "Republic of Dagestan",
+      "display_name_zh": "达吉斯坦共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 122,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Republic_of_Dagestan 选取，另补 98 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "parent_owner_tag": "RU",
+      "parent_owner_tags": [
+        "RU"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ru_dag",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ru_dag"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "federal_subject",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "DAG"
     },
     "DE": {
       "base_iso2": "DE",
@@ -2545,10 +3221,12 @@
     "EH": {
       "base_iso2": "EH",
       "capital_state_id": null,
-      "color_hex": "#d2d2d2",
+      "color_hex": "#c9b27a",
       "continent_id": "continent_africa",
       "continent_label": "Africa",
-      "display_name": "Western Sahara",
+      "display_name": "Sahrawi Arab Democratic Republic (Free Zone)",
+      "display_name_en": "Sahrawi Arab Democratic Republic (Free Zone)",
+      "display_name_zh": "撒哈拉阿拉伯民主共和国（实控区）",
       "entry_kind": "",
       "feature_count": 1,
       "featured": false,
@@ -2557,20 +3235,22 @@
         "modern"
       ],
       "lookup_iso2": "EH",
-      "notes": "",
+      "notes": "二选一取新建 tag：EH_ADMIN0_PASSTHROUGH 已近似沙墙以东的自由区（沙墙以西已在 MA 的地块里），西南角到拉古拉一带与真实沙墙不完全一致，属近似。选中 1 块。（核对修正：原新建 SDR 会把 EH 的全部地块拿走，而 EH 是这些地块的 core，apply_overlay 报 cannot retire protected tags [EH]；改为直接沿用已有 tag EH，只更新名称、颜色与 subject_kind，选择结果为空、仅改元数据。）（核对修正：颜色 #d9a441→#c9b27a，与其他新势力 RGB 距离不足 40）",
       "parent_owner_tag": "",
       "parent_owner_tags": [],
       "primary_rule_source": "",
       "provenance_iso2": "EH",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "mw_western_sahara_sadr"
+      ],
       "scenario_only": false,
       "source": "canonical_baseline",
       "source_type": "canonical_baseline",
       "source_types": [
         "canonical_baseline"
       ],
-      "subject_kind": "",
+      "subject_kind": "de_facto_state",
       "subregion_id": "subregion_northern_africa",
       "subregion_label": "Northern Africa",
       "synthetic_owner": false,
@@ -2618,7 +3298,7 @@
       "continent_label": "Europe",
       "display_name": "Spain",
       "entry_kind": "",
-      "feature_count": 59,
+      "feature_count": 52,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -2652,7 +3332,7 @@
       "continent_label": "Africa",
       "display_name": "Ethiopia",
       "entry_kind": "",
-      "feature_count": 11,
+      "feature_count": 10,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -2677,6 +3357,50 @@
       "subregion_label": "Eastern Africa",
       "synthetic_owner": false,
       "tag": "ET"
+    },
+    "EUS": {
+      "base_iso2": "ES",
+      "capital_state_id": null,
+      "color_hex": "#f2cd5e",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 3,
+      "display_name": "Basque Country",
+      "display_name_en": "Basque Country",
+      "display_name_zh": "巴斯克自治区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "spain_autonomous_communities",
+      "inspector_group_label": "西班牙自治区",
+      "lookup_iso2": "ES",
+      "notes": "巴斯克自治区（阿拉瓦、吉普斯夸、比斯开 3 省），PNV-PSE 执政；纳瓦拉 ES220 是另一个自治区，不并入。把握：高。",
+      "parent_owner_tag": "ES",
+      "parent_owner_tags": [
+        "ES"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_basque_country",
+      "provenance_iso2": "ES",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_basque_country"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "EUS"
     },
     "FI": {
       "base_iso2": "FI",
@@ -2746,6 +3470,48 @@
       "synthetic_owner": false,
       "tag": "FK"
     },
+    "FLA": {
+      "base_iso2": "BE",
+      "capital_state_id": null,
+      "color_hex": "#da9f34",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 13,
+      "display_name": "Flanders",
+      "display_name_en": "Flanders",
+      "display_name_zh": "佛兰德",
+      "entry_kind": "scenario_subject",
+      "feature_count": 13,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BE",
+      "notes": "佛兰德大区（5 省），不含布鲁塞尔首都大区 BE100。N-VA 的 De Wever 任联邦首相，分离议程冻结，属风味性同色单列。把握：高。",
+      "parent_owner_tag": "BE",
+      "parent_owner_tags": [
+        "BE"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_flanders",
+      "provenance_iso2": "BE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_flanders"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_western_europe",
+      "subregion_label": "Western Europe",
+      "synthetic_owner": false,
+      "tag": "FLA"
+    },
     "FO": {
       "base_iso2": "FO",
       "capital_state_id": null,
@@ -2753,28 +3519,35 @@
       "continent_id": "continent_europe",
       "continent_label": "Europe",
       "display_name": "Faroe Islands",
-      "entry_kind": "",
+      "entry_kind": "scenario_subject",
       "feature_count": 1,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
         "modern"
       ],
+      "inspector_group_id": "danish_realm",
+      "inspector_group_label": "丹麦王国",
       "lookup_iso2": "FO",
-      "notes": "",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
+      "notes": "丹麦王国自治领地，已是独立 tag 且与 DK 同色；本条只补 parent_owner_tag/presentation/subject_kind 元数据，选择结果为空。",
+      "parent_owner_tag": "DK",
+      "parent_owner_tags": [
+        "DK"
+      ],
+      "presentation": "parent_merged",
       "primary_rule_source": "",
       "provenance_iso2": "FO",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "mw_faroe_islands_meta"
+      ],
       "scenario_only": false,
       "source": "canonical_baseline",
       "source_type": "canonical_baseline",
       "source_types": [
         "canonical_baseline"
       ],
-      "subject_kind": "",
+      "subject_kind": "special_territory",
       "subregion_id": "subregion_northern_europe",
       "subregion_label": "Northern Europe",
       "synthetic_owner": false,
@@ -2788,7 +3561,7 @@
       "continent_label": "Europe",
       "display_name": "France",
       "entry_kind": "",
-      "feature_count": 286,
+      "feature_count": 281,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -2848,6 +3621,48 @@
       "synthetic_owner": false,
       "tag": "GA"
     },
+    "GAG": {
+      "base_iso2": "MD",
+      "capital_state_id": null,
+      "color_hex": "#bf9683",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 1,
+      "display_name": "Gagauzia",
+      "display_name_en": "Gagauzia",
+      "display_name_zh": "加告兹自治区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "MD",
+      "notes": "加告兹自治领土单位，亲俄倾向，与基希讷乌关系紧张但法理实控均属摩尔多瓦。MDA-1626 'Comrat' 为三部分 MultiPolygon，面积约 0.21 平方度≈1830 km²，与加告兹三块飞地一致；Taraclia 不并入。把握：中高。",
+      "parent_owner_tag": "MD",
+      "parent_owner_tags": [
+        "MD"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_gagauzia",
+      "provenance_iso2": "MD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_gagauzia"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "GAG"
+    },
     "GB": {
       "base_iso2": "GB",
       "capital_state_id": null,
@@ -2856,7 +3671,7 @@
       "continent_label": "Europe",
       "display_name": "United Kingdom",
       "entry_kind": "",
-      "feature_count": 444,
+      "feature_count": 197,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -2882,6 +3697,48 @@
       "synthetic_owner": false,
       "tag": "GB"
     },
+    "GBT": {
+      "base_iso2": "PK",
+      "capital_state_id": null,
+      "color_hex": "#278442",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Gilgit-Baltistan",
+      "display_name_en": "Gilgit-Baltistan",
+      "display_name_zh": "吉尔吉特-巴尔蒂斯坦",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "PK",
+      "notes": "B 类。巴控克什米尔北部自治区。地块 PAK-1111 已核实：名称仍是旧名 'Northern Areas'（2009 年改称吉尔吉特-巴尔蒂斯坦），范围 72.5–77.1E、34.5–37.0N，与之吻合。把握高。选中 1 块。",
+      "parent_owner_tag": "PK",
+      "parent_owner_tags": [
+        "PK"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_gilgit_baltistan",
+      "provenance_iso2": "PK",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_gilgit_baltistan"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "GBT"
+    },
     "GE": {
       "base_iso2": "GE",
       "capital_state_id": null,
@@ -2890,7 +3747,7 @@
       "continent_label": "Asia",
       "display_name": "Georgia",
       "entry_kind": "",
-      "feature_count": 12,
+      "feature_count": 11,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -3025,28 +3882,35 @@
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "display_name": "Greenland",
-      "entry_kind": "",
+      "entry_kind": "scenario_subject",
       "feature_count": 1,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
         "modern"
       ],
+      "inspector_group_id": "danish_realm",
+      "inspector_group_label": "丹麦王国",
       "lookup_iso2": "GL",
-      "notes": "",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
+      "notes": "丹麦王国自治领地，已是独立 tag 且与 DK 同色；只补元数据，选择结果为空。",
+      "parent_owner_tag": "DK",
+      "parent_owner_tags": [
+        "DK"
+      ],
+      "presentation": "parent_merged",
       "primary_rule_source": "",
       "provenance_iso2": "GL",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "mw_greenland_meta"
+      ],
       "scenario_only": false,
       "source": "canonical_baseline",
       "source_type": "canonical_baseline",
       "source_types": [
         "canonical_baseline"
       ],
-      "subject_kind": "",
+      "subject_kind": "special_territory",
       "subregion_id": "subregion_northern_america",
       "subregion_label": "Northern America",
       "synthetic_owner": false,
@@ -3361,32 +4225,39 @@
     "HK": {
       "base_iso2": "HK",
       "capital_state_id": null,
-      "color_hex": "#172685",
+      "color_hex": "#a20050",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "display_name": "Hong Kong S.A.R.",
-      "entry_kind": "",
+      "entry_kind": "scenario_subject",
       "feature_count": 18,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
         "modern"
       ],
+      "inspector_group_id": "china_special_administrative_regions",
+      "inspector_group_label": "中国特别行政区",
       "lookup_iso2": "HK",
-      "notes": "",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
+      "notes": "主权归属中国，原独立色 #172685 与「颜色即归属」不一致，改为 CN 同色并挂靠 CN；只更新元数据，选择结果为空。",
+      "parent_owner_tag": "CN",
+      "parent_owner_tags": [
+        "CN"
+      ],
+      "presentation": "parent_merged",
       "primary_rule_source": "",
       "provenance_iso2": "HK",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "mw_hong_kong_meta"
+      ],
       "scenario_only": false,
       "source": "canonical_baseline",
       "source_type": "canonical_baseline",
       "source_types": [
         "canonical_baseline"
       ],
-      "subject_kind": "",
+      "subject_kind": "special_territory",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
@@ -3459,6 +4330,47 @@
       "subregion_label": "Central America",
       "synthetic_owner": false,
       "tag": "HN"
+    },
+    "HOU": {
+      "base_iso2": "YE",
+      "capital_state_id": null,
+      "color_hex": "#6fa04a",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 12,
+      "display_name": "Supreme Political Council (Houthis)",
+      "display_name_en": "Supreme Political Council (Houthis)",
+      "display_name_zh": "也门最高政治委员会（胡塞武装）",
+      "entry_kind": "",
+      "feature_count": 12,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "yemen_civil_war",
+      "inspector_group_label": "也门内战",
+      "lookup_iso2": "YE",
+      "notes": "书签日 2026-01-01 胡塞实控，整省粗版：萨达、阿姆兰、迈赫维特、萨那省、萨那市、扎马尔、赖马、伊卜、贝达 9 省整省；荷台达（南段沿海归政府方）、哈杰、焦夫按多数归胡塞。塔伊兹、马里卜留 YE（政府控制城区与多数面积）；达利阿南部多数归 STC。选中 12 块。整体格局把握高，跨线省按多数为中等把握。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_yemen_houthi",
+      "provenance_iso2": "YE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_yemen_houthi"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "civil_war_faction",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "HOU"
     },
     "HR": {
       "base_iso2": "HR",
@@ -3638,7 +4550,7 @@
       "continent_label": "Asia",
       "display_name": "Israel",
       "entry_kind": "",
-      "feature_count": 6,
+      "feature_count": 7,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -3651,7 +4563,9 @@
       "primary_rule_source": "",
       "provenance_iso2": "IL",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "mw_golan_buffer_israel"
+      ],
       "scenario_only": false,
       "source": "canonical_baseline",
       "source_type": "canonical_baseline",
@@ -3706,7 +4620,7 @@
       "continent_label": "Asia",
       "display_name": "India",
       "entry_kind": "",
-      "feature_count": 392,
+      "feature_count": 359,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -3731,6 +4645,48 @@
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
       "tag": "IN"
+    },
+    "ING": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#366138",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 20,
+      "display_name": "Republic of Ingushetia",
+      "display_name_en": "Republic of Ingushetia",
+      "display_name_zh": "印古什共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 20,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Republic_of_Ingushetia 选取，另补 14 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "parent_owner_tag": "RU",
+      "parent_owner_tags": [
+        "RU"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ru_ing",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ru_ing"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "federal_subject",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "ING"
     },
     "IO": {
       "base_iso2": "IO",
@@ -3774,7 +4730,7 @@
       "continent_label": "Asia",
       "display_name": "Iraq",
       "entry_kind": "",
-      "feature_count": 18,
+      "feature_count": 15,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -3876,7 +4832,7 @@
       "continent_label": "Europe",
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 108,
+      "feature_count": 107,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -3970,6 +4926,48 @@
       "synthetic_owner": false,
       "tag": "JM"
     },
+    "JNK": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#fea906",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 20,
+      "display_name": "Jammu and Kashmir",
+      "display_name_en": "Jammu and Kashmir",
+      "display_name_zh": "查谟-克什米尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 20,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "B 类。印控查谟-克什米尔中央直辖区（2019 年起），克什米尔争议与分离运动核心区。用层级组 IN_Jammu_and_Kashmir，排除锡亚琴地块（'DATA NOT AVAILABLE'，归拉达克）。把握高。选中 20 块。",
+      "parent_owner_tag": "IN",
+      "parent_owner_tags": [
+        "IN"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_jammu_kashmir",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_jammu_kashmir"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "JNK"
+    },
     "JO": {
       "base_iso2": "JO",
       "capital_state_id": null,
@@ -4037,6 +5035,48 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
       "tag": "JP"
+    },
+    "JUB": {
+      "base_iso2": "SO",
+      "capital_state_id": null,
+      "color_hex": "#80b3eb",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 2,
+      "display_name": "Jubaland State of Somalia",
+      "display_name_en": "Jubaland State of Somalia",
+      "display_name_zh": "朱巴兰州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SO",
+      "notes": "联邦成员州，2024-11 起与联邦决裂。取 Lower Juba（基斯马尤）与 Gedo；Gedo 部分城镇由亲联邦力量控制，属近似。Middle Juba 实为青年党控制，单列 mw_al_shabaab。表达的是成员州身份而非精确实控。把握中。选中 2 块。",
+      "parent_owner_tag": "SO",
+      "parent_owner_tags": [
+        "SO"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_jubaland",
+      "provenance_iso2": "SO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_jubaland"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "federal_member_state",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "JUB"
     },
     "KE": {
       "base_iso2": "KE",
@@ -4140,6 +5180,47 @@
       "synthetic_owner": false,
       "tag": "KH"
     },
+    "KIO": {
+      "base_iso2": "MM",
+      "capital_state_id": null,
+      "color_hex": "#1fb3a0",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Kachin Independence Organisation",
+      "display_name_en": "Kachin Independence Organisation",
+      "display_name_zh": "克钦独立组织",
+      "entry_kind": "",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "myanmar_civil_war",
+      "inspector_group_label": "缅甸内战",
+      "lookup_iso2": "MM",
+      "notes": "D 类。克钦邦整块归 KIO/KIA：2024 年攻势后 KIA 称控制 18 个镇区中的 14 个，并掌握中缅边境稀土带和帕敢玉石区大部；密支那、八莫（被围）、Waingmaw 仍在军政府手里。镇区数是 KIA 一方说法，按大致近似口径整块归入。把握中等，波动大。选中 1 块。（核对修正：颜色 #2f9d6a→#1fb3a0，与其他新势力 RGB 距离不足 40）",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_kachin_independence",
+      "provenance_iso2": "MM",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_kachin_independence"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "civil_war_faction",
+      "subregion_id": "subregion_south_eastern_asia",
+      "subregion_label": "South-Eastern Asia",
+      "synthetic_owner": false,
+      "tag": "KIO"
+    },
     "KM": {
       "base_iso2": "KM",
       "capital_state_id": null,
@@ -4241,6 +5322,48 @@
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
       "tag": "KR"
+    },
+    "KRG": {
+      "base_iso2": "IQ",
+      "capital_state_id": null,
+      "color_hex": "#b27263",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Kurdistan Region",
+      "display_name_en": "Kurdistan Region",
+      "display_name_zh": "库尔德斯坦地区",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IQ",
+      "notes": "宪法承认的联邦自治区：杜胡克、埃尔比勒、苏莱曼尼亚（旧区划含哈莱卜杰）。基尔库克、尼尼微平原、辛贾尔等争议区不划入。选中 3 块，把握高。",
+      "parent_owner_tag": "IQ",
+      "parent_owner_tags": [
+        "IQ"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_iraq_kurdistan",
+      "provenance_iso2": "IQ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_iraq_kurdistan"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "KRG"
     },
     "KW": {
       "base_iso2": "KW",
@@ -4378,6 +5501,48 @@
       "synthetic_owner": false,
       "tag": "LB"
     },
+    "LDK": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#fea906",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Ladakh",
+      "display_name_en": "Ladakh",
+      "display_name_zh": "拉达克",
+      "entry_kind": "scenario_subject",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "B 类。拉达克中央直辖区（列城、卡吉尔），2025 年列城抗议要求第六附表自治与建邦。另并入锡亚琴地块 IN_ADM2_76128533B2782141712775（名称 'DATA NOT AVAILABLE'，主体为锡亚琴冰川，行政上属列城区；附带约 36 块沿控制线的小碎片也随之归入）。把握高。选中 3 块。",
+      "parent_owner_tag": "IN",
+      "parent_owner_tags": [
+        "IN"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ladakh",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ladakh"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "LDK"
+    },
     "LI": {
       "base_iso2": "LI",
       "capital_state_id": null,
@@ -4445,6 +5610,47 @@
       "subregion_label": "Southern Asia",
       "synthetic_owner": false,
       "tag": "LK"
+    },
+    "LNA": {
+      "base_iso2": "LY",
+      "capital_state_id": null,
+      "color_hex": "#7a4f2a",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 14,
+      "display_name": "Libyan National Army (Eastern Libya)",
+      "display_name_en": "Libyan National Army (Eastern Libya)",
+      "display_name_zh": "利比亚国民军（东部当局）",
+      "entry_kind": "",
+      "feature_count": 14,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "libya_civil_war",
+      "inspector_group_label": "利比亚分治",
+      "lookup_iso2": "LY",
+      "notes": "哈夫塔尔控制的东部、苏尔特、朱夫拉与整个费赞，前线大体是 2020 年停火后的苏尔特—朱夫拉一线，与旧 sha'biyat 界吻合。选中 14 块。米兹达、加达米斯留给 LY（民族团结政府），属中等把握；其余把握高。（核对修正：颜色 #9e4a3a→#7a4f2a，与其他新势力 RGB 距离不足 40）",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_libya_lna",
+      "provenance_iso2": "LY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_libya_lna"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "civil_war_faction",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "synthetic_owner": false,
+      "tag": "LNA"
     },
     "LR": {
       "base_iso2": "LR",
@@ -4624,7 +5830,7 @@
       "continent_label": "Africa",
       "display_name": "Libya",
       "entry_kind": "",
-      "feature_count": 22,
+      "feature_count": 8,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -4726,7 +5932,7 @@
       "continent_label": "Europe",
       "display_name": "Moldova",
       "entry_kind": "",
-      "feature_count": 40,
+      "feature_count": 33,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -4896,7 +6102,7 @@
       "continent_label": "Asia",
       "display_name": "Myanmar",
       "entry_kind": "",
-      "feature_count": 15,
+      "feature_count": 11,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -4959,32 +6165,39 @@
     "MO": {
       "base_iso2": "MO",
       "capital_state_id": null,
-      "color_hex": "#5d7cba",
+      "color_hex": "#a20050",
       "continent_id": "continent_asia",
       "continent_label": "Asia",
       "display_name": "Macao S.A.R",
-      "entry_kind": "",
+      "entry_kind": "scenario_subject",
       "feature_count": 1,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
         "modern"
       ],
+      "inspector_group_id": "china_special_administrative_regions",
+      "inspector_group_label": "中国特别行政区",
       "lookup_iso2": "MO",
-      "notes": "",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
+      "notes": "主权归属中国，原独立色 #5d7cba（与 AD 撞色）改为 CN 同色并挂靠 CN；只更新元数据，选择结果为空。",
+      "parent_owner_tag": "CN",
+      "parent_owner_tags": [
+        "CN"
+      ],
+      "presentation": "parent_merged",
       "primary_rule_source": "",
       "provenance_iso2": "MO",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "mw_macao_meta"
+      ],
       "scenario_only": false,
       "source": "canonical_baseline",
       "source_type": "canonical_baseline",
       "source_types": [
         "canonical_baseline"
       ],
-      "subject_kind": "",
+      "subject_kind": "special_territory",
       "subregion_id": "subregion_eastern_asia",
       "subregion_label": "Eastern Asia",
       "synthetic_owner": false,
@@ -5330,6 +6543,48 @@
       "synthetic_owner": false,
       "tag": "NA"
     },
+    "NAG": {
+      "base_iso2": "IN",
+      "capital_state_id": null,
+      "color_hex": "#fea906",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 6,
+      "display_name": "Nagaland",
+      "display_name_en": "Nagaland",
+      "display_name_zh": "那加兰",
+      "entry_kind": "scenario_subject",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IN",
+      "notes": "B 类。那加兰邦，宪法第 371A 条特殊地位，NSCN-IM 'Nagalim' 和谈未结。用层级组 IN_Nagaland（含 2 块合并地块，叶子 100% 落入）。曼尼普尔的那加族山区不并入。把握高。选中 6 块。",
+      "parent_owner_tag": "IN",
+      "parent_owner_tags": [
+        "IN"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_nagaland",
+      "provenance_iso2": "IN",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_nagaland"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "synthetic_owner": false,
+      "tag": "NAG"
+    },
     "NE": {
       "base_iso2": "NE",
       "capital_state_id": null,
@@ -5363,6 +6618,48 @@
       "subregion_label": "Western Africa",
       "synthetic_owner": false,
       "tag": "NE"
+    },
+    "NES": {
+      "base_iso2": "SO",
+      "capital_state_id": null,
+      "color_hex": "#80b3eb",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "North Eastern State of Somalia (SSC-Khaatumo)",
+      "display_name_en": "North Eastern State of Somalia (SSC-Khaatumo)",
+      "display_name_zh": "索马里东北州（SSC-Khaatumo）",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SO",
+      "notes": "2023 年逐出索马里兰军队，2025-07 获承认为第六个联邦成员州，亲摩加迪沙。粗版取 Sool 整块（Caynabo 区实为索马里兰控制，被多算）。同色挂索马里。把握中高。选中 1 块。",
+      "parent_owner_tag": "SO",
+      "parent_owner_tags": [
+        "SO"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ssc_khaatumo",
+      "provenance_iso2": "SO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ssc_khaatumo"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "federal_member_state",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "NES"
     },
     "NG": {
       "base_iso2": "NG",
@@ -5431,6 +6728,50 @@
       "subregion_label": "Central America",
       "synthetic_owner": false,
       "tag": "NI"
+    },
+    "NIR": {
+      "base_iso2": "GB",
+      "capital_state_id": null,
+      "color_hex": "#b9364c",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 38,
+      "display_name": "Northern Ireland",
+      "display_name_en": "Northern Ireland",
+      "display_name_zh": "北爱尔兰",
+      "entry_kind": "scenario_subject",
+      "feature_count": 38,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "uk_constituent_countries",
+      "inspector_group_label": "英国构成国",
+      "lookup_iso2": "GB",
+      "notes": "下放政府（Stormont），法理与实控均属英国。GB_Northern_Ireland 10 块 + 重叠的 GB_NUTS1_UKN + 28 个海岸外壳补片；only_from_owners=GB 防止吞入爱尔兰。把握：高。",
+      "parent_owner_tag": "GB",
+      "parent_owner_tags": [
+        "GB"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_northern_ireland",
+      "provenance_iso2": "GB",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_northern_ireland"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "constituent_country",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "synthetic_owner": false,
+      "tag": "NIR"
     },
     "NL": {
       "base_iso2": "NL",
@@ -5678,7 +7019,7 @@
       "continent_label": "Oceania",
       "display_name": "Papua New Guinea",
       "entry_kind": "",
-      "feature_count": 20,
+      "feature_count": 19,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -5712,7 +7053,7 @@
       "continent_label": "Asia",
       "display_name": "Philippines",
       "entry_kind": "",
-      "feature_count": 117,
+      "feature_count": 112,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -5746,7 +7087,7 @@
       "continent_label": "Asia",
       "display_name": "Pakistan",
       "entry_kind": "",
-      "feature_count": 8,
+      "feature_count": 5,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -5840,14 +7181,97 @@
       "synthetic_owner": false,
       "tag": "PM"
     },
+    "PMR": {
+      "base_iso2": "MD",
+      "capital_state_id": null,
+      "color_hex": "#8b1e5a",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 6,
+      "display_name": "Pridnestrovian Moldavian Republic (Transnistria)",
+      "display_name_en": "Pridnestrovian Moldavian Republic (Transnistria)",
+      "display_name_zh": "德涅斯特河沿岸摩尔达维亚共和国（德左）",
+      "entry_kind": "",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "post_soviet_frozen_conflicts",
+      "inspector_group_label": "后苏联冻结冲突",
+      "lookup_iso2": "MD",
+      "notes": "C 类：事实独立未获承认，把握高。逐块核对：Camenca(1652)、标为 Rezina 的左岸块 1645（实为 Rîbnița 区）、Stîngă Nistrului(1628, Dubăsari 一带)、Transnistria(1638, 杜伯萨里城区小块)、Grigoriopol(1637)、Bender(1650, 实含 Tiraspol 与 Slobozia 区)。右岸 Bender 城本身落在 Anenii Noi/Causeni 地块里，无法单独表达；左岸 Cocieri 等归基希讷乌管辖的村忽略。（核对修正：颜色 #a3341f→#8b1e5a，与其他新势力 RGB 距离不足 40）",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_pmr",
+      "provenance_iso2": "MD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_pmr"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "de_facto_state",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "PMR"
+    },
+    "PNT": {
+      "base_iso2": "SO",
+      "capital_state_id": null,
+      "color_hex": "#80b3eb",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 2,
+      "display_name": "Puntland State of Somalia",
+      "display_name_en": "Puntland State of Somalia",
+      "display_name_zh": "邦特兰州",
+      "entry_kind": "scenario_subject",
+      "feature_count": 2,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SO",
+      "notes": "联邦成员州，2024 年起不承认联邦政府权威、自行运作，不求独立。取 Bari、Nugaal；Mudug 北半（加勒卡约北、Jariiban、Goldogob）属邦特兰，但 Mudug 地块代表点在南半（加勒穆杜格），按多数留在 SO。把握高。选中 2 块。",
+      "parent_owner_tag": "SO",
+      "parent_owner_tags": [
+        "SO"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_puntland",
+      "provenance_iso2": "SO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_puntland"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "federal_member_state",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "PNT"
+    },
     "PR": {
       "base_iso2": "PR",
       "capital_state_id": null,
-      "color_hex": "#9999ff",
+      "color_hex": "#4782af",
       "continent_id": "continent_north_america",
       "continent_label": "North America",
       "display_name": "Puerto Rico",
-      "entry_kind": "",
+      "entry_kind": "scenario_subject",
       "feature_count": 1,
       "featured": false,
       "historical_fidelity": "modern",
@@ -5855,20 +7279,25 @@
         "modern"
       ],
       "lookup_iso2": "PR",
-      "notes": "",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
+      "notes": "美国未合并领土（自由邦），原独立色 #9999ff 改为 US 同色并挂靠 US；只更新元数据，选择结果为空。",
+      "parent_owner_tag": "US",
+      "parent_owner_tags": [
+        "US"
+      ],
+      "presentation": "parent_merged",
       "primary_rule_source": "",
       "provenance_iso2": "PR",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "mw_puerto_rico_meta"
+      ],
       "scenario_only": false,
       "source": "canonical_baseline",
       "source_type": "canonical_baseline",
       "source_types": [
         "canonical_baseline"
       ],
-      "subject_kind": "",
+      "subject_kind": "special_territory",
       "subregion_id": "subregion_caribbean",
       "subregion_label": "Caribbean",
       "synthetic_owner": false,
@@ -6010,6 +7439,48 @@
       "synthetic_owner": false,
       "tag": "QA"
     },
+    "QUE": {
+      "base_iso2": "CA",
+      "capital_state_id": null,
+      "color_hex": "#773027",
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "controller_feature_count": 62,
+      "display_name": "Quebec",
+      "display_name_en": "Quebec",
+      "display_name_zh": "魁北克",
+      "entry_kind": "scenario_subject",
+      "feature_count": 62,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "CA",
+      "notes": "加拿大一省，CAQ 执政，PQ 民调领先并承诺主权公投。CA_Quebec 62 个联邦选区/合并块。把握：高。",
+      "parent_owner_tag": "CA",
+      "parent_owner_tags": [
+        "CA"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_quebec",
+      "provenance_iso2": "CA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_quebec"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "province",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "synthetic_owner": false,
+      "tag": "QUE"
+    },
     "RE": {
       "base_iso2": "RE",
       "capital_state_id": null,
@@ -6112,6 +7583,47 @@
       "synthetic_owner": false,
       "tag": "RS"
     },
+    "RSF": {
+      "base_iso2": "SD",
+      "capital_state_id": null,
+      "color_hex": "#c8642d",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 6,
+      "display_name": "Government of Peace and Unity (RSF)",
+      "display_name_en": "Government of Peace and Unity (RSF)",
+      "display_name_zh": "和平与团结政府（快速支援部队）",
+      "entry_kind": "",
+      "feature_count": 6,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "sudan_civil_war",
+      "inspector_group_label": "苏丹内战",
+      "lookup_iso2": "SD",
+      "notes": "塔西斯平行政府/RSF 实控区，书签 2026-01-01。达尔富尔 5 州（SD_West_Soudan 代表点 22.9E/13.9N，即西达尔富尔）2025-10 法希尔陷落后全境 RSF。现有苏丹地块为 2013 年前区划，无独立西科尔多凡：旧西科尔多凡南部（穆格莱德、巴巴努萨、拉加瓦、哈季利季，2025-12 均落入 RSF）并在 South Kordofan 地块内，连同努巴山区 SPLM-N al-Hilu（塔西斯成员）控制区，按面积多数整块划入；卡杜格利、迪林仍由 SAF 守，属近似。North Kordofan 地块含欧拜伊德（SAF）及东部，按多数留在 SD，其西部恩纳胡德一带的 RSF 控制未表达。把握：达尔富尔高，南科尔多凡中低。选中 6 块。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_rsf_tasis",
+      "provenance_iso2": "SD",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_rsf_tasis"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "civil_war_faction",
+      "subregion_id": "subregion_northern_africa",
+      "subregion_label": "Northern Africa",
+      "synthetic_owner": false,
+      "tag": "RSF"
+    },
     "RU": {
       "base_iso2": "RU",
       "capital_state_id": null,
@@ -6120,7 +7632,7 @@
       "continent_label": "Europe",
       "display_name": "Russia",
       "entry_kind": "",
-      "feature_count": 11004,
+      "feature_count": 10096,
       "featured": true,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -6133,7 +7645,13 @@
       "primary_rule_source": "",
       "provenance_iso2": "RU",
       "quality": "direct_country_copy",
-      "rule_sources": [],
+      "rule_sources": [
+        "mw_ru_occ_crimea",
+        "mw_ru_occ_donetsk",
+        "mw_ru_occ_kherson",
+        "mw_ru_occ_luhansk",
+        "mw_ru_occ_zaporizhzhia"
+      ],
       "scenario_only": false,
       "source": "canonical_baseline",
       "source_type": "canonical_baseline",
@@ -6214,6 +7732,48 @@
       "synthetic_owner": false,
       "tag": "SA"
     },
+    "SAK": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#366138",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 312,
+      "display_name": "Sakha Republic (Yakutia)",
+      "display_name_en": "Sakha Republic (Yakutia)",
+      "display_name_zh": "萨哈（雅库特）共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 312,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Sakha_Republic 选取，另补 279 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "parent_owner_tag": "RU",
+      "parent_owner_tags": [
+        "RU"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ru_sak",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ru_sak"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "federal_subject",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "SAK"
+    },
     "SC": {
       "base_iso2": "SC",
       "capital_state_id": null,
@@ -6248,6 +7808,50 @@
       "synthetic_owner": false,
       "tag": "SC"
     },
+    "SCO": {
+      "base_iso2": "GB",
+      "capital_state_id": null,
+      "color_hex": "#b9364c",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 177,
+      "display_name": "Scotland",
+      "display_name_en": "Scotland",
+      "display_name_zh": "苏格兰",
+      "entry_kind": "scenario_subject",
+      "feature_count": 177,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "uk_constituent_countries",
+      "inspector_group_label": "英国构成国",
+      "lookup_iso2": "GB",
+      "notes": "下放政府，SNP 执政，独立公投议题活跃。GB_Scotland 18 块细分地块 + 与其几何完全重叠的 GB_NUTS1_UKM（数据重复，一并归入避免残留 GB 块）+ 按最近区域分配的 159 个 GB_SHELL_FB 海岸外壳补片。把握：高。",
+      "parent_owner_tag": "GB",
+      "parent_owner_tags": [
+        "GB"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_scotland",
+      "provenance_iso2": "GB",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_scotland"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "constituent_country",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "synthetic_owner": false,
+      "tag": "SCO"
+    },
     "SD": {
       "base_iso2": "SD",
       "capital_state_id": null,
@@ -6256,7 +7860,7 @@
       "continent_label": "Africa",
       "display_name": "Sudan",
       "entry_kind": "",
-      "feature_count": 17,
+      "feature_count": 11,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -6281,6 +7885,47 @@
       "subregion_label": "Northern Africa",
       "synthetic_owner": false,
       "tag": "SD"
+    },
+    "SDF": {
+      "base_iso2": "SY",
+      "capital_state_id": null,
+      "color_hex": "#e0c040",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 3,
+      "display_name": "Autonomous Administration of North and East Syria",
+      "display_name_en": "Autonomous Administration of North and East Syria",
+      "display_name_zh": "北叙利亚和东叙利亚自治当局（叙利亚民主力量）",
+      "entry_kind": "",
+      "feature_count": 3,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "syria_factions",
+      "inspector_group_label": "叙利亚各方",
+      "lookup_iso2": "SY",
+      "notes": "书签日取 2026-01 冲突前的最大范围，整省粗版：哈塞克（拉斯艾因一带除外，按多数）、拉卡（泰勒阿布亚德一带除外，按多数）、代尔祖尔（叙利亚只有整省地块，用近似幼发拉底河线切算东岸约占该省 51%，代表点在东岸，按多数整省归入，把握低）。阿勒颇省的科巴尼、代尔哈菲尔因地块是阿勒颇整省而未表达。选中 3 块。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_syria_sdf",
+      "provenance_iso2": "SY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_syria_sdf"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "civil_war_faction",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "SDF"
     },
     "SE": {
       "base_iso2": "SE",
@@ -6383,6 +8028,47 @@
       "subregion_label": "Western Africa",
       "synthetic_owner": false,
       "tag": "SH"
+    },
+    "SHB": {
+      "base_iso2": "SO",
+      "capital_state_id": null,
+      "color_hex": "#3b3b3b",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Harakat al-Shabaab al-Mujahideen",
+      "display_name_en": "Harakat al-Shabaab al-Mujahideen",
+      "display_name_zh": "青年党",
+      "entry_kind": "",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "somali_civil_war",
+      "inspector_group_label": "索马里内战",
+      "lookup_iso2": "SO",
+      "notes": "只取把握最大的核心区 Middle Juba（含吉利布、萨科），2008 年以来长期由青年党治理。下/中谢贝利、希兰、巴伊、巴科勒等 2025 年反复易手，不划入。把握中高（核心区）。选中 1 块。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_al_shabaab",
+      "provenance_iso2": "SO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_al_shabaab"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "civil_war_faction",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "SHB"
     },
     "SI": {
       "base_iso2": "SI",
@@ -6520,6 +8206,45 @@
       "synthetic_owner": false,
       "tag": "SM"
     },
+    "SML": {
+      "base_iso2": "SO",
+      "capital_state_id": null,
+      "color_hex": "#2e8b57",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 4,
+      "display_name": "Republic of Somaliland",
+      "display_name_en": "Republic of Somaliland",
+      "display_name_zh": "索马里兰共和国",
+      "entry_kind": "",
+      "feature_count": 4,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SO",
+      "notes": "事实独立（2025-12 获以色列承认）。Awdal、Woqooyi Galbeed、Togdheer 全块；Sanaag 西中部（含埃里加沃）由索马里兰控制，东部 Badhan 一带归东北州/邦特兰，按多数整块划入。Sool 2023 后归 SSC-Khaatumo，不划入（另见 mw_ssc_khaatumo）。Togdheer 的 Buhodle 区未剔除。把握高（粗版）。选中 4 块。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_somaliland",
+      "provenance_iso2": "SO",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_somaliland"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "de_facto_state",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "SML"
+    },
     "SN": {
       "base_iso2": "SN",
       "capital_state_id": null,
@@ -6562,7 +8287,7 @@
       "continent_label": "Africa",
       "display_name": "Somalia",
       "entry_kind": "",
-      "feature_count": 18,
+      "feature_count": 8,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -6621,6 +8346,48 @@
       "subregion_label": "South America",
       "synthetic_owner": false,
       "tag": "SR"
+    },
+    "SRP": {
+      "base_iso2": "BA",
+      "capital_state_id": null,
+      "color_hex": "#e0b058",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 1,
+      "display_name": "Republika Srpska",
+      "display_name_en": "Republika Srpska",
+      "display_name_zh": "塞族共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "BA",
+      "notes": "波黑两个实体之一，2025-11 提前选举 SNSD 的 Karan 胜选，分离倾向最强但法理实控均属波黑。单块 BA_ADM1_...909，不含布尔奇科特区。把握：高。",
+      "parent_owner_tag": "BA",
+      "parent_owner_tags": [
+        "BA"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_republika_srpska",
+      "provenance_iso2": "BA",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_republika_srpska"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "constituent_country",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "SRP"
     },
     "SS": {
       "base_iso2": "SS",
@@ -6690,6 +8457,89 @@
       "synthetic_owner": false,
       "tag": "ST"
     },
+    "STC": {
+      "base_iso2": "YE",
+      "capital_state_id": null,
+      "color_hex": "#3a7cb8",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 7,
+      "display_name": "Southern Transitional Council",
+      "display_name_en": "Southern Transitional Council",
+      "display_name_zh": "南方过渡委员会",
+      "entry_kind": "",
+      "feature_count": 7,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "yemen_civil_war",
+      "inspector_group_label": "也门内战",
+      "lookup_iso2": "YE",
+      "notes": "书签日取 2025-12 攻势后的最大范围：亚丁、拉赫季、阿比扬、舍卜沃、哈德拉毛（地块含索科特拉）、迈赫拉，以及达利阿（南部为主，按多数整省归入）。2026-01-03~06 政府方收复哈德拉毛、迈赫拉，书签日之后变化需写进剧本说明。选中 7 块。省级范围把握中高，拉赫季北部与舍卜沃拜汉等边角未细化。YE 原 tag 剩塔伊兹、马里卜 2 块，代表总统领导委员会。",
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "primary_rule_source": "mw_yemen_stc",
+      "provenance_iso2": "YE",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_yemen_stc"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "civil_war_faction",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "STC"
+    },
+    "STY": {
+      "base_iso2": "IT",
+      "capital_state_id": null,
+      "color_hex": "#2f894b",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 1,
+      "display_name": "South Tyrol",
+      "display_name_en": "South Tyrol",
+      "display_name_zh": "南蒂罗尔",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "IT",
+      "notes": "博尔扎诺自治省（ITH10 Bolzano-Bozen），SVP 追求扩大自治，风味性同色单列。把握：高。",
+      "parent_owner_tag": "IT",
+      "parent_owner_tags": [
+        "IT"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_south_tyrol",
+      "provenance_iso2": "IT",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_south_tyrol"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "synthetic_owner": false,
+      "tag": "STY"
+    },
     "SV": {
       "base_iso2": "SV",
       "capital_state_id": null,
@@ -6724,6 +8574,48 @@
       "synthetic_owner": false,
       "tag": "SV"
     },
+    "SWD": {
+      "base_iso2": "SY",
+      "capital_state_id": null,
+      "color_hex": "#7169a3",
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "controller_feature_count": 1,
+      "display_name": "Suwayda (Druze Self-Administration)",
+      "display_name_en": "Suwayda (Druze Self-Administration)",
+      "display_name_zh": "苏韦达（德鲁兹自治）",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "SY",
+      "notes": "2025-08 后希吉里的国民卫队事实自治，未宣布独立，按同色自治处理。粗版取苏韦达整省，政府军控制的西北部村镇未扣除。选中 1 块，事实自治把握高、范围中等。",
+      "parent_owner_tag": "SY",
+      "parent_owner_tags": [
+        "SY"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_syria_suwayda",
+      "provenance_iso2": "SY",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_syria_suwayda"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_western_asia",
+      "subregion_label": "Western Asia",
+      "synthetic_owner": false,
+      "tag": "SWD"
+    },
     "SY": {
       "base_iso2": "SY",
       "capital_state_id": null,
@@ -6732,7 +8624,7 @@
       "continent_label": "Asia",
       "display_name": "Syria",
       "entry_kind": "",
-      "feature_count": 15,
+      "feature_count": 10,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -6791,6 +8683,48 @@
       "subregion_label": "Southern Africa",
       "synthetic_owner": false,
       "tag": "SZ"
+    },
+    "TAT": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#366138",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 170,
+      "display_name": "Republic of Tatarstan",
+      "display_name_en": "Republic of Tatarstan",
+      "display_name_zh": "鞑靼斯坦共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 170,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Republic_of_Tatarstan 选取，另补 148 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "parent_owner_tag": "RU",
+      "parent_owner_tags": [
+        "RU"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ru_tat",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ru_tat"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "federal_subject",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "TAT"
     },
     "TD": {
       "base_iso2": "TD",
@@ -6927,6 +8861,48 @@
       "subregion_label": "South-Eastern Asia",
       "synthetic_owner": false,
       "tag": "TH"
+    },
+    "TIG": {
+      "base_iso2": "ET",
+      "capital_state_id": null,
+      "color_hex": "#5a5faa",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 1,
+      "display_name": "Tigray Interim Regional Administration",
+      "display_name_en": "Tigray Interim Regional Administration",
+      "display_name_zh": "提格雷州临时政府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 1,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "ET",
+      "notes": "比勒陀利亚协议后的州临时政府，书签日仍在联邦框架内，同色挂埃塞俄比亚。地块含西提格雷（Welkait/Humera，实为阿姆哈拉方面管理）与南部 Raya，现有地块无法剔除。TPLF 2026-05 恢复战前政府在书签日后，不体现。把握中。选中 1 块。",
+      "parent_owner_tag": "ET",
+      "parent_owner_tags": [
+        "ET"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_tigray",
+      "provenance_iso2": "ET",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_tigray"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "TIG"
     },
     "TJ": {
       "base_iso2": "TJ",
@@ -7132,6 +9108,48 @@
       "synthetic_owner": false,
       "tag": "TT"
     },
+    "TUV": {
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "color_hex": "#366138",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 79,
+      "display_name": "Tuva Republic",
+      "display_name_en": "Tuva Republic",
+      "display_name_zh": "图瓦共和国",
+      "entry_kind": "scenario_subject",
+      "feature_count": 79,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "RU",
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Tuva_Republic 选取，另补 68 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "parent_owner_tag": "RU",
+      "parent_owner_tags": [
+        "RU"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_ru_tuv",
+      "provenance_iso2": "RU",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_ru_tuv"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "federal_subject",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "synthetic_owner": false,
+      "tag": "TUV"
+    },
     "TW": {
       "base_iso2": "TW",
       "capital_state_id": null,
@@ -7174,7 +9192,7 @@
       "continent_label": "Africa",
       "display_name": "United Republic of Tanzania",
       "entry_kind": "",
-      "feature_count": 30,
+      "feature_count": 25,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -7208,7 +9226,7 @@
       "continent_label": "Europe",
       "display_name": "Ukraine",
       "entry_kind": "",
-      "feature_count": 946,
+      "feature_count": 776,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -7472,6 +9490,50 @@
       "synthetic_owner": false,
       "tag": "VN"
     },
+    "WLS": {
+      "base_iso2": "GB",
+      "capital_state_id": null,
+      "color_hex": "#b9364c",
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "controller_feature_count": 32,
+      "display_name": "Wales",
+      "display_name_en": "Wales",
+      "display_name_zh": "威尔士",
+      "entry_kind": "scenario_subject",
+      "feature_count": 32,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "inspector_group_id": "uk_constituent_countries",
+      "inspector_group_label": "英国构成国",
+      "lookup_iso2": "GB",
+      "notes": "下放政府（Senedd）。GB_Wales 10 块 + 重叠的 GB_NUTS1_UKL + 22 个海岸外壳补片（迪河、塞文河口模糊补片归英格兰）。把握：高。",
+      "parent_owner_tag": "GB",
+      "parent_owner_tags": [
+        "GB"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_wales",
+      "provenance_iso2": "GB",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_wales"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "constituent_country",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "synthetic_owner": false,
+      "tag": "WLS"
+    },
     "XK": {
       "base_iso2": "XK",
       "capital_state_id": null,
@@ -7514,7 +9576,7 @@
       "continent_label": "Asia",
       "display_name": "Yemen",
       "entry_kind": "",
-      "feature_count": 21,
+      "feature_count": 2,
       "featured": false,
       "historical_fidelity": "modern",
       "historical_fidelity_summary": [
@@ -7607,6 +9669,48 @@
       "subregion_label": "Southern Africa",
       "synthetic_owner": false,
       "tag": "ZA"
+    },
+    "ZAN": {
+      "base_iso2": "TZ",
+      "capital_state_id": null,
+      "color_hex": "#8bbdbd",
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "controller_feature_count": 5,
+      "display_name": "Revolutionary Government of Zanzibar",
+      "display_name_en": "Revolutionary Government of Zanzibar",
+      "display_name_zh": "桑给巴尔革命政府",
+      "entry_kind": "scenario_subject",
+      "feature_count": 5,
+      "featured": false,
+      "historical_fidelity": "extended",
+      "historical_fidelity_summary": [
+        "extended"
+      ],
+      "lookup_iso2": "TZ",
+      "notes": "坦桑尼亚联合共和国内半自治部分，有自己的总统、议会和政府。温古贾岛 3 区 + 奔巴岛 2 区。同色挂坦桑尼亚。把握高。选中 5 块。",
+      "parent_owner_tag": "TZ",
+      "parent_owner_tags": [
+        "TZ"
+      ],
+      "presentation": "parent_merged",
+      "primary_rule_source": "mw_zanzibar",
+      "provenance_iso2": "TZ",
+      "quality": "manual_reviewed",
+      "rule_sources": [
+        "mw_zanzibar"
+      ],
+      "scenario_only": true,
+      "source": "manual_rule",
+      "source_type": "scenario_extension",
+      "source_types": [
+        "scenario_extension"
+      ],
+      "subject_kind": "autonomous_region",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "synthetic_owner": false,
+      "tag": "ZAN"
     },
     "ZM": {
       "base_iso2": "ZM",

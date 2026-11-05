@@ -60,9 +60,35 @@ def rebuild(pack_path: Path, base_commit: str, output: Path) -> tuple[dict, dict
     return old, new
 
 
+def pack_identity_id(pack: dict) -> str:
+    """The builder's packId over a pack's own recorded parents and support."""
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from tools.build_river_partitions import _digest
+    identity = {"sceneId": pack["sceneId"], "algorithm": pack["algorithmVersion"], "source": pack["source"],
+                "parents": [[p["parentId"], p["parentFingerprint"], [c["geometryFingerprint"] for c in p["cells"]]]
+                            for p in pack["parents"]],
+                "support": [[p["parentId"], p["geometryFingerprint"]] for p in pack["support"]]}
+    return _digest(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode())
+
+
+def repin_baseline(pack_path: Path) -> tuple[dict, dict]:
+    """Ownership overlays change only the baseline hash; parents and support stay byte-identical."""
+    old = json.loads(pack_path.read_text(encoding="utf-8"))
+    if pack_identity_id(old) != old["packId"]:
+        raise SystemExit(f"{pack_path.name}: recorded packId does not match its identity; rebuild instead")
+    baseline = json.loads((ROOT / f"data/scenarios/{old['sceneId']}/manifest.json").read_text(encoding="utf-8"))["baseline_hash"]
+    new = {**old, "source": {**old["source"], "baselineHash": baseline}}
+    new["packId"] = pack_identity_id(new)
+    pack_path.write_bytes((json.dumps(new, ensure_ascii=False, separators=(",", ":")) + "\n").encode("utf-8"))
+    return old, new
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-commit", default="", help="Provenance commit (default: HEAD).")
+    parser.add_argument("--baseline-only", action="store_true",
+                        help="Owner-only change: keep each pack's geometry and pin only the new baseline hash.")
     args = parser.parse_args()
     base_commit = args.base_commit or subprocess.run(
         ["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True, cwd=ROOT).stdout.strip()
@@ -74,8 +100,11 @@ def main() -> None:
         if pack_path.name.endswith(".transport.json"):
             continue
         old_canonical = canonical_sha256(pack_path)
-        with tempfile.TemporaryDirectory() as directory:
-            old, new = rebuild(pack_path, base_commit, Path(directory) / pack_path.name)
+        if args.baseline_only:
+            old, new = repin_baseline(pack_path)
+        else:
+            with tempfile.TemporaryDirectory() as directory:
+                old, new = rebuild(pack_path, base_commit, Path(directory) / pack_path.name)
         transport = pack_path.with_name(pack_path.stem + ".transport.json")
         if transport.exists():
             with tempfile.TemporaryDirectory() as directory:

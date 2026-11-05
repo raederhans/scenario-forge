@@ -1,0 +1,3155 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "mw_abkhazia",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "ABK",
+      "name_en": "Republic of Abkhazia",
+      "name_zh": "阿布哈兹共和国",
+      "color_hex": "#d98f2b",
+      "subject_kind": "de_facto_state",
+      "cores": [
+        "GE"
+      ],
+      "only_from_owners": [
+        "GE"
+      ],
+      "select": {
+        "feature_ids": [
+          "GEO-3015"
+        ]
+      },
+      "notes": "C 类：俄承认的分离政权，事实独立，把握高。单一地块 GEO-3015 与控制范围基本一致。",
+      "inspector_group_id": "post_soviet_frozen_conflicts",
+      "inspector_group_label": "后苏联冻结冲突"
+    },
+    {
+      "id": "mw_pmr",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "PMR",
+      "name_en": "Pridnestrovian Moldavian Republic (Transnistria)",
+      "name_zh": "德涅斯特河沿岸摩尔达维亚共和国（德左）",
+      "color_hex": "#8b1e5a",
+      "subject_kind": "de_facto_state",
+      "cores": [
+        "MD"
+      ],
+      "only_from_owners": [
+        "MD"
+      ],
+      "select": {
+        "feature_ids": [
+          "MDA-1652",
+          "MDA-1645",
+          "MDA-1628",
+          "MDA-1638",
+          "MDA-1637",
+          "MDA-1650"
+        ]
+      },
+      "notes": "C 类：事实独立未获承认，把握高。逐块核对：Camenca(1652)、标为 Rezina 的左岸块 1645（实为 Rîbnița 区）、Stîngă Nistrului(1628, Dubăsari 一带)、Transnistria(1638, 杜伯萨里城区小块)、Grigoriopol(1637)、Bender(1650, 实含 Tiraspol 与 Slobozia 区)。右岸 Bender 城本身落在 Anenii Noi/Causeni 地块里，无法单独表达；左岸 Cocieri 等归基希讷乌管辖的村忽略。（核对修正：颜色 #a3341f→#8b1e5a，与其他新势力 RGB 距离不足 40）",
+      "inspector_group_id": "post_soviet_frozen_conflicts",
+      "inspector_group_label": "后苏联冻结冲突"
+    },
+    {
+      "id": "mw_ru_bas",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "BAS",
+      "name_en": "Republic of Bashkortostan",
+      "name_zh": "巴什科尔托斯坦共和国",
+      "parent_owner_tag": "RU",
+      "presentation": "parent_merged",
+      "subject_kind": "federal_subject",
+      "cores": [
+        "RU"
+      ],
+      "only_from_owners": [
+        "RU"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "RU_Bashkortostan"
+        ],
+        "feature_ids": [
+          "RU_ARCTIC_FB_10090",
+          "RU_ARCTIC_FB_3618",
+          "RU_ARCTIC_FB_3622",
+          "RU_ARCTIC_FB_3624",
+          "RU_ARCTIC_FB_3626",
+          "RU_ARCTIC_FB_3640",
+          "RU_ARCTIC_FB_3650",
+          "RU_ARCTIC_FB_3656",
+          "RU_ARCTIC_FB_3665",
+          "RU_ARCTIC_FB_3670",
+          "RU_ARCTIC_FB_3673",
+          "RU_ARCTIC_FB_3677",
+          "RU_ARCTIC_FB_3678",
+          "RU_ARCTIC_FB_3681",
+          "RU_ARCTIC_FB_3686",
+          "RU_ARCTIC_FB_3690",
+          "RU_ARCTIC_FB_3691",
+          "RU_ARCTIC_FB_3699",
+          "RU_ARCTIC_FB_3704",
+          "RU_ARCTIC_FB_3706",
+          "RU_ARCTIC_FB_3708",
+          "RU_ARCTIC_FB_3710",
+          "RU_ARCTIC_FB_3711",
+          "RU_ARCTIC_FB_3714",
+          "RU_ARCTIC_FB_3715",
+          "RU_ARCTIC_FB_3717",
+          "RU_ARCTIC_FB_3718",
+          "RU_ARCTIC_FB_3720",
+          "RU_ARCTIC_FB_3722",
+          "RU_ARCTIC_FB_3726",
+          "RU_ARCTIC_FB_3727",
+          "RU_ARCTIC_FB_3729",
+          "RU_ARCTIC_FB_3733",
+          "RU_ARCTIC_FB_3737",
+          "RU_ARCTIC_FB_3738",
+          "RU_ARCTIC_FB_3740",
+          "RU_ARCTIC_FB_3741",
+          "RU_ARCTIC_FB_3742",
+          "RU_ARCTIC_FB_3743",
+          "RU_ARCTIC_FB_3746",
+          "RU_ARCTIC_FB_3750",
+          "RU_ARCTIC_FB_3751",
+          "RU_ARCTIC_FB_3753",
+          "RU_ARCTIC_FB_3754",
+          "RU_ARCTIC_FB_3758",
+          "RU_ARCTIC_FB_3764",
+          "RU_ARCTIC_FB_3767",
+          "RU_ARCTIC_FB_3768",
+          "RU_ARCTIC_FB_3771",
+          "RU_ARCTIC_FB_3777",
+          "RU_ARCTIC_FB_3778",
+          "RU_ARCTIC_FB_3779",
+          "RU_ARCTIC_FB_3782",
+          "RU_ARCTIC_FB_3787",
+          "RU_ARCTIC_FB_3793",
+          "RU_ARCTIC_FB_3794",
+          "RU_ARCTIC_FB_3795",
+          "RU_ARCTIC_FB_3796",
+          "RU_ARCTIC_FB_3797",
+          "RU_ARCTIC_FB_3800",
+          "RU_ARCTIC_FB_3801",
+          "RU_ARCTIC_FB_3810",
+          "RU_ARCTIC_FB_3811",
+          "RU_ARCTIC_FB_3813",
+          "RU_ARCTIC_FB_3814",
+          "RU_ARCTIC_FB_3816",
+          "RU_ARCTIC_FB_3817",
+          "RU_ARCTIC_FB_3825",
+          "RU_ARCTIC_FB_3828",
+          "RU_ARCTIC_FB_3830",
+          "RU_ARCTIC_FB_3831",
+          "RU_ARCTIC_FB_3843",
+          "RU_ARCTIC_FB_3845",
+          "RU_ARCTIC_FB_3854",
+          "RU_ARCTIC_FB_3857",
+          "RU_ARCTIC_FB_3860",
+          "RU_ARCTIC_FB_3863",
+          "RU_ARCTIC_FB_3864",
+          "RU_ARCTIC_FB_3865",
+          "RU_ARCTIC_FB_3866",
+          "RU_ARCTIC_FB_3868",
+          "RU_ARCTIC_FB_3869",
+          "RU_ARCTIC_FB_3872",
+          "RU_ARCTIC_FB_3875",
+          "RU_ARCTIC_FB_3877",
+          "RU_ARCTIC_FB_3878",
+          "RU_ARCTIC_FB_3882",
+          "RU_ARCTIC_FB_3886",
+          "RU_ARCTIC_FB_3887",
+          "RU_ARCTIC_FB_3890",
+          "RU_ARCTIC_FB_3891",
+          "RU_ARCTIC_FB_3892",
+          "RU_ARCTIC_FB_3893",
+          "RU_ARCTIC_FB_3894",
+          "RU_ARCTIC_FB_3895",
+          "RU_ARCTIC_FB_3898",
+          "RU_ARCTIC_FB_3899",
+          "RU_ARCTIC_FB_3901",
+          "RU_ARCTIC_FB_3908",
+          "RU_ARCTIC_FB_3909",
+          "RU_ARCTIC_FB_3910",
+          "RU_ARCTIC_FB_3912",
+          "RU_ARCTIC_FB_3913",
+          "RU_ARCTIC_FB_3921",
+          "RU_ARCTIC_FB_3922",
+          "RU_ARCTIC_FB_3923",
+          "RU_ARCTIC_FB_3929",
+          "RU_ARCTIC_FB_3932",
+          "RU_ARCTIC_FB_3936",
+          "RU_ARCTIC_FB_3939",
+          "RU_ARCTIC_FB_3940",
+          "RU_ARCTIC_FB_3942",
+          "RU_ARCTIC_FB_3944",
+          "RU_ARCTIC_FB_3946",
+          "RU_ARCTIC_FB_3947",
+          "RU_ARCTIC_FB_3948",
+          "RU_ARCTIC_FB_3951",
+          "RU_ARCTIC_FB_3952",
+          "RU_ARCTIC_FB_3956",
+          "RU_ARCTIC_FB_3958",
+          "RU_ARCTIC_FB_3959",
+          "RU_ARCTIC_FB_3960",
+          "RU_ARCTIC_FB_3962",
+          "RU_ARCTIC_FB_3963",
+          "RU_ARCTIC_FB_3965",
+          "RU_ARCTIC_FB_3966",
+          "RU_ARCTIC_FB_3969",
+          "RU_ARCTIC_FB_3971",
+          "RU_ARCTIC_FB_3975",
+          "RU_ARCTIC_FB_3977",
+          "RU_ARCTIC_FB_3979",
+          "RU_ARCTIC_FB_3980",
+          "RU_ARCTIC_FB_3981",
+          "RU_ARCTIC_FB_3982",
+          "RU_ARCTIC_FB_3984",
+          "RU_ARCTIC_FB_3986",
+          "RU_ARCTIC_FB_3987",
+          "RU_ARCTIC_FB_3992",
+          "RU_ARCTIC_FB_3993",
+          "RU_ARCTIC_FB_3996",
+          "RU_ARCTIC_FB_3997",
+          "RU_ARCTIC_FB_4001",
+          "RU_ARCTIC_FB_4002",
+          "RU_ARCTIC_FB_4003",
+          "RU_ARCTIC_FB_4006",
+          "RU_ARCTIC_FB_4007",
+          "RU_ARCTIC_FB_4008",
+          "RU_ARCTIC_FB_4016",
+          "RU_ARCTIC_FB_4017",
+          "RU_ARCTIC_FB_4020",
+          "RU_ARCTIC_FB_4026",
+          "RU_ARCTIC_FB_4030",
+          "RU_ARCTIC_FB_4035",
+          "RU_ARCTIC_FB_4037",
+          "RU_ARCTIC_FB_4043",
+          "RU_ARCTIC_FB_4045",
+          "RU_ARCTIC_FB_4046",
+          "RU_ARCTIC_FB_4047",
+          "RU_ARCTIC_FB_4049",
+          "RU_ARCTIC_FB_4052",
+          "RU_ARCTIC_FB_4053",
+          "RU_ARCTIC_FB_4056",
+          "RU_ARCTIC_FB_4065",
+          "RU_ARCTIC_FB_4067",
+          "RU_ARCTIC_FB_4070",
+          "RU_ARCTIC_FB_4073",
+          "RU_ARCTIC_FB_4075",
+          "RU_ARCTIC_FB_4077",
+          "RU_ARCTIC_FB_4078",
+          "RU_ARCTIC_FB_4081",
+          "RU_ARCTIC_FB_4084",
+          "RU_ARCTIC_FB_4085",
+          "RU_ARCTIC_FB_4086",
+          "RU_ARCTIC_FB_4094",
+          "RU_ARCTIC_FB_4096",
+          "RU_ARCTIC_FB_4105",
+          "RU_ARCTIC_FB_4106",
+          "RU_ARCTIC_FB_4107",
+          "RU_ARCTIC_FB_4112",
+          "RU_ARCTIC_FB_4115",
+          "RU_ARCTIC_FB_4116",
+          "RU_ARCTIC_FB_4117",
+          "RU_ARCTIC_FB_4118",
+          "RU_ARCTIC_FB_4125",
+          "RU_ARCTIC_FB_4128",
+          "RU_ARCTIC_FB_4137",
+          "RU_ARCTIC_FB_4138",
+          "RU_ARCTIC_FB_4143",
+          "RU_ARCTIC_FB_4146",
+          "RU_ARCTIC_FB_4149",
+          "RU_ARCTIC_FB_4150",
+          "RU_ARCTIC_FB_4157",
+          "RU_ARCTIC_FB_4158",
+          "RU_ARCTIC_FB_4159",
+          "RU_ARCTIC_FB_4161",
+          "RU_ARCTIC_FB_4162",
+          "RU_ARCTIC_FB_4164",
+          "RU_ARCTIC_FB_4166",
+          "RU_ARCTIC_FB_4167",
+          "RU_ARCTIC_FB_4172",
+          "RU_ARCTIC_FB_4177",
+          "RU_ARCTIC_FB_4184",
+          "RU_ARCTIC_FB_4190",
+          "RU_ARCTIC_FB_4193",
+          "RU_ARCTIC_FB_4197",
+          "RU_ARCTIC_FB_4198",
+          "RU_ARCTIC_FB_4203",
+          "RU_ARCTIC_FB_4209",
+          "RU_ARCTIC_FB_4210",
+          "RU_ARCTIC_FB_4287",
+          "RU_ARCTIC_FB_8728",
+          "RU_ARCTIC_FB_8734",
+          "RU_ARCTIC_FB_8758",
+          "RU_ARCTIC_FB_9249",
+          "RU_ARCTIC_FB_9508",
+          "RU_ARCTIC_FB_9713",
+          "RU_ARCTIC_FB_9911"
+        ]
+      },
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Bashkortostan 选取，另补 217 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "color_hex": "#366138"
+    },
+    {
+      "id": "mw_ru_bur",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "BUR",
+      "name_en": "Republic of Buryatia",
+      "name_zh": "布里亚特共和国",
+      "parent_owner_tag": "RU",
+      "presentation": "parent_merged",
+      "subject_kind": "federal_subject",
+      "cores": [
+        "RU"
+      ],
+      "only_from_owners": [
+        "RU"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Buryatia"
+        ],
+        "feature_ids": [
+          "RU_ARCTIC_FB_6016",
+          "RU_ARCTIC_FB_6018",
+          "RU_ARCTIC_FB_6020",
+          "RU_ARCTIC_FB_6026",
+          "RU_ARCTIC_FB_6043",
+          "RU_ARCTIC_FB_6079",
+          "RU_ARCTIC_FB_6082",
+          "RU_ARCTIC_FB_6101",
+          "RU_ARCTIC_FB_6102",
+          "RU_ARCTIC_FB_6111",
+          "RU_ARCTIC_FB_6125",
+          "RU_ARCTIC_FB_6128",
+          "RU_ARCTIC_FB_6145",
+          "RU_ARCTIC_FB_6148",
+          "RU_ARCTIC_FB_6151",
+          "RU_ARCTIC_FB_6157",
+          "RU_ARCTIC_FB_6165",
+          "RU_ARCTIC_FB_6169",
+          "RU_ARCTIC_FB_6172",
+          "RU_ARCTIC_FB_6175",
+          "RU_ARCTIC_FB_6177",
+          "RU_ARCTIC_FB_6188",
+          "RU_ARCTIC_FB_6190",
+          "RU_ARCTIC_FB_6191",
+          "RU_ARCTIC_FB_6193",
+          "RU_ARCTIC_FB_6196",
+          "RU_ARCTIC_FB_6197",
+          "RU_ARCTIC_FB_6198",
+          "RU_ARCTIC_FB_6199",
+          "RU_ARCTIC_FB_6200",
+          "RU_ARCTIC_FB_6202",
+          "RU_ARCTIC_FB_6203",
+          "RU_ARCTIC_FB_6204",
+          "RU_ARCTIC_FB_6205",
+          "RU_ARCTIC_FB_6206",
+          "RU_ARCTIC_FB_6209",
+          "RU_ARCTIC_FB_6213",
+          "RU_ARCTIC_FB_6214",
+          "RU_ARCTIC_FB_6215",
+          "RU_ARCTIC_FB_6218",
+          "RU_ARCTIC_FB_6224",
+          "RU_ARCTIC_FB_6229",
+          "RU_ARCTIC_FB_6233",
+          "RU_ARCTIC_FB_6235",
+          "RU_ARCTIC_FB_6245",
+          "RU_ARCTIC_FB_6255",
+          "RU_ARCTIC_FB_6261",
+          "RU_ARCTIC_FB_6262",
+          "RU_ARCTIC_FB_6263",
+          "RU_ARCTIC_FB_6267",
+          "RU_ARCTIC_FB_6269",
+          "RU_ARCTIC_FB_6270",
+          "RU_ARCTIC_FB_6271",
+          "RU_ARCTIC_FB_6272",
+          "RU_ARCTIC_FB_6275",
+          "RU_ARCTIC_FB_6284",
+          "RU_ARCTIC_FB_6287",
+          "RU_ARCTIC_FB_6289",
+          "RU_ARCTIC_FB_6290",
+          "RU_ARCTIC_FB_6291",
+          "RU_ARCTIC_FB_6294",
+          "RU_ARCTIC_FB_6296",
+          "RU_ARCTIC_FB_6298",
+          "RU_ARCTIC_FB_6300",
+          "RU_ARCTIC_FB_6302",
+          "RU_ARCTIC_FB_6304",
+          "RU_ARCTIC_FB_6309",
+          "RU_ARCTIC_FB_6319",
+          "RU_ARCTIC_FB_6321",
+          "RU_ARCTIC_FB_6344",
+          "RU_ARCTIC_FB_6369",
+          "RU_ARCTIC_FB_6371",
+          "RU_ARCTIC_FB_6372",
+          "RU_ARCTIC_FB_6404",
+          "RU_ARCTIC_FB_6407",
+          "RU_ARCTIC_FB_6417",
+          "RU_ARCTIC_FB_6420",
+          "RU_ARCTIC_FB_6424",
+          "RU_ARCTIC_FB_6427",
+          "RU_ARCTIC_FB_6448",
+          "RU_ARCTIC_FB_8970",
+          "RU_ARCTIC_FB_8972",
+          "RU_ARCTIC_FB_8975",
+          "RU_ARCTIC_FB_8983"
+        ]
+      },
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Republic_of_Buryatia 选取，另补 84 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "color_hex": "#366138"
+    },
+    {
+      "id": "mw_ru_cec",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "CEC",
+      "name_en": "Chechen Republic",
+      "name_zh": "车臣共和国",
+      "parent_owner_tag": "RU",
+      "presentation": "parent_merged",
+      "subject_kind": "federal_subject",
+      "cores": [
+        "RU"
+      ],
+      "only_from_owners": [
+        "RU"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "RU_Chechen_Republic"
+        ],
+        "feature_ids": [
+          "RU_ARCTIC_FB_2419",
+          "RU_ARCTIC_FB_2421",
+          "RU_ARCTIC_FB_2464",
+          "RU_ARCTIC_FB_2467",
+          "RU_ARCTIC_FB_2481",
+          "RU_ARCTIC_FB_2483",
+          "RU_ARCTIC_FB_2505",
+          "RU_ARCTIC_FB_2510",
+          "RU_ARCTIC_FB_2517",
+          "RU_ARCTIC_FB_2528",
+          "RU_ARCTIC_FB_2533",
+          "RU_ARCTIC_FB_2544",
+          "RU_ARCTIC_FB_2547",
+          "RU_ARCTIC_FB_2550",
+          "RU_ARCTIC_FB_2570",
+          "RU_ARCTIC_FB_2572",
+          "RU_ARCTIC_FB_2574",
+          "RU_ARCTIC_FB_2575",
+          "RU_ARCTIC_FB_2576",
+          "RU_ARCTIC_FB_2580",
+          "RU_ARCTIC_FB_2592",
+          "RU_ARCTIC_FB_2600",
+          "RU_ARCTIC_FB_2609",
+          "RU_ARCTIC_FB_2617",
+          "RU_ARCTIC_FB_2632",
+          "RU_ARCTIC_FB_2636",
+          "RU_ARCTIC_FB_2654",
+          "RU_ARCTIC_FB_2682",
+          "RU_ARCTIC_FB_8565"
+        ]
+      },
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Chechen_Republic 选取，另补 29 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "color_hex": "#366138"
+    },
+    {
+      "id": "mw_ru_dag",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "DAG",
+      "name_en": "Republic of Dagestan",
+      "name_zh": "达吉斯坦共和国",
+      "parent_owner_tag": "RU",
+      "presentation": "parent_merged",
+      "subject_kind": "federal_subject",
+      "cores": [
+        "RU"
+      ],
+      "only_from_owners": [
+        "RU"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Dagestan"
+        ],
+        "feature_ids": [
+          "RU_ARCTIC_FB_2454",
+          "RU_ARCTIC_FB_2518",
+          "RU_ARCTIC_FB_2582",
+          "RU_ARCTIC_FB_2614",
+          "RU_ARCTIC_FB_2629",
+          "RU_ARCTIC_FB_2651",
+          "RU_ARCTIC_FB_2653",
+          "RU_ARCTIC_FB_2664",
+          "RU_ARCTIC_FB_2675",
+          "RU_ARCTIC_FB_2676",
+          "RU_ARCTIC_FB_2677",
+          "RU_ARCTIC_FB_2678",
+          "RU_ARCTIC_FB_2683",
+          "RU_ARCTIC_FB_2686",
+          "RU_ARCTIC_FB_2695",
+          "RU_ARCTIC_FB_2696",
+          "RU_ARCTIC_FB_2700",
+          "RU_ARCTIC_FB_2702",
+          "RU_ARCTIC_FB_2703",
+          "RU_ARCTIC_FB_2707",
+          "RU_ARCTIC_FB_2708",
+          "RU_ARCTIC_FB_2712",
+          "RU_ARCTIC_FB_2715",
+          "RU_ARCTIC_FB_2718",
+          "RU_ARCTIC_FB_2720",
+          "RU_ARCTIC_FB_2721",
+          "RU_ARCTIC_FB_2727",
+          "RU_ARCTIC_FB_2731",
+          "RU_ARCTIC_FB_2733",
+          "RU_ARCTIC_FB_2734",
+          "RU_ARCTIC_FB_2742",
+          "RU_ARCTIC_FB_2748",
+          "RU_ARCTIC_FB_2752",
+          "RU_ARCTIC_FB_2755",
+          "RU_ARCTIC_FB_2756",
+          "RU_ARCTIC_FB_2762",
+          "RU_ARCTIC_FB_2763",
+          "RU_ARCTIC_FB_2765",
+          "RU_ARCTIC_FB_2771",
+          "RU_ARCTIC_FB_2780",
+          "RU_ARCTIC_FB_2786",
+          "RU_ARCTIC_FB_2787",
+          "RU_ARCTIC_FB_2788",
+          "RU_ARCTIC_FB_2792",
+          "RU_ARCTIC_FB_2796",
+          "RU_ARCTIC_FB_2797",
+          "RU_ARCTIC_FB_2800",
+          "RU_ARCTIC_FB_2804",
+          "RU_ARCTIC_FB_2807",
+          "RU_ARCTIC_FB_2808",
+          "RU_ARCTIC_FB_2810",
+          "RU_ARCTIC_FB_2812",
+          "RU_ARCTIC_FB_2824",
+          "RU_ARCTIC_FB_2837",
+          "RU_ARCTIC_FB_2840",
+          "RU_ARCTIC_FB_2843",
+          "RU_ARCTIC_FB_2850",
+          "RU_ARCTIC_FB_2853",
+          "RU_ARCTIC_FB_2859",
+          "RU_ARCTIC_FB_2860",
+          "RU_ARCTIC_FB_2862",
+          "RU_ARCTIC_FB_2863",
+          "RU_ARCTIC_FB_2872",
+          "RU_ARCTIC_FB_2877",
+          "RU_ARCTIC_FB_2878",
+          "RU_ARCTIC_FB_2886",
+          "RU_ARCTIC_FB_2887",
+          "RU_ARCTIC_FB_2888",
+          "RU_ARCTIC_FB_2889",
+          "RU_ARCTIC_FB_2890",
+          "RU_ARCTIC_FB_2902",
+          "RU_ARCTIC_FB_2904",
+          "RU_ARCTIC_FB_2911",
+          "RU_ARCTIC_FB_2916",
+          "RU_ARCTIC_FB_2928",
+          "RU_ARCTIC_FB_2933",
+          "RU_ARCTIC_FB_2935",
+          "RU_ARCTIC_FB_2936",
+          "RU_ARCTIC_FB_2938",
+          "RU_ARCTIC_FB_2942",
+          "RU_ARCTIC_FB_2944",
+          "RU_ARCTIC_FB_2947",
+          "RU_ARCTIC_FB_2949",
+          "RU_ARCTIC_FB_2952",
+          "RU_ARCTIC_FB_2975",
+          "RU_ARCTIC_FB_2982",
+          "RU_ARCTIC_FB_2986",
+          "RU_ARCTIC_FB_2992",
+          "RU_ARCTIC_FB_2998",
+          "RU_ARCTIC_FB_3012",
+          "RU_ARCTIC_FB_3018",
+          "RU_ARCTIC_FB_3027",
+          "RU_ARCTIC_FB_3028",
+          "RU_ARCTIC_FB_3033",
+          "RU_ARCTIC_FB_3039",
+          "RU_ARCTIC_FB_3060",
+          "RU_ARCTIC_FB_8591",
+          "RU_ARCTIC_FB_8592"
+        ]
+      },
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Republic_of_Dagestan 选取，另补 98 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "color_hex": "#366138"
+    },
+    {
+      "id": "mw_ru_ing",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "ING",
+      "name_en": "Republic of Ingushetia",
+      "name_zh": "印古什共和国",
+      "parent_owner_tag": "RU",
+      "presentation": "parent_merged",
+      "subject_kind": "federal_subject",
+      "cores": [
+        "RU"
+      ],
+      "only_from_owners": [
+        "RU"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Ingushetia"
+        ],
+        "feature_ids": [
+          "RU_ARCTIC_FB_2304",
+          "RU_ARCTIC_FB_2327",
+          "RU_ARCTIC_FB_2332",
+          "RU_ARCTIC_FB_2334",
+          "RU_ARCTIC_FB_2347",
+          "RU_ARCTIC_FB_2350",
+          "RU_ARCTIC_FB_2352",
+          "RU_ARCTIC_FB_2359",
+          "RU_ARCTIC_FB_2371",
+          "RU_ARCTIC_FB_2383",
+          "RU_ARCTIC_FB_2388",
+          "RU_ARCTIC_FB_2399",
+          "RU_ARCTIC_FB_2415",
+          "RU_ARCTIC_FB_2433"
+        ]
+      },
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Republic_of_Ingushetia 选取，另补 14 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "color_hex": "#366138"
+    },
+    {
+      "id": "mw_ru_occ_crimea",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "RU",
+      "cores": [
+        "UA"
+      ],
+      "only_from_owners": [
+        "UA"
+      ],
+      "select": {
+        "polygons": [
+          [
+            [
+              32.2,
+              44.2
+            ],
+            [
+              36.9,
+              44.2
+            ],
+            [
+              36.9,
+              45.8
+            ],
+            [
+              36.5,
+              45.8
+            ],
+            [
+              35.2,
+              45.85
+            ],
+            [
+              34.9,
+              45.85
+            ],
+            [
+              34.6,
+              46.0
+            ],
+            [
+              34.3,
+              46.08
+            ],
+            [
+              33.9,
+              46.12
+            ],
+            [
+              33.6,
+              46.12
+            ],
+            [
+              33.3,
+              46.04
+            ],
+            [
+              32.2,
+              45.9
+            ]
+          ]
+        ],
+        "country_codes": [
+          "UA"
+        ]
+      },
+      "comment": "克里米亚与塞瓦斯托波尔（俄占）：A 类：2014 年起全境俄控，把握高。多边形覆盖克里米亚半岛到彼列科普地峡、阿拉巴特沙嘴南段；只取 UA 地块。（A 类沿用已有 tag RU，故不写 name/notes/subject_kind/inspector 字段，避免 update_country 覆盖俄罗斯本身的元数据）"
+    },
+    {
+      "id": "mw_ru_occ_donetsk",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "RU",
+      "cores": [
+        "UA"
+      ],
+      "only_from_owners": [
+        "UA"
+      ],
+      "select": {
+        "polygons": [
+          [
+            [
+              37.25,
+              48.33
+            ],
+            [
+              37.55,
+              48.45
+            ],
+            [
+              37.75,
+              48.62
+            ],
+            [
+              37.95,
+              48.85
+            ],
+            [
+              38.05,
+              49.35
+            ],
+            [
+              37.95,
+              49.55
+            ],
+            [
+              38.05,
+              49.9
+            ],
+            [
+              38.125,
+              50.05
+            ],
+            [
+              38.15,
+              49.1
+            ],
+            [
+              38.3,
+              48.85
+            ],
+            [
+              38.5,
+              48.5
+            ],
+            [
+              38.55,
+              48.25
+            ],
+            [
+              38.8,
+              48.0
+            ],
+            [
+              39.5,
+              47.85
+            ],
+            [
+              41.0,
+              47.82
+            ],
+            [
+              41.0,
+              46.0
+            ],
+            [
+              37.0,
+              45.822
+            ],
+            [
+              37.0,
+              46.9
+            ],
+            [
+              36.95,
+              47.2
+            ],
+            [
+              36.75,
+              47.6
+            ],
+            [
+              36.661,
+              47.955
+            ],
+            [
+              36.95,
+              48.12
+            ]
+          ]
+        ],
+        "country_codes": [
+          "UA"
+        ]
+      },
+      "comment": "顿涅茨克（俄占）：A 类：按 2025-12-31 前线粗描，约 75-80% 俄控。Marinka 合并块（含 Pokrovsk/Kurakhove，书签日争夺中偏俄控）、Kostiantynivka 合并块（主体为 Bakhmut/Horlivka/Siversk 一带）划俄控；Sloviansk、Dobropillia、Oleksandrivka（克拉马托尔斯克—斯拉维扬斯克集群）留 UA。地块粗，精度约 ±20 km，把握中。（A 类沿用已有 tag RU，故不写 name/notes/subject_kind/inspector 字段，避免 update_country 覆盖俄罗斯本身的元数据）"
+    },
+    {
+      "id": "mw_ru_occ_kherson",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "RU",
+      "cores": [
+        "UA"
+      ],
+      "only_from_owners": [
+        "UA"
+      ],
+      "select": {
+        "polygons": [
+          [
+            [
+              31.4,
+              46.58
+            ],
+            [
+              31.95,
+              46.58
+            ],
+            [
+              32.2,
+              46.52
+            ],
+            [
+              32.55,
+              46.6
+            ],
+            [
+              32.75,
+              46.62
+            ],
+            [
+              33.1,
+              46.68
+            ],
+            [
+              33.4,
+              46.8
+            ],
+            [
+              33.7,
+              46.92
+            ],
+            [
+              33.95,
+              47.05
+            ],
+            [
+              34.2,
+              47.22
+            ],
+            [
+              34.35,
+              47.42
+            ],
+            [
+              34.356,
+              47.424
+            ],
+            [
+              34.38,
+              47.35
+            ],
+            [
+              34.7,
+              47.0
+            ],
+            [
+              34.75,
+              46.7
+            ],
+            [
+              34.95,
+              46.45
+            ],
+            [
+              35.15,
+              46.2
+            ],
+            [
+              35.194,
+              45.85
+            ],
+            [
+              34.9,
+              45.85
+            ],
+            [
+              34.6,
+              46.0
+            ],
+            [
+              34.3,
+              46.08
+            ],
+            [
+              33.9,
+              46.12
+            ],
+            [
+              33.6,
+              46.12
+            ],
+            [
+              33.3,
+              46.04
+            ],
+            [
+              32.2,
+              45.9
+            ],
+            [
+              31.4,
+              45.9
+            ]
+          ]
+        ],
+        "country_codes": [
+          "UA"
+        ]
+      },
+      "comment": "赫尔松第聂伯河左岸（俄占）：A 类：第聂伯河左岸全部俄控，把握高；右岸 Bilozerka/Beryslav/Velyka Oleksandrivka/Novovorontsovka/Vysokopillia 与赫尔松市留 UA。含金本沙嘴（米科拉伊夫州）。现有旧区地块沿河近似。（A 类沿用已有 tag RU，故不写 name/notes/subject_kind/inspector 字段，避免 update_country 覆盖俄罗斯本身的元数据）"
+    },
+    {
+      "id": "mw_ru_occ_luhansk",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "RU",
+      "cores": [
+        "UA"
+      ],
+      "only_from_owners": [
+        "UA"
+      ],
+      "select": {
+        "polygons": [
+          [
+            [
+              38.2,
+              50.2
+            ],
+            [
+              38.3,
+              50.6
+            ],
+            [
+              41.0,
+              50.6
+            ],
+            [
+              41.0,
+              47.82
+            ],
+            [
+              39.5,
+              47.85
+            ],
+            [
+              38.8,
+              48.0
+            ],
+            [
+              38.55,
+              48.25
+            ],
+            [
+              38.5,
+              48.5
+            ],
+            [
+              38.3,
+              48.85
+            ],
+            [
+              38.15,
+              49.1
+            ],
+            [
+              38.125,
+              50.05
+            ]
+          ]
+        ],
+        "country_codes": [
+          "UA"
+        ]
+      },
+      "comment": "卢甘斯克（俄占）：A 类：卢甘斯克州几乎全境俄控（>99%），把握中高。多边形西缘沿卢甘斯克—哈尔科夫州界；哈尔科夫州 Oskil 以东零星俄控点（Kupiansk、Dvorichna 争夺中）未画。（A 类沿用已有 tag RU，故不写 name/notes/subject_kind/inspector 字段，避免 update_country 覆盖俄罗斯本身的元数据）"
+    },
+    {
+      "id": "mw_ru_occ_zaporizhzhia",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "RU",
+      "cores": [
+        "UA"
+      ],
+      "only_from_owners": [
+        "UA"
+      ],
+      "select": {
+        "polygons": [
+          [
+            [
+              34.6,
+              47.56
+            ],
+            [
+              35.2,
+              47.55
+            ],
+            [
+              35.6,
+              47.45
+            ],
+            [
+              35.95,
+              47.45
+            ],
+            [
+              36.3,
+              47.62
+            ],
+            [
+              36.6,
+              47.92
+            ],
+            [
+              36.661,
+              47.955
+            ],
+            [
+              36.75,
+              47.6
+            ],
+            [
+              36.95,
+              47.2
+            ],
+            [
+              37.0,
+              46.9
+            ],
+            [
+              37.0,
+              45.822
+            ],
+            [
+              36.5,
+              45.8
+            ],
+            [
+              35.2,
+              45.85
+            ],
+            [
+              35.194,
+              45.85
+            ],
+            [
+              35.15,
+              46.2
+            ],
+            [
+              34.95,
+              46.45
+            ],
+            [
+              34.75,
+              46.7
+            ],
+            [
+              34.7,
+              47.0
+            ],
+            [
+              34.38,
+              47.35
+            ],
+            [
+              34.356,
+              47.424
+            ]
+          ]
+        ],
+        "country_codes": [
+          "UA"
+        ]
+      },
+      "comment": "扎波罗热南部（俄占）：A 类：2025 年底前线大致近似。Melitopol/Berdiansk/Tokmak/Vesele/Kamianka-Dniprovska/Prymorsk/Yakymivka/Polohy（含争夺中的 Huliaipole）划俄控；Orikhiv、Vilniansk、Zaporizhzhia 留 UA。把握中。（A 类沿用已有 tag RU，故不写 name/notes/subject_kind/inspector 字段，避免 update_country 覆盖俄罗斯本身的元数据）"
+    },
+    {
+      "id": "mw_ru_sak",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "SAK",
+      "name_en": "Sakha Republic (Yakutia)",
+      "name_zh": "萨哈（雅库特）共和国",
+      "parent_owner_tag": "RU",
+      "presentation": "parent_merged",
+      "subject_kind": "federal_subject",
+      "cores": [
+        "RU"
+      ],
+      "only_from_owners": [
+        "RU"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "RU_Sakha_Republic"
+        ],
+        "feature_ids": [
+          "RU_ARCTIC_FB_10012",
+          "RU_ARCTIC_FB_10185",
+          "RU_ARCTIC_FB_6132",
+          "RU_ARCTIC_FB_6140",
+          "RU_ARCTIC_FB_6154",
+          "RU_ARCTIC_FB_6156",
+          "RU_ARCTIC_FB_6210",
+          "RU_ARCTIC_FB_6234",
+          "RU_ARCTIC_FB_6273",
+          "RU_ARCTIC_FB_6280",
+          "RU_ARCTIC_FB_6281",
+          "RU_ARCTIC_FB_6286",
+          "RU_ARCTIC_FB_6301",
+          "RU_ARCTIC_FB_6303",
+          "RU_ARCTIC_FB_6306",
+          "RU_ARCTIC_FB_6323",
+          "RU_ARCTIC_FB_6325",
+          "RU_ARCTIC_FB_6335",
+          "RU_ARCTIC_FB_6340",
+          "RU_ARCTIC_FB_6348",
+          "RU_ARCTIC_FB_6355",
+          "RU_ARCTIC_FB_6356",
+          "RU_ARCTIC_FB_6357",
+          "RU_ARCTIC_FB_6358",
+          "RU_ARCTIC_FB_6364",
+          "RU_ARCTIC_FB_6373",
+          "RU_ARCTIC_FB_6382",
+          "RU_ARCTIC_FB_6384",
+          "RU_ARCTIC_FB_6392",
+          "RU_ARCTIC_FB_6393",
+          "RU_ARCTIC_FB_6398",
+          "RU_ARCTIC_FB_6401",
+          "RU_ARCTIC_FB_6405",
+          "RU_ARCTIC_FB_6409",
+          "RU_ARCTIC_FB_6413",
+          "RU_ARCTIC_FB_6418",
+          "RU_ARCTIC_FB_6436",
+          "RU_ARCTIC_FB_6446",
+          "RU_ARCTIC_FB_6450",
+          "RU_ARCTIC_FB_6461",
+          "RU_ARCTIC_FB_6465",
+          "RU_ARCTIC_FB_6486",
+          "RU_ARCTIC_FB_6505",
+          "RU_ARCTIC_FB_6509",
+          "RU_ARCTIC_FB_6511",
+          "RU_ARCTIC_FB_6516",
+          "RU_ARCTIC_FB_6518",
+          "RU_ARCTIC_FB_6520",
+          "RU_ARCTIC_FB_6523",
+          "RU_ARCTIC_FB_6527",
+          "RU_ARCTIC_FB_6529",
+          "RU_ARCTIC_FB_6532",
+          "RU_ARCTIC_FB_6534",
+          "RU_ARCTIC_FB_6537",
+          "RU_ARCTIC_FB_6539",
+          "RU_ARCTIC_FB_6543",
+          "RU_ARCTIC_FB_6545",
+          "RU_ARCTIC_FB_6550",
+          "RU_ARCTIC_FB_6560",
+          "RU_ARCTIC_FB_6564",
+          "RU_ARCTIC_FB_6571",
+          "RU_ARCTIC_FB_6573",
+          "RU_ARCTIC_FB_6574",
+          "RU_ARCTIC_FB_6575",
+          "RU_ARCTIC_FB_6581",
+          "RU_ARCTIC_FB_6583",
+          "RU_ARCTIC_FB_6584",
+          "RU_ARCTIC_FB_6588",
+          "RU_ARCTIC_FB_6589",
+          "RU_ARCTIC_FB_6590",
+          "RU_ARCTIC_FB_6592",
+          "RU_ARCTIC_FB_6593",
+          "RU_ARCTIC_FB_6594",
+          "RU_ARCTIC_FB_6596",
+          "RU_ARCTIC_FB_6598",
+          "RU_ARCTIC_FB_6600",
+          "RU_ARCTIC_FB_6606",
+          "RU_ARCTIC_FB_6607",
+          "RU_ARCTIC_FB_6609",
+          "RU_ARCTIC_FB_6610",
+          "RU_ARCTIC_FB_6612",
+          "RU_ARCTIC_FB_6613",
+          "RU_ARCTIC_FB_6616",
+          "RU_ARCTIC_FB_6620",
+          "RU_ARCTIC_FB_6621",
+          "RU_ARCTIC_FB_6622",
+          "RU_ARCTIC_FB_6623",
+          "RU_ARCTIC_FB_6626",
+          "RU_ARCTIC_FB_6627",
+          "RU_ARCTIC_FB_6631",
+          "RU_ARCTIC_FB_6639",
+          "RU_ARCTIC_FB_6640",
+          "RU_ARCTIC_FB_6642",
+          "RU_ARCTIC_FB_6645",
+          "RU_ARCTIC_FB_6646",
+          "RU_ARCTIC_FB_6650",
+          "RU_ARCTIC_FB_6654",
+          "RU_ARCTIC_FB_6655",
+          "RU_ARCTIC_FB_6669",
+          "RU_ARCTIC_FB_6672",
+          "RU_ARCTIC_FB_6674",
+          "RU_ARCTIC_FB_6677",
+          "RU_ARCTIC_FB_6687",
+          "RU_ARCTIC_FB_6691",
+          "RU_ARCTIC_FB_6693",
+          "RU_ARCTIC_FB_6696",
+          "RU_ARCTIC_FB_6719",
+          "RU_ARCTIC_FB_6720",
+          "RU_ARCTIC_FB_6725",
+          "RU_ARCTIC_FB_6732",
+          "RU_ARCTIC_FB_6733",
+          "RU_ARCTIC_FB_6734",
+          "RU_ARCTIC_FB_6735",
+          "RU_ARCTIC_FB_6745",
+          "RU_ARCTIC_FB_6747",
+          "RU_ARCTIC_FB_6750",
+          "RU_ARCTIC_FB_6755",
+          "RU_ARCTIC_FB_6756",
+          "RU_ARCTIC_FB_6761",
+          "RU_ARCTIC_FB_6762",
+          "RU_ARCTIC_FB_6763",
+          "RU_ARCTIC_FB_6777",
+          "RU_ARCTIC_FB_6784",
+          "RU_ARCTIC_FB_6787",
+          "RU_ARCTIC_FB_6796",
+          "RU_ARCTIC_FB_6804",
+          "RU_ARCTIC_FB_6820",
+          "RU_ARCTIC_FB_6822",
+          "RU_ARCTIC_FB_6824",
+          "RU_ARCTIC_FB_6826",
+          "RU_ARCTIC_FB_6830",
+          "RU_ARCTIC_FB_6833",
+          "RU_ARCTIC_FB_6838",
+          "RU_ARCTIC_FB_6839",
+          "RU_ARCTIC_FB_6842",
+          "RU_ARCTIC_FB_6857",
+          "RU_ARCTIC_FB_6867",
+          "RU_ARCTIC_FB_6869",
+          "RU_ARCTIC_FB_6876",
+          "RU_ARCTIC_FB_6886",
+          "RU_ARCTIC_FB_6890",
+          "RU_ARCTIC_FB_6891",
+          "RU_ARCTIC_FB_6894",
+          "RU_ARCTIC_FB_6903",
+          "RU_ARCTIC_FB_6918",
+          "RU_ARCTIC_FB_6921",
+          "RU_ARCTIC_FB_6924",
+          "RU_ARCTIC_FB_6926",
+          "RU_ARCTIC_FB_6960",
+          "RU_ARCTIC_FB_6963",
+          "RU_ARCTIC_FB_6985",
+          "RU_ARCTIC_FB_6998",
+          "RU_ARCTIC_FB_7014",
+          "RU_ARCTIC_FB_7021",
+          "RU_ARCTIC_FB_7045",
+          "RU_ARCTIC_FB_7069",
+          "RU_ARCTIC_FB_7082",
+          "RU_ARCTIC_FB_7094",
+          "RU_ARCTIC_FB_7126",
+          "RU_ARCTIC_FB_7140",
+          "RU_ARCTIC_FB_7157",
+          "RU_ARCTIC_FB_7168",
+          "RU_ARCTIC_FB_7170",
+          "RU_ARCTIC_FB_7175",
+          "RU_ARCTIC_FB_7179",
+          "RU_ARCTIC_FB_7189",
+          "RU_ARCTIC_FB_7200",
+          "RU_ARCTIC_FB_7203",
+          "RU_ARCTIC_FB_7206",
+          "RU_ARCTIC_FB_7216",
+          "RU_ARCTIC_FB_7229",
+          "RU_ARCTIC_FB_7230",
+          "RU_ARCTIC_FB_7235",
+          "RU_ARCTIC_FB_7236",
+          "RU_ARCTIC_FB_7237",
+          "RU_ARCTIC_FB_7239",
+          "RU_ARCTIC_FB_7240",
+          "RU_ARCTIC_FB_7244",
+          "RU_ARCTIC_FB_7246",
+          "RU_ARCTIC_FB_7255",
+          "RU_ARCTIC_FB_7260",
+          "RU_ARCTIC_FB_7261",
+          "RU_ARCTIC_FB_7272",
+          "RU_ARCTIC_FB_7274",
+          "RU_ARCTIC_FB_7288",
+          "RU_ARCTIC_FB_7294",
+          "RU_ARCTIC_FB_7295",
+          "RU_ARCTIC_FB_7362",
+          "RU_ARCTIC_FB_7375",
+          "RU_ARCTIC_FB_7395",
+          "RU_ARCTIC_FB_7401",
+          "RU_ARCTIC_FB_7403",
+          "RU_ARCTIC_FB_7408",
+          "RU_ARCTIC_FB_7414",
+          "RU_ARCTIC_FB_7418",
+          "RU_ARCTIC_FB_7419",
+          "RU_ARCTIC_FB_7424",
+          "RU_ARCTIC_FB_7433",
+          "RU_ARCTIC_FB_7438",
+          "RU_ARCTIC_FB_7441",
+          "RU_ARCTIC_FB_7455",
+          "RU_ARCTIC_FB_7457",
+          "RU_ARCTIC_FB_7458",
+          "RU_ARCTIC_FB_7461",
+          "RU_ARCTIC_FB_7463",
+          "RU_ARCTIC_FB_7468",
+          "RU_ARCTIC_FB_7475",
+          "RU_ARCTIC_FB_7478",
+          "RU_ARCTIC_FB_7480",
+          "RU_ARCTIC_FB_7484",
+          "RU_ARCTIC_FB_7493",
+          "RU_ARCTIC_FB_7496",
+          "RU_ARCTIC_FB_7498",
+          "RU_ARCTIC_FB_7501",
+          "RU_ARCTIC_FB_7508",
+          "RU_ARCTIC_FB_7509",
+          "RU_ARCTIC_FB_7511",
+          "RU_ARCTIC_FB_7516",
+          "RU_ARCTIC_FB_7531",
+          "RU_ARCTIC_FB_7533",
+          "RU_ARCTIC_FB_7534",
+          "RU_ARCTIC_FB_7539",
+          "RU_ARCTIC_FB_7543",
+          "RU_ARCTIC_FB_7573",
+          "RU_ARCTIC_FB_7585",
+          "RU_ARCTIC_FB_7588",
+          "RU_ARCTIC_FB_7589",
+          "RU_ARCTIC_FB_7592",
+          "RU_ARCTIC_FB_7593",
+          "RU_ARCTIC_FB_7603",
+          "RU_ARCTIC_FB_7606",
+          "RU_ARCTIC_FB_7608",
+          "RU_ARCTIC_FB_7614",
+          "RU_ARCTIC_FB_7622",
+          "RU_ARCTIC_FB_7632",
+          "RU_ARCTIC_FB_7649",
+          "RU_ARCTIC_FB_7694",
+          "RU_ARCTIC_FB_7699",
+          "RU_ARCTIC_FB_7704",
+          "RU_ARCTIC_FB_7705",
+          "RU_ARCTIC_FB_7715",
+          "RU_ARCTIC_FB_7719",
+          "RU_ARCTIC_FB_7723",
+          "RU_ARCTIC_FB_7729",
+          "RU_ARCTIC_FB_7748",
+          "RU_ARCTIC_FB_7749",
+          "RU_ARCTIC_FB_7781",
+          "RU_ARCTIC_FB_7782",
+          "RU_ARCTIC_FB_7784",
+          "RU_ARCTIC_FB_7790",
+          "RU_ARCTIC_FB_7793",
+          "RU_ARCTIC_FB_7797",
+          "RU_ARCTIC_FB_7798",
+          "RU_ARCTIC_FB_7799",
+          "RU_ARCTIC_FB_7800",
+          "RU_ARCTIC_FB_8982",
+          "RU_ARCTIC_FB_8985",
+          "RU_ARCTIC_FB_8992",
+          "RU_ARCTIC_FB_8995",
+          "RU_ARCTIC_FB_8998",
+          "RU_ARCTIC_FB_9000",
+          "RU_ARCTIC_FB_9011",
+          "RU_ARCTIC_FB_9012",
+          "RU_ARCTIC_FB_9014",
+          "RU_ARCTIC_FB_9015",
+          "RU_ARCTIC_FB_9017",
+          "RU_ARCTIC_FB_9018",
+          "RU_ARCTIC_FB_9024",
+          "RU_ARCTIC_FB_9035",
+          "RU_ARCTIC_FB_9043",
+          "RU_ARCTIC_FB_9067",
+          "RU_ARCTIC_FB_9342",
+          "RU_ARCTIC_FB_9346",
+          "RU_ARCTIC_FB_9347",
+          "RU_ARCTIC_FB_9414",
+          "RU_ARCTIC_FB_9571",
+          "RU_ARCTIC_FB_9612",
+          "RU_ARCTIC_FB_9631",
+          "RU_ARCTIC_FB_9811"
+        ]
+      },
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Sakha_Republic 选取，另补 279 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "color_hex": "#366138"
+    },
+    {
+      "id": "mw_ru_tat",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "TAT",
+      "name_en": "Republic of Tatarstan",
+      "name_zh": "鞑靼斯坦共和国",
+      "parent_owner_tag": "RU",
+      "presentation": "parent_merged",
+      "subject_kind": "federal_subject",
+      "cores": [
+        "RU"
+      ],
+      "only_from_owners": [
+        "RU"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "RU_Republic_of_Tatarstan"
+        ],
+        "feature_ids": [
+          "RU_ARCTIC_FB_2955",
+          "RU_ARCTIC_FB_2987",
+          "RU_ARCTIC_FB_2989",
+          "RU_ARCTIC_FB_2993",
+          "RU_ARCTIC_FB_2999",
+          "RU_ARCTIC_FB_3000",
+          "RU_ARCTIC_FB_3019",
+          "RU_ARCTIC_FB_3020",
+          "RU_ARCTIC_FB_3036",
+          "RU_ARCTIC_FB_3053",
+          "RU_ARCTIC_FB_3057",
+          "RU_ARCTIC_FB_3062",
+          "RU_ARCTIC_FB_3068",
+          "RU_ARCTIC_FB_3075",
+          "RU_ARCTIC_FB_3082",
+          "RU_ARCTIC_FB_3097",
+          "RU_ARCTIC_FB_3102",
+          "RU_ARCTIC_FB_3103",
+          "RU_ARCTIC_FB_3105",
+          "RU_ARCTIC_FB_3106",
+          "RU_ARCTIC_FB_3111",
+          "RU_ARCTIC_FB_3112",
+          "RU_ARCTIC_FB_3113",
+          "RU_ARCTIC_FB_3114",
+          "RU_ARCTIC_FB_3115",
+          "RU_ARCTIC_FB_3119",
+          "RU_ARCTIC_FB_3122",
+          "RU_ARCTIC_FB_3123",
+          "RU_ARCTIC_FB_3125",
+          "RU_ARCTIC_FB_3127",
+          "RU_ARCTIC_FB_3129",
+          "RU_ARCTIC_FB_3134",
+          "RU_ARCTIC_FB_3137",
+          "RU_ARCTIC_FB_3147",
+          "RU_ARCTIC_FB_3160",
+          "RU_ARCTIC_FB_3166",
+          "RU_ARCTIC_FB_3183",
+          "RU_ARCTIC_FB_3185",
+          "RU_ARCTIC_FB_3192",
+          "RU_ARCTIC_FB_3201",
+          "RU_ARCTIC_FB_3208",
+          "RU_ARCTIC_FB_3209",
+          "RU_ARCTIC_FB_3210",
+          "RU_ARCTIC_FB_3214",
+          "RU_ARCTIC_FB_3221",
+          "RU_ARCTIC_FB_3225",
+          "RU_ARCTIC_FB_3231",
+          "RU_ARCTIC_FB_3234",
+          "RU_ARCTIC_FB_3237",
+          "RU_ARCTIC_FB_3240",
+          "RU_ARCTIC_FB_3244",
+          "RU_ARCTIC_FB_3246",
+          "RU_ARCTIC_FB_3248",
+          "RU_ARCTIC_FB_3251",
+          "RU_ARCTIC_FB_3259",
+          "RU_ARCTIC_FB_3262",
+          "RU_ARCTIC_FB_3265",
+          "RU_ARCTIC_FB_3267",
+          "RU_ARCTIC_FB_3271",
+          "RU_ARCTIC_FB_3285",
+          "RU_ARCTIC_FB_3287",
+          "RU_ARCTIC_FB_3288",
+          "RU_ARCTIC_FB_3289",
+          "RU_ARCTIC_FB_3293",
+          "RU_ARCTIC_FB_3297",
+          "RU_ARCTIC_FB_3302",
+          "RU_ARCTIC_FB_3305",
+          "RU_ARCTIC_FB_3308",
+          "RU_ARCTIC_FB_3315",
+          "RU_ARCTIC_FB_3320",
+          "RU_ARCTIC_FB_3321",
+          "RU_ARCTIC_FB_3323",
+          "RU_ARCTIC_FB_3335",
+          "RU_ARCTIC_FB_3344",
+          "RU_ARCTIC_FB_3345",
+          "RU_ARCTIC_FB_3347",
+          "RU_ARCTIC_FB_3352",
+          "RU_ARCTIC_FB_3353",
+          "RU_ARCTIC_FB_3356",
+          "RU_ARCTIC_FB_3362",
+          "RU_ARCTIC_FB_3367",
+          "RU_ARCTIC_FB_3370",
+          "RU_ARCTIC_FB_3375",
+          "RU_ARCTIC_FB_3377",
+          "RU_ARCTIC_FB_3379",
+          "RU_ARCTIC_FB_3384",
+          "RU_ARCTIC_FB_3392",
+          "RU_ARCTIC_FB_3396",
+          "RU_ARCTIC_FB_3400",
+          "RU_ARCTIC_FB_3402",
+          "RU_ARCTIC_FB_3403",
+          "RU_ARCTIC_FB_3411",
+          "RU_ARCTIC_FB_3418",
+          "RU_ARCTIC_FB_3420",
+          "RU_ARCTIC_FB_3424",
+          "RU_ARCTIC_FB_3426",
+          "RU_ARCTIC_FB_3430",
+          "RU_ARCTIC_FB_3435",
+          "RU_ARCTIC_FB_3436",
+          "RU_ARCTIC_FB_3446",
+          "RU_ARCTIC_FB_3468",
+          "RU_ARCTIC_FB_3469",
+          "RU_ARCTIC_FB_3470",
+          "RU_ARCTIC_FB_3474",
+          "RU_ARCTIC_FB_3475",
+          "RU_ARCTIC_FB_3478",
+          "RU_ARCTIC_FB_3481",
+          "RU_ARCTIC_FB_3484",
+          "RU_ARCTIC_FB_3488",
+          "RU_ARCTIC_FB_3496",
+          "RU_ARCTIC_FB_3497",
+          "RU_ARCTIC_FB_3512",
+          "RU_ARCTIC_FB_3513",
+          "RU_ARCTIC_FB_3515",
+          "RU_ARCTIC_FB_3518",
+          "RU_ARCTIC_FB_3527",
+          "RU_ARCTIC_FB_3530",
+          "RU_ARCTIC_FB_3533",
+          "RU_ARCTIC_FB_3537",
+          "RU_ARCTIC_FB_3539",
+          "RU_ARCTIC_FB_3543",
+          "RU_ARCTIC_FB_3544",
+          "RU_ARCTIC_FB_3550",
+          "RU_ARCTIC_FB_3553",
+          "RU_ARCTIC_FB_3554",
+          "RU_ARCTIC_FB_3556",
+          "RU_ARCTIC_FB_3557",
+          "RU_ARCTIC_FB_3558",
+          "RU_ARCTIC_FB_3560",
+          "RU_ARCTIC_FB_3563",
+          "RU_ARCTIC_FB_3573",
+          "RU_ARCTIC_FB_3574",
+          "RU_ARCTIC_FB_3581",
+          "RU_ARCTIC_FB_3586",
+          "RU_ARCTIC_FB_3593",
+          "RU_ARCTIC_FB_3599",
+          "RU_ARCTIC_FB_3601",
+          "RU_ARCTIC_FB_3602",
+          "RU_ARCTIC_FB_3605",
+          "RU_ARCTIC_FB_3611",
+          "RU_ARCTIC_FB_3638",
+          "RU_ARCTIC_FB_3644",
+          "RU_ARCTIC_FB_3671",
+          "RU_ARCTIC_FB_3687",
+          "RU_ARCTIC_FB_3701",
+          "RU_ARCTIC_FB_8682",
+          "RU_ARCTIC_FB_8685",
+          "RU_ARCTIC_FB_8699"
+        ]
+      },
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Republic_of_Tatarstan 选取，另补 148 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "color_hex": "#366138"
+    },
+    {
+      "id": "mw_ru_tuv",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "TUV",
+      "name_en": "Tuva Republic",
+      "name_zh": "图瓦共和国",
+      "parent_owner_tag": "RU",
+      "presentation": "parent_merged",
+      "subject_kind": "federal_subject",
+      "cores": [
+        "RU"
+      ],
+      "only_from_owners": [
+        "RU"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "RU_Tuva_Republic"
+        ],
+        "feature_ids": [
+          "RU_ARCTIC_FB_5643",
+          "RU_ARCTIC_FB_5654",
+          "RU_ARCTIC_FB_5655",
+          "RU_ARCTIC_FB_5657",
+          "RU_ARCTIC_FB_5667",
+          "RU_ARCTIC_FB_5669",
+          "RU_ARCTIC_FB_5680",
+          "RU_ARCTIC_FB_5691",
+          "RU_ARCTIC_FB_5692",
+          "RU_ARCTIC_FB_5698",
+          "RU_ARCTIC_FB_5700",
+          "RU_ARCTIC_FB_5705",
+          "RU_ARCTIC_FB_5715",
+          "RU_ARCTIC_FB_5737",
+          "RU_ARCTIC_FB_5751",
+          "RU_ARCTIC_FB_5759",
+          "RU_ARCTIC_FB_5766",
+          "RU_ARCTIC_FB_5769",
+          "RU_ARCTIC_FB_5770",
+          "RU_ARCTIC_FB_5771",
+          "RU_ARCTIC_FB_5777",
+          "RU_ARCTIC_FB_5782",
+          "RU_ARCTIC_FB_5792",
+          "RU_ARCTIC_FB_5796",
+          "RU_ARCTIC_FB_5810",
+          "RU_ARCTIC_FB_5813",
+          "RU_ARCTIC_FB_5814",
+          "RU_ARCTIC_FB_5815",
+          "RU_ARCTIC_FB_5821",
+          "RU_ARCTIC_FB_5823",
+          "RU_ARCTIC_FB_5824",
+          "RU_ARCTIC_FB_5825",
+          "RU_ARCTIC_FB_5829",
+          "RU_ARCTIC_FB_5834",
+          "RU_ARCTIC_FB_5837",
+          "RU_ARCTIC_FB_5838",
+          "RU_ARCTIC_FB_5839",
+          "RU_ARCTIC_FB_5841",
+          "RU_ARCTIC_FB_5842",
+          "RU_ARCTIC_FB_5844",
+          "RU_ARCTIC_FB_5845",
+          "RU_ARCTIC_FB_5846",
+          "RU_ARCTIC_FB_5848",
+          "RU_ARCTIC_FB_5849",
+          "RU_ARCTIC_FB_5852",
+          "RU_ARCTIC_FB_5853",
+          "RU_ARCTIC_FB_5854",
+          "RU_ARCTIC_FB_5857",
+          "RU_ARCTIC_FB_5867",
+          "RU_ARCTIC_FB_5868",
+          "RU_ARCTIC_FB_5874",
+          "RU_ARCTIC_FB_5875",
+          "RU_ARCTIC_FB_5880",
+          "RU_ARCTIC_FB_5881",
+          "RU_ARCTIC_FB_5882",
+          "RU_ARCTIC_FB_5884",
+          "RU_ARCTIC_FB_5885",
+          "RU_ARCTIC_FB_5887",
+          "RU_ARCTIC_FB_5894",
+          "RU_ARCTIC_FB_5905",
+          "RU_ARCTIC_FB_5919",
+          "RU_ARCTIC_FB_5925",
+          "RU_ARCTIC_FB_5930",
+          "RU_ARCTIC_FB_5938",
+          "RU_ARCTIC_FB_5941",
+          "RU_ARCTIC_FB_5957",
+          "RU_ARCTIC_FB_5958",
+          "RU_ARCTIC_FB_8945"
+        ]
+      },
+      "notes": "B 类：俄罗斯联邦民族共和国，同色挂靠 RU。按 data/hierarchy.json 组 RU_Tuva_Republic 选取，另补 68 个落在该共和国内部、未入层级组的 RU_ARCTIC_FB 缝隙碎片（几何 ≥50% 在共和国轮廓内）。",
+      "color_hex": "#366138"
+    },
+    {
+      "id": "mw_aland_meta",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "AX",
+      "color_hex": "#cdd4e4",
+      "parent_owner_tag": "FI",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "FI"
+      ],
+      "only_from_owners": [
+        "FI"
+      ],
+      "select": {
+        "owners": [
+          "AX"
+        ]
+      },
+      "notes": "芬兰奥兰自治省，已与 FI 同色；只补元数据，选择结果为空。"
+    },
+    {
+      "id": "mw_bangsamoro",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "BAR",
+      "name_en": "Bangsamoro Autonomous Region",
+      "name_zh": "邦萨摩洛穆斯林棉兰老自治区",
+      "color_hex": "#835dc8",
+      "parent_owner_tag": "PH",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "PH"
+      ],
+      "only_from_owners": [
+        "PH"
+      ],
+      "select": {
+        "feature_ids": [
+          "PHL-2519",
+          "PHL-2574",
+          "PHL-2576",
+          "PHL-2511",
+          "PHL-5527"
+        ]
+      },
+      "notes": "BARMM：巴西兰、南拉瑙、马京达瑙（含 2022 拆分后两省）、塔威塔威、哥打巴托市（PHL-5527）。苏禄按 2024 年最高法院裁决已退出，不纳入；北哥打巴托省内 63 个村组成的特别地理区无法用现有地块表达，略去；巴西兰地块含不属 BARMM 的伊莎贝拉市，近似处理。把握：中高。"
+    },
+    {
+      "id": "mw_basque_country",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "EUS",
+      "name_en": "Basque Country",
+      "name_zh": "巴斯克自治区",
+      "color_hex": "#f2cd5e",
+      "parent_owner_tag": "ES",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "ES"
+      ],
+      "only_from_owners": [
+        "ES"
+      ],
+      "select": {
+        "feature_ids": [
+          "ES211",
+          "ES212",
+          "ES213"
+        ]
+      },
+      "notes": "巴斯克自治区（阿拉瓦、吉普斯夸、比斯开 3 省），PNV-PSE 执政；纳瓦拉 ES220 是另一个自治区，不并入。把握：高。",
+      "inspector_group_id": "spain_autonomous_communities",
+      "inspector_group_label": "西班牙自治区"
+    },
+    {
+      "id": "mw_bougainville",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "BGV",
+      "name_en": "Autonomous Region of Bougainville",
+      "name_zh": "布干维尔自治区",
+      "color_hex": "#7d2d1c",
+      "parent_owner_tag": "PG",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "PG"
+      ],
+      "only_from_owners": [
+        "PG"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "PG_of_Bougainville"
+        ]
+      },
+      "notes": "2019 年独立公投 97.7% 赞成，与 PNG 的独立安排谈判中，书签日仍属 PNG。单块 PG_ADM1_PNG-1245。把握：高。"
+    },
+    {
+      "id": "mw_catalonia",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "CAT",
+      "name_en": "Catalonia",
+      "name_zh": "加泰罗尼亚",
+      "color_hex": "#f2cd5e",
+      "parent_owner_tag": "ES",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "ES"
+      ],
+      "only_from_owners": [
+        "ES"
+      ],
+      "select": {
+        "feature_ids": [
+          "ES511",
+          "ES512",
+          "ES513",
+          "ES514"
+        ]
+      },
+      "notes": "自治区，2024 年起 PSC 的 Illa 任主席，独立派仍是议会主要力量。四省 ES511-514 正好等于自治区；ES_PRIMARY_GAP_* 都在加那利群岛，不属于加泰罗尼亚。把握：高。",
+      "inspector_group_id": "spain_autonomous_communities",
+      "inspector_group_label": "西班牙自治区"
+    },
+    {
+      "id": "mw_corsica",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "COR",
+      "name_en": "Corsica",
+      "name_zh": "科西嘉",
+      "color_hex": "#3b508c",
+      "parent_owner_tag": "FR",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "FR"
+      ],
+      "only_from_owners": [
+        "FR"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "FR_Corse"
+        ]
+      },
+      "notes": "科西嘉单一领土集体，自治修宪进程中。FR_Corse 5 个区。把握：高。"
+    },
+    {
+      "id": "mw_faroe_islands_meta",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "FO",
+      "color_hex": "#ac4a74",
+      "parent_owner_tag": "DK",
+      "presentation": "parent_merged",
+      "subject_kind": "special_territory",
+      "cores": [
+        "DK"
+      ],
+      "only_from_owners": [
+        "DK"
+      ],
+      "select": {
+        "owners": [
+          "FO"
+        ]
+      },
+      "notes": "丹麦王国自治领地，已是独立 tag 且与 DK 同色；本条只补 parent_owner_tag/presentation/subject_kind 元数据，选择结果为空。",
+      "inspector_group_id": "danish_realm",
+      "inspector_group_label": "丹麦王国"
+    },
+    {
+      "id": "mw_flanders",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "FLA",
+      "name_en": "Flanders",
+      "name_zh": "佛兰德",
+      "color_hex": "#da9f34",
+      "parent_owner_tag": "BE",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "BE"
+      ],
+      "only_from_owners": [
+        "BE"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "BE_Antwerp",
+          "BE_East_Flanders",
+          "BE_Flemish_Brabant",
+          "BE_Limburg_BE",
+          "BE_West_Flanders"
+        ]
+      },
+      "notes": "佛兰德大区（5 省），不含布鲁塞尔首都大区 BE100。N-VA 的 De Wever 任联邦首相，分离议程冻结，属风味性同色单列。把握：高。"
+    },
+    {
+      "id": "mw_gagauzia",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "GAG",
+      "name_en": "Gagauzia",
+      "name_zh": "加告兹自治区",
+      "color_hex": "#bf9683",
+      "parent_owner_tag": "MD",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "MD"
+      ],
+      "only_from_owners": [
+        "MD"
+      ],
+      "select": {
+        "feature_ids": [
+          "MDA-1626"
+        ]
+      },
+      "notes": "加告兹自治领土单位，亲俄倾向，与基希讷乌关系紧张但法理实控均属摩尔多瓦。MDA-1626 'Comrat' 为三部分 MultiPolygon，面积约 0.21 平方度≈1830 km²，与加告兹三块飞地一致；Taraclia 不并入。把握：中高。"
+    },
+    {
+      "id": "mw_greenland_meta",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "GL",
+      "color_hex": "#ac4a74",
+      "parent_owner_tag": "DK",
+      "presentation": "parent_merged",
+      "subject_kind": "special_territory",
+      "cores": [
+        "DK"
+      ],
+      "only_from_owners": [
+        "DK"
+      ],
+      "select": {
+        "owners": [
+          "GL"
+        ]
+      },
+      "notes": "丹麦王国自治领地，已是独立 tag 且与 DK 同色；只补元数据，选择结果为空。",
+      "inspector_group_id": "danish_realm",
+      "inspector_group_label": "丹麦王国"
+    },
+    {
+      "id": "mw_hong_kong_meta",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "HK",
+      "color_hex": "#a20050",
+      "parent_owner_tag": "CN",
+      "presentation": "parent_merged",
+      "subject_kind": "special_territory",
+      "cores": [
+        "CN"
+      ],
+      "only_from_owners": [
+        "CN"
+      ],
+      "select": {
+        "owners": [
+          "HK"
+        ]
+      },
+      "notes": "主权归属中国，原独立色 #172685 与「颜色即归属」不一致，改为 CN 同色并挂靠 CN；只更新元数据，选择结果为空。",
+      "inspector_group_id": "china_special_administrative_regions",
+      "inspector_group_label": "中国特别行政区"
+    },
+    {
+      "id": "mw_macao_meta",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "MO",
+      "color_hex": "#a20050",
+      "parent_owner_tag": "CN",
+      "presentation": "parent_merged",
+      "subject_kind": "special_territory",
+      "cores": [
+        "CN"
+      ],
+      "only_from_owners": [
+        "CN"
+      ],
+      "select": {
+        "owners": [
+          "MO"
+        ]
+      },
+      "notes": "主权归属中国，原独立色 #5d7cba（与 AD 撞色）改为 CN 同色并挂靠 CN；只更新元数据，选择结果为空。",
+      "inspector_group_id": "china_special_administrative_regions",
+      "inspector_group_label": "中国特别行政区"
+    },
+    {
+      "id": "mw_northern_ireland",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "NIR",
+      "name_en": "Northern Ireland",
+      "name_zh": "北爱尔兰",
+      "color_hex": "#b9364c",
+      "parent_owner_tag": "GB",
+      "presentation": "parent_merged",
+      "subject_kind": "constituent_country",
+      "cores": [
+        "GB"
+      ],
+      "only_from_owners": [
+        "GB"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "GB_Northern_Ireland"
+        ],
+        "feature_ids": [
+          "GB_NUTS1_UKN",
+          "GB_SHELL_FB_001",
+          "GB_SHELL_FB_002",
+          "GB_SHELL_FB_003",
+          "GB_SHELL_FB_004",
+          "GB_SHELL_FB_005",
+          "GB_SHELL_FB_006",
+          "GB_SHELL_FB_007",
+          "GB_SHELL_FB_008",
+          "GB_SHELL_FB_009",
+          "GB_SHELL_FB_010",
+          "GB_SHELL_FB_011",
+          "GB_SHELL_FB_012",
+          "GB_SHELL_FB_014",
+          "GB_SHELL_FB_017",
+          "GB_SHELL_FB_018",
+          "GB_SHELL_FB_025",
+          "GB_SHELL_FB_031",
+          "GB_SHELL_FB_032",
+          "GB_SHELL_FB_034",
+          "GB_SHELL_FB_037",
+          "GB_SHELL_FB_040",
+          "GB_SHELL_FB_157",
+          "GB_SHELL_FB_167",
+          "GB_SHELL_FB_204",
+          "GB_SHELL_FB_232",
+          "GB_SHELL_FB_259",
+          "GB_SHELL_FB_284",
+          "GB_SHELL_FB_309"
+        ]
+      },
+      "notes": "下放政府（Stormont），法理与实控均属英国。GB_Northern_Ireland 10 块 + 重叠的 GB_NUTS1_UKN + 28 个海岸外壳补片；only_from_owners=GB 防止吞入爱尔兰。把握：高。",
+      "inspector_group_id": "uk_constituent_countries",
+      "inspector_group_label": "英国构成国"
+    },
+    {
+      "id": "mw_puerto_rico_meta",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "PR",
+      "color_hex": "#4782af",
+      "parent_owner_tag": "US",
+      "presentation": "parent_merged",
+      "subject_kind": "special_territory",
+      "cores": [
+        "US"
+      ],
+      "only_from_owners": [
+        "US"
+      ],
+      "select": {
+        "owners": [
+          "PR"
+        ]
+      },
+      "notes": "美国未合并领土（自由邦），原独立色 #9999ff 改为 US 同色并挂靠 US；只更新元数据，选择结果为空。"
+    },
+    {
+      "id": "mw_quebec",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "QUE",
+      "name_en": "Quebec",
+      "name_zh": "魁北克",
+      "color_hex": "#773027",
+      "parent_owner_tag": "CA",
+      "presentation": "parent_merged",
+      "subject_kind": "province",
+      "cores": [
+        "CA"
+      ],
+      "only_from_owners": [
+        "CA"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "CA_Quebec"
+        ]
+      },
+      "notes": "加拿大一省，CAQ 执政，PQ 民调领先并承诺主权公投。CA_Quebec 62 个联邦选区/合并块。把握：高。"
+    },
+    {
+      "id": "mw_republika_srpska",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "SRP",
+      "name_en": "Republika Srpska",
+      "name_zh": "塞族共和国",
+      "color_hex": "#e0b058",
+      "parent_owner_tag": "BA",
+      "presentation": "parent_merged",
+      "subject_kind": "constituent_country",
+      "cores": [
+        "BA"
+      ],
+      "only_from_owners": [
+        "BA"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "BA_Republika_Srpska"
+        ]
+      },
+      "notes": "波黑两个实体之一，2025-11 提前选举 SNSD 的 Karan 胜选，分离倾向最强但法理实控均属波黑。单块 BA_ADM1_...909，不含布尔奇科特区。把握：高。"
+    },
+    {
+      "id": "mw_scotland",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "SCO",
+      "name_en": "Scotland",
+      "name_zh": "苏格兰",
+      "color_hex": "#b9364c",
+      "parent_owner_tag": "GB",
+      "presentation": "parent_merged",
+      "subject_kind": "constituent_country",
+      "cores": [
+        "GB"
+      ],
+      "only_from_owners": [
+        "GB"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "GB_Scotland"
+        ],
+        "feature_ids": [
+          "GB_NUTS1_UKM",
+          "GB_SHELL_FB_013",
+          "GB_SHELL_FB_015",
+          "GB_SHELL_FB_016",
+          "GB_SHELL_FB_019",
+          "GB_SHELL_FB_020",
+          "GB_SHELL_FB_021",
+          "GB_SHELL_FB_022",
+          "GB_SHELL_FB_023",
+          "GB_SHELL_FB_024",
+          "GB_SHELL_FB_026",
+          "GB_SHELL_FB_027",
+          "GB_SHELL_FB_028",
+          "GB_SHELL_FB_029",
+          "GB_SHELL_FB_030",
+          "GB_SHELL_FB_033",
+          "GB_SHELL_FB_035",
+          "GB_SHELL_FB_036",
+          "GB_SHELL_FB_039",
+          "GB_SHELL_FB_041",
+          "GB_SHELL_FB_042",
+          "GB_SHELL_FB_043",
+          "GB_SHELL_FB_044",
+          "GB_SHELL_FB_045",
+          "GB_SHELL_FB_046",
+          "GB_SHELL_FB_048",
+          "GB_SHELL_FB_050",
+          "GB_SHELL_FB_051",
+          "GB_SHELL_FB_052",
+          "GB_SHELL_FB_053",
+          "GB_SHELL_FB_054",
+          "GB_SHELL_FB_055",
+          "GB_SHELL_FB_056",
+          "GB_SHELL_FB_057",
+          "GB_SHELL_FB_063",
+          "GB_SHELL_FB_064",
+          "GB_SHELL_FB_065",
+          "GB_SHELL_FB_066",
+          "GB_SHELL_FB_070",
+          "GB_SHELL_FB_075",
+          "GB_SHELL_FB_076",
+          "GB_SHELL_FB_077",
+          "GB_SHELL_FB_078",
+          "GB_SHELL_FB_079",
+          "GB_SHELL_FB_080",
+          "GB_SHELL_FB_081",
+          "GB_SHELL_FB_086",
+          "GB_SHELL_FB_088",
+          "GB_SHELL_FB_090",
+          "GB_SHELL_FB_092",
+          "GB_SHELL_FB_094",
+          "GB_SHELL_FB_096",
+          "GB_SHELL_FB_097",
+          "GB_SHELL_FB_098",
+          "GB_SHELL_FB_102",
+          "GB_SHELL_FB_104",
+          "GB_SHELL_FB_105",
+          "GB_SHELL_FB_109",
+          "GB_SHELL_FB_110",
+          "GB_SHELL_FB_111",
+          "GB_SHELL_FB_113",
+          "GB_SHELL_FB_115",
+          "GB_SHELL_FB_118",
+          "GB_SHELL_FB_120",
+          "GB_SHELL_FB_121",
+          "GB_SHELL_FB_124",
+          "GB_SHELL_FB_125",
+          "GB_SHELL_FB_126",
+          "GB_SHELL_FB_127",
+          "GB_SHELL_FB_128",
+          "GB_SHELL_FB_130",
+          "GB_SHELL_FB_132",
+          "GB_SHELL_FB_133",
+          "GB_SHELL_FB_135",
+          "GB_SHELL_FB_136",
+          "GB_SHELL_FB_158",
+          "GB_SHELL_FB_161",
+          "GB_SHELL_FB_162",
+          "GB_SHELL_FB_163",
+          "GB_SHELL_FB_164",
+          "GB_SHELL_FB_166",
+          "GB_SHELL_FB_168",
+          "GB_SHELL_FB_169",
+          "GB_SHELL_FB_171",
+          "GB_SHELL_FB_173",
+          "GB_SHELL_FB_177",
+          "GB_SHELL_FB_178",
+          "GB_SHELL_FB_179",
+          "GB_SHELL_FB_181",
+          "GB_SHELL_FB_183",
+          "GB_SHELL_FB_184",
+          "GB_SHELL_FB_185",
+          "GB_SHELL_FB_187",
+          "GB_SHELL_FB_188",
+          "GB_SHELL_FB_190",
+          "GB_SHELL_FB_191",
+          "GB_SHELL_FB_192",
+          "GB_SHELL_FB_196",
+          "GB_SHELL_FB_199",
+          "GB_SHELL_FB_200",
+          "GB_SHELL_FB_201",
+          "GB_SHELL_FB_202",
+          "GB_SHELL_FB_205",
+          "GB_SHELL_FB_209",
+          "GB_SHELL_FB_210",
+          "GB_SHELL_FB_211",
+          "GB_SHELL_FB_216",
+          "GB_SHELL_FB_217",
+          "GB_SHELL_FB_219",
+          "GB_SHELL_FB_220",
+          "GB_SHELL_FB_221",
+          "GB_SHELL_FB_224",
+          "GB_SHELL_FB_227",
+          "GB_SHELL_FB_228",
+          "GB_SHELL_FB_229",
+          "GB_SHELL_FB_230",
+          "GB_SHELL_FB_233",
+          "GB_SHELL_FB_237",
+          "GB_SHELL_FB_238",
+          "GB_SHELL_FB_244",
+          "GB_SHELL_FB_245",
+          "GB_SHELL_FB_246",
+          "GB_SHELL_FB_248",
+          "GB_SHELL_FB_249",
+          "GB_SHELL_FB_251",
+          "GB_SHELL_FB_254",
+          "GB_SHELL_FB_255",
+          "GB_SHELL_FB_256",
+          "GB_SHELL_FB_257",
+          "GB_SHELL_FB_260",
+          "GB_SHELL_FB_263",
+          "GB_SHELL_FB_269",
+          "GB_SHELL_FB_270",
+          "GB_SHELL_FB_271",
+          "GB_SHELL_FB_273",
+          "GB_SHELL_FB_274",
+          "GB_SHELL_FB_276",
+          "GB_SHELL_FB_279",
+          "GB_SHELL_FB_280",
+          "GB_SHELL_FB_281",
+          "GB_SHELL_FB_282",
+          "GB_SHELL_FB_285",
+          "GB_SHELL_FB_288",
+          "GB_SHELL_FB_294",
+          "GB_SHELL_FB_295",
+          "GB_SHELL_FB_296",
+          "GB_SHELL_FB_298",
+          "GB_SHELL_FB_299",
+          "GB_SHELL_FB_301",
+          "GB_SHELL_FB_304",
+          "GB_SHELL_FB_305",
+          "GB_SHELL_FB_306",
+          "GB_SHELL_FB_307",
+          "GB_SHELL_FB_310",
+          "GB_SHELL_FB_313",
+          "GB_SHELL_FB_319",
+          "GB_SHELL_FB_320",
+          "GB_SHELL_FB_321",
+          "GB_SHELL_FB_323",
+          "GB_SHELL_FB_324"
+        ]
+      },
+      "notes": "下放政府，SNP 执政，独立公投议题活跃。GB_Scotland 18 块细分地块 + 与其几何完全重叠的 GB_NUTS1_UKM（数据重复，一并归入避免残留 GB 块）+ 按最近区域分配的 159 个 GB_SHELL_FB 海岸外壳补片。把握：高。",
+      "inspector_group_id": "uk_constituent_countries",
+      "inspector_group_label": "英国构成国"
+    },
+    {
+      "id": "mw_south_tyrol",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "STY",
+      "name_en": "South Tyrol",
+      "name_zh": "南蒂罗尔",
+      "color_hex": "#2f894b",
+      "parent_owner_tag": "IT",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "IT"
+      ],
+      "only_from_owners": [
+        "IT"
+      ],
+      "select": {
+        "feature_ids": [
+          "ITH10"
+        ]
+      },
+      "notes": "博尔扎诺自治省（ITH10 Bolzano-Bozen），SVP 追求扩大自治，风味性同色单列。把握：高。"
+    },
+    {
+      "id": "mw_wales",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "WLS",
+      "name_en": "Wales",
+      "name_zh": "威尔士",
+      "color_hex": "#b9364c",
+      "parent_owner_tag": "GB",
+      "presentation": "parent_merged",
+      "subject_kind": "constituent_country",
+      "cores": [
+        "GB"
+      ],
+      "only_from_owners": [
+        "GB"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "GB_Wales"
+        ],
+        "feature_ids": [
+          "GB_NUTS1_UKL",
+          "GB_SHELL_FB_047",
+          "GB_SHELL_FB_058",
+          "GB_SHELL_FB_059",
+          "GB_SHELL_FB_060",
+          "GB_SHELL_FB_062",
+          "GB_SHELL_FB_067",
+          "GB_SHELL_FB_069",
+          "GB_SHELL_FB_071",
+          "GB_SHELL_FB_073",
+          "GB_SHELL_FB_087",
+          "GB_SHELL_FB_091",
+          "GB_SHELL_FB_172",
+          "GB_SHELL_FB_174",
+          "GB_SHELL_FB_175",
+          "GB_SHELL_FB_182",
+          "GB_SHELL_FB_207",
+          "GB_SHELL_FB_213",
+          "GB_SHELL_FB_235",
+          "GB_SHELL_FB_241",
+          "GB_SHELL_FB_266",
+          "GB_SHELL_FB_291",
+          "GB_SHELL_FB_316"
+        ]
+      },
+      "notes": "下放政府（Senedd）。GB_Wales 10 块 + 重叠的 GB_NUTS1_UKL + 22 个海岸外壳补片（迪河、塞文河口模糊补片归英格兰）。把握：高。",
+      "inspector_group_id": "uk_constituent_countries",
+      "inspector_group_label": "英国构成国"
+    },
+    {
+      "id": "mw_golan_buffer_israel",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "IL",
+      "cores": [
+        "SY"
+      ],
+      "only_from_owners": [
+        "SY"
+      ],
+      "select": {
+        "feature_ids": [
+          "SYR-5261"
+        ]
+      },
+      "comment": "以色列占领的叙利亚隔离带（Israeli-occupied Syrian buffer zone）；A 类占领实控：2024-12 起以色列占领 1974 年 UNDOF 隔离带与黑门山叙方主峰，地块 SYR-5261（name=UNDOF）正好对应，owner 改 IL、cores 记 SY。戈兰主体已并在 ISR-3056 里并归 IL，无单独地块，见 deferred。选中 1 块，把握高。（核对修正：A 类沿用已有 tag IL，去掉 name/notes/subject_kind，避免 update_country 覆盖以色列本身的元数据）"
+    },
+    {
+      "id": "mw_iraq_kurdistan",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "KRG",
+      "name_en": "Kurdistan Region",
+      "name_zh": "库尔德斯坦地区",
+      "parent_owner_tag": "IQ",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "IQ"
+      ],
+      "only_from_owners": [
+        "IQ"
+      ],
+      "select": {
+        "feature_ids": [
+          "IRQ-3046",
+          "IRQ-3050",
+          "IRQ-3242"
+        ]
+      },
+      "notes": "宪法承认的联邦自治区：杜胡克、埃尔比勒、苏莱曼尼亚（旧区划含哈莱卜杰）。基尔库克、尼尼微平原、辛贾尔等争议区不划入。选中 3 块，把握高。",
+      "color_hex": "#b27263"
+    },
+    {
+      "id": "mw_libya_lna",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "LNA",
+      "name_en": "Libyan National Army (Eastern Libya)",
+      "name_zh": "利比亚国民军（东部当局）",
+      "color_hex": "#7a4f2a",
+      "subject_kind": "civil_war_faction",
+      "cores": [
+        "LY"
+      ],
+      "only_from_owners": [
+        "LY"
+      ],
+      "select": {
+        "feature_ids": [
+          "LBY-2984",
+          "LBY-2981",
+          "LBY-2982",
+          "LBY-2986",
+          "LBY-2987",
+          "LBY-2983",
+          "LBY-2985",
+          "LBY-2964",
+          "LBY-2965",
+          "LBY-2971",
+          "LBY-2969",
+          "LBY-2968",
+          "LBY-2967",
+          "LBY-5488"
+        ]
+      },
+      "notes": "哈夫塔尔控制的东部、苏尔特、朱夫拉与整个费赞，前线大体是 2020 年停火后的苏尔特—朱夫拉一线，与旧 sha'biyat 界吻合。选中 14 块。米兹达、加达米斯留给 LY（民族团结政府），属中等把握；其余把握高。（核对修正：颜色 #9e4a3a→#7a4f2a，与其他新势力 RGB 距离不足 40）",
+      "inspector_group_id": "libya_civil_war",
+      "inspector_group_label": "利比亚分治"
+    },
+    {
+      "id": "mw_syria_sdf",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "SDF",
+      "name_en": "Autonomous Administration of North and East Syria",
+      "name_zh": "北叙利亚和东叙利亚自治当局（叙利亚民主力量）",
+      "color_hex": "#e0c040",
+      "subject_kind": "civil_war_faction",
+      "cores": [
+        "SY"
+      ],
+      "only_from_owners": [
+        "SY"
+      ],
+      "select": {
+        "feature_ids": [
+          "SYR-141",
+          "SYR-136",
+          "SYR-142"
+        ]
+      },
+      "notes": "书签日取 2026-01 冲突前的最大范围，整省粗版：哈塞克（拉斯艾因一带除外，按多数）、拉卡（泰勒阿布亚德一带除外，按多数）、代尔祖尔（叙利亚只有整省地块，用近似幼发拉底河线切算东岸约占该省 51%，代表点在东岸，按多数整省归入，把握低）。阿勒颇省的科巴尼、代尔哈菲尔因地块是阿勒颇整省而未表达。选中 3 块。",
+      "inspector_group_id": "syria_factions",
+      "inspector_group_label": "叙利亚各方"
+    },
+    {
+      "id": "mw_syria_suwayda",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "SWD",
+      "name_en": "Suwayda (Druze Self-Administration)",
+      "name_zh": "苏韦达（德鲁兹自治）",
+      "parent_owner_tag": "SY",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "SY"
+      ],
+      "only_from_owners": [
+        "SY"
+      ],
+      "select": {
+        "feature_ids": [
+          "SYR-143"
+        ]
+      },
+      "notes": "2025-08 后希吉里的国民卫队事实自治，未宣布独立，按同色自治处理。粗版取苏韦达整省，政府军控制的西北部村镇未扣除。选中 1 块，事实自治把握高、范围中等。",
+      "color_hex": "#7169a3"
+    },
+    {
+      "id": "mw_western_sahara_sadr",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "EH",
+      "name_en": "Sahrawi Arab Democratic Republic (Free Zone)",
+      "name_zh": "撒哈拉阿拉伯民主共和国（实控区）",
+      "color_hex": "#c9b27a",
+      "subject_kind": "de_facto_state",
+      "cores": [
+        "EH"
+      ],
+      "only_from_owners": [
+        "EH"
+      ],
+      "select": {
+        "feature_ids": [
+          "EH_ADMIN0_PASSTHROUGH"
+        ]
+      },
+      "notes": "二选一取新建 tag：EH_ADMIN0_PASSTHROUGH 已近似沙墙以东的自由区（沙墙以西已在 MA 的地块里），西南角到拉古拉一带与真实沙墙不完全一致，属近似。选中 1 块。（核对修正：原新建 SDR 会把 EH 的全部地块拿走，而 EH 是这些地块的 core，apply_overlay 报 cannot retire protected tags [EH]；改为直接沿用已有 tag EH，只更新名称、颜色与 subject_kind，选择结果为空、仅改元数据。）（核对修正：颜色 #d9a441→#c9b27a，与其他新势力 RGB 距离不足 40）"
+    },
+    {
+      "id": "mw_yemen_houthi",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "HOU",
+      "name_en": "Supreme Political Council (Houthis)",
+      "name_zh": "也门最高政治委员会（胡塞武装）",
+      "color_hex": "#6fa04a",
+      "subject_kind": "civil_war_faction",
+      "cores": [
+        "YE"
+      ],
+      "only_from_owners": [
+        "YE"
+      ],
+      "select": {
+        "feature_ids": [
+          "YEM-150",
+          "YEM-155",
+          "YEM-152",
+          "YEM-3496",
+          "YEM-3498",
+          "YEM-153",
+          "YEM-3499",
+          "YEM-156",
+          "YEM-333",
+          "YEM-151",
+          "YEM-154",
+          "YEM-335"
+        ]
+      },
+      "notes": "书签日 2026-01-01 胡塞实控，整省粗版：萨达、阿姆兰、迈赫维特、萨那省、萨那市、扎马尔、赖马、伊卜、贝达 9 省整省；荷台达（南段沿海归政府方）、哈杰、焦夫按多数归胡塞。塔伊兹、马里卜留 YE（政府控制城区与多数面积）；达利阿南部多数归 STC。选中 12 块。整体格局把握高，跨线省按多数为中等把握。",
+      "inspector_group_id": "yemen_civil_war",
+      "inspector_group_label": "也门内战"
+    },
+    {
+      "id": "mw_yemen_stc",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "STC",
+      "name_en": "Southern Transitional Council",
+      "name_zh": "南方过渡委员会",
+      "color_hex": "#3a7cb8",
+      "subject_kind": "civil_war_faction",
+      "cores": [
+        "YE"
+      ],
+      "only_from_owners": [
+        "YE"
+      ],
+      "select": {
+        "feature_ids": [
+          "YEM-3510",
+          "YEM-157",
+          "YEM-3511",
+          "YEM-336",
+          "YEM-3497",
+          "YEM-332",
+          "YEM-334"
+        ]
+      },
+      "notes": "书签日取 2025-12 攻势后的最大范围：亚丁、拉赫季、阿比扬、舍卜沃、哈德拉毛（地块含索科特拉）、迈赫拉，以及达利阿（南部为主，按多数整省归入）。2026-01-03~06 政府方收复哈德拉毛、迈赫拉，书签日之后变化需写进剧本说明。选中 7 块。省级范围把握中高，拉赫季北部与舍卜沃拜汉等边角未细化。YE 原 tag 剩塔伊兹、马里卜 2 块，代表总统领导委员会。",
+      "inspector_group_id": "yemen_civil_war",
+      "inspector_group_label": "也门内战"
+    },
+    {
+      "id": "mw_al_shabaab",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "SHB",
+      "name_en": "Harakat al-Shabaab al-Mujahideen",
+      "name_zh": "青年党",
+      "color_hex": "#3b3b3b",
+      "subject_kind": "civil_war_faction",
+      "cores": [
+        "SO"
+      ],
+      "only_from_owners": [
+        "SO"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "SO_Middle_Juba"
+        ]
+      },
+      "notes": "只取把握最大的核心区 Middle Juba（含吉利布、萨科），2008 年以来长期由青年党治理。下/中谢贝利、希兰、巴伊、巴科勒等 2025 年反复易手，不划入。把握中高（核心区）。选中 1 块。",
+      "inspector_group_id": "somali_civil_war",
+      "inspector_group_label": "索马里内战"
+    },
+    {
+      "id": "mw_ambazonia",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "AMB",
+      "name_en": "Ambazonia (Anglophone Cameroon)",
+      "name_zh": "安巴佐尼亚（喀麦隆英语区）",
+      "parent_owner_tag": "CM",
+      "presentation": "parent_merged",
+      "subject_kind": "separatist_region",
+      "cores": [
+        "CM"
+      ],
+      "only_from_owners": [
+        "CM"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "CM_Northwest",
+          "CM_Southwest"
+        ]
+      },
+      "notes": "2017 年起的英语区分离主义冲突，取西北、西南两大区（主张范围），不表示实控；城市与主干道由政府军控制。同色挂喀麦隆。把握中（范围按行政区，地位为风味）。选中 2 块。",
+      "color_hex": "#c8836f"
+    },
+    {
+      "id": "mw_cabinda",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "CAB",
+      "name_en": "Cabinda",
+      "name_zh": "卡宾达",
+      "parent_owner_tag": "AO",
+      "presentation": "parent_merged",
+      "subject_kind": "separatist_region",
+      "cores": [
+        "AO"
+      ],
+      "only_from_owners": [
+        "AO"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "AO_Cabinda"
+        ]
+      },
+      "notes": "安哥拉飞地省，FLEC 长期低烈度分离运动，政府实控。同色挂安哥拉，仅作数据可区分。把握高（范围），地位为风味。选中 1 块。",
+      "color_hex": "#aa1428"
+    },
+    {
+      "id": "mw_jubaland",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "JUB",
+      "name_en": "Jubaland State of Somalia",
+      "name_zh": "朱巴兰州",
+      "parent_owner_tag": "SO",
+      "presentation": "parent_merged",
+      "subject_kind": "federal_member_state",
+      "cores": [
+        "SO"
+      ],
+      "only_from_owners": [
+        "SO"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "SO_Lower_Juba",
+          "SO_Gedo"
+        ]
+      },
+      "notes": "联邦成员州，2024-11 起与联邦决裂。取 Lower Juba（基斯马尤）与 Gedo；Gedo 部分城镇由亲联邦力量控制，属近似。Middle Juba 实为青年党控制，单列 mw_al_shabaab。表达的是成员州身份而非精确实控。把握中。选中 2 块。",
+      "color_hex": "#80b3eb"
+    },
+    {
+      "id": "mw_puntland",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "PNT",
+      "name_en": "Puntland State of Somalia",
+      "name_zh": "邦特兰州",
+      "parent_owner_tag": "SO",
+      "presentation": "parent_merged",
+      "subject_kind": "federal_member_state",
+      "cores": [
+        "SO"
+      ],
+      "only_from_owners": [
+        "SO"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "SO_Bari",
+          "SO_Nugaal"
+        ]
+      },
+      "notes": "联邦成员州，2024 年起不承认联邦政府权威、自行运作，不求独立。取 Bari、Nugaal；Mudug 北半（加勒卡约北、Jariiban、Goldogob）属邦特兰，但 Mudug 地块代表点在南半（加勒穆杜格），按多数留在 SO。把握高。选中 2 块。",
+      "color_hex": "#80b3eb"
+    },
+    {
+      "id": "mw_rsf_tasis",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "RSF",
+      "name_en": "Government of Peace and Unity (RSF)",
+      "name_zh": "和平与团结政府（快速支援部队）",
+      "color_hex": "#c8642d",
+      "subject_kind": "civil_war_faction",
+      "cores": [
+        "SD"
+      ],
+      "only_from_owners": [
+        "SD"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "SD_North_Darfur",
+          "SD_South_Darfur",
+          "SD_East_Darfur",
+          "SD_Central_Darfur",
+          "SD_West_Soudan",
+          "SD_South_Kordofan"
+        ]
+      },
+      "notes": "塔西斯平行政府/RSF 实控区，书签 2026-01-01。达尔富尔 5 州（SD_West_Soudan 代表点 22.9E/13.9N，即西达尔富尔）2025-10 法希尔陷落后全境 RSF。现有苏丹地块为 2013 年前区划，无独立西科尔多凡：旧西科尔多凡南部（穆格莱德、巴巴努萨、拉加瓦、哈季利季，2025-12 均落入 RSF）并在 South Kordofan 地块内，连同努巴山区 SPLM-N al-Hilu（塔西斯成员）控制区，按面积多数整块划入；卡杜格利、迪林仍由 SAF 守，属近似。North Kordofan 地块含欧拜伊德（SAF）及东部，按多数留在 SD，其西部恩纳胡德一带的 RSF 控制未表达。把握：达尔富尔高，南科尔多凡中低。选中 6 块。",
+      "inspector_group_id": "sudan_civil_war",
+      "inspector_group_label": "苏丹内战"
+    },
+    {
+      "id": "mw_somaliland",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "SML",
+      "name_en": "Republic of Somaliland",
+      "name_zh": "索马里兰共和国",
+      "color_hex": "#2e8b57",
+      "subject_kind": "de_facto_state",
+      "cores": [
+        "SO"
+      ],
+      "only_from_owners": [
+        "SO"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "SO_Awdal",
+          "SO_Woqooyi_Galbeed",
+          "SO_Togdheer",
+          "SO_Sanaag"
+        ]
+      },
+      "notes": "事实独立（2025-12 获以色列承认）。Awdal、Woqooyi Galbeed、Togdheer 全块；Sanaag 西中部（含埃里加沃）由索马里兰控制，东部 Badhan 一带归东北州/邦特兰，按多数整块划入。Sool 2023 后归 SSC-Khaatumo，不划入（另见 mw_ssc_khaatumo）。Togdheer 的 Buhodle 区未剔除。把握高（粗版）。选中 4 块。"
+    },
+    {
+      "id": "mw_ssc_khaatumo",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "NES",
+      "name_en": "North Eastern State of Somalia (SSC-Khaatumo)",
+      "name_zh": "索马里东北州（SSC-Khaatumo）",
+      "parent_owner_tag": "SO",
+      "presentation": "parent_merged",
+      "subject_kind": "federal_member_state",
+      "cores": [
+        "SO"
+      ],
+      "only_from_owners": [
+        "SO"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "SO_Sool"
+        ]
+      },
+      "notes": "2023 年逐出索马里兰军队，2025-07 获承认为第六个联邦成员州，亲摩加迪沙。粗版取 Sool 整块（Caynabo 区实为索马里兰控制，被多算）。同色挂索马里。把握中高。选中 1 块。",
+      "color_hex": "#80b3eb"
+    },
+    {
+      "id": "mw_tigray",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "TIG",
+      "name_en": "Tigray Interim Regional Administration",
+      "name_zh": "提格雷州临时政府",
+      "parent_owner_tag": "ET",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "ET"
+      ],
+      "only_from_owners": [
+        "ET"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "ET_Tigray"
+        ]
+      },
+      "notes": "比勒陀利亚协议后的州临时政府，书签日仍在联邦框架内，同色挂埃塞俄比亚。地块含西提格雷（Welkait/Humera，实为阿姆哈拉方面管理）与南部 Raya，现有地块无法剔除。TPLF 2026-05 恢复战前政府在书签日后，不体现。把握中。选中 1 块。",
+      "color_hex": "#5a5faa"
+    },
+    {
+      "id": "mw_zanzibar",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "ZAN",
+      "name_en": "Revolutionary Government of Zanzibar",
+      "name_zh": "桑给巴尔革命政府",
+      "parent_owner_tag": "TZ",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "TZ"
+      ],
+      "only_from_owners": [
+        "TZ"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "TZ_Unguja_North",
+          "TZ_Unguja_South",
+          "TZ_Mjini_Magharibi",
+          "TZ_North_Pemba",
+          "TZ_South_Pemba"
+        ]
+      },
+      "notes": "坦桑尼亚联合共和国内半自治部分，有自己的总统、议会和政府。温古贾岛 3 区 + 奔巴岛 2 区。同色挂坦桑尼亚。把握高。选中 5 块。",
+      "color_hex": "#8bbdbd"
+    },
+    {
+      "id": "mw_arakan_army",
+      "tag": "ARK",
+      "name_en": "Arakan Army",
+      "name_zh": "若开军",
+      "color_hex": "#b8323a",
+      "subject_kind": "civil_war_faction",
+      "cores": [
+        "MM"
+      ],
+      "only_from_owners": [
+        "MM"
+      ],
+      "select": {
+        "feature_ids": [
+          "MMR-3273",
+          "MM_PRIMARY_GAP_10"
+        ]
+      },
+      "notes": "D 类。若开邦整块归若开军（AA/ULA）：书签日 AA 控制若开 17 个镇区中的 14 个，军政府只剩实兑、皎漂、曼昂，按多数整块归入；MM_PRIMARY_GAP_10 是实兑以南的补缝碎片（约 92.9–93.0E、19.8–20.1N），一并归入以免留下飞地。把握较高；实兑、皎漂、曼昂被错划给 AA 属已知近似。选中 2 块。",
+      "scenarios": [
+        "modern_world"
+      ],
+      "inspector_group_id": "myanmar_civil_war",
+      "inspector_group_label": "缅甸内战"
+    },
+    {
+      "id": "mw_azad_kashmir",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "AJK",
+      "name_en": "Azad Jammu and Kashmir",
+      "name_zh": "阿扎德查谟-克什米尔",
+      "parent_owner_tag": "PK",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "PK"
+      ],
+      "only_from_owners": [
+        "PK"
+      ],
+      "select": {
+        "feature_ids": [
+          "PAK-1109"
+        ]
+      },
+      "notes": "B 类。巴控克什米尔自治区，有自己的总统与总理，宪法上不是巴基斯坦的省。现成地块 PAK-1109 'Azad Kashmir'。把握高。选中 1 块。",
+      "color_hex": "#278442"
+    },
+    {
+      "id": "mw_balochistan",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "BAL",
+      "name_en": "Balochistan",
+      "name_zh": "俾路支斯坦",
+      "parent_owner_tag": "PK",
+      "presentation": "parent_merged",
+      "subject_kind": "province",
+      "cores": [
+        "PK"
+      ],
+      "only_from_owners": [
+        "PK"
+      ],
+      "select": {
+        "feature_ids": [
+          "PAK-1108"
+        ]
+      },
+      "notes": "B 类。俾路支分离运动（BLA 等）所在省份；分离武装没有稳定实控区，只做同色子势力。地块 PAK-1108 'Baluchistan' 整省。把握高（范围），风味中等。选中 1 块。",
+      "color_hex": "#278442"
+    },
+    {
+      "id": "mw_bodoland",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "BTR",
+      "name_en": "Bodoland Territorial Region",
+      "name_zh": "博多兰领地区",
+      "parent_owner_tag": "IN",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "IN"
+      ],
+      "only_from_owners": [
+        "IN"
+      ],
+      "select": {
+        "feature_ids": [
+          "IN_ADM2_76128533B91480770176940",
+          "IN_ADM2_76128533B56012535339305",
+          "IN_ADM2_76128533B8221925175605",
+          "IN_ADM2_76128533B20307518801538"
+        ]
+      },
+      "notes": "B 类。阿萨姆邦博多兰领地区（第六附表自治议会 BTC，2020 年博多和平协议）：Kokrajhar、Chirang、Baksa、Udalguri 四区（2022 年从 Baksa 分出的 Tamulpur 在现有 Baksa 地块内，一并带入）。把握高。选中 4 块。",
+      "color_hex": "#fea906"
+    },
+    {
+      "id": "mw_chin_resistance",
+      "tag": "CHR",
+      "name_en": "Chinland Resistance",
+      "name_zh": "钦族抵抗力量",
+      "color_hex": "#5b4fc4",
+      "subject_kind": "civil_war_faction",
+      "cores": [
+        "MM"
+      ],
+      "only_from_owners": [
+        "MM"
+      ],
+      "select": {
+        "feature_ids": [
+          "MMR-3274"
+        ]
+      },
+      "notes": "D 类。钦邦整块归钦族抵抗力量（Chin Brotherhood 与钦兰委员会合为一个实体）：9 个镇区中 Mindat、Matupi、Kanpetlet、Tonzang、Thantlang、Falam（2026-01 仍在抵抗方手中，2026-04 才被军方夺回）由抵抗方控制，Paletwa 归 AA，军政府只剩 Hakha、Tedim，按多数整块归入。Paletwa 应属 AA、Hakha/Tedim 应属 MM，属已知近似。把握中等。选中 1 块。（核对修正：颜色 #3f6fb5→#5b4fc4，与其他新势力 RGB 距离不足 40）",
+      "scenarios": [
+        "modern_world"
+      ],
+      "inspector_group_id": "myanmar_civil_war",
+      "inspector_group_label": "缅甸内战"
+    },
+    {
+      "id": "mw_gilgit_baltistan",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "GBT",
+      "name_en": "Gilgit-Baltistan",
+      "name_zh": "吉尔吉特-巴尔蒂斯坦",
+      "parent_owner_tag": "PK",
+      "presentation": "parent_merged",
+      "subject_kind": "autonomous_region",
+      "cores": [
+        "PK"
+      ],
+      "only_from_owners": [
+        "PK"
+      ],
+      "select": {
+        "feature_ids": [
+          "PAK-1111"
+        ]
+      },
+      "notes": "B 类。巴控克什米尔北部自治区。地块 PAK-1111 已核实：名称仍是旧名 'Northern Areas'（2009 年改称吉尔吉特-巴尔蒂斯坦），范围 72.5–77.1E、34.5–37.0N，与之吻合。把握高。选中 1 块。",
+      "color_hex": "#278442"
+    },
+    {
+      "id": "mw_jammu_kashmir",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "JNK",
+      "name_en": "Jammu and Kashmir",
+      "name_zh": "查谟-克什米尔",
+      "parent_owner_tag": "IN",
+      "presentation": "parent_merged",
+      "subject_kind": "province",
+      "cores": [
+        "IN"
+      ],
+      "only_from_owners": [
+        "IN"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "IN_Jammu_and_Kashmir"
+        ]
+      },
+      "exclude": {
+        "feature_ids": [
+          "IN_ADM2_76128533B2782141712775"
+        ]
+      },
+      "notes": "B 类。印控查谟-克什米尔中央直辖区（2019 年起），克什米尔争议与分离运动核心区。用层级组 IN_Jammu_and_Kashmir，排除锡亚琴地块（'DATA NOT AVAILABLE'，归拉达克）。把握高。选中 20 块。",
+      "color_hex": "#fea906"
+    },
+    {
+      "id": "mw_kachin_independence",
+      "tag": "KIO",
+      "name_en": "Kachin Independence Organisation",
+      "name_zh": "克钦独立组织",
+      "color_hex": "#1fb3a0",
+      "subject_kind": "civil_war_faction",
+      "cores": [
+        "MM"
+      ],
+      "only_from_owners": [
+        "MM"
+      ],
+      "select": {
+        "feature_ids": [
+          "MMR-3296"
+        ]
+      },
+      "notes": "D 类。克钦邦整块归 KIO/KIA：2024 年攻势后 KIA 称控制 18 个镇区中的 14 个，并掌握中缅边境稀土带和帕敢玉石区大部；密支那、八莫（被围）、Waingmaw 仍在军政府手里。镇区数是 KIA 一方说法，按大致近似口径整块归入。把握中等，波动大。选中 1 块。（核对修正：颜色 #2f9d6a→#1fb3a0，与其他新势力 RGB 距离不足 40）",
+      "scenarios": [
+        "modern_world"
+      ],
+      "inspector_group_id": "myanmar_civil_war",
+      "inspector_group_label": "缅甸内战"
+    },
+    {
+      "id": "mw_ladakh",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "LDK",
+      "name_en": "Ladakh",
+      "name_zh": "拉达克",
+      "parent_owner_tag": "IN",
+      "presentation": "parent_merged",
+      "subject_kind": "province",
+      "cores": [
+        "IN"
+      ],
+      "only_from_owners": [
+        "IN"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "IN_Ladakh"
+        ],
+        "feature_ids": [
+          "IN_ADM2_76128533B2782141712775"
+        ]
+      },
+      "notes": "B 类。拉达克中央直辖区（列城、卡吉尔），2025 年列城抗议要求第六附表自治与建邦。另并入锡亚琴地块 IN_ADM2_76128533B2782141712775（名称 'DATA NOT AVAILABLE'，主体为锡亚琴冰川，行政上属列城区；附带约 36 块沿控制线的小碎片也随之归入）。把握高。选中 3 块。",
+      "color_hex": "#fea906"
+    },
+    {
+      "id": "mw_nagaland",
+      "scenarios": [
+        "modern_world"
+      ],
+      "tag": "NAG",
+      "name_en": "Nagaland",
+      "name_zh": "那加兰",
+      "parent_owner_tag": "IN",
+      "presentation": "parent_merged",
+      "subject_kind": "province",
+      "cores": [
+        "IN"
+      ],
+      "only_from_owners": [
+        "IN"
+      ],
+      "select": {
+        "hierarchy_groups": [
+          "IN_Nagaland"
+        ]
+      },
+      "notes": "B 类。那加兰邦，宪法第 371A 条特殊地位，NSCN-IM 'Nagalim' 和谈未结。用层级组 IN_Nagaland（含 2 块合并地块，叶子 100% 落入）。曼尼普尔的那加族山区不并入。把握高。选中 6 块。",
+      "color_hex": "#fea906"
+    }
+  ]
+}

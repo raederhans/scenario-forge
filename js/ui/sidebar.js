@@ -2679,6 +2679,15 @@ function initSidebar({ render } = {}) {
       commonwealth: t("Commonwealth", "ui"),
       colonial_government: t("Colonial Government", "ui"),
       colonial_federation: t("Colonial Federation", "ui"),
+      autonomous_region: t("Autonomous Region", "ui"),
+      constituent_country: t("Constituent Country", "ui"),
+      federal_subject: t("Federal Subject", "ui"),
+      federal_member_state: t("Federal Member State", "ui"),
+      special_territory: t("Special Territory", "ui"),
+      province: t("Province", "ui"),
+      separatist_region: t("Separatist Region", "ui"),
+      de_facto_state: t("De Facto State", "ui"),
+      civil_war_faction: t("Civil War Faction", "ui"),
     };
     return labels[normalizedKind] || normalizedKind.replace(/_/g, " ");
   };

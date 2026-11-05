@@ -1,5 +1,6 @@
 from copy import deepcopy
 import json
+import unittest
 from pathlib import Path
 
 import pytest
@@ -445,3 +446,54 @@ def test_io_refresh_and_dry_run(inputs):
     run_scenario(overlay, Path("hoi4_1936"), **kwargs)
     assert events == ["write", "refresh"]
     assert payloads == snapshot
+
+
+class OverlayExtensionTests(unittest.TestCase):
+    def setUp(self):
+        self.inputs = dict(
+            features={fid: {"cntr_code": "AA"} for fid in ("a", "b", "c")},
+            owners={fid: "AA" for fid in ("a", "b", "c")},
+            cores={fid: ["AA"] for fid in ("a", "b", "c")},
+            countries={"AA": {"color_hex": "#123456"}}, default_country="AA",
+            hierarchy_groups={}, country_meta={}, prefectures={}, bucket_by_feature={}, plans=[],
+            point_for_feature={"a": (0, 0), "b": (2, 2), "c": (5, 5)}.__getitem__)
+        self.rule = dict(id="new", scenarios=["modern_world"], tag="NEW", name_en="New",
+                         name_zh="新", parent_owner_tag="AA", select={"feature_ids": ["a"]})
+
+    def apply(self, **changes):
+        return apply_overlay({"version": 1, "entries": [{**self.rule, **changes}]},
+                             "modern_world", **self.inputs)
+
+    def test_polygons_alone_filter_and_exclusion(self):
+        rings = [[[-1, -1], [1, -1], [1, 1], [-1, 1]],
+                 [[1, 1], [3, 1], [3, 3], [1, 3]]]
+        self.assertEqual(set(self.apply(select={"polygons": rings})[1]), {"a", "b"})
+        self.assertEqual(set(self.apply(select={"feature_ids": ["a", "c"], "polygons": rings})[1]), {"a"})
+        self.assertEqual(set(self.apply(select={"bbox": [-1, -1, 1, 1], "polygons": rings})[1]), {"a"})
+        self.assertEqual(set(self.apply(select={"feature_ids": ["a", "b", "c"]},
+                                        exclude={"polygons": rings})[1]), {"c"})
+
+    def test_presentation_and_inspector_metadata_for_new_and_existing_tag(self):
+        fields = dict(presentation="parent_merged", inspector_group_id="group",
+                      inspector_group_label="Group", inspector_group_anchor_id="AA",
+                      display_name_zh="新名称", color_hex="#abcdef")
+        countries, assignments, _ = self.apply(**fields)
+        for key, value in fields.items():
+            self.assertEqual(countries["NEW"][key], value)
+        self.inputs["countries"] = countries
+        self.inputs["owners"]["a"] = assignments["a"]["owner"]
+        self.inputs["cores"]["a"] = assignments["a"]["cores"]
+        updated, _, report = self.apply(**{**fields, "inspector_group_label": "Updated"},
+                                        only_from_owners=["AA"])
+        self.assertEqual(updated["NEW"]["inspector_group_label"], "Updated")
+        self.assertEqual(report["changed_count"], 0)
+
+    def test_invalid_presentation_or_parent(self):
+        for changes in ({"presentation": "unknown"},
+                        {"presentation": "parent_merged", "parent_owner_tag": ""},
+                        {"presentation": "parent_merged", "parent_owner_tag": "BAD"}):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                self.apply(**changes)
+        del self.rule["parent_owner_tag"]
+        with self.assertRaisesRegex(ValueError, "parent_owner_tag"):
+            self.apply(presentation="parent_merged", color_hex="#abcdef")

@@ -229,10 +229,18 @@ def _refresh_summary_metadata(
     scenario_id = scenario_dir.name
     summary = manifest["summary"]
     if scenario_id == "modern_world":
-        if set(summary.get("quality_counts", {})) == {"direct_country_copy"}:
-            summary["quality_counts"]["direct_country_copy"] = summary["feature_count"]
-        if set(summary.get("source_counts", {})) == {"canonical_baseline"}:
-            summary["source_counts"]["canonical_baseline"] = summary["feature_count"]
+        owners_path = scenario_dir / "owners.by_feature.json"
+        if not owners_path.exists():
+            if set(summary.get("quality_counts", {})) == {"direct_country_copy"}:
+                summary["quality_counts"]["direct_country_copy"] = summary["feature_count"]
+            if set(summary.get("source_counts", {})) == {"canonical_baseline"}:
+                summary["source_counts"]["canonical_baseline"] = summary["feature_count"]
+            return
+        # Called after the sidecars are written. Overlay countries (occupation,
+        # autonomy, factions) add their own quality and source classes.
+        owners = load_json(owners_path)["owners"]
+        summary["quality_counts"] = dict(Counter(countries[tag]["quality"] for tag in owners.values()))
+        summary["source_counts"] = dict(Counter(countries[tag]["source"] for tag in owners.values()))
         return
     if scenario_id == "tno_1962":
         audit_path = scenario_dir / "audit.json"

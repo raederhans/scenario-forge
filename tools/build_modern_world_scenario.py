@@ -4,6 +4,7 @@ Detached primary islands are retained using the runtime builder's existing
 overlap policy. Interior holes/coastal slivers are not inferred to be land.
 The output keeps source feature IDs and uses lossless shared TopoJSON arcs so
 small countries and repaired rings cannot collapse during quantization.
+Replay order: rebuild → apply_political_feature_merges → apply_modern_world_split_overlay.
 """
 from __future__ import annotations
 
@@ -322,7 +323,15 @@ def main():
     countries_path = ROOT / "data/europe_countries.geojson"
     island_source_path = ROOT / "data/ne_50m_admin_0_countries.zip"
     manifest, countries = read(baseline / "manifest.json"), read(baseline / "countries.json")
+    countries["countries"] = {tag: row for tag, row in countries["countries"].items()
+                              if row["source_type"] == "canonical_baseline"}
+    canonical_tags = set(countries["countries"])
+    # Overlay parcels (occupation, autonomy, factions) carry cores that differ
+    # from their owner; only untouched canonical parcels constrain the rebuild.
+    previous_cores = read(baseline / "cores.by_feature.json")["cores"]
     previous_owners = read(baseline / "owners.by_feature.json")["owners"]
+    canonical_owners = {fid: owner for fid, owner in previous_owners.items()
+                        if owner in canonical_tags and previous_cores.get(fid) == [owner]}
     runtime, primary = read(runtime_path), read(primary_path)
     print("Restore canonical detail and detached primary islands", flush=True)
     country_sources = load_country_sources(countries_path)
@@ -336,7 +345,7 @@ def main():
     hints, overrides = update_capitals(read(baseline / "capital_hints.json"), read(baseline / "city_overrides.json"),
                                       countries["countries"], features, read(ROOT / "data/world_cities.geojson"))
     owners = {f["properties"]["id"]: f["properties"]["cntr_code"] for f in features}
-    if any(owners[fid] != owner for fid, owner in previous_owners.items()):
+    if any(owners[fid] != owner for fid, owner in canonical_owners.items()):
         raise ValueError("Canonical ownership changed for an existing feature")
     if output != baseline:
         if output.exists():

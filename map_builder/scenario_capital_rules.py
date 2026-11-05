@@ -32,6 +32,61 @@ MODERN_CAPITALS = {
     "TZ": ("1159149731", "Dodoma", "多多马"),
     "ZA": ("1159150661", "Pretoria", "比勒陀利亚"),
 }
+
+# Modern World faction overlay (data/scenario-rules/modern_world.split_overlay.json):
+# seats inside each faction's own parcels. YE keeps Ma'rib once Sanaa is Houthi-held.
+# Scoped to modern_world only: blank_base shares MODERN_CAPITALS and has no factions.
+MODERN_FACTION_CAPITALS = {
+    "ABK": ("CITY::ne::1159148621", "Sukhumi", "苏呼米"),
+    "AJK": ("CITY::gn::1169607", "Muzaffarabad", "穆扎法拉巴德"),
+    "AMB": ("CITY::ne::1159150315", "Bamenda", "巴门达"),
+    "ARK": ("CITY::ne::1159150425", "Sittwe", "实兑"),
+    "BAL": ("CITY::ne::1159149471", "Quetta", "奎达"),
+    "BAR": ("CITY::ne::1159148189", "Cotabato City", "哥打巴托"),
+    "BAS": ("CITY::ne::1159150699", "Ufa", "乌法"),
+    "BGV": ("CITY::ne::1159116427", "Arawa", "阿拉瓦"),
+    "BUR": ("CITY::ne::1159149623", "Ulan-Ude", "乌兰乌德"),
+    "CAB": ("CITY::ne::1159144723", "Cabinda", "卡宾达"),
+    "CAT": ("CITY::ne::1159151261", "Barcelona", "巴塞罗那"),
+    "CEC": ("CITY::ne::1159149587", "Grozny", "格罗兹尼"),
+    "CHR": ("CITY::ne::1159121785", "Hakha", "哈卡"),
+    "COR": ("CITY::ne::1159141961", "Ajaccio", "阿雅克肖"),
+    "DAG": ("CITY::ne::1159146589", "Makhachkala", "马哈奇卡拉"),
+    "EUS": ("CITY::ne::1159127229", "Vitoria-Gasteiz", "维多利亚"),
+    "FLA": ("CITY::ne::1159147705", "Antwerp", "安特卫普"),
+    "GAG": ("CITY::gn::618405", "Comrat", "科姆拉特"),
+    "GBT": ("CITY::ne::1159136409", "Gilgit", "吉尔吉特"),
+    "HOU": ("CITY::ne::1159151259", "Sanaa", "萨那"),
+    "ING": ("CITY::ne::1159122297", "Nazran", "纳兹兰"),
+    "JNK": ("CITY::ne::1159150001", "Srinagar", "斯利那加"),
+    "JUB": ("CITY::ne::1159148197", "Kismayo", "基斯马尤"),
+    "KIO": ("CITY::ne::1159147861", "Myitkyina", "密支那"),
+    "KRG": ("CITY::ne::1159147267", "Erbil", "埃尔比勒"),
+    "LDK": ("CITY::ne::1730025033", "Leh", "列城"),
+    "LNA": ("CITY::ne::1159150953", "Benghazi", "班加西"),
+    "NAG": ("CITY::ne::1159141873", "Kohima", "科希马"),
+    "NES": ("CITY::gn::400769", "Las Anod", "拉斯阿诺德"),
+    "NIR": ("CITY::ne::1159149369", "Belfast", "贝尔法斯特"),
+    "PMR": ("CITY::ne::1159136941", "Tiraspol", "蒂拉斯波尔"),
+    "PNT": ("CITY::ne::1159148167", "Garowe", "加罗韦"),
+    "QUE": ("CITY::ne::1159151065", "Quebec City", "魁北克城"),
+    "RSF": ("CITY::ne::1159150629", "Nyala", "尼亚拉"),
+    "SAK": ("CITY::ne::1159150745", "Yakutsk", "雅库茨克"),
+    "SCO": ("CITY::ne::1159146365", "Edinburgh", "爱丁堡"),
+    "SDF": ("CITY::ne::1159133897", "Raqqa", "拉卡"),
+    "SHB": ("CITY::ne::1159116563", "Bu'ale", "布阿莱"),
+    "SML": ("CITY::gn::57289", "Hargeisa", "哈尔格萨"),
+    "SRP": ("CITY::ne::1159145889", "Banja Luka", "巴尼亚卢卡"),
+    "STC": ("CITY::ne::1159150595", "Aden", "亚丁"),
+    "STY": ("CITY::ne::1159139591", "Bolzano", "博尔扎诺"),
+    "SWD": ("CITY::ne::1159133919", "As-Suwayda", "苏韦达"),
+    "TAT": ("CITY::ne::1159150705", "Kazan", "喀山"),
+    "TIG": ("CITY::ne::1159150093", "Mekelle", "默克莱"),
+    "TUV": ("CITY::ne::1159149621", "Kyzyl", "克孜勒"),
+    "WLS": ("CITY::ne::1159146373", "Cardiff", "加的夫"),
+    "ZAN": ("CITY::ne::1159150789", "Zanzibar City", "桑给巴尔城"),
+    "YE": ("CITY::ne::1159122073", "Ma'rib", "马里卜"),
+}
 HOI4_CAPITALS = {
     "AEF": ("1159150993", "Brazzaville", "布拉柴维尔"),
     "AST": ("1159151161", "Canberra", "堪培拉"),
@@ -399,7 +454,7 @@ TNO_CAPITALS = {
 }
 REVIEWED_CAPITALS = {
     "blank_base": MODERN_CAPITALS,
-    "modern_world": MODERN_CAPITALS,
+    "modern_world": {**MODERN_CAPITALS, **MODERN_FACTION_CAPITALS},
     "hoi4_1936": {
         **HOI4_CAPITALS,
         **HOI4_SPLIT_CAPITALS,
@@ -428,7 +483,7 @@ NO_CAPITAL_TAGS = {
     "tno_1962": {"AFA", "RFA", "ATL", "AQ", "SPR", "RKO", "AOI"},
     # Neutral/uninhabited regions or administrations seated outside the mapped
     # territory have no in-territory civilian capital marker.
-    "modern_world": {"AQ", "HM", "IO", "TF"},
+    "modern_world": {"AQ", "HM", "IO", "TF", "BTR"},
 }
 
 # Non-capital historical names use the same stable identities as the capital
