@@ -24,12 +24,24 @@ export function resolveParentMergedBorderKeys({ borderKey, reference, parentKey,
   return { borderKey, parentKey, homeKey: borderKey };
 }
 
-// Default colours are split by ±1 RGB so border identity stays exact. A child
-// still showing its own default must compare as its parent for paint contours;
-// any other colour is a real user edit and keeps its contour.
+// Default colours are split by a few RGB steps (±1 per sibling, at most 8
+// siblings per parent today) so border identity stays exact. A child whose fill
+// is visually the parent's current colour compares as the parent for paint
+// contours. The comparison is against the live fill, not the mutable owner
+// palette: an inspector edit of either side leaves visibly different fills and
+// keeps its contour.
+const MAX_DECONFLICT_STEP = 4;
+const parseHex = value => {
+  const hex = String(value || "").trim().toLowerCase();
+  return /^#[0-9a-f]{6}$/.test(hex) ? [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16)) : null;
+};
+
 export function resolveParentMergedContourColor({ color, owner, parents, baseColors }) {
   const parent = parents.get(owner);
   if (!parent || !color) return color;
-  const normalize = value => String(value || "").trim().toLowerCase();
-  return normalize(color) === normalize(baseColors?.[owner]) ? normalize(baseColors?.[parent]) || color : color;
+  const own = parseHex(color);
+  const parentColor = parseHex(baseColors?.[parent]);
+  if (!own || !parentColor) return color;
+  const step = Math.max(...own.map((value, index) => Math.abs(value - parentColor[index])));
+  return step <= MAX_DECONFLICT_STEP ? String(baseColors[parent]).trim().toLowerCase() : color;
 }

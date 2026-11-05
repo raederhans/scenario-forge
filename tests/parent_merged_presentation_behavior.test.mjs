@@ -104,3 +104,28 @@ test('paint contours treat an unedited child default as its parent colour, but k
   assert.equal(resolveParentMergedContourColor({ color: baseColors.ES, owner: 'ES', parents, baseColors }), baseColors.ES);
   assert.equal(resolveParentMergedContourColor({ color: '#abcdef', owner: 'SUBJECT', parents, baseColors }), '#abcdef');
 });
+
+test('paint contours survive inspector colour edits on either side of a parent-merged boundary', () => {
+  const parents = getParentMergedParents(countries());
+  const defaults = uniquifyScenarioDefaultColors({ ES: '#f2cd5e', CAT: '#f2cd5e' }, { deferred: new Set(parents.keys()) });
+  // applyCountryColor writes the chosen colour into sovereignBaseColors.
+  const childEdited = { ...defaults, CAT: '#123456' };
+  assert.equal(resolveParentMergedContourColor({ color: '#123456', owner: 'CAT', parents, baseColors: childEdited }), '#123456');
+  const parentEdited = { ...defaults, ES: '#3355aa' };
+  assert.equal(resolveParentMergedContourColor({ color: defaults.CAT, owner: 'CAT', parents, baseColors: parentEdited }), defaults.CAT);
+  const childSetToParent = { ...defaults, CAT: '#3355aa', ES: '#3355aa' };
+  assert.equal(resolveParentMergedContourColor({ color: '#3355aa', owner: 'CAT', parents, baseColors: childSetToParent }), '#3355aa');
+});
+
+test('every deconflicted sibling of a crowded parent still compares as the parent', () => {
+  const children = Array.from({ length: 8 }, (_, index) => `C${index}`);
+  const input = Object.fromEntries([['RU', {}], ...children.map(tag => [tag, { presentation: 'parent_merged', parent_owner_tag: 'RU' }])]);
+  const parents = getParentMergedParents(input);
+  const baseColors = uniquifyScenarioDefaultColors(Object.fromEntries(['RU', ...children].map(tag => [tag, '#7a5c8f'])), {
+    deferred: new Set(parents.keys()),
+  });
+  assert.equal(new Set(Object.values(baseColors)).size, 9);
+  for (const tag of children) {
+    assert.equal(resolveParentMergedContourColor({ color: baseColors[tag], owner: tag, parents, baseColors }), '#7a5c8f');
+  }
+});
