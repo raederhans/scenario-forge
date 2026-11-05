@@ -42,10 +42,6 @@ export function createRenderPerfMetricsRuntimeOwner({
     effects.setRenderPerfContextBreakdownState,
     "effects.setRenderPerfContextBreakdownState",
   );
-  const mirrorRenderPerfMetrics = requireFunction(
-    effects.mirrorRenderPerfMetrics,
-    "effects.mirrorRenderPerfMetrics",
-  );
 
   let activeContextMetricSession = null;
 
@@ -69,7 +65,6 @@ export function createRenderPerfMetricsRuntimeOwner({
       entry: nextEntry,
       sequence: nextSequence,
     });
-    mirrorRenderPerfMetrics(normalizedName);
     return nextEntry;
   }
 
@@ -125,13 +120,11 @@ export function createRenderPerfMetricsRuntimeOwner({
       }
     });
     setRenderPerfContextBreakdownState(breakdown);
-    mirrorRenderPerfMetrics("contextBreakdown");
     return breakdown;
   }
 
   function resetContextBreakdownForExactFrame() {
     setRenderPerfContextBreakdownState({});
-    mirrorRenderPerfMetrics("contextBreakdown");
   }
 
   return Object.freeze({
