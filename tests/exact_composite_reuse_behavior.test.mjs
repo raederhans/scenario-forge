@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
+import { lazyOwner } from "../js/core/map_renderer/lazy_owner.js";
 import { parse } from "acorn";
 import { createExactCompositeReuseOwner } from "../js/core/renderer/exact_composite_reuse_owner.js";
 import { createCachedPassCompositorOwner } from "../js/core/renderer/cached_pass_compositor_owner.js";
@@ -11,10 +12,10 @@ import { isPopulationActive } from "../js/core/population_spatial_view_model.js"
 const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
 const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
 function realFunction(name, globals) {
-  const node = ast.body.find(node => node.type === "FunctionDeclaration" && node.id.name === name);
-  const context = vm.createContext(globals);
+  const node = ast.body.find(node => (node.type === "FunctionDeclaration" && node.id.name === name) || (node.type === "VariableDeclaration" && node.declarations.some(entry => entry.id.name === name)));
+  const context = vm.createContext(Object.assign(globals, { lazyOwner }));
   vm.runInContext(source.slice(node.start, node.end), context);
-  return context[name];
+  return vm.runInContext(name, context);
 }
 function canvas(pixels = [null, null]) {
   const result = { width: 2, height: 1, pixels: [...pixels] };
@@ -188,7 +189,7 @@ test("actual transformed-owner buffer injection invalidates prior exact pixels",
     "recordPassTiming",
   ].map(name => [name, () => {}]));
   const getTransformed = realFunction("getTransformedFrameCompositorOwner", {
-    ...h.globals, ...noops, transformedFrameCompositorOwner: null,
+    ...h.globals, ...noops,
     INTERACTION_COMPOSITE_PASS_NAMES: names, RENDER_PHASE_IDLE: "idle",
     RENDER_PHASE_INTERACTING: "interacting", RENDER_PHASE_SETTLING: "settling",
     getRenderPassCacheState: () => h.cache,
