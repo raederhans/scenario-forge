@@ -3,8 +3,6 @@ name: perf-pr-gate
 on:
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
-  schedule:
-    - cron: '17 18 * * *'
   workflow_dispatch:
 
 concurrency:

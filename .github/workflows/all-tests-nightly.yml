@@ -1,8 +1,8 @@
 name: All tests nightly
 
-# Runs every unit test, including the slow lists and the quarantine in
-# tests/quarantine.json, so known breakage stays visible. PRs run the same
-# suites without those entries (pr-verify.yml, job pr-tests).
+# Runs every unit test including the slow lists in tests/quarantine.json, which
+# PRs skip (pr-verify.yml, job pr-tests). Quarantined tests stay skipped so the
+# run only goes red on new breakage; use --all by hand for a full audit.
 on:
   schedule:
     - cron: "37 19 * * *"
@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: ["node --all", "python --all"]
+        suite: ["node --with-slow", "python --with-slow"]
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4

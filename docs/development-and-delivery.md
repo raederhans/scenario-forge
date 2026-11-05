@@ -15,7 +15,7 @@ npm run test:e2e:golden  # golden user flows (about 10 minutes)
 
 `dist/` is not tracked. CI builds the Pages artifact from source with `tools/build_pages_dist.py`, which bundles the editor's JavaScript into `app/js/bundle/` with `tools/build_editor_bundle.mjs` (esbuild). Run `npm run verify:pages-dist` for a local build.
 
-`tests/quarantine.json` is the only skip list on PRs. Every entry needs a reason and leaves as soon as the test is fixed or deleted. Nightly runs everything with `--all`, including the quarantine and the slow lists.
+`tests/quarantine.json` is the only skip list on PRs. Every entry needs a reason and leaves as soon as the test is fixed or deleted. Nightly adds the slow lists with `--with-slow` but still skips the quarantine, so it only goes red on new breakage; run `--all` by hand for a full audit including the quarantine. perf-pr-gate no longer runs on a schedule, only on PRs and manual dispatch.
 
 | Stage | Action |
 | --- | --- |

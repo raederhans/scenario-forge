@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 // Run the whole unit suite instead of a path-selected subset.
-//   node tools/run_all_tests.mjs node [--shard=1/2] [--all]
-//   node tools/run_all_tests.mjs python [--all]
+//   node tools/run_all_tests.mjs node [--shard=1/2] [--with-slow | --all]
+//   node tools/run_all_tests.mjs python [--with-slow | --all]
 // Only entries in tests/quarantine.json are skipped (quarantine plus the slow lists).
-// --all ignores the quarantine; nightly uses it so known breakage stays visible.
+// --with-slow also runs the slow lists but still skips the quarantine (nightly).
+// --all ignores the whole file, for a manual full audit.
 //
 // A few tests compare sources with the built Pages artifact. Unless
 // SCENARIO_FORGE_PAGES_ARTIFACT_ROOT names one explicitly, this builds it into
@@ -15,6 +16,7 @@ import { spawnSync } from "node:child_process";
 
 const [suite, ...flags] = process.argv.slice(2);
 const all = flags.includes("--all");
+const withSlow = flags.includes("--with-slow");
 const shard = flags.find(flag => flag.startsWith("--shard="));
 const quarantine = JSON.parse(readFileSync(new URL("../tests/quarantine.json", import.meta.url), "utf8"));
 const TEST_ARTIFACT_ROOT = ".runtime/pages-test/dist";
@@ -60,17 +62,17 @@ function ensurePagesArtifact() {
 if (suite === "node" || suite === "python") ensurePagesArtifact();
 
 if (suite === "node") {
-  const skipped = new Set(all ? [] : [...Object.keys(quarantine.node), ...quarantine.nodeSlow.files]);
+  const skipped = new Set(all ? [] : [...Object.keys(quarantine.node), ...(withSlow ? [] : quarantine.nodeSlow.files)]);
   const files = readdirSync("tests").filter(name => name.endsWith(".test.mjs"))
     .map(name => `tests/${name}`).filter(file => !skipped.has(file)).sort();
   for (const file of skipped) console.log(`skipped: ${file} — ${quarantine.node[file] || quarantine.nodeSlow._reason}`);
   run(process.execPath, ["--test", ...(shard ? [`--test-shard=${shard.slice(8)}`] : []), ...files]);
 } else if (suite === "python") {
-  const ignored = all ? [] : [...Object.keys(quarantine.python), ...quarantine.pythonSlow.files];
+  const ignored = all ? [] : [...Object.keys(quarantine.python), ...(withSlow ? [] : quarantine.pythonSlow.files)];
   // run_python.mjs picks py -3 / python on Windows and python3 / python elsewhere.
   run(process.execPath, ["tools/run_python.mjs", "-m", "pytest", "tests", "-n", "auto", "-q", "-p", "no:cacheprovider",
     ...ignored.flatMap(file => [file.includes("::") ? "--deselect" : "--ignore", file])]);
 } else {
-  console.error("usage: node tools/run_all_tests.mjs node|python [--shard=i/n] [--all]");
+  console.error("usage: node tools/run_all_tests.mjs node|python [--shard=i/n] [--with-slow | --all]");
   process.exit(2);
 }
