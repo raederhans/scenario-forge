@@ -37,30 +37,53 @@ function createTestOwner(state = {}) {
   return { owner, invalidations, perfMetrics };
 }
 
-test("dynamic mesh publication precedes unresolved-count callbacks and preserves partial commits on throw", (t) => {
-  const oldTopojson = globalThis.topojson;
-  t.after(() => { globalThis.topojson = oldTopojson; });
-  const mesh = { type: "MultiLineString", coordinates: [] };
-  globalThis.topojson = { mesh: () => mesh };
+test("dynamic border rebuild invalidates only when its revision hash changes", () => {
   const state = {
-    cachedBorders: {}, cachedDynamicOwnerBorders: {}, cachedDynamicBordersHash: "old",
-    runtimePoliticalTopology: { objects: { political: { geometries: [{}] } } },
+    cachedBorders: {}, cachedDynamicBordersHash: "old",
+    sovereigntyRevision: 1, activeScenarioId: "scenario", scenarioShellOverlayRevision: 2,
     dynamicBordersDirty: true,
+    get runtimePoliticalTopology() { throw new Error("must not build a mesh"); },
   };
-  const failure = new Error("count failed");
+  const invalidations = [];
+  const metrics = [];
+  let enabled = true;
+  let updates = 0;
   const owner = createBorderMeshOwner({ state, helpers: {
-    isDynamicBordersEnabled: () => true,
-    resolveOwnerBorderCode: () => {
-      assert.equal(state.cachedBorders, null);
-      assert.equal(state.cachedDynamicOwnerBorders, mesh);
-      assert.equal(state.cachedDynamicBordersHash, "old");
-      throw failure;
-    },
+    isDynamicBordersEnabled: () => enabled,
+    updateDynamicBorderStatusUI: () => updates++,
+    invalidateRenderPasses: (...args) => invalidations.push(args),
+    recordRenderPerfMetric: (name, duration, details) => metrics.push({ name, details }),
   } });
-  assert.throws(() => owner.rebuildDynamicBorders(), error => error === failure);
-  assert.equal(state.cachedDynamicOwnerBorders, mesh);
-  assert.equal(state.cachedDynamicBordersHash, "old");
-  assert.equal(state.dynamicBordersDirty, true);
+  assert.equal(owner.rebuildDynamicBorders(), true);
+  assert.equal(state.cachedBorders, null);
+  assert.equal(state.dynamicBordersDirty, false);
+  assert.deepEqual(invalidations, [["borders", "dynamic-borders"]]);
+  const firstHash = state.cachedDynamicBordersHash;
+  assert.equal(owner.rebuildDynamicBorders(), true);
+  assert.equal(state.cachedDynamicBordersHash, firstHash);
+  assert.equal(invalidations.length, 1);
+  assert.deepEqual(metrics.at(-1), {
+    name: "rebuildDynamicBorders", details: { enabled: true, cacheHit: true },
+  });
+  for (const key of ["sovereigntyRevision", "scenarioShellOverlayRevision", "activeScenarioId"]) {
+    const previousHash = state.cachedDynamicBordersHash;
+    state[key] = key === "activeScenarioId" ? "" : state[key] + 1;
+    assert.equal(owner.rebuildDynamicBorders(), true);
+    assert.notEqual(state.cachedDynamicBordersHash, previousHash);
+  }
+  assert.equal(invalidations.length, 4);
+  enabled = false;
+  state.cachedBorders = {};
+  assert.equal(owner.rebuildDynamicBorders(), false);
+  assert.equal(state.cachedBorders, null);
+  assert.equal(state.cachedDynamicBordersHash, null);
+  assert.equal(state.dynamicBordersDirty, false);
+  assert.equal(state.dynamicBordersDirtyReason, "");
+  assert.equal(invalidations.length, 4);
+  assert.equal(updates, 6);
+  assert.deepEqual(metrics.at(-1), {
+    name: "rebuildDynamicBorders", details: { enabled: false },
+  });
 });
 
 function createLifecycleOwner() {
@@ -179,84 +202,36 @@ test("an idle detail cache schedules its initial build even when the signature i
   assert.deepEqual(events, [["schedule", ""]]);
 });
 
-test("refreshScenarioOpeningOwnerBorders reuses mesh pack opening-owner mesh when available", () => {
-  const meshPackMesh = {
-    type: "MultiLineString",
-    coordinates: [[[1, 1], [2, 2]]],
-  };
+test("opening owner refresh reports readiness and invalidates without building meshes", (t) => {
+  const previousTopojson = globalThis.topojson;
+  t.after(() => { globalThis.topojson = previousTopojson; });
+  globalThis.topojson = { mesh: () => { throw new Error("must not build a mesh"); } };
   const state = {
     activeScenarioId: "tno_1962",
     scenarioBorderMode: "scenario_owner_only",
-    runtimePoliticalTopology: null,
-    activeScenarioMeshPack: { meshes: { opening_owner_borders: meshPackMesh } },
-    scenarioBaselineOwnersByFeatureId: {},
-    scenarioAutoShellOwnerByFeatureId: {},
-    scenarioShellOverlayRevision: 0,
-    scenarioBaselineHash: "baseline-hash",
-    cachedScenarioOpeningOwnerBorders: null,
+    activeScenarioMeshPack: { meshes: { opening_owner_borders: { coordinates: [[[1, 1], [2, 2]]] } } },
   };
-
-  const { owner } = createTestOwner(state);
-  const built = owner.refreshScenarioOpeningOwnerBorders("mesh-pack-ready");
-
-  assert.equal(built, true);
-  assert.equal(state.cachedScenarioOpeningOwnerBorders, meshPackMesh);
-});
-
-test("refreshScenarioOpeningOwnerBorders falls back to runtime topology when mesh pack is absent", () => {
-  const runtimeFallbackMesh = {
-    type: "MultiLineString",
-    coordinates: [[[3, 3], [4, 4]]],
-  };
-  const previousTopojson = globalThis.topojson;
-  globalThis.topojson = {
-    mesh: () => runtimeFallbackMesh,
-  };
-
-  try {
-    const state = {
-      activeScenarioId: "tno_1962",
-      scenarioBorderMode: "scenario_owner_only",
-        runtimePoliticalTopology: { objects: { political: {} } },
-      activeScenarioMeshPack: null,
-      scenarioBaselineOwnersByFeatureId: { A: "GER", B: "USA" },
-      scenarioAutoShellOwnerByFeatureId: {},
-      scenarioShellOverlayRevision: 0,
-      scenarioBaselineHash: "baseline-hash",
-      cachedScenarioOpeningOwnerBorders: null,
-    };
-
-    const { owner } = createTestOwner(state);
-    const built = owner.refreshScenarioOpeningOwnerBorders("runtime-fallback");
-
-    assert.equal(built, true);
-    assert.equal(state.cachedScenarioOpeningOwnerBorders, runtimeFallbackMesh);
-  } finally {
-    globalThis.topojson = previousTopojson;
-  }
-});
-
-test("refreshScenarioOpeningOwnerBorders clears cache when startup state is not ready", () => {
-  const state = {
-    activeScenarioId: "tno_1962",
-    scenarioBorderMode: "canonical",
-    runtimePoliticalTopology: { objects: { political: {} } },
-    activeScenarioMeshPack: null,
-    scenarioBaselineOwnersByFeatureId: {},
-    scenarioAutoShellOwnerByFeatureId: {},
-    scenarioShellOverlayRevision: 0,
-    scenarioBaselineHash: "baseline-hash",
-    cachedScenarioOpeningOwnerBorders: {
-      type: "MultiLineString",
-      coordinates: [[[5, 5], [6, 6]]],
-    },
-  };
-
-  const { owner } = createTestOwner(state);
-  const built = owner.refreshScenarioOpeningOwnerBorders("not-ready");
-
-  assert.equal(built, false);
-  assert.equal(state.cachedScenarioOpeningOwnerBorders, null);
+  const { owner, invalidations, perfMetrics } = createTestOwner(state);
+  assert.equal(owner.refreshScenarioOpeningOwnerBorders("mesh-pack-ready"), true);
+  state.activeScenarioMeshPack = null;
+  state.runtimePoliticalTopology = { objects: { political: {} } };
+  state.scenarioBaselineOwnersByFeatureId = { A: "GER" };
+  assert.equal(owner.refreshScenarioOpeningOwnerBorders("runtime-ready"), true);
+  state.scenarioBaselineOwnersByFeatureId = {};
+  assert.equal(owner.refreshScenarioOpeningOwnerBorders(), false);
+  state.scenarioBaselineOwnersByFeatureId = { A: "GER" };
+  state.scenarioBorderMode = "canonical";
+  assert.equal(owner.refreshScenarioOpeningOwnerBorders("not-ready"), false);
+  state.scenarioBorderMode = "scenario_owner_only";
+  state.activeScenarioId = "";
+  assert.equal(owner.refreshScenarioOpeningOwnerBorders("cleared"), false);
+  assert.deepEqual(invalidations, [
+    ["borders", "mesh-pack-ready"], ["borders", "runtime-ready"],
+    ["borders", "scenario-opening-borders"], ["borders", "not-ready"], ["borders", "cleared"],
+  ]);
+  assert.deepEqual(perfMetrics.map(metric => metric.details), [
+    { enabled: true }, { enabled: true }, { enabled: false }, { enabled: false }, { enabled: false },
+  ]);
 });
 
 test("getFrontlineMesh remains disabled after control layer retirement", () => {

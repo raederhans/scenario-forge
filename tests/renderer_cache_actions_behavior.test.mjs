@@ -66,17 +66,17 @@ test("border cache patch publishes only explicit owned fields without copying va
   const mesh = Object.freeze({ coordinates: Object.freeze([]) });
   const target = { unrelated: "keep", cachedFrontlineMeshHash: "old" };
   const patch = Object.assign(Object.create({ cachedBorders: "inherited" }), {
-    cachedDynamicOwnerBorders: mesh, cachedDynamicBordersHash: undefined,
-    cachedScenarioOpeningOwnerBorders: null, cachedFrontlineMesh: mesh,
+    cachedDynamicBordersHash: undefined,
+    cachedFrontlineMesh: mesh,
     unrelated: "replace",
   });
   patchBorderMeshCacheState(target, patch);
   assert.deepEqual(target, {
     unrelated: "keep", cachedFrontlineMeshHash: "old",
-    cachedDynamicOwnerBorders: mesh, cachedDynamicBordersHash: undefined,
-    cachedScenarioOpeningOwnerBorders: null, cachedFrontlineMesh: mesh,
+    cachedDynamicBordersHash: undefined,
+    cachedFrontlineMesh: mesh,
   });
-  assert.equal(target.cachedDynamicOwnerBorders, mesh);
+  assert.equal(target.cachedFrontlineMesh, mesh);
   assert.equal(Object.hasOwn(target, "cachedBorders"), false);
 });
 

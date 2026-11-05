@@ -8,14 +8,10 @@ import {
   buildSourceBorderMeshes as buildSourceBorderMeshesFromSources,
   getSourceCountrySets as getSourceCountrySetsFromSelection,
   getSourceCountrySetsSteps,
-  resolveScenarioOpeningOwnerBorderSelection,
 } from "./border_mesh_source_selection.js";
 import {
   buildDetailAdmBorderMesh as buildDetailAdmBorderMeshRuntime,
   buildDynamicBorderHash,
-  buildDynamicOwnerBorderMesh as buildDynamicOwnerBorderMeshRuntime,
-  buildOwnerBorderMesh as buildOwnerBorderMeshRuntime,
-  countUnresolvedOwnerBorderEntities as countUnresolvedOwnerBorderEntitiesRuntime,
   getDynamicBorderOwnershipContext,
   simplifyCoastlineMesh as simplifyCoastlineMeshRuntime,
 } from "./border_mesh_dynamic_runtime.js";
@@ -70,7 +66,6 @@ export function createBorderMeshOwner({
     nowMs = () => 0,
     publishScenarioCoastlineDecision,
     recordRenderPerfMetric = () => {},
-    resolveOwnerBorderCode,
     sanitizePolyline,
     shouldExcludeOwnerBorderEntity,
     shouldExcludePoliticalInteractionFeature,
@@ -90,43 +85,8 @@ export function createBorderMeshOwner({
     scenarioSurfaceVersionSignal: "",
     decision: null,
   };
-  let scenarioOpeningOwnerBorderCache = {
-    runtimeRef: null,
-    meshPackRef: null,
-    scenarioId: "",
-    baselineHash: "",
-    baselineOwnersRef: null,
-    shellRevision: 0,
-    meshSource: "",
-    mesh: null,
-  };
   const scenarioCoastlineDecisionWarnings = new Set();
   const pendingDynamicBorderTimer = { handle: null };
-
-  const buildOwnerBorderMesh = (runtimeTopology, ownershipContext = {}, { excludeSea = false } = {}) =>
-    buildOwnerBorderMeshRuntime({
-      runtimeTopology,
-      ownershipContext,
-      excludeSea,
-      shouldExcludeOwnerBorderEntity,
-      resolveOwnerBorderCode,
-    });
-
-  const buildDynamicOwnerBorderMesh = (runtimeTopology, ownershipContext) =>
-    buildDynamicOwnerBorderMeshRuntime({
-      runtimeTopology,
-      ownershipContext,
-      shouldExcludeOwnerBorderEntity,
-      resolveOwnerBorderCode,
-    });
-
-  const countUnresolvedOwnerBorderEntities = (runtimeTopology, ownershipContext = {}) =>
-    countUnresolvedOwnerBorderEntitiesRuntime({
-      runtimeTopology,
-      ownershipContext,
-      shouldExcludeOwnerBorderEntity,
-      resolveOwnerBorderCode,
-    });
 
   function clearPendingDynamicBorderTimer() {
     if (pendingDynamicBorderTimer.handle) {
@@ -196,14 +156,12 @@ export function createBorderMeshOwner({
     incrementPerfCounter("dynamicBorderRebuilds");
     patchBorderMeshCacheState(state, { cachedBorders: null });
     if (!isDynamicBordersEnabled()) {
-      patchBorderMeshCacheState(state, { cachedDynamicOwnerBorders: null });
       patchBorderMeshCacheState(state, { cachedDynamicBordersHash: null });
       setDynamicBordersDirtyState(state, false, "");
       clearPendingDynamicBorderTimer();
       updateDynamicBorderStatusUI();
       recordRenderPerfMetric("rebuildDynamicBorders", nowMs() - startedAt, {
         enabled: false,
-        segmentCount: 0,
       });
       return false;
     }
@@ -214,22 +172,16 @@ export function createBorderMeshOwner({
       activeScenarioId: state.activeScenarioId,
       scenarioShellOverlayRevision: state.scenarioShellOverlayRevision,
     });
-    if (state.cachedDynamicBordersHash === nextHash && state.cachedDynamicOwnerBorders) {
+    if (state.cachedDynamicBordersHash === nextHash) {
       setDynamicBordersDirtyState(state, false, "");
       updateDynamicBorderStatusUI();
       recordRenderPerfMetric("rebuildDynamicBorders", nowMs() - startedAt, {
         enabled: true,
         cacheHit: true,
-        segmentCount: Array.isArray(state.cachedDynamicOwnerBorders?.coordinates)
-          ? state.cachedDynamicOwnerBorders.coordinates.length
-          : 0,
       });
       return true;
     }
 
-    const ownershipContext = getDynamicBorderOwnershipContext(state);
-    patchBorderMeshCacheState(state, { cachedDynamicOwnerBorders: buildDynamicOwnerBorderMesh(state.runtimePoliticalTopology, ownershipContext) });
-    const unresolvedEntityCount = countUnresolvedOwnerBorderEntities(state.runtimePoliticalTopology, ownershipContext);
     patchBorderMeshCacheState(state, { cachedDynamicBordersHash: nextHash });
     setDynamicBordersDirtyState(state, false, "");
     updateDynamicBorderStatusUI();
@@ -237,70 +189,25 @@ export function createBorderMeshOwner({
     recordRenderPerfMetric("rebuildDynamicBorders", nowMs() - startedAt, {
       enabled: true,
       cacheHit: false,
-      unresolvedEntityCount,
-      segmentCount: Array.isArray(state.cachedDynamicOwnerBorders?.coordinates)
-        ? state.cachedDynamicOwnerBorders.coordinates.length
-        : 0,
     });
     return true;
   }
 
-  // scenarioOpeningOwnerBorderCache 绑定 runtimeRef/meshPackRef/scenarioId/baselineHash/shellRevision，
-  // 目标是锁定“场景开启时 owner 边界”的快照语义。baselineHash 或 shellRevision 变化会直接触发重建，
-  // baselineHash 缺失时回退到 baselineOwnersRef 引用比较，保证旧数据源也能被正确失效。
   function refreshScenarioOpeningOwnerBorders(reason = "") {
     const startedAt = nowMs();
-    const selection = resolveScenarioOpeningOwnerBorderSelection({
-      state,
-      isUsableMesh,
-    });
-    let cacheMatches = false;
-
-    if (selection.shouldBuild) {
-      cacheMatches =
-        scenarioOpeningOwnerBorderCache.meshSource === selection.meshSource
-        && scenarioOpeningOwnerBorderCache.scenarioId === selection.scenarioId
-        && (selection.baselineHash
-          ? scenarioOpeningOwnerBorderCache.baselineHash === selection.baselineHash
-          : scenarioOpeningOwnerBorderCache.baselineOwnersRef === selection.baselineOwnersRef)
-        && scenarioOpeningOwnerBorderCache.shellRevision === selection.shellRevision
-        && (selection.meshSource === "mesh_pack"
-          ? scenarioOpeningOwnerBorderCache.meshPackRef === selection.meshPackRef
-          : scenarioOpeningOwnerBorderCache.runtimeRef === selection.runtimeRef)
-        && isUsableMesh(scenarioOpeningOwnerBorderCache.mesh);
-
-      patchBorderMeshCacheState(state, { cachedScenarioOpeningOwnerBorders: cacheMatches
-        ? scenarioOpeningOwnerBorderCache.mesh
-        : (
-          selection.hasMeshPackMesh
-            ? selection.meshPackMesh
-            : buildOwnerBorderMesh(selection.runtimeRef, selection.fallbackOwnershipContext, { excludeSea: true })
-        ) });
-
-      scenarioOpeningOwnerBorderCache = {
-        runtimeRef: selection.runtimeRef,
-        meshPackRef: selection.meshPackRef,
-        scenarioId: selection.scenarioId,
-        baselineHash: selection.baselineHash,
-        baselineOwnersRef: selection.baselineOwnersRef,
-        shellRevision: selection.shellRevision,
-        meshSource: selection.meshSource,
-        mesh: state.cachedScenarioOpeningOwnerBorders,
-      };
-    } else {
-      patchBorderMeshCacheState(state, { cachedScenarioOpeningOwnerBorders: null });
-    }
-
+    const enabled =
+      !!String(state.activeScenarioId || "")
+      && state.scenarioBorderMode === "scenario_owner_only"
+      && (
+        isUsableMesh(state.activeScenarioMeshPack?.meshes?.opening_owner_borders || null)
+        || (!!state.runtimePoliticalTopology?.objects?.political
+          && Object.keys(state.scenarioBaselineOwnersByFeatureId || {}).length > 0)
+      );
     invalidateRenderPasses("borders", reason || "scenario-opening-borders");
     recordRenderPerfMetric("refreshScenarioOpeningOwnerBorders", nowMs() - startedAt, {
-      enabled: selection.shouldBuild,
-      cacheHit: !!selection.shouldBuild && !!cacheMatches,
-      source: selection.meshSource,
-      segmentCount: Array.isArray(state.cachedScenarioOpeningOwnerBorders?.coordinates)
-        ? state.cachedScenarioOpeningOwnerBorders.coordinates.length
-        : 0,
+      enabled,
     });
-    return !!state.cachedScenarioOpeningOwnerBorders;
+    return enabled;
   }
 
   function getFrontlineMesh() {
@@ -536,9 +443,6 @@ export function createBorderMeshOwner({
     scheduleDynamicBorderRecompute,
     replaceDetailAdmBorders,
     reconcileDetailAdmBorders,
-    buildOwnerBorderMesh,
-    buildDynamicOwnerBorderMesh,
-    countUnresolvedOwnerBorderEntities,
     rebuildDynamicBorders,
     refreshScenarioOpeningOwnerBorders,
     getFrontlineOwnershipContext,
