@@ -17,7 +17,11 @@ function normalizeGeometry(geometry, geoArea) {
   for (const rings of getCountryLabelPolygons(geometry)) {
     const normalized = [];
     for (let i = 0; i < rings.length; i++) {
-      const ring = rings[i];
+      // d3 always drops a ring's last vertex. topojson.merge can emit an open
+      // ring for a degenerate sliver; reversing it would then drop a different
+      // vertex and flip the orientation test into a whole-sphere complement.
+      const source = rings[i], first = source[0], last = source[source.length - 1];
+      const ring = source.length && (first[0] !== last[0] || first[1] !== last[1]) ? [...source, first] : source;
       let result = clockwise(ring) === (i === 0) ? ring : [...ring].reverse();
       if (geoArea) {
         // Normalize individual rings: a reversed island or a degenerate hole
@@ -134,7 +138,13 @@ async function normalizeMergedGeometry(geometry, { geoArea, geoContains, geoBoun
     }
     const byExterior = new Map(nodes.filter(node => node.depth % 2 === 0).map(node => [node, [node.ring]]));
     for (const node of nodes) if (node.depth % 2 === 1) byExterior.get(node.parent).push([...node.ring].reverse());
-    coordinates.push(...byExterior.values());
+    // Undissolved neighbor slivers can pass the sampled containment test as
+    // "holes" whose combined area exceeds the exterior; the polygon then
+    // wraps into a whole-sphere complement. Keep only that exterior.
+    for (const polygon of byExterior.values()) {
+      coordinates.push(polygon.length > 1 && geoArea({ type: 'Polygon', coordinates: polygon }) > 2 * Math.PI
+        ? [polygon[0]] : polygon);
+    }
   }
   return { type: 'MultiPolygon', coordinates };
 }
