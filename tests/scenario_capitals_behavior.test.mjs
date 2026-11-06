@@ -130,8 +130,8 @@ for (const scenarioId of ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962", 
       sovereigntyByFeatureId: owners, scenarioBaselineOwnersByFeatureId: owners,
     }));
     setCurrentLanguage(state, "zh");
-    syncScenarioLocalizationState({ cityOverridesPayload: overrides,
-      geoLocalePatchPayload: manifest.geo_locale_patch_url ? read(`../${manifest.geo_locale_patch_url}`) : null });
+    const geoPatch = manifest.geo_locale_patch_url ? read(`../${manifest.geo_locale_patch_url}`) : null;
+    syncScenarioLocalizationState({ cityOverridesPayload: overrides, geoLocalePatchPayload: geoPatch });
     const labels = createCityLabelTextModel(state, { getStrictGeoLabel, getPreferredGeoLabel });
     const owner = createUrbanCityPolicyOwner({ state, caches: { cityLayerCache: {} }, helpers: {
       getCityCanonicalId: (f) => f.properties.__city_id,
@@ -155,7 +155,9 @@ for (const scenarioId of ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962", 
           assert.equal(label, labels.formatCityMapLabel(raw.display_name[language], { entry: { feature: city } }), cityId);
         } else if (!raw.display_name && !raw.name && !raw.name_en && !raw.name_zh && raw.host_feature_id) {
           const stableKey = city.properties.__city_stable_key;
-          assert.equal(label, labels.formatCityMapLabel(baseLocalization.locales.geo[stableKey][language], { entry: { feature: city } }), cityId);
+          // A host-only entry keeps the city's own name; the scenario may rename the city itself.
+          const expected = geoPatch?.geo?.[stableKey]?.[language] ?? baseLocalization.locales.geo[stableKey][language];
+          assert.equal(label, labels.formatCityMapLabel(expected, { entry: { feature: city } }), cityId);
         }
       }
     }

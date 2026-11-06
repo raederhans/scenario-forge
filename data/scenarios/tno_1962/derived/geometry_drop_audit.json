@@ -10038,6 +10038,29 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_55",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_FILL_tyrrhenian_6",
       "final_area": null,
       "missing_stages": [],
@@ -16326,7 +16349,7 @@
       "ATLISL_": 71,
       "ATLPRV_": 90,
       "ATLSEA_": 116,
-      "ATLSEA_FILL_": 370,
+      "ATLSEA_FILL_": 371,
       "RU_ARCTIC_FB_": 61
     },
     "owner_core": {
@@ -16334,13 +16357,13 @@
       "ATLISL_": 71,
       "ATLPRV_": 90,
       "ATLSEA_": 116,
-      "ATLSEA_FILL_": 370
+      "ATLSEA_FILL_": 371
     },
     "runtime_atlantropa": {
       "ATLISL_": 71,
       "ATLPRV_": 90,
       "ATLSEA_": 116,
-      "ATLSEA_FILL_": 370
+      "ATLSEA_FILL_": 371
     },
     "runtime_political": {
       "AQ": 1,
@@ -16352,7 +16375,7 @@
   },
   "summary": {
     "polar_feature_count": 1,
-    "protected_feature_count": 709,
+    "protected_feature_count": 710,
     "protected_prefix_drop_count": 0,
     "runtime_only_shell_count": 61
   },

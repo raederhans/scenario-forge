@@ -3031,12 +3031,12 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "51a3b6e72882d1e1804738fdec04189d4b93619ea8ae2fded14be6464732d661",
+  "snapshot_fingerprint": "4e2aaebcc26091b18ce744af29d489f06c2f563621a1717f4cd22639e5ab841e",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "374c9ad2210b9503dceb51f109d0931089c3255c3a2820d42e77e1356f5f68c9",
-    "runtime_bootstrap_topology_sha256": "a2863d77e286c75740b339b03c60dbd49a1ab4a4428f255b43f95189a842e7ba",
-    "runtime_topology_sha256": "2b7b6c24161bbe21e20d0b16843b07ee1245b89dca4b2467dda62647110c7cf6"
+    "detail_chunk_manifest_sha256": "5433a525c3fabe1581dd1b1baf26cc7b3be76207fb868cfff237b9b53cc91263",
+    "runtime_bootstrap_topology_sha256": "33b995621fa5433a46398c1e3786925d391f057aeda29c472b9ee4bc04eba6aa",
+    "runtime_topology_sha256": "2f15c4b5ac44871b5294f3dff9148963bb531df889808940a2c98fd4ee8a793d"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
@@ -3074,7 +3074,7 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 9957,
+    "feature_count": 9958,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 10432,
     "manual_reviewed_region_count": 0,
@@ -3085,7 +3085,7 @@
       "direct_country_copy": 2702,
       "manual_reviewed": 10432
     },
-    "scenario_atlantropa_feature_count": 726,
+    "scenario_atlantropa_feature_count": 727,
     "scenario_rule_blocker_count": 0,
     "scenario_runtime_topology_object_count": 7,
     "source_counts": {

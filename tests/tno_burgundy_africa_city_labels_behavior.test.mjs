@@ -74,7 +74,7 @@ test('district labels stay separate from cities, and scenario names do not leak 
   assert.equal(label('gn::2593460'), '马西纳');
   assert.equal(label('gn::3351500'), '卡阿拉');
   assert.equal(label('gn::2971041'), '施瓦嫩塔尔');
-  assert.equal(feature('ne::1159149977').properties.host_feature_id, 'CD_ADM1_COD-1872');
+  assert.equal(feature('ne::1159149977').properties.host_feature_id, 'CD_ADM1_COD-1872__tno1962_1');
   state.activeScenarioId = ''; state.scenarioCityOverridesData = null; state.cityLayerRevision++;
   state.currentLanguage = 'en';
   assert.equal(label('ne::1159151131'), 'Huambo');
