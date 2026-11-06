@@ -83,3 +83,12 @@ test("other scenarios retain their original tags", () => {
     assert.equal(imported.scenario.tagMigrationVersion, undefined);
   }
 });
+
+test("shipped TNO releasables offer no tag that project import migrates away", async () => {
+  const { migrateTnoProjectTags } = await import("../js/core/country_code_aliases.js");
+  const { readFile } = await import("node:fs/promises");
+  const catalog = JSON.parse(await readFile(new URL("../data/releasables/tno_1962.internal.phase1.catalog.json", import.meta.url), "utf8"));
+  const retired = catalog.entries.map(entry => entry.tag).filter(tag =>
+    migrateTnoProjectTags({ scenario: { id: "tno_1962" }, activeSovereignCode: tag }).activeSovereignCode !== tag);
+  assert.deepEqual(retired, []);
+});
