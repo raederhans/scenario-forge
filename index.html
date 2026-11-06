@@ -257,70 +257,76 @@
                     </div>
                   </section>
 
-                  <section class="appearance-control-card" aria-labelledby="lblOceanTextureCard">
-                    <h3 id="lblOceanTextureCard" class="appearance-control-card-title" data-i18n="Bathymetry tuning">Bathymetry tuning</h3>
-                    <div class="appearance-control-card-stack">
-                      <div>
-                        <div class="range-row">
-                          <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity" data-i18n="Bathymetry opacity">Bathymetry opacity</label>
-                          <span id="oceanTextureOpacityValue" class="range-value">90%</span>
+                  <details class="appearance-mini-section">
+                    <summary class="section-header" data-i18n="Bathymetry details">Bathymetry details</summary>
+                    <section class="appearance-control-card" aria-labelledby="lblOceanTextureCard">
+                      <h3 id="lblOceanTextureCard" class="appearance-control-card-title" data-i18n="Bathymetry tuning">Bathymetry tuning</h3>
+                      <div class="appearance-control-card-stack">
+                        <div>
+                          <div class="range-row">
+                            <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity" data-i18n="Bathymetry opacity">Bathymetry opacity</label>
+                            <span id="oceanTextureOpacityValue" class="range-value">90%</span>
+                          </div>
+                          <input id="oceanTextureOpacity" type="range" min="0" max="100" value="90" class="range-input" />
                         </div>
-                        <input id="oceanTextureOpacity" type="range" min="0" max="100" value="90" class="range-input" />
-                      </div>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblOceanScale" class="range-label" for="oceanTextureScale" data-i18n="Depth contrast">Depth contrast</label>
-                          <span id="oceanTextureScaleValue" class="range-value">1.25x</span>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblOceanScale" class="range-label" for="oceanTextureScale" data-i18n="Depth contrast">Depth contrast</label>
+                            <span id="oceanTextureScaleValue" class="range-value">1.25x</span>
+                          </div>
+                          <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="125" class="range-input" />
                         </div>
-                        <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="125" class="range-input" />
-                      </div>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength" data-i18n="Bathymetry contour strength">Bathymetry contour strength</label>
-                          <span id="oceanContourStrengthValue" class="range-value">0%</span>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength" data-i18n="Bathymetry contour strength">Bathymetry contour strength</label>
+                            <span id="oceanContourStrengthValue" class="range-value">0%</span>
+                          </div>
+                          <input id="oceanContourStrength" type="range" min="0" max="100" value="0" class="range-input" />
                         </div>
-                        <input id="oceanContourStrength" type="range" min="0" max="100" value="0" class="range-input" />
                       </div>
-                    </div>
-                  </section>
+                    </section>
+                  </details>
 
-                  <section class="appearance-control-card" aria-labelledby="lblOceanDepthFieldCard">
-                    <h3 id="lblOceanDepthFieldCard" class="appearance-control-card-title" data-i18n="Depth Field">Depth Field</h3>
-                    <div class="appearance-control-card-stack">
-                      <label class="toggle-label">
-                        <input id="oceanDepthFieldEnabled" type="checkbox" class="checkbox-input" />
-                        <span id="lblOceanDepthFieldEnabled" data-i18n="Enable Channel">Enable Channel</span>
-                      </label>
-                      <div class="flex items-center justify-between gap-2">
-                        <button id="oceanDepthFieldToolToggleBtn" type="button" class="sidebar-action-secondary" data-i18n="Enter Tool">Enter Tool</button>
-                        <button id="oceanDepthFieldPaintBtn" type="button" class="sidebar-action-secondary" data-i18n="Paint">Paint</button>
-                        <button id="oceanDepthFieldEraseBtn" type="button" class="sidebar-action-secondary" data-i18n="Erase">Erase</button>
-                        <button id="oceanDepthFieldPointsBtn" type="button" class="sidebar-action-secondary" data-i18n="Points">Points</button>
-                      </div>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblOceanDepthFieldWeight" class="range-label" for="oceanDepthFieldWeight" data-i18n="Strength">Strength</label>
-                          <span id="oceanDepthFieldWeightValue" class="range-value">100%</span>
+                  <details class="appearance-mini-section">
+                    <summary class="section-header" data-i18n="Local adjustment: depth field">Local adjustment: depth field</summary>
+                    <section class="appearance-control-card" aria-labelledby="lblOceanDepthFieldCard">
+                      <h3 id="lblOceanDepthFieldCard" class="appearance-control-card-title" data-i18n="Depth Field">Depth Field</h3>
+                      <div class="appearance-control-card-stack">
+                        <label class="toggle-label">
+                          <input id="oceanDepthFieldEnabled" type="checkbox" class="checkbox-input" />
+                          <span id="lblOceanDepthFieldEnabled" data-i18n="Enable Channel">Enable Channel</span>
+                        </label>
+                        <div class="flex items-center justify-between gap-2">
+                          <button id="oceanDepthFieldToolToggleBtn" type="button" class="sidebar-action-secondary" data-i18n="Enter Tool">Enter Tool</button>
+                          <button id="oceanDepthFieldPaintBtn" type="button" class="sidebar-action-secondary" data-i18n="Paint">Paint</button>
+                          <button id="oceanDepthFieldEraseBtn" type="button" class="sidebar-action-secondary" data-i18n="Erase">Erase</button>
+                          <button id="oceanDepthFieldPointsBtn" type="button" class="sidebar-action-secondary" data-i18n="Points">Points</button>
                         </div>
-                        <input id="oceanDepthFieldWeight" type="range" min="0" max="200" value="100" class="range-input" />
-                      </div>
-                      <div>
-                        <div class="range-row">
-                          <label id="lblOceanDepthFieldRadius" class="range-label" for="oceanDepthFieldRadius" data-i18n="Radius">Radius</label>
-                          <span id="oceanDepthFieldRadiusValue" class="range-value">≈ 333 km</span>
+                        <div>
+                          <div class="range-row">
+                            <label id="lblOceanDepthFieldWeight" class="range-label" for="oceanDepthFieldWeight" data-i18n="Strength">Strength</label>
+                            <span id="oceanDepthFieldWeightValue" class="range-value">100%</span>
+                          </div>
+                          <input id="oceanDepthFieldWeight" type="range" min="0" max="200" value="100" class="range-input" />
                         </div>
-                        <input id="oceanDepthFieldRadius" type="range" min="25" max="3000" step="25" value="300" class="range-input" />
+                        <div>
+                          <div class="range-row">
+                            <label id="lblOceanDepthFieldRadius" class="range-label" for="oceanDepthFieldRadius" data-i18n="Radius">Radius</label>
+                            <span id="oceanDepthFieldRadiusValue" class="range-value">≈ 333 km</span>
+                          </div>
+                          <input id="oceanDepthFieldRadius" type="range" min="25" max="3000" step="25" value="300" class="range-input" />
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                          <button id="oceanDepthFieldClearBtn" type="button" class="sidebar-action-secondary" data-i18n="Clear Channel">Clear Channel</button>
+                        </div>
+                        <div class="range-row">
+                          <span id="lblOceanDepthFieldPointCount" class="range-label" data-i18n="Points">Points</span>
+                          <span id="oceanDepthFieldPointCount" class="range-value">0</span>
+                        </div>
+                        <div id="oceanDepthFieldPointList" class="space-y-2"></div>
                       </div>
-                      <div class="flex items-center justify-between gap-2">
-                        <button id="oceanDepthFieldClearBtn" type="button" class="sidebar-action-secondary" data-i18n="Clear Channel">Clear Channel</button>
-                      </div>
-                      <div class="range-row">
-                        <span id="lblOceanDepthFieldPointCount" class="range-label" data-i18n="Points">Points</span>
-                        <span id="oceanDepthFieldPointCount" class="range-value">0</span>
-                      </div>
-                      <div id="oceanDepthFieldPointList" class="space-y-2"></div>
-                    </div>
-                  </section>
+                    </section>
+                  </details>
                   <details id="oceanBathymetryDebugDetails" class="appearance-mini-section dev-only">
                     <summary id="lblOceanBathymetryDebug" class="section-header" data-i18n="Bathymetry Debug">Bathymetry Debug</summary>
                     <div class="space-y-3 mt-3">
@@ -805,56 +811,62 @@
                             </div>
                             <input id="urbanAdaptiveStrength" type="range" min="0" max="100" value="30" class="range-input" />
                           </div>
-                          <div>
-                            <div class="range-row">
-                              <label class="range-label" for="urbanStrokeOpacity" data-i18n="Stroke Opacity">Stroke Opacity</label>
-                              <span id="urbanStrokeOpacityValue" class="range-value">25%</span>
-                            </div>
-                            <input id="urbanStrokeOpacity" type="range" min="0" max="100" value="25" class="range-input" />
-                          </div>
-                          <div>
-                            <div class="range-row">
-                              <label class="range-label" for="urbanToneBias" data-i18n="Tone Bias">Tone Bias</label>
-                              <span id="urbanToneBiasValue" class="range-value">+12%</span>
-                            </div>
-                            <input id="urbanToneBias" type="range" min="-30" max="30" value="12" class="range-input" />
-                          </div>
-                          <div class="urban-adaptive-tint-group">
+                          <details class="appearance-mini-section">
+                            <summary class="section-header" data-i18n="Advanced">Advanced</summary>
                             <div>
-                              <label class="range-label" for="urbanAdaptiveTintEnabled" data-i18n="Adaptive Tint">Adaptive Tint</label>
-                              <label class="toggle-switch mt-2">
-                                <input id="urbanAdaptiveTintEnabled" type="checkbox" />
-                                <span class="toggle-slider"></span>
-                              </label>
-                            </div>
-                            <div class="flex items-center justify-between gap-3">
-                              <label class="range-label" for="urbanAdaptiveTintColor" data-i18n="Tint Color">Tint Color</label>
-                              <input id="urbanAdaptiveTintColor" type="color" value="#f2dea1" class="color-input" />
+                              <div class="range-row">
+                                <label class="range-label" for="urbanStrokeOpacity" data-i18n="Stroke Opacity">Stroke Opacity</label>
+                                <span id="urbanStrokeOpacityValue" class="range-value">25%</span>
+                              </div>
+                              <input id="urbanStrokeOpacity" type="range" min="0" max="100" value="25" class="range-input" />
                             </div>
                             <div>
                               <div class="range-row">
-                                <label class="range-label" for="urbanAdaptiveTintStrength" data-i18n="Tint Strength">Tint Strength</label>
-                                <span id="urbanAdaptiveTintStrengthValue" class="range-value">0%</span>
+                                <label class="range-label" for="urbanToneBias" data-i18n="Tone Bias">Tone Bias</label>
+                                <span id="urbanToneBiasValue" class="range-value">+12%</span>
                               </div>
-                              <input id="urbanAdaptiveTintStrength" type="range" min="0" max="50" value="0" class="range-input" />
+                              <input id="urbanToneBias" type="range" min="-30" max="30" value="12" class="range-input" />
                             </div>
-                          </div>
+                            <div class="urban-adaptive-tint-group">
+                              <div>
+                                <label class="range-label" for="urbanAdaptiveTintEnabled" data-i18n="Adaptive Tint">Adaptive Tint</label>
+                                <label class="toggle-switch mt-2">
+                                  <input id="urbanAdaptiveTintEnabled" type="checkbox" />
+                                  <span class="toggle-slider"></span>
+                                </label>
+                              </div>
+                              <div class="flex items-center justify-between gap-3">
+                                <label class="range-label" for="urbanAdaptiveTintColor" data-i18n="Tint Color">Tint Color</label>
+                                <input id="urbanAdaptiveTintColor" type="color" value="#f2dea1" class="color-input" />
+                              </div>
+                              <div>
+                                <div class="range-row">
+                                  <label class="range-label" for="urbanAdaptiveTintStrength" data-i18n="Tint Strength">Tint Strength</label>
+                                  <span id="urbanAdaptiveTintStrengthValue" class="range-value">0%</span>
+                                </div>
+                                <input id="urbanAdaptiveTintStrength" type="range" min="0" max="50" value="0" class="range-input" />
+                              </div>
+                            </div>
+                          </details>
                         </div>
                         <div id="urbanManualControls" class="space-y-2 hidden">
                           <div class="flex items-center justify-between gap-3">
                             <label id="lblUrbanColor" class="range-label" for="urbanColor" data-i18n="Color">Color</label>
                             <input id="urbanColor" type="color" value="#4b5563" class="color-input" />
                           </div>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblUrbanBlendMode" class="range-label" for="urbanBlendMode" data-i18n="Blend Mode">Blend Mode</label>
+                          <details class="appearance-mini-section">
+                            <summary class="section-header" data-i18n="Advanced">Advanced</summary>
+                            <div>
+                              <div class="range-row">
+                                <label id="lblUrbanBlendMode" class="range-label" for="urbanBlendMode" data-i18n="Blend Mode">Blend Mode</label>
+                              </div>
+                              <select id="urbanBlendMode" class="select-input mt-2">
+                                <option id="optUrbanBlendMultiply" value="multiply" selected data-i18n="Multiply">Multiply</option>
+                                <option id="optUrbanBlendNormal" value="source-over" data-i18n="Normal">Normal</option>
+                                <option id="optUrbanBlendOverlay" value="overlay" data-i18n="Overlay">Overlay</option>
+                              </select>
                             </div>
-                            <select id="urbanBlendMode" class="select-input mt-2">
-                              <option id="optUrbanBlendMultiply" value="multiply" selected data-i18n="Multiply">Multiply</option>
-                              <option id="optUrbanBlendNormal" value="source-over" data-i18n="Normal">Normal</option>
-                              <option id="optUrbanBlendOverlay" value="overlay" data-i18n="Overlay">Overlay</option>
-                            </select>
-                          </div>
+                          </details>
                         </div>
                         <div>
                           <div class="range-row">
@@ -870,43 +882,46 @@
                           </div>
                           <input id="urbanMinArea" type="range" min="1" max="80" value="1" class="range-input" />
                         </div>
-                        <div class="appearance-prop-group">
-                          <h3 id="lblUrbanIntensityFieldPanel" class="appearance-prop-heading" data-i18n="Glow Field">Glow Field</h3>
-                          <div class="space-y-2 mt-2">
-                            <label class="toggle-label">
-                              <input id="urbanIntensityFieldEnabled" type="checkbox" class="checkbox-input" />
-                              <span id="lblUrbanIntensityFieldEnabled" data-i18n="Enable Glow Field">Enable Glow Field</span>
-                            </label>
-                            <div class="flex items-center justify-between gap-2">
-                              <button id="urbanIntensityFieldToolToggleBtn" type="button" class="sidebar-action-secondary" data-i18n="Enter Tool">Enter Tool</button>
-                              <button id="urbanIntensityFieldPaintBtn" type="button" class="sidebar-action-secondary" data-i18n="Paint">Paint</button>
-                              <button id="urbanIntensityFieldEraseBtn" type="button" class="sidebar-action-secondary" data-i18n="Erase">Erase</button>
-                              <button id="urbanIntensityFieldPointsBtn" type="button" class="sidebar-action-secondary" data-i18n="Points">Points</button>
-                            </div>
-                            <div>
-                              <div class="range-row">
-                                <label id="lblUrbanIntensityFieldWeight" class="range-label" for="urbanIntensityFieldWeight" data-i18n="Strength">Strength</label>
-                                <span id="urbanIntensityFieldWeightValue" class="range-value">100%</span>
+                        <details class="appearance-mini-section">
+                          <summary class="section-header" data-i18n="Local adjustment: glow field">Local adjustment: glow field</summary>
+                          <div class="appearance-prop-group">
+                            <h3 id="lblUrbanIntensityFieldPanel" class="appearance-prop-heading" data-i18n="Glow Field">Glow Field</h3>
+                            <div class="space-y-2 mt-2">
+                              <label class="toggle-label">
+                                <input id="urbanIntensityFieldEnabled" type="checkbox" class="checkbox-input" />
+                                <span id="lblUrbanIntensityFieldEnabled" data-i18n="Enable Glow Field">Enable Glow Field</span>
+                              </label>
+                              <div class="flex items-center justify-between gap-2">
+                                <button id="urbanIntensityFieldToolToggleBtn" type="button" class="sidebar-action-secondary" data-i18n="Enter Tool">Enter Tool</button>
+                                <button id="urbanIntensityFieldPaintBtn" type="button" class="sidebar-action-secondary" data-i18n="Paint">Paint</button>
+                                <button id="urbanIntensityFieldEraseBtn" type="button" class="sidebar-action-secondary" data-i18n="Erase">Erase</button>
+                                <button id="urbanIntensityFieldPointsBtn" type="button" class="sidebar-action-secondary" data-i18n="Points">Points</button>
                               </div>
-                              <input id="urbanIntensityFieldWeight" type="range" min="0" max="200" value="100" class="range-input" />
-                            </div>
-                            <div>
-                              <div class="range-row">
-                                <label id="lblUrbanIntensityFieldRadius" class="range-label" for="urbanIntensityFieldRadius" data-i18n="Radius">Radius</label>
-                                <span id="urbanIntensityFieldRadiusValue" class="range-value">≈ 333 km</span>
+                              <div>
+                                <div class="range-row">
+                                  <label id="lblUrbanIntensityFieldWeight" class="range-label" for="urbanIntensityFieldWeight" data-i18n="Strength">Strength</label>
+                                  <span id="urbanIntensityFieldWeightValue" class="range-value">100%</span>
+                                </div>
+                                <input id="urbanIntensityFieldWeight" type="range" min="0" max="200" value="100" class="range-input" />
                               </div>
-                              <input id="urbanIntensityFieldRadius" type="range" min="25" max="3000" step="25" value="300" class="range-input" />
+                              <div>
+                                <div class="range-row">
+                                  <label id="lblUrbanIntensityFieldRadius" class="range-label" for="urbanIntensityFieldRadius" data-i18n="Radius">Radius</label>
+                                  <span id="urbanIntensityFieldRadiusValue" class="range-value">≈ 333 km</span>
+                                </div>
+                                <input id="urbanIntensityFieldRadius" type="range" min="25" max="3000" step="25" value="300" class="range-input" />
+                              </div>
+                              <div class="flex items-center justify-between gap-2">
+                                <button id="urbanIntensityFieldClearBtn" type="button" class="sidebar-action-secondary" data-i18n="Clear Channel">Clear Channel</button>
+                              </div>
+                              <div class="range-row">
+                                <span id="lblUrbanIntensityFieldPointCount" class="range-label" data-i18n="Points">Points</span>
+                                <span id="urbanIntensityFieldPointCount" class="range-value">0</span>
+                              </div>
+                              <div id="urbanIntensityFieldPointList" class="space-y-2"></div>
                             </div>
-                            <div class="flex items-center justify-between gap-2">
-                              <button id="urbanIntensityFieldClearBtn" type="button" class="sidebar-action-secondary" data-i18n="Clear Channel">Clear Channel</button>
-                            </div>
-                            <div class="range-row">
-                              <span id="lblUrbanIntensityFieldPointCount" class="range-label" data-i18n="Points">Points</span>
-                              <span id="urbanIntensityFieldPointCount" class="range-value">0</span>
-                            </div>
-                            <div id="urbanIntensityFieldPointList" class="space-y-2"></div>
                           </div>
-                        </div>
+                        </details>
                       </div>
                     </div>
                   </details>
@@ -1626,24 +1641,6 @@
                             <input id="toggleAirports" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportAirportToggle" data-i18n="Show Airports">Show Airports</span>
                           </label>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblAirportVisualStrength" class="range-label" for="airportVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
-                              <span id="airportVisualStrengthValue" class="range-value">62%</span>
-                            </div>
-                            <input id="airportVisualStrength" type="range" min="0" max="100" value="62" class="range-input" />
-                          </div>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblAirportOpacity" class="range-label" for="airportOpacity" data-i18n="Opacity">Opacity</label>
-                              <span id="airportOpacityValue" class="range-value">82%</span>
-                            </div>
-                            <input id="airportOpacity" type="range" min="20" max="100" value="82" class="range-input" />
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblAirportPrimaryColor" class="range-label" for="airportPrimaryColor" data-i18n="Primary Color">Primary Color</label>
-                            <input id="airportPrimaryColor" type="color" value="#1d4ed8" class="color-input" />
-                          </div>
                         </section>
 
                         <section class="space-y-3">
@@ -1652,77 +1649,104 @@
                             <input id="airportLabelsEnabled" type="checkbox" class="checkbox-input" checked />
                             <span id="lblAirportLabelsEnabled" data-i18n="Show Airport Labels">Show Airport Labels</span>
                           </label>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblAirportLabelDensity" class="range-label" for="airportLabelDensity" data-i18n="Label Density">Label Density</label>
-                            <select id="airportLabelDensity" class="select-input">
-                              <option value="sparse" data-i18n="Sparse">Sparse</option>
-                              <option value="balanced" selected data-i18n="Balanced">Balanced</option>
-                              <option value="dense" data-i18n="Dense">Dense</option>
-                            </select>
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblAirportLabelMode" class="range-label" for="airportLabelMode" data-i18n="Label Mode">Label Mode</label>
-                            <select id="airportLabelMode" class="select-input">
-                              <option value="adaptive" selected data-i18n="Adaptive">Adaptive</option>
-                              <option value="both" data-i18n="Name + Code">Name + Code</option>
-                              <option value="name" data-i18n="Name Only">Name Only</option>
-                              <option value="code" data-i18n="Code Only">Code Only</option>
-                            </select>
-                          </div>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblAirportLabelSize" class="range-label" for="airportLabelSize" data-i18n="Label Size">Label Size</label>
-                              <span id="airportLabelSizeValue" class="range-value">9px</span>
-                            </div>
-                            <input id="airportLabelSize" type="range" min="7" max="16" value="9" class="range-input" />
-                          </div>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblAirportLabelHalo" class="range-label" for="airportLabelHalo" data-i18n="Label Halo">Label Halo</label>
-                              <span id="airportLabelHaloValue" class="range-value">22%</span>
-                            </div>
-                            <input id="airportLabelHalo" type="range" min="0" max="100" value="22" class="range-input" />
-                          </div>
                         </section>
 
-                        <section class="space-y-3">
-                          <h3 id="lblTransportAirportScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblAirportCoverageReach" class="range-label" for="airportCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
-                              <span id="airportCoverageReachValue" class="range-value">50%</span>
+                        <details class="appearance-mini-section">
+                          <summary class="section-header" data-i18n="More options">More options</summary>
+                          <div class="space-y-3">
+                            <div>
+                              <div class="range-row">
+                                <label id="lblAirportVisualStrength" class="range-label" for="airportVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
+                                <span id="airportVisualStrengthValue" class="range-value">62%</span>
+                              </div>
+                              <input id="airportVisualStrength" type="range" min="0" max="100" value="62" class="range-input" />
                             </div>
-                            <input id="airportCoverageReach" type="range" min="0" max="100" value="50" class="range-input" />
+                            <div>
+                              <div class="range-row">
+                                <label id="lblAirportOpacity" class="range-label" for="airportOpacity" data-i18n="Opacity">Opacity</label>
+                                <span id="airportOpacityValue" class="range-value">82%</span>
+                              </div>
+                              <input id="airportOpacity" type="range" min="20" max="100" value="82" class="range-input" />
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblAirportPrimaryColor" class="range-label" for="airportPrimaryColor" data-i18n="Primary Color">Primary Color</label>
+                              <input id="airportPrimaryColor" type="color" value="#1d4ed8" class="color-input" />
+                            </div>
                           </div>
-                          <label class="toggle-label">
-                            <input id="airportScopeLinked" type="checkbox" class="checkbox-input" checked />
-                            <span id="lblAirportScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
-                          </label>
-                          <div class="transport-readout-row">
-                            <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                            <span id="airportScopeResolved" class="transport-readout-value">Major Civil</span>
+
+                          <div class="space-y-3">
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblAirportLabelDensity" class="range-label" for="airportLabelDensity" data-i18n="Label Density">Label Density</label>
+                              <select id="airportLabelDensity" class="select-input">
+                                <option value="sparse" data-i18n="Sparse">Sparse</option>
+                                <option value="balanced" selected data-i18n="Balanced">Balanced</option>
+                                <option value="dense" data-i18n="Dense">Dense</option>
+                              </select>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblAirportLabelMode" class="range-label" for="airportLabelMode" data-i18n="Label Mode">Label Mode</label>
+                              <select id="airportLabelMode" class="select-input">
+                                <option value="adaptive" selected data-i18n="Adaptive">Adaptive</option>
+                                <option value="both" data-i18n="Name + Code">Name + Code</option>
+                                <option value="name" data-i18n="Name Only">Name Only</option>
+                                <option value="code" data-i18n="Code Only">Code Only</option>
+                              </select>
+                            </div>
+                            <div>
+                              <div class="range-row">
+                                <label id="lblAirportLabelSize" class="range-label" for="airportLabelSize" data-i18n="Label Size">Label Size</label>
+                                <span id="airportLabelSizeValue" class="range-value">9px</span>
+                              </div>
+                              <input id="airportLabelSize" type="range" min="7" max="16" value="9" class="range-input" />
+                            </div>
+                            <div>
+                              <div class="range-row">
+                                <label id="lblAirportLabelHalo" class="range-label" for="airportLabelHalo" data-i18n="Label Halo">Label Halo</label>
+                                <span id="airportLabelHaloValue" class="range-value">22%</span>
+                              </div>
+                              <input id="airportLabelHalo" type="range" min="0" max="100" value="22" class="range-input" />
+                            </div>
                           </div>
-                          <div class="transport-readout-row">
-                            <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                            <span id="airportThresholdResolved" class="transport-readout-value">Secondary</span>
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblAirportScope" class="range-label" for="airportScope" data-i18n="Manual Scope">Manual Scope</label>
-                            <select id="airportScope" class="select-input">
-                              <option value="international" data-i18n="International">International</option>
-                              <option value="major_civil" selected data-i18n="Major Civil">Major Civil</option>
-                              <option value="all_civil" data-i18n="All Civil">All Civil</option>
-                            </select>
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblAirportImportanceThreshold" class="range-label" for="airportImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
-                            <select id="airportImportanceThreshold" class="select-input">
-                              <option value="primary" data-i18n="Primary">Primary</option>
-                              <option value="secondary" selected data-i18n="Secondary">Secondary</option>
-                              <option value="all" data-i18n="All">All</option>
-                            </select>
-                          </div>
-                        </section>
+
+                          <section class="space-y-3">
+                            <h3 id="lblTransportAirportScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
+                            <div>
+                              <div class="range-row">
+                                <label id="lblAirportCoverageReach" class="range-label" for="airportCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                                <span id="airportCoverageReachValue" class="range-value">50%</span>
+                              </div>
+                              <input id="airportCoverageReach" type="range" min="0" max="100" value="50" class="range-input" />
+                            </div>
+                            <label class="toggle-label">
+                              <input id="airportScopeLinked" type="checkbox" class="checkbox-input" checked />
+                              <span id="lblAirportScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
+                            </label>
+                            <div class="transport-readout-row">
+                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
+                              <span id="airportScopeResolved" class="transport-readout-value">Major Civil</span>
+                            </div>
+                            <div class="transport-readout-row">
+                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
+                              <span id="airportThresholdResolved" class="transport-readout-value">Secondary</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblAirportScope" class="range-label" for="airportScope" data-i18n="Manual Scope">Manual Scope</label>
+                              <select id="airportScope" class="select-input">
+                                <option value="international" data-i18n="International">International</option>
+                                <option value="major_civil" selected data-i18n="Major Civil">Major Civil</option>
+                                <option value="all_civil" data-i18n="All Civil">All Civil</option>
+                              </select>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblAirportImportanceThreshold" class="range-label" for="airportImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
+                              <select id="airportImportanceThreshold" class="select-input">
+                                <option value="primary" data-i18n="Primary">Primary</option>
+                                <option value="secondary" selected data-i18n="Secondary">Secondary</option>
+                                <option value="all" data-i18n="All">All</option>
+                              </select>
+                            </div>
+                          </section>
+                        </details>
                       </div>
                     </details>
 
@@ -1740,24 +1764,6 @@
                             <input id="togglePorts" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportPortToggle" data-i18n="Show Ports">Show Ports</span>
                           </label>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblPortVisualStrength" class="range-label" for="portVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
-                              <span id="portVisualStrengthValue" class="range-value">58%</span>
-                            </div>
-                            <input id="portVisualStrength" type="range" min="0" max="100" value="58" class="range-input" />
-                          </div>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblPortOpacity" class="range-label" for="portOpacity" data-i18n="Opacity">Opacity</label>
-                              <span id="portOpacityValue" class="range-value">78%</span>
-                            </div>
-                            <input id="portOpacity" type="range" min="20" max="100" value="78" class="range-input" />
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblPortPrimaryColor" class="range-label" for="portPrimaryColor" data-i18n="Primary Color">Primary Color</label>
-                            <input id="portPrimaryColor" type="color" value="#b45309" class="color-input" />
-                          </div>
                         </section>
 
                         <section class="space-y-3">
@@ -1766,77 +1772,104 @@
                             <input id="portLabelsEnabled" type="checkbox" class="checkbox-input" checked />
                             <span id="lblPortLabelsEnabled" data-i18n="Show Port Labels">Show Port Labels</span>
                           </label>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblPortLabelDensity" class="range-label" for="portLabelDensity" data-i18n="Label Density">Label Density</label>
-                            <select id="portLabelDensity" class="select-input">
-                              <option value="sparse" data-i18n="Sparse">Sparse</option>
-                              <option value="balanced" selected data-i18n="Balanced">Balanced</option>
-                              <option value="dense" data-i18n="Dense">Dense</option>
-                            </select>
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblPortLabelMode" class="range-label" for="portLabelMode" data-i18n="Label Mode">Label Mode</label>
-                            <select id="portLabelMode" class="select-input">
-                              <option value="adaptive" selected data-i18n="Adaptive">Adaptive</option>
-                              <option value="mixed" data-i18n="Mixed">Mixed</option>
-                              <option value="name" data-i18n="Name Only">Name Only</option>
-                              <option value="cargo_focus" data-i18n="Cargo Focus">Cargo Focus</option>
-                            </select>
-                          </div>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblPortLabelSize" class="range-label" for="portLabelSize" data-i18n="Label Size">Label Size</label>
-                              <span id="portLabelSizeValue" class="range-value">9px</span>
-                            </div>
-                            <input id="portLabelSize" type="range" min="7" max="16" value="9" class="range-input" />
-                          </div>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblPortLabelHalo" class="range-label" for="portLabelHalo" data-i18n="Label Halo">Label Halo</label>
-                              <span id="portLabelHaloValue" class="range-value">22%</span>
-                            </div>
-                            <input id="portLabelHalo" type="range" min="0" max="100" value="22" class="range-input" />
-                          </div>
                         </section>
 
-                        <section class="space-y-3">
-                          <h3 id="lblTransportPortScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblPortCoverageReach" class="range-label" for="portCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
-                              <span id="portCoverageReachValue" class="range-value">50%</span>
+                        <details class="appearance-mini-section">
+                          <summary class="section-header" data-i18n="More options">More options</summary>
+                          <div class="space-y-3">
+                            <div>
+                              <div class="range-row">
+                                <label id="lblPortVisualStrength" class="range-label" for="portVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
+                                <span id="portVisualStrengthValue" class="range-value">58%</span>
+                              </div>
+                              <input id="portVisualStrength" type="range" min="0" max="100" value="58" class="range-input" />
                             </div>
-                            <input id="portCoverageReach" type="range" min="0" max="100" value="50" class="range-input" />
+                            <div>
+                              <div class="range-row">
+                                <label id="lblPortOpacity" class="range-label" for="portOpacity" data-i18n="Opacity">Opacity</label>
+                                <span id="portOpacityValue" class="range-value">78%</span>
+                              </div>
+                              <input id="portOpacity" type="range" min="20" max="100" value="78" class="range-input" />
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblPortPrimaryColor" class="range-label" for="portPrimaryColor" data-i18n="Primary Color">Primary Color</label>
+                              <input id="portPrimaryColor" type="color" value="#b45309" class="color-input" />
+                            </div>
                           </div>
-                          <label class="toggle-label">
-                            <input id="portScopeLinked" type="checkbox" class="checkbox-input" checked />
-                            <span id="lblPortScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
-                          </label>
-                          <div class="transport-readout-row">
-                            <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                            <span id="portScopeResolved" class="transport-readout-value">Regional</span>
+
+                          <div class="space-y-3">
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblPortLabelDensity" class="range-label" for="portLabelDensity" data-i18n="Label Density">Label Density</label>
+                              <select id="portLabelDensity" class="select-input">
+                                <option value="sparse" data-i18n="Sparse">Sparse</option>
+                                <option value="balanced" selected data-i18n="Balanced">Balanced</option>
+                                <option value="dense" data-i18n="Dense">Dense</option>
+                              </select>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblPortLabelMode" class="range-label" for="portLabelMode" data-i18n="Label Mode">Label Mode</label>
+                              <select id="portLabelMode" class="select-input">
+                                <option value="adaptive" selected data-i18n="Adaptive">Adaptive</option>
+                                <option value="mixed" data-i18n="Mixed">Mixed</option>
+                                <option value="name" data-i18n="Name Only">Name Only</option>
+                                <option value="cargo_focus" data-i18n="Cargo Focus">Cargo Focus</option>
+                              </select>
+                            </div>
+                            <div>
+                              <div class="range-row">
+                                <label id="lblPortLabelSize" class="range-label" for="portLabelSize" data-i18n="Label Size">Label Size</label>
+                                <span id="portLabelSizeValue" class="range-value">9px</span>
+                              </div>
+                              <input id="portLabelSize" type="range" min="7" max="16" value="9" class="range-input" />
+                            </div>
+                            <div>
+                              <div class="range-row">
+                                <label id="lblPortLabelHalo" class="range-label" for="portLabelHalo" data-i18n="Label Halo">Label Halo</label>
+                                <span id="portLabelHaloValue" class="range-value">22%</span>
+                              </div>
+                              <input id="portLabelHalo" type="range" min="0" max="100" value="22" class="range-input" />
+                            </div>
                           </div>
-                          <div class="transport-readout-row">
-                            <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                            <span id="portThresholdResolved" class="transport-readout-value">Secondary</span>
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblPortTier" class="range-label" for="portTier" data-i18n="Manual Scope">Manual Scope</label>
-                            <select id="portTier" class="select-input">
-                              <option value="core" data-i18n="Core">Core</option>
-                              <option value="regional" selected data-i18n="Regional">Regional</option>
-                              <option value="expanded" data-i18n="Expanded">Expanded</option>
-                            </select>
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblPortImportanceThreshold" class="range-label" for="portImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
-                            <select id="portImportanceThreshold" class="select-input">
-                              <option value="primary" data-i18n="Primary">Primary</option>
-                              <option value="secondary" selected data-i18n="Secondary">Secondary</option>
-                              <option value="all" data-i18n="All">All</option>
-                            </select>
-                          </div>
-                        </section>
+
+                          <section class="space-y-3">
+                            <h3 id="lblTransportPortScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
+                            <div>
+                              <div class="range-row">
+                                <label id="lblPortCoverageReach" class="range-label" for="portCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                                <span id="portCoverageReachValue" class="range-value">50%</span>
+                              </div>
+                              <input id="portCoverageReach" type="range" min="0" max="100" value="50" class="range-input" />
+                            </div>
+                            <label class="toggle-label">
+                              <input id="portScopeLinked" type="checkbox" class="checkbox-input" checked />
+                              <span id="lblPortScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
+                            </label>
+                            <div class="transport-readout-row">
+                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
+                              <span id="portScopeResolved" class="transport-readout-value">Regional</span>
+                            </div>
+                            <div class="transport-readout-row">
+                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
+                              <span id="portThresholdResolved" class="transport-readout-value">Secondary</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblPortTier" class="range-label" for="portTier" data-i18n="Manual Scope">Manual Scope</label>
+                              <select id="portTier" class="select-input">
+                                <option value="core" data-i18n="Core">Core</option>
+                                <option value="regional" selected data-i18n="Regional">Regional</option>
+                                <option value="expanded" data-i18n="Expanded">Expanded</option>
+                              </select>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblPortImportanceThreshold" class="range-label" for="portImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
+                              <select id="portImportanceThreshold" class="select-input">
+                                <option value="primary" data-i18n="Primary">Primary</option>
+                                <option value="secondary" selected data-i18n="Secondary">Secondary</option>
+                                <option value="all" data-i18n="All">All</option>
+                              </select>
+                            </div>
+                          </section>
+                        </details>
                       </div>
                     </details>
 
@@ -1854,24 +1887,6 @@
                             <input id="toggleRail" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportRailToggle" data-i18n="Show Rail">Show Rail</span>
                           </label>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblRailVisualStrength" class="range-label" for="railVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
-                              <span id="railVisualStrengthValue" class="range-value">50%</span>
-                            </div>
-                            <input id="railVisualStrength" type="range" min="0" max="100" value="50" class="range-input" />
-                          </div>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblRailOpacity" class="range-label" for="railOpacity" data-i18n="Opacity">Opacity</label>
-                              <span id="railOpacityValue" class="range-value">72%</span>
-                            </div>
-                            <input id="railOpacity" type="range" min="20" max="100" value="72" class="range-input" />
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblRailPrimaryColor" class="range-label" for="railPrimaryColor" data-i18n="Primary Color">Primary Color</label>
-                            <input id="railPrimaryColor" type="color" value="#0f172a" class="color-input" />
-                          </div>
                         </section>
 
                         <section class="space-y-3">
@@ -1880,54 +1895,81 @@
                             <input id="railLabelsEnabled" type="checkbox" class="checkbox-input" />
                             <span id="lblRailLabelsEnabled" data-i18n="Show Rail Labels">Show Rail Labels</span>
                           </label>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblRailLabelDensity" class="range-label" for="railLabelDensity" data-i18n="Label Density">Label Density</label>
-                            <select id="railLabelDensity" class="select-input">
-                              <option value="sparse" selected data-i18n="Sparse">Sparse</option>
-                              <option value="balanced" data-i18n="Balanced">Balanced</option>
-                              <option value="dense" data-i18n="Dense">Dense</option>
-                            </select>
-                          </div>
-                          <p class="panel-hint" data-i18n="Rail labels currently use line names only.">Rail labels currently use line names only.</p>
                         </section>
 
-                        <section class="space-y-3">
-                          <h3 id="lblTransportRailScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblRailCoverageReach" class="range-label" for="railCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
-                              <span id="railCoverageReachValue" class="range-value">20%</span>
+                        <details class="appearance-mini-section">
+                          <summary class="section-header" data-i18n="More options">More options</summary>
+                          <div class="space-y-3">
+                            <div>
+                              <div class="range-row">
+                                <label id="lblRailVisualStrength" class="range-label" for="railVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
+                                <span id="railVisualStrengthValue" class="range-value">50%</span>
+                              </div>
+                              <input id="railVisualStrength" type="range" min="0" max="100" value="50" class="range-input" />
                             </div>
-                            <input id="railCoverageReach" type="range" min="0" max="100" value="20" class="range-input" />
+                            <div>
+                              <div class="range-row">
+                                <label id="lblRailOpacity" class="range-label" for="railOpacity" data-i18n="Opacity">Opacity</label>
+                                <span id="railOpacityValue" class="range-value">72%</span>
+                              </div>
+                              <input id="railOpacity" type="range" min="20" max="100" value="72" class="range-input" />
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblRailPrimaryColor" class="range-label" for="railPrimaryColor" data-i18n="Primary Color">Primary Color</label>
+                              <input id="railPrimaryColor" type="color" value="#0f172a" class="color-input" />
+                            </div>
                           </div>
-                          <label class="toggle-label">
-                            <input id="railScopeLinked" type="checkbox" class="checkbox-input" checked />
-                            <span id="lblRailScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
-                          </label>
-                          <div class="transport-readout-row">
-                            <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                            <span id="railScopeResolved" class="transport-readout-value">Mainline Only</span>
+
+                          <div class="space-y-3">
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblRailLabelDensity" class="range-label" for="railLabelDensity" data-i18n="Label Density">Label Density</label>
+                              <select id="railLabelDensity" class="select-input">
+                                <option value="sparse" selected data-i18n="Sparse">Sparse</option>
+                                <option value="balanced" data-i18n="Balanced">Balanced</option>
+                                <option value="dense" data-i18n="Dense">Dense</option>
+                              </select>
+                            </div>
+                            <p class="panel-hint" data-i18n="Rail labels currently use line names only.">Rail labels currently use line names only.</p>
                           </div>
-                          <div class="transport-readout-row">
-                            <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                            <span id="railThresholdResolved" class="transport-readout-value">Primary</span>
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblRailScope" class="range-label" for="railScope" data-i18n="Manual Scope">Manual Scope</label>
-                            <select id="railScope" class="select-input">
-                              <option value="mainline_only" selected data-i18n="Mainline Only">Mainline Only</option>
-                              <option value="mainline_plus_regional" data-i18n="Mainline + Regional">Mainline + Regional</option>
-                            </select>
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblRailImportanceThreshold" class="range-label" for="railImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
-                            <select id="railImportanceThreshold" class="select-input">
-                              <option value="primary" selected data-i18n="Primary">Primary</option>
-                              <option value="secondary" data-i18n="Secondary">Secondary</option>
-                              <option value="all" data-i18n="All">All</option>
-                            </select>
-                          </div>
-                        </section>
+
+                          <section class="space-y-3">
+                            <h3 id="lblTransportRailScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
+                            <div>
+                              <div class="range-row">
+                                <label id="lblRailCoverageReach" class="range-label" for="railCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                                <span id="railCoverageReachValue" class="range-value">20%</span>
+                              </div>
+                              <input id="railCoverageReach" type="range" min="0" max="100" value="20" class="range-input" />
+                            </div>
+                            <label class="toggle-label">
+                              <input id="railScopeLinked" type="checkbox" class="checkbox-input" checked />
+                              <span id="lblRailScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
+                            </label>
+                            <div class="transport-readout-row">
+                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
+                              <span id="railScopeResolved" class="transport-readout-value">Mainline Only</span>
+                            </div>
+                            <div class="transport-readout-row">
+                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
+                              <span id="railThresholdResolved" class="transport-readout-value">Primary</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblRailScope" class="range-label" for="railScope" data-i18n="Manual Scope">Manual Scope</label>
+                              <select id="railScope" class="select-input">
+                                <option value="mainline_only" selected data-i18n="Mainline Only">Mainline Only</option>
+                                <option value="mainline_plus_regional" data-i18n="Mainline + Regional">Mainline + Regional</option>
+                              </select>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblRailImportanceThreshold" class="range-label" for="railImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
+                              <select id="railImportanceThreshold" class="select-input">
+                                <option value="primary" selected data-i18n="Primary">Primary</option>
+                                <option value="secondary" data-i18n="Secondary">Secondary</option>
+                                <option value="all" data-i18n="All">All</option>
+                              </select>
+                            </div>
+                          </section>
+                        </details>
                       </div>
                     </details>
 
@@ -1945,78 +1987,89 @@
                             <input id="toggleRoad" type="checkbox" class="checkbox-input" />
                             <span id="lblTransportRoadToggle" data-i18n="Show Road">Show Road</span>
                           </label>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblRoadVisualStrength" class="range-label" for="roadVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
-                              <span id="roadVisualStrengthValue" class="range-value">50%</span>
-                            </div>
-                            <input id="roadVisualStrength" type="range" min="0" max="100" value="50" class="range-input" />
-                          </div>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblRoadOpacity" class="range-label" for="roadOpacity" data-i18n="Opacity">Opacity</label>
-                              <span id="roadOpacityValue" class="range-value">72%</span>
-                            </div>
-                            <input id="roadOpacity" type="range" min="20" max="100" value="72" class="range-input" />
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblRoadPrimaryColor" class="range-label" for="roadPrimaryColor" data-i18n="Primary Color">Primary Color</label>
-                            <input id="roadPrimaryColor" type="color" value="#374151" class="color-input" />
-                          </div>
                         </section>
+
                         <section class="space-y-2">
                           <h3 id="lblTransportRoadLabelsGroup" class="appearance-prop-heading" data-i18n="Labels">Labels</h3>
                           <label class="toggle-label">
                             <input id="roadLabelsEnabled" type="checkbox" class="checkbox-input" />
                             <span id="lblRoadLabelsEnabled" data-i18n="Show Road Labels">Show Road Labels</span>
                           </label>
-                          <div>
-                            <label id="lblRoadLabelDensity" class="range-label" for="roadLabelDensity" data-i18n="Label Density">Label Density</label>
-                            <select id="roadLabelDensity" class="select-input mt-1">
-                              <option value="sparse" data-i18n="Sparse">Sparse</option>
-                              <option value="balanced" data-i18n="Balanced">Balanced</option>
-                              <option value="dense" data-i18n="Dense">Dense</option>
-                            </select>
-                          </div>
-                          <p class="panel-hint" data-i18n="Road labels use segment ref/name when present.">Road labels use segment ref/name when present.</p>
                         </section>
-                        <section class="space-y-3">
-                          <h3 id="lblTransportRoadScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
-                          <div>
-                            <div class="range-row">
-                              <label id="lblRoadCoverageReach" class="range-label" for="roadCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
-                              <span id="roadCoverageReachValue" class="range-value">20%</span>
+
+                        <details class="appearance-mini-section">
+                          <summary class="section-header" data-i18n="More options">More options</summary>
+                          <div class="space-y-3">
+                            <div>
+                              <div class="range-row">
+                                <label id="lblRoadVisualStrength" class="range-label" for="roadVisualStrength" data-i18n="Visual Strength">Visual Strength</label>
+                                <span id="roadVisualStrengthValue" class="range-value">50%</span>
+                              </div>
+                              <input id="roadVisualStrength" type="range" min="0" max="100" value="50" class="range-input" />
                             </div>
-                            <input id="roadCoverageReach" type="range" min="0" max="100" value="20" class="range-input" />
+                            <div>
+                              <div class="range-row">
+                                <label id="lblRoadOpacity" class="range-label" for="roadOpacity" data-i18n="Opacity">Opacity</label>
+                                <span id="roadOpacityValue" class="range-value">72%</span>
+                              </div>
+                              <input id="roadOpacity" type="range" min="20" max="100" value="72" class="range-input" />
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblRoadPrimaryColor" class="range-label" for="roadPrimaryColor" data-i18n="Primary Color">Primary Color</label>
+                              <input id="roadPrimaryColor" type="color" value="#374151" class="color-input" />
+                            </div>
                           </div>
-                          <label class="toggle-label">
-                            <input id="roadScopeLinked" type="checkbox" class="checkbox-input" checked />
-                            <span id="lblRoadScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
-                          </label>
-                          <div class="transport-readout-row">
-                            <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
-                            <span id="roadScopeResolved" class="transport-readout-value">Motorway Only</span>
+
+                          <div class="space-y-3">
+                            <div>
+                              <label id="lblRoadLabelDensity" class="range-label" for="roadLabelDensity" data-i18n="Label Density">Label Density</label>
+                              <select id="roadLabelDensity" class="select-input mt-1">
+                                <option value="sparse" data-i18n="Sparse">Sparse</option>
+                                <option value="balanced" data-i18n="Balanced">Balanced</option>
+                                <option value="dense" data-i18n="Dense">Dense</option>
+                              </select>
+                            </div>
+                            <p class="panel-hint" data-i18n="Road labels use segment ref/name when present.">Road labels use segment ref/name when present.</p>
                           </div>
-                          <div class="transport-readout-row">
-                            <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
-                            <span id="roadThresholdResolved" class="transport-readout-value">Primary</span>
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblRoadScope" class="range-label" for="roadScope" data-i18n="Manual Scope">Manual Scope</label>
-                            <select id="roadScope" class="select-input">
-                              <option value="motorway_only" selected data-i18n="Motorway Only">Motorway Only</option>
-                              <option value="motorway_trunk" data-i18n="Motorway + Trunk">Motorway + Trunk</option>
-                            </select>
-                          </div>
-                          <div class="flex items-center justify-between gap-3">
-                            <label id="lblRoadImportanceThreshold" class="range-label" for="roadImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
-                            <select id="roadImportanceThreshold" class="select-input">
-                              <option value="primary" selected data-i18n="Primary">Primary</option>
-                              <option value="secondary" data-i18n="Secondary">Secondary</option>
-                              <option value="all" data-i18n="All">All</option>
-                            </select>
-                          </div>
-                        </section>
+
+                          <section class="space-y-3">
+                            <h3 id="lblTransportRoadScopeGroup" class="appearance-prop-heading" data-i18n="Scope">Scope</h3>
+                            <div>
+                              <div class="range-row">
+                                <label id="lblRoadCoverageReach" class="range-label" for="roadCoverageReach" data-i18n="Coverage Reach">Coverage Reach</label>
+                                <span id="roadCoverageReachValue" class="range-value">20%</span>
+                              </div>
+                              <input id="roadCoverageReach" type="range" min="0" max="100" value="20" class="range-input" />
+                            </div>
+                            <label class="toggle-label">
+                              <input id="roadScopeLinked" type="checkbox" class="checkbox-input" checked />
+                              <span id="lblRoadScopeLinked" data-i18n="Link Scope To Reach">Link Scope To Reach</span>
+                            </label>
+                            <div class="transport-readout-row">
+                              <span class="transport-readout-label" data-i18n="Current Scope">Current Scope</span>
+                              <span id="roadScopeResolved" class="transport-readout-value">Motorway Only</span>
+                            </div>
+                            <div class="transport-readout-row">
+                              <span class="transport-readout-label" data-i18n="Current Threshold">Current Threshold</span>
+                              <span id="roadThresholdResolved" class="transport-readout-value">Primary</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblRoadScope" class="range-label" for="roadScope" data-i18n="Manual Scope">Manual Scope</label>
+                              <select id="roadScope" class="select-input">
+                                <option value="motorway_only" selected data-i18n="Motorway Only">Motorway Only</option>
+                                <option value="motorway_trunk" data-i18n="Motorway + Trunk">Motorway + Trunk</option>
+                              </select>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <label id="lblRoadImportanceThreshold" class="range-label" for="roadImportanceThreshold" data-i18n="Manual Threshold">Manual Threshold</label>
+                              <select id="roadImportanceThreshold" class="select-input">
+                                <option value="primary" selected data-i18n="Primary">Primary</option>
+                                <option value="secondary" data-i18n="Secondary">Secondary</option>
+                                <option value="all" data-i18n="All">All</option>
+                              </select>
+                            </div>
+                          </section>
+                        </details>
                       </div>
                     </details>
                   </div>
@@ -2192,11 +2245,14 @@
                   </select>
                   <label class="toggle-label"><input id="toggleThematicWgi" type="checkbox" class="checkbox-input"/><span data-i18n="Show thematic shading">Show thematic shading</span></label>
                   <p id="thematicWgiStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
-                  <p id="thematicWgiReferenceNote" class="city-points-advanced-hint" hidden></p>
                   <button id="thematicWgiRetry" type="button" class="btn-secondary" hidden data-i18n="Retry">Retry</button>
                   <div id="thematicWgiLegend" class="thematic-wgi-legend" hidden></div>
                   <p id="thematicWgiCoverage" class="city-points-advanced-hint"></p>
-                  <p class="city-points-advanced-hint" data-i18n="Hover a region to inspect its country indicator. This is not a local measurement.">Hover a region to inspect its country indicator. This is not a local measurement.</p>
+                  <details class="appearance-mini-section">
+                    <summary class="section-header" data-i18n="Notes">Notes</summary>
+                    <p id="thematicWgiReferenceNote" class="city-points-advanced-hint" hidden></p>
+                    <p class="city-points-advanced-hint" data-i18n="Hover a region to inspect its country indicator. This is not a local measurement.">Hover a region to inspect its country indicator. This is not a local measurement.</p>
+                  </details>
                 </section>
                 <section id="strategicValuesPanel" class="appearance-control-card strategic-values-panel" aria-labelledby="strategicValuesTitle">
                   <div class="strategic-values-heading"><h3 id="strategicValuesTitle" data-i18n="Scenario strategic data">Scenario strategic data</h3><button id="strategicValuesLoad" type="button" class="btn-secondary" data-i18n="Load data">Load data</button></div>
