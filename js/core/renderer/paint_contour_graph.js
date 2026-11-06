@@ -5,6 +5,11 @@ import { packContourPolygons, createContourPolygonQuery, createContourWaterQuery
 // Coordinates are snapped to 1e-7 degrees for identity, not for rendering.
 const SCALE = 1e7;
 const INCREMENTAL_FEATURE_RATIO = 0.2;
+// A closure that widens the context past this share of all features falls
+// back to a full finish, which then costs about the same.
+const INCREMENTAL_CONTEXT_RATIO = 0.5;
+// Small graphs finish fast either way; the fallback only guards large ones.
+const INCREMENTAL_CONTEXT_MINIMUM = 1000;
 const keyOf = ([x, y]) => `${x},${y}`;
 const compare = (a, b) => a[0] - b[0] || a[1] - b[1];
 const coordinate = (point) => {
@@ -450,7 +455,7 @@ function sourceEdgeQuery(edges, occupied) {
   };
 }
 
-function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occupiedSegments) {
+function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occupiedSegments, onGroup = null) {
   // Exceeding this bounded fallback work leaves the original graph unchanged.
   // It is not an input rejection or a relaxed geometric acceptance threshold.
   const maxComparisonsPerGroup = 4096;
@@ -488,6 +493,13 @@ function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occu
     if (!group) groups.set(root, group = []);
     group.push(edge);
   });
+  // Report every connected group. One over the comparison budget is decisive:
+  // any larger group containing it is skipped too, so its extent cannot change
+  // the result. (An incompatible group is as well; treating it as undecided
+  // only widens a local finish, so it is not checked twice.)
+  if (onGroup) for (const group of groups.values()) {
+    if (group.length > 1) onGroup(group, group.length * (group.length - 1) / 2 > maxComparisonsPerGroup);
+  }
   const shared = [], remaining = [], occupied = new Set(occupiedSegments);
   let query = null;
   for (const group of groups.values()) {
@@ -860,7 +872,7 @@ function politicalCoverageQuery(polygons) {
   };
 }
 
-function geometrySegments(edges, diagnostics, precisions, lineSides, registerLine) {
+function geometrySegments(edges, diagnostics, precisions, lineSides, registerLine, onSourceGroup = null) {
   const shared = [], unmatched = [];
   for (const edge of edges.values()) {
     const pair = pairFor(edge.members);
@@ -871,7 +883,7 @@ function geometrySegments(edges, diagnostics, precisions, lineSides, registerLin
   diagnostics.exactSharedSegments = shared.length;
   const exact = nodeEdges(unmatched, diagnostics, undefined, undefined, lineSides, registerLine);
   for (const edge of exact.shared) shared.push(edge);
-  const source = nodeSourceEdges(exact.remaining, diagnostics, precisions, edges, shared);
+  const source = nodeSourceEdges(exact.remaining, diagnostics, precisions, edges, shared, onSourceGroup);
   for (const edge of source.shared) shared.push(edge);
   return { shared, remaining: source.remaining };
 }
@@ -1071,6 +1083,20 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
   const boundaryBounds = new Map(), boundaryCells = new Map();
   const dirtyEdges = [], lineSides = new Map();
   const pendingBounds = [];
+  // Edge index -> owners of its source-collinear group at the last finish that
+  // computed it, for groups within the comparison budget: the extent bound a
+  // local finish widens to.
+  const sourceOwners = new Map();
+  // Only undecided groups spanning several owners are read back: a decisive
+  // group stays unmatched whatever its extent, and a single owner adds nothing.
+  function recordSourceGroup(group, decisive) {
+    if (decisive) return;
+    const first = Math.abs(group[0].members[0]) - 1;
+    if (group.every(edge => Math.abs(edge.members[0]) - 1 === first)) return;
+    const owners = new Set();
+    for (const edge of group) owners.add(Math.abs(edge.members[0]) - 1);
+    for (const edge of group) if (edge.key) sourceOwners.set(edge.key - 1, owners);
+  }
   let cycle = 1, liveEntries = 0, deadEntries = 0;
   const quantizedLines = new Map(), quantizedOwners = new Map();
   let geometryCache = null, segmentCache = null, quantizedInput = null, waterChanged = false;
@@ -1129,7 +1155,7 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
     geometryCache = null; segmentCache = null; quantizedInput = null;
     bounds.clear(); boundaryBounds.clear(); boundaryCells.clear(); liveEntries = 0; deadEntries = 0;
     dirty.clear(); dirtyEdges.length = 0; dirtyBounds.length = 0; pendingBounds.length = 0; cycle++;
-    lineSides.clear(); quantizedLines.clear(); quantizedOwners.clear();
+    lineSides.clear(); quantizedLines.clear(); quantizedOwners.clear(); sourceOwners.clear();
     edges.dropViews();
   }
   function markDirty(id) {
@@ -1381,7 +1407,8 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
       let segments, neighborMs = 0;
       const options = { nearSeamTolerance, land };
       try {
-        if (geometryCache && dirty.size && dirty.size <= featureEdges.size * INCREMENTAL_FEATURE_RATIO && !waterChanged) {
+        let fullFallback = !(geometryCache && dirty.size && dirty.size <= featureEdges.size * INCREMENTAL_FEATURE_RATIO && !waterChanged);
+        if (!fullFallback) local: {
           for (const id of pendingBounds) if (polygons.has(id) && !bounds.has(id)) indexBounds(id, polygons.get(id));
           const lineChanges = updateLines();
           let neighborStart = performance.now();
@@ -1398,29 +1425,92 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
             for (const group of quantizedInput.remaining.values()) for (const edge of group) if (!edge.stale) before.push(edge);
             for (const [id, record] of quantizedRecords(before, true)) replaceQuantizedOwner(id, record);
           }
-          neighborStart = performance.now();
-          let context = neighbors([...affected].flatMap(id => (boundaryBounds.get(id) || []).map(entry => entry.box)));
-          for (const id of affected) context.add(id);
-          neighborMs += performance.now() - neighborStart;
-          const lists = [];
-          for (const id of context) { const list = featureEdges.get(id); if (list) lists.push(list); }
-          // List order, as a full finish would visit them; near-seam ties and
-          // join toggles are resolved by visiting order.
-          const subset = edges.inListOrder(lists, cycle);
-          diagnostics.incrementalSubsetFeatureCount = context.size;
-          diagnostics.incrementalSubsetEdgeCount = subset.length;
-          let geometry = geometrySegments(subset, diagnostics, precisions, lineSides);
+          // A source-collinear group joins edges through shared vertices and is
+          // accepted or skipped as a whole, so it can reach past any fixed
+          // neighbourhood. Every owner of a group that touches an affected owner
+          // becomes affected too (with its neighbours as context) until the
+          // groups close; one that grows too far falls back to a full build.
+          // A source-collinear group joins edges through shared vertices and is
+          // accepted or skipped as a whole, so it can reach past any fixed
+          // neighbourhood. The owners each edge's group had at its last finish
+          // bound the group's current extent: edges nobody changed connect as
+          // before, and every new connection runs through an affected edge.
+          // Those owners (and their neighbours, for blockers) join the context
+          // in one step; only affected owners' results are merged, so the
+          // closure does not cascade. A closure that grows too far falls back.
+          // base: owners whose source-stage input may have changed. A group that
+          // touches one may change its decision, so all its owners are merged
+          // (unless it was and still is decisive). A group that touches only
+          // later-merged owners is unchanged and need only be complete. Each
+          // group's remembered owners bound its current extent; they and their
+          // neighbours join the context, so blockers are present too.
+          const counters = { ...diagnostics }, base = new Set(affected), complete = new Set(affected);
+          const remembered = edge => sourceOwners.get(edge.key - 1);
+          const owned = id => featureEdges.has(id);
+          for (const id of base) for (const index of featureEdges.get(id) || []) {
+            for (const owner of sourceOwners.get(index) || []) if (owned(owner)) { affected.add(owner); complete.add(owner); }
+          }
+          let context, geometry = null, expanded = false, touching = null;
+          for (;;) {
+            neighborStart = performance.now();
+            context = neighbors([...complete].flatMap(id => (boundaryBounds.get(id) || []).map(entry => entry.box)));
+            for (const id of complete) context.add(id);
+            neighborMs += performance.now() - neighborStart;
+            if (expanded && context.size > Math.max(featureEdges.size * INCREMENTAL_CONTEXT_RATIO, INCREMENTAL_CONTEXT_MINIMUM)) break;
+            const lists = [];
+            for (const id of context) { const list = featureEdges.get(id); if (list) lists.push(list); }
+            // List order, as a full finish would visit them; near-seam ties and
+            // join toggles are resolved by visiting order.
+            const subset = edges.inListOrder(lists, cycle);
+            diagnostics.incrementalSubsetFeatureCount = context.size;
+            diagnostics.incrementalSubsetEdgeCount = subset.length;
+            let grown = false;
+            touching = [];
+            geometry = geometrySegments(subset, diagnostics, precisions, lineSides, null, (group, decisive) => {
+              const ownerOf = edge => Math.abs(edge.members[0]) - 1;
+              if (!group.some(edge => affected.has(ownerOf(edge)))) return;
+              const changes = group.some(edge => base.has(ownerOf(edge)));
+              touching.push([group, decisive]);
+              const add = id => {
+                if (!owned(id)) return;
+                if (!complete.has(id)) { complete.add(id); grown = true; }
+                if (changes && !affected.has(id)) { affected.add(id); grown = true; }
+              };
+              // A remembered group that was matched (within budget) had at most
+              // 91 edges: all its owners join at once, and when it may change
+              // they are merged, since its decision may now differ for them.
+              for (const edge of group) {
+                if (changes || !decisive) for (const id of remembered(edge) || []) add(id);
+              }
+              // Any larger group containing a decisive one is decisive too, so
+              // it needs no more context. Otherwise its own owners become
+              // complete, which brings every edge at its vertices in next time;
+              // once all of them are complete the group is closed.
+              if (!decisive) for (const edge of group) add(ownerOf(edge));
+            });
+            if (!grown) break;
+            expanded = true;
+            Object.assign(diagnostics, counters); geometry = null;
+          }
+          if (!geometry) { Object.assign(diagnostics, counters, { incrementalFallback: true }); fullFallback = true; break local; }
+          for (const id of affected) for (const index of featureEdges.get(id) || []) sourceOwners.delete(index);
+          for (const [group, decisive] of touching) recordSourceGroup(group, decisive);
           if (quantization) {
+            // Owners whose quantized lines change mixed status are added after
+            // the merge and read from quantizedInput. Their source intervals are
+            // current: an owner's source result changes only next to an edit, on
+            // a changed exact line, or in a changed source group, and all those
+            // owners are already affected (merged) above.
             const records = quantizedRecords(geometry.remaining), changed = quantizedChanges(records, affected);
             for (const id of affected) replaceQuantizedOwner(id, records.get(id));
             const source = cacheGeometry(geometry);
             mergeGroups(quantizedInput.shared, source.shared, affected, true);
             mergeGroups(quantizedInput.remaining, source.remaining, affected, false);
-            neighborStart = performance.now();
             for (const id of neighbors([...changed].flatMap(id => (boundaryBounds.get(id) || []).map(entry => entry.box)))) affected.add(id);
             for (const id of changed) affected.add(id);
             context = neighbors([...affected].flatMap(id => (boundaryBounds.get(id) || []).map(entry => entry.box)));
             for (const id of affected) context.add(id);
+            neighborStart = performance.now();
             for (const id of [...context]) for (const key of quantizedOwners.get(id)?.lines.keys() || []) {
               const line = quantizedLines.get(key);
               if (line.coarse && line.fine) for (const owner of line.owners) context.add(owner);
@@ -1437,6 +1527,9 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
           mergeGroups(segmentCache.shared, local.shared, affected, true);
           if (local.coast) mergeGroups(segmentCache.coast, local.coast, affected, false);
           diagnostics.incremental = true; diagnostics.incrementalFeatureCount = dirty.size;
+        }
+        if (!fullFallback) {
+          // The local finish above has merged its results into the caches.
         } else if (geometryCache && !dirty.size && !waterChanged) {
           diagnostics.incremental = true;
           diagnostics.incrementalSubsetFeatureCount = 0; diagnostics.incrementalSubsetEdgeCount = 0;
@@ -1452,7 +1545,8 @@ export function createPaintContourGraphBuilder({ nearSeamTolerance = 0, waterMas
             // since the last finish would keep a lineKey no index holds any more,
             // and a later reuse of the slot would unregister it a second time.
             edges.dropViews(); lineSides.clear();
-            geometry = geometrySegments(edges, diagnostics, precisions, null, registerLine);
+            sourceOwners.clear();
+            geometry = geometrySegments(edges, diagnostics, precisions, null, registerLine, recordSourceGroup);
             quantizedInput = null;
             quantizedLines.clear(); quantizedOwners.clear();
             if ([...precisions.values()].includes(4)) {

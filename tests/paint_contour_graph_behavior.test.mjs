@@ -261,7 +261,7 @@ test('compact edge indexing preserves legacy packed bytes through rehash, patche
     '8dbef59895017dc526edad0290e757e710557a04d13cf9de550349414ae64268',
     '0c8bdb2bdee812c7ae9a16114b628f953526fa7d363b5280740b5062086908a8',
     '6b93408e7c9f7609220f7c445b5d888b378f0adbe2bda871cf04d0cca695bf60',
-    'bf7c633e6557a04da1cbfe647ea9e7b154af69d2b3d049771c4e5b426032d06a',
+    '94a56f6de77183c0f5030978d7dcaf248858cf83957f600ade9437af2699a350',
   ]);
   assert.equal(JSON.stringify(features), before);
   assert.equal(builder.getStorageStats().overflowEdges, 0);
