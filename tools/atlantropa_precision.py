@@ -130,6 +130,9 @@ def smooth_atlantropa_land(features, *, fixed_geometry, max_shift=0.05, protecte
         if not problems:
             break
         # Undo only the moves near each problem; a feature without such moves reverts whole.
+        if not any(positions[vertex] != original[vertex] for i in problems for vertex in feature_keys[i]):
+            raise ValueError(f"smoothing cannot repair unmoved features: "
+                             f"{sorted(features[i]['properties']['id'] for i in problems)}")
         for i in sorted(problems, key=lambda i: features[i]["properties"]["id"]):
             moved = [vertex for vertex in sorted(feature_keys[i]) if positions[vertex] != original[vertex]]
             regions = problems[i]
@@ -180,6 +183,10 @@ def absorb_enclosed_island_holes(features):
                 for other, geometry in enumerate(shapes):
                     if other == index or geometry.intersection(hole).area < hole.area * (1 - 1e-9):
                         continue
+                    # A feature that is nothing but this enclave stays; removing it is a
+                    # registry change, not a geometry repair.
+                    if geometry.difference(hole).is_empty:
+                        break
                     shapes[index] = shapes[index].union(hole)
                     shapes[other] = shapes[other].difference(hole)
                     absorbed.append({"island_id": props["id"], "from_id": result[other]["properties"]["id"],

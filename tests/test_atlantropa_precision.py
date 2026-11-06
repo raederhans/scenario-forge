@@ -220,10 +220,29 @@ class AtlantropaPrecisionTests(unittest.TestCase):
         self.assertAlmostEqual(shape(result[1]["geometry"]).area, 1)
         self.assertEqual([entry["from_id"] for entry in absorbed], ["flat"])
         # An enclave of another owner is still returned; an unwelded island keeps its hole.
-        foreign = [features[0], feature(box(1, 1, 2, 2), "flat", "ALB")]
+        foreign = [features[0], feature(box(1, 1, 2, 2).union(box(5, 5, 6, 6)), "flat", "ALB")]
         self.assertEqual(len(absorb_enclosed_island_holes(foreign)[1]), 1)
         unwelded = [feature(island, "isle", "ITA"), foreign[1]]
         self.assertEqual(absorb_enclosed_island_holes(unwelded)[0], unwelded)
+
+    def test_enclave_that_is_only_the_hole_is_kept_and_smoothing_still_ends(self):
+        island = box(0, 0, 4, 4).difference(box(1, 1, 2, 2))
+        features = [
+            {"type": "Feature", "geometry": mapping(island),
+             "properties": {"id": "isle", "atl_join_mode": "boolean_weld", "atl_geometry_role": "donor_island"}},
+            {"type": "Feature", "geometry": mapping(box(1, 1, 2, 2)), "properties": {"id": "enclave"}},
+        ]
+        result, absorbed = absorb_enclosed_island_holes(features)
+        self.assertEqual(result, features)
+        self.assertEqual(absorbed, [])
+        smoothed, _ = smooth_atlantropa_land(result, fixed_geometry=box(10, 10, 11, 11))
+        self.assertTrue(all(not shape(feature["geometry"]).is_empty for feature in smoothed))
+
+    def test_smoothing_rejects_a_feature_it_cannot_repair(self):
+        bowtie = {"type": "Polygon", "coordinates": [[[0, 0], [1, 1], [1, 0], [0, 1], [0, 0]]]}
+        features = [{"type": "Feature", "geometry": bowtie, "properties": {"id": "empty"}}]
+        with self.assertRaisesRegex(ValueError, "cannot repair unmoved features"):
+            smooth_atlantropa_land(features, fixed_geometry=box(10, 10, 11, 11))
 
 if __name__ == "__main__":
     unittest.main()
