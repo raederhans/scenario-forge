@@ -2,6 +2,17 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Political": { zh: "政治与边界", en: "Political" },
+  "Geography": { zh: "地理", en: "Geography" },
+  "Settlements & transport": { zh: "聚落与交通", en: "Settlements & transport" },
+  "Data & annotations": { zh: "专题与标注", en: "Data & annotations" },
+  "Map appearance": { zh: "地图外观", en: "Map appearance" },
+  "Display & performance": { zh: "显示与性能", en: "Display & performance" },
+  "Search layers": { zh: "搜索图层", en: "Search layers" },
+  "No matching layers": { zh: "没有匹配的图层", en: "No matching layers" },
+  "Hide {name}": { zh: "隐藏 {name}", en: "Hide {name}" },
+  "Show {name}": { zh: "显示 {name}", en: "Show {name}" },
+
   "Inspector": { zh: "检查器", en: "Inspector" },
   "Layer settings": { zh: "图层设置", en: "Layer settings" },
   "Scenario": { zh: "剧本", en: "Scenario" },

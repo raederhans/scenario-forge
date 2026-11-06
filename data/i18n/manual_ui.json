@@ -1,4 +1,15 @@
 {
+  "Political": "政治与边界",
+  "Geography": "地理",
+  "Settlements & transport": "聚落与交通",
+  "Data & annotations": "专题与标注",
+  "Map appearance": "地图外观",
+  "Display & performance": "显示与性能",
+  "Search layers": "搜索图层",
+  "No matching layers": "没有匹配的图层",
+  "Hide {name}": "隐藏 {name}",
+  "Show {name}": "显示 {name}",
+
   "Backend": "渲染后端",
   "Loaded tiles": "已加载瓦片",
   "Bathymetry is unavailable for this projection": "当前投影不支持测深",
