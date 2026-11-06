@@ -69,6 +69,8 @@ test('display quality preserves camera and scenario political borders survive sa
     expect(result.profile).toBe('balanced');
     expect(result.exactPasses).toEqual([initial.camera,initial.camera]);
   }
+  // 显示画质在「显示与性能」页，边界控件仍在边界页，先切回去。
+  await page.locator('#appearanceTabBorders').click();
   await page.locator('#lblEmpireBorders').click();
   await expect(page.locator('#politicalBorderToggle')).toBeChecked();
   await page.evaluate(() => {

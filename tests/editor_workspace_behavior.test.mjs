@@ -45,6 +45,7 @@ class Element {
     if (name.startsWith("data-")) this.dataset[name.slice(5).replace(/-([a-z])/g, (_, char) => char.toUpperCase())] = String(value);
   }
   getAttribute(name) { return this.attributes.get(name) ?? null; }
+  hasAttribute(name) { return this.attributes.has(name); }
   removeAttribute(name) { this.attributes.delete(name); }
   addEventListener(name, callback) {
     if (!this.listeners.has(name)) this.listeners.set(name, []);
@@ -132,6 +133,10 @@ function mount(context, initialSearch = "", { countrySelected = true } = {}) {
   for (const id of ["togglePhysical", "toggleUrban", "toggleCityPoints", "toggleRivers", "dayNightEnabled", "transportAppearanceMasterToggle", "scenarioSpecialRegionVisibilityToggle"]) {
     add(id, right, "input").checked = true;
   }
+  // 特殊区域工作台运行时创建的叠加层开关（没有 id，用 data 属性识别）。
+  const specialZoneOverlay = add("specialZoneOverlayToggle", documentRef.getElementById("specialZonePopover"), "input");
+  specialZoneOverlay.checked = true;
+  specialZoneOverlay.setAttribute("data-special-zone-overlay-toggle", "true");
   add("projectSidebarPanel", right);
   add("frontlineProjectSection", right, "details");
   const utilities = add("inspectorUtilitiesSection", right);
@@ -375,7 +380,7 @@ test("layer groups follow map order and display moves existing controls", (conte
 
 test("visibility switches dispatch change and synchronize without navigating", (context) => {
   const h = mount(context);
-  for (const [key, id] of Object.entries({ physical: "togglePhysical", urban: "toggleUrban", citypoints: "toggleCityPoints", rivers: "toggleRivers", daynight: "dayNightEnabled", transport: "transportAppearanceMasterToggle", "special-zones": "scenarioSpecialRegionVisibilityToggle" })) {
+  for (const [key, id] of Object.entries({ physical: "togglePhysical", urban: "toggleUrban", citypoints: "toggleCityPoints", rivers: "toggleRivers", daynight: "dayNightEnabled", transport: "transportAppearanceMasterToggle", "special-zones": "specialZoneOverlayToggle" })) {
     const row = h.get("editorTask-layers").querySelectorAll(".editor-layer-row").find((r) => r.dataset.layerKey === key);
     const toggle = row.querySelector(".editor-layer-visibility");
     const checkbox = h.get(id);
@@ -394,6 +399,8 @@ test("visibility switches dispatch change and synchronize without navigating", (
     h.workspace.selectTask("layers");
     assert.equal(toggle.getAttribute("aria-pressed"), "false");
   }
+  // 特殊区域的眼睛只控制特殊区域叠加层，不碰剧本特殊水域开关。
+  assert.equal(h.get("scenarioSpecialRegionVisibilityToggle").checked, true);
 });
 
 test("layer search filters groups, shows empty state, and Escape clears it", (context) => {
