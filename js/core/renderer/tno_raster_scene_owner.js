@@ -19,7 +19,7 @@ export function createTnoRasterSceneOwner({
   let active = false, disposed = false, previousVisibility = null;
   let fallbackReason = "not-presented", totalFrameMs = 0, view = null;
   let published = null, overview = null, publications = 0, retainedFrames = 0, usingOverview = false;
-  let colorBaselineFrame = null;
+  let colorBaselineFrame = null, composedWithOverview = false;
   let lastPresentationState = "unavailable";
   let publicationPreparation = null, preparationError = "";
 
@@ -106,6 +106,7 @@ export function createTnoRasterSceneOwner({
     if (mapCanvas && previousVisibility !== null) mapCanvas.style.visibility = previousVisibility;
     previousVisibility = null;
     active = false;
+    composedWithOverview = false;
     fallbackReason = reason;
     return false;
   }
@@ -175,24 +176,45 @@ export function createTnoRasterSceneOwner({
     cancelPublicationPreparation();
     revisions.set(name, (revisions.get(name) || 0) + 1);
   }
-  function covers(frame, passes, transform, width, height, dpr) {
-    if (!frame?.plan || !validTransform(frame.transform) || frame.dpr !== dpr) return false;
+  function coverage(frame, passes, transform, dpr) {
+    if (!frame?.plan || !validTransform(frame.transform) || frame.dpr !== dpr) return null;
     const ratio = transform.k / frame.transform.k;
     const x = (transform.x - frame.transform.x * ratio) * dpr;
     const y = (transform.y - frame.transform.y * ratio) * dpr;
-    const left = (frame.plan.outputX - (frame.layout.offsetX || 0) * dpr) * ratio + x;
-    const top = (frame.plan.outputY - (frame.layout.offsetY || 0) * dpr) * ratio + y;
-    if (left > 1e-6 || top > 1e-6 || left + frame.plan.outputWidth * ratio < width - 1e-6
-      || top + frame.plan.outputHeight * ratio < height - 1e-6) return false;
+    let left = (frame.plan.outputX - (frame.layout.offsetX || 0) * dpr) * ratio + x;
+    let top = (frame.plan.outputY - (frame.layout.offsetY || 0) * dpr) * ratio + y;
+    let right = left + frame.plan.outputWidth * ratio, bottom = top + frame.plan.outputHeight * ratio;
     for (const pass of passes?.values() || []) {
       const scale = transform.k / pass.reference.k;
       const dx = (transform.x - (pass.reference.x + (pass.layout.offsetX || 0)) * scale) * dpr;
       const dy = (transform.y - (pass.reference.y + (pass.layout.offsetY || 0)) * scale) * dpr;
-      if (dx > 1e-6 || dy > 1e-6 || dx + pass.width * scale < width - 1e-6 || dy + pass.height * scale < height - 1e-6) return false;
+      left = Math.max(left, dx); top = Math.max(top, dy);
+      right = Math.min(right, dx + pass.width * scale); bottom = Math.min(bottom, dy + pass.height * scale);
     }
-    return true;
+    return { x: left, y: top, width: Math.max(0, right - left), height: Math.max(0, bottom - top) };
+  }
+  function covers(rect, width, height) {
+    return !!rect && rect.x <= 1e-6 && rect.y <= 1e-6
+      && rect.x + rect.width >= width - 1e-6 && rect.y + rect.height >= height - 1e-6;
+  }
+  function coversTogether(primary, background, width, height) {
+    if (!primary || !background) return false;
+    const left = Math.max(0, Math.min(width, primary.x));
+    const top = Math.max(0, Math.min(height, primary.y));
+    const right = Math.max(left, Math.min(width, primary.x + primary.width));
+    const bottom = Math.max(top, Math.min(height, primary.y + primary.height));
+    return [
+      { x: 0, y: 0, width: left, height },
+      { x: right, y: 0, width: width - right, height },
+      { x: left, y: 0, width: right - left, height: top },
+      { x: left, y: bottom, width: right - left, height: height - bottom },
+    ].every(rect => rect.width <= 1e-6 || rect.height <= 1e-6
+      || (background.x <= rect.x + 1e-6 && background.y <= rect.y + 1e-6
+        && background.x + background.width >= rect.x + rect.width - 1e-6
+        && background.y + background.height >= rect.y + rect.height - 1e-6));
   }
   function present(transform, { refresh = true } = {}) {
+    composedWithOverview = false;
     if (publicationPreparation && !preparationCurrent(publicationPreparation, { identity: !refresh })) cancelPublicationPreparation();
     if (disposed) return hide("disposed");
     if (!compositor?.isAvailable() || surface.getMapCanvas() !== mapCanvas) return hide("surface-unavailable");
@@ -213,8 +235,12 @@ export function createTnoRasterSceneOwner({
       overview = null;
     }
     const retainPrimary = published?.frame === frame && (!refresh || frame.presentationState === "retained");
-    usingOverview = !!overview && !covers(frame, retainPrimary ? published.passes : null, transform, width, height, dpr)
-      && covers(overview.frame, overview.passes, transform, width, height, dpr);
+    const primaryCoverage = coverage(frame, retainPrimary ? published.passes : null, transform, dpr);
+    const overviewCoverage = overview && coverage(overview.frame, overview.passes, transform, dpr);
+    const primaryCovers = covers(primaryCoverage, width, height);
+    composedWithOverview = !!overview && retainPrimary && !primaryCovers
+      && coversTogether(primaryCoverage, overviewCoverage, width, height);
+    usingOverview = !composedWithOverview && !!overview && !primaryCovers && covers(overviewCoverage, width, height);
     if (usingOverview) frame = overview.frame;
     const plan = frame.plan;
     if (!plan || ![plan.scale, plan.originX, plan.originY, plan.width, plan.height,
@@ -227,9 +253,7 @@ export function createTnoRasterSceneOwner({
     const left = (plan.outputX - offsetX * dpr) * ratio + dx * dpr;
     const top = (plan.outputY - offsetY * dpr) * ratio + dy * dpr;
     const right = left + plan.outputWidth * ratio, bottom = top + plan.outputHeight * ratio;
-    // A retained frame is useful only while its complete tile rectangle covers
-    // the current output. Tiny rounding differences at exact edges are harmless.
-    if (left > 1e-6 || top > 1e-6 || right < width - 1e-6 || bottom < height - 1e-6) return hide("direct-frame-coverage");
+    if (!composedWithOverview && (left > 1e-6 || top > 1e-6 || right < width - 1e-6 || bottom < height - 1e-6)) return hide("direct-frame-coverage");
     // Cache canvases belong to the candidate producer and can change between
     // yielded passes. Navigation only reads the uploaded published textures.
     const retainedScene = usingOverview ? overview : published;
@@ -250,12 +274,35 @@ export function createTnoRasterSceneOwner({
       f: (plan.outputY - plan.originY * plan.scale - offsetY * dpr) * ratio + dy * dpr,
     };
     const layers = [];
+    if (composedWithOverview) {
+      const background = overview.frame, backgroundPlan = background.plan;
+      const scale = transform.k / background.transform.k;
+      const x = (transform.x - (background.transform.x + (background.layout.offsetX || 0)) * scale) * dpr;
+      const y = (transform.y - (background.transform.y + (background.layout.offsetY || 0)) * scale) * dpr;
+      for (const name of overview.names) {
+        if (name === "political") {
+          layers.push({ name, draw: output => background.gpu.drawLayer({ ...output, transform: {
+            a: backgroundPlan.scale * scale, d: backgroundPlan.scale * scale,
+            e: (backgroundPlan.outputX - backgroundPlan.originX * backgroundPlan.scale) * scale + x,
+            f: (backgroundPlan.outputY - backgroundPlan.originY * backgroundPlan.scale) * scale + y,
+          } }) });
+        } else {
+          const pass = overview.passes.get(name), ratio = transform.k / pass.reference.k;
+          layers.push({ name: pass.textureName, retained: true, revision: pass.revision, transform: {
+            a: ratio * pass.scaleX, d: ratio * pass.scaleY,
+            e: (transform.x - (pass.reference.x + (pass.layout.offsetX || 0)) * ratio) * dpr,
+            f: (transform.y - (pass.reference.y + (pass.layout.offsetY || 0)) * ratio) * dpr,
+          } });
+        }
+      }
+    }
+    const clip = composedWithOverview ? primaryCoverage : undefined;
     const names = retain ? retainedScene.names : h.getActivePassNames();
     const passSnapshots = new Map();
     if (!Array.isArray(names) || !names.includes("political")) return hide("political-pass-inactive");
     for (const name of names) {
       if (name === "political") {
-        layers.push({ name, draw: output => frame.gpu.drawLayer({ ...output, transform: directTransform }) });
+        layers.push({ name, clip, draw: output => frame.gpu.drawLayer({ ...output, transform: directTransform }) });
         continue;
       }
       const saved = retain ? retainedScene.passes.get(name) : null;
@@ -268,21 +315,19 @@ export function createTnoRasterSceneOwner({
       const layerTransform = { a: scale * (saved?.scaleX || 1), d: scale * (saved?.scaleY || 1),
         e: (x - (layout.offsetX ?? 0) * scale) * dpr,
         f: (y - (layout.offsetY ?? 0) * scale) * dpr };
-      // A callback can enforce a narrower painted footprint, but even without
-      // one a viewport raster must cover every output pixel after navigation.
-      if (layerTransform.e > 1e-6 || layerTransform.f > 1e-6
+      if (!composedWithOverview && (layerTransform.e > 1e-6 || layerTransform.f > 1e-6
         || layerTransform.e + source.width * scale < width - 1e-6
-        || layerTransform.f + source.height * scale < height - 1e-6) return hide("pass-coverage");
+        || layerTransform.f + source.height * scale < height - 1e-6)) return hide("pass-coverage");
       const revision = saved?.revision ?? (revisions.get(name) || 0);
       passSnapshots.set(name, { width: source.width, height: source.height, reference: { ...reference }, layout: { ...layout }, revision });
       layers.push({ name: saved?.textureName || name, ...(retain ? { retained: true } : { canvas: source }), revision,
-        transform: layerTransform,
+        transform: layerTransform, clip,
       });
     }
     const start = performance.now();
     try {
       const reservedTextureBytes = politicalGpu.getStats().gpuTextureBytes;
-      if (compositor.render({ width, height, layers, reservedTextureBytes, preserveLayers: usingOverview }) === false) throw new Error("compositor rejected frame");
+      if (compositor.render({ width, height, layers, reservedTextureBytes, preserveLayers: usingOverview || composedWithOverview }) === false) throw new Error("compositor rejected frame");
       if (!retain && publicationPreparation) {
         compositor.cancelPreparedLayers?.();
         publicationPreparation = { snapshot: snapshotPublication(transform), status: "consumed" };
@@ -342,7 +387,7 @@ export function createTnoRasterSceneOwner({
       lastFrameMs: stats.lastFrameMs || 0, totalFrameMs, fallbackReason, view: view ? { ...view } : null,
       presentationState: active ? lastPresentationState : "unavailable",
       publishedEpoch: published?.frame?.epoch ?? null, publications, retainedFrames,
-      usingOverview, overviewReady: !!overview,
+      usingOverview, composedWithOverview, overviewReady: !!overview,
       publicationPending: ["pending", "ready"].includes(publicationPreparation?.status), preparationError,
       preparedPassCount: stats.preparedPassCount || 0, preparedBytes: stats.preparedBytes || 0,
       privateTextureBytes: stats.privateTextureBytes || 0, maxUploadTaskMs: stats.maxUploadTaskMs || 0,
