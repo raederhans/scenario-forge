@@ -487,11 +487,14 @@ def family_palette(parent_hex, count, hue_span=5.0, lightness_width=0.16, max_di
     return ["#%02x%02x%02x" % tuple(round(min(1, max(0, c)) * 255) for c in oklab_to_rgb(lab)) for lab in chosen]
 
 
+BATCH7_TAGS = set("DEE TRH CIH MLN GEM GLG YSH LHJ ABY SHW HDM MHA YUK NWT GGY JEY IOM HRD SUB NTR CAM LAO AAT ROS QML ATA".split())
+
+
 def harmonize_family_colors(entries):
     colors_by_scenario = {}
     for scenario, countries in (("hoi4_1936", C36), ("hoi4_1939", C39)):
         parent_of = {tag: country["parent_owner_tag"] for tag, country in countries.items()
-                     if country.get("parent_owner_tag")}
+                     if country.get("parent_owner_tag") and tag not in BATCH7_TAGS}
         applicable = [e for e in entries if scenario in e["scenarios"]]
         for e in applicable:
             if e.get("parent_owner_tag"):
@@ -512,11 +515,15 @@ def harmonize_family_colors(entries):
             palette = family_palette(colour[parent], len(children), **WIDE_FAMILIES.get(parent, {}))
             for child, hex_color in zip(children, palette):
                 colour[child] = hex_color
+        colour.update({tag: country["color_hex"] for tag, country in countries.items()})
+        for old, current in (("GF", "CAY"), ("GP", "GDL"), ("MQ", "MTQ")):
+            if current in countries:
+                colour[old] = countries[current]["color_hex"]
         colors_by_scenario[scenario] = {tag: colour[tag] for tag in parent_of}
         entry_tags = {e["tag"] for e in applicable}
         for tag in sorted(set(parent_of) - entry_tags):
             entries.append({"id": f"{tag.lower()}_family_colour_{scenario}", "scenarios": [scenario], "tag": tag,
-                            "select": {"owners": [tag]}, "only_from_owners": [tag]})
+                            "select": {"owners": [tag]}, "only_from_owners": [tag], "cores": "keep"})
     colored_entries = []
     for e in entries:
         colors = {scenario: colors_by_scenario[scenario].get(e["tag"], e.get("color_hex"))
@@ -777,6 +784,67 @@ for old, tag, en, zh in [
 E.append({"id": "china_enclaves_1939", "scenarios": Y39,
           "smooth_enclaves": {"tags": ["CHI", "SHX", "PRC", "NCP", "CNZ", "JBZ", "MEN", "RGC", "JCC", "JSC", "JCJ", "THG"],
                               "max_area_km2": 3000}})
+
+for tag, en, zh, parent, kind, numbers, color in [
+    ("DEE", "Derge Chiefdom", "德格土司", "SIC", "tusi", "74822957782790", "#405a89"),
+    ("TRH", "Hor Chiefdoms Debug Region", "霍尔诸部调试区", "SIC", "tusi", "41775887521063 11052099771689 35412891437316", "#607aa4"),
+    ("CIH", "Cheli Pacification Commission", "车里宣慰司", "YUN", "tusi", "39835801597087 3387618125304 56639900099930", "#445183"),
+    ("MLN", "Menglian Pacification Commission", "孟连宣抚司", "YUN", "tusi", "37558107040134", "#6976a5"),
+    ("GEM", "Gengma Pacification Commission", "耿马宣抚司", "YUN", "tusi", "8449177634457", "#71638f"),
+    ("GLG", "Golok Tribes Debug Region", "果洛诸部调试区", "QMA", "autonomous_region", "82919928587081 66695118162266 1787117911325 28481452848090 2182407224263 52151949988531", "#82894b"),
+    ("YSH", "Yushu Tribes Debug Region", "玉树诸部调试区", "QMA", "autonomous_region", "66736115774382 19636254999944 27939254726366 13951895453383 24277287807877 94078824919955", "#a1a969"),
+]:
+    add("batch7_" + tag.lower(), B, tag, en, zh, FI(*CN(numbers)), parent=parent, kind=kind,
+        only=[parent], cores="keep", color=color,
+        notes="Modern county boundaries approximate the regional grouping. " +
+              ("Maqin/Dawu is a debug anchor, not the historical capital of a unified polity; the parent denotes regional organization, not complete control."
+               if tag == "GLG" else "The marked seat is a reviewed administrative/debug anchor."))
+for tag, en, zh, parent, fid, color in [
+    ("LHJ", "Lahij and Western States", "拉赫季及西部诸邦", "WDN", "YEM-157", "#bd536a"),
+    ("ABY", "Abyan States Debug Region", "阿比扬诸邦调试区", "WDN", "YEM-3511", "#ce7185"),
+    ("SHW", "Shabwah States Debug Region", "沙卜瓦诸邦调试区", "WDN", "YEM-336", "#a84161"),
+    ("HDM", "Hadramawt States Debug Region", "哈德拉毛诸邦调试区", "EDN", "YEM-3497", "#d88b9d"),
+    ("MHA", "Mahra Sultanate", "马赫拉苏丹国", "EDN", "YEM-332", "#b7617c"),
+]:
+    add("batch7_" + tag.lower(), B, tag, en, zh, FI(fid), parent=parent, kind="protectorate",
+        only=[parent], cores="keep", color=color,
+        notes="Regional approximation of multiple protectorate states; not exact historical boundaries. Socotra remains in the Hadramawt parcel.")
+for tag, en, zh, parent, kind, ids, color, note in [
+    ("YUK", "Yukon Territory", "育空领地", "CAN", "territory", ["CA_FED_60001"], "#c96a79", "Dawson is the territorial capital."),
+    ("NWT", "Northwest Territories", "西北领地", "CAN", "territory", ["CA_FED_61001", "CA_FED_62001"], "#a44b62", "Administered from Ottawa, outside the territory; no in-territory capital. Includes modern Nunavut."),
+    ("GGY", "Bailiwick of Guernsey", "根西王室属地", "ENG", "crown_dependency", ["GG"], "#ce6379", None),
+    ("JEY", "Bailiwick of Jersey", "泽西王室属地", "ENG", "crown_dependency", ["JE"], "#b94a68", None),
+    ("IOM", "Isle of Man", "马恩岛王室属地", "ENG", "crown_dependency", ["IM"], "#de8b9d", None),
+    ("HRD", "Heard Island and McDonald Islands", "赫德岛与麦克唐纳群岛", "ENG", "territory", ["HM"], "#aa526a", "British dependency before transfer to Australia; uninhabited, no capital."),
+    ("SUB", "Subic Naval Reservation", "苏比克海军保留地", "USA", "military_administration", ["PHL-5540"], "#657fa9", "Olongapo is the naval administration anchor."),
+    ("NTR", "Northern Territory", "北领地", "AST", "territory", ["AU_ADM1_AUS-2650"], "#b88269", None),
+]:
+    source = "AST" if tag == "HRD" else parent
+    add("batch7_" + tag.lower(), B, tag, en, zh, FI(*ids), parent=parent, kind=kind,
+        only=[source], cores="keep", color=color, notes=note)
+for tag in ("ALK", "HAW"):
+    add("batch7_" + tag.lower(), B, tag, None, None, {"owners": [tag]}, parent="USA",
+        kind="territory", only=[tag], cores="keep")
+for tag, en, zh, cc, color in [("CAM", "Protectorate of Cambodia", "柬埔寨保护国", "KH", "#687caf"),
+                               ("LAO", "Protectorate of Laos", "老挝保护国", "LA", "#8596c4")]:
+    add("batch7_" + tag.lower(), B, tag, en, zh, CC(cc), parent="VIN", kind="protectorate",
+        only=["VIN"], cores="keep", color=color)
+for scenarios, parent in [(Y36, "ENG"), (Y39, "AST")]:
+    add("batch7_aat_" + scenarios[0], scenarios, "AAT", "Australian Antarctic Territory", "澳大利亚南极领地",
+        FI("AQ_AAT_EAST", "AQ_AAT_WEST"), parent=parent, kind="territory", only=["ENG"], cores="keep", color="#c68b91",
+        notes="Claim/administrative approximation; Australian transfer effective 24 August 1936. No permanent capital.")
+add("batch7_ros", B, "ROS", "Ross Dependency", "罗斯属地", FI("AQ_ROSS"), parent="NZL", kind="territory",
+    only=["ENG"], cores="keep", color="#b98a95", notes="New Zealand-administered claim since 1923; no permanent capital.")
+add("batch7_adelie", B, "MAD", None, None, FI("AQ_ADELIE"), only=["ENG"], cores="keep",
+    notes="Includes Adelie Land, administered through Madagascar; Antarctic claim approximation.")
+add("batch7_qml", Y39, "QML", "Queen Maud Land", "毛德皇后地", FI("AQ_QML"), parent="NOR", kind="territory",
+    only=["ENG"], cores="keep", color="#b57779", notes="Norwegian claim from 14 January 1939; no permanent capital.")
+for scenarios, ids in [(Y36, ["AQ_QML", "AQ_MARIE_BYRD", "AQ_PEN_WEST"]), (Y39, ["AQ_MARIE_BYRD", "AQ_PEN_WEST"])]:
+    add("batch7_ata_" + scenarios[0], scenarios, "ATA", "Unclaimed Antarctic Debug Region", "南极未主张调试区",
+        FI(*ids), only=["ENG"], cores="keep", color="#b9c2cc", notes="Neutral debug grouping; no parent or permanent capital.")
+add("batch7_falkland_dependencies", B, "FLK", None, None,
+    FI("AQ_PEN_EAST", "AQ_PEN_OVERLAP_CORE", "AQ_PEN_OVERLAP_EAST", "AQ_PEN_OVERLAP_WEST"),
+    only=["ENG"], cores="keep", notes="Includes Falkland Islands Dependencies Antarctic claims, approximated by existing sectors; not a statement of international recognition.")
 
 ids = [e["id"] for e in E]
 assert len(ids) == len(set(ids)), "duplicate ids"
