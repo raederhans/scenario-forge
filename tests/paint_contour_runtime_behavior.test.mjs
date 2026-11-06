@@ -860,3 +860,34 @@ test('coast follows the retained classification across rebuilds and resets with 
   assert.equal(h.runtime.getClassification(), null);
   assert.equal(h.runtime.getCoastMesh(), null);
 });
+
+test('coverage-only shell fills close inland gaps without becoming coast or borders', async () => {
+  const shell = { ...rect('SHELL', 1), shell: true };
+  const land = () => [rect('A', 0).geometry, shell.geometry, rect('B', 2).geometry];
+  // Vertical steps at x=1 or x=2 lie between parcels and the shell, never on the outer coast.
+  const inlandCoast = coast => coast.coordinates.flatMap(line => line.slice(1)
+    .filter((point, index) => point[0] === line[index][0] && (point[0] === 1 || point[0] === 2)));
+  const setup = options => {
+    const h = harness({ resolveClassification: (_feature, id) => ({ borderKey: id, parentKey: '', provinceKey: '' }),
+      getWaterMaskSources: () => ({ land: land() }), ...options });
+    h.state.land = [h.a, shell, rect('B', 2)];
+    h.colors.SHELL = '#0000ff'; h.owners.SHELL = 'SHELL';
+    return h;
+  };
+
+  const excluded = setup({ isEligible: f => !f.shell });
+  excluded.runtime.getClassification(); await excluded.flush(); await excluded.finish();
+  assert.ok(inlandCoast(excluded.runtime.getCoastMesh()).length > 0, 'gap edges become coast without the shell');
+
+  const h = setup({ isCoverageOnly: f => !!f.shell });
+  h.runtime.getClassification(); await h.flush(); await h.finish();
+  assert.deepEqual(inlandCoast(h.runtime.getCoastMesh()), []);
+  assert.ok(h.runtime.getCoastMesh().coordinates.length, 'the outer coast is still drawn');
+  const classification = h.runtime.getClassification();
+  assert.deepEqual([classification.country.length, classification.paint.length,
+    classification.parent.size, classification.province.size, classification.local.size], [0, 0, 0, 0, 0]);
+
+  h.state.activeScenarioId = '';
+  h.runtime.getMeshes(); await h.flush(); await h.finish();
+  assert.deepEqual(h.runtime.getMeshes(), [], 'shell paint never draws a contour against its neighbours');
+});

@@ -45,6 +45,9 @@ function* sameContourGeometry(left, right) {
 }
 export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   isEligible = () => true, resolveColor, onChange = () => {},
+  // Coverage-only features (scenario shell fills) join the geometry so their
+  // land is not mistaken for coast, but never resolve a color or border key.
+  isCoverageOnly = () => false,
   resolveBoundaryKey = () => null,
   getBoundaryRevision = () => 0,
   separatePoliticalBorders = () => false,
@@ -160,17 +163,22 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   function createView() {
     coastMesh = acknowledgedGraph.coast ? createPackedLineMesh(acknowledgedGraph.coast) : null;
     classified = shouldClassify();
+    const paintable = id => {
+      const feature = featuresById.get(id);
+      return feature && !isCoverageOnly(feature, id) ? feature : null;
+    };
     view = classified
       ? createBorderClassification(acknowledgedGraph, id => {
-        const feature = featuresById.get(id);
-        return { ...resolveClassification(feature, id), color: resolveColor(feature, id) };
+        const feature = paintable(id);
+        return feature ? { ...resolveClassification(feature, id), color: resolveColor(feature, id) }
+          : { borderKey: '', parentKey: '', provinceKey: '', color: null };
       }, { isArcEligible })
       : createPaintContourMesh(acknowledgedGraph, id => {
-        const feature = featuresById.get(id);
+        const feature = paintable(id);
         return feature ? resolveColor(feature, id) : null;
       }, {
         resolveBoundaryKey: id => {
-          const feature = featuresById.get(id);
+          const feature = paintable(id);
           return feature ? resolveBoundaryKey(feature, id) : null;
         },
         separatePoliticalBorders,
