@@ -497,3 +497,104 @@ class OverlayExtensionTests(unittest.TestCase):
         del self.rule["parent_owner_tag"]
         with self.assertRaisesRegex(ValueError, "parent_owner_tag"):
             self.apply(presentation="parent_merged", color_hex="#abcdef")
+
+
+@pytest.mark.parametrize("scenario", ["hoi4_1936", "hoi4_1939"])
+def test_batch7_exact_ownership_cores_and_replay(inputs, scenario):
+    root = Path(__file__).resolve().parents[1]
+    rules = json.loads((root / "data/scenario-rules/hoi4_split_overlay.json").read_text(encoding="utf-8"))
+    rules["entries"] = [e for e in rules["entries"] if e["id"].startswith("batch7_")]
+    expected = {}
+    originals = {}
+    southwest = {
+        "DEE": ("SIC", "74822957782790"),
+        "TRH": ("SIC", "41775887521063 11052099771689 35412891437316"),
+        "CIH": ("YUN", "39835801597087 3387618125304 56639900099930"),
+        "MLN": ("YUN", "37558107040134"),
+        "GEM": ("YUN", "8449177634457"),
+        "GLG": ("QMA", "82919928587081 66695118162266 1787117911325 28481452848090 2182407224263 52151949988531"),
+        "YSH": ("QMA", "66736115774382 19636254999944 27939254726366 13951895453383 24277287807877 94078824919955"),
+    }
+    for tag, (parent, numbers) in southwest.items():
+        for number in numbers.split():
+            fid = "CN_CITY_17275852B" + number
+            expected[fid], originals[fid] = tag, parent
+    assert len(expected) == 21
+    for parent, tag, ids in [
+        ("WDN", "LHJ", ["YEM-157"]), ("WDN", "ABY", ["YEM-3511"]),
+        ("WDN", "SHW", ["YEM-336"]), ("EDN", "HDM", ["YEM-3497"]),
+        ("EDN", "MHA", ["YEM-332"]), ("CAN", "YUK", ["CA_FED_60001"]),
+        ("CAN", "NWT", ["CA_FED_61001", "CA_FED_62001"]),
+        ("ENG", "GGY", ["GG"]), ("ENG", "JEY", ["JE"]), ("ENG", "IOM", ["IM"]),
+        ("AST", "HRD", ["HM"]), ("USA", "SUB", ["PHL-5540"]),
+        ("AST", "NTR", ["AU_ADM1_AUS-2650"]),
+        ("ENG", "AAT", ["AQ_AAT_EAST", "AQ_AAT_WEST"]),
+        ("ENG", "ROS", ["AQ_ROSS"]), ("ENG", "MAD", ["AQ_ADELIE"]),
+        ("ENG", "ATA" if scenario == "hoi4_1936" else "QML", ["AQ_QML"]),
+        ("ENG", "ATA", ["AQ_MARIE_BYRD", "AQ_PEN_WEST"]),
+        ("ENG", "FLK", ["AQ_PEN_EAST", "AQ_PEN_OVERLAP_CORE", "AQ_PEN_OVERLAP_EAST", "AQ_PEN_OVERLAP_WEST"]),
+    ]:
+        for fid in ids:
+            expected[fid], originals[fid] = tag, parent
+    originals.update({"CN_CITY_17275852B99290886399570": "QMA", "CN_CITY_17275852B51096101365561": "MAN",
+                      "AU_ADM1_AUS-2653": "AST", "YEM-334": "YEM", "GF_PRIMARY": "CAY",
+                      "YEM-3510": "RAJ" if scenario == "hoi4_1936" else "ADN",
+                      "alaska": "ALK", "hawaii": "HAW", "cambodia": "VIN", "laos": "VIN", "vietnam": "VIN"})
+    expected.update(cambodia="CAM", laos="LAO")
+    inputs.update(features={fid: {"id": fid, "cntr_code": {"cambodia": "KH", "laos": "LA", "vietnam": "VN"}.get(fid, "CN")} for fid in originals},
+                  owners=originals.copy(), cores={fid: [owner] for fid, owner in originals.items()},
+                  countries={tag: {"tag": tag, "color_hex": "#c94a6a"} for tag in set(originals.values()) | {"NZL", "NOR", "MAD", "FLK"}},
+                  hierarchy_groups={}, prefectures={}, plans=[], bucket_by_feature={})
+    countries, assignments, report = apply_overlay(rules, scenario, **inputs)
+    assert {fid: a["owner"] for fid, a in assignments.items()} == expected
+    assert all(a["cores"] == [originals[fid]] for fid, a in assignments.items())
+    assert countries["AAT"]["parent_owner_tag"] == ("ENG" if scenario == "hoi4_1936" else "AST")
+    assert not countries["ATA"].get("parent_owner_tag")
+    assert {countries[t]["subject_kind"] for t in ("ALK", "HAW")} == {"territory"}
+    assert {countries[t]["parent_owner_tag"] for t in ("CAM", "LAO")} == {"VIN"}
+    inputs["countries"] = countries
+    inputs["owners"].update({fid: a["owner"] for fid, a in assignments.items()})
+    repeated, assignments, report = apply_overlay(rules, scenario, **inputs)
+    assert assignments == {}
+    assert report["changed_count"] == 0
+    assert repeated == countries
+    assert not set(inputs["owners"].values()) & {"WDN", "EDN"}
+    assert {"WDN", "EDN"} <= countries.keys()
+
+
+@pytest.mark.parametrize("scenario", ["hoi4_1936", "hoi4_1939", "tno_1962", "modern_world"])
+def test_landless_parent_container_metadata_survives_replay(inputs, scenario):
+    rules = [
+        entry({"country_codes": ["CA"]}, id="parent", tag="CAN", parent_owner_tag="ENG",
+              only_from_owners=["CAN"], scenarios=[scenario]),
+        entry({"country_codes": ["CA"]}, id="child", tag="NFL", parent_owner_tag="CAN",
+              only_from_owners=["CAN"], cores="keep", scenarios=[scenario]),
+    ]
+    countries, assignments, _ = apply(inputs, *rules, scenario=scenario)
+    assert countries["CAN"]["entry_kind"] == "scenario_container"
+    inputs["countries"] = countries
+    inputs["owners"].update({fid: row["owner"] for fid, row in assignments.items()})
+    inputs["cores"].update({fid: row["cores"] for fid, row in assignments.items()})
+    repeated, assignments, report = apply(inputs, *rules, scenario=scenario)
+    assert repeated == countries
+    assert assignments == {}
+    assert report["changed_count"] == 0
+    assert report["retired_tags"] == []
+
+
+def test_owner_selected_colour_entries_follow_the_entries_that_create_their_territory():
+    # A colour-only entry selects its tag by owner; on a fresh build the tag owns
+    # nothing until its territory entry (e.g. panama_canal_zone -> PCZ) has run.
+    overlay = json.loads((Path(__file__).resolve().parents[1] / "data/scenario-rules/hoi4_split_overlay.json").read_text(encoding="utf-8"))
+    first_creator = {}
+    for index, entry in enumerate(overlay["entries"]):
+        tag, select = entry.get("tag"), entry.get("select", {})
+        if tag and select.get("owners") != [tag]:
+            for scenario in entry["scenarios"]:
+                first_creator.setdefault((tag, scenario), index)
+    for index, entry in enumerate(overlay["entries"]):
+        tag = entry.get("tag")
+        if "_family_colour_" in entry["id"]:
+            for scenario in entry["scenarios"]:
+                creator = first_creator.get((tag, scenario))
+                assert creator is None or creator < index, (entry["id"], scenario)

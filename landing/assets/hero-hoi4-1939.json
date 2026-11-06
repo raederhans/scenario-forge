@@ -34,12 +34,12 @@
     "data/scenarios/hoi4_1939/capital_hints.json"
   ],
   "feature_counts": {
-    "territories": 41,
+    "territories": 44,
     "political_features": 5398,
     "capitals": 8
   },
   "counts": {
-    "territories": 41,
+    "territories": 44,
     "political_features": 5398,
     "capitals": 8
   },
@@ -60,11 +60,14 @@
     "FRA",
     "FRO",
     "GER",
+    "GGY",
     "GRE",
     "HOL",
     "HUN",
+    "IOM",
     "IRE",
     "ITA",
+    "JEY",
     "KRL",
     "LAT",
     "LIE",
