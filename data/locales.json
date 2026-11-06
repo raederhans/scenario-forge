@@ -298088,7 +298088,7 @@
     },
     "Notes": {
       "en": "Notes",
-      "zh": "备注"
+      "zh": "说明"
     },
     "ORG": {
       "en": "ORG",
@@ -303817,6 +303817,22 @@
     "Political & borders": {
       "en": "Political & borders",
       "zh": "政治与边界"
+    },
+    "Bathymetry details": {
+      "en": "Bathymetry details",
+      "zh": "测深细节"
+    },
+    "Local adjustment: depth field": {
+      "en": "Local adjustment: depth field",
+      "zh": "局部调整：深度场"
+    },
+    "Local adjustment: glow field": {
+      "en": "Local adjustment: glow field",
+      "zh": "局部调整：辉光场"
+    },
+    "More options": {
+      "en": "More options",
+      "zh": "更多选项"
     }
   }
 }
