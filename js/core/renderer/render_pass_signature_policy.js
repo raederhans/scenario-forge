@@ -182,6 +182,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       Number(runtimeState.contextLayerRevision || 0),
       Number(transform?.k || runtimeState.zoomTransform?.k || 1).toFixed(4),
       stableJson(normalizeUrbanStyleConfig(runtimeState.styleConfig?.urban || {})),
+      `glow:${Number(normalizeIntensityFieldsState(runtimeState.intensityFields)?.channels?.urbanGlow?.revision || 0)}`,
     ].join(":");
   }
 

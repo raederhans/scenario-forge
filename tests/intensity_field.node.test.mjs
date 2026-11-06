@@ -37,9 +37,9 @@ test("intensity field channel registry exposes urban glow target passes", () => 
   const fields = createIntensityFieldsState();
   const passes = getIntensityFieldTargetPasses("urbanGlow");
 
-  assert.deepEqual(passes, ["contextBase", "dayNight"]);
+  assert.deepEqual(passes, ["contextBase", "dayNight", "contextScenario"]);
   passes.push("mutated");
-  assert.deepEqual(getIntensityFieldTargetPasses("urbanGlow"), ["contextBase", "dayNight"]);
+  assert.deepEqual(getIntensityFieldTargetPasses("urbanGlow"), ["contextBase", "dayNight", "contextScenario"]);
   assert.equal(INTENSITY_FIELD_CHANNELS.urbanGlow.applyMode, "featureMultiplier");
   assert.equal(fields.channels.urbanGlow.enabled, false);
   assert.equal(fields.channels.urbanGlow.revision, 0);

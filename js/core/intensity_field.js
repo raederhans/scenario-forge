@@ -23,7 +23,8 @@ export const INTENSITY_FIELD_CHANNELS = Object.freeze({
   }),
   urbanGlow: Object.freeze({
     id: "urbanGlow",
-    targetPasses: Object.freeze(["contextBase", "dayNight"]),
+    // contextScenario carries urban supplements drawn above scenario land.
+    targetPasses: Object.freeze(["contextBase", "dayNight", "contextScenario"]),
     applyMode: "featureMultiplier",
     label: "Glow",
   }),
