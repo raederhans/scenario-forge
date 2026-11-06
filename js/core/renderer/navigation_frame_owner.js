@@ -330,16 +330,15 @@ export function createNavigationFrameOwner({
         };
       }
     }
-    // Decide before any destination mutation. A sharp regional crop can stand
-    // alone only when it covers every target pixel; world blur cannot fill gaps.
-    if (!worldQualityOK && !detail?.coversViewport) {
+    if (!worldQualityOK && !detail) {
       recordMetric("navigationFrameReject", 0, {
         reason: "raster-quality", worldMagnification,
         detailQualityOK: Boolean(detail), detailCoversViewport: Boolean(detail?.coversViewport),
       });
       return false;
     }
-    const detailOnly = !worldQualityOK;
+    const detailOnly = !worldQualityOK && detail.coversViewport;
+    const edgeFilledByWorld = !worldQualityOK && !detailOnly;
     context.save();
     try {
       context.setTransform(1, 0, 0, 1, 0, 0);
@@ -348,7 +347,7 @@ export function createNavigationFrameOwner({
       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
       context.fillStyle = backgroundColor;
       context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-      if (worldQualityOK) {
+      if (!detailOnly) {
         context.setTransform(worldScaleX, 0, 0, worldScaleY, worldOffsetX, worldOffsetY);
         context.drawImage(canvas, 0, 0);
       }
@@ -361,7 +360,7 @@ export function createNavigationFrameOwner({
     }
     recordMetric("navigationFrameReuse", 0, {
       targetK: transform.k, detail: Boolean(detail), detailOnly,
-      worldMagnification, worldQualityOK,
+      worldMagnification, worldQualityOK, edgeFilledByWorld,
       detailCssScaleRatio: detail?.ratio ?? null,
       detailDevicePixelMagnification: detail?.magnification ?? null,
     });
